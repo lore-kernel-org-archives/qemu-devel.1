@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52960)
+Received: from eggs.gnu.org ([209.51.188.92]:53110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gwpkR-0002Ip-9R
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:54:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gwpl9-0002iM-ET
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:55:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gwpkJ-0006Pr-UY
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:54:48 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41802)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gwpkJ-0006Oa-60
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:54:43 -0500
-Received: by mail-wr1-x444.google.com with SMTP id n2so18602181wrw.8
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 06:54:43 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gwpl8-00071Z-5z
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:55:35 -0500
+Date: Thu, 21 Feb 2019 15:55:19 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190221155519.5f199561@redhat.com>
+In-Reply-To: <20190220031557.26293-2-richardw.yang@linux.intel.com>
+References: <20190220031557.26293-1-richardw.yang@linux.intel.com>
+	<20190220031557.26293-2-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-References: <20190221110703.5775-1-marcandre.lureau@redhat.com>
-	<20190221110703.5775-12-marcandre.lureau@redhat.com>
-	<20190221132352.f66y5qljs7q4dmse@sirius.home.kraxel.org>
-	<CAJ+F1CJrfnqaeHcMveNzRUavmyxLpCRxfeertfV9SrH6-Vd86Q@mail.gmail.com>
-	<20190221143923.7k7fjyu64mcv4sdd@sirius.home.kraxel.org>
-In-Reply-To: <20190221143923.7k7fjyu64mcv4sdd@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 21 Feb 2019 15:54:30 +0100
-Message-ID: <CAJ+F1C+Kj5+J_-TXBmmGxzNOf_ehJ2xDzBAQoE8vjmUJJAChZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 11/11] display: add -display spice-app
- launching a Spice client
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] CODING_STYLE: specify the indent
+ rule for multiline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, mjt@tls.msk.ru, philmd@redhat.com, eblake@redhat.com, peter.maydell@linaro.org
 
-Hi
+On Wed, 20 Feb 2019 11:15:56 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
 
-On Thu, Feb 21, 2019 at 3:39 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
->   Hi,
->
-> > > Hmm, not working on RHEL-7:
-> > >
-> > >   qemu-system-x86_64: Failed to launch spice+unix:///tmp/.QON7WZ/spic=
-e.sock URI: The specified location is not supported
-> > >
-> > > virt-viewer + remote-viewer are installed.
-> > >
-> > > any clue?
-> >
-> > 5 months old patch, not event released yet :( but virt-viewer should
-> > have a release very soon hopefully
-> >
-> > https://pagure.io/virt-viewer/c/c4f6142f15c4e51cbf427f5f1bf1fc6ac0e10d8=
-8?branch=3Dmaster
-> >
-> > thanks
->
-> Too bad.  So broken for pretty much everyone I guess?
+> We didn't specify the indent rule for multiline code here, which may
+> mislead users. And in current code, the code use different rules.
+> 
+> Add this rule in CODING_STYLE to make sure this is clear to every one.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> v3:
+>    * misleading -> mislead
+>    * add comma after arg2 in example
+> v2:
+>    * rephrase changelog suggested by Eric Blake
+>      - remove one redundant line
+>      - fix some awkward grammar
+>      - add { ; at the end of example
+> 
+> c1
+> ---
+>  CODING_STYLE | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/CODING_STYLE b/CODING_STYLE
+> index ec075dedc4..1359f9ab81 100644
+> --- a/CODING_STYLE
+> +++ b/CODING_STYLE
+> @@ -29,6 +29,29 @@ Spaces of course are superior to tabs because:
+>  
+>  Do not leave whitespace dangling off the ends of lines.
+>  
+> +1.1 Multiline Indent
+> +
+> +There are several places where indent is necessary:
+> +
+> + - struct definition
+> + - if/else
+> + - while/for
+> + - function definition & call
+> +
+> +When breaking up a long line to fit within line widths, align the secondary
+s/widths/width/
 
-It should be easy to backport the patch for older virt-viewer.
+> +lines just after the opening parenthesis of the first.
+> +
+> +For example:
+> +
+> +    if (a == 1 &&
+> +        b == 2) {
+> +
+> +    while (a == 1 &&
+> +           b == 2) {
+> +
+> +    do_something(arg1, arg2,
+> +                 arg3);
+> +
 
-But to get the "complete" experience, I would recommend you use the
-upcoming virt-viewer. Without it, you won't have the QMP monitor
-handling, VTE serial console, etc..
+there is also another widely used acceptable pattern
+  func_name(arg1, arg2,
+      arg3)
 
-> I think we should have a fallback which exec's remote-viewer then, for
-> the next 2-3 years, until a fixed virt-viewer is in widespread use ...
+where we indent relative to function name start
+(sound weird to me but I'm not sure how to word it properly)
 
-I am not sure, I think it make sense to require the upcoming
-virt-viewer instead.
-
-After all, if you use a bleeding edge qemu, you can use bleeding edge
-virt-viewer, no?
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+>  2. Line width
+>  
+>  Lines should be 80 characters; try not to make them longer.
