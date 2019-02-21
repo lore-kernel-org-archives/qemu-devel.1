@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52165)
+Received: from eggs.gnu.org ([209.51.188.92]:52180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwtXq-0008UB-Nm
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gwtXr-0008Ue-4v
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwtXp-0007SX-3N
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:06 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36612)
+	(envelope-from <peter.maydell@linaro.org>) id 1gwtXo-0007S7-Uc
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:07 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:36024)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gwtXo-0007Nr-HG
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:04 -0500
-Received: by mail-wm1-x343.google.com with SMTP id j125so10314088wmj.1
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:57:58 -0800 (PST)
+	id 1gwtXn-0007Kt-20
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:03 -0500
+Received: by mail-wr1-x432.google.com with SMTP id o17so31822916wrw.3
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:57:53 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	c18sm29065085wre.32.2019.02.21.10.57.56 for <qemu-devel@nongnu.org>
+	c18sm29065085wre.32.2019.02.21.10.57.50 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 21 Feb 2019 10:57:57 -0800 (PST)
+	Thu, 21 Feb 2019 10:57:51 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Feb 2019 18:57:30 +0000
-Message-Id: <20190221185739.25362-13-peter.maydell@linaro.org>
+Date: Thu, 21 Feb 2019 18:57:25 +0000
+Message-Id: <20190221185739.25362-8-peter.maydell@linaro.org>
 In-Reply-To: <20190221185739.25362-1-peter.maydell@linaro.org>
 References: <20190221185739.25362-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/21] hw/char/pl011: Support all interrupt lines
+Subject: [Qemu-devel] [PULL 07/21] target/arm: Implement ARMv8.3-JSConv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,122 +35,264 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The PL011 UART has six interrupt lines:
- * RX (receive data)
- * TX (transmit data)
- * RT (receive timeout)
- * MS (modem status)
- * E (errors)
- * combined (logical OR of all the above)
+From: Richard Henderson <richard.henderson@linaro.org>
 
-So far we have only emulated the combined interrupt line;
-add support for the others, so that boards that wire them
-up to different interrupt controller inputs can do so.
-
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190215192302.27855-5-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PMM: fixed a couple of comment typos]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/hw/char/pl011.h |  2 +-
- hw/char/pl011.c         | 46 +++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 45 insertions(+), 3 deletions(-)
+ target/arm/cpu.h           | 10 +++++
+ target/arm/helper.h        |  3 ++
+ target/arm/cpu.c           |  1 +
+ target/arm/cpu64.c         |  2 +
+ target/arm/translate-a64.c | 26 +++++++++++
+ target/arm/translate.c     | 10 +++++
+ target/arm/vfp_helper.c    | 88 ++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 140 insertions(+)
 
-diff --git a/include/hw/char/pl011.h b/include/hw/char/pl011.h
-index 1b52bfd5c90..dad3cf29121 100644
---- a/include/hw/char/pl011.h
-+++ b/include/hw/char/pl011.h
-@@ -45,7 +45,7 @@ typedef struct PL011State {
-     int read_count;
-     int read_trigger;
-     CharBackend chr;
--    qemu_irq irq;
-+    qemu_irq irq[6];
-     const unsigned char *id;
- } PL011State;
- 
-diff --git a/hw/char/pl011.c b/hw/char/pl011.c
-index 0c4711e4027..29f4e5eb224 100644
---- a/hw/char/pl011.c
-+++ b/hw/char/pl011.c
-@@ -7,6 +7,17 @@
-  * This code is licensed under the GPL.
-  */
- 
-+/*
-+ * QEMU interface:
-+ *  + sysbus MMIO region 0: device registers
-+ *  + sysbus IRQ 0: UARTINTR (combined interrupt line)
-+ *  + sysbus IRQ 1: UARTRXINTR (receive FIFO interrupt line)
-+ *  + sysbus IRQ 2: UARTTXINTR (transmit FIFO interrupt line)
-+ *  + sysbus IRQ 3: UARTRTINTR (receive timeout interrupt line)
-+ *  + sysbus IRQ 4: UARTMSINTR (momem status interrupt line)
-+ *  + sysbus IRQ 5: UARTEINTR (error interrupt line)
-+ */
-+
- #include "qemu/osdep.h"
- #include "hw/char/pl011.h"
- #include "hw/sysbus.h"
-@@ -22,18 +33,46 @@
- #define PL011_FLAG_TXFF 0x20
- #define PL011_FLAG_RXFE 0x10
- 
-+/* Interrupt status bits in UARTRIS, UARTMIS, UARTIMSC */
-+#define INT_OE (1 << 10)
-+#define INT_BE (1 << 9)
-+#define INT_PE (1 << 8)
-+#define INT_FE (1 << 7)
-+#define INT_RT (1 << 6)
-+#define INT_TX (1 << 5)
-+#define INT_RX (1 << 4)
-+#define INT_DSR (1 << 3)
-+#define INT_DCD (1 << 2)
-+#define INT_CTS (1 << 1)
-+#define INT_RI (1 << 0)
-+#define INT_E (INT_OE | INT_BE | INT_PE | INT_FE)
-+#define INT_MS (INT_RI | INT_DSR | INT_DCD | INT_CTS)
-+
- static const unsigned char pl011_id_arm[8] =
-   { 0x11, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
- static const unsigned char pl011_id_luminary[8] =
-   { 0x11, 0x00, 0x18, 0x01, 0x0d, 0xf0, 0x05, 0xb1 };
- 
-+/* Which bits in the interrupt status matter for each outbound IRQ line ? */
-+static const uint32_t irqmask[] = {
-+    INT_E | INT_MS | INT_RT | INT_TX | INT_RX, /* combined IRQ */
-+    INT_RX,
-+    INT_TX,
-+    INT_RT,
-+    INT_MS,
-+    INT_E,
-+};
-+
- static void pl011_update(PL011State *s)
- {
-     uint32_t flags;
-+    int i;
- 
-     flags = s->int_level & s->int_enabled;
-     trace_pl011_irq_state(flags != 0);
--    qemu_set_irq(s->irq, flags != 0);
-+    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
-+        qemu_set_irq(s->irq[i], (flags & irqmask[i]) != 0);
-+    }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 84ae6849c2f..1eea1a408b8 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3273,6 +3273,11 @@ static inline bool isar_feature_aa32_vcma(const ARMISARegisters *id)
+     return FIELD_EX32(id->id_isar5, ID_ISAR5, VCMA) != 0;
  }
  
- static uint64_t pl011_read(void *opaque, hwaddr offset,
-@@ -284,10 +323,13 @@ static void pl011_init(Object *obj)
++static inline bool isar_feature_aa32_jscvt(const ARMISARegisters *id)
++{
++    return FIELD_EX32(id->id_isar6, ID_ISAR6, JSCVT) != 0;
++}
++
+ static inline bool isar_feature_aa32_dp(const ARMISARegisters *id)
  {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     PL011State *s = PL011(obj);
-+    int i;
+     return FIELD_EX32(id->id_isar6, ID_ISAR6, DP) != 0;
+@@ -3351,6 +3356,11 @@ static inline bool isar_feature_aa64_dp(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, DP) != 0;
+ }
  
-     memory_region_init_io(&s->iomem, OBJECT(s), &pl011_ops, s, "pl011", 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
--    sysbus_init_irq(sbd, &s->irq);
-+    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
-+        sysbus_init_irq(sbd, &s->irq[i]);
++static inline bool isar_feature_aa64_jscvt(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, JSCVT) != 0;
++}
++
+ static inline bool isar_feature_aa64_fcma(const ARMISARegisters *id)
+ {
+     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, FCMA) != 0;
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 923e8e15255..747cb64d29f 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -218,6 +218,9 @@ DEF_HELPER_FLAGS_2(rintd_exact, TCG_CALL_NO_RWG, f64, f64, ptr)
+ DEF_HELPER_FLAGS_2(rints, TCG_CALL_NO_RWG, f32, f32, ptr)
+ DEF_HELPER_FLAGS_2(rintd, TCG_CALL_NO_RWG, f64, f64, ptr)
+ 
++DEF_HELPER_FLAGS_2(vjcvt, TCG_CALL_NO_RWG, i32, f64, env)
++DEF_HELPER_FLAGS_2(fjcvtzs, TCG_CALL_NO_RWG, i64, f64, ptr)
++
+ /* neon_helper.c */
+ DEF_HELPER_FLAGS_3(neon_qadd_u8, TCG_CALL_NO_RWG, i32, env, i32, i32)
+ DEF_HELPER_FLAGS_3(neon_qadd_s8, TCG_CALL_NO_RWG, i32, env, i32, i32)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index edf6e0e1f1c..8ea6569088d 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2001,6 +2001,7 @@ static void arm_max_initfn(Object *obj)
+             cpu->isar.id_isar5 = t;
+ 
+             t = cpu->isar.id_isar6;
++            t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);
+             t = FIELD_DP32(t, ID_ISAR6, DP, 1);
+             cpu->isar.id_isar6 = t;
+ 
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index eff0f164dd0..69e4134f79f 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -311,6 +311,7 @@ static void aarch64_max_initfn(Object *obj)
+         cpu->isar.id_aa64isar0 = t;
+ 
+         t = cpu->isar.id_aa64isar1;
++        t = FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 1);
+         t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
+         t = FIELD_DP64(t, ID_AA64ISAR1, APA, 1); /* PAuth, architected only */
+         t = FIELD_DP64(t, ID_AA64ISAR1, API, 0);
+@@ -344,6 +345,7 @@ static void aarch64_max_initfn(Object *obj)
+         cpu->isar.id_isar5 = u;
+ 
+         u = cpu->isar.id_isar6;
++        u = FIELD_DP32(u, ID_ISAR6, JSCVT, 1);
+         u = FIELD_DP32(u, ID_ISAR6, DP, 1);
+         cpu->isar.id_isar6 = u;
+ 
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index dbce24fe32c..c56e878787c 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -6526,6 +6526,24 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
+     }
+ }
+ 
++static void handle_fjcvtzs(DisasContext *s, int rd, int rn)
++{
++    TCGv_i64 t = read_fp_dreg(s, rn);
++    TCGv_ptr fpstatus = get_fpstatus_ptr(false);
++
++    gen_helper_fjcvtzs(t, t, fpstatus);
++
++    tcg_temp_free_ptr(fpstatus);
++
++    tcg_gen_ext32u_i64(cpu_reg(s, rd), t);
++    tcg_gen_extrh_i64_i32(cpu_ZF, t);
++    tcg_gen_movi_i32(cpu_CF, 0);
++    tcg_gen_movi_i32(cpu_NF, 0);
++    tcg_gen_movi_i32(cpu_VF, 0);
++
++    tcg_temp_free_i64(t);
++}
++
+ /* Floating point <-> integer conversions
+  *   31   30  29 28       24 23  22  21 20   19 18 16 15         10 9  5 4  0
+  * +----+---+---+-----------+------+---+-------+-----+-------------+----+----+
+@@ -6601,6 +6619,14 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
+             handle_fmov(s, rd, rn, type, itof);
+             break;
+ 
++        case 0b00111110: /* FJCVTZS */
++            if (!dc_isar_feature(aa64_jscvt, s)) {
++                goto do_unallocated;
++            } else if (fp_access_check(s)) {
++                handle_fjcvtzs(s, rd, rn);
++            }
++            break;
++
+         default:
+         do_unallocated:
+             unallocated_encoding(s);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 64c5fe0df3e..c1175798ac9 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -3718,6 +3718,13 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                     rm_is_dp = false;
+                     break;
+ 
++                case 0x13: /* vjcvt */
++                    if (!dp || !dc_isar_feature(aa32_jscvt, s)) {
++                        return 1;
++                    }
++                    rd_is_dp = false;
++                    break;
++
+                 default:
+                     return 1;
+                 }
+@@ -4088,6 +4095,9 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                     case 17: /* fsito */
+                         gen_vfp_sito(dp, 0);
+                         break;
++                    case 19: /* vjcvt */
++                        gen_helper_vjcvt(cpu_F0s, cpu_F0d, cpu_env);
++                        break;
+                     case 20: /* fshto */
+                         gen_vfp_shto(dp, 16 - rm, 0);
+                         break;
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index 74d3030c471..cc7f9f5cb19 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -1086,3 +1086,91 @@ int arm_rmode_to_sf(int rmode)
+     }
+     return rmode;
+ }
++
++/*
++ * Implement float64 to int32_t conversion without saturation;
++ * the result is supplied modulo 2^32.
++ */
++uint64_t HELPER(fjcvtzs)(float64 value, void *vstatus)
++{
++    float_status *status = vstatus;
++    uint32_t exp, sign;
++    uint64_t frac;
++    uint32_t inexact = 1; /* !Z */
++
++    sign = extract64(value, 63, 1);
++    exp = extract64(value, 52, 11);
++    frac = extract64(value, 0, 52);
++
++    if (exp == 0) {
++        /* While not inexact for IEEE FP, -0.0 is inexact for JavaScript.  */
++        inexact = sign;
++        if (frac != 0) {
++            if (status->flush_inputs_to_zero) {
++                float_raise(float_flag_input_denormal, status);
++            } else {
++                float_raise(float_flag_inexact, status);
++                inexact = 1;
++            }
++        }
++        frac = 0;
++    } else if (exp == 0x7ff) {
++        /* This operation raises Invalid for both NaN and overflow (Inf).  */
++        float_raise(float_flag_invalid, status);
++        frac = 0;
++    } else {
++        int true_exp = exp - 1023;
++        int shift = true_exp - 52;
++
++        /* Restore implicit bit.  */
++        frac |= 1ull << 52;
++
++        /* Shift the fraction into place.  */
++        if (shift >= 0) {
++            /* The number is so large we must shift the fraction left.  */
++            if (shift >= 64) {
++                /* The fraction is shifted out entirely.  */
++                frac = 0;
++            } else {
++                frac <<= shift;
++            }
++        } else if (shift > -64) {
++            /* Normal case -- shift right and notice if bits shift out.  */
++            inexact = (frac << (64 + shift)) != 0;
++            frac >>= -shift;
++        } else {
++            /* The fraction is shifted out entirely.  */
++            frac = 0;
++        }
++
++        /* Notice overflow or inexact exceptions.  */
++        if (true_exp > 31 || frac > (sign ? 0x80000000ull : 0x7fffffff)) {
++            /* Overflow, for which this operation raises invalid.  */
++            float_raise(float_flag_invalid, status);
++            inexact = 1;
++        } else if (inexact) {
++            float_raise(float_flag_inexact, status);
++        }
++
++        /* Honor the sign.  */
++        if (sign) {
++            frac = -frac;
++        }
 +    }
- 
-     s->read_trigger = 1;
-     s->ifl = 0x12;
++
++    /* Pack the result and the env->ZF representation of Z together.  */
++    return deposit64(frac, 32, 32, inexact);
++}
++
++uint32_t HELPER(vjcvt)(float64 value, CPUARMState *env)
++{
++    uint64_t pair = HELPER(fjcvtzs)(value, &env->vfp.fp_status);
++    uint32_t result = pair;
++    uint32_t z = (pair >> 32) == 0;
++
++    /* Store Z, clear NCV, in FPSCR.NZCV.  */
++    env->vfp.xregs[ARM_VFP_FPSCR]
++        = (env->vfp.xregs[ARM_VFP_FPSCR] & ~CPSR_NZCV) | (z * CPSR_Z);
++
++    return result;
++}
 -- 
 2.20.1
