@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55718)
+Received: from eggs.gnu.org ([209.51.188.92]:55771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gwlgX-0007xG-Cb
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:34 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gwlgb-00080A-8V
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gwlgV-0004VO-C3
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:33 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gwlgZ-0004ZY-Az
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:37 -0500
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 21 Feb 2019 11:33:13 +0100
-Message-Id: <20190221103314.58500-10-sgarzare@redhat.com>
+Date: Thu, 21 Feb 2019 11:33:14 +0100
+Message-Id: <20190221103314.58500-11-sgarzare@redhat.com>
 In-Reply-To: <20190221103314.58500-1-sgarzare@redhat.com>
 References: <20190221103314.58500-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 09/10] tests/virtio-blk: add test for
- WRITE_ZEROES command
+Subject: [Qemu-devel] [PATCH v6 10/10] tests/virtio-blk: add test for
+ DISCARD command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +25,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-If the WRITE_ZEROES feature is enabled, we check this command
-in the test_basic().
+If the DISCARD feature is enabled, we try this command in the
+test_basic(), checking only the status returned by the request.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- tests/virtio-blk-test.c | 62 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ tests/virtio-blk-test.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 85b6b99adc..f43d971099 100644
+index f43d971099..8d2fc9c710 100644
 --- a/tests/virtio-blk-test.c
 +++ b/tests/virtio-blk-test.c
-@@ -255,6 +255,68 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
+@@ -317,6 +317,33 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
 ocator *alloc,
+         guest_free(alloc, req_addr);
+     }
 =20
-     guest_free(alloc, req_addr);
-=20
-+    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
++    if (features & (1u << VIRTIO_BLK_F_DISCARD)) {
 +        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+        void *expected;
 +
-+        /*
-+         * WRITE_ZEROES request on the same sector of previous test wher=
-e
-+         * we wrote "TEST".
-+         */
-+        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
++        req.type =3D VIRTIO_BLK_T_DISCARD;
 +        req.data =3D (char *) &dwz_hdr;
 +        dwz_hdr.sector =3D 0;
 +        dwz_hdr.num_sectors =3D 1;
@@ -76,36 +68,6 @@ se);
 +                               QVIRTIO_BLK_TIMEOUT_US);
 +        status =3D readb(req_addr + 16 + sizeof(dwz_hdr));
 +        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        guest_free(alloc, req_addr);
-+
-+        /* Read request to check if the sector contains all zeroes */
-+        req.type =3D VIRTIO_BLK_T_IN;
-+        req.ioprio =3D 1;
-+        req.sector =3D 0;
-+        req.data =3D g_malloc0(512);
-+
-+        req_addr =3D virtio_blk_request(alloc, dev, &req, 512);
-+
-+        g_free(req.data);
-+
-+        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
-+        qvirtqueue_add(vq, req_addr + 16, 512, true, true);
-+        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
-+
-+        qvirtqueue_kick(dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status =3D readb(req_addr + 528);
-+        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        data =3D g_malloc(512);
-+        expected =3D g_malloc0(512);
-+        memread(req_addr + 16, data, 512);
-+        g_assert_cmpmem(data, 512, expected, 512);
-+        g_free(expected);
-+        g_free(data);
 +
 +        guest_free(alloc, req_addr);
 +    }
