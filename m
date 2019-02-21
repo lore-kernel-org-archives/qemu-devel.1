@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53887)
+Received: from eggs.gnu.org ([209.51.188.92]:53823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1gwvP5-0004PZ-8c
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:57:12 -0500
+	(envelope-from <philmd@redhat.com>) id 1gwvPQ-0004MO-77
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:57:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1gwvGi-0002LS-RD
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:48:34 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35346)
+	(envelope-from <philmd@redhat.com>) id 1gwvB2-00082m-Ci
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:42:41 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38450)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1gwvGf-0002J3-6X
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:48:30 -0500
-Received: by mail-ot1-x343.google.com with SMTP id z19so46205982otm.2
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 12:48:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gwvB2-0007zc-4k
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:42:40 -0500
+Received: by mail-wm1-f65.google.com with SMTP id v26so10546983wmh.3
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 12:42:34 -0800 (PST)
+References: <20190221184857.22434-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3ba41c9b-05a0-acfe-e621-10f43048c874@redhat.com>
+Date: Thu, 21 Feb 2019 21:42:32 +0100
 MIME-Version: 1.0
-References: <20190221155359.8247-1-davidkiarie4@gmail.com>
-	<aac6b5d0-ecdd-577c-5b38-8c875ea1dffc@redhat.com>
-	<6cdbaddf-57d8-3333-c9a0-7c5f46cecab7@siemens.com>
-In-Reply-To: <6cdbaddf-57d8-3333-c9a0-7c5f46cecab7@siemens.com>
-From: David Kiarie <davidkiarie4@gmail.com>
-Date: Thu, 21 Feb 2019 23:47:44 +0300
-Message-ID: <CABdVeAB=hM_9afvJf3N8K_+kuUMP3-aow6N5__upTWw_Erw3Hw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/1] snip my name and email
+In-Reply-To: <20190221184857.22434-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] hw/block: better reporting on pflash
+ backing file mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: stappers@stappers.nl, lersek@redhat.com, armbru@redhat.com
 
-On Thu, Feb 21, 2019 at 7:09 PM Jan Kiszka <jan.kiszka@siemens.com> wrote:
+Hi Alex,
 
-> On 21.02.19 17:05, Eric Blake wrote:
-> > On 2/21/19 9:53 AM, David Kiarie wrote:
-> >> the occurrence of my name and email on the files below may have led to
-> >> some confusion in the reporting of a few recent bugs.
-> >>
-> >> i have therefore choosen to snip it.
-> >
-> > Dropping an email from the copyright line makes sense; dropping the
-> > Copyright declaration altogether is a bit odd (the GPL works only in
-> > tandem with a copyright assertion) - but as you are the author of the
-> > line and copyright holder of your contributions, I am not in a position
-> > to say you are wrong in removing it, only that it looks odd.
-> >
->
-> Yeah, indeed.
->
-> David, also note that you probably have been addressed because
-> scripts/get_maintainer.pl will look into the git history of files that
-> some
-> patch addresses and pick up significant and/or recent contributors from
-> there.
-> There should be some opt-out statement from that, but I don't recall how.
->
->
-Jan, Eblake, i respect your opinion but i still think my original patch
-would have been best fit for the simple me.
+On 2/21/19 7:48 PM, Alex Bennée wrote:
+> It looks like there was going to be code to check we had some sort of
+> alignment so lets replace it with an actual check. This is a bit more
+> useful than the enigmatic "failed to read the initial flash content"
+> when we attempt to read the number of bytes the device should have.
+> 
+> This is a potential confusing stumbling block when you move from using
+> -bios to using -drive if=pflash,file=blob,format=raw,readonly for
+> loading your firmware code. To mitigate that we automatically pad in
+> the read-only case.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> ---
+> v3
+>   - tweak commit title/commentary
+>   - use total_len instead of device_len for checks
+>   - if the device is read-only do the padding for them
+>   - accept baking_len > total_len (how to warn_report with NULL *errp?)
+> ---
+>  hw/block/pflash_cfi01.c | 28 +++++++++++++++++++++-------
+>  1 file changed, 21 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index 00c2efd0d7..37d7513c45 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -714,13 +714,6 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+>      }
+>      device_len = sector_len_per_device * blocks_per_device;
+>  
+> -    /* XXX: to be fixed */
+> -#if 0
+> -    if (total_len != (8 * 1024 * 1024) && total_len != (16 * 1024 * 1024) &&
+> -        total_len != (32 * 1024 * 1024) && total_len != (64 * 1024 * 1024))
+> -        return NULL;
+> -#endif
+> -
+>      memory_region_init_rom_device(
+>          &pfl->mem, OBJECT(dev),
+>          &pflash_cfi01_ops,
+> @@ -747,6 +740,27 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      if (pfl->blk) {
+> +        /*
+> +         * Validate the backing store is the right size for pflash
+> +         * devices. It should be padded to a multiple of the flash
+> +         * block size. If the device is read-only we can elide the
+> +         * check and just null pad the region first. If the user
+> +         * supplies a larger file we silently accept it.
+> +         */
+> +        uint64_t backing_len = blk_getlength(pfl->blk);
+> +
+> +        if (backing_len < total_len) {
+> +            if (pfl->ro) {
+> +                memset(pfl->storage, 0, total_len);
 
+When you erasing a NOR flash sector, all bits are set to 1.
+Then you can program a word by setting its bits to 0.
+It is not possible to set bits from 0 to 1 on a word boundary,
+it is only possible to set bits to 1 by erasing a whole sector (sector
+boundary).
 
-> Jan
->
-> --
-> Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-> Corporate Competence Center Embedded Linux
->
+The pflash QEMU models are of NOR type (is different for other flash
+technologies).
+If we want to set the padded area to the fabric blank state, we should
+use the NOR flash erased value of 0xff.
+
+> +                total_len = backing_len;
+> +            } else {
+> +                error_setg(errp, "device(s) needs %" PRIu64 " bytes, "
+> +                           "backing file provides only %" PRIu64 " bytes",
+> +                           total_len, backing_len);
+> +                return;
+> +            }
+> +        }
+> +
+>          /* read the initial flash content */
+>          ret = blk_pread(pfl->blk, 0, pfl->storage, total_len);
+>  
+> 
