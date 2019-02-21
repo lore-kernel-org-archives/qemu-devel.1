@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42886)
+Received: from eggs.gnu.org ([209.51.188.92]:45014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwudZ-0005t1-Oi
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:08:06 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gwuk2-0001HO-Ga
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:14:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwudY-0001Kc-PX
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:08:05 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gwudX-0001FK-5X
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:08:04 -0500
-Received: by mail-wm1-x341.google.com with SMTP id x7so10731303wmj.0
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 12:07:53 -0800 (PST)
-References: <20190221184857.22434-1-alex.bennee@linaro.org>
-	<e080ce0b-5b14-ae9c-28c7-8254db3b648a@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <e080ce0b-5b14-ae9c-28c7-8254db3b648a@redhat.com>
-Date: Thu, 21 Feb 2019 20:07:50 +0000
-Message-ID: <87wols3nxl.fsf@zen.linaroharston>
+	(envelope-from <no-reply@patchew.org>) id 1gwuk1-000581-3W
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:14:46 -0500
+Resent-Message-Id: <E1gwuk1-000581-3W@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21081)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gwujy-0004yG-UZ
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:14:44 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155078004698.20641.15996683449224178339@49fa7ef69f7b>
+In-Reply-To: <20190213234907.24173-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] hw/block: better reporting on pflash
- backing file mismatch
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 21 Feb 2019 12:14:08 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/3] Bitmaps patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, stappers@stappers.nl
+To: jsnow@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-
-Laszlo Ersek <lersek@redhat.com> writes:
-
-> On 02/21/19 19:48, Alex Benn=C3=A9e wrote:
->> It looks like there was going to be code to check we had some sort of
->> alignment so lets replace it with an actual check. This is a bit more
->> useful than the enigmatic "failed to read the initial flash content"
->> when we attempt to read the number of bytes the device should have.
->>
->> This is a potential confusing stumbling block when you move from using
->> -bios to using -drive if=3Dpflash,file=3Dblob,format=3Draw,readonly for
->> loading your firmware code. To mitigate that we automatically pad in
->> the read-only case.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> ---
->> v3
->>   - tweak commit title/commentary
->>   - use total_len instead of device_len for checks
->>   - if the device is read-only do the padding for them
->>   - accept baking_len > total_len (how to warn_report with NULL *errp?)
->> ---
->>  hw/block/pflash_cfi01.c | 28 +++++++++++++++++++++-------
->>  1 file changed, 21 insertions(+), 7 deletions(-)
->>
->> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> index 00c2efd0d7..37d7513c45 100644
->> --- a/hw/block/pflash_cfi01.c
->> +++ b/hw/block/pflash_cfi01.c
->> @@ -714,13 +714,6 @@ static void pflash_cfi01_realize(DeviceState *dev, =
-Error **errp)
->>      }
->>      device_len =3D sector_len_per_device * blocks_per_device;
->>
->> -    /* XXX: to be fixed */
->> -#if 0
->> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 *=
- 1024) &&
->> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 =
-* 1024))
->> -        return NULL;
->> -#endif
->> -
->>      memory_region_init_rom_device(
->>          &pfl->mem, OBJECT(dev),
->>          &pflash_cfi01_ops,
->> @@ -747,6 +740,27 @@ static void pflash_cfi01_realize(DeviceState *dev, =
-Error **errp)
->>      }
->>
->>      if (pfl->blk) {
->> +        /*
->> +         * Validate the backing store is the right size for pflash
->> +         * devices. It should be padded to a multiple of the flash
->> +         * block size. If the device is read-only we can elide the
->> +         * check and just null pad the region first. If the user
->> +         * supplies a larger file we silently accept it.
->
-> (1) I recommend adding "and ignore the tail".
->
->> +         */
->> +        uint64_t backing_len =3D blk_getlength(pfl->blk);
->
-> (2) Didn't we intend to check for blk_getlength() errors (or assert that
-> there would be none)?
-
-Oops, yes I'll fix that.
-
->
->> +
->> +        if (backing_len < total_len) {
->> +            if (pfl->ro) {
->> +                memset(pfl->storage, 0, total_len);
->
-> (3) Should we "optimize" (well, okay, de-pessimize) this to:
->
->   memset((uint8_t*)pfl->storage + backing_len, 0,
->          total_len - backing_len);
->
-> ?
-
-I mean in the grand scheme of things it's unlikely to show up in any
-benchmarks so I went for simple and easy to get right.
-
->
->> +                total_len =3D backing_len;
->> +            } else {
->> +                error_setg(errp, "device(s) needs %" PRIu64 " bytes, "
->
-> (4) not too important, I'm just curious: why the optional plural?
-
-I discovered the difference between device_len and total_len and found
-(for some reason) the efivars came out as multiple devices.
-
->
->> +                           "backing file provides only %" PRIu64 " byte=
-s",
->> +                           total_len, backing_len);
->> +                return;
->> +            }
->> +        }
->> +
->>          /* read the initial flash content */
->>          ret =3D blk_pread(pfl->blk, 0, pfl->storage, total_len);
->>
->>
->
-> I don't feel too strongly about these, so if you disagree, I won't push.
->
-> Thanks!
-> Laszlo
-
-
---
-Alex Benn=C3=A9e
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMzIzNDkwNy4yNDE3
+My0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEg
+U0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgcWFwaS9x
+YXBpLWNvbW1hbmRzLm8KICBDQyAgICAgIHFhcGkvcWFwaS1jb21tYW5kcy1ibG9jay1jb3JlLm8K
+L3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrZGV2LmM6IEluIGZ1bmN0aW9uICdxbXBfYmxvY2tfZGly
+dHlfYml0bWFwX2FkZCc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9ja2Rldi5jOjI4Njg6MTc6IGVy
+cm9yOiBleHBlY3RlZCAnOycgYmVmb3JlICd9JyB0b2tlbgogICAgICAgICBnb3RvIG91dAogICAg
+ICAgICAgICAgICAgIF4KICAgICAgICAgICAgICAgICA7CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
+YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIxMzIzNDkwNy4yNDE3My0xLWpz
+bm93QHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2Uu
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
