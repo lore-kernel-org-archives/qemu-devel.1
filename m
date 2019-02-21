@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33041)
+Received: from eggs.gnu.org ([209.51.188.92]:33125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gwch6-0005uv-3q
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:58:33 -0500
+	(envelope-from <crosa@redhat.com>) id 1gwchB-00060R-OT
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:58:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gwch4-0000zJ-3I
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:58:31 -0500
+	(envelope-from <crosa@redhat.com>) id 1gwch9-00011i-2f
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:58:36 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Wed, 20 Feb 2019 19:57:39 -0500
-Message-Id: <20190221005753.27955-7-crosa@redhat.com>
+Date: Wed, 20 Feb 2019 19:57:41 -0500
+Message-Id: <20190221005753.27955-9-crosa@redhat.com>
 In-Reply-To: <20190221005753.27955-1-crosa@redhat.com>
 References: <20190221005753.27955-1-crosa@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 06/20] Acceptance tests: use "arch:" tag to
- filter target specific tests
+Subject: [Qemu-devel] [PATCH v3 08/20] Boot Linux Console Test: rename the
+ x86_64 after the arch and machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +26,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-Currently, the only test that contains some target architecture
-information is "boot_linux_console.py" which test contains a "x86_64"
-tag.  But that tag is not respected in the default execution, that is,
-"make check-acceptance" doesn't do anything with it.
-
-That said, even the target architecture handling currently present in
-the "avocado_qemu.Test" class, class is pretty limited.  For instance,
-by default, it chooses a target based on the host architecture.
-
-Because the original implementation of the tags feature in Avocado did
-not include any time of namespace or "key:val" mechanism, no tag has
-relation to another tag.  The new implementation of the tags feature
-from version 67.0 onwards, allows "key:val" tags, and because of that,
-a test can be classified with a tag in a given key.  For instance, the
-new proposed version of the "boot_linux_console.py" test, which
-downloads and attempts to run a x86_64 kernel, is now tagged as:
-
-  :avocado: tags=3Darch:x86_64
-
-This means that it can be filtered (out) when no x86_64 target is
-available.  At the same time, tests that don't have a "arch:" tag,
-will not be filtered out.
+Given that the test is specific to x86_64 and pc, and new tests are
+going to be added to the same class, let's rename it accordingly.
+Also, let's make the class documentation not architecture specific.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/Makefile.include                 | 3 +++
- tests/acceptance/boot_linux_console.py | 2 +-
- tests/acceptance/linux_initrd.py       | 2 +-
- tests/acceptance/virtio_version.py     | 2 +-
- tests/requirements.txt                 | 2 +-
- 5 files changed, 7 insertions(+), 4 deletions(-)
+ tests/acceptance/boot_linux_console.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 93ea42553e..633992603d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -1090,6 +1090,7 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
- # Any number of command separated loggers are accepted.  For more
- # information please refer to "avocado --help".
- AVOCADO_SHOW=3Dapp
-+AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARG=
-ET_DIRS)))
-=20
- ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
- $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-@@ -1115,6 +1116,8 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
- 	$(call quiet-command, \
-             $(TESTS_VENV_DIR)/bin/python -m avocado \
-             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RES=
-ULTS_DIR) \
-+            --filter-by-tags-include-empty --filter-by-tags-include-empt=
-y-key \
-+            $(AVOCADO_TAGS) \
-             --failfast=3Don $(SRC_PATH)/tests/acceptance, \
-             "AVOCADO", "tests/acceptance")
-=20
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
 ot_linux_console.py
-index 98324f7591..46b20bdfe2 100644
+index 46b20bdfe2..89df7f6e4f 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -19,7 +19,7 @@ class BootLinuxConsole(Test):
-     and the kernel command line is properly passed from QEMU to the kern=
+@@ -15,16 +15,19 @@ from avocado_qemu import Test
+=20
+ class BootLinuxConsole(Test):
+     """
+-    Boots a x86_64 Linux kernel and checks that the console is operation=
+al
+-    and the kernel command line is properly passed from QEMU to the kern=
 el
++    Boots a Linux kernel and checks that the console is operational and =
+the
++    kernel command line is properly passed from QEMU to the kernel
 =20
      :avocado: enable
--    :avocado: tags=3Dx86_64
-+    :avocado: tags=3Darch:x86_64
+-    :avocado: tags=3Darch:x86_64
      """
 =20
      timeout =3D 60
-diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_in=
-itrd.py
-index 737355c2ef..c75e29be70 100644
---- a/tests/acceptance/linux_initrd.py
-+++ b/tests/acceptance/linux_initrd.py
-@@ -19,7 +19,7 @@ class LinuxInitrd(Test):
-     Checks QEMU evaluates correctly the initrd file passed as -initrd op=
-tion.
 =20
-     :avocado: enable
--    :avocado: tags=3Dx86_64
-+    :avocado: tags=3Darch:x86_64
-     """
-=20
-     timeout =3D 60
-diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio=
-_version.py
-index ce990250d8..3b280e7fc3 100644
---- a/tests/acceptance/virtio_version.py
-+++ b/tests/acceptance/virtio_version.py
-@@ -62,7 +62,7 @@ class VirtioVersionCheck(Test):
-     `disable-legacy`.
-=20
-     :avocado: enable
--    :avocado: tags=3Dx86_64
-+    :avocado: tags=3Darch:x86_64
-     """
-=20
-     # just in case there are failures, show larger diff:
-diff --git a/tests/requirements.txt b/tests/requirements.txt
-index 64c6e27a94..002ded6a22 100644
---- a/tests/requirements.txt
-+++ b/tests/requirements.txt
-@@ -1,4 +1,4 @@
- # Add Python module requirements, one per line, to be installed
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
--avocado-framework=3D=3D65.0
-+avocado-framework=3D=3D68.0
+-    def test(self):
++    def test_x86_64_pc(self):
++        """
++        :avocado: tags=3Darch:x86_64
++        :avocado: tags=3Dmachine:pc
++        """
+         kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28/'
+                       'Everything/x86_64/os/images/pxeboot/vmlinuz')
+         kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
 --=20
 2.20.1
