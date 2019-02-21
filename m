@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55148)
+Received: from eggs.gnu.org ([209.51.188.92]:59405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwnl8-0004ic-TU
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:47:27 -0500
+	(envelope-from <armbru@redhat.com>) id 1gwoAw-0007FV-Nn
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:14:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwnl5-00063M-18
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:47:26 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:37877 helo=mail.rt-rk.com)
+	(envelope-from <armbru@redhat.com>) id 1gwo9s-0001uL-I6
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:13:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54962)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gwnl3-00061K-3X
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:47:22 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 21 Feb 2019 13:46:00 +0100
-Message-Id: <1550753160-15142-9-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1550753160-15142-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1550753160-15142-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gwo9p-0001sP-Iu
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:12:59 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6916281E04
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 13:12:54 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190220092214.2384-1-quintela@redhat.com>
+	<20190220092214.2384-3-quintela@redhat.com>
+	<2bcdaa5b-4ce2-cf40-5774-a3c81690b1e3@redhat.com>
+Date: Thu, 21 Feb 2019 14:12:52 +0100
+In-Reply-To: <2bcdaa5b-4ce2-cf40-5774-a3c81690b1e3@redhat.com> (Eric Blake's
+	message of "Wed, 20 Feb 2019 08:03:45 -0600")
+Message-ID: <87d0nl1e0b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 8/8] target/mips: fulong2e: Dynamically generate
- SPD EEPROM data
+Subject: Re: [Qemu-devel] [PATCH v13 2/3] migration: Create socket-address
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +36,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+Eric Blake <eblake@redhat.com> writes:
 
-The machine comes with 256M memory module by default but it's
-upgradable so it could have different memory size. There was a TODO
-comment to replace static SPD EEPROM data with dynamically generated
-one to support this. Now that we have a function for that, it's easy
-to do. Although this would allow larger RAM sizes, the peculiar memory
-map of the machine may need some special handling to map it as low and
-high memory. Because I don't know what the correct place would be for
-highmem, I've left memory size fixed at 256M for now and TODO is moved
-there instead.
+> On 2/20/19 3:22 AM, Juan Quintela wrote:
+>> It will be used to store the uri parameters. We want this only for
+>> tcp, so we don't set it for other uris.  We need it to know what port
+>> is migration running.
+>>=20
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>>=20
+>> --
+>
+>> +++ b/qapi/migration.json
+>> @@ -6,6 +6,7 @@
+>>  ##
+>>=20=20
+>>  { 'include': 'common.json' }
+>> +{ 'include': 'sockets.json' }
+>>=20=20
+>>  ##
+>>  # @MigrationStats:
+>> @@ -199,6 +200,8 @@
+>>  # @compression: migration compression statistics, only returned if comp=
+ression
+>>  #           feature is on and status is 'active' or 'completed' (Since =
+3.1)
+>>  #
+>> +# @socket-address: Only used for tcp, to know what the real port is (Si=
+nce 4.0)
+>> +#
+>>  # Since: 0.14.0
+>>  ##
+>>  { 'struct': 'MigrationInfo',
+>> @@ -213,7 +216,8 @@
+>>             '*error-desc': 'str',
+>>             '*postcopy-blocktime' : 'uint32',
+>>             '*postcopy-vcpu-blocktime': ['uint32'],
+>> -           '*compression': 'CompressionStats'} }
+>> +           '*compression': 'CompressionStats',
+>> +           '*socket-address': ['SocketAddress'] } }
+>>=20=20
+>
+> Okay, I actually tried compiling your patch with the following hunk:
+>
+>>  ##
+>>  # @query-migrate:
+>> diff --git a/qapi/sockets.json b/qapi/sockets.json
+>> index fc81d8d5e8..d7f77984af 100644
+>> --- a/qapi/sockets.json
+>> +++ b/qapi/sockets.json
+>> @@ -152,3 +152,16 @@
+>>              'unix': 'UnixSocketAddress',
+>>              'vsock': 'VsockSocketAddress',
+>>              'fd': 'String' } }
+>> +
+>> +##
+>> +# @DummyStruct:
+>> +#
+>> +# Both block-core and migration needs SocketAddressList
+>> +# I am open to comments about how to share it
+>> +#
+>> +# @dummy-list: A dummy list
+>> +#
+>> +# Since: 3.1
+>
+> 4.0
+>
+>> +##
+>> +{ 'struct': 'DummyStruct',
+>> +  'data': { 'dummy-list': ['SocketAddress'] } }
+>>=20
+>
+> removed, and got:
+>
+> In file included from qapi/qapi-types-migration.c:15:
+> qapi/qapi-types-migration.h:267:5: error: unknown type name
+> =E2=80=98SocketAddressList=E2=80=99
+>      SocketAddressList *socket_address;
+>      ^~~~~~~~~~~~~~~~~
+> make: *** [/home/eblake/qemu/rules.mak:69: qapi/qapi-types-migration.o]
+> Error 1
+>
+> That says we have a bug in our QAPI generator - the type
+> SocketAddressList should be auto-generated at the point where it is
+> needed in migration.json. Markus, any ideas why we are not properly
+> auto-generating an array type when the only use of that array comes from
+> a different module than where the original type was declared?
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/mips/mips_fulong2e.c | 31 +++++++++++++------------------
- 1 file changed, 13 insertions(+), 18 deletions(-)
+With the DummyStruct, we generate SocketAddressList stuff into
+qapi-{types,visit}-sockets.[ch].
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 10e6ed5..eec6fd0 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -214,20 +214,6 @@ static void main_cpu_reset(void *opaque)
-     }
- }
-=20
--static const uint8_t eeprom_spd[0x80] =3D {
--    0x80,0x08,0x07,0x0d,0x09,0x02,0x40,0x00,0x04,0x70,
--    0x70,0x00,0x82,0x10,0x00,0x01,0x0e,0x04,0x0c,0x01,
--    0x02,0x20,0x80,0x75,0x70,0x00,0x00,0x50,0x3c,0x50,
--    0x2d,0x20,0xb0,0xb0,0x50,0x50,0x00,0x00,0x00,0x00,
--    0x00,0x41,0x48,0x3c,0x32,0x75,0x00,0x00,0x00,0x00,
--    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
--    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
--    0x00,0x00,0x00,0x9c,0x7b,0x07,0x00,0x00,0x00,0x00,
--    0x00,0x00,0x00,0x00,0x48,0x42,0x35,0x34,0x41,0x32,
--    0x35,0x36,0x38,0x4b,0x4e,0x2d,0x41,0x37,0x35,0x42,
--    0x20,0x30,0x20
--};
--
- static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_i=
-rq intc,
-                                        I2CBus **i2c_bus, ISABus **p_isa_=
-bus)
- {
-@@ -284,7 +270,6 @@ static void network_init (PCIBus *pci_bus)
-=20
- static void mips_fulong2e_init(MachineState *machine)
- {
--    ram_addr_t ram_size =3D machine->ram_size;
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     const char *initrd_filename =3D machine->initrd_filename;
-@@ -292,7 +277,10 @@ static void mips_fulong2e_init(MachineState *machine=
-)
-     MemoryRegion *address_space_mem =3D get_system_memory();
-     MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *bios =3D g_new(MemoryRegion, 1);
-+    ram_addr_t ram_size =3D machine->ram_size;
-     long bios_size;
-+    uint8_t *spd_data;
-+    Error *err =3D NULL;
-     int64_t kernel_entry;
-     PCIBus *pci_bus;
-     ISABus *isa_bus;
-@@ -306,7 +294,7 @@ static void mips_fulong2e_init(MachineState *machine)
-=20
-     qemu_register_reset(main_cpu_reset, cpu);
-=20
--    /* fulong 2e has 256M ram. */
-+    /* TODO: support more than 256M RAM as highmem */
-     ram_size =3D 256 * MiB;
-=20
-     /* allocate RAM */
-@@ -359,8 +347,14 @@ static void mips_fulong2e_init(MachineState *machine=
-)
-     vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
-                                &smbus, &isa_bus);
-=20
--    /* TODO: Populate SPD eeprom data.  */
--    smbus_eeprom_init(smbus, 1, eeprom_spd, sizeof(eeprom_spd));
-+    /* Populate SPD eeprom data */
-+    spd_data =3D spd_data_generate(DDR, ram_size, &err);
-+    if (err) {
-+        warn_report_err(err);
-+    }
-+    if (spd_data) {
-+        smbus_eeprom_init_one(smbus, 0x50, spd_data);
-+    }
-=20
-     mc146818_rtc_init(isa_bus, 2000, NULL);
-=20
-@@ -374,6 +368,7 @@ static void mips_fulong2e_machine_init(MachineClass *=
-mc)
-     mc->init =3D mips_fulong2e_init;
-     mc->block_default_type =3D IF_IDE;
-     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-2E");
-+    mc->default_ram_size =3D 256 * MiB;
- }
-=20
- DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
---=20
-2.7.4
+Without it, we it ends up in qapi-{types,visit}-block-core.[ch].  How
+come?
+
+We create non-builtin array types on demand, i.e. on first use, by
+calling ._make_array_type().
+
+Like any other non-builtin type, an array type takes an info tuple
+describing where it's defined.  We pass it the info of whatever
+triggered its creation.  That's not as silly as it may sound; it can be
+viewed as a definition.
+
+However, it falls apart when we use the info to set the type's module,
+in ._def_entity().  The module dicates where the generated code goes.
+The array type's module becomes whatever module uses it first.  It
+should be its element type's module instead.
+
+Needs fixing.
+
+If you don't want to wait for the fix, commit the DummyStruct
+work-around with a big fat FIXME comment.
