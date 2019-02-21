@@ -1,15 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34943)
+Received: from eggs.gnu.org ([209.51.188.92]:35186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gwmDY-0002zR-BO
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:08:43 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gwmEP-0004Gv-FV
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:09:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gwmDS-0007Xj-Mv
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:08:40 -0500
-From: yuchenlin@synology.com
-Date: Thu, 21 Feb 2019 11:08:05 +0000
-Message-Id: <20190221110805.28239-1-yuchenlin@synology.com>
-Subject: [Qemu-devel] [PATCH] vmdk: false positive of compat6 with hwversion
- not set
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gwmEL-00085Y-In
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:09:33 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:41249)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gwmEJ-000811-Pn
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:09:29 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id n2so17347070wrw.8
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 03:09:25 -0800 (PST)
+MIME-Version: 1.0
+References: <20190214201939.494-1-philmd@redhat.com>
+	<20190214201939.494-3-philmd@redhat.com>
+	<CAMxuvawBXN3CwFhWwyUathUy-+SbURFAy_g8scf54UQx-j+84A@mail.gmail.com>
+	<d9b63b89-091d-3a7b-fa74-5f91ce6890ff@redhat.com>
+	<nycvar.YSQ.7.76.1902211633210.4028@xnncv>
+In-Reply-To: <nycvar.YSQ.7.76.1902211633210.4028@xnncv>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 21 Feb 2019 12:09:12 +0100
+Message-ID: <CAJ+F1CL6pK-CSqHDu92daB_sAGsfWm1ukya_1YM-evx5CzgmKg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/9] ccid-card-passthru: Replace never
+ trigger if statement by an assertion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,41 +34,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, qemu-block@nongnu.org, yuchenlin <yuchenlin@synology.com>
+To: P J P <ppandit@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Arash Tohidi Chafi <tohidi.arash@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: yuchenlin <yuchenlin@synology.com>
+Hi
 
-In vmdk_co_create_opts, when it finds hw_version is undefined, it will
-set it to 4, which misleading the compat6 and hwversion in
-vmdk_co_do_create. Simply set hw_version to NULL after free, let
-the logic in vmdk_co_do_create to decide the value of hw_version.
+On Thu, Feb 21, 2019 at 12:06 PM P J P <ppandit@redhat.com> wrote:
+>
+> +-- On Mon, 18 Feb 2019, Philippe Mathieu-Daud=C3=A9 wrote --+
+> | On 2/15/19 11:59 AM, Marc-Andr=C3=A9 Lureau wrote:
+> | Arash or Prasad can you help us here? Do you have a reproducer?
+>
+> No, we don't have a reproducer handy I'm afraid.
 
-This bug can be reproduced by:
+Without a reproducer or convincing arguments, do we have a CVE?
 
-$ qemu-img convert -O vmdk -o subformat=streamOptimized,compat6
-/home/yuchenlin/syno.qcow2 /home/yuchenlin/syno.vmdk
 
-qemu-img: /home/yuchenlin/syno.vmdk: error while converting vmdk:
-compat6 cannot be enabled with hwversion set
-
-Signed-off-by: yuchenlin <yuchenlin@synology.com>
----
- block/vmdk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 096e8eb662..e3bbd18803 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2260,7 +2260,7 @@ static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts
-     compat6 = qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false);
-     if (strcmp(hw_version, "undefined") == 0) {
-         g_free(hw_version);
--        hw_version = g_strdup("4");
-+        hw_version = NULL;
-     }
-     fmt = qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
-     zeroed_grain = qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN, false);
--- 
-2.17.1
+--=20
+Marc-Andr=C3=A9 Lureau
