@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49279)
+Received: from eggs.gnu.org ([209.51.188.92]:50825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1gwdiV-0000ss-Gv
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:04:04 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1gwdyB-0004VZ-3z
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:20:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1gwdiU-0007QV-9v
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:04:03 -0500
-Received: from mga02.intel.com ([134.134.136.20]:14086)
+	(envelope-from <yan.y.zhao@intel.com>) id 1gwdoZ-0002YE-8E
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:10:19 -0500
+Received: from mga06.intel.com ([134.134.136.31]:18741)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1gwdiT-0007NH-Tg
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:04:02 -0500
-Date: Wed, 20 Feb 2019 20:58:37 -0500
+	id 1gwdoY-0002XX-V3
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:10:19 -0500
+Date: Wed, 20 Feb 2019 21:04:58 -0500
 From: Zhao Yan <yan.y.zhao@intel.com>
-Message-ID: <20190221015837.GK16456@joy-OptiPlex-7040>
+Message-ID: <20190221020457.GL16456@joy-OptiPlex-7040>
 References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
 	<33183CC9F5247A488A2544077AF19020DB25D374@dggeml511-mbx.china.huawei.com>
 	<20190221002444.GH16456@joy-OptiPlex-7040>
@@ -33,87 +33,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
 Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-On Thu, Feb 21, 2019 at 01:35:43AM +0000, Gonglei (Arei) wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Zhao Yan [mailto:yan.y.zhao@intel.com]
-> > Sent: Thursday, February 21, 2019 8:25 AM
-> > To: Gonglei (Arei) <arei.gonglei@huawei.com>
-> > Cc: alex.williamson@redhat.com; qemu-devel@nongnu.org;
-> > intel-gvt-dev@lists.freedesktop.org; Zhengxiao.zx@Alibaba-inc.com;
-> > yi.l.liu@intel.com; eskultet@redhat.com; ziye.yang@intel.com;
-> > cohuck@redhat.com; shuangtai.tst@alibaba-inc.com; dgilbert@redhat.com;
-> > zhi.a.wang@intel.com; mlevitsk@redhat.com; pasic@linux.ibm.com;
-> > aik@ozlabs.ru; eauger@redhat.com; felipe@nutanix.com;
-> > jonathan.davies@nutanix.com; changpeng.liu@intel.com; Ken.Xue@amd.com;
-> > kwankhede@nvidia.com; kevin.tian@intel.com; cjia@nvidia.com;
-> > kvm@vger.kernel.org
-> > Subject: Re: [PATCH 0/5] QEMU VFIO live migration
-> > 
-> > On Wed, Feb 20, 2019 at 11:56:01AM +0000, Gonglei (Arei) wrote:
-> > > Hi yan,
-> > >
-> > > Thanks for your work.
-> > >
-> > > I have some suggestions or questions:
-> > >
-> > > 1) Would you add msix mode support,? if not, pls add a check in
-> > vfio_pci_save_config(), likes Nvidia's solution.
-> > ok.
-> > 
-> > > 2) We should start vfio devices before vcpu resumes, so we can't rely on vm
-> > start change handler completely.
-> > vfio devices is by default set to running state.
-> > In the target machine, its state transition flow is running->stop->running.
-> 
-> That's confusing. We should start vfio devices after vfio_load_state, otherwise
-> how can you keep the devices' information are the same between source side
-> and destination side?
->
-so, your meaning is to set device state to running in the first call to
-vfio_load_state?
-
-> > so, maybe you can ignore the stop notification in kernel?
-> > > 3) We'd better support live migration rollback since have many failure
-> > scenarios,
-> > >  register a migration notifier is a good choice.
-> > I think this patchset can also handle the failure case well.
-> > if migration failure or cancelling happens,
-> > in cleanup handler, LOGGING state is cleared. device state(running or
-> > stopped) keeps as it is).
-> 
-> IIRC there're many failure paths don't calling cleanup handler.
->
-could you take an example?
-> > then,
-> > if vm switches back to running, device state will be set to running;
-> > if vm stayes at stopped state, device state is also stopped (it has no
-> > meaning to let it in running state).
-> > Do you think so ?
-> > 
-> IF the underlying state machine is complicated,
-> We should tell the canceling state to vendor driver proactively.
-> 
-That makes sense.
-
-> > > 4) Four memory region for live migration is too complicated IMHO.
-> > one big region requires the sub-regions well padded.
-> > like for the first control fields, they have to be padded to 4K.
-> > the same for other data fields.
-> > Otherwise, mmap simply fails, because the start-offset and size for mmap
-> > both need to be PAGE aligned.
-> > 
-> But if we don't need use mmap for control filed and device state, they are small basically.
-> The performance is enough using pread/pwrite. 
-> 
-we don't mmap control fields. but if data fields going immedately after
-control fields (e.g. just 64 bytes), we can't mmap data fields
-successfully because its start offset is 64. Therefore control fields have
-to be padded to 4k to let data fields start from 4k.
-That's the drawback of one big region holding both control and data fields.
-
-> > Also, 4 regions is clearer in my view :)
 > > 
 > > > 5) About log sync, why not register log_global_start/stop in
 > > vfio_memory_listener?
@@ -126,9 +45,11 @@ That's the drawback of one big region holding both control and data fields.
 > 
 > We just need invoking only once for start and stop logging. Why we need to call
 > them literately? See memory_listener of vhost.
-> 
-
-
+>
+the dirty pages in system memory produces by device is incremental.
+if it can be got iteratively, the dirty pages in stop-and-copy phase can be
+minimal. 
+:)
 
 > Regards,
 > -Gonglei
