@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46564)
+Received: from eggs.gnu.org ([209.51.188.92]:46621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwr4v-0003bY-T3
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:20:07 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gwr4y-0003im-E0
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:20:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwr4u-0005of-TD
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:20:05 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42819)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gwr4u-0004xU-Ma
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:20:04 -0500
-Received: by mail-wr1-f65.google.com with SMTP id r5so17906100wrg.9
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 08:19:51 -0800 (PST)
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-3-armbru@redhat.com>
-	<2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
-	<CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
-	<875ztfuc0j.fsf@dusky.pond.sub.org> <87sgwh5wef.fsf@dusky.pond.sub.org>
-	<CAFEAcA8gHp-VD05x9Q1V3_K29wsMeZD1SdM+PDteOXcAE3QHwg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8d278f39-9549-5326-bfd8-b4bcabeacf84@redhat.com>
-Date: Thu, 21 Feb 2019 17:19:48 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gwr4x-0005rd-3v
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:20:08 -0500
+Date: Thu, 21 Feb 2019 17:19:44 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190221171944.1cc65a33@redhat.com>
+In-Reply-To: <20190220224003.4420-4-eric.auger@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190220224003.4420-4-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8gHp-VD05x9Q1V3_K29wsMeZD1SdM+PDteOXcAE3QHwg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
- just once, expand
+Subject: Re: [Qemu-devel] [PATCH v7 03/17] hw/arm/virt: Split the memory map
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,82 +24,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-On 2/21/19 10:38 AM, Peter Maydell wrote:
-> On Thu, 21 Feb 2019 at 09:22, Markus Armbruster <armbru@redhat.com> wrote:
->> Double-checking... you want me to keep goto reset_flash, like this:
->>
->> @@ -623,8 +617,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
->>                  pfl->wcycle = 0;
->>                  pfl->status |= 0x80;
->>              } else {
->> -                DPRINTF("%s: unknown command for \"write block\"\n", __func__);
->> -                PFLASH_BUG("Write block confirm");
->> +                qemu_log_mask(LOG_GUEST_ERROR,
->> +                              "unknown command for \"write block\"\n");
->>                  goto reset_flash;
->>              }
->>              break;
+On Wed, 20 Feb 2019 23:39:49 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
+
+> In the prospect to introduce an extended memory map supporting more
+> RAM, let's split the memory map array into two parts:
 > 
-> Yes. (We seem to handle most kinds of guest errors in programming
-> the flash by reset_flash.)
+> - the former a15memmap contains regions below and including the RAM
 
-Oh I missed the context of the patch here.
+> - extended_memmap, only initialized with entries located after the RAM.
+>   Only the size of the region is initialized there since their base
+>   address will be dynamically computed, depending on the top of the
+>   RAM (initial RAM at the moment), with same alignment as their size.
+can't parse this part and pinpoint what is 'their', care to rephrase?
 
-So for the case of the Multi-WRITE command (0xe8):
 
-1/ On first write cycle we have
+> This new split will allow to grow the RAM size without changing the
+> description of the high regions.
+> 
+> The patch also moves the memory map setup
+s/moves/makes/
+s/$/dynamic and moves it/
 
-  - address = flash_page_address (we store it in pfl->counter)
-  - data = flash_command (0xe8: enter Multi-WRITE)
+> into machvirt_init().
 
-2/ Second cycle:
+> The rationale is the memory map will be soon affected by the
 
-  - address = flash_page_address
-    We should check it matches flash_page_address
-    of cycle 1/, but we don't.
-  - data: N
+> kvm_type() call that happens after virt_instance_init() and
+is dependency on kvm_type() still valid,
+shouldn't split memmap work for TCG just fine as well?
 
-    "N is the number of elements (bytes / words / double words),
-    minus one, to be written to the write buffer. Expected count
-    ranges are N = 00h to N = 7Fh (e.g., 1 to 128 bytes) in 8-bit
-    mode, N = 00h to N = 003Fh in 16-bit mode, and N = 00h to
-    N = 1Fh in 32-bit mode. Bus cycles 3 and higher are for writing
-    data into the write buffer. The confirm command (D0h) is
-    expected after exactly N + 1 write cycles; any other command at
-    that point in the sequence will prevent the transfer of the
-    buffer to the array (the write will be aborted)."
+> before machvirt_init().
+> 
+> The memory map is unchanged (the top of the initial RAM still is
+> 256GiB). Then come the high IO regions with same layout as before.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> ---
+> v6 -> v7:
+> - s/a15memmap/base_memmap
+> - slight rewording of the commit message
+> - add "if there is less than 256GiB of RAM then the floating area
+>   starts at the 256GiB mark" in the comment associated to the floating
+>   memory map
+> - Added Peter's R-b
+> 
+> v5 -> v6
+> - removal of many macros in units.h
+> - introduce the virt_set_memmap helper
+> - new computation for offsets of high IO regions
+> - add comments
+> ---
+>  hw/arm/virt.c         | 48 +++++++++++++++++++++++++++++++++++++------
+>  include/hw/arm/virt.h | 14 +++++++++----
+>  2 files changed, 52 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index a1955e7764..12039a0367 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -29,6 +29,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "qapi/error.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/arm/arm.h"
+> @@ -121,7 +122,7 @@
+>   * Note that devices should generally be placed at multiples of 0x10000,
+>   * to accommodate guests using 64K pages.
+>   */
+> -static const MemMapEntry a15memmap[] = {
+> +static const MemMapEntry base_memmap[] = {
+>      /* Space up to 0x8000000 is reserved for a boot ROM */
+>      [VIRT_FLASH] =              {          0, 0x08000000 },
+>      [VIRT_CPUPERIPHS] =         { 0x08000000, 0x00020000 },
+> @@ -149,11 +150,21 @@ static const MemMapEntry a15memmap[] = {
+>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+> +};
+> +
+> +/*
+> + * Highmem IO Regions: This memory map is floating, located after the RAM.
+> + * Each IO region offset will be dynamically computed, depending on the
+s/IO region offset/MemMapEntry base (GPA)/
+> + * top of the RAM, so that its base get the same alignment as the size,
 
-    Instead of starting to write the data in a buffer, we write it
-    directly to the block backend.
-    Instead of starting to write from cycle 3+, we write now in 2,
-    and keep cycle count == 2 (pfl->wcycle) until all data is
-    written, where we increment at 3.
+> + * ie. a 512GiB region will be aligned on a 512GiB boundary. If there is
+s/region/entry/
 
-3/ Cycles 3+
+> + * less than 256GiB of RAM, the floating area starts at the 256GiB mark.
+> + */
+> +static MemMapEntry extended_memmap[] = {
+>      /* Additional 64 MB redist region (can contain up to 512 redistributors) */
+> -    [VIRT_HIGH_GIC_REDIST2] =   { 0x4000000000ULL, 0x4000000 },
+> -    [VIRT_HIGH_PCIE_ECAM] =     { 0x4010000000ULL, 0x10000000 },
+> -    /* Second PCIe window, 512GB wide at the 512GB boundary */
+> -    [VIRT_HIGH_PCIE_MMIO] =     { 0x8000000000ULL, 0x8000000000ULL },
+> +    [VIRT_HIGH_GIC_REDIST2] =   { 0x0, 64 * MiB },
+> +    [VIRT_HIGH_PCIE_ECAM] =     { 0x0, 256 * MiB },
+> +    /* Second PCIe window */
+> +    [VIRT_HIGH_PCIE_MMIO] =     { 0x0, 512 * GiB },
+>  };
+>  
+>  static const int a15irqmap[] = {
+> @@ -1354,6 +1365,30 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>      return arm_cpu_mp_affinity(idx, clustersz);
+>  }
+>  
+> +static void virt_set_memmap(VirtMachineState *vms)
+> +{
+> +    hwaddr base;
+> +    int i;
+> +
+> +    vms->memmap = extended_memmap;
+I probably don't see something but ...
 
-  - address = word index (relative to the page address)
-  - data = word value
+> +
+> +    for (i = 0; i < ARRAY_SIZE(base_memmap); i++) {
+> +        vms->memmap[i] = base_memmap[i];
 
-    We check for the CONFIRM command, and switch the device back
-    to READ mode (setting Status), or reset the device (which is
-    modelled the same way).
+ARRAY_SIZE(base_memmap) > 3
+ARRAY_SIZE(extended_memmap) == 3
+as result shouldn't we observe OOB at vms->memmap[i] access
+starting from i==3 ?
 
-    Very silly: If the guest cancelled and never sent the CONFIRM
-    command, the data is already written/flushed back.
+> +    }
+> +
+> +    vms->high_io_base = 256 * GiB; /* Top of the legacy initial RAM region */
+> +    base = vms->high_io_base;
+> +
+> +    for (i = VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++) {
+not sure why VIRT_LOWMEMMAP_LAST is needed at all, one could just continue
+with current 'i' value, provided extended_memmap wasn't corrupted by previous
+loop.
+And does this loop ever executes? VIRT_LOWMEMMAP_LAST > ARRAY_SIZE(extended_memmap)
 
-So back to the previous code snippet, regardless the value, this
-is neither a hw_error() nor a GUEST_ERROR. This code is simply not
-correct. Eventually the proper (polite) error message should be:
-
-    qemu_log_mask(LOG_UNIMP, "MULTI_WRITE: Abort not implemented,"
-                             " the data is already written"
-                             " on storage!\n"
-                             "Nevertheless resetting the flash"
-                             " into READ mode.\n");
-
-Regards,
-
-Phil.
+> +        hwaddr size = extended_memmap[i].size;
+> +
+> +        base = ROUND_UP(base, size);
+> +        vms->memmap[i].base = base;
+> +        vms->memmap[i].size = size;
+> +        base += size;
+> +    }
+> +}
+> +
+>  static void machvirt_init(MachineState *machine)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(machine);
+> @@ -1368,6 +1403,8 @@ static void machvirt_init(MachineState *machine)
+>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+>      bool aarch64 = true;
+>  
+> +    virt_set_memmap(vms);
+> +
+>      /* We can probe only here because during property set
+>       * KVM is not available yet
+>       */
+> @@ -1843,7 +1880,6 @@ static void virt_instance_init(Object *obj)
+>                                      "Valid values are none and smmuv3",
+>                                      NULL);
+>  
+> -    vms->memmap = a15memmap;
+>      vms->irqmap = a15irqmap;
+>  }
+>  
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index a27086d524..3dc7a6c5d5 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -64,7 +64,6 @@ enum {
+>      VIRT_GIC_VCPU,
+>      VIRT_GIC_ITS,
+>      VIRT_GIC_REDIST,
+> -    VIRT_HIGH_GIC_REDIST2,
+>      VIRT_SMMU,
+>      VIRT_UART,
+>      VIRT_MMIO,
+> @@ -74,12 +73,18 @@ enum {
+>      VIRT_PCIE_MMIO,
+>      VIRT_PCIE_PIO,
+>      VIRT_PCIE_ECAM,
+> -    VIRT_HIGH_PCIE_ECAM,
+>      VIRT_PLATFORM_BUS,
+> -    VIRT_HIGH_PCIE_MMIO,
+>      VIRT_GPIO,
+>      VIRT_SECURE_UART,
+>      VIRT_SECURE_MEM,
+> +    VIRT_LOWMEMMAP_LAST,
+> +};
+> +
+> +/* indices of IO regions located after the RAM */
+> +enum {
+> +    VIRT_HIGH_GIC_REDIST2 =  VIRT_LOWMEMMAP_LAST,
+> +    VIRT_HIGH_PCIE_ECAM,
+> +    VIRT_HIGH_PCIE_MMIO,
+>  };
+>  
+>  typedef enum VirtIOMMUType {
+> @@ -116,7 +121,7 @@ typedef struct {
+>      int32_t gic_version;
+>      VirtIOMMUType iommu;
+>      struct arm_boot_info bootinfo;
+> -    const MemMapEntry *memmap;
+> +    MemMapEntry *memmap;
+>      const int *irqmap;
+>      int smp_cpus;
+>      void *fdt;
+> @@ -126,6 +131,7 @@ typedef struct {
+>      uint32_t msi_phandle;
+>      uint32_t iommu_phandle;
+>      int psci_conduit;
+> +    hwaddr high_io_base;
+>  } VirtMachineState;
+>  
+>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
