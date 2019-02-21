@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57954)
+Received: from eggs.gnu.org ([209.51.188.92]:58012)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcT3-0003yK-F3
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:02 -0500
+	id 1gwcT9-00048w-79
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcT1-0002KU-6u
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:01 -0500
+	id 1gwcT5-0002Mf-H7
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:05 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 21 Feb 2019 00:43:49 +0000
-Message-ID: <4522706192fc368d68cca4d61028741f4806070a.1550709660.git.alistair.francis@wdc.com>
+Date: Thu, 21 Feb 2019 00:43:59 +0000
+Message-ID: <c0de9603ba99d5d0aa5b9222366724cbc465ca0f.1550709660.git.alistair.francis@wdc.com>
 References: <cover.1550709660.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1550709660.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 04/11] RISC-V: Remove unnecessary
- disassembler constraints
+Subject: [Qemu-devel] [PATCH v2 05/11] elf: Add RISC-V PSABI ELF header
+ defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,197 +31,40 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 From: Michael Clark <mjc@sifive.com>
 
-Remove machine generated constraints that are not
-referenced by the pseudo-instruction constraints.
+Refer to the RISC-V PSABI specification for details:
 
-Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+- https://github.com/riscv/riscv-elf-psabi-doc/blob/master/riscv-elf.md
+
+Cc: Michael Tokarev <mjt@tls.msk.ru>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- disas/riscv.c | 138 --------------------------------------------------
- 1 file changed, 138 deletions(-)
+ include/elf.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/disas/riscv.c b/disas/riscv.c
-index 7fd1019623..27546dd790 100644
---- a/disas/riscv.c
-+++ b/disas/riscv.c
-@@ -87,33 +87,10 @@ typedef enum {
+diff --git a/include/elf.h b/include/elf.h
+index b35347eee7..ea7708a4ea 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -1393,6 +1393,16 @@ typedef struct {
+ #define R_RISCV_SET16         55
+ #define R_RISCV_SET32         56
 =20
- typedef enum {
-     rvc_end,
--    rvc_simm_6,
--    rvc_imm_6,
--    rvc_imm_7,
--    rvc_imm_8,
--    rvc_imm_9,
--    rvc_imm_10,
--    rvc_imm_12,
--    rvc_imm_18,
--    rvc_imm_nz,
--    rvc_imm_x2,
--    rvc_imm_x4,
--    rvc_imm_x8,
--    rvc_imm_x16,
--    rvc_rd_b3,
--    rvc_rs1_b3,
--    rvc_rs2_b3,
--    rvc_rd_eq_rs1,
-     rvc_rd_eq_ra,
--    rvc_rd_eq_sp,
-     rvc_rd_eq_x0,
--    rvc_rs1_eq_sp,
-     rvc_rs1_eq_x0,
-     rvc_rs2_eq_x0,
--    rvc_rd_ne_x0_x2,
--    rvc_rd_ne_x0,
--    rvc_rs1_ne_x0,
--    rvc_rs2_ne_x0,
-     rvc_rs2_eq_rs1,
-     rvc_rs1_eq_ra,
-     rvc_imm_eq_zero,
-@@ -2522,111 +2499,16 @@ static bool check_constraints(rv_decode *dec, cons=
-t rvc_constraint *c)
-     uint8_t rd =3D dec->rd, rs1 =3D dec->rs1, rs2 =3D dec->rs2;
-     while (*c !=3D rvc_end) {
-         switch (*c) {
--        case rvc_simm_6:
--            if (!(imm >=3D -32 && imm < 32)) {
--                return false;
--            }
--            break;
--        case rvc_imm_6:
--            if (!(imm <=3D 63)) {
--                return false;
--            }
--            break;
--        case rvc_imm_7:
--            if (!(imm <=3D 127)) {
--                return false;
--            }
--            break;
--        case rvc_imm_8:
--            if (!(imm <=3D 255)) {
--                return false;
--            }
--            break;
--        case rvc_imm_9:
--            if (!(imm <=3D 511)) {
--                return false;
--            }
--            break;
--        case rvc_imm_10:
--            if (!(imm <=3D 1023)) {
--                return false;
--            }
--            break;
--        case rvc_imm_12:
--            if (!(imm <=3D 4095)) {
--                return false;
--            }
--            break;
--        case rvc_imm_18:
--            if (!(imm <=3D 262143)) {
--                return false;
--            }
--            break;
--        case rvc_imm_nz:
--            if (!(imm !=3D 0)) {
--                return false;
--            }
--            break;
--        case rvc_imm_x2:
--            if (!((imm & 0b1) =3D=3D 0)) {
--                return false;
--            }
--            break;
--        case rvc_imm_x4:
--            if (!((imm & 0b11) =3D=3D 0)) {
--                return false;
--            }
--            break;
--        case rvc_imm_x8:
--            if (!((imm & 0b111) =3D=3D 0)) {
--                return false;
--            }
--            break;
--        case rvc_imm_x16:
--            if (!((imm & 0b1111) =3D=3D 0)) {
--                return false;
--            }
--            break;
--        case rvc_rd_b3:
--            if (!(rd  >=3D 8 && rd  <=3D 15)) {
--                return false;
--            }
--            break;
--        case rvc_rs1_b3:
--            if (!(rs1 >=3D 8 && rs1 <=3D 15)) {
--                return false;
--            }
--            break;
--        case rvc_rs2_b3:
--            if (!(rs2 >=3D 8 && rs2 <=3D 15)) {
--                return false;
--            }
--            break;
--        case rvc_rd_eq_rs1:
--            if (!(rd =3D=3D rs1)) {
--                return false;
--            }
--            break;
-         case rvc_rd_eq_ra:
-             if (!(rd =3D=3D 1)) {
-                 return false;
-             }
-             break;
--        case rvc_rd_eq_sp:
--            if (!(rd =3D=3D 2)) {
--                return false;
--            }
--            break;
-         case rvc_rd_eq_x0:
-             if (!(rd =3D=3D 0)) {
-                 return false;
-             }
-             break;
--        case rvc_rs1_eq_sp:
--            if (!(rs1 =3D=3D 2)) {
--                return false;
--            }
--            break;
-         case rvc_rs1_eq_x0:
-             if (!(rs1 =3D=3D 0)) {
-                 return false;
-@@ -2637,26 +2519,6 @@ static bool check_constraints(rv_decode *dec, const =
-rvc_constraint *c)
-                 return false;
-             }
-             break;
--        case rvc_rd_ne_x0_x2:
--            if (!(rd !=3D 0 && rd !=3D 2)) {
--                return false;
--            }
--            break;
--        case rvc_rd_ne_x0:
--            if (!(rd !=3D 0)) {
--                return false;
--            }
--            break;
--        case rvc_rs1_ne_x0:
--            if (!(rs1 !=3D 0)) {
--                return false;
--            }
--            break;
--        case rvc_rs2_ne_x0:
--            if (!(rs2 !=3D 0)) {
--                return false;
--            }
--            break;
-         case rvc_rs2_eq_rs1:
-             if (!(rs2 =3D=3D rs1)) {
-                 return false;
++/* RISC-V ELF Flags.  */
++#define EF_RISCV_RVC              0x0001
++#define EF_RISCV_FLOAT_ABI        0x0006
++#define EF_RISCV_FLOAT_ABI_SOFT   0x0000
++#define EF_RISCV_FLOAT_ABI_SINGLE 0x0002
++#define EF_RISCV_FLOAT_ABI_DOUBLE 0x0004
++#define EF_RISCV_FLOAT_ABI_QUAD   0x0006
++#define EF_RISCV_RVE              0x0008
++#define EF_RISCV_TSO              0x0010
++
+ typedef struct elf32_rel {
+   Elf32_Addr	r_offset;
+   Elf32_Word	r_info;
 --=20
 2.20.1
