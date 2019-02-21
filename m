@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57979)
+Received: from eggs.gnu.org ([209.51.188.92]:58057)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcT5-000439-F7
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:04 -0500
+	id 1gwcTK-0004XI-LY
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcT3-0002Lv-HI
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:03 -0500
+	id 1gwcTH-0002PW-7c
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:18 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 21 Feb 2019 00:43:39 +0000
-Message-ID: <7835d3381c5acb91cbb7d8cc947d3df0e3a2c74f.1550709660.git.alistair.francis@wdc.com>
+Date: Thu, 21 Feb 2019 00:44:08 +0000
+Message-ID: <87a626176be2061cbf7a524789685157d17922a0.1550709660.git.alistair.francis@wdc.com>
 References: <cover.1550709660.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1550709660.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 03/11] RISC-V: Allow interrupt controllers
- to claim interrupts
+Subject: [Qemu-devel] [PATCH v2 06/11] RISC-V: linux-user support for RVE ABI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,156 +28,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>
 
-From: Michael Clark <mjc@sifive.com>
+From: Kito Cheng <kito.cheng@gmail.com>
 
-We can't allow the supervisor to control SEIP as this would allow the
-supervisor to clear a pending external interrupt which will result in
-lost a interrupt in the case a PLIC is attached. The SEIP bit must be
-hardware controlled when a PLIC is attached.
+This change checks elf_flags for EF_RISCV_RVE and if
+present uses the RVE linux syscall ABI which uses t0
+for the syscall number instead of a7.
 
-This logic was previously hard-coded so SEIP was always masked even
-if no PLIC was attached. This patch adds riscv_cpu_claim_interrupts
-so that the PLIC can register control of SEIP. In the case of models
-without a PLIC (spike), the SEIP bit remains software controlled.
-
-This interface allows for hardware control of supervisor timer and
-software interrupts by other interrupt controller models.
+Warn and exit if a non-RVE ABI binary is run on a
+cpu with the RVE extension as it is incompatible.
 
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Co-authored-by: Kito Cheng <kito.cheng@gmail.com>
+Co-authored-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_plic.c    | 15 +++++++++++++++
- target/riscv/cpu.h        |  2 ++
- target/riscv/cpu_helper.c | 11 +++++++++++
- target/riscv/csr.c        | 10 ++--------
- 4 files changed, 30 insertions(+), 8 deletions(-)
+ linux-user/riscv/cpu_loop.c | 15 ++++++++++++++-
+ target/riscv/cpu.h          |  4 ++++
+ target/riscv/cpu_user.h     |  3 ++-
+ 3 files changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index b859f919a7..1c703e1a37 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -23,6 +23,7 @@
- #include "qemu/error-report.h"
- #include "hw/sysbus.h"
- #include "target/riscv/cpu.h"
-+#include "sysemu/sysemu.h"
- #include "hw/riscv/sifive_plic.h"
+diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
+index 4cf3e94632..a9bac4ca79 100644
+--- a/linux-user/riscv/cpu_loop.c
++++ b/linux-user/riscv/cpu_loop.c
+@@ -18,8 +18,10 @@
+  */
 =20
- #define RISCV_DEBUG_PLIC 0
-@@ -431,6 +432,7 @@ static void sifive_plic_irq_request(void *opaque, int i=
-rq, int level)
- static void sifive_plic_realize(DeviceState *dev, Error **errp)
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
++#include "elf.h"
+=20
+ void cpu_loop(CPURISCVState *env)
  {
-     SiFivePLICState *plic =3D SIFIVE_PLIC(dev);
-+    int i;
+@@ -53,7 +55,8 @@ void cpu_loop(CPURISCVState *env)
+                 ret =3D 0;
+             } else {
+                 ret =3D do_syscall(env,
+-                                 env->gpr[xA7],
++                                 env->gpr[(env->elf_flags & EF_RISCV_RVE)
++                                    ? xT0 : xA7],
+                                  env->gpr[xA0],
+                                  env->gpr[xA1],
+                                  env->gpr[xA2],
+@@ -113,6 +116,16 @@ void cpu_loop(CPURISCVState *env)
 =20
-     memory_region_init_io(&plic->mmio, OBJECT(dev), &sifive_plic_ops, plic=
-,
-                           TYPE_SIFIVE_PLIC, plic->aperture_size);
-@@ -443,6 +445,19 @@ static void sifive_plic_realize(DeviceState *dev, Erro=
-r **errp)
-     plic->enable =3D g_new0(uint32_t, plic->bitfield_words * plic->num_add=
-rs);
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
-     qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
+ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+ {
++    CPUState *cpu =3D ENV_GET_CPU(env);
++    TaskState *ts =3D cpu->opaque;
++    struct image_info *info =3D ts->info;
 +
-+    /* We can't allow the supervisor to control SEIP as this would allow t=
-he
-+     * supervisor to clear a pending external interrupt which will result =
-in
-+     * lost a interrupt in the case a PLIC is attached. The SEIP bit must =
-be
-+     * hardware controlled when a PLIC is attached.
-+     */
-+    for (i =3D 0; i < smp_cpus; i++) {
-+        RISCVCPU *cpu =3D RISCV_CPU(qemu_get_cpu(i));
-+        if (riscv_cpu_claim_interrupts(cpu, MIP_SEIP) < 0) {
-+            error_report("SEIP already claimed");
-+            exit(1);
-+        }
+     env->pc =3D regs->sepc;
+     env->gpr[xSP] =3D regs->sp;
++    env->elf_flags =3D info->elf_flags;
++
++    if ((env->misa & RVE) && !(env->elf_flags & EF_RISCV_RVE)) {
++        error_report("Incompatible ELF: RVE cpu requires RVE ABI binary");
++        exit(EXIT_FAILURE);
 +    }
  }
-=20
- static void sifive_plic_class_init(ObjectClass *klass, void *data)
 diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 5c2aebf132..a0b3c22dec 100644
+index a0b3c22dec..8e4b5cfe26 100644
 --- a/target/riscv/cpu.h
 +++ b/target/riscv/cpu.h
-@@ -140,6 +140,7 @@ struct CPURISCVState {
-      * mip is 32-bits to allow atomic_read on 32-bit hosts.
-      */
-     uint32_t mip;
-+    uint32_t miclaim;
+@@ -123,6 +123,10 @@ struct CPURISCVState {
 =20
-     target_ulong mie;
-     target_ulong mideleg;
-@@ -263,6 +264,7 @@ void riscv_cpu_list(FILE *f, fprintf_function cpu_fprin=
-tf);
- #define cpu_mmu_index riscv_cpu_mmu_index
+     uint32_t features;
 =20
- #ifndef CONFIG_USER_ONLY
-+int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts);
- uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value=
-);
- #define BOOL_TO_MASK(x) (-!!(x)) /* helper for riscv_cpu_update_mip value =
-*/
- #endif
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index f49e98ed59..555756d40c 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -72,6 +72,17 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrup=
-t_request)
-=20
- #if !defined(CONFIG_USER_ONLY)
-=20
-+int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
-+{
-+    CPURISCVState *env =3D &cpu->env;
-+    if (env->miclaim & interrupts) {
-+        return -1;
-+    } else {
-+        env->miclaim |=3D interrupts;
-+        return 0;
-+    }
-+}
++#ifdef CONFIG_USER_ONLY
++    uint32_t elf_flags;
++#endif
 +
- /* iothread_mutex must be held */
- uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value=
-)
- {
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index 960d2b0aa9..938c10897c 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -550,16 +550,10 @@ static int rmw_mip(CPURISCVState *env, int csrno, tar=
-get_ulong *ret_value,
-                    target_ulong new_value, target_ulong write_mask)
- {
-     RISCVCPU *cpu =3D riscv_env_get_cpu(env);
--    target_ulong mask =3D write_mask & delegable_ints;
-+    /* Allow software control of delegable interrupts not claimed by hardw=
-are */
-+    target_ulong mask =3D write_mask & delegable_ints & ~env->miclaim;
-     uint32_t old_mip;
-=20
--    /* We can't allow the supervisor to control SEIP as this would allow t=
-he
--     * supervisor to clear a pending external interrupt which will result =
-in
--     * lost a interrupt in the case a PLIC is attached. The SEIP bit must =
-be
--     * hardware controlled when a PLIC is attached. This should be an opti=
-on
--     * for CPUs with software-delegated Supervisor External Interrupts. */
--    mask &=3D ~MIP_SEIP;
--
-     if (mask) {
-         qemu_mutex_lock_iothread();
-         old_mip =3D riscv_cpu_update_mip(cpu, mask, (new_value & mask));
+ #ifndef CONFIG_USER_ONLY
+     target_ulong priv;
+     target_ulong resetvec;
+diff --git a/target/riscv/cpu_user.h b/target/riscv/cpu_user.h
+index c2199610ab..52d380aa98 100644
+--- a/target/riscv/cpu_user.h
++++ b/target/riscv/cpu_user.h
+@@ -10,4 +10,5 @@
+ #define xA4 14
+ #define xA5 15
+ #define xA6 16
+-#define xA7 17  /* syscall number goes here */
++#define xA7 17  /* syscall number for RVI ABI */
++#define xT0 5   /* syscall number for RVE ABI */
 --=20
 2.20.1
