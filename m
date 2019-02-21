@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57925)
+Received: from eggs.gnu.org ([209.51.188.92]:57953)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcT1-0003w7-9Z
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:00 -0500
+	id 1gwcT3-0003yJ-F2
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcT0-0002Jw-63
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:43:59 -0500
+	id 1gwcT1-0002KP-6e
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:44:01 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 21 Feb 2019 00:43:30 +0000
-Message-ID: <821f677eb0606393f2c624f262469036c79b0d64.1550709660.git.alistair.francis@wdc.com>
+Date: Thu, 21 Feb 2019 00:43:20 +0000
+Message-ID: <b8787125d5156d8185be03e30d7f2731832cef4e.1550709660.git.alistair.francis@wdc.com>
 References: <cover.1550709660.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1550709660.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 02/11] RISC-V: Replace __builtin_popcount
- with ctpop8 in PLIC
+Subject: [Qemu-devel] [PATCH v2 01/11] riscv: pmp: Log pmp access errors as
+ guest errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +29,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>
 
-From: Michael Clark <mjc@sifive.com>
-
-The mode variable only uses the lower 4-bits (M,H,S,U) so
-replace the GCC specific __builtin_popcount with ctpop8.
-
-Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_plic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/riscv/pmp.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index d12ec3fc9a..b859f919a7 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -383,7 +383,7 @@ static void parse_hart_config(SiFivePLICState *plic)
-     p =3D plic->hart_config;
-     while ((c =3D *p++)) {
-         if (c =3D=3D ',') {
--            addrid +=3D __builtin_popcount(modes);
-+            addrid +=3D ctpop8(modes);
-             modes =3D 0;
-             hartid++;
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+index 15a5366616..b11c4ae22f 100644
+--- a/target/riscv/pmp.c
++++ b/target/riscv/pmp.c
+@@ -113,10 +113,11 @@ static void pmp_write_cfg(CPURISCVState *env, uint32_=
+t pmp_index, uint8_t val)
+             env->pmp_state.pmp[pmp_index].cfg_reg =3D val;
+             pmp_update_rule(env, pmp_index);
          } else {
-@@ -397,7 +397,7 @@ static void parse_hart_config(SiFivePLICState *plic)
+-            PMP_DEBUG("ignoring write - locked");
++            qemu_log_mask(LOG_GUEST_ERROR, "ignoring pmpcfg write - locked=
+\n");
          }
+     } else {
+-        PMP_DEBUG("ignoring write - out of bounds");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ignoring pmpcfg write - out of bounds\n");
      }
-     if (modes) {
--        addrid +=3D __builtin_popcount(modes);
-+        addrid +=3D ctpop8(modes);
-     }
-     hartid++;
+ }
 =20
+@@ -249,7 +250,8 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulon=
+g addr,
+=20
+         /* partially inside */
+         if ((s + e) =3D=3D 1) {
+-            PMP_DEBUG("pmp violation - access is partially inside");
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "pmp violation - access is partially inside\n");
+             ret =3D 0;
+             break;
+         }
+@@ -306,7 +308,8 @@ void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_=
+index,
+         env->mhartid, reg_index, val);
+=20
+     if ((reg_index & 1) && (sizeof(target_ulong) =3D=3D 8)) {
+-        PMP_DEBUG("ignoring write - incorrect address");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ignoring pmpcfg write - incorrect address\n");
+         return;
+     }
+=20
+@@ -353,10 +356,12 @@ void pmpaddr_csr_write(CPURISCVState *env, uint32_t a=
+ddr_index,
+             env->pmp_state.pmp[addr_index].addr_reg =3D val;
+             pmp_update_rule(env, addr_index);
+         } else {
+-            PMP_DEBUG("ignoring write - locked");
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "ignoring pmpaddr write - locked\n");
+         }
+     } else {
+-        PMP_DEBUG("ignoring write - out of bounds");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ignoring pmpaddr write - out of bounds\n");
+     }
+ }
+=20
+@@ -372,7 +377,8 @@ target_ulong pmpaddr_csr_read(CPURISCVState *env, uint3=
+2_t addr_index)
+     if (addr_index < MAX_RISCV_PMPS) {
+         return env->pmp_state.pmp[addr_index].addr_reg;
+     } else {
+-        PMP_DEBUG("ignoring read - out of bounds");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ignoring pmpaddr read - out of bounds\n");
+         return 0;
+     }
+ }
 --=20
 2.20.1
