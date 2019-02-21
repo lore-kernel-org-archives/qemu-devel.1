@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51221)
+Received: from eggs.gnu.org ([209.51.188.92]:51227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTz-0004Yc-KL
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTz-0004Z0-Na
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTy-0005QX-F2
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTy-0005Qy-N0
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:07 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34752 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:34749 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gwtTw-0005OT-DH
+	id 1gwtTy-0005N2-Du
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:06 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 21 Feb 2019 19:53:39 +0100
-Message-Id: <1550775220-26797-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 21 Feb 2019 19:53:37 +0100
+Message-Id: <1550775220-26797-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 7/8] target/mips: fulong2e: Fix bios flash
- size
+Subject: [Qemu-devel] [PULL v2 5/8] target/mips: implement QMP
+ query-cpu-definitions command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +31,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-According to both the specifications on linux-mips.org referenced in a
-comment at the beginning of the file and the flash chip part number
-the bios size should be 512k not 1M.
+This patch enables QMP-based querying of the available CPU types for
+MIPS and MIPS64 platforms.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/mips/mips_fulong2e.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ qapi/target.json     |  4 ++--
+ target/mips/helper.c | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 02549d5..10e6ed5 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -21,6 +21,7 @@
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "qapi/error.h"
-+#include "cpu.h"
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
- #include "hw/dma/i8257.h"
-@@ -35,7 +36,6 @@
- #include "audio/audio.h"
- #include "qemu/log.h"
- #include "hw/loader.h"
--#include "hw/mips/bios.h"
- #include "hw/ide.h"
- #include "elf.h"
- #include "hw/isa/vt82c686.h"
-@@ -51,6 +51,8 @@
- #define ENVP_NB_ENTRIES	 	16
- #define ENVP_ENTRY_SIZE	 	256
+diff --git a/qapi/target.json b/qapi/target.json
+index da7b4be..1d4d54b 100644
+--- a/qapi/target.json
++++ b/qapi/target.json
+@@ -499,7 +499,7 @@
+             'static': 'bool',
+             '*unavailable-features': [ 'str' ],
+             'typename': 'str' },
+-  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
+86) || defined(TARGET_S390X)' }
++  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
+86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
 =20
-+/* fulong 2e has a 512k flash: Winbond W39L040AP70Z */
-+#define BIOS_SIZE (512 * KiB)
- #define MAX_IDE_BUS 2
+ ##
+ # @query-cpu-definitions:
+@@ -511,4 +511,4 @@
+ # Since: 1.2.0
+ ##
+ { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
+-  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
+86) || defined(TARGET_S390X)' }
++  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
+86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 944f094..c44cdca 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -24,6 +24,7 @@
+ #include "exec/cpu_ldst.h"
+ #include "exec/log.h"
+ #include "hw/mips/cpudevs.h"
++#include "qapi/qapi-commands-target.h"
 =20
- /*
-@@ -307,12 +309,9 @@ static void mips_fulong2e_init(MachineState *machine=
-)
-     /* fulong 2e has 256M ram. */
-     ram_size =3D 256 * MiB;
+ enum {
+     TLBRET_XI =3D -6,
+@@ -1470,3 +1471,35 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSS=
+tate *env,
 =20
--    /* fulong 2e has a 1M flash.Winbond W39L040AP70Z */
--    bios_size =3D 1 * MiB;
--
-     /* allocate RAM */
-     memory_region_allocate_system_memory(ram, NULL, "fulong2e.ram", ram_=
-size);
--    memory_region_init_ram(bios, NULL, "fulong2e.bios", bios_size,
-+    memory_region_init_ram(bios, NULL, "fulong2e.bios", BIOS_SIZE,
-                            &error_fatal);
-     memory_region_set_readonly(bios, true);
-=20
+     cpu_loop_exit_restore(cs, pc);
+ }
++
++static void mips_cpu_add_definition(gpointer data, gpointer user_data)
++{
++    ObjectClass *oc =3D data;
++    CpuDefinitionInfoList **cpu_list =3D user_data;
++    CpuDefinitionInfoList *entry;
++    CpuDefinitionInfo *info;
++    const char *typename;
++
++    typename =3D object_class_get_name(oc);
++    info =3D g_malloc0(sizeof(*info));
++    info->name =3D g_strndup(typename,
++                           strlen(typename) - strlen("-" TYPE_MIPS_CPU))=
+;
++    info->q_typename =3D g_strdup(typename);
++
++    entry =3D g_malloc0(sizeof(*entry));
++    entry->value =3D info;
++    entry->next =3D *cpu_list;
++    *cpu_list =3D entry;
++}
++
++CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
++{
++    CpuDefinitionInfoList *cpu_list =3D NULL;
++    GSList *list;
++
++    list =3D object_class_get_list(TYPE_MIPS_CPU, false);
++    g_slist_foreach(list, mips_cpu_add_definition, &cpu_list);
++    g_slist_free(list);
++
++    return cpu_list;
++}
 --=20
 2.7.4
