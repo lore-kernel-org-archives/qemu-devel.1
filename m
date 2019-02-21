@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52280)
+Received: from eggs.gnu.org ([209.51.188.92]:52319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwtXt-00005j-W8
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gwtXv-000071-7r
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwtXr-0007Vd-I6
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:09 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:35736)
+	(envelope-from <peter.maydell@linaro.org>) id 1gwtXu-0007XS-1W
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:11 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33589)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gwtXr-0007UV-9J
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:07 -0500
-Received: by mail-wr1-x433.google.com with SMTP id t18so31879910wrx.2
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:58:07 -0800 (PST)
+	id 1gwtXt-0007Wv-PD
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:09 -0500
+Received: by mail-wm1-x344.google.com with SMTP id h22so7303743wmb.0
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:58:09 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	c18sm29065085wre.32.2019.02.21.10.58.04 for <qemu-devel@nongnu.org>
+	c18sm29065085wre.32.2019.02.21.10.58.07 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 21 Feb 2019 10:58:05 -0800 (PST)
+	Thu, 21 Feb 2019 10:58:07 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Feb 2019 18:57:37 +0000
-Message-Id: <20190221185739.25362-20-peter.maydell@linaro.org>
+Date: Thu, 21 Feb 2019 18:57:39 +0000
+Message-Id: <20190221185739.25362-22-peter.maydell@linaro.org>
 In-Reply-To: <20190221185739.25362-1-peter.maydell@linaro.org>
 References: <20190221185739.25362-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/21] hw/arm/musca: Wire up PL031 RTC
+Subject: [Qemu-devel] [PULL 21/21] hw/arm/armsse: Make 0x5... alias region
+ work for per-CPU devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,85 +37,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Wire up the PL031 RTC for the Musca board.
+The region 0x40010000 .. 0x4001ffff and its secure-only alias
+at 0x50010000... are for per-CPU devices. We implement this by
+giving each CPU its own container memory region, where the
+per-CPU devices live. Unfortunately, the alias region which
+makes devices mapped at 0x4... addresses also appear at 0x5...
+is only implemented in the overall "all CPUs" container. The
+effect of this bug is that the CPU_IDENTITY register block appears
+only at 0x4001f000, but not at the 0x5001f000 alias where it should
+also appear. Guests (like very recent Arm Trusted Firmware-M)
+which try to access it at 0x5001f000 will crash.
+
+Fix this by moving the handling for this alias from the "all CPUs"
+container to the per-CPU container. (We leave the aliases for
+0x1... and 0x3... in the overall container, because there are
+no per-CPU devices there.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190215180500.6906-1-peter.maydell@linaro.org
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- hw/arm/musca.c | 26 +++++++++++++++++++++++---
- 1 file changed, 23 insertions(+), 3 deletions(-)
+ include/hw/arm/armsse.h |  2 +-
+ hw/arm/armsse.c         | 26 ++++++++++++++++----------
+ 2 files changed, 17 insertions(+), 11 deletions(-)
 
-diff --git a/hw/arm/musca.c b/hw/arm/musca.c
-index c4095c4579b..378912b7385 100644
---- a/hw/arm/musca.c
-+++ b/hw/arm/musca.c
-@@ -30,6 +30,7 @@
- #include "hw/misc/tz-mpc.h"
- #include "hw/misc/tz-ppc.h"
- #include "hw/misc/unimp.h"
-+#include "hw/timer/pl031.h"
+diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
+index 84879f40dd8..7ef871c7dfe 100644
+--- a/include/hw/arm/armsse.h
++++ b/include/hw/arm/armsse.h
+@@ -186,7 +186,7 @@ typedef struct ARMSSE {
+     MemoryRegion cpu_container[SSE_MAX_CPUS];
+     MemoryRegion alias1;
+     MemoryRegion alias2;
+-    MemoryRegion alias3;
++    MemoryRegion alias3[SSE_MAX_CPUS];
+     MemoryRegion sram[MAX_SRAM_BANKS];
  
- #define MUSCA_NUMIRQ_MAX 96
- #define MUSCA_PPC_MAX 3
-@@ -73,7 +74,7 @@ typedef struct {
-     UnimplementedDeviceState spi;
-     UnimplementedDeviceState scc;
-     UnimplementedDeviceState timer;
--    UnimplementedDeviceState rtc;
-+    PL031State rtc;
-     UnimplementedDeviceState pvt;
-     UnimplementedDeviceState sdio;
-     UnimplementedDeviceState gpio;
-@@ -98,6 +99,14 @@ typedef struct {
+     qemu_irq *exp_irqs[SSE_MAX_CPUS];
+diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
+index 50da41f64c5..129e7ea7fe0 100644
+--- a/hw/arm/armsse.c
++++ b/hw/arm/armsse.c
+@@ -110,15 +110,16 @@ static bool irq_is_common[32] = {
+     /* 30, 31: reserved */
+ };
+ 
+-/* Create an alias region of @size bytes starting at @base
++/*
++ * Create an alias region in @container of @size bytes starting at @base
+  * which mirrors the memory starting at @orig.
   */
- #define SYSCLK_FRQ 40000000
- 
-+static qemu_irq get_sse_irq_in(MuscaMachineState *mms, int irqno)
-+{
-+    /* Return a qemu_irq which will signal IRQ n to all CPUs in the SSE. */
-+    assert(irqno < MUSCA_NUMIRQ_MAX);
-+
-+    return qdev_get_gpio_in(DEVICE(&mms->cpu_irq_splitter[irqno]), 0);
-+}
-+
- /*
-  * Most of the devices in the Musca board sit behind Peripheral Protection
-  * Controllers. These data structures define the layout of which devices
-@@ -265,6 +274,17 @@ static MemoryRegion *make_mpc(MuscaMachineState *mms, void *opaque,
-     return sysbus_mmio_get_region(SYS_BUS_DEVICE(mpc), 0);
+-static void make_alias(ARMSSE *s, MemoryRegion *mr, const char *name,
+-                       hwaddr base, hwaddr size, hwaddr orig)
++static void make_alias(ARMSSE *s, MemoryRegion *mr, MemoryRegion *container,
++                       const char *name, hwaddr base, hwaddr size, hwaddr orig)
+ {
+-    memory_region_init_alias(mr, NULL, name, &s->container, orig, size);
++    memory_region_init_alias(mr, NULL, name, container, orig, size);
+     /* The alias is even lower priority than unimplemented_device regions */
+-    memory_region_add_subregion_overlap(&s->container, base, mr, -1500);
++    memory_region_add_subregion_overlap(container, base, mr, -1500);
  }
  
-+static MemoryRegion *make_rtc(MuscaMachineState *mms, void *opaque,
-+                              const char *name, hwaddr size)
-+{
-+    PL031State *rtc = opaque;
-+
-+    sysbus_init_child_obj(OBJECT(mms), name, rtc, sizeof(mms->rtc), TYPE_PL031);
-+    object_property_set_bool(OBJECT(rtc), true, "realized", &error_fatal);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(rtc), 0, get_sse_irq_in(mms, 39));
-+    return sysbus_mmio_get_region(SYS_BUS_DEVICE(rtc), 0);
-+}
-+
- static MemoryRegion *make_musca_a_devs(MuscaMachineState *mms, void *opaque,
-                                        const char *name, hwaddr size)
- {
-@@ -287,7 +307,7 @@ static MemoryRegion *make_musca_a_devs(MuscaMachineState *mms, void *opaque,
-         { "i2c1", make_unimp_dev, &mms->i2c[1], 0x5000, 0x1000 },
-         { "i2s", make_unimp_dev, &mms->i2s, 0x6000, 0x1000 },
-         { "pwm0", make_unimp_dev, &mms->pwm[0], 0x7000, 0x1000 },
--        { "rtc", make_unimp_dev, &mms->rtc, 0x8000, 0x1000 },
-+        { "rtc", make_rtc, &mms->rtc, 0x8000, 0x1000 },
-         { "qspi", make_unimp_dev, &mms->qspi, 0xa000, 0x1000 },
-         { "timer", make_unimp_dev, &mms->timer, 0xb000, 0x1000 },
-         { "scc", make_unimp_dev, &mms->scc, 0xc000, 0x1000 },
-@@ -447,7 +467,7 @@ static void musca_init(MachineState *machine)
-                 { "spi", make_unimp_dev, &mms->spi, 0x4010a000, 0x1000 },
-                 { "scc", make_unimp_dev, &mms->scc, 0x5010b000, 0x1000 },
-                 { "timer", make_unimp_dev, &mms->timer, 0x4010c000, 0x1000 },
--                { "rtc", make_unimp_dev, &mms->rtc, 0x4010d000, 0x1000 },
-+                { "rtc", make_rtc, &mms->rtc, 0x4010d000, 0x1000 },
-                 { "pvt", make_unimp_dev, &mms->pvt, 0x4010e000, 0x1000 },
-                 { "sdio", make_unimp_dev, &mms->sdio, 0x4010f000, 0x1000 },
-             },
+ static void irq_status_forwarder(void *opaque, int n, int level)
+@@ -607,16 +608,21 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     /* Set up the big aliases first */
+-    make_alias(s, &s->alias1, "alias 1", 0x10000000, 0x10000000, 0x00000000);
+-    make_alias(s, &s->alias2, "alias 2", 0x30000000, 0x10000000, 0x20000000);
++    make_alias(s, &s->alias1, &s->container, "alias 1",
++               0x10000000, 0x10000000, 0x00000000);
++    make_alias(s, &s->alias2, &s->container,
++               "alias 2", 0x30000000, 0x10000000, 0x20000000);
+     /* The 0x50000000..0x5fffffff region is not a pure alias: it has
+      * a few extra devices that only appear there (generally the
+      * control interfaces for the protection controllers).
+      * We implement this by mapping those devices over the top of this
+-     * alias MR at a higher priority.
++     * alias MR at a higher priority. Some of the devices in this range
++     * are per-CPU, so we must put this alias in the per-cpu containers.
+      */
+-    make_alias(s, &s->alias3, "alias 3", 0x50000000, 0x10000000, 0x40000000);
+-
++    for (i = 0; i < info->num_cpus; i++) {
++        make_alias(s, &s->alias3[i], &s->cpu_container[i],
++                   "alias 3", 0x50000000, 0x10000000, 0x40000000);
++    }
+ 
+     /* Security controller */
+     object_property_set_bool(OBJECT(&s->secctl), true, "realized", &err);
 -- 
 2.20.1
