@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53066)
+Received: from eggs.gnu.org ([209.51.188.92]:55348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gwwlm-0006QA-7r
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 17:24:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gwwpL-0007FB-By
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 17:28:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gwwlk-0002NF-96
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 17:24:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39148)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gwwlj-0002FI-Qt
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 17:24:40 -0500
-Date: Thu, 21 Feb 2019 15:23:44 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190221152344.431ced05@w520.home>
-In-Reply-To: <1550611400-13703-2-git-send-email-kwankhede@nvidia.com>
-References: <1550611400-13703-1-git-send-email-kwankhede@nvidia.com>
-	<1550611400-13703-2-git-send-email-kwankhede@nvidia.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gwwpG-0005fd-3H
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 17:28:19 -0500
+Date: Fri, 22 Feb 2019 09:18:51 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190221221851.GA8609@umbus.fritz.box>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-6-armbru@redhat.com>
+	<878sy9418l.fsf@zen.linaroharston>
+	<87sgwhxfvh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] VFIO KABI for migration interface
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="X1bOJ3K7DJ5YkBrT"
+Content-Disposition: inline
+In-Reply-To: <87sgwhxfvh.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 05/10] ppc405_boards: Don't size flash
+ memory to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,217 +27,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Cc: cjia@nvidia.com, kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com, cohuck@redhat.com, dgilbert@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com, Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com, zhi.a.wang@intel.com, yan.y.zhao@intel.com, yulei.zhang@intel.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-On Wed, 20 Feb 2019 02:53:16 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> - Defined MIGRATION region type and sub-type.
-> - Used 2 bits to define VFIO device states.
->     Bit 0 => 0/1 => _STOPPED/_RUNNING
->     Bit 1 => 0/1 => _RESUMING/_SAVING
->     Combination of these bits defines VFIO device's state during migration
->     _RUNNING => Normal VFIO device running state.
->     _STOPPED => VFIO device stopped.
->     _SAVING | _RUNNING => vCPUs are running, VFIO device is running but start
->                           saving state of device i.e. pre-copy state
->     _SAVING | _STOPPED => vCPUs are stoppped, VFIO device should be stopped, and
->                           save device state,i.e. stop-n-copy state
->     _RESUMING => VFIO device resuming state.
+--X1bOJ3K7DJ5YkBrT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Shouldn't we have a non-_RESUMING/_SAVING run state?  If these are
-indicating directly flow, maybe we need two bits:
+On Thu, Feb 21, 2019 at 05:31:30PM +0100, Markus Armbruster wrote:
+> Alex Benn=E9e <alex.bennee@linaro.org> writes:
+>=20
+> > Markus Armbruster <armbru@redhat.com> writes:
+> >
+> >> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+> >> Image size is rounded up to the next multiple of 64KiB.  Useless,
+> >> because pflash_cfi02_realize() fails with "failed to read the initial
+> >> flash content" unless the rounding is a no-op.
+> >>
+> >> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+> >> other stuff.  No idea how that would play out, but a useful outcomes
+> >> seem unlikely.
+> >>
+> >> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+> >> regardless of image size, to match the physical hardware.
+> >>
+> >> Machine "taihu" maps its boot flash memory similarly.  The code even
+> >> has a comment /* XXX: should check that size is 2MB */, followed by
+> >> disabled code to adjust the size to 2MiB regardless of image size.
+> >>
+> >> Its code to map its application flash memory looks the same, except
+> >> there the XXX comment asks for 32MiB, and the code to adjust the size
+> >> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+> >> to read the initial flash content" for images smaller than 32MiB.
+> >>
+> >> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+> >> to match the physical hardware.  Delete dead code from application
+> >> flash mapping, and simplify some.
+> >>
+> >> Cc: David Gibson <david@gibson.dropbear.id.au>
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> ---
+> >>  hw/ppc/ppc405_boards.c | 53 +++++++++++++-----------------------------
+> >>  1 file changed, 16 insertions(+), 37 deletions(-)
+> >>
+> >> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+> >> index f47b15f10e..728154aebb 100644
+> >> --- a/hw/ppc/ppc405_boards.c
+> >> +++ b/hw/ppc/ppc405_boards.c
+> >> @@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
+> >>      target_ulong kernel_base, initrd_base;
+> >>      long kernel_size, initrd_size;
+> >>      int linux_boot;
+> >> -    int fl_idx, fl_sectors, len;
+> >> +    int len;
+> >>      DriveInfo *dinfo;
+> >>      MemoryRegion *sysmem =3D get_system_memory();
+> >>
+> >> @@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
+> >>  #ifdef DEBUG_BOARD_INIT
+> >>      printf("%s: register BIOS\n", __func__);
+> >>  #endif
+> >> -    fl_idx =3D 0;
+> >>  #ifdef USE_FLASH_BIOS
+> >> -    dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+> >> +    dinfo =3D drive_get(IF_PFLASH, 0, 0);
+> >>      if (dinfo) {
+> >> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+> >> -
+> >> -        bios_size =3D blk_getlength(blk);
+> >> -        fl_sectors =3D (bios_size + 65535) >> 16;
+> >>  #ifdef DEBUG_BOARD_INIT
+> >> -        printf("Register parallel flash %d size %lx"
+> >> -               " at addr %lx '%s' %d\n",
+> >> -               fl_idx, bios_size, -bios_size,
+> >> -               blk_name(blk), fl_sectors);
+> >> +        printf("Register parallel flash\n");
+> >>  #endif
+> >> -        pflash_cfi02_register((uint32_t)(-bios_size),
+> >> +        bios_size =3D 0x80000;
+> >
+> >  bios_size =3D 8 * MiB?
+>=20
+> The next line has base address 0xFFF80000.  I picked 0x80000 to make
+> 0xFFF80000 + 0x80000 =3D=3D 0 mod 2^32 more obvious.
+>=20
+> If I change 0x80000 to 8 * MiB, the size is more obvious, but "at end of
+> 32 bit address space" less so.
+>=20
+> If I additionally change the base address back to ((uint32_t)-bios_size,
+> "at end of 32 bit address space" is obvious again, but the actual base
+> address less so.
 
-  00b - None, normal runtime
-  01b - Saving
-  10b - Resuming
-  11b - Invalid/reserved (maybe a Failed state indicator)
+I have a weak preference for ((uint32_t)-bios_size), with bios_size =3D
+8 * MiB.
 
-> - Defined vfio_device_migration_info structure which will be placed at 0th
->   offset of migration region to get/set VFIO device related information.
->   Defined members of structure and usage on read/write access:
->     * device_state: (write only)
->         To convey VFIO device state to be transitioned to.
+>=20
+> I don't really care myself.  David, you're the maintainer, do you have a
+> preference?
+>=20
+> >> +        pflash_cfi02_register(0xFFF80000,
+> >>                                NULL, "ef405ep.bios", bios_size,
+> >> -                              blk, 65536, fl_sectors, 1,
+> >> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NU=
+LL,
+> >> +                              65536, bios_size / 65536, 1,
+> >
+> > 64 * KiB?
+>=20
+> David, same question (two additional instances below).
 
-Seems trivial and potentially useful to support read here, we have 30
-(or maybe 29) bits yet to define.
+Here I think 64 * KiB would be nice in each of those places.  Again,
+only a weak preference.
 
->     * pending bytes: (read only)
->         To get pending bytes yet to be migrated for VFIO device
->     * data_offset: (read/write)
->         To get or set data offset in migration from where data exist
->         during _SAVING and _RESUMING state
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-What's the use case for writing this?
+--X1bOJ3K7DJ5YkBrT
+Content-Type: application/pgp-signature; name="signature.asc"
 
->     * data_size: (write only)
->         To convey size of data copied in migration region during _RESUMING
->         state
+-----BEGIN PGP SIGNATURE-----
 
-How to know how much is available for read?
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxvI8gACgkQbDjKyiDZ
+s5I8vhAAsIRC7QL+sgm9P8X5NQdUDmGEnu3GVCjS5GlGFewY1dCDx9y7B84cNbet
+0DRebsQgoc1KnKjRN0K+tOGSJ9joRZitB+T4oDvnQ/RG4qnf8n+oWzn+jO81aK6J
+LStoGEQ5mrCAwZs1GFXrBYmRI+Ti2MADMj5wB4Yu2Jiuf3TiWI1z2WTuW1fENhDf
+NPsrFyCeRCy5nv9MCo5oo3jJBAKnXSFLMP3+DthoDl7fi+Stu5i/+ESXhR/1wRR8
+u9a8xuM3pu+MsaBnOLM+7ctDPmnLURUk8RPpt0NIXzWr/w2Ix3giE6saBpnmD8/7
+T9TijbCab8mL3Bn/G/Dl6h1PjF7st0Q2CdasopWKztZh44XILpS+wLYByZBLNtSy
+wvkRCZAN5bdVtUbNv044A31Cf/45kyytr/4mTSoZfsXbYGxw7o96mqb6apdz93fp
+qFVdgXMvUqxlCzOWELjYY4cqhna369Q85z8/PtCge+laOBg+GYo7igtUyU50MqbM
+jXPBG2WEiUV0dIdQQx66FLoPQF5NWKljDXjk1bFmQPz7lpVi9At8x2J89FZOlBfT
+XKiUP8ZlTQ3nI0dMfXfcC3ZFEEQmr5mGwx9CIkLIHUp67WEFDwO6vNNTyhgkPrmK
+lAW7JSaLYMWeHsoXD/IcNIjddiPUBy8yj6pKG9f6LVdupV1lYZk=
+=tWv3
+-----END PGP SIGNATURE-----
 
->     * start_pfn, page_size, total_pfns: (write only)
->         To get bitmap of dirty pages from vendor driver from given
->         start address for total_pfns.
-
-What would happen if a user wrote in 1MB for page size?  Is the vendor
-driver expected to support arbitrary page sizes?  Are we only trying to
-convey the page size and would that page size ever be other than
-getpagesize()?
-
->     * copied_pfns: (read only)
->         To get number of pfns bitmap copied in migration region.
->         Vendor driver should copy the bitmap with bits set only for
->         pages to be marked dirty in migration region. Vendor driver
->         should return 0 if there are 0 pages dirty in requested
->         range.
-
-This is useful, but I wonder if it's really a required feature for the
-vendor driver.  For instance, with mdev IOMMU support we could wrap an
-arbitrary PCI device as mdev, but we don't necessarily have dirty page
-tracking.  Would a device need to report -1 here if it wanted to
-indicate any page could be dirty if we only know how to collect the
-state of the device itself for migration (ie. force the device to be
-stopped first).
- 
-> Migration region looks like:
->  ------------------------------------------------------------------
-> |vfio_device_migration_info|    data section                      |
-> |                          |     ///////////////////////////////  |
->  ------------------------------------------------------------------
-                             ^ what's this?
-
->  ^                              ^                              ^
->  offset 0-trapped part        data.offset                 data.size
-
-Isn't data.size above really (data.offset + data.size)?  '.' vs '_'
-inconsistency vs above.
- 
-> Data section is always followed by vfio_device_migration_info
-> structure in the region, so data.offset will always be none-0.
-
-This seems exactly backwards from the diagram, data section follows
-vfio_device_migration_info.  Also, "non-zero".
-
-> Offset from where data is copied is decided by kernel driver, data
-
-But data_offset is listed as read-write.
-
-> section can be trapped or mapped depending on how kernel driver
-> defines data section. If mmapped, then data.offset should be page
-> aligned, where as initial section which contain
-> vfio_device_migration_info structure might not end at offset which
-> is page aligned.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  linux-headers/linux/vfio.h | 65 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 65 insertions(+)
-> 
-> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> index 12a7b1dc53c8..1b12a9b95e00 100644
-> --- a/linux-headers/linux/vfio.h
-> +++ b/linux-headers/linux/vfio.h
-> @@ -368,6 +368,71 @@ struct vfio_region_gfx_edid {
->   */
->  #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
->  
-> +/* Migration region type and sub-type */
-> +#define VFIO_REGION_TYPE_MIGRATION	        (2)
-> +#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
-> +
-> +/**
-> + * Structure vfio_device_migration_info is placed at 0th offset of
-> + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
-> + * information. Field accesses from this structure are only supported at their
-> + * native width and alignment, otherwise should return error.
-> + *
-> + * device_state: (write only)
-> + *      To indicate vendor driver the state VFIO device should be transitioned
-> + *      to. If device state transition fails, write to this field return error.
-> + *      It consists of 2 bits.
-> + *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
-> + *        _STOPPED state. When device is changed to _STOPPED, driver should stop
-> + *        device before write returns.
-> + *      - If bit 1 set, indicates _SAVING state. When its reset, that indicates
-> + *        _RESUMING state.
-> + *
-> + * pending bytes: (read only)
-> + *      Read pending bytes yet to be migrated from vendor driver
-
-Is this essentially a volatile value, changing based on data previously
-copied and device activity?
-
-> + *
-> + * data_offset: (read/write)
-> + *      User application should read data_offset in migration region from where
-> + *      user application should read data during _SAVING state.
-> + *      User application would write data_offset in migration region from where
-> + *      user application is had written data during _RESUMING state.
-
-Why wouldn't data_offset simply be fixed?  Do we really want to support
-the user writing a arbitrary offsets in the migration region?  Each
-chunk can simply start at the kernel provided data_offset.
-
-> + *
-> + * data_size: (write only)
-> + *      User application should write size of data copied in migration region
-> + *      during _RESUMING state.
-
-How much does the user read on _SAVING then?
-
-> + *
-> + * start_pfn: (write only)
-> + *      Start address pfn to get bitmap of dirty pages from vendor driver duing
-> + *      _SAVING state.
-> + *
-> + * page_size: (write only)
-> + *      User application should write the page_size of pfn.
-> + *
-> + * total_pfns: (write only)
-> + *      Total pfn count from start_pfn for which dirty bitmap is requested.
-
-So effectively the area that begins at data_offset is dual purpose
-(triple purpose vs Yan's, config, memory, and dirty bitmap) but the
-protocol isn't entirely evident to me. I think we need to write it out
-as Yan provided.  If I'm in the _SAVING state, do I simply read from
-data_offset to min(data_size, region.size - data_offset)?  If that area
-is mmap'd, how does the user indicate to the kernel to prepare the data
-or that X bytes were acquired?  In the _RESUMING state, do I write from
-data_offset to min(data_size, region.size - data_offset) and indicate
-the write using data_size?
-
-> + *
-> + * copied_pfns: (read only)
-> + *      pfn count for which dirty bitmap is copied to migration region.
-> + *      Vendor driver should copy the bitmap with bits set only for pages to be
-> + *      marked dirty in migration region.
-> + *      Vendor driver should return 0 if there are 0 pages dirty in requested
-> + *      range.
-> + */
-> +
-> +struct vfio_device_migration_info {
-> +        __u32 device_state;         /* VFIO device state */
-> +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
-> +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
-> +        __u32 reserved;
-> +        __u64 pending_bytes;
-> +        __u64 data_offset;
-> +        __u64 data_size;
-> +        __u64 start_pfn;
-> +        __u64 page_size;
-> +        __u64 total_pfns;
-> +        __u64 copied_pfns;
-> +} __attribute__((packed));
-> +
-
-As you mentioned, and with Yan's version, we still need to figure out
-something with compatibility and versioning.  Thanks,
-
-Alex
-
->  /*
->   * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
->   * which allows direct access to non-MSIX registers which happened to be within
+--X1bOJ3K7DJ5YkBrT--
