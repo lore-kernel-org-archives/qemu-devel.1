@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36768)
+Received: from eggs.gnu.org ([209.51.188.92]:37021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1gwsNB-0001qU-0k
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 12:43:01 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gwsOJ-0002gK-VI
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 12:44:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1gwsNA-00015T-CX
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 12:43:00 -0500
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:46182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1gwsN6-000129-DL
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 12:42:58 -0500
-Received: by mail-oi1-x229.google.com with SMTP id j135so2086458oib.13
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 09:42:52 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1gwsOJ-0001y7-7x
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 12:44:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57950)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gwsOH-0001rZ-6X
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 12:44:09 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B0BB330821A0
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 17:43:59 +0000 (UTC)
+Date: Thu, 21 Feb 2019 17:43:55 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190221174355.GL2605@work-vm>
+References: <20190220115611.3192-1-quintela@redhat.com>
+	<20190220115611.3192-2-quintela@redhat.com>
 MIME-Version: 1.0
-References: <20190221155359.8247-1-davidkiarie4@gmail.com>
-	<aac6b5d0-ecdd-577c-5b38-8c875ea1dffc@redhat.com>
-	<6cdbaddf-57d8-3333-c9a0-7c5f46cecab7@siemens.com>
-	<87h8cxxf2o.fsf@dusky.pond.sub.org>
-	<3c29b265-7add-61e2-2beb-6601d5ad02dd@siemens.com>
-	<87y369vzdr.fsf@dusky.pond.sub.org>
-	<d3bf1cce-0146-af2b-ca83-3cfb1ef29c86@redhat.com>
-In-Reply-To: <d3bf1cce-0146-af2b-ca83-3cfb1ef29c86@redhat.com>
-From: David Kiarie <davidkiarie4@gmail.com>
-Date: Thu, 21 Feb 2019 20:42:09 +0300
-Message-ID: <CABdVeAB1y8-hyANSbVDSNLaX=RyYcO1uguJDBT+ga7b3PB8u4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/1] snip my name and email
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190220115611.3192-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] multifd: Only send pages when
+ packet are not empty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,21 +34,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Feb 21, 2019 at 8:35 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
+* Juan Quintela (quintela@redhat.com) wrote:
+> We send packages without pages sometimes for sysnchronizanion.  The
+> iov functions do the right thing, but we will be changing this code in
+> future patches.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-> On 2/21/19 6:13 PM, Markus Armbruster wrote:
->
-> >
-> > Can we resync with the kernel's script to get this feature?  Or should
-> > we cherry-pick it?
->
-> I think we are out-of-sync and only cherry-picking.
->
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-you can do this if you so wish but i am personally okay with the follow up
-patch i sent.
+> ---
+>  migration/ram.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 59191c1ed2..8b5fd67d66 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1025,9 +1025,12 @@ static void *multifd_send_thread(void *opaque)
+>                  break;
+>              }
+>  
+> -            ret = qio_channel_writev_all(p->c, p->pages->iov, used, &local_err);
+> -            if (ret != 0) {
+> -                break;
+> +            if (used) {
+> +                ret = qio_channel_writev_all(p->c, p->pages->iov,
+> +                                             used, &local_err);
+> +                if (ret != 0) {
+> +                    break;
+> +                }
+>              }
+>  
+>              qemu_mutex_lock(&p->mutex);
+> @@ -1254,9 +1257,12 @@ static void *multifd_recv_thread(void *opaque)
+>          p->num_pages += used;
+>          qemu_mutex_unlock(&p->mutex);
+>  
+> -        ret = qio_channel_readv_all(p->c, p->pages->iov, used, &local_err);
+> -        if (ret != 0) {
+> -            break;
+> +        if (used) {
+> +            ret = qio_channel_readv_all(p->c, p->pages->iov,
+> +                                        used, &local_err);
+> +            if (ret != 0) {
+> +                break;
+> +            }
+>          }
+>  
+>          if (flags & MULTIFD_FLAG_SYNC) {
+> -- 
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
