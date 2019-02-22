@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42938)
+Received: from eggs.gnu.org ([209.51.188.92]:46329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gxDSn-0003B8-Jl
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:14:14 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gxDbR-0006rC-6O
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:23:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gxDSj-0004y4-Gx
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:14:13 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gxDbP-0006CL-Sb
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:23:09 -0500
 References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-12-kwolf@redhat.com>
-	<d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
-	<20190219091729.GE4727@localhost.localdomain>
-	<ade91fc9-dab1-926b-dfba-d7347fcf62bc@redhat.com>
-	<20190222155737.GD8035@dhcp-200-176.str.redhat.com>
+	<20190131175549.11691-11-kwolf@redhat.com>
+	<0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
+	<20190219090431.GD4727@localhost.localdomain>
+	<ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
+	<20190222153505.GB8035@dhcp-200-176.str.redhat.com>
+	<487485f2-31c0-9200-b66d-e430047ad536@redhat.com>
+	<20190222160613.GE8035@dhcp-200-176.str.redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a77df09e-681c-50bd-2e0f-ea0cabdd0510@redhat.com>
-Date: Fri, 22 Feb 2019 17:13:04 +0100
+Message-ID: <cf7daf3b-41e8-1098-f5de-e8feba204d2c@redhat.com>
+Date: Fri, 22 Feb 2019 17:22:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190222155737.GD8035@dhcp-200-176.str.redhat.com>
+In-Reply-To: <20190222160613.GE8035@dhcp-200-176.str.redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="pEMIghF15qDKIqDlNd3hjN2EmbxORidbb"
-Subject: Re: [Qemu-devel] [RFC PATCH 11/11] qcow2: Add data file to
- ImageInfoSpecificQCow2
+	boundary="Lm5cpKkMhZWnGTWOP4TlrSDq9obmrBFB5"
+Subject: Re: [Qemu-devel] [RFC PATCH 10/11] qcow2: Store data file name in
+ the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,223 +35,239 @@ To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pEMIghF15qDKIqDlNd3hjN2EmbxORidbb
+--Lm5cpKkMhZWnGTWOP4TlrSDq9obmrBFB5
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <a77df09e-681c-50bd-2e0f-ea0cabdd0510@redhat.com>
-Subject: Re: [RFC PATCH 11/11] qcow2: Add data file to ImageInfoSpecificQCow2
+Message-ID: <cf7daf3b-41e8-1098-f5de-e8feba204d2c@redhat.com>
+Subject: Re: [RFC PATCH 10/11] qcow2: Store data file name in the image
 References: <20190131175549.11691-1-kwolf@redhat.com>
- <20190131175549.11691-12-kwolf@redhat.com>
- <d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
- <20190219091729.GE4727@localhost.localdomain>
- <ade91fc9-dab1-926b-dfba-d7347fcf62bc@redhat.com>
- <20190222155737.GD8035@dhcp-200-176.str.redhat.com>
-In-Reply-To: <20190222155737.GD8035@dhcp-200-176.str.redhat.com>
+ <20190131175549.11691-11-kwolf@redhat.com>
+ <0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
+ <20190219090431.GD4727@localhost.localdomain>
+ <ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
+ <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
+ <487485f2-31c0-9200-b66d-e430047ad536@redhat.com>
+ <20190222160613.GE8035@dhcp-200-176.str.redhat.com>
+In-Reply-To: <20190222160613.GE8035@dhcp-200-176.str.redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On 22.02.19 16:57, Kevin Wolf wrote:
-> Am 22.02.2019 um 14:51 hat Max Reitz geschrieben:
->> On 19.02.19 10:17, Kevin Wolf wrote:
->>> Am 19.02.2019 um 01:47 hat Max Reitz geschrieben:
->>>> On 31.01.19 18:55, Kevin Wolf wrote:
->>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>>>> ---
->>>>>  qapi/block-core.json | 1 +
->>>>>  block/qcow2.c        | 6 +++++-
->>>>>  2 files changed, 6 insertions(+), 1 deletion(-)
->>>>
->>>> [...]
->>>>
->>>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>>> index 4959bf16a4..e3427f9fcd 100644
->>>>> --- a/block/qcow2.c
->>>>> +++ b/block/qcow2.c
->>>>> @@ -1459,7 +1459,9 @@ static int coroutine_fn qcow2_do_open(BlockDr=
-iverState *bs, QDict *options,
->>>>>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
->>>>>          s->data_file =3D bdrv_open_child(NULL, options, "data-file=
-", bs,
->>>>>                                         &child_file, false, &local_=
-err);
->>>>> -        if (!s->data_file) {
->>>>> +        if (s->data_file) {
->>>>> +            s->image_data_file =3D g_strdup(s->data_file->bs->file=
-name);
->>>>> +        } else {
->>>>>              if (s->image_data_file) {
->>>>>                  error_free(local_err);
->>>>>                  local_err =3D NULL;
->>>>
->>>> Ah, this is what I looked for in the last patch. :-)
->>>>
->>>> (i.e. it should be in the last patch, not here)
->>>
->>> [RFC PATCH 11/11] qcow2: Add data file to ImageInfoSpecificQCow2
->>>
->>> This is the last patch. :-P
->>
->> Sorry, I meant the previous one.
->>
->>>> I think as it is it is just wrong, though.  If I pass enough options=
- at
->>>> runtime, this will overwrite the image header:
->>>>
->>>> $ ./qemu-img create -f qcow2 -o data_file=3Dfoo.raw foo.qcow2 64M
->>>> $ ./qemu-img create -f raw bar.raw 64M
->>>> $ ./qemu-img info foo.qcow2
->>>> [...]
->>>>     data file: foo.raw
->>>> [...]
->>>> $ ./qemu-io --image-opts \
->>>>     file.filename=3Dfoo.qcow2,data-file.driver=3Dfile,\
->>>> data-file.filename=3Dbar.raw,lazy-refcounts=3Don \
->>>>     -c 'write 0 64k'
->>>> # (The lazy-refcounts is so the image header is updated)
->>>> $ ./qemu-img info foo.qcow2
->>>> [...]
->>>>     data file: bar.raw
->>>> [...]
->>>>
->>>> The right thing would probably to check whether the header extension=
-
->>>> exists (i.e. if s->image_data_file is non-NULL) and if it does not (=
-it
->>>> is NULL), s->image_data_file gets set; because there are no valid im=
-ages
->>>> with the external data file flag set where there is no such header
->>>> extension.  So we must be in the process of creating the image right=
- now.
->>>>
->>>> But even then, I don't quite like setting it here and not creating t=
-he
->>>> header extension as part of qcow2_co_create().  I can see why you've=
-
->>>> done it this way, but creating a "bad" image on purpose (one with th=
+On 22.02.19 17:06, Kevin Wolf wrote:
+> Am 22.02.2019 um 16:43 hat Max Reitz geschrieben:
+>> On 22.02.19 16:35, Kevin Wolf wrote:
+>>> Am 22.02.2019 um 15:16 hat Max Reitz geschrieben:
+>>>> On 19.02.19 10:04, Kevin Wolf wrote:
+>>>>> Am 19.02.2019 um 01:18 hat Max Reitz geschrieben:
+>>>>>> On 31.01.19 18:55, Kevin Wolf wrote:
+>>>>>>> Rather than requiring that the external data file node is passed
+>>>>>>> explicitly when creating the qcow2 node, store the filename in th=
 e
->>>> external data file bit set, but no such header extension present yet=
-) in
->>>> order to detect and rectify this case when it is first opened (and t=
-he
->>>> opening code assuming that any such broken image must be one that is=
-
->>>> opened the first time) is a bit weird.
->>>
->>> It's not really a bad image, just one that's a bit cumbersome to use
->>> because you need to specify the 'data-file' option manually.
->>
->> Of course it's bad because it doesn't adhere to the specification (whi=
-ch
->> you could amend, of course, since you add it with this series).  The
->> spec says "If this bit is set, an external data file name header
->> extension must be present as well."  Which it isn't until the image is=
-
->> opened with the data-file option.
->=20
-> Hm, I wonder whether that's a good requirement to make or whether we
-> should indeed change the spec. It wouldn't be so bad to have images tha=
-t
-> require the data-file runtime option.
->=20
-> I guess we could lift the restriction later if we want to make use of
-> it. But the QEMU code is already written in a way that this works, so
-> maybe just allow it.
-
-OK for me.
-
->>>> I suppose doing it right (if you agree with the paragraph before the=
-
->>>> last one) and adding a comment would make it less weird
->>>> ("s->image_data_file must be non-NULL for any valid image, so this i=
-mage
->>>> must be one we are creating right now" or something like that).
+>>>>>>> designated header extension during .bdrv_create and read it from =
+there
+>>>>>>> as a default during .bdrv_open.
+>>>>>>>
+>>>>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>>>>>> ---
+>>>>>>>  block/qcow2.h              |  1 +
+>>>>>>>  block/qcow2.c              | 69 ++++++++++++++++++++++++++++++++=
++++++-
+>>>>>>>  tests/qemu-iotests/082.out | 27 +++++++++++++++
+>>>>>>>  3 files changed, 96 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> [...]
+>>>>>>
+>>>>>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>>>>>> index 6cf862e8b9..4959bf16a4 100644
+>>>>>>> --- a/block/qcow2.c
+>>>>>>> +++ b/block/qcow2.c
+>>>>>>> @@ -398,6 +398,20 @@ static int qcow2_read_extensions(BlockDriver=
+State *bs, uint64_t start_offset,
+>>>>>>>  #endif
+>>>>>>>              break;
+>>>>>>> =20
+>>>>>>> +        case QCOW2_EXT_MAGIC_DATA_FILE:
+>>>>>>> +        {
+>>>>>>> +            s->image_data_file =3D g_malloc0(ext.len + 1);
+>>>>>>> +            ret =3D bdrv_pread(bs->file, offset, s->image_data_f=
+ile, ext.len);
+>>>>>>> +            if (ret < 0) {
+>>>>>>> +                error_setg_errno(errp, -ret, "ERROR: Could not d=
+ata file name");
+>>>>>>
+>>>>>> I think you accidentally a word.
+>>>>>>
+>>>>>>> +                return ret;
+>>>>>>> +            }
+>>>>>>> +#ifdef DEBUG_EXT
+>>>>>>> +            printf("Qcow2: Got external data file %s\n", s->imag=
+e_data_file);
+>>>>>>> +#endif
+>>>>>>> +            break;
+>>>>>>> +        }
+>>>>>>> +
+>>>>>>>          default:
+>>>>>>>              /* unknown magic - save it in case we need to rewrit=
+e the header */
+>>>>>>>              /* If you add a new feature, make sure to also updat=
+e the fast
+>>>>>>> @@ -1444,7 +1458,18 @@ static int coroutine_fn qcow2_do_open(Bloc=
+kDriverState *bs, QDict *options,
+>>>>>>>      /* Open external data file */
+>>>>>>>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+>>>>>>>          s->data_file =3D bdrv_open_child(NULL, options, "data-fi=
+le", bs,
+>>>>>>> -                                       &child_file, false, errp)=
+;
+>>>>>>> +                                       &child_file, false, &loca=
+l_err);
+>>>>>>> +        if (!s->data_file) {
+>>>>>>> +            if (s->image_data_file) {
+>>>>>>> +                error_free(local_err);
+>>>>>>> +                local_err =3D NULL;
+>>>>>>
+>>>>>> This looked a bit weird to me at first because I was wondering why=
+ you
+>>>>>> wouldn't just pass allow_none=3Dtrue and then handle errors (by pa=
+ssing
+>>>>>> them on).  But right, we want to retry with a filename set, maybe =
+that
+>>>>>> makes more sense of the options.
+>>>>>
+>>>>> I think we want the normal error message for the !s->image_data_fil=
+e
+>>>>> case. With allow_none=3Dtrue, we would have to come up with a new o=
+ne here
+>>>>> (in the else branch below).
+>>>>>
+>>>>>> Hm.  But then again, do we really?  It matches what we do with bac=
+king
+>>>>>> files, but that does give at least me headaches from time to time.=
+  How
+>>>>>> bad would it be to allow either passing all valid options through
+>>>>>> @options (which would make qcow2 ignore the string in the header),=
+ or
+>>>>>> use the filename given in the header alone?
+>>>>>
+>>>>> You mean offering only one of the two ways to configure the node?
 >>>>
->>>> But still, the issue you point out in your cover letter remains; whi=
-ch
->>>> is that the node's filename and the filename given by the user may b=
-e
->>>> two different things.
+>>>> Either just the filename from the image header, or ignore that and t=
+ake
+>>>> all options from the user (who'd have to give a syntactically comple=
+te
+>>>> QAPI BlockdevRef object).
+>>>>
+>>>>> The 'data-file' runtime option is a must so that libvirt can build =
+the
+>>>>> graph node by node (and possibly use file descriptor passing one da=
+y).
+>>>>> But having to specify the option every time is very unfriendly for =
+human
+>>>>> users, so I think allowing to store the file name in the header is =
+a
+>>>>> must, too.
+>>>>
+>>>> Sure.  But I don't know whether we have to support taking the filena=
+me
+>>>> from the image header, and the user overriding some of the node's
+>>>> options (e.g. caching).
 >>>
->>> I think what I was planning to do was leaving the path from the image=
-
->>> header in s->image_data_file even when a runtime option overrides it.=
-
->>> After all, ImageInfo is about the image, not about the runtime state.=
-
+>>> So essentially this would mean passing NULL instead of options to
+>>> bdrv_open_child() when we retry with the filename from the header.
+>>>
+>>> But it's inconsistent with all other places, which comes with two
 >>
->> I'm not talking about ImageInfo here, though, I'm talking about the
->> image creation process.  The hunk I've quoted should be in the previou=
-s
->> patch, not in this one.
->>
->> Which doesn't make wrong what you're saying, though, the ImageInfo
->> should print what's in the header.
->>
->>> Image creation would just manually set s->image_data_file before
->>> updating the header.
->>
->> It should, but currently it does that rather indirectly (by setting th=
+>> "all other places"?  Really it's just backing files, as everywhere els=
 e
->> data-file option which then makes qcow2_do_open() copy it into
->> s->image_data_file).
+>> there is no filename that doesn't come from the command line.
+>>
+>> Yes, you can use -drive file=3Dfoo.qcow2,file.locking=3Doff, but I con=
+sider
+>> that case a bit different.  Although maybe it really isn't. *shrug*
 >=20
-> I'm not exactly sure what detail in the image creation process you are
-> talking about.
+> Why would it be different? At least as a user, I consider them the same=
+=2E
+> It's true that bs->file and bs->backing come with some additional magic=
+,
+> but I don't think it makes a difference for this aspect.
+>=20
+> I'll add the third example I can think of and I'm sure you'll love this=
+:
+>=20
+> $ x86_64-softmmu/qemu-system-x86_64 \
+>   -drive file=3D/tmp/test.vmdk,extents.0.cache.no-flush=3Don
+>=20
+> So we have three examples that work this way. Can you think of any
+> existing counterexample?
 
-Mostly the fact that when enough data-file options are provided, the
-header string is overwritten with the filename taken from the node
-that's been specified by those runtime options.
+Define counterexample.  -drive has options for many things, so of course
+I can underspecify everything.  file=3D is basically the same as
+file.filename=3D, so I can give .file.filename=3D for any node (and some
+additional options, but not all that would theoretically be necessary)
+and -drive will do the rest.
 
-(Which is what the creation process uses to get the filename into the
-header the first time.)
+It's just that that's -drive magic and not driver-level magic (which
+this data-file handling is, by virtue of qcow2_do_open() trying to open
+the child in two different ways consecutively).  Even for .backing and
+the extents it's handled generically in the block layer, isn't it...?
 
-> I confirmed that this way of getting the filename into the header is
-> broken, and it was a known problem when I sent the series, spelt out in=
+But now I remember a real issue with .backing specifically:
 
-> the cover letter and in fact fixed in my git branch by now.
+$ ./qemu-img create -f qcow2 base.qcow2 64M
+$ ./qemu-img create -f qcow2 -b base.qcow2 top.qcow2
+$ x86_64-softmmu/qemu-system-x86_64 \
+    -blockdev
+node-name=3Dfoo,driver=3Dqcow2,file.driver=3Dfile,file.filename=3Dtop.qco=
+w2,\
+backing.driver=3Dnull-co
+qemu-system-x86_64: -blockdev
+node-name=3Dfoo,driver=3Dqcow2,file.driver=3Dfile,file.filename=3Dtop.qco=
+w2,backing.driver=3Dnull-co:
+Could not open backing file: The only allowed filename for this driver
+is 'null-co://'
 
-No need to be a bit upset.  As long as we agree, it's all good -- and as
-far as I remember I did acknowledge in my first response that you wrote
-something about this in your cover letter.
+Because .backing is handled by the block driver just giving the filename
+to the generic block layer, which then just puts it in
+backing.file.filename.  It's actually pretty good that this will not
+happen with your approach!  In fact, that prevents a major source of
+headaches I really did have with .backing. :-)
 
-I just wasn't sure what exactly you meant in the cover letter (to me it
-read more like the filename written the first time may be different from
-what the user has specified, thanks to the magic of
-bdrv_refresh_filename() and other things), and that you didn't say how
-you intended to fix it.  So I just wanted to discuss that.
+>>> problems. It's confusing for users who are used to overriding just th=
+at
+>>> one option of a child. And do we actually spare you any headaches or =
+do
+>>> we create new ones because we have now two different behaviours of
+>>> bdrv_open_child() callers that we must preserve in the future?
+>>
+>> It means I can act out on my pain by being angry on how .backing
+>> behaves.  That's better for my health than having to keep it in becaus=
+e
+>> it's the same behavior everywhere and it's officially me who's in the =
+wrong.
+>=20
+> You're officially wrong. ;-)
 
-> Is there anything else about the image creation process that needs
-> fixing?
-
-It was my impression that I went already into too much detail in my
-review of this series as an RFC. :-)
-
-Also, I have to admit that I cannot guarantee a review in a fashion that
-once all my requested changes are incorporated, no further versions will
-be required.
-
-In general, as I said in response to the cover letter, the series looks
-good to me in principle.
+My poor liver.  I hope it can cope with all the Paracetamol it's going
+to receive.
 
 Max
 
 
---pEMIghF15qDKIqDlNd3hjN2EmbxORidbb
+--Lm5cpKkMhZWnGTWOP4TlrSDq9obmrBFB5
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxwH5EACgkQ9AfbAGHV
-z0CQyAgAlrIugALpe93/vwvQm7tZIIDUDjtDp8wtBgAseHJKQ0xeWeN7kvv4BgTf
-ND2ViSnzxzWfWVx/proSec23wU337qnl3RitJdMaK3h9+FhgjQr26V7DbydprxrC
-d0yRWBvCHlxsniDchE57d6Ufh/NnhXzZrCB3agbMODDlqZXk36gQMtJIglMFCotN
-zV+svE9DCk4c06I3DHyCV2GlAf6/yTey8pvt+5NKmfB6Ira8c5m03jZewgPt84+C
-/8ces/ZGVzn6O0Gf7G+qZGLAVQWH+C54rTzgaCYrFNKqzWfv/Lx5ZWZ5kXWguL6P
-5jqzKhyfwG/0nCs835eHe3ZhuQDx7w==
-=pTkE
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxwIcsACgkQ9AfbAGHV
+z0BoPwf7BAkeRp6HjydwVFdUYEUiqEBBjmnj94AlouWKwOEdwp7uEgPJhwda8H0P
+uAwerBrIilQi8TvQxlBdtVRxb14SDHdS2wYkX0FAEkCi4/i3SvyVPauOgYJxwTKO
+qrvH6oA+MA8U4zqxrIqH8BZ/XF616LDWwAKQKWrjK8tUR9bFl7IyhKIr4MT9rXpO
++HX/3tGAkB+Qo48spXu0rlsFol+pqAY8ma2lJcjvxuzoKewFVbrbgzJkSHWs2gs+
+uYW3mLpjeScjpM9g+OZ8ZJLFgfIg2G29QUit8GiZN4wAgqUwPnRkCZZfyhbZX2VE
+HIjkgfHwq7jV9NuVwhMNwtbxYSLEYw==
+=Z7vV
 -----END PGP SIGNATURE-----
 
---pEMIghF15qDKIqDlNd3hjN2EmbxORidbb--
+--Lm5cpKkMhZWnGTWOP4TlrSDq9obmrBFB5--
