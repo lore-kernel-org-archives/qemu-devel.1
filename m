@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51758)
+Received: from eggs.gnu.org ([209.51.188.92]:51812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gxDpU-0004Dq-Uf
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:37:42 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gxDpu-0004VB-QR
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:38:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gxDpR-0004cY-LG
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:37:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60370)
+	(envelope-from <dgilbert@redhat.com>) id 1gxDpp-00052o-Q7
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:38:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gxDpQ-0004Xq-Pf
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:37:37 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5F3773024EA2
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 16:37:33 +0000 (UTC)
-Date: Fri, 22 Feb 2019 16:37:27 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190222163727.GE25234@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190118140336.GA19921@beluga.usersys.redhat.com>
-	<20190221143915.GB2506@beluga.usersys.redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gxDpV-0004fe-0K
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:37:50 -0500
+Date: Fri, 22 Feb 2019 16:37:36 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190222163735.GB2616@work-vm>
+References: <CAJSP0QVxaW3tezjBN9owJHsxzE9h8_qcaeRr5zHHKxKJOeFnkQ@mail.gmail.com>
+	<CAJSP0QVXoZJ9MJ0qp4RM_m2fGJ8iFSyJMAU_X7mdiQvpOK59KA@mail.gmail.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
+	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
+	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190221143915.GB2506@beluga.usersys.redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] Libvirt upstream CI efforts
+In-Reply-To: <CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,171 +37,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Erik Skultety <eskultet@redhat.com>
-Cc: libvir-list@redhat.com, Yash Mankad <ymankad@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa Junior <crosa@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Fernando Casas =?iso-8859-1?Q?Sch=F6ssow?= <casasfernando@outlook.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>, Natanael Copa <ncopa@alpinelinux.org>
 
-On Thu, Feb 21, 2019 at 03:39:15PM +0100, Erik Skultety wrote:
-> number of test cases (and also many unnecessary legacy test cases). An
-> alternative set of functional test cases is available as part of the
-> libvirt-tck framework [2]. The obvious question now is how can we build upon
-> any of this and introduce proper functional testing of upstream libvirt to our
-> jenkins environment at ci.centos.org, so I formulated the following discussion
-> points as I think these are crucial to sort out before we move on to the test
-> suite itself:
-
-Having thought about this some more I think it would be helpful to outline
-the various areas of testing libvirt is missing / could benefit from, as
-I think it is broader than just running an integration test suite on the
-ci.centos.org
-
-Listing in order of the phase of development, not priority....
-
-
- - Testing by developers before code submissions
-
-   Developers today (usually) run unit tests + syntax check before
-   submission, though even that is forgotten at times.
-
-   Ideally some level of functional testing would be commonly performed
-   too.
-
-   Amount of time devs are likely to want spend on testing will depend
-   on the scope of the work being done. ie they're not going to test
-   on all distros, with all integration tests for simple patches. Also
-   no desire to make devs run QEMU tests on patches which are changing
-   Xen code and vica-verca.
-
-   Essentially goal is to give developers confidence that they have
-   not done something terrible before submission. Not expecting devs
-   to catch all bugs themselves at this stage.
+* Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> On Fri, Feb 22, 2019 at 12:57 PM Fernando Casas Sch=F6ssow
+> <casasfernando@outlook.com> wrote:
+>=20
+> I have CCed Natanael Copa, qemu package maintainer in Alpine Linux.
+>=20
+> Fernando: Can you confirm that the bug occurs with an unmodified
+> Alpine Linux qemu binary?
+>=20
+> Richard: Commit 7db2145a6826b14efceb8dd64bfe6ad8647072eb ("bswap: Add
+> host endian unaligned access functions") introduced the unaligned
+> memory access functions in question here.  Please see below for
+> details on the bug - basically QEMU code assumes they are atomic, but
+> that is not guaranteed :(.  Any ideas for how to fix this?
 
 
- - Testing of patches posted to mailing list pre merge
+Why does vring_avail_idx use virtio_ld*u*w_phys_cached?
+(similar for vring_avail_ring).
+There's no generically safe way to do unaligned atomic loads - don't we k=
+now
+in virtio that these are naturally aligned?
 
-   patchew.org currently monitors patch postings to libvir-list
-   and imports each posting into a new github branch. In theory
-   it runs syntax-check against them & reports failures but this
-   has not been reliable.
+Dave
 
-   Highly desirable to have all patches go through build + unit
-   tests at this point, across multiple distros. It is common for
-   devs to break mingw and/or *BSD and/or macOS builds, since vast
-   majority of the dev focus is Linux.  There is generally long
-   enough between patch posting & review approval that build+unit
-   tests should be doable with sufficient patchew worker resource.
-
-
-   Extra brownie points if the build + tests ran across each
-   individual patch to prove that  git bisect-ability isn't
-   broken. This would require significantly more worker
-   resources though. This is the only place bi-sect could
-   be tested as anything beyond is too late.
-
-
-   Running functional tests at this point would be beneficial,
-   on the general principle that the sooner we find a problem,
-   the cheaper it is to fix & less impact it has on people.
-   Massively dependant on worker resource.
-
-
- - Testing of latest git master post merge
-
-   This is where almost all of our current effort has gone.
-   
-   ci.centos.org does build & unit testing fully chained
-   together all libvirt components on Linux + BSD using VMs
-
-   Travis CI does testing of individual of libvirt components
-   on Linux + macOS, using contaniers for Linux.
-
-   Both of these are x86 only thus far. Through use of Debian
-   cross compilers we can get non-x86 coverage for builds,
-   but not much else without finding some real hardware.
-
-   Desirable to have functional testing here to detect problems
-   before they get into any formal release. Dependent on resource
-   to run on ci.centos.org or Travis, or another system we might
-   get access to. Still likely to be x86 only.
-
-
- - Testing during RPM builds
-
-   When building new packages for distros, 'make check' is usually
-   run. This has caught problems appearing in distros which have
-   sometimes been missed by ci.centos.org.
-
-   Desirable to have functional testing here in order to prevent
-   breakage making its way into distros, by aborting the build.
-
-   Runs on all Fedora architectures which is a big plus, since
-   all earlier upstream testing resources are x86 only.
-
-   The environment is quite restrictive as it is inside Koji/Brew
-   but libguestfs test suite has shown its possible to do very
-   thorough testing of Libvirt & QEMU in this context that frequently
-   identifies bugs in libvirt & QEMU & kernel & other Fedora/RHEL
-   components.
-
-   Fedora has an automated system that frequently rebuilds the
-   RPMs to check FTBFS (fail to build from source) status of
-   packages to detect regresisons over time.
-
-
- - Testing of composed distros
-
-   Real integration testing belongs here, as its validating the
-   exact software build & deployment setup that users will ultimately
-   run with.
-
-   The test environment is more flexible than during RPM build,
-   but by the time it runs the update is already in the distro
-   repos, potentially breaking downstream users (libguestfs).
-
-   Note 100% sure, but I think the Fedora CI is x86 only.
-
-
-
- - Testing by developers investigating CI failures
-
-   For any of the above steps which are run by any kind of automated
-   system there needs to be a way for developers to reproduce the
-   same test environment in an easy manner.
-
-   For ci.centos.org we can re-generate the VMs.
-   For Travis we can pull the docker images from quay.io
-   For koji/brew we can run mock locally
-
-   None of these are a perfect match though, as they can't reproduce
-   the exact hardware setup, or the load characteristics, just the
-   software install setup.
-
-
-
-It is clear we have lots of places where we should/could be doing
-functional testing, and none of them is going to cover all the
-bases.
-
-The environments in which we need to be able to do testing are
-also quite varied in scope. Some places (ci.centos) have freedom
-to bring a full VMs customized as we desire, others (Travis, Gitlab)
-are supporting docker containers with arbitrary Linux, others (brew,
-koji) we just have to accept whatever environment we're executing
-in.
-
-In terms of developers, we can't rely on ability to run VMs, because
-they may already be running inside a VM, and lacking nested-virt.
-
-Essentially I think this means we need to make it practical to run
-the functional tests as is, in whatever the current execution
-environment is. If that works, then pretty much by implication,
-it ought to be possible to optionally launch it inside a VM, or
-inside a container to reproduce the precise environment of a
-particular test system.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Natanael: It seems likely that the qemu package in Alpine Linux
+> suffers from a compilation issue resulting in a broken QEMU.  It may
+> be necessary to leave the compiler optimization flag alone in APKBUILD
+> to work around this problem.
+>=20
+> Here are the details.  QEMU relies on the compiler turning
+> memcpy(&dst, &src, 2) turning into a load instruction in
+> include/qemu/bswap.h:lduw_he_p() (explanation below):
+>=20
+> /* Any compiler worth its salt will turn these memcpy into native unali=
+gned
+>    operations.  Thus we don't need to play games with packed attributes=
+, or
+>    inline byte-by-byte stores.  */
+>=20
+> static inline int lduw_he_p(const void *ptr)
+> {
+>     uint16_t r;
+>     memcpy(&r, ptr, sizeof(r));
+>     return r;
+> }
+>=20
+> Here is the disassembly snippet of virtqueue_pop() from Fedora 29 that
+> shows the load instruction:
+>=20
+>   398166:       0f b7 42 02             movzwl 0x2(%rdx),%eax
+>   39816a:       66 89 43 32             mov    %ax,0x32(%rbx)
+>=20
+> Here is the instruction sequence in the Alpine Linux binary:
+>=20
+>   455562:    ba 02 00 00 00           mov    $0x2,%edx
+>   455567:    e8 74 24 f3 ff           callq  3879e0 <memcpy@plt>
+>   45556c:    0f b7 44 24 42           movzwl 0x42(%rsp),%eax
+>   455571:    66 41 89 47 32           mov    %ax,0x32(%r15)
+>=20
+> It's calling memcpy instead of using a load instruction.
+>=20
+> Fernando found that QEMU's virtqueue_pop() function sees bogus values
+> when loading a 16-bit guest RAM location.  Paolo figured out that the
+> bogus value can be produced by memcpy() when another thread is
+> updating the 16-bit memory location simultaneously.  This is a race
+> condition between one thread loading the 16-bit value and another
+> thread storing it (in this case a guest vcpu thread).  Sometimes
+> memcpy() may load one old byte and one new byte, resulting in a bogus
+> value.
+>=20
+> The symptom that Fernando experienced is a "Virtqueue size exceeded"
+> error message from QEMU and then the virtio-blk or virtio-scsi device
+> stops working.  This issue potentially affects other device emulation
+> code in QEMU as well, not just virtio devices.
+>=20
+> For the time being, I suggest tweaking the APKBUILD so the memcpy() is
+> not generated.  Hopefully QEMU can make the code more portable in the
+> future so the compiler always does the expected thing, but this may
+> not be easily possible.
+>=20
+> Stefan
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
