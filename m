@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60679)
+Received: from eggs.gnu.org ([209.51.188.92]:60578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx5eZ-00076c-SG
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:52 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gx5eS-0006yH-8a
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx5eO-0001b9-1n
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54444)
+	(envelope-from <kraxel@redhat.com>) id 1gx5eN-0001aG-IW
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx5eM-0001LS-JZ
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx5eM-0001OW-Fk
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:39 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B3767A911
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:53:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 102C230084BD
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:53:31 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 22 Feb 2019 08:53:17 +0100
-Message-Id: <20190222075326.9850-7-kraxel@redhat.com>
+Date: Fri, 22 Feb 2019 08:53:26 +0100
+Message-Id: <20190222075326.9850-16-kraxel@redhat.com>
 In-Reply-To: <20190222075326.9850-1-kraxel@redhat.com>
 References: <20190222075326.9850-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/15] char/spice: discard write() if backend is
- disconnected
+Subject: [Qemu-devel] [PULL 15/15] display: add -display spice-app launching
+ a Spice client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,102 +38,328 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Most chardev backend handle write() as discarded data if underlying
-system is disconnected. For unknown historical reasons, the Spice
-backend has "reliable" write: it will wait until the client end is
-reconnected to do further successful write().
+Add a new display backend that will configure Spice to allow a remote
+client to control QEMU in a similar fashion as other QEMU display
+backend/UI like GTK.
 
-To decide whether it make sense to wait until the client is
-reconnected (or queue the writes), let's review Spice chardev usage
-and handling of a disconnected client:
+For this to work, it will set up Spice server with a unix socket, and
+register a VC chardev that will be exposed as Spice ports. A QMP
+monitor is also exposed as a Spice port, this allows the remote client
+fuller qemu control and state handling.
 
- * spice vdagent
-   The agents reopen the virtio port on disconnect. In qemu side,
-   virtio_serial_close() will also discard pending data.
-
- * usb redirection
-   A disconnect creates a device disconnection.
-
- * smartcard emulation
-   Data is discarded in passthru_apdu_from_guest().
-
-   (Spice doesn't explicitly open the smartcard char device until
-   upcoming 0.14.2, commit 69a5cfc74131ec0459f2eb5a231139f5a69a8037)
-
- * spice webdavd
-   The daemon will restart the service, and reopen the virtio port.
-
- * spice ports (serial console, qemu monitor..)
-   Depends on the associated device or usage.
-
-   - serial, may be throttled or discarded on write, depending on
-     device
-
-   - QMP/HMP monitor have some CLOSED event handling, but want to
-     flush the write, which will finish when a new client connects.
-
-On disconnect/reconnect, the client starts with fresh sessions. If it
-is a seamless migration, the client disconnects after the source
-migrated. The handling of source disconnect in qemu is thus irrelevant
-for the Spice session migration.
-
-For all these use cases, it is better to discard writes when the
-client is disconnected, and require the vm-side device/agent to behave
-correctly on CHR_EVENT_CLOSED, to stop reading and writing from
-the spice chardev.
+- doesn't handle VC set_echo() - this doesn't seem a strong
+  requirement, very few front-end use it
+- spice options can be tweaked with other -spice arguments
+- Windows support shouldn't be hard to do, but will probably use a TCP
+  port instead
+- we may want to watch the child process to quit automatically if it
+  crashed
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Tested-by: Victor Toso <victortoso@redhat.com>
-Message-id: 20190221110703.5775-3-marcandre.lureau@redhat.com
+Message-id: 20190221110703.5775-12-marcandre.lureau@redhat.com
+
+[ kraxel: squash incremental fix ]
+
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- chardev/spice.c      | 12 ++++++++++++
- chardev/trace-events |  1 +
- 2 files changed, 13 insertions(+)
+ ui/spice-app.c   | 202 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ qapi/ui.json     |   7 +-
+ qemu-options.hx  |   5 ++
+ ui/Makefile.objs |   5 ++
+ 4 files changed, 218 insertions(+), 1 deletion(-)
+ create mode 100644 ui/spice-app.c
 
-diff --git a/chardev/spice.c b/chardev/spice.c
-index c2baeb5461fa..c68e60115bb1 100644
---- a/chardev/spice.c
-+++ b/chardev/spice.c
-@@ -208,6 +208,12 @@ static int spice_chr_write(Chardev *chr, const uint8=
-_t *buf, int len)
-     int read_bytes;
-=20
-     assert(s->datalen =3D=3D 0);
+diff --git a/ui/spice-app.c b/ui/spice-app.c
+new file mode 100644
+index 000000000000..925b27b708bb
+--- /dev/null
++++ b/ui/spice-app.c
+@@ -0,0 +1,202 @@
++/*
++ * QEMU external Spice client display driver
++ *
++ * Copyright (c) 2018 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
+m>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
 +
-+    if (!chr->be_open) {
-+        trace_spice_chr_discard_write(len);
-+        return len;
++#include <gio/gio.h>
++
++#include "qemu-common.h"
++#include "ui/console.h"
++#include "qemu/config-file.h"
++#include "qemu/option.h"
++#include "qemu/cutils.h"
++#include "qapi/error.h"
++#include "io/channel-command.h"
++#include "chardev/spice.h"
++#include "sysemu/sysemu.h"
++
++static const char *tmp_dir;
++static char *app_dir;
++static char *sock_path;
++
++typedef struct VCChardev {
++    SpiceChardev parent;
++} VCChardev;
++
++#define TYPE_CHARDEV_VC "chardev-vc"
++#define VC_CHARDEV(obj) OBJECT_CHECK(VCChardev, (obj), TYPE_CHARDEV_VC)
++
++static ChardevBackend *
++chr_spice_backend_new(void)
++{
++    ChardevBackend *be =3D g_new0(ChardevBackend, 1);
++
++    be->type =3D CHARDEV_BACKEND_KIND_SPICEPORT;
++    be->u.spiceport.data =3D g_new0(ChardevSpicePort, 1);
++
++    return be;
++}
++
++static void vc_chr_open(Chardev *chr,
++                        ChardevBackend *backend,
++                        bool *be_opened,
++                        Error **errp)
++{
++    ChardevBackend *be;
++    const char *fqdn =3D NULL;
++
++    if (strstart(chr->label, "serial", NULL)) {
++        fqdn =3D "org.qemu.console.serial.0";
++    } else if (strstart(chr->label, "parallel", NULL)) {
++        fqdn =3D "org.qemu.console.parallel.0";
++    } else if (strstart(chr->label, "compat_monitor", NULL)) {
++        fqdn =3D "org.qemu.monitor.hmp.0";
 +    }
 +
-     s->datapos =3D buf;
-     s->datalen =3D len;
-     spice_server_char_device_wakeup(&s->sin);
-@@ -300,6 +306,12 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
-     }
-=20
-     *be_opened =3D false;
-+#if SPICE_SERVER_VERSION < 0x000e02
-+    /* Spice < 0.14.2 doesn't explicitly open smartcard chardev */
-+    if (strcmp(type, "smartcard") =3D=3D 0) {
-+        *be_opened =3D true;
++    be =3D chr_spice_backend_new();
++    be->u.spiceport.data->fqdn =3D fqdn ?
++        g_strdup(fqdn) : g_strdup_printf("org.qemu.console.%s", chr->lab=
+el);
++    qemu_chr_open_spice_port(chr, be, be_opened, errp);
++    qapi_free_ChardevBackend(be);
++}
++
++static void vc_chr_set_echo(Chardev *chr, bool echo)
++{
++    /* TODO: set echo for frontends QMP and qtest */
++}
++
++static void char_vc_class_init(ObjectClass *oc, void *data)
++{
++    ChardevClass *cc =3D CHARDEV_CLASS(oc);
++
++    cc->parse =3D qemu_chr_parse_vc;
++    cc->open =3D vc_chr_open;
++    cc->chr_set_echo =3D vc_chr_set_echo;
++}
++
++static const TypeInfo char_vc_type_info =3D {
++    .name =3D TYPE_CHARDEV_VC,
++    .parent =3D TYPE_CHARDEV_SPICEPORT,
++    .instance_size =3D sizeof(VCChardev),
++    .class_init =3D char_vc_class_init,
++};
++
++static void spice_app_atexit(void)
++{
++    if (sock_path) {
++        unlink(sock_path);
 +    }
-+#endif
-     chr_open(chr, type);
- }
++    if (tmp_dir) {
++        rmdir(tmp_dir);
++    }
++    g_free(sock_path);
++    g_free(app_dir);
++}
++
++static void spice_app_display_early_init(DisplayOptions *opts)
++{
++    QemuOpts *qopts;
++    ChardevBackend *be =3D chr_spice_backend_new();
++    GError *err =3D NULL;
++
++    if (opts->has_full_screen) {
++        error_report("spice-app full-screen isn't supported yet.");
++        exit(1);
++    }
++    if (opts->has_window_close) {
++        error_report("spice-app window-close isn't supported yet.");
++        exit(1);
++    }
++
++    atexit(spice_app_atexit);
++
++    if (qemu_name) {
++        app_dir =3D g_build_filename(g_get_user_runtime_dir(),
++                                   "qemu", qemu_name, NULL);
++        if (g_mkdir_with_parents(app_dir, S_IRWXU) < -1) {
++            error_report("Failed to create directory %s: %s",
++                         app_dir, strerror(errno));
++            exit(1);
++        }
++    } else {
++        app_dir =3D g_dir_make_tmp(NULL, &err);
++        tmp_dir =3D app_dir;
++        if (err) {
++            error_report("Failed to create temporary directory: %s",
++                         err->message);
++            exit(1);
++        }
++    }
++
++    type_register(&char_vc_type_info);
++
++    sock_path =3D g_strjoin("", app_dir, "/", "spice.sock", NULL);
++    qopts =3D qemu_opts_create(qemu_find_opts("spice"), NULL, 0, &error_=
+abort);
++    qemu_opt_set(qopts, "disable-ticketing", "on", &error_abort);
++    qemu_opt_set(qopts, "unix", "on", &error_abort);
++    qemu_opt_set(qopts, "addr", sock_path, &error_abort);
++    qemu_opt_set(qopts, "image-compression", "off", &error_abort);
++    qemu_opt_set(qopts, "streaming-video", "off", &error_abort);
++    qemu_opt_set(qopts, "gl", opts->has_gl ? "on" : "off", &error_abort)=
+;
++    display_opengl =3D opts->has_gl;
++
++    be->u.spiceport.data->fqdn =3D g_strdup("org.qemu.monitor.qmp.0");
++    qemu_chardev_new("org.qemu.monitor.qmp", TYPE_CHARDEV_SPICEPORT,
++                     be, NULL, &error_abort);
++    qopts =3D qemu_opts_create(qemu_find_opts("mon"),
++                             NULL, 0, &error_fatal);
++    qemu_opt_set(qopts, "chardev", "org.qemu.monitor.qmp", &error_abort)=
+;
++    qemu_opt_set(qopts, "mode", "control", &error_abort);
++
++    qapi_free_ChardevBackend(be);
++}
++
++static void spice_app_display_init(DisplayState *ds, DisplayOptions *opt=
+s)
++{
++    GError *err =3D NULL;
++    gchar *uri;
++
++    uri =3D g_strjoin("", "spice+unix://", app_dir, "/", "spice.sock", N=
+ULL);
++    info_report("Launching display with URI: %s", uri);
++    g_app_info_launch_default_for_uri(uri, NULL, &err);
++    if (err) {
++        error_report("Failed to launch %s URI: %s", uri, err->message);
++        error_report("You need a capable Spice client, "
++                     "such as virt-viewer 8.0");
++        exit(1);
++    }
++    g_free(uri);
++}
++
++static QemuDisplay qemu_display_spice_app =3D {
++    .type       =3D DISPLAY_TYPE_SPICE_APP,
++    .early_init =3D spice_app_display_early_init,
++    .init       =3D spice_app_display_init,
++};
++
++static void register_spice_app(void)
++{
++    qemu_display_register(&qemu_display_spice_app);
++}
++
++type_init(register_spice_app);
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 7702ddf583a1..c5d1d7f09966 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -1110,12 +1110,17 @@
+ #
+ # @cocoa: The Cocoa user interface.
+ #
++# @spice-app: Set up a Spice server and run the default associated
++#             application to connect to it. The server will redirect
++#             the serial console and QEMU monitors. (Since 4.0)
++#
+ # Since: 2.12
+ #
+ ##
+ { 'enum'    : 'DisplayType',
+   'data'    : [ 'default', 'none', 'gtk', 'sdl',
+-                'egl-headless', 'curses', 'cocoa' ] }
++                'egl-headless', 'curses', 'cocoa',
++                'spice-app'] }
 =20
-diff --git a/chardev/trace-events b/chardev/trace-events
-index d0e5f3bbc1a7..b8a759634420 100644
---- a/chardev/trace-events
-+++ b/chardev/trace-events
-@@ -10,6 +10,7 @@ wct_cmd_other(const char *cmd) "%s"
- wct_speed(int speed) "%d"
+ ##
+ # @DisplayOptions:
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 77bd98e20b14..c843126ebdeb 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1211,6 +1211,7 @@ STEXI
+ ETEXI
 =20
- # chardev/spice.c
-+spice_chr_discard_write(int len) "spice chr write discarded %d"
- spice_vmc_write(ssize_t out, int len) "spice wrote %zd of requested %d"
- spice_vmc_read(int bytes, int len) "spice read %d of requested %d"
- spice_vmc_register_interface(void *scd) "spice vmc registered interface =
-%p"
+ DEF("display", HAS_ARG, QEMU_OPTION_display,
++    "-display spice-app[,gl=3Don|off]\n"
+     "-display sdl[,frame=3Don|off][,alt_grab=3Don|off][,ctrl_grab=3Don|o=
+ff]\n"
+     "            [,window_close=3Don|off][,gl=3Don|core|es|off]\n"
+     "-display gtk[,grab_on_hover=3Don|off][,gl=3Don|off]|\n"
+@@ -1262,6 +1263,10 @@ Start a VNC server on display <arg>
+ @item egl-headless
+ Offload all OpenGL operations to a local DRI device. For any graphical d=
+isplay,
+ this display needs to be paired with either VNC or SPICE displays.
++@item spice-app
++Start QEMU as a Spice server and launch the default Spice client
++application. The Spice server will redirect the serial consoles and
++QEMU monitors. (Since 4.0)
+ @end table
+ ETEXI
+=20
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+index 7f8b3da79134..fe1a7aed97c2 100644
+--- a/ui/Makefile.objs
++++ b/ui/Makefile.objs
+@@ -49,6 +49,11 @@ curses.mo-objs :=3D curses.o
+ curses.mo-cflags :=3D $(CURSES_CFLAGS)
+ curses.mo-libs :=3D $(CURSES_LIBS)
+=20
++common-obj-$(call land,$(CONFIG_SPICE),$(CONFIG_GIO)) +=3D spice-app.mo
++spice-app.mo-objs :=3D spice-app.o
++spice-app.mo-cflags :=3D $(GIO_CFLAGS)
++spice-app.mo-libs :=3D $(GIO_LIBS)
++
+ common-obj-$(CONFIG_OPENGL) +=3D shader.o
+ common-obj-$(CONFIG_OPENGL) +=3D console-gl.o
+ common-obj-$(CONFIG_OPENGL) +=3D egl-helpers.o
 --=20
 2.9.3
