@@ -1,39 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35996)
+Received: from eggs.gnu.org ([209.51.188.92]:36073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gxBSO-0008Uq-I0
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:41 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gxBSR-0008V3-6p
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gxBSN-0005ne-EC
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:40 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:34814)
+	(envelope-from <alex.bennee@linaro.org>) id 1gxBSP-0005qc-Np
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:42 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38891)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gxBSN-0003w2-2p
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:39 -0500
-Received: by mail-wr1-x429.google.com with SMTP id f14so2530295wrg.1
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 06:04:33 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gxBSO-0004tL-VQ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:41 -0500
+Received: by mail-wm1-x342.google.com with SMTP id v26so2075513wmh.3
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 06:05:09 -0800 (PST)
+References: <20190222024106.9167-1-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190222024106.9167-1-richard.henderson@linaro.org>
+Date: Fri, 22 Feb 2019 14:05:07 +0000
+Message-ID: <87r2bz3omk.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<20190221111147.GB3282@stefanha-x1.localdomain>
-	<VI1PR0602MB3245593855B029B427ED544FA47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QUs9Yz2-k1KyVMwpgx6RwY9cK7qdQRCQ74xmgXJPJR-qw@mail.gmail.com>
-	<VI1PR0602MB32453A8B5CBC0308C7D18F1DA47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QVxaW3tezjBN9owJHsxzE9h8_qcaeRr5zHHKxKJOeFnkQ@mail.gmail.com>
-	<CAJSP0QVXoZJ9MJ0qp4RM_m2fGJ8iFSyJMAU_X7mdiQvpOK59KA@mail.gmail.com>
-	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
-	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
-	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
-	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
-	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-In-Reply-To: <VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 22 Feb 2019 14:04:20 +0000
-Message-ID: <CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
- size exceeded error
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] target/arm: Reduce overhead of
+ cpu_get_tb_cpu_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,75 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@outlook.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Natanael Copa <ncopa@alpinelinux.org>, Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, cota@braap.org
 
-On Fri, Feb 22, 2019 at 12:57 PM Fernando Casas Sch=C3=B6ssow
-<casasfernando@outlook.com> wrote:
 
-I have CCed Natanael Copa, qemu package maintainer in Alpine Linux.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Fernando: Can you confirm that the bug occurs with an unmodified
-Alpine Linux qemu binary?
+> Changes since v2:
+>   * Do not cache VECLEN, VECSTRIDE, VFPEN.
+>     These variables come from VFP_FPSCR and VFP_FPEXC, not from
+>     system control registers.
+>   * Move HANDLER and STACKCHECK to rebuild_hflags_a32,
+>     instead of building them in rebuild_hflags_common.
+>
+> Changes since v1:
+>   * Apparently I had started a last-minute API change, and failed to
+>     covert all of the users, and also failed to re-test afterward.
+>   * Retain assertions for --enable-debug-tcg.
 
-Richard: Commit 7db2145a6826b14efceb8dd64bfe6ad8647072eb ("bswap: Add
-host endian unaligned access functions") introduced the unaligned
-memory access functions in question here.  Please see below for
-details on the bug - basically QEMU code assumes they are atomic, but
-that is not guaranteed :(.  Any ideas for how to fix this?
+I thought I was being clever by running our armhf test binaries on a
+aarch64 image. However I have re-tested by doing a full armhf buster
+install this time:
 
-Natanael: It seems likely that the qemu package in Alpine Linux
-suffers from a compilation issue resulting in a broken QEMU.  It may
-be necessary to leave the compiler optimization flag alone in APKBUILD
-to work around this problem.
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Here are the details.  QEMU relies on the compiler turning
-memcpy(&dst, &src, 2) turning into a load instruction in
-include/qemu/bswap.h:lduw_he_p() (explanation below):
+>
+>
+> r~
+>
+>
+>
+> Richard Henderson (3):
+>   target/arm: Split out recompute_hflags et al
+>   target/arm: Rebuild hflags at el changes and MSR writes
+>   target/arm: Rely on hflags correct in cpu_get_tb_cpu_state
+>
+>  target/arm/cpu.h           |  28 ++--
+>  target/arm/helper.h        |   3 +
+>  target/arm/internals.h     |   4 +
+>  linux-user/syscall.c       |   1 +
+>  target/arm/cpu.c           |   1 +
+>  target/arm/helper-a64.c    |   3 +
+>  target/arm/helper.c        | 266 ++++++++++++++++++++++---------------
+>  target/arm/machine.c       |   1 +
+>  target/arm/op_helper.c     |   1 +
+>  target/arm/translate-a64.c |   6 +-
+>  target/arm/translate.c     |  14 +-
+>  11 files changed, 212 insertions(+), 116 deletions(-)
 
-/* Any compiler worth its salt will turn these memcpy into native unaligned
-   operations.  Thus we don't need to play games with packed attributes, or
-   inline byte-by-byte stores.  */
 
-static inline int lduw_he_p(const void *ptr)
-{
-    uint16_t r;
-    memcpy(&r, ptr, sizeof(r));
-    return r;
-}
-
-Here is the disassembly snippet of virtqueue_pop() from Fedora 29 that
-shows the load instruction:
-
-  398166:       0f b7 42 02             movzwl 0x2(%rdx),%eax
-  39816a:       66 89 43 32             mov    %ax,0x32(%rbx)
-
-Here is the instruction sequence in the Alpine Linux binary:
-
-  455562:    ba 02 00 00 00           mov    $0x2,%edx
-  455567:    e8 74 24 f3 ff           callq  3879e0 <memcpy@plt>
-  45556c:    0f b7 44 24 42           movzwl 0x42(%rsp),%eax
-  455571:    66 41 89 47 32           mov    %ax,0x32(%r15)
-
-It's calling memcpy instead of using a load instruction.
-
-Fernando found that QEMU's virtqueue_pop() function sees bogus values
-when loading a 16-bit guest RAM location.  Paolo figured out that the
-bogus value can be produced by memcpy() when another thread is
-updating the 16-bit memory location simultaneously.  This is a race
-condition between one thread loading the 16-bit value and another
-thread storing it (in this case a guest vcpu thread).  Sometimes
-memcpy() may load one old byte and one new byte, resulting in a bogus
-value.
-
-The symptom that Fernando experienced is a "Virtqueue size exceeded"
-error message from QEMU and then the virtio-blk or virtio-scsi device
-stops working.  This issue potentially affects other device emulation
-code in QEMU as well, not just virtio devices.
-
-For the time being, I suggest tweaking the APKBUILD so the memcpy() is
-not generated.  Hopefully QEMU can make the code more portable in the
-future so the compiler always does the expected thing, but this may
-not be easily possible.
-
-Stefan
+--
+Alex Benn=C3=A9e
