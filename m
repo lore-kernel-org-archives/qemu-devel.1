@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36217)
+Received: from eggs.gnu.org ([209.51.188.92]:43739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gx4tw-00065L-A8
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:05:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1gx56X-0008RP-1d
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:18:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gx4tv-0004vA-3B
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:05:40 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:46724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gx4tu-0004ra-Mo
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:05:38 -0500
-Received: by mail-qt1-x841.google.com with SMTP id z25so1380057qti.13
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 23:05:36 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1gx56V-0008Cn-Fy
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:18:40 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-3-armbru@redhat.com>
+	<2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
+	<CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
+	<875ztfuc0j.fsf@dusky.pond.sub.org>
+	<87sgwh5wef.fsf@dusky.pond.sub.org>
+	<CAFEAcA8gHp-VD05x9Q1V3_K29wsMeZD1SdM+PDteOXcAE3QHwg@mail.gmail.com>
+	<8d278f39-9549-5326-bfd8-b4bcabeacf84@redhat.com>
+Date: Fri, 22 Feb 2019 08:17:47 +0100
+In-Reply-To: <8d278f39-9549-5326-bfd8-b4bcabeacf84@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu,
+	21 Feb 2019 17:19:48 +0100")
+Message-ID: <8736ogs350.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190218102748.2242-1-xieyongji@baidu.com>
-	<20190218102748.2242-2-xieyongji@baidu.com>
-	<20190221120121-mutt-send-email-mst@kernel.org>
-	<CAONzpcYHae1fCJLN56ofQ91tSQi_JCXAA6mBhf0NqN=QusV1zg@mail.gmail.com>
-	<20190222011631-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190222011631-mutt-send-email-mst@kernel.org>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Fri, 22 Feb 2019 15:05:23 +0800
-Message-ID: <CAONzpcaxS3ct5bx62126SMiowcZ2mApnYomwXkHg0R67SvoQBg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 1/7] vhost-user: Support transferring
- inflight buffer between qemu and backend
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
+ just once, expand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,129 +32,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Fri, 22 Feb 2019 at 14:21, Michael S. Tsirkin <mst@redhat.com> wrote:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> On 2/21/19 10:38 AM, Peter Maydell wrote:
+>> On Thu, 21 Feb 2019 at 09:22, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+>>> Double-checking... you want me to keep goto reset_flash, like this:
+>>>
+>>> @@ -623,8 +617,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr o=
+ffset,
+>>>                  pfl->wcycle =3D 0;
+>>>                  pfl->status |=3D 0x80;
+>>>              } else {
+>>> -                DPRINTF("%s: unknown command for \"write block\"\n", _=
+_func__);
+>>> -                PFLASH_BUG("Write block confirm");
+>>> +                qemu_log_mask(LOG_GUEST_ERROR,
+>>> +                              "unknown command for \"write block\"\n");
+>>>                  goto reset_flash;
+>>>              }
+>>>              break;
+>>=20
+>> Yes. (We seem to handle most kinds of guest errors in programming
+>> the flash by reset_flash.)
 >
-> On Fri, Feb 22, 2019 at 10:47:03AM +0800, Yongji Xie wrote:
-> > > > +
-> > > > +To track inflight I/O, the queue region should be processed as follows:
-> > > > +
-> > > > +When receiving available buffers from the driver:
-> > > > +
-> > > > +    1. Get the next available head-descriptor index from available ring, i
-> > > > +
-> > > > +    2. Set desc[i].inflight to 1
-> > > > +
-> > > > +When supplying used buffers to the driver:
-> > > > +
-> > > > +    1. Get corresponding used head-descriptor index, i
-> > > > +
-> > > > +    2. Set desc[i].next to process_head
-> > > > +
-> > > > +    3. Set process_head to i
-> > > > +
-> > > > +    4. Steps 1,2,3 may be performed repeatedly if batching is possible
-> > > > +
-> > > > +    5. Increase the idx value of used ring by the size of the batch
-> > > > +
-> > > > +    6. Set the inflight field of each DescStateSplit entry in the batch to 0
-> > > > +
-> > > > +    7. Set used_idx to the idx value of used ring
-> > > > +
-> > > > +When reconnecting:
-> > > > +
-> > > > +    1. If the value of used_idx does not match the idx value of used ring,
-> > > > +
-> > > > +        (a) Subtract the value of used_idx from the idx value of used ring to get
-> > > > +        the number of in-progress DescStateSplit entries
-> > > > +
-> > > > +        (b) Set the inflight field of the in-progress DescStateSplit entries which
-> > > > +        start from process_head to 0
-> > > > +
-> > > > +        (c) Set used_idx to the idx value of used ring
-> > > > +
-> > > > +    2. Resubmit each inflight DescStateSplit entry
-> > >
-> > > I re-read a couple of time and I still don't understand what it says.
-> > >
-> > > For simplicity consider split ring. So we want a list of heads that are
-> > > outstanding. Fair enough. Now device finishes a head. What now? I needs
-> > > to drop head from the list. But list is unidirectional (just next, no
-> > > prev). So how can you drop an entry from the middle?
-> > >
-> >
-> > The process_head is only used when slave crash between increasing the
-> > idx value of used ring and updating used_idx. We use it to find the
-> > in-progress DescStateSplit entries before the crash and complete them
-> > when reconnecting. Make sure guest and slave have the same view for
-> > inflight I/Os.
-> >
+> Oh I missed the context of the patch here.
 >
-> But I don't understand how does the described process help do it?
+> So for the case of the Multi-WRITE command (0xe8):
+
+Since I'm a clueless idiot on pflash, I need to process your argument
+real slow, so I can write a commit message that doesn't document my
+cluelessness forever.
+
+We have a little state machine, and its state is encoded in
+pfl->wcycle. pfl->cmd, pfl->counter.  I'm going to show it as
+
+    (value of pfl->wcycle, value of pfl->cmd, value of pfl->counter)
+
+for brevity.
+
+We start with (0, don't care, don't care).
+
+A guest write sends us a width, an address, and a value.
+pflash_mem_write_with_attrs() does permission checking, and
+pflash_write() the actual work.  We enter it with @offset, @value and
+@width holding the message.
+
+    cmd =3D value;
+
+    trace_pflash_write(offset, value, width, pfl->wcycle);
+    if (!pfl->wcycle) {
+        /* Set the device in I/O access mode */
+        memory_region_rom_device_set_romd(&pfl->mem, false);
+    }
+
+@cmd is @value truncated to 8 bits.
+
+> 1/ On first write cycle we have
 >
+>   - address =3D flash_page_address (we store it in pfl->counter)
+>   - data =3D flash_command (0xe8: enter Multi-WRITE)
 
-For example, we need to submit descriptors A, B, C to driver in a batch.
+    switch (pfl->wcycle) {
+    case 0:
+        /* read mode */
+        switch (cmd) {
+        [...]
+        case 0xe8: /* Write to buffer */
+            DPRINTF("%s: Write to buffer\n", __func__);
+            pfl->status |=3D 0x80; /* Ready! */
+            break;
+        [...]
+        pfl->wcycle++;
+        pfl->cmd =3D cmd;
+        break;
 
-Firstly, we will link those descriptors like:
+Transition from (0, don't care, don't care) to (1, 0xE8, don't care).
 
-process_head->A->B->C    (A)
+I can't see "we store it in pfl->counter".
 
-Then, we need to update idx value of used vring to mark those
-descriptors as used:
+Note that the address (passed in @offset) is entirely ignored.
 
-_vring.used->idx += 3    (B)
-
-At last, clear the inflight field of those descriptors and update
-used_idx field:
-
-A.inflight = 0; B.inflight = 0; C.inflight = 0;    (C)
-
-used_idx = _vring.used->idx;    (D)
-
-After (B), guest can consume the descriptors A,B,C. So we must make
-sure the inflight field of A,B,C is cleared when reconnecting to avoid
-re-submitting used descriptor. If slave crash during (C), the inflight
-field of A,B,C may be incorrect. To detect that case, we can see
-whether used_idx matches _vring.used->idx. And through process_head,
-we can get the in-progress descriptors A,B,C and clear their inflight
-field again when reconnecting.
-
+> 2/ Second cycle:
 >
-> > In other case, the inflight field is enough to track inflight I/O.
-> > When reconnecting, we go through all DescStateSplit entries and
-> > re-submit the entry whose inflight field is equal to 1.
+>   - address =3D flash_page_address
+>     We should check it matches flash_page_address
+>     of cycle 1/, but we don't.
+>   - data: N
 >
-> What I don't understand is how do we know the order
-> in which they have to be resubmitted. Reordering
-> operations would be a big problem, won't it?
+>     "N is the number of elements (bytes / words / double words),
+>     minus one, to be written to the write buffer. Expected count
+>     ranges are N =3D 00h to N =3D 7Fh (e.g., 1 to 128 bytes) in 8-bit
+>     mode, N =3D 00h to N =3D 003Fh in 16-bit mode, and N =3D 00h to
+>     N =3D 1Fh in 32-bit mode. Bus cycles 3 and higher are for writing
+>     data into the write buffer. The confirm command (D0h) is
+>     expected after exactly N + 1 write cycles; any other command at
+>     that point in the sequence will prevent the transfer of the
+>     buffer to the array (the write will be aborted)."
 >
+>     Instead of starting to write the data in a buffer, we write it
+>     directly to the block backend.
 
-In previous patch, I record avail_idx for each DescStateSplit entry to
-preserve the order. Is it useful to fix this?
+    case 1:
+        switch (pfl->cmd) {
+        [...]
+        case 0xe8:
+            /* Mask writeblock size based on device width, or bank width if
+             * device width not specified.
+             */
+            if (pfl->device_width) {
+                value =3D extract32(value, 0, pfl->device_width * 8);
+            } else {
+                value =3D extract32(value, 0, pfl->bank_width * 8);
+            }
+            DPRINTF("%s: block write of %x bytes\n", __func__, value);
+            pfl->counter =3D value;
+            pfl->wcycle++;
+            break;
+        [...]
+        }
+        break;
 
+Transition from (1, 0xE8, don't care) to (2, 0xE8, N), where N is passed
+in @value.
+
+Again, the address (passed in @offset) is ignored.
+
+Nothing is written to the block backend, yet.
+
+>     Instead of starting to write from cycle 3+, we write now in 2,
+>     and keep cycle count =3D=3D 2 (pfl->wcycle) until all data is
+>     written, where we increment at 3.
+
+    case 2:
+        switch (pfl->cmd) {
+        case 0xe8: /* Block write */
+            if (!pfl->ro) {
+                pflash_data_write(pfl, offset, value, width, be);
+            } else {
+                pfl->status |=3D 0x10; /* Programming error */
+            }
+
+Write to memory, with pflash_data_write(), but don't flush to the
+backend, yet.  This is (guest-visibly!) wrong.  It's not quite "instead
+of starting to write the data in a buffer, we write it directly to the
+block backend."
+
+Note that we happily accept any address and width.  I suspect we should
+only accept consecutive addresses and consistent width.
+
+            pfl->status |=3D 0x80;
+
+            if (!pfl->counter) {
+                hwaddr mask =3D pfl->writeblock_size - 1;
+                mask =3D ~mask;
+
+                DPRINTF("%s: block write finished\n", __func__);
+                pfl->wcycle++;
+                if (!pfl->ro) {
+                    /* Flush the entire write buffer onto backing storage. =
+ */
+                    pflash_update(pfl, offset & mask, pfl->writeblock_size);
+                } else {
+                    pfl->status |=3D 0x10; /* Programming error */
+                }
+            }
+
+If this is the multi-write's last write, flush the entire write block to
+the backend *boggle*.
+
+            pfl->counter--;
+            break;
+        [...]
+        }
+        break;
+
+Transition from (2, 0xE8, N) to
+
+    (2, 0xE8, N-1)          if N>0
+    (3, 0xE8, don't care)   if N=3D=3D0
+
+> 3/ Cycles 3+
 >
-> Let's say I fetch descriptors A, B, C and start
-> processing. how does memory look?
-
-A.inflight = 1, C.inflight = 1, B.inflight = 1
-
-> Now I finished B and marked it used. How does
-> memory look?
+>   - address =3D word index (relative to the page address)
+>   - data =3D word value
 >
-
-A.inflight = 1, C.inflight = 1, B.inflight = 0, process_head = B
-
-> I also wonder how do you address a crash between
-> marking descriptor used and clearing inflight.
-> Will you redo the descriptor? Is it always safe?
-> What if it's a write?
+>     We check for the CONFIRM command, and switch the device back
+>     to READ mode (setting Status), or reset the device (which is
+>     modelled the same way).
 >
+>     Very silly: If the guest cancelled and never sent the CONFIRM
+>     command, the data is already written/flushed back.
 
-It's safe. We can get the in-progess descriptors through process_head
-and clear their inflight field when reconnecting.
+    case 3: /* Confirm mode */
+        switch (pfl->cmd) {
+        case 0xe8: /* Block write */
+            if (cmd =3D=3D 0xd0) {
+                pfl->wcycle =3D 0;
+                pfl->status |=3D 0x80;
 
-Thanks,
-Yongji
+On CONFIRM, transition from (3, 0xE8, don't care) back to the intial
+state (0, don't care, don't care).
+
+            } else {
+                DPRINTF("%s: unknown command for \"write block\"\n", __func=
+__);
+                PFLASH_BUG("Write block confirm");
+                goto reset_flash;
+            }
+
+On anything else, pea brain implodes, and we exit(1).
+
+            break;
+
+The fact that we let a hack job like this anywhere near "secure boot" is
+either frightening or amusing, depending on one's level of cynicism
+towards virtual secure boot.
+
+> So back to the previous code snippet, regardless the value, this
+> is neither a hw_error() nor a GUEST_ERROR. This code is simply not
+> correct. Eventually the proper (polite) error message should be:
+>
+>     qemu_log_mask(LOG_UNIMP, "MULTI_WRITE: Abort not implemented,"
+>                              " the data is already written"
+>                              " on storage!\n"
+>                              "Nevertheless resetting the flash"
+>                              " into READ mode.\n");
+
+Yup, makes sense.
+
+Perhaps we should also LOG_UNIMP on the first write of a multi-write
+already, because the guest-visible wrongness starts right there.  You
+tell me.
+
+Two things left to do for this series: FIXME comments, and a commit
+message.  Before I tackle them, I'll give you a chance to correct
+misunderstandings in my reasoning.
