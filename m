@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60132)
+Received: from eggs.gnu.org ([209.51.188.92]:38569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1gxJmb-0006t0-PG
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 17:59:06 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gxK4j-0001LR-Rg
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 18:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1gxJma-0006CG-Tn
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 17:59:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1gxJma-0005P7-NR
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 17:59:04 -0500
-From: Bandan Das <bsd@redhat.com>
-Date: Fri, 22 Feb 2019 17:49:33 -0500
-Message-Id: <20190222224934.5822-2-bsd@redhat.com>
-In-Reply-To: <20190222224934.5822-1-bsd@redhat.com>
-References: <20190222224934.5822-1-bsd@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1gxK4Z-0006Ww-RT
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 18:17:42 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/2] usb-mtp: return incomplete transfer on a
- lstat failure
+References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 22 Feb 2019 15:16:13 -0800
+Message-ID: <CAKmqyKODpLNxp93pketnjJH60iK3xJRnmoXVzjxsmGfvM_vzeQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v8 00/34] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +22,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, peter.maydell@linaro.org
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>, Palmer Dabbelt <palmer@sifive.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>, peer.adelt@hni.uni-paderborn.de, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-MTP writes objects in small chunks and at the end gets the
-real file size to update the object metadata. If this fails for
-any reason, return an INCOMPLETE_TRANSFER to the initiator
+On Fri, Feb 22, 2019 at 6:31 AM Bastian Koppelmann
+<kbastian@mail.uni-paderborn.de> wrote:
+>
+> Hi,
+>
+> this patchset converts the RISC-V decoder to decodetree in four major steps:
+>
+> 1) Convert 32-bit instructions to decodetree [Patch 1-15]:
+>     Many of the gen_* functions are called by the decode functions for 16-bit
+>     and 32-bit functions. If we move translation code from the gen_*
+>     functions to the generated trans_* functions of decode-tree, we get a lot of
+>     duplication. Therefore, we mostly generate calls to the old gen_* function
+>     which are properly replaced after step 2).
+>
+>     Each of the trans_ functions are grouped into files corresponding to their
+>     ISA extension, e.g. addi which is in RV32I is translated in the file
+>     'trans_rvi.inc.c'.
+>
+> 2) Convert 16-bit instructions to decodetree [Patch 16-18]:
+>     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
+>     we convert the arguments in the 16 bit trans_ function to the arguments of
+>     the corresponding 32 bit instruction and call the 32 bit trans_ function.
+>
+> 3) Remove old manual decoding in gen_* function [Patch 19-29]:
+>     this move all manual translation code into the trans_* instructions of
+>     decode tree, such that we can remove the old decode_* functions.
+>
+> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
+>    by Richard. [Patch 30-34]
+>
+> full tree available at
+> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v8
+>
+> Cheers,
+> Bastian
 
-Spotted by Coverity: CID 1398651
+Tested-by: Alistair Francis <alistair.francis@wdc.com>
 
-Signed-off-by: Bandan Das <bsd@redhat.com>
----
- hw/usb/dev-mtp.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+I haven't run any strenuous tests, but it boots 32 and 64-bit
+Linux/openSBI with no issues.
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index f1d20fa1b9..79f2cb8743 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -1644,14 +1644,18 @@ done:
-         return ret;
- }
-=20
--static void usb_mtp_update_object(MTPObject *parent, char *name)
-+static int usb_mtp_update_object(MTPObject *parent, char *name)
- {
-+    int ret =3D -1;
-+
-     MTPObject *o =3D
-         usb_mtp_object_lookup_name(parent, name, strlen(name));
-=20
-     if (o) {
--        lstat(o->path, &o->stat);
-+        ret =3D lstat(o->path, &o->stat);
-     }
-+
-+    return ret;
- }
-=20
- static void usb_mtp_write_data(MTPState *s)
-@@ -1708,14 +1712,19 @@ static void usb_mtp_write_data(MTPState *s)
-         if (d->write_status !=3D WRITE_END) {
-             return;
-         } else {
--            /* Only for < 4G file sizes */
--            if (s->dataset.size !=3D 0xFFFFFFFF && d->offset !=3D s->dat=
-aset.size) {
-+            /*
-+             * Return an incomplete transfer if file size doesn't match
-+             * for < 4G file or if lstat fails which will result in an i=
-ncorrect
-+             * file size
-+             */
-+            if ((s->dataset.size !=3D 0xFFFFFFFF &&
-+                 d->offset !=3D s->dataset.size) ||
-+                usb_mtp_update_object(parent, s->dataset.filename)) {
-                 usb_mtp_queue_result(s, RES_INCOMPLETE_TRANSFER, d->tran=
-s,
-                                      0, 0, 0, 0);
-                 goto done;
-             }
--            usb_mtp_update_object(parent, s->dataset.filename);
-+
-         }
-     }
-=20
---=20
-2.19.2
+Alistair
+
+>
+> v7 -> v8:
+>     - add REQUIRE_EXT macro
+>     - add missing RVM checks
+>     - add missing RVA checks
+>     - add missing RVF checks
+>     - add missing RVF checks
+>     - add missing RVD checks
+>     - add missing RVD checks
+>     - riscv_has_ext -> has_ext
+>     - env->ctx->priv_version -> ctx->priv_version
+>     - fixed wrongly inserted #ifdef TARGET_RISCV64 that lead to a compile error
+>
+>
+> Bastian Koppelmann (34):
+>   target/riscv: Activate decodetree and implemnt LUI & AUIPC
+>   target/riscv: Convert RVXI branch insns to decodetree
+>   target/riscv: Convert RV32I load/store insns to decodetree
+>   target/riscv: Convert RV64I load/store insns to decodetree
+>   target/riscv: Convert RVXI arithmetic insns to decodetree
+>   target/riscv: Convert RVXI fence insns to decodetree
+>   target/riscv: Convert RVXI csr insns to decodetree
+>   target/riscv: Convert RVXM insns to decodetree
+>   target/riscv: Convert RV32A insns to decodetree
+>   target/riscv: Convert RV64A insns to decodetree
+>   target/riscv: Convert RV32F insns to decodetree
+>   target/riscv: Convert RV64F insns to decodetree
+>   target/riscv: Convert RV32D insns to decodetree
+>   target/riscv: Convert RV64D insns to decodetree
+>   target/riscv: Convert RV priv insns to decodetree
+>   target/riscv: Convert quadrant 0 of RVXC insns to decodetree
+>   target/riscv: Convert quadrant 1 of RVXC insns to decodetree
+>   target/riscv: Convert quadrant 2 of RVXC insns to decodetree
+>   target/riscv: Remove gen_jalr()
+>   target/riscv: Remove manual decoding from gen_branch()
+>   target/riscv: Remove manual decoding from gen_load()
+>   target/riscv: Remove manual decoding from gen_store()
+>   target/riscv: Move gen_arith_imm() decoding into trans_* functions
+>   target/riscv: make ADD/SUB/OR/XOR/AND insn use arg lists
+>   target/riscv: Remove shift and slt insn manual decoding
+>   target/riscv: Remove manual decoding of RV32/64M insn
+>   target/riscv: Rename trans_arith to gen_arith
+>   target/riscv: Remove gen_system()
+>   target/riscv: Remove decode_RV32_64G()
+>   target/riscv: Convert @cs_2 insns to share translation functions
+>   target/riscv: Convert @cl_d, @cl_w, @cs_d, @cs_w insns
+>   target/riscv: Splice fsw_sd and flw_ld for riscv32 vs riscv64
+>   target/riscv: Splice remaining compressed insn pairs for riscv32 vs
+>     riscv64
+>   target/riscv: Remaining rvc insn reuse 32 bit translators
+>
+>  target/riscv/Makefile.objs                    |   22 +
+>  target/riscv/insn16-32.decode                 |   31 +
+>  target/riscv/insn16-64.decode                 |   33 +
+>  target/riscv/insn16.decode                    |  114 +
+>  target/riscv/insn32-64.decode                 |   72 +
+>  target/riscv/insn32.decode                    |  203 ++
+>  .../riscv/insn_trans/trans_privileged.inc.c   |  110 +
+>  target/riscv/insn_trans/trans_rva.inc.c       |  218 ++
+>  target/riscv/insn_trans/trans_rvc.inc.c       |  149 ++
+>  target/riscv/insn_trans/trans_rvd.inc.c       |  442 ++++
+>  target/riscv/insn_trans/trans_rvf.inc.c       |  439 ++++
+>  target/riscv/insn_trans/trans_rvi.inc.c       |  568 +++++
+>  target/riscv/insn_trans/trans_rvm.inc.c       |  120 +
+>  target/riscv/translate.c                      | 1948 ++---------------
+>  14 files changed, 2740 insertions(+), 1729 deletions(-)
+>  create mode 100644 target/riscv/insn16-32.decode
+>  create mode 100644 target/riscv/insn16-64.decode
+>  create mode 100644 target/riscv/insn16.decode
+>  create mode 100644 target/riscv/insn32-64.decode
+>  create mode 100644 target/riscv/insn32.decode
+>  create mode 100644 target/riscv/insn_trans/trans_privileged.inc.c
+>  create mode 100644 target/riscv/insn_trans/trans_rva.inc.c
+>  create mode 100644 target/riscv/insn_trans/trans_rvc.inc.c
+>  create mode 100644 target/riscv/insn_trans/trans_rvd.inc.c
+>  create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
+>  create mode 100644 target/riscv/insn_trans/trans_rvi.inc.c
+>  create mode 100644 target/riscv/insn_trans/trans_rvm.inc.c
+>
+> --
+> 2.20.1
+>
+>
