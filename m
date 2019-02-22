@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40617)
+Received: from eggs.gnu.org ([209.51.188.92]:40708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYc-0005Kh-1L
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:08 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYf-0005Ow-W6
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYZ-0007Lp-Ns
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:05 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYd-0007aZ-OT
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:09 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:09:58 +0100
-Message-Id: <20190222141024.22217-9-kbastian@mail.uni-paderborn.de>
+Date: Fri, 22 Feb 2019 15:09:57 +0100
+Message-Id: <20190222141024.22217-8-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 08/34] target/riscv: Convert RVXM insns to
- decodetree
+Subject: [Qemu-devel] [PATCH v8 07/34] target/riscv: Convert RVXI csr insns
+ to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,207 +30,195 @@ Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
-v7 -> v8:
-    -add REQUIRE_EXT macro
-    -add missing RVM checks
+ target/riscv/insn32.decode              |  8 +++
+ target/riscv/insn_trans/trans_rvi.inc.c | 79 +++++++++++++++++++++++++
+ target/riscv/translate.c                | 43 +-------------
+ 3 files changed, 88 insertions(+), 42 deletions(-)
 
- target/riscv/insn32-64.decode           |   7 ++
- target/riscv/insn32.decode              |  10 +++
- target/riscv/insn_trans/trans_rvm.inc.c | 113 ++++++++++++++++++++++++
- target/riscv/translate.c                |  16 ++--
- 4 files changed, 137 insertions(+), 9 deletions(-)
- create mode 100644 target/riscv/insn_trans/trans_rvm.inc.c
-
-diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
-index 9a35f2aa19..008f100546 100644
---- a/target/riscv/insn32-64.decode
-+++ b/target/riscv/insn32-64.decode
-@@ -36,3 +36,10 @@ subw     0100000 .....  ..... 000 ..... 0111011 @r
- sllw     0000000 .....  ..... 001 ..... 0111011 @r
- srlw     0000000 .....  ..... 101 ..... 0111011 @r
- sraw     0100000 .....  ..... 101 ..... 0111011 @r
-+
-+# *** RV64M Standard Extension (in addition to RV32M) ***
-+mulw     0000001 .....  ..... 000 ..... 0111011 @r
-+divw     0000001 .....  ..... 100 ..... 0111011 @r
-+divuw    0000001 .....  ..... 101 ..... 0111011 @r
-+remw     0000001 .....  ..... 110 ..... 0111011 @r
-+remuw    0000001 .....  ..... 111 ..... 0111011 @r
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 977b1b10a3..e53944bf0e 100644
+index 804b721ca5..977b1b10a3 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -92,3 +92,13 @@ csrrc    ............     ..... 011 ..... 1110011 @csr
- csrrwi   ............     ..... 101 ..... 1110011 @csr
- csrrsi   ............     ..... 110 ..... 1110011 @csr
- csrrci   ............     ..... 111 ..... 1110011 @csr
-+
-+# *** RV32M Standard Extension ***
-+mul      0000001 .....  ..... 000 ..... 0110011 @r
-+mulh     0000001 .....  ..... 001 ..... 0110011 @r
-+mulhsu   0000001 .....  ..... 010 ..... 0110011 @r
-+mulhu    0000001 .....  ..... 011 ..... 0110011 @r
-+div      0000001 .....  ..... 100 ..... 0110011 @r
-+divu     0000001 .....  ..... 101 ..... 0110011 @r
-+rem      0000001 .....  ..... 110 ..... 0110011 @r
-+remu     0000001 .....  ..... 111 ..... 0110011 @r
-diff --git a/target/riscv/insn_trans/trans_rvm.inc.c b/target/riscv/insn_trans/trans_rvm.inc.c
-new file mode 100644
-index 0000000000..69631c9e37
---- /dev/null
-+++ b/target/riscv/insn_trans/trans_rvm.inc.c
-@@ -0,0 +1,113 @@
-+/*
-+ * RISC-V translation routines for the RV64M Standard Extension.
-+ *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
-+ * Copyright (c) 2018 Peer Adelt, peer.adelt@hni.uni-paderborn.de
-+ *                    Bastian Koppelmann, kbastian@mail.uni-paderborn.de
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+
-+static bool trans_mul(DisasContext *ctx, arg_mul *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_MUL, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_mulh(DisasContext *ctx, arg_mulh *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_MULH, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_mulhsu(DisasContext *ctx, arg_mulhsu *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_MULHSU, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_mulhu(DisasContext *ctx, arg_mulhu *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_MULHU, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_div(DisasContext *ctx, arg_div *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_DIV, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_divu(DisasContext *ctx, arg_divu *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_DIVU, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_rem(DisasContext *ctx, arg_rem *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_REM, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_remu(DisasContext *ctx, arg_remu *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_REMU, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+#ifdef TARGET_RISCV64
-+static bool trans_mulw(DisasContext *ctx, arg_mulw *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_MULW, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_divw(DisasContext *ctx, arg_divw *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_DIVW, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_divuw(DisasContext *ctx, arg_divuw *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_DIVUW, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_remw(DisasContext *ctx, arg_remw *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_REMW, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+
-+static bool trans_remuw(DisasContext *ctx, arg_remuw *a)
-+{
-+    REQUIRE_EXT(ctx, RVM);
-+    gen_arith(ctx, OPC_RISC_REMUW, a->rd, a->rs1, a->rs2);
-+    return true;
-+}
-+#endif
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 18555000af..783ccade51 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -1841,11 +1841,18 @@ static void decode_RV32_64C(DisasContext *ctx)
- EX_SH(1)
- EX_SH(12)
+@@ -22,6 +22,7 @@
+ %rd        7:5
  
-+#define REQUIRE_EXT(ctx, ext) do { \
-+    if (!has_ext(ctx, ext)) {      \
-+        return false;              \
-+    }                              \
+ %sh10    20:10
++%csr    20:12
+ 
+ # immediates:
+ %imm_i    20:s12
+@@ -43,6 +44,7 @@
+ @j       ....................      ..... .......         imm=%imm_j          %rd
+ 
+ @sh      ......  ...... .....  ... ..... ....... &shift  shamt=%sh10      %rs1 %rd
++@csr     ............   .....  ... ..... .......               %csr     %rs1 %rd
+ 
+ # *** RV32I Base Instruction Set ***
+ lui      ....................       ..... 0110111 @u
+@@ -84,3 +86,9 @@ or       0000000 .....    ..... 110 ..... 0110011 @r
+ and      0000000 .....    ..... 111 ..... 0110011 @r
+ fence    ---- pred:4 succ:4 ----- 000 ----- 0001111
+ fence_i  ---- ----   ----   ----- 001 ----- 0001111
++csrrw    ............     ..... 001 ..... 1110011 @csr
++csrrs    ............     ..... 010 ..... 1110011 @csr
++csrrc    ............     ..... 011 ..... 1110011 @csr
++csrrwi   ............     ..... 101 ..... 1110011 @csr
++csrrsi   ............     ..... 110 ..... 1110011 @csr
++csrrci   ............     ..... 111 ..... 1110011 @csr
+diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+index 973d6371df..4a23372cb8 100644
+--- a/target/riscv/insn_trans/trans_rvi.inc.c
++++ b/target/riscv/insn_trans/trans_rvi.inc.c
+@@ -337,3 +337,82 @@ static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
+     ctx->base.is_jmp = DISAS_NORETURN;
+     return true;
+ }
++
++#define RISCV_OP_CSR_PRE do {\
++    source1 = tcg_temp_new(); \
++    csr_store = tcg_temp_new(); \
++    dest = tcg_temp_new(); \
++    rs1_pass = tcg_temp_new(); \
++    gen_get_gpr(source1, a->rs1); \
++    tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next); \
++    tcg_gen_movi_tl(rs1_pass, a->rs1); \
++    tcg_gen_movi_tl(csr_store, a->csr); \
++    gen_io_start();\
 +} while (0)
 +
- bool decode_insn32(DisasContext *ctx, uint32_t insn);
- /* Include the auto-generated decoder for 32 bit insn */
- #include "decode_insn32.inc.c"
- /* Include insn module translation function */
- #include "insn_trans/trans_rvi.inc.c"
-+#include "insn_trans/trans_rvm.inc.c"
- 
- static void decode_RV32_64G(DisasContext *ctx)
++#define RISCV_OP_CSR_POST do {\
++    gen_io_end(); \
++    gen_set_gpr(a->rd, dest); \
++    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn); \
++    tcg_gen_exit_tb(NULL, 0); \
++    ctx->base.is_jmp = DISAS_NORETURN; \
++    tcg_temp_free(source1); \
++    tcg_temp_free(csr_store); \
++    tcg_temp_free(dest); \
++    tcg_temp_free(rs1_pass); \
++} while (0)
++
++
++static bool trans_csrrw(DisasContext *ctx, arg_csrrw *a)
++{
++    TCGv source1, csr_store, dest, rs1_pass;
++    RISCV_OP_CSR_PRE;
++    gen_helper_csrrw(dest, cpu_env, source1, csr_store);
++    RISCV_OP_CSR_POST;
++    return true;
++}
++
++static bool trans_csrrs(DisasContext *ctx, arg_csrrs *a)
++{
++    TCGv source1, csr_store, dest, rs1_pass;
++    RISCV_OP_CSR_PRE;
++    gen_helper_csrrs(dest, cpu_env, source1, csr_store, rs1_pass);
++    RISCV_OP_CSR_POST;
++    return true;
++}
++
++static bool trans_csrrc(DisasContext *ctx, arg_csrrc *a)
++{
++    TCGv source1, csr_store, dest, rs1_pass;
++    RISCV_OP_CSR_PRE;
++    gen_helper_csrrc(dest, cpu_env, source1, csr_store, rs1_pass);
++    RISCV_OP_CSR_POST;
++    return true;
++}
++
++static bool trans_csrrwi(DisasContext *ctx, arg_csrrwi *a)
++{
++    TCGv source1, csr_store, dest, rs1_pass;
++    RISCV_OP_CSR_PRE;
++    gen_helper_csrrw(dest, cpu_env, rs1_pass, csr_store);
++    RISCV_OP_CSR_POST;
++    return true;
++}
++
++static bool trans_csrrsi(DisasContext *ctx, arg_csrrsi *a)
++{
++    TCGv source1, csr_store, dest, rs1_pass;
++    RISCV_OP_CSR_PRE;
++    gen_helper_csrrs(dest, cpu_env, rs1_pass, csr_store, rs1_pass);
++    RISCV_OP_CSR_POST;
++    return true;
++}
++
++static bool trans_csrrci(DisasContext *ctx, arg_csrrci *a)
++{
++    TCGv source1, csr_store, dest, rs1_pass;
++    RISCV_OP_CSR_PRE;
++    gen_helper_csrrc(dest, cpu_env, rs1_pass, csr_store, rs1_pass);
++    RISCV_OP_CSR_POST;
++    return true;
++}
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index f720746cb7..18555000af 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -1476,16 +1476,11 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+ static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+                        int csr)
  {
-@@ -1867,15 +1874,6 @@ static void decode_RV32_64G(DisasContext *ctx)
-     imm = GET_IMM(ctx->opcode);
+-    TCGv source1, csr_store, dest, rs1_pass, imm_rs1;
++    TCGv source1, dest;
+     source1 = tcg_temp_new();
+-    csr_store = tcg_temp_new();
+     dest = tcg_temp_new();
+-    rs1_pass = tcg_temp_new();
+-    imm_rs1 = tcg_temp_new();
+     gen_get_gpr(source1, rs1);
+     tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+-    tcg_gen_movi_tl(rs1_pass, rs1);
+-    tcg_gen_movi_tl(csr_store, csr); /* copy into temp reg to feed to helper */
  
-     switch (op) {
--    case OPC_RISC_ARITH:
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_ARITH_W:
--#endif
--        if (rd == 0) {
--            break; /* NOP */
--        }
--        gen_arith(ctx, MASK_OP_ARITH(ctx->opcode), rd, rs1, rs2);
--        break;
-     case OPC_RISC_FP_LOAD:
-         gen_fp_load(ctx, MASK_OP_FP_LOAD(ctx->opcode), rd, rs1, imm);
+ #ifndef CONFIG_USER_ONLY
+     /* Extract funct7 value and check whether it matches SFENCE.VMA */
+@@ -1556,45 +1551,9 @@ static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+             break;
+         }
          break;
+-    default:
+-        tcg_gen_movi_tl(imm_rs1, rs1);
+-        gen_io_start();
+-        switch (opc) {
+-        case OPC_RISC_CSRRW:
+-            gen_helper_csrrw(dest, cpu_env, source1, csr_store);
+-            break;
+-        case OPC_RISC_CSRRS:
+-            gen_helper_csrrs(dest, cpu_env, source1, csr_store, rs1_pass);
+-            break;
+-        case OPC_RISC_CSRRC:
+-            gen_helper_csrrc(dest, cpu_env, source1, csr_store, rs1_pass);
+-            break;
+-        case OPC_RISC_CSRRWI:
+-            gen_helper_csrrw(dest, cpu_env, imm_rs1, csr_store);
+-            break;
+-        case OPC_RISC_CSRRSI:
+-            gen_helper_csrrs(dest, cpu_env, imm_rs1, csr_store, rs1_pass);
+-            break;
+-        case OPC_RISC_CSRRCI:
+-            gen_helper_csrrc(dest, cpu_env, imm_rs1, csr_store, rs1_pass);
+-            break;
+-        default:
+-            gen_exception_illegal(ctx);
+-            return;
+-        }
+-        gen_io_end();
+-        gen_set_gpr(rd, dest);
+-        /* end tb since we may be changing priv modes, to get mmu_index right */
+-        tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
+-        tcg_gen_exit_tb(NULL, 0); /* no chaining */
+-        ctx->base.is_jmp = DISAS_NORETURN;
+-        break;
+     }
+     tcg_temp_free(source1);
+-    tcg_temp_free(csr_store);
+     tcg_temp_free(dest);
+-    tcg_temp_free(rs1_pass);
+-    tcg_temp_free(imm_rs1);
+ }
+ 
+ static void decode_RV32_64C0(DisasContext *ctx)
 -- 
 2.20.1
