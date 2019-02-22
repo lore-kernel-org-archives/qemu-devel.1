@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33490)
+Received: from eggs.gnu.org ([209.51.188.92]:33505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gxGUz-0004H7-9p
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gxGUz-0004HE-Fy
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:28:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gxGUx-0001wl-SK
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gxGUy-0001xk-GA
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:28:41 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:55005 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:55003 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gxGUx-0001TZ-IK
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:28:39 -0500
+	id 1gxGUy-0001TW-5O
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:28:40 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 22 Feb 2019 20:26:16 +0100
-Message-Id: <1550863578-30859-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 22 Feb 2019 20:26:15 +0100
+Message-Id: <1550863578-30859-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550863578-30859-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550863578-30859-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 6/8] qemu-doc: Add section on MIPS' Boston
- board
+Subject: [Qemu-devel] [PATCH v3 5/8] qemu-doc: Add section on MIPS' Fulong
+ 2E board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +30,36 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add section on MIPS' Boston board in QEMU user documentation.
+Add section on MIPS' Fulong 2E board in QEMU user documentation.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- qemu-doc.texi | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ qemu-doc.texi | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 18e383c..ae3c3f9 100644
+index 4c5577f..18e383c 100644
 --- a/qemu-doc.texi
 +++ b/qemu-doc.texi
-@@ -2049,6 +2049,15 @@ Malta FPGA serial device
- Cirrus (default) or any other PCI VGA graphics card
+@@ -2077,6 +2077,19 @@ SCSI controller
+ G364 framebuffer
  @end itemize
  
-+The Boston board emulation supports the following devices:
++The Fulong 2E emulation supports:
 +
 +@itemize @minus
 +@item
-+Xilinx FPGA, which includes a PCIe root port and an UART
++Loongson 2E CPU
 +@item
-+Intel EG20T PCH connects the I/O peripherals, but only the SATA bus is emulated
++Bonito64 system controller as North Bridge
++@item
++VT82C686 chipset as South Bridge
++@item
++RTL8139D as a network card chipset
 +@end itemize
 +
- The ACER Pica emulation supports:
- 
- @itemize @minus
+ The mipssim pseudo board emulation provides an environment similar
+ to what the proprietary MIPS emulator uses for running Linux.
+ It supports:
 -- 
 2.7.4
