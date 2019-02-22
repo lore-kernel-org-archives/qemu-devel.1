@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60542)
+Received: from eggs.gnu.org ([209.51.188.92]:60679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx5eQ-0006yC-8x
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:44 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gx5eZ-00076c-SG
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx5eN-0001ar-S0
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51368)
+	(envelope-from <kraxel@redhat.com>) id 1gx5eO-0001b9-1n
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx5eM-0001Mo-Up
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx5eM-0001LS-JZ
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:39 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4FE7EC057F2F
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:53:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B3767A911
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:53:28 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 22 Feb 2019 08:53:23 +0100
-Message-Id: <20190222075326.9850-13-kraxel@redhat.com>
+Date: Fri, 22 Feb 2019 08:53:17 +0100
+Message-Id: <20190222075326.9850-7-kraxel@redhat.com>
 In-Reply-To: <20190222075326.9850-1-kraxel@redhat.com>
 References: <20190222075326.9850-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/15] build-sys: add gio-2.0 check
+Subject: [Qemu-devel] [PULL 06/15] char/spice: discard write() if backend is
+ disconnected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +38,102 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-GIO is required for the "-display spice-app" backend.
+Most chardev backend handle write() as discarded data if underlying
+system is disconnected. For unknown historical reasons, the Spice
+backend has "reliable" write: it will wait until the client end is
+reconnected to do further successful write().
+
+To decide whether it make sense to wait until the client is
+reconnected (or queue the writes), let's review Spice chardev usage
+and handling of a disconnected client:
+
+ * spice vdagent
+   The agents reopen the virtio port on disconnect. In qemu side,
+   virtio_serial_close() will also discard pending data.
+
+ * usb redirection
+   A disconnect creates a device disconnection.
+
+ * smartcard emulation
+   Data is discarded in passthru_apdu_from_guest().
+
+   (Spice doesn't explicitly open the smartcard char device until
+   upcoming 0.14.2, commit 69a5cfc74131ec0459f2eb5a231139f5a69a8037)
+
+ * spice webdavd
+   The daemon will restart the service, and reopen the virtio port.
+
+ * spice ports (serial console, qemu monitor..)
+   Depends on the associated device or usage.
+
+   - serial, may be throttled or discarded on write, depending on
+     device
+
+   - QMP/HMP monitor have some CLOSED event handling, but want to
+     flush the write, which will finish when a new client connects.
+
+On disconnect/reconnect, the client starts with fresh sessions. If it
+is a seamless migration, the client disconnects after the source
+migrated. The handling of source disconnect in qemu is thus irrelevant
+for the Spice session migration.
+
+For all these use cases, it is better to discard writes when the
+client is disconnected, and require the vm-side device/agent to behave
+correctly on CHR_EVENT_CLOSED, to stop reading and writing from
+the spice chardev.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Tested-by: Victor Toso <victortoso@redhat.com>
-Message-id: 20190221110703.5775-9-marcandre.lureau@redhat.com
+Message-id: 20190221110703.5775-3-marcandre.lureau@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ chardev/spice.c      | 12 ++++++++++++
+ chardev/trace-events |  1 +
+ 2 files changed, 13 insertions(+)
 
-diff --git a/configure b/configure
-index a61682c3c727..05d72f1c565b 100755
---- a/configure
-+++ b/configure
-@@ -3503,6 +3503,14 @@ for i in $glib_modules; do
-     fi
- done
+diff --git a/chardev/spice.c b/chardev/spice.c
+index c2baeb5461fa..c68e60115bb1 100644
+--- a/chardev/spice.c
++++ b/chardev/spice.c
+@@ -208,6 +208,12 @@ static int spice_chr_write(Chardev *chr, const uint8=
+_t *buf, int len)
+     int read_bytes;
 =20
-+if $pkg_config --atleast-version=3D$glib_req_ver gio-2.0; then
-+    gio=3Dyes
-+    gio_cflags=3D$($pkg_config --cflags gio-2.0)
-+    gio_libs=3D$($pkg_config --libs gio-2.0)
-+else
-+    gio=3Dno
-+fi
+     assert(s->datalen =3D=3D 0);
 +
- # Sanity check that the current size_t matches the
- # size that glib thinks it should be. This catches
- # problems on multi-arch where people try to build
-@@ -6520,6 +6528,11 @@ if test "$gtk" =3D "yes" ; then
-     echo "CONFIG_GTK_GL=3Dy" >> $config_host_mak
-   fi
- fi
-+if test "$gio" =3D "yes" ; then
-+    echo "CONFIG_GIO=3Dy" >> $config_host_mak
-+    echo "GIO_CFLAGS=3D$gio_cflags" >> $config_host_mak
-+    echo "GIO_LIBS=3D$gio_libs" >> $config_host_mak
-+fi
- echo "CONFIG_TLS_PRIORITY=3D\"$tls_priority\"" >> $config_host_mak
- if test "$gnutls" =3D "yes" ; then
-   echo "CONFIG_GNUTLS=3Dy" >> $config_host_mak
++    if (!chr->be_open) {
++        trace_spice_chr_discard_write(len);
++        return len;
++    }
++
+     s->datapos =3D buf;
+     s->datalen =3D len;
+     spice_server_char_device_wakeup(&s->sin);
+@@ -300,6 +306,12 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
+     }
+=20
+     *be_opened =3D false;
++#if SPICE_SERVER_VERSION < 0x000e02
++    /* Spice < 0.14.2 doesn't explicitly open smartcard chardev */
++    if (strcmp(type, "smartcard") =3D=3D 0) {
++        *be_opened =3D true;
++    }
++#endif
+     chr_open(chr, type);
+ }
+=20
+diff --git a/chardev/trace-events b/chardev/trace-events
+index d0e5f3bbc1a7..b8a759634420 100644
+--- a/chardev/trace-events
++++ b/chardev/trace-events
+@@ -10,6 +10,7 @@ wct_cmd_other(const char *cmd) "%s"
+ wct_speed(int speed) "%d"
+=20
+ # chardev/spice.c
++spice_chr_discard_write(int len) "spice chr write discarded %d"
+ spice_vmc_write(ssize_t out, int len) "spice wrote %zd of requested %d"
+ spice_vmc_read(int bytes, int len) "spice read %d of requested %d"
+ spice_vmc_register_interface(void *scd) "spice vmc registered interface =
+%p"
 --=20
 2.9.3
