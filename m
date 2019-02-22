@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40542)
+Received: from eggs.gnu.org ([209.51.188.92]:40617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYZ-0005J0-FS
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:05 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYc-0005Kh-1L
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYP-00078W-Qz
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:11:58 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYZ-0007Lp-Ns
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:05 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:10:05 +0100
-Message-Id: <20190222141024.22217-16-kbastian@mail.uni-paderborn.de>
+Date: Fri, 22 Feb 2019 15:09:58 +0100
+Message-Id: <20190222141024.22217-9-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 15/34] target/riscv: Convert RV priv insns
- to decodetree
+Subject: [Qemu-devel] [PATCH v8 08/34] target/riscv: Convert RVXM insns to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +31,57 @@ Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
 v7 -> v8:
-    - riscv_has_ext -> has_ext
-    - env->ctx->priv_version -> ctx->priv_version
+    -add REQUIRE_EXT macro
+    -add missing RVM checks
 
- target/riscv/insn32.decode                    |  15 +++
- .../riscv/insn_trans/trans_privileged.inc.c   | 110 ++++++++++++++++++
- target/riscv/translate.c                      |  57 +--------
- 3 files changed, 126 insertions(+), 56 deletions(-)
- create mode 100644 target/riscv/insn_trans/trans_privileged.inc.c
+ target/riscv/insn32-64.decode           |   7 ++
+ target/riscv/insn32.decode              |  10 +++
+ target/riscv/insn_trans/trans_rvm.inc.c | 113 ++++++++++++++++++++++++
+ target/riscv/translate.c                |  16 ++--
+ 4 files changed, 137 insertions(+), 9 deletions(-)
+ create mode 100644 target/riscv/insn_trans/trans_rvm.inc.c
 
+diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+index 9a35f2aa19..008f100546 100644
+--- a/target/riscv/insn32-64.decode
++++ b/target/riscv/insn32-64.decode
+@@ -36,3 +36,10 @@ subw     0100000 .....  ..... 000 ..... 0111011 @r
+ sllw     0000000 .....  ..... 001 ..... 0111011 @r
+ srlw     0000000 .....  ..... 101 ..... 0111011 @r
+ sraw     0100000 .....  ..... 101 ..... 0111011 @r
++
++# *** RV64M Standard Extension (in addition to RV32M) ***
++mulw     0000001 .....  ..... 000 ..... 0111011 @r
++divw     0000001 .....  ..... 100 ..... 0111011 @r
++divuw    0000001 .....  ..... 101 ..... 0111011 @r
++remw     0000001 .....  ..... 110 ..... 0111011 @r
++remuw    0000001 .....  ..... 111 ..... 0111011 @r
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index e64b2b5e34..ecc46a50cc 100644
+index 977b1b10a3..e53944bf0e 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -57,6 +57,21 @@
- @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
- @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
- 
-+@sfence_vma ....... ..... .....   ... ..... ....... %rs2 %rs1
-+@sfence_vm  ....... ..... .....   ... ..... ....... %rs1
+@@ -92,3 +92,13 @@ csrrc    ............     ..... 011 ..... 1110011 @csr
+ csrrwi   ............     ..... 101 ..... 1110011 @csr
+ csrrsi   ............     ..... 110 ..... 1110011 @csr
+ csrrci   ............     ..... 111 ..... 1110011 @csr
 +
-+
-+# *** Privileged Instructions ***
-+ecall      000000000000     00000 000 00000 1110011
-+ebreak     000000000001     00000 000 00000 1110011
-+uret       0000000    00010 00000 000 00000 1110011
-+sret       0001000    00010 00000 000 00000 1110011
-+hret       0010000    00010 00000 000 00000 1110011
-+mret       0011000    00010 00000 000 00000 1110011
-+wfi        0001000    00101 00000 000 00000 1110011
-+sfence_vma 0001001    ..... ..... 000 00000 1110011 @sfence_vma
-+sfence_vm  0001000    00100 ..... 000 00000 1110011 @sfence_vm
-+
- # *** RV32I Base Instruction Set ***
- lui      ....................       ..... 0110111 @u
- auipc    ....................       ..... 0010111 @u
-diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
++# *** RV32M Standard Extension ***
++mul      0000001 .....  ..... 000 ..... 0110011 @r
++mulh     0000001 .....  ..... 001 ..... 0110011 @r
++mulhsu   0000001 .....  ..... 010 ..... 0110011 @r
++mulhu    0000001 .....  ..... 011 ..... 0110011 @r
++div      0000001 .....  ..... 100 ..... 0110011 @r
++divu     0000001 .....  ..... 101 ..... 0110011 @r
++rem      0000001 .....  ..... 110 ..... 0110011 @r
++remu     0000001 .....  ..... 111 ..... 0110011 @r
+diff --git a/target/riscv/insn_trans/trans_rvm.inc.c b/target/riscv/insn_trans/trans_rvm.inc.c
 new file mode 100644
-index 0000000000..acb605923e
+index 0000000000..69631c9e37
 --- /dev/null
-+++ b/target/riscv/insn_trans/trans_privileged.inc.c
-@@ -0,0 +1,110 @@
++++ b/target/riscv/insn_trans/trans_rvm.inc.c
+@@ -0,0 +1,113 @@
 +/*
-+ * RISC-V translation routines for the RISC-V privileged instructions.
++ * RISC-V translation routines for the RV64M Standard Extension.
 + *
 + * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 + * Copyright (c) 2018 Peer Adelt, peer.adelt@hni.uni-paderborn.de
@@ -92,185 +100,137 @@ index 0000000000..acb605923e
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+static bool trans_ecall(DisasContext *ctx, arg_ecall *a)
++
++static bool trans_mul(DisasContext *ctx, arg_mul *a)
 +{
-+    /* always generates U-level ECALL, fixed in do_interrupt handler */
-+    generate_exception(ctx, RISCV_EXCP_U_ECALL);
-+    tcg_gen_exit_tb(NULL, 0); /* no chaining */
-+    ctx->base.is_jmp = DISAS_NORETURN;
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_MUL, a->rd, a->rs1, a->rs2);
 +    return true;
 +}
 +
-+static bool trans_ebreak(DisasContext *ctx, arg_ebreak *a)
++static bool trans_mulh(DisasContext *ctx, arg_mulh *a)
 +{
-+    generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
-+    tcg_gen_exit_tb(NULL, 0); /* no chaining */
-+    ctx->base.is_jmp = DISAS_NORETURN;
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_MULH, a->rd, a->rs1, a->rs2);
 +    return true;
 +}
 +
-+static bool trans_uret(DisasContext *ctx, arg_uret *a)
++static bool trans_mulhsu(DisasContext *ctx, arg_mulhsu *a)
 +{
-+    return false;
-+}
-+
-+static bool trans_sret(DisasContext *ctx, arg_sret *a)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
-+
-+    if (has_ext(ctx, RVS)) {
-+        gen_helper_sret(cpu_pc, cpu_env, cpu_pc);
-+        tcg_gen_exit_tb(NULL, 0); /* no chaining */
-+        ctx->base.is_jmp = DISAS_NORETURN;
-+    } else {
-+        return false;
-+    }
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_MULHSU, a->rd, a->rs1, a->rs2);
 +    return true;
-+#else
-+    return false;
-+#endif
 +}
 +
-+static bool trans_hret(DisasContext *ctx, arg_hret *a)
++static bool trans_mulhu(DisasContext *ctx, arg_mulhu *a)
 +{
-+    return false;
-+}
-+
-+static bool trans_mret(DisasContext *ctx, arg_mret *a)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
-+    gen_helper_mret(cpu_pc, cpu_env, cpu_pc);
-+    tcg_gen_exit_tb(NULL, 0); /* no chaining */
-+    ctx->base.is_jmp = DISAS_NORETURN;
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_MULHU, a->rd, a->rs1, a->rs2);
 +    return true;
-+#else
-+    return false;
-+#endif
 +}
 +
-+static bool trans_wfi(DisasContext *ctx, arg_wfi *a)
++static bool trans_div(DisasContext *ctx, arg_div *a)
 +{
-+#ifndef CONFIG_USER_ONLY
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
-+    gen_helper_wfi(cpu_env);
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_DIV, a->rd, a->rs1, a->rs2);
 +    return true;
-+#else
-+    return false;
-+#endif
 +}
 +
-+static bool trans_sfence_vma(DisasContext *ctx, arg_sfence_vma *a)
++static bool trans_divu(DisasContext *ctx, arg_divu *a)
 +{
-+#ifndef CONFIG_USER_ONLY
-+    if (ctx->priv_ver == PRIV_VERSION_1_10_0) {
-+        gen_helper_tlb_flush(cpu_env);
-+        return true;
-+    }
-+#endif
-+    return false;
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_DIVU, a->rd, a->rs1, a->rs2);
++    return true;
 +}
 +
-+static bool trans_sfence_vm(DisasContext *ctx, arg_sfence_vm *a)
++static bool trans_rem(DisasContext *ctx, arg_rem *a)
 +{
-+#ifndef CONFIG_USER_ONLY
-+    if (ctx->priv_ver <= PRIV_VERSION_1_09_1) {
-+        gen_helper_tlb_flush(cpu_env);
-+        return true;
-+    }
-+#endif
-+    return false;
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_REM, a->rd, a->rs1, a->rs2);
++    return true;
 +}
++
++static bool trans_remu(DisasContext *ctx, arg_remu *a)
++{
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_REMU, a->rd, a->rs1, a->rs2);
++    return true;
++}
++
++#ifdef TARGET_RISCV64
++static bool trans_mulw(DisasContext *ctx, arg_mulw *a)
++{
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_MULW, a->rd, a->rs1, a->rs2);
++    return true;
++}
++
++static bool trans_divw(DisasContext *ctx, arg_divw *a)
++{
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_DIVW, a->rd, a->rs1, a->rs2);
++    return true;
++}
++
++static bool trans_divuw(DisasContext *ctx, arg_divuw *a)
++{
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_DIVUW, a->rd, a->rs1, a->rs2);
++    return true;
++}
++
++static bool trans_remw(DisasContext *ctx, arg_remw *a)
++{
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_REMW, a->rd, a->rs1, a->rs2);
++    return true;
++}
++
++static bool trans_remuw(DisasContext *ctx, arg_remuw *a)
++{
++    REQUIRE_EXT(ctx, RVM);
++    gen_arith(ctx, OPC_RISC_REMUW, a->rd, a->rs1, a->rs2);
++    return true;
++}
++#endif
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 2e36deee82..02f64ed8a7 100644
+index 18555000af..783ccade51 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -772,26 +772,8 @@ static void gen_set_rm(DisasContext *ctx, int rm)
- static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-                        int csr)
- {
--    TCGv source1, dest;
--    source1 = tcg_temp_new();
--    dest = tcg_temp_new();
--    gen_get_gpr(source1, rs1);
-     tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+@@ -1841,11 +1841,18 @@ static void decode_RV32_64C(DisasContext *ctx)
+ EX_SH(1)
+ EX_SH(12)
  
--#ifndef CONFIG_USER_ONLY
--    /* Extract funct7 value and check whether it matches SFENCE.VMA */
--    if ((opc == OPC_RISC_ECALL) && ((csr >> 5) == 9)) {
--        if (ctx->priv_ver == PRIV_VERSION_1_10_0) {
--            /* sfence.vma */
--            /* TODO: handle ASID specific fences */
--            gen_helper_tlb_flush(cpu_env);
--            return;
--        } else {
--            gen_exception_illegal(ctx);
--        }
--    }
--#endif
--
-     switch (opc) {
-     case OPC_RISC_ECALL:
-         switch (csr) {
-@@ -806,50 +788,12 @@ static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-             tcg_gen_exit_tb(NULL, 0); /* no chaining */
-             ctx->base.is_jmp = DISAS_NORETURN;
-             break;
--#ifndef CONFIG_USER_ONLY
--        case 0x002: /* URET */
--            gen_exception_illegal(ctx);
--            break;
--        case 0x102: /* SRET */
--            if (has_ext(ctx, RVS)) {
--                gen_helper_sret(cpu_pc, cpu_env, cpu_pc);
--                tcg_gen_exit_tb(NULL, 0); /* no chaining */
--                ctx->base.is_jmp = DISAS_NORETURN;
--            } else {
--                gen_exception_illegal(ctx);
--            }
--            break;
--        case 0x202: /* HRET */
--            gen_exception_illegal(ctx);
--            break;
--        case 0x302: /* MRET */
--            gen_helper_mret(cpu_pc, cpu_env, cpu_pc);
--            tcg_gen_exit_tb(NULL, 0); /* no chaining */
--            ctx->base.is_jmp = DISAS_NORETURN;
--            break;
--        case 0x7b2: /* DRET */
--            gen_exception_illegal(ctx);
--            break;
--        case 0x105: /* WFI */
--            tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
--            gen_helper_wfi(cpu_env);
--            break;
--        case 0x104: /* SFENCE.VM */
--            if (ctx->priv_ver <= PRIV_VERSION_1_09_1) {
--                gen_helper_tlb_flush(cpu_env);
--            } else {
--                gen_exception_illegal(ctx);
--            }
--            break;
--#endif
-         default:
-             gen_exception_illegal(ctx);
-             break;
-         }
-         break;
-     }
--    tcg_temp_free(source1);
--    tcg_temp_free(dest);
- }
- 
- static void decode_RV32_64C0(DisasContext *ctx)
-@@ -1152,6 +1096,7 @@ bool decode_insn32(DisasContext *ctx, uint32_t insn);
- #include "insn_trans/trans_rva.inc.c"
- #include "insn_trans/trans_rvf.inc.c"
- #include "insn_trans/trans_rvd.inc.c"
-+#include "insn_trans/trans_privileged.inc.c"
++#define REQUIRE_EXT(ctx, ext) do { \
++    if (!has_ext(ctx, ext)) {      \
++        return false;              \
++    }                              \
++} while (0)
++
+ bool decode_insn32(DisasContext *ctx, uint32_t insn);
+ /* Include the auto-generated decoder for 32 bit insn */
+ #include "decode_insn32.inc.c"
+ /* Include insn module translation function */
+ #include "insn_trans/trans_rvi.inc.c"
++#include "insn_trans/trans_rvm.inc.c"
  
  static void decode_RV32_64G(DisasContext *ctx)
  {
+@@ -1867,15 +1874,6 @@ static void decode_RV32_64G(DisasContext *ctx)
+     imm = GET_IMM(ctx->opcode);
+ 
+     switch (op) {
+-    case OPC_RISC_ARITH:
+-#if defined(TARGET_RISCV64)
+-    case OPC_RISC_ARITH_W:
+-#endif
+-        if (rd == 0) {
+-            break; /* NOP */
+-        }
+-        gen_arith(ctx, MASK_OP_ARITH(ctx->opcode), rd, rs1, rs2);
+-        break;
+     case OPC_RISC_FP_LOAD:
+         gen_fp_load(ctx, MASK_OP_FP_LOAD(ctx->opcode), rd, rs1, imm);
+         break;
 -- 
 2.20.1
