@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55342)
+Received: from eggs.gnu.org ([209.51.188.92]:56958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx3er-0004fW-4L
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:46:01 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gx3iq-0005NR-RL
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:50:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx3eq-0005Mu-2s
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:46:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40240)
+	(envelope-from <kraxel@redhat.com>) id 1gx3io-0007rK-L7
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:50:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx3ep-0005AM-PS
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:45:59 -0500
-Date: Fri, 22 Feb 2019 06:45:37 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx3io-0007fW-C3
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:50:06 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190222054537.eisshk2bg73pcd5p@sirius.home.kraxel.org>
-References: <20190220084753.9130-1-kraxel@redhat.com>
-	<20190220084753.9130-2-kraxel@redhat.com>
-	<20190220145435.1881d7a8@w520.home>
-	<20190221073850.rgygkl3uyn4rxswl@sirius.home.kraxel.org>
-	<20190221103450.4f37e60f@w520.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190221103450.4f37e60f@w520.home>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] vfio/display: add edid support.
+Date: Fri, 22 Feb 2019 06:49:36 +0100
+Message-Id: <20190222054939.19739-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] vfio/display: add edid support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +21,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, intel-gvt-dev@lists.freedesktop.org
+To: qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, intel-gvt-dev@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>
 
-  Hi,
+The 5.0 linux kernel header update finally landed in master.  So this
+series has no unmerged dependencies any more.  Rebasing and re-sending
+for merge.
 
-> This is the vdagent using installation like this:
-> 
-> https://www.ovirt.org/develop/infra/testing/spice.html
-> 
-> ie. vdservice install, net start vdservice?
+This series adds EDID support to the qemu vfio display code.  Various
+display-reladed information -- most importantly the display resolution
+which should be used -- is passed to the guest that way.  The (initial)
+display resolution can be set using the new xres and yres properties.
+When supported by the UI it will also be updated on window resizes.
 
-If the page says so, probably.
+v3:
+ - change xres+yres property error handling.
+ - swap one leftover fprintf for a tracepoint.
 
-I've tested the agent setup with linux only, where everything happens
-automatically, you only have to make sure spice-vdagent.rpm is installed.
+Gerd Hoffmann (3):
+  vfio/display: add edid support.
+  vfio/display: add xres + yres properties
+  vfio/display: delay link up event
 
-> I'm not seeing anything magically change when I do that.  I do have the
-> default serial and redirection devices installed by virt-manager:
+ hw/vfio/pci.h                 |   2 +
+ include/hw/vfio/vfio-common.h |   4 ++
+ hw/vfio/display.c             | 155 ++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.c                 |  12 ++++
+ hw/vfio/trace-events          |   7 ++
+ 5 files changed, 180 insertions(+)
 
-This one too?
-
-    <channel type='spicevmc'>
-      <target type='virtio' name='com.redhat.spice.0'/>
-      <address type='virtio-serial' controller='0' bus='0' port='2'/>
-    </channel>
-
-cheers,
-  Gerd
+-- 
+2.9.3
