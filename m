@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38465)
+Received: from eggs.gnu.org ([209.51.188.92]:38769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gx6cj-0004YT-Uk
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:56:04 -0500
+	(envelope-from <philmd@redhat.com>) id 1gx6dP-000538-1x
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:56:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gx6cT-0003iu-8Y
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:55:49 -0500
-References: <20190222081153.14206-1-david@redhat.com>
-	<20190222081153.14206-2-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3fc006ca-98ad-3af6-f98c-00bc0f67987d@redhat.com>
-Date: Fri, 22 Feb 2019 09:55:31 +0100
+	(envelope-from <philmd@redhat.com>) id 1gx6dN-0004eJ-6p
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:56:42 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gx6dM-00049q-Tx
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:56:41 -0500
+Received: by mail-wr1-f68.google.com with SMTP id w17so1428258wrn.12
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 00:56:13 -0800 (PST)
+References: <20190221184857.22434-1-alex.bennee@linaro.org>
+	<e080ce0b-5b14-ae9c-28c7-8254db3b648a@redhat.com>
+	<87wols3nxl.fsf@zen.linaroharston>
+	<5e9e1a86-ab39-dfcb-9562-54eaf38a6deb@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2eda3793-a9e7-195e-993d-0b5b09a83e53@redhat.com>
+Date: Fri, 22 Feb 2019 09:56:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190222081153.14206-2-david@redhat.com>
+In-Reply-To: <5e9e1a86-ab39-dfcb-9562-54eaf38a6deb@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/3] s390x: Use cpu_to_be64 in SIGP
- STORE ADDITIONAL STATUS
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] hw/block: better reporting on pflash
+ backing file mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: stappers@stappers.nl, qemu-devel@nongnu.org, armbru@redhat.com
 
-On 22/02/2019 09.11, David Hildenbrand wrote:
-> As we will support vector instructions soon, and vector registers are
-> stored in 64bit host chunks, let's use cpu_to_be64. Same applies to the
-> guarded storage control block.
+On 2/22/19 9:09 AM, Laszlo Ersek wrote:
+> On 02/21/19 21:07, Alex Bennée wrote:
+>> Laszlo Ersek <lersek@redhat.com> writes:
+>>
+>>> On 02/21/19 19:48, Alex Bennée wrote:
+>>>> It looks like there was going to be code to check we had some sort of
+>>>> alignment so lets replace it with an actual check. This is a bit more
+>>>> useful than the enigmatic "failed to read the initial flash content"
+>>>> when we attempt to read the number of bytes the device should have.
+>>>>
+>>>> This is a potential confusing stumbling block when you move from using
+>>>> -bios to using -drive if=pflash,file=blob,format=raw,readonly for
+>>>> loading your firmware code. To mitigate that we automatically pad in
+>>>> the read-only case.
+>>>>
+>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>>>
+>>>> ---
+>>>> v3
+>>>>   - tweak commit title/commentary
+>>>>   - use total_len instead of device_len for checks
+>>>>   - if the device is read-only do the padding for them
+>>>>   - accept baking_len > total_len (how to warn_report with NULL *errp?)
+>>>> ---
+>>>>  hw/block/pflash_cfi01.c | 28 +++++++++++++++++++++-------
+[...]>>>> +                total_len = backing_len;
+>>>> +            } else {
+>>>> +                error_setg(errp, "device(s) needs %" PRIu64 " bytes, "
+>>>
+>>> (4) not too important, I'm just curious: why the optional plural?
+>>
+>> I discovered the difference between device_len and total_len and found
+>> (for some reason) the efivars came out as multiple devices.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/helper.c | 31 +++++++++++++++++++++----------
->  1 file changed, 21 insertions(+), 10 deletions(-)
-> 
-> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-> index 3d74836a83..f3fcf96482 100644
-> --- a/target/s390x/helper.c
-> +++ b/target/s390x/helper.c
-> @@ -272,32 +272,43 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
->      return 0;
->  }
->  
-> -#define ADTL_GS_OFFSET   1024 /* offset of GS data in adtl save area */
-> +typedef struct SigpAdtlSaveArea {
-> +    uint64_t    vregs[32][2];                     /* 0x0000 */
-> +    uint8_t     pad_0x0200[0x0400 - 0x0200];      /* 0x0200 */
-> +    uint64_t    gscb[4];                          /* 0x0400 */
-> +    uint8_t     pad_0x0420[0x1000 - 0x0420];      /* 0x0420 */
-> +} SigpAdtlSaveArea;
-> +QEMU_BUILD_BUG_ON(sizeof(SigpAdtlSaveArea) != 4096);
-> +
->  #define ADTL_GS_MIN_SIZE 2048 /* minimal size of adtl save area for GS */
->  int s390_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len)
->  {
-> +    SigpAdtlSaveArea *sa;
->      hwaddr save = len;
-> -    void *mem;
-> +    int i;
->  
-> -    mem = cpu_physical_memory_map(addr, &save, 1);
-> -    if (!mem) {
-> +    sa = cpu_physical_memory_map(addr, &save, 1);
-> +    if (!sa) {
->          return -EFAULT;
->      }
->      if (save != len) {
-> -        cpu_physical_memory_unmap(mem, len, 1, 0);
-> +        cpu_physical_memory_unmap(sa, len, 1, 0);
->          return -EFAULT;
->      }
->  
-> -    /* FIXME: as soon as TCG supports these features, convert cpu->be */
->      if (s390_has_feat(S390_FEAT_VECTOR)) {
-> -        memcpy(mem, &cpu->env.vregs, 512);
-> +        for (i = 0; i < 32; i++) {
-> +            sa->vregs[i][0] = cpu_to_be64(cpu->env.vregs[i][0].ll);
-> +            sa->vregs[i][1] = cpu_to_be64(cpu->env.vregs[i][1].ll);
-> +        }
->      }
->      if (s390_has_feat(S390_FEAT_GUARDED_STORAGE) && len >= ADTL_GS_MIN_SIZE) {
-> -        memcpy(mem + ADTL_GS_OFFSET, &cpu->env.gscb, 32);
-> +        for (i = 0; i < 4; i++) {
-> +            sa->gscb[i] = cpu_to_be64(cpu->env.gscb[i]);
-> +        }
->      }
->  
-> -    cpu_physical_memory_unmap(mem, len, 1, len);
-> -
-> +    cpu_physical_memory_unmap(sa, len, 1, len);
->      return 0;
->  }
->  #endif /* CONFIG_USER_ONLY */
-> 
+> It is true that the executable code is in one chip, and the UEFI
+> varstore in another (in the most common & most recommended setup
+> anyway); however, the varstore itself doesn't need multiple chips, and
+> more importantly, I think the realize function of any given single chip
+> should only report errors about that one chip. (Unless we have some
 
-Looks sane to me.
+I agree with László.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> higher level invariant binding the chips together, but I'm unaware of
+> any such in this case.)
+> 
+> If I understand correctly, when we set the error here, QEMU will produce
+> an error report that is tied to the specific pflash chip / command line
+> option that triggered the error. That looks like the right thing to me.
+> 
+> Again I don't really insist on plural vs. singular here, I just wanted
+> to understand your train of thought.
+> 
+> Thanks!
+> Laszlo
