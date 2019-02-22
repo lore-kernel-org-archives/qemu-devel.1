@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34937)
+Received: from eggs.gnu.org ([209.51.188.92]:34801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gxCH8-0000TB-7C
+	(envelope-from <jasowang@redhat.com>) id 1gxCHB-0000QT-As
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gxC8s-0005V6-6y
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:49:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52510)
+	(envelope-from <jasowang@redhat.com>) id 1gxCF8-0007tY-Vo
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gxC8p-0005Jf-Ts
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:49:33 -0500
-Date: Fri, 22 Feb 2019 14:49:12 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190222144912.GC25234@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190215155709.15777-1-berrange@redhat.com>
-	<20190215155709.15777-11-berrange@redhat.com>
-	<81a05e66-016c-db53-c3f5-2607bb8c515e@redhat.com>
-	<20190222122423.GR25234@redhat.com>
-	<23bcdd12-bcc6-f452-f1df-55bcbcd90bec@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <23bcdd12-bcc6-f452-f1df-55bcbcd90bec@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 10/11] authz: add QAuthZPAM object type
- for authorizing using PAM
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gxCF8-0006PI-FR
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:02 -0500
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 22 Feb 2019 22:55:12 +0800
+Message-Id: <1550847320-25110-6-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
+References: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PULL 05/13] migration: Switch to using announce timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,168 +23,326 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On Fri, Feb 22, 2019 at 02:27:26PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> Hi Daniel,
->=20
-> On 2/22/19 1:24 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Fri, Feb 22, 2019 at 01:34:12AM +0100, Philippe Mathieu-Daud=C3=A9=
- wrote:
-> >> Hi Daniel,
-> >>
-> >> On 2/15/19 4:57 PM, Daniel P. Berrang=C3=A9 wrote:
-> >>> From: "Daniel P. Berrange" <berrange@redhat.com>
-> >>>
-> >>> Add an authorization backend that talks to PAM to check whether the=
- user
-> >>> identity is allowed. This only uses the PAM account validation faci=
-lity,
-> >>> which is essentially just a check to see if the provided username i=
-s permitted
-> >>> access. It doesn't use the authentication or session parts of PAM, =
-since
-> >>> that's dealt with by the relevant part of QEMU (eg VNC server).
-> >>>
-> >>> Consider starting QEMU with a VNC server and telling it to use TLS =
-with
-> >>> x509 client certificates and configuring it to use an PAM to valida=
-te
-> >>> the x509 distinguished name. In this example we're telling it to us=
-e PAM
-> >>> for the QAuthZ impl with a service name of "qemu-vnc"
-> >>>
-> >>>  $ qemu-system-x86_64 \
-> >>>      -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/security=
-/qemutls,\
-> >>>              endpoint=3Dserver,verify-peer=3Dyes \
-> >>>      -object authz-pam,id=3Dauthz0,service=3Dqemu-vnc \
-> >>>      -vnc :1,tls-creds=3Dtls0,tls-authz=3Dauthz0
-> >>>
-> >>> This requires an /etc/pam/qemu-vnc file to be created with the auth
-> >>> rules. A very simple file based whitelist can be setup using
-> >>>
-> >>>   $ cat > /etc/pam/qemu-vnc <<EOF
-> >>>   account         requisite       pam_listfile.so item=3Duser sense=
-=3Dallow file=3D/etc/qemu/vnc.allow
-> >>>   EOF
-> >>>
-> >>> The /etc/qemu/vnc.allow file simply contains one username per line.=
- Any
-> >>> username not in the file is denied. The usernames in this example a=
-re
-> >>> the x509 distinguished name from the client's x509 cert.
-> >>>
-> >>>   $ cat > /etc/qemu/vnc.allow <<EOF
-> >>>   CN=3Dlaptop.berrange.com,O=3DBerrange Home,L=3DLondon,ST=3DLondon=
-,C=3DGB
-> >>>   EOF
-> >>>
-> >>> More interesting would be to configure PAM to use an LDAP backend, =
-so
-> >>> that the QEMU authorization check data can be centralized instead o=
-f
-> >>> requiring each compute host to have file maintained.
-> >>>
-> >>> The main limitation with this PAM module is that the rules apply to=
- all
-> >>> QEMU instances on the host. Setting up different rules per VM, woul=
-d
-> >>> require creating a separate PAM service name & config file for ever=
-y
-> >>> guest. An alternative approach for the future might be to not pass =
-in
-> >>> the plain username to PAM, but instead combine the VM name or UUID =
-with
-> >>> the username. This requires further consideration though.
-> >>>
-> >>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> >>> ---
-> >=20
-> >>> +static bool qauthz_pam_is_allowed(QAuthZ *authz,
-> >>> +                                  const char *identity,
-> >>> +                                  Error **errp)
-> >>> +{
-> >>> +    QAuthZPAM *pauthz =3D QAUTHZ_PAM(authz);
-> >>> +    const struct pam_conv pam_conversation =3D { 0 };
-> >>> +    pam_handle_t *pamh =3D NULL;
-> >>> +    int ret;
-> >>> +
-> >>> +    trace_qauthz_pam_check(authz, identity, pauthz->service);
-> >>> +    ret =3D pam_start(pauthz->service,
-> >>> +                    identity,
-> >>> +                    &pam_conversation,
-> >>> +                    &pamh);
-> >>> +    if (ret !=3D PAM_SUCCESS) {
-> >>> +        error_setg(errp, "Unable to start PAM transaction: %s",
-> >>> +                   pam_strerror(NULL, ret));
->=20
-> "In an error case is the content of pamh undefined."
-> So it is safer to use NULL here indeed.
->=20
-> >>> +        return false;
-> >>> +    }
-> >>> +
-> >>> +    ret =3D pam_acct_mgmt(pamh, PAM_SILENT);
-> >>> +    if (ret !=3D PAM_SUCCESS) {
-> >>> +        error_setg(errp, "Unable to authorize user '%s': %s",
-> >>> +                   identity, pam_strerror(pamh, ret));
-> >>> +        goto cleanup;
-> >>> +    }
-> >>> +
-> >>> + cleanup:
-> >>> +    pam_end(pamh, ret);
-> >>> +    return ret =3D=3D PAM_SUCCESS;
->=20
-> Hmm I find this fragile.
->=20
-> A 'cleanup' label means (to me) you expect someone to eventually add
-> more code around, and I'm worried someone add a pam_smth() call after
-> pam_acct_mgmt(), that sets ret to PAM_SUCCESS.
->=20
-> It looks safer to me to simply not use any label here (for the current
-> code, if it is extended, we'll see).
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
->=20
-> If you agree on removing the 'cleanup' label in qauthz_pam_is_allowed()=
-,
-> for the whole patch:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Switch the announcements to using the new announce timer.
+Move the code that does it to announce.c rather than savevm
+because it really has nothing to do with the actual migration.
 
-Thanks, I will squash this in:
+Migration starts the announce from bh's and so they're all
+in the main thread/bql, and so there's never any racing with
+the timers themselves.
 
-diff --git a/authz/pamacct.c b/authz/pamacct.c
-index 8fe4c8ee11..5038358cdc 100644
---- a/authz/pamacct.c
-+++ b/authz/pamacct.c
-@@ -47,15 +47,14 @@ static bool qauthz_pam_is_allowed(QAuthZ *authz,
-     }
-=20
-     ret =3D pam_acct_mgmt(pamh, PAM_SILENT);
-+    pam_end(pamh, ret);
-     if (ret !=3D PAM_SUCCESS) {
-         error_setg(errp, "Unable to authorize user '%s': %s",
-                    identity, pam_strerror(pamh, ret));
--        goto cleanup;
-+        return false;
-     }
-=20
-- cleanup:
--    pam_end(pamh, ret);
--    return ret =3D=3D PAM_SUCCESS;
-+    return true;
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ include/migration/misc.h | 10 -------
+ include/net/announce.h   |  2 ++
+ include/sysemu/sysemu.h  |  2 --
+ migration/migration.c    |  2 +-
+ migration/migration.h    |  4 +++
+ migration/savevm.c       | 72 ++----------------------------------------------
+ migration/trace-events   |  1 -
+ net/announce.c           | 68 +++++++++++++++++++++++++++++++++++++++++++++
+ net/trace-events         |  3 ++
+ 9 files changed, 81 insertions(+), 83 deletions(-)
+
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index e837ab3..0471e04 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -29,16 +29,6 @@ void blk_mig_init(void);
+ static inline void blk_mig_init(void) {}
+ #endif
+ 
+-#define SELF_ANNOUNCE_ROUNDS 5
+-
+-static inline
+-int64_t self_announce_delay(int round)
+-{
+-    assert(round < SELF_ANNOUNCE_ROUNDS && round > 0);
+-    /* delay 50ms, 150ms, 250ms, ... */
+-    return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
+-}
+-
+ AnnounceParameters *migrate_announce_params(void);
+ /* migration/savevm.c */
+ 
+diff --git a/include/net/announce.h b/include/net/announce.h
+index b89f1c2..892d302 100644
+--- a/include/net/announce.h
++++ b/include/net/announce.h
+@@ -36,4 +36,6 @@ void qemu_announce_timer_reset(AnnounceTimer *timer,
+                                QEMUTimerCB *cb,
+                                void *opaque);
+ 
++void qemu_announce_self(AnnounceTimer *timer, AnnounceParameters *params);
++
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 4b5a6b7..89604a8 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -81,8 +81,6 @@ extern bool machine_init_done;
+ void qemu_add_machine_init_done_notifier(Notifier *notify);
+ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ 
+-void qemu_announce_self(void);
+-
+ extern int autostart;
+ 
+ typedef enum {
+diff --git a/migration/migration.c b/migration/migration.c
+index ca9c35a..c39d305 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -374,7 +374,7 @@ static void process_incoming_migration_bh(void *opaque)
+      * This must happen after all error conditions are dealt with and
+      * we're sure the VM is going to be running on this host.
+      */
+-    qemu_announce_self();
++    qemu_announce_self(&mis->announce_timer, migrate_announce_params());
+ 
+     if (multifd_load_cleanup(&local_err) != 0) {
+         error_report_err(local_err);
+diff --git a/migration/migration.h b/migration/migration.h
+index dcd05d9..c99154d 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -21,6 +21,7 @@
+ #include "qemu/coroutine_int.h"
+ #include "hw/qdev.h"
+ #include "io/channel.h"
++#include "net/announce.h"
+ 
+ struct PostcopyBlocktimeContext;
+ 
+@@ -36,6 +37,9 @@ struct MigrationIncomingState {
+      */
+     QemuEvent main_thread_load_event;
+ 
++    /* For network announces */
++    AnnounceTimer  announce_timer;
++
+     size_t         largest_page_size;
+     bool           have_fault_thread;
+     QemuThread     fault_thread;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 3226604..b3868f7 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -57,13 +57,7 @@
+ #include "sysemu/replay.h"
+ #include "qjson.h"
+ #include "migration/colo.h"
+-
+-#ifndef ETH_P_RARP
+-#define ETH_P_RARP 0x8035
+-#endif
+-#define ARP_HTYPE_ETH 0x0001
+-#define ARP_PTYPE_IP 0x0800
+-#define ARP_OP_REQUEST_REV 0x3
++#include "net/announce.h"
+ 
+ const unsigned int postcopy_ram_discard_version = 0;
+ 
+@@ -125,67 +119,6 @@ static struct mig_cmd_args {
+  * generic extendable format with an exception for two old entities.
+  */
+ 
+-static int announce_self_create(uint8_t *buf,
+-                                uint8_t *mac_addr)
+-{
+-    /* Ethernet header. */
+-    memset(buf, 0xff, 6);         /* destination MAC addr */
+-    memcpy(buf + 6, mac_addr, 6); /* source MAC addr */
+-    *(uint16_t *)(buf + 12) = htons(ETH_P_RARP); /* ethertype */
+-
+-    /* RARP header. */
+-    *(uint16_t *)(buf + 14) = htons(ARP_HTYPE_ETH); /* hardware addr space */
+-    *(uint16_t *)(buf + 16) = htons(ARP_PTYPE_IP); /* protocol addr space */
+-    *(buf + 18) = 6; /* hardware addr length (ethernet) */
+-    *(buf + 19) = 4; /* protocol addr length (IPv4) */
+-    *(uint16_t *)(buf + 20) = htons(ARP_OP_REQUEST_REV); /* opcode */
+-    memcpy(buf + 22, mac_addr, 6); /* source hw addr */
+-    memset(buf + 28, 0x00, 4);     /* source protocol addr */
+-    memcpy(buf + 32, mac_addr, 6); /* target hw addr */
+-    memset(buf + 38, 0x00, 4);     /* target protocol addr */
+-
+-    /* Padding to get up to 60 bytes (ethernet min packet size, minus FCS). */
+-    memset(buf + 42, 0x00, 18);
+-
+-    return 60; /* len (FCS will be added by hardware) */
+-}
+-
+-static void qemu_announce_self_iter(NICState *nic, void *opaque)
+-{
+-    uint8_t buf[60];
+-    int len;
+-
+-    trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
+-    len = announce_self_create(buf, nic->conf->macaddr.a);
+-
+-    qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+-}
+-
+-
+-static void qemu_announce_self_once(void *opaque)
+-{
+-    static int count = SELF_ANNOUNCE_ROUNDS;
+-    QEMUTimer *timer = *(QEMUTimer **)opaque;
+-
+-    qemu_foreach_nic(qemu_announce_self_iter, NULL);
+-
+-    if (--count) {
+-        /* delay 50ms, 150ms, 250ms, ... */
+-        timer_mod(timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
+-                  self_announce_delay(count));
+-    } else {
+-            timer_del(timer);
+-            timer_free(timer);
+-    }
+-}
+-
+-void qemu_announce_self(void)
+-{
+-    static QEMUTimer *timer;
+-    timer = timer_new_ms(QEMU_CLOCK_REALTIME, qemu_announce_self_once, &timer);
+-    qemu_announce_self_once(&timer);
+-}
+-
+ /***********************************************************/
+ /* savevm/loadvm support */
+ 
+@@ -1765,13 +1698,14 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
+ {
+     Error *local_err = NULL;
+     HandleRunBhData *data = opaque;
++    MigrationIncomingState *mis = migration_incoming_get_current();
+ 
+     /* TODO we should move all of this lot into postcopy_ram.c or a shared code
+      * in migration.c
+      */
+     cpu_synchronize_all_post_init();
+ 
+-    qemu_announce_self();
++    qemu_announce_self(&mis->announce_timer, migrate_announce_params());
+ 
+     /* Make sure all file formats flush their mutable metadata.
+      * If we get an error here, just don't restart the VM yet. */
+diff --git a/migration/trace-events b/migration/trace-events
+index bd2d0cd..72e3fcb 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -52,7 +52,6 @@ vmstate_save_state_top(const char *idstr) "%s"
+ vmstate_subsection_save_loop(const char *name, const char *sub) "%s/%s"
+ vmstate_subsection_save_top(const char *idstr) "%s"
+ vmstate_load(const char *idstr, const char *vmsd_name) "%s, %s"
+-qemu_announce_self_iter(const char *mac) "%s"
+ 
+ # migration/vmstate.c
+ vmstate_load_field_error(const char *field, int ret) "field \"%s\" load failed, ret = %d"
+diff --git a/net/announce.c b/net/announce.c
+index 8876eb6..13ad9c2 100644
+--- a/net/announce.c
++++ b/net/announce.c
+@@ -9,8 +9,10 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "net/announce.h"
++#include "net/net.h"
+ #include "qapi/clone-visitor.h"
+ #include "qapi/qapi-visit-net.h"
++#include "trace.h"
+ 
+ int64_t qemu_announce_timer_step(AnnounceTimer *timer)
+ {
+@@ -58,3 +60,69 @@ void qemu_announce_timer_reset(AnnounceTimer *timer,
+     timer->type = type;
+     timer->tm = timer_new_ms(type, cb, opaque);
  }
-=20
-=20
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
++
++#ifndef ETH_P_RARP
++#define ETH_P_RARP 0x8035
++#endif
++#define ARP_HTYPE_ETH 0x0001
++#define ARP_PTYPE_IP 0x0800
++#define ARP_OP_REQUEST_REV 0x3
++
++static int announce_self_create(uint8_t *buf,
++                                uint8_t *mac_addr)
++{
++    /* Ethernet header. */
++    memset(buf, 0xff, 6);         /* destination MAC addr */
++    memcpy(buf + 6, mac_addr, 6); /* source MAC addr */
++    *(uint16_t *)(buf + 12) = htons(ETH_P_RARP); /* ethertype */
++
++    /* RARP header. */
++    *(uint16_t *)(buf + 14) = htons(ARP_HTYPE_ETH); /* hardware addr space */
++    *(uint16_t *)(buf + 16) = htons(ARP_PTYPE_IP); /* protocol addr space */
++    *(buf + 18) = 6; /* hardware addr length (ethernet) */
++    *(buf + 19) = 4; /* protocol addr length (IPv4) */
++    *(uint16_t *)(buf + 20) = htons(ARP_OP_REQUEST_REV); /* opcode */
++    memcpy(buf + 22, mac_addr, 6); /* source hw addr */
++    memset(buf + 28, 0x00, 4);     /* source protocol addr */
++    memcpy(buf + 32, mac_addr, 6); /* target hw addr */
++    memset(buf + 38, 0x00, 4);     /* target protocol addr */
++
++    /* Padding to get up to 60 bytes (ethernet min packet size, minus FCS). */
++    memset(buf + 42, 0x00, 18);
++
++    return 60; /* len (FCS will be added by hardware) */
++}
++
++static void qemu_announce_self_iter(NICState *nic, void *opaque)
++{
++    uint8_t buf[60];
++    int len;
++
++    trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
++    len = announce_self_create(buf, nic->conf->macaddr.a);
++
++    qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
++}
++static void qemu_announce_self_once(void *opaque)
++{
++    AnnounceTimer *timer = (AnnounceTimer *)opaque;
++
++    qemu_foreach_nic(qemu_announce_self_iter, NULL);
++
++    if (--timer->round) {
++        qemu_announce_timer_step(timer);
++    } else {
++        qemu_announce_timer_del(timer);
++    }
++}
++
++void qemu_announce_self(AnnounceTimer *timer, AnnounceParameters *params)
++{
++    qemu_announce_timer_reset(timer, params, QEMU_CLOCK_REALTIME,
++                              qemu_announce_self_once, timer);
++    if (params->rounds) {
++        qemu_announce_self_once(timer);
++    } else {
++        qemu_announce_timer_del(timer);
++    }
++}
+diff --git a/net/trace-events b/net/trace-events
+index 7b594cf..3417ac0 100644
+--- a/net/trace-events
++++ b/net/trace-events
+@@ -1,5 +1,8 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+ 
++# net/announce.c
++qemu_announce_self_iter(const char *mac) "%s"
++
+ # net/vhost-user.c
+ vhost_user_event(const char *chr, int event) "chr: %s got event: %d"
+ 
+-- 
+2.5.0
