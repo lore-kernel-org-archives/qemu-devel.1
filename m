@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56994)
+Received: from eggs.gnu.org ([209.51.188.92]:57121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gxBFF-0001xW-MY
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:52:11 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gxBFL-000227-20
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:52:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gxBFE-0006jN-DD
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:52:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gxBFB-0005xq-Nf
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:52:02 -0500
-Date: Fri, 22 Feb 2019 13:51:27 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190222135127.GX25234@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <cover.1550842915.git.berto@igalia.com>
-	<48f7e50413f6f222acb1bf3a9de773e387a2855a.1550842915.git.berto@igalia.com>
+	(envelope-from <mreitz@redhat.com>) id 1gxBFJ-00079d-2K
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:52:10 -0500
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-12-kwolf@redhat.com>
+	<d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
+	<20190219091729.GE4727@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ade91fc9-dab1-926b-dfba-d7347fcf62bc@redhat.com>
+Date: Fri, 22 Feb 2019 14:51:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <48f7e50413f6f222acb1bf3a9de773e387a2855a.1550842915.git.berto@igalia.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] char-socket: Lock
- tcp_chr_disconnect() and socket_reconnect_timeout()
+In-Reply-To: <20190219091729.GE4727@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pAABsGAHXmnEUgFCpHmRGBlxUXYTaQqJB"
+Subject: Re: [Qemu-devel] [RFC PATCH 11/11] qcow2: Add data file to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +27,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Fri, Feb 22, 2019 at 03:46:26PM +0200, Alberto Garcia wrote:
-> There's a race condition in which the tcp_chr_read() ioc handler can
-> close a connection that is being written to from another thread.
->=20
-> Running iotest 136 in a loop triggers this problem and crashes QEMU.
->=20
->  (gdb) bt
->  #0  0x00005558b842902d in object_get_class (obj=3D0x0) at qom/object.c=
-:860
->  #1  0x00005558b84f92db in qio_channel_writev_full (ioc=3D0x0, iov=3D0x=
-7ffc355decf0, niov=3D1, fds=3D0x0, nfds=3D0, errp=3D0x0) at io/channel.c:=
-76
->  #2  0x00005558b84e0e9e in io_channel_send_full (ioc=3D0x0, buf=3D0x555=
-8baf5beb0, len=3D138, fds=3D0x0, nfds=3D0) at chardev/char-io.c:123
->  #3  0x00005558b84e4a69 in tcp_chr_write (chr=3D0x5558ba460380, buf=3D0=
-x5558baf5beb0 "...", len=3D138) at chardev/char-socket.c:135
->  #4  0x00005558b84dca55 in qemu_chr_write_buffer (s=3D0x5558ba460380, b=
-uf=3D0x5558baf5beb0 "...", len=3D138, offset=3D0x7ffc355dedd0, write_all=3D=
-false) at chardev/char.c:112
->  #5  0x00005558b84dcbc2 in qemu_chr_write (s=3D0x5558ba460380, buf=3D0x=
-5558baf5beb0 "...", len=3D138, write_all=3Dfalse) at chardev/char.c:147
->  #6  0x00005558b84dfb26 in qemu_chr_fe_write (be=3D0x5558ba476610, buf=3D=
-0x5558baf5beb0 "...", len=3D138) at chardev/char-fe.c:42
->  #7  0x00005558b8088c86 in monitor_flush_locked (mon=3D0x5558ba476610) =
-at monitor.c:406
->  #8  0x00005558b8088e8c in monitor_puts (mon=3D0x5558ba476610, str=3D0x=
-5558ba921e49 "") at monitor.c:449
->  #9  0x00005558b8089178 in qmp_send_response (mon=3D0x5558ba476610, rsp=
-=3D0x5558bb161600) at monitor.c:498
->  #10 0x00005558b808920c in monitor_qapi_event_emit (event=3DQAPI_EVENT_=
-SHUTDOWN, qdict=3D0x5558bb161600) at monitor.c:526
->  #11 0x00005558b8089307 in monitor_qapi_event_queue_no_reenter (event=3D=
-QAPI_EVENT_SHUTDOWN, qdict=3D0x5558bb161600) at monitor.c:551
->  #12 0x00005558b80896c0 in qapi_event_emit (event=3DQAPI_EVENT_SHUTDOWN=
-, qdict=3D0x5558bb161600) at monitor.c:626
->  #13 0x00005558b855f23b in qapi_event_send_shutdown (guest=3Dfalse, rea=
-son=3DSHUTDOWN_CAUSE_HOST_QMP_QUIT) at qapi/qapi-events-run-state.c:43
->  #14 0x00005558b81911ef in qemu_system_shutdown (cause=3DSHUTDOWN_CAUSE=
-_HOST_QMP_QUIT) at vl.c:1837
->  #15 0x00005558b8191308 in main_loop_should_exit () at vl.c:1885
->  #16 0x00005558b819140d in main_loop () at vl.c:1924
->  #17 0x00005558b8198c84 in main (argc=3D18, argv=3D0x7ffc355df3f8, envp=
-=3D0x7ffc355df490) at vl.c:4665
->=20
-> This patch adds a lock to protect tcp_chr_disconnect() and
-> socket_reconnect_timeout()
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  chardev/char-socket.c | 25 +++++++++++++++++++++----
->  1 file changed, 21 insertions(+), 4 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pAABsGAHXmnEUgFCpHmRGBlxUXYTaQqJB
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
+Message-ID: <ade91fc9-dab1-926b-dfba-d7347fcf62bc@redhat.com>
+Subject: Re: [RFC PATCH 11/11] qcow2: Add data file to ImageInfoSpecificQCow2
+References: <20190131175549.11691-1-kwolf@redhat.com>
+ <20190131175549.11691-12-kwolf@redhat.com>
+ <d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
+ <20190219091729.GE4727@localhost.localdomain>
+In-Reply-To: <20190219091729.GE4727@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On 19.02.19 10:17, Kevin Wolf wrote:
+> Am 19.02.2019 um 01:47 hat Max Reitz geschrieben:
+>> On 31.01.19 18:55, Kevin Wolf wrote:
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>> ---
+>>>  qapi/block-core.json | 1 +
+>>>  block/qcow2.c        | 6 +++++-
+>>>  2 files changed, 6 insertions(+), 1 deletion(-)
+>>
+>> [...]
+>>
+>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>> index 4959bf16a4..e3427f9fcd 100644
+>>> --- a/block/qcow2.c
+>>> +++ b/block/qcow2.c
+>>> @@ -1459,7 +1459,9 @@ static int coroutine_fn qcow2_do_open(BlockDriv=
+erState *bs, QDict *options,
+>>>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+>>>          s->data_file =3D bdrv_open_child(NULL, options, "data-file",=
+ bs,
+>>>                                         &child_file, false, &local_er=
+r);
+>>> -        if (!s->data_file) {
+>>> +        if (s->data_file) {
+>>> +            s->image_data_file =3D g_strdup(s->data_file->bs->filena=
+me);
+>>> +        } else {
+>>>              if (s->image_data_file) {
+>>>                  error_free(local_err);
+>>>                  local_err =3D NULL;
+>>
+>> Ah, this is what I looked for in the last patch. :-)
+>>
+>> (i.e. it should be in the last patch, not here)
+>=20
+> [RFC PATCH 11/11] qcow2: Add data file to ImageInfoSpecificQCow2
+>=20
+> This is the last patch. :-P
+
+Sorry, I meant the previous one.
+
+>> I think as it is it is just wrong, though.  If I pass enough options a=
+t
+>> runtime, this will overwrite the image header:
+>>
+>> $ ./qemu-img create -f qcow2 -o data_file=3Dfoo.raw foo.qcow2 64M
+>> $ ./qemu-img create -f raw bar.raw 64M
+>> $ ./qemu-img info foo.qcow2
+>> [...]
+>>     data file: foo.raw
+>> [...]
+>> $ ./qemu-io --image-opts \
+>>     file.filename=3Dfoo.qcow2,data-file.driver=3Dfile,\
+>> data-file.filename=3Dbar.raw,lazy-refcounts=3Don \
+>>     -c 'write 0 64k'
+>> # (The lazy-refcounts is so the image header is updated)
+>> $ ./qemu-img info foo.qcow2
+>> [...]
+>>     data file: bar.raw
+>> [...]
+>>
+>> The right thing would probably to check whether the header extension
+>> exists (i.e. if s->image_data_file is non-NULL) and if it does not (it=
+
+>> is NULL), s->image_data_file gets set; because there are no valid imag=
+es
+>> with the external data file flag set where there is no such header
+>> extension.  So we must be in the process of creating the image right n=
+ow.
+>>
+>> But even then, I don't quite like setting it here and not creating the=
+
+>> header extension as part of qcow2_co_create().  I can see why you've
+>> done it this way, but creating a "bad" image on purpose (one with the
+>> external data file bit set, but no such header extension present yet) =
+in
+>> order to detect and rectify this case when it is first opened (and the=
+
+>> opening code assuming that any such broken image must be one that is
+>> opened the first time) is a bit weird.
+>=20
+> It's not really a bad image, just one that's a bit cumbersome to use
+> because you need to specify the 'data-file' option manually.
+
+Of course it's bad because it doesn't adhere to the specification (which
+you could amend, of course, since you add it with this series).  The
+spec says "If this bit is set, an external data file name header
+extension must be present as well."  Which it isn't until the image is
+opened with the data-file option.
+
+>> I suppose doing it right (if you agree with the paragraph before the
+>> last one) and adding a comment would make it less weird
+>> ("s->image_data_file must be non-NULL for any valid image, so this ima=
+ge
+>> must be one we are creating right now" or something like that).
+>>
+>> But still, the issue you point out in your cover letter remains; which=
+
+>> is that the node's filename and the filename given by the user may be
+>> two different things.
+>=20
+> I think what I was planning to do was leaving the path from the image
+> header in s->image_data_file even when a runtime option overrides it.
+> After all, ImageInfo is about the image, not about the runtime state.
+
+I'm not talking about ImageInfo here, though, I'm talking about the
+image creation process.  The hunk I've quoted should be in the previous
+patch, not in this one.
+
+Which doesn't make wrong what you're saying, though, the ImageInfo
+should print what's in the header.
+
+> Image creation would just manually set s->image_data_file before
+> updating the header.
+
+It should, but currently it does that rather indirectly (by setting the
+data-file option which then makes qcow2_do_open() copy it into
+s->image_data_file).
+
+Max
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+--pAABsGAHXmnEUgFCpHmRGBlxUXYTaQqJB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxv/mUACgkQ9AfbAGHV
+z0CA8gf+ONvS3Qc/VkOshsq30ynuU5fbclO6XAcGPFJKoBEXB5C0AXnIGFFl2G7F
+9aQjPis2ooUnSIrvxRpCSgKYchcsih5EAlA+xHdXpcGP2rUGG1+YeK0CFgQ626Hn
+MVlRjVaHws+JkD3VkB1LHUy+194w5tA0rlETJcYRmMHzbGezVSWghXzGO/8X5Vwy
+Pf0NTXVONbOzVl6yRIOIMt/FabCHBLUt0hqZUywmQwBqUZP/ypgDZsSt5fYpEFcC
+lpz2a5QbKlvQar/4BDtVSlvPFPm7L2Bkx3DPXwdjUkcUFiIP4c2F9mEAD0qpBw+0
+UAFSMJ32usiy29OhlMiRq1MHmdGU3w==
+=oNX5
+-----END PGP SIGNATURE-----
+
+--pAABsGAHXmnEUgFCpHmRGBlxUXYTaQqJB--
