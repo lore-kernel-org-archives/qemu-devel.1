@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34799)
+Received: from eggs.gnu.org ([209.51.188.92]:35141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gxCHH-0000QR-6t
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:17 -0500
+	(envelope-from <mst@redhat.com>) id 1gxCHO-0000cW-KR
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gxCF6-0007g2-CT
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33820)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gxCF6-0006Dn-0H
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:00 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Feb 2019 22:55:07 +0800
-Message-Id: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1gxCDN-0004UN-9s
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:54:14 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:34208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gxCDN-0004TG-0e
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:54:13 -0500
+Received: by mail-qt1-f195.google.com with SMTP id w4so2787350qtc.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 06:54:12 -0800 (PST)
+Date: Fri, 22 Feb 2019 09:54:09 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190222095009-mutt-send-email-mst@kernel.org>
+References: <20190218102748.2242-1-xieyongji@baidu.com>
+	<20190218102748.2242-2-xieyongji@baidu.com>
+	<20190221120121-mutt-send-email-mst@kernel.org>
+	<CAONzpcYHae1fCJLN56ofQ91tSQi_JCXAA6mBhf0NqN=QusV1zg@mail.gmail.com>
+	<20190222011631-mutt-send-email-mst@kernel.org>
+	<CAONzpcaxS3ct5bx62126SMiowcZ2mApnYomwXkHg0R67SvoQBg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/13] Netpatches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAONzpcaxS3ct5bx62126SMiowcZ2mApnYomwXkHg0R67SvoQBg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 1/7] vhost-user: Support transferring
+ inflight buffer between qemu and backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +34,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: Jason Wang <jasowang@redhat.com>
+To: Yongji Xie <elohimes@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-The following changes since commit 7817ea16c1bb91ba3849e704d5f3e3c5775087=
-bf:
+On Fri, Feb 22, 2019 at 03:05:23PM +0800, Yongji Xie wrote:
+> On Fri, 22 Feb 2019 at 14:21, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Fri, Feb 22, 2019 at 10:47:03AM +0800, Yongji Xie wrote:
+> > > > > +
+> > > > > +To track inflight I/O, the queue region should be processed as follows:
+> > > > > +
+> > > > > +When receiving available buffers from the driver:
+> > > > > +
+> > > > > +    1. Get the next available head-descriptor index from available ring, i
+> > > > > +
+> > > > > +    2. Set desc[i].inflight to 1
+> > > > > +
+> > > > > +When supplying used buffers to the driver:
+> > > > > +
+> > > > > +    1. Get corresponding used head-descriptor index, i
+> > > > > +
+> > > > > +    2. Set desc[i].next to process_head
+> > > > > +
+> > > > > +    3. Set process_head to i
+> > > > > +
+> > > > > +    4. Steps 1,2,3 may be performed repeatedly if batching is possible
+> > > > > +
+> > > > > +    5. Increase the idx value of used ring by the size of the batch
+> > > > > +
+> > > > > +    6. Set the inflight field of each DescStateSplit entry in the batch to 0
+> > > > > +
+> > > > > +    7. Set used_idx to the idx value of used ring
+> > > > > +
+> > > > > +When reconnecting:
+> > > > > +
+> > > > > +    1. If the value of used_idx does not match the idx value of used ring,
+> > > > > +
+> > > > > +        (a) Subtract the value of used_idx from the idx value of used ring to get
+> > > > > +        the number of in-progress DescStateSplit entries
+> > > > > +
+> > > > > +        (b) Set the inflight field of the in-progress DescStateSplit entries which
+> > > > > +        start from process_head to 0
+> > > > > +
+> > > > > +        (c) Set used_idx to the idx value of used ring
+> > > > > +
+> > > > > +    2. Resubmit each inflight DescStateSplit entry
+> > > >
+> > > > I re-read a couple of time and I still don't understand what it says.
+> > > >
+> > > > For simplicity consider split ring. So we want a list of heads that are
+> > > > outstanding. Fair enough. Now device finishes a head. What now? I needs
+> > > > to drop head from the list. But list is unidirectional (just next, no
+> > > > prev). So how can you drop an entry from the middle?
+> > > >
+> > >
+> > > The process_head is only used when slave crash between increasing the
+> > > idx value of used ring and updating used_idx. We use it to find the
+> > > in-progress DescStateSplit entries before the crash and complete them
+> > > when reconnecting. Make sure guest and slave have the same view for
+> > > inflight I/Os.
+> > >
+> >
+> > But I don't understand how does the described process help do it?
+> >
+> 
+> For example, we need to submit descriptors A, B, C to driver in a batch.
+> 
+> Firstly, we will link those descriptors like:
+> 
+> process_head->A->B->C    (A)
+> 
+> Then, we need to update idx value of used vring to mark those
+> descriptors as used:
+> 
+> _vring.used->idx += 3    (B)
+> 
+> At last, clear the inflight field of those descriptors and update
+> used_idx field:
+> 
+> A.inflight = 0; B.inflight = 0; C.inflight = 0;    (C)
+> 
+> used_idx = _vring.used->idx;    (D)
+> 
+> After (B), guest can consume the descriptors A,B,C. So we must make
+> sure the inflight field of A,B,C is cleared when reconnecting to avoid
+> re-submitting used descriptor. If slave crash during (C), the inflight
+> field of A,B,C may be incorrect. To detect that case, we can see
+> whether used_idx matches _vring.used->idx. And through process_head,
+> we can get the in-progress descriptors A,B,C and clear their inflight
+> field again when reconnecting.
+> 
+> >
+> > > In other case, the inflight field is enough to track inflight I/O.
+> > > When reconnecting, we go through all DescStateSplit entries and
+> > > re-submit the entry whose inflight field is equal to 1.
+> >
+> > What I don't understand is how do we know the order
+> > in which they have to be resubmitted. Reordering
+> > operations would be a big problem, won't it?
+> >
+> 
+> In previous patch, I record avail_idx for each DescStateSplit entry to
+> preserve the order. Is it useful to fix this?
+> 
+> >
+> > Let's say I fetch descriptors A, B, C and start
+> > processing. how does memory look?
+> 
+> A.inflight = 1, C.inflight = 1, B.inflight = 1
+> 
+> > Now I finished B and marked it used. How does
+> > memory look?
+> >
+> 
+> A.inflight = 1, C.inflight = 1, B.inflight = 0, process_head = B
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190221' into =
-staging (2019-02-22 13:04:42 +0000)
+OK. And we have
 
-are available in the git repository at:
+process_head->B->process_head
 
-  https://github.com/jasowang/qemu.git tags/net-pull-request
+?
 
-for you to fetch changes up to eb4702b3ffcf11ec62f0c401f77f49219594e95c:
+Now if there is a reconnect, I want to submit A and then C,
+correct? How do I know that from this picture? How do I
+know to start with A? It's not on the list anymore...
 
-  net: netmap: improve netmap_receive_iov() (2019-02-22 22:39:24 +0800)
 
-----------------------------------------------------------------
 
-----------------------------------------------------------------
-Dr. David Alan Gilbert (9):
-      net: Introduce announce timer
-      migration: Add announce parameters
-      virtio-net: Switch to using announce timer
-      migration: Switch to using announce timer
-      net: Add a network device specific self-announcement ability
-      virtio-net: Allow qemu_announce_self to trigger virtio announcement=
-s
-      qmp: Add announce-self command
-      hmp: Add hmp_announce_self
-      tests: Add a test for qemu self announcements
-
-Vincenzo Maffione (3):
-      net: netmap: small improvements netmap_send()
-      net: netmap: simplify netmap_receive()
-      net: netmap: improve netmap_receive_iov()
-
-Zhang Chen (1):
-      net/colo-compare.c: Remove duplicated code
-
- hmp-commands.hx                |  14 +++++
- hmp.c                          |  33 ++++++++++
- hmp.h                          |   1 +
- hw/net/trace-events            |   6 ++
- hw/net/virtio-net.c            |  69 +++++++++++++++-----
- include/hw/virtio/virtio-net.h |   4 +-
- include/migration/misc.h       |  12 +---
- include/net/announce.h         |  41 ++++++++++++
- include/net/net.h              |   2 +
- include/qemu/typedefs.h        |   1 +
- include/sysemu/sysemu.h        |   2 -
- migration/migration.c          | 103 +++++++++++++++++++++++++++++-
- migration/migration.h          |   4 ++
- migration/savevm.c             |  72 +--------------------
- migration/trace-events         |   1 -
- net/Makefile.objs              |   1 +
- net/announce.c                 | 140 +++++++++++++++++++++++++++++++++++=
-++++++
- net/colo-compare.c             |   8 ---
- net/netmap.c                   | 110 ++++++++++++++------------------
- net/trace-events               |   3 +
- qapi/migration.json            |  53 +++++++++++++++-
- qapi/net.json                  |  43 +++++++++++++
- tests/Makefile.include         |   3 +
- tests/test-announce-self.c     |  83 ++++++++++++++++++++++++
- tests/test-hmp.c               |   1 +
- 25 files changed, 636 insertions(+), 174 deletions(-)
- create mode 100644 include/net/announce.h
- create mode 100644 net/announce.c
- create mode 100644 tests/test-announce-self.c
+> > I also wonder how do you address a crash between
+> > marking descriptor used and clearing inflight.
+> > Will you redo the descriptor? Is it always safe?
+> > What if it's a write?
+> >
+> 
+> It's safe. We can get the in-progess descriptors through process_head
+> and clear their inflight field when reconnecting.
+> 
+> Thanks,
+> Yongji
