@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37262)
+Received: from eggs.gnu.org ([209.51.188.92]:38419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gx7Ok-0003pl-18
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:45:38 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gx7RF-0004vs-Rc
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:48:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gx7Oj-0000KN-38
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:45:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gx7Oi-0000E5-72
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:45:36 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8FBA78635
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 09:45:30 +0000 (UTC)
-Date: Fri, 22 Feb 2019 17:45:20 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190222094520.GN8904@xz-x1>
-References: <20190222031413.20250-1-peterx@redhat.com>
-	<4c74698e-3d3b-be12-1f60-cacf0c3421ef@redhat.com>
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gx7RE-00026o-NJ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:48:13 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Fri, 22 Feb 2019 09:48:03 +0000
+Message-ID: <a05ae653-88bb-cf37-e73c-3ca6595e05b5@virtuozzo.com>
+References: <1550519997-253534-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<2cbb158f-a869-e24c-96cc-23f7f61a946b@redhat.com>
+	<4f992059-b448-a234-d319-3eb3bb5e04c9@redhat.com>
+	<dbd04ea0-6a60-9817-52b3-a0cc73f1a637@redhat.com>
+In-Reply-To: <dbd04ea0-6a60-9817-52b3-a0cc73f1a637@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <091F0B2AA87644409054B3D6AC5AA638@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4c74698e-3d3b-be12-1f60-cacf0c3421ef@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] iothread: create gcontext
- unconditionally
+Subject: Re: [Qemu-devel] [PATCH] iotests: handle TypeError for Python3 in
+ test 242
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eduardo Habkost <ehabkost@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 
-On Fri, Feb 22, 2019 at 10:28:57AM +0100, Paolo Bonzini wrote:
-> On 22/02/19 04:14, Peter Xu wrote:
-> > And if this patchset can survive... how about running gcontext
-> > directly in iothread_run()?  I believe there could be a bit more
-> > things to clean but I'll see.
-> 
-> Do you mean instead of aio_poll?
-
-Yes.
-
-> The problem is that GMainContext is
-> quite a bit slower than aio_poll.
-
-That's really what I wanted to know; so it's about performance.
-
-We should mention it somewhere in iothread_run.  I can do that after I
-know how this series will go.
-
-> 
-> Frediano and I tried to bring some of the optimizations of aio_poll to
-> GMainContext
-> (https://github.com/GNOME/glib/commit/e91c11841808ccca408da96136f433a82b2e2145),
-> but they broke webkit. :(
-
-What a pity!
-
--- 
-Peter Xu
+DQoNCk9uIDIyLzAyLzIwMTkgMDM6MTcsIENsZWJlciBSb3NhIHdyb3RlOg0KPiANCj4gDQo+IE9u
+IDIvMTgvMTkgNDoyNSBQTSwgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgd3JvdGU6DQo+PiBPbiAy
+LzE4LzE5IDk6MDUgUE0sIEVyaWMgQmxha2Ugd3JvdGU6DQo+Pj4gW2FkZGluZyBFZHVhcmRvIGZv
+ciBzb21lIHB5dGhvbiAyLXZzLTMgYWR2aWNlXQ0KPj4NCj4+IEFuZCBDbGViZXIuDQo+Pg0KPj4+
+DQo+Pj4gT24gMi8xOC8xOSAxOjU5IFBNLCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+Pj4g
+VG8gd3JpdGUgb25lIGJ5dGUgdG8gZGlzaywgUHl0aG9uMiBtYXkgdXNlICdjaHInIHR5cGUuDQo+
+Pj4+IEluIFB5dGhvbjMsIGNvbnZlcnNpb24gdG8gJ2J5dGUnIHR5cGUgaXMgcmVxdWlyZWQuDQo+
+Pj4+DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtl
+dmljaEB2aXJ0dW96em8uY29tPg0KPj4+PiAtLS0NCj4+Pj4gICB0ZXN0cy9xZW11LWlvdGVzdHMv
+MjQyIHwgOSArKysrKysrLS0NCj4+Pj4gICAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCsp
+LCAyIGRlbGV0aW9ucygtKQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rl
+c3RzLzI0MiBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDINCj4+Pj4gaW5kZXggMTZjNjVlZC4uNmIx
+ZjdiOCAxMDA3NTUNCj4+Pj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Mg0KPj4+PiArKysg
+Yi90ZXN0cy9xZW11LWlvdGVzdHMvMjQyDQo+Pj4+IEBAIC02NSw5ICs2NSwxNCBAQCBkZWYgdG9n
+Z2xlX2ZsYWcob2Zmc2V0KToNCj4+Pj4gICAgICAgd2l0aCBvcGVuKGRpc2ssICJyK2IiKSBhcyBm
+Og0KPj4+PiAgICAgICAgICAgZi5zZWVrKG9mZnNldCwgMCkNCj4+Pj4gICAgICAgICAgIGMgPSBm
+LnJlYWQoMSkNCj4+Pj4gLSAgICAgICAgdG9nZ2xlZCA9IGNocihvcmQoYykgXiBiaXRtYXBfZmxh
+Z191bmtub3duKQ0KPj4+PiArICAgICAgICB0b2dnbGVkID0gb3JkKGMpIF4gYml0bWFwX2ZsYWdf
+dW5rbm93bg0KPj4+PiAgICAgICAgICAgZi5zZWVrKC0xLCAxKQ0KPj4+PiAtICAgICAgICBmLndy
+aXRlKHRvZ2dsZWQpDQo+Pj4+ICsgICAgICAgIHRyeToNCj4+Pj4gKyAgICAgICAgICAgICMgcHl0
+aG9uMg0KPj4+PiArICAgICAgICAgICAgZi53cml0ZShjaHIodG9nZ2xlZCkpDQo+Pj4+ICsgICAg
+ICAgIGV4Y2VwdCBUeXBlRXJyb3I6DQo+Pj4+ICsgICAgICAgICAgICAjIHB5dGhvbjMNCj4+Pj4g
+KyAgICAgICAgICAgIGYud3JpdGUoYnl0ZXMoW3RvZ2dsZWRdKSkNCj4+Pg0KPj4+IExvb2tzIGxp
+a2UgaXQgd29ya3MsIGJ1dCBJJ20gbm90IGVub3VnaCBvZiBhIHB5dGhvbiBleHBlcnQgdG8ga25v
+dyBpZg0KPj4+IHRoZXJlIGlzIGEgbW9yZSBQeXRob25pYyBlbGVnYW50IGFwcHJvYWNoLg0KPj4+
+DQo+IA0KPiBXZWxsLCB0aGVyZSdzIG5vIHdheSBhcm91bmQgdGhlIGZhY3QgdGhhdCBieXRlcyBp
+biBQeXRob24gMyBhcmUgdmVyeQ0KPiBkaWZmZXJlbnQgZnJvbSBieXRlcyBpbiBQeXRob24gMiAo
+anVzdCBhbm90aGVyIG5hbWUgZm9yIGEgc3RyaW5nKS4NCj4gDQo+IFdoYXQgSSdkIHJlY29tbWVu
+ZCBoZXJlIGlzIHRvIG5vdCBiYXNlIHRoZSB0eXBlIG9uIHRoZSBleGNlcHRpb24sIGJ1dA0KPiBj
+aG9vc2UgaXQgZGVwZW5kaW5nIG9uIHRoZSBQeXRob24gdmVyc2lvbi4gIFNvbWV0aGluZyBsaWtl
+Og0KPiANCj4gaWYgc3lzLnZlcnNpb25faW5mby5tYWpvciA9PSAyOg0KPiAgICAgZi53cml0ZShj
+aHIodG9nZ2xlZCkpDQo+IGVsc2U6DQo+ICAgICBmLndyaXRlKGJ5dGVzKFt0b2dnbGVkXSldDQo+
+IA0KPiBUaGlzIGlzIGNoZWFwZXIgdGhhbiByYWlzaW5nL2NhdGNoaW5nIGV4Y2VwdGlvbnMsIGl0
+J3Mgc2VsZiBkb2N1bWVudGluZywNCj4gYW5kIGZvbGxvd3MgdGhlIHBhdHRlcm4gb24gb3RoZXIg
+dGVzdHMuDQo+IA0KPiBSZWdhcmRzLA0KPiAtIENsZWJlci4NCj4gDQoNClRoYW5rIHlvdSB2ZXJ5
+IG11Y2gsIENsZWJlci4NCkkgd291bGQgbGlrZSB0byB3cml0ZSBpdCBkb3duIGFzIHRoYXQgaXMg
+aW4gaW90ZXN0cy5weSA6DQppZiBzeXMudmVyc2lvbl9pbmZvLm1ham9yID49IDM6DQogICAgIC4u
+Lg0KDQo+Pj4gSWYgc29tZW9uZSBlbHNlIHBpY2tzIGl0IHVwIGJlZm9yZSBteSBuZXh0IE5CRCBw
+dWxsIHJlcXVlc3QsDQo+Pj4gQWNrZWQtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29t
+Pg0KPj4+DQoNCi0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5IFNoaW5rZXZpY2gN
+Cg0K
