@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57513)
+Received: from eggs.gnu.org ([209.51.188.92]:58853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gxCx2-0002Mz-11
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:41:24 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gxCzG-0006cU-84
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gxCww-0000A9-5x
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:41:19 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34165)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gxCwv-00009K-N3
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:41:17 -0500
-Received: by mail-oi1-x242.google.com with SMTP id g16so2044829oib.1
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:41:17 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1gxCzF-0002bi-5w
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:43:42 -0500
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-11-kwolf@redhat.com>
+	<0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
+	<20190219090431.GD4727@localhost.localdomain>
+	<ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
+	<20190222153505.GB8035@dhcp-200-176.str.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <487485f2-31c0-9200-b66d-e430047ad536@redhat.com>
+Date: Fri, 22 Feb 2019 16:43:20 +0100
 MIME-Version: 1.0
-References: <20190214102816.3393-1-peter.maydell@linaro.org>
-	<20190214102816.3393-2-peter.maydell@linaro.org>
-	<20190222151910.io5pvf6u3kp3axns@SPB-NB-133.local>
-In-Reply-To: <20190222151910.io5pvf6u3kp3axns@SPB-NB-133.local>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Feb 2019 15:41:05 +0000
-Message-ID: <CAFEAcA_Ek6iZshV45qykNiu8mTgwh0a5zYFRWX-mUNX2f6Na6Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/7] ui/cocoa: Ensure we have the
- iothread lock when calling into QEMU
+In-Reply-To: <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="09nYh3hNYYeBEyrS2ROn43PinDJmhp3ML"
+Subject: Re: [Qemu-devel] [RFC PATCH 10/11] qcow2: Store data file name in
+ the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +29,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>, BALATON Zoltan <balaton@eik.bme.hu>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Fri, 22 Feb 2019 at 15:19, Roman Bolshakov <r.bolshakov@yadro.com> wrote:
->
-> On Thu, Feb 14, 2019 at 10:28:10AM +0000, Peter Maydell wrote:
-> > The Cocoa UI should run on the main thread; this is enforced
-> > in OSX Mojave. In order to be able to run on the main thread,
-> > we need to make sure we hold the iothread lock whenever we
-> > call into various QEMU UI midlayer functions.
-> >
->
-> Hi Peter,
->
-> I wonder if qmp_stop and qmp_cont calls should be made in locked context
-> within pauseQEMU and resumeQEMU methods, respectively?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--09nYh3hNYYeBEyrS2ROn43PinDJmhp3ML
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
+Message-ID: <487485f2-31c0-9200-b66d-e430047ad536@redhat.com>
+Subject: Re: [RFC PATCH 10/11] qcow2: Store data file name in the image
+References: <20190131175549.11691-1-kwolf@redhat.com>
+ <20190131175549.11691-11-kwolf@redhat.com>
+ <0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
+ <20190219090431.GD4727@localhost.localdomain>
+ <ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
+ <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
+In-Reply-To: <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Yes, you're right, I missed these, but they should also be
-called within a with_iothread_lock wrapper.
+On 22.02.19 16:35, Kevin Wolf wrote:
+> Am 22.02.2019 um 15:16 hat Max Reitz geschrieben:
+>> On 19.02.19 10:04, Kevin Wolf wrote:
+>>> Am 19.02.2019 um 01:18 hat Max Reitz geschrieben:
+>>>> On 31.01.19 18:55, Kevin Wolf wrote:
+>>>>> Rather than requiring that the external data file node is passed
+>>>>> explicitly when creating the qcow2 node, store the filename in the
+>>>>> designated header extension during .bdrv_create and read it from th=
+ere
+>>>>> as a default during .bdrv_open.
+>>>>>
+>>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>>>> ---
+>>>>>  block/qcow2.h              |  1 +
+>>>>>  block/qcow2.c              | 69 ++++++++++++++++++++++++++++++++++=
++++-
+>>>>>  tests/qemu-iotests/082.out | 27 +++++++++++++++
+>>>>>  3 files changed, 96 insertions(+), 1 deletion(-)
+>>>>
+>>>> [...]
+>>>>
+>>>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>>>> index 6cf862e8b9..4959bf16a4 100644
+>>>>> --- a/block/qcow2.c
+>>>>> +++ b/block/qcow2.c
+>>>>> @@ -398,6 +398,20 @@ static int qcow2_read_extensions(BlockDriverSt=
+ate *bs, uint64_t start_offset,
+>>>>>  #endif
+>>>>>              break;
+>>>>> =20
+>>>>> +        case QCOW2_EXT_MAGIC_DATA_FILE:
+>>>>> +        {
+>>>>> +            s->image_data_file =3D g_malloc0(ext.len + 1);
+>>>>> +            ret =3D bdrv_pread(bs->file, offset, s->image_data_fil=
+e, ext.len);
+>>>>> +            if (ret < 0) {
+>>>>> +                error_setg_errno(errp, -ret, "ERROR: Could not dat=
+a file name");
+>>>>
+>>>> I think you accidentally a word.
+>>>>
+>>>>> +                return ret;
+>>>>> +            }
+>>>>> +#ifdef DEBUG_EXT
+>>>>> +            printf("Qcow2: Got external data file %s\n", s->image_=
+data_file);
+>>>>> +#endif
+>>>>> +            break;
+>>>>> +        }
+>>>>> +
+>>>>>          default:
+>>>>>              /* unknown magic - save it in case we need to rewrite =
+the header */
+>>>>>              /* If you add a new feature, make sure to also update =
+the fast
+>>>>> @@ -1444,7 +1458,18 @@ static int coroutine_fn qcow2_do_open(BlockD=
+riverState *bs, QDict *options,
+>>>>>      /* Open external data file */
+>>>>>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+>>>>>          s->data_file =3D bdrv_open_child(NULL, options, "data-file=
+", bs,
+>>>>> -                                       &child_file, false, errp);
+>>>>> +                                       &child_file, false, &local_=
+err);
+>>>>> +        if (!s->data_file) {
+>>>>> +            if (s->image_data_file) {
+>>>>> +                error_free(local_err);
+>>>>> +                local_err =3D NULL;
+>>>>
+>>>> This looked a bit weird to me at first because I was wondering why y=
+ou
+>>>> wouldn't just pass allow_none=3Dtrue and then handle errors (by pass=
+ing
+>>>> them on).  But right, we want to retry with a filename set, maybe th=
+at
+>>>> makes more sense of the options.
+>>>
+>>> I think we want the normal error message for the !s->image_data_file
+>>> case. With allow_none=3Dtrue, we would have to come up with a new one=
+ here
+>>> (in the else branch below).
+>>>
+>>>> Hm.  But then again, do we really?  It matches what we do with backi=
+ng
+>>>> files, but that does give at least me headaches from time to time.  =
+How
+>>>> bad would it be to allow either passing all valid options through
+>>>> @options (which would make qcow2 ignore the string in the header), o=
+r
+>>>> use the filename given in the header alone?
+>>>
+>>> You mean offering only one of the two ways to configure the node?
+>>
+>> Either just the filename from the image header, or ignore that and tak=
+e
+>> all options from the user (who'd have to give a syntactically complete=
 
-> I also think it's better to clarify that the reason of the commit is not
-> Mojave enforcing usage of event loop in main thread but an improvement
-> of event processing in Cocoa UI, because Cocoa UI works on Mojave.
+>> QAPI BlockdevRef object).
+>>
+>>> The 'data-file' runtime option is a must so that libvirt can build th=
+e
+>>> graph node by node (and possibly use file descriptor passing one day)=
+=2E
+>>> But having to specify the option every time is very unfriendly for hu=
+man
+>>> users, so I think allowing to store the file name in the header is a
+>>> must, too.
+>>
+>> Sure.  But I don't know whether we have to support taking the filename=
 
-Hmm? The point of this patchset is exactly that Mojave enforces
-that things go on the main thread, where previous OSX versions
-did not, and so in some situations QEMU will crash on Mojave
-where it did not on older versions. So I'm not sure what you're
-suggesting should be clarified here.
+>> from the image header, and the user overriding some of the node's
+>> options (e.g. caching).
+>=20
+> So essentially this would mean passing NULL instead of options to
+> bdrv_open_child() when we retry with the filename from the header.
+>=20
+> But it's inconsistent with all other places, which comes with two
 
-> As of now qemu main loop and Cocoa events processing is done in the same
-> thread. And you can see from below that invocation of the qemu_main blocks
-> Cocoa event loop [NSApp run] in applicationDidFinishLaunching as qemu_main
-> doesn't quit.
+"all other places"?  Really it's just backing files, as everywhere else
+there is no filename that doesn't come from the command line.
 
-Yes, indeed. This is how we've traditionally done the Cocoa
-event handling. It's worked OK for everything up to Mojave...
+Yes, you can use -drive file=3Dfoo.qcow2,file.locking=3Doff, but I consid=
+er
+that case a bit different.  Although maybe it really isn't. *shrug*
 
-> Each millisecond cocoa_refresh gets called by display handler. The function
-> extracts all available events from the cocoa event queue and dispatches them to
-> handleEvent:
->
->         event = [NSApp nextEventMatchingMask:NSEventMaskAny untilDate:distantPast
->                         inMode: NSDefaultRunLoopMode dequeue:YES];
->         if (event != nil) {
->             [cocoaView handleEvent:event];
->         }
->
-> handleEvent enqueues keyboard and mouse events into ps2 queue and the
-> other events are enqueued to Cocoa event queue. I'm curious what happens
-> to the events that are enqueued with:
->         [NSApp sendEvent:event];
+> problems. It's confusing for users who are used to overriding just that=
 
-As I understand it, this sendEvent method doesn't queue anything.
-It just hands the event to the usual OSX event handling chain,
-which will either use it (for example, if it's a menu-item
-key accelerator event) or drop it on the floor. The logic is
-basically "QEMU-specific code gets first chance to decide whether
-to consume the event; the default (and a few other odd cases)
-if it does not is that we let the OSX framework code do whatever
-it wants to do with it".
+> one option of a child. And do we actually spare you any headaches or do=
 
-thanks
--- PMM
+> we create new ones because we have now two different behaviours of
+> bdrv_open_child() callers that we must preserve in the future?
+
+It means I can act out on my pain by being angry on how .backing
+behaves.  That's better for my health than having to keep it in because
+it's the same behavior everywhere and it's officially me who's in the wro=
+ng.
+
+More seriously, though, yeah, it was just a random idea.  It makes sense
+to have the same behavior here as for .backing.
+
+Max
+
+
+--09nYh3hNYYeBEyrS2ROn43PinDJmhp3ML
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxwGJgACgkQ9AfbAGHV
+z0A/qwf/eqf85CtCZkQp93t4xUk4A5+qHtb7GG7hkGTkptZk6YKHGLHISdT3+++V
+NwopNxPFRU0xXCvafANZf/AkCwRu/lAXZOq0dAMwWTF2YnNBk/Pb0Dr/PM3m8Vxc
+vEa/smheCeZIKMDjAXOBTZXaw6Q8RPOieSGFc3jPi1aKwR0sBXK/oXJ5fvf3bbbB
+vJbbyBVJ2j+74Yi/vPQu9C2A/JvGHmVQEf4nlI5FP9FI/iBE8LP7SnWPJdwCOdhL
+ufrjlhh8TgTFBDVFHSLVhm9CkYQuHIYmxdPQA8frWywk9JyXQ26TP6Nm1VijPxpS
+ud+++K5HYZmX2lQmOfCgdQCnshaHFg==
+=AAg0
+-----END PGP SIGNATURE-----
+
+--09nYh3hNYYeBEyrS2ROn43PinDJmhp3ML--
