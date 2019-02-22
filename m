@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55244)
+Received: from eggs.gnu.org ([209.51.188.92]:55908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gxBBX-0007Kc-4e
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:48:19 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gxBCb-0008Do-Jp
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:49:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gxBBV-0001jV-Fa
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:48:14 -0500
-Received: from fanzine.igalia.com ([91.117.99.155]:56216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1gxBBU-0000iU-Qy
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:48:13 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 22 Feb 2019 15:46:25 +0200
-Message-Id: <dcd1ea0775ca548935d906ee9daeee207e1516f6.1550842915.git.berto@igalia.com>
-In-Reply-To: <cover.1550842915.git.berto@igalia.com>
-References: <cover.1550842915.git.berto@igalia.com>
-In-Reply-To: <cover.1550842915.git.berto@igalia.com>
-References: <cover.1550842915.git.berto@igalia.com>
+	(envelope-from <imammedo@redhat.com>) id 1gxBCa-0003Fc-2a
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:49:21 -0500
+Date: Fri, 22 Feb 2019 14:48:46 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190222144846.0a891948@redhat.com>
+In-Reply-To: <20190220224003.4420-14-eric.auger@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190220224003.4420-14-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 2/3] main-loop: Add qemu_idle_add()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 13/17] hw/arm/virt: Allocate
+ device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-This works like g_idle_add() but allows specifying a different
-GMainContext. It also returns the GSource directly instead of its ID
-number for convenience.
+On Wed, 20 Feb 2019 23:39:59 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-qio_task_thread_worker() is modified to make use of this new function.
+> The device memory region is located after the initial RAM.
+> its start/size are 1GB aligned.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> 
+> ---
+> v6 -> v7:
+> - check the device memory top does not wrap
+> - check the device memory can fit the slots
+> 
+> v4 -> v5:
+> - device memory set after the initial RAM
+> 
+> v3 -> v4:
+> - remove bootinfo.device_memory_start/device_memory_size
+> - rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
+> ---
+>  hw/arm/virt.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 470ca0ce2d..33ad9b3f63 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -62,6 +62,7 @@
+>  #include "target/arm/internals.h"
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/mem/nvdimm.h"
+> +#include "hw/acpi/acpi.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -1263,6 +1264,34 @@ static void create_secure_ram(VirtMachineState *vms,
+>      g_free(nodename);
+>  }
+>  
+> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
+> +{
+> +    MachineState *ms = MACHINE(vms);
+> +
+> +    if (!vms->device_memory_size) {
+having vms->device_memory_size seems like duplicate, why not to reuse
+memory_region_size(MachineState::device_memory::mr) like we do elsewhere.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
----
- include/qemu/main-loop.h | 12 ++++++++++++
- io/task.c                | 10 +++-------
- util/main-loop.c         |  9 +++++++++
- 3 files changed, 24 insertions(+), 7 deletions(-)
+Also it would be better to all device_memory allocation/initialization
+compact and close to each other like it's done in pc/spapr.
 
-diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-index f6ba78ea73..f966c015d0 100644
---- a/include/qemu/main-loop.h
-+++ b/include/qemu/main-loop.h
-@@ -295,6 +295,18 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line);
-  */
- void qemu_mutex_unlock_iothread(void);
- 
-+/**
-+ * qemu_idle_add: Add an idle function to a GMainContext
-+ *
-+ * This function is similar to GLib's g_idle_add() but it allows
-+ * specifying a GMainContext instead of using the global one.
-+ *
-+ * The returned GSource is owned by the GMainContext and is deleted
-+ * automatically after @func returns false. It can also be deleted by
-+ * removing it from the GMainContext using g_source_destroy().
-+ */
-+GSource *qemu_idle_add(GSourceFunc func, gpointer data, GMainContext *ctx);
-+
- /* internal interfaces */
- 
- void qemu_fd_register(int fd);
-diff --git a/io/task.c b/io/task.c
-index 1ae7b86488..16754e22ba 100644
---- a/io/task.c
-+++ b/io/task.c
-@@ -19,6 +19,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
- #include "io/task.h"
- #include "qapi/error.h"
- #include "qemu/thread.h"
-@@ -130,13 +131,8 @@ static gpointer qio_task_thread_worker(gpointer opaque)
-     trace_qio_task_thread_exit(task);
- 
-     qemu_mutex_lock(&task->thread_lock);
--
--    task->thread->completion = g_idle_source_new();
--    g_source_set_callback(task->thread->completion,
--                          qio_task_thread_result, task, NULL);
--    g_source_attach(task->thread->completion,
--                    task->thread->context);
--    g_source_unref(task->thread->completion);
-+    task->thread->completion = qemu_idle_add(qio_task_thread_result, task,
-+                                             task->thread->context);
-     trace_qio_task_thread_source_attach(task, task->thread->completion);
- 
-     qemu_cond_signal(&task->thread_cond);
-diff --git a/util/main-loop.c b/util/main-loop.c
-index d4a521caeb..e23eda68cc 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -171,6 +171,15 @@ int qemu_init_main_loop(Error **errp)
-     return 0;
- }
- 
-+GSource *qemu_idle_add(GSourceFunc func, gpointer data, GMainContext *ctx)
-+{
-+    GSource *idle = g_idle_source_new();
-+    g_source_set_callback(idle, func, data, NULL);
-+    g_source_attach(idle, ctx);
-+    g_source_unref(idle);
-+    return idle;
-+}
-+
- static int max_priority;
- 
- #ifndef _WIN32
--- 
-2.11.0
+> +        return;
+> +    }
+> +
+> +    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
+> +        error_report("unsupported number of memory slots: %"PRIu64,
+> +                     ms->ram_slots);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    if (QEMU_ALIGN_UP(ms->maxram_size, GiB) != ms->maxram_size) {
+> +        error_report("maximum memory size must be GiB aligned");
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+> +    ms->device_memory->base = vms->device_memory_base;
+> +
+> +    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
+> +                       "device-memory", vms->device_memory_size);
+> +    memory_region_add_subregion(sysmem, ms->device_memory->base,
+> +                                &ms->device_memory->mr);
+> +}
+> +
+>  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+>  {
+>      const VirtMachineState *board = container_of(binfo, VirtMachineState,
+> @@ -1610,6 +1639,10 @@ static void machvirt_init(MachineState *machine)
+>                                           machine->ram_size);
+>      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+>  
+> +    if (vms->extended_memmap) {
+> +        create_device_memory(vms, sysmem);
+> +    }
+> +
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>  
+>      create_gic(vms, pic);
