@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54682)
+Received: from eggs.gnu.org ([209.51.188.92]:55524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gx5SE-0003gb-3U
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:41:08 -0500
+	(envelope-from <armbru@redhat.com>) id 1gx5Tf-0004cq-Jl
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gx5SC-0000Ba-Is
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:41:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gx5SC-0008Oe-8l
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:41:04 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gx5Ry-0003yi-F1
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:40:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 70AC42E8029
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:40:50 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gx5Te-0001Ul-9s
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:42:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52642)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gx5Td-0001Dy-Tf
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:42:34 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <B9D713FC-5896-4923-9788-AF7EAA9B462D@oberlin.edu>
+	<ab1a67c0-8872-6e22-fc70-946bbcabb8a1@redhat.com>
+	<BD5AEBD4-0B91-4756-B8D6-C0E643CF1F42@oberlin.edu>
+	<87ftsl2clg.fsf@dusky.pond.sub.org>
+	<91720BD9-D5A6-4457-BC99-D2132550BEDA@oberlin.edu>
+	<87ef84z4v6.fsf@dusky.pond.sub.org>
+	<62E7EC09-CB88-4802-9D28-45B06C020614@oberlin.edu>
+	<87imxfssq1.fsf@dusky.pond.sub.org>
+	<E3178A67-9CFC-4CD5-921F-4EE5CCB46F62@oberlin.edu>
+	<87y36boe78.fsf@dusky.pond.sub.org>
+	<fdec6838-6051-427d-6192-f68a76171915@redhat.com>
+	<FBD3F2EA-638A-4B52-826B-7307B1D821C9@oberlin.edu>
+Date: Fri, 22 Feb 2019 08:42:10 +0100
+In-Reply-To: <FBD3F2EA-638A-4B52-826B-7307B1D821C9@oberlin.edu> (Stephen
+	Checkoway's message of "Thu, 21 Feb 2019 14:57:38 -0500")
+Message-ID: <877edsqnfx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 Feb 2019 07:32:57 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
-Reply-To: Bug 1817239 <1817239@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155080581544.22842.8774442486795126526.malonedeb@wampee.canonical.com>
-Message-Id: <5a86f68a-de14-b21c-01eb-174c802cc299@vivier.eu>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1817239] [NEW] add '--targets' option to
- qemu-binfmt-conf.sh
+Subject: Re: [Qemu-devel] Testing sysbus devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,101 +38,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Cc: Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org
 
-On 22/02/2019 04:31, Launchpad Bug Tracker wrote:
-> I'd like to ask for the addition of option '--targets' to scripts/qemu-
-> binfmt-conf.sh, in order to allow registering the interpreters for the
-> given list of architectures only, instead of using all of the ones
-> defined in qemu_target_list. The following is a possible patch that
-> implements it:
-> =
+Stephen Checkoway <stephen.checkoway@oberlin.edu> writes:
 
->   qemu-binfmt-conf.sh | 9 ++++++++-
->   1 file changed, 8 insertions(+), 1 deletion(-)
+>> On Feb 20, 2019, at 03:55, Laszlo Ersek <lersek@redhat.com> wrote:
+>>=20
+>> I would strongly prefer if the guest-side view wouldn't change at all.
+>
+> It sounds like sector protection isn't something you want and it's not
 
-Please send your patch to the qemu-devel mailing list.
+L=C3=A1szl=C3=B3 is content with the status quo, but I'm not.
 
-I think it's a good idea but we should homogenize "--debian" and =
+> something I currently need so unless that changes, I probably won't do
+> anything with it.
 
-"--systemd": remove the parameter from  "--systemd" to generate by =
+Pity.
 
-default all the targets, and allow the user to provide a subset of the =
+> My goal is merely to implement some missing flash functionality that I
+> need to emulate some hardware that I have. My plan for doing this is
+> to not change any defaults (except for a few bug fixes) while doing
+> so. I'm happy for the qemu community to take as much or as little as
+> it finds useful.
 
-targets using the newly introduced "--target" parameter.
+Understand.
 
-Thanks,
-Laurent
+> I'll send a patch series for review in the normal fashion, but if
+> anyone wants to see my in-progress work, including tests, the diff is
+> available here
+> <https://github.com/qemu/qemu/compare/master...stevecheckoway:pflash02>.
+>
+> For my own edification, I'm curious how you're currently dealing with
+> some regions of flash that are protected. I believe Markus mentioned
+> using multiple flash devices. Are you overlapping the address ranges?
 
--- =
+UEFI wants to store some persistent state in flash memory.  Real PCs
+have a single flash chip with a suitable part configured to be writable
+for firmware.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817239
+Since our flash device models can't do that (yet?), we worked around the
+missing functionality by exposing two separate flash chips to guests,
+one read-only, one writable for firmware.  The two are adjacent, no gap,
+with the boundary aligned to 4KiB (page size).
 
-Title:
-  add '--targets' option to qemu-binfmt-conf.sh
+Our track record for doing whatever real hardware does has been okay.
+The track record for our own good-enough inventions less so.  I'm not
+claiming this one is about to explode into our faces.  Still, I'd like
+to clean it up if practical.  If not for PCs (say because complications
+for OVMF render that less than practical), then at least for other, less
+encumbered machines.
 
-Status in QEMU:
-  New
+Would be nice if you could pitch in a bit.
 
-Bug description:
-  I'd like to ask for the addition of option '--targets' to scripts
-  /qemu-binfmt-conf.sh, in order to allow registering the interpreters
-  for the given list of architectures only, instead of using all of the
-  ones defined in qemu_target_list. The following is a possible patch
-  that implements it:
+Way, way more than you ever wanted to know on configuring flash for PCs:
 
-   qemu-binfmt-conf.sh | 9 ++++++++-
-   1 file changed, 8 insertions(+), 1 deletion(-)
+    Subject: Configuring pflash devices for OVMF firmware
+    Message-ID: <87y378n5iy.fsf@dusky.pond.sub.org>
+    https://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg06606.html
 
-  diff --git a/qemu-binfmt-conf.sh b/qemu-binfmt-conf.sh
-  index b5a1674..be4a19b 100644
-  --- a/qemu-binfmt-conf.sh
-  +++ b/qemu-binfmt-conf.sh
-  @@ -170,6 +170,7 @@ usage() {
-   Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
-                              [--help][--credential yes|no][--exportdir PAT=
-H]
-                              [--persistent yes|no][--qemu-suffix SUFFIX]
-  +                           [--targets TARGETS]
+> The current pflash_cfi02.c code assumes, but doesn't check that both
+> the total size of the chip as well as the size of each sector is a
+> power of two. If you wanted say 7 MB of read/write flash and 1 MB of
+> read-only flash, qemu might be willing to create a device with say 7
+> MB of storage, but it will definitely misbehave. (I added a check for
+> that here
+> <https://github.com/qemu/qemu/compare/master...stevecheckoway:pflash02#di=
+ff-d33881bd0ef099e2f46ebd4797c653bcR738>.)
 
-          Configure binfmt_misc to use qemu interpreter
+Awesome.  The magic setup code in hw/i386/pc_sysfw.c will happily create
+any size that's a multiple of 4KiB.  The current sizes are 128KiB
+writable (power of two, good) and 2MiB - 128KiB for read-only (very much
+not a power of two, possibly bad).
 
-  @@ -189,6 +190,8 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debia=
-n][--systemd CPU]
-          --persistent:  if yes, the interpreter is loaded when binfmt is
-                         configured and remains in memory. All future uses
-                         are cloned from the open file.
-  +       --targets:     comma-separated list of targets. If provided, only
-  +                      the targets in the list are registered.
-
-       To import templates with update-binfmts, use :
-
-  @@ -324,7 +327,7 @@ CREDENTIAL=3Dno
-   PERSISTENT=3Dno
-   QEMU_SUFFIX=3D""
-
-  -options=3D$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-=
-suffix:,exportdir:,help,credential:,persistent: -- "$@")
-  +options=3D$(getopt -o ds:Q:S:e:hc:p:t: -l debian,systemd:,qemu-path:,qem=
-u-suffix:,exportdir:,help,credential:,persistent:,targets: -- "$@")
-   eval set -- "$options"
-
-   while true ; do
-  @@ -380,6 +383,10 @@ while true ; do
-           shift
-           PERSISTENT=3D"$1"
-           ;;
-  +    -t|--targets)
-  +        shift
-  +        qemu_target_list=3D"$(echo "$1" | tr ',' ' ')"
-  +        ;;
-       *)
-           break
-           ;;
-  --
-  2.20.1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817239/+subscriptions
+Can you tell us a bit more about what exactly can go wrong?
