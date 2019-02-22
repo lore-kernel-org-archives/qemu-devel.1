@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38765)
+Received: from eggs.gnu.org ([209.51.188.92]:38872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gxHra-00035y-NE
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:56:07 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gxHrc-0003Fi-Th
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:56:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gxHgw-0006uU-O0
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:45:07 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46009)
+	(envelope-from <alex.bennee@linaro.org>) id 1gxHgv-0006tC-Jo
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:45:06 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54591)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gxHgw-0006tR-FU
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:45:06 -0500
-Received: by mail-wr1-x444.google.com with SMTP id w17so3717774wrn.12
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 12:45:06 -0800 (PST)
+	id 1gxHgv-0006sF-Bj
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:45:05 -0500
+Received: by mail-wm1-x344.google.com with SMTP id a62so3111595wmh.4
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 12:45:05 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 22 Feb 2019 20:45:00 +0000
-Message-Id: <20190222204500.24434-7-alex.bennee@linaro.org>
+Date: Fri, 22 Feb 2019 20:44:57 +0000
+Message-Id: <20190222204500.24434-4-alex.bennee@linaro.org>
 In-Reply-To: <20190222204500.24434-1-alex.bennee@linaro.org>
 References: <20190222204500.24434-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 6/6] softfloat: Support float_round_to_odd
- more places
+Subject: [Qemu-devel] [PATCH v1 3/6] softfloat: Implement float128_to_uint32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,263 +30,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, David Hildenbrand <david@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
 
-Previously this was only supported for roundAndPackFloat64.
+Handling it just like float128_to_uint32_round_to_zero, that hopefully
+is free of bugs :)
 
-New support in round_canonical, round_to_int, float128_round_to_int,
-roundAndPackFloat32, roundAndPackInt32, roundAndPackInt64,
-roundAndPackUint64.  This does not include any of the floatx80 routines,
-as we do not have users for that rounding mode there.
+Documentation basically copied from float128_to_uint64
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190215170225.15537-1-richard.henderson@linaro.org>
-Tested-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- fpu/softfloat.c    | 64 ++++++++++++++++++++++++++++++++++++++++++----
- tests/fp/fp-test.c | 43 ++++++++++++++++++++++++-------
- 2 files changed, 93 insertions(+), 14 deletions(-)
+ fpu/softfloat.c         | 29 +++++++++++++++++++++++++++++
+ include/fpu/softfloat.h |  1 +
+ 2 files changed, 30 insertions(+)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index c69cd6b5d1..99c7cc2c3d 100644
+index 9132d7a0b0..c69cd6b5d1 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -696,6 +696,7 @@ static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
- static FloatParts round_canonical(FloatParts p, float_status *s,
-                                   const FloatFmt *parm)
- {
-+    const uint64_t frac_lsb = parm->frac_lsb;
-     const uint64_t frac_lsbm1 = parm->frac_lsbm1;
-     const uint64_t round_mask = parm->round_mask;
-     const uint64_t roundeven_mask = parm->roundeven_mask;
-@@ -731,6 +732,10 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-             inc = p.sign ? round_mask : 0;
-             overflow_norm = !p.sign;
-             break;
-+        case float_round_to_odd:
-+            overflow_norm = true;
-+            inc = frac & frac_lsb ? 0 : round_mask;
-+            break;
-         default:
-             g_assert_not_reached();
-         }
-@@ -778,9 +783,14 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-             shift64RightJamming(frac, 1 - exp, &frac);
-             if (frac & round_mask) {
-                 /* Need to recompute round-to-even.  */
--                if (s->float_rounding_mode == float_round_nearest_even) {
-+                switch (s->float_rounding_mode) {
-+                case float_round_nearest_even:
-                     inc = ((frac & roundeven_mask) != frac_lsbm1
-                            ? frac_lsbm1 : 0);
-+                    break;
-+                case float_round_to_odd:
-+                    inc = frac & frac_lsb ? 0 : round_mask;
-+                    break;
-                 }
-                 flags |= float_flag_inexact;
-                 frac += inc;
-@@ -1988,6 +1998,9 @@ static FloatParts round_to_int(FloatParts a, int rmode,
-             case float_round_down:
-                 one = a.sign;
-                 break;
-+            case float_round_to_odd:
-+                one = true;
-+                break;
-             default:
-                 g_assert_not_reached();
-             }
-@@ -2021,6 +2034,9 @@ static FloatParts round_to_int(FloatParts a, int rmode,
-             case float_round_down:
-                 inc = a.sign ? rnd_mask : 0;
-                 break;
-+            case float_round_to_odd:
-+                inc = a.frac & frac_lsb ? 0 : rnd_mask;
-+                break;
-             default:
-                 g_assert_not_reached();
-             }
-@@ -3314,6 +3330,9 @@ static int32_t roundAndPackInt32(flag zSign, uint64_t absZ, float_status *status
-     case float_round_down:
-         roundIncrement = zSign ? 0x7f : 0;
-         break;
-+    case float_round_to_odd:
-+        roundIncrement = absZ & 0x80 ? 0 : 0x7f;
-+        break;
-     default:
-         abort();
-     }
-@@ -3368,6 +3387,9 @@ static int64_t roundAndPackInt64(flag zSign, uint64_t absZ0, uint64_t absZ1,
-     case float_round_down:
-         increment = zSign && absZ1;
-         break;
-+    case float_round_to_odd:
-+        increment = !(absZ0 & 1) && absZ1;
-+        break;
-     default:
-         abort();
-     }
-@@ -3424,6 +3446,9 @@ static int64_t roundAndPackUint64(flag zSign, uint64_t absZ0,
-     case float_round_down:
-         increment = zSign && absZ1;
-         break;
-+    case float_round_to_odd:
-+        increment = !(absZ0 & 1) && absZ1;
-+        break;
-     default:
-         abort();
-     }
-@@ -3526,6 +3551,8 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-     case float_round_down:
-         roundIncrement = zSign ? 0x7f : 0;
-         break;
-+    case float_round_to_odd:
-+        roundIncrement = zSig & 0x80 ? 0 : 0x7f;
-     default:
-         abort();
-         break;
-@@ -3536,8 +3563,10 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-              || (    ( zExp == 0xFD )
-                   && ( (int32_t) ( zSig + roundIncrement ) < 0 ) )
-            ) {
-+            bool overflow_to_inf = roundingMode != float_round_to_odd &&
-+                                   roundIncrement != 0;
-             float_raise(float_flag_overflow | float_flag_inexact, status);
--            return packFloat32( zSign, 0xFF, - ( roundIncrement == 0 ));
-+            return packFloat32(zSign, 0xFF, -!overflow_to_inf);
-         }
-         if ( zExp < 0 ) {
-             if (status->flush_to_zero) {
-@@ -3555,6 +3584,13 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-             if (isTiny && roundBits) {
-                 float_raise(float_flag_underflow, status);
-             }
-+            if (roundingMode == float_round_to_odd) {
-+                /*
-+                 * For round-to-odd case, the roundIncrement depends on
-+                 * zSig which just changed.
-+                 */
-+                roundIncrement = zSig & 0x80 ? 0 : 0x7f;
-+            }
-         }
-     }
-     if (roundBits) {
-@@ -6987,6 +7023,15 @@ float128 float128_round_to_int(float128 a, float_status *status)
-                 add128(z.high, z.low, 0, roundBitsMask, &z.high, &z.low);
-             }
-             break;
-+        case float_round_to_odd:
-+            /*
-+             * Note that if lastBitMask == 0, the last bit is the lsb
-+             * of high, and roundBitsMask == -1.
-+             */
-+            if ((lastBitMask ? z.low & lastBitMask : z.high & 1) == 0) {
-+                add128(z.high, z.low, 0, roundBitsMask, &z.high, &z.low);
-+            }
-+            break;
-         default:
-             abort();
-         }
-@@ -6998,7 +7043,7 @@ float128 float128_round_to_int(float128 a, float_status *status)
-             status->float_exception_flags |= float_flag_inexact;
-             aSign = extractFloat128Sign( a );
-             switch (status->float_rounding_mode) {
--             case float_round_nearest_even:
-+            case float_round_nearest_even:
-                 if (    ( aExp == 0x3FFE )
-                      && (   extractFloat128Frac0( a )
-                           | extractFloat128Frac1( a ) )
-@@ -7011,14 +7056,17 @@ float128 float128_round_to_int(float128 a, float_status *status)
-                     return packFloat128(aSign, 0x3FFF, 0, 0);
-                 }
-                 break;
--             case float_round_down:
-+            case float_round_down:
-                 return
-                       aSign ? packFloat128( 1, 0x3FFF, 0, 0 )
-                     : packFloat128( 0, 0, 0, 0 );
--             case float_round_up:
-+            case float_round_up:
-                 return
-                       aSign ? packFloat128( 1, 0, 0, 0 )
-                     : packFloat128( 0, 0x3FFF, 0, 0 );
-+
-+            case float_round_to_odd:
-+                return packFloat128(aSign, 0x3FFF, 0, 0);
-             }
-             return packFloat128( aSign, 0, 0, 0 );
-         }
-@@ -7051,6 +7099,12 @@ float128 float128_round_to_int(float128 a, float_status *status)
-                 z.high += roundBitsMask;
-             }
-             break;
-+        case float_round_to_odd:
-+            if ((z.high & lastBitMask) == 0) {
-+                z.high |= (a.low != 0);
-+                z.high += roundBitsMask;
-+            }
-+            break;
-         default:
-             abort();
-         }
-diff --git a/tests/fp/fp-test.c b/tests/fp/fp-test.c
-index 4114f346a9..7d0faf2b47 100644
---- a/tests/fp/fp-test.c
-+++ b/tests/fp/fp-test.c
-@@ -125,17 +125,42 @@ static void not_implemented(void)
+@@ -6792,6 +6792,35 @@ uint32_t float128_to_uint32_round_to_zero(float128 a, float_status *status)
+     return res;
+ }
  
- static bool blacklisted(unsigned op, int rmode)
- {
--    /* odd has only been implemented for a few 128-bit ops */
-+    /* odd has not been implemented for any 80-bit ops */
-     if (rmode == softfloat_round_odd) {
-         switch (op) {
--        case F128_ADD:
--        case F128_SUB:
--        case F128_MUL:
--        case F128_DIV:
--        case F128_TO_F64:
--        case F128_SQRT:
--            return false;
--        default:
-+        case EXTF80_TO_UI32:
-+        case EXTF80_TO_UI64:
-+        case EXTF80_TO_I32:
-+        case EXTF80_TO_I64:
-+        case EXTF80_TO_UI32_R_MINMAG:
-+        case EXTF80_TO_UI64_R_MINMAG:
-+        case EXTF80_TO_I32_R_MINMAG:
-+        case EXTF80_TO_I64_R_MINMAG:
-+        case EXTF80_TO_F16:
-+        case EXTF80_TO_F32:
-+        case EXTF80_TO_F64:
-+        case EXTF80_TO_F128:
-+        case EXTF80_ROUNDTOINT:
-+        case EXTF80_ADD:
-+        case EXTF80_SUB:
-+        case EXTF80_MUL:
-+        case EXTF80_DIV:
-+        case EXTF80_REM:
-+        case EXTF80_SQRT:
-+        case EXTF80_EQ:
-+        case EXTF80_LE:
-+        case EXTF80_LT:
-+        case EXTF80_EQ_SIGNALING:
-+        case EXTF80_LE_QUIET:
-+        case EXTF80_LT_QUIET:
-+        case UI32_TO_EXTF80:
-+        case UI64_TO_EXTF80:
-+        case I32_TO_EXTF80:
-+        case I64_TO_EXTF80:
-+        case F16_TO_EXTF80:
-+        case F32_TO_EXTF80:
-+        case F64_TO_EXTF80:
-+        case F128_TO_EXTF80:
-             return true;
-         }
-     }
++/*----------------------------------------------------------------------------
++| Returns the result of converting the quadruple-precision floating-point value
++| `a' to the 32-bit unsigned integer format.  The conversion is
++| performed according to the IEC/IEEE Standard for Binary Floating-Point
++| Arithmetic---which means in particular that the conversion is rounded
++| according to the current rounding mode.  If `a' is a NaN, the largest
++| positive integer is returned.  If the conversion overflows, the
++| largest unsigned integer is returned.  If 'a' is negative, the value is
++| rounded and zero is returned; negative values that do not round to zero
++| will raise the inexact exception.
++*----------------------------------------------------------------------------*/
++
++uint32_t float128_to_uint32(float128 a, float_status *status)
++{
++    uint64_t v;
++    uint32_t res;
++    int old_exc_flags = get_float_exception_flags(status);
++
++    v = float128_to_uint64(a, status);
++    if (v > 0xffffffff) {
++        res = 0xffffffff;
++    } else {
++        return v;
++    }
++    set_float_exception_flags(old_exc_flags, status);
++    float_raise(float_flag_invalid, status);
++    return res;
++}
++
+ /*----------------------------------------------------------------------------
+ | Returns the result of converting the quadruple-precision floating-point
+ | value `a' to the single-precision floating-point format.  The conversion
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 3ff5215b81..3ff3fa5224 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -878,6 +878,7 @@ int64_t float128_to_int64(float128, float_status *status);
+ int64_t float128_to_int64_round_to_zero(float128, float_status *status);
+ uint64_t float128_to_uint64(float128, float_status *status);
+ uint64_t float128_to_uint64_round_to_zero(float128, float_status *status);
++uint32_t float128_to_uint32(float128, float_status *status);
+ uint32_t float128_to_uint32_round_to_zero(float128, float_status *status);
+ float32 float128_to_float32(float128, float_status *status);
+ float64 float128_to_float64(float128, float_status *status);
 -- 
 2.20.1
