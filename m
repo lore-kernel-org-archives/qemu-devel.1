@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40011)
+Received: from eggs.gnu.org ([209.51.188.92]:40396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gx1Ix-0001Pn-AL
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 22:15:16 -0500
+	(envelope-from <peterx@redhat.com>) id 1gx1Ju-0002Az-09
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 22:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gx1Iv-0000ru-Al
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 22:15:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53634)
+	(envelope-from <peterx@redhat.com>) id 1gx1Jt-0002JW-1s
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 22:16:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gx1Ir-00009h-A4
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 22:15:11 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gx1Js-0000Pi-OD
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 22:16:12 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6E6053688B
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 03:14:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A998D99CE8
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 03:14:52 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 22 Feb 2019 11:14:11 +0800
-Message-Id: <20190222031413.20250-3-peterx@redhat.com>
+Date: Fri, 22 Feb 2019 11:14:13 +0800
+Message-Id: <20190222031413.20250-5-peterx@redhat.com>
 In-Reply-To: <20190222031413.20250-1-peterx@redhat.com>
 References: <20190222031413.20250-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/4] iothread: create the gcontext
- onconditionally
+Subject: [Qemu-devel] [PATCH 4/4] iothread: push gcontext earlier in the
+ thread_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,130 +33,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, peterx@redhat.com, Eric Blake <eblake@redhat.com>
 
-In existing code we create the gcontext dynamically at the first
-access of the gcontext from caller.  That can bring some complexity
-and potential races during using iothread.  Since the context itself
-is not that big a resource, and we won't have millions of iothread,
-let's simply create the gcontext unconditionally.
+We were pushing the context until right before running the gmainloop.
+Now since we have everything unconditionally, we can move this
+earlier.
 
-This will also be a preparation work further to move the thread
-context push operation earlier than before (now it's only pushed right
-before we want to start running the gmainloop).
-
-Removing the g_once since it's not necessary, while introducing a new
-run_gcontext boolean to show whether we want to run the gcontext.
+One benefit is that now it's done even before init_done_sem, so as
+long as the iothread user calls iothread_create() and completes, we
+know that the thread stack is ready.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/sysemu/iothread.h |  2 +-
- iothread.c                | 43 +++++++++++++++++++--------------------
- 2 files changed, 22 insertions(+), 23 deletions(-)
+ iothread.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-index 50411ba54a..5f6240d5cb 100644
---- a/include/sysemu/iothread.h
-+++ b/include/sysemu/iothread.h
-@@ -24,9 +24,9 @@ typedef struct {
- 
-     QemuThread thread;
-     AioContext *ctx;
-+    bool run_gcontext;          /* whether we should run gcontext */
-     GMainContext *worker_context;
-     GMainLoop *main_loop;
--    GOnce once;
-     QemuSemaphore init_done_sem; /* is thread init done? */
-     bool stopping;              /* has iothread_stop() been called? */
-     bool running;               /* should iothread_run() continue? */
 diff --git a/iothread.c b/iothread.c
-index 6e297e9ef1..6fa87876e0 100644
+index 9abdbace66..7b7cba5d04 100644
 --- a/iothread.c
 +++ b/iothread.c
-@@ -65,7 +65,7 @@ static void *iothread_run(void *opaque)
-          * We must check the running state again in case it was
+@@ -53,7 +53,7 @@ static void *iothread_run(void *opaque)
+     IOThread *iothread = opaque;
+ 
+     rcu_register_thread();
+-
++    g_main_context_push_thread_default(iothread->worker_context);
+     my_iothread = iothread;
+     iothread->thread_id = qemu_get_thread_id();
+     qemu_sem_post(&iothread->init_done_sem);
+@@ -66,12 +66,11 @@ static void *iothread_run(void *opaque)
           * changed in previous aio_poll()
           */
--        if (iothread->running && atomic_read(&iothread->worker_context)) {
-+        if (iothread->running && atomic_read(&iothread->run_gcontext)) {
-             GMainLoop *loop;
- 
-             g_main_context_push_thread_default(iothread->worker_context);
-@@ -114,6 +114,8 @@ static void iothread_instance_init(Object *obj)
-     iothread->poll_max_ns = IOTHREAD_POLL_MAX_NS_DEFAULT;
-     iothread->thread_id = -1;
-     qemu_sem_init(&iothread->init_done_sem, 0);
-+    /* By default, we don't run gcontext */
-+    atomic_set(&iothread->run_gcontext, 0);
- }
- 
- static void iothread_instance_finalize(Object *obj)
-@@ -143,6 +145,16 @@ static void iothread_instance_finalize(Object *obj)
-     qemu_sem_destroy(&iothread->init_done_sem);
- }
- 
-+static void iothread_init_gcontext(IOThread *iothread)
-+{
-+    GSource *source;
-+
-+    iothread->worker_context = g_main_context_new();
-+    source = aio_get_g_source(iothread_get_aio_context(iothread));
-+    g_source_attach(source, iothread->worker_context);
-+    g_source_unref(source);
-+}
-+
- static void iothread_complete(UserCreatable *obj, Error **errp)
- {
-     Error *local_error = NULL;
-@@ -157,6 +169,12 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
-         return;
+         if (iothread->running && atomic_read(&iothread->run_gcontext)) {
+-            g_main_context_push_thread_default(iothread->worker_context);
+             g_main_loop_run(iothread->main_loop);
+-            g_main_context_pop_thread_default(iothread->worker_context);
+         }
      }
  
-+    /*
-+     * Init one GMainContext for the iothread unconditionally, even if
-+     * it's not used
-+     */
-+    iothread_init_gcontext(iothread);
-+
-     aio_context_set_poll_params(iothread->ctx,
-                                 iothread->poll_max_ns,
-                                 iothread->poll_grow,
-@@ -169,8 +187,6 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
-         return;
-     }
- 
--    iothread->once = (GOnce) G_ONCE_INIT;
--
-     /* This assumes we are called from a thread with useful CPU affinity for us
-      * to inherit.
-      */
-@@ -333,27 +349,10 @@ IOThreadInfoList *qmp_query_iothreads(Error **errp)
-     return head;
++    g_main_context_pop_thread_default(iothread->worker_context);
+     rcu_unregister_thread();
+     return NULL;
  }
- 
--static gpointer iothread_g_main_context_init(gpointer opaque)
--{
--    AioContext *ctx;
--    IOThread *iothread = opaque;
--    GSource *source;
--
--    iothread->worker_context = g_main_context_new();
--
--    ctx = iothread_get_aio_context(iothread);
--    source = aio_get_g_source(ctx);
--    g_source_attach(source, iothread->worker_context);
--    g_source_unref(source);
--
--    aio_notify(iothread->ctx);
--    return NULL;
--}
--
- GMainContext *iothread_get_g_main_context(IOThread *iothread)
- {
--    g_once(&iothread->once, iothread_g_main_context_init, iothread);
--
-+    atomic_set(&iothread->run_gcontext, 1);
-+    aio_notify(iothread->ctx);
-     return iothread->worker_context;
- }
- 
 -- 
 2.17.1
