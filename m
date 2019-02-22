@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41576)
+Received: from eggs.gnu.org ([209.51.188.92]:41688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZr-0006Xq-D9
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:25 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gxBa7-0006pA-Q6
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZi-0000vE-CZ
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:18 -0500
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:10:16 +0100
-Message-Id: <20190222141024.22217-27-kbastian@mail.uni-paderborn.de>
-In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
-References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
+	(envelope-from <stefanha@redhat.com>) id 1gxBZz-0001Mq-ID
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:35 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri, 22 Feb 2019 14:07:31 +0000
+Message-Id: <20190222140756.29834-3-stefanha@redhat.com>
+In-Reply-To: <20190222140756.29834-1-stefanha@redhat.com>
+References: <20190222140756.29834-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 26/34] target/riscv: Remove manual decoding
- of RV32/64M insn
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 02/27] block/io: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,482 +21,286 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Use new qemu_iovec_init_buf() instead of
+qemu_iovec_init_external( ... , 1), which simplifies the code.
+
+While being here, use qemu_try_blockalign0 as well.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20190218140926.333779-3-vsementsov@virtuozzo.com
+Message-Id: <20190218140926.333779-3-vsementsov@virtuozzo.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- target/riscv/insn_trans/trans_rvm.inc.c |  55 ++--
- target/riscv/translate.c                | 320 ++++++++++--------------
- 2 files changed, 164 insertions(+), 211 deletions(-)
+ block/io.c | 89 ++++++++++++------------------------------------------
+ 1 file changed, 20 insertions(+), 69 deletions(-)
 
-diff --git a/target/riscv/insn_trans/trans_rvm.inc.c b/target/riscv/insn_trans/trans_rvm.inc.c
-index 69631c9e37..d2bf2f1719 100644
---- a/target/riscv/insn_trans/trans_rvm.inc.c
-+++ b/target/riscv/insn_trans/trans_rvm.inc.c
-@@ -22,92 +22,99 @@
- static bool trans_mul(DisasContext *ctx, arg_mul *a)
+diff --git a/block/io.c b/block/io.c
+index 213ca03d8d..2ba603c7bc 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -843,17 +843,13 @@ static int bdrv_prwv_co(BdrvChild *child, int64_t o=
+ffset,
+ static int bdrv_rw_co(BdrvChild *child, int64_t sector_num, uint8_t *buf=
+,
+                       int nb_sectors, bool is_write, BdrvRequestFlags fl=
+ags)
  {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_MUL, a->rd, a->rs1, a->rs2);
--    return true;
-+    return trans_arith(ctx, a, &tcg_gen_mul_tl);
+-    QEMUIOVector qiov;
+-    struct iovec iov =3D {
+-        .iov_base =3D (void *)buf,
+-        .iov_len =3D nb_sectors * BDRV_SECTOR_SIZE,
+-    };
++    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf,
++                                            nb_sectors * BDRV_SECTOR_SIZ=
+E);
+=20
+     if (nb_sectors < 0 || nb_sectors > BDRV_REQUEST_MAX_SECTORS) {
+         return -EINVAL;
+     }
+=20
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+     return bdrv_prwv_co(child, sector_num << BDRV_SECTOR_BITS,
+                         &qiov, is_write, flags);
  }
- 
- static bool trans_mulh(DisasContext *ctx, arg_mulh *a)
+@@ -880,13 +876,8 @@ int bdrv_write(BdrvChild *child, int64_t sector_num,
+ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
+                        int bytes, BdrvRequestFlags flags)
  {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_MULH, a->rd, a->rs1, a->rs2);
-+    TCGv source1 = tcg_temp_new();
-+    TCGv source2 = tcg_temp_new();
-+    gen_get_gpr(source1, a->rs1);
-+    gen_get_gpr(source2, a->rs2);
-+
-+    tcg_gen_muls2_tl(source2, source1, source1, source2);
-+
-+    gen_set_gpr(a->rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-     return true;
+-    QEMUIOVector qiov;
+-    struct iovec iov =3D {
+-        .iov_base =3D NULL,
+-        .iov_len =3D bytes,
+-    };
++    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, NULL, bytes);
+=20
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+     return bdrv_prwv_co(child, offset, &qiov, true,
+                         BDRV_REQ_ZERO_WRITE | flags);
  }
- 
- static bool trans_mulhsu(DisasContext *ctx, arg_mulhsu *a)
+@@ -950,17 +941,12 @@ int bdrv_preadv(BdrvChild *child, int64_t offset, Q=
+EMUIOVector *qiov)
+=20
+ int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes)
  {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_MULHSU, a->rd, a->rs1, a->rs2);
--    return true;
-+    return trans_arith(ctx, a, &gen_mulhsu);
+-    QEMUIOVector qiov;
+-    struct iovec iov =3D {
+-        .iov_base =3D (void *)buf,
+-        .iov_len =3D bytes,
+-    };
++    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+=20
+     if (bytes < 0) {
+         return -EINVAL;
+     }
+=20
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+     return bdrv_preadv(child, offset, &qiov);
  }
- 
- static bool trans_mulhu(DisasContext *ctx, arg_mulhu *a)
+=20
+@@ -978,17 +964,12 @@ int bdrv_pwritev(BdrvChild *child, int64_t offset, =
+QEMUIOVector *qiov)
+=20
+ int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int b=
+ytes)
  {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_MULHU, a->rd, a->rs1, a->rs2);
-+    TCGv source1 = tcg_temp_new();
-+    TCGv source2 = tcg_temp_new();
-+    gen_get_gpr(source1, a->rs1);
-+    gen_get_gpr(source2, a->rs2);
-+
-+    tcg_gen_mulu2_tl(source2, source1, source1, source2);
-+
-+    gen_set_gpr(a->rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-     return true;
+-    QEMUIOVector qiov;
+-    struct iovec iov =3D {
+-        .iov_base   =3D (void *) buf,
+-        .iov_len    =3D bytes,
+-    };
++    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+=20
+     if (bytes < 0) {
+         return -EINVAL;
+     }
+=20
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+     return bdrv_pwritev(child, offset, &qiov);
  }
- 
- static bool trans_div(DisasContext *ctx, arg_div *a)
+=20
+@@ -1165,7 +1146,6 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(Bd=
+rvChild *child,
+     void *bounce_buffer;
+=20
+     BlockDriver *drv =3D bs->drv;
+-    struct iovec iov;
+     QEMUIOVector local_qiov;
+     int64_t cluster_offset;
+     int64_t cluster_bytes;
+@@ -1230,9 +1210,8 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(Bd=
+rvChild *child,
+=20
+         if (ret <=3D 0) {
+             /* Must copy-on-read; use the bounce buffer */
+-            iov.iov_base =3D bounce_buffer;
+-            iov.iov_len =3D pnum =3D MIN(pnum, MAX_BOUNCE_BUFFER);
+-            qemu_iovec_init_external(&local_qiov, &iov, 1);
++            pnum =3D MIN(pnum, MAX_BOUNCE_BUFFER);
++            qemu_iovec_init_buf(&local_qiov, bounce_buffer, pnum);
+=20
+             ret =3D bdrv_driver_preadv(bs, cluster_offset, pnum,
+                                      &local_qiov, 0);
+@@ -1477,7 +1456,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bl=
+ockDriverState *bs,
  {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_DIV, a->rd, a->rs1, a->rs2);
--    return true;
-+    return trans_arith(ctx, a, &gen_div);
+     BlockDriver *drv =3D bs->drv;
+     QEMUIOVector qiov;
+-    struct iovec iov =3D {0};
++    void *buf =3D NULL;
+     int ret =3D 0;
+     bool need_flush =3D false;
+     int head =3D 0;
+@@ -1547,16 +1526,14 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(=
+BlockDriverState *bs,
+                 need_flush =3D true;
+             }
+             num =3D MIN(num, max_transfer);
+-            iov.iov_len =3D num;
+-            if (iov.iov_base =3D=3D NULL) {
+-                iov.iov_base =3D qemu_try_blockalign(bs, num);
+-                if (iov.iov_base =3D=3D NULL) {
++            if (buf =3D=3D NULL) {
++                buf =3D qemu_try_blockalign0(bs, num);
++                if (buf =3D=3D NULL) {
+                     ret =3D -ENOMEM;
+                     goto fail;
+                 }
+-                memset(iov.iov_base, 0, num);
+             }
+-            qemu_iovec_init_external(&qiov, &iov, 1);
++            qemu_iovec_init_buf(&qiov, buf, num);
+=20
+             ret =3D bdrv_driver_pwritev(bs, offset, num, &qiov, write_fl=
+ags);
+=20
+@@ -1564,8 +1541,8 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bl=
+ockDriverState *bs,
+              * all future requests.
+              */
+             if (num < max_transfer) {
+-                qemu_vfree(iov.iov_base);
+-                iov.iov_base =3D NULL;
++                qemu_vfree(buf);
++                buf =3D NULL;
+             }
+         }
+=20
+@@ -1577,7 +1554,7 @@ fail:
+     if (ret =3D=3D 0 && need_flush) {
+         ret =3D bdrv_co_flush(bs);
+     }
+-    qemu_vfree(iov.iov_base);
++    qemu_vfree(buf);
+     return ret;
  }
- 
- static bool trans_divu(DisasContext *ctx, arg_divu *a)
+=20
+@@ -1763,7 +1740,6 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(Bdr=
+vChild *child,
+     BlockDriverState *bs =3D child->bs;
+     uint8_t *buf =3D NULL;
+     QEMUIOVector local_qiov;
+-    struct iovec iov;
+     uint64_t align =3D bs->bl.request_alignment;
+     unsigned int head_padding_bytes, tail_padding_bytes;
+     int ret =3D 0;
+@@ -1775,11 +1751,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(Bd=
+rvChild *child,
+     assert(flags & BDRV_REQ_ZERO_WRITE);
+     if (head_padding_bytes || tail_padding_bytes) {
+         buf =3D qemu_blockalign(bs, align);
+-        iov =3D (struct iovec) {
+-            .iov_base   =3D buf,
+-            .iov_len    =3D align,
+-        };
+-        qemu_iovec_init_external(&local_qiov, &iov, 1);
++        qemu_iovec_init_buf(&local_qiov, buf, align);
+     }
+     if (head_padding_bytes) {
+         uint64_t zero_bytes =3D MIN(bytes, align - head_padding_bytes);
+@@ -1885,17 +1857,12 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child=
+,
+=20
+     if (offset & (align - 1)) {
+         QEMUIOVector head_qiov;
+-        struct iovec head_iov;
+=20
+         mark_request_serialising(&req, align);
+         wait_serialising_requests(&req);
+=20
+         head_buf =3D qemu_blockalign(bs, align);
+-        head_iov =3D (struct iovec) {
+-            .iov_base   =3D head_buf,
+-            .iov_len    =3D align,
+-        };
+-        qemu_iovec_init_external(&head_qiov, &head_iov, 1);
++        qemu_iovec_init_buf(&head_qiov, head_buf, align);
+=20
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
+         ret =3D bdrv_aligned_preadv(child, &req, offset & ~(align - 1), =
+align,
+@@ -1924,7 +1891,6 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+=20
+     if ((offset + bytes) & (align - 1)) {
+         QEMUIOVector tail_qiov;
+-        struct iovec tail_iov;
+         size_t tail_bytes;
+         bool waited;
+=20
+@@ -1933,11 +1899,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+         assert(!waited || !use_local_qiov);
+=20
+         tail_buf =3D qemu_blockalign(bs, align);
+-        tail_iov =3D (struct iovec) {
+-            .iov_base   =3D tail_buf,
+-            .iov_len    =3D align,
+-        };
+-        qemu_iovec_init_external(&tail_qiov, &tail_iov, 1);
++        qemu_iovec_init_buf(&tail_qiov, tail_buf, align);
+=20
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
+         ret =3D bdrv_aligned_preadv(child, &req, (offset + bytes) & ~(al=
+ign - 1),
+@@ -2468,15 +2430,9 @@ bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector=
+ *qiov, int64_t pos,
+ int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
+                       int64_t pos, int size)
  {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_DIVU, a->rd, a->rs1, a->rs2);
--    return true;
-+    return trans_arith(ctx, a, &gen_divu);
- }
- 
- static bool trans_rem(DisasContext *ctx, arg_rem *a)
- {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_REM, a->rd, a->rs1, a->rs2);
--    return true;
-+    return trans_arith(ctx, a, &gen_rem);
- }
- 
- static bool trans_remu(DisasContext *ctx, arg_remu *a)
- {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_REMU, a->rd, a->rs1, a->rs2);
--    return true;
-+    return trans_arith(ctx, a, &gen_remu);
- }
- 
- #ifdef TARGET_RISCV64
- static bool trans_mulw(DisasContext *ctx, arg_mulw *a)
- {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_MULW, a->rd, a->rs1, a->rs2);
--    return true;
-+    return trans_arith(ctx, a, &gen_mulw);
- }
- 
- static bool trans_divw(DisasContext *ctx, arg_divw *a)
- {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_DIVW, a->rd, a->rs1, a->rs2);
--    return true;
-+    return gen_arith_div_w(ctx, a, &gen_div);
- }
- 
- static bool trans_divuw(DisasContext *ctx, arg_divuw *a)
- {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_DIVUW, a->rd, a->rs1, a->rs2);
--    return true;
-+    return gen_arith_div_w(ctx, a, &gen_divu);
- }
- 
- static bool trans_remw(DisasContext *ctx, arg_remw *a)
- {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_REMW, a->rd, a->rs1, a->rs2);
--    return true;
-+    return gen_arith_div_w(ctx, a, &gen_rem);
- }
- 
- static bool trans_remuw(DisasContext *ctx, arg_remuw *a)
- {
-     REQUIRE_EXT(ctx, RVM);
--    gen_arith(ctx, OPC_RISC_REMUW, a->rd, a->rs1, a->rs2);
--    return true;
-+    return gen_arith_div_w(ctx, a, &gen_remu);
- }
- #endif
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 9ae40f6509..3cd7e16c63 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -188,193 +188,112 @@ static void gen_mulhsu(TCGv ret, TCGv arg1, TCGv arg2)
-     tcg_temp_free(rh);
- }
- 
--static void gen_arith(DisasContext *ctx, uint32_t opc, int rd, int rs1,
--        int rs2)
--{
--    TCGv source1, source2, cond1, cond2, zeroreg, resultopt1;
--    source1 = tcg_temp_new();
--    source2 = tcg_temp_new();
--    gen_get_gpr(source1, rs1);
--    gen_get_gpr(source2, rs2);
+-    QEMUIOVector qiov;
+-    struct iovec iov =3D {
+-        .iov_base   =3D (void *) buf,
+-        .iov_len    =3D size,
+-    };
++    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, size);
+     int ret;
+=20
+-    qemu_iovec_init_external(&qiov, &iov, 1);
 -
--    switch (opc) {
--    CASE_OP_32_64(OPC_RISC_MUL):
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        tcg_gen_mul_tl(source1, source1, source2);
--        break;
--    case OPC_RISC_MULH:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        tcg_gen_muls2_tl(source2, source1, source1, source2);
--        break;
--    case OPC_RISC_MULHSU:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        gen_mulhsu(source1, source1, source2);
--        break;
--    case OPC_RISC_MULHU:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        tcg_gen_mulu2_tl(source2, source1, source1, source2);
--        break;
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_DIVW:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        tcg_gen_ext32s_tl(source1, source1);
--        tcg_gen_ext32s_tl(source2, source2);
--        /* fall through to DIV */
--#endif
--    case OPC_RISC_DIV:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        /* Handle by altering args to tcg_gen_div to produce req'd results:
--         * For overflow: want source1 in source1 and 1 in source2
--         * For div by zero: want -1 in source1 and 1 in source2 -> -1 result */
--        cond1 = tcg_temp_new();
--        cond2 = tcg_temp_new();
--        zeroreg = tcg_const_tl(0);
--        resultopt1 = tcg_temp_new();
--
--        tcg_gen_movi_tl(resultopt1, (target_ulong)-1);
--        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, (target_ulong)(~0L));
--        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source1,
--                            ((target_ulong)1) << (TARGET_LONG_BITS - 1));
--        tcg_gen_and_tl(cond1, cond1, cond2); /* cond1 = overflow */
--        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, 0); /* cond2 = div 0 */
--        /* if div by zero, set source1 to -1, otherwise don't change */
--        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond2, zeroreg, source1,
--                resultopt1);
--        /* if overflow or div by zero, set source2 to 1, else don't change */
--        tcg_gen_or_tl(cond1, cond1, cond2);
--        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
--        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
--                resultopt1);
--        tcg_gen_div_tl(source1, source1, source2);
--
--        tcg_temp_free(cond1);
--        tcg_temp_free(cond2);
--        tcg_temp_free(zeroreg);
--        tcg_temp_free(resultopt1);
--        break;
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_DIVUW:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        tcg_gen_ext32u_tl(source1, source1);
--        tcg_gen_ext32u_tl(source2, source2);
--        /* fall through to DIVU */
--#endif
--    case OPC_RISC_DIVU:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        cond1 = tcg_temp_new();
--        zeroreg = tcg_const_tl(0);
--        resultopt1 = tcg_temp_new();
--
--        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0);
--        tcg_gen_movi_tl(resultopt1, (target_ulong)-1);
--        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, source1,
--                resultopt1);
--        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
--        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
--                resultopt1);
--        tcg_gen_divu_tl(source1, source1, source2);
--
--        tcg_temp_free(cond1);
--        tcg_temp_free(zeroreg);
--        tcg_temp_free(resultopt1);
--        break;
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_REMW:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        tcg_gen_ext32s_tl(source1, source1);
--        tcg_gen_ext32s_tl(source2, source2);
--        /* fall through to REM */
--#endif
--    case OPC_RISC_REM:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        cond1 = tcg_temp_new();
--        cond2 = tcg_temp_new();
--        zeroreg = tcg_const_tl(0);
--        resultopt1 = tcg_temp_new();
--
--        tcg_gen_movi_tl(resultopt1, 1L);
--        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, (target_ulong)-1);
--        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source1,
--                            (target_ulong)1 << (TARGET_LONG_BITS - 1));
--        tcg_gen_and_tl(cond2, cond1, cond2); /* cond1 = overflow */
--        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0); /* cond2 = div 0 */
--        /* if overflow or div by zero, set source2 to 1, else don't change */
--        tcg_gen_or_tl(cond2, cond1, cond2);
--        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond2, zeroreg, source2,
--                resultopt1);
--        tcg_gen_rem_tl(resultopt1, source1, source2);
--        /* if div by zero, just return the original dividend */
--        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, resultopt1,
--                source1);
--
--        tcg_temp_free(cond1);
--        tcg_temp_free(cond2);
--        tcg_temp_free(zeroreg);
--        tcg_temp_free(resultopt1);
--        break;
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_REMUW:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        tcg_gen_ext32u_tl(source1, source1);
--        tcg_gen_ext32u_tl(source2, source2);
--        /* fall through to REMU */
--#endif
--    case OPC_RISC_REMU:
--        if (!has_ext(ctx, RVM)) {
--            goto do_illegal;
--        }
--        cond1 = tcg_temp_new();
--        zeroreg = tcg_const_tl(0);
--        resultopt1 = tcg_temp_new();
--
--        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
--        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0);
--        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
--                resultopt1);
--        tcg_gen_remu_tl(resultopt1, source1, source2);
--        /* if div by zero, just return the original dividend */
--        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, resultopt1,
--                source1);
--
--        tcg_temp_free(cond1);
--        tcg_temp_free(zeroreg);
--        tcg_temp_free(resultopt1);
--        break;
--    do_illegal:
--    default:
--        gen_exception_illegal(ctx);
--        return;
--    }
--
--    if (opc & 0x8) { /* sign extend for W instructions */
--        tcg_gen_ext32s_tl(source1, source1);
--    }
--
--    gen_set_gpr(rd, source1);
--    tcg_temp_free(source1);
--    tcg_temp_free(source2);
-+static void gen_div(TCGv ret, TCGv source1, TCGv source2)
-+{
-+    TCGv cond1, cond2, zeroreg, resultopt1;
-+    /*
-+     * Handle by altering args to tcg_gen_div to produce req'd results:
-+     * For overflow: want source1 in source1 and 1 in source2
-+     * For div by zero: want -1 in source1 and 1 in source2 -> -1 result
-+     */
-+    cond1 = tcg_temp_new();
-+    cond2 = tcg_temp_new();
-+    zeroreg = tcg_const_tl(0);
-+    resultopt1 = tcg_temp_new();
-+
-+    tcg_gen_movi_tl(resultopt1, (target_ulong)-1);
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, (target_ulong)(~0L));
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source1,
-+                        ((target_ulong)1) << (TARGET_LONG_BITS - 1));
-+    tcg_gen_and_tl(cond1, cond1, cond2); /* cond1 = overflow */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, 0); /* cond2 = div 0 */
-+    /* if div by zero, set source1 to -1, otherwise don't change */
-+    tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond2, zeroreg, source1,
-+            resultopt1);
-+    /* if overflow or div by zero, set source2 to 1, else don't change */
-+    tcg_gen_or_tl(cond1, cond1, cond2);
-+    tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+    tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+            resultopt1);
-+    tcg_gen_div_tl(ret, source1, source2);
-+
-+    tcg_temp_free(cond1);
-+    tcg_temp_free(cond2);
-+    tcg_temp_free(zeroreg);
-+    tcg_temp_free(resultopt1);
-+}
-+
-+static void gen_divu(TCGv ret, TCGv source1, TCGv source2)
-+{
-+    TCGv cond1, zeroreg, resultopt1;
-+    cond1 = tcg_temp_new();
-+
-+    zeroreg = tcg_const_tl(0);
-+    resultopt1 = tcg_temp_new();
-+
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0);
-+    tcg_gen_movi_tl(resultopt1, (target_ulong)-1);
-+    tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, source1,
-+            resultopt1);
-+    tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+    tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+            resultopt1);
-+    tcg_gen_divu_tl(ret, source1, source2);
-+
-+    tcg_temp_free(cond1);
-+    tcg_temp_free(zeroreg);
-+    tcg_temp_free(resultopt1);
-+}
-+
-+static void gen_rem(TCGv ret, TCGv source1, TCGv source2)
-+{
-+    TCGv cond1, cond2, zeroreg, resultopt1;
-+
-+    cond1 = tcg_temp_new();
-+    cond2 = tcg_temp_new();
-+    zeroreg = tcg_const_tl(0);
-+    resultopt1 = tcg_temp_new();
-+
-+    tcg_gen_movi_tl(resultopt1, 1L);
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, (target_ulong)-1);
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source1,
-+                        (target_ulong)1 << (TARGET_LONG_BITS - 1));
-+    tcg_gen_and_tl(cond2, cond1, cond2); /* cond1 = overflow */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0); /* cond2 = div 0 */
-+    /* if overflow or div by zero, set source2 to 1, else don't change */
-+    tcg_gen_or_tl(cond2, cond1, cond2);
-+    tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond2, zeroreg, source2,
-+            resultopt1);
-+    tcg_gen_rem_tl(resultopt1, source1, source2);
-+    /* if div by zero, just return the original dividend */
-+    tcg_gen_movcond_tl(TCG_COND_EQ, ret, cond1, zeroreg, resultopt1,
-+            source1);
-+
-+    tcg_temp_free(cond1);
-+    tcg_temp_free(cond2);
-+    tcg_temp_free(zeroreg);
-+    tcg_temp_free(resultopt1);
-+}
-+
-+static void gen_remu(TCGv ret, TCGv source1, TCGv source2)
-+{
-+    TCGv cond1, zeroreg, resultopt1;
-+    cond1 = tcg_temp_new();
-+    zeroreg = tcg_const_tl(0);
-+    resultopt1 = tcg_temp_new();
-+
-+    tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0);
-+    tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+            resultopt1);
-+    tcg_gen_remu_tl(resultopt1, source1, source2);
-+    /* if div by zero, just return the original dividend */
-+    tcg_gen_movcond_tl(TCG_COND_EQ, ret, cond1, zeroreg, resultopt1,
-+            source1);
-+
-+    tcg_temp_free(cond1);
-+    tcg_temp_free(zeroreg);
-+    tcg_temp_free(resultopt1);
- }
- 
- static void gen_jal(DisasContext *ctx, int rd, target_ulong imm)
-@@ -681,6 +600,33 @@ static void gen_subw(TCGv ret, TCGv arg1, TCGv arg2)
-     tcg_gen_ext32s_tl(ret, ret);
- }
- 
-+static void gen_mulw(TCGv ret, TCGv arg1, TCGv arg2)
-+{
-+    tcg_gen_mul_tl(ret, arg1, arg2);
-+    tcg_gen_ext32s_tl(ret, ret);
-+}
-+
-+static bool gen_arith_div_w(DisasContext *ctx, arg_r *a,
-+                            void(*func)(TCGv, TCGv, TCGv))
-+{
-+    TCGv source1, source2;
-+    source1 = tcg_temp_new();
-+    source2 = tcg_temp_new();
-+
-+    gen_get_gpr(source1, a->rs1);
-+    gen_get_gpr(source2, a->rs2);
-+    tcg_gen_ext32s_tl(source1, source1);
-+    tcg_gen_ext32s_tl(source2, source2);
-+
-+    (*func)(source1, source1, source2);
-+
-+    tcg_gen_ext32s_tl(source1, source1);
-+    gen_set_gpr(a->rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-+    return true;
-+}
-+
- #endif
- 
- static bool trans_arith(DisasContext *ctx, arg_r *a,
--- 
+     ret =3D bdrv_writev_vmstate(bs, &qiov, pos);
+     if (ret < 0) {
+         return ret;
+@@ -2493,14 +2449,9 @@ int bdrv_writev_vmstate(BlockDriverState *bs, QEMU=
+IOVector *qiov, int64_t pos)
+ int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
+                       int64_t pos, int size)
+ {
+-    QEMUIOVector qiov;
+-    struct iovec iov =3D {
+-        .iov_base   =3D buf,
+-        .iov_len    =3D size,
+-    };
++    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, size);
+     int ret;
+=20
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+     ret =3D bdrv_readv_vmstate(bs, &qiov, pos);
+     if (ret < 0) {
+         return ret;
+--=20
 2.20.1
