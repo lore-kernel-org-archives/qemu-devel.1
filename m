@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36193)
+Received: from eggs.gnu.org ([209.51.188.92]:39039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1gxGbD-0000bM-En
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:35:08 -0500
+	(envelope-from <crosa@redhat.com>) id 1gxGhz-0003qr-0W
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:42:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1gxGbC-0000D5-8K
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:35:07 -0500
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:59428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brogers@suse.com>) id 1gxGbB-0008T6-Sk
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:35:06 -0500
-Message-Id: <5C704EE6020000480009762E@prv-mh.provo.novell.com>
-Date: Fri, 22 Feb 2019 12:35:02 -0700
-From: "Bruce Rogers" <brogers@suse.com>
-References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-	<155085420337.11803.15680355453597063606.malone@gac.canonical.com>
-In-Reply-To: <155085420337.11803.15680355453597063606.malone@gac.canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	(envelope-from <crosa@redhat.com>) id 1gxGhx-00088R-Sn
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:42:06 -0500
+From: Cleber Rosa <crosa@redhat.com>
+Date: Fri, 22 Feb 2019 14:41:39 -0500
+Message-Id: <20190222194146.13102-1-crosa@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
- emulation failure
+Subject: [Qemu-devel] [PULL 0/7] Python queue, 2019-02-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +20,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 1813165@bugs.launchpad.net, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
->>> On 2/22/2019 at 9:50 AM, Vitaly Kuznetsov <1813165@bugs.launchpad.net> =
-wrote:
-> I sent a patch which is supposed to fix the issue:
-> https://marc.info/?l=3Dkvm&m=3D155085391830663&w=3D2=20
->=20
-> it would be great if someone could give it a spin!
->=20
+The following changes since commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62be1=
+16:
 
-I've been trying to get down to the bottom of this.
-It looks like you've got it.
-I can confirm that this fixes the issue for me. Thanks!
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-201902=
+21.0' into staging (2019-02-22 15:48:04 +0000)
 
-Tested-by: Bruce Rogers <brogers@suse.com>
+are available in the Git repository at:
 
+  git://github.com/clebergnu/qemu.git tags/python-next-pull-request
 
-> --=20
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1813165=20
->=20
-> Title:
->   KVM internal error. Suberror: 1 emulation failure
->=20
-> Status in QEMU:
->   New
->=20
-> Bug description:
->   Hello Devs.
->=20
->   Having problems getting VM to run with qemu 3.1.0. I should mention
->   it's a nested configuration.
->=20
->   2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, =
-qemu=20
-> version: 3.1.0, kernel: 4.14.94, hostname: one....
->   LC_ALL=3DC=20
-> PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/sbin:/usr/l=
-ocal/b
-> in:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_AUDIO_DRV=3Dnon=
-e=20
-> /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -object=20
-> secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1=
--one-266/m
-> aster-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,dump-guest-cor=
-e=3Doff=20
-> -cpu=20
-> Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_adjust=3Don,clflushopt=3D=
-on,ssbd=3Don,x
-> saves=3Don,pdpe1gb=3Don -m 1024 -realtime mlock=3Doff -smp=20
-> 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2f0-4128-a948-8673a7a=
-bf968=20
-> -no-user-config -nodefaults -chardev=20
-> socket,id=3Dcharmonitor,fd=3D21,server,nowait -mon=20
-> chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc =
--no-shutdown -boot=20
-> strict=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 =
--drive=20
-> file=3D/var/lib/one//datastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=
-=3Ddrive-virt
-> io-disk0,cache=3Dnone -device=20
-> virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-dis=
-k0,id=3Dvirtio
-> -disk0,bootindex=3D1,write-cache=3Don -drive=20
-> file=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3D=
-drive-ide0-0
-> -0,readonly=3Don -device=20
-> ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive-ide0-0-0,id=3Dide0-0-0 =
--netdev=20
-> tap,fd=3D23,id=3Dhostnet0 -device=20
-> rtl8139,netdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,a=
-ddr=3D0x3=20
-> -chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=
-=3Dserial0=20
-> -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 =
--device=20
-> virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbox=20
-> on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg=20
-> timestamp=3Don
->   char device redirected to /dev/pts/1 (label charserial0)
->   KVM internal error. Suberror: 1
->   emulation failure
->   EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
->   ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
->   EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 =
-HLT=3D0
->   ES =3D0010 00000000 ffffffff 00c09300
->   CS =3D0000 00000000 00000fff 00809b00
->   SS =3D0010 00000000 ffffffff 00c09300
->   DS =3D0010 00000000 ffffffff 00c09300
->   FS =3D0010 00000000 ffffffff 00c09300
->   GS =3D0010 00000000 ffffffff 00c09300
->   LDT=3D0000 00000000 0000ffff 00008200
->   TR =3D0000 00000000 0000ffff 00008b00
->   GDT=3D     10387cfe 0000fe6c
->   IDT=3D     0010387c 00003810
->   CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
->   DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000=20=
+for you to fetch changes up to 8f1c89ec7443e4fa2cf106d8fa1c1c97b6ddeffb:
 
-> DR3=3D0000000000000000
->   DR6=3D00000000fffecffc DR7=3D000000000e1e0400
->   EFER=3D0000000000000000
->   Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff =
-<0f> aa fa=20
-> fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8b =
-25 a8=20
-> 3b
->   2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid =
-2708=20
-> (/usr/sbin/libvirtd)
->=20
->   Someone has an idea whats going wrong here?
->=20
->   thanks and cheers
->   t.
->=20
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions=20
+  Acceptance tests: expect boot to extract 2GiB+ initrd with linux-v4.16 =
+(2019-02-22 14:07:01 -0500)
+
+----------------------------------------------------------------
+Python queue, 2019-02-22
+
+Python:
+* introduce "python" directory with module namespace
+* log QEMU launch command line on qemu.QEMUMachine
+
+Acceptance Tests:
+* initrd 4GiB+ test
+* migration test
+* multi vm support in test class
+* bump Avocado version and drop ":avocado: enable"
+
+----------------------------------------------------------------
+
+Caio Carrara (2):
+  tests.acceptance: adds multi vm capability for acceptance tests
+  tests.acceptance: adds simple migration test
+
+Cleber Rosa (3):
+  Acceptance tests: drop usage of ":avocado: enable"
+  Introduce a Python module structure
+  scripts/qemu.py: log QEMU launch command line
+
+Li Zhijian (2):
+  Acceptance tests: use linux-3.6 and set vm memory to 4GiB
+  Acceptance tests: expect boot to extract 2GiB+ initrd with linux-v4.16
+
+ configure                                  |  1 +
+ docs/devel/testing.rst                     | 42 ++++++++++++++++-
+ scripts/qemu.py =3D> python/qemu/__init__.py | 12 +++--
+ {scripts/qmp =3D> python/qemu}/qmp.py        |  0
+ {scripts =3D> python/qemu}/qtest.py          |  5 +-
+ scripts/device-crash-test                  |  2 +
+ scripts/qmp/__init__.py                    |  0
+ scripts/qmp/qemu-ga-client                 |  5 +-
+ scripts/qmp/qmp-shell                      |  4 +-
+ scripts/render_block_graph.py              |  2 +
+ tests/acceptance/avocado_qemu/__init__.py  | 30 +++++++++---
+ tests/acceptance/boot_linux_console.py     |  1 -
+ tests/acceptance/linux_initrd.py           | 52 +++++++++++++++++----
+ tests/acceptance/migration.py              | 53 ++++++++++++++++++++++
+ tests/acceptance/version.py                |  1 -
+ tests/acceptance/virtio_version.py         |  3 +-
+ tests/acceptance/vnc.py                    |  1 -
+ tests/migration/guestperf/engine.py        |  7 +--
+ tests/qemu-iotests/235                     |  2 +-
+ tests/qemu-iotests/238                     |  2 +-
+ tests/qemu-iotests/iotests.py              |  4 +-
+ tests/requirements.txt                     |  2 +-
+ tests/vm/basevm.py                         |  2 +-
+ 23 files changed, 193 insertions(+), 40 deletions(-)
+ rename scripts/qemu.py =3D> python/qemu/__init__.py (98%)
+ rename {scripts/qmp =3D> python/qemu}/qmp.py (100%)
+ rename {scripts =3D> python/qemu}/qtest.py (98%)
+ delete mode 100644 scripts/qmp/__init__.py
+ create mode 100644 tests/acceptance/migration.py
+
+--=20
+2.20.1
