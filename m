@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53709)
+Received: from eggs.gnu.org ([209.51.188.92]:53981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gxHIx-0005j8-7X
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:20:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1gxHJg-0006Hh-Kf
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:21:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gxHIv-0005K9-Ay
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:20:18 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46830)
+	(envelope-from <bounces@canonical.com>) id 1gxHJf-0005tW-FI
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:21:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45434)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gxHIu-0005DH-UZ
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:20:17 -0500
-Received: by mail-pg1-x543.google.com with SMTP id 196so1586787pgf.13
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 12:20:11 -0800 (PST)
-References: <20190222055950.17403-1-richard.henderson@linaro.org>
-	<a46631f2-fc78-2f06-09f0-25b2563af52d@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <eab85d35-87c5-bf23-20cc-87e334b79049@linaro.org>
-Date: Fri, 22 Feb 2019 12:20:06 -0800
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gxHJf-0005g8-79
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:21:03 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gxHJQ-0007oe-6C
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 20:20:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 085A72E80CE
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 20:20:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <a46631f2-fc78-2f06-09f0-25b2563af52d@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/ppc: Add vector opcodes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Feb 2019 20:10:48 -0000
+From: Albert Damen <1813165@bugs.launchpad.net>
+Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
+Message-Id: <155086624868.11609.4420586563681709057.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
+ emulation failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-On 2/22/19 9:13 AM, Mark Cave-Ayland wrote:
-> On 22/02/2019 05:59, Richard Henderson wrote:
-> 
->> This requires VSX, not just Altivec, so Power7 or later.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>
->> At present there are no tunables that can avoid the 64-bit element
->> load/store requirement.  As with requiring AVX1 for x86 hosts, I'm
->> not sure it's worth inventing such a tunable for pre-power7 hosts.
->>
->> Tested vs aarch64 risu test cases.  It's probably worth testing
->> this vs Mark's target/ppc conversion.
-> 
-> Oooh this looks really exciting! However... I only have a G4 Mac Mini around that I
-> use for testing which is Altivec-only :(  Is it much work to support non-VSX hosts?
+The patch works fine for me too, many thanks!
 
-Hmm, dunno.  I'll think about it.
+-- =
 
-> This leads me to a related point that came up when Howard and I were testing the PPC
-> vector patches - how do we know at runtime which optimisations were being used, e.g.
-> what is the value of have_avx2 on a particular CPU running QEMU?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813165
 
-There is no way from within qemu itself.
+Title:
+  KVM internal error. Suberror: 1 emulation failure
 
-> Under Linux this isn't too bad since you can just do "cat /proc/cpuinfo | grep avx2"
-> but it becomes more tricky when getting bug reports from Windows users who aren't
-> particularly technical...
+Status in QEMU:
+  New
 
-Something like:
-https://www.intel.com/content/www/us/en/support/articles/000005651/processors.html
+Bug description:
+  Hello Devs.
 
-or any one of several other utilities that can display cpuid information.
+  Having problems getting VM to run with qemu 3.1.0. I should mention
+  it's a nested configuration.
 
+  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
 
-r~
+  Someone has an idea whats going wrong here?
+
+  thanks and cheers
+  t.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
