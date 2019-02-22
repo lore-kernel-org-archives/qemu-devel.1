@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60578)
+Received: from eggs.gnu.org ([209.51.188.92]:33467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx5eS-0006yH-8a
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:45 -0500
+	(envelope-from <lersek@redhat.com>) id 1gx5gL-00009I-53
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx5eN-0001aG-IW
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58270)
+	(envelope-from <lersek@redhat.com>) id 1gx5gK-000396-0l
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:55:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50458)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx5eM-0001OW-Fk
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:39 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 102C230084BD
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:53:31 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 22 Feb 2019 08:53:26 +0100
-Message-Id: <20190222075326.9850-16-kraxel@redhat.com>
-In-Reply-To: <20190222075326.9850-1-kraxel@redhat.com>
-References: <20190222075326.9850-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gx5gJ-0002tS-Lc
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:55:39 -0500
+References: <B9D713FC-5896-4923-9788-AF7EAA9B462D@oberlin.edu>
+	<ab1a67c0-8872-6e22-fc70-946bbcabb8a1@redhat.com>
+	<BD5AEBD4-0B91-4756-B8D6-C0E643CF1F42@oberlin.edu>
+	<87ftsl2clg.fsf@dusky.pond.sub.org>
+	<91720BD9-D5A6-4457-BC99-D2132550BEDA@oberlin.edu>
+	<87ef84z4v6.fsf@dusky.pond.sub.org>
+	<62E7EC09-CB88-4802-9D28-45B06C020614@oberlin.edu>
+	<87imxfssq1.fsf@dusky.pond.sub.org>
+	<E3178A67-9CFC-4CD5-921F-4EE5CCB46F62@oberlin.edu>
+	<87y36boe78.fsf@dusky.pond.sub.org>
+	<fdec6838-6051-427d-6192-f68a76171915@redhat.com>
+	<FBD3F2EA-638A-4B52-826B-7307B1D821C9@oberlin.edu>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <55f4fb09-6751-01f0-5946-f2297dc24b24@redhat.com>
+Date: Fri, 22 Feb 2019 08:55:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/15] display: add -display spice-app launching
- a Spice client
+In-Reply-To: <FBD3F2EA-638A-4B52-826B-7307B1D821C9@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Testing sysbus devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,333 +38,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 02/21/19 20:57, Stephen Checkoway wrote:
+> 
+> 
+>> On Feb 20, 2019, at 03:55, Laszlo Ersek <lersek@redhat.com> wrote:
+>>
+>> I would strongly prefer if the guest-side view wouldn't change at
+>> all.
+> 
+> It sounds like sector protection isn't something you want and it's not
+> something I currently need so unless that changes, I probably won't do
+> anything with it.
+> 
+> My goal is merely to implement some missing flash functionality that I
+> need to emulate some hardware that I have. My plan for doing this is
+> to not change any defaults (except for a few bug fixes) while doing
+> so. I'm happy for the qemu community to take as much or as little as
+> it finds useful.
+> 
+> I'll send a patch series for review in the normal fashion, but if
+> anyone wants to see my in-progress work, including tests, the diff is
+> available here
+> <https://github.com/qemu/qemu/compare/master...stevecheckoway:pflash02>.
+> 
+> For my own edification, I'm curious how you're currently dealing with
+> some regions of flash that are protected.
 
-Add a new display backend that will configure Spice to allow a remote
-client to control QEMU in a similar fashion as other QEMU display
-backend/UI like GTK.
+We aren't. The firmware has build-time constants that describe (a) what
+GPA range stands for the varstore area (so that it is writeable at least
+in SMM), and (b) what other range stands for the code area (which the
+firmware never attempts to write). These ranges are adjacent.
 
-For this to work, it will set up Spice server with a unix socket, and
-register a VC chardev that will be exposed as Spice ports. A QMP
-monitor is also exposed as a Spice port, this allows the remote client
-fuller qemu control and state handling.
+> I believe Markus mentioned using multiple flash devices.
 
-- doesn't handle VC set_echo() - this doesn't seem a strong
-  requirement, very few front-end use it
-- spice options can be tweaked with other -spice arguments
-- Windows support shouldn't be hard to do, but will probably use a TCP
-  port instead
-- we may want to watch the child process to quit automatically if it
-  crashed
+Yes. The firmware only has assumptions about GPA ranges, and
+expectations about writeability. Originally it targeted a single r/w
+chip, but it was possible to split that chip in two (one r/w and another
+r/o) without the firmware noticing or caring.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Tested-by: Victor Toso <victortoso@redhat.com>
-Message-id: 20190221110703.5775-12-marcandre.lureau@redhat.com
+> Are you overlapping the address ranges?
 
-[ kraxel: squash incremental fix ]
+No, we're not.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/spice-app.c   | 202 +++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- qapi/ui.json     |   7 +-
- qemu-options.hx  |   5 ++
- ui/Makefile.objs |   5 ++
- 4 files changed, 218 insertions(+), 1 deletion(-)
- create mode 100644 ui/spice-app.c
+> The current pflash_cfi02.c code assumes, but doesn't check that both
+> the total size of the chip as well as the size of each sector is a
+> power of two. If you wanted say 7 MB of read/write flash and 1 MB of
+> read-only flash, qemu might be willing to create a device with say 7
+> MB of storage, but it will definitely misbehave. (I added a check for
+> that here
+> <https://github.com/qemu/qemu/compare/master...stevecheckoway:pflash02#diff-d33881bd0ef099e2f46ebd4797c653bcR738>.)
 
-diff --git a/ui/spice-app.c b/ui/spice-app.c
-new file mode 100644
-index 000000000000..925b27b708bb
---- /dev/null
-+++ b/ui/spice-app.c
-@@ -0,0 +1,202 @@
-+/*
-+ * QEMU external Spice client display driver
-+ *
-+ * Copyright (c) 2018 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+
-+#include <gio/gio.h>
-+
-+#include "qemu-common.h"
-+#include "ui/console.h"
-+#include "qemu/config-file.h"
-+#include "qemu/option.h"
-+#include "qemu/cutils.h"
-+#include "qapi/error.h"
-+#include "io/channel-command.h"
-+#include "chardev/spice.h"
-+#include "sysemu/sysemu.h"
-+
-+static const char *tmp_dir;
-+static char *app_dir;
-+static char *sock_path;
-+
-+typedef struct VCChardev {
-+    SpiceChardev parent;
-+} VCChardev;
-+
-+#define TYPE_CHARDEV_VC "chardev-vc"
-+#define VC_CHARDEV(obj) OBJECT_CHECK(VCChardev, (obj), TYPE_CHARDEV_VC)
-+
-+static ChardevBackend *
-+chr_spice_backend_new(void)
-+{
-+    ChardevBackend *be =3D g_new0(ChardevBackend, 1);
-+
-+    be->type =3D CHARDEV_BACKEND_KIND_SPICEPORT;
-+    be->u.spiceport.data =3D g_new0(ChardevSpicePort, 1);
-+
-+    return be;
-+}
-+
-+static void vc_chr_open(Chardev *chr,
-+                        ChardevBackend *backend,
-+                        bool *be_opened,
-+                        Error **errp)
-+{
-+    ChardevBackend *be;
-+    const char *fqdn =3D NULL;
-+
-+    if (strstart(chr->label, "serial", NULL)) {
-+        fqdn =3D "org.qemu.console.serial.0";
-+    } else if (strstart(chr->label, "parallel", NULL)) {
-+        fqdn =3D "org.qemu.console.parallel.0";
-+    } else if (strstart(chr->label, "compat_monitor", NULL)) {
-+        fqdn =3D "org.qemu.monitor.hmp.0";
-+    }
-+
-+    be =3D chr_spice_backend_new();
-+    be->u.spiceport.data->fqdn =3D fqdn ?
-+        g_strdup(fqdn) : g_strdup_printf("org.qemu.console.%s", chr->lab=
-el);
-+    qemu_chr_open_spice_port(chr, be, be_opened, errp);
-+    qapi_free_ChardevBackend(be);
-+}
-+
-+static void vc_chr_set_echo(Chardev *chr, bool echo)
-+{
-+    /* TODO: set echo for frontends QMP and qtest */
-+}
-+
-+static void char_vc_class_init(ObjectClass *oc, void *data)
-+{
-+    ChardevClass *cc =3D CHARDEV_CLASS(oc);
-+
-+    cc->parse =3D qemu_chr_parse_vc;
-+    cc->open =3D vc_chr_open;
-+    cc->chr_set_echo =3D vc_chr_set_echo;
-+}
-+
-+static const TypeInfo char_vc_type_info =3D {
-+    .name =3D TYPE_CHARDEV_VC,
-+    .parent =3D TYPE_CHARDEV_SPICEPORT,
-+    .instance_size =3D sizeof(VCChardev),
-+    .class_init =3D char_vc_class_init,
-+};
-+
-+static void spice_app_atexit(void)
-+{
-+    if (sock_path) {
-+        unlink(sock_path);
-+    }
-+    if (tmp_dir) {
-+        rmdir(tmp_dir);
-+    }
-+    g_free(sock_path);
-+    g_free(app_dir);
-+}
-+
-+static void spice_app_display_early_init(DisplayOptions *opts)
-+{
-+    QemuOpts *qopts;
-+    ChardevBackend *be =3D chr_spice_backend_new();
-+    GError *err =3D NULL;
-+
-+    if (opts->has_full_screen) {
-+        error_report("spice-app full-screen isn't supported yet.");
-+        exit(1);
-+    }
-+    if (opts->has_window_close) {
-+        error_report("spice-app window-close isn't supported yet.");
-+        exit(1);
-+    }
-+
-+    atexit(spice_app_atexit);
-+
-+    if (qemu_name) {
-+        app_dir =3D g_build_filename(g_get_user_runtime_dir(),
-+                                   "qemu", qemu_name, NULL);
-+        if (g_mkdir_with_parents(app_dir, S_IRWXU) < -1) {
-+            error_report("Failed to create directory %s: %s",
-+                         app_dir, strerror(errno));
-+            exit(1);
-+        }
-+    } else {
-+        app_dir =3D g_dir_make_tmp(NULL, &err);
-+        tmp_dir =3D app_dir;
-+        if (err) {
-+            error_report("Failed to create temporary directory: %s",
-+                         err->message);
-+            exit(1);
-+        }
-+    }
-+
-+    type_register(&char_vc_type_info);
-+
-+    sock_path =3D g_strjoin("", app_dir, "/", "spice.sock", NULL);
-+    qopts =3D qemu_opts_create(qemu_find_opts("spice"), NULL, 0, &error_=
-abort);
-+    qemu_opt_set(qopts, "disable-ticketing", "on", &error_abort);
-+    qemu_opt_set(qopts, "unix", "on", &error_abort);
-+    qemu_opt_set(qopts, "addr", sock_path, &error_abort);
-+    qemu_opt_set(qopts, "image-compression", "off", &error_abort);
-+    qemu_opt_set(qopts, "streaming-video", "off", &error_abort);
-+    qemu_opt_set(qopts, "gl", opts->has_gl ? "on" : "off", &error_abort)=
-;
-+    display_opengl =3D opts->has_gl;
-+
-+    be->u.spiceport.data->fqdn =3D g_strdup("org.qemu.monitor.qmp.0");
-+    qemu_chardev_new("org.qemu.monitor.qmp", TYPE_CHARDEV_SPICEPORT,
-+                     be, NULL, &error_abort);
-+    qopts =3D qemu_opts_create(qemu_find_opts("mon"),
-+                             NULL, 0, &error_fatal);
-+    qemu_opt_set(qopts, "chardev", "org.qemu.monitor.qmp", &error_abort)=
-;
-+    qemu_opt_set(qopts, "mode", "control", &error_abort);
-+
-+    qapi_free_ChardevBackend(be);
-+}
-+
-+static void spice_app_display_init(DisplayState *ds, DisplayOptions *opt=
-s)
-+{
-+    GError *err =3D NULL;
-+    gchar *uri;
-+
-+    uri =3D g_strjoin("", "spice+unix://", app_dir, "/", "spice.sock", N=
-ULL);
-+    info_report("Launching display with URI: %s", uri);
-+    g_app_info_launch_default_for_uri(uri, NULL, &err);
-+    if (err) {
-+        error_report("Failed to launch %s URI: %s", uri, err->message);
-+        error_report("You need a capable Spice client, "
-+                     "such as virt-viewer 8.0");
-+        exit(1);
-+    }
-+    g_free(uri);
-+}
-+
-+static QemuDisplay qemu_display_spice_app =3D {
-+    .type       =3D DISPLAY_TYPE_SPICE_APP,
-+    .early_init =3D spice_app_display_early_init,
-+    .init       =3D spice_app_display_init,
-+};
-+
-+static void register_spice_app(void)
-+{
-+    qemu_display_register(&qemu_display_spice_app);
-+}
-+
-+type_init(register_spice_app);
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 7702ddf583a1..c5d1d7f09966 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1110,12 +1110,17 @@
- #
- # @cocoa: The Cocoa user interface.
- #
-+# @spice-app: Set up a Spice server and run the default associated
-+#             application to connect to it. The server will redirect
-+#             the serial console and QEMU monitors. (Since 4.0)
-+#
- # Since: 2.12
- #
- ##
- { 'enum'    : 'DisplayType',
-   'data'    : [ 'default', 'none', 'gtk', 'sdl',
--                'egl-headless', 'curses', 'cocoa' ] }
-+                'egl-headless', 'curses', 'cocoa',
-+                'spice-app'] }
-=20
- ##
- # @DisplayOptions:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 77bd98e20b14..c843126ebdeb 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1211,6 +1211,7 @@ STEXI
- ETEXI
-=20
- DEF("display", HAS_ARG, QEMU_OPTION_display,
-+    "-display spice-app[,gl=3Don|off]\n"
-     "-display sdl[,frame=3Don|off][,alt_grab=3Don|off][,ctrl_grab=3Don|o=
-ff]\n"
-     "            [,window_close=3Don|off][,gl=3Don|core|es|off]\n"
-     "-display gtk[,grab_on_hover=3Don|off][,gl=3Don|off]|\n"
-@@ -1262,6 +1263,10 @@ Start a VNC server on display <arg>
- @item egl-headless
- Offload all OpenGL operations to a local DRI device. For any graphical d=
-isplay,
- this display needs to be paired with either VNC or SPICE displays.
-+@item spice-app
-+Start QEMU as a Spice server and launch the default Spice client
-+application. The Spice server will redirect the serial consoles and
-+QEMU monitors. (Since 4.0)
- @end table
- ETEXI
-=20
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 7f8b3da79134..fe1a7aed97c2 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -49,6 +49,11 @@ curses.mo-objs :=3D curses.o
- curses.mo-cflags :=3D $(CURSES_CFLAGS)
- curses.mo-libs :=3D $(CURSES_LIBS)
-=20
-+common-obj-$(call land,$(CONFIG_SPICE),$(CONFIG_GIO)) +=3D spice-app.mo
-+spice-app.mo-objs :=3D spice-app.o
-+spice-app.mo-cflags :=3D $(GIO_CFLAGS)
-+spice-app.mo-libs :=3D $(GIO_LIBS)
-+
- common-obj-$(CONFIG_OPENGL) +=3D shader.o
- common-obj-$(CONFIG_OPENGL) +=3D console-gl.o
- common-obj-$(CONFIG_OPENGL) +=3D egl-helpers.o
---=20
-2.9.3
+OVMF and the q35/i440fx boards use cfi01. The 4KB sector size is assumed
+by both QEMU board code and OVMF. The 4KB sector size is not assumed (to
+my knowledge) by cfi01.pflash device model code.
+
+Regarding the full size of each cfi01.pflash chip, i440fx/q35 board code
+determines that dynamically from the file size (the only requirement is
+that the size be a multiple of the sector size). There is no assumption
+in the device model. In OVMF, the assumed/expected full size is
+hard-coded (build-time constant).
+
+Thanks
+Laszlo
