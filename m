@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51708)
+Received: from eggs.gnu.org ([209.51.188.92]:52820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gxCmn-0001nm-F2
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:30:50 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gxCoz-0003SC-IC
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:33:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gxCmj-00006L-4N
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:30:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60118)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gxCmi-0008VT-Kb
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:30:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gxCmh-0000hi-6b
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 15:30:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 248B02E80CC
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 15:30:43 +0000 (UTC)
+	(envelope-from <stefanha@redhat.com>) id 1gxCoy-0002Zg-8Q
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:33:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gxCox-0002Si-UX
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:33:04 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CEE2BE6A83
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 15:32:59 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri, 22 Feb 2019 15:32:54 +0000
+Message-Id: <20190222153254.22739-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 Feb 2019 15:24:04 -0000
-From: Thomas Huth <1815024@bugs.launchpad.net>
-Reply-To: Bug 1815024 <1815024@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155084904458.11423.8645344956177275214.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815024] Re: SIGILL on instruction "stck" under
- qemu-s390x in user mode
+Subject: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,58 +30,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Krempa <pkrempa@redhat.com>
 
-Fix has been merged:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D965018bea7ce79e1987
+QMP clients can usually detect the presence of features via schema
+introspection.  There are rare features that do not involve schema
+changes and are therefore impossible to detect with schema
+introspection.
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+This patch adds the query-qemu-capabilities command.  It returns a list
+of capabilities that this QEMU supports.
 
--- =
+The decision to make this a command rather than something statically
+defined in the schema is intentional.  It allows QEMU to decide which
+capabilities are available at runtime, if necessary.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815024
+This new interface is necessary so that QMP clients can discover that
+migrating disk image files is safe with cache.direct=3Doff on Linux.
+There is no other way to detect whether or not QEMU supports this.
 
-Title:
-  SIGILL on instruction "stck" under qemu-s390x in user mode
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ qapi/misc.json | 42 ++++++++++++++++++++++++++++++++++++++++++
+ qmp.c          | 18 ++++++++++++++++++
+ 2 files changed, 60 insertions(+)
 
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  qemu-s390x in user mode crashes with SIGILL (under host architecture
-  x86_64, running Debian unstable) when executing target instruction
-  "stck" ("STORE CLOCK", see
-  https://www-01.ibm.com/support/docview.wss?uid=3Disg26480faec85f44e238525=
-6d5200627dee&aid=3D1),
-  which is basically a kind of equivalent of Intel "rdtsc". The same
-  instruction works fine under qemu-s390x in system mode. The bug is
-  reproducible with both the qemu version distributed in Debian unstable
-  and with the latest upstream master (commit
-  47994e16b1d66411953623e7c0bf0cdcd50bd507).
-
-  This bug manifested itself as a crash of ssh-keygen program, which
-  uses "stck" to obtain some bits of randomness during key creation.
-  Bisection of the code led to the attached minimal example. Compile
-  with (inside an s390x system):
-
-   $ gcc -c -o test.o test.c
-   $ gcc -c -o rdtsc.o rdtsc.S
-   $ gcc -o test test.o rdtsc.o
-
-  Then run test. It will crash with SIGILL in user mode and run fine in
-  system mode. Also, compare with the original file at
-  https://github.com/openssl/openssl/blob/master/crypto/s390xcpuid.pl#L139
-  (there the instruction "stckf" is also used; it is probable that it
-  has the same problem if it is supported altogether, but it did not
-  test for this).
-
-  Running qemu-s390x with options -d
-  in_asm,out_asm,op,op_opt,exec,nochain,cpu gives the trace attached in
-  log.txt.
-
-  Thanks, Giovanni.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815024/+subscriptions
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 8b3ca4fdd3..9cf24919a3 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3051,3 +3051,45 @@
+   'data': 'NumaOptions',
+   'allow-preconfig': true
+ }
++
++##
++# @QemuCapability:
++#
++# Capabilities that are not otherwise introspectable.
++#
++# @migrate-with-cache-direct-off-on-linux:
++#  It is safe to migrate disk image files with cache.direct=3Doff on Lin=
+ux.
++#  Previously only cache.direct=3Don was supported for live migration.
++#
++# Since: 4.0
++##
++{ 'enum': 'QemuCapability',
++  'data': [
++    'migrate-with-cache-direct-off-on-linux'
++  ]
++}
++
++##
++# @QemuCapabilities:
++#
++# Capability information.
++#
++# @capabilities: supported capabilities
++#
++# Since: 4.0
++##
++{ 'struct': 'QemuCapabilities',
++  'data': { 'capabilities': ['QemuCapability'] } }
++
++##
++# @query-qemu-capabilities:
++#
++# Return the capabilities supported by this QEMU.  Most features can be
++# detected via schema introspection but some are not observable from the
++# schema.  This command offers a way to check for the presence of such
++# features.
++#
++# Since: 4.0
++##
++{ 'command': 'query-qemu-capabilities',
++  'returns': 'QemuCapabilities' }
+diff --git a/qmp.c b/qmp.c
+index b92d62cd5f..91a1228be7 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -717,3 +717,21 @@ MemoryInfo *qmp_query_memory_size_summary(Error **er=
+rp)
+=20
+     return mem_info;
+ }
++
++QemuCapabilities *qmp_query_qemu_capabilities(Error **errp)
++{
++    QemuCapabilities *caps =3D g_new0(QemuCapabilities, 1);
++    QemuCapabilityList **prev =3D &caps->capabilities;
++    QemuCapability cap_val;
++
++    /* Add all QemuCapability enum values defined in the schema */
++    for (cap_val =3D 0; cap_val < QEMU_CAPABILITY__MAX; cap_val++) {
++        QemuCapabilityList *cap =3D g_new0(QemuCapabilityList, 1);
++
++        cap->value =3D cap_val;
++        *prev =3D cap;
++        prev =3D &cap->next;
++    }
++
++    return caps;
++}
+--=20
+2.20.1
