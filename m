@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57874)
+Received: from eggs.gnu.org ([209.51.188.92]:32986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx3km-0006r4-RW
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:52:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1gx3qe-0000FJ-Hh
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:58:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx3ki-0000qF-Ty
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:52:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx3ki-0000Ix-CE
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:52:04 -0500
-Date: Fri, 22 Feb 2019 06:51:35 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190222055135.i7bpdamtzmkqfxjj@sirius.home.kraxel.org>
-References: <20190221110703.5775-1-marcandre.lureau@redhat.com>
-	<20190221110703.5775-12-marcandre.lureau@redhat.com>
-	<20190221132352.f66y5qljs7q4dmse@sirius.home.kraxel.org>
-	<CAJ+F1CJrfnqaeHcMveNzRUavmyxLpCRxfeertfV9SrH6-Vd86Q@mail.gmail.com>
-	<20190221143923.7k7fjyu64mcv4sdd@sirius.home.kraxel.org>
-	<CAJ+F1C+Kj5+J_-TXBmmGxzNOf_ehJ2xDzBAQoE8vjmUJJAChZA@mail.gmail.com>
-	<20190221151856.4ypn2zxq5entu6aj@sirius.home.kraxel.org>
-	<CAJ+F1CKn-9Zvf6RW3GXALC59cHOvr90GHc1z6Yc4skQZqxmcJQ@mail.gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1gx3qd-0005q2-A1
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 00:58:12 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190221183829.31019-1-philmd@redhat.com>
+Date: Fri, 22 Feb 2019 06:57:34 +0100
+In-Reply-To: <20190221183829.31019-1-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu,
+	21 Feb 2019 19:38:29 +0100")
+Message-ID: <87mumotlf5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKn-9Zvf6RW3GXALC59cHOvr90GHc1z6Yc4skQZqxmcJQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 11/11] display: add -display spice-app
- launching a Spice client
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/arm: Use object_initialize_child for
+ correct reference counting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,26 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Antony Pavlov <antonynpavlov@gmail.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Joel Stanley <joel@jms.id.au>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 
-  Hi,
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Would something like that be helpful?
-> 
-> diff --git a/ui/spice-app.c b/ui/spice-app.c
-> index 4f5229f3ee..69f92e440c 100644
-> --- a/ui/spice-app.c
-> +++ b/ui/spice-app.c
-> @@ -181,6 +181,7 @@ static void spice_app_display_init(DisplayState
-> *ds, DisplayOptions *opts)
->      g_app_info_launch_default_for_uri(uri, NULL, &err);
->      if (err) {
->          error_report("Failed to launch %s URI: %s", uri, err->message);
-> +        error_report("You need a capable Spice client, such as
-> virt-viewer 8.0");
+> As Thomas Huth explained:
+> "Both functions, object_initialize() and object_property_add_child()
+> increase the reference counter of the new object, so one of the
+> references has to be dropped afterwards to get the reference counting
+> right. Otherwise the child object will not be properly cleaned up
+> when the parent gets destroyed.
+> Thus let's use now object_initialize_child() instead to get the
+> reference counting here right."
+>
+> This patch was generated using the following Coccinelle script:
+>
+>  @use_object_initialize_child@
+>  identifier parent_obj;
+>  expression child;
+>  expression propname;
+>  expression child_type;
+>  expression errp;
+>  @@
+>  (
+>  -    object_initialize(&child, sizeof(child), child_type);
+>  -    object_property_add_child(parent_obj, propname, OBJECT(&child), NUL=
+L);
+>  +    object_initialize_child(parent_obj, propname,  &child, sizeof(child=
+),
+>  +                            child_type, &error_abort, NULL);
+>  |
+>  -    object_initialize(&child, sizeof(child), child_type);
+>  -    object_property_add_child(parent_obj, propname, OBJECT(&child), err=
+p);
+>  +    object_initialize_child(parent_obj, propname,  &child, sizeof(child=
+),
+>  +                            child_type, errp, NULL);
+>  )
+>
+> and a bit of manual fix-up for overly long lines.
+>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Inspired-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/arm/aspeed_soc.c          | 43 ++++++++++++++++++------------------
+>  hw/arm/bcm2835_peripherals.c | 41 +++++++++++++++++-----------------
+>  hw/arm/digic.c               |  4 ++--
+>  3 files changed, 45 insertions(+), 43 deletions(-)
+>
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index a27233d487..81665f2948 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -106,11 +106,11 @@ static void aspeed_soc_init(Object *obj)
+>      AspeedSoCClass *sc =3D ASPEED_SOC_GET_CLASS(s);
+>      int i;
+>=20=20
+> -    object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
+> -    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
+> +    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
+> +                            sc->info->cpu_type, &error_abort, NULL);
 
-Yep, looks good to me.  Can you send that as incremental patch?
+This flips from "ignore errors" to "abort on error".  Quite probably an
+improvement, but should be mentioned and justified in the commit
+message.
 
-thanks,
-  Gerd
+[...]
