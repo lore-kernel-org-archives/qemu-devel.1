@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40721)
+Received: from eggs.gnu.org ([209.51.188.92]:44645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gxCRv-0001bq-St
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:09:16 -0500
+	(envelope-from <berrange@redhat.com>) id 1gxCZW-00080d-3u
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:17:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gxCRt-0001Kz-Ls
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:09:15 -0500
-Received: from mail-eopbgr720091.outbound.protection.outlook.com
-	([40.107.72.91]:50134
-	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gxCRt-0001Gm-8i
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:09:13 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 22 Feb 2019 15:09:09 +0000
-Message-ID: <BN6PR2201MB1251CE53F93F35FFA399FABEC67F0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190218121322.DAB0474569F@zero.eik.bme.hu>
-In-Reply-To: <20190218121322.DAB0474569F@zero.eik.bme.hu>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <berrange@redhat.com>) id 1gxCZU-0004Oc-R0
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:17:06 -0500
+Date: Fri, 22 Feb 2019 15:16:55 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190222151655.GD25234@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190220145819.30969-1-berrange@redhat.com>
+	<20190220145819.30969-2-berrange@redhat.com>
+	<1b7cca35-0764-c365-169e-f46c033bd2e2@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] mips_fulong2e: Add on-board graphics
- chip
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1b7cca35-0764-c365-169e-f46c033bd2e2@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] iotests: ensure we print nbd server
+ log on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Huacai Chen <zltjiangshi@gmail.com>, "philmd@redhat.com" <philmd@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-> From: BALATON Zoltan <balaton@eik.bme.hu>
-> Subject: [PATCH v2] mips_fulong2e: Add on-board graphics chip
+On Fri, Feb 22, 2019 at 04:06:32PM +0100, Max Reitz wrote:
+> On 20.02.19 15:58, Daniel P. Berrang=C3=A9 wrote:
+> > If we abort the iotest early the server.log file might contain useful
+> > information for diagnosing the problem. Ensure its contents are
+> > displayed in this case.
+> >=20
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  tests/qemu-iotests/233 | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >=20
+> > diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
+> > index fc345a1a46..27932df075 100755
+> > --- a/tests/qemu-iotests/233
+> > +++ b/tests/qemu-iotests/233
+> > @@ -30,6 +30,8 @@ _cleanup()
+> >  {
+> >      nbd_server_stop
+> >      _cleanup_test_img
+> > +    # If we aborted early we want to see this log for diagnosis
+> > +    test -f "$TEST_DIR/server.log" && cat "$TEST_DIR/server.log"
+> >      rm -f "$TEST_DIR/server.log"
+> >      tls_x509_cleanup
+> >  }
+> > @@ -120,6 +122,7 @@ $QEMU_IO -f $IMGFMT -r -U -c 'r -P 0x22 1m 1m' "$=
+TEST_IMG" | _filter_qemu_io
+> >  echo
+> >  echo "=3D=3D final server log =3D=3D"
+> >  cat "$TEST_DIR/server.log"
+> > +rm -f $TEST_DIR/server.log
 >=20
-> Add (partial) emulation of the on-board GPU of the machine. This
-> allows the PMON2000 firmware to run and should also work with Linux
-> console but probably not with X yet.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Based-on: 20190218030257.624A7745694@zero.eik.bme.hu
-> ---
-> hw/mips/mips_fulong2e.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
->=20
+> I'm not sure how well the iotests currently cope with spaced dir names
+> anyway, but it looks weird to not use quotes here right after a line
+> that does.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Yes, that is a mistake since we tried quoting throughout the file
 
-Zoltan, perhaps you ought to create a mini series consisting of the patch
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg02471.html
-
-and this patch.
-
-I would like to apply this patch independently to MIPS queue, but I can't,
-because of interdependencies og the two patches.
-
-I would feel comfortable with both patches going through graphics pull
-request.
-
-Thanks again for all efforts!
-
-Aleksandar=
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
