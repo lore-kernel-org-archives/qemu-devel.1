@@ -1,36 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48798)
+Received: from eggs.gnu.org ([209.51.188.92]:50345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gwzkq-0006cd-OH
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 20:36:01 -0500
+	(envelope-from <mst@redhat.com>) id 1gx0mP-0004wn-96
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 21:41:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gwzkf-0004dl-5Q
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 20:35:49 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:40868)
+	(envelope-from <mst@redhat.com>) id 1gx0mN-0004yX-VF
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 21:41:37 -0500
+Received: from mail-qt1-f170.google.com ([209.85.160.170]:36265)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gwzke-00040q-6k
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 20:35:44 -0500
-Received: by mail-qt1-f195.google.com with SMTP id j36so816769qta.7
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 17:35:10 -0800 (PST)
-Date: Thu, 21 Feb 2019 20:35:07 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gx0mJ-00041f-Nh
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 21:41:33 -0500
+Received: by mail-qt1-f170.google.com with SMTP id p25so983267qtb.3
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 18:40:30 -0800 (PST)
+Date: Thu, 21 Feb 2019 21:40:27 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190221203003-mutt-send-email-mst@kernel.org>
-References: <0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
-	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
-	<20190218113447-mutt-send-email-mst@kernel.org>
-	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
-	<20190218183353-mutt-send-email-mst@kernel.org>
-	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
-	<CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
-	<a5c4b4a1-ea82-f357-e076-ade51ade7ddf@redhat.com>
-	<CAOEp5Ode1Ue0iLD4qUs+tcSGCZ+t+bm1TQpr3UG59jMU9kyVUg@mail.gmail.com>
-	<e6ea2819-ca95-796c-44e9-0067af82c46a@redhat.com>
+Message-ID: <20190221173326.31874-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e6ea2819-ca95-796c-44e9-0067af82c46a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
- not enabled by the guest
+Subject: [Qemu-devel] [PULL 00/26] pci, pc, virtio: fixes, cleanups, tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,116 +27,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Yuri Benditovich <yuri.benditovich@daynix.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, Feb 21, 2019 at 05:40:22PM +0800, Jason Wang wrote:
-> 
-> On 2019/2/21 下午4:18, Yuri Benditovich wrote:
-> 
->         For 1.0 device, we can fix the queue_enable, but for 0.9x device how do
->         you enable one specific queue in this case? (setting status?)
-> 
-> 
->     Do I understand correctly that for 0.9 device in some cases the device will
->     receive feature _MQ set, but will not receive VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET?
->     Or the problem is different?
-> 
-> 
-> Let me clarify, VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET is used to control the the
-> number of queue pairs used by device for doing transmission and reception. It
-> was not used to enable or disable a virtqueue.
-> 
-> For 1.0 device, we should use queue_enable in pci cfg to enable and disable
-> queue:
-> 
-> 
-> We could do:
-> 
-> 1) allocate memory and set queue_enable for vq0
-> 
-> 2) allocate memory and set queue_enable for vq1
-> 
-> 3) Set vq paris to 1
-> 
-> 4) allocate memory and set queue_enable for vq2
-> 
-> 5) allocate memory and set queue_enable for vq3
-> 
-> 6) set vq pairs to 2
+The following changes since commit fc3dbb90f2eb069801bfb4cfe9cbc83cf9c5f4a9:
 
+  Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-02-21 13:09:33 +0000)
 
-I do not think spec allows this.
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-The driver MUST follow this sequence to initialize a device:
-1. Reset the device.
-2. Set the ACKNOWLEDGE status bit: the guest OS has noticed the device.
-3. Set the DRIVER status bit: the guest OS knows how to drive the device.
-4. Read device feature bits, and write the subset of feature bits understood by the OS and driver to the
-device. During this step the driver MAY read (but MUST NOT write) the device-specific configuration
-fields to check that it can support the device before accepting it.
-5. Set the FEATURES_OK status bit. The driver MUST NOT accept new feature bits after this step.
-6. Re-read device status to ensure the FEATURES_OK bit is still set: otherwise, the device does not
-support our subset of features and the device is unusable.
-7. Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup,
-reading and possibly writing the device’s virtio configuration space, and population of virtqueues.
-8. Set the DRIVER_OK status bit. At this point the device is “live”.
+for you to fetch changes up to 1f8c04f18d2ee2f6ec88217dfd547ab38d2be5c5:
 
+  pci: Sanity test minimum downstream LNKSTA (2019-02-21 12:28:41 -0500)
 
-Thus vqs are setup at step 7.
+----------------------------------------------------------------
+pci, pc, virtio: fixes, cleanups, tests
 
-# of vq pairs are set up through a command which is a special
-buffer, and spec says:
+Lots of work on tests: BiosTablesTest UEFI app,
+vhost-user testing for non-Linux hosts.
+Misc cleanups and fixes all over the place
 
-The driver MUST NOT send any buffer available notifications to the device before setting DRIVER_OK.
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
+----------------------------------------------------------------
+Alex Williamson (1):
+      pci: Sanity test minimum downstream LNKSTA
 
-> 
-> But this requires a proper implementation for queue_enable for vhost which is
-> missed in qemu and probably what you really want to do.
-> 
-> but for 0.9x device, there's no such way to do this. That's the issue.
+Alexey Kardashevskiy (1):
+      pci: Move NVIDIA vendor id to the rest of ids
 
-0.9x there's no queue enable, assumption is PA!=0 means VQ has
-been enabled.
+Changpeng Liu (1):
+      contrib/vhost-user-blk: fix the compilation issue
 
+Daniel P. Berrangé (1):
+      hw/smbios: fix offset of type 3 sku field
 
-> So
-> driver must allocate all queBes before starting the device, otherwise there's
-> no way to enable it afterwards.
+David Gibson (5):
+      virtio-balloon: Remove unnecessary MADV_WILLNEED on deflate
+      virtio-balloon: Corrections to address verification
+      virtio-balloon: Rework ballon_page() interface
+      virtio-balloon: Use ram_block_discard_range() instead of raw madvise()
+      virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size
 
+Laszlo Ersek (5):
+      roms: add the edk2 project as a git submodule
+      roms: build the EfiRom utility from the roms/edk2 submodule
+      tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
+      tests/uefi-test-tools: add build scripts
+      tests/data: introduce "uefi-boot-images" with the "bios-tables-test" ISOs
 
-As per spec queues must be allocated before DRIVER_OK.
+Paolo Bonzini (9):
+      vhost-net: move stubs to a separate file
+      vhost-net-user: add stubs for when no virtio-net device is present
+      vhost: restrict Linux dependency to kernel vhost
+      vhost-user: support cross-endian vnet headers
+      vhost-net: compile it on all targets that have virtio-net.
+      vhost-net: revamp configure logic
+      vhost-user-test: create a main loop per TestServer
+      vhost-user-test: small changes to init_hugepagefs
+      vhost-user-test: create a temporary directory per TestServer
 
-That is universal.
+Peter Xu (1):
+      i386/kvm: ignore masked irqs when update msi routes
 
+Philippe Mathieu-Daudé (1):
+      Revert "contrib/vhost-user-blk: fix the compilation issue"
 
-> There're tricks to make it work like what is
-> done in your patch, but it depends on a specific implementation like qemu which
-> is sub-optimal.
-> 
-> 
-> 
-> 
->         A fundamental question is what prevents you from just initialization all
->         queues during driver start? It looks to me this save lots of efforts
->         than allocating queue dynamically.
-> 
-> 
->     This is not so trivial in Windows driver, as it does not have objects for queues
->     that it does not use. Linux driver first of all allocates all the
->     queues and then
->     adds Rx/Tx to those it will use. Windows driver first decides how many queues
->     it will use then allocates objects for them and initializes them from zero to
->     fully functional state.
-> 
-> 
-> Well, you just need to allocate some memory for the virtqueue, there's no need
-> to make it visible to the rest until it was enabled.
-> 
-> Thanks
-> 
-> 
-> 
-> 
+Wei Yang (1):
+      pc-dimm: use same mechanism for [get|set]_addr
+
+ configure                                          | 102 ++++++++-----
+ Makefile                                           |   6 +-
+ default-configs/virtio.mak                         |   4 +-
+ include/exec/poison.h                              |   1 -
+ include/hw/firmware/smbios.h                       |   1 +
+ include/hw/pci/pci_ids.h                           |   2 +
+ include/hw/virtio/virtio-balloon.h                 |   3 +
+ .../UefiTestToolsPkg/Include/Guid/BiosTablesTest.h |  67 +++++++++
+ hw/mem/pc-dimm.c                                   |   4 +-
+ hw/net/vhost_net-stub.c                            |  92 ++++++++++++
+ hw/net/vhost_net.c                                 |  85 +----------
+ hw/pci/pcie.c                                      |  13 +-
+ hw/smbios/smbios.c                                 |   1 +
+ hw/vfio/pci-quirks.c                               |   2 -
+ hw/virtio/vhost-backend.c                          |  12 +-
+ hw/virtio/vhost-user.c                             |  13 +-
+ hw/virtio/vhost.c                                  |   2 +-
+ hw/virtio/virtio-balloon.c                         | 102 ++++++++++---
+ net/net.c                                          |   2 +-
+ net/vhost-user-stub.c                              |  23 +++
+ net/vhost-user.c                                   |  13 ++
+ .../BiosTablesTest/BiosTablesTest.c                | 130 +++++++++++++++++
+ tests/vhost-user-test.c                            | 160 +++++++++++----------
+ .gitmodules                                        |   3 +
+ backends/Makefile.objs                             |   5 +-
+ hw/net/Makefile.objs                               |   4 +-
+ hw/virtio/Makefile.objs                            |   8 +-
+ net/Makefile.objs                                  |   4 +-
+ roms/Makefile                                      |  13 +-
+ roms/edk2                                          |   1 +
+ tests/Makefile.include                             |   5 +-
+ .../bios-tables-test.aarch64.iso.qcow2             | Bin 0 -> 11776 bytes
+ .../bios-tables-test.arm.iso.qcow2                 | Bin 0 -> 11776 bytes
+ .../bios-tables-test.i386.iso.qcow2                | Bin 0 -> 12800 bytes
+ .../bios-tables-test.x86_64.iso.qcow2              | Bin 0 -> 13312 bytes
+ tests/uefi-test-tools/.gitignore                   |   3 +
+ tests/uefi-test-tools/LICENSE                      |  25 ++++
+ tests/uefi-test-tools/Makefile                     | 106 ++++++++++++++
+ .../BiosTablesTest/BiosTablesTest.inf              |  41 ++++++
+ .../UefiTestToolsPkg/UefiTestToolsPkg.dec          |  27 ++++
+ .../UefiTestToolsPkg/UefiTestToolsPkg.dsc          |  69 +++++++++
+ tests/uefi-test-tools/build.sh                     | 145 +++++++++++++++++++
+ 42 files changed, 1051 insertions(+), 248 deletions(-)
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
+ create mode 100644 hw/net/vhost_net-stub.c
+ create mode 100644 net/vhost-user-stub.c
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c
+ create mode 160000 roms/edk2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2
+ create mode 100644 tests/uefi-test-tools/.gitignore
+ create mode 100644 tests/uefi-test-tools/LICENSE
+ create mode 100644 tests/uefi-test-tools/Makefile
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc
+ create mode 100755 tests/uefi-test-tools/build.sh
