@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39108)
+Received: from eggs.gnu.org ([209.51.188.92]:39240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gxGi2-0003tj-5i
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:42:11 -0500
+	(envelope-from <crosa@redhat.com>) id 1gxGi9-00041I-3e
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gxGi1-0008Co-4S
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:42:10 -0500
+	(envelope-from <crosa@redhat.com>) id 1gxGi8-0008Jg-3p
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 14:42:17 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Fri, 22 Feb 2019 14:41:43 -0500
-Message-Id: <20190222194146.13102-5-crosa@redhat.com>
+Date: Fri, 22 Feb 2019 14:41:45 -0500
+Message-Id: <20190222194146.13102-7-crosa@redhat.com>
 In-Reply-To: <20190222194146.13102-1-crosa@redhat.com>
 References: <20190222194146.13102-1-crosa@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/7] tests.acceptance: adds multi vm capability
- for acceptance tests
+Subject: [Qemu-devel] [PULL 6/7] Acceptance tests: use linux-3.6 and set vm
+ memory to 4GiB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +24,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-From: Caio Carrara <ccarrara@redhat.com>
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
 
-This change adds the possibility to write acceptance tests with multi
-virtual machine support. It's done keeping the virtual machines objects
-stored in a test attribute (dictionary). This dictionary shouldn't be
-accessed directly but through the new method added `get_vm`. This new
-method accept a list of args (that will be added as virtual machine
-arguments) and an optional name argument. The name is the key that
-identify a single virtual machine along the test machines available. If
-a name without a machine is informed a new machine will be instantiated.
+QEMU have already supported to load up to 4G initrd if the sepcified memo=
+ry is
+enough and XLF_CAN_BE_LOADED_ABOVE_4G is set by guest kernel
 
-The current usage of vm in tests will not be broken by this change since
-it keeps a property called vm in the base test class. This property only
-calls the new method `get_vm` with default parameters (no args and
-'default' as machine name).
+linux-3.6 kernel shipped by Fedora-18 cannot support xldflags so that it
+cannot support loading more than 2GiB initrd
 
-Signed-off-by: Caio Carrara <ccarrara@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+CC: Wainer dos Santos Moschetta <wainersm@redhat.com>
+CC: Caio Carrara <ccarrara@redhat.com>
+CC: Cleber Rosa <crosa@redhat.com>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-Id: <20190212193855.13223-2-ccarrara@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <1548638112-31101-1-git-send-email-lizhijian@cn.fujitsu.com>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- docs/devel/testing.rst                    | 41 ++++++++++++++++++++++-
- tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++---
- 2 files changed, 61 insertions(+), 5 deletions(-)
+ tests/acceptance/linux_initrd.py | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 3ce171829d..60f897d915 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -633,7 +633,46 @@ instance, available at ``self.vm``.  Because many te=
-sts will tweak the
- QEMU command line, launching the QEMUMachine (by using ``self.vm.launch(=
-)``)
- is left to the test writer.
+diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_in=
+itrd.py
+index 5a15fc4347..e33b5dcec0 100644
+--- a/tests/acceptance/linux_initrd.py
++++ b/tests/acceptance/linux_initrd.py
+@@ -23,14 +23,16 @@ class LinuxInitrd(Test):
 =20
--At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
-+The base test class has also support for tests with more than one
-+QEMUMachine. The way to get machines is through the ``self.get_vm()``
-+method which will return a QEMUMachine instance. The ``self.get_vm()``
-+method accepts arguments that will be passed to the QEMUMachine creation
-+and also an optional `name` attribute so you can identify a specific
-+machine and get it more than once through the tests methods. A simple
-+and hypothetical example follows:
-+
-+.. code::
-+
-+  from avocado_qemu import Test
-+
-+
-+  class MultipleMachines(Test):
-+      """
-+      :avocado: enable
-+      """
-+      def test_multiple_machines(self):
-+          first_machine =3D self.get_vm()
-+          second_machine =3D self.get_vm()
-+          self.get_vm(name=3D'third_machine').launch()
-+
-+          first_machine.launch()
-+          second_machine.launch()
-+
-+          first_res =3D first_machine.command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          second_res =3D second_machine.command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          third_res =3D self.get_vm(name=3D'third_machine').command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          self.assertEquals(first_res, second_res, third_res)
-+
-+At test "tear down", ``avocado_qemu.Test`` handles all the QEMUMachines
- shutdown.
+     timeout =3D 60
 =20
- QEMUMachine
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-index 28bfb8e9d3..a66ec72daa 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -10,6 +10,7 @@
+-    def test_with_2gib_file_should_exit_error_msg(self):
++    def test_with_2gib_file_should_exit_error_msg_with_linux_v3_6(self):
+         """
+         Pretends to boot QEMU with an initrd file with size of 2GiB
+         and expect it exits with error message.
++        Fedora-18 shipped with linux-3.6 which have not supported xloadf=
+lags
++        cannot support more than 2GiB initrd.
+         """
+-        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28/'
+-                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
+-        kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
++        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
+fedora/li'
++                      'nux/releases/18/Fedora/x86_64/os/images/pxeboot/v=
+mlinuz')
++        kernel_hash =3D '41464f68efe42b9991250bed86c7081d2ccdbb21'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+         max_size =3D 2 * (1024 ** 3) - 1
 =20
- import os
- import sys
-+import uuid
-=20
- import avocado
-=20
-@@ -41,13 +42,29 @@ def pick_default_qemu_bin():
-=20
- class Test(avocado.Test):
-     def setUp(self):
--        self.vm =3D None
-+        self._vms =3D {}
-         self.qemu_bin =3D self.params.get('qemu_bin',
-                                         default=3Dpick_default_qemu_bin(=
-))
-         if self.qemu_bin is None:
-             self.cancel("No QEMU binary defined or found in the source t=
-ree")
--        self.vm =3D QEMUMachine(self.qemu_bin)
-+
-+    def _new_vm(self, *args):
-+        vm =3D QEMUMachine(self.qemu_bin)
-+        if args:
-+            vm.add_args(*args)
-+        return vm
-+
-+    @property
-+    def vm(self):
-+        return self.get_vm(name=3D'default')
-+
-+    def get_vm(self, *args, name=3DNone):
-+        if not name:
-+            name =3D str(uuid.uuid4())
-+        if self._vms.get(name) is None:
-+            self._vms[name] =3D self._new_vm(*args)
-+        return self._vms[name]
-=20
-     def tearDown(self):
--        if self.vm is not None:
--            self.vm.shutdown()
-+        for vm in self._vms.values():
-+            vm.shutdown()
+@@ -38,8 +40,8 @@ class LinuxInitrd(Test):
+             initrd.seek(max_size)
+             initrd.write(b'\0')
+             initrd.flush()
+-            cmd =3D "%s -kernel %s -initrd %s" % (self.qemu_bin, kernel_=
+path,
+-                                                initrd.name)
++            cmd =3D "%s -kernel %s -initrd %s -m 4096" % (
++                  self.qemu_bin, kernel_path, initrd.name)
+             res =3D run(cmd, ignore_status=3DTrue)
+             self.assertEqual(res.exit_status, 1)
+             expected_msg =3D r'.*initrd is too large.*max: \d+, need %s.=
+*' % (
 --=20
 2.20.1
