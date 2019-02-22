@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55124)
+Received: from eggs.gnu.org ([209.51.188.92]:56337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gxCsm-0006Of-Ve
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:37:02 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gxCur-0007vK-B2
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:39:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gxCsl-0000wQ-RF
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:37:00 -0500
-Date: Fri, 22 Feb 2019 16:36:42 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190222163642.51cff565@redhat.com>
-In-Reply-To: <20190220224003.4420-16-eric.auger@redhat.com>
-References: <20190220224003.4420-1-eric.auger@redhat.com>
-	<20190220224003.4420-16-eric.auger@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gxCuq-0005UP-GS
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:39:09 -0500
+Date: Fri, 22 Feb 2019 16:38:53 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190222153853.GC8035@dhcp-200-176.str.redhat.com>
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-9-kwolf@redhat.com>
+	<67996e1d-1d6f-2990-3b96-22554f261029@redhat.com>
+	<20190219085141.GC4727@localhost.localdomain>
+	<1a598bde-1921-3253-ff83-967927e45669@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 15/17] hw/arm/virt: Add nvdimm hot-plug
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="VrqPEDrXMn8OVzN4"
+Content-Disposition: inline
+In-Reply-To: <1a598bde-1921-3253-ff83-967927e45669@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 08/11] qcow2: Add basic data-file
  infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,148 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Wed, 20 Feb 2019 23:40:01 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
 
-> From: Kwangwoo Lee <kwangwoo.lee@sk.com>
-> 
-> Pre-plug and plug handlers are prepared for NVDIMM support.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-> ---
->  default-configs/arm-softmmu.mak |  2 ++
->  hw/arm/virt-acpi-build.c        |  6 ++++++
->  hw/arm/virt.c                   | 22 ++++++++++++++++++++++
->  include/hw/arm/virt.h           |  3 +++
->  4 files changed, 33 insertions(+)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 0a78421f72..03dbebb197 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -165,3 +165,5 @@ CONFIG_HIGHBANK=y
->  CONFIG_MUSICPAL=y
->  CONFIG_MEM_DEVICE=y
->  CONFIG_DIMM=y
-> +CONFIG_NVDIMM=y
-> +CONFIG_ACPI_NVDIMM=y
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 781eafaf5e..f086adfa82 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -784,6 +784,7 @@ static
->  void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->  {
->      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-> +    MachineState *ms = MACHINE(vms);
->      GArray *table_offsets;
->      unsigned dsdt, xsdt;
->      GArray *tables_blob = tables->table_data;
-> @@ -824,6 +825,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->          }
->      }
->  
-> +    if (vms->acpi_nvdimm_state.is_enabled) {
-> +        nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
-> +                          &vms->acpi_nvdimm_state, ms->ram_slots);
-> +    }
-> +
->      if (its_class_name() && !vmc->no_its) {
->          acpi_add_table(table_offsets, tables_blob);
->          build_iort(tables_blob, tables->linker, vms);
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 33ad9b3f63..1896920570 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -134,6 +134,7 @@ static const MemMapEntry base_memmap[] = {
->      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-> +    [VIRT_ACPI_IO] =            { 0x09070000, 0x00010000 },
->      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> @@ -1675,6 +1676,18 @@ static void machvirt_init(MachineState *machine)
->  
->      create_platform_bus(vms, pic);
->  
-> +    if (vms->acpi_nvdimm_state.is_enabled) {
-> +        AcpiNVDIMMState *acpi_nvdimm_state = &vms->acpi_nvdimm_state;
-> +
-> +        acpi_nvdimm_state->dsm_io.space_id = AML_AS_SYSTEM_MEMORY;
-> +        acpi_nvdimm_state->dsm_io.address =
-> +                vms->memmap[VIRT_ACPI_IO].base + NVDIMM_ACPI_IO_BASE;
-> +        acpi_nvdimm_state->dsm_io.bit_width = NVDIMM_ACPI_IO_LEN << 3;
-I'd prefer following style (well at least that's direction I try to push
-towards to when dealing with ACPI)
+--VrqPEDrXMn8OVzN4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-           const AcpiGenericAddress dsmio = {
-               .space_id = AML_AS_SYSTEM_MEMORY,
-               .address = vms->memmap[VIRT_ACPI_IO].base + NVDIMM_ACPI_IO_BASE,
-               .bit_width = NVDIMM_ACPI_IO_LEN << 3
-           };
+Am 22.02.2019 um 15:12 hat Max Reitz geschrieben:
+> On 19.02.19 09:51, Kevin Wolf wrote:
+> > Am 19.02.2019 um 00:57 hat Max Reitz geschrieben:
+> >> On 31.01.19 18:55, Kevin Wolf wrote:
+> >>> This adds a .bdrv_open option to specify the external data file node.
+> >>>
+> >>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> >>> ---
+> >>>  qapi/block-core.json |  3 ++-
+> >>>  block/qcow2.h        |  4 +++-
+> >>>  block/qcow2.c        | 25 +++++++++++++++++++++++--
+> >>>  3 files changed, 28 insertions(+), 4 deletions(-)
+> >>
+> >> [...]
+> >>
+> >>> diff --git a/block/qcow2.h b/block/qcow2.h
+> >>> index c161970882..e2114900b4 100644
+> >>> --- a/block/qcow2.h
+> >>> +++ b/block/qcow2.h
+> >>
+> >> [...]
+> >>
+> >>> @@ -205,7 +206,8 @@ enum {
+> >>>      QCOW2_INCOMPAT_DATA_FILE        =3D 1 << QCOW2_INCOMPAT_DATA_FIL=
+E_BITNR,
+> >>> =20
+> >>>      QCOW2_INCOMPAT_MASK          =3D QCOW2_INCOMPAT_DIRTY
+> >>> -                                 | QCOW2_INCOMPAT_CORRUPT,
+> >>> +                                 | QCOW2_INCOMPAT_CORRUPT
+> >>> +                                 | QCOW2_INCOMPAT_DATA_FILE,
+> >>
+> >> This hunk seems to belong somewhere else.
+> >=20
+> > Isn't this the first patch that actually allows opening images that have
+> > QCOW2_INCOMPAT_DATA_FILE set in their header?
+>=20
+> Oh, sorry.  I thought the mask was the mask of all incompatible
+> features, but it's actually the mask of supported incompatible features.
+>  Yep, then it's correct here.
+>=20
+> >>>  };
+> >>> =20
+> >>>  /* Compatible feature bits */
+> >>> diff --git a/block/qcow2.c b/block/qcow2.c
+> >>> index ac9934b3ed..376232d3f0 100644
+> >>> --- a/block/qcow2.c
+> >>> +++ b/block/qcow2.c
+> >>> @@ -1441,8 +1441,22 @@ static int coroutine_fn qcow2_do_open(BlockDri=
+verState *bs, QDict *options,
+> >>>          goto fail;
+> >>>      }
+> >>> =20
+> >>> -    /* TODO Open external data file */
+> >>> -    s->data_file =3D bs->file;
+> >>> +    /* Open external data file */
+> >>> +    if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+> >>> +        s->data_file =3D bdrv_open_child(NULL, options, "data-file",=
+ bs,
+> >>> +                                       &child_file, false, errp);
+> >>> +        if (!s->data_file) {
+> >>> +            ret =3D -EINVAL;
+> >>> +            goto fail;
+> >>> +        }
+> >>> +    } else if (qdict_get(options, QCOW2_OPT_DATA_FILE)) {
+> >>
+> >> I get the idea, but this isn't crumpled so this key may not exist (but
+> >> data-file.driver and data-file.filename may).  Of course the fact that
+> >> these options remain unused will be caught by the block layer, but that
+> >> makes the error message below a bit less useful.
+> >=20
+> > Hmm, good point... So you'd just leave out the check and always let the
+> > block layer complain (with a less than helpful message)? Or are you
+> > suggesting I should try and catch all cases somehow, even if that makes
+> > things quite a bit more complicated?
+>=20
+> I don't mind either way.  Nice error messages are nice as long as
+> they're not too much trouble.  It's just that this current state feels a
+> bit half-baked.
 
-           
-           nvdimm_init_acpi_state(&vms->acpi_nvdimm_state, sysmem, &dsmio,
-                                  vms->fw_cfg, OBJECT(vms),);
+I think catching everything is just not worth the effort. So I
+considered dropping the check. But then I thought that this half baked
+check will make sure that we'll get full coverage once qcow2 is
+converted to a QAPI-based open interface instead of forgetting to bring
+the check back. So I'm leaning towards just leaving it as it is now. If
+you like, I can add a comment that we know this is half baked.
 
-> +
-> +        nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
-> +                               vms->fw_cfg, OBJECT(vms));
-> +    }
-> +
->      vms->bootinfo.ram_size = machine->ram_size;
->      vms->bootinfo.kernel_filename = machine->kernel_filename;
->      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
-> @@ -1860,10 +1873,19 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
->                               DeviceState *dev, Error **errp)
->  {
->      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->      Error *local_err = NULL;
->  
->      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
->  
-> +    if (is_nvdimm) {
-> +        nvdimm_plug(&vms->acpi_nvdimm_state);
-> +    }
-> +
-> +out:
->      error_propagate(errp, local_err);
->  }
->  
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 7798462cb0..bd9cf68311 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -37,6 +37,7 @@
->  #include "hw/arm/arm.h"
->  #include "sysemu/kvm.h"
->  #include "hw/intc/arm_gicv3_common.h"
-> +#include "hw/mem/nvdimm.h"
->  
->  #define NUM_GICV2M_SPIS       64
->  #define NUM_VIRTIO_TRANSPORTS 32
-> @@ -77,6 +78,7 @@ enum {
->      VIRT_GPIO,
->      VIRT_SECURE_UART,
->      VIRT_SECURE_MEM,
-> +    VIRT_ACPI_IO,
->      VIRT_LOWMEMMAP_LAST,
->  };
->  
-> @@ -137,6 +139,7 @@ typedef struct {
->      hwaddr device_memory_base;
->      hwaddr device_memory_size;
->      bool extended_memmap;
-> +    AcpiNVDIMMState acpi_nvdimm_state;
->  } VirtMachineState;
->  
->  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+Kevin
+
+--VrqPEDrXMn8OVzN4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJccBeNAAoJEH8JsnLIjy/WzH4P/RH1OI2+HJ4HX1aiR4EQaHWI
+/sCye5xhXIXCKFnUmWBN1PxEYUUzyxtqdNrXmptxf1hmwNj9QaE66jx9iYaC8Oxh
+ll9SHDt2B0WMZJlpPnYXWMQ4XM5oGb+4R6dp3mEDqzAOSbARxtlny3+L/ogYHhHg
+FTMGJ7rHeKl0tSf0loALETYkYRd/+xKOsjaud8RMoTdndzceMDN6YcVy1CbV79mH
+S321bvfErXSLXQT4oMinzFQmTUlwzx9y44yG5qEzT/FmyCfAuYXNepgfEzccLDkI
+H0NqxSsK7uwc9/txPcT5HWgu+XZ+Loj44i1RmARFR3lDXTJY+B/XKWMM2eFgT6WO
+A5J+1WAJiWBl2kQUL6Ov2O70XvVJFO1hFtgtqVT03mYhz70Ly1Fb+zJTvRoXYewT
+2R3bjzy3V5faHOT83GjtbB5rQ+wdtOtqoUfEhjJq5fTHB+1bIrvip4L0fCA2n3ve
+bzMb19QWKUCRQbsF+jgbv0+XEguvmRp0u8M4VzzbIA8r6pXZc+0P2g+mWjjDPvro
+vIaxiSUtg6+EqtN6rghTjU2jYRTzgR0MXFnKDK/WmpddPQy8yWC5YNclpa3kQYjB
+XpY+B7/M+zNKQJ/NzTwn28f2zFUNSAqozW46TY01Jw7yxgPqD7lxfLbh8CNdi1u8
+OxILY7lgpo6Tjp8bqey0
+=pUxc
+-----END PGP SIGNATURE-----
+
+--VrqPEDrXMn8OVzN4--
