@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34998)
+Received: from eggs.gnu.org ([209.51.188.92]:35028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gxCHG-0000VD-Ry
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:16 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gxCHI-0000Vn-RQ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gxCF8-0007rG-HZ
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44704)
+	(envelope-from <jasowang@redhat.com>) id 1gxCF2-0007D7-7O
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:55:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57598)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gxCF7-00074S-V2
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:02 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gxCEz-0006Jz-Sa
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:55:54 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Feb 2019 22:55:17 +0800
-Message-Id: <1550847320-25110-11-git-send-email-jasowang@redhat.com>
+Date: Fri, 22 Feb 2019 22:55:10 +0800
+Message-Id: <1550847320-25110-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
 References: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 10/13] tests: Add a test for qemu self
- announcements
+Subject: [Qemu-devel] [PULL 03/13] migration: Add announce parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,139 +24,350 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vlad Yasevich <vyasevic@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-We now expose qemu_announce_self through QMP and HMP.  Add a test
-with some very basic packet validation (make sure we get a RARP).
+Add migration parameters that control RARP/GARP announcement timeouts.
 
-Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
+Based on earlier patches by myself and
+  Vladislav Yasevich <vyasevic@redhat.com>
+
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Acked-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- tests/Makefile.include     |  3 ++
- tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 86 insertions(+)
- create mode 100644 tests/test-announce-self.c
+ hmp.c                    |  28 +++++++++++++
+ include/migration/misc.h |   2 +
+ migration/migration.c    | 100 +++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/migration.json      |  53 +++++++++++++++++++++++--
+ 4 files changed, 180 insertions(+), 3 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index b39e989..1b0874c 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -144,6 +144,7 @@ check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
+diff --git a/hmp.c b/hmp.c
+index 1e006ee..f3db0bf 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -334,6 +334,18 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+     params = qmp_query_migrate_parameters(NULL);
  
- check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
- check-qtest-generic-y += tests/cdrom-test$(EXESUF)
-+gcov-files-generic-y = migration/savevm.c
+     if (params) {
++        monitor_printf(mon, "%s: %" PRIu64 " ms\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_ANNOUNCE_INITIAL),
++            params->announce_initial);
++        monitor_printf(mon, "%s: %" PRIu64 " ms\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_ANNOUNCE_MAX),
++            params->announce_max);
++        monitor_printf(mon, "%s: %" PRIu64 "\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_ANNOUNCE_ROUNDS),
++            params->announce_rounds);
++        monitor_printf(mon, "%s: %" PRIu64 " ms\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_ANNOUNCE_STEP),
++            params->announce_step);
+         assert(params->has_compress_level);
+         monitor_printf(mon, "%s: %u\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_LEVEL),
+@@ -1757,6 +1769,22 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+         p->has_max_postcopy_bandwidth = true;
+         visit_type_size(v, param, &p->max_postcopy_bandwidth, &err);
+         break;
++    case MIGRATION_PARAMETER_ANNOUNCE_INITIAL:
++        p->has_announce_initial = true;
++        visit_type_size(v, param, &p->announce_initial, &err);
++        break;
++    case MIGRATION_PARAMETER_ANNOUNCE_MAX:
++        p->has_announce_max = true;
++        visit_type_size(v, param, &p->announce_max, &err);
++        break;
++    case MIGRATION_PARAMETER_ANNOUNCE_ROUNDS:
++        p->has_announce_rounds = true;
++        visit_type_size(v, param, &p->announce_rounds, &err);
++        break;
++    case MIGRATION_PARAMETER_ANNOUNCE_STEP:
++        p->has_announce_step = true;
++        visit_type_size(v, param, &p->announce_step, &err);
++        break;
+     default:
+         assert(0);
+     }
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 4ebf24c..e837ab3 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -15,6 +15,7 @@
+ #define MIGRATION_MISC_H
  
- check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
+ #include "qemu/notify.h"
++#include "qapi/qapi-types-net.h"
  
-@@ -221,6 +222,7 @@ check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
- check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-i386-$(CONFIG_RTL8139_PCI) += tests/test-filter-redirector$(EXESUF)
- check-qtest-i386-y += tests/migration-test$(EXESUF)
-+check-qtest-i386-y += tests/test-announce-self$(EXESUF)
- check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
- check-qtest-i386-y += tests/numa-test$(EXESUF)
- check-qtest-x86_64-y += $(check-qtest-i386-y)
-@@ -258,6 +260,7 @@ check-qtest-ppc64-y += $(check-qtest-ppc-y)
- check-qtest-ppc64-$(CONFIG_PSERIES) += tests/spapr-phb-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_POWERNV) += tests/pnv-xscom-test$(EXESUF)
- check-qtest-ppc64-y += tests/migration-test$(EXESUF)
-+check-qtest-ppc64-y += tests/test-announce-self$(EXESUF)
- check-qtest-ppc64-$(CONFIG_PSERIES) += tests/rtas-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
-diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
-new file mode 100644
-index 0000000..2ff0c77
---- /dev/null
-+++ b/tests/test-announce-self.c
-@@ -0,0 +1,83 @@
+ /* migration/ram.c */
+ 
+@@ -38,6 +39,7 @@ int64_t self_announce_delay(int round)
+     return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
+ }
+ 
++AnnounceParameters *migrate_announce_params(void);
+ /* migration/savevm.c */
+ 
+ void dump_vmstate_json_to_file(FILE *out_fp);
+diff --git a/migration/migration.c b/migration/migration.c
+index a9c4c6f..ca9c35a 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -87,6 +87,15 @@
+  */
+ #define DEFAULT_MIGRATE_MAX_POSTCOPY_BANDWIDTH 0
+ 
 +/*
-+ * QTest testcase for qemu_announce_self
-+ *
-+ * Copyright (c) 2017 Red hat, Inc.
-+ * Copyright (c) 2014 SUSE LINUX Products GmbH
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * Parameters for self_announce_delay giving a stream of RARP/ARP
++ * packets after migration.
 + */
++#define DEFAULT_MIGRATE_ANNOUNCE_INITIAL  50
++#define DEFAULT_MIGRATE_ANNOUNCE_MAX     550
++#define DEFAULT_MIGRATE_ANNOUNCE_ROUNDS    5
++#define DEFAULT_MIGRATE_ANNOUNCE_STEP    100
 +
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qemu-common.h"
-+#include "qemu/sockets.h"
-+#include "qemu/iov.h"
-+#include "libqos/libqos-pc.h"
-+#include "libqos/libqos-spapr.h"
-+
-+#ifndef ETH_P_RARP
-+#define ETH_P_RARP 0x8035
-+#endif
-+
-+static QTestState *test_init(int socket)
+ static NotifierList migration_state_notifiers =
+     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
+ 
+@@ -740,10 +749,32 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->max_postcopy_bandwidth = s->parameters.max_postcopy_bandwidth;
+     params->has_max_cpu_throttle = true;
+     params->max_cpu_throttle = s->parameters.max_cpu_throttle;
++    params->has_announce_initial = true;
++    params->announce_initial = s->parameters.announce_initial;
++    params->has_announce_max = true;
++    params->announce_max = s->parameters.announce_max;
++    params->has_announce_rounds = true;
++    params->announce_rounds = s->parameters.announce_rounds;
++    params->has_announce_step = true;
++    params->announce_step = s->parameters.announce_step;
+ 
+     return params;
+ }
+ 
++AnnounceParameters *migrate_announce_params(void)
 +{
-+    char *args;
++    static AnnounceParameters ap;
 +
-+    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
-+                           "virtio-net-pci,netdev=hs0", socket);
++    MigrationState *s = migrate_get_current();
 +
-+    return qtest_start(args);
++    ap.initial = s->parameters.announce_initial;
++    ap.max = s->parameters.announce_max;
++    ap.rounds = s->parameters.announce_rounds;
++    ap.step = s->parameters.announce_step;
++
++    return &ap;
 +}
 +
-+
-+static void test_announce(int socket)
-+{
-+    char buffer[60];
-+    int len;
-+    QDict *rsp;
-+    int ret;
-+    uint16_t *proto = (uint16_t *)&buffer[12];
-+
-+    rsp = qmp("{ 'execute' : 'announce-self', "
-+                  " 'arguments': {"
-+                      " 'params': {"
-+                          " 'initial': 50, 'max': 550,"
-+                          " 'rounds': 10, 'step': 50 } } }");
-+    assert(!qdict_haskey(rsp, "error"));
-+    qobject_unref(rsp);
-+
-+    /* Catch the packet and make sure it's a RARP */
-+    ret = qemu_recv(socket, &len, sizeof(len), 0);
-+    g_assert_cmpint(ret, ==,  sizeof(len));
-+    len = ntohl(len);
-+
-+    ret = qemu_recv(socket, buffer, len, 0);
-+    g_assert_cmpint(*proto, ==, htons(ETH_P_RARP));
-+}
-+
-+static void setup(gconstpointer data)
-+{
-+    QTestState *qs;
-+    void (*func) (int socket) = data;
-+    int sv[2], ret;
-+
-+    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
-+    g_assert_cmpint(ret, !=, -1);
-+
-+    qs = test_init(sv[1]);
-+    func(sv[0]);
-+
-+    /* End test */
-+    close(sv[0]);
-+    qtest_quit(qs);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+    qtest_add_data_func("/virtio/net/test_announce_self", test_announce, setup);
-+
-+    return g_test_run();
-+}
+ /*
+  * Return true if we're already in the middle of a migration
+  * (i.e. any of the active or setup states)
+@@ -1117,6 +1148,35 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
+         return false;
+     }
+ 
++    if (params->has_announce_initial &&
++        params->announce_initial > 100000) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   "announce_initial",
++                   "is invalid, it must be less than 100000 ms");
++        return false;
++    }
++    if (params->has_announce_max &&
++        params->announce_max > 100000) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   "announce_max",
++                   "is invalid, it must be less than 100000 ms");
++       return false;
++    }
++    if (params->has_announce_rounds &&
++        params->announce_rounds > 1000) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   "announce_rounds",
++                   "is invalid, it must be in the range of 0 to 1000");
++       return false;
++    }
++    if (params->has_announce_step &&
++        (params->announce_step < 1 ||
++        params->announce_step > 10000)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   "announce_step",
++                   "is invalid, it must be in the range of 1 to 10000 ms");
++       return false;
++    }
+     return true;
+ }
+ 
+@@ -1191,6 +1251,18 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+     if (params->has_max_cpu_throttle) {
+         dest->max_cpu_throttle = params->max_cpu_throttle;
+     }
++    if (params->has_announce_initial) {
++        dest->announce_initial = params->announce_initial;
++    }
++    if (params->has_announce_max) {
++        dest->announce_max = params->announce_max;
++    }
++    if (params->has_announce_rounds) {
++        dest->announce_rounds = params->announce_rounds;
++    }
++    if (params->has_announce_step) {
++        dest->announce_step = params->announce_step;
++    }
+ }
+ 
+ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+@@ -1273,6 +1345,18 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+     if (params->has_max_cpu_throttle) {
+         s->parameters.max_cpu_throttle = params->max_cpu_throttle;
+     }
++    if (params->has_announce_initial) {
++        s->parameters.announce_initial = params->announce_initial;
++    }
++    if (params->has_announce_max) {
++        s->parameters.announce_max = params->announce_max;
++    }
++    if (params->has_announce_rounds) {
++        s->parameters.announce_rounds = params->announce_rounds;
++    }
++    if (params->has_announce_step) {
++        s->parameters.announce_step = params->announce_step;
++    }
+ }
+ 
+ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+@@ -3275,6 +3359,18 @@ static Property migration_properties[] = {
+     DEFINE_PROP_UINT8("max-cpu-throttle", MigrationState,
+                       parameters.max_cpu_throttle,
+                       DEFAULT_MIGRATE_MAX_CPU_THROTTLE),
++    DEFINE_PROP_SIZE("announce-initial", MigrationState,
++                      parameters.announce_initial,
++                      DEFAULT_MIGRATE_ANNOUNCE_INITIAL),
++    DEFINE_PROP_SIZE("announce-max", MigrationState,
++                      parameters.announce_max,
++                      DEFAULT_MIGRATE_ANNOUNCE_MAX),
++    DEFINE_PROP_SIZE("announce-rounds", MigrationState,
++                      parameters.announce_rounds,
++                      DEFAULT_MIGRATE_ANNOUNCE_ROUNDS),
++    DEFINE_PROP_SIZE("announce-step", MigrationState,
++                      parameters.announce_step,
++                      DEFAULT_MIGRATE_ANNOUNCE_STEP),
+ 
+     /* Migration capabilities */
+     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+@@ -3347,6 +3443,10 @@ static void migration_instance_init(Object *obj)
+     params->has_xbzrle_cache_size = true;
+     params->has_max_postcopy_bandwidth = true;
+     params->has_max_cpu_throttle = true;
++    params->has_announce_initial = true;
++    params->has_announce_max = true;
++    params->has_announce_rounds = true;
++    params->has_announce_step = true;
+ 
+     qemu_sem_init(&ms->postcopy_pause_sem, 0);
+     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 7a795ec..1fd7bbe 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -480,6 +480,18 @@
+ #
+ # Migration parameters enumeration
+ #
++# @announce-initial: Initial delay (in milliseconds) before sending the first
++#          announce (Since 4.0)
++#
++# @announce-max: Maximum delay (in milliseconds) between packets in the
++#          announcement (Since 4.0)
++#
++# @announce-rounds: Number of self-announce packets sent after migration
++#          (Since 4.0)
++#
++# @announce-step: Increase in delay (in milliseconds) between subsequent
++#          packets in the announcement (Since 4.0)
++#
+ # @compress-level: Set the compression level to be used in live migration,
+ #          the compression level is an integer between 0 and 9, where 0 means
+ #          no compression, 1 means the best compression speed, and 9 means best
+@@ -557,10 +569,13 @@
+ #
+ # @max-cpu-throttle: maximum cpu throttle percentage.
+ #                    Defaults to 99. (Since 3.1)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'MigrationParameter',
+-  'data': ['compress-level', 'compress-threads', 'decompress-threads',
++  'data': ['announce-initial', 'announce-max',
++           'announce-rounds', 'announce-step',
++           'compress-level', 'compress-threads', 'decompress-threads',
+            'compress-wait-thread',
+            'cpu-throttle-initial', 'cpu-throttle-increment',
+            'tls-creds', 'tls-hostname', 'max-bandwidth',
+@@ -572,6 +587,18 @@
+ ##
+ # @MigrateSetParameters:
+ #
++# @announce-initial: Initial delay (in milliseconds) before sending the first
++#          announce (Since 4.0)
++#
++# @announce-max: Maximum delay (in milliseconds) between packets in the
++#          announcement (Since 4.0)
++#
++# @announce-rounds: Number of self-announce packets sent after migration
++#          (Since 4.0)
++#
++# @announce-step: Increase in delay (in milliseconds) between subsequent
++#          packets in the announcement (Since 4.0)
++#
+ # @compress-level: compression level
+ #
+ # @compress-threads: compression thread count
+@@ -653,7 +680,11 @@
+ # TODO either fuse back into MigrationParameters, or make
+ # MigrationParameters members mandatory
+ { 'struct': 'MigrateSetParameters',
+-  'data': { '*compress-level': 'int',
++  'data': { '*announce-initial': 'size',
++            '*announce-max': 'size',
++            '*announce-rounds': 'size',
++            '*announce-step': 'size',
++            '*compress-level': 'int',
+             '*compress-threads': 'int',
+             '*compress-wait-thread': 'bool',
+             '*decompress-threads': 'int',
+@@ -692,6 +723,18 @@
+ #
+ # The optional members aren't actually optional.
+ #
++# @announce-initial: Initial delay (in milliseconds) before sending the
++#          first announce (Since 4.0)
++#
++# @announce-max: Maximum delay (in milliseconds) between packets in the
++#          announcement (Since 4.0)
++#
++# @announce-rounds: Number of self-announce packets sent after migration
++#          (Since 4.0)
++#
++# @announce-step: Increase in delay (in milliseconds) between subsequent
++#          packets in the announcement (Since 4.0)
++#
+ # @compress-level: compression level
+ #
+ # @compress-threads: compression thread count
+@@ -769,7 +812,11 @@
+ # Since: 2.4
+ ##
+ { 'struct': 'MigrationParameters',
+-  'data': { '*compress-level': 'uint8',
++  'data': { '*announce-initial': 'size',
++            '*announce-max': 'size',
++            '*announce-rounds': 'size',
++            '*announce-step': 'size',
++            '*compress-level': 'uint8',
+             '*compress-threads': 'uint8',
+             '*compress-wait-thread': 'bool',
+             '*decompress-threads': 'uint8',
 -- 
 2.5.0
