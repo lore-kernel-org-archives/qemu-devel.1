@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44119)
+Received: from eggs.gnu.org ([209.51.188.92]:46063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gxEcq-0003xW-Kg
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:28:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gxEge-0005gA-BU
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:32:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gxEcp-0003Jf-Aw
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:28:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gxEcp-0002qw-3M
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:28:39 -0500
-References: <1548638112-31101-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1548638112-31101-2-git-send-email-lizhijian@cn.fujitsu.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <8b018aae-cd25-0b1b-6b6d-2ff176bd8be4@redhat.com>
-Date: Fri, 22 Feb 2019 12:28:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gxEgd-00023Q-E9
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:32:36 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:43608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gxEgc-00014S-5j
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:32:35 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id n71so2495181ota.10
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 09:31:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1548638112-31101-2-git-send-email-lizhijian@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] Acceptance tests: expect boot to
- extract 2GiB+ initrd with linux-v4.16
+References: <155081340903.23160.4034617687275790161.stgit@gimli.home>
+In-Reply-To: <155081340903.23160.4034617687275790161.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Feb 2019 17:31:40 +0000
+Message-ID: <CAFEAcA_UZOU7=ozOFrraEMuNrNLhnH17oz+MH30x0uaQ=3eKkQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] vfio updates 2019-02-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On Fri, 22 Feb 2019 at 05:35, Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> The following changes since commit fc3dbb90f2eb069801bfb4cfe9cbc83cf9c5f4a9:
+>
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-02-21 13:09:33 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20190221.0
+>
+> for you to fetch changes up to 2b6326c0bf2c686ae83d6904899cb80e9ad7a6fb:
+>
+>   hw/vfio/common: Refactor container initialization (2019-02-21 21:07:03 -0700)
+>
+> ----------------------------------------------------------------
+> VFIO updates 2019-02-21
+>
+>  - Workaround kernel overflow bug in vfio type1 DMA unmap
+>    (Alex Williamson)
+>
+>  - Refactor vfio container initialization (Eric Auger)
+>
+> ----------------------------------------------------------------
 
+Applied, thanks.
 
-On 1/27/19 8:15 PM, Li Zhijian wrote:
-> XLF_CAN_BE_LOADED_ABOVE_4G is set on vmlinuz shipped by Fedora-28 so th=
-at
-> it's allowed to be loaded below 4 GB address.
->=20
-> timeout is updated to 5 minutes as well since we need more time to load=
- a
-> large initrd to the guest
->=20
-> CC: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> CC: Caio Carrara <ccarrara@redhat.com>
-> CC: Cleber Rosa <crosa@redhat.com>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->=20
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+-- PMM
