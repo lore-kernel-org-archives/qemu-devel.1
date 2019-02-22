@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38472)
+Received: from eggs.gnu.org ([209.51.188.92]:38480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gxBW3-00034u-6N
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:09:28 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gxBW4-00036N-Jl
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:09:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gxBVs-0002d2-Lt
+	(envelope-from <stefanha@redhat.com>) id 1gxBVs-0002d7-M9
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:09:21 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 22 Feb 2019 14:07:45 +0000
-Message-Id: <20190222140756.29834-17-stefanha@redhat.com>
+Date: Fri, 22 Feb 2019 14:07:54 +0000
+Message-Id: <20190222140756.29834-26-stefanha@redhat.com>
 In-Reply-To: <20190222140756.29834-1-stefanha@redhat.com>
 References: <20190222140756.29834-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/27] hw/ide: drop iov field from
- IDEBufferedRequest
+Subject: [Qemu-devel] [PULL 25/27] tests/virtio-blk: add
+ virtio_blk_fix_dwz_hdr() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +25,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-@iov is used only to initialize @qiov. Let's use new
-qemu_iovec_init_buf() instead, which simplifies the code.
+This function is useful to fix the endianness of struct
+virtio_blk_discard_write_zeroes headers.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20190218140926.333779-17-vsementsov@virtuozzo.com
-Message-Id: <20190218140926.333779-17-vsementsov@virtuozzo.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-id: 20190221103314.58500-9-sgarzare@redhat.com
+Message-Id: <20190221103314.58500-9-sgarzare@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/hw/ide/internal.h |  1 -
- hw/ide/core.c             | 11 ++++++-----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ tests/virtio-blk-test.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index fa99486d7a..1b02bb9151 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -346,7 +346,6 @@ extern const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT]=
-;
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 0739498da7..85b6b99adc 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -46,6 +46,12 @@ typedef struct QVirtioBlkReq {
+     uint8_t status;
+ } QVirtioBlkReq;
 =20
- typedef struct IDEBufferedRequest {
-     QLIST_ENTRY(IDEBufferedRequest) list;
--    struct iovec iov;
-     QEMUIOVector qiov;
-     QEMUIOVector *original_qiov;
-     BlockCompletionFunc *original_cb;
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 13f8f78ca6..6afadf894f 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -629,13 +629,15 @@ static void ide_buffered_readv_cb(void *opaque, int=
- ret)
-     IDEBufferedRequest *req =3D opaque;
-     if (!req->orphaned) {
-         if (!ret) {
--            qemu_iovec_from_buf(req->original_qiov, 0, req->iov.iov_base=
-,
-+            assert(req->qiov.size =3D=3D req->original_qiov->size);
-+            qemu_iovec_from_buf(req->original_qiov, 0,
-+                                req->qiov.local_iov.iov_base,
-                                 req->original_qiov->size);
-         }
-         req->original_cb(req->original_opaque, ret);
++#ifdef HOST_WORDS_BIGENDIAN
++const bool host_is_big_endian =3D true;
++#else
++const bool host_is_big_endian; /* false */
++#endif
++
+ static char *drive_create(void)
+ {
+     int fd, ret;
+@@ -125,12 +131,6 @@ static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus=
+ *bus, int slot)
+=20
+ static inline void virtio_blk_fix_request(QVirtioDevice *d, QVirtioBlkRe=
+q *req)
+ {
+-#ifdef HOST_WORDS_BIGENDIAN
+-    const bool host_is_big_endian =3D true;
+-#else
+-    const bool host_is_big_endian =3D false;
+-#endif
+-
+     if (qvirtio_is_big_endian(d) !=3D host_is_big_endian) {
+         req->type =3D bswap32(req->type);
+         req->ioprio =3D bswap32(req->ioprio);
+@@ -138,6 +138,17 @@ static inline void virtio_blk_fix_request(QVirtioDev=
+ice *d, QVirtioBlkReq *req)
      }
-     QLIST_REMOVE(req, list);
--    qemu_vfree(req->iov.iov_base);
-+    qemu_vfree(qemu_iovec_buf(&req->qiov));
-     g_free(req);
  }
 =20
-@@ -660,9 +662,8 @@ BlockAIOCB *ide_buffered_readv(IDEState *s, int64_t s=
-ector_num,
-     req->original_qiov =3D iov;
-     req->original_cb =3D cb;
-     req->original_opaque =3D opaque;
--    req->iov.iov_base =3D qemu_blockalign(blk_bs(s->blk), iov->size);
--    req->iov.iov_len =3D iov->size;
--    qemu_iovec_init_external(&req->qiov, &req->iov, 1);
-+    qemu_iovec_init_buf(&req->qiov, blk_blockalign(s->blk, iov->size),
-+                        iov->size);
-=20
-     aioreq =3D blk_aio_preadv(s->blk, sector_num << BDRV_SECTOR_BITS,
-                             &req->qiov, 0, ide_buffered_readv_cb, req);
++
++static inline void virtio_blk_fix_dwz_hdr(QVirtioDevice *d,
++    struct virtio_blk_discard_write_zeroes *dwz_hdr)
++{
++    if (qvirtio_is_big_endian(d) !=3D host_is_big_endian) {
++        dwz_hdr->sector =3D bswap64(dwz_hdr->sector);
++        dwz_hdr->num_sectors =3D bswap32(dwz_hdr->num_sectors);
++        dwz_hdr->flags =3D bswap32(dwz_hdr->flags);
++    }
++}
++
+ static uint64_t virtio_blk_request(QGuestAllocator *alloc, QVirtioDevice=
+ *d,
+                                    QVirtioBlkReq *req, uint64_t data_siz=
+e)
+ {
 --=20
 2.20.1
