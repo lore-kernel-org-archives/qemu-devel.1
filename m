@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41454)
+Received: from eggs.gnu.org ([209.51.188.92]:41428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZi-0006NM-7X
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:16 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZi-0006My-0i
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZg-0000rB-8k
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:13 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZe-0000md-5U
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:12 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:09:56 +0100
-Message-Id: <20190222141024.22217-7-kbastian@mail.uni-paderborn.de>
+Date: Fri, 22 Feb 2019 15:10:19 +0100
+Message-Id: <20190222141024.22217-30-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 06/34] target/riscv: Convert RVXI fence
- insns to decodetree
+Subject: [Qemu-devel] [PATCH v8 29/34] target/riscv: Remove decode_RV32_64G()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +22,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
+Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
+decodetree handles all instructions now so the fallback is not necessary
+anymore.
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvi.inc.c | 19 +++++++++++++++++++
- target/riscv/translate.c                | 12 ------------
- 3 files changed, 21 insertions(+), 12 deletions(-)
+ target/riscv/translate.c | 21 +--------------------
+ 1 file changed, 1 insertion(+), 20 deletions(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 1f5bf1f6f9..804b721ca5 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -82,3 +82,5 @@ srl      0000000 .....    ..... 101 ..... 0110011 @r
- sra      0100000 .....    ..... 101 ..... 0110011 @r
- or       0000000 .....    ..... 110 ..... 0110011 @r
- and      0000000 .....    ..... 111 ..... 0110011 @r
-+fence    ---- pred:4 succ:4 ----- 000 ----- 0001111
-+fence_i  ---- ----   ----   ----- 001 ----- 0001111
-diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-index 136fa54d06..973d6371df 100644
---- a/target/riscv/insn_trans/trans_rvi.inc.c
-+++ b/target/riscv/insn_trans/trans_rvi.inc.c
-@@ -318,3 +318,22 @@ static bool trans_sraw(DisasContext *ctx, arg_sraw *a)
-     return true;
- }
- #endif
-+
-+static bool trans_fence(DisasContext *ctx, arg_fence *a)
-+{
-+    /* FENCE is a full memory barrier. */
-+    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-+    return true;
-+}
-+
-+static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
-+{
-+    /*
-+     * FENCE_I is a no-op in QEMU,
-+     * however we need to end the translation block
-+     */
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
-+    tcg_gen_exit_tb(NULL, 0);
-+    ctx->base.is_jmp = DISAS_NORETURN;
-+    return true;
-+}
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 1ae84dcd59..f720746cb7 100644
+index 92be090bc7..049fa65c66 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -1950,18 +1950,6 @@ static void decode_RV32_64G(DisasContext *ctx)
-         gen_fp_arith(ctx, MASK_OP_FP_ARITH(ctx->opcode), rd, rs1, rs2,
-                      GET_RM(ctx->opcode));
-         break;
--    case OPC_RISC_FENCE:
--        if (ctx->opcode & 0x1000) {
--            /* FENCE_I is a no-op in QEMU,
--             * however we need to end the translation block */
--            tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
--            tcg_gen_exit_tb(NULL, 0);
--            ctx->base.is_jmp = DISAS_NORETURN;
--        } else {
--            /* FENCE is a full memory barrier. */
--            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
--        }
+@@ -651,24 +651,6 @@ bool decode_insn16(DisasContext *ctx, uint16_t insn);
+ #include "decode_insn16.inc.c"
+ #include "insn_trans/trans_rvc.inc.c"
+ 
+-static void decode_RV32_64G(DisasContext *ctx)
+-{
+-    uint32_t op;
+-
+-    /* We do not do misaligned address check here: the address should never be
+-     * misaligned at this point. Instructions that set PC must do the check,
+-     * since epc must be the address of the instruction that caused us to
+-     * perform the misaligned instruction fetch */
+-
+-    op = MASK_OP_MAJOR(ctx->opcode);
+-
+-    switch (op) {
+-    default:
+-        gen_exception_illegal(ctx);
 -        break;
-     case OPC_RISC_SYSTEM:
-         gen_system(ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
-                    (ctx->opcode & 0xFFF00000) >> 20);
+-    }
+-}
+-
+ static void decode_opc(DisasContext *ctx)
+ {
+     /* check for compressed insn */
+@@ -685,8 +667,7 @@ static void decode_opc(DisasContext *ctx)
+     } else {
+         ctx->pc_succ_insn = ctx->base.pc_next + 4;
+         if (!decode_insn32(ctx, ctx->opcode)) {
+-            /* fallback to old decoder */
+-            decode_RV32_64G(ctx);
++            gen_exception_illegal(ctx);
+         }
+     }
+ }
 -- 
 2.20.1
