@@ -1,42 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35587)
+Received: from eggs.gnu.org ([209.51.188.92]:36228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@outlook.com>) id 1gxCHu-0001DO-SJ
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:57 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gxCI0-0001XC-E0
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@outlook.com>) id 1gxC3X-0006LB-4W
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:44:07 -0500
-Received: from mail-am5eur02olkn0811.outbound.protection.outlook.com
-	([2a01:111:f400:fe07::811]:8160
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <casasfernando@outlook.com>)
-	id 1gxC3W-00063K-CZ
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:44:02 -0500
-From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@outlook.com>
-Date: Fri, 22 Feb 2019 14:43:44 +0000
-Message-ID: <VI1PR0602MB32457D7D0D6C05E83F14FE75A47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<20190221111147.GB3282@stefanha-x1.localdomain>
-	<VI1PR0602MB3245593855B029B427ED544FA47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QUs9Yz2-k1KyVMwpgx6RwY9cK7qdQRCQ74xmgXJPJR-qw@mail.gmail.com>
-	<VI1PR0602MB32453A8B5CBC0308C7D18F1DA47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QVxaW3tezjBN9owJHsxzE9h8_qcaeRr5zHHKxKJOeFnkQ@mail.gmail.com>
-	<CAJSP0QVXoZJ9MJ0qp4RM_m2fGJ8iFSyJMAU_X7mdiQvpOK59KA@mail.gmail.com>
-	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
-	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
-	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
-	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
-	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>,
-	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
-In-Reply-To: <CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1gxCHy-0003qK-QQ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:59:00 -0500
+Date: Fri, 22 Feb 2019 15:58:31 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190222155831.7b534b5d@redhat.com>
+In-Reply-To: <7e584e86-1099-a014-c23c-bd2feb4e50ba@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190220224003.4420-14-eric.auger@redhat.com>
+	<20190222144846.0a891948@redhat.com>
+	<7e584e86-1099-a014-c23c-bd2feb4e50ba@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
- size exceeded error
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 13/17] hw/arm/virt: Allocate
+ device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,67 +26,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@outlook.com>, Paolo Bonzini <pbonzini@redhat.com>, Natanael Copa <ncopa@alpinelinux.org>, Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, david@redhat.com, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, dgilbert@redhat.com, qemu-arm@nongnu.org, david@gibson.dropbear.id.au, eric.auger.pro@gmail.com
 
-SGkgYWxsLA0KDQpJbmRlZWQgSSBjYW4gY29uZmlybSB0aGlzIGlzc3VlIG9jY3VycyB3aXRoIHRo
-ZSBzdG9jaywgdW5tb2RpZmllZCBRRU1VIGJpbmFyeSBwcm92aWRlZCB3aXRoIEFscGluZSBzaW5j
-ZSBhdCBsZWFzdCBBbHBpbmUgMy42IHVwIHRvIDMuOS4NCg0KSXMgdGhlcmUgYW55IGNvbXBpbGVy
-IGZsYWcgSSBjYW4gdHdlYWssIGFkZCBvciByZW1vdmUgdG8gcmVidWlsZCBxZW11IGFuZCB0cnkg
-dG8gcmVwcm8gdG8gY29uZmlybSBhIHBvc3NpYmxlIHdvcmthcm91bmQ/DQoNClRoYW5rcy4NCg0K
-RmVybmFuZG8NCg0KU2VudCBmcm9tIG15IGlQaG9uZQ0KDQo+IE9uIDIyIEZlYiAyMDE5LCBhdCAx
-NTowNCwgU3RlZmFuIEhham5vY3ppIDxzdGVmYW5oYUBnbWFpbC5jb20+IHdyb3RlOg0KPiANCj4g
-T24gRnJpLCBGZWIgMjIsIDIwMTkgYXQgMTI6NTcgUE0gRmVybmFuZG8gQ2FzYXMgU2Now7Zzc293
-DQo+IDxjYXNhc2Zlcm5hbmRvQG91dGxvb2suY29tPiB3cm90ZToNCj4gDQo+IEkgaGF2ZSBDQ2Vk
-IE5hdGFuYWVsIENvcGEsIHFlbXUgcGFja2FnZSBtYWludGFpbmVyIGluIEFscGluZSBMaW51eC4N
-Cj4gDQo+IEZlcm5hbmRvOiBDYW4geW91IGNvbmZpcm0gdGhhdCB0aGUgYnVnIG9jY3VycyB3aXRo
-IGFuIHVubW9kaWZpZWQNCj4gQWxwaW5lIExpbnV4IHFlbXUgYmluYXJ5Pw0KPiANCj4gUmljaGFy
-ZDogQ29tbWl0IDdkYjIxNDVhNjgyNmIxNGVmY2ViOGRkNjRiZmU2YWQ4NjQ3MDcyZWIgKCJic3dh
-cDogQWRkDQo+IGhvc3QgZW5kaWFuIHVuYWxpZ25lZCBhY2Nlc3MgZnVuY3Rpb25zIikgaW50cm9k
-dWNlZCB0aGUgdW5hbGlnbmVkDQo+IG1lbW9yeSBhY2Nlc3MgZnVuY3Rpb25zIGluIHF1ZXN0aW9u
-IGhlcmUuICBQbGVhc2Ugc2VlIGJlbG93IGZvcg0KPiBkZXRhaWxzIG9uIHRoZSBidWcgLSBiYXNp
-Y2FsbHkgUUVNVSBjb2RlIGFzc3VtZXMgdGhleSBhcmUgYXRvbWljLCBidXQNCj4gdGhhdCBpcyBu
-b3QgZ3VhcmFudGVlZCA6KC4gIEFueSBpZGVhcyBmb3IgaG93IHRvIGZpeCB0aGlzPw0KPiANCj4g
-TmF0YW5hZWw6IEl0IHNlZW1zIGxpa2VseSB0aGF0IHRoZSBxZW11IHBhY2thZ2UgaW4gQWxwaW5l
-IExpbnV4DQo+IHN1ZmZlcnMgZnJvbSBhIGNvbXBpbGF0aW9uIGlzc3VlIHJlc3VsdGluZyBpbiBh
-IGJyb2tlbiBRRU1VLiAgSXQgbWF5DQo+IGJlIG5lY2Vzc2FyeSB0byBsZWF2ZSB0aGUgY29tcGls
-ZXIgb3B0aW1pemF0aW9uIGZsYWcgYWxvbmUgaW4gQVBLQlVJTEQNCj4gdG8gd29yayBhcm91bmQg
-dGhpcyBwcm9ibGVtLg0KPiANCj4gSGVyZSBhcmUgdGhlIGRldGFpbHMuICBRRU1VIHJlbGllcyBv
-biB0aGUgY29tcGlsZXIgdHVybmluZw0KPiBtZW1jcHkoJmRzdCwgJnNyYywgMikgdHVybmluZyBp
-bnRvIGEgbG9hZCBpbnN0cnVjdGlvbiBpbg0KPiBpbmNsdWRlL3FlbXUvYnN3YXAuaDpsZHV3X2hl
-X3AoKSAoZXhwbGFuYXRpb24gYmVsb3cpOg0KPiANCj4gLyogQW55IGNvbXBpbGVyIHdvcnRoIGl0
-cyBzYWx0IHdpbGwgdHVybiB0aGVzZSBtZW1jcHkgaW50byBuYXRpdmUgdW5hbGlnbmVkDQo+ICAg
-b3BlcmF0aW9ucy4gIFRodXMgd2UgZG9uJ3QgbmVlZCB0byBwbGF5IGdhbWVzIHdpdGggcGFja2Vk
-IGF0dHJpYnV0ZXMsIG9yDQo+ICAgaW5saW5lIGJ5dGUtYnktYnl0ZSBzdG9yZXMuICAqLw0KPiAN
-Cj4gc3RhdGljIGlubGluZSBpbnQgbGR1d19oZV9wKGNvbnN0IHZvaWQgKnB0cikNCj4gew0KPiAg
-ICB1aW50MTZfdCByOw0KPiAgICBtZW1jcHkoJnIsIHB0ciwgc2l6ZW9mKHIpKTsNCj4gICAgcmV0
-dXJuIHI7DQo+IH0NCj4gDQo+IEhlcmUgaXMgdGhlIGRpc2Fzc2VtYmx5IHNuaXBwZXQgb2Ygdmly
-dHF1ZXVlX3BvcCgpIGZyb20gRmVkb3JhIDI5IHRoYXQNCj4gc2hvd3MgdGhlIGxvYWQgaW5zdHJ1
-Y3Rpb246DQo+IA0KPiAgMzk4MTY2OiAgICAgICAwZiBiNyA0MiAwMiAgICAgICAgICAgICBtb3Z6
-d2wgMHgyKCVyZHgpLCVlYXgNCj4gIDM5ODE2YTogICAgICAgNjYgODkgNDMgMzIgICAgICAgICAg
-ICAgbW92ICAgICVheCwweDMyKCVyYngpDQo+IA0KPiBIZXJlIGlzIHRoZSBpbnN0cnVjdGlvbiBz
-ZXF1ZW5jZSBpbiB0aGUgQWxwaW5lIExpbnV4IGJpbmFyeToNCj4gDQo+ICA0NTU1NjI6ICAgIGJh
-IDAyIDAwIDAwIDAwICAgICAgICAgICBtb3YgICAgJDB4MiwlZWR4DQo+ICA0NTU1Njc6ICAgIGU4
-IDc0IDI0IGYzIGZmICAgICAgICAgICBjYWxscSAgMzg3OWUwIDxtZW1jcHlAcGx0Pg0KPiAgNDU1
-NTZjOiAgICAwZiBiNyA0NCAyNCA0MiAgICAgICAgICAgbW92endsIDB4NDIoJXJzcCksJWVheA0K
-PiAgNDU1NTcxOiAgICA2NiA0MSA4OSA0NyAzMiAgICAgICAgICAgbW92ICAgICVheCwweDMyKCVy
-MTUpDQo+IA0KPiBJdCdzIGNhbGxpbmcgbWVtY3B5IGluc3RlYWQgb2YgdXNpbmcgYSBsb2FkIGlu
-c3RydWN0aW9uLg0KPiANCj4gRmVybmFuZG8gZm91bmQgdGhhdCBRRU1VJ3MgdmlydHF1ZXVlX3Bv
-cCgpIGZ1bmN0aW9uIHNlZXMgYm9ndXMgdmFsdWVzDQo+IHdoZW4gbG9hZGluZyBhIDE2LWJpdCBn
-dWVzdCBSQU0gbG9jYXRpb24uICBQYW9sbyBmaWd1cmVkIG91dCB0aGF0IHRoZQ0KPiBib2d1cyB2
-YWx1ZSBjYW4gYmUgcHJvZHVjZWQgYnkgbWVtY3B5KCkgd2hlbiBhbm90aGVyIHRocmVhZCBpcw0K
-PiB1cGRhdGluZyB0aGUgMTYtYml0IG1lbW9yeSBsb2NhdGlvbiBzaW11bHRhbmVvdXNseS4gIFRo
-aXMgaXMgYSByYWNlDQo+IGNvbmRpdGlvbiBiZXR3ZWVuIG9uZSB0aHJlYWQgbG9hZGluZyB0aGUg
-MTYtYml0IHZhbHVlIGFuZCBhbm90aGVyDQo+IHRocmVhZCBzdG9yaW5nIGl0IChpbiB0aGlzIGNh
-c2UgYSBndWVzdCB2Y3B1IHRocmVhZCkuICBTb21ldGltZXMNCj4gbWVtY3B5KCkgbWF5IGxvYWQg
-b25lIG9sZCBieXRlIGFuZCBvbmUgbmV3IGJ5dGUsIHJlc3VsdGluZyBpbiBhIGJvZ3VzDQo+IHZh
-bHVlLg0KPiANCj4gVGhlIHN5bXB0b20gdGhhdCBGZXJuYW5kbyBleHBlcmllbmNlZCBpcyBhICJW
-aXJ0cXVldWUgc2l6ZSBleGNlZWRlZCINCj4gZXJyb3IgbWVzc2FnZSBmcm9tIFFFTVUgYW5kIHRo
-ZW4gdGhlIHZpcnRpby1ibGsgb3IgdmlydGlvLXNjc2kgZGV2aWNlDQo+IHN0b3BzIHdvcmtpbmcu
-ICBUaGlzIGlzc3VlIHBvdGVudGlhbGx5IGFmZmVjdHMgb3RoZXIgZGV2aWNlIGVtdWxhdGlvbg0K
-PiBjb2RlIGluIFFFTVUgYXMgd2VsbCwgbm90IGp1c3QgdmlydGlvIGRldmljZXMuDQo+IA0KPiBG
-b3IgdGhlIHRpbWUgYmVpbmcsIEkgc3VnZ2VzdCB0d2Vha2luZyB0aGUgQVBLQlVJTEQgc28gdGhl
-IG1lbWNweSgpIGlzDQo+IG5vdCBnZW5lcmF0ZWQuICBIb3BlZnVsbHkgUUVNVSBjYW4gbWFrZSB0
-aGUgY29kZSBtb3JlIHBvcnRhYmxlIGluIHRoZQ0KPiBmdXR1cmUgc28gdGhlIGNvbXBpbGVyIGFs
-d2F5cyBkb2VzIHRoZSBleHBlY3RlZCB0aGluZywgYnV0IHRoaXMgbWF5DQo+IG5vdCBiZSBlYXNp
-bHkgcG9zc2libGUuDQo+IA0KPiBTdGVmYW4NCg==
+On Fri, 22 Feb 2019 15:15:36 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
+
+> Hi Igor,
+> 
+> On 2/22/19 2:48 PM, Igor Mammedov wrote:
+> > On Wed, 20 Feb 2019 23:39:59 +0100
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> The device memory region is located after the initial RAM.
+> >> its start/size are 1GB aligned.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> >>
+> >> ---
+> >> v6 -> v7:
+> >> - check the device memory top does not wrap
+> >> - check the device memory can fit the slots
+> >>
+> >> v4 -> v5:
+> >> - device memory set after the initial RAM
+> >>
+> >> v3 -> v4:
+> >> - remove bootinfo.device_memory_start/device_memory_size
+> >> - rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
+> >> ---
+> >>  hw/arm/virt.c | 33 +++++++++++++++++++++++++++++++++
+> >>  1 file changed, 33 insertions(+)
+> >>
+> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> >> index 470ca0ce2d..33ad9b3f63 100644
+> >> --- a/hw/arm/virt.c
+> >> +++ b/hw/arm/virt.c
+> >> @@ -62,6 +62,7 @@
+> >>  #include "target/arm/internals.h"
+> >>  #include "hw/mem/pc-dimm.h"
+> >>  #include "hw/mem/nvdimm.h"
+> >> +#include "hw/acpi/acpi.h"
+> >>  
+> >>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+> >>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> >> @@ -1263,6 +1264,34 @@ static void create_secure_ram(VirtMachineState *vms,
+> >>      g_free(nodename);
+> >>  }
+> >>  
+> >> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
+> >> +{
+> >> +    MachineState *ms = MACHINE(vms);
+> >> +
+> >> +    if (!vms->device_memory_size) {  
+> > having vms->device_memory_size seems like duplicate, why not to reuse
+> > memory_region_size(MachineState::device_memory::mr) like we do elsewhere.  
+> OK so you mean allocating the ms->device_memory in virt_setmmap? In that
+> case, I wonder if all that code shouldn't land in set_memmap directly?
+> > 
+> > Also it would be better to all device_memory allocation/initialization
+> > compact and close to each other like it's done in pc/spapr.  
+> I am not sure I get your point here. alloc & init are done in this
+> function. Or do you mean I should rather move that into set_memmap?
+I don't have a preference where to put it, could be here or in set_memmap,
+what I do care is to keep all device_memory related parts together
+(like calculating device_memory base and size and allocating/initializing
+structure itself, it's much easier to read when one doesn't have to jump
+around code and could see all related code in one place)
+
+> 
+> Thanks
+> 
+> Eric
+> >   
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
+> >> +        error_report("unsupported number of memory slots: %"PRIu64,
+> >> +                     ms->ram_slots);
+> >> +        exit(EXIT_FAILURE);
+> >> +    }
+> >> +
+> >> +    if (QEMU_ALIGN_UP(ms->maxram_size, GiB) != ms->maxram_size) {
+> >> +        error_report("maximum memory size must be GiB aligned");
+> >> +        exit(EXIT_FAILURE);
+> >> +    }
+> >> +
+> >> +    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+> >> +    ms->device_memory->base = vms->device_memory_base;
+> >> +
+> >> +    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
+> >> +                       "device-memory", vms->device_memory_size);
+> >> +    memory_region_add_subregion(sysmem, ms->device_memory->base,
+> >> +                                &ms->device_memory->mr);
+> >> +}
+> >> +
+> >>  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+> >>  {
+> >>      const VirtMachineState *board = container_of(binfo, VirtMachineState,
+> >> @@ -1610,6 +1639,10 @@ static void machvirt_init(MachineState *machine)
+> >>                                           machine->ram_size);
+> >>      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+> >>  
+> >> +    if (vms->extended_memmap) {
+> >> +        create_device_memory(vms, sysmem);
+> >> +    }
+> >> +
+> >>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+> >>  
+> >>      create_gic(vms, pic);  
+> >   
+> 
