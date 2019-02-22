@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40704)
+Received: from eggs.gnu.org ([209.51.188.92]:40706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYf-0005Os-UL
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:11 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYf-0005Ov-VV
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYb-0007Pj-UT
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYb-0007P0-Pz
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:09 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:09:50 +0100
-Message-Id: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
+Date: Fri, 22 Feb 2019 15:10:04 +0100
+Message-Id: <20190222141024.22217-15-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
+References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 00/34] target/riscv: Convert to decodetree
+Subject: [Qemu-devel] [PATCH v8 14/34] target/riscv: Convert RV64D insns to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,118 +23,763 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
 
-Hi,
-
-this patchset converts the RISC-V decoder to decodetree in four major steps:
-
-1) Convert 32-bit instructions to decodetree [Patch 1-15]:
-    Many of the gen_* functions are called by the decode functions for 16-bit
-    and 32-bit functions. If we move translation code from the gen_*
-    functions to the generated trans_* functions of decode-tree, we get a lot of
-    duplication. Therefore, we mostly generate calls to the old gen_* function
-    which are properly replaced after step 2).
-
-    Each of the trans_ functions are grouped into files corresponding to their
-    ISA extension, e.g. addi which is in RV32I is translated in the file
-    'trans_rvi.inc.c'.
-
-2) Convert 16-bit instructions to decodetree [Patch 16-18]:
-    All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
-    we convert the arguments in the 16 bit trans_ function to the arguments of
-    the corresponding 32 bit instruction and call the 32 bit trans_ function.
-
-3) Remove old manual decoding in gen_* function [Patch 19-29]:
-    this move all manual translation code into the trans_* instructions of
-    decode tree, such that we can remove the old decode_* functions.
-
-4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
-   by Richard. [Patch 30-34]
-
-full tree available at
-https://github.com/bkoppelmann/qemu/tree/riscv-dt-v8
-
-Cheers,
-Bastian
-
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
+---
 v7 -> v8:
-    - add REQUIRE_EXT macro
-    - add missing RVM checks
-    - add missing RVA checks
-    - add missing RVF checks
-    - add missing RVF checks
     - add missing RVD checks
-    - add missing RVD checks
-    - riscv_has_ext -> has_ext
-    - env->ctx->priv_version -> ctx->priv_version
-    - fixed wrongly inserted #ifdef TARGET_RISCV64 that lead to a compile error
 
+ target/riscv/insn32-64.decode           |   8 +
+ target/riscv/insn_trans/trans_rvd.inc.c |  82 ++++
+ target/riscv/translate.c                | 601 +-----------------------
+ 3 files changed, 91 insertions(+), 600 deletions(-)
 
-Bastian Koppelmann (34):
-  target/riscv: Activate decodetree and implemnt LUI & AUIPC
-  target/riscv: Convert RVXI branch insns to decodetree
-  target/riscv: Convert RV32I load/store insns to decodetree
-  target/riscv: Convert RV64I load/store insns to decodetree
-  target/riscv: Convert RVXI arithmetic insns to decodetree
-  target/riscv: Convert RVXI fence insns to decodetree
-  target/riscv: Convert RVXI csr insns to decodetree
-  target/riscv: Convert RVXM insns to decodetree
-  target/riscv: Convert RV32A insns to decodetree
-  target/riscv: Convert RV64A insns to decodetree
-  target/riscv: Convert RV32F insns to decodetree
-  target/riscv: Convert RV64F insns to decodetree
-  target/riscv: Convert RV32D insns to decodetree
-  target/riscv: Convert RV64D insns to decodetree
-  target/riscv: Convert RV priv insns to decodetree
-  target/riscv: Convert quadrant 0 of RVXC insns to decodetree
-  target/riscv: Convert quadrant 1 of RVXC insns to decodetree
-  target/riscv: Convert quadrant 2 of RVXC insns to decodetree
-  target/riscv: Remove gen_jalr()
-  target/riscv: Remove manual decoding from gen_branch()
-  target/riscv: Remove manual decoding from gen_load()
-  target/riscv: Remove manual decoding from gen_store()
-  target/riscv: Move gen_arith_imm() decoding into trans_* functions
-  target/riscv: make ADD/SUB/OR/XOR/AND insn use arg lists
-  target/riscv: Remove shift and slt insn manual decoding
-  target/riscv: Remove manual decoding of RV32/64M insn
-  target/riscv: Rename trans_arith to gen_arith
-  target/riscv: Remove gen_system()
-  target/riscv: Remove decode_RV32_64G()
-  target/riscv: Convert @cs_2 insns to share translation functions
-  target/riscv: Convert @cl_d, @cl_w, @cs_d, @cs_w insns
-  target/riscv: Splice fsw_sd and flw_ld for riscv32 vs riscv64
-  target/riscv: Splice remaining compressed insn pairs for riscv32 vs
-    riscv64
-  target/riscv: Remaining rvc insn reuse 32 bit translators
-
- target/riscv/Makefile.objs                    |   22 +
- target/riscv/insn16-32.decode                 |   31 +
- target/riscv/insn16-64.decode                 |   33 +
- target/riscv/insn16.decode                    |  114 +
- target/riscv/insn32-64.decode                 |   72 +
- target/riscv/insn32.decode                    |  203 ++
- .../riscv/insn_trans/trans_privileged.inc.c   |  110 +
- target/riscv/insn_trans/trans_rva.inc.c       |  218 ++
- target/riscv/insn_trans/trans_rvc.inc.c       |  149 ++
- target/riscv/insn_trans/trans_rvd.inc.c       |  442 ++++
- target/riscv/insn_trans/trans_rvf.inc.c       |  439 ++++
- target/riscv/insn_trans/trans_rvi.inc.c       |  568 +++++
- target/riscv/insn_trans/trans_rvm.inc.c       |  120 +
- target/riscv/translate.c                      | 1948 ++---------------
- 14 files changed, 2740 insertions(+), 1729 deletions(-)
- create mode 100644 target/riscv/insn16-32.decode
- create mode 100644 target/riscv/insn16-64.decode
- create mode 100644 target/riscv/insn16.decode
- create mode 100644 target/riscv/insn32-64.decode
- create mode 100644 target/riscv/insn32.decode
- create mode 100644 target/riscv/insn_trans/trans_privileged.inc.c
- create mode 100644 target/riscv/insn_trans/trans_rva.inc.c
- create mode 100644 target/riscv/insn_trans/trans_rvc.inc.c
- create mode 100644 target/riscv/insn_trans/trans_rvd.inc.c
- create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
- create mode 100644 target/riscv/insn_trans/trans_rvi.inc.c
- create mode 100644 target/riscv/insn_trans/trans_rvm.inc.c
-
+diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+index 6319f872ac..380bf791bc 100644
+--- a/target/riscv/insn32-64.decode
++++ b/target/riscv/insn32-64.decode
+@@ -62,3 +62,11 @@ fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
+ fcvt_lu_s  1100000  00011 ..... ... ..... 1010011 @r2_rm
+ fcvt_s_l   1101000  00010 ..... ... ..... 1010011 @r2_rm
+ fcvt_s_lu  1101000  00011 ..... ... ..... 1010011 @r2_rm
++
++# *** RV64D Standard Extension (in addition to RV32D) ***
++fcvt_l_d   1100001  00010 ..... ... ..... 1010011 @r2_rm
++fcvt_lu_d  1100001  00011 ..... ... ..... 1010011 @r2_rm
++fmv_x_d    1110001  00000 ..... 000 ..... 1010011 @r2
++fcvt_d_l   1101001  00010 ..... ... ..... 1010011 @r2_rm
++fcvt_d_lu  1101001  00011 ..... ... ..... 1010011 @r2_rm
++fmv_d_x    1111001  00000 ..... 000 ..... 1010011 @r2
+diff --git a/target/riscv/insn_trans/trans_rvd.inc.c b/target/riscv/insn_trans/trans_rvd.inc.c
+index 98fc1cdc5a..393fa0248c 100644
+--- a/target/riscv/insn_trans/trans_rvd.inc.c
++++ b/target/riscv/insn_trans/trans_rvd.inc.c
+@@ -358,3 +358,85 @@ static bool trans_fcvt_d_wu(DisasContext *ctx, arg_fcvt_d_wu *a)
+     mark_fs_dirty(ctx);
+     return true;
+ }
++
++#ifdef TARGET_RISCV64
++
++static bool trans_fcvt_l_d(DisasContext *ctx, arg_fcvt_l_d *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVD);
++
++    TCGv t0 = tcg_temp_new();
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_l_d(t0, cpu_env, cpu_fpr[a->rs1]);
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
++    return true;
++}
++
++static bool trans_fcvt_lu_d(DisasContext *ctx, arg_fcvt_lu_d *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVD);
++
++    TCGv t0 = tcg_temp_new();
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_lu_d(t0, cpu_env, cpu_fpr[a->rs1]);
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
++    return true;
++}
++
++static bool trans_fmv_x_d(DisasContext *ctx, arg_fmv_x_d *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVD);
++
++    gen_set_gpr(a->rd, cpu_fpr[a->rs1]);
++    return true;
++}
++
++static bool trans_fcvt_d_l(DisasContext *ctx, arg_fcvt_d_l *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVD);
++
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_d_l(cpu_fpr[a->rd], cpu_env, t0);
++    tcg_temp_free(t0);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fcvt_d_lu(DisasContext *ctx, arg_fcvt_d_lu *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVD);
++
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_d_lu(cpu_fpr[a->rd], cpu_env, t0);
++    tcg_temp_free(t0);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fmv_d_x(DisasContext *ctx, arg_fmv_d_x *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVD);
++
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++
++    tcg_gen_mov_tl(cpu_fpr[a->rd], t0);
++    tcg_temp_free(t0);
++    mark_fs_dirty(ctx);
++    return true;
++}
++#endif
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index c201985ef3..2e36deee82 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -186,44 +186,6 @@ static void gen_mulhsu(TCGv ret, TCGv arg1, TCGv arg2)
+     tcg_temp_free(rh);
+ }
+ 
+-static void gen_fsgnj(DisasContext *ctx, uint32_t rd, uint32_t rs1,
+-    uint32_t rs2, int rm, uint64_t min)
+-{
+-    switch (rm) {
+-    case 0: /* fsgnj */
+-        if (rs1 == rs2) { /* FMOV */
+-            tcg_gen_mov_i64(cpu_fpr[rd], cpu_fpr[rs1]);
+-        } else {
+-            tcg_gen_deposit_i64(cpu_fpr[rd], cpu_fpr[rs2], cpu_fpr[rs1],
+-                                0, min == INT32_MIN ? 31 : 63);
+-        }
+-        break;
+-    case 1: /* fsgnjn */
+-        if (rs1 == rs2) { /* FNEG */
+-            tcg_gen_xori_i64(cpu_fpr[rd], cpu_fpr[rs1], min);
+-        } else {
+-            TCGv_i64 t0 = tcg_temp_new_i64();
+-            tcg_gen_not_i64(t0, cpu_fpr[rs2]);
+-            tcg_gen_deposit_i64(cpu_fpr[rd], t0, cpu_fpr[rs1],
+-                                0, min == INT32_MIN ? 31 : 63);
+-            tcg_temp_free_i64(t0);
+-        }
+-        break;
+-    case 2: /* fsgnjx */
+-        if (rs1 == rs2) { /* FABS */
+-            tcg_gen_andi_i64(cpu_fpr[rd], cpu_fpr[rs1], ~min);
+-        } else {
+-            TCGv_i64 t0 = tcg_temp_new_i64();
+-            tcg_gen_andi_i64(t0, cpu_fpr[rs2], min);
+-            tcg_gen_xor_i64(cpu_fpr[rd], cpu_fpr[rs1], t0);
+-            tcg_temp_free_i64(t0);
+-        }
+-        break;
+-    default:
+-        gen_exception_illegal(ctx);
+-    }
+-}
+-
+ static void gen_arith(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+         int rs2)
+ {
+@@ -807,535 +769,6 @@ static void gen_set_rm(DisasContext *ctx, int rm)
+     tcg_temp_free_i32(t0);
+ }
+ 
+-static void gen_fp_fmadd(DisasContext *ctx, uint32_t opc, int rd,
+-                         int rs1, int rs2, int rs3, int rm)
+-{
+-    switch (opc) {
+-    case OPC_RISC_FMADD_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fmadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
+-                           cpu_fpr[rs2], cpu_fpr[rs3]);
+-        break;
+-    case OPC_RISC_FMADD_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fmadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
+-                           cpu_fpr[rs2], cpu_fpr[rs3]);
+-        break;
+-    do_illegal:
+-    default:
+-        gen_exception_illegal(ctx);
+-        break;
+-    }
+-}
+-
+-static void gen_fp_fmsub(DisasContext *ctx, uint32_t opc, int rd,
+-                         int rs1, int rs2, int rs3, int rm)
+-{
+-    switch (opc) {
+-    case OPC_RISC_FMSUB_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fmsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
+-                           cpu_fpr[rs2], cpu_fpr[rs3]);
+-        break;
+-    case OPC_RISC_FMSUB_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fmsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
+-                           cpu_fpr[rs2], cpu_fpr[rs3]);
+-        break;
+-    do_illegal:
+-    default:
+-        gen_exception_illegal(ctx);
+-        break;
+-    }
+-}
+-
+-static void gen_fp_fnmsub(DisasContext *ctx, uint32_t opc, int rd,
+-                          int rs1, int rs2, int rs3, int rm)
+-{
+-    switch (opc) {
+-    case OPC_RISC_FNMSUB_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fnmsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
+-                            cpu_fpr[rs2], cpu_fpr[rs3]);
+-        break;
+-    case OPC_RISC_FNMSUB_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fnmsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
+-                            cpu_fpr[rs2], cpu_fpr[rs3]);
+-        break;
+-    do_illegal:
+-    default:
+-        gen_exception_illegal(ctx);
+-        break;
+-    }
+-}
+-
+-static void gen_fp_fnmadd(DisasContext *ctx, uint32_t opc, int rd,
+-                          int rs1, int rs2, int rs3, int rm)
+-{
+-    switch (opc) {
+-    case OPC_RISC_FNMADD_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fnmadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
+-                            cpu_fpr[rs2], cpu_fpr[rs3]);
+-        break;
+-    case OPC_RISC_FNMADD_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fnmadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
+-                            cpu_fpr[rs2], cpu_fpr[rs3]);
+-        break;
+-    do_illegal:
+-    default:
+-        gen_exception_illegal(ctx);
+-        break;
+-    }
+-}
+-
+-static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+-                         int rs1, int rs2, int rm)
+-{
+-    TCGv t0 = NULL;
+-    bool fp_output = true;
+-
+-    if (ctx->mstatus_fs == 0) {
+-        goto do_illegal;
+-    }
+-
+-    switch (opc) {
+-    case OPC_RISC_FADD_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-        break;
+-    case OPC_RISC_FSUB_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-        break;
+-    case OPC_RISC_FMUL_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fmul_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-        break;
+-    case OPC_RISC_FDIV_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fdiv_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-        break;
+-    case OPC_RISC_FSQRT_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fsqrt_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
+-        break;
+-    case OPC_RISC_FSGNJ_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        gen_fsgnj(ctx, rd, rs1, rs2, rm, INT32_MIN);
+-        break;
+-
+-    case OPC_RISC_FMIN_S:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        /* also handles: OPC_RISC_FMAX_S */
+-        switch (rm) {
+-        case 0x0:
+-            gen_helper_fmin_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        case 0x1:
+-            gen_helper_fmax_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        default:
+-            goto do_illegal;
+-        }
+-        break;
+-
+-    case OPC_RISC_FEQ_S:
+-        /* also handles: OPC_RISC_FLT_S, OPC_RISC_FLE_S */
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        switch (rm) {
+-        case 0x0:
+-            gen_helper_fle_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        case 0x1:
+-            gen_helper_flt_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        case 0x2:
+-            gen_helper_feq_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        default:
+-            goto do_illegal;
+-        }
+-        gen_set_gpr(rd, t0);
+-        tcg_temp_free(t0);
+-        fp_output = false;
+-        break;
+-
+-    case OPC_RISC_FCVT_W_S:
+-        /* also OPC_RISC_FCVT_WU_S, OPC_RISC_FCVT_L_S, OPC_RISC_FCVT_LU_S */
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        switch (rs2) {
+-        case 0: /* FCVT_W_S */
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[rs1]);
+-            break;
+-        case 1: /* FCVT_WU_S */
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[rs1]);
+-            break;
+-#if defined(TARGET_RISCV64)
+-        case 2: /* FCVT_L_S */
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[rs1]);
+-            break;
+-        case 3: /* FCVT_LU_S */
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[rs1]);
+-            break;
+-#endif
+-        default:
+-            goto do_illegal;
+-        }
+-        gen_set_gpr(rd, t0);
+-        tcg_temp_free(t0);
+-        fp_output = false;
+-        break;
+-
+-    case OPC_RISC_FCVT_S_W:
+-        /* also OPC_RISC_FCVT_S_WU, OPC_RISC_FCVT_S_L, OPC_RISC_FCVT_S_LU */
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        gen_get_gpr(t0, rs1);
+-        switch (rs2) {
+-        case 0: /* FCVT_S_W */
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_s_w(cpu_fpr[rd], cpu_env, t0);
+-            break;
+-        case 1: /* FCVT_S_WU */
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_s_wu(cpu_fpr[rd], cpu_env, t0);
+-            break;
+-#if defined(TARGET_RISCV64)
+-        case 2: /* FCVT_S_L */
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_s_l(cpu_fpr[rd], cpu_env, t0);
+-            break;
+-        case 3: /* FCVT_S_LU */
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_s_lu(cpu_fpr[rd], cpu_env, t0);
+-            break;
+-#endif
+-        default:
+-            goto do_illegal;
+-        }
+-        tcg_temp_free(t0);
+-        break;
+-
+-    case OPC_RISC_FMV_X_S:
+-        /* also OPC_RISC_FCLASS_S */
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        switch (rm) {
+-        case 0: /* FMV */
+-#if defined(TARGET_RISCV64)
+-            tcg_gen_ext32s_tl(t0, cpu_fpr[rs1]);
+-#else
+-            tcg_gen_extrl_i64_i32(t0, cpu_fpr[rs1]);
+-#endif
+-            break;
+-        case 1:
+-            gen_helper_fclass_s(t0, cpu_fpr[rs1]);
+-            break;
+-        default:
+-            goto do_illegal;
+-        }
+-        gen_set_gpr(rd, t0);
+-        tcg_temp_free(t0);
+-        fp_output = false;
+-        break;
+-
+-    case OPC_RISC_FMV_S_X:
+-        if (!has_ext(ctx, RVF)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        gen_get_gpr(t0, rs1);
+-#if defined(TARGET_RISCV64)
+-        tcg_gen_mov_i64(cpu_fpr[rd], t0);
+-#else
+-        tcg_gen_extu_i32_i64(cpu_fpr[rd], t0);
+-#endif
+-        tcg_temp_free(t0);
+-        break;
+-
+-    /* double */
+-    case OPC_RISC_FADD_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-        break;
+-    case OPC_RISC_FSUB_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-        break;
+-    case OPC_RISC_FMUL_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fmul_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-        break;
+-    case OPC_RISC_FDIV_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fdiv_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-        break;
+-    case OPC_RISC_FSQRT_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        gen_set_rm(ctx, rm);
+-        gen_helper_fsqrt_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
+-        break;
+-    case OPC_RISC_FSGNJ_D:
+-        gen_fsgnj(ctx, rd, rs1, rs2, rm, INT64_MIN);
+-        break;
+-
+-    case OPC_RISC_FMIN_D:
+-        /* also OPC_RISC_FMAX_D */
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        switch (rm) {
+-        case 0:
+-            gen_helper_fmin_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        case 1:
+-            gen_helper_fmax_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        default:
+-            goto do_illegal;
+-        }
+-        break;
+-
+-    case OPC_RISC_FCVT_S_D:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        switch (rs2) {
+-        case 1:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_s_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
+-            break;
+-        default:
+-            goto do_illegal;
+-        }
+-        break;
+-
+-    case OPC_RISC_FCVT_D_S:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        switch (rs2) {
+-        case 0:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_d_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
+-            break;
+-        default:
+-            goto do_illegal;
+-        }
+-        break;
+-
+-    case OPC_RISC_FEQ_D:
+-        /* also OPC_RISC_FLT_D, OPC_RISC_FLE_D */
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        switch (rm) {
+-        case 0:
+-            gen_helper_fle_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        case 1:
+-            gen_helper_flt_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        case 2:
+-            gen_helper_feq_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
+-            break;
+-        default:
+-            goto do_illegal;
+-        }
+-        gen_set_gpr(rd, t0);
+-        tcg_temp_free(t0);
+-        fp_output = false;
+-        break;
+-
+-    case OPC_RISC_FCVT_W_D:
+-        /* also OPC_RISC_FCVT_WU_D, OPC_RISC_FCVT_L_D, OPC_RISC_FCVT_LU_D */
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        switch (rs2) {
+-        case 0:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_w_d(t0, cpu_env, cpu_fpr[rs1]);
+-            break;
+-        case 1:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_wu_d(t0, cpu_env, cpu_fpr[rs1]);
+-            break;
+-#if defined(TARGET_RISCV64)
+-        case 2:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_l_d(t0, cpu_env, cpu_fpr[rs1]);
+-            break;
+-        case 3:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_lu_d(t0, cpu_env, cpu_fpr[rs1]);
+-            break;
+-#endif
+-        default:
+-            goto do_illegal;
+-        }
+-        gen_set_gpr(rd, t0);
+-        tcg_temp_free(t0);
+-        fp_output = false;
+-        break;
+-
+-    case OPC_RISC_FCVT_D_W:
+-        /* also OPC_RISC_FCVT_D_WU, OPC_RISC_FCVT_D_L, OPC_RISC_FCVT_D_LU */
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        gen_get_gpr(t0, rs1);
+-        switch (rs2) {
+-        case 0:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_d_w(cpu_fpr[rd], cpu_env, t0);
+-            break;
+-        case 1:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_d_wu(cpu_fpr[rd], cpu_env, t0);
+-            break;
+-#if defined(TARGET_RISCV64)
+-        case 2:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_d_l(cpu_fpr[rd], cpu_env, t0);
+-            break;
+-        case 3:
+-            gen_set_rm(ctx, rm);
+-            gen_helper_fcvt_d_lu(cpu_fpr[rd], cpu_env, t0);
+-            break;
+-#endif
+-        default:
+-            goto do_illegal;
+-        }
+-        tcg_temp_free(t0);
+-        break;
+-
+-    case OPC_RISC_FMV_X_D:
+-        /* also OPC_RISC_FCLASS_D */
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        switch (rm) {
+-#if defined(TARGET_RISCV64)
+-        case 0: /* FMV */
+-            gen_set_gpr(rd, cpu_fpr[rs1]);
+-            break;
+-#endif
+-        case 1:
+-            t0 = tcg_temp_new();
+-            gen_helper_fclass_d(t0, cpu_fpr[rs1]);
+-            gen_set_gpr(rd, t0);
+-            tcg_temp_free(t0);
+-            break;
+-        default:
+-            goto do_illegal;
+-        }
+-        fp_output = false;
+-        break;
+-
+-#if defined(TARGET_RISCV64)
+-    case OPC_RISC_FMV_D_X:
+-        if (!has_ext(ctx, RVD)) {
+-            goto do_illegal;
+-        }
+-        t0 = tcg_temp_new();
+-        gen_get_gpr(t0, rs1);
+-        tcg_gen_mov_tl(cpu_fpr[rd], t0);
+-        tcg_temp_free(t0);
+-        break;
+-#endif
+-
+-    default:
+-    do_illegal:
+-        if (t0) {
+-            tcg_temp_free(t0);
+-        }
+-        gen_exception_illegal(ctx);
+-        return;
+-    }
+-
+-    if (fp_output) {
+-        mark_fs_dirty(ctx);
+-    }
+-}
+-
+ static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+                        int csr)
+ {
+@@ -1722,11 +1155,8 @@ bool decode_insn32(DisasContext *ctx, uint32_t insn);
+ 
+ static void decode_RV32_64G(DisasContext *ctx)
+ {
+-    int rs1;
+-    int rs2;
+-    int rd;
++    int rs1, rd;
+     uint32_t op;
+-    target_long imm;
+ 
+     /* We do not do misaligned address check here: the address should never be
+      * misaligned at this point. Instructions that set PC must do the check,
+@@ -1735,38 +1165,9 @@ static void decode_RV32_64G(DisasContext *ctx)
+ 
+     op = MASK_OP_MAJOR(ctx->opcode);
+     rs1 = GET_RS1(ctx->opcode);
+-    rs2 = GET_RS2(ctx->opcode);
+     rd = GET_RD(ctx->opcode);
+-    imm = GET_IMM(ctx->opcode);
+ 
+     switch (op) {
+-    case OPC_RISC_FP_LOAD:
+-        gen_fp_load(ctx, MASK_OP_FP_LOAD(ctx->opcode), rd, rs1, imm);
+-        break;
+-    case OPC_RISC_FP_STORE:
+-        gen_fp_store(ctx, MASK_OP_FP_STORE(ctx->opcode), rs1, rs2,
+-                     GET_STORE_IMM(ctx->opcode));
+-        break;
+-    case OPC_RISC_FMADD:
+-        gen_fp_fmadd(ctx, MASK_OP_FP_FMADD(ctx->opcode), rd, rs1, rs2,
+-                     GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
+-        break;
+-    case OPC_RISC_FMSUB:
+-        gen_fp_fmsub(ctx, MASK_OP_FP_FMSUB(ctx->opcode), rd, rs1, rs2,
+-                     GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
+-        break;
+-    case OPC_RISC_FNMSUB:
+-        gen_fp_fnmsub(ctx, MASK_OP_FP_FNMSUB(ctx->opcode), rd, rs1, rs2,
+-                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
+-        break;
+-    case OPC_RISC_FNMADD:
+-        gen_fp_fnmadd(ctx, MASK_OP_FP_FNMADD(ctx->opcode), rd, rs1, rs2,
+-                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
+-        break;
+-    case OPC_RISC_FP_ARITH:
+-        gen_fp_arith(ctx, MASK_OP_FP_ARITH(ctx->opcode), rd, rs1, rs2,
+-                     GET_RM(ctx->opcode));
+-        break;
+     case OPC_RISC_SYSTEM:
+         gen_system(ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
+                    (ctx->opcode & 0xFFF00000) >> 20);
 -- 
 2.20.1
