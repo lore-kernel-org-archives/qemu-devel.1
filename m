@@ -1,23 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34245)
+Received: from eggs.gnu.org ([209.51.188.92]:35996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gxBOZ-0006Dc-O3
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:01:51 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gxBSO-0008Uq-I0
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gxBOY-00081i-0Q
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:01:43 -0500
-References: <20190220224003.4420-1-eric.auger@redhat.com>
-	<20190220224003.4420-9-eric.auger@redhat.com>
-	<20190222134516.575288c2@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <d6b2654c-d345-152b-4eec-7f2b885e6047@redhat.com>
-Date: Fri, 22 Feb 2019 15:01:25 +0100
+	(envelope-from <stefanha@gmail.com>) id 1gxBSN-0005ne-EC
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:40 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:34814)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gxBSN-0003w2-2p
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:05:39 -0500
+Received: by mail-wr1-x429.google.com with SMTP id f14so2530295wrg.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 06:04:33 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190222134516.575288c2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 08/17] hw/arm/virt: Implement kvm_type
- function for 4.0 machine
+References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<20190221111147.GB3282@stefanha-x1.localdomain>
+	<VI1PR0602MB3245593855B029B427ED544FA47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QUs9Yz2-k1KyVMwpgx6RwY9cK7qdQRCQ74xmgXJPJR-qw@mail.gmail.com>
+	<VI1PR0602MB32453A8B5CBC0308C7D18F1DA47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QVxaW3tezjBN9owJHsxzE9h8_qcaeRr5zHHKxKJOeFnkQ@mail.gmail.com>
+	<CAJSP0QVXoZJ9MJ0qp4RM_m2fGJ8iFSyJMAU_X7mdiQvpOK59KA@mail.gmail.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
+	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
+	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+In-Reply-To: <VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 22 Feb 2019 14:04:20 +0000
+Message-ID: <CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,170 +42,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
+To: =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@outlook.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Natanael Copa <ncopa@alpinelinux.org>, Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>
 
-Hi Igor,
+On Fri, Feb 22, 2019 at 12:57 PM Fernando Casas Sch=C3=B6ssow
+<casasfernando@outlook.com> wrote:
 
-On 2/22/19 1:45 PM, Igor Mammedov wrote:
-> On Wed, 20 Feb 2019 23:39:54 +0100
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> This patch implements the machine class kvm_type() callback.
->> It returns the number of bits requested to implement the whole GPA
->> range including the RAM and IO regions located beyond.
->> The returned value in passed though the KVM_CREATE_VM ioctl and
->> this allows KVM to set the stage2 tables dynamically.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v6 -> v7:
->> - Introduce RAMBASE and rename add LEGACY_ prefix in that patch
->> - use local variables with explicit names in virt_set_memmap:
->>   device_memory_base, device_memory_size
->> - add an extended_memmap field in the class
->>
->> v5 -> v6:
->> - add some comments
->> - high IO region cannot start before 256GiB
->> ---
->>  hw/arm/virt.c         | 50 ++++++++++++++++++++++++++++++++++++++++++-
->>  include/hw/arm/virt.h |  2 ++
->>  2 files changed, 51 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index 9db602457b..ad3a0ad73d 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -1437,7 +1437,14 @@ static void machvirt_init(MachineState *machine)
->>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
->>      bool aarch64 = true;
->>  
->> -    virt_set_memmap(vms);
->> +    /*
->> +     * In accelerated mode, the memory map is computed in kvm_type(),
->> +     * if set, to create a VM with the right number of IPA bits.
->> +     */
->> +
->> +    if (!mc->kvm_type || !kvm_enabled()) {
->> +        virt_set_memmap(vms);
->> +    }
->>  
->>      /* We can probe only here because during property set
->>       * KVM is not available yet
->> @@ -1814,6 +1821,36 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
->>      return NULL;
->>  }
->>  
->> +/*
->> + * for arm64 kvm_type [7-0] encodes the requested number of bits
->> + * in the IPA address space
->> + */
->> +static int virt_kvm_type(MachineState *ms, const char *type_str)
->> +{
->> +    VirtMachineState *vms = VIRT_MACHINE(ms);
->> +    int max_vm_pa_size = kvm_arm_get_max_vm_ipa_size(ms);
->> +    int requested_pa_size;
->> +
->> +    /* we freeze the memory map to compute the highest gpa */
->> +    virt_set_memmap(vms);
->> +
->> +    requested_pa_size = 64 - clz64(vms->highest_gpa);
->> +
->> +    if (requested_pa_size > max_vm_pa_size) {
->> +        error_report("-m and ,maxmem option values "
->> +                     "require an IPA range (%d bits) larger than "
->> +                     "the one supported by the host (%d bits)",
->> +                     requested_pa_size, max_vm_pa_size);
->> +       exit(1);
->> +    }
->> +    /*
->> +     * By default we return 0 which corresponds to an implicit legacy
->> +     * 40b IPA setting. Otherwise we return the actual requested PA
->> +     * logsize
->> +     */
->> +    return requested_pa_size > 40 ? requested_pa_size : 0;
->> +}
->> +
->>  static void virt_machine_class_init(ObjectClass *oc, void *data)
->>  {
->>      MachineClass *mc = MACHINE_CLASS(oc);
->> @@ -1838,6 +1875,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->>      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
->>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
->>      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
->> +    mc->kvm_type = virt_kvm_type;
->>      assert(!mc->get_hotplug_handler);
->>      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
->>      hc->plug = virt_machine_device_plug_cb;
->> @@ -1909,6 +1947,12 @@ static void virt_instance_init(Object *obj)
->>                                      "Valid values are none and smmuv3",
->>                                      NULL);
->>  
->> +    if (vmc->no_extended_memmap) {
->> +        vms->extended_memmap = false;
->> +    } else {
->> +        vms->extended_memmap = true;
->> +    }
->> +
->>      vms->irqmap = a15irqmap;
->>  }
->>  
->> @@ -1939,8 +1983,12 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
->>  
->>  static void virt_machine_3_1_options(MachineClass *mc)
->>  {
->> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
->>      virt_machine_4_0_options(mc);
->>      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
->> +
->> +    /* extended memory map is enabled from 4.0 onwards */
->> +    vmc->no_extended_memmap = true;
-> That's probably was asked in v6,
-> do we really need this knob?
-Yes the point was raised by Peter and I replied by another question ;-) "
-But don't we want to forbid any pre-4.0 machvirt to run with more than
-255GiB RAM?
-"
-without this knob:
-- pre-4.0 machines will gain the capability to support more than 255GB
-initial RAM if the kernel supports dynamic IPA setting
-- pre-4.0 machines will gain PCDIMM/NVDIMM support
-- another concern, maxmem and slots were not checked previously. If for
-some reason - without instantiating the actual slots -, the user
-specified it this was previously ignored. Now this is not anymore as
-both parameters allow to compute the requested IPA range. So this may
-fail now.
-So I thought this was clearer to disable all the above for pre-4.0
-machines. However if both of you agree, I will remove it.
+I have CCed Natanael Copa, qemu package maintainer in Alpine Linux.
 
-thanks
+Fernando: Can you confirm that the bug occurs with an unmodified
+Alpine Linux qemu binary?
 
-Eric
-> 
->>  }
->>  DEFINE_VIRT_MACHINE(3, 1)
->>  
->> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
->> index acad0400d8..7798462cb0 100644
->> --- a/include/hw/arm/virt.h
->> +++ b/include/hw/arm/virt.h
->> @@ -106,6 +106,7 @@ typedef struct {
->>      bool claim_edge_triggered_timers;
->>      bool smbios_old_sys_ver;
->>      bool no_highmem_ecam;
->> +    bool no_extended_memmap;
->>  } VirtMachineClass;
->>  
->>  typedef struct {
->> @@ -135,6 +136,7 @@ typedef struct {
->>      hwaddr highest_gpa;
->>      hwaddr device_memory_base;
->>      hwaddr device_memory_size;
->> +    bool extended_memmap;
->>  } VirtMachineState;
->>  
->>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-> 
+Richard: Commit 7db2145a6826b14efceb8dd64bfe6ad8647072eb ("bswap: Add
+host endian unaligned access functions") introduced the unaligned
+memory access functions in question here.  Please see below for
+details on the bug - basically QEMU code assumes they are atomic, but
+that is not guaranteed :(.  Any ideas for how to fix this?
+
+Natanael: It seems likely that the qemu package in Alpine Linux
+suffers from a compilation issue resulting in a broken QEMU.  It may
+be necessary to leave the compiler optimization flag alone in APKBUILD
+to work around this problem.
+
+Here are the details.  QEMU relies on the compiler turning
+memcpy(&dst, &src, 2) turning into a load instruction in
+include/qemu/bswap.h:lduw_he_p() (explanation below):
+
+/* Any compiler worth its salt will turn these memcpy into native unaligned
+   operations.  Thus we don't need to play games with packed attributes, or
+   inline byte-by-byte stores.  */
+
+static inline int lduw_he_p(const void *ptr)
+{
+    uint16_t r;
+    memcpy(&r, ptr, sizeof(r));
+    return r;
+}
+
+Here is the disassembly snippet of virtqueue_pop() from Fedora 29 that
+shows the load instruction:
+
+  398166:       0f b7 42 02             movzwl 0x2(%rdx),%eax
+  39816a:       66 89 43 32             mov    %ax,0x32(%rbx)
+
+Here is the instruction sequence in the Alpine Linux binary:
+
+  455562:    ba 02 00 00 00           mov    $0x2,%edx
+  455567:    e8 74 24 f3 ff           callq  3879e0 <memcpy@plt>
+  45556c:    0f b7 44 24 42           movzwl 0x42(%rsp),%eax
+  455571:    66 41 89 47 32           mov    %ax,0x32(%r15)
+
+It's calling memcpy instead of using a load instruction.
+
+Fernando found that QEMU's virtqueue_pop() function sees bogus values
+when loading a 16-bit guest RAM location.  Paolo figured out that the
+bogus value can be produced by memcpy() when another thread is
+updating the 16-bit memory location simultaneously.  This is a race
+condition between one thread loading the 16-bit value and another
+thread storing it (in this case a guest vcpu thread).  Sometimes
+memcpy() may load one old byte and one new byte, resulting in a bogus
+value.
+
+The symptom that Fernando experienced is a "Virtqueue size exceeded"
+error message from QEMU and then the virtio-blk or virtio-scsi device
+stops working.  This issue potentially affects other device emulation
+code in QEMU as well, not just virtio devices.
+
+For the time being, I suggest tweaking the APKBUILD so the memcpy() is
+not generated.  Hopefully QEMU can make the code more portable in the
+future so the compiler always does the expected thing, but this may
+not be easily possible.
+
+Stefan
