@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36983)
+Received: from eggs.gnu.org ([209.51.188.92]:38491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gx8Cb-0005B4-Pu
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:37:10 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gx8G1-0006RH-CE
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gx8Ca-000227-Mv
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:37:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gx8Ca-0001mu-Aj
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:37:08 -0500
-Date: Fri, 22 Feb 2019 11:36:34 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gx8Fv-0004FO-NL
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:40:37 -0500
+Date: Fri, 22 Feb 2019 11:40:13 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190222113634.362e80fa@redhat.com>
-In-Reply-To: <20190222085355.GA30665@richard>
-References: <20190219080826.9812-1-richardw.yang@linux.intel.com>
-	<20190221154551.5ab655f4@redhat.com>
-	<20190222085355.GA30665@richard>
+Message-ID: <20190222114013.5ee11757@redhat.com>
+In-Reply-To: <20190220224003.4420-7-eric.auger@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190220224003.4420-7-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] i386,
- acpi: check acpi_memory_hotplug capacity in pre_plug
+Subject: Re: [Qemu-devel] [PATCH v7 06/17] vl: Set machine ram_size,
+ maxram_size and ram_slots earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-On Fri, 22 Feb 2019 16:53:55 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
+On Wed, 20 Feb 2019 23:39:52 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-> On Thu, Feb 21, 2019 at 03:45:51PM +0100, Igor Mammedov wrote:
-> >On Tue, 19 Feb 2019 16:08:26 +0800
-> >Wei Yang <richardw.yang@linux.intel.com> wrote:
-> >  
-> >> Currently we do device realization like below:
-> >> 
-> >>    hotplug_handler_pre_plug()
-> >>    dc->realize()
-> >>    hotplug_handler_plug()
-> >> 
-> >> Before we do device realization and plug, we should allocate necessary
-> >> resources and check if memory-hotplug-support property is enabled.
-> >> 
-> >> At the piix4 and ich9, the memory-hotplug-support property is checked at
-> >> plug stage. This means that device has been realized and mapped into guest
-> >> address space 'pc_dimm_plug()' by the time acpi plug handler is called,
-> >> where it might fail and crash QEMU due to reaching g_assert_not_reached()
-> >> (piix4) or error_abort (ich9).
-> >> 
-> >> Fix it by checking if memory hotplug is enabled at pre_plug stage
-> >> where we can gracefully abort hotplug request.
-> >> 
-> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> >> CC: Igor Mammedov <imammedo@redhat.com>
-> >> CC: Eric Blake <eblake@redhat.com>  
-> >patch refuses to be applied to current master
-> >  
+> The machine RAM attributes will need to be analyzed during the
+> configure_accelerator() process. especially kvm_type() arm64
+> machine callback will use them to know how many IPA/GPA bits are
+> needed to model the whole RAM range. So let's assign those machine
+> state fields before calling configure_accelerator.
 > 
-> Could latest upstream compile successfully?
-> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-works for me
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> 
+> ---
+> v6 -> v7:
+> - add Peter's R-b
+> 
+> v4: new
+> ---
+>  vl.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 502857a176..fd0d51320d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4239,6 +4239,9 @@ int main(int argc, char **argv, char **envp)
+>      machine_opts = qemu_get_machine_opts();
+>      qemu_opt_foreach(machine_opts, machine_set_property, current_machine,
+>                       &error_fatal);
+> +    current_machine->ram_size = ram_size;
+> +    current_machine->maxram_size = maxram_size;
+> +    current_machine->ram_slots = ram_slots;
+>  
+>      configure_accelerator(current_machine, argv[0]);
+>  
+> @@ -4434,9 +4437,6 @@ int main(int argc, char **argv, char **envp)
+>      replay_checkpoint(CHECKPOINT_INIT);
+>      qdev_machine_init();
+>  
+> -    current_machine->ram_size = ram_size;
+> -    current_machine->maxram_size = maxram_size;
+> -    current_machine->ram_slots = ram_slots;
+>      current_machine->boot_order = boot_order;
+>  
+>      /* parse features once if machine provides default cpu_type */
