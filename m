@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41565)
+Received: from eggs.gnu.org ([209.51.188.92]:41563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZo-0006VB-M5
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZo-0006VA-Ly
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZi-0000ud-7L
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBZh-0000t4-KS
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:13:16 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:10:02 +0100
-Message-Id: <20190222141024.22217-13-kbastian@mail.uni-paderborn.de>
+Date: Fri, 22 Feb 2019 15:10:12 +0100
+Message-Id: <20190222141024.22217-23-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 12/34] target/riscv: Convert RV64F insns to
- decodetree
+Subject: [Qemu-devel] [PATCH v8 22/34] target/riscv: Remove manual decoding
+ from gen_store()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,101 +23,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
+Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
+With decodetree we don't need to convert RISC-V opcodes into to MemOps
+as the old gen_store() did.
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
-v7 -> v8:
-    - add missing RVF checks
+ target/riscv/insn_trans/trans_rvi.inc.c | 27 +++++++++++++++++--------
+ target/riscv/translate.c                |  8 +++++---
+ 2 files changed, 24 insertions(+), 11 deletions(-)
 
- target/riscv/insn32-64.decode           |  6 +++
- target/riscv/insn_trans/trans_rvf.inc.c | 60 +++++++++++++++++++++++++
- 2 files changed, 66 insertions(+)
-
-diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
-index 0bee95c984..6319f872ac 100644
---- a/target/riscv/insn32-64.decode
-+++ b/target/riscv/insn32-64.decode
-@@ -56,3 +56,9 @@ amomin_d   10000 . . ..... ..... 011 ..... 0101111 @atom_st
- amomax_d   10100 . . ..... ..... 011 ..... 0101111 @atom_st
- amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
- amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
-+
-+# *** RV64F Standard Extension (in addition to RV32F) ***
-+fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
-+fcvt_lu_s  1100000  00011 ..... ... ..... 1010011 @r2_rm
-+fcvt_s_l   1101000  00010 ..... ... ..... 1010011 @r2_rm
-+fcvt_s_lu  1101000  00011 ..... ... ..... 1010011 @r2_rm
-diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
-index 0f83790349..172dbfa919 100644
---- a/target/riscv/insn_trans/trans_rvf.inc.c
-+++ b/target/riscv/insn_trans/trans_rvf.inc.c
-@@ -377,3 +377,63 @@ static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
+diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+index cc361ed4d1..5a09c6335a 100644
+--- a/target/riscv/insn_trans/trans_rvi.inc.c
++++ b/target/riscv/insn_trans/trans_rvi.inc.c
+@@ -168,22 +168,34 @@ static bool trans_lhu(DisasContext *ctx, arg_lhu *a)
+     return gen_load(ctx, a, MO_TEUW);
+ }
  
+-static bool trans_sb(DisasContext *ctx, arg_sb *a)
++static bool gen_store(DisasContext *ctx, arg_sb *a, TCGMemOp memop)
+ {
+-    gen_store(ctx, OPC_RISC_SB, a->rs1, a->rs2, a->imm);
++    TCGv t0 = tcg_temp_new();
++    TCGv dat = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_addi_tl(t0, t0, a->imm);
++    gen_get_gpr(dat, a->rs2);
++
++    tcg_gen_qemu_st_tl(dat, t0, ctx->mem_idx, memop);
++    tcg_temp_free(t0);
++    tcg_temp_free(dat);
      return true;
  }
+ 
 +
++static bool trans_sb(DisasContext *ctx, arg_sb *a)
++{
++    return gen_store(ctx, a, MO_SB);
++}
++
+ static bool trans_sh(DisasContext *ctx, arg_sh *a)
+ {
+-    gen_store(ctx, OPC_RISC_SH, a->rs1, a->rs2, a->imm);
+-    return true;
++    return gen_store(ctx, a, MO_TESW);
+ }
+ 
+ static bool trans_sw(DisasContext *ctx, arg_sw *a)
+ {
+-    gen_store(ctx, OPC_RISC_SW, a->rs1, a->rs2, a->imm);
+-    return true;
++    return gen_store(ctx, a, MO_TESL);
+ }
+ 
+ #ifdef TARGET_RISCV64
+@@ -199,8 +211,7 @@ static bool trans_ld(DisasContext *ctx, arg_ld *a)
+ 
+ static bool trans_sd(DisasContext *ctx, arg_sd *a)
+ {
+-    gen_store(ctx, OPC_RISC_SD, a->rs1, a->rs2, a->imm);
+-    return true;
++    return gen_store(ctx, a, MO_TEQ);
+ }
+ #endif
+ 
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 99d6d3b4ae..cdc08b1bff 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -56,6 +56,7 @@ typedef struct DisasContext {
+     int frm;
+ } DisasContext;
+ 
 +#ifdef TARGET_RISCV64
-+static bool trans_fcvt_l_s(DisasContext *ctx, arg_fcvt_l_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[a->rs1]);
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+    return true;
-+}
-+
-+static bool trans_fcvt_lu_s(DisasContext *ctx, arg_fcvt_lu_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[a->rs1]);
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+    return true;
-+}
-+
-+static bool trans_fcvt_s_l(DisasContext *ctx, arg_fcvt_s_l *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_s_l(cpu_fpr[a->rd], cpu_env, t0);
-+
-+    mark_fs_dirty(ctx);
-+    tcg_temp_free(t0);
-+    return true;
-+}
-+
-+static bool trans_fcvt_s_lu(DisasContext *ctx, arg_fcvt_s_lu *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_s_lu(cpu_fpr[a->rd], cpu_env, t0);
-+
-+    mark_fs_dirty(ctx);
-+    tcg_temp_free(t0);
-+    return true;
-+}
+ /* convert riscv funct3 to qemu memop for load/store */
+ static const int tcg_memop_lookup[8] = {
+     [0 ... 7] = -1,
+@@ -69,6 +70,7 @@ static const int tcg_memop_lookup[8] = {
+     [6] = MO_TEUL,
+ #endif
+ };
 +#endif
+ 
+ #ifdef TARGET_RISCV64
+ #define CASE_OP_32_64(X) case X: case glue(X, W)
+@@ -551,9 +553,8 @@ static void gen_load_c(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+     tcg_temp_free(t0);
+     tcg_temp_free(t1);
+ }
+-#endif
+ 
+-static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
++static void gen_store_c(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
+         target_long imm)
+ {
+     TCGv t0 = tcg_temp_new();
+@@ -572,6 +573,7 @@ static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
+     tcg_temp_free(t0);
+     tcg_temp_free(dat);
+ }
++#endif
+ 
+ #ifndef CONFIG_USER_ONLY
+ /* The states of mstatus_fs are:
+@@ -736,7 +738,7 @@ static void decode_RV32_64C0(DisasContext *ctx)
+     case 7:
+ #if defined(TARGET_RISCV64)
+         /* C.SD (RV64/128) -> sd rs2', offset[7:3](rs1')*/
+-        gen_store(ctx, OPC_RISC_SD, rs1s, rd_rs2,
++        gen_store_c(ctx, OPC_RISC_SD, rs1s, rd_rs2,
+                   GET_C_LD_IMM(ctx->opcode));
+ #else
+         /* C.FSW (RV32) -> fsw rs2', offset[6:2](rs1')*/
 -- 
 2.20.1
