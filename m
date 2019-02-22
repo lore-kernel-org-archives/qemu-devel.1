@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35609)
+Received: from eggs.gnu.org ([209.51.188.92]:35677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gxD9L-0007r5-0o
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:54:07 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gxD9N-0007sy-6n
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:54:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gxD9K-0007Wc-70
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:54:06 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:36915)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gxD9J-0007Jf-WA
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:54:06 -0500
-Received: by mail-qk1-f195.google.com with SMTP id m9so1408904qkl.4
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:53:58 -0800 (PST)
-Date: Fri, 22 Feb 2019 10:53:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190222105159-mutt-send-email-mst@kernel.org>
-References: <20190221173326.31874-1-mst@redhat.com>
-	<CAFEAcA_Nmo1bpWr5rUmXotB_J9J78wvqB9TU174WWyqt+CEZZw@mail.gmail.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1gxD9L-0007ZR-FD
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:54:09 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:56863)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gxD9L-0007OO-1k
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:54:07 -0500
+Date: Fri, 22 Feb 2019 16:54:02 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190222115146.e4e5jlbwlysx433f@sirius.home.kraxel.org>
+Message-ID: <alpine.BSF.2.21.9999.1902221629100.73795@zero.eik.bme.hu>
+References: <20190221150353.93DE87465DE@zero.eik.bme.hu>
+	<20190222115146.e4e5jlbwlysx433f@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_Nmo1bpWr5rUmXotB_J9J78wvqB9TU174WWyqt+CEZZw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/26] pci, pc, virtio: fixes, cleanups,
- tests
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v3] hw/display: Add basic ATI VGA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +26,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, david@gibson.dropbear.id.au
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, philmd@redhat.com
 
-On Fri, Feb 22, 2019 at 03:47:36PM +0000, Peter Maydell wrote:
-> On Fri, 22 Feb 2019 at 02:40, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > The following changes since commit fc3dbb90f2eb069801bfb4cfe9cbc83cf9c5f4a9:
-> >
-> >   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-02-21 13:09:33 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> >
-> > for you to fetch changes up to 1f8c04f18d2ee2f6ec88217dfd547ab38d2be5c5:
-> >
-> >   pci: Sanity test minimum downstream LNKSTA (2019-02-21 12:28:41 -0500)
-> >
-> > ----------------------------------------------------------------
-> > pci, pc, virtio: fixes, cleanups, tests
-> >
-> > Lots of work on tests: BiosTablesTest UEFI app,
-> > vhost-user testing for non-Linux hosts.
-> > Misc cleanups and fixes all over the place
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >
-> > ----------------------------------------------------------------
-> 
-> Compile failure on clang:
-> 
-> /home/petmay01/linaro/qemu-for-merges/hw/virtio/virtio-balloon.c:40:3:
-> error: redefinition of typedef 'PartiallyBalloonedPage' is a C11
-> feature [-Werror,-Wtypedef-redefinition]
-> } PartiallyBalloonedPage;
->   ^
-> /home/petmay01/linaro/qemu-for-merges/include/hw/virtio/virtio-balloon.h:33:39:
-> note: previous definition is here
-> typedef struct PartiallyBalloonedPage PartiallyBalloonedPage;
->                                       ^
-> 1 error generated.
-> /home/petmay01/linaro/qemu-for-merges/rules.mak:69: recipe for target
-> 'hw/virtio/virtio-balloon.o' failed
-> 
-> thanks
-> -- PMM
+On Fri, 22 Feb 2019, Gerd Hoffmann wrote:
+> On Thu, Feb 21, 2019 at 03:55:14PM +0100, BALATON Zoltan wrote:
+>> At least two machines, the PPC mac99 and MIPS fulong2e, have an ATI
+>> gfx chip by default (Rage 128 Pro and M6/RV100 respectively) and
+>> guests running on these and the PMON2000 firmware of the fulong2e
+>> expect this to be available. Fortunately these are very similar chips
+>> so they can be mostly emulated in the same device model. This patch
+>> adds basic emulation of these ATI VGA chips.
+>>
+>> While this is incomplete and currently only enough to run the MIPS
+>> firmware and get framebuffer output with Linux, it allows the fulong2e
+>> board to work more like the real hardware and having it in QEMU in
+>> this state provides a way to experiment with it and allows others to
+>> contribute to improve it. It is compiled for all archs but only the
+>> fulong2e (which currently has no display output at all) is set to use
+>> it by default (in a patch sent separately).
+>
+> Attached patch creates two separate devices.  It's just some QOM
+> boilerplate, they still share 95% of the code.
 
-Fixed up and re-pushed.
-David, pls note above and don't add duplicate typedefs in the future.
-There's always include/qemu/typedefs.h if you don't know where
-to put a typedef.
+Thanks. Do you want me to merge this and submit a new version or you want 
+to fix up after merging my patch or what should we do with this? (I'm not 
+a fan of adding a new function for every new model of these devices so I'd 
+probably get rid of the is_ati_* functions and still compare to device id 
+internally maybe via a single is_ati_device(id) function though. I also 
+find ati-rage128pro a bit too long, I liked the ati-vga better with 
+selecting variants via a property but if you think it's better with more 
+QOM boilerplate and adding every variant to the default_list[] one by one 
+then I can live with that. How about ati-r128pro at least instead?
 
--- 
-MST
+>  With that in place
+> vgabios works just fine for both devices.
+
+But I don't get why is the above needed for this. By the time the client 
+runs (after device realize) both should look the same: your QOM subclasses 
+and my ati-vga class that sets device_id based on property. Where's the 
+difference that makes one work and other doesn't?
+
+> On x86 linux:  Fedora live iso happily boots X on both devices, they both
+> are running with the vesa xorg driver though so that doesn't say much.
+>
+> With a self-compiled kernel:
+> aty128fb.ko seems to be able to handle the rage128pro.
+
+Good, that's all that's expected to work at the moment anyway.
+
+> Neither radeonfb.ko nor radeon.ko (drm driver) can handle the rv100.
+> Loading radeonfb results in a kernel panic.  radeon.ko prints an
+> initialization error.  Seems at least radeonfb tries to pull some info
+> out of the bios image ...
+
+Is there a live cd iso or something simple to test this with?
+
+I think the ATI option ROMs have some mode timings that are needed to 
+program PLLs for setting modes and drivers extract this from the BIOS 
+which has some predefined structure so if a driver relies on this it may 
+have a problem when we don't have a BIOS with the data it expects. But if 
+it does not check BIOS format and just pulls junk out of unexpected BIOS 
+image and puts that in clock registers that should not matter as those are 
+ignored anyway. I think rv100 will probably need a separate vgabios that 
+looks more like what drivers expect but I don't have plans yet to 
+implement that. It may also be interesting to try a BIOS from a real card 
+if you can get one to see what it does.
+
+I think I've seen some logs in dmesg from aty128fb driver saying that BIOS 
+is unexpected, guessing PLL values or similar. Maybe the radoeon driver 
+does not do that and exits if BIOS is not found?
+
+Regards,
+BALATON Zoltan
