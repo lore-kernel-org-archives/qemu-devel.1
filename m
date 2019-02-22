@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43644)
+Received: from eggs.gnu.org ([209.51.188.92]:43860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gxEbi-0003Et-AS
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:27:31 -0500
+	(envelope-from <crosa@redhat.com>) id 1gxEcG-0003YN-2J
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:28:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gxEbg-000171-9R
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:27:30 -0500
-Received: from mta-01.yadro.com ([89.207.88.251]:35758)
+	(envelope-from <crosa@redhat.com>) id 1gxEcF-0002Ck-9a
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:28:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41331)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
-	id 1gxEbe-0000U9-AL
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:27:28 -0500
-Date: Fri, 22 Feb 2019 20:27:02 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-ID: <20190222172702.bl7jmvklbmqvdty5@SPB-NB-133.local>
-References: <20190214102816.3393-1-peter.maydell@linaro.org>
-	<20190214102816.3393-3-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gxEcF-0001HE-1n
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:28:03 -0500
+References: <1548638112-31101-1-git-send-email-lizhijian@cn.fujitsu.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <f4c6777f-e577-fef9-e952-a6a9b8e2c37c@redhat.com>
+Date: Fri, 22 Feb 2019 12:27:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20190214102816.3393-3-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] ui/cocoa: Use the pixman image
- directly in switchSurface
+In-Reply-To: <1548638112-31101-1-git-send-email-lizhijian@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Acceptance tests: use linux-3.6 and
+ set vm memory to 4GiB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>, BALATON Zoltan <balaton@eik.bme.hu>
+To: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-On Thu, Feb 14, 2019 at 10:28:11AM +0000, Peter Maydell wrote:
-> Currently the switchSurface method takes a DisplaySurface. We want
-> to change our DisplayChangeListener's dpy_gfx_switch callback
-> to do this work asynchronously on a different thread. The caller
-> of the switch callback will free the old DisplaySurface
-> immediately the callback returns, so to ensure that the
-> other thread doesn't access freed data we need to switch
-> to using the underlying pixman image instead. The pixman
-> image is reference counted, so we will be able to take
-> a reference to it to avoid it vanishing too early.
-> 
-> In this commit we only change the switchSurface method
-> to take a pixman image, and keep the flow of control
-> synchronous for now.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  ui/cocoa.m | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
-> 
 
-Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
-Thanks,
-Roman
+On 1/27/19 8:15 PM, Li Zhijian wrote:
+> QEMU have already supported to load up to 4G initrd if the sepcified me=
+mory is
+> enough and XLF_CAN_BE_LOADED_ABOVE_4G is set by guest kernel
+>=20
+> linux-3.6 kernel shipped by Fedora-18 cannot support xldflags so that i=
+t
+> cannot support loading more than 2GiB initrd
+>=20
+> CC: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> CC: Caio Carrara <ccarrara@redhat.com>
+> CC: Cleber Rosa <crosa@redhat.com>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>=20
+
+
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
