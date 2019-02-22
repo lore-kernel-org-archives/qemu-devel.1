@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41598)
+Received: from eggs.gnu.org ([209.51.188.92]:43757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gx9zx-0007RZ-3r
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 07:32:14 -0500
+	(envelope-from <clg@kaod.org>) id 1gxA4g-0000NE-7W
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 07:37:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gx9zv-0005b8-BQ
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 07:32:12 -0500
-Received: from fanzine.igalia.com ([91.117.99.155]:44814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1gx9zu-0005Q8-Iq
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 07:32:11 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190222121657.GP25234@redhat.com>
-References: <cover.1550836631.git.berto@igalia.com>
-	<a36c45f857a395a1d1bbcc67beae47e437569ab4.1550836631.git.berto@igalia.com>
-	<20190222121657.GP25234@redhat.com>
-Date: Fri, 22 Feb 2019 13:32:07 +0100
-Message-ID: <w51zhqo57i0.fsf@maestria.local.igalia.com>
+	(envelope-from <clg@kaod.org>) id 1gxA4e-0003hq-BX
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 07:37:06 -0500
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:48644)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gxA4d-0002pD-UH
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 07:37:04 -0500
+Received: from player694.ha.ovh.net (unknown [10.109.146.50])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6281115D9B2
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 13:36:24 +0100 (CET)
+References: <20190107183946.7230-1-clg@kaod.org>
+	<20190107183946.7230-14-clg@kaod.org>
+	<20190212011153.GH1884@umbus.fritz.box>
+	<d6dc35c6-4987-3fcc-de81-f2aff865cad1@kaod.org>
+	<20190213013219.GU1884@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <b2678261-7028-8d73-fc4a-473a4d1b2d1c@kaod.org>
+Date: Fri, 22 Feb 2019 13:36:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190213013219.GU1884@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] char-socket: Lock
- tcp_chr_disconnect() and socket_reconnect_timeout()
+Subject: Re: [Qemu-devel] [PATCH 13/13] spapr: add KVM support to the 'dual'
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +35,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Fri 22 Feb 2019 01:16:57 PM CET, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Feb 22, 2019 at 01:59:12PM +0200, Alberto Garcia wrote:
->> There's a race condition in which the tcp_chr_read() ioc handler can
->> close a connection that is being written to from another thread.
->>=20
->> Running iotest 136 in a loop triggers this problem and crashes QEMU.
->>=20
->>  (gdb) bt
->>  #0  0x00005558b842902d in object_get_class (obj=3D0x0) at qom/object.c:=
-860
->>  #1  0x00005558b84f92db in qio_channel_writev_full (ioc=3D0x0, iov=3D0x7=
-ffc355decf0, niov=3D1, fds=3D0x0, nfds=3D0, errp=3D0x0) at io/channel.c:76
->>  #2  0x00005558b84e0e9e in io_channel_send_full (ioc=3D0x0, buf=3D0x5558=
-baf5beb0, len=3D138, fds=3D0x0, nfds=3D0) at chardev/char-io.c:123
->>  #3  0x00005558b84e4a69 in tcp_chr_write (chr=3D0x5558ba460380, buf=3D0x=
-5558baf5beb0 "...", len=3D138) at chardev/char-socket.c:135
->>  #4  0x00005558b84dca55 in qemu_chr_write_buffer (s=3D0x5558ba460380, bu=
-f=3D0x5558baf5beb0 "...", len=3D138, offset=3D0x7ffc355dedd0, write_all=3Df=
-alse) at chardev/char.c:112
->>  #5  0x00005558b84dcbc2 in qemu_chr_write (s=3D0x5558ba460380, buf=3D0x5=
-558baf5beb0 "...", len=3D138, write_all=3Dfalse) at chardev/char.c:147
->>  #6  0x00005558b84dfb26 in qemu_chr_fe_write (be=3D0x5558ba476610, buf=
-=3D0x5558baf5beb0 "...", len=3D138) at chardev/char-fe.c:42
->>  #7  0x00005558b8088c86 in monitor_flush_locked (mon=3D0x5558ba476610) a=
-t monitor.c:406
->>  #8  0x00005558b8088e8c in monitor_puts (mon=3D0x5558ba476610, str=3D0x5=
-558ba921e49 "") at monitor.c:449
->>  #9  0x00005558b8089178 in qmp_send_response (mon=3D0x5558ba476610, rsp=
-=3D0x5558bb161600) at monitor.c:498
->>  #10 0x00005558b808920c in monitor_qapi_event_emit (event=3DQAPI_EVENT_S=
-HUTDOWN, qdict=3D0x5558bb161600) at monitor.c:526
->>  #11 0x00005558b8089307 in monitor_qapi_event_queue_no_reenter (event=3D=
-QAPI_EVENT_SHUTDOWN, qdict=3D0x5558bb161600) at monitor.c:551
->>  #12 0x00005558b80896c0 in qapi_event_emit (event=3DQAPI_EVENT_SHUTDOWN,=
- qdict=3D0x5558bb161600) at monitor.c:626
->>  #13 0x00005558b855f23b in qapi_event_send_shutdown (guest=3Dfalse, reas=
-on=3DSHUTDOWN_CAUSE_HOST_QMP_QUIT) at qapi/qapi-events-run-state.c:43
->>  #14 0x00005558b81911ef in qemu_system_shutdown (cause=3DSHUTDOWN_CAUSE_=
-HOST_QMP_QUIT) at vl.c:1837
->>  #15 0x00005558b8191308 in main_loop_should_exit () at vl.c:1885
->>  #16 0x00005558b819140d in main_loop () at vl.c:1924
->>  #17 0x00005558b8198c84 in main (argc=3D18, argv=3D0x7ffc355df3f8, envp=
-=3D0x7ffc355df490) at vl.c:4665
->>=20
->> This patch adds a lock to protect tcp_chr_disconnect() and
->> socket_reconnect_timeout()
->
-> Can you think of any way to test this in the unit tests ?  I can
-> understand if its too difficult but just curious if there's any viable
-> option ?
+On 2/13/19 2:32 AM, David Gibson wrote:
+> On Tue, Feb 12, 2019 at 08:18:19AM +0100, C=E9dric Le Goater wrote:
+>> On 2/12/19 2:11 AM, David Gibson wrote:
+>>> On Mon, Jan 07, 2019 at 07:39:46PM +0100, C=E9dric Le Goater wrote:
+>>>> The interrupt mode is chosen by the CAS negotiation process and
+>>>> activated after a reset to take into account the required changes in
+>>>> the machine. This brings new constraints on how the associated KVM I=
+RQ
+>>>> device is initialized.
+>>>>
+>>>> Currently, each model takes care of the initialization of the KVM
+>>>> device in their realize method but this is not possible anymore as t=
+he
+>>>> initialization needs to be done globaly when the interrupt mode is
+>>>> known, i.e. when machine is reseted. It also means that we need a wa=
+y
+>>>> to delete a KVM device when another mode is chosen.
+>>>>
+>>>> Also, to support migration, the QEMU objects holding the state to
+>>>> transfer should always be available but not necessarily activated.
+>>>>
+>>>> The overall approach of this proposal is to initialize both interrup=
+t
+>>>> mode at the QEMU level and keep the IRQ number space in sync to allo=
+w
+>>>> switching from one mode to another. For the KVM side of things, the
+>>>> whole initialization of the KVM device, sources and presenters, is
+>>>> grouped in a single routine. The XICS and XIVE sPAPR IRQ reset
+>>>> handlers are modified accordingly to handle the init and the delete
+>>>> sequences of the KVM device.
+>>>>
+>>>> As KVM is now initialized at reset, we loose the possiblity to
+>>>> fallback to the QEMU emulated mode in case of failure and failures
+>>>> become fatal to the machine.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  hw/intc/spapr_xive.c     |  8 +---
+>>>>  hw/intc/spapr_xive_kvm.c | 27 ++++++++++++++
+>>>>  hw/intc/xics_kvm.c       | 25 +++++++++++++
+>>>>  hw/intc/xive.c           |  4 --
+>>>>  hw/ppc/spapr_irq.c       | 79 ++++++++++++++++++++++++++++---------=
+---
+>>>>  5 files changed, 109 insertions(+), 34 deletions(-)
+>>>>
+>>>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>>>> index 21f3c1ef0901..0661aca35900 100644
+>>>> --- a/hw/intc/spapr_xive.c
+>>>> +++ b/hw/intc/spapr_xive.c
+>>>> @@ -330,13 +330,7 @@ static void spapr_xive_realize(DeviceState *dev=
+, Error **errp)
+>>>>      xive->eat =3D g_new0(XiveEAS, xive->nr_irqs);
+>>>>      xive->endt =3D g_new0(XiveEND, xive->nr_ends);
+>>>> =20
+>>>> -    if (kvmppc_xive_enabled()) {
+>>>> -        kvmppc_xive_connect(xive, &local_err);
+>>>> -        if (local_err) {
+>>>> -            error_propagate(errp, local_err);
+>>>> -            return;
+>>>> -        }
+>>>> -    } else {
+>>>> +    if (!kvmppc_xive_enabled()) {
+>>>>          /* TIMA initialization */
+>>>>          memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_t=
+m_ops, xive,
+>>>>                                "xive.tima", 4ull << TM_SHIFT);
+>>>> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+>>>> index d35814c1992e..3ebc947f2be7 100644
+>>>> --- a/hw/intc/spapr_xive_kvm.c
+>>>> +++ b/hw/intc/spapr_xive_kvm.c
+>>>> @@ -737,6 +737,15 @@ void kvmppc_xive_connect(sPAPRXive *xive, Error=
+ **errp)
+>>>>      Error *local_err =3D NULL;
+>>>>      size_t esb_len;
+>>>>      size_t tima_len;
+>>>> +    CPUState *cs;
+>>>> +
+>>>> +    /*
+>>>> +     * The KVM XIVE device already in use. This is the case when
+>>>> +     * rebooting XIVE -> XIVE
+>>>
+>>> Can this case actually occur?  Further down you appear to
+>>> unconditionally destroy both KVM devices at reset time.
+>>
+>> I guess you are right. I will check.
 
-I haven't thought about it. If anyone has a suggestion of how to
-reproduce it we can add a new test later.
+So we have to keep it for ic-mode=3Dxive.
 
->>          if (ret < 0 && errno !=3D EAGAIN) {
->>              if (tcp_chr_read_poll(chr) <=3D 0) {
->> +                qemu_mutex_unlock(&chr->chr_write_lock);
->>                  tcp_chr_disconnect(chr);
->> +                qemu_mutex_lock(&chr->chr_write_lock);
->
-> The idea of unlock & relocking here, just so tcp_chr_disconnect can
-> also acquire locks, doesn't make me too happy. This is really an
-> anti-pattern to me.
+The number of test combinations is exploding. We now have :
 
-I'm not too happy about it either. I'll send a new version with
-tcp_chr_disconnect_locked() as you suggest.
+3 hypervisors              KVM, KVM nested, QEMU TCG
+3 Interrupt modes          xics, xive, dual (xics+xive)
+3 kernel irqchip modes     off, allow, required.
 
-Berto
+
+C.
+ =20
