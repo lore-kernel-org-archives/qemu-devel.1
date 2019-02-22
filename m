@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54695)
+Received: from eggs.gnu.org ([209.51.188.92]:56337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gx6GW-0007AZ-IT
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:33:06 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gx6Ja-0008Q2-8y
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:36:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gx6GV-0004MW-9p
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:33:04 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55263)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gx6GU-0004K7-Q8
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:33:03 -0500
-Received: by mail-wm1-f67.google.com with SMTP id a62so1135970wmh.4
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 00:33:02 -0800 (PST)
-References: <20190220160628.6555-1-marcandre.lureau@redhat.com>
-	<20190220160628.6555-3-marcandre.lureau@redhat.com>
-	<20190221080357.GC3091@xz-x1>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <fbbb45f4-520c-430b-f4ed-19a9fccd2753@redhat.com>
-Date: Fri, 22 Feb 2019 09:32:59 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gx6JX-0006gX-1u
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 03:36:12 -0500
+Date: Fri, 22 Feb 2019 09:35:59 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190222093559.5334886d.cohuck@redhat.com>
+In-Reply-To: <397b094e-d140-d1c3-5ced-ca2d2e0e5d8e@linux.ibm.com>
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-11-git-send-email-jjherne@linux.ibm.com>
+	<20190204122437.58ebdba9.cohuck@redhat.com>
+	<397b094e-d140-d1c3-5ced-ca2d2e0e5d8e@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190221080357.GC3091@xz-x1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] chardev: make
- qemu_chr_fe_set_handlers() context switching safer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/15] s390-bios: Support for running
+ format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,119 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
+On Thu, 21 Feb 2019 13:01:40 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
+> On 2/4/19 6:24 AM, Cornelia Huck wrote:
+> > On Tue, 29 Jan 2019 08:29:17 -0500
+> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+(...)
+> >> -#define SCSW_FCTL_CLEAR_FUNC 0x1000
+> >> -#define SCSW_FCTL_HALT_FUNC 0x2000
+> >> +/* Function Control */
+> >>   #define SCSW_FCTL_START_FUNC 0x4000
+> >> +#define SCSW_FCTL_HALT_FUNC 0x2000
+> >> +#define SCSW_FCTL_CLEAR_FUNC 0x1000
+> >> +
+> >> +/* Activity Control */
+> >> +#define SCSW_ACTL_RESUME_PEND   0x0800
+> >> +#define SCSW_ACTL_START_PEND    0x0400
+> >> +#define SCSW_ACTL_HALT_PEND     0x0200
+> >> +#define SCSW_ACTL_CLEAR_PEND    0x0100
+> >> +#define SCSW_ACTL_CH_ACTIVE     0x0080
+> >> +#define SCSW_ACTL_DEV_ACTIVE    0x0040
+> >> +#define SCSW_ACTL_SUSPENDED     0x0020
+> >> +
+> >> +/* Status Control */
+> >> +#define SCSW_SCTL_ALERT         0x0010
+> >> +#define SCSW_SCTL_INTERMED      0x0008
+> >> +#define SCSW_SCTL_PRIMARY       0x0004
+> >> +#define SCSW_SCTL_SECONDARY     0x0002
+> >> +#define SCSW_SCTL_STATUS_PEND   0x0001
+> >> +
+> >> +/* SCSW Device Status Flags */
+> >> +#define SCSW_DSTAT_ATTN     0x80
+> >> +#define SCSW_DSTAT_STATMOD  0x40
+> >> +#define SCSW_DSTAT_CUEND    0x20
+> >> +#define SCSW_DSTAT_BUSY     0x10
+> >> +#define SCSW_DSTAT_CHEND    0x08
+> >> +#define SCSW_DSTAT_DEVEND   0x04
+> >> +#define SCSW_DSTAT_UCHK     0x02
+> >> +#define SCSW_DSTAT_UEXCP    0x01
+> >> +
+> >> +/* SCSW Subchannel Status Flags */
+> >> +#define SCSW_CSTAT_PCINT    0x80
+> >> +#define SCSW_CSTAT_BADLEN   0x40
+> >> +#define SCSW_CSTAT_PROGCHK  0x20
+> >> +#define SCSW_CSTAT_PROTCHK  0x10
+> >> +#define SCSW_CSTAT_CHDCHK   0x08
+> >> +#define SCSW_CSTAT_CHCCHK   0x04
+> >> +#define SCSW_CSTAT_ICCHK    0x02
+> >> +#define SCSW_CSTAT_CHAINCHK 0x01  
+> > 
+> > Any reason you're not following the Linux kernel definitions here?
+> > Might make it easier for folks familiar with the kernel implementation.
+> >   
+> 
+> There wasn't any real reason. I do like some of my names better as I feel that they all 
+> should start with SCSW_. But in the interest of homogenizing I could change to the kernel 
+> implementation. Let me know if you think its worth the time, I could go either way on it.
 
-On 2/21/19 9:03 AM, Peter Xu wrote:
-> On Wed, Feb 20, 2019 at 05:06:26PM +0100, Marc-André Lureau wrote:
->> qemu_chr_fe_set_handlers() may switch the context of various
->> sources. In order to prevent dispatch races from different threads,
->> let's acquire or freeze the context, do all the source switches, and
->> then release/resume the contexts. This should help to make context
->> switching safer.
->>
->> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
->> ---
->>  include/chardev/char-fe.h |  23 +++++++++
->>  chardev/char-fe.c         | 103 +++++++++++++++++++++++++++++++++-----
->>  chardev/char-mux.c        |  14 +++---
->>  3 files changed, 121 insertions(+), 19 deletions(-)
->>
->> diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
->> index aa1b864ccd..4051435a1c 100644
->> --- a/include/chardev/char-fe.h
->> +++ b/include/chardev/char-fe.h
->> @@ -84,6 +84,14 @@ bool qemu_chr_fe_backend_open(CharBackend *be);
->>   * Set the front end char handlers. The front end takes the focus if
->>   * any of the handler is non-NULL.
->>   *
->> + * A chardev may have multiple main loop sources. In order to prevent
->> + * races when switching contexts, the function will temporarily block
->> + * the contexts before the source switch to prevent them from
->> + * dispatching in different threads concurrently.
->> + *
->> + * The current and the new @context must be acquirable or
->> + * running & dispatched in a loop (the function will hang otherwise).
->> + *
->>   * Without associated Chardev, nothing is changed.
->>   */
->>  void qemu_chr_fe_set_handlers_full(CharBackend *b,
->> @@ -110,6 +118,21 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
->>                                GMainContext *context,
->>                                bool set_open);
->>  
->> +/**
->> + * qemu_chr_fe_set_handlers_internal:
->> + *
->> + * Same as qemu_chr_fe_set_handlers(), without context freezing.
->> + */
->> +void qemu_chr_fe_set_handlers_internal(CharBackend *b,
->> +                                       IOCanReadHandler *fd_can_read,
->> +                                       IOReadHandler *fd_read,
->> +                                       IOEventHandler *fd_event,
->> +                                       BackendChangeHandler *be_change,
->> +                                       void *opaque,
->> +                                       GMainContext *context,
->> +                                       bool set_open,
->> +                                       bool sync_state);
+TBH, some of the kernel defines _are_ a bit wonky, but I'm used to
+them :)
 
-Can we add this function into a new header "chardev/char-internal.h"
-(internal to chardev/) rather than "include/chardev/char-fe.h" (public)?
+Not sure if any of the others who will look at this code are that
+familiar with the kernel code, though, so I'll leave the decision to
+the bios maintainers. (Your names are more consistent...)
 
->> +
->>  /**
->>   * qemu_chr_fe_take_focus:
->>   *
->> diff --git a/chardev/char-fe.c b/chardev/char-fe.c
->> index f3530a90e6..90cd7db007 100644
->> --- a/chardev/char-fe.c
->> +++ b/chardev/char-fe.c
->> @@ -246,15 +246,67 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
->>      }
->>  }
->>  
->> -void qemu_chr_fe_set_handlers_full(CharBackend *b,
->> -                                   IOCanReadHandler *fd_can_read,
->> -                                   IOReadHandler *fd_read,
->> -                                   IOEventHandler *fd_event,
->> -                                   BackendChangeHandler *be_change,
->> -                                   void *opaque,
->> -                                   GMainContext *context,
->> -                                   bool set_open,
->> -                                   bool sync_state)
->> +struct MainContextWait {
->> +    QemuCond cond;
->> +    QemuMutex lock;
->> +};
->> +
->> +static gboolean
->> +main_context_wait_cb(gpointer user_data)
->> +{
->> +    struct MainContextWait *w = user_data;
->> +
->> +    qemu_mutex_lock(&w->lock);
->> +    qemu_cond_signal(&w->cond);
->> +    /* wait until switching is over */
->> +    qemu_cond_wait(&w->cond, &w->lock);
+(...)
+> >> +io_new_code:
+> >> +        /* disable I/O interrupts in cr6 */
+> >> +        stctg 6,6,0(15)
+> >> +        ni 4(15), 0x00
+> >> +        lctlg 6,6,0(15)  
+> > 
+> > What about leaving the isc enabled in cr6 all the time and just
+> > controlling interrupts via enabling/disabling I/O interrupts?
+> >   
 > 
-> Could previous signal() directly wake up itself here?  Man
-> pthread_cond_broadcast says:
-> 
->        The pthread_cond_signal() function shall unblock at least one
->        of the threads that are blocked on the specified condition
->        variable cond (if any threads are blocked on cond).
-> 
->        If more than one thread is blocked on a condition variable, the
->        scheduling policy shall determine the order in which threads
->        are unblocked.
-> 
-> So AFAIU it could, because neither there's a restriction on ordering
-> of how waiters are waked up, nor there's a limitation on how many
-> waiters will be waked up by a single signal().
-> 
-> Why not simply use two semaphores?  Then locks can be avoided too.
-> 
-> Regards,
-> 
+> Its really all about leaving the system in as close to a default and unaltered state as 
+> possible. I could just set isc sometime at the beginning of dasd ipl and clear it right 
+> before transferring control, if you feel strongly about it.
+
+Not feeling strongly. Nobody probably cares about how often you change
+cr6 during load...
