@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54151)
+Received: from eggs.gnu.org ([209.51.188.92]:55124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gxCr3-00051F-Qa
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:35:14 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gxCsm-0006Of-Ve
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:37:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gxCr2-0006ns-PF
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:35:13 -0500
-Date: Fri, 22 Feb 2019 16:35:05 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
-References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-11-kwolf@redhat.com>
-	<0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
-	<20190219090431.GD4727@localhost.localdomain>
-	<ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gxCsl-0000wQ-RF
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:37:00 -0500
+Date: Fri, 22 Feb 2019 16:36:42 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190222163642.51cff565@redhat.com>
+In-Reply-To: <20190220224003.4420-16-eric.auger@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190220224003.4420-16-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AqsLC8rIMeq19msA"
-Content-Disposition: inline
-In-Reply-To: <ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 10/11] qcow2: Store data file name in
- the image
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 15/17] hw/arm/virt: Add nvdimm hot-plug
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,143 +24,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
+On Wed, 20 Feb 2019 23:40:01 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
---AqsLC8rIMeq19msA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> From: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> 
+> Pre-plug and plug handlers are prepared for NVDIMM support.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> ---
+>  default-configs/arm-softmmu.mak |  2 ++
+>  hw/arm/virt-acpi-build.c        |  6 ++++++
+>  hw/arm/virt.c                   | 22 ++++++++++++++++++++++
+>  include/hw/arm/virt.h           |  3 +++
+>  4 files changed, 33 insertions(+)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 0a78421f72..03dbebb197 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -165,3 +165,5 @@ CONFIG_HIGHBANK=y
+>  CONFIG_MUSICPAL=y
+>  CONFIG_MEM_DEVICE=y
+>  CONFIG_DIMM=y
+> +CONFIG_NVDIMM=y
+> +CONFIG_ACPI_NVDIMM=y
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 781eafaf5e..f086adfa82 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -784,6 +784,7 @@ static
+>  void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>  {
+>      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+> +    MachineState *ms = MACHINE(vms);
+>      GArray *table_offsets;
+>      unsigned dsdt, xsdt;
+>      GArray *tables_blob = tables->table_data;
+> @@ -824,6 +825,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>          }
+>      }
+>  
+> +    if (vms->acpi_nvdimm_state.is_enabled) {
+> +        nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
+> +                          &vms->acpi_nvdimm_state, ms->ram_slots);
+> +    }
+> +
+>      if (its_class_name() && !vmc->no_its) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_iort(tables_blob, tables->linker, vms);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 33ad9b3f63..1896920570 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -134,6 +134,7 @@ static const MemMapEntry base_memmap[] = {
+>      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+>      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+>      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
+> +    [VIRT_ACPI_IO] =            { 0x09070000, 0x00010000 },
+>      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+>      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+> @@ -1675,6 +1676,18 @@ static void machvirt_init(MachineState *machine)
+>  
+>      create_platform_bus(vms, pic);
+>  
+> +    if (vms->acpi_nvdimm_state.is_enabled) {
+> +        AcpiNVDIMMState *acpi_nvdimm_state = &vms->acpi_nvdimm_state;
+> +
+> +        acpi_nvdimm_state->dsm_io.space_id = AML_AS_SYSTEM_MEMORY;
+> +        acpi_nvdimm_state->dsm_io.address =
+> +                vms->memmap[VIRT_ACPI_IO].base + NVDIMM_ACPI_IO_BASE;
+> +        acpi_nvdimm_state->dsm_io.bit_width = NVDIMM_ACPI_IO_LEN << 3;
+I'd prefer following style (well at least that's direction I try to push
+towards to when dealing with ACPI)
 
-Am 22.02.2019 um 15:16 hat Max Reitz geschrieben:
-> On 19.02.19 10:04, Kevin Wolf wrote:
-> > Am 19.02.2019 um 01:18 hat Max Reitz geschrieben:
-> >> On 31.01.19 18:55, Kevin Wolf wrote:
-> >>> Rather than requiring that the external data file node is passed
-> >>> explicitly when creating the qcow2 node, store the filename in the
-> >>> designated header extension during .bdrv_create and read it from there
-> >>> as a default during .bdrv_open.
-> >>>
-> >>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> >>> ---
-> >>>  block/qcow2.h              |  1 +
-> >>>  block/qcow2.c              | 69 ++++++++++++++++++++++++++++++++++++=
-+-
-> >>>  tests/qemu-iotests/082.out | 27 +++++++++++++++
-> >>>  3 files changed, 96 insertions(+), 1 deletion(-)
-> >>
-> >> [...]
-> >>
-> >>> diff --git a/block/qcow2.c b/block/qcow2.c
-> >>> index 6cf862e8b9..4959bf16a4 100644
-> >>> --- a/block/qcow2.c
-> >>> +++ b/block/qcow2.c
-> >>> @@ -398,6 +398,20 @@ static int qcow2_read_extensions(BlockDriverStat=
-e *bs, uint64_t start_offset,
-> >>>  #endif
-> >>>              break;
-> >>> =20
-> >>> +        case QCOW2_EXT_MAGIC_DATA_FILE:
-> >>> +        {
-> >>> +            s->image_data_file =3D g_malloc0(ext.len + 1);
-> >>> +            ret =3D bdrv_pread(bs->file, offset, s->image_data_file,=
- ext.len);
-> >>> +            if (ret < 0) {
-> >>> +                error_setg_errno(errp, -ret, "ERROR: Could not data =
-file name");
-> >>
-> >> I think you accidentally a word.
-> >>
-> >>> +                return ret;
-> >>> +            }
-> >>> +#ifdef DEBUG_EXT
-> >>> +            printf("Qcow2: Got external data file %s\n", s->image_da=
-ta_file);
-> >>> +#endif
-> >>> +            break;
-> >>> +        }
-> >>> +
-> >>>          default:
-> >>>              /* unknown magic - save it in case we need to rewrite th=
-e header */
-> >>>              /* If you add a new feature, make sure to also update th=
-e fast
-> >>> @@ -1444,7 +1458,18 @@ static int coroutine_fn qcow2_do_open(BlockDri=
-verState *bs, QDict *options,
-> >>>      /* Open external data file */
-> >>>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
-> >>>          s->data_file =3D bdrv_open_child(NULL, options, "data-file",=
- bs,
-> >>> -                                       &child_file, false, errp);
-> >>> +                                       &child_file, false, &local_er=
-r);
-> >>> +        if (!s->data_file) {
-> >>> +            if (s->image_data_file) {
-> >>> +                error_free(local_err);
-> >>> +                local_err =3D NULL;
-> >>
-> >> This looked a bit weird to me at first because I was wondering why you
-> >> wouldn't just pass allow_none=3Dtrue and then handle errors (by passing
-> >> them on).  But right, we want to retry with a filename set, maybe that
-> >> makes more sense of the options.
-> >=20
-> > I think we want the normal error message for the !s->image_data_file
-> > case. With allow_none=3Dtrue, we would have to come up with a new one h=
-ere
-> > (in the else branch below).
-> >=20
-> >> Hm.  But then again, do we really?  It matches what we do with backing
-> >> files, but that does give at least me headaches from time to time.  How
-> >> bad would it be to allow either passing all valid options through
-> >> @options (which would make qcow2 ignore the string in the header), or
-> >> use the filename given in the header alone?
-> >=20
-> > You mean offering only one of the two ways to configure the node?
->=20
-> Either just the filename from the image header, or ignore that and take
-> all options from the user (who'd have to give a syntactically complete
-> QAPI BlockdevRef object).
->=20
-> > The 'data-file' runtime option is a must so that libvirt can build the
-> > graph node by node (and possibly use file descriptor passing one day).
-> > But having to specify the option every time is very unfriendly for human
-> > users, so I think allowing to store the file name in the header is a
-> > must, too.
->=20
-> Sure.  But I don't know whether we have to support taking the filename
-> from the image header, and the user overriding some of the node's
-> options (e.g. caching).
+           const AcpiGenericAddress dsmio = {
+               .space_id = AML_AS_SYSTEM_MEMORY,
+               .address = vms->memmap[VIRT_ACPI_IO].base + NVDIMM_ACPI_IO_BASE,
+               .bit_width = NVDIMM_ACPI_IO_LEN << 3
+           };
 
-So essentially this would mean passing NULL instead of options to
-bdrv_open_child() when we retry with the filename from the header.
+           
+           nvdimm_init_acpi_state(&vms->acpi_nvdimm_state, sysmem, &dsmio,
+                                  vms->fw_cfg, OBJECT(vms),);
 
-But it's inconsistent with all other places, which comes with two
-problems. It's confusing for users who are used to overriding just that
-one option of a child. And do we actually spare you any headaches or do
-we create new ones because we have now two different behaviours of
-bdrv_open_child() callers that we must preserve in the future?
-
-Kevin
-
---AqsLC8rIMeq19msA
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJccBapAAoJEH8JsnLIjy/WD58P/iQSDPV/5tvNwJbVYTwS7GkW
-NXZu42Eqwe8dEQRo+F4VIR+g0jHe3kNOiMLae0GWFk432yGhAN0OuHAbRp5smit3
-rcI7HRkwPiP3MUZapncZgBkXy58OWjfJnqWEehsTzhvipP8ObT9W0o+REJKCBPKe
-V+DOrIshCBDENev4hwnTGLLKg+iBrhGzYY3+kwKRxsv5mGotpYkb3DoNrTrMaq5t
-MDP5OKrnkEJ+ZbRBWGfEiJvZ5nPdfT7vEjoJUIFFt88Yn2xKi/fYUm/+uL/1sz/c
-PKLDhJ03ubc2FX+1wKpJst+k9fZWQFQnPwAhz47uNk8+78ts1IvthD30GLYIsQ5W
-KJ7aLCvqHE412WCs+MYQ9UdIZOsyA13XDojR4BQgLRCsLTZkvJrFyuRE7dxAUy95
-b+1S1SSJzQwFVDepCZnRw3FfK/4P4WNXbJudmxwl6UGqg+COVpB05OQLBgC3GI1N
-gwQRNy/wQmM/UPRVC/fRrTiH4OE8ozyextgKxKpvOGYnDgVQCjDykZlHhF3BtWGZ
-6++f9wen7U9UijVmZ+g0AyQ8JJ0/FfeKKorzDkboNx020d2Kdl3WtF5DVpJrFAg6
-7c/3N5dI60XXcUBIZoASLItVzIqhRpU0w4nnvE+hWeleQXZkPdtFC7A3foIYsmZs
-Hk0+SQvGBSiwiY5i6/fv
-=hv/g
------END PGP SIGNATURE-----
-
---AqsLC8rIMeq19msA--
+> +
+> +        nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
+> +                               vms->fw_cfg, OBJECT(vms));
+> +    }
+> +
+>      vms->bootinfo.ram_size = machine->ram_size;
+>      vms->bootinfo.kernel_filename = machine->kernel_filename;
+>      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+> @@ -1860,10 +1873,19 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+>                               DeviceState *dev, Error **errp)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>      Error *local_err = NULL;
+>  
+>      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+>  
+> +    if (is_nvdimm) {
+> +        nvdimm_plug(&vms->acpi_nvdimm_state);
+> +    }
+> +
+> +out:
+>      error_propagate(errp, local_err);
+>  }
+>  
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 7798462cb0..bd9cf68311 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -37,6 +37,7 @@
+>  #include "hw/arm/arm.h"
+>  #include "sysemu/kvm.h"
+>  #include "hw/intc/arm_gicv3_common.h"
+> +#include "hw/mem/nvdimm.h"
+>  
+>  #define NUM_GICV2M_SPIS       64
+>  #define NUM_VIRTIO_TRANSPORTS 32
+> @@ -77,6 +78,7 @@ enum {
+>      VIRT_GPIO,
+>      VIRT_SECURE_UART,
+>      VIRT_SECURE_MEM,
+> +    VIRT_ACPI_IO,
+>      VIRT_LOWMEMMAP_LAST,
+>  };
+>  
+> @@ -137,6 +139,7 @@ typedef struct {
+>      hwaddr device_memory_base;
+>      hwaddr device_memory_size;
+>      bool extended_memmap;
+> +    AcpiNVDIMMState acpi_nvdimm_state;
+>  } VirtMachineState;
+>  
+>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
