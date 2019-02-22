@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50582)
+Received: from eggs.gnu.org ([209.51.188.92]:35776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwyrt-0000D2-Li
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 19:39:10 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gwzJG-0003ZM-AE
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 20:07:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwyrs-0005WC-Ec
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 19:39:09 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54415)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gwyrs-0005Tk-4H
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 19:39:08 -0500
-Received: by mail-wm1-f66.google.com with SMTP id a62so399665wmh.4
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 16:39:07 -0800 (PST)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190220010232.18731-1-philmd@redhat.com>
-	<20190220010232.18731-3-philmd@redhat.com>
-	<CAMxuvaw_Hgbtxu79NEUAoaKaEnmKRCgorJ_r5mXQQTbrHEMtbQ@mail.gmail.com>
-	<68f7233c-8b95-8782-27a7-106fc2997646@redhat.com>
-Message-ID: <74dc80bc-d2cd-c79d-4787-6870b450a505@redhat.com>
-Date: Fri, 22 Feb 2019 01:39:04 +0100
+	(envelope-from <wei.w.wang@intel.com>) id 1gwzJC-0005xc-Ep
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 20:07:23 -0500
+Received: from mga17.intel.com ([192.55.52.151]:31791)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1gwzJB-0005W7-UI
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 20:07:22 -0500
+Message-ID: <5C6F4C5A.40400@intel.com>
+Date: Fri, 22 Feb 2019 09:11:54 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <68f7233c-8b95-8782-27a7-106fc2997646@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 02/25] chardev: Assert IOCanReadHandler
- can not be negative
+References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
+	<20181214095646.GB2454@work-vm> <5C13862B.1010905@intel.com>
+	<20181214111705.GD2454@work-vm>
+	<286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
+	<20190220131224.GF2608@work-vm> <5C6E03B6.30309@intel.com>
+	<20190221101839.GD2605@work-vm>
+In-Reply-To: <20190221101839.GD2605@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +35,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>, Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
 
-On 2/20/19 12:13 PM, Philippe Mathieu-Daudé wrote:
-> On 2/20/19 11:03 AM, Marc-André Lureau wrote:
->> Hi
+On 02/21/2019 06:18 PM, Dr. David Alan Gilbert wrote:
+> * Wei Wang (wei.w.wang@intel.com) wrote:
+>> On 02/20/2019 09:12 PM, Dr. David Alan Gilbert wrote:
+>>> * Wang, Wei W (wei.w.wang@intel.com) wrote:
+>>>> On Friday, December 14, 2018 7:17 PM, Dr. David Alan Gilbert wrote:
+>>>>>> On 12/14/2018 05:56 PM, Dr. David Alan Gilbert wrote:
+>>>>>>> * Wei Wang (wei.w.wang@intel.com) wrote:
+>>>>>>>> On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
+>>>>>>>>> * Wei Wang (wei.w.wang@intel.com) wrote:
+>>>>>>>>>> The new feature enables the virtio-balloon device to receive
+>>>>>>>>>> hints of guest free pages from the free page vq.
+>>>>>>>>>>
+>>>>>>>>>> A notifier is registered to the migration precopy notifier
+>>>>>>>>>> chain. The notifier calls free_page_start after the migration
+>>>>>>>>>> thread syncs the dirty bitmap, so that the free page
+>>>>>>>>>> optimization starts to clear bits of free pages from the
+>>>>>>>>>> bitmap. It calls the free_page_stop before the migration
+>>>>>>>>>> thread syncs the bitmap, which is the end of the current round
+>>>>>>>>>> of ram save. The free_page_stop is also called to stop the
+>>>>> optimization in the case when there is an error occurred in the process of
+>>>>> ram saving.
+>>>>>>>>>> Note: balloon will report pages which were free at the time of this
+>>>>> call.
+>>>>>>>>>> As the reporting happens asynchronously, dirty bit logging
+>>>>>>>>>> must be enabled before this free_page_start call is made.
+>>>>>>>>>> Guest reporting must be disabled before the migration dirty bitmap
+>>>>> is synchronized.
+>>>>>>>>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>>>>>>>>> CC: Michael S. Tsirkin <mst@redhat.com>
+>>>>>>>>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>>>>>>>> CC: Juan Quintela <quintela@redhat.com>
+>>>>>>>>>> CC: Peter Xu <peterx@redhat.com>
+>>>>>>>>> I think I'm OK for this from the migration side, I'd appreciate
+>>>>>>>>> someone checking the virtio and aio bits.
+>>>>>>>>>
+>>>>>>>>> I'm not too sure how it gets switched on and off - i.e. if we
+>>>>>>>>> get a nice new qemu on a new kernel, what happens when I try and
+>>>>>>>>> migrate to the same qemu on an older kernel without these hints?
+>>>>>>>>>
+>>>>>>>> This feature doesn't rely on the host kernel. Those hints are
+>>>>>>>> reported from the guest kernel.
+>>>>>>>> So migration across different hosts wouldn't affect the use of this
+>>>>> feature.
+>>>>>>>> Please correct me if I didn't get your point.
+>>>>>>> Ah OK, yes;  now what about migrating from new->old qemu with a new
+>>>>>>> guest but old machine type?
+>>>>>>>
+>>>>>> I think normally, the source QEMU and destination QEMU should have the
+>>>>>> same QEMU booting parameter. If the destination QEMU doesn't support
+>>>>>> "--device virtio-balloon,free-page-hint=true", which the source QEMU
+>>>>>> has, the destination side QEMU will fail to boot, and migration will
+>>>>>> not happen then.
+>>>>> Ah that's OK; as long as free-page-hint is false by default that will work fine.
+>>>>>
+>>>>> Dave
+>>>>>
+>>>> Hi Dave,
+>>>>
+>>>> Could we have this feature in QEMU 4.0 (freeze on Mar 12)?
+>>> I think so; can you remind me where we're up to:
+>>>     a) It looks like you've already got the kernel changes merged -
+>>> correct?
+>> Yes, they were already merged half year ago.
 >>
->> On Wed, Feb 20, 2019 at 2:03 AM Philippe Mathieu-Daudé
->> <philmd@redhat.com> wrote:
->>>
->>> The backend should not return a negative length to read.
->>> We will later change the prototype of IOCanReadHandler to return an
->>> unsigned length. Meanwhile make sure the return length is positive.
->>>
->>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>>     b) What about the virtio spec changes - where are they upto?
+>> The spec changes are in progress. v1 were posted out, a v2 is in
+>> preparation.
 >>
->> In such patch, you should do extensive review of existing callbacks,
->> or find a convincing argument that this can't break.
-> 
-> Argh I missed that.
-> 
->> The problem is there are a lot of can_read callbacks, and it's not
->> trivial. The *first* of git-grep is rng_egd_chr_can_read()
->>
->>  57     QSIMPLEQ_FOREACH(req, &s->parent.requests, next) {
->>  58         size += req->size - req->offset;
->>  59     }
->>  60
->>  61     return size;
->>
->> Clearly not obvious if it returns >= 0.
->>
->> Another approach is to look at the caller and the return value
->> handling. If none handle negative values (or would have wrong
->> behaviour with negative values), the assert() is perhaps justified, as
->> it could prevent from doing more harm.
-> 
-> I'll go and audit all of them.
+>>>     c) Where are the other reviews upto - I think most are reviewed - is
+>>> it just 7/7 that is missing the review-by?
+>> 7/7 is about the virtio changes, and Michael has given the reviewed-by:
+>> http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg03732.html
+> OK, I was going to check with mst for (b) because I prefer it after the
+> spec changes have been merged, but since mst is OK with it, then we can
+> merge especially with (a) already merged.
 
-Actually I already did the work, but it is in the part #2 after this
-series, as suggested by Paolo:
+OK, thanks!
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02294.html
-
-I'll simply cherry-pick the commit from series #2 before this patch.
-
-Thanks,
-
-Phil.
-
->>> ---
->>>  chardev/char.c | 5 ++++-
->>>  1 file changed, 4 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/chardev/char.c b/chardev/char.c
->>> index f6d61fa5f8..71ecd32b25 100644
->>> --- a/chardev/char.c
->>> +++ b/chardev/char.c
->>> @@ -159,12 +159,15 @@ int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_all)
->>>  int qemu_chr_be_can_write(Chardev *s)
->>>  {
->>>      CharBackend *be = s->be;
->>> +    int receivable_bytes;
->>>
->>>      if (!be || !be->chr_can_read) {
->>>          return 0;
->>>      }
->>>
->>> -    return be->chr_can_read(be->opaque);
->>> +    receivable_bytes = be->chr_can_read(be->opaque);
->>> +    assert(receivable_bytes >= 0);
->>> +    return receivable_bytes;
->>>  }
->>>
->>>  void qemu_chr_be_write_impl(Chardev *s, uint8_t *buf, int len)
->>> --
->>> 2.20.1
->>>
+Best,
+Wei
