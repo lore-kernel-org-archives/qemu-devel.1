@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56267)
+Received: from eggs.gnu.org ([209.51.188.92]:59289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gx7xJ-0001Ek-E5
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:21:22 -0500
+	(envelope-from <david@redhat.com>) id 1gx81w-0002ky-Os
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gx7xI-0004ED-Fk
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:21:21 -0500
-Date: Fri, 22 Feb 2019 11:20:53 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190222112053.11ebfab5.cohuck@redhat.com>
-In-Reply-To: <20190222081153.14206-4-david@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gx81v-0002G1-Tq
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 05:26:08 -0500
 References: <20190222081153.14206-1-david@redhat.com>
-	<20190222081153.14206-4-david@redhat.com>
+	<20190222111626.5a09c4d8.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <5cdeb740-a50e-f2bf-b8c5-5e6c70abf70c@redhat.com>
+Date: Fri, 22 Feb 2019 11:26:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190222111626.5a09c4d8.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/3] s390x/tcg: Save vregs to extended
- mchk save area
+Subject: Re: [Qemu-devel] [PATCH v1 0/3] s390x: SIGP + IRQ preparations for
+ TCG vector register support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, 22 Feb 2019 09:11:53 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> If we have vector registers and the designation is not zero, we have
-> to try to write the vector registers. If the designation is zero or
-> if storing fails, we must not indicate validity. s390_build_validity_mcic()
-> automatically already sets validity if the vector instruction facility
-> is installed.
+On 22.02.19 11:16, Cornelia Huck wrote:
+> On Fri, 22 Feb 2019 09:11:50 +0100
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> As long as we don't support the guarded-storage facility, the alignemnt &
-> size of the area is always 1024 bytes.
-
-s/alignemnt & size/alignment and size/
-
-Can change while applying.
-
+>> These are minor preparations for vector instruction support for TCG, also
+>> touching KVM code.
+>>
+>> During SIGP STORE ADDITIONAL STATUS we have to properly convert the
+>> endianess. On machine checks, we have to also store the vector registers
+>> into the extended save area.
+>>
+>> Both changes are not used by TCG code before we implement + enable
+>> vector instructions. KVM code shares the SIGP STORE ADDITIONAL STATUS
+>> implementation.
+>>
+>> Note: Vector registers (128 bit) are modeled as two 64 bit values. Low and
+>> high 64 bit values correspond on big/little systems, however the values
+>> themself need conversion. Documentation for that will be added along with
+>> the actual vector instruction support.
+>>
+>> David Hildenbrand (3):
+>>   s390x: Use cpu_to_be64 in SIGP STORE ADDITIONAL STATUS
+>>   s390x: use a QEMU-style typedef + name for SIGP save area struct
+>>   s390x/tcg: Save vregs to extended mchk save area
+>>
+>>  target/s390x/excp_helper.c | 46 ++++++++++++++++++++++++++++++++++++--
+>>  target/s390x/helper.c      | 39 ++++++++++++++++++++------------
+>>  target/s390x/internal.h    |  4 +++-
+>>  3 files changed, 72 insertions(+), 17 deletions(-)
+>>
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/excp_helper.c | 46 ++++++++++++++++++++++++++++++++++++--
->  target/s390x/internal.h    |  4 +++-
->  2 files changed, 47 insertions(+), 3 deletions(-)
+> Quick question: Unlike your floating-point patch series, this does not
+> depend on anything not going through the s390x tree, right?
+> 
+
+While these patches are based on the others, they should apply and work
+just nicely without the floating-point patches.
+
+-- 
+
+Thanks,
+
+David / dhildenb
