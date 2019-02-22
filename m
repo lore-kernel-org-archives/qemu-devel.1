@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43911)
+Received: from eggs.gnu.org ([209.51.188.92]:44192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gx4Ct-0004Lu-VA
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 01:21:13 -0500
+	(envelope-from <mst@redhat.com>) id 1gx4DP-0004h3-Lr
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 01:21:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gx4Co-0005ta-RL
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 01:21:09 -0500
-References: <1550748288-30598-1-git-send-email-thuth@redhat.com>
-	<895254c7-745e-e594-ceed-df09a1dc84c5@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f672e31f-8b68-24ad-f0bc-75c83e84dad5@redhat.com>
-Date: Fri, 22 Feb 2019 07:20:14 +0100
+	(envelope-from <mst@redhat.com>) id 1gx4DO-0006PR-Nj
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 01:21:43 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:32917)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gx4DO-00061B-7s
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 01:21:42 -0500
+Received: by mail-qt1-f193.google.com with SMTP id z39so1396136qtz.0
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 22:21:19 -0800 (PST)
+Date: Fri, 22 Feb 2019 01:21:15 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190222011631-mutt-send-email-mst@kernel.org>
+References: <20190218102748.2242-1-xieyongji@baidu.com>
+	<20190218102748.2242-2-xieyongji@baidu.com>
+	<20190221120121-mutt-send-email-mst@kernel.org>
+	<CAONzpcYHae1fCJLN56ofQ91tSQi_JCXAA6mBhf0NqN=QusV1zg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <895254c7-745e-e594-ceed-df09a1dc84c5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc: Use object_initialize_child for
- correct reference counting
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAONzpcYHae1fCJLN56ofQ91tSQi_JCXAA6mBhf0NqN=QusV1zg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 1/7] vhost-user: Support transferring
+ inflight buffer between qemu and backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,143 +32,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+To: Yongji Xie <elohimes@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-On 21/02/2019 19.14, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 2/21/19 12:24 PM, Thomas Huth wrote:
->> Both functions, object_initialize() and object_property_add_child() in=
-crease
->> the reference counter of the new object, so one of the references has =
-to be
->> dropped afterwards to get the reference counting right. Otherwise the =
-child
->> object will not be properly cleaned up when the parent gets destroyed.
->> Thus let's use now object_initialize_child() instead to get the refere=
-nce
->> counting here right.
->>
->> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/ppc/pnv.c     | 12 ++++++------
->>  hw/ppc/pnv_psi.c |  4 ++--
->>  hw/ppc/spapr.c   |  6 +++---
->>  3 files changed, 11 insertions(+), 11 deletions(-)
->>
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index da54086..9e03e9c 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -736,18 +736,18 @@ static void pnv_chip_power8_instance_init(Object=
- *obj)
->>  {
->>      Pnv8Chip *chip8 =3D PNV8_CHIP(obj);
->> =20
->> -    object_initialize(&chip8->psi, sizeof(chip8->psi), TYPE_PNV_PSI);
->> -    object_property_add_child(obj, "psi", OBJECT(&chip8->psi), NULL);
->> +    object_initialize_child(obj, "psi",  &chip8->psi, sizeof(chip8->p=
-si),
->> +                            TYPE_PNV_PSI, &error_abort, NULL);
->>      object_property_add_const_link(OBJECT(&chip8->psi), "xics",
->>                                     OBJECT(qdev_get_machine()), &error=
-_abort);
->> =20
->> -    object_initialize(&chip8->lpc, sizeof(chip8->lpc), TYPE_PNV_LPC);
->> -    object_property_add_child(obj, "lpc", OBJECT(&chip8->lpc), NULL);
->> +    object_initialize_child(obj, "lpc",  &chip8->lpc, sizeof(chip8->l=
-pc),
->> +                            TYPE_PNV_LPC, &error_abort, NULL);
->>      object_property_add_const_link(OBJECT(&chip8->lpc), "psi",
->>                                     OBJECT(&chip8->psi), &error_abort)=
-;
->> =20
->> -    object_initialize(&chip8->occ, sizeof(chip8->occ), TYPE_PNV_OCC);
->> -    object_property_add_child(obj, "occ", OBJECT(&chip8->occ), NULL);
->> +    object_initialize_child(obj, "occ",  &chip8->occ, sizeof(chip8->o=
-cc),
->> +                            TYPE_PNV_OCC, &error_abort, NULL);
->>      object_property_add_const_link(OBJECT(&chip8->occ), "psi",
->>                                     OBJECT(&chip8->psi), &error_abort)=
-;
->>  }
->> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
->> index 8ced095..44bc0cb 100644
->> --- a/hw/ppc/pnv_psi.c
->> +++ b/hw/ppc/pnv_psi.c
->> @@ -444,8 +444,8 @@ static void pnv_psi_init(Object *obj)
->>  {
->>      PnvPsi *psi =3D PNV_PSI(obj);
->> =20
->> -    object_initialize(&psi->ics, sizeof(psi->ics), TYPE_ICS_SIMPLE);
->> -    object_property_add_child(obj, "ics-psi", OBJECT(&psi->ics), NULL=
-);
->> +    object_initialize_child(obj, "ics-psi",  &psi->ics, sizeof(psi->i=
-cs),
->> +                            TYPE_ICS_SIMPLE, &error_abort, NULL);
->>  }
->> =20
->>  static const uint8_t irq_to_xivr[] =3D {
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index abf9ebc..6c58dca 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1696,9 +1696,9 @@ static void spapr_create_nvram(sPAPRMachineState=
- *spapr)
->> =20
->>  static void spapr_rtc_create(sPAPRMachineState *spapr)
->>  {
->> -    object_initialize(&spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC=
-);
->> -    object_property_add_child(OBJECT(spapr), "rtc", OBJECT(&spapr->rt=
-c),
->> -                              &error_fatal);
->> +    object_initialize_child(OBJECT(spapr), "rtc",
->> +                            &spapr->rtc, sizeof(spapr->rtc), TYPE_SPA=
-PR_RTC,
->> +                            &error_fatal, NULL);
->>      object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
->>                                &error_fatal);
->>      object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spap=
-r->rtc),
->>
->=20
-> What about intc/spapr_xive.c?
+On Fri, Feb 22, 2019 at 10:47:03AM +0800, Yongji Xie wrote:
+> > > +
+> > > +To track inflight I/O, the queue region should be processed as follows:
+> > > +
+> > > +When receiving available buffers from the driver:
+> > > +
+> > > +    1. Get the next available head-descriptor index from available ring, i
+> > > +
+> > > +    2. Set desc[i].inflight to 1
+> > > +
+> > > +When supplying used buffers to the driver:
+> > > +
+> > > +    1. Get corresponding used head-descriptor index, i
+> > > +
+> > > +    2. Set desc[i].next to process_head
+> > > +
+> > > +    3. Set process_head to i
+> > > +
+> > > +    4. Steps 1,2,3 may be performed repeatedly if batching is possible
+> > > +
+> > > +    5. Increase the idx value of used ring by the size of the batch
+> > > +
+> > > +    6. Set the inflight field of each DescStateSplit entry in the batch to 0
+> > > +
+> > > +    7. Set used_idx to the idx value of used ring
+> > > +
+> > > +When reconnecting:
+> > > +
+> > > +    1. If the value of used_idx does not match the idx value of used ring,
+> > > +
+> > > +        (a) Subtract the value of used_idx from the idx value of used ring to get
+> > > +        the number of in-progress DescStateSplit entries
+> > > +
+> > > +        (b) Set the inflight field of the in-progress DescStateSplit entries which
+> > > +        start from process_head to 0
+> > > +
+> > > +        (c) Set used_idx to the idx value of used ring
+> > > +
+> > > +    2. Resubmit each inflight DescStateSplit entry
+> >
+> > I re-read a couple of time and I still don't understand what it says.
+> >
+> > For simplicity consider split ring. So we want a list of heads that are
+> > outstanding. Fair enough. Now device finishes a head. What now? I needs
+> > to drop head from the list. But list is unidirectional (just next, no
+> > prev). So how can you drop an entry from the middle?
+> >
+> 
+> The process_head is only used when slave crash between increasing the
+> idx value of used ring and updating used_idx. We use it to find the
+> in-progress DescStateSplit entries before the crash and complete them
+> when reconnecting. Make sure guest and slave have the same view for
+> inflight I/Os.
+> 
 
-Good hint. I missed that one since it's in hw/intc, not in hw/ppc...
-
-David, could you please squash this on top:
-
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 290a290..ac5f5ef 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -244,13 +244,12 @@ static void spapr_xive_instance_init(Object *obj)
- {
-     sPAPRXive *xive =3D SPAPR_XIVE(obj);
-=20
--    object_initialize(&xive->source, sizeof(xive->source), TYPE_XIVE_SOU=
-RCE);
--    object_property_add_child(obj, "source", OBJECT(&xive->source), NULL=
-);
-+    object_initialize_child(obj, "source", &xive->source, sizeof(xive->s=
-ource),
-+                            TYPE_XIVE_SOURCE, &error_abort, NULL);
-=20
--    object_initialize(&xive->end_source, sizeof(xive->end_source),
--                      TYPE_XIVE_END_SOURCE);
--    object_property_add_child(obj, "end_source", OBJECT(&xive->end_sourc=
-e),
--                              NULL);
-+    object_initialize_child(obj, "end_source", &xive->end_source,
-+                            sizeof(xive->end_source), TYPE_XIVE_END_SOUR=
-CE,
-+                            &error_abort, NULL);
- }
-=20
- static void spapr_xive_realize(DeviceState *dev, Error **errp)
+But I don't understand how does the described process help do it?
 
 
-... or shall I rather send a v2 or a separate patch for this?
+> In other case, the inflight field is enough to track inflight I/O.
+> When reconnecting, we go through all DescStateSplit entries and
+> re-submit the entry whose inflight field is equal to 1.
 
- Thomas
+What I don't understand is how do we know the order
+in which they have to be resubmitted. Reordering
+operations would be a big problem, won't it?
+
+
+Let's say I fetch descriptors A, B, C and start
+processing. how does memory look?
+Now I finished B and marked it used. How does
+memory look?
+
+I also wonder how do you address a crash between
+marking descriptor used and clearing inflight.
+Will you redo the descriptor? Is it always safe?
+What if it's a write?
