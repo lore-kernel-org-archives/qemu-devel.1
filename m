@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58853)
+Received: from eggs.gnu.org ([209.51.188.92]:59457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gxCzG-0006cU-84
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:43:43 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gxD0X-0007jU-OU
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:45:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gxCzF-0002bi-5w
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:43:42 -0500
-References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-11-kwolf@redhat.com>
-	<0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
-	<20190219090431.GD4727@localhost.localdomain>
-	<ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
-	<20190222153505.GB8035@dhcp-200-176.str.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <487485f2-31c0-9200-b66d-e430047ad536@redhat.com>
-Date: Fri, 22 Feb 2019 16:43:20 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1gxD0W-0003rp-Nn
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:45:01 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51189)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gxD0W-0003pp-F6
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:45:00 -0500
+Received: by mail-wm1-x342.google.com with SMTP id x7so2380124wmj.0
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:45:00 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 22 Feb 2019 15:44:54 +0000
+Message-Id: <20190222154454.30289-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="09nYh3hNYYeBEyrS2ROn43PinDJmhp3ML"
-Subject: Re: [Qemu-devel] [RFC PATCH 10/11] qcow2: Store data file name in
- the image
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4] hw/block: better reporting on pflash
+ backing file mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,184 +28,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: lersek@redhat.com, armbru@redhat.com, stappers@stappers.nl, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---09nYh3hNYYeBEyrS2ROn43PinDJmhp3ML
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <487485f2-31c0-9200-b66d-e430047ad536@redhat.com>
-Subject: Re: [RFC PATCH 10/11] qcow2: Store data file name in the image
-References: <20190131175549.11691-1-kwolf@redhat.com>
- <20190131175549.11691-11-kwolf@redhat.com>
- <0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
- <20190219090431.GD4727@localhost.localdomain>
- <ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
- <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
-In-Reply-To: <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+It looks like there was going to be code to check we had some sort of
+alignment so lets replace it with an actual check. This is a bit more
+useful than the enigmatic "failed to read the initial flash content"
+when we attempt to read the number of bytes the device should have.
 
-On 22.02.19 16:35, Kevin Wolf wrote:
-> Am 22.02.2019 um 15:16 hat Max Reitz geschrieben:
->> On 19.02.19 10:04, Kevin Wolf wrote:
->>> Am 19.02.2019 um 01:18 hat Max Reitz geschrieben:
->>>> On 31.01.19 18:55, Kevin Wolf wrote:
->>>>> Rather than requiring that the external data file node is passed
->>>>> explicitly when creating the qcow2 node, store the filename in the
->>>>> designated header extension during .bdrv_create and read it from th=
-ere
->>>>> as a default during .bdrv_open.
->>>>>
->>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>>>> ---
->>>>>  block/qcow2.h              |  1 +
->>>>>  block/qcow2.c              | 69 ++++++++++++++++++++++++++++++++++=
-+++-
->>>>>  tests/qemu-iotests/082.out | 27 +++++++++++++++
->>>>>  3 files changed, 96 insertions(+), 1 deletion(-)
->>>>
->>>> [...]
->>>>
->>>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>>> index 6cf862e8b9..4959bf16a4 100644
->>>>> --- a/block/qcow2.c
->>>>> +++ b/block/qcow2.c
->>>>> @@ -398,6 +398,20 @@ static int qcow2_read_extensions(BlockDriverSt=
-ate *bs, uint64_t start_offset,
->>>>>  #endif
->>>>>              break;
->>>>> =20
->>>>> +        case QCOW2_EXT_MAGIC_DATA_FILE:
->>>>> +        {
->>>>> +            s->image_data_file =3D g_malloc0(ext.len + 1);
->>>>> +            ret =3D bdrv_pread(bs->file, offset, s->image_data_fil=
-e, ext.len);
->>>>> +            if (ret < 0) {
->>>>> +                error_setg_errno(errp, -ret, "ERROR: Could not dat=
-a file name");
->>>>
->>>> I think you accidentally a word.
->>>>
->>>>> +                return ret;
->>>>> +            }
->>>>> +#ifdef DEBUG_EXT
->>>>> +            printf("Qcow2: Got external data file %s\n", s->image_=
-data_file);
->>>>> +#endif
->>>>> +            break;
->>>>> +        }
->>>>> +
->>>>>          default:
->>>>>              /* unknown magic - save it in case we need to rewrite =
-the header */
->>>>>              /* If you add a new feature, make sure to also update =
-the fast
->>>>> @@ -1444,7 +1458,18 @@ static int coroutine_fn qcow2_do_open(BlockD=
-riverState *bs, QDict *options,
->>>>>      /* Open external data file */
->>>>>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
->>>>>          s->data_file =3D bdrv_open_child(NULL, options, "data-file=
-", bs,
->>>>> -                                       &child_file, false, errp);
->>>>> +                                       &child_file, false, &local_=
-err);
->>>>> +        if (!s->data_file) {
->>>>> +            if (s->image_data_file) {
->>>>> +                error_free(local_err);
->>>>> +                local_err =3D NULL;
->>>>
->>>> This looked a bit weird to me at first because I was wondering why y=
-ou
->>>> wouldn't just pass allow_none=3Dtrue and then handle errors (by pass=
-ing
->>>> them on).  But right, we want to retry with a filename set, maybe th=
-at
->>>> makes more sense of the options.
->>>
->>> I think we want the normal error message for the !s->image_data_file
->>> case. With allow_none=3Dtrue, we would have to come up with a new one=
- here
->>> (in the else branch below).
->>>
->>>> Hm.  But then again, do we really?  It matches what we do with backi=
-ng
->>>> files, but that does give at least me headaches from time to time.  =
-How
->>>> bad would it be to allow either passing all valid options through
->>>> @options (which would make qcow2 ignore the string in the header), o=
-r
->>>> use the filename given in the header alone?
->>>
->>> You mean offering only one of the two ways to configure the node?
->>
->> Either just the filename from the image header, or ignore that and tak=
-e
->> all options from the user (who'd have to give a syntactically complete=
+This is a potential confusing stumbling block when you move from using
+-bios to using -drive if=pflash,file=blob,format=raw,readonly for
+loading your firmware code. To mitigate that we automatically pad in
+the read-only case and warn the user when we have performed magic to
+enable things to Just Work (tm).
 
->> QAPI BlockdevRef object).
->>
->>> The 'data-file' runtime option is a must so that libvirt can build th=
-e
->>> graph node by node (and possibly use file descriptor passing one day)=
-=2E
->>> But having to specify the option every time is very unfriendly for hu=
-man
->>> users, so I think allowing to store the file name in the header is a
->>> must, too.
->>
->> Sure.  But I don't know whether we have to support taking the filename=
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
->> from the image header, and the user overriding some of the node's
->> options (e.g. caching).
->=20
-> So essentially this would mean passing NULL instead of options to
-> bdrv_open_child() when we retry with the filename from the header.
->=20
-> But it's inconsistent with all other places, which comes with two
+---
+v3
+  - tweak commit title/commentary
+  - use total_len instead of device_len for checks
+  - if the device is read-only do the padding for them
+  - accept baking_len > total_len (how to warn_report with NULL *errp?)
+v4
+  - error check blk_getlength
+  - optimise memset and use NOR erase pattern
+  - restore singular device (overly confusing)
+  - add warn_report for when we do magic
+---
+ hw/block/pflash_cfi01.c | 40 +++++++++++++++++++++++++++++++++-------
+ 1 file changed, 33 insertions(+), 7 deletions(-)
 
-"all other places"?  Really it's just backing files, as everywhere else
-there is no filename that doesn't come from the command line.
-
-Yes, you can use -drive file=3Dfoo.qcow2,file.locking=3Doff, but I consid=
-er
-that case a bit different.  Although maybe it really isn't. *shrug*
-
-> problems. It's confusing for users who are used to overriding just that=
-
-> one option of a child. And do we actually spare you any headaches or do=
-
-> we create new ones because we have now two different behaviours of
-> bdrv_open_child() callers that we must preserve in the future?
-
-It means I can act out on my pain by being angry on how .backing
-behaves.  That's better for my health than having to keep it in because
-it's the same behavior everywhere and it's officially me who's in the wro=
-ng.
-
-More seriously, though, yeah, it was just a random idea.  It makes sense
-to have the same behavior here as for .backing.
-
-Max
-
-
---09nYh3hNYYeBEyrS2ROn43PinDJmhp3ML
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxwGJgACgkQ9AfbAGHV
-z0A/qwf/eqf85CtCZkQp93t4xUk4A5+qHtb7GG7hkGTkptZk6YKHGLHISdT3+++V
-NwopNxPFRU0xXCvafANZf/AkCwRu/lAXZOq0dAMwWTF2YnNBk/Pb0Dr/PM3m8Vxc
-vEa/smheCeZIKMDjAXOBTZXaw6Q8RPOieSGFc3jPi1aKwR0sBXK/oXJ5fvf3bbbB
-vJbbyBVJ2j+74Yi/vPQu9C2A/JvGHmVQEf4nlI5FP9FI/iBE8LP7SnWPJdwCOdhL
-ufrjlhh8TgTFBDVFHSLVhm9CkYQuHIYmxdPQA8frWywk9JyXQ26TP6Nm1VijPxpS
-ud+++K5HYZmX2lQmOfCgdQCnshaHFg==
-=AAg0
------END PGP SIGNATURE-----
-
---09nYh3hNYYeBEyrS2ROn43PinDJmhp3ML--
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 00c2efd0d7..c69ecc20a0 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -45,6 +45,7 @@
+ #include "qemu/bitops.h"
+ #include "qemu/host-utils.h"
+ #include "qemu/log.h"
++#include "qemu/error-report.h"
+ #include "hw/sysbus.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+@@ -714,13 +715,6 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+     }
+     device_len = sector_len_per_device * blocks_per_device;
+ 
+-    /* XXX: to be fixed */
+-#if 0
+-    if (total_len != (8 * 1024 * 1024) && total_len != (16 * 1024 * 1024) &&
+-        total_len != (32 * 1024 * 1024) && total_len != (64 * 1024 * 1024))
+-        return NULL;
+-#endif
+-
+     memory_region_init_rom_device(
+         &pfl->mem, OBJECT(dev),
+         &pflash_cfi01_ops,
+@@ -747,6 +741,38 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     if (pfl->blk) {
++        /*
++         * Validate the backing store is the right size for pflash
++         * devices. It should be padded to a multiple of the flash
++         * block size. If the device is read-only we can elide the
++         * check and just null pad the region first. If the user
++         * supplies a larger file we ignore the tail.
++         */
++        int64_t backing_len = blk_getlength(pfl->blk);
++        if (backing_len < 0) {
++            error_setg(errp, "unable to check size of backing file");
++            return;
++        }
++
++        if (backing_len < total_len) {
++            if (pfl->ro) {
++                size_t pad_bytes = total_len - backing_len;
++                /* pad with NOR erase pattern */
++                memset((uint8_t*)pfl->storage + backing_len, 0xff, pad_bytes);
++                warn_report("device needs %" PRIu64
++                            " bytes, padded with %zd 0xff bytes",
++                            total_len, pad_bytes);
++                total_len = backing_len;
++            } else {
++                error_setg(errp, "device needs %" PRIu64 " bytes, "
++                           "backing file provides only %" PRIu64 " bytes",
++                           total_len, backing_len);
++                return;
++            }
++        } else if (backing_len > total_len) {
++            warn_report("device needs %" PRIu64 " bytes, rest ignored", total_len);
++        }
++
+         /* read the initial flash content */
+         ret = blk_pread(pfl->blk, 0, pfl->storage, total_len);
+ 
+-- 
+2.20.1
