@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40708)
+Received: from eggs.gnu.org ([209.51.188.92]:40704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYf-0005Ow-W6
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYf-0005Os-UL
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYd-0007aZ-OT
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYb-0007Pj-UT
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:09 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:09:57 +0100
-Message-Id: <20190222141024.22217-8-kbastian@mail.uni-paderborn.de>
-In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
-References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
+Date: Fri, 22 Feb 2019 15:09:50 +0100
+Message-Id: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 07/34] target/riscv: Convert RVXI csr insns
- to decodetree
+Subject: [Qemu-devel] [PATCH v8 00/34] target/riscv: Convert to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,202 +20,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
+Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
----
- target/riscv/insn32.decode              |  8 +++
- target/riscv/insn_trans/trans_rvi.inc.c | 79 +++++++++++++++++++++++++
- target/riscv/translate.c                | 43 +-------------
- 3 files changed, 88 insertions(+), 42 deletions(-)
+Hi,
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 804b721ca5..977b1b10a3 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -22,6 +22,7 @@
- %rd        7:5
- 
- %sh10    20:10
-+%csr    20:12
- 
- # immediates:
- %imm_i    20:s12
-@@ -43,6 +44,7 @@
- @j       ....................      ..... .......         imm=%imm_j          %rd
- 
- @sh      ......  ...... .....  ... ..... ....... &shift  shamt=%sh10      %rs1 %rd
-+@csr     ............   .....  ... ..... .......               %csr     %rs1 %rd
- 
- # *** RV32I Base Instruction Set ***
- lui      ....................       ..... 0110111 @u
-@@ -84,3 +86,9 @@ or       0000000 .....    ..... 110 ..... 0110011 @r
- and      0000000 .....    ..... 111 ..... 0110011 @r
- fence    ---- pred:4 succ:4 ----- 000 ----- 0001111
- fence_i  ---- ----   ----   ----- 001 ----- 0001111
-+csrrw    ............     ..... 001 ..... 1110011 @csr
-+csrrs    ............     ..... 010 ..... 1110011 @csr
-+csrrc    ............     ..... 011 ..... 1110011 @csr
-+csrrwi   ............     ..... 101 ..... 1110011 @csr
-+csrrsi   ............     ..... 110 ..... 1110011 @csr
-+csrrci   ............     ..... 111 ..... 1110011 @csr
-diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-index 973d6371df..4a23372cb8 100644
---- a/target/riscv/insn_trans/trans_rvi.inc.c
-+++ b/target/riscv/insn_trans/trans_rvi.inc.c
-@@ -337,3 +337,82 @@ static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
-     ctx->base.is_jmp = DISAS_NORETURN;
-     return true;
- }
-+
-+#define RISCV_OP_CSR_PRE do {\
-+    source1 = tcg_temp_new(); \
-+    csr_store = tcg_temp_new(); \
-+    dest = tcg_temp_new(); \
-+    rs1_pass = tcg_temp_new(); \
-+    gen_get_gpr(source1, a->rs1); \
-+    tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next); \
-+    tcg_gen_movi_tl(rs1_pass, a->rs1); \
-+    tcg_gen_movi_tl(csr_store, a->csr); \
-+    gen_io_start();\
-+} while (0)
-+
-+#define RISCV_OP_CSR_POST do {\
-+    gen_io_end(); \
-+    gen_set_gpr(a->rd, dest); \
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn); \
-+    tcg_gen_exit_tb(NULL, 0); \
-+    ctx->base.is_jmp = DISAS_NORETURN; \
-+    tcg_temp_free(source1); \
-+    tcg_temp_free(csr_store); \
-+    tcg_temp_free(dest); \
-+    tcg_temp_free(rs1_pass); \
-+} while (0)
-+
-+
-+static bool trans_csrrw(DisasContext *ctx, arg_csrrw *a)
-+{
-+    TCGv source1, csr_store, dest, rs1_pass;
-+    RISCV_OP_CSR_PRE;
-+    gen_helper_csrrw(dest, cpu_env, source1, csr_store);
-+    RISCV_OP_CSR_POST;
-+    return true;
-+}
-+
-+static bool trans_csrrs(DisasContext *ctx, arg_csrrs *a)
-+{
-+    TCGv source1, csr_store, dest, rs1_pass;
-+    RISCV_OP_CSR_PRE;
-+    gen_helper_csrrs(dest, cpu_env, source1, csr_store, rs1_pass);
-+    RISCV_OP_CSR_POST;
-+    return true;
-+}
-+
-+static bool trans_csrrc(DisasContext *ctx, arg_csrrc *a)
-+{
-+    TCGv source1, csr_store, dest, rs1_pass;
-+    RISCV_OP_CSR_PRE;
-+    gen_helper_csrrc(dest, cpu_env, source1, csr_store, rs1_pass);
-+    RISCV_OP_CSR_POST;
-+    return true;
-+}
-+
-+static bool trans_csrrwi(DisasContext *ctx, arg_csrrwi *a)
-+{
-+    TCGv source1, csr_store, dest, rs1_pass;
-+    RISCV_OP_CSR_PRE;
-+    gen_helper_csrrw(dest, cpu_env, rs1_pass, csr_store);
-+    RISCV_OP_CSR_POST;
-+    return true;
-+}
-+
-+static bool trans_csrrsi(DisasContext *ctx, arg_csrrsi *a)
-+{
-+    TCGv source1, csr_store, dest, rs1_pass;
-+    RISCV_OP_CSR_PRE;
-+    gen_helper_csrrs(dest, cpu_env, rs1_pass, csr_store, rs1_pass);
-+    RISCV_OP_CSR_POST;
-+    return true;
-+}
-+
-+static bool trans_csrrci(DisasContext *ctx, arg_csrrci *a)
-+{
-+    TCGv source1, csr_store, dest, rs1_pass;
-+    RISCV_OP_CSR_PRE;
-+    gen_helper_csrrc(dest, cpu_env, rs1_pass, csr_store, rs1_pass);
-+    RISCV_OP_CSR_POST;
-+    return true;
-+}
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index f720746cb7..18555000af 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -1476,16 +1476,11 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
- static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-                        int csr)
- {
--    TCGv source1, csr_store, dest, rs1_pass, imm_rs1;
-+    TCGv source1, dest;
-     source1 = tcg_temp_new();
--    csr_store = tcg_temp_new();
-     dest = tcg_temp_new();
--    rs1_pass = tcg_temp_new();
--    imm_rs1 = tcg_temp_new();
-     gen_get_gpr(source1, rs1);
-     tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
--    tcg_gen_movi_tl(rs1_pass, rs1);
--    tcg_gen_movi_tl(csr_store, csr); /* copy into temp reg to feed to helper */
- 
- #ifndef CONFIG_USER_ONLY
-     /* Extract funct7 value and check whether it matches SFENCE.VMA */
-@@ -1556,45 +1551,9 @@ static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-             break;
-         }
-         break;
--    default:
--        tcg_gen_movi_tl(imm_rs1, rs1);
--        gen_io_start();
--        switch (opc) {
--        case OPC_RISC_CSRRW:
--            gen_helper_csrrw(dest, cpu_env, source1, csr_store);
--            break;
--        case OPC_RISC_CSRRS:
--            gen_helper_csrrs(dest, cpu_env, source1, csr_store, rs1_pass);
--            break;
--        case OPC_RISC_CSRRC:
--            gen_helper_csrrc(dest, cpu_env, source1, csr_store, rs1_pass);
--            break;
--        case OPC_RISC_CSRRWI:
--            gen_helper_csrrw(dest, cpu_env, imm_rs1, csr_store);
--            break;
--        case OPC_RISC_CSRRSI:
--            gen_helper_csrrs(dest, cpu_env, imm_rs1, csr_store, rs1_pass);
--            break;
--        case OPC_RISC_CSRRCI:
--            gen_helper_csrrc(dest, cpu_env, imm_rs1, csr_store, rs1_pass);
--            break;
--        default:
--            gen_exception_illegal(ctx);
--            return;
--        }
--        gen_io_end();
--        gen_set_gpr(rd, dest);
--        /* end tb since we may be changing priv modes, to get mmu_index right */
--        tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
--        tcg_gen_exit_tb(NULL, 0); /* no chaining */
--        ctx->base.is_jmp = DISAS_NORETURN;
--        break;
-     }
-     tcg_temp_free(source1);
--    tcg_temp_free(csr_store);
-     tcg_temp_free(dest);
--    tcg_temp_free(rs1_pass);
--    tcg_temp_free(imm_rs1);
- }
- 
- static void decode_RV32_64C0(DisasContext *ctx)
+this patchset converts the RISC-V decoder to decodetree in four major steps:
+
+1) Convert 32-bit instructions to decodetree [Patch 1-15]:
+    Many of the gen_* functions are called by the decode functions for 16-bit
+    and 32-bit functions. If we move translation code from the gen_*
+    functions to the generated trans_* functions of decode-tree, we get a lot of
+    duplication. Therefore, we mostly generate calls to the old gen_* function
+    which are properly replaced after step 2).
+
+    Each of the trans_ functions are grouped into files corresponding to their
+    ISA extension, e.g. addi which is in RV32I is translated in the file
+    'trans_rvi.inc.c'.
+
+2) Convert 16-bit instructions to decodetree [Patch 16-18]:
+    All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
+    we convert the arguments in the 16 bit trans_ function to the arguments of
+    the corresponding 32 bit instruction and call the 32 bit trans_ function.
+
+3) Remove old manual decoding in gen_* function [Patch 19-29]:
+    this move all manual translation code into the trans_* instructions of
+    decode tree, such that we can remove the old decode_* functions.
+
+4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
+   by Richard. [Patch 30-34]
+
+full tree available at
+https://github.com/bkoppelmann/qemu/tree/riscv-dt-v8
+
+Cheers,
+Bastian
+
+v7 -> v8:
+    - add REQUIRE_EXT macro
+    - add missing RVM checks
+    - add missing RVA checks
+    - add missing RVF checks
+    - add missing RVF checks
+    - add missing RVD checks
+    - add missing RVD checks
+    - riscv_has_ext -> has_ext
+    - env->ctx->priv_version -> ctx->priv_version
+    - fixed wrongly inserted #ifdef TARGET_RISCV64 that lead to a compile error
+
+
+Bastian Koppelmann (34):
+  target/riscv: Activate decodetree and implemnt LUI & AUIPC
+  target/riscv: Convert RVXI branch insns to decodetree
+  target/riscv: Convert RV32I load/store insns to decodetree
+  target/riscv: Convert RV64I load/store insns to decodetree
+  target/riscv: Convert RVXI arithmetic insns to decodetree
+  target/riscv: Convert RVXI fence insns to decodetree
+  target/riscv: Convert RVXI csr insns to decodetree
+  target/riscv: Convert RVXM insns to decodetree
+  target/riscv: Convert RV32A insns to decodetree
+  target/riscv: Convert RV64A insns to decodetree
+  target/riscv: Convert RV32F insns to decodetree
+  target/riscv: Convert RV64F insns to decodetree
+  target/riscv: Convert RV32D insns to decodetree
+  target/riscv: Convert RV64D insns to decodetree
+  target/riscv: Convert RV priv insns to decodetree
+  target/riscv: Convert quadrant 0 of RVXC insns to decodetree
+  target/riscv: Convert quadrant 1 of RVXC insns to decodetree
+  target/riscv: Convert quadrant 2 of RVXC insns to decodetree
+  target/riscv: Remove gen_jalr()
+  target/riscv: Remove manual decoding from gen_branch()
+  target/riscv: Remove manual decoding from gen_load()
+  target/riscv: Remove manual decoding from gen_store()
+  target/riscv: Move gen_arith_imm() decoding into trans_* functions
+  target/riscv: make ADD/SUB/OR/XOR/AND insn use arg lists
+  target/riscv: Remove shift and slt insn manual decoding
+  target/riscv: Remove manual decoding of RV32/64M insn
+  target/riscv: Rename trans_arith to gen_arith
+  target/riscv: Remove gen_system()
+  target/riscv: Remove decode_RV32_64G()
+  target/riscv: Convert @cs_2 insns to share translation functions
+  target/riscv: Convert @cl_d, @cl_w, @cs_d, @cs_w insns
+  target/riscv: Splice fsw_sd and flw_ld for riscv32 vs riscv64
+  target/riscv: Splice remaining compressed insn pairs for riscv32 vs
+    riscv64
+  target/riscv: Remaining rvc insn reuse 32 bit translators
+
+ target/riscv/Makefile.objs                    |   22 +
+ target/riscv/insn16-32.decode                 |   31 +
+ target/riscv/insn16-64.decode                 |   33 +
+ target/riscv/insn16.decode                    |  114 +
+ target/riscv/insn32-64.decode                 |   72 +
+ target/riscv/insn32.decode                    |  203 ++
+ .../riscv/insn_trans/trans_privileged.inc.c   |  110 +
+ target/riscv/insn_trans/trans_rva.inc.c       |  218 ++
+ target/riscv/insn_trans/trans_rvc.inc.c       |  149 ++
+ target/riscv/insn_trans/trans_rvd.inc.c       |  442 ++++
+ target/riscv/insn_trans/trans_rvf.inc.c       |  439 ++++
+ target/riscv/insn_trans/trans_rvi.inc.c       |  568 +++++
+ target/riscv/insn_trans/trans_rvm.inc.c       |  120 +
+ target/riscv/translate.c                      | 1948 ++---------------
+ 14 files changed, 2740 insertions(+), 1729 deletions(-)
+ create mode 100644 target/riscv/insn16-32.decode
+ create mode 100644 target/riscv/insn16-64.decode
+ create mode 100644 target/riscv/insn16.decode
+ create mode 100644 target/riscv/insn32-64.decode
+ create mode 100644 target/riscv/insn32.decode
+ create mode 100644 target/riscv/insn_trans/trans_privileged.inc.c
+ create mode 100644 target/riscv/insn_trans/trans_rva.inc.c
+ create mode 100644 target/riscv/insn_trans/trans_rvc.inc.c
+ create mode 100644 target/riscv/insn_trans/trans_rvd.inc.c
+ create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
+ create mode 100644 target/riscv/insn_trans/trans_rvi.inc.c
+ create mode 100644 target/riscv/insn_trans/trans_rvm.inc.c
+
 -- 
 2.20.1
