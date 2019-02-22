@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41780)
+Received: from eggs.gnu.org ([209.51.188.92]:41903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gx7Xo-0006hX-6H
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:55:00 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gx7Xq-0006iW-Jq
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:55:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gx7XW-0007UG-PC
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:54:43 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42464)
+	(envelope-from <alex.bennee@linaro.org>) id 1gx7Xp-0007ga-M9
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:55:02 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:46770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gx7XW-00079M-6K
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:54:42 -0500
-Received: by mail-wr1-x432.google.com with SMTP id r5so1640945wrg.9
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 01:54:27 -0800 (PST)
+	id 1gx7Xp-000788-8W
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 04:55:01 -0500
+Received: by mail-wr1-x436.google.com with SMTP id i16so1624236wrs.13
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 01:54:26 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 22 Feb 2019 09:54:17 +0000
-Message-Id: <20190222095421.28938-6-alex.bennee@linaro.org>
+Date: Fri, 22 Feb 2019 09:54:16 +0000
+Message-Id: <20190222095421.28938-5-alex.bennee@linaro.org>
 In-Reply-To: <20190222095421.28938-1-alex.bennee@linaro.org>
 References: <20190222095421.28938-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 5/9] tests/docker: squash initial update and
- install step for debian9
+Subject: [Qemu-devel] [PULL 4/9] .travis.yml: Remove disable-uuid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +30,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+
+Commit 315d3184525 turned --disable-uuid into a warning only; remove
+the check from Travis.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20190215094502.32149-2-dgilbert@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-index 154ae2a455..5f23a35404 100644
---- a/tests/docker/dockerfiles/debian9.docker
-+++ b/tests/docker/dockerfiles/debian9.docker
-@@ -13,8 +13,8 @@ FROM debian:stretch-slim
- RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
+diff --git a/.travis.yml b/.travis.yml
+index 61b086b8b8..cca57f4314 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -95,7 +95,7 @@ matrix:
  
- # Install common build utilities
--RUN apt update
--RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
-+RUN apt-get update && \
-+    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt install -y --no-install-recommends \
-         bison \
+ 
+     - env:
+-        - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-uuid --disable-libusb --disable-user --disable-replication"
++        - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-libusb --disable-user --disable-replication"
+ 
+ 
+     - env:
 -- 
 2.20.1
