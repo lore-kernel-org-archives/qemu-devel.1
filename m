@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49631)
+Received: from eggs.gnu.org ([209.51.188.92]:54171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gx8aI-0002Lh-7u
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 06:01:44 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1gx8iX-0003h3-Eo
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 06:10:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gx8a3-0005Qk-JS
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 06:01:31 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gx8Zu-0004bn-Ng
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 06:01:20 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gx8ZV-00040X-Qb
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 11:00:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C7CAD2E80C7
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 11:00:49 +0000 (UTC)
+	(envelope-from <liam.merwick@oracle.com>) id 1gx8iV-0006HP-BQ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 06:10:09 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:51876)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1gx8iU-0005H4-Kt
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 06:10:07 -0500
+References: <20190222054939.19739-1-kraxel@redhat.com>
+	<20190222054939.19739-2-kraxel@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <e49ae948-5856-e9e2-7c87-76810a44da91@oracle.com>
+Date: Fri, 22 Feb 2019 11:09:06 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 Feb 2019 10:46:12 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1817268 <1817268@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155082367008.22773.11895376561017991070.malonedeb@wampee.canonical.com>
-Message-Id: <155083237271.30126.16072600915154796544.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1817268] Re: Input/output error during migration
+In-Reply-To: <20190222054939.19739-2-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] vfio/display: add edid support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,238 +29,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, intel-gvt-dev@lists.freedesktop.org, Liam Merwick <Liam.Merwick@oracle.com>
 
-Yep that Length mismatch is expected - the source and destination do
-have to match.
+On 22/02/2019 05:49, Gerd Hoffmann wrote:
+> This patch adds EDID support to the vfio display (aka vgpu) code.
+> When supported by the mdev driver qemu will generate a EDID blob
+> and pass it on using the new vfio edid region.  The EDID blob will
+> be updated on UI changes (i.e. window resize), so the guest can
+> adapt.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>   include/hw/vfio/vfio-common.h |   3 +
+>   hw/vfio/display.c             | 127 ++++++++++++++++++++++++++++++++++++++++++
+>   hw/vfio/trace-events          |   7 +++
+>   3 files changed, 137 insertions(+)
+> 
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 7624c9f511c4..5f7f709b95f1 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -148,6 +148,9 @@ typedef struct VFIODMABuf {
+>   typedef struct VFIODisplay {
+>       QemuConsole *con;
+>       RAMFBState *ramfb;
+> +    struct vfio_region_info *edid_info;
+> +    struct vfio_region_gfx_edid *edid_regs;
+> +    uint8_t *edid_blob;
+>       struct {
+>           VFIORegion buffer;
+>           DisplaySurface *surface;
+> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+> index dead30e626cb..f59fcc487128 100644
+> --- a/hw/vfio/display.c
+> +++ b/hw/vfio/display.c
+> @@ -15,15 +15,139 @@
+>   #include <sys/ioctl.h>
+>   
+>   #include "sysemu/sysemu.h"
+> +#include "hw/display/edid.h"
+>   #include "ui/console.h"
+>   #include "qapi/error.h"
+>   #include "pci.h"
+> +#include "trace.h"
+>   
+>   #ifndef DRM_PLANE_TYPE_PRIMARY
+>   # define DRM_PLANE_TYPE_PRIMARY 1
+>   # define DRM_PLANE_TYPE_CURSOR  2
+>   #endif
+>   
+> +#define pread_field(_fd, _reg, _ptr, _fld)                              \
+> +    if (sizeof(_ptr->_fld) !=                                           \
+> +        pread(_fd, &(_ptr->_fld), sizeof(_ptr->_fld),                   \
+> +              _reg->offset + offsetof(typeof(*_ptr), _fld)))            \
+> +        goto err;
+> +#define pwrite_field(_fd, _reg, _ptr, _fld)                             \
+> +    if (sizeof(_ptr->_fld) !=                                           \
+> +        pwrite(_fd, &(_ptr->_fld), sizeof(_ptr->_fld),                  \
+> +               _reg->offset + offsetof(typeof(*_ptr), _fld)))           \
+> +        goto err;
+> +
+> +
+> +static void vfio_display_edid_update(VFIOPCIDevice *vdev, bool enabled,
+> +                                     int prefx, int prefy)
+> +{
+> +    VFIODisplay *dpy = vdev->dpy;
+> +    int fd = vdev->vbasedev.fd;
+> +    qemu_edid_info edid = {
+> +        .maxx  = dpy->edid_regs->max_xres,
+> +        .maxy  = dpy->edid_regs->max_yres,
+> +        .prefx = prefx,
+> +        .prefy = prefy,
+> +    };
+> +
+> +    dpy->edid_regs->link_state = VFIO_DEVICE_GFX_LINK_STATE_DOWN;
+> +    pwrite_field(fd, dpy->edid_info, dpy->edid_regs, link_state);
+> +    trace_vfio_display_edid_link_down();
+> +
+> +    if (!enabled) {
+> +        return;
+> +    }
+> +
+> +    if (edid.maxx && edid.prefx > edid.maxx) {
+> +        edid.prefx = edid.maxx;
+> +    }
+> +    if (edid.maxy && edid.prefy > edid.maxy) {
+> +        edid.prefy = edid.maxy;
+> +    }
+> +    qemu_edid_generate(dpy->edid_blob,
+> +                       dpy->edid_regs->edid_max_size,
+> +                       &edid);
+> +    trace_vfio_display_edid_update(edid.prefx, edid.prefy);
+> +
+> +    dpy->edid_regs->edid_size = qemu_edid_size(dpy->edid_blob);
+> +    pwrite_field(fd, dpy->edid_info, dpy->edid_regs, edid_size);
+> +    if (pwrite(fd, dpy->edid_blob, dpy->edid_regs->edid_size,
+> +               dpy->edid_info->offset + dpy->edid_regs->edid_offset)
+> +        != dpy->edid_regs->edid_size) {
+> +        goto err;
+> +    }
+> +
+> +    dpy->edid_regs->link_state = VFIO_DEVICE_GFX_LINK_STATE_UP;
+> +    pwrite_field(fd, dpy->edid_info, dpy->edid_regs, link_state);
+> +    trace_vfio_display_edid_link_up();
+> +    return;
+> +
+> +err:
+> +    trace_vfio_display_edid_write_error();
+> +    return;
+> +}
+> +
+> +static int vfio_display_edid_ui_info(void *opaque, uint32_t idx,
+> +                                     QemuUIInfo *info)
+> +{
+> +    VFIOPCIDevice *vdev = opaque;
+> +    VFIODisplay *dpy = vdev->dpy;
+> +
+> +    if (!dpy->edid_regs) {
+> +        return 0;
+> +    }
+> +
+> +    if (info->width && info->height) {
+> +        vfio_display_edid_update(vdev, true, info->width, info->height);
+> +    } else {
+> +        vfio_display_edid_update(vdev, false, 0, 0);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static void vfio_display_edid_init(VFIOPCIDevice *vdev)
+> +{
+> +    VFIODisplay *dpy = vdev->dpy;
+> +    int fd = vdev->vbasedev.fd;
+> +    int ret;
+> +
+> +    ret = vfio_get_dev_region_info(&vdev->vbasedev,
+> +                                   VFIO_REGION_TYPE_GFX,
+> +                                   VFIO_REGION_SUBTYPE_GFX_EDID,
+> +                                   &dpy->edid_info);
+> +    if (ret) {
+> +        return;
+> +    }
+> +
+> +    trace_vfio_display_edid_available();
+> +    dpy->edid_regs = g_new0(struct vfio_region_gfx_edid, 1);
+> +    pread_field(fd, dpy->edid_info, dpy->edid_regs, edid_offset);
+> +    pread_field(fd, dpy->edid_info, dpy->edid_regs, edid_max_size);
+> +    pread_field(fd, dpy->edid_info, dpy->edid_regs, max_xres);
+> +    pread_field(fd, dpy->edid_info, dpy->edid_regs, max_yres);
+> +    dpy->edid_blob = g_malloc0(dpy->edid_regs->edid_max_size);
+> +
+> +    vfio_display_edid_update(vdev, true, 0, 0);
+> +    return;
+> +
+> +err:
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817268
+Might it be worth a comment that the p{read|write}_field macros use this 
+label since it's not immediately obvious when reading the code there's a 
+use for this (compiler would have flagged it admittedly). Same comment 
+for vfio_display_edid_update() to a lesser extent.
 
-Title:
-  Input/output error during migration
 
-Status in QEMU:
-  New
+> +    trace_vfio_display_edid_write_error();
+> +    g_free(dpy->edid_regs);
+> +    dpy->edid_regs = NULL;
+> +    return;
+> +}
+> +
+> +static void vfio_display_edid_exit(VFIODisplay *dpy)
+> +{
+> +    if (!dpy->edid_regs) {
+> +        return;
+> +    }
+> +
+> +    g_free(dpy->edid_regs);
+> +    g_free(dpy->edid_blob);
+> +}
+> +
+>   static void vfio_display_update_cursor(VFIODMABuf *dmabuf,
+>                                          struct vfio_device_gfx_plane_info *plane)
+>   {
+> @@ -171,6 +295,7 @@ static void vfio_display_dmabuf_update(void *opaque)
+>   
+>   static const GraphicHwOps vfio_display_dmabuf_ops = {
+>       .gfx_update = vfio_display_dmabuf_update,
+> +    .ui_info    = vfio_display_edid_ui_info,
+>   };
+>   
+>   static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
+> @@ -187,6 +312,7 @@ static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
+>       if (vdev->enable_ramfb) {
+>           vdev->dpy->ramfb = ramfb_setup(errp);
+>       }
+> +    vfio_display_edid_init(vdev);
+>       return 0;
+>   }
+>   
+> @@ -366,5 +492,6 @@ void vfio_display_finalize(VFIOPCIDevice *vdev)
+>       graphic_console_close(vdev->dpy->con);
+>       vfio_display_dmabuf_exit(vdev->dpy);
+>       vfio_display_region_exit(vdev->dpy);
+> +    vfio_display_edid_exit(vdev->dpy);
+>       g_free(vdev->dpy);
+>   }
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index f41ca96160bf..28d445caaf74 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -131,3 +131,10 @@ vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size
+>   vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=0x%x winsize=0x%"PRIx64" offset=0x%"PRIx64
+>   vfio_spapr_remove_window(uint64_t off) "offset=0x%"PRIx64
+>   vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d to liobn fd %d"
+> +
+> +# hw/vfio/display.c
+> +vfio_display_edid_available(void) ""
+> +vfio_display_edid_link_up(void) ""
+> +vfio_display_edid_link_down(void) ""
+> +vfio_display_edid_update(uint32_t prefx, uint32_t prefy) "%dx%d"
 
-Bug description:
-  Operating system: Ubuntu 18.04.2 LTS
-  qemu version: 2.11.1, but also reproduced with 3.1.0 (compiled manually).
-  virsh --version: 4.0.0
+These should be %u since the variables are uint32_t
 
-  Hello,
+> +vfio_display_edid_write_error(void) ""
+> 
 
-  I am having an issue with migration of UEFI virtual machines. If the
-  --copy-storage-inc and the --tunnelled libvirt flags are used
-  together, the migration fails. The same command for non-uefi virtual
-  machines (e.g the same libvirt xml without the <nvram> and <loader>
-  tags) works.
+Otherwise
 
-  The command/output error is:
-
-  virsh migrate --verbose --live --p2p --tunnelled --copy-storage-inc --cha=
-nge-protection --abort-on-error testuefi qemu+tcp://<ip>/system
-  error: internal error: qemu unexpectedly closed the monitor: Receiving bl=
-ock device images
-  2019-02-21T16:20:15.263261Z qemu-system-x86_64: error while loading state=
- section id 2(block)
-  2019-02-21T16:20:15.263996Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-
-  If I remove one of the --tunnelled or the --copy-storage-inc flag, it
-  works, for example:
-
-  virsh migrate --verbose --live --p2p --copy-storage-inc --change-protecti=
-on --abort-on-error testuefi qemu+tcp://<ip>/system
-  Migration: [100 %]
-
-  virsh migrate --verbose --live --p2p --tunnelled --change-protection --ab=
-ort-on-error testuefi qemu+tcp://<ip>/system
-  Migration: [100 %]
-
-  I have no idea why those two flags combined together produce an error,
-  and only for UEFI virtual machines.
-
-  here is the libvirt xml definition:
-
-  <domain type=3D'kvm' id=3D'4'>
-    <name>testuefi</name>
-    <uuid>ce12de05-ec09-4b4b-a27a-47003a511bda</uuid>
-    <description>CentOS 4.5 (32-bit)</description>
-    <memory unit=3D'KiB'>2097152</memory>
-    <currentMemory unit=3D'KiB'>1048576</currentMemory>
-    <vcpu placement=3D'static'>2</vcpu>
-    <cputune>
-      <shares>878</shares>
-    </cputune>
-    <resource>
-      <partition>/machine</partition>
-    </resource>
-    <sysinfo type=3D'smbios'>
-      <system>
-        <entry name=3D'manufacturer'>Apache Software Foundation</entry>
-        <entry name=3D'product'>CloudStack KVM Hypervisor</entry>
-        <entry name=3D'uuid'>ce12de05-ec09-4b4b-a27a-47003a511bda</entry>
-      </system>
-    </sysinfo>
-    <os>
-      <type arch=3D'x86_64' machine=3D'pc-i440fx-2.11'>hvm</type>
-      <loader readonly=3D'yes' type=3D'pflash'>/usr/share/OVMF/OVMF_CODE.fd=
-</loader>
-      <nvram>/var/lib/libvirt/qemu/nvram/testuefi_VARS.fd</nvram>
-      <boot dev=3D'cdrom'/>
-      <boot dev=3D'hd'/>
-      <smbios mode=3D'sysinfo'/>
-    </os>
-    <features>
-      <acpi/>
-      <apic/>
-      <pae/>
-    </features>
-    <cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-      <model fallback=3D'forbid'>Westmere</model>
-      <feature policy=3D'require' name=3D'vmx'/>
-      <feature policy=3D'require' name=3D'vme'/>
-      <feature policy=3D'require' name=3D'pclmuldq'/>
-      <feature policy=3D'require' name=3D'x2apic'/>
-      <feature policy=3D'require' name=3D'hypervisor'/>
-      <feature policy=3D'require' name=3D'arat'/>
-    </cpu>
-    <clock offset=3D'utc'/>
-    <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-    <on_crash>destroy</on_crash>
-    <devices>
-      <emulator>/usr/bin/kvm-spice</emulator>
-      <disk type=3D'file' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'qcow2' cache=3D'none'/>
-        <source file=3D'/var/lib/libvirt/images/testmigration.qcow2'/>
-        <backingStore type=3D'file' index=3D'1'>
-          <format type=3D'raw'/>
-          <source file=3D'/var/lib/libvirt/images/b3e4b880-0611-43bc-9d71-9=
-cdac138f6e2'/>
-          <backingStore/>
-        </backingStore>
-        <target dev=3D'vda' bus=3D'virtio'/>
-        <alias name=3D'virtio-disk0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
-function=3D'0x0'/>
-      </disk>
-      <disk type=3D'file' device=3D'cdrom'>
-        <driver cache=3D'none'/>
-        <target dev=3D'hdc' bus=3D'ide'/>
-        <readonly/>
-        <alias name=3D'ide0-1-0'/>
-        <address type=3D'drive' controller=3D'0' bus=3D'1' target=3D'0' uni=
-t=3D'0'/>
-      </disk>
-      <controller type=3D'usb' index=3D'0' model=3D'piix3-uhci'>
-        <alias name=3D'usb'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
-function=3D'0x2'/>
-      </controller>
-      <controller type=3D'pci' index=3D'0' model=3D'pci-root'>
-  	    <alias name=3D'pci.0'/>
-      </controller>
-      <controller type=3D'ide' index=3D'0'>
-        <alias name=3D'ide'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
-function=3D'0x1'/>
-      </controller>
-      <interface type=3D'bridge'>
-        <mac address=3D'06:6a:20:00:00:55'/>
-        <source bridge=3D'public'/>
-        <target dev=3D'vnet4'/>
-        <model type=3D'virtio'/>
-        <driver queues=3D'2'/>
-        <alias name=3D'net0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
-function=3D'0x0'/>
-      </interface>
-      <serial type=3D'pty'>
-        <source path=3D'/dev/pts/2'/>
-        <target type=3D'isa-serial' port=3D'0'>
-          <model name=3D'isa-serial'/>
-        </target>
-        <alias name=3D'serial0'/>
-      </serial>
-      <console type=3D'pty' tty=3D'/dev/pts/2'>
-        <source path=3D'/dev/pts/2'/>
-        <target type=3D'serial' port=3D'0'/>
-        <alias name=3D'serial0'/>
-      </console>
-      <input type=3D'tablet' bus=3D'usb'>
-        <alias name=3D'input0'/>
-        <address type=3D'usb' bus=3D'0' port=3D'1'/>
-      </input>
-      <input type=3D'mouse' bus=3D'ps2'>
-        <alias name=3D'input1'/>
-      </input>
-      <input type=3D'keyboard' bus=3D'ps2'>
-        <alias name=3D'input2'/>
-      </input>
-      <video>
-        <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
-        <alias name=3D'video0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
-function=3D'0x0'/>
-      </video>
-      <memballoon model=3D'virtio'>
-        <alias name=3D'balloon0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x0'/>
-      </memballoon>
-    </devices>
-  </domain>
-
-  Here is the qemu command on the destination host:
-
-  LC_ALL=3DC
-  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-  QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm-spice -name guest=3Dtestuefi-VM,debug-
-  threads=3Don -S -object
-  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-14
-  -testuefi-VM/master-key.aes -machine pc-i440fx-2.11,accel=3Dkvm,usb=3Doff
-  ,dump-guest-core=3Doff -cpu Skylake-
-  Server,vmx=3Don,pcid=3Don,ssbd=3Don,hypervisor=3Don -drive
-  file=3D/usr/share/OVMF/OVMF_CODE.fd,if=3Dpflash,format=3Draw,unit=3D0,rea=
-donly=3Don
-  -drive file=3D/var/lib/libvirt/qemu/nvram/testuefi-
-  VM_VARS.fd,if=3Dpflash,format=3Draw,unit=3D1 -m 1024 -realtime mlock=3Doff
-  -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid b340b117-1704-4ccf-
-  93a7-21303b12dd7f -smbios 'type=3D1,manufacturer=3DApache Software
-  Foundation,product=3DCloudStack KVM Hypervisor,uuid=3Db340b117-1704-4ccf-
-  93a7-21303b12dd7f' -no-user-config -nodefaults -chardev
-  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-14-testuefi-
-  VM/monitor.sock,server,nowait -mon
-  chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shu=
-tdown
-  -boot strict=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.=
-0x2
-  -drive
-  file=3D/var/lib/libvirt/images/testmigration.qcow2,format=3Dqcow2,if=3Dno=
-ne,id
-  =3Ddrive-virtio-disk0,cache=3Dnone -device virtio-blk-
-  pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvir=
-tio-
-  disk0,bootindex=3D2 -drive if=3Dnone,id=3Ddrive-
-  ide0-1-0,readonly=3Don,cache=3Dnone -device ide-cd,bus=3Dide.1,unit=3D0,d=
-rive
-  =3Ddrive-ide0-1-0,id=3Dide0-1-0,bootindex=3D1 -netdev
-  tap,fd=3D35,id=3Dhostnet0,vhost=3Don,vhostfd=3D37 -device virtio-net-
-  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D06:a0:66:00:00:0c,bus=3Dpci.0,addr=
-=3D0x3
-  -chardev pty,id=3Dcharserial0 -device isa-
-  serial,chardev=3Dcharserial0,id=3Dserial0 -device usb-
-  tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc
-  vnc=3Dunix:/var/run/qemu/b340b117-1704-4ccf-93a7-21303b12dd7f.sock
-  -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -incoming defer -msg
-  timestamp=3Don
-
-  Thanks,
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817268/+subscriptions
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
