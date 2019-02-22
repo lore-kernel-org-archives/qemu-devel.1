@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52845)
+Received: from eggs.gnu.org ([209.51.188.92]:56324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gxEvd-0001Bg-Re
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:48:06 -0500
+	(envelope-from <bounces@canonical.com>) id 1gxF2u-0002dw-ET
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:55:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gxEvd-00084I-0m
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:48:05 -0500
-Received: from mta-01.yadro.com ([89.207.88.251]:36136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
-	id 1gxEvc-0007tw-NV
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:48:04 -0500
-Date: Fri, 22 Feb 2019 20:47:54 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-ID: <20190222174754.udxdxsezr5nfme6r@SPB-NB-133.local>
-References: <20190214102816.3393-1-peter.maydell@linaro.org>
-	<20190214102816.3393-4-peter.maydell@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1gxF2t-0003qD-Iz
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:55:36 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gxF2t-0003pJ-Cq
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:55:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gxF2r-0007JH-TU
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 17:55:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DD4032E8024
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 17:55:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20190214102816.3393-4-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] ui/cocoa: Factor out initial menu
- creation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Feb 2019 17:48:59 -0000
+From: John Snow <1815445@bugs.launchpad.net>
+Reply-To: Bug 1815445 <1815445@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154988507422.19358.16245527010669752237.malonedeb@soybean.canonical.com>
+Message-Id: <155085773921.22622.9642437297688951203.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815445] Re: change and eject commands are not
+ working on an overlay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>, BALATON Zoltan <balaton@eik.bme.hu>
+To: qemu-devel@nongnu.org
 
-On Thu, Feb 14, 2019 at 10:28:12AM +0000, Peter Maydell wrote:
-> Factor out the long code sequence in main() which creates
-> the initial set of menus. This will make later patches
-> which move initialization code around a bit clearer.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  ui/cocoa.m | 78 ++++++++++++++++++++++++++++--------------------------
->  1 file changed, 41 insertions(+), 37 deletions(-)
-> 
+Can you please provide your QEMU version, command line, and any QMP/HMP
+commands you issued, and the expected/desired effect?
 
-Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
+-- =
 
---
-Roman
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815445
+
+Title:
+  change and eject commands are not working on an overlay
+
+Status in QEMU:
+  New
+
+Bug description:
+  From qemu monitor, 'change' and 'eject' commands are not working on a CD =
+overlay.
+  'info block' returns:
+    cd0-overlay0: /home/guillaume/test/cd0-overlay0 (qcow2)
+      Attached to:      cd0-device
+      Removable device: not locked, tray closed
+      Cache mode:       writeback, ignore flushes
+      Backing file:     /home/guillaume/test.iso (chain depth: 1)
+
+  But 'eject cd0-overlay0' returns:
+    Device 'cd0-overlay0' not found
+  I also tried 'cd0-device' and 'cd0'.
+
+  Same problem with 'change' command.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815445/+subscriptions
