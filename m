@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60573)
+Received: from eggs.gnu.org ([209.51.188.92]:60515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx5eS-0006yG-8Y
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:45 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gx5eP-0006y9-FU
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gx5eP-0001cs-4Z
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx5eN-0001Me-Ly
+	(envelope-from <kraxel@redhat.com>) id 1gx5eN-0001Zq-Bg
 	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:41 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+Received: from mx1.redhat.com ([209.132.183.28]:42146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gx5eM-0001R5-EJ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 02:53:39 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1BA0F307D985
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:53:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CBF8430715CA
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:53:32 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 22 Feb 2019 08:53:21 +0100
-Message-Id: <20190222075326.9850-11-kraxel@redhat.com>
+Date: Fri, 22 Feb 2019 08:53:18 +0100
+Message-Id: <20190222075326.9850-8-kraxel@redhat.com>
 In-Reply-To: <20190222075326.9850-1-kraxel@redhat.com>
 References: <20190222075326.9850-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/15] char: move SpiceChardev and
- open_spice_port() to spice.h header
+Subject: [Qemu-devel] [PULL 07/15] spice: avoid spice runtime assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,105 +37,53 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This will allow easier subclassing of SpiceChardev, in upcoming
-"display: add -display spice-app launching external application"
-patch.
+The Spice server doesn't like to be started or stopped twice . It
+aborts with:
+
+(process:6191): Spice-ERROR **: 19:29:35.912: red-worker.c:623:handle_dev=
+_start: assertion `!worker->running' failed
+
+It's easy to avoid that situation since qemu spice_display_is_running
+tracks the server state.
+
+After the commit "spice: do not stop spice if VM is paused", it will
+be possible to pause and resume the VM, and this will call
+qemu_spice_display_start() twice. The easiest is to add a check for
+spice_display_is_running with this patch to avoid the assert.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Tested-by: Victor Toso <victortoso@redhat.com>
-Message-id: 20190221110703.5775-7-marcandre.lureau@redhat.com
+Message-id: 20190221110703.5775-4-marcandre.lureau@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/chardev/spice.h | 27 +++++++++++++++++++++++++++
- chardev/spice.c         | 28 +++++-----------------------
- 2 files changed, 32 insertions(+), 23 deletions(-)
- create mode 100644 include/chardev/spice.h
+ ui/spice-core.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/include/chardev/spice.h b/include/chardev/spice.h
-new file mode 100644
-index 000000000000..6431da320599
---- /dev/null
-+++ b/include/chardev/spice.h
-@@ -0,0 +1,27 @@
-+#ifndef CHARDEV_SPICE_H_
-+#define CHARDEV_SPICE_H_
-+
-+#include <spice.h>
-+#include "chardev/char-fe.h"
-+
-+typedef struct SpiceChardev {
-+    Chardev               parent;
-+
-+    SpiceCharDeviceInstance sin;
-+    bool                  active;
-+    bool                  blocked;
-+    const uint8_t         *datapos;
-+    int                   datalen;
-+    QLIST_ENTRY(SpiceChardev) next;
-+} SpiceChardev;
-+
-+#define TYPE_CHARDEV_SPICE "chardev-spice"
-+#define TYPE_CHARDEV_SPICEVMC "chardev-spicevmc"
-+#define TYPE_CHARDEV_SPICEPORT "chardev-spiceport"
-+
-+#define SPICE_CHARDEV(obj) OBJECT_CHECK(SpiceChardev, (obj), TYPE_CHARDE=
-V_SPICE)
-+
-+void qemu_chr_open_spice_port(Chardev *chr, ChardevBackend *backend,
-+                              bool *be_opened, Error **errp);
-+
-+#endif
-diff --git a/chardev/spice.c b/chardev/spice.c
-index c68e60115bb1..2202d50eee1e 100644
---- a/chardev/spice.c
-+++ b/chardev/spice.c
-@@ -2,30 +2,12 @@
- #include "trace.h"
- #include "ui/qemu-spice.h"
- #include "chardev/char.h"
-+#include "chardev/spice.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
--#include <spice.h>
- #include <spice/protocol.h>
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index 37fae3c42405..784fddff7d45 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -972,12 +972,20 @@ int qemu_spice_display_add_client(int csock, int sk=
+ipauth, int tls)
 =20
--
--typedef struct SpiceChardev {
--    Chardev               parent;
--
--    SpiceCharDeviceInstance sin;
--    bool                  active;
--    bool                  blocked;
--    const uint8_t         *datapos;
--    int                   datalen;
--    QLIST_ENTRY(SpiceChardev) next;
--} SpiceChardev;
--
--#define TYPE_CHARDEV_SPICE "chardev-spice"
--#define TYPE_CHARDEV_SPICEVMC "chardev-spicevmc"
--#define TYPE_CHARDEV_SPICEPORT "chardev-spiceport"
--
--#define SPICE_CHARDEV(obj) OBJECT_CHECK(SpiceChardev, (obj), TYPE_CHARDE=
-V_SPICE)
--
- typedef struct SpiceCharSource {
-     GSource               source;
-     SpiceChardev       *scd;
-@@ -315,10 +297,10 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
-     chr_open(chr, type);
+ void qemu_spice_display_start(void)
+ {
++    if (spice_display_is_running) {
++        return;
++    }
++
+     spice_display_is_running =3D true;
+     spice_server_vm_start(spice_server);
  }
 =20
--static void qemu_chr_open_spice_port(Chardev *chr,
--                                     ChardevBackend *backend,
--                                     bool *be_opened,
--                                     Error **errp)
-+void qemu_chr_open_spice_port(Chardev *chr,
-+                              ChardevBackend *backend,
-+                              bool *be_opened,
-+                              Error **errp)
+ void qemu_spice_display_stop(void)
  {
-     ChardevSpicePort *spiceport =3D backend->u.spiceport.data;
-     const char *name =3D spiceport->fqdn;
++    if (!spice_display_is_running) {
++        return;
++    }
++
+     spice_server_vm_stop(spice_server);
+     spice_display_is_running =3D false;
+ }
 --=20
 2.9.3
