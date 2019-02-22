@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41063)
+Received: from eggs.gnu.org ([209.51.188.92]:41765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwyW6-0004qm-Bq
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 19:16:39 -0500
+	(envelope-from <crosa@redhat.com>) id 1gwyXo-0005cx-KN
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 19:18:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwyW4-0007Mf-Sq
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 19:16:38 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33429)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gwyW0-00057x-29
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 19:16:35 -0500
-Received: by mail-pf1-x443.google.com with SMTP id i19so235424pfd.0
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 16:14:12 -0800 (PST)
-References: <20190219233421.388-1-richard.henderson@linaro.org>
-	<20190221212130.GA6971@flamenco> <87va1c3h1y.fsf@zen.linaroharston>
-	<20190221225906.GA31346@flamenco>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <17486cd7-bf8e-b8a9-656d-b9ac0f289119@linaro.org>
-Date: Thu, 21 Feb 2019 16:14:07 -0800
+	(envelope-from <crosa@redhat.com>) id 1gwyXn-0008D6-Kb
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 19:18:24 -0500
+References: <1550519997-253534-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<2cbb158f-a869-e24c-96cc-23f7f61a946b@redhat.com>
+	<4f992059-b448-a234-d319-3eb3bb5e04c9@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <dbd04ea0-6a60-9817-52b3-a0cc73f1a637@redhat.com>
+Date: Thu, 21 Feb 2019 19:17:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190221225906.GA31346@flamenco>
+In-Reply-To: <4f992059-b448-a234-d319-3eb3bb5e04c9@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/arm: Reduce overhead of
- cpu_get_tb_cpu_state
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] iotests: handle TypeError for Python3 in
+ test 242
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
-
-On 2/21/19 2:59 PM, Emilio G. Cota wrote:
-> Should have done so the first time. Here it is:
-> 
-> (gdb) r                                          
-> Starting program: /data/src/qemu/build/arm-softmmu/qemu-system-arm -machine type=virt -nographic -m 4096 -netdev user,id=unet,hostfwd=tcp::2222-:22 -d
-> evice virtio-net-device,netdev=unet -drive file=../img/arm/jessie-arm32-die-on-boot.qcow2,id=myblock,index=0,if=none -device virtio-blk-device,drive=m
-> yblock -kernel ../img/arm/aarch32-current-linux-kernel-only.img -append console=ttyAMA0\ root=/dev/vda1 -name arm,debug-threads=on -smp 1
-> [...]
-> VFS: Mounted root (ext4 filesystem) readonly on device 254:1.
-> devtmpfs: mounted
-> Freeing unused kernel memory: 300K (80669000 - 806b4000)
-> **
-> ERROR:/data/src/qemu/target/arm/helper.c:14049:cpu_get_tb_cpu_state: assertion failed (flags == check_flags): (0x10080000 == 0x10080080)
-
-Thanks, I've now reproduced this.
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, Eduardo Habkost <ehabkost@redhat.com>, mreitz@redhat.com
 
 
-r~
+
+On 2/18/19 4:25 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 2/18/19 9:05 PM, Eric Blake wrote:
+>> [adding Eduardo for some python 2-vs-3 advice]
+>=20
+> And Cleber.
+>=20
+>>
+>> On 2/18/19 1:59 PM, Andrey Shinkevich wrote:
+>>> To write one byte to disk, Python2 may use 'chr' type.
+>>> In Python3, conversion to 'byte' type is required.
+>>>
+>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>> ---
+>>>  tests/qemu-iotests/242 | 9 +++++++--
+>>>  1 file changed, 7 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+>>> index 16c65ed..6b1f7b8 100755
+>>> --- a/tests/qemu-iotests/242
+>>> +++ b/tests/qemu-iotests/242
+>>> @@ -65,9 +65,14 @@ def toggle_flag(offset):
+>>>      with open(disk, "r+b") as f:
+>>>          f.seek(offset, 0)
+>>>          c =3D f.read(1)
+>>> -        toggled =3D chr(ord(c) ^ bitmap_flag_unknown)
+>>> +        toggled =3D ord(c) ^ bitmap_flag_unknown
+>>>          f.seek(-1, 1)
+>>> -        f.write(toggled)
+>>> +        try:
+>>> +            # python2
+>>> +            f.write(chr(toggled))
+>>> +        except TypeError:
+>>> +            # python3
+>>> +            f.write(bytes([toggled]))
+>>
+>> Looks like it works, but I'm not enough of a python expert to know if
+>> there is a more Pythonic elegant approach.
+>>
+
+Well, there's no way around the fact that bytes in Python 3 are very
+different from bytes in Python 2 (just another name for a string).
+
+What I'd recommend here is to not base the type on the exception, but
+choose it depending on the Python version.  Something like:
+
+if sys.version_info.major =3D=3D 2:
+   f.write(chr(toggled))
+else:
+   f.write(bytes([toggled])]
+
+This is cheaper than raising/catching exceptions, it's self documenting,
+and follows the pattern on other tests.
+
+Regards,
+- Cleber.
+
+>> If someone else picks it up before my next NBD pull request,
+>> Acked-by: Eric Blake <eblake@redhat.com>
+>>
