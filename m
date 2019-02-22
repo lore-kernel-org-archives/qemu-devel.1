@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38788)
+Received: from eggs.gnu.org ([209.51.188.92]:43644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gxEP7-0000ds-OZ
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:14:30 -0500
+	(envelope-from <r.bolshakov@yadro.com>) id 1gxEbi-0003Et-AS
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:27:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gxEP3-00088u-Eq
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:14:27 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:33750
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gxEOx-0007Re-DA
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:14:21 -0500
-References: <20190222055950.17403-1-richard.henderson@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <a46631f2-fc78-2f06-09f0-25b2563af52d@ilande.co.uk>
-Date: Fri, 22 Feb 2019 17:13:37 +0000
+	(envelope-from <r.bolshakov@yadro.com>) id 1gxEbg-000171-9R
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:27:30 -0500
+Received: from mta-01.yadro.com ([89.207.88.251]:35758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
+	id 1gxEbe-0000U9-AL
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:27:28 -0500
+Date: Fri, 22 Feb 2019 20:27:02 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-ID: <20190222172702.bl7jmvklbmqvdty5@SPB-NB-133.local>
+References: <20190214102816.3393-1-peter.maydell@linaro.org>
+	<20190214102816.3393-3-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190222055950.17403-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/ppc: Add vector opcodes
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190214102816.3393-3-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] ui/cocoa: Use the pixman image
+ directly in switchSurface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>, BALATON Zoltan <balaton@eik.bme.hu>
 
-On 22/02/2019 05:59, Richard Henderson wrote:
-
-> This requires VSX, not just Altivec, so Power7 or later.
+On Thu, Feb 14, 2019 at 10:28:11AM +0000, Peter Maydell wrote:
+> Currently the switchSurface method takes a DisplaySurface. We want
+> to change our DisplayChangeListener's dpy_gfx_switch callback
+> to do this work asynchronously on a different thread. The caller
+> of the switch callback will free the old DisplaySurface
+> immediately the callback returns, so to ensure that the
+> other thread doesn't access freed data we need to switch
+> to using the underlying pixman image instead. The pixman
+> image is reference counted, so we will be able to take
+> a reference to it to avoid it vanishing too early.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> In this commit we only change the switchSurface method
+> to take a pixman image, and keep the flow of control
+> synchronous for now.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
+>  ui/cocoa.m | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
 > 
-> At present there are no tunables that can avoid the 64-bit element
-> load/store requirement.  As with requiring AVX1 for x86 hosts, I'm
-> not sure it's worth inventing such a tunable for pre-power7 hosts.
-> 
-> Tested vs aarch64 risu test cases.  It's probably worth testing
-> this vs Mark's target/ppc conversion.
 
-Oooh this looks really exciting! However... I only have a G4 Mac Mini around that I
-use for testing which is Altivec-only :(  Is it much work to support non-VSX hosts?
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
-This leads me to a related point that came up when Howard and I were testing the PPC
-vector patches - how do we know at runtime which optimisations were being used, e.g.
-what is the value of have_avx2 on a particular CPU running QEMU?
-
-Under Linux this isn't too bad since you can just do "cat /proc/cpuinfo | grep avx2"
-but it becomes more tricky when getting bug reports from Windows users who aren't
-particularly technical...
-
-
-ATB,
-
-Mark.
+Thanks,
+Roman
