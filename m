@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40706)
+Received: from eggs.gnu.org ([209.51.188.92]:40752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYf-0005Ov-VV
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:12 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYi-0005Qb-5D
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYb-0007P0-Pz
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:09 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYf-0007fV-UQ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:12:11 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:10:04 +0100
-Message-Id: <20190222141024.22217-15-kbastian@mail.uni-paderborn.de>
+Date: Fri, 22 Feb 2019 15:10:01 +0100
+Message-Id: <20190222141024.22217-12-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 14/34] target/riscv: Convert RV64D insns to
+Subject: [Qemu-devel] [PATCH v8 11/34] target/riscv: Convert RV32F insns to
  decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,755 +31,474 @@ Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
 v7 -> v8:
-    - add missing RVD checks
+    - fix REQUIRE_FPU macro here
+    - add missing RVF checks
+ 
+ target/riscv/insn32.decode              |  35 +++
+ target/riscv/insn_trans/trans_rvf.inc.c | 379 ++++++++++++++++++++++++
+ target/riscv/translate.c                |   1 +
+ 3 files changed, 415 insertions(+)
+ create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
 
- target/riscv/insn32-64.decode           |   8 +
- target/riscv/insn_trans/trans_rvd.inc.c |  82 ++++
- target/riscv/translate.c                | 601 +-----------------------
- 3 files changed, 91 insertions(+), 600 deletions(-)
-
-diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
-index 6319f872ac..380bf791bc 100644
---- a/target/riscv/insn32-64.decode
-+++ b/target/riscv/insn32-64.decode
-@@ -62,3 +62,11 @@ fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
- fcvt_lu_s  1100000  00011 ..... ... ..... 1010011 @r2_rm
- fcvt_s_l   1101000  00010 ..... ... ..... 1010011 @r2_rm
- fcvt_s_lu  1101000  00011 ..... ... ..... 1010011 @r2_rm
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 00b9e2d9a5..e40836bf03 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -17,12 +17,14 @@
+ # this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ # Fields:
++%rs3       27:5
+ %rs2       20:5
+ %rs1       15:5
+ %rd        7:5
+ 
+ %sh10    20:10
+ %csr    20:12
++%rm     12:3
+ 
+ # immediates:
+ %imm_i    20:s12
+@@ -50,6 +52,11 @@
+ @atom_ld ..... aq:1 rl:1 ..... ........ ..... ....... &atomic rs2=0     %rs1 %rd
+ @atom_st ..... aq:1 rl:1 ..... ........ ..... ....... &atomic %rs2      %rs1 %rd
+ 
++@r4_rm   ..... ..  ..... ..... ... ..... ....... %rs3 %rs2 %rs1 %rm %rd
++@r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
++@r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
++@r2      .......   ..... ..... ... ..... ....... %rs1 %rd
 +
-+# *** RV64D Standard Extension (in addition to RV32D) ***
-+fcvt_l_d   1100001  00010 ..... ... ..... 1010011 @r2_rm
-+fcvt_lu_d  1100001  00011 ..... ... ..... 1010011 @r2_rm
-+fmv_x_d    1110001  00000 ..... 000 ..... 1010011 @r2
-+fcvt_d_l   1101001  00010 ..... ... ..... 1010011 @r2_rm
-+fcvt_d_lu  1101001  00011 ..... ... ..... 1010011 @r2_rm
-+fmv_d_x    1111001  00000 ..... 000 ..... 1010011 @r2
-diff --git a/target/riscv/insn_trans/trans_rvd.inc.c b/target/riscv/insn_trans/trans_rvd.inc.c
-index 98fc1cdc5a..393fa0248c 100644
---- a/target/riscv/insn_trans/trans_rvd.inc.c
-+++ b/target/riscv/insn_trans/trans_rvd.inc.c
-@@ -358,3 +358,85 @@ static bool trans_fcvt_d_wu(DisasContext *ctx, arg_fcvt_d_wu *a)
-     mark_fs_dirty(ctx);
-     return true;
- }
+ # *** RV32I Base Instruction Set ***
+ lui      ....................       ..... 0110111 @u
+ auipc    ....................       ..... 0010111 @u
+@@ -119,3 +126,31 @@ amomin_w   10000 . . ..... ..... 010 ..... 0101111 @atom_st
+ amomax_w   10100 . . ..... ..... 010 ..... 0101111 @atom_st
+ amominu_w  11000 . . ..... ..... 010 ..... 0101111 @atom_st
+ amomaxu_w  11100 . . ..... ..... 010 ..... 0101111 @atom_st
 +
-+#ifdef TARGET_RISCV64
++# *** RV32F Standard Extension ***
++flw        ............   ..... 010 ..... 0000111 @i
++fsw        .......  ..... ..... 010 ..... 0100111 @s
++fmadd_s    ..... 00 ..... ..... ... ..... 1000011 @r4_rm
++fmsub_s    ..... 00 ..... ..... ... ..... 1000111 @r4_rm
++fnmsub_s   ..... 00 ..... ..... ... ..... 1001011 @r4_rm
++fnmadd_s   ..... 00 ..... ..... ... ..... 1001111 @r4_rm
++fadd_s     0000000  ..... ..... ... ..... 1010011 @r_rm
++fsub_s     0000100  ..... ..... ... ..... 1010011 @r_rm
++fmul_s     0001000  ..... ..... ... ..... 1010011 @r_rm
++fdiv_s     0001100  ..... ..... ... ..... 1010011 @r_rm
++fsqrt_s    0101100  00000 ..... ... ..... 1010011 @r2_rm
++fsgnj_s    0010000  ..... ..... 000 ..... 1010011 @r
++fsgnjn_s   0010000  ..... ..... 001 ..... 1010011 @r
++fsgnjx_s   0010000  ..... ..... 010 ..... 1010011 @r
++fmin_s     0010100  ..... ..... 000 ..... 1010011 @r
++fmax_s     0010100  ..... ..... 001 ..... 1010011 @r
++fcvt_w_s   1100000  00000 ..... ... ..... 1010011 @r2_rm
++fcvt_wu_s  1100000  00001 ..... ... ..... 1010011 @r2_rm
++fmv_x_w    1110000  00000 ..... 000 ..... 1010011 @r2
++feq_s      1010000  ..... ..... 010 ..... 1010011 @r
++flt_s      1010000  ..... ..... 001 ..... 1010011 @r
++fle_s      1010000  ..... ..... 000 ..... 1010011 @r
++fclass_s   1110000  00000 ..... 001 ..... 1010011 @r2
++fcvt_s_w   1101000  00000 ..... ... ..... 1010011 @r2_rm
++fcvt_s_wu  1101000  00001 ..... ... ..... 1010011 @r2_rm
++fmv_w_x    1111000  00000 ..... 000 ..... 1010011 @r2
+diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
+new file mode 100644
+index 0000000000..0f83790349
+--- /dev/null
++++ b/target/riscv/insn_trans/trans_rvf.inc.c
+@@ -0,0 +1,379 @@
++/*
++ * RISC-V translation routines for the RV64F Standard Extension.
++ *
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2018 Peer Adelt, peer.adelt@hni.uni-paderborn.de
++ *                    Bastian Koppelmann, kbastian@mail.uni-paderborn.de
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+static bool trans_fcvt_l_d(DisasContext *ctx, arg_fcvt_l_d *a)
++#define REQUIRE_FPU do {\
++    if (ctx->mstatus_fs == 0) \
++        return false;                       \
++} while (0)
++
++static bool trans_flw(DisasContext *ctx, arg_flw *a)
++{
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    tcg_gen_addi_tl(t0, t0, a->imm);
++
++    tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
++    /* RISC-V requires NaN-boxing of narrower width floating point values */
++    tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd], 0xffffffff00000000ULL);
++
++    tcg_temp_free(t0);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fsw(DisasContext *ctx, arg_fsw *a)
++{
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    tcg_gen_addi_tl(t0, t0, a->imm);
++
++    tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEUL);
++
++    tcg_temp_free(t0);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fmadd_s(DisasContext *ctx, arg_fmadd_s *a)
 +{
 +    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVD);
++    REQUIRE_EXT(ctx, RVF);
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fmadd_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
++                       cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fmsub_s(DisasContext *ctx, arg_fmsub_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fmsub_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
++                       cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fnmsub_s(DisasContext *ctx, arg_fnmsub_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fnmsub_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
++                        cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fnmadd_s(DisasContext *ctx, arg_fnmadd_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fnmadd_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
++                        cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fadd_s(DisasContext *ctx, arg_fadd_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fadd_s(cpu_fpr[a->rd], cpu_env,
++                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fsub_s(DisasContext *ctx, arg_fsub_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fsub_s(cpu_fpr[a->rd], cpu_env,
++                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fmul_s(DisasContext *ctx, arg_fmul_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fmul_s(cpu_fpr[a->rd], cpu_env,
++                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fdiv_s(DisasContext *ctx, arg_fdiv_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fdiv_s(cpu_fpr[a->rd], cpu_env,
++                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fsqrt_s(DisasContext *ctx, arg_fsqrt_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fsqrt_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fsgnj_s(DisasContext *ctx, arg_fsgnj_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    if (a->rs1 == a->rs2) { /* FMOV */
++        tcg_gen_mov_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1]);
++    } else { /* FSGNJ */
++        tcg_gen_deposit_i64(cpu_fpr[a->rd], cpu_fpr[a->rs2], cpu_fpr[a->rs1],
++                            0, 31);
++    }
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fsgnjn_s(DisasContext *ctx, arg_fsgnjn_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    if (a->rs1 == a->rs2) { /* FNEG */
++        tcg_gen_xori_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], INT32_MIN);
++    } else {
++        TCGv_i64 t0 = tcg_temp_new_i64();
++        tcg_gen_not_i64(t0, cpu_fpr[a->rs2]);
++        tcg_gen_deposit_i64(cpu_fpr[a->rd], t0, cpu_fpr[a->rs1], 0, 31);
++        tcg_temp_free_i64(t0);
++    }
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fsgnjx_s(DisasContext *ctx, arg_fsgnjx_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    if (a->rs1 == a->rs2) { /* FABS */
++        tcg_gen_andi_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], ~INT32_MIN);
++    } else {
++        TCGv_i64 t0 = tcg_temp_new_i64();
++        tcg_gen_andi_i64(t0, cpu_fpr[a->rs2], INT32_MIN);
++        tcg_gen_xor_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], t0);
++        tcg_temp_free_i64(t0);
++    }
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fmin_s(DisasContext *ctx, arg_fmin_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    gen_helper_fmin_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
++                      cpu_fpr[a->rs2]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fmax_s(DisasContext *ctx, arg_fmax_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    gen_helper_fmax_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
++                      cpu_fpr[a->rs2]);
++    mark_fs_dirty(ctx);
++    return true;
++}
++
++static bool trans_fcvt_w_s(DisasContext *ctx, arg_fcvt_w_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
 +
 +    TCGv t0 = tcg_temp_new();
 +    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_l_d(t0, cpu_env, cpu_fpr[a->rs1]);
++    gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[a->rs1]);
 +    gen_set_gpr(a->rd, t0);
 +    tcg_temp_free(t0);
++
 +    return true;
 +}
 +
-+static bool trans_fcvt_lu_d(DisasContext *ctx, arg_fcvt_lu_d *a)
++static bool trans_fcvt_wu_s(DisasContext *ctx, arg_fcvt_wu_s *a)
 +{
 +    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVD);
++    REQUIRE_EXT(ctx, RVF);
 +
 +    TCGv t0 = tcg_temp_new();
 +    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_lu_d(t0, cpu_env, cpu_fpr[a->rs1]);
++    gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[a->rs1]);
 +    gen_set_gpr(a->rd, t0);
 +    tcg_temp_free(t0);
++
 +    return true;
 +}
 +
-+static bool trans_fmv_x_d(DisasContext *ctx, arg_fmv_x_d *a)
++static bool trans_fmv_x_w(DisasContext *ctx, arg_fmv_x_w *a)
 +{
++    /* NOTE: This was FMV.X.S in an earlier version of the ISA spec! */
 +    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVD);
-+
-+    gen_set_gpr(a->rd, cpu_fpr[a->rs1]);
-+    return true;
-+}
-+
-+static bool trans_fcvt_d_l(DisasContext *ctx, arg_fcvt_d_l *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVD);
++    REQUIRE_EXT(ctx, RVF);
 +
 +    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
 +
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_d_l(cpu_fpr[a->rd], cpu_env, t0);
-+    tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fcvt_d_lu(DisasContext *ctx, arg_fcvt_d_lu *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVD);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_d_lu(cpu_fpr[a->rd], cpu_env, t0);
-+    tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fmv_d_x(DisasContext *ctx, arg_fmv_d_x *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVD);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+
-+    tcg_gen_mov_tl(cpu_fpr[a->rd], t0);
-+    tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
++#if defined(TARGET_RISCV64)
++    tcg_gen_ext32s_tl(t0, cpu_fpr[a->rs1]);
++#else
++    tcg_gen_extrl_i64_i32(t0, cpu_fpr[a->rs1]);
 +#endif
++
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
++
++    return true;
++}
++
++static bool trans_feq_s(DisasContext *ctx, arg_feq_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    TCGv t0 = tcg_temp_new();
++    gen_helper_feq_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
++    return true;
++}
++
++static bool trans_flt_s(DisasContext *ctx, arg_flt_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    TCGv t0 = tcg_temp_new();
++    gen_helper_flt_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
++    return true;
++}
++
++static bool trans_fle_s(DisasContext *ctx, arg_fle_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++    TCGv t0 = tcg_temp_new();
++    gen_helper_fle_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
++    return true;
++}
++
++static bool trans_fclass_s(DisasContext *ctx, arg_fclass_s *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    TCGv t0 = tcg_temp_new();
++
++    gen_helper_fclass_s(t0, cpu_fpr[a->rs1]);
++
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
++
++    return true;
++}
++
++static bool trans_fcvt_s_w(DisasContext *ctx, arg_fcvt_s_w *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_s_w(cpu_fpr[a->rd], cpu_env, t0);
++
++    mark_fs_dirty(ctx);
++    tcg_temp_free(t0);
++
++    return true;
++}
++
++static bool trans_fcvt_s_wu(DisasContext *ctx, arg_fcvt_s_wu *a)
++{
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_s_wu(cpu_fpr[a->rd], cpu_env, t0);
++
++    mark_fs_dirty(ctx);
++    tcg_temp_free(t0);
++
++    return true;
++}
++
++static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
++{
++    /* NOTE: This was FMV.S.X in an earlier version of the ISA spec! */
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
++
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++
++#if defined(TARGET_RISCV64)
++    tcg_gen_mov_i64(cpu_fpr[a->rd], t0);
++#else
++    tcg_gen_extu_i32_i64(cpu_fpr[a->rd], t0);
++#endif
++
++    mark_fs_dirty(ctx);
++    tcg_temp_free(t0);
++
++    return true;
++}
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index c201985ef3..2e36deee82 100644
+index c279145999..b9f78f5a1f 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -186,44 +186,6 @@ static void gen_mulhsu(TCGv ret, TCGv arg1, TCGv arg2)
-     tcg_temp_free(rh);
- }
- 
--static void gen_fsgnj(DisasContext *ctx, uint32_t rd, uint32_t rs1,
--    uint32_t rs2, int rm, uint64_t min)
--{
--    switch (rm) {
--    case 0: /* fsgnj */
--        if (rs1 == rs2) { /* FMOV */
--            tcg_gen_mov_i64(cpu_fpr[rd], cpu_fpr[rs1]);
--        } else {
--            tcg_gen_deposit_i64(cpu_fpr[rd], cpu_fpr[rs2], cpu_fpr[rs1],
--                                0, min == INT32_MIN ? 31 : 63);
--        }
--        break;
--    case 1: /* fsgnjn */
--        if (rs1 == rs2) { /* FNEG */
--            tcg_gen_xori_i64(cpu_fpr[rd], cpu_fpr[rs1], min);
--        } else {
--            TCGv_i64 t0 = tcg_temp_new_i64();
--            tcg_gen_not_i64(t0, cpu_fpr[rs2]);
--            tcg_gen_deposit_i64(cpu_fpr[rd], t0, cpu_fpr[rs1],
--                                0, min == INT32_MIN ? 31 : 63);
--            tcg_temp_free_i64(t0);
--        }
--        break;
--    case 2: /* fsgnjx */
--        if (rs1 == rs2) { /* FABS */
--            tcg_gen_andi_i64(cpu_fpr[rd], cpu_fpr[rs1], ~min);
--        } else {
--            TCGv_i64 t0 = tcg_temp_new_i64();
--            tcg_gen_andi_i64(t0, cpu_fpr[rs2], min);
--            tcg_gen_xor_i64(cpu_fpr[rd], cpu_fpr[rs1], t0);
--            tcg_temp_free_i64(t0);
--        }
--        break;
--    default:
--        gen_exception_illegal(ctx);
--    }
--}
--
- static void gen_arith(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-         int rs2)
- {
-@@ -807,535 +769,6 @@ static void gen_set_rm(DisasContext *ctx, int rm)
-     tcg_temp_free_i32(t0);
- }
- 
--static void gen_fp_fmadd(DisasContext *ctx, uint32_t opc, int rd,
--                         int rs1, int rs2, int rs3, int rm)
--{
--    switch (opc) {
--    case OPC_RISC_FMADD_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fmadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
--                           cpu_fpr[rs2], cpu_fpr[rs3]);
--        break;
--    case OPC_RISC_FMADD_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fmadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
--                           cpu_fpr[rs2], cpu_fpr[rs3]);
--        break;
--    do_illegal:
--    default:
--        gen_exception_illegal(ctx);
--        break;
--    }
--}
--
--static void gen_fp_fmsub(DisasContext *ctx, uint32_t opc, int rd,
--                         int rs1, int rs2, int rs3, int rm)
--{
--    switch (opc) {
--    case OPC_RISC_FMSUB_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fmsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
--                           cpu_fpr[rs2], cpu_fpr[rs3]);
--        break;
--    case OPC_RISC_FMSUB_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fmsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
--                           cpu_fpr[rs2], cpu_fpr[rs3]);
--        break;
--    do_illegal:
--    default:
--        gen_exception_illegal(ctx);
--        break;
--    }
--}
--
--static void gen_fp_fnmsub(DisasContext *ctx, uint32_t opc, int rd,
--                          int rs1, int rs2, int rs3, int rm)
--{
--    switch (opc) {
--    case OPC_RISC_FNMSUB_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fnmsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
--                            cpu_fpr[rs2], cpu_fpr[rs3]);
--        break;
--    case OPC_RISC_FNMSUB_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fnmsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
--                            cpu_fpr[rs2], cpu_fpr[rs3]);
--        break;
--    do_illegal:
--    default:
--        gen_exception_illegal(ctx);
--        break;
--    }
--}
--
--static void gen_fp_fnmadd(DisasContext *ctx, uint32_t opc, int rd,
--                          int rs1, int rs2, int rs3, int rm)
--{
--    switch (opc) {
--    case OPC_RISC_FNMADD_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fnmadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
--                            cpu_fpr[rs2], cpu_fpr[rs3]);
--        break;
--    case OPC_RISC_FNMADD_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fnmadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
--                            cpu_fpr[rs2], cpu_fpr[rs3]);
--        break;
--    do_illegal:
--    default:
--        gen_exception_illegal(ctx);
--        break;
--    }
--}
--
--static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
--                         int rs1, int rs2, int rm)
--{
--    TCGv t0 = NULL;
--    bool fp_output = true;
--
--    if (ctx->mstatus_fs == 0) {
--        goto do_illegal;
--    }
--
--    switch (opc) {
--    case OPC_RISC_FADD_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--        break;
--    case OPC_RISC_FSUB_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--        break;
--    case OPC_RISC_FMUL_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fmul_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--        break;
--    case OPC_RISC_FDIV_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fdiv_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--        break;
--    case OPC_RISC_FSQRT_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fsqrt_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
--        break;
--    case OPC_RISC_FSGNJ_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        gen_fsgnj(ctx, rd, rs1, rs2, rm, INT32_MIN);
--        break;
--
--    case OPC_RISC_FMIN_S:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        /* also handles: OPC_RISC_FMAX_S */
--        switch (rm) {
--        case 0x0:
--            gen_helper_fmin_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        case 0x1:
--            gen_helper_fmax_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        default:
--            goto do_illegal;
--        }
--        break;
--
--    case OPC_RISC_FEQ_S:
--        /* also handles: OPC_RISC_FLT_S, OPC_RISC_FLE_S */
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        switch (rm) {
--        case 0x0:
--            gen_helper_fle_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        case 0x1:
--            gen_helper_flt_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        case 0x2:
--            gen_helper_feq_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        default:
--            goto do_illegal;
--        }
--        gen_set_gpr(rd, t0);
--        tcg_temp_free(t0);
--        fp_output = false;
--        break;
--
--    case OPC_RISC_FCVT_W_S:
--        /* also OPC_RISC_FCVT_WU_S, OPC_RISC_FCVT_L_S, OPC_RISC_FCVT_LU_S */
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        switch (rs2) {
--        case 0: /* FCVT_W_S */
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[rs1]);
--            break;
--        case 1: /* FCVT_WU_S */
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[rs1]);
--            break;
--#if defined(TARGET_RISCV64)
--        case 2: /* FCVT_L_S */
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[rs1]);
--            break;
--        case 3: /* FCVT_LU_S */
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[rs1]);
--            break;
--#endif
--        default:
--            goto do_illegal;
--        }
--        gen_set_gpr(rd, t0);
--        tcg_temp_free(t0);
--        fp_output = false;
--        break;
--
--    case OPC_RISC_FCVT_S_W:
--        /* also OPC_RISC_FCVT_S_WU, OPC_RISC_FCVT_S_L, OPC_RISC_FCVT_S_LU */
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        gen_get_gpr(t0, rs1);
--        switch (rs2) {
--        case 0: /* FCVT_S_W */
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_s_w(cpu_fpr[rd], cpu_env, t0);
--            break;
--        case 1: /* FCVT_S_WU */
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_s_wu(cpu_fpr[rd], cpu_env, t0);
--            break;
--#if defined(TARGET_RISCV64)
--        case 2: /* FCVT_S_L */
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_s_l(cpu_fpr[rd], cpu_env, t0);
--            break;
--        case 3: /* FCVT_S_LU */
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_s_lu(cpu_fpr[rd], cpu_env, t0);
--            break;
--#endif
--        default:
--            goto do_illegal;
--        }
--        tcg_temp_free(t0);
--        break;
--
--    case OPC_RISC_FMV_X_S:
--        /* also OPC_RISC_FCLASS_S */
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        switch (rm) {
--        case 0: /* FMV */
--#if defined(TARGET_RISCV64)
--            tcg_gen_ext32s_tl(t0, cpu_fpr[rs1]);
--#else
--            tcg_gen_extrl_i64_i32(t0, cpu_fpr[rs1]);
--#endif
--            break;
--        case 1:
--            gen_helper_fclass_s(t0, cpu_fpr[rs1]);
--            break;
--        default:
--            goto do_illegal;
--        }
--        gen_set_gpr(rd, t0);
--        tcg_temp_free(t0);
--        fp_output = false;
--        break;
--
--    case OPC_RISC_FMV_S_X:
--        if (!has_ext(ctx, RVF)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        gen_get_gpr(t0, rs1);
--#if defined(TARGET_RISCV64)
--        tcg_gen_mov_i64(cpu_fpr[rd], t0);
--#else
--        tcg_gen_extu_i32_i64(cpu_fpr[rd], t0);
--#endif
--        tcg_temp_free(t0);
--        break;
--
--    /* double */
--    case OPC_RISC_FADD_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--        break;
--    case OPC_RISC_FSUB_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--        break;
--    case OPC_RISC_FMUL_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fmul_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--        break;
--    case OPC_RISC_FDIV_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fdiv_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--        break;
--    case OPC_RISC_FSQRT_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        gen_set_rm(ctx, rm);
--        gen_helper_fsqrt_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
--        break;
--    case OPC_RISC_FSGNJ_D:
--        gen_fsgnj(ctx, rd, rs1, rs2, rm, INT64_MIN);
--        break;
--
--    case OPC_RISC_FMIN_D:
--        /* also OPC_RISC_FMAX_D */
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        switch (rm) {
--        case 0:
--            gen_helper_fmin_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        case 1:
--            gen_helper_fmax_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        default:
--            goto do_illegal;
--        }
--        break;
--
--    case OPC_RISC_FCVT_S_D:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        switch (rs2) {
--        case 1:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_s_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
--            break;
--        default:
--            goto do_illegal;
--        }
--        break;
--
--    case OPC_RISC_FCVT_D_S:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        switch (rs2) {
--        case 0:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_d_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
--            break;
--        default:
--            goto do_illegal;
--        }
--        break;
--
--    case OPC_RISC_FEQ_D:
--        /* also OPC_RISC_FLT_D, OPC_RISC_FLE_D */
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        switch (rm) {
--        case 0:
--            gen_helper_fle_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        case 1:
--            gen_helper_flt_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        case 2:
--            gen_helper_feq_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
--            break;
--        default:
--            goto do_illegal;
--        }
--        gen_set_gpr(rd, t0);
--        tcg_temp_free(t0);
--        fp_output = false;
--        break;
--
--    case OPC_RISC_FCVT_W_D:
--        /* also OPC_RISC_FCVT_WU_D, OPC_RISC_FCVT_L_D, OPC_RISC_FCVT_LU_D */
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        switch (rs2) {
--        case 0:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_w_d(t0, cpu_env, cpu_fpr[rs1]);
--            break;
--        case 1:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_wu_d(t0, cpu_env, cpu_fpr[rs1]);
--            break;
--#if defined(TARGET_RISCV64)
--        case 2:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_l_d(t0, cpu_env, cpu_fpr[rs1]);
--            break;
--        case 3:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_lu_d(t0, cpu_env, cpu_fpr[rs1]);
--            break;
--#endif
--        default:
--            goto do_illegal;
--        }
--        gen_set_gpr(rd, t0);
--        tcg_temp_free(t0);
--        fp_output = false;
--        break;
--
--    case OPC_RISC_FCVT_D_W:
--        /* also OPC_RISC_FCVT_D_WU, OPC_RISC_FCVT_D_L, OPC_RISC_FCVT_D_LU */
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        gen_get_gpr(t0, rs1);
--        switch (rs2) {
--        case 0:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_d_w(cpu_fpr[rd], cpu_env, t0);
--            break;
--        case 1:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_d_wu(cpu_fpr[rd], cpu_env, t0);
--            break;
--#if defined(TARGET_RISCV64)
--        case 2:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_d_l(cpu_fpr[rd], cpu_env, t0);
--            break;
--        case 3:
--            gen_set_rm(ctx, rm);
--            gen_helper_fcvt_d_lu(cpu_fpr[rd], cpu_env, t0);
--            break;
--#endif
--        default:
--            goto do_illegal;
--        }
--        tcg_temp_free(t0);
--        break;
--
--    case OPC_RISC_FMV_X_D:
--        /* also OPC_RISC_FCLASS_D */
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        switch (rm) {
--#if defined(TARGET_RISCV64)
--        case 0: /* FMV */
--            gen_set_gpr(rd, cpu_fpr[rs1]);
--            break;
--#endif
--        case 1:
--            t0 = tcg_temp_new();
--            gen_helper_fclass_d(t0, cpu_fpr[rs1]);
--            gen_set_gpr(rd, t0);
--            tcg_temp_free(t0);
--            break;
--        default:
--            goto do_illegal;
--        }
--        fp_output = false;
--        break;
--
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_FMV_D_X:
--        if (!has_ext(ctx, RVD)) {
--            goto do_illegal;
--        }
--        t0 = tcg_temp_new();
--        gen_get_gpr(t0, rs1);
--        tcg_gen_mov_tl(cpu_fpr[rd], t0);
--        tcg_temp_free(t0);
--        break;
--#endif
--
--    default:
--    do_illegal:
--        if (t0) {
--            tcg_temp_free(t0);
--        }
--        gen_exception_illegal(ctx);
--        return;
--    }
--
--    if (fp_output) {
--        mark_fs_dirty(ctx);
--    }
--}
--
- static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-                        int csr)
- {
-@@ -1722,11 +1155,8 @@ bool decode_insn32(DisasContext *ctx, uint32_t insn);
+@@ -1717,6 +1717,7 @@ bool decode_insn32(DisasContext *ctx, uint32_t insn);
+ #include "insn_trans/trans_rvi.inc.c"
+ #include "insn_trans/trans_rvm.inc.c"
+ #include "insn_trans/trans_rva.inc.c"
++#include "insn_trans/trans_rvf.inc.c"
  
  static void decode_RV32_64G(DisasContext *ctx)
  {
--    int rs1;
--    int rs2;
--    int rd;
-+    int rs1, rd;
-     uint32_t op;
--    target_long imm;
- 
-     /* We do not do misaligned address check here: the address should never be
-      * misaligned at this point. Instructions that set PC must do the check,
-@@ -1735,38 +1165,9 @@ static void decode_RV32_64G(DisasContext *ctx)
- 
-     op = MASK_OP_MAJOR(ctx->opcode);
-     rs1 = GET_RS1(ctx->opcode);
--    rs2 = GET_RS2(ctx->opcode);
-     rd = GET_RD(ctx->opcode);
--    imm = GET_IMM(ctx->opcode);
- 
-     switch (op) {
--    case OPC_RISC_FP_LOAD:
--        gen_fp_load(ctx, MASK_OP_FP_LOAD(ctx->opcode), rd, rs1, imm);
--        break;
--    case OPC_RISC_FP_STORE:
--        gen_fp_store(ctx, MASK_OP_FP_STORE(ctx->opcode), rs1, rs2,
--                     GET_STORE_IMM(ctx->opcode));
--        break;
--    case OPC_RISC_FMADD:
--        gen_fp_fmadd(ctx, MASK_OP_FP_FMADD(ctx->opcode), rd, rs1, rs2,
--                     GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
--        break;
--    case OPC_RISC_FMSUB:
--        gen_fp_fmsub(ctx, MASK_OP_FP_FMSUB(ctx->opcode), rd, rs1, rs2,
--                     GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
--        break;
--    case OPC_RISC_FNMSUB:
--        gen_fp_fnmsub(ctx, MASK_OP_FP_FNMSUB(ctx->opcode), rd, rs1, rs2,
--                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
--        break;
--    case OPC_RISC_FNMADD:
--        gen_fp_fnmadd(ctx, MASK_OP_FP_FNMADD(ctx->opcode), rd, rs1, rs2,
--                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
--        break;
--    case OPC_RISC_FP_ARITH:
--        gen_fp_arith(ctx, MASK_OP_FP_ARITH(ctx->opcode), rd, rs1, rs2,
--                     GET_RM(ctx->opcode));
--        break;
-     case OPC_RISC_SYSTEM:
-         gen_system(ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
-                    (ctx->opcode & 0xFFF00000) >> 20);
 -- 
 2.20.1
