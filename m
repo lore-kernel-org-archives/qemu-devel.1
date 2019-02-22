@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34904)
+Received: from eggs.gnu.org ([209.51.188.92]:34998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gxCHH-0000SI-0B
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:15 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gxCHG-0000VD-Ry
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gxCF6-0007hd-Me
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58978)
+	(envelope-from <jasowang@redhat.com>) id 1gxCF8-0007rG-HZ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44704)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gxCF6-0006aq-Am
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:00 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gxCF7-00074S-V2
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:02 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Feb 2019 22:55:13 +0800
-Message-Id: <1550847320-25110-7-git-send-email-jasowang@redhat.com>
+Date: Fri, 22 Feb 2019 22:55:17 +0800
+Message-Id: <1550847320-25110-11-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
 References: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 06/13] net: Add a network device specific
- self-announcement ability
+Subject: [Qemu-devel] [PULL 10/13] tests: Add a test for qemu self
+ announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +25,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vladislav Yasevich <vyasevic@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vlad Yasevich <vyasevic@redhat.com>, Jason Wang <jasowang@redhat.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Some network devices have a capability to do self announcements
-(ex: virtio-net).  Add infrastructure that would allow devices
-to expose this ability.
+We now expose qemu_announce_self through QMP and HMP.  Add a test
+with some very basic packet validation (make sure we get a RARP).
 
-Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- include/net/net.h | 2 ++
- net/announce.c    | 5 +++++
- 2 files changed, 7 insertions(+)
+ tests/Makefile.include     |  3 ++
+ tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+)
+ create mode 100644 tests/test-announce-self.c
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 075cc01..acf0451 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -60,6 +60,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
- typedef int (SetVnetBE)(NetClientState *, bool);
- typedef struct SocketReadState SocketReadState;
- typedef void (SocketReadStateFinalize)(SocketReadState *rs);
-+typedef void (NetAnnounce)(NetClientState *);
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b39e989..1b0874c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -144,6 +144,7 @@ check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
  
- typedef struct NetClientInfo {
-     NetClientDriver type;
-@@ -80,6 +81,7 @@ typedef struct NetClientInfo {
-     SetVnetHdrLen *set_vnet_hdr_len;
-     SetVnetLE *set_vnet_le;
-     SetVnetBE *set_vnet_be;
-+    NetAnnounce *announce;
- } NetClientInfo;
+ check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
+ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
++gcov-files-generic-y = migration/savevm.c
  
- struct NetClientState {
-diff --git a/net/announce.c b/net/announce.c
-index 13ad9c2..070f37a 100644
---- a/net/announce.c
-+++ b/net/announce.c
-@@ -102,6 +102,11 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
-     len = announce_self_create(buf, nic->conf->macaddr.a);
+ check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
  
-     qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+@@ -221,6 +222,7 @@ check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
+ check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
+ check-qtest-i386-$(CONFIG_RTL8139_PCI) += tests/test-filter-redirector$(EXESUF)
+ check-qtest-i386-y += tests/migration-test$(EXESUF)
++check-qtest-i386-y += tests/test-announce-self$(EXESUF)
+ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
+ check-qtest-i386-y += tests/numa-test$(EXESUF)
+ check-qtest-x86_64-y += $(check-qtest-i386-y)
+@@ -258,6 +260,7 @@ check-qtest-ppc64-y += $(check-qtest-ppc-y)
+ check-qtest-ppc64-$(CONFIG_PSERIES) += tests/spapr-phb-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_POWERNV) += tests/pnv-xscom-test$(EXESUF)
+ check-qtest-ppc64-y += tests/migration-test$(EXESUF)
++check-qtest-ppc64-y += tests/test-announce-self$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_PSERIES) += tests/rtas-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
+diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
+new file mode 100644
+index 0000000..2ff0c77
+--- /dev/null
++++ b/tests/test-announce-self.c
+@@ -0,0 +1,83 @@
++/*
++ * QTest testcase for qemu_announce_self
++ *
++ * Copyright (c) 2017 Red hat, Inc.
++ * Copyright (c) 2014 SUSE LINUX Products GmbH
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+    /* if the NIC provides it's own announcement support, use it as well */
-+    if (nic->ncs->info->announce) {
-+        nic->ncs->info->announce(nic->ncs);
-+    }
- }
- static void qemu_announce_self_once(void *opaque)
- {
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qapi/qmp/qdict.h"
++#include "qemu-common.h"
++#include "qemu/sockets.h"
++#include "qemu/iov.h"
++#include "libqos/libqos-pc.h"
++#include "libqos/libqos-spapr.h"
++
++#ifndef ETH_P_RARP
++#define ETH_P_RARP 0x8035
++#endif
++
++static QTestState *test_init(int socket)
++{
++    char *args;
++
++    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
++                           "virtio-net-pci,netdev=hs0", socket);
++
++    return qtest_start(args);
++}
++
++
++static void test_announce(int socket)
++{
++    char buffer[60];
++    int len;
++    QDict *rsp;
++    int ret;
++    uint16_t *proto = (uint16_t *)&buffer[12];
++
++    rsp = qmp("{ 'execute' : 'announce-self', "
++                  " 'arguments': {"
++                      " 'params': {"
++                          " 'initial': 50, 'max': 550,"
++                          " 'rounds': 10, 'step': 50 } } }");
++    assert(!qdict_haskey(rsp, "error"));
++    qobject_unref(rsp);
++
++    /* Catch the packet and make sure it's a RARP */
++    ret = qemu_recv(socket, &len, sizeof(len), 0);
++    g_assert_cmpint(ret, ==,  sizeof(len));
++    len = ntohl(len);
++
++    ret = qemu_recv(socket, buffer, len, 0);
++    g_assert_cmpint(*proto, ==, htons(ETH_P_RARP));
++}
++
++static void setup(gconstpointer data)
++{
++    QTestState *qs;
++    void (*func) (int socket) = data;
++    int sv[2], ret;
++
++    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
++    g_assert_cmpint(ret, !=, -1);
++
++    qs = test_init(sv[1]);
++    func(sv[0]);
++
++    /* End test */
++    close(sv[0]);
++    qtest_quit(qs);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++    qtest_add_data_func("/virtio/net/test_announce_self", test_announce, setup);
++
++    return g_test_run();
++}
 -- 
 2.5.0
