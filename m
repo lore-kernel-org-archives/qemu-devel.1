@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57841)
+Received: from eggs.gnu.org ([209.51.188.92]:33931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gxBGP-0002xk-Tw
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:53:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1gxBON-000677-Tl
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:01:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gxBGO-00017x-NW
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:53:17 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34613)
+	(envelope-from <bounces@canonical.com>) id 1gxBO1-00072M-Ka
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:01:18 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59616)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gxBGL-0000q4-By
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:53:16 -0500
-Received: by mail-oi1-x244.google.com with SMTP id g16so1761107oib.1
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 05:53:13 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gxBNz-0006Xu-9g
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:01:08 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gxBNn-0003P9-S1
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 14:00:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D04AB2E80CC
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 14:00:55 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190221190229.22599-1-richard.henderson@linaro.org>
-In-Reply-To: <20190221190229.22599-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Feb 2019 13:53:00 +0000
-Message-ID: <CAFEAcA_9+wQA+Ud4ZizCsVmO58gnjda1gUqLj+mMusUhdw9joQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] tcg patch queue
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Feb 2019 13:53:55 -0000
+From: Ryan Press <1805697@bugs.launchpad.net>
+Reply-To: Bug 1805697 <1805697@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154343711336.10463.14315631936822945059.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155084363570.30984.6938653776052834041.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1805697] Re: egl-headless crashes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Thu, 21 Feb 2019 at 19:02, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The following changes since commit fc3dbb90f2eb069801bfb4cfe9cbc83cf9c5f4a9:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-02-21 13:09:33 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20190221
->
-> for you to fetch changes up to 8c6edfdd90522caa4fc429144d393aba5b99f584:
->
->   include/exec/helper-head.h: support "const void *" in helper calls (2019-02-21 10:22:24 -0800)
->
-> ----------------------------------------------------------------
-> Allow const void * as argument to helpers.
-> Remove obsolete TODO file.
->
+I have the same issue.  The patch (which is already included in my git
+source) did not help.  I can use the command line solution but it's not
+ideal as I connect to the VM from multiple computers with different
+resolutions.
 
-Applied, thanks.
+Also if I use "Auto resize VM to window" the VM immediately crashes with
+the error:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+qemu-system-x86_64: /root/qemu/ui/egl-headless.c:136: egl_scanout_flush:
+Assertion `surface_width(edpy->ds) =3D=3D edpy->guest_fb.width' failed.
 
--- PMM
+
+Otherwise it is working better than I had hoped, just this small resolution=
+ issue.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805697
+
+Title:
+  egl-headless crashes
+
+Status in QEMU:
+  New
+
+Bug description:
+  egl-headless crashes when it is trying change the resolution. After
+  XFCE login, for example.
+
+  I tryed it on 2.12, 3.0 and 3.1.0-rc2 versions.
+
+  # qemu-system-x86_64 -enable-kvm -enable-kvm -M q35 -smp 8 -vga virtio
+  -spice port=3D59011,addr=3D0.0.0.0,disable-ticketing -hda image.qcow2 -m
+  4G -display egl-headless -chardev spicevmc,name=3Dvdagent,id=3Dvdagent
+
+  main_channel_link: add main channel client
+  main_channel_client_handle_pong: net test: latency 6.942000 ms, bitrate 8=
+497925311 bps (8104.253112 Mbps)
+  inputs_connect: inputs channel client create
+  red_qxl_set_cursor_peer:
+  gl_version 31 - compat profile
+  qemu-system-x86_64: ui/egl-headless.c:128: egl_scanout_flush: Assertion `=
+surface_width(edpy->ds) =3D=3D edpy->guest_fb.width' failed.
+  Aborted (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805697/+subscriptions
