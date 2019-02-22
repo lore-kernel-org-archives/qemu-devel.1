@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46329)
+Received: from eggs.gnu.org ([209.51.188.92]:48440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gxDbR-0006rC-6O
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:23:10 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gxDgL-0007xr-7D
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:28:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gxDbP-0006CL-Sb
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:23:09 -0500
-References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-11-kwolf@redhat.com>
-	<0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
-	<20190219090431.GD4727@localhost.localdomain>
-	<ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
-	<20190222153505.GB8035@dhcp-200-176.str.redhat.com>
-	<487485f2-31c0-9200-b66d-e430047ad536@redhat.com>
-	<20190222160613.GE8035@dhcp-200-176.str.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <cf7daf3b-41e8-1098-f5de-e8feba204d2c@redhat.com>
-Date: Fri, 22 Feb 2019 17:22:35 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gxDgJ-0003Cm-AT
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 11:28:13 -0500
+Date: Fri, 22 Feb 2019 17:27:42 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190222172742.18c3835a@redhat.com>
+In-Reply-To: <20190220224003.4420-1-eric.auger@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190222160613.GE8035@dhcp-200-176.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Lm5cpKkMhZWnGTWOP4TlrSDq9obmrBFB5"
-Subject: Re: [Qemu-devel] [RFC PATCH 10/11] qcow2: Store data file name in
- the image
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expansion
+ and PCDIMM/NVDIMM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,243 +23,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Lm5cpKkMhZWnGTWOP4TlrSDq9obmrBFB5
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <cf7daf3b-41e8-1098-f5de-e8feba204d2c@redhat.com>
-Subject: Re: [RFC PATCH 10/11] qcow2: Store data file name in the image
-References: <20190131175549.11691-1-kwolf@redhat.com>
- <20190131175549.11691-11-kwolf@redhat.com>
- <0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
- <20190219090431.GD4727@localhost.localdomain>
- <ba7c7518-8b44-c1d0-22c9-94f0bde58bdf@redhat.com>
- <20190222153505.GB8035@dhcp-200-176.str.redhat.com>
- <487485f2-31c0-9200-b66d-e430047ad536@redhat.com>
- <20190222160613.GE8035@dhcp-200-176.str.redhat.com>
-In-Reply-To: <20190222160613.GE8035@dhcp-200-176.str.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On Wed, 20 Feb 2019 23:39:46 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-On 22.02.19 17:06, Kevin Wolf wrote:
-> Am 22.02.2019 um 16:43 hat Max Reitz geschrieben:
->> On 22.02.19 16:35, Kevin Wolf wrote:
->>> Am 22.02.2019 um 15:16 hat Max Reitz geschrieben:
->>>> On 19.02.19 10:04, Kevin Wolf wrote:
->>>>> Am 19.02.2019 um 01:18 hat Max Reitz geschrieben:
->>>>>> On 31.01.19 18:55, Kevin Wolf wrote:
->>>>>>> Rather than requiring that the external data file node is passed
->>>>>>> explicitly when creating the qcow2 node, store the filename in th=
-e
->>>>>>> designated header extension during .bdrv_create and read it from =
-there
->>>>>>> as a default during .bdrv_open.
->>>>>>>
->>>>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>>>>>> ---
->>>>>>>  block/qcow2.h              |  1 +
->>>>>>>  block/qcow2.c              | 69 ++++++++++++++++++++++++++++++++=
-+++++-
->>>>>>>  tests/qemu-iotests/082.out | 27 +++++++++++++++
->>>>>>>  3 files changed, 96 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> [...]
->>>>>>
->>>>>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>>>>> index 6cf862e8b9..4959bf16a4 100644
->>>>>>> --- a/block/qcow2.c
->>>>>>> +++ b/block/qcow2.c
->>>>>>> @@ -398,6 +398,20 @@ static int qcow2_read_extensions(BlockDriver=
-State *bs, uint64_t start_offset,
->>>>>>>  #endif
->>>>>>>              break;
->>>>>>> =20
->>>>>>> +        case QCOW2_EXT_MAGIC_DATA_FILE:
->>>>>>> +        {
->>>>>>> +            s->image_data_file =3D g_malloc0(ext.len + 1);
->>>>>>> +            ret =3D bdrv_pread(bs->file, offset, s->image_data_f=
-ile, ext.len);
->>>>>>> +            if (ret < 0) {
->>>>>>> +                error_setg_errno(errp, -ret, "ERROR: Could not d=
-ata file name");
->>>>>>
->>>>>> I think you accidentally a word.
->>>>>>
->>>>>>> +                return ret;
->>>>>>> +            }
->>>>>>> +#ifdef DEBUG_EXT
->>>>>>> +            printf("Qcow2: Got external data file %s\n", s->imag=
-e_data_file);
->>>>>>> +#endif
->>>>>>> +            break;
->>>>>>> +        }
->>>>>>> +
->>>>>>>          default:
->>>>>>>              /* unknown magic - save it in case we need to rewrit=
-e the header */
->>>>>>>              /* If you add a new feature, make sure to also updat=
-e the fast
->>>>>>> @@ -1444,7 +1458,18 @@ static int coroutine_fn qcow2_do_open(Bloc=
-kDriverState *bs, QDict *options,
->>>>>>>      /* Open external data file */
->>>>>>>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
->>>>>>>          s->data_file =3D bdrv_open_child(NULL, options, "data-fi=
-le", bs,
->>>>>>> -                                       &child_file, false, errp)=
-;
->>>>>>> +                                       &child_file, false, &loca=
-l_err);
->>>>>>> +        if (!s->data_file) {
->>>>>>> +            if (s->image_data_file) {
->>>>>>> +                error_free(local_err);
->>>>>>> +                local_err =3D NULL;
->>>>>>
->>>>>> This looked a bit weird to me at first because I was wondering why=
- you
->>>>>> wouldn't just pass allow_none=3Dtrue and then handle errors (by pa=
-ssing
->>>>>> them on).  But right, we want to retry with a filename set, maybe =
-that
->>>>>> makes more sense of the options.
->>>>>
->>>>> I think we want the normal error message for the !s->image_data_fil=
-e
->>>>> case. With allow_none=3Dtrue, we would have to come up with a new o=
-ne here
->>>>> (in the else branch below).
->>>>>
->>>>>> Hm.  But then again, do we really?  It matches what we do with bac=
-king
->>>>>> files, but that does give at least me headaches from time to time.=
-  How
->>>>>> bad would it be to allow either passing all valid options through
->>>>>> @options (which would make qcow2 ignore the string in the header),=
- or
->>>>>> use the filename given in the header alone?
->>>>>
->>>>> You mean offering only one of the two ways to configure the node?
->>>>
->>>> Either just the filename from the image header, or ignore that and t=
-ake
->>>> all options from the user (who'd have to give a syntactically comple=
-te
->>>> QAPI BlockdevRef object).
->>>>
->>>>> The 'data-file' runtime option is a must so that libvirt can build =
-the
->>>>> graph node by node (and possibly use file descriptor passing one da=
-y).
->>>>> But having to specify the option every time is very unfriendly for =
-human
->>>>> users, so I think allowing to store the file name in the header is =
-a
->>>>> must, too.
->>>>
->>>> Sure.  But I don't know whether we have to support taking the filena=
-me
->>>> from the image header, and the user overriding some of the node's
->>>> options (e.g. caching).
->>>
->>> So essentially this would mean passing NULL instead of options to
->>> bdrv_open_child() when we retry with the filename from the header.
->>>
->>> But it's inconsistent with all other places, which comes with two
->>
->> "all other places"?  Really it's just backing files, as everywhere els=
-e
->> there is no filename that doesn't come from the command line.
->>
->> Yes, you can use -drive file=3Dfoo.qcow2,file.locking=3Doff, but I con=
-sider
->> that case a bit different.  Although maybe it really isn't. *shrug*
->=20
-> Why would it be different? At least as a user, I consider them the same=
-=2E
-> It's true that bs->file and bs->backing come with some additional magic=
-,
-> but I don't think it makes a difference for this aspect.
->=20
-> I'll add the third example I can think of and I'm sure you'll love this=
-:
->=20
-> $ x86_64-softmmu/qemu-system-x86_64 \
->   -drive file=3D/tmp/test.vmdk,extents.0.cache.no-flush=3Don
->=20
-> So we have three examples that work this way. Can you think of any
-> existing counterexample?
+> This series aims to bump the 255GB RAM limit in machvirt and to
+> support device memory in general, and especially PCDIMM/NVDIMM.
+> 
+> In machvirt versions < 4.0, the initial RAM starts at 1GB and can
+> grow up to 255GB. From 256GB onwards we find IO regions such as the
+> additional GICv3 RDIST region, high PCIe ECAM region and high PCIe
+> MMIO region. The address map was 1TB large. This corresponded to
+> the max IPA capacity KVM was able to manage.
+> 
+> Since 4.20, the host kernel is able to support a larger and dynamic
+> IPA range. So the guest physical address can go beyond the 1TB. The
+> max GPA size depends on the host kernel configuration and physical CPUs.
+> 
+> In this series we use this feature and allow the RAM to grow without
+> any other limit than the one put by the host kernel.
+> 
+> The RAM still starts at 1GB. First comes the initial ram (-m) of size
+> ram_size and then comes the device memory (,maxmem) of size
+> maxram_size - ram_size. The device memory is potentially hotpluggable
+> depending on the instantiated memory objects.
+> 
+> IO regions previously located between 256GB and 1TB are moved after
+> the RAM. Their offset is dynamically computed, depends on ram_size
+> and maxram_size. Size alignment is enforced.
+> 
+> In case maxmem value is inferior to 255GB, the legacy memory map
+> still is used. The change of memory map becomes effective from 4.0
+> onwards.
+> 
+> As we keep the initial RAM at 1GB base address, we do not need to do
+> invasive changes in the EDK2 FW. It seems nobody is eager to do
+> that job at the moment.
+> 
+> Device memory being put just after the initial RAM, it is possible
+> to get access to this feature while keeping a 1TB address map.
+> 
+> This series reuses/rebases patches initially submitted by Shameer
+> in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
+> 
+> Functionally, the series is split into 3 parts:
+> 1) bump of the initial RAM limit [1 - 9] and change in
+>    the memory map
 
-Define counterexample.  -drive has options for many things, so of course
-I can underspecify everything.  file=3D is basically the same as
-file.filename=3D, so I can give .file.filename=3D for any node (and some
-additional options, but not all that would theoretically be necessary)
-and -drive will do the rest.
+> 2) Support of PC-DIMM [10 - 13]
+Is this part complete ACPI wise (for coldplug)? I haven't noticed
+DSDT AML here no E820 changes, so ACPI wise pc-dimm shouldn't be
+visible to the guest. It might be that DT is masking problem
+but well, that won't work on ACPI only guests.
 
-It's just that that's -drive magic and not driver-level magic (which
-this data-file handling is, by virtue of qcow2_do_open() trying to open
-the child in two different ways consecutively).  Even for .backing and
-the extents it's handled generically in the block layer, isn't it...?
+Even though I've tried make mem hotplug ACPI parts not x86 specific,
+I'm afraid it might be tightly coupled with hotplug support.
+So here are 2 options make DSDT part work without hotplug or
+implement hotplug here. I think the former is just a waste of time
+and we should just add hotplug. It should take relatively minor effort
+since you already implemented most of boiler plate here.
 
-But now I remember a real issue with .backing specifically:
-
-$ ./qemu-img create -f qcow2 base.qcow2 64M
-$ ./qemu-img create -f qcow2 -b base.qcow2 top.qcow2
-$ x86_64-softmmu/qemu-system-x86_64 \
-    -blockdev
-node-name=3Dfoo,driver=3Dqcow2,file.driver=3Dfile,file.filename=3Dtop.qco=
-w2,\
-backing.driver=3Dnull-co
-qemu-system-x86_64: -blockdev
-node-name=3Dfoo,driver=3Dqcow2,file.driver=3Dfile,file.filename=3Dtop.qco=
-w2,backing.driver=3Dnull-co:
-Could not open backing file: The only allowed filename for this driver
-is 'null-co://'
-
-Because .backing is handled by the block driver just giving the filename
-to the generic block layer, which then just puts it in
-backing.file.filename.  It's actually pretty good that this will not
-happen with your approach!  In fact, that prevents a major source of
-headaches I really did have with .backing. :-)
-
->>> problems. It's confusing for users who are used to overriding just th=
-at
->>> one option of a child. And do we actually spare you any headaches or =
-do
->>> we create new ones because we have now two different behaviours of
->>> bdrv_open_child() callers that we must preserve in the future?
->>
->> It means I can act out on my pain by being angry on how .backing
->> behaves.  That's better for my health than having to keep it in becaus=
-e
->> it's the same behavior everywhere and it's officially me who's in the =
-wrong.
->=20
-> You're officially wrong. ;-)
-
-My poor liver.  I hope it can cope with all the Paracetamol it's going
-to receive.
-
-Max
+As for how to implement ACPI HW part, I suggest to borrow GED
+device that NEMU guys trying to use instead of GPIO route,
+like we do now for ACPI_POWER_BUTTON_DEVICE to deliver event.
+So that it would be easier to share this with their virt-x86
+machine eventually.
 
 
---Lm5cpKkMhZWnGTWOP4TlrSDq9obmrBFB5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> 3) Support of NV-DIMM [14 - 17]
+The same might be true for NUMA but I haven't dug this deep in to
+that part.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxwIcsACgkQ9AfbAGHV
-z0BoPwf7BAkeRp6HjydwVFdUYEUiqEBBjmnj94AlouWKwOEdwp7uEgPJhwda8H0P
-uAwerBrIilQi8TvQxlBdtVRxb14SDHdS2wYkX0FAEkCi4/i3SvyVPauOgYJxwTKO
-qrvH6oA+MA8U4zqxrIqH8BZ/XF616LDWwAKQKWrjK8tUR9bFl7IyhKIr4MT9rXpO
-+HX/3tGAkB+Qo48spXu0rlsFol+pqAY8ma2lJcjvxuzoKewFVbrbgzJkSHWs2gs+
-uYW3mLpjeScjpM9g+OZ8ZJLFgfIg2G29QUit8GiZN4wAgqUwPnRkCZZfyhbZX2VE
-HIjkgfHwq7jV9NuVwhMNwtbxYSLEYw==
-=Z7vV
------END PGP SIGNATURE-----
-
---Lm5cpKkMhZWnGTWOP4TlrSDq9obmrBFB5--
+> 
+> 1) can be upstreamed before 2 and 2 can be upstreamed before 3.
+> 
+> Work is ongoing to transform the whole memory as device memory.
+> However this move is not trivial and to me, is independent on
+> the improvements brought by this series:
+> - if we were to use DIMM for initial RAM, those DIMMs would use
+>   use slots. Although they would not be part of the ones provided
+>   using the ",slots" options, they are ACPI limited resources.
+> - DT and ACPI description needs to be reworked
+> - NUMA integration needs special care
+> - a special device memory object may be required to avoid consuming
+>   slots and easing the FW description.
+> 
+> So I preferred to separate the concerns. This new implementation
+> based on device memory could be candidate for another virt
+> version.
+> 
+> Best Regards
+> 
+> Eric
+> 
+> References:
+> 
+> [0] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
+> http://patchwork.ozlabs.org/cover/914694/
+> 
+> [1] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
+> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
+> 
+> This series can be found at:
+> https://github.com/eauger/qemu/tree/v3.1.0-dimm-v7
+> 
+> History:
+> 
+> v6 -> v7:
+> - Addressed Peter and Igor comments (exceptions sent my email)
+> - Fixed TCG case. Now device memory works also for TCG and vcpu
+>   pamax is checked
+> - See individual logs for more details
+> 
+> v5 -> v6:
+> - mingw compilation issue fix
+> - kvm_arm_get_max_vm_phys_shift always returns the number of supported
+>   IPA bits
+> - new patch "hw/arm/virt: Rename highmem IO regions" that eases the review
+>   of "hw/arm/virt: Split the memory map description"
+> - "hw/arm/virt: Move memory map initialization into machvirt_init"
+>   squashed into the previous patch
+> - change alignment of IO regions beyond the RAM so that it matches their
+>   size
+> 
+> v4 -> v5:
+> - change in the memory map
+> - see individual logs
+> 
+> v3 -> v4:
+> - rebase on David's "pc-dimm: next bunch of cleanups" and
+>   "pc-dimm: pre_plug "slot" and "addr" assignment"
+> - kvm-type option not used anymore. We directly use
+>   maxram_size and ram_size machine fields to compute the
+>   MAX IPA range. Migration is naturally handled as CLI
+>   option are kept between source and destination. This was
+>   suggested by David.
+> - device_memory_start and device_memory_size not stored
+>   anymore in vms->bootinfo
+> - I did not take into account 2 Igor's comments: the one
+>   related to the refactoring of arm_load_dtb and the one
+>   related to the generation of the dtb after system_reset
+>   which would contain nodes of hotplugged devices (we do
+>   not support hotplug at this stage)
+> - check the end-user does not attempt to hotplug a device
+> - addition of "vl: Set machine ram_size, maxram_size and
+>   ram_slots earlier"
+> 
+> v2 -> v3:
+> - fix pc_q35 and pc_piix compilation error
+> - kwangwoo's email being not valid anymore, remove his address
+> 
+> v1 -> v2:
+> - kvm_get_max_vm_phys_shift moved in arch specific file
+> - addition of NVDIMM part
+> - single series
+> - rebase on David's refactoring
+> 
+> v1:
+> - was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
+> - was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
+> 
+> Best Regards
+> 
+> Eric
+> 
+> 
+> Eric Auger (12):
+>   hw/arm/virt: Rename highmem IO regions
+>   hw/arm/virt: Split the memory map description
+>   hw/boards: Add a MachineState parameter to kvm_type callback
+>   kvm: add kvm_arm_get_max_vm_ipa_size
+>   vl: Set machine ram_size, maxram_size and ram_slots earlier
+>   hw/arm/virt: Dynamic memory map depending on RAM requirements
+>   hw/arm/virt: Implement kvm_type function for 4.0 machine
+>   hw/arm/virt: Bump the 255GB initial RAM limit
+>   hw/arm/virt: Add memory hotplug framework
+>   hw/arm/virt: Allocate device_memory
+>   hw/arm/boot: Expose the pmem nodes in the DT
+>   hw/arm/virt: Add nvdimm and nvdimm-persistence options
+> 
+> Kwangwoo Lee (2):
+>   nvdimm: use configurable ACPI IO base and size
+>   hw/arm/virt: Add nvdimm hot-plug infrastructure
+> 
+> Shameer Kolothum (3):
+>   hw/arm/boot: introduce fdt_add_memory_node helper
+>   hw/arm/boot: Expose the PC-DIMM nodes in the DT
+>   hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+> 
+>  accel/kvm/kvm-all.c             |   2 +-
+>  default-configs/arm-softmmu.mak |   4 +
+>  hw/acpi/nvdimm.c                |  31 ++-
+>  hw/arm/boot.c                   | 136 ++++++++++--
+>  hw/arm/virt-acpi-build.c        |  23 +-
+>  hw/arm/virt.c                   | 364 ++++++++++++++++++++++++++++----
+>  hw/i386/pc_piix.c               |   6 +-
+>  hw/i386/pc_q35.c                |   6 +-
+>  hw/ppc/mac_newworld.c           |   3 +-
+>  hw/ppc/mac_oldworld.c           |   2 +-
+>  hw/ppc/spapr.c                  |   2 +-
+>  include/hw/arm/virt.h           |  24 ++-
+>  include/hw/boards.h             |   5 +-
+>  include/hw/mem/nvdimm.h         |   4 +
+>  target/arm/kvm.c                |  10 +
+>  target/arm/kvm_arm.h            |  13 ++
+>  vl.c                            |   6 +-
+>  17 files changed, 556 insertions(+), 85 deletions(-)
+> 
