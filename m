@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48211)
+Received: from eggs.gnu.org ([209.51.188.92]:52845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gxEkz-0007MR-Lv
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:37:06 -0500
+	(envelope-from <r.bolshakov@yadro.com>) id 1gxEvd-0001Bg-Re
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:48:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gxEky-0006jM-J7
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:37:05 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46720)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gxEky-0006Om-Cl
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:37:04 -0500
-Received: by mail-oi1-x244.google.com with SMTP id j135so2309355oib.13
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 09:36:41 -0800 (PST)
+	(envelope-from <r.bolshakov@yadro.com>) id 1gxEvd-00084I-0m
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:48:05 -0500
+Received: from mta-01.yadro.com ([89.207.88.251]:36136)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
+	id 1gxEvc-0007tw-NV
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 12:48:04 -0500
+Date: Fri, 22 Feb 2019 20:47:54 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-ID: <20190222174754.udxdxsezr5nfme6r@SPB-NB-133.local>
+References: <20190214102816.3393-1-peter.maydell@linaro.org>
+	<20190214102816.3393-4-peter.maydell@linaro.org>
 MIME-Version: 1.0
-References: <20190222170936.13268-1-peter.maydell@linaro.org>
-	<20190222170936.13268-3-peter.maydell@linaro.org>
-In-Reply-To: <20190222170936.13268-3-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Feb 2019 17:36:29 +0000
-Message-ID: <CAFEAcA-YCosZjWEiLC6cc8Z7rfOUQMLYZJX48MKOYuZNQQVR_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm: Gate "miscellaneous FP"
- insns by ID register field
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190214102816.3393-4-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] ui/cocoa: Factor out initial menu
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>, BALATON Zoltan <balaton@eik.bme.hu>
 
-On Fri, 22 Feb 2019 at 17:09, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> There is a set of VFP instructions which we implement in
-> disas_vfp_v8_insn() and gate on the ARM_FEATURE_V8 bit.
-> These were all first introduced in v8 for A-profile, but in
-> M-profile they appeared in v7M. Gate them on the MVFR2
-> FPMisc field instead, and rename the function appropriately.
+On Thu, Feb 14, 2019 at 10:28:12AM +0000, Peter Maydell wrote:
+> Factor out the long code sequence in main() which creates
+> the initial set of menus. This will make later patches
+> which move initialization code around a bit clearer.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  ui/cocoa.m | 78 ++++++++++++++++++++++++++++--------------------------
+>  1 file changed, 41 insertions(+), 37 deletions(-)
+> 
 
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index b7702fb49f7..af8f9e669b8 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -3357,7 +3357,7 @@ static const uint8_t fp_decode_rm[] = {
->      FPROUNDING_NEGINF,
->  };
->
-> -static int disas_vfp_v8_insn(DisasContext *s, uint32_t insn)
-> +static int disas_vfp_misc_insn(DisasContext *s, uint32_t insn)
->  {
->      uint32_t rd, rn, rm, dp = extract32(insn, 8, 1);
->
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
-Oops, I forgot to commit this part of the change:
-
-@@ -3361,10 +3361,6 @@ static int disas_vfp_misc_insn(DisasContext *s,
-uint32_t insn)
- {
-     uint32_t rd, rn, rm, dp = extract32(insn, 8, 1);
-
--    if (!arm_dc_feature(s, ARM_FEATURE_V8)) {
--        return 1;
--    }
--
-     if (dp) {
-         VFP_DREG_D(rd, insn);
-         VFP_DREG_N(rn, insn);
-
-thanks
--- PMM
+--
+Roman
