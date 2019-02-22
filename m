@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40595)
+Received: from eggs.gnu.org ([209.51.188.92]:40866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gxApP-0000qc-4I
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:25:24 -0500
+	(envelope-from <clg@kaod.org>) id 1gxApT-0000uc-1N
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:25:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gxAeU-0004Oq-Vv
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:14:09 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58942
+	(envelope-from <clg@kaod.org>) id 1gxAeS-0004Ks-TR
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:14:06 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49066
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gxAeT-0003zI-OU
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:14:06 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gxAeS-0003uG-LH
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 08:14:04 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1MDCPO1133585
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 08:13:43 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qtf438c74-1
+	x1MDBxAf062544
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 08:13:38 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qth31j5ax-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 08:13:41 -0500
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 08:13:37 -0500
 Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
 	Fri, 22 Feb 2019 13:13:36 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 22 Feb 2019 14:13:16 +0100
+Date: Fri, 22 Feb 2019 14:13:13 +0100
 In-Reply-To: <20190222131322.26079-1-clg@kaod.org>
 References: <20190222131322.26079-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190222131322.26079-8-clg@kaod.org>
+Message-Id: <20190222131322.26079-5-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 07/13] spapr/xive: fix migration of the
- XiveTCTX under TCG
+Subject: [Qemu-devel] [PATCH v2 04/13] spapr/xive: add state synchronization
+ with KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,58 +44,236 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-When the thread interrupt management state is retrieved from the KVM
-VCPU, word2 is saved under the QEMU XIVE thread context to print out
-the OS CAM line under the QEMU monitor.
+This extends the KVM XIVE device backend with 'synchronize_state'
+methods used to retrieve the state from KVM. The HW state of the
+sources, the KVM device and the thread interrupt contexts are
+collected for the monitor usage and also migration.
 
-This breaks the migration of a TCG guest (and with KVM when
-kernel_irqchip=3Doff) because the matching algorithm of the presenter
-relies on the OS CAM value. Fix with an extra reset of the thread
-contexts to restore the expected value.
+These get operations rely on their KVM counterpart in the host kernel
+which acts as a proxy for OPAL, the host firmware. The set operations
+will be added for migration support later.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr_irq.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+ include/hw/ppc/spapr_xive.h |  8 ++++
+ include/hw/ppc/xive.h       |  1 +
+ hw/intc/spapr_xive.c        | 17 ++++---
+ hw/intc/spapr_xive_kvm.c    | 89 +++++++++++++++++++++++++++++++++++++
+ hw/intc/xive.c              | 10 +++++
+ 5 files changed, 118 insertions(+), 7 deletions(-)
 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 12ecca6264f3..3176098b9f7c 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -356,7 +356,31 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRMach=
-ineState *spapr,
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 749c6cbc2c56..ebd65e7fe36b 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -44,6 +44,13 @@ typedef struct sPAPRXive {
+     void          *tm_mmap;
+ } sPAPRXive;
 =20
- static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int versio=
-n_id)
- {
--    return spapr_xive_post_load(spapr->xive, version_id);
-+    CPUState *cs;
++/*
++ * The sPAPR machine has a unique XIVE IC device. Assign a fixed value
++ * to the controller block id value. It can nevertheless be changed
++ * for testing purpose.
++ */
++#define SPAPR_XIVE_BLOCK_ID 0x0
++
+ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
+ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+@@ -74,5 +81,6 @@ void kvmppc_xive_set_queue_config(sPAPRXive *xive, uint=
+8_t end_blk,
+ void kvmppc_xive_get_queue_config(sPAPRXive *xive, uint8_t end_blk,
+                                  uint32_t end_idx, XiveEND *end,
+                                  Error **errp);
++void kvmppc_xive_synchronize_state(sPAPRXive *xive, Error **errp);
+=20
+ #endif /* PPC_SPAPR_XIVE_H */
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 061d43fea24d..f3766fd881a2 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -431,5 +431,6 @@ void kvmppc_xive_source_reset_one(XiveSource *xsrc, i=
+nt srcno, Error **errp);
+ void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp);
+ void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val);
+ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
++void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp);
+=20
+ #endif /* PPC_XIVE_H */
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 3db24391e31c..9f07567f4d78 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -40,13 +40,6 @@
+=20
+ #define SPAPR_XIVE_NVT_BASE 0x400
+=20
+-/*
+- * The sPAPR machine has a unique XIVE IC device. Assign a fixed value
+- * to the controller block id value. It can nevertheless be changed
+- * for testing purpose.
+- */
+-#define SPAPR_XIVE_BLOCK_ID 0x0
+-
+ /*
+  * sPAPR NVT and END indexing helpers
+  */
+@@ -153,6 +146,16 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Moni=
+tor *mon)
+     XiveSource *xsrc =3D &xive->source;
+     int i;
+=20
++    if (kvm_irqchip_in_kernel()) {
++        Error *local_err =3D NULL;
++
++        kvmppc_xive_synchronize_state(xive, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return;
++        }
++    }
++
+     monitor_printf(mon, "  LSIN         PQ    EISN     CPU/PRIO EQ\n");
+=20
+     for (i =3D 0; i < xive->nr_irqs; i++) {
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 6b50451b4f85..4b1ffb9835f9 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -60,6 +60,57 @@ static void kvm_cpu_enable(CPUState *cs)
+ /*
+  * XIVE Thread Interrupt Management context (KVM)
+  */
++static void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
++{
++    uint64_t state[4] =3D { 0 };
 +    int ret;
 +
-+    ret =3D spapr_xive_post_load(spapr->xive, version_id);
-+    if (ret) {
-+        return ret;
++    ret =3D kvm_get_one_reg(tctx->cs, KVM_REG_PPC_NVT_STATE, state);
++    if (ret !=3D 0) {
++        error_setg_errno(errp, errno,
++                         "XIVE: could not capture KVM state of CPU %ld",
++                         kvm_arch_vcpu_id(tctx->cs));
++        return;
 +    }
++
++    /* word0 and word1 of the OS ring. */
++    *((uint64_t *) &tctx->regs[TM_QW1_OS]) =3D state[0];
 +
 +    /*
-+     * When the states are collected from the KVM XIVE device, word2
-+     * of the XiveTCTX is set to print out the OS CAM line under the
-+     * QEMU monitor.
-+     *
-+     * This breaks the migration on a TCG guest (or on KVM with
-+     * kernel_irqchip=3Doff) because the matching algorithm of the
-+     * presenter relies on the OS CAM value. Fix with an extra reset
-+     * of the thread contexts to restore the expected value.
++     * KVM also returns word2 containing the OS CAM line which is
++     * interesting to print out in the QEMU monitor.
 +     */
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++    *((uint64_t *) &tctx->regs[TM_QW1_OS + TM_WORD2]) =3D state[1];
++}
 +
-+        /* (TCG) Set the OS CAM line of the thread interrupt context. */
-+        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
++typedef struct {
++    XiveTCTX *tctx;
++    Error *err;
++} XiveCpuGetState;
++
++static void kvmppc_xive_cpu_do_synchronize_state(CPUState *cpu,
++                                                 run_on_cpu_data arg)
++{
++    XiveCpuGetState *s =3D arg.host_ptr;
++
++    kvmppc_xive_cpu_get_state(s->tctx, &s->err);
++}
++
++void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp)
++{
++    XiveCpuGetState s =3D {
++        .tctx =3D tctx,
++        .err =3D NULL,
++    };
++
++    run_on_cpu(tctx->cs, kvmppc_xive_cpu_do_synchronize_state,
++               RUN_ON_CPU_HOST_PTR(&s));
++
++    if (s.err) {
++        error_propagate(errp, s.err);
++        return;
 +    }
-+    return 0;
++}
+=20
+ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
+ {
+@@ -229,6 +280,19 @@ uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int sr=
+cno, uint32_t offset,
+     }
  }
 =20
- static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **errp)
++static void kvmppc_xive_source_get_state(XiveSource *xsrc)
++{
++    int i;
++
++    for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        /* Perform a load without side effect to retrieve the PQ bits */
++        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
++
++        /* and save PQ locally */
++        xive_source_esb_set(xsrc, i, pq);
++    }
++}
++
+ void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val)
+ {
+     XiveSource *xsrc =3D opaque;
+@@ -340,6 +404,31 @@ void kvmppc_xive_reset(sPAPRXive *xive, Error **errp=
+)
+                       NULL, true, errp);
+ }
+=20
++static void kvmppc_xive_get_queues(sPAPRXive *xive, Error **errp)
++{
++    Error *local_err =3D NULL;
++    int i;
++
++    for (i =3D 0; i < xive->nr_ends; i++) {
++        kvmppc_xive_get_queue_config(xive, SPAPR_XIVE_BLOCK_ID, i,
++                                     &xive->endt[i], &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++}
++
++void kvmppc_xive_synchronize_state(sPAPRXive *xive, Error **errp)
++{
++    kvmppc_xive_source_get_state(&xive->source);
++
++    /* EAT: there is no extra state to query from KVM */
++
++    /* ENDT */
++    kvmppc_xive_get_queues(xive, errp);
++}
++
+ static void *kvmppc_xive_mmap(sPAPRXive *xive, int pgoff, size_t len,
+                               Error **errp)
+ {
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 0284b5803551..f478c52ab2a0 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -431,6 +431,16 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
+r *mon)
+     int cpu_index =3D tctx->cs ? tctx->cs->cpu_index : -1;
+     int i;
+=20
++    if (kvm_irqchip_in_kernel()) {
++        Error *local_err =3D NULL;
++
++        kvmppc_xive_cpu_synchronize_state(tctx, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return;
++        }
++    }
++
+     monitor_printf(mon, "CPU[%04x]:   QW   NSR CPPR IPB LSMFB ACK# INC A=
+GE PIPR"
+                    "  W2\n", cpu_index);
+=20
 --=20
 2.20.1
