@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59457)
+Received: from eggs.gnu.org ([209.51.188.92]:59628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gxD0X-0007jU-OU
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:45:02 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gxD0i-0007se-Gc
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:45:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gxD0W-0003rp-Nn
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:45:01 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51189)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gxD0W-0003pp-F6
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:45:00 -0500
-Received: by mail-wm1-x342.google.com with SMTP id x7so2380124wmj.0
-	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 07:45:00 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 22 Feb 2019 15:44:54 +0000
-Message-Id: <20190222154454.30289-1-alex.bennee@linaro.org>
+	(envelope-from <mreitz@redhat.com>) id 1gxD0h-00043U-Hi
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 10:45:12 -0500
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-9-kwolf@redhat.com>
+	<67996e1d-1d6f-2990-3b96-22554f261029@redhat.com>
+	<20190219085141.GC4727@localhost.localdomain>
+	<1a598bde-1921-3253-ff83-967927e45669@redhat.com>
+	<20190222153853.GC8035@dhcp-200-176.str.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <be812a73-1d72-0dae-9cc9-3a819e42cba5@redhat.com>
+Date: Fri, 22 Feb 2019 16:45:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4] hw/block: better reporting on pflash
- backing file mismatch
+In-Reply-To: <20190222153853.GC8035@dhcp-200-176.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="u4TWsUbZTzOF2DwaZC5F1Om7z6acdRSLI"
+Subject: Re: [Qemu-devel] [RFC PATCH 08/11] qcow2: Add basic data-file
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,101 +29,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, armbru@redhat.com, stappers@stappers.nl, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
 
-It looks like there was going to be code to check we had some sort of
-alignment so lets replace it with an actual check. This is a bit more
-useful than the enigmatic "failed to read the initial flash content"
-when we attempt to read the number of bytes the device should have.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--u4TWsUbZTzOF2DwaZC5F1Om7z6acdRSLI
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
+Message-ID: <be812a73-1d72-0dae-9cc9-3a819e42cba5@redhat.com>
+Subject: Re: [RFC PATCH 08/11] qcow2: Add basic data-file infrastructure
+References: <20190131175549.11691-1-kwolf@redhat.com>
+ <20190131175549.11691-9-kwolf@redhat.com>
+ <67996e1d-1d6f-2990-3b96-22554f261029@redhat.com>
+ <20190219085141.GC4727@localhost.localdomain>
+ <1a598bde-1921-3253-ff83-967927e45669@redhat.com>
+ <20190222153853.GC8035@dhcp-200-176.str.redhat.com>
+In-Reply-To: <20190222153853.GC8035@dhcp-200-176.str.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-This is a potential confusing stumbling block when you move from using
--bios to using -drive if=pflash,file=blob,format=raw,readonly for
-loading your firmware code. To mitigate that we automatically pad in
-the read-only case and warn the user when we have performed magic to
-enable things to Just Work (tm).
+On 22.02.19 16:38, Kevin Wolf wrote:
+> Am 22.02.2019 um 15:12 hat Max Reitz geschrieben:
+>> On 19.02.19 09:51, Kevin Wolf wrote:
+>>> Am 19.02.2019 um 00:57 hat Max Reitz geschrieben:
+>>>> On 31.01.19 18:55, Kevin Wolf wrote:
+>>>>> This adds a .bdrv_open option to specify the external data file nod=
+e.
+>>>>>
+>>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>>>> ---
+>>>>>  qapi/block-core.json |  3 ++-
+>>>>>  block/qcow2.h        |  4 +++-
+>>>>>  block/qcow2.c        | 25 +++++++++++++++++++++++--
+>>>>>  3 files changed, 28 insertions(+), 4 deletions(-)
+>>>>
+>>>> [...]
+>>>>
+>>>>> diff --git a/block/qcow2.h b/block/qcow2.h
+>>>>> index c161970882..e2114900b4 100644
+>>>>> --- a/block/qcow2.h
+>>>>> +++ b/block/qcow2.h
+>>>>
+>>>> [...]
+>>>>
+>>>>> @@ -205,7 +206,8 @@ enum {
+>>>>>      QCOW2_INCOMPAT_DATA_FILE        =3D 1 << QCOW2_INCOMPAT_DATA_F=
+ILE_BITNR,
+>>>>> =20
+>>>>>      QCOW2_INCOMPAT_MASK          =3D QCOW2_INCOMPAT_DIRTY
+>>>>> -                                 | QCOW2_INCOMPAT_CORRUPT,
+>>>>> +                                 | QCOW2_INCOMPAT_CORRUPT
+>>>>> +                                 | QCOW2_INCOMPAT_DATA_FILE,
+>>>>
+>>>> This hunk seems to belong somewhere else.
+>>>
+>>> Isn't this the first patch that actually allows opening images that h=
+ave
+>>> QCOW2_INCOMPAT_DATA_FILE set in their header?
+>>
+>> Oh, sorry.  I thought the mask was the mask of all incompatible
+>> features, but it's actually the mask of supported incompatible feature=
+s.
+>>  Yep, then it's correct here.
+>>
+>>>>>  };
+>>>>> =20
+>>>>>  /* Compatible feature bits */
+>>>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>>>> index ac9934b3ed..376232d3f0 100644
+>>>>> --- a/block/qcow2.c
+>>>>> +++ b/block/qcow2.c
+>>>>> @@ -1441,8 +1441,22 @@ static int coroutine_fn qcow2_do_open(BlockD=
+riverState *bs, QDict *options,
+>>>>>          goto fail;
+>>>>>      }
+>>>>> =20
+>>>>> -    /* TODO Open external data file */
+>>>>> -    s->data_file =3D bs->file;
+>>>>> +    /* Open external data file */
+>>>>> +    if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+>>>>> +        s->data_file =3D bdrv_open_child(NULL, options, "data-file=
+", bs,
+>>>>> +                                       &child_file, false, errp);
+>>>>> +        if (!s->data_file) {
+>>>>> +            ret =3D -EINVAL;
+>>>>> +            goto fail;
+>>>>> +        }
+>>>>> +    } else if (qdict_get(options, QCOW2_OPT_DATA_FILE)) {
+>>>>
+>>>> I get the idea, but this isn't crumpled so this key may not exist (b=
+ut
+>>>> data-file.driver and data-file.filename may).  Of course the fact th=
+at
+>>>> these options remain unused will be caught by the block layer, but t=
+hat
+>>>> makes the error message below a bit less useful.
+>>>
+>>> Hmm, good point... So you'd just leave out the check and always let t=
+he
+>>> block layer complain (with a less than helpful message)? Or are you
+>>> suggesting I should try and catch all cases somehow, even if that mak=
+es
+>>> things quite a bit more complicated?
+>>
+>> I don't mind either way.  Nice error messages are nice as long as
+>> they're not too much trouble.  It's just that this current state feels=
+ a
+>> bit half-baked.
+>=20
+> I think catching everything is just not worth the effort. So I
+> considered dropping the check. But then I thought that this half baked
+> check will make sure that we'll get full coverage once qcow2 is
+> converted to a QAPI-based open interface instead of forgetting to bring=
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> the check back. So I'm leaning towards just leaving it as it is now. If=
 
----
-v3
-  - tweak commit title/commentary
-  - use total_len instead of device_len for checks
-  - if the device is read-only do the padding for them
-  - accept baking_len > total_len (how to warn_report with NULL *errp?)
-v4
-  - error check blk_getlength
-  - optimise memset and use NOR erase pattern
-  - restore singular device (overly confusing)
-  - add warn_report for when we do magic
----
- hw/block/pflash_cfi01.c | 40 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 33 insertions(+), 7 deletions(-)
+> you like, I can add a comment that we know this is half baked.
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 00c2efd0d7..c69ecc20a0 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -45,6 +45,7 @@
- #include "qemu/bitops.h"
- #include "qemu/host-utils.h"
- #include "qemu/log.h"
-+#include "qemu/error-report.h"
- #include "hw/sysbus.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
-@@ -714,13 +715,6 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-     }
-     device_len = sector_len_per_device * blocks_per_device;
- 
--    /* XXX: to be fixed */
--#if 0
--    if (total_len != (8 * 1024 * 1024) && total_len != (16 * 1024 * 1024) &&
--        total_len != (32 * 1024 * 1024) && total_len != (64 * 1024 * 1024))
--        return NULL;
--#endif
--
-     memory_region_init_rom_device(
-         &pfl->mem, OBJECT(dev),
-         &pflash_cfi01_ops,
-@@ -747,6 +741,38 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-     }
- 
-     if (pfl->blk) {
-+        /*
-+         * Validate the backing store is the right size for pflash
-+         * devices. It should be padded to a multiple of the flash
-+         * block size. If the device is read-only we can elide the
-+         * check and just null pad the region first. If the user
-+         * supplies a larger file we ignore the tail.
-+         */
-+        int64_t backing_len = blk_getlength(pfl->blk);
-+        if (backing_len < 0) {
-+            error_setg(errp, "unable to check size of backing file");
-+            return;
-+        }
-+
-+        if (backing_len < total_len) {
-+            if (pfl->ro) {
-+                size_t pad_bytes = total_len - backing_len;
-+                /* pad with NOR erase pattern */
-+                memset((uint8_t*)pfl->storage + backing_len, 0xff, pad_bytes);
-+                warn_report("device needs %" PRIu64
-+                            " bytes, padded with %zd 0xff bytes",
-+                            total_len, pad_bytes);
-+                total_len = backing_len;
-+            } else {
-+                error_setg(errp, "device needs %" PRIu64 " bytes, "
-+                           "backing file provides only %" PRIu64 " bytes",
-+                           total_len, backing_len);
-+                return;
-+            }
-+        } else if (backing_len > total_len) {
-+            warn_report("device needs %" PRIu64 " bytes, rest ignored", total_len);
-+        }
-+
-         /* read the initial flash content */
-         ret = blk_pread(pfl->blk, 0, pfl->storage, total_len);
- 
--- 
-2.20.1
+"Once"... :-)
+
+Seems reasonable to me.
+
+Max
+
+
+--u4TWsUbZTzOF2DwaZC5F1Om7z6acdRSLI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxwGQAACgkQ9AfbAGHV
+z0CUpwf/bjnV+3Qm9w61QYb/jRHIJFU8S0JCCSJklCXdGSh6y+2v5JpDNxWh5jOP
+kO9ZCsunwSMi5BBvGIw6lAE1Jqi4iF5O18zt1WpsTkC5Fea7jNmNO3DrVXZzuo9e
+XRIKsYBbUZInqdTpCS8Ea74mvWdbCiXr3zk9spyNI1/bkk8nh9f0+9v0Q7A+ogfA
+644r37dSRW1euEw5biGYoyoK3N++QCiUVJuxQQHpb1T+0LYVOcWzK/7g5t3KuQ6P
+6CrkG7PBAacLu48cnuw064NRzgI0FzOq7nkDyd0Z+liuKC+LAu8kaZS04L8wpvn1
+LlSq3ZwZvusBaUML95IkpXP2SwF7Tg==
+=RTfx
+-----END PGP SIGNATURE-----
+
+--u4TWsUbZTzOF2DwaZC5F1Om7z6acdRSLI--
