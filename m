@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54897)
+Received: from eggs.gnu.org ([209.51.188.92]:34801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gxBzd-0002f1-Fg
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:40:02 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gxCH5-0000QT-Eb
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:58:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gxBzZ-0007yi-5c
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:40:01 -0500
-Date: Fri, 22 Feb 2019 15:39:34 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190222153344.332cff15@redhat.com>
-In-Reply-To: <d6b2654c-d345-152b-4eec-7f2b885e6047@redhat.com>
-References: <20190220224003.4420-1-eric.auger@redhat.com>
-	<20190220224003.4420-9-eric.auger@redhat.com>
-	<20190222134516.575288c2@redhat.com>
-	<d6b2654c-d345-152b-4eec-7f2b885e6047@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 08/17] hw/arm/virt: Implement kvm_type
- function for 4.0 machine
+	(envelope-from <jasowang@redhat.com>) id 1gxCF6-0007gg-GL
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59990)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gxCF6-0006H9-3X
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:56:00 -0500
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 22 Feb 2019 22:55:09 +0800
+Message-Id: <1550847320-25110-3-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
+References: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PULL 02/13] net: Introduce announce timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,182 +23,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, david@redhat.com, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, dgilbert@redhat.com, qemu-arm@nongnu.org, david@gibson.dropbear.id.au, eric.auger.pro@gmail.com
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On Fri, 22 Feb 2019 15:01:25 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> Hi Igor,
-> 
-> On 2/22/19 1:45 PM, Igor Mammedov wrote:
-> > On Wed, 20 Feb 2019 23:39:54 +0100
-> > Eric Auger <eric.auger@redhat.com> wrote:
-> >   
-> >> This patch implements the machine class kvm_type() callback.
-> >> It returns the number of bits requested to implement the whole GPA
-> >> range including the RAM and IO regions located beyond.
-> >> The returned value in passed though the KVM_CREATE_VM ioctl and
-> >> this allows KVM to set the stage2 tables dynamically.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v6 -> v7:
-> >> - Introduce RAMBASE and rename add LEGACY_ prefix in that patch
-> >> - use local variables with explicit names in virt_set_memmap:
-> >>   device_memory_base, device_memory_size
-> >> - add an extended_memmap field in the class
-> >>
-> >> v5 -> v6:
-> >> - add some comments
-> >> - high IO region cannot start before 256GiB
-> >> ---
-> >>  hw/arm/virt.c         | 50 ++++++++++++++++++++++++++++++++++++++++++-
-> >>  include/hw/arm/virt.h |  2 ++
-> >>  2 files changed, 51 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> >> index 9db602457b..ad3a0ad73d 100644
-> >> --- a/hw/arm/virt.c
-> >> +++ b/hw/arm/virt.c
-> >> @@ -1437,7 +1437,14 @@ static void machvirt_init(MachineState *machine)
-> >>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-> >>      bool aarch64 = true;
-> >>  
-> >> -    virt_set_memmap(vms);
-> >> +    /*
-> >> +     * In accelerated mode, the memory map is computed in kvm_type(),
-> >> +     * if set, to create a VM with the right number of IPA bits.
-> >> +     */
-> >> +
-> >> +    if (!mc->kvm_type || !kvm_enabled()) {
-> >> +        virt_set_memmap(vms);
-> >> +    }
-> >>  
-> >>      /* We can probe only here because during property set
-> >>       * KVM is not available yet
-> >> @@ -1814,6 +1821,36 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-> >>      return NULL;
-> >>  }
-> >>  
-> >> +/*
-> >> + * for arm64 kvm_type [7-0] encodes the requested number of bits
-> >> + * in the IPA address space
-> >> + */
-> >> +static int virt_kvm_type(MachineState *ms, const char *type_str)
-> >> +{
-> >> +    VirtMachineState *vms = VIRT_MACHINE(ms);
-> >> +    int max_vm_pa_size = kvm_arm_get_max_vm_ipa_size(ms);
-> >> +    int requested_pa_size;
-> >> +
-> >> +    /* we freeze the memory map to compute the highest gpa */
-> >> +    virt_set_memmap(vms);
-> >> +
-> >> +    requested_pa_size = 64 - clz64(vms->highest_gpa);
-> >> +
-> >> +    if (requested_pa_size > max_vm_pa_size) {
-> >> +        error_report("-m and ,maxmem option values "
-> >> +                     "require an IPA range (%d bits) larger than "
-> >> +                     "the one supported by the host (%d bits)",
-> >> +                     requested_pa_size, max_vm_pa_size);
-> >> +       exit(1);
-> >> +    }
-> >> +    /*
-> >> +     * By default we return 0 which corresponds to an implicit legacy
-> >> +     * 40b IPA setting. Otherwise we return the actual requested PA
-> >> +     * logsize
-> >> +     */
-> >> +    return requested_pa_size > 40 ? requested_pa_size : 0;
-> >> +}
-> >> +
-> >>  static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >>  {
-> >>      MachineClass *mc = MACHINE_CLASS(oc);
-> >> @@ -1838,6 +1875,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >>      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
-> >>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-> >>      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-> >> +    mc->kvm_type = virt_kvm_type;
-> >>      assert(!mc->get_hotplug_handler);
-> >>      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-> >>      hc->plug = virt_machine_device_plug_cb;
-> >> @@ -1909,6 +1947,12 @@ static void virt_instance_init(Object *obj)
-> >>                                      "Valid values are none and smmuv3",
-> >>                                      NULL);
-> >>  
-> >> +    if (vmc->no_extended_memmap) {
-> >> +        vms->extended_memmap = false;
-> >> +    } else {
-> >> +        vms->extended_memmap = true;
-> >> +    }
-> >> +
-> >>      vms->irqmap = a15irqmap;
-> >>  }
-> >>  
-> >> @@ -1939,8 +1983,12 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
-> >>  
-> >>  static void virt_machine_3_1_options(MachineClass *mc)
-> >>  {
-> >> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> >>      virt_machine_4_0_options(mc);
-> >>      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-> >> +
-> >> +    /* extended memory map is enabled from 4.0 onwards */
-> >> +    vmc->no_extended_memmap = true;  
-> > That's probably was asked in v6,
-> > do we really need this knob?  
-> Yes the point was raised by Peter and I replied by another question ;-) "
-> But don't we want to forbid any pre-4.0 machvirt to run with more than
-> 255GiB RAM?
-> "
-> without this knob:
-> - pre-4.0 machines will gain the capability to support more than 255GB
-> initial RAM if the kernel supports dynamic IPA setting
-should be fine, you shouldn't be able to start old QEMU with more than 255Gb
+The 'announce timer' will be used by migration, and explicit
+requests for qemu to perform network announces.
 
-> - pre-4.0 machines will gain PCDIMM/NVDIMM support
-ditto
+Based on the work by Germano Veit Michel <germano@redhat.com>
+ and Vlad Yasevich <vyasevic@redhat.com>
 
-> - another concern, maxmem and slots were not checked previously. If for
-> some reason - without instantiating the actual slots -, the user
-> specified it this was previously ignored. Now this is not anymore as
-> both parameters allow to compute the requested IPA range. So this may
-> fail now.
-well that's in category of a broken setup even if QEMU didn't complain about
-it before. User should fix it instead of QEMU supporting madness.
-(I think that such invariant doesn't even deserve deprecation process)
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ include/net/announce.h  | 39 ++++++++++++++++++++++++++++++++
+ include/qemu/typedefs.h |  1 +
+ migration/migration.c   |  1 +
+ net/Makefile.objs       |  1 +
+ net/announce.c          | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/net.json           | 23 +++++++++++++++++++
+ 6 files changed, 125 insertions(+)
+ create mode 100644 include/net/announce.h
+ create mode 100644 net/announce.c
 
-> So I thought this was clearer to disable all the above for pre-4.0
-> machines. However if both of you agree, I will remove it.
-> 
-> thanks
-> 
-> Eric
-> >   
-> >>  }
-> >>  DEFINE_VIRT_MACHINE(3, 1)
-> >>  
-> >> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> >> index acad0400d8..7798462cb0 100644
-> >> --- a/include/hw/arm/virt.h
-> >> +++ b/include/hw/arm/virt.h
-> >> @@ -106,6 +106,7 @@ typedef struct {
-> >>      bool claim_edge_triggered_timers;
-> >>      bool smbios_old_sys_ver;
-> >>      bool no_highmem_ecam;
-> >> +    bool no_extended_memmap;
-> >>  } VirtMachineClass;
-> >>  
-> >>  typedef struct {
-> >> @@ -135,6 +136,7 @@ typedef struct {
-> >>      hwaddr highest_gpa;
-> >>      hwaddr device_memory_base;
-> >>      hwaddr device_memory_size;
-> >> +    bool extended_memmap;
-> >>  } VirtMachineState;
-> >>  
-> >>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)  
-> >   
-> 
+diff --git a/include/net/announce.h b/include/net/announce.h
+new file mode 100644
+index 0000000..b89f1c2
+--- /dev/null
++++ b/include/net/announce.h
+@@ -0,0 +1,39 @@
++/*
++ *  Self-announce facility
++ *  (c) 2017-2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_NET_ANNOUNCE_H
++#define QEMU_NET_ANNOUNCE_H
++
++#include "qemu-common.h"
++#include "qapi/qapi-types-net.h"
++#include "qemu/timer.h"
++
++struct AnnounceTimer {
++    QEMUTimer *tm;
++    AnnounceParameters params;
++    QEMUClockType type;
++    int round;
++};
++
++/* Returns: update the timer to the next time point */
++int64_t qemu_announce_timer_step(AnnounceTimer *timer);
++
++/* Delete the underlying timer */
++void qemu_announce_timer_del(AnnounceTimer *timer);
++
++/*
++ * Under BQL/main thread
++ * Reset the timer to the given parameters/type/notifier.
++ */
++void qemu_announce_timer_reset(AnnounceTimer *timer,
++                               AnnounceParameters *params,
++                               QEMUClockType type,
++                               QEMUTimerCB *cb,
++                               void *opaque);
++
++#endif
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 5d1a2d8..e4a0a65 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -8,6 +8,7 @@
+ typedef struct AdapterInfo AdapterInfo;
+ typedef struct AddressSpace AddressSpace;
+ typedef struct AioContext AioContext;
++typedef struct AnnounceTimer AnnounceTimer;
+ typedef struct BdrvDirtyBitmap BdrvDirtyBitmap;
+ typedef struct BdrvDirtyBitmapIter BdrvDirtyBitmapIter;
+ typedef struct BlockBackend BlockBackend;
+diff --git a/migration/migration.c b/migration/migration.c
+index 37e06b7..a9c4c6f 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -45,6 +45,7 @@
+ #include "migration/colo.h"
+ #include "hw/boards.h"
+ #include "monitor/monitor.h"
++#include "net/announce.h"
+ 
+ #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+ 
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+index b2bf88a..b363fe9 100644
+--- a/net/Makefile.objs
++++ b/net/Makefile.objs
+@@ -2,6 +2,7 @@ common-obj-y = net.o queue.o checksum.o util.o hub.o
+ common-obj-y += socket.o
+ common-obj-y += dump.o
+ common-obj-y += eth.o
++common-obj-y += announce.o
+ common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
+ common-obj-$(CONFIG_POSIX) += vhost-user.o
+ common-obj-$(CONFIG_SLIRP) += slirp.o
+diff --git a/net/announce.c b/net/announce.c
+new file mode 100644
+index 0000000..8876eb6
+--- /dev/null
++++ b/net/announce.c
+@@ -0,0 +1,60 @@
++/*
++ *  Self-announce
++ *  (c) 2017-2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "net/announce.h"
++#include "qapi/clone-visitor.h"
++#include "qapi/qapi-visit-net.h"
++
++int64_t qemu_announce_timer_step(AnnounceTimer *timer)
++{
++    int64_t step;
++
++    step =  timer->params.initial +
++            (timer->params.rounds - timer->round - 1) *
++            timer->params.step;
++
++    if (step < 0 || step > timer->params.max) {
++        step = timer->params.max;
++    }
++    timer_mod(timer->tm, qemu_clock_get_ms(timer->type) + step);
++
++    return step;
++}
++
++void qemu_announce_timer_del(AnnounceTimer *timer)
++{
++    if (timer->tm) {
++        timer_del(timer->tm);
++        timer_free(timer->tm);
++        timer->tm = NULL;
++    }
++}
++
++/*
++ * Under BQL/main thread
++ * Reset the timer to the given parameters/type/notifier.
++ */
++void qemu_announce_timer_reset(AnnounceTimer *timer,
++                               AnnounceParameters *params,
++                               QEMUClockType type,
++                               QEMUTimerCB *cb,
++                               void *opaque)
++{
++    /*
++     * We're under the BQL, so the current timer can't
++     * be firing, so we should be able to delete it.
++     */
++    qemu_announce_timer_del(timer);
++
++    QAPI_CLONE_MEMBERS(AnnounceParameters, &timer->params, params);
++    timer->round = params->rounds;
++    timer->type = type;
++    timer->tm = timer_new_ms(type, cb, opaque);
++}
+diff --git a/qapi/net.json b/qapi/net.json
+index a1a0f39..5face0c 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -684,3 +684,26 @@
+ ##
+ { 'event': 'NIC_RX_FILTER_CHANGED',
+   'data': { '*name': 'str', 'path': 'str' } }
++
++##
++# @AnnounceParameters:
++#
++# Parameters for self-announce timers
++#
++# @initial: Initial delay (in ms) before sending the first GARP/RARP
++#       announcement
++#
++# @max: Maximum delay (in ms) between GARP/RARP announcement packets
++#
++# @rounds: Number of self-announcement attempts
++#
++# @step: Delay increase (in ms) after each self-announcement attempt
++#
++# Since: 4.0
++##
++
++{ 'struct': 'AnnounceParameters',
++  'data': { 'initial': 'int',
++            'max': 'int',
++            'rounds': 'int',
++            'step': 'int' } }
+-- 
+2.5.0
