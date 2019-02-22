@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40260)
+Received: from eggs.gnu.org ([209.51.188.92]:40282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYB-0004yE-U8
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:11:43 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYC-0004ym-Hc
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:11:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYA-0006Ze-3h
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:11:39 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gxBYA-0006at-Bh
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 09:11:40 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 22 Feb 2019 15:09:54 +0100
-Message-Id: <20190222141024.22217-5-kbastian@mail.uni-paderborn.de>
+Date: Fri, 22 Feb 2019 15:09:59 +0100
+Message-Id: <20190222141024.22217-10-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 References: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 04/34] target/riscv: Convert RV64I
- load/store insns to decodetree
+Subject: [Qemu-devel] [PATCH v8 09/34] target/riscv: Convert RV32A insns to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +25,236 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
 Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
 
-this splits the 64-bit only instructions into its own decode file such
-that we generate the decoder for these instructions only for the RISC-V
-64 bit target.
-
 Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
- target/riscv/Makefile.objs              |  8 +++++---
- target/riscv/insn32-64.decode           | 25 +++++++++++++++++++++++++
- target/riscv/insn_trans/trans_rvi.inc.c | 20 ++++++++++++++++++++
- target/riscv/translate.c                |  7 -------
- 4 files changed, 50 insertions(+), 10 deletions(-)
- create mode 100644 target/riscv/insn32-64.decode
+v7 -> v8:
+    -add missing RVA checks
 
-diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-index bf0a268033..05087a91bb 100644
---- a/target/riscv/Makefile.objs
-+++ b/target/riscv/Makefile.objs
-@@ -2,10 +2,12 @@ obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o
+ target/riscv/insn32.decode              |  17 +++
+ target/riscv/insn_trans/trans_rva.inc.c | 160 ++++++++++++++++++++++++
+ target/riscv/translate.c                |   1 +
+ 3 files changed, 178 insertions(+)
+ create mode 100644 target/riscv/insn_trans/trans_rva.inc.c
+
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index e53944bf0e..00b9e2d9a5 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -34,6 +34,7 @@
+ # Argument sets:
+ &b    imm rs2 rs1
+ &shift     shamt rs1 rd
++&atomic    aq rl rs2 rs1 rd
  
- DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+ # Formats 32:
+ @r       .......   ..... ..... ... ..... .......                   %rs2 %rs1 %rd
+@@ -46,6 +47,9 @@
+ @sh      ......  ...... .....  ... ..... ....... &shift  shamt=%sh10      %rs1 %rd
+ @csr     ............   .....  ... ..... .......               %csr     %rs1 %rd
  
--target/riscv/decode_insn32.inc.c: \
--  $(SRC_PATH)/target/riscv/insn32.decode $(DECODETREE)
-+decode32-y = $(SRC_PATH)/target/riscv/insn32.decode
-+decode32-$(TARGET_RISCV64) += $(SRC_PATH)/target/riscv/insn32-64.decode
++@atom_ld ..... aq:1 rl:1 ..... ........ ..... ....... &atomic rs2=0     %rs1 %rd
++@atom_st ..... aq:1 rl:1 ..... ........ ..... ....... &atomic %rs2      %rs1 %rd
 +
-+target/riscv/decode_insn32.inc.c: $(decode32-y) $(DECODETREE)
- 	$(call quiet-command, \
--	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn32 $<, \
-+	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn32 $(decode32-y), \
- 	  "GEN", $(TARGET_DIR)$@)
- 
- target/riscv/translate.o: target/riscv/decode_insn32.inc.c
-diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+ # *** RV32I Base Instruction Set ***
+ lui      ....................       ..... 0110111 @u
+ auipc    ....................       ..... 0010111 @u
+@@ -102,3 +106,16 @@ div      0000001 .....  ..... 100 ..... 0110011 @r
+ divu     0000001 .....  ..... 101 ..... 0110011 @r
+ rem      0000001 .....  ..... 110 ..... 0110011 @r
+ remu     0000001 .....  ..... 111 ..... 0110011 @r
++
++# *** RV32A Standard Extension ***
++lr_w       00010 . . 00000 ..... 010 ..... 0101111 @atom_ld
++sc_w       00011 . . ..... ..... 010 ..... 0101111 @atom_st
++amoswap_w  00001 . . ..... ..... 010 ..... 0101111 @atom_st
++amoadd_w   00000 . . ..... ..... 010 ..... 0101111 @atom_st
++amoxor_w   00100 . . ..... ..... 010 ..... 0101111 @atom_st
++amoand_w   01100 . . ..... ..... 010 ..... 0101111 @atom_st
++amoor_w    01000 . . ..... ..... 010 ..... 0101111 @atom_st
++amomin_w   10000 . . ..... ..... 010 ..... 0101111 @atom_st
++amomax_w   10100 . . ..... ..... 010 ..... 0101111 @atom_st
++amominu_w  11000 . . ..... ..... 010 ..... 0101111 @atom_st
++amomaxu_w  11100 . . ..... ..... 010 ..... 0101111 @atom_st
+diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
 new file mode 100644
-index 0000000000..439d4e2c58
+index 0000000000..5d3c853ca5
 --- /dev/null
-+++ b/target/riscv/insn32-64.decode
-@@ -0,0 +1,25 @@
-+#
-+# RISC-V translation routines for the RV Instruction Set.
-+#
-+# Copyright (c) 2018 Peer Adelt, peer.adelt@hni.uni-paderborn.de
-+#                    Bastian Koppelmann, kbastian@mail.uni-paderborn.de
-+#
-+# This program is free software; you can redistribute it and/or modify it
-+# under the terms and conditions of the GNU General Public License,
-+# version 2 or later, as published by the Free Software Foundation.
-+#
-+# This program is distributed in the hope it will be useful, but WITHOUT
-+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+# more details.
-+#
-+# You should have received a copy of the GNU General Public License along with
-+# this program.  If not, see <http://www.gnu.org/licenses/>.
++++ b/target/riscv/insn_trans/trans_rva.inc.c
+@@ -0,0 +1,160 @@
++/*
++ * RISC-V translation routines for the RV64A Standard Extension.
++ *
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2018 Peer Adelt, peer.adelt@hni.uni-paderborn.de
++ *                    Bastian Koppelmann, kbastian@mail.uni-paderborn.de
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+# This is concatenated with insn32.decode for risc64 targets.
-+# Most of the fields and formats are there.
-+
-+# *** RV64I Base Instruction Set (in addition to RV32I) ***
-+lwu      ............   ..... 110 ..... 0000011 @i
-+ld       ............   ..... 011 ..... 0000011 @i
-+sd       ....... .....  ..... 011 ..... 0100011 @s
-diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-index d13b7b2b6d..61f708dba1 100644
---- a/target/riscv/insn_trans/trans_rvi.inc.c
-+++ b/target/riscv/insn_trans/trans_rvi.inc.c
-@@ -130,3 +130,23 @@ static bool trans_sw(DisasContext *ctx, arg_sw *a)
-     gen_store(ctx, OPC_RISC_SW, a->rs1, a->rs2, a->imm);
-     return true;
- }
-+
-+#ifdef TARGET_RISCV64
-+static bool trans_lwu(DisasContext *ctx, arg_lwu *a)
++static inline bool gen_lr(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
 +{
-+    gen_load(ctx, OPC_RISC_LWU, a->rd, a->rs1, a->imm);
++    TCGv src1 = tcg_temp_new();
++    /* Put addr in load_res, data in load_val.  */
++    gen_get_gpr(src1, a->rs1);
++    if (a->rl) {
++        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
++    }
++    tcg_gen_qemu_ld_tl(load_val, src1, ctx->mem_idx, mop);
++    if (a->aq) {
++        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
++    }
++    tcg_gen_mov_tl(load_res, src1);
++    gen_set_gpr(a->rd, load_val);
++
++    tcg_temp_free(src1);
 +    return true;
 +}
 +
-+static bool trans_ld(DisasContext *ctx, arg_ld *a)
++static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
 +{
-+    gen_load(ctx, OPC_RISC_LD, a->rd, a->rs1, a->imm);
++    TCGv src1 = tcg_temp_new();
++    TCGv src2 = tcg_temp_new();
++    TCGv dat = tcg_temp_new();
++    TCGLabel *l1 = gen_new_label();
++    TCGLabel *l2 = gen_new_label();
++
++    gen_get_gpr(src1, a->rs1);
++    tcg_gen_brcond_tl(TCG_COND_NE, load_res, src1, l1);
++
++    gen_get_gpr(src2, a->rs2);
++    /*
++     * Note that the TCG atomic primitives are SC,
++     * so we can ignore AQ/RL along this path.
++     */
++    tcg_gen_atomic_cmpxchg_tl(src1, load_res, load_val, src2,
++                              ctx->mem_idx, mop);
++    tcg_gen_setcond_tl(TCG_COND_NE, dat, src1, load_val);
++    gen_set_gpr(a->rd, dat);
++    tcg_gen_br(l2);
++
++    gen_set_label(l1);
++    /*
++     * Address comparion failure.  However, we still need to
++     * provide the memory barrier implied by AQ/RL.
++     */
++    tcg_gen_mb(TCG_MO_ALL + a->aq * TCG_BAR_LDAQ + a->rl * TCG_BAR_STRL);
++    tcg_gen_movi_tl(dat, 1);
++    gen_set_gpr(a->rd, dat);
++
++    gen_set_label(l2);
++    tcg_temp_free(dat);
++    tcg_temp_free(src1);
++    tcg_temp_free(src2);
 +    return true;
 +}
 +
-+static bool trans_sd(DisasContext *ctx, arg_sd *a)
++static bool gen_amo(DisasContext *ctx, arg_atomic *a,
++                    void(*func)(TCGv, TCGv, TCGv, TCGArg, TCGMemOp),
++                    TCGMemOp mop)
 +{
-+    gen_store(ctx, OPC_RISC_SD, a->rs1, a->rs2, a->imm);
++    TCGv src1 = tcg_temp_new();
++    TCGv src2 = tcg_temp_new();
++
++    gen_get_gpr(src1, a->rs1);
++    gen_get_gpr(src2, a->rs2);
++
++    (*func)(src2, src1, src2, ctx->mem_idx, mop);
++
++    gen_set_gpr(a->rd, src2);
++    tcg_temp_free(src1);
++    tcg_temp_free(src2);
 +    return true;
 +}
-+#endif
++
++static bool trans_lr_w(DisasContext *ctx, arg_lr_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_lr(ctx, a, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_sc_w(DisasContext *ctx, arg_sc_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_sc(ctx, a, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amoswap_w(DisasContext *ctx, arg_amoswap_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_xchg_tl, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amoadd_w(DisasContext *ctx, arg_amoadd_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_add_tl, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amoxor_w(DisasContext *ctx, arg_amoxor_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_xor_tl, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amoand_w(DisasContext *ctx, arg_amoand_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_and_tl, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amoor_w(DisasContext *ctx, arg_amoor_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_or_tl, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amomin_w(DisasContext *ctx, arg_amomin_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_smin_tl, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amomax_w(DisasContext *ctx, arg_amomax_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_smax_tl, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amominu_w(DisasContext *ctx, arg_amominu_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_umin_tl, (MO_ALIGN | MO_TESL));
++}
++
++static bool trans_amomaxu_w(DisasContext *ctx, arg_amomaxu_w *a)
++{
++    REQUIRE_EXT(ctx, RVA);
++    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_umax_tl, (MO_ALIGN | MO_TESL));
++}
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index fb284a5e08..2e35142ca2 100644
+index 783ccade51..b0de062a4f 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -1908,13 +1908,6 @@ static void decode_RV32_64G(DisasContext *ctx)
-     imm = GET_IMM(ctx->opcode);
+@@ -1853,6 +1853,7 @@ bool decode_insn32(DisasContext *ctx, uint32_t insn);
+ /* Include insn module translation function */
+ #include "insn_trans/trans_rvi.inc.c"
+ #include "insn_trans/trans_rvm.inc.c"
++#include "insn_trans/trans_rva.inc.c"
  
-     switch (op) {
--    case OPC_RISC_LOAD:
--        gen_load(ctx, MASK_OP_LOAD(ctx->opcode), rd, rs1, imm);
--        break;
--    case OPC_RISC_STORE:
--        gen_store(ctx, MASK_OP_STORE(ctx->opcode), rs1, rs2,
--                  GET_STORE_IMM(ctx->opcode));
--        break;
-     case OPC_RISC_ARITH_IMM:
- #if defined(TARGET_RISCV64)
-     case OPC_RISC_ARITH_IMM_W:
+ static void decode_RV32_64G(DisasContext *ctx)
+ {
 -- 
 2.20.1
