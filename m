@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46899)
+Received: from eggs.gnu.org ([209.51.188.92]:52646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gxH1M-0002bX-MT
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:02:09 -0500
+	(envelope-from <r.bolshakov@yadro.com>) id 1gxHHp-00055V-Ft
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:19:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gxH1L-00006Q-Vz
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:02:08 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 22 Feb 2019 20:02:02 +0000
-Message-ID: <BN6PR2201MB125127A1B2F61EDEE01D379FC67F0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190221005753.27955-1-crosa@redhat.com>,
-	<20190221005753.27955-15-crosa@redhat.com>
-In-Reply-To: <20190221005753.27955-15-crosa@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <r.bolshakov@yadro.com>) id 1gxHHl-0004Jp-Tr
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:19:06 -0500
+Received: from mta-01.yadro.com ([89.207.88.251]:38048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
+	id 1gxHHl-00042A-J3
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 15:19:05 -0500
+Date: Fri, 22 Feb 2019 23:18:33 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-ID: <20190222201833.tlcmxheml3wbifzc@SPB-NB-133.local>
+References: <20190214102816.3393-1-peter.maydell@linaro.org>
+	<20190214102816.3393-7-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 14/20] Boot Linux Console Test: add a
- test for mips + malta
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190214102816.3393-7-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] ui/cocoa: Subclass NSApplication so
+ we can implement sendEvent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,17 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Caio Carrara <ccarrara@redhat.com>, =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>, BALATON Zoltan <balaton@eik.bme.hu>
 
-> From: Cleber Rosa <crosa@redhat.com>
-> Subject: [PATCH v3 14/20] Boot Linux Console Test: add a test for mips + =
-malta
->=20
-> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
-> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
-> board and verify the serial is working.  Also, it relies on the serial
-> device set by the machine itself.
+On Thu, Feb 14, 2019 at 10:28:15AM +0000, Peter Maydell wrote:
+> When we switch away from our custom event handling, we still want to
+> be able to have first go at any events our application receives,
+> because in full-screen mode we want to send key events to the guest,
+> even if they would be menu item activation events. There are several
+> ways we could do that, but one simple approach is to subclass
+> NSApplication so we can implement a custom sendEvent method.
+> Do that, but for the moment have our sendEvent just invoke the
+> superclass method.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> New patch in v2
+> ---
+>  ui/cocoa.m | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> 
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
+
+Thanks,
+Roman
