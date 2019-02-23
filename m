@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57169)
+Received: from eggs.gnu.org ([209.51.188.92]:57173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gxS4B-0004WG-AZ
+	(envelope-from <thuth@redhat.com>) id 1gxS4B-0004WH-BL
 	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gxS4A-0001ua-1W
+	(envelope-from <thuth@redhat.com>) id 1gxS4A-0001uV-12
 	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:49:47 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Sat, 23 Feb 2019 08:48:55 +0100
-Message-Id: <1550908162-22644-4-git-send-email-thuth@redhat.com>
+Date: Sat, 23 Feb 2019 08:48:54 +0100
+Message-Id: <1550908162-22644-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1550908162-22644-1-git-send-email-thuth@redhat.com>
 References: <1550908162-22644-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 03/30] hw/ide/ahci: Add a Kconfig switch for
- the AHDI-ICH9 device
+Subject: [Qemu-devel] [PATCH v3 02/30] hw/pci/pci-stub: Add msi_enabled()
+ and msi_notify() to the pci stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +23,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Some of our machines (like the ARM cubieboard) use CONFIG_AHCI for an AHCI
-sysbus device, but do not use CONFIG_PCI since they do not feature a PCI
-bus. With CONFIG_AHCI but without CONFIG_PCI, currently linking fails:
+Some machines have an AHCI adapter, but no PCI. To be able to
+compile hw/ide/ahci.c without CONFIG_PCI, we still need the two
+functions msi_enabled() and msi_notify() for linking.
+This is required for the new Kconfig-like build system, if a user
+wants to compile a QEMU binary with just one machine that has AHCI,
+but no PCI, like the ARM "cubieboard" for example.
 
-    ../hw/ide/ich.o: In function `pci_ich9_ahci_realize':
-    hw/ide/ich.c:124: undefined reference to `pci_allocate_irq'
-    hw/ide/ich.c:126: undefined reference to `pci_register_bar'
-    hw/ide/ich.c:128: undefined reference to `pci_register_bar'
-    hw/ide/ich.c:131: undefined reference to `pci_add_capability'
-    hw/ide/ich.c:147: undefined reference to `msi_init'
-    ../hw/ide/ich.o: In function `pci_ich9_uninit':
-    hw/ide/ich.c:158: undefined reference to `msi_uninit'
-    ../hw/ide/ich.o:(.data.rel+0x50): undefined reference to `vmstate_pci_device'
-
-We must only compile ich.c if CONFIG_PCI is available, too, so introduce a
-new config switch for this device.
-
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/ide/Kconfig       | 6 +++++-
- hw/ide/Makefile.objs | 2 +-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ hw/pci/pci-stub.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
-index ab47b6a..5d9106b 100644
---- a/hw/ide/Kconfig
-+++ b/hw/ide/Kconfig
-@@ -44,9 +44,13 @@ config MICRODRIVE
- 
- config AHCI
-     bool
-+    select IDE_QDEV
+diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+index b941a0e..c04a5df 100644
+--- a/hw/pci/pci-stub.c
++++ b/hw/pci/pci-stub.c
+@@ -53,3 +53,14 @@ uint16_t pci_requester_id(PCIDevice *dev)
+     g_assert(false);
+     return 0;
+ }
 +
-+config AHCI_ICH9
-+    bool
-     default y if PCI_DEVICES
-     depends on PCI
--    select IDE_QDEV
-+    select AHCI
- 
- config IDE_SII3112
-     bool
-diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
-index a142add..faf04e0 100644
---- a/hw/ide/Makefile.objs
-+++ b/hw/ide/Makefile.objs
-@@ -9,6 +9,6 @@ common-obj-$(CONFIG_IDE_MMIO) += mmio.o
- common-obj-$(CONFIG_IDE_VIA) += via.o
- common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
- common-obj-$(CONFIG_AHCI) += ahci.o
--common-obj-$(CONFIG_AHCI) += ich.o
-+common-obj-$(CONFIG_AHCI_ICH9) += ich.o
- common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
- common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
++/* Required by ahci.c */
++bool msi_enabled(const PCIDevice *dev)
++{
++    return false;
++}
++
++void msi_notify(PCIDevice *dev, unsigned int vector)
++{
++    g_assert_not_reached();
++}
 -- 
 1.8.3.1
