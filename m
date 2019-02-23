@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42591)
+Received: from eggs.gnu.org ([209.51.188.92]:48596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gxY74-0006cs-Oi
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:17:12 -0500
+	(envelope-from <maxiwell@linux.ibm.com>) id 1gxYc8-0006xy-FN
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:49:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gxY73-0002R5-CN
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:17:10 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53113)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gxY71-0002Oa-CH
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:17:09 -0500
-Received: by mail-wm1-x341.google.com with SMTP id m1so4357419wml.2
-	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 06:17:01 -0800 (PST)
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 23 Feb 2019 16:16:40 +0200
-Message-Id: <20190223141644.6609-8-marcel.apfelbaum@gmail.com>
-In-Reply-To: <20190223141644.6609-1-marcel.apfelbaum@gmail.com>
-References: <20190223141644.6609-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 07/11] hw/rdma: Free all receive buffers
- when QP is destroyed
+	(envelope-from <maxiwell@linux.ibm.com>) id 1gxYW9-0005Cn-Fn
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:43:06 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50772
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxiwell@linux.ibm.com>)
+	id 1gxYW9-000567-7V
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:43:05 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1NEYBUp023984
+	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 09:42:44 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qu17av9jk-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 09:42:44 -0500
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <maxiwell@linux.ibm.com>;
+	Sat, 23 Feb 2019 14:42:43 -0000
+From: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
+Date: Sat, 23 Feb 2019 11:40:57 -0300
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20190223144057.10509-1-maxiwell@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] spapr-rtas: add ibm,get-vpd RTAS interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,269 +39,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, kamalheib1@gmail.com, philmd@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, "open list:sPAPR" <qemu-ppc@nongnu.org>
 
-From: Yuval Shaia <yuval.shaia@oracle.com>
+This adds a handler for ibm,get-vpd RTAS calls, allowing pseries
+guest to collect host information. It is disabled by default to
+avoid unwanted information leakage. To enable it, use:
+=E2=80=98-M pseries,vpd-export=3Don=E2=80=99
 
-When QP is destroyed the backend QP is destroyed as well. This ensures
-we clean all received buffer we posted to it.
-However, a contexts of these buffers are still remain in the device.
-Fix it by maintaining a list of buffer's context and free them when QP
-is destroyed.
+Only the SE and TM keywords are returned at the moment:
+SE for Machine or Cabinet Serial Number and
+TM for Machine Type and Model.
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Message-Id: <20190213065357.16076-8-yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Powerpc-utils tools can dispatch RTAS calls to retrieve host
+information using this ibm,get-vpd interface. The 'host-serial'
+and 'host-model' nodes of device-tree hold the same information but
+in a static manner, which is useless after a migration operation.
+
+Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
 ---
- hw/rdma/rdma_backend.c      | 26 ++++++++++++++++++++------
- hw/rdma/rdma_backend.h      |  2 +-
- hw/rdma/rdma_backend_defs.h |  2 +-
- hw/rdma/rdma_rm.c           |  2 +-
- hw/rdma/rdma_utils.c        | 29 +++++++++++++++++++++++++++++
- hw/rdma/rdma_utils.h        | 11 +++++++++++
- 6 files changed, 63 insertions(+), 9 deletions(-)
+ hw/ppc/spapr.c         | 21 ++++++++++
+ hw/ppc/spapr_rtas.c    | 93 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h | 17 +++++++-
+ 3 files changed, 130 insertions(+), 1 deletion(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index e8ee205b5f..83a68057a7 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -39,6 +39,7 @@
- typedef struct BackendCtx {
-     void *up_ctx;
-     struct ibv_sge sge; /* Used to save MAD recv buffer */
-+    RdmaBackendQP *backend_qp; /* To maintain recv buffers */
- } BackendCtx;
- 
- struct backend_umad {
-@@ -73,6 +74,7 @@ static void free_cqe_ctx(gpointer data, gpointer user_data)
-     bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, cqe_ctx_id);
-     if (bctx) {
-         rdma_rm_dealloc_cqe_ctx(rdma_dev_res, cqe_ctx_id);
-+        atomic_dec(&rdma_dev_res->stats.missing_cqe);
-     }
-     g_free(bctx);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index abf9ebce59..09fd9e2ebb 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3026,6 +3026,20 @@ static char *spapr_get_fw_dev_path(FWPathProvider =
+*p, BusState *bus,
+     return NULL;
  }
-@@ -85,13 +87,15 @@ static void clean_recv_mads(RdmaBackendDev *backend_dev)
-         cqe_ctx_id = rdma_protected_qlist_pop_int64(&backend_dev->
-                                                     recv_mads_list);
-         if (cqe_ctx_id != -ENOENT) {
-+            atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
-             free_cqe_ctx(GINT_TO_POINTER(cqe_ctx_id),
-                          backend_dev->rdma_dev_res);
-         }
-     } while (cqe_ctx_id != -ENOENT);
- }
- 
--static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
-+static int rdma_poll_cq(RdmaBackendDev *backend_dev,
-+                        RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
- {
-     int i, ne, total_ne = 0;
-     BackendCtx *bctx;
-@@ -113,6 +117,8 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
- 
-             comp_handler(bctx->up_ctx, &wc[i]);
- 
-+            rdma_protected_gslist_remove_int32(&bctx->backend_qp->cqe_ctx_list,
-+                                               wc[i].wr_id);
-             rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
-             g_free(bctx);
-         }
-@@ -175,14 +181,12 @@ static void *comp_handler_thread(void *arg)
-             }
- 
-             backend_dev->rdma_dev_res->stats.poll_cq_from_bk++;
--            rdma_poll_cq(backend_dev->rdma_dev_res, ev_cq);
-+            rdma_poll_cq(backend_dev, backend_dev->rdma_dev_res, ev_cq);
- 
-             ibv_ack_cq_events(ev_cq, 1);
-         }
-     }
- 
--    /* TODO: Post cqe for all remaining buffs that were posted */
--
-     backend_dev->comp_thread.is_running = false;
- 
-     qemu_thread_exit(0);
-@@ -311,7 +315,7 @@ void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
-     int polled;
- 
-     rdma_dev_res->stats.poll_cq_from_guest++;
--    polled = rdma_poll_cq(rdma_dev_res, cq->ibcq);
-+    polled = rdma_poll_cq(cq->backend_dev, rdma_dev_res, cq->ibcq);
-     if (!polled) {
-         rdma_dev_res->stats.poll_cq_from_guest_empty++;
-     }
-@@ -501,6 +505,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
- 
-     bctx = g_malloc0(sizeof(*bctx));
-     bctx->up_ctx = ctx;
-+    bctx->backend_qp = qp;
- 
-     rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
-     if (unlikely(rc)) {
-@@ -508,6 +513,8 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-         goto err_free_bctx;
-     }
- 
-+    rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
-+
-     rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-                               &backend_dev->rdma_dev_res->stats.tx_len);
-     if (rc) {
-@@ -616,6 +623,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
- 
-     bctx = g_malloc0(sizeof(*bctx));
-     bctx->up_ctx = ctx;
-+    bctx->backend_qp = qp;
- 
-     rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
-     if (unlikely(rc)) {
-@@ -623,6 +631,8 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-         goto err_free_bctx;
-     }
- 
-+    rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
-+
-     rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge,
-                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
-     if (rc) {
-@@ -762,6 +772,8 @@ int rdma_backend_create_qp(RdmaBackendQP *qp, uint8_t qp_type,
-         return -EIO;
-     }
- 
-+    rdma_protected_gslist_init(&qp->cqe_ctx_list);
-+
-     qp->ibpd = pd->ibpd;
- 
-     /* TODO: Query QP to get max_inline_data and save it to be used in send */
-@@ -919,11 +931,13 @@ int rdma_backend_query_qp(RdmaBackendQP *qp, struct ibv_qp_attr *attr,
-     return ibv_query_qp(qp->ibqp, attr, attr_mask, init_attr);
- }
- 
--void rdma_backend_destroy_qp(RdmaBackendQP *qp)
-+void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res)
- {
-     if (qp->ibqp) {
-         ibv_destroy_qp(qp->ibqp);
-     }
-+    g_slist_foreach(qp->cqe_ctx_list.list, free_cqe_ctx, dev_res);
-+    rdma_protected_gslist_destroy(&qp->cqe_ctx_list);
- }
- 
- #define CHK_ATTR(req, dev, member, fmt) ({ \
-diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-index 5114c90e67..cb5efa2a3a 100644
---- a/hw/rdma/rdma_backend.h
-+++ b/hw/rdma/rdma_backend.h
-@@ -102,7 +102,7 @@ int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
-                               uint32_t sq_psn, uint32_t qkey, bool use_qkey);
- int rdma_backend_query_qp(RdmaBackendQP *qp, struct ibv_qp_attr *attr,
-                           int attr_mask, struct ibv_qp_init_attr *init_attr);
--void rdma_backend_destroy_qp(RdmaBackendQP *qp);
-+void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res);
- 
- void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-                             RdmaBackendQP *qp, uint8_t qp_type,
-diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-index a8c15b09ab..817153dc8c 100644
---- a/hw/rdma/rdma_backend_defs.h
-+++ b/hw/rdma/rdma_backend_defs.h
-@@ -26,7 +26,6 @@ typedef struct RdmaDeviceResources RdmaDeviceResources;
- 
- typedef struct RdmaBackendThread {
-     QemuThread thread;
--    QemuMutex mutex;
-     bool run; /* Set by thread manager to let thread know it should exit */
-     bool is_running; /* Set by the thread to report its status */
- } RdmaBackendThread;
-@@ -66,6 +65,7 @@ typedef struct RdmaBackendQP {
-     struct ibv_pd *ibpd;
-     struct ibv_qp *ibqp;
-     uint8_t sgid_idx;
-+    RdmaProtectedGSList cqe_ctx_list;
- } RdmaBackendQP;
- 
- #endif
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index d0f5dd0744..3475f67da5 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -484,7 +484,7 @@ void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle)
-         return;
-     }
- 
--    rdma_backend_destroy_qp(&qp->backend_qp);
-+    rdma_backend_destroy_qp(&qp->backend_qp, dev_res);
- 
-     rdma_res_tbl_dealloc(&dev_res->qp_tbl, qp->qpn);
- }
-diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
-index 672a09079a..5cf993d2e7 100644
---- a/hw/rdma/rdma_utils.c
-+++ b/hw/rdma/rdma_utils.c
-@@ -94,3 +94,32 @@ int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)
- 
-     return qnum_get_uint(qobject_to(QNum, obj));
- }
-+
-+void rdma_protected_gslist_init(RdmaProtectedGSList *list)
+=20
++static bool spapr_get_vpd_export(Object *obj, Error **errp)
 +{
-+    qemu_mutex_init(&list->lock);
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++
++    return spapr->vpd_export;
 +}
 +
-+void rdma_protected_gslist_destroy(RdmaProtectedGSList *list)
++static void spapr_set_vpd_export(Object *obj, bool value, Error **errp)
 +{
-+    if (list->list) {
-+        g_slist_free(list->list);
-+        list->list = NULL;
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++
++    spapr->vpd_export =3D value;
++}
++
+ static char *spapr_get_kvm_type(Object *obj, Error **errp)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+@@ -3150,6 +3164,7 @@ static void spapr_instance_init(Object *obj)
+     sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+=20
+     spapr->htab_fd =3D -1;
++    spapr->vpd_export =3D false;
+     spapr->use_hotplug_event_source =3D true;
+     object_property_add_str(obj, "kvm-type",
+                             spapr_get_kvm_type, spapr_set_kvm_type, NULL=
+);
+@@ -3182,6 +3197,12 @@ static void spapr_instance_init(Object *obj)
+     object_property_add_bool(obj, "vfio-no-msix-emulation",
+                              spapr_get_msix_emulation, NULL, NULL);
+=20
++    object_property_add_bool(obj, "vpd-export", spapr_get_vpd_export,
++                             spapr_set_vpd_export, NULL);
++    object_property_set_description(obj, "vpd-export",
++                                    "Export Host's VPD information to gu=
+est",
++                                    &error_abort);
++
+     /* The machine class defines the default interrupt controller mode *=
+/
+     spapr->irq =3D smc->irq;
+     object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index d6a0952154..214e0edfc5 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -287,6 +287,97 @@ static void rtas_ibm_set_system_parameter(PowerPCCPU=
+ *cpu,
+     rtas_st(rets, 0, ret);
+ }
+=20
++static inline int vpd_st(target_ulong addr, target_ulong len,
++                         const void *val, uint16_t val_len)
++{
++    hwaddr phys =3D ppc64_phys_to_real(addr);
++    if (len < val_len) {
++        return RTAS_OUT_PARAM_ERROR;
 +    }
++    cpu_physical_memory_write(phys, val, val_len);
++    return RTAS_OUT_SUCCESS;
 +}
 +
-+void rdma_protected_gslist_append_int32(RdmaProtectedGSList *list,
-+                                        int32_t value)
++static inline void vpd_ret(target_ulong rets, const int status,
++                           const int next_seq_number, const int bytes_re=
+turned)
 +{
-+    qemu_mutex_lock(&list->lock);
-+    list->list = g_slist_prepend(list->list, GINT_TO_POINTER(value));
-+    qemu_mutex_unlock(&list->lock);
++    rtas_st(rets, 0, status);
++    rtas_st(rets, 1, next_seq_number);
++    rtas_st(rets, 2, bytes_returned);
 +}
 +
-+void rdma_protected_gslist_remove_int32(RdmaProtectedGSList *list,
-+                                        int32_t value)
++static void rtas_ibm_get_vpd(PowerPCCPU *cpu,
++                             sPAPRMachineState *spapr,
++                             uint32_t token, uint32_t nargs,
++                             target_ulong args,
++                             uint32_t nret, target_ulong rets)
 +{
-+    qemu_mutex_lock(&list->lock);
-+    list->list = g_slist_remove(list->list, GINT_TO_POINTER(value));
-+    qemu_mutex_unlock(&list->lock);
-+}
-diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-index a8bf1d4fec..2d42249691 100644
---- a/hw/rdma/rdma_utils.h
-+++ b/hw/rdma/rdma_utils.h
-@@ -34,12 +34,23 @@ typedef struct RdmaProtectedQList {
-     QList *list;
- } RdmaProtectedQList;
- 
-+typedef struct RdmaProtectedGSList {
-+    QemuMutex lock;
-+    GSList *list;
-+} RdmaProtectedGSList;
++    sPAPRMachineState *sm =3D SPAPR_MACHINE(spapr);
++    target_ulong loc_code_addr;
++    target_ulong work_area_addr;
++    target_ulong work_area_size;
++    target_ulong seq_number;
++    unsigned char loc_code =3D 0;
++    unsigned int next_seq_number =3D 0;
++    int status =3D RTAS_IBM_GET_VPD_PARAMETER_ERROR;
++    int ret =3D 0;
++    char *field =3D '\0';
 +
- void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
- void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
- void rdma_protected_qlist_init(RdmaProtectedQList *list);
- void rdma_protected_qlist_destroy(RdmaProtectedQList *list);
- void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t value);
- int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list);
-+void rdma_protected_gslist_init(RdmaProtectedGSList *list);
-+void rdma_protected_gslist_destroy(RdmaProtectedGSList *list);
-+void rdma_protected_gslist_append_int32(RdmaProtectedGSList *list,
-+                                        int32_t value);
-+void rdma_protected_gslist_remove_int32(RdmaProtectedGSList *list,
-+                                        int32_t value);
- 
- static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
- {
--- 
-2.17.1
++    if (!sm->vpd_export) {
++        vpd_ret(rets, RTAS_OUT_NOT_AUTHORIZED, 1, 0);
++        return;
++    }
++
++    /* Specific Location Code is not supported */
++    loc_code_addr =3D rtas_ld(args, 0);
++    cpu_physical_memory_read(loc_code_addr, &loc_code, 1);
++    if (loc_code !=3D 0) {
++        vpd_ret(rets, RTAS_IBM_GET_VPD_PARAMETER_ERROR, 1, 0);
++        return;
++    }
++
++    work_area_addr =3D rtas_ld(args, 1);
++    work_area_size =3D rtas_ld(args, 2);
++    seq_number =3D rtas_ld(args, 3);
++    switch (seq_number) {
++        case RTAS_IBM_VPD_KEYWORD_SE: {
++            char *host_serial;
++            if (kvmppc_get_host_serial(&host_serial)) {
++                /* LoPAPR: SE for Machine or Cabinet Serial Number */
++                field =3D g_strdup_printf("SE %s", host_serial);
++                ret =3D vpd_st(work_area_addr, work_area_size,
++                             field, strlen(field) + 1);
++                g_free(host_serial);
++            }
++            break;
++        }
++        case RTAS_IBM_VPD_KEYWORD_TM: {
++            char *host_model;
++            if (kvmppc_get_host_model(&host_model)) {
++                /* LoPAPR: TM for Machine Type and Model */
++                field =3D g_strdup_printf("TM %s", host_model);
++                ret =3D vpd_st(work_area_addr, work_area_size,
++                             field, strlen(field) + 1);
++                g_free(host_model);
++            }
++            break;
++        }
++    }
++
++    if (ret =3D=3D 0) {
++        if (seq_number =3D=3D RTAS_IBM_VPD_KEYWORD_LAST) {
++            status =3D RTAS_IBM_GET_VPD_SUCCESS;
++            next_seq_number =3D 1;
++        } else {
++            status =3D RTAS_IBM_GET_VPD_CONTINUE;
++            next_seq_number =3D seq_number + 1;
++        }
++    }
++
++    vpd_ret(rets, status, next_seq_number, strlen(field));
++    g_free(field);
++}
++
+ static void rtas_ibm_os_term(PowerPCCPU *cpu,
+                             sPAPRMachineState *spapr,
+                             uint32_t token, uint32_t nargs,
+@@ -485,6 +576,8 @@ static void core_rtas_register_types(void)
+                         rtas_ibm_set_system_parameter);
+     spapr_rtas_register(RTAS_IBM_OS_TERM, "ibm,os-term",
+                         rtas_ibm_os_term);
++    spapr_rtas_register(RTAS_IBM_GET_VPD, "ibm,get-vpd",
++                        rtas_ibm_get_vpd);
+     spapr_rtas_register(RTAS_SET_POWER_LEVEL, "set-power-level",
+                         rtas_set_power_level);
+     spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 631fc5103b..235b22340d 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -183,6 +183,7 @@ struct sPAPRMachineState {
+     sPAPRXive  *xive;
+     sPAPRIrq *irq;
+     qemu_irq *qirqs;
++    bool vpd_export;
+=20
+     bool cmd_line_caps[SPAPR_CAP_NUM];
+     sPAPRCapabilities def, eff, mig;
+@@ -605,14 +606,28 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, targe=
+t_ulong opcode,
+ #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
+ #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+ #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
++#define RTAS_IBM_GET_VPD                        (RTAS_TOKEN_BASE + 0x2A)
+=20
+-#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
++#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
+=20
+ /* RTAS ibm,get-system-parameter token values */
+ #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+ #define RTAS_SYSPARM_DIAGNOSTICS_RUN_MODE        42
+ #define RTAS_SYSPARM_UUID                        48
+=20
++/* RTAS ibm,get-vpd status values */
++#define RTAS_IBM_GET_VPD_VPD_CHANGED     -4
++#define RTAS_IBM_GET_VPD_PARAMETER_ERROR -3
++#define RTAS_IBM_GET_VPD_HARDWARE_ERROR  -1
++#define RTAS_IBM_GET_VPD_SUCCESS          0
++#define RTAS_IBM_GET_VPD_CONTINUE         1
++
++/* RTAS ibm,get-vpd keywords index */
++#define RTAS_IBM_VPD_KEYWORD_SE     1
++#define RTAS_IBM_VPD_KEYWORD_TM     2
++
++#define RTAS_IBM_VPD_KEYWORD_LAST   2
++
+ /* RTAS indicator/sensor types
+  *
+  * as defined by PAPR+ 2.7 7.3.5.4, Table 41
+--=20
+2.20.1
