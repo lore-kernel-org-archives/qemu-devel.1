@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48596)
+Received: from eggs.gnu.org ([209.51.188.92]:45157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxiwell@linux.ibm.com>) id 1gxYc8-0006xy-FN
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:49:17 -0500
+	(envelope-from <ncopa@alpinelinux.org>) id 1gxZml-0002He-LV
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 11:04:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxiwell@linux.ibm.com>) id 1gxYW9-0005Cn-Fn
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:43:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50772
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxiwell@linux.ibm.com>)
-	id 1gxYW9-000567-7V
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:43:05 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1NEYBUp023984
-	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 09:42:44 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qu17av9jk-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 09:42:44 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <maxiwell@linux.ibm.com>;
-	Sat, 23 Feb 2019 14:42:43 -0000
-From: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
-Date: Sat, 23 Feb 2019 11:40:57 -0300
+	(envelope-from <ncopa@alpinelinux.org>) id 1gxZmk-0004Vb-1E
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 11:04:19 -0500
+Received: from mx1.tetrasec.net ([74.117.190.25]:53938)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ncopa@alpinelinux.org>) id 1gxZmj-0004V4-Mi
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 11:04:17 -0500
+Date: Sat, 23 Feb 2019 16:55:23 +0100
+From: Natanael Copa <ncopa@alpinelinux.org>
+Message-ID: <20190223165523.1d674224@ncopa-desktop.copa.dup.pw>
+In-Reply-To: <CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
+References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB32453A8B5CBC0308C7D18F1DA47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QVxaW3tezjBN9owJHsxzE9h8_qcaeRr5zHHKxKJOeFnkQ@mail.gmail.com>
+	<CAJSP0QVXoZJ9MJ0qp4RM_m2fGJ8iFSyJMAU_X7mdiQvpOK59KA@mail.gmail.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
+	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
+	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190223144057.10509-1-maxiwell@linux.ibm.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] spapr-rtas: add ibm,get-vpd RTAS interface
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,235 +38,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, "open list:sPAPR" <qemu-ppc@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Fernando Casas =?ISO-8859-1?B?U2No9nNzb3c=?= <casasfernando@outlook.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>
 
-This adds a handler for ibm,get-vpd RTAS calls, allowing pseries
-guest to collect host information. It is disabled by default to
-avoid unwanted information leakage. To enable it, use:
-=E2=80=98-M pseries,vpd-export=3Don=E2=80=99
+On Fri, 22 Feb 2019 14:04:20 +0000
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-Only the SE and TM keywords are returned at the moment:
-SE for Machine or Cabinet Serial Number and
-TM for Machine Type and Model.
+> On Fri, Feb 22, 2019 at 12:57 PM Fernando Casas Sch=F6ssow
+> <casasfernando@outlook.com> wrote:
+>=20
+> I have CCed Natanael Copa, qemu package maintainer in Alpine Linux.
+>=20
+> Fernando: Can you confirm that the bug occurs with an unmodified
+> Alpine Linux qemu binary?
 
-Powerpc-utils tools can dispatch RTAS calls to retrieve host
-information using this ibm,get-vpd interface. The 'host-serial'
-and 'host-model' nodes of device-tree hold the same information but
-in a static manner, which is useless after a migration operation.
+I wonder exactly which binary it is. What arcitecture (x86 or x86_64)
+and what binary. Is it ddynamic or statically linked qemu-system-x86_64?
+=20
+> Richard: Commit 7db2145a6826b14efceb8dd64bfe6ad8647072eb ("bswap: Add
+> host endian unaligned access functions") introduced the unaligned
+> memory access functions in question here.  Please see below for
+> details on the bug - basically QEMU code assumes they are atomic, but
+> that is not guaranteed :(.  Any ideas for how to fix this?
+>=20
+> Natanael: It seems likely that the qemu package in Alpine Linux
+> suffers from a compilation issue resulting in a broken QEMU.  It may
+> be necessary to leave the compiler optimization flag alone in APKBUILD
+> to work around this problem.
+>=20
+> Here are the details.  QEMU relies on the compiler turning
+> memcpy(&dst, &src, 2) turning into a load instruction in
+> include/qemu/bswap.h:lduw_he_p() (explanation below):
+>=20
+> /* Any compiler worth its salt will turn these memcpy into native unalign=
+ed
+>    operations.  Thus we don't need to play games with packed attributes, =
+or
+>    inline byte-by-byte stores.  */
+>=20
+> static inline int lduw_he_p(const void *ptr)
+> {
+>     uint16_t r;
+>     memcpy(&r, ptr, sizeof(r));
+>     return r;
+> }
+>=20
+> Here is the disassembly snippet of virtqueue_pop() from Fedora 29 that
+> shows the load instruction:
+>=20
+>   398166:       0f b7 42 02             movzwl 0x2(%rdx),%eax
+>   39816a:       66 89 43 32             mov    %ax,0x32(%rbx)
+>=20
+> Here is the instruction sequence in the Alpine Linux binary:
+>=20
+>   455562:    ba 02 00 00 00           mov    $0x2,%edx
+>   455567:    e8 74 24 f3 ff           callq  3879e0 <memcpy@plt>
+>   45556c:    0f b7 44 24 42           movzwl 0x42(%rsp),%eax
+>   455571:    66 41 89 47 32           mov    %ax,0x32(%r15)
+>=20
+> It's calling memcpy instead of using a load instruction.
 
-Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
----
- hw/ppc/spapr.c         | 21 ++++++++++
- hw/ppc/spapr_rtas.c    | 93 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h | 17 +++++++-
- 3 files changed, 130 insertions(+), 1 deletion(-)
+I tried to find this section. How do you get the assembly listing of
+relevant secion? I tried to do "disas virtio_pop" from
+`gdb /usr/bin/qemu-system-x86_64` from the binary in alpine edge. I
+could find 2 memcpy but none of them look like a 16 bit operation after:
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index abf9ebce59..09fd9e2ebb 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3026,6 +3026,20 @@ static char *spapr_get_fw_dev_path(FWPathProvider =
-*p, BusState *bus,
-     return NULL;
- }
-=20
-+static bool spapr_get_vpd_export(Object *obj, Error **errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    return spapr->vpd_export;
-+}
-+
-+static void spapr_set_vpd_export(Object *obj, bool value, Error **errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    spapr->vpd_export =3D value;
-+}
-+
- static char *spapr_get_kvm_type(Object *obj, Error **errp)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-@@ -3150,6 +3164,7 @@ static void spapr_instance_init(Object *obj)
-     sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-=20
-     spapr->htab_fd =3D -1;
-+    spapr->vpd_export =3D false;
-     spapr->use_hotplug_event_source =3D true;
-     object_property_add_str(obj, "kvm-type",
-                             spapr_get_kvm_type, spapr_set_kvm_type, NULL=
-);
-@@ -3182,6 +3197,12 @@ static void spapr_instance_init(Object *obj)
-     object_property_add_bool(obj, "vfio-no-msix-emulation",
-                              spapr_get_msix_emulation, NULL, NULL);
-=20
-+    object_property_add_bool(obj, "vpd-export", spapr_get_vpd_export,
-+                             spapr_set_vpd_export, NULL);
-+    object_property_set_description(obj, "vpd-export",
-+                                    "Export Host's VPD information to gu=
-est",
-+                                    &error_abort);
-+
-     /* The machine class defines the default interrupt controller mode *=
-/
-     spapr->irq =3D smc->irq;
-     object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index d6a0952154..214e0edfc5 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -287,6 +287,97 @@ static void rtas_ibm_set_system_parameter(PowerPCCPU=
- *cpu,
-     rtas_st(rets, 0, ret);
- }
-=20
-+static inline int vpd_st(target_ulong addr, target_ulong len,
-+                         const void *val, uint16_t val_len)
-+{
-+    hwaddr phys =3D ppc64_phys_to_real(addr);
-+    if (len < val_len) {
-+        return RTAS_OUT_PARAM_ERROR;
-+    }
-+    cpu_physical_memory_write(phys, val, val_len);
-+    return RTAS_OUT_SUCCESS;
-+}
-+
-+static inline void vpd_ret(target_ulong rets, const int status,
-+                           const int next_seq_number, const int bytes_re=
-turned)
-+{
-+    rtas_st(rets, 0, status);
-+    rtas_st(rets, 1, next_seq_number);
-+    rtas_st(rets, 2, bytes_returned);
-+}
-+
-+static void rtas_ibm_get_vpd(PowerPCCPU *cpu,
-+                             sPAPRMachineState *spapr,
-+                             uint32_t token, uint32_t nargs,
-+                             target_ulong args,
-+                             uint32_t nret, target_ulong rets)
-+{
-+    sPAPRMachineState *sm =3D SPAPR_MACHINE(spapr);
-+    target_ulong loc_code_addr;
-+    target_ulong work_area_addr;
-+    target_ulong work_area_size;
-+    target_ulong seq_number;
-+    unsigned char loc_code =3D 0;
-+    unsigned int next_seq_number =3D 0;
-+    int status =3D RTAS_IBM_GET_VPD_PARAMETER_ERROR;
-+    int ret =3D 0;
-+    char *field =3D '\0';
-+
-+    if (!sm->vpd_export) {
-+        vpd_ret(rets, RTAS_OUT_NOT_AUTHORIZED, 1, 0);
-+        return;
-+    }
-+
-+    /* Specific Location Code is not supported */
-+    loc_code_addr =3D rtas_ld(args, 0);
-+    cpu_physical_memory_read(loc_code_addr, &loc_code, 1);
-+    if (loc_code !=3D 0) {
-+        vpd_ret(rets, RTAS_IBM_GET_VPD_PARAMETER_ERROR, 1, 0);
-+        return;
-+    }
-+
-+    work_area_addr =3D rtas_ld(args, 1);
-+    work_area_size =3D rtas_ld(args, 2);
-+    seq_number =3D rtas_ld(args, 3);
-+    switch (seq_number) {
-+        case RTAS_IBM_VPD_KEYWORD_SE: {
-+            char *host_serial;
-+            if (kvmppc_get_host_serial(&host_serial)) {
-+                /* LoPAPR: SE for Machine or Cabinet Serial Number */
-+                field =3D g_strdup_printf("SE %s", host_serial);
-+                ret =3D vpd_st(work_area_addr, work_area_size,
-+                             field, strlen(field) + 1);
-+                g_free(host_serial);
-+            }
-+            break;
-+        }
-+        case RTAS_IBM_VPD_KEYWORD_TM: {
-+            char *host_model;
-+            if (kvmppc_get_host_model(&host_model)) {
-+                /* LoPAPR: TM for Machine Type and Model */
-+                field =3D g_strdup_printf("TM %s", host_model);
-+                ret =3D vpd_st(work_area_addr, work_area_size,
-+                             field, strlen(field) + 1);
-+                g_free(host_model);
-+            }
-+            break;
-+        }
-+    }
-+
-+    if (ret =3D=3D 0) {
-+        if (seq_number =3D=3D RTAS_IBM_VPD_KEYWORD_LAST) {
-+            status =3D RTAS_IBM_GET_VPD_SUCCESS;
-+            next_seq_number =3D 1;
-+        } else {
-+            status =3D RTAS_IBM_GET_VPD_CONTINUE;
-+            next_seq_number =3D seq_number + 1;
-+        }
-+    }
-+
-+    vpd_ret(rets, status, next_seq_number, strlen(field));
-+    g_free(field);
-+}
-+
- static void rtas_ibm_os_term(PowerPCCPU *cpu,
-                             sPAPRMachineState *spapr,
-                             uint32_t token, uint32_t nargs,
-@@ -485,6 +576,8 @@ static void core_rtas_register_types(void)
-                         rtas_ibm_set_system_parameter);
-     spapr_rtas_register(RTAS_IBM_OS_TERM, "ibm,os-term",
-                         rtas_ibm_os_term);
-+    spapr_rtas_register(RTAS_IBM_GET_VPD, "ibm,get-vpd",
-+                        rtas_ibm_get_vpd);
-     spapr_rtas_register(RTAS_SET_POWER_LEVEL, "set-power-level",
-                         rtas_set_power_level);
-     spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 631fc5103b..235b22340d 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -183,6 +183,7 @@ struct sPAPRMachineState {
-     sPAPRXive  *xive;
-     sPAPRIrq *irq;
-     qemu_irq *qirqs;
-+    bool vpd_export;
-=20
-     bool cmd_line_caps[SPAPR_CAP_NUM];
-     sPAPRCapabilities def, eff, mig;
-@@ -605,14 +606,28 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, targe=
-t_ulong opcode,
- #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
- #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
- #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
-+#define RTAS_IBM_GET_VPD                        (RTAS_TOKEN_BASE + 0x2A)
-=20
--#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
-+#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
-=20
- /* RTAS ibm,get-system-parameter token values */
- #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
- #define RTAS_SYSPARM_DIAGNOSTICS_RUN_MODE        42
- #define RTAS_SYSPARM_UUID                        48
-=20
-+/* RTAS ibm,get-vpd status values */
-+#define RTAS_IBM_GET_VPD_VPD_CHANGED     -4
-+#define RTAS_IBM_GET_VPD_PARAMETER_ERROR -3
-+#define RTAS_IBM_GET_VPD_HARDWARE_ERROR  -1
-+#define RTAS_IBM_GET_VPD_SUCCESS          0
-+#define RTAS_IBM_GET_VPD_CONTINUE         1
-+
-+/* RTAS ibm,get-vpd keywords index */
-+#define RTAS_IBM_VPD_KEYWORD_SE     1
-+#define RTAS_IBM_VPD_KEYWORD_TM     2
-+
-+#define RTAS_IBM_VPD_KEYWORD_LAST   2
-+
- /* RTAS indicator/sensor types
-  *
-  * as defined by PAPR+ 2.7 7.3.5.4, Table 41
---=20
-2.20.1
+   0x00000000004551f1 <+353>:   mov    0x10(%rsp),%rdi
+   0x00000000004551f6 <+358>:   mov    $0x10,%edx
+   0x00000000004551fb <+363>:   callq  0x3879e0 <memcpy@plt>
+   0x0000000000455200 <+368>:   movzwl 0x5c(%rsp),%eax
+   0x0000000000455205 <+373>:   test   $0x4,%al
+   0x0000000000455207 <+375>:   je     0x4552aa <virtqueue_pop+538>
+
+....
+
+   0x0000000000455291 <+513>:   mov    0x10(%rsp),%rdi
+   0x0000000000455296 <+518>:   mov    $0x10,%edx
+   0x000000000045529b <+523>:   callq  0x3879e0 <memcpy@plt>
+   0x00000000004552a0 <+528>:   mov    %rbp,0x20(%rsp)
+   0x00000000004552a5 <+533>:   movzwl 0x5c(%rsp),%eax
+   0x00000000004552aa <+538>:   lea    0x20e0(%rsp),%rdi
+   0x00000000004552b2 <+546>:   xor    %r11d,%r11d
+   0x00000000004552b5 <+549>:   mov    %r15,0x38(%rsp)
+
+
+
+>=20
+> Fernando found that QEMU's virtqueue_pop() function sees bogus values
+> when loading a 16-bit guest RAM location.  Paolo figured out that the
+> bogus value can be produced by memcpy() when another thread is
+> updating the 16-bit memory location simultaneously.  This is a race
+> condition between one thread loading the 16-bit value and another
+> thread storing it (in this case a guest vcpu thread).  Sometimes
+> memcpy() may load one old byte and one new byte, resulting in a bogus
+> value.
+>=20
+> The symptom that Fernando experienced is a "Virtqueue size exceeded"
+> error message from QEMU and then the virtio-blk or virtio-scsi device
+> stops working.  This issue potentially affects other device emulation
+> code in QEMU as well, not just virtio devices.
+>=20
+> For the time being, I suggest tweaking the APKBUILD so the memcpy() is
+> not generated.  Hopefully QEMU can make the code more portable in the
+> future so the compiler always does the expected thing, but this may
+> not be easily possible.
+
+I was thinking of something in the lines of:
+
+typedef volatile uint16_t __attribute__((__may_alias__)) volatile_uint16_t;
+static inline int lduw_he_p(const void *ptr)
+{
+     volatile_uint16_t r =3D *(volatile_uint16_t*)ptr;
+     return r;
+}
+
+I can test different CFLAGS with and without the _FORTIFY_SOURCE and
+with different variants of memcpy (like __builtint_memcpy etc) but i
+need find a way to get the correct assembly output so I know if/when I
+have found something that works.
+
+Thanks!
+
+-nc
+
+
+>=20
+> Stefan
