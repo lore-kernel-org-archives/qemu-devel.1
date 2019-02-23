@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55611)
+Received: from eggs.gnu.org ([209.51.188.92]:55764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gxKqO-000076-5Z
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:07:05 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gxKqU-0000Dz-Bc
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:07:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gxKqL-0001W5-Jn
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:07:03 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gxKqS-0001hv-EQ
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:07:10 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 22 Feb 2019 19:06:08 -0500
-Message-Id: <20190223000614.13894-5-jsnow@redhat.com>
+Date: Fri, 22 Feb 2019 19:06:13 -0500
+Message-Id: <20190223000614.13894-10-jsnow@redhat.com>
 In-Reply-To: <20190223000614.13894-1-jsnow@redhat.com>
 References: <20190223000614.13894-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 04/10] block/dirty-bitmap: change semantics
- of enabled predicate
+Subject: [Qemu-devel] [PATCH v3 09/10] blockdev: remove unused paio
+ parameter documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +23,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, libvir-list@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
 
-Currently, the enabled predicate means something like:
-"the QAPI status of the bitmap is ACTIVE."
-After this patch, it should mean exclusively:
-"This bitmap is recording guest writes, and is allowed to do so."
-
-In many places, this is how this predicate was already used.
-Internal usages of the bitmap QPI can call user_locked to find out if
-the bitmap is in use by an operation.
-
-To accommodate this, modify the create_successor routine to now
-explicitly disable the parent bitmap at creation time.
-
-
-Justifications:
-
-1. bdrv_dirty_bitmap_status suffers no change from the lack of
-   1:1 parity with the new predicates because of the order in which
-   the predicates are checked. This is now only for compatibility.
-
-2. bdrv_set_dirty() is unchanged: pre-patch, it was skipping bitmaps that were
-   disabled or had a successor, while post-patch it is only skipping bitmaps
-   that are disabled. To accommodate this, create_successor now ensures that
-   any bitmap with a successor is explicitly disabled.
-
-3. qcow2_store_persistent_dirty_bitmaps: No functional change. This function
-   cares only about the literal enabled bit, and makes no effort to check if
-   the bitmap is in-use or not. After this patch there are still no ways to
-   produce an enabled bitmap with a successor.
-
-4. block_dirty_bitmap_enable_prepare
-   block_dirty_bitmap_disable_prepare
-   init_dirty_bitmap_migration
-   nbd_export_new
-
-   These functions care about the literal enabled bit,
-   and already check user_locked separately.
+This field isn't present anymore.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ blockdev.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 9ea5738420..976831e765 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -209,7 +209,7 @@ bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap)
- /* Called with BQL taken.  */
- bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
- {
--    return !(bitmap->disabled || bitmap->successor);
-+    return !bitmap->disabled;
- }
- 
- /* Called with BQL taken.  */
-@@ -236,6 +236,7 @@ static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
- /**
-  * Create a successor bitmap destined to replace this bitmap after an operation.
-  * Requires that the bitmap is not user_locked and has no successor.
-+ * The successor will be enabled if the parent bitmap was.
-  * Called with BQL taken.
-  */
- int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
-@@ -264,6 +265,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
- 
-     /* Successor will be on or off based on our current state. */
-     child->disabled = bitmap->disabled;
-+    bitmap->disabled = true;
- 
-     /* Install the successor and freeze the parent */
-     bitmap->successor = child;
-@@ -328,7 +330,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
- /**
-  * In cases of failure where we can no longer safely delete the parent,
-  * we may wish to re-join the parent and child/successor.
-- * The merged parent will not be user_locked, nor explicitly re-enabled.
-+ * The merged parent will not be user_locked.
-+ * The marged parent will be enabled if and only if the successor was enabled.
-  * Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.
-  */
- BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-@@ -346,6 +349,8 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-         error_setg(errp, "Merging of parent and successor bitmap failed");
-         return NULL;
-     }
-+
-+    parent->disabled = successor->disabled;
-     bdrv_release_dirty_bitmap_locked(successor);
-     parent->successor = NULL;
- 
+diff --git a/blockdev.c b/blockdev.c
+index 1aaadb6128..cbce44877d 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1255,7 +1255,6 @@ out_aio_context:
+  * @node: The name of the BDS node to search for bitmaps
+  * @name: The name of the bitmap to search for
+  * @pbs: Output pointer for BDS lookup, if desired. Can be NULL.
+- * @paio: Output pointer for aio_context acquisition, if desired. Can be NULL.
+  * @errp: Output pointer for error information. Can be NULL.
+  *
+  * @return: A bitmap object on success, or NULL on failure.
 -- 
 2.17.2
