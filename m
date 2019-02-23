@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57387)
+Received: from eggs.gnu.org ([209.51.188.92]:42395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gxX80-0002wm-5Y
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 08:14:05 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gxY6k-0006Po-PA
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gxX4I-0007Tj-QD
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 08:10:15 -0500
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:41506)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gxY6j-0002LH-Rs
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:50 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gxX4I-0007So-Hv
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 08:10:14 -0500
-Received: by mail-qt1-x844.google.com with SMTP id v10so5660403qtp.8
-	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 05:10:13 -0800 (PST)
-MIME-Version: 1.0
-References: <20190218102748.2242-1-xieyongji@baidu.com>
-	<20190218102748.2242-2-xieyongji@baidu.com>
-	<20190221120121-mutt-send-email-mst@kernel.org>
-	<CAONzpcYHae1fCJLN56ofQ91tSQi_JCXAA6mBhf0NqN=QusV1zg@mail.gmail.com>
-	<20190222011631-mutt-send-email-mst@kernel.org>
-	<CAONzpcaxS3ct5bx62126SMiowcZ2mApnYomwXkHg0R67SvoQBg@mail.gmail.com>
-	<20190222095009-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190222095009-mutt-send-email-mst@kernel.org>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Sat, 23 Feb 2019 21:10:01 +0800
-Message-ID: <CAONzpcZ_4e5xYonBhXinkQC8E5UCsko3iLY8_8ykaVwdU0Aa4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 1/7] vhost-user: Support transferring
- inflight buffer between qemu and backend
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1gxY6j-0002Kw-KC
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:49 -0500
+Received: by mail-wm1-x344.google.com with SMTP id x7so4335552wmj.0
+	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 06:16:49 -0800 (PST)
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Date: Sat, 23 Feb 2019 16:16:33 +0200
+Message-Id: <20190223141644.6609-1-marcel.apfelbaum@gmail.com>
+Subject: [Qemu-devel]  [PATCH PULL 00/11] RDMA queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,149 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, kamalheib1@gmail.com, philmd@redhat.com, dgilbert@redhat.com
 
-On Fri, 22 Feb 2019 at 22:54, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Fri, Feb 22, 2019 at 03:05:23PM +0800, Yongji Xie wrote:
-> > On Fri, 22 Feb 2019 at 14:21, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Fri, Feb 22, 2019 at 10:47:03AM +0800, Yongji Xie wrote:
-> > > > > > +
-> > > > > > +To track inflight I/O, the queue region should be processed as follows:
-> > > > > > +
-> > > > > > +When receiving available buffers from the driver:
-> > > > > > +
-> > > > > > +    1. Get the next available head-descriptor index from available ring, i
-> > > > > > +
-> > > > > > +    2. Set desc[i].inflight to 1
-> > > > > > +
-> > > > > > +When supplying used buffers to the driver:
-> > > > > > +
-> > > > > > +    1. Get corresponding used head-descriptor index, i
-> > > > > > +
-> > > > > > +    2. Set desc[i].next to process_head
-> > > > > > +
-> > > > > > +    3. Set process_head to i
-> > > > > > +
-> > > > > > +    4. Steps 1,2,3 may be performed repeatedly if batching is possible
-> > > > > > +
-> > > > > > +    5. Increase the idx value of used ring by the size of the batch
-> > > > > > +
-> > > > > > +    6. Set the inflight field of each DescStateSplit entry in the batch to 0
-> > > > > > +
-> > > > > > +    7. Set used_idx to the idx value of used ring
-> > > > > > +
-> > > > > > +When reconnecting:
-> > > > > > +
-> > > > > > +    1. If the value of used_idx does not match the idx value of used ring,
-> > > > > > +
-> > > > > > +        (a) Subtract the value of used_idx from the idx value of used ring to get
-> > > > > > +        the number of in-progress DescStateSplit entries
-> > > > > > +
-> > > > > > +        (b) Set the inflight field of the in-progress DescStateSplit entries which
-> > > > > > +        start from process_head to 0
-> > > > > > +
-> > > > > > +        (c) Set used_idx to the idx value of used ring
-> > > > > > +
-> > > > > > +    2. Resubmit each inflight DescStateSplit entry
-> > > > >
-> > > > > I re-read a couple of time and I still don't understand what it says.
-> > > > >
-> > > > > For simplicity consider split ring. So we want a list of heads that are
-> > > > > outstanding. Fair enough. Now device finishes a head. What now? I needs
-> > > > > to drop head from the list. But list is unidirectional (just next, no
-> > > > > prev). So how can you drop an entry from the middle?
-> > > > >
-> > > >
-> > > > The process_head is only used when slave crash between increasing the
-> > > > idx value of used ring and updating used_idx. We use it to find the
-> > > > in-progress DescStateSplit entries before the crash and complete them
-> > > > when reconnecting. Make sure guest and slave have the same view for
-> > > > inflight I/Os.
-> > > >
-> > >
-> > > But I don't understand how does the described process help do it?
-> > >
-> >
-> > For example, we need to submit descriptors A, B, C to driver in a batch.
-> >
-> > Firstly, we will link those descriptors like:
-> >
-> > process_head->A->B->C    (A)
-> >
-> > Then, we need to update idx value of used vring to mark those
-> > descriptors as used:
-> >
-> > _vring.used->idx += 3    (B)
-> >
-> > At last, clear the inflight field of those descriptors and update
-> > used_idx field:
-> >
-> > A.inflight = 0; B.inflight = 0; C.inflight = 0;    (C)
-> >
-> > used_idx = _vring.used->idx;    (D)
-> >
-> > After (B), guest can consume the descriptors A,B,C. So we must make
-> > sure the inflight field of A,B,C is cleared when reconnecting to avoid
-> > re-submitting used descriptor. If slave crash during (C), the inflight
-> > field of A,B,C may be incorrect. To detect that case, we can see
-> > whether used_idx matches _vring.used->idx. And through process_head,
-> > we can get the in-progress descriptors A,B,C and clear their inflight
-> > field again when reconnecting.
-> >
-> > >
-> > > > In other case, the inflight field is enough to track inflight I/O.
-> > > > When reconnecting, we go through all DescStateSplit entries and
-> > > > re-submit the entry whose inflight field is equal to 1.
-> > >
-> > > What I don't understand is how do we know the order
-> > > in which they have to be resubmitted. Reordering
-> > > operations would be a big problem, won't it?
-> > >
-> >
-> > In previous patch, I record avail_idx for each DescStateSplit entry to
-> > preserve the order. Is it useful to fix this?
-> >
-> > >
-> > > Let's say I fetch descriptors A, B, C and start
-> > > processing. how does memory look?
-> >
-> > A.inflight = 1, C.inflight = 1, B.inflight = 1
-> >
-> > > Now I finished B and marked it used. How does
-> > > memory look?
-> > >
-> >
-> > A.inflight = 1, C.inflight = 1, B.inflight = 0, process_head = B
->
-> OK. And we have
->
-> process_head->B->process_head
->
-> ?
->
-> Now if there is a reconnect, I want to submit A and then C,
-> correct? How do I know that from this picture? How do I
-> know to start with A? It's not on the list anymore...
->
+The following changes since commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62be116:
 
-We can go through all DescStateSplit entries (track all descriptors in
-Descriptor Table), then we can find A and C are inflight entry by its
-inflight field. And if we want to resubmit them in order (submit A and
-then C), we need to introduce a timestamp for each DescStateSplit
-entry to preserve the order when we fetch them from driver. Something
-like:
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20190221.0' into staging (2019-02-22 15:48:04 +0000)
 
-When receiving available buffers from the driver:
+are available in the Git repository at:
 
-1. Get the next available head-descriptor index from available ring, i
+  https://github.com/marcel-apf/qemu tags/rdma-pull-request
 
-2. desc[i].timestamp = avail_idx++;
+for you to fetch changes up to e1038e22f7b3ade2e46cf168fa7486414c424e94:
 
-3. Set desc[i].inflight to 1
+  hw/rdma: another clang compilation fix (2019-02-23 15:28:25 +0200)
 
-Thanks,
-Yongji
+----------------------------------------------------------------
+RDMA queue
+
+ * Another Clang compilation fix
+ * Various fixes for the pvrdma device
+
+----------------------------------------------------------------
+Marcel Apfelbaum (1):
+      hw/rdma: another clang compilation fix
+
+Yuval Shaia (10):
+      contrib/rdmacm-mux: Fix out-of-bounds risk
+      hw/rdma: Switch to generic error reporting way
+      hw/rdma: Introduce protected qlist
+      hw/rdma: Protect against concurrent execution of poll_cq
+      {monitor, hw/pvrdma}: Expose device internals via monitor interface
+      hw/rdma: Free all MAD receive buffers when device is closed
+      hw/rdma: Free all receive buffers when QP is destroyed
+      hw/pvrdma: Delete unneeded function argument
+      hw/pvrdma: Delete pvrdma_exit function
+      hw/pvrdma: Unregister from shutdown notifier when device goes down
+
+ contrib/rdmacm-mux/main.c     |  35 ++-
+ hmp-commands-info.hx          |  16 ++
+ hw/rdma/rdma_backend.c        | 483 +++++++++++++++++++++---------------------
+ hw/rdma/rdma_backend.h        |   3 +-
+ hw/rdma/rdma_backend_defs.h   |  10 +-
+ hw/rdma/rdma_rm.c             | 134 ++++++------
+ hw/rdma/rdma_rm_defs.h        |  32 ++-
+ hw/rdma/rdma_utils.c          |  79 ++++++-
+ hw/rdma/rdma_utils.h          |  61 +++---
+ hw/rdma/trace-events          |  32 ++-
+ hw/rdma/vmw/pvrdma.h          |   7 +-
+ hw/rdma/vmw/pvrdma_cmd.c      | 113 +++-------
+ hw/rdma/vmw/pvrdma_dev_ring.c |  26 +--
+ hw/rdma/vmw/pvrdma_hmp.h      |  21 ++
+ hw/rdma/vmw/pvrdma_main.c     | 217 +++++++++++--------
+ hw/rdma/vmw/pvrdma_qp_ops.c   |  52 ++---
+ hw/rdma/vmw/trace-events      |  16 +-
+ monitor.c                     |  10 +
+ 18 files changed, 744 insertions(+), 603 deletions(-)
+ create mode 100644 hw/rdma/vmw/pvrdma_hmp.h
+
+-- 
+2.17.1
