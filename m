@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57413)
+Received: from eggs.gnu.org ([209.51.188.92]:43805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gxTTN-0002b1-Ej
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 04:19:54 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gxUHx-0003Rf-7j
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 05:12:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gxTTM-0004vc-J8
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 04:19:53 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 23 Feb 2019 09:19:21 +0000
-Message-ID: <95b96a00-d8b2-45d4-75b5-ff513e5eaeb1@virtuozzo.com>
-References: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EC3EE34EEA3FDF42B987F90F18D487AB@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1gxUHw-000319-G6
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 05:12:09 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37129)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gxUHw-0002h8-6j
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 05:12:08 -0500
+Received: by mail-wm1-x343.google.com with SMTP id x10so4013649wmg.2
+	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 02:11:49 -0800 (PST)
+References: <20190222204500.24434-1-alex.bennee@linaro.org>
+	<20190222204500.24434-7-alex.bennee@linaro.org>
+	<4d4521cb-8ce9-661d-9491-e350b4a6320f@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <4d4521cb-8ce9-661d-9491-e350b4a6320f@linaro.org>
+Date: Sat, 23 Feb 2019 10:11:46 +0000
+Message-ID: <87pnrig6fx.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] iotests: handle TypeError for Python3
- in test 242
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 6/6] softfloat: Support
+ float_round_to_odd more places
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "philmd@redhat.com" <philmd@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>
 
-MjIuMDIuMjAxOSAxNDoyNiwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoZSBkYXRhIHR5
-cGUgZm9yIGJ5dGVzIGluIFB5dGhvbjMgZGlmZmVycyBmcm9tIHRoZSBvbmUgaW4gUHl0aG9uMi4N
-Cj4gVGhvc2UgY2FzZXMgc2hvdWxkIGJlIG1hbmFnZWQgc2VwYXJhdGVseS4NCj4gDQo+IHYxOg0K
-PiBJbiB0aGUgZmlyc3QgdmVyc2lvbiwgdGhlIFR5cGVFcnJvciBpbiBQeXRob24zIHdhcyBoYW5k
-bGVkIGFzIHRoZQ0KPiBleGNlcHRpb24uDQo+IERpc2N1c3NlZCBpbiB0aGUgZS1tYWlsIHRocmVh
-ZCB3aXRoIHRoZSBNZXNzYWdlIElEOg0KPiA8MTU1MDUxOTk5Ny0yNTM1MzQtMS1naXQtc2VuZC1l
-bWFpbC1hbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KPiANCj4gU2lnbmVkLW9mZi1i
-eTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20+DQo+
-IFJlcG9ydGVkLWJ5OiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPiAtLS0NCj4gICB0
-ZXN0cy9xZW11LWlvdGVzdHMvMjQyIHwgOCArKysrKystLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA2
-IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMv
-cWVtdS1pb3Rlc3RzLzI0MiBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDINCj4gaW5kZXggMTZjNjVl
-ZC4uNDQ2ZmJmOCAxMDA3NTUNCj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Mg0KPiArKysg
-Yi90ZXN0cy9xZW11LWlvdGVzdHMvMjQyDQo+IEBAIC0yMCw2ICsyMCw3IEBADQo+ICAgDQo+ICAg
-aW1wb3J0IGlvdGVzdHMNCj4gICBpbXBvcnQganNvbg0KPiAraW1wb3J0IHN5cw0KPiAgIGZyb20g
-aW90ZXN0cyBpbXBvcnQgcWVtdV9pbWdfY3JlYXRlLCBxZW11X2lvLCBxZW11X2ltZ19waXBlLCBc
-DQo+ICAgICAgIGZpbGVfcGF0aCwgaW1nX2luZm9fbG9nLCBsb2csIGZpbHRlcl9xZW11X2lvDQo+
-ICAgDQo+IEBAIC02NSw5ICs2NiwxMiBAQCBkZWYgdG9nZ2xlX2ZsYWcob2Zmc2V0KToNCj4gICAg
-ICAgd2l0aCBvcGVuKGRpc2ssICJyK2IiKSBhcyBmOg0KPiAgICAgICAgICAgZi5zZWVrKG9mZnNl
-dCwgMCkNCj4gICAgICAgICAgIGMgPSBmLnJlYWQoMSkNCj4gLSAgICAgICAgdG9nZ2xlZCA9IGNo
-cihvcmQoYykgXiBiaXRtYXBfZmxhZ191bmtub3duKQ0KPiArICAgICAgICB0b2dnbGVkID0gb3Jk
-KGMpIF4gYml0bWFwX2ZsYWdfdW5rbm93bg0KPiAgICAgICAgICAgZi5zZWVrKC0xLCAxKQ0KPiAt
-ICAgICAgICBmLndyaXRlKHRvZ2dsZWQpDQo+ICsgICAgICAgIGlmIHN5cy52ZXJzaW9uX2luZm8u
-bWFqb3IgPj0gMzoNCj4gKyAgICAgICAgICAgIGYud3JpdGUoYnl0ZXMoW3RvZ2dsZWRdKSkNCj4g
-KyAgICAgICAgZWxzZToNCj4gKyAgICAgICAgICAgIGYud3JpdGUoY2hyKHRvZ2dsZWQpKQ0KPiAg
-IA0KPiAgIA0KPiAgIHFlbXVfaW1nX2NyZWF0ZSgnLWYnLCBpb3Rlc3RzLmltZ2ZtdCwgZGlzaywg
-JzFNJykNCj4gDQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2
-c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
-Cg==
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> On 2/22/19 12:45 PM, Alex Benn=C3=A9e wrote:
+>> @@ -3526,6 +3551,8 @@ static float32 roundAndPackFloat32(flag zSign, int=
+ zExp, uint32_t zSig,
+>>      case float_round_down:
+>>          roundIncrement =3D zSign ? 0x7f : 0;
+>>          break;
+>> +    case float_round_to_odd:
+>> +        roundIncrement =3D zSig & 0x80 ? 0 : 0x7f;
+>>      default:
+>>          abort();
+>
+> I clearly missed a break here.
+>
+> Since this didn't kill fp-test, are we missing a float128_to_float32
+> test?
+
+Ahh yes missing that:
+
+10:11:17 [alex@zen:~/l/q/b/a/t/fp] fpu/next + ./fp-test f16_to_f32 f64_to_f=
+32 f128_to_f32 -r odd
+>> Testing f16_to_f32
+408 tests total.
+408 tests performed.
+In 408 tests, no errors found in f16_to_f32.
+>> Testing f64_to_f32, rounding odd, tininess before rounding
+768 tests total.
+768 tests performed.
+In 768 tests, no errors found in f64_to_f32, rounding odd, tininess before =
+rounding.
+>> Testing f64_to_f32, rounding odd, tininess after rounding
+768 tests total.
+768 tests performed.
+In 768 tests, no errors found in f64_to_f32, rounding odd, tininess after r=
+ounding.
+>> Testing f128_to_f32, rounding odd, tininess before rounding
+936 tests total.
+fish: =E2=80=9C./fp-test f16_to_f32 f64_to_f32=E2=80=A6=E2=80=9D terminated=
+ by signal SIGABRT (Abort)
+
+I'll patch it up and fix.
+
+>
+>
+> r~
+
+
+--
+Alex Benn=C3=A9e
