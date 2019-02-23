@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42446)
+Received: from eggs.gnu.org ([209.51.188.92]:42457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gxY6r-0006TI-BI
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:58 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gxY6t-0006UN-55
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gxY6p-0002ND-M6
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:57 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52128)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gxY6r-0002Nc-CU
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:59 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38158)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gxY6p-0002Mw-DC
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:55 -0500
-Received: by mail-wm1-x342.google.com with SMTP id n19so4326041wmi.1
-	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 06:16:54 -0800 (PST)
+	id 1gxY6q-0002NI-Eo
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 09:16:56 -0500
+Received: by mail-wm1-x343.google.com with SMTP id v26so4344963wmh.3
+	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 06:16:56 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 23 Feb 2019 16:16:36 +0200
-Message-Id: <20190223141644.6609-4-marcel.apfelbaum@gmail.com>
+Date: Sat, 23 Feb 2019 16:16:37 +0200
+Message-Id: <20190223141644.6609-5-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20190223141644.6609-1-marcel.apfelbaum@gmail.com>
 References: <20190223141644.6609-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 03/11] hw/rdma: Introduce protected qlist
+Subject: [Qemu-devel] [PATCH PULL 04/11] hw/rdma: Protect against concurrent
+ execution of poll_cq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,191 +32,74 @@ Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, kamalheib1@gmail.com, ph
 
 From: Yuval Shaia <yuval.shaia@oracle.com>
 
-To make code more readable move handling of protected list to a
-rdma_utils
+The function rdma_poll_cq is called from two contexts - completion
+handler thread which sense new completion on backend channel and
+explicitly as result of guest issuing poll_cq command.
+
+Add lock to protect against concurrent executions.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Message-Id: <20190213065357.16076-4-yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-Id: <20190213065357.16076-5-yuval.shaia@oracle.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c      | 20 +++++--------------
- hw/rdma/rdma_backend_defs.h |  8 ++------
- hw/rdma/rdma_utils.c        | 39 +++++++++++++++++++++++++++++++++++++
- hw/rdma/rdma_utils.h        |  9 +++++++++
- 4 files changed, 55 insertions(+), 21 deletions(-)
+ hw/rdma/rdma_backend.c | 2 ++
+ hw/rdma/rdma_rm.c      | 4 ++++
+ hw/rdma/rdma_rm_defs.h | 1 +
+ 3 files changed, 7 insertions(+)
 
 diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index 5f60856d19..6e9c4617da 100644
+index 6e9c4617da..3a2913facf 100644
 --- a/hw/rdma/rdma_backend.c
 +++ b/hw/rdma/rdma_backend.c
-@@ -527,9 +527,7 @@ static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev,
-     bctx->up_ctx = ctx;
-     bctx->sge = *sge;
+@@ -70,6 +70,7 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+     BackendCtx *bctx;
+     struct ibv_wc wc[2];
  
--    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
--    qlist_append_int(backend_dev->recv_mads_list.list, bctx_id);
--    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
-+    rdma_protected_qlist_append_int64(&backend_dev->recv_mads_list, bctx_id);
++    qemu_mutex_lock(&rdma_dev_res->lock);
+     do {
+         ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
  
+@@ -89,6 +90,7 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+             g_free(bctx);
+         }
+     } while (ne > 0);
++    qemu_mutex_unlock(&rdma_dev_res->lock);
+ 
+     if (ne < 0) {
+         rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+index 64c6ea1a4e..7cc597cdc8 100644
+--- a/hw/rdma/rdma_rm.c
++++ b/hw/rdma/rdma_rm.c
+@@ -618,12 +618,16 @@ int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
+ 
+     init_ports(dev_res);
+ 
++    qemu_mutex_init(&dev_res->lock);
++
      return 0;
  }
-@@ -913,23 +911,19 @@ static inline void build_mad_hdr(struct ibv_grh *grh, union ibv_gid *sgid,
- static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
-                                      RdmaCmMuxMsg *msg)
+ 
+ void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+                   const char *ifname)
  {
--    QObject *o_ctx_id;
-     unsigned long cqe_ctx_id;
-     BackendCtx *bctx;
-     char *mad;
- 
-     trace_mad_message("recv", msg->umad.mad, msg->umad_len);
- 
--    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
--    o_ctx_id = qlist_pop(backend_dev->recv_mads_list.list);
--    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
--    if (!o_ctx_id) {
-+    cqe_ctx_id = rdma_protected_qlist_pop_int64(&backend_dev->recv_mads_list);
-+    if (cqe_ctx_id == -ENOENT) {
-         rdma_warn_report("No more free MADs buffers, waiting for a while");
-         sleep(THR_POLL_TO);
-         return;
-     }
- 
--    cqe_ctx_id = qnum_get_uint(qobject_to(QNum, o_ctx_id));
-     bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
-     if (unlikely(!bctx)) {
-         rdma_error_report("No matching ctx for req %ld", cqe_ctx_id);
-@@ -994,8 +988,7 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
-         return -EIO;
-     }
- 
--    qemu_mutex_init(&backend_dev->recv_mads_list.lock);
--    backend_dev->recv_mads_list.list = qlist_new();
-+    rdma_protected_qlist_init(&backend_dev->recv_mads_list);
- 
-     enable_rdmacm_mux_async(backend_dev);
- 
-@@ -1010,10 +1003,7 @@ static void mad_fini(RdmaBackendDev *backend_dev)
- {
-     disable_rdmacm_mux_async(backend_dev);
-     qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
--    if (backend_dev->recv_mads_list.list) {
--        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
--        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
--    }
-+    rdma_protected_qlist_destroy(&backend_dev->recv_mads_list);
- }
- 
- int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
-diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-index 15ae8b970e..a8c15b09ab 100644
---- a/hw/rdma/rdma_backend_defs.h
-+++ b/hw/rdma/rdma_backend_defs.h
-@@ -20,6 +20,7 @@
- #include "chardev/char-fe.h"
- #include <infiniband/verbs.h>
- #include "contrib/rdmacm-mux/rdmacm-mux.h"
-+#include "rdma_utils.h"
- 
- typedef struct RdmaDeviceResources RdmaDeviceResources;
- 
-@@ -30,11 +31,6 @@ typedef struct RdmaBackendThread {
-     bool is_running; /* Set by the thread to report its status */
- } RdmaBackendThread;
- 
--typedef struct RecvMadList {
--    QemuMutex lock;
--    QList *list;
--} RecvMadList;
--
- typedef struct RdmaCmMux {
-     CharBackend *chr_be;
-     int can_receive;
-@@ -48,7 +44,7 @@ typedef struct RdmaBackendDev {
-     struct ibv_context *context;
-     struct ibv_comp_channel *channel;
-     uint8_t port_num;
--    RecvMadList recv_mads_list;
-+    RdmaProtectedQList recv_mads_list;
-     RdmaCmMux rdmacm_mux;
- } RdmaBackendDev;
- 
-diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
-index f1c980c6be..672a09079a 100644
---- a/hw/rdma/rdma_utils.c
-+++ b/hw/rdma/rdma_utils.c
-@@ -14,6 +14,8 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/qmp/qlist.h"
-+#include "qapi/qmp/qnum.h"
- #include "trace.h"
- #include "rdma_utils.h"
- 
-@@ -55,3 +57,40 @@ void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len)
-         pci_dma_unmap(dev, buffer, len, DMA_DIRECTION_TO_DEVICE, 0);
-     }
- }
++    qemu_mutex_destroy(&dev_res->lock);
 +
-+void rdma_protected_qlist_init(RdmaProtectedQList *list)
-+{
-+    qemu_mutex_init(&list->lock);
-+    list->list = qlist_new();
-+}
-+
-+void rdma_protected_qlist_destroy(RdmaProtectedQList *list)
-+{
-+    if (list->list) {
-+        qlist_destroy_obj(QOBJECT(list->list));
-+        qemu_mutex_destroy(&list->lock);
-+        list->list = NULL;
-+    }
-+}
-+
-+void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t value)
-+{
-+    qemu_mutex_lock(&list->lock);
-+    qlist_append_int(list->list, value);
-+    qemu_mutex_unlock(&list->lock);
-+}
-+
-+int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)
-+{
-+    QObject *obj;
-+
-+    qemu_mutex_lock(&list->lock);
-+    obj = qlist_pop(list->list);
-+    qemu_mutex_unlock(&list->lock);
-+
-+    if (!obj) {
-+        return -ENOENT;
-+    }
-+
-+    return qnum_get_uint(qobject_to(QNum, obj));
-+}
-diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-index acd148837f..a8bf1d4fec 100644
---- a/hw/rdma/rdma_utils.h
-+++ b/hw/rdma/rdma_utils.h
-@@ -29,8 +29,17 @@
- #define rdma_info_report(fmt, ...) \
-     info_report("%s: " fmt, "rdma", ## __VA_ARGS__)
+     fini_ports(dev_res, backend_dev, ifname);
  
-+typedef struct RdmaProtectedQList {
+     res_tbl_free(&dev_res->uc_tbl);
+diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+index 0ba61d1838..f0ee1f3072 100644
+--- a/hw/rdma/rdma_rm_defs.h
++++ b/hw/rdma/rdma_rm_defs.h
+@@ -105,6 +105,7 @@ typedef struct RdmaDeviceResources {
+     RdmaRmResTbl cq_tbl;
+     RdmaRmResTbl cqe_ctx_tbl;
+     GHashTable *qp_hash; /* Keeps mapping between real and emulated */
 +    QemuMutex lock;
-+    QList *list;
-+} RdmaProtectedQList;
-+
- void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
- void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
-+void rdma_protected_qlist_init(RdmaProtectedQList *list);
-+void rdma_protected_qlist_destroy(RdmaProtectedQList *list);
-+void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t value);
-+int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list);
+ } RdmaDeviceResources;
  
- static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
- {
+ #endif
 -- 
 2.17.1
