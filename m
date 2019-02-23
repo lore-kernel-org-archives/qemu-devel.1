@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55582)
+Received: from eggs.gnu.org ([209.51.188.92]:55611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gxKqG-0008Tr-Ev
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:06:57 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gxKqO-000076-5Z
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:07:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gxKqA-0001Oh-Sg
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:06:52 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gxKqL-0001W5-Jn
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:07:03 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 22 Feb 2019 19:06:05 -0500
-Message-Id: <20190223000614.13894-2-jsnow@redhat.com>
+Date: Fri, 22 Feb 2019 19:06:08 -0500
+Message-Id: <20190223000614.13894-5-jsnow@redhat.com>
 In-Reply-To: <20190223000614.13894-1-jsnow@redhat.com>
 References: <20190223000614.13894-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/10] block/dirty-bitmap: add recording and
- busy properties
+Subject: [Qemu-devel] [PATCH v3 04/10] block/dirty-bitmap: change semantics
+ of enabled predicate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,249 +23,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, libvir-list@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
 
-The current API allows us to report a single status, which we've defined as:
+Currently, the enabled predicate means something like:
+"the QAPI status of the bitmap is ACTIVE."
+After this patch, it should mean exclusively:
+"This bitmap is recording guest writes, and is allowed to do so."
 
-Frozen: has a successor, treated as qmp_locked, may or may not be enabled.
-Locked: no successor, qmp_locked. may or may not be enabled.
-Disabled: Not frozen or locked, disabled.
-Active: Not frozen, locked, or disabled.
+In many places, this is how this predicate was already used.
+Internal usages of the bitmap QPI can call user_locked to find out if
+the bitmap is in use by an operation.
 
-The problem is that both "Frozen" and "Locked" mean nearly the same thing,
-and that both of them do not intuit whether they are recording guest writes
-or not.
+To accommodate this, modify the create_successor routine to now
+explicitly disable the parent bitmap at creation time.
 
-This patch deprecates that status field and introduces two orthogonal
-properties instead to replace it.
+
+Justifications:
+
+1. bdrv_dirty_bitmap_status suffers no change from the lack of
+   1:1 parity with the new predicates because of the order in which
+   the predicates are checked. This is now only for compatibility.
+
+2. bdrv_set_dirty() is unchanged: pre-patch, it was skipping bitmaps that were
+   disabled or had a successor, while post-patch it is only skipping bitmaps
+   that are disabled. To accommodate this, create_successor now ensures that
+   any bitmap with a successor is explicitly disabled.
+
+3. qcow2_store_persistent_dirty_bitmaps: No functional change. This function
+   cares only about the literal enabled bit, and makes no effort to check if
+   the bitmap is in-use or not. After this patch there are still no ways to
+   produce an enabled bitmap with a successor.
+
+4. block_dirty_bitmap_enable_prepare
+   block_dirty_bitmap_disable_prepare
+   init_dirty_bitmap_migration
+   nbd_export_new
+
+   These functions care about the literal enabled bit,
+   and already check user_locked separately.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c       |  9 +++++++++
- qapi/block-core.json       | 10 +++++++++-
- qemu-deprecated.texi       |  6 ++++++
- tests/qemu-iotests/236.out | 28 ++++++++++++++++++++++++++++
- 4 files changed, 52 insertions(+), 1 deletion(-)
+ block/dirty-bitmap.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index c6d4acebfa..101383b3af 100644
+index 9ea5738420..976831e765 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -226,6 +226,13 @@ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
-     }
+@@ -209,7 +209,7 @@ bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap)
+ /* Called with BQL taken.  */
+ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
+ {
+-    return !(bitmap->disabled || bitmap->successor);
++    return !bitmap->disabled;
  }
  
-+/* Called with BQL taken.  */
-+static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
-+{
-+    return !bitmap->disabled || (bitmap->successor &&
-+                                 !bitmap->successor->disabled);
-+}
-+
+ /* Called with BQL taken.  */
+@@ -236,6 +236,7 @@ static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
  /**
   * Create a successor bitmap destined to replace this bitmap after an operation.
-  * Requires that the bitmap is not frozen and has no successor.
-@@ -448,6 +455,8 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
-         info->has_name = !!bm->name;
-         info->name = g_strdup(bm->name);
-         info->status = bdrv_dirty_bitmap_status(bm);
-+        info->recording = bdrv_dirty_bitmap_recording(bm);
-+        info->busy = bdrv_dirty_bitmap_user_locked(bm);
-         info->persistent = bm->persistent;
-         entry->value = info;
-         *plist = entry;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 2b8afbb924..6e543594b3 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -458,7 +458,14 @@
- #
- # @granularity: granularity of the dirty bitmap in bytes (since 1.4)
- #
--# @status: current status of the dirty bitmap (since 2.4)
-+# @status: Deprecated in favor of @recording and @locked. (since 2.4)
-+#
-+# @recording: true if the bitmap is recording new writes from the guest.
-+#             Replaces `active` and `disabled` statuses. (since 4.0)
-+#
-+# @busy: true if the bitmap is in-use by some operation (NBD or jobs)
-+#        and cannot be modified via QMP or used by another operation.
-+#        Replaces `locked` and `frozen` statuses. (since 4.0)
- #
- # @persistent: true if the bitmap will eventually be flushed to persistent
- #              storage (since 4.0)
-@@ -467,6 +474,7 @@
- ##
- { 'struct': 'BlockDirtyInfo',
-   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
-+           'recording': 'bool', 'busy': 'bool',
-            'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
+  * Requires that the bitmap is not user_locked and has no successor.
++ * The successor will be enabled if the parent bitmap was.
+  * Called with BQL taken.
+  */
+ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+@@ -264,6 +265,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
  
- ##
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 45c57952da..4c7ae8180f 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -67,6 +67,12 @@ topologies described with -smp include all possible cpus, i.e.
- "autoload" parameter is now ignored. All bitmaps are automatically loaded
- from qcow2 images.
+     /* Successor will be on or off based on our current state. */
+     child->disabled = bitmap->disabled;
++    bitmap->disabled = true;
  
-+@subsection query-block result field(s) dirty-bitmaps[i].status (since 4.0)
+     /* Install the successor and freeze the parent */
+     bitmap->successor = child;
+@@ -328,7 +330,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+ /**
+  * In cases of failure where we can no longer safely delete the parent,
+  * we may wish to re-join the parent and child/successor.
+- * The merged parent will not be user_locked, nor explicitly re-enabled.
++ * The merged parent will not be user_locked.
++ * The marged parent will be enabled if and only if the successor was enabled.
+  * Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.
+  */
+ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+@@ -346,6 +349,8 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+         error_setg(errp, "Merging of parent and successor bitmap failed");
+         return NULL;
+     }
 +
-+The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
-+the query-block command is deprecated. Two new boolean fields,
-+``recording'' and ``busy'' effectively replace it.
-+
- @subsection query-cpus (since 2.12.0)
++    parent->disabled = successor->disabled;
+     bdrv_release_dirty_bitmap_locked(successor);
+     parent->successor = NULL;
  
- The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
-diff --git a/tests/qemu-iotests/236.out b/tests/qemu-iotests/236.out
-index 5006f7bca1..815cd053f0 100644
---- a/tests/qemu-iotests/236.out
-+++ b/tests/qemu-iotests/236.out
-@@ -22,17 +22,21 @@ write -P0xcd 0x3ff0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": true,
-         "status": "active"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": true,
-         "status": "active"
-       }
-     ]
-@@ -84,17 +88,21 @@ write -P0xcd 0x3ff0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": true,
-         "status": "active"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": true,
-         "status": "active"
-       }
-     ]
-@@ -184,24 +192,30 @@ write -P0xea 0x3fe0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 393216,
-         "granularity": 65536,
-         "name": "bitmapC",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 458752,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       }
-     ]
-@@ -251,24 +265,30 @@ write -P0xea 0x3fe0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 393216,
-         "granularity": 65536,
-         "name": "bitmapC",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 458752,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       }
-     ]
-@@ -311,31 +331,39 @@ write -P0xea 0x3fe0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 458752,
-         "granularity": 65536,
-         "name": "bitmapD",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 393216,
-         "granularity": 65536,
-         "name": "bitmapC",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 458752,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       }
-     ]
 -- 
 2.17.2
