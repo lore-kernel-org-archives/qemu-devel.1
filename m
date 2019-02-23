@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34850)
+Received: from eggs.gnu.org ([209.51.188.92]:41658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gxL5F-0000Fy-QK
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:22:26 -0500
+	(envelope-from <randrianasulu@gmail.com>) id 1gxLLX-0004U5-QS
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gxL5E-0004X0-Ov
-	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:22:25 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Fri, 22 Feb 2019 19:22:09 -0500
-Message-Id: <20190223002209.23084-5-jsnow@redhat.com>
-In-Reply-To: <20190223002209.23084-1-jsnow@redhat.com>
-References: <20190223002209.23084-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] block/dirty-bitmaps: implement
- inconsistent bit
+	(envelope-from <randrianasulu@gmail.com>) id 1gxLLW-0008FZ-Q1
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:39:15 -0500
+Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:44312)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
+	id 1gxLLW-0008Eh-Hu
+	for qemu-devel@nongnu.org; Fri, 22 Feb 2019 19:39:14 -0500
+Received: by mail-pf1-x433.google.com with SMTP id a3so1813823pff.11
+	for <qemu-devel@nongnu.org>; Fri, 22 Feb 2019 16:39:14 -0800 (PST)
+Received: from [192.168.1.103] ([176.116.252.109])
+	by smtp.gmail.com with ESMTPSA id
+	b85sm5945740pfj.56.2019.02.22.16.39.11 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 22 Feb 2019 16:39:11 -0800 (PST)
+From: Andrew Randrianasulu <randrianasulu@gmail.com>
+Date: Sat, 23 Feb 2019 03:35:59 +0300
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <201902230335.59138.randrianasulu@gmail.com>
+Subject: [Qemu-devel] Build error with git commit
+ 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62be116 on x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,156 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
 
-Set the inconsistent bit on load instead of rejecting such bitmaps.
-There is no way to un-set it; the only option is to delete it.
+Hello!
 
-Obvervations:
-- bitmap loading does not need to update the header for in_use bitmaps.
-- inconsistent bitmaps don't need to have their data loaded; they're
-  glorified corruption sentinels.
-- bitmap saving does not need to save inconsistent bitmaps back to disk.
-- bitmap reopening DOES need to drop the readonly flag from inconsistent
-  bitmaps to allow reopening of qcow2 files with non-qemu-owned bitmaps
-  being eventually flushed back to disk.
+I just pulled latest git
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/qcow2-bitmap.c | 77 +++++++++++++++++++++++---------------------
- 1 file changed, 40 insertions(+), 37 deletions(-)
+up to 
+commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62be116 (HEAD -> master, origin/master, 
+origin/HEAD)
+Merge: a05838cb2a 2b6326c0bf
+Author: Peter Maydell <peter.maydell@linaro.org>
+Date:   Fri Feb 22 15:48:04 2019 +0000
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 3ee524da4b..d1cc11da88 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -343,9 +343,15 @@ static BdrvDirtyBitmap *load_bitmap(BlockDriverState *bs,
-     uint32_t granularity;
-     BdrvDirtyBitmap *bitmap = NULL;
- 
-+    granularity = 1U << bm->granularity_bits;
-+    bitmap = bdrv_create_dirty_bitmap(bs, granularity, bm->name, errp);
-+    if (bitmap == NULL) {
-+        goto fail;
-+    }
-+
-     if (bm->flags & BME_FLAG_IN_USE) {
--        error_setg(errp, "Bitmap '%s' is in use", bm->name);
--        goto fail;
-+        /* Data is unusable, skip loading it */
-+        return bitmap;
-     }
- 
-     ret = bitmap_table_load(bs, &bm->table, &bitmap_table);
-@@ -356,12 +362,6 @@ static BdrvDirtyBitmap *load_bitmap(BlockDriverState *bs,
-         goto fail;
-     }
- 
--    granularity = 1U << bm->granularity_bits;
--    bitmap = bdrv_create_dirty_bitmap(bs, granularity, bm->name, errp);
--    if (bitmap == NULL) {
--        goto fail;
--    }
--
-     ret = load_bitmap_data(bs, bitmap_table, bm->table.size, bitmap);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Could not read bitmap '%s' from image",
-@@ -949,6 +949,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-     Qcow2Bitmap *bm;
-     GSList *created_dirty_bitmaps = NULL;
-     bool header_updated = false;
-+    bool needs_update = false;
- 
-     if (s->nb_bitmaps == 0) {
-         /* No bitmaps - nothing to do */
-@@ -962,23 +963,27 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-     }
- 
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
--        if (!(bm->flags & BME_FLAG_IN_USE)) {
--            BdrvDirtyBitmap *bitmap = load_bitmap(bs, bm, errp);
--            if (bitmap == NULL) {
--                goto fail;
--            }
-+        BdrvDirtyBitmap *bitmap = load_bitmap(bs, bm, errp);
-+        if (bitmap == NULL) {
-+            goto fail;
-+        }
- 
--            if (!(bm->flags & BME_FLAG_AUTO)) {
--                bdrv_disable_dirty_bitmap(bitmap);
--            }
--            bdrv_dirty_bitmap_set_persistance(bitmap, true);
-+        if (bm->flags & BME_FLAG_IN_USE) {
-+            bdrv_dirty_bitmap_set_inconsistent(bitmap);
-+        } else {
-+            /* NB: updated flags only get written if can_write(bs) is true. */
-             bm->flags |= BME_FLAG_IN_USE;
--            created_dirty_bitmaps =
--                    g_slist_append(created_dirty_bitmaps, bitmap);
-+            needs_update = true;
-         }
-+        if (!(bm->flags & BME_FLAG_AUTO)) {
-+            bdrv_disable_dirty_bitmap(bitmap);
-+        }
-+        bdrv_dirty_bitmap_set_persistance(bitmap, true);
-+        created_dirty_bitmaps =
-+            g_slist_append(created_dirty_bitmaps, bitmap);
-     }
- 
--    if (created_dirty_bitmaps != NULL) {
-+    if (needs_update) {
-         if (can_write(bs)) {
-             /* in_use flags must be updated */
-             int ret = update_ext_header_and_dir_in_place(bs, bm_list);
-@@ -1112,23 +1117,21 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-     }
- 
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
--        if (!(bm->flags & BME_FLAG_IN_USE)) {
--            BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
--            if (bitmap == NULL) {
--                continue;
--            }
--
--            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
--                error_setg(errp, "Bitmap %s is not readonly but not marked"
--                                 "'IN_USE' in the image. Something went wrong,"
--                                 "all the bitmaps may be corrupted", bm->name);
--                ret = -EINVAL;
--                goto out;
--            }
-+        BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
-+        if (bitmap == NULL) {
-+            continue;
-+        }
- 
--            bm->flags |= BME_FLAG_IN_USE;
--            ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
-+        if (!bdrv_dirty_bitmap_readonly(bitmap)) {
-+            error_setg(errp, "Bitmap %s was loaded prior to rw-reopen, but was "
-+                       "not marked as readonly. This is a bug, something went "
-+                       "wrong. All of the bitmaps may be corrupted", bm->name);
-+            ret = -EINVAL;
-+            goto out;
-         }
-+
-+        bm->flags |= BME_FLAG_IN_USE;
-+        ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
-     }
- 
-     if (ro_dirty_bitmaps != NULL) {
-@@ -1424,8 +1427,8 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-         Qcow2Bitmap *bm;
- 
-         if (!bdrv_dirty_bitmap_get_persistance(bitmap) ||
--            bdrv_dirty_bitmap_readonly(bitmap))
--        {
-+            bdrv_dirty_bitmap_readonly(bitmap) ||
-+            bdrv_dirty_bitmap_inconsistent(bitmap)) {
-             continue;
-         }
- 
--- 
-2.17.2
+    Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20190221.0' 
+into staging
+
+    VFIO updates 2019-02-21
+
+     - Workaround kernel overflow bug in vfio type1 DMA unmap
+       (Alex Williamson)
+
+     - Refactor vfio container initialization (Eric Auger)
+
+    # gpg: Signature made Fri 22 Feb 2019 05:21:07 GMT
+    # gpg:                using RSA key 239B9B6E3BB08B22
+    # gpg: Good signature from "Alex Williamson <alex.williamson@redhat.com>" 
+[full]
+    # gpg:                 aka "Alex Williamson <alex@shazbot.org>" [full]
+    # gpg:                 aka "Alex Williamson <alwillia@redhat.com>" [full]
+    # gpg:                 aka "Alex Williamson <alex.l.williamson@gmail.com>" 
+[full]
+    # Primary key fingerprint: 42F6 C04E 540B D1A9 9E7B  8A90 239B 9B6E 3BB0 
+8B22
+
+    * remotes/awilliam/tags/vfio-updates-20190221.0:
+      hw/vfio/common: Refactor container initialization
+      vfio/common: Work around kernel overflow bug in DMA unmap
+
+    Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+-----------------
+
+and default build with simple ./configure on slackware 14.2 x86-64 box failed 
+like this:
+
+root@slax:~/src/qemu# LANG=C make -j 5
+        CHK version_gen.h
+  CC      qobject/block-qdict.o
+  CC      util/thread-pool.o
+  CC      util/main-loop.o
+  CC      util/qemu-timer.o
+  CC      util/iohandler.o
+  CC      util/aio-posix.o
+qobject/block-qdict.c: In function 'qdict_array_split':
+qobject/block-qdict.c:259:9: error: 'subqdict' may be used uninitialized in this 
+function [-Werror=maybe-uninitialized]
+         qlist_append_obj(*dst, subqobj ?: QOBJECT(subqdict));
+         ^
+  CC      util/compatfd.o
+  CC      util/event_notifier-posix.o
+cc1: all warnings being treated as errors
+/root/src/qemu/rules.mak:69: recipe for target 'qobject/block-qdict.o' failed
+make: *** [qobject/block-qdict.o] Error 1
+make: *** Waiting for unfinished jobs....
+----------------
+
+ LANG=C gcc --version
+gcc (GCC) 5.5.0
+Copyright (C) 2015 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+---------------
