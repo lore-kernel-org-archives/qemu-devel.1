@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57726)
+Received: from eggs.gnu.org ([209.51.188.92]:57780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gxS5A-0005N7-DW
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:50:49 -0500
+	(envelope-from <thuth@redhat.com>) id 1gxS5B-0005Nu-Tm
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:50:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gxS57-0002vJ-Um
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:50:47 -0500
+	(envelope-from <thuth@redhat.com>) id 1gxS5B-0002x8-94
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:50:49 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Sat, 23 Feb 2019 08:49:16 +0100
-Message-Id: <1550908162-22644-25-git-send-email-thuth@redhat.com>
+Date: Sat, 23 Feb 2019 08:49:21 +0100
+Message-Id: <1550908162-22644-30-git-send-email-thuth@redhat.com>
 In-Reply-To: <1550908162-22644-1-git-send-email-thuth@redhat.com>
 References: <1550908162-22644-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 24/30] hw/arm: Express dependencies of the
- MSF2 / EMCRAFT_SF2 machine with Kconfig
+Subject: [Qemu-devel] [PATCH v3 29/30] hw/arm: Express dependencies of the
+ musca machines with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,104 +23,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Add Kconfig dependencies for the emcraft-sf2 machine - we also
-distinguish between the machine (CONFIG_EMCRAFT_SF2) and the SoC
-(CONFIG_MSF2) now.
+Dependencies have been determined with trial-and-error and by
+looking at the musca.c source file.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak |  3 +--
- hw/arm/Kconfig                  | 12 ++++++++++--
- hw/arm/Makefile.objs            |  3 ++-
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ hw/arm/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 9150858..a01e407 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -31,9 +31,9 @@ CONFIG_MPS2=y
- CONFIG_RASPI=y
- CONFIG_DIGIC=y
- CONFIG_SABRELITE=y
-+CONFIG_EMCRAFT_SF2=y
- 
- CONFIG_VGA=y
--CONFIG_SSI_M25P80=y
- CONFIG_IMX_FEC=y
- 
- CONFIG_NRF51_SOC=y
-@@ -46,5 +46,4 @@ CONFIG_PCIE_PORT=y
- CONFIG_XIO3130=y
- CONFIG_IOH3420=y
- CONFIG_I82801B11=y
--CONFIG_MSF2=y
- CONFIG_PCI_EXPRESS_DESIGNWARE=y
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 8418047..9495e7f 100644
+index 06e9e9a..8105587 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -331,7 +331,6 @@ config MPS2
-     select MPS2_SCC
-     select PL022    # Serial port
-     select PL080    # DMA controller
--    select TZ_MPC
+@@ -79,6 +79,9 @@ config MAINSTONE
  
- config IOTKIT
+ config MUSCA
      bool
-@@ -348,9 +347,17 @@ config FSL_IMX6UL
- config NRF51_SOC
-     bool
++    select ARMSSE
++    select PL011
++    select PL031
  
-+config EMCRAFT_SF2
-+    bool
-+    select MSF2
-+    select SSI_M25P80
-+
- config MSF2
+ config MUSICPAL
      bool
-+    select ARM_V7M
-     select PTIMER
-+    select SERIAL
-+    select SSI
- 
- config ZAURUS
-     bool
-@@ -375,13 +382,14 @@ config ARM11MPCORE
- config ARMSSE
-     bool
-     select ARMSSE_CPUID
--    select CMSDK_APB_TIMER
-     select CMSDK_APB_DUALTIMER
-+    select CMSDK_APB_TIMER
-     select CMSDK_APB_UART
-     select CMSDK_APB_WATCHDOG
-     select IOTKIT_SECCTL
-     select IOTKIT_SYSCTL
-     select IOTKIT_SYSINFO
-+    select TZ_MPC
-     select TZ_MSC
-     select TZ_PPC
- 
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index fadd698..eae9f6c 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -4,6 +4,7 @@ obj-$(CONFIG_ARM_VIRT) += virt.o
- obj-$(CONFIG_ACPI) += virt-acpi-build.o
- obj-$(CONFIG_DIGIC) += digic_boards.o
- obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
-+obj-$(CONFIG_EMCRAFT_SF2) += msf2-som.o
- obj-$(CONFIG_HIGHBANK) += highbank.o
- obj-$(CONFIG_INTEGRATOR) += integratorcp.o
- obj-$(CONFIG_MAINSTONE) += mainstone.o
-@@ -41,7 +42,7 @@ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
- obj-$(CONFIG_MPS2) += mps2-tz.o
--obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-+obj-$(CONFIG_MSF2) += msf2-soc.o
- obj-$(CONFIG_MUSCA) += musca.o
- obj-$(CONFIG_ARMSSE) += armsse.o
- obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
 -- 
 1.8.3.1
