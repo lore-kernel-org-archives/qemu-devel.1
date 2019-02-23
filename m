@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57197)
+Received: from eggs.gnu.org ([209.51.188.92]:57258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gxS4B-0004Wx-O4
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:49:49 -0500
+	(envelope-from <thuth@redhat.com>) id 1gxS4H-0004cH-Ec
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:49:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gxS4A-0001vS-RR
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:49:47 -0500
+	(envelope-from <thuth@redhat.com>) id 1gxS4F-00020D-IV
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 02:49:53 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Sat, 23 Feb 2019 08:48:58 +0100
-Message-Id: <1550908162-22644-7-git-send-email-thuth@redhat.com>
+Date: Sat, 23 Feb 2019 08:49:02 +0100
+Message-Id: <1550908162-22644-11-git-send-email-thuth@redhat.com>
 In-Reply-To: <1550908162-22644-1-git-send-email-thuth@redhat.com>
 References: <1550908162-22644-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 06/30] hw/arm: Express dependencies of the
- highbank machines with Kconfig
+Subject: [Qemu-devel] [PATCH v3 10/30] hw/arm: Express dependencies of the
+ OMAP machines with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +26,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Add Kconfig dependencies for the highbank machine (and the midway
-machine).
+Add Kconfig dependencies for the OMAP machines (cheetah, n800, n810,
+sx1 and sx1-v1).
 This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
 e.
 his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak |  9 +--------
- hw/arm/Kconfig                  | 12 ++++++++++++
- 2 files changed, 13 insertions(+), 8 deletions(-)
+ default-configs/arm-softmmu.mak | 17 ++++-------------
+ hw/arm/Kconfig                  | 26 ++++++++++++++++++++++++++
+ hw/arm/Makefile.objs            |  3 ++-
+ 3 files changed, 32 insertions(+), 14 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 67fc8df..c91f526 100644
+index c8eafb1..e0818f1 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -6,6 +6,7 @@ CONFIG_ARM_V7M=3Dy
- CONFIG_PCI_DEVICES=3Dy
-=20
- CONFIG_EXYNOS4=3Dy
-+CONFIG_HIGHBANK=3Dy
+@@ -10,16 +10,16 @@ CONFIG_HIGHBANK=3Dy
+ CONFIG_INTEGRATOR=3Dy
+ CONFIG_FSL_IMX31=3Dy
+ CONFIG_MUSICPAL=3Dy
++CONFIG_MUSCA=3Dy
++CONFIG_CHEETAH=3Dy
++CONFIG_SX1=3Dy
++CONFIG_NSERIES=3Dy
 =20
  CONFIG_VGA=3Dy
  CONFIG_NAND=3Dy
-@@ -43,24 +44,17 @@ CONFIG_PLATFORM_BUS=3Dy
+ CONFIG_ECC=3Dy
+ CONFIG_SERIAL=3Dy
+ CONFIG_MAX7310=3Dy
+-CONFIG_TWL92230=3Dy
+-CONFIG_TSC2005=3Dy
+-CONFIG_LM832X=3Dy
+-CONFIG_TMP105=3Dy
+ CONFIG_TMP421=3Dy
+ CONFIG_PCA9552=3Dy
+ CONFIG_STELLARIS=3Dy
+@@ -37,9 +37,7 @@ CONFIG_ALLWINNER_EMAC=3Dy
+ CONFIG_IMX_FEC=3Dy
+ CONFIG_FTGMAC100=3Dy
+ CONFIG_DS1338=3Dy
+-CONFIG_PFLASH_CFI01=3Dy
+ CONFIG_MICRODRIVE=3Dy
+-CONFIG_USB_MUSB=3Dy
+ CONFIG_PLATFORM_BUS=3Dy
  CONFIG_VIRTIO_MMIO=3Dy
 =20
- CONFIG_ARM11MPCORE=3Dy
--CONFIG_A15MPCORE=3Dy
+@@ -59,15 +57,8 @@ CONFIG_ZYNQ_DEVCFG=3Dy
 =20
- CONFIG_NETDUINO2=3Dy
-=20
--CONFIG_ARM_TIMER=3Dy
--CONFIG_PL011=3Dy
--CONFIG_PL022=3Dy
--CONFIG_PL031=3Dy
- CONFIG_PL041=3Dy
- CONFIG_PL050=3Dy
--CONFIG_PL061=3Dy
- CONFIG_PL080=3Dy
- CONFIG_PL110=3Dy
- CONFIG_PL181=3Dy
- CONFIG_PL190=3Dy
- CONFIG_PL330=3Dy
- CONFIG_CADENCE=3Dy
--CONFIG_XGMAC=3Dy
- CONFIG_PXA2XX=3Dy
- CONFIG_BITBANG_I2C=3Dy
- CONFIG_FRAMEBUFFER=3Dy
-@@ -150,7 +144,6 @@ CONFIG_XILINX_AXI=3Dy
- CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
-=20
- CONFIG_STRONGARM=3Dy
--CONFIG_HIGHBANK=3Dy
- CONFIG_MUSICPAL=3Dy
-=20
- # for realview and versatilepb
+ CONFIG_ARM11SCU=3Dy
+ CONFIG_DIGIC=3Dy
+-CONFIG_OMAP=3Dy
+-CONFIG_TSC210X=3Dy
+-CONFIG_BLIZZARD=3Dy
+-CONFIG_ONENAND=3Dy
+-CONFIG_TUSB6010=3Dy
+ CONFIG_MAINSTONE=3Dy
+ CONFIG_MPS2=3Dy
+-CONFIG_MUSCA=3Dy
+-CONFIG_NSERIES=3Dy
+ CONFIG_RASPI=3Dy
+ CONFIG_REALVIEW=3Dy
+ CONFIG_ZAURUS=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 9d86b16..aea7301 100644
+index ece2962..af559be 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -18,6 +18,18 @@ config EXYNOS4
-=20
- config HIGHBANK
+@@ -1,6 +1,11 @@
+ config ARM_VIRT
      bool
-+    select A9MPCORE
-+    select A15MPCORE
-+    select AHCI
-+    select ARM_TIMER # sp804
-+    select ARM_V7M
+=20
++config CHEETAH
++    bool
++    select OMAP
++    select TSC210X
++
+ config DIGIC
+     bool
+     select PTIMER
+@@ -64,9 +69,26 @@ config NETDUINO2
+=20
+ config NSERIES
+     bool
++    select OMAP
++    select TMP105   # tempature sensor
++    select BLIZZARD # LCD/TV controller
++    select ONENAND
++    select TSC210X  # touchscreen/sensors/audio
++    select TSC2005  # touchscreen/sensors/keypad
++    select LM832X   # GPIO keyboard chip
++    select TWL92230 # energy-management
++    select TUSB6010
+=20
+ config OMAP
+     bool
++    select FRAMEBUFFER
++    select I2C
++    select ECC
++    select NAND
++    select PFLASH_CFI01
 +    select PCI
-+    select PL011 # UART
-+    select PL022 # Serial port
-+    select PL031 # RTC
-+    select PL061 # GPIO
-+    select PL310 # cache controller
-+    select XGMAC # ethernet
++    select SD
++    select SERIAL
 =20
- config INTEGRATOR
+ config PXA2XX
      bool
+@@ -80,6 +102,10 @@ config STELLARIS
+ config STRONGARM
+     bool
+=20
++config SX1
++    bool
++    select OMAP
++
+ config VERSATILE
+     bool
+=20
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index fa57c7c..8302b8d 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -9,7 +9,8 @@ obj-$(CONFIG_MAINSTONE) +=3D mainstone.o
+ obj-$(CONFIG_MUSICPAL) +=3D musicpal.o
+ obj-$(CONFIG_NETDUINO2) +=3D netduino2.o
+ obj-$(CONFIG_NSERIES) +=3D nseries.o
+-obj-$(CONFIG_OMAP) +=3D omap_sx1.o palm.o
++obj-$(CONFIG_SX1) +=3D omap_sx1.o
++obj-$(CONFIG_CHEETAH) +=3D palm.o
+ obj-$(CONFIG_PXA2XX) +=3D gumstix.o spitz.o tosa.o z2.o
+ obj-$(CONFIG_REALVIEW) +=3D realview.o
+ obj-$(CONFIG_STELLARIS) +=3D stellaris.o
 --=20
 1.8.3.1
