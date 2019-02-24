@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37043)
+Received: from eggs.gnu.org ([209.51.188.92]:37045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gy3L0-0002bk-D4
+	(envelope-from <dgibson@ozlabs.org>) id 1gy3L0-0002bl-F0
 	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 18:37:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gy3Kz-0003Lo-3N
+	(envelope-from <dgibson@ozlabs.org>) id 1gy3Kz-0003Ly-CU
 	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 18:37:38 -0500
-Date: Mon, 25 Feb 2019 10:37:11 +1100
+Received: from ozlabs.org ([203.11.71.1]:47975)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gy3Kw-0003It-Le
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 18:37:37 -0500
+Date: Mon, 25 Feb 2019 10:31:42 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190224233711.GD7668@umbus.fritz.box>
-References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
-	<20190214043916.22128-3-david@gibson.dropbear.id.au>
-	<20190222100822.73515a4d@bahia.lan>
+Message-ID: <20190224233142.GC7668@umbus.fritz.box>
+References: <20190222055950.17403-1-richard.henderson@linaro.org>
+	<a46631f2-fc78-2f06-09f0-25b2563af52d@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="osDK9TLjxFScVI/L"
+	protocol="application/pgp-signature"; boundary="IpbVkmxF4tDyP/Kb"
 Content-Disposition: inline
-In-Reply-To: <20190222100822.73515a4d@bahia.lan>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/5] virtio-balloon: Corrections
- to address verification
+In-Reply-To: <a46631f2-fc78-2f06-09f0-25b2563af52d@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH] tcg/ppc: Add vector opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, qemu-ppc@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
 
---osDK9TLjxFScVI/L
+--IpbVkmxF4tDyP/Kb
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 22, 2019 at 10:08:22AM +0100, Greg Kurz wrote:
-> On Thu, 14 Feb 2019 15:39:13 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Fri, Feb 22, 2019 at 05:13:37PM +0000, Mark Cave-Ayland wrote:
+> On 22/02/2019 05:59, Richard Henderson wrote:
 >=20
-> > The virtio-balloon device's verification of the address given to it by =
-the
-> > guest has a number of faults:
-> >     * The addresses here are guest physical addresses, which should be
-> >       'hwaddr' rather than 'ram_addr_t' (the distinction is admittedly
-> >       pretty subtle and confusing)
-> >     * We don't check for section.mr being NULL, which is the main way t=
-hat
-> >       memory_region_find() reports basic failures.  We really need to c=
-heck
-> >       that before looking at any other section fields, because
-> >       memory_region_find() doesn't initialize them on the failure path
-> >     * We're passing a length of '1' to memory_region_find(), but really=
- the
-> >       guest is requesting that we put the entire page into the balloon,
-> >       so it makes more sense to call it with BALLOON_PAGE_SIZE
+> > This requires VSX, not just Altivec, so Power7 or later.
 > >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > > ---
-> >  hw/virtio/virtio-balloon.c | 17 ++++++++++-------
-> >  1 file changed, 10 insertions(+), 7 deletions(-)
 > >=20
-> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> > index 43af521884..eb357824d8 100644
-> > --- a/hw/virtio/virtio-balloon.c
-> > +++ b/hw/virtio/virtio-balloon.c
-> > @@ -221,17 +221,20 @@ static void virtio_balloon_handle_output(VirtIODe=
-vice *vdev, VirtQueue *vq)
-> >          }
-> > =20
-> >          while (iov_to_buf(elem->out_sg, elem->out_num, offset, &pfn, 4=
-) =3D=3D 4) {
-> > -            ram_addr_t pa;
-> > -            ram_addr_t addr;
-> > +            hwaddr pa;
-> > +            hwaddr addr;
-> >              int p =3D virtio_ldl_p(vdev, &pfn);
-> > =20
-> > -            pa =3D (ram_addr_t) p << VIRTIO_BALLOON_PFN_SHIFT;
-> > +            pa =3D (hwaddr) p << VIRTIO_BALLOON_PFN_SHIFT;
-> >              offset +=3D 4;
-> > =20
-> > -            /* FIXME: remove get_system_memory(), but how? */
-> > -            section =3D memory_region_find(get_system_memory(), pa, 1);
-> > -            if (!int128_nz(section.size) ||
-> > -                !memory_region_is_ram(section.mr) ||
-> > +            section =3D memory_region_find(get_system_memory(), pa,
-> > +                                         BALLOON_PAGE_SIZE);
-> > +            if (!section.mr) {
-> > +                trace_virtio_balloon_bad_addr(pa);
-> > +                continue;
-> > +            }
+> > At present there are no tunables that can avoid the 64-bit element
+> > load/store requirement.  As with requiring AVX1 for x86 hosts, I'm
+> > not sure it's worth inventing such a tunable for pre-power7 hosts.
+> >=20
+> > Tested vs aarch64 risu test cases.  It's probably worth testing
+> > this vs Mark's target/ppc conversion.
 >=20
-> memory_region_unref(section.mr) with section.mr =3D=3D NULL is safe and
-> resolves to a nop. Not sure you need a separate if to handle this
-> case.
+> Oooh this looks really exciting! However... I only have a G4 Mac Mini aro=
+und that I
+> use for testing which is Altivec-only :(  Is it much work to support
+> non-VSX hosts?
 
-memory_region_is_ram() and friends are not, however - they will
-dereference their argument unconditionally.
+I have access to POWER8 and POWER9 machines, but I haven't worked with
+RISU before.  If you can give me a straightforward recipe I can try
+running the tests.
 
 >=20
-> Apart from that,
+> This leads me to a related point that came up when Howard and I were test=
+ing the PPC
+> vector patches - how do we know at runtime which optimisations were being=
+ used, e.g.
+> what is the value of have_avx2 on a particular CPU running QEMU?
 >=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Under Linux this isn't too bad since you can just do "cat /proc/cpuinfo |=
+ grep avx2"
+> but it becomes more tricky when getting bug reports from Windows users wh=
+o aren't
+> particularly technical...
 >=20
-> > +            if (!memory_region_is_ram(section.mr) ||
-> >                  memory_region_is_rom(section.mr) ||
-> >                  memory_region_is_romd(section.mr)) {
-> >                  trace_virtio_balloon_bad_addr(pa);
+>=20
+> ATB,
+>=20
+> Mark.
 >=20
 
 --=20
@@ -118,24 +86,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---osDK9TLjxFScVI/L
+--IpbVkmxF4tDyP/Kb
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxzKqcACgkQbDjKyiDZ
-s5I+uA/+OBU3C+aU6Re9845pogF2aT27JBooyD04Zej5Ni12kEnwvwwlbmLAkzEW
-qV2IrYNN7WK7PI/go/K01tbrLvYWwOXZ+hN4AJOWKC/urj4IcyquHXVD5KWF3Vy4
-/IK03lUt8kjiTSptaG15TzaoFU9S9MSAyyt1Ebs/hJk8cr03/Ej+OGEZLRY5tPRQ
-Q3oiw/RAl5v848Fo0YkaG8j5XdqsZmnHpvKISYBrcCxrPCDi/cHoqmtfEVZe1VkX
-3VXp3FsopcxicD/KAD9GMQ9/721r69izl1hbhA4VRE8/u2wTeDPIa57jsBT4/CIh
-oC4nYZhqzRw3itBZHAbZ8MXaaVC8nPBw+8wVaOzqXn+xB/UBRrpu9vOmcdXRRMBq
-wcl7dQjRziszxTKAUTiMMzVWiBfxh3SPP5s2vyyRaiJRCwEKstnHeMmdPrCHKGe0
-OavrdohFGK0zS1nCGKNOkZ5OvbxkWj5hoNI0kTc98hXcyDgT/Mqmo54nCy0Gvla1
-mUz3mq6hh+3DOL8AsZHZ0K8Hlhl53we9Z72RnwM4bcpVmNADKUt7XnS9WqkME/fC
-r3tNmFUg9uqRqdc8qwruEvaNl3DD0HevLed7yLigg8mjVeW6Lvp9xZQp4bpP4vdY
-uDP8B4tlBHpnB0Q6Z+Vo5pcnt7+O6MQP2kqSWnHeOwdMMntAJcs=
-=0758
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxzKV4ACgkQbDjKyiDZ
+s5K3gg/8DPYs0hcU9q1zN4q+eroCfmI5zlHQnE0PpoWFHMyGMzAXE2u6MuaveOEn
+Q996j7BcM03/biG0JBti5YnpSX4UaEx6LBbnlxyswW7hg0NXRXN1Pq1SKezl0vmJ
+mO/b0tWoUrflyBUjH5hWN91EgCxvYMJebLhOl3OQBBnNShP2aB+vpYsJa7TNApFA
+X2HTT2Rd/BgyfIzeyRJcETLvg6pf/a6Pro7PHhwdm0Xe4o/ZcaEhW7r6dhS20UHP
+4JknhDz3TllwHhS3/duPH0aBqQ+MBR6w5AA2PeqcIGq03HIMifdiEV4235WWPma1
+ottOaa0dHnStyvAvVChCZUQXV2t8jOMd6/H3JfUYzA/hxZE1eCJQUKq4hqTfmejG
+9n0QA+c/0lO/1PHh9dc8Y/HT1+h8zH5Lq/MgKOiHPrfed9+cuAsUIt5aDZmkvcKQ
+PsK02ATMdsq0/6HckrMk853Zb6e4mtakLM/Q0wvyDD30F9nfbBClq2yB8npKxdVU
+/KklX9bwOzsu7I8UAAuAJy4gJ2bx9YvR8DxsbFZB86cKopupVAAueGUxoTdu9GYg
+ZWoYoHzUixoeIn3m36F9jwTIC3vx3OkwbNPe7Gg6LaObASMPT/Ecn6MQs97YSJyQ
+vH1r8waDZ/vhkt9hWshqXDjQK+K1Er0c1fGsudQ1ZSaqymaOizQ=
+=Gzmm
 -----END PGP SIGNATURE-----
 
---osDK9TLjxFScVI/L--
+--IpbVkmxF4tDyP/Kb--
