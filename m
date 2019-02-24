@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44065)
+Received: from eggs.gnu.org ([209.51.188.92]:38633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amagdy.afifi@gmail.com>) id 1gxooy-0004NI-Tf
-	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 03:07:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gxqv7-0001L9-Uh
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 05:22:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amagdy.afifi@gmail.com>) id 1gxoox-0002BQ-R1
-	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 03:07:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gxqv7-00027H-7v
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 05:22:05 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:42848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gxqv7-00025Q-1N
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 05:22:05 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id i5so5473906oto.9
+	for <qemu-devel@nongnu.org>; Sun, 24 Feb 2019 02:22:04 -0800 (PST)
 MIME-Version: 1.0
-References: <20190222162555.13764-1-amagdy.afifi@gmail.com>
-	<20190222162555.13764-2-amagdy.afifi@gmail.com>
-	<8f36a26e-7e20-1b9c-18bd-a5ce4b3d9c14@redhat.com>
-In-Reply-To: <8f36a26e-7e20-1b9c-18bd-a5ce4b3d9c14@redhat.com>
-From: Amed Magdy <amagdy.afifi@gmail.com>
-Date: Sun, 24 Feb 2019 10:07:23 +0200
-Message-ID: <CAKV=O7=JK4t7VxQ74LvjVpM9+TQ6MJ0hA9_XX40ud7OEsh30hQ@mail.gmail.com>
+References: <20190221173326.31874-1-mst@redhat.com>
+	<CAFEAcA_Nmo1bpWr5rUmXotB_J9J78wvqB9TU174WWyqt+CEZZw@mail.gmail.com>
+	<20190222105159-mutt-send-email-mst@kernel.org>
+	<20190223193335-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190223193335-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 24 Feb 2019 10:21:52 +0000
+Message-ID: <CAFEAcA87W8VdNSoROcn_wV2UnOQpP7qaLgok6RsbsPLhVvnZ1w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] riscv: Add proper alignment check and
- pending 'C' extension upon misa writes
+Subject: Re: [Qemu-devel] [PULL 00/26] pci, pc, virtio: fixes, cleanups,
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, palmer@sifive.com, mjc@sifive.com, Alistair.Francis@wdc.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Thank you so much, Eric.
+On Sun, 24 Feb 2019 at 00:34, Michael S. Tsirkin <mst@redhat.com> wrote:
+> Peter, can you merge for_upstream now pls? Don't want to spam
+> the list with a trivial change like that ...
 
-Sorry about this unclear description.
-I forgot to fix user name in git configuration before submitting the patch.
+Yes, it's on my list, but so are seven other pullreqs;
+seems like everybody likes to submit on a Friday, so
+sending on a Friday guarantees maximum delay because
+you'll be in a big queue with other people and I don't
+generally handle pullreqs on the weekend either...
 
-Sorry about any inconvenience.
-Thanks,
-Ahmed
+In general I prefer it if you just re-send the cover-letter
+email as a v2 rather than informally asking for a retry: that
+guarantees I'll see it and automatically makes it appear
+in my list of things to process. You don't need to
+resend all the individual patchmails if the change was
+minor.
 
-On Sat, 23 Feb 2019 at 23:46, Eric Blake <eblake@redhat.com> wrote:
-
-> On 2/22/19 10:25 AM, amagdy.afifi@gmail.com wrote:
-> > From: ahmed_magdy <amagdy.afifi@gmail.com>
-> >
-> > Signed-off-by: ahmed_magdy <amagdy.afifi@gmail.com>
->
-> This appears to be your first contribution to qemu. Welcome to the
-> community!
->
-> Typically, a Signed-off-by designation should be a proper name (what you
-> would sign a legal document with, as it has a legal significance on your
-> right to contribute the code).  Using all lowercase and _ instead of
-> space looks like a username, and while I am not one to tell you it can't
-> be a legal name, it is unusual enough to at least raise my suspicions.
->
-> Furthermore, your commit message doesn't give any details beyond the
-> "what" in the subject line. The body of the commit message should
-> explain the "why" (what bug are you fixing, how to reproduce it), so
-> that a reviewer stands a chance of determining if the code matches the
-> description you gave, and if the issue you describe really does warrant
-> the inclusion of your patch.  You gave a brief "why" in your cover letter:
->
-> "I'm submiting this patch to properly check the next instruction
-> alignment and scheduale compression extenstion enable upon 'MISA'
-> register writes to later aligned instruction through exporting next
-> instruction 'pc' to riscv cpu state"
->
-> where it would be wise to include an improved version of that text with
-> this commit proper (since the cover letter does not get applied to git).
->  For that matter, when sending a single patch, a cover letter is
-> optional (it is only mandatory when sending a multi-patch series).
->
-> For more patch submission hints, see:
-> https://wiki.qemu.org/Contribute/SubmitAPatch
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
+thanks
+-- PMM
