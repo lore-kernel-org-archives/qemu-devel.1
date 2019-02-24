@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53506)
+Received: from eggs.gnu.org ([209.51.188.92]:41617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gxvVe-0001DG-DX
-	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 10:16:07 -0500
+	(envelope-from <mst@redhat.com>) id 1gxwqq-0005Td-3O
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 11:42:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gxvVc-0007t1-IT
-	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 10:16:06 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37324)
+	(envelope-from <mst@redhat.com>) id 1gxwqp-0008ME-Ef
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 11:42:04 -0500
+Received: from mail-wm1-f42.google.com ([209.85.128.42]:36873)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gxvVc-0007r6-C1
-	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 10:16:04 -0500
-Received: by mail-wr1-x442.google.com with SMTP id w6so3929806wrs.4
-	for <qemu-devel@nongnu.org>; Sun, 24 Feb 2019 07:15:59 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Sun, 24 Feb 2019 15:15:53 +0000
-Message-Id: <20190224151553.31344-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gxwqp-0008Lj-8h
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 11:42:03 -0500
+Received: by mail-wm1-f42.google.com with SMTP id x10so5896419wmg.2
+	for <qemu-devel@nongnu.org>; Sun, 24 Feb 2019 08:42:02 -0800 (PST)
+Date: Sun, 24 Feb 2019 11:41:58 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190224114135-mutt-send-email-mst@kernel.org>
+References: <20190221173326.31874-1-mst@redhat.com>
+	<CAFEAcA_Nmo1bpWr5rUmXotB_J9J78wvqB9TU174WWyqt+CEZZw@mail.gmail.com>
+	<20190222105159-mutt-send-email-mst@kernel.org>
+	<20190223193335-mutt-send-email-mst@kernel.org>
+	<CAFEAcA87W8VdNSoROcn_wV2UnOQpP7qaLgok6RsbsPLhVvnZ1w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] tests/Makefile.include: test all rounding
- modes of softfloat
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA87W8VdNSoROcn_wV2UnOQpP7qaLgok6RsbsPLhVvnZ1w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/26] pci, pc, virtio: fixes, cleanups,
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-We missed a bug in a recent patch as we were not testing all the
-rounding modes for all operations. However enabling all rounding modes
-for mulAdd does slow down the already slowest test and doesn't really
-buy us much additional coverage so lets allow the default test flags
-to be overridden.
+On Sun, Feb 24, 2019 at 10:21:52AM +0000, Peter Maydell wrote:
+> On Sun, 24 Feb 2019 at 00:34, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > Peter, can you merge for_upstream now pls? Don't want to spam
+> > the list with a trivial change like that ...
+> 
+> Yes, it's on my list, but so are seven other pullreqs;
+> seems like everybody likes to submit on a Friday, so
+> sending on a Friday guarantees maximum delay because
+> you'll be in a big queue with other people and I don't
+> generally handle pullreqs on the weekend either...
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/Makefile.include | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+OK I'll try to switch over to middle of the week.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 060f765b0e..f260014f02 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -898,12 +898,12 @@ $(FP_TEST_BIN):
- # The full test suite can take a bit of time, default to a quick run
- # "-l 2 -r all" can take more than a day for some operations and is best
- # run manually
--FP_TL=-l 1
-+FP_TL=-l 1 -r all
- 
--# $1 = tests, $2 = description
-+# $1 = tests, $2 = description, $3 = test flags
- test-softfloat = $(call quiet-command, \
- 			cd $(BUILD_DIR)/tests/fp && \
--			./fp-test -s $(FP_TL) $1 > $2.out 2>&1 || \
-+			./fp-test -s $(if $3,$3,$(FP_TL)) $1 > $2.out 2>&1 || \
- 			(cat $2.out && exit 1;), \
- 			"FLOAT TEST", $2)
- 
-@@ -984,7 +984,7 @@ check-softfloat-compare: $(SF_COMPARE_RULES)
- check-softfloat-mulAdd: $(FP_TEST_BIN)
- 	$(call test-softfloat, \
- 		f16_mulAdd f32_mulAdd f64_mulAdd f128_mulAdd, \
--		mulAdd)
-+		mulAdd,-l 1)
- 
- # FIXME: extF80_rem (broken)
- check-softfloat-rem: $(FP_TEST_BIN)
+> In general I prefer it if you just re-send the cover-letter
+> email as a v2 rather than informally asking for a retry: that
+> guarantees I'll see it and automatically makes it appear
+> in my list of things to process. You don't need to
+> resend all the individual patchmails if the change was
+> minor.
+> 
+> thanks
+> -- PMM
+
+Good to know.
+
 -- 
-2.20.1
+MST
