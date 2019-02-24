@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41617)
+Received: from eggs.gnu.org ([209.51.188.92]:41185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gxwqq-0005Td-3O
-	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 11:42:04 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gxz4n-0002Nq-52
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 14:04:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gxwqp-0008ME-Ef
-	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 11:42:04 -0500
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:36873)
+	(envelope-from <richard.henderson@linaro.org>) id 1gxz4m-00060s-5n
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 14:04:37 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:34311)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gxwqp-0008Lj-8h
-	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 11:42:03 -0500
-Received: by mail-wm1-f42.google.com with SMTP id x10so5896419wmg.2
-	for <qemu-devel@nongnu.org>; Sun, 24 Feb 2019 08:42:02 -0800 (PST)
-Date: Sun, 24 Feb 2019 11:41:58 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190224114135-mutt-send-email-mst@kernel.org>
-References: <20190221173326.31874-1-mst@redhat.com>
-	<CAFEAcA_Nmo1bpWr5rUmXotB_J9J78wvqB9TU174WWyqt+CEZZw@mail.gmail.com>
-	<20190222105159-mutt-send-email-mst@kernel.org>
-	<20190223193335-mutt-send-email-mst@kernel.org>
-	<CAFEAcA87W8VdNSoROcn_wV2UnOQpP7qaLgok6RsbsPLhVvnZ1w@mail.gmail.com>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gxz4l-0005zO-LA
+	for qemu-devel@nongnu.org; Sun, 24 Feb 2019 14:04:36 -0500
+Received: by mail-pl1-x643.google.com with SMTP id d15so3428172plr.1
+	for <qemu-devel@nongnu.org>; Sun, 24 Feb 2019 11:04:35 -0800 (PST)
+References: <20190222162555.13764-1-amagdy.afifi@gmail.com>
+	<20190222162555.13764-2-amagdy.afifi@gmail.com>
+	<f782bdde-2a42-c612-5769-1cde42e7c2a4@linaro.org>
+	<CAKV=O7mWBKQzVJRJT-bGW0Ojvb7eFraGniqG1-qPidZWHtp8Ew@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bf134899-fa0b-2a27-dffd-92369805fd50@linaro.org>
+Date: Sun, 24 Feb 2019 11:04:30 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA87W8VdNSoROcn_wV2UnOQpP7qaLgok6RsbsPLhVvnZ1w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/26] pci, pc, virtio: fixes, cleanups,
- tests
+In-Reply-To: <CAKV=O7mWBKQzVJRJT-bGW0Ojvb7eFraGniqG1-qPidZWHtp8Ew@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] riscv: Add proper alignment check and
+ pending 'C' extension upon misa writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +34,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Amed Magdy <amagdy.afifi@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, palmer@sifive.com, mjc@sifive.com, Alistair.Francis@wdc.com
 
-On Sun, Feb 24, 2019 at 10:21:52AM +0000, Peter Maydell wrote:
-> On Sun, 24 Feb 2019 at 00:34, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > Peter, can you merge for_upstream now pls? Don't want to spam
-> > the list with a trivial change like that ...
+On 2/23/19 11:57 PM, Amed Magdy wrote:
+> Thank you for your review and feedback, Richard.
+> As Eric mentioned, this is the first time contribution. I have been exploring
+> Qemu for some time and try to understand main flow, internals, ..etc.
 > 
-> Yes, it's on my list, but so are seven other pullreqs;
-> seems like everybody likes to submit on a Friday, so
-> sending on a Friday guarantees maximum delay because
-> you'll be in a big queue with other people and I don't
-> generally handle pullreqs on the weekend either...
-
-OK I'll try to switch over to middle of the week.
-
-> In general I prefer it if you just re-send the cover-letter
-> email as a v2 rather than informally asking for a retry: that
-> guarantees I'll see it and automatically makes it appear
-> in my list of things to process. You don't need to
-> resend all the individual patchmails if the change was
-> minor.
+>>  You cannot manipulate env like this during translation.
 > 
-> thanks
-> -- PMM
+>>  Neither the write to env->pc_next nor the read from env->pending_rvc here will
+>>  be in any synchronization with the execution of write_misa. 
+>  
+> Does this applies for translated code in a single translation block only or for
+> different TBs also ?
 
-Good to know.
+All of the time this will not work.
 
--- 
-MST
+> So should I manipulate "env" from translation context through helpers only ?
+> for example:
+> 
+> TCGv temp;
+> tcg_gen_movi_tl(temp, ctx->pc_succ_insn);
+> gen_helper_next_pc(cpu_env, temp);
+> 
+> while the helper function definition like that:
+> void helper_next_pc(CPURISCVState *env, target_ulong pc_next)
+> {
+>     env->pc_next = pc_next;
+> }
+
+This is a correct way to write pc_next.  (Although I still don't understand why
+you need it.)
+
+> and the same to read "env->pending_rvc"
+
+No, you cannot read pending_rvc this way.  You would need to incorporate
+pending_rvc into the flags set by cpu_get_tb_cpu_state.  (Although I still
+don't understand why you need it.)
+
+> I'm thinking of a way to add 'C' extension at run time through waiting the
+> correct aligned instruction, which I believe it might be after branch something
+> quite similar to switching between ARM and THUMB states in ARM, for misa 'RVC'
+> enable to take effect since it will be no possibility to check alignment with
+> 'C' extension.
+
+It seems to me that the C extension can be enabled at any point, since if C is
+off, you know that the next insn is aligned modulo 4.
+
+It is only if the C extension is enabled, and you want to disable it, that is
+when we must check to see if the next insn is aligned mod 4.  It is trivial to
+arrange for a particular instruction to be aligned, via assembler directives.
+So it seems silly to make the definition of the csr write to misa any more
+complicated than it is.
+
+You are right that the existing code is broken, in that it is checking the
+alignment of the host PC and not the guest PC.  However, I see no reason to
+introduce a new "pc_next" field when we already update the pc field ...
+
+> static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+>                        int csr)
+> {
+>     TCGv source1, csr_store, dest, rs1_pass, imm_rs1;
+>     source1 = tcg_temp_new();
+>     csr_store = tcg_temp_new();
+>     dest = tcg_temp_new();
+>     rs1_pass = tcg_temp_new();
+>     imm_rs1 = tcg_temp_new();
+>     gen_get_gpr(source1, rs1);
+>     tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+
+... here.
+
+So as far as I can see, the only thing that needs fixing is GETPC.
+
+
+r~
+
+
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 960d2b0aa9..8726ef802e 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -370,10 +370,11 @@ static int write_misa(CPURISCVState *env, int csrno,
+target_ulong val)
+         val &= ~RVD;
+     }
+
+-    /* Suppress 'C' if next instruction is not aligned
+-     * TODO: this should check next_pc
++    /*
++     * Suppress 'C' if next instruction is not aligned.
++     * We updated env->pc to the next insn in the translator.
+      */
+-    if ((val & RVC) && (GETPC() & ~3) != 0) {
++    if ((val & RVC) && (env->pc & ~3) != 0) {
+         val &= ~RVC;
+     }
