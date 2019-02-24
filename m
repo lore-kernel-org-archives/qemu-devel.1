@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52041)
+Received: from eggs.gnu.org ([209.51.188.92]:55711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gxh8f-0008MI-MY
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 18:55:27 -0500
+	(envelope-from <mst@redhat.com>) id 1gxhRG-0002ST-T9
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 19:14:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gxh8Y-0005Cx-0R
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 18:55:22 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45586)
+	(envelope-from <mst@redhat.com>) id 1gxhRF-0001CO-SJ
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 19:14:38 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:33181)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gxh8X-0005Br-By
-	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 18:55:17 -0500
-Received: by mail-wr1-x442.google.com with SMTP id w17so6068344wrn.12
-	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 15:55:17 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20190223232954.7185-1-richard.henderson@linaro.org>
-	<20190223232954.7185-6-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <62b37313-a0b1-83a1-8fcc-de07b6f67547@amsat.org>
-Date: Sun, 24 Feb 2019 00:55:14 +0100
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gxhRF-0001Ac-Mu
+	for qemu-devel@nongnu.org; Sat, 23 Feb 2019 19:14:37 -0500
+Received: by mail-qt1-f194.google.com with SMTP id z39so6757988qtz.0
+	for <qemu-devel@nongnu.org>; Sat, 23 Feb 2019 16:14:36 -0800 (PST)
+Date: Sat, 23 Feb 2019 19:14:32 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190223191037-mutt-send-email-mst@kernel.org>
+References: <20190218102748.2242-1-xieyongji@baidu.com>
+	<20190218102748.2242-2-xieyongji@baidu.com>
+	<20190221120121-mutt-send-email-mst@kernel.org>
+	<CAONzpcYHae1fCJLN56ofQ91tSQi_JCXAA6mBhf0NqN=QusV1zg@mail.gmail.com>
+	<20190222011631-mutt-send-email-mst@kernel.org>
+	<CAONzpcaxS3ct5bx62126SMiowcZ2mApnYomwXkHg0R67SvoQBg@mail.gmail.com>
+	<20190222095009-mutt-send-email-mst@kernel.org>
+	<CAONzpcZ_4e5xYonBhXinkQC8E5UCsko3iLY8_8ykaVwdU0Aa4Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190223232954.7185-6-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] decodetree: Allow grouping of
- overlapping patterns
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAONzpcZ_4e5xYonBhXinkQC8E5UCsko3iLY8_8ykaVwdU0Aa4Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 1/7] vhost-user: Support transferring
+ inflight buffer between qemu and backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,319 +36,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: kbastian@mail.uni-paderborn.de
+To: Yongji Xie <elohimes@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-On 2/24/19 12:29 AM, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  docs/decodetree.rst   |  58 +++++++++++++++++
->  scripts/decodetree.py | 144 ++++++++++++++++++++++++++++++++++++++----
->  2 files changed, 191 insertions(+), 11 deletions(-)
+On Sat, Feb 23, 2019 at 09:10:01PM +0800, Yongji Xie wrote:
+> On Fri, 22 Feb 2019 at 22:54, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Fri, Feb 22, 2019 at 03:05:23PM +0800, Yongji Xie wrote:
+> > > On Fri, 22 Feb 2019 at 14:21, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Fri, Feb 22, 2019 at 10:47:03AM +0800, Yongji Xie wrote:
+> > > > > > > +
+> > > > > > > +To track inflight I/O, the queue region should be processed as follows:
+> > > > > > > +
+> > > > > > > +When receiving available buffers from the driver:
+> > > > > > > +
+> > > > > > > +    1. Get the next available head-descriptor index from available ring, i
+> > > > > > > +
+> > > > > > > +    2. Set desc[i].inflight to 1
+> > > > > > > +
+> > > > > > > +When supplying used buffers to the driver:
+> > > > > > > +
+> > > > > > > +    1. Get corresponding used head-descriptor index, i
+> > > > > > > +
+> > > > > > > +    2. Set desc[i].next to process_head
+> > > > > > > +
+> > > > > > > +    3. Set process_head to i
+> > > > > > > +
+> > > > > > > +    4. Steps 1,2,3 may be performed repeatedly if batching is possible
+> > > > > > > +
+> > > > > > > +    5. Increase the idx value of used ring by the size of the batch
+> > > > > > > +
+> > > > > > > +    6. Set the inflight field of each DescStateSplit entry in the batch to 0
+> > > > > > > +
+> > > > > > > +    7. Set used_idx to the idx value of used ring
+> > > > > > > +
+> > > > > > > +When reconnecting:
+> > > > > > > +
+> > > > > > > +    1. If the value of used_idx does not match the idx value of used ring,
+> > > > > > > +
+> > > > > > > +        (a) Subtract the value of used_idx from the idx value of used ring to get
+> > > > > > > +        the number of in-progress DescStateSplit entries
+> > > > > > > +
+> > > > > > > +        (b) Set the inflight field of the in-progress DescStateSplit entries which
+> > > > > > > +        start from process_head to 0
+> > > > > > > +
+> > > > > > > +        (c) Set used_idx to the idx value of used ring
+> > > > > > > +
+> > > > > > > +    2. Resubmit each inflight DescStateSplit entry
+> > > > > >
+> > > > > > I re-read a couple of time and I still don't understand what it says.
+> > > > > >
+> > > > > > For simplicity consider split ring. So we want a list of heads that are
+> > > > > > outstanding. Fair enough. Now device finishes a head. What now? I needs
+> > > > > > to drop head from the list. But list is unidirectional (just next, no
+> > > > > > prev). So how can you drop an entry from the middle?
+> > > > > >
+> > > > >
+> > > > > The process_head is only used when slave crash between increasing the
+> > > > > idx value of used ring and updating used_idx. We use it to find the
+> > > > > in-progress DescStateSplit entries before the crash and complete them
+> > > > > when reconnecting. Make sure guest and slave have the same view for
+> > > > > inflight I/Os.
+> > > > >
+> > > >
+> > > > But I don't understand how does the described process help do it?
+> > > >
+> > >
+> > > For example, we need to submit descriptors A, B, C to driver in a batch.
+> > >
+> > > Firstly, we will link those descriptors like:
+> > >
+> > > process_head->A->B->C    (A)
+> > >
+> > > Then, we need to update idx value of used vring to mark those
+> > > descriptors as used:
+> > >
+> > > _vring.used->idx += 3    (B)
+> > >
+> > > At last, clear the inflight field of those descriptors and update
+> > > used_idx field:
+> > >
+> > > A.inflight = 0; B.inflight = 0; C.inflight = 0;    (C)
+> > >
+> > > used_idx = _vring.used->idx;    (D)
+> > >
+> > > After (B), guest can consume the descriptors A,B,C. So we must make
+> > > sure the inflight field of A,B,C is cleared when reconnecting to avoid
+> > > re-submitting used descriptor. If slave crash during (C), the inflight
+> > > field of A,B,C may be incorrect. To detect that case, we can see
+> > > whether used_idx matches _vring.used->idx. And through process_head,
+> > > we can get the in-progress descriptors A,B,C and clear their inflight
+> > > field again when reconnecting.
+> > >
+> > > >
+> > > > > In other case, the inflight field is enough to track inflight I/O.
+> > > > > When reconnecting, we go through all DescStateSplit entries and
+> > > > > re-submit the entry whose inflight field is equal to 1.
+> > > >
+> > > > What I don't understand is how do we know the order
+> > > > in which they have to be resubmitted. Reordering
+> > > > operations would be a big problem, won't it?
+> > > >
+> > >
+> > > In previous patch, I record avail_idx for each DescStateSplit entry to
+> > > preserve the order. Is it useful to fix this?
+> > >
+> > > >
+> > > > Let's say I fetch descriptors A, B, C and start
+> > > > processing. how does memory look?
+> > >
+> > > A.inflight = 1, C.inflight = 1, B.inflight = 1
+> > >
+> > > > Now I finished B and marked it used. How does
+> > > > memory look?
+> > > >
+> > >
+> > > A.inflight = 1, C.inflight = 1, B.inflight = 0, process_head = B
+> >
+> > OK. And we have
+> >
+> > process_head->B->process_head
+> >
+> > ?
+> >
+> > Now if there is a reconnect, I want to submit A and then C,
+> > correct? How do I know that from this picture? How do I
+> > know to start with A? It's not on the list anymore...
+> >
 > 
-> diff --git a/docs/decodetree.rst b/docs/decodetree.rst
-> index d9be30b2db..391069c105 100644
-> --- a/docs/decodetree.rst
-> +++ b/docs/decodetree.rst
-> @@ -154,3 +154,61 @@ which will, in part, invoke::
->  and::
->  
->    trans_addl_i(ctx, &arg_opi, insn)
-> +
-> +Pattern Groups
-> +==============
-> +
-> +Syntax::
-> +
-> +  group    := '{' ( pat_def | group )+ '}'
-> +
-> +A *group* begins with a lone open-brace, with all subsequent lines
-> +indented two spaces, and ending with a lone close-brace.  Groups
-> +may be nested, increasing the required indentation of the lines
-> +within the nested group to two spaces per nesting level.
-> +
-> +Unlike ungrouped patterns, grouped patterns are allowed to overlap.
-> +Conflicts are resolved by selecting the patterns in order.  If all
-> +of the fixedbits for a pattern match, its translate function will
-> +be called.  If the translate function returns false, then subsequent
-> +patterns within the group will be matched.
-
-Excellent! The tibetan cuisine inspired you :P
-
-> +
-> +The following example from PA-RISC shows specialization of the *or*
-> +instruction::
-> +
-> +  {
-> +    {
-> +      nop   000010 ----- ----- 0000 001001 0 00000
-> +      copy  000010 00000 r1:5  0000 001001 0 rt:5
-> +    }
-> +    or      000010 r2:5  r1:5  cf:4 001001 0 rt:5
-> +  }
-> +
-> +When the *cf* field is zero, the instruction has no side effects,
-> +and may be specialized.  When the *rt* field is zero, the output
-> +is discarded and so the instruction has no effect.  When the *rt2*
-
-*r2*?
-
-> +field is zero, the operation is ``reg[rt] | 0`` and so encodes
-> +the canonical register copy operation.
-> +
-> +The output from the generator might look like::
-> +
-> +  switch (insn & 0xfc000fe0) {
-> +  case 0x08000240:
-> +    /* 000010.. ........ ....0010 010..... */
-> +    if ((insn & 0x0000f000) == 0x00000000) {
-> +        /* 000010.. ........ 00000010 010..... */
-> +        if ((insn & 0x0000001f) == 0x00000000) {
-> +            /* 000010.. ........ 00000010 01000000 */
-> +            extract_decode_Fmt_0(&u.f_decode0, insn);
-> +            if (trans_nop(ctx, &u.f_decode0)) return true;
-> +        }
-> +        if ((insn & 0x03e00000) == 0x00000000) {
-> +            /* 00001000 000..... 00000010 010..... */
-> +            extract_decode_Fmt_1(&u.f_decode1, insn);
-> +            if (trans_copy(ctx, &u.f_decode1)) return true;
-> +        }
-> +    }
-> +    extract_decode_Fmt_2(&u.f_decode2, insn);
-> +    if (trans_or(ctx, &u.f_decode2)) return true;
-> +    return false;
-> +  }
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> index dd495096fc..abce58ed8f 100755
-> --- a/scripts/decodetree.py
-> +++ b/scripts/decodetree.py
-> @@ -31,6 +31,7 @@ fields = {}
->  arguments = {}
->  formats = {}
->  patterns = []
-> +allpatterns = []
->  
->  translate_prefix = 'trans'
->  translate_scope = 'static '
-> @@ -353,6 +354,46 @@ class Pattern(General):
->  # end Pattern
->  
->  
-> +class MultiPattern(General):
-> +    """Class representing an overlapping set of instruction patterns"""
-> +
-> +    def __init__(self, lineno, pats, fixb, fixm, udfm):
-> +        self.lineno = lineno
-> +        self.pats = pats
-> +        self.base = None
-> +        self.fixedbits = fixb
-> +        self.fixedmask = fixm
-> +        self.undefmask = udfm
-> +
-> +    def __str__(self):
-> +        r = "{"
-> +        for p in self.pats:
-> +           r = r + ' ' + str(p)
-> +        return r + "}"
-> +
-> +    def output_decl(self):
-> +        for p in self.pats:
-> +            p.output_decl()
-> +
-> +    def output_code(self, i, extracted, outerbits, outermask):
-> +        global translate_prefix
-> +        ind = str_indent(i)
-> +        for p in self.pats:
-> +            if outermask != p.fixedmask:
-> +                innermask = p.fixedmask & ~outermask
-> +                innerbits = p.fixedbits & ~outermask
-> +                output(ind, 'if ((insn & ',
-> +                       '0x{0:08x}) == 0x{1:08x}'.format(innermask, innerbits),
-> +                       ') {\n')
-> +                output(ind, '    /* ',
-> +                       str_match_bits(p.fixedbits, p.fixedmask), ' */\n')
-> +                p.output_code(i + 4, extracted, p.fixedbits, p.fixedmask)
-> +                output(ind, '}\n')
-> +            else:
-> +                p.output_code(i, extracted, p.fixedbits, p.fixedmask)
-> +#end MultiPattern
-> +
-> +
->  def parse_field(lineno, name, toks):
->      """Parse one instruction field from TOKS at LINENO"""
->      global fields
-> @@ -505,6 +546,7 @@ def parse_generic(lineno, is_format, name, toks):
->      global arguments
->      global formats
->      global patterns
-> +    global allpatterns
->      global re_ident
->      global insnwidth
->      global insnmask
-> @@ -649,6 +691,7 @@ def parse_generic(lineno, is_format, name, toks):
->          pat = Pattern(name, lineno, fmt, fixedbits, fixedmask,
->                        undefmask, fieldmask, flds)
->          patterns.append(pat)
-> +        allpatterns.append(pat)
->  
->      # Validate the masks that we have assembled.
->      if fieldmask & fixedmask:
-> @@ -667,17 +710,61 @@ def parse_generic(lineno, is_format, name, toks):
->                            .format(allbits ^ insnmask))
->  # end parse_general
->  
-> +def build_multi_pattern(lineno, pats):
-> +    """Validate the Patterns going into a MultiPattern."""
-> +    global patterns
-> +    global insnmask
-> +
-> +    if len(pats) < 2:
-> +        error(lineno, 'less than two patterns within braces')
-> +
-> +    fixedmask = insnmask
-> +    undefmask = insnmask
-> +
-> +    for p in pats:
-> +        fixedmask &= p.fixedmask
-> +        undefmask &= p.undefmask
-> +        if p.lineno < lineno:
-> +            lineno = p.lineno
-> +
-> +    if fixedmask == 0:
-> +        error(lineno, 'no overlap in patterns within braces')
-> +
-> +    fixedbits = None
-> +    for p in pats:
-> +        thisbits = p.fixedbits & fixedmask
-> +        if fixedbits is None:
-> +            fixedbits = thisbits
-> +        elif fixedbits != thisbits:
-> +            error(p.lineno, 'fixedbits mismatch within braces',
-> +                  '(0x{0:08x} != 0x{1:08x})'.format(thisbits, fixedbits))
-> +
-> +    mp = MultiPattern(lineno, pats, fixedbits, fixedmask, undefmask)
-> +    patterns.append(mp)
-> +# end build_multi_pattern
->  
->  def parse_file(f):
->      """Parse all of the patterns within a file"""
->  
-> +    global patterns
-> +
->      # Read all of the lines of the file.  Concatenate lines
->      # ending in backslash; discard empty lines and comments.
->      toks = []
->      lineno = 0
-> +    nesting = 0
-> +    saved_pats = []
-> +
->      for line in f:
->          lineno += 1
->  
-> +        # Expand and strip spaces, to find indent.
-> +        line = line.rstrip()
-> +        line = line.expandtabs()
-> +        len1 = len(line)
-> +        line = line.lstrip()
-> +        len2 = len(line)
-> +
->          # Discard comments
->          end = line.find('#')
->          if end >= 0:
-> @@ -687,10 +774,18 @@ def parse_file(f):
->          if len(toks) != 0:
->              # Next line after continuation
->              toks.extend(t)
-> -        elif len(t) == 0:
-> -            # Empty line
-> -            continue
->          else:
-> +            # Allow completely blank lines.
-> +            if len1 == 0:
-> +                continue
-> +            indent = len1 - len2
-> +            # Empty line due to comment.
-> +            if len(t) == 0:
-> +                # Indentation must be correct, even for comment lines.
-> +                if indent != nesting:
-> +                    error(lineno, 'indentation ', indent, ' != ', nesting)
-> +                continue
-> +            start_lineno = lineno
->              toks = t
->  
->          # Continuation?
-> @@ -698,21 +793,47 @@ def parse_file(f):
->              toks.pop()
->              continue
->  
-> -        if len(toks) < 2:
-> -            error(lineno, 'short line')
-> -
->          name = toks[0]
->          del toks[0]
->  
-> +        # End nesting?
-> +        if name == '}':
-> +            if nesting == 0:
-> +                error(start_lineno, 'mismatched close brace')
-> +            if len(toks) != 0:
-> +                error(start_lineno, 'extra tokens after close brace')
-> +            nesting -= 2
-> +            if indent != nesting:
-> +                error(start_lineno, 'indentation ', indent, ' != ', nesting)
-> +            pats = patterns
-> +            patterns = saved_pats.pop()
-> +            build_multi_pattern(lineno, pats)
-> +            toks = []
-> +            continue
-> +
-> +        # Everything else should have current indentation.
-> +        if indent != nesting:
-> +            error(start_lineno, 'indentation ', indent, ' != ', nesting)
-> +
-> +        # Start nesting?
-> +        if name == '{':
-> +            if len(toks) != 0:
-> +                error(start_lineno, 'extra tokens after open brace')
-> +            saved_pats.append(patterns)
-> +            patterns = []
-> +            nesting += 2
-> +            toks = []
-> +            continue
-> +
->          # Determine the type of object needing to be parsed.
->          if name[0] == '%':
-> -            parse_field(lineno, name[1:], toks)
-> +            parse_field(start_lineno, name[1:], toks)
->          elif name[0] == '&':
-> -            parse_arguments(lineno, name[1:], toks)
-> +            parse_arguments(start_lineno, name[1:], toks)
->          elif name[0] == '@':
-> -            parse_generic(lineno, True, name[1:], toks)
-> +            parse_generic(start_lineno, True, name[1:], toks)
->          else:
-> -            parse_generic(lineno, False, name, toks)
-> +            parse_generic(start_lineno, False, name, toks)
->          toks = []
->  # end parse_file
->  
-> @@ -846,6 +967,7 @@ def main():
->      global arguments
->      global formats
->      global patterns
-> +    global allpatterns
->      global translate_scope
->      global translate_prefix
->      global output_fd
-> @@ -907,7 +1029,7 @@ def main():
->      # Make sure that the argument sets are the same, and declare the
->      # function only once.
->      out_pats = {}
-> -    for i in patterns:
-> +    for i in allpatterns:
->          if i.name in out_pats:
->              p = out_pats[i.name]
->              if i.base.base != p.base.base:
+> We can go through all DescStateSplit entries (track all descriptors in
+> Descriptor Table), then we can find A and C are inflight entry by its
+> inflight field. And if we want to resubmit them in order (submit A and
+> then C), we need to introduce a timestamp for each DescStateSplit
+> entry to preserve the order when we fetch them from driver. Something
+> like:
 > 
+> When receiving available buffers from the driver:
+> 
+> 1. Get the next available head-descriptor index from available ring, i
+> 
+> 2. desc[i].timestamp = avail_idx++;
+> 
+> 3. Set desc[i].inflight to 1
+> 
+> Thanks,
+> Yongji
 
-I'm anxious to test this :)
+OK I guess a 64 bit counter would be fine for that.
+
+In order seems critical for storage right?
+Reordering write would seem to lead to data corruption.
+
+But now I don't understand what does the next
+field do. So it so you can maintain a freelist
+within a statically allocated array?
+
+-- 
+MST
