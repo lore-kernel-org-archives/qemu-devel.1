@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50064)
+Received: from eggs.gnu.org ([209.51.188.92]:51473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1gyCgP-0000f2-Ep
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:36:22 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gyCmt-00026B-Rt
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1gyCgO-0003eM-AF
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:36:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60228)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1gyCgN-0003b1-Pm
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:36:20 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 29846308ED6D
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:28:55 +0000 (UTC)
-Date: Mon, 25 Feb 2019 10:28:46 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20190225092846.GA4757@angien.pipo.sk>
-References: <20190222153254.22739-1-stefanha@redhat.com>
-	<87imx8uu99.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1gyCmp-00080k-0L
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:43:03 -0500
+Date: Mon, 25 Feb 2019 10:42:12 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190225104212.7d40e65e@Igors-MacBook-Pro.local>
+In-Reply-To: <c016024e-9f4b-8953-f492-8802675f7e22@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190222172742.18c3835a@redhat.com>
+	<c016024e-9f4b-8953-f492-8802675f7e22@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
-Content-Disposition: inline
-In-Reply-To: <87imx8uu99.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expansion
+ and PCDIMM/NVDIMM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,147 +25,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, david@redhat.com, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, dgilbert@redhat.com, qemu-arm@nongnu.org, david@gibson.dropbear.id.au, eric.auger.pro@gmail.com
 
+On Fri, 22 Feb 2019 18:35:26 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
---dDRMvlgZJXvWKvBx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Hi Igor,
+> 
+> On 2/22/19 5:27 PM, Igor Mammedov wrote:
+> > On Wed, 20 Feb 2019 23:39:46 +0100
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> > 
+> >> This series aims to bump the 255GB RAM limit in machvirt and to
+> >> support device memory in general, and especially PCDIMM/NVDIMM.
+> >>
+> >> In machvirt versions < 4.0, the initial RAM starts at 1GB and can
+> >> grow up to 255GB. From 256GB onwards we find IO regions such as the
+> >> additional GICv3 RDIST region, high PCIe ECAM region and high PCIe
+> >> MMIO region. The address map was 1TB large. This corresponded to
+> >> the max IPA capacity KVM was able to manage.
+> >>
+> >> Since 4.20, the host kernel is able to support a larger and dynamic
+> >> IPA range. So the guest physical address can go beyond the 1TB. The
+> >> max GPA size depends on the host kernel configuration and physical CPUs.
+> >>
+> >> In this series we use this feature and allow the RAM to grow without
+> >> any other limit than the one put by the host kernel.
+> >>
+> >> The RAM still starts at 1GB. First comes the initial ram (-m) of size
+> >> ram_size and then comes the device memory (,maxmem) of size
+> >> maxram_size - ram_size. The device memory is potentially hotpluggable
+> >> depending on the instantiated memory objects.
+> >>
+> >> IO regions previously located between 256GB and 1TB are moved after
+> >> the RAM. Their offset is dynamically computed, depends on ram_size
+> >> and maxram_size. Size alignment is enforced.
+> >>
+> >> In case maxmem value is inferior to 255GB, the legacy memory map
+> >> still is used. The change of memory map becomes effective from 4.0
+> >> onwards.
+> >>
+> >> As we keep the initial RAM at 1GB base address, we do not need to do
+> >> invasive changes in the EDK2 FW. It seems nobody is eager to do
+> >> that job at the moment.
+> >>
+> >> Device memory being put just after the initial RAM, it is possible
+> >> to get access to this feature while keeping a 1TB address map.
+> >>
+> >> This series reuses/rebases patches initially submitted by Shameer
+> >> in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
+> >>
+> >> Functionally, the series is split into 3 parts:
+> >> 1) bump of the initial RAM limit [1 - 9] and change in
+> >>    the memory map
+> > 
+> >> 2) Support of PC-DIMM [10 - 13]
+> > Is this part complete ACPI wise (for coldplug)? I haven't noticed
+> > DSDT AML here no E820 changes, so ACPI wise pc-dimm shouldn't be
+> > visible to the guest. It might be that DT is masking problem
+> > but well, that won't work on ACPI only guests.
+> 
+> guest /proc/meminfo or "lshw -class memory" reflects the amount of mem
+> added with the DIMM slots.
+Question is how does it get there? Does it come from DT or from firmware
+via UEFI interfaces?
 
-On Mon, Feb 25, 2019 at 09:50:26 +0100, Markus Armbruster wrote:
-> Stefan Hajnoczi <stefanha@redhat.com> writes:
->=20
-> > QMP clients can usually detect the presence of features via schema
-> > introspection.  There are rare features that do not involve schema
-> > changes and are therefore impossible to detect with schema
-> > introspection.
-> >
-> > This patch adds the query-qemu-capabilities command.  It returns a list
-> > of capabilities that this QEMU supports.
->=20
-> The name "capabilities" could be confusing, because we already have QMP
-> capabilities, complete with command qmp_capabilities.  Would "features"
-> work?
->=20
-> > The decision to make this a command rather than something statically
-> > defined in the schema is intentional.  It allows QEMU to decide which
-> > capabilities are available at runtime, if necessary.
-> >
-> > This new interface is necessary so that QMP clients can discover that
-> > migrating disk image files is safe with cache.direct=3Doff on Linux.
-> > There is no other way to detect whether or not QEMU supports this.
->=20
-> I think what's unsaid here is that we don't want to make a completely
-> arbitrary schema change just to carry this bit of information.  We
-> could, but we don't want to.  Correct?
+> So it looks fine to me. Isn't E820 a pure x86 matter?
+sorry for misleading, I've meant is UEFI GetMemoryMap().
+On x86, I'm wary of adding PC-DIMMs to E802 which then gets exposed
+via UEFI GetMemoryMap() as guest kernel might start using it as normal
+memory early at boot and later put that memory into zone normal and hence
+make it non-hot-un-pluggable. The same concerns apply to DT based means
+of discovery.
+(That's guest issue but it's easy to workaround it not putting hotpluggable
+memory into UEFI GetMemoryMap() or DT and let DSDT describe it properly)
+That way memory doesn't get (ab)used by firmware or early boot kernel stages
+and doesn't get locked up.
 
-One example of such 'unrelated' change was a recent query- command which
-is used by libvirt just to detect presence of the feature but the
-queried result is never used and not very useful.
+> What else would you expect in the dsdt?
+Memory device descriptions, look for code that adds PNP0C80 with _CRS
+describing memory ranges
 
-> > Cc: Markus Armbruster <armbru@redhat.com>
-> > Cc: Peter Krempa <pkrempa@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  qapi/misc.json | 42 ++++++++++++++++++++++++++++++++++++++++++
-> >  qmp.c          | 18 ++++++++++++++++++
-> >  2 files changed, 60 insertions(+)
+> I understand hotplug
+> would require extra modifications but I don't see anything else missing
+> for coldplug.
+> > Even though I've tried make mem hotplug ACPI parts not x86 specific,
+> > I'm afraid it might be tightly coupled with hotplug support.
+> > So here are 2 options make DSDT part work without hotplug or
+> > implement hotplug here. I think the former is just a waste of time
+> > and we should just add hotplug. It should take relatively minor effort
+> > since you already implemented most of boiler plate here.
+> 
+> Shameer sent an RFC series for supporting hotplug.
+> 
+> [RFC PATCH 0/4] ARM virt: ACPI memory hotplug support
+> https://patchwork.kernel.org/cover/10783589/
+> 
+> I tested PCDIMM hotplug (with ACPI) this afternoon and it seemed to be
+> OK, even after system_reset.
+> 
+> Note the hotplug kernel support on ARM is very recent. I would prefer to
+> dissociate both efforts if we want to get a chance making coldplug for
+> 4.0. Also we have an issue for NVDIMM since on reboot the guest does not
+> boot properly.
+I guess we can merge implemetation that works on some kernel configs
+[DT based I'd guess], and add ACPI part later. Though that will be
+a bit of a mess as we do not version firmware parts (ACPI tables).
 
-[...]
+> > As for how to implement ACPI HW part, I suggest to borrow GED
+> > device that NEMU guys trying to use instead of GPIO route,
+> > like we do now for ACPI_POWER_BUTTON_DEVICE to deliver event.
+> > So that it would be easier to share this with their virt-x86
+> > machine eventually.
+> Sounds like a different approach than the one initiated by Shameer?
+ARM boards were first to use ACPI hw-reduced profile so they picked up
+available back then GPIO based way to deliver hotplug event, later spec
+introduced Generic Event Device for that means to use with hw-reduced
+profile, which NEMU implemented[1], so I'd use that rather than ad-hoc
+GPIO mapping. I'd guess it will more compatible with various contemporary
+guests and we could reuse the same code for both x86/arm virt boards)
 
-> > +QemuCapabilities *qmp_query_qemu_capabilities(Error **errp)
-> > +{
-> > +    QemuCapabilities *caps =3D g_new0(QemuCapabilities, 1);
-> > +    QemuCapabilityList **prev =3D &caps->capabilities;
-> > +    QemuCapability cap_val;
-> > +
-> > +    /* Add all QemuCapability enum values defined in the schema */
-> > +    for (cap_val =3D 0; cap_val < QEMU_CAPABILITY__MAX; cap_val++) {
-> > +        QemuCapabilityList *cap =3D g_new0(QemuCapabilityList, 1);
-> > +
-> > +        cap->value =3D cap_val;
-> > +        *prev =3D cap;
-> > +        prev =3D &cap->next;
-> > +    }
-> > +
-> > +    return caps;
-> > +}
->=20
-> All capabilities known to this build of QEMU are always present.  Okay;
-> no need to complicate things until we need to.  I just didn't expect it
-> to be this simple after the commit message's "It allows QEMU to decide
-> which capabilities are available at runtime, if necessary."
+1) https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/ged.c
 
-I'm slightly worried of misuse of the possibility to change the behavior
-on runtime. In libvirt we cache the capabilities to prevent a "chicken
-and egg" problem where we need to know what qemu is able to do when
-generating the command line which is obviously prior to starting qemu.
-This means that we will want to cache even information determined by
-interpreting results of this API.
-
-If any further addition is not as simple as this one it may be
-challenging to be able to interpret the result correctly and be able to
-cache it.
-
-Libvirt's use of capabilities is split to pre-startup steps and runtime
-usage. For the pre-startup case [A]  we obviously want to use the cached
-capabilities which are obtained by running same qemu with a different
-configuration that will be used later. After qemu is started we use
-QMP to interact [B] with it also depending to the capabilities
-determined from the cache. Scenario [B] also allows us to re-probe some
-things but they need to be strictly usable only with QMP afterwards.
-
-The proposed API with the 'runtime' behaviour allows for these 3
-scenarios for a capability:
-1) Static capability (as this patch shows)
-    This is easy to cache and also supports both [A] and [B]
-
-2) Capability depending on configuration
-    [A] is out of the window but if QMP only use is necessary we can
-    adapt.
-
-3) Capability depending on host state.
-    Same commandline might not result in same behaviour. Obviously can't
-    be cached at all, but libvirt would not do it anyways. [B] is
-    possible, but it's unpleasant.
-
-I propose that the docs for the function filling the result (and perhaps
-also the documentation for the QMP interface) clarify and/or guide devs
-to avoid situations 2) and 3) if possible and motivate them to document
-the limitations on when the capability is detactable.
-
-Additionally a new field could be added that e.g. pledges that the given
-capability is of type 1) as described above and thus can be easily
-cached. That way we can make sure programatically that we pre-cache only
-the 'good' capabilities.
-
-Other than the above, this is a welcome improvement as I've personally
-ran into scenarios where a feature in qemu was fixed but it was
-impossible to detect whether given qemu version contains the fix as it
-did not have any influence on the QMP schema.
-
-
-
---dDRMvlgZJXvWKvBx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlxztUwACgkQHGwCByjY
-1GrDnA/+OpnPZS+TN+9mBtqsZMass9OT7LzSHZzVPlNS4T0DM5jPFf2regLyWDAB
-dgKJ177/ajxG5d9mtd8X7UZSSuTMGebL1pGoyzqiH4XFfOOMxn8Xhk2Y8YvxsD4K
-2cScc90WlbL4lb6e3iTeZZ/xNrDXZ9T27NhQTv8ISmgm6ojqWXjWbHvP1coiMSGk
-ry3HzkdKphc7eNt5wxTCXUMrPhL36fxMu7KlKd2W41aYnb86D2Gev4Mi3m5m7f5m
-M6um0p6qq39WkC7oB0zTNx+bc5ZtKxWVsCYRa1sWOk4opj3JAQGWGaeFyc+j1FB0
-r/6b2b73cZka9j1D3ZwI5f7+oyJ4eR6TppYCKHCQgbPNEY3jw5yn5q0CDaRAMZiP
-tPzi6+hDmW4lQMP+XAfDzkwQywi4HgBOW8R5WqZyXiJQSIBpWz2mXaDre78nnUK4
-keu3EsNtNX1HwS0O75YDQlZ6AfgI98o9NkGmkZa5Au9nyJju2zaVpZS/2e9x4/i+
-/PNpvg1YJ6tH8HAU0d9iRKRwBkGN9qhfLA9r+ua8Hqd1k6wcsmKS4wB9nEfkX6Al
-srSoGYHqpe9sc1tJbQRRSsdYbaYX+1CrQtjUy1vR+1TVvO0N1j39ppwPRScp12Mb
-WfWrKvf32Q5ssHI+gfSMWmHOu5S9dQXbljAJuiWZbicp4VUbds8=
-=wVNi
------END PGP SIGNATURE-----
-
---dDRMvlgZJXvWKvBx--
+> 
+> Thanks
+> 
+> Eric
+> > 
+> > 
+> >> 3) Support of NV-DIMM [14 - 17]
+> > The same might be true for NUMA but I haven't dug this deep in to
+> > that part.
+> > 
+> >>
+> >> 1) can be upstreamed before 2 and 2 can be upstreamed before 3.
+> >>
+> >> Work is ongoing to transform the whole memory as device memory.
+> >> However this move is not trivial and to me, is independent on
+> >> the improvements brought by this series:
+> >> - if we were to use DIMM for initial RAM, those DIMMs would use
+> >>   use slots. Although they would not be part of the ones provided
+> >>   using the ",slots" options, they are ACPI limited resources.
+> >> - DT and ACPI description needs to be reworked
+> >> - NUMA integration needs special care
+> >> - a special device memory object may be required to avoid consuming
+> >>   slots and easing the FW description.
+> >>
+> >> So I preferred to separate the concerns. This new implementation
+> >> based on device memory could be candidate for another virt
+> >> version.
+> >>
+> >> Best Regards
+> >>
+> >> Eric
+> >>
+> >> References:
+> >>
+> >> [0] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
+> >> http://patchwork.ozlabs.org/cover/914694/
+> >>
+> >> [1] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
+> >> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
+> >>
+> >> This series can be found at:
+> >> https://github.com/eauger/qemu/tree/v3.1.0-dimm-v7
+> >>
+> >> History:
+> >>
+> >> v6 -> v7:
+> >> - Addressed Peter and Igor comments (exceptions sent my email)
+> >> - Fixed TCG case. Now device memory works also for TCG and vcpu
+> >>   pamax is checked
+> >> - See individual logs for more details
+> >>
+> >> v5 -> v6:
+> >> - mingw compilation issue fix
+> >> - kvm_arm_get_max_vm_phys_shift always returns the number of supported
+> >>   IPA bits
+> >> - new patch "hw/arm/virt: Rename highmem IO regions" that eases the review
+> >>   of "hw/arm/virt: Split the memory map description"
+> >> - "hw/arm/virt: Move memory map initialization into machvirt_init"
+> >>   squashed into the previous patch
+> >> - change alignment of IO regions beyond the RAM so that it matches their
+> >>   size
+> >>
+> >> v4 -> v5:
+> >> - change in the memory map
+> >> - see individual logs
+> >>
+> >> v3 -> v4:
+> >> - rebase on David's "pc-dimm: next bunch of cleanups" and
+> >>   "pc-dimm: pre_plug "slot" and "addr" assignment"
+> >> - kvm-type option not used anymore. We directly use
+> >>   maxram_size and ram_size machine fields to compute the
+> >>   MAX IPA range. Migration is naturally handled as CLI
+> >>   option are kept between source and destination. This was
+> >>   suggested by David.
+> >> - device_memory_start and device_memory_size not stored
+> >>   anymore in vms->bootinfo
+> >> - I did not take into account 2 Igor's comments: the one
+> >>   related to the refactoring of arm_load_dtb and the one
+> >>   related to the generation of the dtb after system_reset
+> >>   which would contain nodes of hotplugged devices (we do
+> >>   not support hotplug at this stage)
+> >> - check the end-user does not attempt to hotplug a device
+> >> - addition of "vl: Set machine ram_size, maxram_size and
+> >>   ram_slots earlier"
+> >>
+> >> v2 -> v3:
+> >> - fix pc_q35 and pc_piix compilation error
+> >> - kwangwoo's email being not valid anymore, remove his address
+> >>
+> >> v1 -> v2:
+> >> - kvm_get_max_vm_phys_shift moved in arch specific file
+> >> - addition of NVDIMM part
+> >> - single series
+> >> - rebase on David's refactoring
+> >>
+> >> v1:
+> >> - was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
+> >> - was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
+> >>
+> >> Best Regards
+> >>
+> >> Eric
+> >>
+> >>
+> >> Eric Auger (12):
+> >>   hw/arm/virt: Rename highmem IO regions
+> >>   hw/arm/virt: Split the memory map description
+> >>   hw/boards: Add a MachineState parameter to kvm_type callback
+> >>   kvm: add kvm_arm_get_max_vm_ipa_size
+> >>   vl: Set machine ram_size, maxram_size and ram_slots earlier
+> >>   hw/arm/virt: Dynamic memory map depending on RAM requirements
+> >>   hw/arm/virt: Implement kvm_type function for 4.0 machine
+> >>   hw/arm/virt: Bump the 255GB initial RAM limit
+> >>   hw/arm/virt: Add memory hotplug framework
+> >>   hw/arm/virt: Allocate device_memory
+> >>   hw/arm/boot: Expose the pmem nodes in the DT
+> >>   hw/arm/virt: Add nvdimm and nvdimm-persistence options
+> >>
+> >> Kwangwoo Lee (2):
+> >>   nvdimm: use configurable ACPI IO base and size
+> >>   hw/arm/virt: Add nvdimm hot-plug infrastructure
+> >>
+> >> Shameer Kolothum (3):
+> >>   hw/arm/boot: introduce fdt_add_memory_node helper
+> >>   hw/arm/boot: Expose the PC-DIMM nodes in the DT
+> >>   hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+> >>
+> >>  accel/kvm/kvm-all.c             |   2 +-
+> >>  default-configs/arm-softmmu.mak |   4 +
+> >>  hw/acpi/nvdimm.c                |  31 ++-
+> >>  hw/arm/boot.c                   | 136 ++++++++++--
+> >>  hw/arm/virt-acpi-build.c        |  23 +-
+> >>  hw/arm/virt.c                   | 364 ++++++++++++++++++++++++++++----
+> >>  hw/i386/pc_piix.c               |   6 +-
+> >>  hw/i386/pc_q35.c                |   6 +-
+> >>  hw/ppc/mac_newworld.c           |   3 +-
+> >>  hw/ppc/mac_oldworld.c           |   2 +-
+> >>  hw/ppc/spapr.c                  |   2 +-
+> >>  include/hw/arm/virt.h           |  24 ++-
+> >>  include/hw/boards.h             |   5 +-
+> >>  include/hw/mem/nvdimm.h         |   4 +
+> >>  target/arm/kvm.c                |  10 +
+> >>  target/arm/kvm_arm.h            |  13 ++
+> >>  vl.c                            |   6 +-
+> >>  17 files changed, 556 insertions(+), 85 deletions(-)
+> >>
+> > 
+> > 
