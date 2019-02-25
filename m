@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38041)
+Received: from eggs.gnu.org ([209.51.188.92]:38036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5I-0000lE-NK
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5I-0000kw-Lh
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5G-0001PB-Lk
+	(envelope-from <kwolf@redhat.com>) id 1gyI5G-0001PX-Mt
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:24 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:19 +0100
-Message-Id: <20190225152053.15976-38-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:24 +0100
+Message-Id: <20190225152053.15976-43-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 37/71] block: bdrv_get_full_backing_filename's
- ret. val.
+Subject: [Qemu-devel] [PULL 42/71] quorum: Make bdrv_dirname() return NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,201 +26,53 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Make bdrv_get_full_backing_filename() return an allocated string instead
-of placing the result in a caller-provided buffer.
+While the common implementation for bdrv_dirname() should return NULL
+for quorum BDSs already (because they do not have a file node and their
+exact_filename field should be empty), there is no reason not to make
+that explicit.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20190201192935.18394-12-mreitz@redhat.com
+Message-id: 20190201192935.18394-17-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h |  3 +--
- block.c               | 48 +++++++++++++++----------------------------
- block/qapi.c          | 12 ++---------
- 3 files changed, 20 insertions(+), 43 deletions(-)
+ block/quorum.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 5f1650304d..42cc38f598 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -487,8 +487,7 @@ void bdrv_round_to_clusters(BlockDriverState *bs,
-=20
- void bdrv_get_backing_filename(BlockDriverState *bs,
-                                char *filename, int filename_size);
--void bdrv_get_full_backing_filename(BlockDriverState *bs,
--                                    char *dest, size_t sz, Error **errp)=
-;
-+char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)=
-;
- char *bdrv_get_full_backing_filename_from_filename(const char *backed,
-                                                    const char *backing,
-                                                    Error **errp);
-diff --git a/block.c b/block.c
-index 466d7887cc..a2203f0cfe 100644
---- a/block.c
-+++ b/block.c
-@@ -338,28 +338,16 @@ char *bdrv_get_full_backing_filename_from_filename(=
-const char *backed,
-     }
+diff --git a/block/quorum.c b/block/quorum.c
+index cf9d7c16c2..a890f21e85 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1094,6 +1094,16 @@ static void quorum_refresh_filename(BlockDriverSta=
+te *bs, QDict *options)
+     bs->full_open_options =3D opts;
  }
 =20
--void bdrv_get_full_backing_filename(BlockDriverState *bs, char *dest, si=
-ze_t sz,
--                                    Error **errp)
-+char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)
- {
-     char *backed;
--    char *full_name;
--    Error *local_error =3D NULL;
-=20
-     bdrv_refresh_filename(bs);
-=20
-     backed =3D bs->exact_filename[0] ? bs->exact_filename : bs->filename=
-;
--
--    full_name =3D bdrv_get_full_backing_filename_from_filename(backed,
--                                                             bs->backing=
-_file,
--                                                             &local_erro=
-r);
--    if (full_name) {
--        pstrcpy(dest, sz, full_name);
--        g_free(full_name);
--    } else if (local_error) {
--        error_propagate(errp, local_error);
--    } else if (sz > 0) {
--        *dest =3D '\0';
--    }
-+    return bdrv_get_full_backing_filename_from_filename(backed,
-+                                                        bs->backing_file=
-,
-+                                                        errp);
- }
-=20
- void bdrv_register(BlockDriver *bdrv)
-@@ -2387,7 +2375,7 @@ out:
- int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-                            const char *bdref_key, Error **errp)
- {
--    char *backing_filename =3D g_malloc0(PATH_MAX);
-+    char *backing_filename =3D NULL;
-     char *bdref_key_dot;
-     const char *reference =3D NULL;
-     int ret =3D 0;
-@@ -2422,7 +2410,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QD=
-ict *parent_options,
-      */
-     reference =3D qdict_get_try_str(parent_options, bdref_key);
-     if (reference || qdict_haskey(options, "file.filename")) {
--        backing_filename[0] =3D '\0';
-+        /* keep backing_filename NULL */
-     } else if (bs->backing_file[0] =3D=3D '\0' && qdict_size(options) =3D=
-=3D 0) {
-         qobject_unref(options);
-         goto free_exit;
-@@ -2437,8 +2425,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QD=
-ict *parent_options,
-             implicit_backing =3D !strcmp(bs->auto_backing_file, bs->back=
-ing_file);
-         }
-=20
--        bdrv_get_full_backing_filename(bs, backing_filename, PATH_MAX,
--                                       &local_err);
-+        backing_filename =3D bdrv_get_full_backing_filename(bs, &local_e=
-rr);
-         if (local_err) {
-             ret =3D -EINVAL;
-             error_propagate(errp, local_err);
-@@ -2459,9 +2446,8 @@ int bdrv_open_backing_file(BlockDriverState *bs, QD=
-ict *parent_options,
-         qdict_put_str(options, "driver", bs->backing_format);
-     }
-=20
--    backing_hd =3D bdrv_open_inherit(*backing_filename ? backing_filenam=
-e : NULL,
--                                   reference, options, 0, bs, &child_bac=
-king,
--                                   errp);
-+    backing_hd =3D bdrv_open_inherit(backing_filename, reference, option=
-s, 0, bs,
-+                                   &child_backing, errp);
-     if (!backing_hd) {
-         bs->open_flags |=3D BDRV_O_NO_BACKING;
-         error_prepend(errp, "Could not open backing file: ");
-@@ -4648,7 +4634,6 @@ BlockDriverState *bdrv_find_backing_image(BlockDriv=
-erState *bs,
-     int is_protocol =3D 0;
-     BlockDriverState *curr_bs =3D NULL;
-     BlockDriverState *retval =3D NULL;
--    Error *local_error =3D NULL;
-=20
-     if (!bs || !bs->drv || !backing_file) {
-         return NULL;
-@@ -4668,21 +4653,22 @@ BlockDriverState *bdrv_find_backing_image(BlockDr=
-iverState *bs,
-         /* If either of the filename paths is actually a protocol, then
-          * compare unmodified paths; otherwise make paths relative */
-         if (is_protocol || path_has_protocol(curr_bs->backing_file)) {
-+            char *backing_file_full_ret;
++static char *quorum_dirname(BlockDriverState *bs, Error **errp)
++{
++    /* In general, there are multiple BDSs with different dirnames below=
+ this
++     * one; so there is no unique dirname we could return (unless all ar=
+e equal
++     * by chance, or there is only one). Therefore, to be consistent, ju=
+st
++     * always return NULL. */
++    error_setg(errp, "Cannot generate a base directory for quorum nodes"=
+);
++    return NULL;
++}
 +
-             if (strcmp(backing_file, curr_bs->backing_file) =3D=3D 0) {
-                 retval =3D curr_bs->backing->bs;
-                 break;
-             }
-             /* Also check against the full backing filename for the imag=
-e */
--            bdrv_get_full_backing_filename(curr_bs, backing_file_full, P=
-ATH_MAX,
--                                           &local_error);
--            if (local_error =3D=3D NULL) {
--                if (strcmp(backing_file, backing_file_full) =3D=3D 0) {
-+            backing_file_full_ret =3D bdrv_get_full_backing_filename(cur=
-r_bs,
-+                                                                   NULL)=
-;
-+            if (backing_file_full_ret) {
-+                bool equal =3D strcmp(backing_file, backing_file_full_re=
-t) =3D=3D 0;
-+                g_free(backing_file_full_ret);
-+                if (equal) {
-                     retval =3D curr_bs->backing->bs;
-                     break;
-                 }
--            } else {
--                error_free(local_error);
--                local_error =3D NULL;
-             }
-         } else {
-             /* If not an absolute filename path, make it relative to the=
- current
-diff --git a/block/qapi.c b/block/qapi.c
-index 4623de1d7b..6002a768f8 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -296,18 +296,10 @@ void bdrv_query_image_info(BlockDriverState *bs,
+ static BlockDriver bdrv_quorum =3D {
+     .format_name                        =3D "quorum",
 =20
-     backing_filename =3D bs->backing_file;
-     if (backing_filename[0] !=3D '\0') {
--        char *backing_filename2 =3D g_malloc0(PATH_MAX);
-+        char *backing_filename2;
-         info->backing_filename =3D g_strdup(backing_filename);
-         info->has_backing_filename =3D true;
--        bdrv_get_full_backing_filename(bs, backing_filename2, PATH_MAX, =
-&err);
--        if (err) {
--            /* Can't reconstruct the full backing filename, so we must o=
-mit
--             * this field and apply a Best Effort to this query. */
--            g_free(backing_filename2);
--            backing_filename2 =3D NULL;
--            error_free(err);
--            err =3D NULL;
--        }
-+        backing_filename2 =3D bdrv_get_full_backing_filename(bs, NULL);
+@@ -1102,6 +1112,7 @@ static BlockDriver bdrv_quorum =3D {
+     .bdrv_open                          =3D quorum_open,
+     .bdrv_close                         =3D quorum_close,
+     .bdrv_refresh_filename              =3D quorum_refresh_filename,
++    .bdrv_dirname                       =3D quorum_dirname,
 =20
-         /* Always report the full_backing_filename if present, even if i=
-t's the
-          * same as backing_filename. That they are same is useful info. =
-*/
+     .bdrv_co_flush_to_disk              =3D quorum_co_flush,
+=20
 --=20
 2.20.1
