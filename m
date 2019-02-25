@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34063)
+Received: from eggs.gnu.org ([209.51.188.92]:34418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyHr3-0002yj-Vd
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:07:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1gyHsU-0003ee-8b
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:09:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyHr3-0000cz-9r
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:07:41 -0500
-References: <20190223002209.23084-1-jsnow@redhat.com>
-	<20190223002209.23084-4-jsnow@redhat.com>
-	<be3360bb-cbc1-daa1-2297-f3f8a88faac9@virtuozzo.com>
-	<f8cee179-d67f-2426-7d65-c208a82f1876@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1gyHsR-0001TF-HL
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:09:10 -0500
+References: <20190223000614.13894-1-jsnow@redhat.com>
+	<20190223000614.13894-2-jsnow@redhat.com>
+	<4aea2945-9e5e-e293-8a4d-ceb2780b12cc@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <b293f181-7b78-c11b-81ab-0f4b04e6fb25@redhat.com>
-Date: Mon, 25 Feb 2019 09:07:23 -0600
+Message-ID: <bf6ff77d-32b5-4519-7767-9e0a19d5270c@redhat.com>
+Date: Mon, 25 Feb 2019 09:08:48 -0600
 MIME-Version: 1.0
-In-Reply-To: <f8cee179-d67f-2426-7d65-c208a82f1876@virtuozzo.com>
+In-Reply-To: <4aea2945-9e5e-e293-8a4d-ceb2780b12cc@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] block/dirty-bitmaps: add
- block_dirty_bitmap_check function
+Subject: Re: [Qemu-devel] [PATCH v3 01/10] block/dirty-bitmap: add recording
+ and busy properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +27,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
 
-On 2/25/19 8:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+On 2/25/19 9:01 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 23.02.2019 3:06, John Snow wrote:
+>> The current API allows us to report a single status, which we've defined as:
+>>
+>> Frozen: has a successor, treated as qmp_locked, may or may not be enabled.
+>> Locked: no successor, qmp_locked. may or may not be enabled.
+>> Disabled: Not frozen or locked, disabled.
+>> Active: Not frozen, locked, or disabled.
+>>
+>> The problem is that both "Frozen" and "Locked" mean nearly the same thing,
+>> and that both of them do not intuit whether they are recording guest writes
+>> or not.
+>>
+>> This patch deprecates that status field and introduces two orthogonal
+>> properties instead to replace it.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
 
+>> +++ b/qapi/block-core.json
+>> @@ -458,7 +458,14 @@
+>>   #
+>>   # @granularity: granularity of the dirty bitmap in bytes (since 1.4)
+>>   #
+>> -# @status: current status of the dirty bitmap (since 2.4)
+>> +# @status: Deprecated in favor of @recording and @locked. (since 2.4)
+>> +#
+>> +# @recording: true if the bitmap is recording new writes from the guest.
+>> +#             Replaces `active` and `disabled` statuses. (since 4.0)
+>> +#
+>> +# @busy: true if the bitmap is in-use by some operation (NBD or jobs)
+>> +#        and cannot be modified via QMP or used by another operation.
+>> +#        Replaces `locked` and `frozen` statuses. (since 4.0)
 > 
-> And one more important question: we now creating new qapi bitmap status, consisting of several bool fields.
-> Shouldn't we instead implement it as an array of flags?
+> 
+> Don't we want instead an array of flags? Which will include also persistent and
+> inconsistent?
 
-Parsing:
-
-{ "busy": false, "persistent": false, "recording": true }
-
-is easier than parsing:
-
-{ "flags": [ "recording" ] }
-
-(and knowing that unlisted flags "busy", "persistent", and
-"inconsistent" are false), or:
-
-{ "flags": [ { "busy": false }, { "persistent": false }, { "recording":
-true } ] }
-
-So without more reason why an array of flags would be needed, I don't
-see the point for it.
+No, I don't think an array of flags is worth the extra complications in
+generation and parsing of the JSON.
 
 -- 
 Eric Blake, Principal Software Engineer
