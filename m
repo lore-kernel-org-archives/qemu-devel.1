@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32996)
+Received: from eggs.gnu.org ([209.51.188.92]:34063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyHmd-0000qT-Bd
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:03:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1gyHr3-0002yj-Vd
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:07:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyHmb-0003aA-I1
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:03:07 -0500
-References: <20190225142407.9477-1-muriloo@linux.ibm.com>
-	<20190225142407.9477-3-muriloo@linux.ibm.com>
+	(envelope-from <eblake@redhat.com>) id 1gyHr3-0000cz-9r
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:07:41 -0500
+References: <20190223002209.23084-1-jsnow@redhat.com>
+	<20190223002209.23084-4-jsnow@redhat.com>
+	<be3360bb-cbc1-daa1-2297-f3f8a88faac9@virtuozzo.com>
+	<f8cee179-d67f-2426-7d65-c208a82f1876@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <664222ad-f92f-bbb5-6f6f-dea39b77cc52@redhat.com>
-Date: Mon, 25 Feb 2019 09:02:57 -0600
+Message-ID: <b293f181-7b78-c11b-81ab-0f4b04e6fb25@redhat.com>
+Date: Mon, 25 Feb 2019 09:07:23 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190225142407.9477-3-muriloo@linux.ibm.com>
+In-Reply-To: <f8cee179-d67f-2426-7d65-c208a82f1876@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] ppc/pnv: add INITRD_MAX_SIZE constant
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] block/dirty-bitmaps: add
+ block_dirty_bitmap_check function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder Araujo <mopsfelder@gmail.com>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
 
-On 2/25/19 8:24 AM, Murilo Opsfelder Araujo wrote:
-> The current 0x10000000 value is actually 256MiB, not 128MB as the comment
-> suggests. Move it to a constant and fix the comment (no change in the size
-> value).
+On 2/25/19 8:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+
 > 
-> Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-> ---
->  hw/ppc/pnv.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 000707164e..514439db20 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -56,6 +56,7 @@
->  #define KERNEL_LOAD_ADDR        0x20000000
->  #define KERNEL_MAX_SIZE         0x10000000    /* 256MiB */
->  #define INITRD_LOAD_ADDR        0x60000000
-> +#define INITRD_MAX_SIZE         0x10000000    /* 256MiB */
+> And one more important question: we now creating new qapi bitmap status, consisting of several bool fields.
+> Shouldn't we instead implement it as an array of flags?
 
-Why not #include "qemu/units.h" and spell this:
+Parsing:
 
-#define INITRD_MAX_SIZE (256 * MiB)
+{ "busy": false, "persistent": false, "recording": true }
 
-and so on for the other values?
+is easier than parsing:
+
+{ "flags": [ "recording" ] }
+
+(and knowing that unlisted flags "busy", "persistent", and
+"inconsistent" are false), or:
+
+{ "flags": [ { "busy": false }, { "persistent": false }, { "recording":
+true } ] }
+
+So without more reason why an array of flags would be needed, I don't
+see the point for it.
 
 -- 
 Eric Blake, Principal Software Engineer
