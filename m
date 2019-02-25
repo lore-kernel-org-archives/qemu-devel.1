@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55437)
+Received: from eggs.gnu.org ([209.51.188.92]:56248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gyMt4-0001O0-So
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:30:09 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gyMvr-0002P2-1U
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:33:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gyMsw-0008N4-SQ
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:30:05 -0500
-References: <20190223000614.13894-1-jsnow@redhat.com>
-	<20190223000614.13894-11-jsnow@redhat.com>
-	<39df9fc7-6458-759b-e452-3bfdbf39c94d@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <99bc4d62-0dde-e530-b004-f1947916c72a@redhat.com>
-Date: Mon, 25 Feb 2019 15:29:09 -0500
-MIME-Version: 1.0
-In-Reply-To: <39df9fc7-6458-759b-e452-3bfdbf39c94d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 10/10] iotests: add busy/recording bit
- test to 124
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gyMvp-0001tq-3p
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:32:58 -0500
+Received: from mail-lf1-x134.google.com ([2a00:1450:4864:20::134]:44680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gyMvn-0001pi-55
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:32:56 -0500
+Received: by mail-lf1-x134.google.com with SMTP id g2so7889764lfh.11
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 12:32:51 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon, 25 Feb 2019 12:32:33 -0800
+Message-Id: <20190225203233.3439-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PULL 00/40] target/xtensa queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,215 +23,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, libvir-list@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
+Hi Peter,
 
+please pull the following batch of target/xtensa updates:
 
-On 2/23/19 5:06 PM, Eric Blake wrote:
-> On 2/22/19 6:06 PM, John Snow wrote:
->> This adds a simple test that ensures the busy bit works for push backups,
->> as well as doubling as bonus test for incremental backups that get interrupted
->> by EIO errors.
-> 
-> This makes 124 longer to run, but it is not in the 'quick' group, so
-> that's okay.
-> 
-> The easy part: I compiled the series, and validated that ./check still
-> passes with this applied, so:
-> 
-> Tested-by: Eric Blake <eblake@redhat.com>
-> 
-> Now for the fun part (I know from IRC that you had some interesting
-> challenges coming up with scenarios to even provoke the states you
-> wanted shown in the output):
-> 
->>
->> Recording bit tests are already handled sufficiently by 236.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  tests/qemu-iotests/124     | 110 +++++++++++++++++++++++++++++++++++++
->>  tests/qemu-iotests/124.out |   4 +-
->>  2 files changed, 112 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
->> index 5aa1bf1bd6..30f12a2202 100755
->> --- a/tests/qemu-iotests/124
->> +++ b/tests/qemu-iotests/124
->> @@ -634,6 +634,116 @@ class TestIncrementalBackupBlkdebug(TestIncrementalBackupBase):
->>          self.vm.shutdown()
->>          self.check_backups()
->>  
->> +    def test_incremental_pause(self):
->> +        """
->> +        Test an incremental backup that errors into a pause and is resumed.
->> +        """
->> +
->> +        drive0 = self.drives[0]
->> +        result = self.vm.qmp('blockdev-add',
->> +                             node_name=drive0['id'],
->> +                             driver=drive0['fmt'],
->> +                             file={
->> +                                 'driver': 'blkdebug',
->> +                                 'image': {
->> +                                     'driver': 'file',
->> +                                     'filename': drive0['file']
->> +                                 },
->> +                                 'set-state': [{
->> +                                     'event': 'flush_to_disk',
->> +                                     'state': 1,
->> +                                     'new_state': 2
->> +                                 },{
->> +                                     'event': 'read_aio',
->> +                                     'state': 2,
->> +                                     'new_state': 3
->> +                                 }],
->> +                                 'inject-error': [{
->> +                                     'event': 'read_aio',
->> +                                     'errno': 5,
->> +                                     'state': 3,
->> +                                     'immediately': False,
->> +                                     'once': True
->> +                                 }],
-> 
-> Yeah, it's hairy to come up with sequences that will pause at the right
-> place, and this may be sensitive enough that we have to revisit it in
-> the future, but for now it works and I don't have any better suggestions.
-> 
+The following changes since commit 1c3d45df5e94042d5fb2bb31416072563ab30e49:
 
-The problem in this case was that the drive_add itself provokes a
-read_aio. I didn't dig too far to see why, but I needed an extra
-read_aio state in the sequence there so that the error would occur
-during the actual backup job.
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-02-04' into staging (2019-02-05 12:46:18 +0000)
 
-I think I'll document this in the test, with at least a comment.
+are available in the git repository at:
 
-I wonder if there's a syntactical sugar we could write that makes this
-easier to read, like:
+  git://github.com/OSLL/qemu-xtensa.git tags/20190225-xtensa
 
-'inject-error': [{ 'event': 'flush_to_disk->read_aio->read_aio' }] or
-some such, but that's probably at odds with the existing interface and
-not worth my time to go on a crusade about.
+for you to fetch changes up to 116f9089402081231ebc6d0012e4e029f21f63af:
 
->> +                             })
->> +        self.assert_qmp(result, 'return', {})
->> +        self.create_anchor_backup(drive0)
->> +        bitmap = self.add_bitmap('bitmap0', drive0)
->> +
->> +        # Emulate guest activity
->> +        self.hmp_io_writes(drive0['id'], (('0xab', 0, 512),
->> +                                          ('0xfe', '16M', '256k'),
->> +                                          ('0x64', '32736k', '64k')))
->> +
->> +        # For the purposes of query-block visibility of bitmaps, add a drive
->> +        # frontend after we've written data; otherwise we can't use hmp-io
->> +        result = self.vm.qmp("device_add",
->> +                             id="device0",
->> +                             drive=drive0['id'],
->> +                             driver="virtio-blk")
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        # Bitmap Status Check
->> +        query = self.vm.qmp('query-block')
->> +        ret = [bmap for bmap in query['return'][0]['dirty-bitmaps']
->> +               if bmap.get('name') == bitmap.name][0]
->> +        self.assert_qmp(ret, 'count', 458752)
->> +        self.assert_qmp(ret, 'granularity', 65536)
->> +        self.assert_qmp(ret, 'status', 'active')
->> +        self.assert_qmp(ret, 'busy', False)
->> +        self.assert_qmp(ret, 'recording', True)
-> 
-> So far, nothing too different from we've seen elsewhere, but then we get
-> to the fun part:
-> 
->> +
->> +        # Start backup
->> +        parent, _ = bitmap.last_target()
->> +        target = self.prepare_backup(bitmap, parent)
->> +        res = self.vm.qmp('drive-backup',
->> +                          job_id=bitmap.drive['id'],
->> +                          device=bitmap.drive['id'],
->> +                          sync='incremental',
->> +                          bitmap=bitmap.name,
->> +                          format=bitmap.drive['fmt'],
->> +                          target=target,
->> +                          mode='existing',
->> +                          on_source_error='stop')
->> +        self.assert_qmp(res, 'return', {})
->> +
->> +        # Wait for the error
->> +        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
->> +                                   match={"data":{"device":bitmap.drive['id']}})
->> +        self.assert_qmp(event, 'data', {'device': bitmap.drive['id'],
->> +                                        'action': 'stop',
->> +                                        'operation': 'read'})
->> +
->> +        # Bitmap Status Check
->> +        query = self.vm.qmp('query-block')
->> +        ret = [bmap for bmap in query['return'][0]['dirty-bitmaps']
->> +               if bmap.get('name') == bitmap.name][0]
->> +        self.assert_qmp(ret, 'count', 458752)
->> +        self.assert_qmp(ret, 'granularity', 65536)
->> +        self.assert_qmp(ret, 'status', 'frozen')
->> +        self.assert_qmp(ret, 'busy', True)
->> +        self.assert_qmp(ret, 'recording', True)
-> 
-> "status":"frozen", "busy":true - yay, you provoked the other QMP states
-> that we have not seen elsewhere in the testsuite.
-> 
+  tests/tcg/xtensa: add FPU2000 coprocessor tests (2019-02-18 22:09:10 -0800)
 
-It also tests that you can query a bitmap during an error-paused backup
-job which is new.
+----------------------------------------------------------------
+target/xtensa: FLIX support, various fixes and test improvements
 
->> +
->> +        # Resume and check incremental backup for consistency
->> +        res = self.vm.qmp('block-job-resume', device=bitmap.drive['id'])
->> +        self.assert_qmp(res, 'return', {})
->> +        self.wait_qmp_backup(bitmap.drive['id'])
->> +
->> +        # Bitmap Status Check
->> +        query = self.vm.qmp('query-block')
->> +        ret = [bmap for bmap in query['return'][0]['dirty-bitmaps']
->> +               if bmap.get('name') == bitmap.name][0]
->> +        self.assert_qmp(ret, 'count', 0)
->> +        self.assert_qmp(ret, 'granularity', 65536)
->> +        self.assert_qmp(ret, 'status', 'active')
->> +        self.assert_qmp(ret, 'busy', False)
->> +        self.assert_qmp(ret, 'recording', True)
-> 
-> and even nicer, after the transient error goes away, it does not get in
-> the way of further bitmap edits.
-> 
+- add FLIX (flexible length instructions extension) support;
+- make testsuite runnable on wider range of xtensa cores;
+- add floating point opcode tests;
+- don't add duplicate 'static' in import_core.sh script;
+- fix undefined opcodes detection in test_mmuhifi_c3 overlay.
 
-And that the job can successfully finish, the bitmap is correct, etc. It
-does not, sadly, test further guest writes because of the thorny issue
-with the drive frontend prohibiting writes from HMP.
+----------------------------------------------------------------
+Max Filippov (40):
+      target/xtensa/import_core.sh: don't add duplicate 'static'
+      target/xtensa: don't specify windowed registers manually
+      target/xtensa: get rid of gen_callw[i]
+      target/xtensa: fixup test_mmuhifi_c3 overlay
+      target/xtensa: move xtensa_finalize_config to xtensa_core_class_init
+      target/xtensa: don't require opcode table sorting
+      target/xtensa: allow multiple names for single opcode
+      target/xtensa: implement wide branches and loops
+      target/xtensa: sort FLIX instruction opcodes
+      target/xtensa: add generic instruction post-processing
+      target/xtensa: move WINDOW_BASE SR update to postprocessing
+      target/xtensa: only rotate window in the retw helper
+      target/xtensa: reorganize register handling in translators
+      target/xtensa: reorganize access to MAC16 registers
+      target/xtensa: reorganize access to boolean registers
+      target/xtensa: break circular register dependencies
+      target/xtensa: prioritize load/store in FLIX bundles
+      target/xtensa: implement PREFCTL SR
+      tests/tcg/xtensa: indicate failed tests
+      tests/tcg/xtensa: support configurations w/o vecbase
+      tests/tcg/xtensa: support configs with LITBASE
+      tests/tcg/xtensa: don't use optional opcodes in generic code
+      tests/tcg/xtensa: fix endianness issues in test_b
+      tests/tcg/xtensa: enable boolean tests
+      tests/tcg/xtensa: conditionalize debug option tests
+      tests/tcg/xtensa: conditionalize cache option tests
+      tests/tcg/xtensa: add straightforward conditionals
+      tests/tcg/xtensa: conditionalize interrupt tests
+      tests/tcg/xtensa: conditionalize timer/CCOUNT tests
+      tests/tcg/xtensa: conditionalize and expand SR tests
+      tests/tcg/xtensa: fix SR tests for big endian configs
+      tests/tcg/xtensa: conditionalize and fix s32c1i tests
+      tests/tcg/xtensa: conditionalize windowed register tests
+      tests/tcg/xtensa: conditionalize MMU-related tests
+      tests/tcg/xtensa: add test for FLIX
+      tests/tcg/xtensa: add LSCI/LSCX group tests
+      tests/tcg/xtensa: add FP0 group arithmetic tests
+      tests/tcg/xtensa: add FP0 group conversion tests
+      tests/tcg/xtensa: add FP1 group tests
+      tests/tcg/xtensa: add FPU2000 coprocessor tests
 
->> +
->> +        # Finalize / Cleanup
->> +        self.make_reference_backup(bitmap)
->> +        self.vm.shutdown()
->> +        self.check_backups()
->> +
->>  
->>  if __name__ == '__main__':
->>      iotests.main(supported_fmts=['qcow2'])
->> diff --git a/tests/qemu-iotests/124.out b/tests/qemu-iotests/124.out
->> index e56cae021b..281b69efea 100644
->> --- a/tests/qemu-iotests/124.out
->> +++ b/tests/qemu-iotests/124.out
->> @@ -1,5 +1,5 @@
->> -...........
->> +............
->>  ----------------------------------------------------------------------
->> -Ran 11 tests
->> +Ran 12 tests
-> 
-> Pre-existing, but this output is a bear to debug if the test ever starts
-> failing.  Not something you have to worry about today, though.
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
+ .../core-test_mmuhifi_c3/xtensa-modules.inc.c      | 1322 ++++++------
+ target/xtensa/cpu.h                                |   40 +-
+ target/xtensa/helper.c                             |   94 +-
+ target/xtensa/helper.h                             |    5 +-
+ target/xtensa/import_core.sh                       |    2 +-
+ target/xtensa/overlay_tool.h                       |    1 -
+ target/xtensa/translate.c                          | 2113 ++++++++++----------
+ target/xtensa/win_helper.c                         |   22 +-
+ tests/tcg/xtensa/Makefile                          |   13 +-
+ tests/tcg/xtensa/linker.ld.S                       |   67 +-
+ tests/tcg/xtensa/macros.inc                        |   41 +-
+ tests/tcg/xtensa/test_b.S                          |   40 +-
+ tests/tcg/xtensa/test_boolean.S                    |    4 +
+ tests/tcg/xtensa/test_break.S                      |   27 +-
+ tests/tcg/xtensa/test_cache.S                      |   62 +-
+ tests/tcg/xtensa/test_clamps.S                     |    4 +
+ tests/tcg/xtensa/test_flix.S                       |   60 +
+ tests/tcg/xtensa/test_fp0_arith.S                  |  173 ++
+ tests/tcg/xtensa/test_fp0_conv.S                   |  304 +++
+ tests/tcg/xtensa/test_fp1.S                        |  141 ++
+ tests/tcg/xtensa/test_fp_cpenable.S                |   27 +
+ tests/tcg/xtensa/test_interrupt.S                  |   88 +-
+ tests/tcg/xtensa/test_loop.S                       |    4 +
+ tests/tcg/xtensa/test_lsc.S                        |  122 ++
+ tests/tcg/xtensa/test_mac16.S                      |    4 +
+ tests/tcg/xtensa/test_max.S                        |    4 +
+ tests/tcg/xtensa/test_min.S                        |    4 +
+ tests/tcg/xtensa/test_mmu.S                        |    4 +
+ tests/tcg/xtensa/test_mul16.S                      |    4 +
+ tests/tcg/xtensa/test_mul32.S                      |    4 +
+ tests/tcg/xtensa/test_nsa.S                        |    4 +
+ tests/tcg/xtensa/test_phys_mem.S                   |    4 +
+ tests/tcg/xtensa/test_quo.S                        |    4 +
+ tests/tcg/xtensa/test_rem.S                        |    4 +
+ tests/tcg/xtensa/test_rst0.S                       |    8 +
+ tests/tcg/xtensa/test_s32c1i.S                     |   12 +
+ tests/tcg/xtensa/test_sext.S                       |    4 +
+ tests/tcg/xtensa/test_sr.S                         |  153 +-
+ tests/tcg/xtensa/test_timer.S                      |   48 +-
+ tests/tcg/xtensa/test_windowed.S                   |   32 +-
+ tests/tcg/xtensa/vectors.S                         |   14 +-
+ 41 files changed, 3250 insertions(+), 1837 deletions(-)
+ create mode 100644 tests/tcg/xtensa/test_flix.S
+ create mode 100644 tests/tcg/xtensa/test_fp0_arith.S
+ create mode 100644 tests/tcg/xtensa/test_fp0_conv.S
+ create mode 100644 tests/tcg/xtensa/test_fp1.S
+ create mode 100644 tests/tcg/xtensa/test_fp_cpenable.S
+ create mode 100644 tests/tcg/xtensa/test_lsc.S
 
-Thanks!
+Thanks.
+-- Max
