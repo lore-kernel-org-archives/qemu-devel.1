@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48426)
+Received: from eggs.gnu.org ([209.51.188.92]:50064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gyCXp-0007Wj-Us
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:27:30 -0500
+	(envelope-from <pkrempa@redhat.com>) id 1gyCgP-0000f2-Ep
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:36:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gyCXo-0006mF-0Y
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:27:29 -0500
-Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:44793)
+	(envelope-from <pkrempa@redhat.com>) id 1gyCgO-0003eM-AF
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:36:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60228)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gyCXj-0006Tq-TB
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:27:25 -0500
-Received: from player737.ha.ovh.net (unknown [10.109.143.146])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 0270811C5EC
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 10:26:58 +0100 (CET)
-Date: Mon, 25 Feb 2019 10:26:51 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190225102651.762e2520@bahia.lan>
-In-Reply-To: <20190224233711.GD7668@umbus.fritz.box>
-References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
-	<20190214043916.22128-3-david@gibson.dropbear.id.au>
-	<20190222100822.73515a4d@bahia.lan>
-	<20190224233711.GD7668@umbus.fritz.box>
+	(Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1gyCgN-0003b1-Pm
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:36:20 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 29846308ED6D
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:28:55 +0000 (UTC)
+Date: Mon, 25 Feb 2019 10:28:46 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20190225092846.GA4757@angien.pipo.sk>
+References: <20190222153254.22739-1-stefanha@redhat.com>
+	<87imx8uu99.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/8=QYiygxEyObaqsx9qOLpor";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/5] virtio-balloon: Corrections
- to address verification
+	protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
+Content-Disposition: inline
+In-Reply-To: <87imx8uu99.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,128 +34,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, qemu-ppc@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
---Sig_/8=QYiygxEyObaqsx9qOLpor
-Content-Type: text/plain; charset=US-ASCII
+
+--dDRMvlgZJXvWKvBx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 25 Feb 2019 10:37:11 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Fri, Feb 22, 2019 at 10:08:22AM +0100, Greg Kurz wrote:
-> > On Thu, 14 Feb 2019 15:39:13 +1100
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > The virtio-balloon device's verification of the address given to it b=
-y the
-> > > guest has a number of faults:
-> > >     * The addresses here are guest physical addresses, which should be
-> > >       'hwaddr' rather than 'ram_addr_t' (the distinction is admittedly
-> > >       pretty subtle and confusing)
-> > >     * We don't check for section.mr being NULL, which is the main way=
- that
-> > >       memory_region_find() reports basic failures.  We really need to=
- check
-> > >       that before looking at any other section fields, because
-> > >       memory_region_find() doesn't initialize them on the failure path
-> > >     * We're passing a length of '1' to memory_region_find(), but real=
-ly the
-> > >       guest is requesting that we put the entire page into the balloo=
-n,
-> > >       so it makes more sense to call it with BALLOON_PAGE_SIZE
-> > >=20
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  hw/virtio/virtio-balloon.c | 17 ++++++++++-------
-> > >  1 file changed, 10 insertions(+), 7 deletions(-)
-> > >=20
-> > > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> > > index 43af521884..eb357824d8 100644
-> > > --- a/hw/virtio/virtio-balloon.c
-> > > +++ b/hw/virtio/virtio-balloon.c
-> > > @@ -221,17 +221,20 @@ static void virtio_balloon_handle_output(VirtIO=
-Device *vdev, VirtQueue *vq)
-> > >          }
-> > > =20
-> > >          while (iov_to_buf(elem->out_sg, elem->out_num, offset, &pfn,=
- 4) =3D=3D 4) {
-> > > -            ram_addr_t pa;
-> > > -            ram_addr_t addr;
-> > > +            hwaddr pa;
-> > > +            hwaddr addr;
-> > >              int p =3D virtio_ldl_p(vdev, &pfn);
-> > > =20
-> > > -            pa =3D (ram_addr_t) p << VIRTIO_BALLOON_PFN_SHIFT;
-> > > +            pa =3D (hwaddr) p << VIRTIO_BALLOON_PFN_SHIFT;
-> > >              offset +=3D 4;
-> > > =20
-> > > -            /* FIXME: remove get_system_memory(), but how? */
-> > > -            section =3D memory_region_find(get_system_memory(), pa, =
-1);
-> > > -            if (!int128_nz(section.size) ||
-> > > -                !memory_region_is_ram(section.mr) ||
-> > > +            section =3D memory_region_find(get_system_memory(), pa,
-> > > +                                         BALLOON_PAGE_SIZE);
-> > > +            if (!section.mr) {
-> > > +                trace_virtio_balloon_bad_addr(pa);
-> > > +                continue;
-> > > +            } =20
-> >=20
-> > memory_region_unref(section.mr) with section.mr =3D=3D NULL is safe and
-> > resolves to a nop. Not sure you need a separate if to handle this
-> > case. =20
+On Mon, Feb 25, 2019 at 09:50:26 +0100, Markus Armbruster wrote:
+> Stefan Hajnoczi <stefanha@redhat.com> writes:
 >=20
-> memory_region_is_ram() and friends are not, however - they will
-> dereference their argument unconditionally.
+> > QMP clients can usually detect the presence of features via schema
+> > introspection.  There are rare features that do not involve schema
+> > changes and are therefore impossible to detect with schema
+> > introspection.
+> >
+> > This patch adds the query-qemu-capabilities command.  It returns a list
+> > of capabilities that this QEMU supports.
 >=20
-
-Indeed but the two ifs can be merged anyway:
-
-            if (!section.mr ||
-                !memory_region_is_ram(section.mr) ||
-                memory_region_is_rom(section.mr) ||
-                memory_region_is_romd(section.mr)) {
-                trace_virtio_balloon_bad_addr(pa);
-                memory_region_unref(section.mr);
-                continue;
-            }
-
-> >=20
-> > Apart from that,
-> >=20
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> >  =20
-> > > +            if (!memory_region_is_ram(section.mr) ||
-> > >                  memory_region_is_rom(section.mr) ||
-> > >                  memory_region_is_romd(section.mr)) {
-> > >                  trace_virtio_balloon_bad_addr(pa); =20
-> >  =20
+> The name "capabilities" could be confusing, because we already have QMP
+> capabilities, complete with command qmp_capabilities.  Would "features"
+> work?
 >=20
+> > The decision to make this a command rather than something statically
+> > defined in the schema is intentional.  It allows QEMU to decide which
+> > capabilities are available at runtime, if necessary.
+> >
+> > This new interface is necessary so that QMP clients can discover that
+> > migrating disk image files is safe with cache.direct=3Doff on Linux.
+> > There is no other way to detect whether or not QEMU supports this.
+>=20
+> I think what's unsaid here is that we don't want to make a completely
+> arbitrary schema change just to carry this bit of information.  We
+> could, but we don't want to.  Correct?
+
+One example of such 'unrelated' change was a recent query- command which
+is used by libvirt just to detect presence of the feature but the
+queried result is never used and not very useful.
+
+> > Cc: Markus Armbruster <armbru@redhat.com>
+> > Cc: Peter Krempa <pkrempa@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  qapi/misc.json | 42 ++++++++++++++++++++++++++++++++++++++++++
+> >  qmp.c          | 18 ++++++++++++++++++
+> >  2 files changed, 60 insertions(+)
+
+[...]
+
+> > +QemuCapabilities *qmp_query_qemu_capabilities(Error **errp)
+> > +{
+> > +    QemuCapabilities *caps =3D g_new0(QemuCapabilities, 1);
+> > +    QemuCapabilityList **prev =3D &caps->capabilities;
+> > +    QemuCapability cap_val;
+> > +
+> > +    /* Add all QemuCapability enum values defined in the schema */
+> > +    for (cap_val =3D 0; cap_val < QEMU_CAPABILITY__MAX; cap_val++) {
+> > +        QemuCapabilityList *cap =3D g_new0(QemuCapabilityList, 1);
+> > +
+> > +        cap->value =3D cap_val;
+> > +        *prev =3D cap;
+> > +        prev =3D &cap->next;
+> > +    }
+> > +
+> > +    return caps;
+> > +}
+>=20
+> All capabilities known to this build of QEMU are always present.  Okay;
+> no need to complicate things until we need to.  I just didn't expect it
+> to be this simple after the commit message's "It allows QEMU to decide
+> which capabilities are available at runtime, if necessary."
+
+I'm slightly worried of misuse of the possibility to change the behavior
+on runtime. In libvirt we cache the capabilities to prevent a "chicken
+and egg" problem where we need to know what qemu is able to do when
+generating the command line which is obviously prior to starting qemu.
+This means that we will want to cache even information determined by
+interpreting results of this API.
+
+If any further addition is not as simple as this one it may be
+challenging to be able to interpret the result correctly and be able to
+cache it.
+
+Libvirt's use of capabilities is split to pre-startup steps and runtime
+usage. For the pre-startup case [A]  we obviously want to use the cached
+capabilities which are obtained by running same qemu with a different
+configuration that will be used later. After qemu is started we use
+QMP to interact [B] with it also depending to the capabilities
+determined from the cache. Scenario [B] also allows us to re-probe some
+things but they need to be strictly usable only with QMP afterwards.
+
+The proposed API with the 'runtime' behaviour allows for these 3
+scenarios for a capability:
+1) Static capability (as this patch shows)
+    This is easy to cache and also supports both [A] and [B]
+
+2) Capability depending on configuration
+    [A] is out of the window but if QMP only use is necessary we can
+    adapt.
+
+3) Capability depending on host state.
+    Same commandline might not result in same behaviour. Obviously can't
+    be cached at all, but libvirt would not do it anyways. [B] is
+    possible, but it's unpleasant.
+
+I propose that the docs for the function filling the result (and perhaps
+also the documentation for the QMP interface) clarify and/or guide devs
+to avoid situations 2) and 3) if possible and motivate them to document
+the limitations on when the capability is detactable.
+
+Additionally a new field could be added that e.g. pledges that the given
+capability is of type 1) as described above and thus can be easily
+cached. That way we can make sure programatically that we pre-cache only
+the 'good' capabilities.
+
+Other than the above, this is a welcome improvement as I've personally
+ran into scenarios where a feature in qemu was fixed but it was
+impossible to detect whether given qemu version contains the fix as it
+did not have any influence on the QMP schema.
 
 
---Sig_/8=QYiygxEyObaqsx9qOLpor
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+
+--dDRMvlgZJXvWKvBx
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlxztNsACgkQcdTV5YIv
-c9bi0Q/+JObWXZqwTsp9L8YEl7a/3CoNRs25T3qQZZasrk0AFmwQdX+u8Pj+qME5
-VxiJH4OK8kI6zGnOrHStkBo5Y6UFEy3ayXWiSpMcSuLyOqrfr2crFAZak5aa/Ewv
-fSmP6115SgWzf72Y2m1LNGGVCYG9MfXYwN1E3dHWtHjD4NDq44KeU2hC+knm0hwb
-wzPuMvQWkMELLLwva/7T7RKGgGmU0YM1Mtyz02fDPZbyRZM60PKhdaAFfAeRyriC
-4oeaWOjYkvOPOJGi8o9ia6VGHdMNMwAurJVkH1uATUCWxj8UH2YTkqYksc4QkI3O
-6X5Y2tmxDHQxXyXmJU2VE4ikv6IhDFuxlq3zhLSyILdLoUSEV8VF+HjRaYGWsf2I
-y1DM442qGaqnCuq80oF/W1dlbFAMh7r6aeGGxgrBRjkTBoh6EMXJNm8xUinFoalz
-7wARvKTM4MFnLt0Unw3EH9XagnTNHY9h+YKcIfpvkbYZMi40VeXAm/VJi4+ijrc/
-ydOaV1n6eYE/eZd5scru15sHUVdiqx89T7qujgkE1GzYNl1EIM0aEOXEDuHO3HHF
-xXcOhI04q7ML2LYtFm02AsTXqkaWhHD28TTp81leRCJR+ex3tSfzhChoZJGBk0OL
-sflIfMvD6mVIKsua6wqCNrrwPCHsopGHGRECSmLXQb8N6EIBY9A=
-=cEb+
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlxztUwACgkQHGwCByjY
+1GrDnA/+OpnPZS+TN+9mBtqsZMass9OT7LzSHZzVPlNS4T0DM5jPFf2regLyWDAB
+dgKJ177/ajxG5d9mtd8X7UZSSuTMGebL1pGoyzqiH4XFfOOMxn8Xhk2Y8YvxsD4K
+2cScc90WlbL4lb6e3iTeZZ/xNrDXZ9T27NhQTv8ISmgm6ojqWXjWbHvP1coiMSGk
+ry3HzkdKphc7eNt5wxTCXUMrPhL36fxMu7KlKd2W41aYnb86D2Gev4Mi3m5m7f5m
+M6um0p6qq39WkC7oB0zTNx+bc5ZtKxWVsCYRa1sWOk4opj3JAQGWGaeFyc+j1FB0
+r/6b2b73cZka9j1D3ZwI5f7+oyJ4eR6TppYCKHCQgbPNEY3jw5yn5q0CDaRAMZiP
+tPzi6+hDmW4lQMP+XAfDzkwQywi4HgBOW8R5WqZyXiJQSIBpWz2mXaDre78nnUK4
+keu3EsNtNX1HwS0O75YDQlZ6AfgI98o9NkGmkZa5Au9nyJju2zaVpZS/2e9x4/i+
+/PNpvg1YJ6tH8HAU0d9iRKRwBkGN9qhfLA9r+ua8Hqd1k6wcsmKS4wB9nEfkX6Al
+srSoGYHqpe9sc1tJbQRRSsdYbaYX+1CrQtjUy1vR+1TVvO0N1j39ppwPRScp12Mb
+WfWrKvf32Q5ssHI+gfSMWmHOu5S9dQXbljAJuiWZbicp4VUbds8=
+=wVNi
 -----END PGP SIGNATURE-----
 
---Sig_/8=QYiygxEyObaqsx9qOLpor--
+--dDRMvlgZJXvWKvBx--
