@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57835)
+Received: from eggs.gnu.org ([209.51.188.92]:58400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gyJ7t-0006AN-GO
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:29:10 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gyJ9k-0008EX-B6
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:31:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gyJ7s-0006TY-OM
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:29:09 -0500
-Date: Mon, 25 Feb 2019 16:19:08 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190225161908.GC379@stefanha-x1.localdomain>
-References: <20190221101139.2224-1-stefanha@redhat.com>
-	<c620cfea-6f3c-f9b6-1dce-52eae2d905d7@redhat.com>
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gyJ9Y-0008PK-59
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:30:56 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Mon, 25 Feb 2019 16:30:39 +0000
+Message-ID: <8a32603f-bfe4-4c76-5503-8d1c992d0bd8@virtuozzo.com>
+References: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <ABDFCEEF42F95B4CA623E677BD77CF38@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DBIVS5p969aUjpLe"
-Content-Disposition: inline
-In-Reply-To: <c620cfea-6f3c-f9b6-1dce-52eae2d905d7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] iotests: drop unnecessary accel=kvm in
- 238
+Subject: Re: [Qemu-devel] [PATCH] Discard old bitmap directories in QCOW2
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-
---DBIVS5p969aUjpLe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Feb 21, 2019 at 11:24:12AM +0100, Thomas Huth wrote:
-> On 21/02/2019 11.11, Stefan Hajnoczi wrote:
-> > Test 238 does not require the kvm accelerator.  TCG works fine.
-> >=20
-> > Use the default accelerator instead of requiring kvm.
-> >=20
-> > Suggested-by: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> > Vladimir, I have dropped the 235 change because I don't have time to
-> > figure out the kvm/tcg vs qtest differences or add a skip function.
-> > Sorry!
-> >=20
-> >  tests/qemu-iotests/238 | 1 -
-> >  1 file changed, 1 deletion(-)
-> >=20
-> > diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
-> > index f81ee1112f..e490bb4298 100755
-> > --- a/tests/qemu-iotests/238
-> > +++ b/tests/qemu-iotests/238
-> > @@ -33,7 +33,6 @@ else:
-> >      virtio_scsi_device =3D 'virtio-scsi-pci'
-> > =20
-> >  vm =3D QEMUMachine(iotests.qemu_prog)
-> > -vm.add_args('-machine', 'accel=3Dkvm')
->=20
-> Would it be feasible to change it into "accel=3Dqtest" instead? ... then
-> this test would also work when QEMU has been compiled with --disable-tcg
-> and when KVM is not available...
-
-Sure.  I have tested that qtest still triggered the bug when the fix was
-merged.
-
-Will fix in v3.
-
-Stefan
-
---DBIVS5p969aUjpLe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcdBV8AAoJEJykq7OBq3PIcooIAKgZrMlJPVkeRWV1GWYCcTzp
-/CupLU+7lMPKP4E7V3UIEBLcD7TxRqXvkFyY2rPWzUMBqUAwL9iFff2jIlE5hshN
-x4HEuufGc9ReJRaK1qdKzwTJjSFSyq8QY5ZyIFK0NhvdkuPOEKm1/P5KOm9w3+Mb
-WGxRIFK5VydDNWvqu1McOqD/osoHWpEnHjidGTQw97PNpR+/FJxDeJUt0CC8xVuA
-PE8GLMCuH1MhGxSRWyTkKG3zQrG3T8oc8LZUToUElJvfUSv/KGi+h4SEoZgCTiTa
-1wM1SZA47lscl02islT5LVaw+0rLeo4r97D/dZk7/TJR6hUwItgmyPLvWNvxHIE=
-=lN4z
------END PGP SIGNATURE-----
-
---DBIVS5p969aUjpLe--
+UElOR2luZw0KUGxlYXNlIHJldmlldyB0aGlzIHNpbXBsZSBwYXRjaC4NCg0KT24gMTIvMDIvMjAx
+OSAxNTozNSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IENsZWFuIFFDT1cyIGltYWdlIGZy
+b20gYml0bWFwIG9ic29sZXRlIGRpcmVjdG9yeSB3aGVuIGEgbmV3IG9uZQ0KPiBpcyBhbGxvY2F0
+ZWQgYW5kIHN0b3JlZC4gSXQgc2xvd3MgZG93biB0aGUgaW1hZ2UgZ3Jvd3RoIGEgbGl0dGxlIGJp
+dC4NCj4gVGhlIGZsYWcgUUNPVzJfRElTQ0FSRF9BTFdBWVMgYWxsb3dzIGEgY2FsbCB0byByYXdf
+Y29fcGRpc2NhcmQoKQ0KPiB0aGF0IGRvZXMgdGhlIGFjdHVhbCBjbGVhbmluZyBvZiB0aGUgaW1h
+Z2Ugb24gZGlzay4NCj4gV2l0aCB0aGUgZmxhZyBRQ09XMl9ESVNDQVJEX09USEVSLCBhIHJlZmVy
+ZW5jZSBjb3VudCBvZiB0aGUgY2x1c3Rlcg0KPiBpcyB1cGRhdGVkIG9ubHkuDQo+IA0KPiBTaWdu
+ZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpv
+LmNvbT4NCj4gLS0tDQo+ICAgYmxvY2svcWNvdzItYml0bWFwLmMgfCAxMiArKysrKystLS0tLS0N
+Cj4gICAxIGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0KPiAN
+Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jIGIvYmxvY2svcWNvdzItYml0bWFw
+LmMNCj4gaW5kZXggYjk0NjMwMS4uNjgyY2IwOSAxMDA2NDQNCj4gLS0tIGEvYmxvY2svcWNvdzIt
+Yml0bWFwLmMNCj4gKysrIGIvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gQEAgLTIwMiw3ICsyMDIs
+NyBAQCBzdGF0aWMgdm9pZCBjbGVhcl9iaXRtYXBfdGFibGUoQmxvY2tEcml2ZXJTdGF0ZSAqYnMs
+IHVpbnQ2NF90ICpiaXRtYXBfdGFibGUsDQo+ICAgICAgICAgICAgICAgY29udGludWU7DQo+ICAg
+ICAgICAgICB9DQo+ICAgDQo+IC0gICAgICAgIHFjb3cyX2ZyZWVfY2x1c3RlcnMoYnMsIGFkZHIs
+IHMtPmNsdXN0ZXJfc2l6ZSwgUUNPVzJfRElTQ0FSRF9PVEhFUik7DQo+ICsgICAgICAgIHFjb3cy
+X2ZyZWVfY2x1c3RlcnMoYnMsIGFkZHIsIHMtPmNsdXN0ZXJfc2l6ZSwgUUNPVzJfRElTQ0FSRF9B
+TFdBWVMpOw0KPiAgICAgICAgICAgYml0bWFwX3RhYmxlW2ldID0gMDsNCj4gICAgICAgfQ0KPiAg
+IH0NCj4gQEAgLTI1Nyw3ICsyNTcsNyBAQCBzdGF0aWMgaW50IGZyZWVfYml0bWFwX2NsdXN0ZXJz
+KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRY293MkJpdG1hcFRhYmxlICp0YikNCj4gICANCj4gICAg
+ICAgY2xlYXJfYml0bWFwX3RhYmxlKGJzLCBiaXRtYXBfdGFibGUsIHRiLT5zaXplKTsNCj4gICAg
+ICAgcWNvdzJfZnJlZV9jbHVzdGVycyhicywgdGItPm9mZnNldCwgdGItPnNpemUgKiBzaXplb2Yo
+dWludDY0X3QpLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgUUNPVzJfRElTQ0FSRF9PVEhF
+Uik7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICBRQ09XMl9ESVNDQVJEX0FMV0FZUyk7DQo+
+ICAgICAgIGdfZnJlZShiaXRtYXBfdGFibGUpOw0KPiAgIA0KPiAgICAgICB0Yi0+b2Zmc2V0ID0g
+MDsNCj4gQEAgLTgwMSw3ICs4MDEsNyBAQCBmYWlsOg0KPiAgICAgICBnX2ZyZWUoZGlyKTsNCj4g
+ICANCj4gICAgICAgaWYgKCFpbl9wbGFjZSAmJiBkaXJfb2Zmc2V0ID4gMCkgew0KPiAtICAgICAg
+ICBxY293Ml9mcmVlX2NsdXN0ZXJzKGJzLCBkaXJfb2Zmc2V0LCBkaXJfc2l6ZSwgUUNPVzJfRElT
+Q0FSRF9PVEhFUik7DQo+ICsgICAgICAgIHFjb3cyX2ZyZWVfY2x1c3RlcnMoYnMsIGRpcl9vZmZz
+ZXQsIGRpcl9zaXplLCBRQ09XMl9ESVNDQVJEX0FMV0FZUyk7DQo+ICAgICAgIH0NCj4gICANCj4g
+ICAgICAgcmV0dXJuIHJldDsNCj4gQEAgLTkwNCwxNCArOTA0LDE0IEBAIHN0YXRpYyBpbnQgdXBk
+YXRlX2V4dF9oZWFkZXJfYW5kX2RpcihCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgfQ0K
+PiAgIA0KPiAgICAgICBpZiAob2xkX3NpemUgPiAwKSB7DQo+IC0gICAgICAgIHFjb3cyX2ZyZWVf
+Y2x1c3RlcnMoYnMsIG9sZF9vZmZzZXQsIG9sZF9zaXplLCBRQ09XMl9ESVNDQVJEX09USEVSKTsN
+Cj4gKyAgICAgICAgcWNvdzJfZnJlZV9jbHVzdGVycyhicywgb2xkX29mZnNldCwgb2xkX3NpemUs
+IFFDT1cyX0RJU0NBUkRfQUxXQVlTKTsNCj4gICAgICAgfQ0KPiAgIA0KPiAgICAgICByZXR1cm4g
+MDsNCj4gICANCj4gICBmYWlsOg0KPiAgICAgICBpZiAobmV3X29mZnNldCA+IDApIHsNCj4gLSAg
+ICAgICAgcWNvdzJfZnJlZV9jbHVzdGVycyhicywgbmV3X29mZnNldCwgbmV3X3NpemUsIFFDT1cy
+X0RJU0NBUkRfT1RIRVIpOw0KPiArICAgICAgICBxY293Ml9mcmVlX2NsdXN0ZXJzKGJzLCBuZXdf
+b2Zmc2V0LCBuZXdfc2l6ZSwgUUNPVzJfRElTQ0FSRF9BTFdBWVMpOw0KPiAgICAgICB9DQo+ICAg
+DQo+ICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfb2Zmc2V0ID0gb2xkX29mZnNldDsNCj4gQEAg
+LTEyNDIsNyArMTI0Miw3IEBAIGZhaWw6DQo+ICAgDQo+ICAgICAgIGlmICh0Yl9vZmZzZXQgPiAw
+KSB7DQo+ICAgICAgICAgICBxY293Ml9mcmVlX2NsdXN0ZXJzKGJzLCB0Yl9vZmZzZXQsIHRiX3Np
+emUgKiBzaXplb2YodGJbMF0pLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFDT1cy
+X0RJU0NBUkRfT1RIRVIpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFDT1cyX0RJ
+U0NBUkRfQUxXQVlTKTsNCj4gICAgICAgfQ0KPiAgIA0KPiAgICAgICBnX2ZyZWUodGIpOw0KPiAN
+Cg0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
