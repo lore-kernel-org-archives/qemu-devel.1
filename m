@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44612)
+Received: from eggs.gnu.org ([209.51.188.92]:46413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gyOHo-0000aX-6B
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 16:59:45 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gyORB-0003lB-CC
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 17:09:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gyOHn-0007Vm-7p
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 16:59:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gyOHl-0007MF-J1
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 16:59:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gyOHZ-0001WM-W4
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 21:59:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E653C2E807C
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 21:59:29 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1gyOR4-00066I-Ui
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 17:09:23 -0500
+References: <20190223000614.13894-1-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <fec1904a-6b8a-54c2-f2f9-7012caf29e12@redhat.com>
+Date: Mon, 25 Feb 2019 17:08:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Feb 2019 21:47:06 -0000
-From: empty <ytrezq@sdf-eu.org>
-Reply-To: Bug 1473451 <1473451@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150710133758.14989.51708.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155113122651.22969.12723456517103614638.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1473451] Re: Please support the native bios
- format for dec alpha
+In-Reply-To: <20190223000614.13894-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 00/10] dirty-bitmaps: deprecate @status
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, libvir-list@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
 
-But In that case it=E2=80=99s impossible to emulate or even compile Windows=
- for
-Dec Alpha.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1473451
+On 2/22/19 7:06 PM, John Snow wrote:
+> The current internal meanings of "locked", "user_locked",
+> "qmp_locked", "frozen", "enabled", and "disabled" are all
+> a little muddled.
+> 
+> Deprecate the @status field in favor of two new booleans
+> that carry very specific meanings. Then, rename and rework
+> some of the internal semantics to help make the API a bit
+> more clear and easier to read.
+> 
+> Well, in my opinion.
+> 
+> Based on my current bitmaps branch.
+> 
+> V3:
+> 
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream patch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+> 
+> 001/10:[0002] [FC] 'block/dirty-bitmap: add recording and busy properties'
+> 002/10:[0002] [FC] 'block/dirty-bitmaps: rename frozen predicate helper'
+> 003/10:[down] 'block/dirty-bitmap: remove set/reset assertions against enabled bit'
+> 004/10:[0006] [FC] 'block/dirty-bitmap: change semantics of enabled predicate'
+> 005/10:[down] 'nbd: change error checking order for bitmaps'
+> 006/10:[0002] [FC] 'block/dirty-bitmap: explicitly lock bitmaps with successors'
+> 007/10:[0011] [FC] 'block/dirty-bitmaps: unify qmp_locked and user_locked calls'
+> 008/10:[0002] [FC] 'block/dirty-bitmaps: move comment block'
+> 009/10:[down] 'blockdev: remove unused paio parameter documentation'
+> 010/10:[down] 'iotests: add busy/recording bit test to 124'
+> 
+> V3: (Following Vladimir's feedback)
+> 
+> 001: Changed texi phrasing, parameter --> field
+> 002: Commit message adjustment
+>      comment edit: "not locked" --> "not user_locked"
+> 003: pulled forward out of patch 004
+> 004: Commit message rewrite
+>      create_successor and abdicate doc adjustments
+> 005: New.
+> 006: Change successor doc comment
+>      Commit message adjustment
+> 007: BdrvDirtyBitmap struct comment adjustments
+>      Comment change to create_successor (lock --> busy)
+>      Incidental changes from 004's changes
+> 008: Grammar fix (Eric)
+> 009: New, trivial, unrelated fix tagging along.
+> 010: iotest 124 added.
+> 
+> John Snow (10):
+>   block/dirty-bitmap: add recording and busy properties
+>   block/dirty-bitmaps: rename frozen predicate helper
+>   block/dirty-bitmap: remove set/reset assertions against enabled bit
+>   block/dirty-bitmap: change semantics of enabled predicate
+>   nbd: change error checking order for bitmaps
+>   block/dirty-bitmap: explicitly lock bitmaps with successors
+>   block/dirty-bitmaps: unify qmp_locked and user_locked calls
+>   block/dirty-bitmaps: move comment block
+>   blockdev: remove unused paio parameter documentation
+>   iotests: add busy/recording bit test to 124
+> 
+>  block/dirty-bitmap.c           | 111 ++++++++++++++++++---------------
+>  blockdev.c                     |  19 +++---
+>  include/block/dirty-bitmap.h   |   7 +--
+>  migration/block-dirty-bitmap.c |   8 +--
+>  nbd/server.c                   |  14 ++---
+>  qapi/block-core.json           |  10 ++-
+>  qemu-deprecated.texi           |   6 ++
+>  tests/qemu-iotests/124         | 110 ++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/124.out     |   4 +-
+>  tests/qemu-iotests/236.out     |  28 +++++++++
+>  10 files changed, 239 insertions(+), 78 deletions(-)
+> 
 
-Title:
-  Please support the native bios format for dec alpha
+Pushed to my bitmaps branch with the following minor changes:
 
-Status in QEMU:
-  Won't Fix
+001/10:[0002] [FC] 'block/dirty-bitmap: add recording and busy properties'
+002/10:[0002] [FC] 'block/dirty-bitmaps: rename frozen predicate helper'
+003/10:[----] [--] 'block/dirty-bitmap: remove set/reset assertions
+against enabled bit'
+004/10:[----] [--] 'block/dirty-bitmap: change semantics of enabled
+predicate'
+005/10:[----] [--] 'nbd: change error checking order for bitmaps'
+006/10:[----] [--] 'block/dirty-bitmap: explicitly lock bitmaps with
+successors'
+007/10:[0002] [FC] 'block/dirty-bitmaps: unify qmp_locked and
+user_locked calls'
+008/10:[----] [--] 'block/dirty-bitmaps: move comment block'
+009/10:[----] [--] 'blockdev: remove unused paio parameter documentation'
+010/10:[0003] [FC] 'iotests: add busy/recording bit test to 124'
 
-Bug description:
-  Currently qemu-system-alpha -bios parameter takes an ELF image.
-  However HP maintains firmware updates for those systems.
 
-  Some example rom files can be found here
-  ftp://ftp.hp.com/pub/alphaserver/firmware/current_platforms/v7.3_release/=
-DS20_DS20e/
-
-  It might allow things like using the SRM firmware.
-  The ARC(nt) firmware would allow to build and test windows applications f=
-or that platforms without having the relevant hardware
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1473451/+subscriptions
+001: Texi doc spelling (Eric)
+002: Commit message spelling (Eric)
+     Additional asserts (Vladimir)
+007: Comment phrasing (Vladimir)
+010: Extra test comment
