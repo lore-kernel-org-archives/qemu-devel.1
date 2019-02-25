@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37368)
+Received: from eggs.gnu.org ([209.51.188.92]:37604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyDf8-0007Wb-MJ
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 05:39:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyDg9-0008GH-FE
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 05:40:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyDf7-0005ic-P2
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 05:39:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44750)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyDf7-0005h2-Fp
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 05:39:05 -0500
-Date: Mon, 25 Feb 2019 10:38:56 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190225103856.GE29260@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190223105421.1290-1-davidkiarie4@gmail.com>
-	<20190223105421.1290-2-davidkiarie4@gmail.com>
+	(envelope-from <kwolf@redhat.com>) id 1gyDg8-0007sV-IS
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 05:40:09 -0500
+Date: Mon, 25 Feb 2019 11:31:05 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190225103105.GA6320@linux.fritz.box>
+References: <20190220174843.8847-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190223105421.1290-2-davidkiarie4@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
+In-Reply-To: <20190220174843.8847-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] block: bdrv_set_aio_context()
+ related fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +23,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Kiarie <davidkiarie4@gmail.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, jan.kiszka@siemens.com, peterx@redhat.com, alexaltea123@gmail.com, pbonzini@redhat.com, rth@twiddle.net
+To: qemu-block@nongnu.org
+Cc: mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On Sat, Feb 23, 2019 at 01:54:21PM +0300, David Kiarie wrote:
-> Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
-> ---
->  hw/i386/amd_iommu.c | 2 +-
->  hw/i386/amd_iommu.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+Am 20.02.2019 um 18:48 hat Kevin Wolf geschrieben:
+> Background for this series is the following bug report, which is about a
+> crash with virtio-blk + iothread and request resubmission for werror/rerror:
+> 
+> https://bugzilla.redhat.com/show_bug.cgi?id=1671173
+> 
+> The reason is that bdrv_set_aio_context() didn't correctly quiesce
+> everything. Instead, it had a local hack to call aio_poll() for the
+> source AioContext, which covered some, but not all cases, and is wrong
+> because you can only call aio_poll() from the home thread.
+> 
+> So this series tries to make bdrv_drain() actually drain the known cases
+> (fixes virtio-blk and the NBD client) and use the regular drain
+> functions in bdrv_set_aio_context() instead of open-coding something
+> similar.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Applied to the block branch.
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Kevin
