@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41429)
+Received: from eggs.gnu.org ([209.51.188.92]:41532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyBy9-0008Jc-1B
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 03:50:37 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gyByl-00005z-Fq
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 03:51:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyBy8-00026m-08
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 03:50:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gyBy5-00024m-U0
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 03:50:35 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 798103097061
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 08:50:31 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190222153254.22739-1-stefanha@redhat.com>
-Date: Mon, 25 Feb 2019 09:50:26 +0100
-In-Reply-To: <20190222153254.22739-1-stefanha@redhat.com> (Stefan Hajnoczi's
-	message of "Fri, 22 Feb 2019 15:32:54 +0000")
-Message-ID: <87imx8uu99.fsf@dusky.pond.sub.org>
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gyByk-0002Tc-J4
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 03:51:15 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Mon, 25 Feb 2019 08:51:07 +0000
+Message-ID: <562467c9-1459-e118-d973-b00d4f358a89@virtuozzo.com>
+References: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<83a234ca-cf14-76b9-0374-6425dab989bd@redhat.com>
+In-Reply-To: <83a234ca-cf14-76b9-0374-6425dab989bd@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E414261D79FB5C45A5290BFC340B82EF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: handle TypeError for Python3
+ in test 242
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,136 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Krempa <pkrempa@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "philmd@redhat.com" <philmd@redhat.com>
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
-
-> QMP clients can usually detect the presence of features via schema
-> introspection.  There are rare features that do not involve schema
-> changes and are therefore impossible to detect with schema
-> introspection.
->
-> This patch adds the query-qemu-capabilities command.  It returns a list
-> of capabilities that this QEMU supports.
-
-The name "capabilities" could be confusing, because we already have QMP
-capabilities, complete with command qmp_capabilities.  Would "features"
-work?
-
-> The decision to make this a command rather than something statically
-> defined in the schema is intentional.  It allows QEMU to decide which
-> capabilities are available at runtime, if necessary.
->
-> This new interface is necessary so that QMP clients can discover that
-> migrating disk image files is safe with cache.direct=off on Linux.
-> There is no other way to detect whether or not QEMU supports this.
-
-I think what's unsaid here is that we don't want to make a completely
-arbitrary schema change just to carry this bit of information.  We
-could, but we don't want to.  Correct?
-
->
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Peter Krempa <pkrempa@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  qapi/misc.json | 42 ++++++++++++++++++++++++++++++++++++++++++
->  qmp.c          | 18 ++++++++++++++++++
->  2 files changed, 60 insertions(+)
->
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 8b3ca4fdd3..9cf24919a3 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -3051,3 +3051,45 @@
->    'data': 'NumaOptions',
->    'allow-preconfig': true
->  }
-> +
-> +##
-> +# @QemuCapability:
-> +#
-> +# Capabilities that are not otherwise introspectable.
-> +#
-> +# @migrate-with-cache-direct-off-on-linux:
-> +#  It is safe to migrate disk image files with cache.direct=off on Linux.
-> +#  Previously only cache.direct=on was supported for live migration.
-
-Somewhat unusual formatting due to long name.  I double-checked the doc
-comment gets processed correctly.  Good.
-
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'enum': 'QemuCapability',
-> +  'data': [
-> +    'migrate-with-cache-direct-off-on-linux'
-> +  ]
-> +}
-> +
-> +##
-> +# @QemuCapabilities:
-> +#
-> +# Capability information.
-> +#
-> +# @capabilities: supported capabilities
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'struct': 'QemuCapabilities',
-> +  'data': { 'capabilities': ['QemuCapability'] } }
-> +
-> +##
-> +# @query-qemu-capabilities:
-> +#
-> +# Return the capabilities supported by this QEMU.  Most features can be
-> +# detected via schema introspection but some are not observable from the
-> +# schema.  This command offers a way to check for the presence of such
-> +# features.
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'command': 'query-qemu-capabilities',
-> +  'returns': 'QemuCapabilities' }
-
-Capabilities are flags: either present or absent, thus effectively
-boolean.  I don't have a specific reason to doubt limiting capabilities
-to boolean.  However, doing QemuCapabilities like
-
-   { 'struct': 'QemuCapabilities',
-     'data': { 'migrate-with-cache-direct-off-on-linux': 'bool' } }
-
-could grow to support other values more easily.  What do you think?
-
-> diff --git a/qmp.c b/qmp.c
-> index b92d62cd5f..91a1228be7 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -717,3 +717,21 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
->  
->      return mem_info;
->  }
-> +
-> +QemuCapabilities *qmp_query_qemu_capabilities(Error **errp)
-> +{
-> +    QemuCapabilities *caps = g_new0(QemuCapabilities, 1);
-> +    QemuCapabilityList **prev = &caps->capabilities;
-> +    QemuCapability cap_val;
-> +
-> +    /* Add all QemuCapability enum values defined in the schema */
-> +    for (cap_val = 0; cap_val < QEMU_CAPABILITY__MAX; cap_val++) {
-> +        QemuCapabilityList *cap = g_new0(QemuCapabilityList, 1);
-> +
-> +        cap->value = cap_val;
-> +        *prev = cap;
-> +        prev = &cap->next;
-> +    }
-> +
-> +    return caps;
-> +}
-
-All capabilities known to this build of QEMU are always present.  Okay;
-no need to complicate things until we need to.  I just didn't expect it
-to be this simple after the commit message's "It allows QEMU to decide
-which capabilities are available at runtime, if necessary."
+DQoNCk9uIDIyLzAyLzIwMTkgMTg6MjAsIENsZWJlciBSb3NhIHdyb3RlOg0KPiANCj4gDQo+IE9u
+IDIvMjIvMTkgNjoyNiBBTSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+PiBUaGUgZGF0YSB0
+eXBlIGZvciBieXRlcyBpbiBQeXRob24zIGRpZmZlcnMgZnJvbSB0aGUgb25lIGluIFB5dGhvbjIu
+DQo+PiBUaG9zZSBjYXNlcyBzaG91bGQgYmUgbWFuYWdlZCBzZXBhcmF0ZWx5Lg0KPj4NCj4+IHYx
+Og0KPj4gSW4gdGhlIGZpcnN0IHZlcnNpb24sIHRoZSBUeXBlRXJyb3IgaW4gUHl0aG9uMyB3YXMg
+aGFuZGxlZCBhcyB0aGUNCj4+IGV4Y2VwdGlvbi4NCj4+IERpc2N1c3NlZCBpbiB0aGUgZS1tYWls
+IHRocmVhZCB3aXRoIHRoZSBNZXNzYWdlIElEOg0KPj4gPDE1NTA1MTk5OTctMjUzNTM0LTEtZ2l0
+LXNlbmQtZW1haWwtYW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4NCj4+DQo+PiBTaWdu
+ZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpv
+LmNvbT4NCj4+IFJlcG9ydGVkLWJ5OiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPj4g
+LS0tDQo+PiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yNDIgfCA4ICsrKysrKy0tDQo+PiAgIDEgZmls
+ZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAt
+LWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDIgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQyDQo+
+PiBpbmRleCAxNmM2NWVkLi40NDZmYmY4IDEwMDc1NQ0KPj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rl
+c3RzLzI0Mg0KPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Mg0KPj4gQEAgLTIwLDYgKzIw
+LDcgQEANCj4+ICAgDQo+PiAgIGltcG9ydCBpb3Rlc3RzDQo+PiAgIGltcG9ydCBqc29uDQo+PiAr
+aW1wb3J0IHN5cw0KPj4gICBmcm9tIGlvdGVzdHMgaW1wb3J0IHFlbXVfaW1nX2NyZWF0ZSwgcWVt
+dV9pbywgcWVtdV9pbWdfcGlwZSwgXA0KPj4gICAgICAgZmlsZV9wYXRoLCBpbWdfaW5mb19sb2cs
+IGxvZywgZmlsdGVyX3FlbXVfaW8NCj4+ICAgDQo+PiBAQCAtNjUsOSArNjYsMTIgQEAgZGVmIHRv
+Z2dsZV9mbGFnKG9mZnNldCk6DQo+PiAgICAgICB3aXRoIG9wZW4oZGlzaywgInIrYiIpIGFzIGY6
+DQo+PiAgICAgICAgICAgZi5zZWVrKG9mZnNldCwgMCkNCj4+ICAgICAgICAgICBjID0gZi5yZWFk
+KDEpDQo+PiAtICAgICAgICB0b2dnbGVkID0gY2hyKG9yZChjKSBeIGJpdG1hcF9mbGFnX3Vua25v
+d24pDQo+PiArICAgICAgICB0b2dnbGVkID0gb3JkKGMpIF4gYml0bWFwX2ZsYWdfdW5rbm93bg0K
+Pj4gICAgICAgICAgIGYuc2VlaygtMSwgMSkNCj4+IC0gICAgICAgIGYud3JpdGUodG9nZ2xlZCkN
+Cj4+ICsgICAgICAgIGlmIHN5cy52ZXJzaW9uX2luZm8ubWFqb3IgPj0gMzoNCj4+ICsgICAgICAg
+ICAgICBmLndyaXRlKGJ5dGVzKFt0b2dnbGVkXSkpDQo+PiArICAgICAgICBlbHNlOg0KPj4gKyAg
+ICAgICAgICAgIGYud3JpdGUoY2hyKHRvZ2dsZWQpKQ0KPj4gICANCj4gDQo+IEkgb3JpZ2luYWxs
+eSBzdWdnZXN0ZWQ6DQo+IA0KPiBzeXMudmVyc2lvbl9pbmZvLm1ham9yID09IDI6DQo+ICAgLi4u
+DQo+IA0KPiBCZWNhdXNlIHRoaXMgaXMgYWxyZWFkeSBwcmVzZW50IG9uIG90aGVyIHRlc3RzLCBh
+bmQgSUlSQyBNYXggbWVudGlvbmVkDQo+IHVzaW5nIHRoaXMgYXMgYW4gZWFzeSB0byBmaW5kIGZs
+YWcgdGhlIG1vbWVudCBQeXRob24gMiBzdXBwb3J0IGlzIHRvIGJlDQo+IGRyb3BwZWQuICBCdXQs
+IGxvb2tpbmcgZm9yICJzeXMudmVyc2lvbl9pbmZvLm1ham9yIiBpcyBqdXN0IGFzDQo+IGVmZmVj
+dGl2ZSwgc286DQo+IA0KPiBSZXZpZXdlZC1ieTogQ2xlYmVyIFJvc2EgPGNyb3NhQHJlZGhhdC5j
+b20+DQo+IA0KDQpUaGFuayB5b3UgdmVyeSBtdWNoLCBDbGViZXIuIFlvdXIgcmV2aWV3IGlzIGhl
+bHBmdWwuDQoNCj4+ICAgDQo+PiAgIHFlbXVfaW1nX2NyZWF0ZSgnLWYnLCBpb3Rlc3RzLmltZ2Zt
+dCwgZGlzaywgJzFNJykNCj4+DQoNCi0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5
+IFNoaW5rZXZpY2gNCg==
