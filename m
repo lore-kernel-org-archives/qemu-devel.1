@@ -1,37 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41910)
+Received: from eggs.gnu.org ([209.51.188.92]:42425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ncopa@alpinelinux.org>) id 1gyGOu-0002jk-Az
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:34:32 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gyGRM-0004Ts-5B
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:37:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ncopa@alpinelinux.org>) id 1gyGOs-0007l0-U7
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:34:32 -0500
-Received: from mx1.tetrasec.net ([74.117.190.25]:39924)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ncopa@alpinelinux.org>) id 1gyGOs-0007j5-KJ
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:34:30 -0500
-Date: Mon, 25 Feb 2019 14:25:17 +0100
-From: Natanael Copa <ncopa@alpinelinux.org>
-Message-ID: <20190225142517.24367cad@ncopa-desktop.copa.dup.pw>
-In-Reply-To: <CAFEAcA_F1yxx8Z_8Pc_QOMZ3i9vJLZ8uRze1fTbGfSDs4NAhLg@mail.gmail.com>
-References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
-	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
-	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
-	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
-	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
-	<20190223165523.1d674224@ncopa-desktop.copa.dup.pw>
-	<CAFEAcA8kOEJe-Ax_SFOCa49og-N7gpO-ptsANdvXPhKthrpb8A@mail.gmail.com>
-	<20190225112424.2dd535a1@ncopa-desktop.copa.dup.pw>
-	<CAFEAcA-nfqk9+x1F4nUC0djYRnAgGZL4d9X6rYLBJPvuKCdjbQ@mail.gmail.com>
-	<20190225132156.477faf18@ncopa-desktop.copa.dup.pw>
-	<CAFEAcA_F1yxx8Z_8Pc_QOMZ3i9vJLZ8uRze1fTbGfSDs4NAhLg@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1gyGRL-0000Sl-FA
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:37:04 -0500
+References: <20190218180646.30282-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b028613f-a4bb-2514-b3f5-950daaca03c3@redhat.com>
+Date: Mon, 25 Feb 2019 14:36:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
- size exceeded error
+In-Reply-To: <20190218180646.30282-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Jyp3LrWIjQ6zCBLCNTFV3m4dmQ9BYNjOU"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Skip 211 on insufficient memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,43 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Fernando Casas =?ISO-8859-1?B?U2No9nNzb3c=?= <casasfernando@outlook.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Mon, 25 Feb 2019 13:06:16 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Jyp3LrWIjQ6zCBLCNTFV3m4dmQ9BYNjOU
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <b028613f-a4bb-2514-b3f5-950daaca03c3@redhat.com>
+Subject: Re: [PATCH] iotests: Skip 211 on insufficient memory
+References: <20190218180646.30282-1-mreitz@redhat.com>
+In-Reply-To: <20190218180646.30282-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Mon, 25 Feb 2019 at 12:22, Natanael Copa <ncopa@alpinelinux.org> wrote:
-> >
-> > On Mon, 25 Feb 2019 10:34:23 +0000
-> > Peter Maydell <peter.maydell@linaro.org> wrote:  
-> > > The short term fix is to fix your toolchain/compilation
-> > > environment options so that it isn't trying to override
-> > > the definition of memcpy().  
-> >
-> > The easiest workaround is to simply disable FORTIY_SOURCE, but that
-> > will weaken the security for all implemented string functions, strcpy,
-> > memmove etc, so I don't want to do that.
-> >
-> > Is it only lduw_he_p that needs to be atomic or are the other functions
-> > in include/qemu/bswap.h using memcpy also required to be atomic?  
-> 
-> Hard to say, since we haven't done the "audit all the callers"
-> step that Stefan mentioned. If you're going to replace memcpy
-> with __builtin_memcpy then the safest thing is to do it for
-> all those uses (this will also give you much better generated
-> code for performance purposes).
+On 18.02.19 19:06, Max Reitz wrote:
+> VDI keeps the whole bitmap in memory, and the maximum size (which is
+> tested here) is 2 GB.  This may not be available on all machines, and i=
+t
+> rarely is available when running a 32 bit build.
+>=20
+> Fix this by making VM.run_job() return the error string if an error
+> occurred, and checking whether that contains "Could not allocate bmap"
+> in 211.  If so, the test is skipped.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/211        | 4 +++-
+>  tests/qemu-iotests/iotests.py | 5 ++++-
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 
-I figured that and that is exactly what I did.
+Thanks for the reviews, applied to my block branch.
 
-Fernando: Can you please test the binary from
-qemu-system-x86_64-3.1.0-r3 from alpine edge? I will backport the fix
-if you can confirm it fixes the problem.
+Max
 
-Thanks!
 
--nc
+--Jyp3LrWIjQ6zCBLCNTFV3m4dmQ9BYNjOU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-PS. Those issues are pretty hard to track down, so big thanks to
-everyone who helped find the exact issue here. You have done a great
-work!
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxz73EACgkQ9AfbAGHV
+z0D95AgArWqHYiV5cFl8WDwlPF/owl0gSB2JdV60t4Szf3MtIN2aM+0Kr8NJY0Wf
+oz4viYWzoG3T6Nb7RlB+GCtWt0xo0S9wEETJHfEc8C+pmYlJdO5xyiD00TPeDrw8
+tvMe19WuzvqHGO+cVT/AP6HFIHD13aoXSkoq1kWZKZNbqe5XJ31Vnjh7UERO9owg
+Eq5Oro/Iw0m7ZxoZIgvhedrkF5Do7oKCwRf3J77JNmzSkt/6mzKosA8qUaY9/lVx
+J+sgs3/fP02fllPxvlNlSpKJDvHD6Y+RWRiEZ79l7EQxkNa6BsV9GGlP37uWdv49
+sKVUX6pfCQFq8dfX1NwUJ/AZisLvtw==
+=PCJk
+-----END PGP SIGNATURE-----
+
+--Jyp3LrWIjQ6zCBLCNTFV3m4dmQ9BYNjOU--
