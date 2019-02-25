@@ -1,36 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58340)
+Received: from eggs.gnu.org ([209.51.188.92]:60338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gyFSX-0006e9-4E
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:34:14 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gyFbH-0004f0-RG
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gyFSS-0006w2-KS
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:34:13 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:42299)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gyFSS-0006lh-2Y
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:34:08 -0500
-Received: by mail-qk1-f194.google.com with SMTP id y140so5119389qkb.9
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 04:33:55 -0800 (PST)
-Date: Mon, 25 Feb 2019 07:33:52 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190225073056-mutt-send-email-mst@kernel.org>
-References: <3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
-	<CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
-	<a5c4b4a1-ea82-f357-e076-ade51ade7ddf@redhat.com>
-	<CAOEp5Ode1Ue0iLD4qUs+tcSGCZ+t+bm1TQpr3UG59jMU9kyVUg@mail.gmail.com>
-	<e6ea2819-ca95-796c-44e9-0067af82c46a@redhat.com>
-	<20190221203003-mutt-send-email-mst@kernel.org>
-	<51f52046-a491-bd87-a72d-138197012675@redhat.com>
-	<20190221220807-mutt-send-email-mst@kernel.org>
-	<20190221221052-mutt-send-email-mst@kernel.org>
-	<94c6cead-7ed1-2269-2c2b-8534849d9e41@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gyFbG-0006R3-JT
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:43:15 -0500
+Date: Mon, 25 Feb 2019 13:42:38 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190225134238.4ad9b951.cohuck@redhat.com>
+In-Reply-To: <1550519397-25359-1-git-send-email-akrowiak@linux.ibm.com>
+References: <1550519397-25359-1-git-send-email-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <94c6cead-7ed1-2269-2c2b-8534849d9e41@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
- not enabled by the guest
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] s390x/vfio-ap: hot plug/unplug
+ vfio-ap device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,143 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Yan Vugenfirer <yan@daynix.com>, Yuri Benditovich <yuri.benditovich@daynix.com>, qemu-devel@nongnu.org
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, david@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com, alex.williamson@redhat.com, fiuczy@linux.ibm.com
 
-On Mon, Feb 25, 2019 at 03:47:48PM +0800, Jason Wang wrote:
-> 
-> On 2019/2/22 下午12:22, Michael S. Tsirkin wrote:
-> > On Thu, Feb 21, 2019 at 10:10:08PM -0500, Michael S. Tsirkin wrote:
-> > > On Fri, Feb 22, 2019 at 11:04:05AM +0800, Jason Wang wrote:
-> > > > On 2019/2/22 上午9:35, Michael S. Tsirkin wrote:
-> > > > > On Thu, Feb 21, 2019 at 05:40:22PM +0800, Jason Wang wrote:
-> > > > > > On 2019/2/21 下午4:18, Yuri Benditovich wrote:
-> > > > > > 
-> > > > > >           For 1.0 device, we can fix the queue_enable, but for 0.9x device how do
-> > > > > >           you enable one specific queue in this case? (setting status?)
-> > > > > > 
-> > > > > > 
-> > > > > >       Do I understand correctly that for 0.9 device in some cases the device will
-> > > > > >       receive feature _MQ set, but will not receive VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET?
-> > > > > >       Or the problem is different?
-> > > > > > 
-> > > > > > 
-> > > > > > Let me clarify, VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET is used to control the the
-> > > > > > number of queue pairs used by device for doing transmission and reception. It
-> > > > > > was not used to enable or disable a virtqueue.
-> > > > > > 
-> > > > > > For 1.0 device, we should use queue_enable in pci cfg to enable and disable
-> > > > > > queue:
-> > > > > > 
-> > > > > > 
-> > > > > > We could do:
-> > > > > > 
-> > > > > > 1) allocate memory and set queue_enable for vq0
-> > > > > > 
-> > > > > > 2) allocate memory and set queue_enable for vq1
-> > > > > > 
-> > > > > > 3) Set vq paris to 1
-> > > > > > 
-> > > > > > 4) allocate memory and set queue_enable for vq2
-> > > > > > 
-> > > > > > 5) allocate memory and set queue_enable for vq3
-> > > > > > 
-> > > > > > 6) set vq pairs to 2
-> > > > > I do not think spec allows this.
-> > > > > 
-> > > > > 
-> > > > > The driver MUST follow this sequence to initialize a device:
-> > > > > 1. Reset the device.
-> > > > > 2. Set the ACKNOWLEDGE status bit: the guest OS has noticed the device.
-> > > > > 3. Set the DRIVER status bit: the guest OS knows how to drive the device.
-> > > > > 4. Read device feature bits, and write the subset of feature bits understood by the OS and driver to the
-> > > > > device. During this step the driver MAY read (but MUST NOT write) the device-specific configuration
-> > > > > fields to check that it can support the device before accepting it.
-> > > > > 5. Set the FEATURES_OK status bit. The driver MUST NOT accept new feature bits after this step.
-> > > > > 6. Re-read device status to ensure the FEATURES_OK bit is still set: otherwise, the device does not
-> > > > > support our subset of features and the device is unusable.
-> > > > > 7. Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup,
-> > > > > reading and possibly writing the device’s virtio configuration space, and population of virtqueues.
-> > > > > 8. Set the DRIVER_OK status bit. At this point the device is “live”.
-> > > > > 
-> > > > > 
-> > > > > Thus vqs are setup at step 7.
-> > > > > 
-> > > > > # of vq pairs are set up through a command which is a special
-> > > > > buffer, and spec says:
-> > > > > 
-> > > > > The driver MUST NOT send any buffer available notifications to the device before setting DRIVER_OK.
-> > > > 
-> > > > So you meant write to queue_enable is forbidden after DRIVER_OK (though it's
-> > > > not very clear to me from the  spec). And if a driver want to enable new
-> > > > queues, it must reset the device?
-> > > 
-> > > That's my reading.  What do you think?
-> 
-> 
-> Looks like I can infer this from the spec, maybe it's better to clarify.
-> 
-> 
-> > Btw some legacy drivers might violate this by addig buffers
-> > before driver_ok.
-> 
-> 
-> Yes, but it's probably too late to fix them.
-> 
-> Thanks.
+On Mon, 18 Feb 2019 14:49:55 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Right. As a work around virtio net also checks rings
-when it detects driver ok. We can disable that when VIRTIO_1
-has been negotiated.
-
+> This patch series introduces hot plug/unplug of a vfio-ap device.
 > 
-> > > > > 
-> > > > > > But this requires a proper implementation for queue_enable for vhost which is
-> > > > > > missed in qemu and probably what you really want to do.
-> > > > > > 
-> > > > > > but for 0.9x device, there's no such way to do this. That's the issue.
-> > > > > 0.9x there's no queue enable, assumption is PA!=0 means VQ has
-> > > > > been enabled.
-> > > > > 
-> > > > > 
-> > > > > > So
-> > > > > > driver must allocate all queBes before starting the device, otherwise there's
-> > > > > > no way to enable it afterwards.
-> > > > > As per spec queues must be allocated before DRIVER_OK.
-> > > > > 
-> > > > > That is universal.
-> > > > 
-> > > > If I understand correctly, this is not what is done by current windows
-> > > > drivers.
-> > > > 
-> > > > Thanks
-> > > > 
-> > > > 
-> > > > > > There're tricks to make it work like what is
-> > > > > > done in your patch, but it depends on a specific implementation like qemu which
-> > > > > > is sub-optimal.
-> > > > > > 
-> > > > > > 
-> > > > > > 
-> > > > > > 
-> > > > > >           A fundamental question is what prevents you from just initialization all
-> > > > > >           queues during driver start? It looks to me this save lots of efforts
-> > > > > >           than allocating queue dynamically.
-> > > > > > 
-> > > > > > 
-> > > > > >       This is not so trivial in Windows driver, as it does not have objects for queues
-> > > > > >       that it does not use. Linux driver first of all allocates all the
-> > > > > >       queues and then
-> > > > > >       adds Rx/Tx to those it will use. Windows driver first decides how many queues
-> > > > > >       it will use then allocates objects for them and initializes them from zero to
-> > > > > >       fully functional state.
-> > > > > > 
-> > > > > > 
-> > > > > > Well, you just need to allocate some memory for the virtqueue, there's no need
-> > > > > > to make it visible to the rest until it was enabled.
-> > > > > > 
-> > > > > > Thanks
-> > > > > > 
-> > > > > > 
-> > > > > > 
-> > > > > > 
+> To hot plug a vfio-ap device, the QEMU device_add function may be used:
+> 
+>    (qemu) device_add vfio-ap,sysfsdev=$path-to-mdev
+> 
+>    Where $path-to-mdev is the absolute path to the mediated matrix device
+>    to which AP resources to be used by the guest have been assigned.
+> 
+>    A vfio-ap device can be hot plugged only if:
+> 
+>    1. A vfio-ap device has not been attached to the ap-bus (only one is
+>       allowed per guest) either via the QEMU command line or a prior hot
+>       plug action.
+> 
+>    2. The guest was started with the CPU model feature for AP enabled
+>       (e.g., -cpu host,ap=on).
+> 
+> To hot unplug a vfio-ap device, the QEMU device-del function may be used:
+> 
+>    (qemu) device_del vfio-ap,sysfsdev=$path-to-mdev
+> 
+>    Where $path-to-mdev is the absolute path to the mediated matrix device
+>    specified when the vfio-ap device was attached to the virtual machine's
+>    ap-bus.
+> 
+>    A vfio-ap device can be hot unplugged only if:
+> 
+>    1. A vfio-ap device has been attached to the virtual machine's ap-abus
+>       either via the QEMU command line or a prior hot plug action. 
+> 
+>    2. The guest was started with the CPU model feature for AP enabled
+>       (e.g., -cpu host,ap=on).
+> 
+> Tony Krowiak (2):
+>   s390x/vfio-ap: Implement hot plug/unplug of vfio-ap device
+>   s390x/vfio-ap: document hot plug/unplug of vfio-ap device
+> 
+>  docs/vfio-ap.txt     | 58 +++++++++++++++++++++++++++++++++++++++++++++++-----
+>  hw/s390x/ap-bridge.c | 12 ++++++++++-
+>  hw/vfio/ap.c         |  2 +-
+>  3 files changed, 65 insertions(+), 7 deletions(-)
+> 
+
+In the meantime, the signature of qbus_set_hotplug_handler() has
+changed to take an Object instead of a DeviceState, but I just went
+ahead and did that trivial change myself.
+
+Thanks, applied.
