@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37544)
+Received: from eggs.gnu.org ([209.51.188.92]:37851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI56-0000YL-1w
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5E-0000fQ-7Y
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI54-0001Be-Iu
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:11 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5B-0001Kc-Du
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:19 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:07 +0100
-Message-Id: <20190225152053.15976-26-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:11 +0100
+Message-Id: <20190225152053.15976-30-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 25/71] qcow2: Assert that L2 table offsets fit
- in the L1 table
+Subject: [Qemu-devel] [PULL 29/71] block: Skip implicit nodes for filename
+ info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +25,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Alberto Garcia <berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
 
-L1 table entries have a field to store the offset of an L2 table.
-The rest of the bits of the entry are currently reserved except from
-bit 63, which stores the COPIED flag.
+bdrv_refresh_filename() should simply skip all implicit nodes.  They are
+supposed to be invisible to the user, so they should not appear in
+filename information.
 
-The offset is always taken from the entry using L1E_OFFSET_MASK to
-ensure that we only use the bits that belong to that field.
-
-While that mask is used every time we read from the L1 table, it is
-never used when we write to it. Due to the limits set elsewhere in the
-code QEMU can never produce L2 table offsets that don't fit in that
-field so any such offset when allocating an L2 table would indicate a
-bug in QEMU.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Message-id: 20190201192935.18394-4-mreitz@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 30eca26c47..179aa2c728 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -285,6 +285,9 @@ static int l2_allocate(BlockDriverState *bs, int l1_i=
-ndex)
-         goto fail;
+diff --git a/block.c b/block.c
+index d97f5e7084..31e4664a42 100644
+--- a/block.c
++++ b/block.c
+@@ -5549,6 +5549,20 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+         bdrv_refresh_filename(child->bs);
      }
 =20
-+    /* The offset must fit in the offset field of the L1 table entry */
-+    assert((l2_offset & L1E_OFFSET_MASK) =3D=3D l2_offset);
++    if (bs->implicit) {
++        /* For implicit nodes, just copy everything from the single chil=
+d */
++        child =3D QLIST_FIRST(&bs->children);
++        assert(QLIST_NEXT(child, next) =3D=3D NULL);
 +
-     /* If we're allocating the table at offset 0 then something is wrong=
- */
-     if (l2_offset =3D=3D 0) {
-         qcow2_signal_corruption(bs, true, -1, -1, "Preventing invalid "
++        pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
++                child->bs->exact_filename);
++        pstrcpy(bs->filename, sizeof(bs->filename), child->bs->filename)=
+;
++
++        bs->full_open_options =3D qobject_ref(child->bs->full_open_optio=
+ns);
++
++        return;
++    }
++
+     if (drv->bdrv_refresh_filename) {
+         /* Obsolete information is of no use here, so drop the old file =
+name
+          * information before refreshing it */
 --=20
 2.20.1
