@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54663)
+Received: from eggs.gnu.org ([209.51.188.92]:55268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gyFDM-00006X-4e
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:18:35 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyFFS-0001AU-J2
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gyFDF-0002Z3-Uw
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:18:28 -0500
-References: <20190225115552.7534-1-david@redhat.com>
-	<20190225115552.7534-2-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aabc1531-98bb-e0fe-0b69-2b9e04a567bf@redhat.com>
-Date: Mon, 25 Feb 2019 13:18:18 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190225115552.7534-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyFFI-0004JH-3H
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:20:35 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 25 Feb 2019 12:20:07 +0000
+Message-ID: <de306b00-6c38-eb74-a970-19bb6d45f33f@virtuozzo.com>
+References: <20190223000614.13894-1-jsnow@redhat.com>
+	<20190223000614.13894-10-jsnow@redhat.com>
+In-Reply-To: <20190223000614.13894-10-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/7] s390x/tcg: RXE has an optional M3
- field
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5252D0FCFC874545A9C6CA4A71F4C6D5@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 09/10] blockdev: remove unused paio
+ parameter documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +26,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
 
-On 25/02/2019 12.55, David Hildenbrand wrote:
-> Will be needed, so add it to the format description.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/insn-format.def | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/s390x/insn-format.def b/target/s390x/insn-format.def
-> index a412d90fb7..4297ff4165 100644
-> --- a/target/s390x/insn-format.def
-> +++ b/target/s390x/insn-format.def
-> @@ -36,7 +36,7 @@ F3(RSY_a, R(1, 8),     BDL(2),      R(3,12))
->  F3(RSY_b, R(1, 8),     BDL(2),      M(3,12))
->  F2(RX_a,  R(1, 8),     BXD(2))
->  F2(RX_b,  M(1, 8),     BXD(2))
-> -F2(RXE,   R(1, 8),     BXD(2))
-> +F3(RXE,   R(1, 8),     BXD(2),      M(3,32))
-
-Yes, according to the Principles of Operations, RXE has a M3 field.
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+MjMuMDIuMjAxOSAzOjA2LCBKb2huIFNub3cgd3JvdGU6DQo+IFRoaXMgZmllbGQgaXNuJ3QgcHJl
+c2VudCBhbnltb3JlLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRo
+YXQuY29tPg0KPiAtLS0NCj4gICBibG9ja2Rldi5jIHwgMSAtDQo+ICAgMSBmaWxlIGNoYW5nZWQs
+IDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9ja2Rldi5jIGIvYmxvY2tkZXYu
+Yw0KPiBpbmRleCAxYWFhZGI2MTI4Li5jYmNlNDQ4NzdkIDEwMDY0NA0KPiAtLS0gYS9ibG9ja2Rl
+di5jDQo+ICsrKyBiL2Jsb2NrZGV2LmMNCj4gQEAgLTEyNTUsNyArMTI1NSw2IEBAIG91dF9haW9f
+Y29udGV4dDoNCj4gICAgKiBAbm9kZTogVGhlIG5hbWUgb2YgdGhlIEJEUyBub2RlIHRvIHNlYXJj
+aCBmb3IgYml0bWFwcw0KPiAgICAqIEBuYW1lOiBUaGUgbmFtZSBvZiB0aGUgYml0bWFwIHRvIHNl
+YXJjaCBmb3INCj4gICAgKiBAcGJzOiBPdXRwdXQgcG9pbnRlciBmb3IgQkRTIGxvb2t1cCwgaWYg
+ZGVzaXJlZC4gQ2FuIGJlIE5VTEwuDQo+IC0gKiBAcGFpbzogT3V0cHV0IHBvaW50ZXIgZm9yIGFp
+b19jb250ZXh0IGFjcXVpc2l0aW9uLCBpZiBkZXNpcmVkLiBDYW4gYmUgTlVMTC4NCj4gICAgKiBA
+ZXJycDogT3V0cHV0IHBvaW50ZXIgZm9yIGVycm9yIGluZm9ybWF0aW9uLiBDYW4gYmUgTlVMTC4N
+Cj4gICAgKg0KPiAgICAqIEByZXR1cm46IEEgYml0bWFwIG9iamVjdCBvbiBzdWNjZXNzLCBvciBO
+VUxMIG9uIGZhaWx1cmUuDQo+IA0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9n
+aWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQotLSANCkJlc3QgcmVnYXJkcywN
+ClZsYWRpbWlyDQo=
