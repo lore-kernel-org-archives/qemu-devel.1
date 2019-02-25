@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50219)
+Received: from eggs.gnu.org ([209.51.188.92]:50775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyEsC-0006O0-8J
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 06:56:40 -0500
+	(envelope-from <thuth@redhat.com>) id 1gyEvG-0008R1-IE
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 06:59:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyEry-0005ro-Vt
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 06:56:30 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 25 Feb 2019 12:55:51 +0100
-Message-Id: <20190225115552.7534-7-david@redhat.com>
-In-Reply-To: <20190225115552.7534-1-david@redhat.com>
-References: <20190225115552.7534-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 6/7] s390x/tcg: Implement LOAD LENGTHENED
- short HFP to long HFP
+	(envelope-from <thuth@redhat.com>) id 1gyEvB-0008F3-NJ
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 06:59:46 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 25 Feb 2019 12:59:30 +0100
+Message-Id: <1551095970-14645-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] block/nvme: Remove QEMU_PACKED from naturally
+ aligned NVMeRegs struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,48 +21,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>
+Cc: qemu-block@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-Nice trick to load a 32 bit value into vector element 0 (32 bit element
-size) from memory, zeroing out element1. The short HFP to long HFP
-conversion really only is a shift.
+The QEMU_PACKED is causing a compiler warning/error with GCC 9:
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+  CC      block/nvme.o
+block/nvme.c: In function =E2=80=98nvme_create_queue_pair=E2=80=99:
+block/nvme.c:209:22: error: taking address of packed member of
+ =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer =
+value
+ [-Werror=3Daddress-of-packed-member]
+  209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s->doorbell_=
+scale];
+
+All members of the struct are naturally aligned, so there should
+not be the need for QEMU_PACKED here, and the following QEMU_BUILD_BUG_ON
+also ensures that there is no padding. Thus simply remove the QEMU_PACKED
+here.
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1817525
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- target/s390x/insn-data.def | 2 ++
- target/s390x/translate.c   | 6 ++++++
- 2 files changed, 8 insertions(+)
+ block/nvme.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 61582372ab..fb6ee18650 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -598,6 +598,8 @@
-     F(0xed04, LDEB,    RXE,   Z,   0, m2_32u, new, f1, ldeb, 0, IF_BFP)
-     F(0xed05, LXDB,    RXE,   Z,   0, m2_64, new_P, x1, lxdb, 0, IF_BFP)
-     F(0xed06, LXEB,    RXE,   Z,   0, m2_32u, new_P, x1, lxeb, 0, IF_BFP)
-+    F(0xb324, LDER,    RXE,   Z,   0, e2, new, f1, lde, 0, IF_AFP1)
-+    F(0xed24, LDE,     RXE,   Z,   0, m2_32u, new, f1, lde, 0, IF_AFP1)
- /* LOAD ROUNDED */
-     F(0xb344, LEDBR,   RRE,   Z,   0, f2, new, e1, ledb, 0, IF_BFP)
-     F(0xb345, LDXBR,   RRE,   Z,   x2h, x2l, new, f1, ldxb, 0, IF_BFP)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 322fbbdf81..34799a8704 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2724,6 +2724,12 @@ static DisasJumpType op_lxeb(DisasContext *s, DisasOps *o)
-     return DISAS_NEXT;
- }
- 
-+static DisasJumpType op_lde(DisasContext *s, DisasOps *o)
-+{
-+    tcg_gen_shli_i64(o->out, o->in2, 32);
-+    return DISAS_NEXT;
-+}
-+
- static DisasJumpType op_llgt(DisasContext *s, DisasOps *o)
- {
-     tcg_gen_andi_i64(o->out, o->in2, 0x7fffffff);
--- 
-2.17.2
+diff --git a/block/nvme.c b/block/nvme.c
+index b5952c9..6c2ce7d 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -82,7 +82,7 @@ typedef volatile struct {
+     uint8_t  reserved1[0xec0];
+     uint8_t  cmd_set_specfic[0x100];
+     uint32_t doorbells[];
+-} QEMU_PACKED NVMeRegs;
++} NVMeRegs;
+=20
+ QEMU_BUILD_BUG_ON(offsetof(NVMeRegs, doorbells) !=3D 0x1000);
+=20
+--=20
+1.8.3.1
