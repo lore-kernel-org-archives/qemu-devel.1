@@ -1,44 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43296)
+Received: from eggs.gnu.org ([209.51.188.92]:43336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@outlook.com>) id 1gyIOM-0000XU-L9
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:07 -0500
+	(envelope-from <david@redhat.com>) id 1gyIOQ-0000av-BL
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@outlook.com>) id 1gyIOL-00086j-2a
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:06 -0500
-Received: from mail-oln040092069103.outbound.protection.outlook.com
-	([40.92.69.103]:1029
-	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <casasfernando@outlook.com>)
-	id 1gyIOK-0007vt-GP
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:04 -0500
-From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
-Date: Mon, 25 Feb 2019 15:41:55 +0000
-Message-ID: <VI1PR0602MB3245CFF77C50C143A4D5BE09A47A0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
-	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
-	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
-	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
-	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
-	<20190223165523.1d674224@ncopa-desktop.copa.dup.pw>
-	<CAFEAcA8kOEJe-Ax_SFOCa49og-N7gpO-ptsANdvXPhKthrpb8A@mail.gmail.com>
-	<20190225112424.2dd535a1@ncopa-desktop.copa.dup.pw>
-	<CAFEAcA-nfqk9+x1F4nUC0djYRnAgGZL4d9X6rYLBJPvuKCdjbQ@mail.gmail.com>
-	<20190225132156.477faf18@ncopa-desktop.copa.dup.pw>
-	<CAFEAcA_F1yxx8Z_8Pc_QOMZ3i9vJLZ8uRze1fTbGfSDs4NAhLg@mail.gmail.com>
-	<20190225142517.24367cad@ncopa-desktop.copa.dup.pw>
-	<VI1PR0602MB3245A6B693B23DA2E0E8E500A47A0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-In-Reply-To: <VI1PR0602MB3245A6B693B23DA2E0E8E500A47A0@VI1PR0602MB3245.eurprd06.prod.outlo
-	ok.com>
-Content-Language: en-US
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
- size exceeded error
+	(envelope-from <david@redhat.com>) id 1gyIOP-0008BP-G5
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gyIOP-0008Ag-71
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:09 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Mon, 25 Feb 2019 16:42:04 +0100
+Message-Id: <20190225154204.26751-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] tcg: Implement tcg_gen_shri2_i64()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,44 +21,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Natanael Copa <ncopa@alpinelinux.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Ok, the new package is deployed.
+Will be helpful for s390x. Input 128 bit and output 64 bit only, which
+is sufficient for now.
 
-I stopped and started the test guest so it will use the new QEMU binary.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
 
-Will monitor and report back.
+v1 -> v2:
+- Use one output (lower part) only
+- Shield off big shifts by an assert
 
-On lun, feb 25, 2019 at 2:32 PM, Fernando Casas Sch=F6ssow <casasfernando@o=
-utlook.com> wrote:
-Thanks Natanael. Is the new package ready?
+ tcg/tcg-op.c | 15 +++++++++++++++
+ tcg/tcg-op.h |  1 +
+ 2 files changed, 16 insertions(+)
 
-I will update as soon as the package is available, try to repro and report =
-back.
-
-Thanks everyone for looking into this!
-
-On lun, feb 25, 2019 at 2:25 PM, Natanael Copa <ncopa@alpinelinux.org> wrot=
-e:
-On Mon, 25 Feb 2019 13:06:16 +0000 Peter Maydell <peter.maydell@linaro.org<=
-mailto:peter.maydell@linaro.org>> wrote:
-On Mon, 25 Feb 2019 at 12:22, Natanael Copa <ncopa@alpinelinux.org<mailto:n=
-copa@alpinelinux.org>> wrote: > > On Mon, 25 Feb 2019 10:34:23 +0000 > Pete=
-r Maydell <peter.maydell@linaro.org<mailto:peter.maydell@linaro.org>> wrote=
-: > > The short term fix is to fix your toolchain/compilation > > environme=
-nt options so that it isn't trying to override > > the definition of memcpy=
-(). > > The easiest workaround is to simply disable FORTIY_SOURCE, but that=
- > will weaken the security for all implemented string functions, strcpy, >=
- memmove etc, so I don't want to do that. > > Is it only lduw_he_p that nee=
-ds to be atomic or are the other functions > in include/qemu/bswap.h using =
-memcpy also required to be atomic? Hard to say, since we haven't done the "=
-audit all the callers" step that Stefan mentioned. If you're going to repla=
-ce memcpy with __builtin_memcpy then the safest thing is to do it for all t=
-hose uses (this will also give you much better generated code for performan=
-ce purposes).
-I figured that and that is exactly what I did. Fernando: Can you please tes=
-t the binary from qemu-system-x86_64-3.1.0-r3 from alpine edge? I will back=
-port the fix if you can confirm it fixes the problem. Thanks! -nc PS. Those=
- issues are pretty hard to track down, so big thanks to everyone who helped=
- find the exact issue here. You have done a great work!
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 1bd7ef24af..e4fa75c074 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2381,6 +2381,21 @@ void tcg_gen_sub2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 al,
+     }
+ }
+ 
++void tcg_gen_shri2_i64(TCGv_i64 ret, TCGv_i64 al, TCGv_i64 ah, int64_t count)
++{
++    tcg_debug_assert(count >= 0 && count <= 64);
++    if (count == 0) {
++        tcg_gen_mov_i64(ret, al);
++    } else if (count == 64) {
++        tcg_gen_mov_i64(ret, ah);
++    } else {
++        TCGv_i64 t0 = tcg_temp_new_i64();
++        tcg_gen_shri_i64(t0, al, count);
++        tcg_gen_deposit_i64(ret, t0, ah, 64 - count, count);
++        tcg_temp_free_i64(t0);
++    }
++}
++
+ void tcg_gen_mulu2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2)
+ {
+     if (TCG_TARGET_HAS_mulu2_i64) {
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index d3e51b15af..1ffe689276 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -513,6 +513,7 @@ void tcg_gen_add2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 al,
+                       TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 bh);
+ void tcg_gen_sub2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 al,
+                       TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 bh);
++void tcg_gen_shri2_i64(TCGv_i64 ret, TCGv_i64 al, TCGv_i64 ah, int64_t count);
+ void tcg_gen_mulu2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2);
+ void tcg_gen_muls2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2);
+ void tcg_gen_mulsu2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2);
+-- 
+2.17.2
