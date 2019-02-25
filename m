@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53106)
+Received: from eggs.gnu.org ([209.51.188.92]:53578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gyItO-00027t-7J
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:14:10 -0500
+	(envelope-from <thuth@redhat.com>) id 1gyIuk-0003Jn-MU
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:15:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gyItN-00053g-FU
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:14:10 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39420)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gyItN-000530-47
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:14:09 -0500
-Received: by mail-pl1-x644.google.com with SMTP id b65so1687829plb.6
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 08:14:09 -0800 (PST)
-References: <20190225115552.7534-1-david@redhat.com>
-	<20190225115552.7534-8-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <17cce95e-8e0d-5f49-920a-1e35c9ce8968@linaro.org>
-Date: Mon, 25 Feb 2019 08:14:04 -0800
-MIME-Version: 1.0
-In-Reply-To: <20190225115552.7534-8-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 7/7] s390x/tcg: Implement LOAD COUNT TO
- BLOCK BOUNDARY
+	(envelope-from <thuth@redhat.com>) id 1gyIue-0005jK-Qr
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:15:34 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 25 Feb 2019 17:14:58 +0100
+Message-Id: <1551111298-8445-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/nvram/fw_cfg: Move boot_splash_filedata
+ variables into fw_cfg.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +18,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
 
-On 2/25/19 3:55 AM, David Hildenbrand wrote:
-> +uint64_t HELPER(lcbb)(uint64_t addr, uint32_t m3)
-> +{
-> +    const uint32_t block_size = 1ul << (m3 + 6);
-> +    const uint64_t rounded_addr = ROUND_UP(addr, block_size);
-> +    uint32_t to_load = 16;
-> +
-> +    if (rounded_addr != addr) {
-> +        to_load = MIN(rounded_addr - addr, to_load);
-> +    }
-> +    return to_load;
-> +}
+The global boot_splash_filedata and boot_splash_filedata_size variables
+are only used in fw_cfg.c. So there is really no need that these need
+to be global and reside in vl.c. Move them to fw_cfg.c instead.
 
-I don't understand all of this "blocksize" business, when they are all powers
-of two, and the maximum value returned is 16.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/nvram/fw_cfg.c         |  9 +++++++++
+ include/hw/nvram/fw_cfg.h |  1 +
+ include/sysemu/sysemu.h   |  2 --
+ vl.c                      | 10 +---------
+ 4 files changed, 11 insertions(+), 11 deletions(-)
 
-As far as I can see, the result is obtained by -(addr | -16) regardless of the
-value of m3.
-
-
-r~
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 7fdf04a..15f0023 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -63,6 +63,9 @@ struct FWCfgEntry {
+ #define JPG_FILE 0
+ #define BMP_FILE 1
+ 
++static uint8_t *boot_splash_filedata;
++static size_t boot_splash_filedata_size;
++
+ static char *read_splashfile(char *filename, gsize *file_sizep,
+                              int *file_typep)
+ {
+@@ -175,6 +178,12 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+     }
+ }
+ 
++void fw_cfg_res_free(void)
++{
++    g_free(boot_splash_filedata);
++    boot_splash_filedata = NULL;
++}
++
+ static void fw_cfg_reboot(FWCfgState *s)
+ {
+     const char *reboot_timeout = NULL;
+diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+index f5a6895..16d237c 100644
+--- a/include/hw/nvram/fw_cfg.h
++++ b/include/hw/nvram/fw_cfg.h
+@@ -225,5 +225,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+ 
+ FWCfgState *fw_cfg_find(void);
+ bool fw_cfg_dma_enabled(void *opaque);
++void fw_cfg_res_free(void);
+ 
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 4b5a6b7..63a5eed 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -111,8 +111,6 @@ extern int no_shutdown;
+ extern int old_param;
+ extern int boot_menu;
+ extern bool boot_strict;
+-extern uint8_t *boot_splash_filedata;
+-extern size_t boot_splash_filedata_size;
+ extern bool enable_mlock;
+ extern bool enable_cpu_pm;
+ extern QEMUClockType rtc_clock;
+diff --git a/vl.c b/vl.c
+index 502857a..f769cce 100644
+--- a/vl.c
++++ b/vl.c
+@@ -187,8 +187,6 @@ unsigned int nb_prom_envs = 0;
+ const char *prom_envs[MAX_PROM_ENVS];
+ int boot_menu;
+ bool boot_strict;
+-uint8_t *boot_splash_filedata;
+-size_t boot_splash_filedata_size;
+ bool wakeup_suspend_enabled;
+ 
+ int icount_align_option;
+@@ -559,12 +557,6 @@ const char *qemu_get_vm_name(void)
+     return qemu_name;
+ }
+ 
+-static void res_free(void)
+-{
+-    g_free(boot_splash_filedata);
+-    boot_splash_filedata = NULL;
+-}
+-
+ static int default_driver_check(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     const char *driver = qemu_opt_get(opts, "driver");
+@@ -4585,7 +4577,7 @@ int main(int argc, char **argv, char **envp)
+     job_cancel_sync_all();
+     bdrv_close_all();
+ 
+-    res_free();
++    fw_cfg_res_free();
+ 
+     /* vhost-user must be cleaned up before chardevs.  */
+     tpm_cleanup();
+-- 
+1.8.3.1
