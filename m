@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57669)
+Received: from eggs.gnu.org ([209.51.188.92]:57699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyFQ6-0004vM-JV
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:43 -0500
+	(envelope-from <berrange@redhat.com>) id 1gyFQ7-0004vu-Be
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyFQ1-0004qY-Ol
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34370)
+	(envelope-from <berrange@redhat.com>) id 1gyFQ3-0004sJ-EB
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34400)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyFPw-0004kG-Az
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:34 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyFQ1-0004mY-NW
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:39 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 25 Feb 2019 12:31:00 +0000
-Message-Id: <20190225123111.30363-1-berrange@redhat.com>
+Date: Mon, 25 Feb 2019 12:31:01 +0000
+Message-Id: <20190225123111.30363-2-berrange@redhat.com>
+In-Reply-To: <20190225123111.30363-1-berrange@redhat.com>
+References: <20190225123111.30363-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/11] Merge authz core patches
+Subject: [Qemu-devel] [PULL 01/11] util: add helper APIs for dealing with
+ inotify in portable manner
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,140 +30,1384 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-The following changes since commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62be1=
-16:
+The inotify userspace API for reading events is quite horrible, so it is
+useful to wrap it in a more friendly API to avoid duplicating code
+across many users in QEMU. Wrapping it also allows introduction of a
+platform portability layer, so that we can add impls for non-Linux based
+equivalents in future.
 
-  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-201902=
-21.0' into staging (2019-02-22 15:48:04 +0000)
-
-are available in the Git repository at:
-
-  https://github.com/berrange/qemu tags/authz-core-pull-request
-
-for you to fetch changes up to cfde05c6c0db7d3122a5491d50f62f7910ab8abb:
-
-  authz: delete existing ACL implementation (2019-02-25 12:28:25 +0000)
-
-----------------------------------------------------------------
-Add a standard authorization framework
-
-The current network services now support encryption via TLS and in some
-cases support authentication via SASL. In cases where SASL is not
-available, x509 client certificates can be used as a crude authorization
-scheme, but using a sub-CA and controlling who you give certs to. In
-general this is not very flexible though, so this series introduces a
-new standard authorization framework.
-
-It comes with four initial authorization mechanisms
-
- - Simple - an exact username match. This is useful when there is
-   exactly one user that is known to connect. For example when live
-   migrating from one QEMU to another with TLS, libvirt would use
-   the simple scheme to whitelist the TLS cert of the source QEMU.
-
- - List - an full access control list, with optional regex matching.
-   This is more flexible and is used to provide 100% backcompat with
-   the existing HMP ACL commands. The caveat is that we can't create
-   these via the CLI -object arg yet.
-
- - ListFile - the same as List, but with the rules stored in JSON
-   format in an external file. This avoids the -object limitation
-   while also allowing the admin to change list entries on the file.
-   QEMU uses inotify to notice these changes and auto-reload the
-   file contents. This is likely a good default choice for most
-   network services, if the "simple" mechanism isn't sufficient.
-
- - PAM - delegate the username lookup to a PAM module, which opens
-   the door to many options including things like SQL/LDAP lookups.
-
-----------------------------------------------------------------
-
-Daniel P. Berrang=C3=A9 (11):
-  util: add helper APIs for dealing with inotify in portable manner
-  qom: don't require user creatable objects to be registered
-  hw/usb: don't set IN_ISDIR for inotify watch in MTP driver
-  hw/usb: fix const-ness for string params in MTP driver
-  hw/usb: switch MTP to use new inotify APIs
-  authz: add QAuthZ object as an authorization base class
-  authz: add QAuthZSimple object type for easy whitelist auth checks
-  authz: add QAuthZList object type for an access control list
-  authz: add QAuthZListFile object type for a file access control list
-  authz: add QAuthZPAM object type for authorizing using PAM
-  authz: delete existing ACL implementation
-
- MAINTAINERS                    |  15 +
- Makefile                       |  10 +-
- Makefile.objs                  |   8 +-
- Makefile.target                |   2 +
- authz/Makefile.objs            |   7 +
- authz/base.c                   |  82 ++++
- authz/list.c                   | 271 +++++++++++++
- authz/listfile.c               | 283 ++++++++++++++
- authz/pamacct.c                | 148 +++++++
- authz/simple.c                 | 115 ++++++
- authz/trace-events             |  18 +
- configure                      |  54 ++-
- crypto/tlssession.c            |  35 +-
- crypto/trace-events            |   2 +-
- hw/usb/dev-mtp.c               | 281 ++++++--------
- hw/usb/trace-events            |   2 +-
- include/authz/base.h           | 112 ++++++
- include/authz/list.h           | 106 +++++
- include/authz/listfile.h       | 111 ++++++
- include/authz/pamacct.h        | 100 +++++
- include/authz/simple.h         |  84 ++++
- include/qemu/acl.h             |  66 ----
- include/qemu/filemonitor.h     | 128 ++++++
- monitor.c                      | 179 ++++++---
- qapi/Makefile.objs             |   2 +-
- qapi/authz.json                |  58 +++
- qapi/qapi-schema.json          |   1 +
- qemu-options.hx                | 105 +++++
- qom/object.c                   |  12 +-
- qom/object_interfaces.c        |  16 +-
- tests/Makefile.include         |  16 +-
- tests/test-authz-list.c        | 159 ++++++++
- tests/test-authz-listfile.c    | 195 ++++++++++
- tests/test-authz-pam.c         | 124 ++++++
- tests/test-authz-simple.c      |  50 +++
- tests/test-crypto-tlssession.c |  15 +-
- tests/test-io-channel-tls.c    |  16 +-
- tests/test-util-filemonitor.c  | 685 +++++++++++++++++++++++++++++++++
- ui/vnc-auth-sasl.c             |  23 +-
- ui/vnc-auth-sasl.h             |   5 +-
- ui/vnc-auth-vencrypt.c         |   2 +-
- ui/vnc-ws.c                    |   2 +-
- ui/vnc.c                       |  37 +-
- ui/vnc.h                       |   4 +-
- util/Makefile.objs             |   4 +-
- util/acl.c                     | 179 ---------
- util/filemonitor-inotify.c     | 339 ++++++++++++++++
- util/filemonitor-stub.c        |  59 +++
- util/trace-events              |   9 +
- 49 files changed, 3773 insertions(+), 563 deletions(-)
- create mode 100644 authz/Makefile.objs
- create mode 100644 authz/base.c
- create mode 100644 authz/list.c
- create mode 100644 authz/listfile.c
- create mode 100644 authz/pamacct.c
- create mode 100644 authz/simple.c
- create mode 100644 authz/trace-events
- create mode 100644 include/authz/base.h
- create mode 100644 include/authz/list.h
- create mode 100644 include/authz/listfile.h
- create mode 100644 include/authz/pamacct.h
- create mode 100644 include/authz/simple.h
- delete mode 100644 include/qemu/acl.h
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ MAINTAINERS                   |   7 +
+ Makefile.objs                 |   2 +-
+ include/qemu/filemonitor.h    | 128 +++++++
+ tests/Makefile.include        |   3 +
+ tests/test-util-filemonitor.c | 685 ++++++++++++++++++++++++++++++++++
+ util/Makefile.objs            |   3 +
+ util/filemonitor-inotify.c    | 339 +++++++++++++++++
+ util/filemonitor-stub.c       |  59 +++
+ util/trace-events             |   9 +
+ 9 files changed, 1234 insertions(+), 1 deletion(-)
  create mode 100644 include/qemu/filemonitor.h
- create mode 100644 qapi/authz.json
- create mode 100644 tests/test-authz-list.c
- create mode 100644 tests/test-authz-listfile.c
- create mode 100644 tests/test-authz-pam.c
- create mode 100644 tests/test-authz-simple.c
  create mode 100644 tests/test-util-filemonitor.c
- delete mode 100644 util/acl.c
  create mode 100644 util/filemonitor-inotify.c
  create mode 100644 util/filemonitor-stub.c
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6ae55ff732..9a0bbb7972 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2087,6 +2087,13 @@ F: include/qemu/sockets.h
+ F: util/qemu-sockets.c
+ F: qapi/sockets.json
+=20
++File monitor
++M: Daniel P. Berrange <berrange@redhat.com>
++S: Odd fixes
++F: util/filemonitor*.c
++F: include/qemu/filemonitor.h
++F: tests/test-util-filemonitor.c
++
+ Throttling infrastructure
+ M: Alberto Garcia <berto@igalia.com>
+ S: Supported
+diff --git a/Makefile.objs b/Makefile.objs
+index 5fb022d7ad..0897a346db 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -1,6 +1,6 @@
+ #######################################################################
+ # Common libraries for tools and emulators
+-stub-obj-y =3D stubs/ crypto/
++stub-obj-y =3D stubs/ util/ crypto/
+ util-obj-y =3D util/ qobject/ qapi/
+=20
+ chardev-obj-y =3D chardev/
+diff --git a/include/qemu/filemonitor.h b/include/qemu/filemonitor.h
+new file mode 100644
+index 0000000000..cd031832ed
+--- /dev/null
++++ b/include/qemu/filemonitor.h
+@@ -0,0 +1,128 @@
++/*
++ * QEMU file monitor helper
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
++
++#ifndef QEMU_FILE_MONITOR_H
++#define QEMU_FILE_MONITOR_H
++
++#include "qemu-common.h"
++
++
++typedef struct QFileMonitor QFileMonitor;
++
++typedef enum {
++    /* File has been created in a dir */
++    QFILE_MONITOR_EVENT_CREATED,
++    /* File has been modified in a dir */
++    QFILE_MONITOR_EVENT_MODIFIED,
++    /* File has been deleted in a dir */
++    QFILE_MONITOR_EVENT_DELETED,
++    /* File has attributes changed */
++    QFILE_MONITOR_EVENT_ATTRIBUTES,
++    /* Dir is no longer being monitored (due to deletion) */
++    QFILE_MONITOR_EVENT_IGNORED,
++} QFileMonitorEvent;
++
++
++/**
++ * QFileMonitorHandler:
++ * @id: id from qemu_file_monitor_add_watch()
++ * @event: the file change that occurred
++ * @filename: the name of the file affected
++ * @opaque: opaque data provided to qemu_file_monitor_add_watch()
++ *
++ * Invoked whenever a file changes. If @event is
++ * QFILE_MONITOR_EVENT_IGNORED, @filename will be
++ * empty.
++ *
++ */
++typedef void (*QFileMonitorHandler)(int id,
++                                    QFileMonitorEvent event,
++                                    const char *filename,
++                                    void *opaque);
++
++/**
++ * qemu_file_monitor_new:
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Create a handle for a file monitoring object.
++ *
++ * This object does locking internally to enable it to be
++ * safe to use from multiple threads
++ *
++ * If the platform does not support file monitoring, an
++ * error will be reported. Likewise if file monitoring
++ * is supported, but cannot be initialized
++ *
++ * Currently this is implemented on Linux platforms with
++ * the inotify subsystem.
++ *
++ * Returns: the new monitoring object, or NULL on error
++ */
++QFileMonitor *qemu_file_monitor_new(Error **errp);
++
++/**
++ * qemu_file_monitor_free:
++ * @mon: the file monitor context
++ *
++ * Free resources associated with the file monitor,
++ * including any currently registered watches.
++ */
++void qemu_file_monitor_free(QFileMonitor *mon);
++
++/**
++ * qemu_file_monitor_add_watch:
++ * @mon: the file monitor context
++ * @dirpath: the directory whose contents to watch
++ * @filename: optional filename to filter on
++ * @cb: the function to invoke when @dirpath has changes
++ * @opaque: data to pass to @cb
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Register to receive notifications of changes
++ * in the directory @dirpath. All files in the
++ * directory will be monitored. If the caller is
++ * only interested in one specific file, @filename
++ * can be used to filter events.
++ *
++ * Returns: a positive integer watch ID, or -1 on error
++ */
++int qemu_file_monitor_add_watch(QFileMonitor *mon,
++                                const char *dirpath,
++                                const char *filename,
++                                QFileMonitorHandler cb,
++                                void *opaque,
++                                Error **errp);
++
++/**
++ * qemu_file_monitor_remove_watch:
++ * @mon: the file monitor context
++ * @dirpath: the directory whose contents to unwatch
++ * @id: id of the watch to remove
++ *
++ * Removes the file monitoring watch @id, associated
++ * with the directory @dirpath. This must never be
++ * called from a QFileMonitorHandler callback, or a
++ * deadlock will result.
++ */
++void qemu_file_monitor_remove_watch(QFileMonitor *mon,
++                                    const char *dirpath,
++                                    int id);
++
++#endif /* QEMU_FILE_MONITOR_H */
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b39e989f72..3a6a8d4b17 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -114,6 +114,7 @@ ifneq (,$(findstring qemu-ga,$(TOOLS)))
+ check-unit-$(land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) +=3D tests/te=
+st-qga$(EXESUF)
+ endif
+ check-unit-y +=3D tests/test-timed-average$(EXESUF)
++check-unit-$(CONFIG_INOTIFY1) +=3D tests/test-util-filemonitor$(EXESUF)
+ check-unit-y +=3D tests/test-util-sockets$(EXESUF)
+ check-unit-y +=3D tests/test-io-task$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-socket$(EXESUF)
+@@ -657,6 +658,8 @@ tests/test-crypto-tlssession$(EXESUF): tests/test-cry=
+pto-tlssession.o \
+ 	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o \
+ 	tests/crypto-tls-psk-helpers.o \
+         $(test-crypto-obj-y)
++tests/test-util-filemonitor$(EXESUF): tests/test-util-filemonitor.o \
++	$(test-util-obj-y)
+ tests/test-util-sockets$(EXESUF): tests/test-util-sockets.o \
+ 	tests/socket-helpers.o $(test-util-obj-y)
+ tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
+diff --git a/tests/test-util-filemonitor.c b/tests/test-util-filemonitor.=
+c
+new file mode 100644
+index 0000000000..5d95cea5ee
+--- /dev/null
++++ b/tests/test-util-filemonitor.c
+@@ -0,0 +1,685 @@
++/*
++ * Tests for util/filemonitor-*.c
++ *
++ * Copyright 2018 Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/main-loop.h"
++#include "qapi/error.h"
++#include "qemu/filemonitor.h"
++
++#include <utime.h>
++
++enum {
++    QFILE_MONITOR_TEST_OP_CREATE,
++    QFILE_MONITOR_TEST_OP_APPEND,
++    QFILE_MONITOR_TEST_OP_TRUNC,
++    QFILE_MONITOR_TEST_OP_RENAME,
++    QFILE_MONITOR_TEST_OP_TOUCH,
++    QFILE_MONITOR_TEST_OP_UNLINK,
++};
++
++typedef struct {
++    int type;
++    const char *filesrc;
++    const char *filedst;
++} QFileMonitorTestOp;
++
++typedef struct {
++    const char *file;
++} QFileMonitorTestWatch;
++
++typedef struct {
++    gsize nwatches;
++    const QFileMonitorTestWatch *watches;
++
++    gsize nops;
++    const QFileMonitorTestOp *ops;
++} QFileMonitorTestPlan;
++
++typedef struct {
++    int id;
++    QFileMonitorEvent event;
++    char *filename;
++} QFileMonitorTestRecord;
++
++
++typedef struct {
++    QemuMutex lock;
++    GList *records;
++} QFileMonitorTestData;
++
++static QemuMutex evlock;
++static bool evstopping;
++static bool evrunning;
++
++/*
++ * Main function for a background thread that is
++ * running the event loop during the test
++ */
++static void *
++qemu_file_monitor_test_event_loop(void *opaque G_GNUC_UNUSED)
++{
++    qemu_mutex_lock(&evlock);
++
++    while (!evstopping) {
++        qemu_mutex_unlock(&evlock);
++        main_loop_wait(true);
++        qemu_mutex_lock(&evlock);
++    }
++
++    evrunning =3D false;
++    qemu_mutex_unlock(&evlock);
++    return NULL;
++}
++
++
++/*
++ * File monitor event handler which simply maintains
++ * an ordered list of all events that it receives
++ */
++static void
++qemu_file_monitor_test_handler(int id,
++                               QFileMonitorEvent event,
++                               const char *filename,
++                               void *opaque)
++{
++    QFileMonitorTestData *data =3D opaque;
++    QFileMonitorTestRecord *rec =3D g_new0(QFileMonitorTestRecord, 1);
++
++    rec->id =3D id;
++    rec->event =3D event;
++    rec->filename =3D g_strdup(filename);
++
++    qemu_mutex_lock(&data->lock);
++    data->records =3D g_list_append(data->records, rec);
++    qemu_mutex_unlock(&data->lock);
++}
++
++
++static void
++qemu_file_monitor_test_record_free(QFileMonitorTestRecord *rec)
++{
++    g_free(rec->filename);
++    g_free(rec);
++}
++
++
++/*
++ * Get the next event record that has been received by
++ * the file monitor event handler. Since events are
++ * emitted in the background thread running the event
++ * loop, we can't assume there is a record available
++ * immediately. Thus we will sleep for upto 5 seconds
++ * to wait for the event to be queued for us.
++ */
++static QFileMonitorTestRecord *
++qemu_file_monitor_test_next_record(QFileMonitorTestData *data)
++{
++    GTimer *timer =3D g_timer_new();
++    QFileMonitorTestRecord *record =3D NULL;
++    GList *tmp;
++
++    qemu_mutex_lock(&data->lock);
++    while (!data->records && g_timer_elapsed(timer, NULL) < 5) {
++        qemu_mutex_unlock(&data->lock);
++        usleep(10 * 1000);
++        qemu_mutex_lock(&data->lock);
++    }
++    if (data->records) {
++        record =3D data->records->data;
++        tmp =3D data->records;
++        data->records =3D g_list_remove_link(data->records, tmp);
++        g_list_free(tmp);
++    }
++    qemu_mutex_unlock(&data->lock);
++
++    g_timer_destroy(timer);
++    return record;
++}
++
++
++/*
++ * Check whether the event record we retrieved matches
++ * data we were expecting to see for the event
++ */
++static bool
++qemu_file_monitor_test_expect(QFileMonitorTestData *data,
++                              int id,
++                              QFileMonitorEvent event,
++                              const char *filename)
++{
++    QFileMonitorTestRecord *rec;
++    bool ret =3D false;
++
++    rec =3D qemu_file_monitor_test_next_record(data);
++
++    if (!rec) {
++        g_printerr("Missing event watch id %d event %d file %s\n",
++                   id, event, filename);
++        return false;
++    }
++
++    if (id !=3D rec->id) {
++        g_printerr("Expected watch id %d but got %d\n", id, rec->id);
++        goto cleanup;
++    }
++
++    if (event !=3D rec->event) {
++        g_printerr("Expected event %d but got %d\n", event, rec->event);
++        goto cleanup;
++    }
++
++    if (!g_str_equal(filename, rec->filename)) {
++        g_printerr("Expected filename %s but got %s\n",
++                   filename, rec->filename);
++        goto cleanup;
++    }
++
++    ret =3D true;
++
++ cleanup:
++    qemu_file_monitor_test_record_free(rec);
++    return ret;
++}
++
++
++static void
++test_file_monitor_events(const void *opaque)
++{
++    const QFileMonitorTestPlan *plan =3D opaque;
++    Error *local_err =3D NULL;
++    GError *gerr =3D NULL;
++    QFileMonitor *mon =3D qemu_file_monitor_new(&local_err);
++    QemuThread th;
++    GTimer *timer;
++    gchar *dir =3D NULL;
++    int err =3D -1;
++    gsize i, j;
++    char *pathsrc =3D NULL;
++    char *pathdst =3D NULL;
++    QFileMonitorTestData data;
++
++    qemu_mutex_init(&data.lock);
++    data.records =3D NULL;
++
++    /*
++     * The file monitor needs the main loop running in
++     * order to receive events from inotify. We must
++     * thus spawn a background thread to run an event
++     * loop impl, while this thread triggers the
++     * actual file operations we're testing
++     */
++    evrunning =3D 1;
++    evstopping =3D 0;
++    qemu_thread_create(&th, "event-loop",
++                       qemu_file_monitor_test_event_loop, NULL,
++                       QEMU_THREAD_JOINABLE);
++
++    if (local_err) {
++        g_printerr("File monitoring not available: %s",
++                   error_get_pretty(local_err));
++        error_free(local_err);
++        return;
++    }
++
++    dir =3D g_dir_make_tmp("test-util-filemonitor-XXXXXX",
++                         &gerr);
++    if (!dir) {
++        g_printerr("Unable to create tmp dir %s",
++                   gerr->message);
++        g_error_free(gerr);
++        abort();
++    }
++
++    /*
++     * First register all the directory / file watches
++     * we're interested in seeing events against
++     */
++    for (i =3D 0; i < plan->nwatches; i++) {
++        int watchid;
++        watchid =3D qemu_file_monitor_add_watch(mon,
++                                              dir,
++                                              plan->watches[i].file,
++                                              qemu_file_monitor_test_han=
+dler,
++                                              &data,
++                                              &local_err);
++        if (watchid < 0) {
++            g_printerr("Unable to add watch %s",
++                       error_get_pretty(local_err));
++            goto cleanup;
++        }
++    }
++
++
++    /*
++     * Now invoke all the file operations (create,
++     * delete, rename, chmod, etc). These operations
++     * will trigger the various file monitor events
++     */
++    for (i =3D 0; i < plan->nops; i++) {
++        const QFileMonitorTestOp *op =3D &(plan->ops[i]);
++        int fd;
++        struct utimbuf ubuf;
++
++        pathsrc =3D g_strdup_printf("%s/%s", dir, op->filesrc);
++        if (op->filedst) {
++            pathdst =3D g_strdup_printf("%s/%s", dir, op->filedst);
++        }
++
++        switch (op->type) {
++        case QFILE_MONITOR_TEST_OP_CREATE:
++            fd =3D open(pathsrc, O_WRONLY | O_CREAT, 0700);
++            if (fd < 0) {
++                g_printerr("Unable to create %s: %s",
++                           pathsrc, strerror(errno));
++                goto cleanup;
++            }
++            close(fd);
++            break;
++
++        case QFILE_MONITOR_TEST_OP_APPEND:
++            fd =3D open(pathsrc, O_WRONLY | O_APPEND, 0700);
++            if (fd < 0) {
++                g_printerr("Unable to open %s: %s",
++                           pathsrc, strerror(errno));
++                goto cleanup;
++            }
++
++            if (write(fd, "Hello World", 10) !=3D 10) {
++                g_printerr("Unable to write %s: %s",
++                           pathsrc, strerror(errno));
++                close(fd);
++                goto cleanup;
++            }
++            close(fd);
++            break;
++
++        case QFILE_MONITOR_TEST_OP_TRUNC:
++            if (truncate(pathsrc, 4) < 0) {
++                g_printerr("Unable to truncate %s: %s",
++                           pathsrc, strerror(errno));
++                goto cleanup;
++            }
++            break;
++
++        case QFILE_MONITOR_TEST_OP_RENAME:
++            if (rename(pathsrc, pathdst) < 0) {
++                g_printerr("Unable to rename %s to %s: %s",
++                           pathsrc, pathdst, strerror(errno));
++                goto cleanup;
++            }
++            break;
++
++        case QFILE_MONITOR_TEST_OP_UNLINK:
++            if (unlink(pathsrc) < 0) {
++                g_printerr("Unable to unlink %s: %s",
++                           pathsrc, strerror(errno));
++                goto cleanup;
++            }
++            break;
++
++        case QFILE_MONITOR_TEST_OP_TOUCH:
++            ubuf.actime =3D 1024;
++            ubuf.modtime =3D 1025;
++            if (utime(pathsrc, &ubuf) < 0) {
++                g_printerr("Unable to touch %s: %s",
++                           pathsrc, strerror(errno));
++                goto cleanup;
++            }
++            break;
++
++        default:
++            g_assert_not_reached();
++        }
++
++        g_free(pathsrc);
++        g_free(pathdst);
++        pathsrc =3D pathdst =3D NULL;
++    }
++
++
++    /*
++     * Finally validate that we have received all the events
++     * we expect to see for the combination of watches and
++     * file operations
++     */
++    for (i =3D 0; i < plan->nops; i++) {
++        const QFileMonitorTestOp *op =3D &(plan->ops[i]);
++
++        switch (op->type) {
++        case QFILE_MONITOR_TEST_OP_CREATE:
++            for (j =3D 0; j < plan->nwatches; j++) {
++                if (plan->watches[j].file &&
++                    !g_str_equal(plan->watches[j].file, op->filesrc))
++                    continue;
++
++                if (!qemu_file_monitor_test_expect(
++                        &data, j, QFILE_MONITOR_EVENT_CREATED, op->files=
+rc))
++                    goto cleanup;
++            }
++            break;
++
++        case QFILE_MONITOR_TEST_OP_APPEND:
++        case QFILE_MONITOR_TEST_OP_TRUNC:
++            for (j =3D 0; j < plan->nwatches; j++) {
++                if (plan->watches[j].file &&
++                    !g_str_equal(plan->watches[j].file, op->filesrc))
++                    continue;
++
++                if (!qemu_file_monitor_test_expect(
++                        &data, j, QFILE_MONITOR_EVENT_MODIFIED, op->file=
+src))
++                    goto cleanup;
++            }
++            break;
++
++        case QFILE_MONITOR_TEST_OP_RENAME:
++            for (j =3D 0; j < plan->nwatches; j++) {
++                if (plan->watches[j].file &&
++                    !g_str_equal(plan->watches[j].file, op->filesrc))
++                    continue;
++
++                if (!qemu_file_monitor_test_expect(
++                        &data, j, QFILE_MONITOR_EVENT_DELETED, op->files=
+rc))
++                    goto cleanup;
++            }
++
++            for (j =3D 0; j < plan->nwatches; j++) {
++                if (plan->watches[j].file &&
++                    !g_str_equal(plan->watches[j].file, op->filedst))
++                    continue;
++
++                if (!qemu_file_monitor_test_expect(
++                        &data, j, QFILE_MONITOR_EVENT_CREATED, op->filed=
+st))
++                    goto cleanup;
++            }
++            break;
++
++        case QFILE_MONITOR_TEST_OP_TOUCH:
++            for (j =3D 0; j < plan->nwatches; j++) {
++                if (plan->watches[j].file &&
++                    !g_str_equal(plan->watches[j].file, op->filesrc))
++                    continue;
++
++                if (!qemu_file_monitor_test_expect(
++                        &data, j, QFILE_MONITOR_EVENT_ATTRIBUTES, op->fi=
+lesrc))
++                    goto cleanup;
++            }
++            break;
++
++        case QFILE_MONITOR_TEST_OP_UNLINK:
++            for (j =3D 0; j < plan->nwatches; j++) {
++                if (plan->watches[j].file &&
++                    !g_str_equal(plan->watches[j].file, op->filesrc))
++                    continue;
++
++                if (!qemu_file_monitor_test_expect(
++                        &data, j, QFILE_MONITOR_EVENT_DELETED, op->files=
+rc))
++                    goto cleanup;
++            }
++            break;
++
++        default:
++            g_assert_not_reached();
++        }
++    }
++
++    err =3D 0;
++
++ cleanup:
++    g_free(pathsrc);
++    g_free(pathdst);
++
++    qemu_mutex_lock(&evlock);
++    evstopping =3D 1;
++    timer =3D g_timer_new();
++    while (evrunning && g_timer_elapsed(timer, NULL) < 5) {
++        qemu_mutex_unlock(&evlock);
++        usleep(10 * 1000);
++        qemu_mutex_lock(&evlock);
++    }
++    qemu_mutex_unlock(&evlock);
++
++    if (g_timer_elapsed(timer, NULL) >=3D 5) {
++        g_printerr("Event loop failed to quit after 5 seconds\n");
++    }
++    g_timer_destroy(timer);
++
++    for (i =3D 0; i < plan->nops; i++) {
++        const QFileMonitorTestOp *op =3D &(plan->ops[i]);
++        pathsrc =3D g_strdup_printf("%s/%s", dir, op->filesrc);
++        unlink(pathsrc);
++        g_free(pathsrc);
++        if (op->filedst) {
++            pathdst =3D g_strdup_printf("%s/%s", dir, op->filedst);
++            unlink(pathdst);
++            g_free(pathdst);
++        }
++    }
++
++    qemu_file_monitor_free(mon);
++    g_list_foreach(data.records,
++                   (GFunc)qemu_file_monitor_test_record_free, NULL);
++    g_list_free(data.records);
++    qemu_mutex_destroy(&data.lock);
++    if (dir) {
++        rmdir(dir);
++    }
++    g_free(dir);
++    g_assert(err =3D=3D 0);
++}
++
++
++/*
++ * Set of structs which define which file name patterns
++ * we're trying to watch against. NULL, means all files
++ * in the directory
++ */
++static const QFileMonitorTestWatch watches_any[] =3D {
++    { NULL },
++};
++
++static const QFileMonitorTestWatch watches_one[] =3D {
++    { "one.txt" },
++};
++
++static const QFileMonitorTestWatch watches_two[] =3D {
++    { "two.txt" },
++};
++
++static const QFileMonitorTestWatch watches_many[] =3D {
++    { NULL },
++    { "one.txt" },
++    { "two.txt" },
++};
++
++
++/*
++ * Various sets of file operations we're going to
++ * trigger and validate events for
++ */
++static const QFileMonitorTestOp ops_create_one[] =3D {
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "one.txt", }
++};
++
++static const QFileMonitorTestOp ops_delete_one[] =3D {
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "one.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_UNLINK,
++      .filesrc =3D "one.txt", }
++};
++
++static const QFileMonitorTestOp ops_create_many[] =3D {
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "one.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "two.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "three.txt", }
++};
++
++static const QFileMonitorTestOp ops_rename_one[] =3D {
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "one.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_RENAME,
++      .filesrc =3D "one.txt", .filedst =3D "two.txt" }
++};
++
++static const QFileMonitorTestOp ops_rename_many[] =3D {
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "one.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "two.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_RENAME,
++      .filesrc =3D "one.txt", .filedst =3D "two.txt" }
++};
++
++static const QFileMonitorTestOp ops_append_one[] =3D {
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "one.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_APPEND,
++      .filesrc =3D "one.txt", },
++};
++
++static const QFileMonitorTestOp ops_trunc_one[] =3D {
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "one.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_TRUNC,
++      .filesrc =3D "one.txt", },
++};
++
++static const QFileMonitorTestOp ops_touch_one[] =3D {
++    { .type =3D QFILE_MONITOR_TEST_OP_CREATE,
++      .filesrc =3D "one.txt", },
++    { .type =3D QFILE_MONITOR_TEST_OP_TOUCH,
++      .filesrc =3D "one.txt", },
++};
++
++
++/*
++ * No we define data sets for the combinatorial
++ * expansion of file watches and operation sets
++ */
++#define PLAN_DATA(o, w) \
++    static const QFileMonitorTestPlan plan_ ## o ## _ ## w =3D { \
++        .nops =3D G_N_ELEMENTS(ops_ ##o), \
++        .ops =3D ops_ ##o, \
++        .nwatches =3D G_N_ELEMENTS(watches_ ##w), \
++        .watches =3D watches_ ## w, \
++    }
++
++PLAN_DATA(create_one, any);
++PLAN_DATA(create_one, one);
++PLAN_DATA(create_one, two);
++PLAN_DATA(create_one, many);
++
++PLAN_DATA(delete_one, any);
++PLAN_DATA(delete_one, one);
++PLAN_DATA(delete_one, two);
++PLAN_DATA(delete_one, many);
++
++PLAN_DATA(create_many, any);
++PLAN_DATA(create_many, one);
++PLAN_DATA(create_many, two);
++PLAN_DATA(create_many, many);
++
++PLAN_DATA(rename_one, any);
++PLAN_DATA(rename_one, one);
++PLAN_DATA(rename_one, two);
++PLAN_DATA(rename_one, many);
++
++PLAN_DATA(rename_many, any);
++PLAN_DATA(rename_many, one);
++PLAN_DATA(rename_many, two);
++PLAN_DATA(rename_many, many);
++
++PLAN_DATA(append_one, any);
++PLAN_DATA(append_one, one);
++PLAN_DATA(append_one, two);
++PLAN_DATA(append_one, many);
++
++PLAN_DATA(trunc_one, any);
++PLAN_DATA(trunc_one, one);
++PLAN_DATA(trunc_one, two);
++PLAN_DATA(trunc_one, many);
++
++PLAN_DATA(touch_one, any);
++PLAN_DATA(touch_one, one);
++PLAN_DATA(touch_one, two);
++PLAN_DATA(touch_one, many);
++
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    qemu_init_main_loop(&error_abort);
++
++    qemu_mutex_init(&evlock);
++
++    /*
++     * Register test cases for the combinatorial
++     * expansion of file watches and operation sets
++     */
++    #define PLAN_REGISTER(o, w)                                         =
+\
++        g_test_add_data_func("/util/filemonitor/" # o "/" # w,          =
+\
++                             &plan_ ## o ## _ ## w, test_file_monitor_ev=
+ents)
++
++    PLAN_REGISTER(create_one, any);
++    PLAN_REGISTER(create_one, one);
++    PLAN_REGISTER(create_one, two);
++    PLAN_REGISTER(create_one, many);
++
++    PLAN_REGISTER(delete_one, any);
++    PLAN_REGISTER(delete_one, one);
++    PLAN_REGISTER(delete_one, two);
++    PLAN_REGISTER(delete_one, many);
++
++    PLAN_REGISTER(create_many, any);
++    PLAN_REGISTER(create_many, one);
++    PLAN_REGISTER(create_many, two);
++    PLAN_REGISTER(create_many, many);
++
++    PLAN_REGISTER(rename_one, any);
++    PLAN_REGISTER(rename_one, one);
++    PLAN_REGISTER(rename_one, two);
++    PLAN_REGISTER(rename_one, many);
++
++    PLAN_REGISTER(rename_many, any);
++    PLAN_REGISTER(rename_many, one);
++    PLAN_REGISTER(rename_many, two);
++    PLAN_REGISTER(rename_many, many);
++
++    PLAN_REGISTER(append_one, any);
++    PLAN_REGISTER(append_one, one);
++    PLAN_REGISTER(append_one, two);
++    PLAN_REGISTER(append_one, many);
++
++    PLAN_REGISTER(trunc_one, any);
++    PLAN_REGISTER(trunc_one, one);
++    PLAN_REGISTER(trunc_one, two);
++    PLAN_REGISTER(trunc_one, many);
++
++    PLAN_REGISTER(touch_one, any);
++    PLAN_REGISTER(touch_one, one);
++    PLAN_REGISTER(touch_one, two);
++    PLAN_REGISTER(touch_one, many);
++
++    return g_test_run();
++}
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 0820923c18..c1dd746902 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -50,5 +50,8 @@ util-obj-y +=3D range.o
+ util-obj-y +=3D stats64.o
+ util-obj-y +=3D systemd.o
+ util-obj-y +=3D iova-tree.o
++util-obj-$(CONFIG_INOTIFY1) +=3D filemonitor-inotify.o
+ util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
+ util-obj-$(CONFIG_OPENGL) +=3D drm.o
++
++stub-obj-y +=3D filemonitor-stub.o
+diff --git a/util/filemonitor-inotify.c b/util/filemonitor-inotify.c
+new file mode 100644
+index 0000000000..3a72be037f
+--- /dev/null
++++ b/util/filemonitor-inotify.c
+@@ -0,0 +1,339 @@
++/*
++ * QEMU file monitor Linux inotify impl
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/filemonitor.h"
++#include "qemu/main-loop.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "trace.h"
++
++#include <sys/inotify.h>
++
++struct QFileMonitor {
++    int fd;
++
++    QemuMutex lock; /* protects dirs & idmap */
++    GHashTable *dirs; /* dirname =3D> QFileMonitorDir */
++    GHashTable *idmap; /* inotify ID =3D> dirname */
++};
++
++
++typedef struct {
++    int id; /* watch ID */
++    char *filename; /* optional filter */
++    QFileMonitorHandler cb;
++    void *opaque;
++} QFileMonitorWatch;
++
++
++typedef struct {
++    char *path;
++    int id; /* inotify ID */
++    int nextid; /* watch ID counter */
++    GArray *watches; /* QFileMonitorWatch elements */
++} QFileMonitorDir;
++
++
++static void qemu_file_monitor_watch(void *arg)
++{
++    QFileMonitor *mon =3D arg;
++    char buf[4096]
++        __attribute__ ((aligned(__alignof__(struct inotify_event))));
++    int used =3D 0;
++    int len;
++
++    qemu_mutex_lock(&mon->lock);
++
++    if (mon->fd =3D=3D -1) {
++        qemu_mutex_unlock(&mon->lock);
++        return;
++    }
++
++    len =3D read(mon->fd, buf, sizeof(buf));
++
++    if (len < 0) {
++        if (errno !=3D EAGAIN) {
++            error_report("Failure monitoring inotify FD '%s',"
++                         "disabling events", strerror(errno));
++            goto cleanup;
++        }
++
++        /* no more events right now */
++        goto cleanup;
++    }
++
++    /* Loop over all events in the buffer */
++    while (used < len) {
++        struct inotify_event *ev =3D
++            (struct inotify_event *)(buf + used);
++        const char *name =3D ev->len ? ev->name : "";
++        QFileMonitorDir *dir =3D g_hash_table_lookup(mon->idmap,
++                                                   GINT_TO_POINTER(ev->w=
+d));
++        uint32_t iev =3D ev->mask &
++            (IN_CREATE | IN_MODIFY | IN_DELETE | IN_IGNORED |
++             IN_MOVED_TO | IN_MOVED_FROM | IN_ATTRIB);
++        int qev;
++        gsize i;
++
++        used +=3D sizeof(struct inotify_event) + ev->len;
++
++        if (!dir) {
++            continue;
++        }
++
++        /*
++         * During a rename operation, the old name gets
++         * IN_MOVED_FROM and the new name gets IN_MOVED_TO.
++         * To simplify life for callers, we turn these into
++         * DELETED and CREATED events
++         */
++        switch (iev) {
++        case IN_CREATE:
++        case IN_MOVED_TO:
++            qev =3D QFILE_MONITOR_EVENT_CREATED;
++            break;
++        case IN_MODIFY:
++            qev =3D QFILE_MONITOR_EVENT_MODIFIED;
++            break;
++        case IN_DELETE:
++        case IN_MOVED_FROM:
++            qev =3D QFILE_MONITOR_EVENT_DELETED;
++            break;
++        case IN_ATTRIB:
++            qev =3D QFILE_MONITOR_EVENT_ATTRIBUTES;
++            break;
++        case IN_IGNORED:
++            qev =3D QFILE_MONITOR_EVENT_IGNORED;
++            break;
++        default:
++            g_assert_not_reached();
++        }
++
++        trace_qemu_file_monitor_event(mon, dir->path, name, ev->mask, di=
+r->id);
++        for (i =3D 0; i < dir->watches->len; i++) {
++            QFileMonitorWatch *watch =3D &g_array_index(dir->watches,
++                                                      QFileMonitorWatch,
++                                                      i);
++
++            if (watch->filename =3D=3D NULL ||
++                (name && g_str_equal(watch->filename, name))) {
++                trace_qemu_file_monitor_dispatch(mon, dir->path, name,
++                                                 qev, watch->cb,
++                                                 watch->opaque, watch->i=
+d);
++                watch->cb(watch->id, qev, name, watch->opaque);
++            }
++        }
++    }
++
++ cleanup:
++    qemu_mutex_unlock(&mon->lock);
++}
++
++
++static void
++qemu_file_monitor_dir_free(void *data)
++{
++    QFileMonitorDir *dir =3D data;
++    gsize i;
++
++    for (i =3D 0; i < dir->watches->len; i++) {
++        QFileMonitorWatch *watch =3D &g_array_index(dir->watches,
++                                                  QFileMonitorWatch, i);
++        g_free(watch->filename);
++    }
++    g_array_unref(dir->watches);
++    g_free(dir->path);
++    g_free(dir);
++}
++
++
++QFileMonitor *
++qemu_file_monitor_new(Error **errp)
++{
++    int fd;
++    QFileMonitor *mon;
++
++    fd =3D inotify_init1(IN_NONBLOCK);
++    if (fd < 0) {
++        error_setg_errno(errp, errno,
++                         "Unable to initialize inotify");
++        return NULL;
++    }
++
++    mon =3D g_new0(QFileMonitor, 1);
++    qemu_mutex_init(&mon->lock);
++    mon->fd =3D fd;
++
++    mon->dirs =3D g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
++                                      qemu_file_monitor_dir_free);
++    mon->idmap =3D g_hash_table_new(g_direct_hash, g_direct_equal);
++
++    trace_qemu_file_monitor_new(mon, mon->fd);
++
++    return mon;
++}
++
++static gboolean
++qemu_file_monitor_free_idle(void *opaque)
++{
++    QFileMonitor *mon =3D opaque;
++
++    if (!mon) {
++        return G_SOURCE_REMOVE;
++    }
++
++    qemu_mutex_lock(&mon->lock);
++
++    g_hash_table_unref(mon->idmap);
++    g_hash_table_unref(mon->dirs);
++
++    qemu_mutex_unlock(&mon->lock);
++
++    qemu_mutex_destroy(&mon->lock);
++    g_free(mon);
++
++    return G_SOURCE_REMOVE;
++}
++
++void
++qemu_file_monitor_free(QFileMonitor *mon)
++{
++    if (!mon) {
++        return;
++    }
++
++    qemu_mutex_lock(&mon->lock);
++    if (mon->fd !=3D -1) {
++        qemu_set_fd_handler(mon->fd, NULL, NULL, NULL);
++        close(mon->fd);
++        mon->fd =3D -1;
++    }
++    qemu_mutex_unlock(&mon->lock);
++
++    /*
++     * Can't free it yet, because another thread
++     * may be running event loop, so the inotify
++     * callback might be pending. Using an idle
++     * source ensures we'll only free after the
++     * pending callback is done
++     */
++    g_idle_add((GSourceFunc)qemu_file_monitor_free_idle, mon);
++}
++
++int
++qemu_file_monitor_add_watch(QFileMonitor *mon,
++                            const char *dirpath,
++                            const char *filename,
++                            QFileMonitorHandler cb,
++                            void *opaque,
++                            Error **errp)
++{
++    QFileMonitorDir *dir;
++    QFileMonitorWatch watch;
++    int ret =3D -1;
++
++    qemu_mutex_lock(&mon->lock);
++    dir =3D g_hash_table_lookup(mon->dirs, dirpath);
++    if (!dir) {
++        int rv =3D inotify_add_watch(mon->fd, dirpath,
++                                   IN_CREATE | IN_DELETE | IN_MODIFY |
++                                   IN_MOVED_TO | IN_MOVED_FROM | IN_ATTR=
+IB);
++
++        if (rv < 0) {
++            error_setg_errno(errp, errno, "Unable to watch '%s'", dirpat=
+h);
++            goto cleanup;
++        }
++
++        trace_qemu_file_monitor_enable_watch(mon, dirpath, rv);
++
++        dir =3D g_new0(QFileMonitorDir, 1);
++        dir->path =3D g_strdup(dirpath);
++        dir->id =3D rv;
++        dir->watches =3D g_array_new(FALSE, TRUE, sizeof(QFileMonitorWat=
+ch));
++
++        g_hash_table_insert(mon->dirs, dir->path, dir);
++        g_hash_table_insert(mon->idmap, GINT_TO_POINTER(rv), dir);
++
++        if (g_hash_table_size(mon->dirs) =3D=3D 1) {
++            qemu_set_fd_handler(mon->fd, qemu_file_monitor_watch, NULL, =
+mon);
++        }
++    }
++
++    watch.id =3D dir->nextid++;
++    watch.filename =3D g_strdup(filename);
++    watch.cb =3D cb;
++    watch.opaque =3D opaque;
++
++    g_array_append_val(dir->watches, watch);
++
++    trace_qemu_file_monitor_add_watch(mon, dirpath,
++                                      filename ? filename : "<none>",
++                                      cb, opaque, watch.id);
++
++    ret =3D watch.id;
++
++ cleanup:
++    qemu_mutex_unlock(&mon->lock);
++    return ret;
++}
++
++
++void qemu_file_monitor_remove_watch(QFileMonitor *mon,
++                                    const char *dirpath,
++                                    int id)
++{
++    QFileMonitorDir *dir;
++    gsize i;
++
++    qemu_mutex_lock(&mon->lock);
++
++    trace_qemu_file_monitor_remove_watch(mon, dirpath, id);
++
++    dir =3D g_hash_table_lookup(mon->dirs, dirpath);
++    if (!dir) {
++        goto cleanup;
++    }
++
++    for (i =3D 0; i < dir->watches->len; i++) {
++        QFileMonitorWatch *watch =3D &g_array_index(dir->watches,
++                                                  QFileMonitorWatch, i);
++        if (watch->id =3D=3D id) {
++            g_free(watch->filename);
++            g_array_remove_index(dir->watches, i);
++            break;
++        }
++    }
++
++    if (dir->watches->len =3D=3D 0) {
++        inotify_rm_watch(mon->fd, dir->id);
++        trace_qemu_file_monitor_disable_watch(mon, dir->path, dir->id);
++
++        g_hash_table_remove(mon->idmap, GINT_TO_POINTER(dir->id));
++        g_hash_table_remove(mon->dirs, dir->path);
++
++        if (g_hash_table_size(mon->dirs) =3D=3D 0) {
++            qemu_set_fd_handler(mon->fd, NULL, NULL, NULL);
++        }
++    }
++
++ cleanup:
++    qemu_mutex_unlock(&mon->lock);
++}
+diff --git a/util/filemonitor-stub.c b/util/filemonitor-stub.c
+new file mode 100644
+index 0000000000..48268b2bb6
+--- /dev/null
++++ b/util/filemonitor-stub.c
+@@ -0,0 +1,59 @@
++/*
++ * QEMU file monitor stub impl
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/filemonitor.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++
++
++QFileMonitor *
++qemu_file_monitor_new(Error **errp)
++{
++    error_setg(errp, "File monitoring not available on this platform");
++    return NULL;
++}
++
++
++void
++qemu_file_monitor_free(QFileMonitor *mon G_GNUC_UNUSED)
++{
++}
++
++
++int
++qemu_file_monitor_add_watch(QFileMonitor *mon G_GNUC_UNUSED,
++                            const char *dirpath G_GNUC_UNUSED,
++                            const char *filename G_GNUC_UNUSED,
++                            QFileMonitorHandler cb G_GNUC_UNUSED,
++                            void *opaque G_GNUC_UNUSED,
++                            Error **errp)
++{
++    error_setg(errp, "File monitoring not available on this platform");
++    return -1;
++}
++
++
++void
++qemu_file_monitor_remove_watch(QFileMonitor *mon G_GNUC_UNUSED,
++                               const char *dirpath G_GNUC_UNUSED,
++                               int id G_GNUC_UNUSED)
++{
++}
+diff --git a/util/trace-events b/util/trace-events
+index 79569b7fdf..ff19b253e2 100644
+--- a/util/trace-events
++++ b/util/trace-events
+@@ -21,6 +21,15 @@ buffer_move_empty(const char *buf, size_t len, const c=
+har *from) "%s: %zd bytes
+ buffer_move(const char *buf, size_t len, const char *from) "%s: %zd byte=
+s from %s"
+ buffer_free(const char *buf, size_t len) "%s: capacity %zd"
+=20
++# util/filemonitor.c
++qemu_file_monitor_add_watch(void *mon, const char *dirpath, const char *=
+filename, void *cb, void *opaque, int id) "File monitor %p add watch dir=3D=
+'%s' file=3D'%s' cb=3D%p opaque=3D%p id=3D%u"
++qemu_file_monitor_remove_watch(void *mon, const char *dirpath, int id) "=
+File monitor %p remove watch dir=3D'%s' id=3D%u"
++qemu_file_monitor_new(void *mon, int fd) "File monitor %p created fd=3D%=
+d"
++qemu_file_monitor_enable_watch(void *mon, const char *dirpath, int id) "=
+File monitor %p enable watch dir=3D'%s' id=3D%u"
++qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) =
+"Fle monitor %p disable watch dir=3D'%s' id=3D%u"
++qemu_file_monitor_event(void *mon, const char *dirpath, const char *file=
+name, int mask, unsigned int id) "File monitor %p event dir=3D'%s' file=3D=
+'%s' mask=3D0x%x id=3D%u"
++qemu_file_monitor_dispatch(void *mon, const char *dirpath, const char *f=
+ilename, int ev, void *cb, void *opaque, unsigned int id) "File monitor %=
+p dispatch dir=3D'%s' file=3D'%s' ev=3D%d cb=3D%p opaque=3D%p id=3D%u"
++
+ # util/qemu-coroutine.c
+ qemu_aio_coroutine_enter(void *ctx, void *from, void *to, void *opaque) =
+"ctx %p from %p to %p opaque %p"
+ qemu_coroutine_yield(void *from, void *to) "from %p to %p"
 --=20
 2.20.1
