@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41196)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1gy9iL-0001rQ-6Q
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 01:26:10 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:43610)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <aik@ozlabs.ru>) id 1gy9vG-0003z1-9r
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 01:39:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1gy9iJ-0002Kd-Jj
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 01:26:09 -0500
-Received: from mout.gmx.net ([212.227.17.21]:47275)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gy9iI-0001vF-Bn
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 01:26:07 -0500
-From: Kamil Rytarowski <n54@gmx.com>
-References: <20190202144531.5772-1-n54@gmx.com>
-	<a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
-	<d0b7bfcb-8894-5a06-8290-ac9daf5a05da@gmx.com>
-	<fc6a0084-815c-5e4a-cd5c-11046f16f33b@redhat.com>
-	<e2a4fad5-5a96-994d-e8d4-f129e0929522@gmx.com>
-	<4e7b8587-02a4-4ad2-c297-db7a1231f0b6@gmx.com>
-	<39f61014-bde0-bcbe-67ec-e479b8ab14ec@redhat.com>
-	<26044929-af0b-dc8c-c042-a5d56779caa5@gmx.com>
-Message-ID: <9ee31aff-0a22-479c-3667-33998c061483@gmx.com>
-Date: Mon, 25 Feb 2019 07:26:02 +0100
+	(envelope-from <aik@ozlabs.ru>) id 1gy9v6-0000Iy-RL
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 01:39:23 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gy9v4-00005C-6D
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 01:39:18 -0500
+Received: by mail-pf1-x443.google.com with SMTP id n125so4017762pfn.5
+	for <qemu-devel@nongnu.org>; Sun, 24 Feb 2019 22:39:15 -0800 (PST)
+References: <20190214052144.59541-1-aik@ozlabs.ru>
+	<20190214163743.7162ad53@w520.home>
+	<f8effbfc-e42e-acad-d141-a84a8aa04b92@ozlabs.ru>
+	<20190215032436.GG4573@umbus.fritz.box>
+	<d6f2f973-f57a-f5f0-c20b-9a574e05bd7b@ozlabs.ru>
+	<20190215035447.GI4573@umbus.fritz.box>
+	<36b41743-e218-3b2e-7f96-6feee7849a66@ozlabs.ru>
+	<20190215052059.GL4573@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <dbf77c76-2398-572d-a59e-0ee0a4c5935d@ozlabs.ru>
+Date: Mon, 25 Feb 2019 17:39:06 +1100
 MIME-Version: 1.0
-In-Reply-To: <26044929-af0b-dc8c-c042-a5d56779caa5@gmx.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="eqMemuxm4WOZHdcuqqU3l78WVeNpzqr3h"
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Enhance the stub for
- kvm_arch_get_supported_cpuid()
+In-Reply-To: <20190215052059.GL4573@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2 0/4] spapr_pci,
+ vfio: NVIDIA V100 + POWER9 passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,235 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Reza Arbab <arbab@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eqMemuxm4WOZHdcuqqU3l78WVeNpzqr3h
-From: Kamil Rytarowski <n54@gmx.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-Message-ID: <9ee31aff-0a22-479c-3667-33998c061483@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Enhance the stub for
- kvm_arch_get_supported_cpuid()
-References: <20190202144531.5772-1-n54@gmx.com>
- <a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
- <d0b7bfcb-8894-5a06-8290-ac9daf5a05da@gmx.com>
- <fc6a0084-815c-5e4a-cd5c-11046f16f33b@redhat.com>
- <e2a4fad5-5a96-994d-e8d4-f129e0929522@gmx.com>
- <4e7b8587-02a4-4ad2-c297-db7a1231f0b6@gmx.com>
- <39f61014-bde0-bcbe-67ec-e479b8ab14ec@redhat.com>
- <26044929-af0b-dc8c-c042-a5d56779caa5@gmx.com>
-In-Reply-To: <26044929-af0b-dc8c-c042-a5d56779caa5@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-Ping.
 
-On 21.02.2019 03:08, Kamil Rytarowski wrote:
-> On 20.02.2019 18:29, Paolo Bonzini wrote:
->> On 20/02/19 12:59, Kamil Rytarowski wrote:
->>> Ping, still valid.
+On 15/02/2019 16:21, David Gibson wrote:
+> On Fri, Feb 15, 2019 at 03:34:52PM +1100, Alexey Kardashevskiy wrote:
 >>
->> Sorry, I missed your email.
 >>
->>> On 15.02.2019 00:38, Kamil Rytarowski wrote:
->>>> I consider it as fragile hack and certainly not something to depend =
-on.
->>>> Also in some circumstances of such code, especially "if (zero0)" we =
-want
->>>> to enable disabled code under a debugger.
->>
->> That's a good objection, but certainly does not apply to KVM on NetBSD=
-=2E
->>
->=20
-> There is KVM for Darwin (experimental and rather toy project) and it
-> might be ported to NetBSD (I have actually forked it on GitHub
-> recently), but I doubt that someone would enable KVM on any platform
-> under a debugger this way and expect something to work.
->=20
->>>> There were also kernel backdoors due to this optimization.
->>
->> Citation please?
->>
->=20
-> I saw an exploit for such case with a .txt writeup on ftp of grsecurity=
-
-> but that service seems to be gone (probably long time ago), so please
-> defer discussion on it. If someone is interested to find it out, there
-> are enough pointers to dig it (assuming that this is still possible).
->=20
->>>> Requested cpu.i (hopefully correctly generated)
+>> On 15/02/2019 14:54, David Gibson wrote:
+>>> On Fri, Feb 15, 2019 at 02:32:14PM +1100, Alexey Kardashevskiy wrote:
 >>>>
->>>> http://netbsd.org/~kamil/qemu/cpu.i.bz2
+>>>>
+>>>> On 15/02/2019 14:24, David Gibson wrote:
+>>>>> On Fri, Feb 15, 2019 at 11:35:02AM +1100, Alexey Kardashevskiy wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 15/02/2019 10:37, Alex Williamson wrote:
+>>>>>>> On Thu, 14 Feb 2019 16:21:40 +1100
+>>>>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>>>>>
+>>>>>>>> This is for passing through NVIDIA V100 GPUs on POWER9 systems.
+>>>>>>>>
+>>>>>>>> This implements a subdriver for NVIDIA V100 GPU with coherent memory and
+>>>>>>>> NPU/ATS support available in the POWER9 CPU.
+>>>>>>>>
+>>>>>>>> 1/4 is a preparation for bigger DMA windows.
+>>>>>>>> 2/4 is a small cleanup.
+>>>>>>>>
+>>>>>>>> Here is the kernel driver:
+>>>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/vfio/pci?h=v5.0-rc6&id=7f92891778dff62303c070ac81de7b7d80de331a
+>>>>>>>>
+>>>>>>>> SLOF changes already went in.
+>>>>>>>>
+>>>>>>>> This depends on "pci: Move NVIDIA vendor id to the rest of ids" (posted separately).
+>>>>>>>
+>>>>>>> TBH, I'm not sure it was the best idea to let it live or die on it's
+>>>>>>> own when it now creates a build dependency for this series.
+>>>>>> I am sure that patch is disgustingly primitive and can make it to
+>>>>>> upstream in just one click and the rest of the series will take more
+>>>>>> time anyway (always does :) ).
+>>>>>>
+>>>>>>>> This is based on sha1
+>>>>>>>> 1ea6057 Mark Cave-Ayland "mac_newworld: change default NIC to sungem for mac99 machine".
+>>>>>>>
+>>>>>>> Perhaps this is why it doesn't apply cleanly against qemu.git.  Are
+>>>>>>> there dependencies we need to wait for in the ppc tree as well?
+>>>>>>
+>>>>>> There are few changes in spapr_pci so conflicts are possible, every time
+>>>>>> when David updates his tree and I rebase I get some minor ones.
+>>>>>>
+>>>>>>>> Please comment. Thanks.
+>>>>>>>
+>>>>>>> Besides the build dependency on PCI_VENDOR_ID_NVIDIA, I also get this:
+>>>>>>>
+>>>>>>> .../qemu.git/hw/vfio/spapr.c: In function ‘vfio_spapr_create_window’:
+>>>>>>> .../qemu.git/hw/vfio/spapr.c:212:9: error: ‘ret’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>>>>>>          error_report("Failed to create a window, ret = %d (%m)", ret);
+>>>>>>>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>>>> cc1: all warnings being treated as errors
+>>>>>>
+>>>>>> Agrh. How exactly do you make them errors, not warnings? I get no
+>>>>>> warning/error with --disable-werror but not having  --disable-werror
+>>>>>> prints warnings, not errors so it does not fail the build and easy to miss.
+>>>>>
+>>>>> Are you sure it's printing warnings with --enable-werror?  Otherwise
+>>>>> it sounds like you just have a compiler version that's not picking
+>>>>> this up.
+>>>>
+>>>> Ah, here is my mistake - I thought not having --disable-werror means
+>>>> that it is enabled as ./configure does not advertise  "--enable-werror":
+>>>>
+>>>> [fstn1-p1 qemu]$ ./configure --help | grep werror
+>>>>   --disable-werror         disable compilation abort on warning
+>>>>
+>>>>
+>>>> Apparently it is a tri-state flag :)
+>>>
+>>> Um.. no.. I believe it should be on by default as well, I was just
+>>> saying --enable-werror because I thought it was clearer than the
+>>> double negative in "without --disable-werror".
 >>
->> So, first thing first I can reproduce clang's behavior with this .i fi=
-le
->> and also with this reduced test case.
+>> The default value of werror is "":
 >>
->>     extern void f(void);
->>     int i, j;
->>     int main()
->>     {
->>         if (0  && i) f();
->>         if (j  && 0) f();
->>    }
->>
->> The first is eliminated but the second is not, just like in QEMU where=
+>> https://git.qemu.org/?p=qemu.git;a=blob;f=configure;h=a61682c3c727f467ce2710c7469a33b261da8ff6;hb=HEAD#l935
+> 
+> Which turns into a "yes" on Linux - see line 1835-1844.
 
->> this works:
->>
->>         if (kvm_enabled() && cpu->enable_pmu) {
->>             KVMState *s =3D cs->kvm_state;
->>
->>             *eax =3D kvm_arch_get_supported_cpuid(s, 0xA, count, R_EAX=
-);
->>             *ebx =3D kvm_arch_get_supported_cpuid(s, 0xA, count, R_EBX=
-);
->>             *ecx =3D kvm_arch_get_supported_cpuid(s, 0xA, count, R_ECX=
-);
->>             *edx =3D kvm_arch_get_supported_cpuid(s, 0xA, count, R_EDX=
-);
->>         } else if (hvf_enabled() && cpu->enable_pmu) {
->>             *eax =3D hvf_get_supported_cpuid(0xA, count, R_EAX);
->>             *ebx =3D hvf_get_supported_cpuid(0xA, count, R_EBX);
->>             *ecx =3D hvf_get_supported_cpuid(0xA, count, R_ECX);
->>             *edx =3D hvf_get_supported_cpuid(0xA, count, R_EDX);
->>
->> while this doesn't:
->>
->>     if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
->>         kvm_enabled()) {
->>         KVMState *s =3D CPU(cpu)->kvm_state;
->>         uint32_t eax_0 =3D kvm_arch_get_supported_cpuid(s, 0x14, 0, R_=
-EAX);
->>         uint32_t ebx_0 =3D kvm_arch_get_supported_cpuid(s, 0x14, 0, R_=
-EBX);
->>         uint32_t ecx_0 =3D kvm_arch_get_supported_cpuid(s, 0x14, 0, R_=
-ECX);
->>         uint32_t eax_1 =3D kvm_arch_get_supported_cpuid(s, 0x14, 1, R_=
-EAX);
->>         uint32_t ebx_1 =3D kvm_arch_get_supported_cpuid(s, 0x14, 1, R_=
-EBX);
->>
->> But, that's okay, it's -O0 so we give clang a pass for that  Note that=
 
->> clang does do the optimization even in more complex cases like
->>
->>     extern _Bool f(void);
->>     int main()
->>     {
->>         if (!0) return 0;
->>         if (!f()) return 0;
->>     }
->>
->> The problem is that there is a kvm-stub.c entry for that, and in fact
->> my compilation passes and the symbol is resolved correctly:
->>
->> $ nm target/i386/cpu.o |grep kvm_.*get_sup
->>                  U kvm_arch_get_supported_cpuid
->> $ nm target/i386/kvm-stub.o|grep kvm_.*get_sup
->> 0000000000000030 T kvm_arch_get_supported_cpuid
->> $ nm qemu-system-x86_64 |grep kvm_.*get_sup
->> 000000000046eab0 T kvm_arch_get_supported_cpuid
->>
->> As expected, something much less obvious is going on for you, in
->> particular __OPTIMIZE__seems not to be working properly.  However,
->> that would also be very surprising.
->>
->> Please:
->>
->> 1) run the last two "nm" commands on your build (wthout grep).
->>
->=20
-> I cannot run nm(1) on qemu-system-x86_64 as it's not linkable.
->=20
-> I'm getting the same result for target/i386/cpu.o and
-> target/i386/kvm-stub.o.
->=20
-> $ nm ./i386-softmmu/target/i386/kvm-stub.o
->                  U abort
-> 0000000000000000 T kvm_allows_irq0_override
-> 0000000000000030 T kvm_arch_get_supported_cpuid
-> 0000000000000020 T kvm_enable_x2apic
-> 0000000000000010 T kvm_has_smm
-> 0000000000000050 T kvm_hv_vpindex_settable
->=20
-> grep(1) used, but otherwise I would need to upload results somewhere el=
-se.
->=20
-> $ nm ./i386-bsd-user/target/i386/cpu.o |grep kvm
->                  U kvm_arch_get_supported_cpuid
-> 0000000000001290 d kvm_default_props
->                  U kvm_state
-> 0000000000000240 T x86_cpu_change_kvm_default
->=20
-> Please note that there are 4 types of x86 build: i386, x86_64 and two
-> bsd-user (32-bit and 64-bit).
->=20
-> According to my observations of repeated attempts both builds of
-> bsd-user are affected.
->=20
-> There is also a difference that kvm-stub is twice in !bsd-user
-> directories and once in bsd-user ones.
->=20
-> $ find . -name kvm-stub.o|grep x86_64
-> ./x86_64-softmmu/accel/stubs/kvm-stub.o
-> ./x86_64-softmmu/target/i386/kvm-stub.o
-> ./x86_64-bsd-user/accel/stubs/kvm-stub.o
->=20
->> 2) do the same exercise to get a .i for target/i386/kvm-stub.c
->>
->> 3) try removing the "#ifndef __OPTIMIZE__" and leave everything else a=
-s is,
->> see if it works.
->=20
-> Same result as above, it seems that bsd-user ones are affected in the
-> same way.
->=20
->>  No need to play with macros, which also goes to show that
->> you didn't really understand what's going on---that's fine, but then p=
-lease
->> refrain from making summary judgments which only lengthen the discussi=
-on.
->>
->=20
-> I stand with my expression that I find playing with optimizer as too
-> fragile to depend on it. Relying on a preprocessor to disable unused
-> code is predictable. But if that is the style in qemu, I can just
-> acknowledge it.
->=20
->> Thanks,
->>
->> Paolo
->>
->=20
->=20
+No it does not - the 'test -d "$source_path/.git"' fails as "git
+worktree" makes .git a file, not a folder.
 
 
 
---eqMemuxm4WOZHdcuqqU3l78WVeNpzqr3h
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxzinoMHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZsaJsP+wWsfchAauxPIS5dlXZgv0nvprNXqmYy5h4uhnH2
-WUXHKcTwOxMQAEDaoNqALHN6iCoVK+X8mWyEuxkjhJ72MG4rZVdSxBAq7/A5yrn+
-TjBkC3dUZViOjPShaT54GPLJXQ6bFnhwcIDa10vEEqWOiuMjjokQRPQYgqwjIB70
-Hg/i1x/ZlDyZNK9XvZ1M5xs4VwJfeZzxlF2IMiJZdhuY9P73gE8wI3A3+pzdRSDM
-5FCapoxh52/whIolB3PtqpKrL50a5HcmKvuqoWxj9scsT8ZefYq81B/qh9KubzPS
-pcCjcQB5F5seb09M/MoCoPNbByC091ZQ8IudmvIGAU6lHy50fHtLs5DQAqyvKNtc
-RIoTPwgTlwnpSk/n+VAFhHA9FVRsxm/4Fi04tHSiO0kymmuwts5JtxUnQcqfEIPu
-tEBaHZtohH18nqiiFIhGedm05DS3WicfuOq46kP+AgPzVwAmYs4zc7wUGqkwks4t
-G5y3jK7oIEGzw7Wa4lwSQoMEaiymWQ6EzRkbh5OMqIsboEH34WTWGVTOLBCbF+D9
-2Sp3Gn6SX9jLuxqFoGp0QCYnlXJoebNAYqQNRE1BWWWIKYm0tQ7uv1BOrj9kPxk6
-Phs6z2K9yGMkLMv37RIcKvPSIKOj2IONTb/bqki9Rq3eS9pBL2pmUY4IYgzFHbH2
-au7w
-=Emyq
------END PGP SIGNATURE-----
-
---eqMemuxm4WOZHdcuqqU3l78WVeNpzqr3h--
+-- 
+Alexey
