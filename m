@@ -1,28 +1,44 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43005)
+Received: from eggs.gnu.org ([209.51.188.92]:43296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gyINM-0008B7-BQ
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:41:05 -0500
+	(envelope-from <casasfernando@outlook.com>) id 1gyIOM-0000XU-L9
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gyINL-0007EI-K5
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:41:04 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46413)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gyINL-00078a-57
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:41:03 -0500
-Received: by mail-pg1-x544.google.com with SMTP id 196so4638331pgf.13
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 07:40:57 -0800 (PST)
-References: <20190224151553.31344-1-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <36a53b88-11cb-0206-9e4c-8a9fa174fe31@linaro.org>
-Date: Mon, 25 Feb 2019 07:40:53 -0800
-MIME-Version: 1.0
-In-Reply-To: <20190224151553.31344-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <casasfernando@outlook.com>) id 1gyIOL-00086j-2a
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:06 -0500
+Received: from mail-oln040092069103.outbound.protection.outlook.com
+	([40.92.69.103]:1029
+	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <casasfernando@outlook.com>)
+	id 1gyIOK-0007vt-GP
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:04 -0500
+From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
+Date: Mon, 25 Feb 2019 15:41:55 +0000
+Message-ID: <VI1PR0602MB3245CFF77C50C143A4D5BE09A47A0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
+	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
+	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
+	<20190223165523.1d674224@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA8kOEJe-Ax_SFOCa49og-N7gpO-ptsANdvXPhKthrpb8A@mail.gmail.com>
+	<20190225112424.2dd535a1@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA-nfqk9+x1F4nUC0djYRnAgGZL4d9X6rYLBJPvuKCdjbQ@mail.gmail.com>
+	<20190225132156.477faf18@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA_F1yxx8Z_8Pc_QOMZ3i9vJLZ8uRze1fTbGfSDs4NAhLg@mail.gmail.com>
+	<20190225142517.24367cad@ncopa-desktop.copa.dup.pw>
+	<VI1PR0602MB3245A6B693B23DA2E0E8E500A47A0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+In-Reply-To: <VI1PR0602MB3245A6B693B23DA2E0E8E500A47A0@VI1PR0602MB3245.eurprd06.prod.outlo
+	ok.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tests/Makefile.include: test all rounding
- modes of softfloat
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +47,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: Natanael Copa <ncopa@alpinelinux.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On 2/24/19 7:15 AM, Alex Bennée wrote:
-> We missed a bug in a recent patch as we were not testing all the
-> rounding modes for all operations. However enabling all rounding modes
-> for mulAdd does slow down the already slowest test and doesn't really
-> buy us much additional coverage so lets allow the default test flags
-> to be overridden.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/Makefile.include | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+Ok, the new package is deployed.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I stopped and started the test guest so it will use the new QEMU binary.
 
+Will monitor and report back.
 
-r~
+On lun, feb 25, 2019 at 2:32 PM, Fernando Casas Sch=F6ssow <casasfernando@o=
+utlook.com> wrote:
+Thanks Natanael. Is the new package ready?
+
+I will update as soon as the package is available, try to repro and report =
+back.
+
+Thanks everyone for looking into this!
+
+On lun, feb 25, 2019 at 2:25 PM, Natanael Copa <ncopa@alpinelinux.org> wrot=
+e:
+On Mon, 25 Feb 2019 13:06:16 +0000 Peter Maydell <peter.maydell@linaro.org<=
+mailto:peter.maydell@linaro.org>> wrote:
+On Mon, 25 Feb 2019 at 12:22, Natanael Copa <ncopa@alpinelinux.org<mailto:n=
+copa@alpinelinux.org>> wrote: > > On Mon, 25 Feb 2019 10:34:23 +0000 > Pete=
+r Maydell <peter.maydell@linaro.org<mailto:peter.maydell@linaro.org>> wrote=
+: > > The short term fix is to fix your toolchain/compilation > > environme=
+nt options so that it isn't trying to override > > the definition of memcpy=
+(). > > The easiest workaround is to simply disable FORTIY_SOURCE, but that=
+ > will weaken the security for all implemented string functions, strcpy, >=
+ memmove etc, so I don't want to do that. > > Is it only lduw_he_p that nee=
+ds to be atomic or are the other functions > in include/qemu/bswap.h using =
+memcpy also required to be atomic? Hard to say, since we haven't done the "=
+audit all the callers" step that Stefan mentioned. If you're going to repla=
+ce memcpy with __builtin_memcpy then the safest thing is to do it for all t=
+hose uses (this will also give you much better generated code for performan=
+ce purposes).
+I figured that and that is exactly what I did. Fernando: Can you please tes=
+t the binary from qemu-system-x86_64-3.1.0-r3 from alpine edge? I will back=
+port the fix if you can confirm it fixes the problem. Thanks! -nc PS. Those=
+ issues are pretty hard to track down, so big thanks to everyone who helped=
+ find the exact issue here. You have done a great work!
