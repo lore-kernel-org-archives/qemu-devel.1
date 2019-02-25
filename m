@@ -1,43 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39374)
+Received: from eggs.gnu.org ([209.51.188.92]:41066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gyGCq-0007ph-Bt
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:22:05 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gyGLS-0001LC-3k
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gyGCg-0000BK-Vq
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:21:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50126
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gyGCe-0008OK-Tq
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:21:54 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1PDLIjT022504
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 08:21:26 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qvfexcwvh-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 08:21:21 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Mon, 25 Feb 2019 13:20:11 -0000
-Reply-To: jjherne@linux.ibm.com
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-13-git-send-email-jjherne@linux.ibm.com>
-	<20190204124416.42a023bc.cohuck@redhat.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Mon, 25 Feb 2019 08:20:04 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gyGLF-00057E-FN
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:30:54 -0500
+References: <20190221110805.28239-1-yuchenlin@synology.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5a1794b6-dcef-9635-3d41-3ea60d520dce@redhat.com>
+Date: Mon, 25 Feb 2019 14:30:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190204124416.42a023bc.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <e1e0b2f7-0c2b-3213-bec2-a8f88a954c0a@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 12/15] s390-bios: Refactor virtio to run
- channel programs via cio
+In-Reply-To: <20190221110805.28239-1-yuchenlin@synology.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="H1zg8BkO6qpAuPJPG0mQQUPKKbmMYzknv"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] vmdk: false positive of
+ compat6 with hwversion not set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,83 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: yuchenlin@synology.com, qemu-devel@nongnu.org
+Cc: fam@euphon.net, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 2/4/19 6:44 AM, Cornelia Huck wrote:
-> On Tue, 29 Jan 2019 08:29:19 -0500
-> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-> 
->> Now that we have a Channel I/O library let's modify virtio boot code to
->> make use of it for running channel programs.
->>
->> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
->> ---
->>   pc-bios/s390-ccw/virtio.c | 48 +++++++++++++++++++----------------------------
->>   1 file changed, 19 insertions(+), 29 deletions(-)
->>
->> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
->> index aa9da72..f8d71ed 100644
->> --- a/pc-bios/s390-ccw/virtio.c
->> +++ b/pc-bios/s390-ccw/virtio.c
->> @@ -89,33 +89,20 @@ int drain_irqs(SubChannelId schid)
->>       }
->>   }
->>   
->> -static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
->> +static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
->>   {
->>       Ccw1 ccw = {};
->> -    CmdOrb orb = {};
->> -    int r;
->> -
->> -    enable_subchannel(vdev->schid);
->> -
->> -    /* start subchannel command */
->> -    orb.fmt = 1;
->> -    orb.cpa = (u32)(long)&ccw;
->> -    orb.lpm = 0x80;
->>   
->>       ccw.cmd_code = cmd;
->>       ccw.cda = (long)ptr;
->>       ccw.count = len;
->>   
->> -    r = ssch(vdev->schid, &orb);
->> -    /*
->> -     * XXX Wait until device is done processing the CCW. For now we can
->> -     *     assume that a simple tsch will have finished the CCW processing,
->> -     *     but the architecture allows for asynchronous operation
->> -     */
->> -    if (!r) {
->> -        r = drain_irqs(vdev->schid);
->> +    if (sli) {
->> +        ccw.flags |= CCW_FLAG_SLI;
->>       }
->> -    return r;
->> +
->> +    enable_subchannel(vdev->schid);
->> +    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
-> 
-> That still has the very odd pattern that you enable the subchannel
-> every time you run a channel program...
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--H1zg8BkO6qpAuPJPG0mQQUPKKbmMYzknv
+From: Max Reitz <mreitz@redhat.com>
+To: yuchenlin@synology.com, qemu-devel@nongnu.org
+Cc: fam@euphon.net, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <5a1794b6-dcef-9635-3d41-3ea60d520dce@redhat.com>
+Subject: Re: [Qemu-block] [PATCH] vmdk: false positive of compat6 with
+ hwversion not set
+References: <20190221110805.28239-1-yuchenlin@synology.com>
+In-Reply-To: <20190221110805.28239-1-yuchenlin@synology.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I originally agreed and removed this. But now that I've gotten around to doing some 
-testing I've discovered that  we actually rely on this for one important code path.
+On 21.02.19 12:08, yuchenlin@synology.com wrote:
+> From: yuchenlin <yuchenlin@synology.com>
+>=20
+> In vmdk_co_create_opts, when it finds hw_version is undefined, it will
+> set it to 4, which misleading the compat6 and hwversion in
+> vmdk_co_do_create. Simply set hw_version to NULL after free, let
+> the logic in vmdk_co_do_create to decide the value of hw_version.
+>=20
+> This bug can be reproduced by:
+>=20
+> $ qemu-img convert -O vmdk -o subformat=3DstreamOptimized,compat6
+> /home/yuchenlin/syno.qcow2 /home/yuchenlin/syno.vmdk
+>=20
+> qemu-img: /home/yuchenlin/syno.vmdk: error while converting vmdk:
+> compat6 cannot be enabled with hwversion set
+>=20
+> Signed-off-by: yuchenlin <yuchenlin@synology.com>
+> ---
+>  block/vmdk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index 096e8eb662..e3bbd18803 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -2260,7 +2260,7 @@ static int coroutine_fn vmdk_co_create_opts(const=
+ char *filename, QemuOpts *opts
+>      compat6 =3D qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false);=
 
-Here is the call chain before my patches:
-main -> virtio_setup -> find_dev -> virtio_is_supported -> run_ccw
+>      if (strcmp(hw_version, "undefined") =3D=3D 0) {
+>          g_free(hw_version);
+> -        hw_version =3D g_strdup("4");
+> +        hw_version =3D NULL;
+>      }
+>      fmt =3D qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
+>      zeroed_grain =3D qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAI=
+N, false);
 
-Here is the call chain after my patches:
-main -> find_boot_device -> find_subch -> virtio_is_supported -> run_ccw
+Thanks, applied to my block branch:
 
-We end up in the same situation in both scenarios. If we remove the enable_subchannel() 
-call from run_ccw() then we end up in run_ccw() for a disabled subchannel.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-That said, I can remove the enable_subchannel call from run_ccw and instead add it to 
-find_subch() if that seems cleaner to you.
+Max
 
-Thoughts?
 
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+--H1zg8BkO6qpAuPJPG0mQQUPKKbmMYzknv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxz7fEACgkQ9AfbAGHV
+z0DTjwf/dXuwtwQtlXozyqxdXCpyN33jpzAueI7MKdin7D36Qyy+C7wUHwOUIELF
+MRq+f0zGai8c6A0VeSHBAgAZMlreJKYzUsh7PP6wpS1t5zhcrfuxPcdCUVyiIhcI
+WRgFMuxg2W1x5QoxrMJeKOy4qAnEDuphPVpWhWl+SalxjQyD2JnlL2Mosp7W7DJc
+02T3e/OU4eNysdI0f1Vy+/9VXzBaDXEo3c7g7nRhzAOayu44nhpAm5pWMPk78T9U
+1dJv5icn+J4kBPjRWsVHjY5jhbYK/gYFnDehA7bf3D8bxdJ8VoA4h9smQZ21iHic
+mpOk0Gy3gvYt1VWTrRaNYaPvgzFQMw==
+=T0PC
+-----END PGP SIGNATURE-----
+
+--H1zg8BkO6qpAuPJPG0mQQUPKKbmMYzknv--
