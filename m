@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45325)
+Received: from eggs.gnu.org ([209.51.188.92]:47996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyCHx-0004uN-Qw
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:11:07 -0500
+	(envelope-from <bounces@canonical.com>) id 1gyCW7-0006sD-93
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyCHx-0006Km-15
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:11:05 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37174)
+	(envelope-from <bounces@canonical.com>) id 1gyCW3-0005Rt-EL
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:25:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gyCHw-0006Gx-Kz
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:11:04 -0500
-Received: by mail-ot1-x343.google.com with SMTP id b3so7208477otp.4
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 01:11:03 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gyCVy-0005Ml-Qi
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:25:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gyCVu-0004IQ-B8
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:25:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 51B9F2E8079
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:25:30 +0000 (UTC)
 MIME-Version: 1.0
-References: <1550076626-7202-1-git-send-email-sandra@codesourcery.com>
-In-Reply-To: <1550076626-7202-1-git-send-email-sandra@codesourcery.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Feb 2019 09:10:48 +0000
-Message-ID: <CAFEAcA8YQm940GGF3fT7ZeOOrg_cn8JVrbi=TzbbLiABstOPZg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Fix breakpoint support in Nios II
- user-mode emulation.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 25 Feb 2019 09:16:03 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Reply-To: Bug 1817525 <1817525@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155108616330.22359.6416860237413372412.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1817525] [NEW] qemu fails to compile on gcc 9
+ "block/nvme.c:209:22: error: taking address of packed member of 'struct
+ <anonymous>' may result in an unaligned pointer value
+ [-Werror=address-of-packed-member]"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +38,379 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sandra Loosemore <sandra@codesourcery.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
 
-On Wed, 13 Feb 2019 at 17:19, Sandra Loosemore <sandra@codesourcery.com> wrote:
->
-> Nios II user-mode emulation was missing handling for EXCP_DEBUG,
-> making the gdb stub essentially useless.  This patch adds the missing
-> piece.  The new code was copied from the existing EXCP_TRAP handling
-> and is also similar to what other targets (e.g., arm) do with EXCP_DEBUG.
->
-> Signed-off-by: Sandra Loosemore <sandra@codesourcery.com>
-> ---
->  linux-user/nios2/cpu_loop.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/linux-user/nios2/cpu_loop.c b/linux-user/nios2/cpu_loop.c
-> index b96b1aa..5aa1eca 100644
-> --- a/linux-user/nios2/cpu_loop.c
-> +++ b/linux-user/nios2/cpu_loop.c
-> @@ -73,6 +73,12 @@ void cpu_loop(CPUNios2State *env)
->                  queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
->                  break;
->              }
-> +        case EXCP_DEBUG:
-> +            info.si_signo = TARGET_SIGTRAP;
-> +            info.si_errno = 0;
-> +            info.si_code = TARGET_TRAP_BRKPT;
-> +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> +            break;
->          case 0xaa:
->              switch (env->regs[R_PC]) {
->              /*case 0x1000:*/  /* TODO:__kuser_helper_version */
+Public bug reported:
 
-I don't know NiosII at all, but a quick check of the kernel
-sources suggests this is correct, so
+Issue:
+Qemu compilation fails with below error on ppc64le host with gcc 9, repo(ht=
+tps://github.com/dgibson/qemu.git), branch(ppc-for-4.0), Commit (0483e90393=
+bac8546a1fbc95ab912a1e78e92b00)
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+=C2=A0CHK version_gen.h
+=C2=A0=C2=A0CC      block/nvme.o
+block/nvme.c: In function =E2=80=98nvme_create_queue_pair=E2=80=99:
+block/nvme.c:209:22: error: taking address of packed member of =E2=80=98str=
+uct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werror=
+=3Daddress-of-packed-member]
+=C2=A0=C2=A0209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s->d=
+oorbell_scale];
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+block/nvme.c:216:22: error: taking address of packed member of =E2=80=98str=
+uct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werror=
+=3Daddress-of-packed-member]
+=C2=A0=C2=A0216 |     q->cq.doorbell =3D &s->regs->doorbells[idx * 2 * s->d=
+oorbell_scale + 1];
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/usr/share/avocado-plugins-vt/build/qemu/rules.mak:69: block/nvm=
+e.o] Error 1
 
-thanks
--- PMM
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+$git commit:
+commit 0483e90393bac8546a1fbc95ab912a1e78e92b00 (HEAD -> ppc-for-4.0)
+Author: Thomas Huth <thuth@redhat.com>
+Date:   Thu Feb 21 12:24:48 2019 +0100
+
+=C2=A0=C2=A0=C2=A0=C2=A0hw/ppc: Use object_initialize_child for correct ref=
+erence counting
+
+=C2=A0=C2=A0=C2=A0=C2=A0Both functions, object_initialize() and object_prop=
+erty_add_child() increase
+=C2=A0=C2=A0=C2=A0=C2=A0the reference counter of the new object, so one of =
+the references has to be
+=C2=A0=C2=A0=C2=A0=C2=A0dropped afterwards to get the reference counting ri=
+ght. Otherwise the child
+=C2=A0=C2=A0=C2=A0=C2=A0object will not be properly cleaned up when the par=
+ent gets destroyed.
+=C2=A0=C2=A0=C2=A0=C2=A0Thus let's use now object_initialize_child() instea=
+d to get the reference
+=C2=A0=C2=A0=C2=A0=C2=A0counting here right.
+
+=C2=A0=C2=A0=C2=A0=C2=A0Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+=C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Thomas Huth <thuth@redhat.com>
+=C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <1550748288-30598-1-git-send-email-thut=
+h@redhat.com>
+=C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+=C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: David Gibson <david@gibson.dropbear.=
+id.au>
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Note: Same commit on a different ppc64le host with gcc(8.1.1 20180712)
+compile without any issue.
+
+Host Env:
+
+Power8
+
+#lscpu
+Architecture:         ppc64le
+Byte Order:           Little Endian
+CPU(s):               160
+On-line CPU(s) list:  0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,=
+136,144,152
+Off-line CPU(s) list: 1-7,9-15,17-23,25-31,33-39,41-47,49-55,57-63,65-71,73=
+-79,81-87,89-95,97-103,105-111,113-119,121-127,129-135,137-143,145-151,153-=
+159
+Thread(s) per core:   1
+Core(s) per socket:   5
+Socket(s):            4
+NUMA node(s):         4
+Model:                2.1 (pvr 004b 0201)
+Model name:           POWER8E (raw), altivec supported
+CPU max MHz:          3690.0000
+CPU min MHz:          2061.0000
+L1d cache:            64K
+L1i cache:            32K
+L2 cache:             512K
+L3 cache:             8192K
+NUMA node0 CPU(s):    0,8,16,24,32
+NUMA node1 CPU(s):    40,48,56,64,72
+NUMA node16 CPU(s):   80,88,96,104,112
+NUMA node17 CPU(s):   120,128,136,144,152
+
+# gcc --version
+gcc (GCC) 9.0.1 20190209 (Red Hat 9.0.1-0.4)
+Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# uname -r
+5.0.0-rc7-ge50585e89
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: compilation gcc9 ppc64le
+
+** Description changed:
+
+  Issue:
+  Qemu compilation fails with below error on ppc64le host with gcc 9, repo(=
+https://github.com/dgibson/qemu.git), branch(ppc-for-4.0), Commit (0483e903=
+93bac8546a1fbc95ab912a1e78e92b00)
+  =
+
+- 	CHK version_gen.h
+-   CC      block/nvme.o
++ =C2=A0CHK version_gen.h
++ =C2=A0=C2=A0CC      block/nvme.o
+  block/nvme.c: In function =E2=80=98nvme_create_queue_pair=E2=80=99:
+  block/nvme.c:209:22: error: taking address of packed member of =E2=80=98s=
+truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
+r=3Daddress-of-packed-member]
+-   209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s->doorbell_=
+scale];
+-       |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~
++ =C2=A0=C2=A0209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
+>doorbell_scale];
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  block/nvme.c:216:22: error: taking address of packed member of =E2=80=98s=
+truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
+r=3Daddress-of-packed-member]
+-   216 |     q->cq.doorbell =3D &s->regs->doorbells[idx * 2 * s->doorbell_=
+scale + 1];
+-       |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~
++ =C2=A0=C2=A0216 |     q->cq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
+>doorbell_scale + 1];
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  cc1: all warnings being treated as errors
+  make: *** [/usr/share/avocado-plugins-vt/build/qemu/rules.mak:69: block/n=
+vme.o] Error 1
+  =
+
+- =
+
++ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $git commit:
+  commit 0483e90393bac8546a1fbc95ab912a1e78e92b00 (HEAD -> ppc-for-4.0)
+  Author: Thomas Huth <thuth@redhat.com>
+  Date:   Thu Feb 21 12:24:48 2019 +0100
+  =
+
+-     hw/ppc: Use object_initialize_child for correct reference counting
+-     =
+
+-     Both functions, object_initialize() and object_property_add_child() i=
+ncrease
+-     the reference counter of the new object, so one of the references has=
+ to be
+-     dropped afterwards to get the reference counting right. Otherwise the=
+ child
+-     object will not be properly cleaned up when the parent gets destroyed.
+-     Thus let's use now object_initialize_child() instead to get the refer=
+ence
+-     counting here right.
+-     =
+
+-     Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+-     Signed-off-by: Thomas Huth <thuth@redhat.com>
+-     Message-Id: <1550748288-30598-1-git-send-email-thuth@redhat.com>
+-     Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+-     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
++ =C2=A0=C2=A0=C2=A0=C2=A0hw/ppc: Use object_initialize_child for correct r=
+eference counting
+  =
+
++ =C2=A0=C2=A0=C2=A0=C2=A0Both functions, object_initialize() and object_pr=
+operty_add_child() increase
++ =C2=A0=C2=A0=C2=A0=C2=A0the reference counter of the new object, so one o=
+f the references has to be
++ =C2=A0=C2=A0=C2=A0=C2=A0dropped afterwards to get the reference counting =
+right. Otherwise the child
++ =C2=A0=C2=A0=C2=A0=C2=A0object will not be properly cleaned up when the p=
+arent gets destroyed.
++ =C2=A0=C2=A0=C2=A0=C2=A0Thus let's use now object_initialize_child() inst=
+ead to get the reference
++ =C2=A0=C2=A0=C2=A0=C2=A0counting here right.
+  =
+
+- Note: Same commit on a different ppc64le host with gcc(8.1.1 20180712) co=
+mpile without any issue.
++ =C2=A0=C2=A0=C2=A0=C2=A0Suggested-by: Eduardo Habkost <ehabkost@redhat.co=
+m>
++ =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Thomas Huth <thuth@redhat.com>
++ =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <1550748288-30598-1-git-send-email-th=
+uth@redhat.com>
++ =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
++ =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: David Gibson <david@gibson.dropbea=
+r.id.au>
++ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  =
+
+- Env:
++ Note: Same commit on a different ppc64le host with gcc(8.1.1 20180712)
++ compile without any issue.
++ =
+
++ Host Env:
+  =
+
+  Power8
+  =
+
+  #lscpu
+  Architecture:         ppc64le
+  Byte Order:           Little Endian
+  CPU(s):               160
+  On-line CPU(s) list:  0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,12=
+8,136,144,152
+  Off-line CPU(s) list: 1-7,9-15,17-23,25-31,33-39,41-47,49-55,57-63,65-71,=
+73-79,81-87,89-95,97-103,105-111,113-119,121-127,129-135,137-143,145-151,15=
+3-159
+  Thread(s) per core:   1
+  Core(s) per socket:   5
+  Socket(s):            4
+  NUMA node(s):         4
+  Model:                2.1 (pvr 004b 0201)
+  Model name:           POWER8E (raw), altivec supported
+  CPU max MHz:          3690.0000
+  CPU min MHz:          2061.0000
+  L1d cache:            64K
+  L1i cache:            32K
+  L2 cache:             512K
+  L3 cache:             8192K
+  NUMA node0 CPU(s):    0,8,16,24,32
+  NUMA node1 CPU(s):    40,48,56,64,72
+  NUMA node16 CPU(s):   80,88,96,104,112
+  NUMA node17 CPU(s):   120,128,136,144,152
+  =
+
+  # gcc --version
+  gcc (GCC) 9.0.1 20190209 (Red Hat 9.0.1-0.4)
+  Copyright (C) 2019 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+  =
+
+- =
+
+  # uname -r
+  5.0.0-rc7-ge50585e89
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1817525
+
+Title:
+  qemu fails to compile on gcc 9 "block/nvme.c:209:22: error: taking
+  address of packed member of 'struct <anonymous>' may result in an
+  unaligned pointer value [-Werror=3Daddress-of-packed-member]"
+
+Status in QEMU:
+  New
+
+Bug description:
+  Issue:
+  Qemu compilation fails with below error on ppc64le host with gcc 9, repo(=
+https://github.com/dgibson/qemu.git), branch(ppc-for-4.0), Commit (0483e903=
+93bac8546a1fbc95ab912a1e78e92b00)
+
+  =C2=A0CHK version_gen.h
+  =C2=A0=C2=A0CC      block/nvme.o
+  block/nvme.c: In function =E2=80=98nvme_create_queue_pair=E2=80=99:
+  block/nvme.c:209:22: error: taking address of packed member of =E2=80=98s=
+truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
+r=3Daddress-of-packed-member]
+  =C2=A0=C2=A0209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
+>doorbell_scale];
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  block/nvme.c:216:22: error: taking address of packed member of =E2=80=98s=
+truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
+r=3Daddress-of-packed-member]
+  =C2=A0=C2=A0216 |     q->cq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
+>doorbell_scale + 1];
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  cc1: all warnings being treated as errors
+  make: *** [/usr/share/avocado-plugins-vt/build/qemu/rules.mak:69: block/n=
+vme.o] Error 1
+
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $git commit:
+  commit 0483e90393bac8546a1fbc95ab912a1e78e92b00 (HEAD -> ppc-for-4.0)
+  Author: Thomas Huth <thuth@redhat.com>
+  Date:   Thu Feb 21 12:24:48 2019 +0100
+
+  =C2=A0=C2=A0=C2=A0=C2=A0hw/ppc: Use object_initialize_child for correct r=
+eference counting
+
+  =C2=A0=C2=A0=C2=A0=C2=A0Both functions, object_initialize() and object_pr=
+operty_add_child() increase
+  =C2=A0=C2=A0=C2=A0=C2=A0the reference counter of the new object, so one o=
+f the references has to be
+  =C2=A0=C2=A0=C2=A0=C2=A0dropped afterwards to get the reference counting =
+right. Otherwise the child
+  =C2=A0=C2=A0=C2=A0=C2=A0object will not be properly cleaned up when the p=
+arent gets destroyed.
+  =C2=A0=C2=A0=C2=A0=C2=A0Thus let's use now object_initialize_child() inst=
+ead to get the reference
+  =C2=A0=C2=A0=C2=A0=C2=A0counting here right.
+
+  =C2=A0=C2=A0=C2=A0=C2=A0Suggested-by: Eduardo Habkost <ehabkost@redhat.co=
+m>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Thomas Huth <thuth@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <1550748288-30598-1-git-send-email-th=
+uth@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: David Gibson <david@gibson.dropbea=
+r.id.au>
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  Note: Same commit on a different ppc64le host with gcc(8.1.1 20180712)
+  compile without any issue.
+
+  Host Env:
+
+  Power8
+
+  #lscpu
+  Architecture:         ppc64le
+  Byte Order:           Little Endian
+  CPU(s):               160
+  On-line CPU(s) list:  0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,12=
+8,136,144,152
+  Off-line CPU(s) list: 1-7,9-15,17-23,25-31,33-39,41-47,49-55,57-63,65-71,=
+73-79,81-87,89-95,97-103,105-111,113-119,121-127,129-135,137-143,145-151,15=
+3-159
+  Thread(s) per core:   1
+  Core(s) per socket:   5
+  Socket(s):            4
+  NUMA node(s):         4
+  Model:                2.1 (pvr 004b 0201)
+  Model name:           POWER8E (raw), altivec supported
+  CPU max MHz:          3690.0000
+  CPU min MHz:          2061.0000
+  L1d cache:            64K
+  L1i cache:            32K
+  L2 cache:             512K
+  L3 cache:             8192K
+  NUMA node0 CPU(s):    0,8,16,24,32
+  NUMA node1 CPU(s):    40,48,56,64,72
+  NUMA node16 CPU(s):   80,88,96,104,112
+  NUMA node17 CPU(s):   120,128,136,144,152
+
+  # gcc --version
+  gcc (GCC) 9.0.1 20190209 (Red Hat 9.0.1-0.4)
+  Copyright (C) 2019 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+
+  # uname -r
+  5.0.0-rc7-ge50585e89
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1817525/+subscriptions
