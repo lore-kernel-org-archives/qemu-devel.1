@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49275)
+Received: from eggs.gnu.org ([209.51.188.92]:49833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gyAMv-0007h7-4t
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 02:08:06 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyAON-0008RE-W9
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 02:09:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gyAMu-0005cQ-7u
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 02:08:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gyAMt-0005ZZ-ER
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 02:08:04 -0500
-Date: Mon, 25 Feb 2019 08:07:55 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190225070755.isoufp7cua3muci6@sirius.home.kraxel.org>
-References: <20190221150353.93DE87465DE@zero.eik.bme.hu>
-	<20190222115146.e4e5jlbwlysx433f@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.9999.1902221629100.73795@zero.eik.bme.hu>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyAOM-000714-Bt
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 02:09:35 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 25 Feb 2019 07:09:21 +0000
+Message-ID: <5d773448-60cf-9c7b-9e8b-05cd6fd1998f@virtuozzo.com>
+References: <20190223000614.13894-1-jsnow@redhat.com>
+	<20190223000614.13894-4-jsnow@redhat.com>
+In-Reply-To: <20190223000614.13894-4-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D186A73D69D82A41ABD58FC51381ECA9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1902221629100.73795@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/display: Add basic ATI VGA emulation
+Subject: Re: [Qemu-devel] [PATCH v3 03/10] block/dirty-bitmap: remove
+ set/reset assertions against enabled bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +26,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, philmd@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
 
-> > Attached patch creates two separate devices.  It's just some QOM
-> > boilerplate, they still share 95% of the code.
-> 
-> Thanks. Do you want me to merge this and submit a new version or you want to
-> fix up after merging my patch or what should we do with this? (I'm not a fan
-> of adding a new function for every new model of these devices so I'd
-> probably get rid of the is_ati_* functions and still compare to device id
-> internally maybe via a single is_ati_device(id) function though. I also find
-> ati-rage128pro a bit too long, I liked the ati-vga better with selecting
-> variants via a property but if you think it's better with more QOM
-> boilerplate and adding every variant to the default_list[] one by one then I
-> can live with that. How about ati-r128pro at least instead?
-
-Just apply the patch to your branch and tidy up as you want.  Shorten
-the rage name is fine with me.
-
-I don't expect we'll add too many variants, getting the two work
-properly will be difficult enough, so the QOM boilerplate shouldn't be
-much of a problem.  I think it'll be more user-friendly to just have two
-or three ati devices instead of expecting them to dig out the correct
-id.
-
-> >  With that in place
-> > vgabios works just fine for both devices.
-> 
-> But I don't get why is the above needed for this. By the time the client
-> runs (after device realize) both should look the same: your QOM subclasses
-> and my ati-vga class that sets device_id based on property. Where's the
-> difference that makes one work and other doesn't?
-
-See pci_patch_ids() in hw/pci/pci.c
-
-That gets vgabios-stdvga going with the ati cards (as long as the bochs
-interface is available), by setting the vendor and device IDs so seabios
-accepts and loads the rom.
-
-That requires the device ID being set at that point though.
-Specifically setting it in reset handler is too late, and I think doing
-it in realize() is too late too.  With two QOM types it is already set,
-thats why this gets the vgabios work with the rv100.
-
-> > Neither radeonfb.ko nor radeon.ko (drm driver) can handle the rv100.
-> > Loading radeonfb results in a kernel panic.  radeon.ko prints an
-> > initialization error.  Seems at least radeonfb tries to pull some info
-> > out of the bios image ...
-> 
-> Is there a live cd iso or something simple to test this with?
-
-No.  Problem is modern distros tend to not build these drivers any more.
-
-I have a script which creates a big initrd with a small distro install
-plus a self-compiled kernel, for testing my kernel patches.  This is
-what I have used here too.
-
-> I think the ATI option ROMs have some mode timings that are needed to
-> program PLLs for setting modes and drivers extract this from the BIOS which
-> has some predefined structure so if a driver relies on this it may have a
-> problem when we don't have a BIOS with the data it expects. But if it does
-> not check BIOS format and just pulls junk out of unexpected BIOS image and
-> puts that in clock registers that should not matter as those are ignored
-> anyway. I think rv100 will probably need a separate vgabios that looks more
-> like what drivers expect but I don't have plans yet to implement that.
-
-For radeonfb this might work.
-The radeon drm driver error messaga was quite unspecific.
-
-cheers,
-  Gerd
+YWJvdXQgc3ViamVjdDogc2hvdWxkbid0IGl0IGJlICJhZ2FpbnN0IGRpc2FibGVkIGJpdCIgaW5z
+dGVhZD8NCg0KMjMuMDIuMjAxOSAzOjA2LCBKb2huIFNub3cgd3JvdGU6DQo+IGJkcnZfc2V0X2Rp
+cnR5X2JpdG1hcCBhbmQgYmRydl9yZXNldF9kaXJ0eV9iaXRtYXAgYXJlIG9ubHkgdXNlZCBhcyBh
+bg0KPiBpbnRlcm5hbCBBUEkgYnkgdGhlIG1pcnJvciBhbmQgbWlncmF0aW9uIGFyZWFzIG9mIG91
+ciBjb2RlLiBUaGVzZQ0KPiBjYWxscyBtb2RpZnkgdGhlIGJpdG1hcCwgYnV0IGRvIHNvIGF0IHRo
+ZSBiZWhlc3Qgb2YgUUVNVSBhbmQgbm90IHRoZQ0KPiBndWVzdC4NCj4gDQo+IFByZXNlbnRseSwg
+dGhlc2UgYml0bWFwcyBhcmUgYWx3YXlzICJlbmFibGVkIiBhbnl3YXksIGJ1dCB0aGVyZSdzIG5v
+DQo+IHJlYXNvbiB0aGV5IGhhdmUgdG8gYmUuDQo+IA0KPiBNb2RpZnkgdGhlc2UgaW50ZXJuYWwg
+QVBJcyB0byBkcm9wIHRoaXMgYXNzZXJ0aW9uLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBT
+bm93IDxqc25vd0ByZWRoYXQuY29tPg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292
+LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQo+IC0tLQ0KPiAgIGJsb2Nr
+L2RpcnR5LWJpdG1hcC5jIHwgMiAtLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGRlbGV0aW9ucygt
+KQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2RpcnR5LWJpdG1hcC5jIGIvYmxvY2svZGlydHkt
+Yml0bWFwLmMNCj4gaW5kZXggYWEzZjg2YmI3My4uOWVhNTczODQyMCAxMDA2NDQNCj4gLS0tIGEv
+YmxvY2svZGlydHktYml0bWFwLmMNCj4gKysrIGIvYmxvY2svZGlydHktYml0bWFwLmMNCj4gQEAg
+LTU0Miw3ICs1NDIsNiBAQCBpbnQ2NF90IGJkcnZfZGlydHlfaXRlcl9uZXh0KEJkcnZEaXJ0eUJp
+dG1hcEl0ZXIgKml0ZXIpDQo+ICAgdm9pZCBiZHJ2X3NldF9kaXJ0eV9iaXRtYXBfbG9ja2VkKEJk
+cnZEaXJ0eUJpdG1hcCAqYml0bWFwLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBpbnQ2NF90IG9mZnNldCwgaW50NjRfdCBieXRlcykNCj4gICB7DQo+IC0gICAgYXNzZXJ0
+KGJkcnZfZGlydHlfYml0bWFwX2VuYWJsZWQoYml0bWFwKSk7DQo+ICAgICAgIGFzc2VydCghYmRy
+dl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHkoYml0bWFwKSk7DQo+ICAgICAgIGhiaXRtYXBfc2V0KGJp
+dG1hcC0+Yml0bWFwLCBvZmZzZXQsIGJ5dGVzKTsNCj4gICB9DQo+IEBAIC01NTksNyArNTU4LDYg
+QEAgdm9pZCBiZHJ2X3NldF9kaXJ0eV9iaXRtYXAoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsDQo+
+ICAgdm9pZCBiZHJ2X3Jlc2V0X2RpcnR5X2JpdG1hcF9sb2NrZWQoQmRydkRpcnR5Qml0bWFwICpi
+aXRtYXAsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRfdCBv
+ZmZzZXQsIGludDY0X3QgYnl0ZXMpDQo+ICAgew0KPiAtICAgIGFzc2VydChiZHJ2X2RpcnR5X2Jp
+dG1hcF9lbmFibGVkKGJpdG1hcCkpOw0KPiAgICAgICBhc3NlcnQoIWJkcnZfZGlydHlfYml0bWFw
+X3JlYWRvbmx5KGJpdG1hcCkpOw0KPiAgICAgICBoYml0bWFwX3Jlc2V0KGJpdG1hcC0+Yml0bWFw
+LCBvZmZzZXQsIGJ5dGVzKTsNCj4gICB9DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
+ZGltaXINCg==
