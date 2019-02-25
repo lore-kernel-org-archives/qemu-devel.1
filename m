@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51755)
+Received: from eggs.gnu.org ([209.51.188.92]:51868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyF1F-00036w-Qa
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:06:02 -0500
+	(envelope-from <david@redhat.com>) id 1gyF1R-0003Eo-Oe
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyF10-0005Zc-8z
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:05:56 -0500
+	(envelope-from <david@redhat.com>) id 1gyF1L-00063z-VM
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:06:13 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 25 Feb 2019 12:55:47 +0100
-Message-Id: <20190225115552.7534-3-david@redhat.com>
-In-Reply-To: <20190225115552.7534-1-david@redhat.com>
-References: <20190225115552.7534-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 2/7] s390x/tcg: Simplify disassembler
- operands initialization
+Date: Mon, 25 Feb 2019 12:55:45 +0100
+Message-Id: <20190225115552.7534-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 0/7] s390x/tcg: Cleanups and refactorings
+ for Vector
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +21,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Let's simply initialization to 0.
+Before we start with the real magic, some more cleanups and refactorings.
+This series does not depend on other patches not yet in master.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/translate.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+Also add a variant of "LOAD LENGTHENED" that is used along with
+vector instructions in linux (HFP instructions that can be used without
+HFP :) ). Implement "LOAD COUNT TO BLOCK BOUNDARY", introduced with
+vector facility but not operating on vectors.
 
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 19072efec6..c646e50eb3 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -6091,7 +6091,7 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
-     const DisasInsn *insn;
-     DisasJumpType ret = DISAS_NEXT;
-     DisasFields f;
--    DisasOps o;
-+    DisasOps o = {};
- 
-     /* Search for the insn in the table.  */
-     insn = extract_insn(env, s, &f);
-@@ -6161,12 +6161,6 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
-     /* Set up the strutures we use to communicate with the helpers. */
-     s->insn = insn;
-     s->fields = &f;
--    o.g_out = o.g_out2 = o.g_in1 = o.g_in2 = false;
--    o.out = NULL;
--    o.out2 = NULL;
--    o.in1 = NULL;
--    o.in2 = NULL;
--    o.addr1 = NULL;
- 
-     /* Implement the instruction.  */
-     if (insn->help_in1) {
+David Hildenbrand (7):
+  s390x/tcg: RXE has an optional M3 field
+  s390x/tcg: Simplify disassembler operands initialization
+  s390x/tcg: Clarify terminology in vec_reg_offset()
+  s390x/tcg: Factor out vec_full_reg_offset()
+  s390x/tcg: Factor out gen_addi_and_wrap_i64() from get_address()
+  s390x/tcg: Implement LOAD LENGTHENED short HFP to long HFP
+  s390x/tcg: Implement LOAD COUNT TO BLOCK BOUNDARY
+
+ target/s390x/cc_helper.c     |  8 ++++
+ target/s390x/helper.c        |  1 +
+ target/s390x/helper.h        |  1 +
+ target/s390x/insn-data.def   |  4 ++
+ target/s390x/insn-format.def |  2 +-
+ target/s390x/internal.h      |  1 +
+ target/s390x/mem_helper.c    | 12 +++++
+ target/s390x/translate.c     | 92 ++++++++++++++++++++++++------------
+ 8 files changed, 91 insertions(+), 30 deletions(-)
+
 -- 
 2.17.2
