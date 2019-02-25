@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37076)
+Received: from eggs.gnu.org ([209.51.188.92]:37102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI4I-0008Hl-UL
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI4Q-0008N6-Jo
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI4I-0000gQ-9j
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI4M-0000iB-6R
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:28 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:19:52 +0100
-Message-Id: <20190225152053.15976-11-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:19:53 +0100
+Message-Id: <20190225152053.15976-12-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/71] virtio-blk: Increase in_flight for
- request restart BH
+Subject: [Qemu-devel] [PULL 11/71] nbd: Restrict connection_co reentrance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +24,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-virtio_blk_dma_restart_bh() submits new requests, so in order to make
-sure that these requests are not started inside a drained section of the
-attached BlockBackend, we need to make sure that draining the
-BlockBackend waits for the BH to be executed.
+nbd_client_attach_aio_context() schedules connection_co in the new
+AioContext and this way reenters it in any arbitrary place that has
+yielded. We can restrict this a bit to the function call where the
+coroutine actually sits waiting when it's idle.
 
-This BH is still questionable because its scheduled in the main thread
-instead of the configured iothread. Leave a FIXME comment for this.
+This doesn't solve any bug yet, but it shows where in the code we need
+to support this random reentrance and where we don't have to care.
 
-But with this fix, enabling the data plane at least waits for these
-requests (in bdrv_set_aio_context()) instead of changing the AioContext
-under their feet and making them run in the wrong thread, causing
-crashes and failures (e.g. due to missing locking).
+Add FIXME comments for the existing bugs that the rest of this series
+will fix.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/block/virtio-blk.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ block/nbd-client.h |  1 +
+ block/nbd-client.c | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index cf7f47eaba..e11e6e45d0 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -675,6 +675,7 @@ static void virtio_blk_dma_restart_bh(void *opaque)
-     if (mrb.num_reqs) {
-         virtio_blk_submit_multireq(s->blk, &mrb);
-     }
-+    blk_dec_in_flight(s->conf.conf.blk);
-     aio_context_release(blk_get_aio_context(s->conf.conf.blk));
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index d990207a5c..09e03013d2 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -35,6 +35,7 @@ typedef struct NBDClientSession {
+=20
+     NBDClientRequest requests[MAX_NBD_REQUESTS];
+     NBDReply reply;
++    BlockDriverState *bs;
+     bool quit;
+ } NBDClientSession;
+=20
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index f0ad54ce21..5ce4aa9520 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -76,8 +76,24 @@ static coroutine_fn void nbd_connection_entry(void *op=
+aque)
+     Error *local_err =3D NULL;
+=20
+     while (!s->quit) {
++        /*
++         * The NBD client can only really be considered idle when it has
++         * yielded from qio_channel_readv_all_eof(), waiting for data. T=
+his is
++         * the point where the additional scheduled coroutine entry happ=
+ens
++         * after nbd_client_attach_aio_context().
++         *
++         * Therefore we keep an additional in_flight reference all the t=
+ime and
++         * only drop it temporarily here.
++         *
++         * FIXME This is not safe because the QIOChannel could wake up t=
+he
++         * coroutine for a second time; it is not prepared for coroutine
++         * resumption from external code.
++         */
++        bdrv_dec_in_flight(s->bs);
+         assert(s->reply.handle =3D=3D 0);
+         ret =3D nbd_receive_reply(s->ioc, &s->reply, &local_err);
++        bdrv_inc_in_flight(s->bs);
++
+         if (local_err) {
+             trace_nbd_read_reply_entry_fail(ret, error_get_pretty(local_=
+err));
+             error_free(local_err);
+@@ -116,6 +132,8 @@ static coroutine_fn void nbd_connection_entry(void *o=
+paque)
+=20
+     s->quit =3D true;
+     nbd_recv_coroutines_wake_all(s);
++    bdrv_dec_in_flight(s->bs);
++
+     s->connection_co =3D NULL;
+     aio_wait_kick();
+ }
+@@ -970,6 +988,8 @@ void nbd_client_attach_aio_context(BlockDriverState *=
+bs,
+ {
+     NBDClientSession *client =3D nbd_get_client_session(bs);
+     qio_channel_attach_aio_context(QIO_CHANNEL(client->ioc), new_context=
+);
++
++    /* FIXME Really need a bdrv_inc_in_flight() here */
+     aio_co_schedule(new_context, client->connection_co);
  }
 =20
-@@ -688,8 +689,11 @@ static void virtio_blk_dma_restart_cb(void *opaque, =
-int running,
-     }
+@@ -1076,6 +1096,7 @@ static int nbd_client_connect(BlockDriverState *bs,
+      * kick the reply mechanism.  */
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
+     client->connection_co =3D qemu_coroutine_create(nbd_connection_entry=
+, client);
++    bdrv_inc_in_flight(bs);
+     nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
 =20
-     if (!s->bh) {
-+        /* FIXME The data plane is not started yet, so these requests ar=
-e
-+         * processed in the main thread. */
-         s->bh =3D aio_bh_new(blk_get_aio_context(s->conf.conf.blk),
-                            virtio_blk_dma_restart_bh, s);
-+        blk_inc_in_flight(s->conf.conf.blk);
-         qemu_bh_schedule(s->bh);
-     }
- }
+     logout("Established connection with NBD server\n");
+@@ -1108,6 +1129,7 @@ int nbd_client_init(BlockDriverState *bs,
+ {
+     NBDClientSession *client =3D nbd_get_client_session(bs);
+=20
++    client->bs =3D bs;
+     qemu_co_mutex_init(&client->send_mutex);
+     qemu_co_queue_init(&client->free_sema);
+=20
 --=20
 2.20.1
