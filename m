@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37851)
+Received: from eggs.gnu.org ([209.51.188.92]:37826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5E-0000fQ-7Y
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5D-0000dw-En
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5B-0001Kc-Du
+	(envelope-from <kwolf@redhat.com>) id 1gyI5B-0001KQ-D6
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:19 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:11 +0100
-Message-Id: <20190225152053.15976-30-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:14 +0100
+Message-Id: <20190225152053.15976-33-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 29/71] block: Skip implicit nodes for filename
- info
+Subject: [Qemu-devel] [PULL 32/71] iotests.py: Add filter_imgfmt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +26,37 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-bdrv_refresh_filename() should simply skip all implicit nodes.  They are
-supposed to be invisible to the user, so they should not appear in
-filename information.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190201192935.18394-7-mreitz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20190201192935.18394-4-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ tests/qemu-iotests/iotests.py | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/block.c b/block.c
-index d97f5e7084..31e4664a42 100644
---- a/block.c
-+++ b/block.c
-@@ -5549,6 +5549,20 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-         bdrv_refresh_filename(child->bs);
-     }
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index b461f53abf..d80fd7fc2a 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -304,6 +304,16 @@ def filter_img_info(output, filename):
+         lines.append(line)
+     return '\n'.join(lines)
 =20
-+    if (bs->implicit) {
-+        /* For implicit nodes, just copy everything from the single chil=
-d */
-+        child =3D QLIST_FIRST(&bs->children);
-+        assert(QLIST_NEXT(child, next) =3D=3D NULL);
++def filter_imgfmt(msg):
++    return msg.replace(imgfmt, 'IMGFMT')
 +
-+        pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
-+                child->bs->exact_filename);
-+        pstrcpy(bs->filename, sizeof(bs->filename), child->bs->filename)=
-;
++def filter_qmp_imgfmt(qmsg):
++    def _filter(key, value):
++        if is_str(value):
++            return filter_imgfmt(value)
++        return value
++    return filter_qmp(qmsg, _filter)
 +
-+        bs->full_open_options =3D qobject_ref(child->bs->full_open_optio=
-ns);
-+
-+        return;
-+    }
-+
-     if (drv->bdrv_refresh_filename) {
-         /* Obsolete information is of no use here, so drop the old file =
-name
-          * information before refreshing it */
+ def log(msg, filters=3D[], indent=3DNone):
+     '''Logs either a string message or a JSON serializable message (like=
+ QMP).
+     If indent is provided, JSON serializable messages are pretty-printed=
+.'''
 --=20
 2.20.1
