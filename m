@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38089)
+Received: from eggs.gnu.org ([209.51.188.92]:38110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5L-0000pZ-VG
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5M-0000qL-HJ
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5G-0001Pq-Qk
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5I-0001Rn-Lr
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:27 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:09 +0100
-Message-Id: <20190225152053.15976-28-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:16 +0100
+Message-Id: <20190225152053.15976-35-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 27/71] block: Use bdrv_refresh_filename() to pull
+Subject: [Qemu-devel] [PULL 34/71] iotests: Add test for backing file
+ overrides
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,394 +27,393 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Before this patch, bdrv_refresh_filename() is used in a pushing manner:
-Whenever the BDS graph is modified, the parents of the modified edges
-are supposed to be updated (recursively upwards).  However, that is
-nonviable, considering that we want child changes not to concern
-parents.
-
-Also, in the long run we want a pull model anyway: Here, we would have a
-bdrv_filename() function which returns a BDS's filename, freshly
-constructed.
-
-This patch is an intermediate step.  It adds bdrv_refresh_filename()
-calls before every place a BDS.filename value is used.  The only
-exceptions are protocol drivers that use their own filename, which
-clearly would not profit from refreshing that filename before.
-
-Also, bdrv_get_encrypted_filename() is removed along the way (as a user
-of BDS.filename), since it is completely unused.
-
-In turn, all of the calls to bdrv_refresh_filename() before this patch
-are removed, because we no longer have to call this function on graph
-changes.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190201192935.18394-2-mreitz@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20190201192935.18394-9-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h |  1 -
- block.c               | 31 +++++++++++++++----------------
- block/qapi.c          |  4 ++++
- block/raw-format.c    |  1 +
- block/replication.c   |  2 --
- block/vhdx-log.c      |  1 +
- block/vmdk.c          |  6 ++++++
- blockdev.c            |  8 ++++++++
- qemu-img.c            | 11 +++++++++--
- 9 files changed, 44 insertions(+), 21 deletions(-)
+ tests/qemu-iotests/228     | 242 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/228.out |  84 +++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 327 insertions(+)
+ create mode 100755 tests/qemu-iotests/228
+ create mode 100644 tests/qemu-iotests/228.out
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 73357c6c25..aaae900925 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -485,7 +485,6 @@ void bdrv_round_to_clusters(BlockDriverState *bs,
-                             int64_t *cluster_offset,
-                             int64_t *cluster_bytes);
-=20
--const char *bdrv_get_encrypted_filename(BlockDriverState *bs);
- void bdrv_get_backing_filename(BlockDriverState *bs,
-                                char *filename, int filename_size);
- void bdrv_get_full_backing_filename(BlockDriverState *bs,
-diff --git a/block.c b/block.c
-index 16d59e0b32..88aa687a68 100644
---- a/block.c
-+++ b/block.c
-@@ -323,8 +323,11 @@ void bdrv_get_full_backing_filename_from_filename(co=
-nst char *backed,
- void bdrv_get_full_backing_filename(BlockDriverState *bs, char *dest, si=
-ze_t sz,
-                                     Error **errp)
- {
--    char *backed =3D bs->exact_filename[0] ? bs->exact_filename : bs->fi=
-lename;
-+    char *backed;
-=20
-+    bdrv_refresh_filename(bs);
+diff --git a/tests/qemu-iotests/228 b/tests/qemu-iotests/228
+new file mode 100755
+index 0000000000..2930f8442c
+--- /dev/null
++++ b/tests/qemu-iotests/228
+@@ -0,0 +1,242 @@
++#!/usr/bin/env python
++#
++# Test for when a backing file is considered overridden (thus, a
++# json:{} filename is generated for the overlay) and when it is not
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# Creator/Owner: Max Reitz <mreitz@redhat.com>
 +
-+    backed =3D bs->exact_filename[0] ? bs->exact_filename : bs->filename=
-;
-     bdrv_get_full_backing_filename_from_filename(backed, bs->backing_fil=
-e,
-                                                  dest, sz, errp);
- }
-@@ -1004,6 +1007,8 @@ static void bdrv_backing_attach(BdrvChild *c)
-                "node is used as backing hd of '%s'",
-                bdrv_get_device_or_node_name(parent));
-=20
-+    bdrv_refresh_filename(backing_hd);
++import iotests
++from iotests import log, qemu_img, filter_testfiles, filter_imgfmt, \
++        filter_qmp_testfiles, filter_qmp_imgfmt
 +
-     parent->open_flags &=3D ~BDRV_O_NO_BACKING;
-     pstrcpy(parent->backing_file, sizeof(parent->backing_file),
-             backing_hd->filename);
-@@ -1413,6 +1418,7 @@ static int bdrv_open_common(BlockDriverState *bs, B=
-lockBackend *file,
-     }
-=20
-     if (file !=3D NULL) {
-+        bdrv_refresh_filename(blk_bs(file));
-         filename =3D blk_bs(file)->filename;
-     } else {
-         /*
-@@ -2334,8 +2340,6 @@ void bdrv_set_backing_hd(BlockDriverState *bs, Bloc=
-kDriverState *backing_hd,
-         bdrv_unref(backing_hd);
-     }
-=20
--    bdrv_refresh_filename(bs);
--
- out:
-     bdrv_refresh_limits(bs, NULL);
- }
-@@ -2864,8 +2868,6 @@ static BlockDriverState *bdrv_open_inherit(const ch=
-ar *filename,
-         g_free(child_key_dot);
-     }
-=20
--    bdrv_refresh_filename(bs);
--
-     /* Check if any unknown options were used */
-     if (qdict_size(options) !=3D 0) {
-         const QDictEntry *entry =3D qdict_first(options);
-@@ -3310,6 +3312,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_sta=
-te, BlockReopenQueue *queue,
-             if (local_err !=3D NULL) {
-                 error_propagate(errp, local_err);
-             } else {
-+                bdrv_refresh_filename(reopen_state->bs);
-                 error_setg(errp, "failed while preparing to reopen image=
- '%s'",
-                            reopen_state->bs->filename);
-             }
-@@ -3937,7 +3940,10 @@ int bdrv_drop_intermediate(BlockDriverState *top, =
-BlockDriverState *base,
-     /* success - we can delete the intermediate states, and link top->ba=
-se */
-     /* TODO Check graph modification op blockers (BLK_PERM_GRAPH_MOD) on=
-ce
-      * we've figured out how they should work. */
--    backing_file_str =3D backing_file_str ? backing_file_str : base->fil=
-ename;
-+    if (!backing_file_str) {
-+        bdrv_refresh_filename(base);
-+        backing_file_str =3D base->filename;
-+    }
-=20
-     QLIST_FOREACH_SAFE(c, &top->parents, next_parent, next) {
-         /* Check whether we are allowed to switch c from top to base */
-@@ -4485,16 +4491,6 @@ bool bdrv_can_write_zeroes_with_unmap(BlockDriverS=
-tate *bs)
-     return bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP;
- }
-=20
--const char *bdrv_get_encrypted_filename(BlockDriverState *bs)
--{
--    if (bs->backing && bs->backing->bs->encrypted)
--        return bs->backing_file;
--    else if (bs->encrypted)
--        return bs->filename;
--    else
--        return NULL;
--}
--
- void bdrv_get_backing_filename(BlockDriverState *bs,
-                                char *filename, int filename_size)
- {
-@@ -4615,6 +4611,9 @@ BlockDriverState *bdrv_find_backing_image(BlockDriv=
-erState *bs,
-=20
-     is_protocol =3D path_has_protocol(backing_file);
-=20
-+    /* This will recursively refresh everything in the backing chain */
-+    bdrv_refresh_filename(bs);
++# Need backing file and change-backing-file support
++iotests.verify_image_format(supported_fmts=3D['qcow2', 'qed'])
++iotests.verify_platform(['linux'])
 +
-     for (curr_bs =3D bs; curr_bs->backing; curr_bs =3D curr_bs->backing-=
->bs) {
-=20
-         /* If either of the filename paths is actually a protocol, then
-diff --git a/block/qapi.c b/block/qapi.c
-index 00291f9105..4623de1d7b 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -51,6 +51,8 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *b=
-lk,
-         return NULL;
-     }
-=20
-+    bdrv_refresh_filename(bs);
 +
-     info =3D g_malloc0(sizeof(*info));
-     info->file                   =3D g_strdup(bs->filename);
-     info->ro                     =3D bs->read_only;
-@@ -264,6 +266,8 @@ void bdrv_query_image_info(BlockDriverState *bs,
-         goto out;
-     }
-=20
-+    bdrv_refresh_filename(bs);
++def log_node_info(node):
++    log('')
 +
-     info =3D g_new0(ImageInfo, 1);
-     info->filename        =3D g_strdup(bs->filename);
-     info->format          =3D g_strdup(bdrv_get_format_name(bs));
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 6f6dc99b2c..d07bcdae62 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -436,6 +436,7 @@ static int raw_open(BlockDriverState *bs, QDict *opti=
-ons, int flags,
-             bs->file->bs->supported_zero_flags);
-=20
-     if (bs->probed && !bdrv_is_read_only(bs)) {
-+        bdrv_refresh_filename(bs->file->bs);
-         fprintf(stderr,
-                 "WARNING: Image format was not specified for '%s' and pr=
-obing "
-                 "guessed raw.\n"
-diff --git a/block/replication.c b/block/replication.c
-index e70dd95001..9b332002ee 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -616,8 +616,6 @@ static void replication_done(void *opaque, int ret)
-     if (ret =3D=3D 0) {
-         s->stage =3D BLOCK_REPLICATION_DONE;
-=20
--        /* refresh top bs's filename */
--        bdrv_refresh_filename(bs);
-         s->active_disk =3D NULL;
-         s->secondary_disk =3D NULL;
-         s->hidden_disk =3D NULL;
-diff --git a/block/vhdx-log.c b/block/vhdx-log.c
-index ecd64266c5..3149ff08d8 100644
---- a/block/vhdx-log.c
-+++ b/block/vhdx-log.c
-@@ -803,6 +803,7 @@ int vhdx_parse_log(BlockDriverState *bs, BDRVVHDXStat=
-e *s, bool *flushed,
-=20
-     if (logs.valid) {
-         if (bs->read_only) {
-+            bdrv_refresh_filename(bs);
-             ret =3D -EPERM;
-             error_setg(errp,
-                        "VHDX image file '%s' opened read-only, but "
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 096e8eb662..117dc6adfe 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -479,6 +479,7 @@ static int vmdk_init_tables(BlockDriverState *bs, Vmd=
-kExtent *extent,
-                      extent->l1_table,
-                      l1_size);
-     if (ret < 0) {
-+        bdrv_refresh_filename(extent->file->bs);
-         error_setg_errno(errp, -ret,
-                          "Could not read l1 table from extent '%s'",
-                          extent->file->bs->filename);
-@@ -499,6 +500,7 @@ static int vmdk_init_tables(BlockDriverState *bs, Vmd=
-kExtent *extent,
-                          extent->l1_backup_table,
-                          l1_size);
-         if (ret < 0) {
-+            bdrv_refresh_filename(extent->file->bs);
-             error_setg_errno(errp, -ret,
-                              "Could not read l1 backup table from extent=
- '%s'",
-                              extent->file->bs->filename);
-@@ -530,6 +532,7 @@ static int vmdk_open_vmfs_sparse(BlockDriverState *bs=
-,
-=20
-     ret =3D bdrv_pread(file, sizeof(magic), &header, sizeof(header));
-     if (ret < 0) {
-+        bdrv_refresh_filename(file->bs);
-         error_setg_errno(errp, -ret,
-                          "Could not read header from file '%s'",
-                          file->bs->filename);
-@@ -607,6 +610,7 @@ static int vmdk_open_vmdk4(BlockDriverState *bs,
-=20
-     ret =3D bdrv_pread(file, sizeof(magic), &header, sizeof(header));
-     if (ret < 0) {
-+        bdrv_refresh_filename(file->bs);
-         error_setg_errno(errp, -ret,
-                          "Could not read header from file '%s'",
-                          file->bs->filename);
-@@ -861,6 +865,7 @@ static int vmdk_parse_extents(const char *desc, Block=
-DriverState *bs,
-         if (!path_is_absolute(fname) && !path_has_protocol(fname) &&
-             !desc_file_path[0])
-         {
-+            bdrv_refresh_filename(bs->file->bs);
-             error_setg(errp, "Cannot use relative extent paths with VMDK=
- "
-                        "descriptor file '%s'", bs->file->bs->filename);
-             return -EINVAL;
-@@ -2470,6 +2475,7 @@ static ImageInfo *vmdk_get_extent_info(VmdkExtent *=
-extent)
- {
-     ImageInfo *info =3D g_new0(ImageInfo, 1);
-=20
-+    bdrv_refresh_filename(extent->file->bs);
-     *info =3D (ImageInfo){
-         .filename         =3D g_strdup(extent->file->bs->filename),
-         .format           =3D g_strdup(extent->type),
-diff --git a/blockdev.c b/blockdev.c
-index 8714ad2702..7e6bf9955c 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1627,6 +1627,7 @@ static void external_snapshot_prepare(BlkActionStat=
-e *common,
-                 error_setg_errno(errp, -size, "bdrv_getlength failed");
-                 goto out;
-             }
-+            bdrv_refresh_filename(state->old_bs);
-             bdrv_img_create(new_image_file, format,
-                             state->old_bs->filename,
-                             state->old_bs->drv->format_name,
-@@ -3230,6 +3231,7 @@ void qmp_block_stream(bool has_job_id, const char *=
-job_id, const char *device,
-             goto out;
-         }
-         assert(bdrv_get_aio_context(base_bs) =3D=3D aio_context);
-+        bdrv_refresh_filename(base_bs);
-         base_name =3D base_bs->filename;
-     }
-=20
-@@ -3349,6 +3351,10 @@ void qmp_block_commit(bool has_job_id, const char =
-*job_id, const char *device,
-             goto out;
-         }
-     } else if (has_top && top) {
-+        /* This strcmp() is just a shortcut, there is no need to
-+         * refresh @bs's filename.  If it mismatches,
-+         * bdrv_find_backing_image() will do the refresh and may still
-+         * return @bs. */
-         if (strcmp(bs->filename, top) !=3D 0) {
-             top_bs =3D bdrv_find_backing_image(bs, top);
-         }
-@@ -3509,6 +3515,7 @@ static BlockJob *do_drive_backup(DriveBackup *backu=
-p, JobTxn *txn,
-     if (backup->mode !=3D NEW_IMAGE_MODE_EXISTING) {
-         assert(backup->format);
-         if (source) {
-+            bdrv_refresh_filename(source);
-             bdrv_img_create(backup->target, backup->format, source->file=
-name,
-                             source->drv->format_name, NULL,
-                             size, flags, false, &local_err);
-@@ -3889,6 +3896,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **err=
-p)
-             break;
-         case NEW_IMAGE_MODE_ABSOLUTE_PATHS:
-             /* create new image with backing file */
-+            bdrv_refresh_filename(source);
-             bdrv_img_create(arg->target, format,
-                             source->filename,
-                             source->drv->format_name,
-diff --git a/qemu-img.c b/qemu-img.c
-index eb5045c742..d2fc28c987 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2790,6 +2790,7 @@ static int get_block_status(BlockDriverState *bs, i=
-nt64_t offset,
-     BlockDriverState *file;
-     bool has_offset;
-     int64_t map;
-+    char *filename =3D NULL;
-=20
-     /* As an optimization, we could cache the current range of unallocat=
-ed
-      * clusters in each file of the chain, and avoid querying the same
-@@ -2817,6 +2818,11 @@ static int get_block_status(BlockDriverState *bs, =
-int64_t offset,
-=20
-     has_offset =3D !!(ret & BDRV_BLOCK_OFFSET_VALID);
-=20
-+    if (file && has_offset) {
-+        bdrv_refresh_filename(file);
-+        filename =3D file->filename;
-+    }
++    log('bs->filename: ' + node['image']['filename'],
++        filters=3D[filter_testfiles, filter_imgfmt])
++    log('bs->backing_file: ' + node['backing_file'],
++        filters=3D[filter_testfiles, filter_imgfmt])
 +
-     *e =3D (MapEntry) {
-         .start =3D offset,
-         .length =3D bytes,
-@@ -2825,8 +2831,8 @@ static int get_block_status(BlockDriverState *bs, i=
-nt64_t offset,
-         .offset =3D map,
-         .has_offset =3D has_offset,
-         .depth =3D depth,
--        .has_filename =3D file && has_offset,
--        .filename =3D file && has_offset ? file->filename : NULL,
-+        .has_filename =3D filename,
-+        .filename =3D filename,
-     };
-=20
-     return 0;
-@@ -3334,6 +3340,7 @@ static int img_rebase(int argc, char **argv)
-                 qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
-             }
-=20
-+            bdrv_refresh_filename(bs);
-             overlay_filename =3D bs->exact_filename[0] ? bs->exact_filen=
-ame
-                                                      : bs->filename;
-             out_real_path =3D g_malloc(PATH_MAX);
++    if 'backing-image' in node['image']:
++        log('bs->backing->bs->filename: ' +
++            node['image']['backing-image']['filename'],
++            filters=3D[filter_testfiles, filter_imgfmt])
++    else:
++        log('bs->backing: (none)')
++
++    log('')
++
++
++with iotests.FilePath('base.img') as base_img_path, \
++     iotests.FilePath('top.img') as top_img_path, \
++     iotests.VM() as vm:
++
++    assert qemu_img('create', '-f', iotests.imgfmt, base_img_path, '64M'=
+) =3D=3D 0
++    # Choose a funny way to describe the backing filename
++    assert qemu_img('create', '-f', iotests.imgfmt, '-b',
++                    'file:' + base_img_path, top_img_path) =3D=3D 0
++
++    vm.launch()
++
++    log('--- Implicit backing file ---')
++    log('')
++
++    vm.qmp_log('blockdev-add',
++                node_name=3D'node0',
++                driver=3Diotests.imgfmt,
++                file=3D{
++                    'driver': 'file',
++                    'filename': top_img_path
++                },
++                filters=3D[filter_qmp_testfiles, filter_qmp_imgfmt])
++
++    # Filename should be plain, and the backing filename should not
++    # contain the "file:" prefix
++    log_node_info(vm.node_info('node0'))
++
++    vm.qmp_log('blockdev-del', node_name=3D'node0')
++
++    log('')
++    log('--- change-backing-file ---')
++    log('')
++
++    vm.qmp_log('blockdev-add',
++               node_name=3D'node0',
++               driver=3Diotests.imgfmt,
++               file=3D{
++                   'driver': 'file',
++                   'filename': top_img_path
++               },
++               filters=3D[filter_qmp_testfiles, filter_qmp_imgfmt])
++
++    # Changing the backing file to a qemu-reported filename should
++    # result in qemu accepting the corresponding BDS as the implicit
++    # backing BDS (and thus not generate a json:{} filename).
++    # So, first, query the backing filename.
++
++    backing_filename =3D \
++        vm.node_info('node0')['image']['backing-image']['filename']
++
++    # Next, change the backing file to something different
++
++    vm.qmp_log('change-backing-file',
++               image_node_name=3D'node0',
++               device=3D'node0',
++               backing_file=3D'null-co://',
++               filters=3D[filter_qmp_testfiles])
++
++    # Now, verify that we get a json:{} filename
++    # (Image header says "null-co://", actual backing file still is
++    # base_img_path)
++
++    log_node_info(vm.node_info('node0'))
++
++    # Change it back
++    # (To get header and backing file in sync)
++
++    vm.qmp_log('change-backing-file',
++               image_node_name=3D'node0',
++               device=3D'node0',
++               backing_file=3Dbacking_filename,
++               filters=3D[filter_qmp_testfiles])
++
++    # And verify that we get our original results
++
++    log_node_info(vm.node_info('node0'))
++
++    # Finally, try a "file:" prefix.  While this is actually what we
++    # originally had in the image header, qemu will not reopen the
++    # backing file here, so it cannot verify that this filename
++    # "resolves" to the actual backing BDS's filename and will thus
++    # consider both to be different.
++    # (This may be fixed in the future.)
++
++    vm.qmp_log('change-backing-file',
++               image_node_name=3D'node0',
++               device=3D'node0',
++               backing_file=3D('file:' + backing_filename),
++               filters=3D[filter_qmp_testfiles])
++
++    # So now we should get a json:{} filename
++
++    log_node_info(vm.node_info('node0'))
++
++    # Remove and re-attach so we can see that (as in our first try),
++    # opening the image anew helps qemu resolve the header backing
++    # filename.
++
++    vm.qmp_log('blockdev-del', node_name=3D'node0')
++
++    vm.qmp_log('blockdev-add',
++               node_name=3D'node0',
++               driver=3Diotests.imgfmt,
++               file=3D{
++                   'driver': 'file',
++                   'filename': top_img_path
++               },
++               filters=3D[filter_qmp_testfiles, filter_qmp_imgfmt])
++
++    log_node_info(vm.node_info('node0'))
++
++    vm.qmp_log('blockdev-del', node_name=3D'node0')
++
++    log('')
++    log('--- Override backing file ---')
++    log('')
++
++    # For this test, we need the plain filename in the image header
++    # (because qemu cannot "canonicalize"/"resolve" the backing
++    # filename unless the backing file is opened implicitly with the
++    # overlay)
++    assert qemu_img('create', '-f', iotests.imgfmt, '-b', base_img_path,
++                    top_img_path) =3D=3D 0
++
++    # You can only reliably override backing options by using a node
++    # reference (or by specifying file.filename, but, well...)
++    vm.qmp_log('blockdev-add', node_name=3D'null', driver=3D'null-co')
++
++    vm.qmp_log('blockdev-add',
++               node_name=3D'node0',
++               driver=3Diotests.imgfmt,
++               file=3D{
++                   'driver': 'file',
++                   'filename': top_img_path
++               },
++               backing=3D'null',
++               filters=3D[filter_qmp_testfiles, filter_qmp_imgfmt])
++
++    # Should get a json:{} filename (and bs->backing_file is
++    # null-co://, because that field actually has not much to do
++    # with the header backing filename (except that it is changed by
++    # change-backing-file))
++
++    log_node_info(vm.node_info('node0'))
++
++    # Detach the backing file by reopening the whole thing
++
++    vm.qmp_log('blockdev-del', node_name=3D'node0')
++    vm.qmp_log('blockdev-del', node_name=3D'null')
++
++    vm.qmp_log('blockdev-add',
++               node_name=3D'node0',
++               driver=3Diotests.imgfmt,
++               file=3D{
++                   'driver': 'file',
++                   'filename': top_img_path
++               },
++               backing=3DNone,
++               filters=3D[filter_qmp_testfiles, filter_qmp_imgfmt])
++
++    # Should get a json:{} filename (because we overrode the backing
++    # file to not be there)
++
++    log_node_info(vm.node_info('node0'))
++
++    # Open the original backing file
++
++    vm.qmp_log('blockdev-add',
++               node_name=3D'original-backing',
++               driver=3Diotests.imgfmt,
++               file=3D{
++                   'driver': 'file',
++                   'filename': base_img_path
++               },
++               filters=3D[filter_qmp_testfiles, filter_qmp_imgfmt])
++
++    # Attach the original backing file to its overlay
++
++    vm.qmp_log('blockdev-snapshot',
++               node=3D'original-backing',
++               overlay=3D'node0')
++
++    # This should give us the original plain result
++    # FIXME: Currently, the block layer considers the runtime backing
++    #        file to be different from the image header, which is
++    #        wrong.  This is fixed by a future patch.
++
++    log_node_info(vm.node_info('node0'))
++
++    vm.qmp_log('blockdev-del', node_name=3D'node0')
++    vm.qmp_log('blockdev-del', node_name=3D'original-backing')
++
++    vm.shutdown()
+diff --git a/tests/qemu-iotests/228.out b/tests/qemu-iotests/228.out
+new file mode 100644
+index 0000000000..57fe97d4bc
+--- /dev/null
++++ b/tests/qemu-iotests/228.out
+@@ -0,0 +1,84 @@
++--- Implicit backing file ---
++
++{"execute": "blockdev-add", "arguments": {"driver": "IMGFMT", "file": {"=
+driver": "file", "filename": "TEST_DIR/PID-top.img"}, "node-name": "node0=
+"}}
++{"return": {}}
++
++bs->filename: TEST_DIR/PID-top.img
++bs->backing_file: TEST_DIR/PID-base.img
++bs->backing->bs->filename: TEST_DIR/PID-base.img
++
++{"execute": "blockdev-del", "arguments": {"node-name": "node0"}}
++{"return": {}}
++
++--- change-backing-file ---
++
++{"execute": "blockdev-add", "arguments": {"driver": "IMGFMT", "file": {"=
+driver": "file", "filename": "TEST_DIR/PID-top.img"}, "node-name": "node0=
+"}}
++{"return": {}}
++{"execute": "change-backing-file", "arguments": {"backing-file": "null-c=
+o://", "device": "node0", "image-node-name": "node0"}}
++{"return": {}}
++
++bs->filename: json:{"backing": {"driver": "IMGFMT", "file": {"driver": "=
+file", "filename": "TEST_DIR/PID-base.img"}}, "driver": "IMGFMT", "file":=
+ {"driver": "file", "filename": "TEST_DIR/PID-top.img"}}
++bs->backing_file: null-co://
++bs->backing->bs->filename: TEST_DIR/PID-base.img
++
++{"execute": "change-backing-file", "arguments": {"backing-file": "TEST_D=
+IR/PID-base.img", "device": "node0", "image-node-name": "node0"}}
++{"return": {}}
++
++bs->filename: TEST_DIR/PID-top.img
++bs->backing_file: TEST_DIR/PID-base.img
++bs->backing->bs->filename: TEST_DIR/PID-base.img
++
++{"execute": "change-backing-file", "arguments": {"backing-file": "file:T=
+EST_DIR/PID-base.img", "device": "node0", "image-node-name": "node0"}}
++{"return": {}}
++
++bs->filename: json:{"backing": {"driver": "IMGFMT", "file": {"driver": "=
+file", "filename": "TEST_DIR/PID-base.img"}}, "driver": "IMGFMT", "file":=
+ {"driver": "file", "filename": "TEST_DIR/PID-top.img"}}
++bs->backing_file: file:TEST_DIR/PID-base.img
++bs->backing->bs->filename: TEST_DIR/PID-base.img
++
++{"execute": "blockdev-del", "arguments": {"node-name": "node0"}}
++{"return": {}}
++{"execute": "blockdev-add", "arguments": {"driver": "IMGFMT", "file": {"=
+driver": "file", "filename": "TEST_DIR/PID-top.img"}, "node-name": "node0=
+"}}
++{"return": {}}
++
++bs->filename: TEST_DIR/PID-top.img
++bs->backing_file: TEST_DIR/PID-base.img
++bs->backing->bs->filename: TEST_DIR/PID-base.img
++
++{"execute": "blockdev-del", "arguments": {"node-name": "node0"}}
++{"return": {}}
++
++--- Override backing file ---
++
++{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-nam=
+e": "null"}}
++{"return": {}}
++{"execute": "blockdev-add", "arguments": {"backing": "null", "driver": "=
+IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/PID-top.img"}, =
+"node-name": "node0"}}
++{"return": {}}
++
++bs->filename: json:{"backing": {"driver": "null-co"}, "driver": "IMGFMT"=
+, "file": {"driver": "file", "filename": "TEST_DIR/PID-top.img"}}
++bs->backing_file: null-co://
++bs->backing->bs->filename: null-co://
++
++{"execute": "blockdev-del", "arguments": {"node-name": "node0"}}
++{"return": {}}
++{"execute": "blockdev-del", "arguments": {"node-name": "null"}}
++{"return": {}}
++{"execute": "blockdev-add", "arguments": {"backing": null, "driver": "IM=
+GFMT", "file": {"driver": "file", "filename": "TEST_DIR/PID-top.img"}, "n=
+ode-name": "node0"}}
++{"return": {}}
++
++bs->filename: json:{"backing": null, "driver": "IMGFMT", "file": {"drive=
+r": "file", "filename": "TEST_DIR/PID-top.img"}}
++bs->backing_file: TEST_DIR/PID-base.img
++bs->backing: (none)
++
++{"execute": "blockdev-add", "arguments": {"driver": "IMGFMT", "file": {"=
+driver": "file", "filename": "TEST_DIR/PID-base.img"}, "node-name": "orig=
+inal-backing"}}
++{"return": {}}
++{"execute": "blockdev-snapshot", "arguments": {"node": "original-backing=
+", "overlay": "node0"}}
++{"return": {}}
++
++bs->filename: json:{"backing": {"driver": "IMGFMT", "file": {"driver": "=
+file", "filename": "TEST_DIR/PID-base.img"}}, "driver": "IMGFMT", "file":=
+ {"driver": "file", "filename": "TEST_DIR/PID-top.img"}}
++bs->backing_file: TEST_DIR/PID-base.img
++bs->backing->bs->filename: TEST_DIR/PID-base.img
++
++{"execute": "blockdev-del", "arguments": {"node-name": "node0"}}
++{"return": {}}
++{"execute": "blockdev-del", "arguments": {"node-name": "original-backing=
+"}}
++{"return": {}}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index fc4c416fa3..f701863cdb 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -227,6 +227,7 @@
+ 225 rw auto quick
+ 226 auto quick
+ 227 auto quick
++228 rw auto quick
+ 229 auto quick
+ 231 auto quick
+ 232 auto quick
 --=20
 2.20.1
