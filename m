@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34114)
+Received: from eggs.gnu.org ([209.51.188.92]:36601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyFjw-0001A4-Ld
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:52:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gyFxt-0004BP-PT
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:06:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyFjv-00072J-RH
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:52:12 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34679)
+	(envelope-from <peter.maydell@linaro.org>) id 1gyFxt-0002Is-2T
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:06:37 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36175)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gyFjv-0006xx-JA
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:52:11 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 98so7729488oty.1
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 04:52:09 -0800 (PST)
+	id 1gyFxs-0002Af-3L
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:06:37 -0500
+Received: by mail-oi1-x244.google.com with SMTP id t206so7165360oib.3
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 05:06:30 -0800 (PST)
 MIME-Version: 1.0
-References: <1551095970-14645-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1551095970-14645-1-git-send-email-thuth@redhat.com>
+References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
+	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
+	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
+	<20190223165523.1d674224@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA8kOEJe-Ax_SFOCa49og-N7gpO-ptsANdvXPhKthrpb8A@mail.gmail.com>
+	<20190225112424.2dd535a1@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA-nfqk9+x1F4nUC0djYRnAgGZL4d9X6rYLBJPvuKCdjbQ@mail.gmail.com>
+	<20190225132156.477faf18@ncopa-desktop.copa.dup.pw>
+In-Reply-To: <20190225132156.477faf18@ncopa-desktop.copa.dup.pw>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Feb 2019 12:51:57 +0000
-Message-ID: <CAFEAcA-YP_S36ZtmC-1LtuJN95Y5J1h5wmRgxLZFKwDrEmuvtA@mail.gmail.com>
+Date: Mon, 25 Feb 2019 13:06:16 +0000
+Message-ID: <CAFEAcA_F1yxx8Z_8Pc_QOMZ3i9vJLZ8uRze1fTbGfSDs4NAhLg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block/nvme: Remove QEMU_PACKED from
- naturally aligned NVMeRegs struct
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +42,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <fam@euphon.net>, Qemu-block <qemu-block@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+To: Natanael Copa <ncopa@alpinelinux.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@outlook.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Mon, 25 Feb 2019 at 11:59, Thomas Huth <thuth@redhat.com> wrote:
+On Mon, 25 Feb 2019 at 12:22, Natanael Copa <ncopa@alpinelinux.org> wrote:
 >
-> The QEMU_PACKED is causing a compiler warning/error with GCC 9:
+> On Mon, 25 Feb 2019 10:34:23 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> > The short term fix is to fix your toolchain/compilation
+> > environment options so that it isn't trying to override
+> > the definition of memcpy().
 >
->   CC      block/nvme.o
-> block/nvme.c: In function =E2=80=98nvme_create_queue_pair=E2=80=99:
-> block/nvme.c:209:22: error: taking address of packed member of
->  =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer =
-value
->  [-Werror=3Daddress-of-packed-member]
->   209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s->doorbell_=
-scale];
+> The easiest workaround is to simply disable FORTIY_SOURCE, but that
+> will weaken the security for all implemented string functions, strcpy,
+> memmove etc, so I don't want to do that.
 >
-> All members of the struct are naturally aligned, so there should
-> not be the need for QEMU_PACKED here, and the following QEMU_BUILD_BUG_ON
-> also ensures that there is no padding. Thus simply remove the QEMU_PACKED
-> here.
->
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1817525
-> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  block/nvme.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/block/nvme.c b/block/nvme.c
-> index b5952c9..6c2ce7d 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -82,7 +82,7 @@ typedef volatile struct {
->      uint8_t  reserved1[0xec0];
->      uint8_t  cmd_set_specfic[0x100];
->      uint32_t doorbells[];
-> -} QEMU_PACKED NVMeRegs;
-> +} NVMeRegs;
->
->  QEMU_BUILD_BUG_ON(offsetof(NVMeRegs, doorbells) !=3D 0x1000);
->
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Is it only lduw_he_p that needs to be atomic or are the other functions
+> in include/qemu/bswap.h using memcpy also required to be atomic?
+
+Hard to say, since we haven't done the "audit all the callers"
+step that Stefan mentioned. If you're going to replace memcpy
+with __builtin_memcpy then the safest thing is to do it for
+all those uses (this will also give you much better generated
+code for performance purposes).
 
 thanks
 -- PMM
