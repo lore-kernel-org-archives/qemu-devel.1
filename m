@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47219)
+Received: from eggs.gnu.org ([209.51.188.92]:47713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyGqr-0003aP-Oa
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:03:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyGtL-0004xR-Q5
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyGql-0007C2-Qm
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:03:25 -0500
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:44217)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gyGqj-0007Ak-Oc
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:03:18 -0500
-Received: by mail-ot1-x334.google.com with SMTP id g1so7851823otj.11
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 06:03:14 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1gyGtI-0008DD-Hi
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:05:57 -0500
+Date: Mon, 25 Feb 2019 15:05:44 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190225140544.GD6320@linux.fritz.box>
+References: <20190208154453.25602-1-berto@igalia.com>
 MIME-Version: 1.0
-References: <20190222082436.23029-1-kraxel@redhat.com>
-In-Reply-To: <20190222082436.23029-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Feb 2019 14:03:02 +0000
-Message-ID: <CAFEAcA8Tv9SdOq=teRn+y_MByMKhszEi1cn9u0MhLSjQRf3yWA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] Vga 20190222 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190208154453.25602-1-berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Assert that L2 table offsets fit in
+ the L1 table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +23,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Fri, 22 Feb 2019 at 08:26, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 2e68b8620637a4ee8c79b5724144b726af1e261b:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.0-20190219' into staging (2019-02-18 16:20:13 +0000)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/vga-20190222-pull-request
->
-> for you to fetch changes up to 1ed2cb32dc9e8f74c82bdc567edad717b0f34fa5:
->
->   display/virtio: add edid support. (2019-02-22 07:25:04 +0100)
->
-> ----------------------------------------------------------------
-> vga: bugfixes and edid support for virtio-vga
->
+Am 08.02.2019 um 16:44 hat Alberto Garcia geschrieben:
+> L1 table entries have a field to store the offset of an L2 table.
+> The rest of the bits of the entry are currently reserved except from
+> bit 63, which stores the COPIED flag.
+> 
+> The offset is always taken from the entry using L1E_OFFSET_MASK to
+> ensure that we only use the bits that belong to that field.
+> 
+> While that mask is used every time we read from the L1 table, it is
+> never used when we write to it. Due to the limits set elsewhere in the
+> code QEMU can never produce L2 table offsets that don't fit in that
+> field so any such offset when allocating an L2 table would indicate a
+> bug in QEMU.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-Applied, thanks.
+Thanks, applied to the block branch.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+Kevin
