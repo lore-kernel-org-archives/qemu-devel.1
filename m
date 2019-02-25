@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40718)
+Received: from eggs.gnu.org ([209.51.188.92]:40818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1gyID5-0008Bs-4i
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:30:28 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyIDM-0008Sk-Sn
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:30:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1gyICm-0006EN-Lb
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:30:21 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1gyICk-00067C-H0
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:30:08 -0500
-Received: by mail-wr1-f68.google.com with SMTP id w17so10370125wrn.12
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 07:29:55 -0800 (PST)
-Date: Mon, 25 Feb 2019 16:29:52 +0100
-From: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190225152952.mor62ggdr5cyyryg@dritchie>
-References: <20190221173758.24672-1-slp@redhat.com>
-	<441b350a-6e01-6163-c2ff-29065a344ab0@redhat.com>
-	<20190221193236.5vlbu2aqghtastwv@dritchie>
-	<20190222100425.GA8035@dhcp-200-176.str.redhat.com>
-	<20190225134027.22q5l4klfx3mxsro@dritchie>
-	<20190225140122.GC6320@linux.fritz.box>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyIDL-0006do-NZ
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:30:44 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 25 Feb 2019 15:30:22 +0000
+Message-ID: <86bbc4f0-288b-4b3a-1f6a-cb3de29d80f4@virtuozzo.com>
+References: <20190223002209.23084-1-jsnow@redhat.com>
+	<20190223002209.23084-2-jsnow@redhat.com>
+	<5678ed17-fda7-4083-b4c6-488b3d6f916d@virtuozzo.com>
+In-Reply-To: <5678ed17-fda7-4083-b4c6-488b3d6f916d@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <677F9A2C64273B4BB3F6657F7BC07CAD@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190225140122.GC6320@linux.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: implement copy offload (-C) for
- dd
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] block/dirty-bitmaps: add
+ inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,93 +27,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Feb 25, 2019 at 03:01:22PM +0100, Kevin Wolf wrote:
-> Am 25.02.2019 um 14:40 hat Sergio Lopez geschrieben:
-> > On Fri, Feb 22, 2019 at 11:04:25AM +0100, Kevin Wolf wrote:
-> > > Am 21.02.2019 um 20:32 hat Sergio Lopez geschrieben:
-> > > > On Thu, Feb 21, 2019 at 12:08:12PM -0600, Eric Blake wrote:
-> > > > > On 2/21/19 11:37 AM, Sergio Lopez wrote:
-> > > > > > This parameter is analogous to convert's "-C", making use of
-> > > > > > bdrv_co_copy_range().
-> > > > > 
-> > > > > The last time I tried to patch 'qemu-img dd', it was pointed out that it
-> > > > > already has several bugs (where it is not on feature-parity with real
-> > > > > dd), and that we REALLY want to make it a syntactic sugar wrapper around
-> > > > > 'qemu-img convert', rather than duplicating code (which means that
-> > > > > qemu-img convert needs to make it easier to do arbitrary offsets and
-> > > > > subsets - although to some extent you can already do that with
-> > > > > --image-opts and appropriate raw driver wrappers).
-> > > > > 
-> > > > > https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg02618.html
-> > > > 
-> > > > Interesting, I wasn't aware of that conversation. It might a little
-> > > > late to go again through it, but while I don't a strong opinion about
-> > > > it, I do have some reservations about the idea of making 'dd' a
-> > > > frontend for 'convert'.
-> > > > 
-> > > > While I do see the functional similarity of both commands, to me they
-> > > > are quite different at a semantical level. For 'convert', I do expect
-> > > > it to do "the right thing" and use the optimal settings (i.e. choosing
-> > > > the best transfer size) by default, while 'dd' is more of "do whatever
-> > > > the user told you to do no matter how wrong it is".
-> > > 
-> > > I think that's what defaults are for. It would make sense to allow the
-> > > user to specify the buffer size even for 'qemu-img convert'. In fact, we
-> > > already have a variable for this, we'd just have to add an option to set
-> > > it explicitly instead of just relying on what the output block node
-> > > tells us.
-> > > 
-> > > > Due to this differences, I think turning 'convert' code into something
-> > > > able to deal with 'dd' semantics would imply adding a considerable
-> > > > number of conditionals, possibly making it harder to maintain than
-> > > > keeping it separate.
-> > > 
-> > > 'qemu-img dd' currently supports five options:
-> > > 
-> > > * if and of. These are obviously supported for convert, too.
-> > > * count and skip. We don't have these in convert yet. We could either
-> > >   add the functionality there or add a raw layer in the 'dd'
-> > >   implementation before we call into the common code.
-> > > * bs. The buffer size is already configurable in ImgConvertState.
-> > > 
-> > > So getting this functionality into 'convert' should be easy.
-> > > 
-> > > There are more differences between 'convert' and 'dd' in how exactly the
-> > > copy is done. I'm not sure whether there is actually a good use for the
-> > > dumb 'dd' copying or whether it was just implemented this way because it
-> > > was easier.
-> > > 
-> > > Currently we have features like copying only a given range only in 'dd',
-> > > and most other features like zero detection, dealing with backing files,
-> > > compression, copy offloading or parallel out-of-order copy only in
-> > > 'convert'.
-> > > 
-> > > Actually, we have more than just these two places that copy images: We
-> > > also have the mirror block job and for other special cases also the
-> > > other block jobs that copy data, each with its own list of features and
-> > > missing options.
-> > > 
-> > > What I really want to see eventually is a way to have all features
-> > > available in all of these instead of only a random selection where
-> > > you're out of luck if you want to copy part of an image with compressed
-> > > output while the VM is running because these three are features
-> > > supported in three different copy implementations and you can't get more
-> > > than one of the features at the same time.
-> > 
-> > OK, makes sense. Is someone already working on this?
-> 
-> I don't think anyone has found the time yet.
-> 
-> If you want to start work on it, maybe the best way to begin
-> incrementally would be to factor out some common functionality from the
-> block jobs into a new block/copy.c, from which we can later create an
-> actual unified 'copy' block job.
-
-Thanks for the hint. I'm going to give it a try and I'll send an early
-RFC patchset to put it in common and confirm we're moving in the right
-direction.
-
-Sergio.
+MjUuMDIuMjAxOSAxNzoxOCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MjMuMDIuMjAxOSAzOjIyLCBKb2huIFNub3cgd3JvdGU6DQo+PiBBZGQgYW4gaW5jb25zaXN0ZW50
+IGJpdCB0byBkaXJ0eS1iaXRtYXBzIHRoYXQgYWxsb3dzIHVzIHRvIHJlcG9ydCBhIGJpdG1hcCBh
+cw0KPj4gcGVyc2lzdGVudCBidXQgcG90ZW50aWFsbHkgaW5jb25zaXN0ZW50LCBpLmUuIGlmIHdl
+IGZpbmQgYml0bWFwcyBvbiBhIHFjb3cyDQo+PiB0aGF0IGhhdmUgYmVlbiBtYXJrZWQgYXMgImlu
+IHVzZSIuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29t
+Pg0KPj4gLS0tDQo+PiDCoCBibG9jay9kaXJ0eS1iaXRtYXAuY8KgwqDCoMKgwqDCoMKgwqAgfCAx
+OSArKysrKysrKysrKysrKysrKysrDQo+PiDCoCBpbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5o
+IHzCoCAyICsrDQo+PiDCoCBxYXBpL2Jsb2NrLWNvcmUuanNvbsKgwqDCoMKgwqDCoMKgwqAgfMKg
+IDggKysrKysrLS0NCj4+IMKgIDMgZmlsZXMgY2hhbmdlZCwgMjcgaW5zZXJ0aW9ucygrKSwgMiBk
+ZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svZGlydHktYml0bWFwLmMgYi9i
+bG9jay9kaXJ0eS1iaXRtYXAuYw0KPj4gaW5kZXggODZjM2I4N2FiOS4uOTA0MmMwNDc4OCAxMDA2
+NDQNCj4+IC0tLSBhL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+PiArKysgYi9ibG9jay9kaXJ0eS1i
+aXRtYXAuYw0KPj4gQEAgLTQ2LDYgKzQ2LDkgQEAgc3RydWN0IEJkcnZEaXJ0eUJpdG1hcCB7DQo+
+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgYW5kIHRoaXMgYml0bWFwIG11c3QgcmVtYWluIHVuY2hhbmdlZCB3
+aGlsZQ0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHRoaXMgZmxhZyBpcyBzZXQuICovDQo+PiDCoMKgwqDC
+oMKgIGJvb2wgcGVyc2lzdGVudDvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIGJpdG1hcCBtdXN0
+IGJlIHNhdmVkIHRvIG93bmVyIGRpc2sgaW1hZ2UgKi8NCj4+ICvCoMKgwqAgYm9vbCBpbmNvbnNp
+c3RlbnQ7wqDCoMKgwqDCoMKgwqDCoMKgIC8qIGJpdG1hcCBpcyBwZXJzaXN0ZW50LCBidXQgbm90
+IG93bmVkIGJ5IFFFTVUuDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIEl0IGNhbm5vdCBiZSB1c2VkIGF0IGFsbCBp
+biBhbnkgd2F5LCBleGNlcHQNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogYSBRTVAgdXNlciBjYW4gcmVtb3ZlIGl0
+LiAqLw0KPj4gwqDCoMKgwqDCoCBib29sIG1pZ3JhdGlvbjvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgLyogQml0bWFwIGlzIHNlbGVjdGVkIGZvciBtaWdyYXRpb24sIGl0IHNob3VsZA0KPj4gwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIG5vdCBiZSBzdG9yZWQgb24gdGhlIG5leHQgaW5hY3RpdmF0aW9uDQo+PiDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgKHBlcnNpc3RlbnQgZmxhZyBkb2Vzbid0IG1hdHRlciB1bnRpbCBuZXh0
+DQo+PiBAQCAtNDYyLDYgKzQ2NSw4IEBAIEJsb2NrRGlydHlJbmZvTGlzdCAqYmRydl9xdWVyeV9k
+aXJ0eV9iaXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPj4gwqDCoMKgwqDCoMKgwqDCoMKg
+IGluZm8tPnJlY29yZGluZyA9IGJkcnZfZGlydHlfYml0bWFwX3JlY29yZGluZyhibSk7DQo+PiDC
+oMKgwqDCoMKgwqDCoMKgwqAgaW5mby0+YnVzeSA9IGJkcnZfZGlydHlfYml0bWFwX2J1c3koYm0p
+Ow0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGluZm8tPnBlcnNpc3RlbnQgPSBibS0+cGVyc2lzdGVu
+dDsNCj4+ICvCoMKgwqDCoMKgwqDCoCBpbmZvLT5oYXNfaW5jb25zaXN0ZW50ID0gYm0tPmluY29u
+c2lzdGVudDsNCj4+ICvCoMKgwqDCoMKgwqDCoCBpbmZvLT5pbmNvbnNpc3RlbnQgPSBibS0+aW5j
+b25zaXN0ZW50Ow0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGVudHJ5LT52YWx1ZSA9IGluZm87DQo+
+PiDCoMKgwqDCoMKgwqDCoMKgwqAgKnBsaXN0ID0gZW50cnk7DQo+PiDCoMKgwqDCoMKgwqDCoMKg
+wqAgcGxpc3QgPSAmZW50cnktPm5leHQ7DQo+PiBAQCAtNzA5LDYgKzcxNCwxNSBAQCB2b2lkIGJk
+cnZfZGlydHlfYml0bWFwX3NldF9wZXJzaXN0YW5jZShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwg
+Ym9vbCBwZXJzaXN0ZW50KQ0KPj4gwqDCoMKgwqDCoCBxZW11X211dGV4X3VubG9jayhiaXRtYXAt
+Pm11dGV4KTsNCj4+IMKgIH0NCj4+ICsvKiBDYWxsZWQgd2l0aCBCUUwgdGFrZW4uICovDQo+PiAr
+dm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfaW5jb25zaXN0ZW50KEJkcnZEaXJ0eUJpdG1hcCAq
+Yml0bWFwKQ0KPj4gK3sNCj4+ICvCoMKgwqAgcWVtdV9tdXRleF9sb2NrKGJpdG1hcC0+bXV0ZXgp
+Ow0KPj4gK8KgwqDCoCBiaXRtYXAtPmluY29uc2lzdGVudCA9IHRydWU7DQo+PiArwqDCoMKgIGJp
+dG1hcC0+ZGlzYWJsZWQgPSB0cnVlOw0KPj4gK8KgwqDCoCBxZW11X211dGV4X3VubG9jayhiaXRt
+YXAtPm11dGV4KTsNCj4+ICt9DQo+IA0KPiBEaWRuJ3QgeW91IGNvbnNpZGVyIHNlcGFyYXRlIGJk
+cnZfY3JlYXRlX2luY29uc2lzdGVudF9iaXRtYXAsIHdoaWNoIHdpbGwgbm90IGFsbG9jYXRlIEhC
+aXRtYXA/DQo+IA0KPiBJdCBtYXkgYmUgZG9uZSBzZXBhcmF0ZWx5IG9mY291cnNlLi4NCj4gDQo+
+PiArDQo+PiDCoCAvKiBDYWxsZWQgd2l0aCBCUUwgdGFrZW4uICovDQo+PiDCoCB2b2lkIGJkcnZf
+ZGlydHlfYml0bWFwX3NldF9taWdyYXRpb24oQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsIGJvb2wg
+bWlncmF0aW9uKQ0KPj4gwqAgew0KPj4gQEAgLTcyMiw2ICs3MzYsMTEgQEAgYm9vbCBiZHJ2X2Rp
+cnR5X2JpdG1hcF9nZXRfcGVyc2lzdGFuY2UoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApDQo+PiDC
+oMKgwqDCoMKgIHJldHVybiBiaXRtYXAtPnBlcnNpc3RlbnQgJiYgIWJpdG1hcC0+bWlncmF0aW9u
+Ow0KPj4gwqAgfQ0KPj4gK2Jvb2wgYmRydl9kaXJ0eV9iaXRtYXBfaW5jb25zaXN0ZW50KEJkcnZE
+aXJ0eUJpdG1hcCAqYml0bWFwKQ0KPj4gK3sNCj4+ICvCoMKgwqAgcmV0dXJuIGJpdG1hcC0+aW5j
+b25zaXN0ZW50Ow0KPj4gK30NCj4+ICsNCj4+IMKgIGJvb2wgYmRydl9oYXNfY2hhbmdlZF9wZXJz
+aXN0ZW50X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+PiDCoCB7DQo+PiDCoMKgwqDC
+oMKgIEJkcnZEaXJ0eUJpdG1hcCAqYm07DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9k
+aXJ0eS1iaXRtYXAuaCBiL2luY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmgNCj4+IGluZGV4IGJh
+ODQ3N2I3M2YuLmIyNzA3NzNmN2UgMTAwNjQ0DQo+PiAtLS0gYS9pbmNsdWRlL2Jsb2NrL2RpcnR5
+LWJpdG1hcC5oDQo+PiArKysgYi9pbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oDQo+PiBAQCAt
+NjgsNiArNjgsNyBAQCB2b2lkIGJkcnZfZGlydHlfYml0bWFwX2Rlc2VyaWFsaXplX2ZpbmlzaChC
+ZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCk7DQo+PiDCoCB2b2lkIGJkcnZfZGlydHlfYml0bWFwX3Nl
+dF9yZWFkb25seShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgYm9vbCB2YWx1ZSk7DQo+PiDCoCB2
+b2lkIGJkcnZfZGlydHlfYml0bWFwX3NldF9wZXJzaXN0YW5jZShCZHJ2RGlydHlCaXRtYXAgKmJp
+dG1hcCwNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJvb2wgcGVyc2lzdGVudCk7DQo+PiAr
+dm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfaW5jb25zaXN0ZW50KEJkcnZEaXJ0eUJpdG1hcCAq
+Yml0bWFwKTsNCj4+IMKgIHZvaWQgYmRydl9kaXJ0eV9iaXRtYXBfc2V0X2J1c3koQmRydkRpcnR5
+Qml0bWFwICpiaXRtYXAsIGJvb2wgYnVzeSk7DQo+PiDCoCB2b2lkIGJkcnZfbWVyZ2VfZGlydHlf
+Yml0bWFwKEJkcnZEaXJ0eUJpdG1hcCAqZGVzdCwgY29uc3QgQmRydkRpcnR5Qml0bWFwICpzcmMs
+DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgSEJpdG1hcCAqKmJhY2t1cCwgRXJyb3IgKiplcnJwKTsNCj4+IEBAIC05MSw2ICs5
+Miw3IEBAIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHkoY29uc3QgQmRydkRpcnR5Qml0
+bWFwICpiaXRtYXApOw0KPj4gwqAgYm9vbCBiZHJ2X2hhc19yZWFkb25seV9iaXRtYXBzKEJsb2Nr
+RHJpdmVyU3RhdGUgKmJzKTsNCj4+IMKgIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfZ2V0X2F1dG9s
+b2FkKGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4+IMKgIGJvb2wgYmRydl9kaXJ0
+eV9iaXRtYXBfZ2V0X3BlcnNpc3RhbmNlKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4+ICti
+b29sIGJkcnZfZGlydHlfYml0bWFwX2luY29uc2lzdGVudChCZHJ2RGlydHlCaXRtYXAgKmJpdG1h
+cCk7DQo+PiDCoCBib29sIGJkcnZfZGlydHlfYml0bWFwX2J1c3koQmRydkRpcnR5Qml0bWFwICpi
+aXRtYXApOw0KPj4gwqAgYm9vbCBiZHJ2X2hhc19jaGFuZ2VkX3BlcnNpc3RlbnRfYml0bWFwcyhC
+bG9ja0RyaXZlclN0YXRlICpicyk7DQo+PiDCoCBCZHJ2RGlydHlCaXRtYXAgKmJkcnZfZGlydHlf
+Yml0bWFwX25leHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+PiBkaWZmIC0tZ2l0IGEvcWFwaS9i
+bG9jay1jb3JlLmpzb24gYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gaW5kZXggNmU1NDM1OTRi
+My4uYTcyMDlmY2UyMiAxMDA2NDQNCj4+IC0tLSBhL3FhcGkvYmxvY2stY29yZS5qc29uDQo+PiAr
+KysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gQEAgLTQ3MCwxMiArNDcwLDE2IEBADQo+PiDC
+oCAjIEBwZXJzaXN0ZW50OiB0cnVlIGlmIHRoZSBiaXRtYXAgd2lsbCBldmVudHVhbGx5IGJlIGZs
+dXNoZWQgdG8gcGVyc2lzdGVudA0KPj4gwqAgI8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0
+b3JhZ2UgKHNpbmNlIDQuMCkNCg0Kc28sIGJpdG1hcCBjYW4ndCBiZSBpbmNvbnNpc3RlbnQgYW5k
+IHBlcnNpc3RlbnQsIGFzIHdlIGRvbid0IHdhbnQgdG8gZmx1c2gNCmluY29uc2lzdGVudCBiaXRt
+YXBzLi4uDQoNCj4+IMKgICMNCj4+ICsjIEBpbmNvbnNpc3RlbnQ6IHRydWUgaWYgdGhpcyBpcyBh
+IHBlcnNpc3RlbnQgYml0bWFwIHRoYXQgUUVNVSBkb2VzIG5vdCBvd24uDQo+PiArI8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBJbXBsaWVzIEByZWNvcmRpbmcgYW5kIEBidXN5IHRvIGJl
+IGZhbHNlLiBUbyByZWNsYWltDQo+PiArI8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBv
+d25lcnNoaXAsIHVzZSBAYmxvY2stZGlydHktYml0bWFwLXJlbW92ZS4gKHNpbmNlIDQuMCkNCj4g
+DQo+IElmIHdlIG9wZW5lZCBhbiBpbWFnZSBmb3Igcncgd2l0aCBpbi11c2UgYml0bWFwcywgdGhl
+IG1haW4gdGhpbmcgYWJvdXQgdGhlbSBub3QNCj4gdGhhdCBRRU1VIGRvZXNuJ3Qgb3duIHRoZW0s
+IGJ1dCB0aGF0IHRoZXkgYXJlIHRydWx5IGluY29uc2lzdGVudC4gTm9ib2R5IG93bnMgdGhlbS4N
+Cj4gDQo+IEFsc28sICJRRU1VIGRvZXMgbm90IG93biIgc291bmQgbGlrZSBzb21lYm9keSBvdGhl
+ciBtYXkgb3duLiBUaGVuIHJlbW92aW5nIGl0IGRvbid0DQo+IHNlZW0gYSBjb3JyZWN0IHRoaW5n
+IHRvIGRvLg0KPiANCj4gQW5kIHJlbW92aW5nIGRvbid0IHJlY2xhaW0gb3duZXJzaGlwLCBidXQg
+anVzdCByZW1vdmUgKGxvb2tzIGxpa2UgaXQgd2FzIG1vcmUgYWJvdXQNCj4gcHJldmlvdXMgdmVy
+c2lvbiB3aXRoIC1jbGVhcikuDQo+IA0KPiBTbyBmb3IgbWUgc29tZXRoaW5nIGxpa2U6ICJCaXRt
+YXAgd2FzIG5vdCBjb3JyZWN0bHkgc2F2ZWQgYWZ0ZXIgbGFzdCB1c2FnZSwgc28gaXQNCj4gbWF5
+IGJlIGluY29uc2lzdGVudC4gSXQncyB1c2VsZXNzIGFuZCBvbmx5IHRha2UgcGxhY2UgaW4gYSBs
+aXN0LiBUaGUgb25seSBwb3NzaWJsZQ0KPiBvcGVyYXRpb24gb24gaXQgaXMgcmVtb3ZlLiIgc2Vl
+bXMgYmV0dGVyLg0KPiANCj4+ICsjDQo+PiDCoCAjIFNpbmNlOiAxLjMNCj4+IMKgICMjDQo+PiDC
+oCB7ICdzdHJ1Y3QnOiAnQmxvY2tEaXJ0eUluZm8nLA0KPj4gwqDCoMKgICdkYXRhJzogeycqbmFt
+ZSc6ICdzdHInLCAnY291bnQnOiAnaW50JywgJ2dyYW51bGFyaXR5JzogJ3VpbnQzMicsDQo+PiAt
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgJ3JlY29yZGluZyc6ICdib29sJywgJ2J1c3knOiAnYm9vbCcs
+DQo+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqAgJ3N0YXR1cyc6ICdEaXJ0eUJpdG1hcFN0YXR1cycs
+ICdwZXJzaXN0ZW50JzogJ2Jvb2wnIH0gfQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgICdyZWNv
+cmRpbmcnOiAnYm9vbCcsICdidXN5JzogJ2Jvb2wnLCAnc3RhdHVzJzogJ0RpcnR5Qml0bWFwU3Rh
+dHVzJywNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoCAncGVyc2lzdGVudCc6ICdib29sJywgJypp
+bmNvbnNpc3RlbnQnOiAnYm9vbCcgfSB9DQo+PiDCoCAjIw0KPj4gwqAgIyBAUWNvdzJCaXRtYXBJ
+bmZvRmxhZ3M6DQo+Pg0KPiANCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
