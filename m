@@ -1,23 +1,42 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41519)
+Received: from eggs.gnu.org ([209.51.188.92]:41599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyGNU-00020b-CU
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:33:05 -0500
+	(envelope-from <casasfernando@outlook.com>) id 1gyGNi-00027c-Qd
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:33:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyGNL-0006I0-DH
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:33:00 -0500
-References: <20190225115552.7534-1-david@redhat.com>
-	<20190225115552.7534-3-david@redhat.com>
-	<20190225132101.72a67e3b.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <09ed9b95-122b-0617-53d4-5e3befca9a7f@redhat.com>
-Date: Mon, 25 Feb 2019 14:32:35 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190225132101.72a67e3b.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <casasfernando@outlook.com>) id 1gyGNh-0006P0-Gp
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:33:18 -0500
+Received: from mail-oln040092064071.outbound.protection.outlook.com
+	([40.92.64.71]:17541
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <casasfernando@outlook.com>)
+	id 1gyGNg-0006G5-Vp
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 08:33:17 -0500
+From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
+Date: Mon, 25 Feb 2019 13:32:47 +0000
+Message-ID: <VI1PR0602MB3245A6B693B23DA2E0E8E500A47A0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
+	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
+	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
+	<20190223165523.1d674224@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA8kOEJe-Ax_SFOCa49og-N7gpO-ptsANdvXPhKthrpb8A@mail.gmail.com>
+	<20190225112424.2dd535a1@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA-nfqk9+x1F4nUC0djYRnAgGZL4d9X6rYLBJPvuKCdjbQ@mail.gmail.com>
+	<20190225132156.477faf18@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA_F1yxx8Z_8Pc_QOMZ3i9vJLZ8uRze1fTbGfSDs4NAhLg@mail.gmail.com>
+	<20190225142517.24367cad@ncopa-desktop.copa.dup.pw>
+In-Reply-To: <20190225142517.24367cad@ncopa-desktop.copa.dup.pw>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/7] s390x/tcg: Simplify disassembler
- operands initialization
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +45,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Natanael Copa <ncopa@alpinelinux.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On 25.02.19 13:21, Cornelia Huck wrote:
-> On Mon, 25 Feb 2019 12:55:47 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Let's simply initialization to 0.
-> 
-> "Let's simply zero-initialize the structure." ?
+Thanks Natanael. Is the new package ready?
 
-Or "s/simply/simplify/", whatever you prefer.
+I will update as soon as the package is available, try to repro and report =
+back.
 
-> 
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/translate.c | 8 +-------
->>  1 file changed, 1 insertion(+), 7 deletions(-)
+Thanks everyone for looking into this!
 
-
--- 
-
-Thanks,
-
-David / dhildenb
+On lun, feb 25, 2019 at 2:25 PM, Natanael Copa <ncopa@alpinelinux.org> wrot=
+e:
+On Mon, 25 Feb 2019 13:06:16 +0000 Peter Maydell <peter.maydell@linaro.org<=
+mailto:peter.maydell@linaro.org>> wrote:
+On Mon, 25 Feb 2019 at 12:22, Natanael Copa <ncopa@alpinelinux.org<mailto:n=
+copa@alpinelinux.org>> wrote: > > On Mon, 25 Feb 2019 10:34:23 +0000 > Pete=
+r Maydell <peter.maydell@linaro.org<mailto:peter.maydell@linaro.org>> wrote=
+: > > The short term fix is to fix your toolchain/compilation > > environme=
+nt options so that it isn't trying to override > > the definition of memcpy=
+(). > > The easiest workaround is to simply disable FORTIY_SOURCE, but that=
+ > will weaken the security for all implemented string functions, strcpy, >=
+ memmove etc, so I don't want to do that. > > Is it only lduw_he_p that nee=
+ds to be atomic or are the other functions > in include/qemu/bswap.h using =
+memcpy also required to be atomic? Hard to say, since we haven't done the "=
+audit all the callers" step that Stefan mentioned. If you're going to repla=
+ce memcpy with __builtin_memcpy then the safest thing is to do it for all t=
+hose uses (this will also give you much better generated code for performan=
+ce purposes).
+I figured that and that is exactly what I did. Fernando: Can you please tes=
+t the binary from qemu-system-x86_64-3.1.0-r3 from alpine edge? I will back=
+port the fix if you can confirm it fixes the problem. Thanks! -nc PS. Those=
+ issues are pretty hard to track down, so big thanks to everyone who helped=
+ find the exact issue here. You have done a great work!
