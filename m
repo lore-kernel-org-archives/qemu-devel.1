@@ -1,15 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51868)
+Received: from eggs.gnu.org ([209.51.188.92]:53214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyF1R-0003Eo-Oe
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:06:14 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyF7E-0006Dw-AI
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyF1L-00063z-VM
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:06:13 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 25 Feb 2019 12:55:45 +0100
-Message-Id: <20190225115552.7534-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 0/7] s390x/tcg: Cleanups and refactorings
- for Vector
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyF7C-0004ZQ-H3
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:12:12 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 25 Feb 2019 12:11:48 +0000
+Message-ID: <f1ba4da6-4003-5004-f19c-d1fad4451b19@virtuozzo.com>
+References: <20190223000614.13894-1-jsnow@redhat.com>
+	<20190223000614.13894-9-jsnow@redhat.com>
+In-Reply-To: <20190223000614.13894-9-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <803163535E7BB346BECF1DDE7C4E8F51@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 08/10] block/dirty-bitmaps: move comment
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,35 +26,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
 
-Before we start with the real magic, some more cleanups and refactorings.
-This series does not depend on other patches not yet in master.
-
-Also add a variant of "LOAD LENGTHENED" that is used along with
-vector instructions in linux (HFP instructions that can be used without
-HFP :) ). Implement "LOAD COUNT TO BLOCK BOUNDARY", introduced with
-vector facility but not operating on vectors.
-
-David Hildenbrand (7):
-  s390x/tcg: RXE has an optional M3 field
-  s390x/tcg: Simplify disassembler operands initialization
-  s390x/tcg: Clarify terminology in vec_reg_offset()
-  s390x/tcg: Factor out vec_full_reg_offset()
-  s390x/tcg: Factor out gen_addi_and_wrap_i64() from get_address()
-  s390x/tcg: Implement LOAD LENGTHENED short HFP to long HFP
-  s390x/tcg: Implement LOAD COUNT TO BLOCK BOUNDARY
-
- target/s390x/cc_helper.c     |  8 ++++
- target/s390x/helper.c        |  1 +
- target/s390x/helper.h        |  1 +
- target/s390x/insn-data.def   |  4 ++
- target/s390x/insn-format.def |  2 +-
- target/s390x/internal.h      |  1 +
- target/s390x/mem_helper.c    | 12 +++++
- target/s390x/translate.c     | 92 ++++++++++++++++++++++++------------
- 8 files changed, 91 insertions(+), 30 deletions(-)
-
--- 
-2.17.2
+MjMuMDIuMjAxOSAzOjA2LCBKb2huIFNub3cgd3JvdGU6DQo+IFNpbXBseSBtb3ZlIHRoZSBiaWcg
+c3RhdHVzIGVudW0gY29tbWVudCBibG9jayB0byBhYm92ZSB0aGUgc3RhdHVzDQo+IGZ1bmN0aW9u
+LCBhbmQgZG9jdW1lbnQgaXQgYXMgYmVpbmcgZGVwcmVjYXRlZC4gVGhlIHdob2xlIGNvbmZ1c2lu
+Zw0KPiBibG9jayBjYW4gZ2V0IGRlbGV0ZWQgaW4gdGhyZWUgcmVsZWFzZXMgdGltZS4NCj4gDQo+
+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdzxqc25vd0ByZWRoYXQuY29tPg0KDQpSZXZpZXdlZC1i
+eTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29t
+Pg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
