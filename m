@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49051)
+Received: from eggs.gnu.org ([209.51.188.92]:49093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyMTm-0006qZ-Hb
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:03:59 -0500
+	(envelope-from <david@redhat.com>) id 1gyMTu-0006uD-Lv
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:04:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyMTb-0000pW-Fx
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:03:54 -0500
+	(envelope-from <david@redhat.com>) id 1gyMTo-00010P-Hp
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 15:04:04 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 25 Feb 2019 21:03:15 +0100
-Message-Id: <20190225200318.16102-5-david@redhat.com>
+Date: Mon, 25 Feb 2019 21:03:16 +0100
+Message-Id: <20190225200318.16102-6-david@redhat.com>
 In-Reply-To: <20190225200318.16102-1-david@redhat.com>
 References: <20190225200318.16102-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/7] s390x/tcg: Factor out
- vec_full_reg_offset()
+Subject: [Qemu-devel] [PATCH v2 5/7] s390x/tcg: Factor out
+ gen_addi_and_wrap_i64() from get_address()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +23,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-We'll use that a lot along with gvec helpers, to calculate the start
-address of a vector.
+Also properly wrap in 24bit mode. While at it, convert the comment (and
+drop the comment about fundamental TCG optimizations).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/translate.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ target/s390x/translate.c | 41 +++++++++++++++++++++++++---------------
+ 1 file changed, 26 insertions(+), 15 deletions(-)
 
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 5e3955e4d7..6d36cfed2a 100644
+index 6d36cfed2a..cc52300334 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -145,13 +145,18 @@ void s390x_translate_init(void)
-     }
+@@ -382,32 +382,43 @@ static inline void gen_trap(DisasContext *s)
+     gen_data_exception(0xff);
  }
  
-+static inline int vec_full_reg_offset(uint8_t reg)
++static void gen_addi_and_wrap_i64(DisasContext *s, TCGv_i64 dst, TCGv_i64 src,
++                                  int64_t imm)
 +{
-+    g_assert(reg < 32);
-+    return offsetof(CPUS390XState, vregs[reg][0].d);
++    tcg_gen_addi_i64(dst, src, imm);
++    if (!(s->base.tb->flags & FLAG_MASK_64)) {
++        if (s->base.tb->flags & FLAG_MASK_32) {
++            tcg_gen_andi_i64(dst, dst, 0x7fffffff);
++        } else {
++            tcg_gen_andi_i64(dst, dst, 0x00ffffff);
++        }
++    }
 +}
 +
- static inline int vec_reg_offset(uint8_t reg, uint8_t enr, TCGMemOp es)
+ static TCGv_i64 get_address(DisasContext *s, int x2, int b2, int d2)
  {
-     /* Convert element size (es) - e.g. MO_U8 - to bytes */
-     const uint8_t bytes = 1 << es;
-     int offs = enr * bytes;
+     TCGv_i64 tmp = tcg_temp_new_i64();
+-    bool need_31 = !(s->base.tb->flags & FLAG_MASK_64);
+-
+-    /* Note that d2 is limited to 20 bits, signed.  If we crop negative
+-       displacements early we create larger immedate addends.  */
  
--    g_assert(reg < 32);
-     /*
-      * vregs[n][0] is the lowest 8 byte and vregs[n][1] the highest 8 byte
-      * of the 16 byte vector, on both, little and big endian systems.
-@@ -178,7 +183,7 @@ static inline int vec_reg_offset(uint8_t reg, uint8_t enr, TCGMemOp es)
- #ifndef HOST_WORDS_BIGENDIAN
-     offs ^= (8 - bytes);
- #endif
--    return offs + offsetof(CPUS390XState, vregs[reg][0].d);
-+    return offs + vec_full_reg_offset(reg);
+-    /* Note that addi optimizes the imm==0 case.  */
++    /*
++     * Note that d2 is limited to 20 bits, signed.  If we crop negative
++     * displacements early we create larger immedate addends.
++     */
+     if (b2 && x2) {
+         tcg_gen_add_i64(tmp, regs[b2], regs[x2]);
+-        tcg_gen_addi_i64(tmp, tmp, d2);
++        gen_addi_and_wrap_i64(s, tmp, tmp, d2);
+     } else if (b2) {
+-        tcg_gen_addi_i64(tmp, regs[b2], d2);
++        gen_addi_and_wrap_i64(s, tmp, regs[b2], d2);
+     } else if (x2) {
+-        tcg_gen_addi_i64(tmp, regs[x2], d2);
+-    } else {
+-        if (need_31) {
+-            d2 &= 0x7fffffff;
+-            need_31 = false;
++        gen_addi_and_wrap_i64(s, tmp, regs[x2], d2);
++    } else if (!(s->base.tb->flags & FLAG_MASK_64)) {
++        if (s->base.tb->flags & FLAG_MASK_32) {
++            tcg_gen_movi_i64(tmp, d2 & 0x7fffffff);
++        } else {
++            tcg_gen_movi_i64(tmp, d2 & 0x00ffffff);
+         }
++    } else {
+         tcg_gen_movi_i64(tmp, d2);
+     }
+-    if (need_31) {
+-        tcg_gen_andi_i64(tmp, tmp, 0x7fffffff);
+-    }
+ 
+     return tmp;
  }
- 
- static inline int freg64_offset(uint8_t reg)
 -- 
 2.17.2
