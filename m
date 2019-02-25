@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56157)
+Received: from eggs.gnu.org ([209.51.188.92]:57594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyHN8-0008GG-91
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:36:47 -0500
+	(envelope-from <stefanb@linux.ibm.com>) id 1gyHUn-00024c-71
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:44:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyHN7-000278-5e
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:36:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gyHN6-00022u-T1
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:36:45 -0500
-References: <20190225123111.30363-1-berrange@redhat.com>
-	<20190225123111.30363-9-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d7c93cff-7973-5248-2194-c386cf145505@redhat.com>
-Date: Mon, 25 Feb 2019 08:36:33 -0600
+	(envelope-from <stefanb@linux.ibm.com>) id 1gyHUh-0000Wx-8o
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:44:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38886
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+	id 1gyHUW-00006A-A2
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:44:28 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1PEhA8m046869
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:43:54 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qvhu89v08-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:43:53 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
+	Mon, 25 Feb 2019 14:43:50 -0000
+References: <1550237719-28355-1-git-send-email-liam.merwick@oracle.com>
+	<1550237719-28355-3-git-send-email-liam.merwick@oracle.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Mon, 25 Feb 2019 09:43:46 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190225123111.30363-9-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 08/11] authz: add QAuthZList object type for
- an access control list
+In-Reply-To: <1550237719-28355-3-git-send-email-liam.merwick@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-MW
+Message-Id: <6a1c5c65-7426-5e71-005c-5585146960a7@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] tpm_tis: convert
+ tpm_tis_show_buffer() to use trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +44,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org
+Cc: philmd@redhat.com
 
-I missed reviewing this before the pull request, so comments here are
-best for a followup patch:
+On 2/15/19 8:35 AM, Liam Merwick wrote:
+> cppcheck reports:
+>
+> [hw/tpm/tpm_tis.c:113]: (warning) %d in format string (no. 2) requires 'int' but the argument type is 'unsigned int'
+>
+> Rather than just converting the format specifier to use '%u", the
+> tpm_tis_show_buffer() function is converted to use trace points and
+> the two debug callers use the trace event infrastructure so that it's
+> available in production cases also and not just when DEBUG_TIS is enabled.
+>
+> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
 
-On 2/25/19 6:31 AM, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> Add a QAuthZList object type that implements the QAuthZ interface. This
-> built-in implementation maintains a trivial access control list with a
-> sequence of match rules and a final default policy. This replicates the
-> functionality currently provided by the qemu_acl module.
->=20
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+
 > ---
-
-> +++ b/qapi/Makefile.objs
-> @@ -7,7 +7,7 @@ util-obj-y +=3D qapi-util.o
-> =20
->  QAPI_COMMON_MODULES =3D block-core block char common crypto introspect
->  QAPI_COMMON_MODULES +=3D job migration misc net rdma rocker run-state
-> -QAPI_COMMON_MODULES +=3D sockets tpm trace transaction ui
-> +QAPI_COMMON_MODULES +=3D sockets tpm trace transaction ui authz
-
-Let's keep this list alphabetically sorted (authz before block-core).
-
-> +++ b/qapi/authz.json
-> @@ -0,0 +1,58 @@
-> +# -*- Mode: Python -*-
-> +#
-> +# QAPI authz definitions
+> v3 -> v4
+> - Allow for null terminator in buffer length calc.
+> - dropped "tpm_tis: " from direction string since function name is now printed
+> - Minor tweak to trace event format string and function parameter names
+>
+> Sample trace output
+>
+> --enable-trace-backends=simple
+>
+> % echo tpm_tis_show_buffer > /tmp/events
+> % export QTEST_QEMU_BINARY="/home/Development/qemu-upstream/x86_64-softmmu/qemu-system-x86_64 --trace events=/tmp/events"
+> % tests/tpm-tis-test
+> /D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_localities: OK
+> /D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_access_reg: OK
+> /D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_access_reg_seize: OK
+> /D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_access_reg_release: OK
+> /D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_transmit: OK
+> % ./scripts/simpletrace.py trace-events-all `ls -1rt trace-[0-9]* | tail -1`
+> tpm_tis_show_buffer 0.000 pid=8416 direction=To TPM len=0xc line=80 01 00 00 00 0C 00 00 01 44 00 00
+> tpm_tis_show_buffer 303.909 pid=8416 direction=From TPM len=0xa line=80 01 00 00 00 0A 00 00 01 01
+>
+> --enable-trace-backends=log
+>
+> 1255@1550051983.333949:tpm_tis_show_buffer direction: To TPM len: 12
+> buf: 80 01 00 00 00 0C 00 00 01 44 00 00
+> 1255@1550051983.334213:tpm_tis_show_buffer direction: From TPM len: 10
+> buf: 80 01 00 00 00 0A 00 00 01 01
+>
+>   hw/tpm/tpm_tis.c    | 31 +++++++++++++++++++------------
+>   hw/tpm/trace-events |  1 +
+>   2 files changed, 20 insertions(+), 12 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 772431f20874..d7b9bee85741 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -108,17 +108,26 @@ static uint8_t tpm_tis_locality_from_addr(hwaddr addr)
+>   static void tpm_tis_show_buffer(const unsigned char *buffer,
+>                                   size_t buffer_size, const char *string)
+>   {
+> -    uint32_t len, i;
+> +    size_t len, i;
+> +    char *line_buffer, *p;
+>   
+>       len = MIN(tpm_cmd_get_size(buffer), buffer_size);
+> -    printf("tpm_tis: %s length = %d\n", string, len);
+> -    for (i = 0; i < len; i++) {
 > +
-> +##
-> +# @QAuthZListPolicy:
-> +#
-> +# The authorization policy result
-> +#
-> +# @deny: deny access
-> +# @allow: allow access
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'enum': 'QAuthZListPolicy',
-> +  'prefix': 'QAUTHZ_LIST_POLICY',
-> +  'data': ['deny', 'allow']}
+> +    /*
+> +     * allocate enough room for 3 chars per buffer entry plus a
+> +     * newline after every 16 chars and a final null terminator.
+> +     */
+> +    line_buffer = g_malloc(len * 3 + (len / 16) + 1);
 > +
-> +##
-> +# @QAuthZListFormat:
-> +#
-> +# The authorization policy result
-> +#
-> +# @exact: an exact string match
-> +# @glob: string with ? and * shell wildcard support
-
-Does it actually use glob() (in which case it also has [] glob support?)
-
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'enum': 'QAuthZListFormat',
-> +  'prefix': 'QAUTHZ_LIST_FORMAT',
-> +  'data': ['exact', 'glob']}
+> +    for (i = 0, p = line_buffer; i < len; i++) {
+>           if (i && !(i % 16)) {
+> -            printf("\n");
+> +            p += sprintf(p, "\n");
+>           }
+> -        printf("%.2X ", buffer[i]);
+> +        p += sprintf(p, "%.2X ", buffer[i]);
+>       }
+> -    printf("\n");
+> +    trace_tpm_tis_show_buffer(string, len, line_buffer);
 > +
-> +##
-> +# @QAuthZListRule:
-> +#
-> +# A single authorization rule.
-> +#
-> +# @match: a glob to match against a user identity
-
-Should this read 'a string or glob to match...' since...
-
-> +# @policy: the result to return if @match evaluates to true
-> +# @format: (optional) the format of the @match rule (default 'exact')
-
-...format controls which of the two styles it is interpreted as?  The
-use of '(optional)' is not required in the current QAPI doc generator,
-and in fact results in redundant output.
-
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'struct': 'QAuthZListRule',
-> +  'data': {'match': 'str',
-> +           'policy': 'QAuthZListPolicy',
-> +           '*format': 'QAuthZListFormat'}}
-> +
-> +##
-> +# @QAuthZListRuleListHack:
-> +#
-> +# Not exposed via QMP; hack to generate QAuthZListRuleList
-> +# for use internally by the code.
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'struct': 'QAuthZListRuleListHack',
-> +  'data': { 'unused': ['QAuthZListRule'] } }
-
-We keep on encountering these hacks; someday it would be nice to teach
-the QAPI generator a nicer way to do this. But not your problem.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> +    g_free(line_buffer);
+>   }
+>   
+>   /*
+> @@ -145,9 +154,8 @@ static void tpm_tis_sts_set(TPMLocality *l, uint32_t flags)
+>    */
+>   static void tpm_tis_tpm_send(TPMState *s, uint8_t locty)
+>   {
+> -    if (DEBUG_TIS) {
+> -        tpm_tis_show_buffer(s->buffer, s->be_buffer_size,
+> -                            "tpm_tis: To TPM");
+> +    if (trace_event_get_state_backends(TRACE_TPM_TIS_SHOW_BUFFER)) {
+> +        tpm_tis_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
+>       }
+>   
+>       /*
+> @@ -315,9 +323,8 @@ static void tpm_tis_request_completed(TPMIf *ti, int ret)
+>       s->loc[locty].state = TPM_TIS_STATE_COMPLETION;
+>       s->rw_offset = 0;
+>   
+> -    if (DEBUG_TIS) {
+> -        tpm_tis_show_buffer(s->buffer, s->be_buffer_size,
+> -                            "tpm_tis: From TPM");
+> +    if (trace_event_get_state_backends(TRACE_TPM_TIS_SHOW_BUFFER)) {
+> +        tpm_tis_show_buffer(s->buffer, s->be_buffer_size, "From TPM");
+>       }
+>   
+>       if (TPM_TIS_IS_VALID_LOCTY(s->next_locty)) {
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> index 920d32ad5514..f45dcd220993 100644
+> --- a/hw/tpm/trace-events
+> +++ b/hw/tpm/trace-events
+> @@ -36,6 +36,7 @@ tpm_emulator_pre_save(void) ""
+>   tpm_emulator_inst_init(void) ""
+>   
+>   # hw/tpm/tpm_tis.c
+> +tpm_tis_show_buffer(const char *direction, size_t len, const char *buf) "direction: %s len: %zu\nbuf: %s"
+>   tpm_tis_raise_irq(uint32_t irqmask) "Raising IRQ for flag 0x%08x"
+>   tpm_tis_new_active_locality(uint8_t locty) "Active locality is now %d"
+>   tpm_tis_abort(uint8_t locty) "New active locality is %d"
