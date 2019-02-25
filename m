@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33684)
+Received: from eggs.gnu.org ([209.51.188.92]:34224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1gyJMW-000181-JR
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:44:17 -0500
+	(envelope-from <prvs=952ce4ebe=anthony.perard@citrix.com>)
+	id 1gyJP8-0003LI-Ke
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:47:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1gyJMV-0005BF-Jp
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:44:16 -0500
-Received: from mail-eopbgr690117.outbound.protection.outlook.com
-	([40.107.69.117]:4000
-	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
-	id 1gyJMV-0005AA-4u
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:44:15 -0500
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
-Date: Mon, 25 Feb 2019 16:44:11 +0000
-Message-ID: <DM5PR22MB1658D01A8E0EF07170375FCCD27A0@DM5PR22MB1658.namprd22.prod.outlook.com>
-References: <1551111037-23411-1-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1551111037-23411-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Content-Language: en-US
+	(envelope-from <prvs=952ce4ebe=anthony.perard@citrix.com>)
+	id 1gyJP0-0007UM-02
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:46:52 -0500
+Date: Mon, 25 Feb 2019 16:46:31 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20190225164631.GE1349@perard.uk.xensource.com>
+References: <20190219163440.15702-1-paul.durrant@citrix.com>
+	<9510cf48c9064c0fb1e6eb64b414a7ea@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] target/mips: Add emulation of three
- MMI instructions
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <9510cf48c9064c0fb1e6eb64b414a7ea@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [PATCH] xen-block: stop leaking memory in
+ xen_block_drive_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+On Tue, Feb 19, 2019 at 04:36:28PM +0000, Paul Durrant wrote:
+> > The locally allocated QDict-s need to be freed. ('file_layer' will be
+> > freed implicitly since it is added as an object to 'driver_layer').
+> > 
+> > Spotted by Coverity: CID 1398649
+> > 
+> > While in the neighbourhood free 'driver' and 'filename' as soon as they
+> > are
+> > added to the QDicts. Freeing after the 'done' label doesn't make that much
+> > sense as, if the error path jumps to that label, the values would be NULL
+> > anyway.
+> > 
+> > This patch also makes that more obvious by taking the error path if
+> > 'params' is NULL and then asserting that both driver and filename are
+> > non-NULL in the normal path.
+> > 
+> > Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-> Subject: [PATCH 0/3] target/mips: Add emulation of three MMI instructions
->
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->
-> This series adds emulation of PCPYH, PCPYLD, and PCPYUD MMI
-> instructions.
->
-> Mateja Marjanovic (3):
->  target/mips: Add emulation of MMI instruction PCPYH
->  target/mips: Add emulation of MMI instruction PCPYLD
->  target/mips: Add emulation of MMI instruction PCPYUD
->
-> target/mips/translate.c | 199 +++++++++++++++++++++++++++++++++++++++++++=
-+++--
->  1 file changed, 194 insertions(+), 5 deletions(-)
->
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Friday, February 22, 2019 8:26 PM
-> To: qemu-devel@nongnu.org
-> Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo
-> Subject: [PATCH v3 0/8] Misc target/mips fixes and improvements
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> A collection of misc target/mips fixes and improvements for
-> February 2019.
->
+Thanks,
 
-For all the patches in this series:
-
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-
-Aleksandar Rikalo
+-- 
+Anthony PERARD
