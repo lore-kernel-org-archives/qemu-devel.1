@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52756)
+Received: from eggs.gnu.org ([209.51.188.92]:53475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1gyCrn-0003Dz-3f
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:48:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1gyCuF-0004bk-QV
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1gyCrm-00034m-07
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:48:07 -0500
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Mon, 25 Feb 2019 09:47:32 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA8392D48A6@lhreml524-mbs.china.huawei.com>
-References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
-	<3a6bf5ea-5b48-18c2-8a2c-0ced777be816@redhat.com>
-In-Reply-To: <3a6bf5ea-5b48-18c2-8a2c-0ced777be816@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1gyCuE-0004gC-MP
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:50:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gyCuE-0004eq-F1
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:50:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gyCuB-0006lX-Tu
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:50:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D13972E800F
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:50:35 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 0/4] ARM virt: ACPI memory hotplug
- support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 25 Feb 2019 09:35:55 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1817525 <1817525@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155108616330.22359.6416860237413372412.malonedeb@wampee.canonical.com>
+Message-Id: <155108735530.30390.11649952739598603228.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1817525] Re: qemu fails to compile on gcc 9
+ "block/nvme.c:209:22: error: taking address of packed member of 'struct
+ <anonymous>' may result in an unaligned pointer value
+ [-Werror=address-of-packed-member]"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +39,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Cc: "xuwei (O)" <xuwei5@huawei.com>, Linuxarm <linuxarm@huawei.com>, Ard
-	Biesheuvel <ard.biesheuvel@linaro.org>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, Laszlo Ersek <lersek@redhat.com>
+To: qemu-devel@nongnu.org
 
-SGkgRXJpYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBdWdlciBF
-cmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50OiAyMiBGZWJydWFyeSAy
-MDE5IDE2OjAzDQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtv
-bG90aHVtLnRob2RpQGh1YXdlaS5jb20+Ow0KPiBzaGFubm9uLnpoYW9zbEBnbWFpbC5jb207IHBl
-dGVyLm1heWRlbGxAbGluYXJvLm9yZzsNCj4gaW1hbW1lZG9AcmVkaGF0LmNvbTsgcWVtdS1kZXZl
-bEBub25nbnUub3JnOyBxZW11LWFybUBub25nbnUub3JnDQo+IENjOiB4dXdlaSAoTykgPHh1d2Vp
-NUBodWF3ZWkuY29tPjsgTGludXhhcm0gPGxpbnV4YXJtQGh1YXdlaS5jb20+OyBBcmQNCj4gQmll
-c2hldXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZz47IExlaWYgTGluZGhvbG0gKExpbmFy
-byBhZGRyZXNzKQ0KPiA8bGVpZi5saW5kaG9sbUBsaW5hcm8ub3JnPjsgTGFzemxvIEVyc2VrIDxs
-ZXJzZWtAcmVkaGF0LmNvbT4NCj4gU3ViamVjdDogUmU6IFtSRkMgUEFUQ0ggMC80XSBBUk0gdmly
-dDogQUNQSSBtZW1vcnkgaG90cGx1ZyBzdXBwb3J0DQo+IA0KPiBIaSBTaGFtZWVyLA0KPiANCj4g
-T24gMS8yOC8xOSAxMjowNSBQTSwgU2hhbWVlciBLb2xvdGh1bSB3cm90ZToNCj4gPiBUaGlzIHNl
-cmllcyBpcyBhbiBhdHRlbXB0IHRvIHByb3ZpZGUgaG90cGx1ZyBzdXBwb3J0IHRvIGJvdGgNCj4g
-PiBwYy1kaW1tIGFuZCBudmRpbW0gZGV2aWNlIG1lbW9yeSBvbiBBUk0gdmlydCBwbGF0Zm9ybS4g
-VGhpcyBpcw0KPiA+IGJhc2VkIG9uIEVyaWMncyByZWNlbnQgd29ya3MgdG8gc3VwcG9ydCBQQ0RJ
-TU0vTlZESU1NIGRldmljZQ0KPiBtZW1vcnlbMV0uDQo+ID4gVGhlIGtlcm5lbCBzdXBwb3J0IGZv
-ciBhcm02NCBtZW1vcnkgaG90IGFkZCB3YXMgYWRkZWQgb25seQ0KPiA+IHJlY2VudGx5IGJ5IFJv
-YmluWzJdIGFuZCBoZW5jZSB0aGUgZ3Vlc3Qga2VybmVsIHNob3VsZCBiZSA9PiA1LjAtcmMxLg0K
-PiA+DQo+ID4gVGhpcyBtYWtlcyB1c2Ugb2YgUEwwNjEgR1BJTyBjb250cm9sbGVyIHRvIHNlbnQg
-cmVsYXRlZCBBQ1BJIGV2ZW50cw0KPiBzL3NlbnQvc2VuZA0KPiA+IHRvIHRoZSBHdWVzdC4gVGhl
-IG9ubHkgcmVmZXJlbmNlIEkgY291bGQgZmluZCB3aXRoIHJlc3BlY3QgdG8gdGhlIEdQSU8NCj4g
-PiBwaW5zIHVzYWdlIGlzIGhlcmVbM10gd2hpY2ggc2F5cywgInVzZSBQSU4gMyBmb3Igc3lzdGVt
-X3Bvd2VyZG93biwNCj4gPiByZXNlcnZpbmcgUElOIDAsIDEsIDIgZm9yIFBDSSBob3RwbHVnLCBD
-UFUgaG90cGx1ZyBhbmQgbWVtb3J5IGhvdHBsdWciLg0KPiA+IEhlbmNlIFBpbiAyIGlzIHVzZWQg
-Zm9yIFBDRElNTSBhbmQgcGluIDQgZm9yIE5WRElNTS4NCj4gPg0KPiA+IFRoaXMgaXMgc2FuaXR5
-IHRlc3RlZCBvbiBhIEhpU2lsaWNvbiBBUk02NCBwbGF0Zm9ybSBhbmQgYXBwcmVjaWF0ZQ0KPiA+
-IGFueSBmdXJ0aGVyIHRlc3RpbmcuDQo+IA0KPiBJIGRpZCBzb21lIHRlc3Rpbmcgb24gYW5vdGhl
-ciBwbGF0Zm9ybSBhbmQgSSBnb3QgdGhlIGV4YWN0bHkgdGhlIHNhbWUNCj4gcmVzdWx0cyBhcyB5
-b3VyczogUENESU1NIGhvdCBwbHVnIHdvcmtzIGZpbmUuIEFsc28gYWZ0ZXIgc3lzdGVtX3Jlc2V0
-IEkNCj4gc3RpbGwgY2FuIHNlZSB0aGUgc2xvdHMuDQo+IEhvdC11bnBsdWcgaXMgbm90IHN1cHBv
-cnRlZCB0aG91Z2guDQoNClRoYW5rcyBmb3IgZ2l2aW5nIGl0IGEgc3Bpbi4gSG90IHVucGx1ZyBp
-cyBkaXNhYmxlZCBmb3Igbm93IGFzIGtlcm5lbCBkb2VzbuKAmXQNCmhhdmUgc3VwcG9ydCBmb3Ig
-aXQgeWV0Lg0KDQo+IEZvciBOVkRJTU0sIGhvdC1hZGQgd29ya3MgZmluZSBhbmQgYW5kIEkgY2Fu
-IHNlZSB0aGUgc2xvdHMgdXNpbmcgbmRjdGwNCj4gb24gZ3Vlc3QuIEJ1dCBhZnRlciBzeXN0ZW1f
-cmVzZXQsIHRoZSBndWVzdCBkb2VzIG5vdCBib290IHByb3Blcmx5Lg0KDQpSaWdodC4gQW5kIEkg
-YXNzdW1lIHlvdSBhcmUgc2VlaW5nIHRoZSBzYW1lIGVycm9yIG1lc3NhZ2UgYXMgYmVsb3cuDQpU
-aGFua3MgZm9yIGFkZGluZyByZWxldmFudCBwZW9wbGUgdG8gdGhlIGRpc2N1c3Npb24uDQoNCkNo
-ZWVycywNClNoYW1lZXINCg0KPiA+DQo+ID4gVGhpcyBzZXJpZXMgY2FuIGJlIGFwcGxpZWQgb24g
-dG9wIG9mIEVyaWMncyBicmFuY2ggaGVyZVs0XQ0KPiA+DQo+ID4gVGVzdDoNCj4gPiAtLS0tLS0N
-Cj4gPiBQbGVhc2UgdXNlIGEgR3Vlc3Qga2VybmVsIGltYWdlID41LjAtcmMxIHdpdGggYWxsIHRo
-ZSBtZW0vbnZkaW1tDQo+ID4gaG90cGx1ZyByZWxhdGVkIENPTkZJR3MgZW5hYmxlZC4NCj4gPg0K
-PiA+IC4vcWVtdS1zeXN0ZW0tYWFyY2g2NCBcDQo+ID4gLW1hY2hpbmUgdmlydCxnaWMtdmVyc2lv
-bj0zLG52ZGltbSBcDQo+ID4gLW0gMUcsbWF4bWVtPTRHLHNsb3RzPTQgXA0KPiA+IC1jcHUgaG9z
-dCBcDQo+ID4gLWtlcm5lbCBJbWFnZSBcDQo+ID4gLWluaXRyZCByb290ZnMtaXBlcmYuY3BpbyBc
-DQo+ID4gLWJpb3MgUUVNVV9FRkkuZmQgXA0KPiA+IC1udW1hIG5vZGUsbm9kZWlkPTAgXA0KPiA+
-IC1uZXQgbm9uZSBcDQo+ID4gLW5vZ3JhcGhpYyAtZW5hYmxlLWt2bSBcDQo+ID4gLWFwcGVuZCAi
-Y29uc29sZT10dHlBTUEwIGFjcGk9Zm9yY2UgZWFybHljb249cGwwMTEsMHg5MDAwMDAwIg0KPiA+
-DQo+ID4gRW50ZXIgUWVtdSBtb25pdG9yLA0KPiA+IEFkZCBwYy1kaW1tOg0KPiA+IG9iamVjdF9h
-ZGQgbWVtb3J5LWJhY2tlbmQtcmFtLGlkPW1lbTEsc2l6ZT0xRw0KPiA+IGRldmljZV9hZGQgcGMt
-ZGltbSxpZD1kaW1tMSxtZW1kZXY9bWVtMQ0KPiA+DQo+ID4gQWRkIG52ZGltbToNCj4gPiBvYmpl
-Y3RfYWRkIG1lbW9yeS1iYWNrZW5kLXJhbSxpZD1tZW0yLHNpemU9MUcNCj4gPiBkZXZpY2VfYWRk
-IG52ZGltbSxpZD1kaW1tMixtZW1kZXY9bWVtMg0KPiA+DQo+ID4gS25vd24gSXNzdWU6DQo+ID4N
-Cj4gPiBJdCBpcyBvYnNlcnZlZCB0aGF0IGhvdCBhZGRpbmcgbnZkaW1tIHdpbGwgcmVzdWx0cyBp
-biBndWVzdCByZWJvb3QNCj4gPiBmYWlsdXJlLiBFREsyIGZhaWxzIHRvIGJ1aWxkIHRoZSBBQ1BJ
-IHRhYmxlcyBvbiByZWJvb3QuIFBsZWFzZSBmaW5kDQo+ID4gYmVsb3cgRURLMiBsb2cgb24gR3Vl
-c3QgcmVib290IGFmdGVyIG52ZGltbSBob3QtYWRkLA0KPiA+DQo+ID4gUHJvY2Vzc0NtZEFkZENo
-ZWNrc3VtOiBpbnZhbGlkIGNoZWNrc3VtIHJhbmdlIGluICJldGMvYWNwaS90YWJsZXMiDQo+ID4g
-T25Sb290QnJpZGdlc0Nvbm5lY3RlZDogSW5zdGFsbEFjcGlUYWJsZXM6IFByb3RvY29sIEVycm9y
-DQo+ID4NCj4gPiBUaGUgcm9vdCBjYXVzZSBzZWVtcyB0byBiZSBFREsyIEFDUEkgdGFibGUgY2hl
-Y2tzdW0gZmFpbHVyZQ0KPiA+IGFzIE5GSVQgdGFibGUgaXMgZ2V0dGluZyB1cGRhdGVkIG9uIGhv
-dC1hZGQuIFRoaXMgbmVlZHMgZnVydGhlcg0KPiA+IGludmVzdGlnYXRpb24uDQo+ICsgQXJkLCBM
-ZWlmLCBMYXN6bG8gaWYgdGhleSBoYXZlIGFueSBpZGVhIG9mIHdoYXQgaXMgbWlzc2luZy93cm9u
-Zy4NCj4gDQo+IFRoYW5rcw0KPiANCj4gRXJpYw0KPiA+DQo+ID4gVGhhbmtzLA0KPiA+IFNoYW1l
-ZXINCj4gPg0KPiA+IFsxXWh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1k
-ZXZlbC8yMDE5LTAxL21zZzA1NzQwLmh0bWwNCj4gPiBbMl1odHRwczovL3BhdGNod29yay5rZXJu
-ZWwub3JnL3BhdGNoLzEwNzI0NDU1Lw0KPiA+IFszXWh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNo
-aXZlL2h0bWwvcWVtdS1hcm0vMjAxNS0xMi9tc2cwMDA5NS5odG1sDQo+ID4gWzRdaHR0cHM6Ly9n
-aXRodWIuY29tL2VhdWdlci9xZW11L3RyZWUvdjMuMS4wLWRpbW0tdjUNCj4gPg0KPiA+IFNoYW1l
-ZXIgS29sb3RodW0gKDQpOg0KPiA+ICAgaHc6YWNwaTogTWFrZSBBQ1BJIElPIGFkZHJlc3Mgc3Bh
-Y2UgY29uZmlndXJhYmxlDQo+ID4gICBody9hcm0vdmlydDogQWRkIEdQSU8gYmFzZWQgcGNkaW1t
-IGhvdHBsdWcgQUNQSSBldmVudCBzdXBwb3J0DQo+ID4gICBody9hcm0vdmlydDogRW5hYmxlIHBj
-LWRpbW0gaG90cGx1ZyBzdXBwb3J0DQo+ID4gICBody9hcm0vdmlydDogQWRkIG52ZGltbSBob3Rw
-bHVnIHN1cHBvcnQNCj4gPg0KPiA+ICBkZWZhdWx0LWNvbmZpZ3MvYXJtLXNvZnRtbXUubWFrICB8
-ICAgMSArDQo+ID4gIGh3L2FjcGkvbWVtb3J5X2hvdHBsdWcuYyAgICAgICAgIHwgIDEzICsrKy0t
-DQo+ID4gIGh3L2FybS92aXJ0LWFjcGktYnVpbGQuYyAgICAgICAgIHwgIDQ1ICsrKysrKysrKysr
-KysrKy0tDQo+ID4gIGh3L2FybS92aXJ0LmMgICAgICAgICAgICAgICAgICAgIHwgMTA1DQo+ICsr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLQ0KPiA+ICBody9pMzg2L2FjcGkt
-YnVpbGQuYyAgICAgICAgICAgICB8ICAgMyArLQ0KPiA+ICBpbmNsdWRlL2h3L2FjcGkvbWVtb3J5
-X2hvdHBsdWcuaCB8ICAgNiArKy0NCj4gPiAgaW5jbHVkZS9ody9hcm0vdmlydC5oICAgICAgICAg
-ICAgfCAgMTUgKysrKysrDQo+ID4gIDcgZmlsZXMgY2hhbmdlZCwgMTY4IGluc2VydGlvbnMoKyks
-IDIwIGRlbGV0aW9ucygtKQ0KPiA+DQo=
+The fields of the struct are naturally aligned, so this should be easy
+enough to fix just by dropping QEMU_PACKED (we already have a compile-
+time assert that the doorbells field is at the expected address).
+
+NB: I notice also the struct is marked 'volatile' -- this is a bit of a
+red flag that the code may not really be doing the right thing here.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1817525
+
+Title:
+  qemu fails to compile on gcc 9 "block/nvme.c:209:22: error: taking
+  address of packed member of 'struct <anonymous>' may result in an
+  unaligned pointer value [-Werror=3Daddress-of-packed-member]"
+
+Status in QEMU:
+  New
+
+Bug description:
+  Issue:
+  Qemu compilation fails with below error on ppc64le host with gcc 9, repo(=
+https://github.com/dgibson/qemu.git), branch(ppc-for-4.0), Commit (0483e903=
+93bac8546a1fbc95ab912a1e78e92b00)
+
+  =C2=A0CHK version_gen.h
+  =C2=A0=C2=A0CC      block/nvme.o
+  block/nvme.c: In function =E2=80=98nvme_create_queue_pair=E2=80=99:
+  block/nvme.c:209:22: error: taking address of packed member of =E2=80=98s=
+truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
+r=3Daddress-of-packed-member]
+  =C2=A0=C2=A0209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
+>doorbell_scale];
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  block/nvme.c:216:22: error: taking address of packed member of =E2=80=98s=
+truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
+r=3Daddress-of-packed-member]
+  =C2=A0=C2=A0216 |     q->cq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
+>doorbell_scale + 1];
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  cc1: all warnings being treated as errors
+  make: *** [/usr/share/avocado-plugins-vt/build/qemu/rules.mak:69: block/n=
+vme.o] Error 1
+
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $git commit:
+  commit 0483e90393bac8546a1fbc95ab912a1e78e92b00 (HEAD -> ppc-for-4.0)
+  Author: Thomas Huth <thuth@redhat.com>
+  Date:   Thu Feb 21 12:24:48 2019 +0100
+
+  =C2=A0=C2=A0=C2=A0=C2=A0hw/ppc: Use object_initialize_child for correct r=
+eference counting
+
+  =C2=A0=C2=A0=C2=A0=C2=A0Both functions, object_initialize() and object_pr=
+operty_add_child() increase
+  =C2=A0=C2=A0=C2=A0=C2=A0the reference counter of the new object, so one o=
+f the references has to be
+  =C2=A0=C2=A0=C2=A0=C2=A0dropped afterwards to get the reference counting =
+right. Otherwise the child
+  =C2=A0=C2=A0=C2=A0=C2=A0object will not be properly cleaned up when the p=
+arent gets destroyed.
+  =C2=A0=C2=A0=C2=A0=C2=A0Thus let's use now object_initialize_child() inst=
+ead to get the reference
+  =C2=A0=C2=A0=C2=A0=C2=A0counting here right.
+
+  =C2=A0=C2=A0=C2=A0=C2=A0Suggested-by: Eduardo Habkost <ehabkost@redhat.co=
+m>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Thomas Huth <thuth@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <1550748288-30598-1-git-send-email-th=
+uth@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: David Gibson <david@gibson.dropbea=
+r.id.au>
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  Note: Same commit on a different ppc64le host with gcc(8.1.1 20180712)
+  compile without any issue.
+
+  Host Env:
+
+  Power8
+
+  #lscpu
+  Architecture:         ppc64le
+  Byte Order:           Little Endian
+  CPU(s):               160
+  On-line CPU(s) list:  0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,12=
+8,136,144,152
+  Off-line CPU(s) list: 1-7,9-15,17-23,25-31,33-39,41-47,49-55,57-63,65-71,=
+73-79,81-87,89-95,97-103,105-111,113-119,121-127,129-135,137-143,145-151,15=
+3-159
+  Thread(s) per core:   1
+  Core(s) per socket:   5
+  Socket(s):            4
+  NUMA node(s):         4
+  Model:                2.1 (pvr 004b 0201)
+  Model name:           POWER8E (raw), altivec supported
+  CPU max MHz:          3690.0000
+  CPU min MHz:          2061.0000
+  L1d cache:            64K
+  L1i cache:            32K
+  L2 cache:             512K
+  L3 cache:             8192K
+  NUMA node0 CPU(s):    0,8,16,24,32
+  NUMA node1 CPU(s):    40,48,56,64,72
+  NUMA node16 CPU(s):   80,88,96,104,112
+  NUMA node17 CPU(s):   120,128,136,144,152
+
+  # gcc --version
+  gcc (GCC) 9.0.1 20190209 (Red Hat 9.0.1-0.4)
+  Copyright (C) 2019 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+
+  # uname -r
+  5.0.0-rc7-ge50585e89
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1817525/+subscriptions
