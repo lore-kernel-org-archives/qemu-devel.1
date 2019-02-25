@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37102)
+Received: from eggs.gnu.org ([209.51.188.92]:37150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI4Q-0008N6-Jo
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:31 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI4X-0008Tj-Uw
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI4M-0000iB-6R
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:28 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI4T-0000lY-CH
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:37 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:19:53 +0100
-Message-Id: <20190225152053.15976-12-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:19:54 +0100
+Message-Id: <20190225152053.15976-13-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/71] nbd: Restrict connection_co reentrance
+Subject: [Qemu-devel] [PULL 12/71] io: Make qio_channel_yield() interruptible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +24,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-nbd_client_attach_aio_context() schedules connection_co in the new
-AioContext and this way reenters it in any arbitrary place that has
-yielded. We can restrict this a bit to the function call where the
-coroutine actually sits waiting when it's idle.
-
-This doesn't solve any bug yet, but it shows where in the code we need
-to support this random reentrance and where we don't have to care.
-
-Add FIXME comments for the existing bugs that the rest of this series
-will fix.
+Similar to how qemu_co_sleep_ns() allows preemption from an external
+coroutine entry, allow reentering qio_channel_yield() early.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/nbd-client.h |  1 +
- block/nbd-client.c | 22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ include/io/channel.h |  9 ++++++---
+ io/channel.c         | 10 ++++++++++
+ 2 files changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/block/nbd-client.h b/block/nbd-client.h
-index d990207a5c..09e03013d2 100644
---- a/block/nbd-client.h
-+++ b/block/nbd-client.h
-@@ -35,6 +35,7 @@ typedef struct NBDClientSession {
-=20
-     NBDClientRequest requests[MAX_NBD_REQUESTS];
-     NBDReply reply;
-+    BlockDriverState *bs;
-     bool quit;
- } NBDClientSession;
-=20
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index f0ad54ce21..5ce4aa9520 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -76,8 +76,24 @@ static coroutine_fn void nbd_connection_entry(void *op=
-aque)
-     Error *local_err =3D NULL;
-=20
-     while (!s->quit) {
-+        /*
-+         * The NBD client can only really be considered idle when it has
-+         * yielded from qio_channel_readv_all_eof(), waiting for data. T=
-his is
-+         * the point where the additional scheduled coroutine entry happ=
-ens
-+         * after nbd_client_attach_aio_context().
-+         *
-+         * Therefore we keep an additional in_flight reference all the t=
-ime and
-+         * only drop it temporarily here.
-+         *
-+         * FIXME This is not safe because the QIOChannel could wake up t=
-he
-+         * coroutine for a second time; it is not prepared for coroutine
-+         * resumption from external code.
-+         */
-+        bdrv_dec_in_flight(s->bs);
-         assert(s->reply.handle =3D=3D 0);
-         ret =3D nbd_receive_reply(s->ioc, &s->reply, &local_err);
-+        bdrv_inc_in_flight(s->bs);
-+
-         if (local_err) {
-             trace_nbd_read_reply_entry_fail(ret, error_get_pretty(local_=
-err));
-             error_free(local_err);
-@@ -116,6 +132,8 @@ static coroutine_fn void nbd_connection_entry(void *o=
-paque)
-=20
-     s->quit =3D true;
-     nbd_recv_coroutines_wake_all(s);
-+    bdrv_dec_in_flight(s->bs);
-+
-     s->connection_co =3D NULL;
-     aio_wait_kick();
- }
-@@ -970,6 +988,8 @@ void nbd_client_attach_aio_context(BlockDriverState *=
-bs,
- {
-     NBDClientSession *client =3D nbd_get_client_session(bs);
-     qio_channel_attach_aio_context(QIO_CHANNEL(client->ioc), new_context=
+diff --git a/include/io/channel.h b/include/io/channel.h
+index da2f138200..59460cb1ec 100644
+--- a/include/io/channel.h
++++ b/include/io/channel.h
+@@ -739,10 +739,13 @@ void qio_channel_detach_aio_context(QIOChannel *ioc=
 );
+  * addition, no two coroutine can be waiting on the same condition
+  * and channel at the same time.
+  *
+- * This must only be called from coroutine context
++ * This must only be called from coroutine context. It is safe to
++ * reenter the coroutine externally while it is waiting; in this
++ * case the function will return even if @condition is not yet
++ * available.
+  */
+-void qio_channel_yield(QIOChannel *ioc,
+-                       GIOCondition condition);
++void coroutine_fn qio_channel_yield(QIOChannel *ioc,
++                                    GIOCondition condition);
+=20
+ /**
+  * qio_channel_wait:
+diff --git a/io/channel.c b/io/channel.c
+index 8dd0684f5d..303376e08d 100644
+--- a/io/channel.c
++++ b/io/channel.c
+@@ -469,6 +469,16 @@ void coroutine_fn qio_channel_yield(QIOChannel *ioc,
+     }
+     qio_channel_set_aio_fd_handlers(ioc);
+     qemu_coroutine_yield();
 +
-+    /* FIXME Really need a bdrv_inc_in_flight() here */
-     aio_co_schedule(new_context, client->connection_co);
++    /* Allow interrupting the operation by reentering the coroutine othe=
+r than
++     * through the aio_fd_handlers. */
++    if (condition =3D=3D G_IO_IN && ioc->read_coroutine) {
++        ioc->read_coroutine =3D NULL;
++        qio_channel_set_aio_fd_handlers(ioc);
++    } else if (condition =3D=3D G_IO_OUT && ioc->write_coroutine) {
++        ioc->write_coroutine =3D NULL;
++        qio_channel_set_aio_fd_handlers(ioc);
++    }
  }
 =20
-@@ -1076,6 +1096,7 @@ static int nbd_client_connect(BlockDriverState *bs,
-      * kick the reply mechanism.  */
-     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
-     client->connection_co =3D qemu_coroutine_create(nbd_connection_entry=
-, client);
-+    bdrv_inc_in_flight(bs);
-     nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
-=20
-     logout("Established connection with NBD server\n");
-@@ -1108,6 +1129,7 @@ int nbd_client_init(BlockDriverState *bs,
- {
-     NBDClientSession *client =3D nbd_get_client_session(bs);
-=20
-+    client->bs =3D bs;
-     qemu_co_mutex_init(&client->send_mutex);
-     qemu_co_queue_init(&client->free_sema);
 =20
 --=20
 2.20.1
