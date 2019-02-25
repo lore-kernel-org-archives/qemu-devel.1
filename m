@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57527)
+Received: from eggs.gnu.org ([209.51.188.92]:57673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gyFPV-0004cB-Sw
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:06 -0500
+	(envelope-from <berrange@redhat.com>) id 1gyFQ6-0004vO-Jm
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gyFPU-0004RL-15
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:05 -0500
-References: <20190225115552.7534-1-david@redhat.com>
-	<20190225115552.7534-4-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <295a982e-eb77-84cc-a06e-55e37a1e4c28@redhat.com>
-Date: Mon, 25 Feb 2019 13:30:48 +0100
+	(envelope-from <berrange@redhat.com>) id 1gyFQ3-0004s0-Bk
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59804)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyFQ1-0004oS-RW
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:31:39 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 25 Feb 2019 12:31:02 +0000
+Message-Id: <20190225123111.30363-3-berrange@redhat.com>
+In-Reply-To: <20190225123111.30363-1-berrange@redhat.com>
+References: <20190225123111.30363-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190225115552.7534-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/7] s390x/tcg: Clarify terminology in
- vec_reg_offset()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 02/11] qom: don't require user creatable objects
+ to be registered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 25/02/2019 12.55, David Hildenbrand wrote:
-> We will use s390x speak "Element Size" (es) for MO_8 == 0, MO_16 == 1
-> ... Simple rename of variables.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/translate.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index c646e50eb3..916508b567 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -145,10 +145,10 @@ void s390x_translate_init(void)
->      }
->  }
->  
-> -static inline int vec_reg_offset(uint8_t reg, uint8_t enr, TCGMemOp size)
-> +static inline int vec_reg_offset(uint8_t reg, uint8_t enr, TCGMemOp es)
->  {
-> -    const uint8_t es = 1 << size;
-> -    int offs = enr * es;
-> +    const uint8_t bytes = 1 << es;
+When an object is in turn owned by another user object, it is not
+desirable to expose this in the QOM object hierarchy. It is just an
+internal implementation detail, we should be free to change without
+exposure to apps managing QEMU.
 
-I'd maybe add a comment at the end of above line, saying "/* Convert
-element size to bytes */" or something similar, so that it is clear to
-the reader that "es" means "element size"...
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ qom/object.c            | 12 ++++++++----
+ qom/object_interfaces.c | 16 ++++++++++------
+ 2 files changed, 18 insertions(+), 10 deletions(-)
 
-> +    int offs = enr * bytes;
->  
->      g_assert(reg < 32);
->      /*
-> @@ -173,9 +173,9 @@ static inline int vec_reg_offset(uint8_t reg, uint8_t enr, TCGMemOp size)
->       * the two 8 byte elements have to be loaded separately. Let's force all
->       * 16 byte operations to handle it in a special way.
->       */
-> -    g_assert(size <= MO_64);
-> +    g_assert(es <= MO_64);
->  #ifndef HOST_WORDS_BIGENDIAN
-> -    offs ^= (8 - es);
-> +    offs ^= (8 - bytes);
->  #endif
->      return offs + offsetof(CPUS390XState, vregs[reg][0].d);
->  }
-> 
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+diff --git a/qom/object.c b/qom/object.c
+index b8c732063b..05a8567041 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -646,16 +646,20 @@ Object *object_new_with_propv(const char *typename,
+         goto error;
+     }
+=20
+-    object_property_add_child(parent, id, obj, &local_err);
+-    if (local_err) {
+-        goto error;
++    if (id !=3D NULL) {
++        object_property_add_child(parent, id, obj, &local_err);
++        if (local_err) {
++            goto error;
++        }
+     }
+=20
+     uc =3D (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE=
+);
+     if (uc) {
+         user_creatable_complete(uc, &local_err);
+         if (local_err) {
+-            object_unparent(obj);
++            if (id !=3D NULL) {
++                object_unparent(obj);
++            }
+             goto error;
+         }
+     }
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index db85d1eb75..cb5809934a 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -75,16 +75,20 @@ Object *user_creatable_add_type(const char *type, con=
+st char *id,
+         goto out;
+     }
+=20
+-    object_property_add_child(object_get_objects_root(),
+-                              id, obj, &local_err);
+-    if (local_err) {
+-        goto out;
++    if (id !=3D NULL) {
++        object_property_add_child(object_get_objects_root(),
++                                  id, obj, &local_err);
++        if (local_err) {
++            goto out;
++        }
+     }
+=20
+     user_creatable_complete(USER_CREATABLE(obj), &local_err);
+     if (local_err) {
+-        object_property_del(object_get_objects_root(),
+-                            id, &error_abort);
++        if (id !=3D NULL) {
++            object_property_del(object_get_objects_root(),
++                                id, &error_abort);
++        }
+         goto out;
+     }
+ out:
+--=20
+2.20.1
