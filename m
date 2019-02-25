@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38358)
+Received: from eggs.gnu.org ([209.51.188.92]:38428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5h-0001Dc-Op
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5k-0001Fs-LC
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5f-0001h1-CU
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:49 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5j-0001lr-OF
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:52 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:30 +0100
-Message-Id: <20190225152053.15976-49-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:34 +0100
+Message-Id: <20190225152053.15976-53-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 48/71] block: Add
- BlockDriver.bdrv_gather_child_options
+Subject: [Qemu-devel] [PULL 52/71] block/nvme: Fix bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,186 +26,83 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Some follow-up patches will rework the way bs->full_open_options is
-refreshed in bdrv_refresh_filename(). The new implementation will remove
-the need for the block drivers' bdrv_refresh_filename() implementations
-to set bs->full_open_options; instead, it will be generic and use static
-information from each block driver.
+Currently, nvme's bdrv_refresh_filename() is an exact copy of null's
+implementation.  However, for null, "null-co://" and "null-aio://" are
+indeed valid filenames -- for nvme, they are not, as a device address is
+still required.
 
-However, by implementing bdrv_gather_child_options(), block drivers will
-still be able to override the way the full_open_options of their
-children are incorporated into their own.
-
-We need to implement this function for VMDK because we have to prevent
-the generic implementation from gathering the options of all children:
-It is not possible to specify options for the extents through the
-runtime options.
-
-For quorum, the child names that would be used by the generic
-implementation and the ones that we actually (currently) want to use
-differ. See quorum_gather_child_options() for more information.
-
-Note that both of these are cases which are not ideal: In case of VMDK
-it would probably be nice to be able to specify options for all extents.
-In case of quorum, the current runtime option structure is simply broken
-and needs to be fixed (but that is left for another patch).
+The correct implementation should generate a filename of the form
+"nvme://[PCI address]/[namespace]" (as the comment above
+nvme_parse_filename() describes).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20190201192935.18394-23-mreitz@redhat.com
+Message-id: 20190201192935.18394-27-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block_int.h | 24 +++++++++++++++++++++++
- block/quorum.c            | 40 +++++++++++++++++++++++++++++++++++++++
- block/vmdk.c              | 19 +++++++++++++++++++
- 3 files changed, 83 insertions(+)
+ block/nvme.c | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 160e8cac1f..ab4cf2df07 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -141,6 +141,30 @@ struct BlockDriver {
+diff --git a/block/nvme.c b/block/nvme.c
+index 6b5845644b..0684bbd077 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -111,6 +111,9 @@ typedef struct {
 =20
-     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
-=20
-+    /*
-+     * Gathers the open options for all children into @target.
-+     * A simple format driver (without backing file support) might
-+     * implement this function like this:
-+     *
-+     *     QINCREF(bs->file->bs->full_open_options);
-+     *     qdict_put(target, "file", bs->file->bs->full_open_options);
-+     *
-+     * If not specified, the generic implementation will simply put
-+     * all children's options under their respective name.
-+     *
-+     * @backing_overridden is true when bs->backing seems not to be
-+     * the child that would result from opening bs->backing_file.
-+     * Therefore, if it is true, the backing child's options should be
-+     * gathered; otherwise, there is no need since the backing child
-+     * is the one implied by the image header.
-+     *
-+     * Note that ideally this function would not be needed.  Every
-+     * block driver which implements it is probably doing something
-+     * shady regarding its runtime option structure.
-+     */
-+    void (*bdrv_gather_child_options)(BlockDriverState *bs, QDict *targe=
-t,
-+                                      bool backing_overridden);
+     /* Total size of mapped qiov, accessed under dma_map_lock */
+     int dma_map_count;
 +
-     /*
-      * Returns an allocated string which is the directory name of this B=
-DS: It
-      * will be used to make relative filenames absolute by prepending th=
-is
-diff --git a/block/quorum.c b/block/quorum.c
-index 1af6458dc4..3984f0aa4f 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1094,6 +1094,45 @@ static void quorum_refresh_filename(BlockDriverSta=
-te *bs, QDict *options)
-     bs->full_open_options =3D opts;
++    /* PCI address (required for nvme_refresh_filename()) */
++    char *device;
+ } BDRVNVMeState;
+=20
+ #define NVME_BLOCK_OPT_DEVICE "device"
+@@ -557,6 +560,7 @@ static int nvme_init(BlockDriverState *bs, const char=
+ *device, int namespace,
+=20
+     qemu_co_mutex_init(&s->dma_map_lock);
+     qemu_co_queue_init(&s->dma_flush_queue);
++    s->device =3D g_strdup(device);
+     s->nsid =3D namespace;
+     s->aio_context =3D bdrv_get_aio_context(bs);
+     ret =3D event_notifier_init(&s->irq_notifier, 0);
+@@ -729,6 +733,8 @@ static void nvme_close(BlockDriverState *bs)
+     event_notifier_cleanup(&s->irq_notifier);
+     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZ=
+E);
+     qemu_vfio_close(s->vfio);
++
++    g_free(s->device);
  }
 =20
-+static void quorum_gather_child_options(BlockDriverState *bs, QDict *tar=
-get,
-+                                        bool backing_overridden)
-+{
-+    BDRVQuorumState *s =3D bs->opaque;
-+    QList *children_list;
-+    int i;
-+
-+    /*
-+     * The generic implementation for gathering child options in
-+     * bdrv_refresh_filename() would use the names of the children
-+     * as specified for bdrv_open_child() or bdrv_attach_child(),
-+     * which is "children.%u" with %u being a value
-+     * (s->next_child_index) that is incremented each time a new child
-+     * is added (and never decremented).  Since children can be
-+     * deleted at runtime, there may be gaps in that enumeration.
-+     * When creating a new quorum BDS and specifying the children for
-+     * it through runtime options, the enumeration used there may not
-+     * have any gaps, though.
-+     *
-+     * Therefore, we have to create a new gap-less enumeration here
-+     * (which we can achieve by simply putting all of the children's
-+     * full_open_options into a QList).
-+     *
-+     * XXX: Note that there are issues with the current child option
-+     *      structure quorum uses (such as the fact that children do
-+     *      not really have unique permanent names).  Therefore, this
-+     *      is going to have to change in the future and ideally we
-+     *      want quorum to be covered by the generic implementation.
-+     */
-+
-+    children_list =3D qlist_new();
-+    qdict_put(target, "children", children_list);
-+
-+    for (i =3D 0; i < s->num_children; i++) {
-+        qlist_append(children_list,
-+                     qobject_ref(s->children[i]->bs->full_open_options))=
-;
-+    }
-+}
-+
- static char *quorum_dirname(BlockDriverState *bs, Error **errp)
+ static int nvme_file_open(BlockDriverState *bs, QDict *options, int flag=
+s,
+@@ -1055,21 +1061,10 @@ static int nvme_reopen_prepare(BDRVReopenState *r=
+eopen_state,
+=20
+ static void nvme_refresh_filename(BlockDriverState *bs)
  {
-     /* In general, there are multiple BDSs with different dirnames below=
- this
-@@ -1121,6 +1160,7 @@ static BlockDriver bdrv_quorum =3D {
-     .bdrv_open                          =3D quorum_open,
-     .bdrv_close                         =3D quorum_close,
-     .bdrv_refresh_filename              =3D quorum_refresh_filename,
-+    .bdrv_gather_child_options          =3D quorum_gather_child_options,
-     .bdrv_dirname                       =3D quorum_dirname,
+-    const QDictEntry *e;
+-
+-    for (e =3D qdict_first(bs->full_open_options); e;
+-         e =3D qdict_next(bs->full_open_options, e))
+-    {
+-        /* These options can be ignored */
+-        if (strcmp(qdict_entry_key(e), "filename") &&
+-            strcmp(qdict_entry_key(e), "driver"))
+-        {
+-            return;
+-        }
+-    }
++    BDRVNVMeState *s =3D bs->opaque;
 =20
-     .bdrv_co_flush_to_disk              =3D quorum_co_flush,
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 81c506cb69..91345babb5 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -27,6 +27,7 @@
- #include "qapi/error.h"
- #include "block/block_int.h"
- #include "sysemu/block-backend.h"
-+#include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
-@@ -2608,6 +2609,23 @@ static int vmdk_get_info(BlockDriverState *bs, Blo=
-ckDriverInfo *bdi)
-     return 0;
+-    snprintf(bs->exact_filename, sizeof(bs->exact_filename), "%s://",
+-             bs->drv->format_name);
++    snprintf(bs->exact_filename, sizeof(bs->exact_filename), "nvme://%s/=
+%i",
++             s->device, s->nsid);
  }
 =20
-+static void vmdk_gather_child_options(BlockDriverState *bs, QDict *targe=
-t,
-+                                      bool backing_overridden)
-+{
-+    /* No children but file and backing can be explicitly specified (TOD=
-O) */
-+    qdict_put(target, "file",
-+              qobject_ref(bs->file->bs->full_open_options));
-+
-+    if (backing_overridden) {
-+        if (bs->backing) {
-+            qdict_put(target, "backing",
-+                      qobject_ref(bs->backing->bs->full_open_options));
-+        } else {
-+            qdict_put_null(target, "backing");
-+        }
-+    }
-+}
-+
- static QemuOptsList vmdk_create_opts =3D {
-     .name =3D "vmdk-create-opts",
-     .head =3D QTAILQ_HEAD_INITIALIZER(vmdk_create_opts.head),
-@@ -2679,6 +2697,7 @@ static BlockDriver bdrv_vmdk =3D {
-     .bdrv_get_specific_info       =3D vmdk_get_specific_info,
-     .bdrv_refresh_limits          =3D vmdk_refresh_limits,
-     .bdrv_get_info                =3D vmdk_get_info,
-+    .bdrv_gather_child_options    =3D vmdk_gather_child_options,
-=20
-     .supports_backing             =3D true,
-     .create_opts                  =3D &vmdk_create_opts,
+ static void nvme_refresh_limits(BlockDriverState *bs, Error **errp)
 --=20
 2.20.1
