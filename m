@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55369)
+Received: from eggs.gnu.org ([209.51.188.92]:52461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyJ0b-0007vb-1e
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:21:39 -0500
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gyIrU-0000Vn-B8
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyJ0P-0001CP-23
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:21:28 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 25 Feb 2019 16:21:15 +0000
-Message-ID: <342d8ae7-d15b-cdd4-f03c-6286f92354af@virtuozzo.com>
-References: <20190223002209.23084-1-jsnow@redhat.com>
-	<20190223002209.23084-5-jsnow@redhat.com>
-In-Reply-To: <20190223002209.23084-5-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5EAD523AF8943D42A04A8D1F2267F588@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] block/dirty-bitmaps: implement
- inconsistent bit
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gyIrT-0003HF-E7
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:12:12 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:53610 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
+	id 1gyIrT-0002ci-6m
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 11:12:11 -0500
+From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Date: Mon, 25 Feb 2019 17:10:37 +0100
+Message-Id: <1551111037-23411-4-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1551111037-23411-1-git-send-email-mateja.marjanovic@rt-rk.com>
+References: <1551111037-23411-1-git-send-email-mateja.marjanovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH 3/3] target/mips: Add emulation of MMI
+ instruction PCPYUD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,129 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
-MjMuMDIuMjAxOSAzOjIyLCBKb2huIFNub3cgd3JvdGU6DQo+IFNldCB0aGUgaW5jb25zaXN0ZW50
-IGJpdCBvbiBsb2FkIGluc3RlYWQgb2YgcmVqZWN0aW5nIHN1Y2ggYml0bWFwcy4NCj4gVGhlcmUg
-aXMgbm8gd2F5IHRvIHVuLXNldCBpdDsgdGhlIG9ubHkgb3B0aW9uIGlzIHRvIGRlbGV0ZSBpdC4N
-Cj4gDQo+IE9idmVydmF0aW9uczoNCj4gLSBiaXRtYXAgbG9hZGluZyBkb2VzIG5vdCBuZWVkIHRv
-IHVwZGF0ZSB0aGUgaGVhZGVyIGZvciBpbl91c2UgYml0bWFwcy4NCj4gLSBpbmNvbnNpc3RlbnQg
-Yml0bWFwcyBkb24ndCBuZWVkIHRvIGhhdmUgdGhlaXIgZGF0YSBsb2FkZWQ7IHRoZXkncmUNCj4g
-ICAgZ2xvcmlmaWVkIGNvcnJ1cHRpb24gc2VudGluZWxzLg0KPiAtIGJpdG1hcCBzYXZpbmcgZG9l
-cyBub3QgbmVlZCB0byBzYXZlIGluY29uc2lzdGVudCBiaXRtYXBzIGJhY2sgdG8gZGlzay4NCj4g
-LSBiaXRtYXAgcmVvcGVuaW5nIERPRVMgbmVlZCB0byBkcm9wIHRoZSByZWFkb25seSBmbGFnIGZy
-b20gaW5jb25zaXN0ZW50DQo+ICAgIGJpdG1hcHMgdG8gYWxsb3cgcmVvcGVuaW5nIG9mIHFjb3cy
-IGZpbGVzIHdpdGggbm9uLXFlbXUtb3duZWQgYml0bWFwcw0KPiAgICBiZWluZyBldmVudHVhbGx5
-IGZsdXNoZWQgYmFjayB0byBkaXNrLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxq
-c25vd0ByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBibG9jay9xY293Mi1iaXRtYXAuYyB8IDc3ICsr
-KysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNo
-YW5nZWQsIDQwIGluc2VydGlvbnMoKyksIDM3IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdp
-dCBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jIGIvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gaW5kZXgg
-M2VlNTI0ZGE0Yi4uZDFjYzExZGE4OCAxMDA2NDQNCj4gLS0tIGEvYmxvY2svcWNvdzItYml0bWFw
-LmMNCj4gKysrIGIvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gQEAgLTM0Myw5ICszNDMsMTUgQEAg
-c3RhdGljIEJkcnZEaXJ0eUJpdG1hcCAqbG9hZF9iaXRtYXAoQmxvY2tEcml2ZXJTdGF0ZSAqYnMs
-DQo+ICAgICAgIHVpbnQzMl90IGdyYW51bGFyaXR5Ow0KPiAgICAgICBCZHJ2RGlydHlCaXRtYXAg
-KmJpdG1hcCA9IE5VTEw7DQo+ICAgDQo+ICsgICAgZ3JhbnVsYXJpdHkgPSAxVSA8PCBibS0+Z3Jh
-bnVsYXJpdHlfYml0czsNCj4gKyAgICBiaXRtYXAgPSBiZHJ2X2NyZWF0ZV9kaXJ0eV9iaXRtYXAo
-YnMsIGdyYW51bGFyaXR5LCBibS0+bmFtZSwgZXJycCk7DQo+ICsgICAgaWYgKGJpdG1hcCA9PSBO
-VUxMKSB7DQo+ICsgICAgICAgIGdvdG8gZmFpbDsNCj4gKyAgICB9DQo+ICsNCj4gICAgICAgaWYg
-KGJtLT5mbGFncyAmIEJNRV9GTEFHX0lOX1VTRSkgew0KPiAtICAgICAgICBlcnJvcl9zZXRnKGVy
-cnAsICJCaXRtYXAgJyVzJyBpcyBpbiB1c2UiLCBibS0+bmFtZSk7DQo+IC0gICAgICAgIGdvdG8g
-ZmFpbDsNCj4gKyAgICAgICAgLyogRGF0YSBpcyB1bnVzYWJsZSwgc2tpcCBsb2FkaW5nIGl0ICov
-DQo+ICsgICAgICAgIHJldHVybiBiaXRtYXA7DQo+ICAgICAgIH0NCj4gICANCj4gICAgICAgcmV0
-ID0gYml0bWFwX3RhYmxlX2xvYWQoYnMsICZibS0+dGFibGUsICZiaXRtYXBfdGFibGUpOw0KPiBA
-QCAtMzU2LDEyICszNjIsNiBAQCBzdGF0aWMgQmRydkRpcnR5Qml0bWFwICpsb2FkX2JpdG1hcChC
-bG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgICAgIGdvdG8gZmFpbDsNCj4gICAgICAgfQ0K
-PiAgIA0KPiAtICAgIGdyYW51bGFyaXR5ID0gMVUgPDwgYm0tPmdyYW51bGFyaXR5X2JpdHM7DQo+
-IC0gICAgYml0bWFwID0gYmRydl9jcmVhdGVfZGlydHlfYml0bWFwKGJzLCBncmFudWxhcml0eSwg
-Ym0tPm5hbWUsIGVycnApOw0KPiAtICAgIGlmIChiaXRtYXAgPT0gTlVMTCkgew0KPiAtICAgICAg
-ICBnb3RvIGZhaWw7DQo+IC0gICAgfQ0KPiAtDQo+ICAgICAgIHJldCA9IGxvYWRfYml0bWFwX2Rh
-dGEoYnMsIGJpdG1hcF90YWJsZSwgYm0tPnRhYmxlLnNpemUsIGJpdG1hcCk7DQo+ICAgICAgIGlm
-IChyZXQgPCAwKSB7DQo+ICAgICAgICAgICBlcnJvcl9zZXRnX2Vycm5vKGVycnAsIC1yZXQsICJD
-b3VsZCBub3QgcmVhZCBiaXRtYXAgJyVzJyBmcm9tIGltYWdlIiwNCj4gQEAgLTk0OSw2ICs5NDks
-NyBAQCBib29sIHFjb3cyX2xvYWRfZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicywg
-RXJyb3IgKiplcnJwKQ0KPiAgICAgICBRY293MkJpdG1hcCAqYm07DQo+ICAgICAgIEdTTGlzdCAq
-Y3JlYXRlZF9kaXJ0eV9iaXRtYXBzID0gTlVMTDsNCj4gICAgICAgYm9vbCBoZWFkZXJfdXBkYXRl
-ZCA9IGZhbHNlOw0KPiArICAgIGJvb2wgbmVlZHNfdXBkYXRlID0gZmFsc2U7DQo+ICAgDQo+ICAg
-ICAgIGlmIChzLT5uYl9iaXRtYXBzID09IDApIHsNCj4gICAgICAgICAgIC8qIE5vIGJpdG1hcHMg
-LSBub3RoaW5nIHRvIGRvICovDQo+IEBAIC05NjIsMjMgKzk2MywyNyBAQCBib29sIHFjb3cyX2xv
-YWRfZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKQ0KPiAg
-ICAgICB9DQo+ICAgDQo+ICAgICAgIFFTSU1QTEVRX0ZPUkVBQ0goYm0sIGJtX2xpc3QsIGVudHJ5
-KSB7DQo+IC0gICAgICAgIGlmICghKGJtLT5mbGFncyAmIEJNRV9GTEFHX0lOX1VTRSkpIHsNCj4g
-LSAgICAgICAgICAgIEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwID0gbG9hZF9iaXRtYXAoYnMsIGJt
-LCBlcnJwKTsNCj4gLSAgICAgICAgICAgIGlmIChiaXRtYXAgPT0gTlVMTCkgew0KPiAtICAgICAg
-ICAgICAgICAgIGdvdG8gZmFpbDsNCj4gLSAgICAgICAgICAgIH0NCj4gKyAgICAgICAgQmRydkRp
-cnR5Qml0bWFwICpiaXRtYXAgPSBsb2FkX2JpdG1hcChicywgYm0sIGVycnApOw0KPiArICAgICAg
-ICBpZiAoYml0bWFwID09IE5VTEwpIHsNCj4gKyAgICAgICAgICAgIGdvdG8gZmFpbDsNCj4gKyAg
-ICAgICAgfQ0KPiAgIA0KPiAtICAgICAgICAgICAgaWYgKCEoYm0tPmZsYWdzICYgQk1FX0ZMQUdf
-QVVUTykpIHsNCj4gLSAgICAgICAgICAgICAgICBiZHJ2X2Rpc2FibGVfZGlydHlfYml0bWFwKGJp
-dG1hcCk7DQo+IC0gICAgICAgICAgICB9DQo+IC0gICAgICAgICAgICBiZHJ2X2RpcnR5X2JpdG1h
-cF9zZXRfcGVyc2lzdGFuY2UoYml0bWFwLCB0cnVlKTsNCj4gKyAgICAgICAgaWYgKGJtLT5mbGFn
-cyAmIEJNRV9GTEFHX0lOX1VTRSkgew0KPiArICAgICAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBf
-c2V0X2luY29uc2lzdGVudChiaXRtYXApOw0KPiArICAgICAgICB9IGVsc2Ugew0KPiArICAgICAg
-ICAgICAgLyogTkI6IHVwZGF0ZWQgZmxhZ3Mgb25seSBnZXQgd3JpdHRlbiBpZiBjYW5fd3JpdGUo
-YnMpIGlzIHRydWUuICovDQo+ICAgICAgICAgICAgICAgYm0tPmZsYWdzIHw9IEJNRV9GTEFHX0lO
-X1VTRTsNCj4gLSAgICAgICAgICAgIGNyZWF0ZWRfZGlydHlfYml0bWFwcyA9DQo+IC0gICAgICAg
-ICAgICAgICAgICAgIGdfc2xpc3RfYXBwZW5kKGNyZWF0ZWRfZGlydHlfYml0bWFwcywgYml0bWFw
-KTsNCj4gKyAgICAgICAgICAgIG5lZWRzX3VwZGF0ZSA9IHRydWU7DQo+ICAgICAgICAgICB9DQo+
-ICsgICAgICAgIGlmICghKGJtLT5mbGFncyAmIEJNRV9GTEFHX0FVVE8pKSB7DQo+ICsgICAgICAg
-ICAgICBiZHJ2X2Rpc2FibGVfZGlydHlfYml0bWFwKGJpdG1hcCk7DQo+ICsgICAgICAgIH0NCj4g
-KyAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBfc2V0X3BlcnNpc3RhbmNlKGJpdG1hcCwgdHJ1ZSk7
-DQoNCldlIGRlZmluZSBwZXJzaXN0ZW50IGJpdG1hcHMgYXMgd2hpY2ggd2UgYXJlIGdvaW5nIHRv
-IHN0b3JlLi4gQnV0IHdlIGFyZQ0Kbm90IGdvaW5nIHRvIHN0b3JlIGluY29uc2lzdGVudCBiaXRt
-YXBzLiBTbyBpbmNvbnNpc3RlbnQgYml0bWFwcyBhcmUgbm90IHBlcnNpc3RlbnQuDQoNCj4gKyAg
-ICAgICAgY3JlYXRlZF9kaXJ0eV9iaXRtYXBzID0NCj4gKyAgICAgICAgICAgIGdfc2xpc3RfYXBw
-ZW5kKGNyZWF0ZWRfZGlydHlfYml0bWFwcywgYml0bWFwKTsNCj4gICAgICAgfQ0KPiAgIA0KPiAt
-ICAgIGlmIChjcmVhdGVkX2RpcnR5X2JpdG1hcHMgIT0gTlVMTCkgew0KPiArICAgIGlmIChuZWVk
-c191cGRhdGUpIHsNCg0KY3JlYXRlZF9kaXJ0eV9iaXRtYXBzIGxpc3QgbmVlZGVkIG9ubHkgZm9y
-IHNldHRpbmcgdGhlbSByZWFkb25seSwgaWYgZmFpbGVkIHdyaXRlIHRoYXQNCnRoZXkgYXJlIElO
-X1VTRS4gU28sIGluc3RlYWQgb2YgY3JlYXRpbmcgYWRkaXRpb25hbCB2YXJpYWJsZSwgYmV0dGVy
-IGlzIGp1c3Qgbm90IGluY2x1ZGUNCklOX1VTRSBiaXRtYXBzIHRvIHRoaXMgbGlzdC4gQW5kIGl0
-IG1heSBiZSByZW5hbWVkIGxpa2Ugc2V0X2luX3VzZV9saXN0Lg0KDQo+ICAgICAgICAgICBpZiAo
-Y2FuX3dyaXRlKGJzKSkgew0KPiAgICAgICAgICAgICAgIC8qIGluX3VzZSBmbGFncyBtdXN0IGJl
-IHVwZGF0ZWQgKi8NCj4gICAgICAgICAgICAgICBpbnQgcmV0ID0gdXBkYXRlX2V4dF9oZWFkZXJf
-YW5kX2Rpcl9pbl9wbGFjZShicywgYm1fbGlzdCk7DQo+IEBAIC0xMTEyLDIzICsxMTE3LDIxIEBA
-IGludCBxY293Ml9yZW9wZW5fYml0bWFwc19yd19oaW50KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBi
-b29sICpoZWFkZXJfdXBkYXRlZCwNCj4gICAgICAgfQ0KPiAgIA0KPiAgICAgICBRU0lNUExFUV9G
-T1JFQUNIKGJtLCBibV9saXN0LCBlbnRyeSkgew0KPiAtICAgICAgICBpZiAoIShibS0+ZmxhZ3Mg
-JiBCTUVfRkxBR19JTl9VU0UpKSB7DQo+IC0gICAgICAgICAgICBCZHJ2RGlydHlCaXRtYXAgKmJp
-dG1hcCA9IGJkcnZfZmluZF9kaXJ0eV9iaXRtYXAoYnMsIGJtLT5uYW1lKTsNCj4gLSAgICAgICAg
-ICAgIGlmIChiaXRtYXAgPT0gTlVMTCkgew0KPiAtICAgICAgICAgICAgICAgIGNvbnRpbnVlOw0K
-PiAtICAgICAgICAgICAgfQ0KPiAtDQo+IC0gICAgICAgICAgICBpZiAoIWJkcnZfZGlydHlfYml0
-bWFwX3JlYWRvbmx5KGJpdG1hcCkpIHsNCj4gLSAgICAgICAgICAgICAgICBlcnJvcl9zZXRnKGVy
-cnAsICJCaXRtYXAgJXMgaXMgbm90IHJlYWRvbmx5IGJ1dCBub3QgbWFya2VkIg0KPiAtICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIidJTl9VU0UnIGluIHRoZSBpbWFnZS4gU29tZXRo
-aW5nIHdlbnQgd3JvbmcsIg0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgImFs
-bCB0aGUgYml0bWFwcyBtYXkgYmUgY29ycnVwdGVkIiwgYm0tPm5hbWUpOw0KPiAtICAgICAgICAg
-ICAgICAgIHJldCA9IC1FSU5WQUw7DQo+IC0gICAgICAgICAgICAgICAgZ290byBvdXQ7DQo+IC0g
-ICAgICAgICAgICB9DQo+ICsgICAgICAgIEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwID0gYmRydl9m
-aW5kX2RpcnR5X2JpdG1hcChicywgYm0tPm5hbWUpOw0KPiArICAgICAgICBpZiAoYml0bWFwID09
-IE5VTEwpIHsNCj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiArICAgICAgICB9DQoNCj4gICAN
-Cj4gLSAgICAgICAgICAgIGJtLT5mbGFncyB8PSBCTUVfRkxBR19JTl9VU0U7DQo+IC0gICAgICAg
-ICAgICByb19kaXJ0eV9iaXRtYXBzID0gZ19zbGlzdF9hcHBlbmQocm9fZGlydHlfYml0bWFwcywg
-Yml0bWFwKTsNCj4gKyAgICAgICAgaWYgKCFiZHJ2X2RpcnR5X2JpdG1hcF9yZWFkb25seShiaXRt
-YXApKSB7DQoNCnNvLCB3ZSdsbCBmYWlsLCBhcyB3ZSBkaWRuJ3QgbWFya2VkIGluY29uc2lzdGV0
-biBiaXRtYXBzIGFzIHJlYWRvbmx5IGFib3ZlLiBTaG91bGQgd2U/DQpPciB3ZSBtYXkgY2hlY2sg
-aGVyZSBpbmNvbnNpc3RhbmNlIGRpcmVjdGx5Lg0KDQo+ICsgICAgICAgICAgICBlcnJvcl9zZXRn
-KGVycnAsICJCaXRtYXAgJXMgd2FzIGxvYWRlZCBwcmlvciB0byBydy1yZW9wZW4sIGJ1dCB3YXMg
-Ig0KPiArICAgICAgICAgICAgICAgICAgICAgICAibm90IG1hcmtlZCBhcyByZWFkb25seS4gVGhp
-cyBpcyBhIGJ1Zywgc29tZXRoaW5nIHdlbnQgIg0KPiArICAgICAgICAgICAgICAgICAgICAgICAi
-d3JvbmcuIEFsbCBvZiB0aGUgYml0bWFwcyBtYXkgYmUgY29ycnVwdGVkIiwgYm0tPm5hbWUpOw0K
-DQpIbW0sIHlvdXIgd29yZGluZyBjb3ZlcnMgaW52YWxpZCBjYXNlIHdoZW4gaW5jb25zaXN0ZW50
-IGJpdG1hcCBpcyBub3QgSU5fVVNFLCBhbmQgc291bmRzDQpiZXR0ZXIgZm9yIHVzZXIsIHRob3Vn
-aCBtYXkgYmUgbGVzcyBwcmVjaXNlIChhcyBpdCBtYXkgYmUgbm90IG9uZSByZW9wZW4gaW4gYSBz
-ZXF1ZW5jZS4uKS4NCk9rIGZvciBtZS4NCg0KPiArICAgICAgICAgICAgcmV0ID0gLUVJTlZBTDsN
-Cj4gKyAgICAgICAgICAgIGdvdG8gb3V0Ow0KPiAgICAgICAgICAgfQ0KPiArDQo+ICsgICAgICAg
-IGJtLT5mbGFncyB8PSBCTUVfRkxBR19JTl9VU0U7DQo+ICsgICAgICAgIHJvX2RpcnR5X2JpdG1h
-cHMgPSBnX3NsaXN0X2FwcGVuZChyb19kaXJ0eV9iaXRtYXBzLCBiaXRtYXApOw0KPiAgICAgICB9
-DQo+ICAgDQo+ICAgICAgIGlmIChyb19kaXJ0eV9iaXRtYXBzICE9IE5VTEwpIHsNCj4gQEAgLTE0
-MjQsOCArMTQyNyw4IEBAIHZvaWQgcWNvdzJfc3RvcmVfcGVyc2lzdGVudF9kaXJ0eV9iaXRtYXBz
-KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBFcnJvciAqKmVycnApDQo+ICAgICAgICAgICBRY293MkJp
-dG1hcCAqYm07DQo+ICAgDQo+ICAgICAgICAgICBpZiAoIWJkcnZfZGlydHlfYml0bWFwX2dldF9w
-ZXJzaXN0YW5jZShiaXRtYXApIHx8DQo+IC0gICAgICAgICAgICBiZHJ2X2RpcnR5X2JpdG1hcF9y
-ZWFkb25seShiaXRtYXApKQ0KPiAtICAgICAgICB7DQo+ICsgICAgICAgICAgICBiZHJ2X2RpcnR5
-X2JpdG1hcF9yZWFkb25seShiaXRtYXApIHx8DQo+ICsgICAgICAgICAgICBiZHJ2X2RpcnR5X2Jp
-dG1hcF9pbmNvbnNpc3RlbnQoYml0bWFwKSkgew0KPiAgICAgICAgICAgICAgIGNvbnRpbnVlOw0K
-PiAgICAgICAgICAgfQ0KPiAgIA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
-DQo=
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+
+Add emulation of MMI instruction PCPYUD. The emulation is implemented
+using TCG front end operations directly to achieve better performance.
+
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+---
+ target/mips/translate.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
+
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 117a29c..124f766 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -24454,6 +24454,44 @@ static void gen_mmi_pcpyld(DisasContext *ctx)
+     }
+ }
+ 
++/*
++ *  PCPYUD rd, rs, rt
++ *
++ *    Parallel Copy Upper Doubleword
++ *
++ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
++ *  +-----------+---------+---------+---------+---------+-----------+
++ *  |    MMI    |   rs    |   rt    |   rd    | PCPYUD  |    MMI3   |
++ *  +-----------+---------+---------+---------+---------+-----------+
++ */
++static void gen_mmi_pcpyud(DisasContext *ctx)
++{
++    uint32_t rs, rt, rd;
++    uint32_t opcode;
++
++    opcode = ctx->opcode;
++
++    rs = extract32(opcode, 21, 5);
++    rt = extract32(opcode, 16, 5);
++    rd = extract32(opcode, 11, 5);
++
++    if (rd == 0) {
++        /* nop */
++    } else if ((rt == 0) && (rs == 0)) {
++        tcg_gen_movi_i64(cpu_gpr[rt], 0);
++        tcg_gen_movi_i64(cpu_mmr[rt], 0);
++    } else if (rt == 0) {
++        tcg_gen_movi_i64(cpu_mmr[rd], 0);
++        tcg_gen_mov_i64(cpu_gpr[rd], cpu_mmr[rs]);
++    } else if (rs == 0) {
++        tcg_gen_mov_i64(cpu_mmr[rd], cpu_mmr[rt]);
++        tcg_gen_movi_i64(cpu_gpr[rd], 0);
++    } else {
++        tcg_gen_mov_i64(cpu_mmr[rd], cpu_mmr[rt]);
++        tcg_gen_mov_i64(cpu_gpr[rd], cpu_mmr[rs]);
++    }
++}
++
+ #endif
+ 
+ 
+@@ -27504,7 +27542,6 @@ static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
+     case MMI_OPC_3_PINTEH:     /* TODO: MMI_OPC_3_PINTEH */
+     case MMI_OPC_3_PMULTUW:    /* TODO: MMI_OPC_3_PMULTUW */
+     case MMI_OPC_3_PDIVUW:     /* TODO: MMI_OPC_3_PDIVUW */
+-    case MMI_OPC_3_PCPYUD:     /* TODO: MMI_OPC_3_PCPYUD */
+     case MMI_OPC_3_POR:        /* TODO: MMI_OPC_3_POR */
+     case MMI_OPC_3_PNOR:       /* TODO: MMI_OPC_3_PNOR */
+     case MMI_OPC_3_PEXCH:      /* TODO: MMI_OPC_3_PEXCH */
+@@ -27514,6 +27551,9 @@ static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
+     case MMI_OPC_3_PCPYH:
+         gen_mmi_pcpyh(ctx);
+         break;
++    case MMI_OPC_3_PCPYUD:
++        gen_mmi_pcpyud(ctx);
++        break;
+     default:
+         MIPS_INVAL("TX79 MMI class MMI3");
+         generate_exception_end(ctx, EXCP_RI);
+-- 
+2.7.4
