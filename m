@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38966)
+Received: from eggs.gnu.org ([209.51.188.92]:38980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI6V-0001zI-He
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:40 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI6W-0001zp-2U
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI6R-0002E7-AW
+	(envelope-from <kwolf@redhat.com>) id 1gyI6R-0002E8-Ah
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:38 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:52 +0100
-Message-Id: <20190225152053.15976-71-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:50 +0100
+Message-Id: <20190225152053.15976-69-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 70/71] vmdk: false positive of compat6 with
- hwversion not set
+Subject: [Qemu-devel] [PULL 68/71] qcow2: include LUKS payload overhead in
+ qemu-img measure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +25,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: yuchenlin <yuchenlin@synology.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-In vmdk_co_create_opts, when it finds hw_version is undefined, it will
-set it to 4, which misleading the compat6 and hwversion in
-vmdk_co_do_create. Simply set hw_version to NULL after free, let
-the logic in vmdk_co_do_create to decide the value of hw_version.
+LUKS encryption reserves clusters for its own payload data.  The size of
+this area must be included in the qemu-img measure calculation so that
+we arrive at the correct minimum required image size.
 
-This bug can be reproduced by:
+(Ab)use the qcrypto_block_create() API to determine the payload
+overhead.  We discard the payload data that qcrypto thinks will be
+written to the image.
 
-$ qemu-img convert -O vmdk -o subformat=3DstreamOptimized,compat6
-/home/yuchenlin/syno.qcow2 /home/yuchenlin/syno.vmdk
-
-qemu-img: /home/yuchenlin/syno.vmdk: error while converting vmdk:
-compat6 cannot be enabled with hwversion set
-
-Signed-off-by: yuchenlin <yuchenlin@synology.com>
-Message-id: 20190221110805.28239-1-yuchenlin@synology.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190218104525.23674-2-stefanha@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/vmdk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/qcow2.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 71 insertions(+), 1 deletion(-)
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 91345babb5..f4e68aa00b 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2267,7 +2267,7 @@ static int coroutine_fn vmdk_co_create_opts(const c=
-har *filename, QemuOpts *opts
-     compat6 =3D qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false);
-     if (strcmp(hw_version, "undefined") =3D=3D 0) {
-         g_free(hw_version);
--        hw_version =3D g_strdup("4");
-+        hw_version =3D NULL;
-     }
-     fmt =3D qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
-     zeroed_grain =3D qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN,=
- false);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 92242fb14f..1de5e24613 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4236,6 +4236,60 @@ static coroutine_fn int qcow2_co_flush_to_os(Block=
+DriverState *bs)
+     return ret;
+ }
+=20
++static ssize_t qcow2_measure_crypto_hdr_init_func(QCryptoBlock *block,
++        size_t headerlen, void *opaque, Error **errp)
++{
++    size_t *headerlenp =3D opaque;
++
++    /* Stash away the payload size */
++    *headerlenp =3D headerlen;
++    return 0;
++}
++
++static ssize_t qcow2_measure_crypto_hdr_write_func(QCryptoBlock *block,
++        size_t offset, const uint8_t *buf, size_t buflen,
++        void *opaque, Error **errp)
++{
++    /* Discard the bytes, we're not actually writing to an image */
++    return buflen;
++}
++
++/* Determine the number of bytes for the LUKS payload */
++static bool qcow2_measure_luks_headerlen(QemuOpts *opts, size_t *len,
++                                         Error **errp)
++{
++    QDict *opts_qdict;
++    QDict *cryptoopts_qdict;
++    QCryptoBlockCreateOptions *cryptoopts;
++    QCryptoBlock *crypto;
++
++    /* Extract "encrypt." options into a qdict */
++    opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
++    qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, "encrypt.");
++    qobject_unref(opts_qdict);
++
++    /* Build QCryptoBlockCreateOptions object from qdict */
++    qdict_put_str(cryptoopts_qdict, "format", "luks");
++    cryptoopts =3D block_crypto_create_opts_init(cryptoopts_qdict, errp)=
+;
++    qobject_unref(cryptoopts_qdict);
++    if (!cryptoopts) {
++        return false;
++    }
++
++    /* Fake LUKS creation in order to determine the payload size */
++    crypto =3D qcrypto_block_create(cryptoopts, "encrypt.",
++                                  qcow2_measure_crypto_hdr_init_func,
++                                  qcow2_measure_crypto_hdr_write_func,
++                                  len, errp);
++    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
++    if (!crypto) {
++        return false;
++    }
++
++    qcrypto_block_free(crypto);
++    return true;
++}
++
+ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState =
+*in_bs,
+                                        Error **errp)
+ {
+@@ -4245,11 +4299,13 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *=
+opts, BlockDriverState *in_bs,
+     uint64_t virtual_size; /* disk size as seen by guest */
+     uint64_t refcount_bits;
+     uint64_t l2_tables;
++    uint64_t luks_payload_size =3D 0;
+     size_t cluster_size;
+     int version;
+     char *optstr;
+     PreallocMode prealloc;
+     bool has_backing_file;
++    bool has_luks;
+=20
+     /* Parse image creation options */
+     cluster_size =3D qcow2_opt_get_cluster_size_del(opts, &local_err);
+@@ -4279,6 +4335,20 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *o=
+pts, BlockDriverState *in_bs,
+     has_backing_file =3D !!optstr;
+     g_free(optstr);
+=20
++    optstr =3D qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
++    has_luks =3D optstr && strcmp(optstr, "luks") =3D=3D 0;
++    g_free(optstr);
++
++    if (has_luks) {
++        size_t headerlen;
++
++        if (!qcow2_measure_luks_headerlen(opts, &headerlen, &local_err))=
+ {
++            goto err;
++        }
++
++        luks_payload_size =3D ROUND_UP(headerlen, cluster_size);
++    }
++
+     virtual_size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
+     virtual_size =3D ROUND_UP(virtual_size, cluster_size);
+=20
+@@ -4349,7 +4419,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *op=
+ts, BlockDriverState *in_bs,
+     info =3D g_new(BlockMeasureInfo, 1);
+     info->fully_allocated =3D
+         qcow2_calc_prealloc_size(virtual_size, cluster_size,
+-                                 ctz32(refcount_bits));
++                                 ctz32(refcount_bits)) + luks_payload_si=
+ze;
+=20
+     /* Remove data clusters that are not required.  This overestimates t=
+he
+      * required size because metadata needed for the fully allocated fil=
+e is
 --=20
 2.20.1
