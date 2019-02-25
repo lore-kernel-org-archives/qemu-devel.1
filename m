@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36833)
+Received: from eggs.gnu.org ([209.51.188.92]:36829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI47-00084K-PH
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1gyI47-000849-KB
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI45-0000Vf-UW
+	(envelope-from <eblake@redhat.com>) id 1gyI46-0000Vw-2t
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:11 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:19:44 +0100
-Message-Id: <20190225152053.15976-3-kwolf@redhat.com>
-In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
-References: <20190225152053.15976-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 25 Feb 2019 09:20:15 -0600
+Message-Id: <20190225152015.26089-4-eblake@redhat.com>
+In-Reply-To: <20190225152015.26089-1-eblake@redhat.com>
+References: <20190225152015.26089-1-eblake@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/71] MAINTAINERS: Remove myself as block
- maintainer
+Subject: [Qemu-devel] [PULL 3/3] iotests: avoid broken pipe with certtool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,100 +22,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-From: Jeff Cody <jcody@redhat.com>
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-I'll not be involved in day-to-day qemu development.  Remove myself as
-maintainer from the remainder of the network block drivers, and revert
-them to the general block layer maintainership.
+When we run "certtool 2>&1 | head -1" the latter command is likely to
+complete and exit before certtool has written everything it wants to
+stderr. In at least the RHEL-7 gnutls 3.3.29 this causes certtool to
+quit with broken pipe before it has finished writing the desired
+output file to disk. This causes non-deterministic failures of the
+iotest 233 because the certs are sometimes zero length files.
+If certtool fails the "head -1" means we also lose any useful error
+message it would have printed.
 
-Move 'sheepdog' to the 'Odd Fixes' support level.
+Thus this patch gets rid of the pipe and post-processes the output in a
+more flexible & reliable manner.
 
-For VHDX, added my personal email address as a maintainer, as I can
-answer questions or send the occassional bug fix.  Leaving it as
-'Supported', instead of 'Odd Fixes', because I think the rest of the
-block layer maintainers and developers will upkeep it as well, if
-needed.
-
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Acked-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <63e205cb84c8f0a10c1bc6d5d6856d72ceb56e41.1537984851.git.jcod=
-y@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-Id: <20190220145819.30969-3-berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- MAINTAINERS | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
+ tests/qemu-iotests/common.tls | 48 +++++++++++++++++++++++------------
+ 1 file changed, 32 insertions(+), 16 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bb4d9829a4..e7f69f31ed 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2246,26 +2246,22 @@ F: block/vmdk.c
-=20
- RBD
- M: Josh Durgin <jdurgin@redhat.com>
--M: Jeff Cody <jcody@redhat.com>
- L: qemu-block@nongnu.org
- S: Supported
- F: block/rbd.c
--T: git https://github.com/codyprime/qemu-kvm-jtc.git block
-=20
- Sheepdog
- M: Liu Yuan <namei.unix@gmail.com>
--M: Jeff Cody <jcody@redhat.com>
- L: qemu-block@nongnu.org
--S: Supported
-+L: sheepdog@lists.wpkg.org
-+S: Odd Fixes
- F: block/sheepdog.c
--T: git https://github.com/codyprime/qemu-kvm-jtc.git block
-=20
- VHDX
--M: Jeff Cody <jcody@redhat.com>
-+M: Jeff Cody <codyprime@gmail.com>
- L: qemu-block@nongnu.org
- S: Supported
- F: block/vhdx*
--T: git https://github.com/codyprime/qemu-kvm-jtc.git block
-=20
- VDI
- M: Stefan Weil <sw@weilnetz.de>
-@@ -2295,34 +2291,26 @@ F: docs/interop/nbd.txt
- T: git https://repo.or.cz/qemu/ericb.git nbd
-=20
- NFS
--M: Jeff Cody <jcody@redhat.com>
- M: Peter Lieven <pl@kamp.de>
- L: qemu-block@nongnu.org
- S: Maintained
- F: block/nfs.c
--T: git https://github.com/codyprime/qemu-kvm-jtc.git block
-=20
- SSH
- M: Richard W.M. Jones <rjones@redhat.com>
--M: Jeff Cody <jcody@redhat.com>
- L: qemu-block@nongnu.org
- S: Supported
- F: block/ssh.c
--T: git https://github.com/codyprime/qemu-kvm-jtc.git block
-=20
- CURL
--M: Jeff Cody <jcody@redhat.com>
- L: qemu-block@nongnu.org
- S: Supported
- F: block/curl.c
--T: git https://github.com/codyprime/qemu-kvm-jtc.git block
-=20
- GLUSTER
--M: Jeff Cody <jcody@redhat.com>
- L: qemu-block@nongnu.org
- S: Supported
- F: block/gluster.c
--T: git https://github.com/codyprime/qemu-kvm-jtc.git block
-=20
- Null Block Driver
- M: Fam Zheng <fam@euphon.net>
+diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tl=
+s
+index eae81789bbc..3caf989d28c 100644
+--- a/tests/qemu-iotests/common.tls
++++ b/tests/qemu-iotests/common.tls
+@@ -29,6 +29,17 @@ tls_x509_cleanup()
+ }
+
+
++tls_certtool()
++{
++    certtool "$@" 1>"${tls_dir}"/certtool.log 2>&1
++    if test "$?" =3D 0; then
++      head -1 "${tls_dir}"/certtool.log
++    else
++      cat "${tls_dir}"/certtool.log
++    fi
++    rm -f "${tls_dir}"/certtool.log
++}
++
+ tls_x509_init()
+ {
+     (certtool --help) >/dev/null 2>&1 || \
+@@ -71,10 +82,11 @@ ca
+ cert_signing_key
+ EOF
+
+-    certtool --generate-self-signed \
+-             --load-privkey "${tls_dir}/key.pem" \
+-             --template "${tls_dir}/ca.info" \
+-             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | head -1
++    tls_certtool \
++        --generate-self-signed \
++        --load-privkey "${tls_dir}/key.pem" \
++        --template "${tls_dir}/ca.info" \
++        --outfile "${tls_dir}/$name-cert.pem"
+
+     rm -f "${tls_dir}/ca.info"
+ }
+@@ -98,12 +110,14 @@ encryption_key
+ signing_key
+ EOF
+
+-    certtool --generate-certificate \
+-             --load-ca-privkey "${tls_dir}/key.pem" \
+-             --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
+-             --load-privkey "${tls_dir}/key.pem" \
+-             --template "${tls_dir}/cert.info" \
+-             --outfile "${tls_dir}/$name/server-cert.pem" 2>&1 | head -1
++    tls_certtool \
++        --generate-certificate \
++        --load-ca-privkey "${tls_dir}/key.pem" \
++        --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
++        --load-privkey "${tls_dir}/key.pem" \
++        --template "${tls_dir}/cert.info" \
++        --outfile "${tls_dir}/$name/server-cert.pem"
++
+     ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
+     ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/server-key.pem"
+
+@@ -127,12 +141,14 @@ encryption_key
+ signing_key
+ EOF
+
+-    certtool --generate-certificate \
+-             --load-ca-privkey "${tls_dir}/key.pem" \
+-             --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
+-             --load-privkey "${tls_dir}/key.pem" \
+-             --template "${tls_dir}/cert.info" \
+-             --outfile "${tls_dir}/$name/client-cert.pem" 2>&1 | head -1
++    tls_certtool \
++        --generate-certificate \
++        --load-ca-privkey "${tls_dir}/key.pem" \
++        --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
++        --load-privkey "${tls_dir}/key.pem" \
++        --template "${tls_dir}/cert.info" \
++        --outfile "${tls_dir}/$name/client-cert.pem"
++
+     ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
+     ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/client-key.pem"
+
 --=20
 2.20.1
