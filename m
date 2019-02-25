@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36618)
+Received: from eggs.gnu.org ([209.51.188.92]:36630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyI3u-0007sT-5h
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:20:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1gyI3w-0007u0-5B
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyI3o-0000DH-D3
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:20:56 -0500
+	(envelope-from <eblake@redhat.com>) id 1gyI3t-0000IC-C6
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:20:58 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 25 Feb 2019 09:20:13 -0600
-Message-Id: <20190225152015.26089-2-eblake@redhat.com>
+Date: Mon, 25 Feb 2019 09:20:14 -0600
+Message-Id: <20190225152015.26089-3-eblake@redhat.com>
 In-Reply-To: <20190225152015.26089-1-eblake@redhat.com>
 References: <20190225152015.26089-1-eblake@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/3] iotests: handle TypeError for Python3 in
- test 242
+Subject: [Qemu-devel] [PULL 2/3] iotests: ensure we print nbd server log on
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +24,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-The data type for bytes in Python3 differs from the one in Python2.
-Those cases should be managed separately.
+If we abort the iotest early the server.log file might contain useful
+information for diagnosing the problem. Ensure its contents are
+displayed in this case.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuoz=
-zo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-Id: <20190220145819.30969-2-berrange@redhat.com>
+[eblake: fix shell quoting]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/242 | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/233 | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
-index 16c65edcd7f..446fbf8ea13 100755
---- a/tests/qemu-iotests/242
-+++ b/tests/qemu-iotests/242
-@@ -20,6 +20,7 @@
+diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
+index fc345a1a46e..adb742fafb0 100755
+--- a/tests/qemu-iotests/233
++++ b/tests/qemu-iotests/233
+@@ -30,6 +30,8 @@ _cleanup()
+ {
+     nbd_server_stop
+     _cleanup_test_img
++    # If we aborted early we want to see this log for diagnosis
++    test -f "$TEST_DIR/server.log" && cat "$TEST_DIR/server.log"
+     rm -f "$TEST_DIR/server.log"
+     tls_x509_cleanup
+ }
+@@ -120,6 +122,7 @@ $QEMU_IO -f $IMGFMT -r -U -c 'r -P 0x22 1m 1m' "$TEST=
+_IMG" | _filter_qemu_io
+ echo
+ echo "=3D=3D final server log =3D=3D"
+ cat "$TEST_DIR/server.log"
++rm -f "$TEST_DIR/server.log"
 
- import iotests
- import json
-+import sys
- from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
-     file_path, img_info_log, log, filter_qemu_io
-
-@@ -65,9 +66,12 @@ def toggle_flag(offset):
-     with open(disk, "r+b") as f:
-         f.seek(offset, 0)
-         c =3D f.read(1)
--        toggled =3D chr(ord(c) ^ bitmap_flag_unknown)
-+        toggled =3D ord(c) ^ bitmap_flag_unknown
-         f.seek(-1, 1)
--        f.write(toggled)
-+        if sys.version_info.major >=3D 3:
-+            f.write(bytes([toggled]))
-+        else:
-+            f.write(chr(toggled))
-
-
- qemu_img_create('-f', iotests.imgfmt, disk, '1M')
+ # success, all done
+ echo "*** done"
 --=20
 2.20.1
