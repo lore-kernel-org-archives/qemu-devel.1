@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38783)
+Received: from eggs.gnu.org ([209.51.188.92]:38827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI68-0001eu-1Q
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI6C-0001jD-Cd
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI67-000221-5r
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI6A-00023y-1j
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:45 +0100
-Message-Id: <20190225152053.15976-64-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:47 +0100
+Message-Id: <20190225152053.15976-66-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 63/71] iotests.py: Add is_str()
+Subject: [Qemu-devel] [PULL 65/71] iotests: Filter SSH paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +26,28 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-On Python 2.x, strings are not always unicode strings.  This function
-checks whether a given value is a plain string, or a unicode string (if
-there is a difference).
+8908b253c4ad5f8874c8d13abec169c696a5cd32 has implemented filtering of
+remote paths for NFS, but forgot SSH.  This patch takes care of that.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190210145736.1486-7-mreitz@redhat.com
+Message-id: 20190210145736.1486-9-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tests/qemu-iotests/common.rc | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 82dd096c6e..52fc77563c 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -236,6 +236,12 @@ def image_size(img):
-     r =3D qemu_img_pipe('info', '--output=3Djson', '-f', imgfmt, img)
-     return json.loads(r)['virtual-size']
-=20
-+def is_str(val):
-+    if sys.version_info.major >=3D 3:
-+        return isinstance(val, str)
-+    else:
-+        return isinstance(val, str) or isinstance(val, unicode)
-+
- test_dir_re =3D re.compile(r"%s" % test_dir)
- def filter_test_dir(msg):
-     return test_dir_re.sub("TEST_DIR", msg)
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index e15e7a7c8e..09a27f02d0 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -145,6 +145,7 @@ else
+         TEST_IMG=3D"nbd:127.0.0.1:10810"
+     elif [ "$IMGPROTO" =3D "ssh" ]; then
+         TEST_IMG_FILE=3D$TEST_DIR/t.$IMGFMT
++        REMOTE_TEST_DIR=3D"ssh://127.0.0.1$TEST_DIR"
+         TEST_IMG=3D"ssh://127.0.0.1$TEST_IMG_FILE"
+     elif [ "$IMGPROTO" =3D "nfs" ]; then
+         TEST_IMG_FILE=3D$TEST_DIR/t.$IMGFMT
 --=20
 2.20.1
