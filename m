@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57900)
+Received: from eggs.gnu.org ([209.51.188.92]:57993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyFQg-0005Ip-6D
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:32:20 -0500
+	(envelope-from <berrange@redhat.com>) id 1gyFR7-0005aw-AZ
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:32:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyFQd-0005NI-Ic
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:32:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60958)
+	(envelope-from <berrange@redhat.com>) id 1gyFR3-0005e4-5u
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:32:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49460)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyFQd-0005Mg-8w
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:32:15 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyFR2-0005WI-Ql
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 07:32:41 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 25 Feb 2019 12:31:08 +0000
-Message-Id: <20190225123111.30363-9-berrange@redhat.com>
+Date: Mon, 25 Feb 2019 12:31:10 +0000
+Message-Id: <20190225123111.30363-11-berrange@redhat.com>
 In-Reply-To: <20190225123111.30363-1-berrange@redhat.com>
 References: <20190225123111.30363-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/11] authz: add QAuthZList object type for an
- access control list
+Subject: [Qemu-devel] [PULL 10/11] authz: add QAuthZPAM object type for
+ authorizing using PAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +32,89 @@ Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Be
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Add a QAuthZList object type that implements the QAuthZ interface. This
-built-in implementation maintains a trivial access control list with a
-sequence of match rules and a final default policy. This replicates the
-functionality currently provided by the qemu_acl module.
+Add an authorization backend that talks to PAM to check whether the user
+identity is allowed. This only uses the PAM account validation facility,
+which is essentially just a check to see if the provided username is perm=
+itted
+access. It doesn't use the authentication or session parts of PAM, since
+that's dealt with by the relevant part of QEMU (eg VNC server).
 
-To create an instance of this object via the QMP monitor, the syntax
-used would be:
+Consider starting QEMU with a VNC server and telling it to use TLS with
+x509 client certificates and configuring it to use an PAM to validate
+the x509 distinguished name. In this example we're telling it to use PAM
+for the QAuthZ impl with a service name of "qemu-vnc"
 
-  {
-    "execute": "object-add",
-    "arguments": {
-      "qom-type": "authz-list",
-      "id": "authz0",
-      "props": {
-        "rules": [
-           { "match": "fred", "policy": "allow", "format": "exact" },
-           { "match": "bob", "policy": "allow", "format": "exact" },
-           { "match": "danb", "policy": "deny", "format": "glob" },
-           { "match": "dan*", "policy": "allow", "format": "exact" },
-        ],
-        "policy": "deny"
-      }
-    }
-  }
+ $ qemu-system-x86_64 \
+     -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/security/qemut=
+ls,\
+             endpoint=3Dserver,verify-peer=3Dyes \
+     -object authz-pam,id=3Dauthz0,service=3Dqemu-vnc \
+     -vnc :1,tls-creds=3Dtls0,tls-authz=3Dauthz0
 
-This sets up an authorization rule that allows 'fred', 'bob' and anyone
-whose name starts with 'dan', except for 'danb'. Everyone unmatched is
-denied.
+This requires an /etc/pam/qemu-vnc file to be created with the auth
+rules. A very simple file based whitelist can be setup using
 
-It is not currently possible to create this via -object, since there is
-no syntax supported to specify non-scalar properties for objects. This
-is likely to be addressed by later support for using JSON with -object,
-or an equivalent approach.
+  $ cat > /etc/pam/qemu-vnc <<EOF
+  account         requisite       pam_listfile.so item=3Duser sense=3Dall=
+ow file=3D/etc/qemu/vnc.allow
+  EOF
 
-In any case the future "authz-listfile" object can be used from the
-CLI and is likely a better choice, as it allows the ACL to be refreshed
-automatically on change.
+The /etc/qemu/vnc.allow file simply contains one username per line. Any
+username not in the file is denied. The usernames in this example are
+the x509 distinguished name from the client's x509 cert.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+  $ cat > /etc/qemu/vnc.allow <<EOF
+  CN=3Dlaptop.berrange.com,O=3DBerrange Home,L=3DLondon,ST=3DLondon,C=3DG=
+B
+  EOF
+
+More interesting would be to configure PAM to use an LDAP backend, so
+that the QEMU authorization check data can be centralized instead of
+requiring each compute host to have file maintained.
+
+The main limitation with this PAM module is that the rules apply to all
+QEMU instances on the host. Setting up different rules per VM, would
+require creating a separate PAM service name & config file for every
+guest. An alternative approach for the future might be to not pass in
+the plain username to PAM, but instead combine the VM name or UUID with
+the username. This requires further consideration though.
+
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- MAINTAINERS             |   1 +
- authz/Makefile.objs     |   1 +
- authz/list.c            | 271 ++++++++++++++++++++++++++++++++++++++++
- authz/trace-events      |   4 +
- include/authz/list.h    | 106 ++++++++++++++++
- qapi/Makefile.objs      |   2 +-
- qapi/authz.json         |  58 +++++++++
- qapi/qapi-schema.json   |   1 +
+ authz/Makefile.objs     |   3 +
+ authz/pamacct.c         | 148 ++++++++++++++++++++++++++++++++++++++++
+ authz/trace-events      |   3 +
+ configure               |  37 ++++++++++
+ include/authz/pamacct.h | 100 +++++++++++++++++++++++++++
+ qemu-options.hx         |  35 ++++++++++
  tests/Makefile.include  |   2 +
- tests/test-authz-list.c | 159 +++++++++++++++++++++++
- 10 files changed, 604 insertions(+), 1 deletion(-)
- create mode 100644 authz/list.c
- create mode 100644 include/authz/list.h
- create mode 100644 qapi/authz.json
- create mode 100644 tests/test-authz-list.c
+ tests/test-authz-pam.c  | 124 +++++++++++++++++++++++++++++++++
+ 8 files changed, 452 insertions(+)
+ create mode 100644 authz/pamacct.c
+ create mode 100644 include/authz/pamacct.h
+ create mode 100644 tests/test-authz-pam.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d69d1d70e8..a35c93c564 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2083,6 +2083,7 @@ User authorization
- M: Daniel P. Berrange <berrange@redhat.com>
- S: Maintained
- F: authz/
-+F: qapi/authz.json
- F: include/authz/
- F: tests/test-authz-*
-=20
 diff --git a/authz/Makefile.objs b/authz/Makefile.objs
-index 2a75d53840..921fa624d7 100644
+index 8351bf181d..ed7b273596 100644
 --- a/authz/Makefile.objs
 +++ b/authz/Makefile.objs
-@@ -1,2 +1,3 @@
- authz-obj-y +=3D base.o
+@@ -2,3 +2,6 @@ authz-obj-y +=3D base.o
  authz-obj-y +=3D simple.o
-+authz-obj-y +=3D list.o
-diff --git a/authz/list.c b/authz/list.c
+ authz-obj-y +=3D list.o
+ authz-obj-y +=3D listfile.o
++authz-obj-$(CONFIG_AUTH_PAM) +=3D pamacct.o
++
++pamacct.o-libs =3D -lpam
+diff --git a/authz/pamacct.c b/authz/pamacct.c
 new file mode 100644
-index 0000000000..dc6b0fec13
+index 0000000000..5038358cdc
 --- /dev/null
-+++ b/authz/list.c
-@@ -0,0 +1,271 @@
++++ b/authz/pamacct.c
+@@ -0,0 +1,148 @@
 +/*
-+ * QEMU access control list authorization driver
++ * QEMU PAM authorization driver
 + *
 + * Copyright (c) 2018 Red Hat, Inc.
 + *
@@ -139,241 +135,118 @@ nses/>.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "authz/list.h"
++#include "authz/pamacct.h"
 +#include "authz/trace.h"
 +#include "qom/object_interfaces.h"
-+#include "qapi/qapi-visit-authz.h"
 +
-+static bool qauthz_list_is_allowed(QAuthZ *authz,
-+                                   const char *identity,
-+                                   Error **errp)
++#include <security/pam_appl.h>
++
++
++static bool qauthz_pam_is_allowed(QAuthZ *authz,
++                                  const char *identity,
++                                  Error **errp)
 +{
-+    QAuthZList *lauthz =3D QAUTHZ_LIST(authz);
-+    QAuthZListRuleList *rules =3D lauthz->rules;
++    QAuthZPAM *pauthz =3D QAUTHZ_PAM(authz);
++    const struct pam_conv pam_conversation =3D { 0 };
++    pam_handle_t *pamh =3D NULL;
++    int ret;
 +
-+    while (rules) {
-+        QAuthZListRule *rule =3D rules->value;
-+        QAuthZListFormat format =3D rule->has_format ? rule->format :
-+            QAUTHZ_LIST_FORMAT_EXACT;
-+
-+        trace_qauthz_list_check_rule(authz, rule->match, identity,
-+                                     format, rule->policy);
-+        switch (format) {
-+        case QAUTHZ_LIST_FORMAT_EXACT:
-+            if (g_str_equal(rule->match, identity)) {
-+                return rule->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW;
-+            }
-+            break;
-+        case QAUTHZ_LIST_FORMAT_GLOB:
-+            if (g_pattern_match_simple(rule->match, identity)) {
-+                return rule->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW;
-+            }
-+            break;
-+        default:
-+            g_warn_if_reached();
-+            return false;
-+        }
-+        rules =3D rules->next;
++    trace_qauthz_pam_check(authz, identity, pauthz->service);
++    ret =3D pam_start(pauthz->service,
++                    identity,
++                    &pam_conversation,
++                    &pamh);
++    if (ret !=3D PAM_SUCCESS) {
++        error_setg(errp, "Unable to start PAM transaction: %s",
++                   pam_strerror(NULL, ret));
++        return false;
 +    }
 +
-+    trace_qauthz_list_default_policy(authz, identity, lauthz->policy);
-+    return lauthz->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW;
++    ret =3D pam_acct_mgmt(pamh, PAM_SILENT);
++    pam_end(pamh, ret);
++    if (ret !=3D PAM_SUCCESS) {
++        error_setg(errp, "Unable to authorize user '%s': %s",
++                   identity, pam_strerror(pamh, ret));
++        return false;
++    }
++
++    return true;
 +}
 +
 +
 +static void
-+qauthz_list_prop_set_policy(Object *obj,
-+                            int value,
++qauthz_pam_prop_set_service(Object *obj,
++                            const char *service,
 +                            Error **errp G_GNUC_UNUSED)
 +{
-+    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
++    QAuthZPAM *pauthz =3D QAUTHZ_PAM(obj);
 +
-+    lauthz->policy =3D value;
++    g_free(pauthz->service);
++    pauthz->service =3D g_strdup(service);
 +}
 +
 +
-+static int
-+qauthz_list_prop_get_policy(Object *obj,
++static char *
++qauthz_pam_prop_get_service(Object *obj,
 +                            Error **errp G_GNUC_UNUSED)
 +{
-+    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
++    QAuthZPAM *pauthz =3D QAUTHZ_PAM(obj);
 +
-+    return lauthz->policy;
++    return g_strdup(pauthz->service);
 +}
 +
 +
 +static void
-+qauthz_list_prop_get_rules(Object *obj, Visitor *v, const char *name,
-+                           void *opaque, Error **errp)
++qauthz_pam_complete(UserCreatable *uc, Error **errp)
 +{
-+    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
-+
-+    visit_type_QAuthZListRuleList(v, name, &lauthz->rules, errp);
-+}
-+
-+static void
-+qauthz_list_prop_set_rules(Object *obj, Visitor *v, const char *name,
-+                           void *opaque, Error **errp)
-+{
-+    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
-+    QAuthZListRuleList *oldrules;
-+
-+    oldrules =3D lauthz->rules;
-+    visit_type_QAuthZListRuleList(v, name, &lauthz->rules, errp);
-+
-+    qapi_free_QAuthZListRuleList(oldrules);
 +}
 +
 +
 +static void
-+qauthz_list_finalize(Object *obj)
++qauthz_pam_finalize(Object *obj)
 +{
-+    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
++    QAuthZPAM *pauthz =3D QAUTHZ_PAM(obj);
 +
-+    qapi_free_QAuthZListRuleList(lauthz->rules);
++    g_free(pauthz->service);
 +}
 +
 +
 +static void
-+qauthz_list_class_init(ObjectClass *oc, void *data)
++qauthz_pam_class_init(ObjectClass *oc, void *data)
 +{
++    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
 +    QAuthZClass *authz =3D QAUTHZ_CLASS(oc);
 +
-+    object_class_property_add_enum(oc, "policy",
-+                                   "QAuthZListPolicy",
-+                                   &QAuthZListPolicy_lookup,
-+                                   qauthz_list_prop_get_policy,
-+                                   qauthz_list_prop_set_policy,
-+                                   NULL);
++    ucc->complete =3D qauthz_pam_complete;
++    authz->is_allowed =3D qauthz_pam_is_allowed;
 +
-+    object_class_property_add(oc, "rules", "QAuthZListRule",
-+                              qauthz_list_prop_get_rules,
-+                              qauthz_list_prop_set_rules,
-+                              NULL, NULL, NULL);
-+
-+    authz->is_allowed =3D qauthz_list_is_allowed;
++    object_class_property_add_str(oc, "service",
++                                  qauthz_pam_prop_get_service,
++                                  qauthz_pam_prop_set_service,
++                                  NULL);
 +}
 +
 +
-+QAuthZList *qauthz_list_new(const char *id,
-+                            QAuthZListPolicy policy,
-+                            Error **errp)
++QAuthZPAM *qauthz_pam_new(const char *id,
++                          const char *service,
++                          Error **errp)
 +{
-+    return QAUTHZ_LIST(
-+        object_new_with_props(TYPE_QAUTHZ_LIST,
++    return QAUTHZ_PAM(
++        object_new_with_props(TYPE_QAUTHZ_PAM,
 +                              object_get_objects_root(),
 +                              id, errp,
-+                              "policy", QAuthZListPolicy_str(policy),
++                              "service", service,
 +                              NULL));
 +}
 +
-+ssize_t qauthz_list_append_rule(QAuthZList *auth,
-+                                const char *match,
-+                                QAuthZListPolicy policy,
-+                                QAuthZListFormat format,
-+                                Error **errp)
-+{
-+    QAuthZListRule *rule;
-+    QAuthZListRuleList *rules, *tmp;
-+    size_t i =3D 0;
 +
-+    rule =3D g_new0(QAuthZListRule, 1);
-+    rule->policy =3D policy;
-+    rule->match =3D g_strdup(match);
-+    rule->format =3D format;
-+    rule->has_format =3D true;
-+
-+    tmp =3D g_new0(QAuthZListRuleList, 1);
-+    tmp->value =3D rule;
-+
-+    rules =3D auth->rules;
-+    if (rules) {
-+        while (rules->next) {
-+            i++;
-+            rules =3D rules->next;
-+        }
-+        rules->next =3D tmp;
-+        return i + 1;
-+    } else {
-+        auth->rules =3D tmp;
-+        return 0;
-+    }
-+}
-+
-+
-+ssize_t qauthz_list_insert_rule(QAuthZList *auth,
-+                                const char *match,
-+                                QAuthZListPolicy policy,
-+                                QAuthZListFormat format,
-+                                size_t index,
-+                                Error **errp)
-+{
-+    QAuthZListRule *rule;
-+    QAuthZListRuleList *rules, *tmp;
-+    size_t i =3D 0;
-+
-+    rule =3D g_new0(QAuthZListRule, 1);
-+    rule->policy =3D policy;
-+    rule->match =3D g_strdup(match);
-+    rule->format =3D format;
-+    rule->has_format =3D true;
-+
-+    tmp =3D g_new0(QAuthZListRuleList, 1);
-+    tmp->value =3D rule;
-+
-+    rules =3D auth->rules;
-+    if (rules && index > 0) {
-+        while (rules->next && i < (index - 1)) {
-+            i++;
-+            rules =3D rules->next;
-+        }
-+        tmp->next =3D rules->next;
-+        rules->next =3D tmp;
-+        return i + 1;
-+    } else {
-+        tmp->next =3D auth->rules;
-+        auth->rules =3D tmp;
-+        return 0;
-+    }
-+}
-+
-+
-+ssize_t qauthz_list_delete_rule(QAuthZList *auth, const char *match)
-+{
-+    QAuthZListRule *rule;
-+    QAuthZListRuleList *rules, *prev;
-+    size_t i =3D 0;
-+
-+    prev =3D NULL;
-+    rules =3D auth->rules;
-+    while (rules) {
-+        rule =3D rules->value;
-+        if (g_str_equal(rule->match, match)) {
-+            if (prev) {
-+                prev->next =3D rules->next;
-+            } else {
-+                auth->rules =3D rules->next;
-+            }
-+            rules->next =3D NULL;
-+            qapi_free_QAuthZListRuleList(rules);
-+            return i;
-+        }
-+        prev =3D rules;
-+        rules =3D rules->next;
-+        i++;
-+    }
-+
-+    return -1;
-+}
-+
-+
-+static const TypeInfo qauthz_list_info =3D {
++static const TypeInfo qauthz_pam_info =3D {
 +    .parent =3D TYPE_QAUTHZ,
-+    .name =3D TYPE_QAUTHZ_LIST,
-+    .instance_size =3D sizeof(QAuthZList),
-+    .instance_finalize =3D qauthz_list_finalize,
-+    .class_size =3D sizeof(QAuthZListClass),
-+    .class_init =3D qauthz_list_class_init,
++    .name =3D TYPE_QAUTHZ_PAM,
++    .instance_size =3D sizeof(QAuthZPAM),
++    .instance_finalize =3D qauthz_pam_finalize,
++    .class_size =3D sizeof(QAuthZPAMClass),
++    .class_init =3D qauthz_pam_class_init,
 +    .interfaces =3D (InterfaceInfo[]) {
 +        { TYPE_USER_CREATABLE },
 +        { }
@@ -382,39 +255,121 @@ nses/>.
 +
 +
 +static void
-+qauthz_list_register_types(void)
++qauthz_pam_register_types(void)
 +{
-+    type_register_static(&qauthz_list_info);
++    type_register_static(&qauthz_pam_info);
 +}
 +
 +
-+type_init(qauthz_list_register_types);
++type_init(qauthz_pam_register_types);
 diff --git a/authz/trace-events b/authz/trace-events
-index 1ef796c1e1..a896d876e8 100644
+index fb65349a90..72c411927d 100644
 --- a/authz/trace-events
 +++ b/authz/trace-events
-@@ -5,3 +5,7 @@ qauthz_is_allowed(void *authz, const char *identity, bool=
- allowed) "AuthZ %p che
-=20
- # auth/simple.c
- qauthz_simple_is_allowed(void *authz, const char *wantidentity, const ch=
-ar *gotidentity) "AuthZ simple %p check want identity=3D%s got identity=3D=
-%s"
+@@ -13,3 +13,6 @@ qauthz_list_default_policy(void *authz, const char *ide=
+ntity, int policy) "AuthZ
+ # auth/listfile.c
+ qauthz_list_file_load(void *authz, const char *filename) "AuthZ file %p =
+load filename=3D%s"
+ qauthz_list_file_refresh(void *authz, const char *filename, int success)=
+ "AuthZ file %p load filename=3D%s success=3D%d"
 +
-+# auth/list.c
-+qauthz_list_check_rule(void *authz, const char *identity, const char *ru=
-le, int format, int policy) "AuthZ list %p check rule=3D%s identity=3D%s =
-format=3D%d policy=3D%d"
-+qauthz_list_default_policy(void *authz, const char *identity, int policy=
-) "AuthZ list %p default identity=3D%s policy=3D%d"
-diff --git a/include/authz/list.h b/include/authz/list.h
++# auth/pam.c
++qauthz_pam_check(void *authz, const char *identity, const char *service)=
+ "AuthZ PAM %p identity=3D%s service=3D%s"
+diff --git a/configure b/configure
+index a61682c3c7..c0474a3dfe 100755
+--- a/configure
++++ b/configure
+@@ -463,6 +463,7 @@ gnutls=3D""
+ nettle=3D""
+ gcrypt=3D""
+ gcrypt_hmac=3D"no"
++auth_pam=3D""
+ vte=3D""
+ virglrenderer=3D""
+ tpm=3D"yes"
+@@ -1381,6 +1382,10 @@ for opt do
+   ;;
+   --enable-gcrypt) gcrypt=3D"yes"
+   ;;
++  --disable-auth-pam) auth_pam=3D"no"
++  ;;
++  --enable-auth-pam) auth_pam=3D"yes"
++  ;;
+   --enable-rdma) rdma=3D"yes"
+   ;;
+   --disable-rdma) rdma=3D"no"
+@@ -1707,6 +1712,7 @@ disabled with --disable-FEATURE, default is enabled=
+ if available:
+   gnutls          GNUTLS cryptography support
+   nettle          nettle cryptography support
+   gcrypt          libgcrypt cryptography support
++  auth-pam        PAM access control
+   sdl             SDL UI
+   sdl_image       SDL Image support for icons
+   gtk             gtk UI
+@@ -2864,6 +2870,33 @@ else
+ fi
+=20
+=20
++##########################################
++# PAM probe
++
++if test "$auth_pam" !=3D "no"; then
++    cat > $TMPC <<EOF
++#include <security/pam_appl.h>
++#include <stdio.h>
++int main(void) {
++   const char *service_name =3D "qemu";
++   const char *user =3D "frank";
++   const struct pam_conv *pam_conv =3D NULL;
++   pam_handle_t *pamh =3D NULL;
++   pam_start(service_name, user, pam_conv, &pamh);
++   return 0;
++}
++EOF
++    if compile_prog "" "-lpam" ; then
++        auth_pam=3Dyes
++    else
++        if test "$auth_pam" =3D "yes"; then
++            feature_not_found "PAM" "Install PAM development package"
++        else
++            auth_pam=3Dno
++        fi
++    fi
++fi
++
+ ##########################################
+ # getifaddrs (for tests/test-io-channel-socket )
+=20
+@@ -6083,6 +6116,7 @@ echo "GNUTLS support    $gnutls"
+ echo "libgcrypt         $gcrypt"
+ echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
+ echo "libtasn1          $tasn1"
++echo "PAM               $auth_pam"
+ echo "curses support    $curses"
+ echo "virgl support     $virglrenderer $(echo_version $virglrenderer $vi=
+rgl_version)"
+ echo "curl support      $curl"
+@@ -6537,6 +6571,9 @@ fi
+ if test "$tasn1" =3D "yes" ; then
+   echo "CONFIG_TASN1=3Dy" >> $config_host_mak
+ fi
++if test "$auth_pam" =3D "yes" ; then
++    echo "CONFIG_AUTH_PAM=3Dy" >> $config_host_mak
++fi
+ if test "$have_ifaddrs_h" =3D "yes" ; then
+     echo "HAVE_IFADDRS_H=3Dy" >> $config_host_mak
+ fi
+diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
 new file mode 100644
-index 0000000000..a7225a747c
+index 0000000000..6e3046e528
 --- /dev/null
-+++ b/include/authz/list.h
-@@ -0,0 +1,106 @@
++++ b/include/authz/pamacct.h
+@@ -0,0 +1,100 @@
 +/*
-+ * QEMU list authorization driver
++ * QEMU PAM authorization driver
 + *
 + * Copyright (c) 2018 Red Hat, Inc.
 + *
@@ -434,32 +389,32 @@ nses/>.
 + *
 + */
 +
-+#ifndef QAUTHZ_LIST_H__
-+#define QAUTHZ_LIST_H__
++#ifndef QAUTHZ_PAM_H__
++#define QAUTHZ_PAM_H__
 +
 +#include "authz/base.h"
-+#include "qapi/qapi-types-authz.h"
 +
-+#define TYPE_QAUTHZ_LIST "authz-list"
 +
-+#define QAUTHZ_LIST_CLASS(klass)                        \
-+    OBJECT_CLASS_CHECK(QAuthZListClass, (klass),        \
-+                       TYPE_QAUTHZ_LIST)
-+#define QAUTHZ_LIST_GET_CLASS(obj)              \
-+    OBJECT_GET_CLASS(QAuthZListClass, (obj),    \
-+                      TYPE_QAUTHZ_LIST)
-+#define QAUTHZ_LIST(obj) \
-+    INTERFACE_CHECK(QAuthZList, (obj),          \
-+                    TYPE_QAUTHZ_LIST)
++#define TYPE_QAUTHZ_PAM "authz-pam"
 +
-+typedef struct QAuthZList QAuthZList;
-+typedef struct QAuthZListClass QAuthZListClass;
++#define QAUTHZ_PAM_CLASS(klass) \
++     OBJECT_CLASS_CHECK(QAuthZPAMClass, (klass), \
++                        TYPE_QAUTHZ_PAM)
++#define QAUTHZ_PAM_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(QAuthZPAMClass, (obj), \
++                      TYPE_QAUTHZ_PAM)
++#define QAUTHZ_PAM(obj) \
++     INTERFACE_CHECK(QAuthZPAM, (obj), \
++                     TYPE_QAUTHZ_PAM)
++
++typedef struct QAuthZPAM QAuthZPAM;
++typedef struct QAuthZPAMClass QAuthZPAMClass;
 +
 +
 +/**
-+ * QAuthZList:
++ * QAuthZPAM:
 + *
-+ * This authorization driver provides a list mechanism
++ * This authorization driver provides a PAM mechanism
 + * for granting access by matching user names against a
 + * list of globs. Each match rule has an associated policy
 + * and a catch all policy applies if no rule matches
@@ -469,178 +424,134 @@ nses/>.
 + *  {
 + *    "execute": "object-add",
 + *    "arguments": {
-+ *      "qom-type": "authz-list",
++ *      "qom-type": "authz-pam",
 + *      "id": "authz0",
-+ *      "props": {
-+ *        "rules": [
-+ *           { "match": "fred", "policy": "allow", "format": "exact" },
-+ *           { "match": "bob", "policy": "allow", "format": "exact" },
-+ *           { "match": "danb", "policy": "deny", "format": "exact" },
-+ *           { "match": "dan*", "policy": "allow", "format": "glob" }
-+ *        ],
-+ *        "policy": "deny"
++ *      "parameters": {
++ *        "service": "qemu-vnc-tls"
 + *      }
 + *    }
 + *  }
 + *
++ * The driver only uses the PAM "account" verification
++ * subsystem. The above config would require a config
++ * file /etc/pam.d/qemu-vnc-tls. For a simple file
++ * lookup it would contain
++ *
++ *   account requisite  pam_listfile.so item=3Duser sense=3Dallow \
++ *           file=3D/etc/qemu/vnc.allow
++ *
++ * The external file would then contain a list of usernames.
++ * If x509 cert was being used as the username, a suitable
++ * entry would match the distinguish name:
++ *
++ *  CN=3Dlaptop.berrange.com,O=3DBerrange Home,L=3DLondon,ST=3DLondon,C=3D=
+GB
++ *
++ * On the command line it can be created using
++ *
++ *   -object authz-pam,id=3Dauthz0,service=3Dqemu-vnc-tls
++ *
 + */
-+struct QAuthZList {
++struct QAuthZPAM {
 +    QAuthZ parent_obj;
 +
-+    QAuthZListPolicy policy;
-+    QAuthZListRuleList *rules;
++    char *service;
 +};
 +
 +
-+struct QAuthZListClass {
++struct QAuthZPAMClass {
 +    QAuthZClass parent_class;
 +};
 +
 +
-+QAuthZList *qauthz_list_new(const char *id,
-+                            QAuthZListPolicy policy,
-+                            Error **errp);
-+
-+ssize_t qauthz_list_append_rule(QAuthZList *auth,
-+                                const char *match,
-+                                QAuthZListPolicy policy,
-+                                QAuthZListFormat format,
-+                                Error **errp);
-+
-+ssize_t qauthz_list_insert_rule(QAuthZList *auth,
-+                                const char *match,
-+                                QAuthZListPolicy policy,
-+                                QAuthZListFormat format,
-+                                size_t index,
-+                                Error **errp);
-+
-+ssize_t qauthz_list_delete_rule(QAuthZList *auth,
-+                                const char *match);
++QAuthZPAM *qauthz_pam_new(const char *id,
++                          const char *service,
++                          Error **errp);
 +
 +
-+#endif /* QAUTHZ_LIST_H__ */
-+
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index 87e4df1660..6a1a731025 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -7,7 +7,7 @@ util-obj-y +=3D qapi-util.o
++#endif /* QAUTHZ_PAM_H__ */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index e34d30a013..22cfb32489 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4430,6 +4430,41 @@ would look like:
+      ...
+ @end example
 =20
- QAPI_COMMON_MODULES =3D block-core block char common crypto introspect
- QAPI_COMMON_MODULES +=3D job migration misc net rdma rocker run-state
--QAPI_COMMON_MODULES +=3D sockets tpm trace transaction ui
-+QAPI_COMMON_MODULES +=3D sockets tpm trace transaction ui authz
- QAPI_TARGET_MODULES =3D target
- QAPI_MODULES =3D $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
++@item -object authz-pam,id=3D@var{id},service=3D@var{string}
++
++Create an authorization object that will control access to network servi=
+ces.
++
++The @option{service} parameter provides the name of a PAM service to use
++for authorization. It requires that a file @code{/etc/pam.d/@var{service=
+}}
++exist to provide the configuration for the @code{account} subsystem.
++
++An example authorization object to validate a TLS x509 distinguished
++name would look like:
++
++@example
++ # $QEMU \
++     ...
++     -object authz-pam,id=3Dauth0,service=3Dqemu-vnc
++     ...
++@end example
++
++There would then be a corresponding config file for PAM at
++@code{/etc/pam.d/qemu-vnc} that contains:
++
++@example
++account requisite  pam_listfile.so item=3Duser sense=3Dallow \
++           file=3D/etc/qemu/vnc.allow
++@end example
++
++Finally the @code{/etc/qemu/vnc.allow} file would contain
++the list of x509 distingished names that are permitted
++access
++
++@example
++CN=3Dlaptop.example.com,O=3DExample Home,L=3DLondon,ST=3DLondon,C=3DGB
++@end example
++
++
+ @end table
 =20
-diff --git a/qapi/authz.json b/qapi/authz.json
-new file mode 100644
-index 0000000000..55468de8a8
---- /dev/null
-+++ b/qapi/authz.json
-@@ -0,0 +1,58 @@
-+# -*- Mode: Python -*-
-+#
-+# QAPI authz definitions
-+
-+##
-+# @QAuthZListPolicy:
-+#
-+# The authorization policy result
-+#
-+# @deny: deny access
-+# @allow: allow access
-+#
-+# Since: 4.0
-+##
-+{ 'enum': 'QAuthZListPolicy',
-+  'prefix': 'QAUTHZ_LIST_POLICY',
-+  'data': ['deny', 'allow']}
-+
-+##
-+# @QAuthZListFormat:
-+#
-+# The authorization policy result
-+#
-+# @exact: an exact string match
-+# @glob: string with ? and * shell wildcard support
-+#
-+# Since: 4.0
-+##
-+{ 'enum': 'QAuthZListFormat',
-+  'prefix': 'QAUTHZ_LIST_FORMAT',
-+  'data': ['exact', 'glob']}
-+
-+##
-+# @QAuthZListRule:
-+#
-+# A single authorization rule.
-+#
-+# @match: a glob to match against a user identity
-+# @policy: the result to return if @match evaluates to true
-+# @format: (optional) the format of the @match rule (default 'exact')
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'QAuthZListRule',
-+  'data': {'match': 'str',
-+           'policy': 'QAuthZListPolicy',
-+           '*format': 'QAuthZListFormat'}}
-+
-+##
-+# @QAuthZListRuleListHack:
-+#
-+# Not exposed via QMP; hack to generate QAuthZListRuleList
-+# for use internally by the code.
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'QAuthZListRuleListHack',
-+  'data': { 'unused': ['QAuthZListRule'] } }
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index db61bfd688..a34899c626 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -92,6 +92,7 @@
- { 'include': 'rocker.json' }
- { 'include': 'tpm.json' }
- { 'include': 'ui.json' }
-+{ 'include': 'authz.json' }
- { 'include': 'migration.json' }
- { 'include': 'transaction.json' }
- { 'include': 'trace.json' }
+ ETEXI
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index df1cd255a9..c007968805 100644
+index 199e74d670..bc11d565a6 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -117,6 +117,7 @@ check-unit-y +=3D tests/test-timed-average$(EXESUF)
- check-unit-$(CONFIG_INOTIFY1) +=3D tests/test-util-filemonitor$(EXESUF)
- check-unit-y +=3D tests/test-util-sockets$(EXESUF)
+@@ -119,6 +119,7 @@ check-unit-y +=3D tests/test-util-sockets$(EXESUF)
  check-unit-y +=3D tests/test-authz-simple$(EXESUF)
-+check-unit-y +=3D tests/test-authz-list$(EXESUF)
+ check-unit-y +=3D tests/test-authz-list$(EXESUF)
+ check-unit-y +=3D tests/test-authz-listfile$(EXESUF)
++check-unit-$(CONFIG_AUTH_PAM) +=3D tests/test-authz-pam$(EXESUF)
  check-unit-y +=3D tests/test-io-task$(EXESUF)
  check-unit-y +=3D tests/test-io-channel-socket$(EXESUF)
  check-unit-y +=3D tests/test-io-channel-file$(EXESUF)
-@@ -665,6 +666,7 @@ tests/test-util-filemonitor$(EXESUF): tests/test-util=
--filemonitor.o \
- tests/test-util-sockets$(EXESUF): tests/test-util-sockets.o \
- 	tests/socket-helpers.o $(test-util-obj-y)
+@@ -669,6 +670,7 @@ tests/test-util-sockets$(EXESUF): tests/test-util-soc=
+kets.o \
  tests/test-authz-simple$(EXESUF): tests/test-authz-simple.o $(test-authz=
 -obj-y)
-+tests/test-authz-list$(EXESUF): tests/test-authz-list.o $(test-authz-obj=
+ tests/test-authz-list$(EXESUF): tests/test-authz-list.o $(test-authz-obj=
 -y)
+ tests/test-authz-listfile$(EXESUF): tests/test-authz-listfile.o $(test-a=
+uthz-obj-y)
++tests/test-authz-pam$(EXESUF): tests/test-authz-pam.o $(test-authz-obj-y=
+)
  tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
  tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
          tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
 y)
-diff --git a/tests/test-authz-list.c b/tests/test-authz-list.c
+diff --git a/tests/test-authz-pam.c b/tests/test-authz-pam.c
 new file mode 100644
-index 0000000000..24347a6ac3
+index 0000000000..93d5ac8bbf
 --- /dev/null
-+++ b/tests/test-authz-list.c
-@@ -0,0 +1,159 @@
++++ b/tests/test-authz-pam.c
+@@ -0,0 +1,124 @@
 +/*
-+ * QEMU list file authorization object tests
++ * QEMU PAM authorization object tests
 + *
 + * Copyright (c) 2018 Red Hat, Inc.
 + *
@@ -661,128 +572,97 @@ nses/>.
 + */
 +
 +#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "authz/pamacct.h"
 +
-+#include "authz/list.h"
++#include <security/pam_appl.h>
 +
-+static void test_authz_default_deny(void)
++static bool failauth;
++
++/*
++ * These two functions are exported by libpam.so.
++ *
++ * By defining them again here, our impls are resolved
++ * by the linker instead of those in libpam.so
++ *
++ * The test suite is thus isolated from the host system
++ * PAM setup, so we can do predictable test scenarios
++ */
++int
++pam_start(const char *service_name, const char *user,
++          const struct pam_conv *pam_conversation,
++          pam_handle_t **pamh)
 +{
-+    QAuthZList *auth =3D qauthz_list_new("auth0",
-+                                       QAUTHZ_LIST_POLICY_DENY,
-+                                       &error_abort);
++    failauth =3D true;
++    if (!g_str_equal(service_name, "qemu-vnc")) {
++        return PAM_AUTH_ERR;
++    }
 +
-+    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
++    if (g_str_equal(user, "fred")) {
++        failauth =3D false;
++    }
++
++    return PAM_SUCCESS;
++}
++
++
++int
++pam_acct_mgmt(pam_handle_t *pamh, int flags)
++{
++    if (failauth) {
++        return PAM_AUTH_ERR;
++    }
++
++    return PAM_SUCCESS;
++}
++
++
++static void test_authz_unknown_service(void)
++{
++    Error *local_err =3D NULL;
++    QAuthZPAM *auth =3D qauthz_pam_new("auth0",
++                                     "qemu-does-not-exist",
++                                     &error_abort);
++
++    g_assert_nonnull(auth);
++
++    g_assert_false(qauthz_is_allowed(QAUTHZ(auth), "fred", &local_err));
++
++    error_free_or_abort(&local_err);
++    object_unparent(OBJECT(auth));
++}
++
++
++static void test_authz_good_user(void)
++{
++    QAuthZPAM *auth =3D qauthz_pam_new("auth0",
++                                     "qemu-vnc",
++                                     &error_abort);
++
++    g_assert_nonnull(auth);
++
++    g_assert_true(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort))=
+;
 +
 +    object_unparent(OBJECT(auth));
 +}
 +
-+static void test_authz_default_allow(void)
++
++static void test_authz_bad_user(void)
 +{
-+    QAuthZList *auth =3D qauthz_list_new("auth0",
-+                                       QAUTHZ_LIST_POLICY_ALLOW,
-+                                       &error_abort);
++    Error *local_err =3D NULL;
++    QAuthZPAM *auth =3D qauthz_pam_new("auth0",
++                                     "qemu-vnc",
++                                     &error_abort);
 +
-+    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
++    g_assert_nonnull(auth);
 +
++    g_assert_false(qauthz_is_allowed(QAUTHZ(auth), "bob", &local_err));
++
++    error_free_or_abort(&local_err);
 +    object_unparent(OBJECT(auth));
 +}
 +
-+static void test_authz_explicit_deny(void)
-+{
-+    QAuthZList *auth =3D qauthz_list_new("auth0",
-+                                       QAUTHZ_LIST_POLICY_ALLOW,
-+                                       &error_abort);
-+
-+    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_DENY,
-+                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-+
-+    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
-+
-+    object_unparent(OBJECT(auth));
-+}
-+
-+static void test_authz_explicit_allow(void)
-+{
-+    QAuthZList *auth =3D qauthz_list_new("auth0",
-+                                       QAUTHZ_LIST_POLICY_DENY,
-+                                       &error_abort);
-+
-+    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_ALLOW,
-+                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-+
-+    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
-+
-+    object_unparent(OBJECT(auth));
-+}
-+
-+
-+static void test_authz_complex(void)
-+{
-+    QAuthZList *auth =3D qauthz_list_new("auth0",
-+                                       QAUTHZ_LIST_POLICY_DENY,
-+                                       &error_abort);
-+
-+    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_ALLOW,
-+                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-+    qauthz_list_append_rule(auth, "bob", QAUTHZ_LIST_POLICY_ALLOW,
-+                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-+    qauthz_list_append_rule(auth, "dan", QAUTHZ_LIST_POLICY_DENY,
-+                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
-+    qauthz_list_append_rule(auth, "dan*", QAUTHZ_LIST_POLICY_ALLOW,
-+                            QAUTHZ_LIST_FORMAT_GLOB, &error_abort);
-+
-+    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
-+    g_assert(qauthz_is_allowed(QAUTHZ(auth), "bob", &error_abort));
-+    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
-+    g_assert(qauthz_is_allowed(QAUTHZ(auth), "danb", &error_abort));
-+
-+    object_unparent(OBJECT(auth));
-+}
-+
-+static void test_authz_add_remove(void)
-+{
-+    QAuthZList *auth =3D qauthz_list_new("auth0",
-+                                       QAUTHZ_LIST_POLICY_ALLOW,
-+                                       &error_abort);
-+
-+    g_assert_cmpint(qauthz_list_append_rule(auth, "fred",
-+                                            QAUTHZ_LIST_POLICY_ALLOW,
-+                                            QAUTHZ_LIST_FORMAT_EXACT,
-+                                            &error_abort),
-+                    =3D=3D, 0);
-+    g_assert_cmpint(qauthz_list_append_rule(auth, "bob",
-+                                            QAUTHZ_LIST_POLICY_ALLOW,
-+                                            QAUTHZ_LIST_FORMAT_EXACT,
-+                                            &error_abort),
-+                    =3D=3D, 1);
-+    g_assert_cmpint(qauthz_list_append_rule(auth, "dan",
-+                                            QAUTHZ_LIST_POLICY_DENY,
-+                                            QAUTHZ_LIST_FORMAT_EXACT,
-+                                            &error_abort),
-+                    =3D=3D, 2);
-+    g_assert_cmpint(qauthz_list_append_rule(auth, "frank",
-+                                            QAUTHZ_LIST_POLICY_DENY,
-+                                            QAUTHZ_LIST_FORMAT_EXACT,
-+                                            &error_abort),
-+                    =3D=3D, 3);
-+
-+    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
-+
-+    g_assert_cmpint(qauthz_list_delete_rule(auth, "dan"),
-+                    =3D=3D, 2);
-+
-+    g_assert(qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
-+
-+    g_assert_cmpint(qauthz_list_insert_rule(auth, "dan",
-+                                            QAUTHZ_LIST_POLICY_DENY,
-+                                            QAUTHZ_LIST_FORMAT_EXACT,
-+                                            2,
-+                                            &error_abort),
-+                    =3D=3D, 2);
-+
-+    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
-+
-+    object_unparent(OBJECT(auth));
-+}
 +
 +int main(int argc, char **argv)
 +{
@@ -790,15 +670,10 @@ nses/>.
 +
 +    module_call_init(MODULE_INIT_QOM);
 +
-+    g_test_add_func("/auth/list/default/deny", test_authz_default_deny);
-+    g_test_add_func("/auth/list/default/allow", test_authz_default_allow=
-);
-+    g_test_add_func("/auth/list/explicit/deny", test_authz_explicit_deny=
-);
-+    g_test_add_func("/auth/list/explicit/allow", test_authz_explicit_all=
-ow);
-+    g_test_add_func("/auth/list/complex", test_authz_complex);
-+    g_test_add_func("/auth/list/add-remove", test_authz_add_remove);
++    g_test_add_func("/auth/pam/unknown-service", test_authz_unknown_serv=
+ice);
++    g_test_add_func("/auth/pam/good-user", test_authz_good_user);
++    g_test_add_func("/auth/pam/bad-user", test_authz_bad_user);
 +
 +    return g_test_run();
 +}
