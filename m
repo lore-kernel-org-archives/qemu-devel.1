@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37045)
+Received: from eggs.gnu.org ([209.51.188.92]:37040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI4G-0008F9-EG
+	(envelope-from <kwolf@redhat.com>) id 1gyI4G-0008Ev-63
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI4F-0000en-O8
+	(envelope-from <kwolf@redhat.com>) id 1gyI4E-0000eO-Rn
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:21:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:19:51 +0100
-Message-Id: <20190225152053.15976-10-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:19:50 +0100
+Message-Id: <20190225152053.15976-9-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/71] block-backend: Make blk_inc/dec_in_flight
- public
+Subject: [Qemu-devel] [PULL 08/71] qemu-img: fix error reporting for -object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-For some users of BlockBackends, just increasing the in_flight counter
-is easier than implementing separate handlers in BlockDevOps. Make the
-helper functions for this public.
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
+Error reporting for user_creatable_add_opts_foreach was changed so that
+it no longer called 'error_report_err' in:
+
+  commit 7e1e0c11127bde81cff260fc6859690435c509d6
+  Author: Markus Armbruster <armbru@redhat.com>
+  Date:   Wed Oct 17 10:26:43 2018 +0200
+
+    qom: Clean up error reporting in user_creatable_add_opts_foreach()
+
+Some callers were updated to pass in "&error_fatal" but all the ones in
+qemu-img were left passing NULL. As a result all errors went to
+/dev/null instead of being reported to the user.
+
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/sysemu/block-backend.h | 2 ++
- block/block-backend.c          | 4 ++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ qemu-img.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backen=
-d.h
-index 832a4bf168..e2066eb06b 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -156,6 +156,8 @@ int blk_co_pdiscard(BlockBackend *blk, int64_t offset=
-, int bytes);
- int blk_co_flush(BlockBackend *blk);
- int blk_flush(BlockBackend *blk);
- int blk_commit_all(void);
-+void blk_inc_in_flight(BlockBackend *blk);
-+void blk_dec_in_flight(BlockBackend *blk);
- void blk_drain(BlockBackend *blk);
- void blk_drain_all(void);
- void blk_set_on_error(BlockBackend *blk, BlockdevOnError on_read_error,
-diff --git a/block/block-backend.c b/block/block-backend.c
-index f6ea824308..0219555f89 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1262,12 +1262,12 @@ int blk_make_zero(BlockBackend *blk, BdrvRequestF=
-lags flags)
-     return bdrv_make_zero(blk->root, flags);
- }
+diff --git a/qemu-img.c b/qemu-img.c
+index 9737b815e4..eb5045c742 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -503,7 +503,7 @@ static int img_create(int argc, char **argv)
 =20
--static void blk_inc_in_flight(BlockBackend *blk)
-+void blk_inc_in_flight(BlockBackend *blk)
- {
-     atomic_inc(&blk->in_flight);
- }
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         goto fail;
+     }
 =20
--static void blk_dec_in_flight(BlockBackend *blk)
-+void blk_dec_in_flight(BlockBackend *blk)
- {
-     atomic_dec(&blk->in_flight);
-     aio_wait_kick();
+@@ -753,7 +753,7 @@ static int img_check(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         return 1;
+     }
+=20
+@@ -966,7 +966,7 @@ static int img_commit(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         return 1;
+     }
+=20
+@@ -1349,7 +1349,7 @@ static int img_compare(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         ret =3D 2;
+         goto out4;
+     }
+@@ -2159,7 +2159,7 @@ static int img_convert(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         goto fail_getopt;
+     }
+=20
+@@ -2713,7 +2713,7 @@ static int img_info(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         return 1;
+     }
+=20
+@@ -2932,7 +2932,7 @@ static int img_map(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         return 1;
+     }
+=20
+@@ -3081,7 +3081,7 @@ static int img_snapshot(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         return 1;
+     }
+=20
+@@ -3248,7 +3248,7 @@ static int img_rebase(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         return 1;
+     }
+=20
+@@ -3628,7 +3628,7 @@ static int img_resize(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         return 1;
+     }
+=20
+@@ -3872,7 +3872,7 @@ static int img_amend(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         ret =3D -1;
+         goto out_no_progress;
+     }
+@@ -4516,7 +4516,7 @@ static int img_dd(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         ret =3D -1;
+         goto out;
+     }
+@@ -4793,7 +4793,7 @@ static int img_measure(int argc, char **argv)
+=20
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+-                          NULL, NULL)) {
++                          NULL, &error_fatal)) {
+         goto out;
+     }
+=20
 --=20
 2.20.1
