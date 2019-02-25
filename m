@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38827)
+Received: from eggs.gnu.org ([209.51.188.92]:38826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI6C-0001jD-Cd
+	(envelope-from <kwolf@redhat.com>) id 1gyI6C-0001jC-CM
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI6A-00023y-1j
+	(envelope-from <kwolf@redhat.com>) id 1gyI69-00023q-VY
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:47 +0100
-Message-Id: <20190225152053.15976-66-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:46 +0100
+Message-Id: <20190225152053.15976-65-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 65/71] iotests: Filter SSH paths
+Subject: [Qemu-devel] [PULL 64/71] iotests.py: Filter filename in any string
+ value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +27,33 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-8908b253c4ad5f8874c8d13abec169c696a5cd32 has implemented filtering of
-remote paths for NFS, but forgot SSH.  This patch takes care of that.
+filter_qmp_testfiles() currently filters the filename only for specific
+keys.  However, there are more keys that take filenames (such as
+block-commit's @top and @base, or ssh's @path), and it does not make
+sense to list them all here.  "$TEST_DIR/$PID-" should have enough
+entropy not to appear anywhere randomly.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190210145736.1486-9-mreitz@redhat.com
+Message-id: 20190210145736.1486-8-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/common.rc | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qemu-iotests/iotests.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index e15e7a7c8e..09a27f02d0 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -145,6 +145,7 @@ else
-         TEST_IMG=3D"nbd:127.0.0.1:10810"
-     elif [ "$IMGPROTO" =3D "ssh" ]; then
-         TEST_IMG_FILE=3D$TEST_DIR/t.$IMGFMT
-+        REMOTE_TEST_DIR=3D"ssh://127.0.0.1$TEST_DIR"
-         TEST_IMG=3D"ssh://127.0.0.1$TEST_IMG_FILE"
-     elif [ "$IMGPROTO" =3D "nfs" ]; then
-         TEST_IMG_FILE=3D$TEST_DIR/t.$IMGFMT
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 52fc77563c..cba91a9927 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -289,7 +289,7 @@ def filter_testfiles(msg):
+=20
+ def filter_qmp_testfiles(qmsg):
+     def _filter(key, value):
+-        if key =3D=3D 'filename' or key =3D=3D 'backing-file':
++        if is_str(value):
+             return filter_testfiles(value)
+         return value
+     return filter_qmp(qmsg, _filter)
 --=20
 2.20.1
