@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59767)
+Received: from eggs.gnu.org ([209.51.188.92]:53526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gyHew-00053H-LT
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:55:11 -0500
+	(envelope-from <mopsfelder@gmail.com>) id 1gyHBQ-0006I9-9a
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:24:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gyHev-0002iA-E1
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:55:10 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:46408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gyHet-0002IM-3n
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:55:07 -0500
-Received: by mail-wr1-x436.google.com with SMTP id i16so10232926wrs.13
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 06:54:52 -0800 (PST)
-References: <20181209193749.12277-1-cota@braap.org>
-	<20181209193749.12277-32-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181209193749.12277-32-cota@braap.org>
-Date: Mon, 25 Feb 2019 14:54:50 +0000
-Message-ID: <878sy3ncjp.fsf@zen.linaroharston>
+	(envelope-from <mopsfelder@gmail.com>) id 1gyHBP-0001Il-L0
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 09:24:40 -0500
+From: Murilo Opsfelder Araujo <mopsfelder@gmail.com>
+Date: Mon, 25 Feb 2019 11:24:05 -0300
+Message-Id: <20190225142407.9477-1-muriloo@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 31/38] target/xtensa: fetch code with
- translator_ld
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/2] ppc/pnv: increase kernel size limit to
+ 256MiB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +21,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+To: qemu-devel@nongnu.org
+Cc: mopsfelder@gmail.com, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
 
+First patch increases kernel size limit to 256MiB to fit images generated with
+CONFIG_DEBUG_INFO.
 
-Emilio G. Cota <cota@braap.org> writes:
+Second patch just fixes a misleading comment regarding initrd size limit.
 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/xtensa/translate.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-> index 46e1338448..c140742562 100644
-> --- a/target/xtensa/translate.c
-> +++ b/target/xtensa/translate.c
-> @@ -882,7 +882,7 @@ static inline unsigned xtensa_op0_insn_len(DisasConte=
-xt *dc, uint8_t op0)
->  static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
->  {
->      xtensa_isa isa =3D dc->config->isa;
-> -    unsigned char b[MAX_INSN_LENGTH] =3D {cpu_ldub_code(env, dc->pc)};
-> +    unsigned char b[MAX_INSN_LENGTH] =3D {translator_ldub(env, dc->pc)};
->      unsigned len =3D xtensa_op0_insn_len(dc, b[0]);
->      xtensa_format fmt;
->      int slot, slots;
-> @@ -914,7 +914,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, Di=
-sasContext *dc)
->                        dc->pc);
->      }
->      for (i =3D 1; i < len; ++i) {
-> -        b[i] =3D cpu_ldub_code(env, dc->pc + i);
-> +        b[i] =3D translator_ldub(env, dc->pc + i);
->      }
->      xtensa_insnbuf_from_chars(isa, dc->insnbuf, b, len);
->      fmt =3D xtensa_format_decode(isa, dc->insnbuf);
+Murilo Opsfelder Araujo (2):
+  ppc/pnv: increase kernel size limit to 256MiB
+  ppc/pnv: add INITRD_MAX_SIZE constant
 
-There is also:
+ hw/ppc/pnv.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-  static inline unsigned xtensa_insn_len(CPUXtensaState *env, DisasContext =
-*dc)
-  {
-      uint8_t b0 =3D cpu_ldub_code(env, dc->pc);
-      return xtensa_op0_insn_len(dc, b0);
-  }
-
-Or is this usage a re-read of something we've already got?
-
---
-Alex Benn=C3=A9e
+-- 
+2.20.1
