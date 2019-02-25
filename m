@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53475)
+Received: from eggs.gnu.org ([209.51.188.92]:54532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gyCuF-0004bk-QV
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:50:41 -0500
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1gyCyK-0006Do-Dy
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gyCuE-0004gC-MP
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:50:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60454)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gyCuE-0004eq-F1
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:50:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gyCuB-0006lX-Tu
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:50:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D13972E800F
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 09:50:35 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1gyCyE-0007kp-HE
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 04:54:50 -0500
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Mon, 25 Feb 2019 09:54:05 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8392D48D9@lhreml524-mbs.china.huawei.com>
+References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
+	<3a6bf5ea-5b48-18c2-8a2c-0ced777be816@redhat.com>
+	<892e3eb7-66f5-92a3-5891-de8665fc984a@redhat.com>
+In-Reply-To: <892e3eb7-66f5-92a3-5891-de8665fc984a@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Feb 2019 09:35:55 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1817525 <1817525@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155108616330.22359.6416860237413372412.malonedeb@wampee.canonical.com>
-Message-Id: <155108735530.30390.11649952739598603228.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1817525] Re: qemu fails to compile on gcc 9
- "block/nvme.c:209:22: error: taking address of packed member of 'struct
- <anonymous>' may result in an unaligned pointer value
- [-Werror=address-of-packed-member]"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] ARM virt: ACPI memory hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,129 +28,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, Auger Eric <eric.auger@redhat.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc: "xuwei (O)" <xuwei5@huawei.com>, Linuxarm <linuxarm@huawei.com>, Ard
+	Biesheuvel <ard.biesheuvel@linaro.org>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>
 
-The fields of the struct are naturally aligned, so this should be easy
-enough to fix just by dropping QEMU_PACKED (we already have a compile-
-time assert that the doorbells field is at the expected address).
-
-NB: I notice also the struct is marked 'volatile' -- this is a bit of a
-red flag that the code may not really be doing the right thing here.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817525
-
-Title:
-  qemu fails to compile on gcc 9 "block/nvme.c:209:22: error: taking
-  address of packed member of 'struct <anonymous>' may result in an
-  unaligned pointer value [-Werror=3Daddress-of-packed-member]"
-
-Status in QEMU:
-  New
-
-Bug description:
-  Issue:
-  Qemu compilation fails with below error on ppc64le host with gcc 9, repo(=
-https://github.com/dgibson/qemu.git), branch(ppc-for-4.0), Commit (0483e903=
-93bac8546a1fbc95ab912a1e78e92b00)
-
-  =C2=A0CHK version_gen.h
-  =C2=A0=C2=A0CC      block/nvme.o
-  block/nvme.c: In function =E2=80=98nvme_create_queue_pair=E2=80=99:
-  block/nvme.c:209:22: error: taking address of packed member of =E2=80=98s=
-truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
-r=3Daddress-of-packed-member]
-  =C2=A0=C2=A0209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
->doorbell_scale];
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  block/nvme.c:216:22: error: taking address of packed member of =E2=80=98s=
-truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
-r=3Daddress-of-packed-member]
-  =C2=A0=C2=A0216 |     q->cq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
->doorbell_scale + 1];
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  cc1: all warnings being treated as errors
-  make: *** [/usr/share/avocado-plugins-vt/build/qemu/rules.mak:69: block/n=
-vme.o] Error 1
-
-  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  $git commit:
-  commit 0483e90393bac8546a1fbc95ab912a1e78e92b00 (HEAD -> ppc-for-4.0)
-  Author: Thomas Huth <thuth@redhat.com>
-  Date:   Thu Feb 21 12:24:48 2019 +0100
-
-  =C2=A0=C2=A0=C2=A0=C2=A0hw/ppc: Use object_initialize_child for correct r=
-eference counting
-
-  =C2=A0=C2=A0=C2=A0=C2=A0Both functions, object_initialize() and object_pr=
-operty_add_child() increase
-  =C2=A0=C2=A0=C2=A0=C2=A0the reference counter of the new object, so one o=
-f the references has to be
-  =C2=A0=C2=A0=C2=A0=C2=A0dropped afterwards to get the reference counting =
-right. Otherwise the child
-  =C2=A0=C2=A0=C2=A0=C2=A0object will not be properly cleaned up when the p=
-arent gets destroyed.
-  =C2=A0=C2=A0=C2=A0=C2=A0Thus let's use now object_initialize_child() inst=
-ead to get the reference
-  =C2=A0=C2=A0=C2=A0=C2=A0counting here right.
-
-  =C2=A0=C2=A0=C2=A0=C2=A0Suggested-by: Eduardo Habkost <ehabkost@redhat.co=
-m>
-  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Thomas Huth <thuth@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <1550748288-30598-1-git-send-email-th=
-uth@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: David Gibson <david@gibson.dropbea=
-r.id.au>
-  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  Note: Same commit on a different ppc64le host with gcc(8.1.1 20180712)
-  compile without any issue.
-
-  Host Env:
-
-  Power8
-
-  #lscpu
-  Architecture:         ppc64le
-  Byte Order:           Little Endian
-  CPU(s):               160
-  On-line CPU(s) list:  0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,12=
-8,136,144,152
-  Off-line CPU(s) list: 1-7,9-15,17-23,25-31,33-39,41-47,49-55,57-63,65-71,=
-73-79,81-87,89-95,97-103,105-111,113-119,121-127,129-135,137-143,145-151,15=
-3-159
-  Thread(s) per core:   1
-  Core(s) per socket:   5
-  Socket(s):            4
-  NUMA node(s):         4
-  Model:                2.1 (pvr 004b 0201)
-  Model name:           POWER8E (raw), altivec supported
-  CPU max MHz:          3690.0000
-  CPU min MHz:          2061.0000
-  L1d cache:            64K
-  L1i cache:            32K
-  L2 cache:             512K
-  L3 cache:             8192K
-  NUMA node0 CPU(s):    0,8,16,24,32
-  NUMA node1 CPU(s):    40,48,56,64,72
-  NUMA node16 CPU(s):   80,88,96,104,112
-  NUMA node17 CPU(s):   120,128,136,144,152
-
-  # gcc --version
-  gcc (GCC) 9.0.1 20190209 (Red Hat 9.0.1-0.4)
-  Copyright (C) 2019 Free Software Foundation, Inc.
-  This is free software; see the source for copying conditions.  There is NO
-  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
-E.
-
-  # uname -r
-  5.0.0-rc7-ge50585e89
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817525/+subscriptions
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTGFzemxvIEVyc2VrIFtt
+YWlsdG86bGVyc2VrQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDIyIEZlYnJ1YXJ5IDIwMTkgMTk6MTEN
+Cj4gVG86IEF1Z2VyIEVyaWMgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT47IFNoYW1lZXJhbGkgS29s
+b3RodW0gVGhvZGkNCj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT47IHNo
+YW5ub24uemhhb3NsQGdtYWlsLmNvbTsNCj4gcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBpbWFt
+bWVkb0ByZWRoYXQuY29tOyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+IHFlbXUtYXJtQG5vbmdu
+dS5vcmcNCj4gQ2M6IHh1d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMaW51eGFybSA8bGlu
+dXhhcm1AaHVhd2VpLmNvbT47IEFyZA0KPiBCaWVzaGV1dmVsIDxhcmQuYmllc2hldXZlbEBsaW5h
+cm8ub3JnPjsgTGVpZiBMaW5kaG9sbSAoTGluYXJvIGFkZHJlc3MpDQo+IDxsZWlmLmxpbmRob2xt
+QGxpbmFyby5vcmc+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIFBBVENIIDAvNF0gQVJNIHZpcnQ6IEFD
+UEkgbWVtb3J5IGhvdHBsdWcgc3VwcG9ydA0KPiANCj4gT24gMDIvMjIvMTkgMTc6MDMsIEF1Z2Vy
+IEVyaWMgd3JvdGU6DQo+ID4gSGkgU2hhbWVlciwNCj4gPg0KPiA+IE9uIDEvMjgvMTkgMTI6MDUg
+UE0sIFNoYW1lZXIgS29sb3RodW0gd3JvdGU6DQo+ID4+IFRoaXMgc2VyaWVzIGlzIGFuIGF0dGVt
+cHQgdG8gcHJvdmlkZSBob3RwbHVnIHN1cHBvcnQgdG8gYm90aA0KPiA+PiBwYy1kaW1tIGFuZCBu
+dmRpbW0gZGV2aWNlIG1lbW9yeSBvbiBBUk0gdmlydCBwbGF0Zm9ybS4gVGhpcyBpcw0KPiA+PiBi
+YXNlZCBvbiBFcmljJ3MgcmVjZW50IHdvcmtzIHRvIHN1cHBvcnQgUENESU1NL05WRElNTSBkZXZp
+Y2UNCj4gbWVtb3J5WzFdLg0KPiA+PiBUaGUga2VybmVsIHN1cHBvcnQgZm9yIGFybTY0IG1lbW9y
+eSBob3QgYWRkIHdhcyBhZGRlZCBvbmx5DQo+ID4+IHJlY2VudGx5IGJ5IFJvYmluWzJdIGFuZCBo
+ZW5jZSB0aGUgZ3Vlc3Qga2VybmVsIHNob3VsZCBiZSA9PiA1LjAtcmMxLg0KPiA+Pg0KPiA+PiBU
+aGlzIG1ha2VzIHVzZSBvZiBQTDA2MSBHUElPIGNvbnRyb2xsZXIgdG8gc2VudCByZWxhdGVkIEFD
+UEkgZXZlbnRzDQo+ID4gcy9zZW50L3NlbmQNCj4gPj4gdG8gdGhlIEd1ZXN0LiBUaGUgb25seSBy
+ZWZlcmVuY2UgSSBjb3VsZCBmaW5kIHdpdGggcmVzcGVjdCB0byB0aGUgR1BJTw0KPiA+PiBwaW5z
+IHVzYWdlIGlzIGhlcmVbM10gd2hpY2ggc2F5cywgInVzZSBQSU4gMyBmb3Igc3lzdGVtX3Bvd2Vy
+ZG93biwNCj4gPj4gcmVzZXJ2aW5nIFBJTiAwLCAxLCAyIGZvciBQQ0kgaG90cGx1ZywgQ1BVIGhv
+dHBsdWcgYW5kIG1lbW9yeSBob3RwbHVnIi4NCj4gPj4gSGVuY2UgUGluIDIgaXMgdXNlZCBmb3Ig
+UENESU1NIGFuZCBwaW4gNCBmb3IgTlZESU1NLg0KPiA+Pg0KPiA+PiBUaGlzIGlzIHNhbml0eSB0
+ZXN0ZWQgb24gYSBIaVNpbGljb24gQVJNNjQgcGxhdGZvcm0gYW5kIGFwcHJlY2lhdGUNCj4gPj4g
+YW55IGZ1cnRoZXIgdGVzdGluZy4NCj4gPg0KPiA+IEkgZGlkIHNvbWUgdGVzdGluZyBvbiBhbm90
+aGVyIHBsYXRmb3JtIGFuZCBJIGdvdCB0aGUgZXhhY3RseSB0aGUgc2FtZQ0KPiA+IHJlc3VsdHMg
+YXMgeW91cnM6IFBDRElNTSBob3QgcGx1ZyB3b3JrcyBmaW5lLiBBbHNvIGFmdGVyIHN5c3RlbV9y
+ZXNldCBJDQo+ID4gc3RpbGwgY2FuIHNlZSB0aGUgc2xvdHMuDQo+ID4gSG90LXVucGx1ZyBpcyBu
+b3Qgc3VwcG9ydGVkIHRob3VnaC4NCj4gPiBGb3IgTlZESU1NLCBob3QtYWRkIHdvcmtzIGZpbmUg
+YW5kIGFuZCBJIGNhbiBzZWUgdGhlIHNsb3RzIHVzaW5nIG5kY3RsDQo+ID4gb24gZ3Vlc3QuIEJ1
+dCBhZnRlciBzeXN0ZW1fcmVzZXQsIHRoZSBndWVzdCBkb2VzIG5vdCBib290IHByb3Blcmx5Lg0K
+PiA+DQo+ID4+DQo+ID4+IFRoaXMgc2VyaWVzIGNhbiBiZSBhcHBsaWVkIG9uIHRvcCBvZiBFcmlj
+J3MgYnJhbmNoIGhlcmVbNF0NCj4gPj4NCj4gPj4gVGVzdDoNCj4gPj4gLS0tLS0tDQo+ID4+IFBs
+ZWFzZSB1c2UgYSBHdWVzdCBrZXJuZWwgaW1hZ2UgPjUuMC1yYzEgd2l0aCBhbGwgdGhlIG1lbS9u
+dmRpbW0NCj4gPj4gaG90cGx1ZyByZWxhdGVkIENPTkZJR3MgZW5hYmxlZC4NCj4gPj4NCj4gPj4g
+Li9xZW11LXN5c3RlbS1hYXJjaDY0IFwNCj4gPj4gLW1hY2hpbmUgdmlydCxnaWMtdmVyc2lvbj0z
+LG52ZGltbSBcDQo+ID4+IC1tIDFHLG1heG1lbT00RyxzbG90cz00IFwNCj4gPj4gLWNwdSBob3N0
+IFwNCj4gPj4gLWtlcm5lbCBJbWFnZSBcDQo+ID4+IC1pbml0cmQgcm9vdGZzLWlwZXJmLmNwaW8g
+XA0KPiA+PiAtYmlvcyBRRU1VX0VGSS5mZCBcDQo+ID4+IC1udW1hIG5vZGUsbm9kZWlkPTAgXA0K
+PiA+PiAtbmV0IG5vbmUgXA0KPiA+PiAtbm9ncmFwaGljIC1lbmFibGUta3ZtIFwNCj4gPj4gLWFw
+cGVuZCAiY29uc29sZT10dHlBTUEwIGFjcGk9Zm9yY2UgZWFybHljb249cGwwMTEsMHg5MDAwMDAw
+Ig0KPiA+Pg0KPiA+PiBFbnRlciBRZW11IG1vbml0b3IsDQo+ID4+IEFkZCBwYy1kaW1tOg0KPiA+
+PiBvYmplY3RfYWRkIG1lbW9yeS1iYWNrZW5kLXJhbSxpZD1tZW0xLHNpemU9MUcNCj4gPj4gZGV2
+aWNlX2FkZCBwYy1kaW1tLGlkPWRpbW0xLG1lbWRldj1tZW0xDQo+ID4+DQo+ID4+IEFkZCBudmRp
+bW06DQo+ID4+IG9iamVjdF9hZGQgbWVtb3J5LWJhY2tlbmQtcmFtLGlkPW1lbTIsc2l6ZT0xRw0K
+PiA+PiBkZXZpY2VfYWRkIG52ZGltbSxpZD1kaW1tMixtZW1kZXY9bWVtMg0KPiA+Pg0KPiA+PiBL
+bm93biBJc3N1ZToNCj4gPj4NCj4gPj4gSXQgaXMgb2JzZXJ2ZWQgdGhhdCBob3QgYWRkaW5nIG52
+ZGltbSB3aWxsIHJlc3VsdHMgaW4gZ3Vlc3QgcmVib290DQo+ID4+IGZhaWx1cmUuIEVESzIgZmFp
+bHMgdG8gYnVpbGQgdGhlIEFDUEkgdGFibGVzIG9uIHJlYm9vdC4gUGxlYXNlIGZpbmQNCj4gPj4g
+YmVsb3cgRURLMiBsb2cgb24gR3Vlc3QgcmVib290IGFmdGVyIG52ZGltbSBob3QtYWRkLA0KPiA+
+Pg0KPiA+PiBQcm9jZXNzQ21kQWRkQ2hlY2tzdW06IGludmFsaWQgY2hlY2tzdW0gcmFuZ2UgaW4g
+ImV0Yy9hY3BpL3RhYmxlcyINCj4gPj4gT25Sb290QnJpZGdlc0Nvbm5lY3RlZDogSW5zdGFsbEFj
+cGlUYWJsZXM6IFByb3RvY29sIEVycm9yDQo+ID4+DQo+ID4+IFRoZSByb290IGNhdXNlIHNlZW1z
+IHRvIGJlIEVESzIgQUNQSSB0YWJsZSBjaGVja3N1bSBmYWlsdXJlDQo+ID4+IGFzIE5GSVQgdGFi
+bGUgaXMgZ2V0dGluZyB1cGRhdGVkIG9uIGhvdC1hZGQuIFRoaXMgbmVlZHMgZnVydGhlcg0KPiA+
+PiBpbnZlc3RpZ2F0aW9uLg0KPiA+ICsgQXJkLCBMZWlmLCBMYXN6bG8gaWYgdGhleSBoYXZlIGFu
+eSBpZGVhIG9mIHdoYXQgaXMgbWlzc2luZy93cm9uZy4NCj4gDQo+IEh1aCwgdmVyeSBpbnRlcmVz
+dGluZzsgSSB1c3VhbGx5IGRvbid0IGV4cGVjdCBteSBzYW5pdHkgY2hlY2tzIHRvIGZpcmUNCj4g
+aW4gcHJhY3RpY2UuIDopDQo+IA0KPiBUaGUgbWVzc2FnZQ0KPiANCj4gICBQcm9jZXNzQ21kQWRk
+Q2hlY2tzdW06IGludmFsaWQgY2hlY2tzdW0gcmFuZ2UgaW4gImV0Yy9hY3BpL3RhYmxlcyINCj4g
+DQo+IGlzIGxvZ2dlZCBieSBPVk1GJ3MgYW5kIEFybVZpcnRRZW11J3MgQUNQSSBQbGF0Zm9ybSBE
+WEUgRHJpdmVyIHdoZW4gaXQNCj4gZmluZHMgYW4gaW52YWxpZCBDT01NQU5EX0FERF9DSEVDS1NV
+TSBjb21tYW5kIGluIFFFTVUncyBBQ1BJDQo+IGxpbmtlci9sb2FkZXIgc2NyaXB0Lg0KPiANCj4g
+UGxlYXNlIHNlZSB0aGUgY29tbWFuZCBkZWZpbml0aW9uIGluIFFFTVUncw0KPiAiaHcvYWNwaS9i
+aW9zLWxpbmtlci1sb2FkZXIuYyIuIEluIHBhcnRpY3VsYXIsIHBsZWFzZSByZWZlciB0byB0aGUN
+Cj4gZnVuY3Rpb24gYmlvc19saW5rZXJfbG9hZGVyX2FkZF9jaGVja3N1bSgpLCB3aGljaCBidWls
+ZHMgdGhlIGNvbW1hbmQNCj4gc3RydWN0dXJlLCBhbmQgZG9jdW1lbnRzIHRoZSBmaWVsZHMuDQo+
+IA0KPiAoWW91IG1heSBhbHNvIHJlZmVyIHRvIFFFTVVfTE9BREVSX0FERF9DSEVDS1NVTSBpbiBm
+aWxlDQo+ICJPdm1mUGtnL0FjcGlQbGF0Zm9ybUR4ZS9RZW11TG9hZGVyLmgiIGluIHRoZSBlZGsy
+IHNvdXJjZSB0cmVlLCBmb3IgdGhlDQo+IHNhbWUgaW5mb3JtYXRpb24uKQ0KPiANCj4gVGhlIGVy
+cm9yIG1lc3NhZ2UgaXMgbG9nZ2VkIGlmOg0KPiAtIHRoZSBvZmZzZXQgYXQgd2hpY2ggdGhlIGNo
+ZWNrc3VtIHNob3VsZCBiZSBzdG9yZWQgZmFsbHMgb3V0c2lkZSBvZiB0aGUNCj4gc2l6ZSBvZiB0
+aGUgZndfY2ZnIGJsb2IsIG9yDQo+IC0gdGhlIHJhbmdlIG92ZXIgd2hpY2ggdGhlIGNoZWNrc3Vt
+IHNob3VsZCBiZSBjYWxjdWxhdGVkIGZhbGxzIG91dHNpZGUNCj4gKGF0IGxlYXN0IGluIHBhcnQp
+IG9mIHRoZSBmd19jZmcgYmxvYi4NCj4gDQo+IFRvIG1lIHRoaXMgc3VnZ2VzdHMgdGhhdCBRRU1V
+IGdlbmVyYXRlcyBhbiBpbnZhbGlkDQo+IENPTU1BTkRfQUREX0NIRUNLU1VNDQo+IGNvbW1hbmQg
+Zm9yIHRoZSBmaXJtd2FyZS4NCj4gDQo+IC4uLiBJJ3ZlIHRyaWVkIHRvIHNraW0gdGhlIHBhdGNo
+ZXMgYnJpZWZseS4gSSB0aGluayB0aGVyZSBtdXN0IGJlIGFuDQo+IGVycm9yIGluIHRoZSBEU0RU
+IGJ1aWxkaW5nIGxvZ2ljIHRoYXQgaXMgb25seSBhY3RpdmUgb24gcmVib290IGlmIGFuDQo+IG52
+ZGltbSBtb2R1bGUgd2FzIGhvdC1hZGRlZCBiZWZvcmUgdGhlIHJlYm9vdC4NCg0KVGhhbmtzIGZv
+ciB0YWtpbmcgYSBsb29rIGFuZCB0aGUgcG9pbnRlcnMuIEkgd2lsbCBkZWJ1ZyB0aGlzIGZ1cnRo
+ZXINCmFuZCBnZXQgYmFjay4NCg0KVGhhbmtzLA0KU2hhbWVlcg0KDQo+IFRoYW5rcywNCj4gTGFz
+emxvDQo+IA0KPiANCj4gPj4gWzFdaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9x
+ZW11LWRldmVsLzIwMTktMDEvbXNnMDU3NDAuaHRtbA0KPiA+PiBbMl1odHRwczovL3BhdGNod29y
+ay5rZXJuZWwub3JnL3BhdGNoLzEwNzI0NDU1Lw0KPiA+PiBbM11odHRwczovL2xpc3RzLmdudS5v
+cmcvYXJjaGl2ZS9odG1sL3FlbXUtYXJtLzIwMTUtMTIvbXNnMDAwOTUuaHRtbA0KPiA+PiBbNF1o
+dHRwczovL2dpdGh1Yi5jb20vZWF1Z2VyL3FlbXUvdHJlZS92My4xLjAtZGltbS12NQ0KPiA+Pg0K
+PiA+PiBTaGFtZWVyIEtvbG90aHVtICg0KToNCj4gPj4gICBodzphY3BpOiBNYWtlIEFDUEkgSU8g
+YWRkcmVzcyBzcGFjZSBjb25maWd1cmFibGUNCj4gPj4gICBody9hcm0vdmlydDogQWRkIEdQSU8g
+YmFzZWQgcGNkaW1tIGhvdHBsdWcgQUNQSSBldmVudCBzdXBwb3J0DQo+ID4+ICAgaHcvYXJtL3Zp
+cnQ6IEVuYWJsZSBwYy1kaW1tIGhvdHBsdWcgc3VwcG9ydA0KPiA+PiAgIGh3L2FybS92aXJ0OiBB
+ZGQgbnZkaW1tIGhvdHBsdWcgc3VwcG9ydA0KPiA+Pg0KPiA+PiAgZGVmYXVsdC1jb25maWdzL2Fy
+bS1zb2Z0bW11Lm1hayAgfCAgIDEgKw0KPiA+PiAgaHcvYWNwaS9tZW1vcnlfaG90cGx1Zy5jICAg
+ICAgICAgfCAgMTMgKysrLS0NCj4gPj4gIGh3L2FybS92aXJ0LWFjcGktYnVpbGQuYyAgICAgICAg
+IHwgIDQ1ICsrKysrKysrKysrKysrKy0tDQo+ID4+ICBody9hcm0vdmlydC5jICAgICAgICAgICAg
+ICAgICAgICB8IDEwNQ0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0N
+Cj4gPj4gIGh3L2kzODYvYWNwaS1idWlsZC5jICAgICAgICAgICAgIHwgICAzICstDQo+ID4+ICBp
+bmNsdWRlL2h3L2FjcGkvbWVtb3J5X2hvdHBsdWcuaCB8ICAgNiArKy0NCj4gPj4gIGluY2x1ZGUv
+aHcvYXJtL3ZpcnQuaCAgICAgICAgICAgIHwgIDE1ICsrKysrKw0KPiA+PiAgNyBmaWxlcyBjaGFu
+Z2VkLCAxNjggaW5zZXJ0aW9ucygrKSwgMjAgZGVsZXRpb25zKC0pDQo+ID4+DQoNCg==
