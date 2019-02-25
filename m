@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38515)
+Received: from eggs.gnu.org ([209.51.188.92]:38399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5p-0001KV-Ci
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:57 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5j-0001Fp-Np
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5o-0001qR-NC
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:57 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI5h-0001kA-OE
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:51 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:38 +0100
-Message-Id: <20190225152053.15976-57-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:33 +0100
+Message-Id: <20190225152053.15976-52-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 56/71] block: BDS options may lack the "driver"
- option
+Subject: [Qemu-devel] [PULL 51/71] block: Do not copy exact_filename from
+ format file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +27,53 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-When BDSs are created by qemu itself (e.g. as filters in block jobs),
-they may not have a "driver" option in their options QDict.  When
-generating a json:{} filename, however, it must always be present.
+If a format BDS's file BDS is in turn a format BDS, we cannot simply use
+the same filename, because when opening a BDS tree based on a filename
+alone, qemu will create only one format node on top of one protocol node
+(disregarding a potential backing file).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20190201192935.18394-31-mreitz@redhat.com
+Message-id: 20190201192935.18394-26-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ block.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/block.c b/block.c
-index 9d9929e1a2..35e78e2172 100644
+index 23869623ea..9d9929e1a2 100644
 --- a/block.c
 +++ b/block.c
-@@ -5618,6 +5618,12 @@ static bool append_strong_runtime_options(QDict *d=
-, BlockDriverState *bs)
+@@ -5731,9 +5731,21 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+=20
+         bs->exact_filename[0] =3D '\0';
+=20
+-        /* If no specific options have been given for this BDS, the file=
+name of
+-         * the underlying file should suffice for this one as well */
+-        if (bs->file->bs->exact_filename[0] && !generate_json_filename) =
+{
++        /*
++         * We can use the underlying file's filename if:
++         * - it has a filename,
++         * - the file is a protocol BDS, and
++         * - opening that file (as this BDS's format) will automatically=
+ create
++         *   the BDS tree we have right now, that is:
++         *   - the user did not significantly change this BDS's behavior=
+ with
++         *     some explicit (strong) options
++         *   - no non-file child of this BDS has been overridden by the =
+user
++         *   Both of these conditions are represented by generate_json_f=
+ilename.
++         */
++        if (bs->file->bs->exact_filename[0] &&
++            bs->file->bs->drv->bdrv_file_open &&
++            !generate_json_filename)
++        {
+             strcpy(bs->exact_filename, bs->file->bs->exact_filename);
          }
      }
-=20
-+    if (!qdict_haskey(d, "driver")) {
-+        /* Drivers created with bdrv_new_open_driver() may not have a
-+         * @driver option.  Add it here. */
-+        qdict_put_str(d, "driver", bs->drv->format_name);
-+    }
-+
-     return found_any;
- }
-=20
 --=20
 2.20.1
