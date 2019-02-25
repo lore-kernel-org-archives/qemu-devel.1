@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58973)
+Received: from eggs.gnu.org ([209.51.188.92]:58983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyL8q-00073x-AX
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 13:38:17 -0500
+	(envelope-from <armbru@redhat.com>) id 1gyL8q-00074C-LG
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 13:38:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyL8n-0005W7-0o
+	(envelope-from <armbru@redhat.com>) id 1gyL8n-0005Wq-Gk
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 13:38:16 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 25 Feb 2019 19:37:51 +0100
-Message-Id: <20190225183757.27378-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 0/6] pc: Support firmware configuration
- with -blockdev
+Date: Mon, 25 Feb 2019 19:37:55 +0100
+Message-Id: <20190225183757.27378-5-armbru@redhat.com>
+In-Reply-To: <20190225183757.27378-1-armbru@redhat.com>
+References: <20190225183757.27378-1-armbru@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 4/6] sysbus: Fix latent bug with onboard
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +23,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com
 
-This is RFC mostly due to the last patch.  I'm not 100% sure my
-approach is sane, and there's also an unresolved FIXME.  Please
-review.
+The first call of sysbus_get_default() creates the main system bus and
+stores it in QOM as "/machine/unattached/sysbus".  This must not
+happen before main() creates "/machine", or else container_get() would
+"helpfully" create it as "container" object, and the real creation of
+"/machine" would later abort with "attempt to add duplicate property
+'machine' to object (type 'container')".  Has been that way ever since
+we wired up busses in QOM (commit f968fc6892d, v1.2.0).
 
-Based-on: <20190218125615.18970-1-armbru@redhat.com>
+I believe the bug is latent.  I got it to bite by trying to
+qdev_create() a sysbus device from a machine's .instance_init()
+method.
 
-Markus Armbruster (6):
-  qdev: Fix latent bug with compat_props and onboard devices
-  qom: Move compat_props machinery from qdev to QOM
-  vl: Fix latent bug with -global and onboard devices
-  sysbus: Fix latent bug with onboard devices
-  vl: Create block backends before setting machine properties
-  pc: Support firmware configuration with -blockdev
+The fix is obvious: store the main system bus in QOM right after
+creating "/machine".
 
- accel/accel.c            |   1 +
- hw/block/pflash_cfi01.c  |   5 +
- hw/core/qdev.c           |  21 +---
- hw/core/sysbus.c         |   3 -
- hw/i386/pc.c             |   4 +-
- hw/i386/pc_sysfw.c       | 230 ++++++++++++++++++++++++++-------------
- include/hw/block/flash.h |   1 +
- include/hw/i386/pc.h     |   6 +-
- include/hw/qdev-core.h   |   2 -
- include/qom/object.h     |   3 +
- qom/object.c             |  39 +++++++
- vl.c                     |  90 +++++++--------
- 12 files changed, 255 insertions(+), 150 deletions(-)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/core/sysbus.c | 3 ---
+ vl.c             | 4 ++++
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
---=20
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 9f9edbcab9..307cf90a51 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -357,9 +357,6 @@ static void main_system_bus_create(void)
+     qbus_create_inplace(main_system_bus, system_bus_info.instance_size,
+                         TYPE_SYSTEM_BUS, NULL, "main-system-bus");
+     OBJECT(main_system_bus)->free = g_free;
+-    object_property_add_child(container_get(qdev_get_machine(),
+-                                            "/unattached"),
+-                              "sysbus", OBJECT(main_system_bus), NULL);
+ }
+ 
+ BusState *sysbus_get_default(void)
+diff --git a/vl.c b/vl.c
+index e3fdce410f..6ce3d2d448 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3990,6 +3990,10 @@ int main(int argc, char **argv, char **envp)
+     }
+     object_property_add_child(object_get_root(), "machine",
+                               OBJECT(current_machine), &error_abort);
++    object_property_add_child(container_get(OBJECT(current_machine),
++                                            "/unattached"),
++                              "sysbus", OBJECT(sysbus_get_default()),
++                              NULL);
+ 
+     if (machine_class->minimum_page_bits) {
+         if (!set_preferred_target_page_bits(machine_class->minimum_page_bits)) {
+-- 
 2.17.2
