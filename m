@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35128)
+Received: from eggs.gnu.org ([209.51.188.92]:36335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyHvi-00054k-R8
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:12:31 -0500
+	(envelope-from <mst@redhat.com>) id 1gyI2O-0006wL-Ge
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:19:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyHvi-00044B-2Q
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:12:30 -0500
-References: <20190223002209.23084-1-jsnow@redhat.com>
-	<20190223002209.23084-3-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <24fbb392-d5d5-dba5-f698-638f6297b413@redhat.com>
-Date: Mon, 25 Feb 2019 09:12:08 -0600
+	(envelope-from <mst@redhat.com>) id 1gyI2I-0007uf-R2
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:19:22 -0500
+Received: from mail-qt1-f175.google.com ([209.85.160.175]:40123)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gyI2I-0007t7-Kd
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:19:18 -0500
+Received: by mail-qt1-f175.google.com with SMTP id j36so10845700qta.7
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 07:19:17 -0800 (PST)
+Date: Mon, 25 Feb 2019 10:19:12 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190225101718-mutt-send-email-mst@kernel.org>
+References: <20190221173326.31874-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190223002209.23084-3-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] block/dirty-bitmap: add
- inconsistent status
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190221173326.31874-1-mst@redhat.com>
+Subject: [Qemu-devel] [PULL v2 resend 00/26] pci, pc, virtio: fixes, cleanups,
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,23 +30,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On 2/22/19 6:22 PM, John Snow wrote:
-> Even though the status field is deprecated, we still have to support
-> it for a few more releases. Since this is a very new kind of bitmap
-> state, it makes sense for it to have its own status field.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/dirty-bitmap.c | 7 ++++++-
->  qapi/block-core.json | 7 ++++++-
->  2 files changed, 12 insertions(+), 2 deletions(-)
-> 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+The following changes since commit fc3dbb90f2eb069801bfb4cfe9cbc83cf9c5f4a9:
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+  Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-02-21 13:09:33 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+
+for you to fetch changes up to 88c869198aa630e0477d653d0abf3f42c7c44d1f
+
+  pci: Sanity test minimum downstream LNKSTA (2019-02-21 12:28:41 -0500)
+
+----------------------------------------------------------------
+
+Note: this is same as a fixup I sent earlier, this is just a resend to
+make sure it's not missed.  This should also help me figure out whether
+this is a good format to use.
+
+----------------------------------------------------------------
+pci, pc, virtio: fixes, cleanups, tests
+
+Lots of work on tests: BiosTablesTest UEFI app,
+vhost-user testing for non-Linux hosts.
+Misc cleanups and fixes all over the place
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Alex Williamson (1):
+      pci: Sanity test minimum downstream LNKSTA
+
+Alexey Kardashevskiy (1):
+      pci: Move NVIDIA vendor id to the rest of ids
+
+Changpeng Liu (1):
+      contrib/vhost-user-blk: fix the compilation issue
+
+Daniel P. Berrangé (1):
+      hw/smbios: fix offset of type 3 sku field
+
+David Gibson (5):
+      virtio-balloon: Remove unnecessary MADV_WILLNEED on deflate
+      virtio-balloon: Corrections to address verification
+      virtio-balloon: Rework ballon_page() interface
+      virtio-balloon: Use ram_block_discard_range() instead of raw madvise()
+      virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size
+
+Laszlo Ersek (5):
+      roms: add the edk2 project as a git submodule
+      roms: build the EfiRom utility from the roms/edk2 submodule
+      tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
+      tests/uefi-test-tools: add build scripts
+      tests/data: introduce "uefi-boot-images" with the "bios-tables-test" ISOs
+
+Paolo Bonzini (9):
+      vhost-net: move stubs to a separate file
+      vhost-net-user: add stubs for when no virtio-net device is present
+      vhost: restrict Linux dependency to kernel vhost
+      vhost-user: support cross-endian vnet headers
+      vhost-net: compile it on all targets that have virtio-net.
+      vhost-net: revamp configure logic
+      vhost-user-test: create a main loop per TestServer
+      vhost-user-test: small changes to init_hugepagefs
+      vhost-user-test: create a temporary directory per TestServer
+
+Peter Xu (1):
+      i386/kvm: ignore masked irqs when update msi routes
+
+Philippe Mathieu-Daudé (1):
+      Revert "contrib/vhost-user-blk: fix the compilation issue"
+
+Wei Yang (1):
+      pc-dimm: use same mechanism for [get|set]_addr
+
+ configure                                          | 102 ++++++++-----
+ Makefile                                           |   6 +-
+ default-configs/virtio.mak                         |   4 +-
+ include/exec/poison.h                              |   1 -
+ include/hw/firmware/smbios.h                       |   1 +
+ include/hw/pci/pci_ids.h                           |   2 +
+ include/hw/virtio/virtio-balloon.h                 |   3 +
+ .../UefiTestToolsPkg/Include/Guid/BiosTablesTest.h |  67 +++++++++
+ hw/mem/pc-dimm.c                                   |   4 +-
+ hw/net/vhost_net-stub.c                            |  92 ++++++++++++
+ hw/net/vhost_net.c                                 |  85 +----------
+ hw/pci/pcie.c                                      |  13 +-
+ hw/smbios/smbios.c                                 |   1 +
+ hw/vfio/pci-quirks.c                               |   2 -
+ hw/virtio/vhost-backend.c                          |  12 +-
+ hw/virtio/vhost-user.c                             |  13 +-
+ hw/virtio/vhost.c                                  |   2 +-
+ hw/virtio/virtio-balloon.c                         | 102 ++++++++++---
+ net/net.c                                          |   2 +-
+ net/vhost-user-stub.c                              |  23 +++
+ net/vhost-user.c                                   |  13 ++
+ .../BiosTablesTest/BiosTablesTest.c                | 130 +++++++++++++++++
+ tests/vhost-user-test.c                            | 160 +++++++++++----------
+ .gitmodules                                        |   3 +
+ backends/Makefile.objs                             |   5 +-
+ hw/net/Makefile.objs                               |   4 +-
+ hw/virtio/Makefile.objs                            |   8 +-
+ net/Makefile.objs                                  |   4 +-
+ roms/Makefile                                      |  13 +-
+ roms/edk2                                          |   1 +
+ tests/Makefile.include                             |   5 +-
+ .../bios-tables-test.aarch64.iso.qcow2             | Bin 0 -> 11776 bytes
+ .../bios-tables-test.arm.iso.qcow2                 | Bin 0 -> 11776 bytes
+ .../bios-tables-test.i386.iso.qcow2                | Bin 0 -> 12800 bytes
+ .../bios-tables-test.x86_64.iso.qcow2              | Bin 0 -> 13312 bytes
+ tests/uefi-test-tools/.gitignore                   |   3 +
+ tests/uefi-test-tools/LICENSE                      |  25 ++++
+ tests/uefi-test-tools/Makefile                     | 106 ++++++++++++++
+ .../BiosTablesTest/BiosTablesTest.inf              |  41 ++++++
+ .../UefiTestToolsPkg/UefiTestToolsPkg.dec          |  27 ++++
+ .../UefiTestToolsPkg/UefiTestToolsPkg.dsc          |  69 +++++++++
+ tests/uefi-test-tools/build.sh                     | 145 +++++++++++++++++++
+ 42 files changed, 1051 insertions(+), 248 deletions(-)
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
+ create mode 100644 hw/net/vhost_net-stub.c
+ create mode 100644 net/vhost-user-stub.c
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c
+ create mode 160000 roms/edk2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2
+ create mode 100644 tests/uefi-test-tools/.gitignore
+ create mode 100644 tests/uefi-test-tools/LICENSE
+ create mode 100644 tests/uefi-test-tools/Makefile
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc
+ create mode 100755 tests/uefi-test-tools/build.sh
