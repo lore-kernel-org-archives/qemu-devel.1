@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38359)
+Received: from eggs.gnu.org ([209.51.188.92]:38358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5h-0001De-Ou
+	(envelope-from <kwolf@redhat.com>) id 1gyI5h-0001Dc-Op
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5f-0001gx-CN
+	(envelope-from <kwolf@redhat.com>) id 1gyI5f-0001h1-CU
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:49 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:31 +0100
-Message-Id: <20190225152053.15976-50-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:30 +0100
+Message-Id: <20190225152053.15976-49-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 49/71] block: Generically refresh runtime options
+Subject: [Qemu-devel] [PULL 48/71] block: Add
+ BlockDriver.bdrv_gather_child_options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,229 +27,186 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Instead of having every block driver which implements
-bdrv_refresh_filename() copy all of the strong runtime options over to
-bs->full_open_options, implement this process generically in
-bdrv_refresh_filename().
+Some follow-up patches will rework the way bs->full_open_options is
+refreshed in bdrv_refresh_filename(). The new implementation will remove
+the need for the block drivers' bdrv_refresh_filename() implementations
+to set bs->full_open_options; instead, it will be generic and use static
+information from each block driver.
 
-This patch only adds this new generic implementation, it does not remove
-the old functionality. This is done in a follow-up patch.
+However, by implementing bdrv_gather_child_options(), block drivers will
+still be able to override the way the full_open_options of their
+children are incorporated into their own.
 
-With this patch, some superfluous information (that should never have
-been there) may be removed from some JSON filenames, as can be seen in
-the change to iotests 110's and 228's reference outputs.
+We need to implement this function for VMDK because we have to prevent
+the generic implementation from gathering the options of all children:
+It is not possible to specify options for the extents through the
+runtime options.
+
+For quorum, the child names that would be used by the generic
+implementation and the ones that we actually (currently) want to use
+differ. See quorum_gather_child_options() for more information.
+
+Note that both of these are cases which are not ideal: In case of VMDK
+it would probably be nice to be able to specify options for all extents.
+In case of quorum, the current runtime option structure is simply broken
+and needs to be fixed (but that is left for another patch).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190201192935.18394-24-mreitz@redhat.com
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Message-id: 20190201192935.18394-23-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                    | 116 ++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/110.out |   2 +-
- tests/qemu-iotests/228     |   7 ++-
- tests/qemu-iotests/228.out |   2 +-
- 4 files changed, 121 insertions(+), 6 deletions(-)
+ include/block/block_int.h | 24 +++++++++++++++++++++++
+ block/quorum.c            | 40 +++++++++++++++++++++++++++++++++++++++
+ block/vmdk.c              | 19 +++++++++++++++++++
+ 3 files changed, 83 insertions(+)
 
-diff --git a/block.c b/block.c
-index 185475ab00..a6e523059d 100644
---- a/block.c
-+++ b/block.c
-@@ -5535,6 +5535,92 @@ out:
-     return to_replace_bs;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 160e8cac1f..ab4cf2df07 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -141,6 +141,30 @@ struct BlockDriver {
+=20
+     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
+=20
++    /*
++     * Gathers the open options for all children into @target.
++     * A simple format driver (without backing file support) might
++     * implement this function like this:
++     *
++     *     QINCREF(bs->file->bs->full_open_options);
++     *     qdict_put(target, "file", bs->file->bs->full_open_options);
++     *
++     * If not specified, the generic implementation will simply put
++     * all children's options under their respective name.
++     *
++     * @backing_overridden is true when bs->backing seems not to be
++     * the child that would result from opening bs->backing_file.
++     * Therefore, if it is true, the backing child's options should be
++     * gathered; otherwise, there is no need since the backing child
++     * is the one implied by the image header.
++     *
++     * Note that ideally this function would not be needed.  Every
++     * block driver which implements it is probably doing something
++     * shady regarding its runtime option structure.
++     */
++    void (*bdrv_gather_child_options)(BlockDriverState *bs, QDict *targe=
+t,
++                                      bool backing_overridden);
++
+     /*
+      * Returns an allocated string which is the directory name of this B=
+DS: It
+      * will be used to make relative filenames absolute by prepending th=
+is
+diff --git a/block/quorum.c b/block/quorum.c
+index 1af6458dc4..3984f0aa4f 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1094,6 +1094,45 @@ static void quorum_refresh_filename(BlockDriverSta=
+te *bs, QDict *options)
+     bs->full_open_options =3D opts;
  }
 =20
-+/**
-+ * Iterates through the list of runtime option keys that are said to
-+ * be "strong" for a BDS.  An option is called "strong" if it changes
-+ * a BDS's data.  For example, the null block driver's "size" and
-+ * "read-zeroes" options are strong, but its "latency-ns" option is
-+ * not.
-+ *
-+ * If a key returned by this function ends with a dot, all options
-+ * starting with that prefix are strong.
-+ */
-+static const char *const *strong_options(BlockDriverState *bs,
-+                                         const char *const *curopt)
++static void quorum_gather_child_options(BlockDriverState *bs, QDict *tar=
+get,
++                                        bool backing_overridden)
 +{
-+    static const char *const global_options[] =3D {
-+        "driver", "filename", NULL
-+    };
++    BDRVQuorumState *s =3D bs->opaque;
++    QList *children_list;
++    int i;
 +
-+    if (!curopt) {
-+        return &global_options[0];
-+    }
++    /*
++     * The generic implementation for gathering child options in
++     * bdrv_refresh_filename() would use the names of the children
++     * as specified for bdrv_open_child() or bdrv_attach_child(),
++     * which is "children.%u" with %u being a value
++     * (s->next_child_index) that is incremented each time a new child
++     * is added (and never decremented).  Since children can be
++     * deleted at runtime, there may be gaps in that enumeration.
++     * When creating a new quorum BDS and specifying the children for
++     * it through runtime options, the enumeration used there may not
++     * have any gaps, though.
++     *
++     * Therefore, we have to create a new gap-less enumeration here
++     * (which we can achieve by simply putting all of the children's
++     * full_open_options into a QList).
++     *
++     * XXX: Note that there are issues with the current child option
++     *      structure quorum uses (such as the fact that children do
++     *      not really have unique permanent names).  Therefore, this
++     *      is going to have to change in the future and ideally we
++     *      want quorum to be covered by the generic implementation.
++     */
 +
-+    curopt++;
-+    if (curopt =3D=3D &global_options[ARRAY_SIZE(global_options) - 1] &&=
- bs->drv) {
-+        curopt =3D bs->drv->strong_runtime_opts;
-+    }
++    children_list =3D qlist_new();
++    qdict_put(target, "children", children_list);
 +
-+    return (curopt && *curopt) ? curopt : NULL;
-+}
-+
-+/**
-+ * Copies all strong runtime options from bs->options to the given
-+ * QDict.  The set of strong option keys is determined by invoking
-+ * strong_options().
-+ *
-+ * Returns true iff any strong option was present in bs->options (and
-+ * thus copied to the target QDict) with the exception of "filename"
-+ * and "driver".  The caller is expected to use this value to decide
-+ * whether the existence of strong options prevents the generation of
-+ * a plain filename.
-+ */
-+static bool append_strong_runtime_options(QDict *d, BlockDriverState *bs=
-)
-+{
-+    bool found_any =3D false;
-+    const char *const *option_name =3D NULL;
-+
-+    if (!bs->drv) {
-+        return false;
-+    }
-+
-+    while ((option_name =3D strong_options(bs, option_name))) {
-+        bool option_given =3D false;
-+
-+        assert(strlen(*option_name) > 0);
-+        if ((*option_name)[strlen(*option_name) - 1] !=3D '.') {
-+            QObject *entry =3D qdict_get(bs->options, *option_name);
-+            if (!entry) {
-+                continue;
-+            }
-+
-+            qdict_put_obj(d, *option_name, qobject_ref(entry));
-+            option_given =3D true;
-+        } else {
-+            const QDictEntry *entry;
-+            for (entry =3D qdict_first(bs->options); entry;
-+                 entry =3D qdict_next(bs->options, entry))
-+            {
-+                if (strstart(qdict_entry_key(entry), *option_name, NULL)=
-) {
-+                    qdict_put_obj(d, qdict_entry_key(entry),
-+                                  qobject_ref(qdict_entry_value(entry)))=
++    for (i =3D 0; i < s->num_children; i++) {
++        qlist_append(children_list,
++                     qobject_ref(s->children[i]->bs->full_open_options))=
 ;
-+                    option_given =3D true;
-+                }
-+            }
-+        }
-+
-+        /* While "driver" and "filename" need to be included in a JSON f=
-ilename,
-+         * their existence does not prohibit generation of a plain filen=
-ame. */
-+        if (!found_any && option_given &&
-+            strcmp(*option_name, "driver") && strcmp(*option_name, "file=
-name"))
-+        {
-+            found_any =3D true;
-+        }
 +    }
-+
-+    return found_any;
 +}
 +
- static bool append_open_options(QDict *d, BlockDriverState *bs)
+ static char *quorum_dirname(BlockDriverState *bs, Error **errp)
  {
-     const QDictEntry *entry;
-@@ -5711,9 +5797,37 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-         bs->full_open_options =3D opts;
-     }
+     /* In general, there are multiple BDSs with different dirnames below=
+ this
+@@ -1121,6 +1160,7 @@ static BlockDriver bdrv_quorum =3D {
+     .bdrv_open                          =3D quorum_open,
+     .bdrv_close                         =3D quorum_close,
+     .bdrv_refresh_filename              =3D quorum_refresh_filename,
++    .bdrv_gather_child_options          =3D quorum_gather_child_options,
+     .bdrv_dirname                       =3D quorum_dirname,
 =20
-+    /* Gather the options QDict */
-+    opts =3D qdict_new();
-+    append_strong_runtime_options(opts, bs);
+     .bdrv_co_flush_to_disk              =3D quorum_co_flush,
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 81c506cb69..91345babb5 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -27,6 +27,7 @@
+ #include "qapi/error.h"
+ #include "block/block_int.h"
+ #include "sysemu/block-backend.h"
++#include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/error-report.h"
+ #include "qemu/module.h"
+@@ -2608,6 +2609,23 @@ static int vmdk_get_info(BlockDriverState *bs, Blo=
+ckDriverInfo *bdi)
+     return 0;
+ }
+=20
++static void vmdk_gather_child_options(BlockDriverState *bs, QDict *targe=
+t,
++                                      bool backing_overridden)
++{
++    /* No children but file and backing can be explicitly specified (TOD=
+O) */
++    qdict_put(target, "file",
++              qobject_ref(bs->file->bs->full_open_options));
 +
-+    if (drv->bdrv_gather_child_options) {
-+        /* Some block drivers may not want to present all of their child=
-ren's
-+         * options, or name them differently from BdrvChild.name */
-+        drv->bdrv_gather_child_options(bs, opts, backing_overridden);
-+    } else {
-+        QLIST_FOREACH(child, &bs->children, next) {
-+            if (child->role =3D=3D &child_backing && !backing_overridden=
-) {
-+                /* We can skip the backing BDS if it has not been overri=
-dden */
-+                continue;
-+            }
-+
-+            qdict_put(opts, child->name,
-+                      qobject_ref(child->bs->full_open_options));
-+        }
-+
-+        if (backing_overridden && !bs->backing) {
-+            /* Force no backing file */
-+            qdict_put_null(opts, "backing");
++    if (backing_overridden) {
++        if (bs->backing) {
++            qdict_put(target, "backing",
++                      qobject_ref(bs->backing->bs->full_open_options));
++        } else {
++            qdict_put_null(target, "backing");
 +        }
 +    }
++}
 +
-+    qobject_unref(bs->full_open_options);
-+    bs->full_open_options =3D opts;
-+
-     if (bs->exact_filename[0]) {
-         pstrcpy(bs->filename, sizeof(bs->filename), bs->exact_filename);
--    } else if (bs->full_open_options) {
-+    } else {
-         QString *json =3D qobject_to_json(QOBJECT(bs->full_open_options)=
-);
-         snprintf(bs->filename, sizeof(bs->filename), "json:%s",
-                  qstring_get_str(json));
-diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index 1d0b2475cc..46e6a60510 100644
---- a/tests/qemu-iotests/110.out
-+++ b/tests/qemu-iotests/110.out
-@@ -22,7 +22,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D671=
-08864 backing_file=3Dt.IMGFMT.b
+ static QemuOptsList vmdk_create_opts =3D {
+     .name =3D "vmdk-create-opts",
+     .head =3D QTAILQ_HEAD_INITIALIZER(vmdk_create_opts.head),
+@@ -2679,6 +2697,7 @@ static BlockDriver bdrv_vmdk =3D {
+     .bdrv_get_specific_info       =3D vmdk_get_specific_info,
+     .bdrv_refresh_limits          =3D vmdk_refresh_limits,
+     .bdrv_get_info                =3D vmdk_get_info,
++    .bdrv_gather_child_options    =3D vmdk_gather_child_options,
 =20
- =3D=3D=3D Nodes without a common directory =3D=3D=3D
-=20
--image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file"=
-, "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_=
-DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-co=
-rrupted": false, "vote-threshold": 1}}
-+image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file"=
-, "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_=
-DIR/t.IMGFMT.copy"}], "driver": "quorum", "vote-threshold": 1}}
- file format: IMGFMT
- virtual size: 64M (67108864 bytes)
- backing file: t.IMGFMT.base (cannot determine actual path)
-diff --git a/tests/qemu-iotests/228 b/tests/qemu-iotests/228
-index 2930f8442c..7a57c41e29 100755
---- a/tests/qemu-iotests/228
-+++ b/tests/qemu-iotests/228
-@@ -230,9 +230,10 @@ with iotests.FilePath('base.img') as base_img_path, =
-\
-                overlay=3D'node0')
-=20
-     # This should give us the original plain result
--    # FIXME: Currently, the block layer considers the runtime backing
--    #        file to be different from the image header, which is
--    #        wrong.  This is fixed by a future patch.
-+    # FIXME: Currently, it yields a json:{} filename even though it
-+    #        only contains a @driver and a @file entry, so a plain
-+    #        filename would obviously suffice.  This is fixed by a
-+    #        future patch.
-=20
-     log_node_info(vm.node_info('node0'))
-=20
-diff --git a/tests/qemu-iotests/228.out b/tests/qemu-iotests/228.out
-index 57fe97d4bc..393ab09164 100644
---- a/tests/qemu-iotests/228.out
-+++ b/tests/qemu-iotests/228.out
-@@ -74,7 +74,7 @@ bs->backing: (none)
- {"execute": "blockdev-snapshot", "arguments": {"node": "original-backing=
-", "overlay": "node0"}}
- {"return": {}}
-=20
--bs->filename: json:{"backing": {"driver": "IMGFMT", "file": {"driver": "=
-file", "filename": "TEST_DIR/PID-base.img"}}, "driver": "IMGFMT", "file":=
- {"driver": "file", "filename": "TEST_DIR/PID-top.img"}}
-+bs->filename: json:{"driver": "IMGFMT", "file": {"driver": "file", "file=
-name": "TEST_DIR/PID-top.img"}}
- bs->backing_file: TEST_DIR/PID-base.img
- bs->backing->bs->filename: TEST_DIR/PID-base.img
-=20
+     .supports_backing             =3D true,
+     .create_opts                  =3D &vmdk_create_opts,
 --=20
 2.20.1
