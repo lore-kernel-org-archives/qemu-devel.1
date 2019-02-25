@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37959)
+Received: from eggs.gnu.org ([209.51.188.92]:37971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5G-0000iQ-PL
+	(envelope-from <kwolf@redhat.com>) id 1gyI5G-0000iV-R8
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI5B-0001L1-N8
+	(envelope-from <kwolf@redhat.com>) id 1gyI5E-0001Nq-Kw
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:22:22 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:18 +0100
-Message-Id: <20190225152053.15976-37-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:10 +0100
+Message-Id: <20190225152053.15976-29-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 36/71] block:
- bdrv_get_full_backing_filename_from_...'s ret. val.
+Subject: [Qemu-devel] [PULL 28/71] block: Use children list in
+ bdrv_refresh_filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,205 +27,124 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Make bdrv_get_full_backing_filename_from_filename() return an allocated
-string instead of placing the result in a caller-provided buffer.
+bdrv_refresh_filename() should invoke itself recursively on all
+children, not just on file.
+
+With that change, we can remove the manual invocations in blkverify,
+quorum, commit, mirror, and blklogwrites.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190201192935.18394-11-mreitz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Message-id: 20190201192935.18394-3-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h |  7 +++---
- block.c               | 53 ++++++++++++++++++++++++++++++-------------
- block/vmdk.c          | 10 ++++----
- qemu-img.c            | 12 ++++------
- 4 files changed, 49 insertions(+), 33 deletions(-)
+ block.c              | 9 +++++----
+ block/blklogwrites.c | 3 ---
+ block/blkverify.c    | 3 ---
+ block/commit.c       | 1 -
+ block/mirror.c       | 1 -
+ block/quorum.c       | 1 -
+ 6 files changed, 5 insertions(+), 13 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index e233372a3a..5f1650304d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -489,10 +489,9 @@ void bdrv_get_backing_filename(BlockDriverState *bs,
-                                char *filename, int filename_size);
- void bdrv_get_full_backing_filename(BlockDriverState *bs,
-                                     char *dest, size_t sz, Error **errp)=
-;
--void bdrv_get_full_backing_filename_from_filename(const char *backed,
--                                                  const char *backing,
--                                                  char *dest, size_t sz,
--                                                  Error **errp);
-+char *bdrv_get_full_backing_filename_from_filename(const char *backed,
-+                                                   const char *backing,
-+                                                   Error **errp);
-=20
- int path_has_protocol(const char *path);
- int path_is_absolute(const char *path);
 diff --git a/block.c b/block.c
-index 91859a928d..466d7887cc 100644
+index 88aa687a68..d97f5e7084 100644
 --- a/block.c
 +++ b/block.c
-@@ -312,20 +312,29 @@ fail:
-     return -EACCES;
- }
+@@ -5536,16 +5536,17 @@ static bool append_open_options(QDict *d, BlockDr=
+iverState *bs)
+ void bdrv_refresh_filename(BlockDriverState *bs)
+ {
+     BlockDriver *drv =3D bs->drv;
++    BdrvChild *child;
+     QDict *opts;
 =20
--void bdrv_get_full_backing_filename_from_filename(const char *backed,
--                                                  const char *backing,
--                                                  char *dest, size_t sz,
--                                                  Error **errp)
-+/*
-+ * If @backing is empty, this function returns NULL without setting
-+ * @errp.  In all other cases, NULL will only be returned with @errp
-+ * set.
-+ *
-+ * Therefore, a return value of NULL without @errp set means that
-+ * there is no backing file; if @errp is set, there is one but its
-+ * absolute filename cannot be generated.
-+ */
-+char *bdrv_get_full_backing_filename_from_filename(const char *backed,
-+                                                   const char *backing,
-+                                                   Error **errp)
- {
--    if (backing[0] =3D=3D '\0' || path_has_protocol(backing) ||
--        path_is_absolute(backing))
--    {
--        pstrcpy(dest, sz, backing);
-+    if (backing[0] =3D=3D '\0') {
-+        return NULL;
-+    } else if (path_has_protocol(backing) || path_is_absolute(backing)) =
-{
-+        return g_strdup(backing);
-     } else if (backed[0] =3D=3D '\0' || strstart(backed, "json:", NULL))=
- {
-         error_setg(errp, "Cannot use relative backing file names for '%s=
-'",
-                    backed);
-+        return NULL;
-     } else {
--        path_combine_deprecated(dest, sz, backed, backing);
-+        return path_combine(backed, backing);
+     if (!drv) {
+         return;
      }
- }
 =20
-@@ -333,12 +342,24 @@ void bdrv_get_full_backing_filename(BlockDriverStat=
-e *bs, char *dest, size_t sz,
-                                     Error **errp)
+-    /* This BDS's file name will most probably depend on its file's name=
+, so
+-     * refresh that first */
+-    if (bs->file) {
+-        bdrv_refresh_filename(bs->file->bs);
++    /* This BDS's file name may depend on any of its children's file nam=
+es, so
++     * refresh those first */
++    QLIST_FOREACH(child, &bs->children, next) {
++        bdrv_refresh_filename(child->bs);
+     }
+=20
+     if (drv->bdrv_refresh_filename) {
+diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+index d2e01bdb1d..36e3d0f822 100644
+--- a/block/blklogwrites.c
++++ b/block/blklogwrites.c
+@@ -285,9 +285,6 @@ static void blk_log_writes_refresh_filename(BlockDriv=
+erState *bs,
  {
-     char *backed;
-+    char *full_name;
-+    Error *local_error =3D NULL;
+     BDRVBlkLogWritesState *s =3D bs->opaque;
 =20
-     bdrv_refresh_filename(bs);
-=20
-     backed =3D bs->exact_filename[0] ? bs->exact_filename : bs->filename=
-;
--    bdrv_get_full_backing_filename_from_filename(backed, bs->backing_fil=
-e,
--                                                 dest, sz, errp);
-+
-+    full_name =3D bdrv_get_full_backing_filename_from_filename(backed,
-+                                                             bs->backing=
-_file,
-+                                                             &local_erro=
-r);
-+    if (full_name) {
-+        pstrcpy(dest, sz, full_name);
-+        g_free(full_name);
-+    } else if (local_error) {
-+        error_propagate(errp, local_error);
-+    } else if (sz > 0) {
-+        *dest =3D '\0';
-+    }
- }
-=20
- void bdrv_register(BlockDriver *bdrv)
-@@ -5179,17 +5200,17 @@ void bdrv_img_create(const char *filename, const =
-char *fmt,
-     size =3D qemu_opt_get_size(opts, BLOCK_OPT_SIZE, img_size);
-     if (backing_file && !(flags & BDRV_O_NO_BACKING)) {
-         BlockDriverState *bs;
--        char *full_backing =3D g_new0(char, PATH_MAX);
-+        char *full_backing;
-         int back_flags;
-         QDict *backing_options =3D NULL;
-=20
--        bdrv_get_full_backing_filename_from_filename(filename, backing_f=
-ile,
--                                                     full_backing, PATH_=
-MAX,
--                                                     &local_err);
-+        full_backing =3D
-+            bdrv_get_full_backing_filename_from_filename(filename, backi=
-ng_file,
-+                                                         &local_err);
-         if (local_err) {
--            g_free(full_backing);
-             goto out;
-         }
-+        assert(full_backing);
-=20
-         /* backing files always opened read-only */
-         back_flags =3D flags;
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 32e4e7589a..81c506cb69 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2078,16 +2078,16 @@ static int coroutine_fn vmdk_co_do_create(int64_t=
- size,
-=20
-     if (backing_file) {
-         BlockBackend *backing;
--        char *full_backing =3D g_new0(char, PATH_MAX);
--        bdrv_get_full_backing_filename_from_filename(blk_bs(blk)->filena=
-me, backing_file,
--                                                     full_backing, PATH_=
-MAX,
--                                                     &local_err);
-+        char *full_backing =3D
-+            bdrv_get_full_backing_filename_from_filename(blk_bs(blk)->fi=
-lename,
-+                                                         backing_file,
-+                                                         &local_err);
-         if (local_err) {
--            g_free(full_backing);
-             error_propagate(errp, local_err);
-             ret =3D -ENOENT;
-             goto exit;
-         }
-+        assert(full_backing);
-=20
-         backing =3D blk_new_open(full_backing, NULL, NULL,
-                                BDRV_O_NO_BACKING, errp);
-diff --git a/qemu-img.c b/qemu-img.c
-index d2fc28c987..ae0025926c 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3343,18 +3343,14 @@ static int img_rebase(int argc, char **argv)
-             bdrv_refresh_filename(bs);
-             overlay_filename =3D bs->exact_filename[0] ? bs->exact_filen=
-ame
-                                                      : bs->filename;
--            out_real_path =3D g_malloc(PATH_MAX);
+-    /* bs->file->bs has already been refreshed */
+-    bdrv_refresh_filename(s->log_file->bs);
 -
--            bdrv_get_full_backing_filename_from_filename(overlay_filenam=
-e,
--                                                         out_baseimg,
--                                                         out_real_path,
--                                                         PATH_MAX,
--                                                         &local_err);
-+            out_real_path =3D
-+                bdrv_get_full_backing_filename_from_filename(overlay_fil=
-ename,
-+                                                             out_baseimg=
-,
-+                                                             &local_err)=
-;
-             if (local_err) {
-                 error_reportf_err(local_err,
-                                   "Could not resolve backing filename: "=
-);
-                 ret =3D -1;
--                g_free(out_real_path);
-                 goto out;
-             }
+     if (bs->file->bs->full_open_options
+         && s->log_file->bs->full_open_options)
+     {
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 89bf4386e3..035d77b64a 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -285,9 +285,6 @@ static void blkverify_refresh_filename(BlockDriverSta=
+te *bs, QDict *options)
+ {
+     BDRVBlkverifyState *s =3D bs->opaque;
 =20
+-    /* bs->file->bs has already been refreshed */
+-    bdrv_refresh_filename(s->test_file->bs);
+-
+     if (bs->file->bs->full_open_options
+         && s->test_file->bs->full_open_options)
+     {
+diff --git a/block/commit.c b/block/commit.c
+index 5deb05925b..614a8ca374 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -232,7 +232,6 @@ static int coroutine_fn bdrv_commit_top_preadv(BlockD=
+riverState *bs,
+=20
+ static void bdrv_commit_top_refresh_filename(BlockDriverState *bs, QDict=
+ *opts)
+ {
+-    bdrv_refresh_filename(bs->backing->bs);
+     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
+             bs->backing->bs->filename);
+ }
+diff --git a/block/mirror.c b/block/mirror.c
+index b67b0120f8..031c1aeaeb 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1438,7 +1438,6 @@ static void bdrv_mirror_top_refresh_filename(BlockD=
+riverState *bs, QDict *opts)
+          * bdrv_set_backing_hd */
+         return;
+     }
+-    bdrv_refresh_filename(bs->backing->bs);
+     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
+             bs->backing->bs->filename);
+ }
+diff --git a/block/quorum.c b/block/quorum.c
+index 16b3c8067c..cf9d7c16c2 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1073,7 +1073,6 @@ static void quorum_refresh_filename(BlockDriverStat=
+e *bs, QDict *options)
+     int i;
+=20
+     for (i =3D 0; i < s->num_children; i++) {
+-        bdrv_refresh_filename(s->children[i]->bs);
+         if (!s->children[i]->bs->full_open_options) {
+             return;
+         }
 --=20
 2.20.1
