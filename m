@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33070)
+Received: from eggs.gnu.org ([209.51.188.92]:33072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyDRV-0006J9-1y
+	(envelope-from <peter.maydell@linaro.org>) id 1gyDRV-0006JD-25
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 05:25:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyDRB-0002yt-Js
+	(envelope-from <peter.maydell@linaro.org>) id 1gyDRB-0002yk-ID
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 05:24:52 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35613)
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34085)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gyDRB-0002vm-7m
+	id 1gyDRB-0002xK-70
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 05:24:41 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t18so9267015wrx.2
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 02:24:39 -0800 (PST)
+Received: by mail-wm1-x344.google.com with SMTP id o10so2590278wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 02:24:40 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Feb 2019 10:24:27 +0000
-Message-Id: <20190225102433.22401-2-peter.maydell@linaro.org>
+Date: Mon, 25 Feb 2019 10:24:28 +0000
+Message-Id: <20190225102433.22401-3-peter.maydell@linaro.org>
 In-Reply-To: <20190225102433.22401-1-peter.maydell@linaro.org>
 References: <20190225102433.22401-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 1/7] ui/cocoa: Ensure we have the iothread
- lock when calling into QEMU
+Subject: [Qemu-devel] [PATCH v3 2/7] ui/cocoa: Use the pixman image directly
+ in switchSurface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,193 +32,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Roman Bolshakov <r.bolshakv@yadro.com>, BALATON Zoltan <balaton@eik.bme.hu>, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
 
-The Cocoa UI should run on the main thread; this is enforced
-in OSX Mojave. In order to be able to run on the main thread,
-we need to make sure we hold the iothread lock whenever we
-call into various QEMU UI midlayer functions.
+Currently the switchSurface method takes a DisplaySurface. We want
+to change our DisplayChangeListener's dpy_gfx_switch callback
+to do this work asynchronously on a different thread. The caller
+of the switch callback will free the old DisplaySurface
+immediately the callback returns, so to ensure that the
+other thread doesn't access freed data we need to switch
+to using the underlying pixman image instead. The pixman
+image is reference counted, so we will be able to take
+a reference to it to avoid it vanishing too early.
+
+In this commit we only change the switchSurface method
+to take a pixman image, and keep the flow of control
+synchronous for now.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Roman Bolshakov <r.bolshakv@yadro.com>
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
 Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-id: 20190214102816.3393-2-peter.maydell@linaro.org
+Message-id: 20190214102816.3393-3-peter.maydell@linaro.org
 ---
-Changes since v2: add with_iothread_lock wrap to the
-qmp_stop()/qmp_cont() calls
----
- ui/cocoa.m | 91 ++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 65 insertions(+), 26 deletions(-)
+ ui/cocoa.m | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/ui/cocoa.m b/ui/cocoa.m
-index e2567d6946..f1171c4865 100644
+index f1171c4865..a913a51a2d 100644
 --- a/ui/cocoa.m
 +++ b/ui/cocoa.m
-@@ -129,6 +129,21 @@
- NSTextField *pauseLabel;
- NSArray * supportedImageFileTypes;
- 
-+// Utility function to run specified code block with iothread lock held
-+typedef void (^CodeBlock)(void);
-+
-+static void with_iothread_lock(CodeBlock block)
-+{
-+    bool locked = qemu_mutex_iothread_locked();
-+    if (!locked) {
-+        qemu_mutex_lock_iothread();
-+    }
-+    block();
-+    if (!locked) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+}
-+
- // Mac to QKeyCode conversion
- const int mac_to_qkeycode_map[] = {
-     [kVK_ANSI_A] = Q_KEY_CODE_A,
-@@ -306,6 +321,7 @@ - (void) ungrabMouse;
+@@ -315,7 +315,7 @@ @interface QemuCocoaView : NSView
+     BOOL isAbsoluteEnabled;
+     BOOL isMouseDeassociated;
+ }
+-- (void) switchSurface:(DisplaySurface *)surface;
++- (void) switchSurface:(pixman_image_t *)image;
+ - (void) grabMouse;
+ - (void) ungrabMouse;
  - (void) toggleFullScreen:(id)sender;
- - (void) handleMonitorInput:(NSEvent *)event;
- - (void) handleEvent:(NSEvent *)event;
-+- (void) handleEventLocked:(NSEvent *)event;
- - (void) setAbsoluteEnabled:(BOOL)tIsAbsoluteEnabled;
- /* The state surrounding mouse grabbing is potentially confusing.
-  * isAbsoluteEnabled tracks qemu_input_is_absolute() [ie "is the emulated
-@@ -649,8 +665,14 @@ - (void) handleMonitorInput:(NSEvent *)event
- 
- - (void) handleEvent:(NSEvent *)event
- {
--    COCOA_DEBUG("QemuCocoaView: handleEvent\n");
-+    with_iothread_lock(^{
-+        [self handleEventLocked:event];
-+    });
-+}
- 
-+- (void) handleEventLocked:(NSEvent *)event
-+{
-+    COCOA_DEBUG("QemuCocoaView: handleEvent\n");
-     int buttons = 0;
-     int keycode = 0;
-     bool mouse_event = false;
-@@ -945,15 +967,18 @@ - (QEMUScreen) gscreen {return screen;}
-  */
- - (void) raiseAllKeys
- {
--    int index;
-     const int max_index = ARRAY_SIZE(modifiers_state);
- 
--   for (index = 0; index < max_index; index++) {
--       if (modifiers_state[index]) {
--           modifiers_state[index] = 0;
--           qemu_input_event_send_key_qcode(dcl->con, index, false);
--       }
--   }
-+    with_iothread_lock(^{
-+        int index;
-+
-+        for (index = 0; index < max_index; index++) {
-+            if (modifiers_state[index]) {
-+                modifiers_state[index] = 0;
-+                qemu_input_event_send_key_qcode(dcl->con, index, false);
-+            }
-+        }
-+    });
- }
- @end
- 
-@@ -1178,7 +1203,9 @@ - (void)displayConsole:(id)sender
- /* Pause the guest */
- - (void)pauseQEMU:(id)sender
- {
--    qmp_stop(NULL);
-+    with_iothread_lock(^{
-+        qmp_stop(NULL);
-+    });
-     [sender setEnabled: NO];
-     [[[sender menu] itemWithTitle: @"Resume"] setEnabled: YES];
-     [self displayPause];
-@@ -1187,7 +1214,9 @@ - (void)pauseQEMU:(id)sender
- /* Resume running the guest operating system */
- - (void)resumeQEMU:(id) sender
- {
--    qmp_cont(NULL);
-+    with_iothread_lock(^{
-+        qmp_cont(NULL);
-+    });
-     [sender setEnabled: NO];
-     [[[sender menu] itemWithTitle: @"Pause"] setEnabled: YES];
-     [self removePause];
-@@ -1215,13 +1244,17 @@ - (void)removePause
- /* Restarts QEMU */
- - (void)restartQEMU:(id)sender
- {
--    qmp_system_reset(NULL);
-+    with_iothread_lock(^{
-+        qmp_system_reset(NULL);
-+    });
- }
- 
- /* Powers down QEMU */
- - (void)powerDownQEMU:(id)sender
- {
--    qmp_system_powerdown(NULL);
-+    with_iothread_lock(^{
-+        qmp_system_powerdown(NULL);
-+    });
- }
- 
- /* Ejects the media.
-@@ -1237,9 +1270,11 @@ - (void)ejectDeviceMedia:(id)sender
-         return;
-     }
- 
--    Error *err = NULL;
--    qmp_eject(true, [drive cStringUsingEncoding: NSASCIIStringEncoding],
--              false, NULL, false, false, &err);
-+    __block Error *err = NULL;
-+    with_iothread_lock(^{
-+        qmp_eject(true, [drive cStringUsingEncoding: NSASCIIStringEncoding],
-+                  false, NULL, false, false, &err);
-+    });
-     handleAnyDeviceErrors(err);
- }
- 
-@@ -1271,16 +1306,18 @@ - (void)changeDeviceMedia:(id)sender
-             return;
-         }
- 
--        Error *err = NULL;
--        qmp_blockdev_change_medium(true,
--                                   [drive cStringUsingEncoding:
--                                          NSASCIIStringEncoding],
--                                   false, NULL,
--                                   [file cStringUsingEncoding:
--                                         NSASCIIStringEncoding],
--                                   true, "raw",
--                                   false, 0,
--                                   &err);
-+        __block Error *err = NULL;
-+        with_iothread_lock(^{
-+            qmp_blockdev_change_medium(true,
-+                                       [drive cStringUsingEncoding:
-+                                                  NSASCIIStringEncoding],
-+                                       false, NULL,
-+                                       [file cStringUsingEncoding:
-+                                                 NSASCIIStringEncoding],
-+                                       true, "raw",
-+                                       false, 0,
-+                                       &err);
-+        });
-         handleAnyDeviceErrors(err);
+@@ -495,12 +495,13 @@ - (void) setContentDimensions
      }
  }
-@@ -1419,7 +1456,9 @@ - (void)adjustSpeed:(id)sender
-     // get the throttle percentage
-     throttle_pct = [sender tag];
  
--    cpu_throttle_set(throttle_pct);
-+    with_iothread_lock(^{
-+        cpu_throttle_set(throttle_pct);
-+    });
-     COCOA_DEBUG("cpu throttling at %d%c\n", cpu_throttle_get_percentage(), '%');
+-- (void) switchSurface:(DisplaySurface *)surface
++- (void) switchSurface:(pixman_image_t *)image
+ {
+     COCOA_DEBUG("QemuCocoaView: switchSurface\n");
+ 
+-    int w = surface_width(surface);
+-    int h = surface_height(surface);
++    int w = pixman_image_get_width(image);
++    int h = pixman_image_get_height(image);
++    pixman_format_code_t image_format = pixman_image_get_format(image);
+     /* cdx == 0 means this is our very first surface, in which case we need
+      * to recalculate the content dimensions even if it happens to be the size
+      * of the initial empty window.
+@@ -522,10 +523,10 @@ - (void) switchSurface:(DisplaySurface *)surface
+         CGDataProviderRelease(dataProviderRef);
+ 
+     //sync host window color space with guests
+-    screen.bitsPerPixel = surface_bits_per_pixel(surface);
+-    screen.bitsPerComponent = surface_bytes_per_pixel(surface) * 2;
++    screen.bitsPerPixel = PIXMAN_FORMAT_BPP(image_format);
++    screen.bitsPerComponent = DIV_ROUND_UP(screen.bitsPerPixel, 8) * 2;
+ 
+-    dataProviderRef = CGDataProviderCreateWithData(NULL, surface_data(surface), w * 4 * h, NULL);
++    dataProviderRef = CGDataProviderCreateWithData(NULL, pixman_image_get_data(image), w * 4 * h, NULL);
+ 
+     // update windows
+     if (isFullscreen) {
+@@ -1629,7 +1630,7 @@ static void cocoa_switch(DisplayChangeListener *dcl,
+     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+ 
+     COCOA_DEBUG("qemu_cocoa: cocoa_switch\n");
+-    [cocoaView switchSurface:surface];
++    [cocoaView switchSurface:surface->image];
+     [pool release];
  }
  
 -- 
