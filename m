@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38980)
+Received: from eggs.gnu.org ([209.51.188.92]:39001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI6W-0001zp-2U
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:41 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI6Z-00023P-Ip
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyI6R-0002E8-Ah
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyI6W-0002I8-8t
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:23:43 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Feb 2019 16:20:50 +0100
-Message-Id: <20190225152053.15976-69-kwolf@redhat.com>
+Date: Mon, 25 Feb 2019 16:20:53 +0100
+Message-Id: <20190225152053.15976-72-kwolf@redhat.com>
 In-Reply-To: <20190225152053.15976-1-kwolf@redhat.com>
 References: <20190225152053.15976-1-kwolf@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 68/71] qcow2: include LUKS payload overhead in
- qemu-img measure
+Subject: [Qemu-devel] [PULL 71/71] iotests: Skip 211 on insufficient memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,142 +25,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-LUKS encryption reserves clusters for its own payload data.  The size of
-this area must be included in the qemu-img measure calculation so that
-we arrive at the correct minimum required image size.
+VDI keeps the whole bitmap in memory, and the maximum size (which is
+tested here) is 2 GB.  This may not be available on all machines, and it
+rarely is available when running a 32 bit build.
 
-(Ab)use the qcrypto_block_create() API to determine the payload
-overhead.  We discard the payload data that qcrypto thinks will be
-written to the image.
+Fix this by making VM.run_job() return the error string if an error
+occurred, and checking whether that contains "Could not allocate bmap"
+in 211.  If so, the test is skipped.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190218104525.23674-2-stefanha@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190218180646.30282-1-mreitz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 71 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/211        | 4 +++-
+ tests/qemu-iotests/iotests.py | 5 ++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 92242fb14f..1de5e24613 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4236,6 +4236,60 @@ static coroutine_fn int qcow2_co_flush_to_os(Block=
-DriverState *bs)
-     return ret;
- }
+diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
+index 5d285450b5..6afc894f76 100755
+--- a/tests/qemu-iotests/211
++++ b/tests/qemu-iotests/211
+@@ -32,7 +32,9 @@ def blockdev_create(vm, options):
 =20
-+static ssize_t qcow2_measure_crypto_hdr_init_func(QCryptoBlock *block,
-+        size_t headerlen, void *opaque, Error **errp)
-+{
-+    size_t *headerlenp =3D opaque;
-+
-+    /* Stash away the payload size */
-+    *headerlenp =3D headerlen;
-+    return 0;
-+}
-+
-+static ssize_t qcow2_measure_crypto_hdr_write_func(QCryptoBlock *block,
-+        size_t offset, const uint8_t *buf, size_t buflen,
-+        void *opaque, Error **errp)
-+{
-+    /* Discard the bytes, we're not actually writing to an image */
-+    return buflen;
-+}
-+
-+/* Determine the number of bytes for the LUKS payload */
-+static bool qcow2_measure_luks_headerlen(QemuOpts *opts, size_t *len,
-+                                         Error **errp)
-+{
-+    QDict *opts_qdict;
-+    QDict *cryptoopts_qdict;
-+    QCryptoBlockCreateOptions *cryptoopts;
-+    QCryptoBlock *crypto;
-+
-+    /* Extract "encrypt." options into a qdict */
-+    opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
-+    qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, "encrypt.");
-+    qobject_unref(opts_qdict);
-+
-+    /* Build QCryptoBlockCreateOptions object from qdict */
-+    qdict_put_str(cryptoopts_qdict, "format", "luks");
-+    cryptoopts =3D block_crypto_create_opts_init(cryptoopts_qdict, errp)=
-;
-+    qobject_unref(cryptoopts_qdict);
-+    if (!cryptoopts) {
-+        return false;
-+    }
-+
-+    /* Fake LUKS creation in order to determine the payload size */
-+    crypto =3D qcrypto_block_create(cryptoopts, "encrypt.",
-+                                  qcow2_measure_crypto_hdr_init_func,
-+                                  qcow2_measure_crypto_hdr_write_func,
-+                                  len, errp);
-+    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
-+    if (!crypto) {
-+        return false;
-+    }
-+
-+    qcrypto_block_free(crypto);
-+    return true;
-+}
-+
- static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState =
-*in_bs,
-                                        Error **errp)
- {
-@@ -4245,11 +4299,13 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *=
-opts, BlockDriverState *in_bs,
-     uint64_t virtual_size; /* disk size as seen by guest */
-     uint64_t refcount_bits;
-     uint64_t l2_tables;
-+    uint64_t luks_payload_size =3D 0;
-     size_t cluster_size;
-     int version;
-     char *optstr;
-     PreallocMode prealloc;
-     bool has_backing_file;
-+    bool has_luks;
+     if 'return' in result:
+         assert result['return'] =3D=3D {}
+-        vm.run_job('job0')
++        error =3D vm.run_job('job0')
++        if error and 'Could not allocate bmap' in error:
++            iotests.notrun('Insufficient memory')
+     iotests.log("")
 =20
-     /* Parse image creation options */
-     cluster_size =3D qcow2_opt_get_cluster_size_del(opts, &local_err);
-@@ -4279,6 +4335,20 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *o=
-pts, BlockDriverState *in_bs,
-     has_backing_file =3D !!optstr;
-     g_free(optstr);
+ with iotests.FilePath('t.vdi') as disk_path, \
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 387e026556..4910fb2005 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -532,7 +532,9 @@ class VM(qtest.QEMUQtestMachine):
+         log(result, filters, indent=3Dindent)
+         return result
 =20
-+    optstr =3D qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-+    has_luks =3D optstr && strcmp(optstr, "luks") =3D=3D 0;
-+    g_free(optstr);
-+
-+    if (has_luks) {
-+        size_t headerlen;
-+
-+        if (!qcow2_measure_luks_headerlen(opts, &headerlen, &local_err))=
- {
-+            goto err;
-+        }
-+
-+        luks_payload_size =3D ROUND_UP(headerlen, cluster_size);
-+    }
-+
-     virtual_size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-     virtual_size =3D ROUND_UP(virtual_size, cluster_size);
++    # Returns None on success, and an error string on failure
+     def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse):
++        error =3D None
+         while True:
+             for ev in self.get_qmp_events_filtered(wait=3DTrue):
+                 if ev['event'] =3D=3D 'JOB_STATUS_CHANGE':
+@@ -541,13 +543,14 @@ class VM(qtest.QEMUQtestMachine):
+                         result =3D self.qmp('query-jobs')
+                         for j in result['return']:
+                             if j['id'] =3D=3D job:
++                                error =3D j['error']
+                                 log('Job failed: %s' % (j['error']))
+                     elif status =3D=3D 'pending' and not auto_finalize:
+                         self.qmp_log('job-finalize', id=3Djob)
+                     elif status =3D=3D 'concluded' and not auto_dismiss:
+                         self.qmp_log('job-dismiss', id=3Djob)
+                     elif status =3D=3D 'null':
+-                        return
++                        return error
+                 else:
+                     iotests.log(ev)
 =20
-@@ -4349,7 +4419,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *op=
-ts, BlockDriverState *in_bs,
-     info =3D g_new(BlockMeasureInfo, 1);
-     info->fully_allocated =3D
-         qcow2_calc_prealloc_size(virtual_size, cluster_size,
--                                 ctz32(refcount_bits));
-+                                 ctz32(refcount_bits)) + luks_payload_si=
-ze;
-=20
-     /* Remove data clusters that are not required.  This overestimates t=
-he
-      * required size because metadata needed for the fully allocated fil=
-e is
 --=20
 2.20.1
