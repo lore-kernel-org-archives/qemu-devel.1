@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43336)
+Received: from eggs.gnu.org ([209.51.188.92]:44687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyIOQ-0000av-BL
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gyIT9-0004dP-Po
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:47:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyIOP-0008BP-G5
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gyIOP-0008Ag-71
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:42:09 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 25 Feb 2019 16:42:04 +0100
-Message-Id: <20190225154204.26751-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] tcg: Implement tcg_gen_shri2_i64()
+	(envelope-from <richard.henderson@linaro.org>) id 1gyIT9-0003H9-1i
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:47:03 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gyIT8-00037j-MX
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 10:47:02 -0500
+Received: by mail-pg1-x543.google.com with SMTP id l11so4651552pgq.10
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 07:46:53 -0800 (PST)
+References: <20190225115552.7534-1-david@redhat.com>
+	<20190225115552.7534-2-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <8f705be2-d90f-e99a-55d3-34879a283072@linaro.org>
+Date: Mon, 25 Feb 2019 07:46:49 -0800
+MIME-Version: 1.0
+In-Reply-To: <20190225115552.7534-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/7] s390x/tcg: RXE has an optional M3
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,61 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Will be helpful for s390x. Input 128 bit and output 64 bit only, which
-is sufficient for now.
+On 2/25/19 3:55 AM, David Hildenbrand wrote:
+> Will be needed, so add it to the format description.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-format.def | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
 
-v1 -> v2:
-- Use one output (lower part) only
-- Shield off big shifts by an assert
 
- tcg/tcg-op.c | 15 +++++++++++++++
- tcg/tcg-op.h |  1 +
- 2 files changed, 16 insertions(+)
-
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 1bd7ef24af..e4fa75c074 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2381,6 +2381,21 @@ void tcg_gen_sub2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 al,
-     }
- }
- 
-+void tcg_gen_shri2_i64(TCGv_i64 ret, TCGv_i64 al, TCGv_i64 ah, int64_t count)
-+{
-+    tcg_debug_assert(count >= 0 && count <= 64);
-+    if (count == 0) {
-+        tcg_gen_mov_i64(ret, al);
-+    } else if (count == 64) {
-+        tcg_gen_mov_i64(ret, ah);
-+    } else {
-+        TCGv_i64 t0 = tcg_temp_new_i64();
-+        tcg_gen_shri_i64(t0, al, count);
-+        tcg_gen_deposit_i64(ret, t0, ah, 64 - count, count);
-+        tcg_temp_free_i64(t0);
-+    }
-+}
-+
- void tcg_gen_mulu2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2)
- {
-     if (TCG_TARGET_HAS_mulu2_i64) {
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index d3e51b15af..1ffe689276 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -513,6 +513,7 @@ void tcg_gen_add2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 al,
-                       TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 bh);
- void tcg_gen_sub2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 al,
-                       TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 bh);
-+void tcg_gen_shri2_i64(TCGv_i64 ret, TCGv_i64 al, TCGv_i64 ah, int64_t count);
- void tcg_gen_mulu2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2);
- void tcg_gen_muls2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2);
- void tcg_gen_mulsu2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2);
--- 
-2.17.2
+r~
