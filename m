@@ -1,19 +1,19 @@
 Received: from eggs.gnu.org ([209.51.188.92]:39450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gyi1S-0007JJ-GM
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:04:12 -0500
+	(envelope-from <mst@redhat.com>) id 1gyi1Y-0007JJ-EN
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:04:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gyhqh-0000kM-VT
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:53:05 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:41186)
+	(envelope-from <mst@redhat.com>) id 1gyhpk-0008Hh-5L
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:52:05 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:46668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gyhqh-0000bm-Q3
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:53:03 -0500
-Received: by mail-qt1-f193.google.com with SMTP id v10so16155244qtp.8
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:52:54 -0800 (PST)
-Date: Tue, 26 Feb 2019 13:52:51 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gyhpi-0008FL-8I
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:52:04 -0500
+Received: by mail-qt1-f196.google.com with SMTP id z25so16113416qti.13
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:52:01 -0800 (PST)
+Date: Tue, 26 Feb 2019 13:51:57 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190226135226-mutt-send-email-mst@kernel.org>
+Message-ID: <20190226135044-mutt-send-email-mst@kernel.org>
 References: <20190208112357.31615-1-marcandre.lureau@redhat.com>
 	<20190221110754-mutt-send-email-mst@kernel.org>
 	<CAJ+F1CL5fyMyUX6=OEqsAoEKA8QeeybUvL3C6Q3to1DdBqOBTA@mail.gmail.com>
@@ -65,7 +65,8 @@ On Tue, Feb 26, 2019 at 05:38:32PM +0100, Marc-André Lureau wrote:
 > 
 > thanks
 
-Besides acks I also see unaddressed comments by Daniel and others.
+I think that preferably we'd need Gerd to ack these.
+He's the most qualified to look at virtio input.
 
 > >
 > > > v3:
