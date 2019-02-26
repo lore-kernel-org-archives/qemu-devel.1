@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38708)
+Received: from eggs.gnu.org ([209.51.188.92]:39419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gygDz-00049z-N7
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:09:00 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gygGc-0005gu-E9
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:11:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gygDy-0002oN-Om
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:08:59 -0500
-Date: Tue, 26 Feb 2019 18:08:41 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190226180841.0c30af3c@Igors-MacBook-Pro.local>
-In-Reply-To: <20190226135014.31854-13-eric.auger@redhat.com>
-References: <20190226135014.31854-1-eric.auger@redhat.com>
-	<20190226135014.31854-13-eric.auger@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gygGb-0005xH-Cx
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:11:42 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gygGZ-0005no-9f
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:11:40 -0500
+Received: by mail-wm1-x343.google.com with SMTP id x7so3174696wmj.0
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 09:11:28 -0800 (PST)
+References: <20190226164500.8080-1-alex.bennee@linaro.org>
+	<20190226164500.8080-4-alex.bennee@linaro.org>
+	<20190226164656.mhasc4xxfjf34hns@function>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190226164656.mhasc4xxfjf34hns@function>
+Date: Tue, 26 Feb 2019 17:11:25 +0000
+Message-ID: <871s3umq4i.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 12/18] hw/arm/boot: Expose the PC-DIMM
- nodes in the DT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] contrib: gitdm: add some more
+ people academic group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, BALATON Zoltan <balaton@eik.bme.hu>
 
-On Tue, 26 Feb 2019 14:50:08 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
 
-> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> 
-> This patch adds memory nodes corresponding to PC-DIMM regions.
-> 
-> NVDIMM and ACPI_NVDIMM configs are not yet set for ARM so we
-> don't need to care about NVDIMM at this stage.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-I'm having second thoughts on this one,
-maybe we should drop this patch or at least not to do this by default.
-In the later case it would mean some kind of property that user could use
-to turn this on which in its own turn adds more clutter to user tunables
-(which is not desirable). So I'm leaning more towards dropping this patch for now.
+Samuel Thibault <samuel.thibault@gnu.org> writes:
 
-> 
-> ---
-> v7 -> v8:
-> - s/NV_DIMM/NVDIMM
-> - fix indent
-> v6 -> v7:
-> - rework the error messages, use a switch/case
-> v3 -> v4:
-> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
-> 
-> v1 -> v2:
-> - added qapi_free_MemoryDeviceInfoList and simplify the loop
-> ---
->  hw/arm/boot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
-> 
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index a830655e1a..4caaf91583 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -19,6 +19,7 @@
->  #include "sysemu/numa.h"
->  #include "hw/boards.h"
->  #include "hw/loader.h"
-> +#include "hw/mem/memory-device.h"
->  #include "elf.h"
->  #include "sysemu/device_tree.h"
->  #include "qemu/config-file.h"
-> @@ -522,6 +523,41 @@ static void fdt_add_psci_node(void *fdt)
->      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
->  }
->  
-> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
-> +                                             uint32_t acells, uint32_t scells) {
-> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
-> +    MemoryDeviceInfo *mi;
-> +    int ret = 0;
-> +
-> +    for (info = info_list; info != NULL; info = info->next) {
-> +        mi = info->value;
-> +        switch (mi->type) {
-> +        case MEMORY_DEVICE_INFO_KIND_DIMM:
-> +        {
-> +            PCDIMMDeviceInfo *di = mi->u.dimm.data;
-> +
-> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
-> +                                      scells, di->size, di->node);
-> +            if (ret) {
-> +                fprintf(stderr,
-> +                        "couldn't add PCDIMM /memory@%"PRIx64" node\n",
-> +                        di->addr);
-> +                goto out;
-> +            }
-> +            break;
-> +        }
-> +        default:
-> +            fprintf(stderr, "%s memory nodes are not yet supported\n",
-> +                    MemoryDeviceInfoKind_str(mi->type));
-> +            ret = -ENOENT;
-> +            goto out;
-> +        }
-> +    }
-> +out:
-> +    qapi_free_MemoryDeviceInfoList(info_list);
-> +    return ret;
-> +}
-> +
->  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->                   hwaddr addr_limit, AddressSpace *as)
->  {
-> @@ -621,6 +657,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->          }
->      }
->  
-> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
-> +    if (rc < 0) {
-> +        fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
-> +        goto fail;
-> +    }
-> +
->      rc = fdt_path_offset(fdt, "/chosen");
->      if (rc < 0) {
->          qemu_fdt_add_subnode(fdt, "/chosen");
+> Hello,
+>
+> Alex Benn=C3=A9e, le mar. 26 f=C3=A9vr. 2019 16:44:57 +0000, a ecrit:
+>> I'm basing this on email addresses or published employment. Please
+>> confirm if this is correct or you want to be under (None).
+>>
+>> Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+>
+> @ens-lyon.org means "None".
+> (it's just my alumni address, which I use for all my personal
+> projects)
+
+Fair enough, I shall move you to the individual contributors section
+then?
+
+>
+> Only @ens-lyon.fr would mean under ENS employment.
+>
+> Samuel
+
+
+--
+Alex Benn=C3=A9e
