@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34271)
+Received: from eggs.gnu.org ([209.51.188.92]:34675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyg0g-0003Ez-61
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:55:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gyg21-0004I8-6C
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:56:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyg0c-00065M-FB
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:55:12 -0500
-References: <20190226153549.17867-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8a8d76d1-1280-f3d9-3d72-1c662d1ad666@redhat.com>
-Date: Tue, 26 Feb 2019 10:54:55 -0600
+	(envelope-from <richard.henderson@linaro.org>) id 1gyg1z-0007Su-VE
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:56:37 -0500
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:45728)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gyg1z-0007Rn-NE
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:56:35 -0500
+Received: by mail-pg1-x531.google.com with SMTP id y4so6459216pgc.12
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 08:56:35 -0800 (PST)
+References: <5F2C0013-1D18-44A9-ADAF-F86EC6FD1174@oberlin.edu>
+	<CAFEAcA8VzJRMSThWQ=CgNbB8BY0EAmi77oAJuHQt5iQnkiZmzg@mail.gmail.com>
+	<63A30600-CCE3-4412-A3EB-8D535A8B21B3@oberlin.edu>
+	<4F8E4327-9F59-4F50-A22D-20A3F939899F@oberlin.edu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9108923c-076b-034c-9d68-af355861ae0c@linaro.org>
+Date: Tue, 26 Feb 2019 08:56:30 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190226153549.17867-1-stefanha@redhat.com>
+In-Reply-To: <4F8E4327-9F59-4F50-A22D-20A3F939899F@oberlin.edu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] file-posix: add drop-cache=on|off option
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] x86 segment limits enforcement with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Neil Skrypuch <neil@tembosocial.com>, Peter Krempa <pkrempa@redhat.com>
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 2/26/19 9:35 AM, Stefan Hajnoczi wrote:
-> Commit dd577a26ff03b6829721b1ffbbf9e7c411b72378 ("block/file-posix:
-> implement bdrv_co_invalidate_cache() on Linux") introduced page cache
-> invalidation so that cache.direct=off live migration is safe on Linux.
+On 2/25/19 4:32 PM, Stephen Checkoway wrote:
+> FWIW, I figured out an approach to this. Essentially, I'm reusing the function which computes linear addresses to enforce not only segment limits (in everything but long mode), but also read/write access (in protected mode).
 > 
-> The invalidation takes a significant amount of time when the file is
-> large and present in the page cache.  Normally this is not the case for
-> cross-host live migration but it can happen when migrating between QEMU
-> processes on the same host.
+> Unfortunately, that meant every call to the linear address computation has to be augmented with an access size and whether it's a store or not. The patch is pretty large so I won't include it here, but you can view it at <https://github.com/stevecheckoway/qemu/commit/ac58652efacedc53f3831301ea0326ac8f882b18>.
 > 
-> On same-host migration we don't need to invalidate pages for correctness
-> anyway, so an option to skip page cache invalidation is useful.  I
-> investigated optimizing invalidation and detecting same-host migration,
-> but both are hard to achieve so a user-visible option will suffice.
+> If this is something that qemu would like, then I think two additional things are definitely required:
+> 1. Tests. make check passes and the firmware I have which necessitated the checks appears to work, but that change touches the almost every guest-memory-accessing x86 instruction.
+> 2. This is going to slow down the common case—where segments have a 0 base address and a limit of 0xFFFFFFFF—and there's no real need to do that. It seems like something akin to addseg could be used to decide when to insert the checks. I don't really understand how that works and in my case, segments with nonzero bases and non-0xFFFFFFFF limits are the norm so I didn't investigate that. Something similar could probably be done to omit the writable segment checks.
 > 
-> As a bonus this option means that the cache invalidation feature will
-> now be detectable by libvirt via QMP schema introspection.
+> Finally, there are some limitations. The amount of memory touched by xsave (and the related instructions) depends on edx:eax. I didn't bother checking that at all. Similarly, there are some MPX instructions that don't do any access checks when they really should. And finally, there's one place that checks for an access size of 8 bytes when, in some cases, it should be 16.
+> 
+> I'm happy to work to upstream this, if the approach is broadly acceptable and the functionality is desired.
 
-Do you still want to pursue the QMP query-qemu-features command, or does
-this delay that for another day?
+I am happy to have proper segmentation support upstream, but having read
+through your patch I think I would approach it differently: I would incorporate
+segmentation into the softmmu translation process.
 
-> 
-> Suggested-by: Neil Skrypuch <neil@tembosocial.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  qapi/block-core.json |  5 +++++
->  block/file-posix.c   | 14 ++++++++++++++
->  2 files changed, 19 insertions(+)
-> 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Having many softmmu tlbs, even if unused, used to be expensive, and managing
+them difficult.  However, some (very) recent work has reduced that expense.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+I would add 6 new MMU_MODES, one for each segment register.  Translation for
+these modes would proceed in two stages, just like real segmentation+paging.
+So your access checks happen as a part of normal memory accesses.  (We have an
+example of two-level translation in target/arm, S1_ptw_translate.)
+
+These new tlbs would need to be flushed on any segment register change, and
+with any change to the underlying page tables.  They would need to be flushed
+on privilege level changes (or we'd need to add another 6 for ring0).
+
+I would extend the check for HF_ADDSEG_MASK to include 4GB segment limits.
+With that, "normal" 32-bit operation would ignore these new tlbs and continue
+to use the current flat view of the virtual address space.
+
+That should all mean no slow down in the common case, not having to adjust
+every single memory access in target/i386/translate.c, and fewer runtime calls
+to helper functions when segmentation is in effect.
+
+
+r~
