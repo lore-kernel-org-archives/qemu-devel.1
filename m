@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48847)
+Received: from eggs.gnu.org ([209.51.188.92]:51858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyTtq-0003t0-OI
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:59:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUBb-00005O-La
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:17:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyTto-0007jo-Fo
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:59:22 -0500
-Date: Tue, 26 Feb 2019 14:55:32 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUBY-0003c7-4I
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:17:41 -0500
+Date: Tue, 26 Feb 2019 15:17:22 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190226035532.GM6872@umbus.fritz.box>
-References: <20190226030531.9932-1-sjitindarsingh@gmail.com>
-	<20190226030531.9932-3-sjitindarsingh@gmail.com>
+Message-ID: <20190226041722.GO6872@umbus.fritz.box>
+References: <20190222131322.26079-1-clg@kaod.org>
+	<20190222131322.26079-14-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9ToWwKEyhugL+MAz"
+	protocol="application/pgp-signature"; boundary="djJN5oi3zFpblwUd"
 Content-Disposition: inline
-In-Reply-To: <20190226030531.9932-3-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 3/4] target/ppc: Implement large
- decrementer support for KVM
+In-Reply-To: <20190222131322.26079-14-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 13/13] spapr/xive: fix device hotplug
+ when VM is stopped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,197 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---9ToWwKEyhugL+MAz
+--djJN5oi3zFpblwUd
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 26, 2019 at 02:05:30PM +1100, Suraj Jitindar Singh wrote:
-> Implement support to allow KVM guests to take advantage of the large
-> decrementer introduced on POWER9 cpus.
->=20
-> To determine if the host can support the requested large decrementer
-> size, we check it matches that specified in the ibm,dec-bits device-tree
-> property. We also need to enable it in KVM by setting the LPCR_LD bit in
-> the LPCR. Note that to do this we need to try and set the bit, then read
-> it back to check the host allowed us to set it, if so we can use it but
-> if we were unable to set it the host cannot support it and we must not
-> use the large decrementer.
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+On Fri, Feb 22, 2019 at 02:13:22PM +0100, C=E9dric Le Goater wrote:
+> Instead of switching off the sources, set their state to PENDING to
+> possibly catch a hotplug event occuring while the VM is stopped. At
+> resume, check the previous state and if an interrupt was queued,
+> generate a trigger.
+
+First, I think it would be better to fold this fix into the patch
+introducing the state change handlers.
+
+Second, IIUC this would handle any instance of an irq being triggered
+while the VM is stopped.  Hotplug interrupts is one obvious case of
+that, but I'm not sure its the only one.  VFIO devices could interrupt
+while the VM is stopped, I think.  Maybe even emulated devices
+depending on how their synchronization with the cpu run state works.
+There might be other cases.  Does that sound right to you?
+
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-Although changes might be necessary to match it to things I've
-suggested in the earlier patches in the series.
-
-Is the KVM side support for this already merged?  If so, as of when?
-
 > ---
->  hw/ppc/spapr_caps.c  | 17 +++++++++++++++--
->  target/ppc/kvm.c     | 39 +++++++++++++++++++++++++++++++++++++++
->  target/ppc/kvm_ppc.h | 12 ++++++++++++
->  3 files changed, 66 insertions(+), 2 deletions(-)
+>  hw/intc/spapr_xive_kvm.c | 22 +++++++++++++++++++---
+>  1 file changed, 19 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 44542fdbb2..e07568fb94 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -440,8 +440,16 @@ static void cap_large_decr_apply(sPAPRMachineState *=
-spapr,
->                  pcc->hdecr_bits);
->              return;
+> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> index 99a829fb3f60..64d160babb26 100644
+> --- a/hw/intc/spapr_xive_kvm.c
+> +++ b/hw/intc/spapr_xive_kvm.c
+> @@ -500,8 +500,16 @@ static void kvmppc_xive_change_state_handler(void *o=
+paque, int running,
+>      if (running) {
+>          for (i =3D 0; i < xsrc->nr_irqs; i++) {
+>              uint8_t pq =3D xive_source_esb_get(xsrc, i);
+> -            if (xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq << 8)) !=
+=3D 0x1) {
+> -                error_report("XIVE: IRQ %d has an invalid state", i);
+> +            uint8_t old_pq;
+> +
+> +            old_pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq <=
+< 8));
+> +
+> +            /*
+> +             * If an interrupt was queued (hotplug event) while VM was
+> +             * stopped, generate a trigger.
+> +             */
+> +            if (pq =3D=3D XIVE_ESB_RESET && old_pq =3D=3D XIVE_ESB_QUEUE=
+D) {
+> +                xive_esb_trigger(xsrc, i);
+>              }
 >          }
-> -    } else {
-> -        error_setg(errp, "No large decrementer support, try cap-large-de=
-cr=3D0");
-> +    } else if (kvm_enabled()) {
-> +        int kvm_nr_bits =3D kvmppc_get_cap_large_decr();
+> =20
+> @@ -515,7 +523,15 @@ static void kvmppc_xive_change_state_handler(void *o=
+paque, int running,
+>       * migration is in progress.
+>       */
+>      for (i =3D 0; i < xsrc->nr_irqs; i++) {
+> -        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_01);
+> +        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
 > +
-> +        if (!kvm_nr_bits) {
-> +            error_setg(errp, "No large decrementer support, try cap-larg=
-e-decr=3D0");
-> +        } else if (val !=3D kvm_nr_bits) {
-> +            error_setg(errp,
-> +                "Large decrementer size unsupported, try -cap-large-decr=
-=3D%d",
-> +                kvm_nr_bits);
+> +        /*
+> +         * PQ is set to PENDING to possibly catch a hotplug event
+> +         * occuring while the VM is stopped.
+> +         */
+> +        if (pq !=3D XIVE_ESB_OFF) {
+> +            pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_10);
 > +        }
+>          xive_source_esb_set(xsrc, i, pq);
 >      }
->  }
 > =20
-> @@ -452,6 +460,11 @@ static void cap_large_decr_cpu_apply(sPAPRMachineSta=
-te *spapr,
->      CPUPPCState *env =3D &cpu->env;
->      target_ulong lpcr =3D env->spr[SPR_LPCR];
-> =20
-> +    if (kvm_enabled()) {
-> +        if (kvmppc_enable_cap_large_decr(cpu, !!val))
-> +            error_setg(errp, "No large decrementer support, try cap-larg=
-e-decr=3D0");
-> +    }
-> +
->      if (val)
->          lpcr |=3D LPCR_LD;
->      else
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index d01852fe31..3f650c8fc4 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -91,6 +91,7 @@ static int cap_ppc_safe_cache;
->  static int cap_ppc_safe_bounds_check;
->  static int cap_ppc_safe_indirect_branch;
->  static int cap_ppc_nested_kvm_hv;
-> +static int cap_large_decr;
-> =20
->  static uint32_t debug_inst_opcode;
-> =20
-> @@ -124,6 +125,7 @@ static bool kvmppc_is_pr(KVMState *ks)
-> =20
->  static int kvm_ppc_register_host_cpu_type(MachineState *ms);
->  static void kvmppc_get_cpu_characteristics(KVMState *s);
-> +static int kvmppc_get_dec_bits(void);
-> =20
->  int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
-> @@ -151,6 +153,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      cap_resize_hpt =3D kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HP=
-T);
->      kvmppc_get_cpu_characteristics(s);
->      cap_ppc_nested_kvm_hv =3D kvm_vm_check_extension(s, KVM_CAP_PPC_NEST=
-ED_HV);
-> +    cap_large_decr =3D kvmppc_get_dec_bits();
->      /*
->       * Note: setting it to false because there is not such capability
->       * in KVM at this moment.
-> @@ -1927,6 +1930,15 @@ uint64_t kvmppc_get_clockfreq(void)
->      return kvmppc_read_int_cpu_dt("clock-frequency");
->  }
-> =20
-> +static int kvmppc_get_dec_bits(void)
-> +{
-> +    int nr_bits =3D kvmppc_read_int_cpu_dt("ibm,dec-bits");
-> +
-> +    if (nr_bits > 0)
-> +        return nr_bits;
-> +    return 0;
-> +}
-> +
->  static int kvmppc_get_pvinfo(CPUPPCState *env, struct kvm_ppc_pvinfo *pv=
-info)
->   {
->       PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
-> @@ -2442,6 +2454,33 @@ bool kvmppc_has_cap_spapr_vfio(void)
->      return cap_spapr_vfio;
->  }
-> =20
-> +int kvmppc_get_cap_large_decr(void)
-> +{
-> +    return cap_large_decr;
-> +}
-> +
-> +int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable)
-> +{
-> +    CPUState *cs =3D CPU(cpu);
-> +    uint64_t lpcr;
-> +
-> +    kvm_get_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +    /* Do we need to modify the LPCR? */
-> +    if (!!(lpcr & LPCR_LD) !=3D !!enable) {
-> +        if (enable)
-> +            lpcr |=3D LPCR_LD;
-> +        else
-> +            lpcr &=3D ~LPCR_LD;
-> +        kvm_set_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +        kvm_get_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +
-> +        if (!!(lpcr & LPCR_LD) !=3D !!enable)
-> +            return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
->  {
->      uint32_t host_pvr =3D mfpvr();
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index bdfaa4e70a..a79835bd14 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -64,6 +64,8 @@ int kvmppc_get_cap_safe_bounds_check(void);
->  int kvmppc_get_cap_safe_indirect_branch(void);
->  bool kvmppc_has_cap_nested_kvm_hv(void);
->  int kvmppc_set_cap_nested_kvm_hv(int enable);
-> +int kvmppc_get_cap_large_decr(void);
-> +int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable);
->  int kvmppc_enable_hwrng(void);
->  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-> @@ -332,6 +334,16 @@ static inline int kvmppc_set_cap_nested_kvm_hv(int e=
-nable)
->      return -1;
->  }
-> =20
-> +static inline int kvmppc_get_cap_large_decr(void)
-> +{
-> +    return 0;
-> +}
-> +
-> +static inline int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enab=
-le)
-> +{
-> +    return -1;
-> +}
-> +
->  static inline int kvmppc_enable_hwrng(void)
->  {
->      return -1;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -223,24 +107,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---9ToWwKEyhugL+MAz
+--djJN5oi3zFpblwUd
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx0uLMACgkQbDjKyiDZ
-s5IgTRAAl62RJnyBrbDFVIMXGDbSvYJtKCJBz9C5u2bJxE/XrFJwLT2KGN9hJ/vY
-p+dAfCBoxlznLQXu63DPfrizuANX7N9esKh4ulwuKOVDSf+4t8KjziiMdLlWI5NX
-8X5sfCj9aLaZ9GiSeL3oxoZIMcVjQvy9RnLDtdcqb3kKtCkzT8IuCXTO8S1kPdLa
-kr58QrbF0C6kIPhDxcfCc0SJqTBY4S9yjPBkNteh2Pyyz2rBLWXgqjBTiGso8Jos
-RS0xUI7/oPnlIn6rjXORSTs1wJqvb9JJbqvg/wnWi8TKvq28AkAtUpjCJWWcYuy1
-SbIuGTuCICzze674ws/nANXcdHg5erdaNhiCJfRF7GQvxnATjYW/OPFNyq6oMfLl
-ENsqidYkBvwFPrQYJRdX1YrMR44y2uC/xLtpt56DLVGO5+Dfq1Vwrvi6PydYYsmO
-osijc4q09LBUeD544oz7aHdC2KemUnC2W7nH6iunyuh8O3GUdrNSP/dP40rp6zSi
-oANz0HiPYH3k3hAkj4Omovfdk/SpH0r4wY7mdcuAO8nbdV9M2vE2EX5xC7cM/VWM
-4WLsCtnsk8D+CMF7rU//RrX69kPvIN7qomMxF0zgiZK+Mq3qvAJWL/xq7rEvucB4
-JB7U7SyRovqAconw7uNC+A+u9oRNZTpR+AsjzQ4elPD6pLUiPjA=
-=eCDJ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx0vdIACgkQbDjKyiDZ
+s5IR1g//ZsbDP1snrbrNjUc5rzZ818iZ7xjd/HbGCkEk81Hp3//sOll4FInXRR76
+uSx2gsSq1YkF+kqnNc6OwB+GtuVzLfohzlV3srWAH3MpwWIOtpmYn9SbIRf+2lsw
+4AK+e+JS3tmEO7qtcID6zX35J9rLZcuQO/ShxwxwWLrTjVFRNIGsnh+w0BGwZpmf
+WyAr1OdavrHCnT4oVTC14IuLDzZZrsahDoinIo6Ghn9R53DgLvLJDvRH2DD1EuQL
+n/oM0A0fzoEgypiFzd00uEGZ1AIvkWQHItJe4mXm6SXdUD0GPVhY3FTDISXZE8oe
+CTsP+TJ0wXr3iBYB6QJ17Eva88Ez+FiWij/TmnhRUNBVp/w3zSoNvUDNs547XOBK
+dKzeorqSZy/gTfJUpQNMPSzlQF7bxnBjbRox+h7ChuHGFOl5zffb57xH9TVyVGNO
+HjsLaVmKPbe5x/jK4Ead84TsND7CQ4rDdNrGQPiYgWRM3/YGcF2TUiGl3pavnQvW
++JkL2a2EeX5CtvUPCo2XGoR82S0kdG4/1BY7xYUz2tvIgNm9Rbq4rroAiWrQ9fuZ
+yfjSHr1bXIeLrf8Rv/6nks2RYIsli0ahQVd41aEDwhuq83v8Brw3thOo6hVxYK87
+d0RsEctFT0pSfWYBYOuwJoioAA1UINLowsFWyMYmObZiKX2Quhg=
+=ksvE
 -----END PGP SIGNATURE-----
 
---9ToWwKEyhugL+MAz--
+--djJN5oi3zFpblwUd--
