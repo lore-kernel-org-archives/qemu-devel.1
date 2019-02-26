@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58646)
+Received: from eggs.gnu.org ([209.51.188.92]:58644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUmI-0006PI-UW
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUmI-0006PH-US
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUmD-0003kv-7Y
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUmD-0003l9-8E
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:36 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:59 +1100
-Message-Id: <20190226045304.25618-46-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:55 +1100
+Message-Id: <20190226045304.25618-42-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 45/50] tests/device-plug: Add PHB unplug request
- test for spapr
+Subject: [Qemu-devel] [PULL 41/50] spapr_pci: provide node start offset via
+ spapr_populate_pci_dt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +23,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-We can easily test this, just like PCI. PHB unplug is not supported
-on s390x and x86 ACPI.
+PHB hotplug re-uses PHB device tree generation code and passes
+it to a guest via RTAS. Doing this requires knowledge of where
+exactly in the device tree the node describing the PHB begins.
 
+Provide this via a new optional pointer that can be used to
+store the PHB node's start offset.
+
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155059673939.1466090.14354001937819612724.stgit@bahia.lab.to=
+Message-Id: <155059671912.1466090.10891589403973703473.stgit@bahia.lab.to=
 ulouse-stg.fr.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- tests/device-plug-test.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ hw/ppc/spapr.c              | 2 +-
+ hw/ppc/spapr_pci.c          | 5 ++++-
+ include/hw/pci-host/spapr.h | 2 +-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
-index 87593d9ecf..318e422d51 100644
---- a/tests/device-plug-test.c
-+++ b/tests/device-plug-test.c
-@@ -132,6 +132,20 @@ static void test_spapr_memory_unplug_request(void)
-     qtest_quit(qtest);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index fcda177090..76b3c15d59 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1312,7 +1312,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
+pr)
+=20
+     QLIST_FOREACH(phb, &spapr->phbs, list) {
+         ret =3D spapr_populate_pci_dt(phb, PHANDLE_INTC, fdt,
+-                                    spapr->irq->nr_msis);
++                                    spapr->irq->nr_msis, NULL);
+         if (ret < 0) {
+             error_report("couldn't setup PCI devices in fdt");
+             exit(1);
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index ede928b0bf..a0e1769439 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2153,7 +2153,7 @@ static void spapr_phb_pci_enumerate(sPAPRPHBState *=
+phb)
  }
 =20
-+static void test_spapr_phb_unplug_request(void)
-+{
-+    QTestState *qtest;
-+
-+    qtest =3D qtest_initf("-device spapr-pci-host-bridge,index=3D1,id=3D=
-dev0");
-+
-+    /* similar to test_pci_unplug_request */
-+    device_del_request(qtest, "dev0");
-+    system_reset(qtest);
-+    wait_device_deleted_event(qtest, "dev0");
-+
-+    qtest_quit(qtest);
-+}
-+
- int main(int argc, char **argv)
+ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t intc_phandle, voi=
+d *fdt,
+-                          uint32_t nr_msis)
++                          uint32_t nr_msis, int *node_offset)
  {
-     const char *arch =3D qtest_get_arch();
-@@ -156,6 +170,8 @@ int main(int argc, char **argv)
-                        test_spapr_cpu_unplug_request);
-         qtest_add_func("/device-plug/spapr-memory-unplug-request",
-                        test_spapr_memory_unplug_request);
-+        qtest_add_func("/device-plug/spapr-phb-unplug-request",
-+                       test_spapr_phb_unplug_request);
-     }
+     int bus_off, i, j, ret;
+     gchar *nodename;
+@@ -2208,6 +2208,9 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint3=
+2_t intc_phandle, void *fdt,
+     nodename =3D g_strdup_printf("pci@%" PRIx64, phb->buid);
+     _FDT(bus_off =3D fdt_add_subnode(fdt, 0, nodename));
+     g_free(nodename);
++    if (node_offset) {
++        *node_offset =3D bus_off;
++    }
 =20
-     return g_test_run();
+     /* Write PHB properties */
+     _FDT(fdt_setprop_string(fdt, bus_off, "device_type", "pci"));
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 4b0443f4cf..ab0e3a0a6f 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -113,7 +113,7 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAP=
+RPHBState *phb, int pin)
+ }
+=20
+ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t intc_phandle, voi=
+d *fdt,
+-                          uint32_t nr_msis);
++                          uint32_t nr_msis, int *node_offset);
+=20
+ void spapr_pci_rtas_init(void);
+=20
 --=20
 2.20.1
