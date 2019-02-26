@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44752)
+Received: from eggs.gnu.org ([209.51.188.92]:45215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyYPZ-0004Iu-RF
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 03:48:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyYRK-0005Aw-I3
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 03:50:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyYPZ-0006jw-45
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 03:48:25 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 26 Feb 2019 08:48:18 +0000
-Message-ID: <d1ee3263-17df-f488-7603-3ed6924f178a@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <68EB03942539434B86EDDF632661D6DB@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1gyYRI-0000F0-FD
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 03:50:14 -0500
+Date: Tue, 26 Feb 2019 09:49:59 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190226084959.GA4598@linux.fritz.box>
+References: <20190225161831.20103-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] mirror questions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190225161831.20103-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] iotests: use -M accel=qtest in 238
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,20 +22,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>
 
-SGkhDQoNCkEgcXVlc3Rpb24gYWJvdXQgcy0+Y293X2JpdG1hcCwgaW50cm9kdWNlZCBpbiBmYXIg
-YjgxMmY2NzE5Yw0KICAgICAibWlycm9yOiBwZXJmb3JtIENPVyBpZiB0aGUgY2x1c3RlciBzaXpl
-IGlzIGJpZ2dlciB0aGFuIHRoZSBncmFudWxhcml0eSINCg0KY293X2JpdG1hcCBpcyBqdXN0IGEg
-Yml0bWFwIHdoaWNoIHRyYWNrcywgd2hhdCBjbHVzdGVycyBvZiB0YXJnZXQgYXJlIGFsbG9jYXRl
-ZCwgdG8NCnByZXZlbnQgQ09XIGluIHRhcmdldCwgaWYgdGFyZ2V0IGJhY2tpbmcgaXMgbm90IHJl
-YWR5IHlldC4gQW5kIGl0IGlzIGRvbmUgYnkganVzdA0KYWxpZ25pbmcgcmVxdWVzdCB0byBiZSBs
-YXJnZXQgYW5kIGNvdmVyIHVuYWxpZ25lZCBib3JkZXIgY2x1c3RlcnMuDQoNCnNvLCBxdWVzdGlv
-bnM6DQoNCjEuIElzIGl0IGNvcnJlY3QgdGhhdCB3ZSBhbGlnbiBvbmx5IG9uIENPUFkgb3BlcmF0
-aW9uIGluIG1pcnJvcl9jb19yZWFkPyBNaXNhbGlnbmVkDQp3cml0ZV96ZXJvIGNhbiBhbHNvIGxl
-YWQgdG8gQ09XLCBJIHRoaW5rPyBEaXNjYXJkIHNlZW1zIHNhZmUgaW4gdGhpcyB3YXksIGlzIGl0
-Pw0KDQoyLiBJIGRvbid0IHNlZSwgaG93IGlzIGl0IGhhbmRsZWQsIGlmIHdlIGFsaWduIG9wZXJh
-dGlvbiBzbyB0aGF0IG9mZnNldCBpcyBkZWNyZWFzZXMsDQp0aGVuIGl0IG1heSBpbnRlcnNlY3Qg
-d2l0aCBwcmV2aW91cyBtaXJyb3Igb3BlcmF0aW9uIHJlcXVlc3QsIHdoaWNoIG1heSBiZSBub3Qg
-eWV0IGZpbmlzaGVkPw0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+Am 25.02.2019 um 17:18 hat Stefan Hajnoczi geschrieben:
+> Test 238 does not require the kvm accelerator.  tcg and qtest work too.
+> 
+> Use qtest since it's always built in while kvm and tcg are not.
+> 
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tests/qemu-iotests/238 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
+> index f81ee1112f..c7f8d9422b 100755
+> --- a/tests/qemu-iotests/238
+> +++ b/tests/qemu-iotests/238
+> @@ -33,7 +33,7 @@ else:
+>      virtio_scsi_device = 'virtio-scsi-pci'
+>  
+>  vm = QEMUMachine(iotests.qemu_prog)
+> -vm.add_args('-machine', 'accel=kvm')
+> +vm.add_args('-machine', 'accel=qtest')
+>  vm.launch()
+
+Why not use iotests.VM? This would be a qtest machine automatically.
+
+Kevin
