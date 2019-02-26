@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36988)
+Received: from eggs.gnu.org ([209.51.188.92]:39450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gyhlY-000401-PT
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:47:45 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gyi0b-0007JJ-7n
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:03:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gyhlX-000497-Dy
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:47:44 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:32929)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gyhlV-00045b-C4
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:47:43 -0500
-Received: by mail-wr1-f68.google.com with SMTP id i12so15172937wrw.0
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:47:37 -0800 (PST)
-References: <20190226073159.13434-1-richardw.yang@linux.intel.com>
-	<20190226110934-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <683d6fc9-bfdc-b2e5-e1b7-cd2d2711268e@redhat.com>
-Date: Tue, 26 Feb 2019 19:47:35 +0100
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gyi0a-0001PD-1q
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:03:17 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:45481
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gyi0Z-0001NB-OG
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:03:15 -0500
+References: <20190215143115.28777-1-alex.bennee@linaro.org>
+	<87d0nn6eoi.fsf@zen.linaroharston> <20190219182528.GA19925@flamenco>
+	<01acc60d-5f00-20ed-4631-6da98ae4da7e@ilande.co.uk>
+	<874l8qnbqt.fsf@zen.linaroharston>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <04dc02ce-c217-d4e0-b0dd-e6dc233bc1b2@ilande.co.uk>
+Date: Tue, 26 Feb 2019 19:03:02 +0000
 MIME-Version: 1.0
-In-Reply-To: <20190226110934-mutt-send-email-mst@kernel.org>
+In-Reply-To: <874l8qnbqt.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: use __ATTR_RO_MODE to define rev
- sysfs
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] softmmu demacro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>
-Cc: somlo@cmu.edu, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 
-On 2/26/19 5:10 PM, Michael S. Tsirkin wrote:
-> On Tue, Feb 26, 2019 at 03:31:59PM +0800, Wei Yang wrote:
->> Leverage __ATTR_RO_MODE to define rev sysfs instead of using open code
->> to define the attribute.
->>
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  drivers/firmware/qemu_fw_cfg.c | 13 ++++---------
->>  1 file changed, 4 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
->> index 039e0f91dba8..a1293cbd7adb 100644
->> --- a/drivers/firmware/qemu_fw_cfg.c
->> +++ b/drivers/firmware/qemu_fw_cfg.c
->> @@ -296,18 +296,13 @@ static int fw_cfg_do_platform_probe(struct platform_device *pdev)
->>  	return 0;
->>  }
->>  
->> -static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, char *buf)
->> +static ssize_t fw_cfg_rev_show(struct kobject *k, struct kobj_attribute *a,
->> +			       char *buf)
->>  {
->>  	return sprintf(buf, "%u\n", fw_cfg_rev);
->>  }
->> -
->> -static const struct {
->> -	struct attribute attr;
->> -	ssize_t (*show)(struct kobject *k, struct attribute *a, char *buf);
->> -} fw_cfg_rev_attr = {
->> -	.attr = { .name = "rev", .mode = S_IRUSR },
->> -	.show = fw_cfg_showrev,
->> -};
->> +static const struct kobj_attribute fw_cfg_rev_attr =
->> +	__ATTR_RO_MODE(fw_cfg_rev, 0400);
->>  
->>  /* fw_cfg_sysfs_entry type */
->>  struct fw_cfg_sysfs_entry {
-> 
-> 
-> Looks like this will change the name from "rev" to "fw_cfg_rev".
-> That's a userspace visible change which we should not do lightly.
+On 26/02/2019 09:24, Alex Bennée wrote:
 
-We could name the function rev_show but this stay fragile, we'd also
-need a comment "don't rename this".
-
->> -- 
->> 2.19.1
+>> Presumably the issue here is somehow related to the compiler incorrectly
+>> extending/reducing the shift when the larger type is involved? Also during my tests
+>> the visual corruption was only present for 32-bit accesses, but presumably all the
+>> access sizes will need a similar fix.
 > 
+> So I did fix this in the third patch when I out of lined the unaligned
+> helpers so:
+> 
+>      const tcg_target_ulong size_mask = MAKE_64BIT_MASK(0, size * 8);
+> 
+> and
+> 
+>      /* Big-endian combine.  */
+>      r2 &= size_mask;
+> 
+> or
+> 
+>      /* Little-endian combine.  */
+>      r1 &= size_mask;
+> 
+> I guess I should also apply that to patch 1 for bisectability.
+
+I've done that locally, and while things have improved with progress bars I'm still
+seeing some strange blank fills appearing on the display in MacOS. I'll have another
+dig further and see what's going on...
+
+> Thanks for digging into the failures. It does make me think that we
+> really could do with some system mode tests to properly exercise all
+> softmmu code paths:
+> 
+>   * each size access, load and store
+>   * unaligned accesses, load and store (+ potential arch specific handling)
+>   * page striding accesses faulting and non-faulting
+> 
+> I'm not sure how much work it would be to get a minimal bare metal
+> kernel that would be able to do these and report success/fail. When I
+> did the MTTCG work I used kvm-unit-tests as a fairly complete mini-os
+> but maybe that's overkill for what we need here. After all we already
+> have migration kernels that just do a simple tick-tock for testing
+> migration. It would be nice to have the tests in C with maybe a minimal
+> per-arch assembly so we can share the tests across various platforms.
+
+Right. Having unrolled the macros myself whilst softmmu_template.h appears on the
+surface to be deceptively simple, it hides quite a few subtle implementation details
+which is why I think your work is so valuable here.
+
+
+ATB,
+
+Mark.
