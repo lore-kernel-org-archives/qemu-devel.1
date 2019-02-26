@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59766)
+Received: from eggs.gnu.org ([209.51.188.92]:60477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gyfqv-00041U-9F
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:45:10 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gyfst-0005ek-Sy
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:47:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gyfqs-0004Vf-PR
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:45:09 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:37181)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gyfqs-0004T1-FW
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:45:06 -0500
-Received: by mail-wr1-x434.google.com with SMTP id w6so11460636wrs.4
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 08:45:06 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 26 Feb 2019 16:45:00 +0000
-Message-Id: <20190226164500.8080-7-alex.bennee@linaro.org>
-In-Reply-To: <20190226164500.8080-1-alex.bennee@linaro.org>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gyfss-0006ml-1w
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:47:11 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:58496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gyfsr-0006db-FQ
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 11:47:09 -0500
+Date: Tue, 26 Feb 2019 08:46:56 -0800
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190226164656.mhasc4xxfjf34hns@function>
 References: <20190226164500.8080-1-alex.bennee@linaro.org>
+	<20190226164500.8080-4-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 6/6] contrib: gitdm: another non-corporate
- email from RedHat
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190226164500.8080-4-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] contrib: gitdm: add some more
+ people academic group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, BALATON Zoltan <balaton@eik.bme.hu>
 
-Marcel works in Red Hat's KVM team.
+Hello,
 
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- contrib/gitdm/group-map-redhat | 1 +
- 1 file changed, 1 insertion(+)
+Alex Benn=C3=A9e, le mar. 26 f=C3=A9vr. 2019 16:44:57 +0000, a ecrit:
+> I'm basing this on email addresses or published employment. Please
+> confirm if this is correct or you want to be under (None).
+>=20
+> Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-diff --git a/contrib/gitdm/group-map-redhat b/contrib/gitdm/group-map-redhat
-index 6d05c6b54f..1335569dda 100644
---- a/contrib/gitdm/group-map-redhat
-+++ b/contrib/gitdm/group-map-redhat
-@@ -5,3 +5,4 @@
- david@gibson.dropbear.id.au
- laurent@vivier.eu
- pjp@fedoraproject.org
-+marcel.apfelbaum@gmail.com
--- 
-2.20.1
+@ens-lyon.org means "None".
+(it's just my alumni address, which I use for all my personal projects)
+
+Only @ens-lyon.fr would mean under ENS employment.
+
+Samuel
