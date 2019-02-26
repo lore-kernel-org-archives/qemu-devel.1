@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35915)
+Received: from eggs.gnu.org ([209.51.188.92]:36419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gyhgB-0001T1-RF
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:42:12 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gyhj5-0002OX-RG
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:45:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gyhgA-00079Y-NV
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:42:11 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39516)
+	(envelope-from <richard.henderson@linaro.org>) id 1gyhj1-0001ui-RC
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:45:10 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43634)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gyhgA-00074t-GA
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:42:10 -0500
-Received: by mail-wm1-x342.google.com with SMTP id z84so3245170wmg.4
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:42:10 -0800 (PST)
-References: <20190226164500.8080-1-alex.bennee@linaro.org>
-	<20190226164500.8080-7-alex.bennee@linaro.org>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <ea3b1ba4-3eb0-e71f-d03a-a915e79468fd@gmail.com>
-Date: Tue, 26 Feb 2019 20:42:46 +0200
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gyhiy-0001gK-AU
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:45:06 -0500
+Received: by mail-pl1-x643.google.com with SMTP id m10so6634845plt.10
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:44:53 -0800 (PST)
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-6-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bc885681-3b65-11b7-4aa9-686ad45ac9bc@linaro.org>
+Date: Tue, 26 Feb 2019 10:44:49 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190226164500.8080-7-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190226113915.20150-6-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v1 6/6] contrib: gitdm: another
- non-corporate email from RedHat
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 05/33] s390x/tcg: Implement VECTOR
+ GATHER ELEMENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Alex,
-
-On 2/26/19 6:45 PM, Alex Bennée wrote:
-> Marcel works in Red Hat's KVM team.
-
-Actually I left Red Hat some time ago... :)
-
-Thanks,
-Marcel
-
-
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On 2/26/19 3:38 AM, David Hildenbrand wrote:
+> Let's start with a more involved one, but it is the first in the list
+> of vector support instructions (introduced with the vector facility).
+> 
+> Good thing is, we need a lot of basic infrastructure for this. Reading
+> and writing vector elements, checking element validity as well as loading
+> vector elements from memory. Storing will be added later, once needed.
+> 
+> All vector instruction related translation functions will reside in
+> translate_vx.inc.c, to be included in translate.c - similar to how
+> other architectures handle it.
+> 
+> While at it, directly add some documentation (which contains parts about
+> things added in follow-up patches, but splitting this up does not make
+> too much sense).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->   contrib/gitdm/group-map-redhat | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/contrib/gitdm/group-map-redhat b/contrib/gitdm/group-map-redhat
-> index 6d05c6b54f..1335569dda 100644
-> --- a/contrib/gitdm/group-map-redhat
-> +++ b/contrib/gitdm/group-map-redhat
-> @@ -5,3 +5,4 @@
->   david@gibson.dropbear.id.au
->   laurent@vivier.eu
->   pjp@fedoraproject.org
-> +marcel.apfelbaum@gmail.com
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
