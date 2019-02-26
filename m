@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40357)
+Received: from eggs.gnu.org ([209.51.188.92]:40358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gycaL-0005CM-4l
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gycaL-0005CN-53
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:15:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gycaI-0006ug-UY
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gycaI-0006uY-SR
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:15:49 -0500
-Received: from relay.sw.ru ([185.231.240.75]:43586)
+Received: from relay.sw.ru ([185.231.240.75]:43588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1gycaI-0006tJ-DA
+	id 1gycaI-0006tP-Bv
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:15:46 -0500
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Tue, 26 Feb 2019 16:15:32 +0300
-Message-Id: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/3] migration: add sztd compression
+Date: Tue, 26 Feb 2019 16:15:34 +0300
+Message-Id: <20190226131535.30361-3-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
+References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 2/3] hmp: add compress-type parameter to
+ migration parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +28,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com, quintela@redhat.com, eblake@redhat.com, armbru@redhat.com
 Cc: den@virtuozzo.com, qemu-devel@nongnu.org
 
-zstd date compression algorithm shows better performance on data compression.
-It might be useful to employ the algorithm in VM migration to reduce CPU usage.
-A user will be able to choose between those algorithms, therefor compress-type
-migration parameter is added.
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ hmp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Here are some results of performance comparison zstd vs gzip:
-
-host: i7-4790 8xCPU @ 3.60GHz, 16G RAM
-migration to the same host
-VM: 2xVCPU, 8G RAM total
-5G RAM used, memory populated with postgreqsl data
-produced by pgbench performance benchmark
-
-
-Threads: 1 compress – 1 decompress
-
-zstd provides slightly less compression ratio with almost the same
-CPU usage but copes with RAM  compression roghly 2 times faster
-
-compression type              zlib       |      zstd
----------------------------------------------------------
-compression level          1       5     |   1       5
-compression ratio          6.92    7.05  |   6.69    6.89
-cpu idle, %                82      83    |   86      80
-time, sec                  49      71    |   26      31
-time diff to zlib, sec                      -25     -41
-
-
-Threads: 8 compress – 2 decompress
-
-zstd provides the same migration time with less cpu consumption
-
-compression type         none  |        gzip(zlib)    |          zstd
-------------------------------------------------------------------------------
-compression level        -     |  1      5       9    |   1       5       15
-compression ratio        -     |  6.94   6.99    7.14 |   6.64    6.89    6.93
-time, sec                154   |  22     23      27   |   23      23      25
-cpu idle, %              99    |  45     30      12   |   70      52      23
-cpu idle diff to zlib          |                      |  -25%    -22%    -11%
-
-
-Denis Plotnikov (3):
-  migration: rework compression code for adding more data compressors
-  hmp: add compress-type parameter to migration parameters
-  migration: add zstd compression
-
- configure             |  26 ++++
- hmp.c                 |   8 ++
- migration/migration.c |  45 ++++++-
- migration/migration.h |   1 +
- migration/qemu-file.c |  39 ++----
- migration/qemu-file.h |  18 ++-
- migration/ram.c       | 291 ++++++++++++++++++++++++++++++++++--------
- qapi/migration.json   |  26 +++-
- 8 files changed, 369 insertions(+), 85 deletions(-)
-
+diff --git a/hmp.c b/hmp.c
+index b2a2b1f84e..5f105b816f 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -334,6 +334,10 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+     params = qmp_query_migrate_parameters(NULL);
+ 
+     if (params) {
++        assert(params->has_compress_type);
++        monitor_printf(mon, "%s: %u\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_TYPE),
++            params->compress_type);
+         assert(params->has_compress_level);
+         monitor_printf(mon, "%s: %u\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_LEVEL),
+@@ -1757,6 +1761,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+         p->has_max_postcopy_bandwidth = true;
+         visit_type_size(v, param, &p->max_postcopy_bandwidth, &err);
+         break;
++    case MIGRATION_PARAMETER_COMPRESS_TYPE:
++        p->has_compress_type = true;
++        visit_type_int(v, param, &p->compress_type, &err);
++        break;
+     default:
+         assert(0);
+     }
 -- 
 2.17.0
