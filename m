@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54290)
+Received: from eggs.gnu.org ([209.51.188.92]:59326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyh1s-0000OU-F9
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:00:33 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gyhOq-0003rG-IR
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:24:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyh1a-0000sS-PO
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:00:20 -0500
-References: <20190226135014.31854-1-eric.auger@redhat.com>
-	<20190226135014.31854-13-eric.auger@redhat.com>
-	<20190226180841.0c30af3c@Igors-MacBook-Pro.local>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <2cd3fb96-6f46-18db-cb55-5c4e30fd3bac@redhat.com>
-Date: Tue, 26 Feb 2019 18:59:49 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gyhOp-0008Od-QO
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:24:16 -0500
+Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:38806)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gyhOp-0008Nn-Hn
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:24:15 -0500
+Received: by mail-pg1-x52a.google.com with SMTP id m2so6602491pgl.5
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:24:15 -0800 (PST)
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-2-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <aa52d2ef-536e-a39f-51ec-40e9b04b8c95@linaro.org>
+Date: Tue, 26 Feb 2019 10:24:10 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190226180841.0c30af3c@Igors-MacBook-Pro.local>
+In-Reply-To: <20190226113915.20150-2-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 12/18] hw/arm/boot: Expose the PC-DIMM
- nodes in the DT
+Subject: Re: [Qemu-devel] [PATCH v1 01/33] s390x/tcg: Define vector
+ instruction formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Igor,
-
-On 2/26/19 6:08 PM, Igor Mammedov wrote:
-> On Tue, 26 Feb 2019 14:50:08 +0100
-> Eric Auger <eric.auger@redhat.com> wrote:
+On 2/26/19 3:38 AM, David Hildenbrand wrote:
+> These are the new instruction formats related to vector instructions as
+> up to the z14 (a.k.a. latest PoP).
 > 
->> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->>
->> This patch adds memory nodes corresponding to PC-DIMM regions.
->>
->> NVDIMM and ACPI_NVDIMM configs are not yet set for ARM so we
->> don't need to care about NVDIMM at this stage.
->>
->> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> I'm having second thoughts on this one,
-> maybe we should drop this patch or at least not to do this by default.
-See my reply on your cover letter remark.
-> In the later case it would mean some kind of property that user could use
-> to turn this on which in its own turn adds more clutter to user tunables
-> (which is not desirable). So I'm leaning more towards dropping this patch for now.
-So what about DT support? Doesn't it make sense to support
-cold-pluggable DIMMS?
-
-Thanks
-
-Eric
+> As v2 appeares (like x2 in VRX) with d2/b2 in VRV, we have to assign it a
+> higher field number to avoid collisions.
 > 
->>
->> ---
->> v7 -> v8:
->> - s/NV_DIMM/NVDIMM
->> - fix indent
->> v6 -> v7:
->> - rework the error messages, use a switch/case
->> v3 -> v4:
->> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
->>
->> v1 -> v2:
->> - added qapi_free_MemoryDeviceInfoList and simplify the loop
->> ---
->>  hw/arm/boot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 42 insertions(+)
->>
->> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
->> index a830655e1a..4caaf91583 100644
->> --- a/hw/arm/boot.c
->> +++ b/hw/arm/boot.c
->> @@ -19,6 +19,7 @@
->>  #include "sysemu/numa.h"
->>  #include "hw/boards.h"
->>  #include "hw/loader.h"
->> +#include "hw/mem/memory-device.h"
->>  #include "elf.h"
->>  #include "sysemu/device_tree.h"
->>  #include "qemu/config-file.h"
->> @@ -522,6 +523,41 @@ static void fdt_add_psci_node(void *fdt)
->>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
->>  }
->>  
->> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
->> +                                             uint32_t acells, uint32_t scells) {
->> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
->> +    MemoryDeviceInfo *mi;
->> +    int ret = 0;
->> +
->> +    for (info = info_list; info != NULL; info = info->next) {
->> +        mi = info->value;
->> +        switch (mi->type) {
->> +        case MEMORY_DEVICE_INFO_KIND_DIMM:
->> +        {
->> +            PCDIMMDeviceInfo *di = mi->u.dimm.data;
->> +
->> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
->> +                                      scells, di->size, di->node);
->> +            if (ret) {
->> +                fprintf(stderr,
->> +                        "couldn't add PCDIMM /memory@%"PRIx64" node\n",
->> +                        di->addr);
->> +                goto out;
->> +            }
->> +            break;
->> +        }
->> +        default:
->> +            fprintf(stderr, "%s memory nodes are not yet supported\n",
->> +                    MemoryDeviceInfoKind_str(mi->type));
->> +            ret = -ENOENT;
->> +            goto out;
->> +        }
->> +    }
->> +out:
->> +    qapi_free_MemoryDeviceInfoList(info_list);
->> +    return ret;
->> +}
->> +
->>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->>                   hwaddr addr_limit, AddressSpace *as)
->>  {
->> @@ -621,6 +657,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->>          }
->>      }
->>  
->> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
->> +    if (rc < 0) {
->> +        fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
->> +        goto fail;
->> +    }
->> +
->>      rc = fdt_path_offset(fdt, "/chosen");
->>      if (rc < 0) {
->>          qemu_fdt_add_subnode(fdt, "/chosen");
+> Properly take care of the MSB (to be able to address 32 registers) for
+> each vector register field stored in the RXB field (Bit 36 - 30  for all
+> vector instructions). As we have 32 bit vector registers and the
+> "v" fields are only 4 bit in size, the 5th bit is stored in the RXB.
+> We use a new type to indicate that the MSB has to be fetched from the
+> RXB.
 > 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-format.def | 25 +++++++++++++++++++++++
+>  target/s390x/translate.c     | 39 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 63 insertions(+), 1 deletion(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
