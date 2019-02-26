@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39419)
+Received: from eggs.gnu.org ([209.51.188.92]:39601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gygGc-0005gu-E9
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:11:43 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gygHF-000602-FD
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:12:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gygGb-0005xH-Cx
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:11:42 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50718)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gygGZ-0005no-9f
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:11:40 -0500
-Received: by mail-wm1-x343.google.com with SMTP id x7so3174696wmj.0
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 09:11:28 -0800 (PST)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gygHE-0006zb-9r
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:12:21 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:38636)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gygHD-0006wd-Pa
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:12:20 -0500
+Date: Tue, 26 Feb 2019 09:12:11 -0800
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190226171211.c3cpkorvipzzldif@function>
 References: <20190226164500.8080-1-alex.bennee@linaro.org>
 	<20190226164500.8080-4-alex.bennee@linaro.org>
 	<20190226164656.mhasc4xxfjf34hns@function>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190226164656.mhasc4xxfjf34hns@function>
-Date: Tue, 26 Feb 2019 17:11:25 +0000
-Message-ID: <871s3umq4i.fsf@zen.linaroharston>
+	<871s3umq4i.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <871s3umq4i.fsf@zen.linaroharston>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v1 3/6] contrib: gitdm: add some more
  people academic group
@@ -32,32 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, BALATON Zoltan <balaton@eik.bme.hu>
 
+Alex Benn=C3=A9e, le mar. 26 f=C3=A9vr. 2019 17:11:25 +0000, a ecrit:
+> Samuel Thibault <samuel.thibault@gnu.org> writes:
+>=20
+> > Hello,
+> >
+> > Alex Benn=C3=A9e, le mar. 26 f=C3=A9vr. 2019 16:44:57 +0000, a ecrit:
+> >> I'm basing this on email addresses or published employment. Please
+> >> confirm if this is correct or you want to be under (None).
+> >>
+> >> Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> >
+> > @ens-lyon.org means "None".
+> > (it's just my alumni address, which I use for all my personal
+> > projects)
+>=20
+> Fair enough, I shall move you to the individual contributors section
+> then?
 
-Samuel Thibault <samuel.thibault@gnu.org> writes:
+Yes, please.
 
-> Hello,
->
-> Alex Benn=C3=A9e, le mar. 26 f=C3=A9vr. 2019 16:44:57 +0000, a ecrit:
->> I'm basing this on email addresses or published employment. Please
->> confirm if this is correct or you want to be under (None).
->>
->> Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
->
-> @ens-lyon.org means "None".
-> (it's just my alumni address, which I use for all my personal
-> projects)
-
-Fair enough, I shall move you to the individual contributors section
-then?
-
->
-> Only @ens-lyon.fr would mean under ENS employment.
->
-> Samuel
-
-
---
-Alex Benn=C3=A9e
+Samuel
