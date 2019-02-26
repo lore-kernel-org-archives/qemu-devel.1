@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58427)
+Received: from eggs.gnu.org ([209.51.188.92]:58429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlo-0005w6-8D
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlo-0005w7-8k
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUln-0003EY-7a
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUln-0003EQ-7V
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:08 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:46 +1100
-Message-Id: <20190226045304.25618-33-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:48 +1100
+Message-Id: <20190226045304.25618-35-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 32/50] spapr/pci: Generate FDT fragment at
- configure connector time
+Subject: [Qemu-devel] [PULL 34/50] xics: Write source state to KVM at claim
+ time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +28,151 @@ Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qem
 
 From: Greg Kurz <groug@kaod.org>
 
+The pseries machine only uses LSIs to support legacy PCI devices. Every
+PHB claims 4 LSIs at realize time. When using in-kernel XICS (or upcoming
+in-kernel XIVE), QEMU synchronizes the state of all irqs, including these
+LSIs, later on at machine reset.
+
+In order to support PHB hotplug, we need a way to tell KVM about the LSIs
+that doesn't require a machine reset. An easy way to do that is to always
+inform KVM when an interrupt is claimed, which really isn't a performance
+path.
+
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155059667346.1466090.326696113231137772.stgit@bahia.lab.toul=
-ouse-stg.fr.ibm.com>
+Message-Id: <155059668360.1466090.5969630516627776426.stgit@bahia.lab.tou=
+louse-stg.fr.ibm.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_drc.c          |  1 +
- hw/ppc/spapr_pci.c          | 19 ++++++++++++-------
- include/hw/pci-host/spapr.h |  4 +++-
- 3 files changed, 16 insertions(+), 8 deletions(-)
+ hw/intc/xics.c        |  4 +++
+ hw/intc/xics_kvm.c    | 74 +++++++++++++++++++++++++------------------
+ include/hw/ppc/xics.h |  1 +
+ 3 files changed, 48 insertions(+), 31 deletions(-)
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index aa26aa40be..248eb8a93d 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -691,6 +691,7 @@ static void spapr_drc_pci_class_init(ObjectClass *k, =
-void *data)
-     drck->typename =3D "28";
-     drck->drc_name_prefix =3D "C";
-     drck->release =3D spapr_phb_remove_pci_device_cb;
-+    drck->dt_populate =3D spapr_pci_dt_populate;
- }
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index 767fdeb829..af7dc709ab 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -758,6 +758,10 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool=
+ lsi)
 =20
- static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 60777b2355..b22c9f57b2 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1408,6 +1408,17 @@ static uint32_t spapr_phb_get_pci_drc_index(sPAPRP=
-HBState *phb,
-     return spapr_drc_index(drc);
- }
-=20
-+int spapr_pci_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spap=
-r,
-+                          void *fdt, int *fdt_start_offset, Error **errp=
-)
-+{
-+    HotplugHandler *plug_handler =3D qdev_get_hotplug_handler(drc->dev);
-+    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(plug_handler);
-+    PCIDevice *pdev =3D PCI_DEVICE(drc->dev);
+     ics->irqs[srcno].flags |=3D
+         lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
 +
-+    *fdt_start_offset =3D spapr_create_pci_child_dt(sphb, pdev, fdt, 0);
++    if (kvm_irqchip_in_kernel()) {
++        ics_set_kvm_state_one(ics, srcno);
++    }
+ }
+=20
+ static void xics_register_types(void)
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index a00d0a7962..c6e1b630a4 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -213,45 +213,57 @@ void ics_synchronize_state(ICSState *ics)
+     ics_get_kvm_state(ics);
+ }
+=20
+-int ics_set_kvm_state(ICSState *ics)
++int ics_set_kvm_state_one(ICSState *ics, int srcno)
+ {
+     uint64_t state;
+-    int i;
+     Error *local_err =3D NULL;
++    ICSIRQState *irq =3D &ics->irqs[srcno];
++    int ret;
+=20
+-    for (i =3D 0; i < ics->nr_irqs; i++) {
+-        ICSIRQState *irq =3D &ics->irqs[i];
+-        int ret;
+-
+-        state =3D irq->server;
+-        state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MA=
+SK)
+-            << KVM_XICS_PRIORITY_SHIFT;
+-        if (irq->priority !=3D irq->saved_priority) {
+-            assert(irq->priority =3D=3D 0xff);
+-            state |=3D KVM_XICS_MASKED;
+-        }
++    state =3D irq->server;
++    state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MASK)
++        << KVM_XICS_PRIORITY_SHIFT;
++    if (irq->priority !=3D irq->saved_priority) {
++        assert(irq->priority =3D=3D 0xff);
++        state |=3D KVM_XICS_MASKED;
++    }
+=20
+-        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
+-            state |=3D KVM_XICS_LEVEL_SENSITIVE;
+-            if (irq->status & XICS_STATUS_ASSERTED) {
+-                state |=3D KVM_XICS_PENDING;
+-            }
+-        } else {
+-            if (irq->status & XICS_STATUS_MASKED_PENDING) {
+-                state |=3D KVM_XICS_PENDING;
+-            }
++    if (irq->flags & XICS_FLAGS_IRQ_LSI) {
++        state |=3D KVM_XICS_LEVEL_SENSITIVE;
++        if (irq->status & XICS_STATUS_ASSERTED) {
++            state |=3D KVM_XICS_PENDING;
+         }
+-        if (irq->status & XICS_STATUS_PRESENTED) {
+-                state |=3D KVM_XICS_PRESENTED;
+-        }
+-        if (irq->status & XICS_STATUS_QUEUED) {
+-                state |=3D KVM_XICS_QUEUED;
++    } else {
++        if (irq->status & XICS_STATUS_MASKED_PENDING) {
++            state |=3D KVM_XICS_PENDING;
+         }
++    }
++    if (irq->status & XICS_STATUS_PRESENTED) {
++        state |=3D KVM_XICS_PRESENTED;
++    }
++    if (irq->status & XICS_STATUS_QUEUED) {
++        state |=3D KVM_XICS_QUEUED;
++    }
++
++    ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
++                            srcno + ics->offset, &state, true, &local_er=
+r);
++    if (local_err) {
++        error_report_err(local_err);
++        return ret;
++    }
++
 +    return 0;
 +}
 +
- static void spapr_pci_plug(HotplugHandler *plug_handler,
-                            DeviceState *plugged_dev, Error **errp)
- {
-@@ -1417,8 +1428,6 @@ static void spapr_pci_plug(HotplugHandler *plug_han=
-dler,
-     Error *local_err =3D NULL;
-     PCIBus *bus =3D PCI_BUS(qdev_get_parent_bus(DEVICE(pdev)));
-     uint32_t slotnr =3D PCI_SLOT(pdev->devfn);
--    void *fdt =3D NULL;
--    int fdt_start_offset, fdt_size;
++int ics_set_kvm_state(ICSState *ics)
++{
++    int i;
++
++    for (i =3D 0; i < ics->nr_irqs; i++) {
++        int ret;
 =20
-     /* if DR is disabled we don't need to do anything in the case of
-      * hotplug or coldplug callbacks
-@@ -1448,10 +1457,7 @@ static void spapr_pci_plug(HotplugHandler *plug_ha=
-ndler,
-         goto out;
-     }
-=20
--    fdt =3D create_device_tree(&fdt_size);
--    fdt_start_offset =3D spapr_create_pci_child_dt(phb, pdev, fdt, 0);
--
--    spapr_drc_attach(drc, DEVICE(pdev), fdt, fdt_start_offset, &local_er=
+-        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
+ES,
+-                                i + ics->offset, &state, true, &local_er=
 r);
-+    spapr_drc_attach(drc, DEVICE(pdev), NULL, 0, &local_err);
-     if (local_err) {
-         goto out;
+-        if (local_err) {
+-            error_report_err(local_err);
++        ret =3D ics_set_kvm_state_one(ics, i);
++        if (ret) {
+             return ret;
+         }
      }
-@@ -1483,7 +1489,6 @@ static void spapr_pci_plug(HotplugHandler *plug_han=
-dler,
- out:
-     if (local_err) {
-         error_propagate(errp, local_err);
--        g_free(fdt);
-     }
- }
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index d36bbe11ee..eb65ad7e43 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -195,6 +195,7 @@ void icp_synchronize_state(ICPState *icp);
+ void icp_kvm_realize(DeviceState *dev, Error **errp);
 =20
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index 51d81c4b7c..f6e43f48fe 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -121,8 +121,10 @@ sPAPRPHBState *spapr_pci_find_phb(sPAPRMachineState =
-*spapr, uint64_t buid);
- PCIDevice *spapr_pci_find_dev(sPAPRMachineState *spapr, uint64_t buid,
-                               uint32_t config_addr);
-=20
--/* PCI release callback. */
-+/* DRC callbacks */
- void spapr_phb_remove_pci_device_cb(DeviceState *dev);
-+int spapr_pci_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spap=
-r,
-+                          void *fdt, int *fdt_start_offset, Error **errp=
-);
-=20
- /* VFIO EEH hooks */
- #ifdef CONFIG_LINUX
+ void ics_get_kvm_state(ICSState *ics);
++int ics_set_kvm_state_one(ICSState *ics, int srcno);
+ int ics_set_kvm_state(ICSState *ics);
+ void ics_synchronize_state(ICSState *ics);
+ void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
 --=20
 2.20.1
