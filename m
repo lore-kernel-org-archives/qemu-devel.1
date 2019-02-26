@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37448)
+Received: from eggs.gnu.org ([209.51.188.92]:37701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gyaEA-0001PJ-Jq
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:44:47 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gyaFM-00025U-GC
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:46:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gyaE8-0001NW-5z
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:44:46 -0500
-Date: Tue, 26 Feb 2019 07:44:19 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190226104419.GB4925@habkost.net>
-References: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<20190225202630.GA4925@habkost.net>
-	<CAMRbyysWcfctB8AeSZrQ9x9HRAKut7mWYFqVP=oQ5uVoQgvh0w@mail.gmail.com>
+	(envelope-from <stefanha@redhat.com>) id 1gyaFF-0001mj-4g
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:45:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40398)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gyaF6-0001k4-Sr
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:45:49 -0500
+Date: Tue, 26 Feb 2019 10:45:41 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190226104541.GA31847@stefanha-x1.localdomain>
+References: <2932080.UxbmD43V0u@neil>
+	<20190208062441.GF16257@stefanha-x1.localdomain>
+	<20190208094818.GA2608@work-vm> <1808957.OXY5YYl177@neil>
+	<20190212025658.GB28401@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="sm4nu43k4a2Rpi4c"
 Content-Disposition: inline
-In-Reply-To: <CAMRbyysWcfctB8AeSZrQ9x9HRAKut7mWYFqVP=oQ5uVoQgvh0w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] iotests: handle TypeError
- for Python3 in test 242
+In-Reply-To: <20190212025658.GB28401@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [regression] Clock jump on VM migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nsoffer@redhat.com>
-Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block <qemu-block@nongnu.org>, philmd@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, den@openvz.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Neil Skrypuch <neil@tembosocial.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Feb 26, 2019 at 03:42:11AM +0200, Nir Soffer wrote:
-> On Mon, Feb 25, 2019 at 10:36 PM Eduardo Habkost <ehabkost@redhat.com>
-[...]
-> > -        c = f.read(1)
-> > -        toggled = chr(ord(c) ^ bitmap_flag_unknown)
-> > +        # The casts to bytearray() below are only necessary
-> > +        # for Python 2 compatibility
-> > +        c = bytearray(f.read(1))[0]
-> >
-> 
-> This is simpler and makes the intent of the code more clear:
-> 
->     flag, = struct.unpack("B", f.read(1))
-> 
-> 
-> > +        toggled = c ^ bitmap_flag_unknown
-> >          f.seek(-1, 1)
-> > -        f.write(toggled)
-> > +        f.write(bytearray([toggled]))
-> >
-> 
-> For consistency, we can use struct.pack here:
-> 
->     f.write(struct.pack("B", toggled))
 
-That's perfect.  Thanks for the suggestion!
+--sm4nu43k4a2Rpi4c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
--- 
-Eduardo
+On Tue, Feb 12, 2019 at 10:56:58AM +0800, Stefan Hajnoczi wrote:
+> I'll return to this issue on Monday.
+
+I have played around with posix_fadvise(POSIX_FADV_DONTNEED) and
+measured 100+ millisecond latencies.  This is not a great primitive to
+rely on during migration downtime since it can be slow.
+
+On the other hand, we need it to ensure consistency when migrating to
+another host with cache.direct=off.  In the cross-host migration case
+the invalidation will be relatively fast because few pages will be
+present.
+
+An asynchronous flush and page cache invalidation on the source host at
+the beginning of live migration would help your use case, but I don't
+think the complexity of adding it is worthwhile (it doesn't help the
+cross-host migration case).
+
+Let's go back to the original idea of adding a parameter to disable the
+flush and page cache invalidation.  I will send a patch.
+
+Stefan
+
+--sm4nu43k4a2Rpi4c
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcdRjVAAoJEJykq7OBq3PIuQgH/2fCjt7Xmdq4STFXNFfcWFch
+cKuzoRFq2b8Iy6OdYknkwcTraK8A9adiS3m90h3RlkJnDsZmG1pcoAZ2uTKwyUw/
+0HZRtZI7WhHZSiuR8+MEn19jfaKcQ2/woOmF/D3joZ29AWedK5lDJq5v57M+sklm
+AADVuRlNZrPd2hWahRabNdlGur5yhNxkskbvRw5Rc1WY8R1Dq1A4TN6qEfilwEu7
+WUQ2wSuXUVgi1An5XCxvHNMNXsLWyraoGrmfOgBoy7gi1IerQR03YUZXFkMkCJrC
+/J2SUkGG/yNrTxD1RYstFH31tOVOzgTbaMApEsrcOVAhqSJplhvr83993qbTfZU=
+=vUFc
+-----END PGP SIGNATURE-----
+
+--sm4nu43k4a2Rpi4c--
