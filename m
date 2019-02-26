@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47196)
+Received: from eggs.gnu.org ([209.51.188.92]:47249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bztemail@gmail.com>) id 1gyb4b-0004CQ-NC
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:38:59 -0500
+	(envelope-from <david@redhat.com>) id 1gyb5H-0004RY-FF
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bztemail@gmail.com>) id 1gyb4M-0006UN-6v
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:38:46 -0500
-MIME-Version: 1.0
-From: bzt <bztemail@gmail.com>
-Date: Tue, 26 Feb 2019 12:38:36 +0100
-Message-ID: <CADYoBw1HTzqTjfyDgDbP042AH1EkS1DD7Sf4um8eO7d22t4CDA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] Added periodic IRQ support for bcm2836_control
- local timer
+	(envelope-from <david@redhat.com>) id 1gyb5G-0006mK-7g
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:39 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 26 Feb 2019 12:38:43 +0100
+Message-Id: <20190226113915.20150-2-david@redhat.com>
+In-Reply-To: <20190226113915.20150-1-david@redhat.com>
+References: <20190226113915.20150-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 01/33] s390x/tcg: Define vector instruction
+ formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,242 +20,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Dear qemu developers,
+These are the new instruction formats related to vector instructions as
+up to the z14 (a.k.a. latest PoP).
 
-Honestly SubmitAPatch is a bit complicated for me, so I'm hoping I've
-done everything right. To be sure, you can find my patch here:
-https://github.com/bztsrc/qemu-local-timer and diff against the latest
-github repo here:
-https://github.com/bztsrc/qemu-local-timer/blob/patches/3.1.50.diff
+As v2 appeares (like x2 in VRX) with d2/b2 in VRV, we have to assign it a
+higher field number to avoid collisions.
 
-Currently the IRQ_TIMER in bcm2836_control is defined, but not
-implemented. This patch adds the basic functionality to qemu by
-implementing 3 new registers in bcm2836_control. You can route the
-interrupt to one of the cores' IRQ or FIQ line by writing 0x40000024,
-and you can set up a periodic interrupt with 38.4MHz frequency by
-writing the divider into 0x40000034. Prescaler are not taken into
-account. When the IRQ fired, you'll see it in 0x40000040+4*N bit 11
-with the rest of the local IRQs, and you can acknowledge it by writing
-1<<31 to 0x40000038.
+Properly take care of the MSB (to be able to address 32 registers) for
+each vector register field stored in the RXB field (Bit 36 - 30  for all
+vector instructions). As we have 32 bit vector registers and the
+"v" fields are only 4 bit in size, the 5th bit is stored in the RXB.
+We use a new type to indicate that the MSB has to be fetched from the
+RXB.
 
-The patch is pretty simple, should be easy to review: it does not
-create new classes, does not delete anything, does not change class
-interface, and only two files modified, the bcm2836_control.c and it's
-header.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/insn-format.def | 25 +++++++++++++++++++++++
+ target/s390x/translate.c     | 39 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 63 insertions(+), 1 deletion(-)
 
-Sign-off-by: Zolt=C3=A1n Baldaszti <bztemail@gmail.com>
-Subject: [PATCH] Added periodic IRQ support for bcm2836_control local timer
-
-diff --git a/hw/intc/bcm2836_control.c b/hw/intc/bcm2836_control.c
-index cfa5bc7365..fbd31de0f1 100644
---- a/hw/intc/bcm2836_control.c
-+++ b/hw/intc/bcm2836_control.c
-@@ -7,7 +7,11 @@
-  * This code is licensed under the GNU GPLv2 and later.
-  *
-  * At present, only implements interrupt routing, and mailboxes (i.e.,
-- * not local timer, PMU interrupt, or AXI counters).
-+ * not PMU interrupt, or AXI counters).
-+ *
-+ * 64-bit ARM Local Timer Copyright (c) 2019. Zolt=C3=A1n Baldaszti
-+ * The IRQ_TIMER support is still very basic, does not handle timer access=
-,
-+ * and such there's no point in enabling it without the interrupt flag set=
-.
-  *
-  * Ref:
-  * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/=
-QA7_rev3.4.pdf
-@@ -18,6 +22,9 @@
- #include "qemu/log.h"
-
- #define REG_GPU_ROUTE           0x0c
-+#define REG_LOCALTIMERROUTING   0x24
-+#define REG_LOCALTIMERCONTROL   0x34
-+#define REG_LOCALTIMERACK       0x38
- #define REG_TIMERCONTROL        0x40
- #define REG_MBOXCONTROL         0x50
- #define REG_IRQSRC              0x60
-@@ -43,6 +50,13 @@
- #define IRQ_TIMER       11
- #define IRQ_MAX         IRQ_TIMER
-
-+#define LOCALTIMER_FREQ      38400000
-+#define LOCALTIMER_INTFLAG   (1 << 31)
-+#define LOCALTIMER_RELOAD    (1 << 30)
-+#define LOCALTIMER_INTENABLE (1 << 29)
-+#define LOCALTIMER_ENABLE    (1 << 28)
-+#define LOCALTIMER_VALUE(x)  ((x) & 0xfffffff)
-+
- static void deliver_local(BCM2836ControlState *s, uint8_t core, uint8_t ir=
-q,
-                           uint32_t controlreg, uint8_t controlidx)
- {
-@@ -78,6 +92,15 @@ static void bcm2836_control_update(BCM2836ControlState *=
-s)
-         s->fiqsrc[s->route_gpu_fiq] |=3D (uint32_t)1 << IRQ_GPU;
+diff --git a/target/s390x/insn-format.def b/target/s390x/insn-format.def
+index 4297ff4165..6253edbd19 100644
+--- a/target/s390x/insn-format.def
++++ b/target/s390x/insn-format.def
+@@ -54,3 +54,28 @@ F4(SS_e,  R(1, 8),     BD(2,16,20), R(3,12),     BD(4,32,36))
+ F3(SS_f,  BD(1,16,20), L(2,8,8),    BD(2,32,36))
+ F2(SSE,   BD(1,16,20), BD(2,32,36))
+ F3(SSF,   BD(1,16,20), BD(2,32,36), R(3,8))
++F3(VRI_a, V(1,8),      I(2,16,16),  M(3,32))
++F4(VRI_b, V(1,8),      I(2,16,8),   I(3,24,8),   M(4,32))
++F4(VRI_c, V(1,8),      V(3,12),     I(2,16,16),  M(4,32))
++F5(VRI_d, V(1,8),      V(2,12),     V(3,16),     I(4,24,8),   M(5,32))
++F5(VRI_e, V(1,8),      V(2,12),     I(3,16,12),  M(5,28),     M(4,32))
++F5(VRI_f, V(1,8),      V(2,12),     V(3,16),     M(5,24),     I(4,28,8))
++F5(VRI_g, V(1,8),      V(2,12),     I(4,16,8),   M(5,24),     I(3,28,8))
++F3(VRI_h, V(1,8),      I(2,16,16),  I(3,32,4))
++F4(VRI_i, V(1,8),      R(2,12),     M(4,24),     I(3,28,8))
++F5(VRR_a, V(1,8),      V(2,12),     M(5,24),     M(4,28),     M(3,32))
++F5(VRR_b, V(1,8),      V(2,12),     V(3,16),     M(5,24),     M(4,32))
++F6(VRR_c, V(1,8),      V(2,12),     V(3,16),     M(6,24),     M(5,28),  M(4,32))
++F6(VRR_d, V(1,8),      V(2,12),     V(3,16),     M(5,20),     M(6,24),  V(4,32))
++F6(VRR_e, V(1,8),      V(2,12),     V(3,16),     M(6,20),     M(5,28),  V(4,32))
++F3(VRR_f, V(1,8),      R(2,12),     R(3,16))
++F1(VRR_g, V(1,12))
++F3(VRR_h, V(1,12),     V(2,16),     M(3,24))
++F3(VRR_i, R(1,8),      V(2,12),     M(3,24))
++F4(VRS_a, V(1,8),      V(3,12),     BD(2,16,20), M(4,32))
++F4(VRS_b, V(1,8),      R(3,12),     BD(2,16,20), M(4,32))
++F4(VRS_c, R(1,8),      V(3,12),     BD(2,16,20), M(4,32))
++F3(VRS_d, R(3,12),     BD(2,16,20), V(1,32))
++F4(VRV,   V(1,8),      V(2,12),     BD(2,16,20), M(3,32))
++F3(VRX,   V(1,8),      BXD(2),      M(3,32))
++F3(VSI,   I(3,8,8),    BD(2,16,20), V(1,32))
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 41fb466bb4..1d8030f8cd 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -985,6 +985,7 @@ static void free_compare(DisasCompare *c)
+ #define F3(N, X1, X2, X3)             F0(N)
+ #define F4(N, X1, X2, X3, X4)         F0(N)
+ #define F5(N, X1, X2, X3, X4, X5)     F0(N)
++#define F6(N, X1, X2, X3, X4, X5, X6) F0(N)
+ 
+ typedef enum {
+ #include "insn-format.def"
+@@ -996,6 +997,7 @@ typedef enum {
+ #undef F3
+ #undef F4
+ #undef F5
++#undef F6
+ 
+ /* Define a structure to hold the decoded fields.  We'll store each inside
+    an array indexed by an enum.  In order to conserve memory, we'll arrange
+@@ -1010,6 +1012,8 @@ enum DisasFieldIndexO {
+     FLD_O_m1,
+     FLD_O_m3,
+     FLD_O_m4,
++    FLD_O_m5,
++    FLD_O_m6,
+     FLD_O_b1,
+     FLD_O_b2,
+     FLD_O_b4,
+@@ -1023,7 +1027,11 @@ enum DisasFieldIndexO {
+     FLD_O_i2,
+     FLD_O_i3,
+     FLD_O_i4,
+-    FLD_O_i5
++    FLD_O_i5,
++    FLD_O_v1,
++    FLD_O_v2,
++    FLD_O_v3,
++    FLD_O_v4,
+ };
+ 
+ enum DisasFieldIndexC {
+@@ -1031,6 +1039,7 @@ enum DisasFieldIndexC {
+     FLD_C_m1 = 0,
+     FLD_C_b1 = 0,
+     FLD_C_i1 = 0,
++    FLD_C_v1 = 0,
+ 
+     FLD_C_r2 = 1,
+     FLD_C_b2 = 1,
+@@ -1039,20 +1048,25 @@ enum DisasFieldIndexC {
+     FLD_C_r3 = 2,
+     FLD_C_m3 = 2,
+     FLD_C_i3 = 2,
++    FLD_C_v3 = 2,
+ 
+     FLD_C_m4 = 3,
+     FLD_C_b4 = 3,
+     FLD_C_i4 = 3,
+     FLD_C_l1 = 3,
++    FLD_C_v4 = 3,
+ 
+     FLD_C_i5 = 4,
+     FLD_C_d1 = 4,
++    FLD_C_m5 = 4,
+ 
+     FLD_C_d2 = 5,
++    FLD_C_m6 = 5,
+ 
+     FLD_C_d4 = 6,
+     FLD_C_x2 = 6,
+     FLD_C_l2 = 6,
++    FLD_C_v2 = 6,
+ 
+     NUM_C_FIELD = 7
+ };
+@@ -1097,6 +1111,7 @@ typedef struct DisasFormatInfo {
+ 
+ #define R(N, B)       {  B,  4, 0, FLD_C_r##N, FLD_O_r##N }
+ #define M(N, B)       {  B,  4, 0, FLD_C_m##N, FLD_O_m##N }
++#define V(N, B)       {  B,  4, 3, FLD_C_v##N, FLD_O_v##N }
+ #define BD(N, BB, BD) { BB,  4, 0, FLD_C_b##N, FLD_O_b##N }, \
+                       { BD, 12, 0, FLD_C_d##N, FLD_O_d##N }
+ #define BXD(N)        { 16,  4, 0, FLD_C_b##N, FLD_O_b##N }, \
+@@ -1116,6 +1131,7 @@ typedef struct DisasFormatInfo {
+ #define F3(N, X1, X2, X3)         { { X1, X2, X3 } },
+ #define F4(N, X1, X2, X3, X4)     { { X1, X2, X3, X4 } },
+ #define F5(N, X1, X2, X3, X4, X5) { { X1, X2, X3, X4, X5 } },
++#define F6(N, X1, X2, X3, X4, X5, X6)       { { X1, X2, X3, X4, X5, X6 } },
+ 
+ static const DisasFormatInfo format_info[] = {
+ #include "insn-format.def"
+@@ -1127,8 +1143,10 @@ static const DisasFormatInfo format_info[] = {
+ #undef F3
+ #undef F4
+ #undef F5
++#undef F6
+ #undef R
+ #undef M
++#undef V
+ #undef BD
+ #undef BXD
+ #undef BDL
+@@ -6119,6 +6137,25 @@ static void extract_field(DisasFields *o, const DisasField *f, uint64_t insn)
+     case 2: /* dl+dh split, signed 20 bit. */
+         r = ((int8_t)r << 12) | (r >> 8);
+         break;
++    case 3: /* MSB stored in RXB */
++        g_assert(f->size == 4);
++        switch (f->beg) {
++        case 8:
++            r |= extract64(insn, 63 - 36, 1) << 4;
++            break;
++        case 12:
++            r |= extract64(insn, 63 - 37, 1) << 4;
++            break;
++        case 16:
++            r |= extract64(insn, 63 - 38, 1) << 4;
++            break;
++        case 32:
++            r |= extract64(insn, 63 - 39, 1) << 4;
++            break;
++        default:
++            g_assert_not_reached();
++        }
++        break;
+     default:
+         abort();
      }
-
-+    /* handle THE local timer interrupt for one of the cores' IRQ/FIQ */
-+    if (s->triggered) {
-+        if (s->route_localtimer & 4) {
-+            s->fiqsrc[(s->route_localtimer & 3)] |=3D (uint32_t)1 << IRQ_T=
-IMER;
-+        } else {
-+            s->irqsrc[(s->route_localtimer & 3)] |=3D (uint32_t)1 << IRQ_T=
-IMER;
-+        }
-+    }
-+
-     for (i =3D 0; i < BCM2836_NCORES; i++) {
-         /* handle local timer interrupts for this core */
-         if (s->timerirqs[i]) {
-@@ -162,6 +185,62 @@ static void bcm2836_control_set_gpu_fiq(void
-*opaque, int irq, int level)
-     bcm2836_control_update(s);
- }
-
-+static void bcm2836_control_local_timer_set_next(void *opaque)
-+{
-+    BCM2836ControlState *s =3D opaque;
-+    uint64_t next_event;
-+
-+    assert(s->period > 0);
-+
-+    next_event =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+        (NANOSECONDS_PER_SECOND * s->period / LOCALTIMER_FREQ);
-+    timer_mod(s->timer, next_event);
-+}
-+
-+static void bcm2836_control_local_timer_tick(void *opaque)
-+{
-+    BCM2836ControlState *s =3D opaque;
-+
-+    bcm2836_control_local_timer_set_next(s);
-+
-+    if (!s->triggered) {
-+        s->triggered =3D 1;
-+        bcm2836_control_update(s);
-+    }
-+}
-+
-+static void bcm2836_control_local_timer_control(void *opaque, uint32_t val=
-)
-+{
-+    BCM2836ControlState *s =3D opaque;
-+
-+    s->period =3D LOCALTIMER_VALUE(val);
-+    if (val & LOCALTIMER_INTENABLE) {
-+        if (!s->timer) {
-+            s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                bcm2836_control_local_timer_tick, s);
-+        }
-+        bcm2836_control_local_timer_set_next(s);
-+    } else {
-+        if (s->timer) {
-+            timer_del(s->timer);
-+            s->timer =3D NULL;
-+        }
-+        s->triggered =3D 0;
-+    }
-+}
-+
-+static void bcm2836_control_local_timer_ack(void *opaque, uint32_t val)
-+{
-+    BCM2836ControlState *s =3D opaque;
-+
-+    if (val & LOCALTIMER_INTFLAG) {
-+        s->triggered =3D 0;
-+    }
-+    if (val & LOCALTIMER_RELOAD) {
-+        bcm2836_control_local_timer_set_next(s);
-+    }
-+}
-+
- static uint64_t bcm2836_control_read(void *opaque, hwaddr offset,
-unsigned size)
- {
-     BCM2836ControlState *s =3D opaque;
-@@ -170,6 +249,14 @@ static uint64_t bcm2836_control_read(void
-*opaque, hwaddr offset, unsigned size)
-         assert(s->route_gpu_fiq < BCM2836_NCORES
-                && s->route_gpu_irq < BCM2836_NCORES);
-         return ((uint32_t)s->route_gpu_fiq << 2) | s->route_gpu_irq;
-+    } else if (offset =3D=3D REG_LOCALTIMERROUTING) {
-+        return s->route_localtimer;
-+    } else if (offset =3D=3D REG_LOCALTIMERCONTROL) {
-+        return s->period |
-+            (s->timer ? LOCALTIMER_ENABLE | LOCALTIMER_INTENABLE : 0) |
-+            (s->triggered ? LOCALTIMER_INTFLAG : 0);
-+    } else if (offset =3D=3D REG_LOCALTIMERACK) {
-+        return 0;
-     } else if (offset >=3D REG_TIMERCONTROL && offset < REG_MBOXCONTROL) {
-         return s->timercontrol[(offset - REG_TIMERCONTROL) >> 2];
-     } else if (offset >=3D REG_MBOXCONTROL && offset < REG_IRQSRC) {
-@@ -195,6 +282,12 @@ static void bcm2836_control_write(void *opaque,
-hwaddr offset,
-     if (offset =3D=3D REG_GPU_ROUTE) {
-         s->route_gpu_irq =3D val & 0x3;
-         s->route_gpu_fiq =3D (val >> 2) & 0x3;
-+    } else if (offset =3D=3D REG_LOCALTIMERROUTING) {
-+        s->route_localtimer =3D val & 7;
-+    } else if (offset =3D=3D REG_LOCALTIMERCONTROL) {
-+        bcm2836_control_local_timer_control(s, val);
-+    } else if (offset =3D=3D REG_LOCALTIMERACK) {
-+        bcm2836_control_local_timer_ack(s, val);
-     } else if (offset >=3D REG_TIMERCONTROL && offset < REG_MBOXCONTROL) {
-         s->timercontrol[(offset - REG_TIMERCONTROL) >> 2] =3D val & 0xff;
-     } else if (offset >=3D REG_MBOXCONTROL && offset < REG_IRQSRC) {
-@@ -227,6 +320,13 @@ static void bcm2836_control_reset(DeviceState *d)
-
-     s->route_gpu_irq =3D s->route_gpu_fiq =3D 0;
-
-+    s->route_localtimer =3D s->triggered =3D 0;
-+    s->period =3D 0;
-+    if(s->timer) {
-+        timer_del(s->timer);
-+        s->timer =3D NULL;
-+    }
-+
-     for (i =3D 0; i < BCM2836_NCORES; i++) {
-         s->timercontrol[i] =3D 0;
-         s->mailboxcontrol[i] =3D 0;
-diff --git a/include/hw/intc/bcm2836_control.h
-b/include/hw/intc/bcm2836_control.h
-index 613f3c4186..873bd52253 100644
---- a/include/hw/intc/bcm2836_control.h
-+++ b/include/hw/intc/bcm2836_control.h
-@@ -5,6 +5,9 @@
-  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
-  * Written by Andrew Baumann
-  *
-+ * 64-bit ARM Local Timer Copyright (c) 2019. Zolt=C3=A1n Baldaszti
-+ * Added basic IRQ_TIMER interrupt support
-+ *
-  * This code is licensed under the GNU GPLv2 and later.
-  */
-
-@@ -12,6 +15,7 @@
- #define BCM2836_CONTROL_H
-
- #include "hw/sysbus.h"
-+#include "qemu/timer.h"
-
- /* 4 mailboxes per core, for 16 total */
- #define BCM2836_NCORES 4
-@@ -39,6 +43,12 @@ typedef struct BCM2836ControlState {
-     bool gpu_irq, gpu_fiq;
-     uint8_t timerirqs[BCM2836_NCORES];
-
-+    /* local timer */
-+    uint8_t route_localtimer;
-+    uint32_t period;
-+    bool triggered;
-+    QEMUTimer *timer;
-+
-     /* interrupt source registers, post-routing (also input-derived;
-visible) */
-     uint32_t irqsrc[BCM2836_NCORES];
-     uint32_t fiqsrc[BCM2836_NCORES];
+-- 
+2.17.2
