@@ -1,28 +1,29 @@
 Received: from eggs.gnu.org ([209.51.188.92]:39450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyi1Q-0007JJ-AI
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:04:09 -0500
+	(envelope-from <mst@redhat.com>) id 1gyi1S-0007JJ-GM
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:04:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyhra-0001bE-BY
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:54:00 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38851)
+	(envelope-from <mst@redhat.com>) id 1gyhqh-0000kM-VT
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:53:05 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:41186)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gyhrY-0001Ur-Hk
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:53:58 -0500
-Received: by mail-oi1-x242.google.com with SMTP id q81so11241024oic.5
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:53:52 -0800 (PST)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gyhqh-0000bm-Q3
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:53:03 -0500
+Received: by mail-qt1-f193.google.com with SMTP id v10so16155244qtp.8
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:52:54 -0800 (PST)
+Date: Tue, 26 Feb 2019 13:52:51 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190226135226-mutt-send-email-mst@kernel.org>
+References: <20190208112357.31615-1-marcandre.lureau@redhat.com>
+	<20190221110754-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CL5fyMyUX6=OEqsAoEKA8QeeybUvL3C6Q3to1DdBqOBTA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190220235017.1060-1-richard.henderson@linaro.org>
-	<20190220235017.1060-3-richard.henderson@linaro.org>
-	<CAFEAcA_e4aGCi=uYe-Jy5GG7-VuxbRMagiTqT_mfFBS3c4SCpw@mail.gmail.com>
-	<0e8a6ca6-c041-cbc3-c8d4-ad68bc329036@linaro.org>
-In-Reply-To: <0e8a6ca6-c041-cbc3-c8d4-ad68bc329036@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Feb 2019 18:53:40 +0000
-Message-ID: <CAFEAcA8AHA81F_y_ZfanJQNQQJ+aSvi-ST3SafswJA9jn9EvZg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm: Implement ARMv8.0-PredRes
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJ+F1CL5fyMyUX6=OEqsAoEKA8QeeybUvL3C6Q3to1DdBqOBTA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/13] vhost-user-backend &
+ vhost-user-input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +32,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, 26 Feb 2019 at 18:52, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 2/26/19 10:44 AM, Peter Maydell wrote:
-> > On Wed, 20 Feb 2019 at 23:50, Richard Henderson
-> > <richard.henderson@linaro.org> wrote:
-> >>
-> >> This is named "Execution and Data prediction restriction instructions"
-> >> within the ARMv8.5 manual, and given the name "PredRes" by binutils.
+On Tue, Feb 26, 2019 at 05:38:32PM +0100, Marc-André Lureau wrote:
+> Hi
+> 
+> On Thu, Feb 21, 2019 at 5:09 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 > >
-> > The official name is v8.0-PredInv.
-> > (You can see this used in the xml descriptions for the new insns, eg:
-> > https://developer.arm.com/docs/ddi0595/b/aarch64-system-instructions/cfp-rctx )
->
-> Thanks.  I may file a bug against binutils.  ;-)
->
-> >> +
-> >> +    /* All v8.0-a cpus support aarch64.  */
+> > On Fri, Feb 08, 2019 at 12:23:44PM +0100, Marc-André Lureau wrote:
+> > > Hi,
+> > >
+> > > This series is based on previously discussed "[PATCH v4 00/29]
+> > > vhost-user for input & GPU" and "vhost-user: define conventions for
+> > > vhost-user backends" work. The GPU part is left off for now.
+> > >
+> > > This series introduces a "vhost-user-backend": an helper object to be
+> > > used by vhost-user devices to ease with backend initialization and
+> > > handling. As a simple showcase, a "vhost-user-input-pci" device is
+> > > introduced, which can be used with the "contrib: add vhost-user-input"
+> > > example. vhost-user-input isn't meant to be installed, discovered or
+> > > used by libvirt: no installation is done (no vhost-user JSON file is
+> > > provided either).
+> > >
+> > > thanks
 > >
-> > True, but why is it relevant here ?
-> >
-> >> +    if (cpu_isar_feature(aa64_specres, cpu)) {
-> >> +        define_arm_cp_regs(cpu, specres_reginfo);
-> >> +    }
->
-> The context, I think, is that we're in a function that handles a32,
-> and I am not checking arm_feature(cpu, ARM_FEATURE_AARCH64) before
-> checking cpu_isar_feature(aa64_specres, cpu).
->
-> At least that's my recollection.
+> > Gerd could you please review this?
+> > Thanks!
+> 
+> Except the last patch that (to drop?), are you queuing this series or
+> expecting me to do something else?
+> 
+> thanks
 
-Ah, so in theory if we had a v8.0 CPU which was AArch32 only
-it would not have those ID bits set and fail to register
-these registers. I'm pretty sure it would also not work in
-a bunch of other ways too...
+Besides acks I also see unaddressed comments by Daniel and others.
 
-thanks
--- PMM
+> >
+> > > v3:
+> > > - add previously sent patch "libvhost-user: fix clang enum-conversion
+> > >   warning" to fix clang build
+> > > - "define conventions for vhost-user backends" updates after Eric review
+> > > - Drop user-creatable from vhost-user-backend
+> > > - Make vhost-user-input-pci take a chardev= (instead of vhost-user=)
+> > >
+> > > v2:
+> > > - rebased (VhostUserInputPCI got most of the changes, due to split)
+> > > - added "RFC: add explicit can_migrate to
+> > >   vhost_user_backend_dev_init()" to attempt to address Michael
+> > >   concerns about migration.
+> > >
+> > > Marc-André Lureau (13):
+> > >   libvhost-user: fix clang enum-conversion warning
+> > >   vhost-user: define conventions for vhost-user backends
+> > >   vhost-user: simplify vhost_user_init/vhost_user_cleanup
+> > >   libvhost-user: exit by default on VHOST_USER_NONE
+> > >   vhost-user: wrap some read/write with retry handling
+> > >   Add vhost-user-backend
+> > >   vhost-user: split vhost_user_read()
+> > >   vhost-user: add vhost_user_input_get_config()
+> > >   libvhost-user-glib: export vug_source_new()
+> > >   libvhost-user: add vu_queue_unpop()
+> > >   Add vhost-user-input-pci
+> > >   contrib: add vhost-user-input
+> > >   RFC: add explicit can_migrate to vhost_user_backend_dev_init()
+> > >
+> > >  contrib/libvhost-user/libvhost-user-glib.h |   3 +
+> > >  contrib/libvhost-user/libvhost-user.h      |  17 +-
+> > >  include/hw/virtio/vhost-backend.h          |   4 +
+> > >  include/hw/virtio/vhost-user-blk.h         |   2 +-
+> > >  include/hw/virtio/vhost-user-scsi.h        |   2 +-
+> > >  include/hw/virtio/vhost-user.h             |   2 +-
+> > >  include/hw/virtio/virtio-input.h           |  14 +
+> > >  include/sysemu/vhost-user-backend.h        |  60 ++++
+> > >  backends/cryptodev-vhost-user.c            |  18 +-
+> > >  backends/vhost-user.c                      | 218 +++++++++++
+> > >  contrib/libvhost-user/libvhost-user-glib.c |  11 +-
+> > >  contrib/libvhost-user/libvhost-user.c      |  19 +-
+> > >  contrib/vhost-user-input/main.c            | 398 +++++++++++++++++++++
+> > >  hw/block/vhost-user-blk.c                  |  22 +-
+> > >  hw/input/vhost-user-input.c                | 104 ++++++
+> > >  hw/scsi/vhost-user-scsi.c                  |  20 +-
+> > >  hw/virtio/vhost-stub.c                     |   4 +-
+> > >  hw/virtio/vhost-user-input-pci.c           |  53 +++
+> > >  hw/virtio/vhost-user.c                     | 118 +++++-
+> > >  net/vhost-user.c                           |  13 +-
+> > >  MAINTAINERS                                |   5 +
+> > >  Makefile                                   |   3 +
+> > >  Makefile.objs                              |   1 +
+> > >  backends/Makefile.objs                     |   3 +-
+> > >  configure                                  |   3 +
+> > >  contrib/vhost-user-input/Makefile.objs     |   1 +
+> > >  default-configs/virtio.mak                 |   1 +
+> > >  docs/interop/vhost-user.json               | 232 ++++++++++++
+> > >  docs/interop/vhost-user.txt                | 109 +++++-
+> > >  hw/input/Makefile.objs                     |   1 +
+> > >  hw/virtio/Makefile.objs                    |   1 +
+> > >  31 files changed, 1375 insertions(+), 87 deletions(-)
+> > >  create mode 100644 include/sysemu/vhost-user-backend.h
+> > >  create mode 100644 backends/vhost-user.c
+> > >  create mode 100644 contrib/vhost-user-input/main.c
+> > >  create mode 100644 hw/input/vhost-user-input.c
+> > >  create mode 100644 hw/virtio/vhost-user-input-pci.c
+> > >  create mode 100644 contrib/vhost-user-input/Makefile.objs
+> > >  create mode 100644 docs/interop/vhost-user.json
+> > >
+> > > --
+> > > 2.20.1.519.g8feddda32c
+> >
+> 
+> 
+> -- 
+> Marc-André Lureau
