@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55823)
+Received: from eggs.gnu.org ([209.51.188.92]:58050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyX5J-0005U5-Ci
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 02:23:26 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gyXEu-00078p-R8
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 02:33:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyX5H-00081K-Ax
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 02:23:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57926)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gyXEq-00085d-Op
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 02:33:18 -0500
+Received: from mga14.intel.com ([192.55.52.115]:35208)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gyX5H-0007xh-2U
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 02:23:23 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 12B22307D8E3
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 07:23:21 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190222153254.22739-1-stefanha@redhat.com>
-	<87imx8uu99.fsf@dusky.pond.sub.org>
-	<20190225170646.GH379@stefanha-x1.localdomain>
-Date: Tue, 26 Feb 2019 08:23:17 +0100
-In-Reply-To: <20190225170646.GH379@stefanha-x1.localdomain> (Stefan Hajnoczi's
-	message of "Mon, 25 Feb 2019 17:06:46 +0000")
-Message-ID: <87r2bvm2sa.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1gyXEn-0007rQ-87
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 02:33:15 -0500
+From: Wei Yang <richardw.yang@linux.intel.com>
+Date: Tue, 26 Feb 2019 15:31:59 +0800
+Message-Id: <20190226073159.13434-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] fw_cfg: use __ATTR_RO_MODE to define rev sysfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,57 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
+Cc: somlo@cmu.edu, mst@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
+Leverage __ATTR_RO_MODE to define rev sysfs instead of using open code
+to define the attribute.
 
-> On Mon, Feb 25, 2019 at 09:50:26AM +0100, Markus Armbruster wrote:
->> Stefan Hajnoczi <stefanha@redhat.com> writes:
->> 
->> > QMP clients can usually detect the presence of features via schema
->> > introspection.  There are rare features that do not involve schema
->> > changes and are therefore impossible to detect with schema
->> > introspection.
->> >
->> > This patch adds the query-qemu-capabilities command.  It returns a list
->> > of capabilities that this QEMU supports.
->> 
->> The name "capabilities" could be confusing, because we already have QMP
->> capabilities, complete with command qmp_capabilities.  Would "features"
->> work?
->
-> Sure, will fix.
->
->> > The decision to make this a command rather than something statically
->> > defined in the schema is intentional.  It allows QEMU to decide which
->> > capabilities are available at runtime, if necessary.
->> >
->> > This new interface is necessary so that QMP clients can discover that
->> > migrating disk image files is safe with cache.direct=off on Linux.
->> > There is no other way to detect whether or not QEMU supports this.
->> 
->> I think what's unsaid here is that we don't want to make a completely
->> arbitrary schema change just to carry this bit of information.  We
->> could, but we don't want to.  Correct?
->
-> Yes, exactly.
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+---
+ drivers/firmware/qemu_fw_cfg.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-Then let's rephrase a little:
-
-     QMP clients can usually detect the presence of features via schema
-     introspection.  There are rare features that do not involve schema
-     changes.  To make them detectable with schema introspection, we'd
-     have to make some arbitrary schema change.  Annoying.
-
-     The new query-qemu-features command lets us avoid that.  It returns
-     a list of features supported by this QEMU.
-
-     The decision to make this a command rather than something statically
-     defined in the schema is intentional.  It allows QEMU to decide which
-     capabilities are available at runtime, if necessary.
-
-     Use the new command to declare migrating disk image files is safe
-     with cache.direct=off on Linux.
-
-[...]
+diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
+index 039e0f91dba8..a1293cbd7adb 100644
+--- a/drivers/firmware/qemu_fw_cfg.c
++++ b/drivers/firmware/qemu_fw_cfg.c
+@@ -296,18 +296,13 @@ static int fw_cfg_do_platform_probe(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, char *buf)
++static ssize_t fw_cfg_rev_show(struct kobject *k, struct kobj_attribute *a,
++			       char *buf)
+ {
+ 	return sprintf(buf, "%u\n", fw_cfg_rev);
+ }
+-
+-static const struct {
+-	struct attribute attr;
+-	ssize_t (*show)(struct kobject *k, struct attribute *a, char *buf);
+-} fw_cfg_rev_attr = {
+-	.attr = { .name = "rev", .mode = S_IRUSR },
+-	.show = fw_cfg_showrev,
+-};
++static const struct kobj_attribute fw_cfg_rev_attr =
++	__ATTR_RO_MODE(fw_cfg_rev, 0400);
+ 
+ /* fw_cfg_sysfs_entry type */
+ struct fw_cfg_sysfs_entry {
+-- 
+2.19.1
