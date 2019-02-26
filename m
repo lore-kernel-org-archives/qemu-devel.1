@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58301)
+Received: from eggs.gnu.org ([209.51.188.92]:58206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlP-0005Zt-7O
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlL-0005TS-7T
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlN-0002zY-Aw
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlJ-0002we-Ea
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:39 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:47 +1100
-Message-Id: <20190226045304.25618-34-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:52 +1100
+Message-Id: <20190226045304.25618-39-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 33/50] spapr/drc: Drop spapr_drc_attach() fdt
- argument
+Subject: [Qemu-devel] [PULL 38/50] spapr: create DR connectors for PHBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +22,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-All DRC subtypes have been converted to generate the FDT fragment at
-configure connector time instead of attach time. The fdt and fdt_offset
-arguments of spapr_drc_attach() aren't needed anymore. Drop them and
-make the implementation of the dt_populate() method mandatory.
-
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155059667853.1466090.16527852453054217565.stgit@bahia.lab.to=
+Message-Id: <155059670389.1466090.10015601248906623076.stgit@bahia.lab.to=
 ulouse-stg.fr.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c             |  4 ++--
- hw/ppc/spapr_drc.c         | 13 +------------
- hw/ppc/spapr_pci.c         |  2 +-
- include/hw/ppc/spapr_drc.h |  3 +--
- 4 files changed, 5 insertions(+), 17 deletions(-)
+ hw/ppc/spapr.c             | 13 +++++++++++++
+ hw/ppc/spapr_drc.c         | 17 +++++++++++++++++
+ include/hw/ppc/spapr.h     |  1 +
+ include/hw/ppc/spapr_drc.h |  8 ++++++++
+ 4 files changed, 39 insertions(+)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6cf7a9f5c1..9364d07364 100644
+index 9364d07364..96bea7580a 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -3362,7 +3362,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
-_t addr_start, uint64_t size,
-                               addr / SPAPR_MEMORY_BLOCK_SIZE);
-         g_assert(drc);
+@@ -2875,6 +2875,19 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+     /* We always have at least the nvram device on VIO */
+     spapr_create_nvram(spapr);
 =20
--        spapr_drc_attach(drc, dev, NULL, 0, &local_err);
-+        spapr_drc_attach(drc, dev, &local_err);
-         if (local_err) {
-             while (addr > addr_start) {
-                 addr -=3D SPAPR_MEMORY_BLOCK_SIZE;
-@@ -3744,7 +3744,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
-     g_assert(drc || !mc->has_hotpluggable_cpus);
++    /*
++     * Setup hotplug / dynamic-reconfiguration connectors. top-level
++     * connectors (described in root DT node's "ibm,drc-types" property)
++     * are pre-initialized here. additional child connectors (such as
++     * connectors for a PHBs PCI slots) are added as needed during their
++     * parent's realization.
++     */
++    if (smc->dr_phb_enabled) {
++        for (i =3D 0; i < SPAPR_MAX_PHBS; i++) {
++            spapr_dr_connector_new(OBJECT(machine), TYPE_SPAPR_DRC_PHB, =
+i);
++        }
++    }
++
+     /* Set up PCI */
+     spapr_pci_rtas_init();
 =20
-     if (drc) {
--        spapr_drc_attach(drc, dev, NULL, 0, &local_err);
-+        spapr_drc_attach(drc, dev, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-             return;
 diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 248eb8a93d..87ca7d9735 100644
+index 87ca7d9735..fd6380adb3 100644
 --- a/hw/ppc/spapr_drc.c
 +++ b/hw/ppc/spapr_drc.c
-@@ -374,11 +374,8 @@ static void prop_get_fdt(Object *obj, Visitor *v, co=
-nst char *name,
-     } while (fdt_depth !=3D 0);
+@@ -696,6 +696,15 @@ static void spapr_drc_lmb_class_init(ObjectClass *k,=
+ void *data)
+     drck->dt_populate =3D spapr_lmb_dt_populate;
  }
 =20
--void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
--                      int fdt_start_offset, Error **errp)
-+void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, Error **err=
-p)
- {
--    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--
-     trace_spapr_drc_attach(spapr_drc_index(drc));
++static void spapr_drc_phb_class_init(ObjectClass *k, void *data)
++{
++    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
++
++    drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
++    drck->typename =3D "PHB";
++    drck->drc_name_prefix =3D "PHB ";
++}
++
+ static const TypeInfo spapr_dr_connector_info =3D {
+     .name          =3D TYPE_SPAPR_DR_CONNECTOR,
+     .parent        =3D TYPE_DEVICE,
+@@ -739,6 +748,13 @@ static const TypeInfo spapr_drc_lmb_info =3D {
+     .class_init    =3D spapr_drc_lmb_class_init,
+ };
 =20
-     if (drc->dev) {
-@@ -387,15 +384,9 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceS=
-tate *d, void *fdt,
-     }
-     g_assert((drc->state =3D=3D SPAPR_DRC_STATE_LOGICAL_UNUSABLE)
-              || (drc->state =3D=3D SPAPR_DRC_STATE_PHYSICAL_POWERON));
--    g_assert(fdt || drck->dt_populate);
++static const TypeInfo spapr_drc_phb_info =3D {
++    .name          =3D TYPE_SPAPR_DRC_PHB,
++    .parent        =3D TYPE_SPAPR_DRC_LOGICAL,
++    .instance_size =3D sizeof(sPAPRDRConnector),
++    .class_init    =3D spapr_drc_phb_class_init,
++};
++
+ /* helper functions for external users */
 =20
-     drc->dev =3D d;
+ sPAPRDRConnector *spapr_drc_by_index(uint32_t index)
+@@ -1207,6 +1223,7 @@ static void spapr_drc_register_types(void)
+     type_register_static(&spapr_drc_cpu_info);
+     type_register_static(&spapr_drc_pci_info);
+     type_register_static(&spapr_drc_lmb_info);
++    type_register_static(&spapr_drc_phb_info);
 =20
--    if (fdt) {
--        drc->fdt =3D fdt;
--        drc->fdt_start_offset =3D fdt_start_offset;
--    }
--
-     object_property_add_link(OBJECT(drc), "device",
-                              object_get_typename(OBJECT(drc->dev)),
-                              (Object **)(&drc->dev),
-@@ -1113,8 +1104,6 @@ static void rtas_ibm_configure_connector(PowerPCCPU=
- *cpu,
+     spapr_rtas_register(RTAS_SET_INDICATOR, "set-indicator",
+                         rtas_set_indicator);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 5e3c760725..b173fd7149 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -104,6 +104,7 @@ struct sPAPRMachineClass {
 =20
-     drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-=20
--    g_assert(drc->fdt || drck->dt_populate);
--
-     if (!drc->fdt) {
-         Error *local_err =3D NULL;
-         void *fdt;
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index b22c9f57b2..e2bc9fec82 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1457,7 +1457,7 @@ static void spapr_pci_plug(HotplugHandler *plug_han=
-dler,
-         goto out;
-     }
-=20
--    spapr_drc_attach(drc, DEVICE(pdev), NULL, 0, &local_err);
-+    spapr_drc_attach(drc, DEVICE(pdev), &local_err);
-     if (local_err) {
-         goto out;
-     }
+     /*< public >*/
+     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
+s */
++    bool dr_phb_enabled;       /* enable dynamic-reconfig/hotplug of PHB=
+s */
+     bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+     bool pre_2_10_has_unused_icps;
 diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 2aa919f0cf..f32758ec84 100644
+index f32758ec84..46b0f6216d 100644
 --- a/include/hw/ppc/spapr_drc.h
 +++ b/include/hw/ppc/spapr_drc.h
-@@ -261,8 +261,7 @@ sPAPRDRConnector *spapr_drc_by_id(const char *type, u=
-int32_t id);
- int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
-                           uint32_t drc_type_mask);
+@@ -71,6 +71,14 @@
+ #define SPAPR_DRC_LMB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+                                         TYPE_SPAPR_DRC_LMB)
 =20
--void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
--                      int fdt_start_offset, Error **errp);
-+void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, Error **err=
-p);
- void spapr_drc_detach(sPAPRDRConnector *drc);
- bool spapr_drc_needed(void *opaque);
-=20
++#define TYPE_SPAPR_DRC_PHB "spapr-drc-phb"
++#define SPAPR_DRC_PHB_GET_CLASS(obj) \
++        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_PHB)
++#define SPAPR_DRC_PHB_CLASS(klass) \
++        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAPR_DRC_=
+PHB)
++#define SPAPR_DRC_PHB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
++                                        TYPE_SPAPR_DRC_PHB)
++
+ /*
+  * Various hotplug types managed by sPAPRDRConnector
+  *
 --=20
 2.20.1
