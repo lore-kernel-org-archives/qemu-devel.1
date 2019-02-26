@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58111)
+Received: from eggs.gnu.org ([209.51.188.92]:58110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlH-0005PC-IG
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlH-0005PB-ID
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlF-0002ty-IW
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlF-0002u3-I7
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:35 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:44 +1100
-Message-Id: <20190226045304.25618-31-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:49 +1100
+Message-Id: <20190226045304.25618-36-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 30/50] spapr: Generate FDT fragment for LMBs at
- configure connector time
+Subject: [Qemu-devel] [PULL 35/50] spapr: Expose the name of the interrupt
+ controller node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,138 +28,192 @@ Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qem
 
 From: Greg Kurz <groug@kaod.org>
 
+This will be needed by PHB hotplug in order to access the "phandle"
+property of the interrupt controller node.
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155059666331.1466090.6766540766297333313.stgit@bahia.lab.tou=
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <155059668867.1466090.6339199751719123386.stgit@bahia.lab.tou=
 louse-stg.fr.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         | 33 ++++++++++++++++++---------------
- hw/ppc/spapr_drc.c     |  1 +
- include/hw/ppc/spapr.h |  4 +++-
- 3 files changed, 22 insertions(+), 16 deletions(-)
+ hw/intc/spapr_xive.c        |  9 ++++-----
+ hw/intc/xics_spapr.c        |  2 +-
+ hw/ppc/spapr_irq.c          | 21 ++++++++++++++++++++-
+ include/hw/ppc/spapr_irq.h  |  1 +
+ include/hw/ppc/spapr_xive.h |  3 +++
+ include/hw/ppc/xics_spapr.h |  2 ++
+ 6 files changed, 31 insertions(+), 7 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 00eb3b643c..b92deee771 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3333,14 +3333,26 @@ static void spapr_nmi(NMIState *n, int cpu_index,=
- Error **errp)
-     }
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 290a290e43..06e3c9fdbf 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -317,6 +317,9 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
+r **errp)
+     /* Map all regions */
+     spapr_xive_map_mmio(xive);
+=20
++    xive->nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
++                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_=
+SHIFT));
++
+     qemu_register_reset(spapr_xive_reset, dev);
  }
 =20
-+int spapr_lmb_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spap=
-r,
-+                          void *fdt, int *fdt_start_offset, Error **errp=
-)
+@@ -1448,7 +1451,6 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint32=
+_t nr_servers, void *fdt,
+         cpu_to_be32(7),    /* start */
+         cpu_to_be32(0xf8), /* count */
+     };
+-    gchar *nodename;
+=20
+     /* Thread Interrupt Management Area : User (ring 3) and OS (ring 2) =
+*/
+     timas[0] =3D cpu_to_be64(xive->tm_base +
+@@ -1458,10 +1460,7 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint3=
+2_t nr_servers, void *fdt,
+                            XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
+     timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
+=20
+-    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
+-                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_=
+SHIFT));
+-    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
+-    g_free(nodename);
++    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename));
+=20
+     _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
+     _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index e2d8b38183..53bda6661b 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -254,7 +254,7 @@ void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t=
+ nr_servers, void *fdt,
+     };
+     int node;
+=20
+-    _FDT(node =3D fdt_add_subnode(fdt, 0, "interrupt-controller"));
++    _FDT(node =3D fdt_add_subnode(fdt, 0, XICS_NODENAME));
+=20
+     _FDT(fdt_setprop_string(fdt, node, "device_type",
+                             "PowerPC-External-Interrupt-Presentation"));
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 4297eed600..359761494c 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -230,6 +230,11 @@ static void spapr_irq_reset_xics(sPAPRMachineState *=
+spapr, Error **errp)
+     /* TODO: create the KVM XICS device */
+ }
+=20
++static const char *spapr_irq_get_nodename_xics(sPAPRMachineState *spapr)
 +{
-+    uint64_t addr;
-+    uint32_t node;
-+
-+    addr =3D spapr_drc_index(drc) * SPAPR_MEMORY_BLOCK_SIZE;
-+    node =3D object_property_get_uint(OBJECT(drc->dev), PC_DIMM_NODE_PRO=
-P,
-+                                    &error_abort);
-+    *fdt_start_offset =3D spapr_populate_memory_node(fdt, node, addr,
-+                                                   SPAPR_MEMORY_BLOCK_SI=
-ZE);
-+    return 0;
++    return XICS_NODENAME;
 +}
 +
- static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64=
-_t size,
--                           uint32_t node, bool dedicated_hp_event_source=
-,
--                           Error **errp)
-+                           bool dedicated_hp_event_source, Error **errp)
- {
-     sPAPRDRConnector *drc;
-     uint32_t nr_lmbs =3D size/SPAPR_MEMORY_BLOCK_SIZE;
--    int i, fdt_offset, fdt_size;
--    void *fdt;
-+    int i;
-     uint64_t addr =3D addr_start;
-     bool hotplugged =3D spapr_drc_hotplugged(dev);
-     Error *local_err =3D NULL;
-@@ -3350,11 +3362,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint6=
-4_t addr_start, uint64_t size,
-                               addr / SPAPR_MEMORY_BLOCK_SIZE);
-         g_assert(drc);
+ #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+ #define SPAPR_IRQ_XICS_NR_MSIS     \
+     (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+@@ -249,6 +254,7 @@ sPAPRIrq spapr_irq_xics =3D {
+     .post_load   =3D spapr_irq_post_load_xics,
+     .reset       =3D spapr_irq_reset_xics,
+     .set_irq     =3D spapr_irq_set_irq_xics,
++    .get_nodename =3D spapr_irq_get_nodename_xics,
+ };
 =20
--        fdt =3D create_device_tree(&fdt_size);
--        fdt_offset =3D spapr_populate_memory_node(fdt, node, addr,
--                                                SPAPR_MEMORY_BLOCK_SIZE)=
-;
--
--        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
-+        spapr_drc_attach(drc, dev, NULL, 0, &local_err);
-         if (local_err) {
-             while (addr > addr_start) {
-                 addr -=3D SPAPR_MEMORY_BLOCK_SIZE;
-@@ -3362,7 +3370,6 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
-_t addr_start, uint64_t size,
-                                       addr / SPAPR_MEMORY_BLOCK_SIZE);
-                 spapr_drc_detach(drc);
-             }
--            g_free(fdt);
-             error_propagate(errp, local_err);
-             return;
-         }
-@@ -3395,7 +3402,6 @@ static void spapr_memory_plug(HotplugHandler *hotpl=
-ug_dev, DeviceState *dev,
-     sPAPRMachineState *ms =3D SPAPR_MACHINE(hotplug_dev);
-     PCDIMMDevice *dimm =3D PC_DIMM(dev);
-     uint64_t size, addr;
--    uint32_t node;
-=20
-     size =3D memory_device_get_region_size(MEMORY_DEVICE(dev), &error_ab=
-ort);
-=20
-@@ -3410,10 +3416,7 @@ static void spapr_memory_plug(HotplugHandler *hotp=
-lug_dev, DeviceState *dev,
-         goto out_unplug;
-     }
-=20
--    node =3D object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
--                                    &error_abort);
--    spapr_add_lmbs(dev, addr, size, node,
--                   spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
-+    spapr_add_lmbs(dev, addr, size, spapr_ovec_test(ms->ov5_cas, OV5_HP_=
-EVT),
-                    &local_err);
-     if (local_err) {
-         goto out_unplug;
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 66b965a0a7..634c28695a 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -700,6 +700,7 @@ static void spapr_drc_lmb_class_init(ObjectClass *k, =
-void *data)
-     drck->typename =3D "MEM";
-     drck->drc_name_prefix =3D "LMB ";
-     drck->release =3D spapr_lmb_release;
-+    drck->dt_populate =3D spapr_lmb_dt_populate;
+ /*
+@@ -384,6 +390,11 @@ static void spapr_irq_set_irq_xive(void *opaque, int=
+ srcno, int val)
+     xive_source_set_irq(&spapr->xive->source, srcno, val);
  }
 =20
- static const TypeInfo spapr_dr_connector_info =3D {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 659204ea93..0ec309da49 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -764,9 +764,11 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr, =
-int shift,
- void spapr_clear_pending_events(sPAPRMachineState *spapr);
- int spapr_max_server_number(sPAPRMachineState *spapr);
++static const char *spapr_irq_get_nodename_xive(sPAPRMachineState *spapr)
++{
++    return spapr->xive->nodename;
++}
++
+ /*
+  * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+  * with XICS.
+@@ -407,6 +418,7 @@ sPAPRIrq spapr_irq_xive =3D {
+     .post_load   =3D spapr_irq_post_load_xive,
+     .reset       =3D spapr_irq_reset_xive,
+     .set_irq     =3D spapr_irq_set_irq_xive,
++    .get_nodename =3D spapr_irq_get_nodename_xive,
+ };
 =20
--/* CPU and LMB DRC release callbacks. */
-+/* DRC callbacks. */
- void spapr_core_release(DeviceState *dev);
- void spapr_lmb_release(DeviceState *dev);
-+int spapr_lmb_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spap=
-r,
-+                          void *fdt, int *fdt_start_offset, Error **errp=
-);
+ /*
+@@ -541,6 +553,11 @@ static void spapr_irq_set_irq_dual(void *opaque, int=
+ srcno, int val)
+     spapr_irq_current(spapr)->set_irq(spapr, srcno, val);
+ }
 =20
- void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
- int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
++static const char *spapr_irq_get_nodename_dual(sPAPRMachineState *spapr)
++{
++    return spapr_irq_current(spapr)->get_nodename(spapr);
++}
++
+ /*
+  * Define values in sync with the XIVE and XICS backend
+  */
+@@ -561,7 +578,8 @@ sPAPRIrq spapr_irq_dual =3D {
+     .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
+     .post_load   =3D spapr_irq_post_load_dual,
+     .reset       =3D spapr_irq_reset_dual,
+-    .set_irq     =3D spapr_irq_set_irq_dual
++    .set_irq     =3D spapr_irq_set_irq_dual,
++    .get_nodename =3D spapr_irq_get_nodename_dual,
+ };
+=20
+ /*
+@@ -691,4 +709,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
+     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+     .post_load   =3D spapr_irq_post_load_xics,
+     .set_irq     =3D spapr_irq_set_irq_xics,
++    .get_nodename =3D spapr_irq_get_nodename_xics,
+ };
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index 488511c3d8..8bf1a72919 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -47,6 +47,7 @@ typedef struct sPAPRIrq {
+     int (*post_load)(sPAPRMachineState *spapr, int version_id);
+     void (*reset)(sPAPRMachineState *spapr, Error **errp);
+     void (*set_irq)(void *opaque, int srcno, int val);
++    const char *(*get_nodename)(sPAPRMachineState *spapr);
+ } sPAPRIrq;
+=20
+ extern sPAPRIrq spapr_irq_xics;
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 9bec9192e4..2d31f24e3b 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -26,6 +26,9 @@ typedef struct sPAPRXive {
+     XiveENDSource end_source;
+     hwaddr        end_base;
+=20
++    /* DT */
++    gchar *nodename;
++
+     /* Routing table */
+     XiveEAS       *eat;
+     uint32_t      nr_irqs;
+diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+index b1ab27d022..b8d924baf4 100644
+--- a/include/hw/ppc/xics_spapr.h
++++ b/include/hw/ppc/xics_spapr.h
+@@ -29,6 +29,8 @@
+=20
+ #include "hw/ppc/spapr.h"
+=20
++#define XICS_NODENAME "interrupt-controller"
++
+ void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+                    uint32_t phandle);
+ int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
 --=20
 2.20.1
