@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56982)
+Received: from eggs.gnu.org ([209.51.188.92]:58955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gyjGe-0001ng-Sc
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:23:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1gyjT1-00041D-Cc
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:36:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gyjGa-00033o-58
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:23:54 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gyjGU-00030D-Lb
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:23:49 -0500
-Received: by mail-wm1-x341.google.com with SMTP id n19so3684123wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 12:23:46 -0800 (PST)
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 26 Feb 2019 20:23:09 +0000
-Message-Id: <20190226202309.7761-1-stefanha@gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1gyjT0-0003p6-Kg
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:36:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44054)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gyjT0-0003hp-DK
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:36:42 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8746F3082291
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 20:36:27 +0000 (UTC)
+References: <20190226195959.28759-1-dgilbert@redhat.com>
+	<20190226195959.28759-8-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a0a9c174-cd26-1edc-e884-aaaad7227ba0@redhat.com>
+Date: Tue, 26 Feb 2019 14:36:26 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [qemu-web PATCH] Add GSoC/Outreachy 2019 announcement
+In-Reply-To: <20190226195959.28759-8-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 7/9] qmp: Add announce-self command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +34,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, jasowang@redhat.com
+Cc: quintela@redhat.com
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+On 2/26/19 1:59 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Add a qmp command that can trigger guest announcements.
+> 
+> It uses its own announce-timer instance, and parameters
+> passed to it explicitly in the command.
+> 
+> Like most qmp commands, it's in the main thread/bql, so
+> there's no racing with any outstanding timer.
+> 
+> Based on work of Germano Veit Michel <germano@redhat.com> and
+>                  Vladislav Yasevich <vyasevic@redhat.com>
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  net/announce.c |  7 +++++++
+>  qapi/net.json  | 20 ++++++++++++++++++++
+>  2 files changed, 27 insertions(+)
+> 
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- _posts/2019-02-27-new-internships-2019.md | 32 +++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
- create mode 100644 _posts/2019-02-27-new-internships-2019.md
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-diff --git a/_posts/2019-02-27-new-internships-2019.md b/_posts/2019-02-27-new-internships-2019.md
-new file mode 100644
-index 0000000..f9fa29b
---- /dev/null
-+++ b/_posts/2019-02-27-new-internships-2019.md
-@@ -0,0 +1,32 @@
-+---
-+layout: post
-+title:  "Announcing GSoC and Outreachy 2019 internships"
-+date:   2019-02-26 07:00:00 +0000
-+categories: [gsoc, outreachy, internships]
-+---
-+QEMU is once again participating in [Google Summer of
-+Code](https://summerofcode.withgoogle.com/) and
-+[Outreachy](https://www.outreachy.org/) this year!  These open source
-+internship programs offer full-time remote work opportunities for talented new
-+developers wishing to get involved in our community.
-+
-+Each intern works with one or more mentors who support them in their project.
-+Code is submitted according to QEMU's normal development process, giving the
-+intern experience in open source software development.  Our projects range from
-+device emulation to performance optimization to test infrastructure.
-+
-+If you are interested in contributing to QEMU through a paid 12-week internship
-+from May to August 2019, take a look at [our GSoC
-+page](https://wiki.qemu.org/Google_Summer_of_Code_2019) and [our Outreachy
-+page](https://wiki.qemu.org/Outreachy_2019_MayAugust) for more information.
-+
-+Both GSoC and Outreachy have eligibility criteria, which you can review [here
-+(GSoC)](https://developers.google.com/open-source/gsoc/faq#what_are_the_eligibility_requirements_for_participation)
-+and [here (Outreachy)](https://www.outreachy.org/apply/eligibility/) before
-+applying.
-+
-+You can read about projects that were completed in 2018
-+[here](https://www.qemu.org/2019/01/23/internships-wrapup/).
-+
-+These internships are generously funded by Google (GSoC) and Red Hat
-+(Outreachy).
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
