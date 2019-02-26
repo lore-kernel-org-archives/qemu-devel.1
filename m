@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58142)
+Received: from eggs.gnu.org ([209.51.188.92]:60689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gydlm-0002cY-Ue
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:31:43 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gydyE-0005KV-4g
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:44:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gydlh-0001IG-7Q
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:31:42 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gydlf-0001DM-Sm
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:31:36 -0500
-Received: by mail-ot1-x342.google.com with SMTP id g1so11186192otj.11
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 06:31:29 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gydyD-0000tY-8j
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:44:34 -0500
+Date: Tue, 26 Feb 2019 15:44:20 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190226154420.65032179.cohuck@redhat.com>
+In-Reply-To: <20190218122710.23639-1-david@redhat.com>
+References: <20190218122710.23639-1-david@redhat.com>
 MIME-Version: 1.0
-References: <20190215155919.GA10823@nyan>
-	<CAFEAcA9yEBy-=-2oSDqAXLffGjU7Aa9MeVtYFCU29qxerWb23A@mail.gmail.com>
-In-Reply-To: <CAFEAcA9yEBy-=-2oSDqAXLffGjU7Aa9MeVtYFCU29qxerWb23A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Feb 2019 14:31:16 +0000
-Message-ID: <CAFEAcA8mJ=69NkrO_7_9WoCPq+GYCN9WRf6PuUtGv+4LXXDRow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [v4 PATCH] hw/arm/bcm2835_peripherals: add bcm283x
- arm timer
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 00/15] s390x/tcg: Implement
+ floating-point extension facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark <alnyan@airmail.cc>
-Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "open list:Raspberry Pi" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 21 Feb 2019 at 11:31, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Fri, 15 Feb 2019 at 15:59, Mark <alnyan@airmail.cc> wrote:
-> > +    s->irq = qemu_allocate_irq(bcm283x_timer_set_irq, s, 0);
->
-> I know this code has come from the sp804 code, but it's
-> actually wrong (and I should fix the sp804). qemu_allocate_irq()
-> is for interrupt lines that come into a device, not for ones
-> that go out from it, like this one. The call happens to have
-> no visible bad effects because what it does will be overrriden
-> later when the board code wires up the interrupt to the
-> interrupt controller. (There will be a tiny memory leak.)
+On Mon, 18 Feb 2019 13:26:55 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Looking more closely at this, my analysis here is wrong -- sorry.
-For the sp804, this call is necessary, because the sp804
-has a dual layer structure between the arm_timer_state
-layer and the SP804State layer. It creates outbound IRQs
-from the arm_timer_state with qemu_allocate_irq(), and
-effectively connects them to the SP804State via the
-sp804_set_irq() function (which raises the outbound IRQ from
-the SP804State if either of the arm_timer_state lines is high).
+> This series is based on the patches currently on the list:
+> - [PATCH v2] softfloat: add float128_is_{normal,denormal}=E2=80=8B
+> - [PATCH v1] softfloat: Implement float128_to_uint32
+> - [PATCH v2] softfloat: Support float_round_to_odd more places
+>=20
+> For the KVM folks, only the last patch is of interest.
+>=20
+> The floating-point extension facility seems to be used often without
+> checking by user space. Vector instruction support seems to somewhat also
+> rely on it being available. Some parts are already implemented, others
+> not or are broken.
+>=20
+> Fix some stuff in fpu code, add some FIXMEs to indicate what is definetly
+> missing and implement all BFP stuff needed for the floating-point extensi=
+on
+> facility. Finally, enable it for TCG, adding it to the CPU model for the
+> 4.0 compat machine.
+>=20
+> This series also contains some refactorings needed for floating-point
+> vector instruction support.
+>=20
+> v2 -> v3:
+> - "s390x/tcg: Implement XxC and checks for most FP instructions"
+> -- Use extract32() with constant arithmetic
+> - Use float_round_to_odd and get rid of the corresponding FIXMEs. Thanks
+>   Richard!
+>=20
+> v1 -> v2:
+> - "s390x/tcg: Fix TEST DATA CLASS instructions"
+> -- Simplify + use marko
+> - "s390x/tcg: Prepare for IEEE-inexact-exception control (XxC)"
+> -- Fix some whitespace/newline issues
+> - "s390x/tcg: Handle SET FPC AND LOAD FPC 3-bit BFP rounding modes"
+> -- If FPE is not installed, also bail out on 3rd BFP bit
+> - "s390x/tcg: Implement XxC and checks for most FP instructions"
+> -- Use helper functions to simplify checks+mangling+unmangling
+> -- Take care of FPE facility state
+> -- Fix that XxC is actually bit 1, not bit 0
+> - "s390x/tcg: Prepare for IEEE-inexact-exception control (XxC)"
+> -- Also use new helper functions
+>=20
+> David Hildenbrand (15):
+>   s390x/tcg: Fix TEST DATA CLASS instructions
+>   s390x/tcg: Fix rounding from float128 to uint64_t/uin32_t
+>   s390x/tcg: Factor out conversion of softfloat exceptions
+>   s390x/tcg: Fix parts of IEEE exception handling
+>   s390x/tcg: Hide IEEE underflows in some scenarios
+>   s390x/tcg: Refactor SET FPC AND SIGNAL handling
+>   s390x/tcg: Fix simulated-IEEE exceptions
+>   s390x/tcg: Handle SET FPC AND LOAD FPC 3-bit BFP rounding modes
+>   s390x/tcg: Check for exceptions in SET BFP ROUNDING MODE
+>   s390x/tcg: Refactor saving/restoring the bfp rounding mode
+>   s390x/tcg: Prepare for IEEE-inexact-exception control (XxC)
+>   s390x/tcg: Implement XxC and checks for most FP instructions
+>   s390x/tcg: Implement rounding mode and XxC for LOAD ROUNDED
+>   s390x/tcg: Handle all rounding modes overwritten by BFP instructions
+>   s390x: Add floating-point extension facility to "qemu" cpu model
+>=20
+>  target/s390x/fpu_helper.c   | 541 ++++++++++++++++++++++--------------
+>  target/s390x/gen-features.c |   5 +
+>  target/s390x/helper.h       |   9 +-
+>  target/s390x/insn-data.def  |  12 +-
+>  target/s390x/internal.h     |   9 +
+>  target/s390x/translate.c    | 315 ++++++++++++++-------
+>  6 files changed, 572 insertions(+), 319 deletions(-)
+>=20
 
-In your case there is no dual-layer structure, so you don't
-need to call qemu_allocate_irq() at all. (You're effectively
-trying to use BCM283xTimerState as both the inner layer IRQ
-and the outer layer IRQ, and it happens to work because the
-setup of the outer layer happens last so the bogus inner
-layer initialization is ignored.)
-
-> You can just delete the qemu_allocate_irq() call here, and
-> the bcm283x_timer_set_irq() function.
-
-So my recommendation here was correct, but my reasoning was
-not right.
-
-thanks
--- PMM
+Does anyone still want to give a R-b (especially for the patches that
+don't have one yet?) I plan to queue this once the softfloat patches
+hit master.
