@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60245)
+Received: from eggs.gnu.org ([209.51.188.92]:60417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyjb9-0005e3-2d
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:45:08 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gyjbj-0006Cc-Je
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:45:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyjb7-0008MM-Ut
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:45:07 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gyjbf-0000Iz-RI
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:45:43 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 26 Feb 2019 21:44:24 +0100
-Message-Id: <20190226204439.2296-4-eric.auger@redhat.com>
+Date: Tue, 26 Feb 2019 21:44:28 +0100
+Message-Id: <20190226204439.2296-8-eric.auger@redhat.com>
 In-Reply-To: <20190226204439.2296-1-eric.auger@redhat.com>
 References: <20190226204439.2296-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 03/18] hw/arm/virt: Split the memory map
- description
+Subject: [Qemu-devel] [PATCH v9 07/18] hw/arm/virt: Dynamic memory map
+ depending on RAM requirements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,217 +25,184 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-In the prospect to introduce an extended memory map supporting more
-RAM, let's split the memory map array into two parts:
+Up to now the memory map has been static and the high IO region
+base has always been 256GiB.
 
-- the former a15memmap, renamed base_memmap, contains regions below
-  and including the RAM. MemMapEntries initialized in this array
-  have a static size and base address.
-- extended_memmap, only initialized with entries located after the
-  RAM. MemMapEntries initialized in this array only get their size
-  initialized. Their base address is dynamically computed depending
-  on the the top of the RAM, with same alignment as their size.
+This patch modifies the virt_set_memmap() function, which freezes
+the memory map, so that the high IO range base becomes floating,
+located after the initial RAM and the device memory.
 
-Eventually base_memmap entries are copied into the extended_memmap
-array. Using two separate arrays however clarifies which entries
-are statically allocated and those which are dynamically allocated.
+The function computes
+- the base of the device memory,
+- the size of the device memory,
+- the high IO region base
+- the highest GPA used in the memory map.
 
-This new split will allow to grow the RAM size without changing the
-description of the high IO entries.
+Entries of the high IO region are assigned a base address. The
+device memory is initialized.
 
-We introduce a new virt_set_memmap() helper function which
-"freezes" the memory map. We call it in machvirt_init as
-memory attributes of the machine are not yet set when
-virt_instance_init() gets called.
+The highest GPA used in the memory map will be used at VM creation
+to choose the requested IPA size.
 
-The memory map is unchanged (the top of the initial RAM still is
-256GiB). Then come the high IO regions with same layout as before.
+Setting all the existing highmem IO regions beyond the RAM
+allows to have a single contiguous RAM region (initial RAM and
+possible hotpluggable device memory). That way we do not need
+to do invasive changes in the EDK2 FW to support a dynamic
+RAM base.
+
+Still the user cannot request an initial RAM size greater than 255GB.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v8 -> v9:
-- restore virt_set_memmap call in machvirt_init as otherwise it does
-  not work in TCG mode
+- add if (machine->device_memory) check
 
 v7 -> v8:
-- removed Peter's R-b due to the changes induced by Igor's comments
-- call set_memmap back in virt_instance_init
-- add comments about sizing of extended_memmap
-- s/region/entries as suggested by Igor
-- rewording of the commit message
-
-v6 -> v7:
-- s/a15memmap/base_memmap
-- slight rewording of the commit message
-- add "if there is less than 256GiB of RAM then the floating area
-  starts at the 256GiB mark" in the comment associated to the floating
-  memory map
-- Added Peter's R-b
-
-v5 -> v6
-- removal of many macros in units.h
-- introduce the virt_set_memmap helper
-- new computation for offsets of high IO regions
-- add comments
+- allocate ms->device_memory and removes vms->device_memory_base and
+  vms->device_memory_storage
+- remove (ms->maxram_size > ms->ram_size || ms->ram_slots > 0) and
+  (ms->ram_size > (ram_addr_t)LEGACY_RAMLIMIT_BYTES) checks
+- initialize the device memory
+- move the slots nb check and maxram_size alignment checks in this
+  patch
 ---
- hw/arm/virt.c         | 51 ++++++++++++++++++++++++++++++++++++++-----
- include/hw/arm/virt.h | 14 ++++++++----
- 2 files changed, 55 insertions(+), 10 deletions(-)
+ hw/arm/virt.c         | 54 ++++++++++++++++++++++++++++++++++++++-----
+ include/hw/arm/virt.h |  1 +
+ 2 files changed, 49 insertions(+), 6 deletions(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 892bae4f3a..8a23608d3e 100644
+index 8a23608d3e..b29b2a460b 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -29,6 +29,7 @@
-  */
+@@ -59,6 +59,7 @@
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
+ #include "hw/arm/smmuv3.h"
++#include "hw/acpi/acpi.h"
 =20
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "hw/arm/arm.h"
-@@ -121,7 +122,7 @@
-  * Note that devices should generally be placed at multiples of 0x10000,
-  * to accommodate guests using 64K pages.
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -107,8 +108,9 @@
+  * of a terabyte of RAM will be doing it on a host with more than a
+  * terabyte of physical address space.)
   */
--static const MemMapEntry a15memmap[] =3D {
-+static const MemMapEntry base_memmap[] =3D {
-     /* Space up to 0x8000000 is reserved for a boot ROM */
-     [VIRT_FLASH] =3D              {          0, 0x08000000 },
-     [VIRT_CPUPERIPHS] =3D         { 0x08000000, 0x00020000 },
-@@ -149,11 +150,24 @@ static const MemMapEntry a15memmap[] =3D {
+-#define RAMLIMIT_GB 255
+-#define RAMLIMIT_BYTES (RAMLIMIT_GB * 1024ULL * 1024 * 1024)
++#define RAMBASE GiB
++#define LEGACY_RAMLIMIT_GB 255
++#define LEGACY_RAMLIMIT_BYTES (LEGACY_RAMLIMIT_GB * GiB)
+=20
+ /* Addresses and sizes of our components.
+  * 0..128MB is space for a flash device so we can run bootrom code such =
+as UEFI.
+@@ -149,7 +151,7 @@ static const MemMapEntry base_memmap[] =3D {
+     [VIRT_PCIE_MMIO] =3D          { 0x10000000, 0x2eff0000 },
      [VIRT_PCIE_PIO] =3D           { 0x3eff0000, 0x00010000 },
      [VIRT_PCIE_ECAM] =3D          { 0x3f000000, 0x01000000 },
-     [VIRT_MEM] =3D                { 0x40000000, RAMLIMIT_BYTES },
-+};
-+
-+/*
-+ * Highmem IO Regions: This memory map is floating, located after the RA=
-M.
-+ * Each MemMapEntry base (GPA) will be dynamically computed, depending o=
-n the
-+ * top of the RAM, so that its base get the same alignment as the size,
-+ * ie. a 512GiB entry will be aligned on a 512GiB boundary. If there is
-+ * less than 256GiB of RAM, the floating area starts at the 256GiB mark.
-+ * Note the extended_memmap is sized so that it eventually also includes=
- the
-+ * base_memmap entries (VIRT_HIGH_GIC_REDIST2 index is greater than the =
-last
-+ * index of base_memmap).
-+ */
-+static MemMapEntry extended_memmap[] =3D {
-     /* Additional 64 MB redist region (can contain up to 512 redistribut=
-ors) */
--    [VIRT_HIGH_GIC_REDIST2] =3D   { 0x4000000000ULL, 0x4000000 },
--    [VIRT_HIGH_PCIE_ECAM] =3D     { 0x4010000000ULL, 0x10000000 },
--    /* Second PCIe window, 512GB wide at the 512GB boundary */
--    [VIRT_HIGH_PCIE_MMIO] =3D     { 0x8000000000ULL, 0x8000000000ULL },
-+    [VIRT_HIGH_GIC_REDIST2] =3D   { 0x0, 64 * MiB },
-+    [VIRT_HIGH_PCIE_ECAM] =3D     { 0x0, 256 * MiB },
-+    /* Second PCIe window */
-+    [VIRT_HIGH_PCIE_MMIO] =3D     { 0x0, 512 * GiB },
+-    [VIRT_MEM] =3D                { 0x40000000, RAMLIMIT_BYTES },
++    [VIRT_MEM] =3D                { RAMBASE, LEGACY_RAMLIMIT_BYTES },
  };
 =20
- static const int a15irqmap[] =3D {
-@@ -1354,6 +1368,30 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineSt=
-ate *vms, int idx)
-     return arm_cpu_mp_affinity(idx, clustersz);
- }
+ /*
+@@ -1370,7 +1372,8 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineSta=
+te *vms, int idx)
 =20
-+static void virt_set_memmap(VirtMachineState *vms)
-+{
-+    hwaddr base;
-+    int i;
-+
-+    vms->memmap =3D extended_memmap;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(base_memmap); i++) {
-+        vms->memmap[i] =3D base_memmap[i];
-+    }
-+
-+    vms->high_io_base =3D 256 * GiB; /* Top of the legacy initial RAM re=
-gion */
-+    base =3D vms->high_io_base;
-+
-+    for (i =3D VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++=
-) {
-+        hwaddr size =3D extended_memmap[i].size;
-+
-+        base =3D ROUND_UP(base, size);
-+        vms->memmap[i].base =3D base;
-+        vms->memmap[i].size =3D size;
-+        base +=3D size;
-+    }
-+}
-+
- static void machvirt_init(MachineState *machine)
+ static void virt_set_memmap(VirtMachineState *vms)
  {
-     VirtMachineState *vms =3D VIRT_MACHINE(machine);
-@@ -1368,6 +1406,8 @@ static void machvirt_init(MachineState *machine)
-     bool firmware_loaded =3D bios_name || drive_get(IF_PFLASH, 0, 0);
-     bool aarch64 =3D true;
+-    hwaddr base;
++    MachineState *ms =3D MACHINE(vms);
++    hwaddr base, device_memory_base, device_memory_size;
+     int i;
 =20
-+    virt_set_memmap(vms);
+     vms->memmap =3D extended_memmap;
+@@ -1379,7 +1382,34 @@ static void virt_set_memmap(VirtMachineState *vms)
+         vms->memmap[i] =3D base_memmap[i];
+     }
+=20
+-    vms->high_io_base =3D 256 * GiB; /* Top of the legacy initial RAM re=
+gion */
++    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
++        error_report("unsupported number of memory slots: %"PRIu64,
++                     ms->ram_slots);
++        exit(EXIT_FAILURE);
++    }
 +
-     /* We can probe only here because during property set
-      * KVM is not available yet
-      */
-@@ -1845,7 +1885,6 @@ static void virt_instance_init(Object *obj)
-                                     "Valid values are none and smmuv3",
-                                     NULL);
++    if (QEMU_ALIGN_UP(ms->maxram_size, GiB) !=3D ms->maxram_size) {
++        error_report("maximum memory size must be GiB aligned");
++    }
++
++    /*
++     * We compute the base of the high IO region depending on the
++     * amount of initial and device memory. The device memory start/size
++     * is aligned on 1GiB. We never put the high IO region below 256GiB
++     * so that if maxram_size is < 255GiB we keep the legacy memory map.
++     * The device region size assumes 1GiB page max alignment per slot.
++     */
++    device_memory_base =3D ROUND_UP(RAMBASE + ms->ram_size, GiB);
++    device_memory_size =3D ms->maxram_size - ms->ram_size + ms->ram_slot=
+s * GiB;
++
++    vms->high_io_base =3D device_memory_base + ROUND_UP(device_memory_si=
+ze, GiB);
++    if (vms->high_io_base < device_memory_base) {
++        error_report("maxmem/slots too huge");
++        exit(EXIT_FAILURE);
++    }
++    if (vms->high_io_base < 256 * GiB) {
++        vms->high_io_base =3D 256 * GiB;
++    }
+     base =3D vms->high_io_base;
 =20
--    vms->memmap =3D a15memmap;
-     vms->irqmap =3D a15irqmap;
+     for (i =3D VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++=
+) {
+@@ -1390,6 +1420,13 @@ static void virt_set_memmap(VirtMachineState *vms)
+         vms->memmap[i].size =3D size;
+         base +=3D size;
+     }
++    vms->highest_gpa =3D base - 1;
++    if (device_memory_size > 0) {
++        ms->device_memory =3D g_malloc0(sizeof(*ms->device_memory));
++        ms->device_memory->base =3D device_memory_base;
++        memory_region_init(&ms->device_memory->mr, OBJECT(vms),
++                           "device-memory", device_memory_size);
++    }
  }
+=20
+ static void machvirt_init(MachineState *machine)
+@@ -1476,7 +1513,8 @@ static void machvirt_init(MachineState *machine)
+     vms->smp_cpus =3D smp_cpus;
+=20
+     if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
+-        error_report("mach-virt: cannot model more than %dGB RAM", RAMLI=
+MIT_GB);
++        error_report("mach-virt: cannot model more than %dGB RAM",
++                     LEGACY_RAMLIMIT_GB);
+         exit(1);
+     }
+=20
+@@ -1570,6 +1608,10 @@ static void machvirt_init(MachineState *machine)
+     memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+                                          machine->ram_size);
+     memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram)=
+;
++    if (machine->device_memory) {
++        memory_region_add_subregion(sysmem, machine->device_memory->base=
+,
++                                    &machine->device_memory->mr);
++    }
+=20
+     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
 =20
 diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index a27086d524..3dc7a6c5d5 100644
+index 3dc7a6c5d5..326a26b6d6 100644
 --- a/include/hw/arm/virt.h
 +++ b/include/hw/arm/virt.h
-@@ -64,7 +64,6 @@ enum {
-     VIRT_GIC_VCPU,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
--    VIRT_HIGH_GIC_REDIST2,
-     VIRT_SMMU,
-     VIRT_UART,
-     VIRT_MMIO,
-@@ -74,12 +73,18 @@ enum {
-     VIRT_PCIE_MMIO,
-     VIRT_PCIE_PIO,
-     VIRT_PCIE_ECAM,
--    VIRT_HIGH_PCIE_ECAM,
-     VIRT_PLATFORM_BUS,
--    VIRT_HIGH_PCIE_MMIO,
-     VIRT_GPIO,
-     VIRT_SECURE_UART,
-     VIRT_SECURE_MEM,
-+    VIRT_LOWMEMMAP_LAST,
-+};
-+
-+/* indices of IO regions located after the RAM */
-+enum {
-+    VIRT_HIGH_GIC_REDIST2 =3D  VIRT_LOWMEMMAP_LAST,
-+    VIRT_HIGH_PCIE_ECAM,
-+    VIRT_HIGH_PCIE_MMIO,
- };
-=20
- typedef enum VirtIOMMUType {
-@@ -116,7 +121,7 @@ typedef struct {
-     int32_t gic_version;
-     VirtIOMMUType iommu;
-     struct arm_boot_info bootinfo;
--    const MemMapEntry *memmap;
-+    MemMapEntry *memmap;
-     const int *irqmap;
-     int smp_cpus;
-     void *fdt;
-@@ -126,6 +131,7 @@ typedef struct {
-     uint32_t msi_phandle;
+@@ -132,6 +132,7 @@ typedef struct {
      uint32_t iommu_phandle;
      int psci_conduit;
-+    hwaddr high_io_base;
+     hwaddr high_io_base;
++    hwaddr highest_gpa;
  } VirtMachineState;
 =20
  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
