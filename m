@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39113)
+Received: from eggs.gnu.org ([209.51.188.92]:40260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyk5g-0008Nd-8K
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:16:41 -0500
+	(envelope-from <david@redhat.com>) id 1gykCZ-0001mK-2t
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:23:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyk5d-0004Xd-Fh
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:16:38 -0500
-References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-8-david@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gykCY-0000QN-4y
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:23:47 -0500
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <28395326-e599-45e0-ebbb-0758fc593284@redhat.com>
-Date: Tue, 26 Feb 2019 22:16:32 +0100
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-7-david@redhat.com>
+	<f3a978e7-2e40-9f57-f085-ff5dbf259964@linaro.org>
+	<7bfddcbc-5ace-5f28-8042-8b576f31d573@redhat.com>
+Message-ID: <8b842e77-5d5e-c1eb-89e5-0c8816f0daf8@redhat.com>
+Date: Tue, 26 Feb 2019 22:23:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190226113915.20150-8-david@redhat.com>
+In-Reply-To: <7bfddcbc-5ace-5f28-8042-8b576f31d573@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 07/33] s390x/tcg: Implement VECTOR
- GENERATE MASK
+Subject: Re: [Qemu-devel] [PATCH v1 06/33] s390x/tcg: Implement VECTOR
+ GENERATE BYTE MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,122 +27,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 26.02.19 12:38, David Hildenbrand wrote:
-> This is the first instruction that uses gvec expansion for duplicating
-> elements. We will use makros for most gvec calls to simplify translating
-> vector numbers into offsets (and to not have to worry about oprsz and
-> maxsz).
+On 26.02.19 20:23, David Hildenbrand wrote:
+> On 26.02.19 20:12, Richard Henderson wrote:
+>> On 2/26/19 3:38 AM, David Hildenbrand wrote:
+>>> +static DisasJumpType op_vgbm(DisasContext *s, DisasOps *o)
+>>> +{
+>>> +    const uint16_t i2 = get_field(s->fields, i2);
+>>> +    TCGv_i32 ones = tcg_const_i32(-1u);
+>>> +    TCGv_i32 zeroes = tcg_const_i32(0);
+>>> +    int i;
+>>> +
+>>> +    for (i = 0; i < 16; i++) {
+>>> +        if (extract32(i2, 15 - i, 1)) {
+>>> +            write_vec_element_i32(ones, get_field(s->fields, v1), i, MO_8);
+>>> +        } else {
+>>> +            write_vec_element_i32(zeroes, get_field(s->fields, v1), i, MO_8);
+>>> +        }
+>>> +    }
+>>> +    tcg_temp_free_i32(ones);
+>>> +    tcg_temp_free_i32(zeroes);
+>>> +    return DISAS_NEXT;
+>>> +}
+>>
+>> While this works, it's not in the spirit of
+>>
+>>> Programming Note: VECTOR GENERATE BYTE
+>>> MASK is the preferred method for setting a vector
+>>> register to all zeroes or ones.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/insn-data.def      |  2 ++
->  target/s390x/translate.c        |  1 +
->  target/s390x/translate_vx.inc.c | 34 +++++++++++++++++++++++++++++++++
->  3 files changed, 37 insertions(+)
+> Good point, I skipped that note so far.
 > 
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index 1bdfcf8130..a3a0df7788 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -979,6 +979,8 @@
->      E(0xe712, VGEG,    VRV,   V,   la2, 0, 0, 0, vge, 0, MO_64, IF_VEC)
->  /* VECTOR GENERATE BYTE MASK */
->      F(0xe744, VGBM,    VRI_a, V,   0, 0, 0, 0, vgbm, 0, IF_VEC)
-> +/* VECTOR GENERATE MASK */
-> +    F(0xe746, VGM,     VRI_b, V,   0, 0, 0, 0, vgm, 0, IF_VEC)
->  
->  #ifndef CONFIG_USER_ONLY
->  /* COMPARE AND SWAP AND PURGE */
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 3935bc8bb7..56c146f91e 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -34,6 +34,7 @@
->  #include "disas/disas.h"
->  #include "exec/exec-all.h"
->  #include "tcg-op.h"
-> +#include "tcg-op-gvec.h"
->  #include "qemu/log.h"
->  #include "qemu/host-utils.h"
->  #include "exec/cpu_ldst.h"
-> diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-> index 7775401dd3..ed63b2ca22 100644
-> --- a/target/s390x/translate_vx.inc.c
-> +++ b/target/s390x/translate_vx.inc.c
-> @@ -43,6 +43,7 @@
->  
->  #define NUM_VEC_ELEMENT_BYTES(es) (1 << (es))
->  #define NUM_VEC_ELEMENTS(es) (16 / NUM_VEC_ELEMENT_BYTES(es))
-> +#define NUM_VEC_ELEMENT_BITS(es) (NUM_VEC_ELEMENT_BYTES(es) * BITS_PER_BYTE)
->  
->  static inline bool valid_vec_element(uint8_t enr, TCGMemOp es)
->  {
-> @@ -136,6 +137,9 @@ static void load_vec_element(DisasContext *s, uint8_t reg, uint8_t enr,
->      tcg_temp_free_i64(tmp);
->  }
->  
-> +#define gen_gvec_dup_i64(es, v1, c) \
-> +    tcg_gen_gvec_dup_i64(es, vec_full_reg_offset(v1), 16, 16, c)
-> +
->  static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
->  {
->      const uint8_t es = s->insn->data;
-> @@ -175,3 +179,33 @@ static DisasJumpType op_vgbm(DisasContext *s, DisasOps *o)
->      tcg_temp_free_i32(zeroes);
->      return DISAS_NEXT;
->  }
-> +
-> +static DisasJumpType op_vgm(DisasContext *s, DisasOps *o)
-> +{
-> +    const uint8_t es = get_field(s->fields, m4);
-> +    const uint8_t bits = NUM_VEC_ELEMENT_BITS(es);
-> +    const uint8_t i2 = get_field(s->fields, i2) & (bits - 1);
-> +    const uint8_t i3 = get_field(s->fields, i3) & (bits - 1);
-> +    uint64_t mask = 0;
-> +    TCGv_i64 tmp;
-> +    int i;
-> +
-> +    if (es > MO_64) {
-> +        gen_program_exception(s, PGM_SPECIFICATION);
-> +        return DISAS_NORETURN;
-> +    }
-> +
-> +    /* generate the mask - take care of wrapping */
-> +    for (i = i2; ; i = (i + 1) % bits) {
-> +        mask |= 1ull << (bits - i - 1);
-> +        if (i == i3) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    tmp = tcg_temp_new_i64();
-> +    tcg_gen_movi_i64(tmp, mask);
-> +    gen_gvec_dup_i64(es, get_field(s->fields, v1), tmp);
-
-Richard, shall I better convert this into
-
-switch (es) {
-case MO_8:
-	tcg_gen_gvec_dup8i(..., 16, 16, mask)
-	break;
-case MO_16:
-	tcg_gen_gvec_dup16i(..., 16, 16, mask)
-	break;
-...
-};
-
-?
-
-Thanks
-
-> +    tcg_temp_free_i64(tmp);
-> +    return DISAS_NEXT;
-> +}
+>>
+>> Better, I think, with
 > 
+> Many instructions to implement, so little time to fine tune stuff so
+> far. However I have tests for VGBM, so I can easily get it working. Will
+> play with it!
+> 
+>>
+>> uint64_t generate_byte_mask(uint8_t mask)
+>> {
+>>     uint64_t r = 0;
+>>     int i;
+>>     for (i = 0; i < 8; i++) {
+>>         if ((mask >> i) & 1) {
+>>             r |= 0xffull << (i * 8);
+>>         }
+>>     }
+>>     return r;
+>> }
+>>
+>>     if (i2 == (i2 & 0xff) * 0x0101) {
+>>         /* masks for both halves of the vector are the same.
+>>            trust tcg to produce a good constant loading.  */
+>>         tcg_gen_gvec_dup64i(vec_full_reg_offset(s, v1), 16, 16,
+>>                             generate_byte_mask(i2 & 0xff));
+>>     } else {
+>>         TCGv_i64 t = tcg_temp_new_i64();
+>>         tcg_gen_movi_i64(t, generate_byte_mask(i2 >> 8));
+>>         write_vec_element_i64(t, v1, 0, MO_64);
+>>         tcg_gen_movi_i64(t, generate_byte_mask(i2 & 0xff));
+>>         write_vec_element_i64(t, v1, 1, MO_64);
+>>         tcg_temp_free_i64();
+>>     }
+>>
+>> Somewhere behind tcg_gen_gvec_dup64i, I check to see if the constant can be
+>> decomposed further, which will eventually bottom out at
+>>
+>> 	vpxor	%xmm0,%xmm0,%xmm0		// all zeros
+>> 	vpcmpeq	%xmm0,%xmm0,%xmm0		// all ones
+>>
 
+Just tested with minor adaptions, works like a charm!
 
 -- 
 
