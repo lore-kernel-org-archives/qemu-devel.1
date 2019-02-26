@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47635)
+Received: from eggs.gnu.org ([209.51.188.92]:47677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyb5i-0004qA-N0
+	(envelope-from <david@redhat.com>) id 1gyb5j-0004r8-Hs
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyb5h-00076H-LY
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:40:06 -0500
+	(envelope-from <david@redhat.com>) id 1gyb5h-00076d-SW
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:40:07 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 26 Feb 2019 12:38:56 +0100
-Message-Id: <20190226113915.20150-15-david@redhat.com>
+Date: Tue, 26 Feb 2019 12:38:55 +0100
+Message-Id: <20190226113915.20150-14-david@redhat.com>
 In-Reply-To: <20190226113915.20150-1-david@redhat.com>
 References: <20190226113915.20150-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 14/33] s390x/tcg: Implement VECTOR LOAD
- MULTIPLE
+Subject: [Qemu-devel] [PATCH v1 13/33] s390x/tcg: Implement VECTOR LOAD
+ LOGICAL ELEMENT AND ZERO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +23,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Also fairly easy to implement. One issue we have is that exceptions will
-result in some vectors already being modified. At least handle it
-consistently per vector by using a temporary vector. Good enough for
-now, add a FIXME.
+Fairly easy, zero out the vector before we load the desired element.
+Use a temporary vector so we don't modify the target vector on
+exceptions.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
  target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 26 ++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ target/s390x/translate_vx.inc.c | 43 +++++++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 46a0739703..65ff8bbd2e 100644
+index f4201ff55a..46a0739703 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1000,6 +1000,8 @@
+@@ -998,6 +998,8 @@
+     E(0xe742, VLEIG,   VRI_a, V,   0, 0, 0, 0, vlei, 0, MO_64, IF_VEC)
+ /* VECTOR LOAD GR FROM VR ELEMENT */
      F(0xe721, VLGV,    VRS_c, V,   la2, 0, r1, 0, vlgv, 0, IF_VEC)
- /* VECTOR LOAD LOGICAL ELEMENT AND ZERO */
-     F(0xe704, VLLEZ,   VRX,   V,   la2, 0, 0, 0, vllez, 0, IF_VEC)
-+/* VECTOR LOAD MULTIPLE */
-+    F(0xe736, VLM,     VRS_a, V,   la2, 0, 0, 0, vlm, 0, IF_VEC)
++/* VECTOR LOAD LOGICAL ELEMENT AND ZERO */
++    F(0xe704, VLLEZ,   VRX,   V,   la2, 0, 0, 0, vllez, 0, IF_VEC)
  
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index 301408d1f2..c9f57afd4a 100644
+index a02a3ba81f..301408d1f2 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -377,3 +377,29 @@ static DisasJumpType op_vllez(DisasContext *s, DisasOps *o)
-     gen_gvec_mov(get_field(s->fields, v1), TMP_VREG_0);
+@@ -165,6 +165,11 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uint8_t reg, TCGv_i64 enr,
+     tcg_gen_gvec_mov(0, vec_full_reg_offset(v1), vec_full_reg_offset(v2), 16, \
+                      16)
+ 
++static void zero_vec(uint8_t reg)
++{
++    tcg_gen_gvec_dup8i(vec_full_reg_offset(reg), 16, 16, 0);
++}
++
+ static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
+ {
+     const uint8_t es = s->insn->data;
+@@ -334,3 +339,41 @@ static DisasJumpType op_vlgv(DisasContext *s, DisasOps *o)
+ 
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vlm(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vllez(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t v3 = get_field(s->fields, v3);
-+    uint8_t v1 = get_field(s->fields, v1);
++    uint8_t es = get_field(s->fields, m3);
++    uint8_t enr;
 +
-+    while (v3 < v1 || (v3 - v1 + 1) > 16) {
++    switch (es) {
++    /* rightmost sub-element of leftmost doubleword */
++    case MO_8:
++        enr = 7;
++        break;
++    case MO_16:
++        enr = 3;
++        break;
++    case MO_32:
++        enr = 1;
++        break;
++    case MO_64:
++        enr = 0;
++        break;
++    /* leftmost sub-element of leftmost doubleword */
++    case 6:
++        if (s390_has_feat(S390_FEAT_VECTOR_ENH)) {
++            es = MO_32;
++            enr = 0;
++            break;
++        }
++    default:
++        /* fallthrough */
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
 +    }
 +
-+    /*
-+     * FIXME: On exceptions we must not modify any vector.
-+     */
-+    for (;; v1++) {
-+        load_vec_element(s, TMP_VREG_0, 0, o->addr1, MO_64);
-+        gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
-+        load_vec_element(s, TMP_VREG_0, 1, o->addr1, MO_64);
-+        gen_gvec_mov(v1, TMP_VREG_0);
-+        if (v1 == v3) {
-+            break;
-+        }
-+        gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
-+    }
++    zero_vec(TMP_VREG_0);
++    load_vec_element(s, TMP_VREG_0, enr, o->addr1, es);
++    gen_gvec_mov(get_field(s->fields, v1), TMP_VREG_0);
 +    return DISAS_NEXT;
 +}
 -- 
