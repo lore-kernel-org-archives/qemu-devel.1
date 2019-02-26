@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47249)
+Received: from eggs.gnu.org ([209.51.188.92]:47270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyb5H-0004RY-FF
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:41 -0500
+	(envelope-from <david@redhat.com>) id 1gyb5M-0004VH-2T
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyb5G-0006mK-7g
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:39 -0500
+	(envelope-from <david@redhat.com>) id 1gyb5J-0006nb-H9
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:43 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 26 Feb 2019 12:38:43 +0100
-Message-Id: <20190226113915.20150-2-david@redhat.com>
+Date: Tue, 26 Feb 2019 12:38:49 +0100
+Message-Id: <20190226113915.20150-8-david@redhat.com>
 In-Reply-To: <20190226113915.20150-1-david@redhat.com>
 References: <20190226113915.20150-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 01/33] s390x/tcg: Define vector instruction
- formats
+Subject: [Qemu-devel] [PATCH v1 07/33] s390x/tcg: Implement VECTOR GENERATE
+ MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,186 +23,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-These are the new instruction formats related to vector instructions as
-up to the z14 (a.k.a. latest PoP).
-
-As v2 appeares (like x2 in VRX) with d2/b2 in VRV, we have to assign it a
-higher field number to avoid collisions.
-
-Properly take care of the MSB (to be able to address 32 registers) for
-each vector register field stored in the RXB field (Bit 36 - 30  for all
-vector instructions). As we have 32 bit vector registers and the
-"v" fields are only 4 bit in size, the 5th bit is stored in the RXB.
-We use a new type to indicate that the MSB has to be fetched from the
-RXB.
+This is the first instruction that uses gvec expansion for duplicating
+elements. We will use makros for most gvec calls to simplify translating
+vector numbers into offsets (and to not have to worry about oprsz and
+maxsz).
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-format.def | 25 +++++++++++++++++++++++
- target/s390x/translate.c     | 39 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 63 insertions(+), 1 deletion(-)
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate.c        |  1 +
+ target/s390x/translate_vx.inc.c | 34 +++++++++++++++++++++++++++++++++
+ 3 files changed, 37 insertions(+)
 
-diff --git a/target/s390x/insn-format.def b/target/s390x/insn-format.def
-index 4297ff4165..6253edbd19 100644
---- a/target/s390x/insn-format.def
-+++ b/target/s390x/insn-format.def
-@@ -54,3 +54,28 @@ F4(SS_e,  R(1, 8),     BD(2,16,20), R(3,12),     BD(4,32,36))
- F3(SS_f,  BD(1,16,20), L(2,8,8),    BD(2,32,36))
- F2(SSE,   BD(1,16,20), BD(2,32,36))
- F3(SSF,   BD(1,16,20), BD(2,32,36), R(3,8))
-+F3(VRI_a, V(1,8),      I(2,16,16),  M(3,32))
-+F4(VRI_b, V(1,8),      I(2,16,8),   I(3,24,8),   M(4,32))
-+F4(VRI_c, V(1,8),      V(3,12),     I(2,16,16),  M(4,32))
-+F5(VRI_d, V(1,8),      V(2,12),     V(3,16),     I(4,24,8),   M(5,32))
-+F5(VRI_e, V(1,8),      V(2,12),     I(3,16,12),  M(5,28),     M(4,32))
-+F5(VRI_f, V(1,8),      V(2,12),     V(3,16),     M(5,24),     I(4,28,8))
-+F5(VRI_g, V(1,8),      V(2,12),     I(4,16,8),   M(5,24),     I(3,28,8))
-+F3(VRI_h, V(1,8),      I(2,16,16),  I(3,32,4))
-+F4(VRI_i, V(1,8),      R(2,12),     M(4,24),     I(3,28,8))
-+F5(VRR_a, V(1,8),      V(2,12),     M(5,24),     M(4,28),     M(3,32))
-+F5(VRR_b, V(1,8),      V(2,12),     V(3,16),     M(5,24),     M(4,32))
-+F6(VRR_c, V(1,8),      V(2,12),     V(3,16),     M(6,24),     M(5,28),  M(4,32))
-+F6(VRR_d, V(1,8),      V(2,12),     V(3,16),     M(5,20),     M(6,24),  V(4,32))
-+F6(VRR_e, V(1,8),      V(2,12),     V(3,16),     M(6,20),     M(5,28),  V(4,32))
-+F3(VRR_f, V(1,8),      R(2,12),     R(3,16))
-+F1(VRR_g, V(1,12))
-+F3(VRR_h, V(1,12),     V(2,16),     M(3,24))
-+F3(VRR_i, R(1,8),      V(2,12),     M(3,24))
-+F4(VRS_a, V(1,8),      V(3,12),     BD(2,16,20), M(4,32))
-+F4(VRS_b, V(1,8),      R(3,12),     BD(2,16,20), M(4,32))
-+F4(VRS_c, R(1,8),      V(3,12),     BD(2,16,20), M(4,32))
-+F3(VRS_d, R(3,12),     BD(2,16,20), V(1,32))
-+F4(VRV,   V(1,8),      V(2,12),     BD(2,16,20), M(3,32))
-+F3(VRX,   V(1,8),      BXD(2),      M(3,32))
-+F3(VSI,   I(3,8,8),    BD(2,16,20), V(1,32))
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 1bdfcf8130..a3a0df7788 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -979,6 +979,8 @@
+     E(0xe712, VGEG,    VRV,   V,   la2, 0, 0, 0, vge, 0, MO_64, IF_VEC)
+ /* VECTOR GENERATE BYTE MASK */
+     F(0xe744, VGBM,    VRI_a, V,   0, 0, 0, 0, vgbm, 0, IF_VEC)
++/* VECTOR GENERATE MASK */
++    F(0xe746, VGM,     VRI_b, V,   0, 0, 0, 0, vgm, 0, IF_VEC)
+ 
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 41fb466bb4..1d8030f8cd 100644
+index 3935bc8bb7..56c146f91e 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -985,6 +985,7 @@ static void free_compare(DisasCompare *c)
- #define F3(N, X1, X2, X3)             F0(N)
- #define F4(N, X1, X2, X3, X4)         F0(N)
- #define F5(N, X1, X2, X3, X4, X5)     F0(N)
-+#define F6(N, X1, X2, X3, X4, X5, X6) F0(N)
+@@ -34,6 +34,7 @@
+ #include "disas/disas.h"
+ #include "exec/exec-all.h"
+ #include "tcg-op.h"
++#include "tcg-op-gvec.h"
+ #include "qemu/log.h"
+ #include "qemu/host-utils.h"
+ #include "exec/cpu_ldst.h"
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
+index 7775401dd3..ed63b2ca22 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -43,6 +43,7 @@
  
- typedef enum {
- #include "insn-format.def"
-@@ -996,6 +997,7 @@ typedef enum {
- #undef F3
- #undef F4
- #undef F5
-+#undef F6
+ #define NUM_VEC_ELEMENT_BYTES(es) (1 << (es))
+ #define NUM_VEC_ELEMENTS(es) (16 / NUM_VEC_ELEMENT_BYTES(es))
++#define NUM_VEC_ELEMENT_BITS(es) (NUM_VEC_ELEMENT_BYTES(es) * BITS_PER_BYTE)
  
- /* Define a structure to hold the decoded fields.  We'll store each inside
-    an array indexed by an enum.  In order to conserve memory, we'll arrange
-@@ -1010,6 +1012,8 @@ enum DisasFieldIndexO {
-     FLD_O_m1,
-     FLD_O_m3,
-     FLD_O_m4,
-+    FLD_O_m5,
-+    FLD_O_m6,
-     FLD_O_b1,
-     FLD_O_b2,
-     FLD_O_b4,
-@@ -1023,7 +1027,11 @@ enum DisasFieldIndexO {
-     FLD_O_i2,
-     FLD_O_i3,
-     FLD_O_i4,
--    FLD_O_i5
-+    FLD_O_i5,
-+    FLD_O_v1,
-+    FLD_O_v2,
-+    FLD_O_v3,
-+    FLD_O_v4,
- };
+ static inline bool valid_vec_element(uint8_t enr, TCGMemOp es)
+ {
+@@ -136,6 +137,9 @@ static void load_vec_element(DisasContext *s, uint8_t reg, uint8_t enr,
+     tcg_temp_free_i64(tmp);
+ }
  
- enum DisasFieldIndexC {
-@@ -1031,6 +1039,7 @@ enum DisasFieldIndexC {
-     FLD_C_m1 = 0,
-     FLD_C_b1 = 0,
-     FLD_C_i1 = 0,
-+    FLD_C_v1 = 0,
- 
-     FLD_C_r2 = 1,
-     FLD_C_b2 = 1,
-@@ -1039,20 +1048,25 @@ enum DisasFieldIndexC {
-     FLD_C_r3 = 2,
-     FLD_C_m3 = 2,
-     FLD_C_i3 = 2,
-+    FLD_C_v3 = 2,
- 
-     FLD_C_m4 = 3,
-     FLD_C_b4 = 3,
-     FLD_C_i4 = 3,
-     FLD_C_l1 = 3,
-+    FLD_C_v4 = 3,
- 
-     FLD_C_i5 = 4,
-     FLD_C_d1 = 4,
-+    FLD_C_m5 = 4,
- 
-     FLD_C_d2 = 5,
-+    FLD_C_m6 = 5,
- 
-     FLD_C_d4 = 6,
-     FLD_C_x2 = 6,
-     FLD_C_l2 = 6,
-+    FLD_C_v2 = 6,
- 
-     NUM_C_FIELD = 7
- };
-@@ -1097,6 +1111,7 @@ typedef struct DisasFormatInfo {
- 
- #define R(N, B)       {  B,  4, 0, FLD_C_r##N, FLD_O_r##N }
- #define M(N, B)       {  B,  4, 0, FLD_C_m##N, FLD_O_m##N }
-+#define V(N, B)       {  B,  4, 3, FLD_C_v##N, FLD_O_v##N }
- #define BD(N, BB, BD) { BB,  4, 0, FLD_C_b##N, FLD_O_b##N }, \
-                       { BD, 12, 0, FLD_C_d##N, FLD_O_d##N }
- #define BXD(N)        { 16,  4, 0, FLD_C_b##N, FLD_O_b##N }, \
-@@ -1116,6 +1131,7 @@ typedef struct DisasFormatInfo {
- #define F3(N, X1, X2, X3)         { { X1, X2, X3 } },
- #define F4(N, X1, X2, X3, X4)     { { X1, X2, X3, X4 } },
- #define F5(N, X1, X2, X3, X4, X5) { { X1, X2, X3, X4, X5 } },
-+#define F6(N, X1, X2, X3, X4, X5, X6)       { { X1, X2, X3, X4, X5, X6 } },
- 
- static const DisasFormatInfo format_info[] = {
- #include "insn-format.def"
-@@ -1127,8 +1143,10 @@ static const DisasFormatInfo format_info[] = {
- #undef F3
- #undef F4
- #undef F5
-+#undef F6
- #undef R
- #undef M
-+#undef V
- #undef BD
- #undef BXD
- #undef BDL
-@@ -6119,6 +6137,25 @@ static void extract_field(DisasFields *o, const DisasField *f, uint64_t insn)
-     case 2: /* dl+dh split, signed 20 bit. */
-         r = ((int8_t)r << 12) | (r >> 8);
-         break;
-+    case 3: /* MSB stored in RXB */
-+        g_assert(f->size == 4);
-+        switch (f->beg) {
-+        case 8:
-+            r |= extract64(insn, 63 - 36, 1) << 4;
++#define gen_gvec_dup_i64(es, v1, c) \
++    tcg_gen_gvec_dup_i64(es, vec_full_reg_offset(v1), 16, 16, c)
++
+ static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
+ {
+     const uint8_t es = s->insn->data;
+@@ -175,3 +179,33 @@ static DisasJumpType op_vgbm(DisasContext *s, DisasOps *o)
+     tcg_temp_free_i32(zeroes);
+     return DISAS_NEXT;
+ }
++
++static DisasJumpType op_vgm(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es = get_field(s->fields, m4);
++    const uint8_t bits = NUM_VEC_ELEMENT_BITS(es);
++    const uint8_t i2 = get_field(s->fields, i2) & (bits - 1);
++    const uint8_t i3 = get_field(s->fields, i3) & (bits - 1);
++    uint64_t mask = 0;
++    TCGv_i64 tmp;
++    int i;
++
++    if (es > MO_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    /* generate the mask - take care of wrapping */
++    for (i = i2; ; i = (i + 1) % bits) {
++        mask |= 1ull << (bits - i - 1);
++        if (i == i3) {
 +            break;
-+        case 12:
-+            r |= extract64(insn, 63 - 37, 1) << 4;
-+            break;
-+        case 16:
-+            r |= extract64(insn, 63 - 38, 1) << 4;
-+            break;
-+        case 32:
-+            r |= extract64(insn, 63 - 39, 1) << 4;
-+            break;
-+        default:
-+            g_assert_not_reached();
 +        }
-+        break;
-     default:
-         abort();
-     }
++    }
++
++    tmp = tcg_temp_new_i64();
++    tcg_gen_movi_i64(tmp, mask);
++    gen_gvec_dup_i64(es, get_field(s->fields, v1), tmp);
++    tcg_temp_free_i64(tmp);
++    return DISAS_NEXT;
++}
 -- 
 2.17.2
