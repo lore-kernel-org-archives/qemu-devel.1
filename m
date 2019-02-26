@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46478)
+Received: from eggs.gnu.org ([209.51.188.92]:49880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1gykoL-0006sT-QC
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:02:50 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gyl6X-00014u-QM
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:21:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1gykoK-0006u2-Sl
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:02:49 -0500
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:60538)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1gykoK-0006gY-Lc
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:02:48 -0500
-Date: Tue, 26 Feb 2019 23:02:21 +0100
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20190226220221.GA4454@aurel32.net>
+	(envelope-from <balaton@eik.bme.hu>) id 1gyl6W-0001Ss-9w
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:21:37 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:45790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gyl6W-0001MW-24
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:21:36 -0500
+Date: Tue, 26 Feb 2019 23:21:20 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190226164500.8080-4-alex.bennee@linaro.org>
+Message-ID: <alpine.BSF.2.21.9999.1902262319210.5023@zero.eik.bme.hu>
 References: <20190226164500.8080-1-alex.bennee@linaro.org>
 	<20190226164500.8080-4-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20190226164500.8080-4-alex.bennee@linaro.org>
 Subject: Re: [Qemu-devel] [PATCH v1 3/6] contrib: gitdm: add some more
  people academic group
 List-Id: <qemu-devel.nongnu.org>
@@ -30,17 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-15?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 2019-02-26 16:44, Alex Benn=E9e wrote:
+Hello,
+
+On Tue, 26 Feb 2019, Alex Benn=C3=A9e wrote:
 > I'm basing this on email addresses or published employment. Please
 > confirm if this is correct or you want to be under (None).
+>
+> Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+> contrib/gitdm/group-map-academics | 9 +++++++++
+> 1 file changed, 9 insertions(+)
+>
+> diff --git a/contrib/gitdm/group-map-academics b/contrib/gitdm/group-ma=
+p-academics
+> index 08f9d81d13..a2a43fcc05 100644
+> --- a/contrib/gitdm/group-map-academics
+> +++ b/contrib/gitdm/group-map-academics
+> @@ -12,3 +12,12 @@ ispras.ru
+> # Columbia University
+> cs.columbia.edu
+> cota@braap.org
+> +
+> +# =C3=89cole normale sup=C3=A9rieure de Lyon
+> +samuel.thibault@ens-lyon.org
+> +
+> +# Centre de Recherche Astrophysique de Lyon
+> +aurelien@aurel32.net
+> +
+> +# Budapest University of Technology and Economics
+> +balaton@eik.bme.hu
 
-Please list me as (None) instead, QEMU is not related to my paid work.
+My QEMU contributions are personal work not related to my email address s=
+o=20
+better listed under no affiliation.
 
-Aurelien
-
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Regards,
+BALATON Zoltan
