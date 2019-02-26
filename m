@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47911)
+Received: from eggs.gnu.org ([209.51.188.92]:48747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyd9U-00012O-BZ
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:52:09 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gydD7-00048Z-Aj
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:55:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyd9T-0007s6-0d
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:52:08 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 26 Feb 2019 14:50:12 +0100
-Message-Id: <20190226135014.31854-17-eric.auger@redhat.com>
-In-Reply-To: <20190226135014.31854-1-eric.auger@redhat.com>
-References: <20190226135014.31854-1-eric.auger@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gydD0-00025z-6j
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:55:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gydD0-000248-0S
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:55:46 -0500
+Date: Tue, 26 Feb 2019 13:55:41 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190226135541.GG2721@work-vm>
+References: <CAFEAcA-GYE98ceYOHQ5hGwb-Dh8qv=Jvr=EEp_Dk9YLCmQdA4g@mail.gmail.com>
+	<CAFEAcA9295VBXHWzraE_ykcD+-1cLOMS158Lyf+gQxzumxV=xA@mail.gmail.com>
+	<20190226121700.GF2721@work-vm>
+	<CAFEAcA8fc74k5XKQhmDgv10bk2vyvqZuon395gT0YGhONOF_QA@mail.gmail.com>
+	<CAFEAcA_Pd9EW4pRQSakEPUj2A3Cv669rhhvyV2rmyY0A6evXxw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 16/18] hw/arm/virt: Add nvdimm hot-plug
- infrastructure
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_Pd9EW4pRQSakEPUj2A3Cv669rhhvyV2rmyY0A6evXxw@mail.gmail.com>
+Subject: Re: [Qemu-devel] can we disable the migration-test for TCG targets ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,140 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
-Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Kwangwoo Lee <kwangwoo.lee@sk.com>
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On Tue, 26 Feb 2019 at 12:30, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Tue, 26 Feb 2019 at 12:17, Dr. David Alan Gilbert
+> > <dgilbert@redhat.com> wrote:
+> > >
+> > > * Peter Maydell (peter.maydell@linaro.org) wrote:
+> > > > Backtrace of process 125450:
+> > > > Thread 6 (Thread 0xfff800012de0b900 (LWP 127434)):
+> > > > #0  0xfff80001034c5cdc in futex_abstimed_wait_cancelable (private=0,
+> > > > abstime=0xfff800012de09f88, expected=0, futex_word=0x10001236574)
+> > > >     at ../sysdeps/unix/sysv/linux/futex-internal.h:205
+> > > > #1  0xfff80001034c5cdc in do_futex_wait (sem=0x3c,
+> > > > abstime=0xfff800012de09f88) at sem_waitcommon.c:111
+> > > > #2  0xfff80001034c5e00 in __new_sem_wait_slow (sem=0x10001236570,
+> > > > abstime=0xfff800012de09f88) at sem_waitcommon.c:181
+> > > > #3  0x000001000091dacc in qemu_sem_timedwait (sem=0x10001236570,
+> > > > ms=<optimized out>) at /home/pm215/qemu/util/qemu-thread-posix.c:289
+> > > > #4  0x000001000078ae28 in migration_thread (opaque=0x100012364a0) at
+> > > > /home/pm215/qemu/migration/migration.c:3125
+> > >
+> > > So migration is still apparently running, it's rate-limiting
+> > > using a timedwait; but 'ms' has been unhelpfully optimised out; could
+> > > it be stuck in here for some reason?
+> >
+> > I looked at this from frame 4, and ms is 64. On the other
+> > hand if I tell gdb to 'fin' it doesn't ever leave
+> > futex_abstimed_wait_cancelable(), so I wonder if we're
+> > managing to get the conversion of the relative time into
+> > an absolute deadline wrong somehow ??
+> 
+> Very weirdly, gdb shows me an absolute timestamp passed
+> to the futex function which is indeed in the past, so it
+> seems like the issue is that the kernel isn't returning
+> control to us when the timestamp expires for some reason.
 
-Pre-plug and plug handlers are prepared for NVDIMM support.
+I wonder if we have any more luck with blacklisting CONFIG_SEM_TIMEDWAIT
+- I wonder if it uses a different kernel call?
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+Dave
 
----
-
-v7 -> v8:
-- s/VIRT_ACPI_IO_BASE/VIRT_NVDIMM_ACPI_IO_BASE
-- use const AcpiGenericAddress arm_virt_nvdimm_acpi_dsmio
----
- default-configs/arm-softmmu.mak |  2 ++
- hw/arm/virt-acpi-build.c        |  6 ++++++
- hw/arm/virt.c                   | 27 +++++++++++++++++++++++++--
- include/hw/arm/virt.h           |  2 ++
- 4 files changed, 35 insertions(+), 2 deletions(-)
-
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 4009a56c67..42027bcee5 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -166,3 +166,5 @@ CONFIG_HIGHBANK=3Dy
- CONFIG_MUSICPAL=3Dy
- CONFIG_MEM_DEVICE=3Dy
- CONFIG_DIMM=3Dy
-+CONFIG_NVDIMM=3Dy
-+CONFIG_ACPI_NVDIMM=3Dy
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 8151fda239..d8f7b484ee 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -786,6 +786,7 @@ static
- void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
- {
-     VirtMachineClass *vmc =3D VIRT_MACHINE_GET_CLASS(vms);
-+    MachineState *ms =3D MACHINE(vms);
-     GArray *table_offsets;
-     unsigned dsdt, xsdt;
-     GArray *tables_blob =3D tables->table_data;
-@@ -826,6 +827,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuil=
-dTables *tables)
-         }
-     }
-=20
-+    if (ms->acpi_nvdimm_state.is_enabled) {
-+        nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
-+                          &ms->acpi_nvdimm_state, ms->ram_slots);
-+    }
-+
-     if (its_class_name() && !vmc->no_its) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_iort(tables_blob, tables->linker, vms);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 222b112b5a..0a04f5ca88 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -134,6 +134,7 @@ static const MemMapEntry base_memmap[] =3D {
-     [VIRT_GPIO] =3D               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =3D        { 0x09040000, 0x00001000 },
-     [VIRT_SMMU] =3D               { 0x09050000, 0x00020000 },
-+    [VIRT_NVDIMM_ACPI_IO] =3D     { 0x09070000, 0x00010000 },
-     [VIRT_MMIO] =3D               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that s=
-ize */
-     [VIRT_PLATFORM_BUS] =3D       { 0x0c000000, 0x02000000 },
-@@ -1641,6 +1642,19 @@ static void machvirt_init(MachineState *machine)
-=20
-     create_platform_bus(vms, pic);
-=20
-+    if (machine->acpi_nvdimm_state.is_enabled) {
-+        const struct AcpiGenericAddress arm_virt_nvdimm_acpi_dsmio =3D {
-+            .space_id =3D AML_AS_SYSTEM_MEMORY,
-+            .address =3D vms->memmap[VIRT_NVDIMM_ACPI_IO].base +
-+                       NVDIMM_ACPI_IO_BASE,
-+            .bit_width =3D NVDIMM_ACPI_IO_LEN << 3
-+        };
-+
-+        nvdimm_init_acpi_state(&machine->acpi_nvdimm_state, sysmem,
-+                               arm_virt_nvdimm_acpi_dsmio,
-+                               vms->fw_cfg, OBJECT(vms));
-+    }
-+
-     vms->bootinfo.ram_size =3D machine->ram_size;
-     vms->bootinfo.kernel_filename =3D machine->kernel_filename;
-     vms->bootinfo.kernel_cmdline =3D machine->kernel_cmdline;
-@@ -1825,11 +1839,20 @@ static void virt_memory_pre_plug(HotplugHandler *=
-hotplug_dev, DeviceState *dev,
- static void virt_memory_plug(HotplugHandler *hotplug_dev,
-                              DeviceState *dev, Error **errp)
- {
--    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
-+    MachineState *ms =3D MACHINE(hotplug_dev);
-+    bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-     Error *local_err =3D NULL;
-=20
--    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-+    pc_dimm_plug(PC_DIMM(dev), ms, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-=20
-+    if (is_nvdimm) {
-+        nvdimm_plug(&ms->acpi_nvdimm_state);
-+    }
-+
-+out:
-     error_propagate(errp, local_err);
- }
-=20
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 326a26b6d6..c8a4039f3f 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -37,6 +37,7 @@
- #include "hw/arm/arm.h"
- #include "sysemu/kvm.h"
- #include "hw/intc/arm_gicv3_common.h"
-+#include "hw/mem/nvdimm.h"
-=20
- #define NUM_GICV2M_SPIS       64
- #define NUM_VIRTIO_TRANSPORTS 32
-@@ -77,6 +78,7 @@ enum {
-     VIRT_GPIO,
-     VIRT_SECURE_UART,
-     VIRT_SECURE_MEM,
-+    VIRT_NVDIMM_ACPI_IO,
-     VIRT_LOWMEMMAP_LAST,
- };
-=20
---=20
-2.20.1
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
