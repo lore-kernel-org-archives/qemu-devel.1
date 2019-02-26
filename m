@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51334)
+Received: from eggs.gnu.org ([209.51.188.92]:59148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gylEr-0003LU-Ku
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:30:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gylyq-0001KE-SV
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 18:17:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gylEp-0006WC-QP
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:30:13 -0500
-Date: Tue, 26 Feb 2019 23:30:00 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20190226193408.23862-7-armbru@redhat.com>
-Message-ID: <alpine.BSF.2.21.9999.1902262329040.5023@zero.eik.bme.hu>
-References: <20190226193408.23862-1-armbru@redhat.com>
-	<20190226193408.23862-7-armbru@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gylyp-00077n-Ri
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 18:17:44 -0500
+Date: Wed, 27 Feb 2019 09:50:09 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190226225009.GR6872@umbus.fritz.box>
+References: <20190225162325.24008-1-maxiwell@linux.ibm.com>
+	<20190225232009.GB30778@kermit.br.ibm.com>
+	<20190226032103.GJ6872@umbus.fritz.box>
+	<20190226142126.jxosththzad6h6dd@maxibm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 06/11] sam460ex: Don't size flash memory
- to match backing image
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="VmyrZ50r30oK77nV"
+Content-Disposition: inline
+In-Reply-To: <20190226142126.jxosththzad6h6dd@maxibm>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr-rtas: add ibm,
+ get-vpd RTAS interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,103 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, qemu-ppc@nongnu.org
+To: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
+Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, qemu-devel@nongnu.org, "open list:sPAPR" <qemu-ppc@nongnu.org>
 
-On Tue, 26 Feb 2019, Markus Armbruster wrote:
-> Machine "sam460ex" maps its flash memory at address 0xFFF00000.  When
-> no image is supplied, its size is 1MiB (0x100000), and 512KiB of ROM
-> get mapped on top of its second half.  Else, it's the size of the
-> image rounded up to the next multiple of 64KiB.
->
-> The rounding is actually useless: pflash_cfi01_realize() fails with
-> "failed to read the initial flash content" unless it's a no-op.
->
-> I have no idea what happens when the pflash's size exceeds 1MiB.
-> Useful outcomes seem unlikely.
->
-> I guess memory at the end of the address space remains unmapped when
-> it's smaller than 1MiB.  Again, useful outcomes seem unlikely.
->
-> The physical hardware appears to have 512KiB of flash memory:
-> https://eu.mouser.com/datasheet/2/268/atmel_AT49BV040B-1180330.pdf
->
-> For now, just set the flash memory size to 1MiB regardless of image
-> size, and document the mess.
->
-> Cc: BALATON Zoltan <balaton@eik.bme.hu>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+--VmyrZ50r30oK77nV
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-BALATON Zoltan
+On Tue, Feb 26, 2019 at 11:21:26AM -0300, Maxiwell S. Garcia wrote:
+> On Tue, Feb 26, 2019 at 02:21:03PM +1100, David Gibson wrote:
+> > On Mon, Feb 25, 2019 at 08:20:09PM -0300, Murilo Opsfelder Araujo wrote:
+> > > Hi, Maxiwell.
+> > >=20
+> > > On Mon, Feb 25, 2019 at 01:23:25PM -0300, Maxiwell S. Garcia wrote:
+> > > > This adds a handler for ibm,get-vpd RTAS calls, allowing pseries
+> > > > guest to collect host information. It is disabled by default to
+> > > > avoid unwanted information leakage. To enable it, use:
+> > > > =E2=80=98-M pseries,vpd-export=3Don=E2=80=99
+> > >=20
+> > > The patch for setting host-serial and host-model already landed Gibso=
+n's
+> > > ppc-for-4.0 branch:
+> > >=20
+> > >   commit 9e584f45868f6945c1282c938278038cba0e4af2
+> > >   Author: Prasad J Pandit <pjp@fedoraproject.org>
+> > >   Date:   Mon Feb 18 23:43:49 2019 +0530
+> > >=20
+> > >       ppc: add host-serial and host-model machine attributes (CVE-201=
+9-8934)
+> > >=20
+> > >=20
+> > > QEMU should only return host-serial and host-model from the host if t=
+he
+> > > following combination of parameters are provided:
+> > >=20
+> > >   -M host-serial=3Dpassthrough,host-model=3Dpassthrough,vpd-export=3D=
+on
+> > >=20
+> > > If host-serial or host-model are set with a user-string, ibm,get-vpd =
+should
+> > > honor these values and return them, not exposing host information by =
+accident.
+> > >=20
+> > > I'm not even sure if we need vpd-export=3D<bool> setting. Its logic c=
+ould be
+> > > derived from the presence of host-serial=3Dpassthrough and host-model=
+=3Dpassthrough
+> > > options.
+> > >=20
+> > > What do you think?
+> >=20
+> > That's an excellent point - I hadn't thought through the fact that
+> > this is the same information exposed by those properties.  I do indeed
+> > think that exposing the same information set in those properties - and
+> > thereby avoiding the new machine option - would be a better plan.
+>=20
+> I saw that the patch was applied. So I will work in another patch
+> to use these properties and remove the export-vpd option.
 
-> ---
-> hw/ppc/sam460ex.c | 41 ++++++++++++++++++++++++++---------------
-> 1 file changed, 26 insertions(+), 15 deletions(-)
->
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> index 75250d49e4..0c919529f8 100644
-> --- a/hw/ppc/sam460ex.c
-> +++ b/hw/ppc/sam460ex.c
-> @@ -91,32 +91,43 @@ struct boot_info {
->
-> static int sam460ex_load_uboot(void)
-> {
-> +    /*
-> +     * This first creates 1MiB of flash memory mapped at the end of
-> +     * the 32-bit address space (0xFFF00000..0xFFFFFFFF).
-> +     *
-> +     * If_PFLASH unit 0 is defined, the flash memory is initialized
-> +     * from that block backend.
-> +     *
-> +     * Else, it's initialized to zero.  And then 512KiB of ROM get
-> +     * mapped on top of its second half (0xFFF80000..0xFFFFFFFF),
-> +     * initialized from u-boot-sam460-20100605.bin.
-> +     *
-> +     * This doesn't smell right.
-> +     *
-> +     * The physical hardware appears to have 512KiB flash memory.
-> +     *
-> +     * TODO Figure out what we really need here, and clean this up.
-> +     */
-> +
->     DriveInfo *dinfo;
-> -    BlockBackend *blk = NULL;
-> -    hwaddr base = FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32);
-> -    long bios_size = FLASH_SIZE;
-> -    int fl_sectors;
->
->     dinfo = drive_get(IF_PFLASH, 0, 0);
-> -    if (dinfo) {
-> -        blk = blk_by_legacy_dinfo(dinfo);
-> -        bios_size = blk_getlength(blk);
-> -    }
-> -    fl_sectors = (bios_size + 65535) >> 16;
-> -
-> -    if (!pflash_cfi01_register(base, NULL, "sam460ex.flash", bios_size,
-> -                               blk, 64 * KiB, fl_sectors,
-> +    if (!pflash_cfi01_register(FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32),
-> +                               NULL, "sam460ex.flash", FLASH_SIZE,
-> +                               dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                               64 * KiB, FLASH_SIZE / (64 * KiB),
->                                1, 0x89, 0x18, 0x0000, 0x0, 1)) {
->         error_report("Error registering flash memory");
->         /* XXX: return an error instead? */
->         exit(1);
->     }
->
-> -    if (!blk) {
-> +    if (!dinfo) {
->         /*error_report("No flash image given with the 'pflash' parameter,"
->                 " using default u-boot image");*/
-> -        base = UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32);
-> -        rom_add_file_fixed(UBOOT_FILENAME, base, -1);
-> +        rom_add_file_fixed(UBOOT_FILENAME,
-> +                           UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32),
-> +                           -1);
->     }
->
->     return 0;
->
+Sorry, should have said.  I did apply it, but I pulled it out again
+because of the point above.
+
+> Another thing that I thought the fact that 'host-serial' and 'host-model'
+> nodes in Device Tree are not in accordance with LoPAPR document. What
+> you think in use only get-vpd to get these information and remove
+> nodes from device tree?
+>=20
+>=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--VmyrZ50r30oK77nV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx1wqEACgkQbDjKyiDZ
+s5I8XA/+Ky5g05Aygc6Fk5ua73Zbw8zlIw7y7V+qpsFOI5xW9q5sJjVeLIRbexq6
+RKjy+UNdoo2DT+DXRy13k6z8rF0QXQqoownU39qaPeu32ZD64nefCo8i8+F8hcDp
+M/OnCJKb++HYjGDTSG3geXzhLXFDuSoytNKwalxZ3A0NXQuIGdfOJSt3M/D621wK
+z0y0zqhFw8NUvVDIqPW66FJjM3xOyQ1Hk19rqZRD77E4VznJ+yxBGtCdb1+9x8GQ
+j6cvtWpJKvDYzkW+FC8Oco+SgHbxY20GFa7o1zXJDYIg8V65CAX7d0t9oCqa7acQ
+341GpUuJxqdrTHKMk2YRcpUgqRGog5fwFiNlipejr1VOZ4GMdRMMGBiltZVM6kUH
+XgBQhtcRlRD98XhQ1830Oz/jq0LyIPRSaUGQD0HJt1LjYTXkatEBoVdmwOxgZmcA
+2ITcfd+34cM+xz/JtXfXC/8EMLqk9WMT13USK8Mcbzs4RTYj16o6tH5eao6kgNwb
+uLSf0mJkzmyseOmNFBCSLoe7NBkqujVumvofzDK/z09otXF6RmDfmvrLRXJ1By5M
+bU+DsHoJp/6FqflozuzXu1RrRHrtUbrUf1EA7rhei+5o4GwoFG/+wHi3QVYlhizG
+/XXSIa2qJoye5wJxUCy7xMm1baA2oyzrNbr/cgIWxdjKQlkAdNg=
+=NwDU
+-----END PGP SIGNATURE-----
+
+--VmyrZ50r30oK77nV--
