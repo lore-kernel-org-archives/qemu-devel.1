@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40305)
+Received: from eggs.gnu.org ([209.51.188.92]:40333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gyVRr-0005cR-71
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 00:38:35 -0500
+	(envelope-from <chen.zhang@intel.com>) id 1gyVRt-0005eB-Jt
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 00:38:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gyVRj-0008T3-Py
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 00:38:31 -0500
-Received: from mga11.intel.com ([192.55.52.93]:12519)
+	(envelope-from <chen.zhang@intel.com>) id 1gyVRr-0008UZ-43
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 00:38:37 -0500
+Received: from mga11.intel.com ([192.55.52.93]:12518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1gyVRd-0008Jc-S7
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 00:38:22 -0500
+	id 1gyVRg-0008JC-6m
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 00:38:27 -0500
 From: Zhang Chen <chen.zhang@intel.com >
-Date: Tue, 26 Feb 2019 13:34:32 +0800
-Message-Id: <20190226053434.6252-2-chen.zhang@intel.com>
-In-Reply-To: <20190226053434.6252-1-chen.zhang@intel.com>
-References: <20190226053434.6252-1-chen.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH 1/3] Migration/colo.c: Fix double close bug
- when occur COLO failover
+Date: Tue, 26 Feb 2019 13:34:31 +0800
+Message-Id: <20190226053434.6252-1-chen.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH 0/3] Migration/colo.c: Fix upstream bugs when
+ occur failover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +28,17 @@ Cc: Zhang Chen <chen.zhang@intel.com>
 
 From: Zhang Chen <chen.zhang@intel.com>
 
-In migration_incoming_state_destroy(void) will check the mis->to_src_file
-to double close the mis->to_src_file when occur COLO failover.
+Fix three bugs after COLO failover.
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- migration/colo.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 398b239d1c..a916dc178c 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -872,6 +872,7 @@ out:
-     /* Must be called after failover BH is completed */
-     if (mis->to_src_file) {
-         qemu_fclose(mis->to_src_file);
-+        mis->to_src_file = NULL;
-     }
-     migration_incoming_disable_colo();
- 
+Zhang Chen (3):
+  Migration/colo.c: Fix double close bug when occur COLO failover
+  Migration/colo.c: Fix COLO failover status error
+  Migration/colo.c: Make COLO node running after failover
+
+ migration/colo.c      | 9 +++++----
+ migration/migration.c | 3 +++
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
 -- 
 2.17.GIT
