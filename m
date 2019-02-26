@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58429)
+Received: from eggs.gnu.org ([209.51.188.92]:58435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlo-0005w7-8k
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlo-0005w9-HK
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUln-0003EQ-7V
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUln-0003EP-7d
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:08 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:48 +1100
-Message-Id: <20190226045304.25618-35-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:51 +1100
+Message-Id: <20190226045304.25618-38-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 34/50] xics: Write source state to KVM at claim
- time
+Subject: [Qemu-devel] [PULL 37/50] spapr_pci: add PHB unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,155 +22,221 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
 From: Greg Kurz <groug@kaod.org>
 
-The pseries machine only uses LSIs to support legacy PCI devices. Every
-PHB claims 4 LSIs at realize time. When using in-kernel XICS (or upcoming
-in-kernel XIVE), QEMU synchronizes the state of all irqs, including these
-LSIs, later on at machine reset.
+To support PHB hotplug we need to clean up lingering references,
+memory, child properties, etc. prior to the PHB object being
+finalized. Generally this will be called as a result of calling
+object_unparent() on the PHB object, which in turn would normally
+be called as the result of an unplug() operation.
 
-In order to support PHB hotplug, we need a way to tell KVM about the LSIs
-that doesn't require a machine reset. An easy way to do that is to always
-inform KVM when an interrupt is claimed, which really isn't a performance
+When the PHB is finalized, child objects will be unparented in
+turn, and finalized if the PHB was the only reference holder. so
+we don't bother to explicitly unparent child objects of the PHB,
+with the notable exception of DRCs. This is needed to avoid a QEMU
+crash when unplugging a PHB and resetting the machine before the
+guest could handle the event. The DRCs are removed from the QOM tree
+by  pci_unregister_root_bus() and we must make sure we're not leaving
+stale aliases under the global /dr-connector path.
+
+The formula that gives the number of DMA windows is moved to an
+inline function in the hw/pci-host/spapr.h header because it
+will have other users.
+
+The unrealize function is able to cope with partially realized PHBs.
+It is hence used to implement proper rollback on the realize error
 path.
 
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155059668360.1466090.5969630516627776426.stgit@bahia.lab.tou=
-louse-stg.fr.ibm.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <155059669881.1466090.13515030705986041517.stgit@bahia.lab.to=
+ulouse-stg.fr.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c        |  4 +++
- hw/intc/xics_kvm.c    | 74 +++++++++++++++++++++++++------------------
- include/hw/ppc/xics.h |  1 +
- 3 files changed, 48 insertions(+), 31 deletions(-)
+ hw/ppc/spapr_pci.c          | 86 +++++++++++++++++++++++++++++++++++--
+ include/hw/pci-host/spapr.h |  5 +++
+ 2 files changed, 87 insertions(+), 4 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 767fdeb829..af7dc709ab 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -758,6 +758,10 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool=
- lsi)
-=20
-     ics->irqs[srcno].flags |=3D
-         lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        ics_set_kvm_state_one(ics, srcno);
-+    }
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index e2bc9fec82..ede928b0bf 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1570,6 +1570,75 @@ static void spapr_pci_unplug_request(HotplugHandle=
+r *plug_handler,
+     }
  }
 =20
- static void xics_register_types(void)
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index a00d0a7962..c6e1b630a4 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -213,45 +213,57 @@ void ics_synchronize_state(ICSState *ics)
-     ics_get_kvm_state(ics);
- }
-=20
--int ics_set_kvm_state(ICSState *ics)
-+int ics_set_kvm_state_one(ICSState *ics, int srcno)
- {
-     uint64_t state;
--    int i;
-     Error *local_err =3D NULL;
-+    ICSIRQState *irq =3D &ics->irqs[srcno];
-+    int ret;
-=20
--    for (i =3D 0; i < ics->nr_irqs; i++) {
--        ICSIRQState *irq =3D &ics->irqs[i];
--        int ret;
--
--        state =3D irq->server;
--        state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MA=
-SK)
--            << KVM_XICS_PRIORITY_SHIFT;
--        if (irq->priority !=3D irq->saved_priority) {
--            assert(irq->priority =3D=3D 0xff);
--            state |=3D KVM_XICS_MASKED;
--        }
-+    state =3D irq->server;
-+    state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MASK)
-+        << KVM_XICS_PRIORITY_SHIFT;
-+    if (irq->priority !=3D irq->saved_priority) {
-+        assert(irq->priority =3D=3D 0xff);
-+        state |=3D KVM_XICS_MASKED;
-+    }
-=20
--        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
--            state |=3D KVM_XICS_LEVEL_SENSITIVE;
--            if (irq->status & XICS_STATUS_ASSERTED) {
--                state |=3D KVM_XICS_PENDING;
--            }
--        } else {
--            if (irq->status & XICS_STATUS_MASKED_PENDING) {
--                state |=3D KVM_XICS_PENDING;
--            }
-+    if (irq->flags & XICS_FLAGS_IRQ_LSI) {
-+        state |=3D KVM_XICS_LEVEL_SENSITIVE;
-+        if (irq->status & XICS_STATUS_ASSERTED) {
-+            state |=3D KVM_XICS_PENDING;
-         }
--        if (irq->status & XICS_STATUS_PRESENTED) {
--                state |=3D KVM_XICS_PRESENTED;
--        }
--        if (irq->status & XICS_STATUS_QUEUED) {
--                state |=3D KVM_XICS_QUEUED;
-+    } else {
-+        if (irq->status & XICS_STATUS_MASKED_PENDING) {
-+            state |=3D KVM_XICS_PENDING;
-         }
-+    }
-+    if (irq->status & XICS_STATUS_PRESENTED) {
-+        state |=3D KVM_XICS_PRESENTED;
-+    }
-+    if (irq->status & XICS_STATUS_QUEUED) {
-+        state |=3D KVM_XICS_QUEUED;
-+    }
++static void spapr_phb_finalizefn(Object *obj)
++{
++    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(obj);
 +
-+    ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
-+                            srcno + ics->offset, &state, true, &local_er=
-r);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return ret;
-+    }
-+
-+    return 0;
++    g_free(sphb->dtbusname);
++    sphb->dtbusname =3D NULL;
 +}
 +
-+int ics_set_kvm_state(ICSState *ics)
++static void spapr_phb_unrealize(DeviceState *dev, Error **errp)
 +{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
++    SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
++    PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
++    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(phb);
++    sPAPRTCETable *tcet;
 +    int i;
++    const unsigned windows_supported =3D spapr_phb_windows_supported(sph=
+b);
 +
-+    for (i =3D 0; i < ics->nr_irqs; i++) {
-+        int ret;
++    if (sphb->msi) {
++        g_hash_table_unref(sphb->msi);
++        sphb->msi =3D NULL;
++    }
++
++    /*
++     * Remove IO/MMIO subregions and aliases, rest should get cleaned
++     * via PHB's unrealize->object_finalize
++     */
++    for (i =3D windows_supported - 1; i >=3D 0; i--) {
++        tcet =3D spapr_tce_find_by_liobn(sphb->dma_liobn[i]);
++        if (tcet) {
++            memory_region_del_subregion(&sphb->iommu_root,
++                                        spapr_tce_get_iommu(tcet));
++        }
++    }
++
++    if (sphb->dr_enabled) {
++        for (i =3D PCI_SLOT_MAX * 8 - 1; i >=3D 0; i--) {
++            sPAPRDRConnector *drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PCI=
+,
++                                                    (sphb->index << 16) =
+| i);
++
++            if (drc) {
++                object_unparent(OBJECT(drc));
++            }
++        }
++    }
++
++    for (i =3D PCI_NUM_PINS - 1; i >=3D 0; i--) {
++        if (sphb->lsi_table[i].irq) {
++            spapr_irq_free(spapr, sphb->lsi_table[i].irq, 1);
++            sphb->lsi_table[i].irq =3D 0;
++        }
++    }
++
++    QLIST_REMOVE(sphb, list);
++
++    memory_region_del_subregion(&sphb->iommu_root, &sphb->msiwindow);
++
++    address_space_destroy(&sphb->iommu_as);
++
++    qbus_set_hotplug_handler(BUS(phb->bus), NULL, &error_abort);
++    pci_unregister_root_bus(phb->bus);
++
++    memory_region_del_subregion(get_system_memory(), &sphb->iowindow);
++    if (sphb->mem64_win_pciaddr !=3D (hwaddr)-1) {
++        memory_region_del_subregion(get_system_memory(), &sphb->mem64win=
+dow);
++    }
++    memory_region_del_subregion(get_system_memory(), &sphb->mem32window)=
+;
++}
++
+ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+ {
+     /* We don't use SPAPR_MACHINE() in order to exit gracefully if the u=
+ser
+@@ -1587,8 +1656,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+     PCIBus *bus;
+     uint64_t msi_window_size =3D 4096;
+     sPAPRTCETable *tcet;
+-    const unsigned windows_supported =3D
+-        sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
++    const unsigned windows_supported =3D spapr_phb_windows_supported(sph=
+b);
 =20
--        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
-ES,
--                                i + ics->offset, &state, true, &local_er=
-r);
--        if (local_err) {
--            error_report_err(local_err);
-+        ret =3D ics_set_kvm_state_one(ics, i);
-+        if (ret) {
-             return ret;
+     if (!spapr) {
+         error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries ma=
+chine");
+@@ -1745,6 +1813,10 @@ static void spapr_phb_realize(DeviceState *dev, Er=
+ror **errp)
+             if (local_err) {
+                 error_propagate_prepend(errp, local_err,
+                                         "can't allocate LSIs: ");
++                /*
++                 * Older machines will never support PHB hotplug, ie, th=
+is is an
++                 * init only path and QEMU will terminate. No need to ro=
+llback.
++                 */
+                 return;
+             }
          }
-     }
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index d36bbe11ee..eb65ad7e43 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -195,6 +195,7 @@ void icp_synchronize_state(ICPState *icp);
- void icp_kvm_realize(DeviceState *dev, Error **errp);
+@@ -1752,7 +1824,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+         spapr_irq_claim(spapr, irq, true, &local_err);
+         if (local_err) {
+             error_propagate_prepend(errp, local_err, "can't allocate LSI=
+s: ");
+-            return;
++            goto unrealize;
+         }
 =20
- void ics_get_kvm_state(ICSState *ics);
-+int ics_set_kvm_state_one(ICSState *ics, int srcno);
- int ics_set_kvm_state(ICSState *ics);
- void ics_synchronize_state(ICSState *ics);
- void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
+         sphb->lsi_table[i].irq =3D irq;
+@@ -1772,13 +1844,17 @@ static void spapr_phb_realize(DeviceState *dev, E=
+rror **errp)
+         if (!tcet) {
+             error_setg(errp, "Creating window#%d failed for %s",
+                        i, sphb->dtbusname);
+-            return;
++            goto unrealize;
+         }
+         memory_region_add_subregion(&sphb->iommu_root, 0,
+                                     spapr_tce_get_iommu(tcet));
+     }
+=20
+     sphb->msi =3D g_hash_table_new_full(g_int_hash, g_int_equal, g_free,=
+ g_free);
++    return;
++
++unrealize:
++    spapr_phb_unrealize(dev, NULL);
+ }
+=20
+ static int spapr_phb_children_reset(Object *child, void *opaque)
+@@ -1977,6 +2053,7 @@ static void spapr_phb_class_init(ObjectClass *klass=
+, void *data)
+=20
+     hc->root_bus_path =3D spapr_phb_root_bus_path;
+     dc->realize =3D spapr_phb_realize;
++    dc->unrealize =3D spapr_phb_unrealize;
+     dc->props =3D spapr_phb_properties;
+     dc->reset =3D spapr_phb_reset;
+     dc->vmsd =3D &vmstate_spapr_pci;
+@@ -1992,6 +2069,7 @@ static const TypeInfo spapr_phb_info =3D {
+     .name          =3D TYPE_SPAPR_PCI_HOST_BRIDGE,
+     .parent        =3D TYPE_PCI_HOST_BRIDGE,
+     .instance_size =3D sizeof(sPAPRPHBState),
++    .instance_finalize =3D spapr_phb_finalizefn,
+     .class_init    =3D spapr_phb_class_init,
+     .interfaces    =3D (InterfaceInfo[]) {
+         { TYPE_HOTPLUG_HANDLER },
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index f6e43f48fe..4b0443f4cf 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -165,4 +165,9 @@ static inline void spapr_phb_vfio_reset(DeviceState *=
+qdev)
+=20
+ void spapr_phb_dma_reset(sPAPRPHBState *sphb);
+=20
++static inline unsigned spapr_phb_windows_supported(sPAPRPHBState *sphb)
++{
++    return sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
++}
++
+ #endif /* PCI_HOST_SPAPR_H */
 --=20
 2.20.1
