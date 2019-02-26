@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48038)
+Received: from eggs.gnu.org ([209.51.188.92]:48034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyb6I-0005UB-Vk
+	(envelope-from <david@redhat.com>) id 1gyb6I-0005U7-VB
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:40:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyb6G-0007XE-EJ
+	(envelope-from <david@redhat.com>) id 1gyb6G-0007X4-DK
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:40:42 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 26 Feb 2019 12:39:08 +0100
-Message-Id: <20190226113915.20150-27-david@redhat.com>
+Date: Tue, 26 Feb 2019 12:39:10 +0100
+Message-Id: <20190226113915.20150-29-david@redhat.com>
 In-Reply-To: <20190226113915.20150-1-david@redhat.com>
 References: <20190226113915.20150-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 26/33] s390x/tcg: Implement VECTOR SCATTER
- ELEMENT
+Subject: [Qemu-devel] [PATCH v1 28/33] s390x/tcg: Implement VECTOR SIGN
+ EXTEND TO DOUBLEWORD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Similar to VECTOR GATHER ELEMENT, but the other direction.
+Load both elements signed and store them into the two 64 bit elements.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      |  3 +++
- target/s390x/translate_vx.inc.c | 22 ++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 9aa508547b..4159ec36f9 100644
+index a8d43b588c..ab3309c54b 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1028,6 +1028,9 @@
-     F(0xe74d, VREP,    VRI_c, V,   0, 0, 0, 0, vrep, 0, IF_VEC)
- /* VECTOR REPLICATE IMMEDIATE */
-     F(0xe745, VREPI,   VRI_a, V,   0, 0, 0, 0, vrepi, 0, IF_VEC)
-+/* VECTOR SCATTER ELEMENT */
-+    E(0xe71b, VSCEF,   VRV,   V,   la2, 0, 0, 0, vsce, 0, MO_32, IF_VEC)
-+    E(0xe71a, VSCEG,   VRV,   V,   la2, 0, 0, 0, vsce, 0, MO_64, IF_VEC)
+@@ -1033,6 +1033,8 @@
+     E(0xe71a, VSCEG,   VRV,   V,   la2, 0, 0, 0, vsce, 0, MO_64, IF_VEC)
+ /* VECTOR SELECT */
+     F(0xe78d, VSEL,    VRR_e, V,   0, 0, 0, 0, vsel, 0, IF_VEC)
++/* VECTOR SIGN EXTEND TO DOUBLEWORD */
++    F(0xe75f, VSEG,    VRR_a, V,   0, 0, 0, 0, vseg, 0, IF_VEC)
  
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index 761f3dc723..344ac36f93 100644
+index d3463c9ef3..23cdae0970 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -666,3 +666,25 @@ static DisasJumpType op_vrepi(DisasContext *s, DisasOps *o)
-     tcg_temp_free_i64(tmp);
+@@ -731,3 +731,36 @@ static DisasJumpType op_vsel(DisasContext *s, DisasOps *o)
+                get_field(s->fields, v3), get_field(s->fields, v4), &gvec_op);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vsce(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vseg(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t es = s->insn->data;
-+    const uint8_t enr = get_field(s->fields, m3);
++    const uint8_t es = get_field(s->fields, m3);
++    int idx1, idx2;
 +    TCGv_i64 tmp;
 +
-+    if (!valid_vec_element(enr, es)) {
++    switch (es) {
++    case MO_8:
++        idx1 = 7;
++        idx2 = 15;
++        break;
++    case MO_16:
++        idx1 = 3;
++        idx2 = 7;
++        break;
++    case MO_32:
++        idx1 = 1;
++        idx2 = 3;
++        break;
++    default:
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
 +    }
 +
 +    tmp = tcg_temp_new_i64();
-+    read_vec_element_i64(tmp, get_field(s->fields, v2), enr, es);
-+    tcg_gen_add_i64(o->addr1, o->addr1, tmp);
-+    gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 0);
-+
-+    read_vec_element_i64(tmp, get_field(s->fields, v1), enr, es);
-+    tcg_gen_qemu_st_i64(tmp, o->addr1, get_mem_index(s), MO_TE | es);
++    read_vec_element_i64(tmp, get_field(s->fields, v2), idx1, es | MO_SIGN);
++    write_vec_element_i64(tmp, get_field(s->fields, v1), 0, MO_64);
++    read_vec_element_i64(tmp, get_field(s->fields, v2), idx2, es | MO_SIGN);
++    write_vec_element_i64(tmp, get_field(s->fields, v1), 1, MO_64);
 +    tcg_temp_free_i64(tmp);
 +    return DISAS_NEXT;
 +}
