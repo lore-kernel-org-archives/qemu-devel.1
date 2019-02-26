@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40847)
+Received: from eggs.gnu.org ([209.51.188.92]:41253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gyi5M-0002RR-Mf
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:08:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gyi6o-0003fX-Py
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:09:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gyi5L-0003cP-6c
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:08:12 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40269)
+	(envelope-from <peter.maydell@linaro.org>) id 1gyi6n-0004Fv-Ob
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:09:42 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37056)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gyi5K-0003SN-A3
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:08:10 -0500
-Received: by mail-wm1-x342.google.com with SMTP id g20so2601723wmh.5
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 11:07:49 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gyi6n-0004FU-I4
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:09:41 -0500
+Received: by mail-oi1-x241.google.com with SMTP id w66so11281918oia.4
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 11:09:41 -0800 (PST)
 MIME-Version: 1.0
-References: <20190208112357.31615-1-marcandre.lureau@redhat.com>
-	<20190221110754-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CL5fyMyUX6=OEqsAoEKA8QeeybUvL3C6Q3to1DdBqOBTA@mail.gmail.com>
-	<20190226135226-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190226135226-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 26 Feb 2019 20:07:35 +0100
-Message-ID: <CAJ+F1CJe-CqLaBmRBSL0qK=pnVcsS-rndM3TVhZpTPdf=ejbkw@mail.gmail.com>
+References: <20190225123111.30363-1-berrange@redhat.com>
+	<CAFEAcA9_AeKMZxrGE7pSp0j1JSSWTLCk2g7aP=QCtTWGNFposQ@mail.gmail.com>
+	<41d3532c-0ab4-db82-dc9a-cc9fb45c6162@redhat.com>
+In-Reply-To: <41d3532c-0ab4-db82-dc9a-cc9fb45c6162@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Feb 2019 19:09:29 +0000
+Message-ID: <CAFEAcA-zo+mVS_H7dU2uM83Ndv_f_0BDSBS_jxJs1e7L+=0R5w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/13] vhost-user-backend &
- vhost-user-input
+Subject: Re: [Qemu-devel] [PULL 00/11] Merge authz core patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,144 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
 
-Hi
-
-On Tue, Feb 26, 2019 at 7:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+On Tue, 26 Feb 2019 at 19:07, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
 >
-> On Tue, Feb 26, 2019 at 05:38:32PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
+> On 2/26/19 8:04 PM, Peter Maydell wrote:
+> > On Mon, 25 Feb 2019 at 12:35, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> >>
+> >> The following changes since commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62=
+be116:
+> >>
+> >>   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-201=
+90221.0' into staging (2019-02-22 15:48:04 +0000)
+> >>
+> >> are available in the Git repository at:
+> >>
+> >>   https://github.com/berrange/qemu tags/authz-core-pull-request
+> >>
+> >> for you to fetch changes up to cfde05c6c0db7d3122a5491d50f62f7910ab8ab=
+b:
+> >>
+> >>   authz: delete existing ACL implementation (2019-02-25 12:28:25 +0000=
+)
+> >>
+> >> ----------------------------------------------------------------
+> >> Add a standard authorization framework
+> >>
+> >> The current network services now support encryption via TLS and in som=
+e
+> >> cases support authentication via SASL. In cases where SASL is not
+> >> available, x509 client certificates can be used as a crude authorizati=
+on
+> >> scheme, but using a sub-CA and controlling who you give certs to. In
+> >> general this is not very flexible though, so this series introduces a
+> >> new standard authorization framework.
+> >>
 > >
-> > On Thu, Feb 21, 2019 at 5:09 PM Michael S. Tsirkin <mst@redhat.com> wro=
-te:
-> > >
-> > > On Fri, Feb 08, 2019 at 12:23:44PM +0100, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> > > > Hi,
-> > > >
-> > > > This series is based on previously discussed "[PATCH v4 00/29]
-> > > > vhost-user for input & GPU" and "vhost-user: define conventions for
-> > > > vhost-user backends" work. The GPU part is left off for now.
-> > > >
-> > > > This series introduces a "vhost-user-backend": an helper object to =
-be
-> > > > used by vhost-user devices to ease with backend initialization and
-> > > > handling. As a simple showcase, a "vhost-user-input-pci" device is
-> > > > introduced, which can be used with the "contrib: add vhost-user-inp=
-ut"
-> > > > example. vhost-user-input isn't meant to be installed, discovered o=
-r
-> > > > used by libvirt: no installation is done (no vhost-user JSON file i=
-s
-> > > > provided either).
-> > > >
-> > > > thanks
-> > >
-> > > Gerd could you please review this?
-> > > Thanks!
-> >
-> > Except the last patch that (to drop?), are you queuing this series or
-> > expecting me to do something else?
-> >
-> > thanks
+> > Applied, thanks.
 >
-> Besides acks I also see unaddressed comments by Daniel and others.
+> Argh there is a v2... Daniel didn't NACK'd this one.
 
->From v3? Yes, there is one field in a struct that should be removed, I
-forgot. Gerd can do that on commit, or I can resend the whole thing.
-
-https://patchew.org/QEMU/20190208112357.31615-1-marcandre.lureau@redhat.com=
-/20190208112357.31615-7-marcandre.lureau@redhat.com/
-
-Anything else I missed from earlier versions?
+Oops. Yes, I process my pullreq queue oldest-first and unless you
+follow up to the cover letter to say "don't apply this v1" I'm
+not necessarily going to notice a v2. I'm afraid you'll have to
+send whatever the v1->v2 fixes were as a separate set of patches now.
 
 thanks
-
->
-> > >
-> > > > v3:
-> > > > - add previously sent patch "libvhost-user: fix clang enum-conversi=
-on
-> > > >   warning" to fix clang build
-> > > > - "define conventions for vhost-user backends" updates after Eric r=
-eview
-> > > > - Drop user-creatable from vhost-user-backend
-> > > > - Make vhost-user-input-pci take a chardev=3D (instead of vhost-use=
-r=3D)
-> > > >
-> > > > v2:
-> > > > - rebased (VhostUserInputPCI got most of the changes, due to split)
-> > > > - added "RFC: add explicit can_migrate to
-> > > >   vhost_user_backend_dev_init()" to attempt to address Michael
-> > > >   concerns about migration.
-> > > >
-> > > > Marc-Andr=C3=A9 Lureau (13):
-> > > >   libvhost-user: fix clang enum-conversion warning
-> > > >   vhost-user: define conventions for vhost-user backends
-> > > >   vhost-user: simplify vhost_user_init/vhost_user_cleanup
-> > > >   libvhost-user: exit by default on VHOST_USER_NONE
-> > > >   vhost-user: wrap some read/write with retry handling
-> > > >   Add vhost-user-backend
-> > > >   vhost-user: split vhost_user_read()
-> > > >   vhost-user: add vhost_user_input_get_config()
-> > > >   libvhost-user-glib: export vug_source_new()
-> > > >   libvhost-user: add vu_queue_unpop()
-> > > >   Add vhost-user-input-pci
-> > > >   contrib: add vhost-user-input
-> > > >   RFC: add explicit can_migrate to vhost_user_backend_dev_init()
-> > > >
-> > > >  contrib/libvhost-user/libvhost-user-glib.h |   3 +
-> > > >  contrib/libvhost-user/libvhost-user.h      |  17 +-
-> > > >  include/hw/virtio/vhost-backend.h          |   4 +
-> > > >  include/hw/virtio/vhost-user-blk.h         |   2 +-
-> > > >  include/hw/virtio/vhost-user-scsi.h        |   2 +-
-> > > >  include/hw/virtio/vhost-user.h             |   2 +-
-> > > >  include/hw/virtio/virtio-input.h           |  14 +
-> > > >  include/sysemu/vhost-user-backend.h        |  60 ++++
-> > > >  backends/cryptodev-vhost-user.c            |  18 +-
-> > > >  backends/vhost-user.c                      | 218 +++++++++++
-> > > >  contrib/libvhost-user/libvhost-user-glib.c |  11 +-
-> > > >  contrib/libvhost-user/libvhost-user.c      |  19 +-
-> > > >  contrib/vhost-user-input/main.c            | 398 +++++++++++++++++=
-++++
-> > > >  hw/block/vhost-user-blk.c                  |  22 +-
-> > > >  hw/input/vhost-user-input.c                | 104 ++++++
-> > > >  hw/scsi/vhost-user-scsi.c                  |  20 +-
-> > > >  hw/virtio/vhost-stub.c                     |   4 +-
-> > > >  hw/virtio/vhost-user-input-pci.c           |  53 +++
-> > > >  hw/virtio/vhost-user.c                     | 118 +++++-
-> > > >  net/vhost-user.c                           |  13 +-
-> > > >  MAINTAINERS                                |   5 +
-> > > >  Makefile                                   |   3 +
-> > > >  Makefile.objs                              |   1 +
-> > > >  backends/Makefile.objs                     |   3 +-
-> > > >  configure                                  |   3 +
-> > > >  contrib/vhost-user-input/Makefile.objs     |   1 +
-> > > >  default-configs/virtio.mak                 |   1 +
-> > > >  docs/interop/vhost-user.json               | 232 ++++++++++++
-> > > >  docs/interop/vhost-user.txt                | 109 +++++-
-> > > >  hw/input/Makefile.objs                     |   1 +
-> > > >  hw/virtio/Makefile.objs                    |   1 +
-> > > >  31 files changed, 1375 insertions(+), 87 deletions(-)
-> > > >  create mode 100644 include/sysemu/vhost-user-backend.h
-> > > >  create mode 100644 backends/vhost-user.c
-> > > >  create mode 100644 contrib/vhost-user-input/main.c
-> > > >  create mode 100644 hw/input/vhost-user-input.c
-> > > >  create mode 100644 hw/virtio/vhost-user-input-pci.c
-> > > >  create mode 100644 contrib/vhost-user-input/Makefile.objs
-> > > >  create mode 100644 docs/interop/vhost-user.json
-> > > >
-> > > > --
-> > > > 2.20.1.519.g8feddda32c
-> > >
-> >
-> >
-> > --
-> > Marc-Andr=C3=A9 Lureau
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+-- PMM
