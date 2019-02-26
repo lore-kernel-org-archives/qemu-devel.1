@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49507)
+Received: from eggs.gnu.org ([209.51.188.92]:50113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gybCY-0001u8-Cy
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:47:12 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gybEN-0003GF-W5
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:49:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gybCW-0002t2-Cp
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:47:10 -0500
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:36784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gybCU-0002nr-PF
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:47:08 -0500
-Received: by mail-ot1-x330.google.com with SMTP id v62so10811739otb.3
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 03:47:00 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1gybEM-0004di-Hf
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:49:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:2928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gybEK-0004bF-GY
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:49:01 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DBA94C053FCD
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 11:48:58 +0000 (UTC)
+Date: Tue, 26 Feb 2019 11:48:52 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190226114852.GE2721@work-vm>
+References: <20190220125755.3906-1-quintela@redhat.com>
+	<20190220125755.3906-2-quintela@redhat.com>
 MIME-Version: 1.0
-References: <CAFEAcA-GYE98ceYOHQ5hGwb-Dh8qv=Jvr=EEp_Dk9YLCmQdA4g@mail.gmail.com>
-In-Reply-To: <CAFEAcA-GYE98ceYOHQ5hGwb-Dh8qv=Jvr=EEp_Dk9YLCmQdA4g@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Feb 2019 11:46:46 +0000
-Message-ID: <CAFEAcA9295VBXHWzraE_ykcD+-1cLOMS158Lyf+gQxzumxV=xA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] can we disable the migration-test for TCG targets ?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190220125755.3906-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Add multifd-compress
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,291 +34,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, 25 Feb 2019 at 14:00, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> Hi; the migration-test is failing really frequently for me
-> for TCG targets (usually on sparc64 host) -- can we just disable
-> it from the test set until we've figured out and implemented a
-> fix for the underlying TCG bug, please?
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hmp.c                        | 17 +++++++++++++++++
+>  hw/core/qdev-properties.c    | 11 +++++++++++
+>  include/hw/qdev-properties.h |  1 +
+>  migration/migration.c        | 25 +++++++++++++++++++++++++
+>  migration/migration.h        |  1 +
+>  qapi/common.json             | 15 +++++++++++++++
+>  qapi/migration.json          | 20 ++++++++++++++++----
+>  7 files changed, 86 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 34edad6ea3..abbd49ec17 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -422,6 +422,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>          monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_CHANNELS),
+>              params->multifd_channels);
+> +        monitor_printf(mon, "%s: %s\n",
+> +            MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_COMPRESS),
+> +            MultifdCompress_str(params->multifd_compress));
+>          monitor_printf(mon, "%s: %" PRIu64 "\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+>              params->xbzrle_cache_size);
+> @@ -1690,6 +1693,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>      MigrateSetParameters *p = g_new0(MigrateSetParameters, 1);
+>      uint64_t valuebw = 0;
+>      uint64_t cache_size;
+> +    int compress_type;
+>      Error *err = NULL;
+>      int val, ret;
+>  
+> @@ -1769,6 +1773,19 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>          p->has_multifd_channels = true;
+>          visit_type_int(v, param, &p->multifd_channels, &err);
+>          break;
+> +    case MIGRATION_PARAMETER_MULTIFD_COMPRESS:
+> +        p->has_multifd_compress = true;
+> +        visit_type_enum(v, param, &compress_type,
+> +                        &MultifdCompress_lookup, &err);
+> +        if (err) {
+> +            break;
+> +        }
+> +        if (compress_type < 0 || compress_type > MULTIFD_COMPRESS__MAX) {
 
-Here's a backtrace from the hang.
+I think that needs to be >= rather than >
+(Actually it surprises me visit_type_enum doesn't turn those cases into
+errors)
 
-Process status:
-pm215    125126 35.8  0.0  17896  4008 pts/2    S+   13:51  18:09
-            \_ tests/migration-test -m=quick -k --tap
-pm215    125450  126  0.2 901808 151184 pts/2   Sl+  13:51  64:17
-            |   \_ aarch64-softmmu/qemu-system-aarch64 -qtest
-unix:/tmp/qtest-125126.
-pm215    125560  0.0  0.1 755368 68960 pts/2    Sl+  13:51   0:00
-            |   \_ aarch64-softmmu/qemu-system-aarch64 -qtest
-unix:/tmp/qtest-125126.
+> +            error_setg(&err, "Invalid multifd_compress option %s", valuestr);
+> +            break;
+> +        }
+> +        p->multifd_compress = compress_type;
+> +        break;
+>      case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
+>          p->has_xbzrle_cache_size = true;
+>          visit_type_size(v, param, &cache_size, &err);
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 5da1439a8b..7c8e71532f 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -645,6 +645,17 @@ const PropertyInfo qdev_prop_fdc_drive_type = {
+>      .set_default_value = set_default_value_enum,
+>  };
+>  
+> +/* --- MultifdCompress --- */
+> +
+> +const PropertyInfo qdev_prop_multifd_compress = {
+> +    .name = "MultifdCompress",
+> +    .description = "multifd_compress values",
+> +    .enum_table = &MultifdCompress_lookup,
+> +    .get = get_enum,
+> +    .set = set_enum,
+> +    .set_default_value = set_default_value_enum,
+> +};
+> +
+>  /* --- pci address --- */
+>  
+>  /*
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index b6758c852e..ac452d8f2c 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -23,6 +23,7 @@ extern const PropertyInfo qdev_prop_tpm;
+>  extern const PropertyInfo qdev_prop_ptr;
+>  extern const PropertyInfo qdev_prop_macaddr;
+>  extern const PropertyInfo qdev_prop_on_off_auto;
+> +extern const PropertyInfo qdev_prop_multifd_compress;
+>  extern const PropertyInfo qdev_prop_losttickpolicy;
+>  extern const PropertyInfo qdev_prop_blockdev_on_error;
+>  extern const PropertyInfo qdev_prop_bios_chs_trans;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index f246519ec8..568ec8530f 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -81,6 +81,7 @@
+>  /* The delay time (in ms) between two COLO checkpoints */
+>  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+>  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+> +#define DEFAULT_MIGRATE_MULTIFD_COMPRESS false
 
-(This isn't specific to aarch64 guests, I've seen others.)
+Shouldn't that be an enum value?
 
-Backtrace of migration-test:
-#0  0xfff8000100f8f9c8 in __GI___nanosleep
-(requested_time=0x7feff8c2618, remaining=0x0) at
-../sysdeps/unix/sysv/linux/nanosleep.c:28
-#1  0xfff8000100fbd1f4 in usleep (useconds=<optimized out>) at
-../sysdeps/posix/usleep.c:32
-#2  0x000001000000a380 in wait_for_migration_pass (who=0x10000161cd0)
-at /home/pm215/qemu/tests/migration-test.c:279
-#3  0x000001000000ab44 in migrate_postcopy_prepare
-(from_ptr=0x7feff8c2868, to_ptr=0x7feff8c2870, hide_error=<optimized
-out>)
-    at /home/pm215/qemu/tests/migration-test.c:627
-#4  0x000001000000b384 in test_postcopy () at
-/home/pm215/qemu/tests/migration-test.c:653
-#5  0xfff8000100496370 in ?? () from /usr/lib/sparc64-linux-gnu/libglib-2.0.so.0
+>  /* Background transfer rate for postcopy, 0 means unlimited, note
+>   * that page requests can still exceed this limit.
+> @@ -748,6 +749,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>      params->block_incremental = s->parameters.block_incremental;
+>      params->has_multifd_channels = true;
+>      params->multifd_channels = s->parameters.multifd_channels;
+> +    params->has_multifd_compress = true;
+> +    params->multifd_compress = s->parameters.multifd_compress;
+>      params->has_xbzrle_cache_size = true;
+>      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
+>      params->has_max_postcopy_bandwidth = true;
+> @@ -1191,6 +1194,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+>      if (params->has_multifd_channels) {
+>          dest->multifd_channels = params->multifd_channels;
+>      }
+> +    if (params->has_multifd_compress) {
+> +        dest->multifd_compress = params->multifd_compress;
+> +    }
+>      if (params->has_xbzrle_cache_size) {
+>          dest->xbzrle_cache_size = params->xbzrle_cache_size;
+>      }
+> @@ -1269,6 +1275,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+>      if (params->has_multifd_channels) {
+>          s->parameters.multifd_channels = params->multifd_channels;
+>      }
+> +    if (params->has_multifd_compress) {
+> +        s->parameters.multifd_compress = params->multifd_compress;
+> +    }
+>      if (params->has_xbzrle_cache_size) {
+>          s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+>          xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+> @@ -2008,6 +2017,15 @@ bool migrate_use_multifd(void)
+>      return s->enabled_capabilities[MIGRATION_CAPABILITY_MULTIFD];
+>  }
+>  
+> +bool migrate_use_multifd_zlib(void)
+> +{
+> +    MigrationState *s;
+> +
+> +    s = migrate_get_current();
+> +
+> +    return s->parameters.multifd_compress == MULTIFD_COMPRESS_ZLIB;
+> +}
+> +
+>  bool migrate_pause_before_switchover(void)
+>  {
+>      MigrationState *s;
+> @@ -3220,6 +3238,9 @@ void migration_global_dump(Monitor *mon)
+>  #define DEFINE_PROP_MIG_CAP(name, x)             \
+>      DEFINE_PROP_BOOL(name, MigrationState, enabled_capabilities[x], false)
+>  
+> +#define DEFINE_PROP_MULTIFD_COMPRESS(_n, _s, _f, _d) \
+> +    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_multifd_compress, MultifdCompress)
+> +
+>  static Property migration_properties[] = {
+>      DEFINE_PROP_BOOL("store-global-state", MigrationState,
+>                       store_global_state, true),
+> @@ -3260,6 +3281,9 @@ static Property migration_properties[] = {
+>      DEFINE_PROP_UINT8("multifd-channels", MigrationState,
+>                        parameters.multifd_channels,
+>                        DEFAULT_MIGRATE_MULTIFD_CHANNELS),
+> +    DEFINE_PROP_MULTIFD_COMPRESS("multifd-compress", MigrationState,
+> +                      parameters.multifd_compress,
+> +                      DEFAULT_MIGRATE_MULTIFD_COMPRESS),
+>      DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+>                        parameters.xbzrle_cache_size,
+>                        DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
+> @@ -3337,6 +3361,7 @@ static void migration_instance_init(Object *obj)
+>      params->has_x_checkpoint_delay = true;
+>      params->has_block_incremental = true;
+>      params->has_multifd_channels = true;
+> +    params->has_multifd_compress = true;
+>      params->has_xbzrle_cache_size = true;
+>      params->has_max_postcopy_bandwidth = true;
+>      params->has_max_cpu_throttle = true;
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 7e03643683..646614f71b 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -267,6 +267,7 @@ bool migrate_dirty_bitmaps(void);
+>  
+>  bool migrate_auto_converge(void);
+>  bool migrate_use_multifd(void);
+> +bool migrate_use_multifd_zlib(void);
+>  bool migrate_pause_before_switchover(void);
+>  int migrate_multifd_channels(void);
+>  
+> diff --git a/qapi/common.json b/qapi/common.json
+> index 99d313ef3b..ccdd58d21b 100644
+> --- a/qapi/common.json
+> +++ b/qapi/common.json
+> @@ -193,3 +193,18 @@
+>               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+>               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
+>               'x86_64', 'xtensa', 'xtensaeb' ] }
+> +
+> +##
+> +# @MultifdCompress:
+> +#
+> +# An enumeration of multifd compression.
+> +#
+> +# @none: no compression.
+> +#
+> +# @zlib: Compress using zlib.
+> +#
+> +# Since: 3.1
 
-Backtrace of process 125450:
-Thread 6 (Thread 0xfff800012de0b900 (LWP 127434)):
-#0  0xfff80001034c5cdc in futex_abstimed_wait_cancelable (private=0,
-abstime=0xfff800012de09f88, expected=0, futex_word=0x10001236574)
-    at ../sysdeps/unix/sysv/linux/futex-internal.h:205
-#1  0xfff80001034c5cdc in do_futex_wait (sem=0x3c,
-abstime=0xfff800012de09f88) at sem_waitcommon.c:111
-#2  0xfff80001034c5e00 in __new_sem_wait_slow (sem=0x10001236570,
-abstime=0xfff800012de09f88) at sem_waitcommon.c:181
-#3  0x000001000091dacc in qemu_sem_timedwait (sem=0x10001236570,
-ms=<optimized out>) at /home/pm215/qemu/util/qemu-thread-posix.c:289
-#4  0x000001000078ae28 in migration_thread (opaque=0x100012364a0) at
-/home/pm215/qemu/migration/migration.c:3125
-#5  0x000001000091cdb0 in qemu_thread_start (args=0x1000175e730) at
-/home/pm215/qemu/util/qemu-thread-posix.c:502
-#6  0xfff80001034bbe68 in start_thread (arg=0xfff800012de0b900) at
-pthread_create.c:486
-#7  0xfff80001036c00b8 in __thread_start () at
-../sysdeps/unix/sysv/linux/sparc/sparc64/clone.S:78
+4.
 
-Thread 5 (Thread 0xfff80001139cb900 (LWP 127433)):
-#0  0xfff80001034c7e0c in __libc_recvmsg (flags=1073741824,
-msg=0xfff80001139c9930, fd=17) at
-../sysdeps/unix/sysv/linux/recvmsg.c:28
-#1  0xfff80001034c7e0c in __libc_recvmsg (fd=<optimized out>,
-msg=0xfff80001139c9930, flags=<optimized out>) at
-../sysdeps/unix/sysv/linux/recvmsg.c:25
-#2  0x00000100008ae9e0 in qio_channel_socket_readv (ioc=<optimized
-out>, iov=<optimized out>, niov=<optimized out>, fds=0x0, nfds=0x0,
-errp=0x0)
-    at /home/pm215/qemu/io/channel-socket.c:484
-#3  0x00000100008ab428 in qio_channel_readv_full (ioc=0x100019f9e00,
-iov=0xfff80001139c9b28, niov=1, fds=0x0, nfds=0x0, errp=0x0)
-    at /home/pm215/qemu/io/channel.c:65
-#4  0x00000100008ab594 in qio_channel_read (ioc=0x100019f9e00,
-buf=0x100012ad938 "", buflen=32768, errp=0x0) at
-/home/pm215/qemu/io/channel.c:216
-#5  0x000001000079bb58 in channel_get_buffer (opaque=0x100019f9e00,
-buf=0x100012ad938 "", pos=8, size=32768)
-    at /home/pm215/qemu/migration/qemu-file-channel.c:84
-#6  0x0000010000799d7c in qemu_fill_buffer (f=0x100012ad900) at
-/home/pm215/qemu/migration/qemu-file.c:297
-#7  0x000001000079abe4 in qemu_peek_byte (f=0x100012ad900,
-offset=<optimized out>) at /home/pm215/qemu/migration/qemu-file.c:557
-#8  0x000001000079aef0 in qemu_get_byte (f=0x100012ad900) at
-/home/pm215/qemu/migration/qemu-file.c:642
-#9  0x000001000079aef0 in qemu_get_be16 (f=0x100012ad900) at
-/home/pm215/qemu/migration/qemu-file.c:642
-#10 0x000001000078862c in source_return_path_thread
-(opaque=0x100012364a0) at /home/pm215/qemu/migration/migration.c:2206
-#11 0x000001000091cdb0 in qemu_thread_start (args=0x10001257600) at
-/home/pm215/qemu/util/qemu-thread-posix.c:502
-#12 0xfff80001034bbe68 in start_thread (arg=0xfff80001139cb900) at
-pthread_create.c:486
-#13 0xfff80001036c00b8 in __thread_start () at
-../sysdeps/unix/sysv/linux/sparc/sparc64/clone.S:78
+> +#
+> +##
+> +{ 'enum': 'MultifdCompress',
+> +  'data': [ 'none', 'zlib' ] }
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index c202703889..a882fc0823 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -558,6 +558,10 @@
+>  #
+>  # @max-cpu-throttle: maximum cpu throttle percentage.
+>  #                    Defaults to 99. (Since 3.1)
+> +#
+> +# @multifd-compress: What compression method to use.
+> +#                    Defaults to none. (Since 4.0)
+> +#
 
-Thread 4 (Thread 0xfff8000112e83900 (LWP 125524)):
-#0  0x000001000039cdec in cpu_physical_memory_get_dirty
-(start=54124544, client=<optimized out>, length=1) at
-/home/pm215/qemu/include/exec/ram_addr.h:144
-#1  0x000001000039eec4 in cpu_physical_memory_get_dirty_flag
-(client=1, addr=54124544) at
-/home/pm215/qemu/include/exec/ram_addr.h:214
-#2  0x000001000039eec4 in cpu_physical_memory_is_clean (addr=54124544)
-at /home/pm215/qemu/include/exec/ram_addr.h:214
-#3  0x000001000039eec4 in tlb_set_page_with_attrs
-    (cpu=<optimized out>, vaddr=<optimized out>, paddr=<optimized
-out>, attrs=..., prot=<optimized out>, mmu_idx=<optimized out>,
-size=<optimized out>)
-    at /home/pm215/qemu/accel/tcg/cputlb.c:819
-#4  0x000001000050fb58 in arm_tlb_fill (cs=0x10001258b60,
-address=1127866368, access_type=<optimized out>, mmu_idx=<optimized
-out>, fi=<optimized out>)
-    at /home/pm215/qemu/target/arm/helper.c:11914
-#5  0x00000100004f6e1c in tlb_fill
-    (cs=0x10001258b60, addr=1127866368, size=<optimized out>,
-access_type=<optimized out>, mmu_idx=<optimized out>,
-retaddr=18444492278459273036)
-    at /home/pm215/qemu/target/arm/op_helper.c:206
-#6  0x000001000039f5a8 in helper_ret_ldub_mmu (env=0x10001260fd0,
-addr=1127866368, oi=<optimized out>, retaddr=18444492278459273036)
-    at /home/pm215/qemu/target/arm/cpu.h:919
-#7  0xfff8000110000f54 in code_gen_buffer ()
-#8  0x00000100003c0688 in cpu_tb_exec (itb=<optimized out>,
-cpu=<optimized out>) at /home/pm215/qemu/accel/tcg/cpu-exec.c:171
-#9  0x00000100003c0688 in cpu_loop_exec_tb (tb_exit=<synthetic
-pointer>, last_tb=<synthetic pointer>, tb=<optimized out>,
-cpu=<optimized out>)
-    at /home/pm215/qemu/accel/tcg/cpu-exec.c:618
-#10 0x00000100003c0688 in cpu_exec (cpu=<optimized out>) at
-/home/pm215/qemu/accel/tcg/cpu-exec.c:729
-#11 0x000001000036ae9c in tcg_cpu_exec (cpu=0x10001258b60) at
-/home/pm215/qemu/cpus.c:1429
-#12 0x000001000036daec in qemu_tcg_cpu_thread_fn (arg=0x10001258b60)
-at /home/pm215/qemu/cpus.c:1733
-#13 0x000001000036daec in qemu_tcg_cpu_thread_fn (arg=0x10001258b60)
-at /home/pm215/qemu/cpus.c:1707
-#14 0x000001000091cdb0 in qemu_thread_start (args=0x100012a6670) at
-/home/pm215/qemu/util/qemu-thread-posix.c:502
-#15 0xfff80001034bbe68 in start_thread (arg=0xfff8000112e83900) at
-pthread_create.c:486
-#16 0xfff80001036c00b8 in __thread_start () at
-../sysdeps/unix/sysv/linux/sparc/sparc64/clone.S:78
+I think that should be 'Which' rather than 'What'.
 
-Thread 3 (Thread 0xfff800010be17900 (LWP 125519)):
-#0  0xfff8000103657bd0 in __GI___libc_malloc (bytes=14) at malloc.c:3034
-#1  0xfff8000101984ef0 in g_malloc () at
-/usr/lib/sparc64-linux-gnu/libglib-2.0.so.0
-#2  0x0000010000910e14 in json_token (type=<optimized out>,
-x=<optimized out>, y=<optimized out>, tokstr=0x10001200520)
-    at /home/pm215/qemu/qobject/json-parser.c:565
-#3  0x000001000090f9a0 in json_message_process_token
-(lexer=0x100011b4af8, input=0x10001200520, type=<optimized out>,
-x=<optimized out>, y=<optimized out>)
-    at /home/pm215/qemu/qobject/json-streamer.c:82
-#4  0x000001000093d1c4 in json_lexer_feed_char (lexer=0x100011b4af8,
-ch=<optimized out>, flush=<optimized out>)
-    at /home/pm215/qemu/qobject/json-lexer.c:313
-#5  0x000001000093d340 in json_lexer_feed (lexer=0x100011b4af8,
-buffer=<optimized out>, size=<optimized out>) at
-/home/pm215/qemu/qobject/json-lexer.c:350
-#6  0x0000010000896de8 in qemu_chr_be_write_impl (len=<optimized out>,
-buf=0xfff800010be14d38 "{", s=0x100011ecc00) at
-/home/pm215/qemu/chardev/char.c:175
-#7  0x0000010000896de8 in qemu_chr_be_write (s=0x100011ecc00,
-buf=0xfff800010be14d38 "{", len=<optimized out>) at
-/home/pm215/qemu/chardev/char.c:187
-#8  0x000001000089f608 in tcp_chr_read (chan=<optimized out>,
-cond=<optimized out>, opaque=<optimized out>) at
-/home/pm215/qemu/chardev/char-socket.c:515
-#9  0x00000100008b111c in qio_channel_fd_source_dispatch
-(source=0xfff8000114005e40, callback=0x1000089f500 <tcp_chr_read>,
-user_data=0x100011ecc00)
-    at /home/pm215/qemu/io/channel-watch.c:84
-#10 0xfff800010197ed1c in g_main_context_dispatch () at
-/usr/lib/sparc64-linux-gnu/libglib-2.0.so.0
-#11 0xfff800010197f130 in  () at /usr/lib/sparc64-linux-gnu/libglib-2.0.so.0
+>  # Since: 2.4
+>  ##
+>  { 'enum': 'MigrationParameter',
+> @@ -568,7 +572,7 @@
+>             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+>             'multifd-channels',
+>             'xbzrle-cache-size', 'max-postcopy-bandwidth',
+> -           'max-cpu-throttle' ] }
+> +           'max-cpu-throttle', 'multifd-compress' ] }
+>  
+>  ##
+>  # @MigrateSetParameters:
+> @@ -644,7 +648,10 @@
+>  #                     (Since 3.0)
+>  #
+>  # @max-cpu-throttle: maximum cpu throttle percentage.
+> -#                    The default value is 99. (Since 3.1)
+> +#                    The default value is 99. (Since 4.0)
 
-Thread 2 (Thread 0xfff800010b615900 (LWP 125511)):
-#0  0xfff80001036bc040 in syscall () at
-../sysdeps/unix/sysv/linux/sparc/sparc64/syscall.S:33
-#1  0x000001000091de6c in qemu_futex_wait (val=<optimized out>,
-f=<optimized out>) at /home/pm215/qemu/util/qemu-thread-posix.c:438
-#2  0x000001000091de6c in qemu_event_wait (ev=0x100010cc0c8
-<rcu_gp_event>) at /home/pm215/qemu/util/qemu-thread-posix.c:442
-#3  0x0000010000931e9c in wait_for_readers () at /home/pm215/qemu/util/rcu.c:135
-#4  0x0000010000931e9c in synchronize_rcu () at /home/pm215/qemu/util/rcu.c:171
-#5  0x00000100009322d4 in call_rcu_thread (opaque=<optimized out>) at
-/home/pm215/qemu/util/rcu.c:268
-#6  0x000001000091cdb0 in qemu_thread_start (args=0x100010dcc60) at
-/home/pm215/qemu/util/qemu-thread-posix.c:502
-#7  0xfff80001034bbe68 in start_thread (arg=0xfff800010b615900) at
-pthread_create.c:486
-#8  0xfff80001036c00b8 in __thread_start () at
-../sysdeps/unix/sysv/linux/sparc/sparc64/clone.S:78
+That change is wrong?
 
-Thread 1 (Thread 0xfff800010006e6e0 (LWP 125450)):
-#0  0xfff80001036b57f4 in __GI_ppoll (fds=0x10001a08c90, nfds=6,
-timeout=<optimized out>, sigmask=0x0) at
-../sysdeps/unix/sysv/linux/ppoll.c:39
-#1  0x0000010000917d6c in ppoll (__ss=0x0, __timeout=0x7feffae6a48,
-__nfds=6, __fds=0x10001a08c90) at
-/usr/include/sparc64-linux-gnu/bits/poll2.h:77
-#2  0x0000010000917d6c in qemu_poll_ns (fds=0x10001a08c90,
-nfds=<optimized out>, timeout=<optimized out>) at
-/home/pm215/qemu/util/qemu-timer.c:334
-#3  0x00000100009191cc in os_host_main_loop_wait (timeout=1000000000)
-at /home/pm215/qemu/util/main-loop.c:233
-#4  0x00000100009191cc in main_loop_wait (nonblocking=<optimized out>)
-at /home/pm215/qemu/util/main-loop.c:514
-#5  0x00000100005cbfc4 in main_loop () at /home/pm215/qemu/vl.c:1923
-#6  0x00000100003173a0 in main (argc=<optimized out>, argv=<optimized
-out>, envp=<optimized out>) at /home/pm215/qemu/vl.c:4578
+> +# @multifd-compress: What compression method to use.
+> +#                    Defaults to none. (Since 4.0)
+>  #
+>  # Since: 2.4
+>  ##
+> @@ -666,7 +673,8 @@
+>              '*multifd-channels': 'int',
+>              '*xbzrle-cache-size': 'size',
+>              '*max-postcopy-bandwidth': 'size',
+> -	    '*max-cpu-throttle': 'int' } }
+> +	    '*max-cpu-throttle': 'int',
+> +            '*multifd-compress': 'MultifdCompress' } }
+>  
+>  ##
+>  # @migrate-set-parameters:
+> @@ -760,6 +768,9 @@
+>  #                    Defaults to 99.
+>  #                     (Since 3.1)
+>  #
+> +# @multifd-compress: What compression method to use.
+> +#                    Defaults to none. (Since 4.0)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'MigrationParameters',
+> @@ -778,7 +789,8 @@
+>              '*multifd-channels': 'uint8',
+>              '*xbzrle-cache-size': 'size',
+>  	    '*max-postcopy-bandwidth': 'size',
+> -            '*max-cpu-throttle':'uint8'} }
+> +            '*max-cpu-throttle': 'uint8',
+> +            '*multifd-compress': 'MultifdCompress' } }
+>  
+>  ##
+>  # @query-migrate-parameters:
 
+Dave
 
-
-Backtrace of process 125560:
-
-Thread 4 (Thread 0xfff8000112e83900 (LWP 125642)):
-#0  0xfff8000103502bbc in futex_wait_cancelable (private=0,
-expected=0, futex_word=0x100012a665c) at
-../sysdeps/unix/sysv/linux/futex-internal.h:88
-#1  0xfff8000103502bbc in __pthread_cond_wait_common (abstime=0x0,
-mutex=0x100010958a0 <qemu_global_mutex>, cond=0x100012a6630) at
-pthread_cond_wait.c:502
-#2  0xfff8000103502bbc in __pthread_cond_wait (cond=0x100012a6630,
-mutex=0x100010958a0 <qemu_global_mutex>) at pthread_cond_wait.c:655
-#3  0x000001000091d670 in qemu_cond_wait_impl
-    (cond=0x100012a6630, mutex=0x100010958a0 <qemu_global_mutex>,
-file=0x100009d4d80 "/home/pm215/qemu/cpus.c", line=<optimized out>)
-    at /home/pm215/qemu/util/qemu-thread-posix.c:161
-#4  0x000001000036b448 in qemu_wait_io_event (cpu=0x10001258b60) at
-/home/pm215/qemu/cpus.c:1242
-#5  0x000001000036daa8 in qemu_tcg_cpu_thread_fn (arg=0x10001258b60)
-at /home/pm215/qemu/cpus.c:1760
-#6  0x000001000036daa8 in qemu_tcg_cpu_thread_fn (arg=0x10001258b60)
-at /home/pm215/qemu/cpus.c:1707
-#7  0x000001000091cdb0 in qemu_thread_start (args=0x100012a6670) at
-/home/pm215/qemu/util/qemu-thread-posix.c:502
-#8  0xfff80001034fbe68 in start_thread (arg=0xfff8000112e83900) at
-pthread_create.c:486
-#9  0xfff80001037000b8 in __thread_start () at
-../sysdeps/unix/sysv/linux/sparc/sparc64/clone.S:78
-
-Thread 3 (Thread 0xfff800010be57900 (LWP 125637)):
-#0  0xfff80001036f56dc in __GI___poll (fds=0xfff8000114005650, nfds=3,
-timeout=<optimized out>) at ../sysdeps/unix/sysv/linux/poll.c:29
-#1  0xfff80001019bf0a0 in  () at /usr/lib/sparc64-linux-gnu/libglib-2.0.so.0
-
-Thread 2 (Thread 0xfff800010b655900 (LWP 125629)):
-#0  0xfff80001036fc040 in syscall () at
-../sysdeps/unix/sysv/linux/sparc/sparc64/syscall.S:33
-#1  0x000001000091de6c in qemu_futex_wait (val=<optimized out>,
-f=<optimized out>) at /home/pm215/qemu/util/qemu-thread-posix.c:438
-#2  0x000001000091de6c in qemu_event_wait (ev=0x100010cc040
-<rcu_call_ready_event>) at
-/home/pm215/qemu/util/qemu-thread-posix.c:442
-#3  0x00000100009322a4 in call_rcu_thread (opaque=<optimized out>) at
-/home/pm215/qemu/util/rcu.c:261
-#4  0x000001000091cdb0 in qemu_thread_start (args=0x100010dcc60) at
-/home/pm215/qemu/util/qemu-thread-posix.c:502
-#5  0xfff80001034fbe68 in start_thread (arg=0xfff800010b655900) at
-pthread_create.c:486
-#6  0xfff80001037000b8 in __thread_start () at
-../sysdeps/unix/sysv/linux/sparc/sparc64/clone.S:78
-
-Thread 1 (Thread 0xfff800010006e6e0 (LWP 125560)):
-#0  0xfff80001036f57f4 in __GI_ppoll (fds=0x10001a04080, nfds=7,
-timeout=<optimized out>, sigmask=0x0) at
-../sysdeps/unix/sysv/linux/ppoll.c:39
-#1  0x0000010000917d6c in ppoll (__ss=0x0, __timeout=0x7feff8b49f8,
-__nfds=7, __fds=0x10001a04080) at
-/usr/include/sparc64-linux-gnu/bits/poll2.h:77
-#2  0x0000010000917d6c in qemu_poll_ns (fds=0x10001a04080,
-nfds=<optimized out>, timeout=<optimized out>) at
-/home/pm215/qemu/util/qemu-timer.c:334
-#3  0x00000100009191cc in os_host_main_loop_wait (timeout=1000000000)
-at /home/pm215/qemu/util/main-loop.c:233
-#4  0x00000100009191cc in main_loop_wait (nonblocking=<optimized out>)
-at /home/pm215/qemu/util/main-loop.c:514
-#5  0x00000100005cbfc4 in main_loop () at /home/pm215/qemu/vl.c:1923
-#6  0x00000100003173a0 in main (argc=<optimized out>, argv=<optimized
-out>, envp=<optimized out>) at /home/pm215/qemu/vl.c:4578
-
-
-thanks
--- PMM
+> -- 
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
