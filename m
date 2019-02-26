@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41577)
+Received: from eggs.gnu.org ([209.51.188.92]:41592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyTFc-00075i-JU
+	(envelope-from <dgibson@ozlabs.org>) id 1gyTFc-00075m-W5
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyTFb-0006rl-9X
+	(envelope-from <dgibson@ozlabs.org>) id 1gyTFb-0006ru-EK
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:17:48 -0500
-Date: Tue, 26 Feb 2019 11:39:35 +1100
+Date: Tue, 26 Feb 2019 12:10:18 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190226003935.GE6872@umbus.fritz.box>
+Message-ID: <20190226011018.GH6872@umbus.fritz.box>
 References: <20190222131322.26079-1-clg@kaod.org>
-	<20190222131322.26079-6-clg@kaod.org>
+	<20190222131322.26079-11-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="n+lFg1Zro7sl44OB"
+	protocol="application/pgp-signature"; boundary="N8ia4yKhAKKETby7"
 Content-Disposition: inline
-In-Reply-To: <20190222131322.26079-6-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 05/13] spapr/xive: introduce a VM state
- change handler
+In-Reply-To: <20190222131322.26079-11-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 10/13] spapr: introduce routines to
+ delete the KVM IRQ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,148 +29,214 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---n+lFg1Zro7sl44OB
+--N8ia4yKhAKKETby7
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 22, 2019 at 02:13:14PM +0100, C=E9dric Le Goater wrote:
-> This handler is in charge of stabilizing the flow of event notifications
-> in the XIVE controller before migrating a guest. This is a requirement
-> before transferring the guest EQ pages to a destination.
+On Fri, Feb 22, 2019 at 02:13:19PM +0100, C=E9dric Le Goater wrote:
+> If a new interrupt mode is chosen by CAS, the machine generates a
+> reset to reconfigure. At this point, the connection with the previous
+> KVM device needs to be closed and a new connection needs to opened
+> with the KVM device operating the chosen interrupt mode.
 >=20
-> When the VM is stopped, the handler masks the sources (PQ=3D01) to stop
-> the flow of events and saves their previous state. The XIVE controller
-> is then synced through KVM to flush any in-flight event notification
-> and to stabilize the EQs. At this stage, the EQ pages are marked dirty
-> to make sure the EQ pages are transferred if a migration sequence is
-> in progress.
->=20
-> The previous configuration of the sources is restored when the VM
-> resumes, after a migration or a stop.
+> New routines are introduced to destroy the XICS and the XIVE KVM
+> devices. They make use of a new KVM device ioctl which destroys the
+> device and also disconnects the IRQ presenters from the vCPUs.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Ugly, but necessary
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
 >  include/hw/ppc/spapr_xive.h |  1 +
->  hw/intc/spapr_xive_kvm.c    | 77 ++++++++++++++++++++++++++++++++++++-
->  2 files changed, 77 insertions(+), 1 deletion(-)
+>  include/hw/ppc/xics_spapr.h |  1 +
+>  hw/intc/spapr_xive_kvm.c    | 60 +++++++++++++++++++++++++++++++++++++
+>  hw/intc/xics_kvm.c          | 56 ++++++++++++++++++++++++++++++++++
+>  4 files changed, 118 insertions(+)
 >=20
 > diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index ebd65e7fe36b..298d204d54ef 100644
+> index 22d70650b51f..a7c4c275a747 100644
 > --- a/include/hw/ppc/spapr_xive.h
 > +++ b/include/hw/ppc/spapr_xive.h
-> @@ -42,6 +42,7 @@ typedef struct sPAPRXive {
->      /* KVM support */
->      int           fd;
->      void          *tm_mmap;
-> +    VMChangeStateEntry *change;
->  } sPAPRXive;
+> @@ -71,6 +71,7 @@ int spapr_xive_end_to_target(uint8_t end_blk, uint32_t =
+end_idx,
+>   * KVM XIVE device helpers
+>   */
+>  void kvmppc_xive_connect(sPAPRXive *xive, Error **errp);
+> +void kvmppc_xive_disconnect(sPAPRXive *xive, Error **errp);
+>  void kvmppc_xive_reset(sPAPRXive *xive, Error **errp);
+>  void kvmppc_xive_set_source_config(sPAPRXive *xive, uint32_t lisn, XiveE=
+AS *eas,
+>                                     Error **errp);
+> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+> index b8d924baf437..bddf09821cb0 100644
+> --- a/include/hw/ppc/xics_spapr.h
+> +++ b/include/hw/ppc/xics_spapr.h
+> @@ -34,6 +34,7 @@
+>  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+>                     uint32_t phandle);
+>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+> +int xics_kvm_disconnect(sPAPRMachineState *spapr, Error **errp);
+>  void xics_spapr_init(sPAPRMachineState *spapr);
 > =20
->  /*
+>  #endif /* XICS_SPAPR_H */
 > diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index 4b1ffb9835f9..44d80175b1b5 100644
+> index 119fd59fc9ae..e31035c90260 100644
 > --- a/hw/intc/spapr_xive_kvm.c
 > +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -419,9 +419,81 @@ static void kvmppc_xive_get_queues(sPAPRXive *xive, =
-Error **errp)
->      }
+> @@ -58,6 +58,16 @@ static void kvm_cpu_enable(CPUState *cs)
+>      QLIST_INSERT_HEAD(&kvm_enabled_cpus, enabled_cpu, node);
 >  }
 > =20
-> +/*
-> + * The primary goal of the XIVE VM change handler is to mark the EQ
-> + * pages dirty when all XIVE event notifications have stopped.
-> + *
-> + * Whenever the VM is stopped, the VM change handler masks the sources
-> + * (PQ=3D01) to stop the flow of events and saves the previous state in
-> + * anticipation of a migration. The XIVE controller is then synced
-> + * through KVM to flush any in-flight event notification and stabilize
-> + * the EQs.
-> + *
-> + * At this stage, we can mark the EQ page dirty and let a migration
-> + * sequence transfer the EQ pages to the destination, which is done
-> + * just after the stop state.
-> + *
-> + * The previous configuration of the sources is restored when the VM
-> + * runs again.
-> + */
-> +static void kvmppc_xive_change_state_handler(void *opaque, int running,
-> +                                             RunState state)
+> +static void kvm_cpu_disable_all(void)
 > +{
-> +    sPAPRXive *xive =3D opaque;
-> +    XiveSource *xsrc =3D &xive->source;
-> +    Error *local_err =3D NULL;
-> +    int i;
+> +    KVMEnabledCPU *enabled_cpu, *next;
 > +
-> +    /*
-> +     * Restore the sources to their initial state. This is called when
-> +     * the VM resumes after a stop or a migration.
-> +     */
-> +    if (running) {
-> +        for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> +            uint8_t pq =3D xive_source_esb_get(xsrc, i);
-> +            if (xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq << 8)) !=
-=3D 0x1) {
-> +                error_report("XIVE: IRQ %d has an invalid state", i);
-> +            }
-> +        }
-> +
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Mask the sources, to stop the flow of event notifications, and
-> +     * save the PQs locally in the XiveSource object. The XiveSource
-> +     * state will be collected later on by its vmstate handler if a
-> +     * migration is in progress.
-> +     */
-> +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> +        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_01);
-> +        xive_source_esb_set(xsrc, i, pq);
-> +    }
-> +
-> +    /*
-> +     * Sync the XIVE controller in KVM, to flush in-flight event
-> +     * notification that should be enqueued in the EQs and mark the
-> +     * XIVE EQ pages dirty to collect all updates.
-> +     */
-> +    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL,
-> +                      KVM_DEV_XIVE_EQ_SYNC, NULL, true, &local_err);
-> +    if (local_err) {
-> +        error_report_err(local_err);
-> +        return;
+> +    QLIST_FOREACH_SAFE(enabled_cpu, &kvm_enabled_cpus, node, next) {
+> +        QLIST_REMOVE(enabled_cpu, node);
+> +        g_free(enabled_cpu);
 > +    }
 > +}
 > +
->  void kvmppc_xive_synchronize_state(sPAPRXive *xive, Error **errp)
->  {
-> -    kvmppc_xive_source_get_state(&xive->source);
-> +    /*
-> +     * When the VM is stopped, the sources are masked and the previous
-> +     * state is saved in anticipation of a migration. We should not
-> +     * synchronize the source state in that case else we will override
-> +     * the saved state.
-> +     */
-> +    if (runstate_is_running()) {
-> +        kvmppc_xive_source_get_state(&xive->source);
-> +    }
-> =20
->      /* EAT: there is no extra state to query from KVM */
-> =20
-> @@ -501,6 +573,9 @@ void kvmppc_xive_connect(sPAPRXive *xive, Error **err=
-p)
->                                        "xive.tima", tima_len, xive->tm_mm=
-ap);
->      sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
-> =20
-> +    xive->change =3D qemu_add_vm_change_state_handler(
-> +        kvmppc_xive_change_state_handler, xive);
+>  /*
+>   * XIVE Thread Interrupt Management context (KVM)
+>   */
+> @@ -674,3 +684,53 @@ void kvmppc_xive_connect(sPAPRXive *xive, Error **er=
+rp)
+>      /* Map all regions */
+>      spapr_xive_map_mmio(xive);
+>  }
 > +
->      kvm_kernel_irqchip =3D true;
->      kvm_msi_via_irqfd_allowed =3D true;
->      kvm_gsi_direct_mapping =3D true;
+> +void kvmppc_xive_disconnect(sPAPRXive *xive, Error **errp)
+> +{
+> +    XiveSource *xsrc;
+> +    struct kvm_destroy_device xive_destroy_device;
+> +    size_t esb_len;
+> +    int rc;
+> +
+> +    /* The KVM XIVE device is not in use */
+> +    if (!xive || xive->fd =3D=3D -1) {
+> +        return;
+> +    }
+> +
+> +    if (!kvmppc_has_cap_xive()) {
+> +        error_setg(errp, "IRQ_XIVE capability must be present for KVM");
+> +        return;
+> +    }
+> +
+> +    /* Clear the KVM mapping */
+> +    xsrc =3D &xive->source;
+> +    esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> +
+> +    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 0);
+> +    munmap(xsrc->esb_mmap, esb_len);
+> +
+> +    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 1);
+> +
+> +    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 2);
+> +    munmap(xive->tm_mmap, 4ull << TM_SHIFT);
+> +
+> +    /* Destroy the KVM device. This also clears the VCPU presenters */
+> +    xive_destroy_device.fd =3D xive->fd;
+> +    xive_destroy_device.flags =3D 0;
+> +    rc =3D kvm_vm_ioctl(kvm_state, KVM_DESTROY_DEVICE, &xive_destroy_dev=
+ice);
+> +    if (rc < 0) {
+> +        error_setg_errno(errp, -rc, "Error on KVM_DESTROY_DEVICE for XIV=
+E");
+> +    }
+> +    close(xive->fd);
+> +    xive->fd =3D -1;
+> +
+> +    kvm_kernel_irqchip =3D false;
+> +    kvm_msi_via_irqfd_allowed =3D false;
+> +    kvm_gsi_direct_mapping =3D false;
+> +
+> +    /* Clear the local list of presenter (hotplug) */
+> +    kvm_cpu_disable_all();
+> +
+> +    /* VM Change state handler is not needed anymore */
+> +    qemu_del_vm_change_state_handler(xive->change);
+> +}
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index c6e1b630a404..373de3155f6b 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -51,6 +51,16 @@ typedef struct KVMEnabledICP {
+>  static QLIST_HEAD(, KVMEnabledICP)
+>      kvm_enabled_icps =3D QLIST_HEAD_INITIALIZER(&kvm_enabled_icps);
+> =20
+> +static void kvm_disable_icps(void)
+> +{
+> +    KVMEnabledICP *enabled_icp, *next;
+> +
+> +    QLIST_FOREACH_SAFE(enabled_icp, &kvm_enabled_icps, node, next) {
+> +        QLIST_REMOVE(enabled_icp, node);
+> +        g_free(enabled_icp);
+> +    }
+> +}
+> +
+>  /*
+>   * ICP-KVM
+>   */
+> @@ -360,3 +370,49 @@ fail:
+>      kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
+>      return -1;
+>  }
+> +
+> +int xics_kvm_disconnect(sPAPRMachineState *spapr, Error **errp)
+> +{
+> +    int rc;
+> +    struct kvm_destroy_device xics_destroy_device =3D {
+> +        .fd =3D kernel_xics_fd,
+> +        .flags =3D 0,
+> +    };
+> +
+> +    /* The KVM XICS device is not in use */
+> +    if (kernel_xics_fd =3D=3D -1) {
+> +        return 0;
+> +    }
+> +
+> +    if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_IRQ_XI=
+CS)) {
+> +        error_setg(errp,
+> +                   "KVM and IRQ_XICS capability must be present for KVM =
+XICS device");
+> +        return -1;
+> +    }
+> +
+> +    rc =3D kvm_vm_ioctl(kvm_state, KVM_DESTROY_DEVICE, &xics_destroy_dev=
+ice);
+> +    if (rc < 0) {
+> +        error_setg_errno(errp, -rc, "Error on KVM_DESTROY_DEVICE for XIC=
+S");
+> +    }
+> +    close(kernel_xics_fd);
+> +    kernel_xics_fd =3D -1;
+> +
+> +    spapr_rtas_unregister(RTAS_IBM_SET_XIVE);
+> +    spapr_rtas_unregister(RTAS_IBM_GET_XIVE);
+> +    spapr_rtas_unregister(RTAS_IBM_INT_OFF);
+> +    spapr_rtas_unregister(RTAS_IBM_INT_ON);
+> +
+> +    kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
+> +    kvmppc_define_rtas_kernel_token(0, "ibm,get-xive");
+> +    kvmppc_define_rtas_kernel_token(0, "ibm,int-on");
+> +    kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
+> +
+> +    kvm_kernel_irqchip =3D false;
+> +    kvm_msi_via_irqfd_allowed =3D false;
+> +    kvm_gsi_direct_mapping =3D false;
+> +
+> +    /* Clear the presenter from the VCPUs */
+> +    kvm_disable_icps();
+> +
+> +    return rc;
+> +}
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -178,24 +244,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---n+lFg1Zro7sl44OB
+--N8ia4yKhAKKETby7
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx0isUACgkQbDjKyiDZ
-s5KfZQ//a3EAt3b5KSlMMnJzt8NWqBNq9lYlxNP1S22eGBNJ4/G7Mf1tgAueVFeS
-OYdFHwS0h8X1dE3lotcDA9T5T1oK1vxk1iW4U8StXD36008Q3dhYFPiCZFewNQUR
-q4k8+N/jfGA9SYzh67/CLv1XNsIUvfO9boBz2CiQ29P2Oq2LXeyYfIyB4iR7VNHI
-2vV7fD5UPBjS11X3MOh4Gj9DoFOItWB/IKSK5Dmrd8dlAZU1WIcNZ9Qd2Zcvrxzt
-QENaKVohc3cO9I1VzHNVcG1Dd4NHKZTMHxelFqFRqRI0Cece3hgt/0X7awCQMTAq
-aCc72U53Peoxa9mZh75cgUxcYLST9FKlYcreafJ9oqpHxXtbPzbsF2vrhIx52vr8
-J1bQZZ9BsB6mMqj/7n/W7N94MtUZufEYYhjLAd5NJw60Ee95qJz5Mbnb+I+rYxFl
-rNmgmVR11/+eM+mr6sqvXICSmjANUcOSilz0eaDneyaAaKwEQQjXOh1upZP2G8WW
-L/bkEDafROP1BULKu+t1Jrk2RdDH+S4xKN9sFlsDUYAVUUkdp14yjHCL3KdiVIjc
-Ag1uI25e+kiMm71WHdvdUdDUwTR3hBb7rSj1Qia46LP1bfaO12QsNPIRq8NSaPlV
-ozGh5I8vGGenzVhGm99qYYkEoH+VEKK7k/6pmourBpKFGiYjuMI=
-=XRhI
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx0kfoACgkQbDjKyiDZ
+s5Lkbw/5ATCrMm9idDtP3LovfB/k8q5EzzDU7wAP9cuBif5/xIp3pQG/kL9VN1JE
+X9lM0KXjlB5rxBMZ90n1GK0qfv3aQnmGjS7d4n4JX4EUM55Z2XTNhbunhHoCnvVx
+1Qa1GkWhlnYtrgZ0zNuBUBxlI8/Y3jJojsFzdAScS4FMhuOFlL2YubGFKZEbNMx0
+6cYMbf1opTK5t55d4wF0vlYiwEu4aJu1JIPSRWYvwiBYzWYcKB/oPj42f1ygPdmq
+QRdYglpevIrgz25sxN5rK4/Zr9xRE0IxeTWWuoEto4accOPrxoxyUD4/Y9aXkL+k
+B+KjUL15/aBBguJ1hcSLKGcCJn4PK9eYvE0SzKRi3vmFGYdD6uimaRtFytmffOXB
+VP0V4Htc4qVYXXK16Id3J76yCATjROHBt97EAAuP9gpbq8DLaUcscgkHpI3kjTyI
+HL9WdTGQeUXIlRUG0eNgFXVpYelg5+EwJjBDfucTXqJ5VK18HK+M/jKrwayxTCOA
+xpQux3h2Ziaagl7m7hpasIJutnEx9BNdmNkb+Z8mnI5lwesUxBsSUA7vm+MIzGd9
+17f+8hvPV/Ip7ndD17xR0I2iMdcSk6PwBHhJ+FvYWrbLjEM8Lfkx9dCwe5qxqCs/
+CLcUKb4MdJ1CLZEa91K+GAe4XTGZGVq2Y9R9DhNvSoYuHIC3ms4=
+=fJ4c
 -----END PGP SIGNATURE-----
 
---n+lFg1Zro7sl44OB--
+--N8ia4yKhAKKETby7--
