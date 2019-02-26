@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60677)
+Received: from eggs.gnu.org ([209.51.188.92]:60680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyjcB-0006WV-Vd
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:46:12 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gyjcC-0006Wf-4S
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:46:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyjcA-0000pT-87
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:46:11 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gyjcA-0000pg-Mq
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:46:12 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 26 Feb 2019 21:44:34 +0100
-Message-Id: <20190226204439.2296-14-eric.auger@redhat.com>
+Date: Tue, 26 Feb 2019 21:44:33 +0100
+Message-Id: <20190226204439.2296-13-eric.auger@redhat.com>
 In-Reply-To: <20190226204439.2296-1-eric.auger@redhat.com>
 References: <20190226204439.2296-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 13/18] hw/arm/virt-acpi-build: Add PC-DIMM
- in SRAT
+Subject: [Qemu-devel] [PATCH v9 12/18] hw/arm/boot: Expose the PC-DIMM nodes
+ in the DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +27,100 @@ Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzi
 
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Generate Memory Affinity Structures for PC-DIMM ranges.
+This patch adds memory nodes corresponding to PC-DIMM regions.
+
+NVDIMM and ACPI_NVDIMM configs are not yet set for ARM so we
+don't need to care about NVDIMM at this stage.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 ---
+v8 -> v9:
+- removed Igor's R-b
 
+v7 -> v8:
+- s/NV_DIMM/NVDIMM
+- fix indent
 v6 -> v7:
-- add Igor's R-b
-
-v5 -> v6:
-- fix mingw compil issue
-
-v4 -> v5:
-- Align to x86 code and especially
-  "pc: acpi: revert back to 1 SRAT entry for hotpluggable area"
-
+- rework the error messages, use a switch/case
 v3 -> v4:
-- do not use vms->bootinfo.device_memory_start/device_memory_size anymore
+- git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
 
 v1 -> v2:
-- build_srat_hotpluggable_memory movedc to aml-build
+- added qapi_free_MemoryDeviceInfoList and simplify the loop
 ---
- hw/arm/virt-acpi-build.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/arm/boot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index d7e2e4885b..8151fda239 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -516,6 +516,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
-     int i, srat_start;
-     uint64_t mem_base;
-     MachineClass *mc =3D MACHINE_GET_CLASS(vms);
-+    MachineState *ms =3D MACHINE(vms);
-     const CPUArchIdList *cpu_list =3D mc->possible_cpu_arch_ids(MACHINE(=
-vms));
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index a830655e1a..4caaf91583 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -19,6 +19,7 @@
+ #include "sysemu/numa.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
++#include "hw/mem/memory-device.h"
+ #include "elf.h"
+ #include "sysemu/device_tree.h"
+ #include "qemu/config-file.h"
+@@ -522,6 +523,41 @@ static void fdt_add_psci_node(void *fdt)
+     qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+ }
 =20
-     srat_start =3D table_data->len;
-@@ -541,6 +542,14 @@ build_srat(GArray *table_data, BIOSLinker *linker, V=
-irtMachineState *vms)
++static int fdt_add_hotpluggable_memory_nodes(void *fdt,
++                                             uint32_t acells, uint32_t s=
+cells) {
++    MemoryDeviceInfoList *info, *info_list =3D qmp_memory_device_list();
++    MemoryDeviceInfo *mi;
++    int ret =3D 0;
++
++    for (info =3D info_list; info !=3D NULL; info =3D info->next) {
++        mi =3D info->value;
++        switch (mi->type) {
++        case MEMORY_DEVICE_INFO_KIND_DIMM:
++        {
++            PCDIMMDeviceInfo *di =3D mi->u.dimm.data;
++
++            ret =3D fdt_add_memory_node(fdt, acells, di->addr,
++                                      scells, di->size, di->node);
++            if (ret) {
++                fprintf(stderr,
++                        "couldn't add PCDIMM /memory@%"PRIx64" node\n",
++                        di->addr);
++                goto out;
++            }
++            break;
++        }
++        default:
++            fprintf(stderr, "%s memory nodes are not yet supported\n",
++                    MemoryDeviceInfoKind_str(mi->type));
++            ret =3D -ENOENT;
++            goto out;
++        }
++    }
++out:
++    qapi_free_MemoryDeviceInfoList(info_list);
++    return ret;
++}
++
+ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+                  hwaddr addr_limit, AddressSpace *as)
+ {
+@@ -621,6 +657,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_=
+info *binfo,
          }
      }
 =20
-+    if (ms->device_memory) {
-+        numamem =3D acpi_data_push(table_data, sizeof *numamem);
-+        build_srat_memory(numamem, ms->device_memory->base,
-+                          memory_region_size(&ms->device_memory->mr),
-+                          nb_numa_nodes - 1,
-+                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABL=
-ED);
++    rc =3D fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
++    if (rc < 0) {
++        fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
++        goto fail;
 +    }
 +
-     build_header(linker, table_data, (void *)(table_data->data + srat_st=
-art),
-                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
- }
+     rc =3D fdt_path_offset(fdt, "/chosen");
+     if (rc < 0) {
+         qemu_fdt_add_subnode(fdt, "/chosen");
 --=20
 2.20.1
