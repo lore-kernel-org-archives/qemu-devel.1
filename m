@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48849)
+Received: from eggs.gnu.org ([209.51.188.92]:48850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyTtq-0003t2-OS
+	(envelope-from <dgibson@ozlabs.org>) id 1gyTtq-0003t3-OU
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:59:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyTto-0007jT-DS
+	(envelope-from <dgibson@ozlabs.org>) id 1gyTto-0007jd-FY
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:59:22 -0500
-Date: Tue, 26 Feb 2019 14:39:14 +1100
+Date: Tue, 26 Feb 2019 14:53:27 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190226033914.GK6872@umbus.fritz.box>
+Message-ID: <20190226035326.GL6872@umbus.fritz.box>
 References: <20190226030531.9932-1-sjitindarsingh@gmail.com>
+	<20190226030531.9932-2-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hl1kWnBARzJiTscN"
+	protocol="application/pgp-signature"; boundary="OGLMwEELQbPC02lM"
 Content-Disposition: inline
-In-Reply-To: <20190226030531.9932-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 1/4] target/ppc/spapr: Add
- SPAPR_CAP_LARGE_DECREMENTER
+In-Reply-To: <20190226030531.9932-2-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 2/4] target/ppc: Implement large
+ decrementer support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,160 +29,439 @@ To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
 
 
---hl1kWnBARzJiTscN
-Content-Type: text/plain; charset=us-ascii
+--OGLMwEELQbPC02lM
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 26, 2019 at 02:05:28PM +1100, Suraj Jitindar Singh wrote:
-> Add spapr_cap SPAPR_CAP_LARGE_DECREMENTER to be used to control the
-> availability and size of the large decrementer made available to the
-> guest.
+On Tue, Feb 26, 2019 at 02:05:29PM +1100, Suraj Jitindar Singh wrote:
+> Prior to POWER9 the decrementer was a 32-bit register which decremented
+> with each tick of the timebase. From POWER9 onwards the decrementer can
+> be set to operate in a mode called large decrementer where it acts as a
+> n-bit decrementing register which is visible as a 64-bit register, that
+> is the value of the decrementer is sign extended to 64 bits (where n is
+> implementation dependant).
+>=20
+> The mode in which the decrementer operates is controlled by the LPCR_LD
+> bit in the logical paritition control register (LPCR).
+>=20
+> >From POWER9 onwards the HDEC (hypervisor decrementer) was enlarged to
+> h-bits, also sign extended to 64 bits (where h is implementation
+> dependant). Note this isn't configurable and is always enabled.
+>=20
+> For TCG we allow the user to configure a custom large decrementer size,
+> so long as it's at least 32 and less than the size of the HDEC (the
+> restrictions imposed by the ISA).
 >=20
 > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  hw/ppc/spapr.c         |  2 ++
->  hw/ppc/spapr_caps.c    | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h |  5 ++++-
->  3 files changed, 51 insertions(+), 1 deletion(-)
+>  hw/ppc/ppc.c                    | 78 ++++++++++++++++++++++++++++-------=
+------
+>  hw/ppc/spapr.c                  |  8 +++++
+>  hw/ppc/spapr_caps.c             | 38 +++++++++++++++++++-
+>  target/ppc/cpu-qom.h            |  1 +
+>  target/ppc/cpu.h                | 11 +++---
+>  target/ppc/mmu-hash64.c         |  2 +-
+>  target/ppc/translate.c          |  2 +-
+>  target/ppc/translate_init.inc.c |  1 +
+>  8 files changed, 109 insertions(+), 32 deletions(-)
 >=20
+> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> index d1e3d4cd20..853afeed6a 100644
+> --- a/hw/ppc/ppc.c
+> +++ b/hw/ppc/ppc.c
+> @@ -744,10 +744,10 @@ bool ppc_decr_clear_on_delivery(CPUPPCState *env)
+>      return ((tb_env->flags & flags) =3D=3D PPC_DECR_UNDERFLOW_TRIGGERED);
+>  }
+> =20
+> -static inline uint32_t _cpu_ppc_load_decr(CPUPPCState *env, uint64_t nex=
+t)
+> +static inline uint64_t _cpu_ppc_load_decr(CPUPPCState *env, uint64_t nex=
+t)
+
+Hrm.  Given how we use this - and how muldiv64 works, wouldn't it make
+more sense to have it return int64_t (i.e. signed).
+
+>  {
+>      ppc_tb_t *tb_env =3D env->tb_env;
+> -    uint32_t decr;
+> +    uint64_t decr;
+>      int64_t diff;
+> =20
+>      diff =3D next - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> @@ -758,27 +758,42 @@ static inline uint32_t _cpu_ppc_load_decr(CPUPPCSta=
+te *env, uint64_t next)
+>      }  else {
+>          decr =3D -muldiv64(-diff, tb_env->decr_freq, NANOSECONDS_PER_SEC=
+OND);
+>      }
+> -    LOG_TB("%s: %08" PRIx32 "\n", __func__, decr);
+> +    LOG_TB("%s: %016" PRIx64 "\n", __func__, decr);
+> =20
+>      return decr;
+>  }
+> =20
+> -uint32_t cpu_ppc_load_decr (CPUPPCState *env)
+> +target_ulong cpu_ppc_load_decr (CPUPPCState *env)
+>  {
+>      ppc_tb_t *tb_env =3D env->tb_env;
+> +    uint64_t decr;
+> =20
+>      if (kvm_enabled()) {
+>          return env->spr[SPR_DECR];
+>      }
+> =20
+> -    return _cpu_ppc_load_decr(env, tb_env->decr_next);
+> +    decr =3D _cpu_ppc_load_decr(env, tb_env->decr_next);
+> +
+> +    /*
+> +     * If large decrementer is enabled then the decrementer is signed ex=
+tened
+> +     * to 64 bits, otherwise it is a 32 bit value.
+> +     */
+> +    if (env->spr[SPR_LPCR] & LPCR_LD)
+> +        return decr;
+> +    return (uint32_t) decr;
+>  }
+> =20
+> -uint32_t cpu_ppc_load_hdecr (CPUPPCState *env)
+> +target_ulong cpu_ppc_load_hdecr (CPUPPCState *env)
+>  {
+>      ppc_tb_t *tb_env =3D env->tb_env;
+> +    uint64_t decr;
+> =20
+> -    return _cpu_ppc_load_decr(env, tb_env->hdecr_next);
+> +    decr =3D  _cpu_ppc_load_decr(env, tb_env->hdecr_next);
+> +
+> +    /* If POWER9 or later then hdecr is sign extended to 64 bits otherwi=
+se 32 */
+> +    if (env->mmu_model & POWERPC_MMU_3_00)
+
+You already have a pcc->hdecr_bits.  Wouldn't it make more sense to
+check against that than the cpu model directly?
+
+> +        return decr;
+> +    return (uint32_t) decr;
+>  }
+> =20
+>  uint64_t cpu_ppc_load_purr (CPUPPCState *env)
+> @@ -832,13 +847,21 @@ static void __cpu_ppc_store_decr(PowerPCCPU *cpu, u=
+int64_t *nextp,
+>                                   QEMUTimer *timer,
+>                                   void (*raise_excp)(void *),
+>                                   void (*lower_excp)(PowerPCCPU *),
+> -                                 uint32_t decr, uint32_t value)
+> +                                 target_ulong decr, target_ulong value,
+> +                                 int nr_bits)
+>  {
+>      CPUPPCState *env =3D &cpu->env;
+>      ppc_tb_t *tb_env =3D env->tb_env;
+>      uint64_t now, next;
+> +    bool negative;
+> +
+> +    /* Truncate value to decr_width and sign extend for simplicity */
+> +    value &=3D ((1ULL << nr_bits) - 1);
+> +    negative =3D !!(value & (1ULL << (nr_bits - 1)));
+
+Could you simplify this by just using
+	negative =3D (int64_t)decr < 0;
+before you mask?  Or would that be wrong in some edge case or other?
+
+> +    if (negative)
+> +        value |=3D (0xFFFFFFFFULL << nr_bits);
+> =20
+> -    LOG_TB("%s: %08" PRIx32 " =3D> %08" PRIx32 "\n", __func__,
+> +    LOG_TB("%s: " TARGET_FMT_lx " =3D> " TARGET_FMT_lx "\n", __func__,
+>                  decr, value);
+> =20
+>      if (kvm_enabled()) {
+> @@ -860,15 +883,15 @@ static void __cpu_ppc_store_decr(PowerPCCPU *cpu, u=
+int64_t *nextp,
+>       * an edge interrupt, so raise it here too.
+>       */
+>      if ((value < 3) ||
+> -        ((tb_env->flags & PPC_DECR_UNDERFLOW_LEVEL) && (value & 0x800000=
+00)) ||
+> -        ((tb_env->flags & PPC_DECR_UNDERFLOW_TRIGGERED) && (value & 0x80=
+000000)
+> -          && !(decr & 0x80000000))) {
+> +        ((tb_env->flags & PPC_DECR_UNDERFLOW_LEVEL) && negative) ||
+> +        ((tb_env->flags & PPC_DECR_UNDERFLOW_TRIGGERED) && negative
+> +          && !(decr & (1ULL << (nr_bits - 1))))) {
+>          (*raise_excp)(cpu);
+>          return;
+>      }
+> =20
+>      /* On MSB level based systems a 0 for the MSB stops interrupt delive=
+ry */
+> -    if (!(value & 0x80000000) && (tb_env->flags & PPC_DECR_UNDERFLOW_LEV=
+EL)) {
+> +    if (!negative && (tb_env->flags & PPC_DECR_UNDERFLOW_LEVEL)) {
+>          (*lower_excp)(cpu);
+>      }
+> =20
+> @@ -881,21 +904,24 @@ static void __cpu_ppc_store_decr(PowerPCCPU *cpu, u=
+int64_t *nextp,
+>      timer_mod(timer, next);
+>  }
+> =20
+> -static inline void _cpu_ppc_store_decr(PowerPCCPU *cpu, uint32_t decr,
+> -                                       uint32_t value)
+> +static inline void _cpu_ppc_store_decr(PowerPCCPU *cpu, target_ulong dec=
+r,
+> +                                       target_ulong value, int nr_bits)
+>  {
+>      ppc_tb_t *tb_env =3D cpu->env.tb_env;
+> =20
+>      __cpu_ppc_store_decr(cpu, &tb_env->decr_next, tb_env->decr_timer,
+>                           tb_env->decr_timer->cb, &cpu_ppc_decr_lower, de=
+cr,
+> -                         value);
+> +                         value, nr_bits);
+>  }
+> =20
+> -void cpu_ppc_store_decr (CPUPPCState *env, uint32_t value)
+> +void cpu_ppc_store_decr (CPUPPCState *env, target_ulong value)
+>  {
+>      PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+> +    int nr_bits =3D 32;
+> +    if ((env->spr[SPR_LPCR] & LPCR_LD) && (env->large_decr_bits > 32))
+> +        nr_bits =3D env->large_decr_bits;
+
+This would be simpler if you initialized large_decr_bits to 32 on
+cpus that don't have large decr, wouldn't it?
+
+> =20
+> -    _cpu_ppc_store_decr(cpu, cpu_ppc_load_decr(env), value);
+> +    _cpu_ppc_store_decr(cpu, cpu_ppc_load_decr(env), value, nr_bits);
+>  }
+> =20
+>  static void cpu_ppc_decr_cb(void *opaque)
+> @@ -905,23 +931,25 @@ static void cpu_ppc_decr_cb(void *opaque)
+>      cpu_ppc_decr_excp(cpu);
+>  }
+> =20
+> -static inline void _cpu_ppc_store_hdecr(PowerPCCPU *cpu, uint32_t hdecr,
+> -                                        uint32_t value)
+> +static inline void _cpu_ppc_store_hdecr(PowerPCCPU *cpu, target_ulong hd=
+ecr,
+> +                                        target_ulong value, int nr_bits)
+>  {
+>      ppc_tb_t *tb_env =3D cpu->env.tb_env;
+> =20
+>      if (tb_env->hdecr_timer !=3D NULL) {
+>          __cpu_ppc_store_decr(cpu, &tb_env->hdecr_next, tb_env->hdecr_tim=
+er,
+>                               tb_env->hdecr_timer->cb, &cpu_ppc_hdecr_low=
+er,
+> -                             hdecr, value);
+> +                             hdecr, value, nr_bits);
+>      }
+>  }
+> =20
+> -void cpu_ppc_store_hdecr (CPUPPCState *env, uint32_t value)
+> +void cpu_ppc_store_hdecr (CPUPPCState *env, target_ulong value)
+>  {
+>      PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> +    int nr_bits =3D (pcc->hdecr_bits > 32) ? pcc->hdecr_bits : 32;
+
+Similarly with hdecr_bits.
+
+> -    _cpu_ppc_store_hdecr(cpu, cpu_ppc_load_hdecr(env), value);
+> +    _cpu_ppc_store_hdecr(cpu, cpu_ppc_load_hdecr(env), value, nr_bits);
+>  }
+> =20
+>  static void cpu_ppc_hdecr_cb(void *opaque)
+> @@ -951,8 +979,8 @@ static void cpu_ppc_set_tb_clk (void *opaque, uint32_=
+t freq)
+>       * if a decrementer exception is pending when it enables msr_ee at s=
+tartup,
+>       * it's not ready to handle it...
+>       */
+> -    _cpu_ppc_store_decr(cpu, 0xFFFFFFFF, 0xFFFFFFFF);
+> -    _cpu_ppc_store_hdecr(cpu, 0xFFFFFFFF, 0xFFFFFFFF);
+> +    _cpu_ppc_store_decr(cpu, 0xFFFFFFFF, 0xFFFFFFFF, 32);
+> +    _cpu_ppc_store_hdecr(cpu, 0xFFFFFFFF, 0xFFFFFFFF, 32);
+>      cpu_ppc_store_purr(cpu, 0x0000000000000000ULL);
+>  }
+> =20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b6a571b6f1..acf62a2b9f 100644
+> index acf62a2b9f..966bc74e68 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -2077,6 +2077,7 @@ static const VMStateDescription vmstate_spapr =3D {
->          &vmstate_spapr_irq_map,
->          &vmstate_spapr_cap_nested_kvm_hv,
->          &vmstate_spapr_dtb,
-> +        &vmstate_spapr_cap_large_decr,
->          NULL
+> @@ -557,6 +557,14 @@ static void spapr_populate_cpu_dt(CPUState *cs, void=
+ *fdt, int offset,
+>                            pcc->radix_page_info->count *
+>                            sizeof(radix_AP_encodings[0]))));
 >      }
->  };
-> @@ -4288,6 +4289,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
->      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB */
->      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-> +    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D 0;
-
-This looks basically fine, but the name kind of suggests it's a
-boolean, whereas it's actually a number of bits.  I wonder if just
-calling it "decrementer bits" would be clearer, with it defaulting to
-32.
-
->      spapr_caps_add_properties(smc, &error_abort);
->      smc->irq =3D &spapr_irq_xics;
->      smc->dr_phb_enabled =3D true;
+> +
+> +    /*
+> +     * We set this property to let the guest know that it can use the la=
+rge
+> +     * decrementer and its width in bits.
+> +     */
+> +    if (env->large_decr_bits)
+> +        _FDT((fdt_setprop_u32(fdt, offset, "ibm,dec-bits",
+> +                              env->large_decr_bits)));
+>  }
+> =20
+>  static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *sp=
+apr)
 > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 64f98ae68d..1545a02729 100644
+> index 1545a02729..44542fdbb2 100644
 > --- a/hw/ppc/spapr_caps.c
 > +++ b/hw/ppc/spapr_caps.c
-> @@ -182,6 +182,34 @@ static void spapr_cap_set_pagesize(Object *obj, Visi=
-tor *v, const char *name,
->      spapr->eff.caps[cap->index] =3D val;
->  }
-> =20
-> +static void spapr_cap_get_uint8(Object *obj, Visitor *v, const char *nam=
-e,
-> +                                void *opaque, Error **errp)
-> +{
-> +    sPAPRCapabilityInfo *cap =3D opaque;
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +    uint8_t val =3D spapr_get_cap(spapr, cap->index);
-> +
-> +    visit_type_uint8(v, name, &val, errp);
-> +}
-> +
-> +static void spapr_cap_set_uint8(Object *obj, Visitor *v, const char *nam=
-e,
-> +                                void *opaque, Error **errp)
-> +{
-> +    sPAPRCapabilityInfo *cap =3D opaque;
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +    Error *local_err =3D NULL;
-> +    uint8_t val;
-> +
-> +    visit_type_uint8(v, name, &val, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    spapr->cmd_line_caps[cap->index] =3D true;
-> +    spapr->eff.caps[cap->index] =3D val;
-> +}
-> +
->  static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val, Error *=
-*errp)
->  {
->      if (!val) {
-> @@ -390,6 +418,13 @@ static void cap_nested_kvm_hv_apply(sPAPRMachineStat=
+> @@ -421,8 +421,43 @@ static void cap_nested_kvm_hv_apply(sPAPRMachineStat=
 e *spapr,
->      }
->  }
-> =20
-> +static void cap_large_decr_apply(sPAPRMachineState *spapr,
-> +                                 uint8_t val, Error **errp)
-> +{
-> +    if (val)
-> +        error_setg(errp, "No large decrementer support, try cap-large-de=
+>  static void cap_large_decr_apply(sPAPRMachineState *spapr,
+>                                   uint8_t val, Error **errp)
+>  {
+> -    if (val)
+> +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> +
+> +    if (!val)
+> +        return; /* Disabled by default */
+> +
+> +    if (tcg_enabled()) {
+> +        if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
+> +                              spapr->max_compat_pvr)) {
+
+IIUC this is strictly redundant with the check against hdecr_bits,
+yes, but will  result in a more helpful error message.  Is that right?
+
+> +            error_setg(errp,
+> +                "Large decrementer only supported on POWER9, try -cpu PO=
+WER9");
+> +            return;
+> +        }
+> +        if ((val < 32) || (val > pcc->hdecr_bits)) {
+> +            error_setg(errp,
+> +                "Large decrementer size unsupported, try -cap-large-decr=
+=3D%d",
+> +                pcc->hdecr_bits);
+> +            return;
+> +        }
+> +    } else {
+>          error_setg(errp, "No large decrementer support, try cap-large-de=
 cr=3D0");
+> +    }
 > +}
 > +
+> +static void cap_large_decr_cpu_apply(sPAPRMachineState *spapr,
+> +                                     PowerPCCPU *cpu,
+> +                                     uint8_t val, Error **errp)
+> +{
+> +    CPUPPCState *env =3D &cpu->env;
+> +    target_ulong lpcr =3D env->spr[SPR_LPCR];
+> +
+> +    if (val)
+> +        lpcr |=3D LPCR_LD;
+> +    else
+> +        lpcr &=3D ~LPCR_LD;
+> +    ppc_store_lpcr(cpu, lpcr);
+> +    env->large_decr_bits =3D val;
+>  }
+> =20
 >  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
->      [SPAPR_CAP_HTM] =3D {
->          .name =3D "htm",
-> @@ -468,6 +503,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =
+> @@ -511,6 +546,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =
 =3D {
->          .type =3D "bool",
->          .apply =3D cap_nested_kvm_hv_apply,
+>          .set =3D spapr_cap_set_uint8,
+>          .type =3D "int",
+>          .apply =3D cap_large_decr_apply,
+> +        .cpu_apply =3D cap_large_decr_cpu_apply,
 >      },
-> +    [SPAPR_CAP_LARGE_DECREMENTER] =3D {
-> +        .name =3D "large-decr",
-> +        .description =3D "Size of Large Decrementer for the Guest (bits)=
- 0=3Ddisabled",
-> +        .index =3D SPAPR_CAP_LARGE_DECREMENTER,
-> +        .get =3D spapr_cap_get_uint8,
-> +        .set =3D spapr_cap_set_uint8,
-> +        .type =3D "int",
-> +        .apply =3D cap_large_decr_apply,
-> +    },
 >  };
 > =20
->  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-> @@ -596,6 +640,7 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
->  SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
->  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
->  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
-> +SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index ae51fe754e..cced705e30 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -190,6 +190,7 @@ typedef struct PowerPCCPUClass {
+>  #endif
+>      const PPCHash64Options *hash64_opts;
+>      struct ppc_radix_page_info *radix_page_info;
+> +    uint32_t hdecr_bits;
+>      void (*init_proc)(CPUPPCState *env);
+>      int  (*check_pow)(CPUPPCState *env);
+>      int (*handle_mmu_fault)(PowerPCCPU *cpu, vaddr eaddr, int rwx, int m=
+mu_idx);
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 26604ddf98..8da333e9da 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1171,6 +1171,9 @@ struct CPUPPCState {
+>      uint32_t tm_vscr;
+>      uint64_t tm_dscr;
+>      uint64_t tm_tar;
+> +
+> +    /* Large Decrementer */
+> +    int large_decr_bits;
+>  };
 > =20
->  void spapr_caps_init(sPAPRMachineState *spapr)
->  {
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 59073a7579..8efc5e0779 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -74,8 +74,10 @@ typedef enum {
->  #define SPAPR_CAP_HPT_MAXPAGESIZE       0x06
->  /* Nested KVM-HV */
->  #define SPAPR_CAP_NESTED_KVM_HV         0x07
-> +/* Large Decrementer */
-> +#define SPAPR_CAP_LARGE_DECREMENTER     0x08
->  /* Num Caps */
-> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_NESTED_KVM_HV + 1)
-> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_LARGE_DECREMENTER + 1)
-> =20
->  /*
->   * Capability Values
-> @@ -828,6 +830,7 @@ extern const VMStateDescription vmstate_spapr_cap_cfp=
-c;
->  extern const VMStateDescription vmstate_spapr_cap_sbbc;
->  extern const VMStateDescription vmstate_spapr_cap_ibs;
->  extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
-> +extern const VMStateDescription vmstate_spapr_cap_large_decr;
-> =20
->  static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
->  {
+>  #define SET_FIT_PERIOD(a_, b_, c_, d_)          \
+> @@ -1321,10 +1324,10 @@ uint32_t cpu_ppc_load_atbu (CPUPPCState *env);
+>  void cpu_ppc_store_atbl (CPUPPCState *env, uint32_t value);
+>  void cpu_ppc_store_atbu (CPUPPCState *env, uint32_t value);
+>  bool ppc_decr_clear_on_delivery(CPUPPCState *env);
+> -uint32_t cpu_ppc_load_decr (CPUPPCState *env);
+> -void cpu_ppc_store_decr (CPUPPCState *env, uint32_t value);
+> -uint32_t cpu_ppc_load_hdecr (CPUPPCState *env);
+> -void cpu_ppc_store_hdecr (CPUPPCState *env, uint32_t value);
+> +target_ulong cpu_ppc_load_decr (CPUPPCState *env);
+> +void cpu_ppc_store_decr (CPUPPCState *env, target_ulong value);
+> +target_ulong cpu_ppc_load_hdecr (CPUPPCState *env);
+> +void cpu_ppc_store_hdecr (CPUPPCState *env, target_ulong value);
+>  uint64_t cpu_ppc_load_purr (CPUPPCState *env);
+>  uint32_t cpu_ppc601_load_rtcl (CPUPPCState *env);
+>  uint32_t cpu_ppc601_load_rtcu (CPUPPCState *env);
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index c431303eff..a2b1ec5040 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -1109,7 +1109,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
+al)
+>      case POWERPC_MMU_3_00: /* P9 */
+>          lpcr =3D val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
+>                        (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_A=
+IL |
+> -                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR |
+> +                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LPCR=
+_LD |
+>                        (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_=
+EEE |
+>                        LPCR_DEE | LPCR_OEE)) | LPCR_MER | LPCR_GTSE | LPC=
+R_TC |
+>                        LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE);
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 819221f246..b156be4d98 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -7417,7 +7417,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fpri=
+ntf_function cpu_fprintf,
+>  #if !defined(NO_TIMER_DUMP)
+>      cpu_fprintf(f, "TB %08" PRIu32 " %08" PRIu64
+>  #if !defined(CONFIG_USER_ONLY)
+> -                " DECR %08" PRIu32
+> +                " DECR " TARGET_FMT_lu
+>  #endif
+>                  "\n",
+>                  cpu_ppc_load_tbu(env), cpu_ppc_load_tbl(env)
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 58542c0fe0..4e0bf1f47a 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -8926,6 +8926,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+>      /* segment page size remain the same */
+>      pcc->hash64_opts =3D &ppc_hash64_opts_POWER7;
+>      pcc->radix_page_info =3D &POWER9_radix_page_info;
+> +    pcc->hdecr_bits =3D 56;
+>  #endif
+>      pcc->excp_model =3D POWERPC_EXCP_POWER9;
+>      pcc->bus_model =3D PPC_FLAGS_INPUT_POWER9;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -189,24 +469,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hl1kWnBARzJiTscN
+--OGLMwEELQbPC02lM
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx0tOIACgkQbDjKyiDZ
-s5IgLg/9HM1+ppN+q2RNif2K7TdqVRJlIZg24hjl5xfpllXKg3gSqYjmRoiWlQkJ
-fS92/nrLZzmgplwSxIuUY2A+4zq+1sHkP7MaxsqrlauV5h10M+Im4eznSKTLyQMb
-ep0mXWJAnVkqBP1HFWX8O8mCwdjgvawNZjZdbZO/KQLUkynllr1UvP+6G0ZbDJOp
-Jwwzdsgaew7BXY9xkBuUgeAFVs+2V4Ud3IqTotYBOVvvoZTyBb+akE4PxpovMQ1o
-+kv4iTacEg8+/UaOxBxRmquPrZa+44VuJyxGNNSOZqB3QIvVzzm880NuzTn7sfOV
-+tnbFfHJ4JLCdH12Xggu2ThevvI9iu4JMNOFnu4Z0QAoAph8oT8Sb1vNnZ9CNS5J
-g05ALP71ayejZjXadLlIdMPWDs7EQ72ZaAkv9Hr+buukla+XgBWDtfO2h9H45KKk
-dbmTWKJIvP6836ZDEmfPOal8Alwc3EZyBjpFS66KbXWkzAyBTkiCVSQqxUK43atf
-MAHawEznA6K0C69wqAn0CTmhwMQwPvFrTFQWn/Q/OcLco7YZ3JiX1TaMv3HQuhZI
-OT7AVJZzx/3WLpFOtCTaXNhwb4GFDweZSqkyHdwHcDQMGUhs9pwEYMUDtHsoV/oh
-hfQidyd7lstH8Inrx+XAgDSbg1Aw0vl1FShft06PtDjtEzHf0/s=
-=F5Ps
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx0uDQACgkQbDjKyiDZ
+s5Ki+Q/+JmcnU3Sh51WCnoWiFRnXPVMHT3isIy7C+unurkaBV2r+TVn+oe1pAuZn
+tslGG8dgIQcWMKqaArx3hWdSoBz7tfiJrGE9GGxp+G/tOLWmNsC0JqprfFQla4RW
+NHwcfiymKcd7+WTHKPGs45hxe9OEmK9SjXcLwZpWr+d/RKn1IwV4ZH0yW/i4DtZN
+s+tjI77i7v5OfkQCjWAl2Ee8ASfFXXTT8EsYl1o0wwsm7RVDIc3icVCEknOgaLwV
+Fh2OaDzLKXnF4LxKHgKnU6nMeN+3+qBdIXO3HH1ktvj4OGXAFekb7XzsEig2Hzcm
+Hf3bf4q4Zwu3pcLcKqOfaGhqp/uyh1ZCq4sLs8CkTYczL6ipXzyLlXlwWJUHRNEX
+YLyrcnFaMW3Yj72tRMduWl9VvDmenpbjhkjq6d/A5moCPtiO8oe3yLoZVrt9/oBH
+MctjnfReIEr+STjxclwn/MNOTj2YwWc8I3X5ubLCQfOdcwucxoES3w98x7W0v1vG
++FhR5b9ZYOn+FeQNK9pcVg8jKyNHB5QCSghRGl0jfMRrc9EOYZDc21uGL0bEuzWX
+wUXQKrkcBz8R7GKtlM5R6e5f3dc/5eyFvYGLZWMGkKFyOuo0E0EyBK5ENtJUOKI7
+eifh67mTCgiefAO7wHxAavvPKw7BaKnVKiAAOjK2UxmAK0pqBzk=
+=zHSA
 -----END PGP SIGNATURE-----
 
---hl1kWnBARzJiTscN--
+--OGLMwEELQbPC02lM--
