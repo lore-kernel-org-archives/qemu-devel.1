@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55587)
+Received: from eggs.gnu.org ([209.51.188.92]:58142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxiwell@linux.ibm.com>) id 1gydc2-0007Mc-Vk
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:21:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gydlm-0002cY-Ue
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:31:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxiwell@linux.ibm.com>) id 1gydc1-000356-2o
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:21:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39932)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxiwell@linux.ibm.com>)
-	id 1gydby-00033x-W7
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:21:37 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1QEIhxv073747
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 09:21:33 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qw740861b-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 09:21:33 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <maxiwell@linux.ibm.com>;
-	Tue, 26 Feb 2019 14:21:32 -0000
-Date: Tue, 26 Feb 2019 11:21:26 -0300
-From: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
-References: <20190225162325.24008-1-maxiwell@linux.ibm.com>
-	<20190225232009.GB30778@kermit.br.ibm.com>
-	<20190226032103.GJ6872@umbus.fritz.box>
+	(envelope-from <peter.maydell@linaro.org>) id 1gydlh-0001IG-7Q
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:31:42 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gydlf-0001DM-Sm
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:31:36 -0500
+Received: by mail-ot1-x342.google.com with SMTP id g1so11186192otj.11
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 06:31:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190226032103.GJ6872@umbus.fritz.box>
-Message-Id: <20190226142126.jxosththzad6h6dd@maxibm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr-rtas: add ibm,
- get-vpd RTAS interface
+References: <20190215155919.GA10823@nyan>
+	<CAFEAcA9yEBy-=-2oSDqAXLffGjU7Aa9MeVtYFCU29qxerWb23A@mail.gmail.com>
+In-Reply-To: <CAFEAcA9yEBy-=-2oSDqAXLffGjU7Aa9MeVtYFCU29qxerWb23A@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Feb 2019 14:31:16 +0000
+Message-ID: <CAFEAcA8mJ=69NkrO_7_9WoCPq+GYCN9WRf6PuUtGv+4LXXDRow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [v4 PATCH] hw/arm/bcm2835_peripherals: add bcm283x
+ arm timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,69 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, qemu-devel@nongnu.org, "open list:sPAPR" <qemu-ppc@nongnu.org>
+To: Mark <alnyan@airmail.cc>
+Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "open list:Raspberry Pi" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-On Tue, Feb 26, 2019 at 02:21:03PM +1100, David Gibson wrote:
-> On Mon, Feb 25, 2019 at 08:20:09PM -0300, Murilo Opsfelder Araujo wrote=
-:
-> > Hi, Maxiwell.
-> >=20
-> > On Mon, Feb 25, 2019 at 01:23:25PM -0300, Maxiwell S. Garcia wrote:
-> > > This adds a handler for ibm,get-vpd RTAS calls, allowing pseries
-> > > guest to collect host information. It is disabled by default to
-> > > avoid unwanted information leakage. To enable it, use:
-> > > =E2=80=98-M pseries,vpd-export=3Don=E2=80=99
-> >=20
-> > The patch for setting host-serial and host-model already landed Gibso=
-n's
-> > ppc-for-4.0 branch:
-> >=20
-> >   commit 9e584f45868f6945c1282c938278038cba0e4af2
-> >   Author: Prasad J Pandit <pjp@fedoraproject.org>
-> >   Date:   Mon Feb 18 23:43:49 2019 +0530
-> >=20
-> >       ppc: add host-serial and host-model machine attributes (CVE-201=
-9-8934)
-> >=20
-> >=20
-> > QEMU should only return host-serial and host-model from the host if t=
-he
-> > following combination of parameters are provided:
-> >=20
-> >   -M host-serial=3Dpassthrough,host-model=3Dpassthrough,vpd-export=3D=
-on
-> >=20
-> > If host-serial or host-model are set with a user-string, ibm,get-vpd =
-should
-> > honor these values and return them, not exposing host information by =
-accident.
-> >=20
-> > I'm not even sure if we need vpd-export=3D<bool> setting. Its logic c=
-ould be
-> > derived from the presence of host-serial=3Dpassthrough and host-model=
-=3Dpassthrough
-> > options.
-> >=20
-> > What do you think?
->=20
-> That's an excellent point - I hadn't thought through the fact that
-> this is the same information exposed by those properties.  I do indeed
-> think that exposing the same information set in those properties - and
-> thereby avoiding the new machine option - would be a better plan.
->=20
+On Thu, 21 Feb 2019 at 11:31, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 15 Feb 2019 at 15:59, Mark <alnyan@airmail.cc> wrote:
+> > +    s->irq = qemu_allocate_irq(bcm283x_timer_set_irq, s, 0);
+>
+> I know this code has come from the sp804 code, but it's
+> actually wrong (and I should fix the sp804). qemu_allocate_irq()
+> is for interrupt lines that come into a device, not for ones
+> that go out from it, like this one. The call happens to have
+> no visible bad effects because what it does will be overrriden
+> later when the board code wires up the interrupt to the
+> interrupt controller. (There will be a tiny memory leak.)
 
-I saw that the patch was applied. So I will work in another patch
-to use these properties and remove the export-vpd option.
+Looking more closely at this, my analysis here is wrong -- sorry.
+For the sp804, this call is necessary, because the sp804
+has a dual layer structure between the arm_timer_state
+layer and the SP804State layer. It creates outbound IRQs
+from the arm_timer_state with qemu_allocate_irq(), and
+effectively connects them to the SP804State via the
+sp804_set_irq() function (which raises the outbound IRQ from
+the SP804State if either of the arm_timer_state lines is high).
 
-Another thing that I thought the fact that 'host-serial' and 'host-model'
-nodes in Device Tree are not in accordance with LoPAPR document. What
-you think in use only get-vpd to get these information and remove
-nodes from device tree?
+In your case there is no dual-layer structure, so you don't
+need to call qemu_allocate_irq() at all. (You're effectively
+trying to use BCM283xTimerState as both the inner layer IRQ
+and the outer layer IRQ, and it happens to work because the
+setup of the outer layer happens last so the bogus inner
+layer initialization is ignored.)
 
-> --=20
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _oth=
-er_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+> You can just delete the qemu_allocate_irq() call here, and
+> the bcm283x_timer_set_irq() function.
+
+So my recommendation here was correct, but my reasoning was
+not right.
+
+thanks
+-- PMM
