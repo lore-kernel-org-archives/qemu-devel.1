@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58110)
+Received: from eggs.gnu.org ([209.51.188.92]:58112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlH-0005PB-ID
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlH-0005PE-IM
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlF-0002u3-I7
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlF-0002tl-H2
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:35 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:49 +1100
-Message-Id: <20190226045304.25618-36-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:43 +1100
+Message-Id: <20190226045304.25618-30-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 35/50] spapr: Expose the name of the interrupt
- controller node
+Subject: [Qemu-devel] [PULL 29/50] spapr_drc: Allow FDT fragment to be added
+ later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,192 +27,166 @@ Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qem
 
 From: Greg Kurz <groug@kaod.org>
 
-This will be needed by PHB hotplug in order to access the "phandle"
-property of the interrupt controller node.
+The current logic is to provide the FDT fragment when attaching a device
+to a DRC. This works perfectly fine for our current hotplug support, but
+soon we will add support for PHB hotplug which has some constraints, that
+CPU, PCI and LMB devices don't seem to have.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+The first constraint is that the "ibm,dma-window" property of the PHB
+node requires the IOMMU to be configured, ie, spapr_tce_table_enable()
+has been called, which happens during PHB reset. It is okay in the case
+of hotplug since the device is reset before the hotplug handler is
+called. On the contrary with coldplug, the hotplug handler is called
+first and device is only reset during the initial system reset. Trying
+to create the FDT fragment on the hotplug path in this case, would
+result in somthing like this:
+
+ibm,dma-window =3D < 0x80000000 0x00 0x00 0x00 0x00 >;
+
+This will cause linux in the guest to panic, by simply removing and
+re-adding the PHB using the drmgr command:
+
+	page =3D alloc_pages_node(nid, GFP_KERNEL, get_order(sz));
+	if (!page)
+		panic("iommu_init_table: Can't allocate %ld bytes\n", sz);
+
+The second and maybe more problematic constraint is that the
+"interrupt-map" property needs to reference the interrupt controller
+node using the very same phandle that SLOF has already exposed to the
+guest. QEMU requires SLOF to call the private KVMPPC_H_UPDATE_DT hcall
+at some point to know about this phandle. With the latest QEMU and SLOF,
+this happens when SLOF gets quiesced. This means that if the PHB gets
+hotplugged after CAS but before SLOF quiesce, then we're sure that the
+phandle is not known when the hotplug handler is called.
+
+The FDT is only needed when the guest first invokes RTAS to configure
+the connector actually, long after SLOF quiesce. Let's postpone the
+creation of FDT fragments for PHBs to rtas_ibm_configure_connector().
+
+Since we only need this for PHBs, introduce a new method in the base
+DRC class for that. DRC subtypes will be converted to use it in
+subsequent patches.
+
+Allow spapr_drc_attach() to be passed a NULL fdt argument if the method
+is available. When all DRC subtypes have been converted, the fdt argument
+will eventually disappear.
+
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <155059668867.1466090.6339199751719123386.stgit@bahia.lab.tou=
-louse-stg.fr.ibm.com>
+Message-Id: <155059665823.1466090.18358845122627355537.stgit@bahia.lab.to=
+ulouse-stg.fr.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive.c        |  9 ++++-----
- hw/intc/xics_spapr.c        |  2 +-
- hw/ppc/spapr_irq.c          | 21 ++++++++++++++++++++-
- include/hw/ppc/spapr_irq.h  |  1 +
- include/hw/ppc/spapr_xive.h |  3 +++
- include/hw/ppc/xics_spapr.h |  2 ++
- 6 files changed, 31 insertions(+), 7 deletions(-)
+ hw/ppc/spapr_drc.c         | 36 +++++++++++++++++++++++++++++++-----
+ include/hw/ppc/spapr_drc.h |  6 ++++++
+ 2 files changed, 37 insertions(+), 5 deletions(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 290a290e43..06e3c9fdbf 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -317,6 +317,9 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
-r **errp)
-     /* Map all regions */
-     spapr_xive_map_mmio(xive);
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 2edb7d1e9c..66b965a0a7 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -22,6 +22,7 @@
+ #include "qemu/error-report.h"
+ #include "hw/ppc/spapr.h" /* for RTAS return codes */
+ #include "hw/pci-host/spapr.h" /* spapr_phb_remove_pci_device_cb callbac=
+k */
++#include "sysemu/device_tree.h"
+ #include "trace.h"
 =20
-+    xive->nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
-+                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_=
-SHIFT));
+ #define DRC_CONTAINER_PATH "/dr-connector"
+@@ -376,6 +377,8 @@ static void prop_get_fdt(Object *obj, Visitor *v, con=
+st char *name,
+ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+                       int fdt_start_offset, Error **errp)
+ {
++    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
 +
-     qemu_register_reset(spapr_xive_reset, dev);
- }
+     trace_spapr_drc_attach(spapr_drc_index(drc));
 =20
-@@ -1448,7 +1451,6 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint32=
-_t nr_servers, void *fdt,
-         cpu_to_be32(7),    /* start */
-         cpu_to_be32(0xf8), /* count */
-     };
--    gchar *nodename;
+     if (drc->dev) {
+@@ -384,11 +387,14 @@ void spapr_drc_attach(sPAPRDRConnector *drc, Device=
+State *d, void *fdt,
+     }
+     g_assert((drc->state =3D=3D SPAPR_DRC_STATE_LOGICAL_UNUSABLE)
+              || (drc->state =3D=3D SPAPR_DRC_STATE_PHYSICAL_POWERON));
+-    g_assert(fdt);
++    g_assert(fdt || drck->dt_populate);
 =20
-     /* Thread Interrupt Management Area : User (ring 3) and OS (ring 2) =
-*/
-     timas[0] =3D cpu_to_be64(xive->tm_base +
-@@ -1458,10 +1460,7 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint3=
-2_t nr_servers, void *fdt,
-                            XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
-     timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
-=20
--    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
--                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_=
-SHIFT));
--    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
--    g_free(nodename);
-+    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename));
-=20
-     _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
-     _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index e2d8b38183..53bda6661b 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -254,7 +254,7 @@ void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t=
- nr_servers, void *fdt,
-     };
-     int node;
-=20
--    _FDT(node =3D fdt_add_subnode(fdt, 0, "interrupt-controller"));
-+    _FDT(node =3D fdt_add_subnode(fdt, 0, XICS_NODENAME));
-=20
-     _FDT(fdt_setprop_string(fdt, node, "device_type",
-                             "PowerPC-External-Interrupt-Presentation"));
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 4297eed600..359761494c 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -230,6 +230,11 @@ static void spapr_irq_reset_xics(sPAPRMachineState *=
-spapr, Error **errp)
-     /* TODO: create the KVM XICS device */
- }
-=20
-+static const char *spapr_irq_get_nodename_xics(sPAPRMachineState *spapr)
-+{
-+    return XICS_NODENAME;
-+}
+     drc->dev =3D d;
+-    drc->fdt =3D fdt;
+-    drc->fdt_start_offset =3D fdt_start_offset;
 +
- #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
- #define SPAPR_IRQ_XICS_NR_MSIS     \
-     (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-@@ -249,6 +254,7 @@ sPAPRIrq spapr_irq_xics =3D {
-     .post_load   =3D spapr_irq_post_load_xics,
-     .reset       =3D spapr_irq_reset_xics,
-     .set_irq     =3D spapr_irq_set_irq_xics,
-+    .get_nodename =3D spapr_irq_get_nodename_xics,
- };
++    if (fdt) {
++        drc->fdt =3D fdt;
++        drc->fdt_start_offset =3D fdt_start_offset;
++    }
 =20
- /*
-@@ -384,6 +390,11 @@ static void spapr_irq_set_irq_xive(void *opaque, int=
- srcno, int val)
-     xive_source_set_irq(&spapr->xive->source, srcno, val);
- }
+     object_property_add_link(OBJECT(drc), "device",
+                              object_get_typename(OBJECT(drc->dev)),
+@@ -1102,10 +1108,30 @@ static void rtas_ibm_configure_connector(PowerPCC=
+PU *cpu,
+         goto out;
+     }
 =20
-+static const char *spapr_irq_get_nodename_xive(sPAPRMachineState *spapr)
-+{
-+    return spapr->xive->nodename;
-+}
+-    g_assert(drc->fdt);
+-
+     drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+=20
++    g_assert(drc->fdt || drck->dt_populate);
 +
- /*
-  * XIVE uses the full IRQ number space. Set it to 8K to be compatible
-  * with XICS.
-@@ -407,6 +418,7 @@ sPAPRIrq spapr_irq_xive =3D {
-     .post_load   =3D spapr_irq_post_load_xive,
-     .reset       =3D spapr_irq_reset_xive,
-     .set_irq     =3D spapr_irq_set_irq_xive,
-+    .get_nodename =3D spapr_irq_get_nodename_xive,
- };
-=20
- /*
-@@ -541,6 +553,11 @@ static void spapr_irq_set_irq_dual(void *opaque, int=
- srcno, int val)
-     spapr_irq_current(spapr)->set_irq(spapr, srcno, val);
- }
-=20
-+static const char *spapr_irq_get_nodename_dual(sPAPRMachineState *spapr)
-+{
-+    return spapr_irq_current(spapr)->get_nodename(spapr);
-+}
++    if (!drc->fdt) {
++        Error *local_err =3D NULL;
++        void *fdt;
++        int fdt_size;
 +
- /*
-  * Define values in sync with the XIVE and XICS backend
-  */
-@@ -561,7 +578,8 @@ sPAPRIrq spapr_irq_dual =3D {
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
-     .post_load   =3D spapr_irq_post_load_dual,
-     .reset       =3D spapr_irq_reset_dual,
--    .set_irq     =3D spapr_irq_set_irq_dual
-+    .set_irq     =3D spapr_irq_set_irq_dual,
-+    .get_nodename =3D spapr_irq_get_nodename_dual,
- };
-=20
- /*
-@@ -691,4 +709,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-     .post_load   =3D spapr_irq_post_load_xics,
-     .set_irq     =3D spapr_irq_set_irq_xics,
-+    .get_nodename =3D spapr_irq_get_nodename_xics,
- };
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 488511c3d8..8bf1a72919 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -47,6 +47,7 @@ typedef struct sPAPRIrq {
-     int (*post_load)(sPAPRMachineState *spapr, int version_id);
-     void (*reset)(sPAPRMachineState *spapr, Error **errp);
-     void (*set_irq)(void *opaque, int srcno, int val);
-+    const char *(*get_nodename)(sPAPRMachineState *spapr);
- } sPAPRIrq;
-=20
- extern sPAPRIrq spapr_irq_xics;
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 9bec9192e4..2d31f24e3b 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -26,6 +26,9 @@ typedef struct sPAPRXive {
-     XiveENDSource end_source;
-     hwaddr        end_base;
-=20
-+    /* DT */
-+    gchar *nodename;
++        fdt =3D create_device_tree(&fdt_size);
 +
-     /* Routing table */
-     XiveEAS       *eat;
-     uint32_t      nr_irqs;
-diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
-index b1ab27d022..b8d924baf4 100644
---- a/include/hw/ppc/xics_spapr.h
-+++ b/include/hw/ppc/xics_spapr.h
-@@ -29,6 +29,8 @@
-=20
- #include "hw/ppc/spapr.h"
-=20
-+#define XICS_NODENAME "interrupt-controller"
++        if (drck->dt_populate(drc, spapr, fdt, &drc->fdt_start_offset,
++                              &local_err)) {
++            g_free(fdt);
++            error_free(local_err);
++            rc =3D SPAPR_DR_CC_RESPONSE_ERROR;
++            goto out;
++        }
 +
- void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
-                    uint32_t phandle);
- int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
++        drc->fdt =3D fdt;
++        drc->ccs_offset =3D drc->fdt_start_offset;
++        drc->ccs_depth =3D 0;
++    }
++
+     do {
+         uint32_t tag;
+         const char *name;
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index f6ff32e7e2..2aa919f0cf 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -18,6 +18,7 @@
+ #include "qom/object.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/qdev.h"
++#include "qapi/error.h"
+=20
+ #define TYPE_SPAPR_DR_CONNECTOR "spapr-dr-connector"
+ #define SPAPR_DR_CONNECTOR_GET_CLASS(obj) \
+@@ -213,6 +214,8 @@ typedef struct sPAPRDRConnector {
+     int fdt_start_offset;
+ } sPAPRDRConnector;
+=20
++struct sPAPRMachineState;
++
+ typedef struct sPAPRDRConnectorClass {
+     /*< private >*/
+     DeviceClass parent;
+@@ -228,6 +231,9 @@ typedef struct sPAPRDRConnectorClass {
+     uint32_t (*isolate)(sPAPRDRConnector *drc);
+     uint32_t (*unisolate)(sPAPRDRConnector *drc);
+     void (*release)(DeviceState *dev);
++
++    int (*dt_populate)(sPAPRDRConnector *drc, struct sPAPRMachineState *=
+spapr,
++                       void *fdt, int *fdt_start_offset, Error **errp);
+ } sPAPRDRConnectorClass;
+=20
+ typedef struct sPAPRDRCPhysical {
 --=20
 2.20.1
