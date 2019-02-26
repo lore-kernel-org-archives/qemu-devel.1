@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49349)
+Received: from eggs.gnu.org ([209.51.188.92]:49699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyf1A-0000yY-5e
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:51:40 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gyf34-0001rv-ND
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:53:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gyf19-0002M9-AL
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:51:40 -0500
-Date: Tue, 26 Feb 2019 16:51:31 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190226155131.GC4598@linux.fritz.box>
-References: <20190226145930.5000-1-den@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190226145930.5000-1-den@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: propagate discard aligment from
- format drivers to the guest
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gyf33-0003DN-Sk
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:53:38 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Tue, 26 Feb 2019 18:53:25 +0300
+Message-Id: <1551196405-23815-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3] iotests: handle TypeError for Python 3 in
+ test 242
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +18,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, armbru@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, nsoffer@redhat.com, mreitz@redhat.com, kwolf@redhat.com, ehabkost@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-Am 26.02.2019 um 15:59 hat Denis V. Lunev geschrieben:
-> Nowaday SCSI drivers in guests are able to alight UNMAP requests before
+The data type for bytes in Python 3 differs from the one in Python 2.
+The type cast that is compatible with both versions was applied.
 
-Is s/alight/align/ what you mean?
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+---
+v2:
+The TypeError in Python3 was handled based on the version check.
+Discussed in the e-mail thread with the Message ID:
+<1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
-The subject line has an "alignment" typo, too.
+v1:
+The TypeError in Python3 was handled as the exception.
+Discussed in the e-mail thread with the Message ID:
+<1550519997-253534-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
-> sending to the device. Right now QEMU provides an ability to set
-> this via "discard_granularity" property of the block device which could
-> be used by management layer.
-> 
-> Though, in particular, from the point of QEMU, there is
-> pdiscard_granularity on the format driver level, f.e. on QCOW2 or iSCSI.
-> It would be beneficial to pass this value as a default for this
-> property.
-> 
-> Technically this should reduce the amount of useless UNMAP requests
-> from the guest to the host.
-> 
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Fam Zheng <fam@euphon.net>
+ tests/qemu-iotests/242 | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-I'm not doing things like this very often, but you're touching the guest
-ABI here, which is a bit tricky. The main point is that the same command
-line must result in the same guest view.
-
-You'll need at least some machine type magic to make old machine types
-use the old defaults. I'm not sure if there's something else to consider
-for migration compatibility.
-
-Kevin
+diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+index 16c65ed..c176e92 100755
+--- a/tests/qemu-iotests/242
++++ b/tests/qemu-iotests/242
+@@ -20,6 +20,7 @@
+ 
+ import iotests
+ import json
++import struct
+ from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
+     file_path, img_info_log, log, filter_qemu_io
+ 
+@@ -64,10 +65,11 @@ def write_to_disk(offset, size):
+ def toggle_flag(offset):
+     with open(disk, "r+b") as f:
+         f.seek(offset, 0)
+-        c = f.read(1)
+-        toggled = chr(ord(c) ^ bitmap_flag_unknown)
++        # Read one byte in a way compatible with Python 2
++        flags = struct.unpack("B", f.read(1))
++        toggled = flags[0] ^ bitmap_flag_unknown
+         f.seek(-1, 1)
+-        f.write(toggled)
++        f.write(struct.pack("B", toggled))
+ 
+ 
+ qemu_img_create('-f', iotests.imgfmt, disk, '1M')
+-- 
+1.8.3.1
