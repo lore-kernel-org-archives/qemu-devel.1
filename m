@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42513)
+Received: from eggs.gnu.org ([209.51.188.92]:42581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gygSn-0001oL-Hp
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:24:18 -0500
+	(envelope-from <armbru@redhat.com>) id 1gygTF-00021w-CQ
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gygSm-0007rM-Pk
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:24:17 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37624)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gygSk-0007pL-Gt
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:24:15 -0500
-Received: by mail-ot1-x344.google.com with SMTP id b3so11764100otp.4
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 09:24:14 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1gygTE-00089c-Ky
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:24:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gygTE-00088z-D6
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:24:44 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
+	<1549562254-41157-18-git-send-email-pbonzini@redhat.com>
+	<20190225084428.c7qon3btox2jvxq2@steredhat>
+	<30737edd-4b8c-a458-27c6-cd3fb5da22c3@redhat.com>
+	<875zt6y88o.fsf@dusky.pond.sub.org>
+	<bd83fecf-9ce5-9675-80e1-92c905cd1461@redhat.com>
+Date: Tue, 26 Feb 2019 18:24:38 +0100
+In-Reply-To: <bd83fecf-9ce5-9675-80e1-92c905cd1461@redhat.com> (Paolo
+	Bonzini's message of "Tue, 26 Feb 2019 16:25:50 +0100")
+Message-ID: <874l8qtqcp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190219222952.22183-1-richard.henderson@linaro.org>
-In-Reply-To: <20190219222952.22183-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Feb 2019 17:23:59 +0000
-Message-ID: <CAFEAcA_BDFaTpAc_e7hRB9NM+oiyjXHLRDin6cFo0W83q5H32A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] target/arm: Implement ARMv8.2-FHM
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 17/51] i386: express dependencies with
+ Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, thuth@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org, Stefano Garzarella <sgarzare@redhat.com>
 
-On Tue, 19 Feb 2019 at 22:29, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Changes since v4:
->
-> Fixed the FZ16 issue.
-> Add the aa64 HWCAP bits for both JSConv and FHM.
->
->
-> r~
->
->
-> Richard Henderson (5):
->   target/arm: Add helpers for FMLAL
->   target/arm: Implement FMLAL and FMLSL for aarch64
->   target/arm: Implement VFMAL and VFMSL for aarch32
->   target/arm: Enable ARMv8.2-FHM for -cpu max
->   linux-user: Enable HWCAP_ASIMDFHM, HWCAP_JSCVT
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
+> On 26/02/19 14:44, Markus Armbruster wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> 
+>>> On 25/02/19 09:44, Stefano Garzarella wrote:
+>>>>>  config I440FX
+>>>>>      bool
+>>>>> +    select PC_PCI
+>>>>> +    select PC_ACPI
+>>>>> +    select ACPI_SMBUS
+>>>>> +    select PCI_PIIX
+>>>>> +    select FDC
+>>>> Should we move "select FDC" under "config PC"?
+>>>>
+>>>> I'm not able to build the Q35 machine without enable FDC, since some fdc
+>>>> functions are used in hw/i386/pc.c (eg. isa_fdc_get_drive_type())
+>>>
+>>> Yes, that's a good idea.  I mistakenly thought that Q35 could be built
+>>> without FDC.
+>> 
+>> Could we add stubs to make it buildable that way?
+>
+> Of course I'm ecstatic that one benefit of Kconfig (finding suboptimal
+> dependencies) is already being realized _before_ it lands, but not now.
+>  However, those kind of cleanups can wait for 4.1. :)
 
+Absolutely.
 
-Applied to target-arm.next, thanks.
+> Note that we're doing the most important cleanups (e.g. not having to
+> bring PCI into boards that don't need it), but overall this series will
+> be about 120 patches and it's already a half miracle that everything was
+> done in <2 months and it will be already in 4.0.
 
--- PMM
+Congrats!
