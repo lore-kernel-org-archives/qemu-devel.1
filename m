@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38211)
+Received: from eggs.gnu.org ([209.51.188.92]:39113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gyk0j-00071e-G9
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:11:37 -0500
+	(envelope-from <david@redhat.com>) id 1gyk5g-0008Nd-8K
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:16:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gyk0h-0001RO-FB
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:11:33 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42885)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1gyk0d-0001Mq-HP
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:11:29 -0500
-Received: by mail-wr1-x432.google.com with SMTP id r5so15545017wrg.9
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 13:11:19 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1gyk5d-0004Xd-Fh
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 16:16:38 -0500
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-8-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <28395326-e599-45e0-ebbb-0758fc593284@redhat.com>
+Date: Tue, 26 Feb 2019 22:16:32 +0100
 MIME-Version: 1.0
-References: <CAKyx-3Paa6_RreGZw3sT+qmwu1=_DLnR_RDxa_gN20vwD1EnLw@mail.gmail.com>
-	<20190225152618.r3epnypkpu6fyokt@sirius.home.kraxel.org>
-	<A17B6D30-F428-48E5-B9D0-6F6E7DEE3778@gmail.com>
-	<20190226064347.i5kvwazmz3xcupkj@sirius.home.kraxel.org>
-In-Reply-To: <20190226064347.i5kvwazmz3xcupkj@sirius.home.kraxel.org>
-From: G 3 <programmingkidx@gmail.com>
-Date: Tue, 26 Feb 2019 16:11:06 -0500
-Message-ID: <CAKyx-3OOkkdSQ=UAucP_ZpormrEczwNhEpAnVtFeQOSOrnD7Vg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Questions about EDID
+In-Reply-To: <20190226113915.20150-8-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 07/33] s390x/tcg: Implement VECTOR
+ GENERATE MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +25,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-When I use edid=on, I do see a lot of extra resolutions available in Mac OS
-9 and Mac OS X, just not the resolution I want to use. Is there some kind
-of rule like the resolution value has to be divisible by a certain number?
+On 26.02.19 12:38, David Hildenbrand wrote:
+> This is the first instruction that uses gvec expansion for duplicating
+> elements. We will use makros for most gvec calls to simplify translating
+> vector numbers into offsets (and to not have to worry about oprsz and
+> maxsz).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-data.def      |  2 ++
+>  target/s390x/translate.c        |  1 +
+>  target/s390x/translate_vx.inc.c | 34 +++++++++++++++++++++++++++++++++
+>  3 files changed, 37 insertions(+)
+> 
+> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> index 1bdfcf8130..a3a0df7788 100644
+> --- a/target/s390x/insn-data.def
+> +++ b/target/s390x/insn-data.def
+> @@ -979,6 +979,8 @@
+>      E(0xe712, VGEG,    VRV,   V,   la2, 0, 0, 0, vge, 0, MO_64, IF_VEC)
+>  /* VECTOR GENERATE BYTE MASK */
+>      F(0xe744, VGBM,    VRI_a, V,   0, 0, 0, 0, vgbm, 0, IF_VEC)
+> +/* VECTOR GENERATE MASK */
+> +    F(0xe746, VGM,     VRI_b, V,   0, 0, 0, 0, vgm, 0, IF_VEC)
+>  
+>  #ifndef CONFIG_USER_ONLY
+>  /* COMPARE AND SWAP AND PURGE */
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index 3935bc8bb7..56c146f91e 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -34,6 +34,7 @@
+>  #include "disas/disas.h"
+>  #include "exec/exec-all.h"
+>  #include "tcg-op.h"
+> +#include "tcg-op-gvec.h"
+>  #include "qemu/log.h"
+>  #include "qemu/host-utils.h"
+>  #include "exec/cpu_ldst.h"
+> diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
+> index 7775401dd3..ed63b2ca22 100644
+> --- a/target/s390x/translate_vx.inc.c
+> +++ b/target/s390x/translate_vx.inc.c
+> @@ -43,6 +43,7 @@
+>  
+>  #define NUM_VEC_ELEMENT_BYTES(es) (1 << (es))
+>  #define NUM_VEC_ELEMENTS(es) (16 / NUM_VEC_ELEMENT_BYTES(es))
+> +#define NUM_VEC_ELEMENT_BITS(es) (NUM_VEC_ELEMENT_BYTES(es) * BITS_PER_BYTE)
+>  
+>  static inline bool valid_vec_element(uint8_t enr, TCGMemOp es)
+>  {
+> @@ -136,6 +137,9 @@ static void load_vec_element(DisasContext *s, uint8_t reg, uint8_t enr,
+>      tcg_temp_free_i64(tmp);
+>  }
+>  
+> +#define gen_gvec_dup_i64(es, v1, c) \
+> +    tcg_gen_gvec_dup_i64(es, vec_full_reg_offset(v1), 16, 16, c)
+> +
+>  static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
+>  {
+>      const uint8_t es = s->insn->data;
+> @@ -175,3 +179,33 @@ static DisasJumpType op_vgbm(DisasContext *s, DisasOps *o)
+>      tcg_temp_free_i32(zeroes);
+>      return DISAS_NEXT;
+>  }
+> +
+> +static DisasJumpType op_vgm(DisasContext *s, DisasOps *o)
+> +{
+> +    const uint8_t es = get_field(s->fields, m4);
+> +    const uint8_t bits = NUM_VEC_ELEMENT_BITS(es);
+> +    const uint8_t i2 = get_field(s->fields, i2) & (bits - 1);
+> +    const uint8_t i3 = get_field(s->fields, i3) & (bits - 1);
+> +    uint64_t mask = 0;
+> +    TCGv_i64 tmp;
+> +    int i;
+> +
+> +    if (es > MO_64) {
+> +        gen_program_exception(s, PGM_SPECIFICATION);
+> +        return DISAS_NORETURN;
+> +    }
+> +
+> +    /* generate the mask - take care of wrapping */
+> +    for (i = i2; ; i = (i + 1) % bits) {
+> +        mask |= 1ull << (bits - i - 1);
+> +        if (i == i3) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    tmp = tcg_temp_new_i64();
+> +    tcg_gen_movi_i64(tmp, mask);
+> +    gen_gvec_dup_i64(es, get_field(s->fields, v1), tmp);
 
-On Tue, Feb 26, 2019 at 1:43 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+Richard, shall I better convert this into
 
-> On Mon, Feb 25, 2019 at 09:49:22PM -0500, Programmingkid wrote:
-> >
-> > > On Feb 25, 2019, at 10:26 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > >
-> > > On Mon, Feb 25, 2019 at 09:05:30AM -0500, G 3 wrote:
-> > >> Hi Gerd, I was wondering if you have made any documentation for your
-> EDID
-> > >> patches. If you have could you provide a link please?
-> > >
-> > > No docs.
-> > >
-> > >> Also could a feature be added that allows the user to specify
-> resolutions
-> > >> to be made available to the guest?
-> > >>
-> > >> Maybe it could work like this: -device
-> VGA,edid=on,res=1366x768,7680x4320
-> > >
-> > > A single resolution works (via xres + yres properties).
-> >
-> > Could you send an example of the xres and yres properties please?
-> > I tried this but it didn't work: -device VGA,edid=on,xres=999,yres=888
->
-> That is correct.  But you also need a guest driver with edid support.
->
-> I think the macos driver got support for that, for linux support landed
-> in the 5.0 devel cycle.
->
-> cheers,
->   Gerd
->
->
+switch (es) {
+case MO_8:
+	tcg_gen_gvec_dup8i(..., 16, 16, mask)
+	break;
+case MO_16:
+	tcg_gen_gvec_dup16i(..., 16, 16, mask)
+	break;
+...
+};
+
+?
+
+Thanks
+
+> +    tcg_temp_free_i64(tmp);
+> +    return DISAS_NEXT;
+> +}
+> 
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
