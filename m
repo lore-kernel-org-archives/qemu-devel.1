@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51858)
+Received: from eggs.gnu.org ([209.51.188.92]:57399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUBb-00005O-La
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:17:45 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUkC-0004Sl-2r
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:53:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUBY-0003c7-4I
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:17:41 -0500
-Date: Tue, 26 Feb 2019 15:17:22 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUjz-0000fn-9J
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:53:18 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190226041722.GO6872@umbus.fritz.box>
-References: <20190222131322.26079-1-clg@kaod.org>
-	<20190222131322.26079-14-clg@kaod.org>
+Date: Tue, 26 Feb 2019 15:52:17 +1100
+Message-Id: <20190226045304.25618-4-david@gibson.dropbear.id.au>
+In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
+References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="djJN5oi3zFpblwUd"
-Content-Disposition: inline
-In-Reply-To: <20190222131322.26079-14-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] spapr/xive: fix device hotplug
- when VM is stopped
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/50] target/ppc: Fix support for "STOP light"
+ states on POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +23,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
 
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
---djJN5oi3zFpblwUd
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+STOP must act differently based on PSSCR:EC on POWER9. When set, it
+acts like the P7/P8 power management instructions and wake up at 0x100
+based on the wakeup conditions in LPCR.
 
-On Fri, Feb 22, 2019 at 02:13:22PM +0100, C=E9dric Le Goater wrote:
-> Instead of switching off the sources, set their state to PENDING to
-> possibly catch a hotplug event occuring while the VM is stopped. At
-> resume, check the previous state and if an interrupt was queued,
-> generate a trigger.
+When PSSCR:EC is clear however it will wakeup at the next instruction
+after STOP (if EE is clear) or take the corresponding interrupts (if
+EE is set).
 
-First, I think it would be better to fold this fix into the patch
-introducing the state change handlers.
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20190215161648.9600-4-clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/cpu-qom.h            |  1 +
+ target/ppc/cpu.h                | 12 +++++++++---
+ target/ppc/excp_helper.c        |  8 ++++++--
+ target/ppc/translate.c          | 13 ++++++++++++-
+ target/ppc/translate_init.inc.c |  7 +++++++
+ 5 files changed, 35 insertions(+), 6 deletions(-)
 
-Second, IIUC this would handle any instance of an irq being triggered
-while the VM is stopped.  Hotplug interrupts is one obvious case of
-that, but I'm not sure its the only one.  VFIO devices could interrupt
-while the VM is stopped, I think.  Maybe even emulated devices
-depending on how their synchronization with the cpu run state works.
-There might be other cases.  Does that sound right to you?
-
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  hw/intc/spapr_xive_kvm.c | 22 +++++++++++++++++++---
->  1 file changed, 19 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index 99a829fb3f60..64d160babb26 100644
-> --- a/hw/intc/spapr_xive_kvm.c
-> +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -500,8 +500,16 @@ static void kvmppc_xive_change_state_handler(void *o=
-paque, int running,
->      if (running) {
->          for (i =3D 0; i < xsrc->nr_irqs; i++) {
->              uint8_t pq =3D xive_source_esb_get(xsrc, i);
-> -            if (xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq << 8)) !=
-=3D 0x1) {
-> -                error_report("XIVE: IRQ %d has an invalid state", i);
-> +            uint8_t old_pq;
-> +
-> +            old_pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq <=
-< 8));
-> +
-> +            /*
-> +             * If an interrupt was queued (hotplug event) while VM was
-> +             * stopped, generate a trigger.
-> +             */
-> +            if (pq =3D=3D XIVE_ESB_RESET && old_pq =3D=3D XIVE_ESB_QUEUE=
-D) {
-> +                xive_esb_trigger(xsrc, i);
->              }
->          }
-> =20
-> @@ -515,7 +523,15 @@ static void kvmppc_xive_change_state_handler(void *o=
-paque, int running,
->       * migration is in progress.
->       */
->      for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> -        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_01);
-> +        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> +
-> +        /*
-> +         * PQ is set to PENDING to possibly catch a hotplug event
-> +         * occuring while the VM is stopped.
-> +         */
-> +        if (pq !=3D XIVE_ESB_OFF) {
-> +            pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_10);
-> +        }
->          xive_source_esb_set(xsrc, i, pq);
->      }
-> =20
-
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index 3130802304..e9cb158423 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -122,6 +122,7 @@ typedef enum {
+     PPC_PM_NAP,
+     PPC_PM_SLEEP,
+     PPC_PM_RVWINKLE,
++    PPC_PM_STOP,
+ } powerpc_pm_insn_t;
+=20
+ /***********************************************************************=
+******/
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 325ebbeb98..5b1899bfc9 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -414,6 +414,10 @@ struct ppc_slb_t {
+ #define LPCR_HVICE        PPC_BIT(62) /* HV Virtualisation Int Enable */
+ #define LPCR_HDICE        PPC_BIT(63)
+=20
++/* PSSCR bits */
++#define PSSCR_ESL         PPC_BIT(42) /* Enable State Loss */
++#define PSSCR_EC          PPC_BIT(43) /* Exit Criterion */
++
+ #define msr_sf   ((env->msr >> MSR_SF)   & 1)
+ #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
+ #define msr_shv  ((env->msr >> MSR_SHV)  & 1)
+@@ -1110,9 +1114,11 @@ struct CPUPPCState {
+      * instructions and SPRs are diallowed if MSR:HV is 0
+      */
+     bool has_hv_mode;
+-    /* On P7/P8, set when in PM state, we need to handle resume
+-     * in a special way (such as routing some resume causes to
+-     * 0x100), so flag this here.
++
++    /*
++     * On P7/P8/P9, set when in PM state, we need to handle resume in
++     * a special way (such as routing some resume causes to 0x100), so
++     * flag this here.
+      */
+     bool in_pm_state;
+ #endif
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index 7c7c8d1b9d..97503193ef 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -97,7 +97,10 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int e=
+xcp_model, int excp)
+     asrr0 =3D -1;
+     asrr1 =3D -1;
+=20
+-    /* check for special resume at 0x100 from doze/nap/sleep/winkle on P=
+7/P8 */
++    /*
++     * check for special resume at 0x100 from doze/nap/sleep/winkle on
++     * P7/P8/P9
++     */
+     if (env->in_pm_state) {
+         env->in_pm_state =3D false;
+=20
+@@ -960,7 +963,8 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
+t insn)
+     env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
+=20
+     /* Condition for waking up at 0x100 */
+-    env->in_pm_state =3D true;
++    env->in_pm_state =3D (insn !=3D PPC_PM_STOP) ||
++        (env->spr[SPR_PSSCR] & PSSCR_EC);
+ }
+ #endif /* defined(TARGET_PPC64) */
+=20
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index bffdbd9687..fde7ead7b7 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -3589,7 +3589,18 @@ static void gen_nap(DisasContext *ctx)
+=20
+ static void gen_stop(DisasContext *ctx)
+ {
+-    gen_nap(ctx);
++#if defined(CONFIG_USER_ONLY)
++    GEN_PRIV;
++#else
++    TCGv_i32 t;
++
++    CHK_HV;
++    t =3D tcg_const_i32(PPC_PM_STOP);
++    gen_helper_pminsn(cpu_env, t);
++    tcg_temp_free_i32(t);
++    /* Stop translation, as the CPU is supposed to sleep from now */
++    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
++#endif /* defined(CONFIG_USER_ONLY) */
+ }
+=20
+ static void gen_sleep(DisasContext *ctx)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index d884906004..8b1d324b3b 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8801,9 +8801,16 @@ static bool cpu_has_work_POWER9(CPUState *cs)
+     CPUPPCState *env =3D &cpu->env;
+=20
+     if (cs->halted) {
++        uint64_t psscr =3D env->spr[SPR_PSSCR];
++
+         if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
+             return false;
+         }
++
++        /* If EC is clear, just return true on any pending interrupt */
++        if (!(psscr & PSSCR_EC)) {
++            return true;
++        }
+         /* External Exception */
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
+             (env->spr[SPR_LPCR] & LPCR_EEE)) {
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---djJN5oi3zFpblwUd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx0vdIACgkQbDjKyiDZ
-s5IR1g//ZsbDP1snrbrNjUc5rzZ818iZ7xjd/HbGCkEk81Hp3//sOll4FInXRR76
-uSx2gsSq1YkF+kqnNc6OwB+GtuVzLfohzlV3srWAH3MpwWIOtpmYn9SbIRf+2lsw
-4AK+e+JS3tmEO7qtcID6zX35J9rLZcuQO/ShxwxwWLrTjVFRNIGsnh+w0BGwZpmf
-WyAr1OdavrHCnT4oVTC14IuLDzZZrsahDoinIo6Ghn9R53DgLvLJDvRH2DD1EuQL
-n/oM0A0fzoEgypiFzd00uEGZ1AIvkWQHItJe4mXm6SXdUD0GPVhY3FTDISXZE8oe
-CTsP+TJ0wXr3iBYB6QJ17Eva88Ez+FiWij/TmnhRUNBVp/w3zSoNvUDNs547XOBK
-dKzeorqSZy/gTfJUpQNMPSzlQF7bxnBjbRox+h7ChuHGFOl5zffb57xH9TVyVGNO
-HjsLaVmKPbe5x/jK4Ead84TsND7CQ4rDdNrGQPiYgWRM3/YGcF2TUiGl3pavnQvW
-+JkL2a2EeX5CtvUPCo2XGoR82S0kdG4/1BY7xYUz2tvIgNm9Rbq4rroAiWrQ9fuZ
-yfjSHr1bXIeLrf8Rv/6nks2RYIsli0ahQVd41aEDwhuq83v8Brw3thOo6hVxYK87
-d0RsEctFT0pSfWYBYOuwJoioAA1UINLowsFWyMYmObZiKX2Quhg=
-=ksvE
------END PGP SIGNATURE-----
-
---djJN5oi3zFpblwUd--
+2.20.1
