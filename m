@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46172)
+Received: from eggs.gnu.org ([209.51.188.92]:46174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyiV0-0002IS-E2
+	(envelope-from <armbru@redhat.com>) id 1gyiV0-0002IT-E5
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:34:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyiUu-0006MK-Oh
+	(envelope-from <armbru@redhat.com>) id 1gyiUu-0006M4-Oc
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:34:40 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 26 Feb 2019 20:34:02 +0100
-Message-Id: <20190226193408.23862-6-armbru@redhat.com>
-In-Reply-To: <20190226193408.23862-1-armbru@redhat.com>
-References: <20190226193408.23862-1-armbru@redhat.com>
+Date: Tue, 26 Feb 2019 20:33:57 +0100
+Message-Id: <20190226193408.23862-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 05/11] hw: Use PFLASH_CFI0{1,
- 2} and TYPE_PFLASH_CFI0{1, 2}
+Subject: [Qemu-devel] [PATCH v2 00/11] pflash: Fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,149 +23,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
 
-We have two open-coded copies of macro PFLASH_CFI01().  Move the macro
-to the header, so we can ditch the copies.  Move PFLASH_CFI02() to the
-header for symmetry.
+Alex Benn=C3=A9e posted this patch to address an XXX comment in
+pflash_cfi01_realize() the other day:
 
-We define macros TYPE_PFLASH_CFI01 and TYPE_PFLASH_CFI02 for type name
-strings, then mostly use the strings.  If the macros are worth
-defining, they are worth using.  Replace the strings by the macros.
+Subject: [PATCH v2] hw/block: report when pflash backing file isn't align=
+ed
+Message-Id: <20190215122808.22301-1-alex.bennee@linaro.org>
+https://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg04166.html
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
----
- hw/arm/vexpress.c        | 4 ++--
- hw/arm/virt.c            | 3 ++-
- hw/block/pflash_cfi01.c  | 3 ---
- hw/block/pflash_cfi02.c  | 3 ---
- hw/xtensa/xtfpga.c       | 4 ++--
- include/hw/block/flash.h | 4 ++++
- 6 files changed, 10 insertions(+), 11 deletions(-)
+Review led me to look into its callers.  Most of them are pleasantly
+boring: they create flash memory of some fixed size at some fixed
+address.  A few are more creative, and some of the creative ones look
+quite broken to me.  Fix them, and clean up some along the way.
 
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index ed46d2e730..f07134c424 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -515,7 +515,7 @@ static void vexpress_modify_dtb(const struct arm_boot=
-_info *info, void *fdt)
- static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *na=
-me,
-                                              DriveInfo *di)
- {
--    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
-=20
-     if (di) {
-         qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
-@@ -536,7 +536,7 @@ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr b=
-ase, const char *name,
-     qdev_init_nofail(dev);
-=20
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
--    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
-+    return PFLASH_CFI01(dev);
- }
-=20
- static void vexpress_common_init(MachineState *machine)
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 99c2b6e60d..f2e5fc1ce1 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -34,6 +34,7 @@
- #include "hw/arm/arm.h"
- #include "hw/arm/primecell.h"
- #include "hw/arm/virt.h"
-+#include "hw/block/flash.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/display/ramfb.h"
-@@ -874,7 +875,7 @@ static void create_one_flash(const char *name, hwaddr=
- flashbase,
-      * parameters as the flash devices on the Versatile Express board.
-      */
-     DriveInfo *dinfo =3D drive_get_next(IF_PFLASH);
--    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     const uint64_t sectorlength =3D 256 * 1024;
-=20
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index f75f0a6998..1c99aa6e4a 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -59,9 +59,6 @@ do {                                                   =
-     \
- #define DPRINTF(fmt, ...) do { } while (0)
- #endif
-=20
--#define PFLASH_CFI01(obj) \
--    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
--
- #define PFLASH_BE          0
- #define PFLASH_SECURE      1
-=20
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index c0869fc417..5ef40154b9 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -57,9 +57,6 @@ do {                                                   =
-    \
-=20
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
-=20
--#define PFLASH_CFI02(obj) \
--    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
--
- struct PFlashCFI02 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 3d59a7a356..e05ef75a75 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -167,7 +167,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
-ddress_space,
-                                       DriveInfo *dinfo, int be)
- {
-     SysBusDevice *s;
--    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
-=20
-     qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
-                         &error_abort);
-@@ -181,7 +181,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
-ddress_space,
-     s =3D SYS_BUS_DEVICE(dev);
-     memory_region_add_subregion(address_space, board->flash->base,
-                                 sysbus_mmio_get_region(s, 0));
--    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
-+    return PFLASH_CFI01(dev);
- }
-=20
- static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
-diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index 333005d9ff..aeea3ca99d 100644
---- a/include/hw/block/flash.h
-+++ b/include/hw/block/flash.h
-@@ -8,6 +8,8 @@
- /* pflash_cfi01.c */
-=20
- #define TYPE_PFLASH_CFI01 "cfi.pflash01"
-+#define PFLASH_CFI01(obj) \
-+    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
-=20
- typedef struct PFlashCFI01 PFlashCFI01;
-=20
-@@ -25,6 +27,8 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
- /* pflash_cfi02.c */
-=20
- #define TYPE_PFLASH_CFI02 "cfi.pflash02"
-+#define PFLASH_CFI02(obj) \
-+    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
-=20
- typedef struct PFlashCFI02 PFlashCFI02;
-=20
+v2:
+* PATCH 01+10: Style cleanups [checkpatch]
+* PATCH 02: Rewritten [Peter, Philippe]
+* PATCH 03+04: New [Philippe]
+* PATCH 06: Commit message improved, FIXME added, accidental
+  replacement of 64 * KiB by 65536 backed out [Zoltan]
+* PATCH 07: Style tweak [Alex, David]
+* PATCH 08: Commit message typo [Philippe]
+* PATCH 11: Commit message typo [L=C3=A1szl=C3=B3]
+* Old PATCH 10 dropped [Max, Peter]
+
+Markus Armbruster (11):
+  pflash: Rename pflash_t to PFlashCFI01, PFlashCFI02
+  pflash_cfi01: Do not exit() on guest aborting "write to buffer"
+  pflash_cfi01: Log use of flawed "write to buffer"
+  pflash: Rename *CFI_PFLASH* to *PFLASH_CFI*
+  hw: Use PFLASH_CFI0{1,2} and TYPE_PFLASH_CFI0{1,2}
+  sam460ex: Don't size flash memory to match backing image
+  ppc405_boards: Don't size flash memory to match backing image
+  r2d: Flash memory creation is confused about size, mark FIXME
+  mips_malta: Clean up definition of flash memory size somewhat
+  pflash: Clean up after commit 368a354f02b part 1
+  pflash: Clean up after commit 368a354f02b part 2
+
+ hw/arm/collie.c                          |   9 +-
+ hw/arm/digic_boards.c                    |   3 +-
+ hw/arm/gumstix.c                         |   8 +-
+ hw/arm/mainstone.c                       |   4 +-
+ hw/arm/musicpal.c                        |   8 +-
+ hw/arm/omap_sx1.c                        |   8 +-
+ hw/arm/versatilepb.c                     |   3 +-
+ hw/arm/vexpress.c                        |  10 +-
+ hw/arm/virt.c                            |   3 +-
+ hw/arm/xilinx_zynq.c                     |   5 +-
+ hw/arm/z2.c                              |   5 +-
+ hw/block/pflash_cfi01.c                  | 123 ++++++++++++-----------
+ hw/block/pflash_cfi02.c                  |  79 ++++++++-------
+ hw/i386/pc_sysfw.c                       |  10 +-
+ hw/lm32/lm32_boards.c                    |   8 +-
+ hw/lm32/milkymist.c                      |   4 +-
+ hw/microblaze/petalogix_ml605_mmu.c      |   5 +-
+ hw/microblaze/petalogix_s3adsp1800_mmu.c |   4 +-
+ hw/mips/mips_malta.c                     |  15 ++-
+ hw/mips/mips_r4k.c                       |   4 +-
+ hw/ppc/ppc405_boards.c                   |  57 ++++-------
+ hw/ppc/sam460ex.c                        |  41 +++++---
+ hw/ppc/virtex_ml507.c                    |   4 +-
+ hw/sh4/r2d.c                             |  11 +-
+ hw/xtensa/xtfpga.c                       |  12 +--
+ include/hw/block/flash.h                 |  57 +++++++----
+ 26 files changed, 257 insertions(+), 243 deletions(-)
+
 --=20
 2.17.2
