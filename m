@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52324)
+Received: from eggs.gnu.org ([209.51.188.92]:52356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyito-0007Wp-0t
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gyiu5-0007pd-Kz
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyitl-0007EF-P7
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49466)
+	(envelope-from <dgilbert@redhat.com>) id 1gyitt-0007KG-IS
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyitk-0007Br-3m
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:16 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyitn-0007FL-WB
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:21 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5CB4A36809
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 20:00:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 86E3D30B7A15
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 20:00:18 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 26 Feb 2019 19:59:58 +0000
-Message-Id: <20190226195959.28759-9-dgilbert@redhat.com>
+Date: Tue, 26 Feb 2019 19:59:59 +0000
+Message-Id: <20190226195959.28759-10-dgilbert@redhat.com>
 In-Reply-To: <20190226195959.28759-1-dgilbert@redhat.com>
 References: <20190226195959.28759-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 8/9] hmp: Add hmp_announce_self
+Subject: [Qemu-devel] [PATCH v5 9/9] tests: Add a test for qemu self
+ announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,87 +37,152 @@ Cc: quintela@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add an HMP command to trigger self annocements.
-Unlike the QMP command (which takes a set of parameters), the HMP
-command reuses the set of parameters used for migration.
+We now expose qemu_announce_self through QMP and HMP.  Add a test
+with some very basic packet validation (make sure we get a RARP).
 
-Signend-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hmp-commands.hx  | 14 ++++++++++++++
- hmp.c            |  5 +++++
- hmp.h            |  1 +
- tests/test-hmp.c |  1 +
- 4 files changed, 21 insertions(+)
+ tests/Makefile.include     |  4 ++
+ tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 87 insertions(+)
+ create mode 100644 tests/test-announce-self.c
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index ba71558c25..9f812bc63b 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -928,6 +928,20 @@ Bug: can screw up when the buffer contains invalid U=
-TF-8 sequences,
- NUL characters, after the ring buffer lost data, and when reading
- stops because the size limit is reached.
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3741f8f6dd..b60be5f2b6 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -144,6 +144,7 @@ check-qtest-generic-y +=3D tests/qmp-cmd-test$(EXESUF=
+)
 =20
-+ETEXI
+ check-qtest-generic-y +=3D tests/device-introspect-test$(EXESUF)
+ check-qtest-generic-y +=3D tests/cdrom-test$(EXESUF)
++gcov-files-generic-y =3D migration/savevm.c
+=20
+ check-qtest-ipack-y +=3D tests/ipoctal232-test$(EXESUF)
+=20
+@@ -221,6 +222,7 @@ check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/test-netf=
+ilter$(EXESUF)
+ check-qtest-i386-$(CONFIG_POSIX) +=3D tests/test-filter-mirror$(EXESUF)
+ check-qtest-i386-$(CONFIG_RTL8139_PCI) +=3D tests/test-filter-redirector=
+$(EXESUF)
+ check-qtest-i386-y +=3D tests/migration-test$(EXESUF)
++check-qtest-i386-y +=3D tests/test-announce-self$(EXESUF)
+ check-qtest-i386-y +=3D tests/test-x86-cpuid-compat$(EXESUF)
+ check-qtest-i386-y +=3D tests/numa-test$(EXESUF)
+ check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
+@@ -258,6 +260,7 @@ check-qtest-ppc64-y +=3D $(check-qtest-ppc-y)
+ check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tests/spapr-phb-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_POWERNV) +=3D tests/pnv-xscom-test$(EXESUF)
+ check-qtest-ppc64-y +=3D tests/migration-test$(EXESUF)
++check-qtest-ppc64-y +=3D tests/test-announce-self$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tests/rtas-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_SLIRP) +=3D tests/pxe-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_USB_OHCI) +=3D tests/usb-hcd-ohci-test$(EXESU=
+F)
+@@ -764,6 +767,7 @@ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-=
+test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb=
+-obj-y)
+ tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
+ tests/migration-test$(EXESUF): tests/migration-test.o
++tests/test-announce-self$(EXESUF): tests/test-announce-self.o
+ tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-=
+y) \
+ 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-=
+y) \
+ 	$(chardev-obj-y)
+diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
+new file mode 100644
+index 0000000000..2ff0c77255
+--- /dev/null
++++ b/tests/test-announce-self.c
+@@ -0,0 +1,83 @@
++/*
++ * QTest testcase for qemu_announce_self
++ *
++ * Copyright (c) 2017 Red hat, Inc.
++ * Copyright (c) 2014 SUSE LINUX Products GmbH
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+    {
-+        .name       =3D "announce_self",
-+        .args_type  =3D "",
-+        .params     =3D "",
-+        .help       =3D "Trigger GARP/RARP announcements",
-+        .cmd        =3D hmp_announce_self,
-+    },
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qapi/qmp/qdict.h"
++#include "qemu-common.h"
++#include "qemu/sockets.h"
++#include "qemu/iov.h"
++#include "libqos/libqos-pc.h"
++#include "libqos/libqos-spapr.h"
 +
-+STEXI
-+@item announce_self
-+@findex announce_self
-+Trigger GARP/RARP announcements.
- ETEXI
-=20
-     {
-diff --git a/hmp.c b/hmp.c
-index f3db0bf5a2..5f13b16e24 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1570,6 +1570,11 @@ void hmp_info_snapshots(Monitor *mon, const QDict =
-*qdict)
-=20
- }
-=20
-+void hmp_announce_self(Monitor *mon, const QDict *qdict)
++#ifndef ETH_P_RARP
++#define ETH_P_RARP 0x8035
++#endif
++
++static QTestState *test_init(int socket)
 +{
-+    qmp_announce_self(migrate_announce_params(), NULL);
++    char *args;
++
++    args =3D g_strdup_printf("-netdev socket,fd=3D%d,id=3Dhs0 -device "
++                           "virtio-net-pci,netdev=3Dhs0", socket);
++
++    return qtest_start(args);
 +}
 +
- void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
- {
-     qmp_migrate_cancel(NULL);
-diff --git a/hmp.h b/hmp.h
-index 5f1addcca2..e0f32f04d3 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -46,6 +46,7 @@ void hmp_sync_profile(Monitor *mon, const QDict *qdict)=
-;
- void hmp_system_reset(Monitor *mon, const QDict *qdict);
- void hmp_system_powerdown(Monitor *mon, const QDict *qdict);
- void hmp_exit_preconfig(Monitor *mon, const QDict *qdict);
-+void hmp_announce_self(Monitor *mon, const QDict *qdict);
- void hmp_cpu(Monitor *mon, const QDict *qdict);
- void hmp_memsave(Monitor *mon, const QDict *qdict);
- void hmp_pmemsave(Monitor *mon, const QDict *qdict);
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index 1a3a9c5099..8c49d2fdf1 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -20,6 +20,7 @@
- static int verbose;
-=20
- static const char *hmp_cmds[] =3D {
-+    "announce_self",
-     "boot_set ndc",
-     "chardev-add null,id=3Dtestchardev1",
-     "chardev-send-break testchardev1",
++
++static void test_announce(int socket)
++{
++    char buffer[60];
++    int len;
++    QDict *rsp;
++    int ret;
++    uint16_t *proto =3D (uint16_t *)&buffer[12];
++
++    rsp =3D qmp("{ 'execute' : 'announce-self', "
++                  " 'arguments': {"
++                      " 'params': {"
++                          " 'initial': 50, 'max': 550,"
++                          " 'rounds': 10, 'step': 50 } } }");
++    assert(!qdict_haskey(rsp, "error"));
++    qobject_unref(rsp);
++
++    /* Catch the packet and make sure it's a RARP */
++    ret =3D qemu_recv(socket, &len, sizeof(len), 0);
++    g_assert_cmpint(ret, =3D=3D,  sizeof(len));
++    len =3D ntohl(len);
++
++    ret =3D qemu_recv(socket, buffer, len, 0);
++    g_assert_cmpint(*proto, =3D=3D, htons(ETH_P_RARP));
++}
++
++static void setup(gconstpointer data)
++{
++    QTestState *qs;
++    void (*func) (int socket) =3D data;
++    int sv[2], ret;
++
++    ret =3D socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
++    g_assert_cmpint(ret, !=3D, -1);
++
++    qs =3D test_init(sv[1]);
++    func(sv[0]);
++
++    /* End test */
++    close(sv[0]);
++    qtest_quit(qs);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++    qtest_add_data_func("/virtio/net/test_announce_self", test_announce,=
+ setup);
++
++    return g_test_run();
++}
 --=20
 2.20.1
