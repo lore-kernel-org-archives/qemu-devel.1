@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58577)
+Received: from eggs.gnu.org ([209.51.188.92]:58646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlx-00063t-FX
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:18 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUmI-0006PI-UW
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUls-0003Jw-Ei
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUmD-0003kv-7Y
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:55:36 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:58 +1100
-Message-Id: <20190226045304.25618-45-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:59 +1100
+Message-Id: <20190226045304.25618-46-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 44/50] spapr: enable PHB hotplug for default
- pseries machine type
+Subject: [Qemu-devel] [PULL 45/50] tests/device-plug: Add PHB unplug request
+ test for spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +23,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
+From: Greg Kurz <groug@kaod.org>
 
-The 'dr_phb_enabled' field of that class can be set as part of
-machine-specific init code. It will be used to conditionally
-enable creation of DRC objects and device-tree description to
-facilitate hotplug of PHBs.
+We can easily test this, just like PCI. PHB unplug is not supported
+on s390x and x86 ACPI.
 
-Since we can't migrate this state to older machine types,
-default the option to true and disable it for older machine
-types.
-
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <155059673433.1466090.6188091133769611501.stgit@bahia.lab.tou=
-louse-stg.fr.ibm.com>
+Message-Id: <155059673939.1466090.14354001937819612724.stgit@bahia.lab.to=
+ulouse-stg.fr.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/device-plug-test.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7422c05254..5d8b8c9e53 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4290,6 +4290,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq =3D &spapr_irq_xics;
-+    smc->dr_phb_enabled =3D true;
+diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
+index 87593d9ecf..318e422d51 100644
+--- a/tests/device-plug-test.c
++++ b/tests/device-plug-test.c
+@@ -132,6 +132,20 @@ static void test_spapr_memory_unplug_request(void)
+     qtest_quit(qtest);
  }
 =20
- static const TypeInfo spapr_machine_info =3D {
-@@ -4361,6 +4362,7 @@ static void spapr_machine_3_1_class_options(Machine=
-Class *mc)
++static void test_spapr_phb_unplug_request(void)
++{
++    QTestState *qtest;
++
++    qtest =3D qtest_initf("-device spapr-pci-host-bridge,index=3D1,id=3D=
+dev0");
++
++    /* similar to test_pci_unplug_request */
++    device_del_request(qtest, "dev0");
++    system_reset(qtest);
++    wait_device_deleted_event(qtest, "dev0");
++
++    qtest_quit(qtest);
++}
++
+ int main(int argc, char **argv)
+ {
+     const char *arch =3D qtest_get_arch();
+@@ -156,6 +170,8 @@ int main(int argc, char **argv)
+                        test_spapr_cpu_unplug_request);
+         qtest_add_func("/device-plug/spapr-memory-unplug-request",
+                        test_spapr_memory_unplug_request);
++        qtest_add_func("/device-plug/spapr-phb-unplug-request",
++                       test_spapr_phb_unplug_request);
+     }
 =20
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled =3D false;
-+    smc->dr_phb_enabled =3D false;
- }
-=20
- DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+     return g_test_run();
 --=20
 2.20.1
