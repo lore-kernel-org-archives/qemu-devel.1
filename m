@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59150)
+Received: from eggs.gnu.org ([209.51.188.92]:59545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gylyq-0001KF-TF
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 18:17:45 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gym0l-0002V3-HB
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 18:19:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gylyp-00077u-SQ
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 18:17:44 -0500
-Date: Wed, 27 Feb 2019 09:49:12 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gym0j-0000LN-LL
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 18:19:43 -0500
+Date: Wed, 27 Feb 2019 10:19:20 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190226224912.GQ6872@umbus.fritz.box>
-References: <20190226030531.9932-1-sjitindarsingh@gmail.com>
-	<20190226033914.GK6872@umbus.fritz.box>
-	<1551162370.2210.0.camel@gmail.com>
+Message-ID: <20190226231920.GS6872@umbus.fritz.box>
+References: <20190225162325.24008-1-maxiwell@linux.ibm.com>
+	<20190225232009.GB30778@kermit.br.ibm.com>
+	<20190226032103.GJ6872@umbus.fritz.box>
+	<20190226142126.jxosththzad6h6dd@maxibm>
+	<20190226170830.GA16569@kermit.br.ibm.com>
+	<20190226191140.GA25467@kermit.br.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="25rOlkxR6a4U87uN"
+	protocol="application/pgp-signature"; boundary="96icqjDFsSi85SgI"
 Content-Disposition: inline
-In-Reply-To: <1551162370.2210.0.camel@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 1/4] target/ppc/spapr: Add
- SPAPR_CAP_LARGE_DECREMENTER
+In-Reply-To: <20190226191140.GA25467@kermit.br.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr-rtas: add ibm,
+ get-vpd RTAS interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +29,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Cc: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, "open list:sPAPR" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
 
 
---25rOlkxR6a4U87uN
-Content-Type: text/plain; charset=us-ascii
+--96icqjDFsSi85SgI
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 26, 2019 at 05:26:10PM +1100, Suraj Jitindar Singh wrote:
-> On Tue, 2019-02-26 at 14:39 +1100, David Gibson wrote:
-> > On Tue, Feb 26, 2019 at 02:05:28PM +1100, Suraj Jitindar Singh wrote:
-> > > Add spapr_cap SPAPR_CAP_LARGE_DECREMENTER to be used to control the
-> > > availability and size of the large decrementer made available to
-> > > the
-> > > guest.
-> > >=20
-> > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > > ---
-> > >  hw/ppc/spapr.c         |  2 ++
-> > >  hw/ppc/spapr_caps.c    | 45
-> > > +++++++++++++++++++++++++++++++++++++++++++++
-> > >  include/hw/ppc/spapr.h |  5 ++++-
-> > >  3 files changed, 51 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index b6a571b6f1..acf62a2b9f 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2077,6 +2077,7 @@ static const VMStateDescription vmstate_spapr
-> > > =3D {
-> > >          &vmstate_spapr_irq_map,
-> > >          &vmstate_spapr_cap_nested_kvm_hv,
-> > >          &vmstate_spapr_dtb,
-> > > +        &vmstate_spapr_cap_large_decr,
-> > >          NULL
-> > >      }
-> > >  };
-> > > @@ -4288,6 +4289,7 @@ static void
-> > > spapr_machine_class_init(ObjectClass *oc, void *data)
-> > >      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-> > >      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /*
-> > > 64kiB */
-> > >      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D
-> > > SPAPR_CAP_OFF;
-> > > +    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D 0;
-> >=20
-> > This looks basically fine, but the name kind of suggests it's a
-> > boolean, whereas it's actually a number of bits.  I wonder if just
-> > calling it "decrementer bits" would be clearer, with it defaulting to
-> > 32.
+On Tue, Feb 26, 2019 at 04:11:40PM -0300, Murilo Opsfelder Araujo wrote:
+> On Tue, Feb 26, 2019 at 02:08:30PM -0300, Murilo Opsfelder Araujo wrote:
+> > Hi, Maxiwell.
+> >
+> > On Tue, Feb 26, 2019 at 11:21:26AM -0300, Maxiwell S. Garcia wrote:
+> > > On Tue, Feb 26, 2019 at 02:21:03PM +1100, David Gibson wrote:
+> > > > On Mon, Feb 25, 2019 at 08:20:09PM -0300, Murilo Opsfelder Araujo w=
+rote:
+> > > > > Hi, Maxiwell.
+> > > > >
+> > > > > On Mon, Feb 25, 2019 at 01:23:25PM -0300, Maxiwell S. Garcia wrot=
+e:
+> > > > > > This adds a handler for ibm,get-vpd RTAS calls, allowing pseries
+> > > > > > guest to collect host information. It is disabled by default to
+> > > > > > avoid unwanted information leakage. To enable it, use:
+> > > > > > =E2=80=98-M pseries,vpd-export=3Don=E2=80=99
+> > > > >
+> > > > > The patch for setting host-serial and host-model already landed G=
+ibson's
+> > > > > ppc-for-4.0 branch:
+> > > > >
+> > > > >   commit 9e584f45868f6945c1282c938278038cba0e4af2
+> > > > >   Author: Prasad J Pandit <pjp@fedoraproject.org>
+> > > > >   Date:   Mon Feb 18 23:43:49 2019 +0530
+> > > > >
+> > > > >       ppc: add host-serial and host-model machine attributes (CVE=
+-2019-8934)
+> > > > >
+> > > > >
+> > > > > QEMU should only return host-serial and host-model from the host =
+if the
+> > > > > following combination of parameters are provided:
+> > > > >
+> > > > >   -M host-serial=3Dpassthrough,host-model=3Dpassthrough,vpd-expor=
+t=3Don
+> > > > >
+> > > > > If host-serial or host-model are set with a user-string, ibm,get-=
+vpd should
+> > > > > honor these values and return them, not exposing host information=
+ by accident.
+> > > > >
+> > > > > I'm not even sure if we need vpd-export=3D<bool> setting. Its log=
+ic could be
+> > > > > derived from the presence of host-serial=3Dpassthrough and host-m=
+odel=3Dpassthrough
+> > > > > options.
+> > > > >
+> > > > > What do you think?
+> > > >
+> > > > That's an excellent point - I hadn't thought through the fact that
+> > > > this is the same information exposed by those properties.  I do ind=
+eed
+> > > > think that exposing the same information set in those properties - =
+and
+> > > > thereby avoiding the new machine option - would be a better plan.
+> > > >
+> > >
+> > > I saw that the patch was applied. So I will work in another patch
+> > > to use these properties and remove the export-vpd option.
+> > >
+> > > Another thing that I thought the fact that 'host-serial' and 'host-mo=
+del'
+> > > nodes in Device Tree are not in accordance with LoPAPR document. What
+> > > you think in use only get-vpd to get these information and remove
+> > > nodes from device tree?
+> >
+> > Both "system-id" and "model" properties are described in the section "3=
+=2E3.2.1
+> > Root Node Properties" of the "Device Tree Bindings: Linux on Power Arch=
+itecture
+> > Reference" document:
+> >
+> >   https://members.openpowerfoundation.org/wg/SYSSW/document/1455
 >=20
-> Yes, except there's a difference between a decrementer with 32 bits and
-> a large decrementer with 32 bits...
+> I replied too early. As Maxiwell explained to me (thanks Max!), guest can=
+ end up
+> having the following entries under /proc/device-tree/ (among other entrie=
+s):
+>=20
+>   $ cat host-serial
+>   12A3B4C
+>=20
+>   $ cat host-model
+>   1234-56A
+>=20
+>   $ cat system-id
+>   c7b62da9-3d0c-44f9-8edb-2318271f3c1a
+>=20
+>   $ cat model
+>   IBM pSeries (emulated by qemu)
+>=20
+> Where:
+>=20
+>   - host-serial/host-model: depend on "-M host-serial" and "-M host-model"
+>     machine options.
+>=20
+>   - system-id: created when "-uuid <val>" exists in qemu command line opt=
+ions.
+>=20
+>   - model: hard-coded.
+>=20
+> With this patch, RTAS ibm,get-vpd call will return "system-id" and "model=
+" from
+> the host, not from the guest. I found this confusing.
 
-Ok, and that difference is..?
+Hrm.  I found the bit in LoPAPR describing how ibm,get-vpd operates,
+but not something describing the actual data that appears within it.
+Where's that described?  It'd be nice to check if those values are
+supposed to be describing the host or the guest.
 
-> SPAPR_CAP_LARGE_DECR_NR_BITS?
 
-That could work.
+> Perhaps we can trick ibm,get-vpd call to return "host-serial" and "host-m=
+odel"
+> values from the guest, which will hold safe values after commit
+> 9e584f45868f6945c1282c938278038cba0e4af2 "ppc: add host-serial and host-m=
+odel
+> machine attributes (CVE-2019-8934)".
+
+Well, if it is supposed to be host values, then yes, absolutely, we
+should be using the "host" values that the user supplies (if any).
+
+> What do you think?
+>=20
+> As to removing "host-serial" and "host-model", I am not entirely sure for=
+ what
+> they are used. There should be a reason for them to exist.
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -93,24 +172,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---25rOlkxR6a4U87uN
+--96icqjDFsSi85SgI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx1wmYACgkQbDjKyiDZ
-s5IclRAA2IjPHozau+3k5e0giJwLecNupQM2waFRsP/kSMs22BcYl7lXt6YC5S8o
-QeYnuzahJDY2atHJ+5MxNhV/Bx6USSK3p63PzYgNgladIjdIMqVyukOGhYPbuzFe
-uBswvc/Kgjbwr4E4qIBs+AjFyUJem3VFzPwnOThXKG9rOw2pfM7k2xX4Juc7hPNS
-Idx5Htk/v/fBQn6hu79G5fSrXCXnV0Rhdae7UCUGQw2q63BwB6fYS56PVDtEqo3R
-DP26Q9zNRGoO93sDsdfg4u48qENApIfDz5NyD40LitmJZxvxCNoE+opXwURT3+bz
-D4WWdMpKJg3qDpJ28KMMmjuGvT0lyUorM/h2BdAFLiIy74RwfXQZt4gWb/TinQyk
-lKcaPiGJ++wsVL3SO2QGo+TND4DIBV0knabt5IRtxxQS1AkneIhC+dTUafElY9Z4
-s5dFu7g93Ucp+qiWNBHvDwyVotHeORP/rqKCMXP6wCy1FIy/7D16Z2TLrkR39W/2
-xVrDkACo8tzgUvcZFSR7B4VuYgVkMs/2eb45lMBAM7H+L7JnuD9K3Wn8qGaRbiV0
-N7EveAURdH4PHbNr4fMazVMm81DY7csUnMKfASETpyc72YaFQe4fTWOjq2ZBMRhV
-qa4UJnvqGC1p/CZnmQYgo7aSX75QFG9NOOdv3Nwo12Srxw/xCrA=
-=NM+q
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx1yXgACgkQbDjKyiDZ
+s5Iq1BAAh/E0M3t7rSHXS6/BkoAD8TeTmcvywWB436YayH7UzRnLRTzBrJytifnc
+DoGVTHf1vIlKUsgf3WfV2jBimv46g4WXAazROd4cENpqcg/L7Z8h8Qa7RN2fIo/J
+wZMqDmRln9dtW2nnFnyx7Rbvz6tgKI5nZi4RCUPibCmRLgu6tKUXu0cyjWJRfijW
+61hjLzfCxVerxKCOrBO5vFEb4JMqzTLP1VWR3Aol0egGdPREVqV9Qm6PJUmQVz+e
+E/RJznnKPP1Md5VibqCb/WFOU2kWlqrH90hQ7pOImeX8Fu2f0vCvbbc5tvgqrX1n
+efUEut1wyrx/hpxra8nt9FIo1R7VVZw1M7eNqcF+5DD/yxNRXsu3GEiFiTcqsVgC
+AEYHgDApbK7nczwEuFzQJIOnSleexr8rUVniNCF8PyhpBCqWWPNQpy0lRY9tO5AE
+PT43VbHoLnqGS3Z3x0h4PS3RKd9L1l9Evn/3t044zA677E/xVhCL5DS2rMOP7AS/
+Dd4g0Mng2KhnzhM1VaCcR8akWyH20oIpYng8kEzpRJrTRzoMZengmswxH8zL2Xev
+FqeKwNbQf3Sa/ZP8LBE0WfWmpT6aP/jPk5isAMiaG6i0BhUmD1U+pKnyrHfNtVKQ
+MXMD3IYcp2c8VhRnxsT7HrSimWk5JmUoygU4b8O5fKb4047ftlk=
+=RLJ0
 -----END PGP SIGNATURE-----
 
---25rOlkxR6a4U87uN--
+--96icqjDFsSi85SgI--
