@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34408)
+Received: from eggs.gnu.org ([209.51.188.92]:34435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gyhaU-00070T-F8
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:19 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gyhai-00074m-Qe
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gyhaT-0000s5-K6
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:18 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34475)
+	(envelope-from <richard.henderson@linaro.org>) id 1gyhab-00016L-Qs
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:29 -0500
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:38835)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gyhaT-0000oV-Ai
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:17 -0500
-Received: by mail-wm1-f66.google.com with SMTP id o10so2746646wmc.1
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:36:16 -0800 (PST)
-References: <155119086741.1037569.12734854713022304642.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6e2fa68d-2d4b-d0ee-bc03-c1cd1c7a8cc6@redhat.com>
-Date: Tue, 26 Feb 2019 19:36:13 +0100
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gyhaY-00012q-Rf
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:25 -0500
+Received: by mail-pg1-x52d.google.com with SMTP id m2so6616983pgl.5
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:36:22 -0800 (PST)
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-4-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <59942bd6-49ca-504f-0d2a-910939eea09d@linaro.org>
+Date: Tue, 26 Feb 2019 10:36:18 -0800
 MIME-Version: 1.0
-In-Reply-To: <155119086741.1037569.12734854713022304642.stgit@bahia.lan>
+In-Reply-To: <20190226113915.20150-4-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] bswap: Fix accessors syntax in comment
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 03/33] s390x: Add one temporary vector
+ register in CPU state for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 2/26/19 3:21 PM, Greg Kurz wrote:
-> All accessors that have an endian infix DO have an underscore between
-> {size} and {endian}.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On 2/26/19 3:38 AM, David Hildenbrand wrote:
+> We sometimes want to work on a temporary vector register instead of the
+> actual destination, because source and destination might overlap. An
+> alternative would be loading the vector into two i64 variables, but than
+> separate handling for accessing the vector elements would be needed.
+> This is easier. Add one for now as that seems to be enough.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Hmm, I'll reserve judgment until I see how this is used.
 
-> ---
->  include/qemu/bswap.h |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
-> index a684c1a7a298..5a70f78c0ba4 100644
-> --- a/include/qemu/bswap.h
-> +++ b/include/qemu/bswap.h
-> @@ -255,9 +255,9 @@ typedef union {
->  /*
->   * the generic syntax is:
->   *
-> - * load: ld{type}{sign}{size}{endian}_p(ptr)
-> + * load: ld{type}{sign}{size}_{endian}_p(ptr)
->   *
-> - * store: st{type}{size}{endian}_p(ptr, val)
-> + * store: st{type}{size}_{endian}_p(ptr, val)
->   *
->   * Note there are small differences with the softmmu access API!
->   *
-> @@ -293,10 +293,10 @@ typedef union {
->   *
->   * For cases where the size to be used is not fixed at compile time,
->   * there are
-> - *  stn{endian}_p(ptr, sz, val)
-> + *  stn_{endian}_p(ptr, sz, val)
->   * which stores @val to @ptr as an @endian-order number @sz bytes in size
->   * and
-> - *  ldn{endian}_p(ptr, sz)
-> + *  ldn_{endian}_p(ptr, sz)
->   * which loads @sz bytes from @ptr as an unsigned @endian-order number
->   * and returns it in a uint64_t.
->   */
-> 
-> 
+For ARM SVE, I would allocate this temporary on the stack within the helper,
+and move one of the operands out of the way.  E.g.
+
+void helper(foo)(void *vd, void *vx, *void *vy
+{
+    VectorReg tmp;
+    TYPE *d = vd, *x = vx, *y = vy;
+
+    if (vx == vd || vy == vd) {
+        tmp = *(VectorReg *)vd;
+        if (vx == vd) {
+            vx = &tmp;
+        }
+        if (vy == vd) {
+            vy = &tmp;
+        }
+    }
+
+    process d, x, y as normal.
+}
+
+This minimized the amount of code inline.  However, SVE vectors are quite a bit
+larger, at 256 bytes, so the copy itself was out of line most of the time anyway.
+
+Provisionally,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
