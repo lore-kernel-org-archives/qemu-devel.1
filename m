@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47330)
+Received: from eggs.gnu.org ([209.51.188.92]:47384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyb5N-0004X8-O4
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:46 -0500
+	(envelope-from <david@redhat.com>) id 1gyb5S-0004Zi-1k
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyb5M-0006p0-0B
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:45 -0500
+	(envelope-from <david@redhat.com>) id 1gyb5M-0006pd-Ks
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:39:47 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 26 Feb 2019 12:38:44 +0100
-Message-Id: <20190226113915.20150-3-david@redhat.com>
+Date: Tue, 26 Feb 2019 12:38:45 +0100
+Message-Id: <20190226113915.20150-4-david@redhat.com>
 In-Reply-To: <20190226113915.20150-1-david@redhat.com>
 References: <20190226113915.20150-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 02/33] s390x/tcg: Check vector register
- instructions at central point
+Subject: [Qemu-devel] [PATCH v1 03/33] s390x: Add one temporary vector
+ register in CPU state for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +23,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Check them at a central point. We'll use a new instruction flag to
-flag all vector instructions (IF_VEC) and handle it very similar to
-AFP, whereby we use another unused position in the PSW mask to store
-the state of vector register enablement per translation block.
+We sometimes want to work on a temporary vector register instead of the
+actual destination, because source and destination might overlap. An
+alternative would be loading the vector into two i64 variables, but than
+separate handling for accessing the vector elements would be needed.
+This is easier. Add one for now as that seems to be enough.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.h       |  7 +++++++
- target/s390x/translate.c | 12 ++++++++++++
- 2 files changed, 19 insertions(+)
+ target/s390x/cpu.h       | 11 +++++++++++
+ target/s390x/translate.c |  3 +++
+ 2 files changed, 14 insertions(+)
 
 diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index b71ac5183d..cb6d77053a 100644
+index cb6d77053a..a8dc0b2b83 100644
 --- a/target/s390x/cpu.h
 +++ b/target/s390x/cpu.h
-@@ -257,6 +257,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- /* PSW defines */
- #undef PSW_MASK_PER
- #undef PSW_MASK_UNUSED_2
-+#undef PSW_MASK_UNUSED_3
- #undef PSW_MASK_DAT
- #undef PSW_MASK_IO
- #undef PSW_MASK_EXT
-@@ -276,6 +277,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- 
- #define PSW_MASK_PER            0x4000000000000000ULL
- #define PSW_MASK_UNUSED_2       0x2000000000000000ULL
-+#define PSW_MASK_UNUSED_3       0x1000000000000000ULL
- #define PSW_MASK_DAT            0x0400000000000000ULL
- #define PSW_MASK_IO             0x0200000000000000ULL
- #define PSW_MASK_EXT            0x0100000000000000ULL
-@@ -323,12 +325,14 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- 
- /* we'll use some unused PSW positions to store CR flags in tb flags */
- #define FLAG_MASK_AFP           (PSW_MASK_UNUSED_2 >> FLAG_MASK_PSW_SHIFT)
-+#define FLAG_MASK_VECTOR        (PSW_MASK_UNUSED_3 >> FLAG_MASK_PSW_SHIFT)
- 
- /* Control register 0 bits */
- #define CR0_LOWPROT             0x0000000010000000ULL
- #define CR0_SECONDARY           0x0000000004000000ULL
- #define CR0_EDAT                0x0000000000800000ULL
- #define CR0_AFP                 0x0000000000040000ULL
-+#define CR0_VECTOR              0x0000000000020000ULL
- #define CR0_EMERGENCY_SIGNAL_SC 0x0000000000004000ULL
- #define CR0_EXTERNAL_CALL_SC    0x0000000000002000ULL
- #define CR0_CKC_SC              0x0000000000000800ULL
-@@ -373,6 +377,9 @@ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
-     if (env->cregs[0] & CR0_AFP) {
-         *flags |= FLAG_MASK_AFP;
-     }
-+    if (env->cregs[0] & CR0_VECTOR) {
-+        *flags |= FLAG_MASK_VECTOR;
-+    }
- }
- 
- /* PER bits from control register 9 */
+@@ -67,6 +67,17 @@ struct CPUS390XState {
+      * vregs[0][0] -> vregs[15][0] are 16 floating point registers
+      */
+     CPU_DoubleU vregs[32][2];  /* vector registers */
++#ifdef CONFIG_TCG
++#define TMP_VREG_0   33
++    /*
++     * Temporary vector registers used while processing vector instructions
++     * in TCG. This is helpful e.g. when source and destination registers
++     * overlap for certain instructions in translate functions. Content valid
++     * only within execution of one translated block, therefore no migration is
++     * needed. Resets don't mather, but has to be properly aligned.
++     */
++    CPU_DoubleU tmp_vregs[1][2];
++#endif
+     uint32_t aregs[16];    /* access registers */
+     uint8_t riccb[64];     /* runtime instrumentation control */
+     uint64_t gscb[4];      /* guarded storage control */
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 1d8030f8cd..d52c02c572 100644
+index d52c02c572..8733d19182 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -1203,6 +1203,7 @@ typedef struct {
- #define IF_BFP      0x0008      /* binary floating point instruction */
- #define IF_DFP      0x0010      /* decimal floating point instruction */
- #define IF_PRIV     0x0020      /* privileged instruction */
-+#define IF_VEC      0x0040      /* vector instruction */
+@@ -147,6 +147,9 @@ void s390x_translate_init(void)
  
- struct DisasInsn {
-     unsigned opc:16;
-@@ -6337,11 +6338,22 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
-             if (insn->flags & IF_DFP) {
-                 dxc = 3;
-             }
-+            if (insn->flags & IF_VEC) {
-+                dxc = 0xfe;
-+            }
-             if (dxc) {
-                 gen_data_exception(dxc);
-                 return DISAS_NORETURN;
-             }
-         }
-+
-+        /* if vector instructions not enabled, executing them is forbidden */
-+        if (insn->flags & IF_VEC) {
-+            if (!((s->base.tb->flags & FLAG_MASK_VECTOR))) {
-+                gen_data_exception(0xfe);
-+                return DISAS_NORETURN;
-+            }
-+        }
-     }
- 
-     /* Check for insn specification exceptions.  */
+ static inline int vec_full_reg_offset(uint8_t reg)
+ {
++    if (reg == TMP_VREG_0) {
++        return offsetof(CPUS390XState, tmp_vregs[0][0].d);
++    }
+     g_assert(reg < 32);
+     return offsetof(CPUS390XState, vregs[reg][0].d);
+ }
 -- 
 2.17.2
