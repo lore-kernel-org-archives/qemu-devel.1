@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57892)
+Received: from eggs.gnu.org ([209.51.188.92]:57731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUkr-000528-Rp
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:11 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUkn-0004wb-BV
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUkp-0002V2-Eb
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUkm-0002NL-EY
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:05 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:45 +1100
-Message-Id: <20190226045304.25618-32-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:31 +1100
+Message-Id: <20190226045304.25618-18-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 31/50] spapr: Generate FDT fragment for CPUs at
- configure connector time
+Subject: [Qemu-devel] [PULL 17/50] tests/device-plug: Add memory unplug
+ request test for spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,142 +23,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155059666839.1466090.3833376527523126752.stgit@bahia.lab.tou=
-louse-stg.fr.ibm.com>
+We can easily test this, just like PCI. On x86 ACPI, we need guest
+interaction to make it work, so it is not that easy to test. We might
+add tests for that later on.
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20190218092202.26683-7-david@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         | 52 +++++++++++++++++++-----------------------
- hw/ppc/spapr_drc.c     |  1 +
- include/hw/ppc/spapr.h |  2 ++
- 3 files changed, 26 insertions(+), 29 deletions(-)
+ tests/device-plug-test.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b92deee771..6cf7a9f5c1 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3636,27 +3636,6 @@ out:
-     error_propagate(errp, local_err);
+diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
+index 0262ad6be6..87593d9ecf 100644
+--- a/tests/device-plug-test.c
++++ b/tests/device-plug-test.c
+@@ -116,6 +116,22 @@ static void test_spapr_cpu_unplug_request(void)
+     qtest_quit(qtest);
  }
 =20
--static void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset=
-,
--                                           sPAPRMachineState *spapr)
--{
--    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--    DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
--    int id =3D spapr_get_vcpu_id(cpu);
--    void *fdt;
--    int offset, fdt_size;
--    char *nodename;
--
--    fdt =3D create_device_tree(&fdt_size);
--    nodename =3D g_strdup_printf("%s@%x", dc->fw_name, id);
--    offset =3D fdt_add_subnode(fdt, 0, nodename);
--
--    spapr_populate_cpu_dt(cs, fdt, offset, spapr);
--    g_free(nodename);
--
--    *fdt_offset =3D offset;
--    return fdt;
--}
--
- /* Callback to be called during DRC release. */
- void spapr_core_release(DeviceState *dev)
- {
-@@ -3717,6 +3696,27 @@ void spapr_core_unplug_request(HotplugHandler *hot=
-plug_dev, DeviceState *dev,
-     spapr_hotplug_req_remove_by_index(drc);
- }
-=20
-+int spapr_core_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spa=
-pr,
-+                           void *fdt, int *fdt_start_offset, Error **err=
-p)
++static void test_spapr_memory_unplug_request(void)
 +{
-+    sPAPRCPUCore *core =3D SPAPR_CPU_CORE(drc->dev);
-+    CPUState *cs =3D CPU(core->threads[0]);
-+    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+    DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
-+    int id =3D spapr_get_vcpu_id(cpu);
-+    char *nodename;
-+    int offset;
++    QTestState *qtest;
 +
-+    nodename =3D g_strdup_printf("%s@%x", dc->fw_name, id);
-+    offset =3D fdt_add_subnode(fdt, 0, nodename);
-+    g_free(nodename);
++    qtest =3D qtest_initf("-m 256M,slots=3D1,maxmem=3D768M "
++                        "-object memory-backend-ram,id=3Dmem0,size=3D512=
+M "
++                        "-device pc-dimm,id=3Ddev0,memdev=3Dmem0");
 +
-+    spapr_populate_cpu_dt(cs, fdt, offset, spapr);
++    /* similar to test_pci_unplug_request */
++    device_del_request(qtest, "dev0");
++    system_reset(qtest);
++    wait_device_deleted_event(qtest, "dev0");
 +
-+    *fdt_start_offset =3D offset;
-+    return 0;
++    qtest_quit(qtest);
 +}
 +
- static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *de=
-v,
-                             Error **errp)
+ int main(int argc, char **argv)
  {
-@@ -3725,7 +3725,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
-     sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-     sPAPRCPUCore *core =3D SPAPR_CPU_CORE(OBJECT(dev));
-     CPUCore *cc =3D CPU_CORE(dev);
--    CPUState *cs =3D CPU(core->threads[0]);
-+    CPUState *cs;
-     sPAPRDRConnector *drc;
-     Error *local_err =3D NULL;
-     CPUArchId *core_slot;
-@@ -3744,14 +3744,8 @@ static void spapr_core_plug(HotplugHandler *hotplu=
-g_dev, DeviceState *dev,
-     g_assert(drc || !mc->has_hotpluggable_cpus);
+     const char *arch =3D qtest_get_arch();
+@@ -138,6 +154,8 @@ int main(int argc, char **argv)
+     if (!strcmp(arch, "ppc64")) {
+         qtest_add_func("/device-plug/spapr-cpu-unplug-request",
+                        test_spapr_cpu_unplug_request);
++        qtest_add_func("/device-plug/spapr-memory-unplug-request",
++                       test_spapr_memory_unplug_request);
+     }
 =20
-     if (drc) {
--        void *fdt;
--        int fdt_offset;
--
--        fdt =3D spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
--
--        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
-+        spapr_drc_attach(drc, dev, NULL, 0, &local_err);
-         if (local_err) {
--            g_free(fdt);
-             error_propagate(errp, local_err);
-             return;
-         }
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 634c28695a..aa26aa40be 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -680,6 +680,7 @@ static void spapr_drc_cpu_class_init(ObjectClass *k, =
-void *data)
-     drck->typename =3D "CPU";
-     drck->drc_name_prefix =3D "CPU ";
-     drck->release =3D spapr_core_release;
-+    drck->dt_populate =3D spapr_core_dt_populate;
- }
-=20
- static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 0ec309da49..5e3c760725 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -766,6 +766,8 @@ int spapr_max_server_number(sPAPRMachineState *spapr)=
-;
-=20
- /* DRC callbacks. */
- void spapr_core_release(DeviceState *dev);
-+int spapr_core_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spa=
-pr,
-+                           void *fdt, int *fdt_start_offset, Error **err=
-p);
- void spapr_lmb_release(DeviceState *dev);
- int spapr_lmb_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spap=
-r,
-                           void *fdt, int *fdt_start_offset, Error **errp=
-);
+     return g_test_run();
 --=20
 2.20.1
