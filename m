@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50392)
+Received: from eggs.gnu.org ([209.51.188.92]:50851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gyRii-0000HU-Mr
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:39:45 -0500
+	(envelope-from <nsoffer@redhat.com>) id 1gyRlX-0001Al-UT
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gyRih-0008BY-OE
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:39:44 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42901)
+	(envelope-from <nsoffer@redhat.com>) id 1gyRlT-0001hv-0O
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:42:38 -0500
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:39102)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gyRih-00086Z-GG
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:39:43 -0500
-Received: by mail-wr1-x442.google.com with SMTP id r5so12054045wrg.9
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 17:39:42 -0800 (PST)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
-	<cf14255c576fd361c6cdf941f8c637e613f6cb68.1550698466.git.DirtY.iCE.hu@gmail.com>
-Message-ID: <63250655-a4a3-ef36-5882-65188093ff57@gmail.com>
-Date: Tue, 26 Feb 2019 02:39:38 +0100
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gyRlM-0001eP-Gi
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:42:30 -0500
+Received: by mail-ua1-f68.google.com with SMTP id s15so10366638uap.6
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 17:42:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <cf14255c576fd361c6cdf941f8c637e613f6cb68.1550698466.git.DirtY.iCE.hu@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 04/14] audio: -audiodev command line
- option basic implementation
+References: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<20190225202630.GA4925@habkost.net>
+In-Reply-To: <20190225202630.GA4925@habkost.net>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Tue, 26 Feb 2019 03:42:11 +0200
+Message-ID: <CAMRbyysWcfctB8AeSZrQ9x9HRAKut7mWYFqVP=oQ5uVoQgvh0w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] iotests: handle TypeError
+ for Python3 in test 242
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,127 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block <qemu-block@nongnu.org>, philmd@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, den@openvz.org
 
-On 2019-02-20 22:37, Kővágó, Zoltán wrote:
-[...]
-> diff --git a/audio/audio.c b/audio/audio.c
-> index ce8e6ea8c2..8ad8cbe559 100644
-> --- a/audio/audio.c
-> +++ b/audio/audio.c
-[...]
-> @@ -2129,3 +1866,170 @@ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
->          }
->      }
->  }
-> +
-> +void audio_create_pdos(Audiodev *dev)
-> +{
-> +    switch (dev->driver) {
-> +#define CASE(DRIVER, driver, pdo_name)                              \
-> +    case AUDIODEV_DRIVER_##DRIVER:                                  \
-> +        dev->u.driver.in = g_malloc0(                               \
-> +            sizeof(Audiodev##pdo_name##PerDirectionOptions));       \
-This should check has_in before overwriting. It'll work correctly when
-called from audio_legacy.c, but when using -audiodev it will overwrite
-the options passed by user (and leak memory) when called from
-audio_validate_opts. I'll fix it in the next update.
+On Mon, Feb 25, 2019 at 10:36 PM Eduardo Habkost <ehabkost@redhat.com>
+wrote:
 
-> +        dev->u.driver.has_in = true;                                \
-> +        dev->u.driver.out = g_malloc0(                              \
-> +            sizeof(AudiodevAlsaPerDirectionOptions));               \
-> +        dev->u.driver.has_out = true;                               \
-> +        break
-> +
-> +        CASE(NONE, none, );
-> +        CASE(ALSA, alsa, Alsa);
-> +        CASE(COREAUDIO, coreaudio, Coreaudio);
-> +        CASE(DSOUND, dsound, );
-> +        CASE(OSS, oss, Oss);
-> +        CASE(PA, pa, Pa);
-> +        CASE(SDL, sdl, );
-> +        CASE(SPICE, spice, );
-> +        CASE(WAV, wav, );
-> +
-> +    case AUDIODEV_DRIVER__MAX:
-> +        abort();
-> +    };
-> +}
-> +
-> +static void audio_validate_per_direction_opts(
-> +    AudiodevPerDirectionOptions *pdo, Error **errp)
-> +{
-> +    if (!pdo->has_fixed_settings) {
-> +        pdo->has_fixed_settings = true;
-> +        pdo->fixed_settings = true;
-> +    }
-> +    if (!pdo->fixed_settings &&
-> +        (pdo->has_frequency || pdo->has_channels || pdo->has_format)) {
-> +        error_setg(errp,
-> +                   "You can't use frequency, channels or format with fixed-settings=off");
-> +        return;
-> +    }
-> +
-> +    if (!pdo->has_frequency) {
-> +        pdo->has_frequency = true;
-> +        pdo->frequency = 44100;
-> +    }
-> +    if (!pdo->has_channels) {
-> +        pdo->has_channels = true;
-> +        pdo->channels = 2;
-> +    }
-> +    if (!pdo->has_voices) {
-> +        pdo->has_voices = true;
-> +        pdo->voices = 1;
-> +    }
-> +    if (!pdo->has_format) {
-> +        pdo->has_format = true;
-> +        pdo->format = AUDIO_FORMAT_S16;
-> +    }
-> +}
-> +
-> +static void audio_validate_opts(Audiodev *dev, Error **errp)
-> +{
-> +    Error *err = NULL;
-> +
-> +    audio_create_pdos(dev);
-> +
-> +    audio_validate_per_direction_opts(audio_get_pdo_in(dev), &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
-> +    audio_validate_per_direction_opts(audio_get_pdo_out(dev), &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
-> +    if (!dev->has_timer_period) {
-> +        dev->has_timer_period = true;
-> +        dev->timer_period = 10000; /* 100Hz -> 10ms */
-> +    }
-> +}
-> +
-> +void audio_parse_option(const char *opt)
-> +{
-> +    AudiodevListEntry *e;
-> +    Audiodev *dev = NULL;
-> +
-> +    Visitor *v = qobject_input_visitor_new_str(opt, "driver", &error_fatal);
-> +    visit_type_Audiodev(v, NULL, &dev, &error_fatal);
-> +    visit_free(v);
-> +
-> +    audio_validate_opts(dev, &error_fatal);
-> +
-> +    e = g_malloc0(sizeof(AudiodevListEntry));
-> +    e->dev = dev;
-> +    QSIMPLEQ_INSERT_TAIL(&audiodevs, e, next);
-> +}
-> +
-[...]
+> On Fri, Feb 22, 2019 at 02:26:13PM +0300, Andrey Shinkevich wrote:
+> > The data type for bytes in Python3 differs from the one in Python2.
+> > Those cases should be managed separately.
+> >
+> > v1:
+> > In the first version, the TypeError in Python3 was handled as the
+> > exception.
+> > Discussed in the e-mail thread with the Message ID:
+> > <1550519997-253534-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+> >
+> > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> > Reported-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  tests/qemu-iotests/242 | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+> > index 16c65ed..446fbf8 100755
+> > --- a/tests/qemu-iotests/242
+> > +++ b/tests/qemu-iotests/242
+> > @@ -20,6 +20,7 @@
+> >
+> >  import iotests
+> >  import json
+> > +import sys
+> >  from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
+> >      file_path, img_info_log, log, filter_qemu_io
+> >
+> > @@ -65,9 +66,12 @@ def toggle_flag(offset):
+> >      with open(disk, "r+b") as f:
+> >          f.seek(offset, 0)
+> >          c = f.read(1)
+> > -        toggled = chr(ord(c) ^ bitmap_flag_unknown)
+> > +        toggled = ord(c) ^ bitmap_flag_unknown
+> >          f.seek(-1, 1)
+> > -        f.write(toggled)
+> > +        if sys.version_info.major >= 3:
+> > +            f.write(bytes([toggled]))
+> > +        else:
+> > +            f.write(chr(toggled))
+>
+> Pretending we are dealing with text strings and using str/ord is
+> a python2-specific quirk.  I think it would be nice to get rid of
+> it.
+>
+> Python 2 has bytearray(), which behaves more similarly to the
+> bytes type from Python 3.  If we use it, we can make the code
+> more python3-like:
+>
+> diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+> index 16c65edcd7..7794fd4a70 100755
+> --- a/tests/qemu-iotests/242
+> +++ b/tests/qemu-iotests/242
+> @@ -64,10 +64,12 @@ def write_to_disk(offset, size):
+>  def toggle_flag(offset):
+>      with open(disk, "r+b") as f:
+>          f.seek(offset, 0)
+> -        c = f.read(1)
+> -        toggled = chr(ord(c) ^ bitmap_flag_unknown)
+> +        # The casts to bytearray() below are only necessary
+> +        # for Python 2 compatibility
+> +        c = bytearray(f.read(1))[0]
+>
 
-Regards,
-Zoltan
+This is simpler and makes the intent of the code more clear:
+
+    flag, = struct.unpack("B", f.read(1))
+
+
+> +        toggled = c ^ bitmap_flag_unknown
+>          f.seek(-1, 1)
+> -        f.write(toggled)
+> +        f.write(bytearray([toggled]))
+>
+
+For consistency, we can use struct.pack here:
+
+    f.write(struct.pack("B", toggled))
+
+Nir
+
+
+>
+>
+>  qemu_img_create('-f', iotests.imgfmt, disk, '1M')
+>
+> --
+> Eduardo
+>
+>
