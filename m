@@ -1,42 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38637)
+Received: from eggs.gnu.org ([209.51.188.92]:38708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gygDp-00045o-I5
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:08:50 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gygDz-00049z-N7
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:09:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gygDm-0002E1-SM
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:08:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1gygDl-00027T-Ds
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:08:45 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1QH0Kj5048337
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 12:08:38 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qw7sb7y8v-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 12:08:37 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Tue, 26 Feb 2019 17:08:36 -0000
-Date: Tue, 26 Feb 2019 14:08:30 -0300
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-References: <20190225162325.24008-1-maxiwell@linux.ibm.com>
-	<20190225232009.GB30778@kermit.br.ibm.com>
-	<20190226032103.GJ6872@umbus.fritz.box>
-	<20190226142126.jxosththzad6h6dd@maxibm>
+	(envelope-from <imammedo@redhat.com>) id 1gygDy-0002oN-Om
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 12:08:59 -0500
+Date: Tue, 26 Feb 2019 18:08:41 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190226180841.0c30af3c@Igors-MacBook-Pro.local>
+In-Reply-To: <20190226135014.31854-13-eric.auger@redhat.com>
+References: <20190226135014.31854-1-eric.auger@redhat.com>
+	<20190226135014.31854-13-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190226142126.jxosththzad6h6dd@maxibm>
-Message-Id: <20190226170830.GA16569@kermit.br.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr-rtas: add ibm,
- get-vpd RTAS interface
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 12/18] hw/arm/boot: Expose the PC-DIMM
+ nodes in the DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,79 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, "open list:sPAPR" <qemu-ppc@nongnu.org>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-Hi, Maxiwell.
+On Tue, 26 Feb 2019 14:50:08 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-On Tue, Feb 26, 2019 at 11:21:26AM -0300, Maxiwell S. Garcia wrote:
-> On Tue, Feb 26, 2019 at 02:21:03PM +1100, David Gibson wrote:
-> > On Mon, Feb 25, 2019 at 08:20:09PM -0300, Murilo Opsfelder Araujo wro=
-te:
-> > > Hi, Maxiwell.
-> > >
-> > > On Mon, Feb 25, 2019 at 01:23:25PM -0300, Maxiwell S. Garcia wrote:
-> > > > This adds a handler for ibm,get-vpd RTAS calls, allowing pseries
-> > > > guest to collect host information. It is disabled by default to
-> > > > avoid unwanted information leakage. To enable it, use:
-> > > > =E2=80=98-M pseries,vpd-export=3Don=E2=80=99
-> > >
-> > > The patch for setting host-serial and host-model already landed Gib=
-son's
-> > > ppc-for-4.0 branch:
-> > >
-> > >   commit 9e584f45868f6945c1282c938278038cba0e4af2
-> > >   Author: Prasad J Pandit <pjp@fedoraproject.org>
-> > >   Date:   Mon Feb 18 23:43:49 2019 +0530
-> > >
-> > >       ppc: add host-serial and host-model machine attributes (CVE-2=
-019-8934)
-> > >
-> > >
-> > > QEMU should only return host-serial and host-model from the host if=
- the
-> > > following combination of parameters are provided:
-> > >
-> > >   -M host-serial=3Dpassthrough,host-model=3Dpassthrough,vpd-export=3D=
-on
-> > >
-> > > If host-serial or host-model are set with a user-string, ibm,get-vp=
-d should
-> > > honor these values and return them, not exposing host information b=
-y accident.
-> > >
-> > > I'm not even sure if we need vpd-export=3D<bool> setting. Its logic=
- could be
-> > > derived from the presence of host-serial=3Dpassthrough and host-mod=
-el=3Dpassthrough
-> > > options.
-> > >
-> > > What do you think?
-> >
-> > That's an excellent point - I hadn't thought through the fact that
-> > this is the same information exposed by those properties.  I do indee=
-d
-> > think that exposing the same information set in those properties - an=
-d
-> > thereby avoiding the new machine option - would be a better plan.
-> >
->
-> I saw that the patch was applied. So I will work in another patch
-> to use these properties and remove the export-vpd option.
->
-> Another thing that I thought the fact that 'host-serial' and 'host-mode=
-l'
-> nodes in Device Tree are not in accordance with LoPAPR document. What
-> you think in use only get-vpd to get these information and remove
-> nodes from device tree?
+> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> 
+> This patch adds memory nodes corresponding to PC-DIMM regions.
+> 
+> NVDIMM and ACPI_NVDIMM configs are not yet set for ARM so we
+> don't need to care about NVDIMM at this stage.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+I'm having second thoughts on this one,
+maybe we should drop this patch or at least not to do this by default.
+In the later case it would mean some kind of property that user could use
+to turn this on which in its own turn adds more clutter to user tunables
+(which is not desirable). So I'm leaning more towards dropping this patch for now.
 
-Both "system-id" and "model" properties are described in the section "3.3=
-.2.1
-Root Node Properties" of the "Device Tree Bindings: Linux on Power Archit=
-ecture
-Reference" document:
-
-  https://members.openpowerfoundation.org/wg/SYSSW/document/1455
-
---
-Murilo
+> 
+> ---
+> v7 -> v8:
+> - s/NV_DIMM/NVDIMM
+> - fix indent
+> v6 -> v7:
+> - rework the error messages, use a switch/case
+> v3 -> v4:
+> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
+> 
+> v1 -> v2:
+> - added qapi_free_MemoryDeviceInfoList and simplify the loop
+> ---
+>  hw/arm/boot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 42 insertions(+)
+> 
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index a830655e1a..4caaf91583 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -19,6 +19,7 @@
+>  #include "sysemu/numa.h"
+>  #include "hw/boards.h"
+>  #include "hw/loader.h"
+> +#include "hw/mem/memory-device.h"
+>  #include "elf.h"
+>  #include "sysemu/device_tree.h"
+>  #include "qemu/config-file.h"
+> @@ -522,6 +523,41 @@ static void fdt_add_psci_node(void *fdt)
+>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+>  }
+>  
+> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
+> +                                             uint32_t acells, uint32_t scells) {
+> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
+> +    MemoryDeviceInfo *mi;
+> +    int ret = 0;
+> +
+> +    for (info = info_list; info != NULL; info = info->next) {
+> +        mi = info->value;
+> +        switch (mi->type) {
+> +        case MEMORY_DEVICE_INFO_KIND_DIMM:
+> +        {
+> +            PCDIMMDeviceInfo *di = mi->u.dimm.data;
+> +
+> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
+> +                                      scells, di->size, di->node);
+> +            if (ret) {
+> +                fprintf(stderr,
+> +                        "couldn't add PCDIMM /memory@%"PRIx64" node\n",
+> +                        di->addr);
+> +                goto out;
+> +            }
+> +            break;
+> +        }
+> +        default:
+> +            fprintf(stderr, "%s memory nodes are not yet supported\n",
+> +                    MemoryDeviceInfoKind_str(mi->type));
+> +            ret = -ENOENT;
+> +            goto out;
+> +        }
+> +    }
+> +out:
+> +    qapi_free_MemoryDeviceInfoList(info_list);
+> +    return ret;
+> +}
+> +
+>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>                   hwaddr addr_limit, AddressSpace *as)
+>  {
+> @@ -621,6 +657,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>          }
+>      }
+>  
+> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
+> +    if (rc < 0) {
+> +        fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
+> +        goto fail;
+> +    }
+> +
+>      rc = fdt_path_offset(fdt, "/chosen");
+>      if (rc < 0) {
+>          qemu_fdt_add_subnode(fdt, "/chosen");
