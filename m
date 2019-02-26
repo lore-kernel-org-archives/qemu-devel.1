@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45996)
+Received: from eggs.gnu.org ([209.51.188.92]:48848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gyTZM-0008Oy-Ez
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:38:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyTtq-0003t1-OK
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:59:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gyTZL-00033F-HS
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:38:12 -0500
-Received: from mga03.intel.com ([134.134.136.65]:26350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1gyTZL-0002nR-6N
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:38:11 -0500
-Date: Tue, 26 Feb 2019 11:37:32 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190226033732.GA21357@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190225010708.27385-1-richardw.yang@linux.intel.com>
-	<20190225011534.GA27727@richard>
+	(envelope-from <dgibson@ozlabs.org>) id 1gyTto-0007jm-Fa
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 22:59:22 -0500
+Date: Tue, 26 Feb 2019 14:59:04 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190226035904.GN6872@umbus.fritz.box>
+References: <20190226030531.9932-1-sjitindarsingh@gmail.com>
+	<20190226030531.9932-4-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="1R6ZDISWaA1muLP0"
 Content-Disposition: inline
-In-Reply-To: <20190225011534.GA27727@richard>
-Subject: Re: [Qemu-devel] [PATCH v5] i386,
- acpi: check acpi_memory_hotplug capacity in pre_plug
+In-Reply-To: <20190226030531.9932-4-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 4/4] target/ppc/spapr: Enable
+ the large decrementer by default on POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,107 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com, imammedo@redhat.com, eblake@redhat.com
-
-On Mon, Feb 25, 2019 at 09:15:34AM +0800, Wei Yang wrote:
->On Mon, Feb 25, 2019 at 09:07:08AM +0800, Wei Yang wrote:
->>Currently we do device realization like below:
->>
->>   hotplug_handler_pre_plug()
->>   dc->realize()
->>   hotplug_handler_plug()
->>
->>Before we do device realization and plug, we should allocate necessary
->>resources and check if memory-hotplug-support property is enabled.
->>
->>At the piix4 and ich9, the memory-hotplug-support property is checked at
->>plug stage. This means that device has been realized and mapped into guest
->>address space 'pc_dimm_plug()' by the time acpi plug handler is called,
->>where it might fail and crash QEMU due to reaching g_assert_not_reached()
->>(piix4) or error_abort (ich9).
->>
->>Fix it by checking if memory hotplug is enabled at pre_plug stage
->>where we can gracefully abort hotplug request.
->>
->>Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>CC: Igor Mammedov <imammedo@redhat.com>
->>CC: Eric Blake <eblake@redhat.com>
->>Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>
->>---
->>v5:
->>   * rebase on latest upstream
->>   * remove a comment before hotplug_handler_pre_plug
->>   * fix alignment for ich9_pm_device_pre_plug_cb
->>v4:
->>   * fix code alignment of piix4_device_pre_plug_cb
->>v3:
->>   * replace acpi_memory_hotplug with memory-hotplug-support in changelog
->>   * fix code alignment of ich9_pm_device_pre_plug_cb
->>   * print which device type memory-hotplug-support is disabled in
->>     ich9_pm_device_pre_plug_cb and piix4_device_pre_plug_cb
->>v2:
->>   * (imammedo@redhat.com)
->>     - Almost the whole third paragraph
->>   * apply this change to ich9
->>   * use hotplug_handler_pre_plug() instead of open-coding check
->>---
->> hw/acpi/ich9.c         | 15 +++++++++++++--
->> hw/acpi/piix4.c        | 13 ++++++++++---
->> hw/i386/pc.c           |  2 ++
->> hw/isa/lpc_ich9.c      |  1 +
->> include/hw/acpi/ich9.h |  2 ++
->> 5 files changed, 28 insertions(+), 5 deletions(-)
->>
->>diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
->>index c5d8646abc..e53dfe1ee3 100644
->>--- a/hw/acpi/ich9.c
->>+++ b/hw/acpi/ich9.c
->>@@ -483,13 +483,24 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
->>                              NULL);
->> }
->> 
->>+void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
->>+                                Error **errp)
->>+{
->>+    ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
->>+
->>+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
->>+        !lpc->pm.acpi_memory_hotplug.is_enabled)
->>+        error_setg(errp,
->>+                   "memory hotplug is not enabled: %s.memory-hotplug-support "
->>+                   "is not set", object_get_typename(OBJECT(lpc)));
->>+}
->>+
->> void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
->>                             Error **errp)
->> {
->>     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
->> 
->>-    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
->>-        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->>+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->>         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
->>             nvdimm_acpi_plug_cb(hotplug_dev, dev);
->>         } else {
->>diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
->>index df8c0db909..8b9654e437 100644
->>--- a/hw/acpi/piix4.c
->>+++ b/hw/acpi/piix4.c
->>@@ -374,9 +374,16 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
->> static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->>                                     DeviceState *dev, Error **errp)
->
-
-Where will we invoke this check for pci devices?
-
-pc_machine_device_pre_plug_cb() seems has no connection with this function. So
-how this pre_plug handler takes effect?
-
-Do I miss something?
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
 
 
--- 
-Wei Yang
-Help you, Help me
+--1R6ZDISWaA1muLP0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Feb 26, 2019 at 02:05:31PM +1100, Suraj Jitindar Singh wrote:
+> Enable the large decrementer by default on POWER9 cpu models. The
+> default value applied is that provided in the cpu class.
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
+>  hw/ppc/spapr_caps.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index e07568fb94..f48aa367e3 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -566,11 +566,18 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM]=
+ =3D {
+>  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+>                                                 const char *cputype)
+>  {
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(object_class_by_name(cput=
+ype));
+>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>      sPAPRCapabilities caps;
+> =20
+>      caps =3D smc->default_caps;
+> =20
+> +    caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D pcc->hdecr_bits;
+
+So, the rule with default_caps_with_cpu() is that it can reduce the
+value from the machine-global default, but never increase it (because
+that could change guest visible behaviour for existing machine
+versions).
+
+I think the line above will do that.
+
+> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_3_00,
+> +                               0, spapr->max_compat_pvr)) {
+> +        caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D 0;
+
+And this part I think is redundant, because hdecr_bits won't be large
+for anything pre-POWER9.
+
+> +    }
+> +
+>      if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_07,
+>                                 0, spapr->max_compat_pvr)) {
+>          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--1R6ZDISWaA1muLP0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx0uYgACgkQbDjKyiDZ
+s5J/7A/9EQCmTrVL4nTg2WC5RAK0LQksqTb9m2gVmhfMPTLektLPw98ZMJEphd57
+XieXMftQAe3L2+ah7UI4fOKAAk5DjG1uzhngHVxD5kez5JqXDJWIgNP42IS9g6HL
+0ak6XVmaRHoG6zm9sRX2qmMq6RTFcNNfQlbspBVe+TRh4TpLnJViecR9T/Q6wnqx
+A9E/D/FT6XnH4tDtxQ3ia5UxKPluHUguJ1i6PhD1YCQQictIILjtBRr2bRSJKaXj
+WPqGzWJeiKwzYrP9UH72/tGVUm2Jvg5mKECeKkLnBWOFvuaJ+2AUPPyeZbKQVR+4
+AyR3+DNpVCCfUvzjyhqfNpiwZ+4Pr5DVUfZ9sNsGaV6Nz4HB6FAlkiDmiTiPMObC
+aSPI4f0WMYApOzkVvacvfQ9U8b7pcknmrEI8LrVkmjzbRW6mr280/ED1d0RlEK0+
+AxqyUGdGu457HWVOYIgegUivRJ1Qner7JgeqqVJMNaoV7behJ/RAZvhCtZL8wAd2
+Z8q+7AJRLh2z9f8WDvGGbK1CJESPOuim3PjwzRsZhaoLg9EzllSpSjVEXkgGVV4K
+1VuZ8XdY0NpCbDsiXI256XESogGVWb8i14hDfCUBPaIy0oB+rokRJaXeMb+8Vb2Q
+1dQhc1yu2kYeDL9r1lcB8b6W9dh+SFK+LoGvDVrPsxQSB4ZO8lA=
+=DBjf
+-----END PGP SIGNATURE-----
+
+--1R6ZDISWaA1muLP0--
