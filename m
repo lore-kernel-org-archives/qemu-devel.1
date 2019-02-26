@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56267)
+Received: from eggs.gnu.org ([209.51.188.92]:56982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gyjC1-0000Lr-3C
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:19:09 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gyjGe-0001ng-Sc
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gyjC0-00087Q-7S
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:19:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46520)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gyjBz-0007Wr-RT
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:19:08 -0500
-References: <HK2PR0401MB1955AC7A64864AFEEE3A2E88DE7B0@HK2PR0401MB1955.apcprd04.prod.outlook.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4771b4d7-d780-1053-0441-6c3e0e2ab539@redhat.com>
-Date: Tue, 26 Feb 2019 15:18:54 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gyjGa-00033o-58
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:23:54 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51742)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gyjGU-00030D-Lb
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:23:49 -0500
+Received: by mail-wm1-x341.google.com with SMTP id n19so3684123wmi.1
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 12:23:46 -0800 (PST)
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 26 Feb 2019 20:23:09 +0000
+Message-Id: <20190226202309.7761-1-stefanha@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <HK2PR0401MB1955AC7A64864AFEEE3A2E88DE7B0@HK2PR0401MB1955.apcprd04.prod.outlook.com>
-Content-Type: text/plain; charset=gbk
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] question about qemu-monitor-event result
- redirecting to a file
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [qemu-web PATCH] Add GSoC/Outreachy 2019 announcement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhan Adlun <zhanhouliang@outlook.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ _posts/2019-02-27-new-internships-2019.md | 32 +++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+ create mode 100644 _posts/2019-02-27-new-internships-2019.md
 
-On 2/26/19 6:51 AM, Zhan Adlun wrote:
-> Dear Sir:
->       Sorry to bother you. I use dirty bitmap to do backup in KVM. I could get output from the terminal when I use the command ' virsh qemu-monitor-event DOMAIN --timestamp --loop', but when using ' virsh qemu-monitor-event DOMAIN --timestamp --loop > /file ' to redirect the output to a file, I got nothing both from the terminal and the file. My os version is 'Distributor ID: Ubuntu   Description: Ubuntu 12.04 LTS   Release: 12.04   Codename: precise,Linux version 4.1.0-generic (root@cvknode183) (gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5) ) #1 SMP Wed Nov 9 02:04:23 CST 2016'. KVM version is 'QEMU emulator version 2.7.1(Debian 1:2.7+dfsg-3)'. Hoping for you reply. Thanks!
-> 
-
-Hi, I'm not experienced with how virsh manages its IO streams. The
-behavior that you see no output in the file OR the console is strange to
-me, though.
-
-If you are using bash (or a bash-alike), try
-`virsh ...etc... > file.txt 2>&1`
-which should really truly output everything to file, but you may have to
-wait for stdout flushes to see it, or you can try:
-`virsh ...etc... 2>&2 | tee file.txt`
-which will hopefully let you monitor the output as it occurs.
-
-Maybe someone else on list with more knowledge of virsh's behaviors can
-comment.
-
---js
+diff --git a/_posts/2019-02-27-new-internships-2019.md b/_posts/2019-02-27-new-internships-2019.md
+new file mode 100644
+index 0000000..f9fa29b
+--- /dev/null
++++ b/_posts/2019-02-27-new-internships-2019.md
+@@ -0,0 +1,32 @@
++---
++layout: post
++title:  "Announcing GSoC and Outreachy 2019 internships"
++date:   2019-02-26 07:00:00 +0000
++categories: [gsoc, outreachy, internships]
++---
++QEMU is once again participating in [Google Summer of
++Code](https://summerofcode.withgoogle.com/) and
++[Outreachy](https://www.outreachy.org/) this year!  These open source
++internship programs offer full-time remote work opportunities for talented new
++developers wishing to get involved in our community.
++
++Each intern works with one or more mentors who support them in their project.
++Code is submitted according to QEMU's normal development process, giving the
++intern experience in open source software development.  Our projects range from
++device emulation to performance optimization to test infrastructure.
++
++If you are interested in contributing to QEMU through a paid 12-week internship
++from May to August 2019, take a look at [our GSoC
++page](https://wiki.qemu.org/Google_Summer_of_Code_2019) and [our Outreachy
++page](https://wiki.qemu.org/Outreachy_2019_MayAugust) for more information.
++
++Both GSoC and Outreachy have eligibility criteria, which you can review [here
++(GSoC)](https://developers.google.com/open-source/gsoc/faq#what_are_the_eligibility_requirements_for_participation)
++and [here (Outreachy)](https://www.outreachy.org/apply/eligibility/) before
++applying.
++
++You can read about projects that were completed in 2018
++[here](https://www.qemu.org/2019/01/23/internships-wrapup/).
++
++These internships are generously funded by Google (GSoC) and Red Hat
++(Outreachy).
+-- 
+2.20.1
