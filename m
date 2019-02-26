@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36653)
+Received: from eggs.gnu.org ([209.51.188.92]:37448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gya9k-0000MZ-Pv
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:40:13 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gyaEA-0001PJ-Jq
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:44:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gya9h-0007Rh-WB
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:40:12 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Tue, 26 Feb 2019 10:39:48 +0000
-Message-ID: <a8ca5f99-43d0-610b-ea09-28b2655f5cda@virtuozzo.com>
+	(envelope-from <ehabkost@redhat.com>) id 1gyaE8-0001NW-5z
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 05:44:46 -0500
+Date: Tue, 26 Feb 2019 07:44:19 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190226104419.GB4925@habkost.net>
 References: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 	<20190225202630.GA4925@habkost.net>
 	<CAMRbyysWcfctB8AeSZrQ9x9HRAKut7mWYFqVP=oQ5uVoQgvh0w@mail.gmail.com>
-In-Reply-To: <CAMRbyysWcfctB8AeSZrQ9x9HRAKut7mWYFqVP=oQ5uVoQgvh0w@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5DF433AC31B70547B7C67A75C019EEBE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMRbyysWcfctB8AeSZrQ9x9HRAKut7mWYFqVP=oQ5uVoQgvh0w@mail.gmail.com>
 Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] iotests: handle TypeError
  for Python3 in test 242
 List-Id: <qemu-devel.nongnu.org>
@@ -27,72 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nsoffer@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block <qemu-block@nongnu.org>, "\"philmd@redhat.com; eblake\"@redhat.com" <"philmd@redhat.com; eblake"@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Nir Soffer <nsoffer@redhat.com>
+Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block <qemu-block@nongnu.org>, philmd@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, den@openvz.org
 
-DQoNCk9uIDI2LzAyLzIwMTkgMDQ6NDIsIE5pciBTb2ZmZXIgd3JvdGU6DQo+IE9uIE1vbiwgRmVi
-IDI1LCAyMDE5IGF0IDEwOjM2IFBNIEVkdWFyZG8gSGFia29zdCA8ZWhhYmtvc3RAcmVkaGF0LmNv
-bSANCj4gPG1haWx0bzplaGFia29zdEByZWRoYXQuY29tPj4gd3JvdGU6DQo+IA0KPiAgICAgT24g
-RnJpLCBGZWIgMjIsIDIwMTkgYXQgMDI6MjY6MTNQTSArMDMwMCwgQW5kcmV5IFNoaW5rZXZpY2gg
-d3JvdGU6DQo+ICAgICAgPiBUaGUgZGF0YSB0eXBlIGZvciBieXRlcyBpbiBQeXRob24zIGRpZmZl
-cnMgZnJvbSB0aGUgb25lIGluIFB5dGhvbjIuDQo+ICAgICAgPiBUaG9zZSBjYXNlcyBzaG91bGQg
-YmUgbWFuYWdlZCBzZXBhcmF0ZWx5Lg0KPiAgICAgID4NCj4gICAgICA+IHYxOg0KPiAgICAgID4g
-SW4gdGhlIGZpcnN0IHZlcnNpb24sIHRoZSBUeXBlRXJyb3IgaW4gUHl0aG9uMyB3YXMgaGFuZGxl
-ZCBhcyB0aGUNCj4gICAgICA+IGV4Y2VwdGlvbi4NCj4gICAgICA+IERpc2N1c3NlZCBpbiB0aGUg
-ZS1tYWlsIHRocmVhZCB3aXRoIHRoZSBNZXNzYWdlIElEOg0KPiAgICAgID4NCj4gICAgIDwxNTUw
-NTE5OTk3LTI1MzUzNC0xLWdpdC1zZW5kLWVtYWlsLWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6
-by5jb20NCj4gICAgIDxtYWlsdG86MTU1MDUxOTk5Ny0yNTM1MzQtMS1naXQtc2VuZC1lbWFpbC1h
-bmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPj4NCj4gICAgICA+DQo+ICAgICAgPiBTaWdu
-ZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpv
-LmNvbQ0KPiAgICAgPG1haWx0bzphbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPj4NCj4g
-ICAgICA+IFJlcG9ydGVkLWJ5OiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tIDxtYWlsdG86
-a3dvbGZAcmVkaGF0LmNvbT4+DQo+ICAgICAgPiAtLS0NCj4gICAgICA+wqAgdGVzdHMvcWVtdS1p
-b3Rlc3RzLzI0MiB8IDggKysrKysrLS0NCj4gICAgICA+wqAgMSBmaWxlIGNoYW5nZWQsIDYgaW5z
-ZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gICAgICA+DQo+ICAgICAgPiBkaWZmIC0tZ2l0
-IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MiBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDINCj4gICAg
-ICA+IGluZGV4IDE2YzY1ZWQuLjQ0NmZiZjggMTAwNzU1DQo+ICAgICAgPiAtLS0gYS90ZXN0cy9x
-ZW11LWlvdGVzdHMvMjQyDQo+ICAgICAgPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQyDQo+
-ICAgICAgPiBAQCAtMjAsNiArMjAsNyBAQA0KPiAgICAgID4NCj4gICAgICA+wqAgaW1wb3J0IGlv
-dGVzdHMNCj4gICAgICA+wqAgaW1wb3J0IGpzb24NCj4gICAgICA+ICtpbXBvcnQgc3lzDQo+ICAg
-ICAgPsKgIGZyb20gaW90ZXN0cyBpbXBvcnQgcWVtdV9pbWdfY3JlYXRlLCBxZW11X2lvLCBxZW11
-X2ltZ19waXBlLCBcDQo+ICAgICAgPsKgIMKgIMKgIGZpbGVfcGF0aCwgaW1nX2luZm9fbG9nLCBs
-b2csIGZpbHRlcl9xZW11X2lvDQo+ICAgICAgPg0KPiAgICAgID4gQEAgLTY1LDkgKzY2LDEyIEBA
-IGRlZiB0b2dnbGVfZmxhZyhvZmZzZXQpOg0KPiAgICAgID7CoCDCoCDCoCB3aXRoIG9wZW4oZGlz
-aywgInIrYiIpIGFzIGY6DQo+ICAgICAgPsKgIMKgIMKgIMKgIMKgIGYuc2VlayhvZmZzZXQsIDAp
-DQo+ICAgICAgPsKgIMKgIMKgIMKgIMKgIGMgPSBmLnJlYWQoMSkNCj4gICAgICA+IC3CoCDCoCDC
-oCDCoCB0b2dnbGVkID0gY2hyKG9yZChjKSBeIGJpdG1hcF9mbGFnX3Vua25vd24pDQo+ICAgICAg
-PiArwqAgwqAgwqAgwqAgdG9nZ2xlZCA9IG9yZChjKSBeIGJpdG1hcF9mbGFnX3Vua25vd24NCj4g
-ICAgICA+wqAgwqAgwqAgwqAgwqAgZi5zZWVrKC0xLCAxKQ0KPiAgICAgID4gLcKgIMKgIMKgIMKg
-IGYud3JpdGUodG9nZ2xlZCkNCj4gICAgICA+ICvCoCDCoCDCoCDCoCBpZiBzeXMudmVyc2lvbl9p
-bmZvLm1ham9yID49IDM6DQo+ICAgICAgPiArwqAgwqAgwqAgwqAgwqAgwqAgZi53cml0ZShieXRl
-cyhbdG9nZ2xlZF0pKQ0KPiAgICAgID4gK8KgIMKgIMKgIMKgIGVsc2U6DQo+ICAgICAgPiArwqAg
-wqAgwqAgwqAgwqAgwqAgZi53cml0ZShjaHIodG9nZ2xlZCkpDQo+IA0KPiAgICAgUHJldGVuZGlu
-ZyB3ZSBhcmUgZGVhbGluZyB3aXRoIHRleHQgc3RyaW5ncyBhbmQgdXNpbmcgc3RyL29yZCBpcw0K
-PiAgICAgYSBweXRob24yLXNwZWNpZmljIHF1aXJrLsKgIEkgdGhpbmsgaXQgd291bGQgYmUgbmlj
-ZSB0byBnZXQgcmlkIG9mDQo+ICAgICBpdC4NCj4gDQo+ICAgICBQeXRob24gMiBoYXMgYnl0ZWFy
-cmF5KCksIHdoaWNoIGJlaGF2ZXMgbW9yZSBzaW1pbGFybHkgdG8gdGhlDQo+ICAgICBieXRlcyB0
-eXBlIGZyb20gUHl0aG9uIDMuwqAgSWYgd2UgdXNlIGl0LCB3ZSBjYW4gbWFrZSB0aGUgY29kZQ0K
-PiAgICAgbW9yZSBweXRob24zLWxpa2U6DQo+IA0KPiAgICAgZGlmZiAtLWdpdCBhL3Rlc3RzL3Fl
-bXUtaW90ZXN0cy8yNDIgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQyDQo+ICAgICBpbmRleCAxNmM2
-NWVkY2Q3Li43Nzk0ZmQ0YTcwIDEwMDc1NQ0KPiAgICAgLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3Rz
-LzI0Mg0KPiAgICAgKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Mg0KPiAgICAgQEAgLTY0LDEw
-ICs2NCwxMiBAQCBkZWYgd3JpdGVfdG9fZGlzayhvZmZzZXQsIHNpemUpOg0KPiAgICAgIMKgZGVm
-IHRvZ2dsZV9mbGFnKG9mZnNldCk6DQo+ICAgICAgwqAgwqAgwqB3aXRoIG9wZW4oZGlzaywgInIr
-YiIpIGFzIGY6DQo+ICAgICAgwqAgwqAgwqAgwqAgwqBmLnNlZWsob2Zmc2V0LCAwKQ0KPiAgICAg
-LcKgIMKgIMKgIMKgIGMgPSBmLnJlYWQoMSkNCj4gICAgIC3CoCDCoCDCoCDCoCB0b2dnbGVkID0g
-Y2hyKG9yZChjKSBeIGJpdG1hcF9mbGFnX3Vua25vd24pDQo+ICAgICArwqAgwqAgwqAgwqAgIyBU
-aGUgY2FzdHMgdG8gYnl0ZWFycmF5KCkgYmVsb3cgYXJlIG9ubHkgbmVjZXNzYXJ5DQo+ICAgICAr
-wqAgwqAgwqAgwqAgIyBmb3IgUHl0aG9uIDIgY29tcGF0aWJpbGl0eQ0KPiAgICAgK8KgIMKgIMKg
-IMKgIGMgPSBieXRlYXJyYXkoZi5yZWFkKDEpKVswXQ0KPiANCj4gDQo+IFRoaXMgaXMgc2ltcGxl
-ciBhbmQgbWFrZXMgdGhlIGludGVudCBvZiB0aGUgY29kZSBtb3JlIGNsZWFyOg0KPiANCj4gIMKg
-IMKgIGZsYWcsID0gc3RydWN0LnVucGFjaygiQiIsIGYucmVhZCgxKSkNCj4gDQo+ICAgICArwqAg
-wqAgwqAgwqAgdG9nZ2xlZCA9IGMgXiBiaXRtYXBfZmxhZ191bmtub3duDQo+ICAgICAgwqAgwqAg
-wqAgwqAgwqBmLnNlZWsoLTEsIDEpDQo+ICAgICAtwqAgwqAgwqAgwqAgZi53cml0ZSh0b2dnbGVk
-KQ0KPiAgICAgK8KgIMKgIMKgIMKgIGYud3JpdGUoYnl0ZWFycmF5KFt0b2dnbGVkXSkpDQo+IA0K
-PiANCj4gRm9yIGNvbnNpc3RlbmN5LCB3ZSBjYW4gdXNlIHN0cnVjdC5wYWNrIGhlcmU6DQo+IA0K
-PiAgwqAgwqAgZi53cml0ZShzdHJ1Y3QucGFjaygiQiIsIHRvZ2dsZWQpKQ0KPiANCj4gTmlyDQo+
-IA0KDQpUaGFuayB5b3UgYWxsLiBJIGFtIE9LIHdpdGggdGhpcyBhcHByb2FjaC4NCldpbGwgd2Fp
-dCBmb3IgRXJpYydzIHJlc3BvbnNlLg0KDQo+IA0KPiANCj4gICAgICDCoHFlbXVfaW1nX2NyZWF0
-ZSgnLWYnLCBpb3Rlc3RzLmltZ2ZtdCwgZGlzaywgJzFNJykNCj4gDQo+ICAgICAtLSANCj4gICAg
-IEVkdWFyZG8NCj4gDQoNCi0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5IFNoaW5r
-ZXZpY2gNCg0K
+On Tue, Feb 26, 2019 at 03:42:11AM +0200, Nir Soffer wrote:
+> On Mon, Feb 25, 2019 at 10:36 PM Eduardo Habkost <ehabkost@redhat.com>
+[...]
+> > -        c = f.read(1)
+> > -        toggled = chr(ord(c) ^ bitmap_flag_unknown)
+> > +        # The casts to bytearray() below are only necessary
+> > +        # for Python 2 compatibility
+> > +        c = bytearray(f.read(1))[0]
+> >
+> 
+> This is simpler and makes the intent of the code more clear:
+> 
+>     flag, = struct.unpack("B", f.read(1))
+> 
+> 
+> > +        toggled = c ^ bitmap_flag_unknown
+> >          f.seek(-1, 1)
+> > -        f.write(toggled)
+> > +        f.write(bytearray([toggled]))
+> >
+> 
+> For consistency, we can use struct.pack here:
+> 
+>     f.write(struct.pack("B", toggled))
+
+That's perfect.  Thanks for the suggestion!
+
+-- 
+Eduardo
