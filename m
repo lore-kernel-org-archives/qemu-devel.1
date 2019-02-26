@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45193)
+Received: from eggs.gnu.org ([209.51.188.92]:45191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gyemE-0006Vc-84
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:36:15 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gyem8-0002Ef-74
+	(envelope-from <berrange@redhat.com>) id 1gyemE-0006VW-2y
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:36:14 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 26 Feb 2019 15:35:49 +0000
-Message-Id: <20190226153549.17867-1-stefanha@redhat.com>
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1gyemD-0002Mk-Eu
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:36:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyemD-0002Ki-8b
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:36:13 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 26 Feb 2019 15:35:12 +0000
+Message-Id: <20190226153520.29821-4-berrange@redhat.com>
+In-Reply-To: <20190226153520.29821-1-berrange@redhat.com>
+References: <20190226153520.29821-1-berrange@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] file-posix: add drop-cache=on|off option
+Subject: [Qemu-devel] [PULL v2 03/11] hw/usb: don't set IN_ISDIR for inotify
+ watch in MTP driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,131 +28,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Neil Skrypuch <neil@tembosocial.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Commit dd577a26ff03b6829721b1ffbbf9e7c411b72378 ("block/file-posix:
-implement bdrv_co_invalidate_cache() on Linux") introduced page cache
-invalidation so that cache.direct=3Doff live migration is safe on Linux.
+IN_ISDIR is not a bit that one can request when registering a
+watch with inotify_add_watch. Rather it is a bit that is set
+automatically when reading events from the kernel.
 
-The invalidation takes a significant amount of time when the file is
-large and present in the page cache.  Normally this is not the case for
-cross-host live migration but it can happen when migrating between QEMU
-processes on the same host.
-
-On same-host migration we don't need to invalidate pages for correctness
-anyway, so an option to skip page cache invalidation is useful.  I
-investigated optimizing invalidation and detecting same-host migration,
-but both are hard to achieve so a user-visible option will suffice.
-
-As a bonus this option means that the cache invalidation feature will
-now be detectable by libvirt via QMP schema introspection.
-
-Suggested-by: Neil Skrypuch <neil@tembosocial.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- qapi/block-core.json |  5 +++++
- block/file-posix.c   | 14 ++++++++++++++
- 2 files changed, 19 insertions(+)
+ hw/usb/dev-mtp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 2b8afbb924..d4cc3c4294 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2807,6 +2807,10 @@
- # @locking:     whether to enable file locking. If set to 'auto', only e=
-nable
- #               when Open File Descriptor (OFD) locking API is available
- #               (default: auto, since 2.10)
-+# @drop-cache:  invalidate page cache during live migration.  This preve=
-nts
-+#               stale data on the migration destination with cache.direc=
-t=3Doff.
-+#               Currently only supported on Linux hosts.
-+#               (default: on, since: 4.0)
- # @x-check-cache-dropped: whether to check that page cache was dropped o=
-n live
- #                         migration.  May cause noticeable delays if the=
- image
- #                         file is large, do not use in production.
-@@ -2819,6 +2823,7 @@
-             '*pr-manager': 'str',
-             '*locking': 'OnOffAuto',
-             '*aio': 'BlockdevAioOptions',
-+            '*drop-cache': 'bool',
-             '*x-check-cache-dropped': 'bool' } }
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index f1d20fa1b9..f0c52a476a 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -653,8 +653,7 @@ static void usb_mtp_inotify_cleanup(MTPState *s)
 =20
- ##
-diff --git a/block/file-posix.c b/block/file-posix.c
-index ba6ab62a38..7bb2c4762f 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -154,6 +154,7 @@ typedef struct BDRVRawState {
-     bool page_cache_inconsistent:1;
-     bool has_fallocate;
-     bool needs_alignment;
-+    bool drop_cache;
-     bool check_cache_dropped;
+ static int usb_mtp_add_watch(int inotifyfd, char *path)
+ {
+-    uint32_t mask =3D IN_CREATE | IN_DELETE | IN_MODIFY |
+-        IN_ISDIR;
++    uint32_t mask =3D IN_CREATE | IN_DELETE | IN_MODIFY;
 =20
-     PRManager *pr_mgr;
-@@ -162,6 +163,7 @@ typedef struct BDRVRawState {
- typedef struct BDRVRawReopenState {
-     int fd;
-     int open_flags;
-+    bool drop_cache;
-     bool check_cache_dropped;
- } BDRVRawReopenState;
-=20
-@@ -422,6 +424,11 @@ static QemuOptsList raw_runtime_opts =3D {
-             .type =3D QEMU_OPT_STRING,
-             .help =3D "id of persistent reservation manager object (defa=
-ult: none)",
-         },
-+        {
-+            .name =3D "drop-cache",
-+            .type =3D QEMU_OPT_BOOL,
-+            .help =3D "invalidate page cache during live migration (defa=
-ult: on)",
-+        },
-         {
-             .name =3D "x-check-cache-dropped",
-             .type =3D QEMU_OPT_BOOL,
-@@ -511,6 +518,7 @@ static int raw_open_common(BlockDriverState *bs, QDic=
-t *options,
-         }
-     }
-=20
-+    s->drop_cache =3D qemu_opt_get_bool(opts, "drop-cache", true);
-     s->check_cache_dropped =3D qemu_opt_get_bool(opts, "x-check-cache-dr=
-opped",
-                                                false);
-=20
-@@ -869,6 +877,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
-         goto out;
-     }
-=20
-+    rs->drop_cache =3D qemu_opt_get_bool_del(opts, "drop-cache", true);
-     rs->check_cache_dropped =3D
-         qemu_opt_get_bool_del(opts, "x-check-cache-dropped", false);
-=20
-@@ -946,6 +955,7 @@ static void raw_reopen_commit(BDRVReopenState *state)
-     BDRVRawState *s =3D state->bs->opaque;
-     Error *local_err =3D NULL;
-=20
-+    s->drop_cache =3D rs->drop_cache;
-     s->check_cache_dropped =3D rs->check_cache_dropped;
-     s->open_flags =3D rs->open_flags;
-=20
-@@ -2531,6 +2541,10 @@ static void coroutine_fn raw_co_invalidate_cache(B=
-lockDriverState *bs,
-         return;
-     }
-=20
-+    if (!s->drop_cache) {
-+        return;
-+    }
-+
-     if (s->open_flags & O_DIRECT) {
-         return; /* No host kernel page cache */
-     }
+     return inotify_add_watch(inotifyfd, path, mask);
+ }
 --=20
 2.20.1
