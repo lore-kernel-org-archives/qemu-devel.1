@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51110)
+Received: from eggs.gnu.org ([209.51.188.92]:51334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1gylDS-0002hM-JA
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:28:47 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gylEr-0003LU-Ku
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:30:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1gylDR-0005wL-FX
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:28:46 -0500
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:33992)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
-	id 1gylDR-0005pb-4T
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:28:45 -0500
-Received: by mail-pg1-x533.google.com with SMTP id i130so6894239pgd.1
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 14:28:40 -0800 (PST)
-Received: from [192.168.1.102] ([176.116.252.109])
-	by smtp.gmail.com with ESMTPSA id
-	b26sm17845026pfo.33.2019.02.26.14.28.37 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 26 Feb 2019 14:28:38 -0800 (PST)
-From: Andrew Randrianasulu <randrianasulu@gmail.com>
-Date: Wed, 27 Feb 2019 01:25:35 +0300
+	(envelope-from <balaton@eik.bme.hu>) id 1gylEp-0006WC-QP
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 17:30:13 -0500
+Date: Tue, 26 Feb 2019 23:30:00 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190226193408.23862-7-armbru@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1902262329040.5023@zero.eik.bme.hu>
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-7-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <201902270125.36158.randrianasulu@gmail.com>
-Subject: [Qemu-devel] regression: target/ppc: convert VSX logical operations
- to vector operations broke X for ppc64le guest
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 06/11] sam460ex: Don't size flash memory
+ to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,83 +23,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, qemu-ppc@nongnu.org
 
-Hello.
+On Tue, 26 Feb 2019, Markus Armbruster wrote:
+> Machine "sam460ex" maps its flash memory at address 0xFFF00000.  When
+> no image is supplied, its size is 1MiB (0x100000), and 512KiB of ROM
+> get mapped on top of its second half.  Else, it's the size of the
+> image rounded up to the next multiple of 64KiB.
+>
+> The rounding is actually useless: pflash_cfi01_realize() fails with
+> "failed to read the initial flash content" unless it's a no-op.
+>
+> I have no idea what happens when the pflash's size exceeds 1MiB.
+> Useful outcomes seem unlikely.
+>
+> I guess memory at the end of the address space remains unmapped when
+> it's smaller than 1MiB.  Again, useful outcomes seem unlikely.
+>
+> The physical hardware appears to have 512KiB of flash memory:
+> https://eu.mouser.com/datasheet/2/268/atmel_AT49BV040B-1180330.pdf
+>
+> For now, just set the flash memory size to 1MiB regardless of image
+> size, and document the mess.
+>
+> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-I bisected this problem with fonts (and multicolored vertical stripes) in qemu 
-git (ppc64-softmmu)
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-guest@slax:/dev/shm/qemu$ git bisect good
-7b8fe477e12b164dda97f79e27b55b805d90384f is the first bad commit
-commit 7b8fe477e12b164dda97f79e27b55b805d90384f
-Author: Richard Henderson <richard.henderson@linaro.org>
-Date:   Fri Feb 15 10:00:46 2019 +0000
+Regards,
+BALATON Zoltan
 
-    target/ppc: convert VSX logical operations to vector operations
-
-    Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-    Acked-by: David Gibson <david@gibson.dropbear.id.au>
-    Message-Id: <20190215100058.20015-6-mark.cave-ayland@ilande.co.uk>
-    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-
-:040000 040000 da3024ad2c9dfc3b7170516a8b321ef8c5d5bdf8 
-a0257b9f5880ecc8e7001a59ccaa10407084623f M      target
-
-
-guest@slax:/dev/shm/qemu$ git bisect log
-git bisect start
-# good: [32a1a94dd324d33578dca1dc96d7896a0244d768] Update version for v3.1.0 
-release
-git bisect good 32a1a94dd324d33578dca1dc96d7896a0244d768
-# bad: [86c7e2f4a93322a76afea5ee6806a83420d1dfea] Merge remote-tracking 
-branch 'remotes/berrange/tags/authz-core-pull-request' into staging
-git bisect bad 86c7e2f4a93322a76afea5ee6806a83420d1dfea
-# good: [95ebd99dcd37b8574426c876502bfcc7c299584b] target/arm: Decode PAuth 
-within disas_data_proc_1src
-git bisect good 95ebd99dcd37b8574426c876502bfcc7c299584b
-# good: [268dfefa690b2bdee1f8c5090d2343871cf3467c] hw/microblaze/Makefile.objs: 
-Create configs for petalogix and xilinx boards
-git bisect good 268dfefa690b2bdee1f8c5090d2343871cf3467c
-# good: [f5117fd28552fe3fe32ef0495582b1caaef7a28d] hw/mips_cpc: kick a VP when 
-putting it into Run statewq
-git bisect good f5117fd28552fe3fe32ef0495582b1caaef7a28d
-# bad: [2e68b8620637a4ee8c79b5724144b726af1e261b] Merge remote-tracking 
-branch 'remotes/dgibson/tags/ppc-for-4.0-20190219' into staging
-git bisect bad 2e68b8620637a4ee8c79b5724144b726af1e261b
-# good: [4c668f4a3d684ec133a52d936314379f6edd672e] target/ppc: Remove some #if 
-0'ed code
-git bisect good 4c668f4a3d684ec133a52d936314379f6edd672e
-# bad: [9b5b74da0a07a89ef71c7f7da0b36560a3bac521] target/ppc: Split out VSCR_SAT 
-to a vector field
-git bisect bad 9b5b74da0a07a89ef71c7f7da0b36560a3bac521
-# good: [444d6ca301d97de141a502851940943b09a9ebee] spapr/irq: Use the "simple" 
-ICS class for KVM
-git bisect good 444d6ca301d97de141a502851940943b09a9ebee
-# bad: [9bb0048ec6f8f3bcc144b2c5769d9301e824f946] target/ppc: convert xxspltw to 
-vector operations
-git bisect bad 9bb0048ec6f8f3bcc144b2c5769d9301e824f946
-# good: [471ff3d0257135b938d0a5f2181f22cd753d50de] target/ppc: convert 
-vspltis[bhw] to use vector operations
-git bisect good 471ff3d0257135b938d0a5f2181f22cd753d50de
-# bad: [7b8fe477e12b164dda97f79e27b55b805d90384f] target/ppc: convert VSX 
-logical operations to vector operations
-git bisect bad 7b8fe477e12b164dda97f79e27b55b805d90384f
-# good: [0f6a6d5db853c0cbe438c1831c70710bfb6530ee] target/ppc: convert 
-vsplt[bhw] to use vector operations
-git bisect good 0f6a6d5db853c0cbe438c1831c70710bfb6530ee
-# first bad commit: [7b8fe477e12b164dda97f79e27b55b805d90384f] target/ppc: 
-convert VSX logical operations to vector operations
-guest@slax:/dev/shm/qemu$                                                
-
-configure line:
-setarch i686 ./configure --target-list=ppc64-softmmu             
-
-launch line:
-ppc64-softmmu/qemu-system-ppc64 -display 
-sdl,gl=on -hda /mnt/sdb1/PPC-img/alpine_disk.img
-
-where alpine_disk.img is HDD installed Alpine 3.7 for ppc64le with xfce4 
-desktop.
-
-               
+> ---
+> hw/ppc/sam460ex.c | 41 ++++++++++++++++++++++++++---------------
+> 1 file changed, 26 insertions(+), 15 deletions(-)
+>
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 75250d49e4..0c919529f8 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -91,32 +91,43 @@ struct boot_info {
+>
+> static int sam460ex_load_uboot(void)
+> {
+> +    /*
+> +     * This first creates 1MiB of flash memory mapped at the end of
+> +     * the 32-bit address space (0xFFF00000..0xFFFFFFFF).
+> +     *
+> +     * If_PFLASH unit 0 is defined, the flash memory is initialized
+> +     * from that block backend.
+> +     *
+> +     * Else, it's initialized to zero.  And then 512KiB of ROM get
+> +     * mapped on top of its second half (0xFFF80000..0xFFFFFFFF),
+> +     * initialized from u-boot-sam460-20100605.bin.
+> +     *
+> +     * This doesn't smell right.
+> +     *
+> +     * The physical hardware appears to have 512KiB flash memory.
+> +     *
+> +     * TODO Figure out what we really need here, and clean this up.
+> +     */
+> +
+>     DriveInfo *dinfo;
+> -    BlockBackend *blk = NULL;
+> -    hwaddr base = FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32);
+> -    long bios_size = FLASH_SIZE;
+> -    int fl_sectors;
+>
+>     dinfo = drive_get(IF_PFLASH, 0, 0);
+> -    if (dinfo) {
+> -        blk = blk_by_legacy_dinfo(dinfo);
+> -        bios_size = blk_getlength(blk);
+> -    }
+> -    fl_sectors = (bios_size + 65535) >> 16;
+> -
+> -    if (!pflash_cfi01_register(base, NULL, "sam460ex.flash", bios_size,
+> -                               blk, 64 * KiB, fl_sectors,
+> +    if (!pflash_cfi01_register(FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32),
+> +                               NULL, "sam460ex.flash", FLASH_SIZE,
+> +                               dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                               64 * KiB, FLASH_SIZE / (64 * KiB),
+>                                1, 0x89, 0x18, 0x0000, 0x0, 1)) {
+>         error_report("Error registering flash memory");
+>         /* XXX: return an error instead? */
+>         exit(1);
+>     }
+>
+> -    if (!blk) {
+> +    if (!dinfo) {
+>         /*error_report("No flash image given with the 'pflash' parameter,"
+>                 " using default u-boot image");*/
+> -        base = UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32);
+> -        rom_add_file_fixed(UBOOT_FILENAME, base, -1);
+> +        rom_add_file_fixed(UBOOT_FILENAME,
+> +                           UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32),
+> +                           -1);
+>     }
+>
+>     return 0;
+>
