@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52258)
+Received: from eggs.gnu.org ([209.51.188.92]:52260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyitj-0007TJ-Us
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:16 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gyitj-0007TL-V6
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyiti-0007AP-5b
+	(envelope-from <dgilbert@redhat.com>) id 1gyiti-0007Ak-8K
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40806)
+Received: from mx1.redhat.com ([209.132.183.28]:59776)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyith-00078G-UM
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyith-00079N-V1
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 15:00:14 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C0B15C059B85
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 20:00:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F21626DD9D
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 20:00:12 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 26 Feb 2019 19:59:55 +0000
-Message-Id: <20190226195959.28759-6-dgilbert@redhat.com>
+Date: Tue, 26 Feb 2019 19:59:56 +0000
+Message-Id: <20190226195959.28759-7-dgilbert@redhat.com>
 In-Reply-To: <20190226195959.28759-1-dgilbert@redhat.com>
 References: <20190226195959.28759-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 5/9] net: Add a network device specific
- self-announcement ability
+Subject: [Qemu-devel] [PATCH v5 6/9] virtio-net: Allow qemu_announce_self to
+ trigger virtio announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +37,103 @@ Cc: quintela@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Some network devices have a capability to do self announcements
-(ex: virtio-net).  Add infrastructure that would allow devices
-to expose this ability.
+Expose the virtio-net self announcement capability and allow
+qemu_announce_self() to call it.
+
+These announces are caused by something external (i.e. the
+announce-self command); they won't trigger if the migration
+counter is triggering announces at the same time.
 
 Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/net/net.h | 2 ++
- net/announce.c    | 5 +++++
- 2 files changed, 7 insertions(+)
+ hw/net/trace-events |  1 +
+ hw/net/virtio-net.c | 35 ++++++++++++++++++++++++++++++++---
+ 2 files changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 075cc01267..acf0451fc4 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -60,6 +60,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
- typedef int (SetVnetBE)(NetClientState *, bool);
- typedef struct SocketReadState SocketReadState;
- typedef void (SocketReadStateFinalize)(SocketReadState *rs);
-+typedef void (NetAnnounce)(NetClientState *);
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index b237d9024c..3a86004154 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -361,6 +361,7 @@ sunhme_rx_desc(uint32_t addr, int offset, uint32_t st=
+atus, int len, int cr, int
+ sunhme_rx_xsum_calc(uint16_t xsum) "calculated incoming xsum as 0x%x"
 =20
- typedef struct NetClientInfo {
-     NetClientDriver type;
-@@ -80,6 +81,7 @@ typedef struct NetClientInfo {
-     SetVnetHdrLen *set_vnet_hdr_len;
-     SetVnetLE *set_vnet_le;
-     SetVnetBE *set_vnet_be;
-+    NetAnnounce *announce;
- } NetClientInfo;
+ # hw/net/virtio-net.c
++virtio_net_announce_notify(void) ""
+ virtio_net_announce_timer(int round) "%d"
+ virtio_net_handle_announce(int round) "%d"
+ virtio_net_post_load_device(void)
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 38b8974144..7e2c2a6f6a 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -150,15 +150,42 @@ static bool virtio_net_started(VirtIONet *n, uint8_=
+t status)
+         (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
+ }
 =20
- struct NetClientState {
-diff --git a/net/announce.c b/net/announce.c
-index 13ad9c2ba8..070f37a7fa 100644
---- a/net/announce.c
-+++ b/net/announce.c
-@@ -102,6 +102,11 @@ static void qemu_announce_self_iter(NICState *nic, v=
-oid *opaque)
-     len =3D announce_self_create(buf, nic->conf->macaddr.a);
-=20
-     qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
++static void virtio_net_announce_notify(VirtIONet *net)
++{
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(net);
++    trace_virtio_net_announce_notify();
 +
-+    /* if the NIC provides it's own announcement support, use it as well=
- */
-+    if (nic->ncs->info->announce) {
-+        nic->ncs->info->announce(nic->ncs);
++    net->status |=3D VIRTIO_NET_S_ANNOUNCE;
++    virtio_notify_config(vdev);
++}
++
+ static void virtio_net_announce_timer(void *opaque)
+ {
+     VirtIONet *n =3D opaque;
+-    VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
+     trace_virtio_net_announce_timer(n->announce_timer.round);
+=20
+     n->announce_timer.round--;
+-    n->status |=3D VIRTIO_NET_S_ANNOUNCE;
+-    virtio_notify_config(vdev);
++    virtio_net_announce_notify(n);
++}
++
++static void virtio_net_announce(NetClientState *nc)
++{
++    VirtIONet *n =3D qemu_get_nic_opaque(nc);
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
++
++    /*
++     * Make sure the virtio migration announcement timer isn't running
++     * If it is, let it trigger announcement so that we do not cause
++     * confusion.
++     */
++    if (n->announce_timer.round) {
++        return;
++    }
++
++    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
++        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
++            virtio_net_announce_notify(n);
 +    }
  }
- static void qemu_announce_self_once(void *opaque)
- {
+=20
+ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+@@ -2556,6 +2583,7 @@ static NetClientInfo net_virtio_info =3D {
+     .receive =3D virtio_net_receive,
+     .link_status_changed =3D virtio_net_set_link_status,
+     .query_rx_filter =3D virtio_net_query_rxfilter,
++    .announce =3D virtio_net_announce,
+ };
+=20
+ static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int id=
+x)
+@@ -2692,6 +2720,7 @@ static void virtio_net_device_realize(DeviceState *=
+dev, Error **errp)
+     qemu_announce_timer_reset(&n->announce_timer, migrate_announce_param=
+s(),
+                               QEMU_CLOCK_VIRTUAL,
+                               virtio_net_announce_timer, n);
++    n->announce_timer.round =3D 0;
+=20
+     if (n->netclient_type) {
+         /*
 --=20
 2.20.1
