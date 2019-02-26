@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39575)
+Received: from eggs.gnu.org ([209.51.188.92]:50392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1gyQfr-0000r4-HU
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 19:32:44 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gyRii-0000HU-Mr
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1gyQfq-0008LP-G8
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 19:32:43 -0500
-Received: from mail-it1-x129.google.com ([2607:f8b0:4864:20::129]:40779)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gyRih-0008BY-OE
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:39:44 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42901)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1gyQfo-0008FF-9X
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 19:32:40 -0500
-Received: by mail-it1-x129.google.com with SMTP id i2so1470194ite.5
-	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 16:32:39 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <63A30600-CCE3-4412-A3EB-8D535A8B21B3@oberlin.edu>
-Date: Mon, 25 Feb 2019 19:32:37 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4F8E4327-9F59-4F50-A22D-20A3F939899F@oberlin.edu>
-References: <5F2C0013-1D18-44A9-ADAF-F86EC6FD1174@oberlin.edu>
-	<CAFEAcA8VzJRMSThWQ=CgNbB8BY0EAmi77oAJuHQt5iQnkiZmzg@mail.gmail.com>
-	<63A30600-CCE3-4412-A3EB-8D535A8B21B3@oberlin.edu>
-Subject: Re: [Qemu-devel] x86 segment limits enforcement with TCG
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1gyRih-00086Z-GG
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 20:39:43 -0500
+Received: by mail-wr1-x442.google.com with SMTP id r5so12054045wrg.9
+	for <qemu-devel@nongnu.org>; Mon, 25 Feb 2019 17:39:42 -0800 (PST)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
+	<cf14255c576fd361c6cdf941f8c637e613f6cb68.1550698466.git.DirtY.iCE.hu@gmail.com>
+Message-ID: <63250655-a4a3-ef36-5882-65188093ff57@gmail.com>
+Date: Tue, 26 Feb 2019 02:39:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <cf14255c576fd361c6cdf941f8c637e613f6cb68.1550698466.git.DirtY.iCE.hu@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 04/14] audio: -audiodev command line
+ option basic implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +32,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-FWIW, I figured out an approach to this. Essentially, I'm reusing the =
-function which computes linear addresses to enforce not only segment =
-limits (in everything but long mode), but also read/write access (in =
-protected mode).
+On 2019-02-20 22:37, Kővágó, Zoltán wrote:
+[...]
+> diff --git a/audio/audio.c b/audio/audio.c
+> index ce8e6ea8c2..8ad8cbe559 100644
+> --- a/audio/audio.c
+> +++ b/audio/audio.c
+[...]
+> @@ -2129,3 +1866,170 @@ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
+>          }
+>      }
+>  }
+> +
+> +void audio_create_pdos(Audiodev *dev)
+> +{
+> +    switch (dev->driver) {
+> +#define CASE(DRIVER, driver, pdo_name)                              \
+> +    case AUDIODEV_DRIVER_##DRIVER:                                  \
+> +        dev->u.driver.in = g_malloc0(                               \
+> +            sizeof(Audiodev##pdo_name##PerDirectionOptions));       \
+This should check has_in before overwriting. It'll work correctly when
+called from audio_legacy.c, but when using -audiodev it will overwrite
+the options passed by user (and leak memory) when called from
+audio_validate_opts. I'll fix it in the next update.
 
-Unfortunately, that meant every call to the linear address computation =
-has to be augmented with an access size and whether it's a store or not. =
-The patch is pretty large so I won't include it here, but you can view =
-it at =
-<https://github.com/stevecheckoway/qemu/commit/ac58652efacedc53f3831301ea0=
-326ac8f882b18>.
+> +        dev->u.driver.has_in = true;                                \
+> +        dev->u.driver.out = g_malloc0(                              \
+> +            sizeof(AudiodevAlsaPerDirectionOptions));               \
+> +        dev->u.driver.has_out = true;                               \
+> +        break
+> +
+> +        CASE(NONE, none, );
+> +        CASE(ALSA, alsa, Alsa);
+> +        CASE(COREAUDIO, coreaudio, Coreaudio);
+> +        CASE(DSOUND, dsound, );
+> +        CASE(OSS, oss, Oss);
+> +        CASE(PA, pa, Pa);
+> +        CASE(SDL, sdl, );
+> +        CASE(SPICE, spice, );
+> +        CASE(WAV, wav, );
+> +
+> +    case AUDIODEV_DRIVER__MAX:
+> +        abort();
+> +    };
+> +}
+> +
+> +static void audio_validate_per_direction_opts(
+> +    AudiodevPerDirectionOptions *pdo, Error **errp)
+> +{
+> +    if (!pdo->has_fixed_settings) {
+> +        pdo->has_fixed_settings = true;
+> +        pdo->fixed_settings = true;
+> +    }
+> +    if (!pdo->fixed_settings &&
+> +        (pdo->has_frequency || pdo->has_channels || pdo->has_format)) {
+> +        error_setg(errp,
+> +                   "You can't use frequency, channels or format with fixed-settings=off");
+> +        return;
+> +    }
+> +
+> +    if (!pdo->has_frequency) {
+> +        pdo->has_frequency = true;
+> +        pdo->frequency = 44100;
+> +    }
+> +    if (!pdo->has_channels) {
+> +        pdo->has_channels = true;
+> +        pdo->channels = 2;
+> +    }
+> +    if (!pdo->has_voices) {
+> +        pdo->has_voices = true;
+> +        pdo->voices = 1;
+> +    }
+> +    if (!pdo->has_format) {
+> +        pdo->has_format = true;
+> +        pdo->format = AUDIO_FORMAT_S16;
+> +    }
+> +}
+> +
+> +static void audio_validate_opts(Audiodev *dev, Error **errp)
+> +{
+> +    Error *err = NULL;
+> +
+> +    audio_create_pdos(dev);
+> +
+> +    audio_validate_per_direction_opts(audio_get_pdo_in(dev), &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    audio_validate_per_direction_opts(audio_get_pdo_out(dev), &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    if (!dev->has_timer_period) {
+> +        dev->has_timer_period = true;
+> +        dev->timer_period = 10000; /* 100Hz -> 10ms */
+> +    }
+> +}
+> +
+> +void audio_parse_option(const char *opt)
+> +{
+> +    AudiodevListEntry *e;
+> +    Audiodev *dev = NULL;
+> +
+> +    Visitor *v = qobject_input_visitor_new_str(opt, "driver", &error_fatal);
+> +    visit_type_Audiodev(v, NULL, &dev, &error_fatal);
+> +    visit_free(v);
+> +
+> +    audio_validate_opts(dev, &error_fatal);
+> +
+> +    e = g_malloc0(sizeof(AudiodevListEntry));
+> +    e->dev = dev;
+> +    QSIMPLEQ_INSERT_TAIL(&audiodevs, e, next);
+> +}
+> +
+[...]
 
-If this is something that qemu would like, then I think two additional =
-things are definitely required:
-1. Tests. make check passes and the firmware I have which necessitated =
-the checks appears to work, but that change touches the almost every =
-guest-memory-accessing x86 instruction.
-2. This is going to slow down the common case=E2=80=94where segments =
-have a 0 base address and a limit of 0xFFFFFFFF=E2=80=94and there's no =
-real need to do that. It seems like something akin to addseg could be =
-used to decide when to insert the checks. I don't really understand how =
-that works and in my case, segments with nonzero bases and =
-non-0xFFFFFFFF limits are the norm so I didn't investigate that. =
-Something similar could probably be done to omit the writable segment =
-checks.
-
-Finally, there are some limitations. The amount of memory touched by =
-xsave (and the related instructions) depends on edx:eax. I didn't bother =
-checking that at all. Similarly, there are some MPX instructions that =
-don't do any access checks when they really should. And finally, there's =
-one place that checks for an access size of 8 bytes when, in some cases, =
-it should be 16.
-
-I'm happy to work to upstream this, if the approach is broadly =
-acceptable and the functionality is desired.
-
-If not, thank you Peter for answering my questions which enabled me to =
-solve my problem.
-
-Cheers,
-
-Steve
-
-> On Feb 24, 2019, at 15:21, Stephen Checkoway =
-<stephen.checkoway@oberlin.edu> wrote:
->=20
->=20
->=20
->> On Feb 24, 2019, at 14:46, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
->>=20
->> On Sun, 24 Feb 2019 at 19:37, Stephen Checkoway
->> <stephen.checkoway@oberlin.edu> wrote:
->>> I think that something about adding the tcg_gen_brcond_tl is causing =
-values to become dead and then qemu aborts.
->>=20
->> Yep -- all "TCG temporaries" are dead at the end
->> of a basic block, and brcond ends a basic block.
->> Only globals and "local temporaries" stay live
->> across brcond. This is documented in tcg/README,
->> though it doesn't spell it out very explicitly.
->=20
-> Ah yes. I see that now. I missed it on my first read through.
->=20
->> This makes brcond pretty painful to use and
->> almost impossible to introduce into the middle
->> of some existing sequence of generated code.
->> I haven't looked at what the best way to do what
->> you're trying to do here is, though.
->=20
-> Are there other examples of straight-line code being converted to a =
-conditional I might be able to use as an example? I thought INTO would =
-be a good example, but it merely calls a helper. Maybe I should do that? =
-I assume it'll be slow, but speed isn't really my primary concern.
->=20
->> By the way, don't do this:
->> +    dc->A1 =3D tcg_temp_new();
->>=20
->> The current use of a small number of tcg temps
->> in the i386 translate.c code is an antipattern
->> that is a relic from a very old version of the
->> code. It's much better to simply create new
->> temporaries in the code at the point where you
->> need them and then free them once you're done.
->=20
-> Great, thanks. I saw both the A0/T0/T1 and the creation of new =
-temporaries and I wasn't sure which pattern I should follow.
->=20
-> --=20
-> Stephen Checkoway
->=20
->=20
->=20
->=20
->=20
-
---=20
-Stephen Checkoway
+Regards,
+Zoltan
