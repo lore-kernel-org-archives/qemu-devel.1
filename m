@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34435)
+Received: from eggs.gnu.org ([209.51.188.92]:35352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gyhai-00074m-Qe
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:33 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gyheB-0000G7-76
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gyhab-00016L-Qs
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:29 -0500
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:38835)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gyhe9-0004aV-VI
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:40:07 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35632)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gyhaY-00012q-Rf
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:25 -0500
-Received: by mail-pg1-x52d.google.com with SMTP id m2so6616983pgl.5
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:36:22 -0800 (PST)
-References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-4-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <59942bd6-49ca-504f-0d2a-910939eea09d@linaro.org>
-Date: Tue, 26 Feb 2019 10:36:18 -0800
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1gyhe7-0004VY-QX
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:40:04 -0500
+Received: by mail-wm1-x344.google.com with SMTP id y15so3269380wma.0
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:40:01 -0800 (PST)
+References: <20190223141644.6609-1-marcel.apfelbaum@gmail.com>
+	<CAFEAcA__1qZP3M97Wah_=1mCAJ9f3WA=Nx7GcoAf28sZBap_sw@mail.gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <57ceff35-e9d9-616e-0d1b-e6879cfedbf4@gmail.com>
+Date: Tue, 26 Feb 2019 20:40:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190226113915.20150-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <CAFEAcA__1qZP3M97Wah_=1mCAJ9f3WA=Nx7GcoAf28sZBap_sw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 03/33] s390x: Add one temporary vector
- register in CPU state for TCG
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH PULL 00/11] RDMA queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yuval Shaia <yuval.shaia@oracle.com>, kamal heib <kamalheib1@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 2/26/19 3:38 AM, David Hildenbrand wrote:
-> We sometimes want to work on a temporary vector register instead of the
-> actual destination, because source and destination might overlap. An
-> alternative would be loading the vector into two i64 variables, but than
-> separate handling for accessing the vector elements would be needed.
-> This is easier. Add one for now as that seems to be enough.
+Hi Peter,
 
-Hmm, I'll reserve judgment until I see how this is used.
+On 2/26/19 6:48 PM, Peter Maydell wrote:
+> On Sat, 23 Feb 2019 at 14:16, Marcel Apfelbaum
+> <marcel.apfelbaum@gmail.com> wrote:
+>> The following changes since commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62be116:
+>>
+>>    Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20190221.0' into staging (2019-02-22 15:48:04 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>    https://github.com/marcel-apf/qemu tags/rdma-pull-request
+>>
+>> for you to fetch changes up to e1038e22f7b3ade2e46cf168fa7486414c424e94:
+>>
+>>    hw/rdma: another clang compilation fix (2019-02-23 15:28:25 +0200)
+>>
+>> ----------------------------------------------------------------
+>> RDMA queue
+>>
+>>   * Another Clang compilation fix
+>>   * Various fixes for the pvrdma device
+>>
+> Format string issues for 32-bit hosts:
+>
+> In file included from hw/rdma/trace.c:4:0:
+> hw/rdma/trace.h: In function '_nocheck__trace_rdma_mad_message':
+> hw/rdma/trace.h:231:18: error: format '%ld' expects argument of type
+> 'long int', but argument 6 has type 'size_t {aka unsigned int}'
+> [-Werror=format=]
+>           qemu_log("%d@%zu.%06zu:rdma_mad_message " "mad %s (%ld): %s" "\n",
+>                    ^
+> In file included from hw/rdma/trace.c:4:0:
+> hw/rdma/trace.h: In function '_nocheck__trace_rdma_rm_alloc_mr':
+> hw/rdma/trace.h:507:18: error: format '%ld' expects argument of type
+> 'long int', but argument 8 has type 'size_t {aka unsigned int}'
+> [-Werror=format=]
+>           qemu_log("%d@%zu.%06zu:rdma_rm_alloc_mr " "mr_handle=%d,
+> host_virt=%p, guest_start=0x%"PRIx64", length=%ld, access_flags=0x%x"
+> "\n",
+>                    ^
 
-For ARM SVE, I would allocate this temporary on the stack within the helper,
-and move one of the operands out of the way.  E.g.
+Will fix and resend (and add 32-bit compilation to my set of tests).
 
-void helper(foo)(void *vd, void *vx, *void *vy
-{
-    VectorReg tmp;
-    TYPE *d = vd, *x = vx, *y = vy;
+Thanks,
+Marcel
 
-    if (vx == vd || vy == vd) {
-        tmp = *(VectorReg *)vd;
-        if (vx == vd) {
-            vx = &tmp;
-        }
-        if (vy == vd) {
-            vy = &tmp;
-        }
-    }
-
-    process d, x, y as normal.
-}
-
-This minimized the amount of code inline.  However, SVE vectors are quite a bit
-larger, at 256 bytes, so the copy itself was out of line most of the time anyway.
-
-Provisionally,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+> thanks
+> -- PMM
