@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45330)
+Received: from eggs.gnu.org ([209.51.188.92]:45356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyemx-000789-G2
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:37:01 -0500
+	(envelope-from <berrange@redhat.com>) id 1gyen4-0007BX-FU
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:37:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyemp-0002kV-Ri
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:36:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41052)
+	(envelope-from <berrange@redhat.com>) id 1gyemz-0002pm-B9
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:37:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyemj-0002Yh-4g
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:36:47 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyemp-0002i7-Rl
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:36:55 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 26 Feb 2019 15:35:14 +0000
-Message-Id: <20190226153520.29821-6-berrange@redhat.com>
+Date: Tue, 26 Feb 2019 15:35:17 +0000
+Message-Id: <20190226153520.29821-9-berrange@redhat.com>
 In-Reply-To: <20190226153520.29821-1-berrange@redhat.com>
 References: <20190226153520.29821-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 05/11] hw/usb: switch MTP to use new inotify
- APIs
+Subject: [Qemu-devel] [PULL v2 08/11] authz: add QAuthZList object type for
+ an access control list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,507 +30,778 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The internal inotify APIs allow a lot of conditional statements to be
-cleared out, and provide a simpler callback for handling events.
+From: "Daniel P. Berrange" <berrange@redhat.com>
+
+Add a QAuthZList object type that implements the QAuthZ interface. This
+built-in implementation maintains a trivial access control list with a
+sequence of match rules and a final default policy. This replicates the
+functionality currently provided by the qemu_acl module.
+
+To create an instance of this object via the QMP monitor, the syntax
+used would be:
+
+  {
+    "execute": "object-add",
+    "arguments": {
+      "qom-type": "authz-list",
+      "id": "authz0",
+      "props": {
+        "rules": [
+           { "match": "fred", "policy": "allow", "format": "exact" },
+           { "match": "bob", "policy": "allow", "format": "exact" },
+           { "match": "danb", "policy": "deny", "format": "glob" },
+           { "match": "dan*", "policy": "allow", "format": "exact" },
+        ],
+        "policy": "deny"
+      }
+    }
+  }
+
+This sets up an authorization rule that allows 'fred', 'bob' and anyone
+whose name starts with 'dan', except for 'danb'. Everyone unmatched is
+denied.
+
+It is not currently possible to create this via -object, since there is
+no syntax supported to specify non-scalar properties for objects. This
+is likely to be addressed by later support for using JSON with -object,
+or an equivalent approach.
+
+In any case the future "authz-listfile" object can be used from the
+CLI and is likely a better choice, as it allows the ACL to be refreshed
+automatically on change.
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- hw/usb/dev-mtp.c    | 274 ++++++++++++++++++--------------------------
- hw/usb/trace-events |   2 +-
- 2 files changed, 111 insertions(+), 165 deletions(-)
+ MAINTAINERS             |   1 +
+ authz/Makefile.objs     |   1 +
+ authz/list.c            | 271 ++++++++++++++++++++++++++++++++++++++++
+ authz/trace-events      |   4 +
+ include/authz/list.h    | 106 ++++++++++++++++
+ qapi/Makefile.objs      |   2 +-
+ qapi/authz.json         |  58 +++++++++
+ qapi/qapi-schema.json   |   1 +
+ tests/Makefile.include  |   2 +
+ tests/test-authz-list.c | 159 +++++++++++++++++++++++
+ 10 files changed, 604 insertions(+), 1 deletion(-)
+ create mode 100644 authz/list.c
+ create mode 100644 include/authz/list.h
+ create mode 100644 qapi/authz.json
+ create mode 100644 tests/test-authz-list.c
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 169ee50c02..4ee4fc5a89 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -11,17 +11,16 @@
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c7655ac5cd..7be8c578ea 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2083,6 +2083,7 @@ User authorization
+ M: Daniel P. Berrange <berrange@redhat.com>
+ S: Maintained
+ F: authz/
++F: qapi/authz.json
+ F: include/authz/
+ F: tests/test-authz-*
 =20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include <wchar.h>
- #include <dirent.h>
-=20
- #include <sys/statvfs.h>
--#ifdef CONFIG_INOTIFY1
--#include <sys/inotify.h>
--#include "qemu/main-loop.h"
--#endif
+diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+index 2a75d53840..921fa624d7 100644
+--- a/authz/Makefile.objs
++++ b/authz/Makefile.objs
+@@ -1,2 +1,3 @@
+ authz-obj-y +=3D base.o
+ authz-obj-y +=3D simple.o
++authz-obj-y +=3D list.o
+diff --git a/authz/list.c b/authz/list.c
+new file mode 100644
+index 0000000000..dc6b0fec13
+--- /dev/null
++++ b/authz/list.c
+@@ -0,0 +1,271 @@
++/*
++ * QEMU access control list authorization driver
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
 +
-=20
- #include "qemu-common.h"
- #include "qemu/iov.h"
-+#include "qemu/filemonitor.h"
- #include "trace.h"
- #include "hw/usb.h"
- #include "desc.h"
-@@ -132,7 +131,6 @@ enum {
-     EP_EVENT,
- };
-=20
--#ifdef CONFIG_INOTIFY1
- typedef struct MTPMonEntry MTPMonEntry;
-=20
- struct MTPMonEntry {
-@@ -141,7 +139,6 @@ struct MTPMonEntry {
-=20
-     QTAILQ_ENTRY(MTPMonEntry) next;
- };
--#endif
-=20
- struct MTPControl {
-     uint16_t     code;
-@@ -172,10 +169,8 @@ struct MTPObject {
-     char         *name;
-     char         *path;
-     struct stat  stat;
--#ifdef CONFIG_INOTIFY1
--    /* inotify watch cookie */
--    int          watchfd;
--#endif
-+    /* file monitor watch id */
-+    int          watchid;
-     MTPObject    *parent;
-     uint32_t     nchildren;
-     QLIST_HEAD(, MTPObject) children;
-@@ -198,11 +193,8 @@ struct MTPState {
-     bool         readonly;
-=20
-     QTAILQ_HEAD(, MTPObject) objects;
--#ifdef CONFIG_INOTIFY1
--    /* inotify descriptor */
--    int          inotifyfd;
-+    QFileMonitor *file_monitor;
-     QTAILQ_HEAD(, MTPMonEntry) events;
--#endif
-     /* Responder is expecting a write operation */
-     bool write_pending;
-     struct {
-@@ -391,6 +383,7 @@ static MTPObject *usb_mtp_object_alloc(MTPState *s, u=
-int32_t handle,
-         goto ignore;
-     }
-=20
-+    o->watchid =3D -1;
-     o->handle =3D handle;
-     o->parent =3D parent;
-     o->name =3D g_strdup(name);
-@@ -437,6 +430,10 @@ static void usb_mtp_object_free(MTPState *s, MTPObje=
-ct *o)
-=20
-     trace_usb_mtp_object_free(s->dev.addr, o->handle, o->path);
-=20
-+    if (o->watchid !=3D -1 && s->file_monitor) {
-+        qemu_file_monitor_remove_watch(s->file_monitor, o->path, o->watc=
-hid);
-+    }
++#include "qemu/osdep.h"
++#include "authz/list.h"
++#include "authz/trace.h"
++#include "qom/object_interfaces.h"
++#include "qapi/qapi-visit-authz.h"
 +
-     QTAILQ_REMOVE(&s->objects, o, next);
-     if (o->parent) {
-         QLIST_REMOVE(o, list);
-@@ -488,6 +485,10 @@ static MTPObject *usb_mtp_object_lookup_name(MTPObje=
-ct *parent,
- {
-     MTPObject *iter;
-=20
-+    if (len =3D=3D -1) {
-+        len =3D strlen(name);
-+    }
++static bool qauthz_list_is_allowed(QAuthZ *authz,
++                                   const char *identity,
++                                   Error **errp)
++{
++    QAuthZList *lauthz =3D QAUTHZ_LIST(authz);
++    QAuthZListRuleList *rules =3D lauthz->rules;
 +
-     QLIST_FOREACH(iter, &parent->children, list) {
-         if (strncmp(iter->name, name, len) =3D=3D 0) {
-             return iter;
-@@ -497,13 +498,12 @@ static MTPObject *usb_mtp_object_lookup_name(MTPObj=
-ect *parent,
-     return NULL;
- }
-=20
--#ifdef CONFIG_INOTIFY1
--static MTPObject *usb_mtp_object_lookup_wd(MTPState *s, int wd)
-+static MTPObject *usb_mtp_object_lookup_id(MTPState *s, int id)
- {
-     MTPObject *iter;
-=20
-     QTAILQ_FOREACH(iter, &s->objects, next) {
--        if (iter->watchfd =3D=3D wd) {
-+        if (iter->watchid =3D=3D id) {
-             return iter;
-         }
-     }
-@@ -511,159 +511,103 @@ static MTPObject *usb_mtp_object_lookup_wd(MTPSta=
-te *s, int wd)
-     return NULL;
- }
-=20
--static void inotify_watchfn(void *arg)
-+static void file_monitor_event(int id,
-+                               QFileMonitorEvent ev,
-+                               const char *name,
-+                               void *opaque)
- {
--    MTPState *s =3D arg;
--    ssize_t bytes;
--    /* From the man page: atleast one event can be read */
--    int pos;
--    char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
--
--    for (;;) {
--        bytes =3D read(s->inotifyfd, buf, sizeof(buf));
--        pos =3D 0;
--
--        if (bytes <=3D 0) {
--            /* Better luck next time */
-+    MTPState *s =3D opaque;
-+    MTPObject *parent =3D usb_mtp_object_lookup_id(s, id);
-+    MTPMonEntry *entry =3D NULL;
-+    MTPObject *o;
++    while (rules) {
++        QAuthZListRule *rule =3D rules->value;
++        QAuthZListFormat format =3D rule->has_format ? rule->format :
++            QAUTHZ_LIST_FORMAT_EXACT;
 +
-+    if (!parent) {
-+        return;
-+    }
-+
-+    switch (ev) {
-+    case QFILE_MONITOR_EVENT_CREATED:
-+        if (usb_mtp_object_lookup_name(parent, name, -1)) {
-+            /* Duplicate create event */
-             return;
-         }
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D s->next_handle;
-+        entry->event =3D EVT_OBJ_ADDED;
-+        o =3D usb_mtp_add_child(s, parent, name);
-+        if (!o) {
-+            g_free(entry);
-+            return;
++        trace_qauthz_list_check_rule(authz, rule->match, identity,
++                                     format, rule->policy);
++        switch (format) {
++        case QAUTHZ_LIST_FORMAT_EXACT:
++            if (g_str_equal(rule->match, identity)) {
++                return rule->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW;
++            }
++            break;
++        case QAUTHZ_LIST_FORMAT_GLOB:
++            if (g_pattern_match_simple(rule->match, identity)) {
++                return rule->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW;
++            }
++            break;
++        default:
++            g_warn_if_reached();
++            return false;
 +        }
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, name, "Obj Added")=
-;
-+        break;
-=20
-+    case QFILE_MONITOR_EVENT_DELETED:
-         /*
--         * TODO: Ignore initiator initiated events.
--         * For now we are good because the store is RO
-+         * The kernel issues a IN_IGNORED event
-+         * when a dir containing a watchpoint is
-+         * deleted, so we don't have to delete the
-+         * watchpoint
-          */
--        while (bytes > 0) {
--            char *p =3D buf + pos;
--            struct inotify_event *event =3D (struct inotify_event *)p;
--            int watchfd =3D 0;
--            uint32_t mask =3D event->mask & (IN_CREATE | IN_DELETE |
--                                           IN_MODIFY | IN_IGNORED);
--            MTPObject *parent =3D usb_mtp_object_lookup_wd(s, event->wd)=
-;
--            MTPMonEntry *entry =3D NULL;
--            MTPObject *o;
--
--            pos =3D pos + sizeof(struct inotify_event) + event->len;
--            bytes =3D bytes - pos;
--
--            if (!parent) {
--                continue;
--            }
--
--            switch (mask) {
--            case IN_CREATE:
--                if (usb_mtp_object_lookup_name
--                    (parent, event->name, event->len)) {
--                    /* Duplicate create event */
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D s->next_handle;
--                entry->event =3D EVT_OBJ_ADDED;
--                o =3D usb_mtp_add_child(s, parent, event->name);
--                if (!o) {
--                    g_free(entry);
--                    continue;
--                }
--                o->watchfd =3D watchfd;
--                trace_usb_mtp_inotify_event(s->dev.addr, event->name,
--                                            event->mask, "Obj Added");
--                break;
--
--            case IN_DELETE:
--                /*
--                 * The kernel issues a IN_IGNORED event
--                 * when a dir containing a watchpoint is
--                 * deleted, so we don't have to delete the
--                 * watchpoint
--                 */
--                o =3D usb_mtp_object_lookup_name(parent, event->name, ev=
-ent->len);
--                if (!o) {
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D o->handle;
--                entry->event =3D EVT_OBJ_REMOVED;
--                trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                      event->mask, "Obj Deleted");
--                usb_mtp_object_free(s, o);
--                break;
--
--            case IN_MODIFY:
--                o =3D usb_mtp_object_lookup_name(parent, event->name, ev=
-ent->len);
--                if (!o) {
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D o->handle;
--                entry->event =3D EVT_OBJ_INFO_CHANGED;
--                trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                      event->mask, "Obj Modified");
--                break;
--
--            case IN_IGNORED:
--                trace_usb_mtp_inotify_event(s->dev.addr, parent->path,
--                                      event->mask, "Obj parent dir ignor=
-ed");
--                break;
--
--            default:
--                fprintf(stderr, "usb-mtp: failed to parse inotify event\=
-n");
--                continue;
--            }
--
--            if (entry) {
--                QTAILQ_INSERT_HEAD(&s->events, entry, next);
--            }
-+        o =3D usb_mtp_object_lookup_name(parent, name, -1);
-+        if (!o) {
-+            return;
-         }
--    }
--}
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D o->handle;
-+        entry->event =3D EVT_OBJ_REMOVED;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path, "Obj Dele=
-ted");
-+        usb_mtp_object_free(s, o);
-+        break;
-=20
--static int usb_mtp_inotify_init(MTPState *s)
--{
--    int fd;
-+    case QFILE_MONITOR_EVENT_MODIFIED:
-+        o =3D usb_mtp_object_lookup_name(parent, name, -1);
-+        if (!o) {
-+            return;
-+        }
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D o->handle;
-+        entry->event =3D EVT_OBJ_INFO_CHANGED;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path, "Obj Modi=
-fied");
-+        break;
-=20
--    fd =3D inotify_init1(IN_NONBLOCK);
--    if (fd =3D=3D -1) {
--        return 1;
--    }
-+    case QFILE_MONITOR_EVENT_IGNORED:
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, parent->path,
-+                                    "Obj parent dir ignored");
-+        break;
-=20
--    QTAILQ_INIT(&s->events);
--    s->inotifyfd =3D fd;
-+    case QFILE_MONITOR_EVENT_ATTRIBUTES:
-+        break;
-=20
--    qemu_set_fd_handler(fd, inotify_watchfn, NULL, s);
-+    default:
-+        g_assert_not_reached();
++        rules =3D rules->next;
 +    }
-=20
--    return 0;
-+    if (entry) {
-+        QTAILQ_INSERT_HEAD(&s->events, entry, next);
-+    }
- }
-=20
--static void usb_mtp_inotify_cleanup(MTPState *s)
-+static void usb_mtp_file_monitor_cleanup(MTPState *s)
- {
-     MTPMonEntry *e, *p;
-=20
--    if (!s->inotifyfd) {
--        return;
--    }
--
--    qemu_set_fd_handler(s->inotifyfd, NULL, NULL, s);
--    close(s->inotifyfd);
--
-     QTAILQ_FOREACH_SAFE(e, &s->events, next, p) {
-         QTAILQ_REMOVE(&s->events, e, next);
-         g_free(e);
-     }
--}
-=20
--static int usb_mtp_add_watch(int inotifyfd, const char *path)
--{
--    uint32_t mask =3D IN_CREATE | IN_DELETE | IN_MODIFY;
--
--    return inotify_add_watch(inotifyfd, path, mask);
-+    qemu_file_monitor_free(s->file_monitor);
-+    s->file_monitor =3D NULL;
- }
--#endif
 +
++    trace_qauthz_list_default_policy(authz, identity, lauthz->policy);
++    return lauthz->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW;
++}
++
++
++static void
++qauthz_list_prop_set_policy(Object *obj,
++                            int value,
++                            Error **errp G_GNUC_UNUSED)
++{
++    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
++
++    lauthz->policy =3D value;
++}
++
++
++static int
++qauthz_list_prop_get_policy(Object *obj,
++                            Error **errp G_GNUC_UNUSED)
++{
++    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
++
++    return lauthz->policy;
++}
++
++
++static void
++qauthz_list_prop_get_rules(Object *obj, Visitor *v, const char *name,
++                           void *opaque, Error **errp)
++{
++    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
++
++    visit_type_QAuthZListRuleList(v, name, &lauthz->rules, errp);
++}
++
++static void
++qauthz_list_prop_set_rules(Object *obj, Visitor *v, const char *name,
++                           void *opaque, Error **errp)
++{
++    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
++    QAuthZListRuleList *oldrules;
++
++    oldrules =3D lauthz->rules;
++    visit_type_QAuthZListRuleList(v, name, &lauthz->rules, errp);
++
++    qapi_free_QAuthZListRuleList(oldrules);
++}
++
++
++static void
++qauthz_list_finalize(Object *obj)
++{
++    QAuthZList *lauthz =3D QAUTHZ_LIST(obj);
++
++    qapi_free_QAuthZListRuleList(lauthz->rules);
++}
++
++
++static void
++qauthz_list_class_init(ObjectClass *oc, void *data)
++{
++    QAuthZClass *authz =3D QAUTHZ_CLASS(oc);
++
++    object_class_property_add_enum(oc, "policy",
++                                   "QAuthZListPolicy",
++                                   &QAuthZListPolicy_lookup,
++                                   qauthz_list_prop_get_policy,
++                                   qauthz_list_prop_set_policy,
++                                   NULL);
++
++    object_class_property_add(oc, "rules", "QAuthZListRule",
++                              qauthz_list_prop_get_rules,
++                              qauthz_list_prop_set_rules,
++                              NULL, NULL, NULL);
++
++    authz->is_allowed =3D qauthz_list_is_allowed;
++}
++
++
++QAuthZList *qauthz_list_new(const char *id,
++                            QAuthZListPolicy policy,
++                            Error **errp)
++{
++    return QAUTHZ_LIST(
++        object_new_with_props(TYPE_QAUTHZ_LIST,
++                              object_get_objects_root(),
++                              id, errp,
++                              "policy", QAuthZListPolicy_str(policy),
++                              NULL));
++}
++
++ssize_t qauthz_list_append_rule(QAuthZList *auth,
++                                const char *match,
++                                QAuthZListPolicy policy,
++                                QAuthZListFormat format,
++                                Error **errp)
++{
++    QAuthZListRule *rule;
++    QAuthZListRuleList *rules, *tmp;
++    size_t i =3D 0;
++
++    rule =3D g_new0(QAuthZListRule, 1);
++    rule->policy =3D policy;
++    rule->match =3D g_strdup(match);
++    rule->format =3D format;
++    rule->has_format =3D true;
++
++    tmp =3D g_new0(QAuthZListRuleList, 1);
++    tmp->value =3D rule;
++
++    rules =3D auth->rules;
++    if (rules) {
++        while (rules->next) {
++            i++;
++            rules =3D rules->next;
++        }
++        rules->next =3D tmp;
++        return i + 1;
++    } else {
++        auth->rules =3D tmp;
++        return 0;
++    }
++}
++
++
++ssize_t qauthz_list_insert_rule(QAuthZList *auth,
++                                const char *match,
++                                QAuthZListPolicy policy,
++                                QAuthZListFormat format,
++                                size_t index,
++                                Error **errp)
++{
++    QAuthZListRule *rule;
++    QAuthZListRuleList *rules, *tmp;
++    size_t i =3D 0;
++
++    rule =3D g_new0(QAuthZListRule, 1);
++    rule->policy =3D policy;
++    rule->match =3D g_strdup(match);
++    rule->format =3D format;
++    rule->has_format =3D true;
++
++    tmp =3D g_new0(QAuthZListRuleList, 1);
++    tmp->value =3D rule;
++
++    rules =3D auth->rules;
++    if (rules && index > 0) {
++        while (rules->next && i < (index - 1)) {
++            i++;
++            rules =3D rules->next;
++        }
++        tmp->next =3D rules->next;
++        rules->next =3D tmp;
++        return i + 1;
++    } else {
++        tmp->next =3D auth->rules;
++        auth->rules =3D tmp;
++        return 0;
++    }
++}
++
++
++ssize_t qauthz_list_delete_rule(QAuthZList *auth, const char *match)
++{
++    QAuthZListRule *rule;
++    QAuthZListRuleList *rules, *prev;
++    size_t i =3D 0;
++
++    prev =3D NULL;
++    rules =3D auth->rules;
++    while (rules) {
++        rule =3D rules->value;
++        if (g_str_equal(rule->match, match)) {
++            if (prev) {
++                prev->next =3D rules->next;
++            } else {
++                auth->rules =3D rules->next;
++            }
++            rules->next =3D NULL;
++            qapi_free_QAuthZListRuleList(rules);
++            return i;
++        }
++        prev =3D rules;
++        rules =3D rules->next;
++        i++;
++    }
++
++    return -1;
++}
++
++
++static const TypeInfo qauthz_list_info =3D {
++    .parent =3D TYPE_QAUTHZ,
++    .name =3D TYPE_QAUTHZ_LIST,
++    .instance_size =3D sizeof(QAuthZList),
++    .instance_finalize =3D qauthz_list_finalize,
++    .class_size =3D sizeof(QAuthZListClass),
++    .class_init =3D qauthz_list_class_init,
++    .interfaces =3D (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++
++static void
++qauthz_list_register_types(void)
++{
++    type_register_static(&qauthz_list_info);
++}
++
++
++type_init(qauthz_list_register_types);
+diff --git a/authz/trace-events b/authz/trace-events
+index 1ef796c1e1..a896d876e8 100644
+--- a/authz/trace-events
++++ b/authz/trace-events
+@@ -5,3 +5,7 @@ qauthz_is_allowed(void *authz, const char *identity, bool=
+ allowed) "AuthZ %p che
 =20
- static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
- {
-     struct dirent *entry;
-     DIR *dir;
-     int fd;
-+    Error *err =3D NULL;
+ # auth/simple.c
+ qauthz_simple_is_allowed(void *authz, const char *wantidentity, const ch=
+ar *gotidentity) "AuthZ simple %p check want identity=3D%s got identity=3D=
+%s"
++
++# auth/list.c
++qauthz_list_check_rule(void *authz, const char *identity, const char *ru=
+le, int format, int policy) "AuthZ list %p check rule=3D%s identity=3D%s =
+format=3D%d policy=3D%d"
++qauthz_list_default_policy(void *authz, const char *identity, int policy=
+) "AuthZ list %p default identity=3D%s policy=3D%d"
+diff --git a/include/authz/list.h b/include/authz/list.h
+new file mode 100644
+index 0000000000..a7225a747c
+--- /dev/null
++++ b/include/authz/list.h
+@@ -0,0 +1,106 @@
++/*
++ * QEMU list authorization driver
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
++
++#ifndef QAUTHZ_LIST_H__
++#define QAUTHZ_LIST_H__
++
++#include "authz/base.h"
++#include "qapi/qapi-types-authz.h"
++
++#define TYPE_QAUTHZ_LIST "authz-list"
++
++#define QAUTHZ_LIST_CLASS(klass)                        \
++    OBJECT_CLASS_CHECK(QAuthZListClass, (klass),        \
++                       TYPE_QAUTHZ_LIST)
++#define QAUTHZ_LIST_GET_CLASS(obj)              \
++    OBJECT_GET_CLASS(QAuthZListClass, (obj),    \
++                      TYPE_QAUTHZ_LIST)
++#define QAUTHZ_LIST(obj) \
++    INTERFACE_CHECK(QAuthZList, (obj),          \
++                    TYPE_QAUTHZ_LIST)
++
++typedef struct QAuthZList QAuthZList;
++typedef struct QAuthZListClass QAuthZListClass;
++
++
++/**
++ * QAuthZList:
++ *
++ * This authorization driver provides a list mechanism
++ * for granting access by matching user names against a
++ * list of globs. Each match rule has an associated policy
++ * and a catch all policy applies if no rule matches
++ *
++ * To create an instance of this class via QMP:
++ *
++ *  {
++ *    "execute": "object-add",
++ *    "arguments": {
++ *      "qom-type": "authz-list",
++ *      "id": "authz0",
++ *      "props": {
++ *        "rules": [
++ *           { "match": "fred", "policy": "allow", "format": "exact" },
++ *           { "match": "bob", "policy": "allow", "format": "exact" },
++ *           { "match": "danb", "policy": "deny", "format": "exact" },
++ *           { "match": "dan*", "policy": "allow", "format": "glob" }
++ *        ],
++ *        "policy": "deny"
++ *      }
++ *    }
++ *  }
++ *
++ */
++struct QAuthZList {
++    QAuthZ parent_obj;
++
++    QAuthZListPolicy policy;
++    QAuthZListRuleList *rules;
++};
++
++
++struct QAuthZListClass {
++    QAuthZClass parent_class;
++};
++
++
++QAuthZList *qauthz_list_new(const char *id,
++                            QAuthZListPolicy policy,
++                            Error **errp);
++
++ssize_t qauthz_list_append_rule(QAuthZList *auth,
++                                const char *match,
++                                QAuthZListPolicy policy,
++                                QAuthZListFormat format,
++                                Error **errp);
++
++ssize_t qauthz_list_insert_rule(QAuthZList *auth,
++                                const char *match,
++                                QAuthZListPolicy policy,
++                                QAuthZListFormat format,
++                                size_t index,
++                                Error **errp);
++
++ssize_t qauthz_list_delete_rule(QAuthZList *auth,
++                                const char *match);
++
++
++#endif /* QAUTHZ_LIST_H__ */
++
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index 87e4df1660..77acca0209 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -5,7 +5,7 @@ util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
+ util-obj-y +=3D qmp-event.o
+ util-obj-y +=3D qapi-util.o
 =20
-     if (o->have_children) {
-         return;
-@@ -679,16 +623,21 @@ static void usb_mtp_object_readdir(MTPState *s, MTP=
-Object *o)
-         close(fd);
-         return;
-     }
--#ifdef CONFIG_INOTIFY1
--    int watchfd =3D usb_mtp_add_watch(s->inotifyfd, o->path);
--    if (watchfd =3D=3D -1) {
--        fprintf(stderr, "usb-mtp: failed to add watch for %s\n", o->path=
+-QAPI_COMMON_MODULES =3D block-core block char common crypto introspect
++QAPI_COMMON_MODULES =3D authz block-core block char common crypto intros=
+pect
+ QAPI_COMMON_MODULES +=3D job migration misc net rdma rocker run-state
+ QAPI_COMMON_MODULES +=3D sockets tpm trace transaction ui
+ QAPI_TARGET_MODULES =3D target
+diff --git a/qapi/authz.json b/qapi/authz.json
+new file mode 100644
+index 0000000000..1c836a3abd
+--- /dev/null
++++ b/qapi/authz.json
+@@ -0,0 +1,58 @@
++# -*- Mode: Python -*-
++#
++# QAPI authz definitions
++
++##
++# @QAuthZListPolicy:
++#
++# The authorization policy result
++#
++# @deny: deny access
++# @allow: allow access
++#
++# Since: 4.0
++##
++{ 'enum': 'QAuthZListPolicy',
++  'prefix': 'QAUTHZ_LIST_POLICY',
++  'data': ['deny', 'allow']}
++
++##
++# @QAuthZListFormat:
++#
++# The authorization policy match format
++#
++# @exact: an exact string match
++# @glob: string with ? and * shell wildcard support
++#
++# Since: 4.0
++##
++{ 'enum': 'QAuthZListFormat',
++  'prefix': 'QAUTHZ_LIST_FORMAT',
++  'data': ['exact', 'glob']}
++
++##
++# @QAuthZListRule:
++#
++# A single authorization rule.
++#
++# @match: a string or glob to match against a user identity
++# @policy: the result to return if @match evaluates to true
++# @format: the format of the @match rule (default 'exact')
++#
++# Since: 4.0
++##
++{ 'struct': 'QAuthZListRule',
++  'data': {'match': 'str',
++           'policy': 'QAuthZListPolicy',
++           '*format': 'QAuthZListFormat'}}
++
++##
++# @QAuthZListRuleListHack:
++#
++# Not exposed via QMP; hack to generate QAuthZListRuleList
++# for use internally by the code.
++#
++# Since: 4.0
++##
++{ 'struct': 'QAuthZListRuleListHack',
++  'data': { 'unused': ['QAuthZListRule'] } }
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index db61bfd688..a34899c626 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -92,6 +92,7 @@
+ { 'include': 'rocker.json' }
+ { 'include': 'tpm.json' }
+ { 'include': 'ui.json' }
++{ 'include': 'authz.json' }
+ { 'include': 'migration.json' }
+ { 'include': 'transaction.json' }
+ { 'include': 'trace.json' }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 691cd64fb5..77a8c48c9b 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -117,6 +117,7 @@ check-unit-y +=3D tests/test-timed-average$(EXESUF)
+ check-unit-$(CONFIG_INOTIFY1) +=3D tests/test-util-filemonitor$(EXESUF)
+ check-unit-y +=3D tests/test-util-sockets$(EXESUF)
+ check-unit-y +=3D tests/test-authz-simple$(EXESUF)
++check-unit-y +=3D tests/test-authz-list$(EXESUF)
+ check-unit-y +=3D tests/test-io-task$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-socket$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-file$(EXESUF)
+@@ -665,6 +666,7 @@ tests/test-util-filemonitor$(EXESUF): tests/test-util=
+-filemonitor.o \
+ tests/test-util-sockets$(EXESUF): tests/test-util-sockets.o \
+ 	tests/socket-helpers.o $(test-util-obj-y)
+ tests/test-authz-simple$(EXESUF): tests/test-authz-simple.o $(test-authz=
+-obj-y)
++tests/test-authz-list$(EXESUF): tests/test-authz-list.o $(test-authz-obj=
+-y)
+ tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
+ tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
+         tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
+y)
+diff --git a/tests/test-authz-list.c b/tests/test-authz-list.c
+new file mode 100644
+index 0000000000..24347a6ac3
+--- /dev/null
++++ b/tests/test-authz-list.c
+@@ -0,0 +1,159 @@
++/*
++ * QEMU list file authorization object tests
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++
++#include "authz/list.h"
++
++static void test_authz_default_deny(void)
++{
++    QAuthZList *auth =3D qauthz_list_new("auth0",
++                                       QAUTHZ_LIST_POLICY_DENY,
++                                       &error_abort);
++
++    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
++
++    object_unparent(OBJECT(auth));
++}
++
++static void test_authz_default_allow(void)
++{
++    QAuthZList *auth =3D qauthz_list_new("auth0",
++                                       QAUTHZ_LIST_POLICY_ALLOW,
++                                       &error_abort);
++
++    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
++
++    object_unparent(OBJECT(auth));
++}
++
++static void test_authz_explicit_deny(void)
++{
++    QAuthZList *auth =3D qauthz_list_new("auth0",
++                                       QAUTHZ_LIST_POLICY_ALLOW,
++                                       &error_abort);
++
++    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_DENY,
++                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
++
++    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
++
++    object_unparent(OBJECT(auth));
++}
++
++static void test_authz_explicit_allow(void)
++{
++    QAuthZList *auth =3D qauthz_list_new("auth0",
++                                       QAUTHZ_LIST_POLICY_DENY,
++                                       &error_abort);
++
++    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_ALLOW,
++                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
++
++    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
++
++    object_unparent(OBJECT(auth));
++}
++
++
++static void test_authz_complex(void)
++{
++    QAuthZList *auth =3D qauthz_list_new("auth0",
++                                       QAUTHZ_LIST_POLICY_DENY,
++                                       &error_abort);
++
++    qauthz_list_append_rule(auth, "fred", QAUTHZ_LIST_POLICY_ALLOW,
++                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
++    qauthz_list_append_rule(auth, "bob", QAUTHZ_LIST_POLICY_ALLOW,
++                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
++    qauthz_list_append_rule(auth, "dan", QAUTHZ_LIST_POLICY_DENY,
++                            QAUTHZ_LIST_FORMAT_EXACT, &error_abort);
++    qauthz_list_append_rule(auth, "dan*", QAUTHZ_LIST_POLICY_ALLOW,
++                            QAUTHZ_LIST_FORMAT_GLOB, &error_abort);
++
++    g_assert(qauthz_is_allowed(QAUTHZ(auth), "fred", &error_abort));
++    g_assert(qauthz_is_allowed(QAUTHZ(auth), "bob", &error_abort));
++    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
++    g_assert(qauthz_is_allowed(QAUTHZ(auth), "danb", &error_abort));
++
++    object_unparent(OBJECT(auth));
++}
++
++static void test_authz_add_remove(void)
++{
++    QAuthZList *auth =3D qauthz_list_new("auth0",
++                                       QAUTHZ_LIST_POLICY_ALLOW,
++                                       &error_abort);
++
++    g_assert_cmpint(qauthz_list_append_rule(auth, "fred",
++                                            QAUTHZ_LIST_POLICY_ALLOW,
++                                            QAUTHZ_LIST_FORMAT_EXACT,
++                                            &error_abort),
++                    =3D=3D, 0);
++    g_assert_cmpint(qauthz_list_append_rule(auth, "bob",
++                                            QAUTHZ_LIST_POLICY_ALLOW,
++                                            QAUTHZ_LIST_FORMAT_EXACT,
++                                            &error_abort),
++                    =3D=3D, 1);
++    g_assert_cmpint(qauthz_list_append_rule(auth, "dan",
++                                            QAUTHZ_LIST_POLICY_DENY,
++                                            QAUTHZ_LIST_FORMAT_EXACT,
++                                            &error_abort),
++                    =3D=3D, 2);
++    g_assert_cmpint(qauthz_list_append_rule(auth, "frank",
++                                            QAUTHZ_LIST_POLICY_DENY,
++                                            QAUTHZ_LIST_FORMAT_EXACT,
++                                            &error_abort),
++                    =3D=3D, 3);
++
++    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
++
++    g_assert_cmpint(qauthz_list_delete_rule(auth, "dan"),
++                    =3D=3D, 2);
++
++    g_assert(qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
++
++    g_assert_cmpint(qauthz_list_insert_rule(auth, "dan",
++                                            QAUTHZ_LIST_POLICY_DENY,
++                                            QAUTHZ_LIST_FORMAT_EXACT,
++                                            2,
++                                            &error_abort),
++                    =3D=3D, 2);
++
++    g_assert(!qauthz_is_allowed(QAUTHZ(auth), "dan", &error_abort));
++
++    object_unparent(OBJECT(auth));
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    module_call_init(MODULE_INIT_QOM);
++
++    g_test_add_func("/auth/list/default/deny", test_authz_default_deny);
++    g_test_add_func("/auth/list/default/allow", test_authz_default_allow=
 );
--    } else {
--        trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                    0, "Watch Added");
--        o->watchfd =3D watchfd;
-+
-+    if (s->file_monitor) {
-+        int id =3D qemu_file_monitor_add_watch(s->file_monitor, o->path,=
- NULL,
-+                                             file_monitor_event, s, &err=
++    g_test_add_func("/auth/list/explicit/deny", test_authz_explicit_deny=
 );
-+        if (id =3D=3D -1) {
-+            error_report("usb-mtp: failed to add watch for %s: %s", o->p=
-ath,
-+                         error_get_pretty(err));
-+            error_free(err);
-+        } else {
-+            trace_usb_mtp_file_monitor_event(s->dev.addr, o->path,
-+                                             "Watch Added");
-+            o->watchid =3D id;
-+        }
-     }
--#endif
++    g_test_add_func("/auth/list/explicit/allow", test_authz_explicit_all=
+ow);
++    g_test_add_func("/auth/list/complex", test_authz_complex);
++    g_test_add_func("/auth/list/add-remove", test_authz_add_remove);
 +
-     while ((entry =3D readdir(dir)) !=3D NULL) {
-         usb_mtp_add_child(s, o, entry->d_name);
-     }
-@@ -1196,13 +1145,11 @@ enum {
- /* Assumes that children, if any, have been already freed */
- static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
- {
--#ifndef CONFIG_INOTIFY1
-     assert(o->nchildren =3D=3D 0);
-     QTAILQ_REMOVE(&s->objects, o, next);
-     g_free(o->name);
-     g_free(o->path);
-     g_free(o);
--#endif
- }
-=20
- static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
-@@ -1301,6 +1248,7 @@ static void usb_mtp_command(MTPState *s, MTPControl=
- *c)
-     MTPData *data_in =3D NULL;
-     MTPObject *o =3D NULL;
-     uint32_t nres =3D 0, res0 =3D 0;
-+    Error *err =3D NULL;
-=20
-     /* sanity checks */
-     if (c->code >=3D CMD_CLOSE_SESSION && s->session =3D=3D 0) {
-@@ -1328,19 +1276,21 @@ static void usb_mtp_command(MTPState *s, MTPContr=
-ol *c)
-         trace_usb_mtp_op_open_session(s->dev.addr);
-         s->session =3D c->argv[0];
-         usb_mtp_object_alloc(s, s->next_handle++, NULL, s->root);
--#ifdef CONFIG_INOTIFY1
--        if (usb_mtp_inotify_init(s)) {
--            fprintf(stderr, "usb-mtp: file monitoring init failed\n");
-+
-+        s->file_monitor =3D qemu_file_monitor_new(&err);
-+        if (err) {
-+            error_report("usb-mtp: file monitoring init failed: %s",
-+                         error_get_pretty(err));
-+            error_free(err);
-+        } else {
-+            QTAILQ_INIT(&s->events);
-         }
--#endif
-         break;
-     case CMD_CLOSE_SESSION:
-         trace_usb_mtp_op_close_session(s->dev.addr);
-         s->session =3D 0;
-         s->next_handle =3D 0;
--#ifdef CONFIG_INOTIFY1
--        usb_mtp_inotify_cleanup(s);
--#endif
-+        usb_mtp_file_monitor_cleanup(s);
-         usb_mtp_object_free(s, QTAILQ_FIRST(&s->objects));
-         assert(QTAILQ_EMPTY(&s->objects));
-         break;
-@@ -1553,9 +1503,7 @@ static void usb_mtp_handle_reset(USBDevice *dev)
-=20
-     trace_usb_mtp_reset(s->dev.addr);
-=20
--#ifdef CONFIG_INOTIFY1
--    usb_mtp_inotify_cleanup(s);
--#endif
-+    usb_mtp_file_monitor_cleanup(s);
-     usb_mtp_object_free(s, QTAILQ_FIRST(&s->objects));
-     s->session =3D 0;
-     usb_mtp_data_free(s->data_in);
-@@ -2026,7 +1974,6 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-         }
-         break;
-     case EP_EVENT:
--#ifdef CONFIG_INOTIFY1
-         if (!QTAILQ_EMPTY(&s->events)) {
-             struct MTPMonEntry *e =3D QTAILQ_LAST(&s->events);
-             uint32_t handle;
-@@ -2050,7 +1997,6 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-             g_free(e);
-             return;
-         }
--#endif
-         p->status =3D USB_RET_NAK;
-         return;
-     default:
-diff --git a/hw/usb/trace-events b/hw/usb/trace-events
-index 2c18770ca5..99b1e8b8ce 100644
---- a/hw/usb/trace-events
-+++ b/hw/usb/trace-events
-@@ -237,7 +237,7 @@ usb_mtp_op_unknown(int dev, uint32_t code) "dev %d, c=
-ommand code 0x%x"
- usb_mtp_object_alloc(int dev, uint32_t handle, const char *path) "dev %d=
-, handle 0x%x, path %s"
- usb_mtp_object_free(int dev, uint32_t handle, const char *path) "dev %d,=
- handle 0x%x, path %s"
- usb_mtp_add_child(int dev, uint32_t handle, const char *path) "dev %d, h=
-andle 0x%x, path %s"
--usb_mtp_inotify_event(int dev, const char *path, uint32_t mask, const ch=
-ar *s) "dev %d, path %s mask 0x%x event %s"
-+usb_mtp_file_monitor_event(int dev, const char *path, const char *s) "de=
-v %d, path %s event %s"
-=20
- # hw/usb/host-libusb.c
- usb_host_open_started(int bus, int addr) "dev %d:%d"
++    return g_test_run();
++}
 --=20
 2.20.1
