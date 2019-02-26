@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51601)
+Received: from eggs.gnu.org ([209.51.188.92]:52785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gydPW-0005Yu-HE
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:08:48 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gydSt-0008BR-IS
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gydPV-0000KF-L8
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:08:42 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Tue, 26 Feb 2019 14:08:36 +0000
-Message-ID: <6b9996ca-3a28-2e5b-ba65-f8239770b6fc@virtuozzo.com>
-References: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<20190225202630.GA4925@habkost.net>
-	<CAMRbyysWcfctB8AeSZrQ9x9HRAKut7mWYFqVP=oQ5uVoQgvh0w@mail.gmail.com>
-	<a8ca5f99-43d0-610b-ea09-28b2655f5cda@virtuozzo.com>
-	<d335bcf4-fae8-108d-2e24-9cfba80b5c2c@redhat.com>
-In-Reply-To: <d335bcf4-fae8-108d-2e24-9cfba80b5c2c@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CE8BEF16166D9644BE66086BF8A137C4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1gydSs-0003Q9-7J
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:12:11 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:34144)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gydSr-0003Ou-Tp
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:12:10 -0500
+Received: by mail-wr1-x433.google.com with SMTP id f14so14141764wrg.1
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 06:12:09 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 26 Feb 2019 14:12:00 +0000
+Message-Id: <20190226141201.16999-7-alex.bennee@linaro.org>
+In-Reply-To: <20190226141201.16999-1-alex.bennee@linaro.org>
+References: <20190226141201.16999-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] iotests: handle TypeError
- for Python3 in test 242
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 6/7] softfloat: Support float_round_to_odd more
+ places
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +30,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, qemu-block <qemu-block@nongnu.org>, "philmd@redhat.com" <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, david@redhat.com, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-DQoNCk9uIDI2LzAyLzIwMTkgMTc6MDYsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDIvMjYvMTkg
-NDozOSBBTSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IA0KPj4+ICAgICAgKysrIGIvdGVz
-dHMvcWVtdS1pb3Rlc3RzLzI0Mg0KPj4+ICAgICAgQEAgLTY0LDEwICs2NCwxMiBAQCBkZWYgd3Jp
-dGVfdG9fZGlzayhvZmZzZXQsIHNpemUpOg0KPj4+ICAgICAgIMKgZGVmIHRvZ2dsZV9mbGFnKG9m
-ZnNldCk6DQo+Pj4gICAgICAgwqAgwqAgwqB3aXRoIG9wZW4oZGlzaywgInIrYiIpIGFzIGY6DQo+
-Pj4gICAgICAgwqAgwqAgwqAgwqAgwqBmLnNlZWsob2Zmc2V0LCAwKQ0KPj4+ICAgICAgLcKgIMKg
-IMKgIMKgIGMgPSBmLnJlYWQoMSkNCj4+PiAgICAgIC3CoCDCoCDCoCDCoCB0b2dnbGVkID0gY2hy
-KG9yZChjKSBeIGJpdG1hcF9mbGFnX3Vua25vd24pDQo+Pj4gICAgICArwqAgwqAgwqAgwqAgIyBU
-aGUgY2FzdHMgdG8gYnl0ZWFycmF5KCkgYmVsb3cgYXJlIG9ubHkgbmVjZXNzYXJ5DQo+Pj4gICAg
-ICArwqAgwqAgwqAgwqAgIyBmb3IgUHl0aG9uIDIgY29tcGF0aWJpbGl0eQ0KPj4+ICAgICAgK8Kg
-IMKgIMKgIMKgIGMgPSBieXRlYXJyYXkoZi5yZWFkKDEpKVswXQ0KPj4+DQo+Pj4NCj4+PiBUaGlz
-IGlzIHNpbXBsZXIgYW5kIG1ha2VzIHRoZSBpbnRlbnQgb2YgdGhlIGNvZGUgbW9yZSBjbGVhcjoN
-Cj4+Pg0KPj4+ICAgwqAgwqAgZmxhZywgPSBzdHJ1Y3QudW5wYWNrKCJCIiwgZi5yZWFkKDEpKQ0K
-Pj4+DQo+Pj4gICAgICArwqAgwqAgwqAgwqAgdG9nZ2xlZCA9IGMgXiBiaXRtYXBfZmxhZ191bmtu
-b3duDQo+Pj4gICAgICAgwqAgwqAgwqAgwqAgwqBmLnNlZWsoLTEsIDEpDQo+Pj4gICAgICAtwqAg
-wqAgwqAgwqAgZi53cml0ZSh0b2dnbGVkKQ0KPj4+ICAgICAgK8KgIMKgIMKgIMKgIGYud3JpdGUo
-Ynl0ZWFycmF5KFt0b2dnbGVkXSkpDQo+Pj4NCj4+Pg0KPj4+IEZvciBjb25zaXN0ZW5jeSwgd2Ug
-Y2FuIHVzZSBzdHJ1Y3QucGFjayBoZXJlOg0KPj4+DQo+Pj4gICDCoCDCoCBmLndyaXRlKHN0cnVj
-dC5wYWNrKCJCIiwgdG9nZ2xlZCkpDQo+Pj4NCj4+PiBOaXINCj4+Pg0KPj4NCj4+IFRoYW5rIHlv
-dSBhbGwuIEkgYW0gT0sgd2l0aCB0aGlzIGFwcHJvYWNoLg0KPj4gV2lsbCB3YWl0IGZvciBFcmlj
-J3MgcmVzcG9uc2UuDQo+IA0KPiBUaGF0IGxvb2tzIGJldHRlci4gUGV0ZXIgaGFzbid0IGFwcGxp
-ZWQgbXkgcHVsbCByZXF1ZXN0IHlldCwgc28geW91IGhhdmUNCj4gdGltZSB0byBzdWJtaXQgYSBm
-b3JtYWwgdjMgKG1ha2luZyBpdCBlYXNpZXIgZm9yIG1lIHRvICdnaXQgYW0nIGl0DQo+IHJhdGhl
-ciB0aGFuIHJlY29uc3RydWN0IGZyb20gdGhpcyBlbWFpbCksIGFuZCB0aGVuIEkgd2lsbCB1cGRh
-dGUgbXkgcHVsbA0KPiByZXF1ZXN0IHRvIHVzZSB0aGlzIGltcHJvdmVkIHZlcnNpb24uDQo+IA0K
-Tm90ZWQNCg0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
-DQo=
+From: Richard Henderson <richard.henderson@linaro.org>
+
+Previously this was only supported for roundAndPackFloat64.
+
+New support in round_canonical, round_to_int, float128_round_to_int,
+roundAndPackFloat32, roundAndPackInt32, roundAndPackInt64,
+roundAndPackUint64.  This does not include any of the floatx80 routines,
+as we do not have users for that rounding mode there.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190215170225.15537-1-richard.henderson@linaro.org>
+Tested-by: David Hildenbrand <david@redhat.com>
+[AJB: add missing break]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index c69cd6b5d1..4610738ab1 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -696,6 +696,7 @@ static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
+ static FloatParts round_canonical(FloatParts p, float_status *s,
+                                   const FloatFmt *parm)
+ {
++    const uint64_t frac_lsb = parm->frac_lsb;
+     const uint64_t frac_lsbm1 = parm->frac_lsbm1;
+     const uint64_t round_mask = parm->round_mask;
+     const uint64_t roundeven_mask = parm->roundeven_mask;
+@@ -731,6 +732,10 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
+             inc = p.sign ? round_mask : 0;
+             overflow_norm = !p.sign;
+             break;
++        case float_round_to_odd:
++            overflow_norm = true;
++            inc = frac & frac_lsb ? 0 : round_mask;
++            break;
+         default:
+             g_assert_not_reached();
+         }
+@@ -778,9 +783,14 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
+             shift64RightJamming(frac, 1 - exp, &frac);
+             if (frac & round_mask) {
+                 /* Need to recompute round-to-even.  */
+-                if (s->float_rounding_mode == float_round_nearest_even) {
++                switch (s->float_rounding_mode) {
++                case float_round_nearest_even:
+                     inc = ((frac & roundeven_mask) != frac_lsbm1
+                            ? frac_lsbm1 : 0);
++                    break;
++                case float_round_to_odd:
++                    inc = frac & frac_lsb ? 0 : round_mask;
++                    break;
+                 }
+                 flags |= float_flag_inexact;
+                 frac += inc;
+@@ -1988,6 +1998,9 @@ static FloatParts round_to_int(FloatParts a, int rmode,
+             case float_round_down:
+                 one = a.sign;
+                 break;
++            case float_round_to_odd:
++                one = true;
++                break;
+             default:
+                 g_assert_not_reached();
+             }
+@@ -2021,6 +2034,9 @@ static FloatParts round_to_int(FloatParts a, int rmode,
+             case float_round_down:
+                 inc = a.sign ? rnd_mask : 0;
+                 break;
++            case float_round_to_odd:
++                inc = a.frac & frac_lsb ? 0 : rnd_mask;
++                break;
+             default:
+                 g_assert_not_reached();
+             }
+@@ -3314,6 +3330,9 @@ static int32_t roundAndPackInt32(flag zSign, uint64_t absZ, float_status *status
+     case float_round_down:
+         roundIncrement = zSign ? 0x7f : 0;
+         break;
++    case float_round_to_odd:
++        roundIncrement = absZ & 0x80 ? 0 : 0x7f;
++        break;
+     default:
+         abort();
+     }
+@@ -3368,6 +3387,9 @@ static int64_t roundAndPackInt64(flag zSign, uint64_t absZ0, uint64_t absZ1,
+     case float_round_down:
+         increment = zSign && absZ1;
+         break;
++    case float_round_to_odd:
++        increment = !(absZ0 & 1) && absZ1;
++        break;
+     default:
+         abort();
+     }
+@@ -3424,6 +3446,9 @@ static int64_t roundAndPackUint64(flag zSign, uint64_t absZ0,
+     case float_round_down:
+         increment = zSign && absZ1;
+         break;
++    case float_round_to_odd:
++        increment = !(absZ0 & 1) && absZ1;
++        break;
+     default:
+         abort();
+     }
+@@ -3526,6 +3551,9 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
+     case float_round_down:
+         roundIncrement = zSign ? 0x7f : 0;
+         break;
++    case float_round_to_odd:
++        roundIncrement = zSig & 0x80 ? 0 : 0x7f;
++        break;
+     default:
+         abort();
+         break;
+@@ -3536,8 +3564,10 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
+              || (    ( zExp == 0xFD )
+                   && ( (int32_t) ( zSig + roundIncrement ) < 0 ) )
+            ) {
++            bool overflow_to_inf = roundingMode != float_round_to_odd &&
++                                   roundIncrement != 0;
+             float_raise(float_flag_overflow | float_flag_inexact, status);
+-            return packFloat32( zSign, 0xFF, - ( roundIncrement == 0 ));
++            return packFloat32(zSign, 0xFF, -!overflow_to_inf);
+         }
+         if ( zExp < 0 ) {
+             if (status->flush_to_zero) {
+@@ -3555,6 +3585,13 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
+             if (isTiny && roundBits) {
+                 float_raise(float_flag_underflow, status);
+             }
++            if (roundingMode == float_round_to_odd) {
++                /*
++                 * For round-to-odd case, the roundIncrement depends on
++                 * zSig which just changed.
++                 */
++                roundIncrement = zSig & 0x80 ? 0 : 0x7f;
++            }
+         }
+     }
+     if (roundBits) {
+@@ -6987,6 +7024,15 @@ float128 float128_round_to_int(float128 a, float_status *status)
+                 add128(z.high, z.low, 0, roundBitsMask, &z.high, &z.low);
+             }
+             break;
++        case float_round_to_odd:
++            /*
++             * Note that if lastBitMask == 0, the last bit is the lsb
++             * of high, and roundBitsMask == -1.
++             */
++            if ((lastBitMask ? z.low & lastBitMask : z.high & 1) == 0) {
++                add128(z.high, z.low, 0, roundBitsMask, &z.high, &z.low);
++            }
++            break;
+         default:
+             abort();
+         }
+@@ -6998,7 +7044,7 @@ float128 float128_round_to_int(float128 a, float_status *status)
+             status->float_exception_flags |= float_flag_inexact;
+             aSign = extractFloat128Sign( a );
+             switch (status->float_rounding_mode) {
+-             case float_round_nearest_even:
++            case float_round_nearest_even:
+                 if (    ( aExp == 0x3FFE )
+                      && (   extractFloat128Frac0( a )
+                           | extractFloat128Frac1( a ) )
+@@ -7011,14 +7057,17 @@ float128 float128_round_to_int(float128 a, float_status *status)
+                     return packFloat128(aSign, 0x3FFF, 0, 0);
+                 }
+                 break;
+-             case float_round_down:
++            case float_round_down:
+                 return
+                       aSign ? packFloat128( 1, 0x3FFF, 0, 0 )
+                     : packFloat128( 0, 0, 0, 0 );
+-             case float_round_up:
++            case float_round_up:
+                 return
+                       aSign ? packFloat128( 1, 0, 0, 0 )
+                     : packFloat128( 0, 0x3FFF, 0, 0 );
++
++            case float_round_to_odd:
++                return packFloat128(aSign, 0x3FFF, 0, 0);
+             }
+             return packFloat128( aSign, 0, 0, 0 );
+         }
+@@ -7051,6 +7100,12 @@ float128 float128_round_to_int(float128 a, float_status *status)
+                 z.high += roundBitsMask;
+             }
+             break;
++        case float_round_to_odd:
++            if ((z.high & lastBitMask) == 0) {
++                z.high |= (a.low != 0);
++                z.high += roundBitsMask;
++            }
++            break;
+         default:
+             abort();
+         }
+diff --git a/tests/fp/fp-test.c b/tests/fp/fp-test.c
+index 4114f346a9..7d0faf2b47 100644
+--- a/tests/fp/fp-test.c
++++ b/tests/fp/fp-test.c
+@@ -125,17 +125,42 @@ static void not_implemented(void)
+ 
+ static bool blacklisted(unsigned op, int rmode)
+ {
+-    /* odd has only been implemented for a few 128-bit ops */
++    /* odd has not been implemented for any 80-bit ops */
+     if (rmode == softfloat_round_odd) {
+         switch (op) {
+-        case F128_ADD:
+-        case F128_SUB:
+-        case F128_MUL:
+-        case F128_DIV:
+-        case F128_TO_F64:
+-        case F128_SQRT:
+-            return false;
+-        default:
++        case EXTF80_TO_UI32:
++        case EXTF80_TO_UI64:
++        case EXTF80_TO_I32:
++        case EXTF80_TO_I64:
++        case EXTF80_TO_UI32_R_MINMAG:
++        case EXTF80_TO_UI64_R_MINMAG:
++        case EXTF80_TO_I32_R_MINMAG:
++        case EXTF80_TO_I64_R_MINMAG:
++        case EXTF80_TO_F16:
++        case EXTF80_TO_F32:
++        case EXTF80_TO_F64:
++        case EXTF80_TO_F128:
++        case EXTF80_ROUNDTOINT:
++        case EXTF80_ADD:
++        case EXTF80_SUB:
++        case EXTF80_MUL:
++        case EXTF80_DIV:
++        case EXTF80_REM:
++        case EXTF80_SQRT:
++        case EXTF80_EQ:
++        case EXTF80_LE:
++        case EXTF80_LT:
++        case EXTF80_EQ_SIGNALING:
++        case EXTF80_LE_QUIET:
++        case EXTF80_LT_QUIET:
++        case UI32_TO_EXTF80:
++        case UI64_TO_EXTF80:
++        case I32_TO_EXTF80:
++        case I64_TO_EXTF80:
++        case F16_TO_EXTF80:
++        case F32_TO_EXTF80:
++        case F64_TO_EXTF80:
++        case F128_TO_EXTF80:
+             return true;
+         }
+     }
+-- 
+2.20.1
