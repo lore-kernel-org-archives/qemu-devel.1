@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46089)
+Received: from eggs.gnu.org ([209.51.188.92]:46338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <weijiang.yang@intel.com>) id 1gyWAr-0006dh-AN
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 01:25:07 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gyWCQ-0007xa-6o
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 01:26:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <weijiang.yang@intel.com>) id 1gyWAq-0000Rx-7E
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 01:25:05 -0500
-Received: from mga05.intel.com ([192.55.52.43]:65458)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <weijiang.yang@intel.com>)
-	id 1gyWAp-0008RT-Tf
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 01:25:04 -0500
-From: Yang Weijiang <weijiang.yang@intel.com>
-Date: Mon, 25 Feb 2019 21:18:22 +0800
-Message-Id: <20190225131822.6817-6-weijiang.yang@intel.com>
-In-Reply-To: <20190225131822.6817-1-weijiang.yang@intel.com>
-References: <20190225131822.6817-1-weijiang.yang@intel.com>
-Subject: [Qemu-devel] [PATCH v3 5/5] Add CET MSR save/restore support for
- migration
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gyWCO-0001Rm-1z
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 01:26:42 -0500
+Message-ID: <1551162370.2210.0.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Tue, 26 Feb 2019 17:26:10 +1100
+In-Reply-To: <20190226033914.GK6872@umbus.fritz.box>
+References: <20190226030531.9932-1-sjitindarsingh@gmail.com>
+	<20190226033914.GK6872@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 1/4] target/ppc/spapr: Add
+ SPAPR_CAP_LARGE_DECREMENTER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,234 +24,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, cdupontd@redhat.com, rkrcmar@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
-Cc: Yang Weijiang <weijiang.yang@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
 
-To support features such as live-migration,
-CET runtime MSRs need to be saved in source machine and
-restored on destination machine, this patch is to save
-and restore CET_U, CET_S, PL0_SSP, PL3_SSP and SSP_TABL_ADDR
-MSRs.
+On Tue, 2019-02-26 at 14:39 +1100, David Gibson wrote:
+> On Tue, Feb 26, 2019 at 02:05:28PM +1100, Suraj Jitindar Singh wrote:
+> > Add spapr_cap SPAPR_CAP_LARGE_DECREMENTER to be used to control the
+> > availability and size of the large decrementer made available to
+> > the
+> > guest.
+> > 
+> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > ---
+> >  hw/ppc/spapr.c         |  2 ++
+> >  hw/ppc/spapr_caps.c    | 45
+> > +++++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/ppc/spapr.h |  5 ++++-
+> >  3 files changed, 51 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index b6a571b6f1..acf62a2b9f 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2077,6 +2077,7 @@ static const VMStateDescription vmstate_spapr
+> > = {
+> >          &vmstate_spapr_irq_map,
+> >          &vmstate_spapr_cap_nested_kvm_hv,
+> >          &vmstate_spapr_dtb,
+> > +        &vmstate_spapr_cap_large_decr,
+> >          NULL
+> >      }
+> >  };
+> > @@ -4288,6 +4289,7 @@ static void
+> > spapr_machine_class_init(ObjectClass *oc, void *data)
+> >      smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
+> >      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 16; /*
+> > 64kiB */
+> >      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =
+> > SPAPR_CAP_OFF;
+> > +    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = 0;
+> 
+> This looks basically fine, but the name kind of suggests it's a
+> boolean, whereas it's actually a number of bits.  I wonder if just
+> calling it "decrementer bits" would be clearer, with it defaulting to
+> 32.
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- target/i386/cpu.h     |  12 +++++
- target/i386/kvm.c     |  33 ++++++++++++++
- target/i386/machine.c | 100 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 145 insertions(+)
+Yes, except there's a difference between a decrementer with 32 bits and
+a large decrementer with 32 bits...
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index f3f724d8e6..f350684895 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -460,6 +460,12 @@ typedef enum X86Seg {
- #define MSR_IA32_BNDCFGS                0x00000d90
- #define MSR_IA32_XSS                    0x00000da0
- 
-+#define MSR_IA32_U_CET                  0x6a0
-+#define MSR_IA32_S_CET                  0x6a2
-+#define MSR_IA32_PL0_SSP                0x6a4
-+#define MSR_IA32_PL3_SSP                0x6a7
-+#define MSR_IA32_INTR_SSP_TABL          0x6a8
-+
- #define XSTATE_FP_BIT                   0
- #define XSTATE_SSE_BIT                  1
- #define XSTATE_YMM_BIT                  2
-@@ -1325,6 +1331,12 @@ typedef struct CPUX86State {
- 
-     uintptr_t retaddr;
- 
-+    uint64_t u_cet;
-+    uint64_t s_cet;
-+    uint64_t pl0_ssp;
-+    uint64_t pl3_ssp;
-+    uint64_t ssp_tabl_addr;
-+
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f524e7d929..2ab3c977a4 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -63,6 +63,8 @@
- /* A 4096-byte buffer can hold the 8-byte kvm_msrs header, plus
-  * 255 kvm_msr_entry structs */
- #define MSR_BUF_SIZE 4096
-+#define HAS_CET_CAP(env)  (env->features[FEAT_7_0_ECX] & 0x80 || \
-+                           env->features[FEAT_7_0_EDX] & 0x100000)
- 
- const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-     KVM_CAP_INFO(SET_TSS_ADDR),
-@@ -2197,6 +2199,14 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-         }
-     }
- 
-+    if (HAS_CET_CAP(env)) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_U_CET, env->u_cet);
-+        kvm_msr_entry_add(cpu, MSR_IA32_S_CET, env->s_cet);
-+        kvm_msr_entry_add(cpu, MSR_IA32_PL0_SSP, env->pl0_ssp);
-+        kvm_msr_entry_add(cpu, MSR_IA32_PL3_SSP, env->pl3_ssp);
-+        kvm_msr_entry_add(cpu, MSR_IA32_INTR_SSP_TABL, env->ssp_tabl_addr);
-+    }
-+
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MSRS, cpu->kvm_msr_buf);
-     if (ret < 0) {
-         return ret;
-@@ -2516,6 +2526,14 @@ static int kvm_get_msrs(X86CPU *cpu)
-         }
-     }
- 
-+    if (HAS_CET_CAP(env)) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_U_CET, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_S_CET, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_PL0_SSP, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_PL3_SSP, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_INTR_SSP_TABL, 0);
-+    }
-+
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-     if (ret < 0) {
-         return ret;
-@@ -2789,6 +2807,21 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-             env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
-             break;
-+        case MSR_IA32_U_CET:
-+            env->u_cet = msrs[i].data;
-+            break;
-+        case MSR_IA32_S_CET:
-+            env->s_cet = msrs[i].data;
-+            break;
-+        case MSR_IA32_PL0_SSP:
-+            env->pl0_ssp = msrs[i].data;
-+            break;
-+        case MSR_IA32_PL3_SSP:
-+            env->pl3_ssp = msrs[i].data;
-+            break;
-+        case MSR_IA32_INTR_SSP_TABL:
-+            env->ssp_tabl_addr = msrs[i].data;
-+            break;
-         }
-     }
- 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 225b5d433b..5f8a12ca30 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -810,6 +810,101 @@ static const VMStateDescription vmstate_xss = {
-     }
- };
- 
-+static bool u_cet_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->u_cet != 0;
-+}
-+
-+static const VMStateDescription vmstate_u_cet = {
-+    .name = "cpu/u_cet",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = u_cet_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.u_cet, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool s_cet_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->s_cet != 0;
-+}
-+
-+static const VMStateDescription vmstate_s_cet = {
-+    .name = "cpu/s_cet",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = s_cet_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.s_cet, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool pl0_ssp_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->pl0_ssp != 0;
-+}
-+
-+static const VMStateDescription vmstate_pl0_ssp = {
-+    .name = "cpu/pl0_ssp",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = pl0_ssp_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.pl0_ssp, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool pl3_ssp_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->pl3_ssp != 0;
-+}
-+
-+static const VMStateDescription vmstate_pl3_ssp = {
-+    .name = "cpu/pl3_ssp",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = pl3_ssp_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.pl3_ssp, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool ssp_tabl_addr_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->ssp_tabl_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_ssp_tabl_addr = {
-+    .name = "cpu/ssp_tabl_addr",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = ssp_tabl_addr_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.ssp_tabl_addr, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- #ifdef TARGET_X86_64
- static bool pkru_needed(void *opaque)
- {
-@@ -1089,6 +1184,11 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_msr_intel_pt,
-         &vmstate_msr_virt_ssbd,
-         &vmstate_svm_npt,
-+        &vmstate_u_cet,
-+        &vmstate_s_cet,
-+        &vmstate_pl0_ssp,
-+        &vmstate_pl3_ssp,
-+        &vmstate_ssp_tabl_addr,
-         NULL
-     }
- };
--- 
-2.17.1
+SPAPR_CAP_LARGE_DECR_NR_BITS?
+
+> 
+> >      spapr_caps_add_properties(smc, &error_abort);
+> >      smc->irq = &spapr_irq_xics;
+> >      smc->dr_phb_enabled = true;
+> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> > index 64f98ae68d..1545a02729 100644
+> > --- a/hw/ppc/spapr_caps.c
+> > +++ b/hw/ppc/spapr_caps.c
+> > @@ -182,6 +182,34 @@ static void spapr_cap_set_pagesize(Object
+> > *obj, Visitor *v, const char *name,
+> >      spapr->eff.caps[cap->index] = val;
+> >  }
+> >  
+> > +static void spapr_cap_get_uint8(Object *obj, Visitor *v, const
+> > char *name,
+> > +                                void *opaque, Error **errp)
+> > +{
+> > +    sPAPRCapabilityInfo *cap = opaque;
+> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> > +    uint8_t val = spapr_get_cap(spapr, cap->index);
+> > +
+> > +    visit_type_uint8(v, name, &val, errp);
+> > +}
+> > +
+> > +static void spapr_cap_set_uint8(Object *obj, Visitor *v, const
+> > char *name,
+> > +                                void *opaque, Error **errp)
+> > +{
+> > +    sPAPRCapabilityInfo *cap = opaque;
+> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> > +    Error *local_err = NULL;
+> > +    uint8_t val;
+> > +
+> > +    visit_type_uint8(v, name, &val, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +
+> > +    spapr->cmd_line_caps[cap->index] = true;
+> > +    spapr->eff.caps[cap->index] = val;
+> > +}
+> > +
+> >  static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val,
+> > Error **errp)
+> >  {
+> >      if (!val) {
+> > @@ -390,6 +418,13 @@ static void
+> > cap_nested_kvm_hv_apply(sPAPRMachineState *spapr,
+> >      }
+> >  }
+> >  
+> > +static void cap_large_decr_apply(sPAPRMachineState *spapr,
+> > +                                 uint8_t val, Error **errp)
+> > +{
+> > +    if (val)
+> > +        error_setg(errp, "No large decrementer support, try cap-
+> > large-decr=0");
+> > +}
+> > +
+> >  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+> >      [SPAPR_CAP_HTM] = {
+> >          .name = "htm",
+> > @@ -468,6 +503,15 @@ sPAPRCapabilityInfo
+> > capability_table[SPAPR_CAP_NUM] = {
+> >          .type = "bool",
+> >          .apply = cap_nested_kvm_hv_apply,
+> >      },
+> > +    [SPAPR_CAP_LARGE_DECREMENTER] = {
+> > +        .name = "large-decr",
+> > +        .description = "Size of Large Decrementer for the Guest
+> > (bits) 0=disabled",
+> > +        .index = SPAPR_CAP_LARGE_DECREMENTER,
+> > +        .get = spapr_cap_get_uint8,
+> > +        .set = spapr_cap_set_uint8,
+> > +        .type = "int",
+> > +        .apply = cap_large_decr_apply,
+> > +    },
+> >  };
+> >  
+> >  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState
+> > *spapr,
+> > @@ -596,6 +640,7 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
+> >  SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
+> >  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
+> >  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+> > +SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+> >  
+> >  void spapr_caps_init(sPAPRMachineState *spapr)
+> >  {
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index 59073a7579..8efc5e0779 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -74,8 +74,10 @@ typedef enum {
+> >  #define SPAPR_CAP_HPT_MAXPAGESIZE       0x06
+> >  /* Nested KVM-HV */
+> >  #define SPAPR_CAP_NESTED_KVM_HV         0x07
+> > +/* Large Decrementer */
+> > +#define SPAPR_CAP_LARGE_DECREMENTER     0x08
+> >  /* Num Caps */
+> > -#define SPAPR_CAP_NUM                   (SPAPR_CAP_NESTED_KVM_HV +
+> > 1)
+> > +#define
+> > SPAPR_CAP_NUM                   (SPAPR_CAP_LARGE_DECREMENTER + 1)
+> >  
+> >  /*
+> >   * Capability Values
+> > @@ -828,6 +830,7 @@ extern const VMStateDescription
+> > vmstate_spapr_cap_cfpc;
+> >  extern const VMStateDescription vmstate_spapr_cap_sbbc;
+> >  extern const VMStateDescription vmstate_spapr_cap_ibs;
+> >  extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
+> > +extern const VMStateDescription vmstate_spapr_cap_large_decr;
+> >  
+> >  static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int
+> > cap)
+> >  {
+> 
+> 
