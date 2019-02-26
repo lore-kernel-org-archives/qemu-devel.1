@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58061)
+Received: from eggs.gnu.org ([209.51.188.92]:58065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUlF-0005Mw-B6
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUlF-0005N8-GV
 	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gyUl9-0002rV-BG
-	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:30 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gyUl9-0002rl-Js
+	for qemu-devel@nongnu.org; Mon, 25 Feb 2019 23:54:32 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Feb 2019 15:52:36 +1100
-Message-Id: <20190226045304.25618-23-david@gibson.dropbear.id.au>
+Date: Tue, 26 Feb 2019 15:52:42 +1100
+Message-Id: <20190226045304.25618-29-david@gibson.dropbear.id.au>
 In-Reply-To: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/50] target/ppc: Fix ordering of hash MMU
- accesses
+Subject: [Qemu-devel] [PULL 28/50] target/ppc: Basic POWER9 bare-metal radix
+ MMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,97 +28,156 @@ Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qem
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-With mttcg, we can have MMU lookups happening at the same time
-as the guest modifying the page tables.
-
-Since the HPTEs of the hash table MMU contains two words (or
-double worlds on 64-bit), we need to make sure we read them
-in the right order, with the correct memory barrier.
-
-Additionally, when using emulated SPAPR mode, the hypercalls
-writing to the hash table must also perform the udpates in
-the right order.
-
-Note: This part is still not entirely correct
+No guest support yet
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190215170029.15641-7-clg@kaod.org>
+Message-Id: <20190215170029.15641-13-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c          | 21 +++++++++++++++++++--
- target/ppc/mmu-hash32.c |  6 ++++++
- target/ppc/mmu-hash64.c |  6 ++++++
- 3 files changed, 31 insertions(+), 2 deletions(-)
+ target/ppc/mmu-radix64.c | 81 ++++++++++++++++++++++++++++++++++------
+ 1 file changed, 69 insertions(+), 12 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 84f6e9d9a8..d2520bc662 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1524,8 +1524,25 @@ static void spapr_store_hpte(PPCVirtualHypervisor =
-*vhyp, hwaddr ptex,
-     if (!spapr->htab) {
-         kvmppc_write_hpte(ptex, pte0, pte1);
-     } else {
--        stq_p(spapr->htab + offset, pte0);
--        stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-+        if (pte0 & HPTE64_V_VALID) {
-+            stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-+            /*
-+             * When setting valid, we write PTE1 first. This ensures
-+             * proper synchronization with the reading code in
-+             * ppc_hash64_pteg_search()
-+             */
-+            smp_wmb();
-+            stq_p(spapr->htab + offset, pte0);
-+        } else {
-+            stq_p(spapr->htab + offset, pte0);
-+            /*
-+             * When clearing it we set PTE0 first. This ensures proper
-+             * synchronization with the reading code in
-+             * ppc_hash64_pteg_search()
-+             */
-+            smp_wmb();
-+            stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index a07d757063..ca1fb2673f 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -31,10 +31,26 @@
+ static bool ppc_radix64_get_fully_qualified_addr(CPUPPCState *env, vaddr=
+ eaddr,
+                                                  uint64_t *lpid, uint64_=
+t *pid)
+ {
+-    /* We don't have HV support yet and shouldn't get here with it set a=
+nyway */
+-    assert(!msr_hv);
+-
+-    if (!msr_hv) { /* !MSR[HV] -> Guest */
++    if (msr_hv) { /* MSR[HV] -> Hypervisor/bare metal */
++        switch (eaddr & R_EADDR_QUADRANT) {
++        case R_EADDR_QUADRANT0:
++            *lpid =3D 0;
++            *pid =3D env->spr[SPR_BOOKS_PID];
++            break;
++        case R_EADDR_QUADRANT1:
++            *lpid =3D env->spr[SPR_LPIDR];
++            *pid =3D env->spr[SPR_BOOKS_PID];
++            break;
++        case R_EADDR_QUADRANT2:
++            *lpid =3D env->spr[SPR_LPIDR];
++            *pid =3D 0;
++            break;
++        case R_EADDR_QUADRANT3:
++            *lpid =3D 0;
++            *pid =3D 0;
++            break;
 +        }
-     }
++    } else {  /* !MSR[HV] -> Guest */
+         switch (eaddr & R_EADDR_QUADRANT) {
+         case R_EADDR_QUADRANT0: /* Guest application */
+             *lpid =3D env->spr[SPR_LPIDR];
+@@ -186,21 +202,32 @@ static uint64_t ppc_radix64_walk_tree(PowerPCCPU *c=
+pu, vaddr eaddr,
+                                  raddr, psize, fault_cause, pte_addr);
  }
 =20
-diff --git a/target/ppc/mmu-hash32.c b/target/ppc/mmu-hash32.c
-index 03ae3c1279..e8562a7c87 100644
---- a/target/ppc/mmu-hash32.c
-+++ b/target/ppc/mmu-hash32.c
-@@ -319,6 +319,12 @@ static hwaddr ppc_hash32_pteg_search(PowerPCCPU *cpu=
-, hwaddr pteg_off,
++static bool validate_pate(PowerPCCPU *cpu, uint64_t lpid, ppc_v3_pate_t =
+*pate)
++{
++    CPUPPCState *env =3D &cpu->env;
++
++    if (!(pate->dw0 & PATE0_HR)) {
++        return false;
++    }
++    if (lpid =3D=3D 0 && !msr_hv) {
++        return false;
++    }
++    /* More checks ... */
++    return true;
++}
++
+ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+                                  int mmu_idx)
+ {
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+-    PPCVirtualHypervisorClass *vhc =3D
+-        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++    PPCVirtualHypervisorClass *vhc;
+     hwaddr raddr, pte_addr;
+     uint64_t lpid =3D 0, pid =3D 0, offset, size, prtbe0, pte;
+     int page_size, prot, fault_cause =3D 0;
+     ppc_v3_pate_t pate;
 =20
-     for (i =3D 0; i < HPTES_PER_GROUP; i++) {
-         pte0 =3D ppc_hash32_load_hpte0(cpu, pte_offset);
-+        /*
-+         * pte0 contains the valid bit and must be read before pte1,
-+         * otherwise we might see an old pte1 with a new valid bit and
-+         * thus an inconsistent hpte value
-+         */
-+        smp_rmb();
-         pte1 =3D ppc_hash32_load_hpte1(cpu, pte_offset);
+     assert((rwx =3D=3D 0) || (rwx =3D=3D 1) || (rwx =3D=3D 2));
+-    assert(!msr_hv); /* For now there is no Radix PowerNV Support */
+-    assert(cpu->vhyp);
+     assert(ppc64_use_proc_tbl(cpu));
 =20
-         if ((pte0 & HPTE32_V_VALID)
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 1175b991d9..fbefe5b5aa 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -507,6 +507,12 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu=
-, hwaddr hash,
+     /* Real Mode Access */
+@@ -221,7 +248,23 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, va=
+ddr eaddr, int rwx,
      }
-     for (i =3D 0; i < HPTES_PER_GROUP; i++) {
-         pte0 =3D ppc_hash64_hpte0(cpu, pteg, i);
-+        /*
-+         * pte0 contains the valid bit and must be read before pte1,
-+         * otherwise we might see an old pte1 with a new valid bit and
-+         * thus an inconsistent hpte value
-+         */
-+        smp_rmb();
-         pte1 =3D ppc_hash64_hpte1(cpu, pteg, i);
 =20
-         /* This compares V, B, H (secondary) and the AVPN */
+     /* Get Process Table */
+-    vhc->get_pate(cpu->vhyp, &pate);
++    if (cpu->vhyp) {
++        vhc =3D PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        vhc->get_pate(cpu->vhyp, &pate);
++    } else {
++        if (!ppc64_v3_get_pate(cpu, lpid, &pate)) {
++            ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_NOPTE);
++            return 1;
++        }
++        if (!validate_pate(cpu, lpid, &pate)) {
++            ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_R_BADCONFIG);
++        }
++        /* We don't support guest mode yet */
++        if (lpid !=3D 0) {
++            error_report("PowerNV guest support Unimplemented");
++            exit(1);
++       }
++    }
+=20
+     /* Index Process Table by PID to Find Corresponding Process Table En=
+try */
+     offset =3D pid * sizeof(struct prtb_entry);
+@@ -256,8 +299,7 @@ hwaddr ppc_radix64_get_phys_page_debug(PowerPCCPU *cp=
+u, target_ulong eaddr)
+ {
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+-    PPCVirtualHypervisorClass *vhc =3D
+-        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++    PPCVirtualHypervisorClass *vhc;
+     hwaddr raddr, pte_addr;
+     uint64_t lpid =3D 0, pid =3D 0, offset, size, prtbe0, pte;
+     int page_size, fault_cause =3D 0;
+@@ -275,7 +317,22 @@ hwaddr ppc_radix64_get_phys_page_debug(PowerPCCPU *c=
+pu, target_ulong eaddr)
+     }
+=20
+     /* Get Process Table */
+-    vhc->get_pate(cpu->vhyp, &pate);
++    if (cpu->vhyp) {
++        vhc =3D PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        vhc->get_pate(cpu->vhyp, &pate);
++    } else {
++        if (!ppc64_v3_get_pate(cpu, lpid, &pate)) {
++            return -1;
++        }
++        if (!validate_pate(cpu, lpid, &pate)) {
++            return -1;
++        }
++        /* We don't support guest mode yet */
++        if (lpid !=3D 0) {
++            error_report("PowerNV guest support Unimplemented");
++            exit(1);
++       }
++    }
+=20
+     /* Index Process Table by PID to Find Corresponding Process Table En=
+try */
+     offset =3D pid * sizeof(struct prtb_entry);
 --=20
 2.20.1
