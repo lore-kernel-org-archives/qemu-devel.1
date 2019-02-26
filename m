@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57125)
+Received: from eggs.gnu.org ([209.51.188.92]:57075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gyblw-0007D1-3T
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 07:23:45 -0500
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gyblu-0007Bu-FM
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 07:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gyblu-00073p-Ux
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 07:23:44 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:47711 helo=mail.rt-rk.com)
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gyblr-00071k-ER
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 07:23:42 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:43211 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1gyblu-00071y-Gw
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 07:23:42 -0500
+	id 1gybln-0006wd-M3
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 07:23:37 -0500
 From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Tue, 26 Feb 2019 13:23:17 +0100
-Message-Id: <1551183797-13570-7-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1551183797-13570-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1551183797-13570-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] target/mips: Add emulation of MMI
- instruction PEXCW
+Date: Tue, 26 Feb 2019 13:23:11 +0100
+Message-Id: <1551183797-13570-1-git-send-email-mateja.marjanovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v2 0/6] target/mips: Add emulation of data
+ communication MMI instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,111 +28,28 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-Add emulation of MMI instruction PEXCW. The emulation is implemented
-using TCG front end operations directly to achieve better performance.
+This series adds emulation of PCPYH, PCPYLD, and PCPYUD MMI
+instructions.
 
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/translate.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 72 insertions(+), 1 deletion(-)
+v2:
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 66cea86..7a13841 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -24581,6 +24581,75 @@ static void gen_mmi_pexch(DisasContext *ctx)
-     }
- }
- 
-+/*
-+ *  PEXCW rd, rt
-+ *
-+ *  Parallel Exchange Center Word
-+ *
-+ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *  +-----------+---------+---------+---------+---------+-----------+
-+ *  |    MMI    |0 0 0 0 0|   rt    |   rd    |  PEXCW  |    MMI3   |
-+ *  +-----------+---------+---------+---------+---------+-----------+
-+ */
-+
-+static void gen_mmi_pexcw(DisasContext *ctx)
-+{
-+    uint32_t pd, rt, rd;
-+    uint32_t opcode;
-+
-+    opcode = ctx->opcode;
-+
-+    pd = extract32(opcode, 21, 5);
-+    rt = extract32(opcode, 16, 5);
-+    rd = extract32(opcode, 11, 5);
-+
-+    if (unlikely(pd != 0)) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    } else if (rd == 0) {
-+        /* nop */
-+    } else if (rt == 0) {
-+        tcg_gen_movi_i64(cpu_gpr[rd], 0);
-+        tcg_gen_movi_i64(cpu_mmr[rd], 0);
-+    } else if (rt == rd) {
-+        TCGv_i64 t0 = tcg_temp_new();
-+        TCGv_i64 t1 = tcg_temp_new();
-+        uint64_t mask0 = (1ULL << 32) - 1;
-+        uint64_t mask1 = mask0 << 32;
-+
-+        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask1);
-+        tcg_gen_shri_i64(t0, t0, 32);
-+        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask0);
-+        tcg_gen_shli_i64(t1, t1, 32);
-+
-+        tcg_gen_and_i64(cpu_mmr[rd], cpu_mmr[rd], mask1);
-+        tcg_gen_or_i64(cpu_mmr[rd], cpu_mmr[rd], t0);
-+
-+        tcg_gen_and_i64(cpu_gpr[rd], cpu_gpr[rd], mask0);
-+        tcg_gen_or_i64(cpu_gpr[rd], cpu_gpr[rd], t1);
-+
-+        tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+    } else {
-+        TCGv_i64 t0 = tcg_temp_new();
-+        TCGv_i64 t1 = tcg_temp_new();
-+        uint64_t mask0 = (1ULL << 32) - 1;
-+        uint64_t mask1 = mask0 << 32;
-+
-+        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask1);
-+        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask1);
-+        tcg_gen_shri_i64(t1, t1, 32);
-+        tcg_gen_or_i64(cpu_mmr[rd], t0, t1);
-+
-+        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask0);
-+        tcg_gen_shli_i64(t0, t0, 32);
-+        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask0);
-+        tcg_gen_or_i64(cpu_gpr[rd], t0, t1);
-+
-+        tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+    }
-+}
-+
- #endif
- 
- 
-@@ -27633,7 +27702,6 @@ static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
-     case MMI_OPC_3_PDIVUW:     /* TODO: MMI_OPC_3_PDIVUW */
-     case MMI_OPC_3_POR:        /* TODO: MMI_OPC_3_POR */
-     case MMI_OPC_3_PNOR:       /* TODO: MMI_OPC_3_PNOR */
--    case MMI_OPC_3_PEXCW:      /* TODO: MMI_OPC_3_PEXCW */
-         generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI3 */
-         break;
-     case MMI_OPC_3_PCPYH:
-@@ -27645,6 +27713,9 @@ static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
-     case MMI_OPC_3_PEXCH:
-         gen_mmi_pexch(ctx);
-         break;
-+    case MMI_OPC_3_PEXCW:
-+        gen_mmi_pexcw(ctx);
-+        break;
-     default:
-         MIPS_INVAL("TX79 MMI class MMI3");
-         generate_exception_end(ctx, EXCP_RI);
+  - The patch for PCPYH is split into two patches
+  - Cleaned up handler for PCPYH
+  - Fixed bugs and cleaned up in handler for PCPYLD 
+  - Fixed bugs and cleaned up in handler for PCPYUD
+  - Added handler for MMI instruction PEXCH
+  - Added handler for MMI instruction PEXCW
+
+Mateja Marjanovic (6):
+  target/mips: Preparing for adding MMI instructions
+  target/mips: Add emulation of MMI instruction PCPYH
+  target/mips: Add emulation of MMI instruction PCPYLD
+  target/mips: Add emulation of MMI instruction PCPYUD
+  target/mips: Add emulation of MMI instruction PEXCH
+  target/mips: Add emulation of MMI instruction PEXCW
+
+ target/mips/translate.c | 365 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 358 insertions(+), 7 deletions(-)
+
 -- 
 2.7.4
