@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46648)
+Received: from eggs.gnu.org ([209.51.188.92]:49349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gyesX-0003R8-89
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:42:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gyf1A-0000yY-5e
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:51:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gyesW-00061H-0t
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:42:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52878)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gyesV-0005yz-GX
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:42:43 -0500
-References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-	<1549562254-41157-18-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fdcc00a8-4d8e-d0da-7358-196f9732b05b@redhat.com>
-Date: Tue, 26 Feb 2019 16:42:36 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gyf19-0002M9-AL
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 10:51:40 -0500
+Date: Tue, 26 Feb 2019 16:51:31 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190226155131.GC4598@linux.fritz.box>
+References: <20190226145930.5000-1-den@openvz.org>
 MIME-Version: 1.0
-In-Reply-To: <1549562254-41157-18-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 17/51] i386: express dependencies with
- Kconfig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190226145930.5000-1-den@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH 1/1] block: propagate discard aligment from
+ format drivers to the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: philmd@redhat.com, Yang Zhong <yang.zhong@intel.com>, Stefano Garzarella <sgarzare@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, armbru@redhat.com, dgilbert@redhat.com
 
-On 07/02/2019 18.57, Paolo Bonzini wrote:
-> This way, the default-configs file only need to specify the boards
-> and any optional devices.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> Message-Id: <20190123065618.3520-37-yang.zhong@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-[...]
-> ---
-> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-> index 0f94ae1..daf2015 100644
-> --- a/hw/i386/Kconfig
-> +++ b/hw/i386/Kconfig
-> @@ -7,16 +7,65 @@ config PC
->      imply QXL
->      imply SEV
->      imply TPM_TIS
-> +    select I8259
-> +    select I8254
-> +    select PCSPK
-> +    select I82374
-> +    select I8257
-> +    select MC146818RTC
-> +
-> +config PC_PCI
-> +    bool
-> +    select APIC
-> +    select IOAPIC
-> +    select APM
-> +    select PC
-> +
-> +config PC_ACPI
-> +    bool
-> +    select ACPI_X86
-> +    select ACPI_CPU_HOTPLUG
-> +    select ACPI_MEMORY_HOTPLUG
-> +    depends on ACPI_SMBUS
-> =20
->  config I440FX
->      bool
-> +    select PC_PCI
-> +    select PC_ACPI
-> +    select ACPI_SMBUS
-> +    select PCI_PIIX
-> +    select FDC
-> +    select IDE_PIIX
-> +    select DIMM
-> +    select SMBIOS
-> +    select VMPORT
-> +    select VMMOUSE
-> +    select FW_CFG_DMA
+Am 26.02.2019 um 15:59 hat Denis V. Lunev geschrieben:
+> Nowaday SCSI drivers in guests are able to alight UNMAP requests before
 
-Just a thought: Should we also "imply E1000_PCI" here to indicate the
-default NIC?
+Is s/alight/align/ what you mean?
 
->  config ISAPC
->      bool
->      select ISA_BUS
-> +    select PC
-> +    select IDE_ISA
-> +    select VGA_ISA
+The subject line has an "alignment" typo, too.
 
-ISAPC seems also to work without a vga card when you specify
--nodefaults, so I think this should be "imply VGA_ISA" instead.
+> sending to the device. Right now QEMU provides an ability to set
+> this via "discard_granularity" property of the block device which could
+> be used by management layer.
+> 
+> Though, in particular, from the point of QEMU, there is
+> pdiscard_granularity on the format driver level, f.e. on QCOW2 or iSCSI.
+> It would be beneficial to pass this value as a default for this
+> property.
+> 
+> Technically this should reduce the amount of useless UNMAP requests
+> from the guest to the host.
+> 
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Max Reitz <mreitz@redhat.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Fam Zheng <fam@euphon.net>
 
-Maybe also "imply NE2000_ISA" for the default NIC?
+I'm not doing things like this very often, but you're touching the guest
+ABI here, which is a bit tricky. The main point is that the same command
+line must result in the same guest view.
 
-> +    # FIXME: it is in the same file as i440fx, and does not compile
-> +    # if separated
-> +    depends on I440FX
-> =20
->  config Q35
->      bool
-> +    imply VTD
-> +    imply AMD_IOMMU
-> +    select PC_PCI
-> +    select PC_ACPI
-> +    select PCI_EXPRESS_Q35
-> +    select LPC_ICH9
-> +    select AHCI
-> +    select DIMM
-> +    select SMBIOS
-> +    select VMPORT
-> +    select VMMOUSE
-> +    select FW_CFG_DMA
+You'll need at least some machine type magic to make old machine types
+use the old defaults. I'm not sure if there's something else to consider
+for migration compatibility.
 
-Maybe add "imply E1000E_PCI_EXPRESS" for the default NIC?
-
- Thomas
+Kevin
