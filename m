@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50971)
+Received: from eggs.gnu.org ([209.51.188.92]:51339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gydNY-000495-NA
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:06:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gydO3-0004WA-Vx
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:07:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gydNV-0007mx-Gs
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:06:39 -0500
-References: <1550834773-873512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<20190225202630.GA4925@habkost.net>
-	<CAMRbyysWcfctB8AeSZrQ9x9HRAKut7mWYFqVP=oQ5uVoQgvh0w@mail.gmail.com>
-	<a8ca5f99-43d0-610b-ea09-28b2655f5cda@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d335bcf4-fae8-108d-2e24-9cfba80b5c2c@redhat.com>
-Date: Tue, 26 Feb 2019 08:06:10 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gydO2-0008BY-92
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:07:12 -0500
+Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:41536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gydO1-0008Ay-VP
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 09:07:10 -0500
+Received: by mail-oi1-x232.google.com with SMTP id e7so10392767oia.8
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 06:07:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a8ca5f99-43d0-610b-ea09-28b2655f5cda@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] iotests: handle TypeError
- for Python3 in test 242
+References: <20190222140756.29834-1-stefanha@redhat.com>
+In-Reply-To: <20190222140756.29834-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Feb 2019 14:06:57 +0000
+Message-ID: <CAFEAcA8+xGAakgm0BSydBAyjXim00=aNn0nA++pvrVQwksvMWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/27] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Nir Soffer <nsoffer@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, qemu-block <qemu-block@nongnu.org>, philmd@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-On 2/26/19 4:39 AM, Andrey Shinkevich wrote:
+On Fri, 22 Feb 2019 at 14:07, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> The following changes since commit fc3dbb90f2eb069801bfb4cfe9cbc83cf9c5f4a9:
+>
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-02-21 13:09:33 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 9a9f4b74fa547b68edb38fa414999836770a4735:
+>
+>   tests/virtio-blk: add test for DISCARD command (2019-02-22 09:42:17 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
 
->>     +++ b/tests/qemu-iotests/242
->>     @@ -64,10 +64,12 @@ def write_to_disk(offset, size):
->>      =C2=A0def toggle_flag(offset):
->>      =C2=A0 =C2=A0 =C2=A0with open(disk, "r+b") as f:
->>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0f.seek(offset, 0)
->>     -=C2=A0 =C2=A0 =C2=A0 =C2=A0 c =3D f.read(1)
->>     -=C2=A0 =C2=A0 =C2=A0 =C2=A0 toggled =3D chr(ord(c) ^ bitmap_flag_=
-unknown)
->>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 # The casts to bytearray() below are =
-only necessary
->>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 # for Python 2 compatibility
->>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 c =3D bytearray(f.read(1))[0]
->>
->>
->> This is simpler and makes the intent of the code more clear:
->>
->>  =C2=A0 =C2=A0 flag, =3D struct.unpack("B", f.read(1))
->>
->>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 toggled =3D c ^ bitmap_flag_unknown
->>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0f.seek(-1, 1)
->>     -=C2=A0 =C2=A0 =C2=A0 =C2=A0 f.write(toggled)
->>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 f.write(bytearray([toggled]))
->>
->>
->> For consistency, we can use struct.pack here:
->>
->>  =C2=A0 =C2=A0 f.write(struct.pack("B", toggled))
->>
->> Nir
->>
->=20
-> Thank you all. I am OK with this approach.
-> Will wait for Eric's response.
+Applied, thanks.
 
-That looks better. Peter hasn't applied my pull request yet, so you have
-time to submit a formal v3 (making it easier for me to 'git am' it
-rather than reconstruct from this email), and then I will update my pull
-request to use this improved version.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+-- PMM
