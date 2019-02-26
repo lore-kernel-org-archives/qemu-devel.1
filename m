@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33324)
+Received: from eggs.gnu.org ([209.51.188.92]:34408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyhWO-00066i-3G
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:32:04 -0500
+	(envelope-from <philmd@redhat.com>) id 1gyhaU-00070T-F8
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gyhWN-0006W0-9Y
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:32:04 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43296)
+	(envelope-from <philmd@redhat.com>) id 1gyhaT-0000s5-K6
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:18 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:34475)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gyhWN-0006Vc-2i
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:32:03 -0500
-Received: by mail-ot1-x343.google.com with SMTP id n71so11952112ota.10
-	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:32:02 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gyhaT-0000oV-Ai
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 13:36:17 -0500
+Received: by mail-wm1-f66.google.com with SMTP id o10so2746646wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 26 Feb 2019 10:36:16 -0800 (PST)
+References: <155119086741.1037569.12734854713022304642.stgit@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6e2fa68d-2d4b-d0ee-bc03-c1cd1c7a8cc6@redhat.com>
+Date: Tue, 26 Feb 2019 19:36:13 +0100
 MIME-Version: 1.0
-References: <20190220235017.1060-1-richard.henderson@linaro.org>
-	<20190220235017.1060-2-richard.henderson@linaro.org>
-In-Reply-To: <20190220235017.1060-2-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Feb 2019 18:31:50 +0000
-Message-ID: <CAFEAcA9GW2HGGw1FjFSTOJgOn+eRs-1anQDJ7nb3FnOSNbQesQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] target/arm: Implement ARMv8.0-SB
+In-Reply-To: <155119086741.1037569.12734854713022304642.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] bswap: Fix accessors syntax in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>
 
-On Wed, 20 Feb 2019 at 23:50, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 2/26/19 3:21 PM, Greg Kurz wrote:
+> All accessors that have an endian infix DO have an underscore between
+> {size} and {endian}.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> @@ -9192,6 +9192,17 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->                   */
->                  gen_goto_tb(s, 0, s->pc & ~1);
->                  return;
-> +            case 7: /* sb */
-> +                if (!dc_isar_feature(aa32_sb, s)) {
-> +                    goto illegal_op;
-> +                }
-> +                /*
-> +                 * TODO: There is no speculation barrier opcode
-> +                 * for TCG; MB and end the TB instead.
-> +                 */
-> +                tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-> +                s->base.is_jmp = DISAS_TOO_MANY;
-
-Why do we do the "end the TB" code differently here than we
-do for the implementation of ISB in the case immediately
-above ?
-
-In the A32 encoding bits [3:0] are "(0)", so we should check that
-they're 0 and UNDEF if not.
-
-
-> +                return;
->              default:
->                  goto illegal_op;
->              }
-> @@ -11810,6 +11821,17 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
->                               */
->                              gen_goto_tb(s, 0, s->pc & ~1);
->                              break;
-> +                        case 7: /* sb */
-> +                            if (!dc_isar_feature(aa32_sb, s)) {
-> +                                goto illegal_op;
-> +                            }
-> +                            /*
-> +                             * TODO: There is no speculation barrier opcode
-> +                             * for TCG; MB and end the TB instead.
-> +                             */
-> +                            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-> +                            s->base.is_jmp = DISAS_TOO_MANY;
-
-Similarly here: inconsistency about how we end the TB, and
-not checking the [3:0] bits for being zero.
-
-(We also I think are not fully decoding some of the other
-sbz/sbo fields for insns in this group, but that's more of
-an existing bug than a new one.)
-
-> +                            break;
->                          default:
->                              goto illegal_op;
->                          }
-> --
-> 2.17.2
-
-thanks
--- PMM
+> ---
+>  include/qemu/bswap.h |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+> index a684c1a7a298..5a70f78c0ba4 100644
+> --- a/include/qemu/bswap.h
+> +++ b/include/qemu/bswap.h
+> @@ -255,9 +255,9 @@ typedef union {
+>  /*
+>   * the generic syntax is:
+>   *
+> - * load: ld{type}{sign}{size}{endian}_p(ptr)
+> + * load: ld{type}{sign}{size}_{endian}_p(ptr)
+>   *
+> - * store: st{type}{size}{endian}_p(ptr, val)
+> + * store: st{type}{size}_{endian}_p(ptr, val)
+>   *
+>   * Note there are small differences with the softmmu access API!
+>   *
+> @@ -293,10 +293,10 @@ typedef union {
+>   *
+>   * For cases where the size to be used is not fixed at compile time,
+>   * there are
+> - *  stn{endian}_p(ptr, sz, val)
+> + *  stn_{endian}_p(ptr, sz, val)
+>   * which stores @val to @ptr as an @endian-order number @sz bytes in size
+>   * and
+> - *  ldn{endian}_p(ptr, sz)
+> + *  ldn_{endian}_p(ptr, sz)
+>   * which loads @sz bytes from @ptr as an unsigned @endian-order number
+>   * and returns it in a uint64_t.
+>   */
+> 
+> 
