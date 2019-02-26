@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47294)
+Received: from eggs.gnu.org ([209.51.188.92]:47295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyd8G-0008R9-V8
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:50:54 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gyd8G-0008RA-VG
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:50:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gyd8C-0006et-NE
+	(envelope-from <eric.auger@redhat.com>) id 1gyd8C-0006f3-O6
 	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 08:50:51 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 26 Feb 2019 14:49:59 +0100
-Message-Id: <20190226135014.31854-4-eric.auger@redhat.com>
-In-Reply-To: <20190226135014.31854-1-eric.auger@redhat.com>
-References: <20190226135014.31854-1-eric.auger@redhat.com>
+Date: Tue, 26 Feb 2019 14:49:56 +0100
+Message-Id: <20190226135014.31854-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 03/18] hw/arm/virt: Split the memory map
- description
+Subject: [Qemu-devel] [PATCH v8 00/18] ARM virt: Initial RAM expansion and
+ PCDIMM/NVDIMM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,206 +23,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-In the prospect to introduce an extended memory map supporting more
-RAM, let's split the memory map array into two parts:
+This series aims to bump the 255GB RAM limit in machvirt and to
+support device memory in general, and especially PCDIMM/NVDIMM.
 
-- the former a15memmap, renamed base_memmap, contains regions below
-  and including the RAM. MemMapEntries initialized in this array
-  have a static size and base address.
-- extended_memmap, only initialized with entries located after the
-  RAM. MemMapEntries initialized in this array only get their size
-  initialized. Their base address is dynamically computed depending
-  on the the top of the RAM, with same alignment as their size.
+In machvirt versions < 4.0, the initial RAM starts at 1GB and can
+grow up to 255GB. From 256GB onwards we find IO regions such as the
+additional GICv3 RDIST region, high PCIe ECAM region and high PCIe
+MMIO region. The address map was 1TB large. This corresponded to
+the max IPA capacity KVM was able to manage.
 
-Eventually base_memmap entries are copied into the extended_memmap
-array. Using two separate arrays however clarifies which entries
-are statically allocated and those which are dynamically allocated.
+Since 4.20, the host kernel is able to support a larger and dynamic
+IPA range. So the guest physical address can go beyond the 1TB. The
+max GPA size depends on the host kernel configuration and physical CPUs.
 
-This new split will allow to grow the RAM size without changing the
-description of the high IO entries.
+In this series we use this feature and allow the RAM to grow without
+any other limit than the one put by the host kernel.
 
-We introduce a new virt_set_memmap() helper function which
-"freezes" the memory map.
+The RAM still starts at 1GB. First comes the initial ram (-m) of size
+ram_size and then comes the device memory (,maxmem) of size
+maxram_size - ram_size. The device memory is potentially hotpluggable
+depending on the instantiated memory objects.
 
-The memory map is unchanged (the top of the initial RAM still is
-256GiB). Then come the high IO regions with same layout as before.
+IO regions previously located between 256GB and 1TB are moved after
+the RAM. Their offset is dynamically computed, depends on ram_size
+and maxram_size. Size alignment is enforced.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+In case maxmem value is inferior to 255GB, the legacy memory map
+still is used. The change of memory map becomes effective from 4.0
+onwards.
 
----
+As we keep the initial RAM at 1GB base address, we do not need to do
+invasive changes in the EDK2 FW. It seems nobody is eager to do
+that job at the moment.
+
+Device memory being put just after the initial RAM, it is possible
+to get access to this feature while keeping a 1TB address map.
+
+This series reuses/rebases patches initially submitted by Shameer
+in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
+
+Functionally, the series is split into 3 parts:
+1) bump of the initial RAM limit [1 - 10] and change in
+   the memory map
+2) Support of PC-DIMM [11 - 13]
+3) Support of NV-DIMM [14 - 18]
+
+1) can be upstreamed before 2 and 2 can be upstreamed before 3.
+
+Work is ongoing to transform the whole memory as device memory.
+However this move is not trivial and to me, is independent on
+the improvements brought by this series:
+- if we were to use DIMM for initial RAM, those DIMMs would use
+  use slots. Although they would not be part of the ones provided
+  using the ",slots" options, they are ACPI limited resources.
+- DT and ACPI description needs to be reworked
+- NUMA integration needs special care
+- a special device memory object may be required to avoid consuming
+  slots and easing the FW description.
+
+So I preferred to separate the concerns. This new implementation
+based on device memory could be candidate for another virt
+version.
+
+DIMM hotplug in not supported in the series.
+
+Best Regards
+
+Eric
+
+References:
+
+[0] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
+http://patchwork.ozlabs.org/cover/914694/
+
+[1] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
+https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
+
+This series can be found at:
+https://github.com/eauger/qemu/tree/v3.1.0-dimm-v8
+
+History:
+
 v7 -> v8:
-- removed Peter's R-b due to the changes induced by Igor's comments
-- call set_memmap back in virt_instance_init
-- add comments about sizing of extended_memmap
-- s/region/entries as suggested by Igor
-- rewording of the commit message
+- addressed Igor's comments
+- remove no_extended_memmap knob
+- moved acpi_nvdimm_state into MachineState
+- separate "hw/arm/virt: Check the VCPU PA range in TCG mode" patch
 
 v6 -> v7:
-- s/a15memmap/base_memmap
-- slight rewording of the commit message
-- add "if there is less than 256GiB of RAM then the floating area
-  starts at the 256GiB mark" in the comment associated to the floating
-  memory map
-- Added Peter's R-b
+- Addressed Peter and Igor comments (exceptions sent my email)
+- Fixed TCG case. Now device memory works also for TCG and vcpu
+  pamax is checked
+- See individual logs for more details
 
-v5 -> v6
-- removal of many macros in units.h
-- introduce the virt_set_memmap helper
-- new computation for offsets of high IO regions
-- add comments
----
- hw/arm/virt.c         | 51 ++++++++++++++++++++++++++++++++++++++-----
- include/hw/arm/virt.h | 14 ++++++++----
- 2 files changed, 55 insertions(+), 10 deletions(-)
+v5 -> v6:
+- mingw compilation issue fix
+- kvm_arm_get_max_vm_phys_shift always returns the number of supported
+  IPA bits
+- new patch "hw/arm/virt: Rename highmem IO regions" that eases the revie=
+w
+  of "hw/arm/virt: Split the memory map description"
+- "hw/arm/virt: Move memory map initialization into machvirt_init"
+  squashed into the previous patch
+- change alignment of IO regions beyond the RAM so that it matches their
+  size
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 892bae4f3a..7297b69d93 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -29,6 +29,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "hw/arm/arm.h"
-@@ -121,7 +122,7 @@
-  * Note that devices should generally be placed at multiples of 0x10000,
-  * to accommodate guests using 64K pages.
-  */
--static const MemMapEntry a15memmap[] =3D {
-+static const MemMapEntry base_memmap[] =3D {
-     /* Space up to 0x8000000 is reserved for a boot ROM */
-     [VIRT_FLASH] =3D              {          0, 0x08000000 },
-     [VIRT_CPUPERIPHS] =3D         { 0x08000000, 0x00020000 },
-@@ -149,11 +150,24 @@ static const MemMapEntry a15memmap[] =3D {
-     [VIRT_PCIE_PIO] =3D           { 0x3eff0000, 0x00010000 },
-     [VIRT_PCIE_ECAM] =3D          { 0x3f000000, 0x01000000 },
-     [VIRT_MEM] =3D                { 0x40000000, RAMLIMIT_BYTES },
-+};
-+
-+/*
-+ * Highmem IO Regions: This memory map is floating, located after the RA=
-M.
-+ * Each MemMapEntry base (GPA) will be dynamically computed, depending o=
-n the
-+ * top of the RAM, so that its base get the same alignment as the size,
-+ * ie. a 512GiB entry will be aligned on a 512GiB boundary. If there is
-+ * less than 256GiB of RAM, the floating area starts at the 256GiB mark.
-+ * Note the extended_memmap is sized so that it eventually also includes=
- the
-+ * base_memmap entries (VIRT_HIGH_GIC_REDIST2 index is greater than the =
-last
-+ * index of base_memmap).
-+ */
-+static MemMapEntry extended_memmap[] =3D {
-     /* Additional 64 MB redist region (can contain up to 512 redistribut=
-ors) */
--    [VIRT_HIGH_GIC_REDIST2] =3D   { 0x4000000000ULL, 0x4000000 },
--    [VIRT_HIGH_PCIE_ECAM] =3D     { 0x4010000000ULL, 0x10000000 },
--    /* Second PCIe window, 512GB wide at the 512GB boundary */
--    [VIRT_HIGH_PCIE_MMIO] =3D     { 0x8000000000ULL, 0x8000000000ULL },
-+    [VIRT_HIGH_GIC_REDIST2] =3D   { 0x0, 64 * MiB },
-+    [VIRT_HIGH_PCIE_ECAM] =3D     { 0x0, 256 * MiB },
-+    /* Second PCIe window */
-+    [VIRT_HIGH_PCIE_MMIO] =3D     { 0x0, 512 * GiB },
- };
-=20
- static const int a15irqmap[] =3D {
-@@ -1354,6 +1368,30 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineSt=
-ate *vms, int idx)
-     return arm_cpu_mp_affinity(idx, clustersz);
- }
-=20
-+static void virt_set_memmap(VirtMachineState *vms)
-+{
-+    hwaddr base;
-+    int i;
-+
-+    vms->memmap =3D extended_memmap;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(base_memmap); i++) {
-+        vms->memmap[i] =3D base_memmap[i];
-+    }
-+
-+    vms->high_io_base =3D 256 * GiB; /* Top of the legacy initial RAM re=
-gion */
-+    base =3D vms->high_io_base;
-+
-+    for (i =3D VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++=
-) {
-+        hwaddr size =3D extended_memmap[i].size;
-+
-+        base =3D ROUND_UP(base, size);
-+        vms->memmap[i].base =3D base;
-+        vms->memmap[i].size =3D size;
-+        base +=3D size;
-+    }
-+}
-+
- static void machvirt_init(MachineState *machine)
- {
-     VirtMachineState *vms =3D VIRT_MACHINE(machine);
-@@ -1845,7 +1883,8 @@ static void virt_instance_init(Object *obj)
-                                     "Valid values are none and smmuv3",
-                                     NULL);
-=20
--    vms->memmap =3D a15memmap;
-+    virt_set_memmap(vms);
-+
-     vms->irqmap =3D a15irqmap;
- }
-=20
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index a27086d524..3dc7a6c5d5 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -64,7 +64,6 @@ enum {
-     VIRT_GIC_VCPU,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
--    VIRT_HIGH_GIC_REDIST2,
-     VIRT_SMMU,
-     VIRT_UART,
-     VIRT_MMIO,
-@@ -74,12 +73,18 @@ enum {
-     VIRT_PCIE_MMIO,
-     VIRT_PCIE_PIO,
-     VIRT_PCIE_ECAM,
--    VIRT_HIGH_PCIE_ECAM,
-     VIRT_PLATFORM_BUS,
--    VIRT_HIGH_PCIE_MMIO,
-     VIRT_GPIO,
-     VIRT_SECURE_UART,
-     VIRT_SECURE_MEM,
-+    VIRT_LOWMEMMAP_LAST,
-+};
-+
-+/* indices of IO regions located after the RAM */
-+enum {
-+    VIRT_HIGH_GIC_REDIST2 =3D  VIRT_LOWMEMMAP_LAST,
-+    VIRT_HIGH_PCIE_ECAM,
-+    VIRT_HIGH_PCIE_MMIO,
- };
-=20
- typedef enum VirtIOMMUType {
-@@ -116,7 +121,7 @@ typedef struct {
-     int32_t gic_version;
-     VirtIOMMUType iommu;
-     struct arm_boot_info bootinfo;
--    const MemMapEntry *memmap;
-+    MemMapEntry *memmap;
-     const int *irqmap;
-     int smp_cpus;
-     void *fdt;
-@@ -126,6 +131,7 @@ typedef struct {
-     uint32_t msi_phandle;
-     uint32_t iommu_phandle;
-     int psci_conduit;
-+    hwaddr high_io_base;
- } VirtMachineState;
-=20
- #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+v4 -> v5:
+- change in the memory map
+- see individual logs
+
+v3 -> v4:
+- rebase on David's "pc-dimm: next bunch of cleanups" and
+  "pc-dimm: pre_plug "slot" and "addr" assignment"
+- kvm-type option not used anymore. We directly use
+  maxram_size and ram_size machine fields to compute the
+  MAX IPA range. Migration is naturally handled as CLI
+  option are kept between source and destination. This was
+  suggested by David.
+- device_memory_start and device_memory_size not stored
+  anymore in vms->bootinfo
+- I did not take into account 2 Igor's comments: the one
+  related to the refactoring of arm_load_dtb and the one
+  related to the generation of the dtb after system_reset
+  which would contain nodes of hotplugged devices (we do
+  not support hotplug at this stage)
+- check the end-user does not attempt to hotplug a device
+- addition of "vl: Set machine ram_size, maxram_size and
+  ram_slots earlier"
+
+v2 -> v3:
+- fix pc_q35 and pc_piix compilation error
+- kwangwoo's email being not valid anymore, remove his address
+
+v1 -> v2:
+- kvm_get_max_vm_phys_shift moved in arch specific file
+- addition of NVDIMM part
+- single series
+- rebase on David's refactoring
+
+v1:
+- was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
+- was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
+
+Best Regards
+
+Eric
+
+
+Eric Auger (13):
+  hw/arm/virt: Rename highmem IO regions
+  hw/arm/virt: Split the memory map description
+  hw/boards: Add a MachineState parameter to kvm_type callback
+  kvm: add kvm_arm_get_max_vm_ipa_size
+  vl: Set machine ram_size, maxram_size and ram_slots earlier
+  hw/arm/virt: Dynamic memory map depending on RAM requirements
+  hw/arm/virt: Implement kvm_type function for 4.0 machine
+  hw/arm/virt: Check the VCPU PA range in TCG mode
+  hw/arm/virt: Bump the 255GB initial RAM limit
+  hw/arm/virt: Add memory hotplug framework
+  machine: Move acpi_nvdimm_state into struct MachineState
+  hw/arm/boot: Expose the pmem nodes in the DT
+  hw/arm/virt: Allow nvdimm instantiation
+
+Kwangwoo Lee (2):
+  nvdimm: Use configurable ACPI IO base and size
+  hw/arm/virt: Add nvdimm hot-plug infrastructure
+
+Shameer Kolothum (3):
+  hw/arm/boot: introduce fdt_add_memory_node helper
+  hw/arm/boot: Expose the PC-DIMM nodes in the DT
+  hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+
+ accel/kvm/kvm-all.c             |   2 +-
+ default-configs/arm-softmmu.mak |   4 +
+ hw/acpi/nvdimm.c                |  30 +++-
+ hw/arm/boot.c                   | 136 ++++++++++++---
+ hw/arm/virt-acpi-build.c        |  25 ++-
+ hw/arm/virt.c                   | 285 +++++++++++++++++++++++++++-----
+ hw/core/machine.c               |  57 +++++++
+ hw/i386/acpi-build.c            |  12 +-
+ hw/i386/acpi-build.h            |   3 +
+ hw/i386/pc.c                    |  56 +------
+ hw/i386/pc_piix.c               |   6 +-
+ hw/i386/pc_q35.c                |   6 +-
+ hw/ppc/mac_newworld.c           |   3 +-
+ hw/ppc/mac_oldworld.c           |   2 +-
+ hw/ppc/spapr.c                  |   2 +-
+ include/hw/arm/virt.h           |  19 ++-
+ include/hw/boards.h             |   7 +-
+ include/hw/i386/pc.h            |   4 -
+ include/hw/mem/nvdimm.h         |   3 +
+ include/hw/mem/pc-dimm.h        |   1 -
+ target/arm/kvm.c                |  10 ++
+ target/arm/kvm_arm.h            |  13 ++
+ vl.c                            |   6 +-
+ 23 files changed, 540 insertions(+), 152 deletions(-)
+
 --=20
 2.20.1
