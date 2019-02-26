@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44769)
+Received: from eggs.gnu.org ([209.51.188.92]:47196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gyasG-0002Qm-6w
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:26:13 -0500
+	(envelope-from <bztemail@gmail.com>) id 1gyb4b-0004CQ-NC
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:38:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gyasE-0008VY-E6
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:26:12 -0500
-Received: from mga02.intel.com ([134.134.136.20]:51213)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1gyasE-0008Lb-3O
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:26:10 -0500
-From: "Zhang, Chen" <chen.zhang@intel.com>
-Date: Tue, 26 Feb 2019 11:25:56 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78060487EA@shsmsx102.ccr.corp.intel.com>
-References: <20190226053434.6252-1-chen.zhang@intel.com>
-	<20190226053434.6252-3-chen.zhang@intel.com>
-	<20190226105522.GC2721@work-vm>
-In-Reply-To: <20190226105522.GC2721@work-vm>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bztemail@gmail.com>) id 1gyb4M-0006UN-6v
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 06:38:46 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/3] Migration/colo.c: Fix COLO failover
- status error
+From: bzt <bztemail@gmail.com>
+Date: Tue, 26 Feb 2019 12:38:36 +0100
+Message-ID: <CADYoBw1HTzqTjfyDgDbP042AH1EkS1DD7Sf4um8eO7d22t4CDA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] Added periodic IRQ support for bcm2836_control
+ local timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +21,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-dev <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
+Dear qemu developers,
 
------Original Message-----
-From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]=20
-Sent: Tuesday, February 26, 2019 6:55 PM
-To: Zhang, Chen <chen.zhang@intel.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>; Zhang Chen <zhangckid@gmail.com>=
-; Juan Quintela <quintela@redhat.com>; zhanghailiang <zhang.zhanghailiang@h=
-uawei.com>; qemu-dev <qemu-devel@nongnu.org>
-Subject: Re: [PATCH 2/3] Migration/colo.c: Fix COLO failover status error
+Honestly SubmitAPatch is a bit complicated for me, so I'm hoping I've
+done everything right. To be sure, you can find my patch here:
+https://github.com/bztsrc/qemu-local-timer and diff against the latest
+github repo here:
+https://github.com/bztsrc/qemu-local-timer/blob/patches/3.1.50.diff
 
-* Zhang Chen (chen.zhang@intel.com) wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
->=20
-> When finished COLO failover, the status is FAILOVER_STATUS_COMPLETED.
-> The origin codes misunderstand the FAILOVER_STATUS_REQUIRE.
->=20
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Currently the IRQ_TIMER in bcm2836_control is defined, but not
+implemented. This patch adds the basic functionality to qemu by
+implementing 3 new registers in bcm2836_control. You can route the
+interrupt to one of the cores' IRQ or FIQ line by writing 0x40000024,
+and you can set up a periodic interrupt with 38.4MHz frequency by
+writing the divider into 0x40000034. Prescaler are not taken into
+account. When the IRQ fired, you'll see it in 0x40000040+4*N bit 11
+with the rest of the local IRQs, and you can acknowledge it by writing
+1<<31 to 0x40000038.
 
-Why do these 'case's have to only deal with COMPLETED - what stops the REQU=
-IRE/ACTIVE states appearing when these routines check the status; even if t=
-hose states only happen for a short amount of time?
+The patch is pretty simple, should be easy to review: it does not
+create new classes, does not delete anything, does not change class
+interface, and only two files modified, the bcm2836_control.c and it's
+header.
 
-Yes, other status just marked the failover processing. We can see colo_fail=
-over_bh(), the REQUIRE/ACTIVE only exist for a very short time.
+Sign-off-by: Zolt=C3=A1n Baldaszti <bztemail@gmail.com>
+Subject: [PATCH] Added periodic IRQ support for bcm2836_control local timer
 
+diff --git a/hw/intc/bcm2836_control.c b/hw/intc/bcm2836_control.c
+index cfa5bc7365..fbd31de0f1 100644
+--- a/hw/intc/bcm2836_control.c
++++ b/hw/intc/bcm2836_control.c
+@@ -7,7 +7,11 @@
+  * This code is licensed under the GNU GPLv2 and later.
+  *
+  * At present, only implements interrupt routing, and mailboxes (i.e.,
+- * not local timer, PMU interrupt, or AXI counters).
++ * not PMU interrupt, or AXI counters).
++ *
++ * 64-bit ARM Local Timer Copyright (c) 2019. Zolt=C3=A1n Baldaszti
++ * The IRQ_TIMER support is still very basic, does not handle timer access=
+,
++ * and such there's no point in enabling it without the interrupt flag set=
+.
+  *
+  * Ref:
+  * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/=
+QA7_rev3.4.pdf
+@@ -18,6 +22,9 @@
+ #include "qemu/log.h"
 
-Thanks
-Zhang Chen
+ #define REG_GPU_ROUTE           0x0c
++#define REG_LOCALTIMERROUTING   0x24
++#define REG_LOCALTIMERCONTROL   0x34
++#define REG_LOCALTIMERACK       0x38
+ #define REG_TIMERCONTROL        0x40
+ #define REG_MBOXCONTROL         0x50
+ #define REG_IRQSRC              0x60
+@@ -43,6 +50,13 @@
+ #define IRQ_TIMER       11
+ #define IRQ_MAX         IRQ_TIMER
 
-Dave
++#define LOCALTIMER_FREQ      38400000
++#define LOCALTIMER_INTFLAG   (1 << 31)
++#define LOCALTIMER_RELOAD    (1 << 30)
++#define LOCALTIMER_INTENABLE (1 << 29)
++#define LOCALTIMER_ENABLE    (1 << 28)
++#define LOCALTIMER_VALUE(x)  ((x) & 0xfffffff)
++
+ static void deliver_local(BCM2836ControlState *s, uint8_t core, uint8_t ir=
+q,
+                           uint32_t controlreg, uint8_t controlidx)
+ {
+@@ -78,6 +92,15 @@ static void bcm2836_control_update(BCM2836ControlState *=
+s)
+         s->fiqsrc[s->route_gpu_fiq] |=3D (uint32_t)1 << IRQ_GPU;
+     }
 
-> ---
->  migration/colo.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->=20
-> diff --git a/migration/colo.c b/migration/colo.c index=20
-> a916dc178c..a13acac192 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -121,6 +121,7 @@ static void secondary_vm_do_failover(void)
->      }
->      /* Notify COLO incoming thread that failover work is finished */
->      qemu_sem_post(&mis->colo_incoming_sem);
-> +
->      /* For Secondary VM, jump to incoming co */
->      if (mis->migration_incoming_co) {
->          qemu_coroutine_enter(mis->migration_incoming_co);
-> @@ -262,7 +263,7 @@ COLOStatus *qmp_query_colo_status(Error **errp)
->      case FAILOVER_STATUS_NONE:
->          s->reason =3D COLO_EXIT_REASON_NONE;
->          break;
-> -    case FAILOVER_STATUS_REQUIRE:
-> +    case FAILOVER_STATUS_COMPLETED:
->          s->reason =3D COLO_EXIT_REASON_REQUEST;
->          break;
->      default:
-> @@ -582,7 +583,7 @@ out:
->          qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
->                                    COLO_EXIT_REASON_ERROR);
->          break;
-> -    case FAILOVER_STATUS_REQUIRE:
-> +    case FAILOVER_STATUS_COMPLETED:
->          qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
->                                    COLO_EXIT_REASON_REQUEST);
->          break;
-> @@ -854,7 +855,7 @@ out:
->          qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
->                                    COLO_EXIT_REASON_ERROR);
->          break;
-> -    case FAILOVER_STATUS_REQUIRE:
-> +    case FAILOVER_STATUS_COMPLETED:
->          qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
->                                    COLO_EXIT_REASON_REQUEST);
->          break;
-> --
-> 2.17.GIT
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
++    /* handle THE local timer interrupt for one of the cores' IRQ/FIQ */
++    if (s->triggered) {
++        if (s->route_localtimer & 4) {
++            s->fiqsrc[(s->route_localtimer & 3)] |=3D (uint32_t)1 << IRQ_T=
+IMER;
++        } else {
++            s->irqsrc[(s->route_localtimer & 3)] |=3D (uint32_t)1 << IRQ_T=
+IMER;
++        }
++    }
++
+     for (i =3D 0; i < BCM2836_NCORES; i++) {
+         /* handle local timer interrupts for this core */
+         if (s->timerirqs[i]) {
+@@ -162,6 +185,62 @@ static void bcm2836_control_set_gpu_fiq(void
+*opaque, int irq, int level)
+     bcm2836_control_update(s);
+ }
+
++static void bcm2836_control_local_timer_set_next(void *opaque)
++{
++    BCM2836ControlState *s =3D opaque;
++    uint64_t next_event;
++
++    assert(s->period > 0);
++
++    next_event =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++        (NANOSECONDS_PER_SECOND * s->period / LOCALTIMER_FREQ);
++    timer_mod(s->timer, next_event);
++}
++
++static void bcm2836_control_local_timer_tick(void *opaque)
++{
++    BCM2836ControlState *s =3D opaque;
++
++    bcm2836_control_local_timer_set_next(s);
++
++    if (!s->triggered) {
++        s->triggered =3D 1;
++        bcm2836_control_update(s);
++    }
++}
++
++static void bcm2836_control_local_timer_control(void *opaque, uint32_t val=
+)
++{
++    BCM2836ControlState *s =3D opaque;
++
++    s->period =3D LOCALTIMER_VALUE(val);
++    if (val & LOCALTIMER_INTENABLE) {
++        if (!s->timer) {
++            s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
++                bcm2836_control_local_timer_tick, s);
++        }
++        bcm2836_control_local_timer_set_next(s);
++    } else {
++        if (s->timer) {
++            timer_del(s->timer);
++            s->timer =3D NULL;
++        }
++        s->triggered =3D 0;
++    }
++}
++
++static void bcm2836_control_local_timer_ack(void *opaque, uint32_t val)
++{
++    BCM2836ControlState *s =3D opaque;
++
++    if (val & LOCALTIMER_INTFLAG) {
++        s->triggered =3D 0;
++    }
++    if (val & LOCALTIMER_RELOAD) {
++        bcm2836_control_local_timer_set_next(s);
++    }
++}
++
+ static uint64_t bcm2836_control_read(void *opaque, hwaddr offset,
+unsigned size)
+ {
+     BCM2836ControlState *s =3D opaque;
+@@ -170,6 +249,14 @@ static uint64_t bcm2836_control_read(void
+*opaque, hwaddr offset, unsigned size)
+         assert(s->route_gpu_fiq < BCM2836_NCORES
+                && s->route_gpu_irq < BCM2836_NCORES);
+         return ((uint32_t)s->route_gpu_fiq << 2) | s->route_gpu_irq;
++    } else if (offset =3D=3D REG_LOCALTIMERROUTING) {
++        return s->route_localtimer;
++    } else if (offset =3D=3D REG_LOCALTIMERCONTROL) {
++        return s->period |
++            (s->timer ? LOCALTIMER_ENABLE | LOCALTIMER_INTENABLE : 0) |
++            (s->triggered ? LOCALTIMER_INTFLAG : 0);
++    } else if (offset =3D=3D REG_LOCALTIMERACK) {
++        return 0;
+     } else if (offset >=3D REG_TIMERCONTROL && offset < REG_MBOXCONTROL) {
+         return s->timercontrol[(offset - REG_TIMERCONTROL) >> 2];
+     } else if (offset >=3D REG_MBOXCONTROL && offset < REG_IRQSRC) {
+@@ -195,6 +282,12 @@ static void bcm2836_control_write(void *opaque,
+hwaddr offset,
+     if (offset =3D=3D REG_GPU_ROUTE) {
+         s->route_gpu_irq =3D val & 0x3;
+         s->route_gpu_fiq =3D (val >> 2) & 0x3;
++    } else if (offset =3D=3D REG_LOCALTIMERROUTING) {
++        s->route_localtimer =3D val & 7;
++    } else if (offset =3D=3D REG_LOCALTIMERCONTROL) {
++        bcm2836_control_local_timer_control(s, val);
++    } else if (offset =3D=3D REG_LOCALTIMERACK) {
++        bcm2836_control_local_timer_ack(s, val);
+     } else if (offset >=3D REG_TIMERCONTROL && offset < REG_MBOXCONTROL) {
+         s->timercontrol[(offset - REG_TIMERCONTROL) >> 2] =3D val & 0xff;
+     } else if (offset >=3D REG_MBOXCONTROL && offset < REG_IRQSRC) {
+@@ -227,6 +320,13 @@ static void bcm2836_control_reset(DeviceState *d)
+
+     s->route_gpu_irq =3D s->route_gpu_fiq =3D 0;
+
++    s->route_localtimer =3D s->triggered =3D 0;
++    s->period =3D 0;
++    if(s->timer) {
++        timer_del(s->timer);
++        s->timer =3D NULL;
++    }
++
+     for (i =3D 0; i < BCM2836_NCORES; i++) {
+         s->timercontrol[i] =3D 0;
+         s->mailboxcontrol[i] =3D 0;
+diff --git a/include/hw/intc/bcm2836_control.h
+b/include/hw/intc/bcm2836_control.h
+index 613f3c4186..873bd52253 100644
+--- a/include/hw/intc/bcm2836_control.h
++++ b/include/hw/intc/bcm2836_control.h
+@@ -5,6 +5,9 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
++ * 64-bit ARM Local Timer Copyright (c) 2019. Zolt=C3=A1n Baldaszti
++ * Added basic IRQ_TIMER interrupt support
++ *
+  * This code is licensed under the GNU GPLv2 and later.
+  */
+
+@@ -12,6 +15,7 @@
+ #define BCM2836_CONTROL_H
+
+ #include "hw/sysbus.h"
++#include "qemu/timer.h"
+
+ /* 4 mailboxes per core, for 16 total */
+ #define BCM2836_NCORES 4
+@@ -39,6 +43,12 @@ typedef struct BCM2836ControlState {
+     bool gpu_irq, gpu_fiq;
+     uint8_t timerirqs[BCM2836_NCORES];
+
++    /* local timer */
++    uint8_t route_localtimer;
++    uint32_t period;
++    bool triggered;
++    QEMUTimer *timer;
++
+     /* interrupt source registers, post-routing (also input-derived;
+visible) */
+     uint32_t irqsrc[BCM2836_NCORES];
+     uint32_t fiqsrc[BCM2836_NCORES];
