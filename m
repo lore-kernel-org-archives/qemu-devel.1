@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44077)
+Received: from eggs.gnu.org ([209.51.188.92]:46029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyiKM-0000Oh-3Y
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:23:44 -0500
+	(envelope-from <armbru@redhat.com>) id 1gyiUh-00022u-D5
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:34:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyiKL-0004Qv-60
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:23:42 -0500
-References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-7-david@redhat.com>
-	<f3a978e7-2e40-9f57-f085-ff5dbf259964@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7bfddcbc-5ace-5f28-8042-8b576f31d573@redhat.com>
-Date: Tue, 26 Feb 2019 20:23:18 +0100
-MIME-Version: 1.0
-In-Reply-To: <f3a978e7-2e40-9f57-f085-ff5dbf259964@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 06/33] s390x/tcg: Implement VECTOR
- GENERATE BYTE MASK
+	(envelope-from <armbru@redhat.com>) id 1gyiUf-000655-Bv
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 14:34:22 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 26 Feb 2019 20:34:00 +0100
+Message-Id: <20190226193408.23862-4-armbru@redhat.com>
+In-Reply-To: <20190226193408.23862-1-armbru@redhat.com>
+References: <20190226193408.23862-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 03/11] pflash_cfi01: Log use of flawed
+ "write to buffer"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +20,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
 
-On 26.02.19 20:12, Richard Henderson wrote:
-> On 2/26/19 3:38 AM, David Hildenbrand wrote:
->> +static DisasJumpType op_vgbm(DisasContext *s, DisasOps *o)
->> +{
->> +    const uint16_t i2 = get_field(s->fields, i2);
->> +    TCGv_i32 ones = tcg_const_i32(-1u);
->> +    TCGv_i32 zeroes = tcg_const_i32(0);
->> +    int i;
->> +
->> +    for (i = 0; i < 16; i++) {
->> +        if (extract32(i2, 15 - i, 1)) {
->> +            write_vec_element_i32(ones, get_field(s->fields, v1), i, MO_8);
->> +        } else {
->> +            write_vec_element_i32(zeroes, get_field(s->fields, v1), i, MO_8);
->> +        }
->> +    }
->> +    tcg_temp_free_i32(ones);
->> +    tcg_temp_free_i32(zeroes);
->> +    return DISAS_NEXT;
->> +}
-> 
-> While this works, it's not in the spirit of
-> 
->> Programming Note: VECTOR GENERATE BYTE
->> MASK is the preferred method for setting a vector
->> register to all zeroes or ones.
+Our implementation of "write to buffer" (command 0xE8) is flawed.
+LOG_UNIMP its use, and add some FIXME comments.
 
-Good point, I skipped that note so far.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/block/pflash_cfi01.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-> 
-> Better, I think, with
-
-Many instructions to implement, so little time to fine tune stuff so
-far. However I have tests for VGBM, so I can easily get it working. Will
-play with it!
-
-> 
-> uint64_t generate_byte_mask(uint8_t mask)
-> {
->     uint64_t r = 0;
->     int i;
->     for (i = 0; i < 8; i++) {
->         if ((mask >> i) & 1) {
->             r |= 0xffull << (i * 8);
->         }
->     }
->     return r;
-> }
-> 
->     if (i2 == (i2 & 0xff) * 0x0101) {
->         /* masks for both halves of the vector are the same.
->            trust tcg to produce a good constant loading.  */
->         tcg_gen_gvec_dup64i(vec_full_reg_offset(s, v1), 16, 16,
->                             generate_byte_mask(i2 & 0xff));
->     } else {
->         TCGv_i64 t = tcg_temp_new_i64();
->         tcg_gen_movi_i64(t, generate_byte_mask(i2 >> 8));
->         write_vec_element_i64(t, v1, 0, MO_64);
->         tcg_gen_movi_i64(t, generate_byte_mask(i2 & 0xff));
->         write_vec_element_i64(t, v1, 1, MO_64);
->         tcg_temp_free_i64();
->     }
-> 
-> Somewhere behind tcg_gen_gvec_dup64i, I check to see if the constant can be
-> decomposed further, which will eventually bottom out at
-> 
-> 	vpxor	%xmm0,%xmm0,%xmm0		// all zeros
-> 	vpcmpeq	%xmm0,%xmm0,%xmm0		// all ones
-> 
-> and even more interesting combinations for tcg/aarch64.
-> 
-> 
-
-At this point I want to highlight how helpful your reviews are. Amazing! :)
-
-> 
-> r~
-> 
-
-
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index e6d933a06d..d381f14e3c 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -502,6 +502,10 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
+             break;
+         case 0xe8: /* Write to buffer */
+             DPRINTF("%s: Write to buffer\n", __func__);
++            /* FIXME should save @offset, @width for case 1+ */
++            qemu_log_mask(LOG_UNIMP,
++                          "%s: Write to buffer emulation is flawed\n",
++                          __func__);
+             pfl->status |= 0x80; /* Ready! */
+             break;
+         case 0xf0: /* Probe for AMD flash */
+@@ -545,6 +549,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
+             /* Mask writeblock size based on device width, or bank width if
+              * device width not specified.
+              */
++            /* FIXME check @offset, @width */
+             if (pfl->device_width) {
+                 value = extract32(value, 0, pfl->device_width * 8);
+             } else {
+@@ -582,7 +587,13 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
+     case 2:
+         switch (pfl->cmd) {
+         case 0xe8: /* Block write */
++            /* FIXME check @offset, @width */
+             if (!pfl->ro) {
++                /*
++                 * FIXME writing straight to memory is *wrong*.  We
++                 * should write to a buffer, and flush it to memory
++                 * only on confirm command (see below).
++                 */
+                 pflash_data_write(pfl, offset, value, width, be);
+             } else {
+                 pfl->status |= 0x10; /* Programming error */
+@@ -598,6 +609,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
+                 pfl->wcycle++;
+                 if (!pfl->ro) {
+                     /* Flush the entire write buffer onto backing storage.  */
++                    /* FIXME premature! */
+                     pflash_update(pfl, offset & mask, pfl->writeblock_size);
+                 } else {
+                     pfl->status |= 0x10; /* Programming error */
+@@ -614,6 +626,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
+         switch (pfl->cmd) {
+         case 0xe8: /* Block write */
+             if (cmd == 0xd0) {
++                /* FIXME this is where we should write out the buffer */
+                 pfl->wcycle = 0;
+                 pfl->status |= 0x80;
+             } else {
 -- 
-
-Thanks,
-
-David / dhildenb
+2.17.2
