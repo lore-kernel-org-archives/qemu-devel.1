@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36499)
+Received: from eggs.gnu.org ([209.51.188.92]:38295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz8Fm-0005pN-22
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:04:42 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8NV-00036a-Oe
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:12:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz8Fk-0004Ir-TI
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:04:41 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46436)
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8NU-0002OZ-J3
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:12:41 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gz8Fk-00049f-JY
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:04:40 -0500
-Received: by mail-pg1-x542.google.com with SMTP id 196so8672021pgf.13
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:04:27 -0800 (PST)
-References: <20190223232954.7185-6-richard.henderson@linaro.org>
-	<20190227120217.20794-1-kbastian@mail.uni-paderborn.de>
+	id 1gz8NS-0001oa-U0
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:12:40 -0500
+Received: by mail-pg1-x542.google.com with SMTP id j3so8672988pgm.11
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:12:00 -0800 (PST)
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-21-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e8a75992-65a2-ed29-2d1b-a0008bfea84c@linaro.org>
-Date: Wed, 27 Feb 2019 15:04:19 -0800
+Message-ID: <e9be57a6-b639-39fa-2ec9-9f5cb52f954a@linaro.org>
+Date: Wed, 27 Feb 2019 15:11:56 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190227120217.20794-1-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20190226113915.20150-21-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] test/decode: Add tests for PatternGroups
+Subject: Re: [Qemu-devel] [PATCH v1 20/33] s390x/tcg: Implement VECTOR PACK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: f4bug@amsat.org, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 2/27/19 4:02 AM, Bastian Koppelmann wrote:
-> this adds one test that supposed to succeed to test deep nesting
-> of pattern groups which is rarely exercised by targets using decode
-> tree. The remaining tests exercise various fail conditions.
+On 2/26/19 3:39 AM, David Hildenbrand wrote:
+> We cannot use gvex expansion as the element size of source and
+> destination differs. So expand manually. Luckily, VECTOR PACK does not
+> care about saturation or setting the CC, so it can be implemented
+> without a helper. We have to watch out for overlapping source and
+> destination registers and use a temporary register in this case.
 > 
-> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
-> These are the tests that came to my mind. It's not complete,but a
-> start.
+>  target/s390x/insn-data.def      |  2 ++
+>  target/s390x/translate_vx.inc.c | 41 +++++++++++++++++++++++++++++++++
+>  2 files changed, 43 insertions(+)
 
-Thanks for these.  Will queue for v2.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
