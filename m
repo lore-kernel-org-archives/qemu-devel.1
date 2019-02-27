@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40266)
+Received: from eggs.gnu.org ([209.51.188.92]:42499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gz28B-0007ES-04
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 11:32:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1gz2Jb-0002MQ-KE
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 11:44:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gz289-0001eS-Db
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 11:32:26 -0500
-References: <20190227115152.1906-1-berrange@redhat.com>
-	<20190227115152.1906-2-berrange@redhat.com>
-	<61c14d41-362e-b6ba-be62-b360c215a98b@redhat.com>
-	<20190227153331.GL31688@redhat.com> <20190227155828.GO31688@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gz2JV-0008GM-8u
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 11:44:11 -0500
+References: <20190227162035.18543-1-berrange@redhat.com>
+	<20190227162035.18543-2-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f11fce5e-8119-5dfa-b9b8-cc9d9071d131@redhat.com>
-Date: Wed, 27 Feb 2019 10:32:10 -0600
+Message-ID: <29dfdc31-9e4d-88be-13f0-53e3f33d6800@redhat.com>
+Date: Wed, 27 Feb 2019 10:43:40 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190227155828.GO31688@redhat.com>
+In-Reply-To: <20190227162035.18543-2-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] qemu-nbd: add support for
+Subject: Re: [Qemu-devel] [PATCH v6 1/3] qemu-nbd: add support for
  authorization of TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,104 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 2/27/19 9:58 AM, Daniel P. Berrang=C3=A9 wrote:
-
->>>>  echo "=3D=3D check TLS works =3D=3D"
->>>> -obj=3Dtls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,id=3D=
-tls0
->>>> -$QEMU_IMG info --image-opts --object $obj \
->>>> +obj1=3Dtls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,id=
-=3Dtls0
->>>> +obj2=3Dtls-creds-x509,dir=3D${tls_dir}/client3,endpoint=3Dclient,id=
-=3Dtls0
->>>> +$QEMU_IMG info --image-opts --object $obj1 \
->>>>      driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-cred=
-s=3Dtls0 \
->>>>      2>&1 | sed "s/$nbd_tcp_port/PORT/g"
->>>> -$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port --object $obj \
->>>> +$QEMU_IMG info --image-opts --object $obj2 \
->>>> +    driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-cred=
-s=3Dtls0 \
->>>> +    2>&1 | sed "s/$nbd_tcp_port/PORT/g"
->>>> +$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port --object $obj1 =
-\
->>>>      --tls-creds=3Dtls0
->>>
->>> It looks like you have both a positive and negative test that a qemu-=
-img
->>> client can only connect with the right auth, but only a positive test
->>> for a qemu-nbd --list client.  Should we also duplicate the
->>> QEMU_NBD_PROG line to use $obj2 for a negative test?
->>
->> I can look at that
+On 2/27/19 10:20 AM, Daniel P. Berrang=C3=A9 wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
 >=20
-> On reflection I don't think that's needed. This is a server side featur=
-e we
-> are validating. As such it is sufficient to validate with any client ap=
-p
-> supporting TLS. IOW, qemu-img is sufficient to prove the server side fe=
-ature
-> is working correctly.
-
-There's two things being validated in this test: does the server
-properly honor authorization (accepting/denying clients as appropriate),
-and does the client properly expose a way to pass correct credentials.
-You're right that once we've tested that the server can reject at least
-one client lacking credentials, we don't need any more negative tests
-(the server will reject any other client without credentials); and as
-long as both clients that we care about (qemu-img, qemu-nbd --list) have
-at least one positive test, then we've covered that each important
-client has a way to provide the required credentials.
-
-Okay, I can live with your claim that we have sufficient coverage, and
-don't need anything more with --list (for this test, where the server is
-accepting regardless of client certificate).
-
->>>> +echo "=3D=3D check TLS with authorization =3D=3D"
->>>> +
->>>> +nbd_server_stop
->>>> +
->>>> +nbd_server_start_tcp_socket \
->>>> +    --object tls-creds-x509,dir=3D${tls_dir}/server1,endpoint=3Dser=
-ver,id=3Dtls0,verify-peer=3Dyes \
->>>> +    --object "authz-simple,identity=3DCN=3Dlocalhost,,O=3DCthulu Da=
-rk Lord Enterprises client1,,L=3DR'lyeh,,C=3DSouth Pacific,id=3Dauthz0" \
->>>> +    --tls-authz authz0 \
->>>> +    --tls-creds tls0 \
->>>> +    -f $IMGFMT "$TEST_IMG" 2>> "$TEST_DIR/server.log"
->>>> +
->>>> +$QEMU_IMG info --image-opts \
->>>> +    --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dcli=
-ent,id=3Dtls0 \
->>>> +    driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-cred=
-s=3Dtls0
->>>> +
->>>> +$QEMU_IMG info --image-opts \
->>>> +    --object tls-creds-x509,dir=3D${tls_dir}/client3,endpoint=3Dcli=
-ent,id=3Dtls0 \
->>>> +    driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-cred=
-s=3Dtls0
->>>
->>> Similarly, do we want --list testing here?
->>
->> I'll have a look.
+> Currently any client which can complete the TLS handshake is able to us=
+e
+> the NBD server. The server admin can turn on the 'verify-peer' option
+> for the x509 creds to require the client to provide a x509 certificate.
+> This means the client will have to acquire a certificate from the CA
+> before they are permitted to use the NBD server. This is still a fairly
+> low bar to cross.
 >=20
-> For same reason as above, we don't need to repeat with qemu-nbd --list
+> This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command whic=
+h
+> takes the ID of a previously added 'QAuthZ' object instance. This will
+> be used to validate the client's x509 distinguished name. Clients
+> failing the authorization check will not be permitted to use the NBD
+> server.
+>=20
 
-Here, it's a bit fuzzier - now that the server DOES require the client
-to use a correct certificate (you're showing that the server accepts
-client 1 but rejects client 2, because they used a different
-certificate).  But, since client 1 is the same here as it was before,
-and the earlier test showed how to let qemu-nbd --list as client give
-the same credentials as before, I can also live with the notion that we
-don't need a --list test here (the server being stricter about
-certificates doesn't change that the client can still pass the correct
-certificate).
+> +++ b/qemu-nbd.c
 
-Okay.
+> @@ -103,6 +105,7 @@ static void usage(const char *name)
+>  "  --object type,id=3DID,...   define an object such as 'secret' for p=
+roviding\n"
+>  "                            passwords and/or encryption keys\n"
+>  "  --tls-creds=3DID            use id of an earlier --object to provid=
+e TLS\n"
+> +"  --tls-authz=3DID            use id of an earlier --object to provid=
+e authorization\n"
+
+Usage line exceeds 80 columns; I don't mind splitting the line.
+
+> @@ -142,13 +146,16 @@ qemu-nbd -f qcow2 file.qcow2
+>  @end example
+> =20
+>  Start a long-running server listening with encryption on port 10810,
+> -and require clients to have a correct X.509 certificate to connect to
+> +and whitelist clients with a specific X.509 certificate to connect to
+>  a 1 megabyte subset of a raw file, using the export name 'subset':
+> =20
+>  @example
+>  qemu-nbd \
+>    --object tls-creds-x509,id=3Dtls0,endpoint=3Dserver,dir=3D/path/to/q=
+emutls \
+> -  --tls-creds tls0 -t -x subset -p 10810 \
+> +  --object 'authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.example.com=
+,,\
+> +            O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB' \
+
+A long line may be necessary here, unless the whitespace in the
+identity=3D parameter inserted by the line continuation is harmless.  Lon=
+g
+lines in man pages are annoying, but even worse is an example that
+copies-and-pastes incorrectly.  I may just s/^ *O/O/.
+
+
+> =20
+> +=3D=3D check TLS with authorization =3D=3D
+> +qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3D10809,t=
+ls-creds=3Dtls0': Failed to read option reply: Cannot read from TLS chann=
+el: Software caused connection abort
+> +qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3D10809,t=
+ls-creds=3Dtls0': Failed to read option reply: Cannot read from TLS chann=
+el: Software caused connection abort
+
+A rather uninformative message for the client to figure out why it
+failed, but (as with all things security-related), giving too many
+details may in itself be an improper information leak. At any rate, I
+don't know that you could make it work any better, so it is not a
+problem with this patch.  It may be the sign of a server bug for closing
+the socket too soon (before the client has a chance to read an actual
+error message), where we could tweak things to provoke a nicer error
+than 'Software caused connection abort', but that would be a separate pat=
+ch.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+I can make the minor changes as part of staging through my NBD tree
+without needing a v7.
 
 --=20
 Eric Blake, Principal Software Engineer
