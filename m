@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48026)
+Received: from eggs.gnu.org ([209.51.188.92]:48880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gyvso-0003OZ-6v
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:52:10 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyvxW-0004V7-Lv
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:57:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gyvsn-0004U0-GN
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:52:10 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyvxJ-00077e-Vp
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:56:55 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 27 Feb 2019 09:56:39 +0000
+Message-ID: <f71828ee-508a-6f38-e4de-98e1d419b1d9@virtuozzo.com>
+References: <20190211144421.106232-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190211144421.106232-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5BE2EE78655D01489EEF329FACC7397E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190227012132.16271-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20190227012132.16271-1-david@gibson.dropbear.id.au>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 27 Feb 2019 10:51:54 +0100
-Message-ID: <CAJ+F1CKmkJ5NcfjT31ChVis7zNdiOWgvXHGAc_S7Zrx0EVr4Qg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Allow -sandbox off with --disable-seccomp
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] qcow2: encryption threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,61 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Eduardo Otubo <otubo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, QEMU <qemu-devel@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
 
-Hi
-
-On Wed, Feb 27, 2019 at 2:22 AM David Gibson
-<david@gibson.dropbear.id.au> wrote:
->
-> At present, when seccomp support is compiled out with --disable-seccomp
-> we fail with an error if the user puts -sandbox on the command line.
->
-> That kind of makes sense, but it's a bit strange that we reject a request
-> to disable sandboxing with "-sandbox off" saying we don't support
-> sandboxing.
->
-> This puts in a small sandbox to (correctly) silently ignore -sandbox off
-> when we don't have sandboxing support compiled in.  This makes life easie=
-r
-> for testcases, since they can safely specify "-sandbox off" without havin=
-g
-> to care if the qemu they're using is compiled with sandbox support or not=
-.
->
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
->  vl.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index 502857a176..9d5f1b7ebb 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3857,9 +3857,11 @@ int main(int argc, char **argv, char **envp)
->                      exit(1);
->                  }
->  #else
-> -                error_report("-sandbox support is not enabled "
-> -                             "in this QEMU binary");
-> -                exit(1);
-> +                if (!g_str_equal(optarg, "off")) {
-> +                    error_report("-sandbox support is not enabled "
-> +                                 "in this QEMU binary");
-> +                    exit(1);
-> +                }
->  #endif
->                  break;
->              case QEMU_OPTION_add_fd:
-> --
-> 2.20.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+cGluZw0KDQoxMS4wMi4yMDE5IDE3OjQ0LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
+b3RlOg0KPiBIaSBhbGwhDQo+IA0KPiBUaGUgc2VyaWVzIGJyaW5ncyB0aHJlYWRzIHRvIHFjb3cy
+IGVuY3J5cHRpb24vZGVjcnlwdGlvbiBwYXRoLA0KPiBsaWtlIGl0IGlzIGFscmVhZHkgZG9uZSBm
+b3IgY29tcHJlc3Npb24uDQo+IA0KPiB2NDoNCj4gYWRkIHItYidzIHRvIG1vc3Qgb2YgcGF0Y2hl
+cw0KPiAwNDogYWRkIHItYiBieSBBbGJlcnRvIGFuZCBQYW9sby4NCj4gICAgICBQYW9sbyBhc2tl
+ZCB0byBhZGQgc29tZSBpbmZvcm1hdGlvbiB0byB0aGUgY29tbWl0IG1lc3NhZ2UuDQo+ICAgICAg
+SSBkb24ndCBoYXZlIGdvb2QgdW5kZXJzdGFuZGluZyBvZiBtb3ZpbmcgZnJvbQ0KPiAgICAgICJB
+aW9Db250ZXh0IGxvY2sgdXNhZ2UiIHRvIG90aGVyIGxvY2tzLCBzbyBJIGp1c3QgYWRkZWQNCj4g
+ICAgICAiRHJvcCBkZXBlbmRlbmNlIG9uIEFpb0NvbnRleHQgbG9jay4iLCBub3QgYmVpbmcgc3Vy
+ZSB0aGF0DQo+ICAgICAgaXQgaXMgY29ycmVjdCBvciBtYWtlIHNlbnNlLiBBbmQsIGluIHRoZSBz
+YW1lIHRpbWUgdGFrZSBib3RoDQo+ICAgICAgci1iJ3MuIFNvLCBob3BlIG1haW50YWluZXJzIHdp
+bGwgYWRqdXN0IGNvbW1pdCBtZXNzYWdlIGlmDQo+ICAgICAgbmVlZGVkLg0KPiAwNjogYWRkIHIt
+YiBieSBBbGJlcnRvDQo+ICAgICAgZHJvcCBjb21tZW50ICdObyBzZW5zZSBpbiByZWxlYXNpbmcg
+dGhlIGxvY2snIFtBbGJlcnRvXQ0KPiANCj4gDQo+IHYzOg0KPiAwMTogZHJvcCAnaW5jbHVkZSBi
+bG9ja19pbnQuaCcgbGluZXMgbm90IG5lZWRlZCBtb3JlIFtBbGJlcnRvXQ0KPiAwMjogZml4IGNv
+bW1lbnRzIHN0eWxlIChvcGVuL2Nsb3NlIG9uIHNlcGFyYXRlIGxpbmUpLCBhZGQgQWxiZXJ0bydz
+IHItYg0KPiAwMzogaW1wcm92ZSBjb21taXQgbWVzc2FnZSwgYWRkIEFsYmVydG8ncyByLWINCj4g
+MDQ6IG5ldywgZm9sbG93cyBQYW9sbydzIGNvbW1lbnQNCj4gDQo+IA0KPiB2MjogKG5vdCB2ZXJ5
+IGNhcmVmdWwgY2hhbmdlIGxpc3QpDQo+ICAgICAgLSBtdWx0aXBsZSBjaXBoZXIgaW5zaWRlIFFD
+cnlwdG9CbG9jayBpbnN0ZWFkIG9mIG11bHRpcGxlDQo+ICAgICAgICBibG9ja3MgaW5zaWRlIHFj
+b3cyLCBhcyBzdWdnZXN0ZWQgYnkgRGFuaWVsLCBhbmQgaXQgaXMNCj4gICAgICAgIGRvbmUgaW4g
+c2VwYXJhdGUgc2VyaWVzDQo+ICAgICAgLSB1c2UgdGhyZWFkZWQgZW5jcnlwdGlvbiBpbiBkb19w
+ZXJmb3JtX2Nvd19lbmNyeXB0KCkgdG9vDQo+ICAgICAgLSBzb21lIHJlbmFtaW5nIGFuZCByZWZh
+Y3RvcmluZyBhbmQgc2ltcGxpZmljYXRpb25zDQo+IA0KPiANCj4gPT0gUGVyZm9ybWFuY2UgdGVz
+dGluZyAobm90IHVwZGF0ZWQgZm9yIHY0LCBhcyB0aGVyZSBhcmUgbm8gYWN0dWFsIGNoYW5nZXMp
+ID09DQo+IA0KPiBIbW0sIGRvIHdlIGhhdmUgc29tZXRoaW5nIGxpa2UgdGVzdHMvcWVtdS1pb3Rl
+c3RzLCBidXQgZm9yIHBlcmZvcm1hbmNlPw0KPiANCj4gW3Jvb3RAa3ZtIHVwLXFjb3cyLWVuY3J5
+cHQtdGhyZWFkc10jIGNhdCB0ZXN0LnNoDQo+ICAgICAgIyEvYmluL2Jhc2gNCj4gDQo+ICAgICAg
+c2l6ZT0xRw0KPiAgICAgIHNyYz0vc3NkL3NyYy5yYXcNCj4gICAgICBkc3Q9L3NzZC9kc3QuZW5j
+LnFjb3cyDQo+IA0KPiAgICAgICMgY3JlYXRlIHNvdXJjZSBmb3IgdGVzdHMNCj4gICAgICAuL3Fl
+bXUtaW1nIGNyZWF0ZSAtZiByYXcgIiRzcmMiICRzaXplID4gL2Rldi9udWxsDQo+ICAgICAgLi9x
+ZW11LWlvIC1mIHJhdyAtYyAid3JpdGUgLVAgMHhhIDAgJHNpemUiICIkc3JjIiA+IC9kZXYvbnVs
+bA0KPiANCj4gICAgICBmb3IgdyBpbiAiIiAiLVciOyBkbw0KPiAgICAgICAgICBlY2hvIC1lICJU
+ZXN0IHdpdGggYWRkaXRpb25hbCBwYXJhbXRlciBmb3IgcWVtdS1pbWc6ICckdyciDQo+IA0KPiAg
+ICAgICAgICAjIGNyZWF0ZSB0YXJnZXQNCj4gICAgICAgICAgLi9xZW11LWltZyBjcmVhdGUgLWYg
+cWNvdzIgLS1vYmplY3Qgc2VjcmV0LGlkPXNlYzAsZGF0YT10ZXN0IC1vIGVuY3J5cHQuZm9ybWF0
+PWx1a3MsZW5jcnlwdC5rZXktc2VjcmV0PXNlYzAgIiRkc3QiICRzaXplID4gL2Rldi9udWxsDQo+
+IA0KPiAgICAgICAgICB0aW1lIC4vcWVtdS1pbWcgY29udmVydCAkdyAtZiByYXcgLS1vYmplY3Qg
+c2VjcmV0LGlkPXNlYzAsZGF0YT10ZXN0IC0tdGFyZ2V0LWltYWdlLW9wdHMgLW4gIiRzcmMiICJk
+cml2ZXI9cWNvdzIsZmlsZS5maWxlbmFtZT0kZHN0LGVuY3J5cHQua2V5LXNlY3JldD1zZWMwIg0K
+PiAgICAgICAgICBlY2hvDQo+ICAgICAgZG9uZQ0KPiANCj4gDQo+IGJlZm9yZSB0aGUgc2VyaWVz
+Og0KPiAgICAgIFRlc3Qgd2l0aCBhZGRpdGlvbmFsIHBhcmFtdGVyIGZvciBxZW11LWltZzogJycN
+Cj4gDQo+ICAgICAgcmVhbCAgICAwbTE0LjMxOHMNCj4gICAgICB1c2VyICAgIDBtMTMuNjM3cw0K
+PiAgICAgIHN5cyAgICAgMG0wLjg4MXMNCj4gDQo+ICAgICAgVGVzdCB3aXRoIGFkZGl0aW9uYWwg
+cGFyYW10ZXIgZm9yIHFlbXUtaW1nOiAnLVcnDQo+IA0KPiAgICAgIHJlYWwgICAgMG0xMy45NjJz
+DQo+ICAgICAgdXNlciAgICAwbTEzLjY4MXMNCj4gICAgICBzeXMgICAgIDBtMS4xNTZzDQo+IA0K
+PiANCj4gYWZ0ZXIgdGhlIHNlcmllczoNCj4gICAgICBUZXN0IHdpdGggYWRkaXRpb25hbCBwYXJh
+bXRlciBmb3IgcWVtdS1pbWc6ICcnDQo+IA0KPiAgICAgIHJlYWwgICAgMG0xNC4zODJzDQo+ICAg
+ICAgdXNlciAgICAwbTEzLjczNXMNCj4gICAgICBzeXMgICAgIDBtMC44MzVzDQo+IA0KPiAgICAg
+IFRlc3Qgd2l0aCBhZGRpdGlvbmFsIHBhcmFtdGVyIGZvciBxZW11LWltZzogJy1XJw0KPiANCj4g
+ICAgICByZWFsICAgIDBtNS42OTZzDQo+ICAgICAgdXNlciAgICAwbTE1LjkzMXMNCj4gICAgICBz
+eXMgICAgIDBtMS4xNDRzDQo+IA0KPiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICg5KToN
+Cj4gICAgcWNvdzIuaDogYWRkIG1pc3NpbmcgaW5jbHVkZQ0KPiAgICBxY293MjogYWRkIHNlcGFy
+YXRlIGZpbGUgZm9yIHRocmVhZGVkIGRhdGEgcHJvY2Vzc2luZyBmdW5jdGlvbnMNCj4gICAgcWNv
+dzItdGhyZWFkczogdXNlIHRocmVhZF9wb29sX3N1Ym1pdF9jbw0KPiAgICBxY293Mi10aHJlYWRz
+OiBxY293Ml9jb19kb19jb21wcmVzczogcHJvdGVjdCBxdWV1aW5nIGJ5IG11dGV4DQo+ICAgIHFj
+b3cyLXRocmVhZHM6IHNwbGl0IG91dCBnZW5lcmljIHBhdGgNCj4gICAgcWNvdzI6IHFjb3cyX2Nv
+X3ByZWFkdjogaW1wcm92ZSBsb2NraW5nDQo+ICAgIHFjb3cyOiBxY293Ml9jb19wcmVhZHY6IHNr
+aXAgdXNpbmcgaGRfcWlvdiB3aGVuIHBvc3NpYmxlDQo+ICAgIHFjb3cyOiBiZHJ2X2NvX3B3cml0
+ZXY6IG1vdmUgZW5jcnlwdGlvbiBjb2RlIG91dCBvZiB0aGUgbG9jaw0KPiAgICBxY293MjogZG8g
+ZW5jcnlwdGlvbiBpbiB0aHJlYWRzDQo+IA0KPiAgIGJsb2NrL3Fjb3cyLmggICAgICAgICAgfCAg
+MjAgKystDQo+ICAgYmxvY2svcWNvdzItYml0bWFwLmMgICB8ICAgMSAtDQo+ICAgYmxvY2svcWNv
+dzItY2FjaGUuYyAgICB8ICAgMSAtDQo+ICAgYmxvY2svcWNvdzItY2x1c3Rlci5jICB8ICAgOCAr
+LQ0KPiAgIGJsb2NrL3Fjb3cyLXJlZmNvdW50LmMgfCAgIDEgLQ0KPiAgIGJsb2NrL3Fjb3cyLXNu
+YXBzaG90LmMgfCAgIDEgLQ0KPiAgIGJsb2NrL3Fjb3cyLXRocmVhZHMuYyAgfCAyNjggKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgYmxvY2svcWNvdzIuYyAgICAg
+ICAgICB8IDI3NSArKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAg
+IGJsb2NrL01ha2VmaWxlLm9ianMgICAgfCAgIDIgKy0NCj4gICA5IGZpbGVzIGNoYW5nZWQsIDM0
+MSBpbnNlcnRpb25zKCspLCAyMzYgZGVsZXRpb25zKC0pDQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0
+IGJsb2NrL3Fjb3cyLXRocmVhZHMuYw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
+bWlyDQo=
