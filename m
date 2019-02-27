@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54669)
+Received: from eggs.gnu.org ([209.51.188.92]:54697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gz1Nc-000232-8r
+	(envelope-from <no-reply@patchew.org>) id 1gz1Nd-000233-1F
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gz1Nb-0008Nz-BO
+	(envelope-from <no-reply@patchew.org>) id 1gz1Na-0008N8-Fy
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:20 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gz1Nb-0007Mk-0B
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:19 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id w2so18461324wrt.11
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 07:41:59 -0800 (PST)
-Date: Wed, 27 Feb 2019 15:31:40 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190227153140.GG22539@stefanha-x1.localdomain>
-References: <20190226202309.7761-1-stefanha@gmail.com>
-	<434db57d-d672-3c3f-7284-d07e47daddbc@redhat.com>
+Resent-Message-Id: <E1gz1Na-0008N8-Fy@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gz1NY-0008Ei-A3
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:16 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155128220282.1544.3536205279570425164@49fa7ef69f7b>
+In-Reply-To: <20190222024106.9167-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="GdbWtwDHkcXqP16f"
-Content-Disposition: inline
-In-Reply-To: <434db57d-d672-3c3f-7284-d07e47daddbc@redhat.com>
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Add GSoC/Outreachy 2019
- announcement
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 27 Feb 2019 07:43:24 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] target/arm: Reduce overhead of
+ cpu_get_tb_cpu_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, cota@braap.org, alex.bennee@linaro.org
 
-
---GdbWtwDHkcXqP16f
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, Feb 27, 2019 at 09:43:33AM +0100, Thomas Huth wrote:
-> By the way, I just noticed that on
-> https://wiki.qemu.org/Outreachy_2019_MayAugust the link in step 2 is
-> broken. You might want to fix that...
-
-Fixed, thanks!
-
-Stefan
-
---GdbWtwDHkcXqP16f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcdq1cAAoJEJykq7OBq3PIv4oIAKa0NY/PzldhXXaV+KdUz+K+
-/Drt3Y1LjUCdxArfFRDC7YKQxfdRgoP8vr1ArTZz5Yc2kfuykRJ5BOuf1ACuPutR
-7im0wy6RRx1LiK1R42/NO6I1WQHtWqZC3nCM7D9Jiya3NGMjoQbdwV+svVk6u885
-XbE9k7Lhx4YtT6wStYzyU3kRZPG2NLsDOGb8p1ki7QDTh9lCeRdckQjjNrTFmtcn
-MWpbfeH3NVb6Y6O6c1G2ObCujFLbjyxu9V1YjlOYuSHrcKZrW0cfg2HJj/KlNXcM
-1C2N5YvicFtPFApWw1ambEAhmxOxJk0WSRawE+72PAj8Ha1lDReWVveISXdUNYg=
-=F8U+
------END PGP SIGNATURE-----
-
---GdbWtwDHkcXqP16f--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyMjAyNDEwNi45MTY3
+LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMjIwMjQxMDYuOTE2Ny0xLXJp
+Y2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2
+MyAwLzNdIHRhcmdldC9hcm06IFJlZHVjZSBvdmVyaGVhZCBvZiBjcHVfZ2V0X3RiX2NwdV9zdGF0
+ZQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
+IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKMWQ0YTljYmQyMSB0YXJnZXQvYXJtOiBSZWx5IG9uIGhmbGFn
+cyBjb3JyZWN0IGluIGNwdV9nZXRfdGJfY3B1X3N0YXRlCmM2ZWQwNDQzOWMgdGFyZ2V0L2FybTog
+UmVidWlsZCBoZmxhZ3MgYXQgZWwgY2hhbmdlcyBhbmQgTVNSIHdyaXRlcwozN2Q4MTE3ZWFjIHRh
+cmdldC9hcm06IFNwbGl0IG91dCByZWNvbXB1dGVfaGZsYWdzIGV0IGFsCgo9PT0gT1VUUFVUIEJF
+R0lOID09PQoxLzMgQ2hlY2tpbmcgY29tbWl0IDM3ZDgxMTdlYWNlZiAodGFyZ2V0L2FybTogU3Bs
+aXQgb3V0IHJlY29tcHV0ZV9oZmxhZ3MgZXQgYWwpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
+ZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMjU6IEZJTEU6IHRhcmdldC9hcm0v
+aGVscGVyLmM6MTI4NjA6CisgICAgLyogdjhNIGFsd2F5cyBhcHBsaWVzIHN0YWNrIGxpbWl0IGNo
+ZWNrcyB1bmxlc3MgQ0NSLlNUS09GSEZOTUlHTiBpcwoKV0FSTklORzogQmxvY2sgY29tbWVudHMg
+dXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE3MDogRklMRTogdGFyZ2V0L2Fy
+bS9oZWxwZXIuYzoxMjkwNToKKyAgICAgICAgLyogSWYgU1ZFIGlzIGRpc2FibGVkLCBidXQgRlAg
+aXMgZW5hYmxlZCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMzY4IGxpbmVzIGNoZWNr
+ZWQKClBhdGNoIDEvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzMgQ2hlY2tpbmcgY29t
+bWl0IGM2ZWQwNDQzOWM1NyAodGFyZ2V0L2FybTogUmVidWlsZCBoZmxhZ3MgYXQgZWwgY2hhbmdl
+cyBhbmQgTVNSIHdyaXRlcykKMy8zIENoZWNraW5nIGNvbW1pdCAxZDRhOWNiZDIxOWQgKHRhcmdl
+dC9hcm06IFJlbHkgb24gaGZsYWdzIGNvcnJlY3QgaW4gY3B1X2dldF90Yl9jcHVfc3RhdGUpCkVS
+Uk9SOiBVc2UgZ19hc3NlcnQgb3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzc1OiBGSUxFOiB0YXJn
+ZXQvYXJtL2hlbHBlci5jOjEyOTgyOgorICAgICAgICBnX2Fzc2VydF9jbXBoZXgoZmxhZ3MsID09
+LCBjaGVja19mbGFncyk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM0IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDMvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMjIwMjQxMDYuOTE2
+Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
+PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
