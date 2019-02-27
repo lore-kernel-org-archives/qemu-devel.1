@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56034)
+Received: from eggs.gnu.org ([209.51.188.92]:56155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gyzg0-0006v6-B2
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:55:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1gyzgW-0007Mh-8z
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gyzfy-0004o1-9U
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:55:12 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:33815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gyzfu-0004G1-G5
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:55:08 -0500
-Received: by mail-qt1-f195.google.com with SMTP id w4so19262122qtc.1
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 05:55:01 -0800 (PST)
-Date: Wed, 27 Feb 2019 08:54:58 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190227085442-mutt-send-email-mst@kernel.org>
-References: <20190226073159.13434-1-richardw.yang@linux.intel.com>
-	<bf6ad77d-6514-57b3-141b-530f46500b57@redhat.com>
-	<20190227030715.GA5449@richard>
+	(envelope-from <berrange@redhat.com>) id 1gyzgU-0005Gz-Su
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:55:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyzgU-0005G1-LU
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:55:42 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E9D182DB72B
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 13:55:41 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 27 Feb 2019 13:55:22 +0000
+Message-Id: <20190227135523.16952-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190227030715.GA5449@richard>
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: use __ATTR_RO_MODE to define rev
- sysfs
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/1] chardev: support for authorization control
+ on TLS connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, somlo@cmu.edu
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On Wed, Feb 27, 2019 at 11:07:16AM +0800, Wei Yang wrote:
-> On Tue, Feb 26, 2019 at 07:45:46PM +0100, Philippe Mathieu-Daudé wrote:
-> >Hi Wei,
-> >
-> >On 2/26/19 8:31 AM, Wei Yang wrote:
-> >> Leverage __ATTR_RO_MODE to define rev sysfs instead of using open code
-> >> to define the attribute.
-> >> 
-> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> >> ---
-> >>  drivers/firmware/qemu_fw_cfg.c | 13 ++++---------
-> >>  1 file changed, 4 insertions(+), 9 deletions(-)
-> >> 
-> >> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
-> >> index 039e0f91dba8..a1293cbd7adb 100644
-> >> --- a/drivers/firmware/qemu_fw_cfg.c
-> >> +++ b/drivers/firmware/qemu_fw_cfg.c
-> >> @@ -296,18 +296,13 @@ static int fw_cfg_do_platform_probe(struct platform_device *pdev)
-> >>  	return 0;
-> >>  }
-> >>  
-> >> -static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, char *buf)
-> >> +static ssize_t fw_cfg_rev_show(struct kobject *k, struct kobj_attribute *a,
-> >> +			       char *buf)
-> >>  {
-> >>  	return sprintf(buf, "%u\n", fw_cfg_rev);
-> >>  }
-> >> -
-> >> -static const struct {
-> >> -	struct attribute attr;
-> >> -	ssize_t (*show)(struct kobject *k, struct attribute *a, char *buf);
-> >> -} fw_cfg_rev_attr = {
-> >> -	.attr = { .name = "rev", .mode = S_IRUSR },
-> >> -	.show = fw_cfg_showrev,
-> >> -};
-> >> +static const struct kobj_attribute fw_cfg_rev_attr =
-> >> +	__ATTR_RO_MODE(fw_cfg_rev, 0400);
-> >
-> >Why not keep S_IRUSR?
-> >
-> 
-> Because scripts/checkpatch.pl suggest not use S_IRUSR :-)
-> 
-> I am not sure about the particular reason.
+This series provides the chardev part of the authorization control series
+previously posted as:
 
-Oh yea.
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04482.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05727.html
+  v3: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01639.html
+  v4: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04319.html
 
-http://lkml.kernel.org/r/CA+55aFw5v23T-zvDZp-MmD_EYxF8WbafwwB59934FV7g21uMGQ@mail.gmail.com
+The core authz framework is now merged & this patch has previously
+had positive review, but I removed the r-b due to need for changes
+to resolve merge conflicts with current chardev code. I expect this
+is none the less ready for the chardev tree, should the maintainer
+consider it acceptable.
 
-maybe mention this in the commit log.
+Daniel P. Berrang=C3=A9 (1):
+  chardev: add support for authorization for TLS clients
 
-> >>  
-> >>  /* fw_cfg_sysfs_entry type */
-> >>  struct fw_cfg_sysfs_entry {
-> >> 
-> 
-> -- 
-> Wei Yang
-> Help you, Help me
+ chardev/char-socket.c | 12 +++++++++++-
+ chardev/char.c        |  3 +++
+ qapi/char.json        |  6 ++++++
+ qemu-options.hx       |  9 +++++++--
+ 4 files changed, 27 insertions(+), 3 deletions(-)
+
+--=20
+2.20.1
