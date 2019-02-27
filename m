@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35500)
+Received: from eggs.gnu.org ([209.51.188.92]:35558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz8Co-0003jf-Qw
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:01:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8Cy-0003nm-5P
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:01:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz8Co-0001z9-0L
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:01:38 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43076)
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8Cw-00026D-6w
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:01:48 -0500
+Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:43634)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gz8Cn-0001uW-Lq
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:01:37 -0500
-Received: by mail-pg1-x544.google.com with SMTP id l11so8667664pgq.10
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:01:33 -0800 (PST)
+	id 1gz8Cu-00024S-CC
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:01:44 -0500
+Received: by mail-pf1-x432.google.com with SMTP id q17so8709360pfh.10
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:01:44 -0800 (PST)
 References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-8-david@redhat.com>
-	<28395326-e599-45e0-ebbb-0758fc593284@redhat.com>
+	<20190226113915.20150-9-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <04397ac3-4efb-115c-9d3d-7c9d0581f8ab@linaro.org>
-Date: Wed, 27 Feb 2019 07:29:22 -0800
+Message-ID: <23a43b55-4902-0440-8243-62aaff19c83a@linaro.org>
+Date: Wed, 27 Feb 2019 07:39:47 -0800
 MIME-Version: 1.0
-In-Reply-To: <28395326-e599-45e0-ebbb-0758fc593284@redhat.com>
+In-Reply-To: <20190226113915.20150-9-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 07/33] s390x/tcg: Implement VECTOR
- GENERATE MASK
+Subject: Re: [Qemu-devel] [PATCH v1 08/33] s390x/tcg: Implement VECTOR LOAD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +34,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 2/26/19 1:16 PM, David Hildenbrand wrote:
->> +    tmp = tcg_temp_new_i64();
->> +    tcg_gen_movi_i64(tmp, mask);
->> +    gen_gvec_dup_i64(es, get_field(s->fields, v1), tmp);
-> Richard, shall I better convert this into
-> 
-> switch (es) {
-> case MO_8:
-> 	tcg_gen_gvec_dup8i(..., 16, 16, mask)
-> 	break;
-> case MO_16:
-> 	tcg_gen_gvec_dup16i(..., 16, 16, mask)
-> 	break;
-> ...
-> };
-> 
-> ?
+On 2/26/19 3:38 AM, David Hildenbrand wrote:
+> +static DisasJumpType op_vl(DisasContext *s, DisasOps *o)
+> +{
+> +    load_vec_element(s, TMP_VREG_0, 0, o->addr1, MO_64);
+> +    gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
+> +    load_vec_element(s, TMP_VREG_0, 1, o->addr1, MO_64);
+> +    gen_gvec_mov(get_field(s->fields, v1), TMP_VREG_0);
+> +    return DISAS_NEXT;
+> +}
 
-Yes, that would be better.
+Isn't it just as easy to load two TCGv_i64 temps and store into the correct
+vector afterward?
 
-I see code in tcg/optimizer.c that should have propagated the constant, but
-it's better to emit the correct opcode in the first place when it is easy like
-this.
+Also, it is easy to honor the required alignment:
 
-With that,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org
+    TCGMemOp mop1, mop2;
+
+    if (m3 < 3) {
+        mop1 = mop2 = MO_TEQ;
+    } else if (m3 == 3) {
+        mop1 = mop2 = MO_TEQ | MO_ALIGN;
+    } else {
+        mop1 = MO_TEQ | MO_ALIGN_16;
+        mop2 = MO_TEQ | MO_ALIGN;
+    }
+    tcg_gen_qemu_ld_i64(tmp1, o->addr1, mem_idx, mop1);
+    gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
+    tcg_gen_qemu_ld_i64(tmp2, o->addr1, mem_idx, mop2);
+    write_vec_element_i64(tmp1, v1, 0, MO_64);
+    write_vec_element_i64(tmp2, v1, 1, MO_64);
+
 
 r~
