@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44790)
+Received: from eggs.gnu.org ([209.51.188.92]:44906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyzA3-0007VJ-FL
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:22:12 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gyzAA-0007br-5i
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:22:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyzA2-0008FE-K8
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:22:11 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 27 Feb 2019 12:47:19 +0000
-Message-ID: <1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-	<20181214134240.217870-6-vsementsov@virtuozzo.com>
-	<15e27f9f-8788-66ce-7843-0922662e42b1@redhat.com>
-In-Reply-To: <15e27f9f-8788-66ce-7843-0922662e42b1@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D84D4DFC69D4854AA9CF88A125586C56@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kraxel@redhat.com>) id 1gyzA9-0008If-3A
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:22:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gyzA8-0008IC-Mt
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:22:16 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C43BE3B73D
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 13:14:21 +0000 (UTC)
+Date: Wed, 27 Feb 2019 14:14:16 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190227131416.nrgt5jgvrdtyxmry@sirius.home.kraxel.org>
+References: <20190227103017.29515-1-marcandre.lureau@redhat.com>
+	<20190227103017.29515-13-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] qcow2-refcount: don't mask
- corruptions under internal errors
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190227103017.29515-13-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 12/12] contrib: add vhost-user-input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +34,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-MjcuMDIuMjAxOSAxNTo0MiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNC4xMi4xOCAxNDo0Miwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IE5vIHJlYXNvbnMgZm9yIG5v
-dCByZXBvcnRpbmcgZm91bmQgY29ycnVwdGlvbnMgYXMgY29ycnVwdGlvbnMgaW4gY2FzZQ0KPj4g
-b2Ygc29tZSBpbnRlcm5hbCBlcnJvcnMsIGVzcGVjaWFsbHkgaW4gY2FzZSBvZiBqdXN0IGZhaWxl
-ZCB0byBmaXggbDINCj4+IGVudHJ5IChhbmQgaW4gdGhpcyBjYXNlLCBtaXNzZWQgY29ycnVwdGlv
-bnMgbWF5IGluZmx1ZW5jZSBjb21wYXJpbmcNCj4+IGxvZ2ljLCB3aGVuIHdlIGNhbGN1bGF0ZSBk
-aWZmZXJlbmNlIGJldHdlZW4gY29ycnVwdGlvbnMgZmllbGRzIG9mIHR3bw0KPj4gcmVzdWx0cykN
-Cj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2Vt
-ZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2svcWNvdzItcmVmY291bnQu
-YyB8IDMxICsrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0NCj4+ICAgMSBmaWxlIGNoYW5n
-ZWQsIDE0IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQg
-YS9ibG9jay9xY293Mi1yZWZjb3VudC5jIGIvYmxvY2svcWNvdzItcmVmY291bnQuYw0KPj4gaW5k
-ZXggOGRhMGU5MWRkMy4uYjBlMDA2ZTYyOCAxMDA2NDQNCj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLXJl
-ZmNvdW50LmMNCj4+ICsrKyBiL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMNCj4gDQo+IFsuLi5dDQo+
-IA0KPj4gQEAgLTE4OTksMTkgKzE4OTksMTYgQEAgc3RhdGljIGludCBjaGVja19vZmxhZ19jb3Bp
-ZWQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEJkcnZDaGVja1Jlc3VsdCAqcmVzLA0KPj4gICAgICAg
-ICAgICAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiJXMgT0ZMQUdfQ09QSUVEIGRhdGEgY2x1
-c3RlcjogIg0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgImwyX2VudHJ5PSUiIFBS
-SXg2NCAiIHJlZmNvdW50PSUiIFBSSXU2NCAiXG4iLA0KPj4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgcmVwYWlyID8gIlJlcGFpcmluZyIgOiAiRVJST1IiLCBsMl9lbnRyeSwgcmVmY291
-bnQpOw0KPj4gLSAgICAgICAgICAgICAgICAgICAgaWYgKHJlcGFpcikgew0KPj4gLSAgICAgICAg
-ICAgICAgICAgICAgICAgIGwyX3RhYmxlW2pdID0gY3B1X3RvX2JlNjQocmVmY291bnQgPT0gMQ0K
-Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID8gbDJfZW50cnkgfCAgUUNP
-V19PRkxBR19DT1BJRUQNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6
-IGwyX2VudHJ5ICYgflFDT1dfT0ZMQUdfQ09QSUVEKTsNCj4+IC0gICAgICAgICAgICAgICAgICAg
-ICAgICBsMl9kaXJ0eSsrOw0KPj4gLSAgICAgICAgICAgICAgICAgICAgfSBlbHNlIHsNCj4+IC0g
-ICAgICAgICAgICAgICAgICAgICAgICByZXMtPmNvcnJ1cHRpb25zKys7DQo+PiAtICAgICAgICAg
-ICAgICAgICAgICB9DQo+PiArICAgICAgICAgICAgICAgICAgICBsMl90YWJsZVtqXSA9IGNwdV90
-b19iZTY0KHJlZmNvdW50ID09IDENCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ID8gbDJfZW50cnkgfCAgUUNPV19PRkxBR19DT1BJRUQNCj4+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIDogbDJfZW50cnkgJiB+UUNPV19PRkxBR19DT1BJRUQpOw0KPj4gKyAgICAg
-ICAgICAgICAgICAgICAgbDJfZGlydHkrKzsNCj4gDQo+IEkgZm91bmQgdGhlIG9sZCBsb2dpYyB0
-byBiZSBlYXNpZXIgdG8gdW5kZXJzdGFuZCwgYWN0dWFsbHkuICBJdCBtYWRlIGl0DQo+IGNsZWFy
-IHRoYXQgaWYgIXJlcGFpciwgdGhlIEwyIHRhYmxlIGlzIG5vdCBnb2luZyB0byBiZSB0b3VjaGVk
-Lg0KPiANCj4gTWF4DQo+IA0KDQpzbywNCg0KICAgaWYgKHJlcGFpcikgew0KICAgICAga2VlcCBh
-cyBpcw0KICAgfQ0KICAgcmVzLT5jb3JydXB0aW9ucysrOw0KDQpvaz8NCg0KDQotLSANCkJlc3Qg
-cmVnYXJkcywNClZsYWRpbWlyDQo=
+On Wed, Feb 27, 2019 at 11:30:17AM +0100, Marc-Andr=E9 Lureau wrote:
+> Add a vhost-user input backend example, based on virtio-input-host
+> device. It takes an evdev path as argument, and can be associated with
+> a vhost-user-input device via a UNIX socket:
+>=20
+> $ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
+>=20
+> $ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
+>   -device vhost-user-input-pci,chardev=3Dvuic
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
