@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51496)
+Received: from eggs.gnu.org ([209.51.188.92]:51501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gz2wT-0003fS-Oi
+	(envelope-from <kwolf@redhat.com>) id 1gz2wT-0003fX-PQ
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:24:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gz2wO-0003er-6M
+	(envelope-from <kwolf@redhat.com>) id 1gz2wO-0003et-6z
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:24:25 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 27 Feb 2019 18:22:45 +0100
-Message-Id: <20190227172256.30368-10-kwolf@redhat.com>
+Date: Wed, 27 Feb 2019 18:22:38 +0100
+Message-Id: <20190227172256.30368-3-kwolf@redhat.com>
 In-Reply-To: <20190227172256.30368-1-kwolf@redhat.com>
 References: <20190227172256.30368-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 09/20] qcow2: Return 0/-errno in
- qcow2_alloc_compressed_cluster_offset()
+Subject: [Qemu-devel] [PATCH 02/20] qcow2: Simplify preallocation code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,178 +24,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-qcow2_alloc_compressed_cluster_offset() used to return the cluster
-offset for success and 0 for error. This doesn't only conflict with 0 as
-a valid host offset, but also loses the error code.
-
-Similar to the change made to qcow2_alloc_cluster_offset() for
-uncompressed clusters in commit 148da7ea9d6, make the function return
-0/-errno and return the allocated cluster offset in a by-reference
-parameter.
+Image creation already involves a bdrv_co_truncate() call, which allows
+to specify a preallocation mode. Just pass the right mode there and
+remove the code that is made redundant by this.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2.h              |  7 ++++---
- block/qcow2-cluster.c      | 28 +++++++++++++---------------
- block/qcow2.c              | 19 ++++++++-----------
- tests/qemu-iotests/220.out |  2 +-
- 4 files changed, 26 insertions(+), 30 deletions(-)
+ block/qcow2.c | 28 +---------------------------
+ 1 file changed, 1 insertion(+), 27 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index e3bf322be1..fad6abf602 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -647,9 +647,10 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, u=
-int64_t offset,
- int qcow2_alloc_cluster_offset(BlockDriverState *bs, uint64_t offset,
-                                unsigned int *bytes, uint64_t *host_offse=
-t,
-                                QCowL2Meta **m);
--uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
--                                         uint64_t offset,
--                                         int compressed_size);
-+int qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-+                                          uint64_t offset,
-+                                          int compressed_size,
-+                                          uint64_t *host_offset);
-=20
- int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
- void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m);
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 1d09f5454e..8c4b4005ff 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -736,19 +736,16 @@ static int get_cluster_table(BlockDriverState *bs, =
-uint64_t offset,
- /*
-  * alloc_compressed_cluster_offset
-  *
-- * For a given offset of the disk image, return cluster offset in
-- * qcow2 file.
-- *
-- * If the offset is not found, allocate a new compressed cluster.
-- *
-- * Return the cluster offset if successful,
-- * Return 0, otherwise.
-+ * For a given offset on the virtual disk, allocate a new compressed clu=
-ster
-+ * and put the host offset of the cluster into *host_offset. If a cluste=
-r is
-+ * already allocated at the offset, return an error.
-  *
-+ * Return 0 on success and -errno in error cases
-  */
--
--uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
--                                               uint64_t offset,
--                                               int compressed_size)
-+int qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-+                                          uint64_t offset,
-+                                          int compressed_size,
-+                                          uint64_t *host_offset)
- {
-     BDRVQcow2State *s =3D bs->opaque;
-     int l2_index, ret;
-@@ -758,7 +755,7 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockD=
-riverState *bs,
-=20
-     ret =3D get_cluster_table(bs, offset, &l2_slice, &l2_index);
-     if (ret < 0) {
--        return 0;
-+        return ret;
-     }
-=20
-     /* Compression can't overwrite anything. Fail if the cluster was alr=
-eady
-@@ -766,13 +763,13 @@ uint64_t qcow2_alloc_compressed_cluster_offset(Bloc=
-kDriverState *bs,
-     cluster_offset =3D be64_to_cpu(l2_slice[l2_index]);
-     if (cluster_offset & L2E_OFFSET_MASK) {
-         qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
--        return 0;
-+        return -EIO;
-     }
-=20
-     cluster_offset =3D qcow2_alloc_bytes(bs, compressed_size);
-     if (cluster_offset < 0) {
-         qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
--        return 0;
-+        return cluster_offset;
-     }
-=20
-     nb_csectors =3D ((cluster_offset + compressed_size - 1) >> 9) -
-@@ -790,7 +787,8 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockD=
-riverState *bs,
-     l2_slice[l2_index] =3D cpu_to_be64(cluster_offset);
-     qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-=20
--    return cluster_offset;
-+    *host_offset =3D cluster_offset & s->cluster_offset_mask;
-+    return 0;
- }
-=20
- static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
 diff --git a/block/qcow2.c b/block/qcow2.c
-index c2e3a31d1d..11ff5e0434 100644
+index 1de5e24613..e38041e817 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -3885,17 +3885,16 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs,=
- uint64_t offset,
-     int ret;
-     size_t out_len;
-     uint8_t *buf, *out_buf;
--    int64_t cluster_offset;
-+    uint64_t cluster_offset;
+@@ -2940,19 +2940,6 @@ qcow2_co_create(BlockdevCreateOptions *create_opti=
+ons, Error **errp)
+         goto out;
+     }
 =20
-     if (bytes =3D=3D 0) {
-         /* align end of file to a sector boundary to ease reading with
-            sector based I/Os */
--        cluster_offset =3D bdrv_getlength(bs->file->bs);
--        if (cluster_offset < 0) {
--            return cluster_offset;
-+        int64_t len =3D bdrv_getlength(bs->file->bs);
-+        if (len < 0) {
-+            return len;
+-    if (qcow2_opts->preallocation =3D=3D PREALLOC_MODE_FULL ||
+-        qcow2_opts->preallocation =3D=3D PREALLOC_MODE_FALLOC)
+-    {
+-        int64_t prealloc_size =3D
+-            qcow2_calc_prealloc_size(qcow2_opts->size, cluster_size,
+-                                     refcount_order);
+-
+-        ret =3D blk_truncate(blk, prealloc_size, qcow2_opts->preallocati=
+on, errp);
+-        if (ret < 0) {
+-            goto out;
+-        }
+-    }
+-
+     /* Write the header */
+     QEMU_BUILD_BUG_ON((1 << MIN_CLUSTER_BITS) < sizeof(*header));
+     header =3D g_malloc0(cluster_size);
+@@ -3034,7 +3021,7 @@ qcow2_co_create(BlockdevCreateOptions *create_optio=
+ns, Error **errp)
+     }
+=20
+     /* Okay, now that we have a valid image, let's give it the right siz=
+e */
+-    ret =3D blk_truncate(blk, qcow2_opts->size, PREALLOC_MODE_OFF, errp)=
+;
++    ret =3D blk_truncate(blk, qcow2_opts->size, qcow2_opts->preallocatio=
+n, errp);
+     if (ret < 0) {
+         error_prepend(errp, "Could not resize image: ");
+         goto out;
+@@ -3066,19 +3053,6 @@ qcow2_co_create(BlockdevCreateOptions *create_opti=
+ons, Error **errp)
          }
--        return bdrv_co_truncate(bs->file, cluster_offset, PREALLOC_MODE_=
-OFF,
--                                NULL);
-+        return bdrv_co_truncate(bs->file, len, PREALLOC_MODE_OFF, NULL);
      }
 =20
-     if (offset_into_cluster(s, offset)) {
-@@ -3932,14 +3931,12 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs,=
- uint64_t offset,
-     }
+-    /* And if we're supposed to preallocate metadata, do that now */
+-    if (qcow2_opts->preallocation !=3D PREALLOC_MODE_OFF) {
+-        BDRVQcow2State *s =3D blk_bs(blk)->opaque;
+-        qemu_co_mutex_lock(&s->lock);
+-        ret =3D preallocate_co(blk_bs(blk), 0, qcow2_opts->size);
+-        qemu_co_mutex_unlock(&s->lock);
+-
+-        if (ret < 0) {
+-            error_setg_errno(errp, -ret, "Could not preallocate metadata=
+");
+-            goto out;
+-        }
+-    }
+-
+     blk_unref(blk);
+     blk =3D NULL;
 =20
-     qemu_co_mutex_lock(&s->lock);
--    cluster_offset =3D
--        qcow2_alloc_compressed_cluster_offset(bs, offset, out_len);
--    if (!cluster_offset) {
-+    ret =3D qcow2_alloc_compressed_cluster_offset(bs, offset, out_len,
-+                                                &cluster_offset);
-+    if (ret < 0) {
-         qemu_co_mutex_unlock(&s->lock);
--        ret =3D -EIO;
-         goto fail;
-     }
--    cluster_offset &=3D s->cluster_offset_mask;
-=20
-     ret =3D qcow2_pre_write_overlap_check(bs, 0, cluster_offset, out_len=
-);
-     qemu_co_mutex_unlock(&s->lock);
-diff --git a/tests/qemu-iotests/220.out b/tests/qemu-iotests/220.out
-index af3021fd88..33b994b8a1 100644
---- a/tests/qemu-iotests/220.out
-+++ b/tests/qemu-iotests/220.out
-@@ -38,7 +38,7 @@ wrote 2097152/2097152 bytes at offset 37748736
- No errors were found on the image.
- image size 39845888
- =3D=3D Trying to write compressed cluster =3D=3D
--write failed: Input/output error
-+write failed: File too large
- image size 562949957615616
- =3D=3D Writing normal cluster =3D=3D
- wrote 2097152/2097152 bytes at offset 0
 --=20
 2.20.1
