@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51910)
+Received: from eggs.gnu.org ([209.51.188.92]:51906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gz2wm-00040z-T2
+	(envelope-from <kwolf@redhat.com>) id 1gz2wm-00040w-RQ
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:24:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gz2wi-00042j-EA
+	(envelope-from <kwolf@redhat.com>) id 1gz2wi-00042y-Ef
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:24:44 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 27 Feb 2019 18:22:52 +0100
-Message-Id: <20190227172256.30368-17-kwolf@redhat.com>
+Date: Wed, 27 Feb 2019 18:22:55 +0100
+Message-Id: <20190227172256.30368-20-kwolf@redhat.com>
 In-Reply-To: <20190227172256.30368-1-kwolf@redhat.com>
 References: <20190227172256.30368-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 16/20] qcow2: Store data file name in the image
+Subject: [Qemu-devel] [PATCH 19/20] qemu-iotests: General tests for qcow2
+ with external data file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,537 +25,397 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-Rather than requiring that the external data file node is passed
-explicitly when creating the qcow2 node, store the filename in the
-designated header extension during .bdrv_create and read it from there
-as a default during .bdrv_open.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json       |  8 +++-
- block/qcow2.h              |  1 +
- block/qcow2.c              | 94 +++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/082.out | 27 +++++++++++
- 4 files changed, 128 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/244     | 200 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/244.out | 125 +++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 326 insertions(+)
+ create mode 100755 tests/qemu-iotests/244
+ create mode 100644 tests/qemu-iotests/244.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 2303266bc4..e6faa94fa2 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -59,6 +59,9 @@
- #
- # @compat: compatibility level
- #
-+# @data-file: the filename of the external data file that is stored in t=
-he
-+#             image and used as a default for opening the image (since: =
-4.0)
+diff --git a/tests/qemu-iotests/244 b/tests/qemu-iotests/244
+new file mode 100755
+index 0000000000..d8e7122305
+--- /dev/null
++++ b/tests/qemu-iotests/244
+@@ -0,0 +1,200 @@
++#!/bin/bash
 +#
- # @lazy-refcounts: on or off; only valid for compat >=3D 1.1
- #
- # @corrupt: true if the image has been marked corrupt; only valid for
-@@ -76,6 +79,7 @@
- { 'struct': 'ImageInfoSpecificQCow2',
-   'data': {
-       'compat': 'str',
-+      '*data-file': 'str',
-       '*lazy-refcounts': 'bool',
-       '*corrupt': 'bool',
-       'refcount-bits': 'int',
-@@ -3082,7 +3086,9 @@
- #
- # @data-file:             reference to or definition of the external dat=
-a file.
- #                         This may only be specified for images that req=
-uire an
--#                         external data file. (since 4.0)
-+#                         external data file. If it is not specified for=
- such
-+#                         an image, the data file name is loaded from th=
-e image
-+#                         file. (since 4.0)
- #
- # Since: 2.9
- ##
-diff --git a/block/qcow2.h b/block/qcow2.h
-index f23c003a46..a9c9cb4a26 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -343,6 +343,7 @@ typedef struct BDRVQcow2State {
-      * override) */
-     char *image_backing_file;
-     char *image_backing_format;
-+    char *image_data_file;
-=20
-     CoQueue compress_wait_queue;
-     int nb_compress_threads;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a6144689ea..24c023e13d 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -398,6 +398,21 @@ static int qcow2_read_extensions(BlockDriverState *b=
-s, uint64_t start_offset,
- #endif
-             break;
-=20
-+        case QCOW2_EXT_MAGIC_DATA_FILE:
-+        {
-+            s->image_data_file =3D g_malloc0(ext.len + 1);
-+            ret =3D bdrv_pread(bs->file, offset, s->image_data_file, ext=
-.len);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret,
-+                                 "ERROR: Could not read data file name")=
-;
-+                return ret;
-+            }
-+#ifdef DEBUG_EXT
-+            printf("Qcow2: Got external data file %s\n", s->image_data_f=
-ile);
-+#endif
-+            break;
-+        }
++# Test qcow2 with external data files
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-         default:
-             /* unknown magic - save it in case we need to rewrite the he=
-ader */
-             /* If you add a new feature, make sure to also update the fa=
-st
-@@ -1451,6 +1466,15 @@ static int coroutine_fn qcow2_do_open(BlockDriverS=
-tate *bs, QDict *options,
-     }
-=20
-     if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
-+        if (!s->data_file && s->image_data_file) {
-+            s->data_file =3D bdrv_open_child(s->image_data_file, options=
-,
-+                                           "data-file", bs, &child_file,
-+                                           false, errp);
-+            if (!s->data_file) {
-+                ret =3D -EINVAL;
-+                goto fail;
-+            }
-+        }
-         if (!s->data_file) {
-             error_setg(errp, "'data-file' is required for this image");
-             ret =3D -EINVAL;
-@@ -1638,6 +1662,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverSt=
-ate *bs, QDict *options,
-     return ret;
-=20
-  fail:
-+    g_free(s->image_data_file);
-     if (has_data_file(bs)) {
-         bdrv_unref_child(bs, s->data_file);
-     }
-@@ -2257,6 +2282,7 @@ static void qcow2_close(BlockDriverState *bs)
-     g_free(s->unknown_header_fields);
-     cleanup_unknown_header_ext(bs);
-=20
-+    g_free(s->image_data_file);
-     g_free(s->image_backing_file);
-     g_free(s->image_backing_format);
-=20
-@@ -2433,6 +2459,19 @@ int qcow2_update_header(BlockDriverState *bs)
-         buflen -=3D ret;
-     }
-=20
-+    /* External data file header extension */
-+    if (has_data_file(bs) && s->image_data_file) {
-+        ret =3D header_ext_add(buf, QCOW2_EXT_MAGIC_DATA_FILE,
-+                             s->image_data_file, strlen(s->image_data_fi=
-le),
-+                             buflen);
-+        if (ret < 0) {
-+            goto fail;
-+        }
++# creator
++owner=3Dkwolf@redhat.com
 +
-+        buf +=3D ret;
-+        buflen -=3D ret;
-+    }
++seq=3D$(basename $0)
++echo "QA output created by $seq"
 +
-     /* Full disk encryption header pointer extension */
-     if (s->crypto_header.offset !=3D 0) {
-         s->crypto_header.offset =3D cpu_to_be64(s->crypto_header.offset)=
-;
-@@ -3074,6 +3113,12 @@ qcow2_co_create(BlockdevCreateOptions *create_opti=
-ons, Error **errp)
-         abort();
-     }
-=20
-+    /* Set the external data file if necessary */
-+    if (data_bs) {
-+        BDRVQcow2State *s =3D blk_bs(blk)->opaque;
-+        s->image_data_file =3D g_strdup(data_bs->filename);
-+    }
++status=3D1	# failure is the default!
 +
-     /* Create a full header (including things like feature table) */
-     ret =3D qcow2_update_header(blk_bs(blk));
-     if (ret < 0) {
-@@ -3153,6 +3198,7 @@ static int coroutine_fn qcow2_co_create_opts(const =
-char *filename, QemuOpts *opt
-     QDict *qdict;
-     Visitor *v;
-     BlockDriverState *bs =3D NULL;
-+    BlockDriverState *data_bs =3D NULL;
-     Error *local_err =3D NULL;
-     const char *val;
-     int ret;
-@@ -3216,6 +3262,26 @@ static int coroutine_fn qcow2_co_create_opts(const=
- char *filename, QemuOpts *opt
-         goto finish;
-     }
-=20
-+    /* Create and open an external data file (protocol layer) */
-+    val =3D qdict_get_try_str(qdict, BLOCK_OPT_DATA_FILE);
-+    if (val) {
-+        ret =3D bdrv_create_file(val, opts, errp);
-+        if (ret < 0) {
-+            goto finish;
-+        }
++_cleanup()
++{
++    _cleanup_test_img
++    rm -f $TEST_IMG.data
++    rm -f $TEST_IMG.src
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+        data_bs =3D bdrv_open(val, NULL, NULL,
-+                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCO=
-L,
-+                            errp);
-+        if (data_bs =3D=3D NULL) {
-+            ret =3D -EIO;
-+            goto finish;
-+        }
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
 +
-+        qdict_del(qdict, BLOCK_OPT_DATA_FILE);
-+        qdict_put_str(qdict, "data-file", data_bs->node_name);
-+    }
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
 +
-     /* Set 'driver' and 'node' options */
-     qdict_put_str(qdict, "driver", "qcow2");
-     qdict_put_str(qdict, "file", bs->node_name);
-@@ -3250,6 +3316,7 @@ static int coroutine_fn qcow2_co_create_opts(const =
-char *filename, QemuOpts *opt
- finish:
-     qobject_unref(qdict);
-     bdrv_unref(bs);
-+    bdrv_unref(data_bs);
-     qapi_free_BlockdevCreateOptions(create_options);
-     return ret;
- }
-@@ -4548,6 +4615,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(B=
-lockDriverState *bs,
-             .refcount_bits      =3D s->refcount_bits,
-             .has_bitmaps        =3D !!bitmaps,
-             .bitmaps            =3D bitmaps,
-+            .has_data_file      =3D !!s->image_data_file,
-+            .data_file          =3D g_strdup(s->image_data_file),
-         };
-     } else {
-         /* if this assertion fails, this probably means a new version wa=
-s
-@@ -4750,7 +4819,7 @@ static int qcow2_amend_options(BlockDriverState *bs=
-, QemuOpts *opts,
-     BDRVQcow2State *s =3D bs->opaque;
-     int old_version =3D s->qcow_version, new_version =3D old_version;
-     uint64_t new_size =3D 0;
--    const char *backing_file =3D NULL, *backing_format =3D NULL;
-+    const char *backing_file =3D NULL, *backing_format =3D NULL, *data_f=
-ile =3D NULL;
-     bool lazy_refcounts =3D s->use_lazy_refcounts;
-     const char *compat =3D NULL;
-     uint64_t cluster_size =3D s->cluster_size;
-@@ -4832,6 +4901,13 @@ static int qcow2_amend_options(BlockDriverState *b=
-s, QemuOpts *opts,
-                            "may not exceed 64 bits");
-                 return -EINVAL;
-             }
-+        } else if (!strcmp(desc->name, BLOCK_OPT_DATA_FILE)) {
-+            data_file =3D qemu_opt_get(opts, BLOCK_OPT_DATA_FILE);
-+            if (data_file && !has_data_file(bs)) {
-+                error_setg(errp, "data-file can only be set for images t=
-hat "
-+                                 "use an external data file");
-+                return -EINVAL;
-+            }
-         } else {
-             /* if this point is reached, this probably means a new optio=
-n was
-              * added without having it covered here */
-@@ -4878,6 +4954,17 @@ static int qcow2_amend_options(BlockDriverState *b=
-s, QemuOpts *opts,
-         }
-     }
-=20
-+    if (data_file) {
-+        g_free(s->image_data_file);
-+        s->image_data_file =3D *data_file ? g_strdup(data_file) : NULL;
-+    }
++echo
++echo "=3D=3D=3D Create and open image with external data file =3D=3D=3D"
++echo
 +
-+    ret =3D qcow2_update_header(bs);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Failed to update the image header"=
-);
-+        return ret;
-+    }
++echo "With data file name in the image:"
++IMGOPTS=3D"data_file=3D$TEST_IMG.data" _make_test_img 64M
++_check_test_img
 +
-     if (backing_file || backing_format) {
-         ret =3D qcow2_change_backing_file(bs,
-                     backing_file ?: s->image_backing_file,
-@@ -5025,6 +5112,11 @@ static QemuOptsList qcow2_create_opts =3D {
-             .type =3D QEMU_OPT_STRING,
-             .help =3D "Image format of the base image"
-         },
-+        {
-+            .name =3D BLOCK_OPT_DATA_FILE,
-+            .type =3D QEMU_OPT_STRING,
-+            .help =3D "File name of an external data file"
-+        },
-         {
-             .name =3D BLOCK_OPT_ENCRYPT,
-             .type =3D QEMU_OPT_BOOL,
-diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
-index 0ce18c075b..7dc59f6075 100644
---- a/tests/qemu-iotests/082.out
-+++ b/tests/qemu-iotests/082.out
-@@ -48,6 +48,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -69,6 +70,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -90,6 +92,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -111,6 +114,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -132,6 +136,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -153,6 +158,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -174,6 +180,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -195,6 +202,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -231,6 +239,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -304,6 +313,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -325,6 +335,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -346,6 +357,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -367,6 +379,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -388,6 +401,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -409,6 +423,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -430,6 +445,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -451,6 +467,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -487,6 +504,7 @@ Supported options:
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -568,6 +586,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -590,6 +609,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -612,6 +632,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -634,6 +655,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -656,6 +678,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -678,6 +701,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -700,6 +724,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -722,6 +747,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
-@@ -761,6 +787,7 @@ Creation options for 'qcow2':
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-   compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  data_file=3D<str>        - File name of an external data file
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
-   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
-luks'
++$QEMU_IO -c "open $TEST_IMG" -c "read -P 0 0 64k" 2>&1 | _filter_qemu_io=
+ | _filter_testdir
++$QEMU_IO -c "open -odata-file.filename=3D$TEST_IMG.data $TEST_IMG" -c "r=
+ead -P 0 0 64k" 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -c "open -odata-file.filename=3Dinexistent $TEST_IMG" -c "read =
+-P 0 0 64k" 2>&1 | _filter_qemu_io | _filter_testdir
++
++echo
++echo "Data file required, but without data file name in the image:"
++$QEMU_IMG amend -odata_file=3D $TEST_IMG
++
++$QEMU_IO -c "open $TEST_IMG" -c "read -P 0 0 64k" 2>&1 | _filter_qemu_io=
+ | _filter_testdir
++$QEMU_IO -c "open -odata-file.filename=3D$TEST_IMG.data $TEST_IMG" -c "r=
+ead -P 0 0 64k" 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -c "open -odata-file.filename=3Dinexistent $TEST_IMG" -c "read =
+-P 0 0 64k" 2>&1 | _filter_qemu_io | _filter_testdir
++
++echo
++echo "Setting data-file for an image with internal data:"
++_make_test_img 64M
++
++$QEMU_IO -c "open -odata-file.filename=3D$TEST_IMG.data $TEST_IMG" -c "r=
+ead -P 0 0 64k" 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -c "open -odata-file.filename=3Dinexistent $TEST_IMG" -c "read =
+-P 0 0 64k" 2>&1 | _filter_qemu_io | _filter_testdir
++
++echo
++echo "=3D=3D=3D Conflicting features =3D=3D=3D"
++echo
++
++echo "Convert to compressed target with data file:"
++TEST_IMG=3D"$TEST_IMG.src" _make_test_img 64M
++
++$QEMU_IO -c 'write -P 0x11 0 1M' \
++         -f $IMGFMT "$TEST_IMG.src" |
++         _filter_qemu_io
++
++$QEMU_IMG convert -f $IMGFMT -O $IMGFMT -c -odata_file=3D"$TEST_IMG.data=
+" \
++    "$TEST_IMG.src" "$TEST_IMG"
++
++echo
++echo "Convert uncompressed, then write compressed data manually:"
++$QEMU_IMG convert -f $IMGFMT -O $IMGFMT -odata_file=3D"$TEST_IMG.data" \
++    "$TEST_IMG.src" "$TEST_IMG"
++$QEMU_IMG compare "$TEST_IMG.src" "$TEST_IMG"
++
++$QEMU_IO -c 'write -c -P 0x22 0 1M' \
++         -f $IMGFMT "$TEST_IMG" |
++         _filter_qemu_io
++_check_test_img
++
++echo
++echo "Take an internal snapshot:"
++
++$QEMU_IMG snapshot -c test "$TEST_IMG"
++_check_test_img
++
++echo
++echo "=3D=3D=3D Standalone image with external data file (efficient) =3D=
+=3D=3D"
++echo
++
++IMGOPTS=3D"data_file=3D$TEST_IMG.data" _make_test_img 64M
++
++echo -n "qcow2 file size before I/O: "
++du -b $TEST_IMG | cut -f1
++
++# Create image with the following layout
++# 0-1 MB: Unallocated
++# 1-2 MB: Written (pattern 0x11)
++# 2-3 MB: Discarded
++# 3-4 MB: Zero write over discarded space
++# 4-5 MB: Zero write over written space
++# 5-6 MB: Zero write over unallocated space
++
++echo
++$QEMU_IO -c 'write -P 0x11 1M 4M' \
++         -c 'discard 2M 2M' \
++         -c 'write -z 3M 3M' \
++         -f $IMGFMT "$TEST_IMG" |
++         _filter_qemu_io
++_check_test_img
++
++echo
++$QEMU_IMG map --output=3Djson "$TEST_IMG"
++
++echo
++$QEMU_IO -c 'read -P 0 0 1M' \
++         -c 'read -P 0x11 1M 1M' \
++         -c 'read -P 0 2M 4M' \
++         -f $IMGFMT "$TEST_IMG" |
++         _filter_qemu_io
++
++# Zero clusters are only marked as such in the qcow2 metadata, but conta=
+in
++# stale data in the external data file
++echo
++$QEMU_IO -c 'read -P 0 0 1M' \
++         -c 'read -P 0x11 1M 1M' \
++         -c 'read -P 0 2M 2M' \
++         -c 'read -P 0x11 4M 1M' \
++         -c 'read -P 0 5M 1M' \
++         -f raw "$TEST_IMG.data" |
++         _filter_qemu_io
++
++
++echo -n "qcow2 file size after I/O: "
++du -b $TEST_IMG | cut -f1
++
++echo
++echo "=3D=3D=3D Standalone image with external data file (valid raw) =3D=
+=3D=3D"
++echo
++
++IMGOPTS=3D"data_file=3D$TEST_IMG.data,data_file_raw=3Don" _make_test_img=
+ 64M
++
++echo -n "qcow2 file size before I/O: "
++du -b $TEST_IMG | cut -f1
++
++echo
++$QEMU_IO -c 'write -P 0x11 1M 4M' \
++         -c 'discard 2M 2M' \
++         -c 'write -z 3M 3M' \
++         -f $IMGFMT "$TEST_IMG" |
++         _filter_qemu_io
++_check_test_img
++
++echo
++$QEMU_IMG map --output=3Djson "$TEST_IMG"
++
++echo
++$QEMU_IO -c 'read -P 0 0 1M' \
++         -c 'read -P 0x11 1M 1M' \
++         -c 'read -P 0 2M 4M' \
++         -f $IMGFMT "$TEST_IMG" |
++         _filter_qemu_io
++
++echo
++$QEMU_IMG compare "$TEST_IMG" "$TEST_IMG.data"
++
++echo -n "qcow2 file size after I/O: "
++du -b $TEST_IMG | cut -f1
++
++echo
++echo "=3D=3D=3D bdrv_co_block_status test for file and offset=3D0 =3D=3D=
+=3D"
++echo
++
++IMGOPTS=3D"data_file=3D$TEST_IMG.data" _make_test_img 64M
++
++$QEMU_IO -c 'write -P 0x11 0 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_i=
+o
++$QEMU_IO -c 'read -P 0x11 0 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=3Dhuman "$TEST_IMG" | _filter_testdir
++$QEMU_IMG map --output=3Djson "$TEST_IMG"
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/244.out b/tests/qemu-iotests/244.out
+new file mode 100644
+index 0000000000..98e5946976
+--- /dev/null
++++ b/tests/qemu-iotests/244.out
+@@ -0,0 +1,125 @@
++QA output created by 244
++
++=3D=3D=3D Create and open image with external data file =3D=3D=3D
++
++With data file name in the image:
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3D=
+TEST_DIR/t.IMGFMT.data
++No errors were found on the image.
++read 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++can't open device TEST_DIR/t.qcow2: Could not open 'inexistent': No such=
+ file or directory
++no file open, try 'help open'
++
++Data file required, but without data file name in the image:
++can't open device TEST_DIR/t.qcow2: 'data-file' is required for this ima=
+ge
++no file open, try 'help open'
++read 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++can't open device TEST_DIR/t.qcow2: Could not open 'inexistent': No such=
+ file or directory
++no file open, try 'help open'
++
++Setting data-file for an image with internal data:
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
++can't open device TEST_DIR/t.qcow2: 'data-file' can only be set for imag=
+es with an external data file
++no file open, try 'help open'
++can't open device TEST_DIR/t.qcow2: Could not open 'inexistent': No such=
+ file or directory
++no file open, try 'help open'
++
++=3D=3D=3D Conflicting features =3D=3D=3D
++
++Convert to compressed target with data file:
++Formatting 'TEST_DIR/t.IMGFMT.src', fmt=3DIMGFMT size=3D67108864
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++qemu-img: error while writing sector 0: Operation not supported
++
++Convert uncompressed, then write compressed data manually:
++Images are identical.
++write failed: Operation not supported
++No errors were found on the image.
++
++Take an internal snapshot:
++qemu-img: Could not create snapshot 'test': -95 (Operation not supported=
+)
++No errors were found on the image.
++
++=3D=3D=3D Standalone image with external data file (efficient) =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3D=
+TEST_DIR/t.IMGFMT.data
++qcow2 file size before I/O: 196616
++
++wrote 4194304/4194304 bytes at offset 1048576
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 2097152/2097152 bytes at offset 2097152
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 3145728/3145728 bytes at offset 3145728
++3 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++No errors were found on the image.
++
++[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fals=
+e},
++{ "start": 1048576, "length": 1048576, "depth": 0, "zero": false, "data"=
+: true, "offset": 1048576},
++{ "start": 2097152, "length": 2097152, "depth": 0, "zero": true, "data":=
+ false},
++{ "start": 4194304, "length": 1048576, "depth": 0, "zero": true, "data":=
+ false, "offset": 4194304},
++{ "start": 5242880, "length": 61865984, "depth": 0, "zero": true, "data"=
+: false}]
++
++read 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1048576/1048576 bytes at offset 1048576
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4194304/4194304 bytes at offset 2097152
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++read 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1048576/1048576 bytes at offset 1048576
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 2097152/2097152 bytes at offset 2097152
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1048576/1048576 bytes at offset 4194304
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1048576/1048576 bytes at offset 5242880
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++qcow2 file size after I/O: 327680
++
++=3D=3D=3D Standalone image with external data file (valid raw) =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3D=
+TEST_DIR/t.IMGFMT.data data_file_raw=3Don
++qcow2 file size before I/O: 196616
++
++wrote 4194304/4194304 bytes at offset 1048576
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 2097152/2097152 bytes at offset 2097152
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 3145728/3145728 bytes at offset 3145728
++3 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++No errors were found on the image.
++
++[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fals=
+e},
++{ "start": 1048576, "length": 1048576, "depth": 0, "zero": false, "data"=
+: true, "offset": 1048576},
++{ "start": 2097152, "length": 2097152, "depth": 0, "zero": true, "data":=
+ false},
++{ "start": 4194304, "length": 1048576, "depth": 0, "zero": true, "data":=
+ false, "offset": 4194304},
++{ "start": 5242880, "length": 61865984, "depth": 0, "zero": true, "data"=
+: false}]
++
++read 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1048576/1048576 bytes at offset 1048576
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4194304/4194304 bytes at offset 2097152
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++Images are identical.
++qcow2 file size after I/O: 327680
++
++=3D=3D=3D bdrv_co_block_status test for file and offset=3D0 =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3D=
+TEST_DIR/t.IMGFMT.data
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          Mapped to       File
++0               0x100000        0               TEST_DIR/t.qcow2.data
++[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data": tru=
+e, "offset": 0},
++{ "start": 1048576, "length": 66060288, "depth": 0, "zero": true, "data"=
+: false}]
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 03aa93dbf5..36100b803c 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -242,3 +242,4 @@
+ 240 auto quick
+ 242 rw auto quick
+ 243 rw auto quick
++244 rw auto quick
 --=20
 2.20.1
