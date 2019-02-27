@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56850)
+Received: from eggs.gnu.org ([209.51.188.92]:56928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gywcJ-0000dZ-0Y
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:11 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gywcQ-0000lX-Q4
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gywcH-0005OE-39
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gywcF-0005Mz-Pe
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:09 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 68400C0AC924
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:30:44 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 27 Feb 2019 11:30:09 +0100
-Message-Id: <20190227103017.29515-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20190227103017.29515-1-marcandre.lureau@redhat.com>
-References: <20190227103017.29515-1-marcandre.lureau@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gywcO-0005U8-S1
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:18 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44617)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gywcM-0005QU-VU
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:16 -0500
+Received: by mail-wr1-f66.google.com with SMTP id w2so17321109wrt.11
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 02:39:13 -0800 (PST)
+Date: Wed, 27 Feb 2019 11:39:08 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190227103908.xao5xy7ryx47ndeo@steredhat>
+References: <20190227012132.16271-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 04/12] libvhost-user: exit by default on
- VHOST_USER_NONE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190227012132.16271-1-david@gibson.dropbear.id.au>
+Subject: Re: [Qemu-devel] [PATCH] Allow -sandbox off with --disable-seccomp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, mst@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: otubo@redhat.com, pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Since commit 2566378d6d13bf4d28c7770bdbda5f7682594bbe, libvhost-user
-no longer panics on disconnect (rc =3D=3D 0), and instead silently ignore=
-s
-an invalid VHOST_USER_NONE message.
+On Wed, Feb 27, 2019 at 12:21:32PM +1100, David Gibson wrote:
+> At present, when seccomp support is compiled out with --disable-seccomp
+> we fail with an error if the user puts -sandbox on the command line.
+> 
+> That kind of makes sense, but it's a bit strange that we reject a request
+> to disable sandboxing with "-sandbox off" saying we don't support
+> sandboxing.
+> 
+> This puts in a small sandbox to (correctly) silently ignore -sandbox off
+> when we don't have sandboxing support compiled in.  This makes life easier
+> for testcases, since they can safely specify "-sandbox off" without having
+> to care if the qemu they're using is compiled with sandbox support or not.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  vl.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 
-Without extra work from the API user, this will simply busy-loop on
-HUP events. The obvious thing to do is to exit(0) instead, while
-additional or different work can be done by overriding
-iface->process_msg().
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>
----
- contrib/libvhost-user/libvhost-user.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-index 3f14b4138b..fcf5014240 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -1285,7 +1285,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-     case VHOST_USER_SET_CONFIG:
-         return vu_set_config(dev, vmsg);
-     case VHOST_USER_NONE:
--        break;
-+        /* if you need processing before exit, override iface->process_m=
-sg */
-+        exit(0);
-     case VHOST_USER_POSTCOPY_ADVISE:
-         return vu_set_postcopy_advise(dev, vmsg);
-     case VHOST_USER_POSTCOPY_LISTEN:
---=20
-2.21.0
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
