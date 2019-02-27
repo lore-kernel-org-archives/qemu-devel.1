@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38601)
+Received: from eggs.gnu.org ([209.51.188.92]:41127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gz0Gu-00031v-0p
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:33:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1gz0R2-00035h-Gc
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:43:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gz0Gs-0001OO-Tm
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:33:19 -0500
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:41999)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gz0Gs-0001Kx-Mg
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:33:18 -0500
-Received: from player794.ha.ovh.net (unknown [10.109.143.216])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 12198F32C8
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:33:15 +0100 (CET)
-Date: Wed, 27 Feb 2019 15:33:03 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190227153303.7b890f19@bahia.lan>
-In-Reply-To: <20190227085149.38596-5-aik@ozlabs.ru>
-References: <20190227085149.38596-1-aik@ozlabs.ru>
-	<20190227085149.38596-5-aik@ozlabs.ru>
+	(envelope-from <eblake@redhat.com>) id 1gz0R0-0007AS-KX
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:43:47 -0500
+References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
+	<20181214134240.217870-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <09afd97f-0e16-82f2-df02-eccec310c4ab@redhat.com>
+Date: Wed, 27 Feb 2019 08:43:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20181214134240.217870-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu v3 4/6] spapr_iommu: Do not
- replay mappings from just created DMA window
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] qcow2-refcount: avoid eating RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, qemu-ppc@nongnu.org, Leonardo Augusto =?UTF-8?B?R3VpbWFyw6Nlcw==?= Garcia <lagarcia@br.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-On Wed, 27 Feb 2019 19:51:47 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-
-> On sPAPR vfio_listener_region_add() is called in 2 situations:
-> 1. a new listener is registered from vfio_connect_container();
-> 2. a new IOMMU Memory Region is added from rtas_ibm_create_pe_dma_window().
+On 12/14/18 7:42 AM, Vladimir Sementsov-Ogievskiy wrote:
+> qcow2_inc_refcounts_imrt() (through realloc_refcount_array()) can eat
+> an unpredictable amount of memory on corrupted table entries, which are
+> referencing regions far beyond the end of file.
 > 
-> In both cases vfio_listener_region_add() calls
-> memory_region_iommu_replay() to notify newly registered IOMMU notifiers
-> about existing mappings which is totally desirable for case 1.
+> Prevent this, by skipping such regions from further processing.
 > 
-> However for case 2 it is nothing but noop as the window has just been
-> created and has no valid mappings so replaying those does not do anything.
-> It is barely noticeable with usual guests but if the window happens to be
-> really big, such no-op replay might take minutes and trigger RCU stall
-> warnings in the guest.
+> Interesting that iotest 138 checks exactly the behavior which we fix
+> here. So, change the test appropriately.
 > 
-> For example, a upcoming GPU RAM memory region mapped at 64TiB (right
-> after SPAPR_PCI_LIMIT) causes a 64bit DMA window to be at least 128TiB
-> which is (128<<40)/0x10000=2.147.483.648 TCEs to replay.
-> 
-> This mitigates the problem by adding an "skipping_replay" flag to
-> sPAPRTCETable and defining sPAPR own IOMMU MR replay() hook which does
-> exactly the same thing as the generic one except it returns early if
-> @skipping_replay==true.
-> 
-> When "ibm,create-pe-dma-window" is complete, the guest will map only
-> required regions of the huge DMA window.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  include/hw/ppc/spapr.h  |  1 +
->  hw/ppc/spapr_iommu.c    | 31 +++++++++++++++++++++++++++++++
->  hw/ppc/spapr_rtas_ddw.c |  7 +++++++
->  3 files changed, 39 insertions(+)
-> 
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 86b0488..358bb38 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -727,6 +727,7 @@ struct sPAPRTCETable {
->      uint64_t *mig_table;
->      bool bypass;
->      bool need_vfio;
-> +    bool skipping_replay;
->      int fd;
->      MemoryRegion root;
->      IOMMUMemoryRegion iommu;
-> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-> index 37e98f9..8f23179 100644
-> --- a/hw/ppc/spapr_iommu.c
-> +++ b/hw/ppc/spapr_iommu.c
-> @@ -141,6 +141,36 @@ static IOMMUTLBEntry spapr_tce_translate_iommu(IOMMUMemoryRegion *iommu,
->      return ret;
->  }
->  
-> +static void spapr_tce_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-> +{
-> +    MemoryRegion *mr = MEMORY_REGION(iommu_mr);
-> +    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
-> +    hwaddr addr, granularity;
-> +    IOMMUTLBEntry iotlb;
-> +    sPAPRTCETable *tcet = container_of(iommu_mr, sPAPRTCETable, iommu);
-> +
-> +    if (tcet->skipping_replay) {
-> +        return;
-> +    }
-> +
-> +    granularity = memory_region_iommu_get_min_page_size(iommu_mr);
-> +
-> +    for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
-> +        iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE, n->iommu_idx);
-> +        if (iotlb.perm != IOMMU_NONE) {
-> +            n->notify(n, &iotlb);
-> +        }
-> +
-> +        /*
-> +         * if (2^64 - MR size) < granularity, it's possible to get an
-> +         * infinite loop here.  This should catch such a wraparound.
-> +         */
-> +        if ((addr + granularity) < addr) {
-> +            break;
-> +        }
-> +    }
-> +}
 
-It is a bit unfortunate to duplicate all that code. What about making
-a memory_region_iommu_replay_generic() helper out of it and call it
-from spapr_tce_replay() and memory_region_iommu_replay() ?
+> +    /* Last cluster of qcow2 image may be semi-allocated, so it's may be OK to
+> +     * reference some space after file end but it should be less than one
+> +     * cluster.
 
-Apart from that, LGTM.
+Are we guaranteed that this is always the case, even when incrementally
+building up an image.  That is, if we get a power failure in the middle
+of allocating both a new L2 table and a larger refcount table, can we
+see an image which temporary references 2 or more clusters beyond the
+end of the file that it was previously using?  Or are we guaranteed that
+the way we update the refcount table will never see more than one
+cluster beyond the end of the file for any other reference?  I guess
+where I'm going with this is a question of whether we should permit a
+finite overrun to account for multiple pieces of metadata all being in
+flight at once, and only reject the obvious overruns that are definitely
+beyond that sane limit, and whether 1 cluster is too small for that sane
+limit.
 
-> +
->  static int spapr_tce_table_pre_save(void *opaque)
->  {
->      sPAPRTCETable *tcet = SPAPR_TCE_TABLE(opaque);
-> @@ -659,6 +689,7 @@ static void spapr_iommu_memory_region_class_init(ObjectClass *klass, void *data)
->      IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
->  
->      imrc->translate = spapr_tce_translate_iommu;
-> +    imrc->replay = spapr_tce_replay;
->      imrc->get_min_page_size = spapr_tce_get_min_page_size;
->      imrc->notify_flag_changed = spapr_tce_notify_flag_changed;
->      imrc->get_attr = spapr_tce_get_attr;
-> diff --git a/hw/ppc/spapr_rtas_ddw.c b/hw/ppc/spapr_rtas_ddw.c
-> index cb8a410..9cc020d 100644
-> --- a/hw/ppc/spapr_rtas_ddw.c
-> +++ b/hw/ppc/spapr_rtas_ddw.c
-> @@ -171,8 +171,15 @@ static void rtas_ibm_create_pe_dma_window(PowerPCCPU *cpu,
->      }
->  
->      win_addr = (windows == 0) ? sphb->dma_win_addr : sphb->dma64_win_addr;
-> +    /*
-> +     * We have just created a window, we know for the fact that it is empty,
-> +     * use a hack to avoid iterating over the table as it is quite possible
-> +     * to have billions of TCEs, all empty.
 > +     */
-> +    tcet->skipping_replay = true;
->      spapr_tce_table_enable(tcet, page_shift, win_addr,
->                             1ULL << (window_shift - page_shift));
-> +    tcet->skipping_replay = false;
->      if (!tcet->nb_table) {
->          goto hw_error_exit;
->      }
+> +    if (offset + size - file_len >= s->cluster_size) {
+> +        fprintf(stderr, "ERROR: counting reference for region exceeding the "
+> +                "end of the file by one cluster or more: offset 0x%" PRIx64
+> +                " size 0x%" PRIx64 "\n", offset, size);
+
+Should we be using something smarter than fprintf() here?
+
+Grammar suggestion:
+
+ERROR: reference to a region too far beyond the end of the file:
+
+(which is shorter than what you wrote, and also has the nice property of
+allowing us to change our mind on whether it is 1 cluster, 2, 10, or
+some other finite limit as our heuristic of when we consider the image
+corrupt without having to reword it).
+
+
+> +++ b/tests/qemu-iotests/138
+> @@ -54,15 +54,13 @@ $QEMU_IO -c 'write 0 512' "$TEST_IMG" | _filter_qemu_io
+>  # Put the data cluster at a multiple of 2 TB, resulting in the image apparently
+>  # having a multiple of 2^32 clusters
+>  # (To be more specific: It is at 32 PB)
+> -poke_file "$TEST_IMG" 2048 "\x80\x80\x00\x00\x00\x00\x00\x00"
+> +poke_file "$TEST_IMG" $((2048 + 8)) "\x00\x80\x00\x00\x00\x00\x00\x00"
+>  
+>  # An offset of 32 PB results in qemu-img check having to allocate an in-memory
+> -# refcount table of 128 TB (16 bit refcounts, 512 byte clusters).
+> -# This should be generally too much for any system and thus fail.
+> -# What this test is checking is that the qcow2 driver actually tries to allocate
+> -# such a large amount of memory (and is consequently aborting) instead of having
+> -# truncated the cluster count somewhere (which would result in much less memory
+> -# being allocated and then a segfault occurring).
+> +# refcount table of 128 TB (16 bit refcounts, 512 byte clusters), if qemu-img
+> +# don't check that referenced data cluster is far beyond the end of file.
+> +# But starting from 4.0, qemu-img does this check, and instead of "Cannot
+> +# allocate memory", we have an error showing that l2 entry is invalid.
+>  _check_test_img
+
+In other words, we are still gracefully invalidating the file, but now
+because of a heuristic rather than a memory allocation failure.
+
+I might word the comment differently:
+
+An offset of 32 PB would result in qemu-img check having to allocate an
+in-memory refcount table of 128 TB (16 bit refcounts, 512 byte
+clusters). It is unlikely that a system has this much memory, so the
+test ensures that qemu-img either gracefully fails an allocation (prior
+to 4.0) or flags the image as invalid (the reference points to a cluster
+too far beyond the actual file), rather than silently allocating a
+truncated memory amount or dumping core.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
