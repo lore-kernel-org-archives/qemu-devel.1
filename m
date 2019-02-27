@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56985)
+Received: from eggs.gnu.org ([209.51.188.92]:57100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gz3Dm-0000Xq-OG
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:19 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gz3E6-0000rv-OU
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gz3Dl-0001P9-9U
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:18 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:53616 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1gz3Dk-00006z-Qq
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:17 -0500
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Wed, 27 Feb 2019 18:40:15 +0100
-Message-Id: <1551289217-10072-3-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1551289217-10072-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1551289217-10072-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	(envelope-from <no-reply@patchew.org>) id 1gz3E5-0001l8-Kf
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:38 -0500
+Resent-Message-Id: <E1gz3E5-0001l8-Kf@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155128928923.2181.6599379873066523864@49fa7ef69f7b>
+In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/4] target/mips: Optimize support for MSA
- instructions ILVOD.<B|H|W|D>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 27 Feb 2019 09:41:30 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +23,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: armbru@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-
-Optimize support for MSA instructions ILVOD.B, ILVOD.H, ILVOD.W, and
-ILVOD.D.
-
-Optimization is done by eliminating loops, and explicitly assigning
-desired values to individual data elements. Performance measurement
-is done by executing the instructions large number of times on a
-computer with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
-
-Measured time before optimization:
-  ILVOD.B:  118.42 ms
-  ILVOD.H:   93.45 ms
-  ILVOD.W:  119.89 ms
-  ILVOD.D:   46.00 ms
-
-Measured time after optimization:
-  ILVOD.B:   60.08 ms
-  ILVOD.H:   41.52 ms
-  ILVOD.W:   36.44 ms
-  ILVOD.D:   36.40 ms
-
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/msa_helper.c | 58 ++++++++++++++++++++++++++++++++++++++++++=
-------
- 1 file changed, 51 insertions(+), 7 deletions(-)
-
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 4e6584e..90ae44e 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1198,13 +1198,6 @@ MSA_FN_DF(ilvl_df)
- MSA_FN_DF(ilvr_df)
- #undef MSA_DO
-=20
--#define MSA_DO(DF)                          \
--    do {                                    \
--        pwx->DF[2*i]   =3D pwt->DF[2*i+1];    \
--        pwx->DF[2*i+1] =3D pws->DF[2*i+1];    \
--    } while (0)
--MSA_FN_DF(ilvod_df)
--#undef MSA_DO
- #undef MSA_LOOP_COND
-=20
- #define MSA_LOOP_COND(DF) \
-@@ -1274,6 +1267,57 @@ void helper_msa_ilvev_df(CPUMIPSState *env, uint32=
-_t df, uint32_t wd,
-     }
- }
-=20
-+void helper_msa_ilvod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-+                         uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
-+
-+    switch (df) {
-+    case DF_BYTE:
-+        pwd->b[0]  =3D pwt->b[1];
-+        pwd->b[1]  =3D pws->b[1];
-+        pwd->b[2]  =3D pwt->b[3];
-+        pwd->b[3]  =3D pws->b[3];
-+        pwd->b[4]  =3D pwt->b[5];
-+        pwd->b[5]  =3D pws->b[5];
-+        pwd->b[6]  =3D pwt->b[7];
-+        pwd->b[7]  =3D pws->b[7];
-+        pwd->b[8]  =3D pwt->b[9];
-+        pwd->b[9]  =3D pws->b[9];
-+        pwd->b[10] =3D pwt->b[11];
-+        pwd->b[11] =3D pws->b[11];
-+        pwd->b[12] =3D pwt->b[13];
-+        pwd->b[13] =3D pws->b[13];
-+        pwd->b[14] =3D pwt->b[15];
-+        pwd->b[15] =3D pws->b[15];
-+        break;
-+    case DF_HALF:
-+        pwd->h[0] =3D pwt->h[1];
-+        pwd->h[1] =3D pws->h[1];
-+        pwd->h[2] =3D pwt->h[3];
-+        pwd->h[3] =3D pws->h[3];
-+        pwd->h[4] =3D pwt->h[5];
-+        pwd->h[5] =3D pws->h[5];
-+        pwd->h[6] =3D pwt->h[7];
-+        pwd->h[7] =3D pws->h[7];
-+        break;
-+    case DF_WORD:
-+        pwd->w[0] =3D pwt->w[1];
-+        pwd->w[1] =3D pws->w[1];
-+        pwd->w[2] =3D pwt->w[3];
-+        pwd->w[3] =3D pws->w[3];
-+        break;
-+    case DF_DOUBLE:
-+        pwd->d[0] =3D pwt->d[1];
-+        pwd->d[1] =3D pws->d[1];
-+        break;
-+    default:
-+        assert(0);
-+    }
-+}
-+
- void helper_msa_sldi_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-                         uint32_t ws, uint32_t n)
- {
---=20
-2.7.4
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
+MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
+YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9z
+Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVO
+RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
+RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRh
+dGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIxOTE5NTkyOC4xMjI4OS0xLWRnaWxiZXJ0QHJl
+ZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDIxOTE5NTkyOC4xMjI4OS0xLWRnaWxiZXJ0QHJlZGhh
+dC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5NzUwMmYzMTk2IGh3L2FybSBo
+dy94dGVuc2E6IERlLWR1cGxpY2F0ZSBwZmxhc2ggY3JlYXRpb24gY29kZSBzb21lCjZiYjJiYzA3
+ZmYgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYwMmIgcGFydCAyCjk2MDQ1
+NThlZTAgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYwMmIgcGFydCAxCmJj
+MzllMjBhZTEgbWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBmbGFzaCBtZW1vcnkg
+c2l6ZSBzb21ld2hhdAo5YWVkZGZiODc0IHIyZDogRmxhc2ggbWVtb3J5IGNyZWF0aW9uIGlzIGNv
+bmZ1c2VkIGFib3V0IHNpemUsIG1hcmsgRklYTUUKY2QxZmIxNTY3ZSBwcGM0MDVfYm9hcmRzOiBE
+b24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlCjZhNTY1ZjBhMmEg
+c2FtNDYwZXg6IERvbid0IHNpemUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJhY2tpbmcgaW1hZ2UK
+OWNiZmZmZWZlYyBodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBFX0NGSV9QRkxBU0gw
+ezEsIDJ9CjlmNzg0ZjNmMzMgcGZsYXNoOiBNYWNybyBQRkxBU0hfQlVHKCkgaXMgdXNlZCBqdXN0
+IG9uY2UsIGV4cGFuZAoxZTk2NDRiZDNiIHBmbGFzaDogUmVuYW1lIHBmbGFzaF90IHRvIFBGbGFz
+aENGSTAxLCBQRmxhc2hDRkkwMgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBj
+b21taXQgMWU5NjQ0YmQzYjBkIChwZmxhc2g6IFJlbmFtZSBwZmxhc2hfdCB0byBQRmxhc2hDRkkw
+MSwgUEZsYXNoQ0ZJMDIpCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24g
+bmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEyOTogRklMRTogaHcvYmxvY2svcGZsYXNo
+X2NmaTAxLmM6Mjg4Ogorc3RhdGljIHVpbnQzMl90IHBmbGFzaF9yZWFkIChQRmxhc2hDRkkwMSAq
+cGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5j
+dGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzQxOiBGSUxFOiBody9ibG9jay9w
+Zmxhc2hfY2ZpMDIuYzoxNDE6CitzdGF0aWMgdWludDMyX3QgcGZsYXNoX3JlYWQgKFBGbGFzaENG
+STAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVu
+IGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTk6IEZJTEU6IGh3L2Js
+b2NrL3BmbGFzaF9jZmkwMi5jOjI2NDoKK3N0YXRpYyB2b2lkIHBmbGFzaF93cml0ZSAoUEZsYXNo
+Q0ZJMDIgKnBmbCwgaHdhZGRyIG9mZnNldCwKCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywg
+NDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+CjIvMTAgQ2hlY2tpbmcgY29tbWl0IDlmNzg0ZjNmMzMyMSAocGZsYXNoOiBNYWNybyBQRkxBU0hf
+QlVHKCkgaXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZCkKMy8xMCBDaGVja2luZyBjb21taXQgOWNi
+ZmZmZWZlYzBiIChodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBFX0NGSV9QRkxBU0gw
+ezEsIDJ9KQo0LzEwIENoZWNraW5nIGNvbW1pdCA2YTU2NWYwYTJhYTggKHNhbTQ2MGV4OiBEb24n
+dCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo1LzEwIENoZWNraW5n
+IGNvbW1pdCBjZDFmYjE1NjdlYzMgKHBwYzQwNV9ib2FyZHM6IERvbid0IHNpemUgZmxhc2ggbWVt
+b3J5IHRvIG1hdGNoIGJhY2tpbmcgaW1hZ2UpCjYvMTAgQ2hlY2tpbmcgY29tbWl0IDlhZWRkZmI4
+NzQ4ZSAocjJkOiBGbGFzaCBtZW1vcnkgY3JlYXRpb24gaXMgY29uZnVzZWQgYWJvdXQgc2l6ZSwg
+bWFyayBGSVhNRSkKNy8xMCBDaGVja2luZyBjb21taXQgYmMzOWUyMGFlMTZjIChtaXBzX21hbHRh
+OiBDbGVhbiB1cCBkZWZpbml0aW9uIG9mIGZsYXNoIG1lbW9yeSBzaXplIHNvbWV3aGF0KQo4LzEw
+IENoZWNraW5nIGNvbW1pdCA5NjA0NTU4ZWUwYjggKHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29t
+bWl0IDM2OGEzNTRmMDJiIHBhcnQgMSkKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
+dCAnLScgKGN0eDpWeFYpCiM5MjogRklMRTogaHcvYXJtL211c2ljcGFsLmM6MTYzOToKKyAgICAg
+ICAgcGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZMQVNIX1NJWkVfTUFY
+LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzEwMDogRklMRTogaHcv
+YXJtL211c2ljcGFsLmM6MTY0NjoKKyAgICAgICAgcGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAw
+MDAwMDAwVUxMLU1QX0ZMQVNIX1NJWkVfTUFYLAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDI0OCBsaW5l
+cyBjaGVja2VkCgpQYXRjaCA4LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo5LzEwIENo
+ZWNraW5nIGNvbW1pdCA2YmIyYmMwN2ZmYjcgKHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0
+IDM2OGEzNTRmMDJiIHBhcnQgMikKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IDk3NTAyZjMxOTYzNiAo
+aHcvYXJtIGh3L3h0ZW5zYTogRGUtZHVwbGljYXRlIHBmbGFzaCBjcmVhdGlvbiBjb2RlIHNvbWUp
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
+MjE4MTI1NjE1LjE4OTcwLTEtYXJtYnJ1QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90
+eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
