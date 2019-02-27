@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36290)
+Received: from eggs.gnu.org ([209.51.188.92]:38797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyx92-0003C2-E5
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:13:01 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gyxOI-0000dN-Fq
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:28:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyx90-0005SE-TC
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:13:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyx90-0005RS-KC
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:12:58 -0500
-Date: Wed, 27 Feb 2019 11:12:43 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190227111243.GF31688@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190225123111.30363-1-berrange@redhat.com>
-	<CAFEAcA9_AeKMZxrGE7pSp0j1JSSWTLCk2g7aP=QCtTWGNFposQ@mail.gmail.com>
-	<41d3532c-0ab4-db82-dc9a-cc9fb45c6162@redhat.com>
-	<CAFEAcA-zo+mVS_H7dU2uM83Ndv_f_0BDSBS_jxJs1e7L+=0R5w@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gyxOG-0000WY-Oq
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:28:46 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39280)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gyxOG-0000Er-GN
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:28:44 -0500
+Received: by mail-wm1-x343.google.com with SMTP id z84so5208623wmg.4
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 03:28:27 -0800 (PST)
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-10-armbru@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190226193408.23862-10-armbru@redhat.com>
+Date: Wed, 27 Feb 2019 11:28:25 +0000
+Message-ID: <87pnrdlbc6.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-zo+mVS_H7dU2uM83Ndv_f_0BDSBS_jxJs1e7L+=0R5w@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/11] Merge authz core patches
+Subject: Re: [Qemu-devel] [PATCH v2 09/11] mips_malta: Clean up definition
+ of flash memory size somewhat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Tue, Feb 26, 2019 at 07:09:29PM +0000, Peter Maydell wrote:
-> On Tue, 26 Feb 2019 at 19:07, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
-t.com> wrote:
-> >
-> > On 2/26/19 8:04 PM, Peter Maydell wrote:
-> > > On Mon, 25 Feb 2019 at 12:35, Daniel P. Berrang=C3=A9 <berrange@red=
-hat.com> wrote:
-> > >>
-> > >> The following changes since commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f=
-7a62be116:
-> > >>
-> > >>   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates=
--20190221.0' into staging (2019-02-22 15:48:04 +0000)
-> > >>
-> > >> are available in the Git repository at:
-> > >>
-> > >>   https://github.com/berrange/qemu tags/authz-core-pull-request
-> > >>
-> > >> for you to fetch changes up to cfde05c6c0db7d3122a5491d50f62f7910a=
-b8abb:
-> > >>
-> > >>   authz: delete existing ACL implementation (2019-02-25 12:28:25 +=
-0000)
-> > >>
-> > >> ----------------------------------------------------------------
-> > >> Add a standard authorization framework
-> > >>
-> > >> The current network services now support encryption via TLS and in=
- some
-> > >> cases support authentication via SASL. In cases where SASL is not
-> > >> available, x509 client certificates can be used as a crude authori=
-zation
-> > >> scheme, but using a sub-CA and controlling who you give certs to. =
-In
-> > >> general this is not very flexible though, so this series introduce=
-s a
-> > >> new standard authorization framework.
-> > >>
-> > >
-> > > Applied, thanks.
-> >
-> > Argh there is a v2... Daniel didn't NACK'd this one.
->=20
-> Oops. Yes, I process my pullreq queue oldest-first and unless you
-> follow up to the cover letter to say "don't apply this v1" I'm
-> not necessarily going to notice a v2. I'm afraid you'll have to
-> send whatever the v1->v2 fixes were as a separate set of patches now.
 
-Actually there is no problem here.  git-publish will always use the
-same tag name when sending a pull request, so the v2 tag name was
-the same as the v1 tag name & thus you automatically applied the
-correct v2 pull request.
+Markus Armbruster <armbru@redhat.com> writes:
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> pflash_cfi01_register() takes a size in bytes, a block size in bytes
+> and a number of blocks.  mips_malta_init() passes BIOS_SIZE, 65536,
+> FLASH_SIZE >> 16.  Actually consistent only because BIOS_SIZE (defined
+> in include/hw/mips/bios.h as (4 * MiB)) matches FLASH_SIZE (defined
+> locally as 0x400000).  Confusing all the same.
+>
+> Pass FLASH_SIZE instead of BIOS_SIZE.
+>
+> There are more uses of BIOS_SIZE, but I don't sufficiently understand
+> them to attempt cleanup.
+>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/mips/mips_malta.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 172ee033af..c2a5c65a24 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1269,12 +1269,12 @@ void mips_malta_init(MachineState *machine)
+>      if (dinfo) {
+>          printf("Register parallel flash %d size " TARGET_FMT_lx " at "
+>                 "addr %08llx '%s' %x\n",
+> -               fl_idx, bios_size, FLASH_ADDRESS,
+> +               fl_idx, FLASH_SIZE, FLASH_ADDRESS,
+
+bios_size =3D=3D FLASH_SIZE at this point, but is then overwritten later in
+the function *if* the flash is loaded (and not already set via a dinfo).
+I'd say you could move bios_size down to were it's used but then you
+confused the byte swapping machinery which expects something to be set.
+
+All that said these changes so far are not wrong:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+
+>                 blk_name(dinfo->bdrv), fl_sectors);
+>      }
+>  #endif
+>      fl =3D pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
+> -                               BIOS_SIZE,
+> +                               FLASH_SIZE,
+>                                 dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+>                                 65536, fl_sectors,
+>                                 4, 0x0000, 0x0000, 0x0000, 0x0000, be);
+
+
+--
+Alex Benn=C3=A9e
