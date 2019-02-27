@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36475)
+Received: from eggs.gnu.org ([209.51.188.92]:36533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gyuxe-0004uV-Gu
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:53:07 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gyuxg-0004w8-F8
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:53:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gyuxX-0004de-DU
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:53:02 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gyuxf-0004m0-5T
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:53:08 -0500
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed, 27 Feb 2019 19:51:47 +1100
-Message-Id: <20190227085149.38596-5-aik@ozlabs.ru>
+Date: Wed, 27 Feb 2019 19:51:45 +1100
+Message-Id: <20190227085149.38596-3-aik@ozlabs.ru>
 In-Reply-To: <20190227085149.38596-1-aik@ozlabs.ru>
 References: <20190227085149.38596-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v3 4/6] spapr_iommu: Do not replay
- mappings from just created DMA window
+Subject: [Qemu-devel] [PATCH qemu v3 2/6] vfio/spapr: Fix indirect levels
+ calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,119 +23,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, =?UTF-8?q?Leonardo=20Augusto=20Guimar=C3=A3es=20Garcia?= <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>
 
-On sPAPR vfio_listener_region_add() is called in 2 situations:
-1. a new listener is registered from vfio_connect_container();
-2. a new IOMMU Memory Region is added from rtas_ibm_create_pe_dma_window().
+The current code assumes that we can address more bits on a PCI bus
+for DMA than we really can but there is no way knowing the actual limit.
 
-In both cases vfio_listener_region_add() calls
-memory_region_iommu_replay() to notify newly registered IOMMU notifiers
-about existing mappings which is totally desirable for case 1.
+This makes a better guess for the number of levels and if the kernel
+fails to allocate that, this increases the level numbers till succeeded
+or reached the 64bit limit.
 
-However for case 2 it is nothing but noop as the window has just been
-created and has no valid mappings so replaying those does not do anything.
-It is barely noticeable with usual guests but if the window happens to be
-really big, such no-op replay might take minutes and trigger RCU stall
-warnings in the guest.
+This adds levels to the trace point.
 
-For example, a upcoming GPU RAM memory region mapped at 64TiB (right
-after SPAPR_PCI_LIMIT) causes a 64bit DMA window to be at least 128TiB
-which is (128<<40)/0x10000=2.147.483.648 TCEs to replay.
-
-This mitigates the problem by adding an "skipping_replay" flag to
-sPAPRTCETable and defining sPAPR own IOMMU MR replay() hook which does
-exactly the same thing as the generic one except it returns early if
-@skipping_replay==true.
-
-When "ibm,create-pe-dma-window" is complete, the guest will map only
-required regions of the huge DMA window.
+This may cause the kernel to warn about failed allocation:
+   [65122.837458] Failed to allocate a TCE memory, level shift=28
+which might happen if MAX_ORDER is not large enough as it can vary:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/Kconfig?h=v5.0-rc2#n727
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- include/hw/ppc/spapr.h  |  1 +
- hw/ppc/spapr_iommu.c    | 31 +++++++++++++++++++++++++++++++
- hw/ppc/spapr_rtas_ddw.c |  7 +++++++
- 3 files changed, 39 insertions(+)
+Changes:
+v2:
+* replace systempagesize with getpagesize() when calculating bits_per_level/max_levels
+---
+ hw/vfio/spapr.c      | 43 +++++++++++++++++++++++++++++++++----------
+ hw/vfio/trace-events |  2 +-
+ 2 files changed, 34 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 86b0488..358bb38 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -727,6 +727,7 @@ struct sPAPRTCETable {
-     uint64_t *mig_table;
-     bool bypass;
-     bool need_vfio;
-+    bool skipping_replay;
-     int fd;
-     MemoryRegion root;
-     IOMMUMemoryRegion iommu;
-diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-index 37e98f9..8f23179 100644
---- a/hw/ppc/spapr_iommu.c
-+++ b/hw/ppc/spapr_iommu.c
-@@ -141,6 +141,36 @@ static IOMMUTLBEntry spapr_tce_translate_iommu(IOMMUMemoryRegion *iommu,
-     return ret;
- }
+diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+index becf71a..88437a7 100644
+--- a/hw/vfio/spapr.c
++++ b/hw/vfio/spapr.c
+@@ -143,10 +143,10 @@ int vfio_spapr_create_window(VFIOContainer *container,
+                              MemoryRegionSection *section,
+                              hwaddr *pgsize)
+ {
+-    int ret;
++    int ret = 0;
+     IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+     uint64_t pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
+-    unsigned entries, pages;
++    unsigned entries, bits_total, bits_per_level, max_levels;
+     struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
+     long systempagesize = qemu_getrampagesize();
  
-+static void spapr_tce_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-+{
-+    MemoryRegion *mr = MEMORY_REGION(iommu_mr);
-+    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
-+    hwaddr addr, granularity;
-+    IOMMUTLBEntry iotlb;
-+    sPAPRTCETable *tcet = container_of(iommu_mr, sPAPRTCETable, iommu);
-+
-+    if (tcet->skipping_replay) {
-+        return;
+@@ -176,16 +176,38 @@ int vfio_spapr_create_window(VFIOContainer *container,
+     create.window_size = int128_get64(section->size);
+     create.page_shift = ctz64(pagesize);
+     /*
+-     * SPAPR host supports multilevel TCE tables, there is some
+-     * heuristic to decide how many levels we want for our table:
+-     * 0..64 = 1; 65..4096 = 2; 4097..262144 = 3; 262145.. = 4
++     * SPAPR host supports multilevel TCE tables. We try to guess optimal
++     * levels number and if this fails (for example due to the host memory
++     * fragmentation), we increase levels. The DMA address structure is:
++     * rrrrrrrr rxxxxxxx xxxxxxxx xxxxxxxx  xxxxxxxx xxxxxxxx xxxxxxxx iiiiiiii
++     * where:
++     *   r = reserved (bits >= 55 are reserved in the existing hardware)
++     *   i = IOMMU page offset (64K in this example)
++     *   x = bits to index a TCE which can be split to equal chunks to index
++     *      within the level.
++     * The aim is to split "x" to smaller possible number of levels.
+      */
+     entries = create.window_size >> create.page_shift;
+-    pages = MAX((entries * sizeof(uint64_t)) / getpagesize(), 1);
+-    pages = MAX(pow2ceil(pages), 1); /* Round up */
+-    create.levels = ctz64(pages) / 6 + 1;
+-
+-    ret = ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
++    /* bits_total is number of "x" needed */
++    bits_total = ctz64(entries * sizeof(uint64_t));
++    /*
++     * bits_per_level is a safe guess of how much we can allocate per level:
++     * 8 is the current minimum for CONFIG_FORCE_MAX_ZONEORDER and MAX_ORDER
++     * is usually bigger than that.
++     * Below we look at getpagesize() as TCEs are allocated from system pages.
++     */
++    bits_per_level = ctz64(getpagesize()) + 8;
++    create.levels = bits_total / bits_per_level;
++    if (bits_total % bits_per_level) {
++        ++create.levels;
 +    }
-+
-+    granularity = memory_region_iommu_get_min_page_size(iommu_mr);
-+
-+    for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
-+        iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE, n->iommu_idx);
-+        if (iotlb.perm != IOMMU_NONE) {
-+            n->notify(n, &iotlb);
-+        }
-+
-+        /*
-+         * if (2^64 - MR size) < granularity, it's possible to get an
-+         * infinite loop here.  This should catch such a wraparound.
-+         */
-+        if ((addr + granularity) < addr) {
++    max_levels = (64 - create.page_shift) / ctz64(getpagesize());
++    for ( ; create.levels <= max_levels; ++create.levels) {
++        ret = ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
++        if (!ret) {
 +            break;
 +        }
 +    }
-+}
-+
- static int spapr_tce_table_pre_save(void *opaque)
- {
-     sPAPRTCETable *tcet = SPAPR_TCE_TABLE(opaque);
-@@ -659,6 +689,7 @@ static void spapr_iommu_memory_region_class_init(ObjectClass *klass, void *data)
-     IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
- 
-     imrc->translate = spapr_tce_translate_iommu;
-+    imrc->replay = spapr_tce_replay;
-     imrc->get_min_page_size = spapr_tce_get_min_page_size;
-     imrc->notify_flag_changed = spapr_tce_notify_flag_changed;
-     imrc->get_attr = spapr_tce_get_attr;
-diff --git a/hw/ppc/spapr_rtas_ddw.c b/hw/ppc/spapr_rtas_ddw.c
-index cb8a410..9cc020d 100644
---- a/hw/ppc/spapr_rtas_ddw.c
-+++ b/hw/ppc/spapr_rtas_ddw.c
-@@ -171,8 +171,15 @@ static void rtas_ibm_create_pe_dma_window(PowerPCCPU *cpu,
+     if (ret) {
+         error_report("Failed to create a window, ret = %d (%m)", ret);
+         return -errno;
+@@ -200,6 +222,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+         return -EINVAL;
      }
- 
-     win_addr = (windows == 0) ? sphb->dma_win_addr : sphb->dma64_win_addr;
-+    /*
-+     * We have just created a window, we know for the fact that it is empty,
-+     * use a hack to avoid iterating over the table as it is quite possible
-+     * to have billions of TCEs, all empty.
-+     */
-+    tcet->skipping_replay = true;
-     spapr_tce_table_enable(tcet, page_shift, win_addr,
-                            1ULL << (window_shift - page_shift));
-+    tcet->skipping_replay = false;
-     if (!tcet->nb_table) {
-         goto hw_error_exit;
-     }
+     trace_vfio_spapr_create_window(create.page_shift,
++                                   create.levels,
+                                    create.window_size,
+                                    create.start_addr);
+     *pgsize = pagesize;
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index ed2f333..cf1e886 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -129,6 +129,6 @@ vfio_prereg_listener_region_add_skip(uint64_t start, uint64_t end) "0x%"PRIx64"
+ vfio_prereg_listener_region_del_skip(uint64_t start, uint64_t end) "0x%"PRIx64" - 0x%"PRIx64
+ vfio_prereg_register(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
+ vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
+-vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=0x%x winsize=0x%"PRIx64" offset=0x%"PRIx64
++vfio_spapr_create_window(int ps, unsigned int levels, uint64_t ws, uint64_t off) "pageshift=0x%x levels=%u winsize=0x%"PRIx64" offset=0x%"PRIx64
+ vfio_spapr_remove_window(uint64_t off) "offset=0x%"PRIx64
+ vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d to liobn fd %d"
 -- 
 2.17.1
