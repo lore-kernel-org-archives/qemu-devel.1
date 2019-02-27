@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35642)
+Received: from eggs.gnu.org ([209.51.188.92]:48040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gypZf-0000zE-1v
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 22:07:59 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gyqrf-0000bI-GF
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 23:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gypZV-0001O0-9z
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 22:07:52 -0500
-Received: from mga01.intel.com ([192.55.52.88]:18081)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1gypZT-0001Lj-4Q
-	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 22:07:49 -0500
-Date: Wed, 27 Feb 2019 11:07:16 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190227030715.GA5449@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190226073159.13434-1-richardw.yang@linux.intel.com>
-	<bf6ad77d-6514-57b3-141b-530f46500b57@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bf6ad77d-6514-57b3-141b-530f46500b57@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: use __ATTR_RO_MODE to define rev
- sysfs
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gyqre-0008Qo-5v
+	for qemu-devel@nongnu.org; Tue, 26 Feb 2019 23:30:39 -0500
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Wed, 27 Feb 2019 15:30:05 +1100
+Message-Id: <20190227043008.12059-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH v2 1/4] target/ppc/spapr: Add
+ SPAPR_CAP_LARGE_DECREMENTER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +18,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, somlo@cmu.edu, mst@redhat.com
+To: qemu-ppc@nongnu.org
+Cc: david@gibson.dropbear.id.au, clg@kaod.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-On Tue, Feb 26, 2019 at 07:45:46PM +0100, Philippe Mathieu-Daudé wrote:
->Hi Wei,
->
->On 2/26/19 8:31 AM, Wei Yang wrote:
->> Leverage __ATTR_RO_MODE to define rev sysfs instead of using open code
->> to define the attribute.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  drivers/firmware/qemu_fw_cfg.c | 13 ++++---------
->>  1 file changed, 4 insertions(+), 9 deletions(-)
->> 
->> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
->> index 039e0f91dba8..a1293cbd7adb 100644
->> --- a/drivers/firmware/qemu_fw_cfg.c
->> +++ b/drivers/firmware/qemu_fw_cfg.c
->> @@ -296,18 +296,13 @@ static int fw_cfg_do_platform_probe(struct platform_device *pdev)
->>  	return 0;
->>  }
->>  
->> -static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, char *buf)
->> +static ssize_t fw_cfg_rev_show(struct kobject *k, struct kobj_attribute *a,
->> +			       char *buf)
->>  {
->>  	return sprintf(buf, "%u\n", fw_cfg_rev);
->>  }
->> -
->> -static const struct {
->> -	struct attribute attr;
->> -	ssize_t (*show)(struct kobject *k, struct attribute *a, char *buf);
->> -} fw_cfg_rev_attr = {
->> -	.attr = { .name = "rev", .mode = S_IRUSR },
->> -	.show = fw_cfg_showrev,
->> -};
->> +static const struct kobj_attribute fw_cfg_rev_attr =
->> +	__ATTR_RO_MODE(fw_cfg_rev, 0400);
->
->Why not keep S_IRUSR?
->
+Add spapr_cap SPAPR_CAP_LARGE_DECREMENTER to be used to control the
+availability of the large decrementer for a guest.
 
-Because scripts/checkpatch.pl suggest not use S_IRUSR :-)
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ hw/ppc/spapr.c         |  2 ++
+ hw/ppc/spapr_caps.c    | 17 +++++++++++++++++
+ include/hw/ppc/spapr.h |  5 ++++-
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
-I am not sure about the particular reason.
-
->>  
->>  /* fw_cfg_sysfs_entry type */
->>  struct fw_cfg_sysfs_entry {
->> 
-
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b6a571b6f1..acf62a2b9f 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2077,6 +2077,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_irq_map,
+         &vmstate_spapr_cap_nested_kvm_hv,
+         &vmstate_spapr_dtb,
++        &vmstate_spapr_cap_large_decr,
+         NULL
+     }
+ };
+@@ -4288,6 +4289,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
+     smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 16; /* 64kiB */
+     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
++    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = 0;
+     spapr_caps_add_properties(smc, &error_abort);
+     smc->irq = &spapr_irq_xics;
+     smc->dr_phb_enabled = true;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 64f98ae68d..3f90f5823e 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -390,6 +390,13 @@ static void cap_nested_kvm_hv_apply(sPAPRMachineState *spapr,
+     }
+ }
+ 
++static void cap_large_decr_apply(sPAPRMachineState *spapr,
++                                 uint8_t val, Error **errp)
++{
++    if (val)
++        error_setg(errp, "No large decrementer support, try cap-large-decr=off");
++}
++
+ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     [SPAPR_CAP_HTM] = {
+         .name = "htm",
+@@ -468,6 +475,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+         .type = "bool",
+         .apply = cap_nested_kvm_hv_apply,
+     },
++    [SPAPR_CAP_LARGE_DECREMENTER] = {
++        .name = "large-decr",
++        .description = "Allow Large Decrementer",
++        .index = SPAPR_CAP_LARGE_DECREMENTER,
++        .get = spapr_cap_get_bool,
++        .set = spapr_cap_set_bool,
++        .type = "bool",
++        .apply = cap_large_decr_apply,
++    },
+ };
+ 
+ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+@@ -596,6 +612,7 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
+ SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
+ SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
+ SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
++SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+ 
+ void spapr_caps_init(sPAPRMachineState *spapr)
+ {
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 59073a7579..8efc5e0779 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -74,8 +74,10 @@ typedef enum {
+ #define SPAPR_CAP_HPT_MAXPAGESIZE       0x06
+ /* Nested KVM-HV */
+ #define SPAPR_CAP_NESTED_KVM_HV         0x07
++/* Large Decrementer */
++#define SPAPR_CAP_LARGE_DECREMENTER     0x08
+ /* Num Caps */
+-#define SPAPR_CAP_NUM                   (SPAPR_CAP_NESTED_KVM_HV + 1)
++#define SPAPR_CAP_NUM                   (SPAPR_CAP_LARGE_DECREMENTER + 1)
+ 
+ /*
+  * Capability Values
+@@ -828,6 +830,7 @@ extern const VMStateDescription vmstate_spapr_cap_cfpc;
+ extern const VMStateDescription vmstate_spapr_cap_sbbc;
+ extern const VMStateDescription vmstate_spapr_cap_ibs;
+ extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
++extern const VMStateDescription vmstate_spapr_cap_large_decr;
+ 
+ static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
+ {
 -- 
-Wei Yang
-Help you, Help me
+2.13.6
