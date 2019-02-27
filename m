@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44131)
+Received: from eggs.gnu.org ([209.51.188.92]:44213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gyz8b-0006KY-L5
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:20:42 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gyz8d-0006NP-9T
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gyz8a-0007qk-PM
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:20:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35202)
+	(envelope-from <dgilbert@redhat.com>) id 1gyz8b-0007sH-P7
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:20:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gyz8a-0007oX-FF
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:20:40 -0500
-From: Juan Quintela <quintela@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 27 Feb 2019 13:47:15 +0100
-Message-ID: <8736o9tn3g.fsf@trasno.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyz8b-0007oW-Fi
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:20:41 -0500
+Date: Wed, 27 Feb 2019 13:11:32 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190227131132.GG2602@work-vm>
+References: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
+	<1550847320-25110-10-git-send-email-jasowang@redhat.com>
+	<954908bc-c5fd-9073-e137-dd4057c792ea@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] Call for agenda for 2019-03-05
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <954908bc-c5fd-9073-e137-dd4057c792ea@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 09/13] hmp: Add hmp_announce_self
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kvm-devel <kvm@vger.kernel.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, Vladislav Yasevich <vyasevic@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
+* Thomas Huth (thuth@redhat.com) wrote:
+> On 22/02/2019 15.55, Jason Wang wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Add an HMP command to trigger self annocements.
+> > Unlike the QMP command (which takes a set of parameters), the HMP
+> > command reuses the set of parameters used for migration.
+> > 
+> > Signend-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> >  hmp-commands.hx  | 14 ++++++++++++++
+> >  hmp.c            |  5 +++++
+> >  hmp.h            |  1 +
+> >  tests/test-hmp.c |  1 +
+> >  4 files changed, 21 insertions(+)
+> > 
+> > diff --git a/hmp-commands.hx b/hmp-commands.hx
+> > index ba71558..9f812bc 100644
+> > --- a/hmp-commands.hx
+> > +++ b/hmp-commands.hx
+> > @@ -931,6 +931,20 @@ stops because the size limit is reached.
+> >  ETEXI
+> >  
+> >      {
+> > +        .name       = "announce_self",
+> > +        .args_type  = "",
+> > +        .params     = "",
+> > +        .help       = "Trigger GARP/RARP announcements",
+> > +        .cmd        = hmp_announce_self,
+> > +    },
+> > +
+> > +STEXI
+> > +@item announce_self
+> > +@findex announce_self
+> > +Trigger GARP/RARP announcements.
+> > +ETEXI
+> 
+> The help text is incredibly sparse. I doubt that the average user
+> manages to find out the meaning of this command just by looking at this
+> short information. Also, shouldn't you mention here that the parameters
+> used for migration are re-used here, like in the patch description?
+> Thus, could you please send a follow-up patch to increase that
+> information here a little bit, please?
 
+I've updated that to:
++STEXI
++@item announce_self
++@findex announce_self
++Trigger a round of GARP/RARP broadcasts; this is useful for explicitly updating the
++network infrastructure after a reconfiguration or some forms of migration.
++The timings of the round are set by the migration announce parameters.
+ ETEXI
 
-Hi
+None of these pieces of help seem to be particularly deep.
 
-Please, send any topic that you are interested in covering.
+Dave
 
-At the end of Monday I will send an email with the agenda or the
-cancellation of the call, so hurry up.
-
-After discussions on the QEMU Summit, we are going to have always open a
-KVM call where you can add topics.
-
- Call details:
-
-By popular demand, a google calendar public entry with it
-
-  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
-
-(Let me know if you have any problems with the calendar entry.  I just
-gave up about getting right at the same time CEST, CET, EDT and DST).
-
-If you need phone number details,  contact me privately
-
-Thanks, Juan.
+>  Thanks,
+>   Thomas
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
