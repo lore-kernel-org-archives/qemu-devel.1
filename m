@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54973)
+Received: from eggs.gnu.org ([209.51.188.92]:55531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gz1OG-0002fu-IT
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:45:01 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gz1Pf-0003ms-NE
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:46:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gz1O3-000094-Co
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:53 -0500
-Date: Wed, 27 Feb 2019 15:33:11 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190227153311.GH22539@stefanha-x1.localdomain>
-References: <20190226153549.17867-1-stefanha@redhat.com>
-	<8a8d76d1-1280-f3d9-3d72-1c662d1ad666@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gz1Pb-0000o5-Vb
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:46:25 -0500
+Resent-Message-Id: <E1gz1Pb-0000o5-Vb@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gz1Pa-0000SQ-9P
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:46:22 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155128231213.1544.12990251990687911920@49fa7ef69f7b>
+In-Reply-To: <20190222055950.17403-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="o71xDhNo7p97+qVi"
-Content-Disposition: inline
-In-Reply-To: <8a8d76d1-1280-f3d9-3d72-1c662d1ad666@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] file-posix: add drop-cache=on|off option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 27 Feb 2019 07:45:13 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] tcg/ppc: Add vector opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Neil Skrypuch <neil@tembosocial.com>, Max Reitz <mreitz@redhat.com>
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, david@gibson.dropbear.id.au
 
-
---o71xDhNo7p97+qVi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Feb 26, 2019 at 10:54:55AM -0600, Eric Blake wrote:
-> On 2/26/19 9:35 AM, Stefan Hajnoczi wrote:
-> > Commit dd577a26ff03b6829721b1ffbbf9e7c411b72378 ("block/file-posix:
-> > implement bdrv_co_invalidate_cache() on Linux") introduced page cache
-> > invalidation so that cache.direct=3Doff live migration is safe on Linux.
-> >=20
-> > The invalidation takes a significant amount of time when the file is
-> > large and present in the page cache.  Normally this is not the case for
-> > cross-host live migration but it can happen when migrating between QEMU
-> > processes on the same host.
-> >=20
-> > On same-host migration we don't need to invalidate pages for correctness
-> > anyway, so an option to skip page cache invalidation is useful.  I
-> > investigated optimizing invalidation and detecting same-host migration,
-> > but both are hard to achieve so a user-visible option will suffice.
-> >=20
-> > As a bonus this option means that the cache invalidation feature will
-> > now be detectable by libvirt via QMP schema introspection.
->=20
-> Do you still want to pursue the QMP query-qemu-features command, or does
-> this delay that for another day?
-
-The presence of this new option doesn't guarantee that dropping caches
-works.  It is currently only implemented on Linux.
-
-We still need query-qemu-features so that libvirt can detect whether
-this QEMU binary can drop caches (e.g. on Linux vs FreeBSD).
-
-Stefan
-
---o71xDhNo7p97+qVi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcdq23AAoJEJykq7OBq3PIsa0H/jdjWertbi9rQ/7pEGsABOlr
-knJ7QFr9bVeD85CA6nKadIyJV1CrqEOCK0louLwDh5Y1KE3aEV1Zaz24MB1LNQcr
-9Iw4YeB/EFi8Qpx3UZ3CWfHH2UX8HLHWS6CI4RW2j0717TghpnhdJLKZxkllyioG
-3+dGSFhOwKlK3LcbMVGoNCw2r7d8iBMcf47OKaL5nTtjf6porTUB0ErZe0JxLoQa
-8AKzYzxQ4hoE1JOACl6et+DwMMPN7HB63k+vHDUiAo4dDGcVxLcDzZyrKbgsBGQ/
-JXvhD/VN68stKSe02zqRYpipFWaQDvspeMYb6SJ0y5mT0HjByULRuQGAkFu8nx8=
-=wgTL
------END PGP SIGNATURE-----
-
---o71xDhNo7p97+qVi--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyMjA1NTk1MC4xNzQw
+My0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMjIyMDU1OTUwLjE3NDAzLTEt
+cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENI
+XSB0Y2cvcHBjOiBBZGQgdmVjdG9yIG9wY29kZXMKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
+fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
+dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
+cWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1NTEwOTU5NzAtMTQ2NDUt
+MS1naXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTU1MTA5NTk3MC0x
+NDY0NS0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAg
+ICAgICAgICAgcGF0Y2hldy8yMDE5MDIyMTA4MTA1NC4xMzg1My0xLWtyYXhlbEByZWRoYXQuY29t
+IC0+IHBhdGNoZXcvMjAxOTAyMjEwODEwNTQuMTM4NTMtMS1rcmF4ZWxAcmVkaGF0LmNvbQogKiBb
+bmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwMjIxMTczNzU4LjI0NjcyLTEtc2xw
+QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDIyMTE3Mzc1OC4yNDY3Mi0xLXNscEByZWRoYXQu
+Y29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMjIwNTU5NTAuMTc0
+MDMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAyMjIwNTU5
+NTAuMTc0MDMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAgICAg
+ICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMjIxNzA5MzYuMTMyNjgtMS1wZXRlci5tYXlkZWxsQGxp
+bmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIyMjE3MDkzNi4xMzI2OC0xLXBldGVyLm1heWRlbGxA
+bGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU2MTc3YjljYjcgdGNn
+L3BwYzogQWRkIHZlY3RvciBvcGNvZGVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzE4NzogRklMRTogdGNnL3Bw
+Yy90Y2ctdGFyZ2V0LmluYy5jOjMyNzoKKyNkZWZpbmUgVlg0KG9wYykgIChPUENEKDQpfChvcGMp
+KQogICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFj
+ZQojNTUyOiBGSUxFOiB0Y2cvcHBjL3RjZy10YXJnZXQuaW5jLmM6Mjg3NjoKKyAgICAgICAgdW1p
+bl9vcFs0XSA9IHsgVk1JTlVCLCBWTUlOVUgsIFZNSU5VVywgVk1JTlVEIH0sICQKCkVSUk9SOiB0
+cmFpbGluZyB3aGl0ZXNwYWNlCiM1NTM6IEZJTEU6IHRjZy9wcGMvdGNnLXRhcmdldC5pbmMuYzoy
+ODc3OgorICAgICAgICBzbWluX29wWzRdID0geyBWTUlOU0IsIFZNSU5TSCwgVk1JTlNXLCBWTUlO
+U0QgfSwgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzU1NDogRklMRTogdGNnL3BwYy90
+Y2ctdGFyZ2V0LmluYy5jOjI4Nzg6CisgICAgICAgIHVtYXhfb3BbNF0gPSB7IFZNQVhVQiwgVk1B
+WFVILCBWTUFYVVcsIFZNQVhVRCB9LCAkCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBs
+ZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNjIzOiBGSUxFOiB0Y2cvcHBjL3RjZy10YXJn
+ZXQuaW5jLmM6Mjk0NzoKKyAgICAgICAgLyogUmVjYWxsIHdlIHVzZSBWU1ggaW50ZWdlciBsb2Fk
+cywgc28gdGhlIGludGVnZXIgaXMgcmlnaHQKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSAq
+IG9uIHN1YnNlcXVlbnQgbGluZXMKIzYyNDogRklMRTogdGNnL3BwYy90Y2ctdGFyZ2V0LmluYy5j
+OjI5NDg6CisgICAgICAgIC8qIFJlY2FsbCB3ZSB1c2UgVlNYIGludGVnZXIgbG9hZHMsIHNvIHRo
+ZSBpbnRlZ2VyIGlzIHJpZ2h0CisgICAgICAgICAgIGp1c3RpZmllZCB3aXRoaW4gdGhlIGxlZnQg
+KHplcm8taW5kZXgpIGRvdWJsZS13b3JkLiAgKi8KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
+ZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojNjI0OiBGSUxFOiB0Y2cvcHBjL3Rj
+Zy10YXJnZXQuaW5jLmM6Mjk0ODoKKyAgICAgICAgICAganVzdGlmaWVkIHdpdGhpbiB0aGUgbGVm
+dCAoemVyby1pbmRleCkgZG91YmxlLXdvcmQuICAqLwoKV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
+IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojODIyOiAK
+bmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRp
+bmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM4Mjc6IEZJTEU6IHRjZy9wcGMvdGNnLXRhcmdldC5v
+cGMuaDoxOgorLyogVGFyZ2V0LXNwZWNpZmljIG9wY29kZXMgZm9yIGhvc3QgdmVjdG9yIGV4cGFu
+c2lvbi4gIFRoZXNlIHdpbGwgYmUKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSAqIG9uIHN1
+YnNlcXVlbnQgbGluZXMKIzgyODogRklMRTogdGNnL3BwYy90Y2ctdGFyZ2V0Lm9wYy5oOjI6Cisv
+KiBUYXJnZXQtc3BlY2lmaWMgb3Bjb2RlcyBmb3IgaG9zdCB2ZWN0b3IgZXhwYW5zaW9uLiAgVGhl
+c2Ugd2lsbCBiZQorICAgZW1pdHRlZCBieSB0Y2dfZXhwYW5kX3ZlY19vcC4gIEZvciB0aG9zZSBm
+YW1pbGlhciB3aXRoIEdDQyBpbnRlcm5hbHMsCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
+YSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzgyOTogRklMRTogdGNnL3BwYy90Y2ct
+dGFyZ2V0Lm9wYy5oOjM6CisgICBjb25zaWRlciB0aGVzZSB0byBiZSBVTlNQRUMgd2l0aCBuYW1l
+cy4gICovCgp0b3RhbDogNCBlcnJvcnMsIDcgd2FybmluZ3MsIDc4MyBsaW5lcyBjaGVja2VkCgpD
+b21taXQgNTYxNzdiOWNiNzQzICh0Y2cvcHBjOiBBZGQgdmVjdG9yIG9wY29kZXMpIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
+aGV3Lm9yZy9sb2dzLzIwMTkwMjIyMDU1OTUwLjE3NDAzLTEtcmljaGFyZC5oZW5kZXJzb25AbGlu
+YXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
