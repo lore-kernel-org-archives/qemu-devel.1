@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38797)
+Received: from eggs.gnu.org ([209.51.188.92]:38834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gyxOI-0000dN-Fq
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:28:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1gyxOg-0000eY-G9
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:29:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gyxOG-0000WY-Oq
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:28:46 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39280)
+	(envelope-from <bounces@canonical.com>) id 1gyxGw-0003cl-01
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:21:11 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47728)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gyxOG-0000Er-GN
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:28:44 -0500
-Received: by mail-wm1-x343.google.com with SMTP id z84so5208623wmg.4
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 03:28:27 -0800 (PST)
-References: <20190226193408.23862-1-armbru@redhat.com>
-	<20190226193408.23862-10-armbru@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190226193408.23862-10-armbru@redhat.com>
-Date: Wed, 27 Feb 2019 11:28:25 +0000
-Message-ID: <87pnrdlbc6.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gyxGv-0003Xo-Or
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:21:09 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gyxGu-0008Lo-GG
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 11:21:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 770D52E80C7
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 11:21:08 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] mips_malta: Clean up definition
- of flash memory size somewhat
+Date: Wed, 27 Feb 2019 11:07:49 -0000
+From: elmarco <marcandre.lureau@gmail.com>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <155126566994.28771.11063439915285098635.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
+ signal 31 in __pthread_setaffinity_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: qemu-devel@nongnu.org
 
+(I reported that issue a few days ago too:
+https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06066.html)
 
-Markus Armbruster <armbru@redhat.com> writes:
+Perhaps we can teach mesa to not change CPU affinity (some option, or
+environment variable, or seccomp check).
 
-> pflash_cfi01_register() takes a size in bytes, a block size in bytes
-> and a number of blocks.  mips_malta_init() passes BIOS_SIZE, 65536,
-> FLASH_SIZE >> 16.  Actually consistent only because BIOS_SIZE (defined
-> in include/hw/mips/bios.h as (4 * MiB)) matches FLASH_SIZE (defined
-> locally as 0x400000).  Confusing all the same.
->
-> Pass FLASH_SIZE instead of BIOS_SIZE.
->
-> There are more uses of BIOS_SIZE, but I don't sufficiently understand
-> them to attempt cleanup.
->
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/mips/mips_malta.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 172ee033af..c2a5c65a24 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -1269,12 +1269,12 @@ void mips_malta_init(MachineState *machine)
->      if (dinfo) {
->          printf("Register parallel flash %d size " TARGET_FMT_lx " at "
->                 "addr %08llx '%s' %x\n",
-> -               fl_idx, bios_size, FLASH_ADDRESS,
-> +               fl_idx, FLASH_SIZE, FLASH_ADDRESS,
+Daniel, when virgl/mesa will be running in a separate process (thanks to
+vhost-user-gpu), I suppose the rendering process will be free to change
+the CPU affinity. Does that make a difference if mesa thread is in qemu
+or a separate process, in this case?
 
-bios_size =3D=3D FLASH_SIZE at this point, but is then overwritten later in
-the function *if* the flash is loaded (and not already set via a dinfo).
-I'd say you could move bios_size down to were it's used but then you
-confused the byte swapping machinery which expects something to be set.
+-- =
 
-All that said these changes so far are not wrong:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
 
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
 
->                 blk_name(dinfo->bdrv), fl_sectors);
->      }
->  #endif
->      fl =3D pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
-> -                               BIOS_SIZE,
-> +                               FLASH_SIZE,
->                                 dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                                 65536, fl_sectors,
->                                 4, 0x0000, 0x0000, 0x0000, 0x0000, be);
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
 
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
 
---
-Alex Benn=C3=A9e
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815889/+subscriptions
