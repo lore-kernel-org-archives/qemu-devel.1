@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34111)
+Received: from eggs.gnu.org ([209.51.188.92]:34464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gyx02-0006HA-4E
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:03:43 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gyx1s-0007XU-W5
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gywzv-0006xb-T1
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:03:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gywzt-0006u5-MO
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:03:35 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 84D8D300308F
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 11:03:31 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20190221183020.GO2605@work-vm> (David Alan Gilbert's message of
-	"Thu, 21 Feb 2019 18:30:21 +0000")
-References: <20190220115611.3192-1-quintela@redhat.com>
-	<20190220115611.3192-6-quintela@redhat.com>
-	<20190221183020.GO2605@work-vm>
-Reply-To: quintela@redhat.com
-Date: Wed, 27 Feb 2019 12:06:55 +0100
-Message-ID: <874l8psd68.fsf@trasno.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1gyx1r-0008No-3e
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:05:36 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gyx1q-0007qc-TW
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:05:35 -0500
+Received: by mail-wm1-x344.google.com with SMTP id g20so4411020wmh.5
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 03:04:53 -0800 (PST)
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-7-armbru@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190226193408.23862-7-armbru@redhat.com>
+Date: Wed, 27 Feb 2019 11:04:50 +0000
+Message-ID: <87tvgplcfh.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 5/8] multifd: Be flexible about packet
- size
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 06/11] sam460ex: Don't size flash memory
+ to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,101 +31,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> This way we can change the packet size in the future and everything
->> will work.  We choose an arbitrary big number (100 times configured
->> size) as a limit about how big we will reallocate.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  migration/ram.c | 24 ++++++++++++++++++------
->>  1 file changed, 18 insertions(+), 6 deletions(-)
->> 
->> diff --git a/migration/ram.c b/migration/ram.c
->> index e22d02760b..75a8fc21f8 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -723,13 +723,13 @@ static void multifd_pages_clear(MultiFDPages_t *pages)
->>  static void multifd_send_fill_packet(MultiFDSendParams *p)
->>  {
->>      MultiFDPacket_t *packet = p->packet;
->> -    uint32_t page_count = MULTIFD_PACKET_SIZE / qemu_target_page_size();
->> +    uint32_t page_max = MULTIFD_PACKET_SIZE / qemu_target_page_size();
->>      int i;
->>  
->>      packet->magic = cpu_to_be32(MULTIFD_MAGIC);
->>      packet->version = cpu_to_be32(MULTIFD_VERSION);
->>      packet->flags = cpu_to_be32(p->flags);
->> -    packet->pages_alloc = cpu_to_be32(page_count);
->> +    packet->pages_alloc = cpu_to_be32(page_max);
->>      packet->pages_used = cpu_to_be32(p->pages->used);
->>      packet->next_packet_size = cpu_to_be32(p->next_packet_size);
->>      packet->packet_num = cpu_to_be64(p->packet_num);
->> @@ -746,7 +746,7 @@ static void multifd_send_fill_packet(MultiFDSendParams *p)
->>  static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
->>  {
->>      MultiFDPacket_t *packet = p->packet;
->> -    uint32_t page_count = MULTIFD_PACKET_SIZE / qemu_target_page_size();
->> +    uint32_t pages_max = MULTIFD_PACKET_SIZE / qemu_target_page_size();
->>      RAMBlock *block;
->>      int i;
->>  
->> @@ -769,12 +769,24 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
->>      p->flags = be32_to_cpu(packet->flags);
->>  
->>      packet->pages_alloc = be32_to_cpu(packet->pages_alloc);
->> -    if (packet->pages_alloc > page_count) {
->> +    /*
->> +     * If we recevied a packet that is 100 times bigger than expected
->> +     * just stop migration.  It is a magic number.
->> +     */
->> +    if (packet->pages_alloc > pages_max * 100) {
->>          error_setg(errp, "multifd: received packet "
->> -                   "with size %d and expected maximum size %d",
->> -                   packet->pages_alloc, page_count) ;
->> +                   "with size %d and expected size %d",
->> +                   packet->pages_alloc, pages_max) ;
+
+Markus Armbruster <armbru@redhat.com> writes:
+
+> Machine "sam460ex" maps its flash memory at address 0xFFF00000.  When
+> no image is supplied, its size is 1MiB (0x100000), and 512KiB of ROM
+> get mapped on top of its second half.  Else, it's the size of the
+> image rounded up to the next multiple of 64KiB.
 >
-> Should that end with pages_max * 100 ?
-
-Not sure.
-
-The *allocated* by defaault size is pages_max.  If we receive
-bigger packets, we update it, but until a limit (arbitrary, I am open to
-other limits).
-
-So, what multifd is expecting here is pages_max.  But it will cope with
-anything that is smaller than pages_max * 100.  So, what I should put on
-the error message?  100 * pages_max or pages_max?
-
-It appears that for you it is simpler to understand pages_max * 100, and
-as I don't care, I am just changing it.
-
->>          return -1;
->>      }
->> +    /*
->> +     * We received a packet that is bigger than expected but inside
->> +     * reasonable limits (see previous comment).  Just reallocate.
->> +     */
->> +    if (packet->pages_alloc > p->pages->allocated) {
->> +        multifd_pages_clear(p->pages);
->> +        multifd_pages_init(packet->pages_alloc);
->> +    }
->>  
->>      p->pages->used = be32_to_cpu(packet->pages_used);
->>      if (p->pages->used > packet->pages_alloc) {
+> The rounding is actually useless: pflash_cfi01_realize() fails with
+> "failed to read the initial flash content" unless it's a no-op.
 >
-> Other than that error message, I think it's OK, although the names get
-> very confusing (max, alloc, allocated)
-
-I am open to suggestions.  I just got out of names :-(
-
+> I have no idea what happens when the pflash's size exceeds 1MiB.
+> Useful outcomes seem unlikely.
 >
+> I guess memory at the end of the address space remains unmapped when
+> it's smaller than 1MiB.  Again, useful outcomes seem unlikely.
 >
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> The physical hardware appears to have 512KiB of flash memory:
+> https://eu.mouser.com/datasheet/2/268/atmel_AT49BV040B-1180330.pdf
+>
+> For now, just set the flash memory size to 1MiB regardless of image
+> size, and document the mess.
+>
+> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Thanks.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  hw/ppc/sam460ex.c | 41 ++++++++++++++++++++++++++---------------
+>  1 file changed, 26 insertions(+), 15 deletions(-)
+>
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 75250d49e4..0c919529f8 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -91,32 +91,43 @@ struct boot_info {
+>
+>  static int sam460ex_load_uboot(void)
+>  {
+> +    /*
+> +     * This first creates 1MiB of flash memory mapped at the end of
+> +     * the 32-bit address space (0xFFF00000..0xFFFFFFFF).
+> +     *
+> +     * If_PFLASH unit 0 is defined, the flash memory is initialized
+> +     * from that block backend.
+> +     *
+> +     * Else, it's initialized to zero.  And then 512KiB of ROM get
+> +     * mapped on top of its second half (0xFFF80000..0xFFFFFFFF),
+> +     * initialized from u-boot-sam460-20100605.bin.
+> +     *
+> +     * This doesn't smell right.
+> +     *
+> +     * The physical hardware appears to have 512KiB flash memory.
+> +     *
+> +     * TODO Figure out what we really need here, and clean this up.
+> +     */
+> +
+>      DriveInfo *dinfo;
+> -    BlockBackend *blk =3D NULL;
+> -    hwaddr base =3D FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32);
+> -    long bios_size =3D FLASH_SIZE;
+> -    int fl_sectors;
+>
+>      dinfo =3D drive_get(IF_PFLASH, 0, 0);
+> -    if (dinfo) {
+> -        blk =3D blk_by_legacy_dinfo(dinfo);
+> -        bios_size =3D blk_getlength(blk);
+> -    }
+> -    fl_sectors =3D (bios_size + 65535) >> 16;
+> -
+> -    if (!pflash_cfi01_register(base, NULL, "sam460ex.flash", bios_size,
+> -                               blk, 64 * KiB, fl_sectors,
+> +    if (!pflash_cfi01_register(FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32),
+> +                               NULL, "sam460ex.flash", FLASH_SIZE,
+> +                               dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                               64 * KiB, FLASH_SIZE / (64 * KiB),
+>                                 1, 0x89, 0x18, 0x0000, 0x0, 1)) {
+>          error_report("Error registering flash memory");
+>          /* XXX: return an error instead? */
+>          exit(1);
+>      }
+>
+> -    if (!blk) {
+> +    if (!dinfo) {
+>          /*error_report("No flash image given with the 'pflash' parameter=
+,"
+>                  " using default u-boot image");*/
+> -        base =3D UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32);
+> -        rom_add_file_fixed(UBOOT_FILENAME, base, -1);
+> +        rom_add_file_fixed(UBOOT_FILENAME,
+> +                           UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32=
+),
+> +                           -1);
+>      }
+>
+>      return 0;
+
+
+--
+Alex Benn=C3=A9e
