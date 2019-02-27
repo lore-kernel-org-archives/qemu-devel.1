@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51690)
+Received: from eggs.gnu.org ([209.51.188.92]:51200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gyzV0-0005jJ-39
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:56 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gyzV2-0005Ft-RH
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gyzGC-0002Ug-4G
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:28:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35522)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gyzG8-0002St-HS
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:28:30 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gyxoH-00023J-NE
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 11:55:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AAB3F2E80C8
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 11:55:37 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1gyzFt-0002IX-AS
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:28:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gyzFr-0002AK-8s
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:28:11 -0500
+Date: Wed, 27 Feb 2019 14:12:42 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190227141242.71081f37@redhat.com>
+In-Reply-To: <20190225124714.2567npif32iqt5bx@master>
+References: <20190220005124.24224-1-richardw.yang@linux.intel.com>
+	<20190221155004.010f7b7a@redhat.com>
+	<20190223000249.e56gmq6su7vqor6k@master>
+	<20190225090537.60f7aedf@Igors-MacBook-Pro.local>
+	<20190225124714.2567npif32iqt5bx@master>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Feb 2019 11:50:05 -0000
-From: Daniel Berrange <1815889@bugs.launchpad.net>
-Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
-Message-Id: <155126820551.28960.15566134236734331758.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
- signal 31 in __pthread_setaffinity_new()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] PCDIMM cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Wei Yang <richard.weiyang@gmail.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, xiaoguangrong.eric@gmail.com, philmd@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
 
-I did wonder if we could set the action for some syscalls to be "errno"
-instead of "kill process", but I worry that could then result in silent
-mis-behaviour as processes fail to check return value as they blindly
-assume the call cannot fail.
+On Mon, 25 Feb 2019 12:47:14 +0000
+Wei Yang <richard.weiyang@gmail.com> wrote:
 
-We should probably talk with mesa developers about providing a config
-option to prevent this affinity change. An env variable is workable if
-there's no other mechanism they can expose.
+> On Mon, Feb 25, 2019 at 09:05:37AM +0100, Igor Mammedov wrote:
+> >On Sat, 23 Feb 2019 00:02:49 +0000
+> >Wei Yang <richard.weiyang@gmail.com> wrote:
+> >  
+> >> On Thu, Feb 21, 2019 at 03:50:04PM +0100, Igor Mammedov wrote:  
+> >> >On Wed, 20 Feb 2019 08:51:21 +0800
+> >> >Wei Yang <richardw.yang@linux.intel.com> wrote:
+> >> >  
+> >> >> Three trivial cleanup for pc-dimm.
+> >> >> 
+> >> >> Patch [1] remove the check on class->hotpluggable since pc-dimm is always
+> >> >> hotpluggable.
+> >> >> Patch [2] remove nvdimm_realize
+> >> >> Patch [2] remove pcdimm realize-callback  
+> >> >even though this series doesn't break anything, I disagree with it
+> >> >conceptually as it makes device less abstracted and make it more
+> >> >dependent on how existing machine code uses it.
+> >> >I'd drop whole series.
+> >> >  
+> >> 
+> >> Is Patch [1] also make device more dependent on existing implementation?  
+> >yes, it's implementation detail that PCDIMM&Co are hotpluggable now.
+> >  
+> >> For example, when we look at the counterpart of acpi_memory_plug_cb():
+> >> 
+> >>     acpi_pcihp_device_plug_cb
+> >> 
+> >> which handle the pci device hotplug. We don't check the hotpluggable
+> >> property for pci devices.
+> >> 
+> >> To me, this is a general rule for PCDIMM, they are hotpluggable.  
+> >yes, PCDIMMs are hotpluggable but apci device (piix4pm/ich9/...) handling hotplug
+> >should ignore any non-hotpluggable one. If you remove check and then later
+> >someone else would add non-hotpluggable memory device or make PC-DIMMs or its
+> >variant of non-hotpluggable one, acpi device handling will break.
+> >Hence I'd prefer to keep the check.  
+> >   
+> 
+> Ok, if we'd support un-hotpluggable mem device, we could retain this
+> check. But this maybe not a proper place.
+> 
+> Based on my understanding, at this point, every thing has been done
+> properly. If this check pass, we will send an acpi interrupt to notify
+> the guest. In case this is an un-hotpluggable device, every thing looks
+> good but no effect in guest. Because we skip the notification.
+> 
+> Maybe we need to move the check in pre-plug?
+And what would happen then and afterwards?
 
--- =
+Point is to make one of the handlers in chain to ignore plug event
+(i.e. do not generate SCI event) while the rest of handlers complete
+successfully mapping device in address space and whatever else.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815889
-
-Title:
-  qemu-system-x86_64 crashed with signal 31 in
-  __pthread_setaffinity_new()
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  Unable to launch Default Fedora 29 images in gnome-boxes
-
-  ProblemType: Crash
-  DistroRelease: Ubuntu 19.04
-  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
-  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
-  Uname: Linux 4.19.0-12-generic x86_64
-  ApportVersion: 2.20.10-0ubuntu20
-  Architecture: amd64
-  Date: Thu Feb 14 11:00:45 2019
-  ExecutablePath: /usr/bin/qemu-system-x86_64
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: Dell Inc. Precision T3610
-  ProcEnviron: PATH=3D(custom, user)
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
-ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
-  Signal: 31
-  SourcePackage: qemu
-  StacktraceTop:
-   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
-t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
-   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
-   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
-   start_thread (arg=3D<optimized out>) at pthread_create.c:486
-   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
-_new()
-  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
-  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
-  dmi.bios.date: 11/14/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: A18
-  dmi.board.name: 09M8Y8
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A01
-  dmi.chassis.type: 7
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
-T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
-  dmi.product.name: Precision T3610
-  dmi.product.sku: 05D2
-  dmi.product.version: 00
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815889/+subscriptions
+> >> For Patch[2][3], I agree with you.
+> >>   
+> 
