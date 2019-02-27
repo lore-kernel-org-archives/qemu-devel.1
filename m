@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51935)
+Received: from eggs.gnu.org ([209.51.188.92]:51322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyzUt-00064R-Qt
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:46 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gyzUv-0005cE-WE
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyzIg-0003nw-L2
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:31:07 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 27 Feb 2019 16:14:31 +0300
-Message-Id: <20190227131433.197063-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190227131433.197063-1-vsementsov@virtuozzo.com>
-References: <20190227131433.197063-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 3/5] qcow2-refcount: check_refcounts_l2:
- reduce ignored overlaps
+	(envelope-from <dgilbert@redhat.com>) id 1gyzHM-00037V-1X
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:29:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36084)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzHL-00036y-Nt
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:29:43 -0500
+Date: Wed, 27 Feb 2019 12:10:52 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190227121052.GD2602@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] possible ahci/migrate fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,83 +25,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@virtuozzo.com, vsementsov@virtuozzo.com
+To: alex.bennee@linaro.org
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com
 
-Reduce number of structures ignored in overlap check: when checking
-active table ignore active tables, when checking inactive table ignore
-inactive ones.
+Hi Alex,
+  Can you see if the attached patch fixes the ahci/migrate failure you
+see;  it won't fail for me however mean I am to it.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+=46rom f4c327d14d656d1c0f0e694d0efc6165493416f0 Mon Sep 17 00:00:00 2001
+=46rom: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Date: Wed, 27 Feb 2019 12:04:37 +0000
+Subject: [PATCH] migration: Cleanup during exit
+
+Currently we cleanup the migration object as we exit main after the
+main_loop finishes; however if there's a migration running things
+get messy and we can end up with the migration thread still trying
+to access freed structures.
+
+We now take a ref to the object around the migration thread itself,
+so the act of dropping the ref during exit doesn't cause us to lose
+the state until the thread quits.
+
+Cancelling the migration during migration also tries to get the thread
+to quit.
+
+We do this a bit earlier; so hopefully migration gets out of the way
+before all the devices etc are freed.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- block/qcow2-refcount.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ migration/migration.c | 8 ++++++++
+ vl.c                  | 7 ++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index add1bbf54f..00a922edfa 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1579,7 +1579,7 @@ enum {
- static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-                               void **refcount_table,
-                               int64_t *refcount_table_size, int64_t l2_offset,
--                              int flags, BdrvCheckMode fix)
-+                              int flags, BdrvCheckMode fix, bool active)
+diff --git a/migration/migration.c b/migration/migration.c
+index e44f77af02..f612313d09 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -126,6 +126,7 @@ static bool migration_object_check(MigrationState *ms, =
+Error **errp);
+ static int migration_maybe_pause(MigrationState *s,
+                                  int *current_active_state,
+                                  int new_state);
++static void migrate_fd_cancel(MigrationState *s);
+=20
+ void migration_object_init(void)
  {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t *l2_table, l2_entry;
-@@ -1663,11 +1663,12 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-                     if (fix & BDRV_FIX_ERRORS) {
-                         uint64_t l2e_offset =
-                             l2_offset + (uint64_t)i * sizeof(uint64_t);
-+                        int ign = active ? QCOW2_OL_ACTIVE_L2 :
-+                                           QCOW2_OL_INACTIVE_L2;
- 
-                         l2_entry = QCOW_OFLAG_ZERO;
-                         l2_table[i] = cpu_to_be64(l2_entry);
--                        ret = qcow2_pre_write_overlap_check(bs,
--                                QCOW2_OL_ACTIVE_L2 | QCOW2_OL_INACTIVE_L2,
-+                        ret = qcow2_pre_write_overlap_check(bs, ign,
-                                 l2e_offset, sizeof(uint64_t));
-                         if (ret < 0) {
-                             fprintf(stderr, "ERROR: Overlap check failed\n");
-@@ -1741,7 +1742,7 @@ static int check_refcounts_l1(BlockDriverState *bs,
-                               void **refcount_table,
-                               int64_t *refcount_table_size,
-                               int64_t l1_table_offset, int l1_size,
--                              int flags, BdrvCheckMode fix)
-+                              int flags, BdrvCheckMode fix, bool active)
+@@ -169,6 +170,11 @@ void migration_object_init(void)
+=20
+ void migration_object_finalize(void)
  {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t *l1_table = NULL, l2_offset, l1_size2;
-@@ -1797,7 +1798,7 @@ static int check_refcounts_l1(BlockDriverState *bs,
-             /* Process and check L2 entries */
-             ret = check_refcounts_l2(bs, res, refcount_table,
-                                      refcount_table_size, l2_offset, flags,
--                                     fix);
-+                                     fix, active);
-             if (ret < 0) {
-                 goto fail;
-             }
-@@ -2083,7 +2084,7 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     /* current L1 table */
-     ret = check_refcounts_l1(bs, res, refcount_table, nb_clusters,
-                              s->l1_table_offset, s->l1_size, CHECK_FRAG_INFO,
--                             fix);
-+                             fix, true);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -2106,7 +2107,8 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-             continue;
-         }
-         ret = check_refcounts_l1(bs, res, refcount_table, nb_clusters,
--                                 sn->l1_table_offset, sn->l1_size, 0, fix);
-+                                 sn->l1_table_offset, sn->l1_size, 0, fix,
-+                                 false);
-         if (ret < 0) {
-             return ret;
-         }
--- 
-2.18.0
++    /*
++     * Cancel the current migration - that will (eventually)
++     * stop the migration using this structure
++     */
++    migrate_fd_cancel(current_migration);
+     object_unref(OBJECT(current_migration));
+ }
+=20
+@@ -3134,6 +3140,7 @@ static void *migration_thread(void *opaque)
+=20
+     rcu_register_thread();
+=20
++    object_ref(OBJECT(s));
+     s->iteration_start_time =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+=20
+     qemu_savevm_state_header(s->to_dst_file);
+@@ -3230,6 +3237,7 @@ static void *migration_thread(void *opaque)
+=20
+     trace_migration_thread_after_loop();
+     migration_iteration_finish(s);
++    object_unref(OBJECT(s));
+     rcu_unregister_thread();
+     return NULL;
+ }
+diff --git a/vl.c b/vl.c
+index 2f340686a7..c1920165f3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4579,6 +4579,12 @@ int main(int argc, char **argv, char **envp)
+=20
+     gdbserver_cleanup();
+=20
++    /*
++     * cleaning up the migration object cancels any existing migration
++     * try to do this early so that it also stops using devices.
++     */
++    migration_object_finalize();
++
+     /* No more vcpu or device emulation activity beyond this point */
+     vm_shutdown();
+=20
+@@ -4594,7 +4600,6 @@ int main(int argc, char **argv, char **envp)
+     monitor_cleanup();
+     qemu_chr_cleanup();
+     user_creatable_cleanup();
+-    migration_object_finalize();
+     /* TODO: unref root container, check all devices are ok */
+=20
+     return 0;
+--=20
+2.20.1
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
