@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51695)
+Received: from eggs.gnu.org ([209.51.188.92]:54669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz18T-0006SV-E9
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:28:42 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gz1Nc-000232-8r
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz18R-0002vu-VT
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:28:41 -0500
-Resent-Message-Id: <E1gz18R-0002vu-VT@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gz18O-0002r1-6b
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:28:38 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155128129383.1544.1746033432959505539@49fa7ef69f7b>
-In-Reply-To: <20190219233421.388-1-richard.henderson@linaro.org>
+	(envelope-from <stefanha@gmail.com>) id 1gz1Nb-0008Nz-BO
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:20 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gz1Nb-0007Mk-0B
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:19 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id w2so18461324wrt.11
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 07:41:59 -0800 (PST)
+Date: Wed, 27 Feb 2019 15:31:40 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190227153140.GG22539@stefanha-x1.localdomain>
+References: <20190226202309.7761-1-stefanha@gmail.com>
+	<434db57d-d672-3c3f-7284-d07e47daddbc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 27 Feb 2019 07:28:15 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/arm: Reduce overhead of
- cpu_get_tb_cpu_state
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="GdbWtwDHkcXqP16f"
+Content-Disposition: inline
+In-Reply-To: <434db57d-d672-3c3f-7284-d07e47daddbc@redhat.com>
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Add GSoC/Outreachy 2019
+ announcement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, cota@braap.org, alex.bennee@linaro.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxOTIzMzQyMS4zODgt
-MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxOTIzMzQyMS4zODgtMS1yaWNo
-YXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIg
-MC8zXSB0YXJnZXQvYXJtOiBSZWR1Y2Ugb3ZlcmhlYWQgb2YgY3B1X2dldF90Yl9jcHVfc3RhdGUK
-VHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBy
-ZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCmY2ZTdmZjMyOTggdGFyZ2V0L2FybTogUmVseSBvbiBoZmxhZ3Mg
-Y29ycmVjdCBpbiBjcHVfZ2V0X3RiX2NwdV9zdGF0ZQoyY2NmYTMxODRiIHRhcmdldC9hcm06IFJl
-YnVpbGQgaGZsYWdzIGF0IGVsIGNoYW5nZXMgYW5kIE1TUiB3cml0ZXMKZWVkNjg4MjhlNCB0YXJn
-ZXQvYXJtOiBTcGxpdCBvdXQgcmVjb21wdXRlX2hmbGFncyBldCBhbAoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KMS8zIENoZWNraW5nIGNvbW1pdCBlZWQ2ODgyOGU0OGUgKHRhcmdldC9hcm06IFNwbGl0
-IG91dCByZWNvbXB1dGVfaGZsYWdzIGV0IGFsKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
-YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjc3OiBGSUxFOiB0YXJnZXQvYXJtL2hl
-bHBlci5jOjEyOTEyOgorICAgICAgICAvKiBJZiBTVkUgaXMgZGlzYWJsZWQsIGJ1dCBGUCBpcyBl
-bmFibGVkLAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNl
-cGFyYXRlIGxpbmUKIzM1ODogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxMjk5MzoKKyAgICAv
-KiBUaGUgU1NfQUNUSVZFIGFuZCBQU1RBVEVfU1MgYml0cyBjb3JyZXNwb25kIHRvIHRoZSBzdGF0
-ZSBtYWNoaW5lCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDM2MyBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCAxLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi8zIENoZWNraW5nIGNvbW1p
-dCAyY2NmYTMxODRiZDUgKHRhcmdldC9hcm06IFJlYnVpbGQgaGZsYWdzIGF0IGVsIGNoYW5nZXMg
-YW5kIE1TUiB3cml0ZXMpCjMvMyBDaGVja2luZyBjb21taXQgZjZlN2ZmMzI5ODNlICh0YXJnZXQv
-YXJtOiBSZWx5IG9uIGhmbGFncyBjb3JyZWN0IGluIGNwdV9nZXRfdGJfY3B1X3N0YXRlKQpFUlJP
-UjogVXNlIGdfYXNzZXJ0IG9yIGdfYXNzZXJ0X25vdF9yZWFjaGVkCiM3NTogRklMRTogdGFyZ2V0
-L2FybS9oZWxwZXIuYzoxMjk4OToKKyAgICAgICAgZ19hc3NlcnRfY21waGV4KGZsYWdzLCA9PSwg
-Y2hlY2tfZmxhZ3MpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzNCBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAzLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
-YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjE5MjMzNDIxLjM4OC0x
-LXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1l
-c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
-Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
-dmVsQHJlZGhhdC5jb20=
+
+--GdbWtwDHkcXqP16f
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Wed, Feb 27, 2019 at 09:43:33AM +0100, Thomas Huth wrote:
+> By the way, I just noticed that on
+> https://wiki.qemu.org/Outreachy_2019_MayAugust the link in step 2 is
+> broken. You might want to fix that...
+
+Fixed, thanks!
+
+Stefan
+
+--GdbWtwDHkcXqP16f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcdq1cAAoJEJykq7OBq3PIv4oIAKa0NY/PzldhXXaV+KdUz+K+
+/Drt3Y1LjUCdxArfFRDC7YKQxfdRgoP8vr1ArTZz5Yc2kfuykRJ5BOuf1ACuPutR
+7im0wy6RRx1LiK1R42/NO6I1WQHtWqZC3nCM7D9Jiya3NGMjoQbdwV+svVk6u885
+XbE9k7Lhx4YtT6wStYzyU3kRZPG2NLsDOGb8p1ki7QDTh9lCeRdckQjjNrTFmtcn
+MWpbfeH3NVb6Y6O6c1G2ObCujFLbjyxu9V1YjlOYuSHrcKZrW0cfg2HJj/KlNXcM
+1C2N5YvicFtPFApWw1ambEAhmxOxJk0WSRawE+72PAj8Ha1lDReWVveISXdUNYg=
+=F8U+
+-----END PGP SIGNATURE-----
+
+--GdbWtwDHkcXqP16f--
