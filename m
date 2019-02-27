@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46366)
+Received: from eggs.gnu.org ([209.51.188.92]:46370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gyzDp-0002OW-D0
+	(envelope-from <mreitz@redhat.com>) id 1gyzDp-0002OZ-DZ
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:26:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gyzDn-0001DD-AY
+	(envelope-from <mreitz@redhat.com>) id 1gyzDn-0001D7-AA
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:26:05 -0500
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-	<20181214134240.217870-6-vsementsov@virtuozzo.com>
-	<15e27f9f-8788-66ce-7843-0922662e42b1@redhat.com>
-	<1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
+References: <20190227131433.197063-1-vsementsov@virtuozzo.com>
+	<20190227131433.197063-6-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c097c89c-40ef-d3a5-ac4e-7adec1841029@redhat.com>
-Date: Wed, 27 Feb 2019 13:48:41 +0100
+Message-ID: <df4b140a-247e-027a-95f1-d62732267b32@redhat.com>
+Date: Wed, 27 Feb 2019 14:18:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
+In-Reply-To: <20190227131433.197063-6-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Dwyj2hlxslYBTttqwJNZEXm4ChaX8snBy"
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] qcow2-refcount: don't mask
+	boundary="pdR4D8E7Mt3EokmsMDRWrOiblnTLrz9EZ"
+Subject: Re: [Qemu-devel] [PATCH v5 5/5] qcow2-refcount: don't mask
  corruptions under internal errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,111 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Dwyj2hlxslYBTttqwJNZEXm4ChaX8snBy
+--pdR4D8E7Mt3EokmsMDRWrOiblnTLrz9EZ
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <c097c89c-40ef-d3a5-ac4e-7adec1841029@redhat.com>
-Subject: Re: [PATCH v4 5/5] qcow2-refcount: don't mask corruptions under
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com
+Message-ID: <df4b140a-247e-027a-95f1-d62732267b32@redhat.com>
+Subject: Re: [PATCH v5 5/5] qcow2-refcount: don't mask corruptions under
  internal errors
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
- <20181214134240.217870-6-vsementsov@virtuozzo.com>
- <15e27f9f-8788-66ce-7843-0922662e42b1@redhat.com>
- <1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
-In-Reply-To: <1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
+References: <20190227131433.197063-1-vsementsov@virtuozzo.com>
+ <20190227131433.197063-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20190227131433.197063-6-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 27.02.19 13:47, Vladimir Sementsov-Ogievskiy wrote:
-> 27.02.2019 15:42, Max Reitz wrote:
->> On 14.12.18 14:42, Vladimir Sementsov-Ogievskiy wrote:
->>> No reasons for not reporting found corruptions as corruptions in case=
-
->>> of some internal errors, especially in case of just failed to fix l2
->>> entry (and in this case, missed corruptions may influence comparing
->>> logic, when we calculate difference between corruptions fields of two=
-
->>> results)
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->>>   block/qcow2-refcount.c | 31 ++++++++++++++-----------------
->>>   1 file changed, 14 insertions(+), 17 deletions(-)
->>>
->>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->>> index 8da0e91dd3..b0e006e628 100644
->>> --- a/block/qcow2-refcount.c
->>> +++ b/block/qcow2-refcount.c
->>
->> [...]
->>
->>> @@ -1899,19 +1899,16 @@ static int check_oflag_copied(BlockDriverStat=
-e *bs, BdrvCheckResult *res,
->>>                       fprintf(stderr, "%s OFLAG_COPIED data cluster: =
-"
->>>                               "l2_entry=3D%" PRIx64 " refcount=3D%" P=
-RIu64 "\n",
->>>                               repair ? "Repairing" : "ERROR", l2_entr=
-y, refcount);
->>> -                    if (repair) {
->>> -                        l2_table[j] =3D cpu_to_be64(refcount =3D=3D =
-1
->>> -                                    ? l2_entry |  QCOW_OFLAG_COPIED
->>> -                                    : l2_entry & ~QCOW_OFLAG_COPIED)=
-;
->>> -                        l2_dirty++;
->>> -                    } else {
->>> -                        res->corruptions++;
->>> -                    }
->>> +                    l2_table[j] =3D cpu_to_be64(refcount =3D=3D 1
->>> +                                ? l2_entry |  QCOW_OFLAG_COPIED
->>> +                                : l2_entry & ~QCOW_OFLAG_COPIED);
->>> +                    l2_dirty++;
->>
->> I found the old logic to be easier to understand, actually.  It made i=
-t
->> clear that if !repair, the L2 table is not going to be touched.
->>
->> Max
->>
+On 27.02.19 14:14, Vladimir Sementsov-Ogievskiy wrote:
+> No reasons for not reporting found corruptions as corruptions in case
+> of some internal errors, especially in case of just failed to fix l2
+> entry (and in this case, missed corruptions may influence comparing
+> logic, when we calculate difference between corruptions fields of two
+> results)
 >=20
-> so,
->=20
->    if (repair) {
->       keep as is
->    }
->    res->corruptions++;
->=20
-> ok?
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-refcount.c | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
 
-Yep, that works for me.  Or above the fprintf() as you did it in other
-places in this patch.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+I'll be on PTO for a couple of weeks, so it doesn't make sense for me to
+take this series to my branch now, though...
 
 Max
 
 
---Dwyj2hlxslYBTttqwJNZEXm4ChaX8snBy
+--pdR4D8E7Mt3EokmsMDRWrOiblnTLrz9EZ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlx2hykACgkQ9AfbAGHV
-z0CRLAgAuSh6PtA1bfg8KgG9t7v1US7ogZn2ysPOHqYEwmYBrTsocC1MNWDYSoX2
-+0eLTUADtKDhDQ8Y9laTLLwo34fF5bzaH84f8X9LIjnMsdQ0HU0RCOUHZgMyR7iF
-xmGnLSJPQdajLkzLFVWnKDO08FTA5GwWNF9BsvHpwczEc3OZi8B5DM+uNxgGetAl
-kr3H5zWWycjTidcJSKeEH0AX/OMHBStS3GTul9CnzgC12FFIfTZCkprED2VrqnxQ
-Fw5PVGgFE3A5ErewZpIxed3dX5omgM6x0kk0w/Xm9e5wSzs+VpICril4NPe61BYV
-mQwnVRH45qcZkH+Hn3Dd4qkyNXBvQQ==
-=qmST
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlx2jhQACgkQ9AfbAGHV
+z0AjZQgAm1yOXtF5a2ewia0igGDxNjSQv6hHBCZHvJEH+7bbFACz3heXRQzYAy6T
+56IezpLe3rHZkHiqPBJO2KcMINHOZYzeO8YNv8RPFXl5hYV8Mu0DDPkMiNuswaTM
+7U6Zq7D30fqAdzNLWJ1hNs4cEJmIIvRLFGXy+/Lm3ZFAqJQ4EXSHXqm1wCu5i9mF
++5zwbAS+ApmxdaFNoY0YwW2yltn4CCJ0/+A2I/qDPJZ/lbzzAEGRJnKd75/DSboO
+mgZYgtChNOvQJI/WVfuljvqdqY4Va/K4ppVZRoFz/tWUheydAUaYQz7hPszwZ20o
+p5tlGIWctWQSWX9SYb4On2D4ccko7w==
+=UtZ+
 -----END PGP SIGNATURE-----
 
---Dwyj2hlxslYBTttqwJNZEXm4ChaX8snBy--
+--pdR4D8E7Mt3EokmsMDRWrOiblnTLrz9EZ--
