@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50907)
+Received: from eggs.gnu.org ([209.51.188.92]:50938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz15z-0004bM-Fa
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:08 -0500
+	(envelope-from <berrange@redhat.com>) id 1gz15z-0004bN-Tb
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz15y-00011F-5I
+	(envelope-from <berrange@redhat.com>) id 1gz15y-00011s-PE
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:07 -0500
-Resent-Message-Id: <E1gz15y-00011F-5I@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gz15w-0000bT-Qq
+Received: from mx1.redhat.com ([209.132.183.28]:46624)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gz15y-0000cM-FH
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:06 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155128109448.1544.16250328773370124812@49fa7ef69f7b>
-In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
+Date: Wed, 27 Feb 2019 15:25:25 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190227152525.GK31688@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190222153254.22739-1-stefanha@redhat.com>
+	<87imx8uu99.fsf@dusky.pond.sub.org>
+	<20190225092846.GA4757@angien.pipo.sk>
+	<20190225174001.GI379@stefanha-x1.localdomain>
+	<87a7iincg0.fsf@dusky.pond.sub.org>
+	<20190227151535.GE22539@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 27 Feb 2019 07:24:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190227151535.GE22539@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, programmingkidx@gmail.com, r.bolshakov@yadro.com, kraxel@redhat.com, ben.hekster@foghorn.io, berkus@gmail.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDEwMjgxNi4zMzkz
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIu
-bWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB1
-aS9jb2NvYTogVXNlIE9TWCdzIG1haW4gbG9vcApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8
-IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
-ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTUxNzQ1NDguMjYz
-MC0xLXl1cnkta290b3ZAeWFuZGV4LXRlYW0ucnUgLT4gcGF0Y2hldy8yMDE5MDIxNTE3NDU0OC4y
-NjMwLTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjkzYTNjZjljNDIgdWkvY29jb2E6IFBlcmZvcm0gVUkgb3BlcmF0aW9ucyBvbmx5IG9u
-IHRoZSBtYWluIHRocmVhZAo3ZWIxMzAzNzVhIHVpL2NvY29hOiBTdWJjbGFzcyBOU0FwcGxpY2F0
-aW9uIHNvIHdlIGNhbiBpbXBsZW1lbnQgc2VuZEV2ZW50CjU1NmUzMTNiZjUgdWkvY29jb2E6IERv
-bid0IGNhbGwgTlNBcHAgc2VuZEV2ZW50IGRpcmVjdGx5IGZyb20gaGFuZGxlRXZlbnQKNWUyMGNj
-ZjYzYyB1aS9jb2NvYTogTW92ZSBjb25zb2xlL2RldmljZSBtZW51IGNyZWF0aW9uIGNvZGUgdXAg
-aW4gZmlsZQowMTczNTNiODQwIHVpL2NvY29hOiBGYWN0b3Igb3V0IGluaXRpYWwgbWVudSBjcmVh
-dGlvbgo0NTVjZTkwM2ZhIHVpL2NvY29hOiBVc2UgdGhlIHBpeG1hbiBpbWFnZSBkaXJlY3RseSBp
-biBzd2l0Y2hTdXJmYWNlCjAyYjY3NWVkZTAgdWkvY29jb2E6IEVuc3VyZSB3ZSBoYXZlIHRoZSBp
-b3RocmVhZCBsb2NrIHdoZW4gY2FsbGluZyBpbnRvIFFFTVUKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvNyBDaGVja2luZyBjb21taXQgMDJiNjc1ZWRlMGEyICh1aS9jb2NvYTogRW5zdXJlIHdlIGhh
-dmUgdGhlIGlvdGhyZWFkIGxvY2sgd2hlbiBjYWxsaW5nIGludG8gUUVNVSkKMi83IENoZWNraW5n
-IGNvbW1pdCA0NTVjZTkwM2ZhMDkgKHVpL2NvY29hOiBVc2UgdGhlIHBpeG1hbiBpbWFnZSBkaXJl
-Y3RseSBpbiBzd2l0Y2hTdXJmYWNlKQozLzcgQ2hlY2tpbmcgY29tbWl0IDAxNzM1M2I4NDBiNCAo
-dWkvY29jb2E6IEZhY3RvciBvdXQgaW5pdGlhbCBtZW51IGNyZWF0aW9uKQo0LzcgQ2hlY2tpbmcg
-Y29tbWl0IDVlMjBjY2Y2M2M2MiAodWkvY29jb2E6IE1vdmUgY29uc29sZS9kZXZpY2UgbWVudSBj
-cmVhdGlvbiBjb2RlIHVwIGluIGZpbGUpCjUvNyBDaGVja2luZyBjb21taXQgNTU2ZTMxM2JmNWUx
-ICh1aS9jb2NvYTogRG9uJ3QgY2FsbCBOU0FwcCBzZW5kRXZlbnQgZGlyZWN0bHkgZnJvbSBoYW5k
-bGVFdmVudCkKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQ0OiBGSUxFOiB1aS9jb2NvYS5t
-OjE1MjoKKyAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEyMiBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCA1LzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjYvNyBDaGVja2luZyBj
-b21taXQgN2ViMTMwMzc1YWQwICh1aS9jb2NvYTogU3ViY2xhc3MgTlNBcHBsaWNhdGlvbiBzbyB3
-ZSBjYW4gaW1wbGVtZW50IHNlbmRFdmVudCkKNy83IENoZWNraW5nIGNvbW1pdCA5M2EzY2Y5YzQy
-NjggKHVpL2NvY29hOiBQZXJmb3JtIFVJIG9wZXJhdGlvbnMgb25seSBvbiB0aGUgbWFpbiB0aHJl
-YWQpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
-MTkwMjE0MTAyODE2LjMzOTMtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVj
-a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Wed, Feb 27, 2019 at 03:15:35PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Feb 26, 2019 at 10:09:19AM +0100, Markus Armbruster wrote:
+> > Stefan Hajnoczi <stefanha@redhat.com> writes:
+> > > On Mon, Feb 25, 2019 at 10:28:46AM +0100, Peter Krempa wrote:
+> > >> On Mon, Feb 25, 2019 at 09:50:26 +0100, Markus Armbruster wrote:
+> > >> > Stefan Hajnoczi <stefanha@redhat.com> writes:
+> > >> Other than the above, this is a welcome improvement as I've personally
+> > >> ran into scenarios where a feature in qemu was fixed but it was
+> > >> impossible to detect whether given qemu version contains the fix as it
+> > >> did not have any influence on the QMP schema.
+> > >
+> > > I'd like to make things as simpler as possible, but no simpler :).
+> > >
+> > > The simplest option is that the advertised features are set in stone at
+> > > build time (e.g. selected with #ifdef if necessary).  But then we have
+> > > no way of selecting features at runtime (e.g. based on kernel features).
+> > >
+> > > What do you think?
+> > 
+> > I think we should map the problem space, identify cases with actual
+> > uses, then design a solution that covers them and can plausibly grow to
+> > cover cases we anticipate.
+> > 
+> > The migrate-with-cache-direct-off-on-linux case is compile-time static.
+> > 
+> > Do we have or have we had a case that is not compile-time static?
+> 
+> I can't think of something that both requires query-qemu-features and
+> isn't compile-time static.  But that could be because not many things
+> require query-qemu-features :).
+> 
+> The philosophy on Linux seems to be: distros compile QEMU against
+> headers that accurately reflect the system features that are available.
+> Therefore there isn't a lot of runtime fallback logic in case a new QEMU
+> is running on an old host.  This means we can get by with compile-time
+> static features only.
+
+This assumption is probably going to be more troublesome in future. It
+is increasingly common to deploy libvirt & QEMU inside docker containers,
+and there's not a strict requirement that the docker container image
+is the same distro / version as the docker host. ie a Fedora docker
+image could be run on a RHEL host & vica-verca. IOW we could see an older
+kernel than what we compiled on. I don't know how common such mismatches
+will be in practice, but at the Docker level there's nothing preventing
+such mismatches, which means some people will inevitably end up running
+in such scenarios whether we like it or not. 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
