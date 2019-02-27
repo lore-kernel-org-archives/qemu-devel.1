@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54104)
+Received: from eggs.gnu.org ([209.51.188.92]:54847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gyzZe-000256-RZ
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:48:39 -0500
+	(envelope-from <mst@redhat.com>) id 1gyzcB-00040P-IG
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:51:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gyzZe-0006Fu-5z
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:48:38 -0500
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-	<20181214134240.217870-5-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ba0783f0-768f-e1bd-2d14-738640b0a167@redhat.com>
-Date: Wed, 27 Feb 2019 13:32:58 +0100
+	(envelope-from <mst@redhat.com>) id 1gyzcA-0000lL-Oh
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:51:15 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:39843)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gyzcA-0000kw-Ii
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:51:14 -0500
+Received: by mail-qt1-f194.google.com with SMTP id o6so19191211qtk.6
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 05:51:14 -0800 (PST)
+Date: Wed, 27 Feb 2019 08:51:11 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190227084843-mutt-send-email-mst@kernel.org>
+References: <20190226073159.13434-1-richardw.yang@linux.intel.com>
+	<20190226110934-mutt-send-email-mst@kernel.org>
+	<20190227053319.GB5449@richard>
 MIME-Version: 1.0
-In-Reply-To: <20181214134240.217870-5-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="J2vZashBWpK7Gx6xFpLkse491t38QvLiJ"
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] qcow2-refcount: check_refcounts_l2:
- don't count fixed cluster as allocated
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190227053319.GB5449@richard>
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg: use __ATTR_RO_MODE to define rev
+ sysfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, somlo@cmu.edu
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---J2vZashBWpK7Gx6xFpLkse491t38QvLiJ
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org
-Message-ID: <ba0783f0-768f-e1bd-2d14-738640b0a167@redhat.com>
-Subject: Re: [PATCH v4 4/5] qcow2-refcount: check_refcounts_l2: don't count
- fixed cluster as allocated
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
- <20181214134240.217870-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20181214134240.217870-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Feb 27, 2019 at 01:33:19PM +0800, Wei Yang wrote:
+> On Tue, Feb 26, 2019 at 11:10:06AM -0500, Michael S. Tsirkin wrote:
+> >On Tue, Feb 26, 2019 at 03:31:59PM +0800, Wei Yang wrote:
+> >> Leverage __ATTR_RO_MODE to define rev sysfs instead of using open code
+> >> to define the attribute.
+> >> 
+> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >> ---
+> >>  drivers/firmware/qemu_fw_cfg.c | 13 ++++---------
+> >>  1 file changed, 4 insertions(+), 9 deletions(-)
+> >> 
+> >> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
+> >> index 039e0f91dba8..a1293cbd7adb 100644
+> >> --- a/drivers/firmware/qemu_fw_cfg.c
+> >> +++ b/drivers/firmware/qemu_fw_cfg.c
+> >> @@ -296,18 +296,13 @@ static int fw_cfg_do_platform_probe(struct platform_device *pdev)
+> >>  	return 0;
+> >>  }
+> >>  
+> >> -static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, char *buf)
+> >> +static ssize_t fw_cfg_rev_show(struct kobject *k, struct kobj_attribute *a,
+> >> +			       char *buf)
+> >>  {
+> >>  	return sprintf(buf, "%u\n", fw_cfg_rev);
+> >>  }
+> >> -
+> >> -static const struct {
+> >> -	struct attribute attr;
+> >> -	ssize_t (*show)(struct kobject *k, struct attribute *a, char *buf);
+> >> -} fw_cfg_rev_attr = {
+> >> -	.attr = { .name = "rev", .mode = S_IRUSR },
+> >> -	.show = fw_cfg_showrev,
+> >> -};
+> >> +static const struct kobj_attribute fw_cfg_rev_attr =
+> >> +	__ATTR_RO_MODE(fw_cfg_rev, 0400);
+> >>  
+> >>  /* fw_cfg_sysfs_entry type */
+> >>  struct fw_cfg_sysfs_entry {
+> >
+> >
+> >Looks like this will change the name from "rev" to "fw_cfg_rev".
+> >That's a userspace visible change which we should not do lightly.
+> 
+> You are right, I should keep the interface untouched.
+> 
+> To keep it user un-visible, we could change like below:
+> 
+> -       __ATTR_RO(fw_cfg_rev);
+> +       __ATTR_RO(rev);
+> 
+> Is this better for you?
 
-On 14.12.18 14:42, Vladimir Sementsov-Ogievskiy wrote:
-> Do not count a cluster which is fixed to be ZERO as allocated.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2-refcount.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Also why use 0400 and not S_IRUSR?
 
-
---J2vZashBWpK7Gx6xFpLkse491t38QvLiJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlx2g3oACgkQ9AfbAGHV
-z0DNvQf8D/V/RwxmnXTubpCcuR0avcxLYFL8KNS+fHC5ONy1xFmefxMCgF2klDdC
-aJrlZhD4GSMSeMkBmxGExULl6gyLIxFSVFH9OJVTyByqIMUqyGgMfOSESn//s1nC
-KjP8k1uqm1fzc+KiOyVLGiQ0qoQAd3lUwo18RcVtebfAhMq79kwPkLdVqjY5H4Ly
-fdARCqfFVp8uow5oRbDeIbetsB95m2a3P9T8KG0+eKDHYbNkQHhSgIykpZvZGTBx
-ASEIsv3JNmu24GXpnTmkd31TujSxJEdcPJVSU99ZAaIeJdfyt5Si+EoHX4ccQU8C
-rWuMVHZ1al636Nc2aeSvSdJB8+tN/Q==
-=EfJD
------END PGP SIGNATURE-----
-
---J2vZashBWpK7Gx6xFpLkse491t38QvLiJ--
+> >> -- 
+> >> 2.19.1
+> 
+> -- 
+> Wei Yang
+> Help you, Help me
