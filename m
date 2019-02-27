@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56240)
+Received: from eggs.gnu.org ([209.51.188.92]:56386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyzgo-0007ab-C9
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:56:04 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gyzh6-0007ny-Od
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:56:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gyzgm-0005S3-OO
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:56:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48670)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gyzgc-0005LD-BJ
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:55:53 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA7E840220
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 13:55:47 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed, 27 Feb 2019 13:55:23 +0000
-Message-Id: <20190227135523.16952-2-berrange@redhat.com>
-In-Reply-To: <20190227135523.16952-1-berrange@redhat.com>
-References: <20190227135523.16952-1-berrange@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gyzh2-0005c0-TP
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:56:20 -0500
+Date: Wed, 27 Feb 2019 13:40:35 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190227134035.5b8a0b98@redhat.com>
+In-Reply-To: <2cd3fb96-6f46-18db-cb55-5c4e30fd3bac@redhat.com>
+References: <20190226135014.31854-1-eric.auger@redhat.com>
+	<20190226135014.31854-13-eric.auger@redhat.com>
+	<20190226180841.0c30af3c@Igors-MacBook-Pro.local>
+	<2cd3fb96-6f46-18db-cb55-5c4e30fd3bac@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/1] chardev: add support for authorization for
- TLS clients
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 12/18] hw/arm/boot: Expose the PC-DIMM
+ nodes in the DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,198 +26,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+On Tue, 26 Feb 2019 18:59:49 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-Currently any client which can complete the TLS handshake is able to use
-a chardev server. The server admin can turn on the 'verify-peer' option
-for the x509 creds to require the client to provide a x509
-certificate. This means the client will have to acquire a certificate
-from the CA before they are permitted to use the chardev server. This is
-still a fairly low bar.
+> Hi Igor,
+> 
+> On 2/26/19 6:08 PM, Igor Mammedov wrote:
+> > On Tue, 26 Feb 2019 14:50:08 +0100
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> >>
+> >> This patch adds memory nodes corresponding to PC-DIMM regions.
+> >>
+> >> NVDIMM and ACPI_NVDIMM configs are not yet set for ARM so we
+> >> don't need to care about NVDIMM at this stage.
+> >>
+> >> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Reviewed-by: Igor Mammedov <imammedo@redhat.com>  
+> > I'm having second thoughts on this one,
+> > maybe we should drop this patch or at least not to do this by default.  
+> See my reply on your cover letter remark.
+Replied there.
 
-This adds a 'tls-authz=3DOBJECT-ID' option to the socket chardev backend
-which takes the ID of a previously added 'QAuthZ' object instance. This
-will be used to validate the client's x509 distinguished name. Clients
-failing the check will not be permitted to use the chardev server.
+> > In the later case it would mean some kind of property that user could use
+> > to turn this on which in its own turn adds more clutter to user tunables
+> > (which is not desirable). So I'm leaning more towards dropping this patch for now.  
+> So what about DT support? Doesn't it make sense to support
+> cold-pluggable DIMMS?
+It would have a sense if initial memory was also dimms, in that case
+for static cases it would be possible to describe numa mapping using
+only -device, but we are far from being ale to do it yet.
 
-For example to setup authorization that only allows connection from a
-client whose x509 certificate distinguished name contains 'CN=3Dfred', yo=
-u
-would use:
+So right now, I'm not sure if is there are a compelling reasons for
+cold-plugged dimms, at startup time initial RAM is sufficient to do the job.
+Main goal was to introduce most of infrastructure so that it would be
+easier to add hotplug on top. 
 
-  $QEMU -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls,\
-                endpoint=3Dserver,verify-peer=3Dyes \
-        -object authz-simple,id=3Dauthz0,identity=3DCN=3Dlaptop.example.c=
-om,,\
-                O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
-        -chardev socket,host=3D127.0.0.1,port=3D9000,server,\
-	         tls-creds=3Dtls0,tls-authz=3Dauthz0 \
-        ...other qemu args...
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- chardev/char-socket.c | 12 +++++++++++-
- chardev/char.c        |  3 +++
- qapi/char.json        |  6 ++++++
- qemu-options.hx       |  9 +++++++--
- 4 files changed, 27 insertions(+), 3 deletions(-)
-
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 4fcdd8aedd..12e78426aa 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -59,6 +59,7 @@ typedef struct {
-     QIONetListener *listener;
-     GSource *hup_source;
-     QCryptoTLSCreds *tls_creds;
-+    char *tls_authz;
-     TCPChardevState state;
-     int max_size;
-     int do_telnetopt;
-@@ -807,7 +808,7 @@ static void tcp_chr_tls_init(Chardev *chr)
-     if (s->is_listen) {
-         tioc =3D qio_channel_tls_new_server(
-             s->ioc, s->tls_creds,
--            NULL, /* XXX Use an ACL */
-+            s->tls_authz,
-             &err);
-     } else {
-         tioc =3D qio_channel_tls_new_client(
-@@ -1055,6 +1056,7 @@ static void char_socket_finalize(Object *obj)
-     if (s->tls_creds) {
-         object_unref(OBJECT(s->tls_creds));
-     }
-+    g_free(s->tls_authz);
-=20
-     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
- }
-@@ -1242,6 +1244,11 @@ static bool qmp_chardev_validate_socket(ChardevSoc=
-ket *sock,
-         break;
-     }
-=20
-+    if (sock->has_tls_authz && !sock->has_tls_creds) {
-+        error_setg(errp, "'tls_authz' option requires 'tls_creds' option=
-");
-+        return false;
-+    }
-+
-     /* Validate any options which have a dependancy on client vs server =
-*/
-     if (!sock->has_server || sock->server) {
-         if (sock->has_reconnect) {
-@@ -1320,6 +1327,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-             }
-         }
-     }
-+    s->tls_authz =3D g_strdup(sock->tls_authz);
-=20
-     s->addr =3D addr =3D socket_address_flatten(sock->addr);
-=20
-@@ -1399,6 +1407,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, C=
-hardevBackend *backend,
-     sock->reconnect =3D qemu_opt_get_number(opts, "reconnect", 0);
-     sock->has_tls_creds =3D qemu_opt_get(opts, "tls-creds");
-     sock->tls_creds =3D g_strdup(qemu_opt_get(opts, "tls-creds"));
-+    sock->has_tls_authz =3D qemu_opt_get(opts, "tls-authz");
-+    sock->tls_authz =3D g_strdup(qemu_opt_get(opts, "tls-authz"));
-=20
-     addr =3D g_new0(SocketAddressLegacy, 1);
-     if (path) {
-diff --git a/chardev/char.c b/chardev/char.c
-index f6d61fa5f8..514cd6b0c3 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -880,6 +880,9 @@ QemuOptsList qemu_chardev_opts =3D {
-         },{
-             .name =3D "tls-creds",
-             .type =3D QEMU_OPT_STRING,
-+        },{
-+            .name =3D "tls-authz",
-+            .type =3D QEMU_OPT_STRING,
-         },{
-             .name =3D "websocket",
-             .type =3D QEMU_OPT_BOOL,
-diff --git a/qapi/char.json b/qapi/char.json
-index 77ed847972..7847c98d05 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -248,6 +248,11 @@
- # @addr: socket address to listen on (server=3Dtrue)
- #        or connect to (server=3Dfalse)
- # @tls-creds: the ID of the TLS credentials object (since 2.6)
-+# @tls-authz: the ID of the QAuthZ authorization object against which
-+#             the client's x509 distinguished name will validated. This
-+#             object is only resolved at time of use, so can be deleted
-+#             and recreated on the fly while the chardev server is activ=
-e.
-+#             If missing, it will default to denying access (since 4.0)
- # @server: create server socket (default: true)
- # @wait: wait for incoming connection on server
- #        sockets (default: false).
-@@ -268,6 +273,7 @@
- { 'struct': 'ChardevSocket',
-   'data': { 'addr': 'SocketAddressLegacy',
-             '*tls-creds': 'str',
-+            '*tls-authz'  : 'str',
-             '*server': 'bool',
-             '*wait': 'bool',
-             '*nodelay': 'bool',
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 1cf9aac1fe..aecbb2ca9c 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2413,7 +2413,7 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
-     "-chardev null,id=3Did[,mux=3Don|off][,logfile=3DPATH][,logappend=3D=
-on|off]\n"
-     "-chardev socket,id=3Did[,host=3Dhost],port=3Dport[,to=3Dto][,ipv4][=
-,ipv6][,nodelay][,reconnect=3Dseconds]\n"
-     "         [,server][,nowait][,telnet][,websocket][,reconnect=3Dsecon=
-ds][,mux=3Don|off]\n"
--    "         [,logfile=3DPATH][,logappend=3Don|off][,tls-creds=3DID] (t=
-cp)\n"
-+    "         [,logfile=3DPATH][,logappend=3Don|off][,tls-creds=3DID][,t=
-ls-authz=3DID] (tcp)\n"
-     "-chardev socket,id=3Did,path=3Dpath[,server][,nowait][,telnet][,web=
-socket][,reconnect=3Dseconds]\n"
-     "         [,mux=3Don|off][,logfile=3DPATH][,logappend=3Don|off] (uni=
-x)\n"
-     "-chardev udp,id=3Did[,host=3Dhost],port=3Dport[,localaddr=3Dlocalad=
-dr]\n"
-@@ -2542,7 +2542,7 @@ The available backends are:
- A void device. This device will not emit any data, and will drop any dat=
-a it
- receives. The null backend does not take any options.
-=20
--@item -chardev socket,id=3D@var{id}[,@var{TCP options} or @var{unix opti=
-ons}][,server][,nowait][,telnet][,websocket][,reconnect=3D@var{seconds}][=
-,tls-creds=3D@var{id}]
-+@item -chardev socket,id=3D@var{id}[,@var{TCP options} or @var{unix opti=
-ons}][,server][,nowait][,telnet][,websocket][,reconnect=3D@var{seconds}][=
-,tls-creds=3D@var{id}][,tls-authz=3D@var{id}]
-=20
- Create a two-way stream socket, which can be either a TCP or a unix sock=
-et. A
- unix socket will be created if @option{path} is specified. Behaviour is
-@@ -2568,6 +2568,11 @@ and specifies the id of the TLS credentials to use=
- for the handshake. The
- credentials must be previously created with the @option{-object tls-cred=
-s}
- argument.
-=20
-+@option{tls-auth} provides the ID of the QAuthZ authorization object aga=
-inst
-+which the client's x509 distinguished name will validated. This object i=
-s only
-+resolved at time of use, so can be deleted and recreated on the fly whil=
-e the
-+chardev server is active. If missing, it will default to denying access.
-+
- TCP and unix socket options are given below:
-=20
- @table @option
---=20
-2.20.1
+> 
+> Thanks
+> 
+> Eric
+> >   
+> >>
+> >> ---
+> >> v7 -> v8:
+> >> - s/NV_DIMM/NVDIMM
+> >> - fix indent
+> >> v6 -> v7:
+> >> - rework the error messages, use a switch/case
+> >> v3 -> v4:
+> >> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
+> >>
+> >> v1 -> v2:
+> >> - added qapi_free_MemoryDeviceInfoList and simplify the loop
+> >> ---
+> >>  hw/arm/boot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 42 insertions(+)
+> >>
+> >> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> >> index a830655e1a..4caaf91583 100644
+> >> --- a/hw/arm/boot.c
+> >> +++ b/hw/arm/boot.c
+> >> @@ -19,6 +19,7 @@
+> >>  #include "sysemu/numa.h"
+> >>  #include "hw/boards.h"
+> >>  #include "hw/loader.h"
+> >> +#include "hw/mem/memory-device.h"
+> >>  #include "elf.h"
+> >>  #include "sysemu/device_tree.h"
+> >>  #include "qemu/config-file.h"
+> >> @@ -522,6 +523,41 @@ static void fdt_add_psci_node(void *fdt)
+> >>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+> >>  }
+> >>  
+> >> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
+> >> +                                             uint32_t acells, uint32_t scells) {
+> >> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
+> >> +    MemoryDeviceInfo *mi;
+> >> +    int ret = 0;
+> >> +
+> >> +    for (info = info_list; info != NULL; info = info->next) {
+> >> +        mi = info->value;
+> >> +        switch (mi->type) {
+> >> +        case MEMORY_DEVICE_INFO_KIND_DIMM:
+> >> +        {
+> >> +            PCDIMMDeviceInfo *di = mi->u.dimm.data;
+> >> +
+> >> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
+> >> +                                      scells, di->size, di->node);
+> >> +            if (ret) {
+> >> +                fprintf(stderr,
+> >> +                        "couldn't add PCDIMM /memory@%"PRIx64" node\n",
+> >> +                        di->addr);
+> >> +                goto out;
+> >> +            }
+> >> +            break;
+> >> +        }
+> >> +        default:
+> >> +            fprintf(stderr, "%s memory nodes are not yet supported\n",
+> >> +                    MemoryDeviceInfoKind_str(mi->type));
+> >> +            ret = -ENOENT;
+> >> +            goto out;
+> >> +        }
+> >> +    }
+> >> +out:
+> >> +    qapi_free_MemoryDeviceInfoList(info_list);
+> >> +    return ret;
+> >> +}
+> >> +
+> >>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+> >>                   hwaddr addr_limit, AddressSpace *as)
+> >>  {
+> >> @@ -621,6 +657,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+> >>          }
+> >>      }
+> >>  
+> >> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
+> >> +    if (rc < 0) {
+> >> +        fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
+> >> +        goto fail;
+> >> +    }
+> >> +
+> >>      rc = fdt_path_offset(fdt, "/chosen");
+> >>      if (rc < 0) {
+> >>          qemu_fdt_add_subnode(fdt, "/chosen");  
+> >   
