@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42277)
+Received: from eggs.gnu.org ([209.51.188.92]:42615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz8ni-0003hw-3V
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:39:46 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8od-0004Su-MI
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:40:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz8nh-000625-8N
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:39:46 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41884)
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8ob-0007t5-PD
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:40:43 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46031)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gz8ng-0005RS-RI
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:39:45 -0500
-Received: by mail-pl1-x642.google.com with SMTP id y5so8767814plk.8
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:39:24 -0800 (PST)
+	id 1gz8ob-0007de-9n
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:40:41 -0500
+Received: by mail-pg1-x544.google.com with SMTP id y4so8700734pgc.12
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:40:35 -0800 (PST)
 References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-26-david@redhat.com>
+	<20190226113915.20150-27-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f76916bb-ef7e-e734-e675-2f2d520c1ee3@linaro.org>
-Date: Wed, 27 Feb 2019 15:39:19 -0800
+Message-ID: <9bd1de91-6cc5-dd99-4fe9-479d1cf28c34@linaro.org>
+Date: Wed, 27 Feb 2019 15:40:30 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190226113915.20150-26-david@redhat.com>
+In-Reply-To: <20190226113915.20150-27-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 25/33] s390x/tcg: Implement VECTOR
- REPLICATE IMMEDIATE
+Subject: Re: [Qemu-devel] [PATCH v1 26/33] s390x/tcg: Implement VECTOR
+ SCATTER ELEMENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,13 +36,15 @@ To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 On 2/26/19 3:39 AM, David Hildenbrand wrote:
-> +    tmp = tcg_temp_new_i64();
-> +    tcg_gen_movi_i64(tmp, data);
-> +    gen_gvec_dup_i64(es, get_field(s->fields, v1), tmp);
-> +    tcg_temp_free_i64(tmp);
-> +    return DISAS_NEXT;
+> Similar to VECTOR GATHER ELEMENT, but the other direction.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-data.def      |  3 +++
+>  target/s390x/translate_vx.inc.c | 22 ++++++++++++++++++++++
+>  2 files changed, 25 insertions(+)
 
-Reuse the dupi8, dupi16, ... switch from one of the other patches upthread?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
