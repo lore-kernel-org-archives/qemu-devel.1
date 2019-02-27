@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41286)
+Received: from eggs.gnu.org ([209.51.188.92]:41284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz8il-0000GV-UZ
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8il-0000GU-SK
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:34:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz8ik-0006AF-B9
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8ik-0006Ad-Hi
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:34:39 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:33066)
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:39810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gz8ik-0005wb-23
+	id 1gz8ik-00068a-3z
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:34:38 -0500
-Received: by mail-pl1-x641.google.com with SMTP id y10so8790623plp.0
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:34:27 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id i20so8754184pfo.6
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:34:37 -0800 (PST)
 References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-22-david@redhat.com>
+	<20190226113915.20150-24-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <275fd1c1-a911-d527-d492-9aaffbbb6790@linaro.org>
-Date: Wed, 27 Feb 2019 15:18:51 -0800
+Message-ID: <e5a93b57-9049-e26f-7f30-a0a0404ed6fd@linaro.org>
+Date: Wed, 27 Feb 2019 15:26:29 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190226113915.20150-22-david@redhat.com>
+In-Reply-To: <20190226113915.20150-24-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 21/33] s390x/tcg: Implement VECTOR PACK
- (LOGICAL) SATURATE
+Subject: Re: [Qemu-devel] [PATCH v1 23/33] s390x/tcg: Implement VECTOR
+ PERMUTE DOUBLEWORD IMMEDIATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,24 +36,13 @@ To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 On 2/26/19 3:39 AM, David Hildenbrand wrote:
-> We'll implement both via gvec ool helpers. As these can't return
-> values, we'll return the CC via env->cc_op. Generate different C
-> functions for the different cases using makros.
-> 
-> In the future we might want to do a translation like VECTOR PACK or
-> use separate handlers in case no CC update is needed. As linux does
-> not seem to use the function right now, no need to tune for performance.
-
-Fair enough.
-
+> Read the whole input before modifying the destination vector.
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/helper.h           |  6 +++
->  target/s390x/insn-data.def      |  4 ++
->  target/s390x/translate_vx.inc.c | 37 ++++++++++++++++
->  target/s390x/vec_helper.c       | 75 +++++++++++++++++++++++++++++++++
->  4 files changed, 122 insertions(+)
+>  target/s390x/insn-data.def      |  2 ++
+>  target/s390x/translate_vx.inc.c | 16 ++++++++++++++++
+>  2 files changed, 18 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
