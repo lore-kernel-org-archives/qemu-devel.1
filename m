@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34774)
+Received: from eggs.gnu.org ([209.51.188.92]:34797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gysWF-0000s2-Gv
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:16:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gysWJ-0000u1-J2
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gysWC-0003f0-4C
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:16:39 -0500
-Date: Wed, 27 Feb 2019 17:16:11 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gysWH-0003hd-KJ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:16:43 -0500
+Date: Wed, 27 Feb 2019 17:15:08 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190227061611.GB6872@umbus.fritz.box>
-References: <20190227043008.12059-1-sjitindarsingh@gmail.com>
+Message-ID: <20190227061508.GA6872@umbus.fritz.box>
+References: <20190227051859.26026-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Qtzb1h6tVL0ohdDu"
+	protocol="application/pgp-signature"; boundary="rwlp4HDnqjg7pxzw"
 Content-Disposition: inline
-In-Reply-To: <20190227043008.12059-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH v2 1/4] target/ppc/spapr: Add
- SPAPR_CAP_LARGE_DECREMENTER
+In-Reply-To: <20190227051859.26026-1-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH] target/ppc/spapr: Enable
+ mitigations by default for pseries-4.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +25,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---Qtzb1h6tVL0ohdDu
+--rwlp4HDnqjg7pxzw
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 27, 2019 at 03:30:05PM +1100, Suraj Jitindar Singh wrote:
-> Add spapr_cap SPAPR_CAP_LARGE_DECREMENTER to be used to control the
-> availability of the large decrementer for a guest.
+On Wed, Feb 27, 2019 at 04:18:59PM +1100, Suraj Jitindar Singh wrote:
+> There are currently 3 vulnerability mitigations controlled by the
+> spapr-caps mechanism, cap-cfpc, cap-sbbc, and cap-ibs. Enable these
+> mitigations by default for the pseries-4.0 machine type.
+>=20
+> By now machine firmware should have been upgraded to allow these
+> settings.
+> Note: This means these caps will have to be set to broken for tcg
 >=20
 > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-This series looks good now, except for one nit...
+There was a conflict because you've diffed this against a tree which
+already has your large decrementer patches, but I've fixed that up and appl=
+ied.
 
 > ---
->  hw/ppc/spapr.c         |  2 ++
->  hw/ppc/spapr_caps.c    | 17 +++++++++++++++++
->  include/hw/ppc/spapr.h |  5 ++++-
->  3 files changed, 23 insertions(+), 1 deletion(-)
+>  hw/ppc/spapr.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b6a571b6f1..acf62a2b9f 100644
+> index 73aba70aa9..1ef8865dc5 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -2077,6 +2077,7 @@ static const VMStateDescription vmstate_spapr =3D {
->          &vmstate_spapr_irq_map,
->          &vmstate_spapr_cap_nested_kvm_hv,
->          &vmstate_spapr_dtb,
-> +        &vmstate_spapr_cap_large_decr,
->          NULL
->      }
->  };
-> @@ -4288,6 +4289,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+> @@ -4313,9 +4313,9 @@ static void spapr_machine_class_init(ObjectClass *o=
 c, void *data)
->      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
+>      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_DFP] =3D SPAPR_CAP_ON;
+> -    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
+> -    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
+> -    smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
+> +    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_WORKAROUND;
+> +    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_WORKAROUND;
+> +    smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_FIXED_CCD;
 >      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB */
 >      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-> +    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D 0;
-
-=2E.. since this is now a boolean, it should use SPAPR_CAP_OFF /
-SPAPR_CAP_ON instead of bare 0 and 1.
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D 1;
+> @@ -4394,6 +4394,9 @@ static void spapr_machine_3_1_class_options(Machine=
+Class *mc)
+>      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+>      smc->update_dt_enabled =3D false;
+>      smc->dr_phb_enabled =3D false;
+> +    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
+> +    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
+> +    smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D 0;
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -75,24 +88,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Qtzb1h6tVL0ohdDu
+--rwlp4HDnqjg7pxzw
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx2KysACgkQbDjKyiDZ
-s5KSdRAAw+9GGyEpbaCZbjeCbr166+uGG2IMNnLrm2AoF8XKYDDlmbsG0+QrOpAC
-TMqp8+1JK7YeQo/gxUB1vsBHj1aC/l8EY7bxpUzT+79SrFTQ63hwbAvTsWfsjw5B
-SzVRt7b4I+GivK2Tof/DOLXapxUAkBrWHcXOyzPF0wmGPIqXDJmLG++cfgSAJnBf
-Tr/Rhye8xOXux4CQ3WJ+igBp9KsKPRT5eZok1Fta44Mhy46Jqahiaw51+diUibZ1
-Lz5LPDHgSEUh1WOzP2EutApK5SILRPjko4N9VpgL4mZHwXP3MtqY8M4RchFIqp98
-1lHSoVMthOcY2G7ppE/QqgHChyufuJVACspWI8DaBK0YjN+McXwrd1Ymat3Kbp9z
-1s1Y2QLmOiV0umK6kTqzBbS2wv3ZVQc/yvC6F6VLa30gI3iwm8KCSPileGrwONGG
-l1Pqu8p8ld8fdzz0eTKPfCu1qs7zO7RVlQKDCkRg9vzJMjCrG9m6zdH7A1i8cKmO
-ISlZxOIfonW1gKWLKtyUoXpiuaENyFVr2Ejr2KyD6P/vcjzaquGPwWvQFQ+i2ajt
-aosfsCSPDLLv77bUaNJMh3wgR62J8LMQ+IV+hFR/dSaCR3aKPRiQ+VFZHqgSVMN2
-pd/dqaeGNsxC2wMWU347U0I5Ku3TOsBQKnzyAHsy9y+7HHCpbUU=
-=h6qy
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx2KukACgkQbDjKyiDZ
+s5I07hAAiBuYx6W3D+h5iHI2oah80BGvh0Wqjv7kcLSUGe/RMaRBEOUv+OM+VN5o
+888YZl7alKXvPFLBkD80XGhwA+wm+SbioYKid1R5Z+F7SYYzk3GoiFd44+bhKo+O
+f705YDq2/dBDK2cyeHbHD/Qgg+4He5Li7ujiFz3BvWSjex9CN20kobavPAIUhhop
++0T86vj1E7heEpAebfyTBngiFt8kRfYQwklufq+p62+9uxotOPlL2lTFhsJXFNgh
+aJcpeANzlfmLliFZtEEuHTGcUj4VZD2lcvt56PlH96WPzOhLVmnTUpw0F8B0G9HC
+DXH4OneKna1LbHcGF1AjHHNZY6DQIC6i4Sp2uzTRMhQARvwZMNy4QaIkjfAhp3F2
+H9Z5RE0rldwoJWufxmFi0Ot5gR30bB2IaZ0+jTKTCFayJjmjv3F0hcnK/1dnzDCX
+gQE87CYAF6P/lWIa9/MPTQ9YOSBbR5UZQG9LY6OW29BzesUxhKCygdUYh8aiPFfi
+TpfJ6z3M/G8+noD3NX0IceqTqgBLhFpU45SFbHAeuQYvGwdJhNznIENj56D9GUco
+bw5OvDMoqX1vC9RM2/V+4I6/1MNSSAENETll23Pvm1YznqE09p33xcYYqxcttxdn
+x3gX7wdPEPtu9AmbjrY9a/q5htZ4lxICL59raVWJrBUpUAn6em4=
+=t6dT
 -----END PGP SIGNATURE-----
 
---Qtzb1h6tVL0ohdDu--
+--rwlp4HDnqjg7pxzw--
