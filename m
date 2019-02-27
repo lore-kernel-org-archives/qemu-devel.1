@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56764)
+Received: from eggs.gnu.org ([209.51.188.92]:57166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gyzip-0001EP-CP
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:58:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1gyzkC-0002ad-Ih
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:59:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gyzio-0006RK-Ak
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:58:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55548)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gyzio-0006NS-1c
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:58:06 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20190227121052.GD2602@work-vm> (David Alan Gilbert's message of
-	"Wed, 27 Feb 2019 12:10:52 +0000")
-References: <20190227121052.GD2602@work-vm>
-Reply-To: quintela@redhat.com
-Date: Wed, 27 Feb 2019 13:41:48 +0100
-Message-ID: <877edltncj.fsf@trasno.org>
+	(envelope-from <eblake@redhat.com>) id 1gyzkA-0007HP-JQ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:59:32 -0500
+References: <20190227012132.16271-1-david@gibson.dropbear.id.au>
+	<20190227110127.GE31688@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b9f4a52e-43e0-c209-4743-2f039e96a6b9@redhat.com>
+Date: Wed, 27 Feb 2019 07:59:11 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] possible ahci/migrate fix
+In-Reply-To: <20190227110127.GE31688@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Allow -sandbox off with --disable-seccomp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org, peterx@redhat.com
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: otubo@redhat.com, pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> Hi Alex,
->   Can you see if the attached patch fixes the ahci/migrate failure you
-> see;  it won't fail for me however mean I am to it.
->
->
+On 2/27/19 5:01 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Feb 27, 2019 at 12:21:32PM +1100, David Gibson wrote:
+>> At present, when seccomp support is compiled out with --disable-seccom=
+p
+>> we fail with an error if the user puts -sandbox on the command line.
+>>
+>> That kind of makes sense, but it's a bit strange that we reject a requ=
+est
+>> to disable sandboxing with "-sandbox off" saying we don't support
+>> sandboxing.
+>>
+>> This puts in a small sandbox to (correctly) silently ignore -sandbox o=
+ff
+>> when we don't have sandboxing support compiled in.  This makes life ea=
+sier
+>> for testcases, since they can safely specify "-sandbox off" without ha=
+ving
+>> to care if the qemu they're using is compiled with sandbox support or =
+not.
+>>
+>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-....
+> '-sandbox off'  is just syntax sugar for '-sandbox enable=3Doff', with
+> the default arg name handled by QemuOpts.
 
->  void migration_object_finalize(void)
->  {
-> +    /*
-> +     * Cancel the current migration - that will (eventually)
-> +     * stop the migration using this structure
-> +     */
-> +    migrate_fd_cancel(current_migration);
+Except that libvirt probes, via query-command-line-options, whether the
+'-sandbox' option supports the 'enable' key.  You risk breaking
+introspection (where libvirt knows NOT to use enable=3Don|off) if -sandbo=
+x
+enable=3Doff is advertised even when the feature is not compiled in.
 
-This can only happen during "civilized" exit of qemu, right?
-Otherwise, we are changing the migration status.
+>=20
+> If we want to keep ability to run "-sandbox off" we should do it via
+> the QEMU opts code we already have in the first part of the conditional=
+,
+> so that "-sandbox enable=3Doff" also works as normal.
+>=20
+> Essentially we need to push the #ifdef CONFIG_SECCOMP down into the
+> parse_sandbox method, so that it parses the "enable" option normally
+> but rejects any value except disabled..
+>=20
+> The QemuOptsList should also be conditional to only register the
+> "enable"  arg and not the other bits.
 
->      object_unref(OBJECT(current_migration));
->  }
->  
-> @@ -3134,6 +3140,7 @@ static void *migration_thread(void *opaque)
->  
->      rcu_register_thread();
->  
-> +    object_ref(OBJECT(s));
+Whatever we do here had better be careful that the introspection used by
+libvirt doesn't break, when libvirt is trying to learn when seccomp was
+not compiled in.
 
-It is weird that this is not enough :-(
-
->      s->iteration_start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->  
->      qemu_savevm_state_header(s->to_dst_file);
-> @@ -3230,6 +3237,7 @@ static void *migration_thread(void *opaque)
->  
->      trace_migration_thread_after_loop();
->      migration_iteration_finish(s);
-> +    object_unref(OBJECT(s));
->      rcu_unregister_thread();
->      return NULL;
->  }
-> diff --git a/vl.c b/vl.c
-> index 2f340686a7..c1920165f3 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4579,6 +4579,12 @@ int main(int argc, char **argv, char **envp)
->  
->      gdbserver_cleanup();
->  
-> +    /*
-> +     * cleaning up the migration object cancels any existing migration
-> +     * try to do this early so that it also stops using devices.
-> +     */
-> +    migration_object_finalize();
-> +
->      /* No more vcpu or device emulation activity beyond this point */
->      vm_shutdown();
->  
-> @@ -4594,7 +4600,6 @@ int main(int argc, char **argv, char **envp)
->      monitor_cleanup();
->      qemu_chr_cleanup();
->      user_creatable_cleanup();
-> -    migration_object_finalize();
->      /* TODO: unref root container, check all devices are ok */
->  
->      return 0;
-
-Ok, it was happening really late.
-
-Once that you are at this, can we rename it?
-
-migration_cleanup()
-
-looks more consistent with everything else, and makes sure that it does
-"more" than finalize the object, no?
-
-Furthermore, it is enough to "just" cancel the migration?  It is not
-needed that we wait for the migration thread to finish?
-
-If the problem was that migration_thread() was accessing the object
-after main thread freed it, then just the ref counting should be enough,
-no?  My understanding is that returning from main is the quivalent of
-exit() and kill all threads?  Or are we doing something special for that
-not to happen?
-
-Later, Juan.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
