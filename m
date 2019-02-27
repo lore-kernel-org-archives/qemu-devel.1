@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57166)
+Received: from eggs.gnu.org ([209.51.188.92]:57230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyzkC-0002ad-Ih
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:59:34 -0500
+	(envelope-from <david@redhat.com>) id 1gyzkE-0002cJ-9P
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:59:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gyzkA-0007HP-JQ
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:59:32 -0500
-References: <20190227012132.16271-1-david@gibson.dropbear.id.au>
-	<20190227110127.GE31688@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b9f4a52e-43e0-c209-4743-2f039e96a6b9@redhat.com>
-Date: Wed, 27 Feb 2019 07:59:11 -0600
+	(envelope-from <david@redhat.com>) id 1gyzkD-0007JG-0c
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:59:34 -0500
+References: <20190227111411.22890-1-david@redhat.com>
+	<20190227111411.22890-2-david@redhat.com>
+	<87lg21lai8.fsf@zen.linaroharston>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <467f1311-0534-232d-b85d-2d6e0fd47661@redhat.com>
+Date: Wed, 27 Feb 2019 13:42:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190227110127.GE31688@redhat.com>
+In-Reply-To: <87lg21lai8.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Allow -sandbox off with --disable-seccomp
+Subject: Re: [Qemu-devel] [PATCH RFC 1/2] tests/tcg: Allow targets to set
+ the optimization level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: otubo@redhat.com, pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 2/27/19 5:01 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Feb 27, 2019 at 12:21:32PM +1100, David Gibson wrote:
->> At present, when seccomp support is compiled out with --disable-seccom=
-p
->> we fail with an error if the user puts -sandbox on the command line.
->>
->> That kind of makes sense, but it's a bit strange that we reject a requ=
-est
->> to disable sandboxing with "-sandbox off" saying we don't support
->> sandboxing.
->>
->> This puts in a small sandbox to (correctly) silently ignore -sandbox o=
-ff
->> when we don't have sandboxing support compiled in.  This makes life ea=
-sier
->> for testcases, since they can safely specify "-sandbox off" without ha=
-ving
->> to care if the qemu they're using is compiled with sandbox support or =
-not.
->>
->> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-
-> '-sandbox off'  is just syntax sugar for '-sandbox enable=3Doff', with
-> the default arg name handled by QemuOpts.
-
-Except that libvirt probes, via query-command-line-options, whether the
-'-sandbox' option supports the 'enable' key.  You risk breaking
-introspection (where libvirt knows NOT to use enable=3Don|off) if -sandbo=
-x
-enable=3Doff is advertised even when the feature is not compiled in.
-
+On 27.02.19 12:46, Alex Benn=C3=A9e wrote:
 >=20
-> If we want to keep ability to run "-sandbox off" we should do it via
-> the QEMU opts code we already have in the first part of the conditional=
-,
-> so that "-sandbox enable=3Doff" also works as normal.
+> David Hildenbrand <david@redhat.com> writes:
 >=20
-> Essentially we need to push the #ifdef CONFIG_SECCOMP down into the
-> parse_sandbox method, so that it parses the "enable" option normally
-> but rejects any value except disabled..
+>> We sometimes want basic optimizations, e.g. for constant propagation
+>> into inlined functions.
+>>
+>> Especially for inline asm with immediates;
 >=20
-> The QemuOptsList should also be conditional to only register the
-> "enable"  arg and not the other bits.
+> I agree you need this, but...
+>=20
+> <snip>
+>>  # Start with a blank slate, the build targets get to add stuff first
+>> -CFLAGS=3D
+>> +CFLAGS=3D-O0
+>>  QEMU_CFLAGS=3D
+>>  LDFLAGS=3D
+>>
+>> @@ -70,7 +70,7 @@ ifneq ($(TARGET_BASE_ARCH),$(TARGET_NAME))
+>>  endif
+>>
+>>  # Add the common build options
+>> -CFLAGS+=3D-Wall -O0 -g -fno-strict-aliasing
+>> +CFLAGS+=3D-Wall -g -fno-strict-aliasing
+>=20
+>=20
+> You don't need to do this - we already have EXTRA_CFLAGS which will
+> always be at the end of the compile invocation:
+>=20
+>   # enable vectors and optimisation to vectorise for this test
+>   vglv: CFLAGS+=3D-march=3Dz13 -m64
+>   vglv: EXTRA_CFLAGS+=3D-O2
 
-Whatever we do here had better be careful that the introspection used by
-libvirt doesn't break, when libvirt is trying to learn when seccomp was
-not compiled in.
+For whatever reason I can't get this to work. EXTRA_CFLAGS+=3D-O2 is
+always silently dropped:
+
+make SHELL=3D'sh -x' run-tcg-tests-s390x-linux-user
+
++ /home/dhildenb/git/qemu/tests/docker/docker.py cc --user 100813 --cc
+s390x-linux-gnu-gcc -i qemu:debian-s390x-cross -s
+/home/dhildenb/git/qemu -- -march=3DzEC12 -m64 -Wall -O0 -g
+-fno-strict-aliasing -march=3Dz13
+/home/dhildenb/git/qemu/tests/tcg/s390x/vlgv.c -o vlgv -static
+/home/dhildenb/git/qemu/tests/tcg/s390x/vlgv.c: In function 'vlgv':
+/home/dhildenb/git/qemu/tests/tcg/s390x/vlgv.c:8:5: warning: asm operand
+3 probably doesn't match constraints
+     asm volatile("vlgv %[r1], %[v3], 0(%[a2]), %[m4]\n"
+     ^~~
+/home/dhildenb/git/qemu/tests/tcg/s390x/vlgv.c:8:5: error: impossible
+constraint in 'asm'
+
+
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+
+Thanks,
+
+David / dhildenb
