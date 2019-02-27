@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35263)
+Received: from eggs.gnu.org ([209.51.188.92]:35304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gyx5W-0000DH-3q
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:09:22 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gyx5n-0000QN-V1
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:09:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gyx5V-0002mc-98
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:09:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gyx5T-0002kr-GQ
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:09:20 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97EA3C04FFF7
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 11:09:18 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 27 Feb 2019 12:08:12 +0100
-Message-Id: <20190227110812.2185-9-quintela@redhat.com>
-In-Reply-To: <20190227110812.2185-1-quintela@redhat.com>
-References: <20190227110812.2185-1-quintela@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gyx5j-0002vy-HK
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:09:37 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36517)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gyx5h-0002tq-Kr
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:09:34 -0500
+Received: by mail-wm1-x341.google.com with SMTP id j125so5167033wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 03:09:32 -0800 (PST)
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-3-armbru@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190226193408.23862-3-armbru@redhat.com>
+Date: Wed, 27 Feb 2019 11:09:24 +0000
+Message-ID: <87sgw9lc7v.fsf@zen.linaroharston>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 8/8] tests: Add migration multifd test
+Subject: Re: [Qemu-devel] [PATCH v2 02/11] pflash_cfi01: Do not exit() on
+ guest aborting "write to buffer"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
 
-We set multifd-channels.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- tests/migration-test.c | 48 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+Markus Armbruster <armbru@redhat.com> writes:
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 677ed9c8a3..01ca757488 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -943,6 +943,53 @@ static void test_precopy_tcp(void)
-     g_free(uri);
- }
-=20
-+static void test_multifd_tcp(void)
-+{
-+    char *uri;
-+    QTestState *from, *to;
-+
-+    if (test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false)) {
-+        return;
-+    }
-+
-+    /*
-+     * We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 1 ms should make it not converge*/
-+    migrate_set_parameter(from, "downtime-limit", 1);
-+    /* 1GB/s */
-+    migrate_set_parameter(from, "max-bandwidth", 1000000000);
-+
-+    migrate_set_parameter(from, "multifd-channels", 2);
-+    migrate_set_parameter(to, "multifd-channels", 2);
-+
-+    migrate_set_capability(from, "multifd", "true");
-+    migrate_set_capability(to, "multifd", "true");
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    uri =3D migrate_get_socket_address(to, "socket-address");
-+
-+    migrate(from, uri, "{}");
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms it should converge */
-+    migrate_set_parameter(from, "downtime-limit", 300);
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
-+    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to, true);
-+}
-+
- int main(int argc, char **argv)
- {
-     char template[] =3D "/tmp/migration-test-XXXXXX";
-@@ -996,6 +1043,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-+    qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
-=20
-     ret =3D g_test_run();
-=20
---=20
-2.20.1
+> When a guest tries to abort "write to buffer" (command 0xE8), we print
+> "PFLASH: Possible BUG - Write block confirm", then exit(1).  Letting
+> the guest terminate QEMU is not a good idea.  Instead, LOG_UNIMP we
+> screwed up, then reset the device.
+>
+> Macro PFLASH_BUG() is now unused; delete it.
+>
+> Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  hw/block/pflash_cfi01.c | 13 +++++--------
+>  1 file changed, 5 insertions(+), 8 deletions(-)
+>
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index a51ac9f399..e6d933a06d 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -49,12 +49,6 @@
+>  #include "sysemu/sysemu.h"
+>  #include "trace.h"
+>
+> -#define PFLASH_BUG(fmt, ...) \
+> -do { \
+> -    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
+> -    exit(1); \
+> -} while(0)
+> -
+>  /* #define PFLASH_DEBUG */
+>  #ifdef PFLASH_DEBUG
+>  #define DPRINTF(fmt, ...)                                   \
+> @@ -623,8 +617,11 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr of=
+fset,
+>                  pfl->wcycle =3D 0;
+>                  pfl->status |=3D 0x80;
+>              } else {
+> -                DPRINTF("%s: unknown command for \"write block\"\n", __f=
+unc__);
+> -                PFLASH_BUG("Write block confirm");
+> +                qemu_log_mask(LOG_UNIMP,
+> +                    "%s: Aborting write to buffer not implemented,"
+> +                    " the data is already written to storage!\n"
+> +                    "Flash device reset into READ mode.\n",
+> +                    __func__);
+>                  goto reset_flash;
+>              }
+>              break;
+
+
+--
+Alex Benn=C3=A9e
