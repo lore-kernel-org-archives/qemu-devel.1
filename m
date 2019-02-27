@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34256)
+Received: from eggs.gnu.org ([209.51.188.92]:34644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz5eo-0006hR-9p
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:18:24 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gz5gK-0007Qe-4W
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:19:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz5em-0006Yf-K0
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:18:22 -0500
-Resent-Message-Id: <E1gz5em-0006Yf-K0@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155129866685.2181.13183076585677181381@49fa7ef69f7b>
-In-Reply-To: <20190222141024.22217-1-kbastian@mail.uni-paderborn.de>
+	(envelope-from <alex.bennee@linaro.org>) id 1gz5gB-0007NI-1j
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:19:51 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36830)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gz5gA-0007AS-7r
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:19:46 -0500
+Received: by mail-wm1-x342.google.com with SMTP id j125so6818975wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 12:19:26 -0800 (PST)
+References: <20190227111411.22890-1-david@redhat.com>
+	<20190227111411.22890-3-david@redhat.com>
+	<ec7a9ec1-3d6d-6d19-246c-4f6d41f52ec1@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <ec7a9ec1-3d6d-6d19-246c-4f6d41f52ec1@redhat.com>
+Date: Wed, 27 Feb 2019 20:19:21 +0000
+Message-ID: <87h8cpkmra.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 27 Feb 2019 12:17:48 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v8 00/34] target/riscv: Convert to
- decodetree
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/tcg: target/s390: Add test
+ for VECTOR LOAD GR FROM VR ELEMENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,181 +32,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kbastian@mail.uni-paderborn.de
-Cc: fam@euphon.net, sagark@eecs.berkeley.edu, palmer@sifive.com, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyMjE0MTAyNC4yMjIx
-Ny0xLWtiYXN0aWFuQG1haWwudW5pLXBhZGVyYm9ybi5kZS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMjIxNDEwMjQuMjIyMTct
-MS1rYmFzdGlhbkBtYWlsLnVuaS1wYWRlcmJvcm4uZGUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQ
-QVRDSCB2OCAwMC8zNF0gdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHRvIGRlY29kZXRyZWUKVHlwZTog
-c2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
-aGV3LzIwMTkwMjIyMTQxMDI0LjIyMjE3LTEta2Jhc3RpYW5AbWFpbC51bmktcGFkZXJib3JuLmRl
-IC0+IHBhdGNoZXcvMjAxOTAyMjIxNDEwMjQuMjIyMTctMS1rYmFzdGlhbkBtYWlsLnVuaS1wYWRl
-cmJvcm4uZGUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4NTY3NjI1ZDI0IHRhcmdl
-dC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMyIGJpdCB0cmFuc2xhdG9ycwoxNjI4
-NGQxNTcwIHRhcmdldC9yaXNjdjogU3BsaWNlIHJlbWFpbmluZyBjb21wcmVzc2VkIGluc24gcGFp
-cnMgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NAo3YTQ1OWYyMmRlIHRhcmdldC9yaXNjdjogU3BsaWNl
-IGZzd19zZCBhbmQgZmx3X2xkIGZvciByaXNjdjMyIHZzIHJpc2N2NjQKMTc4NTMxYjE0MSB0YXJn
-ZXQvcmlzY3Y6IENvbnZlcnQgQGNsX2QsIEBjbF93LCBAY3NfZCwgQGNzX3cgaW5zbnMKNThhZDhm
-Mzg0YyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNzXzIgaW5zbnMgdG8gc2hhcmUgdHJhbnNsYXRp
-b24gZnVuY3Rpb25zCjNhODI2ZThmMmMgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUgZGVjb2RlX1JWMzJf
-NjRHKCkKNmRmODhlNzFiNCB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBnZW5fc3lzdGVtKCkKODIwMGI3
-MjRiNCB0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0aCB0byBnZW5fYXJpdGgKZTY0MGFi
-Zjc1ZSB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVjb2Rpbmcgb2YgUlYzMi82NE0gaW5z
-bgplNDI2NzdhOGU0IHRhcmdldC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBzbHQgaW5zbiBtYW51
-YWwgZGVjb2RpbmcKZTg0NjdmMDJhMiB0YXJnZXQvcmlzY3Y6IG1ha2UgQUREL1NVQi9PUi9YT1Iv
-QU5EIGluc24gdXNlIGFyZyBsaXN0cwpmZjAyMGVjOTNkIHRhcmdldC9yaXNjdjogTW92ZSBnZW5f
-YXJpdGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucwoxZDQyYzZhMzg1IHRh
-cmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9zdG9yZSgpCmViZGJk
-N2RiOWIgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20gZ2VuX2xvYWQo
-KQpmODE0MWViMmVjIHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBmcm9tIGdl
-bl9icmFuY2goKQo4ZDBmMzAwODk4IHRhcmdldC9yaXNjdjogUmVtb3ZlIGdlbl9qYWxyKCkKOGVj
-YjBlOTEwNSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMiBvZiBSVlhDIGluc25zIHRv
-IGRlY29kZXRyZWUKNjE4NjkyZTljMCB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMSBv
-ZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKMjE4NTEyZDU1NCB0YXJnZXQvcmlzY3Y6IENvbnZl
-cnQgcXVhZHJhbnQgMCBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKMDM2ODQ3MjYxZiB0YXJn
-ZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBpbnNucyB0byBkZWNvZGV0cmVlCmQ3NGYxNDc2ZmUg
-dGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjREIGluc25zIHRvIGRlY29kZXRyZWUKNjUzYjk2NWY5
-NCB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkQgaW5zbnMgdG8gZGVjb2RldHJlZQo4YjlhODhk
-ODZkIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0RiBpbnNucyB0byBkZWNvZGV0cmVlCmQ4Zjc3
-NmY5NzggdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJGIGluc25zIHRvIGRlY29kZXRyZWUKMWZl
-MTgwYjgwZiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEEgaW5zbnMgdG8gZGVjb2RldHJlZQow
-YWExZjViMmE2IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyQSBpbnNucyB0byBkZWNvZGV0cmVl
-CjkyMWE0MTA0YjkgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWE0gaW5zbnMgdG8gZGVjb2RldHJl
-ZQo1NjRiZGM0YWQ3IHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBpbnNucyB0byBkZWNv
-ZGV0cmVlCmE5M2E5ODI1YTggdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgZmVuY2UgaW5zbnMg
-dG8gZGVjb2RldHJlZQplNDU2OTllNjA1IHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGFyaXRo
-bWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZQo0ZjdhNzRmZmY1IHRhcmdldC9yaXNjdjogQ29udmVy
-dCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRyZWUKYjE2YjM0MmVmYSB0YXJnZXQv
-cmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNvZGV0cmVlCjAzODU0
-Y2ZkOWQgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgYnJhbmNoIGluc25zIHRvIGRlY29kZXRy
-ZWUKMjNjODk0YTQ5MyB0YXJnZXQvcmlzY3Y6IEFjdGl2YXRlIGRlY29kZXRyZWUgYW5kIGltcGxl
-bW50IExVSSAmIEFVSVBDCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzM0IENoZWNraW5nIGNvbW1p
-dCAyM2M4OTRhNDkzMmQgKHRhcmdldC9yaXNjdjogQWN0aXZhdGUgZGVjb2RldHJlZSBhbmQgaW1w
-bGVtbnQgTFVJICYgQVVJUEMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
-cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM0OiAKbmV3IGZpbGUgbW9kZSAx
-MDA2NDQKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMxMjU6
-IEZJTEU6IHRhcmdldC9yaXNjdi90cmFuc2xhdGUuYzoxODg0OgorYm9vbCBkZWNvZGVfaW5zbjMy
-KERpc2FzQ29udGV4dCAqY3R4LCB1aW50MzJfdCBpbnNuKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3
-YXJuaW5ncywgMTI1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMzQgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCjIvMzQgQ2hlY2tpbmcgY29tbWl0IDAzODU0Y2ZkOWQ2MyAodGFyZ2V0L3Jpc2N2
-OiBDb252ZXJ0IFJWWEkgYnJhbmNoIGluc25zIHRvIGRlY29kZXRyZWUpCjMvMzQgQ2hlY2tpbmcg
-Y29tbWl0IGIxNmIzNDJlZmEwNCAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJJIGxvYWQvc3Rv
-cmUgaW5zbnMgdG8gZGVjb2RldHJlZSkKNC8zNCBDaGVja2luZyBjb21taXQgNGY3YTc0ZmZmNWRj
-ICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNvZGV0
-cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5U
-QUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzOTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDog
-MCBlcnJvcnMsIDEgd2FybmluZ3MsIDc2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMzQgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8zNCBDaGVja2luZyBjb21taXQgZTQ1Njk5ZTYwNWRlICh0
-YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlZYSSBhcml0aG1ldGljIGluc25zIHRvIGRlY29kZXRyZWUp
-CjYvMzQgQ2hlY2tpbmcgY29tbWl0IGE5M2E5ODI1YTgzYSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0
-IFJWWEkgZmVuY2UgaW5zbnMgdG8gZGVjb2RldHJlZSkKNy8zNCBDaGVja2luZyBjb21taXQgNTY0
-YmRjNGFkNzU3ICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlZYSSBjc3IgaW5zbnMgdG8gZGVjb2Rl
-dHJlZSkKOC8zNCBDaGVja2luZyBjb21taXQgOTIxYTQxMDRiOTdhICh0YXJnZXQvcmlzY3Y6IENv
-bnZlcnQgUlZYTSBpbnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0ODogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE2OSBsaW5l
-cyBjaGVja2VkCgpQYXRjaCA4LzM0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjkvMzQgQ2hl
-Y2tpbmcgY29tbWl0IDBhYTFmNWIyYTY1OCAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJBIGlu
-c25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
-cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU0OiAKbmV3IGZpbGUgbW9kZSAx
-MDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTk5IGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDkvMzQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMzQgQ2hlY2tpbmcgY29tbWl0
-IDFmZTE4MGI4MGYyYiAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjRBIGluc25zIHRvIGRlY29k
-ZXRyZWUpCjExLzM0IENoZWNraW5nIGNvbW1pdCBkOGY3NzZmOTc4ZTMgKHRhcmdldC9yaXNjdjog
-Q29udmVydCBSVjMyRiBpbnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM3ODog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ0MiBs
-aW5lcyBjaGVja2VkCgpQYXRjaCAxMS8zNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMi8z
-NCBDaGVja2luZyBjb21taXQgOGI5YTg4ZDg2ZDAyICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2
-NEYgaW5zbnMgdG8gZGVjb2RldHJlZSkKMTMvMzQgQ2hlY2tpbmcgY29tbWl0IDY1M2I5NjVmOTRk
-MyAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJEIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzUxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMzk4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEzLzM0IGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCjE0LzM0IENoZWNraW5nIGNvbW1pdCBkNzRmMTQ3NmZlMzcgKHRhcmdldC9y
-aXNjdjogQ29udmVydCBSVjY0RCBpbnNucyB0byBkZWNvZGV0cmVlKQoxNS8zNCBDaGVja2luZyBj
-b21taXQgMDM2ODQ3MjYxZjVmICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBpbnNucyB0
-byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDIxNCBsaW5lcyBjaGVja2VkCgpQYXRjaCAx
-NS8zNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNi8zNCBDaGVja2luZyBjb21taXQgMjE4
-NTEyZDU1NDkxICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMCBvZiBSVlhDIGluc25z
-IHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMxOiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMyNTE6IEZJ
-TEU6IHRhcmdldC9yaXNjdi90cmFuc2xhdGUuYzoxMDcyOgorYm9vbCBkZWNvZGVfaW5zbjE2KERp
-c2FzQ29udGV4dCAqY3R4LCB1aW50MTZfdCBpbnNuKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJu
-aW5ncywgMjMxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2LzM0IGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgoxNy8zNCBDaGVja2luZyBjb21taXQgNjE4NjkyZTljMDhlICh0YXJnZXQvcmlzY3Y6
-IENvbnZlcnQgcXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUpCjE4LzM0IENo
-ZWNraW5nIGNvbW1pdCA4ZWNiMGU5MTA1NmQgKHRhcmdldC9yaXNjdjogQ29udmVydCBxdWFkcmFu
-dCAyIG9mIFJWWEMgaW5zbnMgdG8gZGVjb2RldHJlZSkKMTkvMzQgQ2hlY2tpbmcgY29tbWl0IDhk
-MGYzMDA4OThiNiAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgZ2VuX2phbHIoKSkKMjAvMzQgQ2hlY2tp
-bmcgY29tbWl0IGY4MTQxZWIyZWM2YyAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29k
-aW5nIGZyb20gZ2VuX2JyYW5jaCgpKQoyMS8zNCBDaGVja2luZyBjb21taXQgZWJkYmQ3ZGI5Yjhh
-ICh0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVjb2RpbmcgZnJvbSBnZW5fbG9hZCgpKQoy
-Mi8zNCBDaGVja2luZyBjb21taXQgMWQ0MmM2YTM4NTUzICh0YXJnZXQvcmlzY3Y6IFJlbW92ZSBt
-YW51YWwgZGVjb2RpbmcgZnJvbSBnZW5fc3RvcmUoKSkKMjMvMzQgQ2hlY2tpbmcgY29tbWl0IGZm
-MDIwZWM5M2Q5NSAodGFyZ2V0L3Jpc2N2OiBNb3ZlIGdlbl9hcml0aF9pbW0oKSBkZWNvZGluZyBp
-bnRvIHRyYW5zXyogZnVuY3Rpb25zKQoyNC8zNCBDaGVja2luZyBjb21taXQgZTg0NjdmMDJhMjAw
-ICh0YXJnZXQvcmlzY3Y6IG1ha2UgQUREL1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBsaXN0
-cykKMjUvMzQgQ2hlY2tpbmcgY29tbWl0IGU0MjY3N2E4ZTRhYSAodGFyZ2V0L3Jpc2N2OiBSZW1v
-dmUgc2hpZnQgYW5kIHNsdCBpbnNuIG1hbnVhbCBkZWNvZGluZykKMjYvMzQgQ2hlY2tpbmcgY29t
-bWl0IGU2NDBhYmY3NWUyOCAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIG9m
-IFJWMzIvNjRNIGluc24pCjI3LzM0IENoZWNraW5nIGNvbW1pdCA4MjAwYjcyNGI0ZTMgKHRhcmdl
-dC9yaXNjdjogUmVuYW1lIHRyYW5zX2FyaXRoIHRvIGdlbl9hcml0aCkKMjgvMzQgQ2hlY2tpbmcg
-Y29tbWl0IDZkZjg4ZTcxYjRlMCAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgZ2VuX3N5c3RlbSgpKQoy
-OS8zNCBDaGVja2luZyBjb21taXQgM2E4MjZlOGYyY2Q2ICh0YXJnZXQvcmlzY3Y6IFJlbW92ZSBk
-ZWNvZGVfUlYzMl82NEcoKSkKMzAvMzQgQ2hlY2tpbmcgY29tbWl0IDU4YWQ4ZjM4NGM5MiAodGFy
-Z2V0L3Jpc2N2OiBDb252ZXJ0IEBjc18yIGluc25zIHRvIHNoYXJlIHRyYW5zbGF0aW9uIGZ1bmN0
-aW9ucykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6
-IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzE4MjogRklMRTogdGFyZ2V0
-L3Jpc2N2L3RyYW5zbGF0ZS5jOjU0ODoKK2Jvb2wgZGVjb2RlX2luc24xNihEaXNhc0NvbnRleHQg
-KmN0eCwgdWludDE2X3QgaW5zbik7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE2NCBs
-aW5lcyBjaGVja2VkCgpQYXRjaCAzMC8zNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMzEv
-MzQgQ2hlY2tpbmcgY29tbWl0IDE3ODUzMWIxNDFkZCAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IEBj
-bF9kLCBAY2xfdywgQGNzX2QsIEBjc193IGluc25zKQozMi8zNCBDaGVja2luZyBjb21taXQgN2E0
-NTlmMjJkZTJlICh0YXJnZXQvcmlzY3Y6IFNwbGljZSBmc3dfc2QgYW5kIGZsd19sZCBmb3Igcmlz
-Y3YzMiB2cyByaXNjdjY0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyODogCm5ldyBmaWxlIG1vZGUgMTAw
-NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwOSBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAzMi8zNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozMy8zNCBDaGVja2luZyBjb21taXQg
-MTYyODRkMTU3MDA1ICh0YXJnZXQvcmlzY3Y6IFNwbGljZSByZW1haW5pbmcgY29tcHJlc3NlZCBp
-bnNuIHBhaXJzIGZvciByaXNjdjMyIHZzIHJpc2N2NjQpCjM0LzM0IENoZWNraW5nIGNvbW1pdCA4
-NTY3NjI1ZDI0OTIgKHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMyIGJp
-dCB0cmFuc2xhdG9ycykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAxOTAyMjIxNDEwMjQuMjIyMTctMS1rYmFzdGlhbkBtYWlsLnVuaS1wYWRlcmJv
-cm4uZGUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+David Hildenbrand <david@redhat.com> writes:
+
+> On 27.02.19 12:14, David Hildenbrand wrote:
+>> We want to make use of vectors, so use -march=3Dz13. To make it compile,
+>> use a reasonable optimization level (-O2), which seems to work just fine
+>> with all tests.
+>>
+>> Add some infrastructure for checking if SIGILL will be properly
+>> triggered.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  tests/tcg/s390x/Makefile.target     |  3 ++-
+>>  tests/tcg/s390x/helper.h            | 28 +++++++++++++++++++++
+>>  tests/tcg/s390x/signal_helper.inc.c | 39 +++++++++++++++++++++++++++++
+>>  tests/tcg/s390x/vlgv.c              | 37 +++++++++++++++++++++++++++
+>>  4 files changed, 106 insertions(+), 1 deletion(-)
+>>  create mode 100644 tests/tcg/s390x/helper.h
+>>  create mode 100644 tests/tcg/s390x/signal_helper.inc.c
+>>  create mode 100644 tests/tcg/s390x/vlgv.c
+>>
+>> diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.=
+target
+>> index 151dc075aa..d1ae755ab9 100644
+>> --- a/tests/tcg/s390x/Makefile.target
+>> +++ b/tests/tcg/s390x/Makefile.target
+>> @@ -1,8 +1,9 @@
+>>  VPATH+=3D$(SRC_PATH)/tests/tcg/s390x
+>> -CFLAGS+=3D-march=3DzEC12 -m64
+>> +CFLAGS+=3D-march=3Dz13 -m64 -O2
+>>  TESTS+=3Dhello-s390x
+>>  TESTS+=3Dcsst
+>>  TESTS+=3Dipm
+>>  TESTS+=3Dexrl-trt
+>>  TESTS+=3Dexrl-trtr
+>>  TESTS+=3Dpack
+>> +TESTS+=3Dvlgv
+>> diff --git a/tests/tcg/s390x/helper.h b/tests/tcg/s390x/helper.h
+>> new file mode 100644
+>> index 0000000000..845b8bb504
+>> --- /dev/null
+>> +++ b/tests/tcg/s390x/helper.h
+>> @@ -0,0 +1,28 @@
+>> +#ifndef TEST_TCG_S390x_VECTOR_H
+>> +#define TEST_TCG_S390x_VECTOR_H
+>> +
+>> +#include <stdint.h>
+>> +
+>> +#define ES_8    0
+>> +#define ES_16   1
+>> +#define ES_32   2
+>> +#define ES_64   3
+>> +#define ES_128  4
+>> +
+>> +typedef union S390Vector {
+>> +    __uint128_t v;
+>> +    uint64_t q[2];
+>> +    uint32_t d[4];
+>> +    uint16_t w[8];
+>> +    uint8_t h[16];
+>> +} S390Vector;
+>> +
+>> +static inline void check(const char *s, bool cond)
+>> +{
+>> +    if (!cond) {
+>> +        fprintf(stderr, "Check failed: %s\n", s);
+>> +        exit(-1);
+>> +    }
+>> +}
+>> +
+>> +#endif /* TEST_TCG_S390x_VECTOR_H */
+>> diff --git a/tests/tcg/s390x/signal_helper.inc.c b/tests/tcg/s390x/signa=
+l_helper.inc.c
+>> new file mode 100644
+>> index 0000000000..5bd69ca76a
+>> --- /dev/null
+>> +++ b/tests/tcg/s390x/signal_helper.inc.c
+>> @@ -0,0 +1,39 @@
+>> +#include <stdlib.h>
+>> +#include <stdio.h>
+>> +#include <stdbool.h>
+>> +#include <signal.h>
+>> +#include <setjmp.h>
+>> +#include "helper.h"
+>> +
+>> +jmp_buf jmp_env;
+>> +
+>> +static void sig_sigill(int sig)
+>> +{
+>> +    if (sig !=3D SIGILL) {
+>> +        check("Wrong signal received", false);
+>> +    }
+>> +    longjmp(jmp_env, 1);
+>> +}
+>> +
+>> +#define CHECK_SIGILL(STATEMENT)                             \
+>> +do {                                                        \
+>> +    struct sigaction act;                                   \
+>> +                                                            \
+>> +    act.sa_handler =3D sig_sigill;                            \
+>> +    act.sa_flags =3D 0;                                       \
+>> +    if (sigaction(SIGILL, &act, NULL)) {                    \
+>> +        check("SIGILL handler not registered", false);      \
+>> +    }                                                       \
+>> +                                                            \
+>> +    if (setjmp(jmp_env) =3D=3D 0) {                             \
+>> +        STATEMENT;                                          \
+>> +        check("SIGILL not triggered", false);               \
+>> +    }                                                       \
+>> +                                                            \
+>> +    act.sa_handler =3D SIG_DFL;                               \
+>> +    sigemptyset(&act.sa_mask);                              \
+>> +    act.sa_flags =3D 0;                                       \
+>> +    if (sigaction(SIGILL, &act, NULL)) {                    \
+>> +        check("SIGILL handler not unregistered", false);    \
+>> +    }                                                       \
+>> +} while (0)
+>
+> Now this is some interesting hackery.
+>
+> I changed it to
+>
+> jmp_buf jmp_env;
+>
+> static void sig_sigill(int sig)
+> {
+>     if (sig !=3D SIGILL) {
+>         check("Wrong signal received", false);
+>     }
+>     longjmp(jmp_env, 1);
+> }
+>
+> #define CHECK_SIGILL(STATEMENT)                  \
+> do {                                             \
+>     if (signal(SIGILL, sig_sigill) =3D=3D SIG_ERR) { \
+>         check("SIGILL not registered", false);   \
+>     }                                            \
+>     if (setjmp(jmp_env) =3D=3D 0) {                  \
+>         STATEMENT;                               \
+>         check("SIGILL not triggered", false);    \
+>     }                                            \
+>     if (signal(SIGILL, SIG_DFL) =3D=3D SIG_ERR) {    \
+>         check("SIGILL not registered", false);   \
+>     }                                            \
+> } while (0)
+>
+>
+> However it only works once. During the second signal, QEMU decides to
+> set the default handler.
+>
+> 1. In a signal handler that signal is blocked. We leave that handler via
+> a longjump. So after the first signal, the signal is blocked.
+>
+> 2. In QEMU, we decide that synchronous signals cannot be blocked and
+> simply override the signal handler to default handler. So on the second
+> signal, we execute the default handler and not our defined handler.
+>
+> Multiple ways to fix:
+>
+> 1. We have to manually unblock the signal in that hackery above.
+> 2. In QEMU, don't block synchronous signals.
+> 3. In QEMU, don't set the signal handler to the default handler in case
+> a synchronous signal is blocked.
+
+
+This all seems a little over-engineered. This is a single-threaded test
+so what's wrong with a couple of flags:
+
+bool should_get_sigill;
+
+and the handler doing:
+
+if (!should_get_sigill) {
+   unexpected_sigills++;
+}
+
+Tests don't have to be pretty, just reliable.
+
+>
+>
+> Trying to run the test on a real s390x linux indicates that 1. should be
+> the right approach.
+>
+> [linux1@redhat-kvm ~]$ ./vge
+> Illegal instruction (core dumped)
+
+
+--
+Alex Benn=C3=A9e
