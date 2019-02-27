@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45837)
+Received: from eggs.gnu.org ([209.51.188.92]:45841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzCO-00014l-NF
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:38 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gyzCP-00014z-1A
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzCN-0000Z3-DQ
+	(envelope-from <dgilbert@redhat.com>) id 1gyzCN-0000Yv-By
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46318)
+Received: from mx1.redhat.com ([209.132.183.28]:51186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzCM-0000Wo-U8
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzCM-0000WE-Qc
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:35 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D5F93B77E
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 13:24:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5293130BD1C6
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 13:24:25 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 27 Feb 2019 13:24:12 +0000
-Message-Id: <20190227132413.13213-9-dgilbert@redhat.com>
+Date: Wed, 27 Feb 2019 13:24:10 +0000
+Message-Id: <20190227132413.13213-7-dgilbert@redhat.com>
 In-Reply-To: <20190227132413.13213-1-dgilbert@redhat.com>
 References: <20190227132413.13213-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 8/9] hmp: Add hmp_announce_self
+Subject: [Qemu-devel] [PATCH v6 6/9] virtio-net: Allow qemu_announce_self to
+ trigger virtio announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,91 +37,103 @@ Cc: quintela@redhat.com, armbru@redhat.com, thuth@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add an HMP command to trigger self annocements.
-Unlike the QMP command (which takes a set of parameters), the HMP
-command reuses the set of parameters used for migration.
+Expose the virtio-net self announcement capability and allow
+qemu_announce_self() to call it.
 
-Signend-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+These announces are caused by something external (i.e. the
+announce-self command); they won't trigger if the migration
+counter is triggering announces at the same time.
+
+Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hmp-commands.hx  | 16 ++++++++++++++++
- hmp.c            |  5 +++++
- hmp.h            |  1 +
- tests/test-hmp.c |  1 +
- 4 files changed, 23 insertions(+)
+ hw/net/trace-events |  1 +
+ hw/net/virtio-net.c | 35 ++++++++++++++++++++++++++++++++---
+ 2 files changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index ba71558c25..0648b1efa3 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -928,6 +928,22 @@ Bug: can screw up when the buffer contains invalid U=
-TF-8 sequences,
- NUL characters, after the ring buffer lost data, and when reading
- stops because the size limit is reached.
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index b237d9024c..3a86004154 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -361,6 +361,7 @@ sunhme_rx_desc(uint32_t addr, int offset, uint32_t st=
+atus, int len, int cr, int
+ sunhme_rx_xsum_calc(uint16_t xsum) "calculated incoming xsum as 0x%x"
 =20
-+ETEXI
-+
-+    {
-+        .name       =3D "announce_self",
-+        .args_type  =3D "",
-+        .params     =3D "",
-+        .help       =3D "Trigger GARP/RARP announcements",
-+        .cmd        =3D hmp_announce_self,
-+    },
-+
-+STEXI
-+@item announce_self
-+@findex announce_self
-+Trigger a round of GARP/RARP broadcasts; this is useful for explicitly u=
-pdating the
-+network infrastructure after a reconfiguration or some forms of migratio=
-n.
-+The timings of the round are set by the migration announce parameters.
- ETEXI
-=20
-     {
-diff --git a/hmp.c b/hmp.c
-index f3db0bf5a2..5f13b16e24 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1570,6 +1570,11 @@ void hmp_info_snapshots(Monitor *mon, const QDict =
-*qdict)
-=20
+ # hw/net/virtio-net.c
++virtio_net_announce_notify(void) ""
+ virtio_net_announce_timer(int round) "%d"
+ virtio_net_handle_announce(int round) "%d"
+ virtio_net_post_load_device(void)
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 38b8974144..7e2c2a6f6a 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -150,15 +150,42 @@ static bool virtio_net_started(VirtIONet *n, uint8_=
+t status)
+         (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
  }
 =20
-+void hmp_announce_self(Monitor *mon, const QDict *qdict)
++static void virtio_net_announce_notify(VirtIONet *net)
 +{
-+    qmp_announce_self(migrate_announce_params(), NULL);
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(net);
++    trace_virtio_net_announce_notify();
++
++    net->status |=3D VIRTIO_NET_S_ANNOUNCE;
++    virtio_notify_config(vdev);
 +}
 +
- void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
+ static void virtio_net_announce_timer(void *opaque)
  {
-     qmp_migrate_cancel(NULL);
-diff --git a/hmp.h b/hmp.h
-index 5f1addcca2..e0f32f04d3 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -46,6 +46,7 @@ void hmp_sync_profile(Monitor *mon, const QDict *qdict)=
-;
- void hmp_system_reset(Monitor *mon, const QDict *qdict);
- void hmp_system_powerdown(Monitor *mon, const QDict *qdict);
- void hmp_exit_preconfig(Monitor *mon, const QDict *qdict);
-+void hmp_announce_self(Monitor *mon, const QDict *qdict);
- void hmp_cpu(Monitor *mon, const QDict *qdict);
- void hmp_memsave(Monitor *mon, const QDict *qdict);
- void hmp_pmemsave(Monitor *mon, const QDict *qdict);
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index 1a3a9c5099..8c49d2fdf1 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -20,6 +20,7 @@
- static int verbose;
+     VirtIONet *n =3D opaque;
+-    VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
+     trace_virtio_net_announce_timer(n->announce_timer.round);
 =20
- static const char *hmp_cmds[] =3D {
-+    "announce_self",
-     "boot_set ndc",
-     "chardev-add null,id=3Dtestchardev1",
-     "chardev-send-break testchardev1",
+     n->announce_timer.round--;
+-    n->status |=3D VIRTIO_NET_S_ANNOUNCE;
+-    virtio_notify_config(vdev);
++    virtio_net_announce_notify(n);
++}
++
++static void virtio_net_announce(NetClientState *nc)
++{
++    VirtIONet *n =3D qemu_get_nic_opaque(nc);
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
++
++    /*
++     * Make sure the virtio migration announcement timer isn't running
++     * If it is, let it trigger announcement so that we do not cause
++     * confusion.
++     */
++    if (n->announce_timer.round) {
++        return;
++    }
++
++    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
++        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
++            virtio_net_announce_notify(n);
++    }
+ }
+=20
+ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+@@ -2556,6 +2583,7 @@ static NetClientInfo net_virtio_info =3D {
+     .receive =3D virtio_net_receive,
+     .link_status_changed =3D virtio_net_set_link_status,
+     .query_rx_filter =3D virtio_net_query_rxfilter,
++    .announce =3D virtio_net_announce,
+ };
+=20
+ static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int id=
+x)
+@@ -2692,6 +2720,7 @@ static void virtio_net_device_realize(DeviceState *=
+dev, Error **errp)
+     qemu_announce_timer_reset(&n->announce_timer, migrate_announce_param=
+s(),
+                               QEMU_CLOCK_VIRTUAL,
+                               virtio_net_announce_timer, n);
++    n->announce_timer.round =3D 0;
+=20
+     if (n->netclient_type) {
+         /*
 --=20
 2.20.1
