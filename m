@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49180)
+Received: from eggs.gnu.org ([209.51.188.92]:49500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gyvyX-0004yM-Fn
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:58:06 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gyw01-0005pO-C6
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:59:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gyvyW-0007lH-CA
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:58:05 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:47099)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gyvyW-0007h2-37
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:58:04 -0500
-Received: by mail-wr1-f68.google.com with SMTP id i16so17153146wrs.13
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 01:57:59 -0800 (PST)
-Date: Wed, 27 Feb 2019 10:57:55 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190227095755.y4mlmwv6cmresezd@steredhat>
-References: <20190226153549.17867-1-stefanha@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gyw00-0000ES-IJ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:59:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47194)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyw00-0000DI-B3
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 04:59:36 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 501FA307D98D
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 09:59:35 +0000 (UTC)
+Date: Wed, 27 Feb 2019 09:59:31 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190227095931.GB2602@work-vm>
+References: <20190226195959.28759-1-dgilbert@redhat.com>
+	<20190226195959.28759-8-dgilbert@redhat.com>
+	<87pnrdoh73.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190226153549.17867-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] file-posix: add drop-cache=on|off option
+In-Reply-To: <87pnrdoh73.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v5 7/9] qmp: Add announce-self command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Neil Skrypuch <neil@tembosocial.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com, quintela@redhat.com
 
-On Tue, Feb 26, 2019 at 03:35:49PM +0000, Stefan Hajnoczi wrote:
-> Commit dd577a26ff03b6829721b1ffbbf9e7c411b72378 ("block/file-posix:
-> implement bdrv_co_invalidate_cache() on Linux") introduced page cache
-> invalidation so that cache.direct=off live migration is safe on Linux.
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
 > 
-> The invalidation takes a significant amount of time when the file is
-> large and present in the page cache.  Normally this is not the case for
-> cross-host live migration but it can happen when migrating between QEMU
-> processes on the same host.
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > Add a qmp command that can trigger guest announcements.
+> >
+> > It uses its own announce-timer instance, and parameters
+> > passed to it explicitly in the command.
+> >
+> > Like most qmp commands, it's in the main thread/bql, so
+> > there's no racing with any outstanding timer.
+> >
+> > Based on work of Germano Veit Michel <germano@redhat.com> and
+> >                  Vladislav Yasevich <vyasevic@redhat.com>
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> [...]
+> > diff --git a/qapi/net.json b/qapi/net.json
+> > index 5face0c14b..c093087278 100644
+> > --- a/qapi/net.json
+> > +++ b/qapi/net.json
+> > @@ -707,3 +707,23 @@
+> >              'max': 'int',
+> >              'rounds': 'int',
+> >              'step': 'int' } }
+> > +
+> > +##
+> > +# @announce-self:
+> > +#
+> > +# Trigger generation of broadcast RARP frames to update network switches.
+> > +# This can be useful when network bonds fail-over the active slave.
+> > +#
+> > +# @params: AnnounceParameters giving timing and repetition count of announce
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "announce-self"
+> > +#      "arguments": { "params:" {
+> > +#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } } }
+> > +# <- { "return": {} }
+> > +#
+> > +# Since: 4.0
+> > +##
+> > +{ 'command': 'announce-self',
+> > +  'data' : {'params': 'AnnounceParameters'} }
 > 
-> On same-host migration we don't need to invalidate pages for correctness
-> anyway, so an option to skip page cache invalidation is useful.  I
-> investigated optimizing invalidation and detecting same-host migration,
-> but both are hard to achieve so a user-visible option will suffice.
-> 
-> As a bonus this option means that the cache invalidation feature will
-> now be detectable by libvirt via QMP schema introspection.
-> 
-> Suggested-by: Neil Skrypuch <neil@tembosocial.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  qapi/block-core.json |  5 +++++
->  block/file-posix.c   | 14 ++++++++++++++
->  2 files changed, 19 insertions(+)
-> 
+> Any particular reason for the additional level of nesting within
+> "arguments"?
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+I'd just copied one of the other places;  boxed doesn't seem to be used
+that often.
+
+Dave
+
+> Here's how to avoid it:
+> 
+>    { 'command': 'announce-self', 'boxed': true,
+>      'data' : 'AnnounceParameters' }
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
