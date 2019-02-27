@@ -1,32 +1,46 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46293)
+Received: from eggs.gnu.org ([209.51.188.92]:46569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gz0kk-0002eu-AA
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:04:15 -0500
+	(envelope-from <muriloo@linux.ibm.com>) id 1gz0m7-0003ii-VD
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gz0ki-0002DG-61
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:04:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37281)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gz0kh-0002Ba-RP
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:04:08 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E5D7830024E7
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 14:56:49 +0000 (UTC)
-References: <20190118140336.GA19921@beluga.usersys.redhat.com>
-	<20190221143915.GB2506@beluga.usersys.redhat.com>
-	<734bb989-ba08-edaf-6ea4-3fa84903fc3d@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <9d1edf2b-b9f1-c711-2aac-4a07d69cfaca@redhat.com>
-Date: Wed, 27 Feb 2019 11:56:41 -0300
+	(envelope-from <muriloo@linux.ibm.com>) id 1gz0ll-0002m7-BS
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:05:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38236
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1gz0lk-0002ec-Vk
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:05:13 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1RF0xdS008237
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:05:08 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qwva5261e-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:05:07 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Wed, 27 Feb 2019 15:05:06 -0000
+Date: Wed, 27 Feb 2019 12:04:49 -0300
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+References: <20190225162325.24008-1-maxiwell@linux.ibm.com>
+	<20190225232009.GB30778@kermit.br.ibm.com>
+	<20190226032103.GJ6872@umbus.fritz.box>
+	<20190226142126.jxosththzad6h6dd@maxibm>
+	<20190226170830.GA16569@kermit.br.ibm.com>
+	<20190226191140.GA25467@kermit.br.ibm.com>
+	<20190226231920.GS6872@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <734bb989-ba08-edaf-6ea4-3fa84903fc3d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Libvirt upstream CI efforts
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190226231920.GS6872@umbus.fritz.box>
+Message-Id: <20190227150449.GA9614@kermit.br.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr-rtas: add ibm,
+ get-vpd RTAS interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,241 +49,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, Erik Skultety <eskultet@redhat.com>, libvir-list@redhat.com
-Cc: Yash Mankad <ymankad@redhat.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, "open list:sPAPR" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
 
+Hi, David.
 
-On 02/21/2019 03:50 PM, Cleber Rosa wrote:
+On Wed, Feb 27, 2019 at 10:19:20AM +1100, David Gibson wrote:
+> On Tue, Feb 26, 2019 at 04:11:40PM -0300, Murilo Opsfelder Araujo wrote=
+:
+> > On Tue, Feb 26, 2019 at 02:08:30PM -0300, Murilo Opsfelder Araujo wro=
+te:
+> > > Hi, Maxiwell.
+> > >
+> > > On Tue, Feb 26, 2019 at 11:21:26AM -0300, Maxiwell S. Garcia wrote:
+> > > > On Tue, Feb 26, 2019 at 02:21:03PM +1100, David Gibson wrote:
+> > > > > On Mon, Feb 25, 2019 at 08:20:09PM -0300, Murilo Opsfelder Arau=
+jo wrote:
+> > > > > > Hi, Maxiwell.
+> > > > > >
+> > > > > > On Mon, Feb 25, 2019 at 01:23:25PM -0300, Maxiwell S. Garcia =
+wrote:
+> > > > > > > This adds a handler for ibm,get-vpd RTAS calls, allowing ps=
+eries
+> > > > > > > guest to collect host information. It is disabled by defaul=
+t to
+> > > > > > > avoid unwanted information leakage. To enable it, use:
+> > > > > > > =E2=80=98-M pseries,vpd-export=3Don=E2=80=99
+> > > > > >
+> > > > > > The patch for setting host-serial and host-model already land=
+ed Gibson's
+> > > > > > ppc-for-4.0 branch:
+> > > > > >
+> > > > > >   commit 9e584f45868f6945c1282c938278038cba0e4af2
+> > > > > >   Author: Prasad J Pandit <pjp@fedoraproject.org>
+> > > > > >   Date:   Mon Feb 18 23:43:49 2019 +0530
+> > > > > >
+> > > > > >       ppc: add host-serial and host-model machine attributes =
+(CVE-2019-8934)
+> > > > > >
+> > > > > >
+> > > > > > QEMU should only return host-serial and host-model from the h=
+ost if the
+> > > > > > following combination of parameters are provided:
+> > > > > >
+> > > > > >   -M host-serial=3Dpassthrough,host-model=3Dpassthrough,vpd-e=
+xport=3Don
+> > > > > >
+> > > > > > If host-serial or host-model are set with a user-string, ibm,=
+get-vpd should
+> > > > > > honor these values and return them, not exposing host informa=
+tion by accident.
+> > > > > >
+> > > > > > I'm not even sure if we need vpd-export=3D<bool> setting. Its=
+ logic could be
+> > > > > > derived from the presence of host-serial=3Dpassthrough and ho=
+st-model=3Dpassthrough
+> > > > > > options.
+> > > > > >
+> > > > > > What do you think?
+> > > > >
+> > > > > That's an excellent point - I hadn't thought through the fact t=
+hat
+> > > > > this is the same information exposed by those properties.  I do=
+ indeed
+> > > > > think that exposing the same information set in those propertie=
+s - and
+> > > > > thereby avoiding the new machine option - would be a better pla=
+n.
+> > > > >
+> > > >
+> > > > I saw that the patch was applied. So I will work in another patch
+> > > > to use these properties and remove the export-vpd option.
+> > > >
+> > > > Another thing that I thought the fact that 'host-serial' and 'hos=
+t-model'
+> > > > nodes in Device Tree are not in accordance with LoPAPR document. =
+What
+> > > > you think in use only get-vpd to get these information and remove
+> > > > nodes from device tree?
+> > >
+> > > Both "system-id" and "model" properties are described in the sectio=
+n "3.3.2.1
+> > > Root Node Properties" of the "Device Tree Bindings: Linux on Power =
+Architecture
+> > > Reference" document:
+> > >
+> > >   https://members.openpowerfoundation.org/wg/SYSSW/document/1455
+> >
+> > I replied too early. As Maxiwell explained to me (thanks Max!), guest=
+ can end up
+> > having the following entries under /proc/device-tree/ (among other en=
+tries):
+> >
+> >   $ cat host-serial
+> >   12A3B4C
+> >
+> >   $ cat host-model
+> >   1234-56A
+> >
+> >   $ cat system-id
+> >   c7b62da9-3d0c-44f9-8edb-2318271f3c1a
+> >
+> >   $ cat model
+> >   IBM pSeries (emulated by qemu)
+> >
+> > Where:
+> >
+> >   - host-serial/host-model: depend on "-M host-serial" and "-M host-m=
+odel"
+> >     machine options.
+> >
+> >   - system-id: created when "-uuid <val>" exists in qemu command line=
+ options.
+> >
+> >   - model: hard-coded.
+> >
+> > With this patch, RTAS ibm,get-vpd call will return "system-id" and "m=
+odel" from
+> > the host, not from the guest. I found this confusing.
 >
-> On 2/21/19 9:39 AM, Erik Skultety wrote:
->> Hi,
->> I'm starting this thread in order to continue with the ongoing efforts to
->> bring actual integration testing to libvirt. Currently, the status quo is that
->> we build libvirt (along with our unit test suite) using different OS-flavoured
->> VMs in ci.centos.org. Andrea put a tremendous amount of work to not only
->> automate the whole process of creating the VMs but also having a way for a
->> dev to re-create the same environment locally without jenkins by using the
->> lcitool.
->>
-> Nice to meet you lcitool!  I spent some time looking and testing it, and
-> I see tremendously value in allowing developers have the same experience
-> locally (or anywhere else they choose) as opposed to only behind a
-> black(-ish) box environment.  Yash may remember some of our
-> conversations about that.  The problem lcitool solves is common (I'm
-> having that myself for "deployment checks", AKA integration tests, of
-> Avocado itself)[1].
->
-> Hopefully not diverting too much from the main topic, but I'd like to
-> ask if there was a specific reason for installing guests instead of
-> reusing something like virt-builder?  This is my "provision" step that I
-> use locally:
->
->    $ virsh destroy $DOMAIN; virt-builder
-> --ssh-inject=root:file:$SSH_PUB_KEY --selinux-relabel
-> --root-password=password:$PASSWORD --output=$VM_BASE_DIR/$DOMAIN.qcow2
-> --format=qcow2 --install python2 $GUEST_TYPE && virsh start $DOMAIN
->
-> Which seems to be quicker and simpler than maintaining kickstart files.
->   It also covers more guests (should work for FreeBSD which seem to have
-> some caveats on lcitool).  Ideally, I'd like ansible to be responsible
-> for it (and it'd be fine that it calls this or something else).  But I
-> haven't looked at how well ansible will take this (maybe a dynamic
-> inventory implementation is all that's needed).
+> Hrm.  I found the bit in LoPAPR describing how ibm,get-vpd operates,
+> but not something describing the actual data that appears within it.
+> Where's that described?  It'd be nice to check if those values are
+> supposed to be describing the host or the guest.
 
-At Red Hat, the downstream CI system for QEMU uses Linchpin[1] to 
-provision bare-metal machines on Beaker [2].
+Are you asking about the fields of the ibm,vpd property? They are describ=
+ed in
+Table 11.2 "LoPAPR VPD Fields" of this LoPAPR document:
 
-Linchpin is an Ansible based tool that allows to provision (and destroy) 
-resources with various providers, for example, Libvirt, Openstack, and 
-Duffy [3] (behind of ci.centos.org). On provision success, it generates 
-an Ansible inventory file which can be used run tasks on the resources.
+  https://members.openpowerfoundation.org/wg/SYSSW/document/1461
 
-It would be good if we could adopt that tool upstream, so have a "common 
-language" for provision resources across Libvirt and QEMU CI projects, 
-and eventually making Linchpin a better tool.
-
-Okay, there are limitations... it does not provision Docker containers 
-yet, for example. I'm working on it [4] though.
-
-Regards,
-
-Wainer
-
-[1] https://linchpin.readthedocs.io/en/latest/index.html
-[2] https://beaker-project.org/
-[3] https://wiki.centos.org/QaWiki/CI/Duffy
-[4] https://github.com/CentOS-PaaS-SIG/linchpin/pull/977
-
+Is that what you were looking for?
 
 >
->> #TL;DR (if you're from QEMU, no TLDR for you ;), there are questions to answer)
->> - we need to run functional tests upstream on ci.centos.org
->>      -> pure VM testing environment (nested for migration) vs Docker images
->> - we need to host the upstream test suite somewhere
->>      -> main libvirt.git repo vs libvirt-jenkins-ci.git vs new standalone repo
->> - what framework to use for the test suite
->>      -> TCK vs avocado-vt vs plain avocado
->>
->> #THE LONG STORY SHORT
->> As far as the functional test suite goes, there's an already existing
->> integration with the avocado-vt and a massive number of test cases at [1]
->> which is currently not used for upstream testing, primarily because of the huge
->> number of test cases (and also many unnecessary legacy test cases). An
->> alternative set of functional test cases is available as part of the
->> libvirt-tck framework [2]. The obvious question now is how can we build upon
->> any of this and introduce proper functional testing of upstream libvirt to our
->> jenkins environment at ci.centos.org, so I formulated the following discussion
->> points as I think these are crucial to sort out before we move on to the test
->> suite itself:
->>
->> * Infrastructure/Storage requirements (need for hosting pre-build images?)
->>       - one of the main goals we should strive for with upstream CI is that
->>         every developer should be able to run the integration test suite on
->>         their own machine (conveniently) prior to submitting their patchset to
->>         the list
->>       - we need a reproducible environment to ensure that we don't get different
->>         results across different platforms (including ci.centos.org), therefore
->>         we could provide pre-built images with environment already set up to run
->>         the suite in an L1 guest.
-> This seems to match the virt-builder approach.
 >
->>       - as for performing migration tests, we could utilize nested virt
->>       - should we go this way, having some publicly accessible storage to host
->>         all the pre-built images is a key problem to solve
->>
->>             -> an estimate of how much we're currently using: roughly 130G from
->>                our 500G allocation at ci.centos.org to store 8 qcow2 images + 2
->>                freebsd isos
->>
-> Maybe this just needs to become a repository that developers can also
-> download from?  This would require the FreeBSD ISOs (and installation)
-> to be converted into a similar pre-built image use, though.
+> > Perhaps we can trick ibm,get-vpd call to return "host-serial" and "ho=
+st-model"
+> > values from the guest, which will hold safe values after commit
+> > 9e584f45868f6945c1282c938278038cba0e4af2 "ppc: add host-serial and ho=
+st-model
+> > machine attributes (CVE-2019-8934)".
 >
->>             -> we're also fairly generous with how much we allocate for a guest
->>                image as most of the guests don't even use half of the 20G
->>                allocation
->>
->>             -> considering sparsifying the pre-built images and compressing them
->>                + adding a ton of dependencies to run the suite, extending the
->>                pool of distros by including ubuntu 16 + 18, 200-250G is IMHO
->>                quite a generous estimate of our real need
->>
->>             -> we need to find a party willing to give us the estimated amount
->>                of publicly accessible storage and consider whether we'd need any
->>                funds for that
->>
->>             -> we'd have to also talk to other projects that have done a similar
->>                thing about possible caveats related to hosting images, e.g.
->>                bandwidth
-> We're hosting a very small number of images (and small images in size) here:
+> Well, if it is supposed to be host values, then yes, absolutely, we
+> should be using the "host" values that the user supplies (if any).
 >
->    https://avocado-project.org/data/assets/
+> > What do you think?
+> >
+> > As to removing "host-serial" and "host-model", I am not entirely sure=
+ for what
+> > they are used. There should be a reason for them to exist.
+> >
 >
-> There's at least one image that gets downloaded on every single
-> Avocado-VT installation (vt-bootstrap) by default.  I have to admit I
-> haven't monitored the bandwidth usage, but it hasn't gone over the quota
-> (and we're paying ~5 USD/month for that server).
->
->>             -> as for ci.centos.org, it does provide publicly accessible folder
->>                where projects can store artifacts (the documentation even
->>                mentions VM images), there might a limit though [3]
->>
->>       - alternatively, we could use Docker images to test migration instead of
->>         nested virt (and not only migration)
->>             -> we'd loose support for non-Linux platforms like FreeBSD which we
->>                would not if we used nested
->>
-> One must pay attention to capabilities, seccomp and other layers added
-> to containers.  I'm not fully confident that the results of
-> virtualization testing under a container (specially failures) are just
-> as good as results from a non-containerized environment.  But I may be
-> on track to changing my opinion on this matter.
->
->> * Hosting the test suite itself
->>       - the main point to discuss here is whether the test suite should be part
->>         of the main libvirt repo following QEMU's lead by example or should they
->>         live inside a separate repo (a new one or as part of
->>         libvirt-jenkins-ci [4]
->>             -> the question here for QEMU folks is:
->>
->>         *"What was the rationale for QEMU to decide to have avocado-qemu as
->>          part of the main repo?"*
->>
-> Whenever you have an external test suite, you loose the automatic
-> version matching of the component you're testing.  Then conditionals,
-> abstractions, special treatments for the components we're testing tend
-> to plague everything.  Avocado-VT/tp-{qemu,libvirt} are examples of test
-> frameworks repositories that may still support 10 years or so of
-> different software versions.  The end result is *not* nice because:
->
->    * Abstraction increases to support multiple versions of everything
->    * Learning curve goes through the roof
->    * Developers don't take the time to learn a complex framework full of
-> abstractions
->    * QE does take the time, because they usually need to more than one
-> version of a software
->    * Developers and QE now have their own silos
->
-> You could overcome some of that by keeping policies on supported
-> versions, baby sitting and deprecating code, but I firmly believe that
-> those house keeping tasks are bound to fail.
->
-> There's one thing developers will take immediate action on, and that is
-> when a "make check[-functional]" fails... so a test suite in this sense
-> need to be intrusive and affect a developer's common workflow.
->
->> * What framework to use for the test suite
->>       - libvirt-tck because it already contains a bunch of very useful tests as
->>         mentioned in the beginning
->>       - using the avocado-vt plugin because that's what's the existing
->>         libvirt-test-provider [1] is about
->>       - pure avocado for its community popularity and continuous development and
->>         once again follow QEMU leading by example
->>             -> and again a question for QEMU folks:
->>
->>         *"What was QEMU's take on this and why did they decide to go with
->>          avocado-qemu?"*
->>
-> Well, "avocado-qemu" did not exist when we initially pursued this task.
->   Besides the points above, as to why keeping the tests as part of the
-> main repo, we understand that there are a lot of common problems in
-> testing.  They're usually solved over and over again, in an ad-hoc
-> manner for each project.
->
-> (Pure) Avocado was for a long time nothing but a speculation of what we
-> believed most projects would need for their testing (and an Avocado-VT
-> compatibility layer).  We got somethings right, and somethings wrong.
->
-> During the last year or so, a number of Avocado features have been added
-> for the sake of QEMU testing (for the "avocado-qemu" initiative), but I
-> bet that a user reading the documentation won't guess that.  Those
-> features are abstract and should work for any other project.
->
-> So, along the way, we had confidence that the testing stack could be
-> shared and split, and that tests living within the main repo ended up
-> looking simple and effective.  The "glue" between tests and framework is
-> quite thin and the bootstrap can be done transparently as part of the
-> "make check-acceptance" target.  We haven't heard from developers any
-> resistance to this approach, so, so far, we believe we're on the right
-> track.
->
->> * Integrating the test suite with the main libvirt.git repo
->>       - if we host the suite as part of libvirt-jenkins-ci as mentioned in the
->>         previous section then we could make libvirt-jenkins-ci a submodule of
->>         libvirt.git and enhance the toolchain by having something like 'make
->>         integration' that would prepare the selected guests and execute the test
->>         suite in them (only on demand)
->>
-> Yes, this is the type of experience that should ultimately be delivered.
->
->> Regards,
->> Erik
->>
->> [1] https://github.com/autotest/tp-libvirt
->> [2] https://libvirt.org/testtck.html
->> [3] https://wiki.centos.org/QaWiki/CI/GettingStarted#head-a46ee49e8818ef9b50225c4e9d429f7a079758d2
->> [4] https://github.com/libvirt/libvirt-jenkins-ci
->>
-> [1]
-> https://github.com/avocado-framework/avocado/tree/master/selftests/deployment
->
+> --
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _oth=
+er_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
+
+--
+Murilo
