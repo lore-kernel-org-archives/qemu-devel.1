@@ -1,26 +1,46 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51322)
+Received: from eggs.gnu.org ([209.51.188.92]:50921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzUN-0005cE-LQ
+	(envelope-from <jjherne@linux.ibm.com>) id 1gyzUM-000502-M5
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzMU-0005Vq-4y
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:35:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32899)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzMS-0005OD-7s
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:35:00 -0500
-Date: Wed, 27 Feb 2019 12:58:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190227125834.GF2602@work-vm>
-References: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
-	<1550847320-25110-11-git-send-email-jasowang@redhat.com>
-	<30e7bd39-7ca1-fd1a-1864-b3a0a390f4fc@redhat.com>
+	(envelope-from <jjherne@linux.ibm.com>) id 1gyzNg-00067p-CQ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:36:17 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45830
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gyzNe-0005sn-EH
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:36:16 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1RDYYjB130259
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 08:35:45 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qwuj4828d-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 08:35:45 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Wed, 27 Feb 2019 13:35:44 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-11-git-send-email-jjherne@linux.ibm.com>
+	<735ca9ff-76e3-966f-6fbc-a72bf994b413@linux.ibm.com>
+	<20190204121319.32915fd6.cohuck@redhat.com>
+	<bd0a3a4e-d82c-e01b-7c81-60ee2b50eebe@linux.ibm.com>
+	<20190205111838.5fe2fc47.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Wed, 27 Feb 2019 08:35:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <30e7bd39-7ca1-fd1a-1864-b3a0a390f4fc@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 10/13] tests: Add a test for qemu self
- announcements
+In-Reply-To: <20190205111838.5fe2fc47.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <a6766d6e-c848-be08-7881-dec6b0cb0604@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 10/15] s390-bios: Support for running
+ format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +49,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, Vlad Yasevich <vyasevic@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> On 22/02/2019 15.55, Jason Wang wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > We now expose qemu_announce_self through QMP and HMP.  Add a test
-> > with some very basic packet validation (make sure we get a RARP).
-> > 
-> > Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > ---
-> >  tests/Makefile.include     |  3 ++
-> >  tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 86 insertions(+)
-> >  create mode 100644 tests/test-announce-self.c
-> > 
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index b39e989..1b0874c 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -144,6 +144,7 @@ check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
-> >  
-> >  check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
-> >  check-qtest-generic-y += tests/cdrom-test$(EXESUF)
-> > +gcov-files-generic-y = migration/savevm.c
+On 2/5/19 5:18 AM, Cornelia Huck wrote:
+> On Mon, 4 Feb 2019 14:29:18 -0500
+> Farhan Ali <alifm@linux.ibm.com> wrote:
 > 
-> AFAIK you don't need these gcov lines anymore. See commit
-> 26830e9325d05d537dd9a3765437908771d19475.
-
-Deleted, thanks.
-
-Dave
-
+>> On 02/04/2019 06:13 AM, Cornelia Huck wrote:
+>>> On Thu, 31 Jan 2019 12:31:00 -0500
+>>> Farhan Ali <alifm@linux.ibm.com> wrote:
+>>>    
+>>>> On 01/29/2019 08:29 AM, Jason J. Herne wrote:
+>>>>> Add struct for format-0 ccws. Support executing format-0 channel
+>>>>> programs and waiting for their completion before continuing execution.
+>>>>> This will be used for real dasd ipl.
+>>>>>
+>>>>> Add cu_type() to channel io library. This will be used to query control
+>>>>> unit type which is used to determine if we are booting a virtio device or a
+>>>>> real dasd device.
+>>>>>
+>>>>> Signed-off-by: Jason J. Herne<jjherne@linux.ibm.com>
+>>>>> ---
+>>>>>     pc-bios/s390-ccw/cio.c      | 114 +++++++++++++++++++++++++++++++++++++++
+>>>>>     pc-bios/s390-ccw/cio.h      | 127 ++++++++++++++++++++++++++++++++++++++++++--
+>>>>>     pc-bios/s390-ccw/s390-ccw.h |   1 +
+>>>>>     pc-bios/s390-ccw/start.S    |  33 +++++++++++-
+>>>>>     4 files changed, 270 insertions(+), 5 deletions(-)
+>>>    
+>>>>> +/*
+>>>>> + * Executes a channel program at a given subchannel. The request to run the
+>>>>> + * channel program is sent to the subchannel, we then wait for the interrupt
+>>>>> + * signaling completion of the I/O operation(s) performed by the channel
+>>>>> + * program. Lastly we verify that the i/o operation completed without error and
+>>>>> + * that the interrupt we received was for the subchannel used to run the
+>>>>> + * channel program.
+>>>>> + *
+>>>>> + * Note: This function assumes it is running in an environment where no other
+>>>>> + * cpus are generating or receiving I/O interrupts. So either run it in a
+>>>>> + * single-cpu environment or make sure all other cpus are not doing I/O and
+>>>>> + * have I/O interrupts masked off.
+>>>>> + */
+>>>>> +int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
+>>>>> +{
+>>>>> +    CmdOrb orb = {};
+>>>>> +    Irb irb = {};
+>>>>> +    sense_data_eckd_dasd sd;
+>>>>> +    int rc, retries = 0;
+>>>>> +
+>>>>> +    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
+>>>>> +
+>>>>> +    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
+>>>>> +    if (fmt == 0) {
+>>>>> +        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
+>>>>> +    }
+>>>>> +
+>>>>> +    orb.fmt = fmt ;
+>>>>> +    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
+>>>>> +    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
+>>>>> +    orb.lpm = 0xFF; /* All paths allowed */
+>>>>> +    orb.cpa = ccw_addr;
+>>>>> +
+>>>>> +    while (true) {
+>>>>> +        rc = ssch(schid, &orb);
+>>>>> +        if (rc == 1) {
+>>>>> +            /* Status pending, not sure why. Let's eat the status and retry. */
+>>>>> +            tsch(schid, &irb);
+>>>>> +            retries++;
+>>>>> +            continue;
+>>>>> +        }
+>>>>> +        if (rc) {
+>>>>> +            print_int("ssch failed with rc=", rc);
+>>>>> +            break;
+>>>>> +        }
+>>>>> +
+>>>>> +        consume_io_int();
+>>>>> +
+>>>>> +        /* collect status */
+>>>>> +        rc = tsch(schid, &irb);
+>>>>> +        if (rc) {
+>>>>> +            print_int("tsch failed with rc=", rc);
+>>>>> +            break;
+>>>>> +        }
+>>>>> +
+>>>>> +        if (!irb_error(&irb)) {
+>>>>> +            break;
+>>>>> +        }
+>>>>> +
+>>>>> +        /*
+>>>>> +         * Unexpected unit check, or interface-control-check. Use sense to
+>>>>> +         * clear unit check then retry.
+>>>>> +         */
+>>>>> +        if ((unit_check(&irb) || iface_ctrl_check(&irb)) && retries <= 2) {
+>>>>> +            basic_sense(schid, &sd, sizeof(sd));
+>>>>
+>>>> We are using basic sense to clear any unit check or ifcc, but is it
+>>>> possible for the basic sense to cause another unit check?
+>>>>
+>>>> The chapter on Basic Sense in the Common I/O Device Commands
+>>>> (http://publibz.boulder.ibm.com/support/libraryserver/FRAMESET/dz9ar501/2.1?SHELF=&DT=19920409154647&CASE=)
+>>>>     says this:
+>>>>
+>>>> ""
+>>>> The basic sense command initiates a sense operation  at  all  devices
+>>>> and cannot  cause  the  command-reject,  intervention-required,
+>>>> data-check, or overrun bit to be set to one.  If the control unit
+>>>> detects  an  equipment malfunction  or  invalid  checking-block  code
+>>>> (CBC) on the sense-command code, the equipment-check or bus-out-check
+>>>> bit is set  to  one,  and  unit check is indicated in the device-status
+>>>> byte.
+>>>> ""
+>>>>
+>>>> If my understanding is correct, if there is an equipment malfunction
+>>>> then the control unit can return a unit check even for a basic sense.
+>>>> This can lead to infinite recursion in the bios.
+>>>
+>>> I think the retries variable is supposed to take care of that.
+>>>    
+>>
+>> If I understand the code correctly, the retries variable cannot prevent
+>> infinite recursion. Because every time we get a unit check we do a basic
+>> sense which calls the do_cio function again. If that basic sense returns
+>> a unit check we do another basic sense....
 > 
->  Thomas
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Eww, you're right...
+> 
+> I think that the routine needs to be split:
+> - inner routine that does the ssch, retries if the subchannel is status
+>    pending, and waits for a final status (regardless whether it is a
+>    special condition or not)
+> - outer routine that does error handling, if needed (like retrying on
+>    IFCC, or doing a basic sense on unit check)
+> 
+> The inner routine will probably only be called by the outer routine
+> (and not directly by other code).
+> 
+> Does that make sense? It's hopefully enough; we really don't want to
+> transplant the whole Linux cio state machine into the bios...
+> 
+
+I had a hard time following what you were suggesting here. Its most likely me,not you :). 
+That said, I did redesign it to remove the potential infinite recursion. I'll be posting 
+v3 soon, let me know what you think.
+
+
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
