@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32885)
+Received: from eggs.gnu.org ([209.51.188.92]:33429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gywvC-0003Jo-BV
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:58:43 -0500
+	(envelope-from <quintela@redhat.com>) id 1gywxb-0004lK-7Q
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:01:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gywv9-0003DW-WE
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:58:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:15210)
+	(envelope-from <quintela@redhat.com>) id 1gywxZ-00055V-LS
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:01:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50777)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gywv9-0003Cl-MM
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:58:39 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gywxY-00053g-Hs
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:01:09 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F150C23E6E7
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:58:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 838362DD77C
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:51:46 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20190221184529.GQ2605@work-vm> (David Alan Gilbert's message of
-	"Thu, 21 Feb 2019 18:45:30 +0000")
-References: <20190220115611.3192-1-quintela@redhat.com>
-	<20190220115611.3192-4-quintela@redhat.com>
-	<20190221184529.GQ2605@work-vm>
-Reply-To: quintela@redhat.com
-Date: Wed, 27 Feb 2019 12:02:02 +0100
-Message-ID: <878sy1sded.fsf@trasno.org>
+Date: Wed, 27 Feb 2019 11:51:25 +0100
+Message-Id: <20190227105128.1655-1-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] multifd: Create new
- next_packet_size field
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v14 0/3] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,141 +29,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> We need to send this field when we add compression support.  As we are
->> still on x- stage, we can do this kind of changes.
->
-> Can you explain this a bit more; I'm confused how you can know what the
-> next size is going to be until you've got there.
+In v14:
+- updates commets to 4.0
+- Update migration-test copy of SocketAddress_str
 
-This is needed for compression.  Without compression, we always know the
-size of packet: number of pages * page size + some headers (that don't
-matter here).
+In v13:
+- Rename socket_address to socket_address_list (dave)
+- Remove useless breaks (dave)
 
-With compression that changes, and it is *much* easier for zlib if we
-read the full packet in advance to a buffer and then tell zlib to
-uncompress it.  It is possible to do it otherwise, but it is a mess (not
-that zlib is not *always* a mess).
-
-So with this change, I  can do a:
-- read header (it is not compressed and has the size of the following
-part of the packet)
-- read rest of the packet in one go
-- uncompress it like a champ, without worrying that we need to still
-read something else.
+If nothing pops out, everything is reviewed and will be sent on next
+pull requset.
 
 Later, Juan.
 
+In v12:
+- drop multifd case (caming in next series)
+- fix leak of socketaddress (eric)
+- handle vsock printing correctly (eric)
 
-> Dave
->
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  migration/ram.c        | 15 +++++++++++++--
->>  migration/trace-events |  4 ++--
->>  2 files changed, 15 insertions(+), 4 deletions(-)
->> 
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 29f0d431a8..26ed26fc2d 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -534,6 +534,8 @@ typedef struct {
->>      /* maximum number of allocated pages */
->>      uint32_t pages_alloc;
->>      uint32_t pages_used;
->> +    /* size of the next packet that contains pages */
->> +    uint32_t next_packet_size;
->>      uint64_t packet_num;
->>      char ramblock[256];
->>      uint64_t offset[];
->> @@ -581,6 +583,8 @@ typedef struct {
->>      MultiFDPacket_t *packet;
->>      /* multifd flags for each packet */
->>      uint32_t flags;
->> +    /* size of the next packet that contains pages */
->> +    uint32_t next_packet_size;
->>      /* global number of generated multifd packets */
->>      uint64_t packet_num;
->>      /* thread local variables */
->> @@ -617,6 +621,8 @@ typedef struct {
->>      /* global number of generated multifd packets */
->>      uint64_t packet_num;
->>      /* thread local variables */
->> +    /* size of the next packet that contains pages */
->> +    uint32_t next_packet_size;
->>      /* packets sent through this channel */
->>      uint64_t num_packets;
->>      /* pages sent through this channel */
->> @@ -721,6 +727,7 @@ static void multifd_send_fill_packet(MultiFDSendParams *p)
->>      packet->flags = cpu_to_be32(p->flags);
->>      packet->pages_alloc = cpu_to_be32(migrate_multifd_page_count());
->>      packet->pages_used = cpu_to_be32(p->pages->used);
->> +    packet->next_packet_size = cpu_to_be32(p->next_packet_size);
->>      packet->packet_num = cpu_to_be64(p->packet_num);
->>  
->>      if (p->pages->block) {
->> @@ -772,6 +779,7 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
->>          return -1;
->>      }
->>  
->> +    p->next_packet_size = be32_to_cpu(packet->next_packet_size);
->>      p->packet_num = be64_to_cpu(packet->packet_num);
->>  
->>      if (p->pages->used) {
->> @@ -1011,6 +1019,7 @@ static void *multifd_send_thread(void *opaque)
->>              uint64_t packet_num = p->packet_num;
->>              uint32_t flags = p->flags;
->>  
->> +            p->next_packet_size = used * qemu_target_page_size();
->>              multifd_send_fill_packet(p);
->>              p->flags = 0;
->>              p->num_packets++;
->> @@ -1018,7 +1027,8 @@ static void *multifd_send_thread(void *opaque)
->>              p->pages->used = 0;
->>              qemu_mutex_unlock(&p->mutex);
->>  
->> -            trace_multifd_send(p->id, packet_num, used, flags);
->> +            trace_multifd_send(p->id, packet_num, used, flags,
->> +                               p->next_packet_size);
->>  
->>              ret = qio_channel_write_all(p->c, (void *)p->packet,
->>                                          p->packet_len, &local_err);
->> @@ -1253,7 +1263,8 @@ static void *multifd_recv_thread(void *opaque)
->>  
->>          used = p->pages->used;
->>          flags = p->flags;
->> -        trace_multifd_recv(p->id, p->packet_num, used, flags);
->> +        trace_multifd_recv(p->id, p->packet_num, used, flags,
->> +                           p->next_packet_size);
->>          p->num_packets++;
->>          p->num_pages += used;
->>          qemu_mutex_unlock(&p->mutex);
->> diff --git a/migration/trace-events b/migration/trace-events
->> index bd2d0cd25a..a11e66e1d9 100644
->> --- a/migration/trace-events
->> +++ b/migration/trace-events
->> @@ -77,13 +77,13 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
->>  migration_bitmap_sync_start(void) ""
->>  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
->>  migration_throttle(void) ""
->> -multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags) "channel %d packet number %" PRIu64 " pages %d flags 0x%x"
->> +multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pages %d flags 0x%x next packet size %d"
->>  multifd_recv_sync_main(long packet_num) "packet num %ld"
->>  multifd_recv_sync_main_signal(uint8_t id) "channel %d"
->>  multifd_recv_sync_main_wait(uint8_t id) "channel %d"
->>  multifd_recv_thread_end(uint8_t id, uint64_t packets, uint64_t pages) "channel %d packets %" PRIu64 " pages %" PRIu64
->>  multifd_recv_thread_start(uint8_t id) "%d"
->> -multifd_send(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags) "channel %d packet_num %" PRIu64 " pages %d flags 0x%x"
->> +multifd_send(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet_num %" PRIu64 " pages %d flags 0x%x next packet size %d"
->>  multifd_send_sync_main(long packet_num) "packet num %ld"
->>  multifd_send_sync_main_signal(uint8_t id) "channel %d"
->>  multifd_send_sync_main_wait(uint8_t id) "channel %d"
->> -- 
->> 2.20.1
->> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Iv v11:
+- Rebase to lastest
+- Remove the compress test.  It didin't worked really.
+  See my next series.
+- Only patch missing review-by is the second one.
+
+Please, consider them.
+
+In v10:
+- rebase to latest upstream
+- code changed quite a bit with qmp refactorings
+  apllied them
+- make it work again
+- compress threads test, continue working there, not trivial.
+
+Two question-:
+- should we integrate them on this cycle?
+  they are tests
+- should we enable them only on baremetal, and not on emulation?
+  There is still a problem on TCG that sometimes fails the migration
+  thread
+
+ToDo:
+- Finish debug compress test
+  Still stuck why the test wonk when I launch qemu by hand but not
+  trough qtest.  Creatuve uses of launching gdb through launched
+  guests have not help so far.
+
+- Finish fd transport test
+  Not very difficult in principle, need more checking to see if it
+  don't fail in other setups.
+
+- Finish tl trasport test
+  I already knew that I hate certificates, but this is too much.  Trying
+  to understand how to use them.
+
+Please commet, Juan.
+
+In v9:
+- Dropp Export SocketAddress_to_str
+  just create the functions where I need them.
+- drop precopy test and xbzrle (on pull requset)
+  Use 100M for cache as dave suggests
+- drop ppc improvemnet (on pull request)
+- drop RFH, will work on tha later
+- move socket_address to info migrate
+
+Please, review.
+
+Later, Juan.
+
+v8:
+- just rebase to make things continue to wonk
+
+New in the other v7:
+- SocketAddress is now a list (a.k.a make happy danp)
+- Rebase on top of upstream
+  network listener is *interesting*
+- *HACK* to make SocketAddress list in common
+  see patch: create-socket-paramenter
+
+Please review, Juan.
+
+CC: berrange@redhat.com
+
+[v7]
+This is v6, it differest from the patches that I sent with previous
+multifd post:
+- Rename x-tcp-port to x-socket-address
+  This is more *complicated* that it looks as:
+
+  * it is a pointer, so I need to use QAPI_CLONE() to make info
+    migrate work
+
+  * this is an union of structs.  In QAPI. So, a dict of strings.  The
+    only way that I was able to make things work is parsing the qdict
+    to a SocketAddress and then output a SocketAddress as an str.  It
+    needs to be an easier way, for sure.
+
+  * Cleanups here andthere.
+
+Please, review, Juan.
+
+[v5]
+- Several patches moved to pull request
+- merge info_migrate and migration_tests
+  only missing bit is tcp_port, needed for tcp tests
+- Rename tcp-port to x-tcp-port
+  We will get better naming from David at some point, and we will use tha=
+t bit
+- ppc: use inline code as suggested by lvivier
+
+Please, review.
+
+It is based on my previous pull request
+
+Based-on: 20180129120932.12874-1-quintela@redhat.com
+
+[v4]
+- rebase on top on v4 info_migrate patches
+- Tune sleeps to make patches fast
+- Create a deprecated test for deprecated commands (i.e. make peterxu hap=
+py)
+- create migrate_start_postcopy function
+- fix naming/sizes between power and x86
+- cleanup comments to match code
+
+[v3]
+
+- No more tests for deprecated parameters. Now I only use
+  migrate_set_parameter.  If there is a deprecated command for that,
+  we tests it there.
+- free "result" string, always good to return memory (Peter found it)
+- use the new tcp_port parameter from info migrate.  So we are
+  handling well the tcp case.
+- lots of code movement around to make everything consistent.
+- Several patches already integrated upstream.
+
+[v2]
+- to make review easier, I started renaming postcopy-test.c to migration-=
+test.c
+- Did cleanups/refactoring there
+- Don't use global-qtest anymore
+- check that the parameters that we sent got really set
+- RFH: comrpress threads tests is not working for some weird reason.  Usi=
+ng the same code on command line works.
+  still investigating why.
+
+ToDoo:
+
+- tcp: after discussions with dave, we ended in conclusion that we
+  need to use the 0 port and let the system gives us a free one
+
+  But .... that means that we need to be able to get that port back someh=
+ow.
+  "info migrate" woring on destination side?
+
+- compression threads.  There is some weird interaction with the test
+  hardness and every migration thread get waiting in a different
+  semaphore.  Investigating if it is a race/bug/whateverr
+
+- deprecated commands: There was a suggestion to make
+  migrate_set_parameter look at the parameter name and test old/new
+  depending on something.  Not sure what to do here.
+
+- testing commands: Is there a way to launch qemu and just sent
+  qmp/hmp commands without having to really run anything else?
+
+[v1]
+- add test for precopy for unix/tcp
+  exec and fd to came, don't know how to test rdma without hardware
+- add tests using deprecated interfaces
+- add test for xbzrle
+  Note to myself, there is no way to set the cache size with migraton_set=
+_parameters
+- Add test for compress threads
+  disabled on the series, right now it appears that compression is not wo=
+rking at all
+- Move postcopy to use new results
+  Idea is to move it on top of migration-test.c, but first I want some re=
+views on basic idea
+
+Juan Quintela (3):
+  tests: Add migration xbzrle test
+  migration: Create socket-address parameter
+  tests: Add basic migration precopy tcp test
+
+ hmp.c                  |  33 ++++++++
+ migration/migration.c  |  24 ++++++
+ migration/migration.h  |   4 +
+ migration/socket.c     |  11 +++
+ qapi/migration.json    |   6 +-
+ qapi/sockets.json      |  18 +++++
+ tests/migration-test.c | 174 +++++++++++++++++++++++++++++++++++++++--
+ 7 files changed, 264 insertions(+), 6 deletions(-)
+
+--=20
+2.20.1
