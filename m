@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59625)
+Received: from eggs.gnu.org ([209.51.188.92]:59687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gyzrs-0008HY-Cc
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:07:34 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gyzru-0008Jj-GE
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:07:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gyzrn-0003wq-Og
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:07:26 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:54358)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gyzrr-0003zI-14
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:07:29 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:54302)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gyzrl-0003iw-Gu
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:07:23 -0500
+	id 1gyzro-0003fd-5N
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:07:26 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Wed, 27 Feb 2019 16:06:25 +0200
-Message-Id: <20190227140629.1569-6-yuval.shaia@oracle.com>
+Date: Wed, 27 Feb 2019 16:06:23 +0200
+Message-Id: <20190227140629.1569-4-yuval.shaia@oracle.com>
 In-Reply-To: <20190227140629.1569-1-yuval.shaia@oracle.com>
 References: <20190227140629.1569-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 5/9] hw/rdma: Free all MAD receive buffers
- when device is closed
+Subject: [Qemu-devel] [PATCH v3 3/9] hw/rdma: Protect against concurrent
+ execution of poll_cq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +27,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-When device is going down free all saved MAD buffers.
+The function rdma_poll_cq is called from two contexts - completion
+handler thread which sense new completion on backend channel and
+explicitly as result of guest issuing poll_cq command.
+
+Add lock to protect against concurrent executions.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c    | 34 +++++++++++++++++++++++++++++++++-
- hw/rdma/vmw/pvrdma_main.c |  2 ++
- 2 files changed, 35 insertions(+), 1 deletion(-)
+ hw/rdma/rdma_backend.c | 2 ++
+ hw/rdma/rdma_rm.c      | 4 ++++
+ hw/rdma/rdma_rm_defs.h | 1 +
+ 3 files changed, 7 insertions(+)
 
 diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index bc2fefcf93..a65f5737e4 100644
+index 0ed14751be..9679b842d1 100644
 --- a/hw/rdma/rdma_backend.c
 +++ b/hw/rdma/rdma_backend.c
-@@ -64,6 +64,33 @@ static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
-     comp_handler(ctx, &wc);
- }
+@@ -70,6 +70,7 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+     BackendCtx *bctx;
+     struct ibv_wc wc[2];
  
-+static void free_cqe_ctx(gpointer data, gpointer user_data)
-+{
-+    BackendCtx *bctx;
-+    RdmaDeviceResources *rdma_dev_res = user_data;
-+    unsigned long cqe_ctx_id = GPOINTER_TO_INT(data);
++    qemu_mutex_lock(&rdma_dev_res->lock);
+     do {
+         ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
+ 
+@@ -89,6 +90,7 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+             g_free(bctx);
+         }
+     } while (ne > 0);
++    qemu_mutex_unlock(&rdma_dev_res->lock);
+ 
+     if (ne < 0) {
+         rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+index 5dab4a2189..14580ca379 100644
+--- a/hw/rdma/rdma_rm.c
++++ b/hw/rdma/rdma_rm.c
+@@ -618,12 +618,16 @@ int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
+ 
+     init_ports(dev_res);
+ 
++    qemu_mutex_init(&dev_res->lock);
 +
-+    bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, cqe_ctx_id);
-+    if (bctx) {
-+        rdma_rm_dealloc_cqe_ctx(rdma_dev_res, cqe_ctx_id);
-+    }
-+    g_free(bctx);
-+}
-+
-+static void clean_recv_mads(RdmaBackendDev *backend_dev)
-+{
-+    unsigned long cqe_ctx_id;
-+
-+    do {
-+        cqe_ctx_id = rdma_protected_qlist_pop_int64(&backend_dev->
-+                                                    recv_mads_list);
-+        if (cqe_ctx_id != -ENOENT) {
-+            free_cqe_ctx(GINT_TO_POINTER(cqe_ctx_id),
-+                         backend_dev->rdma_dev_res);
-+        }
-+    } while (cqe_ctx_id != -ENOENT);
-+}
-+
- static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
- {
-     int i, ne, total_ne = 0;
-@@ -1037,6 +1064,11 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
      return 0;
  }
  
-+static void mad_stop(RdmaBackendDev *backend_dev)
-+{
-+    clean_recv_mads(backend_dev);
-+}
+ void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+                   const char *ifname)
+ {
++    qemu_mutex_destroy(&dev_res->lock);
 +
- static void mad_fini(RdmaBackendDev *backend_dev)
- {
-     disable_rdmacm_mux_async(backend_dev);
-@@ -1224,12 +1256,12 @@ void rdma_backend_start(RdmaBackendDev *backend_dev)
+     fini_ports(dev_res, backend_dev, ifname);
  
- void rdma_backend_stop(RdmaBackendDev *backend_dev)
- {
-+    mad_stop(backend_dev);
-     stop_backend_thread(&backend_dev->comp_thread);
- }
+     res_tbl_free(&dev_res->uc_tbl);
+diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+index 0ba61d1838..f0ee1f3072 100644
+--- a/hw/rdma/rdma_rm_defs.h
++++ b/hw/rdma/rdma_rm_defs.h
+@@ -105,6 +105,7 @@ typedef struct RdmaDeviceResources {
+     RdmaRmResTbl cq_tbl;
+     RdmaRmResTbl cqe_ctx_tbl;
+     GHashTable *qp_hash; /* Keeps mapping between real and emulated */
++    QemuMutex lock;
+ } RdmaDeviceResources;
  
- void rdma_backend_fini(RdmaBackendDev *backend_dev)
- {
--    rdma_backend_stop(backend_dev);
-     mad_fini(backend_dev);
-     g_hash_table_destroy(ah_hash);
-     ibv_destroy_comp_channel(backend_dev->channel);
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 85101368c5..8056bde5c7 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -361,6 +361,8 @@ static void pvrdma_fini(PCIDevice *pdev)
- 
-     pvrdma_qp_ops_fini();
- 
-+    rdma_backend_stop(&dev->backend_dev);
-+
-     rdma_rm_fini(&dev->rdma_dev_res, &dev->backend_dev,
-                  dev->backend_eth_device_name);
- 
+ #endif
 -- 
 2.17.2
