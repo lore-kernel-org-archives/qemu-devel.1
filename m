@@ -1,46 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46569)
+Received: from eggs.gnu.org ([209.51.188.92]:48939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gz0m7-0003ii-VD
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:05:38 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gz0vb-0000AZ-6d
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:15:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1gz0ll-0002m7-BS
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:05:27 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38236
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1gz0lk-0002ec-Vk
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:05:13 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1RF0xdS008237
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:05:08 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qwva5261e-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:05:07 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Wed, 27 Feb 2019 15:05:06 -0000
-Date: Wed, 27 Feb 2019 12:04:49 -0300
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-References: <20190225162325.24008-1-maxiwell@linux.ibm.com>
-	<20190225232009.GB30778@kermit.br.ibm.com>
-	<20190226032103.GJ6872@umbus.fritz.box>
-	<20190226142126.jxosththzad6h6dd@maxibm>
-	<20190226170830.GA16569@kermit.br.ibm.com>
-	<20190226191140.GA25467@kermit.br.ibm.com>
-	<20190226231920.GS6872@umbus.fritz.box>
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gz0vZ-0001W1-6u
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:15:23 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Wed, 27 Feb 2019 15:15:06 +0000
+Message-ID: <1205dd10-25a4-ab53-d7ab-162e257cbba7@virtuozzo.com>
+References: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<5c72aad4-d1bc-7241-a972-32dd07ef23b0@virtuozzo.com>
+	<efdc687a-239e-3f30-c2d8-e46a47029496@redhat.com>
+	<7414a532-3005-5cfe-6f29-77cf95eeb4d2@virtuozzo.com>
+	<7dc5a22b-88fe-883d-0dd8-1101d67891f5@redhat.com>
+In-Reply-To: <7dc5a22b-88fe-883d-0dd8-1101d67891f5@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CFC301454849BD41ADCE3C09AA688606@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190226231920.GS6872@umbus.fritz.box>
-Message-Id: <20190227150449.GA9614@kermit.br.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr-rtas: add ibm,
- get-vpd RTAS interface
+Subject: Re: [Qemu-devel] [PATCH] Discard old bitmap directories in QCOW2
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,163 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, "open list:sPAPR" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>
 
-Hi, David.
-
-On Wed, Feb 27, 2019 at 10:19:20AM +1100, David Gibson wrote:
-> On Tue, Feb 26, 2019 at 04:11:40PM -0300, Murilo Opsfelder Araujo wrote=
-:
-> > On Tue, Feb 26, 2019 at 02:08:30PM -0300, Murilo Opsfelder Araujo wro=
-te:
-> > > Hi, Maxiwell.
-> > >
-> > > On Tue, Feb 26, 2019 at 11:21:26AM -0300, Maxiwell S. Garcia wrote:
-> > > > On Tue, Feb 26, 2019 at 02:21:03PM +1100, David Gibson wrote:
-> > > > > On Mon, Feb 25, 2019 at 08:20:09PM -0300, Murilo Opsfelder Arau=
-jo wrote:
-> > > > > > Hi, Maxiwell.
-> > > > > >
-> > > > > > On Mon, Feb 25, 2019 at 01:23:25PM -0300, Maxiwell S. Garcia =
-wrote:
-> > > > > > > This adds a handler for ibm,get-vpd RTAS calls, allowing ps=
-eries
-> > > > > > > guest to collect host information. It is disabled by defaul=
-t to
-> > > > > > > avoid unwanted information leakage. To enable it, use:
-> > > > > > > =E2=80=98-M pseries,vpd-export=3Don=E2=80=99
-> > > > > >
-> > > > > > The patch for setting host-serial and host-model already land=
-ed Gibson's
-> > > > > > ppc-for-4.0 branch:
-> > > > > >
-> > > > > >   commit 9e584f45868f6945c1282c938278038cba0e4af2
-> > > > > >   Author: Prasad J Pandit <pjp@fedoraproject.org>
-> > > > > >   Date:   Mon Feb 18 23:43:49 2019 +0530
-> > > > > >
-> > > > > >       ppc: add host-serial and host-model machine attributes =
-(CVE-2019-8934)
-> > > > > >
-> > > > > >
-> > > > > > QEMU should only return host-serial and host-model from the h=
-ost if the
-> > > > > > following combination of parameters are provided:
-> > > > > >
-> > > > > >   -M host-serial=3Dpassthrough,host-model=3Dpassthrough,vpd-e=
-xport=3Don
-> > > > > >
-> > > > > > If host-serial or host-model are set with a user-string, ibm,=
-get-vpd should
-> > > > > > honor these values and return them, not exposing host informa=
-tion by accident.
-> > > > > >
-> > > > > > I'm not even sure if we need vpd-export=3D<bool> setting. Its=
- logic could be
-> > > > > > derived from the presence of host-serial=3Dpassthrough and ho=
-st-model=3Dpassthrough
-> > > > > > options.
-> > > > > >
-> > > > > > What do you think?
-> > > > >
-> > > > > That's an excellent point - I hadn't thought through the fact t=
-hat
-> > > > > this is the same information exposed by those properties.  I do=
- indeed
-> > > > > think that exposing the same information set in those propertie=
-s - and
-> > > > > thereby avoiding the new machine option - would be a better pla=
-n.
-> > > > >
-> > > >
-> > > > I saw that the patch was applied. So I will work in another patch
-> > > > to use these properties and remove the export-vpd option.
-> > > >
-> > > > Another thing that I thought the fact that 'host-serial' and 'hos=
-t-model'
-> > > > nodes in Device Tree are not in accordance with LoPAPR document. =
-What
-> > > > you think in use only get-vpd to get these information and remove
-> > > > nodes from device tree?
-> > >
-> > > Both "system-id" and "model" properties are described in the sectio=
-n "3.3.2.1
-> > > Root Node Properties" of the "Device Tree Bindings: Linux on Power =
-Architecture
-> > > Reference" document:
-> > >
-> > >   https://members.openpowerfoundation.org/wg/SYSSW/document/1455
-> >
-> > I replied too early. As Maxiwell explained to me (thanks Max!), guest=
- can end up
-> > having the following entries under /proc/device-tree/ (among other en=
-tries):
-> >
-> >   $ cat host-serial
-> >   12A3B4C
-> >
-> >   $ cat host-model
-> >   1234-56A
-> >
-> >   $ cat system-id
-> >   c7b62da9-3d0c-44f9-8edb-2318271f3c1a
-> >
-> >   $ cat model
-> >   IBM pSeries (emulated by qemu)
-> >
-> > Where:
-> >
-> >   - host-serial/host-model: depend on "-M host-serial" and "-M host-m=
-odel"
-> >     machine options.
-> >
-> >   - system-id: created when "-uuid <val>" exists in qemu command line=
- options.
-> >
-> >   - model: hard-coded.
-> >
-> > With this patch, RTAS ibm,get-vpd call will return "system-id" and "m=
-odel" from
-> > the host, not from the guest. I found this confusing.
->
-> Hrm.  I found the bit in LoPAPR describing how ibm,get-vpd operates,
-> but not something describing the actual data that appears within it.
-> Where's that described?  It'd be nice to check if those values are
-> supposed to be describing the host or the guest.
-
-Are you asking about the fields of the ibm,vpd property? They are describ=
-ed in
-Table 11.2 "LoPAPR VPD Fields" of this LoPAPR document:
-
-  https://members.openpowerfoundation.org/wg/SYSSW/document/1461
-
-Is that what you were looking for?
-
->
->
-> > Perhaps we can trick ibm,get-vpd call to return "host-serial" and "ho=
-st-model"
-> > values from the guest, which will hold safe values after commit
-> > 9e584f45868f6945c1282c938278038cba0e4af2 "ppc: add host-serial and ho=
-st-model
-> > machine attributes (CVE-2019-8934)".
->
-> Well, if it is supposed to be host values, then yes, absolutely, we
-> should be using the "host" values that the user supplies (if any).
->
-> > What do you think?
-> >
-> > As to removing "host-serial" and "host-model", I am not entirely sure=
- for what
-> > they are used. There should be a reason for them to exist.
-> >
->
-> --
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _oth=
-er_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
-
---
-Murilo
+DQoNCk9uIDI3LzAyLzIwMTkgMTY6MjUsIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMjcuMDIuMTkg
+MTQ6MTYsIERlbmlzIEx1bmV2IHdyb3RlOg0KPj4gT24gMi8yNy8xOSA0OjAwIFBNLCBNYXggUmVp
+dHogd3JvdGU6DQo+Pj4gT24gMTguMDIuMTkgMTY6MzYsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
+dnNraXkgd3JvdGU6DQo+Pj4+IDEyLjAyLjIwMTkgMTU6MzUsIEFuZHJleSBTaGlua2V2aWNoIHdy
+b3RlOg0KPj4+Pj4gQ2xlYW4gUUNPVzIgaW1hZ2UgZnJvbSBiaXRtYXAgb2Jzb2xldGUgZGlyZWN0
+b3J5IHdoZW4gYSBuZXcgb25lDQo+Pj4+PiBpcyBhbGxvY2F0ZWQgYW5kIHN0b3JlZC4gSXQgc2xv
+d3MgZG93biB0aGUgaW1hZ2UgZ3Jvd3RoIGEgbGl0dGxlIGJpdC4NCj4+Pj4+IFRoZSBmbGFnIFFD
+T1cyX0RJU0NBUkRfQUxXQVlTIGFsbG93cyBhIGNhbGwgdG8gcmF3X2NvX3BkaXNjYXJkKCkNCj4+
+Pj4+IHRoYXQgZG9lcyB0aGUgYWN0dWFsIGNsZWFuaW5nIG9mIHRoZSBpbWFnZSBvbiBkaXNrLg0K
+Pj4+Pj4gV2l0aCB0aGUgZmxhZyBRQ09XMl9ESVNDQVJEX09USEVSLCBhIHJlZmVyZW5jZSBjb3Vu
+dCBvZiB0aGUgY2x1c3Rlcg0KPj4+Pj4gaXMgdXBkYXRlZCBvbmx5Lg0KPj4+Pj4NCj4+Pj4+IFNp
+Z25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96
+em8uY29tPg0KPj4+PiBSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8
+dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+Pg0KPj4+PiBzaWRlIHF1ZXN0aW9uOiBzaG91
+bGQgbm90IHdlIGNoYW5nZSBkaXNjYXJkX3Bhc3N0aHJvdWdoW1FDT1cyX0RJU0NBUkRfT1RIRVJd
+IHRvDQo+Pj4+IHRydWUgb3IgYXQgbGVhc3QgZmxhZ3MmQkRSVl9PX1VOTUFQIGJ5IGRlZmF1bHQ/
+IFdoYXQgaXMgdGhlIHJlYXNvbiBvZiBub3QgZGlzY2FyZGluZw0KPj4+PiB0aGluZ3MgaW4gcWNv
+dzItY2x1c3Rlcj8NCj4+PiBBcyBmYXIgYXMgSSByZW1lbWJlciB0aGUgcmVhc29uIGlzIHRoYXQg
+d2hlbmV2ZXIgeW91IGNsZWFuIHVwIHNvbWV0aGluZw0KPj4+IGl0cyBjbHVzdGVyIGlzIHByb2Jh
+Ymx5IGdvaW5nIHRvIGJlIHJldXNlZCByYXRoZXIgc29vbi4gIFNvIGNsZWFuaW5nIHVwDQo+Pj4g
+dGFrZXMgbG9uZ2VyLCByZXBvcHVsYXRpbmcgdGhhdCBjbHVzdGVyIHRha2VzIGxvbmdlciwgYW5k
+IHlvdSBzYXZlIG9ubHkNCj4+PiByYXRoZXIgbGl0dGxlIHNwYWNlLg0KPj4+DQo+Pj4gVGhpcyBp
+cyBhbHNvIHdoeSBJIGRvbid0IGtub3cgd2hldGhlciB0aGlzIHBhdGNoIG1ha2VzIG11Y2ggc2Vu
+c2UuDQo+Pj4NCj4+PiBNYXgNCj4+Pg0KPj4gVGhpcyBkZXBhbmRzIHVwb24gdGhlIGFtb3VudCBv
+ZiBhY3R1YWxseSBmcmVlIGNsdXN0ZXJzIGluIHRoZSBpbWFnZS4NCj4+IElmIHRoZXJlIGEgbG90
+IG9mIHRoZW0gYXQgdGhlIG1vbWVudCwgdGhpcyBvbmUgY291bGQgYmUgcmVmaWxsZWQNCj4+IGFu
+eSB0aW1lIGxhdGVyIG9uLg0KPiANCj4gV2VsbCwgaXQncyBhIHRyYWRlLW9mZi4gIEZvciBzbWFs
+bCBzdHJ1Y3R1cmVzIGxpa2UgdGhlIGJpdG1hcCBkaXJlY3RvcnksDQo+IEkgZG9uJ3Qgc2VlIHRo
+ZSBwb2ludCBpbiBmb3JjZWZ1bGx5IHVubWFwcGluZyB0aGVtLiAgV2UgZG9uJ3QgZG8gaXQgZm9y
+DQo+IHRoZSBvbGQgTDEgdGFibGUgZWl0aGVyIHdoZW4gdGhhdCBoYXMgdG8gYmUgcmVzaXplZC4N
+Cj4gDQo+IERpc2NhcmRpbmcgYSB3aG9sZSBiaXRtYXAgKGxpa2UgaW4gY2xlYXJfYml0bWFwX3Rh
+YmxlKCkpIGlzIHNvbWV0aGluZw0KPiBlbHNlLCB0aG91Z2guICBTbyBJIHdhcyB0b28gcXVpY2sg
+dG8gZGlzbWlzcyB0aGUgd2hvbGUgcGF0Y2g7IHBhcnRzIG9mDQo+IGl0IGRvIG1ha2Ugc2Vuc2Uu
+DQo+IA0KPiBGb3IgYml0bWFwIHRhYmxlcy4uLiAgSSBkb24ndCBrbm93IGV4YWN0bHkuICBJIGRv
+bid0IHRoaW5rIGEgYml0bWFwDQo+IHRhYmxlIGlzIGV2ZXIgZ29pbmcgdG8gYmUgbGFyZ2VyIHRo
+YW4gdGhlIEwxIHRhYmxlLCBzbyBpdCBzaG91bGQNCj4gcHJvYmFibHkgYmUgaGFuZGxlZCB0aGUg
+c2FtZSB3YXkgLS0gd2hpY2ggaXMgdG8ga2VlcCBRQ09XMl9ESVNDQVJEX09USEVSLg0KPiANCj4g
+TWF4DQo+IA0KWWVzLCBNYXguIEFsbCB3aGF0IHlvdSB3cm90ZSBhYm91dCBkbyBtYWtlIHRoZSBz
+ZW5zZS4NClRoZSByZWFzb24gYmVoaW5kIHRoZSBwcm9wb3NpdGlvbiB0byBkaXNjYXJkIHRoZSBv
+YnNvbGV0ZSBiaXRtYXANCmRpcmVjdG9yaWVzIGluIHRoZSBpbWFnZSBpcyB0aGF0IGl0IG1ha2Vz
+IGRlYnVnZ2luZyBvZiB0aGUgaW90ZXN0cw0KZWFzaWVyIGZvciBhIGRldmVsb3Blci4gT3RoZXJ3
+aXNlLCBsb3RzIG9mIGlycmVsZXZhbnQgc3ltYm9saWMNCmluZm9ybWF0aW9uIGluIHRoZSBpbWFn
+ZSBmb3JjZXMgdG8gdHJhY2sgd2hpY2ggb25lIGlzIHZhbGlkLg0KUGFydGljdWxhcmx5LCBJIGxv
+Y2F0ZSB0aGUgYnl0ZSB0aGF0IGRlc2lnbmF0ZXMgdGhlIGJpdG1hcCBmbGFncyB0byBzZWUNCmlm
+IHRoZSBmbGFnICdpbi11c2UnIGlzIG5vdCBzZXQuIEFuZCBJIGRvIHRoYXQgZm9yIGV2ZXJ5IHNp
+bmdsZSBiaXRtYXANCmRpcmVjdG9yeSBpbiB0aGUgaW1hZ2UuDQpBZ2FpbiwgY2xlYW5pbmcgdXAg
+dGhlIG9ic29sZXRlIGJpdG1hcCBkaXJlY3RvcmllcyBpbiB0aGUgaW1hZ2Ugc2VydmVzDQpmb3Ig
+dGhlIGNvbnZlbmllbmNlIG9mIGRlYnVnZ2luZy4gV2hhdCBkbyB5b3UgdGhpbmsgYWJvdXQgaXQ/
+DQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2aWNoDQo=
