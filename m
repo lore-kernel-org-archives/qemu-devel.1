@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48939)
+Received: from eggs.gnu.org ([209.51.188.92]:49071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gz0vb-0000AZ-6d
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:15:24 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gz0wQ-0000gj-1c
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gz0vZ-0001W1-6u
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:15:23 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Wed, 27 Feb 2019 15:15:06 +0000
-Message-ID: <1205dd10-25a4-ab53-d7ab-162e257cbba7@virtuozzo.com>
-References: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<5c72aad4-d1bc-7241-a972-32dd07ef23b0@virtuozzo.com>
-	<efdc687a-239e-3f30-c2d8-e46a47029496@redhat.com>
-	<7414a532-3005-5cfe-6f29-77cf95eeb4d2@virtuozzo.com>
-	<7dc5a22b-88fe-883d-0dd8-1101d67891f5@redhat.com>
-In-Reply-To: <7dc5a22b-88fe-883d-0dd8-1101d67891f5@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CFC301454849BD41ADCE3C09AA688606@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@gmail.com>) id 1gz0wK-0001oc-Od
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:16:14 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51104)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gz0wJ-0001eS-1d
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:16:08 -0500
+Received: by mail-wm1-x343.google.com with SMTP id x7so6188472wmj.0
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 07:15:37 -0800 (PST)
+Date: Wed, 27 Feb 2019 15:15:35 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190227151535.GE22539@stefanha-x1.localdomain>
+References: <20190222153254.22739-1-stefanha@redhat.com>
+	<87imx8uu99.fsf@dusky.pond.sub.org>
+	<20190225092846.GA4757@angien.pipo.sk>
+	<20190225174001.GI379@stefanha-x1.localdomain>
+	<87a7iincg0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] Discard old bitmap directories in QCOW2
- image
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="C94crkcyjafcjHxo"
+Content-Disposition: inline
+In-Reply-To: <87a7iincg0.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org
 
-DQoNCk9uIDI3LzAyLzIwMTkgMTY6MjUsIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMjcuMDIuMTkg
-MTQ6MTYsIERlbmlzIEx1bmV2IHdyb3RlOg0KPj4gT24gMi8yNy8xOSA0OjAwIFBNLCBNYXggUmVp
-dHogd3JvdGU6DQo+Pj4gT24gMTguMDIuMTkgMTY6MzYsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
-dnNraXkgd3JvdGU6DQo+Pj4+IDEyLjAyLjIwMTkgMTU6MzUsIEFuZHJleSBTaGlua2V2aWNoIHdy
-b3RlOg0KPj4+Pj4gQ2xlYW4gUUNPVzIgaW1hZ2UgZnJvbSBiaXRtYXAgb2Jzb2xldGUgZGlyZWN0
-b3J5IHdoZW4gYSBuZXcgb25lDQo+Pj4+PiBpcyBhbGxvY2F0ZWQgYW5kIHN0b3JlZC4gSXQgc2xv
-d3MgZG93biB0aGUgaW1hZ2UgZ3Jvd3RoIGEgbGl0dGxlIGJpdC4NCj4+Pj4+IFRoZSBmbGFnIFFD
-T1cyX0RJU0NBUkRfQUxXQVlTIGFsbG93cyBhIGNhbGwgdG8gcmF3X2NvX3BkaXNjYXJkKCkNCj4+
-Pj4+IHRoYXQgZG9lcyB0aGUgYWN0dWFsIGNsZWFuaW5nIG9mIHRoZSBpbWFnZSBvbiBkaXNrLg0K
-Pj4+Pj4gV2l0aCB0aGUgZmxhZyBRQ09XMl9ESVNDQVJEX09USEVSLCBhIHJlZmVyZW5jZSBjb3Vu
-dCBvZiB0aGUgY2x1c3Rlcg0KPj4+Pj4gaXMgdXBkYXRlZCBvbmx5Lg0KPj4+Pj4NCj4+Pj4+IFNp
-Z25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96
-em8uY29tPg0KPj4+PiBSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8
-dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+Pg0KPj4+PiBzaWRlIHF1ZXN0aW9uOiBzaG91
-bGQgbm90IHdlIGNoYW5nZSBkaXNjYXJkX3Bhc3N0aHJvdWdoW1FDT1cyX0RJU0NBUkRfT1RIRVJd
-IHRvDQo+Pj4+IHRydWUgb3IgYXQgbGVhc3QgZmxhZ3MmQkRSVl9PX1VOTUFQIGJ5IGRlZmF1bHQ/
-IFdoYXQgaXMgdGhlIHJlYXNvbiBvZiBub3QgZGlzY2FyZGluZw0KPj4+PiB0aGluZ3MgaW4gcWNv
-dzItY2x1c3Rlcj8NCj4+PiBBcyBmYXIgYXMgSSByZW1lbWJlciB0aGUgcmVhc29uIGlzIHRoYXQg
-d2hlbmV2ZXIgeW91IGNsZWFuIHVwIHNvbWV0aGluZw0KPj4+IGl0cyBjbHVzdGVyIGlzIHByb2Jh
-Ymx5IGdvaW5nIHRvIGJlIHJldXNlZCByYXRoZXIgc29vbi4gIFNvIGNsZWFuaW5nIHVwDQo+Pj4g
-dGFrZXMgbG9uZ2VyLCByZXBvcHVsYXRpbmcgdGhhdCBjbHVzdGVyIHRha2VzIGxvbmdlciwgYW5k
-IHlvdSBzYXZlIG9ubHkNCj4+PiByYXRoZXIgbGl0dGxlIHNwYWNlLg0KPj4+DQo+Pj4gVGhpcyBp
-cyBhbHNvIHdoeSBJIGRvbid0IGtub3cgd2hldGhlciB0aGlzIHBhdGNoIG1ha2VzIG11Y2ggc2Vu
-c2UuDQo+Pj4NCj4+PiBNYXgNCj4+Pg0KPj4gVGhpcyBkZXBhbmRzIHVwb24gdGhlIGFtb3VudCBv
-ZiBhY3R1YWxseSBmcmVlIGNsdXN0ZXJzIGluIHRoZSBpbWFnZS4NCj4+IElmIHRoZXJlIGEgbG90
-IG9mIHRoZW0gYXQgdGhlIG1vbWVudCwgdGhpcyBvbmUgY291bGQgYmUgcmVmaWxsZWQNCj4+IGFu
-eSB0aW1lIGxhdGVyIG9uLg0KPiANCj4gV2VsbCwgaXQncyBhIHRyYWRlLW9mZi4gIEZvciBzbWFs
-bCBzdHJ1Y3R1cmVzIGxpa2UgdGhlIGJpdG1hcCBkaXJlY3RvcnksDQo+IEkgZG9uJ3Qgc2VlIHRo
-ZSBwb2ludCBpbiBmb3JjZWZ1bGx5IHVubWFwcGluZyB0aGVtLiAgV2UgZG9uJ3QgZG8gaXQgZm9y
-DQo+IHRoZSBvbGQgTDEgdGFibGUgZWl0aGVyIHdoZW4gdGhhdCBoYXMgdG8gYmUgcmVzaXplZC4N
-Cj4gDQo+IERpc2NhcmRpbmcgYSB3aG9sZSBiaXRtYXAgKGxpa2UgaW4gY2xlYXJfYml0bWFwX3Rh
-YmxlKCkpIGlzIHNvbWV0aGluZw0KPiBlbHNlLCB0aG91Z2guICBTbyBJIHdhcyB0b28gcXVpY2sg
-dG8gZGlzbWlzcyB0aGUgd2hvbGUgcGF0Y2g7IHBhcnRzIG9mDQo+IGl0IGRvIG1ha2Ugc2Vuc2Uu
-DQo+IA0KPiBGb3IgYml0bWFwIHRhYmxlcy4uLiAgSSBkb24ndCBrbm93IGV4YWN0bHkuICBJIGRv
-bid0IHRoaW5rIGEgYml0bWFwDQo+IHRhYmxlIGlzIGV2ZXIgZ29pbmcgdG8gYmUgbGFyZ2VyIHRo
-YW4gdGhlIEwxIHRhYmxlLCBzbyBpdCBzaG91bGQNCj4gcHJvYmFibHkgYmUgaGFuZGxlZCB0aGUg
-c2FtZSB3YXkgLS0gd2hpY2ggaXMgdG8ga2VlcCBRQ09XMl9ESVNDQVJEX09USEVSLg0KPiANCj4g
-TWF4DQo+IA0KWWVzLCBNYXguIEFsbCB3aGF0IHlvdSB3cm90ZSBhYm91dCBkbyBtYWtlIHRoZSBz
-ZW5zZS4NClRoZSByZWFzb24gYmVoaW5kIHRoZSBwcm9wb3NpdGlvbiB0byBkaXNjYXJkIHRoZSBv
-YnNvbGV0ZSBiaXRtYXANCmRpcmVjdG9yaWVzIGluIHRoZSBpbWFnZSBpcyB0aGF0IGl0IG1ha2Vz
-IGRlYnVnZ2luZyBvZiB0aGUgaW90ZXN0cw0KZWFzaWVyIGZvciBhIGRldmVsb3Blci4gT3RoZXJ3
-aXNlLCBsb3RzIG9mIGlycmVsZXZhbnQgc3ltYm9saWMNCmluZm9ybWF0aW9uIGluIHRoZSBpbWFn
-ZSBmb3JjZXMgdG8gdHJhY2sgd2hpY2ggb25lIGlzIHZhbGlkLg0KUGFydGljdWxhcmx5LCBJIGxv
-Y2F0ZSB0aGUgYnl0ZSB0aGF0IGRlc2lnbmF0ZXMgdGhlIGJpdG1hcCBmbGFncyB0byBzZWUNCmlm
-IHRoZSBmbGFnICdpbi11c2UnIGlzIG5vdCBzZXQuIEFuZCBJIGRvIHRoYXQgZm9yIGV2ZXJ5IHNp
-bmdsZSBiaXRtYXANCmRpcmVjdG9yeSBpbiB0aGUgaW1hZ2UuDQpBZ2FpbiwgY2xlYW5pbmcgdXAg
-dGhlIG9ic29sZXRlIGJpdG1hcCBkaXJlY3RvcmllcyBpbiB0aGUgaW1hZ2Ugc2VydmVzDQpmb3Ig
-dGhlIGNvbnZlbmllbmNlIG9mIGRlYnVnZ2luZy4gV2hhdCBkbyB5b3UgdGhpbmsgYWJvdXQgaXQ/
-DQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2aWNoDQo=
+
+--C94crkcyjafcjHxo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Feb 26, 2019 at 10:09:19AM +0100, Markus Armbruster wrote:
+> Stefan Hajnoczi <stefanha@redhat.com> writes:
+> > On Mon, Feb 25, 2019 at 10:28:46AM +0100, Peter Krempa wrote:
+> >> On Mon, Feb 25, 2019 at 09:50:26 +0100, Markus Armbruster wrote:
+> >> > Stefan Hajnoczi <stefanha@redhat.com> writes:
+> >> Other than the above, this is a welcome improvement as I've personally
+> >> ran into scenarios where a feature in qemu was fixed but it was
+> >> impossible to detect whether given qemu version contains the fix as it
+> >> did not have any influence on the QMP schema.
+> >
+> > I'd like to make things as simpler as possible, but no simpler :).
+> >
+> > The simplest option is that the advertised features are set in stone at
+> > build time (e.g. selected with #ifdef if necessary).  But then we have
+> > no way of selecting features at runtime (e.g. based on kernel features).
+> >
+> > What do you think?
+>=20
+> I think we should map the problem space, identify cases with actual
+> uses, then design a solution that covers them and can plausibly grow to
+> cover cases we anticipate.
+>=20
+> The migrate-with-cache-direct-off-on-linux case is compile-time static.
+>=20
+> Do we have or have we had a case that is not compile-time static?
+
+I can't think of something that both requires query-qemu-features and
+isn't compile-time static.  But that could be because not many things
+require query-qemu-features :).
+
+The philosophy on Linux seems to be: distros compile QEMU against
+headers that accurately reflect the system features that are available.
+Therefore there isn't a lot of runtime fallback logic in case a new QEMU
+is running on an old host.  This means we can get by with compile-time
+static features only.
+
+One possible exception is the ENOSYS/ENOTSUP fallback code in
+block/file-posix.c:handle_aiocb_write_zeroes() and
+handle_aiocb_copy_range().
+
+Stefan
+
+--C94crkcyjafcjHxo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcdqmWAAoJEJykq7OBq3PIsboH/jYRSoVSOZdr9BK+/A7XSq0w
+pQCDrHuYi/+f2S4q2sWpBDnSdORomECiKZLa98lvnA0mhKD95Yzw4ePBteuRb2jj
+EVyj2CKZ9gM+8uy0SkIPnCGvACyv18hsKl9T+An1eKDL8dlgW+YRSu6HazdgaQWc
+PzX5ksWEu8GNzuVo406PQkpfvuTh/V8SWTnuqpiV0dJ5ZQPvc319Ge5A26dEgKpJ
+8f6AOr+StaAs1tvKKQQGlVBUhtuOvIAPlbBs5aKhf3omwEgj99txlnfb8R0yCcwc
+488dkDFZfnXARsijk70uXCm6wNjPHZD+XR2XbC0HD0KwePxZtOP0zz+e/HcywzE=
+=D32B
+-----END PGP SIGNATURE-----
+
+--C94crkcyjafcjHxo--
