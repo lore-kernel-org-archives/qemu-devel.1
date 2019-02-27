@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55925)
+Received: from eggs.gnu.org ([209.51.188.92]:56102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gywYu-0006rh-8M
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:35:41 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywZv-0007OT-6n
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gywYs-00034M-Sz
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:35:40 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36271)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gywYs-00032U-3j
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:35:38 -0500
-Received: by mail-wm1-x344.google.com with SMTP id j125so5063053wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 02:35:37 -0800 (PST)
-References: <20190226193408.23862-1-armbru@redhat.com>
-	<20190226193408.23862-8-armbru@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190226193408.23862-8-armbru@redhat.com>
-Date: Wed, 27 Feb 2019 10:35:34 +0000
-Message-ID: <87va15lds9.fsf@zen.linaroharston>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywZo-0003gn-QY
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38642)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gywZo-0003fn-GZ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:36 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 421DBC0669BA
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:30:24 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 27 Feb 2019 11:30:05 +0100
+Message-Id: <20190227103017.29515-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/11] ppc405_boards: Don't size flash
- memory to match backing image
+Subject: [Qemu-devel] [PATCH v4 00/12] vhost-user-backend & vhost-user-input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,161 +31,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, mst@redhat.com
 
+Hi,
 
-Markus Armbruster <armbru@redhat.com> writes:
+This series is based on previously discussed "[PATCH v4 00/29]
+vhost-user for input & GPU" and "vhost-user: define conventions for
+vhost-user backends" work. The GPU part is left off for now.
 
-> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
-> Image size is rounded up to the next multiple of 64KiB.  Useless,
-> because pflash_cfi02_realize() fails with "failed to read the initial
-> flash content" unless the rounding is a no-op.
->
-> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
-> other stuff.  No idea how that would play out, but a useful outcomes
-> seem unlikely.
->
-> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
-> regardless of image size, to match the physical hardware.
->
-> Machine "taihu" maps its boot flash memory similarly.  The code even
-> has a comment /* XXX: should check that size is 2MB */, followed by
-> disabled code to adjust the size to 2MiB regardless of image size.
->
-> Its code to map its application flash memory looks the same, except
-> there the XXX comment asks for 32MiB, and the code to adjust the size
-> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
-> to read the initial flash content" for images smaller than 32MiB.
->
-> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
-> to match the physical hardware.  Delete dead code from application
-> flash mapping, and simplify some.
+This series introduces a "vhost-user-backend": an helper object to be
+used by vhost-user devices to ease with backend initialization and
+handling. As a simple showcase, a "vhost-user-input-pci" device is
+introduced, which can be used with the "contrib: add vhost-user-input"
+example. vhost-user-input isn't meant to be installed, discovered or
+used by libvirt: no installation is done (no vhost-user JSON file is
+provided either).
 
-It seems to me the DEBUG_BOARD_INIT code is probably out of date cruft
-that could be excised all together. But that doesn't stop this being
-useful:
+thanks
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+v4:
+- drop "RFC: add explicit can_migrate to vhost_user_backend_dev_init()"
+- remove useless "cmd" struct field leftover
 
->
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/ppc405_boards.c | 51 +++++++++++++-----------------------------
->  1 file changed, 15 insertions(+), 36 deletions(-)
->
-> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-> index f47b15f10e..672717ef1b 100644
-> --- a/hw/ppc/ppc405_boards.c
-> +++ b/hw/ppc/ppc405_boards.c
-> @@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
->      target_ulong kernel_base, initrd_base;
->      long kernel_size, initrd_size;
->      int linux_boot;
-> -    int fl_idx, fl_sectors, len;
-> +    int len;
->      DriveInfo *dinfo;
->      MemoryRegion *sysmem =3D get_system_memory();
->
-> @@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
->  #ifdef DEBUG_BOARD_INIT
->      printf("%s: register BIOS\n", __func__);
->  #endif
-> -    fl_idx =3D 0;
->  #ifdef USE_FLASH_BIOS
-> -    dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
-> +    dinfo =3D drive_get(IF_PFLASH, 0, 0);
->      if (dinfo) {
-> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
-> -
-> -        bios_size =3D blk_getlength(blk);
-> -        fl_sectors =3D (bios_size + 65535) >> 16;
->  #ifdef DEBUG_BOARD_INIT
-> -        printf("Register parallel flash %d size %lx"
-> -               " at addr %lx '%s' %d\n",
-> -               fl_idx, bios_size, -bios_size,
-> -               blk_name(blk), fl_sectors);
-> +        printf("Register parallel flash\n");
->  #endif
-> +        bios_size =3D 8 * MiB;
->          pflash_cfi02_register((uint32_t)(-bios_size),
->                                NULL, "ef405ep.bios", bios_size,
-> -                              blk, 65536, fl_sectors, 1,
-> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                              64 * KiB, bios_size / (64 * KiB), 1,
->                                2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
->                                1);
-> -        fl_idx++;
->      } else
->  #endif
->      {
-> @@ -455,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
->      target_ulong kernel_base, initrd_base;
->      long kernel_size, initrd_size;
->      int linux_boot;
-> -    int fl_idx, fl_sectors;
-> +    int fl_idx;
->      DriveInfo *dinfo;
->
->      /* RAM is soldered to the board so the size cannot be changed */
-> @@ -486,21 +479,14 @@ static void taihu_405ep_init(MachineState *machine)
->  #if defined(USE_FLASH_BIOS)
->      dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
->      if (dinfo) {
-> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
-> -
-> -        bios_size =3D blk_getlength(blk);
-> -        /* XXX: should check that size is 2MB */
-> -        //        bios_size =3D 2 * 1024 * 1024;
-> -        fl_sectors =3D (bios_size + 65535) >> 16;
->  #ifdef DEBUG_BOARD_INIT
-> -        printf("Register parallel flash %d size %lx"
-> -               " at addr %lx '%s' %d\n",
-> -               fl_idx, bios_size, -bios_size,
-> -               blk_name(blk), fl_sectors);
-> +        printf("Register boot flash\n");
->  #endif
-> -        pflash_cfi02_register((uint32_t)(-bios_size),
-> +        bios_size =3D 2 * MiB;
-> +        pflash_cfi02_register(0xFFE00000,
->                                NULL, "taihu_405ep.bios", bios_size,
-> -                              blk, 65536, fl_sectors, 1,
-> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                              64 * KiB, bios_size / (64 * KiB), 1,
->                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
->                                1);
->          fl_idx++;
-> @@ -536,20 +522,13 @@ static void taihu_405ep_init(MachineState *machine)
->      /* Register Linux flash */
->      dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
->      if (dinfo) {
-> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
-> -
-> -        bios_size =3D blk_getlength(blk);
-> -        /* XXX: should check that size is 32MB */
->          bios_size =3D 32 * MiB;
-> -        fl_sectors =3D (bios_size + 65535) >> 16;
->  #ifdef DEBUG_BOARD_INIT
-> -        printf("Register parallel flash %d size %lx"
-> -               " at addr " TARGET_FMT_lx " '%s'\n",
-> -               fl_idx, bios_size, (target_ulong)0xfc000000,
-> -               blk_name(blk));
-> +        printf("Register application flash\n"
->  #endif
->          pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bio=
-s_size,
-> -                              blk, 65536, fl_sectors, 1,
-> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                              64 * KiB, bios_size / (64 * KiB), 1,
->                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
->                                1);
->          fl_idx++;
+v3:
+- add previously sent patch "libvhost-user: fix clang enum-conversion
+  warning" to fix clang build
+- "define conventions for vhost-user backends" updates after Eric review
+- Drop user-creatable from vhost-user-backend
+- Make vhost-user-input-pci take a chardev=3D (instead of vhost-user=3D)
 
+v2:
+- rebased (VhostUserInputPCI got most of the changes, due to split)
+- added "RFC: add explicit can_migrate to
+  vhost_user_backend_dev_init()" to attempt to address Michael
+  concerns about migration.
 
---
-Alex Benn=C3=A9e
+Marc-Andr=C3=A9 Lureau (12):
+  libvhost-user: fix clang enum-conversion warning
+  vhost-user: define conventions for vhost-user backends
+  vhost-user: simplify vhost_user_init/vhost_user_cleanup
+  libvhost-user: exit by default on VHOST_USER_NONE
+  vhost-user: wrap some read/write with retry handling
+  Add vhost-user-backend
+  vhost-user: split vhost_user_read()
+  vhost-user: add vhost_user_input_get_config()
+  libvhost-user-glib: export vug_source_new()
+  libvhost-user: add vu_queue_unpop()
+  Add vhost-user-input-pci
+  contrib: add vhost-user-input
+
+ contrib/libvhost-user/libvhost-user-glib.h |   3 +
+ contrib/libvhost-user/libvhost-user.h      |  17 +-
+ include/hw/virtio/vhost-backend.h          |   4 +
+ include/hw/virtio/vhost-user-blk.h         |   2 +-
+ include/hw/virtio/vhost-user-scsi.h        |   2 +-
+ include/hw/virtio/vhost-user.h             |   2 +-
+ include/hw/virtio/virtio-input.h           |  14 +
+ include/sysemu/vhost-user-backend.h        |  58 +++
+ backends/cryptodev-vhost-user.c            |  18 +-
+ backends/vhost-user.c                      | 213 +++++++++++
+ contrib/libvhost-user/libvhost-user-glib.c |  11 +-
+ contrib/libvhost-user/libvhost-user.c      |  19 +-
+ contrib/vhost-user-input/main.c            | 398 +++++++++++++++++++++
+ hw/block/vhost-user-blk.c                  |  22 +-
+ hw/input/vhost-user-input.c                |  99 +++++
+ hw/scsi/vhost-user-scsi.c                  |  20 +-
+ hw/virtio/vhost-stub.c                     |   4 +-
+ hw/virtio/vhost-user-input-pci.c           |  53 +++
+ hw/virtio/vhost-user.c                     | 118 +++++-
+ net/vhost-user.c                           |  13 +-
+ MAINTAINERS                                |   5 +
+ Makefile                                   |   3 +
+ Makefile.objs                              |   1 +
+ backends/Makefile.objs                     |   3 +-
+ configure                                  |   3 +
+ contrib/vhost-user-input/Makefile.objs     |   1 +
+ default-configs/virtio.mak                 |   1 +
+ docs/interop/vhost-user.json               | 232 ++++++++++++
+ docs/interop/vhost-user.txt                | 109 +++++-
+ hw/input/Makefile.objs                     |   1 +
+ hw/virtio/Makefile.objs                    |   1 +
+ 31 files changed, 1363 insertions(+), 87 deletions(-)
+ create mode 100644 include/sysemu/vhost-user-backend.h
+ create mode 100644 backends/vhost-user.c
+ create mode 100644 contrib/vhost-user-input/main.c
+ create mode 100644 hw/input/vhost-user-input.c
+ create mode 100644 hw/virtio/vhost-user-input-pci.c
+ create mode 100644 contrib/vhost-user-input/Makefile.objs
+ create mode 100644 docs/interop/vhost-user.json
+
+--=20
+2.21.0
