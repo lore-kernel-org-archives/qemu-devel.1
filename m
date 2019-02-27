@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56098)
+Received: from eggs.gnu.org ([209.51.188.92]:56132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gywZt-0007NH-9Z
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:48 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywaC-0007WD-0D
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:37:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gywZo-0003gd-PO
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38644)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywa7-0003sb-Pn
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:17021)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gywZo-0003fp-GX
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:36 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1gywa2-0003mj-6Q
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:53 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41B22C065859
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:30:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D44F3316EB98
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:31:27 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 27 Feb 2019 11:30:11 +0100
-Message-Id: <20190227103017.29515-7-marcandre.lureau@redhat.com>
+Date: Wed, 27 Feb 2019 11:30:17 +0100
+Message-Id: <20190227103017.29515-13-marcandre.lureau@redhat.com>
 In-Reply-To: <20190227103017.29515-1-marcandre.lureau@redhat.com>
 References: <20190227103017.29515-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 06/12] Add vhost-user-backend
+Subject: [Qemu-devel] [PATCH v4 12/12] contrib: add vhost-user-input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,337 +36,505 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kraxel@redhat.com, mst@redhat.com
 
-Create a vhost-user-backend object that holds a connection to a
-vhost-user backend and can be referenced from virtio devices that
-support it. See later patches for input & gpu usage.
+Add a vhost-user input backend example, based on virtio-input-host
+device. It takes an evdev path as argument, and can be associated with
+a vhost-user-input device via a UNIX socket:
+
+$ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
+
+$ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
+  -device vhost-user-input-pci,chardev=3Dvuic
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/sysemu/vhost-user-backend.h |  58 ++++++++
- backends/vhost-user.c               | 213 ++++++++++++++++++++++++++++
- MAINTAINERS                         |   2 +
- backends/Makefile.objs              |   3 +-
- 4 files changed, 275 insertions(+), 1 deletion(-)
- create mode 100644 include/sysemu/vhost-user-backend.h
- create mode 100644 backends/vhost-user.c
+ contrib/vhost-user-input/main.c        | 398 +++++++++++++++++++++++++
+ MAINTAINERS                            |   1 +
+ Makefile                               |   3 +
+ Makefile.objs                          |   1 +
+ configure                              |   3 +
+ contrib/vhost-user-input/Makefile.objs |   1 +
+ 6 files changed, 407 insertions(+)
+ create mode 100644 contrib/vhost-user-input/main.c
+ create mode 100644 contrib/vhost-user-input/Makefile.objs
 
-diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-u=
-ser-backend.h
+diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
+ain.c
 new file mode 100644
-index 0000000000..ee80492323
+index 0000000000..bef44f163d
 --- /dev/null
-+++ b/include/sysemu/vhost-user-backend.h
-@@ -0,0 +1,58 @@
++++ b/contrib/vhost-user-input/main.c
+@@ -0,0 +1,398 @@
 +/*
-+ * QEMU vhost-user backend
-+ *
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
 + */
-+#ifndef QEMU_VHOST_USER_BACKEND_H
-+#define QEMU_VHOST_USER_BACKEND_H
-+
-+#include "qom/object.h"
-+#include "exec/memory.h"
-+#include "qemu/option.h"
-+#include "qemu/bitmap.h"
-+#include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-user.h"
-+#include "chardev/char-fe.h"
-+#include "io/channel.h"
-+
-+#define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
-+#define VHOST_USER_BACKEND(obj) \
-+    OBJECT_CHECK(VhostUserBackend, (obj), TYPE_VHOST_USER_BACKEND)
-+#define VHOST_USER_BACKEND_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(VhostUserBackendClass, (obj), TYPE_VHOST_USER_BACKE=
-ND)
-+#define VHOST_USER_BACKEND_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(VhostUserBackendClass, (klass), TYPE_VHOST_USER_B=
-ACKEND)
-+
-+typedef struct VhostUserBackend VhostUserBackend;
-+typedef struct VhostUserBackendClass VhostUserBackendClass;
-+
-+struct VhostUserBackendClass {
-+    ObjectClass parent_class;
-+};
-+
-+struct VhostUserBackend {
-+    /* private */
-+    Object parent;
-+
-+    char *chr_name;
-+    CharBackend chr;
-+    VhostUserState vhost_user;
-+    struct vhost_dev dev;
-+    QIOChannel *child;
-+    VirtIODevice *vdev;
-+    bool started;
-+    bool completed;
-+};
-+
-+int vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
-+                                unsigned nvqs, Error **errp);
-+void vhost_user_backend_start(VhostUserBackend *b);
-+void vhost_user_backend_stop(VhostUserBackend *b);
-+
-+#endif
-diff --git a/backends/vhost-user.c b/backends/vhost-user.c
-new file mode 100644
-index 0000000000..289dbd9e6d
---- /dev/null
-+++ b/backends/vhost-user.c
-@@ -0,0 +1,213 @@
-+/*
-+ * QEMU vhost-user backend
-+ *
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
 +
 +#include "qemu/osdep.h"
-+#include "hw/qdev.h"
++
++#include <glib.h>
++#include <linux/input.h>
++
++#include "qemu/iov.h"
++#include "qemu/bswap.h"
++#include "contrib/libvhost-user/libvhost-user.h"
++#include "contrib/libvhost-user/libvhost-user-glib.h"
++#include "standard-headers/linux/virtio_input.h"
 +#include "qapi/error.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qemu/error-report.h"
-+#include "qom/object_interfaces.h"
-+#include "sysemu/vhost-user-backend.h"
-+#include "sysemu/kvm.h"
-+#include "io/channel-command.h"
-+#include "hw/virtio/virtio-bus.h"
 +
-+static bool
-+ioeventfd_enabled(void)
++typedef struct virtio_input_event virtio_input_event;
++typedef struct virtio_input_config virtio_input_config;
++
++typedef struct VuInput {
++    VugDev dev;
++    GSource *evsrc;
++    int evdevfd;
++    GArray *config;
++    struct {
++        virtio_input_event event;
++        VuVirtqElement *elem;
++    }                                 *queue;
++    uint32_t qindex, qsize;
++} VuInput;
++
++static void vi_input_send(VuInput *vi, struct virtio_input_event *event)
 +{
-+    return kvm_enabled() && kvm_eventfds_enabled();
-+}
++    VuDev *dev =3D &vi->dev.parent;
++    VuVirtq *vq =3D vu_get_queue(dev, 0);
++    VuVirtqElement *elem;
++    int i, len;
 +
-+int
-+vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
-+                            unsigned nvqs, Error **errp)
-+{
-+    int ret;
-+
-+    assert(!b->vdev && vdev);
-+
-+    if (!ioeventfd_enabled()) {
-+        error_setg(errp, "vhost initialization failed: requires kvm");
-+        return -1;
++    /* queue up events ... */
++    if (vi->qindex =3D=3D vi->qsize) {
++        vi->qsize++;
++        vi->queue =3D g_realloc_n(vi->queue, vi->qsize, sizeof(vi->queue=
+[0]));
 +    }
++    vi->queue[vi->qindex++].event =3D *event;
 +
-+    if (!vhost_user_init(&b->vhost_user, &b->chr, errp)) {
-+        return -1;
-+    }
-+
-+    b->vdev =3D vdev;
-+    b->dev.nvqs =3D nvqs;
-+    b->dev.vqs =3D g_new(struct vhost_virtqueue, nvqs);
-+
-+    ret =3D vhost_dev_init(&b->dev, &b->vhost_user, VHOST_BACKEND_TYPE_U=
-SER, 0);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "vhost initialization failed");
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+void
-+vhost_user_backend_start(VhostUserBackend *b)
-+{
-+    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
-+    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-+    int ret, i ;
-+
-+    if (b->started) {
++    /* ... until we see a report sync ... */
++    if (event->type !=3D htole16(EV_SYN) ||
++        event->code !=3D htole16(SYN_REPORT)) {
 +        return;
 +    }
 +
-+    if (!k->set_guest_notifiers) {
-+        error_report("binding does not support guest notifiers");
-+        return;
-+    }
-+
-+    ret =3D vhost_dev_enable_notifiers(&b->dev, b->vdev);
-+    if (ret < 0) {
-+        return;
-+    }
-+
-+    ret =3D k->set_guest_notifiers(qbus->parent, b->dev.nvqs, true);
-+    if (ret < 0) {
-+        error_report("Error binding guest notifier");
-+        goto err_host_notifiers;
-+    }
-+
-+    b->dev.acked_features =3D b->vdev->guest_features;
-+    ret =3D vhost_dev_start(&b->dev, b->vdev);
-+    if (ret < 0) {
-+        error_report("Error start vhost dev");
-+        goto err_guest_notifiers;
-+    }
-+
-+    /* guest_notifier_mask/pending not used yet, so just unmask
-+     * everything here.  virtio-pci will do the right thing by
-+     * enabling/disabling irqfd.
-+     */
-+    for (i =3D 0; i < b->dev.nvqs; i++) {
-+        vhost_virtqueue_mask(&b->dev, b->vdev,
-+                             b->dev.vq_index + i, false);
-+    }
-+
-+    b->started =3D true;
-+    return;
-+
-+err_guest_notifiers:
-+    k->set_guest_notifiers(qbus->parent, b->dev.nvqs, false);
-+err_host_notifiers:
-+    vhost_dev_disable_notifiers(&b->dev, b->vdev);
-+}
-+
-+void
-+vhost_user_backend_stop(VhostUserBackend *b)
-+{
-+    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
-+    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-+    int ret =3D 0;
-+
-+    if (!b->started) {
-+        return;
-+    }
-+
-+    vhost_dev_stop(&b->dev, b->vdev);
-+
-+    if (k->set_guest_notifiers) {
-+        ret =3D k->set_guest_notifiers(qbus->parent,
-+                                     b->dev.nvqs, false);
-+        if (ret < 0) {
-+            error_report("vhost guest notifier cleanup failed: %d", ret)=
-;
++    /* ... then check available space ... */
++    for (i =3D 0; i < vi->qindex; i++) {
++        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
++        if (!elem) {
++            while (--i >=3D 0) {
++                vu_queue_unpop(dev, vq, vi->queue[i].elem, 0);
++            }
++            vi->qindex =3D 0;
++            g_warning("virtio-input queue full");
++            return;
 +        }
++        vi->queue[i].elem =3D elem;
 +    }
-+    assert(ret >=3D 0);
 +
-+    vhost_dev_disable_notifiers(&b->dev, b->vdev);
-+    b->started =3D false;
++    /* ... and finally pass them to the guest */
++    for (i =3D 0; i < vi->qindex; i++) {
++        elem =3D vi->queue[i].elem;
++        len =3D iov_from_buf(elem->in_sg, elem->in_num,
++                           0, &vi->queue[i].event, sizeof(virtio_input_e=
+vent));
++        vu_queue_push(dev, vq, elem, len);
++        g_free(elem);
++    }
++
++    vu_queue_notify(&vi->dev.parent, vq);
++    vi->qindex =3D 0;
 +}
 +
-+static void set_chardev(Object *obj, const char *value, Error **errp)
++static void
++vi_evdev_watch(VuDev *dev, int condition, void *data)
 +{
-+    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
-+    Chardev *chr;
++    VuInput *vi =3D data;
++    int fd =3D vi->evdevfd;
 +
-+    if (b->completed) {
-+        error_setg(errp, QERR_PERMISSION_DENIED);
++    g_debug("Got evdev condition %x", condition);
++
++    struct virtio_input_event virtio;
++    struct input_event evdev;
++    int rc;
++
++    for (;;) {
++        rc =3D read(fd, &evdev, sizeof(evdev));
++        if (rc !=3D sizeof(evdev)) {
++            break;
++        }
++
++        g_debug("input %d %d %d", evdev.type, evdev.code, evdev.value);
++
++        virtio.type  =3D htole16(evdev.type);
++        virtio.code  =3D htole16(evdev.code);
++        virtio.value =3D htole32(evdev.value);
++        vi_input_send(vi, &virtio);
++    }
++}
++
++
++static void vi_handle_status(VuInput *vi, virtio_input_event *event)
++{
++    struct input_event evdev;
++    int rc;
++
++    if (gettimeofday(&evdev.time, NULL)) {
++        perror("vi_handle_status: gettimeofday");
 +        return;
 +    }
 +
-+    g_free(b->chr_name);
-+    b->chr_name =3D g_strdup(value);
++    evdev.type =3D le16toh(event->type);
++    evdev.code =3D le16toh(event->code);
++    evdev.value =3D le32toh(event->value);
 +
-+    chr =3D qemu_chr_find(b->chr_name);
-+    if (chr =3D=3D NULL) {
-+        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-+                  "Chardev '%s' not found", b->chr_name);
-+        return;
++    rc =3D write(vi->evdevfd, &evdev, sizeof(evdev));
++    if (rc =3D=3D -1) {
++        perror("vi_host_handle_status: write");
 +    }
-+
-+    if (!qemu_chr_fe_init(&b->chr, chr, errp)) {
-+        return;
-+    }
-+
-+    b->completed =3D true;
-+    /* could call vhost_dev_init() so early message can be exchanged */
 +}
 +
-+static char *get_chardev(Object *obj, Error **errp)
++static void vi_handle_sts(VuDev *dev, int qidx)
 +{
-+    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
-+    Chardev *chr =3D qemu_chr_fe_get_driver(&b->chr);
++    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
++    VuVirtq *vq =3D vu_get_queue(dev, qidx);
++    virtio_input_event event;
++    VuVirtqElement *elem;
++    int len;
 +
-+    if (chr && chr->label) {
-+        return g_strdup(chr->label);
++    g_debug("%s", G_STRFUNC);
++
++    for (;;) {
++        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
++        if (!elem) {
++            break;
++        }
++
++        memset(&event, 0, sizeof(event));
++        len =3D iov_to_buf(elem->out_sg, elem->out_num,
++                         0, &event, sizeof(event));
++        vi_handle_status(vi, &event);
++        vu_queue_push(dev, vq, elem, len);
++        g_free(elem);
 +    }
 +
-+    return NULL;
++    vu_queue_notify(&vi->dev.parent, vq);
 +}
 +
-+static void vhost_user_backend_init(Object *obj)
++static void
++vi_panic(VuDev *dev, const char *msg)
 +{
-+    object_property_add_str(obj, "chardev", get_chardev, set_chardev, NU=
-LL);
++    g_critical("%s\n", msg);
++    exit(EXIT_FAILURE);
 +}
 +
-+static void vhost_user_backend_finalize(Object *obj)
++static void
++vi_queue_set_started(VuDev *dev, int qidx, bool started)
 +{
-+    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
++    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
++    VuVirtq *vq =3D vu_get_queue(dev, qidx);
 +
-+    g_free(b->dev.vqs);
-+    g_free(b->chr_name);
++    g_debug("queue started %d:%d", qidx, started);
 +
-+    vhost_user_cleanup(&b->vhost_user);
-+    qemu_chr_fe_deinit(&b->chr, true);
++    if (qidx =3D=3D 1) {
++        vu_set_queue_handler(dev, vq, started ? vi_handle_sts : NULL);
++    }
 +
-+    if (b->child) {
-+        object_unref(OBJECT(b->child));
++    started =3D vu_queue_started(dev, vu_get_queue(dev, 0)) &&
++        vu_queue_started(dev, vu_get_queue(dev, 1));
++
++    if (started && !vi->evsrc) {
++        vi->evsrc =3D vug_source_new(&vi->dev, vi->evdevfd,
++                                   G_IO_IN, vi_evdev_watch, vi);
++    }
++
++    if (!started && vi->evsrc) {
++        g_source_destroy(vi->evsrc);
++        vi->evsrc =3D NULL;
 +    }
 +}
 +
-+static const TypeInfo vhost_user_backend_info =3D {
-+    .name =3D TYPE_VHOST_USER_BACKEND,
-+    .parent =3D TYPE_OBJECT,
-+    .instance_size =3D sizeof(VhostUserBackend),
-+    .instance_init =3D vhost_user_backend_init,
-+    .instance_finalize =3D vhost_user_backend_finalize,
-+    .class_size =3D sizeof(VhostUserBackendClass),
++static int
++vi_process_msg(VuDev *dev, VhostUserMsg *vmsg, int *do_reply)
++{
++    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
++
++    switch (vmsg->request) {
++    case VHOST_USER_INPUT_GET_CONFIG:
++        vmsg->size =3D vi->config->len * sizeof(virtio_input_config);
++        vmsg->data =3D g_memdup(vi->config->data, vmsg->size);
++        *do_reply =3D true;
++        return 1;
++    default:
++        return 0;
++    }
++}
++
++static const VuDevIface vuiface =3D {
++    .queue_set_started =3D vi_queue_set_started,
++    .process_msg =3D vi_process_msg,
 +};
 +
-+static void register_types(void)
++static void
++vi_bits_config(VuInput *vi, int type, int count)
 +{
-+    type_register_static(&vhost_user_backend_info);
++    virtio_input_config bits;
++    int rc, i, size =3D 0;
++
++    memset(&bits, 0, sizeof(bits));
++    rc =3D ioctl(vi->evdevfd, EVIOCGBIT(type, count / 8), bits.u.bitmap)=
+;
++    if (rc < 0) {
++        return;
++    }
++
++    for (i =3D 0; i < count / 8; i++) {
++        if (bits.u.bitmap[i]) {
++            size =3D i + 1;
++        }
++    }
++    if (size =3D=3D 0) {
++        return;
++    }
++
++    bits.select =3D VIRTIO_INPUT_CFG_EV_BITS;
++    bits.subsel =3D type;
++    bits.size   =3D size;
++    g_array_append_val(vi->config, bits);
 +}
 +
-+type_init(register_types);
++static int unix_sock_new(char *path)
++{
++    int sock;
++    struct sockaddr_un un;
++    size_t len;
++
++    sock =3D socket(AF_UNIX, SOCK_STREAM, 0);
++    if (sock <=3D 0) {
++        perror("socket");
++        return -1;
++    }
++
++    un.sun_family =3D AF_UNIX;
++    snprintf(un.sun_path, sizeof(un.sun_path), "%s", path);
++    len =3D sizeof(un.sun_family) + strlen(un.sun_path);
++
++    unlink(path);
++    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
++        perror("bind");
++        goto fail;
++    }
++
++    if (listen(sock, 1) < 0) {
++        perror("listen");
++        goto fail;
++    }
++
++    return sock;
++
++fail:
++    close(sock);
++
++    return -1;
++}
++
++static char *opt_evdev;
++static int opt_fdnum =3D -1;
++static char *opt_socket_path;
++static gboolean opt_nograb;
++static gboolean opt_print_caps;
++
++static GOptionEntry entries[] =3D {
++    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
++      "Print capabilities", NULL },
++    { "no-grab", 'n', 0, G_OPTION_ARG_NONE, &opt_nograb,
++      "Don't grab device", NULL },
++    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
++      "Use inherited fd socket", "FDNUM" },
++    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
++      "Use UNIX socket path", "PATH" },
++    { "evdev-path", 'p', 0, G_OPTION_ARG_FILENAME, &opt_evdev,
++      "evdev input device path", "PATH" },
++    { NULL, }
++};
++
++int
++main(int argc, char *argv[])
++{
++    GMainLoop *loop =3D NULL;
++    VuInput vi =3D { 0, };
++    int rc, ver, fd;
++    virtio_input_config id;
++    struct input_id ids;
++    GError *error =3D NULL;
++    GOptionContext *context;
++
++    context =3D g_option_context_new(NULL);
++    g_option_context_add_main_entries(context, entries, NULL);
++    if (!g_option_context_parse(context, &argc, &argv, &error)) {
++        g_printerr("Option parsing failed: %s\n", error->message);
++        exit(EXIT_FAILURE);
++    }
++    if (opt_print_caps) {
++        g_print("{\n");
++        g_print("  \"type\": \"input\",\n");
++        g_print("  \"features\": [\n");
++        g_print("    \"evdev-path\",\n");
++        g_print("    \"no-grab\"\n");
++        g_print("  ]\n");
++        g_print("}\n");
++        exit(EXIT_SUCCESS);
++    }
++    if (!opt_evdev) {
++        g_printerr("Please specify an evdev path\n");
++        exit(EXIT_FAILURE);
++    }
++    if ((!!opt_socket_path + (opt_fdnum !=3D -1)) !=3D 1) {
++        g_printerr("Please specify either --fd or --socket-path\n");
++        exit(EXIT_FAILURE);
++    }
++
++    vi.evdevfd =3D open(opt_evdev, O_RDWR);
++    if (vi.evdevfd < 0) {
++        g_printerr("Failed to open evdev: %s\n", g_strerror(errno));
++        exit(EXIT_FAILURE);
++    }
++
++    rc =3D ioctl(vi.evdevfd, EVIOCGVERSION, &ver);
++    if (rc < 0) {
++        g_printerr("%s: is not an evdev device\n", argv[1]);
++        exit(EXIT_FAILURE);
++    }
++
++    if (!opt_nograb) {
++        rc =3D ioctl(vi.evdevfd, EVIOCGRAB, 1);
++        if (rc < 0) {
++            g_printerr("Failed to grab device\n");
++            exit(EXIT_FAILURE);
++        }
++    }
++
++    vi.config =3D g_array_new(false, false, sizeof(virtio_input_config))=
+;
++    memset(&id, 0, sizeof(id));
++    ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1), id.u.string);
++    id.select =3D VIRTIO_INPUT_CFG_ID_NAME;
++    id.size =3D strlen(id.u.string);
++    g_array_append_val(vi.config, id);
++
++    if (ioctl(vi.evdevfd, EVIOCGID, &ids) =3D=3D 0) {
++        memset(&id, 0, sizeof(id));
++        id.select =3D VIRTIO_INPUT_CFG_ID_DEVIDS;
++        id.size =3D sizeof(struct virtio_input_devids);
++        id.u.ids.bustype =3D cpu_to_le16(ids.bustype);
++        id.u.ids.vendor  =3D cpu_to_le16(ids.vendor);
++        id.u.ids.product =3D cpu_to_le16(ids.product);
++        id.u.ids.version =3D cpu_to_le16(ids.version);
++        g_array_append_val(vi.config, id);
++    }
++
++    vi_bits_config(&vi, EV_KEY, KEY_CNT);
++    vi_bits_config(&vi, EV_REL, REL_CNT);
++    vi_bits_config(&vi, EV_ABS, ABS_CNT);
++    vi_bits_config(&vi, EV_MSC, MSC_CNT);
++    vi_bits_config(&vi, EV_SW,  SW_CNT);
++    g_debug("config length: %u", vi.config->len);
++
++    if (opt_socket_path) {
++        int lsock =3D unix_sock_new(opt_socket_path);
++        fd =3D accept(lsock, NULL, NULL);
++        close(lsock);
++    } else {
++        fd =3D opt_fdnum;
++    }
++    if (fd =3D=3D -1) {
++        g_printerr("Invalid socket");
++        exit(EXIT_FAILURE);
++    }
++    vug_init(&vi.dev, fd, vi_panic, &vuiface);
++
++    loop =3D g_main_loop_new(NULL, FALSE);
++    g_main_loop_run(loop);
++    g_main_loop_unref(loop);
++
++    vug_deinit(&vi.dev);
++
++    if (vi.evsrc) {
++        g_source_unref(vi.evsrc);
++    }
++    g_array_free(vi.config, TRUE);
++    g_free(vi.queue);
++    return 0;
++}
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 6364a4ea9c..dbe71e6c1e 100644
+index c3eb708306..df4461d457 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1427,6 +1427,8 @@ F: hw/*/*vhost*
- F: docs/interop/vhost-user.json
- F: docs/interop/vhost-user.txt
- F: contrib/vhost-user-*/
-+F: backends/vhost-user.c
-+F: include/sysemu/vhost-user-backend.h
+@@ -1473,6 +1473,7 @@ S: Maintained
+ F: hw/input/vhost-user-input.c
+ F: hw/input/virtio-input*.c
+ F: include/hw/virtio/virtio-input.h
++F: contrib/vhost-user-input/*
 =20
- virtio
- M: Michael S. Tsirkin <mst@redhat.com>
-diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-index 717fcbdae4..a5ec0bf907 100644
---- a/backends/Makefile.objs
-+++ b/backends/Makefile.objs
-@@ -12,7 +12,8 @@ common-obj-y +=3D cryptodev-builtin.o
- ifeq ($(CONFIG_VIRTIO),y)
- common-obj-y +=3D cryptodev-vhost.o
- common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) +=3D \
--    cryptodev-vhost-user.o
-+    cryptodev-vhost-user.o \
-+    vhost-user.o
- endif
+ virtio-serial
+ M: Amit Shah <amit@kernel.org>
+diff --git a/Makefile b/Makefile
+index 7fa04e0821..9e53a8295b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -370,6 +370,7 @@ dummy :=3D $(call unnest-vars,, \
+                 libvhost-user-obj-y \
+                 vhost-user-scsi-obj-y \
+                 vhost-user-blk-obj-y \
++                vhost-user-input-obj-y \
+                 qga-vss-dll-obj-y \
+                 block-obj-y \
+                 block-obj-m \
+@@ -590,6 +591,8 @@ vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libv=
+host-user.a
+ rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
+ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
++vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) libvhost-user.a lib=
+qemuutil.a
++	$(call LINK, $^)
 =20
- common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
+mak
+ 	$(call quiet-command,$(PYTHON) $< $@ \
+diff --git a/Makefile.objs b/Makefile.objs
+index 6e91ee5674..8084d9270c 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -124,6 +124,7 @@ vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
+ vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
+ vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
+ rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
++vhost-user-input-obj-y =3D contrib/vhost-user-input/
+=20
+ ######################################################################
+ trace-events-subdirs =3D
+diff --git a/configure b/configure
+index 694088a4ec..6afa99e72c 100755
+--- a/configure
++++ b/configure
+@@ -5833,6 +5833,9 @@ if test "$want_tools" =3D "yes" ; then
+   if [ "$curl" =3D "yes" ]; then
+       tools=3D"elf2dmp\$(EXESUF) $tools"
+   fi
++  if [ "$vhost_user" =3D "yes" ] && [ "$linux" =3D "yes" ] ; then
++    tools=3D"vhost-user-input\$(EXESUF) $tools"
++  fi
+ fi
+ if test "$softmmu" =3D yes ; then
+   if test "$linux" =3D yes; then
+diff --git a/contrib/vhost-user-input/Makefile.objs b/contrib/vhost-user-=
+input/Makefile.objs
+new file mode 100644
+index 0000000000..b1fad90d51
+--- /dev/null
++++ b/contrib/vhost-user-input/Makefile.objs
+@@ -0,0 +1 @@
++vhost-user-input-obj-y =3D main.o
 --=20
 2.21.0
