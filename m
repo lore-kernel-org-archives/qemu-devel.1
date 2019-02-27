@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34644)
+Received: from eggs.gnu.org ([209.51.188.92]:35238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gz5gK-0007Qe-4W
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:19:57 -0500
+	(envelope-from <david@redhat.com>) id 1gz5ha-000859-Du
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:21:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gz5gB-0007NI-1j
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:19:51 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36830)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gz5gA-0007AS-7r
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:19:46 -0500
-Received: by mail-wm1-x342.google.com with SMTP id j125so6818975wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 12:19:26 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1gz5hY-0000P5-6y
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 15:21:14 -0500
 References: <20190227111411.22890-1-david@redhat.com>
 	<20190227111411.22890-3-david@redhat.com>
 	<ec7a9ec1-3d6d-6d19-246c-4f6d41f52ec1@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <ec7a9ec1-3d6d-6d19-246c-4f6d41f52ec1@redhat.com>
-Date: Wed, 27 Feb 2019 20:19:21 +0000
-Message-ID: <87h8cpkmra.fsf@zen.linaroharston>
+	<87h8cpkmra.fsf@zen.linaroharston>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <56298ace-a6f7-2b2a-acc2-0e09615c121b@redhat.com>
+Date: Wed, 27 Feb 2019 21:20:27 +0100
 MIME-Version: 1.0
+In-Reply-To: <87h8cpkmra.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/tcg: target/s390: Add test
  for VECTOR LOAD GR FROM VR ELEMENT
@@ -32,196 +27,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-
-David Hildenbrand <david@redhat.com> writes:
-
-> On 27.02.19 12:14, David Hildenbrand wrote:
->> We want to make use of vectors, so use -march=3Dz13. To make it compile,
->> use a reasonable optimization level (-O2), which seems to work just fine
->> with all tests.
+On 27.02.19 21:19, Alex Benn=C3=A9e wrote:
+>=20
+> David Hildenbrand <david@redhat.com> writes:
+>=20
+>> On 27.02.19 12:14, David Hildenbrand wrote:
+>>> We want to make use of vectors, so use -march=3Dz13. To make it compi=
+le,
+>>> use a reasonable optimization level (-O2), which seems to work just f=
+ine
+>>> with all tests.
+>>>
+>>> Add some infrastructure for checking if SIGILL will be properly
+>>> triggered.
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  tests/tcg/s390x/Makefile.target     |  3 ++-
+>>>  tests/tcg/s390x/helper.h            | 28 +++++++++++++++++++++
+>>>  tests/tcg/s390x/signal_helper.inc.c | 39 +++++++++++++++++++++++++++=
+++
+>>>  tests/tcg/s390x/vlgv.c              | 37 +++++++++++++++++++++++++++
+>>>  4 files changed, 106 insertions(+), 1 deletion(-)
+>>>  create mode 100644 tests/tcg/s390x/helper.h
+>>>  create mode 100644 tests/tcg/s390x/signal_helper.inc.c
+>>>  create mode 100644 tests/tcg/s390x/vlgv.c
+>>>
+>>> diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefi=
+le.target
+>>> index 151dc075aa..d1ae755ab9 100644
+>>> --- a/tests/tcg/s390x/Makefile.target
+>>> +++ b/tests/tcg/s390x/Makefile.target
+>>> @@ -1,8 +1,9 @@
+>>>  VPATH+=3D$(SRC_PATH)/tests/tcg/s390x
+>>> -CFLAGS+=3D-march=3DzEC12 -m64
+>>> +CFLAGS+=3D-march=3Dz13 -m64 -O2
+>>>  TESTS+=3Dhello-s390x
+>>>  TESTS+=3Dcsst
+>>>  TESTS+=3Dipm
+>>>  TESTS+=3Dexrl-trt
+>>>  TESTS+=3Dexrl-trtr
+>>>  TESTS+=3Dpack
+>>> +TESTS+=3Dvlgv
+>>> diff --git a/tests/tcg/s390x/helper.h b/tests/tcg/s390x/helper.h
+>>> new file mode 100644
+>>> index 0000000000..845b8bb504
+>>> --- /dev/null
+>>> +++ b/tests/tcg/s390x/helper.h
+>>> @@ -0,0 +1,28 @@
+>>> +#ifndef TEST_TCG_S390x_VECTOR_H
+>>> +#define TEST_TCG_S390x_VECTOR_H
+>>> +
+>>> +#include <stdint.h>
+>>> +
+>>> +#define ES_8    0
+>>> +#define ES_16   1
+>>> +#define ES_32   2
+>>> +#define ES_64   3
+>>> +#define ES_128  4
+>>> +
+>>> +typedef union S390Vector {
+>>> +    __uint128_t v;
+>>> +    uint64_t q[2];
+>>> +    uint32_t d[4];
+>>> +    uint16_t w[8];
+>>> +    uint8_t h[16];
+>>> +} S390Vector;
+>>> +
+>>> +static inline void check(const char *s, bool cond)
+>>> +{
+>>> +    if (!cond) {
+>>> +        fprintf(stderr, "Check failed: %s\n", s);
+>>> +        exit(-1);
+>>> +    }
+>>> +}
+>>> +
+>>> +#endif /* TEST_TCG_S390x_VECTOR_H */
+>>> diff --git a/tests/tcg/s390x/signal_helper.inc.c b/tests/tcg/s390x/si=
+gnal_helper.inc.c
+>>> new file mode 100644
+>>> index 0000000000..5bd69ca76a
+>>> --- /dev/null
+>>> +++ b/tests/tcg/s390x/signal_helper.inc.c
+>>> @@ -0,0 +1,39 @@
+>>> +#include <stdlib.h>
+>>> +#include <stdio.h>
+>>> +#include <stdbool.h>
+>>> +#include <signal.h>
+>>> +#include <setjmp.h>
+>>> +#include "helper.h"
+>>> +
+>>> +jmp_buf jmp_env;
+>>> +
+>>> +static void sig_sigill(int sig)
+>>> +{
+>>> +    if (sig !=3D SIGILL) {
+>>> +        check("Wrong signal received", false);
+>>> +    }
+>>> +    longjmp(jmp_env, 1);
+>>> +}
+>>> +
+>>> +#define CHECK_SIGILL(STATEMENT)                             \
+>>> +do {                                                        \
+>>> +    struct sigaction act;                                   \
+>>> +                                                            \
+>>> +    act.sa_handler =3D sig_sigill;                            \
+>>> +    act.sa_flags =3D 0;                                       \
+>>> +    if (sigaction(SIGILL, &act, NULL)) {                    \
+>>> +        check("SIGILL handler not registered", false);      \
+>>> +    }                                                       \
+>>> +                                                            \
+>>> +    if (setjmp(jmp_env) =3D=3D 0) {                             \
+>>> +        STATEMENT;                                          \
+>>> +        check("SIGILL not triggered", false);               \
+>>> +    }                                                       \
+>>> +                                                            \
+>>> +    act.sa_handler =3D SIG_DFL;                               \
+>>> +    sigemptyset(&act.sa_mask);                              \
+>>> +    act.sa_flags =3D 0;                                       \
+>>> +    if (sigaction(SIGILL, &act, NULL)) {                    \
+>>> +        check("SIGILL handler not unregistered", false);    \
+>>> +    }                                                       \
+>>> +} while (0)
 >>
->> Add some infrastructure for checking if SIGILL will be properly
->> triggered.
+>> Now this is some interesting hackery.
 >>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  tests/tcg/s390x/Makefile.target     |  3 ++-
->>  tests/tcg/s390x/helper.h            | 28 +++++++++++++++++++++
->>  tests/tcg/s390x/signal_helper.inc.c | 39 +++++++++++++++++++++++++++++
->>  tests/tcg/s390x/vlgv.c              | 37 +++++++++++++++++++++++++++
->>  4 files changed, 106 insertions(+), 1 deletion(-)
->>  create mode 100644 tests/tcg/s390x/helper.h
->>  create mode 100644 tests/tcg/s390x/signal_helper.inc.c
->>  create mode 100644 tests/tcg/s390x/vlgv.c
+>> I changed it to
 >>
->> diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.=
-target
->> index 151dc075aa..d1ae755ab9 100644
->> --- a/tests/tcg/s390x/Makefile.target
->> +++ b/tests/tcg/s390x/Makefile.target
->> @@ -1,8 +1,9 @@
->>  VPATH+=3D$(SRC_PATH)/tests/tcg/s390x
->> -CFLAGS+=3D-march=3DzEC12 -m64
->> +CFLAGS+=3D-march=3Dz13 -m64 -O2
->>  TESTS+=3Dhello-s390x
->>  TESTS+=3Dcsst
->>  TESTS+=3Dipm
->>  TESTS+=3Dexrl-trt
->>  TESTS+=3Dexrl-trtr
->>  TESTS+=3Dpack
->> +TESTS+=3Dvlgv
->> diff --git a/tests/tcg/s390x/helper.h b/tests/tcg/s390x/helper.h
->> new file mode 100644
->> index 0000000000..845b8bb504
->> --- /dev/null
->> +++ b/tests/tcg/s390x/helper.h
->> @@ -0,0 +1,28 @@
->> +#ifndef TEST_TCG_S390x_VECTOR_H
->> +#define TEST_TCG_S390x_VECTOR_H
->> +
->> +#include <stdint.h>
->> +
->> +#define ES_8    0
->> +#define ES_16   1
->> +#define ES_32   2
->> +#define ES_64   3
->> +#define ES_128  4
->> +
->> +typedef union S390Vector {
->> +    __uint128_t v;
->> +    uint64_t q[2];
->> +    uint32_t d[4];
->> +    uint16_t w[8];
->> +    uint8_t h[16];
->> +} S390Vector;
->> +
->> +static inline void check(const char *s, bool cond)
->> +{
->> +    if (!cond) {
->> +        fprintf(stderr, "Check failed: %s\n", s);
->> +        exit(-1);
->> +    }
->> +}
->> +
->> +#endif /* TEST_TCG_S390x_VECTOR_H */
->> diff --git a/tests/tcg/s390x/signal_helper.inc.c b/tests/tcg/s390x/signa=
-l_helper.inc.c
->> new file mode 100644
->> index 0000000000..5bd69ca76a
->> --- /dev/null
->> +++ b/tests/tcg/s390x/signal_helper.inc.c
->> @@ -0,0 +1,39 @@
->> +#include <stdlib.h>
->> +#include <stdio.h>
->> +#include <stdbool.h>
->> +#include <signal.h>
->> +#include <setjmp.h>
->> +#include "helper.h"
->> +
->> +jmp_buf jmp_env;
->> +
->> +static void sig_sigill(int sig)
->> +{
->> +    if (sig !=3D SIGILL) {
->> +        check("Wrong signal received", false);
->> +    }
->> +    longjmp(jmp_env, 1);
->> +}
->> +
->> +#define CHECK_SIGILL(STATEMENT)                             \
->> +do {                                                        \
->> +    struct sigaction act;                                   \
->> +                                                            \
->> +    act.sa_handler =3D sig_sigill;                            \
->> +    act.sa_flags =3D 0;                                       \
->> +    if (sigaction(SIGILL, &act, NULL)) {                    \
->> +        check("SIGILL handler not registered", false);      \
->> +    }                                                       \
->> +                                                            \
->> +    if (setjmp(jmp_env) =3D=3D 0) {                             \
->> +        STATEMENT;                                          \
->> +        check("SIGILL not triggered", false);               \
->> +    }                                                       \
->> +                                                            \
->> +    act.sa_handler =3D SIG_DFL;                               \
->> +    sigemptyset(&act.sa_mask);                              \
->> +    act.sa_flags =3D 0;                                       \
->> +    if (sigaction(SIGILL, &act, NULL)) {                    \
->> +        check("SIGILL handler not unregistered", false);    \
->> +    }                                                       \
->> +} while (0)
->
-> Now this is some interesting hackery.
->
-> I changed it to
->
-> jmp_buf jmp_env;
->
-> static void sig_sigill(int sig)
-> {
->     if (sig !=3D SIGILL) {
->         check("Wrong signal received", false);
->     }
->     longjmp(jmp_env, 1);
-> }
->
-> #define CHECK_SIGILL(STATEMENT)                  \
-> do {                                             \
->     if (signal(SIGILL, sig_sigill) =3D=3D SIG_ERR) { \
->         check("SIGILL not registered", false);   \
->     }                                            \
->     if (setjmp(jmp_env) =3D=3D 0) {                  \
->         STATEMENT;                               \
->         check("SIGILL not triggered", false);    \
->     }                                            \
->     if (signal(SIGILL, SIG_DFL) =3D=3D SIG_ERR) {    \
->         check("SIGILL not registered", false);   \
->     }                                            \
-> } while (0)
->
->
-> However it only works once. During the second signal, QEMU decides to
-> set the default handler.
->
-> 1. In a signal handler that signal is blocked. We leave that handler via
-> a longjump. So after the first signal, the signal is blocked.
->
-> 2. In QEMU, we decide that synchronous signals cannot be blocked and
-> simply override the signal handler to default handler. So on the second
-> signal, we execute the default handler and not our defined handler.
->
-> Multiple ways to fix:
->
-> 1. We have to manually unblock the signal in that hackery above.
-> 2. In QEMU, don't block synchronous signals.
-> 3. In QEMU, don't set the signal handler to the default handler in case
-> a synchronous signal is blocked.
+>> jmp_buf jmp_env;
+>>
+>> static void sig_sigill(int sig)
+>> {
+>>     if (sig !=3D SIGILL) {
+>>         check("Wrong signal received", false);
+>>     }
+>>     longjmp(jmp_env, 1);
+>> }
+>>
+>> #define CHECK_SIGILL(STATEMENT)                  \
+>> do {                                             \
+>>     if (signal(SIGILL, sig_sigill) =3D=3D SIG_ERR) { \
+>>         check("SIGILL not registered", false);   \
+>>     }                                            \
+>>     if (setjmp(jmp_env) =3D=3D 0) {                  \
+>>         STATEMENT;                               \
+>>         check("SIGILL not triggered", false);    \
+>>     }                                            \
+>>     if (signal(SIGILL, SIG_DFL) =3D=3D SIG_ERR) {    \
+>>         check("SIGILL not registered", false);   \
+>>     }                                            \
+>> } while (0)
+>>
+>>
+>> However it only works once. During the second signal, QEMU decides to
+>> set the default handler.
+>>
+>> 1. In a signal handler that signal is blocked. We leave that handler v=
+ia
+>> a longjump. So after the first signal, the signal is blocked.
+>>
+>> 2. In QEMU, we decide that synchronous signals cannot be blocked and
+>> simply override the signal handler to default handler. So on the secon=
+d
+>> signal, we execute the default handler and not our defined handler.
+>>
+>> Multiple ways to fix:
+>>
+>> 1. We have to manually unblock the signal in that hackery above.
+>> 2. In QEMU, don't block synchronous signals.
+>> 3. In QEMU, don't set the signal handler to the default handler in cas=
+e
+>> a synchronous signal is blocked.
+>=20
+>=20
+> This all seems a little over-engineered. This is a single-threaded test
+> so what's wrong with a couple of flags:
+
+I have to jump over the actual broken instruction and want to avoid
+patching it. Otherwise I'll loop forever ...
 
 
-This all seems a little over-engineered. This is a single-threaded test
-so what's wrong with a couple of flags:
+--=20
 
-bool should_get_sigill;
+Thanks,
 
-and the handler doing:
-
-if (!should_get_sigill) {
-   unexpected_sigills++;
-}
-
-Tests don't have to be pretty, just reliable.
-
->
->
-> Trying to run the test on a real s390x linux indicates that 1. should be
-> the right approach.
->
-> [linux1@redhat-kvm ~]$ ./vge
-> Illegal instruction (core dumped)
-
-
---
-Alex Benn=C3=A9e
+David / dhildenb
