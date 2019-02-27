@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56209)
+Received: from eggs.gnu.org ([209.51.188.92]:56848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nagarwal@xilinx.com>) id 1gz3Bf-0007Ah-II
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:40:08 -0500
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gz3Dh-0000SK-UE
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nagarwal@xilinx.com>) id 1gz3Be-0008G0-Jc
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:40:07 -0500
-Received: from mail-eopbgr740051.outbound.protection.outlook.com
-	([40.107.74.51]:46767
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nagarwal@xilinx.com>) id 1gz3Be-00085E-8p
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:40:06 -0500
-From: Nikhil Agarwal <nagarwal@xilinx.com>
-Date: Wed, 27 Feb 2019 17:39:46 +0000
-Message-ID: <MN2PR02MB580695B27405FA206A38110FB6740@MN2PR02MB5806.namprd02.prod.outlook.com>
-References: <MN2PR02MB580680857B3390A2447B512DB67B0@MN2PR02MB5806.namprd02.prod.outlook.com>
-	<20190227152347.GF22539@stefanha-x1.localdomain>
-In-Reply-To: <20190227152347.GF22539@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gz3Dd-0001H1-S9
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:13 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:53596 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
+	id 1gz3DO-00004x-1x
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:01 -0500
+From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Date: Wed, 27 Feb 2019 18:40:14 +0100
+Message-Id: <1551289217-10072-2-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1551289217-10072-1-git-send-email-mateja.marjanovic@rt-rk.com>
+References: <1551289217-10072-1-git-send-email-mateja.marjanovic@rt-rk.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Virtio-net control queue handling
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 1/4] target/mips: Optimize support for MSA
+ instructions ILVEV.<B|H|W|D>
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, "jasowang@redhat.com" <jasowang@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
-Hi Stefan,
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-Thanks for directing question to correct people, yes your understanding is =
-correct.
+Optimize support for MSA instructions ILVEV.B, ILVEV.H, ILVEV.W, and
+ILVEV.D.
 
-I want virtio-net control virtqueue to be handled by vhost-user-net device =
-based backend for vdpa use case where control message would do some configu=
-ration on actual hw device. Or these changes should to be done in libvirt w=
-here QMP event are being handled as of now?
+Optimization is done by eliminating loops, and explicitly assigning
+desired values to individual data elements. Performance measurement
+is done by executing the instructions large number of times on a
+computer with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
 
-Regards
-Nikhil
+Measured time before optimization:
+  ILVEV.B:  119.02 ms
+  ILVEV.H:   94.16 ms
+  ILVEV.W:  120.97 ms
+  ILVEV.D:   42.99 ms
 
+Measured time after optimization:
+  ILVEV.B:   61.81 ms
+  ILVEV.H:   42.78 ms
+  ILVEV.W:   39.47 ms
+  ILVEV.D:   39.11 ms
 
------Original Message-----
-From: Stefan Hajnoczi <stefanha@gmail.com>=20
-Sent: Wednesday, February 27, 2019 8:54 PM
-To: Nikhil Agarwal <nagarwal@xilinx.com>
-Cc: qemu-devel@nongnu.org; jasowang@redhat.com; libvir-list@redhat.com
-Subject: Re: [Qemu-devel] Virtio-net control queue handling
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+---
+ target/mips/msa_helper.c | 60 +++++++++++++++++++++++++++++++++++++++++-=
+------
+ 1 file changed, 52 insertions(+), 8 deletions(-)
 
-On Tue, Feb 26, 2019 at 02:13:43PM +0000, Nikhil Agarwal wrote:
-> Is there any option in QEMU to offload virtio device control queue handli=
-ng to backend instead of deciphering and passing to libvirt via QMP? if not=
-, is there any interface in libvirt which passes on these message to applic=
-ation or i directly use QMP interface from QEMU?
-
-I'm not sure I understand your question.  It could be because of
-terminology:
-
-"virtio device control queue" =3D=3D virtio-net control virtqueue?
-
-"backend" =3D=3D vhost-user-net device backend?
-
-"message" =3D=3D QMP event?
-
-I have CCed Jason Wang, QEMU network subsystem maintainer, and the libvirt =
-mailing list.
-
-Stefan
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index c74e3cd..4e6584e 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -1198,14 +1198,6 @@ MSA_FN_DF(ilvl_df)
+ MSA_FN_DF(ilvr_df)
+ #undef MSA_DO
+=20
+-#define MSA_DO(DF)                      \
+-    do {                                \
+-        pwx->DF[2*i]   =3D pwt->DF[2*i];  \
+-        pwx->DF[2*i+1] =3D pws->DF[2*i];  \
+-    } while (0)
+-MSA_FN_DF(ilvev_df)
+-#undef MSA_DO
+-
+ #define MSA_DO(DF)                          \
+     do {                                    \
+         pwx->DF[2*i]   =3D pwt->DF[2*i+1];    \
+@@ -1230,6 +1222,58 @@ MSA_FN_DF(vshf_df)
+ #undef MSA_LOOP_COND
+ #undef MSA_FN_DF
+=20
++
++void helper_msa_ilvev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
++                         uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
++
++    switch (df) {
++    case DF_BYTE:
++        pwd->b[0]  =3D pwt->b[0];
++        pwd->b[1]  =3D pws->b[0];
++        pwd->b[2]  =3D pwt->b[2];
++        pwd->b[3]  =3D pws->b[2];
++        pwd->b[4]  =3D pwt->b[4];
++        pwd->b[5]  =3D pws->b[4];
++        pwd->b[6]  =3D pwt->b[6];
++        pwd->b[7]  =3D pws->b[6];
++        pwd->b[8]  =3D pwt->b[8];
++        pwd->b[9]  =3D pws->b[8];
++        pwd->b[10] =3D pwt->b[10];
++        pwd->b[11] =3D pws->b[10];
++        pwd->b[12] =3D pwt->b[12];
++        pwd->b[13] =3D pws->b[12];
++        pwd->b[14] =3D pwt->b[14];
++        pwd->b[15] =3D pws->b[14];
++        break;
++    case DF_HALF:
++        pwd->h[0] =3D pwt->h[0];
++        pwd->h[1] =3D pws->h[0];
++        pwd->h[2] =3D pwt->h[2];
++        pwd->h[3] =3D pws->h[2];
++        pwd->h[4] =3D pwt->h[4];
++        pwd->h[5] =3D pws->h[4];
++        pwd->h[6] =3D pwt->h[6];
++        pwd->h[7] =3D pws->h[6];
++        break;
++    case DF_WORD:
++        pwd->w[0] =3D pwt->w[0];
++        pwd->w[1] =3D pws->w[0];
++        pwd->w[2] =3D pwt->w[2];
++        pwd->w[3] =3D pws->w[2];
++        break;
++    case DF_DOUBLE:
++        pwd->d[0] =3D pwt->d[0];
++        pwd->d[1] =3D pws->d[0];
++        break;
++    default:
++        assert(0);
++    }
++}
++
+ void helper_msa_sldi_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+                         uint32_t ws, uint32_t n)
+ {
+--=20
+2.7.4
