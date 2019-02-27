@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34400)
+Received: from eggs.gnu.org ([209.51.188.92]:34430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz3Yx-0007gr-SE
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 13:04:12 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gz3Yy-0007hf-Mx
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 13:04:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz3Yw-0004H9-P7
+	(envelope-from <imammedo@redhat.com>) id 1gz3Yx-0004Ht-70
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 13:04:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gz3Yw-0004Fw-Rz
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 13:04:11 -0500
-Resent-Message-Id: <E1gz3Yw-0004H9-P7@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21148)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gz3Ym-000433-9e
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 13:04:03 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155129054583.2181.6950932384841138495@49fa7ef69f7b>
-In-Reply-To: <20190221155359.8247-1-davidkiarie4@gmail.com>
+Date: Wed, 27 Feb 2019 19:04:02 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190227190402.6c50c8ff@redhat.com>
+In-Reply-To: <20190225011534.GA27727@richard>
+References: <20190225010708.27385-1-richardw.yang@linux.intel.com>
+	<20190225011534.GA27727@richard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 27 Feb 2019 10:02:27 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/1] snip my name and email
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5] i386,
+ acpi: check acpi_memory_hotplug capacity in pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +28,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: davidkiarie4@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, alexaltea123@gmail.com, jan.kiszka@siemens.com, peterx@redhat.com, mst@redhat.com
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyMTE1NTM1OS44MjQ3
-LTEtZGF2aWRraWFyaWU0QGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMjExNTUzNTkuODI0Ny0xLWRhdmlka2lh
-cmllNEBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzFdIHNuaXAgbXkg
-bmFtZSBhbmQgZW1haWwKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQou
-L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjM4NDA2NDcwMTAgaHcvaTM4Njogc25p
-cCBteSBuYW1lIGFuZCBlbWFpbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IE1pc3Npbmcg
-U2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNCBs
-aW5lcyBjaGVja2VkCgpDb21taXQgMzg0MDY0NzAxMDc0IChody9pMzg2OiBzbmlwIG15IG5hbWUg
-YW5kIGVtYWlsKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0K
-ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
-YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIyMTE1NTM1OS44MjQ3LTEtZGF2
-aWRraWFyaWU0QGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+On Mon, 25 Feb 2019 09:15:34 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+
+> On Mon, Feb 25, 2019 at 09:07:08AM +0800, Wei Yang wrote:
+> >Currently we do device realization like below:
+> >
+> >   hotplug_handler_pre_plug()
+> >   dc->realize()
+> >   hotplug_handler_plug()
+> >
+> >Before we do device realization and plug, we should allocate necessary
+> >resources and check if memory-hotplug-support property is enabled.
+> >
+> >At the piix4 and ich9, the memory-hotplug-support property is checked at
+> >plug stage. This means that device has been realized and mapped into guest
+> >address space 'pc_dimm_plug()' by the time acpi plug handler is called,
+> >where it might fail and crash QEMU due to reaching g_assert_not_reached()
+> >(piix4) or error_abort (ich9).
+> >
+> >Fix it by checking if memory hotplug is enabled at pre_plug stage
+> >where we can gracefully abort hotplug request.
+> >
+> >Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >CC: Igor Mammedov <imammedo@redhat.com>
+> >CC: Eric Blake <eblake@redhat.com>
+> >Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >
+> >---
+> >v5:
+> >   * rebase on latest upstream
+> >   * remove a comment before hotplug_handler_pre_plug
+> >   * fix alignment for ich9_pm_device_pre_plug_cb
+> >v4:
+> >   * fix code alignment of piix4_device_pre_plug_cb
+> >v3:
+> >   * replace acpi_memory_hotplug with memory-hotplug-support in changelog
+> >   * fix code alignment of ich9_pm_device_pre_plug_cb
+> >   * print which device type memory-hotplug-support is disabled in
+> >     ich9_pm_device_pre_plug_cb and piix4_device_pre_plug_cb
+> >v2:
+> >   * (imammedo@redhat.com)
+> >     - Almost the whole third paragraph
+> >   * apply this change to ich9
+> >   * use hotplug_handler_pre_plug() instead of open-coding check
+> >---
+> > hw/acpi/ich9.c         | 15 +++++++++++++--
+> > hw/acpi/piix4.c        | 13 ++++++++++---
+> > hw/i386/pc.c           |  2 ++
+> > hw/isa/lpc_ich9.c      |  1 +
+> > include/hw/acpi/ich9.h |  2 ++
+> > 5 files changed, 28 insertions(+), 5 deletions(-)
+> >
+> >diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+> >index c5d8646abc..e53dfe1ee3 100644
+> >--- a/hw/acpi/ich9.c
+> >+++ b/hw/acpi/ich9.c
+> >@@ -483,13 +483,24 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
+> >                              NULL);
+> > }
+> > 
+> >+void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >+                                Error **errp)
+> >+{
+> >+    ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+> >+
+> >+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+> >+        !lpc->pm.acpi_memory_hotplug.is_enabled)
+> >+        error_setg(errp,
+> >+                   "memory hotplug is not enabled: %s.memory-hotplug-support "
+> >+                   "is not set", object_get_typename(OBJECT(lpc)));
+> >+}
+> >+
+> > void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >                             Error **errp)
+> > {
+> >     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+> > 
+> >-    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
+> >-        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+> >             nvdimm_acpi_plug_cb(hotplug_dev, dev);
+> >         } else {
+> >diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> >index df8c0db909..8b9654e437 100644
+> >--- a/hw/acpi/piix4.c
+> >+++ b/hw/acpi/piix4.c
+> >@@ -374,9 +374,16 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
+> > static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> >                                     DeviceState *dev, Error **errp)  
+> 
+> Hmm, I found one interesting thing.
+> 
+> This function is introduced in
+> 
+>     commit ec266f408882fd38475f72c4e864ed576228643b
+>     pci/pcihp: perform check for bus capability in pre_plug handler
+> 
+> This is just implemented in piix4, but don't has the counterpart in ich9.
+> 
+> So I suggest to have a follow up patch to create the counterpart for ich9 and
+> then apply this patch on top of that.
+not sure what do you mean, could you be more specific?
+
+> 
+> Is my understanding correct?
+> 
+> > {
+> >+    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+> >+
+> >     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> >         acpi_pcihp_device_pre_plug_cb(hotplug_dev, dev, errp);
+> >-    } else if (!object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+> >+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+> >+               !s->acpi_memory_hotplug.is_enabled) {
+> >+        error_setg(errp,
+> >+                   "memory hotplug is not enabled: %s.memory-hotplug-support "
+> >+                   "is not set", object_get_typename(OBJECT(s)));
+> >+    } else if (
+> >                !object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> >         error_setg(errp, "acpi: device pre plug request for not supported"
+> >                    " device type: %s", object_get_typename(OBJECT(dev)));
+> >@@ -388,8 +395,7 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+> > {
+> >     PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+> > 
+> >-    if (s->acpi_memory_hotplug.is_enabled &&
+> >-        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+> >             nvdimm_acpi_plug_cb(hotplug_dev, dev);
+> >         } else {
+> >@@ -704,6 +710,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
+> >     dc->user_creatable = false;
+> >     dc->hotpluggable = false;
+> >     hc->pre_plug = piix4_device_pre_plug_cb;
+> >+    hc->pre_plug = piix4_device_pre_plug_cb;
+> >     hc->plug = piix4_device_plug_cb;
+> >     hc->unplug_request = piix4_device_unplug_request_cb;
+> >     hc->unplug = piix4_device_unplug_cb;
+> >diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> >index 578f772e7c..64d9e756fa 100644
+> >--- a/hw/i386/pc.c
+> >+++ b/hw/i386/pc.c
+> >@@ -2083,6 +2083,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >         return;
+> >     }
+> > 
+> >+    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
+> >+
+> >     if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+> >         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+> >         return;
+> >diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+> >index e692b9fdc1..ac44aa53be 100644
+> >--- a/hw/isa/lpc_ich9.c
+> >+++ b/hw/isa/lpc_ich9.c
+> >@@ -805,6 +805,7 @@ static void ich9_lpc_class_init(ObjectClass *klass, void *data)
+> >      * pc_q35_init()
+> >      */
+> >     dc->user_creatable = false;
+> >+    hc->pre_plug = ich9_pm_device_pre_plug_cb;
+> >     hc->plug = ich9_pm_device_plug_cb;
+> >     hc->unplug_request = ich9_pm_device_unplug_request_cb;
+> >     hc->unplug = ich9_pm_device_unplug_cb;
+> >diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
+> >index 59aeb06393..41568d1837 100644
+> >--- a/include/hw/acpi/ich9.h
+> >+++ b/include/hw/acpi/ich9.h
+> >@@ -74,6 +74,8 @@ extern const VMStateDescription vmstate_ich9_pm;
+> > 
+> > void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp);
+> > 
+> >+void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >+                                Error **errp);
+> > void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >                             Error **errp);
+> > void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> >-- 
+> >2.19.1  
+> 
