@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51914)
+Received: from eggs.gnu.org ([209.51.188.92]:51912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gz2wm-000413-TV
+	(envelope-from <kwolf@redhat.com>) id 1gz2wm-000410-TB
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:24:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gz2wi-00042o-EQ
+	(envelope-from <kwolf@redhat.com>) id 1gz2wi-00042b-D8
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:24:44 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 27 Feb 2019 18:22:47 +0100
-Message-Id: <20190227172256.30368-12-kwolf@redhat.com>
+Date: Wed, 27 Feb 2019 18:22:53 +0100
+Message-Id: <20190227172256.30368-18-kwolf@redhat.com>
 In-Reply-To: <20190227172256.30368-1-kwolf@redhat.com>
 References: <20190227172256.30368-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 11/20] qcow2: External file I/O
+Subject: [Qemu-devel] [PATCH 17/20] qcow2: Implement data-file-raw create
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,592 +25,558 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This changes the qcow2 implementation to direct all guest data I/O to
-s->data_file rather than bs->file, while metadata I/O still uses
-bs->file. At the moment, this is still always the same, but soon we'll
-add options to set s->data_file to an external data file.
+Provide an option to force QEMU to always keep the external data file
+consistent as a standalone read-only raw image.
+
+At the moment, this means making sure that write_zeroes requests are
+forwarded to the data file instead of just updating the metadata, and
+checking that no backing file is used.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2.h          |  2 +-
- block/qcow2-bitmap.c   |  7 +++---
- block/qcow2-cache.c    |  6 ++---
- block/qcow2-cluster.c  | 46 +++++++++++++++++++++++++++++++------
- block/qcow2-refcount.c | 39 +++++++++++++++++++++++--------
- block/qcow2-snapshot.c |  7 +++---
- block/qcow2.c          | 52 +++++++++++++++++++++++++++++++++---------
- 7 files changed, 122 insertions(+), 37 deletions(-)
+ qapi/block-core.json       |  9 ++++++
+ block/qcow2.h              |  9 +++++-
+ include/block/block_int.h  |  1 +
+ block/qcow2-cluster.c      | 10 +++++++
+ block/qcow2.c              | 56 ++++++++++++++++++++++++++++++++++++--
+ tests/qemu-iotests/082.out | 27 ++++++++++++++++++
+ 6 files changed, 109 insertions(+), 3 deletions(-)
 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index e6faa94fa2..919d0530b2 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -62,6 +62,10 @@
+ # @data-file: the filename of the external data file that is stored in t=
+he
+ #             image and used as a default for opening the image (since: =
+4.0)
+ #
++# @data-file-raw: True if the external data file must stay valid as a
++#                 standalone (read-only) raw image without looking at qc=
+ow2
++#                 metadata (since: 4.0)
++#
+ # @lazy-refcounts: on or off; only valid for compat >=3D 1.1
+ #
+ # @corrupt: true if the image has been marked corrupt; only valid for
+@@ -80,6 +84,7 @@
+   'data': {
+       'compat': 'str',
+       '*data-file': 'str',
++      '*data-file-raw': 'bool',
+       '*lazy-refcounts': 'bool',
+       '*corrupt': 'bool',
+       'refcount-bits': 'int',
+@@ -4144,6 +4149,9 @@
+ # @data-file        Node to use as an external data file in which all gu=
+est
+ #                   data is stored so that only metadata remains in the =
+qcow2
+ #                   file (since: 4.0)
++# @data-file-raw    True if the external data file must stay valid as a
++#                   standalone (read-only) raw image without looking at =
+qcow2
++#                   metadata (default: false; since: 4.0)
+ # @size             Size of the virtual disk in bytes
+ # @version          Compatibility level (default: v3)
+ # @backing-file     File name of the backing file if a backing file
+@@ -4160,6 +4168,7 @@
+ { 'struct': 'BlockdevCreateOptionsQcow2',
+   'data': { 'file':             'BlockdevRef',
+             '*data-file':       'BlockdevRef',
++            '*data-file-raw':   'bool',
+             'size':             'size',
+             '*version':         'BlockdevQcow2Version',
+             '*backing-file':    'str',
 diff --git a/block/qcow2.h b/block/qcow2.h
-index fad6abf602..aac7fc4348 100644
+index a9c9cb4a26..de2a3bdfc5 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -622,7 +622,7 @@ void qcow2_process_discards(BlockDriverState *bs, int=
- ret);
- int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t =
-offset,
-                                  int64_t size);
- int qcow2_pre_write_overlap_check(BlockDriverState *bs, int ign, int64_t=
- offset,
--                                  int64_t size);
-+                                  int64_t size, bool data_file);
- int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
-                              void **refcount_table,
-                              int64_t *refcount_table_size,
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 3ee524da4b..9d968bdcda 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -778,7 +778,8 @@ static int bitmap_list_store(BlockDriverState *bs, Qc=
-ow2BitmapList *bm_list,
-      * directory in-place (actually, turn-off the extension), which is c=
-hecked
-      * in qcow2_check_metadata_overlap() */
-     ret =3D qcow2_pre_write_overlap_check(
--            bs, in_place ? QCOW2_OL_BITMAP_DIRECTORY : 0, dir_offset, di=
-r_size);
-+            bs, in_place ? QCOW2_OL_BITMAP_DIRECTORY : 0, dir_offset, di=
-r_size,
-+            false);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -1224,7 +1225,7 @@ static uint64_t *store_bitmap_data(BlockDriverState=
- *bs,
-             memset(buf + write_size, 0, s->cluster_size - write_size);
-         }
+@@ -225,7 +225,8 @@ enum {
+     QCOW2_AUTOCLEAR_BITMAPS             =3D 1 << QCOW2_AUTOCLEAR_BITMAPS=
+_BITNR,
+     QCOW2_AUTOCLEAR_DATA_FILE_RAW       =3D 1 << QCOW2_AUTOCLEAR_DATA_FI=
+LE_RAW_BITNR,
 =20
--        ret =3D qcow2_pre_write_overlap_check(bs, 0, off, s->cluster_siz=
-e);
-+        ret =3D qcow2_pre_write_overlap_check(bs, 0, off, s->cluster_siz=
-e, false);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret, "Qcow2 overlap check failed");
-             goto fail;
-@@ -1292,7 +1293,7 @@ static int store_bitmap(BlockDriverState *bs, Qcow2=
-Bitmap *bm, Error **errp)
-     }
+-    QCOW2_AUTOCLEAR_MASK                =3D QCOW2_AUTOCLEAR_BITMAPS,
++    QCOW2_AUTOCLEAR_MASK                =3D QCOW2_AUTOCLEAR_BITMAPS
++                                        | QCOW2_AUTOCLEAR_DATA_FILE_RAW,
+ };
 =20
-     ret =3D qcow2_pre_write_overlap_check(bs, 0, tb_offset,
--                                        tb_size * sizeof(tb[0]));
-+                                        tb_size * sizeof(tb[0]), false);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Qcow2 overlap check failed");
-         goto fail;
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index d9dafa31e5..df02e7b20a 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -205,13 +205,13 @@ static int qcow2_cache_entry_flush(BlockDriverState=
- *bs, Qcow2Cache *c, int i)
+ enum qcow2_discard_type {
+@@ -474,6 +475,12 @@ static inline bool has_data_file(BlockDriverState *b=
+s)
+     return (s->data_file !=3D bs->file);
+ }
 =20
-     if (c =3D=3D s->refcount_block_cache) {
-         ret =3D qcow2_pre_write_overlap_check(bs, QCOW2_OL_REFCOUNT_BLOC=
-K,
--                c->entries[i].offset, c->table_size);
-+                c->entries[i].offset, c->table_size, false);
-     } else if (c =3D=3D s->l2_table_cache) {
-         ret =3D qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_L2,
--                c->entries[i].offset, c->table_size);
-+                c->entries[i].offset, c->table_size, false);
-     } else {
-         ret =3D qcow2_pre_write_overlap_check(bs, 0,
--                c->entries[i].offset, c->table_size);
-+                c->entries[i].offset, c->table_size, false);
-     }
++static inline bool data_file_is_raw(BlockDriverState *bs)
++{
++    BDRVQcow2State *s =3D bs->opaque;
++    return !!(s->autoclear_features & QCOW2_AUTOCLEAR_DATA_FILE_RAW);
++}
++
+ static inline int64_t start_of_cluster(BDRVQcow2State *s, int64_t offset=
+)
+ {
+     return offset & ~(s->cluster_size - 1);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index acd29ce521..a23cabaddd 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -57,6 +57,7 @@
+ #define BLOCK_OPT_OBJECT_SIZE       "object_size"
+ #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
+ #define BLOCK_OPT_DATA_FILE         "data_file"
++#define BLOCK_OPT_DATA_FILE_RAW     "data_file_raw"
 =20
-     if (ret < 0) {
+ #define BLOCK_PROBE_BUF_SIZE        512
+=20
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 8c4b4005ff..7579f5a5ae 100644
+index 7579f5a5ae..974a4e8656 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -153,7 +153,7 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_=
-t min_size,
-     /* the L1 position has not yet been updated, so these clusters must
-      * indeed be completely free */
-     ret =3D qcow2_pre_write_overlap_check(bs, 0, new_l1_table_offset,
--                                        new_l1_size2);
-+                                        new_l1_size2, false);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -238,7 +238,7 @@ int qcow2_write_l1_entry(BlockDriverState *bs, int l1=
-_index)
-     }
-=20
-     ret =3D qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_L1,
--            s->l1_table_offset + 8 * l1_start_index, sizeof(buf));
-+            s->l1_table_offset + 8 * l1_start_index, sizeof(buf), false)=
-;
-     if (ret < 0) {
-         return ret;
-     }
-@@ -490,6 +490,7 @@ static int coroutine_fn do_perform_cow_write(BlockDri=
-verState *bs,
-                                              unsigned offset_in_cluster,
-                                              QEMUIOVector *qiov)
- {
-+    BDRVQcow2State *s =3D bs->opaque;
+@@ -1783,6 +1783,16 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, ui=
+nt64_t offset,
+     int64_t cleared;
      int ret;
 =20
-     if (qiov->size =3D=3D 0) {
-@@ -497,13 +498,13 @@ static int coroutine_fn do_perform_cow_write(BlockD=
-riverState *bs,
-     }
-=20
-     ret =3D qcow2_pre_write_overlap_check(bs, 0,
--            cluster_offset + offset_in_cluster, qiov->size);
-+            cluster_offset + offset_in_cluster, qiov->size, true);
-     if (ret < 0) {
-         return ret;
-     }
-=20
-     BLKDBG_EVENT(bs->file, BLKDBG_COW_WRITE);
--    ret =3D bdrv_co_pwritev(bs->file, cluster_offset + offset_in_cluster=
-,
-+    ret =3D bdrv_co_pwritev(s->data_file, cluster_offset + offset_in_clu=
-ster,
-                           qiov->size, qiov, 0);
-     if (ret < 0) {
-         return ret;
-@@ -607,6 +608,14 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, u=
-int64_t offset,
-     }
-     switch (type) {
-     case QCOW2_CLUSTER_COMPRESSED:
-+        if (has_data_file(bs)) {
-+            qcow2_signal_corruption(bs, true, -1, -1, "Compressed cluste=
-r "
-+                                    "entry found in image with external =
-data "
-+                                    "file (L2 offset: %#" PRIx64 ", L2 i=
-ndex: "
-+                                    "%#x)", l2_offset, l2_index);
-+            ret =3D -EIO;
-+            goto fail;
-+        }
-         /* Compressed clusters can only be processed one by one */
-         c =3D 1;
-         *cluster_offset &=3D L2E_COMPRESSED_OFFSET_SIZE_MASK;
-@@ -633,6 +642,17 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, u=
-int64_t offset,
-             ret =3D -EIO;
-             goto fail;
-         }
-+        if (has_data_file(bs) && *cluster_offset !=3D offset - offset_in=
-_cluster)
-+        {
-+            qcow2_signal_corruption(bs, true, -1, -1,
-+                                    "External data file host cluster off=
-set %#"
-+                                    PRIx64 " does not match guest cluste=
-r "
-+                                    "offset: %#" PRIx64
-+                                    ", L2 index: %#x)", *cluster_offset,
-+                                    offset - offset_in_cluster, l2_index=
++    /* If we have to stay in sync with an external data file, zero out
++     * s->data_file first. */
++    if (data_file_is_raw(bs)) {
++        assert(has_data_file(bs));
++        ret =3D bdrv_co_pwrite_zeroes(s->data_file, offset, bytes, flags=
 );
-+            ret =3D -EIO;
-+            goto fail;
++        if (ret < 0) {
++            return ret;
 +        }
-         break;
-     default:
-         abort();
-@@ -753,6 +773,10 @@ int qcow2_alloc_compressed_cluster_offset(BlockDrive=
-rState *bs,
-     int64_t cluster_offset;
-     int nb_csectors;
-=20
-+    if (has_data_file(bs)) {
-+        return 0;
 +    }
 +
-     ret =3D get_cluster_table(bs, offset, &l2_slice, &l2_index);
-     if (ret < 0) {
-         return ret;
-@@ -1243,6 +1267,13 @@ static int do_alloc_cluster_offset(BlockDriverStat=
-e *bs, uint64_t guest_offset,
-     trace_qcow2_do_alloc_clusters_offset(qemu_coroutine_self(), guest_of=
-fset,
-                                          *host_offset, *nb_clusters);
-=20
-+    if (has_data_file(bs)) {
-+        assert(*host_offset =3D=3D INV_OFFSET ||
-+               *host_offset =3D=3D start_of_cluster(s, guest_offset));
-+        *host_offset =3D start_of_cluster(s, guest_offset);
-+        return 0;
-+    }
-+
-     /* Allocate new clusters */
-     trace_qcow2_cluster_alloc_phys(qemu_coroutine_self());
-     if (*host_offset =3D=3D INV_OFFSET) {
-@@ -1919,7 +1950,7 @@ static int expand_zero_clusters_in_l1(BlockDriverSt=
-ate *bs, uint64_t *l1_table,
-                 }
-=20
-                 ret =3D qcow2_pre_write_overlap_check(bs, 0, offset,
--                                                    s->cluster_size);
-+                                                    s->cluster_size, tru=
-e);
-                 if (ret < 0) {
-                     if (cluster_type =3D=3D QCOW2_CLUSTER_ZERO_PLAIN) {
-                         qcow2_free_clusters(bs, offset, s->cluster_size,
-@@ -1928,7 +1959,8 @@ static int expand_zero_clusters_in_l1(BlockDriverSt=
-ate *bs, uint64_t *l1_table,
-                     goto fail;
-                 }
-=20
--                ret =3D bdrv_pwrite_zeroes(bs->file, offset, s->cluster_=
-size, 0);
-+                ret =3D bdrv_pwrite_zeroes(s->data_file, offset,
-+                                         s->cluster_size, 0);
-                 if (ret < 0) {
-                     if (cluster_type =3D=3D QCOW2_CLUSTER_ZERO_PLAIN) {
-                         qcow2_free_clusters(bs, offset, s->cluster_size,
-@@ -1955,7 +1987,7 @@ static int expand_zero_clusters_in_l1(BlockDriverSt=
-ate *bs, uint64_t *l1_table,
-                 if (l2_dirty) {
-                     ret =3D qcow2_pre_write_overlap_check(
-                         bs, QCOW2_OL_INACTIVE_L2 | QCOW2_OL_ACTIVE_L2,
--                        slice_offset, slice_size2);
-+                        slice_offset, slice_size2, false);
-                     if (ret < 0) {
-                         goto fail;
-                     }
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 05e7974d7e..df73580e5d 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1156,8 +1156,20 @@ void qcow2_free_any_clusters(BlockDriverState *bs,=
- uint64_t l2_entry,
-                              int nb_clusters, enum qcow2_discard_type ty=
-pe)
- {
-     BDRVQcow2State *s =3D bs->opaque;
-+    QCow2ClusterType ctype =3D qcow2_get_cluster_type(bs, l2_entry);
-=20
--    switch (qcow2_get_cluster_type(bs, l2_entry)) {
-+    if (has_data_file(bs)) {
-+        if (s->discard_passthrough[type] &&
-+            (ctype =3D=3D QCOW2_CLUSTER_NORMAL ||
-+             ctype =3D=3D QCOW2_CLUSTER_ZERO_ALLOC))
-+        {
-+            bdrv_pdiscard(s->data_file, l2_entry & L2E_OFFSET_MASK,
-+                          nb_clusters << s->cluster_bits);
-+        }
-+        return;
-+    }
-+
-+    switch (ctype) {
-     case QCOW2_CLUSTER_COMPRESSED:
-         {
-             int nb_csectors;
-@@ -1649,7 +1661,7 @@ static int check_refcounts_l2(BlockDriverState *bs,=
- BdrvCheckResult *res,
-                         l2_table[i] =3D cpu_to_be64(l2_entry);
-                         ret =3D qcow2_pre_write_overlap_check(bs,
-                                 QCOW2_OL_ACTIVE_L2 | QCOW2_OL_INACTIVE_L=
-2,
--                                l2e_offset, sizeof(uint64_t));
-+                                l2e_offset, sizeof(uint64_t), false);
-                         if (ret < 0) {
-                             fprintf(stderr, "ERROR: Overlap check failed=
-\n");
-                             res->check_errors++;
-@@ -1898,7 +1910,8 @@ static int check_oflag_copied(BlockDriverState *bs,=
- BdrvCheckResult *res,
-=20
-         if (l2_dirty) {
-             ret =3D qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_L2=
-,
--                                                l2_offset, s->cluster_si=
-ze);
-+                                                l2_offset, s->cluster_si=
-ze,
-+                                                false);
-             if (ret < 0) {
-                 fprintf(stderr, "ERROR: Could not write L2 table; metada=
-ta "
-                         "overlap check failed: %s\n", strerror(-ret));
-@@ -2366,7 +2379,7 @@ write_refblocks:
-         }
-=20
-         ret =3D qcow2_pre_write_overlap_check(bs, 0, refblock_offset,
--                                            s->cluster_size);
-+                                            s->cluster_size, false);
-         if (ret < 0) {
-             fprintf(stderr, "ERROR writing refblock: %s\n", strerror(-re=
-t));
-             goto fail;
-@@ -2417,7 +2430,8 @@ write_refblocks:
-     }
-=20
-     ret =3D qcow2_pre_write_overlap_check(bs, 0, reftable_offset,
--                                        reftable_size * sizeof(uint64_t)=
-);
-+                                        reftable_size * sizeof(uint64_t)=
-,
-+                                        false);
-     if (ret < 0) {
-         fprintf(stderr, "ERROR writing reftable: %s\n", strerror(-ret));
-         goto fail;
-@@ -2751,10 +2765,15 @@ QEMU_BUILD_BUG_ON(QCOW2_OL_MAX_BITNR !=3D ARRAY_S=
-IZE(metadata_ol_names));
-  * overlaps; or a negative value (-errno) on error.
-  */
- int qcow2_pre_write_overlap_check(BlockDriverState *bs, int ign, int64_t=
- offset,
--                                  int64_t size)
-+                                  int64_t size, bool data_file)
- {
--    int ret =3D qcow2_check_metadata_overlap(bs, ign, offset, size);
-+    int ret;
-+
-+    if (data_file && has_data_file(bs)) {
-+        return 0;
-+    }
-=20
-+    ret =3D qcow2_check_metadata_overlap(bs, ign, offset, size);
-     if (ret < 0) {
-         return ret;
-     } else if (ret > 0) {
-@@ -2855,7 +2874,8 @@ static int flush_refblock(BlockDriverState *bs, uin=
-t64_t **reftable,
-     if (reftable_index < *reftable_size && (*reftable)[reftable_index]) =
-{
-         offset =3D (*reftable)[reftable_index];
-=20
--        ret =3D qcow2_pre_write_overlap_check(bs, 0, offset, s->cluster_=
-size);
-+        ret =3D qcow2_pre_write_overlap_check(bs, 0, offset, s->cluster_=
-size,
-+                                            false);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret, "Overlap check failed");
-             return ret;
-@@ -3121,7 +3141,8 @@ int qcow2_change_refcount_order(BlockDriverState *b=
-s, int refcount_order,
-=20
-     /* Write the new reftable */
-     ret =3D qcow2_pre_write_overlap_check(bs, 0, new_reftable_offset,
--                                        new_reftable_size * sizeof(uint6=
-4_t));
-+                                        new_reftable_size * sizeof(uint6=
-4_t),
-+                                        false);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Overlap check failed");
-         goto done;
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 20e8472191..5ae3407f68 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -184,7 +184,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs=
-)
-=20
-     /* The snapshot list position has not yet been updated, so these clu=
-sters
-      * must indeed be completely free */
--    ret =3D qcow2_pre_write_overlap_check(bs, 0, offset, snapshots_size)=
-;
-+    ret =3D qcow2_pre_write_overlap_check(bs, 0, offset, snapshots_size,=
- false);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -389,7 +389,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUS=
-napshotInfo *sn_info)
-     }
-=20
-     ret =3D qcow2_pre_write_overlap_check(bs, 0, sn->l1_table_offset,
--                                        s->l1_size * sizeof(uint64_t));
-+                                        s->l1_size * sizeof(uint64_t), f=
-alse);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -528,7 +528,8 @@ int qcow2_snapshot_goto(BlockDriverState *bs, const c=
-har *snapshot_id)
-     }
-=20
-     ret =3D qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_L1,
--                                        s->l1_table_offset, cur_l1_bytes=
-);
-+                                        s->l1_table_offset, cur_l1_bytes=
-,
-+                                        false);
-     if (ret < 0) {
-         goto fail;
-     }
+     /* Caller must pass aligned values, except at image end */
+     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 8dc6f21047..b77d856007 100644
+index 24c023e13d..503239d865 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -140,7 +140,7 @@ static ssize_t qcow2_crypto_hdr_init_func(QCryptoBloc=
-k *block, size_t headerlen,
-     /* Zero fill remaining space in cluster so it has predictable
-      * content in case of future spec changes */
-     clusterlen =3D size_to_clusters(s, headerlen) * s->cluster_size;
--    assert(qcow2_pre_write_overlap_check(bs, 0, ret, clusterlen) =3D=3D =
-0);
-+    assert(qcow2_pre_write_overlap_check(bs, 0, ret, clusterlen, false) =
-=3D=3D 0);
-     ret =3D bdrv_pwrite_zeroes(bs->file,
-                              ret + headerlen,
-                              clusterlen - headerlen, 0);
-@@ -1953,7 +1953,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriver=
-State *bs, uint64_t offset,
-                  */
-                 if (!cluster_data) {
-                     cluster_data =3D
--                        qemu_try_blockalign(bs->file->bs,
-+                        qemu_try_blockalign(s->data_file->bs,
-                                             QCOW_MAX_CRYPT_CLUSTERS
-                                             * s->cluster_size);
-                     if (cluster_data =3D=3D NULL) {
-@@ -1969,7 +1969,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriver=
-State *bs, uint64_t offset,
-=20
-             BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
-             qemu_co_mutex_unlock(&s->lock);
--            ret =3D bdrv_co_preadv(bs->file,
-+            ret =3D bdrv_co_preadv(s->data_file,
-                                  cluster_offset + offset_in_cluster,
-                                  cur_bytes, &hd_qiov, 0);
-             qemu_co_mutex_lock(&s->lock);
-@@ -2128,7 +2128,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDrive=
-rState *bs, uint64_t offset,
-         }
-=20
-         ret =3D qcow2_pre_write_overlap_check(bs, 0,
--                cluster_offset + offset_in_cluster, cur_bytes);
-+                cluster_offset + offset_in_cluster, cur_bytes, true);
-         if (ret < 0) {
+@@ -1486,8 +1486,14 @@ static int coroutine_fn qcow2_do_open(BlockDriverS=
+tate *bs, QDict *options,
+                              "external data file");
+             ret =3D -EINVAL;
              goto fail;
-         }
-@@ -2142,7 +2142,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDrive=
-rState *bs, uint64_t offset,
-             BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
-             trace_qcow2_writev_data(qemu_coroutine_self(),
-                                     cluster_offset + offset_in_cluster);
--            ret =3D bdrv_co_pwritev(bs->file,
-+            ret =3D bdrv_co_pwritev(s->data_file,
-                                   cluster_offset + offset_in_cluster,
-                                   cur_bytes, &hd_qiov, 0);
-             qemu_co_mutex_lock(&s->lock);
-@@ -3344,7 +3344,7 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
-             goto out;
-=20
-         case QCOW2_CLUSTER_NORMAL:
--            child =3D bs->file;
-+            child =3D s->data_file;
-             copy_offset +=3D offset_into_cluster(s, src_offset);
-             if ((copy_offset & 511) !=3D 0) {
-                 ret =3D -EIO;
-@@ -3414,14 +3414,14 @@ qcow2_co_copy_range_to(BlockDriverState *bs,
-         assert((cluster_offset & 511) =3D=3D 0);
-=20
-         ret =3D qcow2_pre_write_overlap_check(bs, 0,
--                cluster_offset + offset_in_cluster, cur_bytes);
-+                cluster_offset + offset_in_cluster, cur_bytes, true);
-         if (ret < 0) {
-             goto fail;
-         }
-=20
-         qemu_co_mutex_unlock(&s->lock);
-         ret =3D bdrv_co_copy_range_to(src, src_offset,
--                                    bs->file,
-+                                    s->data_file,
-                                     cluster_offset + offset_in_cluster,
-                                     cur_bytes, read_flags, write_flags);
-         qemu_co_mutex_lock(&s->lock);
-@@ -3576,6 +3576,17 @@ static int coroutine_fn qcow2_co_truncate(BlockDri=
-verState *bs, int64_t offset,
-         int64_t old_file_size, new_file_size;
-         uint64_t nb_new_data_clusters, nb_new_l2_tables;
-=20
-+        /* With a data file, preallocation means just allocating the met=
-adata
-+         * and forwarding the truncate request to the data file */
-+        if (has_data_file(bs)) {
-+            ret =3D preallocate_co(bs, old_length, offset);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret, "Preallocation failed");
-+                goto fail;
-+            }
-+            break;
+-        } else {
+-            s->data_file =3D bs->file;
 +        }
 +
-         old_file_size =3D bdrv_getlength(bs->file->bs);
-         if (old_file_size < 0) {
-             error_setg_errno(errp, -old_file_size,
-@@ -3684,6 +3695,16 @@ static int coroutine_fn qcow2_co_truncate(BlockDri=
-verState *bs, int64_t offset,
-=20
-     bs->total_sectors =3D offset / BDRV_SECTOR_SIZE;
-=20
-+    if (has_data_file(bs)) {
-+        if (prealloc =3D=3D PREALLOC_MODE_METADATA) {
-+            prealloc =3D PREALLOC_MODE_OFF;
-+        }
-+        ret =3D bdrv_co_truncate(s->data_file, offset, prealloc, errp);
-+        if (ret < 0) {
++        s->data_file =3D bs->file;
++
++        if (data_file_is_raw(bs)) {
++            error_setg(errp, "data-file-raw requires a data file");
++            ret =3D -EINVAL;
 +            goto fail;
-+        }
-+    }
-+
-     /* write updated header.size */
-     offset =3D cpu_to_be64(offset);
-     ret =3D bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
-@@ -3887,6 +3908,10 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, =
-uint64_t offset,
-     uint8_t *buf, *out_buf;
-     uint64_t cluster_offset;
-=20
-+    if (has_data_file(bs)) {
-+        return -ENOTSUP;
-+    }
-+
-     if (bytes =3D=3D 0) {
-         /* align end of file to a sector boundary to ease reading with
-            sector based I/Os */
-@@ -3938,7 +3963,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, u=
-int64_t offset,
-         goto fail;
+         }
      }
 =20
--    ret =3D qcow2_pre_write_overlap_check(bs, 0, cluster_offset, out_len=
-);
-+    ret =3D qcow2_pre_write_overlap_check(bs, 0, cluster_offset, out_len=
-, true);
-     qemu_co_mutex_unlock(&s->lock);
-     if (ret < 0) {
-         goto fail;
-@@ -3950,8 +3975,8 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, u=
-int64_t offset,
+@@ -2594,6 +2600,12 @@ static int qcow2_change_backing_file(BlockDriverSt=
+ate *bs,
+ {
+     BDRVQcow2State *s =3D bs->opaque;
+=20
++    /* Adding a backing file means that the external data file alone won=
+'t be
++     * enough to make sense of the content */
++    if (backing_file && data_file_is_raw(bs)) {
++        return -EINVAL;
++    }
++
+     if (backing_file && strlen(backing_file) > 1023) {
+         return -EINVAL;
+     }
+@@ -3004,6 +3016,18 @@ qcow2_co_create(BlockdevCreateOptions *create_opti=
+ons, Error **errp)
+     }
+     refcount_order =3D ctz32(qcow2_opts->refcount_bits);
+=20
++    if (qcow2_opts->data_file_raw && !qcow2_opts->data_file) {
++        error_setg(errp, "data-file-raw requires data-file");
++        ret =3D -EINVAL;
++        goto out;
++    }
++    if (qcow2_opts->data_file_raw && qcow2_opts->has_backing_file) {
++        error_setg(errp, "Backing file and data-file-raw cannot be used =
+at "
++                   "the same time");
++        ret =3D -EINVAL;
++        goto out;
++    }
++
+     if (qcow2_opts->data_file) {
+         if (version < 3) {
+             error_setg(errp, "External data files are only supported wit=
+h "
+@@ -3060,6 +3084,10 @@ qcow2_co_create(BlockdevCreateOptions *create_opti=
+ons, Error **errp)
+         header->incompatible_features |=3D
+             cpu_to_be64(QCOW2_INCOMPAT_DATA_FILE);
+     }
++    if (qcow2_opts->data_file_raw) {
++        header->autoclear_features |=3D
++            cpu_to_be64(QCOW2_AUTOCLEAR_DATA_FILE_RAW);
++    }
+=20
+     ret =3D blk_pwrite(blk, 0, header, cluster_size, 0);
+     g_free(header);
+@@ -3241,6 +3269,7 @@ static int coroutine_fn qcow2_co_create_opts(const =
+char *filename, QemuOpts *opt
+         { BLOCK_OPT_REFCOUNT_BITS,      "refcount-bits" },
+         { BLOCK_OPT_ENCRYPT,            BLOCK_OPT_ENCRYPT_FORMAT },
+         { BLOCK_OPT_COMPAT_LEVEL,       "version" },
++        { BLOCK_OPT_DATA_FILE_RAW,      "data-file-raw" },
+         { NULL, NULL },
      };
-     qemu_iovec_init_external(&hd_qiov, &iov, 1);
 =20
--    BLKDBG_EVENT(bs->file, BLKDBG_WRITE_COMPRESSED);
--    ret =3D bdrv_co_pwritev(bs->file, cluster_offset, out_len, &hd_qiov,=
- 0);
-+    BLKDBG_EVENT(s->data_file, BLKDBG_WRITE_COMPRESSED);
-+    ret =3D bdrv_co_pwritev(s->data_file, cluster_offset, out_len, &hd_q=
-iov, 0);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -4543,6 +4568,11 @@ static int qcow2_downgrade(BlockDriverState *bs, i=
-nt target_version,
-         return -ENOTSUP;
+@@ -4617,6 +4646,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(B=
+lockDriverState *bs,
+             .bitmaps            =3D bitmaps,
+             .has_data_file      =3D !!s->image_data_file,
+             .data_file          =3D g_strdup(s->image_data_file),
++            .has_data_file_raw  =3D has_data_file(bs),
++            .data_file_raw      =3D data_file_is_raw(bs),
+         };
+     } else {
+         /* if this assertion fails, this probably means a new version wa=
+s
+@@ -4821,6 +4852,7 @@ static int qcow2_amend_options(BlockDriverState *bs=
+, QemuOpts *opts,
+     uint64_t new_size =3D 0;
+     const char *backing_file =3D NULL, *backing_format =3D NULL, *data_f=
+ile =3D NULL;
+     bool lazy_refcounts =3D s->use_lazy_refcounts;
++    bool data_file_raw =3D data_file_is_raw(bs);
+     const char *compat =3D NULL;
+     uint64_t cluster_size =3D s->cluster_size;
+     bool encrypt;
+@@ -4908,6 +4940,14 @@ static int qcow2_amend_options(BlockDriverState *b=
+s, QemuOpts *opts,
+                                  "use an external data file");
+                 return -EINVAL;
+             }
++        } else if (!strcmp(desc->name, BLOCK_OPT_DATA_FILE_RAW)) {
++            data_file_raw =3D qemu_opt_get_bool(opts, BLOCK_OPT_DATA_FIL=
+E_RAW,
++                                              data_file_raw);
++            if (data_file_raw && !data_file_is_raw(bs)) {
++                error_setg(errp, "data-file-raw cannot be set on existin=
+g "
++                                 "images");
++                return -EINVAL;
++            }
+         } else {
+             /* if this point is reached, this probably means a new optio=
+n was
+              * added without having it covered here */
+@@ -4954,6 +4994,13 @@ static int qcow2_amend_options(BlockDriverState *b=
+s, QemuOpts *opts,
+         }
      }
 =20
-+    if (has_data_file(bs)) {
-+        error_setg(errp, "Cannot downgrade an image with a data file");
-+        return -ENOTSUP;
++    /* data-file-raw blocks backing files, so clear it first if requeste=
+d */
++    if (data_file_raw) {
++        s->autoclear_features |=3D QCOW2_AUTOCLEAR_DATA_FILE_RAW;
++    } else {
++        s->autoclear_features &=3D ~QCOW2_AUTOCLEAR_DATA_FILE_RAW;
 +    }
 +
-     /* clear incompatible features */
-     if (s->incompatible_features & QCOW2_INCOMPAT_DIRTY) {
-         ret =3D qcow2_mark_clean(bs);
+     if (data_file) {
+         g_free(s->image_data_file);
+         s->image_data_file =3D *data_file ? g_strdup(data_file) : NULL;
+@@ -5117,6 +5164,11 @@ static QemuOptsList qcow2_create_opts =3D {
+             .type =3D QEMU_OPT_STRING,
+             .help =3D "File name of an external data file"
+         },
++        {
++            .name =3D BLOCK_OPT_DATA_FILE_RAW,
++            .type =3D QEMU_OPT_BOOL,
++            .help =3D "The external data file must stay valid as a raw i=
+mage"
++        },
+         {
+             .name =3D BLOCK_OPT_ENCRYPT,
+             .type =3D QEMU_OPT_BOOL,
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index 7dc59f6075..915640613f 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -49,6 +49,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -71,6 +72,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -93,6 +95,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -115,6 +118,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -137,6 +141,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -159,6 +164,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -181,6 +187,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -203,6 +210,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -240,6 +248,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -314,6 +323,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -336,6 +346,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -358,6 +369,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -380,6 +392,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -402,6 +415,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -424,6 +438,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -446,6 +461,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -468,6 +484,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -505,6 +522,7 @@ Supported options:
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -587,6 +605,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -610,6 +629,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -633,6 +653,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -656,6 +677,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -679,6 +701,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -702,6 +725,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -725,6 +749,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -748,6 +773,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
+@@ -788,6 +814,7 @@ Creation options for 'qcow2':
+   cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (0.10 or 1.1)
+   data_file=3D<str>        - File name of an external data file
++  data_file_raw=3D<bool (on/off)> - The external data file must stay val=
+id as a raw image
+   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+   encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+   encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', '=
+luks'
 --=20
 2.20.1
