@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56849)
+Received: from eggs.gnu.org ([209.51.188.92]:56934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gz3Dh-0000SQ-Uh
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:15 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gz3Dk-0000UY-1J
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gz3De-0001Hh-8l
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:13 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:53606 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1gz3DW-000054-Ap
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:08 -0500
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Wed, 27 Feb 2019 18:40:17 +0100
-Message-Id: <1551289217-10072-5-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1551289217-10072-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1551289217-10072-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	(envelope-from <no-reply@patchew.org>) id 1gz3Di-0001LF-CH
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:15 -0500
+Resent-Message-Id: <E1gz3Di-0001LF-CH@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gz3Di-00018b-1l
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:42:14 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155128927822.2181.17653738042186526600@49fa7ef69f7b>
+In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/4] target/mips: Optimize support for MSA
- instructions ILVR.<B|H|W|D>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 27 Feb 2019 09:41:19 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, programmingkidx@gmail.com, r.bolshakov@yadro.com, kraxel@redhat.com, ben.hekster@foghorn.io, berkus@gmail.com
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-
-Optimize support for MSA instructions ILVR.B, ILVR.H, ILVR.W, and
-ILVR.D.
-
-Optimization is done by eliminating loops, and explicitly assigning
-desired values to individual data elements. Performance measurement
-is done by executing the instructions large number of times on a
-computer with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
-
-Measured time before optimization:
-  ILVR.B:  115.84 ms
-  ILVR.H:   94.20 ms
-  ILVR.W:  121.12 ms
-  ILVR.D:   41.36 ms
-
-Measured time after optimization:
-  ILVR.B:   61.06 ms
-  ILVR.H:   43.03 ms
-  ILVR.W:   39.21 ms
-  ILVR.D:   39.18 ms
-
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/msa_helper.c | 59 +++++++++++++++++++++++++++++++++++++++++-=
-------
- 1 file changed, 51 insertions(+), 8 deletions(-)
-
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 59aac72..ab797b1 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1182,14 +1182,6 @@ MSA_FN_DF(pckev_df)
- MSA_FN_DF(pckod_df)
- #undef MSA_DO
-=20
--#define MSA_DO(DF)                      \
--    do {                                \
--        pwx->DF[2*i]   =3D R##DF(pwt, i); \
--        pwx->DF[2*i+1] =3D R##DF(pws, i); \
--    } while (0)
--MSA_FN_DF(ilvr_df)
--#undef MSA_DO
--
- #undef MSA_LOOP_COND
-=20
- #define MSA_LOOP_COND(DF) \
-@@ -1361,6 +1353,57 @@ void helper_msa_ilvl_df(CPUMIPSState *env, uint32_=
-t df, uint32_t wd,
-     }
- }
-=20
-+void helper_msa_ilvr_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-+    uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
-+
-+    switch (df) {
-+    case DF_BYTE:
-+        pwd->b[0]  =3D pwt->b[0];
-+        pwd->b[1]  =3D pws->b[0];
-+        pwd->b[2]  =3D pwt->b[1];
-+        pwd->b[3]  =3D pws->b[1];
-+        pwd->b[4]  =3D pwt->b[2];
-+        pwd->b[5]  =3D pws->b[2];
-+        pwd->b[6]  =3D pwt->b[3];
-+        pwd->b[7]  =3D pws->b[3];
-+        pwd->b[8]  =3D pwt->b[4];
-+        pwd->b[9]  =3D pws->b[4];
-+        pwd->b[10] =3D pwt->b[5];
-+        pwd->b[11] =3D pws->b[5];
-+        pwd->b[12] =3D pwt->b[6];
-+        pwd->b[13] =3D pws->b[6];
-+        pwd->b[14] =3D pwt->b[7];
-+        pwd->b[15] =3D pws->b[7];
-+        break;
-+    case DF_HALF:
-+        pwd->h[0] =3D pwt->h[0];
-+        pwd->h[1] =3D pws->h[0];
-+        pwd->h[2] =3D pwt->h[1];
-+        pwd->h[3] =3D pws->h[1];
-+        pwd->h[4] =3D pwt->h[2];
-+        pwd->h[5] =3D pws->h[2];
-+        pwd->h[6] =3D pwt->h[3];
-+        pwd->h[7] =3D pws->h[3];
-+        break;
-+    case DF_WORD:
-+        pwd->w[0] =3D pwt->w[0];
-+        pwd->w[1] =3D pws->w[0];
-+        pwd->w[2] =3D pwt->w[1];
-+        pwd->w[3] =3D pws->w[1];
-+        break;
-+    case DF_DOUBLE:
-+        pwd->d[0] =3D pwt->d[0];
-+        pwd->d[1] =3D pws->d[0];
-+        break;
-+    default:
-+        assert(0);
-+    }
-+}
-+
- void helper_msa_sldi_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-                         uint32_t ws, uint32_t n)
- {
---=20
-2.7.4
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDEwMjgxNi4zMzkz
+LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIu
+bWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB1
+aS9jb2NvYTogVXNlIE9TWCdzIG1haW4gbG9vcApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8
+IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTU1MDYwMzcwNC0yMjQ3NC0x
+LWdpdC1zZW5kLWVtYWlsLWFsZWtzYW5kYXIubWFya292aWNAcnQtcmsuY29tIC0+IHBhdGNoZXcv
+MTU1MDYwMzcwNC0yMjQ3NC0xLWdpdC1zZW5kLWVtYWlsLWFsZWtzYW5kYXIubWFya292aWNAcnQt
+cmsuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTQxMDI4MTYu
+MzM5My0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkwMjE0MTAyODE2
+LjMzOTMtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAg
+ICAgcGF0Y2hldy8yMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRoYXQuY29tIC0+IHBh
+dGNoZXcvMjAxOTAyMTgxMjU2MTUuMTg5NzAtMS1hcm1icnVAcmVkaGF0LmNvbQogdCBbdGFnIHVw
+ZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwMjE4MTgxMzQ5LjIzODg1LTEtcHBhbmRpdEBy
+ZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAyMTgxODEzNDkuMjM4ODUtMS1wcGFuZGl0QHJlZGhh
+dC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1OGUwZTQxYmJhIHVpL2NvY29h
+OiBQZXJmb3JtIFVJIG9wZXJhdGlvbnMgb25seSBvbiB0aGUgbWFpbiB0aHJlYWQKNmRiZGQ5YmZj
+YyB1aS9jb2NvYTogU3ViY2xhc3MgTlNBcHBsaWNhdGlvbiBzbyB3ZSBjYW4gaW1wbGVtZW50IHNl
+bmRFdmVudApmYmE0MWYzOWZiIHVpL2NvY29hOiBEb24ndCBjYWxsIE5TQXBwIHNlbmRFdmVudCBk
+aXJlY3RseSBmcm9tIGhhbmRsZUV2ZW50Cjg0YjEwZTE0OGYgdWkvY29jb2E6IE1vdmUgY29uc29s
+ZS9kZXZpY2UgbWVudSBjcmVhdGlvbiBjb2RlIHVwIGluIGZpbGUKOTIwYWFhYWNlZSB1aS9jb2Nv
+YTogRmFjdG9yIG91dCBpbml0aWFsIG1lbnUgY3JlYXRpb24KYTQ1YjJjNWQ2NyB1aS9jb2NvYTog
+VXNlIHRoZSBwaXhtYW4gaW1hZ2UgZGlyZWN0bHkgaW4gc3dpdGNoU3VyZmFjZQo3YmY2NDNhOGJl
+IHVpL2NvY29hOiBFbnN1cmUgd2UgaGF2ZSB0aGUgaW90aHJlYWQgbG9jayB3aGVuIGNhbGxpbmcg
+aW50byBRRU1VCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzcgQ2hlY2tpbmcgY29tbWl0IDdiZjY0
+M2E4YmU2ZCAodWkvY29jb2E6IEVuc3VyZSB3ZSBoYXZlIHRoZSBpb3RocmVhZCBsb2NrIHdoZW4g
+Y2FsbGluZyBpbnRvIFFFTVUpCjIvNyBDaGVja2luZyBjb21taXQgYTQ1YjJjNWQ2N2M5ICh1aS9j
+b2NvYTogVXNlIHRoZSBwaXhtYW4gaW1hZ2UgZGlyZWN0bHkgaW4gc3dpdGNoU3VyZmFjZSkKMy83
+IENoZWNraW5nIGNvbW1pdCA5MjBhYWFhY2VlMDcgKHVpL2NvY29hOiBGYWN0b3Igb3V0IGluaXRp
+YWwgbWVudSBjcmVhdGlvbikKNC83IENoZWNraW5nIGNvbW1pdCA4NGIxMGUxNDhmMjggKHVpL2Nv
+Y29hOiBNb3ZlIGNvbnNvbGUvZGV2aWNlIG1lbnUgY3JlYXRpb24gY29kZSB1cCBpbiBmaWxlKQo1
+LzcgQ2hlY2tpbmcgY29tbWl0IGZiYTQxZjM5ZmJiMyAodWkvY29jb2E6IERvbid0IGNhbGwgTlNB
+cHAgc2VuZEV2ZW50IGRpcmVjdGx5IGZyb20gaGFuZGxlRXZlbnQpCkVSUk9SOiB0cmFpbGluZyB3
+aGl0ZXNwYWNlCiM0NDogRklMRTogdWkvY29jb2EubToxNTI6CisgICAgJAoKdG90YWw6IDEgZXJy
+b3JzLCAwIHdhcm5pbmdzLCAxMjIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS83IGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgo2LzcgQ2hlY2tpbmcgY29tbWl0IDZkYmRkOWJmY2MyNiAodWkvY29j
+b2E6IFN1YmNsYXNzIE5TQXBwbGljYXRpb24gc28gd2UgY2FuIGltcGxlbWVudCBzZW5kRXZlbnQp
+CjcvNyBDaGVja2luZyBjb21taXQgNThlMGU0MWJiYTk4ICh1aS9jb2NvYTogUGVyZm9ybSBVSSBv
+cGVyYXRpb25zIG9ubHkgb24gdGhlIG1haW4gdGhyZWFkKQo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
+ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIu
+bWF5ZGVsbEBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0K
+RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
+Y29t
