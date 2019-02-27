@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51495)
+Received: from eggs.gnu.org ([209.51.188.92]:51504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gz2wT-0003fR-Og
+	(envelope-from <kwolf@redhat.com>) id 1gz2wT-0003fY-PS
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:24:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gz2wO-0003eo-6g
+	(envelope-from <kwolf@redhat.com>) id 1gz2wO-0003em-69
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:24:25 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 27 Feb 2019 18:22:54 +0100
-Message-Id: <20190227172256.30368-19-kwolf@redhat.com>
+Date: Wed, 27 Feb 2019 18:22:50 +0100
+Message-Id: <20190227172256.30368-15-kwolf@redhat.com>
 In-Reply-To: <20190227172256.30368-1-kwolf@redhat.com>
 References: <20190227172256.30368-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 18/20] qemu-iotests: Preallocation with
- external data file
+Subject: [Qemu-devel] [PATCH 14/20] qcow2: Add basic data-file infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +24,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-Test that preallocating metadata results in a somewhat larger qcow2
-file, but preallocating data only affects the disk usage of the data
-file and the qcow2 file stays small.
+This adds a .bdrv_open option to specify the external data file node.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/243     | 22 ++++++++++++++++++++++
- tests/qemu-iotests/243.out | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
+ qapi/block-core.json |  7 ++++++-
+ block/qcow2.h        |  4 +++-
+ block/qcow2.c        | 34 ++++++++++++++++++++++++++++++++--
+ 3 files changed, 41 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/243 b/tests/qemu-iotests/243
-index 5ab1b7863d..0e807dabf6 100755
---- a/tests/qemu-iotests/243
-+++ b/tests/qemu-iotests/243
-@@ -29,6 +29,7 @@ status=3D1	# failure is the default!
- _cleanup()
- {
-     _cleanup_test_img
-+    rm -f $TEST_IMG.data
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 2b8afbb924..de4d4fd0e4 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3080,6 +3080,10 @@
+ #                         encrypted images, except when doing a metadata=
+-only
+ #                         probe of the image. (since 2.10)
+ #
++# @data-file:             reference to or definition of the external dat=
+a file.
++#                         This may only be specified for images that req=
+uire an
++#                         external data file. (since 4.0)
++#
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsQcow2',
+@@ -3094,7 +3098,8 @@
+             '*l2-cache-entry-size': 'int',
+             '*refcount-cache-size': 'int',
+             '*cache-clean-interval': 'int',
+-            '*encrypt': 'BlockdevQcow2Encryption' } }
++            '*encrypt': 'BlockdevQcow2Encryption',
++            '*data-file': 'BlockdevRef' } }
+=20
+ ##
+ # @SshHostKeyCheckMode:
+diff --git a/block/qcow2.h b/block/qcow2.h
+index aac7fc4348..f23c003a46 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -91,6 +91,7 @@
+=20
+ #define DEFAULT_CLUSTER_SIZE 65536
+=20
++#define QCOW2_OPT_DATA_FILE "data-file"
+ #define QCOW2_OPT_LAZY_REFCOUNTS "lazy-refcounts"
+ #define QCOW2_OPT_DISCARD_REQUEST "pass-discard-request"
+ #define QCOW2_OPT_DISCARD_SNAPSHOT "pass-discard-snapshot"
+@@ -205,7 +206,8 @@ enum {
+     QCOW2_INCOMPAT_DATA_FILE        =3D 1 << QCOW2_INCOMPAT_DATA_FILE_BI=
+TNR,
+=20
+     QCOW2_INCOMPAT_MASK             =3D QCOW2_INCOMPAT_DIRTY
+-                                    | QCOW2_INCOMPAT_CORRUPT,
++                                    | QCOW2_INCOMPAT_CORRUPT
++                                    | QCOW2_INCOMPAT_DATA_FILE,
+ };
+=20
+ /* Compatible feature bits */
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b77d856007..37ab645e7b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1441,8 +1441,31 @@ static int coroutine_fn qcow2_do_open(BlockDriverS=
+tate *bs, QDict *options,
+         goto fail;
+     }
+=20
+-    /* TODO Open external data file */
+-    s->data_file =3D bs->file;
++    /* Open external data file */
++    s->data_file =3D bdrv_open_child(NULL, options, "data-file", bs, &ch=
+ild_file,
++                                   true, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret =3D -EINVAL;
++        goto fail;
++    }
++
++    if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
++        if (!s->data_file) {
++            error_setg(errp, "'data-file' is required for this image");
++            ret =3D -EINVAL;
++            goto fail;
++        }
++    } else {
++        if (s->data_file) {
++            error_setg(errp, "'data-file' can only be set for images wit=
+h an "
++                             "external data file");
++            ret =3D -EINVAL;
++            goto fail;
++        } else {
++            s->data_file =3D bs->file;
++        }
++    }
+=20
+     /* qcow2_read_extension may have set up the crypto context
+      * if the crypt method needs a header region, some methods
+@@ -1615,6 +1638,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverSt=
+ate *bs, QDict *options,
+     return ret;
+=20
+  fail:
++    if (has_data_file(bs)) {
++        bdrv_unref_child(bs, s->data_file);
++    }
+     g_free(s->unknown_header_fields);
+     cleanup_unknown_header_ext(bs);
+     qcow2_free_snapshots(bs);
+@@ -2234,6 +2260,10 @@ static void qcow2_close(BlockDriverState *bs)
+     g_free(s->image_backing_file);
+     g_free(s->image_backing_format);
+=20
++    if (has_data_file(bs)) {
++        bdrv_unref_child(bs, s->data_file);
++    }
++
+     qcow2_refcount_close(bs);
+     qcow2_free_snapshots(bs);
  }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-=20
-@@ -57,6 +58,27 @@ for mode in off metadata falloc full; do
-=20
- done
-=20
-+for mode in off metadata falloc full; do
-+
-+    echo
-+    echo "=3D=3D=3D External data file: preallocation=3D$mode =3D=3D=3D"
-+    echo
-+
-+    IMGOPTS=3D"data_file=3D$TEST_IMG.data,preallocation=3D$mode" _make_t=
-est_img 64M
-+
-+    echo -n "qcow2 file size: "
-+    du -b $TEST_IMG | cut -f1
-+    echo -n "data file size:  "
-+    du -b $TEST_IMG.data | cut -f1
-+
-+    # Can't use precise numbers here because they differ between filesys=
-tems
-+    echo -n "qcow2 disk usage: "
-+    [ $(du -B1 $TEST_IMG | cut -f1) -lt 1048576 ] && echo "low" || echo =
-"high"
-+    echo -n "data disk usage:  "
-+    [ $(du -B1 $TEST_IMG.data | cut -f1) -lt 1048576 ] && echo "low" || =
-echo "high"
-+
-+done
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/243.out b/tests/qemu-iotests/243.out
-index e531753ad1..dcb33fac32 100644
---- a/tests/qemu-iotests/243.out
-+++ b/tests/qemu-iotests/243.out
-@@ -23,4 +23,36 @@ Disk usage: high
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
-on=3Dfull
- File size: 67436544
- Disk usage: high
-+
-+=3D=3D=3D External data file: preallocation=3Doff =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3D=
-TEST_DIR/t.IMGFMT.data preallocation=3Doff
-+qcow2 file size: 196616
-+data file size:  67108864
-+qcow2 disk usage: low
-+data disk usage:  low
-+
-+=3D=3D=3D External data file: preallocation=3Dmetadata =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3D=
-TEST_DIR/t.IMGFMT.data preallocation=3Dmetadata
-+qcow2 file size: 327680
-+data file size:  67108864
-+qcow2 disk usage: low
-+data disk usage:  low
-+
-+=3D=3D=3D External data file: preallocation=3Dfalloc =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3D=
-TEST_DIR/t.IMGFMT.data preallocation=3Dfalloc
-+qcow2 file size: 327680
-+data file size:  67108864
-+qcow2 disk usage: low
-+data disk usage:  high
-+
-+=3D=3D=3D External data file: preallocation=3Dfull =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3D=
-TEST_DIR/t.IMGFMT.data preallocation=3Dfull
-+qcow2 file size: 327680
-+data file size:  67108864
-+qcow2 disk usage: low
-+data disk usage:  high
- *** done
 --=20
 2.20.1
