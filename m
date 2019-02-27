@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52993)
+Received: from eggs.gnu.org ([209.51.188.92]:54104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyzWF-0007c5-2G
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:45:07 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gyzZe-000256-RZ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:48:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gyzWE-0003St-4j
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:45:07 -0500
-From: David Hildenbrand <david@redhat.com>
-References: <20190227111411.22890-1-david@redhat.com>
-	<20190227111411.22890-2-david@redhat.com>
-	<87lg21lai8.fsf@zen.linaroharston>
-	<467f1311-0534-232d-b85d-2d6e0fd47661@redhat.com>
-Message-ID: <30288f51-ebcf-d0c7-ea2c-1a19a8575115@redhat.com>
-Date: Wed, 27 Feb 2019 14:44:47 +0100
+	(envelope-from <mreitz@redhat.com>) id 1gyzZe-0006Fu-5z
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:48:38 -0500
+References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
+	<20181214134240.217870-5-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ba0783f0-768f-e1bd-2d14-738640b0a167@redhat.com>
+Date: Wed, 27 Feb 2019 13:32:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <467f1311-0534-232d-b85d-2d6e0fd47661@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 1/2] tests/tcg: Allow targets to set
- the optimization level
+In-Reply-To: <20181214134240.217870-5-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="J2vZashBWpK7Gx6xFpLkse491t38QvLiJ"
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] qcow2-refcount: check_refcounts_l2:
+ don't count fixed cluster as allocated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
-On 27.02.19 13:42, David Hildenbrand wrote:
-> On 27.02.19 12:46, Alex Benn=C3=A9e wrote:
->>
->> David Hildenbrand <david@redhat.com> writes:
->>
->>> We sometimes want basic optimizations, e.g. for constant propagation
->>> into inlined functions.
->>>
->>> Especially for inline asm with immediates;
->>
->> I agree you need this, but...
->>
->> <snip>
->>>  # Start with a blank slate, the build targets get to add stuff first
->>> -CFLAGS=3D
->>> +CFLAGS=3D-O0
->>>  QEMU_CFLAGS=3D
->>>  LDFLAGS=3D
->>>
->>> @@ -70,7 +70,7 @@ ifneq ($(TARGET_BASE_ARCH),$(TARGET_NAME))
->>>  endif
->>>
->>>  # Add the common build options
->>> -CFLAGS+=3D-Wall -O0 -g -fno-strict-aliasing
->>> +CFLAGS+=3D-Wall -g -fno-strict-aliasing
->>
->>
->> You don't need to do this - we already have EXTRA_CFLAGS which will
->> always be at the end of the compile invocation:
->>
->>   # enable vectors and optimisation to vectorise for this test
->>   vglv: CFLAGS+=3D-march=3Dz13 -m64
->>   vglv: EXTRA_CFLAGS+=3D-O2
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--J2vZashBWpK7Gx6xFpLkse491t38QvLiJ
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
+Message-ID: <ba0783f0-768f-e1bd-2d14-738640b0a167@redhat.com>
+Subject: Re: [PATCH v4 4/5] qcow2-refcount: check_refcounts_l2: don't count
+ fixed cluster as allocated
+References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
+ <20181214134240.217870-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20181214134240.217870-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 14.12.18 14:42, Vladimir Sementsov-Ogievskiy wrote:
+> Do not count a cluster which is fixed to be ZERO as allocated.
 >=20
-> For whatever reason I can't get this to work. EXTRA_CFLAGS+=3D-O2 is
-> always silently dropped:
->=20
-> make SHELL=3D'sh -x' run-tcg-tests-s390x-linux-user
->=20
-> + /home/dhildenb/git/qemu/tests/docker/docker.py cc --user 100813 --cc
-> s390x-linux-gnu-gcc -i qemu:debian-s390x-cross -s
-> /home/dhildenb/git/qemu -- -march=3DzEC12 -m64 -Wall -O0 -g
-> -fno-strict-aliasing -march=3Dz13
-> /home/dhildenb/git/qemu/tests/tcg/s390x/vlgv.c -o vlgv -static
-> /home/dhildenb/git/qemu/tests/tcg/s390x/vlgv.c: In function 'vlgv':
-> /home/dhildenb/git/qemu/tests/tcg/s390x/vlgv.c:8:5: warning: asm operan=
-d
-> 3 probably doesn't match constraints
->      asm volatile("vlgv %[r1], %[v3], 0(%[a2]), %[m4]\n"
->      ^~~
-> /home/dhildenb/git/qemu/tests/tcg/s390x/vlgv.c:8:5: error: impossible
-> constraint in 'asm'
->=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-refcount.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 
-vlgv: CFLAGS+=3D-march=3Dz13 -O2
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-However works. I am very confused now. I guess this is about evaluation
-order or something like that.
 
---=20
+--J2vZashBWpK7Gx6xFpLkse491t38QvLiJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
-David / dhildenb
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlx2g3oACgkQ9AfbAGHV
+z0DNvQf8D/V/RwxmnXTubpCcuR0avcxLYFL8KNS+fHC5ONy1xFmefxMCgF2klDdC
+aJrlZhD4GSMSeMkBmxGExULl6gyLIxFSVFH9OJVTyByqIMUqyGgMfOSESn//s1nC
+KjP8k1uqm1fzc+KiOyVLGiQ0qoQAd3lUwo18RcVtebfAhMq79kwPkLdVqjY5H4Ly
+fdARCqfFVp8uow5oRbDeIbetsB95m2a3P9T8KG0+eKDHYbNkQHhSgIykpZvZGTBx
+ASEIsv3JNmu24GXpnTmkd31TujSxJEdcPJVSU99ZAaIeJdfyt5Si+EoHX4ccQU8C
+rWuMVHZ1al636Nc2aeSvSdJB8+tN/Q==
+=EfJD
+-----END PGP SIGNATURE-----
+
+--J2vZashBWpK7Gx6xFpLkse491t38QvLiJ--
