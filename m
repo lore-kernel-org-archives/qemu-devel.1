@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57066)
+Received: from eggs.gnu.org ([209.51.188.92]:59366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gyuIz-0005So-Bk
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:11:06 -0500
+	(envelope-from <thuth@redhat.com>) id 1gyuTl-00074N-0Q
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:22:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gyuIy-0007I0-8O
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:11:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45372)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gyuIu-00074h-T9
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:11:03 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gyuIj-0006LV-1T
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 08:10:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0280D2E80C7
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 08:10:49 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1gyuTk-00053r-2F
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:22:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:14568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gyuTi-0004zg-Rf
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 03:22:11 -0500
+References: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
+	<1550847320-25110-11-git-send-email-jasowang@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <30e7bd39-7ca1-fd1a-1864-b3a0a390f4fc@redhat.com>
+Date: Wed, 27 Feb 2019 09:21:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Feb 2019 07:59:01 -0000
-From: RTOS Pharos <1817846@bugs.launchpad.net>
-Reply-To: Bug 1817846 <1817846@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155125434202.29829.12830631606462823569.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1817846] [NEW] Qemu 3.1 Aarch64 TLBI VAE1, x0
+In-Reply-To: <1550847320-25110-11-git-send-email-jasowang@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 10/13] tests: Add a test for qemu self
+ announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,135 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: Vlad Yasevich <vyasevic@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Public bug reported:
+On 22/02/2019 15.55, Jason Wang wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> We now expose qemu_announce_self through QMP and HMP.  Add a test
+> with some very basic packet validation (make sure we get a RARP).
+> 
+> Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  tests/Makefile.include     |  3 ++
+>  tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 86 insertions(+)
+>  create mode 100644 tests/test-announce-self.c
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index b39e989..1b0874c 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -144,6 +144,7 @@ check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
+>  
+>  check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
+>  check-qtest-generic-y += tests/cdrom-test$(EXESUF)
+> +gcov-files-generic-y = migration/savevm.c
 
-Hello,
+AFAIK you don't need these gcov lines anymore. See commit
+26830e9325d05d537dd9a3765437908771d19475.
 
-In my code I'm trying to remove some permissions to a 4KiB MMU
-descriptor. After that I invalidate the MMU with
-
-TLBI VAE1, x0
-
-where x0 is the start of the address of the 4 KiB page.
-
-In Qemu 2.12 this did not work, but I worked around it with:
-
-
-    /* invalidate the address */
-    TLBI VAE1, x0
-
-
-    /*****************************************************************/
-    /*****************************************************************/
-    /* NOTE: THIS IS A TRICK FOR QEMU!!!!!!!!!!!!                          =
-                                     */
-    /* Apparently we have to change the TTBR0_EL1 when we change a descript=
-or (especially to remove permissions) */
-    /* Otherwise qemu (2.12) will continue with the same descriptor with pe=
-rmissions!                          **/
-   /*****************************************************************/
-   /*****************************************************************/
-     =
-
-    /* do a trick (in qemu) */
-    mrs     x1 , TTBR0_EL1
-
-    ldr     x2 , =3DkernelTable0Table
-
-    msr     TTBR0_EL1 , x2
-
-    isb
-
-    msr     TTBR0_EL1 , x1
-
-    /* return from function */
-    ret
-
-
-That is, I just replaced the TTBR0_EL1 with a temporary value, and then res=
-tored it. (guess qemu 2.12 just needed to reload the values again).
-
-However, even this procedure is not working with qemu 3.1. (I just
-tested again with qemu 2.12 and the code works fine, with qemu 3.1 it
-does not).
-
-Thanks,
-Pharos team
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817846
-
-Title:
-  Qemu 3.1 Aarch64 TLBI VAE1, x0
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  In my code I'm trying to remove some permissions to a 4KiB MMU
-  descriptor. After that I invalidate the MMU with
-
-  TLBI VAE1, x0
-
-  where x0 is the start of the address of the 4 KiB page.
-
-  In Qemu 2.12 this did not work, but I worked around it with:
-
-  =
-
-      /* invalidate the address */
-      TLBI VAE1, x0
-
-  =
-
-      /*****************************************************************/
-      /*****************************************************************/
-      /* NOTE: THIS IS A TRICK FOR QEMU!!!!!!!!!!!!                        =
-                                       */
-      /* Apparently we have to change the TTBR0_EL1 when we change a descri=
-ptor (especially to remove permissions) */
-      /* Otherwise qemu (2.12) will continue with the same descriptor with =
-permissions!                          **/
-     /*****************************************************************/
-     /*****************************************************************/
-       =
-
-      /* do a trick (in qemu) */
-      mrs     x1 , TTBR0_EL1
-
-      ldr     x2 , =3DkernelTable0Table
-
-      msr     TTBR0_EL1 , x2
-
-      isb
-
-      msr     TTBR0_EL1 , x1
-
-      /* return from function */
-      ret
-
-  =
-
-  That is, I just replaced the TTBR0_EL1 with a temporary value, and then r=
-estored it. (guess qemu 2.12 just needed to reload the values again).
-
-  However, even this procedure is not working with qemu 3.1. (I just
-  tested again with qemu 2.12 and the code works fine, with qemu 3.1 it
-  does not).
-
-  Thanks,
-  Pharos team
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817846/+subscriptions
+ Thomas
