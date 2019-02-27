@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36821)
+Received: from eggs.gnu.org ([209.51.188.92]:37021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gz0Du-0000Hg-2f
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:30:15 -0500
+	(envelope-from <richard.weiyang@gmail.com>) id 1gz0Eg-0000ZI-PH
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:31:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gz0Cp-00077z-94
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:29:08 -0500
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:40881)
+	(envelope-from <richard.weiyang@gmail.com>) id 1gz0Au-0005zf-39
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:27:08 -0500
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:34803)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1gz0Co-00076B-VC
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:29:07 -0500
-Received: by mail-ed1-x543.google.com with SMTP id 10so14043857eds.7
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 06:29:05 -0800 (PST)
-Date: Wed, 27 Feb 2019 14:29:03 +0000
+	id 1gz0At-0005op-SL
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:27:08 -0500
+Received: by mail-ed1-x541.google.com with SMTP id a16so14075452edn.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 06:26:54 -0800 (PST)
+Date: Wed, 27 Feb 2019 14:26:51 +0000
 From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190227142903.cvqrc453tgcme77f@master>
+Message-ID: <20190227142651.3enr2eey5bn2v6ls@master>
 Reply-To: Wei Yang <richard.weiyang@gmail.com>
 References: <20190226073159.13434-1-richardw.yang@linux.intel.com>
-	<bf6ad77d-6514-57b3-141b-530f46500b57@redhat.com>
-	<20190227030715.GA5449@richard>
-	<20190227085442-mutt-send-email-mst@kernel.org>
+	<20190226110934-mutt-send-email-mst@kernel.org>
+	<20190227053319.GB5449@richard>
+	<20190227084843-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190227085442-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190227084843-mutt-send-email-mst@kernel.org>
 Subject: Re: [Qemu-devel] [PATCH] fw_cfg: use __ATTR_RO_MODE to define rev
  sysfs
 List-Id: <qemu-devel.nongnu.org>
@@ -36,14 +35,12 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, somlo@cmu.edu, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
+Cc: Wei Yang <richardw.yang@linux.intel.com>, somlo@cmu.edu, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
 
-On Wed, Feb 27, 2019 at 08:54:58AM -0500, Michael S. Tsirkin wrote:
->On Wed, Feb 27, 2019 at 11:07:16AM +0800, Wei Yang wrote:
->> On Tue, Feb 26, 2019 at 07:45:46PM +0100, Philippe Mathieu-Daudé wrote:
->> >Hi Wei,
->> >
->> >On 2/26/19 8:31 AM, Wei Yang wrote:
+On Wed, Feb 27, 2019 at 08:51:11AM -0500, Michael S. Tsirkin wrote:
+>On Wed, Feb 27, 2019 at 01:33:19PM +0800, Wei Yang wrote:
+>> On Tue, Feb 26, 2019 at 11:10:06AM -0500, Michael S. Tsirkin wrote:
+>> >On Tue, Feb 26, 2019 at 03:31:59PM +0800, Wei Yang wrote:
 >> >> Leverage __ATTR_RO_MODE to define rev sysfs instead of using open code
 >> >> to define the attribute.
 >> >> 
@@ -76,27 +73,34 @@ On Wed, Feb 27, 2019 at 08:54:58AM -0500, Michael S. Tsirkin wrote:
 >> >> -};
 >> >> +static const struct kobj_attribute fw_cfg_rev_attr =
 >> >> +	__ATTR_RO_MODE(fw_cfg_rev, 0400);
->> >
->> >Why not keep S_IRUSR?
->> >
->> 
->> Because scripts/checkpatch.pl suggest not use S_IRUSR :-)
->> 
->> I am not sure about the particular reason.
->
->Oh yea.
->
->http://lkml.kernel.org/r/CA+55aFw5v23T-zvDZp-MmD_EYxF8WbafwwB59934FV7g21uMGQ@mail.gmail.com
->
->maybe mention this in the commit log.
->
-
-Thanks :-)
-
 >> >>  
 >> >>  /* fw_cfg_sysfs_entry type */
 >> >>  struct fw_cfg_sysfs_entry {
->> >> 
+>> >
+>> >
+>> >Looks like this will change the name from "rev" to "fw_cfg_rev".
+>> >That's a userspace visible change which we should not do lightly.
+>> 
+>> You are right, I should keep the interface untouched.
+>> 
+>> To keep it user un-visible, we could change like below:
+>> 
+>> -       __ATTR_RO(fw_cfg_rev);
+>> +       __ATTR_RO(rev);
+>> 
+>> Is this better for you?
+>
+>
+>Also why use 0400 and not S_IRUSR?
+>
+
+This is interesting. The scripts/checkpatch.pl suggest to use 0400.
+
+I am not sure why the script give this suggestion. Maybe we need to fix
+the script?
+
+>> >> -- 
+>> >> 2.19.1
 >> 
 >> -- 
 >> Wei Yang
