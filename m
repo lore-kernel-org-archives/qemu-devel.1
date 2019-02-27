@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51653)
+Received: from eggs.gnu.org ([209.51.188.92]:51122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyzUt-0005jH-Dk
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyzUt-00057B-Nm
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyzIq-0003u5-Bk
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:31:17 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gyzIk-0003r5-1P
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:31:10 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 27 Feb 2019 16:14:30 +0300
-Message-Id: <20190227131433.197063-3-vsementsov@virtuozzo.com>
+Date: Wed, 27 Feb 2019 16:14:33 +0300
+Message-Id: <20190227131433.197063-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20190227131433.197063-1-vsementsov@virtuozzo.com>
 References: <20190227131433.197063-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 2/5] qcow2-refcount: avoid eating RAM
+Subject: [Qemu-devel] [PATCH v5 5/5] qcow2-refcount: don't mask corruptions
+ under internal errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,97 +23,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, den@virtuozzo.com, vsementsov@virtuozzo.com
 
-qcow2_inc_refcounts_imrt() (through realloc_refcount_array()) can eat
-an unpredictable amount of memory on corrupted table entries, which are
-referencing regions far beyond the end of file.
-
-Prevent this, by skipping such regions from further processing.
-
-Interesting that iotest 138 checks exactly the behavior which we fix
-here. So, change the test appropriately.
+No reasons for not reporting found corruptions as corruptions in case
+of some internal errors, especially in case of just failed to fix l2
+entry (and in this case, missed corruptions may influence comparing
+logic, when we calculate difference between corruptions fields of two
+results)
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-refcount.c     | 19 +++++++++++++++++++
- tests/qemu-iotests/138     | 12 +++++-------
- tests/qemu-iotests/138.out |  5 ++++-
- 3 files changed, 28 insertions(+), 8 deletions(-)
+ block/qcow2-refcount.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 16e8942343..add1bbf54f 100644
+index 35a9d943f2..55dad70a2a 100644
 --- a/block/qcow2-refcount.c
 +++ b/block/qcow2-refcount.c
-@@ -1508,12 +1508,31 @@ int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
- {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t start, last, cluster_offset, k, refcount;
-+    int64_t file_len;
-     int ret;
+@@ -1643,6 +1643,8 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
  
-     if (size <= 0) {
-         return 0;
+             /* Correct offsets are cluster aligned */
+             if (offset_into_cluster(s, offset)) {
++                res->corruptions++;
++
+                 if (qcow2_get_cluster_type(l2_entry) ==
+                     QCOW2_CLUSTER_ZERO_ALLOC)
+                 {
+@@ -1678,18 +1680,16 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+                             /* Do not abort, continue checking the rest of this
+                              * L2 table's entries */
+                         } else {
++                            res->corruptions--;
+                             res->corruptions_fixed++;
+                             /* Skip marking the cluster as used
+                              * (it is unused now) */
+                             continue;
+                         }
+-                    } else {
+-                        res->corruptions++;
+                     }
+                 } else {
+                     fprintf(stderr, "ERROR offset=%" PRIx64 ": Data cluster is "
+                         "not properly aligned; L2 entry corrupted.\n", offset);
+-                    res->corruptions++;
+                 }
+             }
+ 
+@@ -1858,6 +1858,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+             continue;
+         }
+         if ((refcount == 1) != ((l1_entry & QCOW_OFLAG_COPIED) != 0)) {
++            res->corruptions++;
+             fprintf(stderr, "%s OFLAG_COPIED L2 cluster: l1_index=%d "
+                     "l1_entry=%" PRIx64 " refcount=%" PRIu64 "\n",
+                     repair ? "Repairing" : "ERROR", i, l1_entry, refcount);
+@@ -1870,9 +1871,8 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+                     res->check_errors++;
+                     goto fail;
+                 }
++                res->corruptions--;
+                 res->corruptions_fixed++;
+-            } else {
+-                res->corruptions++;
+             }
+         }
+ 
+@@ -1900,6 +1900,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+                     continue;
+                 }
+                 if ((refcount == 1) != ((l2_entry & QCOW_OFLAG_COPIED) != 0)) {
++                    res->corruptions++;
+                     fprintf(stderr, "%s OFLAG_COPIED data cluster: "
+                             "l2_entry=%" PRIx64 " refcount=%" PRIu64 "\n",
+                             repair ? "Repairing" : "ERROR", l2_entry, refcount);
+@@ -1908,8 +1909,6 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+                                     ? l2_entry |  QCOW_OFLAG_COPIED
+                                     : l2_entry & ~QCOW_OFLAG_COPIED);
+                         l2_dirty++;
+-                    } else {
+-                        res->corruptions++;
+                     }
+                 }
+             }
+@@ -1933,6 +1932,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+                 res->check_errors++;
+                 goto fail;
+             }
++            res->corruptions -= l2_dirty;
+             res->corruptions_fixed += l2_dirty;
+         }
      }
+@@ -1971,6 +1971,7 @@ static int check_refblocks(BlockDriverState *bs, BdrvCheckResult *res,
+         }
  
-+    file_len = bdrv_getlength(bs->file->bs);
-+    if (file_len < 0) {
-+        return file_len;
-+    }
-+
-+    /*
-+     * Last cluster of qcow2 image may be semi-allocated, so it may be OK to
-+     * reference some space after file end but it should be less than one
-+     * cluster.
-+     */
-+    if (offset + size - file_len >= s->cluster_size) {
-+        fprintf(stderr, "ERROR: counting reference for region exceeding the "
-+                "end of the file by one cluster or more: offset 0x%" PRIx64
-+                " size 0x%" PRIx64 "\n", offset, size);
-+        res->corruptions++;
-+        return 0;
-+    }
-+
-     start = start_of_cluster(s, offset);
-     last = start_of_cluster(s, offset + size - 1);
-     for(cluster_offset = start; cluster_offset <= last;
-diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
-index eccbcae3a6..12e20762e5 100755
---- a/tests/qemu-iotests/138
-+++ b/tests/qemu-iotests/138
-@@ -54,15 +54,13 @@ $QEMU_IO -c 'write 0 512' "$TEST_IMG" | _filter_qemu_io
- # Put the data cluster at a multiple of 2 TB, resulting in the image apparently
- # having a multiple of 2^32 clusters
- # (To be more specific: It is at 32 PB)
--poke_file "$TEST_IMG" 2048 "\x80\x80\x00\x00\x00\x00\x00\x00"
-+poke_file "$TEST_IMG" $((2048 + 8)) "\x00\x80\x00\x00\x00\x00\x00\x00"
+         if (cluster >= *nb_clusters) {
++            res->corruptions++;
+             fprintf(stderr, "%s refcount block %" PRId64 " is outside image\n",
+                     fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR", i);
  
- # An offset of 32 PB results in qemu-img check having to allocate an in-memory
--# refcount table of 128 TB (16 bit refcounts, 512 byte clusters).
--# This should be generally too much for any system and thus fail.
--# What this test is checking is that the qcow2 driver actually tries to allocate
--# such a large amount of memory (and is consequently aborting) instead of having
--# truncated the cluster count somewhere (which would result in much less memory
--# being allocated and then a segfault occurring).
-+# refcount table of 128 TB (16 bit refcounts, 512 byte clusters), if qemu-img
-+# don't check that referenced data cluster is far beyond the end of file.
-+# But starting from 4.0, qemu-img does this check, and instead of "Cannot
-+# allocate memory", we have an error showing that l2 entry is invalid.
- _check_test_img
+@@ -2010,6 +2011,7 @@ static int check_refblocks(BlockDriverState *bs, BdrvCheckResult *res,
+                     goto resize_fail;
+                 }
  
- # success, all done
-diff --git a/tests/qemu-iotests/138.out b/tests/qemu-iotests/138.out
-index 3fe911f85a..aca7d47a80 100644
---- a/tests/qemu-iotests/138.out
-+++ b/tests/qemu-iotests/138.out
-@@ -5,5 +5,8 @@ QA output created by 138
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=512
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--qemu-img: Check failed: Cannot allocate memory
-+ERROR: counting reference for region exceeding the end of the file by one cluster or more: offset 0x80000000000000 size 0x200
-+
-+1 errors were found on the image.
-+Data may be corrupted, or further writes to the image may corrupt it.
- *** done
++                res->corruptions--;
+                 res->corruptions_fixed++;
+                 ret = qcow2_inc_refcounts_imrt(bs, res,
+                                                refcount_table, nb_clusters,
+@@ -2023,12 +2025,9 @@ static int check_refblocks(BlockDriverState *bs, BdrvCheckResult *res,
+                 continue;
+ 
+ resize_fail:
+-                res->corruptions++;
+                 *rebuild = true;
+                 fprintf(stderr, "ERROR could not resize image: %s\n",
+                         strerror(-ret));
+-            } else {
+-                res->corruptions++;
+             }
+             continue;
+         }
 -- 
 2.18.0
