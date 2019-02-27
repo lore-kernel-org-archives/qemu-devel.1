@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51452)
+Received: from eggs.gnu.org ([209.51.188.92]:51322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fam@euphon.net>) id 1gyzUL-0005fJ-RZ
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:11 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gyzUN-0005cE-LQ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fam@euphon.net>) id 1gyzM2-0005GT-0G
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:34:37 -0500
-Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17855
-	helo=sender1.zoho.com.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fam@euphon.net>) id 1gyzLr-0005AO-3I
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:34:27 -0500
-Date: Wed, 27 Feb 2019 21:33:17 +0800
-From: Fam Zheng <fam@euphon.net>
-Message-ID: <20190227133317.vo3xterwclps7fo2@deb>
-References: <20181031025712.18602-1-famz@redhat.com>
-	<4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
-	<20181114095807.GB22784@magic> <20190109135504.GA12179@redhat.com>
-	<20190109135917.GP3998@redhat.com>
-	<A3EA5405-A5EE-4E77-8C77-A67398756B96@euphon.net>
-	<20190114101515.GA3686@redhat.com>
-	<20190122161236.GZ13143@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gyzMU-0005Vq-4y
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:35:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32899)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzMS-0005OD-7s
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:35:00 -0500
+Date: Wed, 27 Feb 2019 12:58:35 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190227125834.GF2602@work-vm>
+References: <1550847320-25110-1-git-send-email-jasowang@redhat.com>
+	<1550847320-25110-11-git-send-email-jasowang@redhat.com>
+	<30e7bd39-7ca1-fd1a-1864-b3a0a390f4fc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20190122161236.GZ13143@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] tests: vm: auto_install OpenBSD
+In-Reply-To: <30e7bd39-7ca1-fd1a-1864-b3a0a390f4fc@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 10/13] tests: Add a test for qemu self
+ announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,18 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Brad Smith <brad@comstyle.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, Vlad Yasevich <vyasevic@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, 01/22 16:12, Daniel P. Berrang=E9 wrote:
-> > can't you just refresh that pre-built image to have SDL 2, based on you=
-r
-> > auto-install patches, so we don't have to wait for that to merge.
->=20
-> Please could we just get this pre-built img updated so that we are
-> not blocked on the SDL 1 removal anymore.
+* Thomas Huth (thuth@redhat.com) wrote:
+> On 22/02/2019 15.55, Jason Wang wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > We now expose qemu_announce_self through QMP and HMP.  Add a test
+> > with some very basic packet validation (make sure we get a RARP).
+> > 
+> > Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> >  tests/Makefile.include     |  3 ++
+> >  tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 86 insertions(+)
+> >  create mode 100644 tests/test-announce-self.c
+> > 
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index b39e989..1b0874c 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -144,6 +144,7 @@ check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
+> >  
+> >  check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
+> >  check-qtest-generic-y += tests/cdrom-test$(EXESUF)
+> > +gcov-files-generic-y = migration/savevm.c
+> 
+> AFAIK you don't need these gcov lines anymore. See commit
+> 26830e9325d05d537dd9a3765437908771d19475.
 
-Oops. I was seriously distracted from the external mail folders recently..
-Updated the image, please test it.
+Deleted, thanks.
 
-Fam
+Dave
+
+> 
+>  Thomas
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
