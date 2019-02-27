@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58590)
+Received: from eggs.gnu.org ([209.51.188.92]:59074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gyzp9-00063f-Cl
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:04:46 -0500
+	(envelope-from <bounces@canonical.com>) id 1gyzqc-0007UI-Oc
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:06:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gyzp4-0002Lr-BE
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:04:38 -0500
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-	<20181214134240.217870-6-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <15e27f9f-8788-66ce-7843-0922662e42b1@redhat.com>
-Date: Wed, 27 Feb 2019 13:42:33 +0100
+	(envelope-from <bounces@canonical.com>) id 1gyzqb-0003RX-51
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:06:10 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gyzqa-0003Mb-TQ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 09:06:09 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gyzqR-0005BF-Cg
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 14:05:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5C2D02E80C9
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 14:05:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181214134240.217870-6-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kbv0elEJACZq3qiI0B4dVZ4QPzpxHYd13"
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] qcow2-refcount: don't mask
- corruptions under internal errors
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 27 Feb 2019 13:55:56 -0000
+From: elmarco <marcandre.lureau@gmail.com>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <155127575610.17656.12750131598490665117.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
+ signal 31 in __pthread_setaffinity_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kbv0elEJACZq3qiI0B4dVZ4QPzpxHYd13
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org
-Message-ID: <15e27f9f-8788-66ce-7843-0922662e42b1@redhat.com>
-Subject: Re: [PATCH v4 5/5] qcow2-refcount: don't mask corruptions under
- internal errors
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
- <20181214134240.217870-6-vsementsov@virtuozzo.com>
-In-Reply-To: <20181214134240.217870-6-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+See also mesa bug:
+https://bugs.freedesktop.org/show_bug.cgi?id=3D109695
 
-On 14.12.18 14:42, Vladimir Sementsov-Ogievskiy wrote:
-> No reasons for not reporting found corruptions as corruptions in case
-> of some internal errors, especially in case of just failed to fix l2
-> entry (and in this case, missed corruptions may influence comparing
-> logic, when we calculate difference between corruptions fields of two
-> results)
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2-refcount.c | 31 ++++++++++++++-----------------
->  1 file changed, 14 insertions(+), 17 deletions(-)
->=20
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index 8da0e91dd3..b0e006e628 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
+** Bug watch added: freedesktop.org Bugzilla #109695
+   https://bugs.freedesktop.org/show_bug.cgi?id=3D109695
 
-[...]
+-- =
 
-> @@ -1899,19 +1899,16 @@ static int check_oflag_copied(BlockDriverState =
-*bs, BdrvCheckResult *res,
->                      fprintf(stderr, "%s OFLAG_COPIED data cluster: "
->                              "l2_entry=3D%" PRIx64 " refcount=3D%" PRIu=
-64 "\n",
->                              repair ? "Repairing" : "ERROR", l2_entry, =
-refcount);
-> -                    if (repair) {
-> -                        l2_table[j] =3D cpu_to_be64(refcount =3D=3D 1
-> -                                    ? l2_entry |  QCOW_OFLAG_COPIED
-> -                                    : l2_entry & ~QCOW_OFLAG_COPIED);
-> -                        l2_dirty++;
-> -                    } else {
-> -                        res->corruptions++;
-> -                    }
-> +                    l2_table[j] =3D cpu_to_be64(refcount =3D=3D 1
-> +                                ? l2_entry |  QCOW_OFLAG_COPIED
-> +                                : l2_entry & ~QCOW_OFLAG_COPIED);
-> +                    l2_dirty++;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
 
-I found the old logic to be easier to understand, actually.  It made it
-clear that if !repair, the L2 table is not going to be touched.
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
 
-Max
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
 
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
 
---kbv0elEJACZq3qiI0B4dVZ4QPzpxHYd13
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlx2hbkACgkQ9AfbAGHV
-z0C1SQgAsYiK8CsuqKw3iaq02dDTnrPxwKJMkteINlVY39d3pDTTak75qMTWC5Hb
-Vw91WdMAcqNPA2LF1j8f5U7hhYNQacm+rVGzR1ohIwSde13H4ZWb/znJ6STbhun7
-vYyzB7C3g5jnF7jiBw+inzJkfsHtPXxDAO5WGSnYn413rBW6TYYQubRcx7guz8D6
-SlMLtFm/jgAlyvu9FxgS9a4vX13i0VbfafyrQfw10LEWSr/4DM6wvQYy7gWPBkEN
-3RsDxt2Z5eur7qrxXGZHTQ4Q8Q0Ji7ME4MWz8gOn2tUzfkGkPdVrXjpJKDBdVcFs
-hxs5EvCIhnsBE+WGrsNQ/en23qiQ0A==
-=VpLH
------END PGP SIGNATURE-----
-
---kbv0elEJACZq3qiI0B4dVZ4QPzpxHYd13--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815889/+subscriptions
