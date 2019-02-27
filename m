@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53819)
+Received: from eggs.gnu.org ([209.51.188.92]:53831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gywQc-0002Eb-4U
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:27:07 -0500
+	(envelope-from <bounces@canonical.com>) id 1gywQc-0002G3-J7
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:27:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gywFc-00081E-Bi
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:15:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37810)
+	(envelope-from <bounces@canonical.com>) id 1gywFc-00081L-DJ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:15:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gywFc-0007zL-4s
+	id 1gywFc-000809-67
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:15:44 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gywFX-00025l-RS
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:15:39 +0000
+	id 1gywFa-0002Cy-Gb
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:15:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C84E22E8029
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:15:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7AB362E80C9
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:15:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Feb 2019 09:56:22 -0000
+Date: Wed, 27 Feb 2019 10:01:15 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1815889@bugs.launchpad.net>
 Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
-Message-Id: <155126138242.29074.4916965150759165189.malone@chaenomeles.canonical.com>
+Message-Id: <155126167505.18566.11713975222144926222.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
  signal 31 in __pthread_setaffinity_new()
@@ -39,22 +39,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
->From Ubuntu's POV this is rather new as the code in Mesa came in with the f=
-resh 18.3.0_rc4-1
-It is possible that no one else saw it so far ...
-It is in mesa upstream since
-  https://github.com/mesa3d/mesa/commit/d877451b48a59ab0f9a4210fc736f51da58=
-51c9a
+Summary:
+- qemu crash when using GL
+- "sched_setaffinity" is the syscall that is seccomp blocked and kills qemu
+- the mesa i915 drivers (and your radeon as well) will do that call
+- it is blocked by the current qemu -sanbox on,...,resourcecontrol=3Ddeny w=
+hich is libvirts default
+- Implemented by qemu 24f8cdc572
+- Similar issue being fixed last year qemu 056de1e894
+- new code in mesa 18.3 since mesa d877451b48
 
-But opinions might differ ...
-I'll subscribe upstream qemu to this bug and then post a summary here.
-This will mirror the bug updates to the Mailing List, if there is no harsh =
-feedback I'll propose a patch to remove sched_setaffinity from the list of =
-blocked calls.
+I think we just need to allow sched_setaffinity with these new mesa drivers=
+ in the wild.
+The alternative to detect gl usage in libvirt and only then allow ressource=
+control IMHO seems over-engineered (needs internals to actually pass the ne=
+ed of seccomp subsets to be switched) and not better (more syscalls will be=
+ non-blocked then as the -secomp interface isn't fine grained).
 
-** Also affects: qemu
-   Importance: Undecided
-       Status: New
+OTOH the man page literally says "... Disable process affinity ...", so I'm=
+ not sure we can just remove it. Maybe split resourcecontrol in two, put *a=
+ffinity* in the new one and make the default being not blocked - so that up=
+per layers like libvirt will work until one explicitly states ... -sandbox =
+on,affinity=3Don which no one wanting to use GL would do. That again seems =
+too much.
+Well the discussion will happen either here on ML/bug or latter when submit=
+ting an RFC for it.
 
 -- =
 
