@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53831)
+Received: from eggs.gnu.org ([209.51.188.92]:53819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gywQc-0002G3-J7
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:27:12 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gywQk-0002Eb-IL
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:27:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gywFc-00081L-DJ
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:15:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37938)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gywFc-000809-67
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:15:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gywFa-0002Cy-Gb
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:15:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7AB362E80C9
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:15:42 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1gywAf-0005gn-BH
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:10:38 -0500
+Date: Wed, 27 Feb 2019 11:10:25 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190227111025.4bb39cc7@redhat.com>
+In-Reply-To: <c68ba5a2-0d24-c1ad-c2af-c957768abf9f@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190222172742.18c3835a@redhat.com>
+	<c016024e-9f4b-8953-f492-8802675f7e22@redhat.com>
+	<20190225104212.7d40e65e@Igors-MacBook-Pro.local>
+	<70249194-349e-37f6-0e8d-dc50b39082b7@redhat.com>
+	<cd283485-49a9-ddd1-a020-26110ee093be@redhat.com>
+	<20190226175653.6ca2b6c4@Igors-MacBook-Pro.local>
+	<c68ba5a2-0d24-c1ad-c2af-c957768abf9f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Feb 2019 10:01:15 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1815889@bugs.launchpad.net>
-Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
-Message-Id: <155126167505.18566.11713975222144926222.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
- signal 31 in __pthread_setaffinity_new()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expansion
+ and PCDIMM/NVDIMM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,93 +30,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, david@redhat.com, dgilbert@redhat.com, shameerali.kolothum.thodi@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger.pro@gmail.com, david@gibson.dropbear.id.au
 
-Summary:
-- qemu crash when using GL
-- "sched_setaffinity" is the syscall that is seccomp blocked and kills qemu
-- the mesa i915 drivers (and your radeon as well) will do that call
-- it is blocked by the current qemu -sanbox on,...,resourcecontrol=3Ddeny w=
-hich is libvirts default
-- Implemented by qemu 24f8cdc572
-- Similar issue being fixed last year qemu 056de1e894
-- new code in mesa 18.3 since mesa d877451b48
+On Tue, 26 Feb 2019 18:53:24 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-I think we just need to allow sched_setaffinity with these new mesa drivers=
- in the wild.
-The alternative to detect gl usage in libvirt and only then allow ressource=
-control IMHO seems over-engineered (needs internals to actually pass the ne=
-ed of seccomp subsets to be switched) and not better (more syscalls will be=
- non-blocked then as the -secomp interface isn't fine grained).
+> Hi Igor,
+> 
+> On 2/26/19 5:56 PM, Igor Mammedov wrote:
+> > On Tue, 26 Feb 2019 14:11:58 +0100
+> > Auger Eric <eric.auger@redhat.com> wrote:
+> >   
+> >> Hi Igor,
+> >>
+> >> On 2/26/19 9:40 AM, Auger Eric wrote:  
+> >>> Hi Igor,
+> >>>
+> >>> On 2/25/19 10:42 AM, Igor Mammedov wrote:  
+> >>>> On Fri, 22 Feb 2019 18:35:26 +0100
+> >>>> Auger Eric <eric.auger@redhat.com> wrote:
+> >>>>  
+> >>>>> Hi Igor,
+> >>>>>
+> >>>>> On 2/22/19 5:27 PM, Igor Mammedov wrote:  
+> >>>>>> On Wed, 20 Feb 2019 23:39:46 +0100
+> >>>>>> Eric Auger <eric.auger@redhat.com> wrote:
+> >>>>>>  
+> >>>>>>> This series aims to bump the 255GB RAM limit in machvirt and to
+> >>>>>>> support device memory in general, and especially PCDIMM/NVDIMM.
+> >>>>>>>
+> >>>>>>> In machvirt versions < 4.0, the initial RAM starts at 1GB and can
+> >>>>>>> grow up to 255GB. From 256GB onwards we find IO regions such as the
+> >>>>>>> additional GICv3 RDIST region, high PCIe ECAM region and high PCIe
+> >>>>>>> MMIO region. The address map was 1TB large. This corresponded to
+> >>>>>>> the max IPA capacity KVM was able to manage.
+> >>>>>>>
+> >>>>>>> Since 4.20, the host kernel is able to support a larger and dynamic
+> >>>>>>> IPA range. So the guest physical address can go beyond the 1TB. The
+> >>>>>>> max GPA size depends on the host kernel configuration and physical CPUs.
+> >>>>>>>
+> >>>>>>> In this series we use this feature and allow the RAM to grow without
+> >>>>>>> any other limit than the one put by the host kernel.
+> >>>>>>>
+> >>>>>>> The RAM still starts at 1GB. First comes the initial ram (-m) of size
+> >>>>>>> ram_size and then comes the device memory (,maxmem) of size
+> >>>>>>> maxram_size - ram_size. The device memory is potentially hotpluggable
+> >>>>>>> depending on the instantiated memory objects.
+> >>>>>>>
+> >>>>>>> IO regions previously located between 256GB and 1TB are moved after
+> >>>>>>> the RAM. Their offset is dynamically computed, depends on ram_size
+> >>>>>>> and maxram_size. Size alignment is enforced.
+> >>>>>>>
+> >>>>>>> In case maxmem value is inferior to 255GB, the legacy memory map
+> >>>>>>> still is used. The change of memory map becomes effective from 4.0
+> >>>>>>> onwards.
+> >>>>>>>
+> >>>>>>> As we keep the initial RAM at 1GB base address, we do not need to do
+> >>>>>>> invasive changes in the EDK2 FW. It seems nobody is eager to do
+> >>>>>>> that job at the moment.
+> >>>>>>>
+> >>>>>>> Device memory being put just after the initial RAM, it is possible
+> >>>>>>> to get access to this feature while keeping a 1TB address map.
+> >>>>>>>
+> >>>>>>> This series reuses/rebases patches initially submitted by Shameer
+> >>>>>>> in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
+> >>>>>>>
+> >>>>>>> Functionally, the series is split into 3 parts:
+> >>>>>>> 1) bump of the initial RAM limit [1 - 9] and change in
+> >>>>>>>    the memory map  
+> >>>>>>  
+> >>>>>>> 2) Support of PC-DIMM [10 - 13]  
+> >>>>>> Is this part complete ACPI wise (for coldplug)? I haven't noticed
+> >>>>>> DSDT AML here no E820 changes, so ACPI wise pc-dimm shouldn't be
+> >>>>>> visible to the guest. It might be that DT is masking problem
+> >>>>>> but well, that won't work on ACPI only guests.  
+> >>>>>
+> >>>>> guest /proc/meminfo or "lshw -class memory" reflects the amount of mem
+> >>>>> added with the DIMM slots.  
+> >>>> Question is how does it get there? Does it come from DT or from firmware
+> >>>> via UEFI interfaces?
+> >>>>  
+> >>>>> So it looks fine to me. Isn't E820 a pure x86 matter?  
+> >>>> sorry for misleading, I've meant is UEFI GetMemoryMap().
+> >>>> On x86, I'm wary of adding PC-DIMMs to E802 which then gets exposed
+> >>>> via UEFI GetMemoryMap() as guest kernel might start using it as normal
+> >>>> memory early at boot and later put that memory into zone normal and hence
+> >>>> make it non-hot-un-pluggable. The same concerns apply to DT based means
+> >>>> of discovery.
+> >>>> (That's guest issue but it's easy to workaround it not putting hotpluggable
+> >>>> memory into UEFI GetMemoryMap() or DT and let DSDT describe it properly)
+> >>>> That way memory doesn't get (ab)used by firmware or early boot kernel stages
+> >>>> and doesn't get locked up.
+> >>>>  
+> >>>>> What else would you expect in the dsdt?  
+> >>>> Memory device descriptions, look for code that adds PNP0C80 with _CRS
+> >>>> describing memory ranges  
+> >>>
+> >>> OK thank you for the explanations. I will work on PNP0C80 addition then.
+> >>> Does it mean that in ACPI mode we must not output DT hotplug memory
+> >>> nodes or assuming that PNP0C80 is properly described, it will "override"
+> >>> DT description?  
+> >>
+> >> After further investigations, I think the pieces you pointed out are
+> >> added by Shameer's series, ie. through the build_memory_hotplug_aml()
+> >> call. So I suggest we separate the concerns: this series brings support
+> >> for DIMM coldplug. hotplug, including all the relevant ACPI structures
+> >> will be added later on by Shameer.  
+> > 
+> > Maybe we should not put pc-dimms in DT for this series until it gets clear
+> > if it doesn't conflict with ACPI in some way.  
+> 
+> I guess you mean removing the DT hotpluggable memory nodes only in ACPI
+> mode? Otherwise you simply remove the DIMM feature, right?
+Something like this so DT won't get in conflict with ACPI.
+Only we don't have a switch for it something like, -machine fdt=on (with default off)
+ 
+> I double checked and if you remove the hotpluggable memory DT nodes in
+> ACPI mode:
+> - you do not see the PCDIMM slots in guest /proc/meminfo anymore. So I
+> guess you're right, if the DT nodes are available, that memory is
+> considered as not unpluggable by the guest.
+> - You can see the NVDIMM slots using ndctl list -u. You can mount a DAX
+> system.
+> 
+> Hotplug/unplug is clearly not supported by this series and any attempt
+> results in "memory hotplug is not supported". Is it really an issue if
+> the guest does not consider DIMM slots as not hot-unpluggable memory? I
+> am not even sure the guest kernel would support to unplug that memory.
+> 
+> In case we want all ACPI tables to be ready for making this memory seen
+> as hot-unpluggable we need some Shameer's patches on top of this series.
+May be we should push for this way (into 4.0), it's just a several patches
+after all or even merge them in your series (I'd guess it would need to be
+rebased on top of your latest work)
+ 
+> Also don't DIMM slots already make sense in DT mode. Usually we accept
+> to add one feature in DT and then in ACPI. For instance we can benefit
+usually it doesn't conflict with each other (at least I'm not aware of it)
+but I see a problem with in this case.
 
-OTOH the man page literally says "... Disable process affinity ...", so I'm=
- not sure we can just remove it. Maybe split resourcecontrol in two, put *a=
-ffinity* in the new one and make the default being not blocked - so that up=
-per layers like libvirt will work until one explicitly states ... -sandbox =
-on,affinity=3Don which no one wanting to use GL would do. That again seems =
-too much.
-Well the discussion will happen either here on ML/bug or latter when submit=
-ting an RFC for it.
+> from nvdimm in dt mode right? So, considering an incremental approach I
+> would be in favour of keeping the DT nodes.
+I'd guess it is the same as for DIMMs, ACPI support for NVDIMMs is much
+more versatile.
 
--- =
+I consider target application of arm/virt as a board that's used to
+run in production generic ACPI capable guest in most use cases and
+various DT only guests as secondary ones. It's hard to make
+both usecases be happy with defaults (that's probably  one of the
+reasons why 'sbsa' board is being added).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815889
+So I'd give priority to ACPI based arm/virt versus DT when defaults are
+considered.
 
-Title:
-  qemu-system-x86_64 crashed with signal 31 in
-  __pthread_setaffinity_new()
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  Unable to launch Default Fedora 29 images in gnome-boxes
-
-  ProblemType: Crash
-  DistroRelease: Ubuntu 19.04
-  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
-  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
-  Uname: Linux 4.19.0-12-generic x86_64
-  ApportVersion: 2.20.10-0ubuntu20
-  Architecture: amd64
-  Date: Thu Feb 14 11:00:45 2019
-  ExecutablePath: /usr/bin/qemu-system-x86_64
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: Dell Inc. Precision T3610
-  ProcEnviron: PATH=3D(custom, user)
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
-ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
-  Signal: 31
-  SourcePackage: qemu
-  StacktraceTop:
-   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
-t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
-   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
-   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
-   start_thread (arg=3D<optimized out>) at pthread_create.c:486
-   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
-_new()
-  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
-  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
-  dmi.bios.date: 11/14/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: A18
-  dmi.board.name: 09M8Y8
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A01
-  dmi.chassis.type: 7
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
-T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
-  dmi.product.name: Precision T3610
-  dmi.product.sku: 05D2
-  dmi.product.version: 00
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815889/+subscriptions
+> Thanks
+> 
+> Eric
+> > 
+> > 
+> > 
+> >   
