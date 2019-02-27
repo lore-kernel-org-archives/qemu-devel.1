@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56102)
+Received: from eggs.gnu.org ([209.51.188.92]:56098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gywZv-0007OT-6n
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:49 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywZt-0007NH-9Z
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gywZo-0003gn-QY
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38642)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywZo-0003gd-PO
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38644)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gywZo-0003fn-GZ
+	id 1gywZo-0003fp-GX
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:36:36 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 421DBC0669BA
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:30:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41B22C065859
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:30:57 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 27 Feb 2019 11:30:05 +0100
-Message-Id: <20190227103017.29515-1-marcandre.lureau@redhat.com>
+Date: Wed, 27 Feb 2019 11:30:11 +0100
+Message-Id: <20190227103017.29515-7-marcandre.lureau@redhat.com>
+In-Reply-To: <20190227103017.29515-1-marcandre.lureau@redhat.com>
+References: <20190227103017.29515-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 00/12] vhost-user-backend & vhost-user-input
+Subject: [Qemu-devel] [PATCH v4 06/12] Add vhost-user-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,92 +36,337 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kraxel@redhat.com, mst@redhat.com
 
-Hi,
+Create a vhost-user-backend object that holds a connection to a
+vhost-user backend and can be referenced from virtio devices that
+support it. See later patches for input & gpu usage.
 
-This series is based on previously discussed "[PATCH v4 00/29]
-vhost-user for input & GPU" and "vhost-user: define conventions for
-vhost-user backends" work. The GPU part is left off for now.
-
-This series introduces a "vhost-user-backend": an helper object to be
-used by vhost-user devices to ease with backend initialization and
-handling. As a simple showcase, a "vhost-user-input-pci" device is
-introduced, which can be used with the "contrib: add vhost-user-input"
-example. vhost-user-input isn't meant to be installed, discovered or
-used by libvirt: no installation is done (no vhost-user JSON file is
-provided either).
-
-thanks
-
-v4:
-- drop "RFC: add explicit can_migrate to vhost_user_backend_dev_init()"
-- remove useless "cmd" struct field leftover
-
-v3:
-- add previously sent patch "libvhost-user: fix clang enum-conversion
-  warning" to fix clang build
-- "define conventions for vhost-user backends" updates after Eric review
-- Drop user-creatable from vhost-user-backend
-- Make vhost-user-input-pci take a chardev=3D (instead of vhost-user=3D)
-
-v2:
-- rebased (VhostUserInputPCI got most of the changes, due to split)
-- added "RFC: add explicit can_migrate to
-  vhost_user_backend_dev_init()" to attempt to address Michael
-  concerns about migration.
-
-Marc-Andr=C3=A9 Lureau (12):
-  libvhost-user: fix clang enum-conversion warning
-  vhost-user: define conventions for vhost-user backends
-  vhost-user: simplify vhost_user_init/vhost_user_cleanup
-  libvhost-user: exit by default on VHOST_USER_NONE
-  vhost-user: wrap some read/write with retry handling
-  Add vhost-user-backend
-  vhost-user: split vhost_user_read()
-  vhost-user: add vhost_user_input_get_config()
-  libvhost-user-glib: export vug_source_new()
-  libvhost-user: add vu_queue_unpop()
-  Add vhost-user-input-pci
-  contrib: add vhost-user-input
-
- contrib/libvhost-user/libvhost-user-glib.h |   3 +
- contrib/libvhost-user/libvhost-user.h      |  17 +-
- include/hw/virtio/vhost-backend.h          |   4 +
- include/hw/virtio/vhost-user-blk.h         |   2 +-
- include/hw/virtio/vhost-user-scsi.h        |   2 +-
- include/hw/virtio/vhost-user.h             |   2 +-
- include/hw/virtio/virtio-input.h           |  14 +
- include/sysemu/vhost-user-backend.h        |  58 +++
- backends/cryptodev-vhost-user.c            |  18 +-
- backends/vhost-user.c                      | 213 +++++++++++
- contrib/libvhost-user/libvhost-user-glib.c |  11 +-
- contrib/libvhost-user/libvhost-user.c      |  19 +-
- contrib/vhost-user-input/main.c            | 398 +++++++++++++++++++++
- hw/block/vhost-user-blk.c                  |  22 +-
- hw/input/vhost-user-input.c                |  99 +++++
- hw/scsi/vhost-user-scsi.c                  |  20 +-
- hw/virtio/vhost-stub.c                     |   4 +-
- hw/virtio/vhost-user-input-pci.c           |  53 +++
- hw/virtio/vhost-user.c                     | 118 +++++-
- net/vhost-user.c                           |  13 +-
- MAINTAINERS                                |   5 +
- Makefile                                   |   3 +
- Makefile.objs                              |   1 +
- backends/Makefile.objs                     |   3 +-
- configure                                  |   3 +
- contrib/vhost-user-input/Makefile.objs     |   1 +
- default-configs/virtio.mak                 |   1 +
- docs/interop/vhost-user.json               | 232 ++++++++++++
- docs/interop/vhost-user.txt                | 109 +++++-
- hw/input/Makefile.objs                     |   1 +
- hw/virtio/Makefile.objs                    |   1 +
- 31 files changed, 1363 insertions(+), 87 deletions(-)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/sysemu/vhost-user-backend.h |  58 ++++++++
+ backends/vhost-user.c               | 213 ++++++++++++++++++++++++++++
+ MAINTAINERS                         |   2 +
+ backends/Makefile.objs              |   3 +-
+ 4 files changed, 275 insertions(+), 1 deletion(-)
  create mode 100644 include/sysemu/vhost-user-backend.h
  create mode 100644 backends/vhost-user.c
- create mode 100644 contrib/vhost-user-input/main.c
- create mode 100644 hw/input/vhost-user-input.c
- create mode 100644 hw/virtio/vhost-user-input-pci.c
- create mode 100644 contrib/vhost-user-input/Makefile.objs
- create mode 100644 docs/interop/vhost-user.json
 
+diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-u=
+ser-backend.h
+new file mode 100644
+index 0000000000..ee80492323
+--- /dev/null
++++ b/include/sysemu/vhost-user-backend.h
+@@ -0,0 +1,58 @@
++/*
++ * QEMU vhost-user backend
++ *
++ * Copyright (C) 2018 Red Hat Inc
++ *
++ * Authors:
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++#ifndef QEMU_VHOST_USER_BACKEND_H
++#define QEMU_VHOST_USER_BACKEND_H
++
++#include "qom/object.h"
++#include "exec/memory.h"
++#include "qemu/option.h"
++#include "qemu/bitmap.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-user.h"
++#include "chardev/char-fe.h"
++#include "io/channel.h"
++
++#define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
++#define VHOST_USER_BACKEND(obj) \
++    OBJECT_CHECK(VhostUserBackend, (obj), TYPE_VHOST_USER_BACKEND)
++#define VHOST_USER_BACKEND_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(VhostUserBackendClass, (obj), TYPE_VHOST_USER_BACKE=
+ND)
++#define VHOST_USER_BACKEND_CLASS(klass) \
++    OBJECT_CLASS_CHECK(VhostUserBackendClass, (klass), TYPE_VHOST_USER_B=
+ACKEND)
++
++typedef struct VhostUserBackend VhostUserBackend;
++typedef struct VhostUserBackendClass VhostUserBackendClass;
++
++struct VhostUserBackendClass {
++    ObjectClass parent_class;
++};
++
++struct VhostUserBackend {
++    /* private */
++    Object parent;
++
++    char *chr_name;
++    CharBackend chr;
++    VhostUserState vhost_user;
++    struct vhost_dev dev;
++    QIOChannel *child;
++    VirtIODevice *vdev;
++    bool started;
++    bool completed;
++};
++
++int vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
++                                unsigned nvqs, Error **errp);
++void vhost_user_backend_start(VhostUserBackend *b);
++void vhost_user_backend_stop(VhostUserBackend *b);
++
++#endif
+diff --git a/backends/vhost-user.c b/backends/vhost-user.c
+new file mode 100644
+index 0000000000..289dbd9e6d
+--- /dev/null
++++ b/backends/vhost-user.c
+@@ -0,0 +1,213 @@
++/*
++ * QEMU vhost-user backend
++ *
++ * Copyright (C) 2018 Red Hat Inc
++ *
++ * Authors:
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++
++#include "qemu/osdep.h"
++#include "hw/qdev.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qerror.h"
++#include "qemu/error-report.h"
++#include "qom/object_interfaces.h"
++#include "sysemu/vhost-user-backend.h"
++#include "sysemu/kvm.h"
++#include "io/channel-command.h"
++#include "hw/virtio/virtio-bus.h"
++
++static bool
++ioeventfd_enabled(void)
++{
++    return kvm_enabled() && kvm_eventfds_enabled();
++}
++
++int
++vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
++                            unsigned nvqs, Error **errp)
++{
++    int ret;
++
++    assert(!b->vdev && vdev);
++
++    if (!ioeventfd_enabled()) {
++        error_setg(errp, "vhost initialization failed: requires kvm");
++        return -1;
++    }
++
++    if (!vhost_user_init(&b->vhost_user, &b->chr, errp)) {
++        return -1;
++    }
++
++    b->vdev =3D vdev;
++    b->dev.nvqs =3D nvqs;
++    b->dev.vqs =3D g_new(struct vhost_virtqueue, nvqs);
++
++    ret =3D vhost_dev_init(&b->dev, &b->vhost_user, VHOST_BACKEND_TYPE_U=
+SER, 0);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "vhost initialization failed");
++        return -1;
++    }
++
++    return 0;
++}
++
++void
++vhost_user_backend_start(VhostUserBackend *b)
++{
++    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
++    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
++    int ret, i ;
++
++    if (b->started) {
++        return;
++    }
++
++    if (!k->set_guest_notifiers) {
++        error_report("binding does not support guest notifiers");
++        return;
++    }
++
++    ret =3D vhost_dev_enable_notifiers(&b->dev, b->vdev);
++    if (ret < 0) {
++        return;
++    }
++
++    ret =3D k->set_guest_notifiers(qbus->parent, b->dev.nvqs, true);
++    if (ret < 0) {
++        error_report("Error binding guest notifier");
++        goto err_host_notifiers;
++    }
++
++    b->dev.acked_features =3D b->vdev->guest_features;
++    ret =3D vhost_dev_start(&b->dev, b->vdev);
++    if (ret < 0) {
++        error_report("Error start vhost dev");
++        goto err_guest_notifiers;
++    }
++
++    /* guest_notifier_mask/pending not used yet, so just unmask
++     * everything here.  virtio-pci will do the right thing by
++     * enabling/disabling irqfd.
++     */
++    for (i =3D 0; i < b->dev.nvqs; i++) {
++        vhost_virtqueue_mask(&b->dev, b->vdev,
++                             b->dev.vq_index + i, false);
++    }
++
++    b->started =3D true;
++    return;
++
++err_guest_notifiers:
++    k->set_guest_notifiers(qbus->parent, b->dev.nvqs, false);
++err_host_notifiers:
++    vhost_dev_disable_notifiers(&b->dev, b->vdev);
++}
++
++void
++vhost_user_backend_stop(VhostUserBackend *b)
++{
++    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
++    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
++    int ret =3D 0;
++
++    if (!b->started) {
++        return;
++    }
++
++    vhost_dev_stop(&b->dev, b->vdev);
++
++    if (k->set_guest_notifiers) {
++        ret =3D k->set_guest_notifiers(qbus->parent,
++                                     b->dev.nvqs, false);
++        if (ret < 0) {
++            error_report("vhost guest notifier cleanup failed: %d", ret)=
+;
++        }
++    }
++    assert(ret >=3D 0);
++
++    vhost_dev_disable_notifiers(&b->dev, b->vdev);
++    b->started =3D false;
++}
++
++static void set_chardev(Object *obj, const char *value, Error **errp)
++{
++    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
++    Chardev *chr;
++
++    if (b->completed) {
++        error_setg(errp, QERR_PERMISSION_DENIED);
++        return;
++    }
++
++    g_free(b->chr_name);
++    b->chr_name =3D g_strdup(value);
++
++    chr =3D qemu_chr_find(b->chr_name);
++    if (chr =3D=3D NULL) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Chardev '%s' not found", b->chr_name);
++        return;
++    }
++
++    if (!qemu_chr_fe_init(&b->chr, chr, errp)) {
++        return;
++    }
++
++    b->completed =3D true;
++    /* could call vhost_dev_init() so early message can be exchanged */
++}
++
++static char *get_chardev(Object *obj, Error **errp)
++{
++    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
++    Chardev *chr =3D qemu_chr_fe_get_driver(&b->chr);
++
++    if (chr && chr->label) {
++        return g_strdup(chr->label);
++    }
++
++    return NULL;
++}
++
++static void vhost_user_backend_init(Object *obj)
++{
++    object_property_add_str(obj, "chardev", get_chardev, set_chardev, NU=
+LL);
++}
++
++static void vhost_user_backend_finalize(Object *obj)
++{
++    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
++
++    g_free(b->dev.vqs);
++    g_free(b->chr_name);
++
++    vhost_user_cleanup(&b->vhost_user);
++    qemu_chr_fe_deinit(&b->chr, true);
++
++    if (b->child) {
++        object_unref(OBJECT(b->child));
++    }
++}
++
++static const TypeInfo vhost_user_backend_info =3D {
++    .name =3D TYPE_VHOST_USER_BACKEND,
++    .parent =3D TYPE_OBJECT,
++    .instance_size =3D sizeof(VhostUserBackend),
++    .instance_init =3D vhost_user_backend_init,
++    .instance_finalize =3D vhost_user_backend_finalize,
++    .class_size =3D sizeof(VhostUserBackendClass),
++};
++
++static void register_types(void)
++{
++    type_register_static(&vhost_user_backend_info);
++}
++
++type_init(register_types);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6364a4ea9c..dbe71e6c1e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1427,6 +1427,8 @@ F: hw/*/*vhost*
+ F: docs/interop/vhost-user.json
+ F: docs/interop/vhost-user.txt
+ F: contrib/vhost-user-*/
++F: backends/vhost-user.c
++F: include/sysemu/vhost-user-backend.h
+=20
+ virtio
+ M: Michael S. Tsirkin <mst@redhat.com>
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index 717fcbdae4..a5ec0bf907 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -12,7 +12,8 @@ common-obj-y +=3D cryptodev-builtin.o
+ ifeq ($(CONFIG_VIRTIO),y)
+ common-obj-y +=3D cryptodev-vhost.o
+ common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) +=3D \
+-    cryptodev-vhost-user.o
++    cryptodev-vhost-user.o \
++    vhost-user.o
+ endif
+=20
+ common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
 --=20
 2.21.0
