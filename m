@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50938)
+Received: from eggs.gnu.org ([209.51.188.92]:51018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gz15z-0004bN-Tb
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:09 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gz164-0004cv-Ms
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gz15y-00011s-PE
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gz15y-0000cM-FH
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:06 -0500
-Date: Wed, 27 Feb 2019 15:25:25 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190227152525.GK31688@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190222153254.22739-1-stefanha@redhat.com>
-	<87imx8uu99.fsf@dusky.pond.sub.org>
-	<20190225092846.GA4757@angien.pipo.sk>
-	<20190225174001.GI379@stefanha-x1.localdomain>
-	<87a7iincg0.fsf@dusky.pond.sub.org>
-	<20190227151535.GE22539@stefanha-x1.localdomain>
+	(envelope-from <mreitz@redhat.com>) id 1gz163-00017X-NX
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:12 -0500
+References: <20190214064312.44794-1-mahaocong_work@163.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f335dd82-1944-d367-b845-29dcc01e2f3e@redhat.com>
+Date: Wed, 27 Feb 2019 16:25:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190227151535.GE22539@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
+In-Reply-To: <20190214064312.44794-1-mahaocong_work@163.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9305LHyHOjAT6JIDU8d3Mi1Srgd4MxzXa"
+Subject: Re: [Qemu-devel] [PATCH RESEND v4] drive-mirror: add incremental
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +24,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: mahaocong <mahaocong_work@163.com>, qemu-block@nongnu.org
+Cc: John Snow <jsnow@redhat.com>, kwolf@redhat.com, qemu-devel@nongnu.org, mahaocong <mahaocong@didichuxing.com>
 
-On Wed, Feb 27, 2019 at 03:15:35PM +0000, Stefan Hajnoczi wrote:
-> On Tue, Feb 26, 2019 at 10:09:19AM +0100, Markus Armbruster wrote:
-> > Stefan Hajnoczi <stefanha@redhat.com> writes:
-> > > On Mon, Feb 25, 2019 at 10:28:46AM +0100, Peter Krempa wrote:
-> > >> On Mon, Feb 25, 2019 at 09:50:26 +0100, Markus Armbruster wrote:
-> > >> > Stefan Hajnoczi <stefanha@redhat.com> writes:
-> > >> Other than the above, this is a welcome improvement as I've personally
-> > >> ran into scenarios where a feature in qemu was fixed but it was
-> > >> impossible to detect whether given qemu version contains the fix as it
-> > >> did not have any influence on the QMP schema.
-> > >
-> > > I'd like to make things as simpler as possible, but no simpler :).
-> > >
-> > > The simplest option is that the advertised features are set in stone at
-> > > build time (e.g. selected with #ifdef if necessary).  But then we have
-> > > no way of selecting features at runtime (e.g. based on kernel features).
-> > >
-> > > What do you think?
-> > 
-> > I think we should map the problem space, identify cases with actual
-> > uses, then design a solution that covers them and can plausibly grow to
-> > cover cases we anticipate.
-> > 
-> > The migrate-with-cache-direct-off-on-linux case is compile-time static.
-> > 
-> > Do we have or have we had a case that is not compile-time static?
-> 
-> I can't think of something that both requires query-qemu-features and
-> isn't compile-time static.  But that could be because not many things
-> require query-qemu-features :).
-> 
-> The philosophy on Linux seems to be: distros compile QEMU against
-> headers that accurately reflect the system features that are available.
-> Therefore there isn't a lot of runtime fallback logic in case a new QEMU
-> is running on an old host.  This means we can get by with compile-time
-> static features only.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9305LHyHOjAT6JIDU8d3Mi1Srgd4MxzXa
+From: Max Reitz <mreitz@redhat.com>
+To: mahaocong <mahaocong_work@163.com>, qemu-block@nongnu.org
+Cc: John Snow <jsnow@redhat.com>, kwolf@redhat.com, qemu-devel@nongnu.org,
+ mahaocong <mahaocong@didichuxing.com>
+Message-ID: <f335dd82-1944-d367-b845-29dcc01e2f3e@redhat.com>
+Subject: Re: [PATCH RESEND v4] drive-mirror: add incremental mode
+References: <20190214064312.44794-1-mahaocong_work@163.com>
+In-Reply-To: <20190214064312.44794-1-mahaocong_work@163.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This assumption is probably going to be more troublesome in future. It
-is increasingly common to deploy libvirt & QEMU inside docker containers,
-and there's not a strict requirement that the docker container image
-is the same distro / version as the docker host. ie a Fedora docker
-image could be run on a RHEL host & vica-verca. IOW we could see an older
-kernel than what we compiled on. I don't know how common such mismatches
-will be in practice, but at the Docker level there's nothing preventing
-such mismatches, which means some people will inevitably end up running
-in such scenarios whether we like it or not. 
+CC-ing John because of the keyword "incremental".
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On 14.02.19 07:43, mahaocong wrote:
+> From: mahaocong <mahaocong@didichuxing.com>
+>=20
+> This patch adds possibility to start mirroring with user-created-bitmap=
+=2E
+> On full mode, mirror create a non-named-bitmap by scanning whole block-=
+chain,
+> and on top mode, mirror create a bitmap by scanning the top block layer=
+=2E So I
+> think I can copy a user-created-bitmap and use it as the initial state =
+of the
+> mirror, the same as incremental mode drive-backup, and I call this new =
+mode
+> as incremental mode drive-mirror.
+>=20
+> A possible usage scene of incremental mode mirror is live migration. Fo=
+r maintain
+> the block data and recover after a malfunction, someone may backup data=
+ to ceph
+> or other distributed storage. On qemu incremental backup, we need to cr=
+eate a new
+> bitmap and attach to block device before the first backup job. Then the=
+ bitmap
+> records the change after the backup job. If we want to migration this v=
+m, we can
+> migrate block data between source and destionation by using drive-mirro=
+r directly,
+> or use backup data and backup-bitmap to reduce the data should be synch=
+ronize.
+> To do this, we should first create a new image in destination and set b=
+acking file
+> as backup image, then set backup-bitmap as the initial state of increme=
+ntal mode
+> drive-mirror, and synchronize dirty block starting with the state set b=
+y the last
+> incremental backup job. When the mirror complete, we get an active laye=
+r on destination,
+> and its backing file is backup image on ceph. Then we can do live copy =
+data from
+> backing files into overlay images by using block-stream, or do backup c=
+ontinually.
+>=20
+> In this scene, It seems that If the guest os doesn't write too many dat=
+a after the
+> last backup, the incremental mode may transmit less data than full mode=
+ or top
+> mode. However, if the write data is too many, there is no advantage on =
+incremental
+> mode compare with other mode.
+>=20
+> This scene can be described as following steps:
+> 1.create rbd image in ceph, and map nbd device with rbd image.
+> 2.create a new bitmap and attach to block device.
+> 3.do full mode backup on nbd device and thus sync it to the rbd image.
+> 4.severl times incremental mode backup.
+> 5.create new image in destination and set its backing file as backup im=
+age.
+> 6.do live-migration, and migrate block data by incremental mode drive-m=
+irror
+>   with bitmap created from step 2.
+>=20
+> Signed-off-by: Ma Haocong <mahaocong@didichuxing.com>
+> ---
+
+So one important point about incremental backups is that you can
+actually do them incrementally: The bitmap is effectively cleared at the
+beginning of the backup process (a successor bitmap is installed that is
+cleared and receives all changes; at the end of the backup, it either
+replaces the old bitmap (on success) or is merged into it (on failure)).
+ Therefore, you can do the next incremental backup by using the same bitm=
+ap.
+
+How would this work with mirroring?  Instead of clearing the bitmap at
+the start of the process, it'd need to be cleared at the end (because we
+reach synchronization between source and target then).  But how would
+error handling work?
+
+I suppose the named bitmap would need to be copied to act as the dirty
+bitmap for the mirror job (at the start of the job).  If a failure
+occurs, the copy is simply discarded.  On success, the named bitmap is
+cleared when the job is completed.  Hm, that seems to make sense.  Did I
+forget anything, John?
+
+In any case, I don't think this patch implemented anything to this
+regard...?  So it doesn't really implement incremental mirroring.
+However, I think it should, if possible.
+
+Max
+
+
+--9305LHyHOjAT6JIDU8d3Mi1Srgd4MxzXa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlx2q/8ACgkQ9AfbAGHV
+z0Ax9gf8Cz8pchfT5vOdt8LadkmQenlTtkFXoebMaSN3AtTC62Gm3K556LNvU5D/
+MLb3TQrcdxGc2Wa4OrK1/y+t4cKCwsyZuCkvCmFkei0riZQtNth7ltRKm1SCUp6e
+bWuAEmChxPKfr6uDB5M2rALH7sv/Y/ukFI0InV3lIGY4XXSzgE5vUQDjdAwPHs4J
+qYNDO3keKLDSNQzxTGxsPX1Tk8S8X42pqMMvmFpKWNa83kw/zGqA2CZc+oryZnbQ
+V4pHuEtCKbUvLMJTTmQwa77ag2kVO5KfnLsq7JxX5szG8fQANgOuPwVj2GVRgfmi
+iCKXwIToIzSZdZ5RmCTuP6VpFzCRaQ==
+=22mX
+-----END PGP SIGNATURE-----
+
+--9305LHyHOjAT6JIDU8d3Mi1Srgd4MxzXa--
