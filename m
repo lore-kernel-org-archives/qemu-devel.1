@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50991)
+Received: from eggs.gnu.org ([209.51.188.92]:53819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyw8I-0008Rc-I3
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:08:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1gywQc-0002Eb-4U
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:27:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gyw8F-0004Fw-9A
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:08:10 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 27 Feb 2019 10:07:53 +0000
-Message-ID: <1d6c9336-d3d2-783f-6db4-4c3d000dc727@virtuozzo.com>
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-	<e2f687c3-ad05-8921-0528-8f28357542a6@virtuozzo.com>
-In-Reply-To: <e2f687c3-ad05-8921-0528-8f28357542a6@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B36756210FAF9946BFA713CE777D1B54@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1gywFc-00081E-Bi
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:15:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37810)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gywFc-0007zL-4s
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:15:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gywFX-00025l-RS
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:15:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C84E22E8029
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:15:39 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] qcow2 check improvements part I
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 27 Feb 2019 09:56:22 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1815889@bugs.launchpad.net>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <155126138242.29074.4916965150759165189.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
+ signal 31 in __pthread_setaffinity_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,26 +37,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
 
-cGluZw0KDQoxMC4wMS4yMDE5IDE4OjI4LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiBwaW5nDQo+IA0KPiAxNC4xMi4yMDE4IDE2OjQyLCBWbGFkaW1pciBTZW1lbnRzb3Yt
-T2dpZXZza2l5IHdyb3RlOg0KPj4gSGkgYWxsIQ0KPj4NCj4+IFRoZXNlIHNlcmllcyBhcmUgZGVy
-aXZlZCBmcm9tICJbUEFUQ0ggdjMgMC84XSBxY293MiBjaGVjayBpbXByb3ZlbWVudHMiDQo+PiAo
-aHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMTAvbXNn
-MDIyODQuaHRtbCkNCj4+DQo+PiBTb21lIHBhdGNoZXMgYXJlIG5ldywgc29tZSBwYXRjaGVzIGFy
-ZSBub3QgaW5jbHVkZWQgYW5kIGFyZSBwb3N0cG9uZWQgdG8NCj4+IHBhcnQgSUkuDQo+Pg0KPj4g
-U28sIGhlcmU6DQo+PiAwMSwwMyAtIHVuY2hhbmdlZA0KPj4gMDI6IGhhbmRsZSBicm9rZW4gaW90
-ZXN0DQo+PiAwNC0wNTogbmV3DQo+Pg0KPj4gVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSAo
-NSk6DQo+PiDCoMKgIHFjb3cyLXJlZmNvdW50OiBmaXggY2hlY2tfb2ZsYWdfY29waWVkDQo+PiDC
-oMKgIHFjb3cyLXJlZmNvdW50OiBhdm9pZCBlYXRpbmcgUkFNDQo+PiDCoMKgIHFjb3cyLXJlZmNv
-dW50OiBjaGVja19yZWZjb3VudHNfbDI6IHJlZHVjZSBpZ25vcmVkIG92ZXJsYXBzDQo+PiDCoMKg
-IHFjb3cyLXJlZmNvdW50OiBjaGVja19yZWZjb3VudHNfbDI6IGRvbid0IGNvdW50IGZpeGVkIGNs
-dXN0ZXIgYXMNCj4+IMKgwqDCoMKgIGFsbG9jYXRlZA0KPj4gwqDCoCBxY293Mi1yZWZjb3VudDog
-ZG9uJ3QgbWFzayBjb3JydXB0aW9ucyB1bmRlciBpbnRlcm5hbCBlcnJvcnMNCj4+DQo+PiDCoCBi
-bG9jay9xY293Mi1yZWZjb3VudC5jwqDCoMKgwqAgfCA4NyArKysrKysrKysrKysrKysrKysrKysr
-Ky0tLS0tLS0tLS0tLS0tLQ0KPj4gwqAgdGVzdHMvcWVtdS1pb3Rlc3RzLzEzOMKgwqDCoMKgIHwg
-MTIgKysrLS0tDQo+PiDCoCB0ZXN0cy9xZW11LWlvdGVzdHMvMTM4Lm91dCB8wqAgNSArKy0NCj4+
-IMKgIDMgZmlsZXMgY2hhbmdlZCwgNjEgaW5zZXJ0aW9ucygrKSwgNDMgZGVsZXRpb25zKC0pDQo+
-Pg0KPiANCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+>From Ubuntu's POV this is rather new as the code in Mesa came in with the f=
+resh 18.3.0_rc4-1
+It is possible that no one else saw it so far ...
+It is in mesa upstream since
+  https://github.com/mesa3d/mesa/commit/d877451b48a59ab0f9a4210fc736f51da58=
+51c9a
+
+But opinions might differ ...
+I'll subscribe upstream qemu to this bug and then post a summary here.
+This will mirror the bug updates to the Mailing List, if there is no harsh =
+feedback I'll propose a patch to remove sched_setaffinity from the list of =
+blocked calls.
+
+** Also affects: qemu
+   Importance: Undecided
+       Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
+
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
+
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815889/+subscriptions
