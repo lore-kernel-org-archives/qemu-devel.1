@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39701)
+Received: from eggs.gnu.org ([209.51.188.92]:41537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gyxQc-0002TP-Oa
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:31:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1gyxa7-0001G1-HA
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:41:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gyxQb-0003Cy-TE
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:31:10 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38361)
+	(envelope-from <bounces@canonical.com>) id 1gyxa5-0002mI-JN
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:40:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49678)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gyxQb-000337-I8
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:31:09 -0500
-Received: by mail-wm1-x341.google.com with SMTP id v26so5229019wmh.3
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 03:31:00 -0800 (PST)
-References: <20190226193408.23862-1-armbru@redhat.com>
-	<87wolml3wn.fsf@zen.linaroharston>
-	<87h8cpoh0m.fsf@dusky.pond.sub.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87h8cpoh0m.fsf@dusky.pond.sub.org>
-Date: Wed, 27 Feb 2019 11:30:58 +0000
-Message-ID: <87mumhlb7x.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gyxa1-0002hK-L0
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 06:40:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gyxZy-0001Fk-3P
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 11:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 18ADD2E80CD
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 11:40:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] pflash: Fixes and cleanups
+Date: Wed, 27 Feb 2019 11:32:56 -0000
+From: Daniel Berrange <1815889@bugs.launchpad.net>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <155126717656.18092.5644729081444053295.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
+ signal 31 in __pthread_setaffinity_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: qemu-devel@nongnu.org
 
+As & when libvirt & QEMU supports the external vhost processes for this
+I expect it will still restrict the CPU affinity and apply seccomp
+filters that likely to be as strict as they are today at minimum.
 
-Markus Armbruster <armbru@redhat.com> writes:
+-- =
 
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
->> Markus Armbruster <armbru@redhat.com> writes:
->>
->>> Alex Benn=C3=A9e posted this patch to address an XXX comment in
->>> pflash_cfi01_realize() the other day:
->>
->> If I send you v5 will you include that in your series?
->
-> Sure!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
 
-OK, sent:
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
 
-  Subject: [PATCH v5] hw/block: better reporting on pflash backing file mis=
-match
-  Date: Wed, 27 Feb 2019 11:13:47 +0000
-  Message-Id: <20190227111347.15063-1-alex.bennee@linaro.org>
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
 
---
-Alex Benn=C3=A9e
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815889/+subscriptions
