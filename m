@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38911)
+Received: from eggs.gnu.org ([209.51.188.92]:41236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1gz8Qx-0005K5-A0
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:16:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8ik-0000GD-PI
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:34:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1gz8Qw-0005rt-9a
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:16:15 -0500
-Message-ID: <1551309360.2210.16.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Thu, 28 Feb 2019 10:16:00 +1100
-In-Reply-To: <20190227061611.GB6872@umbus.fritz.box>
-References: <20190227043008.12059-1-sjitindarsingh@gmail.com>
-	<20190227061611.GB6872@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <richard.henderson@linaro.org>) id 1gz8ij-00069Z-WE
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:34:38 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46445)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gz8ij-00062w-Hb
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 18:34:37 -0500
+Received: by mail-pf1-x442.google.com with SMTP id g6so8738113pfh.13
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 15:34:32 -0800 (PST)
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-23-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <65e35aaa-70a1-0357-c7b2-8c1c0c54d1a4@linaro.org>
+Date: Wed, 27 Feb 2019 15:21:38 -0800
+MIME-Version: 1.0
+In-Reply-To: <20190226113915.20150-23-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH v2 1/4] target/ppc/spapr: Add
- SPAPR_CAP_LARGE_DECREMENTER
+Subject: Re: [Qemu-devel] [PATCH v1 22/33] s390x/tcg: Implement VECTOR
+ PERMUTE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 2019-02-27 at 17:16 +1100, David Gibson wrote:
-> On Wed, Feb 27, 2019 at 03:30:05PM +1100, Suraj Jitindar Singh wrote:
-> > Add spapr_cap SPAPR_CAP_LARGE_DECREMENTER to be used to control the
-> > availability of the large decrementer for a guest.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+On 2/26/19 3:39 AM, David Hildenbrand wrote:
+> Take care of overlying inputs and outputs by using a temporary vector.
 > 
-> This series looks good now, except for one nit...
-> 
-> > ---
-> >  hw/ppc/spapr.c         |  2 ++
-> >  hw/ppc/spapr_caps.c    | 17 +++++++++++++++++
-> >  include/hw/ppc/spapr.h |  5 ++++-
-> >  3 files changed, 23 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index b6a571b6f1..acf62a2b9f 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2077,6 +2077,7 @@ static const VMStateDescription vmstate_spapr
-> > = {
-> >          &vmstate_spapr_irq_map,
-> >          &vmstate_spapr_cap_nested_kvm_hv,
-> >          &vmstate_spapr_dtb,
-> > +        &vmstate_spapr_cap_large_decr,
-> >          NULL
-> >      }
-> >  };
-> > @@ -4288,6 +4289,7 @@ static void
-> > spapr_machine_class_init(ObjectClass *oc, void *data)
-> >      smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-> >      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 16; /*
-> > 64kiB */
-> >      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =
-> > SPAPR_CAP_OFF;
-> > +    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = 0;
-> 
-> ... since this is now a boolean, it should use SPAPR_CAP_OFF /
-> SPAPR_CAP_ON instead of bare 0 and 1.
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/helper.h           |  1 +
+>  target/s390x/insn-data.def      |  2 ++
+>  target/s390x/translate_vx.inc.c | 12 ++++++++++++
+>  target/s390x/vec_helper.c       | 20 ++++++++++++++++++++
+>  4 files changed, 35 insertions(+)
 
-True, do you want me to fix-up and resend? Or can you fix it when you
-apply?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> 
+
+r~
