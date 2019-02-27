@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45782)
+Received: from eggs.gnu.org ([209.51.188.92]:45846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzCN-00013q-Km
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:37 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gyzCP-00015D-92
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzCM-0000Yh-RD
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51196)
+	(envelope-from <dgilbert@redhat.com>) id 1gyzCN-0000ZK-GI
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzCM-0000WW-He
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:34 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzCM-0000X3-VD
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:35 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C048330BD1DB
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 13:24:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AD4FE30BA311
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 13:24:29 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 27 Feb 2019 13:24:11 +0000
-Message-Id: <20190227132413.13213-8-dgilbert@redhat.com>
+Date: Wed, 27 Feb 2019 13:24:13 +0000
+Message-Id: <20190227132413.13213-10-dgilbert@redhat.com>
 In-Reply-To: <20190227132413.13213-1-dgilbert@redhat.com>
 References: <20190227132413.13213-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 7/9] qmp: Add announce-self command
+Subject: [Qemu-devel] [PATCH v6 9/9] tests: Add a test for qemu self
+ announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,76 +37,142 @@ Cc: quintela@redhat.com, armbru@redhat.com, thuth@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add a qmp command that can trigger guest announcements.
+We now expose qemu_announce_self through QMP and HMP.  Add a test
+with some very basic packet validation (make sure we get a RARP).
 
-It uses its own announce-timer instance, and parameters
-passed to it explicitly in the command.
-
-Like most qmp commands, it's in the main thread/bql, so
-there's no racing with any outstanding timer.
-
-Based on work of Germano Veit Michel <germano@redhat.com> and
-                 Vladislav Yasevich <vyasevic@redhat.com>
-
+Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- net/announce.c |  7 +++++++
- qapi/net.json  | 20 ++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ tests/Makefile.include     |  3 ++
+ tests/test-announce-self.c | 82 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 85 insertions(+)
+ create mode 100644 tests/test-announce-self.c
 
-diff --git a/net/announce.c b/net/announce.c
-index 070f37a7fa..91e9a6e267 100644
---- a/net/announce.c
-+++ b/net/announce.c
-@@ -12,6 +12,7 @@
- #include "net/net.h"
- #include "qapi/clone-visitor.h"
- #include "qapi/qapi-visit-net.h"
-+#include "qapi/qapi-commands-net.h"
- #include "trace.h"
-=20
- int64_t qemu_announce_timer_step(AnnounceTimer *timer)
-@@ -131,3 +132,9 @@ void qemu_announce_self(AnnounceTimer *timer, Announc=
-eParameters *params)
-         qemu_announce_timer_del(timer);
-     }
- }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index e60488da7d..e9aa7ec258 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -226,6 +226,7 @@ check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/test-netf=
+ilter$(EXESUF)
+ check-qtest-i386-$(CONFIG_POSIX) +=3D tests/test-filter-mirror$(EXESUF)
+ check-qtest-i386-$(CONFIG_RTL8139_PCI) +=3D tests/test-filter-redirector=
+$(EXESUF)
+ check-qtest-i386-y +=3D tests/migration-test$(EXESUF)
++check-qtest-i386-y +=3D tests/test-announce-self$(EXESUF)
+ check-qtest-i386-y +=3D tests/test-x86-cpuid-compat$(EXESUF)
+ check-qtest-i386-y +=3D tests/numa-test$(EXESUF)
+ check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
+@@ -263,6 +264,7 @@ check-qtest-ppc64-y +=3D $(check-qtest-ppc-y)
+ check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tests/spapr-phb-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_POWERNV) +=3D tests/pnv-xscom-test$(EXESUF)
+ check-qtest-ppc64-y +=3D tests/migration-test$(EXESUF)
++check-qtest-ppc64-y +=3D tests/test-announce-self$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tests/rtas-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_SLIRP) +=3D tests/pxe-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_USB_OHCI) +=3D tests/usb-hcd-ohci-test$(EXESU=
+F)
+@@ -776,6 +778,7 @@ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-=
+test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb=
+-obj-y)
+ tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
+ tests/migration-test$(EXESUF): tests/migration-test.o
++tests/test-announce-self$(EXESUF): tests/test-announce-self.o
+ tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-=
+y) \
+ 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-=
+y) \
+ 	$(chardev-obj-y)
+diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
+new file mode 100644
+index 0000000000..1644d34a3f
+--- /dev/null
++++ b/tests/test-announce-self.c
+@@ -0,0 +1,82 @@
++/*
++ * QTest testcase for qemu_announce_self
++ *
++ * Copyright (c) 2017 Red hat, Inc.
++ * Copyright (c) 2014 SUSE LINUX Products GmbH
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+void qmp_announce_self(AnnounceParameters *params, Error **errp)
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qapi/qmp/qdict.h"
++#include "qemu-common.h"
++#include "qemu/sockets.h"
++#include "qemu/iov.h"
++#include "libqos/libqos-pc.h"
++#include "libqos/libqos-spapr.h"
++
++#ifndef ETH_P_RARP
++#define ETH_P_RARP 0x8035
++#endif
++
++static QTestState *test_init(int socket)
 +{
-+    static AnnounceTimer announce_timer;
-+    qemu_announce_self(&announce_timer, params);
-+}
-diff --git a/qapi/net.json b/qapi/net.json
-index 5face0c14b..372ae10168 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -707,3 +707,23 @@
-             'max': 'int',
-             'rounds': 'int',
-             'step': 'int' } }
++    char *args;
 +
-+##
-+# @announce-self:
-+#
-+# Trigger generation of broadcast RARP frames to update network switches=
-.
-+# This can be useful when network bonds fail-over the active slave.
-+#
-+# @params: AnnounceParameters giving timing and repetition count of anno=
-unce
-+#
-+# Example:
-+#
-+# -> { "execute": "announce-self"
-+#      "arguments": {
-+#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } }
-+# <- { "return": {} }
-+#
-+# Since: 4.0
-+##
-+{ 'command': 'announce-self', 'boxed': true,
-+  'data' : 'AnnounceParameters'}
++    args =3D g_strdup_printf("-netdev socket,fd=3D%d,id=3Dhs0 -device "
++                           "virtio-net-pci,netdev=3Dhs0", socket);
++
++    return qtest_start(args);
++}
++
++
++static void test_announce(int socket)
++{
++    char buffer[60];
++    int len;
++    QDict *rsp;
++    int ret;
++    uint16_t *proto =3D (uint16_t *)&buffer[12];
++
++    rsp =3D qmp("{ 'execute' : 'announce-self', "
++                  " 'arguments': {"
++                      " 'initial': 50, 'max': 550,"
++                      " 'rounds': 10, 'step': 50 } }");
++    assert(!qdict_haskey(rsp, "error"));
++    qobject_unref(rsp);
++
++    /* Catch the packet and make sure it's a RARP */
++    ret =3D qemu_recv(socket, &len, sizeof(len), 0);
++    g_assert_cmpint(ret, =3D=3D,  sizeof(len));
++    len =3D ntohl(len);
++
++    ret =3D qemu_recv(socket, buffer, len, 0);
++    g_assert_cmpint(*proto, =3D=3D, htons(ETH_P_RARP));
++}
++
++static void setup(gconstpointer data)
++{
++    QTestState *qs;
++    void (*func) (int socket) =3D data;
++    int sv[2], ret;
++
++    ret =3D socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
++    g_assert_cmpint(ret, !=3D, -1);
++
++    qs =3D test_init(sv[1]);
++    func(sv[0]);
++
++    /* End test */
++    close(sv[0]);
++    qtest_quit(qs);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++    qtest_add_data_func("/virtio/net/test_announce_self", test_announce,=
+ setup);
++
++    return g_test_run();
++}
 --=20
 2.20.1
