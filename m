@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50921)
+Received: from eggs.gnu.org ([209.51.188.92]:50852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gyzU8-000502-FR
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:42:57 -0500
+	(envelope-from <fam@euphon.net>) id 1gyzUM-0004ye-Oj
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gyzQ5-0007l4-8L
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:38:46 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45315)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gyzQ4-0007iv-Rz
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:38:45 -0500
-Received: by mail-wr1-x442.google.com with SMTP id w17so17971122wrn.12
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 05:38:41 -0800 (PST)
-Date: Wed, 27 Feb 2019 13:38:38 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190227133838.GB22539@stefanha-x1.localdomain>
-References: <20190222031413.20250-1-peterx@redhat.com>
-	<20190222031413.20250-5-peterx@redhat.com>
-	<CAMxuvax9+NNe6Mh3TnFgt6p+q=kcgR1tEiQNr+be8bJRDUPCJw@mail.gmail.com>
-	<20190222065724.GH8904@xz-x1>
+	(envelope-from <fam@euphon.net>) id 1gyzN9-0005rZ-KL
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:35:45 -0500
+Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17701
+	helo=sender1.zoho.com.cn)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fam@euphon.net>) id 1gyzN7-0005oR-RO
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:35:43 -0500
+Date: Wed, 27 Feb 2019 21:35:09 +0800
+From: Fam Zheng <fam@euphon.net>
+Message-ID: <20190227133509.sd7luqap3bv66lxf@deb>
+References: <20181031025712.18602-1-famz@redhat.com>
+	<4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
+	<20181114095807.GB22784@magic> <20190109135504.GA12179@redhat.com>
+	<20190109135917.GP3998@redhat.com>
+	<A3EA5405-A5EE-4E77-8C77-A67398756B96@euphon.net>
+	<20190114101515.GA3686@redhat.com>
+	<20190122161236.GZ13143@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cvVnyQ+4j833TQvp"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190222065724.GH8904@xz-x1>
-Subject: Re: [Qemu-devel] [PATCH 4/4] iothread: push gcontext earlier in the
- thread_fn
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190122161236.GZ13143@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4] tests: vm: auto_install OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +34,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Brad Smith <brad@comstyle.com>
 
-
---cvVnyQ+4j833TQvp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 22, 2019 at 02:57:24PM +0800, Peter Xu wrote:
-> On Fri, Feb 22, 2019 at 07:37:02AM +0100, Marc-Andr=E9 Lureau wrote:
-> > Hi
-> >=20
-> > On Fri, Feb 22, 2019 at 4:14 AM Peter Xu <peterx@redhat.com> wrote:
-> > >
-> > > We were pushing the context until right before running the gmainloop.
-> > > Now since we have everything unconditionally, we can move this
-> > > earlier.
-> > >
-> > > One benefit is that now it's done even before init_done_sem, so as
-> > > long as the iothread user calls iothread_create() and completes, we
-> > > know that the thread stack is ready.
-> > >
-> >=20
-> > This will change the default context in the iothread, for code running
-> > there. This may not be a good idea. Until now, only sources dispatched
-> > from iothread_get_g_main_context() would have default context
-> > associated to it.
-> >=20
-> > I don't know if the current behaviour is intentional, but it has some
-> > logic. With this change, you may create hidden races, by changing the
-> > default context of sources to the iothread.
+On Tue, 01/22 16:12, Daniel P. Berrang=E9 wrote:
+> > can't you just refresh that pre-built image to have SDL 2, based on you=
+r
+> > auto-install patches, so we don't have to wait for that to merge.
 >=20
-> Yes I agree that the behavior will be changed in this patch that even
-> if the iothread user does not use the gcontext they'll also have the
-> context set.  I would think it should be ok because IMHO events hooked
-> onto the aio context should not depend on the gcontext, but indeed I'd
-> like to get some confirmation from others, especially the block layer.
+> Please could we just get this pre-built img updated so that we are
+> not blocked on the SDL 1 removal anymore.
 
-I don't understand why Patch 4 is desirable.  The comment about
-init_done_sem isn't clear to me but I also wondered the same thing as
-Marc-Andr=E9.
+Oops. I was seriously distracted from the external mail folders recently..
+Updated the image, please test it.
 
-Can you explain why we should apply this patch?
-
-Stefan
-
---cvVnyQ+4j833TQvp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcdpLeAAoJEJykq7OBq3PIaY8IAIktuajPSANNq4EhfPo+I603
-MIDQliFU0J1HNZ7pw8D4EcNlnoaIVnbiEAqI2iWg3HIk3RwkxPEynoeBvfuGjsln
-BsqDFKIU+ubJHpxh1gUbH2pGLEe122N6NeUxju5vUGWASVlg9pK7/pB2+rFLle0y
-gG2xz4fTQuniw6aKKUJApvlP/p6x+4x8goI7S/lipZfmjC8+Cwzbrs7e/E0Pg7vS
-ZQu9P7afKR8ipTSzfQ4oTiJ9ILuNhuQ3Lr+WLQMfZ0kaEn6090K5iLKBAuHrMRMW
-aAGbaGsymhN9qOHphH0DpKluScFxRRnXoR9CM9i9pF8BpZARnQ9/iYZPp+TPUH4=
-=wbwI
------END PGP SIGNATURE-----
-
---cvVnyQ+4j833TQvp--
+Fam
