@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54416)
+Received: from eggs.gnu.org ([209.51.188.92]:55925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gywRM-000357-0l
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:27:53 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gywYu-0006rh-8M
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:35:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gywRF-0006Mp-Iy
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:27:49 -0500
-References: <20190220224003.4420-1-eric.auger@redhat.com>
-	<20190222172742.18c3835a@redhat.com>
-	<c016024e-9f4b-8953-f492-8802675f7e22@redhat.com>
-	<20190225104212.7d40e65e@Igors-MacBook-Pro.local>
-	<70249194-349e-37f6-0e8d-dc50b39082b7@redhat.com>
-	<cd283485-49a9-ddd1-a020-26110ee093be@redhat.com>
-	<20190226175653.6ca2b6c4@Igors-MacBook-Pro.local>
-	<c68ba5a2-0d24-c1ad-c2af-c957768abf9f@redhat.com>
-	<20190227111025.4bb39cc7@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <116c5375-0ff4-8f91-ac05-05a53e7fe206@redhat.com>
-Date: Wed, 27 Feb 2019 11:27:28 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1gywYs-00034M-Sz
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:35:40 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36271)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gywYs-00032U-3j
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:35:38 -0500
+Received: by mail-wm1-x344.google.com with SMTP id j125so5063053wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 02:35:37 -0800 (PST)
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-8-armbru@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190226193408.23862-8-armbru@redhat.com>
+Date: Wed, 27 Feb 2019 10:35:34 +0000
+Message-ID: <87va15lds9.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190227111025.4bb39cc7@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expansion
- and PCDIMM/NVDIMM support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 07/11] ppc405_boards: Don't size flash
+ memory to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,179 +31,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, david@redhat.com, dgilbert@redhat.com, shameerali.kolothum.thodi@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger.pro@gmail.com, david@gibson.dropbear.id.au
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi Igor, Shameer,
 
-On 2/27/19 11:10 AM, Igor Mammedov wrote:
-> On Tue, 26 Feb 2019 18:53:24 +0100
-> Auger Eric <eric.auger@redhat.com> wrote:
-> 
->> Hi Igor,
->>
->> On 2/26/19 5:56 PM, Igor Mammedov wrote:
->>> On Tue, 26 Feb 2019 14:11:58 +0100
->>> Auger Eric <eric.auger@redhat.com> wrote:
->>>   
->>>> Hi Igor,
->>>>
->>>> On 2/26/19 9:40 AM, Auger Eric wrote:  
->>>>> Hi Igor,
->>>>>
->>>>> On 2/25/19 10:42 AM, Igor Mammedov wrote:  
->>>>>> On Fri, 22 Feb 2019 18:35:26 +0100
->>>>>> Auger Eric <eric.auger@redhat.com> wrote:
->>>>>>  
->>>>>>> Hi Igor,
->>>>>>>
->>>>>>> On 2/22/19 5:27 PM, Igor Mammedov wrote:  
->>>>>>>> On Wed, 20 Feb 2019 23:39:46 +0100
->>>>>>>> Eric Auger <eric.auger@redhat.com> wrote:
->>>>>>>>  
->>>>>>>>> This series aims to bump the 255GB RAM limit in machvirt and to
->>>>>>>>> support device memory in general, and especially PCDIMM/NVDIMM.
->>>>>>>>>
->>>>>>>>> In machvirt versions < 4.0, the initial RAM starts at 1GB and can
->>>>>>>>> grow up to 255GB. From 256GB onwards we find IO regions such as the
->>>>>>>>> additional GICv3 RDIST region, high PCIe ECAM region and high PCIe
->>>>>>>>> MMIO region. The address map was 1TB large. This corresponded to
->>>>>>>>> the max IPA capacity KVM was able to manage.
->>>>>>>>>
->>>>>>>>> Since 4.20, the host kernel is able to support a larger and dynamic
->>>>>>>>> IPA range. So the guest physical address can go beyond the 1TB. The
->>>>>>>>> max GPA size depends on the host kernel configuration and physical CPUs.
->>>>>>>>>
->>>>>>>>> In this series we use this feature and allow the RAM to grow without
->>>>>>>>> any other limit than the one put by the host kernel.
->>>>>>>>>
->>>>>>>>> The RAM still starts at 1GB. First comes the initial ram (-m) of size
->>>>>>>>> ram_size and then comes the device memory (,maxmem) of size
->>>>>>>>> maxram_size - ram_size. The device memory is potentially hotpluggable
->>>>>>>>> depending on the instantiated memory objects.
->>>>>>>>>
->>>>>>>>> IO regions previously located between 256GB and 1TB are moved after
->>>>>>>>> the RAM. Their offset is dynamically computed, depends on ram_size
->>>>>>>>> and maxram_size. Size alignment is enforced.
->>>>>>>>>
->>>>>>>>> In case maxmem value is inferior to 255GB, the legacy memory map
->>>>>>>>> still is used. The change of memory map becomes effective from 4.0
->>>>>>>>> onwards.
->>>>>>>>>
->>>>>>>>> As we keep the initial RAM at 1GB base address, we do not need to do
->>>>>>>>> invasive changes in the EDK2 FW. It seems nobody is eager to do
->>>>>>>>> that job at the moment.
->>>>>>>>>
->>>>>>>>> Device memory being put just after the initial RAM, it is possible
->>>>>>>>> to get access to this feature while keeping a 1TB address map.
->>>>>>>>>
->>>>>>>>> This series reuses/rebases patches initially submitted by Shameer
->>>>>>>>> in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
->>>>>>>>>
->>>>>>>>> Functionally, the series is split into 3 parts:
->>>>>>>>> 1) bump of the initial RAM limit [1 - 9] and change in
->>>>>>>>>    the memory map  
->>>>>>>>  
->>>>>>>>> 2) Support of PC-DIMM [10 - 13]  
->>>>>>>> Is this part complete ACPI wise (for coldplug)? I haven't noticed
->>>>>>>> DSDT AML here no E820 changes, so ACPI wise pc-dimm shouldn't be
->>>>>>>> visible to the guest. It might be that DT is masking problem
->>>>>>>> but well, that won't work on ACPI only guests.  
->>>>>>>
->>>>>>> guest /proc/meminfo or "lshw -class memory" reflects the amount of mem
->>>>>>> added with the DIMM slots.  
->>>>>> Question is how does it get there? Does it come from DT or from firmware
->>>>>> via UEFI interfaces?
->>>>>>  
->>>>>>> So it looks fine to me. Isn't E820 a pure x86 matter?  
->>>>>> sorry for misleading, I've meant is UEFI GetMemoryMap().
->>>>>> On x86, I'm wary of adding PC-DIMMs to E802 which then gets exposed
->>>>>> via UEFI GetMemoryMap() as guest kernel might start using it as normal
->>>>>> memory early at boot and later put that memory into zone normal and hence
->>>>>> make it non-hot-un-pluggable. The same concerns apply to DT based means
->>>>>> of discovery.
->>>>>> (That's guest issue but it's easy to workaround it not putting hotpluggable
->>>>>> memory into UEFI GetMemoryMap() or DT and let DSDT describe it properly)
->>>>>> That way memory doesn't get (ab)used by firmware or early boot kernel stages
->>>>>> and doesn't get locked up.
->>>>>>  
->>>>>>> What else would you expect in the dsdt?  
->>>>>> Memory device descriptions, look for code that adds PNP0C80 with _CRS
->>>>>> describing memory ranges  
->>>>>
->>>>> OK thank you for the explanations. I will work on PNP0C80 addition then.
->>>>> Does it mean that in ACPI mode we must not output DT hotplug memory
->>>>> nodes or assuming that PNP0C80 is properly described, it will "override"
->>>>> DT description?  
->>>>
->>>> After further investigations, I think the pieces you pointed out are
->>>> added by Shameer's series, ie. through the build_memory_hotplug_aml()
->>>> call. So I suggest we separate the concerns: this series brings support
->>>> for DIMM coldplug. hotplug, including all the relevant ACPI structures
->>>> will be added later on by Shameer.  
->>>
->>> Maybe we should not put pc-dimms in DT for this series until it gets clear
->>> if it doesn't conflict with ACPI in some way.  
->>
->> I guess you mean removing the DT hotpluggable memory nodes only in ACPI
->> mode? Otherwise you simply remove the DIMM feature, right?
-> Something like this so DT won't get in conflict with ACPI.
-> Only we don't have a switch for it something like, -machine fdt=on (with default off)
->  
->> I double checked and if you remove the hotpluggable memory DT nodes in
->> ACPI mode:
->> - you do not see the PCDIMM slots in guest /proc/meminfo anymore. So I
->> guess you're right, if the DT nodes are available, that memory is
->> considered as not unpluggable by the guest.
->> - You can see the NVDIMM slots using ndctl list -u. You can mount a DAX
->> system.
->>
->> Hotplug/unplug is clearly not supported by this series and any attempt
->> results in "memory hotplug is not supported". Is it really an issue if
->> the guest does not consider DIMM slots as not hot-unpluggable memory? I
->> am not even sure the guest kernel would support to unplug that memory.
->>
->> In case we want all ACPI tables to be ready for making this memory seen
->> as hot-unpluggable we need some Shameer's patches on top of this series.
-> May be we should push for this way (into 4.0), it's just a several patches
-> after all or even merge them in your series (I'd guess it would need to be
-> rebased on top of your latest work)
+Markus Armbruster <armbru@redhat.com> writes:
 
-Shameer, would you agree if we merge PATCH 1 of your RFC hotplug series
-(without the reduced hw_reduced_acpi flag) in this series and isolate in
-a second PATCH the acpi_memory_hotplug_init() + build_memory_hotplug_aml
-called in virt code?
+> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+> Image size is rounded up to the next multiple of 64KiB.  Useless,
+> because pflash_cfi02_realize() fails with "failed to read the initial
+> flash content" unless the rounding is a no-op.
+>
+> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+> other stuff.  No idea how that would play out, but a useful outcomes
+> seem unlikely.
+>
+> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+> regardless of image size, to match the physical hardware.
+>
+> Machine "taihu" maps its boot flash memory similarly.  The code even
+> has a comment /* XXX: should check that size is 2MB */, followed by
+> disabled code to adjust the size to 2MiB regardless of image size.
+>
+> Its code to map its application flash memory looks the same, except
+> there the XXX comment asks for 32MiB, and the code to adjust the size
+> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+> to read the initial flash content" for images smaller than 32MiB.
+>
+> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+> to match the physical hardware.  Delete dead code from application
+> flash mapping, and simplify some.
 
-Then would remain the GED/GPIO actual integration.
+It seems to me the DEBUG_BOARD_INIT code is probably out of date cruft
+that could be excised all together. But that doesn't stop this being
+useful:
 
-Thanks
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Eric
->  
->> Also don't DIMM slots already make sense in DT mode. Usually we accept
->> to add one feature in DT and then in ACPI. For instance we can benefit
-> usually it doesn't conflict with each other (at least I'm not aware of it)
-> but I see a problem with in this case.
-> 
->> from nvdimm in dt mode right? So, considering an incremental approach I
->> would be in favour of keeping the DT nodes.
-> I'd guess it is the same as for DIMMs, ACPI support for NVDIMMs is much
-> more versatile.
-> 
-> I consider target application of arm/virt as a board that's used to
-> run in production generic ACPI capable guest in most use cases and
-> various DT only guests as secondary ones. It's hard to make
-> both usecases be happy with defaults (that's probably  one of the
-> reasons why 'sbsa' board is being added).
-> 
-> So I'd give priority to ACPI based arm/virt versus DT when defaults are
-> considered.
-> 
->> Thanks
->>
->> Eric
->>>
->>>
->>>
->>>   
-> 
+>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/ppc405_boards.c | 51 +++++++++++++-----------------------------
+>  1 file changed, 15 insertions(+), 36 deletions(-)
+>
+> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+> index f47b15f10e..672717ef1b 100644
+> --- a/hw/ppc/ppc405_boards.c
+> +++ b/hw/ppc/ppc405_boards.c
+> @@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
+>      target_ulong kernel_base, initrd_base;
+>      long kernel_size, initrd_size;
+>      int linux_boot;
+> -    int fl_idx, fl_sectors, len;
+> +    int len;
+>      DriveInfo *dinfo;
+>      MemoryRegion *sysmem =3D get_system_memory();
+>
+> @@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
+>  #ifdef DEBUG_BOARD_INIT
+>      printf("%s: register BIOS\n", __func__);
+>  #endif
+> -    fl_idx =3D 0;
+>  #ifdef USE_FLASH_BIOS
+> -    dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+> +    dinfo =3D drive_get(IF_PFLASH, 0, 0);
+>      if (dinfo) {
+> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size =3D blk_getlength(blk);
+> -        fl_sectors =3D (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr %lx '%s' %d\n",
+> -               fl_idx, bios_size, -bios_size,
+> -               blk_name(blk), fl_sectors);
+> +        printf("Register parallel flash\n");
+>  #endif
+> +        bios_size =3D 8 * MiB;
+>          pflash_cfi02_register((uint32_t)(-bios_size),
+>                                NULL, "ef405ep.bios", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              64 * KiB, bios_size / (64 * KiB), 1,
+>                                2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+>                                1);
+> -        fl_idx++;
+>      } else
+>  #endif
+>      {
+> @@ -455,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
+>      target_ulong kernel_base, initrd_base;
+>      long kernel_size, initrd_size;
+>      int linux_boot;
+> -    int fl_idx, fl_sectors;
+> +    int fl_idx;
+>      DriveInfo *dinfo;
+>
+>      /* RAM is soldered to the board so the size cannot be changed */
+> @@ -486,21 +479,14 @@ static void taihu_405ep_init(MachineState *machine)
+>  #if defined(USE_FLASH_BIOS)
+>      dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+>      if (dinfo) {
+> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size =3D blk_getlength(blk);
+> -        /* XXX: should check that size is 2MB */
+> -        //        bios_size =3D 2 * 1024 * 1024;
+> -        fl_sectors =3D (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr %lx '%s' %d\n",
+> -               fl_idx, bios_size, -bios_size,
+> -               blk_name(blk), fl_sectors);
+> +        printf("Register boot flash\n");
+>  #endif
+> -        pflash_cfi02_register((uint32_t)(-bios_size),
+> +        bios_size =3D 2 * MiB;
+> +        pflash_cfi02_register(0xFFE00000,
+>                                NULL, "taihu_405ep.bios", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              64 * KiB, bios_size / (64 * KiB), 1,
+>                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+>                                1);
+>          fl_idx++;
+> @@ -536,20 +522,13 @@ static void taihu_405ep_init(MachineState *machine)
+>      /* Register Linux flash */
+>      dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+>      if (dinfo) {
+> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size =3D blk_getlength(blk);
+> -        /* XXX: should check that size is 32MB */
+>          bios_size =3D 32 * MiB;
+> -        fl_sectors =3D (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr " TARGET_FMT_lx " '%s'\n",
+> -               fl_idx, bios_size, (target_ulong)0xfc000000,
+> -               blk_name(blk));
+> +        printf("Register application flash\n"
+>  #endif
+>          pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bio=
+s_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              64 * KiB, bios_size / (64 * KiB), 1,
+>                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+>                                1);
+>          fl_idx++;
+
+
+--
+Alex Benn=C3=A9e
