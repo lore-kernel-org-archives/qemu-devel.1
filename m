@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49071)
+Received: from eggs.gnu.org ([209.51.188.92]:50396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gz0wQ-0000gj-1c
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:16:14 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gz139-0003Cf-0p
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:23:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gz0wK-0001oc-Od
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:16:14 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gz0wJ-0001eS-1d
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:16:08 -0500
-Received: by mail-wm1-x343.google.com with SMTP id x7so6188472wmj.0
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 07:15:37 -0800 (PST)
-Date: Wed, 27 Feb 2019 15:15:35 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190227151535.GE22539@stefanha-x1.localdomain>
-References: <20190222153254.22739-1-stefanha@redhat.com>
-	<87imx8uu99.fsf@dusky.pond.sub.org>
-	<20190225092846.GA4757@angien.pipo.sk>
-	<20190225174001.GI379@stefanha-x1.localdomain>
-	<87a7iincg0.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1gz138-00071n-4F
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:23:11 -0500
+References: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<5c72aad4-d1bc-7241-a972-32dd07ef23b0@virtuozzo.com>
+	<efdc687a-239e-3f30-c2d8-e46a47029496@redhat.com>
+	<7414a532-3005-5cfe-6f29-77cf95eeb4d2@virtuozzo.com>
+	<7dc5a22b-88fe-883d-0dd8-1101d67891f5@redhat.com>
+	<1205dd10-25a4-ab53-d7ab-162e257cbba7@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <dc493087-f0e8-91d1-69fc-ff63e5ec345d@redhat.com>
+Date: Wed, 27 Feb 2019 16:22:45 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="C94crkcyjafcjHxo"
-Content-Disposition: inline
-In-Reply-To: <87a7iincg0.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
+In-Reply-To: <1205dd10-25a4-ab53-d7ab-162e257cbba7@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="YRspFXloHBXH2vzVnQTT8hymhyxy9OfZd"
+Subject: Re: [Qemu-devel] [PATCH] Discard old bitmap directories in QCOW2
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,69 +29,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>
 
-
---C94crkcyjafcjHxo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YRspFXloHBXH2vzVnQTT8hymhyxy9OfZd
+From: Max Reitz <mreitz@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>
+Message-ID: <dc493087-f0e8-91d1-69fc-ff63e5ec345d@redhat.com>
+Subject: Re: [PATCH] Discard old bitmap directories in QCOW2 image
+References: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <5c72aad4-d1bc-7241-a972-32dd07ef23b0@virtuozzo.com>
+ <efdc687a-239e-3f30-c2d8-e46a47029496@redhat.com>
+ <7414a532-3005-5cfe-6f29-77cf95eeb4d2@virtuozzo.com>
+ <7dc5a22b-88fe-883d-0dd8-1101d67891f5@redhat.com>
+ <1205dd10-25a4-ab53-d7ab-162e257cbba7@virtuozzo.com>
+In-Reply-To: <1205dd10-25a4-ab53-d7ab-162e257cbba7@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 26, 2019 at 10:09:19AM +0100, Markus Armbruster wrote:
-> Stefan Hajnoczi <stefanha@redhat.com> writes:
-> > On Mon, Feb 25, 2019 at 10:28:46AM +0100, Peter Krempa wrote:
-> >> On Mon, Feb 25, 2019 at 09:50:26 +0100, Markus Armbruster wrote:
-> >> > Stefan Hajnoczi <stefanha@redhat.com> writes:
-> >> Other than the above, this is a welcome improvement as I've personally
-> >> ran into scenarios where a feature in qemu was fixed but it was
-> >> impossible to detect whether given qemu version contains the fix as it
-> >> did not have any influence on the QMP schema.
-> >
-> > I'd like to make things as simpler as possible, but no simpler :).
-> >
-> > The simplest option is that the advertised features are set in stone at
-> > build time (e.g. selected with #ifdef if necessary).  But then we have
-> > no way of selecting features at runtime (e.g. based on kernel features).
-> >
-> > What do you think?
+On 27.02.19 16:15, Andrey Shinkevich wrote:
 >=20
-> I think we should map the problem space, identify cases with actual
-> uses, then design a solution that covers them and can plausibly grow to
-> cover cases we anticipate.
 >=20
-> The migrate-with-cache-direct-off-on-linux case is compile-time static.
->=20
-> Do we have or have we had a case that is not compile-time static?
+> On 27/02/2019 16:25, Max Reitz wrote:
+>> On 27.02.19 14:16, Denis Lunev wrote:
+>>> On 2/27/19 4:00 PM, Max Reitz wrote:
+>>>> On 18.02.19 16:36, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 12.02.2019 15:35, Andrey Shinkevich wrote:
+>>>>>> Clean QCOW2 image from bitmap obsolete directory when a new one
+>>>>>> is allocated and stored. It slows down the image growth a little b=
+it.
+>>>>>> The flag QCOW2_DISCARD_ALWAYS allows a call to raw_co_pdiscard()
+>>>>>> that does the actual cleaning of the image on disk.
+>>>>>> With the flag QCOW2_DISCARD_OTHER, a reference count of the cluste=
+r
+>>>>>> is updated only.
+>>>>>>
+>>>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>=
 
-I can't think of something that both requires query-qemu-features and
-isn't compile-time static.  But that could be because not many things
-require query-qemu-features :).
+>>>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>>>>
+>>>>> side question: should not we change discard_passthrough[QCOW2_DISCA=
+RD_OTHER] to
+>>>>> true or at least flags&BDRV_O_UNMAP by default? What is the reason =
+of not discarding
+>>>>> things in qcow2-cluster?
+>>>> As far as I remember the reason is that whenever you clean up someth=
+ing
+>>>> its cluster is probably going to be reused rather soon.  So cleaning=
+ up
+>>>> takes longer, repopulating that cluster takes longer, and you save o=
+nly
+>>>> rather little space.
+>>>>
+>>>> This is also why I don't know whether this patch makes much sense.
+>>>>
+>>>> Max
+>>>>
+>>> This depands upon the amount of actually free clusters in the image.
+>>> If there a lot of them at the moment, this one could be refilled
+>>> any time later on.
+>>
+>> Well, it's a trade-off.  For small structures like the bitmap director=
+y,
+>> I don't see the point in forcefully unmapping them.  We don't do it fo=
+r
+>> the old L1 table either when that has to be resized.
+>>
+>> Discarding a whole bitmap (like in clear_bitmap_table()) is something
+>> else, though.  So I was too quick to dismiss the whole patch; parts of=
 
-The philosophy on Linux seems to be: distros compile QEMU against
-headers that accurately reflect the system features that are available.
-Therefore there isn't a lot of runtime fallback logic in case a new QEMU
-is running on an old host.  This means we can get by with compile-time
-static features only.
+>> it do make sense.
+>>
+>> For bitmap tables...  I don't know exactly.  I don't think a bitmap
+>> table is ever going to be larger than the L1 table, so it should
+>> probably be handled the same way -- which is to keep QCOW2_DISCARD_OTH=
+ER.
+>>
+>> Max
+>>
+> Yes, Max. All what you wrote about do make the sense.
+> The reason behind the proposition to discard the obsolete bitmap
+> directories in the image is that it makes debugging of the iotests
+> easier for a developer. Otherwise, lots of irrelevant symbolic
+> information in the image forces to track which one is valid.
+> Particularly, I locate the byte that designates the bitmap flags to see=
 
-One possible exception is the ENOSYS/ENOTSUP fallback code in
-block/file-posix.c:handle_aiocb_write_zeroes() and
-handle_aiocb_copy_range().
+> if the flag 'in-use' is not set. And I do that for every single bitmap
+> directory in the image.
+> Again, cleaning up the obsolete bitmap directories in the image serves
+> for the convenience of debugging. What do you think about it?
 
-Stefan
+I don't think convenience of debugging is a good reason to implement
+something that is probably worse behavior when not debugging.  Of
+course, if the changed behavior is neither worse nor better, then we
+might as well go for it if it eases debugging.  But I think it is a bit
+worse.
 
---C94crkcyjafcjHxo
+Also, if you want to debug images you have created yourself (or at least
+are used by VMs you have control over), you can simply set
+pass-discard-other=3Don.
+
+Max
+
+
+--YRspFXloHBXH2vzVnQTT8hymhyxy9OfZd
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcdqmWAAoJEJykq7OBq3PIsboH/jYRSoVSOZdr9BK+/A7XSq0w
-pQCDrHuYi/+f2S4q2sWpBDnSdORomECiKZLa98lvnA0mhKD95Yzw4ePBteuRb2jj
-EVyj2CKZ9gM+8uy0SkIPnCGvACyv18hsKl9T+An1eKDL8dlgW+YRSu6HazdgaQWc
-PzX5ksWEu8GNzuVo406PQkpfvuTh/V8SWTnuqpiV0dJ5ZQPvc319Ge5A26dEgKpJ
-8f6AOr+StaAs1tvKKQQGlVBUhtuOvIAPlbBs5aKhf3omwEgj99txlnfb8R0yCcwc
-488dkDFZfnXARsijk70uXCm6wNjPHZD+XR2XbC0HD0KwePxZtOP0zz+e/HcywzE=
-=D32B
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlx2q0UACgkQ9AfbAGHV
+z0BJ9wgAkbPYXwkEvxyu+zT9cVbl6nuLdtYeKa9W8WgGn/fY6N0Jjy/FmsX69CQj
+71Jterdj2heeXWJ4/RIOLy6RmYoWbqO60FAYj3z3sUK7OtEdqhpAhGZUJzj/P8T8
+3E3DSzjrx4Ev09wMIHon6ke+VQ4jNsuuea29rAAYJFi0X0DFInsYcdzjdPBMYS3X
+NL0L3s7ExzF6rLYcR/SBEXd9gJR0QPQyOgyonfRDaZrrbNNeoTKu/cBUSS2qA2tU
+nO2zyGgiRZbaTIDuXp1iArRf+68aIm2i4aKjoa+vjuxtC3WpfjWkCPoMlEX6gkAJ
+ufuVSlJC0u++UP2ti2wJm6DoheMnCA==
+=UOIt
 -----END PGP SIGNATURE-----
 
---C94crkcyjafcjHxo--
+--YRspFXloHBXH2vzVnQTT8hymhyxy9OfZd--
