@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49065)
+Received: from eggs.gnu.org ([209.51.188.92]:51189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gz2n5-0000vL-9Q
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:14:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gz2vY-0002wS-0Y
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:23:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gz2mx-000703-OO
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:14:40 -0500
-Date: Wed, 27 Feb 2019 18:14:12 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190227181412.2a69a926@redhat.com>
-In-Reply-To: <20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
-References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
-	<20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
+	(envelope-from <kwolf@redhat.com>) id 1gz2vM-0002x1-2E
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:23:19 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 27 Feb 2019 18:22:37 +0100
+Message-Id: <20190227172256.30368-2-kwolf@redhat.com>
+In-Reply-To: <20190227172256.30368-1-kwolf@redhat.com>
+References: <20190227172256.30368-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
- hotplug support
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 01/20] qemu-iotests: Test qcow2 preallocation
+ modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,155 +22,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: eric.auger@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, linuxarm@huawei.com, xuwei5@huawei.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Mon, 28 Jan 2019 11:05:45 +0000
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/243     | 63 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/243.out | 26 ++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 90 insertions(+)
+ create mode 100755 tests/qemu-iotests/243
+ create mode 100644 tests/qemu-iotests/243.out
 
-> pc-dimm memory hotplug is enabled using GPIO(Pin 2) based ACPI
-> event. Hot removal functionality is not yet supported.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  hw/arm/virt.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 55 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 884960d..cf64554 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -62,6 +62,7 @@
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/mem/nvdimm.h"
->  #include "hw/acpi/acpi.h"
-> +#include "hw/acpi/pc-hotplug.h"
->  
->  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-> @@ -1651,7 +1652,14 @@ static void machvirt_init(MachineState *machine)
->          nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
->                                 vms->fw_cfg, OBJECT(vms));
->      }
-> +    if (vms->acpi_memhp_state.is_enabled) {
-> +        MemHotplugState *state =  &vms->acpi_memhp_state;
-> +        hwaddr base;
->  
-> +        state->hw_reduced_acpi = true;
-> +        base = vms->memmap[VIRT_ACPI_IO].base + ACPI_MEMORY_HOTPLUG_BASE;
-> +        acpi_memory_hotplug_init(sysmem, OBJECT(vms), state, base);
-> +    }
-this hunk should be a part of 'acpi' device that owns respective interrupts and mmio regions.
-(something like we do in x86)
-In this case I'd suggest to make 'base' its property and the board will set it during
-device creation.
-
->      vms->bootinfo.ram_size = machine->ram_size;
->      vms->bootinfo.kernel_filename = machine->kernel_filename;
->      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
-> @@ -1819,6 +1827,20 @@ static void virt_set_nvdimm_persistence(Object *obj, const char *value,
->      nvdimm_state->persistence_string = g_strdup(value);
->  }
->  
-> +static bool virt_get_memhp_support(Object *obj, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(obj);
-> +
-> +    return vms->acpi_memhp_state.is_enabled;
-> +}
-> +
-> +static void virt_set_memhp_support(Object *obj, bool value, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(obj);
-> +
-> +    vms->acpi_memhp_state.is_enabled = value;
-> +}
-> +
->  static CpuInstanceProperties
->  virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
->  {
-> @@ -1863,8 +1885,8 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->  
-> -    if (dev->hotplugged) {
-> -        error_setg(errp, "memory hotplug is not supported");
-> +    if (dev->hotplugged && is_nvdimm) {
-> +        error_setg(errp, "nvdimm hotplug is not supported");
->      }
->  
->      if (is_nvdimm && !vms->acpi_nvdimm_state.is_enabled) {
-> @@ -1875,6 +1897,22 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
->  }
->  
-> +static void virt_memhp_send_event(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                  Error **errp)
-> +{
-> +    DeviceState *gpio_dev;
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +
-> +    gpio_dev = virt_get_gpio_dev(GPIO_PCDIMM);
-> +    if (!gpio_dev) {
-> +        error_setg(errp, "No dev interface to send hotplug event");
-                             ^^^^^^ confusing
-> +        return;
-> +    }
-> +    acpi_memory_plug_cb(hotplug_dev, &vms->acpi_memhp_state,
-> +                        dev, errp);
-> +    qemu_set_irq(qdev_get_gpio_in(gpio_dev, 0), 1);
-> +}
-> +
->  static void virt_memory_plug(HotplugHandler *hotplug_dev,
->                               DeviceState *dev, Error **errp)
->  {
-> @@ -1891,6 +1929,10 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
->          nvdimm_plug(&vms->acpi_nvdimm_state);
->      }
->  
-> +    if (dev->hotplugged && !is_nvdimm) {
-> +        virt_memhp_send_event(hotplug_dev, dev, errp);
-...
-  acpi_memory_plug_cb();
-  hotplug_handler_plug(HOTPLUG_HANDLER(pcms->gpio_dev), dev, &error_abort);
-  ^^^^ forward snd process hotplug notification event in gpio_dev,
-       machine should not care about which and how to deal with random IRQs
-
-> +    }
-> +
->  out:
->      error_propagate(errp, local_err);
->  }
-> @@ -1898,6 +1940,11 @@ out:
->  static void virt_memory_unplug(HotplugHandler *hotplug_dev,
->                                 DeviceState *dev, Error **errp)
->  {
-> +    if (dev->hotplugged) {
-> +        error_setg(errp, "memory hot unplug is not supported");
-> +        return;
-> +    }
-what if unplug is called on cold-plugged device?
-
-Better way to disable mgmt initiated unplug is to forbid it in unplug_request()
-For guest initiated one ('unplug' handler), the best we can do is log error
-and ignore it (provided guest won't get in confused). it's also possible 
-to hide _EJ method and then it would be even fine to abort if it gets here,
-since guest is not supposed to interface with MMIO interface without using AML.
-
-> +
->      pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
->      object_unparent(OBJECT(dev));
->  }
-> @@ -2085,6 +2132,12 @@ static void virt_instance_init(Object *obj)
->                                      "Set NVDIMM persistence"
->                                      "Valid values are cpu and mem-ctrl", NULL);
->  
-> +    vms->acpi_memhp_state.is_enabled = true;
-> +    object_property_add_bool(obj, "memory-hotplug-support",
-> +                             virt_get_memhp_support,
-> +                             virt_set_memhp_support,
-> +                             NULL);
-> +
->      vms->irqmap = a15irqmap;
->  }
->  
+diff --git a/tests/qemu-iotests/243 b/tests/qemu-iotests/243
+new file mode 100755
+index 0000000000..5ab1b7863d
+--- /dev/null
++++ b/tests/qemu-iotests/243
+@@ -0,0 +1,63 @@
++#!/bin/bash
++#
++# Test qcow2 preallocation
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=3Dkwolf@redhat.com
++
++seq=3D$(basename $0)
++echo "QA output created by $seq"
++
++status=3D1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++for mode in off metadata falloc full; do
++
++    echo
++    echo "=3D=3D=3D preallocation=3D$mode =3D=3D=3D"
++    echo
++
++    IMGOPTS=3D"preallocation=3D$mode" _make_test_img 64M
++
++    echo -n "File size: "
++    du -b $TEST_IMG | cut -f1
++
++    # Can't use precise numbers here because they differ between filesys=
+tems
++    echo -n "Disk usage: "
++    [ $(du -B1 $TEST_IMG | cut -f1) -lt 1048576 ] && echo "low" || echo =
+"high"
++
++done
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/243.out b/tests/qemu-iotests/243.out
+new file mode 100644
+index 0000000000..e531753ad1
+--- /dev/null
++++ b/tests/qemu-iotests/243.out
+@@ -0,0 +1,26 @@
++QA output created by 243
++
++=3D=3D=3D preallocation=3Doff =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
+on=3Doff
++File size: 196616
++Disk usage: low
++
++=3D=3D=3D preallocation=3Dmetadata =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
+on=3Dmetadata
++File size: 67436544
++Disk usage: low
++
++=3D=3D=3D preallocation=3Dfalloc =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
+on=3Dfalloc
++File size: 67436544
++Disk usage: high
++
++=3D=3D=3D preallocation=3Dfull =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
+on=3Dfull
++File size: 67436544
++Disk usage: high
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index b5ca63cf72..03aa93dbf5 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -241,3 +241,4 @@
+ 239 rw auto quick
+ 240 auto quick
+ 242 rw auto quick
++243 rw auto quick
+--=20
+2.20.1
