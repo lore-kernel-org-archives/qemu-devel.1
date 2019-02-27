@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45875)
+Received: from eggs.gnu.org ([209.51.188.92]:46366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzCQ-00016G-9Q
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:40 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gyzDp-0002OW-D0
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:26:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzCN-0000ZA-Cw
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:5192)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzCM-0000Ut-QC
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:24:35 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6DACE3DBE8
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 13:24:19 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 27 Feb 2019 13:24:06 +0000
-Message-Id: <20190227132413.13213-3-dgilbert@redhat.com>
-In-Reply-To: <20190227132413.13213-1-dgilbert@redhat.com>
-References: <20190227132413.13213-1-dgilbert@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1gyzDn-0001DD-AY
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:26:05 -0500
+References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
+	<20181214134240.217870-6-vsementsov@virtuozzo.com>
+	<15e27f9f-8788-66ce-7843-0922662e42b1@redhat.com>
+	<1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c097c89c-40ef-d3a5-ac4e-7adec1841029@redhat.com>
+Date: Wed, 27 Feb 2019 13:48:41 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 2/9] migration: Add announce parameters
+In-Reply-To: <1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Dwyj2hlxslYBTttqwJNZEXm4ChaX8snBy"
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] qcow2-refcount: don't mask
+ corruptions under internal errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,366 +27,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, jasowang@redhat.com
-Cc: quintela@redhat.com, armbru@redhat.com, thuth@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Dwyj2hlxslYBTttqwJNZEXm4ChaX8snBy
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+Message-ID: <c097c89c-40ef-d3a5-ac4e-7adec1841029@redhat.com>
+Subject: Re: [PATCH v4 5/5] qcow2-refcount: don't mask corruptions under
+ internal errors
+References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
+ <20181214134240.217870-6-vsementsov@virtuozzo.com>
+ <15e27f9f-8788-66ce-7843-0922662e42b1@redhat.com>
+ <1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
+In-Reply-To: <1b6f86f0-1bf5-f306-b24a-ed37c3d9016a@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Add migration parameters that control RARP/GARP announcement timeouts.
+On 27.02.19 13:47, Vladimir Sementsov-Ogievskiy wrote:
+> 27.02.2019 15:42, Max Reitz wrote:
+>> On 14.12.18 14:42, Vladimir Sementsov-Ogievskiy wrote:
+>>> No reasons for not reporting found corruptions as corruptions in case=
 
-Based on earlier patches by myself and
-  Vladislav Yasevich <vyasevic@redhat.com>
+>>> of some internal errors, especially in case of just failed to fix l2
+>>> entry (and in this case, missed corruptions may influence comparing
+>>> logic, when we calculate difference between corruptions fields of two=
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Acked-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
----
- hmp.c                    |  28 +++++++++++
- include/migration/misc.h |   2 +
- migration/migration.c    | 100 +++++++++++++++++++++++++++++++++++++++
- qapi/migration.json      |  53 +++++++++++++++++++--
- 4 files changed, 180 insertions(+), 3 deletions(-)
+>>> results)
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> ---
+>>>   block/qcow2-refcount.c | 31 ++++++++++++++-----------------
+>>>   1 file changed, 14 insertions(+), 17 deletions(-)
+>>>
+>>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+>>> index 8da0e91dd3..b0e006e628 100644
+>>> --- a/block/qcow2-refcount.c
+>>> +++ b/block/qcow2-refcount.c
+>>
+>> [...]
+>>
+>>> @@ -1899,19 +1899,16 @@ static int check_oflag_copied(BlockDriverStat=
+e *bs, BdrvCheckResult *res,
+>>>                       fprintf(stderr, "%s OFLAG_COPIED data cluster: =
+"
+>>>                               "l2_entry=3D%" PRIx64 " refcount=3D%" P=
+RIu64 "\n",
+>>>                               repair ? "Repairing" : "ERROR", l2_entr=
+y, refcount);
+>>> -                    if (repair) {
+>>> -                        l2_table[j] =3D cpu_to_be64(refcount =3D=3D =
+1
+>>> -                                    ? l2_entry |  QCOW_OFLAG_COPIED
+>>> -                                    : l2_entry & ~QCOW_OFLAG_COPIED)=
+;
+>>> -                        l2_dirty++;
+>>> -                    } else {
+>>> -                        res->corruptions++;
+>>> -                    }
+>>> +                    l2_table[j] =3D cpu_to_be64(refcount =3D=3D 1
+>>> +                                ? l2_entry |  QCOW_OFLAG_COPIED
+>>> +                                : l2_entry & ~QCOW_OFLAG_COPIED);
+>>> +                    l2_dirty++;
+>>
+>> I found the old logic to be easier to understand, actually.  It made i=
+t
+>> clear that if !repair, the L2 table is not going to be touched.
+>>
+>> Max
+>>
+>=20
+> so,
+>=20
+>    if (repair) {
+>       keep as is
+>    }
+>    res->corruptions++;
+>=20
+> ok?
 
-diff --git a/hmp.c b/hmp.c
-index 1e006eeb49..f3db0bf5a2 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -334,6 +334,18 @@ void hmp_info_migrate_parameters(Monitor *mon, const=
- QDict *qdict)
-     params =3D qmp_query_migrate_parameters(NULL);
-=20
-     if (params) {
-+        monitor_printf(mon, "%s: %" PRIu64 " ms\n",
-+            MigrationParameter_str(MIGRATION_PARAMETER_ANNOUNCE_INITIAL)=
-,
-+            params->announce_initial);
-+        monitor_printf(mon, "%s: %" PRIu64 " ms\n",
-+            MigrationParameter_str(MIGRATION_PARAMETER_ANNOUNCE_MAX),
-+            params->announce_max);
-+        monitor_printf(mon, "%s: %" PRIu64 "\n",
-+            MigrationParameter_str(MIGRATION_PARAMETER_ANNOUNCE_ROUNDS),
-+            params->announce_rounds);
-+        monitor_printf(mon, "%s: %" PRIu64 " ms\n",
-+            MigrationParameter_str(MIGRATION_PARAMETER_ANNOUNCE_STEP),
-+            params->announce_step);
-         assert(params->has_compress_level);
-         monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_LEVEL),
-@@ -1757,6 +1769,22 @@ void hmp_migrate_set_parameter(Monitor *mon, const=
- QDict *qdict)
-         p->has_max_postcopy_bandwidth =3D true;
-         visit_type_size(v, param, &p->max_postcopy_bandwidth, &err);
-         break;
-+    case MIGRATION_PARAMETER_ANNOUNCE_INITIAL:
-+        p->has_announce_initial =3D true;
-+        visit_type_size(v, param, &p->announce_initial, &err);
-+        break;
-+    case MIGRATION_PARAMETER_ANNOUNCE_MAX:
-+        p->has_announce_max =3D true;
-+        visit_type_size(v, param, &p->announce_max, &err);
-+        break;
-+    case MIGRATION_PARAMETER_ANNOUNCE_ROUNDS:
-+        p->has_announce_rounds =3D true;
-+        visit_type_size(v, param, &p->announce_rounds, &err);
-+        break;
-+    case MIGRATION_PARAMETER_ANNOUNCE_STEP:
-+        p->has_announce_step =3D true;
-+        visit_type_size(v, param, &p->announce_step, &err);
-+        break;
-     default:
-         assert(0);
-     }
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 4ebf24c6c2..e837ab3042 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -15,6 +15,7 @@
- #define MIGRATION_MISC_H
-=20
- #include "qemu/notify.h"
-+#include "qapi/qapi-types-net.h"
-=20
- /* migration/ram.c */
-=20
-@@ -38,6 +39,7 @@ int64_t self_announce_delay(int round)
-     return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
- }
-=20
-+AnnounceParameters *migrate_announce_params(void);
- /* migration/savevm.c */
-=20
- void dump_vmstate_json_to_file(FILE *out_fp);
-diff --git a/migration/migration.c b/migration/migration.c
-index a9c4c6f01d..ca9c35a5cd 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -87,6 +87,15 @@
-  */
- #define DEFAULT_MIGRATE_MAX_POSTCOPY_BANDWIDTH 0
-=20
-+/*
-+ * Parameters for self_announce_delay giving a stream of RARP/ARP
-+ * packets after migration.
-+ */
-+#define DEFAULT_MIGRATE_ANNOUNCE_INITIAL  50
-+#define DEFAULT_MIGRATE_ANNOUNCE_MAX     550
-+#define DEFAULT_MIGRATE_ANNOUNCE_ROUNDS    5
-+#define DEFAULT_MIGRATE_ANNOUNCE_STEP    100
-+
- static NotifierList migration_state_notifiers =3D
-     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
-=20
-@@ -740,10 +749,32 @@ MigrationParameters *qmp_query_migrate_parameters(E=
-rror **errp)
-     params->max_postcopy_bandwidth =3D s->parameters.max_postcopy_bandwi=
-dth;
-     params->has_max_cpu_throttle =3D true;
-     params->max_cpu_throttle =3D s->parameters.max_cpu_throttle;
-+    params->has_announce_initial =3D true;
-+    params->announce_initial =3D s->parameters.announce_initial;
-+    params->has_announce_max =3D true;
-+    params->announce_max =3D s->parameters.announce_max;
-+    params->has_announce_rounds =3D true;
-+    params->announce_rounds =3D s->parameters.announce_rounds;
-+    params->has_announce_step =3D true;
-+    params->announce_step =3D s->parameters.announce_step;
-=20
-     return params;
- }
-=20
-+AnnounceParameters *migrate_announce_params(void)
-+{
-+    static AnnounceParameters ap;
-+
-+    MigrationState *s =3D migrate_get_current();
-+
-+    ap.initial =3D s->parameters.announce_initial;
-+    ap.max =3D s->parameters.announce_max;
-+    ap.rounds =3D s->parameters.announce_rounds;
-+    ap.step =3D s->parameters.announce_step;
-+
-+    return &ap;
-+}
-+
- /*
-  * Return true if we're already in the middle of a migration
-  * (i.e. any of the active or setup states)
-@@ -1117,6 +1148,35 @@ static bool migrate_params_check(MigrationParamete=
-rs *params, Error **errp)
-         return false;
-     }
-=20
-+    if (params->has_announce_initial &&
-+        params->announce_initial > 100000) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   "announce_initial",
-+                   "is invalid, it must be less than 100000 ms");
-+        return false;
-+    }
-+    if (params->has_announce_max &&
-+        params->announce_max > 100000) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   "announce_max",
-+                   "is invalid, it must be less than 100000 ms");
-+       return false;
-+    }
-+    if (params->has_announce_rounds &&
-+        params->announce_rounds > 1000) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   "announce_rounds",
-+                   "is invalid, it must be in the range of 0 to 1000");
-+       return false;
-+    }
-+    if (params->has_announce_step &&
-+        (params->announce_step < 1 ||
-+        params->announce_step > 10000)) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   "announce_step",
-+                   "is invalid, it must be in the range of 1 to 10000 ms=
-");
-+       return false;
-+    }
-     return true;
- }
-=20
-@@ -1191,6 +1251,18 @@ static void migrate_params_test_apply(MigrateSetPa=
-rameters *params,
-     if (params->has_max_cpu_throttle) {
-         dest->max_cpu_throttle =3D params->max_cpu_throttle;
-     }
-+    if (params->has_announce_initial) {
-+        dest->announce_initial =3D params->announce_initial;
-+    }
-+    if (params->has_announce_max) {
-+        dest->announce_max =3D params->announce_max;
-+    }
-+    if (params->has_announce_rounds) {
-+        dest->announce_rounds =3D params->announce_rounds;
-+    }
-+    if (params->has_announce_step) {
-+        dest->announce_step =3D params->announce_step;
-+    }
- }
-=20
- static void migrate_params_apply(MigrateSetParameters *params, Error **e=
-rrp)
-@@ -1273,6 +1345,18 @@ static void migrate_params_apply(MigrateSetParamet=
-ers *params, Error **errp)
-     if (params->has_max_cpu_throttle) {
-         s->parameters.max_cpu_throttle =3D params->max_cpu_throttle;
-     }
-+    if (params->has_announce_initial) {
-+        s->parameters.announce_initial =3D params->announce_initial;
-+    }
-+    if (params->has_announce_max) {
-+        s->parameters.announce_max =3D params->announce_max;
-+    }
-+    if (params->has_announce_rounds) {
-+        s->parameters.announce_rounds =3D params->announce_rounds;
-+    }
-+    if (params->has_announce_step) {
-+        s->parameters.announce_step =3D params->announce_step;
-+    }
- }
-=20
- void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **er=
-rp)
-@@ -3275,6 +3359,18 @@ static Property migration_properties[] =3D {
-     DEFINE_PROP_UINT8("max-cpu-throttle", MigrationState,
-                       parameters.max_cpu_throttle,
-                       DEFAULT_MIGRATE_MAX_CPU_THROTTLE),
-+    DEFINE_PROP_SIZE("announce-initial", MigrationState,
-+                      parameters.announce_initial,
-+                      DEFAULT_MIGRATE_ANNOUNCE_INITIAL),
-+    DEFINE_PROP_SIZE("announce-max", MigrationState,
-+                      parameters.announce_max,
-+                      DEFAULT_MIGRATE_ANNOUNCE_MAX),
-+    DEFINE_PROP_SIZE("announce-rounds", MigrationState,
-+                      parameters.announce_rounds,
-+                      DEFAULT_MIGRATE_ANNOUNCE_ROUNDS),
-+    DEFINE_PROP_SIZE("announce-step", MigrationState,
-+                      parameters.announce_step,
-+                      DEFAULT_MIGRATE_ANNOUNCE_STEP),
-=20
-     /* Migration capabilities */
-     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-@@ -3347,6 +3443,10 @@ static void migration_instance_init(Object *obj)
-     params->has_xbzrle_cache_size =3D true;
-     params->has_max_postcopy_bandwidth =3D true;
-     params->has_max_cpu_throttle =3D true;
-+    params->has_announce_initial =3D true;
-+    params->has_announce_max =3D true;
-+    params->has_announce_rounds =3D true;
-+    params->has_announce_step =3D true;
-=20
-     qemu_sem_init(&ms->postcopy_pause_sem, 0);
-     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 7a795ecc16..1fd7bbea9b 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -480,6 +480,18 @@
- #
- # Migration parameters enumeration
- #
-+# @announce-initial: Initial delay (in milliseconds) before sending the =
-first
-+#          announce (Since 4.0)
-+#
-+# @announce-max: Maximum delay (in milliseconds) between packets in the
-+#          announcement (Since 4.0)
-+#
-+# @announce-rounds: Number of self-announce packets sent after migration
-+#          (Since 4.0)
-+#
-+# @announce-step: Increase in delay (in milliseconds) between subsequent
-+#          packets in the announcement (Since 4.0)
-+#
- # @compress-level: Set the compression level to be used in live migratio=
-n,
- #          the compression level is an integer between 0 and 9, where 0 =
-means
- #          no compression, 1 means the best compression speed, and 9 mea=
-ns best
-@@ -557,10 +569,13 @@
- #
- # @max-cpu-throttle: maximum cpu throttle percentage.
- #                    Defaults to 99. (Since 3.1)
-+#
- # Since: 2.4
- ##
- { 'enum': 'MigrationParameter',
--  'data': ['compress-level', 'compress-threads', 'decompress-threads',
-+  'data': ['announce-initial', 'announce-max',
-+           'announce-rounds', 'announce-step',
-+           'compress-level', 'compress-threads', 'decompress-threads',
-            'compress-wait-thread',
-            'cpu-throttle-initial', 'cpu-throttle-increment',
-            'tls-creds', 'tls-hostname', 'max-bandwidth',
-@@ -572,6 +587,18 @@
- ##
- # @MigrateSetParameters:
- #
-+# @announce-initial: Initial delay (in milliseconds) before sending the =
-first
-+#          announce (Since 4.0)
-+#
-+# @announce-max: Maximum delay (in milliseconds) between packets in the
-+#          announcement (Since 4.0)
-+#
-+# @announce-rounds: Number of self-announce packets sent after migration
-+#          (Since 4.0)
-+#
-+# @announce-step: Increase in delay (in milliseconds) between subsequent
-+#          packets in the announcement (Since 4.0)
-+#
- # @compress-level: compression level
- #
- # @compress-threads: compression thread count
-@@ -653,7 +680,11 @@
- # TODO either fuse back into MigrationParameters, or make
- # MigrationParameters members mandatory
- { 'struct': 'MigrateSetParameters',
--  'data': { '*compress-level': 'int',
-+  'data': { '*announce-initial': 'size',
-+            '*announce-max': 'size',
-+            '*announce-rounds': 'size',
-+            '*announce-step': 'size',
-+            '*compress-level': 'int',
-             '*compress-threads': 'int',
-             '*compress-wait-thread': 'bool',
-             '*decompress-threads': 'int',
-@@ -692,6 +723,18 @@
- #
- # The optional members aren't actually optional.
- #
-+# @announce-initial: Initial delay (in milliseconds) before sending the
-+#          first announce (Since 4.0)
-+#
-+# @announce-max: Maximum delay (in milliseconds) between packets in the
-+#          announcement (Since 4.0)
-+#
-+# @announce-rounds: Number of self-announce packets sent after migration
-+#          (Since 4.0)
-+#
-+# @announce-step: Increase in delay (in milliseconds) between subsequent
-+#          packets in the announcement (Since 4.0)
-+#
- # @compress-level: compression level
- #
- # @compress-threads: compression thread count
-@@ -769,7 +812,11 @@
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
--  'data': { '*compress-level': 'uint8',
-+  'data': { '*announce-initial': 'size',
-+            '*announce-max': 'size',
-+            '*announce-rounds': 'size',
-+            '*announce-step': 'size',
-+            '*compress-level': 'uint8',
-             '*compress-threads': 'uint8',
-             '*compress-wait-thread': 'bool',
-             '*decompress-threads': 'uint8',
---=20
-2.20.1
+Yep, that works for me.  Or above the fprintf() as you did it in other
+places in this patch.
+
+Max
+
+
+--Dwyj2hlxslYBTttqwJNZEXm4ChaX8snBy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlx2hykACgkQ9AfbAGHV
+z0CRLAgAuSh6PtA1bfg8KgG9t7v1US7ogZn2ysPOHqYEwmYBrTsocC1MNWDYSoX2
++0eLTUADtKDhDQ8Y9laTLLwo34fF5bzaH84f8X9LIjnMsdQ0HU0RCOUHZgMyR7iF
+xmGnLSJPQdajLkzLFVWnKDO08FTA5GwWNF9BsvHpwczEc3OZi8B5DM+uNxgGetAl
+kr3H5zWWycjTidcJSKeEH0AX/OMHBStS3GTul9CnzgC12FFIfTZCkprED2VrqnxQ
+Fw5PVGgFE3A5ErewZpIxed3dX5omgM6x0kk0w/Xm9e5wSzs+VpICril4NPe61BYV
+mQwnVRH45qcZkH+Hn3Dd4qkyNXBvQQ==
+=qmST
+-----END PGP SIGNATURE-----
+
+--Dwyj2hlxslYBTttqwJNZEXm4ChaX8snBy--
