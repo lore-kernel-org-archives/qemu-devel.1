@@ -1,32 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51423)
+Received: from eggs.gnu.org ([209.51.188.92]:51072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzUM-0005eA-UL
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:17 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gyzUU-00053S-2O
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:43:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gyzMX-0005X5-Ka
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:35:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gyzMU-0005OJ-2d
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:35:04 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B062D309CC26
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 12:56:58 +0000 (UTC)
-Date: Wed, 27 Feb 2019 12:56:55 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190227125654.GE2602@work-vm>
-References: <20190226195959.28759-1-dgilbert@redhat.com>
-	<20190226195959.28759-8-dgilbert@redhat.com>
-	<87pnrdoh73.fsf@dusky.pond.sub.org> <20190227095931.GB2602@work-vm>
-	<87h8cpxv9p.fsf@dusky.pond.sub.org>
+	(envelope-from <jjherne@linux.ibm.com>) id 1gyzLA-0004pi-HY
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:33:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36556)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gyzL7-0004ha-MV
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 08:33:38 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1RDSfqu086290
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 08:33:18 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qwtux2bye-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 08:33:17 -0500
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Wed, 27 Feb 2019 13:33:16 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-11-git-send-email-jjherne@linux.ibm.com>
+	<735ca9ff-76e3-966f-6fbc-a72bf994b413@linux.ibm.com>
+	<20190204121319.32915fd6.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Wed, 27 Feb 2019 08:32:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87h8cpxv9p.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v5 7/9] qmp: Add announce-self command
+In-Reply-To: <20190204121319.32915fd6.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <333f78d1-48e1-3483-7c94-5cf52e1eafab@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 10/15] s390-bios: Support for running
+ format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +46,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On 2/4/19 6:13 AM, Cornelia Huck wrote:
+> On Thu, 31 Jan 2019 12:31:00 -0500
+> Farhan Ali <alifm@linux.ibm.com> wrote:
 > 
-> > * Markus Armbruster (armbru@redhat.com) wrote:
-> >> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
-> >> 
-> >> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >> >
-> >> > Add a qmp command that can trigger guest announcements.
-> >> >
-> >> > It uses its own announce-timer instance, and parameters
-> >> > passed to it explicitly in the command.
-> >> >
-> >> > Like most qmp commands, it's in the main thread/bql, so
-> >> > there's no racing with any outstanding timer.
-> >> >
-> >> > Based on work of Germano Veit Michel <germano@redhat.com> and
-> >> >                  Vladislav Yasevich <vyasevic@redhat.com>
-> >> >
-> >> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> >> > ---
-> >> [...]
-> >> > diff --git a/qapi/net.json b/qapi/net.json
-> >> > index 5face0c14b..c093087278 100644
-> >> > --- a/qapi/net.json
-> >> > +++ b/qapi/net.json
-> >> > @@ -707,3 +707,23 @@
-> >> >              'max': 'int',
-> >> >              'rounds': 'int',
-> >> >              'step': 'int' } }
-> >> > +
-> >> > +##
-> >> > +# @announce-self:
-> >> > +#
-> >> > +# Trigger generation of broadcast RARP frames to update network switches.
-> >> > +# This can be useful when network bonds fail-over the active slave.
-> >> > +#
-> >> > +# @params: AnnounceParameters giving timing and repetition count of announce
-> >> > +#
-> >> > +# Example:
-> >> > +#
-> >> > +# -> { "execute": "announce-self"
-> >> > +#      "arguments": { "params:" {
-> >> > +#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } } }
-> >> > +# <- { "return": {} }
-> >> > +#
-> >> > +# Since: 4.0
-> >> > +##
-> >> > +{ 'command': 'announce-self',
-> >> > +  'data' : {'params': 'AnnounceParameters'} }
-> >> 
-> >> Any particular reason for the additional level of nesting within
-> >> "arguments"?
-> >
-> > I'd just copied one of the other places;  boxed doesn't seem to be used
-> > that often.
+>> On 01/29/2019 08:29 AM, Jason J. Herne wrote:
+>>> Add struct for format-0 ccws. Support executing format-0 channel
+>>> programs and waiting for their completion before continuing execution.
+>>> This will be used for real dasd ipl.
+>>>
+>>> Add cu_type() to channel io library. This will be used to query control
+>>> unit type which is used to determine if we are booting a virtio device or a
+>>> real dasd device.
+>>>
+>>> Signed-off-by: Jason J. Herne<jjherne@linux.ibm.com>
+>>> ---
+>>>    pc-bios/s390-ccw/cio.c      | 114 +++++++++++++++++++++++++++++++++++++++
+>>>    pc-bios/s390-ccw/cio.h      | 127 ++++++++++++++++++++++++++++++++++++++++++--
+>>>    pc-bios/s390-ccw/s390-ccw.h |   1 +
+>>>    pc-bios/s390-ccw/start.S    |  33 +++++++++++-
+>>>    4 files changed, 270 insertions(+), 5 deletions(-)
 > 
-> Then let's box here, it's tidier on the wire.
+>>> +/*
+>>> + * Executes a channel program at a given subchannel. The request to run the
+>>> + * channel program is sent to the subchannel, we then wait for the interrupt
+>>> + * signaling completion of the I/O operation(s) performed by the channel
+>>> + * program. Lastly we verify that the i/o operation completed without error and
+>>> + * that the interrupt we received was for the subchannel used to run the
+>>> + * channel program.
+>>> + *
+>>> + * Note: This function assumes it is running in an environment where no other
+>>> + * cpus are generating or receiving I/O interrupts. So either run it in a
+>>> + * single-cpu environment or make sure all other cpus are not doing I/O and
+>>> + * have I/O interrupts masked off.
+>>> + */
+>>> +int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
+>>> +{
+>>> +    CmdOrb orb = {};
+>>> +    Irb irb = {};
+>>> +    sense_data_eckd_dasd sd;
+>>> +    int rc, retries = 0;
+>>> +
+>>> +    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
+>>> +
+>>> +    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
+>>> +    if (fmt == 0) {
+>>> +        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
+>>> +    }
+>>> +
+>>> +    orb.fmt = fmt ;
+>>> +    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
+>>> +    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
+>>> +    orb.lpm = 0xFF; /* All paths allowed */
+>>> +    orb.cpa = ccw_addr;
+>>> +
+>>> +    while (true) {
+>>> +        rc = ssch(schid, &orb);
+>>> +        if (rc == 1) {
+>>> +            /* Status pending, not sure why. Let's eat the status and retry. */
+>>> +            tsch(schid, &irb);
+>>> +            retries++;
+>>> +            continue;
+>>> +        }
+>>> +        if (rc) {
+>>> +            print_int("ssch failed with rc=", rc);
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        consume_io_int();
+>>> +
+>>> +        /* collect status */
+>>> +        rc = tsch(schid, &irb);
+>>> +        if (rc) {
+>>> +            print_int("tsch failed with rc=", rc);
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        if (!irb_error(&irb)) {
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        /*
+>>> +         * Unexpected unit check, or interface-control-check. Use sense to
+>>> +         * clear unit check then retry.
+>>> +         */
+>>> +        if ((unit_check(&irb) || iface_ctrl_check(&irb)) && retries <= 2) {
+>>> +            basic_sense(schid, &sd, sizeof(sd));
+>>
+>> We are using basic sense to clear any unit check or ifcc, but is it
+>> possible for the basic sense to cause another unit check?
+>>
+>> The chapter on Basic Sense in the Common I/O Device Commands
+>> (http://publibz.boulder.ibm.com/support/libraryserver/FRAMESET/dz9ar501/2.1?SHELF=&DT=19920409154647&CASE=)
+>>    says this:
+>>
+>> ""
+>> The basic sense command initiates a sense operation  at  all  devices
+>> and cannot  cause  the  command-reject,  intervention-required,
+>> data-check, or overrun bit to be set to one.  If the control unit
+>> detects  an  equipment malfunction  or  invalid  checking-block  code
+>> (CBC) on the sense-command code, the equipment-check or bus-out-check
+>> bit is set  to  one,  and  unit check is indicated in the device-status
+>> byte.
+>> ""
+>>
+>> If my understanding is correct, if there is an equipment malfunction
+>> then the control unit can return a unit check even for a basic sense.
+>> This can lead to infinite recursion in the bios.
+> 
+> I think the retries variable is supposed to take care of that.
+> 
+> What I don't understand is why we do the basic sense after an IFCC?
+> Wouldn't it make more sense to simply retry the original command in
+> that case?
+> 
 
-OK, v6 coming up.
+I assumed it might be needed to clear status. It seems not. I'll modify that code path 
+accordingly.
 
-> > Dave
-> >
-> >> Here's how to avoid it:
-> >> 
-> >>    { 'command': 'announce-self', 'boxed': true,
-> >>      'data' : 'AnnounceParameters' }
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
