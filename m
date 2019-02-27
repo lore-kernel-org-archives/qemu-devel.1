@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54697)
+Received: from eggs.gnu.org ([209.51.188.92]:54973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz1Nd-000233-1F
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:21 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gz1OG-0002fu-IT
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:45:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gz1Na-0008N8-Fy
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:20 -0500
-Resent-Message-Id: <E1gz1Na-0008N8-Fy@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21103)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gz1NY-0008Ei-A3
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:16 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155128220282.1544.3536205279570425164@49fa7ef69f7b>
-In-Reply-To: <20190222024106.9167-1-richard.henderson@linaro.org>
+	(envelope-from <stefanha@gmail.com>) id 1gz1O3-000094-Co
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:44:53 -0500
+Date: Wed, 27 Feb 2019 15:33:11 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190227153311.GH22539@stefanha-x1.localdomain>
+References: <20190226153549.17867-1-stefanha@redhat.com>
+	<8a8d76d1-1280-f3d9-3d72-1c662d1ad666@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 27 Feb 2019 07:43:24 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] target/arm: Reduce overhead of
- cpu_get_tb_cpu_state
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="o71xDhNo7p97+qVi"
+Content-Disposition: inline
+In-Reply-To: <8a8d76d1-1280-f3d9-3d72-1c662d1ad666@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] file-posix: add drop-cache=on|off option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, cota@braap.org, alex.bennee@linaro.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Neil Skrypuch <neil@tembosocial.com>, Max Reitz <mreitz@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyMjAyNDEwNi45MTY3
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMjIwMjQxMDYuOTE2Ny0xLXJp
-Y2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2
-MyAwLzNdIHRhcmdldC9hcm06IFJlZHVjZSBvdmVyaGVhZCBvZiBjcHVfZ2V0X3RiX2NwdV9zdGF0
-ZQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
-IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
-dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKMWQ0YTljYmQyMSB0YXJnZXQvYXJtOiBSZWx5IG9uIGhmbGFn
-cyBjb3JyZWN0IGluIGNwdV9nZXRfdGJfY3B1X3N0YXRlCmM2ZWQwNDQzOWMgdGFyZ2V0L2FybTog
-UmVidWlsZCBoZmxhZ3MgYXQgZWwgY2hhbmdlcyBhbmQgTVNSIHdyaXRlcwozN2Q4MTE3ZWFjIHRh
-cmdldC9hcm06IFNwbGl0IG91dCByZWNvbXB1dGVfaGZsYWdzIGV0IGFsCgo9PT0gT1VUUFVUIEJF
-R0lOID09PQoxLzMgQ2hlY2tpbmcgY29tbWl0IDM3ZDgxMTdlYWNlZiAodGFyZ2V0L2FybTogU3Bs
-aXQgb3V0IHJlY29tcHV0ZV9oZmxhZ3MgZXQgYWwpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
-ZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMjU6IEZJTEU6IHRhcmdldC9hcm0v
-aGVscGVyLmM6MTI4NjA6CisgICAgLyogdjhNIGFsd2F5cyBhcHBsaWVzIHN0YWNrIGxpbWl0IGNo
-ZWNrcyB1bmxlc3MgQ0NSLlNUS09GSEZOTUlHTiBpcwoKV0FSTklORzogQmxvY2sgY29tbWVudHMg
-dXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE3MDogRklMRTogdGFyZ2V0L2Fy
-bS9oZWxwZXIuYzoxMjkwNToKKyAgICAgICAgLyogSWYgU1ZFIGlzIGRpc2FibGVkLCBidXQgRlAg
-aXMgZW5hYmxlZCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMzY4IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDEvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzMgQ2hlY2tpbmcgY29t
-bWl0IGM2ZWQwNDQzOWM1NyAodGFyZ2V0L2FybTogUmVidWlsZCBoZmxhZ3MgYXQgZWwgY2hhbmdl
-cyBhbmQgTVNSIHdyaXRlcykKMy8zIENoZWNraW5nIGNvbW1pdCAxZDRhOWNiZDIxOWQgKHRhcmdl
-dC9hcm06IFJlbHkgb24gaGZsYWdzIGNvcnJlY3QgaW4gY3B1X2dldF90Yl9jcHVfc3RhdGUpCkVS
-Uk9SOiBVc2UgZ19hc3NlcnQgb3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzc1OiBGSUxFOiB0YXJn
-ZXQvYXJtL2hlbHBlci5jOjEyOTgyOgorICAgICAgICBnX2Fzc2VydF9jbXBoZXgoZmxhZ3MsID09
-LCBjaGVja19mbGFncyk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM0IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDMvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMjIwMjQxMDYuOTE2
-Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+
+--o71xDhNo7p97+qVi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Feb 26, 2019 at 10:54:55AM -0600, Eric Blake wrote:
+> On 2/26/19 9:35 AM, Stefan Hajnoczi wrote:
+> > Commit dd577a26ff03b6829721b1ffbbf9e7c411b72378 ("block/file-posix:
+> > implement bdrv_co_invalidate_cache() on Linux") introduced page cache
+> > invalidation so that cache.direct=3Doff live migration is safe on Linux.
+> >=20
+> > The invalidation takes a significant amount of time when the file is
+> > large and present in the page cache.  Normally this is not the case for
+> > cross-host live migration but it can happen when migrating between QEMU
+> > processes on the same host.
+> >=20
+> > On same-host migration we don't need to invalidate pages for correctness
+> > anyway, so an option to skip page cache invalidation is useful.  I
+> > investigated optimizing invalidation and detecting same-host migration,
+> > but both are hard to achieve so a user-visible option will suffice.
+> >=20
+> > As a bonus this option means that the cache invalidation feature will
+> > now be detectable by libvirt via QMP schema introspection.
+>=20
+> Do you still want to pursue the QMP query-qemu-features command, or does
+> this delay that for another day?
+
+The presence of this new option doesn't guarantee that dropping caches
+works.  It is currently only implemented on Linux.
+
+We still need query-qemu-features so that libvirt can detect whether
+this QEMU binary can drop caches (e.g. on Linux vs FreeBSD).
+
+Stefan
+
+--o71xDhNo7p97+qVi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcdq23AAoJEJykq7OBq3PIsa0H/jdjWertbi9rQ/7pEGsABOlr
+knJ7QFr9bVeD85CA6nKadIyJV1CrqEOCK0louLwDh5Y1KE3aEV1Zaz24MB1LNQcr
+9Iw4YeB/EFi8Qpx3UZ3CWfHH2UX8HLHWS6CI4RW2j0717TghpnhdJLKZxkllyioG
+3+dGSFhOwKlK3LcbMVGoNCw2r7d8iBMcf47OKaL5nTtjf6porTUB0ErZe0JxLoQa
+8AKzYzxQ4hoE1JOACl6et+DwMMPN7HB63k+vHDUiAo4dDGcVxLcDzZyrKbgsBGQ/
+JXvhD/VN68stKSe02zqRYpipFWaQDvspeMYb6SJ0y5mT0HjByULRuQGAkFu8nx8=
+=wgTL
+-----END PGP SIGNATURE-----
+
+--o71xDhNo7p97+qVi--
