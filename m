@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41459)
+Received: from eggs.gnu.org ([209.51.188.92]:42401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyt6A-0005TQ-In
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:53:47 -0500
+	(envelope-from <armbru@redhat.com>) id 1gyt9Y-00070i-Gt
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:57:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gyt67-000137-Bi
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:53:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50226)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gyt65-00010E-Cb
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:53:43 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 08D9F30F8DB8
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 06:53:38 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gyt9X-0003cE-Ps
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 01:57:16 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20190226195959.28759-1-dgilbert@redhat.com>
-	<20190226195959.28759-8-dgilbert@redhat.com>
-Date: Wed, 27 Feb 2019 07:53:36 +0100
-In-Reply-To: <20190226195959.28759-8-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Tue, 26 Feb 2019 19:59:57 +0000")
-Message-ID: <87pnrdoh73.fsf@dusky.pond.sub.org>
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-12-armbru@redhat.com>
+	<alpine.BSF.2.21.9999.1902270206280.5023@zero.eik.bme.hu>
+Date: Wed, 27 Feb 2019 07:57:10 +0100
+In-Reply-To: <alpine.BSF.2.21.9999.1902270206280.5023@zero.eik.bme.hu>
+	(BALATON Zoltan's message of "Wed, 27 Feb 2019 02:11:10 +0100 (CET)")
+Message-ID: <87lg21oh15.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 7/9] qmp: Add announce-self command
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 11/11] pflash: Clean up after
+ commit 368a354f02b part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, quintela@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, lersek@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, alex.bennee@linaro.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+BALATON Zoltan <balaton@eik.bme.hu> writes:
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Add a qmp command that can trigger guest announcements.
->
-> It uses its own announce-timer instance, and parameters
-> passed to it explicitly in the command.
->
-> Like most qmp commands, it's in the main thread/bql, so
-> there's no racing with any outstanding timer.
->
-> Based on work of Germano Veit Michel <germano@redhat.com> and
->                  Vladislav Yasevich <vyasevic@redhat.com>
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
+> On Tue, 26 Feb 2019, Markus Armbruster wrote:
+>> QOMification left parameter @size unused in pflash_cfi01_register()
+>> and pflash_cfi02_register().  Obviously, @size should match
+>> @sector_len and @nb_blocs, i.e. size =3D=3D sector_len * nb_blocs.  All
+>> callers satisfy this.
+>>
+>> Remove @nb_blocs and compute it from @size and @sector_len.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
 [...]
-> diff --git a/qapi/net.json b/qapi/net.json
-> index 5face0c14b..c093087278 100644
-> --- a/qapi/net.json
-> +++ b/qapi/net.json
-> @@ -707,3 +707,23 @@
->              'max': 'int',
->              'rounds': 'int',
->              'step': 'int' } }
-> +
-> +##
-> +# @announce-self:
-> +#
-> +# Trigger generation of broadcast RARP frames to update network switches.
-> +# This can be useful when network bonds fail-over the active slave.
-> +#
-> +# @params: AnnounceParameters giving timing and repetition count of announce
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "announce-self"
-> +#      "arguments": { "params:" {
-> +#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } } }
-> +# <- { "return": {} }
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'command': 'announce-self',
-> +  'data' : {'params': 'AnnounceParameters'} }
+>> diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+>> index 304dbeab2f..2e526218f4 100644
+>> --- a/hw/arm/gumstix.c
+>> +++ b/hw/arm/gumstix.c
+>> @@ -74,7 +74,7 @@ static void connex_init(MachineState *machine)
+>> #endif
+>>     if (!pflash_cfi01_register(0x00000000, "connext.rom", connex_rom,
+>>                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+>> -                               sector_len, connex_rom / sector_len,
+>> +                               sector_len,
+>>                                2, 0, 0, 0, 0, be)) {
+>
+> I'd say you could also reformat and join next line during this change
+> to avoid short lines in the middle (also for all other similar changes
+> below). But I have no strong feelings about that so I don't
+> mind. (This might be easier to review the patch this way but the
+> resulting code will look ugly.)
 
-Any particular reason for the additional level of nesting within
-"arguments"?
-
-Here's how to avoid it:
-
-   { 'command': 'announce-self', 'boxed': true,
-     'data' : 'AnnounceParameters' }
+Will do, thanks!
