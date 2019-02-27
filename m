@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56596)
+Received: from eggs.gnu.org ([209.51.188.92]:56610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gywbn-0000AV-Hr
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywbo-0000BI-8A
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:38:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gywbl-0004z0-Kz
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:38:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50402)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywbm-0004zv-1C
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:38:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50400)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gywbl-0004rs-AB
+	id 1gywbl-0004rr-Kx
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:38:37 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3224330BBB72
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:30:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F122230A5A40
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:31:16 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 27 Feb 2019 11:30:08 +0100
-Message-Id: <20190227103017.29515-4-marcandre.lureau@redhat.com>
+Date: Wed, 27 Feb 2019 11:30:16 +0100
+Message-Id: <20190227103017.29515-12-marcandre.lureau@redhat.com>
 In-Reply-To: <20190227103017.29515-1-marcandre.lureau@redhat.com>
 References: <20190227103017.29515-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 03/12] vhost-user: simplify
- vhost_user_init/vhost_user_cleanup
+Subject: [Qemu-devel] [PATCH v4 11/12] Add vhost-user-input-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,366 +36,288 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kraxel@redhat.com, mst@redhat.com
 
-Take a VhostUserState* that can be pre-allocated, and initialize it
-with the associated chardev.
+Add a new virtio-input device, which connects to a vhost-user
+backend.
+
+vhost-user-input is similar to virtio-input-host, it is wrapped by
+vhost-user-input-pci. Instead of reading configuration directly from
+an input device / evdev, it reads it over vhost-user protocol with
+INPUT_GET_CONFIG message. Then vhost-user-backend takes care of
+interfacing the virtio device with the backend, for the queue & events
+processing.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Tiwei Bie <tiwei.bie@intel.com>
 ---
- include/hw/virtio/vhost-user-blk.h  |  2 +-
- include/hw/virtio/vhost-user-scsi.h |  2 +-
- include/hw/virtio/vhost-user.h      |  2 +-
- backends/cryptodev-vhost-user.c     | 18 ++++--------------
- hw/block/vhost-user-blk.c           | 22 ++++------------------
- hw/scsi/vhost-user-scsi.c           | 20 ++++----------------
- hw/virtio/vhost-stub.c              |  4 ++--
- hw/virtio/vhost-user.c              | 16 ++++++++++++----
- net/vhost-user.c                    | 13 ++++---------
- 9 files changed, 33 insertions(+), 66 deletions(-)
+ include/hw/virtio/virtio-input.h | 14 +++++
+ hw/input/vhost-user-input.c      | 99 ++++++++++++++++++++++++++++++++
+ hw/virtio/vhost-user-input-pci.c | 53 +++++++++++++++++
+ MAINTAINERS                      |  1 +
+ default-configs/virtio.mak       |  1 +
+ hw/input/Makefile.objs           |  1 +
+ hw/virtio/Makefile.objs          |  1 +
+ 7 files changed, 170 insertions(+)
+ create mode 100644 hw/input/vhost-user-input.c
+ create mode 100644 hw/virtio/vhost-user-input-pci.c
 
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost=
--user-blk.h
-index d52944aeeb..a8a106eecb 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -36,7 +36,7 @@ typedef struct VHostUserBlk {
-     uint32_t queue_size;
-     uint32_t config_wce;
-     struct vhost_dev dev;
--    VhostUserState *vhost_user;
-+    VhostUserState vhost_user;
- } VHostUserBlk;
+diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-=
+input.h
+index 054c38836f..4fca03e796 100644
+--- a/include/hw/virtio/virtio-input.h
++++ b/include/hw/virtio/virtio-input.h
+@@ -2,6 +2,7 @@
+ #define QEMU_VIRTIO_INPUT_H
 =20
- #endif
-diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhos=
-t-user-scsi.h
-index e429cacd8e..738f9288bd 100644
---- a/include/hw/virtio/vhost-user-scsi.h
-+++ b/include/hw/virtio/vhost-user-scsi.h
-@@ -30,7 +30,7 @@
+ #include "ui/input.h"
++#include "sysemu/vhost-user-backend.h"
 =20
- typedef struct VHostUserSCSI {
-     VHostSCSICommon parent_obj;
--    VhostUserState *vhost_user;
-+    VhostUserState vhost_user;
- } VHostUserSCSI;
+ /* ----------------------------------------------------------------- */
+ /* virtio input protocol                                             */
+@@ -42,11 +43,18 @@ typedef struct virtio_input_event virtio_input_event;
+ #define VIRTIO_INPUT_HOST_GET_PARENT_CLASS(obj) \
+         OBJECT_GET_PARENT_CLASS(obj, TYPE_VIRTIO_INPUT_HOST)
 =20
- #endif /* VHOST_USER_SCSI_H */
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-use=
-r.h
-index fd660393a0..811e325f42 100644
---- a/include/hw/virtio/vhost-user.h
-+++ b/include/hw/virtio/vhost-user.h
-@@ -22,7 +22,7 @@ typedef struct VhostUserState {
-     VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
- } VhostUserState;
++#define TYPE_VHOST_USER_INPUT   "vhost-user-input"
++#define VHOST_USER_INPUT(obj)                              \
++    OBJECT_CHECK(VHostUserInput, (obj), TYPE_VHOST_USER_INPUT)
++#define VHOST_USER_INPUT_GET_PARENT_CLASS(obj)             \
++    OBJECT_GET_PARENT_CLASS(obj, TYPE_VHOST_USER_INPUT)
++
+ typedef struct VirtIOInput VirtIOInput;
+ typedef struct VirtIOInputClass VirtIOInputClass;
+ typedef struct VirtIOInputConfig VirtIOInputConfig;
+ typedef struct VirtIOInputHID VirtIOInputHID;
+ typedef struct VirtIOInputHost VirtIOInputHost;
++typedef struct VHostUserInput VHostUserInput;
 =20
--VhostUserState *vhost_user_init(void);
-+bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
-p);
- void vhost_user_cleanup(VhostUserState *user);
+ struct VirtIOInputConfig {
+     virtio_input_config               config;
+@@ -98,6 +106,12 @@ struct VirtIOInputHost {
+     int                               fd;
+ };
 =20
- #endif
-diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-u=
-ser.c
-index d539f14d59..1052a5d0e9 100644
---- a/backends/cryptodev-vhost-user.c
-+++ b/backends/cryptodev-vhost-user.c
-@@ -47,7 +47,7 @@
- typedef struct CryptoDevBackendVhostUser {
-     CryptoDevBackend parent_obj;
-=20
--    VhostUserState *vhost_user;
-+    VhostUserState vhost_user;
-     CharBackend chr;
-     char *chr_name;
-     bool opened;
-@@ -104,7 +104,7 @@ cryptodev_vhost_user_start(int queues,
-             continue;
-         }
-=20
--        options.opaque =3D s->vhost_user;
-+        options.opaque =3D &s->vhost_user;
-         options.backend_type =3D VHOST_BACKEND_TYPE_USER;
-         options.cc =3D b->conf.peers.ccs[i];
-         s->vhost_crypto[i] =3D cryptodev_vhost_init(&options);
-@@ -182,7 +182,6 @@ static void cryptodev_vhost_user_init(
-     size_t i;
-     Error *local_err =3D NULL;
-     Chardev *chr;
--    VhostUserState *user;
-     CryptoDevBackendClient *cc;
-     CryptoDevBackendVhostUser *s =3D
-                       CRYPTODEV_BACKEND_VHOST_USER(backend);
-@@ -213,15 +212,10 @@ static void cryptodev_vhost_user_init(
-         }
-     }
-=20
--    user =3D vhost_user_init();
--    if (!user) {
--        error_setg(errp, "Failed to init vhost_user");
-+    if (!vhost_user_init(&s->vhost_user, &s->chr, errp)) {
-         return;
-     }
-=20
--    user->chr =3D &s->chr;
--    s->vhost_user =3D user;
--
-     qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-                      cryptodev_vhost_user_event, NULL, s, NULL, true);
-=20
-@@ -307,11 +301,7 @@ static void cryptodev_vhost_user_cleanup(
-         }
-     }
-=20
--    if (s->vhost_user) {
--        vhost_user_cleanup(s->vhost_user);
--        g_free(s->vhost_user);
--        s->vhost_user =3D NULL;
--    }
-+    vhost_user_cleanup(&s->vhost_user);
- }
-=20
- static void cryptodev_vhost_user_set_chardev(Object *obj,
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 44ac814016..767c734a81 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -253,7 +253,6 @@ static void vhost_user_blk_device_realize(DeviceState=
- *dev, Error **errp)
- {
-     VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-     VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
--    VhostUserState *user;
-     struct vhost_virtqueue *vqs =3D NULL;
-     int i, ret;
-=20
-@@ -272,15 +271,10 @@ static void vhost_user_blk_device_realize(DeviceSta=
-te *dev, Error **errp)
-         return;
-     }
-=20
--    user =3D vhost_user_init();
--    if (!user) {
--        error_setg(errp, "vhost-user-blk: failed to init vhost_user");
-+    if (!vhost_user_init(&s->vhost_user, &s->chardev, errp)) {
-         return;
-     }
-=20
--    user->chr =3D &s->chardev;
--    s->vhost_user =3D user;
--
-     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-                 sizeof(struct virtio_blk_config));
-=20
-@@ -297,7 +291,7 @@ static void vhost_user_blk_device_realize(DeviceState=
- *dev, Error **errp)
-=20
-     vhost_dev_set_config_notifier(&s->dev, &blk_ops);
-=20
--    ret =3D vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_US=
-ER, 0);
-+    ret =3D vhost_dev_init(&s->dev, &s->vhost_user, VHOST_BACKEND_TYPE_U=
-SER, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-blk: vhost initialization failed: %=
-s",
-                    strerror(-ret));
-@@ -322,10 +316,7 @@ vhost_err:
- virtio_err:
-     g_free(vqs);
-     virtio_cleanup(vdev);
--
--    vhost_user_cleanup(user);
--    g_free(user);
--    s->vhost_user =3D NULL;
-+    vhost_user_cleanup(&s->vhost_user);
- }
-=20
- static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **er=
-rp)
-@@ -338,12 +329,7 @@ static void vhost_user_blk_device_unrealize(DeviceSt=
-ate *dev, Error **errp)
-     vhost_dev_cleanup(&s->dev);
-     g_free(vqs);
-     virtio_cleanup(vdev);
--
--    if (s->vhost_user) {
--        vhost_user_cleanup(s->vhost_user);
--        g_free(s->vhost_user);
--        s->vhost_user =3D NULL;
--    }
-+    vhost_user_cleanup(&s->vhost_user);
- }
-=20
- static void vhost_user_blk_instance_init(Object *obj)
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index 6728878a52..8b1e6876db 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -69,7 +69,6 @@ static void vhost_user_scsi_realize(DeviceState *dev, E=
-rror **errp)
-     VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(dev);
-     VHostUserSCSI *s =3D VHOST_USER_SCSI(dev);
-     VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(s);
--    VhostUserState *user;
-     Error *err =3D NULL;
-     int ret;
-=20
-@@ -86,30 +85,24 @@ static void vhost_user_scsi_realize(DeviceState *dev,=
- Error **errp)
-         return;
-     }
-=20
--    user =3D vhost_user_init();
--    if (!user) {
--        error_setg(errp, "vhost-user-scsi: failed to init vhost_user");
-+    if (!vhost_user_init(&s->vhost_user, &vs->conf.chardev, errp)) {
-         return;
-     }
--    user->chr =3D &vs->conf.chardev;
-=20
-     vsc->dev.nvqs =3D 2 + vs->conf.num_queues;
-     vsc->dev.vqs =3D g_new(struct vhost_virtqueue, vsc->dev.nvqs);
-     vsc->dev.vq_index =3D 0;
-     vsc->dev.backend_features =3D 0;
-=20
--    ret =3D vhost_dev_init(&vsc->dev, user,
-+    ret =3D vhost_dev_init(&vsc->dev, &s->vhost_user,
-                          VHOST_BACKEND_TYPE_USER, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-scsi: vhost initialization failed: =
-%s",
-                    strerror(-ret));
--        vhost_user_cleanup(user);
--        g_free(user);
-+        vhost_user_cleanup(&s->vhost_user);
-         return;
-     }
-=20
--    s->vhost_user =3D user;
--
-     /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
-     vsc->channel =3D 0;
-     vsc->lun =3D 0;
-@@ -130,12 +123,7 @@ static void vhost_user_scsi_unrealize(DeviceState *d=
-ev, Error **errp)
-     g_free(vqs);
-=20
-     virtio_scsi_common_unrealize(dev, errp);
--
--    if (s->vhost_user) {
--        vhost_user_cleanup(s->vhost_user);
--        g_free(s->vhost_user);
--        s->vhost_user =3D NULL;
--    }
-+    vhost_user_cleanup(&s->vhost_user);
- }
-=20
- static Property vhost_user_scsi_properties[] =3D {
-diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
-index 049089b5e2..c175148fce 100644
---- a/hw/virtio/vhost-stub.c
-+++ b/hw/virtio/vhost-stub.c
-@@ -7,9 +7,9 @@ bool vhost_has_free_slot(void)
-     return true;
- }
-=20
--VhostUserState *vhost_user_init(void)
-+bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
-p)
- {
--    return NULL;
-+    return false;
- }
-=20
- void vhost_user_cleanup(VhostUserState *user)
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 564a31d12c..a0e8a81857 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -1739,17 +1739,24 @@ static bool vhost_user_mem_section_filter(struct =
-vhost_dev *dev,
-     return result;
- }
-=20
--VhostUserState *vhost_user_init(void)
-+bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
-p)
- {
--    VhostUserState *user =3D g_new0(struct VhostUserState, 1);
--
--    return user;
-+    if (user->chr) {
-+        error_setg(errp, "Cannot initialize vhost-user state");
-+        return false;
-+    }
-+    user->chr =3D chr;
-+    return true;
- }
-=20
- void vhost_user_cleanup(VhostUserState *user)
- {
-     int i;
-=20
-+    if (!user->chr) {
++struct VHostUserInput {
++    VirtIOInput                       parent_obj;
++
++    VhostUserBackend                  *vhost;
++};
++
+ void virtio_input_send(VirtIOInput *vinput, virtio_input_event *event);
+ void virtio_input_init_config(VirtIOInput *vinput,
+                               virtio_input_config *config);
+diff --git a/hw/input/vhost-user-input.c b/hw/input/vhost-user-input.c
+new file mode 100644
+index 0000000000..41c25d2398
+--- /dev/null
++++ b/hw/input/vhost-user-input.c
+@@ -0,0 +1,99 @@
++/*
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++
++#include "hw/qdev.h"
++#include "hw/virtio/virtio-input.h"
++
++static void vhost_input_realize(DeviceState *dev, Error **errp)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(dev);
++    VirtIOInput *vinput =3D VIRTIO_INPUT(dev);
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
++    virtio_input_config *config;
++    int i, ret;
++
++    if (vhost_user_backend_dev_init(vhi->vhost, vdev, 2, errp) =3D=3D -1=
+) {
 +        return;
 +    }
 +
-     for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
-         if (user->notifier[i].addr) {
-             object_unparent(OBJECT(&user->notifier[i].mr));
-@@ -1757,6 +1764,7 @@ void vhost_user_cleanup(VhostUserState *user)
-             user->notifier[i].addr =3D NULL;
-         }
-     }
-+    user->chr =3D NULL;
- }
++    ret =3D vhost_user_input_get_config(&vhi->vhost->dev, &config);
++    if (ret < 0) {
++        error_setg(errp, "failed to get input config");
++        return;
++    }
++    for (i =3D 0; i < ret; i++) {
++        virtio_input_add_config(vinput, &config[i]);
++    }
++    g_free(config);
++}
++
++static void vhost_input_change_active(VirtIOInput *vinput)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(vinput);
++
++    if (vinput->active) {
++        vhost_user_backend_start(vhi->vhost);
++    } else {
++        vhost_user_backend_stop(vhi->vhost);
++    }
++}
++
++static const VMStateDescription vmstate_vhost_input =3D {
++    .name =3D "vhost-user-input",
++    .unmigratable =3D 1,
++};
++
++static void vhost_input_class_init(ObjectClass *klass, void *data)
++{
++    VirtIOInputClass *vic =3D VIRTIO_INPUT_CLASS(klass);
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->vmsd           =3D &vmstate_vhost_input;
++    vic->realize       =3D vhost_input_realize;
++    vic->change_active =3D vhost_input_change_active;
++}
++
++static void vhost_input_init(Object *obj)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(obj);
++    VirtIOInput *vinput =3D VIRTIO_INPUT(obj);
++    struct virtio_input_config vhost_input_config[] =3D { { /* empty lis=
+t */ } };
++
++    virtio_input_init_config(vinput, vhost_input_config);
++
++    vhi->vhost =3D VHOST_USER_BACKEND(object_new(TYPE_VHOST_USER_BACKEND=
+));
++    object_property_add_alias(obj, "chardev",
++                              OBJECT(vhi->vhost), "chardev", &error_abor=
+t);
++}
++
++static void vhost_input_finalize(Object *obj)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(obj);
++
++    object_unref(OBJECT(vhi->vhost));
++}
++
++static const TypeInfo vhost_input_info =3D {
++    .name          =3D TYPE_VHOST_USER_INPUT,
++    .parent        =3D TYPE_VIRTIO_INPUT,
++    .instance_size =3D sizeof(VHostUserInput),
++    .instance_init =3D vhost_input_init,
++    .instance_finalize =3D vhost_input_finalize,
++    .class_init    =3D vhost_input_class_init,
++};
++
++/* ----------------------------------------------------------------- */
++
++static void vhost_input_register_types(void)
++{
++    type_register_static(&vhost_input_info);
++}
++
++type_init(vhost_input_register_types)
+diff --git a/hw/virtio/vhost-user-input-pci.c b/hw/virtio/vhost-user-inpu=
+t-pci.c
+new file mode 100644
+index 0000000000..3d1b7a85fd
+--- /dev/null
++++ b/hw/virtio/vhost-user-input-pci.c
+@@ -0,0 +1,53 @@
++/*
++ * This work is licensed under the terms of the GNU LGPL, version 2 or
++ * later.  See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-input.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "virtio-pci.h"
++
++typedef struct VHostUserInputPCI VHostUserInputPCI;
++
++#define TYPE_VHOST_USER_INPUT_PCI "vhost-user-input-pci-base"
++
++#define VHOST_USER_INPUT_PCI(obj) \
++    OBJECT_CHECK(VHostUserInputPCI, (obj), TYPE_VHOST_USER_INPUT_PCI)
++
++struct VHostUserInputPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserInput vhi;
++};
++
++static void vhost_user_input_pci_instance_init(Object *obj)
++{
++    VHostUserInputPCI *dev =3D VHOST_USER_INPUT_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vhi, sizeof(dev->vhi),
++                                TYPE_VHOST_USER_INPUT);
++
++    object_property_add_alias(obj, "chardev",
++                              OBJECT(&dev->vhi), "chardev",
++                              &error_abort);
++}
++
++static const VirtioPCIDeviceTypeInfo vhost_user_input_pci_info =3D {
++    .base_name =3D TYPE_VHOST_USER_INPUT_PCI,
++    .generic_name =3D "vhost-user-input-pci",
++    .transitional_name =3D "vhost-user-input-pci-transitional",
++    .non_transitional_name =3D "vhost-user-input-pci-non-transitional",
++    .parent =3D TYPE_VIRTIO_INPUT_PCI,
++    .instance_size =3D sizeof(VHostUserInputPCI),
++    .instance_init =3D vhost_user_input_pci_instance_init,
++};
++
++static void vhost_user_input_pci_register(void)
++{
++    virtio_pci_types_register(&vhost_user_input_pci_info);
++}
++
++type_init(vhost_user_input_pci_register)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index dbe71e6c1e..c3eb708306 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1470,6 +1470,7 @@ L: qemu-s390x@nongnu.org
+ virtio-input
+ M: Gerd Hoffmann <kraxel@redhat.com>
+ S: Maintained
++F: hw/input/vhost-user-input.c
+ F: hw/input/virtio-input*.c
+ F: include/hw/virtio/virtio-input.h
 =20
- const VhostOps user_ops =3D {
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index a39f9c9974..cea78b81f6 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -291,19 +291,14 @@ static int net_vhost_user_init(NetClientState *peer=
-, const char *device,
- {
-     Error *err =3D NULL;
-     NetClientState *nc, *nc0 =3D NULL;
--    VhostUserState *user =3D NULL;
-     NetVhostUserState *s =3D NULL;
-+    VhostUserState *user;
-     int i;
+diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+index ecb4420e74..5f5266ef8b 100644
+--- a/default-configs/virtio.mak
++++ b/default-configs/virtio.mak
+@@ -13,3 +13,4 @@ CONFIG_SCSI=3Dy
+ CONFIG_VIRTIO_SCSI=3Dy
+ CONFIG_VIRTIO_SERIAL=3Dy
+ CONFIG_VIRTIO_INPUT_HOST=3D$(CONFIG_LINUX)
++CONFIG_VHOST_USER_INPUT=3D$(call land,$(CONFIG_VHOST_USER),$(CONFIG_VIRT=
+IO_INPUT))
+diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+index c8b00f71ec..9511e3102f 100644
+--- a/hw/input/Makefile.objs
++++ b/hw/input/Makefile.objs
+@@ -11,6 +11,7 @@ common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input.o
+ common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-hid.o
+ ifeq ($(CONFIG_LINUX),y)
+ common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-host.o
++common-obj-$(CONFIG_VHOST_USER_INPUT) +=3D vhost-user-input.o
+ endif
 =20
-     assert(name);
-     assert(queues > 0);
-=20
--    user =3D vhost_user_init();
--    if (!user) {
--        error_report("failed to init vhost_user");
--        goto err;
--    }
--
-+    user =3D g_new0(struct VhostUserState, 1);
-     for (i =3D 0; i < queues; i++) {
-         nc =3D qemu_new_net_client(&net_vhost_user_info, peer, device, n=
-ame);
-         snprintf(nc->info_str, sizeof(nc->info_str), "vhost-user%d to %s=
-",
-@@ -312,11 +307,11 @@ static int net_vhost_user_init(NetClientState *peer=
-, const char *device,
-         if (!nc0) {
-             nc0 =3D nc;
-             s =3D DO_UPCAST(NetVhostUserState, nc, nc);
--            if (!qemu_chr_fe_init(&s->chr, chr, &err)) {
-+            if (!qemu_chr_fe_init(&s->chr, chr, &err) ||
-+                !vhost_user_init(user, &s->chr, &err)) {
-                 error_report_err(err);
-                 goto err;
-             }
--            user->chr =3D &s->chr;
-         }
-         s =3D DO_UPCAST(NetVhostUserState, nc, nc);
-         s->vhost_user =3D user;
+ obj-$(CONFIG_MILKYMIST) +=3D milkymist-softusb.o
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index d335dd0a6a..7462051ba3 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -14,6 +14,7 @@ obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock.o
+ ifeq ($(CONFIG_VIRTIO_PCI),y)
+ obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock-pci.o
+ obj-$(CONFIG_VHOST_USER_BLK) +=3D vhost-user-blk-pci.o
++obj-$(CONFIG_VHOST_USER_INPUT) +=3D vhost-user-input-pci.o
+ obj-$(CONFIG_VHOST_USER_SCSI) +=3D vhost-user-scsi-pci.o
+ obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi-pci.o
+ obj-$(CONFIG_VIRTIO_INPUT_HOST) +=3D virtio-input-host-pci.o
 --=20
 2.21.0
