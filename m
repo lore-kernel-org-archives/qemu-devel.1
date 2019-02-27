@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56928)
+Received: from eggs.gnu.org ([209.51.188.92]:56997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gywcQ-0000lX-Q4
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:19 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywcm-000160-VF
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gywcO-0005U8-S1
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:18 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44617)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gywcM-0005QU-VU
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:16 -0500
-Received: by mail-wr1-f66.google.com with SMTP id w2so17321109wrt.11
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 02:39:13 -0800 (PST)
-Date: Wed, 27 Feb 2019 11:39:08 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190227103908.xao5xy7ryx47ndeo@steredhat>
-References: <20190227012132.16271-1-david@gibson.dropbear.id.au>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gywcl-0005pX-Uu
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42140)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gywcj-0005mF-Re
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 05:39:39 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A9E1B7F3EA
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 10:31:05 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 27 Feb 2019 11:30:13 +0100
+Message-Id: <20190227103017.29515-9-marcandre.lureau@redhat.com>
+In-Reply-To: <20190227103017.29515-1-marcandre.lureau@redhat.com>
+References: <20190227103017.29515-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190227012132.16271-1-david@gibson.dropbear.id.au>
-Subject: Re: [Qemu-devel] [PATCH] Allow -sandbox off with --disable-seccomp
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 08/12] vhost-user: add
+ vhost_user_input_get_config()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +34,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: otubo@redhat.com, pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, mst@redhat.com
 
-On Wed, Feb 27, 2019 at 12:21:32PM +1100, David Gibson wrote:
-> At present, when seccomp support is compiled out with --disable-seccomp
-> we fail with an error if the user puts -sandbox on the command line.
-> 
-> That kind of makes sense, but it's a bit strange that we reject a request
-> to disable sandboxing with "-sandbox off" saying we don't support
-> sandboxing.
-> 
-> This puts in a small sandbox to (correctly) silently ignore -sandbox off
-> when we don't have sandboxing support compiled in.  This makes life easier
-> for testcases, since they can safely specify "-sandbox off" without having
-> to care if the qemu they're using is compiled with sandbox support or not.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  vl.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+Ask vhost user input backend the list of virtio_input_config.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.h |  1 +
+ include/hw/virtio/vhost-backend.h     |  4 ++
+ hw/virtio/vhost-user.c                | 60 +++++++++++++++++++++++++++
+ docs/interop/vhost-user.txt           |  8 ++++
+ 4 files changed, 73 insertions(+)
+
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+index c0133b7f3f..b0c798fa1a 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -91,6 +91,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_ADVISE  =3D 28,
+     VHOST_USER_POSTCOPY_LISTEN  =3D 29,
+     VHOST_USER_POSTCOPY_END     =3D 30,
++    VHOST_USER_INPUT_GET_CONFIG =3D 31,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-=
+backend.h
+index 81283ec50f..1fca321d8a 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -12,6 +12,7 @@
+ #define VHOST_BACKEND_H
+=20
+ #include "exec/memory.h"
++#include "standard-headers/linux/virtio_input.h"
+=20
+ typedef enum VhostBackendType {
+     VHOST_BACKEND_TYPE_NONE =3D 0,
+@@ -160,4 +161,7 @@ int vhost_backend_invalidate_device_iotlb(struct vhos=
+t_dev *dev,
+ int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
+                                           struct vhost_iotlb_msg *imsg);
+=20
++int vhost_user_input_get_config(struct vhost_dev *dev,
++                                struct virtio_input_config **config);
++
+ #endif /* VHOST_BACKEND_H */
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 0acf56fe96..272985adf2 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -89,6 +89,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_ADVISE  =3D 28,
+     VHOST_USER_POSTCOPY_LISTEN  =3D 29,
+     VHOST_USER_POSTCOPY_END     =3D 30,
++    VHOST_USER_INPUT_GET_CONFIG =3D 31,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+@@ -338,6 +339,65 @@ static int vhost_user_write(struct vhost_dev *dev, V=
+hostUserMsg *msg,
+     return 0;
+ }
+=20
++static void *vhost_user_read_size(struct vhost_dev *dev, uint32_t size)
++{
++    struct vhost_user *u =3D dev->opaque;
++    CharBackend *chr =3D u->user->chr;
++    int r;
++    uint8_t *p =3D g_malloc(size);
++
++    r =3D qemu_chr_fe_read_all(chr, p, size);
++    if (r !=3D size) {
++        error_report("Failed to read msg payload."
++                     " Read %d instead of %u.", r, size);
++        g_free(p);
++        return NULL;
++    }
++
++    return p;
++}
++
++int vhost_user_input_get_config(struct vhost_dev *dev,
++                                struct virtio_input_config **config)
++{
++    void *p =3D NULL;
++    VhostUserMsg msg =3D {
++        .hdr.request =3D VHOST_USER_INPUT_GET_CONFIG,
++        .hdr.flags =3D VHOST_USER_VERSION,
++    };
++
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
++        goto err;
++    }
++
++    if (vhost_user_read_header(dev, &msg) < 0) {
++        goto err;
++    }
++
++    if (msg.hdr.request !=3D VHOST_USER_INPUT_GET_CONFIG) {
++        error_report("Received unexpected msg type. Expected %d received=
+ %d",
++                     VHOST_USER_INPUT_GET_CONFIG, msg.hdr.request);
++        goto err;
++    }
++
++    if (msg.hdr.size % sizeof(struct virtio_input_config)) {
++        error_report("Invalid msg size");
++        goto err;
++    }
++
++    p =3D vhost_user_read_size(dev, msg.hdr.size);
++    if (!p) {
++        goto err;
++    }
++
++    *config =3D p;
++    return msg.hdr.size / sizeof(struct virtio_input_config);
++
++err:
++    g_free(p);
++    return -1;
++}
++
+ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+                                    struct vhost_log *log)
+ {
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index 9ee2a60cfb..e145b3ec55 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -766,6 +766,14 @@ Master message types
+       was previously sent.
+       The value returned is an error indication; 0 is success.
+=20
++ * VHOST_USER_INPUT_GET_CONFIG
++      Id: 31
++      Master payload: N/A
++      Slave payload: (struct virtio_input_config)*
++
++      Ask vhost user input backend the list of virtio_input_config, in
++      host endianness.
++
+ Slave message types
+ -------------------
+=20
+--=20
+2.21.0
