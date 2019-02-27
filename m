@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50517)
+Received: from eggs.gnu.org ([209.51.188.92]:50907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gz13t-0003XG-2Z
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:23:59 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gz15z-0004bM-Fa
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gz13p-0007ja-WF
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:23:55 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:53859)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gz13o-0007dN-WB
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:23:53 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id e74so6195377wmg.3
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 07:23:49 -0800 (PST)
-Date: Wed, 27 Feb 2019 15:23:47 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190227152347.GF22539@stefanha-x1.localdomain>
-References: <MN2PR02MB580680857B3390A2447B512DB67B0@MN2PR02MB5806.namprd02.prod.outlook.com>
+	(envelope-from <no-reply@patchew.org>) id 1gz15y-00011F-5I
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:07 -0500
+Resent-Message-Id: <E1gz15y-00011F-5I@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gz15w-0000bT-Qq
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 10:26:06 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155128109448.1544.16250328773370124812@49fa7ef69f7b>
+In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="m1UC1K4AOz1Ywdkx"
-Content-Disposition: inline
-In-Reply-To: <MN2PR02MB580680857B3390A2447B512DB67B0@MN2PR02MB5806.namprd02.prod.outlook.com>
-Subject: Re: [Qemu-devel] Virtio-net control queue handling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 27 Feb 2019 07:24:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikhil Agarwal <nagarwal@xilinx.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, jasowang@redhat.com, libvir-list@redhat.com
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, programmingkidx@gmail.com, r.bolshakov@yadro.com, kraxel@redhat.com, ben.hekster@foghorn.io, berkus@gmail.com
 
-
---m1UC1K4AOz1Ywdkx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, Feb 26, 2019 at 02:13:43PM +0000, Nikhil Agarwal wrote:
-> Is there any option in QEMU to offload virtio device control queue handling to backend instead of deciphering and passing to libvirt via QMP? if not, is there any interface in libvirt which passes on these message to application or i directly use QMP interface from QEMU?
-
-I'm not sure I understand your question.  It could be because of
-terminology:
-
-"virtio device control queue" == virtio-net control virtqueue?
-
-"backend" == vhost-user-net device backend?
-
-"message" == QMP event?
-
-I have CCed Jason Wang, QEMU network subsystem maintainer, and the
-libvirt mailing list.
-
-Stefan
-
---m1UC1K4AOz1Ywdkx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcdquDAAoJEJykq7OBq3PIkoIIAIt69iVdkyEGaM72Wb88WTYY
-k5aNWwKhH1eFZxzZs6sBTj+f7NzowF51YCyPyLuWLDrqgcXiZWY6lzQISsSdj62P
-RpqmJ8avx1zULyRFniktx+jmBwavJGZDxSvo1l4fk9rmOoV/TwyHBLMhgP5r6rXX
-2qCpFTuJOILuYFsrdWODQcwxsP5X6t8k+GnlhTPQs5Ti2GC/L77Dd5JJBnXKX0NO
-u5gYoazrpy6rBmb5tFzkejc+SQIfRsN1U/7HJ3VvtyYxOy3ls8wSRS++nJcNy+B9
-dsxb3tYG9xMtiOXtjSU7s7nnHwfUtsI1KFFri5sJ7HCbrlyFUUwPLmD6vhT4RFs=
-=C9R3
------END PGP SIGNATURE-----
-
---m1UC1K4AOz1Ywdkx--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDEwMjgxNi4zMzkz
+LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIu
+bWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB1
+aS9jb2NvYTogVXNlIE9TWCdzIG1haW4gbG9vcApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8
+IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTUxNzQ1NDguMjYz
+MC0xLXl1cnkta290b3ZAeWFuZGV4LXRlYW0ucnUgLT4gcGF0Y2hldy8yMDE5MDIxNTE3NDU0OC4y
+NjMwLTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCjkzYTNjZjljNDIgdWkvY29jb2E6IFBlcmZvcm0gVUkgb3BlcmF0aW9ucyBvbmx5IG9u
+IHRoZSBtYWluIHRocmVhZAo3ZWIxMzAzNzVhIHVpL2NvY29hOiBTdWJjbGFzcyBOU0FwcGxpY2F0
+aW9uIHNvIHdlIGNhbiBpbXBsZW1lbnQgc2VuZEV2ZW50CjU1NmUzMTNiZjUgdWkvY29jb2E6IERv
+bid0IGNhbGwgTlNBcHAgc2VuZEV2ZW50IGRpcmVjdGx5IGZyb20gaGFuZGxlRXZlbnQKNWUyMGNj
+ZjYzYyB1aS9jb2NvYTogTW92ZSBjb25zb2xlL2RldmljZSBtZW51IGNyZWF0aW9uIGNvZGUgdXAg
+aW4gZmlsZQowMTczNTNiODQwIHVpL2NvY29hOiBGYWN0b3Igb3V0IGluaXRpYWwgbWVudSBjcmVh
+dGlvbgo0NTVjZTkwM2ZhIHVpL2NvY29hOiBVc2UgdGhlIHBpeG1hbiBpbWFnZSBkaXJlY3RseSBp
+biBzd2l0Y2hTdXJmYWNlCjAyYjY3NWVkZTAgdWkvY29jb2E6IEVuc3VyZSB3ZSBoYXZlIHRoZSBp
+b3RocmVhZCBsb2NrIHdoZW4gY2FsbGluZyBpbnRvIFFFTVUKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvNyBDaGVja2luZyBjb21taXQgMDJiNjc1ZWRlMGEyICh1aS9jb2NvYTogRW5zdXJlIHdlIGhh
+dmUgdGhlIGlvdGhyZWFkIGxvY2sgd2hlbiBjYWxsaW5nIGludG8gUUVNVSkKMi83IENoZWNraW5n
+IGNvbW1pdCA0NTVjZTkwM2ZhMDkgKHVpL2NvY29hOiBVc2UgdGhlIHBpeG1hbiBpbWFnZSBkaXJl
+Y3RseSBpbiBzd2l0Y2hTdXJmYWNlKQozLzcgQ2hlY2tpbmcgY29tbWl0IDAxNzM1M2I4NDBiNCAo
+dWkvY29jb2E6IEZhY3RvciBvdXQgaW5pdGlhbCBtZW51IGNyZWF0aW9uKQo0LzcgQ2hlY2tpbmcg
+Y29tbWl0IDVlMjBjY2Y2M2M2MiAodWkvY29jb2E6IE1vdmUgY29uc29sZS9kZXZpY2UgbWVudSBj
+cmVhdGlvbiBjb2RlIHVwIGluIGZpbGUpCjUvNyBDaGVja2luZyBjb21taXQgNTU2ZTMxM2JmNWUx
+ICh1aS9jb2NvYTogRG9uJ3QgY2FsbCBOU0FwcCBzZW5kRXZlbnQgZGlyZWN0bHkgZnJvbSBoYW5k
+bGVFdmVudCkKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQ0OiBGSUxFOiB1aS9jb2NvYS5t
+OjE1MjoKKyAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEyMiBsaW5lcyBjaGVj
+a2VkCgpQYXRjaCA1LzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjYvNyBDaGVja2luZyBj
+b21taXQgN2ViMTMwMzc1YWQwICh1aS9jb2NvYTogU3ViY2xhc3MgTlNBcHBsaWNhdGlvbiBzbyB3
+ZSBjYW4gaW1wbGVtZW50IHNlbmRFdmVudCkKNy83IENoZWNraW5nIGNvbW1pdCA5M2EzY2Y5YzQy
+NjggKHVpL2NvY29hOiBQZXJmb3JtIFVJIG9wZXJhdGlvbnMgb25seSBvbiB0aGUgbWFpbiB0aHJl
+YWQpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
+MTkwMjE0MTAyODE2LjMzOTMtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVj
+a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
