@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48661)
+Received: from eggs.gnu.org ([209.51.188.92]:49065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gz2ku-0007yw-PU
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:12:31 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gz2n5-0000vL-9Q
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:14:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gz2kn-0005ui-In
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:12:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60698)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gz2kn-0005uM-3S
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:12:21 -0500
-Date: Wed, 27 Feb 2019 17:12:18 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190227171218.GF927@stefanha-x1.localdomain>
-References: <20190222153254.22739-1-stefanha@redhat.com>
-	<87imx8uu99.fsf@dusky.pond.sub.org>
-	<20190225092846.GA4757@angien.pipo.sk>
-	<20190225174001.GI379@stefanha-x1.localdomain>
-	<87a7iincg0.fsf@dusky.pond.sub.org>
-	<20190227151535.GE22539@stefanha-x1.localdomain>
-	<20190227152525.GK31688@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gz2mx-000703-OO
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 12:14:40 -0500
+Date: Wed, 27 Feb 2019 18:14:12 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190227181412.2a69a926@redhat.com>
+In-Reply-To: <20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
+References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
+	<20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uTRFFR9qmiCqR05s"
-Content-Disposition: inline
-In-Reply-To: <20190227152525.GK31688@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+ hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,93 +24,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: eric.auger@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, linuxarm@huawei.com, xuwei5@huawei.com
 
+On Mon, 28 Jan 2019 11:05:45 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
---uTRFFR9qmiCqR05s
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> pc-dimm memory hotplug is enabled using GPIO(Pin 2) based ACPI
+> event. Hot removal functionality is not yet supported.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  hw/arm/virt.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 55 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 884960d..cf64554 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -62,6 +62,7 @@
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/mem/nvdimm.h"
+>  #include "hw/acpi/acpi.h"
+> +#include "hw/acpi/pc-hotplug.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -1651,7 +1652,14 @@ static void machvirt_init(MachineState *machine)
+>          nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
+>                                 vms->fw_cfg, OBJECT(vms));
+>      }
+> +    if (vms->acpi_memhp_state.is_enabled) {
+> +        MemHotplugState *state =  &vms->acpi_memhp_state;
+> +        hwaddr base;
+>  
+> +        state->hw_reduced_acpi = true;
+> +        base = vms->memmap[VIRT_ACPI_IO].base + ACPI_MEMORY_HOTPLUG_BASE;
+> +        acpi_memory_hotplug_init(sysmem, OBJECT(vms), state, base);
+> +    }
+this hunk should be a part of 'acpi' device that owns respective interrupts and mmio regions.
+(something like we do in x86)
+In this case I'd suggest to make 'base' its property and the board will set it during
+device creation.
 
-On Wed, Feb 27, 2019 at 03:25:25PM +0000, Daniel P. Berrang=E9 wrote:
-> On Wed, Feb 27, 2019 at 03:15:35PM +0000, Stefan Hajnoczi wrote:
-> > On Tue, Feb 26, 2019 at 10:09:19AM +0100, Markus Armbruster wrote:
-> > > Stefan Hajnoczi <stefanha@redhat.com> writes:
-> > > > On Mon, Feb 25, 2019 at 10:28:46AM +0100, Peter Krempa wrote:
-> > > >> On Mon, Feb 25, 2019 at 09:50:26 +0100, Markus Armbruster wrote:
-> > > >> > Stefan Hajnoczi <stefanha@redhat.com> writes:
-> > > >> Other than the above, this is a welcome improvement as I've person=
-ally
-> > > >> ran into scenarios where a feature in qemu was fixed but it was
-> > > >> impossible to detect whether given qemu version contains the fix a=
-s it
-> > > >> did not have any influence on the QMP schema.
-> > > >
-> > > > I'd like to make things as simpler as possible, but no simpler :).
-> > > >
-> > > > The simplest option is that the advertised features are set in ston=
-e at
-> > > > build time (e.g. selected with #ifdef if necessary).  But then we h=
-ave
-> > > > no way of selecting features at runtime (e.g. based on kernel featu=
-res).
-> > > >
-> > > > What do you think?
-> > >=20
-> > > I think we should map the problem space, identify cases with actual
-> > > uses, then design a solution that covers them and can plausibly grow =
-to
-> > > cover cases we anticipate.
-> > >=20
-> > > The migrate-with-cache-direct-off-on-linux case is compile-time stati=
-c.
-> > >=20
-> > > Do we have or have we had a case that is not compile-time static?
-> >=20
-> > I can't think of something that both requires query-qemu-features and
-> > isn't compile-time static.  But that could be because not many things
-> > require query-qemu-features :).
-> >=20
-> > The philosophy on Linux seems to be: distros compile QEMU against
-> > headers that accurately reflect the system features that are available.
-> > Therefore there isn't a lot of runtime fallback logic in case a new QEMU
-> > is running on an old host.  This means we can get by with compile-time
-> > static features only.
->=20
-> This assumption is probably going to be more troublesome in future. It
-> is increasingly common to deploy libvirt & QEMU inside docker containers,
-> and there's not a strict requirement that the docker container image
-> is the same distro / version as the docker host. ie a Fedora docker
-> image could be run on a RHEL host & vica-verca. IOW we could see an older
+>      vms->bootinfo.ram_size = machine->ram_size;
+>      vms->bootinfo.kernel_filename = machine->kernel_filename;
+>      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+> @@ -1819,6 +1827,20 @@ static void virt_set_nvdimm_persistence(Object *obj, const char *value,
+>      nvdimm_state->persistence_string = g_strdup(value);
+>  }
+>  
+> +static bool virt_get_memhp_support(Object *obj, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    return vms->acpi_memhp_state.is_enabled;
+> +}
+> +
+> +static void virt_set_memhp_support(Object *obj, bool value, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    vms->acpi_memhp_state.is_enabled = value;
+> +}
+> +
+>  static CpuInstanceProperties
+>  virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+>  {
+> @@ -1863,8 +1885,8 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+>  
+> -    if (dev->hotplugged) {
+> -        error_setg(errp, "memory hotplug is not supported");
+> +    if (dev->hotplugged && is_nvdimm) {
+> +        error_setg(errp, "nvdimm hotplug is not supported");
+>      }
+>  
+>      if (is_nvdimm && !vms->acpi_nvdimm_state.is_enabled) {
+> @@ -1875,6 +1897,22 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
+>  }
+>  
+> +static void virt_memhp_send_event(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                                  Error **errp)
+> +{
+> +    DeviceState *gpio_dev;
+> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +
+> +    gpio_dev = virt_get_gpio_dev(GPIO_PCDIMM);
+> +    if (!gpio_dev) {
+> +        error_setg(errp, "No dev interface to send hotplug event");
+                             ^^^^^^ confusing
+> +        return;
+> +    }
+> +    acpi_memory_plug_cb(hotplug_dev, &vms->acpi_memhp_state,
+> +                        dev, errp);
+> +    qemu_set_irq(qdev_get_gpio_in(gpio_dev, 0), 1);
+> +}
+> +
+>  static void virt_memory_plug(HotplugHandler *hotplug_dev,
+>                               DeviceState *dev, Error **errp)
+>  {
+> @@ -1891,6 +1929,10 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+>          nvdimm_plug(&vms->acpi_nvdimm_state);
+>      }
+>  
+> +    if (dev->hotplugged && !is_nvdimm) {
+> +        virt_memhp_send_event(hotplug_dev, dev, errp);
+...
+  acpi_memory_plug_cb();
+  hotplug_handler_plug(HOTPLUG_HANDLER(pcms->gpio_dev), dev, &error_abort);
+  ^^^^ forward snd process hotplug notification event in gpio_dev,
+       machine should not care about which and how to deal with random IRQs
 
-Off-topic, the standard spelling seems to be "vice versa".  Is this a
-typo or another accepted spelling?
+> +    }
+> +
+>  out:
+>      error_propagate(errp, local_err);
+>  }
+> @@ -1898,6 +1940,11 @@ out:
+>  static void virt_memory_unplug(HotplugHandler *hotplug_dev,
+>                                 DeviceState *dev, Error **errp)
+>  {
+> +    if (dev->hotplugged) {
+> +        error_setg(errp, "memory hot unplug is not supported");
+> +        return;
+> +    }
+what if unplug is called on cold-plugged device?
 
-> kernel than what we compiled on. I don't know how common such mismatches
-> will be in practice, but at the Docker level there's nothing preventing
-> such mismatches, which means some people will inevitably end up running
-> in such scenarios whether we like it or not.=20
+Better way to disable mgmt initiated unplug is to forbid it in unplug_request()
+For guest initiated one ('unplug' handler), the best we can do is log error
+and ignore it (provided guest won't get in confused). it's also possible 
+to hide _EJ method and then it would be even fine to abort if it gets here,
+since guest is not supposed to interface with MMIO interface without using AML.
 
-Good point.
-
-Peter's suggestion for a cacheable flag sounds useful.  I can propose
-that in the next revision.
-
-Stefan
-
---uTRFFR9qmiCqR05s
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcdsTyAAoJEJykq7OBq3PIcMoH/2EbeCJfZnxC/MgUHFCJ7EFy
-klJsKGxs5c13s7ztfnBaS68nDOeeV3LJOObvQwEXArzkB3nWpgsHMFZh/rgCH9qG
-63qjj4rvUqBghyDBh2Wa6AaCqyc5HtUmL0CIv/2jkH1B8lfvZ4HZaQ61/d8cnsSW
-2xi47NoVSMsCbm0mnmITTy4Cc68iHVVbfT2iKYFU7VwDJFHIOaw1Inv1idcmjfxr
-/3jaETxGW79zGNtsN3Abgja+ct1trZ9oVEPcISLZ9qf34tDInrCuVxBUtDx751EC
-68xnopcUISouz0lg1TSFJKmZ/815KUSPDZJL7A/IffQC15tDRIcIWI8mkUsFT/Y=
-=f/HZ
------END PGP SIGNATURE-----
-
---uTRFFR9qmiCqR05s--
+> +
+>      pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
+>      object_unparent(OBJECT(dev));
+>  }
+> @@ -2085,6 +2132,12 @@ static void virt_instance_init(Object *obj)
+>                                      "Set NVDIMM persistence"
+>                                      "Valid values are cpu and mem-ctrl", NULL);
+>  
+> +    vms->acpi_memhp_state.is_enabled = true;
+> +    object_property_add_bool(obj, "memory-hotplug-support",
+> +                             virt_get_memhp_support,
+> +                             virt_set_memhp_support,
+> +                             NULL);
+> +
+>      vms->irqmap = a15irqmap;
+>  }
+>  
