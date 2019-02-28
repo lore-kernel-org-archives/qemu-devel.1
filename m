@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45259)
+Received: from eggs.gnu.org ([209.51.188.92]:45406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzQ9f-00069T-Ua
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:11:36 -0500
+	(envelope-from <philmd@redhat.com>) id 1gzQAB-0006R1-Su
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:12:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzQ9c-0007X8-02
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:11:33 -0500
-References: <20190227162035.18543-1-berrange@redhat.com>
-	<20190227162035.18543-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e6944ece-e00e-643a-fa71-deb18841e2fb@redhat.com>
-Date: Thu, 28 Feb 2019 12:11:00 -0600
+	(envelope-from <philmd@redhat.com>) id 1gzQA9-0007z8-Tc
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:12:07 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38071)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gzQA6-0007vk-VD
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:12:04 -0500
+Received: by mail-wr1-f66.google.com with SMTP id g12so10967288wrm.5
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:11:53 -0800 (PST)
+References: <63559cf027d4ebd95a844b73b1f20444fb72fb2c.camel@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <62cddadf-8327-fdd1-baa9-c4ade791b8ee@redhat.com>
+Date: Thu, 28 Feb 2019 19:11:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190227162035.18543-2-berrange@redhat.com>
+In-Reply-To: <63559cf027d4ebd95a844b73b1f20444fb72fb2c.camel@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 1/3] qemu-nbd: add support for
- authorization of TLS clients
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] trivial fix of malloc to g_new in thunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Aarushi Mehta <mehta.aaru20@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>
 
-On 2/27/19 10:20 AM, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> Currently any client which can complete the TLS handshake is able to us=
-e
-> the NBD server. The server admin can turn on the 'verify-peer' option
-> for the x509 creds to require the client to provide a x509 certificate.
-> This means the client will have to acquire a certificate from the CA
-> before they are permitted to use the NBD server. This is still a fairly
-> low bar to cross.
->=20
-> This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command whic=
-h
-> takes the ID of a previously added 'QAuthZ' object instance. This will
-> be used to validate the client's x509 distinguished name. Clients
-> failing the authorization check will not be permitted to use the NBD
-> server.
+On 2/28/19 5:46 PM, Aarushi Mehta wrote:
+> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> Note that since thunking occurs throughout the lifetime of the QEMU
+> instance, there is no matching 'free' to correct.
+> 
+> ---
+>  thunk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/thunk.c b/thunk.c
+> index d5d8645cd4..17f3d320bb 100644
+> --- a/thunk.c
+> +++ b/thunk.c
+> @@ -89,7 +89,7 @@ void thunk_register_struct(int id, const char *name,
+> const argtype *types)
 
-It doesn't hold up this patch, but I note that with the qemu QMP command
-changes you make in 2/3, you document that the object can be
-created/removed on the fly, and the server will adjust which clients can
-then subsequently connect. Is there any need for the same sort of
-runtime configurability in qemu-nbd, and if so, how would we accomplish
-it?  Perhaps by having a command-line option to parse --tls-authz from a
-file, where you can send SIGHUP to qemu-nbd to force it to re-read the
-file?  Or am I worrying about something unlikely to be needed in practice=
-?
+Clearer than using a single:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+       se->field_offsets = g_new(int *, nb_fields * 2);
+
+So:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+>      for(i = 0;i < 2; i++) {
+
+BTW we can replace here by:
+
+       for (i = 0; i < ARRAY_SIZE(se->field_offsets); i++) {
+
+>          offset = 0;
+>          max_align = 1;
+> -        se->field_offsets[i] = malloc(nb_fields * sizeof(int));
+> +        se->field_offsets[i] = g_new(int, nb_fields);
+>          type_ptr = se->field_types;
+>          for(j = 0;j < nb_fields; j++) {
+>              size = thunk_type_size(type_ptr, i);
+> 
