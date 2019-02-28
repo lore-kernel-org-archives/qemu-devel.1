@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55370)
+Received: from eggs.gnu.org ([209.51.188.92]:52467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gzUNx-0006IK-QQ
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:42:38 -0500
+	(envelope-from <pburton@wavecomp.com>) id 1gzU8q-0003ee-KC
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:27:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gzUNv-0006zE-Ur
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:42:37 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:39775)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gzUNv-0006qA-5J
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:42:35 -0500
-Received: by mail-wm1-f67.google.com with SMTP id z84so10483527wmg.4
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:42:11 -0800 (PST)
-References: <20190228202537.4638-1-alex.bennee@linaro.org>
-	<20190228202537.4638-6-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c3a65d4b-8720-2957-1394-032823a78760@redhat.com>
-Date: Thu, 28 Feb 2019 23:42:03 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190228202537.4638-6-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <pburton@wavecomp.com>) id 1gzU8p-0006cY-FB
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:27:00 -0500
+Received: from mail-eopbgr720104.outbound.protection.outlook.com
+	([40.107.72.104]:6335
+	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pburton@wavecomp.com>)
+	id 1gzU8n-0006bd-Oq
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:26:59 -0500
+From: Paul Burton <pburton@wavecomp.com>
+Date: Thu, 28 Feb 2019 22:26:53 +0000
+Message-ID: <20190228222651.qzc3nihybd6sqz4s@pburton-laptop>
+References: <20190204202609.26956-1-philmd@redhat.com>
+	<20190204202609.26956-5-philmd@redhat.com>
+In-Reply-To: <20190204202609.26956-5-philmd@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/16] tests/tcg/mips: fix hello-mips
- compilation
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <8D2797FEE1480C46A21CC677253A8762@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] mips: Express dependencies of the
+ Boston machine with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@gmail.com, qemu-arm@nongnu.org, jcmvbkbc@gmail.com
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?iso-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, James Hogan <jhogan@kernel.org>, Thomas Huth <thuth@redhat.com>
 
-Hi Alex,
+On Mon, Feb 04, 2019 at 09:26:07PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Boston is built around a Xilinx FPGA, which includes a PCIe root port
+> and an UART. An Intel EG20T PCH connects the I/O peripherals, but only
+> the SATA bus is emulated.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-On 2/28/19 9:25 PM, Alex Bennée wrote:
-> The compilation flags for proper building are in the source tree. We
-> also fix exit to 0 so the result is counted as a success.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Paul Burton <pburton@wavecomp.com>
+
+Thanks,
+    Paul
+
 > ---
->  tests/tcg/mips/Makefile.target | 11 ++++-------
->  tests/tcg/mips/hello-mips.c    |  2 +-
->  2 files changed, 5 insertions(+), 8 deletions(-)
-> 
-> diff --git a/tests/tcg/mips/Makefile.target b/tests/tcg/mips/Makefile.target
-> index 086625f533..1a994d5525 100644
-> --- a/tests/tcg/mips/Makefile.target
-> +++ b/tests/tcg/mips/Makefile.target
-> @@ -8,15 +8,12 @@ MIPS_SRC=$(SRC_PATH)/tests/tcg/mips
->  # Set search path for all sources
->  VPATH 		+= $(MIPS_SRC)
->  
-> +# hello-mips is 32 bit only
-
-Correct.
-
-> +ifeq ($(findstring 64,$(TARGET_NAME)),)
->  MIPS_TESTS=hello-mips
->  
->  TESTS += $(MIPS_TESTS)
->  
-> -hello-mips: CFLAGS+=-ffreestanding
-> +hello-mips: CFLAGS+=-mno-abicalls -fno-PIC -mabi=32
-
-As suggested in the header.
-
->  hello-mips: LDFLAGS+=-nostdlib
-> -
-> -# For MIPS32 and 64 we have a bunch of extra tests in sub-directories
-> -# however they are intended for system tests.
-> -
-> -run-hello-mips: hello-mips
-> -	$(call skip-test, $<, "BROKEN")
-> +endif
-> diff --git a/tests/tcg/mips/hello-mips.c b/tests/tcg/mips/hello-mips.c
-> index c7052fdf2e..4e1cf501af 100644
-> --- a/tests/tcg/mips/hello-mips.c
-> +++ b/tests/tcg/mips/hello-mips.c
-> @@ -60,5 +60,5 @@ static inline int write(int fd, const char *buf, int len)
->  void __start(void)
->  {
->      write (1, "Hello, World!\n", 14);
-> -    exit1 (42);
-
-I understand 42 is to check SYS_exit1 worked, and this is not another
-qemu-user exit. But we were previously never checked the exit code for
-42. Neither are we checking 'Hello, World' on stdout.
-
-> +    exit1(0);
->  }
-> 
+>  default-configs/mips64el-softmmu.mak | 4 ----
+>  hw/mips/Kconfig                      | 5 +++++
+>  2 files changed, 5 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips6=
+4el-softmmu.mak
+> index 23445cfcf9..c6f1f9c9aa 100644
+> --- a/default-configs/mips64el-softmmu.mak
+> +++ b/default-configs/mips64el-softmmu.mak
+> @@ -4,8 +4,4 @@ include mips-softmmu-common.mak
+>  CONFIG_IDE_VIA=3Dy
+>  CONFIG_FULONG=3Dy
+>  CONFIG_VT82C686=3Dy
+> -CONFIG_AHCI=3Dy
+>  CONFIG_MIPS_BOSTON=3Dy
+> -CONFIG_FITLOADER=3Dy
+> -CONFIG_PCI_EXPRESS=3Dy
+> -CONFIG_PCI_EXPRESS_XILINX=3Dy
+> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+> index ee6290d497..2940ff39ab 100644
+> --- a/hw/mips/Kconfig
+> +++ b/hw/mips/Kconfig
+> @@ -49,3 +49,8 @@ config MIPS_CPS
+> =20
+>  config MIPS_BOSTON
+>      bool
+> +    select FITLOADER
+> +    select MIPS_CPS
+> +    select PCI_EXPRESS_XILINX
+> +    select AHCI
+> +    select SERIAL
+> --=20
+> 2.20.1
+>=20
