@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34161)
+Received: from eggs.gnu.org ([209.51.188.92]:35126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzJLF-0005tG-Gm
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:55:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gzJSK-0007pP-Cy
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:02:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzJLE-0008QE-Fg
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:55:05 -0500
-From: David Hildenbrand <david@redhat.com>
-References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-34-david@redhat.com>
-	<9c8913f5-76b6-1175-5574-19f19d1e8eef@linaro.org>
-	<c37a7e69-934c-ab2e-08a1-c67cb3e156c5@redhat.com>
-Message-ID: <f4e08332-be07-e2f1-be20-fe4406215427@redhat.com>
-Date: Thu, 28 Feb 2019 11:54:54 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gzJS9-0003u6-Lb
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:02:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47482)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gzJS9-0003tT-CP
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:02:13 -0500
+References: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1cd4a3cd-72fc-62ab-a7f9-784c51b89fbf@redhat.com>
+Date: Thu, 28 Feb 2019 12:01:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <c37a7e69-934c-ab2e-08a1-c67cb3e156c5@redhat.com>
+In-Reply-To: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 33/33] s390x/tcg: Implement VECTOR
- UNPACK *
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2] i386: extended the cpuid_level when
+ Intel PT is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Luwei Kang <luwei.kang@intel.com>, mst@redhat.com, marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org
 
-On 28.02.19 10:28, David Hildenbrand wrote:
-> On 28.02.19 01:03, Richard Henderson wrote:
->> On 2/26/19 3:39 AM, David Hildenbrand wrote:
->>> Combine all variant in a single handler. As source and destination
->>> have different element sizes, we can't use gvec expansion. Expand
->>> manually. Also watch out for overlapping source and destination and
->>> use a temporary register in that case.
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  target/s390x/insn-data.def      |  8 +++++++
->>>  target/s390x/translate_vx.inc.c | 41 +++++++++++++++++++++++++++++++=
-++
->>>  2 files changed, 49 insertions(+)
->>
->> This works as is, so
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>
->> But the same comment applies wrt iteration order and not needing a tem=
-porary.
->> High unpack can iterate backward, while low unpack can iterate forward=
-, with no
->> lost data.
->=20
-> I'll fix that right away. I guess vector pack cannot be handled like th=
-is.
->=20
-> The only way to get rid of the temporary would be to load both elements
-> from v2 and v3 and then writing the two (half sized) elements in v1.
->=20
-> I'll have a look.
+On 30/01/19 00:52, Luwei Kang wrote:
+> Intel Processor Trace required CPUID[0x14] but the cpuid_level
+> have no change when create a kvm guest with
+> e.g. "-cpu qemu64,+intel-pt".
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+> ---
+>  hw/i386/pc.c      | 1 +
+>  target/i386/cpu.c | 9 +++++++++
+>  target/i386/cpu.h | 3 +++
+>  3 files changed, 13 insertions(+)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 73d688f..72a0a70 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -122,6 +122,7 @@ GlobalProperty pc_compat_3_1[] = {
+>      { "Cascadelake-Server" "-" TYPE_X86_CPU,  "mpx", "on" },
+>      { "Icelake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
+>      { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
+> +    { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
+>  };
+>  const size_t pc_compat_3_1_len = G_N_ELEMENTS(pc_compat_3_1);
+>  
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 2f54125..6dddd99 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5023,6 +5023,13 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>          x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
+> +
+> +        /* Intel Processor Trace requires CPUID[0x14] */
+> +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
+> +             kvm_enabled() && cpu->intel_pt_auto_level) {
+> +            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
+> +        }
+> +
+>          /* SVM requires CPUID[0x8000000A] */
+>          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+>              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+> @@ -5816,6 +5823,8 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
+>      DEFINE_PROP_BOOL("x-hv-synic-kvm-only", X86CPU, hyperv_synic_kvm_only,
+>                       false),
+> +    DEFINE_PROP_BOOL("x-intel-pt-auto-level", X86CPU, intel_pt_auto_level,
+> +                     true),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 59656a7..090baa4 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1455,6 +1455,9 @@ struct X86CPU {
+>      /* Enable auto level-increase for all CPUID leaves */
+>      bool full_cpuid_auto_level;
+>  
+> +    /* Enable auto level-increase for Intel Processor Trace leave */
+> +    bool intel_pt_auto_level;
+> +
+>      /* if true fill the top bits of the MTRR_PHYSMASKn variable range */
+>      bool fill_mtrr_mask;
+>  
+> 
 
-Hmm, as v2 and v3 are handled concatenated it is not that easy. I am not
-sure if we can handle this without a temporary vector.
-
-I thought about packing them first interleaved
-
-v2 =3D [v2e0, v2e1]
-v3 =3D [v3e0, ve31]
-v1 =3D [v2e0_packed, v3e0_packed, v2e1_packed, v3e1_packed]
-
-And then restoring the right order
-
-v1 =3D [v2e0_packed, v2e1_packed, v3e0_packed, v3e1_packed]
-
-But than the second operation seems to be the problem. That shuffling
-would have to be hard coded as far as I can see. (shuffling with MO_8 is
-nasty -> 14 element shave to be exchanged, in my opinion needing
-eventually 14 temporary variables)
-
-Of course, we can also simply detect duplicates and if so, call into a
-helper.
-
---=20
+Eduardo is back, but I've queued this anyway.
 
 Thanks,
 
-David / dhildenb
+Paolo
