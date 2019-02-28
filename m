@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46511)
+Received: from eggs.gnu.org ([209.51.188.92]:46529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gzCnh-0003wf-Tx
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:56:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gzCnj-0003x3-Mj
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:56:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gzCnT-0005DS-HZ
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:55:50 -0500
-Date: Thu, 28 Feb 2019 13:21:13 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gzCnU-0005FE-Bz
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:55:54 -0500
+Date: Thu, 28 Feb 2019 14:49:50 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190228022113.GA5894@umbus.fritz.box>
-References: <20190214052144.59541-1-aik@ozlabs.ru>
-	<20190214163743.7162ad53@w520.home>
-	<f8effbfc-e42e-acad-d141-a84a8aa04b92@ozlabs.ru>
-	<20190215032436.GG4573@umbus.fritz.box>
-	<d6f2f973-f57a-f5f0-c20b-9a574e05bd7b@ozlabs.ru>
-	<20190215035447.GI4573@umbus.fritz.box>
-	<36b41743-e218-3b2e-7f96-6feee7849a66@ozlabs.ru>
-	<20190215052059.GL4573@umbus.fritz.box>
-	<dbf77c76-2398-572d-a59e-0ee0a4c5935d@ozlabs.ru>
+Message-ID: <20190228034950.GB27799@umbus.fritz.box>
+References: <20190227085149.38596-1-aik@ozlabs.ru>
+	<20190227085149.38596-5-aik@ozlabs.ru>
+	<20190227153303.7b890f19@bahia.lan>
+	<a31bddd9-dfaf-1a4c-e04b-5f863218c87a@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
+	protocol="application/pgp-signature"; boundary="/WwmFnJnmDyWGHa4"
 Content-Disposition: inline
-In-Reply-To: <dbf77c76-2398-572d-a59e-0ee0a4c5935d@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v2 0/4] spapr_pci,
- vfio: NVIDIA V100 + POWER9 passthrough
+In-Reply-To: <a31bddd9-dfaf-1a4c-e04b-5f863218c87a@ozlabs.ru>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu v3 4/6] spapr_iommu: Do not
+ replay mappings from just created DMA window
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,126 +28,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Reza Arbab <arbab@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, qemu-ppc@nongnu.org, Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>
 
 
---qMm9M+Fa2AknHoGS
-Content-Type: text/plain; charset=utf-8
+--/WwmFnJnmDyWGHa4
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 25, 2019 at 05:39:06PM +1100, Alexey Kardashevskiy wrote:
+On Thu, Feb 28, 2019 at 10:59:56AM +1100, Alexey Kardashevskiy wrote:
 >=20
 >=20
-> On 15/02/2019 16:21, David Gibson wrote:
-> > On Fri, Feb 15, 2019 at 03:34:52PM +1100, Alexey Kardashevskiy wrote:
-> >>
-> >>
-> >> On 15/02/2019 14:54, David Gibson wrote:
-> >>> On Fri, Feb 15, 2019 at 02:32:14PM +1100, Alexey Kardashevskiy wrote:
-> >>>>
-> >>>>
-> >>>> On 15/02/2019 14:24, David Gibson wrote:
-> >>>>> On Fri, Feb 15, 2019 at 11:35:02AM +1100, Alexey Kardashevskiy wrot=
-e:
-> >>>>>>
-> >>>>>>
-> >>>>>> On 15/02/2019 10:37, Alex Williamson wrote:
-> >>>>>>> On Thu, 14 Feb 2019 16:21:40 +1100
-> >>>>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >>>>>>>
-> >>>>>>>> This is for passing through NVIDIA V100 GPUs on POWER9 systems.
-> >>>>>>>>
-> >>>>>>>> This implements a subdriver for NVIDIA V100 GPU with coherent me=
-mory and
-> >>>>>>>> NPU/ATS support available in the POWER9 CPU.
-> >>>>>>>>
-> >>>>>>>> 1/4 is a preparation for bigger DMA windows.
-> >>>>>>>> 2/4 is a small cleanup.
-> >>>>>>>>
-> >>>>>>>> Here is the kernel driver:
-> >>>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.g=
-it/commit/drivers/vfio/pci?h=3Dv5.0-rc6&id=3D7f92891778dff62303c070ac81de7b=
-7d80de331a
-> >>>>>>>>
-> >>>>>>>> SLOF changes already went in.
-> >>>>>>>>
-> >>>>>>>> This depends on "pci: Move NVIDIA vendor id to the rest of ids" =
-(posted separately).
-> >>>>>>>
-> >>>>>>> TBH, I'm not sure it was the best idea to let it live or die on i=
-t's
-> >>>>>>> own when it now creates a build dependency for this series.
-> >>>>>> I am sure that patch is disgustingly primitive and can make it to
-> >>>>>> upstream in just one click and the rest of the series will take mo=
-re
-> >>>>>> time anyway (always does :) ).
-> >>>>>>
-> >>>>>>>> This is based on sha1
-> >>>>>>>> 1ea6057 Mark Cave-Ayland "mac_newworld: change default NIC to su=
-ngem for mac99 machine".
-> >>>>>>>
-> >>>>>>> Perhaps this is why it doesn't apply cleanly against qemu.git.  A=
-re
-> >>>>>>> there dependencies we need to wait for in the ppc tree as well?
-> >>>>>>
-> >>>>>> There are few changes in spapr_pci so conflicts are possible, ever=
-y time
-> >>>>>> when David updates his tree and I rebase I get some minor ones.
-> >>>>>>
-> >>>>>>>> Please comment. Thanks.
-> >>>>>>>
-> >>>>>>> Besides the build dependency on PCI_VENDOR_ID_NVIDIA, I also get =
-this:
-> >>>>>>>
-> >>>>>>> .../qemu.git/hw/vfio/spapr.c: In function =E2=80=98vfio_spapr_cre=
-ate_window=E2=80=99:
-> >>>>>>> .../qemu.git/hw/vfio/spapr.c:212:9: error: =E2=80=98ret=E2=80=99 =
-may be used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
-> >>>>>>>          error_report("Failed to create a window, ret =3D %d (%m)=
-", ret);
-> >>>>>>>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~
-> >>>>>>> cc1: all warnings being treated as errors
-> >>>>>>
-> >>>>>> Agrh. How exactly do you make them errors, not warnings? I get no
-> >>>>>> warning/error with --disable-werror but not having  --disable-werr=
-or
-> >>>>>> prints warnings, not errors so it does not fail the build and easy=
- to miss.
-> >>>>>
-> >>>>> Are you sure it's printing warnings with --enable-werror?  Otherwise
-> >>>>> it sounds like you just have a compiler version that's not picking
-> >>>>> this up.
-> >>>>
-> >>>> Ah, here is my mistake - I thought not having --disable-werror means
-> >>>> that it is enabled as ./configure does not advertise  "--enable-werr=
-or":
-> >>>>
-> >>>> [fstn1-p1 qemu]$ ./configure --help | grep werror
-> >>>>   --disable-werror         disable compilation abort on warning
-> >>>>
-> >>>>
-> >>>> Apparently it is a tri-state flag :)
-> >>>
-> >>> Um.. no.. I believe it should be on by default as well, I was just
-> >>> saying --enable-werror because I thought it was clearer than the
-> >>> double negative in "without --disable-werror".
-> >>
-> >> The default value of werror is "":
-> >>
-> >> https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dconfigure;h=3Da61682c3=
-c727f467ce2710c7469a33b261da8ff6;hb=3DHEAD#l935
+> On 28/02/2019 01:33, Greg Kurz wrote:
+> > On Wed, 27 Feb 2019 19:51:47 +1100
+> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 > >=20
-> > Which turns into a "yes" on Linux - see line 1835-1844.
+> >> On sPAPR vfio_listener_region_add() is called in 2 situations:
+> >> 1. a new listener is registered from vfio_connect_container();
+> >> 2. a new IOMMU Memory Region is added from rtas_ibm_create_pe_dma_wind=
+ow().
+> >>
+> >> In both cases vfio_listener_region_add() calls
+> >> memory_region_iommu_replay() to notify newly registered IOMMU notifiers
+> >> about existing mappings which is totally desirable for case 1.
+> >>
+> >> However for case 2 it is nothing but noop as the window has just been
+> >> created and has no valid mappings so replaying those does not do anyth=
+ing.
+> >> It is barely noticeable with usual guests but if the window happens to=
+ be
+> >> really big, such no-op replay might take minutes and trigger RCU stall
+> >> warnings in the guest.
+> >>
+> >> For example, a upcoming GPU RAM memory region mapped at 64TiB (right
+> >> after SPAPR_PCI_LIMIT) causes a 64bit DMA window to be at least 128TiB
+> >> which is (128<<40)/0x10000=3D2.147.483.648 TCEs to replay.
+> >>
+> >> This mitigates the problem by adding an "skipping_replay" flag to
+> >> sPAPRTCETable and defining sPAPR own IOMMU MR replay() hook which does
+> >> exactly the same thing as the generic one except it returns early if
+> >> @skipping_replay=3D=3Dtrue.
+> >>
+> >> When "ibm,create-pe-dma-window" is complete, the guest will map only
+> >> required regions of the huge DMA window.
+> >>
+> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >> ---
+> >>  include/hw/ppc/spapr.h  |  1 +
+> >>  hw/ppc/spapr_iommu.c    | 31 +++++++++++++++++++++++++++++++
+> >>  hw/ppc/spapr_rtas_ddw.c |  7 +++++++
+> >>  3 files changed, 39 insertions(+)
+> >>
+> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >> index 86b0488..358bb38 100644
+> >> --- a/include/hw/ppc/spapr.h
+> >> +++ b/include/hw/ppc/spapr.h
+> >> @@ -727,6 +727,7 @@ struct sPAPRTCETable {
+> >>      uint64_t *mig_table;
+> >>      bool bypass;
+> >>      bool need_vfio;
+> >> +    bool skipping_replay;
+> >>      int fd;
+> >>      MemoryRegion root;
+> >>      IOMMUMemoryRegion iommu;
+> >> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+> >> index 37e98f9..8f23179 100644
+> >> --- a/hw/ppc/spapr_iommu.c
+> >> +++ b/hw/ppc/spapr_iommu.c
+> >> @@ -141,6 +141,36 @@ static IOMMUTLBEntry spapr_tce_translate_iommu(IO=
+MMUMemoryRegion *iommu,
+> >>      return ret;
+> >>  }
+> >> =20
+> >> +static void spapr_tce_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifi=
+er *n)
+> >> +{
+> >> +    MemoryRegion *mr =3D MEMORY_REGION(iommu_mr);
+> >> +    IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_GET_CLASS(io=
+mmu_mr);
+> >> +    hwaddr addr, granularity;
+> >> +    IOMMUTLBEntry iotlb;
+> >> +    sPAPRTCETable *tcet =3D container_of(iommu_mr, sPAPRTCETable, iom=
+mu);
+> >> +
+> >> +    if (tcet->skipping_replay) {
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    granularity =3D memory_region_iommu_get_min_page_size(iommu_mr);
+> >> +
+> >> +    for (addr =3D 0; addr < memory_region_size(mr); addr +=3D granula=
+rity) {
+> >> +        iotlb =3D imrc->translate(iommu_mr, addr, IOMMU_NONE, n->iomm=
+u_idx);
+> >> +        if (iotlb.perm !=3D IOMMU_NONE) {
+> >> +            n->notify(n, &iotlb);
+> >> +        }
+> >> +
+> >> +        /*
+> >> +         * if (2^64 - MR size) < granularity, it's possible to get an
+> >> +         * infinite loop here.  This should catch such a wraparound.
+> >> +         */
+> >> +        if ((addr + granularity) < addr) {
+> >> +            break;
+> >> +        }
+> >> +    }
+> >> +}
+> >=20
+> > It is a bit unfortunate to duplicate all that code. What about making
+> > a memory_region_iommu_replay_generic() helper out of it and call it
+> > from spapr_tce_replay() and memory_region_iommu_replay() ?
 >=20
 >=20
-> No it does not - the 'test -d "$source_path/.git"' fails as "git
-> worktree" makes .git a file, not a folder.
+> I really do not want to mess with generic code to solve our local sPAPR
+> problem, especially when there is a way not to do so.
 
-Oh, right.  Turns into a "yes" for people who don't have weird git
-setups :-p.  Care to submit a patch to make it do the right thing in
-your setup?
+Well, the thing is, I think we're actually the only user of the
+current generic replay - everything else has more efficient structure
+aware replay hooks AFAIK.  Which makes this hack even hackier.
+
+> And as a next step, I was thinking of removing (i.e. making this replay
+> a no-op) from QEMU later and do replay in KVM instead when an IOMMU
+> group is attaching to KVM as this is the only case when we need replay
+> and KVM has a lot better idea what TCEs are actually valid and can skip
+> most of them. This is a bit bigger thing as it requires a KVM capability
+> "KVM replays mappings" but when we get it, spapr_tce_replay() will
+> become no-op.
+
+That's a good idea longer term.
+
+> > Apart from that, LGTM.
+>=20
+> Well. It is a hack, I just do not have taste to tell how nasty it is
+> :)
+
+As an interim step until the kernel change, I think we can do a bit
+better than this.  First, as Greg suggests we should have the
+"generic" replay be a helper and have the spapr one call that with a
+little in the way of extra checking.
+
+Second, rather than having an explicit "skip_replay" flag, what we
+really want here is to have the replay be a fast no-op if there are no
+existing mappings rather than a slow no-op.  So instead I think we
+should have a flag which records if any mappings have been made in the
+region yet, initialized to false.  The new replay would do nothing if
+it's still false.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -160,24 +180,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qMm9M+Fa2AknHoGS
+--/WwmFnJnmDyWGHa4
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx3RZYACgkQbDjKyiDZ
-s5JVDg/+PmhTpM+9z1HMCaNBviST3MT2Zb08AwjxyjdS15n3xxr7dPx2OTh9KOVL
-7AyHsEBbj6mp6zc3E1DVXdJV+jKXVyOy//A9eG6kFnQbs8XiwRYk+fI5CM80wcWp
-ZXgo7WNsD4E9wxJIa9m9+4yTuxqLuYGCxL12M/llLT5HG6V7YQeBxgLhn60nCwTG
-roI47nRPTmk9edbjZyP0g0HYbxYz8FihqeVmYj/vRFqj8tKanA2m0Xt0hjoEvfKh
-ya3gHQkgbJqsrihd1VR5wyrpXL43vxiXdBkD/67PI2fL4aKQob+m67p3IH9JnmDj
-a88Vq8qkyMFWs+TNw4WP/DguzskcrKQnhDomJCAWngyeHwd1cd2hL8N+p0bqiY44
-Agp7nrz52bCZbUPsUJA0PGhhKfInPmlZhdLBA5nxIiqlzoweP0e3ZJ5pIMFgIDbu
-u80fanx/46gpQDwT6QvLFeKy5coyKewSQlmJyygRcJnZB1MqD+2QX+fPbymSGbsG
-o1UcYPfDmaU+y/mP2K2DTkqnFBmVfYi9lvoYgV4Zp2Vw1Pw6m5wsm8kOJvLX1jf3
-wbO9UkbgUHxAnEEddbFK8uk1PRTb5KXgoImwKNCJKUh4AJ26jjssXk0rWXolspTi
-nk75jjh1MgA1QtQFOIEv4je+m9V6qUiCYhvURFd16UKnM40A4QM=
-=YQT1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx3WlsACgkQbDjKyiDZ
+s5J04w/+IvggU26tdfuu6zDFbV4VPKlzPeyf60xWtZT9nV6Kep+yt47jeSZutIMa
+O+6r30JOBUl7wKubbPLtfQ+a0Jqz3zSeb8GCCQnXWJtxNSnpXdVIt6nD5esrcTKZ
+RUcgdLhiavnKKmcxXjslZNEU7k8nmWbIbH9ovGziZny1fSliz97p92ORQRY2qxVv
++cpsMX2KIghpfhOYcADcTeCOYekuFpupynN1T4L2e2qHVDrJW1LzOm7UZdqFKmCz
+pWmuc009cS8oPmv+ehqD6BpU6oEXriCd3Is0Jsh6IzMSMDqZ0niUXQXItTo3a0Bv
+pQCABh6PeAVIwLmyJzOBS5lIjUklw9U7m66nkbgjbko0Rd/BvO4ZBjBeZ86CVZgw
+oISfnZfEfOXTSQJyXHHpbx/PZBfGP+e7PZ8UicWg3ZZVpGJZMoHJQzHEobxPSp54
+ONyTuItgTzq8c1XWZU2P0l3fTbNG5QqAqHIltKaPw9xrTVzWG0WrMenUbZmUCuej
+5SGOfBvLKxos9oD3NpeYXmEEA9DxTBKm5sbPfZMzZ1FlatEhLbFmYNhD0wZgLMJB
+mGSV2y4dU8yLXasP1VRL4oJ3Im+3Hv67x95+89pj5VbdDSNEEKfuHAs6f54tQVdG
+rHbEN/DIaEUXORpAZdbeiNyjvuY3xQUzJKw1tSjL7SzsTUV+Mak=
+=18Y1
 -----END PGP SIGNATURE-----
 
---qMm9M+Fa2AknHoGS--
+--/WwmFnJnmDyWGHa4--
