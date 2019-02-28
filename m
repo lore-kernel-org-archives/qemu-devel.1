@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51238)
+Received: from eggs.gnu.org ([209.51.188.92]:51243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzKnI-0001KC-Q8
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:28:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1gzKnI-0001KF-RG
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:28:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzKnH-0007PN-ID
+	(envelope-from <thuth@redhat.com>) id 1gzKnH-0007Pj-MN
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:28:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46668)
+Received: from mx1.redhat.com ([209.132.183.28]:46498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gzKnH-0007O9-Ar
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gzKnH-0007OZ-Di
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:28:07 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 28 Feb 2019 13:27:43 +0100
-Message-Id: <1551356875-30676-2-git-send-email-thuth@redhat.com>
+Date: Thu, 28 Feb 2019 13:27:44 +0100
+Message-Id: <1551356875-30676-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1551356875-30676-1-git-send-email-thuth@redhat.com>
 References: <1551356875-30676-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/13] MAINTAINERS: Add missing entries for the
- sun4u machines
+Subject: [Qemu-devel] [PULL 02/13] MAINTAINERS: Add missing entries for the
+ PC machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +32,27 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- MAINTAINERS | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ MAINTAINERS | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 8f9f9d7..22e0293 100644
+index 22e0293..3a034f9 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1100,9 +1100,13 @@ Sun4u
- M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
- S: Maintained
- F: hw/sparc64/sun4u.c
--F: pc-bios/openbios-sparc64
-+F: hw/sparc64/sun4u_iommu.c
-+F: include/hw/sparc/sun4u_iommu.h
- F: hw/pci-host/sabre.c
- F: include/hw/pci-host/sabre.h
-+F: hw/pci-bridge/simba.c
-+F: include/hw/pci-bridge/simba.h
-+F: pc-bios/openbios-sparc64
+@@ -1185,6 +1185,10 @@ F: hw/acpi/ich9.c
+ F: include/hw/acpi/ich9.h
+ F: include/hw/acpi/piix4.h
+ F: hw/misc/sga.c
++F: hw/isa/apm.c
++F: include/hw/isa/apm.h
++F: tests/test-x86-cpuid.c
++F: tests/test-x86-cpuid-compat.c
 =20
- Sun4v
- M: Artyom Tarasenko <atar4qemu@gmail.com>
+ PC Chipset
+ M: Michael S. Tsirkin <mst@redhat.com>
 --=20
 1.8.3.1
