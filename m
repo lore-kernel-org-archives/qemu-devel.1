@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32976)
+Received: from eggs.gnu.org ([209.51.188.92]:33284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzJGB-0002w0-H9
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:49:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1gzJHO-0003mP-AZ
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:51:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzJGA-0003qm-ER
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:49:51 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43244)
+	(envelope-from <bounces@canonical.com>) id 1gzJHN-0005LR-9a
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:51:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49752)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gzJG9-0003qC-Vj
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:49:50 -0500
-Received: by mail-wr1-x443.google.com with SMTP id d17so21341034wre.10
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 02:49:49 -0800 (PST)
-References: <20190227164900.16378-1-dgilbert@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190227164900.16378-1-dgilbert@redhat.com>
-Date: Thu, 28 Feb 2019 10:49:46 +0000
-Message-ID: <87ef7skx11.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gzJHN-00058v-2i
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:51:05 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gzJH8-0007XU-LB
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:50:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9D9E92E80CD
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:50:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: Cleanup during exit
+Date: Thu, 28 Feb 2019 10:39:09 -0000
+From: Will Cooke <1815889@bugs.launchpad.net>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <155135034932.32123.16882926218381851803.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
+ signal 31 in __pthread_setaffinity_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,127 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
+Adding Timo who maintainers mesa.
 
-Dr. David Alan Gilbert (git) <dgilbert@redhat.com> writes:
+-- =
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Currently we cleanup the migration object as we exit main after the
-> main_loop finishes; however if there's a migration running things
-> get messy and we can end up with the migration thread still trying
-> to access freed structures.
->
-> We now take a ref to the object around the migration thread itself,
-> so the act of dropping the ref during exit doesn't cause us to lose
-> the state until the thread quits.
->
-> Cancelling the migration during migration also tries to get the thread
-> to quit.
->
-> We do this a bit earlier; so hopefully migration gets out of the way
-> before all the devices etc are freed.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  include/migration/misc.h |  2 +-
->  migration/migration.c    | 10 +++++++++-
->  vl.c                     |  7 ++++++-
->  3 files changed, 16 insertions(+), 3 deletions(-)
->
-> diff --git a/include/migration/misc.h b/include/migration/misc.h
-> index 0471e04d1f..6f9df74436 100644
-> --- a/include/migration/misc.h
-> +++ b/include/migration/misc.h
-> @@ -36,7 +36,7 @@ void dump_vmstate_json_to_file(FILE *out_fp);
->
->  /* migration/migration.c */
->  void migration_object_init(void);
-> -void migration_object_finalize(void);
-> +void migration_shutdown(void);
->  void qemu_start_incoming_migration(const char *uri, Error **errp);
->  bool migration_is_idle(void);
->  void add_migration_state_change_notifier(Notifier *notify);
-> diff --git a/migration/migration.c b/migration/migration.c
-> index e44f77af02..d45561f9b8 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -126,6 +126,7 @@ static bool migration_object_check(MigrationState *ms=
-, Error **errp);
->  static int migration_maybe_pause(MigrationState *s,
->                                   int *current_active_state,
->                                   int new_state);
-> +static void migrate_fd_cancel(MigrationState *s);
->
->  void migration_object_init(void)
->  {
-> @@ -167,8 +168,13 @@ void migration_object_init(void)
->      }
->  }
->
-> -void migration_object_finalize(void)
-> +void migration_shutdown(void)
->  {
-> +    /*
-> +     * Cancel the current migration - that will (eventually)
-> +     * stop the migration using this structure
-> +     */
-> +    migrate_fd_cancel(current_migration);
->      object_unref(OBJECT(current_migration));
->  }
->
-> @@ -3134,6 +3140,7 @@ static void *migration_thread(void *opaque)
->
->      rcu_register_thread();
->
-> +    object_ref(OBJECT(s));
->      s->iteration_start_time =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->
->      qemu_savevm_state_header(s->to_dst_file);
-> @@ -3230,6 +3237,7 @@ static void *migration_thread(void *opaque)
->
->      trace_migration_thread_after_loop();
->      migration_iteration_finish(s);
-> +    object_unref(OBJECT(s));
->      rcu_unregister_thread();
->      return NULL;
->  }
-> diff --git a/vl.c b/vl.c
-> index 2f340686a7..e7f460a114 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4579,6 +4579,12 @@ int main(int argc, char **argv, char **envp)
->
->      gdbserver_cleanup();
->
-> +    /*
-> +     * cleaning up the migration object cancels any existing migration
-> +     * try to do this early so that it also stops using devices.
-> +     */
-> +    migration_shutdown();
-> +
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
 
-We do like to vary our language over here, I guess shutdown and cleanup
-imply subtly different things. FWIW I suspect the gdbserver_cleanup()
-should be a shutdown ;-)
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Status in Mesa:
+  Unknown
+Status in QEMU:
+  New
+Status in mesa package in Ubuntu:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
 
->      /* No more vcpu or device emulation activity beyond this point */
->      vm_shutdown();
->
-> @@ -4594,7 +4600,6 @@ int main(int argc, char **argv, char **envp)
->      monitor_cleanup();
->      qemu_chr_cleanup();
->      user_creatable_cleanup();
-> -    migration_object_finalize();
->      /* TODO: unref root container, check all devices are ok */
->
->      return 0;
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
 
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
 
---
-Alex Benn=C3=A9e
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/mesa/+bug/1815889/+subscriptions
