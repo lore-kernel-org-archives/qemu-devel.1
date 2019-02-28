@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50092)
+Received: from eggs.gnu.org ([209.51.188.92]:50248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gzISf-0007Er-Jt
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:58:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzITC-0007VX-1F
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:59:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gzIS4-0004s7-5T
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:58:05 -0500
-References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
-	<20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
-	<20190227181412.2a69a926@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <61d04463-c237-eabb-18f1-3c8e49a87885@redhat.com>
-Date: Thu, 28 Feb 2019 10:57:41 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gzIT4-00055U-1B
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:59:08 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38311)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gzIT1-00051a-Be
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:59:04 -0500
+Received: by mail-oi1-x242.google.com with SMTP id q81so16018699oic.5
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 01:58:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190227181412.2a69a926@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
- hotplug support
+References: <VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<VI1PR0602MB324516419266A934FE7759C6A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB32454C17192EFA863E29CC49A47E0@VI1PR0602MB3245.eurprd06.prod.outlo>
+	<VI1PR0602MB324547F72DA9EDEB1613C888A47E0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QUg=cq3tCSLidQ9BR2hxAo3K6gA6LKtpx5Rjb=_6XgJ6Q@mail.gmail.com>
+	<28e6b4ed-9afd-3a79-6267-86c7385c23ce@redhat.com>
+	<VI1PR0602MB324578F91F1AF9390D03022FA47F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<CAJSP0QWouR43wVi0guTuASP9gc24_CPucbBvtfE5_htkDkmsrQ@mail.gmail.com>
+	<20190223165523.1d674224@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA8kOEJe-Ax_SFOCa49og-N7gpO-ptsANdvXPhKthrpb8A@mail.gmail.com>
+	<20190225112424.2dd535a1@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA-nfqk9+x1F4nUC0djYRnAgGZL4d9X6rYLBJPvuKCdjbQ@mail.gmail.com>
+	<20190225132156.477faf18@ncopa-desktop.copa.dup.pw>
+	<CAFEAcA_F1yxx8Z_8Pc_QOMZ3i9vJLZ8uRze1fTbGfSDs4NAhLg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_F1yxx8Z_8Pc_QOMZ3i9vJLZ8uRze1fTbGfSDs4NAhLg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 09:58:34 +0000
+Message-ID: <CAFEAcA9g42CzcV3n-ONQ=sD5O_gPpQGACArtzg7_TJ82Oq7DzQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,172 +43,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: shannon.zhaosl@gmail.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, linuxarm@huawei.com, xuwei5@huawei.com
+To: Natanael Copa <ncopa@alpinelinux.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@outlook.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-Hi Igor,
+On Mon, 25 Feb 2019 at 13:06, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 25 Feb 2019 at 12:22, Natanael Copa <ncopa@alpinelinux.org> wrote:
+> >
+> > On Mon, 25 Feb 2019 10:34:23 +0000
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > The short term fix is to fix your toolchain/compilation
+> > > environment options so that it isn't trying to override
+> > > the definition of memcpy().
+> >
+> > The easiest workaround is to simply disable FORTIY_SOURCE, but that
+> > will weaken the security for all implemented string functions, strcpy,
+> > memmove etc, so I don't want to do that.
+> >
+> > Is it only lduw_he_p that needs to be atomic or are the other functions
+> > in include/qemu/bswap.h using memcpy also required to be atomic?
+>
+> Hard to say, since we haven't done the "audit all the callers"
+> step that Stefan mentioned. If you're going to replace memcpy
+> with __builtin_memcpy then the safest thing is to do it for
+> all those uses (this will also give you much better generated
+> code for performance purposes).
 
-On 2/27/19 6:14 PM, Igor Mammedov wrote:
-> On Mon, 28 Jan 2019 11:05:45 +0000
-> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> 
->> pc-dimm memory hotplug is enabled using GPIO(Pin 2) based ACPI
->> event. Hot removal functionality is not yet supported.
->>
->> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->> ---
->>  hw/arm/virt.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 55 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index 884960d..cf64554 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -62,6 +62,7 @@
->>  #include "hw/mem/pc-dimm.h"
->>  #include "hw/mem/nvdimm.h"
->>  #include "hw/acpi/acpi.h"
->> +#include "hw/acpi/pc-hotplug.h"
->>  
->>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
->> @@ -1651,7 +1652,14 @@ static void machvirt_init(MachineState *machine)
->>          nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
->>                                 vms->fw_cfg, OBJECT(vms));
->>      }
->> +    if (vms->acpi_memhp_state.is_enabled) {
->> +        MemHotplugState *state =  &vms->acpi_memhp_state;
->> +        hwaddr base;
->>  
->> +        state->hw_reduced_acpi = true;
->> +        base = vms->memmap[VIRT_ACPI_IO].base + ACPI_MEMORY_HOTPLUG_BASE;
->> +        acpi_memory_hotplug_init(sysmem, OBJECT(vms), state, base);
->> +    }
-> this hunk should be a part of 'acpi' device that owns respective interrupts and mmio regions.
-> (something like we do in x86)
-> In this case I'd suggest to make 'base' its property and the board will set it during
-> device creation.
-> 
->>      vms->bootinfo.ram_size = machine->ram_size;
->>      vms->bootinfo.kernel_filename = machine->kernel_filename;
->>      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
->> @@ -1819,6 +1827,20 @@ static void virt_set_nvdimm_persistence(Object *obj, const char *value,
->>      nvdimm_state->persistence_string = g_strdup(value);
->>  }
->>  
->> +static bool virt_get_memhp_support(Object *obj, Error **errp)
->> +{
->> +    VirtMachineState *vms = VIRT_MACHINE(obj);
->> +
->> +    return vms->acpi_memhp_state.is_enabled;
->> +}
->> +
->> +static void virt_set_memhp_support(Object *obj, bool value, Error **errp)
->> +{
->> +    VirtMachineState *vms = VIRT_MACHINE(obj);
->> +
->> +    vms->acpi_memhp_state.is_enabled = value;
->> +}
->> +
->>  static CpuInstanceProperties
->>  virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
->>  {
->> @@ -1863,8 +1885,8 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->>  
->> -    if (dev->hotplugged) {
->> -        error_setg(errp, "memory hotplug is not supported");
->> +    if (dev->hotplugged && is_nvdimm) {
->> +        error_setg(errp, "nvdimm hotplug is not supported");
->>      }
->>  
->>      if (is_nvdimm && !vms->acpi_nvdimm_state.is_enabled) {
->> @@ -1875,6 +1897,22 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
->>  }
->>  
->> +static void virt_memhp_send_event(HotplugHandler *hotplug_dev, DeviceState *dev,
->> +                                  Error **errp)
->> +{
->> +    DeviceState *gpio_dev;
->> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->> +
->> +    gpio_dev = virt_get_gpio_dev(GPIO_PCDIMM);
->> +    if (!gpio_dev) {
->> +        error_setg(errp, "No dev interface to send hotplug event");
->                              ^^^^^^ confusing
->> +        return;
->> +    }
->> +    acpi_memory_plug_cb(hotplug_dev, &vms->acpi_memhp_state,
->> +                        dev, errp);
->> +    qemu_set_irq(qdev_get_gpio_in(gpio_dev, 0), 1);
->> +}
->> +
->>  static void virt_memory_plug(HotplugHandler *hotplug_dev,
->>                               DeviceState *dev, Error **errp)
->>  {
->> @@ -1891,6 +1929,10 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
->>          nvdimm_plug(&vms->acpi_nvdimm_state);
->>      }
->>  
->> +    if (dev->hotplugged && !is_nvdimm) {
->> +        virt_memhp_send_event(hotplug_dev, dev, errp);
-> ...
->   acpi_memory_plug_cb();
->   hotplug_handler_plug(HOTPLUG_HANDLER(pcms->gpio_dev), dev, &error_abort);
->   ^^^^ forward snd process hotplug notification event in gpio_dev,
->        machine should not care about which and how to deal with random IRQs
-> 
->> +    }
->> +
->>  out:
->>      error_propagate(errp, local_err);
->>  }
->> @@ -1898,6 +1940,11 @@ out:
->>  static void virt_memory_unplug(HotplugHandler *hotplug_dev,
->>                                 DeviceState *dev, Error **errp)
->>  {
->> +    if (dev->hotplugged) {
->> +        error_setg(errp, "memory hot unplug is not supported");
->> +        return;
->> +    }
-> what if unplug is called on cold-plugged device?
-> 
-> Better way to disable mgmt initiated unplug is to forbid it in unplug_request()
-> For guest initiated one ('unplug' handler), the best we can do is log error
-> and ignore it (provided guest won't get in confused). it's also possible 
-> to hide _EJ method and then it would be even fine to abort if it gets here,
-> since guest is not supposed to interface with MMIO interface without using AML.
-I don't understand the guest initiated unplug handling. How does it
-differ from x86 handling as we are using the same dynamic methods?
+I mentioned this to Richard on IRC the other day, but I think there's
+a good argument for making upstream QEMU use __builtin_memcpy in
+these helpers:
+ * it makes us robust against things like this fortify library
+   in the short term (until we fix QEMU to have an equivalent set
+   of functions for doing atomic accesses to AddressSpaces)
+ * in the longer term it will mean that we don't end up with
+   these functions being really badly-performing even if the
+   semantics of the out-of-line memcpy() are correct
 
-Besides In ARM case I checked
-/sys/devices/system/memory/memoryX/removable state for cold-plugged and
-hot-plugged DIMMs and it is equal to 0. I don't know if it is a
-limitation of the guest or a bug in our ACPI description somewhere. I
-would not be surprised if hot-unplug is not supported at kernel leve
-though.
-
-Thanks
-
-Eric
-> 
->> +
->>      pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
->>      object_unparent(OBJECT(dev));
->>  }
->> @@ -2085,6 +2132,12 @@ static void virt_instance_init(Object *obj)
->>                                      "Set NVDIMM persistence"
->>                                      "Valid values are cpu and mem-ctrl", NULL);
->>  
->> +    vms->acpi_memhp_state.is_enabled = true;
->> +    object_property_add_bool(obj, "memory-hotplug-support",
->> +                             virt_get_memhp_support,
->> +                             virt_set_memhp_support,
->> +                             NULL);
->> +
->>      vms->irqmap = a15irqmap;
->>  }
->>  
-> 
+thanks
+-- PMM
