@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34647)
+Received: from eggs.gnu.org ([209.51.188.92]:34968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzNiT-0005cu-Vr
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:35:23 -0500
+	(envelope-from <mehta.aaru20@gmail.com>) id 1gzNja-0006BD-04
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:36:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzNiL-0003g2-21
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:35:20 -0500
-Resent-Message-Id: <E1gzNiL-0003g2-21@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21755)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gzNiK-0003QQ-Mj
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:35:12 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155136805796.7448.17140051247032971400@49fa7ef69f7b>
-In-Reply-To: <20190228145624.24885-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 28 Feb 2019 07:34:19 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] Enable build and install of our
- rST docs
+	(envelope-from <mehta.aaru20@gmail.com>) id 1gzNjX-0004CG-LW
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:36:29 -0500
+Message-ID: <60952760a82dc603b836ca41fd0f9b1325cad635.camel@gmail.com>
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
+Date: Thu, 28 Feb 2019 21:05:41 +0530
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2] trivial fix of malloc to g_new in thunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +20,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, philmd@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyODE0NTYyNC4yNDg4
-NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8x
-MV0gRW5hYmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
-OTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
-MDE5MDIyODE0NTYyNC4yNDg4NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjAyNGJkZGNiODQgZG9jcy9jb25mLnB5OiBEb24ndCBoYXJk
-LWNvZGUgUUVNVSB2ZXJzaW9uCmM4Y2M5ZjYwMzQgTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRl
-bnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUKZDU4OTc4ZWMyZCBNYWtlZmlsZSwgY29uZmlndXJl
-OiBTdXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uCjdmYjBiYzE5NmEgZG9jczogUHJv
-dmlkZSBzZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50CjdhNzBjNjk0MmUg
-ZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncwoxZWVlZTQ5NWZlIGRvY3MvY29u
-Zi5weTogRG9uJ3QgaW5jbHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1aWxkCjJjYzNlZmU3MDcg
-ZG9jcy9jb25mLnB5OiBDb25maWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lCjBiMmY4YzAzNTcg
-ZG9jcy9jb25mLnB5OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeQpmZDNkN2U0ZDAx
-IGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQKMmZlMTcz
-OTg2OCBkb2NzOiBDb252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdAplMTVhZjg2MThkIGRv
-Y3MvY3B1LWhvdHBsdWcucnN0OiBGaXggclNUIG1hcmt1cCBpc3N1ZXMKCj09PSBPVVRQVVQgQkVH
-SU4gPT09CjEvMTEgQ2hlY2tpbmcgY29tbWl0IGUxNWFmODYxOGQ5NiAoZG9jcy9jcHUtaG90cGx1
-Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3VlcykKMi8xMSBDaGVja2luZyBjb21taXQgMmZlMTcz
-OTg2OGFmIChkb2NzOiBDb252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdCkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMjI6IApyZW5hbWUgZnJvbSBkb2NzL2RldmVsL21lbW9yeS50eHQKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgMTk1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTEgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xMSBDaGVja2luZyBjb21taXQgZmQzZDdlNGQwMWE4IChk
-b2NzOiBDb21taXQgaW5pdGlhbCBmaWxlcyBmcm9tIHNwaGlueC1xdWlja3N0YXJ0KQpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiMxNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDE4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzExIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjQvMTEgQ2hlY2tpbmcgY29tbWl0IDBiMmY4YzAzNTc4ZiAoZG9jcy9jb25mLnB5
-OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQg
-MmNjM2VmZTcwNzI0IChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhl
-bWUpCjYvMTEgQ2hlY2tpbmcgY29tbWl0IDFlZWVlNDk1ZmVhZiAoZG9jcy9jb25mLnB5OiBEb24n
-dCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0
-IDdhNzBjNjk0MmVmZCAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8x
-MSBDaGVja2luZyBjb21taXQgN2ZiMGJjMTk2YTQzIChkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNv
-bmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEwMDogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE4NTog
-RklMRTogZG9jcy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2Ny
-aXB0aW9uJ10gPSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJp
-bGl0eSBHdWlkZScKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcg
-Y29tbWl0IGQ1ODk3OGVjMmRhOCAoTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGlu
-ZyByU1QgZG9jdW1lbnRhdGlvbikKMTAvMTEgQ2hlY2tpbmcgY29tbWl0IGM4Y2M5ZjYwMzQ1YSAo
-TWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjEx
-LzExIENoZWNraW5nIGNvbW1pdCAwMjRiZGRjYjg0YTcgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFy
-ZC1jb2RlIFFFTVUgdmVyc2lvbikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMjAxOTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRlci5tYXlkZWxsQGxpbmFy
-by5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+---
+Note that since thunking occurs throughout the lifetime of the QEMU instance, 
+there is no matching 'free' to correct
+It might be valuable to edit the BiteSizedTasks to reflect that g_new is favoured over g_malloc
+
+ thunk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/thunk.c b/thunk.c
+index d5d8645cd4..17f3d320bb 100644
+--- a/thunk.c
++++ b/thunk.c
+@@ -89,7 +89,7 @@ void thunk_register_struct(int id, const char *name, const argtype *types)
+     for(i = 0;i < 2; i++) {
+         offset = 0;
+         max_align = 1;
+-        se->field_offsets[i] = malloc(nb_fields * sizeof(int));
++        se->field_offsets[i] = g_new(int, nb_fields);
+         type_ptr = se->field_types;
+         for(j = 0;j < nb_fields; j++) {
+             size = thunk_type_size(type_ptr, i);
+-- 
+2.17.1
+Regards
+Aarushi Mehta
