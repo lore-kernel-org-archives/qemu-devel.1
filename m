@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51521)
+Received: from eggs.gnu.org ([209.51.188.92]:51559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzKny-0001ru-8w
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:28:52 -0500
+	(envelope-from <david@redhat.com>) id 1gzKoG-0002AW-2m
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:29:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzKnw-0007q1-8S
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:28:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35470)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gzKnv-0007gO-MN
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:28:47 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 28 Feb 2019 13:27:54 +0100
-Message-Id: <1551356875-30676-13-git-send-email-thuth@redhat.com>
-In-Reply-To: <1551356875-30676-1-git-send-email-thuth@redhat.com>
-References: <1551356875-30676-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/13] tests/test-qga: Reenable guest-agent qtest
+	(envelope-from <david@redhat.com>) id 1gzKoF-0007wI-AA
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:29:08 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 28 Feb 2019 13:28:46 +0100
+Message-Id: <20190228122849.4296-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] qdev: Hotplug handler chaining
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +17,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, David Hildenbrand <david@redhat.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Can somebody please pick this up in the near future? (@Eduardo, @MST,
+@Paolo, @David - I have no idea who the right person is :) )
 
-Due to a misuse of rules.mak logical functions, commit f386df17448
-disabled the guest-agent test.
-Enable it back.
+The longer we wait, the more likely it is that some stuff gets upstreamed
+that conflicts with patch 1 and will break unnoticed. (e.g. spapr PHB
+hotplug was just upstreamed and required a fixup, luckily I was CC'ed on
+that one).
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 370de59..4154da2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -112,7 +112,7 @@ check-unit-y +=3D tests/test-crypto-secret$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) +=3D tests/test-crypto-tlscredsx509$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) +=3D tests/test-crypto-tlssession$(EXESUF)
- ifneq (,$(findstring qemu-ga,$(TOOLS)))
--check-unit-$(land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) +=3D tests/te=
-st-qga$(EXESUF)
-+check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) +=3D tes=
-ts/test-qga$(EXESUF)
- endif
- check-unit-y +=3D tests/test-timed-average$(EXESUF)
- check-unit-$(CONFIG_INOTIFY1) +=3D tests/test-util-filemonitor$(EXESUF)
---=20
-1.8.3.1
+This series implements support for hotplug handler chaining (proposed
+by Igor), something that is necessary to turn selected virtio devices into
+memory devices. Planned devices inlude virtio-mem and virtio-pmem.
+
+The machine hotplug handler can intercept hotplug handler calls
+to properly prepare/teardown the memory device part of a device. Control
+is then passed on to the actual bus hotplug handler. So the default hotplug
+handler is effectively overwritten to make interception possible.
+
+This series was tested against the - now upstream - device unplug tests
+part of "tests/device-plug-test".
+
+v1 -> v2:
+- Fixed spapr PHB unplug which was just upstreamed
+
+RFCv2 -> v1:
+- "qdev: Let the hotplug_handler_unplug() caller delete the device"
+-- Fixed two spapr delete_device() calls I missed. Covered by tests now
+-- Handle + add a comment for host pci bridge unplug, for which we have
+   code but no user yet.
+- virtio-pmem prototype will be handled from this point by Pankaj again,
+  so no longer included
+
+David Hildenbrand (2):
+  qdev: Let the hotplug_handler_unplug() caller delete the device
+  qdev: Provide qdev_get_bus_hotplug_handler()
+
+Igor Mammedov (1):
+  qdev: Let machine hotplug handler to override bus hotplug handler
+
+ hw/acpi/cpu.c            |  1 +
+ hw/acpi/memory_hotplug.c |  1 +
+ hw/acpi/pcihp.c          |  3 ++-
+ hw/core/qdev.c           | 19 ++++++++++++-------
+ hw/i386/pc.c             |  5 ++---
+ hw/pci/pci.c             |  3 ++-
+ hw/pci/pcie.c            |  3 ++-
+ hw/pci/shpc.c            |  3 ++-
+ hw/ppc/spapr.c           |  9 ++++++---
+ hw/ppc/spapr_pci.c       |  3 ++-
+ hw/s390x/css-bridge.c    |  2 +-
+ hw/s390x/s390-pci-bus.c  | 13 ++++++++-----
+ include/hw/qdev-core.h   | 12 ++++++++++++
+ qdev-monitor.c           |  9 +++++++--
+ 14 files changed, 60 insertions(+), 26 deletions(-)
+
+-- 
+2.17.2
