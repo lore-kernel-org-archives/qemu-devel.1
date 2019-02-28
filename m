@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43894)
+Received: from eggs.gnu.org ([209.51.188.92]:45389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bztemail@gmail.com>) id 1gzMQV-0008WA-Fd
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:12:44 -0500
+	(envelope-from <bounces@canonical.com>) id 1gzMYJ-00028y-EI
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bztemail@gmail.com>) id 1gzMQU-0002Qj-IC
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:12:43 -0500
+	(envelope-from <bounces@canonical.com>) id 1gzMYI-0006lP-1I
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41544)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gzMYH-0006ie-Kn
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gzMYA-0001ul-Hp
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:20:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8600E2E80C7
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:20:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <BN6PR21MB0785CB5DAEB34BB0F1C465E09E740@BN6PR21MB0785.namprd21.prod.outlook.com>
-References: <CADYoBw1HTzqTjfyDgDbP042AH1EkS1DD7Sf4um8eO7d22t4CDA@mail.gmail.com>
-	<CAFEAcA9G73yrRvj3AdyxAi2uUBH9GPPerwi7y38oMDKw8F0B=A@mail.gmail.com>
-	<CADYoBw2pm=j8QejJyC17MNye==gcyM1TgG=jN+0nGjgYJ0qkFQ@mail.gmail.com>
-	<BN6PR21MB0785CB5DAEB34BB0F1C465E09E740@BN6PR21MB0785.namprd21.prod.outlook.com>
-From: bzt <bztemail@gmail.com>
-Date: Thu, 28 Feb 2019 15:12:37 +0100
-Message-ID: <CADYoBw2C0roYiv4nLrYPJuO43atL+s=7X+6jOwZoE9KpYdJhAQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Added periodic IRQ support for
- bcm2836_control local timer
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 Feb 2019 14:12:28 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1818075 <1818075@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155136199055.29310.6029801353341134939.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155136314928.17731.15025076749935067501.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818075] Re: qemu x86 TCG doesn't support AVX
+ insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +37,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi Andrew,
+** Summary changed:
 
-That's great news, I'll then bring those drivers up to the modern qemu API!
+- qemu-user-x86-64 hangs at vcvttsd2si
++ qemu x86 TCG doesn't support AVX insns
 
-Maybe that's a Linux kernel module configuration issue as well, but
-with the BCM System Timer small delays depend on polling the counter.
-Without the qemu support that counter register remains zero, causing
-an endless loop. TBH it was years ago when I last checked raspbian,
-but I know for sure that many bare metal applications and libraries
-(like https://github.com/rsta2/circle) fails to boot because of this,
-and the community is very excited to have the BCM ST emulation in
-qemu. The PM thing is mostly for me, I'd like to reboot and shut down
-the vm gracefully from the guest without the semihosting hack :-)
+-- =
 
-Thank you again, I'll get to work!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818075
 
-Best wishes,
-bzt
+Title:
+  qemu x86 TCG doesn't support AVX insns
 
+Status in QEMU:
+  New
 
-On 2/27/19, Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
->> From: bzt <bztemail@gmail.com>
->> Sent: Wednesday, 27 February 2019 03:54
->>
->> I'd like to add more drivers for the bcm283[567] too, and this question
->> goes to
->> Andrew Baumann mostly. I've seen implemented those missing drivers in his
->> repo, which aren't in the qemu mainline yet. I don't want to reinvent the
->> wheel,
->> so I'm willing to fix those classes to get them right, but I'd like to
->> know what's
->> wrong with them in the first place.
->
-> Nothing's wrong with them per se, but when I was working on upstreaming the
-> raspi board I prioritised the device support needed to boot Linux and
-> Windows on raspi2. The remaining devices were always planned for eventual
-> inclusion, but just fell off the end of my TODO list. They never went
-> through code review on qemu-devel, so would probably need some work to bring
-> them up to modern qemu APIs and standards.
->
->> I'm interested in fixing the
->> TYPE_BCM2835_POWER and TYPE_BCM2835_ST drivers, which I know many
->> hoppy OS developers lack and would improve the raspi emulation experience
->> remarkably.
->
-> Sounds good to me!
->
->> It would be still a long way to boot a raspbian image, but still, a
->> small step towards that goal at least.
->
-> That's interesting. Raspbian did seem to be working (on pi2) when I last
-> worked on this. Perhaps it now depends on these devices, but didn't before?
->
-> Cheers,
-> Andrew
->
+Bug description:
+  I'm trying to execute code that has been built with -march=3Dskylake
+  -mtune=3Dgeneric -mavx2 under qemu-user x86-64 with -cpu Skylake-Client.
+  However this code just hangs at 100% CPU.
+
+  Adding input tracing shows that it is likely hanging when dealing with
+  an AVX instruction:
+
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.fma [bit 12]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.pcid [bit 1=
+7]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit=
+ 21]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.tsc-deadlin=
+e [bit 24]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.f16c [bit 2=
+9]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.rdrand [bit=
+ 30]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.hle [bit 4]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.avx2 [bit 5]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.invpcid [bi=
+t 10]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rtm [bit 11]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rdseed [bit=
+ 18]
+  warning: TCG doesn't support requested feature: CPUID.80000001H:ECX.3dnow=
+prefetch [bit 8]
+  warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsavec [bit=
+ 1]
+
+  IN:
+  0x4000b4ef3b:  c5 fb 5c ca              vsubsd   %xmm2, %xmm0, %xmm1
+  0x4000b4ef3f:  c4 e1 fb 2c d1           vcvttsd2si %xmm1, %rdx
+  0x4000b4ef44:  4c 31 e2                 xorq     %r12, %rdx
+  0x4000b4ef47:  48 85 d2                 testq    %rdx, %rdx
+  0x4000b4ef4a:  79 9e                    jns      0x4000b4eeea
+
+  [ hangs ]
+
+  Attaching a gdb produces this stacktrace:
+
+  (gdb) bt
+  #0  canonicalize (status=3D0x55a20ff67a88, parm=3D0x55a20bb807e0 <float64=
+_params>, part=3D...)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:350
+  #1  float64_unpack_canonical (s=3D0x55a20ff67a88, f=3D0)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:547
+  #2  float64_sub (a=3D0, b=3D4890909195324358656, status=3D0x55a20ff67a88)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:776
+  #3  0x000055a20baa1949 in helper_subsd (env=3D<optimized out>, d=3D0x55a2=
+0ff67ad8, s=3D<optimized out>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/target/i386/ops_sse.h:623
+  #4  0x000055a20cfcfea8 in static_code_gen_buffer ()
+  #5  0x000055a20ba3f764 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55a=
+20cea2180 <static_code_gen_buffer+15684720>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:171
+  #6  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic=
+ pointer>, tb=3D<optimized out>,
+      cpu=3D0x55a20cea2180 <static_code_gen_buffer+15684720>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:615
+  #7  cpu_exec (cpu=3Dcpu@entry=3D0x55a20ff5f4d0)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:725
+  #8  0x000055a20ba6d728 in cpu_loop (env=3D0x55a20ff67780)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/linux-user/x86_64/../i386/cpu_loop.c:93
+  #9  0x000055a20ba049ff in main (argc=3D<optimized out>, argv=3D0x7ffc5857=
+2868, envp=3D<optimized out>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/linux-user/main.c:819
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818075/+subscriptions
