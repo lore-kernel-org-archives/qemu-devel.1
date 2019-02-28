@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46700)
+Received: from eggs.gnu.org ([209.51.188.92]:46715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gzQFh-0000Wp-2x
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:59 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gzQFi-0000XR-8w
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:18:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gzQFV-0002IO-Rw
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:49 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33922)
+	(envelope-from <tcminyard@gmail.com>) id 1gzQFY-0002Jr-D4
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:50 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42340)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gzQFV-0002Di-IR
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:37 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 98so18591592oty.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:17:30 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gzQFY-00029S-6X
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:40 -0500
+Received: by mail-oi1-x243.google.com with SMTP id s16so17258412oih.9
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:17:17 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu, 28 Feb 2019 12:17:08 -0600
-Message-Id: <20190228181710.2477-18-minyard@acm.org>
+Date: Thu, 28 Feb 2019 12:16:55 -0600
+Message-Id: <20190228181710.2477-5-minyard@acm.org>
 In-Reply-To: <20190228181710.2477-1-minyard@acm.org>
 References: <20190228181710.2477-1-minyard@acm.org>
-Subject: [Qemu-devel] [PULL 17/19] i2c:smbus_eeprom: Add vmstate handling to
- the smbus eeprom
+Subject: [Qemu-devel] [PULL 04/19] i2c: Don't check return value from
+ i2c_recv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +28,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, minyard@acm.org, Corey Minyard <cminyard@mvista.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, minyard@acm.org, Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Transfer the state of the EEPROM on a migration.  This way the
-data remains consistent on migration.
+i2c_recv() cannot fail, so there is no need to check the return
+value.  It also returns unt8_t, so comparing with < 0 is not
+meaningful.
 
-This required moving the actual data to a separate array and
-using the data provided in the init function as a separate
-initialization array, since a pointer property has to be a
-void * and the array needs to be uint8_t[].
+Fix up various I2C controllers to remove the unneeded code.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/i2c/smbus_eeprom.c | 34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ hw/i2c/aspeed_i2c.c     |  9 ++-------
+ hw/i2c/exynos4210_i2c.c |  8 +-------
+ hw/i2c/imx_i2c.c        | 12 ++----------
+ 3 files changed, 5 insertions(+), 24 deletions(-)
 
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index 3fbbffb4de..5b10c31ae7 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -26,6 +26,7 @@
- #include "qemu/units.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
-+#include "hw/boards.h"
- #include "hw/i2c/i2c.h"
- #include "hw/i2c/smbus_slave.h"
- #include "hw/i2c/smbus_eeprom.h"
-@@ -41,8 +42,10 @@
+diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
+index a2dfa82760..a085510cfd 100644
+--- a/hw/i2c/aspeed_i2c.c
++++ b/hw/i2c/aspeed_i2c.c
+@@ -189,16 +189,11 @@ static uint8_t aspeed_i2c_get_state(AspeedI2CBus *bus)
  
- typedef struct SMBusEEPROMDevice {
-     SMBusDevice smbusdev;
--    void *data;
-+    uint8_t data[SMBUS_EEPROM_SIZE];
-+    void *init_data;
-     uint8_t offset;
-+    bool accessed;
- } SMBusEEPROMDevice;
- 
- static uint8_t eeprom_receive_byte(SMBusDevice *dev)
-@@ -51,6 +54,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
-     uint8_t *data = eeprom->data;
-     uint8_t val = data[eeprom->offset++];
- 
-+    eeprom->accessed = true;
- #ifdef DEBUG
-     printf("eeprom_receive_byte: addr=0x%02x val=0x%02x\n",
-            dev->i2c.address, val);
-@@ -63,6 +67,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
-     SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
-     uint8_t *data = eeprom->data;
- 
-+    eeprom->accessed = true;
- #ifdef DEBUG
-     printf("eeprom_write_byte: addr=0x%02x cmd=0x%02x val=0x%02x\n",
-            dev->i2c.address, buf[0], buf[1]);
-@@ -80,15 +85,39 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
-     return 0;
- }
- 
-+static bool smbus_eeprom_vmstate_needed(void *opaque)
-+{
-+    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
-+    SMBusEEPROMDevice *eeprom = opaque;
-+
-+    return (eeprom->accessed || smbus_vmstate_needed(&eeprom->smbusdev)) &&
-+        !mc->smbus_no_migration_support;
-+}
-+
-+static const VMStateDescription vmstate_smbus_eeprom = {
-+    .name = "smbus-eeprom",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = smbus_eeprom_vmstate_needed,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
-+        VMSTATE_UINT8_ARRAY(data, SMBusEEPROMDevice, SMBUS_EEPROM_SIZE),
-+        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
-+        VMSTATE_BOOL(accessed, SMBusEEPROMDevice),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+ static void aspeed_i2c_handle_rx_cmd(AspeedI2CBus *bus)
  {
-     SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+-    int ret;
++    uint8_t ret;
  
-+    memcpy(eeprom->data, eeprom->init_data, SMBUS_EEPROM_SIZE);
-     eeprom->offset = 0;
+     aspeed_i2c_set_state(bus, I2CD_MRXD);
+     ret = i2c_recv(bus->bus);
+-    if (ret < 0) {
+-        qemu_log_mask(LOG_GUEST_ERROR, "%s: read failed\n", __func__);
+-        ret = 0xff;
+-    } else {
+-        bus->intr_status |= I2CD_INTR_RX_DONE;
+-    }
++    bus->intr_status |= I2CD_INTR_RX_DONE;
+     bus->buf = (ret & I2CD_BYTE_BUF_RX_MASK) << I2CD_BYTE_BUF_RX_SHIFT;
+     if (bus->cmd & I2CD_M_S_RX_CMD_LAST) {
+         i2c_nack(bus->bus);
+diff --git a/hw/i2c/exynos4210_i2c.c b/hw/i2c/exynos4210_i2c.c
+index c96fa7d7be..d154b05739 100644
+--- a/hw/i2c/exynos4210_i2c.c
++++ b/hw/i2c/exynos4210_i2c.c
+@@ -106,16 +106,10 @@ static inline void exynos4210_i2c_raise_interrupt(Exynos4210I2CState *s)
+ static void exynos4210_i2c_data_receive(void *opaque)
+ {
+     Exynos4210I2CState *s = (Exynos4210I2CState *)opaque;
+-    int ret;
+ 
+     s->i2cstat &= ~I2CSTAT_LAST_BIT;
+     s->scl_free = false;
+-    ret = i2c_recv(s->bus);
+-    if (ret < 0 && (s->i2ccon & I2CCON_ACK_GEN)) {
+-        s->i2cstat |= I2CSTAT_LAST_BIT;  /* Data is not acknowledged */
+-    } else {
+-        s->i2cds = ret;
+-    }
++    s->i2cds = i2c_recv(s->bus);
+     exynos4210_i2c_raise_interrupt(s);
  }
  
- static Property smbus_eeprom_properties[] = {
--    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, data),
-+    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
-     DEFINE_PROP_END_OF_LIST(),
- };
+diff --git a/hw/i2c/imx_i2c.c b/hw/i2c/imx_i2c.c
+index 6c81b98ebd..6da5224e2e 100644
+--- a/hw/i2c/imx_i2c.c
++++ b/hw/i2c/imx_i2c.c
+@@ -120,7 +120,7 @@ static uint64_t imx_i2c_read(void *opaque, hwaddr offset,
+         value = s->i2dr_read;
  
-@@ -101,6 +130,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
-     sc->receive_byte = eeprom_receive_byte;
-     sc->write_data = eeprom_write_data;
-     dc->props = smbus_eeprom_properties;
-+    dc->vmsd = &vmstate_smbus_eeprom;
-     /* Reason: pointer property "data" */
-     dc->user_creatable = false;
- }
+         if (imx_i2c_is_master(s)) {
+-            int ret = 0xff;
++            uint8_t ret = 0xff;
+ 
+             if (s->address == ADDR_RESET) {
+                 /* something is wrong as the address is not set */
+@@ -133,15 +133,7 @@ static uint64_t imx_i2c_read(void *opaque, hwaddr offset,
+             } else {
+                 /* get the next byte */
+                 ret = i2c_recv(s->bus);
+-
+-                if (ret >= 0) {
+-                    imx_i2c_raise_interrupt(s);
+-                } else {
+-                    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: read failed "
+-                                  "for device 0x%02x\n", TYPE_IMX_I2C,
+-                                  __func__, s->address);
+-                    ret = 0xff;
+-                }
++                imx_i2c_raise_interrupt(s);
+             }
+ 
+             s->i2dr_read = ret;
 -- 
 2.17.1
