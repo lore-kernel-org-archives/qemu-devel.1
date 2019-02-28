@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52100)
+Received: from eggs.gnu.org ([209.51.188.92]:52124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzN6y-0004gL-SN
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:56:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzN72-0004h2-0Y
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:56:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzN6x-0007f0-C5
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:56:36 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36254)
+	(envelope-from <peter.maydell@linaro.org>) id 1gzN70-0007gT-Kr
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:56:39 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:37815)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gzN6x-0007ef-2d
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:56:35 -0500
-Received: by mail-wr1-x444.google.com with SMTP id o17so22327617wrw.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 06:56:35 -0800 (PST)
+	id 1gzN70-0007g5-E7
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:56:38 -0500
+Received: by mail-wm1-x334.google.com with SMTP id x10so9165459wmg.2
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 06:56:38 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Feb 2019 14:56:15 +0000
-Message-Id: <20190228145624.24885-3-peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 14:56:16 +0000
+Message-Id: <20190228145624.24885-4-peter.maydell@linaro.org>
 In-Reply-To: <20190228145624.24885-1-peter.maydell@linaro.org>
 References: <20190228145624.24885-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 02/11] docs: Convert memory.txt to rst format
+Subject: [Qemu-devel] [PATCH v2 03/11] docs: Commit initial files from
+ sphinx-quickstart
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,231 +32,217 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Convert the memory API documentation from plain text
-to restructured text format.
-
-This is a very minimal conversion: all I had to change
-was to mark up the ASCII art parts as Sphinx expects
-for 'literal blocks', and fix up the bulleted lists
-(Sphinx expects no leading space before the bullet, and
-wants a blank line before after any list).
+Commit the initial Sphinx conf.py and skeleton index.rst as
+generated with sphinx-quickstart. We'll update these to
+add QEMU-specific tweaks in subsequent commits.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- docs/devel/{memory.txt => memory.rst} | 128 ++++++++++++++------------
- 1 file changed, 70 insertions(+), 58 deletions(-)
- rename docs/devel/{memory.txt => memory.rst} (85%)
+ docs/conf.py   | 168 +++++++++++++++++++++++++++++++++++++++++++++++++
+ docs/index.rst |  20 ++++++
+ 2 files changed, 188 insertions(+)
+ create mode 100644 docs/conf.py
+ create mode 100644 docs/index.rst
 
-diff --git a/docs/devel/memory.txt b/docs/devel/memory.rst
-similarity index 85%
-rename from docs/devel/memory.txt
-rename to docs/devel/memory.rst
-index 42577e1d860..b6a4c37ea5e 100644
---- a/docs/devel/memory.txt
-+++ b/docs/devel/memory.rst
-@@ -1,19 +1,20 @@
-+==============
- The memory API
- ==============
- 
- The memory API models the memory and I/O buses and controllers of a QEMU
- machine.  It attempts to allow modelling of:
- 
-- - ordinary RAM
-- - memory-mapped I/O (MMIO)
-- - memory controllers that can dynamically reroute physical memory regions
--   to different destinations
-+- ordinary RAM
-+- memory-mapped I/O (MMIO)
-+- memory controllers that can dynamically reroute physical memory regions
-+  to different destinations
- 
- The memory model provides support for
- 
-- - tracking RAM changes by the guest
-- - setting up coalesced memory for kvm
-- - setting up ioeventfd regions for kvm
-+- tracking RAM changes by the guest
-+- setting up coalesced memory for kvm
-+- setting up ioeventfd regions for kvm
- 
- Memory is modelled as an acyclic graph of MemoryRegion objects.  Sinks
- (leaves) are RAM and MMIO regions, while other nodes represent
-@@ -98,25 +99,30 @@ ROM device memory region types), this host memory needs to be
- copied to the destination on migration. These APIs which allocate
- the host memory for you will also register the memory so it is
- migrated:
-- - memory_region_init_ram()
-- - memory_region_init_rom()
-- - memory_region_init_rom_device()
+diff --git a/docs/conf.py b/docs/conf.py
+new file mode 100644
+index 00000000000..53a17506615
+--- /dev/null
++++ b/docs/conf.py
+@@ -0,0 +1,168 @@
++# -*- coding: utf-8 -*-
++#
++# QEMU documentation build configuration file, created by
++# sphinx-quickstart on Thu Jan 31 16:40:14 2019.
++#
++# This file is execfile()d with the current directory set to its
++# containing dir.
++#
++# Note that not all possible configuration values are present in this
++# autogenerated file.
++#
++# All configuration values have a default; values that are commented out
++# serve to show the default.
 +
-+- memory_region_init_ram()
-+- memory_region_init_rom()
-+- memory_region_init_rom_device()
- 
- For most devices and boards this is the correct thing. If you
- have a special case where you need to manage the migration of
- the backing memory yourself, you can call the functions:
-- - memory_region_init_ram_nomigrate()
-- - memory_region_init_rom_nomigrate()
-- - memory_region_init_rom_device_nomigrate()
++# If extensions (or modules to document with autodoc) are in another directory,
++# add these directories to sys.path here. If the directory is relative to the
++# documentation root, use os.path.abspath to make it absolute, like shown here.
++#
++# import os
++# import sys
++# sys.path.insert(0, os.path.abspath('.'))
 +
-+- memory_region_init_ram_nomigrate()
-+- memory_region_init_rom_nomigrate()
-+- memory_region_init_rom_device_nomigrate()
 +
- which only initialize the MemoryRegion and leave handling
- migration to the caller.
- 
- The functions:
-- - memory_region_init_resizeable_ram()
-- - memory_region_init_ram_from_file()
-- - memory_region_init_ram_from_fd()
-- - memory_region_init_ram_ptr()
-- - memory_region_init_ram_device_ptr()
++# -- General configuration ------------------------------------------------
 +
-+- memory_region_init_resizeable_ram()
-+- memory_region_init_ram_from_file()
-+- memory_region_init_ram_from_fd()
-+- memory_region_init_ram_ptr()
-+- memory_region_init_ram_device_ptr()
++# If your documentation needs a minimal Sphinx version, state it here.
++#
++# needs_sphinx = '1.0'
 +
- are for special cases only, and so they do not automatically
- register the backing memory for migration; the caller must
- manage migration if necessary.
-@@ -218,7 +224,7 @@ For example, suppose we have a container A of size 0x8000 with two subregions
- B and C. B is a container mapped at 0x2000, size 0x4000, priority 2; C is
- an MMIO region mapped at 0x0, size 0x6000, priority 1. B currently has two
- of its own subregions: D of size 0x1000 at offset 0 and E of size 0x1000 at
--offset 0x2000. As a diagram:
-+offset 0x2000. As a diagram::
- 
-         0      1000   2000   3000   4000   5000   6000   7000   8000
-         |------|------|------|------|------|------|------|------|
-@@ -228,8 +234,9 @@ offset 0x2000. As a diagram:
-   D:                  [DDDDD]
-   E:                                [EEEEE]
- 
--The regions that will be seen within this address range then are:
--        [CCCCCCCCCCCC][DDDDD][CCCCC][EEEEE][CCCCC]
-+The regions that will be seen within this address range then are::
++# Add any Sphinx extension module names here, as strings. They can be
++# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
++# ones.
++extensions = []
 +
-+  [CCCCCCCCCCCC][DDDDD][CCCCC][EEEEE][CCCCC]
- 
- Since B has higher priority than C, its subregions appear in the flat map
- even where they overlap with C. In ranges where B has not mapped anything
-@@ -237,8 +244,9 @@ C's region appears.
- 
- If B had provided its own MMIO operations (ie it was not a pure container)
- then these would be used for any addresses in its range not handled by
--D or E, and the result would be:
--        [CCCCCCCCCCCC][DDDDD][BBBBB][EEEEE][BBBBB]
-+D or E, and the result would be::
++# Add any paths that contain templates here, relative to this directory.
++templates_path = ['_templates']
 +
-+  [CCCCCCCCCCCC][DDDDD][BBBBB][EEEEE][BBBBB]
- 
- Priority values are local to a container, because the priorities of two
- regions are only compared when they are both children of the same container.
-@@ -257,6 +265,7 @@ guest accesses an address:
- 
- - all direct subregions of the root region are matched against the address, in
-   descending priority order
++# The suffix(es) of source filenames.
++# You can specify multiple suffix as a list of string:
++#
++# source_suffix = ['.rst', '.md']
++source_suffix = '.rst'
 +
-   - if the address lies outside the region offset/size, the subregion is
-     discarded
-   - if the subregion is a leaf (RAM or MMIO), the search terminates, returning
-@@ -270,36 +279,39 @@ guest accesses an address:
-     address range), then if this is a container with its own MMIO or RAM
-     backing the search terminates, returning the container itself. Otherwise
-     we continue with the next subregion in priority order
++# The master toctree document.
++master_doc = 'index'
 +
- - if none of the subregions match the address then the search terminates
-   with no match found
- 
- Example memory map
- ------------------
- 
--system_memory: container@0-2^48-1
-- |
-- +---- lomem: alias@0-0xdfffffff ---> #ram (0-0xdfffffff)
-- |
-- +---- himem: alias@0x100000000-0x11fffffff ---> #ram (0xe0000000-0xffffffff)
-- |
-- +---- vga-window: alias@0xa0000-0xbffff ---> #pci (0xa0000-0xbffff)
-- |      (prio 1)
-- |
-- +---- pci-hole: alias@0xe0000000-0xffffffff ---> #pci (0xe0000000-0xffffffff)
-+::
- 
--pci (0-2^32-1)
-- |
-- +--- vga-area: container@0xa0000-0xbffff
-- |      |
-- |      +--- alias@0x00000-0x7fff  ---> #vram (0x010000-0x017fff)
-- |      |
-- |      +--- alias@0x08000-0xffff  ---> #vram (0x020000-0x027fff)
-- |
-- +---- vram: ram@0xe1000000-0xe1ffffff
-- |
-- +---- vga-mmio: mmio@0xe2000000-0xe200ffff
-+  system_memory: container@0-2^48-1
-+   |
-+   +---- lomem: alias@0-0xdfffffff ---> #ram (0-0xdfffffff)
-+   |
-+   +---- himem: alias@0x100000000-0x11fffffff ---> #ram (0xe0000000-0xffffffff)
-+   |
-+   +---- vga-window: alias@0xa0000-0xbffff ---> #pci (0xa0000-0xbffff)
-+   |      (prio 1)
-+   |
-+   +---- pci-hole: alias@0xe0000000-0xffffffff ---> #pci (0xe0000000-0xffffffff)
- 
--ram: ram@0x00000000-0xffffffff
-+  pci (0-2^32-1)
-+   |
-+   +--- vga-area: container@0xa0000-0xbffff
-+   |      |
-+   |      +--- alias@0x00000-0x7fff  ---> #vram (0x010000-0x017fff)
-+   |      |
-+   |      +--- alias@0x08000-0xffff  ---> #vram (0x020000-0x027fff)
-+   |
-+   +---- vram: ram@0xe1000000-0xe1ffffff
-+   |
-+   +---- vga-mmio: mmio@0xe2000000-0xe200ffff
++# General information about the project.
++project = u'QEMU'
++copyright = u'2019, The QEMU Project Developers'
++author = u'The QEMU Project Developers'
 +
-+  ram: ram@0x00000000-0xffffffff
- 
- This is a (simplified) PC memory map. The 4GB RAM block is mapped into the
- system address space via two aliases: "lomem" is a 1:1 mapping of the first
-@@ -336,16 +348,16 @@ rather than completing successfully; those devices can use the
- In addition various constraints can be supplied to control how these
- callbacks are called:
- 
-- - .valid.min_access_size, .valid.max_access_size define the access sizes
--   (in bytes) which the device accepts; accesses outside this range will
--   have device and bus specific behaviour (ignored, or machine check)
-- - .valid.unaligned specifies that the *device being modelled* supports
--    unaligned accesses; if false, unaligned accesses will invoke the
--    appropriate bus or CPU specific behaviour.
-- - .impl.min_access_size, .impl.max_access_size define the access sizes
--   (in bytes) supported by the *implementation*; other access sizes will be
--   emulated using the ones available.  For example a 4-byte write will be
--   emulated using four 1-byte writes, if .impl.max_access_size = 1.
-- - .impl.unaligned specifies that the *implementation* supports unaligned
--   accesses; if false, unaligned accesses will be emulated by two aligned
--   accesses.
-+- .valid.min_access_size, .valid.max_access_size define the access sizes
-+  (in bytes) which the device accepts; accesses outside this range will
-+  have device and bus specific behaviour (ignored, or machine check)
-+- .valid.unaligned specifies that the *device being modelled* supports
-+  unaligned accesses; if false, unaligned accesses will invoke the
-+  appropriate bus or CPU specific behaviour.
-+- .impl.min_access_size, .impl.max_access_size define the access sizes
-+  (in bytes) supported by the *implementation*; other access sizes will be
-+  emulated using the ones available.  For example a 4-byte write will be
-+  emulated using four 1-byte writes, if .impl.max_access_size = 1.
-+- .impl.unaligned specifies that the *implementation* supports unaligned
-+  accesses; if false, unaligned accesses will be emulated by two aligned
-+  accesses.
++# The version info for the project you're documenting, acts as replacement for
++# |version| and |release|, also used in various other places throughout the
++# built documents.
++#
++# The short X.Y version.
++version = u'4.0'
++# The full version, including alpha/beta/rc tags.
++release = u'4.0'
++
++# The language for content autogenerated by Sphinx. Refer to documentation
++# for a list of supported languages.
++#
++# This is also used if you do content translation via gettext catalogs.
++# Usually you set "language" from the command line for these cases.
++language = None
++
++# List of patterns, relative to source directory, that match files and
++# directories to ignore when looking for source files.
++# This patterns also effect to html_static_path and html_extra_path
++exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
++
++# The name of the Pygments (syntax highlighting) style to use.
++pygments_style = 'sphinx'
++
++# If true, `todo` and `todoList` produce output, else they produce nothing.
++todo_include_todos = False
++
++
++# -- Options for HTML output ----------------------------------------------
++
++# The theme to use for HTML and HTML Help pages.  See the documentation for
++# a list of builtin themes.
++#
++html_theme = 'alabaster'
++
++# Theme options are theme-specific and customize the look and feel of a theme
++# further.  For a list of options available for each theme, see the
++# documentation.
++#
++# html_theme_options = {}
++
++# Add any paths that contain custom static files (such as style sheets) here,
++# relative to this directory. They are copied after the builtin static files,
++# so a file named "default.css" will overwrite the builtin "default.css".
++html_static_path = ['_static']
++
++# Custom sidebar templates, must be a dictionary that maps document names
++# to template names.
++#
++# This is required for the alabaster theme
++# refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
++html_sidebars = {
++    '**': [
++        'relations.html',  # needs 'show_related': True theme option to display
++        'searchbox.html',
++    ]
++}
++
++
++# -- Options for HTMLHelp output ------------------------------------------
++
++# Output file base name for HTML help builder.
++htmlhelp_basename = 'QEMUdoc'
++
++
++# -- Options for LaTeX output ---------------------------------------------
++
++latex_elements = {
++    # The paper size ('letterpaper' or 'a4paper').
++    #
++    # 'papersize': 'letterpaper',
++
++    # The font size ('10pt', '11pt' or '12pt').
++    #
++    # 'pointsize': '10pt',
++
++    # Additional stuff for the LaTeX preamble.
++    #
++    # 'preamble': '',
++
++    # Latex figure (float) alignment
++    #
++    # 'figure_align': 'htbp',
++}
++
++# Grouping the document tree into LaTeX files. List of tuples
++# (source start file, target name, title,
++#  author, documentclass [howto, manual, or own class]).
++latex_documents = [
++    (master_doc, 'QEMU.tex', u'QEMU Documentation',
++     u'The QEMU Project Developers', 'manual'),
++]
++
++
++# -- Options for manual page output ---------------------------------------
++
++# One entry per manual page. List of tuples
++# (source start file, name, description, authors, manual section).
++man_pages = [
++    (master_doc, 'qemu', u'QEMU Documentation',
++     [author], 1)
++]
++
++
++# -- Options for Texinfo output -------------------------------------------
++
++# Grouping the document tree into Texinfo files. List of tuples
++# (source start file, target name, title, author,
++#  dir menu entry, description, category)
++texinfo_documents = [
++    (master_doc, 'QEMU', u'QEMU Documentation',
++     author, 'QEMU', 'One line description of project.',
++     'Miscellaneous'),
++]
++
++
++
+diff --git a/docs/index.rst b/docs/index.rst
+new file mode 100644
+index 00000000000..93f82228310
+--- /dev/null
++++ b/docs/index.rst
+@@ -0,0 +1,20 @@
++.. QEMU documentation master file, created by
++   sphinx-quickstart on Thu Jan 31 16:40:14 2019.
++   You can adapt this file completely to your liking, but it should at least
++   contain the root `toctree` directive.
++
++Welcome to QEMU's documentation!
++================================
++
++.. toctree::
++   :maxdepth: 2
++   :caption: Contents:
++
++
++
++Indices and tables
++==================
++
++* :ref:`genindex`
++* :ref:`modindex`
++* :ref:`search`
 -- 
 2.20.1
