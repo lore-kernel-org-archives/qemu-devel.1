@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41903)
+Received: from eggs.gnu.org ([209.51.188.92]:42439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1gzMH5-00054g-5S
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:03:02 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzMK3-0006RX-1M
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:06:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1gzMGz-0005p4-AX
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:02:59 -0500
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Thu, 28 Feb 2019 14:02:21 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA8392D778D@lhreml524-mbs.china.huawei.com>
-References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
-	<3a6bf5ea-5b48-18c2-8a2c-0ced777be816@redhat.com>
-	<892e3eb7-66f5-92a3-5891-de8665fc984a@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA8392D6875@lhreml524-mbs.china.huawei.com>
-	<d3c99948-2fdb-f345-8b22-03a7e181122c@redhat.com>
-	<6f4276b4-c79c-00a0-530e-be72c8093ad1@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1gzMJu-0007o8-AH
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:06:02 -0500
+Date: Thu, 28 Feb 2019 15:05:31 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190228150531.184f5974@redhat.com>
+In-Reply-To: <f9518e2d-0e46-d25f-f9f5-809b21f744aa@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190222172742.18c3835a@redhat.com>
+	<c016024e-9f4b-8953-f492-8802675f7e22@redhat.com>
+	<20190225104212.7d40e65e@Igors-MacBook-Pro.local>
+	<70249194-349e-37f6-0e8d-dc50b39082b7@redhat.com>
+	<cd283485-49a9-ddd1-a020-26110ee093be@redhat.com>
+	<20190226175653.6ca2b6c4@Igors-MacBook-Pro.local>
+	<c68ba5a2-0d24-c1ad-c2af-c957768abf9f@redhat.com>
+	<20190227111025.4bb39cc7@redhat.com>
+	<116c5375-0ff4-8f91-ac05-05a53e7fe206@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8392D6690@lhreml524-mbs.china.huawei.com>
+	<20190227185123.314171ae@redhat.com>
+	<f9518e2d-0e46-d25f-f9f5-809b21f744aa@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 0/4] ARM virt: ACPI memory hotplug
- support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expansion
+ and PCDIMM/NVDIMM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,233 +35,348 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Cc: "xuwei (O)" <xuwei5@huawei.com>, Linuxarm <linuxarm@huawei.com>, Ard
-	Biesheuvel <ard.biesheuvel@linaro.org>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, "david@redhat.com" <david@redhat.com>, Linuxarm <linuxarm@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU2hhbWVlcmFsaSBLb2xv
-dGh1bSBUaG9kaQ0KPiBTZW50OiAyOCBGZWJydWFyeSAyMDE5IDEyOjA0DQo+IFRvOiAnQXVnZXIg
-RXJpYycgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT47IExhc3psbyBFcnNlayA8bGVyc2VrQHJlZGhh
-dC5jb20+Ow0KPiBzaGFubm9uLnpoYW9zbEBnbWFpbC5jb207IHBldGVyLm1heWRlbGxAbGluYXJv
-Lm9yZzsNCj4gaW1hbW1lZG9AcmVkaGF0LmNvbTsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBxZW11
-LWFybUBub25nbnUub3JnDQo+IENjOiB4dXdlaSAoTykgPHh1d2VpNUBodWF3ZWkuY29tPjsgTGlu
-dXhhcm0gPGxpbnV4YXJtQGh1YXdlaS5jb20+OyBBcmQNCj4gQmllc2hldXZlbCA8YXJkLmJpZXNo
-ZXV2ZWxAbGluYXJvLm9yZz47IExlaWYgTGluZGhvbG0gKExpbmFybyBhZGRyZXNzKQ0KPiA8bGVp
-Zi5saW5kaG9sbUBsaW5hcm8ub3JnPg0KPiBTdWJqZWN0OiBSRTogW1JGQyBQQVRDSCAwLzRdIEFS
-TSB2aXJ0OiBBQ1BJIG1lbW9yeSBob3RwbHVnIHN1cHBvcnQNCj4gDQo+IA0KPiANCj4gPiAtLS0t
-LU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IEF1Z2VyIEVyaWMgW21haWx0bzplcmlj
-LmF1Z2VyQHJlZGhhdC5jb21dDQo+ID4gU2VudDogMjggRmVicnVhcnkgMjAxOSAxMDoxMg0KPiA+
-IFRvOiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPjsgU2hhbWVlcmFsaSBLb2xvdGh1
-bSBUaG9kaQ0KPiA+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+OyBzaGFu
-bm9uLnpoYW9zbEBnbWFpbC5jb207DQo+ID4gcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBpbWFt
-bWVkb0ByZWRoYXQuY29tOw0KPiBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+ID4gcWVtdS1hcm1A
-bm9uZ251Lm9yZw0KPiA+IENjOiB4dXdlaSAoTykgPHh1d2VpNUBodWF3ZWkuY29tPjsgTGludXhh
-cm0gPGxpbnV4YXJtQGh1YXdlaS5jb20+Ow0KPiBBcmQNCj4gPiBCaWVzaGV1dmVsIDxhcmQuYmll
-c2hldXZlbEBsaW5hcm8ub3JnPjsgTGVpZiBMaW5kaG9sbSAoTGluYXJvIGFkZHJlc3MpDQo+ID4g
-PGxlaWYubGluZGhvbG1AbGluYXJvLm9yZz4NCj4gPiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSCAw
-LzRdIEFSTSB2aXJ0OiBBQ1BJIG1lbW9yeSBob3RwbHVnIHN1cHBvcnQNCj4gPg0KPiA+IEhpIExh
-c3psbywNCj4gPg0KPiA+IE9uIDIvMjcvMTkgOToxNCBQTSwgTGFzemxvIEVyc2VrIHdyb3RlOg0K
-PiA+ID4gT24gMDIvMjcvMTkgMTM6NTUsIFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgd3JvdGU6
-DQo+ID4gPj4gSGkgTGFzemxvLA0KPiA+ID4+DQo+ID4gPj4+IC0tLS0tT3JpZ2luYWwgTWVzc2Fn
-ZS0tLS0tDQo+ID4gPj4+IEZyb206IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gPiA+Pj4g
-U2VudDogMjUgRmVicnVhcnkgMjAxOSAwOTo1NA0KPiA+ID4+PiBUbzogJ0xhc3psbyBFcnNlaycg
-PGxlcnNla0ByZWRoYXQuY29tPjsgQXVnZXIgRXJpYw0KPiA+IDxlcmljLmF1Z2VyQHJlZGhhdC5j
-b20+Ow0KPiA+ID4+PiBzaGFubm9uLnpoYW9zbEBnbWFpbC5jb207IHBldGVyLm1heWRlbGxAbGlu
-YXJvLm9yZzsNCj4gPiA+Pj4gaW1hbW1lZG9AcmVkaGF0LmNvbTsgcWVtdS1kZXZlbEBub25nbnUu
-b3JnOw0KPiA+IHFlbXUtYXJtQG5vbmdudS5vcmcNCj4gPiA+Pj4gQ2M6IHh1d2VpIChPKSA8eHV3
-ZWk1QGh1YXdlaS5jb20+OyBMaW51eGFybQ0KPiA8bGludXhhcm1AaHVhd2VpLmNvbT47DQo+ID4g
-QXJkDQo+ID4gPj4+IEJpZXNoZXV2ZWwgPGFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmc+OyBMZWlm
-IExpbmRob2xtIChMaW5hcm8gYWRkcmVzcykNCj4gPiA+Pj4gPGxlaWYubGluZGhvbG1AbGluYXJv
-Lm9yZz4NCj4gPiA+Pj4gU3ViamVjdDogUkU6IFtSRkMgUEFUQ0ggMC80XSBBUk0gdmlydDogQUNQ
-SSBtZW1vcnkgaG90cGx1ZyBzdXBwb3J0DQo+ID4gPj4NCj4gPiA+PiBbLi4uXQ0KPiA+ID4+DQo+
-ID4gPj4+Pj4+IFRoZSByb290IGNhdXNlIHNlZW1zIHRvIGJlIEVESzIgQUNQSSB0YWJsZSBjaGVj
-a3N1bSBmYWlsdXJlDQo+ID4gPj4+Pj4+IGFzIE5GSVQgdGFibGUgaXMgZ2V0dGluZyB1cGRhdGVk
-IG9uIGhvdC1hZGQuIFRoaXMgbmVlZHMgZnVydGhlcg0KPiA+ID4+Pj4+PiBpbnZlc3RpZ2F0aW9u
-Lg0KPiA+ID4+Pj4+ICsgQXJkLCBMZWlmLCBMYXN6bG8gaWYgdGhleSBoYXZlIGFueSBpZGVhIG9m
-IHdoYXQgaXMgbWlzc2luZy93cm9uZy4NCj4gPiA+Pj4+DQo+ID4gPj4+PiBIdWgsIHZlcnkgaW50
-ZXJlc3Rpbmc7IEkgdXN1YWxseSBkb24ndCBleHBlY3QgbXkgc2FuaXR5IGNoZWNrcyB0byBmaXJl
-DQo+ID4gPj4+PiBpbiBwcmFjdGljZS4gOikNCj4gPiA+Pj4+DQo+ID4gPj4+PiBUaGUgbWVzc2Fn
-ZQ0KPiA+ID4+Pj4NCj4gPiA+Pj4+ICAgUHJvY2Vzc0NtZEFkZENoZWNrc3VtOiBpbnZhbGlkIGNo
-ZWNrc3VtIHJhbmdlIGluDQo+ID4gImV0Yy9hY3BpL3RhYmxlcyINCj4gPiA+Pj4+DQo+ID4gPj4+
-PiBpcyBsb2dnZWQgYnkgT1ZNRidzIGFuZCBBcm1WaXJ0UWVtdSdzIEFDUEkgUGxhdGZvcm0gRFhF
-IERyaXZlciB3aGVuDQo+ID4gaXQNCj4gPiA+Pj4+IGZpbmRzIGFuIGludmFsaWQgQ09NTUFORF9B
-RERfQ0hFQ0tTVU0gY29tbWFuZCBpbiBRRU1VJ3MNCj4gQUNQSQ0KPiA+ID4+Pj4gbGlua2VyL2xv
-YWRlciBzY3JpcHQuDQo+ID4gPj4+Pg0KPiA+ID4+Pj4gUGxlYXNlIHNlZSB0aGUgY29tbWFuZCBk
-ZWZpbml0aW9uIGluIFFFTVUncw0KPiA+ID4+Pj4gImh3L2FjcGkvYmlvcy1saW5rZXItbG9hZGVy
-LmMiLiBJbiBwYXJ0aWN1bGFyLCBwbGVhc2UgcmVmZXIgdG8gdGhlDQo+ID4gPj4+PiBmdW5jdGlv
-biBiaW9zX2xpbmtlcl9sb2FkZXJfYWRkX2NoZWNrc3VtKCksIHdoaWNoIGJ1aWxkcyB0aGUNCj4g
-Y29tbWFuZA0KPiA+ID4+Pj4gc3RydWN0dXJlLCBhbmQgZG9jdW1lbnRzIHRoZSBmaWVsZHMuDQo+
-ID4gPj4+Pg0KPiA+ID4+Pj4gKFlvdSBtYXkgYWxzbyByZWZlciB0byBRRU1VX0xPQURFUl9BRERf
-Q0hFQ0tTVU0gaW4gZmlsZQ0KPiA+ID4+Pj4gIk92bWZQa2cvQWNwaVBsYXRmb3JtRHhlL1FlbXVM
-b2FkZXIuaCIgaW4gdGhlIGVkazIgc291cmNlIHRyZWUsIGZvcg0KPiA+IHRoZQ0KPiA+ID4+Pj4g
-c2FtZSBpbmZvcm1hdGlvbi4pDQo+ID4gPj4+Pg0KPiA+ID4+Pj4gVGhlIGVycm9yIG1lc3NhZ2Ug
-aXMgbG9nZ2VkIGlmOg0KPiA+ID4+Pj4gLSB0aGUgb2Zmc2V0IGF0IHdoaWNoIHRoZSBjaGVja3N1
-bSBzaG91bGQgYmUgc3RvcmVkIGZhbGxzIG91dHNpZGUgb2YgdGhlDQo+ID4gPj4+PiBzaXplIG9m
-IHRoZSBmd19jZmcgYmxvYiwgb3INCj4gPiA+Pj4+IC0gdGhlIHJhbmdlIG92ZXIgd2hpY2ggdGhl
-IGNoZWNrc3VtIHNob3VsZCBiZSBjYWxjdWxhdGVkIGZhbGxzIG91dHNpZGUNCj4gPiA+Pj4+IChh
-dCBsZWFzdCBpbiBwYXJ0KSBvZiB0aGUgZndfY2ZnIGJsb2IuDQo+ID4gPj4+Pg0KPiA+ID4+Pj4g
-VG8gbWUgdGhpcyBzdWdnZXN0cyB0aGF0IFFFTVUgZ2VuZXJhdGVzIGFuIGludmFsaWQNCj4gPiA+
-Pj4+IENPTU1BTkRfQUREX0NIRUNLU1VNDQo+ID4gPj4+PiBjb21tYW5kIGZvciB0aGUgZmlybXdh
-cmUuDQo+ID4gPj4+Pg0KPiA+ID4+Pj4gLi4uIEkndmUgdHJpZWQgdG8gc2tpbSB0aGUgcGF0Y2hl
-cyBicmllZmx5LiBJIHRoaW5rIHRoZXJlIG11c3QgYmUgYW4NCj4gPiA+Pj4+IGVycm9yIGluIHRo
-ZSBEU0RUIGJ1aWxkaW5nIGxvZ2ljIHRoYXQgaXMgb25seSBhY3RpdmUgb24gcmVib290IGlmIGFu
-DQo+ID4gPj4+PiBudmRpbW0gbW9kdWxlIHdhcyBob3QtYWRkZWQgYmVmb3JlIHRoZSByZWJvb3Qu
-DQo+ID4gPj4+DQo+ID4gPj4+IFRoYW5rcyBmb3IgdGFraW5nIGEgbG9vayBhbmQgdGhlIHBvaW50
-ZXJzLiBJIHdpbGwgZGVidWcgdGhpcyBmdXJ0aGVyDQo+ID4gPj4+IGFuZCBnZXQgYmFjay4NCj4g
-PiA+Pg0KPiA+ID4+IFRoZSByb290IGNhdXNlIG9mIHRoZSBpc3N1ZSBzZWVtcyB0byBiZSBVRUZJ
-IG5vdCBzZWVpbmcgdGhlIHVwZGF0ZWQgYWNwaQ0KPiA+ID4+IHRhYmxlIGJsb2Igc2l6ZSBvbiBy
-ZWJvb3Qgb25jZSBhIG5ldyBORklUIHRhYmxlIGlzIGFkZGVkKG52ZGltbSBob3QNCj4gPiBhZGRl
-ZCkuDQo+ID4gPj4NCj4gPiA+PiBQbGVhc2Ugc2VlIHRoZSBkZWJ1ZyBsb2dzIGJlbG93LA0KPiA+
-ID4+DQo+ID4gPj4gSW5pdGlhbCBHdWVzdCBib290DQo+ID4gPj4gLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tDQo+ID4gPj4NCj4gPiA+PiBEZWJ1ZyBsb2dzIGZyb20gUWVtdToNCj4gPiA+Pg0K
-PiA+ID4+IGJ1aWxkX2hlYWRlcjogYWNwaSBzaWcgRFNEVCBsZW4gMHg1MTI3DQo+ID4gPj4gYnVp
-bGRfaGVhZGVyOiBhY3BpIHNpZyBGQUNQIGxlbiAweDEwYw0KPiA+ID4+IGJ1aWxkX2hlYWRlcjog
-YWNwaSBzaWcgQVBJQyBsZW4gMHhhOA0KPiA+ID4+IGJ1aWxkX2hlYWRlcjogYWNwaSBzaWcgR1RE
-VCBsZW4gMHg2MA0KPiA+ID4+IGJ1aWxkX2hlYWRlcjogYWNwaSBzaWcgTUNGRyBsZW4gMHgzYw0K
-PiA+ID4+IGJ1aWxkX2hlYWRlcjogYWNwaSBzaWcgU1BDUiBsZW4gMHg1MA0KPiA+ID4+IGJ1aWxk
-X2hlYWRlcjogYWNwaSBzaWcgU1JBVCBsZW4gMHg5Mg0KPiA+ID4+IGJ1aWxkX2hlYWRlcjogYWNw
-aSBzaWcgU1NEVCBsZW4gMHgzOGYNCj4gPiA+PiBidWlsZF9oZWFkZXI6IGFjcGkgc2lnIFhTRFQg
-bGVuIDB4NWMNCj4gPiA+PiB2aXJ0X2FjcGlfYnVpbGQ6IGFjcGkgdGFibGVfYmxvYiBsZW4gMHg1
-ODQ0DQo+ID4gPj4NCj4gPiA+PiBEZWJ1ZyBsb2dzIGZyb20gVUVGSToNCj4gPiA+Pg0KPiA+ID4+
-IFByb2Nlc3NDbWRBZGRDaGVja3N1bTogRmlsZT0iZXRjL2FjcGkvdGFibGVzIiBSZXN1bHRPZmZz
-ZXQ9MHg5DQo+ID4gU3RhcnQ9MHgwIExlbmd0aD0weDUxMjcgQmxvYi0+U2l6ZT0weDU4NDQNCj4g
-PiA+PiBQcm9jZXNzQ21kQWRkQ2hlY2tzdW06IEZpbGU9ImV0Yy9hY3BpL3RhYmxlcyIgUmVzdWx0
-T2Zmc2V0PTB4NTEzMA0KPiA+IFN0YXJ0PTB4NTEyNyBMZW5ndGg9MHgxMEMgQmxvYi0+U2l6ZT0w
-eDU4NDQNCj4gPiA+PiBQcm9jZXNzQ21kQWRkQ2hlY2tzdW06IEZpbGU9ImV0Yy9hY3BpL3RhYmxl
-cyIgUmVzdWx0T2Zmc2V0PTB4NTIzQw0KPiA+IFN0YXJ0PTB4NTIzMyBMZW5ndGg9MHhBOCBCbG9i
-LT5TaXplPTB4NTg0NA0KPiA+ID4+IFByb2Nlc3NDbWRBZGRDaGVja3N1bTogRmlsZT0iZXRjL2Fj
-cGkvdGFibGVzIiBSZXN1bHRPZmZzZXQ9MHg1MkU0DQo+ID4gU3RhcnQ9MHg1MkRCIExlbmd0aD0w
-eDYwIEJsb2ItPlNpemU9MHg1ODQ0DQo+ID4gPj4gUHJvY2Vzc0NtZEFkZENoZWNrc3VtOiBGaWxl
-PSJldGMvYWNwaS90YWJsZXMiIFJlc3VsdE9mZnNldD0weDUzNDQNCj4gPiBTdGFydD0weDUzM0Ig
-TGVuZ3RoPTB4M0MgQmxvYi0+U2l6ZT0weDU4NDQNCj4gPiA+PiBQcm9jZXNzQ21kQWRkQ2hlY2tz
-dW06IEZpbGU9ImV0Yy9hY3BpL3RhYmxlcyIgUmVzdWx0T2Zmc2V0PTB4NTM4MA0KPiA+IFN0YXJ0
-PTB4NTM3NyBMZW5ndGg9MHg1MCBCbG9iLT5TaXplPTB4NTg0NA0KPiA+ID4+IFByb2Nlc3NDbWRB
-ZGRDaGVja3N1bTogRmlsZT0iZXRjL2FjcGkvdGFibGVzIiBSZXN1bHRPZmZzZXQ9MHg1M0QwDQo+
-ID4gU3RhcnQ9MHg1M0M3IExlbmd0aD0weDkyIEJsb2ItPlNpemU9MHg1ODQ0DQo+ID4gPj4gUHJv
-Y2Vzc0NtZEFkZENoZWNrc3VtOiBGaWxlPSJldGMvYWNwaS90YWJsZXMiIFJlc3VsdE9mZnNldD0w
-eDU0NjINCj4gPiBTdGFydD0weDU0NTkgTGVuZ3RoPTB4MzhGIEJsb2ItPlNpemU9MHg1ODQ0DQo+
-ID4gPj4gUHJvY2Vzc0NtZEFkZENoZWNrc3VtOiBGaWxlPSJldGMvYWNwaS90YWJsZXMiIFJlc3Vs
-dE9mZnNldD0weDU3RjENCj4gPiBTdGFydD0weDU3RTggTGVuZ3RoPTB4NUMgQmxvYi0+U2l6ZT0w
-eDU4NDQNCj4gPiA+PiBQcm9jZXNzQ21kQWRkQ2hlY2tzdW06IEZpbGU9ImV0Yy9hY3BpL3JzZHAi
-IFJlc3VsdE9mZnNldD0weDgNCj4gU3RhcnQ9MHgwDQo+ID4gTGVuZ3RoPTB4MTQgQmxvYi0+U2l6
-ZT0weDI0DQo+ID4gPj4gUHJvY2Vzc0NtZEFkZENoZWNrc3VtOiBGaWxlPSJldGMvYWNwaS9yc2Rw
-IiBSZXN1bHRPZmZzZXQ9MHgyMA0KPiA+IFN0YXJ0PTB4MCBMZW5ndGg9MHgyNCBCbG9iLT5TaXpl
-PTB4MjQNCj4gPiA+PiBJbnN0YWxsUWVtdUZ3Q2ZnVGFibGVzOiBpbnN0YWxsZWQgOCB0YWJsZXMN
-Cj4gPiA+Pg0KPiA+ID4+IEd1ZXN0IFJlYm9vdCBhZnRlciBuZGltbSBob3QgYWRkZWQNCj4gPiA+
-PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiA+Pg0KPiA+ID4+IERl
-YnVnIGxvZ3MgZnJvbSBRZW11Og0KPiA+ID4+DQo+ID4gPj4gYnVpbGRfaGVhZGVyOiBhY3BpIHNp
-ZyBEU0RUIGxlbiAweDUxMjcNCj4gPiA+PiBidWlsZF9oZWFkZXI6IGFjcGkgc2lnIEZBQ1AgbGVu
-IDB4MTBjDQo+ID4gPj4gYnVpbGRfaGVhZGVyOiBhY3BpIHNpZyBBUElDIGxlbiAweGE4DQo+ID4g
-Pj4gYnVpbGRfaGVhZGVyOiBhY3BpIHNpZyBHVERUIGxlbiAweDYwDQo+ID4gPj4gYnVpbGRfaGVh
-ZGVyOiBhY3BpIHNpZyBNQ0ZHIGxlbiAweDNjDQo+ID4gPj4gYnVpbGRfaGVhZGVyOiBhY3BpIHNp
-ZyBTUENSIGxlbiAweDUwDQo+ID4gPj4gYnVpbGRfaGVhZGVyOiBhY3BpIHNpZyBTUkFUIGxlbiAw
-eDkyDQo+ID4gPj4gYnVpbGRfaGVhZGVyOiBhY3BpIHNpZyBTU0RUIGxlbiAweDM4Zg0KPiA+ID4+
-IGJ1aWxkX2hlYWRlcjogYWNwaSBzaWcgTkZJVCBsZW4gMHhlMCAgLS0+TmV3DQo+ID4gPj4gYnVp
-bGRfaGVhZGVyOiBhY3BpIHNpZyBYU0RUIGxlbiAweDY0DQo+ID4gPj4gdmlydF9hY3BpX2J1aWxk
-OiBhY3BpIHRhYmxlX2Jsb2IgbGVuIDB4NTkyYyAtLT5ibG9iIGxlbiB1cGRhdGVkDQo+ID4gPj4N
-Cj4gPiA+PiBEZWJ1ZyBsb2dzIGZyb20gVUVGSToNCj4gPiA+Pg0KPiA+ID4+IFByb2Nlc3NDbWRB
-ZGRDaGVja3N1bTogRmlsZT0iZXRjL2FjcGkvdGFibGVzIiBSZXN1bHRPZmZzZXQ9MHg5DQo+ID4g
-U3RhcnQ9MHgwIExlbmd0aD0weDUxMjcgQmxvYi0+U2l6ZT0weDU4NDQgIC0tPldyb25nIGJsb2Ig
-c2l6ZS4NCj4gPiA+PiBQcm9jZXNzQ21kQWRkQ2hlY2tzdW06IEZpbGU9ImV0Yy9hY3BpL3RhYmxl
-cyIgUmVzdWx0T2Zmc2V0PTB4NTEzMA0KPiA+IFN0YXJ0PTB4NTEyNyBMZW5ndGg9MHgxMEMgQmxv
-Yi0+U2l6ZT0weDU4NDQNCj4gPiA+PiBQcm9jZXNzQ21kQWRkQ2hlY2tzdW06IEZpbGU9ImV0Yy9h
-Y3BpL3RhYmxlcyIgUmVzdWx0T2Zmc2V0PTB4NTIzQw0KPiA+IFN0YXJ0PTB4NTIzMyBMZW5ndGg9
-MHhBOCBCbG9iLT5TaXplPTB4NTg0NA0KPiA+ID4+IFByb2Nlc3NDbWRBZGRDaGVja3N1bTogRmls
-ZT0iZXRjL2FjcGkvdGFibGVzIiBSZXN1bHRPZmZzZXQ9MHg1MkU0DQo+ID4gU3RhcnQ9MHg1MkRC
-IExlbmd0aD0weDYwIEJsb2ItPlNpemU9MHg1ODQ0DQo+ID4gPj4gUHJvY2Vzc0NtZEFkZENoZWNr
-c3VtOiBGaWxlPSJldGMvYWNwaS90YWJsZXMiIFJlc3VsdE9mZnNldD0weDUzNDQNCj4gPiBTdGFy
-dD0weDUzM0IgTGVuZ3RoPTB4M0MgQmxvYi0+U2l6ZT0weDU4NDQNCj4gPiA+PiBQcm9jZXNzQ21k
-QWRkQ2hlY2tzdW06IEZpbGU9ImV0Yy9hY3BpL3RhYmxlcyIgUmVzdWx0T2Zmc2V0PTB4NTM4MA0K
-PiA+IFN0YXJ0PTB4NTM3NyBMZW5ndGg9MHg1MCBCbG9iLT5TaXplPTB4NTg0NA0KPiA+ID4+IFBy
-b2Nlc3NDbWRBZGRDaGVja3N1bTogRmlsZT0iZXRjL2FjcGkvdGFibGVzIiBSZXN1bHRPZmZzZXQ9
-MHg1M0QwDQo+ID4gU3RhcnQ9MHg1M0M3IExlbmd0aD0weDkyIEJsb2ItPlNpemU9MHg1ODQ0DQo+
-ID4gPj4gUHJvY2Vzc0NtZEFkZENoZWNrc3VtOiBGaWxlPSJldGMvYWNwaS90YWJsZXMiIFJlc3Vs
-dE9mZnNldD0weDU0NjINCj4gPiBTdGFydD0weDU0NTkgTGVuZ3RoPTB4MzhGIEJsb2ItPlNpemU9
-MHg1ODQ0DQo+ID4gPj4gUHJvY2Vzc0NtZEFkZENoZWNrc3VtOiBGaWxlPSJldGMvYWNwaS90YWJs
-ZXMiIFJlc3VsdE9mZnNldD0weDU3RjENCj4gPiBTdGFydD0weDU3RTggTGVuZ3RoPTB4RTAgQmxv
-Yi0+U2l6ZT0weDU4NDQNCj4gPiA+PiBQcm9jZXNzQ21kQWRkQ2hlY2tzdW06IGludmFsaWQgY2hl
-Y2tzdW0gcmFuZ2UgaW4gImV0Yy9hY3BpL3RhYmxlcyINCj4gPiA+PiBPblJvb3RCcmlkZ2VzQ29u
-bmVjdGVkOiBJbnN0YWxsQWNwaVRhYmxlczogUHJvdG9jb2wgRXJyb3INCj4gPiA+Pg0KPiA+ID4+
-DQo+ID4gPj4gVG8gbWUgaXQgc2VlbXMgb24gQVJNIHZpdCBhY3BpIHBhdGgsIHRoZSBibG9iIGxl
-biBpcyBjYWxjdWxhdGVkIGJhc2VkDQo+ID4gPj4gb24gYWN0dWFsIHRhYmxlcyBhbmQgaXMgdXBk
-YXRlZCBvbmx5IGluIHZpcnRfYWNwaV9zZXR1cCgpIC0tPg0KPiA+IGFjcGlfYWRkX3JvbV9ibG9i
-KCkNCj4gPiA+PiBwYXRoLiBJIGhhZCBhIGxvb2sgYXQgdGhlIHg4NiBjb2RlIGFuZCBpdCBsb29r
-cyBsaWtlLCB0aGVyZSwgdGhlIGJsb2IgbGVuIGdldHMNCj4gPiB1cGRhdGVkDQo+ID4gPj4gd2l0
-aCBhbiBhZGRpdGlvbmFsIGJ1ZmZlciB0byB0YWtlIGNhcmUgb2YgdGFibGUgcmVzaXppbmdbMV0u
-DQo+ID4gPj4NCj4gPiA+PiBBcyBhIGhhY2sgaSBhZGRlZCB0aGUgc2FtZSB0byBBUk0gdmlydCBh
-bmQgaXQgc2VlbXMgdG8gcmVzb2x2ZSB0aGUgaXNzdWUuDQo+ID4gPj4gSSBhbSBub3Qgc3VyZSB0
-aGlzIGlzIHRoZSBiZXN0IGFwcHJvYWNoIHRvIGZpeCB0aGlzIHRob3VnaC4NCj4gPiA+Pg0KPiA+
-ID4+IFBsZWFzZSBsZXQgbWUga25vdyB5b3VyIHRob3VnaHRzLg0KPiA+ID4+DQo+ID4gPj4gVGhh
-bmtzLA0KPiA+ID4+IFNoYW1lZXINCj4gPiA+Pg0KPiA+ID4+IGRpZmYgLS1naXQgYS9ody9hcm0v
-dmlydC1hY3BpLWJ1aWxkLmMgYi9ody9hcm0vdmlydC1hY3BpLWJ1aWxkLmMNCj4gPiA+PiBpbmRl
-eCAxMzI0MTRjLi40MjkxNTUzIDEwMDY0NA0KPiA+ID4+IC0tLSBhL2h3L2FybS92aXJ0LWFjcGkt
-YnVpbGQuYw0KPiA+ID4+ICsrKyBiL2h3L2FybS92aXJ0LWFjcGktYnVpbGQuYw0KPiA+ID4+IEBA
-IC01MCw2ICs1MCw4IEBADQo+ID4gPj4gICNkZWZpbmUgQVJNX1NQSV9CQVNFIDMyDQo+ID4gPj4g
-ICNkZWZpbmUgQUNQSV9QT1dFUl9CVVRUT05fREVWSUNFICJQV1JCIg0KPiA+ID4+DQo+ID4gPj4g
-KyNkZWZpbmUgQUNQSV9CVUlMRF9UQUJMRV9TSVpFICAgIDB4MjAwMDANCj4gPiA+PiArDQo+ID4g
-Pj4gIHN0YXRpYyB2b2lkIGFjcGlfZHNkdF9hZGRfY3B1cyhBbWwgKnNjb3BlLCBpbnQgc21wX2Nw
-dXMpDQo+ID4gPj4gIHsNCj4gPiA+PiAgICAgIHVpbnQxNl90IGk7DQo+ID4gPj4gQEAgLTg4Niw2
-ICs4ODgsMTAgQEAgdm9pZCB2aXJ0X2FjcGlfYnVpbGQoVmlydE1hY2hpbmVTdGF0ZSAqdm1zLA0K
-PiA+IEFjcGlCdWlsZFRhYmxlcyAqdGFibGVzKQ0KPiA+ID4+ICAgICAgICAgIGJ1aWxkX3JzZHAo
-dGFibGVzLT5yc2RwLCB0YWJsZXMtPmxpbmtlciwgJnJzZHBfZGF0YSk7DQo+ID4gPj4gICAgICB9
-DQo+ID4gPj4NCj4gPiA+PiArICAgIC8qIE1ha2Ugc3VyZSB3ZSBoYXZlIGEgYnVmZmVyIGluIGNh
-c2Ugd2UgbmVlZCB0byByZXNpemUgdGhlIHRhYmxlcy4NCj4gKi8NCj4gPiA+PiArICAgIGdfYXJy
-YXlfc2V0X3NpemUodGFibGVzX2Jsb2IsDQo+ID4gUk9VTkRfVVAoYWNwaV9kYXRhX2xlbih0YWJs
-ZXNfYmxvYiksDQo+ID4gPj4gKyAgICAgICAgICAgICAgICAgICAgIEFDUElfQlVJTERfVEFCTEVf
-U0laRSkpOw0KPiA+ID4+ICsNCj4gPiA+PiAgICAgIC8qIENsZWFudXAgbWVtb3J5IHRoYXQncyBu
-byBsb25nZXIgdXNlZC4gKi8NCj4gPiA+PiAgICAgIGdfYXJyYXlfZnJlZSh0YWJsZV9vZmZzZXRz
-LCB0cnVlKTsNCj4gPiA+PiAgfQ0KPiA+ID4+DQo+ID4gPj4gWzFdDQo+ID4gaHR0cHM6Ly9naXRo
-dWIuY29tL3FlbXUvcWVtdS9ibG9iL21hc3Rlci9ody9pMzg2L2FjcGktYnVpbGQuYyNMMjc5Mg0K
-PiA+ID4NCj4gPiA+IE5pY2UgYW5hbHlzaXMsIHRoYW5rcy4NCj4gPiA+DQo+ID4gPiBJIHRoaW5r
-IHRoZSBsaW5lIHRoYXQgeW91IHJlZmVyZW5jZSwgaS5lLg0KPiA+ID4NCj4gPiA+ICAgYWNwaV9h
-bGlnbl9zaXplKHRhYmxlc19ibG9iLCBBQ1BJX0JVSUxEX1RBQkxFX1NJWkUpOw0KPiANCj4gWWVz
-Lg0KPiANCj4gPiA+IGluIGFjcGlfYnVpbGQoKSBbaHcvaTM4Ni9hY3BpLWJ1aWxkLmNdIG1hc2tz
-IHRoaXMgaXNzdWUgZm9yIHg4NiBvbmx5IGFzDQo+ID4gPiBhIHNpZGUgZWZmZWN0LiBUbyBteSB1
-bmRlcnN0YW5kaW5nLCB0aGUgYWxpZ25tZW50IC8gcGFkZGluZyBleGlzdHMgdGhlcmUNCj4gPiA+
-IGZvciBtaWdyYXRpb24gY29tcGF0aWJpbGl0eS4gSXQgZG9lc24ndCBleGlzdCBmb3IgdXBkYXRp
-bmcgdGhlIHNpemUgb2YNCj4gPiA+IHRoZSBBQ1BJIGJsb2JzIGluIGZ3X2NmZyBhY3Jvc3MgcmVi
-b290cy4gVGhlIGlzc3VlIGlzIG1hc2tlZCBiZWNhdXNlIHRoZQ0KPiA+ID4gYWxpZ25tZW50IGlz
-IGxhcmdlIGVub3VnaCAodW4tY2hhbmdlZCkgdG8gY29udGFpbiB0aGUgcmVnZW5lcmF0ZWQgYmxv
-YnMNCj4gPiA+IGFzIHdlbGwuPg0KPiA+ID4gR2l2ZW4gdGhhdCB0aGUgInZpcnQiIG1hY2hpbmUg
-dHlwZSBpcyB2ZXJzaW9uZWQsIEkgdGhpbmsgbWlncmF0aW9uDQo+ID4gPiBjb21wYXQgaXMgYSB2
-YWxpZCBjb25jZXJuIHRoZXJlIHRvby4gVGhpcyBpbiBpdHNlbGYgd291bGQganVzdGlmeSBhDQo+
-ID4gPiBzaW1pbGFyIHBhZGRpbmcuDQo+ID4gSSBkb24ndCB1bmRlcnN0YW5kIHRoZSBtaWdyYXRp
-b24gY29tcGF0IGlzc3VlLiBQbGVhc2UgY291bGQgeW91IGVsYWJvcmF0ZT8NCj4gDQo+IFllcy4g
-UGxlYXNlIGVsYWJvcmF0ZS4NCj4gDQo+ID4gPiBJIGRvbid0IGtub3cgaWYgd2Ugd2FudCB0byBz
-cGVjaWZpY2FsbHkgY2FyZSBhYm91dCBzaXplLWNoYW5naW5nDQo+ID4gPiBBQ1BJLXJlZ2VuIGFj
-cm9zcyByZWJvb3QuIEkgYmVsaWV2ZSBtZWFzdXJlcyBmb3IgdGhhdCBzcGVjaWZpYyB1c2UgY2Fz
-ZQ0KPiA+ID4gZG9uJ3QgZXhpc3QgaW4geDg2IG1hY2hpbmUgdHlwZXMgZWl0aGVyLg0KPiA+IFRo
-ZSBORklUIHJlZGltZW5zaW9uaW5nIHNob3VsZCBleGl0IG9uIHg4NiB0b28/DQo+IA0KPiBJIGhh
-ZCBhIGdvIHdpdGggeDg2IGNvbW1lbnRpbmcgb3V0IHRoZSBwYWRkaW5nIGNvbXBsZXRlbHkuIEJ1
-dCBpbnRlcmVzdGluZ2x5DQo+IHNvbWV3aGVyZSBpbiB4ODYgY29kZSBwYXRoIHRoZSBibG9iIGxl
-bmd0aCBnZXRzIGFsaWduZWQgdG8gMHgxMDAwIGJvdW5kYXJ5DQo+IGFuZCBpdCBlc2NhcGVzIHRo
-ZSBzYW5pdHkgY2hlY2suDQo+IA0KPiBXaXRoIHBhZGRpbmcsIFVFRkkgYWx3YXlzIHNlZXMsIEFD
-UElfQlVJTERfVEFCTEVfU0laRSAoMHgyMDAwMCkNCj4gDQo+IFByb2Nlc3NDbWRBZGRDaGVja3N1
-bTogRmlsZT0iZXRjL2FjcGkvdGFibGVzIiBSZXN1bHRPZmZzZXQ9MHg0OQ0KPiBTdGFydD0weDQw
-IExlbmd0aD0weDE5RTkgQmxvYi0+U2l6ZT0weDIwMDAwDQo+IA0KPiBXaXRoIHBhZGRpbmcgcmVt
-b3ZlZCwNCj4gDQo+IEZyb20gUWVtdSwNCj4gYWNwaV9idWlsZDogdGFibGVzX2Jsb2IgbGVuIDB4
-MmM2Mg0KPiANCj4gVUVGSToNCj4gUHJvY2Vzc0NtZEFkZENoZWNrc3VtOiBGaWxlPSJldGMvYWNw
-aS90YWJsZXMiIFJlc3VsdE9mZnNldD0weDQ5DQo+IFN0YXJ0PTB4NDAgTGVuZ3RoPTB4MUYzMyBC
-bG9iLT5TaXplPTB4MzAwMA0KPiANCj4gR3Vlc3QgUmVib290IGFmdGVyIGFkZGluZyBhIG51bWJl
-ciBvZiBudmRpbW1zLA0KPiANCj4gUWVtdToNCj4gYWNwaV9idWlsZDogIHRhYmxlc19ibG9iIGxl
-biAweDM4MGUNCj4gDQo+IFVFRkk6DQo+IFByb2Nlc3NDbWRBZGRDaGVja3N1bTogRmlsZT0iZXRj
-L2FjcGkvdGFibGVzIiBSZXN1bHRPZmZzZXQ9MHg0OQ0KPiBTdGFydD0weDQwIExlbmd0aD0weDI0
-MDEgQmxvYi0+U2l6ZT0weDQwMDANCj4gDQo+IEkgY291bGRu4oCZdCBmaWd1cmUgb3V0IGZyb20g
-dGhlIGNvZGUgd2hlcmUgdGhhdCByb3VuZCB1cCBpcyBoYXBwZW5pbmcuIEJ1dA0KPiB4ODYgYWxz
-byBoYXMgc2FtZSBpc3N1ZSBpZiB0aGUgcGFkZGluZyBpcyByZW1vdmVkLCBJIGd1ZXNzLg0KDQpB
-aC4uSSBtaXNzZWQgdGhlIGZhY3QgdGhhdCwgZmlybXdhcmUgaW5kZWVkIHNlZXMgYW4gdXBkYXRl
-IGluIHRoZSBibG9iIGxlbiBoZXJlDQoocm91bmRlZCBvciBub3QpIGFmdGVyIHJlYm9vdC4gU28g
-ZG9u4oCZdCB0aGluayB4ODYgaGFzIHRoZSBzYW1lIGlzc3VlIGFuZCBwYWRkaW5nDQppcyBub3Qg
-dGhlIHJpZ2h0IHNvbHV0aW9uIGFzIElnb3IgZXhwbGFpbmVkIGluIGhpcyByZXBseS4NCg0KSSB3
-aWxsIHRyeSB0byBkZWJ1ZyB0aGlzIGZ1cnRoZXIuIEFueSBwb2ludGVycyB3ZWxjb21lLg0KDQpD
-aGVlcnMsDQpTaGFtZWVyDQoNCj4gVGhhbmtzLA0KPiBTaGFtZWVyDQo+IA0KPiA+ID4gQW5vdGhl
-ciB0cmljayB0aGF0IGlzIG9jY2FzaW9uYWxseSB1c2VkIChidXQgbWlnaHQgbm90IGFwcGx5IGhl
-cmUsIEknbQ0KPiA+ID4gdW5jZXJ0YWluKSBpcyB0byBhbHdheXMgZ2VuZXJhdGUgdGhlIHJlbGV2
-YW50IEFDUEkgb2JqZWN0cywgYnV0LCBpbiBjYXNlDQo+ID4gPiB0aGV5IGFyZSBub3QganVzdGlm
-aWVkIGZvciB0aGUgdmlydHVhbCBoYXJkd2FyZSBjb25maWcsIGludmFsaWRhdGUgdGhlbQ0KPiA+
-ID4gYnkgb3ZlcndyaXRpbmcgcGFydGljdWxhciBwYXJ0cyBvZiB0aGVtIChmb3IgZXhhbXBsZSwg
-b25lIG9yIHR3byBieXRlcw0KPiA+ID4gb2YgdGhlaXIgbmFtZXMpLiBIb3BlZnVsbHkgdGhpcyBz
-aG91bGRuJ3QgaW50cm9kdWNlIEFDUEkgb3IgQU1MIGVycm9ycywNCj4gPiA+IGp1c3QgbWFrZSB0
-aGUgQUNQSSBpbnRlcnByZXRlciBpZ25vcmUgdGhlIGFmZmVjdGVkIG9iamVjdHMuDQo+ID4NCj4g
-PiBUaGFua3MhDQo+ID4NCj4gPiBFcmljDQo+ID4gPg0KPiA+ID4gVGhhbmtzLA0KPiA+ID4gTGFz
-emxvDQo+ID4gPg0K
+On Thu, 28 Feb 2019 08:48:18 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
+
+> Hi Igor, Shameer,
+>=20
+> On 2/27/19 6:51 PM, Igor Mammedov wrote:
+> > On Wed, 27 Feb 2019 10:41:45 +0000
+> > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+> >  =20
+> >> Hi Eric,
+> >> =20
+> >>> -----Original Message-----
+> >>> From: Auger Eric [mailto:eric.auger@redhat.com]
+> >>> Sent: 27 February 2019 10:27
+> >>> To: Igor Mammedov <imammedo@redhat.com>
+> >>> Cc: peter.maydell@linaro.org; drjones@redhat.com; david@redhat.com;
+> >>> dgilbert@redhat.com; Shameerali Kolothum Thodi
+> >>> <shameerali.kolothum.thodi@huawei.com>; qemu-devel@nongnu.org;
+> >>> qemu-arm@nongnu.org; eric.auger.pro@gmail.com;
+> >>> david@gibson.dropbear.id.au
+> >>> Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expa=
+nsion
+> >>> and PCDIMM/NVDIMM support
+> >>>
+> >>> Hi Igor, Shameer,
+> >>>
+> >>> On 2/27/19 11:10 AM, Igor Mammedov wrote:   =20
+> >>>> On Tue, 26 Feb 2019 18:53:24 +0100
+> >>>> Auger Eric <eric.auger@redhat.com> wrote:
+> >>>>   =20
+> >>>>> Hi Igor,
+> >>>>>
+> >>>>> On 2/26/19 5:56 PM, Igor Mammedov wrote:   =20
+> >>>>>> On Tue, 26 Feb 2019 14:11:58 +0100
+> >>>>>> Auger Eric <eric.auger@redhat.com> wrote:
+> >>>>>>   =20
+> >>>>>>> Hi Igor,
+> >>>>>>>
+> >>>>>>> On 2/26/19 9:40 AM, Auger Eric wrote:   =20
+> >>>>>>>> Hi Igor,
+> >>>>>>>>
+> >>>>>>>> On 2/25/19 10:42 AM, Igor Mammedov wrote:   =20
+> >>>>>>>>> On Fri, 22 Feb 2019 18:35:26 +0100
+> >>>>>>>>> Auger Eric <eric.auger@redhat.com> wrote:
+> >>>>>>>>>   =20
+> >>>>>>>>>> Hi Igor,
+> >>>>>>>>>>
+> >>>>>>>>>> On 2/22/19 5:27 PM, Igor Mammedov wrote:   =20
+> >>>>>>>>>>> On Wed, 20 Feb 2019 23:39:46 +0100
+> >>>>>>>>>>> Eric Auger <eric.auger@redhat.com> wrote:
+> >>>>>>>>>>>   =20
+> >>>>>>>>>>>> This series aims to bump the 255GB RAM limit in machvirt and=
+ to
+> >>>>>>>>>>>> support device memory in general, and especially   =20
+> >>> PCDIMM/NVDIMM.   =20
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> In machvirt versions < 4.0, the initial RAM starts at 1GB an=
+d can
+> >>>>>>>>>>>> grow up to 255GB. From 256GB onwards we find IO regions such=
+ as   =20
+> >>> the   =20
+> >>>>>>>>>>>> additional GICv3 RDIST region, high PCIe ECAM region and hig=
+h   =20
+> >>> PCIe   =20
+> >>>>>>>>>>>> MMIO region. The address map was 1TB large. This corresponde=
+d   =20
+> >>> to   =20
+> >>>>>>>>>>>> the max IPA capacity KVM was able to manage.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Since 4.20, the host kernel is able to support a larger and =
+dynamic
+> >>>>>>>>>>>> IPA range. So the guest physical address can go beyond the 1=
+TB.   =20
+> >>> The   =20
+> >>>>>>>>>>>> max GPA size depends on the host kernel configuration and ph=
+ysical   =20
+> >>> CPUs.   =20
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> In this series we use this feature and allow the RAM to grow=
+   =20
+> >>> without   =20
+> >>>>>>>>>>>> any other limit than the one put by the host kernel.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> The RAM still starts at 1GB. First comes the initial ram (-m=
+) of size
+> >>>>>>>>>>>> ram_size and then comes the device memory (,maxmem) of size
+> >>>>>>>>>>>> maxram_size - ram_size. The device memory is potentially   =
+=20
+> >>> hotpluggable   =20
+> >>>>>>>>>>>> depending on the instantiated memory objects.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> IO regions previously located between 256GB and 1TB are move=
+d   =20
+> >>> after   =20
+> >>>>>>>>>>>> the RAM. Their offset is dynamically computed, depends on   =
+=20
+> >>> ram_size   =20
+> >>>>>>>>>>>> and maxram_size. Size alignment is enforced.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> In case maxmem value is inferior to 255GB, the legacy memory=
+   =20
+> >>> map   =20
+> >>>>>>>>>>>> still is used. The change of memory map becomes effective fr=
+om 4.0
+> >>>>>>>>>>>> onwards.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> As we keep the initial RAM at 1GB base address, we do not ne=
+ed to   =20
+> >>> do   =20
+> >>>>>>>>>>>> invasive changes in the EDK2 FW. It seems nobody is eager to=
+ do
+> >>>>>>>>>>>> that job at the moment.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Device memory being put just after the initial RAM, it is po=
+ssible
+> >>>>>>>>>>>> to get access to this feature while keeping a 1TB address ma=
+p.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> This series reuses/rebases patches initially submitted by Sh=
+ameer
+> >>>>>>>>>>>> in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Functionally, the series is split into 3 parts:
+> >>>>>>>>>>>> 1) bump of the initial RAM limit [1 - 9] and change in
+> >>>>>>>>>>>>    the memory map   =20
+> >>>>>>>>>>>   =20
+> >>>>>>>>>>>> 2) Support of PC-DIMM [10 - 13]   =20
+> >>>>>>>>>>> Is this part complete ACPI wise (for coldplug)? I haven't not=
+iced
+> >>>>>>>>>>> DSDT AML here no E820 changes, so ACPI wise pc-dimm shouldn't=
+ be
+> >>>>>>>>>>> visible to the guest. It might be that DT is masking problem
+> >>>>>>>>>>> but well, that won't work on ACPI only guests.   =20
+> >>>>>>>>>>
+> >>>>>>>>>> guest /proc/meminfo or "lshw -class memory" reflects the amoun=
+t of   =20
+> >>> mem   =20
+> >>>>>>>>>> added with the DIMM slots.   =20
+> >>>>>>>>> Question is how does it get there? Does it come from DT or from=
+   =20
+> >>> firmware   =20
+> >>>>>>>>> via UEFI interfaces?
+> >>>>>>>>>   =20
+> >>>>>>>>>> So it looks fine to me. Isn't E820 a pure x86 matter?   =20
+> >>>>>>>>> sorry for misleading, I've meant is UEFI GetMemoryMap().
+> >>>>>>>>> On x86, I'm wary of adding PC-DIMMs to E802 which then gets exp=
+osed
+> >>>>>>>>> via UEFI GetMemoryMap() as guest kernel might start using it as=
+   =20
+> >>> normal   =20
+> >>>>>>>>> memory early at boot and later put that memory into zone normal=
+ and   =20
+> >>> hence   =20
+> >>>>>>>>> make it non-hot-un-pluggable. The same concerns apply to DT bas=
+ed   =20
+> >>> means   =20
+> >>>>>>>>> of discovery.
+> >>>>>>>>> (That's guest issue but it's easy to workaround it not putting =
+  =20
+> >>> hotpluggable   =20
+> >>>>>>>>> memory into UEFI GetMemoryMap() or DT and let DSDT describe it =
+  =20
+> >>> properly)   =20
+> >>>>>>>>> That way memory doesn't get (ab)used by firmware or early boot =
+  =20
+> >>> kernel stages   =20
+> >>>>>>>>> and doesn't get locked up.
+> >>>>>>>>>   =20
+> >>>>>>>>>> What else would you expect in the dsdt?   =20
+> >>>>>>>>> Memory device descriptions, look for code that adds PNP0C80 wit=
+h   =20
+> >>> _CRS   =20
+> >>>>>>>>> describing memory ranges   =20
+> >>>>>>>>
+> >>>>>>>> OK thank you for the explanations. I will work on PNP0C80 additi=
+on then.
+> >>>>>>>> Does it mean that in ACPI mode we must not output DT hotplug mem=
+ory
+> >>>>>>>> nodes or assuming that PNP0C80 is properly described, it will "o=
+verride"
+> >>>>>>>> DT description?   =20
+> >>>>>>>
+> >>>>>>> After further investigations, I think the pieces you pointed out =
+are
+> >>>>>>> added by Shameer's series, ie. through the build_memory_hotplug_a=
+ml()
+> >>>>>>> call. So I suggest we separate the concerns: this series brings s=
+upport
+> >>>>>>> for DIMM coldplug. hotplug, including all the relevant ACPI struc=
+tures
+> >>>>>>> will be added later on by Shameer.   =20
+> >>>>>>
+> >>>>>> Maybe we should not put pc-dimms in DT for this series until it ge=
+ts clear
+> >>>>>> if it doesn't conflict with ACPI in some way.   =20
+> >>>>>
+> >>>>> I guess you mean removing the DT hotpluggable memory nodes only in =
+ACPI
+> >>>>> mode? Otherwise you simply remove the DIMM feature, right?   =20
+> >>>> Something like this so DT won't get in conflict with ACPI.
+> >>>> Only we don't have a switch for it something like, -machine fdt=3Don=
+ (with   =20
+> >>> default off)   =20
+> >>>>   =20
+> >>>>> I double checked and if you remove the hotpluggable memory DT nodes=
+ in
+> >>>>> ACPI mode:
+> >>>>> - you do not see the PCDIMM slots in guest /proc/meminfo anymore. S=
+o I
+> >>>>> guess you're right, if the DT nodes are available, that memory is
+> >>>>> considered as not unpluggable by the guest.
+> >>>>> - You can see the NVDIMM slots using ndctl list -u. You can mount a=
+ DAX
+> >>>>> system.
+> >>>>>
+> >>>>> Hotplug/unplug is clearly not supported by this series and any atte=
+mpt
+> >>>>> results in "memory hotplug is not supported". Is it really an issue=
+ if
+> >>>>> the guest does not consider DIMM slots as not hot-unpluggable memor=
+y? I
+> >>>>> am not even sure the guest kernel would support to unplug that memo=
+ry.
+> >>>>>
+> >>>>> In case we want all ACPI tables to be ready for making this memory =
+seen
+> >>>>> as hot-unpluggable we need some Shameer's patches on top of this se=
+ries.   =20
+> >>>> May be we should push for this way (into 4.0), it's just a several p=
+atches
+> >>>> after all or even merge them in your series (I'd guess it would need=
+ to be
+> >>>> rebased on top of your latest work)   =20
+> >>>
+> >>> Shameer, would you agree if we merge PATCH 1 of your RFC hotplug seri=
+es
+> >>> (without the reduced hw_reduced_acpi flag) in this series and isolate=
+ in
+> >>> a second PATCH the acpi_memory_hotplug_init() + build_memory_hotplug_=
+aml
+> >>> called in virt code?   =20
+> > probably we can do it as transitional step as we need working mmio inte=
+rface
+> > in place for build_memory_hotplug_aml() to work, provided it won't crea=
+te
+> > migration issues (do we need VMSTATE_MEMORY_HOTPLUG for cold-plug case?=
+).
+> >=20
+> > What about dummy initial GED (empty device), that manages mmio region o=
+nly
+> > and then later it will be filled with remaining logic IRQ. In this case=
+ mmio region
+> > and vmstate won't change (maybe) so it won't cause ABI or migration iss=
+ues. =20
+>=20
+>=20
+> >=20
+> >  =20
+> >> Sure, that=E2=80=99s fine with me. So what would you use for the event=
+_handler_method in
+> >> build_memory_hotplug_aml()? GPO0 device? =20
+> >=20
+> > a method name not defined in spec, so it won't be called might do. =20
+>=20
+> At this point the event_handler_method, ie. \_SB.GPO0._E02, is not
+> supposed to be called, right? So effectivily we should be able to use
+> any other method name (unlinked to any GPIO/GED). I guess at this stage
+> only the PNP0C80 definition blocks + methods are used.
+pretty much yes.
+=20
+> What still remains fuzzy for me is in case of cold plug the mmio hotplug
+> control region part only is read (despite the slot selection of course)
+> and returns 0 for addr/size and also flags meaning the slot is not
+> enabled.
+If you mean guest reads 0s than it looks broken, could you show
+trace log with mhp_* tracepoints enabled during a dimm hotplug.
+
+> So despite the slots are advertised as hotpluggable/enabled in
+> the SRAT; I am not sure for the OS it actually makes any difference
+> whether the DSDT definition blocks are described or not.
+SRAT isn't used fro informing guests about amount of present RAM,
+it holds affinity information for present and possible RAM
+
+> To be honest I am afraid this is too late to add those additional
+> features for 4.0 now. This is going to jeopardize the first preliminary
+> part which is the introduction of the new memory map, allowing the
+> expansion of the initial RAM and paving the way for device memory
+> introduction. So I think I am going to resend the first 10 patches in a
+> standalone series. And we can iterate on the PCDIMM/NVDIMM parts
+> independently.
+sounds good to me, I'll try to review 1-10 today=20
+=20
+> Thanks
+>=20
+> Eric
+> >=20
+> >  =20
+> >>
+> >> Thanks,
+> >> Shameer
+> >> =20
+> >>> Then would remain the GED/GPIO actual integration.
+> >>>
+> >>> Thanks
+> >>>
+> >>> Eric   =20
+> >>>>   =20
+> >>>>> Also don't DIMM slots already make sense in DT mode. Usually we acc=
+ept
+> >>>>> to add one feature in DT and then in ACPI. For instance we can bene=
+fit   =20
+> >>>> usually it doesn't conflict with each other (at least I'm not aware =
+of it)
+> >>>> but I see a problem with in this case.
+> >>>>   =20
+> >>>>> from nvdimm in dt mode right? So, considering an incremental approa=
+ch I
+> >>>>> would be in favour of keeping the DT nodes.   =20
+> >>>> I'd guess it is the same as for DIMMs, ACPI support for NVDIMMs is m=
+uch
+> >>>> more versatile.
+> >>>>
+> >>>> I consider target application of arm/virt as a board that's used to
+> >>>> run in production generic ACPI capable guest in most use cases and
+> >>>> various DT only guests as secondary ones. It's hard to make
+> >>>> both usecases be happy with defaults (that's probably  one of the
+> >>>> reasons why 'sbsa' board is being added).
+> >>>>
+> >>>> So I'd give priority to ACPI based arm/virt versus DT when defaults =
+are
+> >>>> considered.
+> >>>>   =20
+> >>>>> Thanks
+> >>>>>
+> >>>>> Eric   =20
+> >>>>>>
+> >>>>>>
+> >>>>>>
+> >>>>>>   =20
+> >>>>   =20
+> >=20
+> >  =20
