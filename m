@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35850)
+Received: from eggs.gnu.org ([209.51.188.92]:35801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzHPL-0005W3-Rd
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:51:12 -0500
+	(envelope-from <david@redhat.com>) id 1gzHPM-0005V7-Sv
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:51:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzHCc-0006eR-0x
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:38:03 -0500
-References: <155129014351.2181.16531275718275765030@49fa7ef69f7b>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d29adfb8-e194-54af-5f08-b4accb5df790@redhat.com>
-Date: Thu, 28 Feb 2019 09:37:57 +0100
+	(envelope-from <david@redhat.com>) id 1gzHB8-00067e-6y
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:36:31 -0500
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-15-david@redhat.com>
+	<c57c068f-1c42-9cba-0f0f-3204f6648d8d@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <f11109de-6ba3-5104-71b6-1245c42b282e@redhat.com>
+Date: Thu, 28 Feb 2019 09:36:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <155129014351.2181.16531275718275765030@49fa7ef69f7b>
+In-Reply-To: <c57c068f-1c42-9cba-0f0f-3204f6648d8d@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 00/34] target/riscv: Convert to
- decodetree
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 14/33] s390x/tcg: Implement VECTOR LOAD
+ MULTIPLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,21 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, fam@euphon.net
-Cc: qemu-devel@nongnu.org, kbastian@mail.uni-paderborn.de, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, palmer@sifive.com, richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 27/02/2019 18.55, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190222141024.22217-1-kbastian@mail.uni-paderborn.de/
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
+On 27.02.19 17:02, Richard Henderson wrote:
+> On 2/26/19 3:38 AM, David Hildenbrand wrote:
+>> Also fairly easy to implement. One issue we have is that exceptions wi=
+ll
+>> result in some vectors already being modified. At least handle it
+>> consistently per vector by using a temporary vector. Good enough for
+>> now, add a FIXME.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/insn-data.def      |  2 ++
+>>  target/s390x/translate_vx.inc.c | 26 ++++++++++++++++++++++++++
+>>  2 files changed, 28 insertions(+)
+>=20
+> I suppose the fixme is good enough.  For the record, I think you could =
+do the
+> check with just two loads -- the first and last quadword.  After that, =
+none of
+> the other loads can fault, and you can store everything else into the
+> destination vectors as you read them.
 
- Fam, Paolo,
+Aren't such approaches prone to races if other VCPUs invalidate page
+tables/TLB entries?
 
-Patchew is really going wild these days. It replied 32 times to this
-patch series - quite a bit annoying. Could this be fixed, please?
+(or am I messing up things and the MMU of this VCPU won't be touched
+while in this block and once we touched all applicable pages, it cannot
+fail anymore?)
 
- Thanks,
-  Thomas
+>=20
+> Also missing for the fixme: MO_ALIGN{,_16}.
+
+Just like the other occurrence, I think MO_ALIGN would be wrong.
+
+"Setting the alignment hint to a non-zero value
+that doesn=E2=80=99t correspond to the alignment of the
+second operand may reduce performance on
+some models."
+
+>=20
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>=20
+
+Thanks!
+
+>=20
+> r~
+>=20
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
