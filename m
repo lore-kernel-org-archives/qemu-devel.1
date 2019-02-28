@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41337)
+Received: from eggs.gnu.org ([209.51.188.92]:41481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzO9Z-0008I0-Le
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:03:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1gzO9w-00008I-Eb
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:03:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzO9O-0004Qs-Ki
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:03:18 -0500
-Date: Thu, 28 Feb 2019 17:02:22 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190228170222.018c917f@redhat.com>
-In-Reply-To: <20190228150324.25973-6-eric.auger@redhat.com>
-References: <20190228150324.25973-1-eric.auger@redhat.com>
-	<20190228150324.25973-6-eric.auger@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gzO9u-0004gk-DV
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:03:44 -0500
+References: <60952760a82dc603b836ca41fd0f9b1325cad635.camel@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3f30ec53-6cac-d2cb-5fdb-db9ab3438c85@redhat.com>
+Date: Thu, 28 Feb 2019 10:03:37 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <60952760a82dc603b836ca41fd0f9b1325cad635.camel@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 05/10] kvm: add
- kvm_arm_get_max_vm_ipa_size
+Subject: Re: [Qemu-devel] [PATCH v2] trivial fix of malloc to g_new in thunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
+To: Aarushi Mehta <mehta.aaru20@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>
 
-On Thu, 28 Feb 2019 16:03:19 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
-
-> Add the kvm_arm_get_max_vm_ipa_size() helper that returns the
-> number of bits in the IPA address space supported by KVM.
+On 2/28/19 9:35 AM, Aarushi Mehta wrote:
 > 
-> This capability needs to be known to create the VM with a
-> specific IPA max size (kvm_type passed along KVM_CREATE_VM ioctl.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> 
+> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 > ---
-> v6 -> v7:
-> - s/kvm_arm_get_max_vm_phys_shift/kvm_arm_get_max_vm_ipa_size
-> - reword the comment
-> 
-> v4 -> v5:
-> - return 40 if the host does not support the capability
-> 
-> v3 -> v4:
-> - s/s/ms in kvm_arm_get_max_vm_phys_shift function comment
-> - check KVM_CAP_ARM_VM_IPA_SIZE extension
-> 
-> v1 -> v2:
-> - put this in ARM specific code
-> ---
->  target/arm/kvm.c     | 10 ++++++++++
->  target/arm/kvm_arm.h | 13 +++++++++++++
->  2 files changed, 23 insertions(+)
-> 
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index e00ccf9c98..79a79f0190 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -18,6 +18,7 @@
->  #include "qemu/error-report.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/kvm.h"
-> +#include "sysemu/kvm_int.h"
->  #include "kvm_arm.h"
->  #include "cpu.h"
->  #include "trace.h"
-> @@ -162,6 +163,15 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
->      env->features = arm_host_cpu_features.features;
->  }
->  
-> +int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
-> +{
-> +    KVMState *s = KVM_STATE(ms->accelerator);
-> +    int ret;
-> +
-> +    ret = kvm_check_extension(s, KVM_CAP_ARM_VM_IPA_SIZE);
-> +    return ret > 0 ? ret : 40;
-> +}
-> +
->  int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      /* For ARM interrupt delivery is always asynchronous,
-> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> index 6393455b1d..2a07333c61 100644
-> --- a/target/arm/kvm_arm.h
-> +++ b/target/arm/kvm_arm.h
-> @@ -207,6 +207,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
->   */
->  void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
->  
-> +/**
-> + * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
-> + * IPA address space supported by KVM
-> + *
-> + * @ms: Machine state handle
-> + */
-> +int kvm_arm_get_max_vm_ipa_size(MachineState *ms);
-> +
->  /**
->   * kvm_arm_sync_mpstate_to_kvm
->   * @cpu: ARMCPU
-> @@ -239,6 +247,11 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
->      cpu->host_cpu_probe_failed = true;
->  }
->  
-> +static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
-> +{
-> +    return -ENOENT;
-> +}
-> +
->  static inline int kvm_arm_vgic_probe(void)
->  {
->      return 0;
+> Note that since thunking occurs throughout the lifetime of the QEMU instance, 
+> there is no matching 'free' to correct
+
+This sentence is vital to the patch, so it belongs above the --- and
+S-o-b as part of the commit message.
+
+> It might be valuable to edit the BiteSizedTasks to reflect that g_new is favoured over g_malloc
+
+And I've done that now, by emphasizing the discussion in HACKING (rather
+than repeating it on the wiki):
+https://wiki.qemu.org/index.php?title=Contribute/BiteSizedTasks&diff=8247&oldid=8242
+
+With the improved commit message,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
