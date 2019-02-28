@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44716)
+Received: from eggs.gnu.org ([209.51.188.92]:44925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gzHzN-00021E-OX
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:28:26 -0500
+	(envelope-from <david@redhat.com>) id 1gzHzx-0002Jq-27
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:29:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gzHzJ-0002QX-6v
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:28:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gzHzH-0002PR-4W
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:28:21 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CC1E130B27D3
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 09:28:16 +0000 (UTC)
-Date: Thu, 28 Feb 2019 10:28:15 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190228092815.jmlrnriddvovrn4u@sirius.home.kraxel.org>
-References: <20190225154335.11397-1-fziglio@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gzHzu-0002dZ-1R
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:29:00 -0500
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-34-david@redhat.com>
+	<9c8913f5-76b6-1175-5574-19f19d1e8eef@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c37a7e69-934c-ab2e-08a1-c67cb3e156c5@redhat.com>
+Date: Thu, 28 Feb 2019 10:28:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190225154335.11397-1-fziglio@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] audio: Use g_strdup_printf instead of
- manual building a string
+In-Reply-To: <9c8913f5-76b6-1175-5574-19f19d1e8eef@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 33/33] s390x/tcg: Implement VECTOR
+ UNPACK *
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Frediano Ziglio <fziglio@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Feb 25, 2019 at 03:43:34PM +0000, Frediano Ziglio wrote:
-> Instead of using lot of low level function and manually allocate
-> the temporary string in audio_process_options use more high
-> level GLib function. The function is not used in hot path but to
-> read some initial setting.
+On 28.02.19 01:03, Richard Henderson wrote:
+> On 2/26/19 3:39 AM, David Hildenbrand wrote:
+>> Combine all variant in a single handler. As source and destination
+>> have different element sizes, we can't use gvec expansion. Expand
+>> manually. Also watch out for overlapping source and destination and
+>> use a temporary register in that case.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/insn-data.def      |  8 +++++++
+>>  target/s390x/translate_vx.inc.c | 41 +++++++++++++++++++++++++++++++++
+>>  2 files changed, 49 insertions(+)
+> 
+> This works as is, so
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> But the same comment applies wrt iteration order and not needing a temporary.
+> High unpack can iterate backward, while low unpack can iterate forward, with no
+> lost data.
 
-Added to qudio queue.
+I'll fix that right away. I guess vector pack cannot be handled like this.
 
-thanks,
-  Gerd
+The only way to get rid of the temporary would be to load both elements
+from v2 and v3 and then writing the two (half sized) elements in v1.
+
+I'll have a look.
+
+Thanks!
+
+-- 
+
+Thanks,
+
+David / dhildenb
