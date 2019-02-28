@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56176)
+Received: from eggs.gnu.org ([209.51.188.92]:57065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gzDpG-0000zz-8u
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:01:44 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gzDuX-0002D4-So
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:07:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gzDpF-0006Od-CO
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:01:42 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:49870
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gzDpF-0006Bs-4S
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:01:41 -0500
-References: <CAKyx-3Paa6_RreGZw3sT+qmwu1=_DLnR_RDxa_gN20vwD1EnLw@mail.gmail.com>
-	<20190225152618.r3epnypkpu6fyokt@sirius.home.kraxel.org>
-	<A17B6D30-F428-48E5-B9D0-6F6E7DEE3778@gmail.com>
-	<20190226064347.i5kvwazmz3xcupkj@sirius.home.kraxel.org>
-	<CAKyx-3OOkkdSQ=UAucP_ZpormrEczwNhEpAnVtFeQOSOrnD7Vg@mail.gmail.com>
-	<20190227052755.3lgo3265kaa6bzmi@sirius.home.kraxel.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gzDuW-0002vg-IP
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:07:09 -0500
+References: <201902270125.36158.randrianasulu@gmail.com>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <1ef851d2-4148-56f0-65ac-a0e75022f20e@ilande.co.uk>
-Date: Thu, 28 Feb 2019 05:01:18 +0000
+Message-ID: <b3f9b42e-5895-51ca-9313-506b857e65d8@ilande.co.uk>
+Date: Thu, 28 Feb 2019 05:06:45 +0000
 MIME-Version: 1.0
-In-Reply-To: <20190227052755.3lgo3265kaa6bzmi@sirius.home.kraxel.org>
+In-Reply-To: <201902270125.36158.randrianasulu@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Questions about EDID
+Subject: Re: [Qemu-devel] regression: target/ppc: convert VSX logical
+ operations to vector operations broke X for ppc64le guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, G 3 <programmingkidx@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Andrew Randrianasulu <randrianasulu@gmail.com>, qemu-devel@nongnu.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On 27/02/2019 05:27, Gerd Hoffmann wrote:
+On 26/02/2019 22:25, Andrew Randrianasulu wrote:
 
-> On Tue, Feb 26, 2019 at 04:11:06PM -0500, G 3 wrote:
->> When I use edid=on, I do see a lot of extra resolutions available in Mac OS
->> 9 and Mac OS X, just not the resolution I want to use. Is there some kind
->> of rule like the resolution value has to be divisible by a certain number?
+(adding qemu-ppc, Richard and David - please make sure you add the relevant
+maintainer on bug reports, as otherwise due to the high volume of mails to the list
+it's very easy to miss things)
+
+> Hello.
 > 
-> qemu doesn't have such a requirement.
-> Might be the guest drivers have.
-> Try making width/height multiple of 8 or 16.
+> I bisected this problem with fonts (and multicolored vertical stripes) in qemu 
+> git (ppc64-softmmu)
+> 
+> guest@slax:/dev/shm/qemu$ git bisect good
+> 7b8fe477e12b164dda97f79e27b55b805d90384f is the first bad commit
+> commit 7b8fe477e12b164dda97f79e27b55b805d90384f
+> Author: Richard Henderson <richard.henderson@linaro.org>
+> Date:   Fri Feb 15 10:00:46 2019 +0000
+> 
+>     target/ppc: convert VSX logical operations to vector operations
+> 
+>     Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>     Acked-by: David Gibson <david@gibson.dropbear.id.au>
+>     Message-Id: <20190215100058.20015-6-mark.cave-ayland@ilande.co.uk>
+>     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> 
+> :040000 040000 da3024ad2c9dfc3b7170516a8b321ef8c5d5bdf8 
+> a0257b9f5880ecc8e7001a59ccaa10407084623f M      target
+> 
+> 
+> guest@slax:/dev/shm/qemu$ git bisect log
+> git bisect start
+> # good: [32a1a94dd324d33578dca1dc96d7896a0244d768] Update version for v3.1.0 
+> release
+> git bisect good 32a1a94dd324d33578dca1dc96d7896a0244d768
+> # bad: [86c7e2f4a93322a76afea5ee6806a83420d1dfea] Merge remote-tracking 
+> branch 'remotes/berrange/tags/authz-core-pull-request' into staging
+> git bisect bad 86c7e2f4a93322a76afea5ee6806a83420d1dfea
+> # good: [95ebd99dcd37b8574426c876502bfcc7c299584b] target/arm: Decode PAuth 
+> within disas_data_proc_1src
+> git bisect good 95ebd99dcd37b8574426c876502bfcc7c299584b
+> # good: [268dfefa690b2bdee1f8c5090d2343871cf3467c] hw/microblaze/Makefile.objs: 
+> Create configs for petalogix and xilinx boards
+> git bisect good 268dfefa690b2bdee1f8c5090d2343871cf3467c
+> # good: [f5117fd28552fe3fe32ef0495582b1caaef7a28d] hw/mips_cpc: kick a VP when 
+> putting it into Run statewq
+> git bisect good f5117fd28552fe3fe32ef0495582b1caaef7a28d
+> # bad: [2e68b8620637a4ee8c79b5724144b726af1e261b] Merge remote-tracking 
+> branch 'remotes/dgibson/tags/ppc-for-4.0-20190219' into staging
+> git bisect bad 2e68b8620637a4ee8c79b5724144b726af1e261b
+> # good: [4c668f4a3d684ec133a52d936314379f6edd672e] target/ppc: Remove some #if 
+> 0'ed code
+> git bisect good 4c668f4a3d684ec133a52d936314379f6edd672e
+> # bad: [9b5b74da0a07a89ef71c7f7da0b36560a3bac521] target/ppc: Split out VSCR_SAT 
+> to a vector field
+> git bisect bad 9b5b74da0a07a89ef71c7f7da0b36560a3bac521
+> # good: [444d6ca301d97de141a502851940943b09a9ebee] spapr/irq: Use the "simple" 
+> ICS class for KVM
+> git bisect good 444d6ca301d97de141a502851940943b09a9ebee
+> # bad: [9bb0048ec6f8f3bcc144b2c5769d9301e824f946] target/ppc: convert xxspltw to 
+> vector operations
+> git bisect bad 9bb0048ec6f8f3bcc144b2c5769d9301e824f946
+> # good: [471ff3d0257135b938d0a5f2181f22cd753d50de] target/ppc: convert 
+> vspltis[bhw] to use vector operations
+> git bisect good 471ff3d0257135b938d0a5f2181f22cd753d50de
+> # bad: [7b8fe477e12b164dda97f79e27b55b805d90384f] target/ppc: convert VSX 
+> logical operations to vector operations
+> git bisect bad 7b8fe477e12b164dda97f79e27b55b805d90384f
+> # good: [0f6a6d5db853c0cbe438c1831c70710bfb6530ee] target/ppc: convert 
+> vsplt[bhw] to use vector operations
+> git bisect good 0f6a6d5db853c0cbe438c1831c70710bfb6530ee
+> # first bad commit: [7b8fe477e12b164dda97f79e27b55b805d90384f] target/ppc: 
+> convert VSX logical operations to vector operations
+> guest@slax:/dev/shm/qemu$                                                
+> 
+> configure line:
+> setarch i686 ./configure --target-list=ppc64-softmmu             
+> 
+> launch line:
+> ppc64-softmmu/qemu-system-ppc64 -display 
+> sdl,gl=on -hda /mnt/sdb1/PPC-img/alpine_disk.img
+> 
+> where alpine_disk.img is HDD installed Alpine 3.7 for ppc64le with xfce4 
+> desktop.
 
-Right, at the moment all the MacOS driver does is parse the resolution list from the
-EDID and add them to the dropdown list - it doesn't support the xres and yres properties.
+AFAICT the vector instructions converted here are independent of endian, so I can't
+see why this patch on its own would have any effect.
 
-The main reason for this that OpenBIOS currently makes use of the -g XxYxD parameter
-to set up the display resolution and bit depth, and AFAICT we currently only have
-access to the X and Y resolutions via the EDID blob. So it's not clear whether EDID
-can completely replace the existing mechanism yet.
-
-The other issue to contend with is that some machines such as SPARC will reject
-invalid bit depths (i.e. d != 8 || d != 24) during machine init to prevent screen
-corruption, and I'm not yet sure how to enforce this with EDID.
+Maybe it could be because the "setarch i686" part forces use of some lesser-used
+32-bit paths in the vector code - is this required? And do you see the same issue on
+a x86_64 build?
 
 
 ATB,
