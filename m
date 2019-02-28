@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38242)
+Received: from eggs.gnu.org ([209.51.188.92]:53836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danmei.wei@intel.com>) id 1gzBwZ-0006JN-3I
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:01:09 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gzNEI-0001WS-91
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:04:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danmei.wei@intel.com>) id 1gzBwT-0002vk-Ka
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:01:04 -0500
-Received: from mga18.intel.com ([134.134.136.126]:60866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danmei.wei@intel.com>)
-	id 1gzBwL-0001s7-3Y
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:00:57 -0500
-From: "Wei, Danmei" <danmei.wei@intel.com>
-Date: Thu, 28 Feb 2019 03:00:29 +0000
-Message-ID: <38A2C2D0FB356A4785EEFA56D99BFB2B0B718883@SHSMSX101.ccr.corp.intel.com>
-Content-Language: en-US
+	(envelope-from <eric.auger@redhat.com>) id 1gzNEG-0003yS-Vi
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:04:10 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Thu, 28 Feb 2019 16:03:15 +0100
+Message-Id: <20190228150324.25973-2-eric.auger@redhat.com>
+In-Reply-To: <20190228150324.25973-1-eric.auger@redhat.com>
+References: <20190228150324.25973-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Qemu build failure with uninitialized variables when
- "-Wmaybe-uninitialized" is open
+Subject: [Qemu-devel] [PATCH v10 01/10] hw/arm/boot: introduce
+ fdt_add_memory_node helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +22,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Hao, Xudong" <xudong.hao@intel.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-Hi,
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-When we build qemu with "-Wmaybe-uninitialized" on, and got the following e=
-rror information.
-  CC      qobject/json-streamer.o
-  CC      qobject/json-parser.o
-  CC      qobject/block-qdict.o
-qobject/block-qdict.c: In function 'qdict_array_split':
-qobject/block-qdict.c:259:25: error: 'subqdict' may be used uninitialized i=
-n this function [-Werror=3Dmaybe-uninitialized]
-         qlist_append_obj(*dst, subqobj ?: QOBJECT(subqdict));
-                         ^
-cc1: all warnings being treated as errors
-make: *** [qobject/block-qdict.o] Error 1
+We introduce an helper to create a memory node.
 
-It is because of the uninitialized variable subqdict function qdict_array_s=
-plit.
-Thanks to confirm it.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Below is the ENV Setting:
-OS: RHEL OS 7.6
-Qemu Version: commit c102d9471f8f02d9fbea72ec4505d7089173f470
-CFLAGS Setting in env: export CFLAGS=3D"-g -O3 -Wmaybe-uninitialized"
+---
+v7 -> v8:
+- Added Igor's R-b
 
-Thanks,
-               Danmei
+v6 -> v7:
+- msg error in the caller
+- add comment about NUMA ID
+---
+ hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 34 insertions(+), 20 deletions(-)
+
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index d90af2f17d..a830655e1a 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -423,6 +423,32 @@ static void set_kernel_args_old(const struct arm_boo=
+t_info *info,
+     }
+ }
+=20
++static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_ba=
+se,
++                               uint32_t scells, hwaddr mem_len,
++                               int numa_node_id)
++{
++    char *nodename;
++    int ret;
++
++    nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    ret =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, m=
+em_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        goto out;
++    }
++
++    /* only set the NUMA ID if it is specified */
++    if (numa_node_id >=3D 0) {
++        ret =3D qemu_fdt_setprop_cell(fdt, nodename,
++                                    "numa-node-id", numa_node_id);
++    }
++out:
++    g_free(nodename);
++    return ret;
++}
++
+ static void fdt_add_psci_node(void *fdt)
+ {
+     uint32_t cpu_suspend_fn;
+@@ -502,7 +528,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_i=
+nfo *binfo,
+     void *fdt =3D NULL;
+     int size, rc, n =3D 0;
+     uint32_t acells, scells;
+-    char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
+     char **node_path;
+@@ -576,35 +601,24 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot=
+_info *binfo,
+         mem_base =3D binfo->loader_start;
+         for (i =3D 0; i < nb_numa_nodes; i++) {
+             mem_len =3D numa_info[i].node_mem;
+-            nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
+-            qemu_fdt_add_subnode(fdt, nodename);
+-            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memor=
+y");
+-            rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                              acells, mem_base,
+-                                              scells, mem_len);
++            rc =3D fdt_add_memory_node(fdt, acells, mem_base,
++                                     scells, mem_len, i);
+             if (rc < 0) {
+-                fprintf(stderr, "couldn't set %s/reg for node %d\n", nod=
+ename,
+-                        i);
++                fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
++                        mem_base);
+                 goto fail;
+             }
+=20
+-            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+             mem_base +=3D mem_len;
+-            g_free(nodename);
+         }
+     } else {
+-        nodename =3D g_strdup_printf("/memory@%" PRIx64, binfo->loader_s=
+tart);
+-        qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-
+-        rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                          acells, binfo->loader_start,
+-                                          scells, binfo->ram_size);
++        rc =3D fdt_add_memory_node(fdt, acells, binfo->loader_start,
++                                 scells, binfo->ram_size, -1);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set %s reg\n", nodename);
++            fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
++                    binfo->loader_start);
+             goto fail;
+         }
+-        g_free(nodename);
+     }
+=20
+     rc =3D fdt_path_offset(fdt, "/chosen");
+--=20
+2.20.1
