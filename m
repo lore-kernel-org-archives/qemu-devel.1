@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35466)
+Received: from eggs.gnu.org ([209.51.188.92]:36280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1gzJUs-0000N0-6i
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:05:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzJYm-0001Ec-NR
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:09:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1gzJUf-00055a-82
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:04:59 -0500
-Received: from mga03.intel.com ([134.134.136.65]:48482)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1gzJUZ-00050O-SK
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:04:44 -0500
-From: "Kang, Luwei" <luwei.kang@intel.com>
-Date: Thu, 28 Feb 2019 11:04:35 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E172D02803@SHSMSX101.ccr.corp.intel.com>
-References: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
-	<1cd4a3cd-72fc-62ab-a7f9-784c51b89fbf@redhat.com>
-In-Reply-To: <1cd4a3cd-72fc-62ab-a7f9-784c51b89fbf@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gzJYd-0003Ls-C3
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:09:02 -0500
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:53619)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gzJYW-00034N-0n
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:08:50 -0500
+Received: by mail-wm1-x330.google.com with SMTP id e74so8738432wmg.3
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 03:08:47 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id
+	c17sm13153241wrs.17.2019.02.28.03.08.41 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 28 Feb 2019 03:08:44 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 11:08:19 +0000
+Message-Id: <20190228110835.16159-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH V2] i386: extended the cpuid_level when
- Intel PT is enabled
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/16] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8gQm9uemluaSBb
-bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBGZWJydWFyeSAy
-OCwgMjAxOSA3OjAyIFBNDQo+IFRvOiBLYW5nLCBMdXdlaSA8bHV3ZWkua2FuZ0BpbnRlbC5jb20+
-OyBtc3RAcmVkaGF0LmNvbTsgbWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb207IHJ0aEB0d2lkZGxl
-Lm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNvbQ0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+
-IFN1YmplY3Q6IFJlOiBbUEFUQ0ggVjJdIGkzODY6IGV4dGVuZGVkIHRoZSBjcHVpZF9sZXZlbCB3
-aGVuIEludGVsIFBUIGlzIGVuYWJsZWQNCj4gDQo+IE9uIDMwLzAxLzE5IDAwOjUyLCBMdXdlaSBL
-YW5nIHdyb3RlOg0KPiA+IEludGVsIFByb2Nlc3NvciBUcmFjZSByZXF1aXJlZCBDUFVJRFsweDE0
-XSBidXQgdGhlIGNwdWlkX2xldmVsIGhhdmUgbm8NCj4gPiBjaGFuZ2Ugd2hlbiBjcmVhdGUgYSBr
-dm0gZ3Vlc3Qgd2l0aCBlLmcuICItY3B1IHFlbXU2NCwraW50ZWwtcHQiLg0KPiA+DQo+ID4gU2ln
-bmVkLW9mZi1ieTogRWR1YXJkbyBIYWJrb3N0IDxlaGFia29zdEByZWRoYXQuY29tPg0KPiA+IFNp
-Z25lZC1vZmYtYnk6IEx1d2VpIEthbmcgPGx1d2VpLmthbmdAaW50ZWwuY29tPg0KPiA+IC0tLQ0K
-PiA+ICBody9pMzg2L3BjLmMgICAgICB8IDEgKw0KPiA+ICB0YXJnZXQvaTM4Ni9jcHUuYyB8IDkg
-KysrKysrKysrDQo+ID4gIHRhcmdldC9pMzg2L2NwdS5oIHwgMyArKysNCj4gPiAgMyBmaWxlcyBj
-aGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9w
-Yy5jIGIvaHcvaTM4Ni9wYy5jIGluZGV4IDczZDY4OGYuLjcyYTBhNzAgMTAwNjQ0DQo+ID4gLS0t
-IGEvaHcvaTM4Ni9wYy5jDQo+ID4gKysrIGIvaHcvaTM4Ni9wYy5jDQo+ID4gQEAgLTEyMiw2ICsx
-MjIsNyBAQCBHbG9iYWxQcm9wZXJ0eSBwY19jb21wYXRfM18xW10gPSB7DQo+ID4gICAgICB7ICJD
-YXNjYWRlbGFrZS1TZXJ2ZXIiICItIiBUWVBFX1g4Nl9DUFUsICAibXB4IiwgIm9uIiB9LA0KPiA+
-ICAgICAgeyAiSWNlbGFrZS1DbGllbnQiICItIiBUWVBFX1g4Nl9DUFUsICAgICAgIm1weCIsICJv
-biIgfSwNCj4gPiAgICAgIHsgIkljZWxha2UtU2VydmVyIiAiLSIgVFlQRV9YODZfQ1BVLCAgICAg
-ICJtcHgiLCAib24iIH0sDQo+ID4gKyAgICB7IFRZUEVfWDg2X0NQVSwgIngtaW50ZWwtcHQtYXV0
-by1sZXZlbCIsICJvZmYiIH0sDQo+ID4gIH07DQo+ID4gIGNvbnN0IHNpemVfdCBwY19jb21wYXRf
-M18xX2xlbiA9IEdfTl9FTEVNRU5UUyhwY19jb21wYXRfM18xKTsNCj4gPg0KPiA+IGRpZmYgLS1n
-aXQgYS90YXJnZXQvaTM4Ni9jcHUuYyBiL3RhcmdldC9pMzg2L2NwdS5jIGluZGV4DQo+ID4gMmY1
-NDEyNS4uNmRkZGQ5OSAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvaTM4Ni9jcHUuYw0KPiA+ICsr
-KyBiL3RhcmdldC9pMzg2L2NwdS5jDQo+ID4gQEAgLTUwMjMsNiArNTAyMywxMyBAQCBzdGF0aWMg
-dm9pZCB4ODZfY3B1X2V4cGFuZF9mZWF0dXJlcyhYODZDUFUgKmNwdSwgRXJyb3IgKiplcnJwKQ0K
-PiA+ICAgICAgICAgIHg4Nl9jcHVfYWRqdXN0X2ZlYXRfbGV2ZWwoY3B1LCBGRUFUX0MwMDBfMDAw
-MV9FRFgpOw0KPiA+ICAgICAgICAgIHg4Nl9jcHVfYWRqdXN0X2ZlYXRfbGV2ZWwoY3B1LCBGRUFU
-X1NWTSk7DQo+ID4gICAgICAgICAgeDg2X2NwdV9hZGp1c3RfZmVhdF9sZXZlbChjcHUsIEZFQVRf
-WFNBVkUpOw0KPiA+ICsNCj4gPiArICAgICAgICAvKiBJbnRlbCBQcm9jZXNzb3IgVHJhY2UgcmVx
-dWlyZXMgQ1BVSURbMHgxNF0gKi8NCj4gPiArICAgICAgICBpZiAoKGVudi0+ZmVhdHVyZXNbRkVB
-VF83XzBfRUJYXSAmIENQVUlEXzdfMF9FQlhfSU5URUxfUFQpICYmDQo+ID4gKyAgICAgICAgICAg
-ICBrdm1fZW5hYmxlZCgpICYmIGNwdS0+aW50ZWxfcHRfYXV0b19sZXZlbCkgew0KPiA+ICsgICAg
-ICAgICAgICB4ODZfY3B1X2FkanVzdF9sZXZlbChjcHUsICZjcHUtPmVudi5jcHVpZF9taW5fbGV2
-ZWwsIDB4MTQpOw0KPiA+ICsgICAgICAgIH0NCj4gPiArDQo+ID4gICAgICAgICAgLyogU1ZNIHJl
-cXVpcmVzIENQVUlEWzB4ODAwMDAwMEFdICovDQo+ID4gICAgICAgICAgaWYgKGVudi0+ZmVhdHVy
-ZXNbRkVBVF84MDAwXzAwMDFfRUNYXSAmIENQVUlEX0VYVDNfU1ZNKSB7DQo+ID4gICAgICAgICAg
-ICAgIHg4Nl9jcHVfYWRqdXN0X2xldmVsKGNwdSwgJmVudi0+Y3B1aWRfbWluX3hsZXZlbCwNCj4g
-PiAweDgwMDAwMDBBKTsgQEAgLTU4MTYsNiArNTgyMyw4IEBAIHN0YXRpYyBQcm9wZXJ0eSB4ODZf
-Y3B1X3Byb3BlcnRpZXNbXSA9IHsNCj4gPiAgICAgIERFRklORV9QUk9QX0lOVDMyKCJ4LWh2LW1h
-eC12cHMiLCBYODZDUFUsIGh2X21heF92cHMsIC0xKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0JP
-T0woIngtaHYtc3luaWMta3ZtLW9ubHkiLCBYODZDUFUsIGh5cGVydl9zeW5pY19rdm1fb25seSwN
-Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgZmFsc2UpLA0KPiA+ICsgICAgREVGSU5FX1BST1Bf
-Qk9PTCgieC1pbnRlbC1wdC1hdXRvLWxldmVsIiwgWDg2Q1BVLCBpbnRlbF9wdF9hdXRvX2xldmVs
-LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICB0cnVlKSwNCj4gPiAgICAgIERFRklORV9QUk9Q
-X0VORF9PRl9MSVNUKCkNCj4gPiAgfTsNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4
-Ni9jcHUuaCBiL3RhcmdldC9pMzg2L2NwdS5oIGluZGV4DQo+ID4gNTk2NTZhNy4uMDkwYmFhNCAx
-MDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvaTM4Ni9jcHUuaA0KPiA+ICsrKyBiL3RhcmdldC9pMzg2
-L2NwdS5oDQo+ID4gQEAgLTE0NTUsNiArMTQ1NSw5IEBAIHN0cnVjdCBYODZDUFUgew0KPiA+ICAg
-ICAgLyogRW5hYmxlIGF1dG8gbGV2ZWwtaW5jcmVhc2UgZm9yIGFsbCBDUFVJRCBsZWF2ZXMgKi8N
-Cj4gPiAgICAgIGJvb2wgZnVsbF9jcHVpZF9hdXRvX2xldmVsOw0KPiA+DQo+ID4gKyAgICAvKiBF
-bmFibGUgYXV0byBsZXZlbC1pbmNyZWFzZSBmb3IgSW50ZWwgUHJvY2Vzc29yIFRyYWNlIGxlYXZl
-ICovDQo+ID4gKyAgICBib29sIGludGVsX3B0X2F1dG9fbGV2ZWw7DQo+ID4gKw0KPiA+ICAgICAg
-LyogaWYgdHJ1ZSBmaWxsIHRoZSB0b3AgYml0cyBvZiB0aGUgTVRSUl9QSFlTTUFTS24gdmFyaWFi
-bGUgcmFuZ2UgKi8NCj4gPiAgICAgIGJvb2wgZmlsbF9tdHJyX21hc2s7DQo+ID4NCj4gPg0KPiAN
-Cj4gRWR1YXJkbyBpcyBiYWNrLCBidXQgSSd2ZSBxdWV1ZWQgdGhpcyBhbnl3YXkuDQo+IA0KDQpH
-ZXQgaXQuIFRoYW5rcyENCg0KTHV3ZWkgS2FuZw0K
+The following changes since commit adf2e451f357e993f173ba9b4176dbf3e65fee7e:
+
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-02-26 19:04:47 +0000)
+
+are available in the Git repository at:
+
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190228-1
+
+for you to fetch changes up to 1c9af3a9e05c1607a36df4943f8f5393d7621a91:
+
+  linux-user: Enable HWCAP_ASIMDFHM, HWCAP_JSCVT (2019-02-28 11:03:05 +0000)
+
+----------------------------------------------------------------
+target-arm queue:
+ * add MHU and dual-core support to Musca boards
+ * refactor some VFP insns to be gated by ID registers
+ * Revert "arm: Allow system registers for KVM guests to be changed by QEMU code"
+ * Implement ARMv8.2-FHM extension
+ * Advertise JSCVT via HWCAP for linux-user
+
+----------------------------------------------------------------
+Peter Maydell (11):
+      hw/misc/armsse-mhu.c: Model the SSE-200 Message Handling Unit
+      hw/arm/armsse: Wire up the MHUs
+      target/arm/cpu: Allow init-svtor property to be set after realize
+      target/arm/arm-powerctl: Add new arm_set_cpu_on_and_reset()
+      hw/misc/iotkit-sysctl: Correct typo in INITSVTOR0 register name
+      hw/arm/iotkit-sysctl: Add SSE-200 registers
+      hw/arm/iotkit-sysctl: Implement CPUWAIT and INITSVTOR*
+      hw/arm/armsse: Unify init-svtor and cpuwait handling
+      target/arm: Use MVFR1 feature bits to gate A32/T32 FP16 instructions
+      target/arm: Gate "miscellaneous FP" insns by ID register field
+      Revert "arm: Allow system registers for KVM guests to be changed by QEMU code"
+
+Richard Henderson (5):
+      target/arm: Add helpers for FMLAL
+      target/arm: Implement FMLAL and FMLSL for aarch64
+      target/arm: Implement VFMAL and VFMSL for aarch32
+      target/arm: Enable ARMv8.2-FHM for -cpu max
+      linux-user: Enable HWCAP_ASIMDFHM, HWCAP_JSCVT
+
+ hw/misc/Makefile.objs           |   1 +
+ include/hw/arm/armsse.h         |   3 +-
+ include/hw/misc/armsse-mhu.h    |  44 ++++++
+ include/hw/misc/iotkit-sysctl.h |  25 +++-
+ target/arm/arm-powerctl.h       |  16 +++
+ target/arm/cpu.h                |  76 +++++++++--
+ target/arm/helper.h             |   9 ++
+ hw/arm/armsse.c                 |  91 +++++++++----
+ hw/misc/armsse-mhu.c            | 198 +++++++++++++++++++++++++++
+ hw/misc/iotkit-sysctl.c         | 294 ++++++++++++++++++++++++++++++++++++++--
+ linux-user/elfload.c            |   2 +
+ target/arm/arm-powerctl.c       |  56 ++++++++
+ target/arm/cpu.c                |  32 ++++-
+ target/arm/cpu64.c              |   2 +
+ target/arm/helper.c             |  27 +---
+ target/arm/kvm32.c              |  23 +++-
+ target/arm/kvm64.c              |   2 -
+ target/arm/machine.c            |   2 +-
+ target/arm/translate-a64.c      |  49 ++++++-
+ target/arm/translate.c          | 180 ++++++++++++++++--------
+ target/arm/vec_helper.c         | 148 ++++++++++++++++++++
+ MAINTAINERS                     |   2 +
+ default-configs/arm-softmmu.mak |   1 +
+ hw/misc/trace-events            |   4 +
+ 24 files changed, 1139 insertions(+), 148 deletions(-)
+ create mode 100644 include/hw/misc/armsse-mhu.h
+ create mode 100644 hw/misc/armsse-mhu.c
