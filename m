@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34094)
+Received: from eggs.gnu.org ([209.51.188.92]:34304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gzPTD-0000dU-Op
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:27:44 -0500
+	(envelope-from <rth7680@gmail.com>) id 1gzPTH-0000xE-4Z
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:27:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gzPJk-0004FJ-Dq
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:17:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51872)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gzPJb-0004AL-Tt
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:17:49 -0500
-Date: Thu, 28 Feb 2019 14:17:41 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190228171741.GD4925@habkost.net>
-References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+	(envelope-from <rth7680@gmail.com>) id 1gzPHq-0003Fj-20
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:15:59 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-15-david@redhat.com>
+	<c57c068f-1c42-9cba-0f0f-3204f6648d8d@linaro.org>
+	<f11109de-6ba3-5104-71b6-1245c42b282e@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <864f3ba7-3115-c6f8-e018-15425ca67a72@twiddle.net>
+Date: Thu, 28 Feb 2019 09:15:52 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
+In-Reply-To: <f11109de-6ba3-5104-71b6-1245c42b282e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 14/33] s390x/tcg: Implement VECTOR LOAD
+ MULTIPLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, imammedo@redhat.com, pmorel@linux.ibm.com
+To: David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On Mon, Dec 17, 2018 at 10:57:30AM -0500, Tony Krowiak wrote:
-> The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
-> value of the BusState structure with the max_dev value of the BusClass structure
-> to determine whether the maximum number of children has been reached for the
-> bus. The problem is, the max_index field of the BusState structure does not
-> necessarily reflect the number of devices that have been plugged into
-> the bus.
+On 2/28/19 12:36 AM, David Hildenbrand wrote:
+> On 27.02.19 17:02, Richard Henderson wrote:
+>> On 2/26/19 3:38 AM, David Hildenbrand wrote:
+>>> Also fairly easy to implement. One issue we have is that exceptions will
+>>> result in some vectors already being modified. At least handle it
+>>> consistently per vector by using a temporary vector. Good enough for
+>>> now, add a FIXME.
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  target/s390x/insn-data.def      |  2 ++
+>>>  target/s390x/translate_vx.inc.c | 26 ++++++++++++++++++++++++++
+>>>  2 files changed, 28 insertions(+)
+>>
+>> I suppose the fixme is good enough.  For the record, I think you could do the
+>> check with just two loads -- the first and last quadword.  After that, none of
+>> the other loads can fault, and you can store everything else into the
+>> destination vectors as you read them.
 > 
-> Whenever a child device is plugged into the bus, the bus's max_index value is
-> assigned to the child device and then incremented. If the child is subsequently
-> unplugged, the value of the max_index does not change and no longer reflects the
-> number of children.
-> 
-> When the bus's max_index value reaches the maximum number of devices
-> allowed for the bus (i.e., the max_dev field in the BusClass structure),
-> attempts to plug another device will be rejected claiming that the bus is
-> full -- even if the bus is actually empty.
-> 
-> To resolve the problem, a new 'num_children' field is being added to the
-> BusState structure to keep track of the number of children plugged into the
-> bus. It will be incremented when a child is plugged, and decremented when a
-> child is unplugged.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> Aren't such approaches prone to races if other VCPUs invalidate page
+> tables/TLB entries?
 
-Queued on machine-next, thanks!
+No, because...
 
--- 
-Eduardo
+> (or am I messing up things and the MMU of this VCPU won't be touched
+> while in this block and once we touched all applicable pages, it cannot
+> fail anymore?)
+
+Correct.
+
+If vcpu 1 does a global invalidate, the time at which vcpu 2 acknowledges that
+invalidate is somewhat fluid.  VCPU 2 will see an interrupt, exit at a TB
+boundary, and then acknowledge.
+
+VCPU 1 has to wait for the ack before it knows the operation is complete.
+
+Thus no race within any given instruction's execution.
+
+
+r~
