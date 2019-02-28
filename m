@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55843)
+Received: from eggs.gnu.org ([209.51.188.92]:55845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzIom-00012e-Us
+	(envelope-from <bounces@canonical.com>) id 1gzIom-00012f-VR
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzIol-0007Ds-2K
+	(envelope-from <bounces@canonical.com>) id 1gzIok-0007Dm-Ue
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:32 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45136)
+Received: from indium.canonical.com ([91.189.90.7]:44978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gzIok-0007Bt-Mo
+	id 1gzIok-0007BV-L9
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:30 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gzIof-0004at-Ga
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:21:25 +0000
+	id 1gzIod-0004UA-5I
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:21:23 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7877F2E80D1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:21:25 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 233562E80CB
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:21:23 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Feb 2019 10:08:07 -0000
+Date: Thu, 28 Feb 2019 10:04:29 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1815889@bugs.launchpad.net>
 Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
-Message-Id: <155134848761.29514.18248082791145783650.malone@chaenomeles.canonical.com>
+Message-Id: <155134826956.17116.2356163172765945227.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
  signal 31 in __pthread_setaffinity_new()
@@ -39,18 +39,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-@Ubuntu-Desktop Team (now subscribed) - is there a chance we can revert [1]=
- in mesa before it will be released with Disco for now. That would be neede=
-d until an accepted solution throughout the stack of libvirt/qemu/mesa is f=
-ound?
-Otherwise using GL backed qemu graphics will fail as outlined in the bug.
+Thanks Daniel and MarcAndre for chiming in here.
+Atfer thinking more about it I agree to Daniel that actually mesa should ho=
+nor and stick with its affinity assignment.
 
-Once such a cross-package solution to the problem is found we can (if
-needed at all) SRU back the set of changes to all components required.
+For documentation purpose: the solution proposed on the ML is at https://li=
+sts.freedesktop.org/archives/mesa-dev/2019-February/215926.html
+I also added a bug tracker to the fredesktop bug as task.
 
-[1]:
-https://github.com/mesa3d/mesa/commit/d877451b48a59ab0f9a4210fc736f51da5851=
-c9a
+** Also affects: mesa (Ubuntu)
+   Importance: Undecided
+       Status: New
+
+** Also affects: mesa via
+   https://bugs.freedesktop.org/show_bug.cgi?id=3D109695
+   Importance: Unknown
+       Status: Unknown
 
 -- =
 
