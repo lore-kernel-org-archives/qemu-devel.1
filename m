@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45389)
+Received: from eggs.gnu.org ([209.51.188.92]:45385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzMYJ-00028y-EI
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1gzMYJ-00028x-6c
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzMYI-0006lP-1I
+	(envelope-from <bounces@canonical.com>) id 1gzMYH-0006lG-Tj
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41544)
+Received: from indium.canonical.com ([91.189.90.7]:41570)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gzMYH-0006ie-Kn
+	id 1gzMYH-0006il-J9
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:45 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gzMYA-0001ul-Hp
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:20:38 +0000
+	id 1gzMYB-0001uk-0l
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:20:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8600E2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:20:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 03E452E8037
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:20:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Feb 2019 14:12:28 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 14:13:04 -0000
+From: Ross Burton <ross@burtonini.com>
 Reply-To: Bug 1818075 <1818075@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155136199055.29310.6029801353341134939.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155136314928.17731.15025076749935067501.launchpad@soybean.canonical.com>
+Message-Id: <155136318464.16990.15874176797864277292.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1818075] Re: qemu x86 TCG doesn't support AVX
  insns
@@ -39,10 +39,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Summary changed:
+<pm215> my guess is we're doing something unhelpful with the AVX insn,
+and so the guest code which is checking the result and using it as its
+loop condition for the jns is just looping forever
 
-- qemu-user-x86-64 hangs at vcvttsd2si
-+ qemu x86 TCG doesn't support AVX insns
+<rburton> in_asm log just stopped with this as the last line
+<rburton> 0x4000b4ef4a:  79 9e                    jns      0x4000b4eeea
 
 -- =
 
