@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47351)
+Received: from eggs.gnu.org ([209.51.188.92]:47893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1gz9QT-0004df-Jq
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:19:50 -0500
+	(envelope-from <rth7680@gmail.com>) id 1gz9Rj-0005gU-3C
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:21:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1gz9La-0002Qs-89
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:14:49 -0500
-Received: from mga18.intel.com ([134.134.136.126]:50982)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1gz9LT-0008Ka-11
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:14:39 -0500
-From: "Kang, Luwei" <luwei.kang@intel.com>
-Date: Thu, 28 Feb 2019 00:13:54 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E172D01FF9@SHSMSX101.ccr.corp.intel.com>
-References: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
-In-Reply-To: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <rth7680@gmail.com>) id 1gz9Rc-0006F5-4B
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:21:04 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20190227111411.22890-1-david@redhat.com>
+	<20190227111411.22890-3-david@redhat.com>
+	<ec7a9ec1-3d6d-6d19-246c-4f6d41f52ec1@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e1b83ea1-2ae3-e137-90d1-1d6adcc7a3f3@twiddle.net>
+Date: Wed, 27 Feb 2019 16:17:47 -0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH V2] i386: extended the cpuid_level when
- Intel PT is enabled
+In-Reply-To: <ec7a9ec1-3d6d-6d19-246c-4f6d41f52ec1@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/tcg: target/s390: Add test
+ for VECTOR LOAD GR FROM VR ELEMENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+
+On 2/27/19 11:37 AM, David Hildenbrand wrote:
+> #define CHECK_SIGILL(STATEMENT)                  \
+> do {                                             \
+>     if (signal(SIGILL, sig_sigill) == SIG_ERR) { \
+>         check("SIGILL not registered", false);   \
+>     }                                            \
+>     if (setjmp(jmp_env) == 0) {                  \
+>         STATEMENT;                               \
+>         check("SIGILL not triggered", false);    \
+>     }                                            \
+>     if (signal(SIGILL, SIG_DFL) == SIG_ERR) {    \
+>         check("SIGILL not registered", false);   \
+>     }                                            \
+> } while (0)
+> 
+> 
+> However it only works once. During the second signal, QEMU decides to
+> set the default handler.
+> 
+> 1. In a signal handler that signal is blocked. We leave that handler via
+> a longjump. So after the first signal, the signal is blocked.
+
+And this is why we use sigaction not signal.
+
+You can set action.sa_flags |= SA_RESETHAND to avoid needing the explicit reset
+(or leave it clear to avoid the reset action that you are seeing).
+
+You can set action.sa_flags |= SA_NODEFER to avoid having the signal added to
+the signal mask of the thread, to avoid neeing to use sigsetjmp/siglongjmp.  Or
+you can just use sigsetjmp/siglongjmp.  ;-)
 
 
-
-> -----Original Message-----
-> From: Kang, Luwei
-> Sent: Wednesday, January 30, 2019 7:53 AM
-> To: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com; rth@=
-twiddle.net; ehabkost@redhat.com
-> Cc: qemu-devel@nongnu.org; Kang, Luwei <luwei.kang@intel.com>
-> Subject: [PATCH V2] i386: extended the cpuid_level when Intel PT is enabl=
-ed
->=20
-> Intel Processor Trace required CPUID[0x14] but the cpuid_level have no ch=
-ange when create a kvm guest with e.g. "-cpu qemu64,+intel-pt".
-
-Ping.
-
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-> ---
->  hw/i386/pc.c      | 1 +
->  target/i386/cpu.c | 9 +++++++++
->  target/i386/cpu.h | 3 +++
->  3 files changed, 13 insertions(+)
->=20
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c index 73d688f..72a0a70 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -122,6 +122,7 @@ GlobalProperty pc_compat_3_1[] =3D {
->      { "Cascadelake-Server" "-" TYPE_X86_CPU,  "mpx", "on" },
->      { "Icelake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
->      { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
-> +    { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
->  };
->  const size_t pc_compat_3_1_len =3D G_N_ELEMENTS(pc_compat_3_1);
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c index 2f54125..6dddd99=
- 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5023,6 +5023,13 @@ static void x86_cpu_expand_features(X86CPU *cpu, E=
-rror **errp)
->          x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
->          x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
->          x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
-> +
-> +        /* Intel Processor Trace requires CPUID[0x14] */
-> +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
-> +             kvm_enabled() && cpu->intel_pt_auto_level) {
-> +            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-> +        }
-> +
->          /* SVM requires CPUID[0x8000000A] */
->          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
->              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A=
-); @@ -5816,6 +5823,8 @@ static Property x86_cpu_properties[] =3D
-> {
->      DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
->      DEFINE_PROP_BOOL("x-hv-synic-kvm-only", X86CPU, hyperv_synic_kvm_onl=
-y,
->                       false),
-> +    DEFINE_PROP_BOOL("x-intel-pt-auto-level", X86CPU, intel_pt_auto_leve=
-l,
-> +                     true),
->      DEFINE_PROP_END_OF_LIST()
->  };
->=20
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h index 59656a7..090baa4=
- 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1455,6 +1455,9 @@ struct X86CPU {
->      /* Enable auto level-increase for all CPUID leaves */
->      bool full_cpuid_auto_level;
->=20
-> +    /* Enable auto level-increase for Intel Processor Trace leave */
-> +    bool intel_pt_auto_level;
-> +
->      /* if true fill the top bits of the MTRR_PHYSMASKn variable range */
->      bool fill_mtrr_mask;
->=20
-> --
-> 1.8.3.1
+r~
