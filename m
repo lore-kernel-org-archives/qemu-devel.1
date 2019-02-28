@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49230)
+Received: from eggs.gnu.org ([209.51.188.92]:54109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gzTtD-0000RK-E6
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:10:54 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1gzUHg-0004p6-G9
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:36:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gzTtC-0007GO-AI
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:10:51 -0500
-Received: from mail-lj1-x22f.google.com ([2a00:1450:4864:20::22f]:37784)
+	(envelope-from <programmingkidx@gmail.com>) id 1gzUHf-00033V-KX
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:36:08 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36841)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gzTtB-0007FR-Tl
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:10:50 -0500
-Received: by mail-lj1-x22f.google.com with SMTP id a17so18569041ljd.4
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:10:49 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 28 Feb 2019 14:10:33 -0800
-Message-Id: <20190228221033.14484-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PULL v2 00/40] target/xtensa queue
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1gzUHf-00032y-Co
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:36:07 -0500
+Received: by mail-wr1-x442.google.com with SMTP id o17so23790272wrw.3
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:36:07 -0800 (PST)
+MIME-Version: 1.0
+References: <20190225102433.22401-1-peter.maydell@linaro.org>
+	<20190225102433.22401-8-peter.maydell@linaro.org>
+In-Reply-To: <20190225102433.22401-8-peter.maydell@linaro.org>
+From: G 3 <programmingkidx@gmail.com>
+Date: Thu, 28 Feb 2019 17:35:54 -0500
+Message-ID: <CAKyx-3No8BYeijyDrUHLOJsL7bRM-N-SuJLOkKk3r=8cRWuVug@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] ui/cocoa: Perform UI operations
+ only on the main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,127 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, patches@linaro.org, Roman Bolshakov <r.bolshakv@yadro.com>, BALATON Zoltan <balaton@eik.bme.hu>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
 
-Hi Peter,
+On Mon, Feb 25, 2019 at 5:24 AM Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-please pull the following batch of target/xtensa updates.
-Changes v1->v2:
-- fix build with clang.
+> The OSX Mojave release is more picky about enforcing the Cocoa API
+> restriction that only the main thread may perform UI calls. To
+> accommodate this we need to restructure the Cocoa code:
+>  * the special OSX main() creates a second thread and uses
+>    that to call the vl.c qemu_main(); the original main
+>    thread goes into the OSX event loop
+>  * the refresh, switch and update callbacks asynchronously
+>    tell the main thread to do the necessary work
+>  * the refresh callback no longer does the "get events from the
+>    UI event queue and handle them" loop, since we now use
+>    the stock OSX event loop. Instead our NSApplication sendEvent
+>    method will either deal with them or pass them on to OSX
+>
+> All these things have to be changed in one commit, to avoid
+> breaking bisection.
+>
+> Note that since we use dispatch_get_main_queue(), this bumps
+> our minimum version requirement to OSX 10.10 Yosemite (released
+> in 2014, unsupported by Apple since 2017).
+>
+> I think eliminating support for Macintosh operating systems older than
+10.10 is a mistake. These operating systems may be old but are far from
+useless. They are fully capable of handling QEMU. I do believe that fixing
+support for Mac OS 10.14 and maintaining support for older versions of Mac
+OS is possible. Calling methods and functions on the main thread can be
+done using performSelectorOnMainThread.
 
-The following changes since commit 1c3d45df5e94042d5fb2bb31416072563ab30e49:
-
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-02-04' into staging (2019-02-05 12:46:18 +0000)
-
-are available in the git repository at:
-
-  git://github.com/OSLL/qemu-xtensa.git tags/20190228-xtensa
-
-for you to fetch changes up to de0cebd93089ff2ebf2ebf9d287381eb73cbb9aa:
-
-  tests/tcg/xtensa: add FPU2000 coprocessor tests (2019-02-28 04:43:24 -0800)
-
-----------------------------------------------------------------
-target/xtensa: FLIX support, various fixes and test improvements
-
-- add FLIX (flexible length instructions extension) support;
-- make testsuite runnable on wider range of xtensa cores;
-- add floating point opcode tests;
-- don't add duplicate 'static' in import_core.sh script;
-- fix undefined opcodes detection in test_mmuhifi_c3 overlay.
-
-----------------------------------------------------------------
-Max Filippov (40):
-      target/xtensa/import_core.sh: don't add duplicate 'static'
-      target/xtensa: don't specify windowed registers manually
-      target/xtensa: get rid of gen_callw[i]
-      target/xtensa: fixup test_mmuhifi_c3 overlay
-      target/xtensa: move xtensa_finalize_config to xtensa_core_class_init
-      target/xtensa: don't require opcode table sorting
-      target/xtensa: allow multiple names for single opcode
-      target/xtensa: implement wide branches and loops
-      target/xtensa: sort FLIX instruction opcodes
-      target/xtensa: add generic instruction post-processing
-      target/xtensa: move WINDOW_BASE SR update to postprocessing
-      target/xtensa: only rotate window in the retw helper
-      target/xtensa: reorganize register handling in translators
-      target/xtensa: reorganize access to MAC16 registers
-      target/xtensa: reorganize access to boolean registers
-      target/xtensa: break circular register dependencies
-      target/xtensa: prioritize load/store in FLIX bundles
-      target/xtensa: implement PREFCTL SR
-      tests/tcg/xtensa: indicate failed tests
-      tests/tcg/xtensa: support configurations w/o vecbase
-      tests/tcg/xtensa: support configs with LITBASE
-      tests/tcg/xtensa: don't use optional opcodes in generic code
-      tests/tcg/xtensa: fix endianness issues in test_b
-      tests/tcg/xtensa: enable boolean tests
-      tests/tcg/xtensa: conditionalize debug option tests
-      tests/tcg/xtensa: conditionalize cache option tests
-      tests/tcg/xtensa: add straightforward conditionals
-      tests/tcg/xtensa: conditionalize interrupt tests
-      tests/tcg/xtensa: conditionalize timer/CCOUNT tests
-      tests/tcg/xtensa: conditionalize and expand SR tests
-      tests/tcg/xtensa: fix SR tests for big endian configs
-      tests/tcg/xtensa: conditionalize and fix s32c1i tests
-      tests/tcg/xtensa: conditionalize windowed register tests
-      tests/tcg/xtensa: conditionalize MMU-related tests
-      tests/tcg/xtensa: add test for FLIX
-      tests/tcg/xtensa: add LSCI/LSCX group tests
-      tests/tcg/xtensa: add FP0 group arithmetic tests
-      tests/tcg/xtensa: add FP0 group conversion tests
-      tests/tcg/xtensa: add FP1 group tests
-      tests/tcg/xtensa: add FPU2000 coprocessor tests
-
- .../core-test_mmuhifi_c3/xtensa-modules.inc.c      | 1322 ++++++------
- target/xtensa/cpu.h                                |   40 +-
- target/xtensa/helper.c                             |   94 +-
- target/xtensa/helper.h                             |    5 +-
- target/xtensa/import_core.sh                       |    2 +-
- target/xtensa/overlay_tool.h                       |    1 -
- target/xtensa/translate.c                          | 2114 ++++++++++----------
- target/xtensa/win_helper.c                         |   22 +-
- tests/tcg/xtensa/Makefile                          |   13 +-
- tests/tcg/xtensa/linker.ld.S                       |   67 +-
- tests/tcg/xtensa/macros.inc                        |   41 +-
- tests/tcg/xtensa/test_b.S                          |   40 +-
- tests/tcg/xtensa/test_boolean.S                    |    4 +
- tests/tcg/xtensa/test_break.S                      |   27 +-
- tests/tcg/xtensa/test_cache.S                      |   62 +-
- tests/tcg/xtensa/test_clamps.S                     |    4 +
- tests/tcg/xtensa/test_flix.S                       |   60 +
- tests/tcg/xtensa/test_fp0_arith.S                  |  173 ++
- tests/tcg/xtensa/test_fp0_conv.S                   |  304 +++
- tests/tcg/xtensa/test_fp1.S                        |  141 ++
- tests/tcg/xtensa/test_fp_cpenable.S                |   27 +
- tests/tcg/xtensa/test_interrupt.S                  |   88 +-
- tests/tcg/xtensa/test_loop.S                       |    4 +
- tests/tcg/xtensa/test_lsc.S                        |  122 ++
- tests/tcg/xtensa/test_mac16.S                      |    4 +
- tests/tcg/xtensa/test_max.S                        |    4 +
- tests/tcg/xtensa/test_min.S                        |    4 +
- tests/tcg/xtensa/test_mmu.S                        |    4 +
- tests/tcg/xtensa/test_mul16.S                      |    4 +
- tests/tcg/xtensa/test_mul32.S                      |    4 +
- tests/tcg/xtensa/test_nsa.S                        |    4 +
- tests/tcg/xtensa/test_phys_mem.S                   |    4 +
- tests/tcg/xtensa/test_quo.S                        |    4 +
- tests/tcg/xtensa/test_rem.S                        |    4 +
- tests/tcg/xtensa/test_rst0.S                       |    8 +
- tests/tcg/xtensa/test_s32c1i.S                     |   12 +
- tests/tcg/xtensa/test_sext.S                       |    4 +
- tests/tcg/xtensa/test_sr.S                         |  153 +-
- tests/tcg/xtensa/test_timer.S                      |   48 +-
- tests/tcg/xtensa/test_windowed.S                   |   32 +-
- tests/tcg/xtensa/vectors.S                         |   14 +-
- 41 files changed, 3251 insertions(+), 1837 deletions(-)
- create mode 100644 tests/tcg/xtensa/test_flix.S
- create mode 100644 tests/tcg/xtensa/test_fp0_arith.S
- create mode 100644 tests/tcg/xtensa/test_fp0_conv.S
- create mode 100644 tests/tcg/xtensa/test_fp1.S
- create mode 100644 tests/tcg/xtensa/test_fp_cpenable.S
- create mode 100644 tests/tcg/xtensa/test_lsc.S
-
-Thanks.
--- Max
+Thank you.
