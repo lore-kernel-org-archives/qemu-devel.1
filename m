@@ -1,23 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46649)
+Received: from eggs.gnu.org ([209.51.188.92]:47210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gzCnt-00044F-Ni
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:56:14 -0500
+	(envelope-from <mark.kanda@oracle.com>) id 1gzCqq-0006aJ-BB
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:59:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gzCns-0005nM-Bg
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:56:13 -0500
-Date: Thu, 28 Feb 2019 14:50:56 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190228035056.GC27799@umbus.fritz.box>
-References: <20190227043008.12059-1-sjitindarsingh@gmail.com>
-	<20190227061611.GB6872@umbus.fritz.box>
-	<1551309360.2210.16.camel@gmail.com>
+	(envelope-from <mark.kanda@oracle.com>) id 1gzCqn-0000qM-JQ
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:59:14 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:45382)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.kanda@oracle.com>)
+	id 1gzCqn-0000Ov-8O
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:59:13 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1S3wowK186842
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 03:58:50 GMT
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+	by userp2130.oracle.com with ESMTP id 2qtwkuemgx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 03:58:50 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x1S3wnPA005119
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK) for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 03:58:50 GMT
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x1S3wnmf024371
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 03:58:49 GMT
+References: <b83ee802-1f9a-f379-f1bf-4e13bfd8a94f@oracle.com>
+From: Mark Kanda <mark.kanda@oracle.com>
+Message-ID: <9d62856a-0148-d3a2-6401-c8ff29b71ed3@oracle.com>
+Date: Wed, 27 Feb 2019 21:58:48 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XWOWbaMNXpFDWE00"
-Content-Disposition: inline
-In-Reply-To: <1551309360.2210.16.camel@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH v2 1/4] target/ppc/spapr: Add
- SPAPR_CAP_LARGE_DECREMENTER
+In-Reply-To: <b83ee802-1f9a-f379-f1bf-4e13bfd8a94f@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Nested SVM only enabled (by default) in
+ pc-i440fx-2.1?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +44,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-
---XWOWbaMNXpFDWE00
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Feb 28, 2019 at 10:16:00AM +1100, Suraj Jitindar Singh wrote:
-> On Wed, 2019-02-27 at 17:16 +1100, David Gibson wrote:
-> > On Wed, Feb 27, 2019 at 03:30:05PM +1100, Suraj Jitindar Singh wrote:
-> > > Add spapr_cap SPAPR_CAP_LARGE_DECREMENTER to be used to control the
-> > > availability of the large decrementer for a guest.
-> > >=20
-> > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> >=20
-> > This series looks good now, except for one nit...
-> >=20
-> > > ---
-> > >  hw/ppc/spapr.c         |  2 ++
-> > >  hw/ppc/spapr_caps.c    | 17 +++++++++++++++++
-> > >  include/hw/ppc/spapr.h |  5 ++++-
-> > >  3 files changed, 23 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index b6a571b6f1..acf62a2b9f 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2077,6 +2077,7 @@ static const VMStateDescription vmstate_spapr
-> > > =3D {
-> > >          &vmstate_spapr_irq_map,
-> > >          &vmstate_spapr_cap_nested_kvm_hv,
-> > >          &vmstate_spapr_dtb,
-> > > +        &vmstate_spapr_cap_large_decr,
-> > >          NULL
-> > >      }
-> > >  };
-> > > @@ -4288,6 +4289,7 @@ static void
-> > > spapr_machine_class_init(ObjectClass *oc, void *data)
-> > >      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-> > >      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /*
-> > > 64kiB */
-> > >      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D
-> > > SPAPR_CAP_OFF;
-> > > +    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D 0;
-> >=20
-> > ... since this is now a boolean, it should use SPAPR_CAP_OFF /
-> > SPAPR_CAP_ON instead of bare 0 and 1.
+On 2/27/2019 4:05 PM, Mark Kanda wrote:
+> Hi all,
 >=20
-> True, do you want me to fix-up and resend? Or can you fix it when you
-> apply?
+> I noticed nested SVM is enabled only in pc-i440fx-2.1 (default is=20
+> disabled); this was added when 2.1 was the latest:
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A075d373ef97 ("target-i386: Disable SVM by defau=
+lt in KVM mode")
+>=20
+> However, this change was not carried forward to newer machine types. Is=
+=20
+> this an oversight? Is there a reason we (still) need SVM disabled by=20
+> default?
 
-Fix and resend, please.
+To clarify, it's my understanding the above patch was added to disable=20
+nested SVM in pc-i440fx-2.2 (and future) machine types due to stability=20
+issues (while keeping it enabled in pc-i440fx-2.1 and previous machine=20
+types).
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+I'm wondering if nested SVM is now mature enough to remove this=20
+restriction and enable it by default (at least on recent machine types).
 
---XWOWbaMNXpFDWE00
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx3WqAACgkQbDjKyiDZ
-s5JkhxAAvLhhjobCD/ULKQw3+sPaUNSYrX1FEcAQ+2Je9L2RsHjaVCNDxy/GqUK1
-b0FsL2QBDz2TZhUlb1RORrOxyGZjTafMf7yWNody+K4od7skUc2uO2MTI8rwSOfC
-4AW3SilrHiDUVneTRcyKdc+Dac1KgFcm1iP8iod6LNyVVrnbAv+i3BX9BJisuk2M
-I71ZEvAlxeiyc2BDa5+lfBJrKBpZttjTv+b2Rs8D8GT5++gLA89tYMhaMjDUKaen
-eTkGiajL2xBkplzm0jMLeE55G03NQyX4W0ui1+gxOHI9A4rkvIPUTxV2sWcaTnzy
-u7pkLyqUD7a+hC3opEtR7ZkzUSDnGYV76ecxfg9Jb3qR0x1Ebsq6aR89/WX74AUt
-Has1YXJg6nuwLbppDrSUenpUORc3zstpza1pn4t8dtNswuZV2zWsa8VZ5tvJvrL8
-6L5cRamipP3sADgWSQwhdnEmcz/ja2Wn1mF2urTea3IedZbXQ+UA2j7BSkGpgCp6
-FhW0BHecFJkyAkdPWK5XQ9hvHwarC5qVJfpFbU0acLSAq1estkg3O1Sr1CcB/m68
-YcD6wgtltgQipv9sehVNOlKxsdoBx07ofllYuSz6rodfEOIzgWG584mnAa7PZ4Zc
-+ZGgrQoCjnrYLrv8DtWygxR6rAnD6IlJO36WmS9SgkaPZSB6g04=
-=5pXl
------END PGP SIGNATURE-----
-
---XWOWbaMNXpFDWE00--
+Thanks/regards,
+-Mark
