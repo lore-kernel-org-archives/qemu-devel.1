@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55845)
+Received: from eggs.gnu.org ([209.51.188.92]:55898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzIom-00012f-VR
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:34 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gzIoy-00018b-Iv
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzIok-0007Dm-Ue
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:32 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44978)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gzIok-0007BV-L9
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:30 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gzIod-0004UA-5I
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:21:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 233562E80CB
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:21:23 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gzIox-0007I9-5P
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:44 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 28 Feb 2019 10:21:13 +0000
+Message-ID: <13ed7c02-3a2a-a3c6-f66c-2e4a30aef175@virtuozzo.com>
+References: <20190223002209.23084-1-jsnow@redhat.com>
+	<20190223002209.23084-5-jsnow@redhat.com>
+	<342d8ae7-d15b-cdd4-f03c-6286f92354af@virtuozzo.com>
+	<1747ac32-4862-020d-509e-8ea655ab1771@redhat.com>
+In-Reply-To: <1747ac32-4862-020d-509e-8ea655ab1771@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Feb 2019 10:04:29 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1815889@bugs.launchpad.net>
-Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
-Message-Id: <155134826956.17116.2356163172765945227.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
- signal 31 in __pthread_setaffinity_new()
+Content-ID: <CCD383BDF556FD4882C77DE70A82DA71@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] block/dirty-bitmaps: implement
+ inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,88 +28,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
 
-Thanks Daniel and MarcAndre for chiming in here.
-Atfer thinking more about it I agree to Daniel that actually mesa should ho=
-nor and stick with its affinity assignment.
-
-For documentation purpose: the solution proposed on the ML is at https://li=
-sts.freedesktop.org/archives/mesa-dev/2019-February/215926.html
-I also added a bug tracker to the fredesktop bug as task.
-
-** Also affects: mesa (Ubuntu)
-   Importance: Undecided
-       Status: New
-
-** Also affects: mesa via
-   https://bugs.freedesktop.org/show_bug.cgi?id=3D109695
-   Importance: Unknown
-       Status: Unknown
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815889
-
-Title:
-  qemu-system-x86_64 crashed with signal 31 in
-  __pthread_setaffinity_new()
-
-Status in Mesa:
-  Unknown
-Status in QEMU:
-  New
-Status in mesa package in Ubuntu:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  Unable to launch Default Fedora 29 images in gnome-boxes
-
-  ProblemType: Crash
-  DistroRelease: Ubuntu 19.04
-  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
-  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
-  Uname: Linux 4.19.0-12-generic x86_64
-  ApportVersion: 2.20.10-0ubuntu20
-  Architecture: amd64
-  Date: Thu Feb 14 11:00:45 2019
-  ExecutablePath: /usr/bin/qemu-system-x86_64
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: Dell Inc. Precision T3610
-  ProcEnviron: PATH=3D(custom, user)
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
-ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
-  Signal: 31
-  SourcePackage: qemu
-  StacktraceTop:
-   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
-t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
-   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
-   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
-   start_thread (arg=3D<optimized out>) at pthread_create.c:486
-   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
-_new()
-  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
-  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
-  dmi.bios.date: 11/14/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: A18
-  dmi.board.name: 09M8Y8
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A01
-  dmi.chassis.type: 7
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
-T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
-  dmi.product.name: Precision T3610
-  dmi.product.sku: 05D2
-  dmi.product.version: 00
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/mesa/+bug/1815889/+subscriptions
+MjguMDIuMjAxOSAyOjQ4LCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gMi8yNS8xOSAx
+MToyMSBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIzLjAyLjIw
+MTkgMzoyMiwgSm9obiBTbm93IHdyb3RlOg0KPj4+IFNldCB0aGUgaW5jb25zaXN0ZW50IGJpdCBv
+biBsb2FkIGluc3RlYWQgb2YgcmVqZWN0aW5nIHN1Y2ggYml0bWFwcy4NCj4+PiBUaGVyZSBpcyBu
+byB3YXkgdG8gdW4tc2V0IGl0OyB0aGUgb25seSBvcHRpb24gaXMgdG8gZGVsZXRlIGl0Lg0KPj4+
+DQo+Pj4gT2J2ZXJ2YXRpb25zOg0KPj4+IC0gYml0bWFwIGxvYWRpbmcgZG9lcyBub3QgbmVlZCB0
+byB1cGRhdGUgdGhlIGhlYWRlciBmb3IgaW5fdXNlIGJpdG1hcHMuDQo+Pj4gLSBpbmNvbnNpc3Rl
+bnQgYml0bWFwcyBkb24ndCBuZWVkIHRvIGhhdmUgdGhlaXIgZGF0YSBsb2FkZWQ7IHRoZXkncmUN
+Cj4+PiAgICAgZ2xvcmlmaWVkIGNvcnJ1cHRpb24gc2VudGluZWxzLg0KPj4+IC0gYml0bWFwIHNh
+dmluZyBkb2VzIG5vdCBuZWVkIHRvIHNhdmUgaW5jb25zaXN0ZW50IGJpdG1hcHMgYmFjayB0byBk
+aXNrLg0KPj4+IC0gYml0bWFwIHJlb3BlbmluZyBET0VTIG5lZWQgdG8gZHJvcCB0aGUgcmVhZG9u
+bHkgZmxhZyBmcm9tIGluY29uc2lzdGVudA0KPj4+ICAgICBiaXRtYXBzIHRvIGFsbG93IHJlb3Bl
+bmluZyBvZiBxY293MiBmaWxlcyB3aXRoIG5vbi1xZW11LW93bmVkIGJpdG1hcHMNCj4+PiAgICAg
+YmVpbmcgZXZlbnR1YWxseSBmbHVzaGVkIGJhY2sgdG8gZGlzay4NCj4+Pg0KPj4+IFNpZ25lZC1v
+ZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCj4+PiAtLS0NCj4+PiAgICBibG9j
+ay9xY293Mi1iaXRtYXAuYyB8IDc3ICsrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tDQo+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDQwIGluc2VydGlvbnMoKyksIDM3IGRl
+bGV0aW9ucygtKQ0KPj4+DQo+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jIGIv
+YmxvY2svcWNvdzItYml0bWFwLmMNCj4+PiBpbmRleCAzZWU1MjRkYTRiLi5kMWNjMTFkYTg4IDEw
+MDY0NA0KPj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jDQo+Pj4gKysrIGIvYmxvY2svcWNv
+dzItYml0bWFwLmMNCj4+PiBAQCAtMzQzLDkgKzM0MywxNSBAQCBzdGF0aWMgQmRydkRpcnR5Qml0
+bWFwICpsb2FkX2JpdG1hcChCbG9ja0RyaXZlclN0YXRlICpicywNCj4+PiAgICAgICAgdWludDMy
+X3QgZ3JhbnVsYXJpdHk7DQo+Pj4gICAgICAgIEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwID0gTlVM
+TDsNCj4+PiAgICANCj4+PiArICAgIGdyYW51bGFyaXR5ID0gMVUgPDwgYm0tPmdyYW51bGFyaXR5
+X2JpdHM7DQo+Pj4gKyAgICBiaXRtYXAgPSBiZHJ2X2NyZWF0ZV9kaXJ0eV9iaXRtYXAoYnMsIGdy
+YW51bGFyaXR5LCBibS0+bmFtZSwgZXJycCk7DQo+Pj4gKyAgICBpZiAoYml0bWFwID09IE5VTEwp
+IHsNCj4+PiArICAgICAgICBnb3RvIGZhaWw7DQo+Pj4gKyAgICB9DQo+Pj4gKw0KPj4+ICAgICAg
+ICBpZiAoYm0tPmZsYWdzICYgQk1FX0ZMQUdfSU5fVVNFKSB7DQo+Pj4gLSAgICAgICAgZXJyb3Jf
+c2V0ZyhlcnJwLCAiQml0bWFwICclcycgaXMgaW4gdXNlIiwgYm0tPm5hbWUpOw0KPj4+IC0gICAg
+ICAgIGdvdG8gZmFpbDsNCj4+PiArICAgICAgICAvKiBEYXRhIGlzIHVudXNhYmxlLCBza2lwIGxv
+YWRpbmcgaXQgKi8NCj4+PiArICAgICAgICByZXR1cm4gYml0bWFwOw0KPj4+ICAgICAgICB9DQo+
+Pj4gICAgDQo+Pj4gICAgICAgIHJldCA9IGJpdG1hcF90YWJsZV9sb2FkKGJzLCAmYm0tPnRhYmxl
+LCAmYml0bWFwX3RhYmxlKTsNCj4+PiBAQCAtMzU2LDEyICszNjIsNiBAQCBzdGF0aWMgQmRydkRp
+cnR5Qml0bWFwICpsb2FkX2JpdG1hcChCbG9ja0RyaXZlclN0YXRlICpicywNCj4+PiAgICAgICAg
+ICAgIGdvdG8gZmFpbDsNCj4+PiAgICAgICAgfQ0KPj4+ICAgIA0KPj4+IC0gICAgZ3JhbnVsYXJp
+dHkgPSAxVSA8PCBibS0+Z3JhbnVsYXJpdHlfYml0czsNCj4+PiAtICAgIGJpdG1hcCA9IGJkcnZf
+Y3JlYXRlX2RpcnR5X2JpdG1hcChicywgZ3JhbnVsYXJpdHksIGJtLT5uYW1lLCBlcnJwKTsNCj4+
+PiAtICAgIGlmIChiaXRtYXAgPT0gTlVMTCkgew0KPj4+IC0gICAgICAgIGdvdG8gZmFpbDsNCj4+
+PiAtICAgIH0NCj4+PiAtDQo+Pj4gICAgICAgIHJldCA9IGxvYWRfYml0bWFwX2RhdGEoYnMsIGJp
+dG1hcF90YWJsZSwgYm0tPnRhYmxlLnNpemUsIGJpdG1hcCk7DQo+Pj4gICAgICAgIGlmIChyZXQg
+PCAwKSB7DQo+Pj4gICAgICAgICAgICBlcnJvcl9zZXRnX2Vycm5vKGVycnAsIC1yZXQsICJDb3Vs
+ZCBub3QgcmVhZCBiaXRtYXAgJyVzJyBmcm9tIGltYWdlIiwNCj4+PiBAQCAtOTQ5LDYgKzk0OSw3
+IEBAIGJvb2wgcWNvdzJfbG9hZF9kaXJ0eV9iaXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBF
+cnJvciAqKmVycnApDQo+Pj4gICAgICAgIFFjb3cyQml0bWFwICpibTsNCj4+PiAgICAgICAgR1NM
+aXN0ICpjcmVhdGVkX2RpcnR5X2JpdG1hcHMgPSBOVUxMOw0KPj4+ICAgICAgICBib29sIGhlYWRl
+cl91cGRhdGVkID0gZmFsc2U7DQo+Pj4gKyAgICBib29sIG5lZWRzX3VwZGF0ZSA9IGZhbHNlOw0K
+Pj4+ICAgIA0KPj4+ICAgICAgICBpZiAocy0+bmJfYml0bWFwcyA9PSAwKSB7DQo+Pj4gICAgICAg
+ICAgICAvKiBObyBiaXRtYXBzIC0gbm90aGluZyB0byBkbyAqLw0KPj4+IEBAIC05NjIsMjMgKzk2
+MywyNyBAQCBib29sIHFjb3cyX2xvYWRfZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpi
+cywgRXJyb3IgKiplcnJwKQ0KPj4+ICAgICAgICB9DQo+Pj4gICAgDQo+Pj4gICAgICAgIFFTSU1Q
+TEVRX0ZPUkVBQ0goYm0sIGJtX2xpc3QsIGVudHJ5KSB7DQo+Pj4gLSAgICAgICAgaWYgKCEoYm0t
+PmZsYWdzICYgQk1FX0ZMQUdfSU5fVVNFKSkgew0KPj4+IC0gICAgICAgICAgICBCZHJ2RGlydHlC
+aXRtYXAgKmJpdG1hcCA9IGxvYWRfYml0bWFwKGJzLCBibSwgZXJycCk7DQo+Pj4gLSAgICAgICAg
+ICAgIGlmIChiaXRtYXAgPT0gTlVMTCkgew0KPj4+IC0gICAgICAgICAgICAgICAgZ290byBmYWls
+Ow0KPj4+IC0gICAgICAgICAgICB9DQo+Pj4gKyAgICAgICAgQmRydkRpcnR5Qml0bWFwICpiaXRt
+YXAgPSBsb2FkX2JpdG1hcChicywgYm0sIGVycnApOw0KPj4+ICsgICAgICAgIGlmIChiaXRtYXAg
+PT0gTlVMTCkgew0KPj4+ICsgICAgICAgICAgICBnb3RvIGZhaWw7DQo+Pj4gKyAgICAgICAgfQ0K
+Pj4+ICAgIA0KPj4+IC0gICAgICAgICAgICBpZiAoIShibS0+ZmxhZ3MgJiBCTUVfRkxBR19BVVRP
+KSkgew0KPj4+IC0gICAgICAgICAgICAgICAgYmRydl9kaXNhYmxlX2RpcnR5X2JpdG1hcChiaXRt
+YXApOw0KPj4+IC0gICAgICAgICAgICB9DQo+Pj4gLSAgICAgICAgICAgIGJkcnZfZGlydHlfYml0
+bWFwX3NldF9wZXJzaXN0YW5jZShiaXRtYXAsIHRydWUpOw0KPj4+ICsgICAgICAgIGlmIChibS0+
+ZmxhZ3MgJiBCTUVfRkxBR19JTl9VU0UpIHsNCj4+PiArICAgICAgICAgICAgYmRydl9kaXJ0eV9i
+aXRtYXBfc2V0X2luY29uc2lzdGVudChiaXRtYXApOw0KPj4+ICsgICAgICAgIH0gZWxzZSB7DQo+
+Pj4gKyAgICAgICAgICAgIC8qIE5COiB1cGRhdGVkIGZsYWdzIG9ubHkgZ2V0IHdyaXR0ZW4gaWYg
+Y2FuX3dyaXRlKGJzKSBpcyB0cnVlLiAqLw0KPj4+ICAgICAgICAgICAgICAgIGJtLT5mbGFncyB8
+PSBCTUVfRkxBR19JTl9VU0U7DQo+Pj4gLSAgICAgICAgICAgIGNyZWF0ZWRfZGlydHlfYml0bWFw
+cyA9DQo+Pj4gLSAgICAgICAgICAgICAgICAgICAgZ19zbGlzdF9hcHBlbmQoY3JlYXRlZF9kaXJ0
+eV9iaXRtYXBzLCBiaXRtYXApOw0KPj4+ICsgICAgICAgICAgICBuZWVkc191cGRhdGUgPSB0cnVl
+Ow0KPj4+ICAgICAgICAgICAgfQ0KPj4+ICsgICAgICAgIGlmICghKGJtLT5mbGFncyAmIEJNRV9G
+TEFHX0FVVE8pKSB7DQo+Pj4gKyAgICAgICAgICAgIGJkcnZfZGlzYWJsZV9kaXJ0eV9iaXRtYXAo
+Yml0bWFwKTsNCj4+PiArICAgICAgICB9DQo+Pj4gKyAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBf
+c2V0X3BlcnNpc3RhbmNlKGJpdG1hcCwgdHJ1ZSk7DQo+Pg0KPj4gV2UgZGVmaW5lIHBlcnNpc3Rl
+bnQgYml0bWFwcyBhcyB3aGljaCB3ZSBhcmUgZ29pbmcgdG8gc3RvcmUuLiBCdXQgd2UgYXJlDQo+
+PiBub3QgZ29pbmcgdG8gc3RvcmUgaW5jb25zaXN0ZW50IGJpdG1hcHMuIFNvIGluY29uc2lzdGVu
+dCBiaXRtYXBzIGFyZSBub3QgcGVyc2lzdGVudC4NCj4+DQo+IA0KPiBJIGNoYW5nZWQgdGhlIHdv
+cmRpbmcgZm9yIHYzLg0KPiANCj4+PiArICAgICAgICBjcmVhdGVkX2RpcnR5X2JpdG1hcHMgPQ0K
+Pj4+ICsgICAgICAgICAgICBnX3NsaXN0X2FwcGVuZChjcmVhdGVkX2RpcnR5X2JpdG1hcHMsIGJp
+dG1hcCk7DQo+Pj4gICAgICAgIH0NCj4+PiAgICANCj4+PiAtICAgIGlmIChjcmVhdGVkX2RpcnR5
+X2JpdG1hcHMgIT0gTlVMTCkgew0KPj4+ICsgICAgaWYgKG5lZWRzX3VwZGF0ZSkgew0KPj4NCj4+
+IGNyZWF0ZWRfZGlydHlfYml0bWFwcyBsaXN0IG5lZWRlZCBvbmx5IGZvciBzZXR0aW5nIHRoZW0g
+cmVhZG9ubHksIGlmIGZhaWxlZCB3cml0ZSB0aGF0DQo+PiB0aGV5IGFyZSBJTl9VU0UuIFNvLCBp
+bnN0ZWFkIG9mIGNyZWF0aW5nIGFkZGl0aW9uYWwgdmFyaWFibGUsIGJldHRlciBpcyBqdXN0IG5v
+dCBpbmNsdWRlDQo+PiBJTl9VU0UgYml0bWFwcyB0byB0aGlzIGxpc3QuIEFuZCBpdCBtYXkgYmUg
+cmVuYW1lZCBsaWtlIHNldF9pbl91c2VfbGlzdC4NCj4+DQo+IA0KPiBJZiBJIGRvbid0IGFkZCB0
+aGVtIHRvIHRoZSBsaXN0LCB0aGVuIG9uZSBvZiB0aGUgYml0bWFwcyBpbiB0aGUgbGlzdA0KPiBm
+YWlscywgSSBkb24ndCBrbm93IHdoaWNoIGJpdG1hcCB0byByZW1vdmUgd2hlbiB3ZSBnbyB0byB0
+aGUgZXJyb3IgZXhpdC4NCg0KDQpPb3BzLCB5b3UgYXJlIHJpZ2h0Lg0KDQo+IA0KPj4+ICAgICAg
+ICAgICAgaWYgKGNhbl93cml0ZShicykpIHsNCj4+PiAgICAgICAgICAgICAgICAvKiBpbl91c2Ug
+ZmxhZ3MgbXVzdCBiZSB1cGRhdGVkICovDQo+Pj4gICAgICAgICAgICAgICAgaW50IHJldCA9IHVw
+ZGF0ZV9leHRfaGVhZGVyX2FuZF9kaXJfaW5fcGxhY2UoYnMsIGJtX2xpc3QpOw0KPj4+IEBAIC0x
+MTEyLDIzICsxMTE3LDIxIEBAIGludCBxY293Ml9yZW9wZW5fYml0bWFwc19yd19oaW50KEJsb2Nr
+RHJpdmVyU3RhdGUgKmJzLCBib29sICpoZWFkZXJfdXBkYXRlZCwNCj4+PiAgICAgICAgfQ0KPj4+
+ICAgIA0KPj4+ICAgICAgICBRU0lNUExFUV9GT1JFQUNIKGJtLCBibV9saXN0LCBlbnRyeSkgew0K
+Pj4+IC0gICAgICAgIGlmICghKGJtLT5mbGFncyAmIEJNRV9GTEFHX0lOX1VTRSkpIHsNCj4+PiAt
+ICAgICAgICAgICAgQmRydkRpcnR5Qml0bWFwICpiaXRtYXAgPSBiZHJ2X2ZpbmRfZGlydHlfYml0
+bWFwKGJzLCBibS0+bmFtZSk7DQo+Pj4gLSAgICAgICAgICAgIGlmIChiaXRtYXAgPT0gTlVMTCkg
+ew0KPj4+IC0gICAgICAgICAgICAgICAgY29udGludWU7DQo+Pj4gLSAgICAgICAgICAgIH0NCj4+
+PiAtDQo+Pj4gLSAgICAgICAgICAgIGlmICghYmRydl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHkoYml0
+bWFwKSkgew0KPj4+IC0gICAgICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQml0bWFwICVz
+IGlzIG5vdCByZWFkb25seSBidXQgbm90IG1hcmtlZCINCj4+PiAtICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIidJTl9VU0UnIGluIHRoZSBpbWFnZS4gU29tZXRoaW5nIHdlbnQgd3Jv
+bmcsIg0KPj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiYWxsIHRoZSBiaXRt
+YXBzIG1heSBiZSBjb3JydXB0ZWQiLCBibS0+bmFtZSk7DQo+Pj4gLSAgICAgICAgICAgICAgICBy
+ZXQgPSAtRUlOVkFMOw0KPj4+IC0gICAgICAgICAgICAgICAgZ290byBvdXQ7DQo+Pj4gLSAgICAg
+ICAgICAgIH0NCj4+PiArICAgICAgICBCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCA9IGJkcnZfZmlu
+ZF9kaXJ0eV9iaXRtYXAoYnMsIGJtLT5uYW1lKTsNCj4+PiArICAgICAgICBpZiAoYml0bWFwID09
+IE5VTEwpIHsNCj4+PiArICAgICAgICAgICAgY29udGludWU7DQo+Pj4gKyAgICAgICAgfQ0KPj4N
+Cj4+PiAgICANCj4+PiAtICAgICAgICAgICAgYm0tPmZsYWdzIHw9IEJNRV9GTEFHX0lOX1VTRTsN
+Cj4+PiAtICAgICAgICAgICAgcm9fZGlydHlfYml0bWFwcyA9IGdfc2xpc3RfYXBwZW5kKHJvX2Rp
+cnR5X2JpdG1hcHMsIGJpdG1hcCk7DQo+Pj4gKyAgICAgICAgaWYgKCFiZHJ2X2RpcnR5X2JpdG1h
+cF9yZWFkb25seShiaXRtYXApKSB7DQo+Pg0KPj4gc28sIHdlJ2xsIGZhaWwsIGFzIHdlIGRpZG4n
+dCBtYXJrZWQgaW5jb25zaXN0ZXRuIGJpdG1hcHMgYXMgcmVhZG9ubHkgYWJvdmUuIFNob3VsZCB3
+ZT8NCj4+IE9yIHdlIG1heSBjaGVjayBoZXJlIGluY29uc2lzdGFuY2UgZGlyZWN0bHkuDQo+Pg0K
+PiANCj4gT0ghIEkgZGlkbid0IG1lYW4gdG8gZG8gdGhpcyAtLSBJIHdhbnQgdG8gbWFyayBhbGwg
+aW5jb25zaXN0ZW50IGJpdG1hcHMNCj4gYXMgcmVhZG9ubHksIHllcy4gSSB3aWxsIGZpeCB0aGlz
+Lg0KPiANCj4+PiArICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQml0bWFwICVzIHdhcyBs
+b2FkZWQgcHJpb3IgdG8gcnctcmVvcGVuLCBidXQgd2FzICINCj4+PiArICAgICAgICAgICAgICAg
+ICAgICAgICAibm90IG1hcmtlZCBhcyByZWFkb25seS4gVGhpcyBpcyBhIGJ1Zywgc29tZXRoaW5n
+IHdlbnQgIg0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICJ3cm9uZy4gQWxsIG9mIHRoZSBi
+aXRtYXBzIG1heSBiZSBjb3JydXB0ZWQiLCBibS0+bmFtZSk7DQo+Pg0KPj4gSG1tLCB5b3VyIHdv
+cmRpbmcgY292ZXJzIGludmFsaWQgY2FzZSB3aGVuIGluY29uc2lzdGVudCBiaXRtYXAgaXMgbm90
+IElOX1VTRSwgYW5kIHNvdW5kcw0KPj4gYmV0dGVyIGZvciB1c2VyLCB0aG91Z2ggbWF5IGJlIGxl
+c3MgcHJlY2lzZSAoYXMgaXQgbWF5IGJlIG5vdCBvbmUgcmVvcGVuIGluIGEgc2VxdWVuY2UuLiku
+DQo+PiBPayBmb3IgbWUuDQo+Pg0KPiANCj4gV2l0aCBhbGwgaW5jb25zaXN0ZW50IGJpdG1hcHMg
+bWFya2VkIGFzIHJlYWRvbmx5LCB0aGlzIHNob3VsZG4ndCBldmVyDQo+IGFjdHVhbGx5IHRyaWdn
+ZXIuIEFsbCBwZXJzaXN0ZW50IGJpdG1hcHMgb24gYSBkcml2ZSB0aGF0IGhpdHMNCj4gcmVvcGVu
+X3J3X2hpbnQgb3VnaHQgdG8gYmUgcmVhZG9ubHksIHJpZ2h0Pw0KDQpub3QgbmVjZXNzYXJ5IEkg
+dGhpbmsuIFNvbWUgYml0bWFwcyBtYXkgYmUgY3JlYXRlZCB0aHJvdWdoIHFtcCBjb21tYW5kLCB0
+aGV5IHdpbGwgbm90IGJlIHJlYWRvbmx5LA0KYXMgdGhleSBhcmUgbm90IGZsdXNoZWQgdG8gc3Rv
+cmFnZS4NCg0KQnV0IGl0IG9mIGNvdXJzZSBkb2Vzbid0IGxlYWQgdG8gdGhhdCBtZXNzYWdlLiBZ
+ZXMgaXQgc2hvdWxkIG5ldmVyIGhhcHBlbiBJIHRoaW5rLCBzbyBpdCBpcyB3b3JkZWQgaW4NCm1h
+bm5lciAiVGhpcyBpcyBhIGJ1ZyIuIE9uIHRoZSBvdGhlciBoYW5kLCBhc3N1bWUgdGhhdCBzb21l
+b25lIGlsbGVnYWxseSBtb2RpZmllcyBpbWFnZSwgd2hpbGUNClFlbXUgaXMgcnVubmluZyBhbmQg
+Y2xlYXIgSU5fVVNFIGJpdC4gSW4gdGhpcyBjYXNlIHdlJ2xsIHNlZSB0aGF0IG1lc3NhZ2UuDQoN
+Cj4gDQo+IFRoYXQncyBteSBhc3N1bXB0aW9uOyB0aGF0IHdlIHNob3VsZCBuZXZlciBzZWUgdGhp
+cyBtZXNzYWdlLg0KPiANCj4+PiArICAgICAgICAgICAgcmV0ID0gLUVJTlZBTDsNCj4+PiArICAg
+ICAgICAgICAgZ290byBvdXQ7DQo+Pj4gICAgICAgICAgICB9DQo+Pj4gKw0KPj4+ICsgICAgICAg
+IGJtLT5mbGFncyB8PSBCTUVfRkxBR19JTl9VU0U7DQo+Pj4gKyAgICAgICAgcm9fZGlydHlfYml0
+bWFwcyA9IGdfc2xpc3RfYXBwZW5kKHJvX2RpcnR5X2JpdG1hcHMsIGJpdG1hcCk7DQo+Pj4gICAg
+ICAgIH0NCj4+PiAgICANCj4+PiAgICAgICAgaWYgKHJvX2RpcnR5X2JpdG1hcHMgIT0gTlVMTCkg
+ew0KPj4+IEBAIC0xNDI0LDggKzE0MjcsOCBAQCB2b2lkIHFjb3cyX3N0b3JlX3BlcnNpc3RlbnRf
+ZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKQ0KPj4+ICAg
+ICAgICAgICAgUWNvdzJCaXRtYXAgKmJtOw0KPj4+ICAgIA0KPj4+ICAgICAgICAgICAgaWYgKCFi
+ZHJ2X2RpcnR5X2JpdG1hcF9nZXRfcGVyc2lzdGFuY2UoYml0bWFwKSB8fA0KPj4+IC0gICAgICAg
+ICAgICBiZHJ2X2RpcnR5X2JpdG1hcF9yZWFkb25seShiaXRtYXApKQ0KPj4+IC0gICAgICAgIHsN
+Cj4+PiArICAgICAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHkoYml0bWFwKSB8fA0K
+Pj4+ICsgICAgICAgICAgICBiZHJ2X2RpcnR5X2JpdG1hcF9pbmNvbnNpc3RlbnQoYml0bWFwKSkg
+ew0KPj4+ICAgICAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4+ICAgICAgICAgICAgfQ0KPj4+ICAg
+IA0KPj4+DQo+Pg0KPj4NCj4gDQo+IFNlbmRpbmcgYSBWMyBmb3IgZnVydGhlciBjcml0aXF1ZSwg
+YnV0IGZyZWV6ZSBpcyBzb29uLg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
+DQo=
