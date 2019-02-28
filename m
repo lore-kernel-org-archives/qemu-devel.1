@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53669)
+Received: from eggs.gnu.org ([209.51.188.92]:55477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzGTA-0001LG-Qc
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 02:51:05 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gzGeI-0004MB-80
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:02:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzGTA-0000PP-0J
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 02:51:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gzGT9-0000HH-MC
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 02:51:03 -0500
-References: <20190228043503.68494-1-aik@ozlabs.ru>
-	<20190228050007.GF27799@umbus.fritz.box>
-	<365a4f56-5f68-9f33-72c2-9d0dc2c7f3c6@redhat.com>
-	<20190228071444.72ku2l7fspjik6do@sirius.home.kraxel.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d595430c-160d-49a1-9b1a-ea6d0f1963ac@redhat.com>
-Date: Thu, 28 Feb 2019 08:50:43 +0100
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gzGeE-0008Bh-GM
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:02:33 -0500
+Received: from mail.uni-paderborn.de ([131.234.142.9]:55764)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1gzGeD-00089k-8D
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:02:30 -0500
+References: <20190228052432.32571-1-richard.henderson@linaro.org>
+	<20190228052432.32571-3-richard.henderson@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <51f75752-5f46-9ee4-1afa-d9eb619aa182@mail.uni-paderborn.de>
+Date: Thu, 28 Feb 2019 09:01:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190228071444.72ku2l7fspjik6do@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20190228052432.32571-3-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] configure: Enable werror for git
- worktrees
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] decodetree: Move documentation to
+ docs/devel/decodetree.rst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: f4bug@amsat.org
 
-On 28/02/2019 08.14, Gerd Hoffmann wrote:
-> On Thu, Feb 28, 2019 at 08:01:53AM +0100, Thomas Huth wrote:
->> On 28/02/2019 06.00, David Gibson wrote:
->>> On Thu, Feb 28, 2019 at 03:35:03PM +1100, Alexey Kardashevskiy wrote:
->>>> The configure script checks multiple times whether it works in a git
->>>> repository and it does this by "test -e "${source_path}/.git" in 4 cases
->>>> but in one case where it tries to enable werror "-d" is used there which
->>>> fails on git worktrees as .git is a file then and not a directory.
->>
->> That confused me. What is a "git worktree" where .git is a file? So far
->> .git was always a directory here...?
-> 
-> git worktree --help
+On 2/28/19 6:24 AM, Richard Henderson wrote:
+> One great big block comment isn't the best way to document
+> the syntax of a language.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>   MAINTAINERS               |   1 +
+>   docs/devel/decodetree.rst | 156 ++++++++++++++++++++++++++++++++++++++
+>   scripts/decodetree.py     | 134 +-------------------------------
+>   3 files changed, 158 insertions(+), 133 deletions(-)
+>   create mode 100644 docs/devel/decodetree.rst
 
-Thanks a lot for the explanation, now it makes sense, indeed.
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Anyway, my local git from RHEL7 is obviously too old for that:
+Cheers,
 
-$ git worktree --help
-No manual entry for gitworktree
-$ git worktree
-git: 'worktree' is not a git command. See 'git --help'.
-$ git --version
-git version 1.8.3.1
-
- Thomas
+Bastian
