@@ -1,32 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42439)
+Received: from eggs.gnu.org ([209.51.188.92]:43054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzMK3-0006RX-1M
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:06:04 -0500
+	(envelope-from <mst@redhat.com>) id 1gzMN2-000784-Kv
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:09:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzMJu-0007o8-AH
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:06:02 -0500
-Date: Thu, 28 Feb 2019 15:05:31 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190228150531.184f5974@redhat.com>
-In-Reply-To: <f9518e2d-0e46-d25f-f9f5-809b21f744aa@redhat.com>
-References: <20190220224003.4420-1-eric.auger@redhat.com>
-	<20190222172742.18c3835a@redhat.com>
-	<c016024e-9f4b-8953-f492-8802675f7e22@redhat.com>
-	<20190225104212.7d40e65e@Igors-MacBook-Pro.local>
-	<70249194-349e-37f6-0e8d-dc50b39082b7@redhat.com>
-	<cd283485-49a9-ddd1-a020-26110ee093be@redhat.com>
-	<20190226175653.6ca2b6c4@Igors-MacBook-Pro.local>
-	<c68ba5a2-0d24-c1ad-c2af-c957768abf9f@redhat.com>
-	<20190227111025.4bb39cc7@redhat.com>
-	<116c5375-0ff4-8f91-ac05-05a53e7fe206@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA8392D6690@lhreml524-mbs.china.huawei.com>
-	<20190227185123.314171ae@redhat.com>
-	<f9518e2d-0e46-d25f-f9f5-809b21f744aa@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1gzMMw-0000cO-Eg
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:09:08 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:40456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gzMMw-0000av-7a
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:09:02 -0500
+Received: by mail-qt1-f195.google.com with SMTP id j36so23563769qta.7
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 06:08:59 -0800 (PST)
+Date: Thu, 28 Feb 2019 09:08:55 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190228090628-mutt-send-email-mst@kernel.org>
+References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
+	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
+	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
+	<20190218113447-mutt-send-email-mst@kernel.org>
+	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
+	<20190218183353-mutt-send-email-mst@kernel.org>
+	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
+	<CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
+	<a5c4b4a1-ea82-f357-e076-ade51ade7ddf@redhat.com>
+	<CAOEp5Ode1Ue0iLD4qUs+tcSGCZ+t+bm1TQpr3UG59jMU9kyVUg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expansion
- and PCDIMM/NVDIMM support
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOEp5Ode1Ue0iLD4qUs+tcSGCZ+t+bm1TQpr3UG59jMU9kyVUg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
+ not enabled by the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,348 +39,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, "david@redhat.com" <david@redhat.com>, Linuxarm <linuxarm@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
 
-On Thu, 28 Feb 2019 08:48:18 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+On Thu, Feb 21, 2019 at 10:18:52AM +0200, Yuri Benditovich wrote:
+> On Thu, Feb 21, 2019 at 8:49 AM Jason Wang <jasowang@redhat.com> wrote:
+> >
+> >
+> > On 2019/2/21 下午2:00, Yuri Benditovich wrote:
+> > > On Tue, Feb 19, 2019 at 8:27 AM Jason Wang <jasowang@redhat.com> wrote:
+> > >>
+> > >> On 2019/2/19 上午7:34, Michael S. Tsirkin wrote:
+> > >>> On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
+> > >>>> On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >>>>> On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
+> > >>>>>> On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> wrote:
+> > >>>>>>> On 2019/2/13 下午10:51, Yuri Benditovich wrote:
+> > >>>>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1608226
+> > >>>>>>>> On startup/link-up in multiqueue configuration the virtio-net
+> > >>>>>>>> tries to starts all the queues, including those that the guest
+> > >>>>>>>> will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
+> > >>>>>>>> If the guest driver does not allocate queues that it will not
+> > >>>>>>>> use (for example, Windows driver does not) and number of actually
+> > >>>>>>>> used queues is less that maximal number supported by the device,
+> > >>>>>>> Is this a requirement of e.g NDIS? If not, could we simply allocate all
+> > >>>>>>> queues in this case. This is usually what normal Linux driver did.
+> > >>>>>>>
+> > >>>>>>>
+> > >>>>>>>> this causes vhost_net_start to fail and actually disables vhost
+> > >>>>>>>> for all the queues, reducing the performance.
+> > >>>>>>>> Current commit fixes this: initially only first queue is started,
+> > >>>>>>>> upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
+> > >>>>>>>> requested by the guest.
+> > >>>>>>>>
+> > >>>>>>>> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> > >>>>>>>> ---
+> > >>>>>>>>     hw/net/virtio-net.c | 7 +++++--
+> > >>>>>>>>     1 file changed, 5 insertions(+), 2 deletions(-)
+> > >>>>>>>>
+> > >>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > >>>>>>>> index 3f319ef723..d3b1ac6d3a 100644
+> > >>>>>>>> --- a/hw/net/virtio-net.c
+> > >>>>>>>> +++ b/hw/net/virtio-net.c
+> > >>>>>>>> @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+> > >>>>>>>>     {
+> > >>>>>>>>         VirtIODevice *vdev = VIRTIO_DEVICE(n);
+> > >>>>>>>>         NetClientState *nc = qemu_get_queue(n->nic);
+> > >>>>>>>> -    int queues = n->multiqueue ? n->max_queues : 1;
+> > >>>>>>>> +    int queues = n->multiqueue ? n->curr_queues : 1;
+> > >>>>>>>>
+> > >>>>>>>>         if (!get_vhost_net(nc->peer)) {
+> > >>>>>>>>             return;
+> > >>>>>>>> @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet *n, uint8_t cmd,
+> > >>>>>>>>             return VIRTIO_NET_ERR;
+> > >>>>>>>>         }
+> > >>>>>>>>
+> > >>>>>>>> -    n->curr_queues = queues;
+> > >>>>>>>>         /* stop the backend before changing the number of queues to avoid handling a
+> > >>>>>>>>          * disabled queue */
+> > >>>>>>>> +    virtio_net_set_status(vdev, 0);
+> > >>>>>>> Any reason for doing this?
+> > >>>>>> I think there are 2 reasons:
+> > >>>>>> 1. The spec does not require guest SW to allocate unused queues.
+> > >>>>>> 2. We spend guest's physical memory to just make vhost happy when it
+> > >>>>>> touches queues that it should not use.
+> > >>>>>>
+> > >>>>>> Thanks,
+> > >>>>>> Yuri Benditovich
+> > >>>>> The spec also says:
+> > >>>>>           queue_enable The driver uses this to selectively prevent the device from executing requests from this
+> > >>>>>           virtqueue. 1 - enabled; 0 - disabled.
+> > >>>>>
+> > >>>>> While this is not a conformance clause this strongly implies that
+> > >>>>> queues which are not enabled are never accessed by device.
+> > >>>>>
+> > >>>>> Yuri I am guessing you are not enabling these unused queues right?
+> > >>>> Of course, we (Windows driver) do not.
+> > >>>> The code of virtio-net passes max_queues to vhost and this causes
+> > >>>> vhost to try accessing all the queues, fail on unused ones and finally
+> > >>>> leave vhost disabled at all.
+> > >>> Jason, at least for 1.0 accessing disabled queues looks like a spec
+> > >>> violation. What do you think?
+> > >>
+> > >> Yes, but there's some issues:
+> > >>
+> > >> - How to detect a disabled queue for 0.9x device? Looks like there's no
+> > >> way according to the spec, so device must assume all queues was enabled.
+> > > Can you please add several words - what is 0.9 device (probably this
+> > > is more about driver) and
+> > > what is the problem with it?
+> >
+> >
+> > It's not a net specific issue. 0.9x device is legacy device defined in
+> > the spec. We don't have a method to disable and enable a specific queue
+> > at that time. Michael said we can assume queue address 0 as disabled,
+> > but there's still a question of how to enable it. Spec is unclear and it
+> > was too late to add thing for legacy device. For 1.0 device we have
+> > queue_enable, but its implementation is incomplete, since it can work
+> > with vhost correctly, we probably need to add thing to make it work.
+> >
+> >
+> > >
+> > >> - For 1.0, if we depends on queue_enable, we should implement the
+> > >> callback for vhost I think. Otherwise it's still buggy.
+> > >>
+> > >> So it looks tricky to enable and disable queues through set status
+> > > If I succeed to modify the patch such a way that it will act only in
+> > > 'target' case,
+> > > i.e. only if some of queueus are not initialized (at time of
+> > > driver_ok), will it be more safe?
+> >
+> >
+> > For 1.0 device, we can fix the queue_enable, but for 0.9x device how do
+> > you enable one specific queue in this case? (setting status?)
+> >
+> 
+> Do I understand correctly that for 0.9 device in some cases the device will
+> receive feature _MQ set, but will not receive VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET?
+> Or the problem is different?
 
-> Hi Igor, Shameer,
->=20
-> On 2/27/19 6:51 PM, Igor Mammedov wrote:
-> > On Wed, 27 Feb 2019 10:41:45 +0000
-> > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
-> >  =20
-> >> Hi Eric,
-> >> =20
-> >>> -----Original Message-----
-> >>> From: Auger Eric [mailto:eric.auger@redhat.com]
-> >>> Sent: 27 February 2019 10:27
-> >>> To: Igor Mammedov <imammedo@redhat.com>
-> >>> Cc: peter.maydell@linaro.org; drjones@redhat.com; david@redhat.com;
-> >>> dgilbert@redhat.com; Shameerali Kolothum Thodi
-> >>> <shameerali.kolothum.thodi@huawei.com>; qemu-devel@nongnu.org;
-> >>> qemu-arm@nongnu.org; eric.auger.pro@gmail.com;
-> >>> david@gibson.dropbear.id.au
-> >>> Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expa=
-nsion
-> >>> and PCDIMM/NVDIMM support
-> >>>
-> >>> Hi Igor, Shameer,
-> >>>
-> >>> On 2/27/19 11:10 AM, Igor Mammedov wrote:   =20
-> >>>> On Tue, 26 Feb 2019 18:53:24 +0100
-> >>>> Auger Eric <eric.auger@redhat.com> wrote:
-> >>>>   =20
-> >>>>> Hi Igor,
-> >>>>>
-> >>>>> On 2/26/19 5:56 PM, Igor Mammedov wrote:   =20
-> >>>>>> On Tue, 26 Feb 2019 14:11:58 +0100
-> >>>>>> Auger Eric <eric.auger@redhat.com> wrote:
-> >>>>>>   =20
-> >>>>>>> Hi Igor,
-> >>>>>>>
-> >>>>>>> On 2/26/19 9:40 AM, Auger Eric wrote:   =20
-> >>>>>>>> Hi Igor,
-> >>>>>>>>
-> >>>>>>>> On 2/25/19 10:42 AM, Igor Mammedov wrote:   =20
-> >>>>>>>>> On Fri, 22 Feb 2019 18:35:26 +0100
-> >>>>>>>>> Auger Eric <eric.auger@redhat.com> wrote:
-> >>>>>>>>>   =20
-> >>>>>>>>>> Hi Igor,
-> >>>>>>>>>>
-> >>>>>>>>>> On 2/22/19 5:27 PM, Igor Mammedov wrote:   =20
-> >>>>>>>>>>> On Wed, 20 Feb 2019 23:39:46 +0100
-> >>>>>>>>>>> Eric Auger <eric.auger@redhat.com> wrote:
-> >>>>>>>>>>>   =20
-> >>>>>>>>>>>> This series aims to bump the 255GB RAM limit in machvirt and=
- to
-> >>>>>>>>>>>> support device memory in general, and especially   =20
-> >>> PCDIMM/NVDIMM.   =20
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> In machvirt versions < 4.0, the initial RAM starts at 1GB an=
-d can
-> >>>>>>>>>>>> grow up to 255GB. From 256GB onwards we find IO regions such=
- as   =20
-> >>> the   =20
-> >>>>>>>>>>>> additional GICv3 RDIST region, high PCIe ECAM region and hig=
-h   =20
-> >>> PCIe   =20
-> >>>>>>>>>>>> MMIO region. The address map was 1TB large. This corresponde=
-d   =20
-> >>> to   =20
-> >>>>>>>>>>>> the max IPA capacity KVM was able to manage.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> Since 4.20, the host kernel is able to support a larger and =
-dynamic
-> >>>>>>>>>>>> IPA range. So the guest physical address can go beyond the 1=
-TB.   =20
-> >>> The   =20
-> >>>>>>>>>>>> max GPA size depends on the host kernel configuration and ph=
-ysical   =20
-> >>> CPUs.   =20
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> In this series we use this feature and allow the RAM to grow=
-   =20
-> >>> without   =20
-> >>>>>>>>>>>> any other limit than the one put by the host kernel.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> The RAM still starts at 1GB. First comes the initial ram (-m=
-) of size
-> >>>>>>>>>>>> ram_size and then comes the device memory (,maxmem) of size
-> >>>>>>>>>>>> maxram_size - ram_size. The device memory is potentially   =
-=20
-> >>> hotpluggable   =20
-> >>>>>>>>>>>> depending on the instantiated memory objects.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> IO regions previously located between 256GB and 1TB are move=
-d   =20
-> >>> after   =20
-> >>>>>>>>>>>> the RAM. Their offset is dynamically computed, depends on   =
-=20
-> >>> ram_size   =20
-> >>>>>>>>>>>> and maxram_size. Size alignment is enforced.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> In case maxmem value is inferior to 255GB, the legacy memory=
-   =20
-> >>> map   =20
-> >>>>>>>>>>>> still is used. The change of memory map becomes effective fr=
-om 4.0
-> >>>>>>>>>>>> onwards.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> As we keep the initial RAM at 1GB base address, we do not ne=
-ed to   =20
-> >>> do   =20
-> >>>>>>>>>>>> invasive changes in the EDK2 FW. It seems nobody is eager to=
- do
-> >>>>>>>>>>>> that job at the moment.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> Device memory being put just after the initial RAM, it is po=
-ssible
-> >>>>>>>>>>>> to get access to this feature while keeping a 1TB address ma=
-p.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> This series reuses/rebases patches initially submitted by Sh=
-ameer
-> >>>>>>>>>>>> in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> Functionally, the series is split into 3 parts:
-> >>>>>>>>>>>> 1) bump of the initial RAM limit [1 - 9] and change in
-> >>>>>>>>>>>>    the memory map   =20
-> >>>>>>>>>>>   =20
-> >>>>>>>>>>>> 2) Support of PC-DIMM [10 - 13]   =20
-> >>>>>>>>>>> Is this part complete ACPI wise (for coldplug)? I haven't not=
-iced
-> >>>>>>>>>>> DSDT AML here no E820 changes, so ACPI wise pc-dimm shouldn't=
- be
-> >>>>>>>>>>> visible to the guest. It might be that DT is masking problem
-> >>>>>>>>>>> but well, that won't work on ACPI only guests.   =20
-> >>>>>>>>>>
-> >>>>>>>>>> guest /proc/meminfo or "lshw -class memory" reflects the amoun=
-t of   =20
-> >>> mem   =20
-> >>>>>>>>>> added with the DIMM slots.   =20
-> >>>>>>>>> Question is how does it get there? Does it come from DT or from=
-   =20
-> >>> firmware   =20
-> >>>>>>>>> via UEFI interfaces?
-> >>>>>>>>>   =20
-> >>>>>>>>>> So it looks fine to me. Isn't E820 a pure x86 matter?   =20
-> >>>>>>>>> sorry for misleading, I've meant is UEFI GetMemoryMap().
-> >>>>>>>>> On x86, I'm wary of adding PC-DIMMs to E802 which then gets exp=
-osed
-> >>>>>>>>> via UEFI GetMemoryMap() as guest kernel might start using it as=
-   =20
-> >>> normal   =20
-> >>>>>>>>> memory early at boot and later put that memory into zone normal=
- and   =20
-> >>> hence   =20
-> >>>>>>>>> make it non-hot-un-pluggable. The same concerns apply to DT bas=
-ed   =20
-> >>> means   =20
-> >>>>>>>>> of discovery.
-> >>>>>>>>> (That's guest issue but it's easy to workaround it not putting =
-  =20
-> >>> hotpluggable   =20
-> >>>>>>>>> memory into UEFI GetMemoryMap() or DT and let DSDT describe it =
-  =20
-> >>> properly)   =20
-> >>>>>>>>> That way memory doesn't get (ab)used by firmware or early boot =
-  =20
-> >>> kernel stages   =20
-> >>>>>>>>> and doesn't get locked up.
-> >>>>>>>>>   =20
-> >>>>>>>>>> What else would you expect in the dsdt?   =20
-> >>>>>>>>> Memory device descriptions, look for code that adds PNP0C80 wit=
-h   =20
-> >>> _CRS   =20
-> >>>>>>>>> describing memory ranges   =20
-> >>>>>>>>
-> >>>>>>>> OK thank you for the explanations. I will work on PNP0C80 additi=
-on then.
-> >>>>>>>> Does it mean that in ACPI mode we must not output DT hotplug mem=
-ory
-> >>>>>>>> nodes or assuming that PNP0C80 is properly described, it will "o=
-verride"
-> >>>>>>>> DT description?   =20
-> >>>>>>>
-> >>>>>>> After further investigations, I think the pieces you pointed out =
-are
-> >>>>>>> added by Shameer's series, ie. through the build_memory_hotplug_a=
-ml()
-> >>>>>>> call. So I suggest we separate the concerns: this series brings s=
-upport
-> >>>>>>> for DIMM coldplug. hotplug, including all the relevant ACPI struc=
-tures
-> >>>>>>> will be added later on by Shameer.   =20
-> >>>>>>
-> >>>>>> Maybe we should not put pc-dimms in DT for this series until it ge=
-ts clear
-> >>>>>> if it doesn't conflict with ACPI in some way.   =20
-> >>>>>
-> >>>>> I guess you mean removing the DT hotpluggable memory nodes only in =
-ACPI
-> >>>>> mode? Otherwise you simply remove the DIMM feature, right?   =20
-> >>>> Something like this so DT won't get in conflict with ACPI.
-> >>>> Only we don't have a switch for it something like, -machine fdt=3Don=
- (with   =20
-> >>> default off)   =20
-> >>>>   =20
-> >>>>> I double checked and if you remove the hotpluggable memory DT nodes=
- in
-> >>>>> ACPI mode:
-> >>>>> - you do not see the PCDIMM slots in guest /proc/meminfo anymore. S=
-o I
-> >>>>> guess you're right, if the DT nodes are available, that memory is
-> >>>>> considered as not unpluggable by the guest.
-> >>>>> - You can see the NVDIMM slots using ndctl list -u. You can mount a=
- DAX
-> >>>>> system.
-> >>>>>
-> >>>>> Hotplug/unplug is clearly not supported by this series and any atte=
-mpt
-> >>>>> results in "memory hotplug is not supported". Is it really an issue=
- if
-> >>>>> the guest does not consider DIMM slots as not hot-unpluggable memor=
-y? I
-> >>>>> am not even sure the guest kernel would support to unplug that memo=
-ry.
-> >>>>>
-> >>>>> In case we want all ACPI tables to be ready for making this memory =
-seen
-> >>>>> as hot-unpluggable we need some Shameer's patches on top of this se=
-ries.   =20
-> >>>> May be we should push for this way (into 4.0), it's just a several p=
-atches
-> >>>> after all or even merge them in your series (I'd guess it would need=
- to be
-> >>>> rebased on top of your latest work)   =20
-> >>>
-> >>> Shameer, would you agree if we merge PATCH 1 of your RFC hotplug seri=
-es
-> >>> (without the reduced hw_reduced_acpi flag) in this series and isolate=
- in
-> >>> a second PATCH the acpi_memory_hotplug_init() + build_memory_hotplug_=
-aml
-> >>> called in virt code?   =20
-> > probably we can do it as transitional step as we need working mmio inte=
-rface
-> > in place for build_memory_hotplug_aml() to work, provided it won't crea=
-te
-> > migration issues (do we need VMSTATE_MEMORY_HOTPLUG for cold-plug case?=
-).
-> >=20
-> > What about dummy initial GED (empty device), that manages mmio region o=
-nly
-> > and then later it will be filled with remaining logic IRQ. In this case=
- mmio region
-> > and vmstate won't change (maybe) so it won't cause ABI or migration iss=
-ues. =20
->=20
->=20
-> >=20
-> >  =20
-> >> Sure, that=E2=80=99s fine with me. So what would you use for the event=
-_handler_method in
-> >> build_memory_hotplug_aml()? GPO0 device? =20
-> >=20
-> > a method name not defined in spec, so it won't be called might do. =20
->=20
-> At this point the event_handler_method, ie. \_SB.GPO0._E02, is not
-> supposed to be called, right? So effectivily we should be able to use
-> any other method name (unlinked to any GPIO/GED). I guess at this stage
-> only the PNP0C80 definition blocks + methods are used.
-pretty much yes.
-=20
-> What still remains fuzzy for me is in case of cold plug the mmio hotplug
-> control region part only is read (despite the slot selection of course)
-> and returns 0 for addr/size and also flags meaning the slot is not
-> enabled.
-If you mean guest reads 0s than it looks broken, could you show
-trace log with mhp_* tracepoints enabled during a dimm hotplug.
+No. For 0.9 it is possible that device adds buffers before DRIVER_OK.
 
-> So despite the slots are advertised as hotpluggable/enabled in
-> the SRAT; I am not sure for the OS it actually makes any difference
-> whether the DSDT definition blocks are described or not.
-SRAT isn't used fro informing guests about amount of present RAM,
-it holds affinity information for present and possible RAM
 
-> To be honest I am afraid this is too late to add those additional
-> features for 4.0 now. This is going to jeopardize the first preliminary
-> part which is the introduction of the new memory map, allowing the
-> expansion of the initial RAM and paving the way for device memory
-> introduction. So I think I am going to resend the first 10 patches in a
-> standalone series. And we can iterate on the PCDIMM/NVDIMM parts
-> independently.
-sounds good to me, I'll try to review 1-10 today=20
-=20
-> Thanks
->=20
-> Eric
-> >=20
-> >  =20
-> >>
-> >> Thanks,
-> >> Shameer
-> >> =20
-> >>> Then would remain the GED/GPIO actual integration.
-> >>>
-> >>> Thanks
-> >>>
-> >>> Eric   =20
-> >>>>   =20
-> >>>>> Also don't DIMM slots already make sense in DT mode. Usually we acc=
-ept
-> >>>>> to add one feature in DT and then in ACPI. For instance we can bene=
-fit   =20
-> >>>> usually it doesn't conflict with each other (at least I'm not aware =
-of it)
-> >>>> but I see a problem with in this case.
-> >>>>   =20
-> >>>>> from nvdimm in dt mode right? So, considering an incremental approa=
-ch I
-> >>>>> would be in favour of keeping the DT nodes.   =20
-> >>>> I'd guess it is the same as for DIMMs, ACPI support for NVDIMMs is m=
-uch
-> >>>> more versatile.
-> >>>>
-> >>>> I consider target application of arm/virt as a board that's used to
-> >>>> run in production generic ACPI capable guest in most use cases and
-> >>>> various DT only guests as secondary ones. It's hard to make
-> >>>> both usecases be happy with defaults (that's probably  one of the
-> >>>> reasons why 'sbsa' board is being added).
-> >>>>
-> >>>> So I'd give priority to ACPI based arm/virt versus DT when defaults =
-are
-> >>>> considered.
-> >>>>   =20
-> >>>>> Thanks
-> >>>>>
-> >>>>> Eric   =20
-> >>>>>>
-> >>>>>>
-> >>>>>>
-> >>>>>>   =20
-> >>>>   =20
-> >=20
-> >  =20
+> > A fundamental question is what prevents you from just initialization all
+> > queues during driver start? It looks to me this save lots of efforts
+> > than allocating queue dynamically.
+> >
+> 
+> This is not so trivial in Windows driver, as it does not have objects for queues
+> that it does not use. Linux driver first of all allocates all the
+> queues and then
+> adds Rx/Tx to those it will use. Windows driver first decides how many queues
+> it will use then allocates objects for them and initializes them from zero to
+> fully functional state.
+> 
+> > Thanks
+> >
+> >
+> > >
+> > >> Thanks
+> > >>
+> > >>
+> > >>>>>
+> > >>>>>>> Thanks
+> > >>>>>>>
+> > >>>>>>>
+> > >>>>>>>> +
+> > >>>>>>>> +    n->curr_queues = queues;
+> > >>>>>>>> +
+> > >>>>>>>>         virtio_net_set_status(vdev, vdev->status);
+> > >>>>>>>>         virtio_net_set_queues(n);
+> > >>>>>>>>
