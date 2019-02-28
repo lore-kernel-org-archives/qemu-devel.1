@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40857)
+Received: from eggs.gnu.org ([209.51.188.92]:41332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gzO8o-0007tW-SZ
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:02:36 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzO9Z-0008Hz-L6
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:03:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gzO8c-00042f-Op
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:02:32 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38982)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gzO8N-0003W8-Ne
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:02:10 -0500
-Received: by mail-wm1-f68.google.com with SMTP id z84so9453273wmg.4
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 08:01:15 -0800 (PST)
-References: <20190228145624.24885-1-peter.maydell@linaro.org>
-	<20190228145624.24885-4-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <074eb05d-762d-97ae-a3fe-4f009382e83d@redhat.com>
-Date: Thu, 28 Feb 2019 17:01:12 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gzO9O-0004Qz-L9
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:03:18 -0500
+Date: Thu, 28 Feb 2019 17:01:07 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190228170107.73e9d779@redhat.com>
+In-Reply-To: <20190228150324.25973-8-eric.auger@redhat.com>
+References: <20190228150324.25973-1-eric.auger@redhat.com>
+	<20190228150324.25973-8-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190228145624.24885-4-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/11] docs: Commit initial files from
- sphinx-quickstart
+Subject: Re: [Qemu-devel] [PATCH v10 07/10] hw/arm/virt: Dynamic memory map
+ depending on RAM requirements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,234 +24,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-Hi Peter,
+On Thu, 28 Feb 2019 16:03:21 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-On 2/28/19 3:56 PM, Peter Maydell wrote:
-> Commit the initial Sphinx conf.py and skeleton index.rst as
-> generated with sphinx-quickstart. We'll update these to
-> add QEMU-specific tweaks in subsequent commits.
+> Up to now the memory map has been static and the high IO region
+> base has always been 256GiB.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> This patch modifies the virt_set_memmap() function, which freezes
+> the memory map, so that the high IO range base becomes floating,
+> located after the initial RAM and the device memory.
+> 
+> The function computes
+> - the base of the device memory,
+> - the size of the device memory,
+> - the high IO region base
+> - the highest GPA used in the memory map.
+> 
+> Entries of the high IO region are assigned a base address. The
+> device memory is initialized.
+> 
+> The highest GPA used in the memory map will be used at VM creation
+> to choose the requested IPA size.
+> 
+> Setting all the existing highmem IO regions beyond the RAM
+> allows to have a single contiguous RAM region (initial RAM and
+> possible hotpluggable device memory). That way we do not need
+> to do invasive changes in the EDK2 FW to support a dynamic
+> RAM base.
+> 
+> Still the user cannot request an initial RAM size greater than 255GB.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->  docs/conf.py   | 168 +++++++++++++++++++++++++++++++++++++++++++++++++
-
-Can you add a "rST documentation" section in MAINTAINERS?
-
-Eduardo/Cleber:
-
-What about replacing the current resctricted rules in the "Python
-scripts" section by a global "F: *.py" rule?
-
-Thanks,
-
-Phil.
-
->  docs/index.rst |  20 ++++++
->  2 files changed, 188 insertions(+)
->  create mode 100644 docs/conf.py
->  create mode 100644 docs/index.rst
+> v9 -> v10:
+> - remove check of maxram_size 1GB alignment
 > 
-> diff --git a/docs/conf.py b/docs/conf.py
-> new file mode 100644
-> index 00000000000..53a17506615
-> --- /dev/null
-> +++ b/docs/conf.py
-> @@ -0,0 +1,168 @@
-> +# -*- coding: utf-8 -*-
-> +#
-> +# QEMU documentation build configuration file, created by
-> +# sphinx-quickstart on Thu Jan 31 16:40:14 2019.
-> +#
-> +# This file is execfile()d with the current directory set to its
-> +# containing dir.
-> +#
-> +# Note that not all possible configuration values are present in this
-> +# autogenerated file.
-> +#
-> +# All configuration values have a default; values that are commented out
-> +# serve to show the default.
-> +
-> +# If extensions (or modules to document with autodoc) are in another directory,
-> +# add these directories to sys.path here. If the directory is relative to the
-> +# documentation root, use os.path.abspath to make it absolute, like shown here.
-> +#
-> +# import os
-> +# import sys
-> +# sys.path.insert(0, os.path.abspath('.'))
-> +
-> +
-> +# -- General configuration ------------------------------------------------
-> +
-> +# If your documentation needs a minimal Sphinx version, state it here.
-> +#
-> +# needs_sphinx = '1.0'
-> +
-> +# Add any Sphinx extension module names here, as strings. They can be
-> +# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-> +# ones.
-> +extensions = []
-> +
-> +# Add any paths that contain templates here, relative to this directory.
-> +templates_path = ['_templates']
-> +
-> +# The suffix(es) of source filenames.
-> +# You can specify multiple suffix as a list of string:
-> +#
-> +# source_suffix = ['.rst', '.md']
-> +source_suffix = '.rst'
-> +
-> +# The master toctree document.
-> +master_doc = 'index'
-> +
-> +# General information about the project.
-> +project = u'QEMU'
-> +copyright = u'2019, The QEMU Project Developers'
-> +author = u'The QEMU Project Developers'
-> +
-> +# The version info for the project you're documenting, acts as replacement for
-> +# |version| and |release|, also used in various other places throughout the
-> +# built documents.
-> +#
-> +# The short X.Y version.
-> +version = u'4.0'
-> +# The full version, including alpha/beta/rc tags.
-> +release = u'4.0'
-> +
-> +# The language for content autogenerated by Sphinx. Refer to documentation
-> +# for a list of supported languages.
-> +#
-> +# This is also used if you do content translation via gettext catalogs.
-> +# Usually you set "language" from the command line for these cases.
-> +language = None
-> +
-> +# List of patterns, relative to source directory, that match files and
-> +# directories to ignore when looking for source files.
-> +# This patterns also effect to html_static_path and html_extra_path
-> +exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-> +
-> +# The name of the Pygments (syntax highlighting) style to use.
-> +pygments_style = 'sphinx'
-> +
-> +# If true, `todo` and `todoList` produce output, else they produce nothing.
-> +todo_include_todos = False
-> +
-> +
-> +# -- Options for HTML output ----------------------------------------------
-> +
-> +# The theme to use for HTML and HTML Help pages.  See the documentation for
-> +# a list of builtin themes.
-> +#
-> +html_theme = 'alabaster'
-> +
-> +# Theme options are theme-specific and customize the look and feel of a theme
-> +# further.  For a list of options available for each theme, see the
-> +# documentation.
-> +#
-> +# html_theme_options = {}
-> +
-> +# Add any paths that contain custom static files (such as style sheets) here,
-> +# relative to this directory. They are copied after the builtin static files,
-> +# so a file named "default.css" will overwrite the builtin "default.css".
-> +html_static_path = ['_static']
-> +
-> +# Custom sidebar templates, must be a dictionary that maps document names
-> +# to template names.
-> +#
-> +# This is required for the alabaster theme
-> +# refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
-> +html_sidebars = {
-> +    '**': [
-> +        'relations.html',  # needs 'show_related': True theme option to display
-> +        'searchbox.html',
-> +    ]
-> +}
-> +
-> +
-> +# -- Options for HTMLHelp output ------------------------------------------
-> +
-> +# Output file base name for HTML help builder.
-> +htmlhelp_basename = 'QEMUdoc'
-> +
-> +
-> +# -- Options for LaTeX output ---------------------------------------------
-> +
-> +latex_elements = {
-> +    # The paper size ('letterpaper' or 'a4paper').
-> +    #
-> +    # 'papersize': 'letterpaper',
-> +
-> +    # The font size ('10pt', '11pt' or '12pt').
-> +    #
-> +    # 'pointsize': '10pt',
-> +
-> +    # Additional stuff for the LaTeX preamble.
-> +    #
-> +    # 'preamble': '',
-> +
-> +    # Latex figure (float) alignment
-> +    #
-> +    # 'figure_align': 'htbp',
-> +}
-> +
-> +# Grouping the document tree into LaTeX files. List of tuples
-> +# (source start file, target name, title,
-> +#  author, documentclass [howto, manual, or own class]).
-> +latex_documents = [
-> +    (master_doc, 'QEMU.tex', u'QEMU Documentation',
-> +     u'The QEMU Project Developers', 'manual'),
-> +]
-> +
-> +
-> +# -- Options for manual page output ---------------------------------------
-> +
-> +# One entry per manual page. List of tuples
-> +# (source start file, name, description, authors, manual section).
-> +man_pages = [
-> +    (master_doc, 'qemu', u'QEMU Documentation',
-> +     [author], 1)
-> +]
-> +
-> +
-> +# -- Options for Texinfo output -------------------------------------------
-> +
-> +# Grouping the document tree into Texinfo files. List of tuples
-> +# (source start file, target name, title, author,
-> +#  dir menu entry, description, category)
-> +texinfo_documents = [
-> +    (master_doc, 'QEMU', u'QEMU Documentation',
-> +     author, 'QEMU', 'One line description of project.',
-> +     'Miscellaneous'),
-> +]
-> +
-> +
-> +
-> diff --git a/docs/index.rst b/docs/index.rst
-> new file mode 100644
-> index 00000000000..93f82228310
-> --- /dev/null
-> +++ b/docs/index.rst
-> @@ -0,0 +1,20 @@
-> +.. QEMU documentation master file, created by
-> +   sphinx-quickstart on Thu Jan 31 16:40:14 2019.
-> +   You can adapt this file completely to your liking, but it should at least
-> +   contain the root `toctree` directive.
-> +
-> +Welcome to QEMU's documentation!
-> +================================
-> +
-> +.. toctree::
-> +   :maxdepth: 2
-> +   :caption: Contents:
-> +
-> +
-> +
-> +Indices and tables
-> +==================
-> +
-> +* :ref:`genindex`
-> +* :ref:`modindex`
-> +* :ref:`search`
+> v8 -> v9:
+> - add if (machine->device_memory) check
 > 
+> v7 -> v8:
+> - allocate ms->device_memory and removes vms->device_memory_base and
+>   vms->device_memory_storage
+> - remove (ms->maxram_size > ms->ram_size || ms->ram_slots > 0) and
+>   (ms->ram_size > (ram_addr_t)LEGACY_RAMLIMIT_BYTES) checks
+> - initialize the device memory
+> - move the slots nb check and maxram_size alignment checks in this
+>   patch
+> ---
+>  hw/arm/virt.c         | 50 +++++++++++++++++++++++++++++++++++++------
+>  include/hw/arm/virt.h |  1 +
+>  2 files changed, 45 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 8a23608d3e..d7aa7d3f9d 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -59,6 +59,7 @@
+>  #include "qapi/visitor.h"
+>  #include "standard-headers/linux/input.h"
+>  #include "hw/arm/smmuv3.h"
+> +#include "hw/acpi/acpi.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -107,8 +108,9 @@
+>   * of a terabyte of RAM will be doing it on a host with more than a
+>   * terabyte of physical address space.)
+>   */
+> -#define RAMLIMIT_GB 255
+> -#define RAMLIMIT_BYTES (RAMLIMIT_GB * 1024ULL * 1024 * 1024)
+> +#define RAMBASE GiB
+> +#define LEGACY_RAMLIMIT_GB 255
+> +#define LEGACY_RAMLIMIT_BYTES (LEGACY_RAMLIMIT_GB * GiB)
+>  
+>  /* Addresses and sizes of our components.
+>   * 0..128MB is space for a flash device so we can run bootrom code such as UEFI.
+> @@ -149,7 +151,7 @@ static const MemMapEntry base_memmap[] = {
+>      [VIRT_PCIE_MMIO] =          { 0x10000000, 0x2eff0000 },
+>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+> -    [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+> +    [VIRT_MEM] =                { RAMBASE, LEGACY_RAMLIMIT_BYTES },
+>  };
+>  
+>  /*
+> @@ -1370,7 +1372,8 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>  
+>  static void virt_set_memmap(VirtMachineState *vms)
+>  {
+> -    hwaddr base;
+> +    MachineState *ms = MACHINE(vms);
+> +    hwaddr base, device_memory_base, device_memory_size;
+>      int i;
+>  
+>      vms->memmap = extended_memmap;
+> @@ -1379,7 +1382,30 @@ static void virt_set_memmap(VirtMachineState *vms)
+>          vms->memmap[i] = base_memmap[i];
+>      }
+>  
+> -    vms->high_io_base = 256 * GiB; /* Top of the legacy initial RAM region */
+> +    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
+> +        error_report("unsupported number of memory slots: %"PRIu64,
+> +                     ms->ram_slots);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    /*
+> +     * We compute the base of the high IO region depending on the
+> +     * amount of initial and device memory. The device memory start/size
+> +     * is aligned on 1GiB. We never put the high IO region below 256GiB
+> +     * so that if maxram_size is < 255GiB we keep the legacy memory map.
+> +     * The device region size assumes 1GiB page max alignment per slot.
+> +     */
+> +    device_memory_base = ROUND_UP(RAMBASE + ms->ram_size, GiB);
+s/RAMBASE/vms->memmap[VIRT_MEM].base/
+
+> +    device_memory_size = ms->maxram_size - ms->ram_size + ms->ram_slots * GiB;
+> +
+> +    vms->high_io_base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> +    if (vms->high_io_base < device_memory_base) {
+> +        error_report("maxmem/slots too huge");
+> +        exit(EXIT_FAILURE);
+> +    }
+> +    if (vms->high_io_base < 256 * GiB) {
+> +        vms->high_io_base = 256 * GiB;
+> +    }
+>      base = vms->high_io_base;
+>  
+>      for (i = VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++) {
+> @@ -1390,6 +1416,13 @@ static void virt_set_memmap(VirtMachineState *vms)
+>          vms->memmap[i].size = size;
+>          base += size;
+>      }
+> +    vms->highest_gpa = base - 1;
+> +    if (device_memory_size > 0) {
+> +        ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+> +        ms->device_memory->base = device_memory_base;
+> +        memory_region_init(&ms->device_memory->mr, OBJECT(vms),
+> +                           "device-memory", device_memory_size);
+> +    }
+>  }
+>  
+>  static void machvirt_init(MachineState *machine)
+> @@ -1476,7 +1509,8 @@ static void machvirt_init(MachineState *machine)
+>      vms->smp_cpus = smp_cpus;
+>  
+>      if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
+> -        error_report("mach-virt: cannot model more than %dGB RAM", RAMLIMIT_GB);
+> +        error_report("mach-virt: cannot model more than %dGB RAM",
+> +                     LEGACY_RAMLIMIT_GB);
+>          exit(1);
+>      }
+>  
+> @@ -1570,6 +1604,10 @@ static void machvirt_init(MachineState *machine)
+>      memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+>                                           machine->ram_size);
+>      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+> +    if (machine->device_memory) {
+> +        memory_region_add_subregion(sysmem, machine->device_memory->base,
+> +                                    &machine->device_memory->mr);
+> +    }
+>  
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>  
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 3dc7a6c5d5..326a26b6d6 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -132,6 +132,7 @@ typedef struct {
+>      uint32_t iommu_phandle;
+>      int psci_conduit;
+>      hwaddr high_io_base;
+> +    hwaddr highest_gpa;
+>  } VirtMachineState;
+>  
+>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
