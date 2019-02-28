@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37433)
+Received: from eggs.gnu.org ([209.51.188.92]:37510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gzHT3-0000RV-64
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:03 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gzHT7-0000VH-7p
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gzHT0-0004Kx-T0
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:01 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34246)
+	(envelope-from <elohimes@gmail.com>) id 1gzHT3-0004Lw-8N
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:05 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34248)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gzHSy-0004IO-Tj
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:54:57 -0500
-Received: by mail-pg1-x541.google.com with SMTP id i130so9401421pgd.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 00:54:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gzHT1-0004KV-5M
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:01 -0500
+Received: by mail-pg1-x541.google.com with SMTP id i130so9401663pgd.1
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 00:54:57 -0800 (PST)
 From: elohimes@gmail.com
-Date: Thu, 28 Feb 2019 16:53:50 +0800
-Message-Id: <20190228085355.9614-3-xieyongji@baidu.com>
+Date: Thu, 28 Feb 2019 16:53:53 +0800
+Message-Id: <20190228085355.9614-6-xieyongji@baidu.com>
 In-Reply-To: <20190228085355.9614-1-xieyongji@baidu.com>
 References: <20190228085355.9614-1-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH v7 2/7] libvhost-user: Remove unnecessary FD
- flag check for event file descriptors
+Subject: [Qemu-devel] [PATCH v7 5/7] vhost-user-blk: Add support to get/set
+ inflight buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +31,102 @@ Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.c
 
 From: Xie Yongji <xieyongji@baidu.com>
 
-The vu_check_queue_msg_file() has checked the FD flag. So let's
-delete the redundant check after it.
+This patch adds support for vhost-user-blk device to get/set
+inflight buffer from/to backend.
 
 Signed-off-by: Xie Yongji <xieyongji@baidu.com>
 Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ hw/block/vhost-user-blk.c          | 28 ++++++++++++++++++++++++++++
+ include/hw/virtio/vhost-user-blk.h |  1 +
+ 2 files changed, 29 insertions(+)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index 3f14b4138b..16fec3a3fd 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -907,10 +907,8 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *vmsg)
-         dev->vq[index].kick_fd = -1;
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 44ac814016..9682df1a7b 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -128,6 +128,21 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
      }
  
--    if (!(vmsg->payload.u64 & VHOST_USER_VRING_NOFD_MASK)) {
--        dev->vq[index].kick_fd = vmsg->fds[0];
--        DPRINT("Got kick_fd: %d for vq: %d\n", vmsg->fds[0], index);
--    }
-+    dev->vq[index].kick_fd = vmsg->fds[0];
-+    DPRINT("Got kick_fd: %d for vq: %d\n", vmsg->fds[0], index);
- 
-     dev->vq[index].started = true;
-     if (dev->iface->queue_set_started) {
-@@ -995,9 +993,7 @@ vu_set_vring_call_exec(VuDev *dev, VhostUserMsg *vmsg)
-         dev->vq[index].call_fd = -1;
+     s->dev.acked_features = vdev->guest_features;
++
++    if (!s->inflight->addr) {
++        ret = vhost_dev_get_inflight(&s->dev, s->queue_size, s->inflight);
++        if (ret < 0) {
++            error_report("Error get inflight: %d", -ret);
++            goto err_guest_notifiers;
++        }
++    }
++
++    ret = vhost_dev_set_inflight(&s->dev, s->inflight);
++    if (ret < 0) {
++        error_report("Error set inflight: %d", -ret);
++        goto err_guest_notifiers;
++    }
++
+     ret = vhost_dev_start(&s->dev, vdev);
+     if (ret < 0) {
+         error_report("Error starting vhost: %d", -ret);
+@@ -249,6 +264,13 @@ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
      }
- 
--    if (!(vmsg->payload.u64 & VHOST_USER_VRING_NOFD_MASK)) {
--        dev->vq[index].call_fd = vmsg->fds[0];
--    }
-+    dev->vq[index].call_fd = vmsg->fds[0];
- 
-     DPRINT("Got call_fd: %d for vq: %d\n", vmsg->fds[0], index);
- 
-@@ -1020,9 +1016,7 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vmsg)
-         dev->vq[index].err_fd = -1;
-     }
- 
--    if (!(vmsg->payload.u64 & VHOST_USER_VRING_NOFD_MASK)) {
--        dev->vq[index].err_fd = vmsg->fds[0];
--    }
-+    dev->vq[index].err_fd = vmsg->fds[0];
- 
-     return false;
  }
+ 
++static void vhost_user_blk_reset(VirtIODevice *vdev)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++
++    vhost_dev_free_inflight(s->inflight);
++}
++
+ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -289,6 +311,8 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+                          vhost_user_blk_handle_output);
+     }
+ 
++    s->inflight = g_new0(struct vhost_inflight, 1);
++
+     s->dev.nvqs = s->num_queues;
+     s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
+     s->dev.vq_index = 0;
+@@ -321,6 +345,7 @@ vhost_err:
+     vhost_dev_cleanup(&s->dev);
+ virtio_err:
+     g_free(vqs);
++    g_free(s->inflight);
+     virtio_cleanup(vdev);
+ 
+     vhost_user_cleanup(user);
+@@ -336,7 +361,9 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
+ 
+     vhost_user_blk_set_status(vdev, 0);
+     vhost_dev_cleanup(&s->dev);
++    vhost_dev_free_inflight(s->inflight);
+     g_free(vqs);
++    g_free(s->inflight);
+     virtio_cleanup(vdev);
+ 
+     if (s->vhost_user) {
+@@ -386,6 +413,7 @@ static void vhost_user_blk_class_init(ObjectClass *klass, void *data)
+     vdc->set_config = vhost_user_blk_set_config;
+     vdc->get_features = vhost_user_blk_get_features;
+     vdc->set_status = vhost_user_blk_set_status;
++    vdc->reset = vhost_user_blk_reset;
+ }
+ 
+ static const TypeInfo vhost_user_blk_info = {
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+index d52944aeeb..445516604a 100644
+--- a/include/hw/virtio/vhost-user-blk.h
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -36,6 +36,7 @@ typedef struct VHostUserBlk {
+     uint32_t queue_size;
+     uint32_t config_wce;
+     struct vhost_dev dev;
++    struct vhost_inflight *inflight;
+     VhostUserState *vhost_user;
+ } VHostUserBlk;
+ 
 -- 
 2.17.1
