@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35126)
+Received: from eggs.gnu.org ([209.51.188.92]:35466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gzJSK-0007pP-Cy
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:02:25 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1gzJUs-0000N0-6i
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:05:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gzJS9-0003u6-Lb
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:02:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47482)
+	(envelope-from <luwei.kang@intel.com>) id 1gzJUf-00055a-82
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:04:59 -0500
+Received: from mga03.intel.com ([134.134.136.65]:48482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gzJS9-0003tT-CP
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:02:13 -0500
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1gzJUZ-00050O-SK
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:04:44 -0500
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Thu, 28 Feb 2019 11:04:35 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E172D02803@SHSMSX101.ccr.corp.intel.com>
 References: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1cd4a3cd-72fc-62ab-a7f9-784c51b89fbf@redhat.com>
-Date: Thu, 28 Feb 2019 12:01:51 +0100
-MIME-Version: 1.0
-In-Reply-To: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
-Content-Type: text/plain; charset=utf-8
+	<1cd4a3cd-72fc-62ab-a7f9-784c51b89fbf@redhat.com>
+In-Reply-To: <1cd4a3cd-72fc-62ab-a7f9-784c51b89fbf@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH V2] i386: extended the cpuid_level when
  Intel PT is enabled
 List-Id: <qemu-devel.nongnu.org>
@@ -28,79 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luwei Kang <luwei.kang@intel.com>, mst@redhat.com, marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 30/01/19 00:52, Luwei Kang wrote:
-> Intel Processor Trace required CPUID[0x14] but the cpuid_level
-> have no change when create a kvm guest with
-> e.g. "-cpu qemu64,+intel-pt".
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-> ---
->  hw/i386/pc.c      | 1 +
->  target/i386/cpu.c | 9 +++++++++
->  target/i386/cpu.h | 3 +++
->  3 files changed, 13 insertions(+)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 73d688f..72a0a70 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -122,6 +122,7 @@ GlobalProperty pc_compat_3_1[] = {
->      { "Cascadelake-Server" "-" TYPE_X86_CPU,  "mpx", "on" },
->      { "Icelake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
->      { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
-> +    { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
->  };
->  const size_t pc_compat_3_1_len = G_N_ELEMENTS(pc_compat_3_1);
->  
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 2f54125..6dddd99 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5023,6 +5023,13 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->          x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
->          x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
->          x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
-> +
-> +        /* Intel Processor Trace requires CPUID[0x14] */
-> +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
-> +             kvm_enabled() && cpu->intel_pt_auto_level) {
-> +            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-> +        }
-> +
->          /* SVM requires CPUID[0x8000000A] */
->          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
->              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
-> @@ -5816,6 +5823,8 @@ static Property x86_cpu_properties[] = {
->      DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
->      DEFINE_PROP_BOOL("x-hv-synic-kvm-only", X86CPU, hyperv_synic_kvm_only,
->                       false),
-> +    DEFINE_PROP_BOOL("x-intel-pt-auto-level", X86CPU, intel_pt_auto_level,
-> +                     true),
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 59656a7..090baa4 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1455,6 +1455,9 @@ struct X86CPU {
->      /* Enable auto level-increase for all CPUID leaves */
->      bool full_cpuid_auto_level;
->  
-> +    /* Enable auto level-increase for Intel Processor Trace leave */
-> +    bool intel_pt_auto_level;
-> +
->      /* if true fill the top bits of the MTRR_PHYSMASKn variable range */
->      bool fill_mtrr_mask;
->  
-> 
-
-Eduardo is back, but I've queued this anyway.
-
-Thanks,
-
-Paolo
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8gQm9uemluaSBb
+bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBGZWJydWFyeSAy
+OCwgMjAxOSA3OjAyIFBNDQo+IFRvOiBLYW5nLCBMdXdlaSA8bHV3ZWkua2FuZ0BpbnRlbC5jb20+
+OyBtc3RAcmVkaGF0LmNvbTsgbWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb207IHJ0aEB0d2lkZGxl
+Lm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNvbQ0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+
+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggVjJdIGkzODY6IGV4dGVuZGVkIHRoZSBjcHVpZF9sZXZlbCB3
+aGVuIEludGVsIFBUIGlzIGVuYWJsZWQNCj4gDQo+IE9uIDMwLzAxLzE5IDAwOjUyLCBMdXdlaSBL
+YW5nIHdyb3RlOg0KPiA+IEludGVsIFByb2Nlc3NvciBUcmFjZSByZXF1aXJlZCBDUFVJRFsweDE0
+XSBidXQgdGhlIGNwdWlkX2xldmVsIGhhdmUgbm8NCj4gPiBjaGFuZ2Ugd2hlbiBjcmVhdGUgYSBr
+dm0gZ3Vlc3Qgd2l0aCBlLmcuICItY3B1IHFlbXU2NCwraW50ZWwtcHQiLg0KPiA+DQo+ID4gU2ln
+bmVkLW9mZi1ieTogRWR1YXJkbyBIYWJrb3N0IDxlaGFia29zdEByZWRoYXQuY29tPg0KPiA+IFNp
+Z25lZC1vZmYtYnk6IEx1d2VpIEthbmcgPGx1d2VpLmthbmdAaW50ZWwuY29tPg0KPiA+IC0tLQ0K
+PiA+ICBody9pMzg2L3BjLmMgICAgICB8IDEgKw0KPiA+ICB0YXJnZXQvaTM4Ni9jcHUuYyB8IDkg
+KysrKysrKysrDQo+ID4gIHRhcmdldC9pMzg2L2NwdS5oIHwgMyArKysNCj4gPiAgMyBmaWxlcyBj
+aGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9w
+Yy5jIGIvaHcvaTM4Ni9wYy5jIGluZGV4IDczZDY4OGYuLjcyYTBhNzAgMTAwNjQ0DQo+ID4gLS0t
+IGEvaHcvaTM4Ni9wYy5jDQo+ID4gKysrIGIvaHcvaTM4Ni9wYy5jDQo+ID4gQEAgLTEyMiw2ICsx
+MjIsNyBAQCBHbG9iYWxQcm9wZXJ0eSBwY19jb21wYXRfM18xW10gPSB7DQo+ID4gICAgICB7ICJD
+YXNjYWRlbGFrZS1TZXJ2ZXIiICItIiBUWVBFX1g4Nl9DUFUsICAibXB4IiwgIm9uIiB9LA0KPiA+
+ICAgICAgeyAiSWNlbGFrZS1DbGllbnQiICItIiBUWVBFX1g4Nl9DUFUsICAgICAgIm1weCIsICJv
+biIgfSwNCj4gPiAgICAgIHsgIkljZWxha2UtU2VydmVyIiAiLSIgVFlQRV9YODZfQ1BVLCAgICAg
+ICJtcHgiLCAib24iIH0sDQo+ID4gKyAgICB7IFRZUEVfWDg2X0NQVSwgIngtaW50ZWwtcHQtYXV0
+by1sZXZlbCIsICJvZmYiIH0sDQo+ID4gIH07DQo+ID4gIGNvbnN0IHNpemVfdCBwY19jb21wYXRf
+M18xX2xlbiA9IEdfTl9FTEVNRU5UUyhwY19jb21wYXRfM18xKTsNCj4gPg0KPiA+IGRpZmYgLS1n
+aXQgYS90YXJnZXQvaTM4Ni9jcHUuYyBiL3RhcmdldC9pMzg2L2NwdS5jIGluZGV4DQo+ID4gMmY1
+NDEyNS4uNmRkZGQ5OSAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvaTM4Ni9jcHUuYw0KPiA+ICsr
+KyBiL3RhcmdldC9pMzg2L2NwdS5jDQo+ID4gQEAgLTUwMjMsNiArNTAyMywxMyBAQCBzdGF0aWMg
+dm9pZCB4ODZfY3B1X2V4cGFuZF9mZWF0dXJlcyhYODZDUFUgKmNwdSwgRXJyb3IgKiplcnJwKQ0K
+PiA+ICAgICAgICAgIHg4Nl9jcHVfYWRqdXN0X2ZlYXRfbGV2ZWwoY3B1LCBGRUFUX0MwMDBfMDAw
+MV9FRFgpOw0KPiA+ICAgICAgICAgIHg4Nl9jcHVfYWRqdXN0X2ZlYXRfbGV2ZWwoY3B1LCBGRUFU
+X1NWTSk7DQo+ID4gICAgICAgICAgeDg2X2NwdV9hZGp1c3RfZmVhdF9sZXZlbChjcHUsIEZFQVRf
+WFNBVkUpOw0KPiA+ICsNCj4gPiArICAgICAgICAvKiBJbnRlbCBQcm9jZXNzb3IgVHJhY2UgcmVx
+dWlyZXMgQ1BVSURbMHgxNF0gKi8NCj4gPiArICAgICAgICBpZiAoKGVudi0+ZmVhdHVyZXNbRkVB
+VF83XzBfRUJYXSAmIENQVUlEXzdfMF9FQlhfSU5URUxfUFQpICYmDQo+ID4gKyAgICAgICAgICAg
+ICBrdm1fZW5hYmxlZCgpICYmIGNwdS0+aW50ZWxfcHRfYXV0b19sZXZlbCkgew0KPiA+ICsgICAg
+ICAgICAgICB4ODZfY3B1X2FkanVzdF9sZXZlbChjcHUsICZjcHUtPmVudi5jcHVpZF9taW5fbGV2
+ZWwsIDB4MTQpOw0KPiA+ICsgICAgICAgIH0NCj4gPiArDQo+ID4gICAgICAgICAgLyogU1ZNIHJl
+cXVpcmVzIENQVUlEWzB4ODAwMDAwMEFdICovDQo+ID4gICAgICAgICAgaWYgKGVudi0+ZmVhdHVy
+ZXNbRkVBVF84MDAwXzAwMDFfRUNYXSAmIENQVUlEX0VYVDNfU1ZNKSB7DQo+ID4gICAgICAgICAg
+ICAgIHg4Nl9jcHVfYWRqdXN0X2xldmVsKGNwdSwgJmVudi0+Y3B1aWRfbWluX3hsZXZlbCwNCj4g
+PiAweDgwMDAwMDBBKTsgQEAgLTU4MTYsNiArNTgyMyw4IEBAIHN0YXRpYyBQcm9wZXJ0eSB4ODZf
+Y3B1X3Byb3BlcnRpZXNbXSA9IHsNCj4gPiAgICAgIERFRklORV9QUk9QX0lOVDMyKCJ4LWh2LW1h
+eC12cHMiLCBYODZDUFUsIGh2X21heF92cHMsIC0xKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0JP
+T0woIngtaHYtc3luaWMta3ZtLW9ubHkiLCBYODZDUFUsIGh5cGVydl9zeW5pY19rdm1fb25seSwN
+Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgZmFsc2UpLA0KPiA+ICsgICAgREVGSU5FX1BST1Bf
+Qk9PTCgieC1pbnRlbC1wdC1hdXRvLWxldmVsIiwgWDg2Q1BVLCBpbnRlbF9wdF9hdXRvX2xldmVs
+LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICB0cnVlKSwNCj4gPiAgICAgIERFRklORV9QUk9Q
+X0VORF9PRl9MSVNUKCkNCj4gPiAgfTsNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4
+Ni9jcHUuaCBiL3RhcmdldC9pMzg2L2NwdS5oIGluZGV4DQo+ID4gNTk2NTZhNy4uMDkwYmFhNCAx
+MDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvaTM4Ni9jcHUuaA0KPiA+ICsrKyBiL3RhcmdldC9pMzg2
+L2NwdS5oDQo+ID4gQEAgLTE0NTUsNiArMTQ1NSw5IEBAIHN0cnVjdCBYODZDUFUgew0KPiA+ICAg
+ICAgLyogRW5hYmxlIGF1dG8gbGV2ZWwtaW5jcmVhc2UgZm9yIGFsbCBDUFVJRCBsZWF2ZXMgKi8N
+Cj4gPiAgICAgIGJvb2wgZnVsbF9jcHVpZF9hdXRvX2xldmVsOw0KPiA+DQo+ID4gKyAgICAvKiBF
+bmFibGUgYXV0byBsZXZlbC1pbmNyZWFzZSBmb3IgSW50ZWwgUHJvY2Vzc29yIFRyYWNlIGxlYXZl
+ICovDQo+ID4gKyAgICBib29sIGludGVsX3B0X2F1dG9fbGV2ZWw7DQo+ID4gKw0KPiA+ICAgICAg
+LyogaWYgdHJ1ZSBmaWxsIHRoZSB0b3AgYml0cyBvZiB0aGUgTVRSUl9QSFlTTUFTS24gdmFyaWFi
+bGUgcmFuZ2UgKi8NCj4gPiAgICAgIGJvb2wgZmlsbF9tdHJyX21hc2s7DQo+ID4NCj4gPg0KPiAN
+Cj4gRWR1YXJkbyBpcyBiYWNrLCBidXQgSSd2ZSBxdWV1ZWQgdGhpcyBhbnl3YXkuDQo+IA0KDQpH
+ZXQgaXQuIFRoYW5rcyENCg0KTHV3ZWkgS2FuZw0K
