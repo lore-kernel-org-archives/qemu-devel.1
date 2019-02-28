@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46736)
+Received: from eggs.gnu.org ([209.51.188.92]:46766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gzQFm-0000ZG-5u
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:18:06 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gzQFo-0000aE-1j
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:18:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gzQFY-0002JI-1d
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:53 -0500
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:33980)
+	(envelope-from <tcminyard@gmail.com>) id 1gzQFc-0002ME-TH
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:56 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35969)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gzQFV-0002CX-Nz
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:37 -0500
-Received: by mail-ot1-x331.google.com with SMTP id 98so18591442oty.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:17:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gzQFY-0002A4-EJ
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:42 -0500
+Received: by mail-ot1-x342.google.com with SMTP id v62so18538838otb.3
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:17:19 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu, 28 Feb 2019 12:17:07 -0600
-Message-Id: <20190228181710.2477-17-minyard@acm.org>
+Date: Thu, 28 Feb 2019 12:16:56 -0600
+Message-Id: <20190228181710.2477-6-minyard@acm.org>
 In-Reply-To: <20190228181710.2477-1-minyard@acm.org>
 References: <20190228181710.2477-1-minyard@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/19] i2c:smbus_eeprom: Add a size constant for
- the smbus_eeprom size
+Subject: [Qemu-devel] [PULL 05/19] i2c:smbus: Correct the working of quick
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +32,85 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, minyard@acm.org, Corey Minyard <cmi
 
 From: Corey Minyard <cminyard@mvista.com>
 
-It was hard-coded to 256 in a number of places, create a constant
-for that.
+The logic of handling quick SMBus commands was wrong.  If you get a
+finish event with no data, that's a quick command.
+
+Document the quick command while we are at it.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/i2c/smbus_eeprom.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ hw/i2c/smbus_slave.c         | 35 +++++++++++++++++++----------------
+ include/hw/i2c/smbus_slave.h |  5 +++++
+ 2 files changed, 24 insertions(+), 16 deletions(-)
 
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index 76f0d4aab0..3fbbffb4de 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -37,6 +37,8 @@
- #define SMBUS_EEPROM(obj) \
-     OBJECT_CHECK(SMBusEEPROMDevice, (obj), TYPE_SMBUS_EEPROM)
- 
-+#define SMBUS_EEPROM_SIZE 256
-+
- typedef struct SMBusEEPROMDevice {
-     SMBusDevice smbusdev;
-     void *data;
-@@ -72,7 +74,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
- 
-     for (; len > 0; len--) {
-         data[eeprom->offset] = *buf++;
--        eeprom->offset = (eeprom->offset + 1) % 256;
-+        eeprom->offset = (eeprom->offset + 1) % SMBUS_EEPROM_SIZE;
-     }
- 
-     return 0;
-@@ -131,13 +133,15 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
-                        const uint8_t *eeprom_spd, int eeprom_spd_size)
+diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
+index 6e4d542f51..6a89a286e3 100644
+--- a/hw/i2c/smbus_slave.c
++++ b/hw/i2c/smbus_slave.c
+@@ -54,9 +54,7 @@ static void smbus_do_write(SMBusDevice *dev)
  {
-     int i;
--    uint8_t *eeprom_buf = g_malloc0(8 * 256); /* XXX: make this persistent */
-+     /* XXX: make this persistent */
-+    uint8_t *eeprom_buf = g_malloc0(8 * SMBUS_EEPROM_SIZE);
-     if (eeprom_spd_size > 0) {
-         memcpy(eeprom_buf, eeprom_spd, eeprom_spd_size);
-     }
+     SMBusDeviceClass *sc = SMBUS_DEVICE_GET_CLASS(dev);
  
-     for (i = 0; i < nb_eeprom; i++) {
--        smbus_eeprom_init_one(smbus, 0x50 + i, eeprom_buf + (i * 256));
-+        smbus_eeprom_init_one(smbus, 0x50 + i,
-+                              eeprom_buf + (i * SMBUS_EEPROM_SIZE));
-     }
- }
+-    if (dev->data_len == 0) {
+-        smbus_do_quick_cmd(dev, 0);
+-    } else if (dev->data_len == 1) {
++    if (dev->data_len == 1) {
+         DPRINTF("Send Byte\n");
+         if (sc->send_byte) {
+             sc->send_byte(dev, dev->data_buf[0]);
+@@ -120,19 +118,24 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
+         break;
  
+     case I2C_FINISH:
+-        switch (dev->mode) {
+-        case SMBUS_WRITE_DATA:
+-            smbus_do_write(dev);
+-            break;
+-        case SMBUS_RECV_BYTE:
+-            smbus_do_quick_cmd(dev, 1);
+-            break;
+-        case SMBUS_READ_DATA:
+-            BADF("Unexpected stop during receive\n");
+-            break;
+-        default:
+-            /* Nothing to do.  */
+-            break;
++        if (dev->data_len == 0) {
++            if (dev->mode == SMBUS_WRITE_DATA || dev->mode == SMBUS_READ_DATA) {
++                smbus_do_quick_cmd(dev, dev->mode == SMBUS_READ_DATA);
++            }
++        } else {
++            switch (dev->mode) {
++            case SMBUS_WRITE_DATA:
++                smbus_do_write(dev);
++                break;
++
++            case SMBUS_READ_DATA:
++                BADF("Unexpected stop during receive\n");
++                break;
++
++            default:
++                /* Nothing to do.  */
++                break;
++            }
+         }
+         dev->mode = SMBUS_IDLE;
+         dev->data_len = 0;
+diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
+index 46b8948f0f..5ef1c72ad0 100644
+--- a/include/hw/i2c/smbus_slave.h
++++ b/include/hw/i2c/smbus_slave.h
+@@ -40,6 +40,11 @@ typedef struct SMBusDevice SMBusDevice;
+ typedef struct SMBusDeviceClass
+ {
+     I2CSlaveClass parent_class;
++
++    /*
++     * An operation with no data, special in SMBus.
++     * This may be NULL, quick commands are ignore in that case.
++     */
+     void (*quick_cmd)(SMBusDevice *dev, uint8_t read);
+     void (*send_byte)(SMBusDevice *dev, uint8_t val);
+     uint8_t (*receive_byte)(SMBusDevice *dev);
 -- 
 2.17.1
