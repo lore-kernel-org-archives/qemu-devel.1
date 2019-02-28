@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58508)
+Received: from eggs.gnu.org ([209.51.188.92]:60390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzNT1-0005VJ-5z
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:19:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1gzNbe-00029T-LV
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:28:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzNSz-0004lG-AZ
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:19:23 -0500
-Date: Thu, 28 Feb 2019 16:19:14 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190228161914.740b2134@redhat.com>
-In-Reply-To: <20190225012530.28225-3-richardw.yang@linux.intel.com>
-References: <20190225012530.28225-1-richardw.yang@linux.intel.com>
-	<20190225012530.28225-3-richardw.yang@linux.intel.com>
+	(envelope-from <eblake@redhat.com>) id 1gzNbc-0000Lo-4z
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:28:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gzNbb-0000HP-LU
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:28:16 -0500
+References: <155136636659.26299.15306206822524053043.stgit@bahia.lan>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <755e3b06-3a24-1f8b-b469-7ee3744024aa@redhat.com>
+Date: Thu, 28 Feb 2019 09:28:08 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <155136636659.26299.15306206822524053043.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] CODING_STYLE: indent example code
- as all others
+Subject: Re: [Qemu-devel] [PATCH] crypto/block: Fix build with gcc 9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, mjt@tls.msk.ru, philmd@redhat.com, eblake@redhat.com, peter.maydell@linaro.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, 25 Feb 2019 09:25:30 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
-
-> All the example code are indented with four spaces except this one.
+On 2/28/19 9:06 AM, Greg Kurz wrote:
+> Build fails with gcc 9:
 >=20
-> Fix this by adding four spaces here.
+> crypto/block-luks.c:689:18: error: taking address of packed member of =E2=
+=80=98struct QCryptoBlockLUKSHeader=E2=80=99 may result in an unaligned p=
+ointer value [-Werror=3Daddress-of-packed-member]
+>   689 |     be32_to_cpus(&luks->header.payload_offset);
+>       |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 >=20
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+> All members of the QCryptoBlockLUKSKeySlot and QCryptoBlockLUKSHeader a=
+re
+> naturally aligned and we already check at build time there isn't any
+> unwanted padding. Drop the QEMU_PACKED attribute.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  CODING_STYLE | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  crypto/block-luks.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/CODING_STYLE b/CODING_STYLE
-> index 1bccf4f865..e6d21dcd67 100644
-> --- a/CODING_STYLE
-> +++ b/CODING_STYLE
-> @@ -137,10 +137,10 @@ block to a separate function altogether.
->  When comparing a variable for (in)equality with a constant, list the
->  constant on the right, as in:
-> =20
-> -if (a =3D=3D 1) {
-> -    /* Reads like: "If a equals 1" */
-> -    do_something();
-> -}
-> +    if (a =3D=3D 1) {
-> +        /* Reads like: "If a equals 1" */
-> +        do_something();
-> +    }
-> =20
->  Rationale: Yoda conditions (as in 'if (1 =3D=3D a)') are awkward to read.
->  Besides, good compilers already warn users when '=3D=3D' is mis-typed as=
- '=3D',
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
