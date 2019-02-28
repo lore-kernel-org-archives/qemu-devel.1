@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46529)
+Received: from eggs.gnu.org ([209.51.188.92]:46528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gzCnj-0003x3-Mj
+	(envelope-from <dgibson@ozlabs.org>) id 1gzCnj-0003x2-Ma
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:56:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gzCnU-0005FE-Bz
+	(envelope-from <dgibson@ozlabs.org>) id 1gzCnT-0005EE-QS
 	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:55:54 -0500
-Date: Thu, 28 Feb 2019 14:49:50 +1100
+Date: Thu, 28 Feb 2019 13:24:53 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190228034950.GB27799@umbus.fritz.box>
+Message-ID: <20190228022453.GD7734@umbus.fritz.box>
 References: <20190227085149.38596-1-aik@ozlabs.ru>
-	<20190227085149.38596-5-aik@ozlabs.ru>
-	<20190227153303.7b890f19@bahia.lan>
-	<a31bddd9-dfaf-1a4c-e04b-5f863218c87a@ozlabs.ru>
+	<20190227085149.38596-3-aik@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/WwmFnJnmDyWGHa4"
+	protocol="application/pgp-signature"; boundary="BI5RvnYi6R4T2M87"
 Content-Disposition: inline
-In-Reply-To: <a31bddd9-dfaf-1a4c-e04b-5f863218c87a@ozlabs.ru>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu v3 4/6] spapr_iommu: Do not
- replay mappings from just created DMA window
+In-Reply-To: <20190227085149.38596-3-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v3 2/6] vfio/spapr: Fix indirect
+ levels calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,151 +26,150 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, qemu-ppc@nongnu.org, Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>
 
 
---/WwmFnJnmDyWGHa4
+--BI5RvnYi6R4T2M87
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 28, 2019 at 10:59:56AM +1100, Alexey Kardashevskiy wrote:
+On Wed, Feb 27, 2019 at 07:51:45PM +1100, Alexey Kardashevskiy wrote:
+> The current code assumes that we can address more bits on a PCI bus
+> for DMA than we really can but there is no way knowing the actual limit.
 >=20
+> This makes a better guess for the number of levels and if the kernel
+> fails to allocate that, this increases the level numbers till succeeded
+> or reached the 64bit limit.
 >=20
-> On 28/02/2019 01:33, Greg Kurz wrote:
-> > On Wed, 27 Feb 2019 19:51:47 +1100
-> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >=20
-> >> On sPAPR vfio_listener_region_add() is called in 2 situations:
-> >> 1. a new listener is registered from vfio_connect_container();
-> >> 2. a new IOMMU Memory Region is added from rtas_ibm_create_pe_dma_wind=
-ow().
-> >>
-> >> In both cases vfio_listener_region_add() calls
-> >> memory_region_iommu_replay() to notify newly registered IOMMU notifiers
-> >> about existing mappings which is totally desirable for case 1.
-> >>
-> >> However for case 2 it is nothing but noop as the window has just been
-> >> created and has no valid mappings so replaying those does not do anyth=
-ing.
-> >> It is barely noticeable with usual guests but if the window happens to=
- be
-> >> really big, such no-op replay might take minutes and trigger RCU stall
-> >> warnings in the guest.
-> >>
-> >> For example, a upcoming GPU RAM memory region mapped at 64TiB (right
-> >> after SPAPR_PCI_LIMIT) causes a 64bit DMA window to be at least 128TiB
-> >> which is (128<<40)/0x10000=3D2.147.483.648 TCEs to replay.
-> >>
-> >> This mitigates the problem by adding an "skipping_replay" flag to
-> >> sPAPRTCETable and defining sPAPR own IOMMU MR replay() hook which does
-> >> exactly the same thing as the generic one except it returns early if
-> >> @skipping_replay=3D=3Dtrue.
-> >>
-> >> When "ibm,create-pe-dma-window" is complete, the guest will map only
-> >> required regions of the huge DMA window.
-> >>
-> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >> ---
-> >>  include/hw/ppc/spapr.h  |  1 +
-> >>  hw/ppc/spapr_iommu.c    | 31 +++++++++++++++++++++++++++++++
-> >>  hw/ppc/spapr_rtas_ddw.c |  7 +++++++
-> >>  3 files changed, 39 insertions(+)
-> >>
-> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >> index 86b0488..358bb38 100644
-> >> --- a/include/hw/ppc/spapr.h
-> >> +++ b/include/hw/ppc/spapr.h
-> >> @@ -727,6 +727,7 @@ struct sPAPRTCETable {
-> >>      uint64_t *mig_table;
-> >>      bool bypass;
-> >>      bool need_vfio;
-> >> +    bool skipping_replay;
-> >>      int fd;
-> >>      MemoryRegion root;
-> >>      IOMMUMemoryRegion iommu;
-> >> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-> >> index 37e98f9..8f23179 100644
-> >> --- a/hw/ppc/spapr_iommu.c
-> >> +++ b/hw/ppc/spapr_iommu.c
-> >> @@ -141,6 +141,36 @@ static IOMMUTLBEntry spapr_tce_translate_iommu(IO=
-MMUMemoryRegion *iommu,
-> >>      return ret;
-> >>  }
-> >> =20
-> >> +static void spapr_tce_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifi=
-er *n)
-> >> +{
-> >> +    MemoryRegion *mr =3D MEMORY_REGION(iommu_mr);
-> >> +    IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_GET_CLASS(io=
-mmu_mr);
-> >> +    hwaddr addr, granularity;
-> >> +    IOMMUTLBEntry iotlb;
-> >> +    sPAPRTCETable *tcet =3D container_of(iommu_mr, sPAPRTCETable, iom=
-mu);
-> >> +
-> >> +    if (tcet->skipping_replay) {
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    granularity =3D memory_region_iommu_get_min_page_size(iommu_mr);
-> >> +
-> >> +    for (addr =3D 0; addr < memory_region_size(mr); addr +=3D granula=
-rity) {
-> >> +        iotlb =3D imrc->translate(iommu_mr, addr, IOMMU_NONE, n->iomm=
-u_idx);
-> >> +        if (iotlb.perm !=3D IOMMU_NONE) {
-> >> +            n->notify(n, &iotlb);
-> >> +        }
-> >> +
-> >> +        /*
-> >> +         * if (2^64 - MR size) < granularity, it's possible to get an
-> >> +         * infinite loop here.  This should catch such a wraparound.
-> >> +         */
-> >> +        if ((addr + granularity) < addr) {
-> >> +            break;
-> >> +        }
-> >> +    }
-> >> +}
-> >=20
-> > It is a bit unfortunate to duplicate all that code. What about making
-> > a memory_region_iommu_replay_generic() helper out of it and call it
-> > from spapr_tce_replay() and memory_region_iommu_replay() ?
+> This adds levels to the trace point.
 >=20
+> This may cause the kernel to warn about failed allocation:
+>    [65122.837458] Failed to allocate a TCE memory, level shift=3D28
+> which might happen if MAX_ORDER is not large enough as it can vary:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/a=
+rch/powerpc/Kconfig?h=3Dv5.0-rc2#n727
 >=20
-> I really do not want to mess with generic code to solve our local sPAPR
-> problem, especially when there is a way not to do so.
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> Changes:
+> v2:
+> * replace systempagesize with getpagesize() when calculating
+> bits_per_level/max_levels
 
-Well, the thing is, I think we're actually the only user of the
-current generic replay - everything else has more efficient structure
-aware replay hooks AFAIK.  Which makes this hack even hackier.
+As noted previously, guessing how the kernel will do this is pretty
+gross, but the existing KVM interface kind of forces us to.  Plus it's
+only non-optimal, not incorrect if we guess wrong.  So, applied.
 
-> And as a next step, I was thinking of removing (i.e. making this replay
-> a no-op) from QEMU later and do replay in KVM instead when an IOMMU
-> group is attaching to KVM as this is the only case when we need replay
-> and KVM has a lot better idea what TCEs are actually valid and can skip
-> most of them. This is a bit bigger thing as it requires a KVM capability
-> "KVM replays mappings" but when we get it, spapr_tce_replay() will
-> become no-op.
-
-That's a good idea longer term.
-
-> > Apart from that, LGTM.
+> ---
+>  hw/vfio/spapr.c      | 43 +++++++++++++++++++++++++++++++++----------
+>  hw/vfio/trace-events |  2 +-
+>  2 files changed, 34 insertions(+), 11 deletions(-)
 >=20
-> Well. It is a hack, I just do not have taste to tell how nasty it is
-> :)
-
-As an interim step until the kernel change, I think we can do a bit
-better than this.  First, as Greg suggests we should have the
-"generic" replay be a helper and have the spapr one call that with a
-little in the way of extra checking.
-
-Second, rather than having an explicit "skip_replay" flag, what we
-really want here is to have the replay be a fast no-op if there are no
-existing mappings rather than a slow no-op.  So instead I think we
-should have a flag which records if any mappings have been made in the
-region yet, initialized to false.  The new replay would do nothing if
-it's still false.
+> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+> index becf71a..88437a7 100644
+> --- a/hw/vfio/spapr.c
+> +++ b/hw/vfio/spapr.c
+> @@ -143,10 +143,10 @@ int vfio_spapr_create_window(VFIOContainer *contain=
+er,
+>                               MemoryRegionSection *section,
+>                               hwaddr *pgsize)
+>  {
+> -    int ret;
+> +    int ret =3D 0;
+>      IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr);
+>      uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_mr=
+);
+> -    unsigned entries, pages;
+> +    unsigned entries, bits_total, bits_per_level, max_levels;
+>      struct vfio_iommu_spapr_tce_create create =3D { .argsz =3D sizeof(cr=
+eate) };
+>      long systempagesize =3D qemu_getrampagesize();
+> =20
+> @@ -176,16 +176,38 @@ int vfio_spapr_create_window(VFIOContainer *contain=
+er,
+>      create.window_size =3D int128_get64(section->size);
+>      create.page_shift =3D ctz64(pagesize);
+>      /*
+> -     * SPAPR host supports multilevel TCE tables, there is some
+> -     * heuristic to decide how many levels we want for our table:
+> -     * 0..64 =3D 1; 65..4096 =3D 2; 4097..262144 =3D 3; 262145.. =3D 4
+> +     * SPAPR host supports multilevel TCE tables. We try to guess optimal
+> +     * levels number and if this fails (for example due to the host memo=
+ry
+> +     * fragmentation), we increase levels. The DMA address structure is:
+> +     * rrrrrrrr rxxxxxxx xxxxxxxx xxxxxxxx  xxxxxxxx xxxxxxxx xxxxxxxx i=
+iiiiiii
+> +     * where:
+> +     *   r =3D reserved (bits >=3D 55 are reserved in the existing hardw=
+are)
+> +     *   i =3D IOMMU page offset (64K in this example)
+> +     *   x =3D bits to index a TCE which can be split to equal chunks to=
+ index
+> +     *      within the level.
+> +     * The aim is to split "x" to smaller possible number of levels.
+>       */
+>      entries =3D create.window_size >> create.page_shift;
+> -    pages =3D MAX((entries * sizeof(uint64_t)) / getpagesize(), 1);
+> -    pages =3D MAX(pow2ceil(pages), 1); /* Round up */
+> -    create.levels =3D ctz64(pages) / 6 + 1;
+> -
+> -    ret =3D ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
+> +    /* bits_total is number of "x" needed */
+> +    bits_total =3D ctz64(entries * sizeof(uint64_t));
+> +    /*
+> +     * bits_per_level is a safe guess of how much we can allocate per le=
+vel:
+> +     * 8 is the current minimum for CONFIG_FORCE_MAX_ZONEORDER and MAX_O=
+RDER
+> +     * is usually bigger than that.
+> +     * Below we look at getpagesize() as TCEs are allocated from system =
+pages.
+> +     */
+> +    bits_per_level =3D ctz64(getpagesize()) + 8;
+> +    create.levels =3D bits_total / bits_per_level;
+> +    if (bits_total % bits_per_level) {
+> +        ++create.levels;
+> +    }
+> +    max_levels =3D (64 - create.page_shift) / ctz64(getpagesize());
+> +    for ( ; create.levels <=3D max_levels; ++create.levels) {
+> +        ret =3D ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &creat=
+e);
+> +        if (!ret) {
+> +            break;
+> +        }
+> +    }
+>      if (ret) {
+>          error_report("Failed to create a window, ret =3D %d (%m)", ret);
+>          return -errno;
+> @@ -200,6 +222,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+>          return -EINVAL;
+>      }
+>      trace_vfio_spapr_create_window(create.page_shift,
+> +                                   create.levels,
+>                                     create.window_size,
+>                                     create.start_addr);
+>      *pgsize =3D pagesize;
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index ed2f333..cf1e886 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -129,6 +129,6 @@ vfio_prereg_listener_region_add_skip(uint64_t start, =
+uint64_t end) "0x%"PRIx64"
+>  vfio_prereg_listener_region_del_skip(uint64_t start, uint64_t end) "0x%"=
+PRIx64" - 0x%"PRIx64
+>  vfio_prereg_register(uint64_t va, uint64_t size, int ret) "va=3D0x%"PRIx=
+64" size=3D0x%"PRIx64" ret=3D%d"
+>  vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=3D0x%"PR=
+Ix64" size=3D0x%"PRIx64" ret=3D%d"
+> -vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=
+=3D0x%x winsize=3D0x%"PRIx64" offset=3D0x%"PRIx64
+> +vfio_spapr_create_window(int ps, unsigned int levels, uint64_t ws, uint6=
+4_t off) "pageshift=3D0x%x levels=3D%u winsize=3D0x%"PRIx64" offset=3D0x%"P=
+RIx64
+>  vfio_spapr_remove_window(uint64_t off) "offset=3D0x%"PRIx64
+>  vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d t=
+o liobn fd %d"
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -180,24 +177,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---/WwmFnJnmDyWGHa4
+--BI5RvnYi6R4T2M87
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx3WlsACgkQbDjKyiDZ
-s5J04w/+IvggU26tdfuu6zDFbV4VPKlzPeyf60xWtZT9nV6Kep+yt47jeSZutIMa
-O+6r30JOBUl7wKubbPLtfQ+a0Jqz3zSeb8GCCQnXWJtxNSnpXdVIt6nD5esrcTKZ
-RUcgdLhiavnKKmcxXjslZNEU7k8nmWbIbH9ovGziZny1fSliz97p92ORQRY2qxVv
-+cpsMX2KIghpfhOYcADcTeCOYekuFpupynN1T4L2e2qHVDrJW1LzOm7UZdqFKmCz
-pWmuc009cS8oPmv+ehqD6BpU6oEXriCd3Is0Jsh6IzMSMDqZ0niUXQXItTo3a0Bv
-pQCABh6PeAVIwLmyJzOBS5lIjUklw9U7m66nkbgjbko0Rd/BvO4ZBjBeZ86CVZgw
-oISfnZfEfOXTSQJyXHHpbx/PZBfGP+e7PZ8UicWg3ZZVpGJZMoHJQzHEobxPSp54
-ONyTuItgTzq8c1XWZU2P0l3fTbNG5QqAqHIltKaPw9xrTVzWG0WrMenUbZmUCuej
-5SGOfBvLKxos9oD3NpeYXmEEA9DxTBKm5sbPfZMzZ1FlatEhLbFmYNhD0wZgLMJB
-mGSV2y4dU8yLXasP1VRL4oJ3Im+3Hv67x95+89pj5VbdDSNEEKfuHAs6f54tQVdG
-rHbEN/DIaEUXORpAZdbeiNyjvuY3xQUzJKw1tSjL7SzsTUV+Mak=
-=18Y1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx3RnUACgkQbDjKyiDZ
+s5LBLw//SGNrNULb64N24vOseh5wjlikqcsFz2GwGvhLrE3lVLjLwCm/BWnEOYpu
+nZ9GzeKgF/9JmM8BPexSrTGWiD0VmnPunFxYkYWW2i89nb03BAhqxcAfFKLxvmFh
+Rn4spmnjvC3nXXJPeeQL8SEUxzwlAhGn7cc5ngjEUAjYGZuyUxv+iQAlRevR1l64
+82uvrIdhYXajn1PIhCuyP+buTRzT5xXNnlSVxBx637+FABAob+dARuyD9nuiHQsW
+h5THs9c4AlPGWwZLgTtRB34rG99n1xGk1wYwZeSyejBPXpbg8+Zmmx4PyFx/FdDb
+Agilz0LZX6LV28FKg2XrlD8Dztb2WSWxem6ftc6I7Rs1VTQfXfNtBYOUl7ZKSz0d
+lbQhTt7Hga88Y70nW1wYrJH9GK+CJRfF+6zKVHbWO9+CiXRnRN6xsqFs3O9GG2lO
+H+/h4RMI0ao6yzyz8aUFBoew03Bw3yosQn5rrqoAZoXWwpLva/y0J8DybtoEw7uf
+MbEliCSHBjdL1tCC/FsLhL/wdM4KrCYgvrrhinsltv3nEQtDaaFZDozePnmAo6ck
+A1QJ+kUJcVS96JtR5YHeSNu1xgUGKuL26hf5c22kHKwYTevCuHP8xJG2xUJ7l8S3
+3+7e4BfO7hlQG/oN9lk/3vr0OkB+/1mjJEE6nBpPmiepEvm62Wk=
+=NOL1
 -----END PGP SIGNATURE-----
 
---/WwmFnJnmDyWGHa4--
+--BI5RvnYi6R4T2M87--
