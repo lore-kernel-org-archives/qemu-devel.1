@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46775)
+Received: from eggs.gnu.org ([209.51.188.92]:47728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzMe2-0006KE-Ld
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:26:43 -0500
+	(envelope-from <bounces@canonical.com>) id 1gzMiJ-0008RA-D4
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzMe0-0001Aw-M2
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:26:42 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36782)
+	(envelope-from <bounces@canonical.com>) id 1gzMhy-0003p7-2b
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:30:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45416)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gzMdx-00016T-TN
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:26:38 -0500
-Received: by mail-oi1-x241.google.com with SMTP id t206so16619414oib.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 06:26:31 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gzMhx-0003ot-Sa
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:30:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gzMhw-0003vl-Pn
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C09B32E80C8
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:30:44 +0000 (UTC)
 MIME-Version: 1.0
-References: <4817f5c3b20aedba869608c06e76d11a722f4864.camel@gmail.com>
-	<3aaecc9d-d03b-a754-0ef0-a65609777b2e@redhat.com>
-In-Reply-To: <3aaecc9d-d03b-a754-0ef0-a65609777b2e@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Feb 2019 14:26:19 +0000
-Message-ID: <CAFEAcA8ZxNPTcPWJZLBN7dir1-6Kj7-2LuLX3f58SfDMM7xyTw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] trivial malloc to g_malloc in thunk
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 Feb 2019 14:24:57 -0000
+From: Thomas Huth <1817525@bugs.launchpad.net>
+Reply-To: Bug 1817525 <1817525@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155108616330.22359.6416860237413372412.malonedeb@wampee.canonical.com>
+Message-Id: <155136389740.28922.9078080703677536506.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1817525] Re: qemu fails to compile on gcc 9
+ "block/nvme.c:209:22: error: taking address of packed member of 'struct
+ <anonymous>' may result in an unaligned pointer value
+ [-Werror=address-of-packed-member]"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +39,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Aarushi Mehta <mehta.aaru20@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>
+To: qemu-devel@nongnu.org
 
-On Thu, 28 Feb 2019 at 14:00, Eric Blake <eblake@redhat.com> wrote:
->
-> On 2/28/19 7:42 AM, Aarushi Mehta wrote:
-> > Hi
-> >
-> > This is a trivial contribution part of the BiteSizedTasks on the wiki.
-> > I found this discussion http://git.corpit.ru/?p=qemu.git;a=commit;h=b45c03f585ea9bb1af76c73e82195418c294919d
-> > on migrating even g_malloc to g_new, is this not appropriate for the same?
-> > The wiki can presumably use an update regarding this.
-> >
-> > Signed-off-by: Aarushi <mehta.aaru20@gmail.com>
-> > ---
-> >  thunk.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/thunk.c b/thunk.c
-> > index d5d8645cd4..03fb2abab7 100644
-> > --- a/thunk.c
-> > +++ b/thunk.c
-> > @@ -89,7 +89,7 @@ void thunk_register_struct(int id, const char *name, const argtype *types)
-> >      for(i = 0;i < 2; i++) {
-> >          offset = 0;
-> >          max_align = 1;
-> > -        se->field_offsets[i] = malloc(nb_fields * sizeof(int));
-> > +        se->field_offsets[i] = g_malloc(nb_fields * sizeof(int));
->
-> Where is the counterpart free() that needs to be changed to g_free()?
+Fix has been merged:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D83c68e149a9365a3db6de
 
-There is none, because this code sets up a data structure at
-startup which then lasts for the lifetime of the QEMU process.
-This is definitely worth noting in the commit message.
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-thanks
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1817525
+
+Title:
+  qemu fails to compile on gcc 9 "block/nvme.c:209:22: error: taking
+  address of packed member of 'struct <anonymous>' may result in an
+  unaligned pointer value [-Werror=3Daddress-of-packed-member]"
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  Issue:
+  Qemu compilation fails with below error on ppc64le host with gcc 9, repo(=
+https://github.com/dgibson/qemu.git), branch(ppc-for-4.0), Commit (0483e903=
+93bac8546a1fbc95ab912a1e78e92b00)
+
+  =C2=A0CHK version_gen.h
+  =C2=A0=C2=A0CC      block/nvme.o
+  block/nvme.c: In function =E2=80=98nvme_create_queue_pair=E2=80=99:
+  block/nvme.c:209:22: error: taking address of packed member of =E2=80=98s=
+truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
+r=3Daddress-of-packed-member]
+  =C2=A0=C2=A0209 |     q->sq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
+>doorbell_scale];
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  block/nvme.c:216:22: error: taking address of packed member of =E2=80=98s=
+truct <anonymous>=E2=80=99 may result in an unaligned pointer value [-Werro=
+r=3Daddress-of-packed-member]
+  =C2=A0=C2=A0216 |     q->cq.doorbell =3D &s->regs->doorbells[idx * 2 * s-=
+>doorbell_scale + 1];
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|                      ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  cc1: all warnings being treated as errors
+  make: *** [/usr/share/avocado-plugins-vt/build/qemu/rules.mak:69: block/n=
+vme.o] Error 1
+
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $git commit:
+  commit 0483e90393bac8546a1fbc95ab912a1e78e92b00 (HEAD -> ppc-for-4.0)
+  Author: Thomas Huth <thuth@redhat.com>
+  Date:   Thu Feb 21 12:24:48 2019 +0100
+
+  =C2=A0=C2=A0=C2=A0=C2=A0hw/ppc: Use object_initialize_child for correct r=
+eference counting
+
+  =C2=A0=C2=A0=C2=A0=C2=A0Both functions, object_initialize() and object_pr=
+operty_add_child() increase
+  =C2=A0=C2=A0=C2=A0=C2=A0the reference counter of the new object, so one o=
+f the references has to be
+  =C2=A0=C2=A0=C2=A0=C2=A0dropped afterwards to get the reference counting =
+right. Otherwise the child
+  =C2=A0=C2=A0=C2=A0=C2=A0object will not be properly cleaned up when the p=
+arent gets destroyed.
+  =C2=A0=C2=A0=C2=A0=C2=A0Thus let's use now object_initialize_child() inst=
+ead to get the reference
+  =C2=A0=C2=A0=C2=A0=C2=A0counting here right.
+
+  =C2=A0=C2=A0=C2=A0=C2=A0Suggested-by: Eduardo Habkost <ehabkost@redhat.co=
+m>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Thomas Huth <thuth@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <1550748288-30598-1-git-send-email-th=
+uth@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: David Gibson <david@gibson.dropbea=
+r.id.au>
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  Note: Same commit on a different ppc64le host with gcc(8.1.1 20180712)
+  compile without any issue.
+
+  Host Env:
+
+  Power8
+
+  #lscpu
+  Architecture:         ppc64le
+  Byte Order:           Little Endian
+  CPU(s):               160
+  On-line CPU(s) list:  0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,12=
+8,136,144,152
+  Off-line CPU(s) list: 1-7,9-15,17-23,25-31,33-39,41-47,49-55,57-63,65-71,=
+73-79,81-87,89-95,97-103,105-111,113-119,121-127,129-135,137-143,145-151,15=
+3-159
+  Thread(s) per core:   1
+  Core(s) per socket:   5
+  Socket(s):            4
+  NUMA node(s):         4
+  Model:                2.1 (pvr 004b 0201)
+  Model name:           POWER8E (raw), altivec supported
+  CPU max MHz:          3690.0000
+  CPU min MHz:          2061.0000
+  L1d cache:            64K
+  L1i cache:            32K
+  L2 cache:             512K
+  L3 cache:             8192K
+  NUMA node0 CPU(s):    0,8,16,24,32
+  NUMA node1 CPU(s):    40,48,56,64,72
+  NUMA node16 CPU(s):   80,88,96,104,112
+  NUMA node17 CPU(s):   120,128,136,144,152
+
+  # gcc --version
+  gcc (GCC) 9.0.1 20190209 (Red Hat 9.0.1-0.4)
+  Copyright (C) 2019 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+
+  # uname -r
+  5.0.0-rc7-ge50585e89
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1817525/+subscriptions
