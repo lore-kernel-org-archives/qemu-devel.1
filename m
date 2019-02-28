@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57008)
+Received: from eggs.gnu.org ([209.51.188.92]:57118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gzP1W-0005fE-UT
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:59:07 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gzP1c-0005kL-HV
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:59:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gzP1M-0007Rz-OC
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:59:02 -0500
-Received: from mga17.intel.com ([192.55.52.151]:63424)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1gzP1D-0007LG-Cs
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:58:49 -0500
-From: Zhang Chen <chen.zhang@intel.com >
-Date: Fri,  1 Mar 2019 00:55:08 +0800
-Message-Id: <20190228165508.21594-8-chen.zhang@intel.com>
-In-Reply-To: <20190228165508.21594-1-chen.zhang@intel.com>
-References: <20190228165508.21594-1-chen.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH V2 7/7] Migration/colo.c: Make user obtain the
- COLO mode info after failover
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gzP1b-0007rE-JK
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:59:12 -0500
+References: <201902270125.36158.randrianasulu@gmail.com>
+	<b3f9b42e-5895-51ca-9313-506b857e65d8@ilande.co.uk>
+	<201902281139.14787.randrianasulu@gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <a984d6e6-4b9c-fecf-d0c6-3ff9b80cc07c@ilande.co.uk>
+Date: Thu, 28 Feb 2019 16:59:02 +0000
+MIME-Version: 1.0
+In-Reply-To: <201902281139.14787.randrianasulu@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] regression: target/ppc: convert VSX logical
+ operations to vector operations broke X for ppc64le guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
-Cc: Zhang Chen <chen.zhang@intel.com>
+To: Andrew Randrianasulu <randrianasulu@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Zhang Chen <chen.zhang@intel.com>
+On 28/02/2019 08:39, Andrew Randrianasulu wrote:
 
-Add the last_colo_mode to save the status after failover.
-This patch can solve the issue that user got nothing to call
-query_colo_status after failover.
+>>> configure line:
+>>> setarch i686 ./configure --target-list=ppc64-softmmu
+>>>
+>>> launch line:
+>>> ppc64-softmmu/qemu-system-ppc64 -display
+>>> sdl,gl=on -hda /mnt/sdb1/PPC-img/alpine_disk.img
+>>>
+>>> where alpine_disk.img is HDD installed Alpine 3.7 for ppc64le with xfce4
+>>> desktop.
+>>
+>> AFAICT the vector instructions converted here are independent of endian, so
+>> I can't see why this patch on its own would have any effect.
+>>
+>> Maybe it could be because the "setarch i686" part forces use of some
+>> lesser-used 32-bit paths in the vector code - is this required? And do you
+>> see the same issue on a x86_64 build?
+> 
+> I use 32-bit Slackware userland with x86_64 kerenl - so setarch prevent most of 
+> configures from detecting my arch wrongly.
+> 
+> Yes, bug was and is present with qemu compiled for x86_64 (inside chroot).
+> I initially discovered it there, and after dropping -O3 and even march=native, 
+> and even disabling avx2 via configure switch - moved to bisect.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06414.html
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- migration/colo.c | 28 +++++++++++++++++++++++-----
- 1 file changed, 23 insertions(+), 5 deletions(-)
+Can you upload your alpine_disk.img somewhere and then email me the link off-list?
+I'll see if I can take a look when I get a spare moment.
 
-diff --git a/migration/colo.c b/migration/colo.c
-index d1ae2e6d11..6eba8e06f2 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -38,6 +38,9 @@
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
- 
-+/* User need to know colo mode after COLO failover */
-+static COLOMode last_colo_mode;
-+
- #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
- 
- bool migration_in_colo_state(void)
-@@ -197,7 +200,10 @@ void colo_do_failover(MigrationState *s)
-         vm_stop_force_state(RUN_STATE_COLO);
-     }
- 
--    switch (get_colo_mode()) {
-+    /* Update last_COLO_mode to avoid unexpectedly exit COLO status */
-+    last_colo_mode = get_colo_mode();
-+
-+    switch (last_colo_mode) {
-     case COLO_MODE_PRIMARY:
-         primary_vm_do_failover();
-         break;
-@@ -263,7 +269,7 @@ COLOStatus *qmp_query_colo_status(Error **errp)
- {
-     COLOStatus *s = g_new0(COLOStatus, 1);
- 
--    s->mode = get_colo_mode();
-+    s->mode = last_colo_mode;
- 
-     switch (failover_get_state()) {
-     case FAILOVER_STATUS_NONE:
-@@ -515,6 +521,12 @@ static void colo_process_checkpoint(MigrationState *s)
-     Error *local_err = NULL;
-     int ret;
- 
-+    last_colo_mode = get_colo_mode();
-+    if (last_colo_mode != COLO_MODE_PRIMARY) {
-+        error_report("COLO mode must be COLO_MODE_PRIMARY");
-+        return;
-+    }
-+
-     failover_init_state();
- 
-     s->rp_state.from_dst_file = qemu_file_get_return_path(s->to_dst_file);
-@@ -682,12 +694,18 @@ void *colo_process_incoming_thread(void *opaque)
-     Error *local_err = NULL;
-     int ret;
- 
--    rcu_register_thread();
--    qemu_sem_init(&mis->colo_incoming_sem, 0);
--
-     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-                       MIGRATION_STATUS_COLO);
- 
-+    last_colo_mode = get_colo_mode();
-+    if (last_colo_mode != COLO_MODE_SECONDARY) {
-+        error_report("COLO mode must be COLO_MODE_SECONDARY");
-+        return NULL;
-+    }
-+
-+    rcu_register_thread();
-+    qemu_sem_init(&mis->colo_incoming_sem, 0);
-+
-     failover_init_state();
- 
-     mis->to_src_file = qemu_file_get_return_path(mis->from_src_file);
--- 
-2.17.GIT
+
+ATB,
+
+Mark.
