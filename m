@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49450)
+Received: from eggs.gnu.org ([209.51.188.92]:47381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ekohler@gmail.com>) id 1gzSZx-00070Y-Kq
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:46:54 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gzTpS-0007OJ-TS
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:06:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ekohler@gmail.com>) id 1gzSZv-00053B-P8
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:46:53 -0500
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:42363)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ekohler@gmail.com>) id 1gzSZt-00051T-Ur
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:46:51 -0500
-Received: by mail-qt1-x844.google.com with SMTP id u7so16010094qtg.9
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 12:46:48 -0800 (PST)
-From: Eddie Kohler <ekohler@gmail.com>
-Date: Thu, 28 Feb 2019 15:46:38 -0500
-Message-Id: <20190228204638.4928-1-ekohler@gmail.com>
-Subject: [Qemu-devel] [PATCH] Use wide-character ncurses functions.
+	(envelope-from <no-reply@patchew.org>) id 1gzTpR-0004YN-PI
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:06:58 -0500
+Resent-Message-Id: <E1gzTpR-0004YN-PI@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21074)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gzTpQ-0004V7-0k
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:06:56 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155139159565.7448.11829805949225371557@49fa7ef69f7b>
+In-Reply-To: <20190228204638.4928-1-ekohler@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 28 Feb 2019 14:06:36 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] Use wide-character ncurses functions.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,217 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eddie Kohler <ekohler@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: ekohler@gmail.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kraxel@redhat.com
 
-Hi,
-
-QEMU is unable to display all VGA characters to console output; for
-instance, the smiley (VGA character 0x01) is printed just as
-\001. However, QEMU links with the wide-character ncurses library,
-which can output all VGA characters (since they have Unicode
-equivalents). The attached patch switches QEMU to use wide-character
-functions, using the VGA character Unicode equivalents from
-Wikipedia. It works for me, and I'm hoping something like it would be
-acceptable for QEMU.
-
-Thanks for any comments,
-Eddie Kohler
-
-***
-
-All VGA console characters have Unicode equivalents, and most
-modern terminals can display them.
-
-Signed-off-by: Eddie Kohler <ekohler@gmail.com>
----
- ui/curses.c | 143 +++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 92 insertions(+), 51 deletions(-)
-
-diff --git a/ui/curses.c b/ui/curses.c
-index 6e0091c3b2..a07528770f 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -27,6 +27,7 @@
- #include <sys/ioctl.h>
- #include <termios.h>
- #endif
-+#include <locale.h>
- 
- #include "qapi/error.h"
- #include "qemu-common.h"
-@@ -48,25 +49,106 @@ static WINDOW *screenpad = NULL;
- static int width, height, gwidth, gheight, invalidate;
- static int px, py, sminx, sminy, smaxx, smaxy;
- 
--static chtype vga_to_curses[256];
-+static const wchar_t vga_to_wchar[256] = {
-+    // 0x0_
-+    L' ', L'\u263A', L'\u263B', L'\u2665',
-+    L'\u2666', L'\u2663', L'\u2660', L'\u2022',
-+    L'\u25D8', L'\u25CB', L'\u25D9', L'\u2642',
-+    L'\u2640', L'\u266A', L'\u266B', L'\u263C',
-+
-+    // 0x1_
-+    L'\u25BA', L'\u25C4', L'\u2195', L'\u203C',
-+    L'\u00B6', L'\u00A7', L'\u25AC', L'\u21A8',
-+    L'\u2191', L'\u2193', L'\u2192', L'\u2190',
-+    L'\u221F', L'\u2194', L'\u25B2', L'\u25BC',
-+
-+    // 0x2_
-+    L' ', L'!', L'"', L'#', L'$', L'%', L'&', L'\'',
-+    L'(', L')', L'*', L'+', L',', L'-', L'.', L'/',
-+
-+    // 0x3_
-+    L'0', L'1', L'2', L'3', L'4', L'5', L'6', L'7',
-+    L'8', L'9', L':', L';', L'<', L'=', L'>', L'?',
-+
-+    // 0x4_
-+    L'@', L'A', L'B', L'C', L'D', L'E', L'F', L'G',
-+    L'H', L'I', L'J', L'K', L'L', L'M', L'N', L'O',
-+
-+    // 0x5_
-+    L'P', L'Q', L'R', L'S', L'T', L'U', L'V', L'W',
-+    L'X', L'Y', L'Z', L'[', L'\\', L']', L'^', L'_',
-+
-+    // 0x6_
-+    L'`', L'a', L'b', L'c', L'd', L'e', L'f', L'g',
-+    L'h', L'i', L'j', L'k', L'l', L'm', L'n', L'o',
-+
-+    // 0x7_
-+    L'p', L'q', L'r', L's', L't', L'u', L'v', L'w',
-+    L'x', L'y', L'z', L'{', L'|', L'}', L'~', L'\u2302',
-+
-+    // 0x8_
-+    L'\u00C7', L'\u00FC', L'\u00E9', L'\u00E2',
-+    L'\u00E4', L'\u00E0', L'\u00E5', L'\u00E7',
-+    L'\u00EA', L'\u00EB', L'\u00E8', L'\u00EF',
-+    L'\u00EE', L'\u00EC', L'\u00C4', L'\u00C5',
-+
-+    // 0x9_
-+    L'\u00C9', L'\u00E6', L'\u00C6', L'\u00F4',
-+    L'\u00F6', L'\u00F2', L'\u00FB', L'\u00F9',
-+    L'\u00FF', L'\u00D6', L'\u00DC', L'\u00A2',
-+    L'\u00A3', L'\u00A5', L'\u20A7', L'\u0192',
-+
-+    // 0xA_
-+    L'\u00E1', L'\u00ED', L'\u00F3', L'\u00FA',
-+    L'\u00F1', L'\u00D1', L'\u00AA', L'\u00BA',
-+    L'\u00BF', L'\u2310', L'\u00AC', L'\u00BD',
-+    L'\u00BC', L'\u00A1', L'\u00AB', L'\u00BB',
-+
-+    // 0xB_
-+    L'\u2591', L'\u2592', L'\u2593', L'\u2502',
-+    L'\u2524', L'\u2561', L'\u2562', L'\u2556',
-+    L'\u2555', L'\u2563', L'\u2551', L'\u2557',
-+    L'\u255D', L'\u255C', L'\u255B', L'\u2510',
-+
-+    // 0xC_
-+    L'\u2514', L'\u2534', L'\u252C', L'\u251C',
-+    L'\u2500', L'\u253C', L'\u255E', L'\u255F',
-+    L'\u255A', L'\u2554', L'\u2569', L'\u2566',
-+    L'\u2560', L'\u2550', L'\u256C', L'\u2567',
-+
-+    // 0xD_
-+    L'\u2568', L'\u2564', L'\u2565', L'\u2559',
-+    L'\u2558', L'\u2552', L'\u2553', L'\u256B',
-+    L'\u256A', L'\u2518', L'\u250C', L'\u2588',
-+    L'\u2584', L'\u258C', L'\u2590', L'\u2580',
-+
-+    // 0xE_
-+    L'\u03B1', L'\u00DF', L'\u0393', L'\u03C0',
-+    L'\u03A3', L'\u03C3', L'\u00B5', L'\u03C4',
-+    L'\u03A6', L'\u0398', L'\u03A9', L'\u03B4',
-+    L'\u221E', L'\u03C6', L'\u03B5', L'\u2229',
-+
-+    // 0xF_
-+    L'\u2261', L'\u00B1', L'\u2265', L'\u2264',
-+    L'\u2320', L'\u2321', L'\u00F7', L'\u2248',
-+    L'\u00B0', L'\u2219', L'\u00B7', L'\u221A',
-+    L'\u207F', L'\u00B2', L'\u25A0', L'\u00A0'
-+};
- 
- static void curses_update(DisplayChangeListener *dcl,
-                           int x, int y, int w, int h)
- {
-     console_ch_t *line;
--    chtype curses_line[width];
-+    cchar_t curses_line[width];
- 
-     line = screen + y * width;
-     for (h += y; y < h; y ++, line += width) {
-         for (x = 0; x < width; x++) {
--            chtype ch = line[x] & 0xff;
--            chtype at = line[x] & ~0xff;
--            if (vga_to_curses[ch]) {
--                ch = vga_to_curses[ch];
--            }
--            curses_line[x] = ch | at;
-+            curses_line[x].attr = line[x] & ~0xff;
-+            curses_line[x].chars[0] = vga_to_wchar[line[x] & 0xff];
-+            curses_line[x].chars[1] = L'\0';
-         }
--        mvwaddchnstr(screenpad, y, 0, curses_line, width);
-+        mvwadd_wchnstr(screenpad, y, 0, curses_line, width);
-     }
- 
-     pnoutrefresh(screenpad, py, px, sminy, sminx, smaxy - 1, smaxx - 1);
-@@ -358,6 +440,7 @@ static void curses_setup(void)
- 
-     /* input as raw as possible, let everything be interpreted
-      * by the guest system */
-+    setlocale(LC_ALL, "");
-     initscr(); noecho(); intrflush(stdscr, FALSE);
-     nodelay(stdscr, TRUE); nonl(); keypad(stdscr, TRUE);
-     start_color(); raw(); scrollok(stdscr, FALSE);
-@@ -370,48 +453,6 @@ static void curses_setup(void)
-     for (i = 64; i < COLOR_PAIRS; i++) {
-         init_pair(i, COLOR_WHITE, COLOR_BLACK);
-     }
--
--    /*
--     * Setup mapping for vga to curses line graphics.
--     * FIXME: for better font, have to use ncursesw and setlocale()
--     */
--#if 0
--    /* FIXME: map from where? */
--    ACS_S1;
--    ACS_S3;
--    ACS_S7;
--    ACS_S9;
--#endif
--    /* ACS_* is not constant. So, we can't initialize statically. */
--    vga_to_curses['\0'] = ' ';
--    vga_to_curses[0x04] = ACS_DIAMOND;
--    vga_to_curses[0x18] = ACS_UARROW;
--    vga_to_curses[0x19] = ACS_DARROW;
--    vga_to_curses[0x1a] = ACS_RARROW;
--    vga_to_curses[0x1b] = ACS_LARROW;
--    vga_to_curses[0x9c] = ACS_STERLING;
--    vga_to_curses[0xb0] = ACS_BOARD;
--    vga_to_curses[0xb1] = ACS_CKBOARD;
--    vga_to_curses[0xb3] = ACS_VLINE;
--    vga_to_curses[0xb4] = ACS_RTEE;
--    vga_to_curses[0xbf] = ACS_URCORNER;
--    vga_to_curses[0xc0] = ACS_LLCORNER;
--    vga_to_curses[0xc1] = ACS_BTEE;
--    vga_to_curses[0xc2] = ACS_TTEE;
--    vga_to_curses[0xc3] = ACS_LTEE;
--    vga_to_curses[0xc4] = ACS_HLINE;
--    vga_to_curses[0xc5] = ACS_PLUS;
--    vga_to_curses[0xce] = ACS_LANTERN;
--    vga_to_curses[0xd8] = ACS_NEQUAL;
--    vga_to_curses[0xd9] = ACS_LRCORNER;
--    vga_to_curses[0xda] = ACS_ULCORNER;
--    vga_to_curses[0xdb] = ACS_BLOCK;
--    vga_to_curses[0xe3] = ACS_PI;
--    vga_to_curses[0xf1] = ACS_PLMINUS;
--    vga_to_curses[0xf2] = ACS_GEQUAL;
--    vga_to_curses[0xf3] = ACS_LEQUAL;
--    vga_to_curses[0xf8] = ACS_DEGREE;
--    vga_to_curses[0xfe] = ACS_BULLET;
- }
- 
- static void curses_keyboard_setup(void)
--- 
-2.17.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyODIwNDYzOC40OTI4
+LTEtZWtvaGxlckBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMjI4MjA0NjM4LjQ5MjgtMS1la29obGVyQGdtYWls
+LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBVc2Ugd2lkZS1jaGFyYWN0ZXIgbmN1
+cnNlcyBmdW5jdGlvbnMuClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
+ODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
+YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIyODIwNDYzOC40OTI4LTEtZWtvaGxlckBn
+bWFpbC5jb20gLT4gcGF0Y2hldy8yMDE5MDIyODIwNDYzOC40OTI4LTEtZWtvaGxlckBnbWFpbC5j
+b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1Mzc5ZmI1MjE2IFVzZSB3aWRlLWNo
+YXJhY3RlciBuY3Vyc2VzIGZ1bmN0aW9ucy4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBk
+byBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNDc6IEZJTEU6IHVpL2N1cnNlcy5jOjUzOgorICAg
+IC8vIDB4MF8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNTM6IEZJTEU6IHVp
+L2N1cnNlcy5jOjU5OgorICAgIC8vIDB4MV8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21t
+ZW50cwojNTk6IEZJTEU6IHVpL2N1cnNlcy5jOjY1OgorICAgIC8vIDB4Ml8KCkVSUk9SOiBkbyBu
+b3QgdXNlIEM5OSAvLyBjb21tZW50cwojNjM6IEZJTEU6IHVpL2N1cnNlcy5jOjY5OgorICAgIC8v
+IDB4M18KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNjc6IEZJTEU6IHVpL2N1
+cnNlcy5jOjczOgorICAgIC8vIDB4NF8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50
+cwojNzE6IEZJTEU6IHVpL2N1cnNlcy5jOjc3OgorICAgIC8vIDB4NV8KCkVSUk9SOiBkbyBub3Qg
+dXNlIEM5OSAvLyBjb21tZW50cwojNzU6IEZJTEU6IHVpL2N1cnNlcy5jOjgxOgorICAgIC8vIDB4
+Nl8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNzk6IEZJTEU6IHVpL2N1cnNl
+cy5jOjg1OgorICAgIC8vIDB4N18KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwoj
+ODM6IEZJTEU6IHVpL2N1cnNlcy5jOjg5OgorICAgIC8vIDB4OF8KCkVSUk9SOiBkbyBub3QgdXNl
+IEM5OSAvLyBjb21tZW50cwojODk6IEZJTEU6IHVpL2N1cnNlcy5jOjk1OgorICAgIC8vIDB4OV8K
+CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojOTU6IEZJTEU6IHVpL2N1cnNlcy5j
+OjEwMToKKyAgICAvLyAweEFfCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzEw
+MTogRklMRTogdWkvY3Vyc2VzLmM6MTA3OgorICAgIC8vIDB4Ql8KCkVSUk9SOiBkbyBub3QgdXNl
+IEM5OSAvLyBjb21tZW50cwojMTA3OiBGSUxFOiB1aS9jdXJzZXMuYzoxMTM6CisgICAgLy8gMHhD
+XwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxMTM6IEZJTEU6IHVpL2N1cnNl
+cy5jOjExOToKKyAgICAvLyAweERfCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMK
+IzExOTogRklMRTogdWkvY3Vyc2VzLmM6MTI1OgorICAgIC8vIDB4RV8KCkVSUk9SOiBkbyBub3Qg
+dXNlIEM5OSAvLyBjb21tZW50cwojMTI1OiBGSUxFOiB1aS9jdXJzZXMuYzoxMzE6CisgICAgLy8g
+MHhGXwoKdG90YWw6IDE2IGVycm9ycywgMCB3YXJuaW5ncywgMTc3IGxpbmVzIGNoZWNrZWQKCkNv
+bW1pdCA1Mzc5ZmI1MjE2YjUgKFVzZSB3aWRlLWNoYXJhY3RlciBuY3Vyc2VzIGZ1bmN0aW9ucy4p
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjI4MjA0NjM4LjQ5MjgtMS1la29obGVyQGdtYWls
+LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
