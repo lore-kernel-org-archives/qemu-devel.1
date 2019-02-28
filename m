@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36360)
+Received: from eggs.gnu.org ([209.51.188.92]:36382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzJYo-0001F8-Uk
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:09:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzJYp-0001H4-JN
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:09:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzJYm-0003c9-SP
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:09:06 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:53614)
+	(envelope-from <peter.maydell@linaro.org>) id 1gzJYn-0003eF-Hu
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:09:07 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gzJYl-0003Cx-Im
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:09:04 -0500
-Received: by mail-wm1-x329.google.com with SMTP id e74so8738660wmg.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 03:08:51 -0800 (PST)
+	id 1gzJYn-0003ab-4A
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:09:05 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id l5so21464720wrw.6
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 03:09:04 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	c17sm13153241wrs.17.2019.02.28.03.08.45 for <qemu-devel@nongnu.org>
+	c17sm13153241wrs.17.2019.02.28.03.08.59 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 28 Feb 2019 03:08:49 -0800 (PST)
+	Thu, 28 Feb 2019 03:09:02 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Feb 2019 11:08:20 +0000
-Message-Id: <20190228110835.16159-2-peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 11:08:25 +0000
+Message-Id: <20190228110835.16159-7-peter.maydell@linaro.org>
 In-Reply-To: <20190228110835.16159-1-peter.maydell@linaro.org>
 References: <20190228110835.16159-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/16] hw/misc/armsse-mhu.c: Model the SSE-200
- Message Handling Unit
+Subject: [Qemu-devel] [PULL 06/16] hw/arm/iotkit-sysctl: Add SSE-200
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,327 +36,414 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Implement a model of the Message Handling Unit (MHU) found in
-the Arm SSE-200. This is a simple device which just contains
-some registers which allow the two cores of the SSE-200
-to raise interrupts on each other.
+The SYSCTL block in the SSE-200 has some extra registers that
+are not present in the IoTKit version. Add these registers
+(as reads-as-written stubs), enabled by a new QOM property.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190219125808.25174-2-peter.maydell@linaro.org
+Message-id: 20190219125808.25174-7-peter.maydell@linaro.org
 ---
- hw/misc/Makefile.objs           |   1 +
- include/hw/misc/armsse-mhu.h    |  44 +++++++
- hw/misc/armsse-mhu.c            | 198 ++++++++++++++++++++++++++++++++
- MAINTAINERS                     |   2 +
- default-configs/arm-softmmu.mak |   1 +
- hw/misc/trace-events            |   4 +
- 6 files changed, 250 insertions(+)
- create mode 100644 include/hw/misc/armsse-mhu.h
- create mode 100644 hw/misc/armsse-mhu.c
+ include/hw/misc/iotkit-sysctl.h |  20 +++
+ hw/arm/armsse.c                 |   2 +
+ hw/misc/iotkit-sysctl.c         | 245 +++++++++++++++++++++++++++++++-
+ 3 files changed, 262 insertions(+), 5 deletions(-)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 74c91d250c8..c71e07ae35d 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -70,6 +70,7 @@ obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
- obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
- obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
- obj-$(CONFIG_ARMSSE_CPUID) += armsse-cpuid.o
-+obj-$(CONFIG_ARMSSE_MHU) += armsse-mhu.o
+diff --git a/include/hw/misc/iotkit-sysctl.h b/include/hw/misc/iotkit-sysctl.h
+index 17a145517a4..9c2f23ecd28 100644
+--- a/include/hw/misc/iotkit-sysctl.h
++++ b/include/hw/misc/iotkit-sysctl.h
+@@ -17,6 +17,9 @@
+  * "system control register" blocks.
+  *
+  * QEMU interface:
++ *  + QOM property "SYS_VERSION": value of the SYS_VERSION register of the
++ *    system information block of the SSE
++ *    (used to identify whether to provide SSE-200-only registers)
+  *  + sysbus MMIO region 0: the system information register bank
+  *  + sysbus MMIO region 1: the system control register bank
+  */
+@@ -44,6 +47,23 @@ typedef struct IoTKitSysCtl {
+     uint32_t initsvtor0;
+     uint32_t cpuwait;
+     uint32_t wicctrl;
++    uint32_t scsecctrl;
++    uint32_t fclk_div;
++    uint32_t sysclk_div;
++    uint32_t clock_force;
++    uint32_t initsvtor1;
++    uint32_t nmi_enable;
++    uint32_t ewctrl;
++    uint32_t pdcm_pd_sys_sense;
++    uint32_t pdcm_pd_sram0_sense;
++    uint32_t pdcm_pd_sram1_sense;
++    uint32_t pdcm_pd_sram2_sense;
++    uint32_t pdcm_pd_sram3_sense;
++
++    /* Properties */
++    uint32_t sys_version;
++
++    bool is_sse200;
+ } IoTKitSysCtl;
  
- obj-$(CONFIG_PVPANIC) += pvpanic.o
- obj-$(CONFIG_AUX) += auxbus.o
-diff --git a/include/hw/misc/armsse-mhu.h b/include/hw/misc/armsse-mhu.h
-new file mode 100644
-index 00000000000..e57eafc2521
---- /dev/null
-+++ b/include/hw/misc/armsse-mhu.h
-@@ -0,0 +1,44 @@
-+/*
-+ * ARM SSE-200 Message Handling Unit (MHU)
-+ *
-+ * Copyright (c) 2019 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+/*
-+ * This is a model of the Message Handling Unit (MHU) which is part of the
-+ * Arm SSE-200 and documented in
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.101104_0100_00_en/corelink_sse200_subsystem_for_embedded_technical_reference_manual_101104_0100_00_en.pdf
-+ *
-+ * QEMU interface:
-+ *  + sysbus MMIO region 0: the system information register bank
-+ *  + sysbus IRQ 0: interrupt for CPU 0
-+ *  + sysbus IRQ 1: interrupt for CPU 1
-+ */
-+
-+#ifndef HW_MISC_SSE_MHU_H
-+#define HW_MISC_SSE_MHU_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_ARMSSE_MHU "armsse-mhu"
-+#define ARMSSE_MHU(obj) OBJECT_CHECK(ARMSSEMHU, (obj), TYPE_ARMSSE_MHU)
-+
-+typedef struct ARMSSEMHU {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    MemoryRegion iomem;
-+    qemu_irq cpu0irq;
-+    qemu_irq cpu1irq;
-+
-+    uint32_t cpu0intr;
-+    uint32_t cpu1intr;
-+} ARMSSEMHU;
-+
-+#endif
-diff --git a/hw/misc/armsse-mhu.c b/hw/misc/armsse-mhu.c
-new file mode 100644
-index 00000000000..9ebca32e9aa
---- /dev/null
-+++ b/hw/misc/armsse-mhu.c
-@@ -0,0 +1,198 @@
-+/*
-+ * ARM SSE-200 Message Handling Unit (MHU)
-+ *
-+ * Copyright (c) 2019 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+/*
-+ * This is a model of the Message Handling Unit (MHU) which is part of the
-+ * Arm SSE-200 and documented in
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.101104_0100_00_en/corelink_sse200_subsystem_for_embedded_technical_reference_manual_101104_0100_00_en.pdf
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/misc/armsse-mhu.h"
-+
-+REG32(CPU0INTR_STAT, 0x0)
-+REG32(CPU0INTR_SET, 0x4)
-+REG32(CPU0INTR_CLR, 0x8)
-+REG32(CPU1INTR_STAT, 0x10)
-+REG32(CPU1INTR_SET, 0x14)
-+REG32(CPU1INTR_CLR, 0x18)
-+REG32(PID4, 0xfd0)
-+REG32(PID5, 0xfd4)
-+REG32(PID6, 0xfd8)
-+REG32(PID7, 0xfdc)
-+REG32(PID0, 0xfe0)
-+REG32(PID1, 0xfe4)
-+REG32(PID2, 0xfe8)
-+REG32(PID3, 0xfec)
-+REG32(CID0, 0xff0)
-+REG32(CID1, 0xff4)
-+REG32(CID2, 0xff8)
-+REG32(CID3, 0xffc)
-+
-+/* Valid bits in the interrupt registers. If any are set the IRQ is raised */
-+#define INTR_MASK 0xf
-+
-+/* PID/CID values */
-+static const int armsse_mhu_id[] = {
-+    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
-+    0x56, 0xb8, 0x0b, 0x00, /* PID0..PID3 */
-+    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
-+};
-+
-+static void armsse_mhu_update(ARMSSEMHU *s)
+ #endif
+diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
+index 97e3d5e807e..6eed2ecf809 100644
+--- a/hw/arm/armsse.c
++++ b/hw/arm/armsse.c
+@@ -997,6 +997,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+     /* System information registers */
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysinfo), 0, 0x40020000);
+     /* System control registers */
++    object_property_set_int(OBJECT(&s->sysctl), info->sys_version,
++                            "SYS_VERSION", &err);
+     object_property_set_bool(OBJECT(&s->sysctl), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/hw/misc/iotkit-sysctl.c b/hw/misc/iotkit-sysctl.c
+index 8c85aea9309..05606017fc2 100644
+--- a/hw/misc/iotkit-sysctl.c
++++ b/hw/misc/iotkit-sysctl.c
+@@ -17,6 +17,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/bitops.h"
+ #include "qemu/log.h"
+ #include "trace.h"
+ #include "qapi/error.h"
+@@ -28,15 +29,26 @@
+ REG32(SECDBGSTAT, 0x0)
+ REG32(SECDBGSET, 0x4)
+ REG32(SECDBGCLR, 0x8)
++REG32(SCSECCTRL, 0xc)
++REG32(FCLK_DIV, 0x10)
++REG32(SYSCLK_DIV, 0x14)
++REG32(CLOCK_FORCE, 0x18)
+ REG32(RESET_SYNDROME, 0x100)
+ REG32(RESET_MASK, 0x104)
+ REG32(SWRESET, 0x108)
+     FIELD(SWRESET, SWRESETREQ, 9, 1)
+ REG32(GRETREG, 0x10c)
+ REG32(INITSVTOR0, 0x110)
++REG32(INITSVTOR1, 0x114)
+ REG32(CPUWAIT, 0x118)
+-REG32(BUSWAIT, 0x11c)
++REG32(NMI_ENABLE, 0x11c) /* BUSWAIT in IoTKit */
+ REG32(WICCTRL, 0x120)
++REG32(EWCTRL, 0x124)
++REG32(PDCM_PD_SYS_SENSE, 0x200)
++REG32(PDCM_PD_SRAM0_SENSE, 0x20c)
++REG32(PDCM_PD_SRAM1_SENSE, 0x210)
++REG32(PDCM_PD_SRAM2_SENSE, 0x214)
++REG32(PDCM_PD_SRAM3_SENSE, 0x218)
+ REG32(PID4, 0xfd0)
+ REG32(PID5, 0xfd4)
+ REG32(PID6, 0xfd8)
+@@ -67,6 +79,30 @@ static uint64_t iotkit_sysctl_read(void *opaque, hwaddr offset,
+     case A_SECDBGSTAT:
+         r = s->secure_debug;
+         break;
++    case A_SCSECCTRL:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->scsecctrl;
++        break;
++    case A_FCLK_DIV:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->fclk_div;
++        break;
++    case A_SYSCLK_DIV:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->sysclk_div;
++        break;
++    case A_CLOCK_FORCE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->clock_force;
++        break;
+     case A_RESET_SYNDROME:
+         r = s->reset_syndrome;
+         break;
+@@ -79,16 +115,62 @@ static uint64_t iotkit_sysctl_read(void *opaque, hwaddr offset,
+     case A_INITSVTOR0:
+         r = s->initsvtor0;
+         break;
++    case A_INITSVTOR1:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->initsvtor1;
++        break;
+     case A_CPUWAIT:
+         r = s->cpuwait;
+         break;
+-    case A_BUSWAIT:
+-        /* In IoTKit BUSWAIT is reserved, R/O, zero */
+-        r = 0;
++    case A_NMI_ENABLE:
++        /* In IoTKit this is named BUSWAIT but is marked reserved, R/O, zero */
++        if (!s->is_sse200) {
++            r = 0;
++            break;
++        }
++        r = s->nmi_enable;
+         break;
+     case A_WICCTRL:
+         r = s->wicctrl;
+         break;
++    case A_EWCTRL:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->ewctrl;
++        break;
++    case A_PDCM_PD_SYS_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->pdcm_pd_sys_sense;
++        break;
++    case A_PDCM_PD_SRAM0_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->pdcm_pd_sram0_sense;
++        break;
++    case A_PDCM_PD_SRAM1_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->pdcm_pd_sram1_sense;
++        break;
++    case A_PDCM_PD_SRAM2_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->pdcm_pd_sram2_sense;
++        break;
++    case A_PDCM_PD_SRAM3_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        r = s->pdcm_pd_sram3_sense;
++        break;
+     case A_PID4 ... A_CID3:
+         r = sysctl_id[(offset - A_PID4) / 4];
+         break;
+@@ -101,6 +183,7 @@ static uint64_t iotkit_sysctl_read(void *opaque, hwaddr offset,
+         r = 0;
+         break;
+     default:
++    bad_offset:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "IoTKit SysCtl read: bad offset %x\n", (int)offset);
+         r = 0;
+@@ -172,14 +255,105 @@ static void iotkit_sysctl_write(void *opaque, hwaddr offset,
+             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+         }
+         break;
+-    case A_BUSWAIT:        /* In IoTKit BUSWAIT is reserved, R/O, zero */
++    case A_SCSECCTRL:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP, "IoTKit SysCtl SCSECCTRL unimplemented\n");
++        s->scsecctrl = value;
++        break;
++    case A_FCLK_DIV:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP, "IoTKit SysCtl FCLK_DIV unimplemented\n");
++        s->fclk_div = value;
++        break;
++    case A_SYSCLK_DIV:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP, "IoTKit SysCtl SYSCLK_DIV unimplemented\n");
++        s->sysclk_div = value;
++        break;
++    case A_CLOCK_FORCE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP, "IoTKit SysCtl CLOCK_FORCE unimplemented\n");
++        s->clock_force = value;
++        break;
++    case A_INITSVTOR1:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP, "IoTKit SysCtl INITSVTOR1 unimplemented\n");
++        s->initsvtor1 = value;
++        break;
++    case A_EWCTRL:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP, "IoTKit SysCtl EWCTRL unimplemented\n");
++        s->ewctrl = value;
++        break;
++    case A_PDCM_PD_SYS_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP,
++                      "IoTKit SysCtl PDCM_PD_SYS_SENSE unimplemented\n");
++        s->pdcm_pd_sys_sense = value;
++        break;
++    case A_PDCM_PD_SRAM0_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP,
++                      "IoTKit SysCtl PDCM_PD_SRAM0_SENSE unimplemented\n");
++        s->pdcm_pd_sram0_sense = value;
++        break;
++    case A_PDCM_PD_SRAM1_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP,
++                      "IoTKit SysCtl PDCM_PD_SRAM1_SENSE unimplemented\n");
++        s->pdcm_pd_sram1_sense = value;
++        break;
++    case A_PDCM_PD_SRAM2_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP,
++                      "IoTKit SysCtl PDCM_PD_SRAM2_SENSE unimplemented\n");
++        s->pdcm_pd_sram2_sense = value;
++        break;
++    case A_PDCM_PD_SRAM3_SENSE:
++        if (!s->is_sse200) {
++            goto bad_offset;
++        }
++        qemu_log_mask(LOG_UNIMP,
++                      "IoTKit SysCtl PDCM_PD_SRAM3_SENSE unimplemented\n");
++        s->pdcm_pd_sram3_sense = value;
++        break;
++    case A_NMI_ENABLE:
++        /* In IoTKit this is BUSWAIT: reserved, R/O, zero */
++        if (!s->is_sse200) {
++            goto ro_offset;
++        }
++        qemu_log_mask(LOG_UNIMP, "IoTKit SysCtl NMI_ENABLE unimplemented\n");
++        s->nmi_enable = value;
++        break;
+     case A_SECDBGSTAT:
+     case A_PID4 ... A_CID3:
++    ro_offset:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "IoTKit SysCtl write: write of RO offset %x\n",
+                       (int)offset);
+         break;
+     default:
++    bad_offset:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "IoTKit SysCtl write: bad offset %x\n", (int)offset);
+         break;
+@@ -207,8 +381,20 @@ static void iotkit_sysctl_reset(DeviceState *dev)
+     s->reset_mask = 0;
+     s->gretreg = 0;
+     s->initsvtor0 = 0x10000000;
++    s->initsvtor1 = 0x10000000;
+     s->cpuwait = 0;
+     s->wicctrl = 0;
++    s->scsecctrl = 0;
++    s->fclk_div = 0;
++    s->sysclk_div = 0;
++    s->clock_force = 0;
++    s->nmi_enable = 0;
++    s->ewctrl = 0;
++    s->pdcm_pd_sys_sense = 0x7f;
++    s->pdcm_pd_sram0_sense = 0;
++    s->pdcm_pd_sram1_sense = 0;
++    s->pdcm_pd_sram2_sense = 0;
++    s->pdcm_pd_sram3_sense = 0;
+ }
+ 
+ static void iotkit_sysctl_init(Object *obj)
+@@ -221,6 +407,44 @@ static void iotkit_sysctl_init(Object *obj)
+     sysbus_init_mmio(sbd, &s->iomem);
+ }
+ 
++static void iotkit_sysctl_realize(DeviceState *dev, Error **errp)
 +{
-+    qemu_set_irq(s->cpu0irq, s->cpu0intr != 0);
-+    qemu_set_irq(s->cpu1irq, s->cpu1intr != 0);
-+}
++    IoTKitSysCtl *s = IOTKIT_SYSCTL(dev);
 +
-+static uint64_t armsse_mhu_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    ARMSSEMHU *s = ARMSSE_MHU(opaque);
-+    uint64_t r;
-+
-+    switch (offset) {
-+    case A_CPU0INTR_STAT:
-+        r = s->cpu0intr;
-+        break;
-+
-+    case A_CPU1INTR_STAT:
-+        r = s->cpu1intr;
-+        break;
-+
-+    case A_PID4 ... A_CID3:
-+        r = armsse_mhu_id[(offset - A_PID4) / 4];
-+        break;
-+
-+    case A_CPU0INTR_SET:
-+    case A_CPU0INTR_CLR:
-+    case A_CPU1INTR_SET:
-+    case A_CPU1INTR_CLR:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "SSE MHU: read of write-only register at offset 0x%x\n",
-+                      (int)offset);
-+        r = 0;
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "SSE MHU read: bad offset 0x%x\n", (int)offset);
-+        r = 0;
-+        break;
++    /* The top 4 bits of the SYS_VERSION register tell us if we're an SSE-200 */
++    if (extract32(s->sys_version, 28, 4) == 2) {
++        s->is_sse200 = true;
 +    }
-+    trace_armsse_mhu_read(offset, r, size);
-+    return r;
 +}
 +
-+static void armsse_mhu_write(void *opaque, hwaddr offset,
-+                             uint64_t value, unsigned size)
++static bool sse200_needed(void *opaque)
 +{
-+    ARMSSEMHU *s = ARMSSE_MHU(opaque);
++    IoTKitSysCtl *s = IOTKIT_SYSCTL(opaque);
 +
-+    trace_armsse_mhu_write(offset, value, size);
-+
-+    switch (offset) {
-+    case A_CPU0INTR_SET:
-+        s->cpu0intr |= (value & INTR_MASK);
-+        break;
-+    case A_CPU0INTR_CLR:
-+        s->cpu0intr &= ~(value & INTR_MASK);
-+        break;
-+    case A_CPU1INTR_SET:
-+        s->cpu1intr |= (value & INTR_MASK);
-+        break;
-+    case A_CPU1INTR_CLR:
-+        s->cpu1intr &= ~(value & INTR_MASK);
-+        break;
-+
-+    case A_CPU0INTR_STAT:
-+    case A_CPU1INTR_STAT:
-+    case A_PID4 ... A_CID3:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "SSE MHU: write to read-only register at offset 0x%x\n",
-+                      (int)offset);
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "SSE MHU write: bad offset 0x%x\n", (int)offset);
-+        break;
-+    }
-+
-+    armsse_mhu_update(s);
++    return s->is_sse200;
 +}
 +
-+static const MemoryRegionOps armsse_mhu_ops = {
-+    .read = armsse_mhu_read,
-+    .write = armsse_mhu_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+};
-+
-+static void armsse_mhu_reset(DeviceState *dev)
-+{
-+    ARMSSEMHU *s = ARMSSE_MHU(dev);
-+
-+    s->cpu0intr = 0;
-+    s->cpu1intr = 0;
-+}
-+
-+static const VMStateDescription armsse_mhu_vmstate = {
-+    .name = "armsse-mhu",
++static const VMStateDescription iotkit_sysctl_sse200_vmstate = {
++    .name = "iotkit-sysctl/sse-200",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
++    .needed = sse200_needed,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(cpu0intr, ARMSSEMHU),
-+        VMSTATE_UINT32(cpu1intr, ARMSSEMHU),
++        VMSTATE_UINT32(scsecctrl, IoTKitSysCtl),
++        VMSTATE_UINT32(fclk_div, IoTKitSysCtl),
++        VMSTATE_UINT32(sysclk_div, IoTKitSysCtl),
++        VMSTATE_UINT32(clock_force, IoTKitSysCtl),
++        VMSTATE_UINT32(initsvtor1, IoTKitSysCtl),
++        VMSTATE_UINT32(nmi_enable, IoTKitSysCtl),
++        VMSTATE_UINT32(pdcm_pd_sys_sense, IoTKitSysCtl),
++        VMSTATE_UINT32(pdcm_pd_sram0_sense, IoTKitSysCtl),
++        VMSTATE_UINT32(pdcm_pd_sram1_sense, IoTKitSysCtl),
++        VMSTATE_UINT32(pdcm_pd_sram2_sense, IoTKitSysCtl),
++        VMSTATE_UINT32(pdcm_pd_sram3_sense, IoTKitSysCtl),
 +        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription iotkit_sysctl_vmstate = {
+     .name = "iotkit-sysctl",
+     .version_id = 1,
+@@ -234,15 +458,26 @@ static const VMStateDescription iotkit_sysctl_vmstate = {
+         VMSTATE_UINT32(cpuwait, IoTKitSysCtl),
+         VMSTATE_UINT32(wicctrl, IoTKitSysCtl),
+         VMSTATE_END_OF_LIST()
 +    },
++    .subsections = (const VMStateDescription*[]) {
++        &iotkit_sysctl_sse200_vmstate,
++        NULL
+     }
+ };
+ 
++static Property iotkit_sysctl_props[] = {
++    DEFINE_PROP_UINT32("SYS_VERSION", IoTKitSysCtl, sys_version, 0),
++    DEFINE_PROP_END_OF_LIST()
 +};
 +
-+static void armsse_mhu_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    ARMSSEMHU *s = ARMSSE_MHU(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &armsse_mhu_ops,
-+                          s, "armsse-mhu", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->cpu0irq);
-+    sysbus_init_irq(sbd, &s->cpu1irq);
-+}
-+
-+static void armsse_mhu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = armsse_mhu_reset;
-+    dc->vmsd = &armsse_mhu_vmstate;
-+}
-+
-+static const TypeInfo armsse_mhu_info = {
-+    .name = TYPE_ARMSSE_MHU,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(ARMSSEMHU),
-+    .instance_init = armsse_mhu_init,
-+    .class_init = armsse_mhu_class_init,
-+};
-+
-+static void armsse_mhu_register_types(void)
-+{
-+    type_register_static(&armsse_mhu_info);
-+}
-+
-+type_init(armsse_mhu_register_types);
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8f9f9d7c7d5..0a6190ecff6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -633,6 +633,8 @@ F: hw/misc/iotkit-sysinfo.c
- F: include/hw/misc/iotkit-sysinfo.h
- F: hw/misc/armsse-cpuid.c
- F: include/hw/misc/armsse-cpuid.h
-+F: hw/misc/armsse-mhu.c
-+F: include/hw/misc/armsse-mhu.h
+ static void iotkit_sysctl_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
- Musca
- M: Peter Maydell <peter.maydell@linaro.org>
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 87ad2674946..bd6943b691a 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -119,6 +119,7 @@ CONFIG_IOTKIT_SECCTL=y
- CONFIG_IOTKIT_SYSCTL=y
- CONFIG_IOTKIT_SYSINFO=y
- CONFIG_ARMSSE_CPUID=y
-+CONFIG_ARMSSE_MHU=y
+     dc->vmsd = &iotkit_sysctl_vmstate;
+     dc->reset = iotkit_sysctl_reset;
++    dc->props = iotkit_sysctl_props;
++    dc->realize = iotkit_sysctl_realize;
+ }
  
- CONFIG_VERSATILE=y
- CONFIG_VERSATILE_PCI=y
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index b0701bddd3c..c1795bb54b8 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -136,3 +136,7 @@ iotkit_sysctl_reset(void) "IoTKit SysCtl: reset"
- # hw/misc/armsse-cpuid.c
- armsse_cpuid_read(uint64_t offset, uint64_t data, unsigned size) "SSE-200 CPU_IDENTITY read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- armsse_cpuid_write(uint64_t offset, uint64_t data, unsigned size) "SSE-200 CPU_IDENTITY write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+
-+# hw/misc/armsse-mhu.c
-+armsse_mhu_read(uint64_t offset, uint64_t data, unsigned size) "SSE-200 MHU read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+armsse_mhu_write(uint64_t offset, uint64_t data, unsigned size) "SSE-200 MHU write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ static const TypeInfo iotkit_sysctl_info = {
 -- 
 2.20.1
