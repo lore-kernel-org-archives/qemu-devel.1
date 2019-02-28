@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41121)
+Received: from eggs.gnu.org ([209.51.188.92]:41386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzMDS-0002uV-Vl
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 08:59:20 -0500
+	(envelope-from <bounces@canonical.com>) id 1gzMFG-00044P-GM
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:01:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzMDS-0004OW-3c
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 08:59:14 -0500
-References: <4817f5c3b20aedba869608c06e76d11a722f4864.camel@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3aaecc9d-d03b-a754-0ef0-a65609777b2e@redhat.com>
-Date: Thu, 28 Feb 2019 07:59:02 -0600
+	(envelope-from <bounces@canonical.com>) id 1gzMFB-00052d-MM
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:01:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gzMF7-0004zV-DF
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:00:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gzMEy-0000Kv-4b
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:00:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1F4322E8042
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:00:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <4817f5c3b20aedba869608c06e76d11a722f4864.camel@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] trivial malloc to g_malloc in thunk
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 Feb 2019 13:53:10 -0000
+From: Ross Burton <ross@burtonini.com>
+Reply-To: Bug 1818075 <1818075@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155136199055.29310.6029801353341134939.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818075] [NEW] qemu-user-x86-64 hangs at
+ vcvttsd2si
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +36,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aarushi Mehta <mehta.aaru20@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>
+To: qemu-devel@nongnu.org
 
-On 2/28/19 7:42 AM, Aarushi Mehta wrote:
-> Hi
-> 
-> This is a trivial contribution part of the BiteSizedTasks on the wiki.
-> I found this discussion http://git.corpit.ru/?p=qemu.git;a=commit;h=b45c03f585ea9bb1af76c73e82195418c294919d
-> on migrating even g_malloc to g_new, is this not appropriate for the same? 
-> The wiki can presumably use an update regarding this.
-> 
-> Signed-off-by: Aarushi <mehta.aaru20@gmail.com>
-> ---
->  thunk.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/thunk.c b/thunk.c
-> index d5d8645cd4..03fb2abab7 100644
-> --- a/thunk.c
-> +++ b/thunk.c
-> @@ -89,7 +89,7 @@ void thunk_register_struct(int id, const char *name, const argtype *types)
->      for(i = 0;i < 2; i++) {
->          offset = 0;
->          max_align = 1;
-> -        se->field_offsets[i] = malloc(nb_fields * sizeof(int));
-> +        se->field_offsets[i] = g_malloc(nb_fields * sizeof(int));
+Public bug reported:
 
-Where is the counterpart free() that needs to be changed to g_free()?
+I'm trying to execute code that has been built with -march=3Dskylake
+-mtune=3Dgeneric -mavx2 under qemu-user x86-64 with -cpu Skylake-Client.
+However this code just hangs at 100% CPU.
 
-Also, you absolutely want g_new() or some other variant that separates
-the number of elements from the size of the element as two separate
-arguments, to avoid the possibility of integer overflow when using * in
-a single argument.
+Adding input tracing shows that it is likely hanging when dealing with
+an AVX instruction:
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.fma [bit 12]
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.pcid [bit 17]
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit 2=
+1]
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.tsc-deadline =
+[bit 24]
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.f16c [bit 29]
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.rdrand [bit 3=
+0]
+warning: TCG doesn't support requested feature: CPUID.07H:EBX.hle [bit 4]
+warning: TCG doesn't support requested feature: CPUID.07H:EBX.avx2 [bit 5]
+warning: TCG doesn't support requested feature: CPUID.07H:EBX.invpcid [bit =
+10]
+warning: TCG doesn't support requested feature: CPUID.07H:EBX.rtm [bit 11]
+warning: TCG doesn't support requested feature: CPUID.07H:EBX.rdseed [bit 1=
+8]
+warning: TCG doesn't support requested feature: CPUID.80000001H:ECX.3dnowpr=
+efetch [bit 8]
+warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsavec [bit 1]
+
+IN:
+0x4000b4ef3b:  c5 fb 5c ca              vsubsd   %xmm2, %xmm0, %xmm1
+0x4000b4ef3f:  c4 e1 fb 2c d1           vcvttsd2si %xmm1, %rdx
+0x4000b4ef44:  4c 31 e2                 xorq     %r12, %rdx
+0x4000b4ef47:  48 85 d2                 testq    %rdx, %rdx
+0x4000b4ef4a:  79 9e                    jns      0x4000b4eeea
+
+[ hangs ]
+
+Attaching a gdb produces this stacktrace:
+
+(gdb) bt
+#0  canonicalize (status=3D0x55a20ff67a88, parm=3D0x55a20bb807e0 <float64_p=
+arams>, part=3D...)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/fpu/softfloat.c:350
+#1  float64_unpack_canonical (s=3D0x55a20ff67a88, f=3D0)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/fpu/softfloat.c:547
+#2  float64_sub (a=3D0, b=3D4890909195324358656, status=3D0x55a20ff67a88)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/fpu/softfloat.c:776
+#3  0x000055a20baa1949 in helper_subsd (env=3D<optimized out>, d=3D0x55a20f=
+f67ad8, s=3D<optimized out>)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/target/i386/ops_sse.h:623
+#4  0x000055a20cfcfea8 in static_code_gen_buffer ()
+#5  0x000055a20ba3f764 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55a20=
+cea2180 <static_code_gen_buffer+15684720>)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/accel/tcg/cpu-exec.c:171
+#6  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic p=
+ointer>, tb=3D<optimized out>,
+    cpu=3D0x55a20cea2180 <static_code_gen_buffer+15684720>)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/accel/tcg/cpu-exec.c:615
+#7  cpu_exec (cpu=3Dcpu@entry=3D0x55a20ff5f4d0)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/accel/tcg/cpu-exec.c:725
+#8  0x000055a20ba6d728 in cpu_loop (env=3D0x55a20ff67780)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/linux-user/x86_64/../i386/cpu_loop.c:93
+#9  0x000055a20ba049ff in main (argc=3D<optimized out>, argv=3D0x7ffc585728=
+68, envp=3D<optimized out>)
+    at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-3.=
+1.0/linux-user/main.c:819
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818075
+
+Title:
+  qemu-user-x86-64 hangs at vcvttsd2si
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm trying to execute code that has been built with -march=3Dskylake
+  -mtune=3Dgeneric -mavx2 under qemu-user x86-64 with -cpu Skylake-Client.
+  However this code just hangs at 100% CPU.
+
+  Adding input tracing shows that it is likely hanging when dealing with
+  an AVX instruction:
+
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.fma [bit 12]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.pcid [bit 1=
+7]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit=
+ 21]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.tsc-deadlin=
+e [bit 24]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.f16c [bit 2=
+9]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.rdrand [bit=
+ 30]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.hle [bit 4]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.avx2 [bit 5]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.invpcid [bi=
+t 10]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rtm [bit 11]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rdseed [bit=
+ 18]
+  warning: TCG doesn't support requested feature: CPUID.80000001H:ECX.3dnow=
+prefetch [bit 8]
+  warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsavec [bit=
+ 1]
+
+  IN:
+  0x4000b4ef3b:  c5 fb 5c ca              vsubsd   %xmm2, %xmm0, %xmm1
+  0x4000b4ef3f:  c4 e1 fb 2c d1           vcvttsd2si %xmm1, %rdx
+  0x4000b4ef44:  4c 31 e2                 xorq     %r12, %rdx
+  0x4000b4ef47:  48 85 d2                 testq    %rdx, %rdx
+  0x4000b4ef4a:  79 9e                    jns      0x4000b4eeea
+
+  [ hangs ]
+
+  Attaching a gdb produces this stacktrace:
+
+  (gdb) bt
+  #0  canonicalize (status=3D0x55a20ff67a88, parm=3D0x55a20bb807e0 <float64=
+_params>, part=3D...)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:350
+  #1  float64_unpack_canonical (s=3D0x55a20ff67a88, f=3D0)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:547
+  #2  float64_sub (a=3D0, b=3D4890909195324358656, status=3D0x55a20ff67a88)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:776
+  #3  0x000055a20baa1949 in helper_subsd (env=3D<optimized out>, d=3D0x55a2=
+0ff67ad8, s=3D<optimized out>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/target/i386/ops_sse.h:623
+  #4  0x000055a20cfcfea8 in static_code_gen_buffer ()
+  #5  0x000055a20ba3f764 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55a=
+20cea2180 <static_code_gen_buffer+15684720>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:171
+  #6  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic=
+ pointer>, tb=3D<optimized out>,
+      cpu=3D0x55a20cea2180 <static_code_gen_buffer+15684720>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:615
+  #7  cpu_exec (cpu=3Dcpu@entry=3D0x55a20ff5f4d0)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:725
+  #8  0x000055a20ba6d728 in cpu_loop (env=3D0x55a20ff67780)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/linux-user/x86_64/../i386/cpu_loop.c:93
+  #9  0x000055a20ba049ff in main (argc=3D<optimized out>, argv=3D0x7ffc5857=
+2868, envp=3D<optimized out>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/linux-user/main.c:819
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818075/+subscriptions
