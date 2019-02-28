@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40628)
+Received: from eggs.gnu.org ([209.51.188.92]:40857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzO6f-0006cl-CF
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:27 -0500
+	(envelope-from <philmd@redhat.com>) id 1gzO8o-0007tW-SZ
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:02:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzO6a-0002rJ-WA
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:21 -0500
-Resent-Message-Id: <E1gzO6a-0002rJ-WA@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21806)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gzO6a-0002jA-JH
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:16 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155136957846.7448.12579906111564987092@49fa7ef69f7b>
-In-Reply-To: <20190228145624.24885-1-peter.maydell@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1gzO8c-00042f-Op
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:02:32 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38982)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gzO8N-0003W8-Ne
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:02:10 -0500
+Received: by mail-wm1-f68.google.com with SMTP id z84so9453273wmg.4
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 08:01:15 -0800 (PST)
+References: <20190228145624.24885-1-peter.maydell@linaro.org>
+	<20190228145624.24885-4-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <074eb05d-762d-97ae-a3fe-4f009382e83d@redhat.com>
+Date: Thu, 28 Feb 2019 17:01:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 28 Feb 2019 07:59:40 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] Enable build and install of our
- rST docs
+In-Reply-To: <20190228145624.24885-4-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/11] docs: Commit initial files from
+ sphinx-quickstart
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +31,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, philmd@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyODE0NTYyNC4yNDg4
-NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8x
-MV0gRW5hYmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
-OTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
-MDE5MDIyODE0NTYyNC4yNDg4NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjI2M2Q1YmNkMmUgZG9jcy9jb25mLnB5OiBEb24ndCBoYXJk
-LWNvZGUgUUVNVSB2ZXJzaW9uCjVjYTg4MjZkMmMgTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRl
-bnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUKZGFiN2JkNzRhMCBNYWtlZmlsZSwgY29uZmlndXJl
-OiBTdXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uCmRlZDAzZjNlNDkgZG9jczogUHJv
-dmlkZSBzZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50CjZlOWU5MmNkMjYg
-ZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncwpkMzg5MTdjZjAzIGRvY3MvY29u
-Zi5weTogRG9uJ3QgaW5jbHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1aWxkCmE2OWJmYWU0MTcg
-ZG9jcy9jb25mLnB5OiBDb25maWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lCmEwNjNkYWQwYWEg
-ZG9jcy9jb25mLnB5OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeQpiNmQxNTQ3NGE1
-IGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQKNWFkOTAz
-OGJkMCBkb2NzOiBDb252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdApmMTk0YjA0ZmFkIGRv
-Y3MvY3B1LWhvdHBsdWcucnN0OiBGaXggclNUIG1hcmt1cCBpc3N1ZXMKCj09PSBPVVRQVVQgQkVH
-SU4gPT09CjEvMTEgQ2hlY2tpbmcgY29tbWl0IGYxOTRiMDRmYWQyOCAoZG9jcy9jcHUtaG90cGx1
-Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3VlcykKMi8xMSBDaGVja2luZyBjb21taXQgNWFkOTAz
-OGJkMGJmIChkb2NzOiBDb252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdCkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMjM6IApyZW5hbWUgZnJvbSBkb2NzL2RldmVsL21lbW9yeS50eHQKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgMTk1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTEgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xMSBDaGVja2luZyBjb21taXQgYjZkMTU0NzRhNWI1IChk
-b2NzOiBDb21taXQgaW5pdGlhbCBmaWxlcyBmcm9tIHNwaGlueC1xdWlja3N0YXJ0KQpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDE4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzExIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjQvMTEgQ2hlY2tpbmcgY29tbWl0IGEwNjNkYWQwYWFiZSAoZG9jcy9jb25mLnB5
-OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQg
-YTY5YmZhZTQxNzIwIChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhl
-bWUpCjYvMTEgQ2hlY2tpbmcgY29tbWl0IGQzODkxN2NmMDMwZSAoZG9jcy9jb25mLnB5OiBEb24n
-dCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0
-IDZlOWU5MmNkMjYyNiAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8x
-MSBDaGVja2luZyBjb21taXQgZGVkMDNmM2U0OWIwIChkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNv
-bmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEwMTogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE4Njog
-RklMRTogZG9jcy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2Ny
-aXB0aW9uJ10gPSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJp
-bGl0eSBHdWlkZScKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcg
-Y29tbWl0IGRhYjdiZDc0YTAxNCAoTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGlu
-ZyByU1QgZG9jdW1lbnRhdGlvbikKMTAvMTEgQ2hlY2tpbmcgY29tbWl0IDVjYTg4MjZkMmMzOCAo
-TWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjEx
-LzExIENoZWNraW5nIGNvbW1pdCAyNjNkNWJjZDJlNzcgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFy
-ZC1jb2RlIFFFTVUgdmVyc2lvbikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMjAxOTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRlci5tYXlkZWxsQGxpbmFy
-by5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi Peter,
+
+On 2/28/19 3:56 PM, Peter Maydell wrote:
+> Commit the initial Sphinx conf.py and skeleton index.rst as
+> generated with sphinx-quickstart. We'll update these to
+> add QEMU-specific tweaks in subsequent commits.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  docs/conf.py   | 168 +++++++++++++++++++++++++++++++++++++++++++++++++
+
+Can you add a "rST documentation" section in MAINTAINERS?
+
+Eduardo/Cleber:
+
+What about replacing the current resctricted rules in the "Python
+scripts" section by a global "F: *.py" rule?
+
+Thanks,
+
+Phil.
+
+>  docs/index.rst |  20 ++++++
+>  2 files changed, 188 insertions(+)
+>  create mode 100644 docs/conf.py
+>  create mode 100644 docs/index.rst
+> 
+> diff --git a/docs/conf.py b/docs/conf.py
+> new file mode 100644
+> index 00000000000..53a17506615
+> --- /dev/null
+> +++ b/docs/conf.py
+> @@ -0,0 +1,168 @@
+> +# -*- coding: utf-8 -*-
+> +#
+> +# QEMU documentation build configuration file, created by
+> +# sphinx-quickstart on Thu Jan 31 16:40:14 2019.
+> +#
+> +# This file is execfile()d with the current directory set to its
+> +# containing dir.
+> +#
+> +# Note that not all possible configuration values are present in this
+> +# autogenerated file.
+> +#
+> +# All configuration values have a default; values that are commented out
+> +# serve to show the default.
+> +
+> +# If extensions (or modules to document with autodoc) are in another directory,
+> +# add these directories to sys.path here. If the directory is relative to the
+> +# documentation root, use os.path.abspath to make it absolute, like shown here.
+> +#
+> +# import os
+> +# import sys
+> +# sys.path.insert(0, os.path.abspath('.'))
+> +
+> +
+> +# -- General configuration ------------------------------------------------
+> +
+> +# If your documentation needs a minimal Sphinx version, state it here.
+> +#
+> +# needs_sphinx = '1.0'
+> +
+> +# Add any Sphinx extension module names here, as strings. They can be
+> +# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+> +# ones.
+> +extensions = []
+> +
+> +# Add any paths that contain templates here, relative to this directory.
+> +templates_path = ['_templates']
+> +
+> +# The suffix(es) of source filenames.
+> +# You can specify multiple suffix as a list of string:
+> +#
+> +# source_suffix = ['.rst', '.md']
+> +source_suffix = '.rst'
+> +
+> +# The master toctree document.
+> +master_doc = 'index'
+> +
+> +# General information about the project.
+> +project = u'QEMU'
+> +copyright = u'2019, The QEMU Project Developers'
+> +author = u'The QEMU Project Developers'
+> +
+> +# The version info for the project you're documenting, acts as replacement for
+> +# |version| and |release|, also used in various other places throughout the
+> +# built documents.
+> +#
+> +# The short X.Y version.
+> +version = u'4.0'
+> +# The full version, including alpha/beta/rc tags.
+> +release = u'4.0'
+> +
+> +# The language for content autogenerated by Sphinx. Refer to documentation
+> +# for a list of supported languages.
+> +#
+> +# This is also used if you do content translation via gettext catalogs.
+> +# Usually you set "language" from the command line for these cases.
+> +language = None
+> +
+> +# List of patterns, relative to source directory, that match files and
+> +# directories to ignore when looking for source files.
+> +# This patterns also effect to html_static_path and html_extra_path
+> +exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+> +
+> +# The name of the Pygments (syntax highlighting) style to use.
+> +pygments_style = 'sphinx'
+> +
+> +# If true, `todo` and `todoList` produce output, else they produce nothing.
+> +todo_include_todos = False
+> +
+> +
+> +# -- Options for HTML output ----------------------------------------------
+> +
+> +# The theme to use for HTML and HTML Help pages.  See the documentation for
+> +# a list of builtin themes.
+> +#
+> +html_theme = 'alabaster'
+> +
+> +# Theme options are theme-specific and customize the look and feel of a theme
+> +# further.  For a list of options available for each theme, see the
+> +# documentation.
+> +#
+> +# html_theme_options = {}
+> +
+> +# Add any paths that contain custom static files (such as style sheets) here,
+> +# relative to this directory. They are copied after the builtin static files,
+> +# so a file named "default.css" will overwrite the builtin "default.css".
+> +html_static_path = ['_static']
+> +
+> +# Custom sidebar templates, must be a dictionary that maps document names
+> +# to template names.
+> +#
+> +# This is required for the alabaster theme
+> +# refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
+> +html_sidebars = {
+> +    '**': [
+> +        'relations.html',  # needs 'show_related': True theme option to display
+> +        'searchbox.html',
+> +    ]
+> +}
+> +
+> +
+> +# -- Options for HTMLHelp output ------------------------------------------
+> +
+> +# Output file base name for HTML help builder.
+> +htmlhelp_basename = 'QEMUdoc'
+> +
+> +
+> +# -- Options for LaTeX output ---------------------------------------------
+> +
+> +latex_elements = {
+> +    # The paper size ('letterpaper' or 'a4paper').
+> +    #
+> +    # 'papersize': 'letterpaper',
+> +
+> +    # The font size ('10pt', '11pt' or '12pt').
+> +    #
+> +    # 'pointsize': '10pt',
+> +
+> +    # Additional stuff for the LaTeX preamble.
+> +    #
+> +    # 'preamble': '',
+> +
+> +    # Latex figure (float) alignment
+> +    #
+> +    # 'figure_align': 'htbp',
+> +}
+> +
+> +# Grouping the document tree into LaTeX files. List of tuples
+> +# (source start file, target name, title,
+> +#  author, documentclass [howto, manual, or own class]).
+> +latex_documents = [
+> +    (master_doc, 'QEMU.tex', u'QEMU Documentation',
+> +     u'The QEMU Project Developers', 'manual'),
+> +]
+> +
+> +
+> +# -- Options for manual page output ---------------------------------------
+> +
+> +# One entry per manual page. List of tuples
+> +# (source start file, name, description, authors, manual section).
+> +man_pages = [
+> +    (master_doc, 'qemu', u'QEMU Documentation',
+> +     [author], 1)
+> +]
+> +
+> +
+> +# -- Options for Texinfo output -------------------------------------------
+> +
+> +# Grouping the document tree into Texinfo files. List of tuples
+> +# (source start file, target name, title, author,
+> +#  dir menu entry, description, category)
+> +texinfo_documents = [
+> +    (master_doc, 'QEMU', u'QEMU Documentation',
+> +     author, 'QEMU', 'One line description of project.',
+> +     'Miscellaneous'),
+> +]
+> +
+> +
+> +
+> diff --git a/docs/index.rst b/docs/index.rst
+> new file mode 100644
+> index 00000000000..93f82228310
+> --- /dev/null
+> +++ b/docs/index.rst
+> @@ -0,0 +1,20 @@
+> +.. QEMU documentation master file, created by
+> +   sphinx-quickstart on Thu Jan 31 16:40:14 2019.
+> +   You can adapt this file completely to your liking, but it should at least
+> +   contain the root `toctree` directive.
+> +
+> +Welcome to QEMU's documentation!
+> +================================
+> +
+> +.. toctree::
+> +   :maxdepth: 2
+> +   :caption: Contents:
+> +
+> +
+> +
+> +Indices and tables
+> +==================
+> +
+> +* :ref:`genindex`
+> +* :ref:`modindex`
+> +* :ref:`search`
+> 
