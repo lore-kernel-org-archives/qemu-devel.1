@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37613)
+Received: from eggs.gnu.org ([209.51.188.92]:38187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzLuz-0003CV-Cq
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 08:40:10 -0500
+	(envelope-from <mehta.aaru20@gmail.com>) id 1gzLxs-0004I2-3Z
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 08:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzLuy-00038R-D0
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 08:40:09 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:34525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gzLux-00035A-UC
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 08:40:08 -0500
-Received: by mail-oi1-x235.google.com with SMTP id g16so16504598oib.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 05:40:05 -0800 (PST)
-MIME-Version: 1.0
-References: <20190201145035.22739-1-peter.maydell@linaro.org>
-	<20190201145035.22739-6-peter.maydell@linaro.org>
-	<87imy3v4qo.fsf@zen.linaroharston>
-In-Reply-To: <87imy3v4qo.fsf@zen.linaroharston>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Feb 2019 13:39:53 +0000
-Message-ID: <CAFEAcA-D-3kR+9=k0yLdBA+gRjw+n7tHUyXD5CeJqBt7OO_z6g@mail.gmail.com>
+	(envelope-from <mehta.aaru20@gmail.com>) id 1gzLxq-0005d6-TV
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 08:43:08 -0500
+Message-ID: <4817f5c3b20aedba869608c06e76d11a722f4864.camel@gmail.com>
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
+Date: Thu, 28 Feb 2019 19:12:45 +0530
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/11] docs/conf.py: Configure the
- 'alabaster' theme
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] trivial malloc to g_malloc in thunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +20,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>
 
-On Fri, 1 Feb 2019 at 16:43, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
->
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
-> > Add the 'navigation' bar to the sidebar, which for some
-> > reason is not enabled by default. Remove 'relations', which
-> > is effectively disabled anyway and isn't useful for us.
->
-> I'm not sure what the title means... is the theme a reference to a
-> layout? I thought themes were colours and other such visual frippery
-> rather than actual content layout. But what do I know as a mere code
-> monkey...
+Hi
 
-Just noticed I never followed up to this. Sphinx themes
-allow a bit more customisation than just "colours and fonts":
-they can also do layout things like changing up what sorts of
-sidebar information is shown, or indeed whether there's any
-kind of sidebar at all. Specific themes might expose some
-theme-specific config options which allow tweaking of how
-they appear.
+This is a trivial contribution part of the BiteSizedTasks on the wiki.
+I found this discussion http://git.corpit.ru/?p=qemu.git;a=commit;h=b45c03f585ea9bb1af76c73e82195418c294919d
+on migrating even g_malloc to g_new, is this not appropriate for the same? 
+The wiki can presumably use an update regarding this.
 
-http://www.sphinx-doc.org/en/stable/theming.html
-has a few screenshots and gives more of an idea of what
-sort of tweaks the theming system allows.
+Signed-off-by: Aarushi <mehta.aaru20@gmail.com>
+---
+ thunk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-thanks
--- PMM
+diff --git a/thunk.c b/thunk.c
+index d5d8645cd4..03fb2abab7 100644
+--- a/thunk.c
++++ b/thunk.c
+@@ -89,7 +89,7 @@ void thunk_register_struct(int id, const char *name, const argtype *types)
+     for(i = 0;i < 2; i++) {
+         offset = 0;
+         max_align = 1;
+-        se->field_offsets[i] = malloc(nb_fields * sizeof(int));
++        se->field_offsets[i] = g_malloc(nb_fields * sizeof(int));
+         type_ptr = se->field_types;
+         for(j = 0;j < nb_fields; j++) {
+             size = thunk_type_size(type_ptr, i);
+-- 
+2.17.1
