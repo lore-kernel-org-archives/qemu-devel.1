@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37511)
+Received: from eggs.gnu.org ([209.51.188.92]:37567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gzHT7-0000VI-7w
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:08 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gzHT9-0000XM-Dx
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gzHT3-0004MA-An
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:05 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44743)
+	(envelope-from <elohimes@gmail.com>) id 1gzHT7-0004O5-3k
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:07 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:40810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gzHT1-0004Hm-70
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:01 -0500
-Received: by mail-pf1-x441.google.com with SMTP id a3so9390637pff.11
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 00:54:44 -0800 (PST)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gzHT3-0004JW-By
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 03:55:03 -0500
+Received: by mail-pl1-x643.google.com with SMTP id bj4so9422328plb.7
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 00:54:54 -0800 (PST)
 From: elohimes@gmail.com
-Date: Thu, 28 Feb 2019 16:53:49 +0800
-Message-Id: <20190228085355.9614-2-xieyongji@baidu.com>
+Date: Thu, 28 Feb 2019 16:53:52 +0800
+Message-Id: <20190228085355.9614-5-xieyongji@baidu.com>
 In-Reply-To: <20190228085355.9614-1-xieyongji@baidu.com>
 References: <20190228085355.9614-1-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH v7 1/7] vhost-user: Support transferring
- inflight buffer between qemu and backend
+Subject: [Qemu-devel] [PATCH v7 4/7] libvhost-user: Support tracking
+ inflight I/O in shared memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,103 +31,548 @@ Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.c
 
 From: Xie Yongji <xieyongji@baidu.com>
 
-This patch introduces two new messages VHOST_USER_GET_INFLIGHT_FD
-and VHOST_USER_SET_INFLIGHT_FD to support transferring a shared
-buffer between qemu and backend.
-
-Firstly, qemu uses VHOST_USER_GET_INFLIGHT_FD to get the
-shared buffer from backend. Then qemu should send it back
-through VHOST_USER_SET_INFLIGHT_FD each time we start vhost-user.
-
-This shared buffer is used to track inflight I/O by backend.
-Qemu should retrieve a new one when vm reset.
+This patch adds support for VHOST_USER_GET_INFLIGHT_FD and
+VHOST_USER_SET_INFLIGHT_FD message to set/get shared buffer
+to/from qemu. Then backend can track inflight I/O in this buffer.
 
 Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Chai Wen <chaiwen@baidu.com>
 Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
 ---
- docs/interop/vhost-user.txt       | 285 ++++++++++++++++++++++++++++++
- hw/virtio/vhost-user.c            | 107 +++++++++++
- hw/virtio/vhost.c                 |  96 ++++++++++
- include/hw/virtio/vhost-backend.h |  10 ++
- include/hw/virtio/vhost.h         |  18 ++
- 5 files changed, 516 insertions(+)
+ Makefile                              |   2 +-
+ contrib/libvhost-user/libvhost-user.c | 349 ++++++++++++++++++++++++--
+ contrib/libvhost-user/libvhost-user.h |  70 ++++++
+ 3 files changed, 400 insertions(+), 21 deletions(-)
 
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index c2194711d9..de7e38c7db 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -142,6 +142,17 @@ Depending on the request type, payload can be:
-    Offset: a 64-bit offset of this area from the start of the
-        supplied file descriptor
+diff --git a/Makefile b/Makefile
+index 7fa04e0821..3cf34bf8b3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -479,7 +479,7 @@ Makefile: $(version-obj-y)
+ # Build libraries
  
-+ * Inflight description
-+   -----------------------------------------------------
-+   | mmap size | mmap offset | num queues | queue size |
-+   -----------------------------------------------------
-+
-+   mmap size: a 64-bit size of area to track inflight I/O
-+   mmap offset: a 64-bit offset of this area from the start
-+                of the supplied file descriptor
-+   num queues: a 16-bit number of virtqueues
-+   queue size: a 16-bit size of virtqueues
-+
- In QEMU the vhost-user message is implemented with the following struct:
+ libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
+-libvhost-user.a: $(libvhost-user-obj-y)
++libvhost-user.a: $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y)
  
- typedef struct VhostUserMsg {
-@@ -157,6 +168,7 @@ typedef struct VhostUserMsg {
-         struct vhost_iotlb_msg iotlb;
+ ######################################################################
+ 
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index ea0f414b6d..065ab60924 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -41,6 +41,8 @@
+ #endif
+ 
+ #include "qemu/atomic.h"
++#include "qemu/osdep.h"
++#include "qemu/memfd.h"
+ 
+ #include "libvhost-user.h"
+ 
+@@ -53,6 +55,18 @@
+             _min1 < _min2 ? _min1 : _min2; })
+ #endif
+ 
++/* Round number down to multiple */
++#define ALIGN_DOWN(n, m) ((n) / (m) * (m))
++
++/* Round number up to multiple */
++#define ALIGN_UP(n, m) ALIGN_DOWN((n) + (m) - 1, (m))
++
++/* Align each region to cache line size in inflight buffer */
++#define INFLIGHT_ALIGNMENT 64
++
++/* The version of inflight buffer */
++#define INFLIGHT_VERSION 1
++
+ #define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
+ 
+ /* The version of the protocol we support */
+@@ -66,6 +80,20 @@
+         }                                       \
+     } while (0)
+ 
++static inline
++bool has_feature(uint64_t features, unsigned int fbit)
++{
++    assert(fbit < 64);
++    return !!(features & (1ULL << fbit));
++}
++
++static inline
++bool vu_has_feature(VuDev *dev,
++                    unsigned int fbit)
++{
++    return has_feature(dev->features, fbit);
++}
++
+ static const char *
+ vu_request_to_string(unsigned int req)
+ {
+@@ -100,6 +128,8 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_POSTCOPY_ADVISE),
+         REQ(VHOST_USER_POSTCOPY_LISTEN),
+         REQ(VHOST_USER_POSTCOPY_END),
++        REQ(VHOST_USER_GET_INFLIGHT_FD),
++        REQ(VHOST_USER_SET_INFLIGHT_FD),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+@@ -890,6 +920,91 @@ vu_check_queue_msg_file(VuDev *dev, VhostUserMsg *vmsg)
+     return true;
+ }
+ 
++static int
++inflight_desc_compare(const void *a, const void *b)
++{
++    VuVirtqInflightDesc *desc0 = (VuVirtqInflightDesc *)a,
++                        *desc1 = (VuVirtqInflightDesc *)b;
++
++    if (desc1->counter > desc0->counter &&
++        (desc1->counter - desc0->counter) < VIRTQUEUE_MAX_SIZE * 2) {
++        return 1;
++    }
++
++    return -1;
++}
++
++static int
++vu_check_queue_inflights(VuDev *dev, VuVirtq *vq)
++{
++    int i = 0;
++
++    if (!has_feature(dev->protocol_features,
++        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
++        return 0;
++    }
++
++    if (unlikely(!vq->inflight)) {
++        return -1;
++    }
++
++    if (unlikely(!vq->inflight->version)) {
++        /* initialize the buffer */
++        vq->inflight->version = INFLIGHT_VERSION;
++        return 0;
++    }
++
++    vq->used_idx = vq->vring.used->idx;
++    vq->resubmit_num = 0;
++    vq->resubmit_list = NULL;
++    vq->counter = 0;
++
++    if (unlikely(vq->inflight->used_idx != vq->used_idx)) {
++        vq->inflight->desc[vq->inflight->last_batch_head].inflight = 0;
++
++        barrier();
++
++        vq->inflight->used_idx = vq->used_idx;
++    }
++
++    for (i = 0; i < vq->inflight->desc_num; i++) {
++        if (vq->inflight->desc[i].inflight == 1) {
++            vq->inuse++;
++        }
++    }
++
++    vq->shadow_avail_idx = vq->last_avail_idx = vq->inuse + vq->used_idx;
++
++    if (vq->inuse) {
++        vq->resubmit_list = malloc(sizeof(VuVirtqInflightDesc) * vq->inuse);
++        if (!vq->resubmit_list) {
++            return -1;
++        }
++
++        for (i = 0; i < vq->inflight->desc_num; i++) {
++            if (vq->inflight->desc[i].inflight) {
++                vq->resubmit_list[vq->resubmit_num].index = i;
++                vq->resubmit_list[vq->resubmit_num].counter =
++                                        vq->inflight->desc[i].counter;
++                vq->resubmit_num++;
++            }
++        }
++
++        if (vq->resubmit_num > 1) {
++            qsort(vq->resubmit_list, vq->resubmit_num,
++                  sizeof(VuVirtqInflightDesc), inflight_desc_compare);
++        }
++        vq->counter = vq->resubmit_list[0].counter + 1;
++    }
++
++    /* in case of I/O hang after reconnecting */
++    if (eventfd_write(vq->kick_fd, 1)) {
++        return -1;
++    }
++
++    return 0;
++}
++
+ static bool
+ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *vmsg)
+ {
+@@ -923,6 +1038,10 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *vmsg)
+                dev->vq[index].kick_fd, index);
+     }
+ 
++    if (vu_check_queue_inflights(dev, &dev->vq[index])) {
++        vu_panic(dev, "Failed to check inflights for vq: %d\n", index);
++    }
++
+     return false;
+ }
+ 
+@@ -995,6 +1114,11 @@ vu_set_vring_call_exec(VuDev *dev, VhostUserMsg *vmsg)
+ 
+     dev->vq[index].call_fd = vmsg->fds[0];
+ 
++    /* in case of I/O hang after reconnecting */
++    if (eventfd_write(vmsg->fds[0], 1)) {
++        return -1;
++    }
++
+     DPRINT("Got call_fd: %d for vq: %d\n", vmsg->fds[0], index);
+ 
+     return false;
+@@ -1209,6 +1333,116 @@ vu_set_postcopy_end(VuDev *dev, VhostUserMsg *vmsg)
+     return true;
+ }
+ 
++static inline uint64_t
++vu_inflight_queue_size(uint16_t queue_size)
++{
++    return ALIGN_UP(sizeof(VuDescStateSplit) * queue_size +
++           sizeof(uint16_t), INFLIGHT_ALIGNMENT);
++}
++
++static bool
++vu_get_inflight_fd(VuDev *dev, VhostUserMsg *vmsg)
++{
++    int fd;
++    void *addr;
++    uint64_t mmap_size;
++    uint16_t num_queues, queue_size;
++
++    if (vmsg->size != sizeof(vmsg->payload.inflight)) {
++        vu_panic(dev, "Invalid get_inflight_fd message:%d", vmsg->size);
++        vmsg->payload.inflight.mmap_size = 0;
++        return true;
++    }
++
++    num_queues = vmsg->payload.inflight.num_queues;
++    queue_size = vmsg->payload.inflight.queue_size;
++
++    DPRINT("set_inflight_fd num_queues: %"PRId16"\n", num_queues);
++    DPRINT("set_inflight_fd queue_size: %"PRId16"\n", queue_size);
++
++    mmap_size = vu_inflight_queue_size(queue_size) * num_queues;
++
++    addr = qemu_memfd_alloc("vhost-inflight", mmap_size,
++                            F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_SEAL,
++                            &fd, NULL);
++
++    if (!addr) {
++        vu_panic(dev, "Failed to alloc vhost inflight area");
++        vmsg->payload.inflight.mmap_size = 0;
++        return true;
++    }
++
++    memset(addr, 0, mmap_size);
++
++    dev->inflight_info.addr = addr;
++    dev->inflight_info.size = vmsg->payload.inflight.mmap_size = mmap_size;
++    dev->inflight_info.fd = vmsg->fds[0] = fd;
++    vmsg->fd_num = 1;
++    vmsg->payload.inflight.mmap_offset = 0;
++
++    DPRINT("send inflight mmap_size: %"PRId64"\n",
++           vmsg->payload.inflight.mmap_size);
++    DPRINT("send inflight mmap offset: %"PRId64"\n",
++           vmsg->payload.inflight.mmap_offset);
++
++    return true;
++}
++
++static bool
++vu_set_inflight_fd(VuDev *dev, VhostUserMsg *vmsg)
++{
++    int fd, i;
++    uint64_t mmap_size, mmap_offset;
++    uint16_t num_queues, queue_size;
++    void *rc;
++
++    if (vmsg->fd_num != 1 ||
++        vmsg->size != sizeof(vmsg->payload.inflight)) {
++        vu_panic(dev, "Invalid set_inflight_fd message size:%d fds:%d",
++                 vmsg->size, vmsg->fd_num);
++        return false;
++    }
++
++    fd = vmsg->fds[0];
++    mmap_size = vmsg->payload.inflight.mmap_size;
++    mmap_offset = vmsg->payload.inflight.mmap_offset;
++    num_queues = vmsg->payload.inflight.num_queues;
++    queue_size = vmsg->payload.inflight.queue_size;
++
++    DPRINT("set_inflight_fd mmap_size: %"PRId64"\n", mmap_size);
++    DPRINT("set_inflight_fd mmap_offset: %"PRId64"\n", mmap_offset);
++    DPRINT("set_inflight_fd num_queues: %"PRId16"\n", num_queues);
++    DPRINT("set_inflight_fd queue_size: %"PRId16"\n", queue_size);
++
++    rc = mmap(0, mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED,
++              fd, mmap_offset);
++
++    if (rc == MAP_FAILED) {
++        vu_panic(dev, "set_inflight_fd mmap error: %s", strerror(errno));
++        return false;
++    }
++
++    if (dev->inflight_info.fd) {
++        close(dev->inflight_info.fd);
++    }
++
++    if (dev->inflight_info.addr) {
++        munmap(dev->inflight_info.addr, dev->inflight_info.size);
++    }
++
++    dev->inflight_info.fd = fd;
++    dev->inflight_info.addr = rc;
++    dev->inflight_info.size = mmap_size;
++
++    for (i = 0; i < num_queues; i++) {
++        dev->vq[i].inflight = (VuVirtqInflight *)rc;
++        dev->vq[i].inflight->desc_num = queue_size;
++        rc = (void *)((char *)rc + vu_inflight_queue_size(queue_size));
++    }
++
++    return false;
++}
++
+ static bool
+ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+ {
+@@ -1286,6 +1520,10 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+         return vu_set_postcopy_listen(dev, vmsg);
+     case VHOST_USER_POSTCOPY_END:
+         return vu_set_postcopy_end(dev, vmsg);
++    case VHOST_USER_GET_INFLIGHT_FD:
++        return vu_get_inflight_fd(dev, vmsg);
++    case VHOST_USER_SET_INFLIGHT_FD:
++        return vu_set_inflight_fd(dev, vmsg);
+     default:
+         vmsg_close_fds(vmsg);
+         vu_panic(dev, "Unhandled request: %d", vmsg->request);
+@@ -1353,8 +1591,24 @@ vu_deinit(VuDev *dev)
+             close(vq->err_fd);
+             vq->err_fd = -1;
+         }
++
++        if (vq->resubmit_list) {
++            free(vq->resubmit_list);
++            vq->resubmit_list = NULL;
++        }
++
++        vq->inflight = NULL;
++    }
++
++    if (dev->inflight_info.addr) {
++        munmap(dev->inflight_info.addr, dev->inflight_info.size);
++        dev->inflight_info.addr = NULL;
+     }
+ 
++    if (dev->inflight_info.fd > 0) {
++        close(dev->inflight_info.fd);
++        dev->inflight_info.fd = -1;
++    }
+ 
+     vu_close_log(dev);
+     if (dev->slave_fd != -1) {
+@@ -1681,20 +1935,6 @@ vu_queue_empty(VuDev *dev, VuVirtq *vq)
+     return vring_avail_idx(vq) == vq->last_avail_idx;
+ }
+ 
+-static inline
+-bool has_feature(uint64_t features, unsigned int fbit)
+-{
+-    assert(fbit < 64);
+-    return !!(features & (1ULL << fbit));
+-}
+-
+-static inline
+-bool vu_has_feature(VuDev *dev,
+-                    unsigned int fbit)
+-{
+-    return has_feature(dev->features, fbit);
+-}
+-
+ static bool
+ vring_notify(VuDev *dev, VuVirtq *vq)
+ {
+@@ -1823,12 +2063,6 @@ virtqueue_map_desc(VuDev *dev,
+     *p_num_sg = num_sg;
+ }
+ 
+-/* Round number down to multiple */
+-#define ALIGN_DOWN(n, m) ((n) / (m) * (m))
+-
+-/* Round number up to multiple */
+-#define ALIGN_UP(n, m) ALIGN_DOWN((n) + (m) - 1, (m))
+-
+ static void *
+ virtqueue_alloc_element(size_t sz,
+                                      unsigned out_num, unsigned in_num)
+@@ -1929,9 +2163,68 @@ vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
+     return elem;
+ }
+ 
++static int
++vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
++{
++    if (!has_feature(dev->protocol_features,
++        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
++        return 0;
++    }
++
++    if (unlikely(!vq->inflight)) {
++        return -1;
++    }
++
++    vq->inflight->desc[desc_idx].counter = vq->counter++;
++    vq->inflight->desc[desc_idx].inflight = 1;
++
++    return 0;
++}
++
++static int
++vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
++{
++    if (!has_feature(dev->protocol_features,
++        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
++        return 0;
++    }
++
++    if (unlikely(!vq->inflight)) {
++        return -1;
++    }
++
++    vq->inflight->last_batch_head = desc_idx;
++
++    return 0;
++}
++
++static int
++vu_queue_inflight_post_put(VuDev *dev, VuVirtq *vq, int desc_idx)
++{
++    if (!has_feature(dev->protocol_features,
++        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
++        return 0;
++    }
++
++    if (unlikely(!vq->inflight)) {
++        return -1;
++    }
++
++    barrier();
++
++    vq->inflight->desc[desc_idx].inflight = 0;
++
++    barrier();
++
++    vq->inflight->used_idx = vq->used_idx;
++
++    return 0;
++}
++
+ void *
+ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
+ {
++    int i;
+     unsigned int head;
+     VuVirtqElement *elem;
+ 
+@@ -1940,6 +2233,18 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
+         return NULL;
+     }
+ 
++    if (unlikely(vq->resubmit_list && vq->resubmit_num > 0)) {
++        i = (--vq->resubmit_num);
++        elem = vu_queue_map_desc(dev, vq, vq->resubmit_list[i].index, sz);
++
++        if (!vq->resubmit_num) {
++            free(vq->resubmit_list);
++            vq->resubmit_list = NULL;
++        }
++
++        return elem;
++    }
++
+     if (vu_queue_empty(dev, vq)) {
+         return NULL;
+     }
+@@ -1970,6 +2275,8 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
+ 
+     vq->inuse++;
+ 
++    vu_queue_inflight_get(dev, vq, head);
++
+     return elem;
+ }
+ 
+@@ -2114,5 +2421,7 @@ vu_queue_push(VuDev *dev, VuVirtq *vq,
+               const VuVirtqElement *elem, unsigned int len)
+ {
+     vu_queue_fill(dev, vq, elem, len, 0);
++    vu_queue_inflight_pre_put(dev, vq, elem->index);
+     vu_queue_flush(dev, vq, 1);
++    vu_queue_inflight_post_put(dev, vq, elem->index);
+ }
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 4aa55b4d2d..8a32456943 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -53,6 +53,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_CONFIG = 9,
+     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
+     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
++    VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
+ 
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+@@ -91,6 +92,8 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_ADVISE  = 28,
+     VHOST_USER_POSTCOPY_LISTEN  = 29,
+     VHOST_USER_POSTCOPY_END     = 30,
++    VHOST_USER_GET_INFLIGHT_FD = 31,
++    VHOST_USER_SET_INFLIGHT_FD = 32,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+ 
+@@ -138,6 +141,13 @@ typedef struct VhostUserVringArea {
+     uint64_t offset;
+ } VhostUserVringArea;
+ 
++typedef struct VhostUserInflight {
++    uint64_t mmap_size;
++    uint64_t mmap_offset;
++    uint16_t num_queues;
++    uint16_t queue_size;
++} VhostUserInflight;
++
+ #if defined(_WIN32)
+ # define VU_PACKED __attribute__((gcc_struct, packed))
+ #else
+@@ -163,6 +173,7 @@ typedef struct VhostUserMsg {
+         VhostUserLog log;
          VhostUserConfig config;
          VhostUserVringArea area;
 +        VhostUserInflight inflight;
-     };
- } QEMU_PACKED VhostUserMsg;
+     } payload;
  
-@@ -175,6 +187,7 @@ the ones that do:
-  * VHOST_USER_GET_PROTOCOL_FEATURES
-  * VHOST_USER_GET_VRING_BASE
-  * VHOST_USER_SET_LOG_BASE (if VHOST_USER_PROTOCOL_F_LOG_SHMFD)
-+ * VHOST_USER_GET_INFLIGHT_FD (if VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)
+     int fds[VHOST_MEMORY_MAX_NREGIONS];
+@@ -234,9 +245,61 @@ typedef struct VuRing {
+     uint32_t flags;
+ } VuRing;
  
- [ Also see the section on REPLY_ACK protocol extension. ]
- 
-@@ -188,6 +201,7 @@ in the ancillary data:
-  * VHOST_USER_SET_VRING_CALL
-  * VHOST_USER_SET_VRING_ERR
-  * VHOST_USER_SET_SLAVE_REQ_FD
-+ * VHOST_USER_SET_INFLIGHT_FD (if VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)
- 
- If Master is unable to send the full message or receives a wrong reply it will
- close the connection. An optional reconnection mechanism can be implemented.
-@@ -382,6 +396,256 @@ If VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD protocol feature is negotiated,
- slave can send file descriptors (at most 8 descriptors in each message)
- to master via ancillary data using this fd communication channel.
- 
-+Inflight I/O tracking
-+---------------------
-+
-+To support reconnecting after restart or crash, slave may need to resubmit
-+inflight I/Os. If virtqueue is processed in order, we can easily achieve
-+that by getting the inflight descriptors from descriptor table (split virtqueue)
-+or descriptor ring (packed virtqueue). However, it can't work when we process
-+descriptors out-of-order because some entries which store the information of
-+inflight descriptors in available ring (split virtqueue) or descriptor
-+ring (packed virtqueue) might be overrided by new entries. To solve this
-+problem, slave need to allocate an extra buffer to store this information of inflight
-+descriptors and share it with master for persistent. VHOST_USER_GET_INFLIGHT_FD and
-+VHOST_USER_SET_INFLIGHT_FD are used to transfer this buffer between master
-+and slave. And the format of this buffer is described below:
-+
-+-------------------------------------------------------
-+| queue0 region | queue1 region | ... | queueN region |
-+-------------------------------------------------------
-+
-+N is the number of available virtqueues. Slave could get it from num queues
-+field of VhostUserInflight.
-+
-+For split virtqueue, queue region can be implemented as:
-+
-+typedef struct DescStateSplit {
++typedef struct VuDescStateSplit {
 +    /* Indicate whether this descriptor is inflight or not.
 +     * Only available for head-descriptor. */
 +    uint8_t inflight;
@@ -142,581 +587,67 @@ index c2194711d9..de7e38c7db 100644
 +    /* Used to preserve the order of fetching available descriptors.
 +     * Only available for head-descriptor. */
 +    uint64_t counter;
-+} DescStateSplit;
++} VuDescStateSplit;
 +
-+typedef struct QueueRegionSplit {
++typedef struct VuVirtqInflight {
 +    /* The feature flags of this region. Now it's initialized to 0. */
 +    uint64_t features;
 +
 +    /* The version of this region. It's 1 currently.
-+     * Zero value indicates an uninitialized buffer */
++     * Zero value indicates a vm reset happened. */
 +    uint16_t version;
 +
-+    /* The size of DescStateSplit array. It's equal to the virtqueue
++    /* The size of VuDescStateSplit array. It's equal to the virtqueue
 +     * size. Slave could get it from queue size field of VhostUserInflight. */
 +    uint16_t desc_num;
 +
 +    /* The head of list that track the last batch of used descriptors. */
 +    uint16_t last_batch_head;
 +
-+    /* Store the idx value of used ring */
++    /* Storing the idx value of used ring */
 +    uint16_t used_idx;
 +
 +    /* Used to track the state of each descriptor in descriptor table */
-+    DescStateSplit desc[0];
-+} QueueRegionSplit;
++    VuDescStateSplit desc[0];
++} VuVirtqInflight;
 +
-+To track inflight I/O, the queue region should be processed as follows:
++typedef struct VuVirtqInflightDesc {
++    uint16_t index;
++    uint64_t counter;
++} VuVirtqInflightDesc;
 +
-+When receiving available buffers from the driver:
+ typedef struct VuVirtq {
+     VuRing vring;
+ 
++    VuVirtqInflight *inflight;
 +
-+    1. Get the next available head-descriptor index from available ring, i
++    VuVirtqInflightDesc *resubmit_list;
 +
-+    2. Set desc[i].counter to the value of global counter
++    uint16_t resubmit_num;
 +
-+    3. Increase global counter by 1
-+
-+    4. Set desc[i].inflight to 1
-+
-+When supplying used buffers to the driver:
-+
-+    1. Get corresponding used head-descriptor index, i
-+
-+    2. Set desc[i].next to last_batch_head
-+
-+    3. Set last_batch_head to i
-+
-+    4. Steps 1,2,3 may be performed repeatedly if batching is possible
-+
-+    5. Increase the idx value of used ring by the size of the batch
-+
-+    6. Set the inflight field of each DescStateSplit entry in the batch to 0
-+
-+    7. Set used_idx to the idx value of used ring
-+
-+When reconnecting:
-+
-+    1. If the value of used_idx does not match the idx value of used ring (means
-+    the inflight field of DescStateSplit entries in last batch may be incorrect),
-+
-+        (a) Subtract the value of used_idx from the idx value of used ring to get
-+        last batch size of DescStateSplit entries
-+
-+        (b) Set the inflight field of each DescStateSplit entry to 0 in last batch
-+        list which starts from last_batch_head
-+
-+        (c) Set used_idx to the idx value of used ring
-+
-+    2. Resubmit inflight DescStateSplit entries in order of their counter value
-+
-+For packed virtqueue, queue region can be implemented as:
-+
-+typedef struct DescStatePacked {
-+    /* Indicate whether this descriptor is inflight or not.
-+     * Only available for head-descriptor. */
-+    uint8_t inflight;
-+
-+    /* Padding */
-+    uint8_t padding;
-+
-+    /* Link to the next free entry */
-+    uint16_t next;
-+
-+    /* Link to the last entry of descriptor list.
-+     * Only available for head-descriptor. */
-+    uint16_t last;
-+
-+    /* The length of descriptor list.
-+     * Only available for head-descriptor. */
-+    uint16_t num;
-+
-+    /* Used to preserve the order of fetching available descriptors.
-+     * Only available for head-descriptor. */
 +    uint64_t counter;
 +
-+    /* The buffer id */
-+    uint16_t id;
-+
-+    /* The descriptor flags */
-+    uint16_t flags;
-+
-+    /* The buffer length */
-+    uint32_t len;
-+
-+    /* The buffer address */
-+    uint64_t addr;
-+} DescStatePacked;
-+
-+typedef struct QueueRegionPacked {
-+    /* The feature flags of this region. Now it's initialized to 0. */
-+    uint64_t features;
-+
-+    /* The version of this region. It's 1 currently.
-+     * Zero value indicates an uninitialized buffer */
-+    uint16_t version;
-+
-+    /* The size of DescStatePacked array. It's equal to the virtqueue
-+     * size. Slave could get it from queue size field of VhostUserInflight. */
-+    uint16_t desc_num;
-+
-+    /* The head of free DescStatePacked entry list */
-+    uint16_t free_head;
-+
-+    /* The old head of free DescStatePacked entry list */
-+    uint16_t old_free_head;
-+
-+    /* The used index of descriptor ring */
-+    uint16_t used_idx;
-+
-+    /* The old used index of descriptor ring */
-+    uint16_t old_used_idx;
-+
-+    /* Device ring wrap counter */
-+    uint8_t used_wrap_counter;
-+
-+    /* The old device ring wrap counter */
-+    uint8_t old_used_wrap_counter;
-+
-+    /* Padding */
-+    uint8_t padding[7];
-+
-+    /* Used to track the state of each descriptor fetched from descriptor ring */
-+    DescStatePacked desc[0];
-+} QueueRegionPacked;
-+
-+To track inflight I/O, the queue region should be processed as follows:
-+
-+When receiving available buffers from the driver:
-+
-+    1. Get the next available descriptor entry from descriptor ring, d
-+
-+    2. If d is head descriptor,
-+
-+        (a) Set desc[old_free_head].num to 0
-+
-+        (b) Set desc[old_free_head].counter to the value of global counter
-+
-+        (c) Increase global counter by 1
-+
-+        (d) Set desc[old_free_head].inflight to 1
-+
-+    3. If d is last descriptor, set desc[old_free_head].last to free_head
-+
-+    4. Increase desc[old_free_head].num by 1
-+
-+    5. Set desc[free_head].addr, desc[free_head].len, desc[free_head].flags,
-+    desc[free_head].id to d.addr, d.len, d.flags, d.id
-+
-+    6. Set free_head to desc[free_head].next
-+
-+    7. If d is last descriptor, set old_free_head to free_head
-+
-+When supplying used buffers to the driver:
-+
-+    1. Get corresponding used head-descriptor entry from descriptor ring, d
-+
-+    2. Get corresponding DescStatePacked entry, e
-+
-+    3. Set desc[e.last].next to free_head
-+
-+    4. Set free_head to the index of e
-+
-+    5. Steps 1,2,3,4 may be performed repeatedly if batching is possible
-+
-+    6. Increase used_idx by the size of the batch and update used_wrap_counter if needed
-+
-+    7. Update d.flags
-+
-+    8. Set the inflight field of each head DescStatePacked entry in the batch to 0
-+
-+    9. Set old_free_head, old_used_idx, old_used_wrap_counter to free_head, used_idx,
-+    used_wrap_counter
-+
-+When reconnecting:
-+
-+    1. If used_idx does not match old_used_idx (means the inflight field of DescStatePacked
-+    entries in last batch may be incorrect),
-+
-+        (a) Get the next descriptor ring entry through old_used_idx, d
-+
-+        (b) Use old_used_wrap_counter to calculate the available flags
-+
-+        (c) If d.flags is not equal to the calculated flags value (means slave has
-+        submitted the buffer to guest driver before crash, so it has to commit the
-+        in-progres update), set old_free_head, old_used_idx, old_used_wrap_counter
-+        to free_head, used_idx, used_wrap_counter
-+
-+    2. Set free_head, used_idx, used_wrap_counter to old_free_head, old_used_idx,
-+    old_used_wrap_counter (roll back any in-progress update)
-+
-+    3. Set the inflight field of each DescStatePacked entry in free list to 0
-+
-+    4. Resubmit inflight DescStatePacked entries in order of their counter value
-+
- Protocol features
- -----------------
+     /* Next head to pop */
+     uint16_t last_avail_idx;
  
-@@ -397,6 +661,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_CONFIG         9
- #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
- #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
-+#define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD 12
+@@ -279,11 +342,18 @@ typedef void (*vu_set_watch_cb) (VuDev *dev, int fd, int condition,
+                                  vu_watch_cb cb, void *data);
+ typedef void (*vu_remove_watch_cb) (VuDev *dev, int fd);
  
- Master message types
- --------------------
-@@ -761,6 +1026,26 @@ Master message types
-       was previously sent.
-       The value returned is an error indication; 0 is success.
- 
-+ * VHOST_USER_GET_INFLIGHT_FD
-+      Id: 31
-+      Equivalent ioctl: N/A
-+      Master payload: inflight description
-+
-+      When VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD protocol feature has been
-+      successfully negotiated, this message is submitted by master to get
-+      a shared buffer from slave. The shared buffer will be used to track
-+      inflight I/O by slave. QEMU should retrieve a new one when vm reset.
-+
-+ * VHOST_USER_SET_INFLIGHT_FD
-+      Id: 32
-+      Equivalent ioctl: N/A
-+      Master payload: inflight description
-+
-+      When VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD protocol feature has been
-+      successfully negotiated, this message is submitted by master to send
-+      the shared inflight buffer back to slave so that slave could get
-+      inflight I/O after a crash or restart.
-+
- Slave message types
- -------------------
- 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 564a31d12c..21a81998ba 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -52,6 +52,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_CONFIG = 9,
-     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
-     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
-+    VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
-     VHOST_USER_PROTOCOL_F_MAX
- };
- 
-@@ -89,6 +90,8 @@ typedef enum VhostUserRequest {
-     VHOST_USER_POSTCOPY_ADVISE  = 28,
-     VHOST_USER_POSTCOPY_LISTEN  = 29,
-     VHOST_USER_POSTCOPY_END     = 30,
-+    VHOST_USER_GET_INFLIGHT_FD = 31,
-+    VHOST_USER_SET_INFLIGHT_FD = 32,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-@@ -147,6 +150,13 @@ typedef struct VhostUserVringArea {
-     uint64_t offset;
- } VhostUserVringArea;
- 
-+typedef struct VhostUserInflight {
-+    uint64_t mmap_size;
-+    uint64_t mmap_offset;
-+    uint16_t num_queues;
-+    uint16_t queue_size;
-+} VhostUserInflight;
-+
- typedef struct {
-     VhostUserRequest request;
- 
-@@ -169,6 +179,7 @@ typedef union {
-         VhostUserConfig config;
-         VhostUserCryptoSession session;
-         VhostUserVringArea area;
-+        VhostUserInflight inflight;
- } VhostUserPayload;
- 
- typedef struct VhostUserMsg {
-@@ -1739,6 +1750,100 @@ static bool vhost_user_mem_section_filter(struct vhost_dev *dev,
-     return result;
- }
- 
-+static int vhost_user_get_inflight_fd(struct vhost_dev *dev,
-+                                      uint16_t queue_size,
-+                                      struct vhost_inflight *inflight)
-+{
-+    void *addr;
-+    int fd;
-+    struct vhost_user *u = dev->opaque;
-+    CharBackend *chr = u->user->chr;
-+    VhostUserMsg msg = {
-+        .hdr.request = VHOST_USER_GET_INFLIGHT_FD,
-+        .hdr.flags = VHOST_USER_VERSION,
-+        .payload.inflight.num_queues = dev->nvqs,
-+        .payload.inflight.queue_size = queue_size,
-+        .hdr.size = sizeof(msg.payload.inflight),
-+    };
-+
-+    if (!virtio_has_feature(dev->protocol_features,
-+                            VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-+        return 0;
-+    }
-+
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -1;
-+    }
-+
-+    if (vhost_user_read(dev, &msg) < 0) {
-+        return -1;
-+    }
-+
-+    if (msg.hdr.request != VHOST_USER_GET_INFLIGHT_FD) {
-+        error_report("Received unexpected msg type. "
-+                     "Expected %d received %d",
-+                     VHOST_USER_GET_INFLIGHT_FD, msg.hdr.request);
-+        return -1;
-+    }
-+
-+    if (msg.hdr.size != sizeof(msg.payload.inflight)) {
-+        error_report("Received bad msg size.");
-+        return -1;
-+    }
-+
-+    if (!msg.payload.inflight.mmap_size) {
-+        return 0;
-+    }
-+
-+    fd = qemu_chr_fe_get_msgfd(chr);
-+    if (fd < 0) {
-+        error_report("Failed to get mem fd");
-+        return -1;
-+    }
-+
-+    addr = mmap(0, msg.payload.inflight.mmap_size, PROT_READ | PROT_WRITE,
-+                MAP_SHARED, fd, msg.payload.inflight.mmap_offset);
-+
-+    if (addr == MAP_FAILED) {
-+        error_report("Failed to mmap mem fd");
-+        close(fd);
-+        return -1;
-+    }
-+
-+    inflight->addr = addr;
-+    inflight->fd = fd;
-+    inflight->size = msg.payload.inflight.mmap_size;
-+    inflight->offset = msg.payload.inflight.mmap_offset;
-+    inflight->queue_size = queue_size;
-+
-+    return 0;
-+}
-+
-+static int vhost_user_set_inflight_fd(struct vhost_dev *dev,
-+                                      struct vhost_inflight *inflight)
-+{
-+    VhostUserMsg msg = {
-+        .hdr.request = VHOST_USER_SET_INFLIGHT_FD,
-+        .hdr.flags = VHOST_USER_VERSION,
-+        .payload.inflight.mmap_size = inflight->size,
-+        .payload.inflight.mmap_offset = inflight->offset,
-+        .payload.inflight.num_queues = dev->nvqs,
-+        .payload.inflight.queue_size = inflight->queue_size,
-+        .hdr.size = sizeof(msg.payload.inflight),
-+    };
-+
-+    if (!virtio_has_feature(dev->protocol_features,
-+                            VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-+        return 0;
-+    }
-+
-+    if (vhost_user_write(dev, &msg, &inflight->fd, 1) < 0) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
- VhostUserState *vhost_user_init(void)
- {
-     VhostUserState *user = g_new0(struct VhostUserState, 1);
-@@ -1790,4 +1895,6 @@ const VhostOps user_ops = {
-         .vhost_crypto_create_session = vhost_user_crypto_create_session,
-         .vhost_crypto_close_session = vhost_user_crypto_close_session,
-         .vhost_backend_mem_section_filter = vhost_user_mem_section_filter,
-+        .vhost_get_inflight_fd = vhost_user_get_inflight_fd,
-+        .vhost_set_inflight_fd = vhost_user_set_inflight_fd,
- };
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 569c4053ea..8db1a855eb 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1481,6 +1481,102 @@ void vhost_dev_set_config_notifier(struct vhost_dev *hdev,
-     hdev->config_ops = ops;
- }
- 
-+void vhost_dev_free_inflight(struct vhost_inflight *inflight)
-+{
-+    if (inflight->addr) {
-+        qemu_memfd_free(inflight->addr, inflight->size, inflight->fd);
-+        inflight->addr = NULL;
-+        inflight->fd = -1;
-+    }
-+}
-+
-+static int vhost_dev_resize_inflight(struct vhost_inflight *inflight,
-+                                     uint64_t new_size)
-+{
-+    Error *err = NULL;
-+    int fd = -1;
-+    void *addr = qemu_memfd_alloc("vhost-inflight", new_size,
-+                                  F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_SEAL,
-+                                  &fd, &err);
-+
-+    if (err) {
-+        error_report_err(err);
-+        return -1;
-+    }
-+
-+    vhost_dev_free_inflight(inflight);
-+    inflight->offset = 0;
-+    inflight->addr = addr;
-+    inflight->fd = fd;
-+    inflight->size = new_size;
-+
-+    return 0;
-+}
-+
-+void vhost_dev_save_inflight(struct vhost_inflight *inflight, QEMUFile *f)
-+{
-+    if (inflight->addr) {
-+        qemu_put_be64(f, inflight->size);
-+        qemu_put_be16(f, inflight->queue_size);
-+        qemu_put_buffer(f, inflight->addr, inflight->size);
-+    } else {
-+        qemu_put_be64(f, 0);
-+    }
-+}
-+
-+int vhost_dev_load_inflight(struct vhost_inflight *inflight, QEMUFile *f)
-+{
-+    uint64_t size;
-+
-+    size = qemu_get_be64(f);
-+    if (!size) {
-+        return 0;
-+    }
-+
-+    if (inflight->size != size) {
-+        if (vhost_dev_resize_inflight(inflight, size)) {
-+            return -1;
-+        }
-+    }
-+    inflight->queue_size = qemu_get_be16(f);
-+
-+    qemu_get_buffer(f, inflight->addr, size);
-+
-+    return 0;
-+}
-+
-+int vhost_dev_set_inflight(struct vhost_dev *dev,
-+                           struct vhost_inflight *inflight)
-+{
-+    int r;
-+
-+    if (dev->vhost_ops->vhost_set_inflight_fd && inflight->addr) {
-+        r = dev->vhost_ops->vhost_set_inflight_fd(dev, inflight);
-+        if (r) {
-+            VHOST_OPS_DEBUG("vhost_set_inflight_fd failed");
-+            return -errno;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+int vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size,
-+                           struct vhost_inflight *inflight)
-+{
-+    int r;
-+
-+    if (dev->vhost_ops->vhost_get_inflight_fd) {
-+        r = dev->vhost_ops->vhost_get_inflight_fd(dev, queue_size, inflight);
-+        if (r) {
-+            VHOST_OPS_DEBUG("vhost_get_inflight_fd failed");
-+            return -errno;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
- /* Host notifiers must be enabled at this point. */
- int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
- {
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index 81283ec50f..d6632a18e6 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -25,6 +25,7 @@ typedef enum VhostSetConfigType {
-     VHOST_SET_CONFIG_TYPE_MIGRATION = 1,
- } VhostSetConfigType;
- 
-+struct vhost_inflight;
- struct vhost_dev;
- struct vhost_log;
- struct vhost_memory;
-@@ -104,6 +105,13 @@ typedef int (*vhost_crypto_close_session_op)(struct vhost_dev *dev,
- typedef bool (*vhost_backend_mem_section_filter_op)(struct vhost_dev *dev,
-                                                 MemoryRegionSection *section);
- 
-+typedef int (*vhost_get_inflight_fd_op)(struct vhost_dev *dev,
-+                                        uint16_t queue_size,
-+                                        struct vhost_inflight *inflight);
-+
-+typedef int (*vhost_set_inflight_fd_op)(struct vhost_dev *dev,
-+                                        struct vhost_inflight *inflight);
-+
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-     vhost_backend_init vhost_backend_init;
-@@ -142,6 +150,8 @@ typedef struct VhostOps {
-     vhost_crypto_create_session_op vhost_crypto_create_session;
-     vhost_crypto_close_session_op vhost_crypto_close_session;
-     vhost_backend_mem_section_filter_op vhost_backend_mem_section_filter;
-+    vhost_get_inflight_fd_op vhost_get_inflight_fd;
-+    vhost_set_inflight_fd_op vhost_set_inflight_fd;
- } VhostOps;
- 
- extern const VhostOps user_ops;
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index a7f449fa87..619498c8f4 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -7,6 +7,15 @@
- #include "exec/memory.h"
- 
- /* Generic structures common for any vhost based device. */
-+
-+struct vhost_inflight {
++typedef struct VuDevInflightInfo {
 +    int fd;
 +    void *addr;
 +    uint64_t size;
-+    uint64_t offset;
-+    uint16_t queue_size;
-+};
++} VuDevInflightInfo;
 +
- struct vhost_virtqueue {
-     int kick;
-     int call;
-@@ -120,4 +129,13 @@ int vhost_dev_set_config(struct vhost_dev *dev, const uint8_t *data,
-  */
- void vhost_dev_set_config_notifier(struct vhost_dev *dev,
-                                    const VhostDevConfigOps *ops);
-+
-+void vhost_dev_reset_inflight(struct vhost_inflight *inflight);
-+void vhost_dev_free_inflight(struct vhost_inflight *inflight);
-+void vhost_dev_save_inflight(struct vhost_inflight *inflight, QEMUFile *f);
-+int vhost_dev_load_inflight(struct vhost_inflight *inflight, QEMUFile *f);
-+int vhost_dev_set_inflight(struct vhost_dev *dev,
-+                           struct vhost_inflight *inflight);
-+int vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size,
-+                           struct vhost_inflight *inflight);
- #endif
+ struct VuDev {
+     int sock;
+     uint32_t nregions;
+     VuDevRegion regions[VHOST_MEMORY_MAX_NREGIONS];
+     VuVirtq vq[VHOST_MAX_NR_VIRTQUEUE];
++    VuDevInflightInfo inflight_info;
+     int log_call_fd;
+     int slave_fd;
+     uint64_t log_size;
 -- 
 2.17.1
