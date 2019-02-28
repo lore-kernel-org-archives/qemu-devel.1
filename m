@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38044)
+Received: from eggs.gnu.org ([209.51.188.92]:38255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gzNxP-0002aN-5O
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:50:49 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gzNyB-00032l-Hj
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:51:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gzNxM-0006Nb-Md
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:50:47 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36045)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gzNxK-00060D-Ip
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:50:42 -0500
-Received: by mail-ot1-x343.google.com with SMTP id v62so18068342otb.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 07:50:22 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1gzNy1-0006m8-T9
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:51:29 -0500
+Date: Thu, 28 Feb 2019 16:50:53 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190228155053.GB5563@linux.fritz.box>
+References: <20190227165212.34901-1-slp@redhat.com>
+	<20190227173714.GA6276@localhost.localdomain>
+	<20190228150119.c77xcmrp4ogg32eu@dritchie>
 MIME-Version: 1.0
-In-Reply-To: <20190228145624.24885-1-peter.maydell@linaro.org>
-References: <20190228145624.24885-1-peter.maydell@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 28 Feb 2019 16:50:20 +0100
-Message-ID: <CAL1e-=jqw=8Q5UmGSzrZOnOai5kOq0thjZJ+LM8wtfXCsML6iA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] Enable build and install of our
- rST docs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190228150119.c77xcmrp4ogg32eu@dritchie>
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: dataplane: release AioContext
+ before blk_set_aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,138 +25,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-> Peter Maydell <peter.maydell@linaro.org> wrote:
+Am 28.02.2019 um 16:01 hat Sergio Lopez geschrieben:
+> On Wed, Feb 27, 2019 at 06:37:14PM +0100, Kevin Wolf wrote:
+> > Am 27.02.2019 um 17:52 hat Sergio Lopez geschrieben:
+> > > Stopping the dataplane requires calling to blk_set_aio_context, which
+> > > may need to wait for a running job to be completed or paused.
+> > > 
+> > > As stopping the dataplane is something that can be triggered from a vcpu
+> > > thread (due to the Guest requesting to stop the device), while the job
+> > > itself may be managed by an iothread, holding the AioContext will lead
+> > > to a deadlock, where the first one is waiting for the job to pause or
+> > > finish, while the second can't make any progress as it's waiting for the
+> > > AioContext to be released:
+> > > 
+> > >  Thread 6 (LWP 90472)
+> > >  #0  0x000055a6f8497aee in blk_root_drained_end
+> > >  #1  0x000055a6f84a7926 in bdrv_parent_drained_end
+> > >  #2  0x000055a6f84a799f in bdrv_do_drained_end
+> > >  #3  0x000055a6f84a82ab in bdrv_drained_end
+> > >  #4  0x000055a6f8498be8 in blk_drain
+> > >  #5  0x000055a6f84a22cd in mirror_drain
+> > >  #6  0x000055a6f8457708 in block_job_detach_aio_context
+> > >  #7  0x000055a6f84538f1 in bdrv_detach_aio_context
+> > >  #8  0x000055a6f8453a96 in bdrv_set_aio_context
+> > >  #9  0x000055a6f84999f8 in blk_set_aio_context
+> > >  #10 0x000055a6f81802c8 in virtio_blk_data_plane_stop
+> > >  #11 0x000055a6f83cfc95 in virtio_bus_stop_ioeventfd
+> > >  #12 0x000055a6f83d1f81 in virtio_pci_common_write
+> > >  #13 0x000055a6f83d1f81 in virtio_pci_common_write
+> > >  #14 0x000055a6f8148d62 in memory_region_write_accessor
+> > >  #15 0x000055a6f81459c9 in access_with_adjusted_size
+> > >  #16 0x000055a6f814a608 in memory_region_dispatch_write
+> > >  #17 0x000055a6f80f1f98 in flatview_write_continue
+> > >  #18 0x000055a6f80f214f in flatview_write
+> > >  #19 0x000055a6f80f6a7b in address_space_write
+> > >  #20 0x000055a6f80f6b15 in address_space_rw
+> > >  #21 0x000055a6f815da08 in kvm_cpu_exec
+> > >  #22 0x000055a6f8132fee in qemu_kvm_cpu_thread_fn
+> > >  #23 0x000055a6f8551306 in qemu_thread_start
+> > >  #24 0x00007f9bdf5b9dd5 in start_thread
+> > >  #25 0x00007f9bdf2e2ead in clone
+> > > 
+> > >  Thread 8 (LWP 90467)
+> > >  #0  0x00007f9bdf5c04ed in __lll_lock_wait
+> > >  #1  0x00007f9bdf5bbde6 in _L_lock_941
+> > >  #2  0x00007f9bdf5bbcdf in __GI___pthread_mutex_lock
+> > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl
+> > >  #4  0x000055a6f854be77 in co_schedule_bh_cb
+> > >  #5  0x000055a6f854b781 in aio_bh_poll
+> > >  #6  0x000055a6f854b781 in aio_bh_poll
+> > >  #7  0x000055a6f854f01b in aio_poll
+> > >  #8  0x000055a6f825a488 in iothread_run
+> > >  #9  0x000055a6f8551306 in qemu_thread_start
+> > >  #10 0x00007f9bdf5b9dd5 in start_thread
+> > >  #11 0x00007f9bdf2e2ead in clone
+> > > 
+> > >  (gdb) thread 8
+> > >  [Switching to thread 8 (Thread 0x7f9bd6dae700 (LWP 90467))]
+> > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl (mutex=0x55a6fac8fea0,
+> > >      file=0x55a6f8730c3f "util/async.c", line=511) at util/qemu-thread-posix.c:66
+> > >  66	    err = pthread_mutex_lock(&mutex->lock);
+> > >  (gdb) up 3
+> > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl (mutex=0x55a6fac8fea0,
+> > >      file=0x55a6f8730c3f "util/async.c", line=511) at util/qemu-thread-posix.c:66
+> > >  66	    err = pthread_mutex_lock(&mutex->lock);
+> > >  (gdb) p mutex.lock.__data.__owner
+> > >  $6 = 90472
+> > > 
+> > > Signed-off-by: Sergio Lopez <slp@redhat.com>
+> > > ---
+> > >  hw/block/dataplane/virtio-blk.c | 3 +--
+> > >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > > 
+> > > diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+> > > index 8c37bd314a..358e6ae89b 100644
+> > > --- a/hw/block/dataplane/virtio-blk.c
+> > > +++ b/hw/block/dataplane/virtio-blk.c
+> > > @@ -280,12 +280,11 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+> > >  
+> > >      aio_context_acquire(s->ctx);
+> > >      aio_wait_bh_oneshot(s->ctx, virtio_blk_data_plane_stop_bh, s);
+> > > +    aio_context_release(s->ctx);
+> > >  
+> > >      /* Drain and switch bs back to the QEMU main loop */
+> > >      blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
+> > >  
+> > > -    aio_context_release(s->ctx);
+> > > -
+> > 
+> > blk_set_aio_context() requires that the caller hold the lock for the
+> > source context, so I'm afraid this is wrong.
+> 
+> TBH, I was quite sure this patch was wrong myself, but I thought it was
+> still a good way to illustrate the issue.
+> 
+> > However, I think the problem might already be fixed with my "block: Use
+> > normal drain for bdrv_set_aio_context()" (contained in a pull request,
+> > which isn't merged yet), which makes bdrv_set_aio_context() use a real
+> > drain operation. This way, the requests of the mirror jobs should be
+> > already drained before we even call into block_job_detach_aio_context().
+> > 
+> > Can you give this a try and see whether it fixes your problem?
+> 
+> I've applied your patchset to my local copy, but it doesn't fix the
+> issue.
+> 
+> The problem is the coroutine is already scheduled to be run in the
+> iothread context, which means job->busy == true, so we can't switch to
+> it from any other place.
 
-> This patchset enables building and installing the various rST
-> docs we have started to accumulate in our docs/ directory.
+I still don't understand this because with job->paused == true the
+hanging loop wouldn't even be started. And after bdrv_drained_begin()
+returns, all jobs that use the node in question should be paused (see
+child_job_drained_begin/poll).
 
-For the entire series:
+So somehow that drain (called in bdrv_set_aio_context()) doesn't seem to
+fully do what it is supposed to do?
 
-Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> I think we should give it a chance to run. What'd do you think of
+> something like this:
+> 
+> diff --git a/blockjob.c b/blockjob.c
+> index 58de8cb..1695bef 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -135,9 +135,8 @@ static void block_job_detach_aio_context(void *opaque)
+> 
+>      job_pause(&job->job);
+> 
+> -    while (!job->job.paused && !job_is_completed(&job->job)) {
+> -        job_drain(&job->job);
+> -    }
+> +    AIO_WAIT_WHILE(job->job.aio_context,
+> +        (job_drain(&job->job), !job->job.paused && !job_is_completed(&job->job)));
+> 
+>      job->job.aio_context = NULL;
+>      job_unref(&job->job);
 
-It does this using Sphinx (which is the docs tooling that the
-> Linux kernel uses). The series is not trying to take us in one
-> giant leap to a brave new Sphinx-powered world -- it is simply
-> setting up a framework so that we are at least building and
-> shipping these documents and can gradually migrate other parts
-> of our documentation to it.
->
-> Changes v1->v2:
->  * Added a few missing Signed-off-by lines
->  * Provided a proper commit message for patch 8
->  * patch 9: only add 'sphinxdocs' target to 'all' if BUILD_DOCS
->    is defined (fixes building on systems without sphinx-build,
->    which will now just not build the docs rather than barfing)
->
-> All patches except 9 have been reviewed.
->
-> Feedback to v1 seemed to be positive, so I propose that (assuming
-> no further issues found in code review) we commit this series
-> before softfreeze for the 4.1 release.
->
->
-> All the text below here is from the v1 cover letter, for context.
->
->
-> The approach I've used here is that we will have multiple "manuals",
-> as proposed by Paolo here:
->   https://wiki.qemu.org/Features/Documentation
-> For the moment I've only created 'interop' and 'devel' as we don't
-> yet have any rST files for 'user', 'system' or 'specs'.
->
-> One slightly awkward mismatch between how Sphinx naturally wants
-> to work and our requirements is that when Sphinx generates a
-> documentation set all in one go it creates hyperlinks between
-> all the docs, they all appear in a single top level table of
-> contents, and so on. But for QEMU's docs we don't want to
-> ship the "devel" manual to end-users. I've taken an approach
-> suggested to me on sphinx-users
-> (https://www.mail-archive.com/sphinx-users@googlegroups.com/msg03224.html)
-> where we run Sphinx once per manual, and treat them as
-> entirely separate documents. The config/tooling in this patchset
-> also supports building everything in a single run, for compatibility
-> with third-party docs sites like readthedocs.org.
->
-> To see the results:
->
-> What you get in the docs/ subdir of your build directory
-> when you do a local build:
->  http://people.linaro.org/~peter.maydell/build-dir-docs/
-> (follow the links to 'devel' and 'interop' for the two manuals)
->
-> What we'll ship in 'make install' in /usr/local/share/doc/qemu/
-> http://people.linaro.org/~peter.maydell/installed-docs/
-> (should be same as the build dir except we don't ship 'devel')
->
-> What you get with a standalone single-run docs build:
->  http://people.linaro.org/~peter.maydell/standalone-docs/index.html
->
-> These use the default 'alabaster' theme from Sphinx. I
-> also experimented with the 'read_the_docs' theme, which I
-> do think looks nicer. Unfortunately it also requires the
-> docs we install to include about 3MB of TrueType font files
-> per manual, which is awkward licensing-wise as the TTFs are
-> under the Open Font License and it's not completely clear to
-> me that it's OK to ship those to use with a doc file that is
-> GPLed. Alabaster doesn't ship fonts, which sidesteps both
-> those problems.
->
-> Other notes:
->  * this does not build the two .rst files that are directly
->    in docs/ (cpu-hotplug.rst and pr-manager.rst) -- we should
->    move these to whichever of the five manuals is the best place
->  * I do have some prototype patches which integrate the kernel's
->    kerneldoc Sphinx extension to parse doc comments in source
->    code. I haven't included them here because I think the 'devel'
->    manual is the lowest priority of the five. They might be
->    useful if we want to try things like building documentation
->    of supported machine models from in-code comments/etc, though.
->  * as noted in a previous email thread, the configure changes
->    now mean that building docs depends on build-sphinx being
->    available, so this is a new build-dep for --enable-docs.
->
->
-> thanks
-> -- PMM
->
->
-> Peter Maydell (11):
->   docs/cpu-hotplug.rst: Fix rST markup issues
->   docs: Convert memory.txt to rst format
->   docs: Commit initial files from sphinx-quickstart
->   docs/conf.py: Disable unused _static directory
->   docs/conf.py: Configure the 'alabaster' theme
->   docs/conf.py: Don't include rST sources in HTML build
->   docs/conf.py: Disable option warnings
->   docs: Provide separate conf.py for each manual we want
->   Makefile, configure: Support building rST documentation
->   Makefile: Abstract out "identify the pkgversion" code
->   docs/conf.py: Don't hard-code QEMU version
->
->  configure                             |   4 +-
->  Makefile                              |  78 +++++++---
->  docs/conf.py                          | 215 ++++++++++++++++++++++++++
->  docs/cpu-hotplug.rst                  |   2 +-
->  docs/devel/conf.py                    |  15 ++
->  docs/devel/index.rst                  |  21 +++
->  docs/devel/{memory.txt => memory.rst} | 128 ++++++++-------
->  docs/index.rst                        |  15 ++
->  docs/interop/conf.py                  |  15 ++
->  docs/interop/index.rst                |  18 +++
->  10 files changed, 430 insertions(+), 81 deletions(-)
->  create mode 100644 docs/conf.py
->  create mode 100644 docs/devel/conf.py
->  create mode 100644 docs/devel/index.rst
->  rename docs/devel/{memory.txt => memory.rst} (85%)
->  create mode 100644 docs/index.rst
->  create mode 100644 docs/interop/conf.py
->  create mode 100644 docs/interop/index.rst
->
-> --
-> 2.20.1
->
->
->
+If that's enough, it looks okay to me (and very similar to what we
+already do in job_finish_sync()).
+
+But I'd still like to understand why the drain didn't work.
+
+Kevin
