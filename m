@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50009)
+Received: from eggs.gnu.org ([209.51.188.92]:50596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzOXs-0001Mm-M5
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:28:29 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzOZb-0002dq-E3
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:30:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzOXr-0008VZ-IO
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:28:28 -0500
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:44553)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzOXq-0008Sh-RV
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:28:27 -0500
-Received: by mail-pf1-x42b.google.com with SMTP id a3so9944434pff.11
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 08:28:26 -0800 (PST)
-References: <1551356875-30676-1-git-send-email-thuth@redhat.com>
-	<1551356875-30676-10-git-send-email-thuth@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <eab2ac82-2b97-c7e6-cced-0141aac16cf6@linaro.org>
-Date: Thu, 28 Feb 2019 08:28:22 -0800
+	(envelope-from <imammedo@redhat.com>) id 1gzOZX-000116-FI
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:30:13 -0500
+Date: Thu, 28 Feb 2019 17:29:38 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190228172938.1993ed57@redhat.com>
+In-Reply-To: <20190228150324.25973-11-eric.auger@redhat.com>
+References: <20190228150324.25973-1-eric.auger@redhat.com>
+	<20190228150324.25973-11-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1551356875-30676-10-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 09/13] MAINTAINERS: Add maintainer to the
- TCG/i386 subsystem
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 10/10] hw/arm/virt: Bump the 255GB
+ initial RAM limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-On 2/28/19 4:27 AM, Thomas Huth wrote:
-> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Thu, 28 Feb 2019 16:03:24 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
+
+> Now we have the extended memory map (high IO regions beyond the
+> scalable RAM) and dynamic IPA range support at KVM/ARM level
+> we can bump the legacy 255GB initial RAM limit. The actual maximum
+> RAM size now depends on the physical CPU and host kernel, in
+> accelerated mode. In TCG mode, it depends on the VCPU
+> AA64MMFR0.PARANGE.
 > 
-> Richard obviously maintains this subdirectory, make this official :)
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> Remove the qemu-devel@nongnu.org entry because the list is always
-> selected by the 'All patches CC here' section.
-> 
-> Cc: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> v7 -> v8:
+> - TCG PAMAX check moved in a separate patch
+> 
+> v6 -> v7
+> - handle TCG case
+> - set_memmap modifications moved to previous patches
+> ---
+>  hw/arm/virt.c | 21 +--------------------
+>  1 file changed, 1 insertion(+), 20 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index a3da75a5ae..a45f0fcf79 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -95,21 +95,8 @@
+>  
+>  #define PLATFORM_BUS_NUM_IRQS 64
+>  
+> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
+> - * address space unallocated and free for future use between 256G and 512G.
+> - * If we need to provide more RAM to VMs in the future then we need to:
+> - *  * allocate a second bank of RAM starting at 2TB and working up
+> - *  * fix the DT and ACPI table generation code in QEMU to correctly
+> - *    report two split lumps of RAM to the guest
+> - *  * fix KVM in the host kernel to allow guests with >40 bit address spaces
+> - * (We don't want to fill all the way up to 512GB with RAM because
+> - * we might want it for non-RAM purposes later. Conversely it seems
+> - * reasonable to assume that anybody configuring a VM with a quarter
+> - * of a terabyte of RAM will be doing it on a host with more than a
+> - * terabyte of physical address space.)
+> - */
+>  #define RAMBASE GiB
+> +/* Legacy RAM limit in GB (< version 4.0) */
+>  #define LEGACY_RAMLIMIT_GB 255
+>  #define LEGACY_RAMLIMIT_BYTES (LEGACY_RAMLIMIT_GB * GiB)
+do we need to keep these couple around?
 
-s/rth@twiddle.net/richard.henderson@linaro.org/
+it's used only in
+ [VIRT_MEM] = { RAMBASE, LEGACY_RAMLIMIT_BYTES },
+and doesn't have any effect whatsoever.
+I'd set initial  VIRT_MEM.size to 0 and drop LEGACY_RAMLIMIT_*
+maybe add comment above entry that size is defined by ram_size
 
-I do this as part of my day job.  With that,
-
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+>  
+> @@ -1515,12 +1502,6 @@ static void machvirt_init(MachineState *machine)
+>  
+>      vms->smp_cpus = smp_cpus;
+>  
+> -    if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
+> -        error_report("mach-virt: cannot model more than %dGB RAM",
+> -                     LEGACY_RAMLIMIT_GB);
+> -        exit(1);
+> -    }
+> -
+>      if (vms->virt && kvm_enabled()) {
+>          error_report("mach-virt: KVM does not support providing "
+>                       "Virtualization extensions to the guest CPU");
