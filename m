@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43750)
+Received: from eggs.gnu.org ([209.51.188.92]:46574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gzK3H-0000um-Jb
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:40:37 -0500
+	(envelope-from <llyzs.vic@gmail.com>) id 1gzKLe-0003mK-Og
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:59:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gzK3G-0000Y9-He
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:40:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gzK3G-0000HT-6u
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:40:34 -0500
-Date: Thu, 28 Feb 2019 11:40:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190228114019.GB4970@work-vm>
-References: <20190227164900.16378-1-dgilbert@redhat.com>
-	<20190228062803.GA7471@xz-x1>
+	(envelope-from <llyzs.vic@gmail.com>) id 1gzKLa-0001yA-I7
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:59:32 -0500
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:35754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <llyzs.vic@gmail.com>) id 1gzKLW-0001xn-Ps
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 06:59:28 -0500
+Received: by mail-io1-xd44.google.com with SMTP id x4so16387713ion.2
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 03:59:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190228062803.GA7471@xz-x1>
-Subject: Re: [Qemu-devel] [PATCH] migration: Cleanup during exit
+From: llyzs <llyzs.vic@gmail.com>
+Date: Thu, 28 Feb 2019 19:59:12 +0800
+Message-ID: <CACxphuFGAODB_=X1fVFqJa=U14E_YSJMreWJcOgzdsooke1wxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [PATCH] socket: fix blocking udp recvfrom.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Feb 27, 2019 at 04:49:00PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Currently we cleanup the migration object as we exit main after the
-> > main_loop finishes; however if there's a migration running things
-> > get messy and we can end up with the migration thread still trying
-> > to access freed structures.
-> > 
-> > We now take a ref to the object around the migration thread itself,
-> > so the act of dropping the ref during exit doesn't cause us to lose
-> > the state until the thread quits.
-> > 
-> > Cancelling the migration during migration also tries to get the thread
-> > to quit.
-> > 
-> > We do this a bit earlier; so hopefully migration gets out of the way
-> > before all the devices etc are freed.
-> 
-> So does it mean that even with the patch it's still possible the
-> migration thread will be accessing device structs that have already
-> been freed which can still crash QEMU?
+Sometimes sorecvfrom() is called from slirp.c because revents == G_IO_IN,
+however inside sorecvfrom() function, ioctlsocket() returns 0 bytes available
+and recvfrom could be blocking indefinitely. This adds a non-blocking flag to
+recvfrom and checks data availability.
+---
+ slirp/socket.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Possibly yes; I'm not sure how to go to the next stage and stop that
-case; the consensus seems to be we don't want to explicitly block
-during the exit process, so doing a join on the migration thread doesn't
-seem to be wanted.
+diff --git a/slirp/socket.c b/slirp/socket.c
+index c01d8696af..ea30478ce6 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -581,7 +581,7 @@ sorecvfrom(struct socket *so)
+          }
+          /* } */
 
-Dave
-
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-         m->m_len = recvfrom(so->s, m->m_data, len, 0,
++         m->m_len = recvfrom(so->s, m->m_data, len, MSG_DONTWAIT,
+                              (struct sockaddr *)&addr, &addrlen);
+          DEBUG_MISC((dfd, " did recvfrom %d, errno = %d-%s\n",
+                      m->m_len, errno,strerror(errno)));
+@@ -618,6 +618,8 @@ sorecvfrom(struct socket *so)
+              break;
+            }
+            m_free(m);
++         } else if (m->m_len==0) {
++           m_free(m);
+          } else {
+          /*
+           * Hack: domain name lookup will be used the most for UDP,
+-- 
+2.20.1
