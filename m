@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47500)
+Received: from eggs.gnu.org ([209.51.188.92]:47351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz9QM-0004jJ-TU
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:19:43 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1gz9QT-0004df-Jq
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:19:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gz9QL-00017G-BF
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:19:42 -0500
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:41923)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gz9QK-00074W-6O
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:19:40 -0500
-Received: by mail-pf1-x430.google.com with SMTP id d25so8799176pfn.8
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 16:18:56 -0800 (PST)
-References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-34-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9c8913f5-76b6-1175-5574-19f19d1e8eef@linaro.org>
-Date: Wed, 27 Feb 2019 16:03:53 -0800
-MIME-Version: 1.0
-In-Reply-To: <20190226113915.20150-34-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <luwei.kang@intel.com>) id 1gz9La-0002Qs-89
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:14:49 -0500
+Received: from mga18.intel.com ([134.134.136.126]:50982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1gz9LT-0008Ka-11
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 19:14:39 -0500
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Thu, 28 Feb 2019 00:13:54 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E172D01FF9@SHSMSX101.ccr.corp.intel.com>
+References: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
+In-Reply-To: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 33/33] s390x/tcg: Implement VECTOR
- UNPACK *
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH V2] i386: extended the cpuid_level when
+ Intel PT is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 2/26/19 3:39 AM, David Hildenbrand wrote:
-> Combine all variant in a single handler. As source and destination
-> have different element sizes, we can't use gvec expansion. Expand
-> manually. Also watch out for overlapping source and destination and
-> use a temporary register in that case.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+
+> -----Original Message-----
+> From: Kang, Luwei
+> Sent: Wednesday, January 30, 2019 7:53 AM
+> To: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com; rth@=
+twiddle.net; ehabkost@redhat.com
+> Cc: qemu-devel@nongnu.org; Kang, Luwei <luwei.kang@intel.com>
+> Subject: [PATCH V2] i386: extended the cpuid_level when Intel PT is enabl=
+ed
+>=20
+> Intel Processor Trace required CPUID[0x14] but the cpuid_level have no ch=
+ange when create a kvm guest with e.g. "-cpu qemu64,+intel-pt".
+
+Ping.
+
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 > ---
->  target/s390x/insn-data.def      |  8 +++++++
->  target/s390x/translate_vx.inc.c | 41 +++++++++++++++++++++++++++++++++
->  2 files changed, 49 insertions(+)
-
-This works as is, so
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-But the same comment applies wrt iteration order and not needing a temporary.
-High unpack can iterate backward, while low unpack can iterate forward, with no
-lost data.
-
-
-r~
+>  hw/i386/pc.c      | 1 +
+>  target/i386/cpu.c | 9 +++++++++
+>  target/i386/cpu.h | 3 +++
+>  3 files changed, 13 insertions(+)
+>=20
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c index 73d688f..72a0a70 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -122,6 +122,7 @@ GlobalProperty pc_compat_3_1[] =3D {
+>      { "Cascadelake-Server" "-" TYPE_X86_CPU,  "mpx", "on" },
+>      { "Icelake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
+>      { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
+> +    { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
+>  };
+>  const size_t pc_compat_3_1_len =3D G_N_ELEMENTS(pc_compat_3_1);
+>=20
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c index 2f54125..6dddd99=
+ 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5023,6 +5023,13 @@ static void x86_cpu_expand_features(X86CPU *cpu, E=
+rror **errp)
+>          x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
+> +
+> +        /* Intel Processor Trace requires CPUID[0x14] */
+> +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
+> +             kvm_enabled() && cpu->intel_pt_auto_level) {
+> +            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
+> +        }
+> +
+>          /* SVM requires CPUID[0x8000000A] */
+>          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+>              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A=
+); @@ -5816,6 +5823,8 @@ static Property x86_cpu_properties[] =3D
+> {
+>      DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
+>      DEFINE_PROP_BOOL("x-hv-synic-kvm-only", X86CPU, hyperv_synic_kvm_onl=
+y,
+>                       false),
+> +    DEFINE_PROP_BOOL("x-intel-pt-auto-level", X86CPU, intel_pt_auto_leve=
+l,
+> +                     true),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>=20
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h index 59656a7..090baa4=
+ 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1455,6 +1455,9 @@ struct X86CPU {
+>      /* Enable auto level-increase for all CPUID leaves */
+>      bool full_cpuid_auto_level;
+>=20
+> +    /* Enable auto level-increase for Intel Processor Trace leave */
+> +    bool intel_pt_auto_level;
+> +
+>      /* if true fill the top bits of the MTRR_PHYSMASKn variable range */
+>      bool fill_mtrr_mask;
+>=20
+> --
+> 1.8.3.1
