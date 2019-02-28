@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34569)
+Received: from eggs.gnu.org ([209.51.188.92]:46512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gzBjF-00047J-CG
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 21:47:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gzCnh-0003wg-Tz
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:56:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gzBjE-0006tP-3x
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 21:47:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gzBjD-0006nu-KQ
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 21:47:19 -0500
-References: <MN2PR02MB580680857B3390A2447B512DB67B0@MN2PR02MB5806.namprd02.prod.outlook.com>
-	<20190227152347.GF22539@stefanha-x1.localdomain>
-	<MN2PR02MB580695B27405FA206A38110FB6740@MN2PR02MB5806.namprd02.prod.outlook.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <da9ffd31-370d-6f6f-5fd9-bba08de1f66e@redhat.com>
-Date: Thu, 28 Feb 2019 10:47:03 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1gzCnT-0005Dv-Ls
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 22:55:50 -0500
+Date: Thu, 28 Feb 2019 11:56:47 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190228005647.GC7734@umbus.fritz.box>
+References: <20190227085149.38596-1-aik@ozlabs.ru>
+	<20190227085149.38596-2-aik@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <MN2PR02MB580695B27405FA206A38110FB6740@MN2PR02MB5806.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Virtio-net control queue handling
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Clx92ZfkiYIKRjnr"
+Content-Disposition: inline
+In-Reply-To: <20190227085149.38596-2-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v3 1/6] pci: Move NVIDIA vendor id to
+ the rest of ids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikhil Agarwal <nagarwal@xilinx.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "libvir-list@redhat.com" <libvir-list@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>
 
 
-On 2019/2/28 =E4=B8=8A=E5=8D=881:39, Nikhil Agarwal wrote:
-> Hi Stefan,
->
-> Thanks for directing question to correct people, yes your understanding=
- is correct.
->
-> I want virtio-net control virtqueue to be handled by vhost-user-net dev=
-ice based backend for vdpa use case where control message would do some c=
-onfiguration on actual hw device. Or these changes should to be done in l=
-ibvirt where QMP event are being handled as of now?
->
-> Regards
-> Nikhil
+--Clx92ZfkiYIKRjnr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Feb 27, 2019 at 07:51:44PM +1100, Alexey Kardashevskiy wrote:
+> sPAPR code will use it too so move it from VFIO to the common code.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Cc Michael. Several methods for dealing with control virtqueue:
+Not technically my purview, but since it's to enable the rest of this
+series, I've applied it to ppc-for-4.0.
 
-1) using backend specific method. For example, multiqueue control for=20
-TAP was done in this way, and we plan to support RSS in this way as well=20
-(through steering eBPF program). But this may not work for the=20
-privilleged operations.
-2) inventing new vhost(user) protocol, convert the vq command to=20
-vhost(user) command and pass it to vhost(user) backend.
-3) extend vhost protocol to deal with control vq like you propose here.
-4) notify libvirt using QMP event, we've already supported this if rx=20
-filter is changed for virtio-net, and let management to deal with the=20
-changes.
-5) implementing or linking vhost backend qemu, then there's no need to=20
-invent no IPCs
+> ---
+>  include/hw/pci/pci_ids.h | 2 ++
+>  hw/vfio/pci-quirks.c     | 2 --
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
+> index eeb3301..0abe27a 100644
+> --- a/include/hw/pci/pci_ids.h
+> +++ b/include/hw/pci/pci_ids.h
+> @@ -271,4 +271,6 @@
+> =20
+>  #define PCI_VENDOR_ID_SYNOPSYS           0x16C3
+> =20
+> +#define PCI_VENDOR_ID_NVIDIA             0x10de
+> +
+>  #endif
+> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> index eae31c7..40a1200 100644
+> --- a/hw/vfio/pci-quirks.c
+> +++ b/hw/vfio/pci-quirks.c
+> @@ -526,8 +526,6 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *=
+vdev, int nr)
+>   * note it for future reference.
+>   */
+> =20
+> -#define PCI_VENDOR_ID_NVIDIA                    0x10de
+> -
+>  /*
+>   * Nvidia has several different methods to get to config space, the
+>   * nouveu project has several of these documented here:
 
-For the case of vDPA, I'm not sure the use case for vDPA through=20
-vhost-user. Can you describe more about that? To me the best way is=20
-probably done through mdev and VFIO not userspace path.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Thanks
+--Clx92ZfkiYIKRjnr
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
->
->
-> -----Original Message-----
-> From: Stefan Hajnoczi <stefanha@gmail.com>
-> Sent: Wednesday, February 27, 2019 8:54 PM
-> To: Nikhil Agarwal <nagarwal@xilinx.com>
-> Cc: qemu-devel@nongnu.org; jasowang@redhat.com; libvir-list@redhat.com
-> Subject: Re: [Qemu-devel] Virtio-net control queue handling
->
-> On Tue, Feb 26, 2019 at 02:13:43PM +0000, Nikhil Agarwal wrote:
->> Is there any option in QEMU to offload virtio device control queue han=
-dling to backend instead of deciphering and passing to libvirt via QMP? i=
-f not, is there any interface in libvirt which passes on these message to=
- application or i directly use QMP interface from QEMU?
-> I'm not sure I understand your question.  It could be because of
-> terminology:
->
-> "virtio device control queue" =3D=3D virtio-net control virtqueue?
->
-> "backend" =3D=3D vhost-user-net device backend?
->
-> "message" =3D=3D QMP event?
->
-> I have CCed Jason Wang, QEMU network subsystem maintainer, and the libv=
-irt mailing list.
->
-> Stefan
->
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx3Mc0ACgkQbDjKyiDZ
+s5IGOxAAy/fNMrBjoU6kFkgEvztr7wd4A9geYVlLfPcsFYxtMHjAVKexWSSfOhNL
+bi/RC4ob+765lwfqkbR2ZIdYNaHoTIQksXCqPWx0yY0GQCOE714F4usnTx9UzjDM
+yW5+/M5jlb8ySl2mvCfLDAErRV8dSJZ7wuNI2UAbyCEIKVEBEjy4K2NSEsj+c7ph
+NnbYVPZTJOYNS01UHev7nGs2/h/iZnH6ZOiVlRDKwLiolUMY4IhYNPQxlsKcQ8UM
+kSJ32HfFaevi8IMVZ6mqjG+/pm3SkI6vVgu/fPD5vUhMG/8l4YYya2R2dRaPhRf5
+n4J0pIr69qNz9D6sgkZCQu+28N5SwmjWwmjfu8im2bq9emdHoofwObfUtzjhCHaM
+O2NWOIYNJ13hLbKRPIp+kp+smTa2iZG959DQfz6dEeQTtCA0ShUMjCYxCs0pB7v4
+oEEXcrcRUWsyM6z+N5ts8QRHue7GznYtJB9fcTEuQgbAqgmM0pX9+uWnbKpIjx5C
+KxPUfGVGkD5OBqh/nZZLlzKxkQmIxiCOZ1XDr9+DPrR1QseFT7nd5iT10/BLWnpX
+Mv0cndlmMEA4mXJRA0txuaBr636FjMRPp+Y9qY6cRHjG5EUtOsnEGVZNcEZea6Ou
+9r15ALnGF7rBc2TvuGBDv/C85/uO3ORATmbt2JT0o2t4LTWdVoI=
+=s2qV
+-----END PGP SIGNATURE-----
+
+--Clx92ZfkiYIKRjnr--
