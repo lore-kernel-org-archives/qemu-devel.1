@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56983)
+Received: from eggs.gnu.org ([209.51.188.92]:57008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gzP1D-0005OK-9A
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:58:47 -0500
+	(envelope-from <chen.zhang@intel.com>) id 1gzP1W-0005fE-UT
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:59:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gzP1B-0007L6-9Q
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:58:46 -0500
-Received: from mga17.intel.com ([192.55.52.151]:63406)
+	(envelope-from <chen.zhang@intel.com>) id 1gzP1M-0007Rz-OC
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:59:02 -0500
+Received: from mga17.intel.com ([192.55.52.151]:63424)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1gzP1A-0007D6-RG
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:58:45 -0500
+	id 1gzP1D-0007LG-Cs
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:58:49 -0500
 From: Zhang Chen <chen.zhang@intel.com >
-Date: Fri,  1 Mar 2019 00:55:07 +0800
-Message-Id: <20190228165508.21594-7-chen.zhang@intel.com>
+Date: Fri,  1 Mar 2019 00:55:08 +0800
+Message-Id: <20190228165508.21594-8-chen.zhang@intel.com>
 In-Reply-To: <20190228165508.21594-1-chen.zhang@intel.com>
 References: <20190228165508.21594-1-chen.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH V2 6/7] Migration/colo.c: Add the necessary
- checks for colo_do_failover
+Subject: [Qemu-devel] [PATCH V2 7/7] Migration/colo.c: Make user obtain the
+ COLO mode info after failover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +30,84 @@ Cc: Zhang Chen <chen.zhang@intel.com>
 
 From: Zhang Chen <chen.zhang@intel.com>
 
+Add the last_colo_mode to save the status after failover.
+This patch can solve the issue that user got nothing to call
+query_colo_status after failover.
+
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 ---
- migration/colo.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ migration/colo.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
 diff --git a/migration/colo.c b/migration/colo.c
-index dbe2b88807..d1ae2e6d11 100644
+index d1ae2e6d11..6eba8e06f2 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -197,10 +197,16 @@ void colo_do_failover(MigrationState *s)
+@@ -38,6 +38,9 @@
+ static bool vmstate_loading;
+ static Notifier packets_compare_notifier;
+ 
++/* User need to know colo mode after COLO failover */
++static COLOMode last_colo_mode;
++
+ #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+ 
+ bool migration_in_colo_state(void)
+@@ -197,7 +200,10 @@ void colo_do_failover(MigrationState *s)
          vm_stop_force_state(RUN_STATE_COLO);
      }
  
--    if (get_colo_mode() == COLO_MODE_PRIMARY) {
-+    switch (get_colo_mode()) {
-+    case COLO_MODE_PRIMARY:
+-    switch (get_colo_mode()) {
++    /* Update last_COLO_mode to avoid unexpectedly exit COLO status */
++    last_colo_mode = get_colo_mode();
++
++    switch (last_colo_mode) {
+     case COLO_MODE_PRIMARY:
          primary_vm_do_failover();
--    } else {
-+        break;
-+    case COLO_MODE_SECONDARY:
-         secondary_vm_do_failover();
-+        break;
-+    default:
-+        error_report("colo_do_failover failed because the colo mode"
-+                     " could not be obtained");
-     }
- }
+         break;
+@@ -263,7 +269,7 @@ COLOStatus *qmp_query_colo_status(Error **errp)
+ {
+     COLOStatus *s = g_new0(COLOStatus, 1);
  
+-    s->mode = get_colo_mode();
++    s->mode = last_colo_mode;
+ 
+     switch (failover_get_state()) {
+     case FAILOVER_STATUS_NONE:
+@@ -515,6 +521,12 @@ static void colo_process_checkpoint(MigrationState *s)
+     Error *local_err = NULL;
+     int ret;
+ 
++    last_colo_mode = get_colo_mode();
++    if (last_colo_mode != COLO_MODE_PRIMARY) {
++        error_report("COLO mode must be COLO_MODE_PRIMARY");
++        return;
++    }
++
+     failover_init_state();
+ 
+     s->rp_state.from_dst_file = qemu_file_get_return_path(s->to_dst_file);
+@@ -682,12 +694,18 @@ void *colo_process_incoming_thread(void *opaque)
+     Error *local_err = NULL;
+     int ret;
+ 
+-    rcu_register_thread();
+-    qemu_sem_init(&mis->colo_incoming_sem, 0);
+-
+     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+                       MIGRATION_STATUS_COLO);
+ 
++    last_colo_mode = get_colo_mode();
++    if (last_colo_mode != COLO_MODE_SECONDARY) {
++        error_report("COLO mode must be COLO_MODE_SECONDARY");
++        return NULL;
++    }
++
++    rcu_register_thread();
++    qemu_sem_init(&mis->colo_incoming_sem, 0);
++
+     failover_init_state();
+ 
+     mis->to_src_file = qemu_file_get_return_path(mis->from_src_file);
 -- 
 2.17.GIT
