@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34304)
+Received: from eggs.gnu.org ([209.51.188.92]:34105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1gzPTH-0000xE-4Z
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:27:48 -0500
+	(envelope-from <rth7680@gmail.com>) id 1gzPTY-0000ds-UV
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:28:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1gzPHq-0003Fj-20
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:15:59 -0500
+	(envelope-from <rth7680@gmail.com>) id 1gzPFK-0000To-6d
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:13:23 -0500
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-15-david@redhat.com>
-	<c57c068f-1c42-9cba-0f0f-3204f6648d8d@linaro.org>
-	<f11109de-6ba3-5104-71b6-1245c42b282e@redhat.com>
+	<20190226113915.20150-13-david@redhat.com>
+	<b3317597-1eed-8f02-07d4-d84c5398733c@linaro.org>
+	<52631119-05fa-e08e-437b-619987750f28@redhat.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <864f3ba7-3115-c6f8-e018-15425ca67a72@twiddle.net>
-Date: Thu, 28 Feb 2019 09:15:52 -0800
+Message-ID: <8046c492-d479-a050-c7bc-3555d24a3eae@twiddle.net>
+Date: Thu, 28 Feb 2019 09:10:54 -0800
 MIME-Version: 1.0
-In-Reply-To: <f11109de-6ba3-5104-71b6-1245c42b282e@redhat.com>
+In-Reply-To: <52631119-05fa-e08e-437b-619987750f28@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 14/33] s390x/tcg: Implement VECTOR LOAD
- MULTIPLE
+Subject: Re: [Qemu-devel] [PATCH v1 12/33] s390x/tcg: Implement VECTOR LOAD
+ GR FROM VR ELEMENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +31,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On 2/28/19 12:36 AM, David Hildenbrand wrote:
-> On 27.02.19 17:02, Richard Henderson wrote:
->> On 2/26/19 3:38 AM, David Hildenbrand wrote:
->>> Also fairly easy to implement. One issue we have is that exceptions will
->>> result in some vectors already being modified. At least handle it
->>> consistently per vector by using a temporary vector. Good enough for
->>> now, add a FIXME.
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  target/s390x/insn-data.def      |  2 ++
->>>  target/s390x/translate_vx.inc.c | 26 ++++++++++++++++++++++++++
->>>  2 files changed, 28 insertions(+)
->>
->> I suppose the fixme is good enough.  For the record, I think you could do the
->> check with just two loads -- the first and last quadword.  After that, none of
->> the other loads can fault, and you can store everything else into the
->> destination vectors as you read them.
+On 2/28/19 12:27 AM, David Hildenbrand wrote:
+> +    /* fast path if we don't need the register content */
+> +    if (!get_field(s->fields, b2)) {
+> +        uint8_t enr = get_field(s->fields, d2) & (NUM_VEC_ELEMENTS(es) - 1);
+> +
+> +        read_vec_element_i64(o->out, get_field(s->fields, v3), enr, es);
+> +        return DISAS_NEXT;
+> +    }
+> +
 > 
-> Aren't such approaches prone to races if other VCPUs invalidate page
-> tables/TLB entries?
+> Should do the trick, right?
 
-No, because...
-
-> (or am I messing up things and the MMU of this VCPU won't be touched
-> while in this block and once we touched all applicable pages, it cannot
-> fail anymore?)
-
-Correct.
-
-If vcpu 1 does a global invalidate, the time at which vcpu 2 acknowledges that
-invalidate is somewhat fluid.  VCPU 2 will see an interrupt, exit at a TB
-boundary, and then acknowledge.
-
-VCPU 1 has to wait for the ack before it knows the operation is complete.
-
-Thus no race within any given instruction's execution.
+Yep!
 
 
 r~
