@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40450)
+Received: from eggs.gnu.org ([209.51.188.92]:40842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gzHeL-0001H4-T2
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:06:45 -0500
+	(envelope-from <david@redhat.com>) id 1gzHfh-0001zD-T0
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:08:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gzHeJ-0002XL-BZ
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:06:41 -0500
-References: <155129014351.2181.16531275718275765030@49fa7ef69f7b>
-	<d29adfb8-e194-54af-5f08-b4accb5df790@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6fd94511-8634-fa0a-0cfc-6d7a83d57f9c@redhat.com>
-Date: Thu, 28 Feb 2019 10:06:13 +0100
+	(envelope-from <david@redhat.com>) id 1gzHff-0003Dd-Sz
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:08:04 -0500
+References: <20190226113915.20150-1-david@redhat.com>
+	<20190226113915.20150-26-david@redhat.com>
+	<f76916bb-ef7e-e734-e675-2f2d520c1ee3@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <224fa006-9acc-6c81-dc76-8b7aca3b14f8@redhat.com>
+Date: Thu, 28 Feb 2019 10:07:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <d29adfb8-e194-54af-5f08-b4accb5df790@redhat.com>
+In-Reply-To: <f76916bb-ef7e-e734-e675-2f2d520c1ee3@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 00/34] target/riscv: Convert to
- decodetree
+Subject: Re: [Qemu-devel] [PATCH v1 25/33] s390x/tcg: Implement VECTOR
+ REPLICATE IMMEDIATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,23 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, fam@euphon.net
-Cc: qemu-devel@nongnu.org, kbastian@mail.uni-paderborn.de, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, palmer@sifive.com, richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 28/02/19 09:37, Thomas Huth wrote:
-> On 27/02/2019 18.55, no-reply@patchew.org wrote:
->> Patchew URL: https://patchew.org/QEMU/20190222141024.22217-1-kbastian@mail.uni-paderborn.de/
->>
->> Hi,
->>
->> This series seems to have some coding style problems. See output below for
->> more information:
+On 28.02.19 00:39, Richard Henderson wrote:
+> On 2/26/19 3:39 AM, David Hildenbrand wrote:
+>> +    tmp = tcg_temp_new_i64();
+>> +    tcg_gen_movi_i64(tmp, data);
+>> +    gen_gvec_dup_i64(es, get_field(s->fields, v1), tmp);
+>> +    tcg_temp_free_i64(tmp);
+>> +    return DISAS_NEXT;
 > 
->  Fam, Paolo,
+> Reuse the dupi8, dupi16, ... switch from one of the other patches upthread?
+
+Yes, makes sense!
+
 > 
-> Patchew is really going wild these days. It replied 32 times to this
-> patch series - quite a bit annoying. Could this be fixed, please?
+> 
+> r~
+> 
 
-I have a fix, I haven't deployed it yet to patchew.org though.
 
-Paolo
+-- 
+
+Thanks,
+
+David / dhildenb
