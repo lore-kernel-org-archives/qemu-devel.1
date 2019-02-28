@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58781)
+Received: from eggs.gnu.org ([209.51.188.92]:59004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gzLGZ-00013v-MT
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:58:24 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzLHf-0001dR-2S
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gzLGU-0006yy-3C
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:58:21 -0500
-Received: from mail-yw1-xc34.google.com ([2607:f8b0:4864:20::c34]:34976)
+	(envelope-from <peter.maydell@linaro.org>) id 1gzLHe-0007K3-5Q
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:59:30 -0500
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:38294)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gzLGT-0006xa-9V
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:58:17 -0500
-Received: by mail-yw1-xc34.google.com with SMTP id s204so10953291ywg.2
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 04:58:13 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gzLHd-0007Jv-VF
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 07:59:30 -0500
+Received: by mail-oi1-x230.google.com with SMTP id q81so16382784oic.5
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 04:59:29 -0800 (PST)
 MIME-Version: 1.0
-References: <20190225203233.3439-1-jcmvbkbc@gmail.com>
-	<CAFEAcA_oanfMXGd1cD=+ypL5N32Hm8JR064LWdW09WCVwZXVRg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_oanfMXGd1cD=+ypL5N32Hm8JR064LWdW09WCVwZXVRg@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 28 Feb 2019 04:58:02 -0800
-Message-ID: <CAMo8Bf+KRECi8dKUiBqSHTJk6UD-XayjDGS6mxOy_eeU2-dL2Q@mail.gmail.com>
+References: <20190226165013.24867-1-eblake@redhat.com>
+In-Reply-To: <20190226165013.24867-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 12:59:17 +0000
+Message-ID: <CAFEAcA9aqX+YanZHKbZfGVwNdEZ27SaoZ44M1in-jgO5wFMVyA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/40] target/xtensa queue
+Subject: Re: [Qemu-devel] [PULL v2 0/3] NBD patches for 2019-02-25
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Eric Blake <eblake@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Peter,
-
-On Thu, Feb 28, 2019 at 2:27 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> On Mon, 25 Feb 2019 at 20:32, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> > please pull the following batch of target/xtensa updates:
+On Tue, 26 Feb 2019 at 16:56, Eric Blake <eblake@redhat.com> wrote:
 >
-> Hi -- I'm afraid this fails to build on some clang compilers:
+> The following changes since commit d88d85f1f0625d57e9f354aa0874c4c8b5d1fb47:
 >
-> /Users/pm215/src/qemu-for-merges/target/xtensa/translate.c:967:14:
-> error: result of comparison of constant 256 with expression of type
-> 'enum resource_type' is always true
-> [-Werror,-Wtautological-constant-out-of-range-compare]
->     assert(r < 256 && g < 256 && n < 65536);
->            ~ ^ ~~~
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-02-25 17:28:04 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-02-25-v2
+>
+> for you to fetch changes up to 3e6f45446b11ccc20b4b751f70331f03d70369b8:
+>
+>   iotests: avoid broken pipe with certtool (2019-02-26 10:45:37 -0600)
+>
+> (v2: pull in Andrey's v3 python patch per last-minute list emails)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2019-02-25
+>
+> - iotest failure fixes for tests related to NBD
+>
+> ----------------------------------------------------------------
 
-Thanks. I've fixed it up with the following:
+Applied, thanks.
 
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 616ed8f57972..bda4e9469b86 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -865,11 +865,12 @@ struct slot_prop {
- enum resource_type {
-     RES_REGFILE,
-     RES_STATE,
-+    RES_MAX,
- };
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
- static uint32_t encode_resource(enum resource_type r, unsigned g, unsigned n)
- {
--    assert(r < 256 && g < 256 && n < 65536);
-+    assert(r < RES_MAX && g < 256 && n < 65536);
-     return (r << 24) | (g << 16) | n;
- }
-
-and pushed the updated tag 20190228-xtensa.
-
--- 
-Thanks.
--- Max
+-- PMM
