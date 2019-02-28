@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47692)
+Received: from eggs.gnu.org ([209.51.188.92]:49285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzOQI-0007Sp-SE
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:20:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzOVZ-0000W3-Mk
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:26:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzOQ8-0003kY-UB
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:20:32 -0500
-Date: Thu, 28 Feb 2019 17:19:42 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190228171942.28f2f953@redhat.com>
-In-Reply-To: <20190228150324.25973-9-eric.auger@redhat.com>
-References: <20190228150324.25973-1-eric.auger@redhat.com>
-	<20190228150324.25973-9-eric.auger@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gzOVY-0007NK-Sb
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:26:05 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43101)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gzOVX-0007Iq-2o
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:26:04 -0500
+Received: by mail-ot1-x343.google.com with SMTP id n71so18175544ota.10
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 08:25:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 08/10] hw/arm/virt: Implement kvm_type
- function for 4.0 machine
+References: <20190228145624.24885-1-peter.maydell@linaro.org>
+	<20190228145624.24885-10-peter.maydell@linaro.org>
+	<7ec8917a-eabd-6a14-3c1f-38b1d429c900@redhat.com>
+In-Reply-To: <7ec8917a-eabd-6a14-3c1f-38b1d429c900@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 16:25:39 +0000
+Message-ID: <CAFEAcA-oRrH81xcYazGgDfiEmORcACtC6S6a96ZMoOMwy20QAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 09/11] Makefile,
+ configure: Support building rST documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,110 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>
 
-On Thu, 28 Feb 2019 16:03:22 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
+On Thu, 28 Feb 2019 at 15:49, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Hi Peter,
+>
+> On 2/28/19 3:56 PM, Peter Maydell wrote:
+> >  if test "$docs" !=3D "no" ; then
+> > -  if has makeinfo && has pod2man; then
+> > +  if has makeinfo && has pod2man && has sphinx-build; then
+>
+> Unrelated to your patch, I tried that on fresh Fedora image where no
+> python2 installed (on purpose). sphinx-build is not included in the
+> suggested python3-sphinx. Once python2-sphinx installed (which pull a
+> lot of py2 packages) I could test your series.
 
-> This patch implements the machine class kvm_type() callback.
-> It returns the number of bits requested to implement the whole GPA
-> range including the RAM and IO regions located beyond.
-> The returned value in passed though the KVM_CREATE_VM ioctl and
-> this allows KVM to set the stage2 tables dynamically.
-> 
-> To compute the highest GPA used in the memory map, kvm_type()
-> must freeze the memory map by calling virt_set_memmap().
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> v7 -> v8:
-> - remove vmc->no_extended_memmap and vms->extended_memmap
-> 
-> v6 -> v7:
-> - Introduce RAMBASE and rename add LEGACY_ prefix in that patch
-> - use local variables with explicit names in virt_set_memmap:
->   device_memory_base, device_memory_size
-> - add an extended_memmap field in the class
-> 
-> v5 -> v6:
-> - add some comments
-> - high IO region cannot start before 256GiB
-> ---
->  hw/arm/virt.c | 39 ++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 38 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index d7aa7d3f9d..7a158571b7 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1439,7 +1439,13 @@ static void machvirt_init(MachineState *machine)
->      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
->      bool aarch64 = true;
->  
-> -    virt_set_memmap(vms);
-> +    /*
-> +     * In accelerated mode, the memory map is computed in kvm_type()
-s/in/earlier in/
+Yeah, Fedora gives the Python 3 version of the tool a silly name.
+I'm told newer Fedora fix this.
 
-> +     * to create a VM with the right number of IPA bits.
-> +     */
-> +    if (!kvm_enabled()) {
-maybe check not for KVM but for vms->memmap == NULL
-so it would match with comment and be clear that we initializing memmap
-because nobody else did it yet.
+> Again, not related to your patch, but 'make install-sphinxdocs' clone
+> libfdt + capstone, requires C compiler to build libfdt.a and C++ to
+> build libcapstone.a. Once both build we can generate the doc.
 
-> +        virt_set_memmap(vms);
-> +    }
->  
->      /* We can probe only here because during property set
->       * KVM is not available yet
-> @@ -1828,6 +1834,36 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
->      return NULL;
->  }
->  
-> +/*
-> + * for arm64 kvm_type [7-0] encodes the requested number of bits
-> + * in the IPA address space
-> + */
-> +static int virt_kvm_type(MachineState *ms, const char *type_str)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(ms);
-> +    int max_vm_pa_size = kvm_arm_get_max_vm_ipa_size(ms);
-> +    int requested_pa_size;
-> +
-> +    /* we freeze the memory map to compute the highest gpa */
-> +    virt_set_memmap(vms);
-> +
+Yes, this sounds like an unrelated thing -- our makefiles
+sometimes does more work than you expect because of some
+things that we do up front (like building anything in
+GENERATED_FILES, or doing this subdirs stuff). You can see
+that sometimes when you do 'make clean' and it builds a
+bunch of stuff before deleting it.
 
-> +    requested_pa_size = 64 - clz64(vms->highest_gpa);
-> +
-> +    if (requested_pa_size > max_vm_pa_size) {
-> +        error_report("-m and ,maxmem option values "
-> +                     "require an IPA range (%d bits) larger than "
-> +                     "the one supported by the host (%d bits)",
-> +                     requested_pa_size, max_vm_pa_size);
-> +       exit(1);
-> +    }
-this part is recurring pattern, is it worth using a helper function?
+> > +# Sphinx builds all its documentation at once in one invocation
+> > +# and handles "don't rebuild things unless necessary" itself.
+> > +# The '.doctrees' files are cached information to speed this up.
+>
+> Can you add .doctrees to .gitignore?
 
-> +    /*
-> +     * By default we return 0 which corresponds to an implicit legacy
-> +     * 40b IPA setting. Otherwise we return the actual requested PA
-> +     * logsize
-> +     */
-> +    return requested_pa_size > 40 ? requested_pa_size : 0;
-> +}
-> +
->  static void virt_machine_class_init(ObjectClass *oc, void *data)
->  {
->      MachineClass *mc = MACHINE_CLASS(oc);
-> @@ -1852,6 +1888,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
->      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
->      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-> +    mc->kvm_type = virt_kvm_type;
->      assert(!mc->get_hotplug_handler);
->      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
->      hc->plug = virt_machine_device_plug_cb;
+Sure. I tend to forget about this because I never do in-tree
+builds, so anything in the build directory doesn't show up
+in git status separately.
+
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Thanks for the review.
+
+-- PMM
