@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36172)
+Received: from eggs.gnu.org ([209.51.188.92]:36265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=955018df6=anthony.perard@citrix.com>)
-	id 1gzPaV-000682-4l
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:35:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzPaz-0006TZ-62
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=955018df6=anthony.perard@citrix.com>)
-	id 1gzPaU-0003dN-BQ
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:35:15 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:52020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=955018df6=anthony.perard@citrix.com>)
-	id 1gzPaU-0003KN-1V
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:35:14 -0500
-From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Thu, 28 Feb 2019 17:34:36 +0000
-Message-ID: <20190228173439.8013-2-anthony.perard@citrix.com>
-In-Reply-To: <20190228173439.8013-1-anthony.perard@citrix.com>
-References: <20190228173439.8013-1-anthony.perard@citrix.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gzPay-0003nW-8b
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:35:45 -0500
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:43619)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gzPaw-0003mK-ES
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:35:44 -0500
+Received: by mail-oi1-x235.google.com with SMTP id i8so17146570oib.10
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 09:35:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 1/4] dataplane/xen-block: remove dead code
+References: <20190228100858.28397-1-kraxel@redhat.com>
+In-Reply-To: <20190228100858.28397-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 17:35:29 +0000
+Message-ID: <CAFEAcA9L1oa0-WP-sSKB80Y0esWY99y6+BK+NqeyQ0i8_0EUwg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] Audio 20190228 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: Paul Durrant <paul.durrant@citrix.com>
+On Thu, 28 Feb 2019 at 10:11, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 86c7e2f4a93322a76afea5ee6806a83420d1dfea:
+>
+>   Merge remote-tracking branch 'remotes/berrange/tags/authz-core-pull-request' into staging (2019-02-26 17:59:41 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/audio-20190228-pull-request
+>
+> for you to fetch changes up to 9399ef168377d9e7f2e33b1c2eb61751aa1b72fa:
+>
+>   audio/sdlaudio: Simplify the sdl_callback function (2019-02-28 10:30:08 +0100)
+>
+> ----------------------------------------------------------------
+> audio: fixes and cleanups.
 
-The if() statement is clearly bogus (dead code which should have been
-cleaned up when grant mapping was removed).
 
-Spotted by Coverity: CID 1398635
+Applied, thanks.
 
-While in the neighbourhood, add a missing 'fall through' annotation.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-Message-Id: <20190215162533.19475-2-paul.durrant@citrix.com>
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
- hw/block/dataplane/xen-block.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index c6a15da024..f1523c5b45 100644
---- a/hw/block/dataplane/xen-block.c
-+++ b/hw/block/dataplane/xen-block.c
-@@ -281,10 +281,6 @@ static void xen_block_complete_aio(void *opaque, int ret)
-         break;
-     case BLKIF_OP_WRITE:
-     case BLKIF_OP_FLUSH_DISKCACHE:
--        if (!request->req.nr_segments) {
--            break;
--        }
--        break;
-     default:
-         break;
-     }
-@@ -298,6 +294,7 @@ static void xen_block_complete_aio(void *opaque, int ret)
-         if (!request->req.nr_segments) {
-             break;
-         }
-+        /* fall through */
-     case BLKIF_OP_READ:
-         if (request->status == BLKIF_RSP_OKAY) {
-             block_acct_done(blk_get_stats(dataplane->blk), &request->acct);
--- 
-Anthony PERARD
+-- PMM
