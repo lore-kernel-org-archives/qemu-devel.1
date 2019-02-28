@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46626)
+Received: from eggs.gnu.org ([209.51.188.92]:46638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gzQFe-0000VK-BM
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:57 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gzQFe-0000VO-BN
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:18:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gzQFV-0002I8-N8
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:42 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46741)
+	(envelope-from <tcminyard@gmail.com>) id 1gzQFV-0002Ha-G9
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:44 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35201)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gzQFV-0002DP-E3
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gzQFV-0002DZ-5v
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:17:37 -0500
-Received: by mail-ot1-x341.google.com with SMTP id c18so18489701otl.13
+Received: by mail-ot1-x343.google.com with SMTP id z19so18560642otm.2
 	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:17:29 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu, 28 Feb 2019 12:17:06 -0600
-Message-Id: <20190228181710.2477-16-minyard@acm.org>
+Date: Thu, 28 Feb 2019 12:17:09 -0600
+Message-Id: <20190228181710.2477-19-minyard@acm.org>
 In-Reply-To: <20190228181710.2477-1-minyard@acm.org>
 References: <20190228181710.2477-1-minyard@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/19] i2c:smbus_eeprom: Add normal type name
- and cast to smbus_eeprom.c
+Subject: [Qemu-devel] [PULL 18/19] i2c:smbus_eeprom: Add a reset function to
+ smbus_eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,76 +35,57 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, minyard@acm.org, Corey Minyard <cmi
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Create a type name and a cast macro and use those through the
-code.
+Reset the contents to init data and reset the offset on a machine
+reset.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/i2c/smbus_eeprom.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ hw/i2c/smbus_eeprom.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index 2816e35bcc..76f0d4aab0 100644
+index 5b10c31ae7..0ba5763fc2 100644
 --- a/hw/i2c/smbus_eeprom.c
 +++ b/hw/i2c/smbus_eeprom.c
-@@ -32,6 +32,11 @@
+@@ -108,7 +108,17 @@ static const VMStateDescription vmstate_smbus_eeprom = {
+     }
+ };
  
- //#define DEBUG
- 
-+#define TYPE_SMBUS_EEPROM "smbus-eeprom"
-+
-+#define SMBUS_EEPROM(obj) \
-+    OBJECT_CHECK(SMBusEEPROMDevice, (obj), TYPE_SMBUS_EEPROM)
-+
- typedef struct SMBusEEPROMDevice {
-     SMBusDevice smbusdev;
-     void *data;
-@@ -40,7 +45,7 @@ typedef struct SMBusEEPROMDevice {
- 
- static uint8_t eeprom_receive_byte(SMBusDevice *dev)
+-static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
++/*
++ * Reset the EEPROM contents to the initial state on a reset.  This
++ * isn't really how an EEPROM works, of course, but the general
++ * principle of QEMU is to restore function on reset to what it would
++ * be if QEMU was stopped and started.
++ *
++ * The proper thing to do would be to have a backing blockdev to hold
++ * the contents and restore that on startup, and not do this on reset.
++ * But until that time, act as if we had been stopped and restarted.
++ */
++static void smbus_eeprom_reset(DeviceState *dev)
  {
--    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
-+    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
-     uint8_t *data = eeprom->data;
-     uint8_t val = data[eeprom->offset++];
+     SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
  
-@@ -53,7 +58,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
- 
- static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
- {
--    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
-+    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
-     uint8_t *data = eeprom->data;
- 
- #ifdef DEBUG
-@@ -75,7 +80,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
- 
- static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
- {
--    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
-+    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
- 
+@@ -116,6 +126,11 @@ static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
      eeprom->offset = 0;
  }
-@@ -99,7 +104,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
- }
  
- static const TypeInfo smbus_eeprom_info = {
--    .name          = "smbus-eeprom",
-+    .name          = TYPE_SMBUS_EEPROM,
-     .parent        = TYPE_SMBUS_DEVICE,
-     .instance_size = sizeof(SMBusEEPROMDevice),
-     .class_init    = smbus_eeprom_class_initfn,
-@@ -116,7 +121,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eeprom_buf)
- {
-     DeviceState *dev;
++static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
++{
++    smbus_eeprom_reset(dev);
++}
++
+ static Property smbus_eeprom_properties[] = {
+     DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -127,6 +142,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+     SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(klass);
  
--    dev = qdev_create((BusState *) smbus, "smbus-eeprom");
-+    dev = qdev_create((BusState *) smbus, TYPE_SMBUS_EEPROM);
-     qdev_prop_set_uint8(dev, "address", address);
-     qdev_prop_set_ptr(dev, "data", eeprom_buf);
-     qdev_init_nofail(dev);
+     dc->realize = smbus_eeprom_realize;
++    dc->reset = smbus_eeprom_reset;
+     sc->receive_byte = eeprom_receive_byte;
+     sc->write_data = eeprom_write_data;
+     dc->props = smbus_eeprom_properties;
 -- 
 2.17.1
