@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34094)
+Received: from eggs.gnu.org ([209.51.188.92]:34105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzPSu-0000dU-U4
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:27:26 -0500
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1gzPTC-0000ds-UZ
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:27:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzPMR-0005z8-2L
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:20:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45076)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1gzPKS-0004gL-RY
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:18:41 -0500
+Received: from mail-it1-x12f.google.com ([2607:f8b0:4864:20::12f]:54715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gzPMM-0005wI-4m
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:20:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gzPMI-0004v7-Sd
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 17:20:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D72242E80C8
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 17:20:34 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1gzPKS-0004f4-CO
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:18:40 -0500
+Received: by mail-it1-x12f.google.com with SMTP id w18so15803193itj.4
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 09:18:40 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+In-Reply-To: <013f91f0-1968-1400-84b2-4d4fe2ece9a6@linaro.org>
+Date: Thu, 28 Feb 2019 12:18:36 -0500
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Feb 2019 17:12:01 -0000
-From: DDoSolitary <1818122@bugs.launchpad.net>
-Reply-To: Bug 1818122 <1818122@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155137392124.31316.11495671074765014993.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818122] [NEW] QEMU 3.1 makes libxslt to crash on
- ppc64
+Message-Id: <8F89FA7E-E952-425F-A587-66BEECF4A295@oberlin.edu>
+References: <5F2C0013-1D18-44A9-ADAF-F86EC6FD1174@oberlin.edu>
+	<CAFEAcA8VzJRMSThWQ=CgNbB8BY0EAmi77oAJuHQt5iQnkiZmzg@mail.gmail.com>
+	<63A30600-CCE3-4412-A3EB-8D535A8B21B3@oberlin.edu>
+	<4F8E4327-9F59-4F50-A22D-20A3F939899F@oberlin.edu>
+	<9108923c-076b-034c-9d68-af355861ae0c@linaro.org>
+	<1FBF59F3-F256-4680-B2AD-199C197814C9@oberlin.edu>
+	<013f91f0-1968-1400-84b2-4d4fe2ece9a6@linaro.org>
+Subject: Re: [Qemu-devel] x86 segment limits enforcement with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,236 +36,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Public bug reported:
+This is all extremely helpful! I'll dig in and try this approach soon.
 
-Host: clean Ubuntu Disco with QEMU 3.1
+> On Feb 28, 2019, at 11:11, Richard Henderson =
+<richard.henderson@linaro.org> wrote:
+>=20
+>> Are you thinking that this should be modeled as independent sets of =
+TLBs, one per mode?
+>=20
+> One per segment you mean?
 
-Guest: Alpine Linux edge with xmlto
+Yes.
 
-Steps to set up guest:
-curl -O http://dl-cdn.alpinelinux.org/alpine/edge/releases/ppc64le/netboot/=
-vmlinuz-vanilla
-curl -O http://dl-cdn.alpinelinux.org/alpine/edge/releases/ppc64le/netboot/=
-initramfs-vanilla
-qemu-system-ppc64 -m 1G -kernel vmlinuz-vanilla -initrd initramfs-vanilla -=
-append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinelinux.or=
-g/alpine/edge/main/ modloop=3Dhttp://dl-cdn.alpinelinux.org/alpine/edge/rel=
-eases/ppc64le/netboot/modloop-vanilla" -device virtio-rng-pci -nographic
-This brings up an VM with an in-memory Alpine Linux.
+>  Yes, exactly.  Since each segment can have
+> independent segment base + limit + permissions.  All of which would be =
+taken
+> into account by tlb_fill when populating the TLB.
+>=20
+>> It seems easier to have a linear address MMU mode and then for the =
+MMU modes
+>> corresponding to segment registers, perform an access and limit =
+check,
+>> adjust the address by the segment base, and then go through the =
+linear
+>> address MMU mode translation.
+> Except you need to generate extra calls at runtime to perform this =
+translation,
+> and you are not able to cache the result of the lookup against a =
+second access
+> to the same page.
 
-Steps to reproduce:
-Login as root and execute the following commands.
-apk add xmlto
-ntpd -nqp time.google.com // For TLS OCSP
-wget https://ddosolitary.org/manpage-base.xsl
-wget https://ddosolitary.org/shadowsocks-libev.xml
-xmlto -m manpage-base.xsl man shadowsocks-libev.xml
-The downloaded files are from this project: https://github.com/shadowsocks/=
-shadowsocks-libev The former is directly taken from the "doc" directory and=
- the latter is an intermediate build output generated by asciidoc from doc/=
-shadowsocks-libev.asciidoc
+I see. That makes sense. I didn't realize the results of the calls were =
+being cached.
 
-Expected behavior: The command silently succeeds producing shadowsocks-
-libev.8
+>=20
+>> In particular, code that uses segments spends a lot of time changing =
+the
+>> values of segment registers. E.g., in the movs example above, the ds =
+segment
+>> may be overridden but the es segment cannot be, so to use the string =
+move
+>> instructions within ds, es needs to be saved, modified, and then =
+restored.
+> You are correct that this would result in two TLB flushes.
+>=20
+> But if MOVS executes a non-trivial number of iterations, we still may =
+win.
+>=20
+> The work that Emilio Cota has done in this development cycle to make =
+the size
+> of the softmmu TLBs dynamic will help here.  It may well be that MOVS =
+is used
+> with small memcpy, and there are a fair few flushes.  But in that case =
+the TLB
+> will be kept very small, and so the flush will not be expensive.
 
-Actual behavior: =
+I wonder if it would make sense to maintain a small cache of TLBs. The =
+majority of cases are likely to involving setting segment registers to =
+one of a handful of segments (e.g., setting es to ds or ss). So it might =
+be nice to avoid the flushes entirely.
 
-runtime error: file file:///usr/share/xml/docbook/xsl-stylesheets-1.79.1/ma=
-npages/tbl.xsl line 450 element text
-xsltApplySequenceConstructor: A potential infinite template recursion was d=
-etected.
-You can adjust xsltMaxDepth (--maxdepth) in order to raise the maximum numb=
-er of nested template calls and variables/params (currently set to 3000).
-Templates:
-#0 name process.colspan
-#1 name process.colspan
-#2 name process.colspan
-#3 name process.colspan
-#4 name process.colspan
-#5 name process.colspan
-#6 name process.colspan
-#7 name process.colspan
-#8 name process.colspan
-#9 name process.colspan
-#10 name process.colspan
-#11 name process.colspan
-#12 name process.colspan
-#13 name process.colspan
-#14 name process.colspan
-Variables:
-#0
-type
-colspan
-#1
-colspan
-#2
-type
-colspan
-#3
-colspan
-#4
-type
-colspan
-#5
-colspan
-#6
-type
-colspan
-#7
-colspan
-#8
-type
-colspan
-#9
-colspan
-#10
-type
-colspan
-#11
-colspan
-#12
-type
-colspan
-#13
-colspan
-#14
-type
-colspan
-error: file /root/shadowsocks-libev.xml
-xsltRunStylesheet : run failed
+> On the other hand, DS changes are rare (depending on the programming =
+model),
+> and SS changes only on context switches.  Their TLBs will keep their =
+contents,
+> even while ES gets flushed.  Work has been saved over adding explicit =
+calls to
+> a linear address helper function.
 
-Note:
-I tried increasing --maxdepth as suggested in the error output but that wil=
-l result in a segfault.
-This error doesn't occur with an older QEMU (I tested QEMU 2.12 on Ubuntu C=
-osmic) or different architectures on QEMU 3.1 (I tested x86, x86_64, arm, a=
-arch64, s390x). Also it didn't help to use an older Alpine Linux (I tested =
-v3.8). So I think it is caused by a bug in QEMU rather than the distro/pack=
-age.
+In my case, ds changes are pretty frequent=E2=80=94I count 75 instances =
+of mov ds, __ and 124 instances of pop ds=E2=80=94in the executive (ring =
+0) portion of this firmware. Obviously the dynamic count is more =
+interesting, but I don't have that off-hand.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+> The vast majority of x86 instructions have exactly one memory access, =
+and it
+> uses the default segment (ds/ss) or the segment override.  We can set =
+this
+> default mmu index as soon as we have seen any segment override.
+>=20
+>> Returning to the movs example, the order of operations _must_ be
+>> 1. lea ds:[esi]
+>> 2. load 4 bytes
+>> 3. lea es:[edi]
+>> 4. store 4 bytes
+>=20
+> MOVS is one of the rare examples of two memory accesses within one =
+instruction.
+> Yes, we would have to special case this, and be careful to get =
+everything right.
 
--- =
+I agree that the vast majority of x86 instructions access at most one =
+segment, but off-hand, I can think of a handful that access two:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818122
+- movs=20
+- cmps
+- push r/m32
+- pop r/m32
+- call m32
+- call m16:m32
 
-Title:
-  QEMU 3.1 makes libxslt to crash on ppc64
+I'm not sure if there are others.
 
-Status in QEMU:
-  New
-
-Bug description:
-  Host: clean Ubuntu Disco with QEMU 3.1
-
-  Guest: Alpine Linux edge with xmlto
-
-  Steps to set up guest:
-  curl -O http://dl-cdn.alpinelinux.org/alpine/edge/releases/ppc64le/netboo=
-t/vmlinuz-vanilla
-  curl -O http://dl-cdn.alpinelinux.org/alpine/edge/releases/ppc64le/netboo=
-t/initramfs-vanilla
-  qemu-system-ppc64 -m 1G -kernel vmlinuz-vanilla -initrd initramfs-vanilla=
- -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinelinux.=
-org/alpine/edge/main/ modloop=3Dhttp://dl-cdn.alpinelinux.org/alpine/edge/r=
-eleases/ppc64le/netboot/modloop-vanilla" -device virtio-rng-pci -nographic
-  This brings up an VM with an in-memory Alpine Linux.
-
-  Steps to reproduce:
-  Login as root and execute the following commands.
-  apk add xmlto
-  ntpd -nqp time.google.com // For TLS OCSP
-  wget https://ddosolitary.org/manpage-base.xsl
-  wget https://ddosolitary.org/shadowsocks-libev.xml
-  xmlto -m manpage-base.xsl man shadowsocks-libev.xml
-  The downloaded files are from this project: https://github.com/shadowsock=
-s/shadowsocks-libev The former is directly taken from the "doc" directory a=
-nd the latter is an intermediate build output generated by asciidoc from do=
-c/shadowsocks-libev.asciidoc
-
-  Expected behavior: The command silently succeeds producing
-  shadowsocks-libev.8
-
-  Actual behavior: =
-
-  runtime error: file file:///usr/share/xml/docbook/xsl-stylesheets-1.79.1/=
-manpages/tbl.xsl line 450 element text
-  xsltApplySequenceConstructor: A potential infinite template recursion was=
- detected.
-  You can adjust xsltMaxDepth (--maxdepth) in order to raise the maximum nu=
-mber of nested template calls and variables/params (currently set to 3000).
-  Templates:
-  #0 name process.colspan
-  #1 name process.colspan
-  #2 name process.colspan
-  #3 name process.colspan
-  #4 name process.colspan
-  #5 name process.colspan
-  #6 name process.colspan
-  #7 name process.colspan
-  #8 name process.colspan
-  #9 name process.colspan
-  #10 name process.colspan
-  #11 name process.colspan
-  #12 name process.colspan
-  #13 name process.colspan
-  #14 name process.colspan
-  Variables:
-  #0
-  type
-  colspan
-  #1
-  colspan
-  #2
-  type
-  colspan
-  #3
-  colspan
-  #4
-  type
-  colspan
-  #5
-  colspan
-  #6
-  type
-  colspan
-  #7
-  colspan
-  #8
-  type
-  colspan
-  #9
-  colspan
-  #10
-  type
-  colspan
-  #11
-  colspan
-  #12
-  type
-  colspan
-  #13
-  colspan
-  #14
-  type
-  colspan
-  error: file /root/shadowsocks-libev.xml
-  xsltRunStylesheet : run failed
-
-  Note:
-  I tried increasing --maxdepth as suggested in the error output but that w=
-ill result in a segfault.
-  This error doesn't occur with an older QEMU (I tested QEMU 2.12 on Ubuntu=
- Cosmic) or different architectures on QEMU 3.1 (I tested x86, x86_64, arm,=
- aarch64, s390x). Also it didn't help to use an older Alpine Linux (I teste=
-d v3.8). So I think it is caused by a bug in QEMU rather than the distro/pa=
-ckage.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818122/+subscriptions
+--=20
+Stephen Checkoway
