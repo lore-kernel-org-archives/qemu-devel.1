@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55898)
+Received: from eggs.gnu.org ([209.51.188.92]:56032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gzIoy-00018b-Iv
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:45 -0500
+	(envelope-from <berrange@redhat.com>) id 1gzIpx-0001k1-JV
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:22:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gzIox-0007I9-5P
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:21:44 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 28 Feb 2019 10:21:13 +0000
-Message-ID: <13ed7c02-3a2a-a3c6-f66c-2e4a30aef175@virtuozzo.com>
-References: <20190223002209.23084-1-jsnow@redhat.com>
-	<20190223002209.23084-5-jsnow@redhat.com>
-	<342d8ae7-d15b-cdd4-f03c-6286f92354af@virtuozzo.com>
-	<1747ac32-4862-020d-509e-8ea655ab1771@redhat.com>
-In-Reply-To: <1747ac32-4862-020d-509e-8ea655ab1771@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CCD383BDF556FD4882C77DE70A82DA71@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1gzIpw-0007VM-6z
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:22:45 -0500
+Date: Thu, 28 Feb 2019 10:22:36 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190228102236.GC9217@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190227012132.16271-1-david@gibson.dropbear.id.au>
+	<20190227110127.GE31688@redhat.com>
+	<b9f4a52e-43e0-c209-4743-2f039e96a6b9@redhat.com>
+	<20190227140843.GI31688@redhat.com>
+	<87d0ndujej.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] block/dirty-bitmaps: implement
- inconsistent bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87d0ndujej.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Allow -sandbox off with --disable-seccomp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,157 +28,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, otubo@redhat.com, pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-MjguMDIuMjAxOSAyOjQ4LCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gMi8yNS8xOSAx
-MToyMSBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIzLjAyLjIw
-MTkgMzoyMiwgSm9obiBTbm93IHdyb3RlOg0KPj4+IFNldCB0aGUgaW5jb25zaXN0ZW50IGJpdCBv
-biBsb2FkIGluc3RlYWQgb2YgcmVqZWN0aW5nIHN1Y2ggYml0bWFwcy4NCj4+PiBUaGVyZSBpcyBu
-byB3YXkgdG8gdW4tc2V0IGl0OyB0aGUgb25seSBvcHRpb24gaXMgdG8gZGVsZXRlIGl0Lg0KPj4+
-DQo+Pj4gT2J2ZXJ2YXRpb25zOg0KPj4+IC0gYml0bWFwIGxvYWRpbmcgZG9lcyBub3QgbmVlZCB0
-byB1cGRhdGUgdGhlIGhlYWRlciBmb3IgaW5fdXNlIGJpdG1hcHMuDQo+Pj4gLSBpbmNvbnNpc3Rl
-bnQgYml0bWFwcyBkb24ndCBuZWVkIHRvIGhhdmUgdGhlaXIgZGF0YSBsb2FkZWQ7IHRoZXkncmUN
-Cj4+PiAgICAgZ2xvcmlmaWVkIGNvcnJ1cHRpb24gc2VudGluZWxzLg0KPj4+IC0gYml0bWFwIHNh
-dmluZyBkb2VzIG5vdCBuZWVkIHRvIHNhdmUgaW5jb25zaXN0ZW50IGJpdG1hcHMgYmFjayB0byBk
-aXNrLg0KPj4+IC0gYml0bWFwIHJlb3BlbmluZyBET0VTIG5lZWQgdG8gZHJvcCB0aGUgcmVhZG9u
-bHkgZmxhZyBmcm9tIGluY29uc2lzdGVudA0KPj4+ICAgICBiaXRtYXBzIHRvIGFsbG93IHJlb3Bl
-bmluZyBvZiBxY293MiBmaWxlcyB3aXRoIG5vbi1xZW11LW93bmVkIGJpdG1hcHMNCj4+PiAgICAg
-YmVpbmcgZXZlbnR1YWxseSBmbHVzaGVkIGJhY2sgdG8gZGlzay4NCj4+Pg0KPj4+IFNpZ25lZC1v
-ZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCj4+PiAtLS0NCj4+PiAgICBibG9j
-ay9xY293Mi1iaXRtYXAuYyB8IDc3ICsrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tDQo+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDQwIGluc2VydGlvbnMoKyksIDM3IGRl
-bGV0aW9ucygtKQ0KPj4+DQo+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jIGIv
-YmxvY2svcWNvdzItYml0bWFwLmMNCj4+PiBpbmRleCAzZWU1MjRkYTRiLi5kMWNjMTFkYTg4IDEw
-MDY0NA0KPj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jDQo+Pj4gKysrIGIvYmxvY2svcWNv
-dzItYml0bWFwLmMNCj4+PiBAQCAtMzQzLDkgKzM0MywxNSBAQCBzdGF0aWMgQmRydkRpcnR5Qml0
-bWFwICpsb2FkX2JpdG1hcChCbG9ja0RyaXZlclN0YXRlICpicywNCj4+PiAgICAgICAgdWludDMy
-X3QgZ3JhbnVsYXJpdHk7DQo+Pj4gICAgICAgIEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwID0gTlVM
-TDsNCj4+PiAgICANCj4+PiArICAgIGdyYW51bGFyaXR5ID0gMVUgPDwgYm0tPmdyYW51bGFyaXR5
-X2JpdHM7DQo+Pj4gKyAgICBiaXRtYXAgPSBiZHJ2X2NyZWF0ZV9kaXJ0eV9iaXRtYXAoYnMsIGdy
-YW51bGFyaXR5LCBibS0+bmFtZSwgZXJycCk7DQo+Pj4gKyAgICBpZiAoYml0bWFwID09IE5VTEwp
-IHsNCj4+PiArICAgICAgICBnb3RvIGZhaWw7DQo+Pj4gKyAgICB9DQo+Pj4gKw0KPj4+ICAgICAg
-ICBpZiAoYm0tPmZsYWdzICYgQk1FX0ZMQUdfSU5fVVNFKSB7DQo+Pj4gLSAgICAgICAgZXJyb3Jf
-c2V0ZyhlcnJwLCAiQml0bWFwICclcycgaXMgaW4gdXNlIiwgYm0tPm5hbWUpOw0KPj4+IC0gICAg
-ICAgIGdvdG8gZmFpbDsNCj4+PiArICAgICAgICAvKiBEYXRhIGlzIHVudXNhYmxlLCBza2lwIGxv
-YWRpbmcgaXQgKi8NCj4+PiArICAgICAgICByZXR1cm4gYml0bWFwOw0KPj4+ICAgICAgICB9DQo+
-Pj4gICAgDQo+Pj4gICAgICAgIHJldCA9IGJpdG1hcF90YWJsZV9sb2FkKGJzLCAmYm0tPnRhYmxl
-LCAmYml0bWFwX3RhYmxlKTsNCj4+PiBAQCAtMzU2LDEyICszNjIsNiBAQCBzdGF0aWMgQmRydkRp
-cnR5Qml0bWFwICpsb2FkX2JpdG1hcChCbG9ja0RyaXZlclN0YXRlICpicywNCj4+PiAgICAgICAg
-ICAgIGdvdG8gZmFpbDsNCj4+PiAgICAgICAgfQ0KPj4+ICAgIA0KPj4+IC0gICAgZ3JhbnVsYXJp
-dHkgPSAxVSA8PCBibS0+Z3JhbnVsYXJpdHlfYml0czsNCj4+PiAtICAgIGJpdG1hcCA9IGJkcnZf
-Y3JlYXRlX2RpcnR5X2JpdG1hcChicywgZ3JhbnVsYXJpdHksIGJtLT5uYW1lLCBlcnJwKTsNCj4+
-PiAtICAgIGlmIChiaXRtYXAgPT0gTlVMTCkgew0KPj4+IC0gICAgICAgIGdvdG8gZmFpbDsNCj4+
-PiAtICAgIH0NCj4+PiAtDQo+Pj4gICAgICAgIHJldCA9IGxvYWRfYml0bWFwX2RhdGEoYnMsIGJp
-dG1hcF90YWJsZSwgYm0tPnRhYmxlLnNpemUsIGJpdG1hcCk7DQo+Pj4gICAgICAgIGlmIChyZXQg
-PCAwKSB7DQo+Pj4gICAgICAgICAgICBlcnJvcl9zZXRnX2Vycm5vKGVycnAsIC1yZXQsICJDb3Vs
-ZCBub3QgcmVhZCBiaXRtYXAgJyVzJyBmcm9tIGltYWdlIiwNCj4+PiBAQCAtOTQ5LDYgKzk0OSw3
-IEBAIGJvb2wgcWNvdzJfbG9hZF9kaXJ0eV9iaXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBF
-cnJvciAqKmVycnApDQo+Pj4gICAgICAgIFFjb3cyQml0bWFwICpibTsNCj4+PiAgICAgICAgR1NM
-aXN0ICpjcmVhdGVkX2RpcnR5X2JpdG1hcHMgPSBOVUxMOw0KPj4+ICAgICAgICBib29sIGhlYWRl
-cl91cGRhdGVkID0gZmFsc2U7DQo+Pj4gKyAgICBib29sIG5lZWRzX3VwZGF0ZSA9IGZhbHNlOw0K
-Pj4+ICAgIA0KPj4+ICAgICAgICBpZiAocy0+bmJfYml0bWFwcyA9PSAwKSB7DQo+Pj4gICAgICAg
-ICAgICAvKiBObyBiaXRtYXBzIC0gbm90aGluZyB0byBkbyAqLw0KPj4+IEBAIC05NjIsMjMgKzk2
-MywyNyBAQCBib29sIHFjb3cyX2xvYWRfZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpi
-cywgRXJyb3IgKiplcnJwKQ0KPj4+ICAgICAgICB9DQo+Pj4gICAgDQo+Pj4gICAgICAgIFFTSU1Q
-TEVRX0ZPUkVBQ0goYm0sIGJtX2xpc3QsIGVudHJ5KSB7DQo+Pj4gLSAgICAgICAgaWYgKCEoYm0t
-PmZsYWdzICYgQk1FX0ZMQUdfSU5fVVNFKSkgew0KPj4+IC0gICAgICAgICAgICBCZHJ2RGlydHlC
-aXRtYXAgKmJpdG1hcCA9IGxvYWRfYml0bWFwKGJzLCBibSwgZXJycCk7DQo+Pj4gLSAgICAgICAg
-ICAgIGlmIChiaXRtYXAgPT0gTlVMTCkgew0KPj4+IC0gICAgICAgICAgICAgICAgZ290byBmYWls
-Ow0KPj4+IC0gICAgICAgICAgICB9DQo+Pj4gKyAgICAgICAgQmRydkRpcnR5Qml0bWFwICpiaXRt
-YXAgPSBsb2FkX2JpdG1hcChicywgYm0sIGVycnApOw0KPj4+ICsgICAgICAgIGlmIChiaXRtYXAg
-PT0gTlVMTCkgew0KPj4+ICsgICAgICAgICAgICBnb3RvIGZhaWw7DQo+Pj4gKyAgICAgICAgfQ0K
-Pj4+ICAgIA0KPj4+IC0gICAgICAgICAgICBpZiAoIShibS0+ZmxhZ3MgJiBCTUVfRkxBR19BVVRP
-KSkgew0KPj4+IC0gICAgICAgICAgICAgICAgYmRydl9kaXNhYmxlX2RpcnR5X2JpdG1hcChiaXRt
-YXApOw0KPj4+IC0gICAgICAgICAgICB9DQo+Pj4gLSAgICAgICAgICAgIGJkcnZfZGlydHlfYml0
-bWFwX3NldF9wZXJzaXN0YW5jZShiaXRtYXAsIHRydWUpOw0KPj4+ICsgICAgICAgIGlmIChibS0+
-ZmxhZ3MgJiBCTUVfRkxBR19JTl9VU0UpIHsNCj4+PiArICAgICAgICAgICAgYmRydl9kaXJ0eV9i
-aXRtYXBfc2V0X2luY29uc2lzdGVudChiaXRtYXApOw0KPj4+ICsgICAgICAgIH0gZWxzZSB7DQo+
-Pj4gKyAgICAgICAgICAgIC8qIE5COiB1cGRhdGVkIGZsYWdzIG9ubHkgZ2V0IHdyaXR0ZW4gaWYg
-Y2FuX3dyaXRlKGJzKSBpcyB0cnVlLiAqLw0KPj4+ICAgICAgICAgICAgICAgIGJtLT5mbGFncyB8
-PSBCTUVfRkxBR19JTl9VU0U7DQo+Pj4gLSAgICAgICAgICAgIGNyZWF0ZWRfZGlydHlfYml0bWFw
-cyA9DQo+Pj4gLSAgICAgICAgICAgICAgICAgICAgZ19zbGlzdF9hcHBlbmQoY3JlYXRlZF9kaXJ0
-eV9iaXRtYXBzLCBiaXRtYXApOw0KPj4+ICsgICAgICAgICAgICBuZWVkc191cGRhdGUgPSB0cnVl
-Ow0KPj4+ICAgICAgICAgICAgfQ0KPj4+ICsgICAgICAgIGlmICghKGJtLT5mbGFncyAmIEJNRV9G
-TEFHX0FVVE8pKSB7DQo+Pj4gKyAgICAgICAgICAgIGJkcnZfZGlzYWJsZV9kaXJ0eV9iaXRtYXAo
-Yml0bWFwKTsNCj4+PiArICAgICAgICB9DQo+Pj4gKyAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBf
-c2V0X3BlcnNpc3RhbmNlKGJpdG1hcCwgdHJ1ZSk7DQo+Pg0KPj4gV2UgZGVmaW5lIHBlcnNpc3Rl
-bnQgYml0bWFwcyBhcyB3aGljaCB3ZSBhcmUgZ29pbmcgdG8gc3RvcmUuLiBCdXQgd2UgYXJlDQo+
-PiBub3QgZ29pbmcgdG8gc3RvcmUgaW5jb25zaXN0ZW50IGJpdG1hcHMuIFNvIGluY29uc2lzdGVu
-dCBiaXRtYXBzIGFyZSBub3QgcGVyc2lzdGVudC4NCj4+DQo+IA0KPiBJIGNoYW5nZWQgdGhlIHdv
-cmRpbmcgZm9yIHYzLg0KPiANCj4+PiArICAgICAgICBjcmVhdGVkX2RpcnR5X2JpdG1hcHMgPQ0K
-Pj4+ICsgICAgICAgICAgICBnX3NsaXN0X2FwcGVuZChjcmVhdGVkX2RpcnR5X2JpdG1hcHMsIGJp
-dG1hcCk7DQo+Pj4gICAgICAgIH0NCj4+PiAgICANCj4+PiAtICAgIGlmIChjcmVhdGVkX2RpcnR5
-X2JpdG1hcHMgIT0gTlVMTCkgew0KPj4+ICsgICAgaWYgKG5lZWRzX3VwZGF0ZSkgew0KPj4NCj4+
-IGNyZWF0ZWRfZGlydHlfYml0bWFwcyBsaXN0IG5lZWRlZCBvbmx5IGZvciBzZXR0aW5nIHRoZW0g
-cmVhZG9ubHksIGlmIGZhaWxlZCB3cml0ZSB0aGF0DQo+PiB0aGV5IGFyZSBJTl9VU0UuIFNvLCBp
-bnN0ZWFkIG9mIGNyZWF0aW5nIGFkZGl0aW9uYWwgdmFyaWFibGUsIGJldHRlciBpcyBqdXN0IG5v
-dCBpbmNsdWRlDQo+PiBJTl9VU0UgYml0bWFwcyB0byB0aGlzIGxpc3QuIEFuZCBpdCBtYXkgYmUg
-cmVuYW1lZCBsaWtlIHNldF9pbl91c2VfbGlzdC4NCj4+DQo+IA0KPiBJZiBJIGRvbid0IGFkZCB0
-aGVtIHRvIHRoZSBsaXN0LCB0aGVuIG9uZSBvZiB0aGUgYml0bWFwcyBpbiB0aGUgbGlzdA0KPiBm
-YWlscywgSSBkb24ndCBrbm93IHdoaWNoIGJpdG1hcCB0byByZW1vdmUgd2hlbiB3ZSBnbyB0byB0
-aGUgZXJyb3IgZXhpdC4NCg0KDQpPb3BzLCB5b3UgYXJlIHJpZ2h0Lg0KDQo+IA0KPj4+ICAgICAg
-ICAgICAgaWYgKGNhbl93cml0ZShicykpIHsNCj4+PiAgICAgICAgICAgICAgICAvKiBpbl91c2Ug
-ZmxhZ3MgbXVzdCBiZSB1cGRhdGVkICovDQo+Pj4gICAgICAgICAgICAgICAgaW50IHJldCA9IHVw
-ZGF0ZV9leHRfaGVhZGVyX2FuZF9kaXJfaW5fcGxhY2UoYnMsIGJtX2xpc3QpOw0KPj4+IEBAIC0x
-MTEyLDIzICsxMTE3LDIxIEBAIGludCBxY293Ml9yZW9wZW5fYml0bWFwc19yd19oaW50KEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzLCBib29sICpoZWFkZXJfdXBkYXRlZCwNCj4+PiAgICAgICAgfQ0KPj4+
-ICAgIA0KPj4+ICAgICAgICBRU0lNUExFUV9GT1JFQUNIKGJtLCBibV9saXN0LCBlbnRyeSkgew0K
-Pj4+IC0gICAgICAgIGlmICghKGJtLT5mbGFncyAmIEJNRV9GTEFHX0lOX1VTRSkpIHsNCj4+PiAt
-ICAgICAgICAgICAgQmRydkRpcnR5Qml0bWFwICpiaXRtYXAgPSBiZHJ2X2ZpbmRfZGlydHlfYml0
-bWFwKGJzLCBibS0+bmFtZSk7DQo+Pj4gLSAgICAgICAgICAgIGlmIChiaXRtYXAgPT0gTlVMTCkg
-ew0KPj4+IC0gICAgICAgICAgICAgICAgY29udGludWU7DQo+Pj4gLSAgICAgICAgICAgIH0NCj4+
-PiAtDQo+Pj4gLSAgICAgICAgICAgIGlmICghYmRydl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHkoYml0
-bWFwKSkgew0KPj4+IC0gICAgICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQml0bWFwICVz
-IGlzIG5vdCByZWFkb25seSBidXQgbm90IG1hcmtlZCINCj4+PiAtICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIidJTl9VU0UnIGluIHRoZSBpbWFnZS4gU29tZXRoaW5nIHdlbnQgd3Jv
-bmcsIg0KPj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiYWxsIHRoZSBiaXRt
-YXBzIG1heSBiZSBjb3JydXB0ZWQiLCBibS0+bmFtZSk7DQo+Pj4gLSAgICAgICAgICAgICAgICBy
-ZXQgPSAtRUlOVkFMOw0KPj4+IC0gICAgICAgICAgICAgICAgZ290byBvdXQ7DQo+Pj4gLSAgICAg
-ICAgICAgIH0NCj4+PiArICAgICAgICBCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCA9IGJkcnZfZmlu
-ZF9kaXJ0eV9iaXRtYXAoYnMsIGJtLT5uYW1lKTsNCj4+PiArICAgICAgICBpZiAoYml0bWFwID09
-IE5VTEwpIHsNCj4+PiArICAgICAgICAgICAgY29udGludWU7DQo+Pj4gKyAgICAgICAgfQ0KPj4N
-Cj4+PiAgICANCj4+PiAtICAgICAgICAgICAgYm0tPmZsYWdzIHw9IEJNRV9GTEFHX0lOX1VTRTsN
-Cj4+PiAtICAgICAgICAgICAgcm9fZGlydHlfYml0bWFwcyA9IGdfc2xpc3RfYXBwZW5kKHJvX2Rp
-cnR5X2JpdG1hcHMsIGJpdG1hcCk7DQo+Pj4gKyAgICAgICAgaWYgKCFiZHJ2X2RpcnR5X2JpdG1h
-cF9yZWFkb25seShiaXRtYXApKSB7DQo+Pg0KPj4gc28sIHdlJ2xsIGZhaWwsIGFzIHdlIGRpZG4n
-dCBtYXJrZWQgaW5jb25zaXN0ZXRuIGJpdG1hcHMgYXMgcmVhZG9ubHkgYWJvdmUuIFNob3VsZCB3
-ZT8NCj4+IE9yIHdlIG1heSBjaGVjayBoZXJlIGluY29uc2lzdGFuY2UgZGlyZWN0bHkuDQo+Pg0K
-PiANCj4gT0ghIEkgZGlkbid0IG1lYW4gdG8gZG8gdGhpcyAtLSBJIHdhbnQgdG8gbWFyayBhbGwg
-aW5jb25zaXN0ZW50IGJpdG1hcHMNCj4gYXMgcmVhZG9ubHksIHllcy4gSSB3aWxsIGZpeCB0aGlz
-Lg0KPiANCj4+PiArICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQml0bWFwICVzIHdhcyBs
-b2FkZWQgcHJpb3IgdG8gcnctcmVvcGVuLCBidXQgd2FzICINCj4+PiArICAgICAgICAgICAgICAg
-ICAgICAgICAibm90IG1hcmtlZCBhcyByZWFkb25seS4gVGhpcyBpcyBhIGJ1Zywgc29tZXRoaW5n
-IHdlbnQgIg0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICJ3cm9uZy4gQWxsIG9mIHRoZSBi
-aXRtYXBzIG1heSBiZSBjb3JydXB0ZWQiLCBibS0+bmFtZSk7DQo+Pg0KPj4gSG1tLCB5b3VyIHdv
-cmRpbmcgY292ZXJzIGludmFsaWQgY2FzZSB3aGVuIGluY29uc2lzdGVudCBiaXRtYXAgaXMgbm90
-IElOX1VTRSwgYW5kIHNvdW5kcw0KPj4gYmV0dGVyIGZvciB1c2VyLCB0aG91Z2ggbWF5IGJlIGxl
-c3MgcHJlY2lzZSAoYXMgaXQgbWF5IGJlIG5vdCBvbmUgcmVvcGVuIGluIGEgc2VxdWVuY2UuLiku
-DQo+PiBPayBmb3IgbWUuDQo+Pg0KPiANCj4gV2l0aCBhbGwgaW5jb25zaXN0ZW50IGJpdG1hcHMg
-bWFya2VkIGFzIHJlYWRvbmx5LCB0aGlzIHNob3VsZG4ndCBldmVyDQo+IGFjdHVhbGx5IHRyaWdn
-ZXIuIEFsbCBwZXJzaXN0ZW50IGJpdG1hcHMgb24gYSBkcml2ZSB0aGF0IGhpdHMNCj4gcmVvcGVu
-X3J3X2hpbnQgb3VnaHQgdG8gYmUgcmVhZG9ubHksIHJpZ2h0Pw0KDQpub3QgbmVjZXNzYXJ5IEkg
-dGhpbmsuIFNvbWUgYml0bWFwcyBtYXkgYmUgY3JlYXRlZCB0aHJvdWdoIHFtcCBjb21tYW5kLCB0
-aGV5IHdpbGwgbm90IGJlIHJlYWRvbmx5LA0KYXMgdGhleSBhcmUgbm90IGZsdXNoZWQgdG8gc3Rv
-cmFnZS4NCg0KQnV0IGl0IG9mIGNvdXJzZSBkb2Vzbid0IGxlYWQgdG8gdGhhdCBtZXNzYWdlLiBZ
-ZXMgaXQgc2hvdWxkIG5ldmVyIGhhcHBlbiBJIHRoaW5rLCBzbyBpdCBpcyB3b3JkZWQgaW4NCm1h
-bm5lciAiVGhpcyBpcyBhIGJ1ZyIuIE9uIHRoZSBvdGhlciBoYW5kLCBhc3N1bWUgdGhhdCBzb21l
-b25lIGlsbGVnYWxseSBtb2RpZmllcyBpbWFnZSwgd2hpbGUNClFlbXUgaXMgcnVubmluZyBhbmQg
-Y2xlYXIgSU5fVVNFIGJpdC4gSW4gdGhpcyBjYXNlIHdlJ2xsIHNlZSB0aGF0IG1lc3NhZ2UuDQoN
-Cj4gDQo+IFRoYXQncyBteSBhc3N1bXB0aW9uOyB0aGF0IHdlIHNob3VsZCBuZXZlciBzZWUgdGhp
-cyBtZXNzYWdlLg0KPiANCj4+PiArICAgICAgICAgICAgcmV0ID0gLUVJTlZBTDsNCj4+PiArICAg
-ICAgICAgICAgZ290byBvdXQ7DQo+Pj4gICAgICAgICAgICB9DQo+Pj4gKw0KPj4+ICsgICAgICAg
-IGJtLT5mbGFncyB8PSBCTUVfRkxBR19JTl9VU0U7DQo+Pj4gKyAgICAgICAgcm9fZGlydHlfYml0
-bWFwcyA9IGdfc2xpc3RfYXBwZW5kKHJvX2RpcnR5X2JpdG1hcHMsIGJpdG1hcCk7DQo+Pj4gICAg
-ICAgIH0NCj4+PiAgICANCj4+PiAgICAgICAgaWYgKHJvX2RpcnR5X2JpdG1hcHMgIT0gTlVMTCkg
-ew0KPj4+IEBAIC0xNDI0LDggKzE0MjcsOCBAQCB2b2lkIHFjb3cyX3N0b3JlX3BlcnNpc3RlbnRf
-ZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKQ0KPj4+ICAg
-ICAgICAgICAgUWNvdzJCaXRtYXAgKmJtOw0KPj4+ICAgIA0KPj4+ICAgICAgICAgICAgaWYgKCFi
-ZHJ2X2RpcnR5X2JpdG1hcF9nZXRfcGVyc2lzdGFuY2UoYml0bWFwKSB8fA0KPj4+IC0gICAgICAg
-ICAgICBiZHJ2X2RpcnR5X2JpdG1hcF9yZWFkb25seShiaXRtYXApKQ0KPj4+IC0gICAgICAgIHsN
-Cj4+PiArICAgICAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHkoYml0bWFwKSB8fA0K
-Pj4+ICsgICAgICAgICAgICBiZHJ2X2RpcnR5X2JpdG1hcF9pbmNvbnNpc3RlbnQoYml0bWFwKSkg
-ew0KPj4+ICAgICAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4+ICAgICAgICAgICAgfQ0KPj4+ICAg
-IA0KPj4+DQo+Pg0KPj4NCj4gDQo+IFNlbmRpbmcgYSBWMyBmb3IgZnVydGhlciBjcml0aXF1ZSwg
-YnV0IGZyZWV6ZSBpcyBzb29uLg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
-DQo=
+On Wed, Feb 27, 2019 at 08:21:40PM +0100, Markus Armbruster wrote:
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>=20
+> > On Wed, Feb 27, 2019 at 07:59:11AM -0600, Eric Blake wrote:
+> >> On 2/27/19 5:01 AM, Daniel P. Berrang=C3=A9 wrote:
+> >> > On Wed, Feb 27, 2019 at 12:21:32PM +1100, David Gibson wrote:
+> >> >> At present, when seccomp support is compiled out with --disable-s=
+eccomp
+> >> >> we fail with an error if the user puts -sandbox on the command li=
+ne.
+> >> >>
+> >> >> That kind of makes sense, but it's a bit strange that we reject a=
+ request
+> >> >> to disable sandboxing with "-sandbox off" saying we don't support
+> >> >> sandboxing.
+> >> >>
+> >> >> This puts in a small sandbox to (correctly) silently ignore -sand=
+box off
+> >> >> when we don't have sandboxing support compiled in.  This makes li=
+fe easier
+> >> >> for testcases, since they can safely specify "-sandbox off" witho=
+ut having
+> >> >> to care if the qemu they're using is compiled with sandbox suppor=
+t or not.
+>=20
+> I can't see such test cases.  Can you give specific examples?
+>=20
+> >> >> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>=20
+> >> > '-sandbox off'  is just syntax sugar for '-sandbox enable=3Doff', =
+with
+> >> > the default arg name handled by QemuOpts.
+> >>=20
+> >> Except that libvirt probes, via query-command-line-options, whether =
+the
+> >> '-sandbox' option supports the 'enable' key.  You risk breaking
+> >> introspection (where libvirt knows NOT to use enable=3Don|off) if -s=
+andbox
+> >> enable=3Doff is advertised even when the feature is not compiled in.
+> >
+> > It is even more complex than that. Libvirt looks for "elevateprivileg=
+es"
+> > option to decide to enable the sandbox. It only looks for "enable" wh=
+en
+> > libvirt is configured to disable the sandbox, at which point is sets
+> > "-sandbox off". So I don't think my suggestion should break it.
+> >
+> > I do hate the idea of QEMU tailoring its CLI handling to suit the
+> > current specific impl of one client app though.
+> >
+> > If anything I'd suggest we should completely disable any parsing
+> > of -sandbox when seccomp is disabled, rather than leaving getopt
+> > to parse -sandbox and then raise an error.
+>=20
+> I'm confused.  Are you proposing to silently ignore -sandbox OPTARG
+> regardless of OPTARG when CONFIG_SECCOMP is off?  If yes, I object.  If
+> a user asks for a sandbox, and we can't give him one, we should at leas=
+t
+> tell him as much.
+
+No, i mean remove "case QEMU_OPTION_sandbox:" from the code, which
+will cause us to report '-sandbox' as an unsupported argument.
+
+> Currently, we have both
+>=20
+>     #ifdef CONFIG_FOO
+>                 case QEMU_OPTION_FOO:
+>                     ...
+>                     break;
+>     #endif
+
+This is what I was suggesting for -sandbox above.
+
+>=20
+> and
+>=20
+>=20
+>                 case QEMU_OPTION_FOO:
+>     #ifdef CONFIG_FOO
+>                     ...
+>                     break;
+>     #else
+>                     error_report("FOO support is disabled");
+>                     exit(1);
+>     #endif
+
+This is what -sandbox does currently.
+
+>=20
+> The patch adds a third variant.  We need fewer variants, not more.
+>=20
+> For what it's worth, conditional QMP commands do not exist when
+> disabled, like the first variant above.  In particular, introspection
+> doesn't have them.  Nicely obvious.
+>=20
+> QAPIfying the command line (yes, yes, overdue) should make it more like
+> QMP.
+>=20
+> Wanting nicer errors than "unknown option / command" is legitimate.
+>=20
+> Wanting to accept "switch FOO off" even though FOO is disabled is also
+> legitimate.
+>=20
+> Patches that provide such UI niceties while keeping introspection nicel=
+y
+> obvious would be acceptable to me, provided they're not too complex.
+> But they should be general, not a one-off.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
