@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38255)
+Received: from eggs.gnu.org ([209.51.188.92]:38705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gzNyB-00032l-Hj
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:51:36 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzNzI-0003lB-Ew
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gzNy1-0006m8-T9
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:51:29 -0500
-Date: Thu, 28 Feb 2019 16:50:53 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190228155053.GB5563@linux.fritz.box>
-References: <20190227165212.34901-1-slp@redhat.com>
-	<20190227173714.GA6276@localhost.localdomain>
-	<20190228150119.c77xcmrp4ogg32eu@dritchie>
+	(envelope-from <imammedo@redhat.com>) id 1gzNzH-0007Or-0y
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 10:52:44 -0500
+Date: Thu, 28 Feb 2019 16:51:39 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190228165139.7c4b827d@redhat.com>
+In-Reply-To: <20190228150324.25973-4-eric.auger@redhat.com>
+References: <20190228150324.25973-1-eric.auger@redhat.com>
+	<20190228150324.25973-4-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190228150119.c77xcmrp4ogg32eu@dritchie>
-Subject: Re: [Qemu-devel] [PATCH] virtio-blk: dataplane: release AioContext
- before blk_set_aio_context
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 03/10] hw/arm/virt: Split the memory
+ map description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,149 +24,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio Lopez <slp@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-Am 28.02.2019 um 16:01 hat Sergio Lopez geschrieben:
-> On Wed, Feb 27, 2019 at 06:37:14PM +0100, Kevin Wolf wrote:
-> > Am 27.02.2019 um 17:52 hat Sergio Lopez geschrieben:
-> > > Stopping the dataplane requires calling to blk_set_aio_context, which
-> > > may need to wait for a running job to be completed or paused.
-> > > 
-> > > As stopping the dataplane is something that can be triggered from a vcpu
-> > > thread (due to the Guest requesting to stop the device), while the job
-> > > itself may be managed by an iothread, holding the AioContext will lead
-> > > to a deadlock, where the first one is waiting for the job to pause or
-> > > finish, while the second can't make any progress as it's waiting for the
-> > > AioContext to be released:
-> > > 
-> > >  Thread 6 (LWP 90472)
-> > >  #0  0x000055a6f8497aee in blk_root_drained_end
-> > >  #1  0x000055a6f84a7926 in bdrv_parent_drained_end
-> > >  #2  0x000055a6f84a799f in bdrv_do_drained_end
-> > >  #3  0x000055a6f84a82ab in bdrv_drained_end
-> > >  #4  0x000055a6f8498be8 in blk_drain
-> > >  #5  0x000055a6f84a22cd in mirror_drain
-> > >  #6  0x000055a6f8457708 in block_job_detach_aio_context
-> > >  #7  0x000055a6f84538f1 in bdrv_detach_aio_context
-> > >  #8  0x000055a6f8453a96 in bdrv_set_aio_context
-> > >  #9  0x000055a6f84999f8 in blk_set_aio_context
-> > >  #10 0x000055a6f81802c8 in virtio_blk_data_plane_stop
-> > >  #11 0x000055a6f83cfc95 in virtio_bus_stop_ioeventfd
-> > >  #12 0x000055a6f83d1f81 in virtio_pci_common_write
-> > >  #13 0x000055a6f83d1f81 in virtio_pci_common_write
-> > >  #14 0x000055a6f8148d62 in memory_region_write_accessor
-> > >  #15 0x000055a6f81459c9 in access_with_adjusted_size
-> > >  #16 0x000055a6f814a608 in memory_region_dispatch_write
-> > >  #17 0x000055a6f80f1f98 in flatview_write_continue
-> > >  #18 0x000055a6f80f214f in flatview_write
-> > >  #19 0x000055a6f80f6a7b in address_space_write
-> > >  #20 0x000055a6f80f6b15 in address_space_rw
-> > >  #21 0x000055a6f815da08 in kvm_cpu_exec
-> > >  #22 0x000055a6f8132fee in qemu_kvm_cpu_thread_fn
-> > >  #23 0x000055a6f8551306 in qemu_thread_start
-> > >  #24 0x00007f9bdf5b9dd5 in start_thread
-> > >  #25 0x00007f9bdf2e2ead in clone
-> > > 
-> > >  Thread 8 (LWP 90467)
-> > >  #0  0x00007f9bdf5c04ed in __lll_lock_wait
-> > >  #1  0x00007f9bdf5bbde6 in _L_lock_941
-> > >  #2  0x00007f9bdf5bbcdf in __GI___pthread_mutex_lock
-> > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl
-> > >  #4  0x000055a6f854be77 in co_schedule_bh_cb
-> > >  #5  0x000055a6f854b781 in aio_bh_poll
-> > >  #6  0x000055a6f854b781 in aio_bh_poll
-> > >  #7  0x000055a6f854f01b in aio_poll
-> > >  #8  0x000055a6f825a488 in iothread_run
-> > >  #9  0x000055a6f8551306 in qemu_thread_start
-> > >  #10 0x00007f9bdf5b9dd5 in start_thread
-> > >  #11 0x00007f9bdf2e2ead in clone
-> > > 
-> > >  (gdb) thread 8
-> > >  [Switching to thread 8 (Thread 0x7f9bd6dae700 (LWP 90467))]
-> > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl (mutex=0x55a6fac8fea0,
-> > >      file=0x55a6f8730c3f "util/async.c", line=511) at util/qemu-thread-posix.c:66
-> > >  66	    err = pthread_mutex_lock(&mutex->lock);
-> > >  (gdb) up 3
-> > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl (mutex=0x55a6fac8fea0,
-> > >      file=0x55a6f8730c3f "util/async.c", line=511) at util/qemu-thread-posix.c:66
-> > >  66	    err = pthread_mutex_lock(&mutex->lock);
-> > >  (gdb) p mutex.lock.__data.__owner
-> > >  $6 = 90472
-> > > 
-> > > Signed-off-by: Sergio Lopez <slp@redhat.com>
-> > > ---
-> > >  hw/block/dataplane/virtio-blk.c | 3 +--
-> > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > 
-> > > diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-> > > index 8c37bd314a..358e6ae89b 100644
-> > > --- a/hw/block/dataplane/virtio-blk.c
-> > > +++ b/hw/block/dataplane/virtio-blk.c
-> > > @@ -280,12 +280,11 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
-> > >  
-> > >      aio_context_acquire(s->ctx);
-> > >      aio_wait_bh_oneshot(s->ctx, virtio_blk_data_plane_stop_bh, s);
-> > > +    aio_context_release(s->ctx);
-> > >  
-> > >      /* Drain and switch bs back to the QEMU main loop */
-> > >      blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
-> > >  
-> > > -    aio_context_release(s->ctx);
-> > > -
-> > 
-> > blk_set_aio_context() requires that the caller hold the lock for the
-> > source context, so I'm afraid this is wrong.
-> 
-> TBH, I was quite sure this patch was wrong myself, but I thought it was
-> still a good way to illustrate the issue.
-> 
-> > However, I think the problem might already be fixed with my "block: Use
-> > normal drain for bdrv_set_aio_context()" (contained in a pull request,
-> > which isn't merged yet), which makes bdrv_set_aio_context() use a real
-> > drain operation. This way, the requests of the mirror jobs should be
-> > already drained before we even call into block_job_detach_aio_context().
-> > 
-> > Can you give this a try and see whether it fixes your problem?
-> 
-> I've applied your patchset to my local copy, but it doesn't fix the
-> issue.
-> 
-> The problem is the coroutine is already scheduled to be run in the
-> iothread context, which means job->busy == true, so we can't switch to
-> it from any other place.
+On Thu, 28 Feb 2019 16:03:17 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-I still don't understand this because with job->paused == true the
-hanging loop wouldn't even be started. And after bdrv_drained_begin()
-returns, all jobs that use the node in question should be paused (see
-child_job_drained_begin/poll).
-
-So somehow that drain (called in bdrv_set_aio_context()) doesn't seem to
-fully do what it is supposed to do?
-
-> I think we should give it a chance to run. What'd do you think of
-> something like this:
+> In the prospect to introduce an extended memory map supporting more
+> RAM, let's split the memory map array into two parts:
 > 
-> diff --git a/blockjob.c b/blockjob.c
-> index 58de8cb..1695bef 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -135,9 +135,8 @@ static void block_job_detach_aio_context(void *opaque)
+> - the former a15memmap, renamed base_memmap, contains regions below
+>   and including the RAM. MemMapEntries initialized in this array
+>   have a static size and base address.
+> - extended_memmap, only initialized with entries located after the
+>   RAM. MemMapEntries initialized in this array only get their size
+>   initialized. Their base address is dynamically computed depending
+>   on the the top of the RAM, with same alignment as their size.
 > 
->      job_pause(&job->job);
+> Eventually base_memmap entries are copied into the extended_memmap
+> array. Using two separate arrays however clarifies which entries
+> are statically allocated and those which are dynamically allocated.
 > 
-> -    while (!job->job.paused && !job_is_completed(&job->job)) {
-> -        job_drain(&job->job);
-> -    }
-> +    AIO_WAIT_WHILE(job->job.aio_context,
-> +        (job_drain(&job->job), !job->job.paused && !job_is_completed(&job->job)));
+> This new split will allow to grow the RAM size without changing the
+> description of the high IO entries.
 > 
->      job->job.aio_context = NULL;
->      job_unref(&job->job);
+> We introduce a new virt_set_memmap() helper function which
+> "freezes" the memory map. We call it in machvirt_init as
+> memory attributes of the machine are not yet set when
+> virt_instance_init() gets called.
+> 
+> The memory map is unchanged (the top of the initial RAM still is
+> 256GiB). Then come the high IO regions with same layout as before.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> v8 -> v9:
+> - restore virt_set_memmap call in machvirt_init as otherwise it does
+>   not work in TCG mode
+> 
+> v7 -> v8:
+> - removed Peter's R-b due to the changes induced by Igor's comments
+> - call set_memmap back in virt_instance_init
+> - add comments about sizing of extended_memmap
+> - s/region/entries as suggested by Igor
+> - rewording of the commit message
+> 
+> v6 -> v7:
+> - s/a15memmap/base_memmap
+> - slight rewording of the commit message
+> - add "if there is less than 256GiB of RAM then the floating area
+>   starts at the 256GiB mark" in the comment associated to the floating
+>   memory map
+> - Added Peter's R-b
+> 
+> v5 -> v6
+> - removal of many macros in units.h
+> - introduce the virt_set_memmap helper
+> - new computation for offsets of high IO regions
+> - add comments
+> ---
+>  hw/arm/virt.c         | 51 ++++++++++++++++++++++++++++++++++++++-----
+>  include/hw/arm/virt.h | 14 ++++++++----
+>  2 files changed, 55 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 892bae4f3a..8a23608d3e 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -29,6 +29,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "qapi/error.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/arm/arm.h"
+> @@ -121,7 +122,7 @@
+>   * Note that devices should generally be placed at multiples of 0x10000,
+>   * to accommodate guests using 64K pages.
+>   */
+> -static const MemMapEntry a15memmap[] = {
+> +static const MemMapEntry base_memmap[] = {
+>      /* Space up to 0x8000000 is reserved for a boot ROM */
+>      [VIRT_FLASH] =              {          0, 0x08000000 },
+>      [VIRT_CPUPERIPHS] =         { 0x08000000, 0x00020000 },
+> @@ -149,11 +150,24 @@ static const MemMapEntry a15memmap[] = {
+>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+> +};
+> +
+> +/*
+> + * Highmem IO Regions: This memory map is floating, located after the RAM.
+> + * Each MemMapEntry base (GPA) will be dynamically computed, depending on the
+> + * top of the RAM, so that its base get the same alignment as the size,
+> + * ie. a 512GiB entry will be aligned on a 512GiB boundary. If there is
+> + * less than 256GiB of RAM, the floating area starts at the 256GiB mark.
+> + * Note the extended_memmap is sized so that it eventually also includes the
+> + * base_memmap entries (VIRT_HIGH_GIC_REDIST2 index is greater than the last
+> + * index of base_memmap).
+> + */
+> +static MemMapEntry extended_memmap[] = {
+>      /* Additional 64 MB redist region (can contain up to 512 redistributors) */
+> -    [VIRT_HIGH_GIC_REDIST2] =   { 0x4000000000ULL, 0x4000000 },
+> -    [VIRT_HIGH_PCIE_ECAM] =     { 0x4010000000ULL, 0x10000000 },
+> -    /* Second PCIe window, 512GB wide at the 512GB boundary */
+> -    [VIRT_HIGH_PCIE_MMIO] =     { 0x8000000000ULL, 0x8000000000ULL },
+> +    [VIRT_HIGH_GIC_REDIST2] =   { 0x0, 64 * MiB },
+> +    [VIRT_HIGH_PCIE_ECAM] =     { 0x0, 256 * MiB },
+> +    /* Second PCIe window */
+> +    [VIRT_HIGH_PCIE_MMIO] =     { 0x0, 512 * GiB },
+>  };
+>  
+>  static const int a15irqmap[] = {
+> @@ -1354,6 +1368,30 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>      return arm_cpu_mp_affinity(idx, clustersz);
+>  }
+>  
+> +static void virt_set_memmap(VirtMachineState *vms)
+> +{
+> +    hwaddr base;
+> +    int i;
+> +
+> +    vms->memmap = extended_memmap;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(base_memmap); i++) {
+> +        vms->memmap[i] = base_memmap[i];
+> +    }
+> +
+> +    vms->high_io_base = 256 * GiB; /* Top of the legacy initial RAM region */
+Why do we need to carry this state in vms?
+it looks like it is used as local variable
 
-If that's enough, it looks okay to me (and very similar to what we
-already do in job_finish_sync()).
+and then it's possible to access that memmap[VIRT_HIGH_GIC_REDIST2]
+outside of this function, hence it rises duplication alarm
 
-But I'd still like to understand why the drain didn't work.
-
-Kevin
+> +    base = vms->high_io_base;
+> +
+> +    for (i = VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++) {
+> +        hwaddr size = extended_memmap[i].size;
+> +
+> +        base = ROUND_UP(base, size);
+> +        vms->memmap[i].base = base;
+> +        vms->memmap[i].size = size;
+> +        base += size;
+> +    }
+> +}
+> +
+>  static void machvirt_init(MachineState *machine)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(machine);
+> @@ -1368,6 +1406,8 @@ static void machvirt_init(MachineState *machine)
+>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+>      bool aarch64 = true;
+>  
+> +    virt_set_memmap(vms);
+> +
+>      /* We can probe only here because during property set
+>       * KVM is not available yet
+>       */
+> @@ -1845,7 +1885,6 @@ static void virt_instance_init(Object *obj)
+>                                      "Valid values are none and smmuv3",
+>                                      NULL);
+>  
+> -    vms->memmap = a15memmap;
+>      vms->irqmap = a15irqmap;
+>  }
+>  
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index a27086d524..3dc7a6c5d5 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -64,7 +64,6 @@ enum {
+>      VIRT_GIC_VCPU,
+>      VIRT_GIC_ITS,
+>      VIRT_GIC_REDIST,
+> -    VIRT_HIGH_GIC_REDIST2,
+>      VIRT_SMMU,
+>      VIRT_UART,
+>      VIRT_MMIO,
+> @@ -74,12 +73,18 @@ enum {
+>      VIRT_PCIE_MMIO,
+>      VIRT_PCIE_PIO,
+>      VIRT_PCIE_ECAM,
+> -    VIRT_HIGH_PCIE_ECAM,
+>      VIRT_PLATFORM_BUS,
+> -    VIRT_HIGH_PCIE_MMIO,
+>      VIRT_GPIO,
+>      VIRT_SECURE_UART,
+>      VIRT_SECURE_MEM,
+> +    VIRT_LOWMEMMAP_LAST,
+> +};
+> +
+> +/* indices of IO regions located after the RAM */
+> +enum {
+> +    VIRT_HIGH_GIC_REDIST2 =  VIRT_LOWMEMMAP_LAST,
+> +    VIRT_HIGH_PCIE_ECAM,
+> +    VIRT_HIGH_PCIE_MMIO,
+>  };
+>  
+>  typedef enum VirtIOMMUType {
+> @@ -116,7 +121,7 @@ typedef struct {
+>      int32_t gic_version;
+>      VirtIOMMUType iommu;
+>      struct arm_boot_info bootinfo;
+> -    const MemMapEntry *memmap;
+> +    MemMapEntry *memmap;
+>      const int *irqmap;
+>      int smp_cpus;
+>      void *fdt;
+> @@ -126,6 +131,7 @@ typedef struct {
+>      uint32_t msi_phandle;
+>      uint32_t iommu_phandle;
+>      int psci_conduit;
+> +    hwaddr high_io_base;
+>  } VirtMachineState;
+>  
+>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
