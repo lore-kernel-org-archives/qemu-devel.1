@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42118)
+Received: from eggs.gnu.org ([209.51.188.92]:43286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzHlT-0005cv-Tf
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:14:04 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gzHrv-0007rm-9Z
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzHlR-0005f0-VD
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:14:03 -0500
-References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-33-david@redhat.com>
-	<27f4869b-5fb0-0b26-8980-5a5819386f43@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ba1e9659-6bec-9d70-14b0-0ad7880782ea@redhat.com>
-Date: Thu, 28 Feb 2019 10:13:54 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gzHru-00082O-Jf
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:20:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gzHru-00081u-9a
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:20:42 -0500
+References: <20190228043503.68494-1-aik@ozlabs.ru>
+	<20190228050007.GF27799@umbus.fritz.box>
+	<365a4f56-5f68-9f33-72c2-9d0dc2c7f3c6@redhat.com>
+	<20190228071444.72ku2l7fspjik6do@sirius.home.kraxel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <77acaf36-f9ae-70a4-4ad9-2323bf2a09ce@redhat.com>
+Date: Thu, 28 Feb 2019 10:20:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <27f4869b-5fb0-0b26-8980-5a5819386f43@linaro.org>
+In-Reply-To: <20190228071444.72ku2l7fspjik6do@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 32/33] s390x/tcg: Implement VECTOR STORE
- WITH LENGTH
+Subject: Re: [Qemu-devel] [PATCH qemu] configure: Enable werror for git
+ worktrees
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, philmd@redhat.com
 
-On 28.02.19 00:49, Richard Henderson wrote:
-> On 2/26/19 3:39 AM, David Hildenbrand wrote:
->> Very similar to VECTOR LOAD WITH LENGTH, just the opposite direction.
+On 28/02/19 08:14, Gerd Hoffmann wrote:
+> On Thu, Feb 28, 2019 at 08:01:53AM +0100, Thomas Huth wrote:
+>> On 28/02/2019 06.00, David Gibson wrote:
+>>> On Thu, Feb 28, 2019 at 03:35:03PM +1100, Alexey Kardashevskiy wrote:
+>>>> The configure script checks multiple times whether it works in a git
+>>>> repository and it does this by "test -e "${source_path}/.git" in 4 cases
+>>>> but in one case where it tries to enable werror "-d" is used there which
+>>>> fails on git worktrees as .git is a file then and not a directory.
 >>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/helper.h           |  1 +
->>  target/s390x/insn-data.def      |  2 ++
->>  target/s390x/translate_vx.inc.c | 13 +++++++++++++
->>  target/s390x/vec_helper.c       | 15 +++++++++++++++
->>  4 files changed, 31 insertions(+)
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-I'll also add a fast path for storing with lengths >= 16.
-
-Thanks.
-
-> r~
+>> That confused me. What is a "git worktree" where .git is a file? So far
+>> .git was always a directory here...?
 > 
+> git worktree --help
+> 
+> A worktree is basically a clone, but instead of copying over the git
+> repo it is simply referenced.
+> 
+> That is not the only possible case where .git is a file not a directory.
+> In newer versions "git submodule" stores the repo in
+> .git/modules/$submodule and $submodule/.git is just a file with a
+> reference:
+> 
+> kraxel@sirius ~/projects/qemu# cat roms/seabios/.git
+> gitdir: ../../.git/modules/roms/seabios
+> 
+> So, yes, the patch makes sense.
+> 
+> cheers,
+>   Gerd
 > 
 
+Queued, thanks.
 
--- 
-
-Thanks,
-
-David / dhildenb
+Paolo
