@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43054)
+Received: from eggs.gnu.org ([209.51.188.92]:43839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gzMN2-000784-Kv
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:09:10 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzMQO-0008Sx-E3
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:12:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gzMMw-0000cO-Eg
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:09:08 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:40456)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gzMMw-0000av-7a
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:09:02 -0500
-Received: by mail-qt1-f195.google.com with SMTP id j36so23563769qta.7
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 06:08:59 -0800 (PST)
-Date: Thu, 28 Feb 2019 09:08:55 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190228090628-mutt-send-email-mst@kernel.org>
-References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
-	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
-	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
-	<20190218113447-mutt-send-email-mst@kernel.org>
-	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
-	<20190218183353-mutt-send-email-mst@kernel.org>
-	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
-	<CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
-	<a5c4b4a1-ea82-f357-e076-ade51ade7ddf@redhat.com>
-	<CAOEp5Ode1Ue0iLD4qUs+tcSGCZ+t+bm1TQpr3UG59jMU9kyVUg@mail.gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1gzMQM-0002Kz-GN
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:12:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43478)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gzMQJ-0002I1-Rw
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:12:32 -0500
+Date: Thu, 28 Feb 2019 15:12:21 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190228151221.5909ff92@redhat.com>
+In-Reply-To: <20190228011325.GA5515@richard>
+References: <20190225010708.27385-1-richardw.yang@linux.intel.com>
+	<20190225011534.GA27727@richard>
+	<20190227190402.6c50c8ff@redhat.com>
+	<20190228011325.GA5515@richard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOEp5Ode1Ue0iLD4qUs+tcSGCZ+t+bm1TQpr3UG59jMU9kyVUg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
- not enabled by the guest
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5] i386,
+ acpi: check acpi_memory_hotplug capacity in pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,154 +30,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Cc: Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-On Thu, Feb 21, 2019 at 10:18:52AM +0200, Yuri Benditovich wrote:
-> On Thu, Feb 21, 2019 at 8:49 AM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> >
-> > On 2019/2/21 下午2:00, Yuri Benditovich wrote:
-> > > On Tue, Feb 19, 2019 at 8:27 AM Jason Wang <jasowang@redhat.com> wrote:
-> > >>
-> > >> On 2019/2/19 上午7:34, Michael S. Tsirkin wrote:
-> > >>> On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
-> > >>>> On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >>>>> On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
-> > >>>>>> On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> wrote:
-> > >>>>>>> On 2019/2/13 下午10:51, Yuri Benditovich wrote:
-> > >>>>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1608226
-> > >>>>>>>> On startup/link-up in multiqueue configuration the virtio-net
-> > >>>>>>>> tries to starts all the queues, including those that the guest
-> > >>>>>>>> will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
-> > >>>>>>>> If the guest driver does not allocate queues that it will not
-> > >>>>>>>> use (for example, Windows driver does not) and number of actually
-> > >>>>>>>> used queues is less that maximal number supported by the device,
-> > >>>>>>> Is this a requirement of e.g NDIS? If not, could we simply allocate all
-> > >>>>>>> queues in this case. This is usually what normal Linux driver did.
-> > >>>>>>>
-> > >>>>>>>
-> > >>>>>>>> this causes vhost_net_start to fail and actually disables vhost
-> > >>>>>>>> for all the queues, reducing the performance.
-> > >>>>>>>> Current commit fixes this: initially only first queue is started,
-> > >>>>>>>> upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
-> > >>>>>>>> requested by the guest.
-> > >>>>>>>>
-> > >>>>>>>> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> > >>>>>>>> ---
-> > >>>>>>>>     hw/net/virtio-net.c | 7 +++++--
-> > >>>>>>>>     1 file changed, 5 insertions(+), 2 deletions(-)
-> > >>>>>>>>
-> > >>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > >>>>>>>> index 3f319ef723..d3b1ac6d3a 100644
-> > >>>>>>>> --- a/hw/net/virtio-net.c
-> > >>>>>>>> +++ b/hw/net/virtio-net.c
-> > >>>>>>>> @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
-> > >>>>>>>>     {
-> > >>>>>>>>         VirtIODevice *vdev = VIRTIO_DEVICE(n);
-> > >>>>>>>>         NetClientState *nc = qemu_get_queue(n->nic);
-> > >>>>>>>> -    int queues = n->multiqueue ? n->max_queues : 1;
-> > >>>>>>>> +    int queues = n->multiqueue ? n->curr_queues : 1;
-> > >>>>>>>>
-> > >>>>>>>>         if (!get_vhost_net(nc->peer)) {
-> > >>>>>>>>             return;
-> > >>>>>>>> @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet *n, uint8_t cmd,
-> > >>>>>>>>             return VIRTIO_NET_ERR;
-> > >>>>>>>>         }
-> > >>>>>>>>
-> > >>>>>>>> -    n->curr_queues = queues;
-> > >>>>>>>>         /* stop the backend before changing the number of queues to avoid handling a
-> > >>>>>>>>          * disabled queue */
-> > >>>>>>>> +    virtio_net_set_status(vdev, 0);
-> > >>>>>>> Any reason for doing this?
-> > >>>>>> I think there are 2 reasons:
-> > >>>>>> 1. The spec does not require guest SW to allocate unused queues.
-> > >>>>>> 2. We spend guest's physical memory to just make vhost happy when it
-> > >>>>>> touches queues that it should not use.
-> > >>>>>>
-> > >>>>>> Thanks,
-> > >>>>>> Yuri Benditovich
-> > >>>>> The spec also says:
-> > >>>>>           queue_enable The driver uses this to selectively prevent the device from executing requests from this
-> > >>>>>           virtqueue. 1 - enabled; 0 - disabled.
-> > >>>>>
-> > >>>>> While this is not a conformance clause this strongly implies that
-> > >>>>> queues which are not enabled are never accessed by device.
-> > >>>>>
-> > >>>>> Yuri I am guessing you are not enabling these unused queues right?
-> > >>>> Of course, we (Windows driver) do not.
-> > >>>> The code of virtio-net passes max_queues to vhost and this causes
-> > >>>> vhost to try accessing all the queues, fail on unused ones and finally
-> > >>>> leave vhost disabled at all.
-> > >>> Jason, at least for 1.0 accessing disabled queues looks like a spec
-> > >>> violation. What do you think?
-> > >>
-> > >> Yes, but there's some issues:
-> > >>
-> > >> - How to detect a disabled queue for 0.9x device? Looks like there's no
-> > >> way according to the spec, so device must assume all queues was enabled.
-> > > Can you please add several words - what is 0.9 device (probably this
-> > > is more about driver) and
-> > > what is the problem with it?
-> >
-> >
-> > It's not a net specific issue. 0.9x device is legacy device defined in
-> > the spec. We don't have a method to disable and enable a specific queue
-> > at that time. Michael said we can assume queue address 0 as disabled,
-> > but there's still a question of how to enable it. Spec is unclear and it
-> > was too late to add thing for legacy device. For 1.0 device we have
-> > queue_enable, but its implementation is incomplete, since it can work
-> > with vhost correctly, we probably need to add thing to make it work.
-> >
-> >
-> > >
-> > >> - For 1.0, if we depends on queue_enable, we should implement the
-> > >> callback for vhost I think. Otherwise it's still buggy.
-> > >>
-> > >> So it looks tricky to enable and disable queues through set status
-> > > If I succeed to modify the patch such a way that it will act only in
-> > > 'target' case,
-> > > i.e. only if some of queueus are not initialized (at time of
-> > > driver_ok), will it be more safe?
-> >
-> >
-> > For 1.0 device, we can fix the queue_enable, but for 0.9x device how do
-> > you enable one specific queue in this case? (setting status?)
-> >
+On Thu, 28 Feb 2019 09:13:25 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+
+> On Wed, Feb 27, 2019 at 07:04:02PM +0100, Igor Mammedov wrote:
+> >On Mon, 25 Feb 2019 09:15:34 +0800
+> >Wei Yang <richardw.yang@linux.intel.com> wrote:
+> >  
+> >> On Mon, Feb 25, 2019 at 09:07:08AM +0800, Wei Yang wrote:  
+> >> >Currently we do device realization like below:
+> >> >
+> >> >   hotplug_handler_pre_plug()
+> >> >   dc->realize()
+> >> >   hotplug_handler_plug()
+> >> >
+> >> >Before we do device realization and plug, we should allocate necessary
+> >> >resources and check if memory-hotplug-support property is enabled.
+> >> >
+> >> >At the piix4 and ich9, the memory-hotplug-support property is checked at
+> >> >plug stage. This means that device has been realized and mapped into guest
+> >> >address space 'pc_dimm_plug()' by the time acpi plug handler is called,
+> >> >where it might fail and crash QEMU due to reaching g_assert_not_reached()
+> >> >(piix4) or error_abort (ich9).
+> >> >
+> >> >Fix it by checking if memory hotplug is enabled at pre_plug stage
+> >> >where we can gracefully abort hotplug request.
+> >> >
+> >> >Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >> >CC: Igor Mammedov <imammedo@redhat.com>
+> >> >CC: Eric Blake <eblake@redhat.com>
+> >> >Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >> >
+> >> >---
+> >> >v5:
+> >> >   * rebase on latest upstream
+> >> >   * remove a comment before hotplug_handler_pre_plug
+> >> >   * fix alignment for ich9_pm_device_pre_plug_cb
+> >> >v4:
+> >> >   * fix code alignment of piix4_device_pre_plug_cb
+> >> >v3:
+> >> >   * replace acpi_memory_hotplug with memory-hotplug-support in changelog
+> >> >   * fix code alignment of ich9_pm_device_pre_plug_cb
+> >> >   * print which device type memory-hotplug-support is disabled in
+> >> >     ich9_pm_device_pre_plug_cb and piix4_device_pre_plug_cb
+> >> >v2:
+> >> >   * (imammedo@redhat.com)
+> >> >     - Almost the whole third paragraph
+> >> >   * apply this change to ich9
+> >> >   * use hotplug_handler_pre_plug() instead of open-coding check
+> >> >---
+> >> > hw/acpi/ich9.c         | 15 +++++++++++++--
+> >> > hw/acpi/piix4.c        | 13 ++++++++++---
+> >> > hw/i386/pc.c           |  2 ++
+> >> > hw/isa/lpc_ich9.c      |  1 +
+> >> > include/hw/acpi/ich9.h |  2 ++
+> >> > 5 files changed, 28 insertions(+), 5 deletions(-)
+> >> >
+> >> >diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+> >> >index c5d8646abc..e53dfe1ee3 100644
+> >> >--- a/hw/acpi/ich9.c
+> >> >+++ b/hw/acpi/ich9.c
+> >> >@@ -483,13 +483,24 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
+> >> >                              NULL);
+> >> > }
+> >> > 
+> >> >+void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >> >+                                Error **errp)
+> >> >+{
+> >> >+    ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+> >> >+
+> >> >+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+> >> >+        !lpc->pm.acpi_memory_hotplug.is_enabled)
+> >> >+        error_setg(errp,
+> >> >+                   "memory hotplug is not enabled: %s.memory-hotplug-support "
+> >> >+                   "is not set", object_get_typename(OBJECT(lpc)));
+> >> >+}
+> >> >+
+> >> > void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >> >                             Error **errp)
+> >> > {
+> >> >     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+> >> > 
+> >> >-    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
+> >> >-        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >> >+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >> >         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+> >> >             nvdimm_acpi_plug_cb(hotplug_dev, dev);
+> >> >         } else {
+> >> >diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> >> >index df8c0db909..8b9654e437 100644
+> >> >--- a/hw/acpi/piix4.c
+> >> >+++ b/hw/acpi/piix4.c
+> >> >@@ -374,9 +374,16 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
+> >> > static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> >> >                                     DeviceState *dev, Error **errp)    
+> >> 
+> >> Hmm, I found one interesting thing.
+> >> 
+> >> This function is introduced in
+> >> 
+> >>     commit ec266f408882fd38475f72c4e864ed576228643b
+> >>     pci/pcihp: perform check for bus capability in pre_plug handler
+> >> 
+> >> This is just implemented in piix4, but don't has the counterpart in ich9.
+> >> 
+> >> So I suggest to have a follow up patch to create the counterpart for ich9 and
+> >> then apply this patch on top of that.  
+> >not sure what do you mean, could you be more specific?
+> >  
 > 
-> Do I understand correctly that for 0.9 device in some cases the device will
-> receive feature _MQ set, but will not receive VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET?
-> Or the problem is different?
-
-No. For 0.9 it is possible that device adds buffers before DRIVER_OK.
-
-
-> > A fundamental question is what prevents you from just initialization all
-> > queues during driver start? It looks to me this save lots of efforts
-> > than allocating queue dynamically.
-> >
+> Let me reply here.
 > 
-> This is not so trivial in Windows driver, as it does not have objects for queues
-> that it does not use. Linux driver first of all allocates all the
-> queues and then
-> adds Rx/Tx to those it will use. Windows driver first decides how many queues
-> it will use then allocates objects for them and initializes them from zero to
-> fully functional state.
+> Everything starts from device_set_realized().
 > 
-> > Thanks
-> >
-> >
-> > >
-> > >> Thanks
-> > >>
-> > >>
-> > >>>>>
-> > >>>>>>> Thanks
-> > >>>>>>>
-> > >>>>>>>
-> > >>>>>>>> +
-> > >>>>>>>> +    n->curr_queues = queues;
-> > >>>>>>>> +
-> > >>>>>>>>         virtio_net_set_status(vdev, vdev->status);
-> > >>>>>>>>         virtio_net_set_queues(n);
-> > >>>>>>>>
+>     device_set_realized()
+>        hotplug_handler_pre_plug()
+>        dc->realize()
+>        hotplug_handler_plug()
+> 
+> There is two choice of HotplugHandler :
+> 
+>     * dev's bus hotplug_handler
+>     * machine_hotplug_handler
+> 
+> Take PIIX as an example, machine_hotplug_handler and pci_bus hotplug_handler
+> is:
+> 
+>     pc_machine_device_[pre_]plug_cb
+>     piix4_device_[pre_]plug_cb
+> 
+> if I am correct.
+> 
+> Now back to your question.
+> 
+> Commit ec266f408882 introduced piix4_device_pre_plug_cb() to move the check in
+> pre_plug handler for PIIX. Then I am wondering the counter part of ich9, But I
+> don't see something for PCI_DEVICE in ich9_pm_device_plug_cb(). So on ich9,
+> PCI_DEVICE is not pluggable? Maybe I am lost here.
+> 
+> Or in other words, in case other machine supports PCI_DEVICE hotplug, do we
+> need to move similar check to pre_plug too?
+it depends, in case of ICH9. I think acpi hotplug is not used (thankfully)
+it uses native PCI-E hotplug path. Following pops out when looking for it.
+ hw/pci/pcie.c:void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+ hw/pci/pcie_port.c:    hc->pre_plug = pcie_cap_slot_pre_plug_cb;
