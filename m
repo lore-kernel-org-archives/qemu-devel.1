@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57808)
+Received: from eggs.gnu.org ([209.51.188.92]:57841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gzUdD-0002sh-Eb
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:24 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1gzUdG-0002vw-O8
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gzUdC-0001vK-FL
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:23 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35004
+	(envelope-from <farosas@linux.ibm.com>) id 1gzUdF-0001yQ-04
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:26 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54808
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gzUdC-0001uf-8p
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:22 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1gzUdE-0001xu-Mf
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:24 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1SMsHcl055827
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 17:58:21 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qxnus8as0-1
+	x1SMsEpn109905
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 17:58:24 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qxq6bmmb1-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 17:58:21 -0500
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 17:58:24 -0500
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Thu, 28 Feb 2019 22:58:21 -0000
+	Thu, 28 Feb 2019 22:58:23 -0000
 From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Thu, 28 Feb 2019 19:57:58 -0300
+Date: Thu, 28 Feb 2019 19:57:59 -0300
 In-Reply-To: <20190228225759.21328-1-farosas@linux.ibm.com>
 References: <20190228225759.21328-1-farosas@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Message-Id: <20190228225759.21328-5-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v4 4/5] target/ppc: Refactor
- kvm_handle_debug
+Message-Id: <20190228225759.21328-6-farosas@linux.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v4 5/5] target/ppc: support single stepping
+ with KVM HV
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,129 +44,401 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-There are four scenarios being handled in this function:
+The hardware singlestep mechanism in POWER works via a Trace Interrupt
+(0xd00) that happens after any instruction executes, whenever MSR_SE =
+1 (PowerISA Section 6.5.15 - Trace Interrupt).
 
-- single stepping
-- hardware breakpoints
-- software breakpoints
-- fallback (no debug supported)
+However, with kvm_hv, the Trace Interrupt happens inside the guest and
+KVM has no visibility of it. Therefore, when the gdbstub uses the
+KVM_SET_GUEST_DEBUG ioctl to enable singlestep, KVM simply ignores it.
 
-A future patch will add code to handle specific single step and
-software breakpoints cases so let's split each scenario into its own
-function now to avoid hurting readability.
+This patch takes advantage of the Trace Interrupt to perform the step
+inside the guest, but uses a breakpoint at the Trace Interrupt handler
+to return control to KVM. The exit is treated by KVM as a regular
+breakpoint and it returns to the host (and QEMU eventually).
+
+Before signalling GDB, QEMU sets the Next Instruction Pointer to the
+instruction following the one being stepped and restores the MSR,
+SRR0, SRR1 values from before the step, effectively skipping the
+interrupt handler execution and hiding the trace interrupt breakpoint
+from GDB.
+
+This approach works with both of GDB's 'scheduler-locking' options
+(off, step).
+
+Note:
+
+- kvm_arch_set_singlestep happens after GDB asks for a single step,
+  while the vcpus are stopped.
+
+- kvm_handle_singlestep executes after the step, during the handling
+  of the Emulation Assist Interrupt (breakpoint).
 
 Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- target/ppc/kvm.c | 86 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 50 insertions(+), 36 deletions(-)
+ target/ppc/cpu.h         |  16 ++++
+ target/ppc/excp_helper.c |  13 +++
+ target/ppc/gdbstub.c     |  35 +++++++
+ target/ppc/kvm.c         | 195 +++++++++++++++++++++++++++++++++++++--
+ 4 files changed, 252 insertions(+), 7 deletions(-)
 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 26604ddf98..fb1bf1e9d7 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1171,6 +1171,11 @@ struct CPUPPCState {
+     uint32_t tm_vscr;
+     uint64_t tm_dscr;
+     uint64_t tm_tar;
++
++    /* Used for software single step */
++    target_ulong sstep_msr;
++    target_ulong sstep_srr0;
++    target_ulong sstep_srr1;
+ };
+ 
+ #define SET_FIT_PERIOD(a_, b_, c_, d_)          \
+@@ -1266,6 +1271,7 @@ struct PPCVirtualHypervisorClass {
+     OBJECT_GET_CLASS(PPCVirtualHypervisorClass, (obj), \
+                      TYPE_PPC_VIRTUAL_HYPERVISOR)
+ 
++target_ulong ppc_get_trace_int_handler_addr(CPUState *cs);
+ void ppc_cpu_do_interrupt(CPUState *cpu);
+ bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
+ void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+@@ -1281,6 +1287,12 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cpu, uint8_t *buf, int reg);
+ void ppc_gdb_gen_spr_xml(PowerPCCPU *cpu);
+ const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name);
+ #endif
++uint32_t ppc_gdb_read_insn(CPUState *cs, target_ulong addr);
++uint32_t ppc_gdb_get_op(uint32_t insn);
++uint32_t ppc_gdb_get_xop(uint32_t insn);
++uint32_t ppc_gdb_get_spr(uint32_t insn);
++uint32_t ppc_gdb_get_rt(uint32_t insn);
++
+ int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+                                int cpuid, void *opaque);
+ int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+@@ -2227,6 +2239,10 @@ enum {
+                         PPC2_ISA300)
+ };
+ 
++#define XOP_RFID 18
++#define XOP_MFMSR 83
++#define XOP_MTSPR 467
++
+ /*****************************************************************************/
+ /* Memory access type :
+  * may be needed for precise access rights control and precise exceptions.
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index beafcf1ebd..cf8c86de91 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -112,6 +112,8 @@ static uint64_t ppc_excp_vector_offset(CPUState *cs, int ail)
+     uint64_t offset = 0;
+ 
+     switch (ail) {
++    case AIL_NONE:
++        break;
+     case AIL_0001_8000:
+         offset = 0x18000;
+         break;
+@@ -768,6 +770,17 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+     check_tlb_flush(env, false);
+ }
+ 
++target_ulong ppc_get_trace_int_handler_addr(CPUState *cs)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
++    int ail;
++
++    ail = (env->spr[SPR_LPCR] & LPCR_AIL) >> LPCR_AIL_SHIFT;
++    return env->excp_vectors[POWERPC_EXCP_TRACE] |
++        ppc_excp_vector_offset(cs, ail);
++}
++
+ void ppc_cpu_do_interrupt(CPUState *cs)
+ {
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
+index fbf3821f4b..a5b2705ade 100644
+--- a/target/ppc/gdbstub.c
++++ b/target/ppc/gdbstub.c
+@@ -380,3 +380,38 @@ const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name)
+     return NULL;
+ }
+ #endif
++
++uint32_t ppc_gdb_read_insn(CPUState *cs, target_ulong addr)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
++    uint32_t insn;
++
++    cpu_memory_rw_debug(cs, addr, (uint8_t *)&insn, sizeof(insn), 0);
++
++    if (msr_le) {
++        return ldl_le_p(&insn);
++    } else {
++        return ldl_be_p(&insn);
++    }
++}
++
++uint32_t ppc_gdb_get_op(uint32_t insn)
++{
++    return extract32(insn, 26, 6);
++}
++
++uint32_t ppc_gdb_get_xop(uint32_t insn)
++{
++    return extract32(insn, 1, 10);
++}
++
++uint32_t ppc_gdb_get_spr(uint32_t insn)
++{
++    return extract32(insn, 11, 5) << 5 | extract32(insn, 16, 5);
++}
++
++uint32_t ppc_gdb_get_rt(uint32_t insn)
++{
++    return extract32(insn, 21, 5);
++}
 diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 941c4e7523..9392fba192 100644
+index 9392fba192..2bcb8814f4 100644
 --- a/target/ppc/kvm.c
 +++ b/target/ppc/kvm.c
-@@ -1620,52 +1620,66 @@ static int kvm_handle_hw_breakpoint(CPUState *cs,
+@@ -1554,6 +1554,86 @@ void kvm_arch_remove_all_hw_breakpoints(void)
+     nb_hw_breakpoint = nb_hw_watchpoint = 0;
+ }
+ 
++void kvm_arch_set_singlestep(CPUState *cs, int enabled)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
++    target_ulong trace_handler_addr;
++    uint32_t insn;
++    bool rfid;
++
++    if (!enabled) {
++        return;
++    }
++
++    cpu_synchronize_state(cs);
++    insn = ppc_gdb_read_insn(cs, env->nip);
++
++    /*
++     * rfid needs special handling because it:
++     *   - overwrites NIP with SRR0;
++     *   - overwrites MSR with SRR1;
++     *   - cannot be single stepped.
++     */
++    rfid = ppc_gdb_get_op(insn) == 19 && ppc_gdb_get_xop(insn) == XOP_RFID;
++
++    if (rfid && kvm_find_sw_breakpoint(cs, env->spr[SPR_SRR0])) {
++        /*
++         * There is a breakpoint at the next instruction address. It
++         * will already cause the vm exit we need for the single step,
++         * so there's nothing to be done.
++         */
++        return;
++    }
++
++    /*
++     * Save the registers that will be affected by the single step
++     * mechanism. These will be restored after the step at
++     * kvm_handle_singlestep.
++     */
++    env->sstep_msr = env->msr;
++    env->sstep_srr0 = env->spr[SPR_SRR0];
++    env->sstep_srr1 = env->spr[SPR_SRR1];
++
++    /*
++     * MSR_SE = 1 will cause a Trace Interrupt in the guest after the
++     * next instruction executes. If this is a rfid, use SRR1 instead
++     * of MSR.
++     */
++    if (rfid) {
++        if ((env->spr[SPR_SRR1] >> MSR_SE) & 1) {
++            /*
++             * The guest is doing a single step itself. Make sure we
++             * restore it later.
++             */
++            env->sstep_msr |= (1ULL << MSR_SE);
++        }
++
++        env->spr[SPR_SRR1] |= (1ULL << MSR_SE);
++    } else {
++        env->msr |= (1ULL << MSR_SE);
++    }
++
++    /*
++     * We set a breakpoint at the interrupt handler address so
++     * that the singlestep will be seen by KVM (this is treated by
++     * KVM like an ordinary breakpoint) and control is returned to
++     * QEMU.
++     */
++    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
++
++    if (env->nip == trace_handler_addr) {
++        /*
++         * We are trying to step over the interrupt handler
++         * address itself; move the breakpoint to the next
++         * instruction.
++         */
++        trace_handler_addr += 4;
++    }
++
++    kvm_insert_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
++}
++
+ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
+ {
+     int n;
+@@ -1593,6 +1673,91 @@ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
+     }
+ }
+ 
++/* Revert any side-effects caused during single step */
++static void restore_singlestep_env(CPUState *cs)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
++    uint32_t insn;
++    int reg;
++    int spr;
++
++    insn = ppc_gdb_read_insn(cs, env->spr[SPR_SRR0] - 4);
++
++    env->spr[SPR_SRR0] = env->sstep_srr0;
++    env->spr[SPR_SRR1] = env->sstep_srr1;
++
++    if (ppc_gdb_get_op(insn) != 31) {
++        return;
++    }
++
++    reg = ppc_gdb_get_rt(insn);
++
++    switch (ppc_gdb_get_xop(insn)) {
++    case XOP_MTSPR:
++        /*
++         * mtspr: the guest altered the SRR, so do not use the
++         *        pre-step value.
++         */
++        spr = ppc_gdb_get_spr(insn);
++        if (spr == SPR_SRR0 || spr == SPR_SRR1) {
++            env->spr[spr] = env->gpr[reg];
++        }
++        break;
++    case XOP_MFMSR:
++        /*
++         * mfmsr: clear MSR_SE bit to avoid the guest knowing
++         *         that it is being single-stepped.
++         */
++        env->gpr[reg] &= ~(1ULL << MSR_SE);
++        break;
++    }
++}
++
++static int kvm_handle_singlestep(CPUState *cs, target_ulong address)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
++    target_ulong trace_handler_addr;
++
++    if (kvm_has_guestdbg_singlestep()) {
++        return 1;
++    }
++
++    cpu_synchronize_state(cs);
++    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
++
++    if (address == trace_handler_addr) {
++        kvm_remove_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
++
++        if (env->sstep_msr & (1ULL << MSR_SE)) {
++            /*
++             * The guest expects the last instruction to have caused a
++             * single step, go back into the interrupt handler.
++             */
++            return 1;
++        }
++
++        env->nip = env->spr[SPR_SRR0];
++        /* Bits 33-36, 43-47 are set by the interrupt */
++        env->msr = env->spr[SPR_SRR1] & ~(1ULL << MSR_SE |
++                                          PPC_BITMASK(33, 36) |
++                                          PPC_BITMASK(43, 47));
++        restore_singlestep_env(cs);
++
++    } else if (address == trace_handler_addr + 4) {
++        /*
++         * A step at trace_handler_addr would interfere with the
++         * singlestep mechanism itself, so we have previously
++         * displaced the breakpoint to the next instruction.
++         */
++        kvm_remove_breakpoint(cs, trace_handler_addr + 4, 4, GDB_BREAKPOINT_SW);
++        restore_singlestep_env(cs);
++    }
++
++    return 1;
++}
++
+ static int kvm_handle_hw_breakpoint(CPUState *cs,
+                                     struct kvm_debug_exit_arch *arch_info)
+ {
+@@ -1620,13 +1785,29 @@ static int kvm_handle_hw_breakpoint(CPUState *cs,
      return handle;
  }
  
-+static int kvm_handle_singlestep(void)
-+{
-+    return 1;
-+}
-+
-+static int kvm_handle_sw_breakpoint(void)
-+{
-+    return 1;
-+}
-+
- static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
+-static int kvm_handle_singlestep(void)
++static int kvm_handle_sw_breakpoint(CPUState *cs, target_ulong address)
  {
-     CPUState *cs = CPU(cpu);
-     CPUPPCState *env = &cpu->env;
-     struct kvm_debug_exit_arch *arch_info = &run->debug.arch;
--    int handle = 0;
+-    return 1;
+-}
++    target_ulong trace_handler_addr;
  
-     if (cs->singlestep_enabled) {
--        handle = 1;
--    } else if (arch_info->status) {
--        handle = kvm_handle_hw_breakpoint(cs, arch_info);
--    } else if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
--        handle = 1;
--    } else {
--        /* QEMU is not able to handle debug exception, so inject
--         * program exception to guest;
--         * Yes program exception NOT debug exception !!
--         * When QEMU is using debug resources then debug exception must
--         * be always set. To achieve this we set MSR_DE and also set
--         * MSRP_DEP so guest cannot change MSR_DE.
--         * When emulating debug resource for guest we want guest
--         * to control MSR_DE (enable/disable debug interrupt on need).
--         * Supporting both configurations are NOT possible.
--         * So the result is that we cannot share debug resources
--         * between QEMU and Guest on BOOKE architecture.
--         * In the current design QEMU gets the priority over guest,
--         * this means that if QEMU is using debug resources then guest
--         * cannot use them;
--         * For software breakpoint QEMU uses a privileged instruction;
--         * So there cannot be any reason that we are here for guest
--         * set debug exception, only possibility is guest executed a
--         * privileged / illegal instruction and that's why we are
--         * injecting a program interrupt.
--         */
-+        return kvm_handle_singlestep();
+-static int kvm_handle_sw_breakpoint(void)
+-{
++    if (kvm_has_guestdbg_singlestep()) {
++        return 1;
 +    }
 +
-+    if (arch_info->status) {
-+        return kvm_handle_hw_breakpoint(cs, arch_info);
-+    }
- 
--        cpu_synchronize_state(cs);
--        /* env->nip is PC, so increment this by 4 to use
--         * ppc_cpu_do_interrupt(), which set srr0 = env->nip - 4.
--         */
--        env->nip += 4;
--        cs->exception_index = POWERPC_EXCP_PROGRAM;
--        env->error_code = POWERPC_EXCP_INVAL;
--        ppc_cpu_do_interrupt(cs);
-+    if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
-+        return kvm_handle_sw_breakpoint();
-     }
- 
--    return handle;
-+    /*
-+     * QEMU is not able to handle debug exception, so inject
-+     * program exception to guest;
-+     * Yes program exception NOT debug exception !!
-+     * When QEMU is using debug resources then debug exception must
-+     * be always set. To achieve this we set MSR_DE and also set
-+     * MSRP_DEP so guest cannot change MSR_DE.
-+     * When emulating debug resource for guest we want guest
-+     * to control MSR_DE (enable/disable debug interrupt on need).
-+     * Supporting both configurations are NOT possible.
-+     * So the result is that we cannot share debug resources
-+     * between QEMU and Guest on BOOKE architecture.
-+     * In the current design QEMU gets the priority over guest,
-+     * this means that if QEMU is using debug resources then guest
-+     * cannot use them;
-+     * For software breakpoint QEMU uses a privileged instruction;
-+     * So there cannot be any reason that we are here for guest
-+     * set debug exception, only possibility is guest executed a
-+     * privileged / illegal instruction and that's why we are
-+     * injecting a program interrupt.
-+     */
 +    cpu_synchronize_state(cs);
-+    /*
-+     * env->nip is PC, so increment this by 4 to use
-+     * ppc_cpu_do_interrupt(), which set srr0 = env->nip - 4.
-+     */
-+    env->nip += 4;
-+    cs->exception_index = POWERPC_EXCP_PROGRAM;
-+    env->error_code = POWERPC_EXCP_INVAL;
-+    ppc_cpu_do_interrupt(cs);
++    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
 +
-+    return 0;
++    if (address == trace_handler_addr) {
++        CPU_FOREACH(cs) {
++            if (cs->singlestep_enabled) {
++                /*
++                 * We hit this breakpoint while another cpu is doing a
++                 * software single step. Go back into the guest to
++                 * give chance for the single step to finish.
++                 */
++                return 0;
++            }
++        }
++    }
+     return 1;
  }
  
- int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+@@ -1637,7 +1818,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
+     struct kvm_debug_exit_arch *arch_info = &run->debug.arch;
+ 
+     if (cs->singlestep_enabled) {
+-        return kvm_handle_singlestep();
++        return kvm_handle_singlestep(cs, arch_info->address);
+     }
+ 
+     if (arch_info->status) {
+@@ -1645,7 +1826,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
+     }
+ 
+     if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
+-        return kvm_handle_sw_breakpoint();
++        return kvm_handle_sw_breakpoint(cs, arch_info->address);
+     }
+ 
+     /*
 -- 
 2.20.1
