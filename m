@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52153)
+Received: from eggs.gnu.org ([209.51.188.92]:52289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzQcJ-0000XW-Hc
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:41:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1gzQck-0000rL-L8
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:41:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzQcI-0006Om-DL
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:41:11 -0500
-References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
-	<20190226045304.25618-41-david@gibson.dropbear.id.au>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ec8e11d1-c966-b814-98da-a6ab56572834@redhat.com>
-Date: Thu, 28 Feb 2019 19:40:52 +0100
+	(envelope-from <eblake@redhat.com>) id 1gzQcj-0006ae-H7
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:41:38 -0500
+References: <20190227162035.18543-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f84fc50a-110b-e2bf-0061-6ff17a98dbe6@redhat.com>
+Date: Thu, 28 Feb 2019 12:41:29 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190226045304.25618-41-david@gibson.dropbear.id.au>
+In-Reply-To: <20190227162035.18543-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 40/50] spapr_events: add support for phb
- hotplug events
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] nbd: support for authorization
+ control on TLS connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, gkurz@kaod.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, clg@kaod.org
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 26/02/2019 05.52, David Gibson wrote:
-> From: Michael Roth <mdroth@linux.vnet.ibm.com>
-> 
-> Extend the existing EPOW event format we use for PCI
-> devices to emit PHB plug/unplug events.
-> 
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Message-Id: <155059671405.1466090.535964535260503283.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_events.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index b9c7ecb9e9..ab9a1f0063 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -526,6 +526,9 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
->      case SPAPR_DR_CONNECTOR_TYPE_CPU:
->          hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_CPU;
->          break;
-> +    case SPAPR_DR_CONNECTOR_TYPE_PHB:
-> +        hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_PHB;
-> +        break;
->      default:
->          /* we shouldn't be signaling hotplug events for resources
->           * that don't support them
+On 2/27/19 10:20 AM, Daniel P. Berrang=C3=A9 wrote:
+> This series provides the NBD parts of the authorization control series
+> previously posted as:
+>=20
+>   v1: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04482.ht=
+ml
+>   v2: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05727.ht=
+ml
+>   v3: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01639.ht=
+ml
+>   v4: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04319.ht=
+ml
+>=20
+> Then separated for merge:
+>=20
+>   v5: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07347.ht=
+ml
+>=20
+> The core authz framework is now merged & these patches have all had
+> positive review. Thus these NBD parts are ready to go into the NBD
+> maintainer's tree, should the maintainer consider them acceptable.
 
-I think this patch (or something else in this PULL request) broke CPU
-hot-plugging with older machine types:
+Thanks; series is queued for my next pull request.
 
-$ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-test -m=slow
-/ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=6: OK
-/ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=6: OK
-/ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=6: OK
-/ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=6: OK
-/ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=6: OK
-/ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=6: OK
-/ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=6: OK
-/ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=6: **
-ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_to_source: assertion failed: (source->enabled)
-Broken pipe
-/home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
-Aborted (core dumped)
-
-Could you please have a look?
-
- Thomas
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
