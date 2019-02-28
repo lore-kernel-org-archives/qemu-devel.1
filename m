@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45399)
+Received: from eggs.gnu.org ([209.51.188.92]:45523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzMYK-00028z-6o
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:49 -0500
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1gzMZ0-0002XN-Pq
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gzMYH-0006lB-T3
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41602)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gzMYH-0006iy-J8
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:20:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gzMYB-0001um-IB
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8518F2E8037
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:20:39 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Feb 2019 14:14:32 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1818075 <1818075@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155136199055.29310.6029801353341134939.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155136327295.29163.9717379667769472182.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818075] Re: qemu x86 TCG doesn't support AVX
- insns
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1gzMYy-00073t-Im
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:21:30 -0500
+Received: from mga07.intel.com ([134.134.136.100]:44789)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
+	id 1gzMYy-000731-8k
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:21:28 -0500
+From: Yi Sun <yi.y.sun@linux.intel.com>
+Date: Thu, 28 Feb 2019 21:47:56 +0800
+Message-Id: <1551361677-28933-3-git-send-email-yi.y.sun@linux.intel.com>
+In-Reply-To: <1551361677-28933-1-git-send-email-yi.y.sun@linux.intel.com>
+References: <1551361677-28933-1-git-send-email-yi.y.sun@linux.intel.com>
+Subject: [Qemu-devel] [RFC v2 2/3] intel_iommu: add 256 bits qi_desc support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,110 +25,181 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, peterx@redhat.com, jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com, Yi Sun <yi.y.sun@linux.intel.com>
 
-Further debugging on IRC reveals that QEMU itself is not hanging, but
-the guest code is looping infinitely, because QEMU doesn't implement the
-AVX instruction set and isn't generating an undefined-instruction
-exception either. So the %rdx output from the AVX insn is wrong and the
-guest code never exits the loop (whose condition depends on %rdx).
+From: "Liu, Yi L" <yi.l.liu@intel.com>
 
-We should ideally:
- * make the x86 decoder properly handle insns that don't exist for the CPU =
-being emulated (not too difficult, but doesn't actually help in running thi=
-s test program)
- * implement AVX (a fair chunk of effort; it is being proposed as a GSoC pr=
-oject for this summer)
+Per Intel(R) VT-d 3.0, the qi_desc is 256 bits in Scalable
+Mode. This patch adds emulation of 256bits qi_desc.
 
--- =
+Signed-off-by: Liu, Yi L <yi.l.liu@intel.com>
+[Yi Sun is co-developer to rebase and refine the patch.]
+Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+---
+v2:
+    - modify s-o-b position.
+    - remove unnecessary macros.
+    - change 'iq_dw' type to bool.
+    - remove initialization to 'inv_desc->val[]'.
+    - modify 'VTDInvDesc' to add a union 'val[4]' to be compatible
+      with both legacy mode and scalable mode.
+---
+ hw/i386/intel_iommu.c          | 40 +++++++++++++++++++++++++++++-----------
+ hw/i386/intel_iommu_internal.h |  9 ++++++++-
+ include/hw/i386/intel_iommu.h  |  1 +
+ 3 files changed, 38 insertions(+), 12 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818075
-
-Title:
-  qemu x86 TCG doesn't support AVX insns
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm trying to execute code that has been built with -march=3Dskylake
-  -mtune=3Dgeneric -mavx2 under qemu-user x86-64 with -cpu Skylake-Client.
-  However this code just hangs at 100% CPU.
-
-  Adding input tracing shows that it is likely hanging when dealing with
-  an AVX instruction:
-
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.fma [bit 12]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.pcid [bit 1=
-7]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit=
- 21]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.tsc-deadlin=
-e [bit 24]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.f16c [bit 2=
-9]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.rdrand [bit=
- 30]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.hle [bit 4]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.avx2 [bit 5]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.invpcid [bi=
-t 10]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rtm [bit 11]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rdseed [bit=
- 18]
-  warning: TCG doesn't support requested feature: CPUID.80000001H:ECX.3dnow=
-prefetch [bit 8]
-  warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsavec [bit=
- 1]
-
-  IN:
-  0x4000b4ef3b:  c5 fb 5c ca              vsubsd   %xmm2, %xmm0, %xmm1
-  0x4000b4ef3f:  c4 e1 fb 2c d1           vcvttsd2si %xmm1, %rdx
-  0x4000b4ef44:  4c 31 e2                 xorq     %r12, %rdx
-  0x4000b4ef47:  48 85 d2                 testq    %rdx, %rdx
-  0x4000b4ef4a:  79 9e                    jns      0x4000b4eeea
-
-  [ hangs ]
-
-  Attaching a gdb produces this stacktrace:
-
-  (gdb) bt
-  #0  canonicalize (status=3D0x55a20ff67a88, parm=3D0x55a20bb807e0 <float64=
-_params>, part=3D...)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/fpu/softfloat.c:350
-  #1  float64_unpack_canonical (s=3D0x55a20ff67a88, f=3D0)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/fpu/softfloat.c:547
-  #2  float64_sub (a=3D0, b=3D4890909195324358656, status=3D0x55a20ff67a88)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/fpu/softfloat.c:776
-  #3  0x000055a20baa1949 in helper_subsd (env=3D<optimized out>, d=3D0x55a2=
-0ff67ad8, s=3D<optimized out>)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/target/i386/ops_sse.h:623
-  #4  0x000055a20cfcfea8 in static_code_gen_buffer ()
-  #5  0x000055a20ba3f764 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55a=
-20cea2180 <static_code_gen_buffer+15684720>)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/accel/tcg/cpu-exec.c:171
-  #6  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic=
- pointer>, tb=3D<optimized out>,
-      cpu=3D0x55a20cea2180 <static_code_gen_buffer+15684720>)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/accel/tcg/cpu-exec.c:615
-  #7  cpu_exec (cpu=3Dcpu@entry=3D0x55a20ff5f4d0)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/accel/tcg/cpu-exec.c:725
-  #8  0x000055a20ba6d728 in cpu_loop (env=3D0x55a20ff67780)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/linux-user/x86_64/../i386/cpu_loop.c:93
-  #9  0x000055a20ba049ff in main (argc=3D<optimized out>, argv=3D0x7ffc5857=
-2868, envp=3D<optimized out>)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/linux-user/main.c:819
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818075/+subscriptions
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 109fdbc..d1eb0c5 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2028,7 +2028,7 @@ static void vtd_handle_gcmd_qie(IntelIOMMUState *s, bool en)
+     if (en) {
+         s->iq = iqa_val & VTD_IQA_IQA_MASK(s->aw_bits);
+         /* 2^(x+8) entries */
+-        s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8);
++        s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8 - (s->iq_dw ? 1 : 0));
+         s->qi_enabled = true;
+         trace_vtd_inv_qi_setup(s->iq, s->iq_size);
+         /* Ok - report back to driver */
+@@ -2195,19 +2195,24 @@ static void vtd_handle_iotlb_write(IntelIOMMUState *s)
+ }
+ 
+ /* Fetch an Invalidation Descriptor from the Invalidation Queue */
+-static bool vtd_get_inv_desc(dma_addr_t base_addr, uint32_t offset,
++static bool vtd_get_inv_desc(IntelIOMMUState *s,
+                              VTDInvDesc *inv_desc)
+ {
+-    dma_addr_t addr = base_addr + offset * sizeof(*inv_desc);
+-    if (dma_memory_read(&address_space_memory, addr, inv_desc,
+-        sizeof(*inv_desc))) {
+-        error_report_once("Read INV DESC failed");
+-        inv_desc->lo = 0;
+-        inv_desc->hi = 0;
++    dma_addr_t base_addr = s->iq;
++    uint32_t offset = s->iq_head;
++    uint32_t dw = s->iq_dw ? 32 : 16;
++    dma_addr_t addr = base_addr + offset * dw;
++
++    if (dma_memory_read(&address_space_memory, addr, inv_desc, dw)) {
++        error_report_once("Read INV DESC failed.");
+         return false;
+     }
+     inv_desc->lo = le64_to_cpu(inv_desc->lo);
+     inv_desc->hi = le64_to_cpu(inv_desc->hi);
++    if (dw == 32) {
++        inv_desc->val[2] = le64_to_cpu(inv_desc->val[2]);
++        inv_desc->val[3] = le64_to_cpu(inv_desc->val[3]);
++    }
+     return true;
+ }
+ 
+@@ -2413,10 +2418,11 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+     uint8_t desc_type;
+ 
+     trace_vtd_inv_qi_head(s->iq_head);
+-    if (!vtd_get_inv_desc(s->iq, s->iq_head, &inv_desc)) {
++    if (!vtd_get_inv_desc(s, &inv_desc)) {
+         s->iq_last_desc_type = VTD_INV_DESC_NONE;
+         return false;
+     }
++
+     desc_type = inv_desc.lo & VTD_INV_DESC_TYPE;
+     /* FIXME: should update at first or at last? */
+     s->iq_last_desc_type = desc_type;
+@@ -2501,7 +2507,12 @@ static void vtd_handle_iqt_write(IntelIOMMUState *s)
+ {
+     uint64_t val = vtd_get_quad_raw(s, DMAR_IQT_REG);
+ 
+-    s->iq_tail = VTD_IQT_QT(val);
++    if (s->iq_dw && val & VTD_IQT_QT_256_RSV_BIT) {
++        error_report_once("%s: RSV bit is set: val=0x%"PRIx64,
++                          __func__, val);
++        return;
++    }
++    s->iq_tail = VTD_IQT_QT(s->iq_dw, val);
+     trace_vtd_inv_qi_tail(s->iq_tail);
+ 
+     if (s->qi_enabled && !(vtd_get_long_raw(s, DMAR_FSTS_REG) & VTD_FSTS_IQE)) {
+@@ -2770,6 +2781,12 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
+         } else {
+             vtd_set_quad(s, addr, val);
+         }
++        if (s->ecap & VTD_ECAP_SMTS &&
++            val & VTD_IQA_DW_MASK) {
++            s->iq_dw = true;
++        } else {
++            s->iq_dw = false;
++        }
+         break;
+ 
+     case DMAR_IQA_REG_HI:
+@@ -3477,6 +3494,7 @@ static void vtd_init(IntelIOMMUState *s)
+     s->iq_size = 0;
+     s->qi_enabled = false;
+     s->iq_last_desc_type = VTD_INV_DESC_NONE;
++    s->iq_dw = false;
+     s->next_frcd_reg = 0;
+     s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+              VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+@@ -3554,7 +3572,7 @@ static void vtd_init(IntelIOMMUState *s)
+ 
+     vtd_define_quad(s, DMAR_IQH_REG, 0, 0, 0);
+     vtd_define_quad(s, DMAR_IQT_REG, 0, 0x7fff0ULL, 0);
+-    vtd_define_quad(s, DMAR_IQA_REG, 0, 0xfffffffffffff007ULL, 0);
++    vtd_define_quad(s, DMAR_IQA_REG, 0, 0xfffffffffffff807ULL, 0);
+     vtd_define_long(s, DMAR_ICS_REG, 0, 0, 0x1UL);
+     vtd_define_long(s, DMAR_IECTL_REG, 0x80000000UL, 0x80000000UL, 0);
+     vtd_define_long(s, DMAR_IEDATA_REG, 0, 0xffffffffUL, 0);
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index fe72bc3..016fa4c 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -190,6 +190,7 @@
+ #define VTD_ECAP_EIM                (1ULL << 4)
+ #define VTD_ECAP_PT                 (1ULL << 6)
+ #define VTD_ECAP_MHMV               (15ULL << 20)
++#define VTD_ECAP_SMTS               (1ULL << 43)
+ 
+ /* CAP_REG */
+ /* (offset >> 4) << 24 */
+@@ -218,11 +219,14 @@
+ #define VTD_CAP_SAGAW_48bit         (0x4ULL << VTD_CAP_SAGAW_SHIFT)
+ 
+ /* IQT_REG */
+-#define VTD_IQT_QT(val)             (((val) >> 4) & 0x7fffULL)
++#define VTD_IQT_QT(dw_bit, val)     (dw_bit ? (((val) >> 5) & 0x3fffULL) : \
++                                     (((val) >> 4) & 0x7fffULL))
++#define VTD_IQT_QT_256_RSV_BIT      0x10
+ 
+ /* IQA_REG */
+ #define VTD_IQA_IQA_MASK(aw)        (VTD_HAW_MASK(aw) ^ 0xfffULL)
+ #define VTD_IQA_QS                  0x7ULL
++#define VTD_IQA_DW_MASK             0x800
+ 
+ /* IQH_REG */
+ #define VTD_IQH_QH_SHIFT            4
+@@ -324,6 +328,9 @@ union VTDInvDesc {
+         uint64_t lo;
+         uint64_t hi;
+     };
++    struct {
++        uint64_t val[4];
++    };
+     union {
+         VTDInvDescIEC iec;
+     };
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 72c5ca6..2877c94 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -238,6 +238,7 @@ struct IntelIOMMUState {
+     uint16_t iq_tail;               /* Current invalidation queue tail */
+     dma_addr_t iq;                  /* Current invalidation queue pointer */
+     uint16_t iq_size;               /* IQ Size in number of entries */
++    bool iq_dw;                     /* IQ descriptor width 256bit or not */
+     bool qi_enabled;                /* Set if the QI is enabled */
+     uint8_t iq_last_desc_type;      /* The type of last completed descriptor */
+ 
+-- 
+1.9.1
