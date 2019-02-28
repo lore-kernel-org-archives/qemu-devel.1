@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47430)
+Received: from eggs.gnu.org ([209.51.188.92]:47692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzOP1-0006ng-8O
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:19:20 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzOQI-0007Sp-SE
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzOOy-00037d-Sc
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:19:19 -0500
-Resent-Message-Id: <E1gzOOy-00037d-Sc@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gzOOy-00036M-GY
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:19:16 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155137071242.7448.9874258891015845619@49fa7ef69f7b>
-In-Reply-To: <20190228145624.24885-1-peter.maydell@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1gzOQ8-0003kY-UB
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:20:32 -0500
+Date: Thu, 28 Feb 2019 17:19:42 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190228171942.28f2f953@redhat.com>
+In-Reply-To: <20190228150324.25973-9-eric.auger@redhat.com>
+References: <20190228150324.25973-1-eric.auger@redhat.com>
+	<20190228150324.25973-9-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 28 Feb 2019 08:18:33 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] Enable build and install of our
- rST docs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 08/10] hw/arm/virt: Implement kvm_type
+ function for 4.0 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, philmd@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyODE0NTYyNC4yNDg4
-NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8x
-MV0gRW5hYmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiAgIDA5M2EyYWY3YjYuLjcxMWQxM2Q1ZTIgIG1hc3RlciAgICAg
-LT4gbWFzdGVyCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMjgxNDU2
-MjQuMjQ4ODUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIyODE0
-NTYyNC4yNDg4NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCjUzYjk0YWZmMmYgZG9jcy9jb25mLnB5OiBEb24ndCBoYXJkLWNvZGUgUUVN
-VSB2ZXJzaW9uCjMzMDg5OGQxMjYgTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhl
-IHBrZ3ZlcnNpb24iIGNvZGUKNzQ2ZGVkNjA1OCBNYWtlZmlsZSwgY29uZmlndXJlOiBTdXBwb3J0
-IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uCmFmNGRkYWM1N2EgZG9jczogUHJvdmlkZSBzZXBh
-cmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50CjFlMjZhNjUwNDggZG9jcy9jb25m
-LnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncwo3YWIwODQyYmE0IGRvY3MvY29uZi5weTogRG9u
-J3QgaW5jbHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1aWxkCmI0ZTRhZWRhMzEgZG9jcy9jb25m
-LnB5OiBDb25maWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lCmUyZTNkMTRkODAgZG9jcy9jb25m
-LnB5OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeQozZGE1NGQyMmUwIGRvY3M6IENv
-bW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQKZjU3YmU3ZDFlYiBkb2Nz
-OiBDb252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdAo5YzM4MzlhZGQxIGRvY3MvY3B1LWhv
-dHBsdWcucnN0OiBGaXggclNUIG1hcmt1cCBpc3N1ZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
-MTEgQ2hlY2tpbmcgY29tbWl0IDljMzgzOWFkZDEyMiAoZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZp
-eCByU1QgbWFya3VwIGlzc3VlcykKMi8xMSBDaGVja2luZyBjb21taXQgZjU3YmU3ZDFlYjUwIChk
-b2NzOiBDb252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdCkKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-MjM6IApyZW5hbWUgZnJvbSBkb2NzL2RldmVsL21lbW9yeS50eHQKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMTk1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTEgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KMy8xMSBDaGVja2luZyBjb21taXQgM2RhNTRkMjJlMDdkIChkb2NzOiBDb21t
-aXQgaW5pdGlhbCBmaWxlcyBmcm9tIHNwaGlueC1xdWlja3N0YXJ0KQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDE4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CjQvMTEgQ2hlY2tpbmcgY29tbWl0IGUyZTNkMTRkODA4MiAoZG9jcy9jb25mLnB5OiBEaXNhYmxl
-IHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQgYjRlNGFlZGEz
-MTdkIChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUpCjYvMTEg
-Q2hlY2tpbmcgY29tbWl0IDdhYjA4NDJiYTQxZSAoZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRl
-IHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0IDFlMjZhNjUw
-NDg4ZCAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8xMSBDaGVja2lu
-ZyBjb21taXQgYWY0ZGRhYzU3YTZmIChkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNvbmYucHkgZm9y
-IGVhY2ggbWFudWFsIHdlIHdhbnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEwMTogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE4NjogRklMRTogZG9j
-cy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2NyaXB0aW9uJ10g
-PSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJpbGl0eSBHdWlk
-ZScKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IDc0
-NmRlZDYwNTg2YiAoTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9j
-dW1lbnRhdGlvbikKMTAvMTEgQ2hlY2tpbmcgY29tbWl0IDMzMDg5OGQxMjZmNiAoTWFrZWZpbGU6
-IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNr
-aW5nIGNvbW1pdCA1M2I5NGFmZjJmNTIgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFF
-TVUgdmVyc2lvbikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, 28 Feb 2019 16:03:22 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
+
+> This patch implements the machine class kvm_type() callback.
+> It returns the number of bits requested to implement the whole GPA
+> range including the RAM and IO regions located beyond.
+> The returned value in passed though the KVM_CREATE_VM ioctl and
+> this allows KVM to set the stage2 tables dynamically.
+> 
+> To compute the highest GPA used in the memory map, kvm_type()
+> must freeze the memory map by calling virt_set_memmap().
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> v7 -> v8:
+> - remove vmc->no_extended_memmap and vms->extended_memmap
+> 
+> v6 -> v7:
+> - Introduce RAMBASE and rename add LEGACY_ prefix in that patch
+> - use local variables with explicit names in virt_set_memmap:
+>   device_memory_base, device_memory_size
+> - add an extended_memmap field in the class
+> 
+> v5 -> v6:
+> - add some comments
+> - high IO region cannot start before 256GiB
+> ---
+>  hw/arm/virt.c | 39 ++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 38 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index d7aa7d3f9d..7a158571b7 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1439,7 +1439,13 @@ static void machvirt_init(MachineState *machine)
+>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+>      bool aarch64 = true;
+>  
+> -    virt_set_memmap(vms);
+> +    /*
+> +     * In accelerated mode, the memory map is computed in kvm_type()
+s/in/earlier in/
+
+> +     * to create a VM with the right number of IPA bits.
+> +     */
+> +    if (!kvm_enabled()) {
+maybe check not for KVM but for vms->memmap == NULL
+so it would match with comment and be clear that we initializing memmap
+because nobody else did it yet.
+
+> +        virt_set_memmap(vms);
+> +    }
+>  
+>      /* We can probe only here because during property set
+>       * KVM is not available yet
+> @@ -1828,6 +1834,36 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+>      return NULL;
+>  }
+>  
+> +/*
+> + * for arm64 kvm_type [7-0] encodes the requested number of bits
+> + * in the IPA address space
+> + */
+> +static int virt_kvm_type(MachineState *ms, const char *type_str)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(ms);
+> +    int max_vm_pa_size = kvm_arm_get_max_vm_ipa_size(ms);
+> +    int requested_pa_size;
+> +
+> +    /* we freeze the memory map to compute the highest gpa */
+> +    virt_set_memmap(vms);
+> +
+
+> +    requested_pa_size = 64 - clz64(vms->highest_gpa);
+> +
+> +    if (requested_pa_size > max_vm_pa_size) {
+> +        error_report("-m and ,maxmem option values "
+> +                     "require an IPA range (%d bits) larger than "
+> +                     "the one supported by the host (%d bits)",
+> +                     requested_pa_size, max_vm_pa_size);
+> +       exit(1);
+> +    }
+this part is recurring pattern, is it worth using a helper function?
+
+> +    /*
+> +     * By default we return 0 which corresponds to an implicit legacy
+> +     * 40b IPA setting. Otherwise we return the actual requested PA
+> +     * logsize
+> +     */
+> +    return requested_pa_size > 40 ? requested_pa_size : 0;
+> +}
+> +
+>  static void virt_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> @@ -1852,6 +1888,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+>      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
+> +    mc->kvm_type = virt_kvm_type;
+>      assert(!mc->get_hotplug_handler);
+>      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+>      hc->plug = virt_machine_device_plug_cb;
