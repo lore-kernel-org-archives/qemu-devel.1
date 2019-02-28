@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50989)
+Received: from eggs.gnu.org ([209.51.188.92]:52153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1gzQXy-0005zC-Lz
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:36:44 -0500
+	(envelope-from <thuth@redhat.com>) id 1gzQcJ-0000XW-Hc
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1gzQXw-0002er-NY
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:36:42 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:34626)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1gzQXw-0002dv-Eb
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:36:40 -0500
-Received: by mail-wm1-f67.google.com with SMTP id o10so7189429wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:36:40 -0800 (PST)
-Date: Thu, 28 Feb 2019 19:36:37 +0100
-From: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190228183637.f7v6phv3kqtin3ps@dritchie>
-References: <20190227165212.34901-1-slp@redhat.com>
-	<20190227173714.GA6276@localhost.localdomain>
-	<20190228150119.c77xcmrp4ogg32eu@dritchie>
-	<20190228155053.GB5563@linux.fritz.box>
-	<20190228170436.mifnzx6agowzxyq3@dritchie>
-	<20190228172202.GC5563@linux.fritz.box>
+	(envelope-from <thuth@redhat.com>) id 1gzQcI-0006Om-DL
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:41:11 -0500
+References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
+	<20190226045304.25618-41-david@gibson.dropbear.id.au>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ec8e11d1-c966-b814-98da-a6ab56572834@redhat.com>
+Date: Thu, 28 Feb 2019 19:40:52 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190228172202.GC5563@linux.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH] virtio-blk: dataplane: release AioContext
- before blk_set_aio_context
+In-Reply-To: <20190226045304.25618-41-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 40/50] spapr_events: add support for phb
+ hotplug events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,160 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, gkurz@kaod.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, clg@kaod.org
 
-On Thu, Feb 28, 2019 at 06:22:02PM +0100, Kevin Wolf wrote:
-> Am 28.02.2019 um 18:04 hat Sergio Lopez geschrieben:
-> > On Thu, Feb 28, 2019 at 04:50:53PM +0100, Kevin Wolf wrote:
-> > > Am 28.02.2019 um 16:01 hat Sergio Lopez geschrieben:
-> > > > On Wed, Feb 27, 2019 at 06:37:14PM +0100, Kevin Wolf wrote:
-> > > > > Am 27.02.2019 um 17:52 hat Sergio Lopez geschrieben:
-> > > > > > Stopping the dataplane requires calling to blk_set_aio_context, which
-> > > > > > may need to wait for a running job to be completed or paused.
-> > > > > > 
-> > > > > > As stopping the dataplane is something that can be triggered from a vcpu
-> > > > > > thread (due to the Guest requesting to stop the device), while the job
-> > > > > > itself may be managed by an iothread, holding the AioContext will lead
-> > > > > > to a deadlock, where the first one is waiting for the job to pause or
-> > > > > > finish, while the second can't make any progress as it's waiting for the
-> > > > > > AioContext to be released:
-> > > > > > 
-> > > > > >  Thread 6 (LWP 90472)
-> > > > > >  #0  0x000055a6f8497aee in blk_root_drained_end
-> > > > > >  #1  0x000055a6f84a7926 in bdrv_parent_drained_end
-> > > > > >  #2  0x000055a6f84a799f in bdrv_do_drained_end
-> > > > > >  #3  0x000055a6f84a82ab in bdrv_drained_end
-> > > > > >  #4  0x000055a6f8498be8 in blk_drain
-> > > > > >  #5  0x000055a6f84a22cd in mirror_drain
-> > > > > >  #6  0x000055a6f8457708 in block_job_detach_aio_context
-> > > > > >  #7  0x000055a6f84538f1 in bdrv_detach_aio_context
-> > > > > >  #8  0x000055a6f8453a96 in bdrv_set_aio_context
-> > > > > >  #9  0x000055a6f84999f8 in blk_set_aio_context
-> > > > > >  #10 0x000055a6f81802c8 in virtio_blk_data_plane_stop
-> > > > > >  #11 0x000055a6f83cfc95 in virtio_bus_stop_ioeventfd
-> > > > > >  #12 0x000055a6f83d1f81 in virtio_pci_common_write
-> > > > > >  #13 0x000055a6f83d1f81 in virtio_pci_common_write
-> > > > > >  #14 0x000055a6f8148d62 in memory_region_write_accessor
-> > > > > >  #15 0x000055a6f81459c9 in access_with_adjusted_size
-> > > > > >  #16 0x000055a6f814a608 in memory_region_dispatch_write
-> > > > > >  #17 0x000055a6f80f1f98 in flatview_write_continue
-> > > > > >  #18 0x000055a6f80f214f in flatview_write
-> > > > > >  #19 0x000055a6f80f6a7b in address_space_write
-> > > > > >  #20 0x000055a6f80f6b15 in address_space_rw
-> > > > > >  #21 0x000055a6f815da08 in kvm_cpu_exec
-> > > > > >  #22 0x000055a6f8132fee in qemu_kvm_cpu_thread_fn
-> > > > > >  #23 0x000055a6f8551306 in qemu_thread_start
-> > > > > >  #24 0x00007f9bdf5b9dd5 in start_thread
-> > > > > >  #25 0x00007f9bdf2e2ead in clone
-> > > > > > 
-> > > > > >  Thread 8 (LWP 90467)
-> > > > > >  #0  0x00007f9bdf5c04ed in __lll_lock_wait
-> > > > > >  #1  0x00007f9bdf5bbde6 in _L_lock_941
-> > > > > >  #2  0x00007f9bdf5bbcdf in __GI___pthread_mutex_lock
-> > > > > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl
-> > > > > >  #4  0x000055a6f854be77 in co_schedule_bh_cb
-> > > > > >  #5  0x000055a6f854b781 in aio_bh_poll
-> > > > > >  #6  0x000055a6f854b781 in aio_bh_poll
-> > > > > >  #7  0x000055a6f854f01b in aio_poll
-> > > > > >  #8  0x000055a6f825a488 in iothread_run
-> > > > > >  #9  0x000055a6f8551306 in qemu_thread_start
-> > > > > >  #10 0x00007f9bdf5b9dd5 in start_thread
-> > > > > >  #11 0x00007f9bdf2e2ead in clone
-> > > > > > 
-> > > > > >  (gdb) thread 8
-> > > > > >  [Switching to thread 8 (Thread 0x7f9bd6dae700 (LWP 90467))]
-> > > > > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl (mutex=0x55a6fac8fea0,
-> > > > > >      file=0x55a6f8730c3f "util/async.c", line=511) at util/qemu-thread-posix.c:66
-> > > > > >  66	    err = pthread_mutex_lock(&mutex->lock);
-> > > > > >  (gdb) up 3
-> > > > > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl (mutex=0x55a6fac8fea0,
-> > > > > >      file=0x55a6f8730c3f "util/async.c", line=511) at util/qemu-thread-posix.c:66
-> > > > > >  66	    err = pthread_mutex_lock(&mutex->lock);
-> > > > > >  (gdb) p mutex.lock.__data.__owner
-> > > > > >  $6 = 90472
-> > > > > > 
-> > > > > > Signed-off-by: Sergio Lopez <slp@redhat.com>
-> > > > > > ---
-> > > > > >  hw/block/dataplane/virtio-blk.c | 3 +--
-> > > > > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-> > > > > > index 8c37bd314a..358e6ae89b 100644
-> > > > > > --- a/hw/block/dataplane/virtio-blk.c
-> > > > > > +++ b/hw/block/dataplane/virtio-blk.c
-> > > > > > @@ -280,12 +280,11 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
-> > > > > >  
-> > > > > >      aio_context_acquire(s->ctx);
-> > > > > >      aio_wait_bh_oneshot(s->ctx, virtio_blk_data_plane_stop_bh, s);
-> > > > > > +    aio_context_release(s->ctx);
-> > > > > >  
-> > > > > >      /* Drain and switch bs back to the QEMU main loop */
-> > > > > >      blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
-> > > > > >  
-> > > > > > -    aio_context_release(s->ctx);
-> > > > > > -
-> > > > > 
-> > > > > blk_set_aio_context() requires that the caller hold the lock for the
-> > > > > source context, so I'm afraid this is wrong.
-> > > > 
-> > > > TBH, I was quite sure this patch was wrong myself, but I thought it was
-> > > > still a good way to illustrate the issue.
-> > > > 
-> > > > > However, I think the problem might already be fixed with my "block: Use
-> > > > > normal drain for bdrv_set_aio_context()" (contained in a pull request,
-> > > > > which isn't merged yet), which makes bdrv_set_aio_context() use a real
-> > > > > drain operation. This way, the requests of the mirror jobs should be
-> > > > > already drained before we even call into block_job_detach_aio_context().
-> > > > > 
-> > > > > Can you give this a try and see whether it fixes your problem?
-> > > > 
-> > > > I've applied your patchset to my local copy, but it doesn't fix the
-> > > > issue.
-> > > > 
-> > > > The problem is the coroutine is already scheduled to be run in the
-> > > > iothread context, which means job->busy == true, so we can't switch to
-> > > > it from any other place.
-> > > 
-> > > I still don't understand this because with job->paused == true the
-> > > hanging loop wouldn't even be started. And after bdrv_drained_begin()
-> > > returns, all jobs that use the node in question should be paused (see
-> > > child_job_drained_begin/poll).
-> > > 
-> > > So somehow that drain (called in bdrv_set_aio_context()) doesn't seem to
-> > > fully do what it is supposed to do?
-> > 
-> > IIUC, child_job_drained_begin() requests the job to be paused (something
-> > that block_job_detach_aio_context() also does), but we don't get to
-> > child_job_drained_poll() as bdrv_parent_drained_begin_single() is called
-> > with "poll == false" by bdrv_parent_drained_begin().
-> > 
-> > But even if we did, that probably won't help in some scenarios, as
-> > mirror's drained_poll implementation just checks if there are in_flight
-> > requests, so it might happen that BDRV_POLL_WHILE returns without having
-> > called aio_wait() a single time.
-> > 
-> > In other words, I think the drain code makes sure there aren't any
-> > in_flight requests in the chain, but doesn't provide by itself a
-> > guarantee that the jobs have been paused.
+On 26/02/2019 05.52, David Gibson wrote:
+> From: Michael Roth <mdroth@linux.vnet.ibm.com>
 > 
-> Yes, seems this is what it does. But I think that's not enough because
-> if the job isn't paused, it can still issue new requests.
+> Extend the existing EPOW event format we use for PCI
+> devices to emit PHB plug/unplug events.
 > 
-> I'm not sure whether mirror_drained_poll() or child_job_drained_poll()
-> is to blame, but the logic is wrong there: We should only return that
-> the job is quiescent when it has reached a pause point _and_
-> s->in_flight == 0.
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Message-Id: <155059671405.1466090.535964535260503283.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_events.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index b9c7ecb9e9..ab9a1f0063 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -526,6 +526,9 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
+>      case SPAPR_DR_CONNECTOR_TYPE_CPU:
+>          hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_CPU;
+>          break;
+> +    case SPAPR_DR_CONNECTOR_TYPE_PHB:
+> +        hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_PHB;
+> +        break;
+>      default:
+>          /* we shouldn't be signaling hotplug events for resources
+>           * that don't support them
 
-If we expect this to be the case even when
-bdrv_parent_drained_begin_single() is called from
-bdrv_parent_drained_begin() with poll == false, then we need to make the
-job_pause() at child_job_drained_begin() to take effect immeditaly,
-probaly putting an AIO_WAIT_WHILE afterwards.
+I think this patch (or something else in this PULL request) broke CPU
+hot-plugging with older machine types:
 
-Otherwise, we can simply add an extra condition at
-child_job_drained_poll(), before the drv->drained_poll(), to return true
-if the job isn't yet paused.
+$ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-test -m=slow
+/ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=6: OK
+/ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=6: OK
+/ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=6: OK
+/ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=6: OK
+/ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=6: OK
+/ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=6: OK
+/ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=6: OK
+/ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=6: **
+ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_to_source: assertion failed: (source->enabled)
+Broken pipe
+/home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
+Aborted (core dumped)
 
-Thanks,
-Sergio (slp).
+Could you please have a look?
+
+ Thomas
