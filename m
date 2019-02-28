@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47633)
+Received: from eggs.gnu.org ([209.51.188.92]:48836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzQKI-00040V-7i
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:22:35 -0500
+	(envelope-from <eblake@redhat.com>) id 1gzQPE-0008Bg-2e
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:27:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzQKG-000561-TP
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:22:34 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38382)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzQKG-00053l-LK
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:22:32 -0500
-Received: by mail-pg1-x544.google.com with SMTP id m2so10111342pgl.5
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:22:31 -0800 (PST)
-References: <20190226113915.20150-1-david@redhat.com>
-	<20190226113915.20150-34-david@redhat.com>
-	<9c8913f5-76b6-1175-5574-19f19d1e8eef@linaro.org>
-	<c37a7e69-934c-ab2e-08a1-c67cb3e156c5@redhat.com>
-	<f4e08332-be07-e2f1-be20-fe4406215427@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <12668b8f-18c8-c656-d28f-9cc36b3171c7@linaro.org>
-Date: Thu, 28 Feb 2019 10:22:27 -0800
+	(envelope-from <eblake@redhat.com>) id 1gzQPD-0007JJ-AW
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:27:40 -0500
+References: <20190227162035.18543-1-berrange@redhat.com>
+	<20190227162035.18543-2-berrange@redhat.com>
+	<e6944ece-e00e-643a-fa71-deb18841e2fb@redhat.com>
+	<20190228181812.GJ9217@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2c4ee767-de99-2fb4-fa3d-5f00a5b978fe@redhat.com>
+Date: Thu, 28 Feb 2019 12:27:10 -0600
 MIME-Version: 1.0
-In-Reply-To: <f4e08332-be07-e2f1-be20-fe4406215427@redhat.com>
+In-Reply-To: <20190228181812.GJ9217@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 33/33] s390x/tcg: Implement VECTOR
- UNPACK *
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 1/3] qemu-nbd: add support for
+ authorization of TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 2/28/19 2:54 AM, David Hildenbrand wrote:
-> Hmm, as v2 and v3 are handled concatenated it is not that easy. I am not
-> sure if we can handle this without a temporary vector.
-> 
-> I thought about packing them first interleaved
-> 
-> v2 = [v2e0, v2e1]
-> v3 = [v3e0, ve31]
-> v1 = [v2e0_packed, v3e0_packed, v2e1_packed, v3e1_packed]
-> 
-> And then restoring the right order
-> 
-> v1 = [v2e0_packed, v2e1_packed, v3e0_packed, v3e1_packed]
-> 
-> But than the second operation seems to be the problem. That shuffling
-> would have to be hard coded as far as I can see. (shuffling with MO_8 is
-> nasty -> 14 element shave to be exchanged, in my opinion needing
-> eventually 14 temporary variables)
+On 2/28/19 12:18 PM, Daniel P. Berrang=C3=A9 wrote:
 
-I suppose you could do it in registers.
+>> It doesn't hold up this patch, but I note that with the qemu QMP comma=
+nd
+>> changes you make in 2/3, you document that the object can be
+>> created/removed on the fly, and the server will adjust which clients c=
+an
+>> then subsequently connect. Is there any need for the same sort of
+>> runtime configurability in qemu-nbd, and if so, how would we accomplis=
+h
+>> it?  Perhaps by having a command-line option to parse --tls-authz from=
+ a
+>> file, where you can send SIGHUP to qemu-nbd to force it to re-read the
+>> file?  Or am I worrying about something unlikely to be needed in pract=
+ice?
+>=20
+> Well the QAuthZListFile object type can store its contents in an extern=
+al
+> file that gets auto-reloaded upon inotify triggers from the main loop.
+> The QAuthZPAM type can also be fairly dynamic depending on its backend.
+> I think any single process is unlikely  to need to switch between
+> different object types, so this is good enough dynamic support.
 
-  load_element_i64(t1, v2, 0);
-  for (i = 1; i < N; i++) {
-    load_element_i64(t3, v2, i, es);
-    tcg_gen_deposit_i64(t1, t1, t3, i << es, 1 << es);
-  }
-  // repeat for v3 into t2
-  // store t1,t2 into v1.
+That, and QMP nbd-server-start can serve up multiple exports, while
+qemu-nbd serves exactly one export.
 
-Now you have only 3 temporaries, which is manageable.
+I also note that my work on incremental backups has raised the topic
+that we someday want to support multiple parallel NBD servers.  Right
+now, you are limited to exactly one (even though it can server multiple
+exports), which makes serving different content to different clients
+harder than if you could have different servers on separate ports with
+per-server settings on which clients to allow.  Or, if we have tls-authz
+items per-export instead of per-server, so that different clients see a
+different subset of available exports when doing NBD_OPT_LIST.
 
-The only question, when it comes to MO_8, is whether the code expansion of this
-is reasonable (16 byte loads, 15 deposits, 2 stores -- minimum 33 insns,
-probably 48 for x86_64 host), or whether a helper function would be better in
-the end.  But then the same is true for all of the other merge & unpack
-operations wrt MO_8.
+>=20
+> I can't help thinking we should add QMP to qemu-nbd one day though....
 
+Yeah, as QMP nbd server gets more powerful, we may eventually need a
+similar monitor interface into controlling a long-running qemu-nbd
+process...
 
-r~
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
