@@ -1,14 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44376)
+Received: from eggs.gnu.org ([209.51.188.92]:44716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gzHy5-0001ND-S0
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:27:06 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gzHzN-00021E-OX
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:28:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gzHy4-00022s-TB
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:27:05 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Thu, 28 Feb 2019 12:26:59 +0300
-Message-Id: <1551346019-293202-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2] qcow2: discard bitmap when removed
+	(envelope-from <kraxel@redhat.com>) id 1gzHzJ-0002QX-6v
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:28:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43948)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gzHzH-0002PR-4W
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 04:28:21 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC1E130B27D3
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 09:28:16 +0000 (UTC)
+Date: Thu, 28 Feb 2019 10:28:15 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190228092815.jmlrnriddvovrn4u@sirius.home.kraxel.org>
+References: <20190225154335.11397-1-fziglio@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190225154335.11397-1-fziglio@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] audio: Use g_strdup_printf instead of
+ manual building a string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,42 +33,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
+To: Frediano Ziglio <fziglio@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-When a bitmap is removed, we can clean some space on the disk. The size
-of a cluster may be larger, so is the size of the bitmap that includes
-many clusters. Some bitmaps can be as large as tens of megabytes.
-The flag QCOW2_DISCARD_ALWAYS allows a call to the raw_co_pdiscard()
-that does the actual cleaning of the image on disk, while with the flag
-QCOW2_DISCARD_OTHER, a reference count of the cluster is updated only.
+On Mon, Feb 25, 2019 at 03:43:34PM +0000, Frediano Ziglio wrote:
+> Instead of using lot of low level function and manually allocate
+> the temporary string in audio_process_options use more high
+> level GLib function. The function is not used in hot path but to
+> read some initial setting.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
-v1: Discard old bitmap directories in QCOW2 image
+Added to qudio queue.
 
-In the first version of the patch, any call to qcow2_free_clusters() in
-block/qcow2-bitmap.c was with the flag QCOW2_DISCARD_ALWAYS, even in the
-cases when the cleaned space is insignificant, particularly, in case of
-bitmap directories.
-Discussed in the email thread with the message ID
-<1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-
- block/qcow2-bitmap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 3ee524d..162744e 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -202,7 +202,7 @@ static void clear_bitmap_table(BlockDriverState *bs, uint64_t *bitmap_table,
-             continue;
-         }
- 
--        qcow2_free_clusters(bs, addr, s->cluster_size, QCOW2_DISCARD_OTHER);
-+        qcow2_free_clusters(bs, addr, s->cluster_size, QCOW2_DISCARD_ALWAYS);
-         bitmap_table[i] = 0;
-     }
- }
--- 
-1.8.3.1
+thanks,
+  Gerd
