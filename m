@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48836)
+Received: from eggs.gnu.org ([209.51.188.92]:49002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzQPE-0008Bg-2e
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:27:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzQQC-0000aS-DN
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:28:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzQPD-0007JJ-AW
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:27:40 -0500
-References: <20190227162035.18543-1-berrange@redhat.com>
-	<20190227162035.18543-2-berrange@redhat.com>
-	<e6944ece-e00e-643a-fa71-deb18841e2fb@redhat.com>
-	<20190228181812.GJ9217@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2c4ee767-de99-2fb4-fa3d-5f00a5b978fe@redhat.com>
-Date: Thu, 28 Feb 2019 12:27:10 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gzQQB-0007ka-ER
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:28:40 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gzQQA-0007hj-HQ
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:28:38 -0500
+Received: by mail-ot1-x344.google.com with SMTP id m1so18591470otf.5
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:28:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190228181812.GJ9217@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <155137665241.44413.528147250140332507.stgit@bahia.lan>
+In-Reply-To: <155137665241.44413.528147250140332507.stgit@bahia.lan>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 18:28:23 +0000
+Message-ID: <CAFEAcA_B4fMvhP+cXhZQX0g5FMq1MvPxcfboT=pDSu9Ww_fFNA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 1/3] qemu-nbd: add support for
- authorization of TLS clients
+Subject: Re: [Qemu-devel] [PATCH] usb-mtp: Fix build with gcc 9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>
 
-On 2/28/19 12:18 PM, Daniel P. Berrang=C3=A9 wrote:
+On Thu, 28 Feb 2019 at 17:57, Greg Kurz <groug@kaod.org> wrote:
+>
+> Build fails with gcc 9:
+>
+>   CC      hw/usb/dev-mtp.o
+> hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
+> hw/usb/dev-mtp.c:1754:36: error: taking address of packed member of =E2=
+=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
+[-Werror=3Daddress-of-packed-member]
+>  1754 |                             dataset->filename);
+>       |                             ~~~~~~~^~~~~~~~~~
+> cc1: all warnings being treated as errors
+>
+> The way the MTP protocol encodes strings with a leading 8-bit unsigned
+> integer containing the string length causes the @filename field of the
+> packed ObjectInfo structure to be unaligned.
+>
+> Use a temporary buffer for the utf16 filename instead of passing the
+> dataset->filename pointer around.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/usb/dev-mtp.c |   18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index 4ee4fc5a893a..8a0ef7f9f4a8 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1692,13 +1692,25 @@ static void usb_mtp_write_metadata(MTPState *s, u=
+int64_t dlen)
+>      MTPObject *o;
+>      MTPObject *p =3D usb_mtp_object_lookup(s, s->dataset.parent_handle);
+>      uint32_t next_handle =3D s->next_handle;
+> +    uint16_t *utf16_filename;
+> +    uint8_t filename_len;
+>
+>      assert(!s->write_pending);
+>      assert(p !=3D NULL);
+>
+> -    filename =3D utf16_to_str(MIN(dataset->length,
+> -                                dlen - offsetof(ObjectInfo, filename)),
+> -                            dataset->filename);
+> +    /*
+> +     * MTP Specification 3.2.3 Strings
+> +     * Strings in PTP (and thus MTP) consist of standard 2-byte Unicode
+> +     * characters as defined by ISO 10646. Strings begin with a single, =
+8-bit
+> +     * unsigned integer that identifies the number of characters to foll=
+ow (not
+> +     * bytes).
+> +     *
+> +     * This causes dataset->filename to be unaligned.
+> +     */
+> +    filename_len =3D MIN(dataset->length, dlen - offsetof(ObjectInfo, fi=
+lename));
+> +    utf16_filename =3D g_memdup(dataset->filename, filename_len * 2);
+> +    filename =3D utf16_to_str(filename_len, utf16_filename);
+> +    g_free(utf16_filename);
 
->> It doesn't hold up this patch, but I note that with the qemu QMP comma=
-nd
->> changes you make in 2/3, you document that the object can be
->> created/removed on the fly, and the server will adjust which clients c=
-an
->> then subsequently connect. Is there any need for the same sort of
->> runtime configurability in qemu-nbd, and if so, how would we accomplis=
-h
->> it?  Perhaps by having a command-line option to parse --tls-authz from=
- a
->> file, where you can send SIGHUP to qemu-nbd to force it to re-read the
->> file?  Or am I worrying about something unlikely to be needed in pract=
-ice?
->=20
-> Well the QAuthZListFile object type can store its contents in an extern=
-al
-> file that gets auto-reloaded upon inotify triggers from the main loop.
-> The QAuthZPAM type can also be fairly dynamic depending on its backend.
-> I think any single process is unlikely  to need to switch between
-> different object types, so this is good enough dynamic support.
+I think there's an underlying problem with this code which we
+should deal with differently. The 'dataset' local in this
+file is (I think) pointing at on-the-wire information from
+the USB device, but we're treating it as an array of
+host-order uint16_t values. Is this really correct on a
+big-endian host ? Do we do the right thing if we are
+passed a malicious USB packet that ends halfway through a
+utf16_t character, or do we index off the end of the packet
+data ?
 
-That, and QMP nbd-server-start can serve up multiple exports, while
-qemu-nbd serves exactly one export.
+I think that we should define the "filename" field in
+ObjectInfo to be a uint8_t array, make utf16_to_str()
+take a uint8_t* for its data array, and have it do the
+reading of data from the array with lduw_he_p(), which
+can handle accessing unaligned data.
 
-I also note that my work on incremental backups has raised the topic
-that we someday want to support multiple parallel NBD servers.  Right
-now, you are limited to exactly one (even though it can server multiple
-exports), which makes serving different content to different clients
-harder than if you could have different servers on separate ports with
-per-server settings on which clients to allow.  Or, if we have tls-authz
-items per-export instead of per-server, so that different clients see a
-different subset of available exports when doing NBD_OPT_LIST.
+We should also check what the endianness of other fields in
+the ObjectInfo struct is (eg "format" and "size" and see
+whether we should be doing byte swapping here.
 
->=20
-> I can't help thinking we should add QMP to qemu-nbd one day though....
+PS: it is a bit confusing that in this function the local
+variable "dataset" is a pointer to a struct of entirely
+different type to the one that s->dataset is.
 
-Yeah, as QMP nbd server gets more powerful, we may eventually need a
-similar monitor interface into controlling a long-running qemu-nbd
-process...
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
