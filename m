@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36942)
+Received: from eggs.gnu.org ([209.51.188.92]:37458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gzElQ-0007TE-RN
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 01:01:50 -0500
+	(envelope-from <peterx@redhat.com>) id 1gzEpN-0008Ix-Ne
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 01:05:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gzElQ-0006W4-3E
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 01:01:48 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:50004
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gzElM-0006NW-Dq
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 01:01:46 -0500
-References: <CAKyx-3Paa6_RreGZw3sT+qmwu1=_DLnR_RDxa_gN20vwD1EnLw@mail.gmail.com>
-	<20190225152618.r3epnypkpu6fyokt@sirius.home.kraxel.org>
-	<A17B6D30-F428-48E5-B9D0-6F6E7DEE3778@gmail.com>
-	<20190226064347.i5kvwazmz3xcupkj@sirius.home.kraxel.org>
-	<CAKyx-3OOkkdSQ=UAucP_ZpormrEczwNhEpAnVtFeQOSOrnD7Vg@mail.gmail.com>
-	<20190227052755.3lgo3265kaa6bzmi@sirius.home.kraxel.org>
-	<1ef851d2-4148-56f0-65ac-a0e75022f20e@ilande.co.uk>
-	<20190228054923.wxguahjavmqybddn@sirius.home.kraxel.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <7de277ad-ab04-795b-8399-7a01d476e130@ilande.co.uk>
-Date: Thu, 28 Feb 2019 06:01:30 +0000
+	(envelope-from <peterx@redhat.com>) id 1gzEpH-0005QG-Tm
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 01:05:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58570)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gzEpF-00038F-O5
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 01:05:45 -0500
+Date: Thu, 28 Feb 2019 13:58:56 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190228055856.GV13653@xz-x1>
+References: <20190222031413.20250-1-peterx@redhat.com>
+	<20190222031413.20250-5-peterx@redhat.com>
+	<CAMxuvax9+NNe6Mh3TnFgt6p+q=kcgR1tEiQNr+be8bJRDUPCJw@mail.gmail.com>
+	<20190222065724.GH8904@xz-x1>
+	<20190227133838.GB22539@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190228054923.wxguahjavmqybddn@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Questions about EDID
+Content-Disposition: inline
+In-Reply-To: <20190227133838.GB22539@stefanha-x1.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] iothread: push gcontext earlier in the
+ thread_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: G 3 <programmingkidx@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 28/02/2019 05:49, Gerd Hoffmann wrote:
+On Wed, Feb 27, 2019 at 01:38:38PM +0000, Stefan Hajnoczi wrote:
+> On Fri, Feb 22, 2019 at 02:57:24PM +0800, Peter Xu wrote:
+> > On Fri, Feb 22, 2019 at 07:37:02AM +0100, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > Hi
+> > >=20
+> > > On Fri, Feb 22, 2019 at 4:14 AM Peter Xu <peterx@redhat.com> wrote:
+> > > >
+> > > > We were pushing the context until right before running the gmainl=
+oop.
+> > > > Now since we have everything unconditionally, we can move this
+> > > > earlier.
+> > > >
+> > > > One benefit is that now it's done even before init_done_sem, so a=
+s
+> > > > long as the iothread user calls iothread_create() and completes, =
+we
+> > > > know that the thread stack is ready.
+> > > >
+> > >=20
+> > > This will change the default context in the iothread, for code runn=
+ing
+> > > there. This may not be a good idea. Until now, only sources dispatc=
+hed
+> > > from iothread_get_g_main_context() would have default context
+> > > associated to it.
+> > >=20
+> > > I don't know if the current behaviour is intentional, but it has so=
+me
+> > > logic. With this change, you may create hidden races, by changing t=
+he
+> > > default context of sources to the iothread.
+> >=20
+> > Yes I agree that the behavior will be changed in this patch that even
+> > if the iothread user does not use the gcontext they'll also have the
+> > context set.  I would think it should be ok because IMHO events hooke=
+d
+> > onto the aio context should not depend on the gcontext, but indeed I'=
+d
+> > like to get some confirmation from others, especially the block layer=
+.
+>=20
+> I don't understand why Patch 4 is desirable.  The comment about
+> init_done_sem isn't clear to me but I also wondered the same thing as
+> Marc-Andr=C3=A9.
+>=20
+> Can you explain why we should apply this patch?
 
->   Hi,
-> 
->> Right, at the moment all the MacOS driver does is parse the resolution list from the
->> EDID and add them to the dropdown list - it doesn't support the xres and yres properties.
-> 
->> The main reason for this that OpenBIOS currently makes use of the -g XxYxD parameter
->> to set up the display resolution and bit depth, and AFAICT we currently only have
->> access to the X and Y resolutions via the EDID blob. So it's not clear whether EDID
->> can completely replace the existing mechanism yet.
-> 
-> EDID can only propagate x + y, not depth.
+Hi, Stefan,
 
-Right - my quick reading online was that there was very limited depth capability, and
-certainly nothing greater than 16-bit.
+The patch 4 itself does not help much for current QEMU, but it should
+be required to replace the patch that Marc-Andre proposed below:
 
-Rather than duplicating these parameters, would it make sense to come up with a
-custom QEMU extension block to hold the extra depth information?
+https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05460.html [1]
 
+And IMHO patch 4 along with this whole series should be a cleaner
+approach comparing to the one proposed in [1].  Here if my
+understanding is correct the problem is that
+g_main_context_push_thread_default() is really designed to be called
+at the very beginning of a thread creation but not dynamically called
+during the execution of a thread (prove is that it even does not have
+any error to return when failed to acquire the context so the caller
+will never know if it failed! see [2] below), in that sense this patch
+4 can be seen as a tiny cleanup too.
 
-ATB,
+g_main_context_push_thread_default (GMainContext *context)
+{
+  GQueue *stack;
+  gboolean acquired_context;
 
-Mark.
+  acquired_context =3D g_main_context_acquire (context);
+  g_return_if_fail (acquired_context);  <------------- [2]
+
+  ...
+}
+
+Regards,
+
+--=20
+Peter Xu
