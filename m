@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52254)
+Received: from eggs.gnu.org ([209.51.188.92]:52287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzN7X-0004zm-PT
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:57:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzN7Z-00050s-03
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:57:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzN7V-0008BO-LZ
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:57:11 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54511)
+	(envelope-from <peter.maydell@linaro.org>) id 1gzN7X-0008Db-U0
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:57:12 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:55884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gzN7S-0007tK-CQ
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:57:07 -0500
-Received: by mail-wm1-x341.google.com with SMTP id a62so9573497wmh.4
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 06:56:57 -0800 (PST)
+	id 1gzN7X-000827-MD
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 09:57:11 -0500
+Received: by mail-wm1-x336.google.com with SMTP id q187so9567143wme.5
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 06:57:03 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Feb 2019 14:56:23 +0000
-Message-Id: <20190228145624.24885-11-peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 14:56:24 +0000
+Message-Id: <20190228145624.24885-12-peter.maydell@linaro.org>
 In-Reply-To: <20190228145624.24885-1-peter.maydell@linaro.org>
 References: <20190228145624.24885-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 10/11] Makefile: Abstract out "identify the
- pkgversion" code
+Subject: [Qemu-devel] [PATCH v2 11/11] docs/conf.py: Don't hard-code QEMU
+ version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +33,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Abstract out the "identify the pkgversion" code from the
-rule for creating qemu-version.h, so it sets makefile
-variables for QEMU_PKGVERSION and QEMU_FULL_VERSION.
-(We will want to use these when building the Sphinx docs.)
+Don't hard-code the QEMU version number into conf.py. Instead
+we either pass it to sphinx-build on the command line, or
+(if doing a standalone Sphinx run in a readthedocs.org setup)
+extract it from the VERSION file.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- Makefile | 33 ++++++++++++++++-----------------
- 1 file changed, 16 insertions(+), 17 deletions(-)
+ Makefile     |  2 +-
+ docs/conf.py | 21 ++++++++++++++++-----
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index d6b897be0bc..46cb8e62571 100644
+index 46cb8e62571..526bac7f516 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -87,6 +87,20 @@ endif
+@@ -865,7 +865,7 @@ docs/version.texi: $(SRC_PATH)/VERSION
+ sphinxdocs: docs/devel/index.html docs/interop/index.html
  
- include $(SRC_PATH)/rules.mak
+ # Canned command to build a single manual
+-build-manual = $(call quiet-command,sphinx-build $(if $(V),,-q) -b html -d .doctrees/$1 $(SRC_PATH)/docs/$1 docs/$1 ,"SPHINX","docs/$1")
++build-manual = $(call quiet-command,sphinx-build $(if $(V),,-q) -b html -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1 $(SRC_PATH)/docs/$1 docs/$1 ,"SPHINX","docs/$1")
+ # We assume all RST files in the manual's directory are used in it
+ manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
  
-+# Create QEMU_PKGVERSION and FULL_VERSION strings
-+# If PKGVERSION is set, use that; otherwise get version and -dirty status from git
-+QEMU_PKGVERSION := $(if $(PKGVERSION),$(PKGVERSION),$(shell \
-+  cd $(SRC_PATH); \
-+  if test -d .git; then \
-+    git describe --match 'v*' 2>/dev/null | tr -d '\n'; \
-+    if ! git diff-index --quiet HEAD &>/dev/null; then \
-+      echo "-dirty"; \
-+    fi; \
-+  fi))
+diff --git a/docs/conf.py b/docs/conf.py
+index 6a334f545ec..0842d44e930 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -75,11 +75,22 @@ author = u'The QEMU Project Developers'
+ # The version info for the project you're documenting, acts as replacement for
+ # |version| and |release|, also used in various other places throughout the
+ # built documents.
+-#
+-# The short X.Y version.
+-version = u'4.0'
+-# The full version, including alpha/beta/rc tags.
+-release = u'4.0'
 +
-+# Either "version (pkgversion)", or just "version" if pkgversion not set
-+FULL_VERSION := $(if $(QEMU_PKGVERSION),$(VERSION) ($(QEMU_PKGVERSION)),$(VERSION))
-+
- GENERATED_FILES = qemu-version.h config-host.h qemu-options.def
++# Extract this information from the VERSION file, for the benefit of
++# standalone Sphinx runs as used by readthedocs.org. Builds run from
++# the Makefile will pass version and release on the sphinx-build
++# command line, which override this.
++try:
++    extracted_version = None
++    with open(os.path.join(qemu_docdir, '../VERSION')) as f:
++        extracted_version = f.readline().strip()
++except:
++    pass
++finally:
++    if extracted_version:
++        version = release = extracted_version
++    else:
++        version = release = "unknown version"
  
- GENERATED_QAPI_FILES = qapi/qapi-builtin-types.h qapi/qapi-builtin-types.c
-@@ -392,23 +406,8 @@ all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all mo
- 
- qemu-version.h: FORCE
- 	$(call quiet-command, \
--		(cd $(SRC_PATH); \
--		if test -n "$(PKGVERSION)"; then \
--			pkgvers="$(PKGVERSION)"; \
--		else \
--			if test -d .git; then \
--				pkgvers=$$(git describe --match 'v*' 2>/dev/null | tr -d '\n');\
--				if ! git diff-index --quiet HEAD &>/dev/null; then \
--					pkgvers="$${pkgvers}-dirty"; \
--				fi; \
--			fi; \
--		fi; \
--		printf "#define QEMU_PKGVERSION \"$${pkgvers}\"\n"; \
--		if test -n "$${pkgvers}"; then \
--			printf '#define QEMU_FULL_VERSION QEMU_VERSION " (" QEMU_PKGVERSION ")"\n'; \
--		else \
--			printf '#define QEMU_FULL_VERSION QEMU_VERSION\n'; \
--		fi; \
-+                (printf '#define QEMU_PKGVERSION "$(QEMU_PKGVERSION)"\n'; \
-+		printf '#define QEMU_FULL_VERSION "$(FULL_VERSION)"\n'; \
- 		) > $@.tmp)
- 	$(call quiet-command, if ! cmp -s $@ $@.tmp; then \
- 	  mv $@.tmp $@; \
+ # The language for content autogenerated by Sphinx. Refer to documentation
+ # for a list of supported languages.
 -- 
 2.20.1
