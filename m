@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34094)
+Received: from eggs.gnu.org ([209.51.188.92]:34114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gzPTE-0000dU-KX
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:27:46 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gzPTD-0000dz-I3
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:27:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gzPJJ-000407-Ak
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:17:31 -0500
-Date: Thu, 28 Feb 2019 14:17:06 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1gzPJr-0004JS-Q7
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:18:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38678)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gzPJr-0004HN-Jx
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 12:18:03 -0500
+Date: Thu, 28 Feb 2019 14:17:58 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190228171706.GC4925@habkost.net>
-References: <20190228122849.4296-1-david@redhat.com>
+Message-ID: <20190228171758.GE4925@habkost.net>
+References: <20190214105733.25643-1-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190228122849.4296-1-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] qdev: Hotplug handler chaining
+In-Reply-To: <20190214105733.25643-1-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hostmem: fix crash when querying empty
+ host-nodes property via QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,19 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, armbru@redhat.com
 
-On Thu, Feb 28, 2019 at 01:28:46PM +0100, David Hildenbrand wrote:
-> Can somebody please pick this up in the near future? (@Eduardo, @MST,
-> @Paolo, @David - I have no idea who the right person is :) )
+On Thu, Feb 14, 2019 at 05:57:33AM -0500, Igor Mammedov wrote:
+> QEMU will crashes with
+>  qapi/qobject-output-visitor.c:210: qobject_output_complete: Assertion `qov->root && ((&qov->stack)->slh_first == ((void *)0))' failed
+> when trying to get value of not set hostmem's "host-nodes"
+> property, HostMemoryBackend::host_nodes bitmap doesn't have
+> any bits set in it, which leads to find_first_bit() returning
+> MAX_NODES and consequently to an early return from
+> host_memory_backend_get_host_nodes() without calling visitor.
 > 
-> The longer we wait, the more likely it is that some stuff gets upstreamed
-> that conflicts with patch 1 and will break unnoticed. (e.g. spapr PHB
-> hotplug was just upstreamed and required a fixup, luckily I was CC'ed on
-> that one).
+> Fix it by calling visitor even if "host-nodes" property wasn't
+> set before exiting from property getter to return valid empty
+> list.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-I'm queueing it on machine-next, thanks!
+Queued on machine-next, thanks!
 
 -- 
 Eduardo
