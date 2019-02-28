@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47381)
+Received: from eggs.gnu.org ([209.51.188.92]:49055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzTpS-0007OJ-TS
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:06:59 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gzTsi-0008RW-NA
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:10:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzTpR-0004YN-PI
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:06:58 -0500
-Resent-Message-Id: <E1gzTpR-0004YN-PI@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gzTpQ-0004V7-0k
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:06:56 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155139159565.7448.11829805949225371557@49fa7ef69f7b>
-In-Reply-To: <20190228204638.4928-1-ekohler@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 28 Feb 2019 14:06:36 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] Use wide-character ncurses functions.
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gzTsh-0006T3-Dj
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:10:20 -0500
+Received: from mail-lf1-x136.google.com ([2a00:1450:4864:20::136]:44742)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gzTsY-0006OL-4F
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:10:14 -0500
+Received: by mail-lf1-x136.google.com with SMTP id v185so5080244lfa.11
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:10:06 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 28 Feb 2019 14:09:48 -0800
+Message-Id: <20190228220948.14436-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 09/40] target/xtensa: sort FLIX instruction
+ opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +24,299 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ekohler@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kraxel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyODIwNDYzOC40OTI4
-LTEtZWtvaGxlckBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMjI4MjA0NjM4LjQ5MjgtMS1la29obGVyQGdtYWls
-LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBVc2Ugd2lkZS1jaGFyYWN0ZXIgbmN1
-cnNlcyBmdW5jdGlvbnMuClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
-Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
-ODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
-YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIyODIwNDYzOC40OTI4LTEtZWtvaGxlckBn
-bWFpbC5jb20gLT4gcGF0Y2hldy8yMDE5MDIyODIwNDYzOC40OTI4LTEtZWtvaGxlckBnbWFpbC5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1Mzc5ZmI1MjE2IFVzZSB3aWRlLWNo
-YXJhY3RlciBuY3Vyc2VzIGZ1bmN0aW9ucy4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBk
-byBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNDc6IEZJTEU6IHVpL2N1cnNlcy5jOjUzOgorICAg
-IC8vIDB4MF8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNTM6IEZJTEU6IHVp
-L2N1cnNlcy5jOjU5OgorICAgIC8vIDB4MV8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21t
-ZW50cwojNTk6IEZJTEU6IHVpL2N1cnNlcy5jOjY1OgorICAgIC8vIDB4Ml8KCkVSUk9SOiBkbyBu
-b3QgdXNlIEM5OSAvLyBjb21tZW50cwojNjM6IEZJTEU6IHVpL2N1cnNlcy5jOjY5OgorICAgIC8v
-IDB4M18KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNjc6IEZJTEU6IHVpL2N1
-cnNlcy5jOjczOgorICAgIC8vIDB4NF8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50
-cwojNzE6IEZJTEU6IHVpL2N1cnNlcy5jOjc3OgorICAgIC8vIDB4NV8KCkVSUk9SOiBkbyBub3Qg
-dXNlIEM5OSAvLyBjb21tZW50cwojNzU6IEZJTEU6IHVpL2N1cnNlcy5jOjgxOgorICAgIC8vIDB4
-Nl8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNzk6IEZJTEU6IHVpL2N1cnNl
-cy5jOjg1OgorICAgIC8vIDB4N18KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwoj
-ODM6IEZJTEU6IHVpL2N1cnNlcy5jOjg5OgorICAgIC8vIDB4OF8KCkVSUk9SOiBkbyBub3QgdXNl
-IEM5OSAvLyBjb21tZW50cwojODk6IEZJTEU6IHVpL2N1cnNlcy5jOjk1OgorICAgIC8vIDB4OV8K
-CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojOTU6IEZJTEU6IHVpL2N1cnNlcy5j
-OjEwMToKKyAgICAvLyAweEFfCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzEw
-MTogRklMRTogdWkvY3Vyc2VzLmM6MTA3OgorICAgIC8vIDB4Ql8KCkVSUk9SOiBkbyBub3QgdXNl
-IEM5OSAvLyBjb21tZW50cwojMTA3OiBGSUxFOiB1aS9jdXJzZXMuYzoxMTM6CisgICAgLy8gMHhD
-XwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxMTM6IEZJTEU6IHVpL2N1cnNl
-cy5jOjExOToKKyAgICAvLyAweERfCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMK
-IzExOTogRklMRTogdWkvY3Vyc2VzLmM6MTI1OgorICAgIC8vIDB4RV8KCkVSUk9SOiBkbyBub3Qg
-dXNlIEM5OSAvLyBjb21tZW50cwojMTI1OiBGSUxFOiB1aS9jdXJzZXMuYzoxMzE6CisgICAgLy8g
-MHhGXwoKdG90YWw6IDE2IGVycm9ycywgMCB3YXJuaW5ncywgMTc3IGxpbmVzIGNoZWNrZWQKCkNv
-bW1pdCA1Mzc5ZmI1MjE2YjUgKFVzZSB3aWRlLWNoYXJhY3RlciBuY3Vyc2VzIGZ1bmN0aW9ucy4p
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjI4MjA0NjM4LjQ5MjgtMS1la29obGVyQGdtYWls
-LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Opcodes in different slots may read and write same resources (registers,
+states). In the absence of resource dependency loops it must be possible
+to sort opcodes to avoid interference.
+
+Record resources used by each opcode in the bundle. Build opcode
+dependency graph and use topological sort to order its nodes. In case of
+success translate opcodes in sort order. In case of failure report and
+raise invalid opcode exception.
+
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+Changes v1->v2:
+- fix build with clang
+
+ target/xtensa/cpu.h       |   2 +
+ target/xtensa/translate.c | 227 ++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 221 insertions(+), 8 deletions(-)
+
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index db8ee70a0386..c59f79e56326 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -373,6 +373,8 @@ enum {
+     XTENSA_OP_EXIT_TB_0 = 0x800,
+ 
+     XTENSA_OP_NAME_ARRAY = 0x8000,
++
++    XTENSA_OP_CONTROL_FLOW = 0x10000,
+ };
+ 
+ typedef struct XtensaOpcodeOps {
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index e8dddd32b3af..bda4e9469b86 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -846,6 +846,157 @@ static inline unsigned xtensa_op0_insn_len(DisasContext *dc, uint8_t op0)
+     return xtensa_isa_length_from_chars(dc->config->isa, &op0);
+ }
+ 
++struct opcode_arg_info {
++    uint32_t resource;
++    int index;
++};
++
++struct slot_prop {
++    XtensaOpcodeOps *ops;
++    uint32_t arg[MAX_OPCODE_ARGS];
++    uint32_t raw_arg[MAX_OPCODE_ARGS];
++    struct opcode_arg_info in[MAX_OPCODE_ARGS];
++    struct opcode_arg_info out[MAX_OPCODE_ARGS];
++    unsigned n_in;
++    unsigned n_out;
++    uint32_t op_flags;
++};
++
++enum resource_type {
++    RES_REGFILE,
++    RES_STATE,
++    RES_MAX,
++};
++
++static uint32_t encode_resource(enum resource_type r, unsigned g, unsigned n)
++{
++    assert(r < RES_MAX && g < 256 && n < 65536);
++    return (r << 24) | (g << 16) | n;
++}
++
++/*
++ * a depends on b if b must be executed before a,
++ * because a's side effects will destroy b's inputs.
++ */
++static bool op_depends_on(const struct slot_prop *a,
++                          const struct slot_prop *b)
++{
++    unsigned i = 0;
++    unsigned j = 0;
++
++    if (a->op_flags & XTENSA_OP_CONTROL_FLOW) {
++        return true;
++    }
++    while (i < a->n_out && j < b->n_in) {
++        if (a->out[i].resource < b->in[j].resource) {
++            ++i;
++        } else if (a->out[i].resource > b->in[j].resource) {
++            ++j;
++        } else {
++            return true;
++        }
++    }
++    return false;
++}
++
++/*
++ * Calculate evaluation order for slot opcodes.
++ * Build opcode order graph and output its nodes in topological sort order.
++ * An edge a -> b in the graph means that opcode a must be followed by
++ * opcode b.
++ */
++static bool tsort(struct slot_prop *slot,
++                  struct slot_prop *sorted[],
++                  unsigned n)
++{
++    struct tsnode {
++        unsigned n_in_edge;
++        unsigned n_out_edge;
++        unsigned out_edge[MAX_INSN_SLOTS];
++    } node[MAX_INSN_SLOTS];
++
++    unsigned in[MAX_INSN_SLOTS];
++    unsigned i, j;
++    unsigned n_in = 0;
++    unsigned n_out = 0;
++    unsigned n_edge = 0;
++    unsigned in_idx;
++
++    for (i = 0; i < n; ++i) {
++        node[i].n_in_edge = 0;
++        node[i].n_out_edge = 0;
++    }
++
++    for (i = 0; i < n; ++i) {
++        unsigned n_out_edge = 0;
++
++        for (j = 0; j < n; ++j) {
++            if (i != j && op_depends_on(slot + j, slot + i)) {
++                node[i].out_edge[n_out_edge] = j;
++                ++node[j].n_in_edge;
++                ++n_out_edge;
++                ++n_edge;
++            }
++        }
++        node[i].n_out_edge = n_out_edge;
++    }
++
++    for (i = 0; i < n; ++i) {
++        if (!node[i].n_in_edge) {
++            in[n_in] = i;
++            ++n_in;
++        }
++    }
++
++    for (in_idx = 0; in_idx < n_in; ++in_idx) {
++        i = in[in_idx];
++        sorted[n_out] = slot + i;
++        ++n_out;
++        for (j = 0; j < node[i].n_out_edge; ++j) {
++            --n_edge;
++            if (--node[node[i].out_edge[j]].n_in_edge == 0) {
++                in[n_in] = node[i].out_edge[j];
++                ++n_in;
++            }
++        }
++    }
++    return n_edge == 0;
++}
++
++static void opcode_add_resource(struct slot_prop *op,
++                                uint32_t resource, char direction,
++                                int index)
++{
++    switch (direction) {
++    case 'm':
++    case 'i':
++        assert(op->n_in < ARRAY_SIZE(op->in));
++        op->in[op->n_in].resource = resource;
++        op->in[op->n_in].index = index;
++        ++op->n_in;
++        /* fall through */
++    case 'o':
++        if (direction == 'm' || direction == 'o') {
++            assert(op->n_out < ARRAY_SIZE(op->out));
++            op->out[op->n_out].resource = resource;
++            op->out[op->n_out].index = index;
++            ++op->n_out;
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static int resource_compare(const void *a, const void *b)
++{
++    const struct opcode_arg_info *pa = a;
++    const struct opcode_arg_info *pb = b;
++
++    return pa->resource < pb->resource ?
++        -1 : (pa->resource > pb->resource ? 1 : 0);
++}
++
+ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+ {
+     xtensa_isa isa = dc->config->isa;
+@@ -855,11 +1006,8 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+     int slot, slots;
+     unsigned i;
+     uint32_t op_flags = 0;
+-    struct {
+-        XtensaOpcodeOps *ops;
+-        uint32_t arg[MAX_OPCODE_ARGS];
+-        uint32_t raw_arg[MAX_OPCODE_ARGS];
+-    } slot_prop[MAX_INSN_SLOTS];
++    struct slot_prop slot_prop[MAX_INSN_SLOTS];
++    struct slot_prop *ordered[MAX_INSN_SLOTS];
+     uint32_t debug_cause = 0;
+     uint32_t windowed_register = 0;
+     uint32_t coprocessor = 0;
+@@ -954,6 +1102,68 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+             windowed_register |= ops->test_overflow(dc, arg, ops->par);
+         }
+         coprocessor |= ops->coprocessor;
++
++        if (slots > 1) {
++            slot_prop[slot].n_in = 0;
++            slot_prop[slot].n_out = 0;
++            slot_prop[slot].op_flags = 0;
++
++            opnds = xtensa_opcode_num_operands(isa, opc);
++
++            for (opnd = vopnd = 0; opnd < opnds; ++opnd) {
++                bool visible = xtensa_operand_is_visible(isa, opc, opnd);
++
++                if (xtensa_operand_is_register(isa, opc, opnd)) {
++                    xtensa_regfile rf = xtensa_operand_regfile(isa, opc, opnd);
++                    uint32_t v = 0;
++
++                    xtensa_operand_get_field(isa, opc, opnd, fmt, slot,
++                                             dc->slotbuf, &v);
++                    xtensa_operand_decode(isa, opc, opnd, &v);
++                    opcode_add_resource(slot_prop + slot,
++                                        encode_resource(RES_REGFILE, rf, v),
++                                        xtensa_operand_inout(isa, opc, opnd),
++                                        visible ? vopnd : -1);
++                }
++                if (visible) {
++                    ++vopnd;
++                }
++            }
++
++            opnds = xtensa_opcode_num_stateOperands(isa, opc);
++
++            for (opnd = 0; opnd < opnds; ++opnd) {
++                xtensa_state state = xtensa_stateOperand_state(isa, opc, opnd);
++
++                opcode_add_resource(slot_prop + slot,
++                                    encode_resource(RES_STATE, 0, state),
++                                    xtensa_stateOperand_inout(isa, opc, opnd),
++                                    -1);
++            }
++            if (xtensa_opcode_is_branch(isa, opc) ||
++                xtensa_opcode_is_jump(isa, opc) ||
++                xtensa_opcode_is_loop(isa, opc) ||
++                xtensa_opcode_is_call(isa, opc)) {
++                slot_prop[slot].op_flags |= XTENSA_OP_CONTROL_FLOW;
++            }
++
++            qsort(slot_prop[slot].in, slot_prop[slot].n_in,
++                  sizeof(slot_prop[slot].in[0]), resource_compare);
++            qsort(slot_prop[slot].out, slot_prop[slot].n_out,
++                  sizeof(slot_prop[slot].out[0]), resource_compare);
++        }
++    }
++
++    if (slots > 1) {
++        if (!tsort(slot_prop, ordered, slots)) {
++            qemu_log_mask(LOG_UNIMP,
++                          "Circular resource dependencies (pc = %08x)\n",
++                          dc->pc);
++            gen_exception_cause(dc, ILLEGAL_INSTRUCTION_CAUSE);
++            return;
++        }
++    } else {
++        ordered[0] = slot_prop + 0;
+     }
+ 
+     if ((op_flags & XTENSA_OP_PRIVILEGED) &&
+@@ -1002,10 +1212,11 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+     }
+ 
+     for (slot = 0; slot < slots; ++slot) {
+-        XtensaOpcodeOps *ops = slot_prop[slot].ops;
++        struct slot_prop *pslot = ordered[slot];
++        XtensaOpcodeOps *ops = pslot->ops;
+ 
+-        dc->raw_arg = slot_prop[slot].raw_arg;
+-        ops->translate(dc, slot_prop[slot].arg, ops->par);
++        dc->raw_arg = pslot->raw_arg;
++        ops->translate(dc, pslot->arg, ops->par);
+     }
+ 
+     if (dc->base.is_jmp == DISAS_NEXT) {
+-- 
+2.11.0
