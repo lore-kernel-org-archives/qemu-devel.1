@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52962)
+Received: from eggs.gnu.org ([209.51.188.92]:52995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gzIco-00031o-N1
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:09:12 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gzIcq-000339-Qe
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:09:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gzIcm-0000xC-OC
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:09:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:28472)
+	(envelope-from <kraxel@redhat.com>) id 1gzIco-0000yO-Pt
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:09:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45040)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gzIck-0000qG-MC
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:09:08 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gzIcm-0000r3-Qq
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 05:09:10 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EF696C075D75
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:09:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2F8A79D1E2
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:09:02 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 28 Feb 2019 11:08:55 +0100
-Message-Id: <20190228100858.28397-3-kraxel@redhat.com>
-In-Reply-To: <20190228100858.28397-1-kraxel@redhat.com>
-References: <20190228100858.28397-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/5] audio: Do not check for audio_calloc failure
+Date: Thu, 28 Feb 2019 11:08:53 +0100
+Message-Id: <20190228100858.28397-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/5] Audio 20190228 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,111 +31,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Frediano Ziglio <fziglio@redhat.com>
+The following changes since commit 86c7e2f4a93322a76afea5ee6806a83420d1df=
+ea:
 
-audio_calloc uses g_malloc0 which never returns in case of
-memory failure.
+  Merge remote-tracking branch 'remotes/berrange/tags/authz-core-pull-req=
+uest' into staging (2019-02-26 17:59:41 +0000)
 
-Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
-Message-id: 20190225154335.11397-2-fziglio@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- audio/audio.c | 48 ++++++------------------------------------------
- 1 file changed, 6 insertions(+), 42 deletions(-)
+are available in the git repository at:
 
-diff --git a/audio/audio.c b/audio/audio.c
-index 472721a7a9f0..909c817103c8 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -811,12 +811,7 @@ static int audio_attach_capture (HWVoiceOut *hw)
-         SWVoiceOut *sw;
-         HWVoiceOut *hw_cap = &cap->hw;
- 
--        sc = audio_calloc(__func__, 1, sizeof(*sc));
--        if (!sc) {
--            dolog ("Could not allocate soft capture voice (%zu bytes)\n",
--                   sizeof (*sc));
--            return -1;
--        }
-+        sc = g_malloc0(sizeof(*sc));
- 
-         sc->cap = cap;
-         sw = &sc->sw;
-@@ -1960,15 +1955,10 @@ CaptureVoiceOut *AUD_add_capture (
-     if (audio_validate_settings (as)) {
-         dolog ("Invalid settings were passed when trying to add capture\n");
-         audio_print_settings (as);
--        goto err0;
-+        return NULL;
-     }
- 
--    cb = audio_calloc(__func__, 1, sizeof(*cb));
--    if (!cb) {
--        dolog ("Could not allocate capture callback information, size %zu\n",
--               sizeof (*cb));
--        goto err0;
--    }
-+    cb = g_malloc0(sizeof(*cb));
-     cb->ops = *ops;
-     cb->opaque = cb_opaque;
- 
-@@ -1981,12 +1971,7 @@ CaptureVoiceOut *AUD_add_capture (
-         HWVoiceOut *hw;
-         CaptureVoiceOut *cap;
- 
--        cap = audio_calloc(__func__, 1, sizeof(*cap));
--        if (!cap) {
--            dolog ("Could not allocate capture voice, size %zu\n",
--                   sizeof (*cap));
--            goto err1;
--        }
-+        cap = g_malloc0(sizeof(*cap));
- 
-         hw = &cap->hw;
-         QLIST_INIT (&hw->sw_head);
-@@ -1994,23 +1979,11 @@ CaptureVoiceOut *AUD_add_capture (
- 
-         /* XXX find a more elegant way */
-         hw->samples = 4096 * 4;
--        hw->mix_buf = audio_calloc(__func__, hw->samples,
--                                   sizeof(struct st_sample));
--        if (!hw->mix_buf) {
--            dolog ("Could not allocate capture mix buffer (%d samples)\n",
--                   hw->samples);
--            goto err2;
--        }
-+        hw->mix_buf = g_new0(struct st_sample, hw->samples);
- 
-         audio_pcm_init_info (&hw->info, as);
- 
--        cap->buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
--        if (!cap->buf) {
--            dolog ("Could not allocate capture buffer "
--                   "(%d samples, each %d bytes)\n",
--                   hw->samples, 1 << hw->info.shift);
--            goto err3;
--        }
-+        cap->buf = g_malloc0_n(hw->samples, 1 << hw->info.shift);
- 
-         hw->clip = mixeng_clip
-             [hw->info.nchannels == 2]
-@@ -2025,15 +1998,6 @@ CaptureVoiceOut *AUD_add_capture (
-             audio_attach_capture (hw);
-         }
-         return cap;
--
--    err3:
--        g_free (cap->hw.mix_buf);
--    err2:
--        g_free (cap);
--    err1:
--        g_free (cb);
--    err0:
--        return NULL;
-     }
- }
- 
--- 
+  git://git.kraxel.org/qemu tags/audio-20190228-pull-request
+
+for you to fetch changes up to 9399ef168377d9e7f2e33b1c2eb61751aa1b72fa:
+
+  audio/sdlaudio: Simplify the sdl_callback function (2019-02-28 10:30:08=
+ +0100)
+
+----------------------------------------------------------------
+audio: fixes and cleanups.
+
+----------------------------------------------------------------
+
+Frediano Ziglio (2):
+  audio: Use g_strdup_printf instead of manual building a string
+  audio: Do not check for audio_calloc failure
+
+Gerd Hoffmann (1):
+  audio: don't build alsa and sdl by default on linux
+
+Thomas Huth (2):
+  audio/sdlaudio: Remove the semaphore code
+  audio/sdlaudio: Simplify the sdl_callback function
+
+ configure        |   2 +-
+ audio/audio.c    |  73 ++++-----------------
+ audio/sdlaudio.c | 190 +++++++------------------------------------------=
+------
+ 3 files changed, 36 insertions(+), 229 deletions(-)
+
+--=20
 2.9.3
