@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40594)
+Received: from eggs.gnu.org ([209.51.188.92]:40628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gzO6d-0006cX-Bq
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:23 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gzO6f-0006cl-CF
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gzO6X-0002nK-BC
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51140)
+	(envelope-from <no-reply@patchew.org>) id 1gzO6a-0002rJ-WA
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:21 -0500
+Resent-Message-Id: <E1gzO6a-0002rJ-WA@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gzO6V-0002TF-9u
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:13 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1SFo2Mx033407
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:59:48 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qxfs51etd-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 10:59:42 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Thu, 28 Feb 2019 15:59:23 -0000
-Reply-To: jjherne@linux.ibm.com
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-12-git-send-email-jjherne@linux.ibm.com>
-	<20190204124105.0abb9b44.cohuck@redhat.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Thu, 28 Feb 2019 10:59:13 -0500
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gzO6a-0002jA-JH
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 11:00:16 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155136957846.7448.12579906111564987092@49fa7ef69f7b>
+In-Reply-To: <20190228145624.24885-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190204124105.0abb9b44.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <1ae847e3-5f46-e050-5910-7e9010a8c6cf@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 11/15] s390-bios: cio error handling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 28 Feb 2019 07:59:40 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 00/11] Enable build and install of our
+ rST docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,48 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, philmd@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-On 2/4/19 6:41 AM, Cornelia Huck wrote:
-...
-> 
->> +static void print_irb_err(Irb *irb)
->> +{
->> +    Ccw0 *this_ccw = u32toptr(irb->scsw.cpa);
->> +    Ccw0 *prev_ccw = u32toptr(irb->scsw.cpa - 8);
-> 
-> I don't think you can cast this conditionally to format 0 -- I'd pass
-> in the format from do_cio and handle it accordingly.
-> 
->> +    char msgline[256];
->> +
->> +    sclp_print("vfio-ccw device I/O error - Interrupt Response Block Data:\n");
-> 
-> If you call this from the generic function, you shouldn't talk about
-> vfio-ccw here; but it might make sense to print subchannel/devno and
-> the cu type.
-> 
-> (...)
->
-
-Fixed for v3.
-
-
->> @@ -148,6 +370,9 @@ int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
->>               continue;
->>           }
->>   
->> +        print_irb_err(&irb);
->> +        basic_sense(schid, &sd, sizeof(sd));
->> +        print_eckd_dasd_sense_data(&sd);
-> 
-> I think this should only be printed for actual dasds (and maybe only
-> print it if there is actually sense data available)?
-> 
-
-Good point. Currently do_cio doesn't have any info on its device type. Should I pass in 
-the controller type? Thats the easiest way I can think of to make the decision.
-
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyODE0NTYyNC4yNDg4
+NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRl
+ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8x
+MV0gRW5hYmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMK
+Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
+ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
+OTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
+MDE5MDIyODE0NTYyNC4yNDg4NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjI2M2Q1YmNkMmUgZG9jcy9jb25mLnB5OiBEb24ndCBoYXJk
+LWNvZGUgUUVNVSB2ZXJzaW9uCjVjYTg4MjZkMmMgTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRl
+bnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUKZGFiN2JkNzRhMCBNYWtlZmlsZSwgY29uZmlndXJl
+OiBTdXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uCmRlZDAzZjNlNDkgZG9jczogUHJv
+dmlkZSBzZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50CjZlOWU5MmNkMjYg
+ZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncwpkMzg5MTdjZjAzIGRvY3MvY29u
+Zi5weTogRG9uJ3QgaW5jbHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1aWxkCmE2OWJmYWU0MTcg
+ZG9jcy9jb25mLnB5OiBDb25maWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lCmEwNjNkYWQwYWEg
+ZG9jcy9jb25mLnB5OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeQpiNmQxNTQ3NGE1
+IGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQKNWFkOTAz
+OGJkMCBkb2NzOiBDb252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdApmMTk0YjA0ZmFkIGRv
+Y3MvY3B1LWhvdHBsdWcucnN0OiBGaXggclNUIG1hcmt1cCBpc3N1ZXMKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CjEvMTEgQ2hlY2tpbmcgY29tbWl0IGYxOTRiMDRmYWQyOCAoZG9jcy9jcHUtaG90cGx1
+Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3VlcykKMi8xMSBDaGVja2luZyBjb21taXQgNWFkOTAz
+OGJkMGJmIChkb2NzOiBDb252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdCkKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojMjM6IApyZW5hbWUgZnJvbSBkb2NzL2RldmVsL21lbW9yeS50eHQKCnRvdGFsOiAw
+IGVycm9ycywgMSB3YXJuaW5ncywgMTk1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTEgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xMSBDaGVja2luZyBjb21taXQgYjZkMTU0NzRhNWI1IChk
+b2NzOiBDb21taXQgaW5pdGlhbCBmaWxlcyBmcm9tIHNwaGlueC1xdWlja3N0YXJ0KQpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDE4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzExIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCjQvMTEgQ2hlY2tpbmcgY29tbWl0IGEwNjNkYWQwYWFiZSAoZG9jcy9jb25mLnB5
+OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQg
+YTY5YmZhZTQxNzIwIChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhl
+bWUpCjYvMTEgQ2hlY2tpbmcgY29tbWl0IGQzODkxN2NmMDMwZSAoZG9jcy9jb25mLnB5OiBEb24n
+dCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0
+IDZlOWU5MmNkMjYyNiAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8x
+MSBDaGVja2luZyBjb21taXQgZGVkMDNmM2U0OWIwIChkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNv
+bmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEwMTogCm5l
+dyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE4Njog
+RklMRTogZG9jcy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2Ny
+aXB0aW9uJ10gPSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJp
+bGl0eSBHdWlkZScKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNr
+ZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcg
+Y29tbWl0IGRhYjdiZDc0YTAxNCAoTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGlu
+ZyByU1QgZG9jdW1lbnRhdGlvbikKMTAvMTEgQ2hlY2tpbmcgY29tbWl0IDVjYTg4MjZkMmMzOCAo
+TWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjEx
+LzExIENoZWNraW5nIGNvbW1pdCAyNjNkNWJjZDJlNzcgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFy
+ZC1jb2RlIFFFTVUgdmVyc2lvbikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
+dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
+dGNoZXcub3JnL2xvZ3MvMjAxOTAyMjgxNDU2MjQuMjQ4ODUtMS1wZXRlci5tYXlkZWxsQGxpbmFy
+by5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
