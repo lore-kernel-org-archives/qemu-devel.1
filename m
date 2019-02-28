@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42610)
+Received: from eggs.gnu.org ([209.51.188.92]:42566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzSFV-0000RS-TU
+	(envelope-from <alex.bennee@linaro.org>) id 1gzSFU-0000Ql-9a
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzSFU-0007Hn-W6
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:45 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34041)
+	(envelope-from <alex.bennee@linaro.org>) id 1gzSFT-0007DE-EJ
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:44 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41553)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gzSFU-0007GG-OG
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:44 -0500
-Received: by mail-wr1-x444.google.com with SMTP id f14so23462233wrg.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 12:25:44 -0800 (PST)
+	id 1gzSFT-00079o-5v
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:43 -0500
+Received: by mail-wr1-x441.google.com with SMTP id n2so23420507wrw.8
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 12:25:43 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 28 Feb 2019 20:25:27 +0000
-Message-Id: <20190228202537.4638-7-alex.bennee@linaro.org>
+Date: Thu, 28 Feb 2019 20:25:25 +0000
+Message-Id: <20190228202537.4638-5-alex.bennee@linaro.org>
 In-Reply-To: <20190228202537.4638-1-alex.bennee@linaro.org>
 References: <20190228202537.4638-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 06/16] tests/docker: add debian-xtensa-cross
- image
+Subject: [Qemu-devel] [PATCH  v2 04/16] tests/tcg: add gdb runner variant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +30,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-arm@nongnu.org, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+With this you can launch a test in gdb with:
 
-Xtensa cpu supported:
-- dc232b
-- dc233c
-- csp
+  cd $(BUILD)/tests
+  make -f $(SRC)/tests/tcg/Makefile gdb-$(TEST_NAME)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v2
-  - the compiler only works for system tests (no libc)
----
- .../dockerfiles/debian-xtensa-cross.docker    | 31 +++++++++++++++++++
- tests/tcg/xtensa/Makefile.include             | 11 +++++++
- 2 files changed, 42 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-xtensa-cross.docker
- create mode 100644 tests/tcg/xtensa/Makefile.include
+ tests/tcg/Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian-xtensa-cross.docker b/tests/docker/dockerfiles/debian-xtensa-cross.docker
-new file mode 100644
-index 0000000000..afd2ab9163
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-xtensa-cross.docker
-@@ -0,0 +1,31 @@
-+#
-+# Docker cross-compiler target
-+#
-+# This docker target builds on the debian stretch base image,
-+# using a prebuilt toolchains for Xtensa cores from:
-+# https://github.com/foss-xtensa/toolchain/releases
-+#
-+FROM debian:stretch-slim
+diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
+index 097e6374ea..47f4298e68 100644
+--- a/tests/tcg/Makefile
++++ b/tests/tcg/Makefile
+@@ -113,6 +113,9 @@ RUN_TESTS+=$(EXTRA_RUNS)
+ run-%: %
+ 	$(call run-test, $<, $(QEMU) $(QEMU_OPTS) $<, "$< on $(TARGET_NAME)")
+ 
++gdb-%: %
++	gdb --args $(QEMU) $(QEMU_OPTS) $<
 +
-+RUN apt-get update && \
-+    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get install -y --no-install-recommends \
-+        bison \
-+        build-essential \
-+        ca-certificates \
-+        curl \
-+        flex \
-+        gettext \
-+        git \
-+        python-minimal
-+
-+ENV CPU_LIST csp dc232b dc233c
-+ENV TOOLCHAIN_RELEASE 2018.02
-+
-+RUN for cpu in $CPU_LIST; do \
-+        curl -#SL http://github.com/foss-xtensa/toolchain/releases/download/$TOOLCHAIN_RELEASE/x86_64-$TOOLCHAIN_RELEASE-xtensa-$cpu-elf.tar.gz \
-+        | tar -xzC /opt; \
-+    done
-+
-+ENV PATH $PATH:/opt/$TOOLCHAIN_RELEASE/xtensa-dc232b-elf/bin:/opt/$TOOLCHAIN_RELEASE/xtensa-dc233c-elf/bin:/opt/$TOOLCHAIN_RELEASE/xtensa-csp-elf/bin
-diff --git a/tests/tcg/xtensa/Makefile.include b/tests/tcg/xtensa/Makefile.include
-new file mode 100644
-index 0000000000..423c00a5d3
---- /dev/null
-+++ b/tests/tcg/xtensa/Makefile.include
-@@ -0,0 +1,11 @@
-+# Makefile.include for xtensa targets
-+#
-+# The compilers can only be used for building system tests
-+
-+ifeq ($(CONFIG_SOFTMMU),y)
-+DOCKER_IMAGE=debian-xtensa-cross
-+
-+# default to the dc232b cpu
-+DOCKER_CROSS_COMPILER=/opt/2018.02/xtensa-dc232b-elf/bin/xtensa-dc232b-elf-gcc
-+DOCKER_CROSS_LINKER=/opt/2018.02/xtensa-dc232b-elf/bin/xtensa-dc232b-elf-ld
-+endif
+ .PHONY: run
+ run: $(RUN_TESTS)
+ 
 -- 
 2.20.1
