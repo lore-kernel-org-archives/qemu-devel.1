@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46973)
+Received: from eggs.gnu.org ([209.51.188.92]:47245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gzQGu-0001Mi-T6
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:19:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1gzQIE-0002Rl-Vt
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:20:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gzQGs-0002z7-Ma
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:19:03 -0500
-Date: Thu, 28 Feb 2019 18:18:12 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190228181812.GJ9217@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gzQID-0003oO-6B
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:20:26 -0500
 References: <20190227162035.18543-1-berrange@redhat.com>
 	<20190227162035.18543-2-berrange@redhat.com>
-	<e6944ece-e00e-643a-fa71-deb18841e2fb@redhat.com>
+	<29dfdc31-9e4d-88be-13f0-53e3f33d6800@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <75393117-5893-4ca1-f86b-83913a924e53@redhat.com>
+Date: Thu, 28 Feb 2019 12:20:16 -0600
 MIME-Version: 1.0
+In-Reply-To: <29dfdc31-9e4d-88be-13f0-53e3f33d6800@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e6944ece-e00e-643a-fa71-deb18841e2fb@redhat.com>
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v6 1/3] qemu-nbd: add support for
  authorization of TLS clients
 List-Id: <qemu-devel.nongnu.org>
@@ -27,58 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu, Feb 28, 2019 at 12:11:00PM -0600, Eric Blake wrote:
-> On 2/27/19 10:20 AM, Daniel P. Berrang=C3=A9 wrote:
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> >=20
-> > Currently any client which can complete the TLS handshake is able to =
-use
-> > the NBD server. The server admin can turn on the 'verify-peer' option
-> > for the x509 creds to require the client to provide a x509 certificat=
-e.
-> > This means the client will have to acquire a certificate from the CA
-> > before they are permitted to use the NBD server. This is still a fair=
-ly
-> > low bar to cross.
-> >=20
-> > This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command wh=
-ich
-> > takes the ID of a previously added 'QAuthZ' object instance. This wil=
-l
-> > be used to validate the client's x509 distinguished name. Clients
-> > failing the authorization check will not be permitted to use the NBD
-> > server.
->=20
-> It doesn't hold up this patch, but I note that with the qemu QMP comman=
-d
-> changes you make in 2/3, you document that the object can be
-> created/removed on the fly, and the server will adjust which clients ca=
-n
-> then subsequently connect. Is there any need for the same sort of
-> runtime configurability in qemu-nbd, and if so, how would we accomplish
-> it?  Perhaps by having a command-line option to parse --tls-authz from =
-a
-> file, where you can send SIGHUP to qemu-nbd to force it to re-read the
-> file?  Or am I worrying about something unlikely to be needed in practi=
-ce?
+On 2/27/19 10:43 AM, Eric Blake wrote:
 
-Well the QAuthZListFile object type can store its contents in an external
-file that gets auto-reloaded upon inotify triggers from the main loop.
-The QAuthZPAM type can also be fairly dynamic depending on its backend.
-I think any single process is unlikely  to need to switch between
-different object types, so this is good enough dynamic support.
+>>  @example
+>>  qemu-nbd \
+>>    --object tls-creds-x509,id=tls0,endpoint=server,dir=/path/to/qemutls \
+>> -  --tls-creds tls0 -t -x subset -p 10810 \
+>> +  --object 'authz-simple,id=auth0,identity=CN=laptop.example.com,,\
+>> +            O=Example Org,,L=London,,ST=London,,C=GB' \
+> 
+> A long line may be necessary here, unless the whitespace in the
+> identity= parameter inserted by the line continuation is harmless.  Long
+> lines in man pages are annoying, but even worse is an example that
+> copies-and-pastes incorrectly.  I may just s/^ *O/O/.
 
-I can't help thinking we should add QMP to qemu-nbd one day though....
+I've just confirmed that whitespace in the identity= parameter is
+harmless, via this change:
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git i/tests/qemu-iotests/233 w/tests/qemu-iotests/233
+index 6adade45353..5e5fe1e8cdb 100755
+--- i/tests/qemu-iotests/233
++++ w/tests/qemu-iotests/233
+@@ -131,7 +131,8 @@ nbd_server_stop
+
+ nbd_server_start_tcp_socket \
+     --object
+tls-creds-x509,dir=${tls_dir}/server1,endpoint=server,id=tls0,verify-peer=yes
+\
+-    --object "authz-simple,identity=CN=localhost,,O=Cthulu Dark Lord
+Enterprises client1,,L=R'lyeh,,C=South Pacific,id=authz0" \
++    --object "authz-simple,id=authz0,identity=CN=localhost,, \
++      O=Cthulu Dark Lord Enterprises client1,,L=R'lyeh,,C=South Pacific" \
+     --tls-authz authz0 \
+     --tls-creds tls0 \
+     -f $IMGFMT "$TEST_IMG" 2>> "$TEST_DIR/server.log"
+
+
+So I'll go ahead and tweak the patch along those lines.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
