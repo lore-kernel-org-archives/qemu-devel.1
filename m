@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58633)
+Received: from eggs.gnu.org ([209.51.188.92]:60782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzAYU-0004I8-Gd
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 20:32:11 -0500
+	(envelope-from <mhines@scalecomputing.com>) id 1gzAhm-000628-8i
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 20:41:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzAYR-0005yk-0J
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 20:32:09 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34019)
+	(envelope-from <mhines@scalecomputing.com>) id 1gzAhk-0004lQ-79
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 20:41:46 -0500
+Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:53149)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzAYH-0005mh-GN
-	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 20:32:01 -0500
-Received: by mail-pg1-x541.google.com with SMTP id i130so8861010pgd.1
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 17:31:47 -0800 (PST)
-References: <20190220235017.1060-1-richard.henderson@linaro.org>
-	<20190220235017.1060-2-richard.henderson@linaro.org>
-	<CAFEAcA9GW2HGGw1FjFSTOJgOn+eRs-1anQDJ7nb3FnOSNbQesQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6605b2a8-e46f-4b01-5f6b-6bc84eb9affc@linaro.org>
-Date: Wed, 27 Feb 2019 17:18:27 -0800
+	(Exim 4.71) (envelope-from <mhines@scalecomputing.com>)
+	id 1gzAhj-0004ZU-EC
+	for qemu-devel@nongnu.org; Wed, 27 Feb 2019 20:41:44 -0500
+Received: by mail-it1-x143.google.com with SMTP id g17so4351641ita.2
+	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 17:41:23 -0800 (PST)
+Message-ID: <5c773c41.1c69fb81.68974.a5a0@mx.google.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9GW2HGGw1FjFSTOJgOn+eRs-1anQDJ7nb3FnOSNbQesQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] target/arm: Implement ARMv8.0-SB
+From: Matt Hines <mhines@scalecomputing.com>
+Date: Wed, 27 Feb 2019 17:41:19 -0800
+In-Reply-To: <154895722053.23946.2175068699085740175@ebba9967afc0>
+References: <20190128223056.19452-1-mhines@scalecomputing.com>
+	<154895722053.23946.2175068699085740175@ebba9967afc0>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] QGA: Fix guest-get-fsinfo PCI
+ addresscollection in Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +31,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>
 
-On 2/26/19 10:31 AM, Peter Maydell wrote:
-> On Wed, 20 Feb 2019 at 23:50, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> 
->> @@ -9192,6 +9192,17 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->>                   */
->>                  gen_goto_tb(s, 0, s->pc & ~1);
->>                  return;
->> +            case 7: /* sb */
->> +                if (!dc_isar_feature(aa32_sb, s)) {
->> +                    goto illegal_op;
->> +                }
->> +                /*
->> +                 * TODO: There is no speculation barrier opcode
->> +                 * for TCG; MB and end the TB instead.
->> +                 */
->> +                tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
->> +                s->base.is_jmp = DISAS_TOO_MANY;
-> 
-> Why do we do the "end the TB" code differently here than we
-> do for the implementation of ISB in the case immediately
-> above ?
-
-No good reason, I suppose.  This is how we end the TB for MSR, I think.  But I
-can change it.
+ping
 
 
-r~
+
+From: no-reply@patchew.org
+Sent: Thursday, January 31, 2019 9:53
+To: mhines@scalecomputing.com
+Cc: fam@euphon.net; qemu-devel@nongnu.org; mhines@scalecomputing.com; mdrot=
+h@linux.vnet.ibm.com
+Subject: Re: [Qemu-devel] [PATCH v3] QGA: Fix guest-get-fsinfo PCI addressc=
+ollection in Windows
+
+Patchew URL: https://patchew.org/QEMU/20190128223056.19452-1-mhines@scaleco=
+mputing.com/
+
+
+
+Hi,
+
+This series seems to have some coding style problems. See output below for
+more information:
+
+Subject: [Qemu-devel] [PATCH v3] QGA: Fix guest-get-fsinfo PCI address coll=
+ection in Windows
+Type: series
+Message-id: 20190128223056.19452-1-mhines@scalecomputing.com
+
+=3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+#!/bin/bash
+git config --local diff.renamelimit 0
+git config --local diff.renames True
+git config --local diff.algorithm histogram
+./scripts/checkpatch.pl --mailback base..
+=3D=3D=3D TEST SCRIPT END =3D=3D=3D
+
+Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+Switched to a new branch 'test'
+6805362916 QGA: Fix guest-get-fsinfo PCI address collection in Windows
+
+=3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+WARNING: Block comments should align the * on each line
+#198: FILE: qga/commands-win32.c:592:
++            /*
++            * CM API used here as opposed to
+
+WARNING: line over 80 characters
+#302: FILE: qga/commands-win32.c:661:
++            /* There is no need to allocate buffer in the next functions. =
+The size
+
+WARNING: Block comments use a leading /* on a separate line
+#302: FILE: qga/commands-win32.c:661:
++            /* There is no need to allocate buffer in the next functions. =
+The size
+
+WARNING: Block comments should align the * on each line
+#303: FILE: qga/commands-win32.c:662:
++            /* There is no need to allocate buffer in the next functions. =
+The size
++            * is known and ULONG according to
+
+ERROR: spaces required around that '&' (ctx:VxV)
+#308: FILE: qga/commands-win32.c:667:
++                  &type, (PBYTE)&bus, size, NULL)) {
+                                 ^
+
+WARNING: Block comments use a leading /* on a separate line
+#326: FILE: qga/commands-win32.c:673:
++            /* The function retrieves the device's address. This value wil=
+l be
+
+WARNING: Block comments use a trailing */ on a separate line
+#327: FILE: qga/commands-win32.c:674:
++            * transformed into device function and number */
+
+WARNING: Block comments should align the * on each line
+#327: FILE: qga/commands-win32.c:674:
++            /* The function retrieves the device's address. This value wil=
+l be
++            * transformed into device function and number */
+
+ERROR: spaces required around that '&' (ctx:VxV)
+#330: FILE: qga/commands-win32.c:677:
++                    &type, (PBYTE)&addr, size, NULL)) {
+                                   ^
+
+WARNING: Block comments use a leading /* on a separate line
+#336: FILE: qga/commands-win32.c:683:
++            /* This call returns UINumber of DEVICE_CAPABILITIES structure=
+.
+
+WARNING: Block comments use a trailing */ on a separate line
+#337: FILE: qga/commands-win32.c:684:
++            * This number is typically a user-perceived slot number. */
+
+WARNING: Block comments should align the * on each line
+#337: FILE: qga/commands-win32.c:684:
++            /* This call returns UINumber of DEVICE_CAPABILITIES structure=
+.
++            * This number is typically a user-perceived slot number. */
+
+ERROR: spaces required around that '&' (ctx:VxV)
+#340: FILE: qga/commands-win32.c:687:
++                    &type, (PBYTE)&slot, size, NULL)) {
+                                   ^
+
+WARNING: Block comments use a leading /* on a separate line
+#346: FILE: qga/commands-win32.c:693:
++            /* SetupApi gives us the same information as driver with
+
+WARNING: Block comments should align the * on each line
+#347: FILE: qga/commands-win32.c:694:
++            /* SetupApi gives us the same information as driver with
++            * IoGetDeviceProperty. According to Microsoft
+
+WARNING: Block comments use a trailing */ on a separate line
+#351: FILE: qga/commands-win32.c:698:
++            * SPDRP_ADDRESS is propertyAddress, so we do the same.*/
+
+total: 3 errors, 13 warnings, 407 lines checked
+
+Commit 680536291660 (QGA: Fix guest-get-fsinfo PCI address collection in Wi=
+ndows) has style problems, please review.  If any of these errors
+are false positives report them to the maintainer, see
+CHECKPATCH in MAINTAINERS.
+=3D=3D=3D OUTPUT END =3D=3D=3D
+
+Test command exited with code: 1
+
+
+The full log is available at
+http://patchew.org/logs/20190128223056.19452-1-mhines@scalecomputing.com/te=
+sting.checkpatch/?type=3Dmessage.
+---
+Email generated automatically by Patchew [http://patchew.org/].
+Please send your feedback to patchew-devel@redhat.com
