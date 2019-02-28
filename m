@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52289)
+Received: from eggs.gnu.org ([209.51.188.92]:56257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzQck-0000rL-L8
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:41:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzQy6-0006Ok-QQ
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 14:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzQcj-0006ae-H7
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 13:41:38 -0500
-References: <20190227162035.18543-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f84fc50a-110b-e2bf-0061-6ff17a98dbe6@redhat.com>
-Date: Thu, 28 Feb 2019 12:41:29 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gzQy5-00085y-Qz
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 14:03:42 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:34262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gzQy5-0007zZ-Il
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 14:03:41 -0500
+Received: by mail-ot1-x331.google.com with SMTP id 98so18725708oty.1
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 11:03:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190227162035.18543-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] nbd: support for authorization
- control on TLS connections
+References: <20190228110835.16159-1-peter.maydell@linaro.org>
+In-Reply-To: <20190228110835.16159-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Feb 2019 19:03:13 +0000
+Message-ID: <CAFEAcA9qP6m1GmrVtHraAs-jK2sBhN7w9mZ4uxRCTOft9-Ys8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/16] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On 2/27/19 10:20 AM, Daniel P. Berrang=C3=A9 wrote:
-> This series provides the NBD parts of the authorization control series
-> previously posted as:
->=20
->   v1: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04482.ht=
-ml
->   v2: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05727.ht=
-ml
->   v3: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01639.ht=
-ml
->   v4: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04319.ht=
-ml
->=20
-> Then separated for merge:
->=20
->   v5: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07347.ht=
-ml
->=20
-> The core authz framework is now merged & these patches have all had
-> positive review. Thus these NBD parts are ready to go into the NBD
-> maintainer's tree, should the maintainer consider them acceptable.
+On Thu, 28 Feb 2019 at 11:08, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> The following changes since commit adf2e451f357e993f173ba9b4176dbf3e65fee7e:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-02-26 19:04:47 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190228-1
+>
+> for you to fetch changes up to 1c9af3a9e05c1607a36df4943f8f5393d7621a91:
+>
+>   linux-user: Enable HWCAP_ASIMDFHM, HWCAP_JSCVT (2019-02-28 11:03:05 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * add MHU and dual-core support to Musca boards
+>  * refactor some VFP insns to be gated by ID registers
+>  * Revert "arm: Allow system registers for KVM guests to be changed by QEMU code"
+>  * Implement ARMv8.2-FHM extension
+>  * Advertise JSCVT via HWCAP for linux-user
+>
 
-Thanks; series is queued for my next pull request.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
