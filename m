@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34060)
+Received: from eggs.gnu.org ([209.51.188.92]:35290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzEQY-00046y-4R
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:40:14 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gzEZZ-0005aa-3L
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:49:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzEQX-0003rq-EY
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:40:14 -0500
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:43192)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzEQX-0003oT-63
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:40:13 -0500
-Received: by mail-pl1-x62a.google.com with SMTP id m10so9157948plt.10
-	for <qemu-devel@nongnu.org>; Wed, 27 Feb 2019 21:40:11 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 27 Feb 2019 21:40:07 -0800
-Message-Id: <20190228054007.779-1-richard.henderson@linaro.org>
-In-Reply-To: <20190228052432.32571-1-richard.henderson@linaro.org>
-References: <20190228052432.32571-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 9/8] decodetree: Produce clean output for an
- empty input file
+	(envelope-from <kraxel@redhat.com>) id 1gzEZT-0001nV-Dn
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:49:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45506)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gzEZS-0001j3-5W
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 00:49:27 -0500
+Date: Thu, 28 Feb 2019 06:49:23 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190228054923.wxguahjavmqybddn@sirius.home.kraxel.org>
+References: <CAKyx-3Paa6_RreGZw3sT+qmwu1=_DLnR_RDxa_gN20vwD1EnLw@mail.gmail.com>
+	<20190225152618.r3epnypkpu6fyokt@sirius.home.kraxel.org>
+	<A17B6D30-F428-48E5-B9D0-6F6E7DEE3778@gmail.com>
+	<20190226064347.i5kvwazmz3xcupkj@sirius.home.kraxel.org>
+	<CAKyx-3OOkkdSQ=UAucP_ZpormrEczwNhEpAnVtFeQOSOrnD7Vg@mail.gmail.com>
+	<20190227052755.3lgo3265kaa6bzmi@sirius.home.kraxel.org>
+	<1ef851d2-4148-56f0-65ac-a0e75022f20e@ilande.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ef851d2-4148-56f0-65ac-a0e75022f20e@ilande.co.uk>
+Subject: Re: [Qemu-devel] Questions about EDID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: f4bug@amsat.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: G 3 <programmingkidx@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-This is interesting for bisection, where an output file is plumbed,
-but does not yet have patterns.
+  Hi,
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
+> Right, at the moment all the MacOS driver does is parse the resolution list from the
+> EDID and add them to the dropdown list - it doesn't support the xres and yres properties.
 
-One more small fix that should have gone with the v2 patchset.
+> The main reason for this that OpenBIOS currently makes use of the -g XxYxD parameter
+> to set up the display resolution and bit depth, and AFAICT we currently only have
+> access to the X and Y resolutions via the EDID blob. So it's not clear whether EDID
+> can completely replace the existing mechanism yet.
 
----
- scripts/decodetree.py | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+EDID can only propagate x + y, not depth.
 
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index 68979b73a0..1785769eec 100755
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
-@@ -1050,15 +1050,16 @@ def main():
-            '(DisasContext *ctx, ', insntype, ' insn)\n{\n')
- 
-     i4 = str_indent(4)
--    output(i4, 'union {\n')
--    for n in sorted(arguments.keys()):
--        f = arguments[n]
--        output(i4, i4, f.struct_name(), ' f_', f.name, ';\n')
--    output(i4, '} u;\n\n')
- 
--    t.output_code(4, False, 0, 0)
-+    if len(allpatterns) != 0:
-+        output(i4, 'union {\n')
-+        for n in sorted(arguments.keys()):
-+            f = arguments[n]
-+            output(i4, i4, f.struct_name(), ' f_', f.name, ';\n')
-+        output(i4, '} u;\n\n')
-+        t.output_code(4, False, 0, 0)
-+
-     output(i4, 'return false;\n')
--
-     output('}\n')
- 
-     if output_file:
--- 
-2.17.2
+cheers,
+  Gerd
