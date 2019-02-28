@@ -1,38 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57841)
+Received: from eggs.gnu.org ([209.51.188.92]:59938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gzUdG-0002vw-O8
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:28 -0500
+	(envelope-from <philmd@redhat.com>) id 1gzUma-0008Sw-Kv
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 18:08:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gzUdF-0001yQ-04
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54808
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gzUdE-0001xu-Mf
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:58:24 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1SMsEpn109905
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 17:58:24 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qxq6bmmb1-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 17:58:24 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Thu, 28 Feb 2019 22:58:23 -0000
-From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Thu, 28 Feb 2019 19:57:59 -0300
-In-Reply-To: <20190228225759.21328-1-farosas@linux.ibm.com>
-References: <20190228225759.21328-1-farosas@linux.ibm.com>
+	(envelope-from <philmd@redhat.com>) id 1gzUmW-000607-Hm
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 18:08:04 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:40583)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gzUmS-0005yN-G6
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 18:07:58 -0500
+Received: by mail-wr1-f68.google.com with SMTP id q1so23850963wrp.7
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 15:07:56 -0800 (PST)
+References: <20190228202537.4638-1-alex.bennee@linaro.org>
+	<20190228202537.4638-11-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fec89b30-8da5-daa9-e8e7-22ddfc055ac6@redhat.com>
+Date: Fri, 1 Mar 2019 00:07:53 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190228202537.4638-11-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Message-Id: <20190228225759.21328-6-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v4 5/5] target/ppc: support single stepping
- with KVM HV
+Subject: Re: [Qemu-devel] [PATCH v2 10/16] tests/tcg: split cris tests into
+ bare and libc directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,404 +31,714 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@gmail.com, qemu-arm@nongnu.org, jcmvbkbc@gmail.com
 
-The hardware singlestep mechanism in POWER works via a Trace Interrupt
-(0xd00) that happens after any instruction executes, whenever MSR_SE =
-1 (PowerISA Section 6.5.15 - Trace Interrupt).
+Hi Alex,
 
-However, with kvm_hv, the Trace Interrupt happens inside the guest and
-KVM has no visibility of it. Therefore, when the gdbstub uses the
-KVM_SET_GUEST_DEBUG ioctl to enable singlestep, KVM simply ignores it.
+On 2/28/19 9:25 PM, Alex Bennée wrote:
+> Bare tests are standalone assembly tests that don't require linking to
+> any libc and hence can be built with kernel only compilers. The libc
+> tests need a compiler capable of building properly linked userspace
+> binaries. As we don't have such a cross compiler at the moment we
+> won't be building those tests.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> ---
+> v2
+>   - split between bare/libc instead of system/user
+> ---
+>  tests/tcg/cris/{ => bare}/check_addcv17.s     |  0
+>  tests/tcg/cris/{ => bare}/check_addi.s        |  0
+>  tests/tcg/cris/{ => bare}/check_addiv32.s     |  0
+>  tests/tcg/cris/{ => bare}/check_addm.s        |  0
+>  tests/tcg/cris/{ => bare}/check_addq.s        |  0
+>  tests/tcg/cris/{ => bare}/check_addr.s        |  0
+>  tests/tcg/cris/{ => bare}/check_addxc.s       |  0
+>  tests/tcg/cris/{ => bare}/check_addxm.s       |  0
+>  tests/tcg/cris/{ => bare}/check_addxr.s       |  0
+>  tests/tcg/cris/{ => bare}/check_andc.s        |  0
+>  tests/tcg/cris/{ => bare}/check_andm.s        |  0
+>  tests/tcg/cris/{ => bare}/check_andq.s        |  0
+>  tests/tcg/cris/{ => bare}/check_andr.s        |  0
+>  tests/tcg/cris/{ => bare}/check_asr.s         |  0
+>  tests/tcg/cris/{ => bare}/check_ba.s          |  0
+>  tests/tcg/cris/{ => bare}/check_bas.s         |  0
+>  tests/tcg/cris/{ => bare}/check_bcc.s         |  0
+>  tests/tcg/cris/{ => bare}/check_boundc.s      |  0
+>  tests/tcg/cris/{ => bare}/check_boundr.s      |  0
+>  tests/tcg/cris/{ => bare}/check_btst.s        |  0
+>  tests/tcg/cris/{ => bare}/check_clearfv32.s   |  0
+>  tests/tcg/cris/{ => bare}/check_clrjmp1.s     |  0
+>  tests/tcg/cris/{ => bare}/check_cmp-2.s       |  0
+>  tests/tcg/cris/{ => bare}/check_cmpc.s        |  0
+>  tests/tcg/cris/{ => bare}/check_cmpm.s        |  0
+>  tests/tcg/cris/{ => bare}/check_cmpq.s        |  0
+>  tests/tcg/cris/{ => bare}/check_cmpr.s        |  0
+>  tests/tcg/cris/{ => bare}/check_cmpxc.s       |  0
+>  tests/tcg/cris/{ => bare}/check_cmpxm.s       |  0
+>  tests/tcg/cris/{ => bare}/check_dstep.s       |  0
+>  tests/tcg/cris/{ => bare}/check_jsr.s         |  0
+>  tests/tcg/cris/{ => bare}/check_lapc.s        |  0
+>  tests/tcg/cris/{ => bare}/check_lsl.s         |  0
+>  tests/tcg/cris/{ => bare}/check_lsr.s         |  0
+>  tests/tcg/cris/{ => bare}/check_mcp.s         |  0
+>  tests/tcg/cris/{ => bare}/check_movdelsr1.s   |  0
+>  tests/tcg/cris/{ => bare}/check_movecr.s      |  0
+>  tests/tcg/cris/{ => bare}/check_movei.s       |  0
+>  tests/tcg/cris/{ => bare}/check_movemr.s      |  0
+>  tests/tcg/cris/{ => bare}/check_movemrv32.s   |  0
+>  tests/tcg/cris/{ => bare}/check_mover.s       |  0
+>  tests/tcg/cris/{ => bare}/check_moverm.s      |  0
+>  tests/tcg/cris/{ => bare}/check_movmp.s       |  0
+>  tests/tcg/cris/{ => bare}/check_movpmv32.s    |  0
+>  tests/tcg/cris/{ => bare}/check_movpr.s       |  0
+>  tests/tcg/cris/{ => bare}/check_movprv32.s    |  0
+>  tests/tcg/cris/{ => bare}/check_movscr.s      |  0
+>  tests/tcg/cris/{ => bare}/check_movsm.s       |  0
+>  tests/tcg/cris/{ => bare}/check_movsr.s       |  0
+>  tests/tcg/cris/{ => bare}/check_movucr.s      |  0
+>  tests/tcg/cris/{ => bare}/check_movum.s       |  0
+>  tests/tcg/cris/{ => bare}/check_movur.s       |  0
+>  tests/tcg/cris/{ => bare}/check_mulv32.s      |  0
+>  tests/tcg/cris/{ => bare}/check_mulx.s        |  0
+>  tests/tcg/cris/{ => bare}/check_neg.s         |  0
+>  tests/tcg/cris/{ => bare}/check_not.s         |  0
+>  tests/tcg/cris/{ => bare}/check_orc.s         |  0
+>  tests/tcg/cris/{ => bare}/check_orm.s         |  0
+>  tests/tcg/cris/{ => bare}/check_orq.s         |  0
+>  tests/tcg/cris/{ => bare}/check_orr.s         |  0
+>  tests/tcg/cris/{ => bare}/check_ret.s         |  0
+>  tests/tcg/cris/{ => bare}/check_scc.s         |  0
+>  tests/tcg/cris/{ => bare}/check_subc.s        |  0
+>  tests/tcg/cris/{ => bare}/check_subm.s        |  0
+>  tests/tcg/cris/{ => bare}/check_subq.s        |  0
+>  tests/tcg/cris/{ => bare}/check_subr.s        |  0
+>  tests/tcg/cris/{ => bare}/check_xarith.s      |  0
+>  tests/tcg/cris/{ => bare}/crt.s               |  0
+>  tests/tcg/cris/{ => bare}/sys.c               |  0
 
-This patch takes advantage of the Trace Interrupt to perform the step
-inside the guest, but uses a breakpoint at the Trace Interrupt handler
-to return control to KVM. The exit is treated by KVM as a regular
-breakpoint and it returns to the host (and QEMU eventually).
+Here you move the current sys.c which includes stdio/stdlib/unistd to
+bare ...
 
-Before signalling GDB, QEMU sets the Next Instruction Pointer to the
-instruction following the one being stepped and restores the MSR,
-SRR0, SRR1 values from before the step, effectively skipping the
-interrupt handler execution and hiding the trace interrupt breakpoint
-from GDB.
+>  tests/tcg/cris/{ => bare}/testutils.inc       |  0
+>  tests/tcg/cris/{ => libc}/check_abs.c         |  0
+>  tests/tcg/cris/{ => libc}/check_addc.c        |  0
+>  tests/tcg/cris/{ => libc}/check_addcm.c       |  0
+>  tests/tcg/cris/{ => libc}/check_addo.c        |  0
+>  tests/tcg/cris/{ => libc}/check_addoq.c       |  0
+>  tests/tcg/cris/{ => libc}/check_bound.c       |  0
+>  tests/tcg/cris/{ => libc}/check_ftag.c        |  0
+>  .../{ => libc}/check_gcctorture_pr28634-1.c   |  0
+>  .../{ => libc}/check_gcctorture_pr28634.c     |  0
+>  .../{ => libc}/check_glibc_kernelversion.c    |  0
+>  tests/tcg/cris/{ => libc}/check_hello.c       |  0
+>  tests/tcg/cris/{ => libc}/check_int64.c       |  0
+>  tests/tcg/cris/{ => libc}/check_lz.c          |  0
+>  tests/tcg/cris/{ => libc}/check_mapbrk.c      |  0
+>  tests/tcg/cris/{ => libc}/check_mmap1.c       |  0
+>  tests/tcg/cris/{ => libc}/check_mmap2.c       |  0
+>  tests/tcg/cris/{ => libc}/check_mmap3.c       |  0
+>  tests/tcg/cris/{ => libc}/check_moveq.c       |  0
+>  tests/tcg/cris/{ => libc}/check_openpf1.c     |  0
+>  tests/tcg/cris/{ => libc}/check_openpf2.c     |  0
+>  tests/tcg/cris/{ => libc}/check_openpf3.c     |  0
+>  tests/tcg/cris/{ => libc}/check_openpf5.c     |  0
+>  tests/tcg/cris/{ => libc}/check_settls1.c     |  0
+>  tests/tcg/cris/{ => libc}/check_sigalrm.c     |  0
+>  tests/tcg/cris/{ => libc}/check_stat1.c       |  0
+>  tests/tcg/cris/{ => libc}/check_stat2.c       |  0
+>  tests/tcg/cris/{ => libc}/check_stat3.c       |  0
+>  tests/tcg/cris/{ => libc}/check_stat4.c       |  0
+>  tests/tcg/cris/{ => libc}/check_swap.c        |  0
+>  tests/tcg/cris/{ => libc}/check_time2.c       |  0
+>  tests/tcg/cris/{ => libc}/crisutils.h         |  0
+>  tests/tcg/cris/libc/sys.c                     | 58 +++++++++++++++++++
+>  tests/tcg/cris/{ => libc}/sys.h               |  0
+>  103 files changed, 58 insertions(+)
+>  rename tests/tcg/cris/{ => bare}/check_addcv17.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_addi.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_addiv32.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_addm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_addq.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_addr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_addxc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_addxm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_addxr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_andc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_andm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_andq.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_andr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_asr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_ba.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_bas.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_bcc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_boundc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_boundr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_btst.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_clearfv32.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_clrjmp1.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_cmp-2.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_cmpc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_cmpm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_cmpq.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_cmpr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_cmpxc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_cmpxm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_dstep.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_jsr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_lapc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_lsl.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_lsr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_mcp.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movdelsr1.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movecr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movei.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movemr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movemrv32.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_mover.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_moverm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movmp.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movpmv32.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movpr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movprv32.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movscr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movsm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movsr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movucr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movum.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_movur.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_mulv32.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_mulx.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_neg.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_not.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_orc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_orm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_orq.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_orr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_ret.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_scc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_subc.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_subm.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_subq.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_subr.s (100%)
+>  rename tests/tcg/cris/{ => bare}/check_xarith.s (100%)
+>  rename tests/tcg/cris/{ => bare}/crt.s (100%)
+>  rename tests/tcg/cris/{ => bare}/sys.c (100%)
+>  rename tests/tcg/cris/{ => bare}/testutils.inc (100%)
+>  rename tests/tcg/cris/{ => libc}/check_abs.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_addc.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_addcm.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_addo.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_addoq.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_bound.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_ftag.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_gcctorture_pr28634-1.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_gcctorture_pr28634.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_glibc_kernelversion.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_hello.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_int64.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_lz.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_mapbrk.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_mmap1.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_mmap2.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_mmap3.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_moveq.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_openpf1.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_openpf2.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_openpf3.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_openpf5.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_settls1.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_sigalrm.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_stat1.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_stat2.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_stat3.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_stat4.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_swap.c (100%)
+>  rename tests/tcg/cris/{ => libc}/check_time2.c (100%)
+>  rename tests/tcg/cris/{ => libc}/crisutils.h (100%)
+>  create mode 100644 tests/tcg/cris/libc/sys.c
+>  rename tests/tcg/cris/{ => libc}/sys.h (100%)
+> 
+> diff --git a/tests/tcg/cris/check_addcv17.s b/tests/tcg/cris/bare/check_addcv17.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addcv17.s
+> rename to tests/tcg/cris/bare/check_addcv17.s
+> diff --git a/tests/tcg/cris/check_addi.s b/tests/tcg/cris/bare/check_addi.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addi.s
+> rename to tests/tcg/cris/bare/check_addi.s
+> diff --git a/tests/tcg/cris/check_addiv32.s b/tests/tcg/cris/bare/check_addiv32.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addiv32.s
+> rename to tests/tcg/cris/bare/check_addiv32.s
+> diff --git a/tests/tcg/cris/check_addm.s b/tests/tcg/cris/bare/check_addm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addm.s
+> rename to tests/tcg/cris/bare/check_addm.s
+> diff --git a/tests/tcg/cris/check_addq.s b/tests/tcg/cris/bare/check_addq.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addq.s
+> rename to tests/tcg/cris/bare/check_addq.s
+> diff --git a/tests/tcg/cris/check_addr.s b/tests/tcg/cris/bare/check_addr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addr.s
+> rename to tests/tcg/cris/bare/check_addr.s
+> diff --git a/tests/tcg/cris/check_addxc.s b/tests/tcg/cris/bare/check_addxc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addxc.s
+> rename to tests/tcg/cris/bare/check_addxc.s
+> diff --git a/tests/tcg/cris/check_addxm.s b/tests/tcg/cris/bare/check_addxm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addxm.s
+> rename to tests/tcg/cris/bare/check_addxm.s
+> diff --git a/tests/tcg/cris/check_addxr.s b/tests/tcg/cris/bare/check_addxr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_addxr.s
+> rename to tests/tcg/cris/bare/check_addxr.s
+> diff --git a/tests/tcg/cris/check_andc.s b/tests/tcg/cris/bare/check_andc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_andc.s
+> rename to tests/tcg/cris/bare/check_andc.s
+> diff --git a/tests/tcg/cris/check_andm.s b/tests/tcg/cris/bare/check_andm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_andm.s
+> rename to tests/tcg/cris/bare/check_andm.s
+> diff --git a/tests/tcg/cris/check_andq.s b/tests/tcg/cris/bare/check_andq.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_andq.s
+> rename to tests/tcg/cris/bare/check_andq.s
+> diff --git a/tests/tcg/cris/check_andr.s b/tests/tcg/cris/bare/check_andr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_andr.s
+> rename to tests/tcg/cris/bare/check_andr.s
+> diff --git a/tests/tcg/cris/check_asr.s b/tests/tcg/cris/bare/check_asr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_asr.s
+> rename to tests/tcg/cris/bare/check_asr.s
+> diff --git a/tests/tcg/cris/check_ba.s b/tests/tcg/cris/bare/check_ba.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_ba.s
+> rename to tests/tcg/cris/bare/check_ba.s
+> diff --git a/tests/tcg/cris/check_bas.s b/tests/tcg/cris/bare/check_bas.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_bas.s
+> rename to tests/tcg/cris/bare/check_bas.s
+> diff --git a/tests/tcg/cris/check_bcc.s b/tests/tcg/cris/bare/check_bcc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_bcc.s
+> rename to tests/tcg/cris/bare/check_bcc.s
+> diff --git a/tests/tcg/cris/check_boundc.s b/tests/tcg/cris/bare/check_boundc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_boundc.s
+> rename to tests/tcg/cris/bare/check_boundc.s
+> diff --git a/tests/tcg/cris/check_boundr.s b/tests/tcg/cris/bare/check_boundr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_boundr.s
+> rename to tests/tcg/cris/bare/check_boundr.s
+> diff --git a/tests/tcg/cris/check_btst.s b/tests/tcg/cris/bare/check_btst.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_btst.s
+> rename to tests/tcg/cris/bare/check_btst.s
+> diff --git a/tests/tcg/cris/check_clearfv32.s b/tests/tcg/cris/bare/check_clearfv32.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_clearfv32.s
+> rename to tests/tcg/cris/bare/check_clearfv32.s
+> diff --git a/tests/tcg/cris/check_clrjmp1.s b/tests/tcg/cris/bare/check_clrjmp1.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_clrjmp1.s
+> rename to tests/tcg/cris/bare/check_clrjmp1.s
+> diff --git a/tests/tcg/cris/check_cmp-2.s b/tests/tcg/cris/bare/check_cmp-2.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_cmp-2.s
+> rename to tests/tcg/cris/bare/check_cmp-2.s
+> diff --git a/tests/tcg/cris/check_cmpc.s b/tests/tcg/cris/bare/check_cmpc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_cmpc.s
+> rename to tests/tcg/cris/bare/check_cmpc.s
+> diff --git a/tests/tcg/cris/check_cmpm.s b/tests/tcg/cris/bare/check_cmpm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_cmpm.s
+> rename to tests/tcg/cris/bare/check_cmpm.s
+> diff --git a/tests/tcg/cris/check_cmpq.s b/tests/tcg/cris/bare/check_cmpq.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_cmpq.s
+> rename to tests/tcg/cris/bare/check_cmpq.s
+> diff --git a/tests/tcg/cris/check_cmpr.s b/tests/tcg/cris/bare/check_cmpr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_cmpr.s
+> rename to tests/tcg/cris/bare/check_cmpr.s
+> diff --git a/tests/tcg/cris/check_cmpxc.s b/tests/tcg/cris/bare/check_cmpxc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_cmpxc.s
+> rename to tests/tcg/cris/bare/check_cmpxc.s
+> diff --git a/tests/tcg/cris/check_cmpxm.s b/tests/tcg/cris/bare/check_cmpxm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_cmpxm.s
+> rename to tests/tcg/cris/bare/check_cmpxm.s
+> diff --git a/tests/tcg/cris/check_dstep.s b/tests/tcg/cris/bare/check_dstep.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_dstep.s
+> rename to tests/tcg/cris/bare/check_dstep.s
+> diff --git a/tests/tcg/cris/check_jsr.s b/tests/tcg/cris/bare/check_jsr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_jsr.s
+> rename to tests/tcg/cris/bare/check_jsr.s
+> diff --git a/tests/tcg/cris/check_lapc.s b/tests/tcg/cris/bare/check_lapc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_lapc.s
+> rename to tests/tcg/cris/bare/check_lapc.s
+> diff --git a/tests/tcg/cris/check_lsl.s b/tests/tcg/cris/bare/check_lsl.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_lsl.s
+> rename to tests/tcg/cris/bare/check_lsl.s
+> diff --git a/tests/tcg/cris/check_lsr.s b/tests/tcg/cris/bare/check_lsr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_lsr.s
+> rename to tests/tcg/cris/bare/check_lsr.s
+> diff --git a/tests/tcg/cris/check_mcp.s b/tests/tcg/cris/bare/check_mcp.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_mcp.s
+> rename to tests/tcg/cris/bare/check_mcp.s
+> diff --git a/tests/tcg/cris/check_movdelsr1.s b/tests/tcg/cris/bare/check_movdelsr1.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movdelsr1.s
+> rename to tests/tcg/cris/bare/check_movdelsr1.s
+> diff --git a/tests/tcg/cris/check_movecr.s b/tests/tcg/cris/bare/check_movecr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movecr.s
+> rename to tests/tcg/cris/bare/check_movecr.s
+> diff --git a/tests/tcg/cris/check_movei.s b/tests/tcg/cris/bare/check_movei.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movei.s
+> rename to tests/tcg/cris/bare/check_movei.s
+> diff --git a/tests/tcg/cris/check_movemr.s b/tests/tcg/cris/bare/check_movemr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movemr.s
+> rename to tests/tcg/cris/bare/check_movemr.s
+> diff --git a/tests/tcg/cris/check_movemrv32.s b/tests/tcg/cris/bare/check_movemrv32.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movemrv32.s
+> rename to tests/tcg/cris/bare/check_movemrv32.s
+> diff --git a/tests/tcg/cris/check_mover.s b/tests/tcg/cris/bare/check_mover.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_mover.s
+> rename to tests/tcg/cris/bare/check_mover.s
+> diff --git a/tests/tcg/cris/check_moverm.s b/tests/tcg/cris/bare/check_moverm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_moverm.s
+> rename to tests/tcg/cris/bare/check_moverm.s
+> diff --git a/tests/tcg/cris/check_movmp.s b/tests/tcg/cris/bare/check_movmp.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movmp.s
+> rename to tests/tcg/cris/bare/check_movmp.s
+> diff --git a/tests/tcg/cris/check_movpmv32.s b/tests/tcg/cris/bare/check_movpmv32.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movpmv32.s
+> rename to tests/tcg/cris/bare/check_movpmv32.s
+> diff --git a/tests/tcg/cris/check_movpr.s b/tests/tcg/cris/bare/check_movpr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movpr.s
+> rename to tests/tcg/cris/bare/check_movpr.s
+> diff --git a/tests/tcg/cris/check_movprv32.s b/tests/tcg/cris/bare/check_movprv32.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movprv32.s
+> rename to tests/tcg/cris/bare/check_movprv32.s
+> diff --git a/tests/tcg/cris/check_movscr.s b/tests/tcg/cris/bare/check_movscr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movscr.s
+> rename to tests/tcg/cris/bare/check_movscr.s
+> diff --git a/tests/tcg/cris/check_movsm.s b/tests/tcg/cris/bare/check_movsm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movsm.s
+> rename to tests/tcg/cris/bare/check_movsm.s
+> diff --git a/tests/tcg/cris/check_movsr.s b/tests/tcg/cris/bare/check_movsr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movsr.s
+> rename to tests/tcg/cris/bare/check_movsr.s
+> diff --git a/tests/tcg/cris/check_movucr.s b/tests/tcg/cris/bare/check_movucr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movucr.s
+> rename to tests/tcg/cris/bare/check_movucr.s
+> diff --git a/tests/tcg/cris/check_movum.s b/tests/tcg/cris/bare/check_movum.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movum.s
+> rename to tests/tcg/cris/bare/check_movum.s
+> diff --git a/tests/tcg/cris/check_movur.s b/tests/tcg/cris/bare/check_movur.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_movur.s
+> rename to tests/tcg/cris/bare/check_movur.s
+> diff --git a/tests/tcg/cris/check_mulv32.s b/tests/tcg/cris/bare/check_mulv32.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_mulv32.s
+> rename to tests/tcg/cris/bare/check_mulv32.s
+> diff --git a/tests/tcg/cris/check_mulx.s b/tests/tcg/cris/bare/check_mulx.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_mulx.s
+> rename to tests/tcg/cris/bare/check_mulx.s
+> diff --git a/tests/tcg/cris/check_neg.s b/tests/tcg/cris/bare/check_neg.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_neg.s
+> rename to tests/tcg/cris/bare/check_neg.s
+> diff --git a/tests/tcg/cris/check_not.s b/tests/tcg/cris/bare/check_not.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_not.s
+> rename to tests/tcg/cris/bare/check_not.s
+> diff --git a/tests/tcg/cris/check_orc.s b/tests/tcg/cris/bare/check_orc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_orc.s
+> rename to tests/tcg/cris/bare/check_orc.s
+> diff --git a/tests/tcg/cris/check_orm.s b/tests/tcg/cris/bare/check_orm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_orm.s
+> rename to tests/tcg/cris/bare/check_orm.s
+> diff --git a/tests/tcg/cris/check_orq.s b/tests/tcg/cris/bare/check_orq.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_orq.s
+> rename to tests/tcg/cris/bare/check_orq.s
+> diff --git a/tests/tcg/cris/check_orr.s b/tests/tcg/cris/bare/check_orr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_orr.s
+> rename to tests/tcg/cris/bare/check_orr.s
+> diff --git a/tests/tcg/cris/check_ret.s b/tests/tcg/cris/bare/check_ret.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_ret.s
+> rename to tests/tcg/cris/bare/check_ret.s
+> diff --git a/tests/tcg/cris/check_scc.s b/tests/tcg/cris/bare/check_scc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_scc.s
+> rename to tests/tcg/cris/bare/check_scc.s
+> diff --git a/tests/tcg/cris/check_subc.s b/tests/tcg/cris/bare/check_subc.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_subc.s
+> rename to tests/tcg/cris/bare/check_subc.s
+> diff --git a/tests/tcg/cris/check_subm.s b/tests/tcg/cris/bare/check_subm.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_subm.s
+> rename to tests/tcg/cris/bare/check_subm.s
+> diff --git a/tests/tcg/cris/check_subq.s b/tests/tcg/cris/bare/check_subq.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_subq.s
+> rename to tests/tcg/cris/bare/check_subq.s
+> diff --git a/tests/tcg/cris/check_subr.s b/tests/tcg/cris/bare/check_subr.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_subr.s
+> rename to tests/tcg/cris/bare/check_subr.s
+> diff --git a/tests/tcg/cris/check_xarith.s b/tests/tcg/cris/bare/check_xarith.s
+> similarity index 100%
+> rename from tests/tcg/cris/check_xarith.s
+> rename to tests/tcg/cris/bare/check_xarith.s
+> diff --git a/tests/tcg/cris/crt.s b/tests/tcg/cris/bare/crt.s
+> similarity index 100%
+> rename from tests/tcg/cris/crt.s
+> rename to tests/tcg/cris/bare/crt.s
+> diff --git a/tests/tcg/cris/sys.c b/tests/tcg/cris/bare/sys.c
+> similarity index 100%
+> rename from tests/tcg/cris/sys.c
+> rename to tests/tcg/cris/bare/sys.c
+> diff --git a/tests/tcg/cris/testutils.inc b/tests/tcg/cris/bare/testutils.inc
+> similarity index 100%
+> rename from tests/tcg/cris/testutils.inc
+> rename to tests/tcg/cris/bare/testutils.inc
+> diff --git a/tests/tcg/cris/check_abs.c b/tests/tcg/cris/libc/check_abs.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_abs.c
+> rename to tests/tcg/cris/libc/check_abs.c
+> diff --git a/tests/tcg/cris/check_addc.c b/tests/tcg/cris/libc/check_addc.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_addc.c
+> rename to tests/tcg/cris/libc/check_addc.c
+> diff --git a/tests/tcg/cris/check_addcm.c b/tests/tcg/cris/libc/check_addcm.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_addcm.c
+> rename to tests/tcg/cris/libc/check_addcm.c
+> diff --git a/tests/tcg/cris/check_addo.c b/tests/tcg/cris/libc/check_addo.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_addo.c
+> rename to tests/tcg/cris/libc/check_addo.c
+> diff --git a/tests/tcg/cris/check_addoq.c b/tests/tcg/cris/libc/check_addoq.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_addoq.c
+> rename to tests/tcg/cris/libc/check_addoq.c
+> diff --git a/tests/tcg/cris/check_bound.c b/tests/tcg/cris/libc/check_bound.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_bound.c
+> rename to tests/tcg/cris/libc/check_bound.c
+> diff --git a/tests/tcg/cris/check_ftag.c b/tests/tcg/cris/libc/check_ftag.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_ftag.c
+> rename to tests/tcg/cris/libc/check_ftag.c
+> diff --git a/tests/tcg/cris/check_gcctorture_pr28634-1.c b/tests/tcg/cris/libc/check_gcctorture_pr28634-1.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_gcctorture_pr28634-1.c
+> rename to tests/tcg/cris/libc/check_gcctorture_pr28634-1.c
+> diff --git a/tests/tcg/cris/check_gcctorture_pr28634.c b/tests/tcg/cris/libc/check_gcctorture_pr28634.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_gcctorture_pr28634.c
+> rename to tests/tcg/cris/libc/check_gcctorture_pr28634.c
+> diff --git a/tests/tcg/cris/check_glibc_kernelversion.c b/tests/tcg/cris/libc/check_glibc_kernelversion.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_glibc_kernelversion.c
+> rename to tests/tcg/cris/libc/check_glibc_kernelversion.c
+> diff --git a/tests/tcg/cris/check_hello.c b/tests/tcg/cris/libc/check_hello.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_hello.c
+> rename to tests/tcg/cris/libc/check_hello.c
+> diff --git a/tests/tcg/cris/check_int64.c b/tests/tcg/cris/libc/check_int64.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_int64.c
+> rename to tests/tcg/cris/libc/check_int64.c
+> diff --git a/tests/tcg/cris/check_lz.c b/tests/tcg/cris/libc/check_lz.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_lz.c
+> rename to tests/tcg/cris/libc/check_lz.c
+> diff --git a/tests/tcg/cris/check_mapbrk.c b/tests/tcg/cris/libc/check_mapbrk.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_mapbrk.c
+> rename to tests/tcg/cris/libc/check_mapbrk.c
+> diff --git a/tests/tcg/cris/check_mmap1.c b/tests/tcg/cris/libc/check_mmap1.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_mmap1.c
+> rename to tests/tcg/cris/libc/check_mmap1.c
+> diff --git a/tests/tcg/cris/check_mmap2.c b/tests/tcg/cris/libc/check_mmap2.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_mmap2.c
+> rename to tests/tcg/cris/libc/check_mmap2.c
+> diff --git a/tests/tcg/cris/check_mmap3.c b/tests/tcg/cris/libc/check_mmap3.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_mmap3.c
+> rename to tests/tcg/cris/libc/check_mmap3.c
+> diff --git a/tests/tcg/cris/check_moveq.c b/tests/tcg/cris/libc/check_moveq.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_moveq.c
+> rename to tests/tcg/cris/libc/check_moveq.c
+> diff --git a/tests/tcg/cris/check_openpf1.c b/tests/tcg/cris/libc/check_openpf1.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_openpf1.c
+> rename to tests/tcg/cris/libc/check_openpf1.c
+> diff --git a/tests/tcg/cris/check_openpf2.c b/tests/tcg/cris/libc/check_openpf2.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_openpf2.c
+> rename to tests/tcg/cris/libc/check_openpf2.c
+> diff --git a/tests/tcg/cris/check_openpf3.c b/tests/tcg/cris/libc/check_openpf3.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_openpf3.c
+> rename to tests/tcg/cris/libc/check_openpf3.c
+> diff --git a/tests/tcg/cris/check_openpf5.c b/tests/tcg/cris/libc/check_openpf5.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_openpf5.c
+> rename to tests/tcg/cris/libc/check_openpf5.c
+> diff --git a/tests/tcg/cris/check_settls1.c b/tests/tcg/cris/libc/check_settls1.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_settls1.c
+> rename to tests/tcg/cris/libc/check_settls1.c
+> diff --git a/tests/tcg/cris/check_sigalrm.c b/tests/tcg/cris/libc/check_sigalrm.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_sigalrm.c
+> rename to tests/tcg/cris/libc/check_sigalrm.c
+> diff --git a/tests/tcg/cris/check_stat1.c b/tests/tcg/cris/libc/check_stat1.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_stat1.c
+> rename to tests/tcg/cris/libc/check_stat1.c
+> diff --git a/tests/tcg/cris/check_stat2.c b/tests/tcg/cris/libc/check_stat2.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_stat2.c
+> rename to tests/tcg/cris/libc/check_stat2.c
+> diff --git a/tests/tcg/cris/check_stat3.c b/tests/tcg/cris/libc/check_stat3.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_stat3.c
+> rename to tests/tcg/cris/libc/check_stat3.c
+> diff --git a/tests/tcg/cris/check_stat4.c b/tests/tcg/cris/libc/check_stat4.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_stat4.c
+> rename to tests/tcg/cris/libc/check_stat4.c
+> diff --git a/tests/tcg/cris/check_swap.c b/tests/tcg/cris/libc/check_swap.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_swap.c
+> rename to tests/tcg/cris/libc/check_swap.c
+> diff --git a/tests/tcg/cris/check_time2.c b/tests/tcg/cris/libc/check_time2.c
+> similarity index 100%
+> rename from tests/tcg/cris/check_time2.c
+> rename to tests/tcg/cris/libc/check_time2.c
+> diff --git a/tests/tcg/cris/crisutils.h b/tests/tcg/cris/libc/crisutils.h
+> similarity index 100%
+> rename from tests/tcg/cris/crisutils.h
+> rename to tests/tcg/cris/libc/crisutils.h
+> diff --git a/tests/tcg/cris/libc/sys.c b/tests/tcg/cris/libc/sys.c
+> new file mode 100644
+> index 0000000000..b8e759eee3
+> --- /dev/null
+> +++ b/tests/tcg/cris/libc/sys.c
+> @@ -0,0 +1,58 @@
+> +/*
+> + * Minilib helpers functions for system test
+> + */
+> +
+> +
 
-This approach works with both of GDB's 'scheduler-locking' options
-(off, step).
+... and you add a copy which doesn't include stdio/stdlib/unistd in
+libc/. Don't we want the opposite? Maybe we can avoid duplicate code
+having each including ../sys.inc.c.
 
-Note:
+> +void exit (int status) {
+> +	register unsigned int callno asm ("r9") = 1; /* NR_exit */
+> +	asm volatile ("break 13\n"
+> +		      :
+> +		      : "r" (callno)
+> +		      : "memory" );
+> +	while(1);
+> +}
+> +
+> +ssize_t write (int fd, const void *buf, size_t count) {
 
-- kvm_arch_set_singlestep happens after GDB asks for a single step,
-  while the vcpus are stopped.
+The CPP should complain about size_t undefined.
 
-- kvm_handle_singlestep executes after the step, during the handling
-  of the Emulation Assist Interrupt (breakpoint).
-
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- target/ppc/cpu.h         |  16 ++++
- target/ppc/excp_helper.c |  13 +++
- target/ppc/gdbstub.c     |  35 +++++++
- target/ppc/kvm.c         | 195 +++++++++++++++++++++++++++++++++++++--
- 4 files changed, 252 insertions(+), 7 deletions(-)
-
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 26604ddf98..fb1bf1e9d7 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1171,6 +1171,11 @@ struct CPUPPCState {
-     uint32_t tm_vscr;
-     uint64_t tm_dscr;
-     uint64_t tm_tar;
-+
-+    /* Used for software single step */
-+    target_ulong sstep_msr;
-+    target_ulong sstep_srr0;
-+    target_ulong sstep_srr1;
- };
- 
- #define SET_FIT_PERIOD(a_, b_, c_, d_)          \
-@@ -1266,6 +1271,7 @@ struct PPCVirtualHypervisorClass {
-     OBJECT_GET_CLASS(PPCVirtualHypervisorClass, (obj), \
-                      TYPE_PPC_VIRTUAL_HYPERVISOR)
- 
-+target_ulong ppc_get_trace_int_handler_addr(CPUState *cs);
- void ppc_cpu_do_interrupt(CPUState *cpu);
- bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
- void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-@@ -1281,6 +1287,12 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cpu, uint8_t *buf, int reg);
- void ppc_gdb_gen_spr_xml(PowerPCCPU *cpu);
- const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name);
- #endif
-+uint32_t ppc_gdb_read_insn(CPUState *cs, target_ulong addr);
-+uint32_t ppc_gdb_get_op(uint32_t insn);
-+uint32_t ppc_gdb_get_xop(uint32_t insn);
-+uint32_t ppc_gdb_get_spr(uint32_t insn);
-+uint32_t ppc_gdb_get_rt(uint32_t insn);
-+
- int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                                int cpuid, void *opaque);
- int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-@@ -2227,6 +2239,10 @@ enum {
-                         PPC2_ISA300)
- };
- 
-+#define XOP_RFID 18
-+#define XOP_MFMSR 83
-+#define XOP_MTSPR 467
-+
- /*****************************************************************************/
- /* Memory access type :
-  * may be needed for precise access rights control and precise exceptions.
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index beafcf1ebd..cf8c86de91 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -112,6 +112,8 @@ static uint64_t ppc_excp_vector_offset(CPUState *cs, int ail)
-     uint64_t offset = 0;
- 
-     switch (ail) {
-+    case AIL_NONE:
-+        break;
-     case AIL_0001_8000:
-         offset = 0x18000;
-         break;
-@@ -768,6 +770,17 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
-     check_tlb_flush(env, false);
- }
- 
-+target_ulong ppc_get_trace_int_handler_addr(CPUState *cs)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    int ail;
-+
-+    ail = (env->spr[SPR_LPCR] & LPCR_AIL) >> LPCR_AIL_SHIFT;
-+    return env->excp_vectors[POWERPC_EXCP_TRACE] |
-+        ppc_excp_vector_offset(cs, ail);
-+}
-+
- void ppc_cpu_do_interrupt(CPUState *cs)
- {
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
-index fbf3821f4b..a5b2705ade 100644
---- a/target/ppc/gdbstub.c
-+++ b/target/ppc/gdbstub.c
-@@ -380,3 +380,38 @@ const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name)
-     return NULL;
- }
- #endif
-+
-+uint32_t ppc_gdb_read_insn(CPUState *cs, target_ulong addr)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    uint32_t insn;
-+
-+    cpu_memory_rw_debug(cs, addr, (uint8_t *)&insn, sizeof(insn), 0);
-+
-+    if (msr_le) {
-+        return ldl_le_p(&insn);
-+    } else {
-+        return ldl_be_p(&insn);
-+    }
-+}
-+
-+uint32_t ppc_gdb_get_op(uint32_t insn)
-+{
-+    return extract32(insn, 26, 6);
-+}
-+
-+uint32_t ppc_gdb_get_xop(uint32_t insn)
-+{
-+    return extract32(insn, 1, 10);
-+}
-+
-+uint32_t ppc_gdb_get_spr(uint32_t insn)
-+{
-+    return extract32(insn, 11, 5) << 5 | extract32(insn, 16, 5);
-+}
-+
-+uint32_t ppc_gdb_get_rt(uint32_t insn)
-+{
-+    return extract32(insn, 21, 5);
-+}
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 9392fba192..2bcb8814f4 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1554,6 +1554,86 @@ void kvm_arch_remove_all_hw_breakpoints(void)
-     nb_hw_breakpoint = nb_hw_watchpoint = 0;
- }
- 
-+void kvm_arch_set_singlestep(CPUState *cs, int enabled)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    target_ulong trace_handler_addr;
-+    uint32_t insn;
-+    bool rfid;
-+
-+    if (!enabled) {
-+        return;
-+    }
-+
-+    cpu_synchronize_state(cs);
-+    insn = ppc_gdb_read_insn(cs, env->nip);
-+
-+    /*
-+     * rfid needs special handling because it:
-+     *   - overwrites NIP with SRR0;
-+     *   - overwrites MSR with SRR1;
-+     *   - cannot be single stepped.
-+     */
-+    rfid = ppc_gdb_get_op(insn) == 19 && ppc_gdb_get_xop(insn) == XOP_RFID;
-+
-+    if (rfid && kvm_find_sw_breakpoint(cs, env->spr[SPR_SRR0])) {
-+        /*
-+         * There is a breakpoint at the next instruction address. It
-+         * will already cause the vm exit we need for the single step,
-+         * so there's nothing to be done.
-+         */
-+        return;
-+    }
-+
-+    /*
-+     * Save the registers that will be affected by the single step
-+     * mechanism. These will be restored after the step at
-+     * kvm_handle_singlestep.
-+     */
-+    env->sstep_msr = env->msr;
-+    env->sstep_srr0 = env->spr[SPR_SRR0];
-+    env->sstep_srr1 = env->spr[SPR_SRR1];
-+
-+    /*
-+     * MSR_SE = 1 will cause a Trace Interrupt in the guest after the
-+     * next instruction executes. If this is a rfid, use SRR1 instead
-+     * of MSR.
-+     */
-+    if (rfid) {
-+        if ((env->spr[SPR_SRR1] >> MSR_SE) & 1) {
-+            /*
-+             * The guest is doing a single step itself. Make sure we
-+             * restore it later.
-+             */
-+            env->sstep_msr |= (1ULL << MSR_SE);
-+        }
-+
-+        env->spr[SPR_SRR1] |= (1ULL << MSR_SE);
-+    } else {
-+        env->msr |= (1ULL << MSR_SE);
-+    }
-+
-+    /*
-+     * We set a breakpoint at the interrupt handler address so
-+     * that the singlestep will be seen by KVM (this is treated by
-+     * KVM like an ordinary breakpoint) and control is returned to
-+     * QEMU.
-+     */
-+    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
-+
-+    if (env->nip == trace_handler_addr) {
-+        /*
-+         * We are trying to step over the interrupt handler
-+         * address itself; move the breakpoint to the next
-+         * instruction.
-+         */
-+        trace_handler_addr += 4;
-+    }
-+
-+    kvm_insert_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
-+}
-+
- void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
- {
-     int n;
-@@ -1593,6 +1673,91 @@ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
-     }
- }
- 
-+/* Revert any side-effects caused during single step */
-+static void restore_singlestep_env(CPUState *cs)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    uint32_t insn;
-+    int reg;
-+    int spr;
-+
-+    insn = ppc_gdb_read_insn(cs, env->spr[SPR_SRR0] - 4);
-+
-+    env->spr[SPR_SRR0] = env->sstep_srr0;
-+    env->spr[SPR_SRR1] = env->sstep_srr1;
-+
-+    if (ppc_gdb_get_op(insn) != 31) {
-+        return;
-+    }
-+
-+    reg = ppc_gdb_get_rt(insn);
-+
-+    switch (ppc_gdb_get_xop(insn)) {
-+    case XOP_MTSPR:
-+        /*
-+         * mtspr: the guest altered the SRR, so do not use the
-+         *        pre-step value.
-+         */
-+        spr = ppc_gdb_get_spr(insn);
-+        if (spr == SPR_SRR0 || spr == SPR_SRR1) {
-+            env->spr[spr] = env->gpr[reg];
-+        }
-+        break;
-+    case XOP_MFMSR:
-+        /*
-+         * mfmsr: clear MSR_SE bit to avoid the guest knowing
-+         *         that it is being single-stepped.
-+         */
-+        env->gpr[reg] &= ~(1ULL << MSR_SE);
-+        break;
-+    }
-+}
-+
-+static int kvm_handle_singlestep(CPUState *cs, target_ulong address)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    target_ulong trace_handler_addr;
-+
-+    if (kvm_has_guestdbg_singlestep()) {
-+        return 1;
-+    }
-+
-+    cpu_synchronize_state(cs);
-+    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
-+
-+    if (address == trace_handler_addr) {
-+        kvm_remove_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
-+
-+        if (env->sstep_msr & (1ULL << MSR_SE)) {
-+            /*
-+             * The guest expects the last instruction to have caused a
-+             * single step, go back into the interrupt handler.
-+             */
-+            return 1;
-+        }
-+
-+        env->nip = env->spr[SPR_SRR0];
-+        /* Bits 33-36, 43-47 are set by the interrupt */
-+        env->msr = env->spr[SPR_SRR1] & ~(1ULL << MSR_SE |
-+                                          PPC_BITMASK(33, 36) |
-+                                          PPC_BITMASK(43, 47));
-+        restore_singlestep_env(cs);
-+
-+    } else if (address == trace_handler_addr + 4) {
-+        /*
-+         * A step at trace_handler_addr would interfere with the
-+         * singlestep mechanism itself, so we have previously
-+         * displaced the breakpoint to the next instruction.
-+         */
-+        kvm_remove_breakpoint(cs, trace_handler_addr + 4, 4, GDB_BREAKPOINT_SW);
-+        restore_singlestep_env(cs);
-+    }
-+
-+    return 1;
-+}
-+
- static int kvm_handle_hw_breakpoint(CPUState *cs,
-                                     struct kvm_debug_exit_arch *arch_info)
- {
-@@ -1620,13 +1785,29 @@ static int kvm_handle_hw_breakpoint(CPUState *cs,
-     return handle;
- }
- 
--static int kvm_handle_singlestep(void)
-+static int kvm_handle_sw_breakpoint(CPUState *cs, target_ulong address)
- {
--    return 1;
--}
-+    target_ulong trace_handler_addr;
- 
--static int kvm_handle_sw_breakpoint(void)
--{
-+    if (kvm_has_guestdbg_singlestep()) {
-+        return 1;
-+    }
-+
-+    cpu_synchronize_state(cs);
-+    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
-+
-+    if (address == trace_handler_addr) {
-+        CPU_FOREACH(cs) {
-+            if (cs->singlestep_enabled) {
-+                /*
-+                 * We hit this breakpoint while another cpu is doing a
-+                 * software single step. Go back into the guest to
-+                 * give chance for the single step to finish.
-+                 */
-+                return 0;
-+            }
-+        }
-+    }
-     return 1;
- }
- 
-@@ -1637,7 +1818,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
-     struct kvm_debug_exit_arch *arch_info = &run->debug.arch;
- 
-     if (cs->singlestep_enabled) {
--        return kvm_handle_singlestep();
-+        return kvm_handle_singlestep(cs, arch_info->address);
-     }
- 
-     if (arch_info->status) {
-@@ -1645,7 +1826,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
-     }
- 
-     if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
--        return kvm_handle_sw_breakpoint();
-+        return kvm_handle_sw_breakpoint(cs, arch_info->address);
-     }
- 
-     /*
--- 
-2.20.1
+> +	register unsigned int callno asm ("r9") = 4; /* NR_write */
+> +	register unsigned int r10 asm ("r10") = fd;
+> +	register const void *r11 asm ("r11") = buf;
+> +	register size_t r12 asm ("r12") = count;
+> +	register unsigned int r asm ("r10");
+> +
+> +	asm volatile ("break 13\n"
+> +	     : "=r" (r)
+> +	     : "r" (callno), "0" (r10), "r" (r11), "r" (r12)
+> +	     : "memory");
+> +
+> +	return r;
+> +}
+> +
+> +static inline int mystrlen(char *s) {
+> +	int i = 0;
+> +	while (s[i])
+> +		i++;
+> +	return i;
+> +}
+> +
+> +void pass(void) {
+> +	char s[] = "passed.\n";
+> +	write (1, s, sizeof (s) - 1);
+> +	exit (0);
+> +}
+> +
+> +void _fail(char *reason) {
+> +	char s[] = "\nfailed: ";
+> +	int len = mystrlen(reason);
+> +	write (1, s, sizeof (s) - 1);
+> +	write (1, reason, len);
+> +	write (1, "\n", 1);
+> +//	exit (1);
+> +}
+> +
+> +void *memset (void *s, int c, size_t n) {
+> +	char *p = s;
+> +	int i;
+> +	for (i = 0; i < n; i++)
+> +		p[i] = c;
+> +	return p;
+> +}
+> diff --git a/tests/tcg/cris/sys.h b/tests/tcg/cris/libc/sys.h
+> similarity index 100%
+> rename from tests/tcg/cris/sys.h
+> rename to tests/tcg/cris/libc/sys.h
+> 
