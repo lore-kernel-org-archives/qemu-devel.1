@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54109)
+Received: from eggs.gnu.org ([209.51.188.92]:55370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gzUHg-0004p6-G9
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:36:09 -0500
+	(envelope-from <philmd@redhat.com>) id 1gzUNx-0006IK-QQ
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:42:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gzUHf-00033V-KX
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:36:08 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36841)
+	(envelope-from <philmd@redhat.com>) id 1gzUNv-0006zE-Ur
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:42:37 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:39775)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1gzUHf-00032y-Co
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:36:07 -0500
-Received: by mail-wr1-x442.google.com with SMTP id o17so23790272wrw.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:36:07 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gzUNv-0006qA-5J
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 17:42:35 -0500
+Received: by mail-wm1-f67.google.com with SMTP id z84so10483527wmg.4
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 14:42:11 -0800 (PST)
+References: <20190228202537.4638-1-alex.bennee@linaro.org>
+	<20190228202537.4638-6-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c3a65d4b-8720-2957-1394-032823a78760@redhat.com>
+Date: Thu, 28 Feb 2019 23:42:03 +0100
 MIME-Version: 1.0
-References: <20190225102433.22401-1-peter.maydell@linaro.org>
-	<20190225102433.22401-8-peter.maydell@linaro.org>
-In-Reply-To: <20190225102433.22401-8-peter.maydell@linaro.org>
-From: G 3 <programmingkidx@gmail.com>
-Date: Thu, 28 Feb 2019 17:35:54 -0500
-Message-ID: <CAKyx-3No8BYeijyDrUHLOJsL7bRM-N-SuJLOkKk3r=8cRWuVug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] ui/cocoa: Perform UI operations
- only on the main thread
+In-Reply-To: <20190228202537.4638-6-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/16] tests/tcg/mips: fix hello-mips
+ compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, patches@linaro.org, Roman Bolshakov <r.bolshakv@yadro.com>, BALATON Zoltan <balaton@eik.bme.hu>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@gmail.com, qemu-arm@nongnu.org, jcmvbkbc@gmail.com
 
-On Mon, Feb 25, 2019 at 5:24 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+Hi Alex,
 
-> The OSX Mojave release is more picky about enforcing the Cocoa API
-> restriction that only the main thread may perform UI calls. To
-> accommodate this we need to restructure the Cocoa code:
->  * the special OSX main() creates a second thread and uses
->    that to call the vl.c qemu_main(); the original main
->    thread goes into the OSX event loop
->  * the refresh, switch and update callbacks asynchronously
->    tell the main thread to do the necessary work
->  * the refresh callback no longer does the "get events from the
->    UI event queue and handle them" loop, since we now use
->    the stock OSX event loop. Instead our NSApplication sendEvent
->    method will either deal with them or pass them on to OSX
->
-> All these things have to be changed in one commit, to avoid
-> breaking bisection.
->
-> Note that since we use dispatch_get_main_queue(), this bumps
-> our minimum version requirement to OSX 10.10 Yosemite (released
-> in 2014, unsupported by Apple since 2017).
->
-> I think eliminating support for Macintosh operating systems older than
-10.10 is a mistake. These operating systems may be old but are far from
-useless. They are fully capable of handling QEMU. I do believe that fixing
-support for Mac OS 10.14 and maintaining support for older versions of Mac
-OS is possible. Calling methods and functions on the main thread can be
-done using performSelectorOnMainThread.
+On 2/28/19 9:25 PM, Alex Bennée wrote:
+> The compilation flags for proper building are in the source tree. We
+> also fix exit to 0 so the result is counted as a success.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/tcg/mips/Makefile.target | 11 ++++-------
+>  tests/tcg/mips/hello-mips.c    |  2 +-
+>  2 files changed, 5 insertions(+), 8 deletions(-)
+> 
+> diff --git a/tests/tcg/mips/Makefile.target b/tests/tcg/mips/Makefile.target
+> index 086625f533..1a994d5525 100644
+> --- a/tests/tcg/mips/Makefile.target
+> +++ b/tests/tcg/mips/Makefile.target
+> @@ -8,15 +8,12 @@ MIPS_SRC=$(SRC_PATH)/tests/tcg/mips
+>  # Set search path for all sources
+>  VPATH 		+= $(MIPS_SRC)
+>  
+> +# hello-mips is 32 bit only
 
-Thank you.
+Correct.
+
+> +ifeq ($(findstring 64,$(TARGET_NAME)),)
+>  MIPS_TESTS=hello-mips
+>  
+>  TESTS += $(MIPS_TESTS)
+>  
+> -hello-mips: CFLAGS+=-ffreestanding
+> +hello-mips: CFLAGS+=-mno-abicalls -fno-PIC -mabi=32
+
+As suggested in the header.
+
+>  hello-mips: LDFLAGS+=-nostdlib
+> -
+> -# For MIPS32 and 64 we have a bunch of extra tests in sub-directories
+> -# however they are intended for system tests.
+> -
+> -run-hello-mips: hello-mips
+> -	$(call skip-test, $<, "BROKEN")
+> +endif
+> diff --git a/tests/tcg/mips/hello-mips.c b/tests/tcg/mips/hello-mips.c
+> index c7052fdf2e..4e1cf501af 100644
+> --- a/tests/tcg/mips/hello-mips.c
+> +++ b/tests/tcg/mips/hello-mips.c
+> @@ -60,5 +60,5 @@ static inline int write(int fd, const char *buf, int len)
+>  void __start(void)
+>  {
+>      write (1, "Hello, World!\n", 14);
+> -    exit1 (42);
+
+I understand 42 is to check SYS_exit1 worked, and this is not another
+qemu-user exit. But we were previously never checked the exit code for
+42. Neither are we checking 'Hello, World' on stdout.
+
+> +    exit1(0);
+>  }
+> 
