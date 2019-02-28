@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42653)
+Received: from eggs.gnu.org ([209.51.188.92]:42676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzSFX-0000RW-98
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:48 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gzSFY-0000Rf-6U
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzSFW-0007MD-8k
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:47 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43115)
+	(envelope-from <alex.bennee@linaro.org>) id 1gzSFW-0007Ml-Uo
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:48 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54225)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gzSFW-0007K2-1v
+	id 1gzSFW-0007M3-LY
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 15:25:46 -0500
-Received: by mail-wr1-x443.google.com with SMTP id d17so23389347wre.10
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 12:25:45 -0800 (PST)
+Received: by mail-wm1-x344.google.com with SMTP id e74so10415384wmg.3
+	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 12:25:46 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 28 Feb 2019 20:25:28 +0000
-Message-Id: <20190228202537.4638-8-alex.bennee@linaro.org>
+Date: Thu, 28 Feb 2019 20:25:29 +0000
+Message-Id: <20190228202537.4638-9-alex.bennee@linaro.org>
 In-Reply-To: <20190228202537.4638-1-alex.bennee@linaro.org>
 References: <20190228202537.4638-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 07/16] tests/tcg/xtensa: enable system tests
+Subject: [Qemu-devel] [PATCH v2 08/16] tests/tcg/arm: add ARMv6-M UNDEFINED
+ 32-bit instruction test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,165 +31,257 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-arm@nongnu.org, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+From: Stefan Hajnoczi <stefanha@redhat.com>
+
+Test that 32-bit instructions declared UNDEFINED in the ARMv6-M
+Reference Manual really do raise an exception.  Also test that the 6
+32-bit instructions defined in the ARMv6-M Reference Manual do not raise
+an exception.
+
+Based-on: <20181029194519.15628-1-stefanha@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20181129185113.30353-1-stefanha@redhat.com>
+[AJB: integrated into system tests]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
 v2
-  - use cross CC for linker
-  - fix up test selection to skip linker.ld.S
+  - added to series
+  - used softmmu-target Makefile with single compile/link step
+  - launches with -kernel
+  - drop .hex file
 ---
- tests/tcg/xtensa/Makefile                | 93 ------------------------
- tests/tcg/xtensa/Makefile.softmmu-target | 40 ++++++++++
- 2 files changed, 40 insertions(+), 93 deletions(-)
- delete mode 100644 tests/tcg/xtensa/Makefile
- create mode 100644 tests/tcg/xtensa/Makefile.softmmu-target
+ tests/tcg/arm/Makefile.softmmu-target |  29 +++++
+ tests/tcg/arm/test-armv6m-undef.S     | 154 ++++++++++++++++++++++++++
+ tests/tcg/arm/test-armv6m-undef.ld    |  21 ++++
+ 3 files changed, 204 insertions(+)
+ create mode 100644 tests/tcg/arm/Makefile.softmmu-target
+ create mode 100644 tests/tcg/arm/test-armv6m-undef.S
+ create mode 100644 tests/tcg/arm/test-armv6m-undef.ld
 
-diff --git a/tests/tcg/xtensa/Makefile b/tests/tcg/xtensa/Makefile
-deleted file mode 100644
-index 2f5691f75b..0000000000
---- a/tests/tcg/xtensa/Makefile
-+++ /dev/null
-@@ -1,93 +0,0 @@
---include ../../../config-host.mak
--
--CORE=dc232b
--CROSS=xtensa-$(CORE)-elf-
--
--ifndef XT
--SIM = ../../../xtensa-softmmu/qemu-system-xtensa
--SIMFLAGS = -M sim -cpu $(CORE) -nographic -semihosting -icount 6 $(EXTFLAGS) -kernel
--SIMDEBUG = -s -S
--else
--SIM = xt-run
--SIMFLAGS = --xtensa-core=DC_B_232L --exit_with_target_code $(EXTFLAGS)
--SIMDEBUG = --gdbserve=0
--endif
--
--HOST_CC = gcc
--CC      = $(CROSS)gcc
--AS      = $(CROSS)gcc -x assembler-with-cpp
--LD      = $(CROSS)ld
--
--XTENSA_SRC_PATH = $(SRC_PATH)/tests/tcg/xtensa
--INCLUDE_DIRS = $(XTENSA_SRC_PATH) $(SRC_PATH)/target/xtensa/core-$(CORE)
--XTENSA_INC = $(addprefix -I,$(INCLUDE_DIRS))
--
--LDFLAGS = -Tlinker.ld
--
--CRT        = crt.o vectors.o
--
--TESTCASES += test_b.tst
--TESTCASES += test_bi.tst
--#TESTCASES += test_boolean.tst
--TESTCASES += test_break.tst
--TESTCASES += test_bz.tst
--TESTCASES += test_cache.tst
--TESTCASES += test_clamps.tst
--TESTCASES += test_extui.tst
--TESTCASES += test_fail.tst
--TESTCASES += test_interrupt.tst
--TESTCASES += test_loop.tst
--TESTCASES += test_mac16.tst
--TESTCASES += test_max.tst
--TESTCASES += test_min.tst
--TESTCASES += test_mmu.tst
--TESTCASES += test_mul16.tst
--TESTCASES += test_mul32.tst
--TESTCASES += test_nsa.tst
--TESTCASES += test_phys_mem.tst
--ifdef XT
--TESTCASES += test_pipeline.tst
--endif
--TESTCASES += test_quo.tst
--TESTCASES += test_rem.tst
--TESTCASES += test_rst0.tst
--TESTCASES += test_s32c1i.tst
--TESTCASES += test_sar.tst
--TESTCASES += test_sext.tst
--TESTCASES += test_shift.tst
--TESTCASES += test_sr.tst
--TESTCASES += test_timer.tst
--TESTCASES += test_windowed.tst
--
--all: build
--
--linker.ld: $(XTENSA_SRC_PATH)/linker.ld.S
--	$(HOST_CC) $(XTENSA_INC) -E -P $< -o $@
--
--%.o: $(XTENSA_SRC_PATH)/%.c
--	$(CC) $(XTENSA_INC) $(CFLAGS) -c $< -o $@
--
--%.o: $(XTENSA_SRC_PATH)/%.S
--	$(CC) $(XTENSA_INC) $(ASFLAGS) -c $< -o $@
--
--%.tst: %.o linker.ld $(XTENSA_SRC_PATH)/macros.inc $(CRT) Makefile
--	$(LD) $(LDFLAGS) $(NOSTDFLAGS) $(CRT) $< -o $@
--
--build: $(TESTCASES)
--
--check: $(addprefix run-, $(TESTCASES))
--
--run-%.tst: %.tst
--	$(SIM) $(SIMFLAGS) ./$<
--
--run-test_fail.tst: test_fail.tst
--	! $(SIM) $(SIMFLAGS) ./$<
--
--debug-%.tst: %.tst
--	$(SIM) $(SIMDEBUG) $(SIMFLAGS) ./$<
--
--host-debug-%.tst: %.tst
--	gdb --args $(SIM) $(SIMFLAGS) ./$<
--
--clean:
--	$(RM) -fr $(TESTCASES) $(CRT) linker.ld
-diff --git a/tests/tcg/xtensa/Makefile.softmmu-target b/tests/tcg/xtensa/Makefile.softmmu-target
+diff --git a/tests/tcg/arm/Makefile.softmmu-target b/tests/tcg/arm/Makefile.softmmu-target
 new file mode 100644
-index 0000000000..1a4014506f
+index 0000000000..49d48d8a1c
 --- /dev/null
-+++ b/tests/tcg/xtensa/Makefile.softmmu-target
-@@ -0,0 +1,40 @@
++++ b/tests/tcg/arm/Makefile.softmmu-target
+@@ -0,0 +1,29 @@
++# -*- Mode: makefile -*-
 +#
-+# Xtensa softmmu tests
++# ARM SoftMMU tests - included from tests/tcg/Makefile
 +#
 +
-+ifneq ($(TARGET_WORDS_BIGENDIAN),y)
++ifeq ($(TARGET_ABI_DIR),arm)
 +
-+XTENSA_SRC = $(SRC_PATH)/tests/tcg/xtensa
-+XTENSA_ALL = $(filter-out $(XTENSA_SRC)/linker.ld.S,$(wildcard $(XTENSA_SRC)/*.S))
-+XTENSA_TESTS = $(patsubst $(XTENSA_SRC)/%.S, %, $(XTENSA_ALL))
-+# Filter out common blobs and broken tests
-+XTENSA_BROKEN_TESTS  = crt vectors test_boolean test_pipeline test_fail
-+XTENSA_USABLE_TESTS = $(filter-out $(XTENSA_BROKEN_TESTS), $(XTENSA_TESTS))
++ARM_SRC=$(SRC_PATH)/tests/tcg/arm
 +
-+# add to the list of tests
-+TESTS += $(XTENSA_USABLE_TESTS)
-+VPATH += $(XTENSA_SRC)
++# Set search path for all sources
++VPATH 		+= $(ARM_SRC)
 +
-+CORE=dc232b
-+QEMU_OPTS+=-M sim -cpu $(CORE) -nographic -semihosting -icount 6 $(EXTFLAGS) -kernel
++ARM_TESTS=test-armv6m-undef
 +
-+INCLUDE_DIRS = $(SRC_PATH)/target/xtensa/core-$(CORE)
-+XTENSA_INC = $(addprefix -I,$(INCLUDE_DIRS))
++TESTS += $(ARM_TESTS)
 +
-+LDFLAGS = -Tlinker.ld -nostartfiles -nostdlib
++CFLAGS+=-Wl,--build-id=none -x assembler-with-cpp
++LDFLAGS+=-nostdlib -N -static
 +
-+CRT        = crt.o vectors.o
++%: %.S %.ld
++	$(CC) $(CFLAGS) $(ASFLAGS) $< -o $@ $(LDFLAGS) -T $(ARM_SRC)/$@.ld
 +
-+linker.ld: linker.ld.S
-+	$(CC) $(XTENSA_INC) -E -P $< -o $@
++# Specific Test Rules
 +
-+$(XTENSA_USABLE_TESTS): linker.ld macros.inc $(CRT) Makefile.softmmu-target
++test-armv6m-undef: EXTRA_CFLAGS+=-mcpu=cortex-m0
 +
-+# special rule for common blobs
-+%.o: %.S
-+	$(CC) $(XTENSA_INC) $(ASFLAGS) -c $< -o $@
-+
-+%: %.S
-+	$(CC) $(XTENSA_INC) $(ASFLAGS) $< -o $@ $(LDFLAGS) $(NOSTDFLAGS) $(CRT)
++run-test-armv6m-undef: QEMU_OPTS+=-semihosting -M microbit -kernel
 +
 +endif
+diff --git a/tests/tcg/arm/test-armv6m-undef.S b/tests/tcg/arm/test-armv6m-undef.S
+new file mode 100644
+index 0000000000..d18ca56b4a
+--- /dev/null
++++ b/tests/tcg/arm/test-armv6m-undef.S
+@@ -0,0 +1,154 @@
++/*
++ * Test ARMv6-M UNDEFINED 32-bit instructions
++ *
++ * Copyright 2018 Red Hat Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2
++ * or later. See the COPYING file in the top-level directory.
++ */
++
++/*
++ * Test that UNDEFINED 32-bit instructions fault as expected.  This is an
++ * interesting test because ARMv6-M shares code with its more fully-featured
++ * siblings and it's necessary to verify that its limited instruction set is
++ * emulated correctly.
++ *
++ * The emulator must be invoked with -semihosting so that the test case can
++ * terminate with exit code 0 on success or 1 on failure.
++ *
++ * Failures can be debugged with -d in_asm,int,exec,cpu and the
++ * gdbstub (-S -s).
++ */
++
++.syntax unified
++.cpu cortex-m0
++.thumb
++
++/*
++ * Memory map
++ */
++#define SRAM_BASE 0x20000000
++#define SRAM_SIZE (16 * 1024)
++
++/*
++ * Semihosting interface on ARM T32
++ * See "Semihosting for AArch32 and AArch64 Version 2.0 Documentation" by ARM
++ */
++#define semihosting_call bkpt 0xab
++#define SYS_EXIT 0x18
++
++vector_table:
++    .word SRAM_BASE + SRAM_SIZE /* 0. SP_main */
++    .word exc_reset_thumb       /* 1. Reset */
++    .word 0                     /* 2. NMI */
++    .word exc_hard_fault_thumb  /* 3. HardFault */
++    .rept 7
++    .word 0                     /* 4-10. Reserved */
++    .endr
++    .word 0                     /* 11. SVCall */
++    .word 0                     /* 12. Reserved */
++    .word 0                     /* 13. Reserved */
++    .word 0                     /* 14. PendSV */
++    .word 0                     /* 15. SysTick */
++    .rept 32
++    .word 0                     /* 16-47. External Interrupts */
++    .endr
++
++exc_reset:
++.equ exc_reset_thumb, exc_reset + 1
++.global exc_reset_thumb
++    /* The following 32-bit UNDEFINED instructions are tested by executing
++     * them.  The HardFault exception handler should execute and return to
++     * the next test case.  If no exception is raised the test fails.
++     */
++
++    /* Table A5-9 32-bit Thumb encoding */
++    .short 0b1110100000000000
++    .short 0b0000000000000000
++    b not_reached
++    .short 0b1110100000000000
++    .short 0b1000000000000000
++    b not_reached
++    .short 0b1111100000000000
++    .short 0b0000000000000000
++    b not_reached
++    .short 0b1111100000000000
++    .short 0b1000000000000000
++    b not_reached
++    .short 0b1111000000000000
++    .short 0b0000000000000000
++    b not_reached
++
++    /* Table A5-10 Branch and miscellaneous control instructions */
++    .short 0b1111011111110000
++    .short 0b1010000000000000
++    b not_reached
++
++    /* The following are valid 32-bit instructions that must not raise a
++     * HardFault.
++     */
++
++    /* B4.2.3 Move to Special Register (moves to IPSR are ignored) */
++    msr ipsr, r0
++    b 1f
++    b not_reached
++1:
++    /* B4.2.2 Move from Special Register */
++    mrs r0, ipsr
++    b 1f
++    b not_reached
++1:
++    /* A6.7.13 Branch with Link (immediate) */
++    bl 1f
++1:
++    b 1f
++    b not_reached
++1:
++    /* A6.7.21 Data Memory Barrier */
++    dmb
++    b 1f
++    b not_reached
++1:
++    /* A6.7.22 Data Synchronization Barrier */
++    dsb
++    b 1f
++    b not_reached
++1:
++    /* A6.7.24 Instruction Memory Barrier */
++    isb
++    b 1f
++    b not_reached
++1:
++
++    /* Success! */
++    movs r0, 1
++    b exit
++
++not_reached: /* Failure :( */
++    movs r0, 0
++    b exit
++
++/* When a HardFault occurs, return to pc+6 (test cases are 3 halfwords long) */
++exc_hard_fault:
++.equ exc_hard_fault_thumb, exc_hard_fault + 1
++.global exc_hard_fault_thumb
++    ldr r0, [sp, 0x18]
++    adds r0, 6
++    str r0, [sp, 0x18]
++    bx lr
++
++/*
++ * exit: Terminate emulator
++ * @r0: 0 - failure, 1 - success
++ */
++exit:
++    movs r1, 0
++    cmp r0, 1
++    bne 1f
++    ldr r1, ADP_Stopped_ApplicationExit
++1:
++    movs r0, SYS_EXIT
++    semihosting_call
++.align 2
++ADP_Stopped_ApplicationExit:
++    .word 0x20026
+diff --git a/tests/tcg/arm/test-armv6m-undef.ld b/tests/tcg/arm/test-armv6m-undef.ld
+new file mode 100644
+index 0000000000..43dbbf17d5
+--- /dev/null
++++ b/tests/tcg/arm/test-armv6m-undef.ld
+@@ -0,0 +1,21 @@
++ENTRY(exc_reset_thumb)
++
++SECTIONS
++{
++    . = 0x0;
++    .text : {
++        *(.text)
++    }
++    .data : {
++        *(.data)
++    }
++    .rodata : {
++        *(.rodata)
++    }
++    .bss : {
++        *(.bss)
++    }
++    /DISCARD/ : {
++        *(.ARM.attributes)
++    }
++}
 -- 
 2.20.1
