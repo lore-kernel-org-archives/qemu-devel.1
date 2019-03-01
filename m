@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40295)
+Received: from eggs.gnu.org ([209.51.188.92]:41226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzc2c-0006vM-1n
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:53:07 -0500
+	(envelope-from <peterx@redhat.com>) id 1gzc8g-0000jJ-5e
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:59:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzc2a-0003WE-Sw
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:53:06 -0500
-Resent-Message-Id: <E1gzc2a-0003WE-Sw@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gzc2a-0003Up-NT
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:53:04 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155142315557.7448.6826117398052655325@49fa7ef69f7b>
-In-Reply-To: <20190301064809.3074-1-llyzs.vic@gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1gzc8e-0000cP-8W
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:59:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gzc8c-0000ZD-7q
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:59:20 -0500
+Date: Fri, 1 Mar 2019 14:59:00 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190301065900.GB22229@xz-x1>
+References: <1551361677-28933-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1551361677-28933-3-git-send-email-yi.y.sun@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 28 Feb 2019 22:52:36 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] slirp: check for ioctlsocket error and
- 0-length udp payload.
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1551361677-28933-3-git-send-email-yi.y.sun@linux.intel.com>
+Subject: Re: [Qemu-devel] [RFC v2 2/3] intel_iommu: add 256 bits qi_desc
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: llyzs.vic@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, jan.kiszka@siemens.com, marcandre.lureau@gmail.com, samuel.thibault@gnu.org
+To: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwMTA2NDgwOS4zMDc0
-LTEtbGx5enMudmljQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAzMDEwNjQ4MDkuMzA3NC0xLWxseXpzLnZpY0Bn
-bWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2Ml0gc2xpcnA6IGNoZWNrIGZv
-ciBpb2N0bHNvY2tldCBlcnJvciBhbmQgMC1sZW5ndGggdWRwIHBheWxvYWQuClR5cGU6IHNlcmll
-cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJh
-c2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
-cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8y
-MDE5MDMwMTA2NDgwOS4zMDc0LTEtbGx5enMudmljQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkw
-MzAxMDY0ODA5LjMwNzQtMS1sbHl6cy52aWNAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKMDk4N2U0ODUxZiBzbGlycDogY2hlY2sgZm9yIGlvY3Rsc29ja2V0IGVycm9y
-IGFuZCAwLWxlbmd0aCB1ZHAgcGF5bG9hZC4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBj
-b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIzOiBGSUxFOiBzbGlycC9zb2NrZXQu
-Yzo1MzI6CiteSSAgaWYgKGlvY3Rsc29ja2V0KHNvLT5zLCBGSU9OUkVBRCwgJm4pICE9IDApIHsk
-CgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAo
-MTAsIDE0KQojMjM6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjUzMjoKKyAgICAgICAgIGlmIChpb2N0
-bHNvY2tldChzby0+cywgRklPTlJFQUQsICZuKSAhPSAwKSB7CisgICAgICAgICAgICAgREVCVUdf
-TUlTQygoZGZkLCIgaW9jdGxzb2NrZXQgZXJybm8gPSAlZC0lc1xuIiwKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI0OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo1MzM6
-CiteSSAgICAgIERFQlVHX01JU0MoKGRmZCwiIGlvY3Rsc29ja2V0IGVycm5vID0gJWQtJXNcbiIs
-JAoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMjQ6IEZJ
-TEU6IHNsaXJwL3NvY2tldC5jOjUzMzoKKyAgICAgICAgICAgICBERUJVR19NSVNDKChkZmQsIiBp
-b2N0bHNvY2tldCBlcnJubyA9ICVkLSVzXG4iLAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IF4KCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI1OiBGSUxFOiBz
-bGlycC9zb2NrZXQuYzo1MzQ6CiteSV5JXkkgIGVycm5vLHN0cmVycm9yKGVycm5vKSkpOyQKCkVS
-Uk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzI1OiBGSUxFOiBz
-bGlycC9zb2NrZXQuYzo1MzQ6CisgICAgICAgICAgICAgICAgICAgICAgICAgZXJybm8sc3RyZXJy
-b3IoZXJybm8pKSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogY29k
-ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNjogRklMRTogc2xpcnAvc29ja2V0LmM6
-NTM1OgorXkkgICAgICByZXR1cm47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojMjc6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjUzNjoKK15JICB9JAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjg6IEZJTEU6IHNsaXJwL3NvY2tldC5j
-OjUzNzoKK15JICBpZiAobiA9PSAwKSB7JAoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9y
-IGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDEwLCAxNCkKIzI4OiBGSUxFOiBzbGlycC9zb2NrZXQu
-Yzo1Mzc6CisgICAgICAgICBpZiAobiA9PSAwKSB7CisgICAgICAgICAgICAgcmV0dXJuOwoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjk6IEZJTEU6IHNsaXJwL3Nv
-Y2tldC5jOjUzODoKK15JICAgICAgcmV0dXJuOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzMwOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo1Mzk6CiteSSAgfSQKCnRv
-dGFsOiAxMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIyIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCAwOTg3
-ZTQ4NTFmNjAgKHNsaXJwOiBjaGVjayBmb3IgaW9jdGxzb2NrZXQgZXJyb3IgYW5kIDAtbGVuZ3Ro
-IHVkcCBwYXlsb2FkLikgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDEwNjQ4MDkuMzA3NC0x
-LWxseXpzLnZpY0BnbWFpbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+On Thu, Feb 28, 2019 at 09:47:56PM +0800, Yi Sun wrote:
+> From: "Liu, Yi L" <yi.l.liu@intel.com>
+> 
+> Per Intel(R) VT-d 3.0, the qi_desc is 256 bits in Scalable
+> Mode. This patch adds emulation of 256bits qi_desc.
+> 
+> Signed-off-by: Liu, Yi L <yi.l.liu@intel.com>
+> [Yi Sun is co-developer to rebase and refine the patch.]
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+
+[...]
+
+> @@ -2501,7 +2507,12 @@ static void vtd_handle_iqt_write(IntelIOMMUState *s)
+>  {
+>      uint64_t val = vtd_get_quad_raw(s, DMAR_IQT_REG);
+>  
+> -    s->iq_tail = VTD_IQT_QT(val);
+> +    if (s->iq_dw && val & VTD_IQT_QT_256_RSV_BIT) {
+
+Nit: Let's do (val & VTD_IQT_QT_256_RSV_BIT) to be clear.  With that:
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Regards,
+
+-- 
+Peter Xu
