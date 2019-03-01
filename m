@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60504)
+Received: from eggs.gnu.org ([209.51.188.92]:60575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gzkuZ-00075I-Mf
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:21:24 -0500
+	(envelope-from <thuth@redhat.com>) id 1gzkuk-0007Fc-40
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:21:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gzkuR-0005XC-Ux
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:21:17 -0500
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <155144987334.126105.2493613675615671242.stgit@bahia.lan>
-References: <155144987334.126105.2493613675615671242.stgit@bahia.lan>
-Message-ID: <155145721677.30057.3700488922747499209@sif>
-Date: Fri, 01 Mar 2019 10:20:16 -0600
-Subject: Re: [Qemu-devel] [PATCH] spapr: Explicitly check machine support
- before using EVENT_CLASS_HOT_PLUG
+	(envelope-from <thuth@redhat.com>) id 1gzkui-0005qj-Aj
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:21:34 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri,  1 Mar 2019 17:21:17 +0100
+Message-Id: <1551457277-884-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests: Do not use "\n" in g_test_message()
+ strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +18,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Quoting Greg Kurz (2019-03-01 08:17:53)
-> Recent commit b8165118f52c "spapr: support memory unplug for qtest" broke
-> CPU hotplug tests for old machine types:
-> =
+g_test_message() takes care of the newline on its own, so we
+should not use \n in the strings here.
 
-> $ QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-te=
-st -m=3Dslow
-> /ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=3D6: **
-> ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_to_=
-source: assertion failed: (source->enabled)
-> Broken pipe
-> /home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU de=
-ath from signal 6 (Aborted) (core dumped)
-> Aborted (core dumped)
-> =
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/ivshmem-test.c         |  4 ++--
+ tests/m48t59-test.c          |  4 ++--
+ tests/migration-test.c       |  4 ++--
+ tests/rtc-test.c             |  4 ++--
+ tests/rtl8139-test.c         |  6 +++---
+ tests/test-aio-multithread.c |  8 ++++----
+ tests/test-coroutine.c       | 10 ++++------
+ tests/vhost-user-test.c      | 14 +++++++-------
+ 8 files changed, 26 insertions(+), 28 deletions(-)
 
-> The rtas_event_log_to_source() function is supposed to return the event
-> source to be used for a given event type. In the case of hotplug, it first
-> tries EVENT_CLASS_HOT_PLUG and, if the guest doesn't support it, it falls
-> back to EVENT_CLASS_EPOW.
-> =
-
-> This works well for machine types that enable EVENT_CLASS_HOT_PLUG. For
-> older machine types, this happened to work because they don't set the
-> OV5_HP_EVT bit in spapr->ov5. CAS hence logically keeps the bit cleared
-> in spapr->ov5_cas and we avoid the assert.
-> =
-
-> As shown by commit b8165118f52c, the logic is fragile and we need a
-> bigger hammer to ensure that rtas_event_log_to_source() doesn't go
-> down the EVENT_CLASS_HOT_PLUG path with older machine types.
-
-I think that fact that we set spapr->ov5 based on relevant machine
-options/support being there, and the fact that this means they won't
-show up in ov5_cas, is a nice thing to assert and rely on, since being
-able to rely on that keeps keeps the logic throughout the code tied to
-ov5/ov5_cas and avoids the need to keep re-checking things like
-spapr->use_hotplug_event_source (and various other options tied to an
-OV5 capability) after init time.
-
-I think this particular case is purely the result of us violating (via
-b8165118f52c) the condition that bits that aren't ever set in spapr->ov5
-should never end up in spapr->ov5_cas, and losing that precondition might
-make the code harder to reason about since now we have to check both
-ov5_cas and the related options (rather than 1 necessarilly following
-from the other).
-
-Another approach might be to revert b8165118f52c, and then add a hook for
-qtest_enabled() that does a fake CAS negotiation (which I guess would
-essentially involve copying spapr->ov5 into spapr->ov5_cas). This would
-maintain the flow of machine options -> spapr->ov5 -> spapr->ov5_cas and
-still let qtest do it's thing (AFAICT).
-
-> =
-
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr_events.c |   12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> =
-
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index ab9a1f0063d5..1a09dab6857d 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -307,11 +307,13 @@ rtas_event_log_to_source(sPAPRMachineState *spapr, =
-int log_type)
-> =
-
->      switch (log_type) {
->      case RTAS_LOG_TYPE_HOTPLUG:
-> -        source =3D spapr_event_sources_get_source(spapr->event_sources,
-> -                                                EVENT_CLASS_HOT_PLUG);
-> -        if (spapr_ovec_test(spapr->ov5_cas, OV5_HP_EVT)) {
-> -            g_assert(source->enabled);
-> -            break;
-> +        if (spapr->use_hotplug_event_source) {
-> +            source =3D spapr_event_sources_get_source(spapr->event_sourc=
-es,
-> +                                                    EVENT_CLASS_HOT_PLUG=
-);
-> +            if (spapr_ovec_test(spapr->ov5_cas, OV5_HP_EVT)) {
-> +                g_assert(source->enabled);
-> +                break;
-> +            }
->          }
->          /* fall back to epow for legacy hotplug interrupt source */
->      case RTAS_LOG_TYPE_EPOW:
-> =
-
->=20
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 942ddc9..227561f 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -74,7 +74,7 @@ static inline unsigned in_reg(IVState *s, enum Reg reg)
+     unsigned res;
+ 
+     res = qpci_io_readl(s->dev, s->reg_bar, reg);
+-    g_test_message("*%s -> %x\n", name, res);
++    g_test_message("*%s -> %x", name, res);
+ 
+     return res;
+ }
+@@ -83,7 +83,7 @@ static inline void out_reg(IVState *s, enum Reg reg, unsigned v)
+ {
+     const char *name = reg2str(reg);
+ 
+-    g_test_message("%x -> *%s\n", v, name);
++    g_test_message("%x -> *%s", v, name);
+     qpci_io_writel(s->dev, s->reg_bar, reg, v);
+ }
+ 
+diff --git a/tests/m48t59-test.c b/tests/m48t59-test.c
+index 4abf9c6..b94a123 100644
+--- a/tests/m48t59-test.c
++++ b/tests/m48t59-test.c
+@@ -199,9 +199,9 @@ static void bcd_check_time(void)
+         t = (long)mktime(datep);
+         s = (long)mktime(&start);
+         if (t < s) {
+-            g_test_message("RTC is %ld second(s) behind wall-clock\n", (s - t));
++            g_test_message("RTC is %ld second(s) behind wall-clock", (s - t));
+         } else {
+-            g_test_message("RTC is %ld second(s) ahead of wall-clock\n", (t - s));
++            g_test_message("RTC is %ld second(s) ahead of wall-clock", (t - s));
+         }
+ 
+         g_assert_cmpint(ABS(t - s), <=, wiggle);
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 8352612..905d545 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -821,7 +821,7 @@ int main(int argc, char **argv)
+ 
+     tmpfs = mkdtemp(template);
+     if (!tmpfs) {
+-        g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
++        g_test_message("mkdtemp on path (%s): %s", template, strerror(errno));
+     }
+     g_assert(tmpfs);
+ 
+@@ -839,7 +839,7 @@ int main(int argc, char **argv)
+ 
+     ret = rmdir(tmpfs);
+     if (ret != 0) {
+-        g_test_message("unable to rmdir: path (%s): %s\n",
++        g_test_message("unable to rmdir: path (%s): %s",
+                        tmpfs, strerror(errno));
+     }
+ 
+diff --git a/tests/rtc-test.c b/tests/rtc-test.c
+index d7a96cb..509be70 100644
+--- a/tests/rtc-test.c
++++ b/tests/rtc-test.c
+@@ -165,9 +165,9 @@ static void check_time(int wiggle)
+         t = (long)mktime(datep);
+         s = (long)mktime(&start);
+         if (t < s) {
+-            g_test_message("RTC is %ld second(s) behind wall-clock\n", (s - t));
++            g_test_message("RTC is %ld second(s) behind wall-clock", (s - t));
+         } else {
+-            g_test_message("RTC is %ld second(s) ahead of wall-clock\n", (t - s));
++            g_test_message("RTC is %ld second(s) ahead of wall-clock", (t - s));
+         }
+ 
+         g_assert_cmpint(ABS(t - s), <=, wiggle);
+diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
+index 68bfc42..49e3f03 100644
+--- a/tests/rtl8139-test.c
++++ b/tests/rtl8139-test.c
+@@ -46,12 +46,12 @@ static QPCIDevice *get_device(void)
+ static unsigned __attribute__((unused)) in_##name(void) \
+ { \
+     unsigned res = qpci_io_read##len(dev, dev_bar, (val));     \
+-    g_test_message("*%s -> %x\n", #name, res); \
++    g_test_message("*%s -> %x", #name, res); \
+     return res; \
+ } \
+ static void out_##name(unsigned v) \
+ { \
+-    g_test_message("%x -> *%s\n", v, #name); \
++    g_test_message("%x -> *%s", v, #name); \
+     qpci_io_write##len(dev, dev_bar, (val), v);        \
+ }
+ 
+@@ -176,7 +176,7 @@ static void test_timer(void)
+         }
+     }
+ 
+-    g_test_message("Everythink is ok!\n");
++    g_test_message("Everythink is ok!");
+ }
+ 
+ 
+diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
+index 6440d54..d3144be 100644
+--- a/tests/test-aio-multithread.c
++++ b/tests/test-aio-multithread.c
+@@ -178,7 +178,7 @@ static void test_multi_co_schedule(int seconds)
+     }
+ 
+     join_aio_contexts();
+-    g_test_message("scheduled %d, queued %d, retry %d, total %d\n",
++    g_test_message("scheduled %d, queued %d, retry %d, total %d",
+                   count_other, count_here, count_retry,
+                   count_here + count_other + count_retry);
+ }
+@@ -242,7 +242,7 @@ static void test_multi_co_mutex(int threads, int seconds)
+     }
+ 
+     join_aio_contexts();
+-    g_test_message("%d iterations/second\n", counter / seconds);
++    g_test_message("%d iterations/second", counter / seconds);
+     g_assert_cmpint(counter, ==, atomic_counter);
+ }
+ 
+@@ -361,7 +361,7 @@ static void test_multi_fair_mutex(int threads, int seconds)
+     }
+ 
+     join_aio_contexts();
+-    g_test_message("%d iterations/second\n", counter / seconds);
++    g_test_message("%d iterations/second", counter / seconds);
+     g_assert_cmpint(counter, ==, atomic_counter);
+ }
+ 
+@@ -417,7 +417,7 @@ static void test_multi_mutex(int threads, int seconds)
+     }
+ 
+     join_aio_contexts();
+-    g_test_message("%d iterations/second\n", counter / seconds);
++    g_test_message("%d iterations/second", counter / seconds);
+     g_assert_cmpint(counter, ==, atomic_counter);
+ }
+ 
+diff --git a/tests/test-coroutine.c b/tests/test-coroutine.c
+index 28e79b3..e946d93 100644
+--- a/tests/test-coroutine.c
++++ b/tests/test-coroutine.c
+@@ -369,7 +369,7 @@ static void perf_lifecycle(void)
+     }
+     duration = g_test_timer_elapsed();
+ 
+-    g_test_message("Lifecycle %u iterations: %f s\n", max, duration);
++    g_test_message("Lifecycle %u iterations: %f s", max, duration);
+ }
+ 
+ static void perf_nesting(void)
+@@ -393,7 +393,7 @@ static void perf_nesting(void)
+     }
+     duration = g_test_timer_elapsed();
+ 
+-    g_test_message("Nesting %u iterations of %u depth each: %f s\n",
++    g_test_message("Nesting %u iterations of %u depth each: %f s",
+         maxcycles, maxnesting, duration);
+ }
+ 
+@@ -426,8 +426,7 @@ static void perf_yield(void)
+     }
+     duration = g_test_timer_elapsed();
+ 
+-    g_test_message("Yield %u iterations: %f s\n",
+-        maxcycles, duration);
++    g_test_message("Yield %u iterations: %f s", maxcycles, duration);
+ }
+ 
+ static __attribute__((noinline)) void dummy(unsigned *i)
+@@ -449,8 +448,7 @@ static void perf_baseline(void)
+     }
+     duration = g_test_timer_elapsed();
+ 
+-    g_test_message("Function call %u iterations: %f s\n",
+-        maxcycles, duration);
++    g_test_message("Function call %u iterations: %f s", maxcycles, duration);
+ }
+ 
+ static __attribute__((noinline)) void perf_cost_func(void *opaque)
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index d961bd0..b5af8c3 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -332,7 +332,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+     }
+ 
+     if (size != VHOST_USER_HDR_SIZE) {
+-        g_test_message("Wrong message size received %d\n", size);
++        g_test_message("Wrong message size received %d", size);
+         return;
+     }
+ 
+@@ -343,7 +343,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+         p += VHOST_USER_HDR_SIZE;
+         size = qemu_chr_fe_read_all(chr, p, msg.size);
+         if (size != msg.size) {
+-            g_test_message("Wrong message size received %d != %d\n",
++            g_test_message("Wrong message size received %d != %d",
+                            size, msg.size);
+             return;
+         }
+@@ -465,7 +465,7 @@ static const char *init_hugepagefs(const char *path)
+     int ret;
+ 
+     if (access(path, R_OK | W_OK | X_OK)) {
+-        g_test_message("access on path (%s): %s\n", path, strerror(errno));
++        g_test_message("access on path (%s): %s", path, strerror(errno));
+         return NULL;
+     }
+ 
+@@ -474,12 +474,12 @@ static const char *init_hugepagefs(const char *path)
+     } while (ret != 0 && errno == EINTR);
+ 
+     if (ret != 0) {
+-        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
++        g_test_message("statfs on path (%s): %s", path, strerror(errno));
+         return NULL;
+     }
+ 
+     if (fs.f_type != HUGETLBFS_MAGIC) {
+-        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
++        g_test_message("Warning: path not on HugeTLBFS: %s", path);
+         return NULL;
+     }
+ 
+@@ -979,7 +979,7 @@ int main(int argc, char **argv)
+ 
+     tmpfs = mkdtemp(template);
+     if (!tmpfs) {
+-        g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
++        g_test_message("mkdtemp on path (%s): %s", template, strerror(errno));
+     }
+     g_assert(tmpfs);
+ 
+@@ -1032,7 +1032,7 @@ int main(int argc, char **argv)
+ 
+     ret = rmdir(tmpfs);
+     if (ret != 0) {
+-        g_test_message("unable to rmdir: path (%s): %s\n",
++        g_test_message("unable to rmdir: path (%s): %s",
+                        tmpfs, strerror(errno));
+     }
+     g_assert_cmpint(ret, ==, 0);
+-- 
+1.8.3.1
