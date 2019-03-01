@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49532)
+Received: from eggs.gnu.org ([209.51.188.92]:50393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gzmGr-0002ez-LU
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:48:30 -0500
+	(envelope-from <david@redhat.com>) id 1gzmJq-0003sb-PL
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:51:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gzmGn-0004lF-D8
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:48:29 -0500
-Date: Fri, 1 Mar 2019 17:48:06 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190301174806.GN21251@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
-	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
-	<20190301154947.GJ21251@redhat.com>
-	<20190301183328.20b63e23@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gzmJp-0006xB-QN
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:51:34 -0500
+References: <20190301115413.27153-1-david@redhat.com>
+	<20190301115413.27153-14-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <faa026aa-a32c-fc0c-f483-653f962c85a3@redhat.com>
+Date: Fri, 1 Mar 2019 18:51:30 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190301115413.27153-14-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190301183328.20b63e23@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
- parameter of '-numa node' option
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 13/32] s390x/tcg: Implement VECTOR LOAD
+ MULTIPLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wrote:
-> On Fri, 1 Mar 2019 15:49:47 +0000
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->=20
-> > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote:
-> > > The parameter allows to configure fake NUMA topology where guest
-> > > VM simulates NUMA topology but not actually getting a performance
-> > > benefits from it. The same or better results could be achieved
-> > > using 'memdev' parameter. In light of that any VM that uses NUMA
-> > > to get its benefits should use 'memdev' and to allow transition
-> > > initial RAM to device based model, deprecate 'mem' parameter as
-> > > its ad-hoc partitioning of initial RAM MemoryRegion can't be
-> > > translated to memdev based backend transparently to users and in
-> > > compatible manner (migration wise).
-> > >=20
-> > > That will also allow to clean up a bit our numa code, leaving only
-> > > 'memdev' impl. in place and several boards that use node_mem
-> > > to generate FDT/ACPI description from it. =20
-> >=20
-> > Can you confirm that the  'mem' and 'memdev' parameters to -numa
-> > are 100% live migration compatible in both directions ?  Libvirt
-> > would need this to be the case in order to use the 'memdev' syntax
-> > instead.
-> Unfortunately they are not migration compatible in any direction,
-> if it where possible to translate them to each other I'd alias 'mem'
-> to 'memdev' without deprecation. The former sends over only one
-> MemoryRegion to target, while the later sends over several (one per
-> memdev).
+On 01.03.19 12:53, David Hildenbrand wrote:
+> Try to load the last element first. Access to the first element will
+> be checked afterwards. This way, we can guarantee that the vector is
+> not modified before we checked for all possible exceptions. (16 vectors
+> cannot cross more than two pages)
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-data.def      |  2 ++
+>  target/s390x/translate_vx.inc.c | 34 +++++++++++++++++++++++++++++++++
+>  2 files changed, 36 insertions(+)
+> 
+> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> index 2b36205c84..fa0f3a9003 100644
+> --- a/target/s390x/insn-data.def
+> +++ b/target/s390x/insn-data.def
+> @@ -1000,6 +1000,8 @@
+>      F(0xe721, VLGV,    VRS_c, V,   la2, 0, r1, 0, vlgv, 0, IF_VEC)
+>  /* VECTOR LOAD LOGICAL ELEMENT AND ZERO */
+>      F(0xe704, VLLEZ,   VRX,   V,   la2, 0, 0, 0, vllez, 0, IF_VEC)
+> +/* VECTOR LOAD MULTIPLE */
+> +    F(0xe736, VLM,     VRS_a, V,   la2, 0, 0, 0, vlm, 0, IF_VEC)
+>  
+>  #ifndef CONFIG_USER_ONLY
+>  /* COMPARE AND SWAP AND PURGE */
+> diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
+> index cdad2a52f0..93f9c0f804 100644
+> --- a/target/s390x/translate_vx.inc.c
+> +++ b/target/s390x/translate_vx.inc.c
+> @@ -406,3 +406,37 @@ static DisasJumpType op_vllez(DisasContext *s, DisasOps *o)
+>      tcg_temp_free_i64(t);
+>      return DISAS_NEXT;
+>  }
+> +
+> +static DisasJumpType op_vlm(DisasContext *s, DisasOps *o)
+> +{
+> +    const uint8_t v3 = get_field(s->fields, v3);
+> +    uint8_t v1 = get_field(s->fields, v1);
+> +    TCGv_i64 t;
+> +
+> +    while (v3 < v1 || (v3 - v1 + 1) > 16) {
 
-If we can't migration from one to the other, then we can not deprecate
-the existing 'mem' syntax. Even if libvirt were to provide a config
-option to let apps opt-in to the new syntax, we need to be able to
-support live migration of existing running VMs indefinitely. Effectively
-this means we need the to keep 'mem' support forever, or at least such
-a long time that it effectively means forever.
+while -> if, funny that this works
 
-So I think this patch has to be dropped & replaced with one that
-simply documents that memdev syntax is preferred.
+> +        gen_program_exception(s, PGM_SPECIFICATION);
+> +        return DISAS_NORETURN;
+> +    }
+> +
+> +    /*
+> +     * Check for possible access exceptions by trying to load the last
+> +     * element. The first element will be checked first next.
+> +     */
+> +    t = tcg_temp_new_i64();
+> +    gen_addi_and_wrap_i64(s, t, o->addr1, (v3 - v1) * 16 + 8);
+> +    tcg_gen_qemu_ld_i64(t, t, get_mem_index(s), MO_TEQ);
+> +
+> +    for (;; v1++) {
+> +        tcg_gen_qemu_ld_i64(t, o->addr1, get_mem_index(s), MO_TEQ);
+> +        write_vec_element_i64(t, v1, 0, ES_64);
+> +        gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
+> +        tcg_gen_qemu_ld_i64(t, o->addr1, get_mem_index(s), MO_TEQ);
+> +        write_vec_element_i64(t, v1, 1, ES_64);
+> +        if (v1 == v3) {
+> +            break;
+> +        }
+> +        gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
+> +    }
+> +    tcg_temp_free_i64(t);
+> +    return DISAS_NEXT;
+> +}
+> 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+-- 
+
+Thanks,
+
+David / dhildenb
