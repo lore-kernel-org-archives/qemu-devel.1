@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53598)
+Received: from eggs.gnu.org ([209.51.188.92]:33748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gzmU6-0002C0-Ks
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:02:12 -0500
+	(envelope-from <david@redhat.com>) id 1gzmp8-0005j0-80
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:23:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gzmU4-0006Mr-PU
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:02:10 -0500
-Date: Fri, 1 Mar 2019 18:01:52 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190301180151.GE2851@work-vm>
-References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
-	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
-	<20190301154947.GJ21251@redhat.com>
-	<20190301183328.20b63e23@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gzmgp-0003PX-12
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:15:22 -0500
+References: <20190301115413.27153-1-david@redhat.com>
+	<20190301115413.27153-28-david@redhat.com>
+	<bccdbc0a-1dd9-5675-557a-15e69058ef9d@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <811b50cd-5ec1-f65a-eebe-9991c01c82be@redhat.com>
+Date: Fri, 1 Mar 2019 19:15:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190301183328.20b63e23@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
- parameter of '-numa node' option
+In-Reply-To: <bccdbc0a-1dd9-5675-557a-15e69058ef9d@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 27/32] s390x/tcg: Provide probe_write
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,133 +26,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Fri, 1 Mar 2019 15:49:47 +0000
-> Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
->=20
-> > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote:
-> > > The parameter allows to configure fake NUMA topology where guest
-> > > VM simulates NUMA topology but not actually getting a performance
-> > > benefits from it. The same or better results could be achieved
-> > > using 'memdev' parameter. In light of that any VM that uses NUMA
-> > > to get its benefits should use 'memdev' and to allow transition
-> > > initial RAM to device based model, deprecate 'mem' parameter as
-> > > its ad-hoc partitioning of initial RAM MemoryRegion can't be
-> > > translated to memdev based backend transparently to users and in
-> > > compatible manner (migration wise).
-> > >=20
-> > > That will also allow to clean up a bit our numa code, leaving only
-> > > 'memdev' impl. in place and several boards that use node_mem
-> > > to generate FDT/ACPI description from it. =20
-> >=20
-> > Can you confirm that the  'mem' and 'memdev' parameters to -numa
-> > are 100% live migration compatible in both directions ?  Libvirt
-> > would need this to be the case in order to use the 'memdev' syntax
-> > instead.
-> Unfortunately they are not migration compatible in any direction,
-> if it where possible to translate them to each other I'd alias 'mem'
-> to 'memdev' without deprecation. The former sends over only one
-> MemoryRegion to target, while the later sends over several (one per
-> memdev).
->=20
-> Mixed memory issue[1] first came from libvirt side RHBZ1624223,
-> back then it was resolved on libvirt side in favor of migration
-> compatibility vs correctness (i.e. bind policy doesn't work as expected=
-).
-> What worse that it was made default and affects all new machines,
-> as I understood it.
->=20
-> In case of -mem-path + -mem-prealloc (with 1 numa node or numa less)
-> it's possible on QEMU side to make conversion to memdev in migration
-> compatible way (that's what stopped Michal from memdev approach).
-> But it's hard to do so in multi-nodes case as amount of MemoryRegions
-> is different.
->=20
-> Point is to consider 'mem' as mis-configuration error, as the user
-> in the first place using broken numa configuration
-> (i.e. fake numa configuration doesn't actually improve performance).
->=20
-> CCed David, maybe he could offer a way to do 1:n migration and other
-> way around.
+On 01.03.19 18:54, Richard Henderson wrote:
+> On 3/1/19 3:54 AM, David Hildenbrand wrote:
+>> Instead of checking e.g. the first access on every touched page, we should
+>> check the actual access, otherwise we might get false positives when Low
+>> Address Protection (LAP) is active. As probe_write() can only deal with
+>> accesses to one page, we have to loop.
+>>
+>> Use i64 for the length, although not needed - easier to reuse
+>> TCG temps we already have in the translation functions where this will
+>> be used. Also allow it to be used from other helpers.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/helper.h     |  1 +
+>>  target/s390x/internal.h   |  2 ++
+>>  target/s390x/mem_helper.c | 21 +++++++++++++++++++++
+>>  3 files changed, 24 insertions(+)
+>>
+>> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+>> index 577edb384f..e2710f4fb3 100644
+>> --- a/target/s390x/helper.h
+>> +++ b/target/s390x/helper.h
+>> @@ -123,6 +123,7 @@ DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
+>>  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
+>>  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
+>>  DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+>> +DEF_HELPER_FLAGS_3(probe_write_access, TCG_CALL_NO_WG, void, env, i64, i64)
+>>  
+>>  /* === Vector Support Instructions === */
+>>  DEF_HELPER_FLAGS_4(vll, TCG_CALL_NO_WG, void, env, ptr, i64, i64)
+>> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+>> index 7baf0e2404..848d6c36d0 100644
+>> --- a/target/s390x/internal.h
+>> +++ b/target/s390x/internal.h
+>> @@ -386,6 +386,8 @@ void ioinst_handle_sal(S390CPU *cpu, uint64_t reg1, uintptr_t ra);
+>>  
+>>  /* mem_helper.c */
+>>  target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr);
+>> +void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
+>> +                        uintptr_t ra);
+>>  
+>>  
+>>  /* mmu_helper.c */
+>> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+>> index a506d9ef99..efd5256ebf 100644
+>> --- a/target/s390x/mem_helper.c
+>> +++ b/target/s390x/mem_helper.c
+>> @@ -2623,3 +2623,24 @@ uint32_t HELPER(cu42)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
+>>      return convert_unicode(env, r1, r2, m3, GETPC(),
+>>                             decode_utf32, encode_utf16);
+>>  }
+>> +
+>> +void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
+>> +                        uintptr_t ra)
+>> +{
+>> +#ifndef CONFIG_USER_ONLY
+>> +    /* test the actual access, not just any access to the page due to LAP */
+>> +    while (len) {
+>> +        uint64_t curlen = MIN(TARGET_PAGE_SIZE - (addr % TARGET_PAGE_SIZE),
+>> +                              len);
+> 
+> pagelen = -(addr | TARGET_PAGE_MASK);
+> curlen = MIN(pagelen, len);
+> 
+>> +
+>> +        probe_write(env, addr, curlen, cpu_mmu_index(env, false), ra);
+>> +        addr = wrap_address(env, addr + curlen);
+>> +        len -= curlen;
+>> +    }
+>> +#endif
+> 
+> That's annoying.  I thought we defined probe_write for user-only as well.
+> 
+> The user-only version would look something like
+> 
+>   uint64_t end = addr + len - 1;
+> 
+>   if (!h2g_valid(addr) ||
+>       !h2g_valid(end) ||
+>       page_check_range(addr, len, PAGE_WRITE) < 0) {
+>     // raise PGM_ADDRESSING
+>   }
+> 
+> Ah, I see why -- there's no user-only equivalent of tlb_fill with which to
+> produce the exception in the failure case.
+> 
 
-I can't see a trivial way.
-About the easiest I can think of is if you had a way to create a memdev
-that was an alias to pc.ram (of a particular size and offset).
+So I guess I can just implement that manually as you suggested. Can
+later be factored out. Thanks!
 
-Dave
 
->=20
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > >  numa.c               |  2 ++
-> > >  qemu-deprecated.texi | 14 ++++++++++++++
-> > >  2 files changed, 16 insertions(+)
-> > >=20
-> > > diff --git a/numa.c b/numa.c
-> > > index 3875e1e..2205773 100644
-> > > --- a/numa.c
-> > > +++ b/numa.c
-> > > @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, N=
-umaNodeOptions *node,
-> > > =20
-> > >      if (node->has_mem) {
-> > >          numa_info[nodenr].node_mem =3D node->mem;
-> > > +        warn_report("Parameter -numa node,mem is deprecated,"
-> > > +                    " use -numa node,memdev instead");
-> > >      }
-> > >      if (node->has_memdev) {
-> > >          Object *o;
-> > > diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> > > index 45c5795..73f99d4 100644
-> > > --- a/qemu-deprecated.texi
-> > > +++ b/qemu-deprecated.texi
-> > > @@ -60,6 +60,20 @@ Support for invalid topologies will be removed, =
-the user must ensure
-> > >  topologies described with -smp include all possible cpus, i.e.
-> > >    @math{@var{sockets} * @var{cores} * @var{threads} =3D @var{maxcp=
-us}}.
-> > > =20
-> > > +@subsection -numa node,mem=3D@var{size} (since 4.0)
-> > > +
-> > > +The parameter @option{mem} of @option{-numa node} is used to assig=
-n a part of
-> > > +guest RAM to a NUMA node. But when using it, it's impossible to ma=
-nage specified
-> > > +size on the host side (like bind it to a host node, setting bind p=
-olicy, ...),
-> > > +so guest end-ups with the fake NUMA configuration with suboptiomal=
- performance.
-> > > +However since 2014 there is an alternative way to assign RAM to a =
-NUMA node
-> > > +using parameter @option{memdev}, which does the same as @option{me=
-m} and has
-> > > +an ability to actualy manage node RAM on the host side. Use parame=
-ter
-> > > +@option{memdev} with @var{memory-backend-ram} backend as an replac=
-ement for
-> > > +parameter @option{mem} to achieve the same fake NUMA effect or a p=
-roperly
-> > > +configured @var{memory-backend-file} backend to actually benefit f=
-rom NUMA
-> > > +configuration.
-> > > +
-> > >  @section QEMU Machine Protocol (QMP) commands
-> > > =20
-> > >  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.1=
-2.0)
-> > > --=20
-> > > 2.7.4
-> > >=20
-> > > --
-> > > libvir-list mailing list
-> > > libvir-list@redhat.com
-> > > https://www.redhat.com/mailman/listinfo/libvir-list =20
-> >=20
-> > Regards,
-> > Daniel
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+
+Thanks,
+
+David / dhildenb
