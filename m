@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44598)
+Received: from eggs.gnu.org ([209.51.188.92]:44646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzoPH-0004At-Pq
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:20 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gzoPL-0004HR-S5
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzoPF-0001jA-P1
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:19 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38301)
+	(envelope-from <richard.henderson@linaro.org>) id 1gzoPH-0001mG-T4
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:21 -0500
+Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:41668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzoP9-0001cf-UQ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:15 -0500
-Received: by mail-pg1-x543.google.com with SMTP id m2so11930978pgl.5
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:05:08 -0800 (PST)
+	id 1gzoPG-0001g0-CA
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:19 -0500
+Received: by mail-pl1-x62a.google.com with SMTP id y5so11968509plk.8
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:05:12 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Mar 2019 12:04:53 -0800
-Message-Id: <20190301200501.16533-3-richard.henderson@linaro.org>
+Date: Fri,  1 Mar 2019 12:04:56 -0800
+Message-Id: <20190301200501.16533-6-richard.henderson@linaro.org>
 In-Reply-To: <20190301200501.16533-1-richard.henderson@linaro.org>
 References: <20190301200501.16533-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 02/10] target/arm: Implement ARMv8.0-SB
+Subject: [Qemu-devel] [PATCH v3 05/10] target/arm: Add set/clear_pstate_bits,
+ share gen_ss_advance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,153 +30,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+We do not need an out-of-line helper for manipulating bits in pstate.
+While changing things, share the implementation of gen_ss_advance.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h           | 10 ++++++++++
- linux-user/elfload.c       |  1 +
- target/arm/cpu.c           |  1 +
- target/arm/cpu64.c         |  2 ++
- target/arm/translate-a64.c | 14 ++++++++++++++
- target/arm/translate.c     | 22 ++++++++++++++++++++++
- 6 files changed, 50 insertions(+)
+v3: Assert no manual change to CACHED_PSTATE_BITS,
+    merged in from a previously separate patch.
+---
+ target/arm/helper.h        |  2 --
+ target/arm/translate.h     | 34 ++++++++++++++++++++++++++++++++++
+ target/arm/op_helper.c     |  5 -----
+ target/arm/translate-a64.c | 11 -----------
+ target/arm/translate.c     | 11 -----------
+ 5 files changed, 34 insertions(+), 29 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 67b06bfad0..361e51143c 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3307,6 +3307,11 @@ static inline bool isar_feature_aa32_fhm(const ARMISARegisters *id)
-     return FIELD_EX32(id->id_isar6, ID_ISAR6, FHM) != 0;
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 6f0f386926..583adba9b0 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -77,8 +77,6 @@ DEF_HELPER_2(get_cp_reg, i32, env, ptr)
+ DEF_HELPER_3(set_cp_reg64, void, env, ptr, i64)
+ DEF_HELPER_2(get_cp_reg64, i64, env, ptr)
+ 
+-DEF_HELPER_1(clear_pstate_ss, void, env)
+-
+ DEF_HELPER_2(get_r13_banked, i32, env, i32)
+ DEF_HELPER_3(set_r13_banked, void, env, i32, i32)
+ 
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index f25fe75685..912cc2a4a5 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -202,6 +202,40 @@ static inline TCGv_i32 get_ahp_flag(void)
+     return ret;
  }
  
-+static inline bool isar_feature_aa32_sb(const ARMISARegisters *id)
++/* Set bits within PSTATE.  */
++static inline void set_pstate_bits(uint32_t bits)
 +{
-+    return FIELD_EX32(id->id_isar6, ID_ISAR6, SB) != 0;
++    TCGv_i32 p = tcg_temp_new_i32();
++
++    tcg_debug_assert(!(bits & CACHED_PSTATE_BITS));
++
++    tcg_gen_ld_i32(p, cpu_env, offsetof(CPUARMState, pstate));
++    tcg_gen_ori_i32(p, p, bits);
++    tcg_gen_st_i32(p, cpu_env, offsetof(CPUARMState, pstate));
++    tcg_temp_free_i32(p);
 +}
 +
- static inline bool isar_feature_aa32_fp16_arith(const ARMISARegisters *id)
- {
-     /*
-@@ -3445,6 +3450,11 @@ static inline bool isar_feature_aa64_pauth(const ARMISARegisters *id)
-              FIELD_DP64(0, ID_AA64ISAR1, GPI, 0xf))) != 0;
++/* Clear bits within PSTATE.  */
++static inline void clear_pstate_bits(uint32_t bits)
++{
++    TCGv_i32 p = tcg_temp_new_i32();
++
++    tcg_debug_assert(!(bits & CACHED_PSTATE_BITS));
++
++    tcg_gen_ld_i32(p, cpu_env, offsetof(CPUARMState, pstate));
++    tcg_gen_andi_i32(p, p, ~bits);
++    tcg_gen_st_i32(p, cpu_env, offsetof(CPUARMState, pstate));
++    tcg_temp_free_i32(p);
++}
++
++/* If the singlestep state is Active-not-pending, advance to Active-pending. */
++static inline void gen_ss_advance(DisasContext *s)
++{
++    if (s->ss_active) {
++        s->pstate_ss = 0;
++        clear_pstate_bits(PSTATE_SS);
++    }
++}
+ 
+ /* Vector operations shared between ARM and AArch64.  */
+ extern const GVecGen3 bsl_op;
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index c5721a866d..8698b4dc83 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -861,11 +861,6 @@ uint64_t HELPER(get_cp_reg64)(CPUARMState *env, void *rip)
+     return res;
  }
  
-+static inline bool isar_feature_aa64_sb(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, SB) != 0;
-+}
-+
- static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
+-void HELPER(clear_pstate_ss)(CPUARMState *env)
+-{
+-    env->pstate &= ~PSTATE_SS;
+-}
+-
+ void HELPER(pre_hvc)(CPUARMState *env)
  {
-     /* We always set the AdvSIMD and FP fields identically wrt FP16.  */
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index b9f7cbbdc1..6cfebe1446 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -604,6 +604,7 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE_ID(aa64_pauth, ARM_HWCAP_A64_PACA | ARM_HWCAP_A64_PACG);
-     GET_FEATURE_ID(aa64_fhm, ARM_HWCAP_A64_ASIMDFHM);
-     GET_FEATURE_ID(aa64_jscvt, ARM_HWCAP_A64_JSCVT);
-+    GET_FEATURE_ID(aa64_sb, ARM_HWCAP_A64_SB);
- 
- #undef GET_FEATURE_ID
- 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 54b61f917b..ef069c268d 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2021,6 +2021,7 @@ static void arm_max_initfn(Object *obj)
-             t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);
-             t = FIELD_DP32(t, ID_ISAR6, DP, 1);
-             t = FIELD_DP32(t, ID_ISAR6, FHM, 1);
-+            t = FIELD_DP32(t, ID_ISAR6, SB, 1);
-             cpu->isar.id_isar6 = t;
- 
-             t = cpu->id_mmfr4;
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 1b0c427277..6788c0f6ff 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -318,6 +318,7 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64ISAR1, API, 0);
-         t = FIELD_DP64(t, ID_AA64ISAR1, GPA, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR1, GPI, 0);
-+        t = FIELD_DP64(t, ID_AA64ISAR1, SB, 1);
-         cpu->isar.id_aa64isar1 = t;
- 
-         t = cpu->isar.id_aa64pfr0;
-@@ -349,6 +350,7 @@ static void aarch64_max_initfn(Object *obj)
-         u = FIELD_DP32(u, ID_ISAR6, JSCVT, 1);
-         u = FIELD_DP32(u, ID_ISAR6, DP, 1);
-         u = FIELD_DP32(u, ID_ISAR6, FHM, 1);
-+        u = FIELD_DP32(u, ID_ISAR6, SB, 1);
-         cpu->isar.id_isar6 = u;
- 
-         /*
+     ARMCPU *cpu = arm_env_get_cpu(env);
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index d3c8eaf089..4aa5a307e4 100644
+index 1e49d33365..eaeb43577d 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -1637,7 +1637,21 @@ static void handle_sync(DisasContext *s, uint32_t insn,
-         reset_btype(s);
-         gen_goto_tb(s, 0, s->pc);
-         return;
-+
-+    case 7: /* SB */
-+        if (crm != 0 || !dc_isar_feature(aa64_sb, s)) {
-+            goto do_unallocated;
-+        }
-+        /*
-+         * TODO: There is no speculation barrier opcode for TCG;
-+         * MB and end the TB instead.
-+         */
-+        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-+        gen_goto_tb(s, 0, s->pc);
-+        return;
-+
-     default:
-+    do_unallocated:
-         unallocated_encoding(s);
-         return;
-     }
+@@ -421,17 +421,6 @@ static void gen_exception_bkpt_insn(DisasContext *s, int offset,
+     s->base.is_jmp = DISAS_NORETURN;
+ }
+ 
+-static void gen_ss_advance(DisasContext *s)
+-{
+-    /* If the singlestep state is Active-not-pending, advance to
+-     * Active-pending.
+-     */
+-    if (s->ss_active) {
+-        s->pstate_ss = 0;
+-        gen_helper_clear_pstate_ss(cpu_env);
+-    }
+-}
+-
+ static void gen_step_complete_exception(DisasContext *s)
+ {
+     /* We just completed step of an insn. Move from Active-not-pending
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 8f7f5b95aa..61adefb328 100644
+index 61adefb328..57b1b20287 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -9282,6 +9282,17 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                  */
-                 gen_goto_tb(s, 0, s->pc & ~1);
-                 return;
-+            case 7: /* sb */
-+                if ((insn & 0xf) || !dc_isar_feature(aa32_sb, s)) {
-+                    goto illegal_op;
-+                }
-+                /*
-+                 * TODO: There is no speculation barrier opcode
-+                 * for TCG; MB and end the TB instead.
-+                 */
-+                tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-+                gen_goto_tb(s, 0, s->pc & ~1);
-+                return;
-             default:
-                 goto illegal_op;
-             }
-@@ -11900,6 +11911,17 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                              */
-                             gen_goto_tb(s, 0, s->pc & ~1);
-                             break;
-+                        case 7: /* sb */
-+                            if ((insn & 0xf) || !dc_isar_feature(aa32_sb, s)) {
-+                                goto illegal_op;
-+                            }
-+                            /*
-+                             * TODO: There is no speculation barrier opcode
-+                             * for TCG; MB and end the TB instead.
-+                             */
-+                            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-+                            gen_goto_tb(s, 0, s->pc & ~1);
-+                            break;
-                         default:
-                             goto illegal_op;
-                         }
+@@ -298,17 +298,6 @@ static void gen_exception(int excp, uint32_t syndrome, uint32_t target_el)
+     tcg_temp_free_i32(tcg_excp);
+ }
+ 
+-static void gen_ss_advance(DisasContext *s)
+-{
+-    /* If the singlestep state is Active-not-pending, advance to
+-     * Active-pending.
+-     */
+-    if (s->ss_active) {
+-        s->pstate_ss = 0;
+-        gen_helper_clear_pstate_ss(cpu_env);
+-    }
+-}
+-
+ static void gen_step_complete_exception(DisasContext *s)
+ {
+     /* We just completed step of an insn. Move from Active-not-pending
 -- 
 2.17.2
