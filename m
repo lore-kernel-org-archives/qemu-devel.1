@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51865)
+Received: from eggs.gnu.org ([209.51.188.92]:52469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzmPd-0007p0-Fs
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:57:34 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gzmRy-0000vg-GR
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:59:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzmPc-0002a8-G9
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:57:33 -0500
-References: <1551456970-463-1-git-send-email-thuth@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
-Date: Fri, 1 Mar 2019 12:57:19 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gzmRw-0004Gt-I3
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:59:58 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33156)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gzmRs-0004Co-Nk
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:59:56 -0500
+Received: by mail-wr1-x442.google.com with SMTP id i12so26880502wrw.0
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 09:59:51 -0800 (PST)
+References: <20190214180216.246707-1-sgarzare@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190214180216.246707-1-sgarzare@redhat.com>
+Date: Fri, 01 Mar 2019 17:59:48 +0000
+Message-ID: <87mumejx0r.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <1551456970-463-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests: Remove (mostly) useless
- architecture checks
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/i386/pc: run the multiboot loader
+ before the PVH loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <minyard@acm.org>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, George Kennedy <George.Kennedy@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 
+Stefano Garzarella <sgarzare@redhat.com> writes:
 
-On 3/1/19 11:16 AM, Thomas Huth wrote:
-> These checks at the beginning of some of the tests are mostly useless:
-> We only run the tests on x86 anyway, and g_test_message() does not
-> print anything unless you call g_test_init() first.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Some multiboot images could be in the ELF format. In the current
+> implementation QEMU fails because we try to load these images
+> as a PVH image.
+>
+> In order to fix this issue, we should try multiboot first (we
+> already check the multiboot magic header before to load it).
+> If it is not a multiboot image, we can try the PVH loader.
+>
+> Fixes: ab969087da6 ("pvh: Boot uncompressed kernel using direct boot ABI"=
+, 2019-01-15)
+> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  tests/fdc-test.c      | 7 -------
->  tests/ide-test.c      | 7 -------
->  tests/ipmi-bt-test.c  | 7 -------
->  tests/ipmi-kcs-test.c | 7 -------
->  4 files changed, 28 deletions(-)
-> 
-> diff --git a/tests/fdc-test.c b/tests/fdc-test.c
-> index 88f1abf..31cd329 100644
-> --- a/tests/fdc-test.c
-> +++ b/tests/fdc-test.c
-> @@ -548,16 +548,9 @@ static void fuzz_registers(void)
->  
->  int main(int argc, char **argv)
->  {
-> -    const char *arch = qtest_get_arch();
->      int fd;
->      int ret;
->  
-> -    /* Check architecture */
-> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
-> -        g_test_message("Skipping test for non-x86\n");
-> -        return 0;
-> -    }
-> -
->      /* Create a temporary raw image */
->      fd = mkstemp(test_image);
->      g_assert(fd >= 0);
-> diff --git a/tests/ide-test.c b/tests/ide-test.c
-> index f0280e6..300d64e 100644
-> --- a/tests/ide-test.c
-> +++ b/tests/ide-test.c
-> @@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
->  
->  int main(int argc, char **argv)
->  {
-> -    const char *arch = qtest_get_arch();
->      int fd;
->      int ret;
->  
-> -    /* Check architecture */
-> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
-> -        g_test_message("Skipping test for non-x86\n");
-> -        return 0;
-> -    }
-> -
->      /* Create temporary blkdebug instructions */
->      fd = mkstemp(debug_path);
->      g_assert(fd >= 0);
-> diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
-> index f4a81b5..fc4c83b 100644
-> --- a/tests/ipmi-bt-test.c
-> +++ b/tests/ipmi-bt-test.c
-> @@ -400,15 +400,8 @@ static void open_socket(void)
->  
->  int main(int argc, char **argv)
->  {
-> -    const char *arch = qtest_get_arch();
->      int ret;
->  
-> -    /* Check architecture */
-> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
-> -        g_test_message("Skipping test for non-x86\n");
-> -        return 0;
-> -    }
-> -
->      open_socket();
->  
->      /* Run the tests */
-> diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
-> index 178ffc1..a2354c1 100644
-> --- a/tests/ipmi-kcs-test.c
-> +++ b/tests/ipmi-kcs-test.c
-> @@ -263,16 +263,9 @@ static void test_enable_irq(void)
->  
->  int main(int argc, char **argv)
->  {
-> -    const char *arch = qtest_get_arch();
->      char *cmdline;
->      int ret;
->  
-> -    /* Check architecture */
-> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
-> -        g_test_message("Skipping test for non-x86\n");
-> -        return 0;
-> -    }
-> -
->      /* Run the tests */
->      g_test_init(&argc, &argv, NULL);
->  
-> 
+>  hw/i386/pc.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 3889eccdc3..207c267093 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1209,6 +1209,17 @@ static void load_linux(PCMachineState *pcms,
+>      if (ldl_p(header+0x202) =3D=3D 0x53726448) {
+>          protocol =3D lduw_p(header+0x206);
+>      } else {
+> +        /*
+> +         * This could be a multiboot kernel. If it is, let's stop treati=
+ng it
+> +         * like a Linux kernel.
+> +         * Note: some multiboot images could be in the ELF format (the s=
+ame of
+> +         * PVH), so we try multiboot first since we check the multiboot =
+magic
+> +         * header before to load it.
+> +         */
+> +        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
+> +                           kernel_cmdline, kernel_size, header)) {
+> +            return;
+> +        }
+>          /*
+>           * Check if the file is an uncompressed kernel file (ELF) and lo=
+ad it,
+>           * saving the PVH entry point used by the x86/HVM direct boot AB=
+I.
+> @@ -1262,12 +1273,6 @@ static void load_linux(PCMachineState *pcms,
+>
+>              return;
+>          }
+> -        /* This looks like a multiboot kernel. If it is, let's stop
+> -           treating it like a Linux kernel. */
+> -        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
+> -                           kernel_cmdline, kernel_size, header)) {
+> -            return;
+> -        }
+>          protocol =3D 0;
+>      }
 
-Hm, if you insist. I have no strong feelings... Do we plan to split
-tests out by architecture eventually? Clearly x86 only tests don't
-really need to each individually check the arch, but I'm not sure what
-the vision is.
 
-Either way, since I have no horse in the race:
-
-Acked-by: John Snow <jsnow@redhat.com>
+--
+Alex Benn=C3=A9e
