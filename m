@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55379)
+Received: from eggs.gnu.org ([209.51.188.92]:56611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gznTa-0002AH-Qc
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:43 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznV3-0003N1-67
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:07:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gznTZ-0002z0-HV
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41140)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gznTW-0002S9-4S
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:41 -0500
-Date: Fri, 1 Mar 2019 19:05:01 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190301190501.GF2851@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] vhost-user slave deadlock question
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznV0-0004jS-Gi
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:07:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36048
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gznUx-0004FZ-IQ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:07:10 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x21J0rYF032340
+	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:06:45 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qy7ygxxq8-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:04:53 -0500
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Fri, 1 Mar 2019 18:59:45 -0000
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Fri,  1 Mar 2019 13:59:31 -0500
+In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+Message-Id: <1551466776-29123-12-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 11/16] s390-bios: cio error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +38,317 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, tiwei.bie@intel.com, marcandre.lureau@redhat.com
-Cc: stefanha@redhat.com, maxime.coquelin@redhat.com
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Hi,
-  I've added a few commands to vhost-user for virtio-fs and
-am hitting a deadlock and am trying to figure out what the correct fix
-is; suggestions welcome.
+Add verbose error output for when unexpected i/o errors happen. This eases the
+burden of debugging and reporting i/o errors. No error information is printed
+in the success case, here is an example of what is output on error:
 
-My setup is:
-  Messages sent over the virtio queues can cause the daemon to need
-  to send a request back to qemu along the slave, and qemu must respond with an
-  OK/error.  Lets call this command 'setupmapping'.
-  In my case I'm reading vhost-user commands in one thread and
-  processing the queues in another.
+cio device error
+  ssid  : 0x0000000000000000
+  cssid : 0x0000000000000000
+  sch_no: 0x0000000000000000
 
-  That normally works OK
+Interrupt Response Block Data:
+    Function Ctrl : [Start]
+    Activity Ctrl : [Start-Pending]
+    Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
+    Device Status : [Unit-Check]
+    Channel Status :
+    cpa=: 0x000000007f8d6038
+    prev_ccw=: 0x0000000000000000
+    this_ccw=: 0x0000000000000000
+Eckd Dasd Sense Data (fmt 32-bytes):
+    Sense Condition Flags :
+    Residual Count     =: 0x0000000000000000
+    Phys Drive ID      =: 0x000000000000009e
+    low cyl address    =: 0x0000000000000000
+    head addr & hi cyl =: 0x0000000000000000
+    format/message     =: 0x0000000000000008
+    fmt-dependent[0-7] =: 0x0000000000000004
+    fmt-dependent[8-15]=: 0xe561282305082fff
+    prog action code   =: 0x0000000000000016
+    Configuration info =: 0x00000000000040e0
+    mcode / hi-cyl     =: 0x0000000000000000
+    cyl & head addr [0]=: 0x0000000000000000
+    cyl & head addr [1]=: 0x0000000000000000
+    cyl & head addr [2]=: 0x0000000000000000
 
-My problem:
-  If qemu crashes or quits it stops the queues synchronously at a point
-when the main loop in qemu wont respond to anything else.  However
-if we're unlucky the daemon has already sent a message to qemu and
-is waiting for the response; but that response can't arrive because
-qemu is shutting down.  So the queue shutdown request never completes.
-Then if I kill the daemon forcibly, qemu's handler for the slavefd
-wakes up and tries to read data - but it's device has gone and it
-crashes.
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+---
+ pc-bios/s390-ccw/cio.c  | 230 ++++++++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/libc.h |  11 +++
+ 2 files changed, 241 insertions(+)
 
-The trace is:
-(Where vuf_* is my device and the structure is pretty much the same
-as the others).
-
-vm_state_notify->virtio_set_status->vuf_set_status->vuf_stop->vhost_dev_stop->vhost_virtqueue_stop->vhost_user_get_vring_base->vhost_user_read
-
-So it feels like we need to shut down the slave FD when we shut
-down the device;  but it's not clear to me at what level.
-In some ways it feels like we need a way to get out if this
-hole even if we shut down one queue synchronously.
-
-Is anyone fighting similar cases?
-
-Dave
-
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+index e61cfd3..c528bbf 100644
+--- a/pc-bios/s390-ccw/cio.c
++++ b/pc-bios/s390-ccw/cio.c
+@@ -82,6 +82,228 @@ static bool irb_error(Irb *irb)
+     return irb->scsw.dstat != (SCSW_DSTAT_DEVEND | SCSW_DSTAT_CHEND);
+ }
+ 
++static void print_eckd_dasd_sense_data(SenseDataEckdDasd *sd)
++{
++    char msgline[512];
++
++    if (sd->config_info & 0x8000) {
++        sclp_print("Eckd Dasd Sense Data (fmt 24-bytes):\n");
++    } else {
++        sclp_print("Eckd Dasd Sense Data (fmt 32-bytes):\n");
++    }
++
++    strcat(msgline, "    Sense Condition Flags :");
++    if (sd->status[0] & SNS_STAT0_CMD_REJECT) {
++        strcat(msgline, " [Cmd-Reject]");
++    }
++    if (sd->status[0] & SNS_STAT0_INTERVENTION_REQ) {
++        strcat(msgline, " [Intervention-Required]");
++    }
++    if (sd->status[0] & SNS_STAT0_BUS_OUT_CHECK) {
++        strcat(msgline, " [Bus-Out-Parity-Check]");
++    }
++    if (sd->status[0] & SNS_STAT0_EQUIPMENT_CHECK) {
++        strcat(msgline, " [Equipment-Check]");
++    }
++    if (sd->status[0] & SNS_STAT0_DATA_CHECK) {
++        strcat(msgline, " [Data-Check]");
++    }
++    if (sd->status[0] & SNS_STAT0_OVERRUN) {
++        strcat(msgline, " [Overrun]");
++    }
++    if (sd->status[0] & SNS_STAT0_INCOMPL_DOMAIN) {
++        strcat(msgline, " [Incomplete-Domain]");
++    }
++
++    if (sd->status[1] & SNS_STAT1_PERM_ERR) {
++        strcat(msgline, " [Permanent-Error]");
++    }
++    if (sd->status[1] & SNS_STAT1_INV_TRACK_FORMAT) {
++        strcat(msgline, " [Invalid-Track-Fmt]");
++    }
++    if (sd->status[1] & SNS_STAT1_EOC) {
++        strcat(msgline, " [End-of-Cyl]");
++    }
++    if (sd->status[1] & SNS_STAT1_MESSAGE_TO_OPER) {
++        strcat(msgline, " [Operator-Msg]");
++    }
++    if (sd->status[1] & SNS_STAT1_NO_REC_FOUND) {
++        strcat(msgline, " [No-Record-Found]");
++    }
++    if (sd->status[1] & SNS_STAT1_FILE_PROTECTED) {
++        strcat(msgline, " [File-Protected]");
++    }
++    if (sd->status[1] & SNS_STAT1_WRITE_INHIBITED) {
++        strcat(msgline, " [Write-Inhibited]");
++    }
++    if (sd->status[1] & SNS_STAT1_IMPRECISE_END) {
++        strcat(msgline, " [Imprecise-Ending]");
++    }
++
++    if (sd->status[2] & SNS_STAT2_REQ_INH_WRITE) {
++        strcat(msgline, " [Req-Inhibit-Write]");
++    }
++    if (sd->status[2] & SNS_STAT2_CORRECTABLE) {
++        strcat(msgline, " [Correctable-Data-Check]");
++    }
++    if (sd->status[2] & SNS_STAT2_FIRST_LOG_ERR) {
++        strcat(msgline, " [First-Error-Log]");
++    }
++    if (sd->status[2] & SNS_STAT2_ENV_DATA_PRESENT) {
++        strcat(msgline, " [Env-Data-Present]");
++    }
++    if (sd->status[2] & SNS_STAT2_IMPRECISE_END) {
++        strcat(msgline, " [Imprecise-End]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    print_int("    Residual Count     =", sd->res_count);
++    print_int("    Phys Drive ID      =", sd->phys_drive_id);
++    print_int("    low cyl address    =", sd->low_cyl_addr);
++    print_int("    head addr & hi cyl =", sd->head_high_cyl_addr);
++    print_int("    format/message     =", sd->fmt_msg);
++    print_int("    fmt-dependent[0-7] =", sd->fmt_dependent_info[0]);
++    print_int("    fmt-dependent[8-15]=", sd->fmt_dependent_info[1]);
++    print_int("    prog action code   =", sd->program_action_code);
++    print_int("    Configuration info =", sd->config_info);
++    print_int("    mcode / hi-cyl     =", sd->mcode_hicyl);
++    print_int("    cyl & head addr [0]=", sd->cyl_head_addr[0]);
++    print_int("    cyl & head addr [1]=", sd->cyl_head_addr[1]);
++    print_int("    cyl & head addr [2]=", sd->cyl_head_addr[2]);
++}
++
++static void print_irb_err(Irb *irb)
++{
++    uint64_t this_ccw = *(uint64_t *)u32toptr(irb->scsw.cpa);
++    uint64_t prev_ccw = *(uint64_t *)u32toptr(irb->scsw.cpa - 8);
++    char msgline[256];
++
++    sclp_print("Interrupt Response Block Data:\n");
++
++    strcat(msgline, "    Function Ctrl :");
++    if (irb->scsw.ctrl & SCSW_FCTL_START_FUNC) {
++        strcat(msgline, " [Start]");
++    }
++    if (irb->scsw.ctrl & SCSW_FCTL_HALT_FUNC) {
++        strcat(msgline, " [Halt]");
++    }
++    if (irb->scsw.ctrl & SCSW_FCTL_CLEAR_FUNC) {
++        strcat(msgline, " [Clear]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    msgline[0] = '\0';
++    strcat(msgline, "    Activity Ctrl :");
++    if (irb->scsw.ctrl & SCSW_ACTL_RESUME_PEND) {
++        strcat(msgline, " [Resume-Pending]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_START_PEND) {
++        strcat(msgline, " [Start-Pending]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_HALT_PEND) {
++        strcat(msgline, " [Halt-Pending]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_CLEAR_PEND) {
++        strcat(msgline, " [Clear-Pending]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_CH_ACTIVE) {
++        strcat(msgline, " [Channel-Active]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_DEV_ACTIVE) {
++        strcat(msgline, " [Device-Active]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_SUSPENDED) {
++        strcat(msgline, " [Suspended]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    msgline[0] = '\0';
++    strcat(msgline, "    Status Ctrl :");
++    if (irb->scsw.ctrl & SCSW_SCTL_ALERT) {
++        strcat(msgline, " [Alert]");
++    }
++    if (irb->scsw.ctrl & SCSW_SCTL_INTERMED) {
++        strcat(msgline, " [Intermediate]");
++    }
++    if (irb->scsw.ctrl & SCSW_SCTL_PRIMARY) {
++        strcat(msgline, " [Primary]");
++    }
++    if (irb->scsw.ctrl & SCSW_SCTL_SECONDARY) {
++        strcat(msgline, " [Secondary]");
++    }
++    if (irb->scsw.ctrl & SCSW_SCTL_STATUS_PEND) {
++        strcat(msgline, " [Status-Pending]");
++    }
++
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    msgline[0] = '\0';
++    strcat(msgline, "    Device Status :");
++    if (irb->scsw.dstat & SCSW_DSTAT_ATTN) {
++        strcat(msgline, " [Attention]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_STATMOD) {
++        strcat(msgline, " [Status-Modifier]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_CUEND) {
++        strcat(msgline, " [Ctrl-Unit-End]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_BUSY) {
++        strcat(msgline, " [Busy]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_CHEND) {
++        strcat(msgline, " [Channel-End]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_DEVEND) {
++        strcat(msgline, " [Device-End]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_UCHK) {
++        strcat(msgline, " [Unit-Check]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_UEXCP) {
++        strcat(msgline, " [Unit-Exception]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    msgline[0] = '\0';
++    strcat(msgline, "    Channel Status :");
++    if (irb->scsw.cstat & SCSW_CSTAT_PCINT) {
++        strcat(msgline, " [Program-Ctrl-Interruption]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_BADLEN) {
++        strcat(msgline, " [Incorrect-Length]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_PROGCHK) {
++        strcat(msgline, " [Program-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_PROTCHK) {
++        strcat(msgline, " [Protection-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_CHDCHK) {
++        strcat(msgline, " [Channel-Data-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_CHCCHK) {
++        strcat(msgline, " [Channel-Ctrl-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_ICCHK) {
++        strcat(msgline, " [Interface-Ctrl-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_CHAINCHK) {
++        strcat(msgline, " [Chaining-Check]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    print_int("    cpa=", irb->scsw.cpa);
++    print_int("    prev_ccw=", prev_ccw);
++    print_int("    this_ccw=", this_ccw);
++}
++
+ /*
+  * Handles executing ssch, tsch and returns the irb obtained from tsch.
+  * Returns 0 on success, -1 if unexpected status pending and we need to retry,
+@@ -176,6 +398,14 @@ int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
+             continue;
+         }
+ 
++        sclp_print("cio device error\n");
++        print_int("  ssid  ", schid.ssid);
++        print_int("  cssid ", schid.cssid);
++        print_int("  sch_no", schid.sch_no);
++        sclp_print("\n");
++        print_irb_err(&irb);
++        basic_sense(schid, &sd, sizeof(sd));
++        print_eckd_dasd_sense_data(&sd);
+         rc = -1;
+         break;
+     }
+diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
+index 818517f..bcdc457 100644
+--- a/pc-bios/s390-ccw/libc.h
++++ b/pc-bios/s390-ccw/libc.h
+@@ -67,6 +67,17 @@ static inline size_t strlen(const char *str)
+     return i;
+ }
+ 
++static inline char *strcat(char *dest, const char *src)
++{
++    int i;
++    char *dest_end = dest + strlen(dest);
++
++    for (i = 0; i <= strlen(src); i++) {
++        dest_end[i] = src[i];
++    }
++    return dest;
++}
++
+ static inline int isdigit(int c)
+ {
+     return (c >= '0') && (c <= '9');
+-- 
+2.7.4
