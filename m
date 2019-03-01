@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57980)
+Received: from eggs.gnu.org ([209.51.188.92]:59650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gziLE-0006wE-89
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:36:45 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gziVo-0002n7-RB
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:47:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gziLD-0002Zy-5x
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:36:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53794)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gziLC-0002ZK-Sw
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:36:43 -0500
-Date: Fri, 1 Mar 2019 14:36:30 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190301143630.474870d2.cohuck@redhat.com>
-In-Reply-To: <f15fecfe-26c0-05fa-da3b-20156145d287@nvidia.com>
-References: <1550611400-13703-1-git-send-email-kwankhede@nvidia.com>
-	<1550611400-13703-2-git-send-email-kwankhede@nvidia.com>
-	<20190221152344.431ced05@w520.home>
-	<f15fecfe-26c0-05fa-da3b-20156145d287@nvidia.com>
+	(envelope-from <eric.auger@redhat.com>) id 1gziVm-0002dG-Bl
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:47:40 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Fri,  1 Mar 2019 14:47:00 +0100
+Message-Id: <20190301134709.4695-2-eric.auger@redhat.com>
+In-Reply-To: <20190301134709.4695-1-eric.auger@redhat.com>
+References: <20190301134709.4695-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] VFIO KABI for migration interface
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 01/10] hw/arm/boot: introduce
+ fdt_add_memory_node helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +22,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, cjia@nvidia.com, kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com, dgilbert@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com, Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com, zhi.a.wang@intel.com, yan.y.zhao@intel.com, yulei.zhang@intel.com, qemu-devel@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-On Wed, 27 Feb 2019 01:35:01 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-> Alex,
-> 
-> On 2/22/2019 3:53 AM, Alex Williamson wrote:
-> > On Wed, 20 Feb 2019 02:53:16 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> - Defined MIGRATION region type and sub-type.
-> >> - Used 2 bits to define VFIO device states.
-> >>     Bit 0 => 0/1 => _STOPPED/_RUNNING
-> >>     Bit 1 => 0/1 => _RESUMING/_SAVING
-> >>     Combination of these bits defines VFIO device's state during migration
-> >>     _RUNNING => Normal VFIO device running state.
-> >>     _STOPPED => VFIO device stopped.
-> >>     _SAVING | _RUNNING => vCPUs are running, VFIO device is running but start
-> >>                           saving state of device i.e. pre-copy state
-> >>     _SAVING | _STOPPED => vCPUs are stoppped, VFIO device should be stopped, and
-> >>                           save device state,i.e. stop-n-copy state
-> >>     _RESUMING => VFIO device resuming state.  
-> > 
-> > Shouldn't we have a non-_RESUMING/_SAVING run state?  If these are
-> > indicating directly flow, maybe we need two bits:
-> > 
-> >   00b - None, normal runtime
-> >   01b - Saving
-> >   10b - Resuming
-> >   11b - Invalid/reserved (maybe a Failed state indicator)
-> >   
-> 
-> There has to be 2 more states:
-> _SAVING | _RUNNING => SAVING while device is RUNNING - pre-copy phase
-> _SAVING | _STOPPED => SAVING while device is STOPPED - stop-and-copy phase
-> 
-> So the 2 bits used in this patch are:
-> 00b - _RESUMING
-> 01b - _RUNNING - Normal Running
-> 10b - _SAVING | _STOPPED - stop-and-copy phase
-> 11b - _SAVING | _RUNNING - pre-copy phase
+We introduce an helper to create a memory node.
 
-Not sure if the "use two bits" approach is the most elegant here --
-rightmost bit unset can mean either _RESUMING or _STOPPED...
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-What about simply making this four distinct states?
+---
+v7 -> v8:
+- Added Igor's R-b
 
-#define _RESUMING 0
-#define _RUNNING 1 //or the other way around?
-#define _SAVING_STOPPED 2
-#define _SAVING_RUNNING 3
+v6 -> v7:
+- msg error in the caller
+- add comment about NUMA ID
+---
+ hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 34 insertions(+), 20 deletions(-)
 
-You could still check if you're currently SAVING by ANDing with 10b.
-
-(...)
-
-> >> + *
-> >> + * data_offset: (read/write)
-> >> + *      User application should read data_offset in migration region from where
-> >> + *      user application should read data during _SAVING state.
-> >> + *      User application would write data_offset in migration region from where
-> >> + *      user application is had written data during _RESUMING state.  
-> > 
-> > Why wouldn't data_offset simply be fixed?  Do we really want to support
-> > the user writing a arbitrary offsets in the migration region?  Each
-> > chunk can simply start at the kernel provided data_offset.
-> >  
-> 
-> data_offset differs based on region is trapped on mapped. In case when
-> region is mmaped, QEMU writes data to mapped region and then write
-> data_offset field, indicating data is present in mmaped buffer. Read
-> below for more detailed steps.
-> 
-> >> + *
-> >> + * data_size: (write only)
-> >> + *      User application should write size of data copied in migration region
-> >> + *      during _RESUMING state.  
-> > 
-> > How much does the user read on _SAVING then?
-> >   
-> 
-> pending_bytes tells bytes that should be read on _SAVING.
-> 
-> >> + *
-> >> + * start_pfn: (write only)
-> >> + *      Start address pfn to get bitmap of dirty pages from vendor driver duing
-> >> + *      _SAVING state.
-> >> + *
-> >> + * page_size: (write only)
-> >> + *      User application should write the page_size of pfn.
-> >> + *
-> >> + * total_pfns: (write only)
-> >> + *      Total pfn count from start_pfn for which dirty bitmap is requested.  
-> > 
-> > So effectively the area that begins at data_offset is dual purpose
-> > (triple purpose vs Yan's, config, memory, and dirty bitmap) 
-
-I'm wondering whether splitting it would combine the best of the two
-approaches: Just having an optional dirty bitmap region would make it
-more obvious if dirty page tracking is not available.
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index d90af2f17d..a830655e1a 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -423,6 +423,32 @@ static void set_kernel_args_old(const struct arm_boo=
+t_info *info,
+     }
+ }
+=20
++static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_ba=
+se,
++                               uint32_t scells, hwaddr mem_len,
++                               int numa_node_id)
++{
++    char *nodename;
++    int ret;
++
++    nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    ret =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, m=
+em_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        goto out;
++    }
++
++    /* only set the NUMA ID if it is specified */
++    if (numa_node_id >=3D 0) {
++        ret =3D qemu_fdt_setprop_cell(fdt, nodename,
++                                    "numa-node-id", numa_node_id);
++    }
++out:
++    g_free(nodename);
++    return ret;
++}
++
+ static void fdt_add_psci_node(void *fdt)
+ {
+     uint32_t cpu_suspend_fn;
+@@ -502,7 +528,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_i=
+nfo *binfo,
+     void *fdt =3D NULL;
+     int size, rc, n =3D 0;
+     uint32_t acells, scells;
+-    char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
+     char **node_path;
+@@ -576,35 +601,24 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot=
+_info *binfo,
+         mem_base =3D binfo->loader_start;
+         for (i =3D 0; i < nb_numa_nodes; i++) {
+             mem_len =3D numa_info[i].node_mem;
+-            nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
+-            qemu_fdt_add_subnode(fdt, nodename);
+-            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memor=
+y");
+-            rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                              acells, mem_base,
+-                                              scells, mem_len);
++            rc =3D fdt_add_memory_node(fdt, acells, mem_base,
++                                     scells, mem_len, i);
+             if (rc < 0) {
+-                fprintf(stderr, "couldn't set %s/reg for node %d\n", nod=
+ename,
+-                        i);
++                fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
++                        mem_base);
+                 goto fail;
+             }
+=20
+-            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+             mem_base +=3D mem_len;
+-            g_free(nodename);
+         }
+     } else {
+-        nodename =3D g_strdup_printf("/memory@%" PRIx64, binfo->loader_s=
+tart);
+-        qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-
+-        rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                          acells, binfo->loader_start,
+-                                          scells, binfo->ram_size);
++        rc =3D fdt_add_memory_node(fdt, acells, binfo->loader_start,
++                                 scells, binfo->ram_size, -1);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set %s reg\n", nodename);
++            fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
++                    binfo->loader_start);
+             goto fail;
+         }
+-        g_free(nodename);
+     }
+=20
+     rc =3D fdt_path_offset(fdt, "/chosen");
+--=20
+2.20.1
