@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48922)
+Received: from eggs.gnu.org ([209.51.188.92]:49208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gzhTh-00057x-91
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:41:26 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gzhTq-0005Wu-Vn
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:41:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gzhLL-0004nl-Vg
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:32:52 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53733)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gzhLJ-0004mt-R3
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:32:46 -0500
-Received: by mail-wm1-f67.google.com with SMTP id e74so12276998wmg.3
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 04:32:45 -0800 (PST)
-References: <1551111298-8445-1-git-send-email-thuth@redhat.com>
-	<2da5f950-ab74-355a-6019-add964ddb43c@redhat.com>
-	<7883d30d-6ecc-7206-8636-b9c920268319@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2c2adf9f-01c6-613b-889b-40aa48c42578@redhat.com>
-Date: Fri, 1 Mar 2019 13:32:42 +0100
+	(envelope-from <yuval.shaia@oracle.com>) id 1gzhHO-0002xC-17
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:28:43 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:45258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gzhHN-0002wm-Mi
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:28:41 -0500
+Date: Fri, 1 Mar 2019 14:28:26 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190301122826.GA3863@lap1>
+References: <20190227140629.1569-1-yuval.shaia@oracle.com>
+	<20190227140629.1569-5-yuval.shaia@oracle.com>
+	<152bf41f-8eea-d112-77d3-cd334c5bb4f7@gmail.com>
+	<87fts7oyhd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <7883d30d-6ecc-7206-8636-b9c920268319@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/nvram/fw_cfg: Move boot_splash_filedata
- variables into fw_cfg.c
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87fts7oyhd.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] {monitor,
+ hw/pvrdma}: Expose device internals via monitor interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,140 +32,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, qemu-devel@nongnu.org
 
-Hi Thomas,
+On Fri, Mar 01, 2019 at 08:17:02AM +0100, Markus Armbruster wrote:
+> Marcel Apfelbaum <marcel.apfelbaum@gmail.com> writes:
+>=20
+> > Hi Yuval,
+> >
+> > On 2/27/19 4:06 PM, Yuval Shaia wrote:
+> >> Allow interrogating device internals through HMP interface.
+> >> The exposed indicators can be used for troubleshooting by developers=
+ or
+> >> sysadmin.
+> >> There is no need to expose these attributes to a management system (=
+e.x.
+> >> libvirt) because (1) most of them are not "device-management' relate=
+d
+> >> info and (2) there is no guarantee the interface is stable.
+> >>
+> >> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> >> ---
+> >>   hmp-commands-info.hx      | 16 ++++++++
+> >>   hw/rdma/rdma_backend.c    | 70 ++++++++++++++++++++++++++---------
+> >>   hw/rdma/rdma_rm.c         |  7 ++++
+> >>   hw/rdma/rdma_rm_defs.h    | 27 +++++++++++++-
+> >>   hw/rdma/vmw/pvrdma.h      |  5 +++
+> >>   hw/rdma/vmw/pvrdma_hmp.h  | 21 +++++++++++
+> >>   hw/rdma/vmw/pvrdma_main.c | 77 +++++++++++++++++++++++++++++++++++=
+++++
+> >>   monitor.c                 | 10 +++++
+> >>   8 files changed, 215 insertions(+), 18 deletions(-)
+> >>   create mode 100644 hw/rdma/vmw/pvrdma_hmp.h
+> >>
+> >> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> >> index cbee8b944d..9153c33974 100644
+> >> --- a/hmp-commands-info.hx
+> >> +++ b/hmp-commands-info.hx
+> >> @@ -524,6 +524,22 @@ STEXI
+> >>   Show CPU statistics.
+> >>   ETEXI
+> >>   +#if defined(CONFIG_PVRDMA)
+> >> +    {
+> >> +        .name       =3D "pvrdmacounters",
+> >> +        .args_type  =3D "",
+> >> +        .params     =3D "",
+> >> +        .help       =3D "show pvrdma device counters",
+> >> +        .cmd        =3D hmp_info_pvrdmacounters,
+> >> +    },
+> >> +
+> >> +STEXI
+> >> +@item info pvrdmacounters
+> >> +@findex info pvrdmacounters
+> >> +Show pvrdma device counters.
+> >> +ETEXI
+> >> +#endif
+> >> +
+> >>   #if defined(CONFIG_SLIRP)
+> >>       {
+> >>           .name       =3D "usernet",
+> [...]
+> >> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> >> index b6061f4b6e..85101368c5 100644
+> >> --- a/hw/rdma/vmw/pvrdma_main.c
+> >> +++ b/hw/rdma/vmw/pvrdma_main.c
+> >> @@ -14,6 +14,7 @@
+> >>    */
+> >>     #include "qemu/osdep.h"
+> >> +#include "qemu/units.h"
+> >>   #include "qapi/error.h"
+> >>   #include "hw/hw.h"
+> >>   #include "hw/pci/pci.h"
+> >> @@ -25,6 +26,7 @@
+> >>   #include "cpu.h"
+> >>   #include "trace.h"
+> >>   #include "sysemu/sysemu.h"
+> >> +#include "monitor/monitor.h"
+> >>     #include "../rdma_rm.h"
+> >>   #include "../rdma_backend.h"
+> >> @@ -32,10 +34,13 @@
+> >>     #include <infiniband/verbs.h>
+> >>   #include "pvrdma.h"
+> >> +#include "pvrdma_hmp.h"
+> >>   #include "standard-headers/rdma/vmw_pvrdma-abi.h"
+> >>   #include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma=
+_dev_api.h"
+> >>   #include "pvrdma_qp_ops.h"
+> >>   +GSList *devices;
+>=20
+> "devices" is far too generic for an external identifier.  Are you
+> missing a 'static' here?  Even if static, I'd recommend "rdma_devices".
 
-On 3/1/19 12:28 PM, Thomas Huth wrote:
-> On 25/02/2019 19.31, Laszlo Ersek wrote:
->> Hi Thomas,
->>
->> On 02/25/19 17:14, Thomas Huth wrote:
->>> The global boot_splash_filedata and boot_splash_filedata_size variables
->>> are only used in fw_cfg.c. So there is really no need that these need
->>> to be global and reside in vl.c. Move them to fw_cfg.c instead.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  hw/nvram/fw_cfg.c         |  9 +++++++++
->>>  include/hw/nvram/fw_cfg.h |  1 +
->>>  include/sysemu/sysemu.h   |  2 --
->>>  vl.c                      | 10 +---------
->>>  4 files changed, 11 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->>> index 7fdf04a..15f0023 100644
->>> --- a/hw/nvram/fw_cfg.c
->>> +++ b/hw/nvram/fw_cfg.c
->>> @@ -63,6 +63,9 @@ struct FWCfgEntry {
->>>  #define JPG_FILE 0
->>>  #define BMP_FILE 1
->>>  
->>> +static uint8_t *boot_splash_filedata;
->>> +static size_t boot_splash_filedata_size;
->>> +
->>>  static char *read_splashfile(char *filename, gsize *file_sizep,
->>>                               int *file_typep)
->>>  {
->>> @@ -175,6 +178,12 @@ static void fw_cfg_bootsplash(FWCfgState *s)
->>>      }
->>>  }
->>>  
->>> +void fw_cfg_res_free(void)
->>> +{
->>> +    g_free(boot_splash_filedata);
->>> +    boot_splash_filedata = NULL;
->>> +}
->>> +
->>>  static void fw_cfg_reboot(FWCfgState *s)
->>>  {
->>>      const char *reboot_timeout = NULL;
->>> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
->>> index f5a6895..16d237c 100644
->>> --- a/include/hw/nvram/fw_cfg.h
->>> +++ b/include/hw/nvram/fw_cfg.h
->>> @@ -225,5 +225,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->>>  
->>>  FWCfgState *fw_cfg_find(void);
->>>  bool fw_cfg_dma_enabled(void *opaque);
->>> +void fw_cfg_res_free(void);
->>>  
->>>  #endif
->>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->>> index 4b5a6b7..63a5eed 100644
->>> --- a/include/sysemu/sysemu.h
->>> +++ b/include/sysemu/sysemu.h
->>> @@ -111,8 +111,6 @@ extern int no_shutdown;
->>>  extern int old_param;
->>>  extern int boot_menu;
->>>  extern bool boot_strict;
->>> -extern uint8_t *boot_splash_filedata;
->>> -extern size_t boot_splash_filedata_size;
->>>  extern bool enable_mlock;
->>>  extern bool enable_cpu_pm;
->>>  extern QEMUClockType rtc_clock;
->>> diff --git a/vl.c b/vl.c
->>> index 502857a..f769cce 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -187,8 +187,6 @@ unsigned int nb_prom_envs = 0;
->>>  const char *prom_envs[MAX_PROM_ENVS];
->>>  int boot_menu;
->>>  bool boot_strict;
->>> -uint8_t *boot_splash_filedata;
->>> -size_t boot_splash_filedata_size;
->>>  bool wakeup_suspend_enabled;
->>>  
->>>  int icount_align_option;
->>> @@ -559,12 +557,6 @@ const char *qemu_get_vm_name(void)
->>>      return qemu_name;
->>>  }
->>>  
->>> -static void res_free(void)
->>> -{
->>> -    g_free(boot_splash_filedata);
->>> -    boot_splash_filedata = NULL;
->>> -}
->>> -
->>>  static int default_driver_check(void *opaque, QemuOpts *opts, Error **errp)
->>>  {
->>>      const char *driver = qemu_opt_get(opts, "driver");
->>> @@ -4585,7 +4577,7 @@ int main(int argc, char **argv, char **envp)
->>>      job_cancel_sync_all();
->>>      bdrv_close_all();
->>>  
->>> -    res_free();
->>> +    fw_cfg_res_free();
->>>  
->>>      /* vhost-user must be cleaned up before chardevs.  */
->>>      tpm_cleanup();
->>>
->>
->> The res_free() function call in main() goes back to commit 3d3b8303c6f8
->> ("showing a splash picture when start", 2011-07-29). That seems to be
->> the original addition of the bootsplash feature. And, res_free() appears
->> to simply release dynamic memory before the QEMU process exits.
->>
->> Do we release malloc'd memory, as a general rule, before we exit the
->> QEMU process (with exit status 0)? My impression has been that we don't
->> care; we just let the kernel forget about all memory that the QEMU
->> process used to own.
->>
->> If that's the case, I suggest to respin this patch, deleting res_free()
->> completely. AFAICS there are no other call sites. That would be a nice
->> improvement IMO (we wouldn't have to extend "include/hw/nvram/fw_cfg.h").
-> 
-> Hmm, thinking about this for a while, the fw_cfg is a qdev device, so I
-> think we should at least add an unrealize() function where we clean up
-> the allocated memory, even if the unrealize function is currently not
-> called yet, since the device never gets destroyed...
+Yep, thanks.
 
-I worked on a similar cleanup last month, I can submit it this
-afternoon. Do you mind having a look at it before reworking this patch?
-I'm not sure which one is the best, but since the work is already done I
-don't want any of us waste his time :)
+>=20
+> >> +
+> >>   static Property pvrdma_dev_properties[] =3D {
+> >>       DEFINE_PROP_STRING("netdev", PVRDMADev, backend_eth_device_nam=
+e),
+> >>       DEFINE_PROP_STRING("ibdev", PVRDMADev, backend_device_name),
+> >> @@ -55,6 +60,71 @@ static Property pvrdma_dev_properties[] =3D {
+> [...]
+> >> +}
+> >> +
+> >> +void pvrdma_dump_counters(Monitor *mon)
+> >> +{
+> >> +    g_slist_foreach(devices, pvrdma_dump_device_counters, mon);
+> >> +}
+>=20
+> Note for later: does nothing when @devices is empty.
 
-Thanks,
+But that is fine, isn't it?
 
-Phil.
+>=20
+> >> +
+> >>   static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
+> >>                             void *ring_state)
+> >>   {
+> >> @@ -304,6 +374,8 @@ static void pvrdma_fini(PCIDevice *pdev)
+> >>         rdma_info_report("Device %s %x.%x is down", pdev->name,
+> >>                        PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn))=
+;
+> >> +
+> >> +    devices =3D g_slist_remove(devices, pdev);
+> >>   }
+> >>     static void pvrdma_stop(PVRDMADev *dev)
+> >> @@ -394,6 +466,7 @@ static void pvrdma_regs_write(void *opaque, hwad=
+dr addr, uint64_t val,
+> >>           if (val =3D=3D 0) {
+> >>               trace_pvrdma_regs_write(addr, val, "REQUEST", "");
+> >>               pvrdma_exec_cmd(dev);
+> >> +            dev->stats.commands++;
+> >>           }
+> >>           break;
+> >>       default:
+> >> @@ -612,9 +685,13 @@ static void pvrdma_realize(PCIDevice *pdev, Err=
+or **errp)
+> >>           goto out;
+> >>       }
+> >>   +    memset(&dev->stats, 0, sizeof(dev->stats));
+> >> +
+> >>       dev->shutdown_notifier.notify =3D pvrdma_shutdown_notifier;
+> >>       qemu_register_shutdown_notifier(&dev->shutdown_notifier);
+> >>   +    devices =3D g_slist_append(devices, pdev);
+> >> +
+> >>   out:
+> >>       if (rc) {
+> >>           pvrdma_fini(pdev);
+>=20
+> Note for later: @devices contains the realized "pvrdma" devices.
+
+This happens only when rc indicates an error and we jumped here before
+adding the device to the list.
+
+>=20
+> You could find these devices with object_child_foreach_recursive()
+> instead of maintaining a separate list.
+
+Hmmm...interesting.
+I will check if it fits my needs and will change accordingly if yes.
+
+>=20
+> >> diff --git a/monitor.c b/monitor.c
+> >> index defa129319..53ecb5bc70 100644
+> >> --- a/monitor.c
+> >> +++ b/monitor.c
+> >> @@ -85,6 +85,9 @@
+> >>   #include "sysemu/iothread.h"
+> >>   #include "qemu/cutils.h"
+> >>   #include "tcg/tcg.h"
+> >> +#ifdef CONFIG_PVRDMA
+> >> +#include "hw/rdma/vmw/pvrdma_hmp.h"
+> >> +#endif
+> >>     #if defined(TARGET_S390X)
+> >>   #include "hw/s390x/storage-keys.h"
+> >> @@ -1362,6 +1365,13 @@ static void hmp_info_cpustats(Monitor *mon, c=
+onst QDict *qdict)
+> >>       cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
+> >>   }
+> >>   +#ifdef CONFIG_PVRDMA
+> >> +static void hmp_info_pvrdmacounters(Monitor *mon, const QDict *qdic=
+t)
+> >> +{
+> >> +    pvrdma_dump_counters(mon);
+> >
+> > Compilation fails on archs with no PCI support:
+> >
+> > =A0=A0=A0 /usr/bin/ld: monitor.o: in function `hmp_info_pvrdmacounter=
+s':
+> > =A0=A0=A0 /home/marcel/git/qemu/monitor.c:1371: undefined reference t=
+o
+> > `pvrdma_dump_counters'
+> > =A0=A0 collect2: error: ld returned 1 exit status
+> > =A0=A0 make[1]: *** [Makefile:210: qemu-system-m68k] Error 1
+> >
+> >
+> > The below patch solves it by adding a pci stub:
+> >
+> > diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+> > index b941a0e842..cab364f93d 100644
+> > --- a/hw/pci/pci-stub.c
+> > +++ b/hw/pci/pci-stub.c
+> > @@ -26,6 +26,7 @@
+> > =A0#include "qapi/qmp/qerror.h"
+> > =A0#include "hw/pci/pci.h"
+> > =A0#include "hw/pci/msi.h"
+> > +#include "hw/rdma/vmw/pvrdma_hmp.h"
+> >
+> > =A0bool msi_nonbroken;
+> > =A0bool pci_available;
+> > @@ -53,3 +54,9 @@ uint16_t pci_requester_id(PCIDevice *dev)
+> > =A0=A0=A0=A0 g_assert(false);
+> > =A0=A0=A0=A0 return 0;
+> > =A0}
+> > +
+> > +void pvrdma_dump_counters(Monitor *mon)
+> > +{
+> > +=A0=A0=A0 monitor_printf(mon, "PVRDMA requires PCI support\n");
+> > +}
+> > +
+>=20
+> When CONFIG_PCI is enabled, "info pvrdmacounters" does nothing when
+> there are no "pvrdma" devices.
+>=20
+> When CONFIG_PCI is disabled, there are no "pvrdma" devices.  Therefore,
+> "info pvrdmacounters" should also do nothing then, shouldn't it?
+
+Yeah, problem was in case that pvrdma was selected in ./configure phase b=
+ut
+platform does not have PCI -> CONFIG_PCI is diabeled -> pvrdma code is no=
+t
+compiled -> pvrdma_dump_counters is missing in link phase.
+
+If you have a better alternative then i'm fine, meanwhile i'm taking
+Marcel's proposal.
+
+>=20
+> > However you should include a generic rdma header as hw/rdma/rdma_hmp.=
+h
+> > and not a vmw specific one.
+> >
+> >
+> > Thanks,
+> > Marcel
+> >
+> >
+> >> +}
+> >> +#endif
+> >> +
+> >>   static void hmp_info_trace_events(Monitor *mon, const QDict *qdict=
+)
+> >>   {
+> >>       const char *name =3D qdict_get_try_str(qdict, "name");
+>=20
