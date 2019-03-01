@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39456)
+Received: from eggs.gnu.org ([209.51.188.92]:40816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzjE2-0007do-6K
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 09:33:23 -0500
+	(envelope-from <berto@igalia.com>) id 1gzjI9-0002pp-HG
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 09:37:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzjE1-0004WN-96
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 09:33:22 -0500
-Date: Fri, 1 Mar 2019 15:33:11 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190301153311.79c0d287@redhat.com>
-In-Reply-To: <20190301091214-mutt-send-email-mst@kernel.org>
-References: <1551407310-32413-1-git-send-email-guoheyi@huawei.com>
-	<20190301084619-mutt-send-email-mst@kernel.org>
-	<cc3c8e42-0632-0c90-41cc-27bfdcaef11d@huawei.com>
-	<20190301091214-mutt-send-email-mst@kernel.org>
+	(envelope-from <berto@igalia.com>) id 1gzjI8-00079O-Rk
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 09:37:37 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190301141809.GD5861@localhost.localdomain>
+References: <cover.1547739122.git.berto@igalia.com>
+	<61bbfa3721938326edb03db58a6a246b384f3260.1547739122.git.berto@igalia.com>
+	<20190212180231.GJ5283@localhost.localdomain>
+	<w51zhqe7q01.fsf@maestria.local.igalia.com>
+	<20190301123608.GB5861@localhost.localdomain>
+	<w51woli7oma.fsf@maestria.local.igalia.com>
+	<20190301125642.GC5861@localhost.localdomain>
+	<w51tvgm7nim.fsf@maestria.local.igalia.com>
+	<20190301141809.GD5861@localhost.localdomain>
+Date: Fri, 01 Mar 2019 15:37:31 +0100
+Message-ID: <w51r2bq7j9w.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/acpi: enable SHPC native hot plug
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 09/13] block: Add 'runtime_opts' and
+ 'mutable_opts' fields to BlockDriver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Heyi Guo <guoheyi@huawei.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Heyi Guo <heyi.guo@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Fri, 1 Mar 2019 09:12:33 -0500
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Fri 01 Mar 2019 03:18:09 PM CET, Kevin Wolf wrote:
+> Hm, actually, do you even need the runtime_opts list?
+>
+> You use it in bdrv_reset_options_allowed() to iterate through each
+> option and then check whether it was present in the old set of
+> options, but not in the new set of options.
+>
+> In order to achieve this, you can just iterate the old options dict
+> because you don't do anything with options that are present in the
+> QemuOptsList, but not the old options dict.
 
-> On Fri, Mar 01, 2019 at 10:04:38PM +0800, Heyi Guo wrote:
-> > 
-> > 
-> > On 2019/3/1 21:47, Michael S. Tsirkin wrote:  
-> > > On Fri, Mar 01, 2019 at 10:28:30AM +0800, Heyi Guo wrote:  
-> > > > After the introduction of generic PCIe root port and PCIe-PCI bridge,
-> > > > we will also have SHPC controller on ARM, so just enalbe SHPC native
-> > > > hot plug.
-> > > > 
-> > > > Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> > > > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > Cc: Igor Mammedov <imammedo@redhat.com>
-> > > > Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-> > > > Signed-off-by: Heyi Guo <heyi.guo@linaro.org>  
-> > > 
-> > > So when OS enables SHPC, should we block ACPI hotplug events?  
-> > I supposed we don't support ACPI hotplug events on ARM virt; do we have any currently?
-> > 
-> > Thanks,
-> > Heyi  
-> 
-> Oh I didn't realise. That explains it sorry about the noise.
-And I thought we did not support them on PCIe completely (I mean q35/ich9).
-(Or did I miss something)?
+Hmm, that could work, I'll give it a try.
 
-> 
-> > >   
-> > > > ---
-> > > >   hw/arm/virt-acpi-build.c | 7 ++++++-
-> > > >   1 file changed, 6 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index 04b62c7..7849ec5 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -265,7 +265,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-> > > >           aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
-> > > >       aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
-> > > >       aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
-> > > > -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
-> > > > +
-> > > > +    /*
-> > > > +     * Allow OS control for all 5 features:
-> > > > +     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
-> > > > +     */
-> > > > +    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1F), NULL),
-> > > >                                   aml_name("CTRL")));
-> > > >       ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
-> > > > -- 
-> > > > 1.8.3.1  
-> > > .
-> > >   
-> >   
+Berto
