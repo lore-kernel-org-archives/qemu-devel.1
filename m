@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50282)
+Received: from eggs.gnu.org ([209.51.188.92]:50172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gzq3T-0003S3-C5
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:50:58 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gzq3P-0003Pi-N5
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:50:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gzq3M-0002wi-5k
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:50:54 -0500
-Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:42891)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gzq3K-0002Ca-16
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:50:47 -0500
-Received: by mail-pf1-x42e.google.com with SMTP id n74so12018840pfi.9
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 13:50:16 -0800 (PST)
-Date: Fri,  1 Mar 2019 13:49:22 -0800
-Message-Id: <20190301214945.4353-12-palmer@sifive.com>
-In-Reply-To: <20190301214945.4353-1-palmer@sifive.com>
-References: <20190301214945.4353-1-palmer@sifive.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 11/34] target/riscv: Convert RV32F insns to
- decodetree
+	(envelope-from <no-reply@patchew.org>) id 1gzq3L-0002up-Cw
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:50:51 -0500
+Resent-Message-Id: <E1gzq3L-0002up-Cw@eggs.gnu.org>
+Message-ID: <155147699045.24.7067927408374178495@6acff2cf482b>
+In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Mar 2019 13:49:51 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/16] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,482 +23,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
+To: jjherne@linux.ibm.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
- target/riscv/insn32.decode              |  35 +++
- target/riscv/insn_trans/trans_rvf.inc.c | 379 ++++++++++++++++++++++++
- target/riscv/translate.c                |   1 +
- 3 files changed, 415 insertions(+)
- create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
-
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 00b9e2d9a508..e40836bf032f 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -17,12 +17,14 @@
- # this program.  If not, see <http://www.gnu.org/licenses/>.
- 
- # Fields:
-+%rs3       27:5
- %rs2       20:5
- %rs1       15:5
- %rd        7:5
- 
- %sh10    20:10
- %csr    20:12
-+%rm     12:3
- 
- # immediates:
- %imm_i    20:s12
-@@ -50,6 +52,11 @@
- @atom_ld ..... aq:1 rl:1 ..... ........ ..... ....... &atomic rs2=0     %rs1 %rd
- @atom_st ..... aq:1 rl:1 ..... ........ ..... ....... &atomic %rs2      %rs1 %rd
- 
-+@r4_rm   ..... ..  ..... ..... ... ..... ....... %rs3 %rs2 %rs1 %rm %rd
-+@r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
-+@r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
-+@r2      .......   ..... ..... ... ..... ....... %rs1 %rd
-+
- # *** RV32I Base Instruction Set ***
- lui      ....................       ..... 0110111 @u
- auipc    ....................       ..... 0010111 @u
-@@ -119,3 +126,31 @@ amomin_w   10000 . . ..... ..... 010 ..... 0101111 @atom_st
- amomax_w   10100 . . ..... ..... 010 ..... 0101111 @atom_st
- amominu_w  11000 . . ..... ..... 010 ..... 0101111 @atom_st
- amomaxu_w  11100 . . ..... ..... 010 ..... 0101111 @atom_st
-+
-+# *** RV32F Standard Extension ***
-+flw        ............   ..... 010 ..... 0000111 @i
-+fsw        .......  ..... ..... 010 ..... 0100111 @s
-+fmadd_s    ..... 00 ..... ..... ... ..... 1000011 @r4_rm
-+fmsub_s    ..... 00 ..... ..... ... ..... 1000111 @r4_rm
-+fnmsub_s   ..... 00 ..... ..... ... ..... 1001011 @r4_rm
-+fnmadd_s   ..... 00 ..... ..... ... ..... 1001111 @r4_rm
-+fadd_s     0000000  ..... ..... ... ..... 1010011 @r_rm
-+fsub_s     0000100  ..... ..... ... ..... 1010011 @r_rm
-+fmul_s     0001000  ..... ..... ... ..... 1010011 @r_rm
-+fdiv_s     0001100  ..... ..... ... ..... 1010011 @r_rm
-+fsqrt_s    0101100  00000 ..... ... ..... 1010011 @r2_rm
-+fsgnj_s    0010000  ..... ..... 000 ..... 1010011 @r
-+fsgnjn_s   0010000  ..... ..... 001 ..... 1010011 @r
-+fsgnjx_s   0010000  ..... ..... 010 ..... 1010011 @r
-+fmin_s     0010100  ..... ..... 000 ..... 1010011 @r
-+fmax_s     0010100  ..... ..... 001 ..... 1010011 @r
-+fcvt_w_s   1100000  00000 ..... ... ..... 1010011 @r2_rm
-+fcvt_wu_s  1100000  00001 ..... ... ..... 1010011 @r2_rm
-+fmv_x_w    1110000  00000 ..... 000 ..... 1010011 @r2
-+feq_s      1010000  ..... ..... 010 ..... 1010011 @r
-+flt_s      1010000  ..... ..... 001 ..... 1010011 @r
-+fle_s      1010000  ..... ..... 000 ..... 1010011 @r
-+fclass_s   1110000  00000 ..... 001 ..... 1010011 @r2
-+fcvt_s_w   1101000  00000 ..... ... ..... 1010011 @r2_rm
-+fcvt_s_wu  1101000  00001 ..... ... ..... 1010011 @r2_rm
-+fmv_w_x    1111000  00000 ..... 000 ..... 1010011 @r2
-diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
-new file mode 100644
-index 000000000000..0f837903491b
---- /dev/null
-+++ b/target/riscv/insn_trans/trans_rvf.inc.c
-@@ -0,0 +1,379 @@
-+/*
-+ * RISC-V translation routines for the RV64F Standard Extension.
-+ *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
-+ * Copyright (c) 2018 Peer Adelt, peer.adelt@hni.uni-paderborn.de
-+ *                    Bastian Koppelmann, kbastian@mail.uni-paderborn.de
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#define REQUIRE_FPU do {\
-+    if (ctx->mstatus_fs == 0) \
-+        return false;                       \
-+} while (0)
-+
-+static bool trans_flw(DisasContext *ctx, arg_flw *a)
-+{
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    tcg_gen_addi_tl(t0, t0, a->imm);
-+
-+    tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
-+    /* RISC-V requires NaN-boxing of narrower width floating point values */
-+    tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd], 0xffffffff00000000ULL);
-+
-+    tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fsw(DisasContext *ctx, arg_fsw *a)
-+{
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    tcg_gen_addi_tl(t0, t0, a->imm);
-+
-+    tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEUL);
-+
-+    tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fmadd_s(DisasContext *ctx, arg_fmadd_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fmadd_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
-+                       cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fmsub_s(DisasContext *ctx, arg_fmsub_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fmsub_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
-+                       cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fnmsub_s(DisasContext *ctx, arg_fnmsub_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fnmsub_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
-+                        cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fnmadd_s(DisasContext *ctx, arg_fnmadd_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fnmadd_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
-+                        cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fadd_s(DisasContext *ctx, arg_fadd_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fadd_s(cpu_fpr[a->rd], cpu_env,
-+                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fsub_s(DisasContext *ctx, arg_fsub_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fsub_s(cpu_fpr[a->rd], cpu_env,
-+                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fmul_s(DisasContext *ctx, arg_fmul_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fmul_s(cpu_fpr[a->rd], cpu_env,
-+                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fdiv_s(DisasContext *ctx, arg_fdiv_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fdiv_s(cpu_fpr[a->rd], cpu_env,
-+                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fsqrt_s(DisasContext *ctx, arg_fsqrt_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fsqrt_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fsgnj_s(DisasContext *ctx, arg_fsgnj_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    if (a->rs1 == a->rs2) { /* FMOV */
-+        tcg_gen_mov_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1]);
-+    } else { /* FSGNJ */
-+        tcg_gen_deposit_i64(cpu_fpr[a->rd], cpu_fpr[a->rs2], cpu_fpr[a->rs1],
-+                            0, 31);
-+    }
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fsgnjn_s(DisasContext *ctx, arg_fsgnjn_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    if (a->rs1 == a->rs2) { /* FNEG */
-+        tcg_gen_xori_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], INT32_MIN);
-+    } else {
-+        TCGv_i64 t0 = tcg_temp_new_i64();
-+        tcg_gen_not_i64(t0, cpu_fpr[a->rs2]);
-+        tcg_gen_deposit_i64(cpu_fpr[a->rd], t0, cpu_fpr[a->rs1], 0, 31);
-+        tcg_temp_free_i64(t0);
-+    }
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fsgnjx_s(DisasContext *ctx, arg_fsgnjx_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    if (a->rs1 == a->rs2) { /* FABS */
-+        tcg_gen_andi_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], ~INT32_MIN);
-+    } else {
-+        TCGv_i64 t0 = tcg_temp_new_i64();
-+        tcg_gen_andi_i64(t0, cpu_fpr[a->rs2], INT32_MIN);
-+        tcg_gen_xor_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], t0);
-+        tcg_temp_free_i64(t0);
-+    }
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fmin_s(DisasContext *ctx, arg_fmin_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    gen_helper_fmin_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
-+                      cpu_fpr[a->rs2]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fmax_s(DisasContext *ctx, arg_fmax_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    gen_helper_fmax_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
-+                      cpu_fpr[a->rs2]);
-+    mark_fs_dirty(ctx);
-+    return true;
-+}
-+
-+static bool trans_fcvt_w_s(DisasContext *ctx, arg_fcvt_w_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[a->rs1]);
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+
-+    return true;
-+}
-+
-+static bool trans_fcvt_wu_s(DisasContext *ctx, arg_fcvt_wu_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[a->rs1]);
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+
-+    return true;
-+}
-+
-+static bool trans_fmv_x_w(DisasContext *ctx, arg_fmv_x_w *a)
-+{
-+    /* NOTE: This was FMV.X.S in an earlier version of the ISA spec! */
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+
-+#if defined(TARGET_RISCV64)
-+    tcg_gen_ext32s_tl(t0, cpu_fpr[a->rs1]);
-+#else
-+    tcg_gen_extrl_i64_i32(t0, cpu_fpr[a->rs1]);
-+#endif
-+
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+
-+    return true;
-+}
-+
-+static bool trans_feq_s(DisasContext *ctx, arg_feq_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    TCGv t0 = tcg_temp_new();
-+    gen_helper_feq_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+    return true;
-+}
-+
-+static bool trans_flt_s(DisasContext *ctx, arg_flt_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    TCGv t0 = tcg_temp_new();
-+    gen_helper_flt_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+    return true;
-+}
-+
-+static bool trans_fle_s(DisasContext *ctx, arg_fle_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+    TCGv t0 = tcg_temp_new();
-+    gen_helper_fle_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+    return true;
-+}
-+
-+static bool trans_fclass_s(DisasContext *ctx, arg_fclass_s *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+
-+    gen_helper_fclass_s(t0, cpu_fpr[a->rs1]);
-+
-+    gen_set_gpr(a->rd, t0);
-+    tcg_temp_free(t0);
-+
-+    return true;
-+}
-+
-+static bool trans_fcvt_s_w(DisasContext *ctx, arg_fcvt_s_w *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_s_w(cpu_fpr[a->rd], cpu_env, t0);
-+
-+    mark_fs_dirty(ctx);
-+    tcg_temp_free(t0);
-+
-+    return true;
-+}
-+
-+static bool trans_fcvt_s_wu(DisasContext *ctx, arg_fcvt_s_wu *a)
-+{
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+
-+    gen_set_rm(ctx, a->rm);
-+    gen_helper_fcvt_s_wu(cpu_fpr[a->rd], cpu_env, t0);
-+
-+    mark_fs_dirty(ctx);
-+    tcg_temp_free(t0);
-+
-+    return true;
-+}
-+
-+static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
-+{
-+    /* NOTE: This was FMV.S.X in an earlier version of the ISA spec! */
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-+
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+
-+#if defined(TARGET_RISCV64)
-+    tcg_gen_mov_i64(cpu_fpr[a->rd], t0);
-+#else
-+    tcg_gen_extu_i32_i64(cpu_fpr[a->rd], t0);
-+#endif
-+
-+    mark_fs_dirty(ctx);
-+    tcg_temp_free(t0);
-+
-+    return true;
-+}
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index c2791459993e..b9f78f5a1f8f 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -1717,6 +1717,7 @@ bool decode_insn32(DisasContext *ctx, uint32_t insn);
- #include "insn_trans/trans_rvi.inc.c"
- #include "insn_trans/trans_rvm.inc.c"
- #include "insn_trans/trans_rva.inc.c"
-+#include "insn_trans/trans_rvf.inc.c"
- 
- static void decode_RV32_64G(DisasContext *ctx)
- {
--- 
-2.18.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxNDY2Nzc2LTI5MTIzLTEt
+Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
+b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MTQ2
+Njc3Ni0yOTEyMy0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzE2XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
+dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzE1NTE0NjY3NzYtMjkxMjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
+b20gLT4gcGF0Y2hldy8xNTUxNDY2Nzc2LTI5MTIzLTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
+aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzM3MzliMGNjNiBz
+MzkwLWJpb3M6IGRhc2QtaXBsOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVy
+cm9yIGRhdGEKODczMzMzMDQ5MiBzMzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwg
+ZGFzZCBkZXZpY2UKNWE1YzRiMDFlZiBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29k
+ZXMvc3RydWN0cyBuZWVkZWQgZm9yIGRhc2QtaXBsCmQyM2ZmNDdhM2QgczM5MC1iaW9zOiBVc2Ug
+Y29udHJvbCB1bml0IHR5cGUgdG8gZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCjJhZjI0NTgxYjQgczM5
+MC1iaW9zOiBSZWZhY3RvciB2aXJ0aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwo2
+MzEwMDJjNjQ0IHMzOTAtYmlvczogY2lvIGVycm9yIGhhbmRsaW5nCjQ0ZDUyNTk4NzAgczM5MC1i
+aW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwo3MjQ0
+ZGY1YTc5IHMzOTAtYmlvczogcHRyMnUzMiBhbmQgdTMydG9wdHIKYWYyMjJmNTYxOCBzMzkwLWJp
+b3M6IE1hcCBsb3cgY29yZSBtZW1vcnkKMjgxZjY0YjM3YSBzMzkwLWJpb3M6IERlY291cGxlIGNo
+YW5uZWwgaS9vIGxvZ2ljIGZyb20gdmlydGlvCjRhYzk2YzJjMTAgczM5MC1iaW9zOiBDbGVhbiB1
+cCBjaW8uaAowNmVhNzE0Njk1IHMzOTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ug
+b3V0IG9mIHZpcnRpbyBjb2RlIHBhdGgKYTk5OTQ3YzMzZCBzMzkwLWJpb3M6IEV4dGVuZCBmaW5k
+X2RldigpIGZvciBub24tdmlydGlvIGRldmljZXMKOWI4MmNhYmIzYiBzMzkwLWJpb3M6IGRlY291
+cGxlIGNvbW1vbiBib290IGxvZ2ljIGZyb20gdmlydGlvCjJlNGM4OGE4YWUgczM5MC1iaW9zOiBk
+ZWNvdXBsZSBjaW8gc2V0dXAgZnJvbSB2aXJ0aW8KNjQ4YzM2NDhjNyBzMzkwIHZmaW8tY2N3OiBB
+ZGQgYm9vdGluZGV4IHByb3BlcnR5IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvMTYgQ2hlY2tpbmcgY29tbWl0IDY0OGMzNjQ4YzczYiAoczM5MCB2ZmlvLWNjdzogQWRkIGJv
+b3RpbmRleCBwcm9wZXJ0eSBhbmQgSVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
+ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDU6IApu
+ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxODEgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggMS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE2IENo
+ZWNraW5nIGNvbW1pdCAyZTRjODhhOGFlODQgKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVw
+IGZyb20gdmlydGlvKQozLzE2IENoZWNraW5nIGNvbW1pdCA5YjgyY2FiYjNiNDAgKHMzOTAtYmlv
+czogZGVjb3VwbGUgY29tbW9uIGJvb3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5z
+IHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNj
+dy9tYWluLmM6MTk6CitJcGxQYXJhbWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxp
+Z25lZF9fKFBBR0VfU0laRSkpKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggMy8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNiBD
+aGVja2luZyBjb21taXQgYTk5OTQ3YzMzZDRhIChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2Rldigp
+IGZvciBub24tdmlydGlvIGRldmljZXMpCjUvMTYgQ2hlY2tpbmcgY29tbWl0IDA2ZWE3MTQ2OTUx
+MCAoczM5MC1iaW9zOiBGYWN0b3IgZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNv
+ZGUgcGF0aCkKNi8xNiBDaGVja2luZyBjb21taXQgNGFjOTZjMmMxMDVlIChzMzkwLWJpb3M6IENs
+ZWFuIHVwIGNpby5oKQo3LzE2IENoZWNraW5nIGNvbW1pdCAyODFmNjRiMzdhNjkgKHMzOTAtYmlv
+czogRGVjb3VwbGUgY2hhbm5lbCBpL28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzI4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
+cywgMTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KOC8xNiBDaGVja2luZyBjb21taXQgYWYyMjJmNTYxODEwIChzMzkwLWJpb3M6IE1hcCBsb3cg
+Y29yZSBtZW1vcnkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgv
+MTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS8xNiBDaGVja2luZyBjb21taXQgNzI0NGRm
+NWE3OWZhIChzMzkwLWJpb3M6IHB0cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+MTAvMTYgQ2hlY2tpbmcgY29tbWl0IDQ0ZDUyNTk4NzA2ZiAoczM5MC1iaW9zOiBTdXBwb3J0IGZv
+ciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcykKMTEvMTYgQ2hlY2tpbmcgY29t
+bWl0IDYzMTAwMmM2NDQxNyAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEyLzE2IENo
+ZWNraW5nIGNvbW1pdCAyYWYyNDU4MWI0NDEgKHMzOTAtYmlvczogUmVmYWN0b3IgdmlydGlvIHRv
+IHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4OgorICAgICAg
+ICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywgc2l6ZW9m
+KGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAgIHJ1bl9j
+Y3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0dXMpLCBm
+YWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVzIGNoZWNr
+ZWQKClBhdGNoIDEyLzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE2IENoZWNraW5n
+IGNvbW1pdCBkMjNmZjQ3YTNkM2MgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0eXBlIHRv
+IGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IDVhNWM0YjAxZWZi
+YyAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVlZGVkIGZv
+ciBkYXNkLWlwbCkKMTUvMTYgQ2hlY2tpbmcgY29tbWl0IDg3MzMzMzA0OTJmNCAoczM5MC1iaW9z
+OiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMyNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDQ0NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoxNi8xNiBDaGVja2luZyBjb21taXQgNzM3MzliMGNjNmUxIChzMzkwLWJpb3M6IGRhc2QtaXBs
+OiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVycm9yIGRhdGEpCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
+b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTE0NjY3NzYtMjkx
+MjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5jb20vdGVzdGluZy5jaGVja3Bh
+dGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
