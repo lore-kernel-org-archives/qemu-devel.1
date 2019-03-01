@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50900)
+Received: from eggs.gnu.org ([209.51.188.92]:50846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1gzkNQ-0004uY-7F
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:47:10 -0500
+	(envelope-from <armbru@redhat.com>) id 1gzkNQ-0004sk-B6
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:47:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1gzkBT-0006AF-7F
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:34:49 -0500
-Received: from greensocs.com ([193.104.36.180]:57314)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1gzkBS-00064y-Ij
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:34:47 -0500
-References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
-	<CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
-Date: Fri, 1 Mar 2019 16:34:37 +0100
+	(envelope-from <armbru@redhat.com>) id 1gzkAw-0005hq-Hb
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:34:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gzkAw-0005gW-8P
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:34:14 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190227140629.1569-1-yuval.shaia@oracle.com>
+	<20190227140629.1569-5-yuval.shaia@oracle.com>
+	<152bf41f-8eea-d112-77d3-cd334c5bb4f7@gmail.com>
+	<87fts7oyhd.fsf@dusky.pond.sub.org> <20190301122826.GA3863@lap1>
+Date: Fri, 01 Mar 2019 16:31:59 +0100
+In-Reply-To: <20190301122826.GA3863@lap1> (Yuval Shaia's message of "Fri, 1
+	Mar 2019 14:28:26 +0200")
+Message-ID: <87wolimx00.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] multi phase reset
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] {monitor,
+ hw/pvrdma}: Expose device internals via monitor interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,302 +31,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: dgilbert@redhat.com, qemu-devel@nongnu.org
 
-On 3/1/19 12:43 PM, Peter Maydell wrote:
-> On Mon, 25 Feb 2019 at 10:49, Damien Hedde <damien.hedde@greensocs.com> wrote:
->> I had more thought about the reset problem and what we want to achieve
->> (add power gating and clock support).
->> Feel free to comment. I'll start to implement this and send a first
->> version with a reroll of everything when it's ready.
-> 
-> I generally like this; I have some comments below.
-> 
->> # PROPOSAL OVERVIEW
->>
->> I propose to add a Resetable interface and a ResetDomain object.
->>
->> Having an interface simplify things since there is several reset entry
->> points (at least Buses and Devices).
->> Device and Bus objects will implement this interface.
->>
->> The ResetDomain will hold several Resetable objects and implement the
->> interface too. The ResetDomain is needed to have at least a global/main
->> ResetDomain to place buses and devices to replace the current
->> qemu_register_reset system which only allow to register a function.
-> 
-> How does the ResetDomain fit in for a typical case where
-> we have an SoC container object with a handful of devices
-> (which are children of the container object)? Does the
-> SoC container object just directly implement the Resettable
-> interface and handle the propagation as ResetDomain would?
-> Does the SoC container create one or more ResetDomains and
-> add its child devices to them (if so, with what API)?
+Yuval Shaia <yuval.shaia@oracle.com> writes:
 
-By SoC container, I suppose you mean a Machine object.
-Both option are doable.
-I did not really start to work on the Machine part as it could be done
-in a second time when bus/device is done.
-Containers, as a general principle (SoC containers or composed Devices),
-should reset containees.
-We could put a ResetDomain in the the Machine base object to help for
-this or let each Machine handle this. Also the global ResetDomain could
-be put into the Machine's ResetDomain at machine creation.
+> On Fri, Mar 01, 2019 at 08:17:02AM +0100, Markus Armbruster wrote:
+>> Marcel Apfelbaum <marcel.apfelbaum@gmail.com> writes:
+>>=20
+>> > Hi Yuval,
+>> >
+>> > On 2/27/19 4:06 PM, Yuval Shaia wrote:
+>> >> Allow interrogating device internals through HMP interface.
+>> >> The exposed indicators can be used for troubleshooting by developers =
+or
+>> >> sysadmin.
+>> >> There is no need to expose these attributes to a management system (e=
+.x.
+>> >> libvirt) because (1) most of them are not "device-management' related
+>> >> info and (2) there is no guarantee the interface is stable.
+>> >>
+>> >> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>> >> ---
+>> >>   hmp-commands-info.hx      | 16 ++++++++
+>> >>   hw/rdma/rdma_backend.c    | 70 ++++++++++++++++++++++++++---------
+>> >>   hw/rdma/rdma_rm.c         |  7 ++++
+>> >>   hw/rdma/rdma_rm_defs.h    | 27 +++++++++++++-
+>> >>   hw/rdma/vmw/pvrdma.h      |  5 +++
+>> >>   hw/rdma/vmw/pvrdma_hmp.h  | 21 +++++++++++
+>> >>   hw/rdma/vmw/pvrdma_main.c | 77 ++++++++++++++++++++++++++++++++++++=
++++
+>> >>   monitor.c                 | 10 +++++
+>> >>   8 files changed, 215 insertions(+), 18 deletions(-)
+>> >>   create mode 100644 hw/rdma/vmw/pvrdma_hmp.h
+>> >>
+>> >> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+>> >> index cbee8b944d..9153c33974 100644
+>> >> --- a/hmp-commands-info.hx
+>> >> +++ b/hmp-commands-info.hx
+>> >> @@ -524,6 +524,22 @@ STEXI
+>> >>   Show CPU statistics.
+>> >>   ETEXI
+>> >>   +#if defined(CONFIG_PVRDMA)
+>> >> +    {
+>> >> +        .name       =3D "pvrdmacounters",
+>> >> +        .args_type  =3D "",
+>> >> +        .params     =3D "",
+>> >> +        .help       =3D "show pvrdma device counters",
+>> >> +        .cmd        =3D hmp_info_pvrdmacounters,
+>> >> +    },
+>> >> +
+>> >> +STEXI
+>> >> +@item info pvrdmacounters
+>> >> +@findex info pvrdmacounters
+>> >> +Show pvrdma device counters.
+>> >> +ETEXI
+>> >> +#endif
+>> >> +
+>> >>   #if defined(CONFIG_SLIRP)
+>> >>       {
+>> >>           .name       =3D "usernet",
+>> [...]
+>> >> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+>> >> index b6061f4b6e..85101368c5 100644
+>> >> --- a/hw/rdma/vmw/pvrdma_main.c
+>> >> +++ b/hw/rdma/vmw/pvrdma_main.c
+>> >> @@ -14,6 +14,7 @@
+>> >>    */
+>> >>     #include "qemu/osdep.h"
+>> >> +#include "qemu/units.h"
+>> >>   #include "qapi/error.h"
+>> >>   #include "hw/hw.h"
+>> >>   #include "hw/pci/pci.h"
+>> >> @@ -25,6 +26,7 @@
+>> >>   #include "cpu.h"
+>> >>   #include "trace.h"
+>> >>   #include "sysemu/sysemu.h"
+>> >> +#include "monitor/monitor.h"
+>> >>     #include "../rdma_rm.h"
+>> >>   #include "../rdma_backend.h"
+>> >> @@ -32,10 +34,13 @@
+>> >>     #include <infiniband/verbs.h>
+>> >>   #include "pvrdma.h"
+>> >> +#include "pvrdma_hmp.h"
+>> >>   #include "standard-headers/rdma/vmw_pvrdma-abi.h"
+>> >>   #include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_=
+dev_api.h"
+>> >>   #include "pvrdma_qp_ops.h"
+>> >>   +GSList *devices;
+>>=20
+>> "devices" is far too generic for an external identifier.  Are you
+>> missing a 'static' here?  Even if static, I'd recommend "rdma_devices".
+>
+> Yep, thanks.
+>
+>>=20
+>> >> +
+>> >>   static Property pvrdma_dev_properties[] =3D {
+>> >>       DEFINE_PROP_STRING("netdev", PVRDMADev, backend_eth_device_name=
+),
+>> >>       DEFINE_PROP_STRING("ibdev", PVRDMADev, backend_device_name),
+>> >> @@ -55,6 +60,71 @@ static Property pvrdma_dev_properties[] =3D {
+>> [...]
+>> >> +}
+>> >> +
+>> >> +void pvrdma_dump_counters(Monitor *mon)
+>> >> +{
+>> >> +    g_slist_foreach(devices, pvrdma_dump_device_counters, mon);
+>> >> +}
+>>=20
+>> Note for later: does nothing when @devices is empty.
+>
+> But that is fine, isn't it?
 
-Right now, I only have 2 functions reset_domain_[un]register_object to
-add/remove an object in a reset domain (which is just a list of Resettable).
+Yes.  It's just an observation for use in a later comment.
 
-> 
->> I also propose to handle the warm/cold reset distinction. This point is
->> explained below.
->>
->> # RESETABLE INTERFACE
->>
->> This Resetable interface describes the methods corresponding to a multi-
->> phase reset system. This is based on Peter's proposal (see
->> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03302.html).
->>
->> Here's the phases (I've tried to find adequate names):
-> 
-> I think this naming definitely works better than my 1/2/3 numbering...
-> 
->>
->> INIT PHASE: (Peter's phase 1)
->>     Reset the object internal state, put a resetting flag and do the
->>     same for the reset subtree. No side effect on other devices to
->>     guarantee that, in a reset domain, everything get initialized first.
->>     This corresponds mostly to what is currently done in the device/bus
->>     reset method.
->>
->> HOLD PHASE: (This phase was not in Peter's proposal)
->>     This phase allows to control a reset with a IO. When a IO control
->>     reset procedure based on the IO level (not edge), we may need to
->>     assert the reset, wait some time, and finally de-assert the reset.
->>     The consequence is that such a device can stay in a "resetting
->>     state" and may need to show this state to other devices through
->>     its outputs. For example, a clock controller will typically shutdown
->>     its clocks when it is in resetting state.
->>
->> RELEASE PHASE: (Peter's phase 2, modified)
->>     This phase sets outputs to state after reset. For a clock controller
->>     it starts the clocks. It also clears the "resetting" flag (this is
->>     where is differs from Peter's phase 2). A device should not react to
->>     inputs until this flag has been cleared. During this phase, outputs
->>     are propagated in the reset domain (and outside the reset domain).
->>
->> POST PHASE: (Peter's phase 3)
->>     This phase is kind of post-reset phase to do things that need the
->>     guarantee to be after the propagation of outputs inside the reset
->>     domain.
-> 
-> In my design the only thing that I thought would happen in phase 3
-> was the "clear the resetting flag", but you've moved that to RELEASE.
-> What's left ? Do you have a concrete example where we'd need this?
+>>=20
+>> >> +
+>> >>   static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
+>> >>                             void *ring_state)
+>> >>   {
+>> >> @@ -304,6 +374,8 @@ static void pvrdma_fini(PCIDevice *pdev)
+>> >>         rdma_info_report("Device %s %x.%x is down", pdev->name,
+>> >>                        PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
+>> >> +
+>> >> +    devices =3D g_slist_remove(devices, pdev);
+>> >>   }
+>> >>     static void pvrdma_stop(PVRDMADev *dev)
+>> >> @@ -394,6 +466,7 @@ static void pvrdma_regs_write(void *opaque, hwadd=
+r addr, uint64_t val,
+>> >>           if (val =3D=3D 0) {
+>> >>               trace_pvrdma_regs_write(addr, val, "REQUEST", "");
+>> >>               pvrdma_exec_cmd(dev);
+>> >> +            dev->stats.commands++;
+>> >>           }
+>> >>           break;
+>> >>       default:
+>> >> @@ -612,9 +685,13 @@ static void pvrdma_realize(PCIDevice *pdev, Erro=
+r **errp)
+>> >>           goto out;
+>> >>       }
+>> >>   +    memset(&dev->stats, 0, sizeof(dev->stats));
+>> >> +
+>> >>       dev->shutdown_notifier.notify =3D pvrdma_shutdown_notifier;
+>> >>       qemu_register_shutdown_notifier(&dev->shutdown_notifier);
+>> >>   +    devices =3D g_slist_append(devices, pdev);
+>> >> +
+>> >>   out:
+>> >>       if (rc) {
+>> >>           pvrdma_fini(pdev);
+>>=20
+>> Note for later: @devices contains the realized "pvrdma" devices.
+>
+> This happens only when rc indicates an error and we jumped here before
+> adding the device to the list.
 
-I hesitated to remove this phase (would be easy to add it after if it is
-really needed). I see 2 cases where it might be useful.
+I'm referring to the update of @devices, not the out: label.
 
-To stay in my use case for clocks, here how it can be used: For an uart,
-during release phase, the clock will propagate and only after every
-release phases has been executed we will have the final/valid input
-frequency.
-So we can either recompute the uart baudrate every time the clock change
-due to propagation or wait till post phase to do it once for all (and
-initialize the backend parameters). But it is probably no big deal for
-this case if we don't have post phase.
+>> You could find these devices with object_child_foreach_recursive()
+>> instead of maintaining a separate list.
+>
+> Hmmm...interesting.
+> I will check if it fits my needs and will change accordingly if yes.
 
-Another place where it may be needed is cases like the pc's machine
-reset case (hw/i386/p.c) that reset everything then reset interrupt
-controllers.
-static void pc_machine_reset(void)
-{
-    CPUState *cs;
-    X86CPU *cpu;
-    qemu_devices_reset();
+Examples include hmp_info_irq() and hmp_info_pic().
 
-    /* Reset APIC after devices have been reset to cancel
-     * any changes that qemu_devices_reset() might have done.
-     */
-    CPU_FOREACH(cs) {
-        cpu = X86_CPU(cs);
+>> >> diff --git a/monitor.c b/monitor.c
+>> >> index defa129319..53ecb5bc70 100644
+>> >> --- a/monitor.c
+>> >> +++ b/monitor.c
+>> >> @@ -85,6 +85,9 @@
+>> >>   #include "sysemu/iothread.h"
+>> >>   #include "qemu/cutils.h"
+>> >>   #include "tcg/tcg.h"
+>> >> +#ifdef CONFIG_PVRDMA
+>> >> +#include "hw/rdma/vmw/pvrdma_hmp.h"
+>> >> +#endif
+>> >>     #if defined(TARGET_S390X)
+>> >>   #include "hw/s390x/storage-keys.h"
+>> >> @@ -1362,6 +1365,13 @@ static void hmp_info_cpustats(Monitor *mon, co=
+nst QDict *qdict)
+>> >>       cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
+>> >>   }
+>> >>   +#ifdef CONFIG_PVRDMA
+>> >> +static void hmp_info_pvrdmacounters(Monitor *mon, const QDict *qdict)
+>> >> +{
+>> >> +    pvrdma_dump_counters(mon);
+>> >
+>> > Compilation fails on archs with no PCI support:
+>> >
+>> > =C2=A0=C2=A0=C2=A0 /usr/bin/ld: monitor.o: in function `hmp_info_pvrdm=
+acounters':
+>> > =C2=A0=C2=A0=C2=A0 /home/marcel/git/qemu/monitor.c:1371: undefined ref=
+erence to
+>> > `pvrdma_dump_counters'
+>> > =C2=A0=C2=A0 collect2: error: ld returned 1 exit status
+>> > =C2=A0=C2=A0 make[1]: *** [Makefile:210: qemu-system-m68k] Error 1
+>> >
+>> >
+>> > The below patch solves it by adding a pci stub:
+>> >
+>> > diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+>> > index b941a0e842..cab364f93d 100644
+>> > --- a/hw/pci/pci-stub.c
+>> > +++ b/hw/pci/pci-stub.c
+>> > @@ -26,6 +26,7 @@
+>> > =C2=A0#include "qapi/qmp/qerror.h"
+>> > =C2=A0#include "hw/pci/pci.h"
+>> > =C2=A0#include "hw/pci/msi.h"
+>> > +#include "hw/rdma/vmw/pvrdma_hmp.h"
+>> >
+>> > =C2=A0bool msi_nonbroken;
+>> > =C2=A0bool pci_available;
+>> > @@ -53,3 +54,9 @@ uint16_t pci_requester_id(PCIDevice *dev)
+>> > =C2=A0=C2=A0=C2=A0=C2=A0 g_assert(false);
+>> > =C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>> > =C2=A0}
+>> > +
+>> > +void pvrdma_dump_counters(Monitor *mon)
+>> > +{
+>> > +=C2=A0=C2=A0=C2=A0 monitor_printf(mon, "PVRDMA requires PCI support\n=
+");
+>> > +}
+>> > +
+>>=20
+>> When CONFIG_PCI is enabled, "info pvrdmacounters" does nothing when
+>> there are no "pvrdma" devices.
+>>=20
+>> When CONFIG_PCI is disabled, there are no "pvrdma" devices.  Therefore,
+>> "info pvrdmacounters" should also do nothing then, shouldn't it?
+>
+> Yeah, problem was in case that pvrdma was selected in ./configure phase b=
+ut
+> platform does not have PCI -> CONFIG_PCI is diabeled -> pvrdma code is not
+> compiled -> pvrdma_dump_counters is missing in link phase.
+>
+> If you have a better alternative then i'm fine, meanwhile i'm taking
+> Marcel's proposal.
 
-        if (cpu->apic_state) {
-            device_reset(cpu->apic_state);
-        }
-    }
-}
+Marcel's idea to fix compilation with a stub is spot on.  But should it
+print a message?  I don't think so.
 
-> 
->> The interface contains a method per phase:
->>  void (*reset_init)(Resetable *rst, bool cold);
->>  void (*reset_hold)(Resetable *rst);
->>  void (*reset_release)(Resetable *rst);
->>  void (*reset_post)(Resetable *rst);
->>
->> # WARM/COLD RESET
->>
->> Warm/Cold reset differences may exists in devices. We want a cold reset
->> to handle power gating. (IMO powering off a device is identical to
->> putting it in a cold reset state).
->>
->> To handle the difference between warm and cold reset, I propose to have
->> a parameter to the init phase of Resetable interface.
->> Other phases do not need the parameter since init phase should
->> put warm/cold difference in the device state.
->>
->> # How to do a reset on a Resetable object
->>
->> There is 3 entry points. The first one is when we do a reset event. I
->> call it `void resetable_trigger_reset(Resetable *rst, bool cold)`. This
->> the one used for example at machine startup to initialize everything.
->> this should do the init, release and postphases in a row. I don't think
->> hold phase must be done here since release will do the opposite just after.
->>
->> The 2 other entry points are dedicated to io control.
->> void resetable_assert_reset(Resetable *rst, bool cold);
->> void resetable_deassert_reset(Resetable *rst);
->> assert will do init and hold phases while deassert will release and post
->> phase.
-> 
-> Could we avoid having these two flavours of reset (init->release->post
-> vs init->hold->release->post) by just saying that if you only care
-> about triggering reset you just call assert then deassert ?
-
-Yes. In the end, results of both must be the same (without maybe more
-intermediate glitches for the init->hold->release->post).
-
-> 
->> Obviously to correctly support this assert/de-assert a device must have
->> special support in order to handle migration in "resetting" state. There
->> is no migration problem while we only use trigger because there is no
->> point during the reset were migration could occur.
-> 
-> What would need to be different? Just needing to migrate the state
-> of the 'resetting' flag ? (I think we could handle that in the
-> device base class.)
-
-That's it. It would be nice to handle this in the base class but I don't
-know how I can do that. vmsd field has no inheritance mechanism. Should
-we add some base/background migration to every device ?
-
-> 
->> # DeviceClass impact
->>
->> 4 new methods are added in Device:
->> + 3 corresponding to the hold/release/post phases.
->> + 1 to handle the cold reset init phase.
->>
->> The existing `reset` method is now the warm reset init phase. To handle
->> the cold reset, a new `cold_reset` is added. The default behavior of
->> this method is to call `reset` so that without any specific support cold
->> and warm reset are the same.
-> 
-> I think it would be nicer if devices just implemented the Resettable
-> interface, so that we don't have two similar but not identical APIs
-> for handling the various phases.
-> 
->> Instead of adding a cold reset method, we could add a parameter to the
->> current reset. But there is a lot of places that would need some changes
->> and I am really not sure we can do it automatically.
-> 
-> Coccinelle is very good for making wide-scale automatic changes.
-> I would prefer that we design (and work out a path for transitioning
-> to) the right API, rather than producing a weird API because we're
-> trying to retain some legacy method names and fit them into the
-> scheme.
-> 
-> If I'm a device that's aware of the new reset scheme, what
-> do I need to implement? Do I declare that I implement Resettable,
-> and provide the various methods for the phases? Or do I rely
-> on DeviceClass to implement Resettable, and provide DeviceClass
-> methods ?
-
-It can rely on DeviceClass to implement Resettable and have to provide
-DeviceClass methods.
-
-> 
-> (perhaps what we want is for new-system-aware devices to implement
-> Resettable directly, and also for DeviceClass to implement
-> Resettable with some methods that call old-school DeviceClass::reset,
-> for back-compatibility ? This feels like it's going to end up
-> with our "preferred" API being more boilerplatey than the
-> "deprecated" old API, though :-( )
-
-What I started to do is make Deviceclass implements Resettable and add
-additional methods in DeviceClass corresponding to the "local" version
-of the Resettable methods.
-
-So in DeviceClass I have 4 news methods
-   cold_reset (this forms reset_init with existing reset, we could name
-               it reset_init and see how to replace existing reset)
-   reset_release
-   reset_hold
-   reset_post
-These methods are empty by default and should be implemented by
-specialization classes to do local reset operations.
-
-And there is the 4 methods of the resettable interface:
-   reset_init
-   reset_release
-   reset_hold
-   reset_post
-These methods are implemented by default to:
-+ call the local version
-+ call the sub-buses methods
-
-We can choose to keep only the interface methods and let specialization
-overrides them to do local stuff and call the DeviceClass's version to
-also do sub-buses reset.
-
-This approach simplify specialization because all the dirty things (like
-handling "resetting flag") are done by the interface methods which do
-not need to be overriden in normal use cases (only if we do not want to
-call sub-buses reset for some reason).
-
-The reason I initially "duplicate" the methods is because of
-"device_reset" which currently only do local reset (in opposite to
-qdev_reset_all) and is used at several places. I'm not sure at which
-point we could drop this and have a single reset for devices: maybe such
-devices such devices don't have sub-buses and therefore the distinction
-is meaningless.
-
-> 
->> # BusClass impact
->>
->> I don't think we need to add any new method to the bus. Since a bus has
->> no gpio, there is no propagation so phase hold/release/term are probably
->> meaningless here. Maybe a cold reset method is useful here ?
-> 
-> I suspect buses in general should also be using the same APIs. For
-> instance a PCI controller can do a bus reset which should reset
-> all the devices on the bus. We don't model the individual
-> GPIO lines in a PCI bus connection but that doesn't mean there
-> isn't a logical equivalent there. Our support for bus resets
-> (mainly as you say SCSI and PCI) is basically a half-baked
-> implementation of a reset domain.
-
-I was not clear enough. BusClass also implements the Resettable
-interface and has the 4 phase methods like DeviceClass that call reset
-on sub-devices on the bus. But I don't think we need local version of
-all these methods because there is no `bus_reset` function (like
-device_reset) and hold/release/post phases will probably never need to
-be overriden to do local stuff.
-
-> 
->> # Impact on existing code
->>
->> There is not much impact. Basically the global qemu_reset should be
->> changed to handle Resetable objects with a global ResetDomain. Also the
->> 2 occurrences of qemu_register_reset(qbus_reset_all, ...) must be
->> replaced to add the buses in the global ResetDomain.
->>
->> qdev/qbus_reset_all/device_reset behavior will be changed to trigger
->> phase reset (instead of doing one dev/bus walk, there will be a walk per
->> reset phase). We can add the cold/warm parameter (and modify the places
->> were the functions are called) or choose a default (anyway until support
->> is added to devices, both are identical).
-> 
-
-Thanks,
-Damien
+>>=20
+>> > However you should include a generic rdma header as hw/rdma/rdma_hmp.h
+>> > and not a vmw specific one.
+>> >
+>> >
+>> > Thanks,
+>> > Marcel
+>> >
+>> >
+>> >> +}
+>> >> +#endif
+>> >> +
+>> >>   static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+>> >>   {
+>> >>       const char *name =3D qdict_get_try_str(qdict, "name");
+>>=20
