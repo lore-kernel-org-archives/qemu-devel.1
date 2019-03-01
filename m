@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48013)
+Received: from eggs.gnu.org ([209.51.188.92]:51362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gzntx-0007w2-Eq
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:32:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1gznyU-0002z4-Op
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:37:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gznts-0002R6-L3
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:32:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gzntm-0002GI-Lq
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:32:49 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x21JOFqM037344
-	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:32:45 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qy8arykq9-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:32:44 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 1 Mar 2019 19:32:42 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 01 Mar 2019 20:32:37 +0100
-In-Reply-To: <155146874478.147873.5019623412212796259.stgit@bahia.lan>
-References: <155146874478.147873.5019623412212796259.stgit@bahia.lan>
+	(envelope-from <eblake@redhat.com>) id 1gznyP-0008FL-Pz
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:37:37 -0500
+References: <20190301191545.8728-1-jsnow@redhat.com>
+	<20190301191545.8728-4-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <66ebf636-43e1-f16a-bd05-e9a8a766d4bd@redhat.com>
+Date: Fri, 1 Mar 2019 13:36:53 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190301191545.8728-4-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <155146875704.147873.10563808578795890265.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH 2/2] spapr: Simulate CAS for qtest
+Subject: Re: [Qemu-devel] [PATCH v3 3/7] block/dirty-bitmaps: add
+ block_dirty_bitmap_check function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,56 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-The RTAS event hotplug code for machine types 2.8 and newer depends on
-the CAS negotiated ov5 in order to work properly. However, there's no
-CAS when running under qtest. There has been a tentative to trick the
-code by faking the OV5_HP_EVT bit, but it turned out to break other
-assumptions in the code and the change got reverted.
+On 3/1/19 1:15 PM, John Snow wrote:
+> Instead of checking against busy, inconsistent, or read only directly,
+> use a check function with permissions bits that let us streamline the
+> checks without reproducing them in many places.
+> 
+> Included in this patch are permissions changes that simply add the
+> inconsistent check to existing permissions call spots, without
+> addressing existing bugs.
+> 
+> In general, this means that busy+readonly checks become BDRV_BITMAP_DEFAULT,
+> which checks against all three conditions. busy-only checks become
+> BDRV_BITMAP_ALLOW_RO.
+> 
+> Notably, remove allows inconsistent bitmaps, so it doesn't follow the pattern.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  include/block/dirty-bitmap.h   | 13 ++++++++-
+>  block/dirty-bitmap.c           | 38 +++++++++++++++++++-------
+>  blockdev.c                     | 49 +++++++---------------------------
+>  migration/block-dirty-bitmap.c | 12 +++------
+>  nbd/server.c                   |  3 +--
+>  5 files changed, 54 insertions(+), 61 deletions(-)
+> 
 
-Go for a more general approach and simulate a CAS when running under
-qtest. For simplicity, this pseudo CAS simple simulates the case where
-the guest supports the same features as the machine. It is done at
-reset time, just before we reset the DRCs, which could potentially
-exercise the unplug code.
+Diffstat proves its a win, even with the extra documentation for the new
+function. Nice.
 
-This allows to test unplug on spapr with both older and newer machine
-types.
+> +int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t flags,
+> +                            Error **errp)
+> +{
+> +    if ((flags & BDRV_BITMAP_BUSY) && bdrv_dirty_bitmap_busy(bitmap)) {
+> +        error_setg(errp, "Bitmap '%s' is currently in use by another"
+> +                   " operation and cannot be used", bitmap->name);
 
-Suggested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
+Split before space,
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b6a571b6f184..6da64ef7ee2b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -29,6 +29,7 @@
- #include "qapi/visitor.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/numa.h"
-+#include "sysemu/qtest.h"
- #include "hw/hw.h"
- #include "qemu/log.h"
- #include "hw/fw-path-provider.h"
-@@ -1711,6 +1712,16 @@ static void spapr_machine_reset(void)
-      */
-     spapr_irq_reset(spapr, &error_fatal);
- 
-+    /*
-+     * There is no CAS under qtest. Simulate one to please the code that
-+     * depends on spapr->ov5_cas. This is especially needed to test device
-+     * unplug, so we do that before resetting the DRCs.
-+     */
-+    if (qtest_enabled()) {
-+        spapr_ovec_cleanup(spapr->ov5_cas);
-+        spapr->ov5_cas = spapr_ovec_clone(spapr->ov5);
-+    }
-+
-     /* DRC reset may cause a device to be unplugged. This will cause troubles
-      * if this device is used by another device (eg, a running vhost backend
-      * will crash QEMU if the DIMM holding the vring goes away). To avoid such
+> +        return -1;
+> +    }
+> +
+> +    if ((flags & BDRV_BITMAP_RO) && bdrv_dirty_bitmap_readonly(bitmap)) {
+> +        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
+> +                   bitmap->name);
+> +        return -1;
+> +    }
+> +
+> +    if ((flags & BDRV_BITMAP_INCONSISTENT) &&
+> +        bdrv_dirty_bitmap_inconsistent(bitmap)) {
+> +        error_setg(errp, "Bitmap '%s' is inconsistent and cannot be used",
+> +                   bitmap->name);
+> +        error_append_hint(errp, "Try block-dirty-bitmap-remove to delete "
+> +                          "this bitmap from disk");
+
+split after space.  Looks inconsistent within a single function (pardon
+the pun :)
+
+That's minor,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
