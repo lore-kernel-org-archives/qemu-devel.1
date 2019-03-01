@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53633)
+Received: from eggs.gnu.org ([209.51.188.92]:57732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <llyzs.vic@gmail.com>) id 1gzaU0-00050c-PQ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 00:13:17 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gzaxP-0001iN-Dr
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 00:43:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <llyzs.vic@gmail.com>) id 1gzaU0-0000tm-5F
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 00:13:16 -0500
-Received: from mail-it1-x12c.google.com ([2607:f8b0:4864:20::12c]:36191)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <llyzs.vic@gmail.com>) id 1gzaTz-0000tO-Uq
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 00:13:16 -0500
-Received: by mail-it1-x12c.google.com with SMTP id v83so19555606itf.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 21:13:15 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1gzaxO-0003MM-Mj
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 00:43:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35672)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gzaxO-0003M1-GQ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 00:43:38 -0500
+Date: Fri, 1 Mar 2019 06:43:35 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190301054335.qck44hrsnldbpwhu@sirius.home.kraxel.org>
+References: <20190225152618.r3epnypkpu6fyokt@sirius.home.kraxel.org>
+	<A17B6D30-F428-48E5-B9D0-6F6E7DEE3778@gmail.com>
+	<20190226064347.i5kvwazmz3xcupkj@sirius.home.kraxel.org>
+	<CAKyx-3OOkkdSQ=UAucP_ZpormrEczwNhEpAnVtFeQOSOrnD7Vg@mail.gmail.com>
+	<20190227052755.3lgo3265kaa6bzmi@sirius.home.kraxel.org>
+	<1ef851d2-4148-56f0-65ac-a0e75022f20e@ilande.co.uk>
+	<20190228054923.wxguahjavmqybddn@sirius.home.kraxel.org>
+	<7de277ad-ab04-795b-8399-7a01d476e130@ilande.co.uk>
+	<20190228063812.b75cqgoacf32bri4@sirius.home.kraxel.org>
+	<d2b28d19-0533-e467-013d-66427c307126@ilande.co.uk>
 MIME-Version: 1.0
-References: <CACxphuFGAODB_=X1fVFqJa=U14E_YSJMreWJcOgzdsooke1wxg@mail.gmail.com>
-	<20190228205109.hmldtldbnlw3pnqq@function>
-	<CACxphuHr-Eo6JoPzZWvaZ_29GjxRzP=saWUKCKQxTuBa8qC9mg@mail.gmail.com>
-In-Reply-To: <CACxphuHr-Eo6JoPzZWvaZ_29GjxRzP=saWUKCKQxTuBa8qC9mg@mail.gmail.com>
-From: llyzs <llyzs.vic@gmail.com>
-Date: Fri, 1 Mar 2019 13:13:03 +0800
-Message-ID: <CACxphuFL0hKxzf_Makk8FGh=kc5y+yrVB3v50fiWVrtiCJq=rQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [PATCHv2] slirp: check for ioctlsocket error and
- 0-length udp payload.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2b28d19-0533-e467-013d-66427c307126@ilande.co.uk>
+Subject: Re: [Qemu-devel] Questions about EDID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +35,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Samuel Thibault <samuel.thibault@gnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: G 3 <programmingkidx@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Sometimes sorecvfrom() is called from slirp.c because revents == G_IO_IN,
-but there is 0 bytes available and recvfrom could be blocking indefinitely.
-This is likely due to 0-length udp payload. This also adds an error
-checking for ioctlsocket.
+  Hi,
 
-Signed-off-by: Vic Lee <llyzs.vic@gmail.com>
----
- slirp/socket.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+> > Well, not really.  EDID is about monitor capabilities.  The monitor will
+> > see 8 bit per color channel, no matter whenever your GPU composes that
+> > signal using a 8bpp mode + color palette or 24bpp mode with direct
+> > color.
+> 
+> Hmmm okay. Perhaps it might still be worth hooking -g XxYxD to also put X and Y into
+> xres and yres within the EDID so at least everything is consistent between OpenBIOS
+> and the client driver when it eventually loads?
 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index c01d8696af..a624d829e3 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -549,6 +549,15 @@ sorecvfrom(struct socket *so)
-           int n;
- #endif
+That makes sense, sure.  Will be a bit tricky due to (I think) only ppc
+and sparc actually looking at -g right now, to make sure current
+behavior of the other archs doesn't change when -g is not specified.
 
-+         if (ioctlsocket(so->s, FIONREAD, &n) != 0) {
-+             DEBUG_MISC((dfd," ioctlsocket errno = %d-%s\n",
-+                         errno,strerror(errno)));
-+             return;
-+         }
-+         if (n == 0) {
-+             return;
-+         }
-+
-          m = m_get(so->slirp);
-          if (!m) {
-              return;
-@@ -572,7 +581,6 @@ sorecvfrom(struct socket *so)
-           */
-          len = M_FREEROOM(m);
-          /* if (so->so_fport != htons(53)) { */
--         ioctlsocket(so->s, FIONREAD, &n);
-
-          if (n > len) {
-            n = (m->m_data - m->m_dat) + m->m_len + n + 1;
--- 
-2.20.1
+cheers,
+  Gerd
