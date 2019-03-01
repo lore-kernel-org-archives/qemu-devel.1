@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52808)
+Received: from eggs.gnu.org ([209.51.188.92]:56765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzo0S-0004Lq-24
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:39:40 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gzo5I-0006Yv-7k
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:44:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzo0R-00028T-27
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:39:39 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gzo5G-0008UO-9X
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:44:40 -0500
 References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-6-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d36a2f9c-09db-e5cc-21e9-bab43a6f0744@redhat.com>
-Date: Fri, 1 Mar 2019 13:39:16 -0600
+	<20190301191545.8728-2-jsnow@redhat.com>
+	<98d945ac-a57b-eb0d-7bb8-319675834c61@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8ae01183-ee35-545d-0866-2d6ff27f8003@redhat.com>
+Date: Fri, 1 Mar 2019 14:44:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190301191545.8728-6-jsnow@redhat.com>
+In-Reply-To: <98d945ac-a57b-eb0d-7bb8-319675834c61@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] block/dirty-bitmaps: prohibit
- removing readonly bitmaps
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] block/dirty-bitmaps: add
+ inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 3/1/19 1:15 PM, John Snow wrote:
-> Remove is an inherently RW operation, so this will fail anyway, but
-> we can fail it very quickly instead of trying and failing, so do so.
+
+
+On 3/1/19 2:32 PM, Eric Blake wrote:
+> On 3/1/19 1:15 PM, John Snow wrote:
+>> Add an inconsistent bit to dirty-bitmaps that allows us to report a bitmap as
+>> persistent but potentially inconsistent, i.e. if we find bitmaps on a qcow2
+>> that have been marked as "in use".
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  qapi/block-core.json         | 13 +++++++++----
+>>  include/block/dirty-bitmap.h |  2 ++
+>>  block/dirty-bitmap.c         | 19 +++++++++++++++++++
+>>  3 files changed, 30 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 6e543594b3..e639ef6d1c 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -467,15 +467,20 @@
+>>  #        and cannot be modified via QMP or used by another operation.
+>>  #        Replaces `locked` and `frozen` statuses. (since 4.0)
+>>  #
+>> -# @persistent: true if the bitmap will eventually be flushed to persistent
+>> -#              storage (since 4.0)
+>> +# @persistent: true if the bitmap was stored on disk, is scheduled to be stored
+>> +#              on disk, or both. (since 4.0)
+>> +#
+>> +# @inconsistent: true if this is a persistent bitmap that was improperly
+>> +#                stored. Implies @persistent to be true; @recording and
+>> +#                @busy to be false. This bitmap cannot be used. To remove
+>> +#                it, use @block-dirty-bitmap-remove. (Since 4.0)
+>>  #
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  blockdev.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> 
-> diff --git a/blockdev.c b/blockdev.c
-> index c8255dda0b..a9a059c570 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2881,7 +2881,8 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
->          return;
->      }
->  
-> -    if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_BUSY, errp)) {
-> +    if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_BUSY | BDRV_BITMAP_RO,
-> +                                errp)) {
->          return;
->      }
->  
+> I know we waffled on word-smithing this, but this turned out nicely.
 > 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Yes, I think so too.
+
+> 
+>>  
+>> +/* Called with BQL taken. */
+>> +void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap)
+>> +{
+>> +    qemu_mutex_lock(bitmap->mutex);
+>> +    bitmap->inconsistent = true;
+>> +    bitmap->disabled = true;
+>> +    qemu_mutex_unlock(bitmap->mutex);
+> 
+> Worth an assert that persistent is true?  Either way,
+> 
+
+Won't hurt.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
