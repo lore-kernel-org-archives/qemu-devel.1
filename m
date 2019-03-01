@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46745)
+Received: from eggs.gnu.org ([209.51.188.92]:53785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzoS0-0000IV-Dr
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:08:09 -0500
+	(envelope-from <rth7680@gmail.com>) id 1gzocI-0000Ns-2B
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:18:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzoRz-00050K-0u
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:08:08 -0500
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-4-jsnow@redhat.com>
-	<66ebf636-43e1-f16a-bd05-e9a8a766d4bd@redhat.com>
-	<4ee8a7b7-d110-8253-2caa-c8f6ec105bba@redhat.com>
-	<4a58f266-dca6-8208-a046-85b718ed72fc@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d8bcc11c-5dea-7658-4a94-b0d697358e9e@redhat.com>
-Date: Fri, 1 Mar 2019 14:06:51 -0600
+	(envelope-from <rth7680@gmail.com>) id 1gzocF-0005qW-OR
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:18:45 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34568)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1gzocF-0005Aj-5H
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:18:43 -0500
+Received: by mail-pl1-x644.google.com with SMTP id d15so12008154plr.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:18:27 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20190301100310.22345-1-alex.bennee@linaro.org>
+	<20190301100310.22345-4-alex.bennee@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <4741bd0d-5d01-ae48-58c0-f0020c0722a5@twiddle.net>
+Date: Fri, 1 Mar 2019 12:18:22 -0800
 MIME-Version: 1.0
-In-Reply-To: <4a58f266-dca6-8208-a046-85b718ed72fc@redhat.com>
+In-Reply-To: <20190301100310.22345-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] block/dirty-bitmaps: add
- block_dirty_bitmap_check function
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] contrib: gitdm: add more individual
+ contributors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Fredrik Noring <noring@nocrew.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-On 3/1/19 2:03 PM, Eric Blake wrote:
-> On 3/1/19 1:57 PM, John Snow wrote:
+On 3/1/19 2:03 AM, Alex Bennée wrote:
+> I know Richard's is right because I asked him in the pub. I'm guessing
+> Fredrik's based on the fact I vaguely remember an Atari demo. The
+> others I attributed to academic institutions last time I posted so
+> have moved them to individuals as requested.
 > 
->>>> +    if ((flags & BDRV_BITMAP_BUSY) && bdrv_dirty_bitmap_busy(bitmap)) {
->>>> +        error_setg(errp, "Bitmap '%s' is currently in use by another"
->>>> +                   " operation and cannot be used", bitmap->name);
->>>
->>> Split before space,
->>>
-> 
->>>> +        error_setg(errp, "Bitmap '%s' is inconsistent and cannot be used",
->>>> +                   bitmap->name);
->>>> +        error_append_hint(errp, "Try block-dirty-bitmap-remove to delete "
->>>> +                          "this bitmap from disk");
->>>
->>> split after space.  Looks inconsistent within a single function (pardon
->>> the pun :)
->>>
->>
->> Ah... I've never known how to split strings. In fact, does anyone?
->> I'll address this either in staging or as a follow-up, as I assume
->> Vladimir will have some comments for me.
-> 
-> I don't care which way you go. git says we have both styles with enough
-> frequency that I wouldn't rule out the other style in HACKING.  But it
-> also says split after space seems more common, if you trust my regex:
-> 
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Fredrik Noring <noring@nocrew.org>
+> Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  contrib/gitdm/group-map-individuals | 5 +++++
+>  1 file changed, 5 insertions(+)
 
-Shoot, I was in the wrong directory when I counted. Trying again, this
-time on qemu.git:
+Acked-by: Richard Henderson <rth@twiddle.net>
 
-$ git grep '"[^"]* "$' | wc
-   1566   13019  135245
-$ git grep '^[[:space:]]*" [^"]*"' | wc
-   1714   11772  130881
 
-and now the numbers favor split before space.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+r~
