@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34544)
+Received: from eggs.gnu.org ([209.51.188.92]:36754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1gzY9O-0002O4-5C
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 21:43:50 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gzYQA-0006hl-7O
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 22:01:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1gzY9N-0000uv-CY
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 21:43:50 -0500
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri,  1 Mar 2019 13:43:17 +1100
-Message-Id: <20190301024317.22137-4-sjitindarsingh@gmail.com>
-In-Reply-To: <20190301024317.22137-1-sjitindarsingh@gmail.com>
-References: <20190301024317.22137-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH v3 4/4] target/ppc/spapr: Enable the
- large decrementer for pseries-4.0
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gzYHe-0005uK-LM
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 21:52:23 -0500
+Received: from mga17.intel.com ([192.55.52.151]:38393)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1gzYHe-0005tx-D6
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 21:52:22 -0500
+From: Wei Yang <richardw.yang@linux.intel.com>
+Date: Fri,  1 Mar 2019 10:51:40 +0800
+Message-Id: <20190301025140.4351-1-richardw.yang@linux.intel.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6] i386,
+ acpi: check acpi_memory_hotplug capacity in pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +25,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: david@gibson.dropbear.id.au, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, imammedo@redhat.com, eblake@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
 
-Enable the large decrementer by default for the pseries-4.0 machine type.
-It is disabled again by default_caps_with_cpu() for pre-POWER9 cpus
-since they don't support the large decrementer.
+Currently we do device realization like below:
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+   hotplug_handler_pre_plug()
+   dc->realize()
+   hotplug_handler_plug()
+
+Before we do device realization and plug, we should allocate necessary
+resources and check if memory-hotplug-support property is enabled.
+
+At the piix4 and ich9, the memory-hotplug-support property is checked at
+plug stage. This means that device has been realized and mapped into guest
+address space 'pc_dimm_plug()' by the time acpi plug handler is called,
+where it might fail and crash QEMU due to reaching g_assert_not_reached()
+(piix4) or error_abort (ich9).
+
+Fix it by checking if memory hotplug is enabled at pre_plug stage
+where we can gracefully abort hotplug request.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+CC: Igor Mammedov <imammedo@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+
 ---
- hw/ppc/spapr.c      | 3 ++-
- hw/ppc/spapr_caps.c | 5 +++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+v6:
+   * fix the check in piix4_device_pre_plug_cb
+v5:
+   * rebase on latest upstream
+   * remove a comment before hotplug_handler_pre_plug
+   * fix alignment for ich9_pm_device_pre_plug_cb
+v4:
+   * fix code alignment of piix4_device_pre_plug_cb
+v3:
+   * replace acpi_memory_hotplug with memory-hotplug-support in changelog
+   * fix code alignment of ich9_pm_device_pre_plug_cb
+   * print which device type memory-hotplug-support is disabled in
+     ich9_pm_device_pre_plug_cb and piix4_device_pre_plug_cb
+v2:
+   * (imammedo@redhat.com)
+     - Almost the whole third paragraph
+   * apply this change to ich9
+   * use hotplug_handler_pre_plug() instead of open-coding check
+---
+ hw/acpi/ich9.c         | 15 +++++++++++++--
+ hw/acpi/piix4.c        | 13 ++++++++++---
+ hw/i386/pc.c           |  2 ++
+ hw/isa/lpc_ich9.c      |  1 +
+ include/hw/acpi/ich9.h |  2 ++
+ 5 files changed, 28 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9942b270df..1df324379f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4318,7 +4318,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 16; /* 64kiB */
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
--    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_OFF;
-+    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq = &spapr_irq_xics;
-     smc->dr_phb_enabled = true;
-@@ -4394,6 +4394,7 @@ static void spapr_machine_3_1_class_options(MachineClass *mc)
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled = false;
-     smc->dr_phb_enabled = false;
-+    smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_OFF;
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index c5d8646abc..e53dfe1ee3 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -483,13 +483,24 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
+                              NULL);
  }
  
- DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 1e76685199..920224d0c2 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -536,6 +536,11 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
- 
-     caps = smc->default_caps;
- 
-+    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_3_00,
-+                               0, spapr->max_compat_pvr)) {
-+        caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_OFF;
-+    }
++void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                                Error **errp)
++{
++    ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
 +
-     if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_07,
-                                0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
++        !lpc->pm.acpi_memory_hotplug.is_enabled)
++        error_setg(errp,
++                   "memory hotplug is not enabled: %s.memory-hotplug-support "
++                   "is not set", object_get_typename(OBJECT(lpc)));
++}
++
+ void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                             Error **errp)
+ {
+     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+ 
+-    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
+-        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+             nvdimm_acpi_plug_cb(hotplug_dev, dev);
+         } else {
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index df8c0db909..068ee4e2a1 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -374,9 +374,17 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
+ static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+                                     DeviceState *dev, Error **errp)
+ {
++    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
++
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         acpi_pcihp_device_pre_plug_cb(hotplug_dev, dev, errp);
+-    } else if (!object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++        if(!s->acpi_memory_hotplug.is_enabled) {
++            error_setg(errp,
++                "memory hotplug is not enabled: %s.memory-hotplug-support "
++                "is not set", object_get_typename(OBJECT(s)));
++	}
++    } else if (
+                !object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+         error_setg(errp, "acpi: device pre plug request for not supported"
+                    " device type: %s", object_get_typename(OBJECT(dev)));
+@@ -388,8 +396,7 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+ {
+     PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+ 
+-    if (s->acpi_memory_hotplug.is_enabled &&
+-        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+             nvdimm_acpi_plug_cb(hotplug_dev, dev);
+         } else {
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 578f772e7c..64d9e756fa 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2083,6 +2083,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
+ 
++    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
++
+     if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+         return;
+diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+index e692b9fdc1..ac44aa53be 100644
+--- a/hw/isa/lpc_ich9.c
++++ b/hw/isa/lpc_ich9.c
+@@ -805,6 +805,7 @@ static void ich9_lpc_class_init(ObjectClass *klass, void *data)
+      * pc_q35_init()
+      */
+     dc->user_creatable = false;
++    hc->pre_plug = ich9_pm_device_pre_plug_cb;
+     hc->plug = ich9_pm_device_plug_cb;
+     hc->unplug_request = ich9_pm_device_unplug_request_cb;
+     hc->unplug = ich9_pm_device_unplug_cb;
+diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
+index 59aeb06393..41568d1837 100644
+--- a/include/hw/acpi/ich9.h
++++ b/include/hw/acpi/ich9.h
+@@ -74,6 +74,8 @@ extern const VMStateDescription vmstate_ich9_pm;
+ 
+ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp);
+ 
++void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                                Error **errp);
+ void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                             Error **errp);
+ void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
 -- 
-2.13.6
+2.19.1
