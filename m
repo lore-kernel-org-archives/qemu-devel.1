@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34709)
+Received: from eggs.gnu.org ([209.51.188.92]:34750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzndh-0002Ab-2k
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:10 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gzndj-0002CU-2o
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzndc-0008BP-Vv
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:06 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gzndg-0008EX-Vt
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:10 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri,  1 Mar 2019 14:15:39 -0500
-Message-Id: <20190301191545.8728-2-jsnow@redhat.com>
+Date: Fri,  1 Mar 2019 14:15:40 -0500
+Message-Id: <20190301191545.8728-3-jsnow@redhat.com>
 In-Reply-To: <20190301191545.8728-1-jsnow@redhat.com>
 References: <20190301191545.8728-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/7] block/dirty-bitmaps: add inconsistent
- bit
+Subject: [Qemu-devel] [PATCH v3 2/7] block/dirty-bitmap: add inconsistent
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,116 +23,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Add an inconsistent bit to dirty-bitmaps that allows us to report a bitmap as
-persistent but potentially inconsistent, i.e. if we find bitmaps on a qcow2
-that have been marked as "in use".
+Even though the status field is deprecated, we still have to support
+it for a few more releases. Since this is a very new kind of bitmap
+state, it makes sense for it to have its own status field.
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- qapi/block-core.json         | 13 +++++++++----
- include/block/dirty-bitmap.h |  2 ++
- block/dirty-bitmap.c         | 19 +++++++++++++++++++
- 3 files changed, 30 insertions(+), 4 deletions(-)
+ qapi/block-core.json | 7 ++++++-
+ block/dirty-bitmap.c | 7 ++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 6e543594b3..e639ef6d1c 100644
+index e639ef6d1c..ae55cd0704 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -467,15 +467,20 @@
- #        and cannot be modified via QMP or used by another operation.
- #        Replaces `locked` and `frozen` statuses. (since 4.0)
+@@ -442,10 +442,15 @@
+ #          recording new writes. If the bitmap was @disabled, it is not
+ #          recording new writes. (Since 2.12)
  #
--# @persistent: true if the bitmap will eventually be flushed to persistent
--#              storage (since 4.0)
-+# @persistent: true if the bitmap was stored on disk, is scheduled to be stored
-+#              on disk, or both. (since 4.0)
++# @inconsistent: This is a persistent dirty bitmap that was marked in-use on
++#                disk, and is unusable by QEMU. It can only be deleted.
++#                Please rely on the inconsistent field in @BlockDirtyInfo
++#                instead, as the status field is deprecated. (Since 4.0)
 +#
-+# @inconsistent: true if this is a persistent bitmap that was improperly
-+#                stored. Implies @persistent to be true; @recording and
-+#                @busy to be false. This bitmap cannot be used. To remove
-+#                it, use @block-dirty-bitmap-remove. (Since 4.0)
- #
- # Since: 1.3
+ # Since: 2.4
  ##
- { 'struct': 'BlockDirtyInfo',
-   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
--           'recording': 'bool', 'busy': 'bool',
--           'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
-+           'recording': 'bool', 'busy': 'bool', 'status': 'DirtyBitmapStatus',
-+           'persistent': 'bool', '*inconsistent': 'bool' } }
+ { 'enum': 'DirtyBitmapStatus',
+-  'data': ['active', 'disabled', 'frozen', 'locked'] }
++  'data': ['active', 'disabled', 'frozen', 'locked', 'inconsistent'] }
  
  ##
- # @Qcow2BitmapInfoFlags:
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index ba8477b73f..bd1b6479df 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -68,6 +68,7 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
- void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
-                                        bool persistent);
-+void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy);
- void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
-                              HBitmap **backup, Error **errp);
-@@ -91,6 +92,7 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
- bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
- bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
-+bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_busy(BdrvDirtyBitmap *bitmap);
- bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
- BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+ # @BlockDirtyInfo:
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 980cae4fa3..9e8630e1ac 100644
+index 9e8630e1ac..71e0098396 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -46,6 +46,9 @@ struct BdrvDirtyBitmap {
-                                    and this bitmap must remain unchanged while
-                                    this flag is set. */
-     bool persistent;            /* bitmap must be saved to owner disk image */
-+    bool inconsistent;          /* bitmap is persistent, but inconsistent.
-+                                 * It cannot be used at all in any way, except
-+                                 * a QMP user can remove it. */
-     bool migration;             /* Bitmap is selected for migration, it should
-                                    not be stored on the next inactivation
-                                    (persistent flag doesn't matter until next
-@@ -464,6 +467,8 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
-         info->recording = bdrv_dirty_bitmap_recording(bm);
-         info->busy = bdrv_dirty_bitmap_busy(bm);
-         info->persistent = bm->persistent;
-+        info->has_inconsistent = bm->inconsistent;
-+        info->inconsistent = bm->inconsistent;
-         entry->value = info;
-         *plist = entry;
-         plist = &entry->next;
-@@ -711,6 +716,15 @@ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool persistent)
-     qemu_mutex_unlock(bitmap->mutex);
- }
- 
-+/* Called with BQL taken. */
-+void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap)
-+{
-+    qemu_mutex_lock(bitmap->mutex);
-+    bitmap->inconsistent = true;
-+    bitmap->disabled = true;
-+    qemu_mutex_unlock(bitmap->mutex);
-+}
-+
- /* Called with BQL taken. */
- void bdrv_dirty_bitmap_set_migration(BdrvDirtyBitmap *bitmap, bool migration)
+@@ -209,10 +209,15 @@ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
+  *               or it can be Disabled and not recording writes.
+  * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
+  *               in any way from the monitor.
++ * (5) Inconsistent: This is a persistent bitmap whose "in use" bit is set, and
++ *                   is unusable by QEMU. It can be deleted to remove it from
++ *                   the qcow2.
+  */
+ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
  {
-@@ -724,6 +738,11 @@ bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap)
-     return bitmap->persistent && !bitmap->migration;
- }
- 
-+bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap)
-+{
-+    return bitmap->inconsistent;
-+}
-+
- bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs)
- {
-     BdrvDirtyBitmap *bm;
+-    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
++    if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
++        return DIRTY_BITMAP_STATUS_INCONSISTENT;
++    } else if (bdrv_dirty_bitmap_has_successor(bitmap)) {
+         return DIRTY_BITMAP_STATUS_FROZEN;
+     } else if (bdrv_dirty_bitmap_busy(bitmap)) {
+         return DIRTY_BITMAP_STATUS_LOCKED;
 -- 
 2.17.2
