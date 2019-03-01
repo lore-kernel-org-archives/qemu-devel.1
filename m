@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38330)
+Received: from eggs.gnu.org ([209.51.188.92]:38694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzoI5-0004Cg-4U
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:57:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1gzoIM-0004YP-Tt
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:58:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzoI3-0000RP-Vl
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:57:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1gzoIL-0000tN-45
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:58:10 -0500
 References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-4-jsnow@redhat.com>
-	<66ebf636-43e1-f16a-bd05-e9a8a766d4bd@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4ee8a7b7-d110-8253-2caa-c8f6ec105bba@redhat.com>
-Date: Fri, 1 Mar 2019 14:57:19 -0500
+	<20190301191545.8728-7-jsnow@redhat.com>
+	<5d204716-dc54-70ac-8b67-266ce8f44e0e@redhat.com>
+	<ce11fd2d-0b28-9b67-2382-506f0bfd8754@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <15751e4f-6415-219f-036b-26a3515a72ce@redhat.com>
+Date: Fri, 1 Mar 2019 13:57:47 -0600
 MIME-Version: 1.0
-In-Reply-To: <66ebf636-43e1-f16a-bd05-e9a8a766d4bd@redhat.com>
+In-Reply-To: <ce11fd2d-0b28-9b67-2382-506f0bfd8754@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] block/dirty-bitmaps: add
- block_dirty_bitmap_check function
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/dirty-bitmaps: disallow busy
+ bitmaps as merge source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
 
+On 3/1/19 1:48 PM, John Snow wrote:
 
-
-On 3/1/19 2:36 PM, Eric Blake wrote:
-> On 3/1/19 1:15 PM, John Snow wrote:
->> Instead of checking against busy, inconsistent, or read only directly,
->> use a check function with permissions bits that let us streamline the
->> checks without reproducing them in many places.
->>
->> Included in this patch are permissions changes that simply add the
->> inconsistent check to existing permissions call spots, without
->> addressing existing bugs.
->>
->> In general, this means that busy+readonly checks become BDRV_BITMAP_DEFAULT,
->> which checks against all three conditions. busy-only checks become
->> BDRV_BITMAP_ALLOW_RO.
->>
->> Notably, remove allows inconsistent bitmaps, so it doesn't follow the pattern.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  include/block/dirty-bitmap.h   | 13 ++++++++-
->>  block/dirty-bitmap.c           | 38 +++++++++++++++++++-------
->>  blockdev.c                     | 49 +++++++---------------------------
->>  migration/block-dirty-bitmap.c | 12 +++------
->>  nbd/server.c                   |  3 +--
->>  5 files changed, 54 insertions(+), 61 deletions(-)
+>> I understand forbidding inconsistent sources (because if the source is
+>> potentially missing bits, then the merge destination will also be
+>> missing bits and thus be inconsistent), but why forbid busy?  If I've
+>> associated a bitmap with an NBD server (making it busy), it is still
+>> readable, and so I should still be able to merge its bits into another copy.
 >>
 > 
-> Diffstat proves its a win, even with the extra documentation for the new
-> function. Nice.
-> 
+> True, do you rely on this, though?
 
-It would have been even more obvious if I had added the individual
-"inconsistent" checks before conversion, so that it's even close to
-breaking even seems like a win.
+Not in my current libvirt code (as I create a temporary bitmap to hand
+to NBD, since it may be the merge of one or more disabled bitmaps in a
+differential backup case), so being tighter for now and relaxing later
+if we DO come up with a use is acceptable.
 
->> +int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t flags,
->> +                            Error **errp)
->> +{
->> +    if ((flags & BDRV_BITMAP_BUSY) && bdrv_dirty_bitmap_busy(bitmap)) {
->> +        error_setg(errp, "Bitmap '%s' is currently in use by another"
->> +                   " operation and cannot be used", bitmap->name);
 > 
-> Split before space,
+> I was working from a space of "busy" meant "actively in-use by an
+> operation, and COULD change" so I was forbidding it out of good hygiene.
 > 
->> +        return -1;
->> +    }
->> +
->> +    if ((flags & BDRV_BITMAP_RO) && bdrv_dirty_bitmap_readonly(bitmap)) {
->> +        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
->> +                   bitmap->name);
->> +        return -1;
->> +    }
->> +
->> +    if ((flags & BDRV_BITMAP_INCONSISTENT) &&
->> +        bdrv_dirty_bitmap_inconsistent(bitmap)) {
->> +        error_setg(errp, "Bitmap '%s' is inconsistent and cannot be used",
->> +                   bitmap->name);
->> +        error_append_hint(errp, "Try block-dirty-bitmap-remove to delete "
->> +                          "this bitmap from disk");
-> 
-> split after space.  Looks inconsistent within a single function (pardon
-> the pun :)
-> 
+> Clearly the ones in-use by NBD are actually static and unchanging, so
+> it's safer -- but that might not be true for push backups, where you
+> might not actually be getting what you think you are, because of the
+> bifurcated nature of those bitmaps.
 
-Ah... I've never known how to split strings. In fact, does anyone?
-I'll address this either in staging or as a follow-up, as I assume
-Vladimir will have some comments for me.
+Oh, good point, especially after you worked so hard to merge
+locked/frozen into a single status - you WILL miss the bits from the
+successor (unless we teach the merge algorithm to pull in the busy
+bitmap's bits AND all the bits of its successors - but that feels like a
+lot of work if we don't have a client needing it now).  Okay, with the
+extra justification mentioned in the commit message,
 
---js
-
-> That's minor,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
 > 
+> If this causes a problem for you in the short-term I will simply roll
+> this back, but it stands out to me.
+> 
+> (I can't stop myself from trying to protect the user from themselves.
+> It's clearly a recurring theme in my design and reviews.)
+> 
+>>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>>> index 769668ccdc..8403c9981d 100644
+>>> --- a/block/dirty-bitmap.c
+>>> +++ b/block/dirty-bitmap.c
+>>> @@ -825,6 +825,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>>>          goto out;
+>>>      }
+>>>  
+>>> +    if (bdrv_dirty_bitmap_check(src, BDRV_BITMAP_ALLOW_RO, errp)) {
+>>
+>> Thus, I think this should be BDRV_BITMAP_INCONSISTENT.
 
-Thanks!
+then I retract my complaint, and the code is acceptable for now.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
