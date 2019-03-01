@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46013)
+Received: from eggs.gnu.org ([209.51.188.92]:49308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzpyT-0001Dc-95
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:45:47 -0500
+	(envelope-from <palmer@sifive.com>) id 1gzq2g-0002gn-R2
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:50:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzpyR-0003vP-GL
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:45:45 -0500
-Resent-Message-Id: <E1gzpyR-0003vP-GL@eggs.gnu.org>
-Message-ID: <155147672241.24.6903915451886259119@6acff2cf482b>
-In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Mar 2019 13:45:23 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] s390: vfio-ccw dasd ipl support
+	(envelope-from <palmer@sifive.com>) id 1gzq2f-0001lR-5Z
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:50:06 -0500
+Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:37650)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gzq2e-0001fJ-2Q
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:50:04 -0500
+Received: by mail-pl1-x62f.google.com with SMTP id q3so12092741pll.4
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 13:50:02 -0800 (PST)
+Date: Fri,  1 Mar 2019 13:49:14 -0800
+Message-Id: <20190301214945.4353-4-palmer@sifive.com>
+In-Reply-To: <20190301214945.4353-1-palmer@sifive.com>
+References: <20190301214945.4353-1-palmer@sifive.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Subject: [Qemu-devel] [PULL 03/34] target/riscv: Convert RV32I load/store
+ insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +26,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxNDY2Nzc2LTI5MTIzLTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MTQ2
-Njc3Ni0yOTEyMy0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzE2XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
-dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
-aGV3LzE1NTE0NjY3NzYtMjkxMjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
-b20gLT4gcGF0Y2hldy8xNTUxNDY2Nzc2LTI5MTIzLTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
-aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzBhMWZhMzhjNCBz
-MzkwLWJpb3M6IGRhc2QtaXBsOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVy
-cm9yIGRhdGEKMjk4OWMzMTlmZCBzMzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwg
-ZGFzZCBkZXZpY2UKYjIwODVjNDA1ZSBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29k
-ZXMvc3RydWN0cyBuZWVkZWQgZm9yIGRhc2QtaXBsCmYzMjIyMjUzMjQgczM5MC1iaW9zOiBVc2Ug
-Y29udHJvbCB1bml0IHR5cGUgdG8gZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCmM2ZjAzYmM4NGYgczM5
-MC1iaW9zOiBSZWZhY3RvciB2aXJ0aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwo2
-NTg2NDU4NWMwIHMzOTAtYmlvczogY2lvIGVycm9yIGhhbmRsaW5nCjA5N2JjY2VjZDAgczM5MC1i
-aW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwpjOGI4
-NDgxZGUwIHMzOTAtYmlvczogcHRyMnUzMiBhbmQgdTMydG9wdHIKMmI3MTBiNWQ0MyBzMzkwLWJp
-b3M6IE1hcCBsb3cgY29yZSBtZW1vcnkKMTZkMTg4MmI1ZiBzMzkwLWJpb3M6IERlY291cGxlIGNo
-YW5uZWwgaS9vIGxvZ2ljIGZyb20gdmlydGlvCjdhMjhhMjU3M2UgczM5MC1iaW9zOiBDbGVhbiB1
-cCBjaW8uaApiMThhYjA4MmIwIHMzOTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ug
-b3V0IG9mIHZpcnRpbyBjb2RlIHBhdGgKNjdlNWU5OTJkNiBzMzkwLWJpb3M6IEV4dGVuZCBmaW5k
-X2RldigpIGZvciBub24tdmlydGlvIGRldmljZXMKNWYyMTVkYTRjZSBzMzkwLWJpb3M6IGRlY291
-cGxlIGNvbW1vbiBib290IGxvZ2ljIGZyb20gdmlydGlvCmI3NjczN2VlMTQgczM5MC1iaW9zOiBk
-ZWNvdXBsZSBjaW8gc2V0dXAgZnJvbSB2aXJ0aW8KZTJkNmI3NDk5YSBzMzkwIHZmaW8tY2N3OiBB
-ZGQgYm9vdGluZGV4IHByb3BlcnR5IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvMTYgQ2hlY2tpbmcgY29tbWl0IGUyZDZiNzQ5OWFmNCAoczM5MCB2ZmlvLWNjdzogQWRkIGJv
-b3RpbmRleCBwcm9wZXJ0eSBhbmQgSVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDU6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxODEgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE2IENo
-ZWNraW5nIGNvbW1pdCBiNzY3MzdlZTE0YjcgKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVw
-IGZyb20gdmlydGlvKQozLzE2IENoZWNraW5nIGNvbW1pdCA1ZjIxNWRhNGNlNzYgKHMzOTAtYmlv
-czogZGVjb3VwbGUgY29tbW9uIGJvb3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5z
-IHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNj
-dy9tYWluLmM6MTk6CitJcGxQYXJhbWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxp
-Z25lZF9fKFBBR0VfU0laRSkpKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMy8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNiBD
-aGVja2luZyBjb21taXQgNjdlNWU5OTJkNjI1IChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2Rldigp
-IGZvciBub24tdmlydGlvIGRldmljZXMpCjUvMTYgQ2hlY2tpbmcgY29tbWl0IGIxOGFiMDgyYjA4
-NCAoczM5MC1iaW9zOiBGYWN0b3IgZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNv
-ZGUgcGF0aCkKNi8xNiBDaGVja2luZyBjb21taXQgN2EyOGEyNTczZWJhIChzMzkwLWJpb3M6IENs
-ZWFuIHVwIGNpby5oKQo3LzE2IENoZWNraW5nIGNvbW1pdCAxNmQxODgyYjVmN2QgKHMzOTAtYmlv
-czogRGVjb3VwbGUgY2hhbm5lbCBpL28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzI4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgMTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KOC8xNiBDaGVja2luZyBjb21taXQgMmI3MTBiNWQ0MzZjIChzMzkwLWJpb3M6IE1hcCBsb3cg
-Y29yZSBtZW1vcnkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgv
-MTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS8xNiBDaGVja2luZyBjb21taXQgYzhiODQ4
-MWRlMGFjIChzMzkwLWJpb3M6IHB0cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-MTAvMTYgQ2hlY2tpbmcgY29tbWl0IDA5N2JjY2VjZDBlMSAoczM5MC1iaW9zOiBTdXBwb3J0IGZv
-ciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcykKMTEvMTYgQ2hlY2tpbmcgY29t
-bWl0IDY1ODY0NTg1YzA5NyAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEyLzE2IENo
-ZWNraW5nIGNvbW1pdCBjNmYwM2JjODRmY2IgKHMzOTAtYmlvczogUmVmYWN0b3IgdmlydGlvIHRv
-IHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4OgorICAgICAg
-ICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywgc2l6ZW9m
-KGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAgIHJ1bl9j
-Y3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0dXMpLCBm
-YWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDEyLzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE2IENoZWNraW5n
-IGNvbW1pdCBmMzIyMjI1MzI0OTAgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0eXBlIHRv
-IGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IGIyMDg1YzQwNWU4
-MyAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVlZGVkIGZv
-ciBkYXNkLWlwbCkKMTUvMTYgQ2hlY2tpbmcgY29tbWl0IDI5ODljMzE5ZmQyOCAoczM5MC1iaW9z
-OiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMyNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDQ0NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoxNi8xNiBDaGVja2luZyBjb21taXQgMzBhMWZhMzhjNDJlIChzMzkwLWJpb3M6IGRhc2QtaXBs
-OiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVycm9yIGRhdGEpCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTE0NjY3NzYtMjkx
-MjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5jb20vdGVzdGluZy5jaGVja3Bh
-dGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ target/riscv/insn32.decode              | 10 ++++++
+ target/riscv/insn_trans/trans_rvi.inc.c | 48 +++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
+
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 81f56c16b45f..076de873c4f1 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -23,6 +23,7 @@
+ 
+ # immediates:
+ %imm_i    20:s12
++%imm_s    25:s7 7:5
+ %imm_b    31:s1 7:1 25:6 8:4     !function=ex_shift_1
+ %imm_j    31:s1 12:8 20:1 21:10  !function=ex_shift_1
+ %imm_u    12:s20                 !function=ex_shift_12
+@@ -33,6 +34,7 @@
+ # Formats 32:
+ @i       ............    ..... ... ..... .......         imm=%imm_i     %rs1 %rd
+ @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
++@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
+ @u       ....................      ..... .......         imm=%imm_u          %rd
+ @j       ....................      ..... .......         imm=%imm_j          %rd
+ 
+@@ -47,3 +49,11 @@ blt      ....... .....    ..... 100 ..... 1100011 @b
+ bge      ....... .....    ..... 101 ..... 1100011 @b
+ bltu     ....... .....    ..... 110 ..... 1100011 @b
+ bgeu     ....... .....    ..... 111 ..... 1100011 @b
++lb       ............     ..... 000 ..... 0000011 @i
++lh       ............     ..... 001 ..... 0000011 @i
++lw       ............     ..... 010 ..... 0000011 @i
++lbu      ............     ..... 100 ..... 0000011 @i
++lhu      ............     ..... 101 ..... 0000011 @i
++sb       .......  .....   ..... 000 ..... 0100011 @s
++sh       .......  .....   ..... 001 ..... 0100011 @s
++sw       .......  .....   ..... 010 ..... 0100011 @s
+diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+index bcf20def50eb..d13b7b2b6d8f 100644
+--- a/target/riscv/insn_trans/trans_rvi.inc.c
++++ b/target/riscv/insn_trans/trans_rvi.inc.c
+@@ -82,3 +82,51 @@ static bool trans_bgeu(DisasContext *ctx, arg_bgeu *a)
+     gen_branch(ctx, OPC_RISC_BGEU, a->rs1, a->rs2, a->imm);
+     return true;
+ }
++
++static bool trans_lb(DisasContext *ctx, arg_lb *a)
++{
++    gen_load(ctx, OPC_RISC_LB, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_lh(DisasContext *ctx, arg_lh *a)
++{
++    gen_load(ctx, OPC_RISC_LH, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_lw(DisasContext *ctx, arg_lw *a)
++{
++    gen_load(ctx, OPC_RISC_LW, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_lbu(DisasContext *ctx, arg_lbu *a)
++{
++    gen_load(ctx, OPC_RISC_LBU, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_lhu(DisasContext *ctx, arg_lhu *a)
++{
++    gen_load(ctx, OPC_RISC_LHU, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_sb(DisasContext *ctx, arg_sb *a)
++{
++    gen_store(ctx, OPC_RISC_SB, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_sh(DisasContext *ctx, arg_sh *a)
++{
++    gen_store(ctx, OPC_RISC_SH, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_sw(DisasContext *ctx, arg_sw *a)
++{
++    gen_store(ctx, OPC_RISC_SW, a->rs1, a->rs2, a->imm);
++    return true;
++}
+-- 
+2.18.1
