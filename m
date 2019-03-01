@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59825)
+Received: from eggs.gnu.org ([209.51.188.92]:59846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gziVx-0002uG-Mw
+	(envelope-from <eric.auger@redhat.com>) id 1gziVy-0002w2-HR
 	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:47:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gziVr-0002ig-Ar
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:47:49 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:38255)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gziVq-0002ec-WA
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:47:43 -0500
-Received: by mail-qt1-f196.google.com with SMTP id s1so27744882qte.5
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 05:47:40 -0800 (PST)
-Date: Fri, 1 Mar 2019 08:47:36 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190301084619-mutt-send-email-mst@kernel.org>
-References: <1551407310-32413-1-git-send-email-guoheyi@huawei.com>
+	(envelope-from <eric.auger@redhat.com>) id 1gziVx-0002oy-Hc
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:47:50 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Fri,  1 Mar 2019 14:47:04 +0100
+Message-Id: <20190301134709.4695-6-eric.auger@redhat.com>
+In-Reply-To: <20190301134709.4695-1-eric.auger@redhat.com>
+References: <20190301134709.4695-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1551407310-32413-1-git-send-email-guoheyi@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/acpi: enable SHPC native hot plug
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 05/10] kvm: add kvm_arm_get_max_vm_ipa_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +21,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Heyi Guo <guoheyi@huawei.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Heyi Guo <heyi.guo@linaro.org>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-On Fri, Mar 01, 2019 at 10:28:30AM +0800, Heyi Guo wrote:
-> After the introduction of generic PCIe root port and PCIe-PCI bridge,
-> we will also have SHPC controller on ARM, so just enalbe SHPC native
-> hot plug.
-> 
-> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-> Signed-off-by: Heyi Guo <heyi.guo@linaro.org>
+Add the kvm_arm_get_max_vm_ipa_size() helper that returns the
+number of bits in the IPA address space supported by KVM.
 
+This capability needs to be known to create the VM with a
+specific IPA max size (kvm_type passed along KVM_CREATE_VM ioctl.
 
-So when OS enables SHPC, should we block ACPI hotplug events?
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
+---
+v10 -> v11:
+- added Igor's R-b
 
-> ---
->  hw/arm/virt-acpi-build.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 04b62c7..7849ec5 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -265,7 +265,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->          aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
->      aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
->      aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
-> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
-> +
-> +    /*
-> +     * Allow OS control for all 5 features:
-> +     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
-> +     */
-> +    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1F), NULL),
->                                  aml_name("CTRL")));
->  
->      ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
-> -- 
-> 1.8.3.1
+v6 -> v7:
+- s/kvm_arm_get_max_vm_phys_shift/kvm_arm_get_max_vm_ipa_size
+- reword the comment
+
+v4 -> v5:
+- return 40 if the host does not support the capability
+
+v3 -> v4:
+- s/s/ms in kvm_arm_get_max_vm_phys_shift function comment
+- check KVM_CAP_ARM_VM_IPA_SIZE extension
+
+v1 -> v2:
+- put this in ARM specific code
+---
+ target/arm/kvm.c     | 10 ++++++++++
+ target/arm/kvm_arm.h | 13 +++++++++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index e00ccf9c98..79a79f0190 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -18,6 +18,7 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/kvm_int.h"
+ #include "kvm_arm.h"
+ #include "cpu.h"
+ #include "trace.h"
+@@ -162,6 +163,15 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+     env->features =3D arm_host_cpu_features.features;
+ }
+=20
++int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
++{
++    KVMState *s =3D KVM_STATE(ms->accelerator);
++    int ret;
++
++    ret =3D kvm_check_extension(s, KVM_CAP_ARM_VM_IPA_SIZE);
++    return ret > 0 ? ret : 40;
++}
++
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+     /* For ARM interrupt delivery is always asynchronous,
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 6393455b1d..2a07333c61 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -207,6 +207,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeature=
+s *ahcf);
+  */
+ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+=20
++/**
++ * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
++ * IPA address space supported by KVM
++ *
++ * @ms: Machine state handle
++ */
++int kvm_arm_get_max_vm_ipa_size(MachineState *ms);
++
+ /**
+  * kvm_arm_sync_mpstate_to_kvm
+  * @cpu: ARMCPU
+@@ -239,6 +247,11 @@ static inline void kvm_arm_set_cpu_features_from_hos=
+t(ARMCPU *cpu)
+     cpu->host_cpu_probe_failed =3D true;
+ }
+=20
++static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
++{
++    return -ENOENT;
++}
++
+ static inline int kvm_arm_vgic_probe(void)
+ {
+     return 0;
+--=20
+2.20.1
