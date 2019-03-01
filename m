@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50816)
+Received: from eggs.gnu.org ([209.51.188.92]:50846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzkN6-0004sY-AL
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:46:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1gzkNE-0004sk-Cm
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:46:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzkIs-0007cp-IC
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:42:27 -0500
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri,  1 Mar 2019 16:42:15 +0100
-Message-Id: <1551454936-205218-2-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
-References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] numa: deprecate 'mem' parameter of '-numa
- node' option
+	(envelope-from <armbru@redhat.com>) id 1gzkHU-0005uZ-M2
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:41:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:6377)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gzkHR-0005pK-TR
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:40:58 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri,  1 Mar 2019 16:40:50 +0100
+Message-Id: <20190301154051.23317-7-armbru@redhat.com>
+In-Reply-To: <20190301154051.23317-1-armbru@redhat.com>
+References: <20190301154051.23317-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 6/7] tests/qapi-schema: Cover forward reference
+ to sub-module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,65 +25,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, libvir-list@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-arm@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, eblake@redhat.com, quintela@redhat.com
 
-The parameter allows to configure fake NUMA topology where guest
-VM simulates NUMA topology but not actually getting a performance
-benefits from it. The same or better results could be achieved
-using 'memdev' parameter. In light of that any VM that uses NUMA
-to get its benefits should use 'memdev' and to allow transition
-initial RAM to device based model, deprecate 'mem' parameter as
-its ad-hoc partitioning of initial RAM MemoryRegion can't be
-translated to memdev based backend transparently to users and in
-compatible manner (migration wise).
+The forward reference from the main module to the sub-module works
+fine, except for an issue visible in qapi-schema-test.out: the array
+type wrapped around the forward reference ends up in the main module,
+not the sub-module.  The next commit will explain why that's bad, and
+fix it.
 
-That will also allow to clean up a bit our numa code, leaving only
-'memdev' impl. in place and several boards that use node_mem
-to generate FDT/ACPI description from it.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- numa.c               |  2 ++
- qemu-deprecated.texi | 14 ++++++++++++++
- 2 files changed, 16 insertions(+)
+ tests/qapi-schema/qapi-schema-test.json | 3 ++-
+ tests/qapi-schema/qapi-schema-test.out  | 5 +++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/numa.c b/numa.c
-index 3875e1e..2205773 100644
---- a/numa.c
-+++ b/numa.c
-@@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
+index 908f718027..0952c68734 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -128,7 +128,8 @@
+             'boolean': ['bool'],
+             'string': ['str'],
+             'sizes': ['size'],
+-            'any': ['any'] } }
++            'any': ['any'],
++            'user': ['Status'] } } # intentional forward ref. to sub-module
  
-     if (node->has_mem) {
-         numa_info[nodenr].node_mem = node->mem;
-+        warn_report("Parameter -numa node,mem is deprecated,"
-+                    " use -numa node,memdev instead");
-     }
-     if (node->has_memdev) {
-         Object *o;
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 45c5795..73f99d4 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -60,6 +60,20 @@ Support for invalid topologies will be removed, the user must ensure
- topologies described with -smp include all possible cpus, i.e.
-   @math{@var{sockets} * @var{cores} * @var{threads} = @var{maxcpus}}.
- 
-+@subsection -numa node,mem=@var{size} (since 4.0)
-+
-+The parameter @option{mem} of @option{-numa node} is used to assign a part of
-+guest RAM to a NUMA node. But when using it, it's impossible to manage specified
-+size on the host side (like bind it to a host node, setting bind policy, ...),
-+so guest end-ups with the fake NUMA configuration with suboptiomal performance.
-+However since 2014 there is an alternative way to assign RAM to a NUMA node
-+using parameter @option{memdev}, which does the same as @option{mem} and has
-+an ability to actualy manage node RAM on the host side. Use parameter
-+@option{memdev} with @var{memory-backend-ram} backend as an replacement for
-+parameter @option{mem} to achieve the same fake NUMA effect or a properly
-+configured @var{memory-backend-file} backend to actually benefit from NUMA
-+configuration.
-+
- @section QEMU Machine Protocol (QMP) commands
- 
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+ # for testing sub-modules
+ { 'include': 'include/sub-module.json' }
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
+index cecf270ec3..38c1de70d8 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -144,6 +144,9 @@ object q_obj_sizeList-wrapper
+     member data: sizeList optional=False
+ object q_obj_anyList-wrapper
+     member data: anyList optional=False
++array StatusList Status
++object q_obj_StatusList-wrapper
++    member data: StatusList optional=False
+ enum UserDefListUnionKind
+     member integer
+     member s8
+@@ -159,6 +162,7 @@ enum UserDefListUnionKind
+     member string
+     member sizes
+     member any
++    member user
+ object UserDefListUnion
+     member type: UserDefListUnionKind optional=False
+     tag type
+@@ -176,6 +180,7 @@ object UserDefListUnion
+     case string: q_obj_strList-wrapper
+     case sizes: q_obj_sizeList-wrapper
+     case any: q_obj_anyList-wrapper
++    case user: q_obj_StatusList-wrapper
+ include include/sub-module.json
+ module include/sub-module.json
+ include sub-sub-module.json
 -- 
-2.7.4
+2.17.2
