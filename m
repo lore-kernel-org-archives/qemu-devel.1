@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39813)
+Received: from eggs.gnu.org ([209.51.188.92]:39807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzgkN-0002oa-P7
+	(envelope-from <david@redhat.com>) id 1gzgkN-0002oY-P5
 	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzgkL-0006K6-Cc
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:34 -0500
+	(envelope-from <david@redhat.com>) id 1gzgkJ-0006Hs-QZ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:33 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Fri,  1 Mar 2019 12:53:48 +0100
-Message-Id: <20190301115413.27153-8-david@redhat.com>
+Date: Fri,  1 Mar 2019 12:53:47 +0100
+Message-Id: <20190301115413.27153-7-david@redhat.com>
 In-Reply-To: <20190301115413.27153-1-david@redhat.com>
 References: <20190301115413.27153-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 07/32] s390x/tcg: Implement VECTOR LOAD
+Subject: [Qemu-devel] [PATCH v2 06/32] s390x/tcg: Implement VECTOR GENERATE
+ MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,69 +23,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-When loading from memory, load both elements into temps first before
-modifying the target vector
+Add gen_gvec_dupi() for handling duplication of immediates, so it can
+be reused later.
 
-Loading with strange alingment from the end of the address space will
-not properly wrap, we can ignore that for now.
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      |  3 +++
- target/s390x/translate_vx.inc.c | 24 ++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 47 +++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index c8cd5dfa24..f129e51d41 100644
+index d3f66c858f..c8cd5dfa24 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -981,6 +981,9 @@
+@@ -979,6 +979,8 @@
+     E(0xe712, VGEG,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_64, IF_VEC)
+ /* VECTOR GENERATE BYTE MASK */
      F(0xe744, VGBM,    VRI_a, V,   0, 0, 0, 0, vgbm, 0, IF_VEC)
- /* VECTOR GENERATE MASK */
-     F(0xe746, VGM,     VRI_b, V,   0, 0, 0, 0, vgm, 0, IF_VEC)
-+/* VECTOR LOAD */
-+    F(0xe706, VL,      VRX,   V,   la2, 0, 0, 0, vl, 0, IF_VEC)
-+    F(0xe756, VLR,     VRR_a, V,   0, 0, 0, 0, vlr, 0, IF_VEC)
++/* VECTOR GENERATE MASK */
++    F(0xe746, VGM,     VRI_b, V,   0, 0, 0, 0, vgm, 0, IF_VEC)
  
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index 28edd9b0c4..9063784a76 100644
+index 395c0ebcc2..28edd9b0c4 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -113,6 +113,9 @@ static void write_vec_element_i64(TCGv_i64 src, int reg, uint8_t enr,
-     }
- }
+@@ -44,6 +44,7 @@
  
-+#define gen_gvec_mov(v1, v2) \
-+    tcg_gen_gvec_mov(0, vec_full_reg_offset(v1), vec_full_reg_offset(v2), 16, \
-+                     16)
+ #define NUM_VEC_ELEMENT_BYTES(es) (1 << (es))
+ #define NUM_VEC_ELEMENTS(es) (16 / NUM_VEC_ELEMENT_BYTES(es))
++#define NUM_VEC_ELEMENT_BITS(es) (NUM_VEC_ELEMENT_BYTES(es) * BITS_PER_BYTE)
+ 
+ #define ES_8    MO_8
+ #define ES_16   MO_16
+@@ -115,6 +116,26 @@ static void write_vec_element_i64(TCGv_i64 src, int reg, uint8_t enr,
  #define gen_gvec_dup64i(v1, c) \
      tcg_gen_gvec_dup64i(vec_full_reg_offset(v1), 16, 16, c)
  
-@@ -219,3 +222,24 @@ static DisasJumpType op_vgm(DisasContext *s, DisasOps *o)
-     gen_gvec_dupi(es, get_field(s->fields, v1), mask);
++static void gen_gvec_dupi(uint8_t es, uint8_t reg, uint64_t c)
++{
++    switch (es) {
++    case ES_8:
++        tcg_gen_gvec_dup8i(vec_full_reg_offset(reg), 16, 16, c);
++        break;
++    case ES_16:
++        tcg_gen_gvec_dup16i(vec_full_reg_offset(reg), 16, 16, c);
++        break;
++    case ES_32:
++        tcg_gen_gvec_dup32i(vec_full_reg_offset(reg), 16, 16, c);
++        break;
++    case ES_64:
++        gen_gvec_dup64i(reg, c);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
++
+ static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
+ {
+     const uint8_t es = s->insn->data;
+@@ -172,3 +193,29 @@ static DisasJumpType op_vgbm(DisasContext *s, DisasOps *o)
+     }
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vl(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vgm(DisasContext *s, DisasOps *o)
 +{
-+    TCGv_i64 t0 = tcg_temp_new_i64();
-+    TCGv_i64 t1 = tcg_temp_new_i64();
++    const uint8_t es = get_field(s->fields, m4);
++    const uint8_t bits = NUM_VEC_ELEMENT_BITS(es);
++    const uint8_t i2 = get_field(s->fields, i2) & (bits - 1);
++    const uint8_t i3 = get_field(s->fields, i3) & (bits - 1);
++    uint64_t mask = 0;
++    int i;
 +
-+    tcg_gen_qemu_ld_i64(t0, o->addr1, get_mem_index(s), MO_TEQ);
-+    gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
-+    tcg_gen_qemu_ld_i64(t1, o->addr1, get_mem_index(s), MO_TEQ);
-+    write_vec_element_i64(t0, get_field(s->fields, v1), 0, ES_64);
-+    write_vec_element_i64(t1, get_field(s->fields, v1), 1, ES_64);
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+    return DISAS_NEXT;
-+}
++    if (es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
 +
-+static DisasJumpType op_vlr(DisasContext *s, DisasOps *o)
-+{
-+    gen_gvec_mov(get_field(s->fields, v1), get_field(s->fields, v2));
++    /* generate the mask - take care of wrapping */
++    for (i = i2; ; i = (i + 1) % bits) {
++        mask |= 1ull << (bits - i - 1);
++        if (i == i3) {
++            break;
++        }
++    }
++
++    gen_gvec_dupi(es, get_field(s->fields, v1), mask);
 +    return DISAS_NEXT;
 +}
 -- 
