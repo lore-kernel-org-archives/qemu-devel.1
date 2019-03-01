@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44646)
+Received: from eggs.gnu.org ([209.51.188.92]:44660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzoPL-0004HR-S5
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:25 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gzoPM-0004Ic-Dn
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzoPH-0001mG-T4
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:21 -0500
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:41668)
+	(envelope-from <richard.henderson@linaro.org>) id 1gzoPJ-0001nm-TP
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:23 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:40799)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzoPG-0001g0-CA
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:19 -0500
-Received: by mail-pl1-x62a.google.com with SMTP id y5so11968509plk.8
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:05:12 -0800 (PST)
+	id 1gzoPH-0001iJ-Pe
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:20 -0500
+Received: by mail-pg1-x542.google.com with SMTP id u9so11929339pgo.7
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:05:17 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Mar 2019 12:04:56 -0800
-Message-Id: <20190301200501.16533-6-richard.henderson@linaro.org>
+Date: Fri,  1 Mar 2019 12:04:59 -0800
+Message-Id: <20190301200501.16533-9-richard.henderson@linaro.org>
 In-Reply-To: <20190301200501.16533-1-richard.henderson@linaro.org>
 References: <20190301200501.16533-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 05/10] target/arm: Add set/clear_pstate_bits,
- share gen_ss_advance
+Subject: [Qemu-devel] [PATCH v3 08/10] target/arm: Implement ARMv8.5-CondM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,138 +29,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-We do not need an out-of-line helper for manipulating bits in pstate.
-While changing things, share the implementation of gen_ss_advance.
-
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3: Assert no manual change to CACHED_PSTATE_BITS,
-    merged in from a previously separate patch.
+v2: Update ID_AA64ISAR0.TS.
 ---
- target/arm/helper.h        |  2 --
- target/arm/translate.h     | 34 ++++++++++++++++++++++++++++++++++
- target/arm/op_helper.c     |  5 -----
- target/arm/translate-a64.c | 11 -----------
- target/arm/translate.c     | 11 -----------
- 5 files changed, 34 insertions(+), 29 deletions(-)
+ target/arm/cpu.h           |  5 ++++
+ target/arm/cpu64.c         |  2 +-
+ target/arm/translate-a64.c | 58 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 64 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 6f0f386926..583adba9b0 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -77,8 +77,6 @@ DEF_HELPER_2(get_cp_reg, i32, env, ptr)
- DEF_HELPER_3(set_cp_reg64, void, env, ptr, i64)
- DEF_HELPER_2(get_cp_reg64, i64, env, ptr)
- 
--DEF_HELPER_1(clear_pstate_ss, void, env)
--
- DEF_HELPER_2(get_r13_banked, i32, env, i32)
- DEF_HELPER_3(set_r13_banked, void, env, i32, i32)
- 
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index f25fe75685..912cc2a4a5 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -202,6 +202,40 @@ static inline TCGv_i32 get_ahp_flag(void)
-     return ret;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index fc2909ea6d..a7aaec63d7 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3436,6 +3436,11 @@ static inline bool isar_feature_aa64_condm_4(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, TS) != 0;
  }
  
-+/* Set bits within PSTATE.  */
-+static inline void set_pstate_bits(uint32_t bits)
++static inline bool isar_feature_aa64_condm_5(const ARMISARegisters *id)
 +{
-+    TCGv_i32 p = tcg_temp_new_i32();
-+
-+    tcg_debug_assert(!(bits & CACHED_PSTATE_BITS));
-+
-+    tcg_gen_ld_i32(p, cpu_env, offsetof(CPUARMState, pstate));
-+    tcg_gen_ori_i32(p, p, bits);
-+    tcg_gen_st_i32(p, cpu_env, offsetof(CPUARMState, pstate));
-+    tcg_temp_free_i32(p);
++    return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, TS) >= 2;
 +}
 +
-+/* Clear bits within PSTATE.  */
-+static inline void clear_pstate_bits(uint32_t bits)
-+{
-+    TCGv_i32 p = tcg_temp_new_i32();
-+
-+    tcg_debug_assert(!(bits & CACHED_PSTATE_BITS));
-+
-+    tcg_gen_ld_i32(p, cpu_env, offsetof(CPUARMState, pstate));
-+    tcg_gen_andi_i32(p, p, ~bits);
-+    tcg_gen_st_i32(p, cpu_env, offsetof(CPUARMState, pstate));
-+    tcg_temp_free_i32(p);
-+}
-+
-+/* If the singlestep state is Active-not-pending, advance to Active-pending. */
-+static inline void gen_ss_advance(DisasContext *s)
-+{
-+    if (s->ss_active) {
-+        s->pstate_ss = 0;
-+        clear_pstate_bits(PSTATE_SS);
-+    }
-+}
- 
- /* Vector operations shared between ARM and AArch64.  */
- extern const GVecGen3 bsl_op;
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index c5721a866d..8698b4dc83 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -861,11 +861,6 @@ uint64_t HELPER(get_cp_reg64)(CPUARMState *env, void *rip)
-     return res;
- }
- 
--void HELPER(clear_pstate_ss)(CPUARMState *env)
--{
--    env->pstate &= ~PSTATE_SS;
--}
--
- void HELPER(pre_hvc)(CPUARMState *env)
+ static inline bool isar_feature_aa64_jscvt(const ARMISARegisters *id)
  {
-     ARMCPU *cpu = arm_env_get_cpu(env);
+     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, JSCVT) != 0;
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index fcf79321e2..9fe0844a82 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -309,7 +309,7 @@ static void aarch64_max_initfn(Object *obj)
+         t = FIELD_DP64(t, ID_AA64ISAR0, SM4, 1);
+         t = FIELD_DP64(t, ID_AA64ISAR0, DP, 1);
+         t = FIELD_DP64(t, ID_AA64ISAR0, FHM, 1);
+-        t = FIELD_DP64(t, ID_AA64ISAR0, TS, 1);
++        t = FIELD_DP64(t, ID_AA64ISAR0, TS, 2); /* v8.5-CondM */
+         cpu->isar.id_aa64isar0 = t;
+ 
+         t = cpu->isar.id_aa64isar1;
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 1e49d33365..eaeb43577d 100644
+index 49a09b58e3..c2b9e800c8 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -421,17 +421,6 @@ static void gen_exception_bkpt_insn(DisasContext *s, int offset,
-     s->base.is_jmp = DISAS_NORETURN;
+@@ -1646,6 +1646,48 @@ static void handle_sync(DisasContext *s, uint32_t insn,
+     }
  }
  
--static void gen_ss_advance(DisasContext *s)
--{
--    /* If the singlestep state is Active-not-pending, advance to
--     * Active-pending.
--     */
--    if (s->ss_active) {
--        s->pstate_ss = 0;
--        gen_helper_clear_pstate_ss(cpu_env);
--    }
--}
--
- static void gen_step_complete_exception(DisasContext *s)
- {
-     /* We just completed step of an insn. Move from Active-not-pending
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 61adefb328..57b1b20287 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -298,17 +298,6 @@ static void gen_exception(int excp, uint32_t syndrome, uint32_t target_el)
-     tcg_temp_free_i32(tcg_excp);
- }
++static void gen_xaflag(void)
++{
++    TCGv_i32 z = tcg_temp_new_i32();
++
++    tcg_gen_setcondi_i32(TCG_COND_EQ, z, cpu_ZF, 0);
++
++    /*
++     * (!C & !Z) << 31
++     * (!(C | Z)) << 31
++     * ~((C | Z) << 31)
++     * ~-(C | Z)
++     * (C | Z) - 1
++     */
++    tcg_gen_or_i32(cpu_NF, cpu_CF, z);
++    tcg_gen_subi_i32(cpu_NF, cpu_NF, 1);
++
++    /* !(Z & C) */
++    tcg_gen_and_i32(cpu_ZF, z, cpu_CF);
++    tcg_gen_xori_i32(cpu_ZF, cpu_ZF, 1);
++
++    /* (!C & Z) << 31 -> -(Z & ~C) */
++    tcg_gen_andc_i32(cpu_VF, z, cpu_CF);
++    tcg_gen_neg_i32(cpu_VF, cpu_VF);
++
++    /* C | Z */
++    tcg_gen_or_i32(cpu_CF, cpu_CF, z);
++
++    tcg_temp_free_i32(z);
++}
++
++static void gen_axflag(void)
++{
++    tcg_gen_sari_i32(cpu_VF, cpu_VF, 31);         /* V ? -1 : 0 */
++    tcg_gen_andc_i32(cpu_CF, cpu_CF, cpu_VF);     /* C & !V */
++
++    /* !(Z | V) -> !(!ZF | V) -> ZF & !V -> ZF & ~VF */
++    tcg_gen_andc_i32(cpu_ZF, cpu_ZF, cpu_VF);
++
++    tcg_gen_movi_i32(cpu_NF, 0);
++    tcg_gen_movi_i32(cpu_VF, 0);
++}
++
+ /* MSR (immediate) - move immediate to processor state field */
+ static void handle_msr_i(DisasContext *s, uint32_t insn,
+                          unsigned int op1, unsigned int op2, unsigned int crm)
+@@ -1665,6 +1707,22 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+         s->base.is_jmp = DISAS_NEXT;
+         break;
  
--static void gen_ss_advance(DisasContext *s)
--{
--    /* If the singlestep state is Active-not-pending, advance to
--     * Active-pending.
--     */
--    if (s->ss_active) {
--        s->pstate_ss = 0;
--        gen_helper_clear_pstate_ss(cpu_env);
--    }
--}
--
- static void gen_step_complete_exception(DisasContext *s)
- {
-     /* We just completed step of an insn. Move from Active-not-pending
++    case 0x01: /* XAFlag */
++        if (crm != 0 || !dc_isar_feature(aa64_condm_5, s)) {
++            goto do_unallocated;
++        }
++        gen_xaflag();
++        s->base.is_jmp = DISAS_NEXT;
++        break;
++
++    case 0x02: /* AXFlag */
++        if (crm != 0 || !dc_isar_feature(aa64_condm_5, s)) {
++            goto do_unallocated;
++        }
++        gen_axflag();
++        s->base.is_jmp = DISAS_NEXT;
++        break;
++
+     case 0x05: /* SPSel */
+         if (s->current_el == 0) {
+             goto do_unallocated;
 -- 
 2.17.2
