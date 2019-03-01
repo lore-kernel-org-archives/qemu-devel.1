@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33748)
+Received: from eggs.gnu.org ([209.51.188.92]:41125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzmp8-0005j0-80
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:23:55 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gzn52-00016F-PC
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:40:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzmgp-0003PX-12
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:15:22 -0500
-References: <20190301115413.27153-1-david@redhat.com>
-	<20190301115413.27153-28-david@redhat.com>
-	<bccdbc0a-1dd9-5675-557a-15e69058ef9d@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <811b50cd-5ec1-f65a-eebe-9991c01c82be@redhat.com>
-Date: Fri, 1 Mar 2019 19:15:07 +0100
+	(envelope-from <tcminyard@gmail.com>) id 1gzn4o-00084Z-Ug
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:40:20 -0500
+Sender: Corey Minyard <tcminyard@gmail.com>
+Date: Fri, 1 Mar 2019 12:39:45 -0600
+From: Corey Minyard <minyard@acm.org>
+Message-ID: <20190301183945.GC19921@minyard.net>
+Reply-To: minyard@acm.org
+References: <1551456970-463-1-git-send-email-thuth@redhat.com>
+	<74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bccdbc0a-1dd9-5675-557a-15e69058ef9d@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 27/32] s390x/tcg: Provide probe_write
- helper
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] tests: Remove (mostly) useless
+ architecture checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +26,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 01.03.19 18:54, Richard Henderson wrote:
-> On 3/1/19 3:54 AM, David Hildenbrand wrote:
->> Instead of checking e.g. the first access on every touched page, we should
->> check the actual access, otherwise we might get false positives when Low
->> Address Protection (LAP) is active. As probe_write() can only deal with
->> accesses to one page, we have to loop.
->>
->> Use i64 for the length, although not needed - easier to reuse
->> TCG temps we already have in the translation functions where this will
->> be used. Also allow it to be used from other helpers.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/helper.h     |  1 +
->>  target/s390x/internal.h   |  2 ++
->>  target/s390x/mem_helper.c | 21 +++++++++++++++++++++
->>  3 files changed, 24 insertions(+)
->>
->> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
->> index 577edb384f..e2710f4fb3 100644
->> --- a/target/s390x/helper.h
->> +++ b/target/s390x/helper.h
->> @@ -123,6 +123,7 @@ DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
->>  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
->>  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
->>  DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->> +DEF_HELPER_FLAGS_3(probe_write_access, TCG_CALL_NO_WG, void, env, i64, i64)
->>  
->>  /* === Vector Support Instructions === */
->>  DEF_HELPER_FLAGS_4(vll, TCG_CALL_NO_WG, void, env, ptr, i64, i64)
->> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
->> index 7baf0e2404..848d6c36d0 100644
->> --- a/target/s390x/internal.h
->> +++ b/target/s390x/internal.h
->> @@ -386,6 +386,8 @@ void ioinst_handle_sal(S390CPU *cpu, uint64_t reg1, uintptr_t ra);
->>  
->>  /* mem_helper.c */
->>  target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr);
->> +void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
->> +                        uintptr_t ra);
->>  
->>  
->>  /* mmu_helper.c */
->> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
->> index a506d9ef99..efd5256ebf 100644
->> --- a/target/s390x/mem_helper.c
->> +++ b/target/s390x/mem_helper.c
->> @@ -2623,3 +2623,24 @@ uint32_t HELPER(cu42)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
->>      return convert_unicode(env, r1, r2, m3, GETPC(),
->>                             decode_utf32, encode_utf16);
->>  }
->> +
->> +void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
->> +                        uintptr_t ra)
->> +{
->> +#ifndef CONFIG_USER_ONLY
->> +    /* test the actual access, not just any access to the page due to LAP */
->> +    while (len) {
->> +        uint64_t curlen = MIN(TARGET_PAGE_SIZE - (addr % TARGET_PAGE_SIZE),
->> +                              len);
+On Fri, Mar 01, 2019 at 12:57:19PM -0500, John Snow wrote:
 > 
-> pagelen = -(addr | TARGET_PAGE_MASK);
-> curlen = MIN(pagelen, len);
 > 
->> +
->> +        probe_write(env, addr, curlen, cpu_mmu_index(env, false), ra);
->> +        addr = wrap_address(env, addr + curlen);
->> +        len -= curlen;
->> +    }
->> +#endif
+> On 3/1/19 11:16 AM, Thomas Huth wrote:
+> > These checks at the beginning of some of the tests are mostly useless:
+> > We only run the tests on x86 anyway, and g_test_message() does not
+> > print anything unless you call g_test_init() first.
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  tests/fdc-test.c      | 7 -------
+> >  tests/ide-test.c      | 7 -------
+> >  tests/ipmi-bt-test.c  | 7 -------
+> >  tests/ipmi-kcs-test.c | 7 -------
+> >  4 files changed, 28 deletions(-)
+> > 
+> > diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+> > index 88f1abf..31cd329 100644
+> > --- a/tests/fdc-test.c
+> > +++ b/tests/fdc-test.c
+> > @@ -548,16 +548,9 @@ static void fuzz_registers(void)
+> >  
+> >  int main(int argc, char **argv)
+> >  {
+> > -    const char *arch = qtest_get_arch();
+> >      int fd;
+> >      int ret;
+> >  
+> > -    /* Check architecture */
+> > -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> > -        g_test_message("Skipping test for non-x86\n");
+> > -        return 0;
+> > -    }
+> > -
+> >      /* Create a temporary raw image */
+> >      fd = mkstemp(test_image);
+> >      g_assert(fd >= 0);
+> > diff --git a/tests/ide-test.c b/tests/ide-test.c
+> > index f0280e6..300d64e 100644
+> > --- a/tests/ide-test.c
+> > +++ b/tests/ide-test.c
+> > @@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
+> >  
+> >  int main(int argc, char **argv)
+> >  {
+> > -    const char *arch = qtest_get_arch();
+> >      int fd;
+> >      int ret;
+> >  
+> > -    /* Check architecture */
+> > -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> > -        g_test_message("Skipping test for non-x86\n");
+> > -        return 0;
+> > -    }
+> > -
+> >      /* Create temporary blkdebug instructions */
+> >      fd = mkstemp(debug_path);
+> >      g_assert(fd >= 0);
+> > diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
+> > index f4a81b5..fc4c83b 100644
+> > --- a/tests/ipmi-bt-test.c
+> > +++ b/tests/ipmi-bt-test.c
+> > @@ -400,15 +400,8 @@ static void open_socket(void)
+> >  
+> >  int main(int argc, char **argv)
+> >  {
+> > -    const char *arch = qtest_get_arch();
+> >      int ret;
+> >  
+> > -    /* Check architecture */
+> > -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> > -        g_test_message("Skipping test for non-x86\n");
+> > -        return 0;
+> > -    }
+> > -
+> >      open_socket();
+> >  
+> >      /* Run the tests */
+> > diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
+> > index 178ffc1..a2354c1 100644
+> > --- a/tests/ipmi-kcs-test.c
+> > +++ b/tests/ipmi-kcs-test.c
+> > @@ -263,16 +263,9 @@ static void test_enable_irq(void)
+> >  
+> >  int main(int argc, char **argv)
+> >  {
+> > -    const char *arch = qtest_get_arch();
+> >      char *cmdline;
+> >      int ret;
+> >  
+> > -    /* Check architecture */
+> > -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> > -        g_test_message("Skipping test for non-x86\n");
+> > -        return 0;
+> > -    }
+> > -
+> >      /* Run the tests */
+> >      g_test_init(&argc, &argv, NULL);
+> >  
+> > 
 > 
-> That's annoying.  I thought we defined probe_write for user-only as well.
-> 
-> The user-only version would look something like
-> 
->   uint64_t end = addr + len - 1;
-> 
->   if (!h2g_valid(addr) ||
->       !h2g_valid(end) ||
->       page_check_range(addr, len, PAGE_WRITE) < 0) {
->     // raise PGM_ADDRESSING
->   }
-> 
-> Ah, I see why -- there's no user-only equivalent of tlb_fill with which to
-> produce the exception in the failure case.
-> 
+> Hm, if you insist. I have no strong feelings... Do we plan to split
+> tests out by architecture eventually? Clearly x86 only tests don't
+> really need to each individually check the arch, but I'm not sure what
+> the vision is.
 
-So I guess I can just implement that manually as you suggested. Can
-later be factored out. Thanks!
+Hmm, I don't have strong feelings, either, but I assume that you
+would want to leave the door open for testing on arches besides
+x86.  The IPMI device is used by at least powerpc, and probably
+in some upcoming ARM64 systems.
 
+But in that case you would want to remove these checks, anyway, and
+find some other way to know if you want to run the test.  So...
 
--- 
+Acked-by: Corey Minyard <cminyard@mvista.com>
 
-Thanks,
-
-David / dhildenb
+> 
+> Either way, since I have no horse in the race:
+> 
+> Acked-by: John Snow <jsnow@redhat.com>
