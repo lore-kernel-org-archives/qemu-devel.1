@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34750)
+Received: from eggs.gnu.org ([209.51.188.92]:34751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzndj-0002CU-2o
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:12 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gzndj-0002CY-30
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzndg-0008EX-Vt
+	(envelope-from <jsnow@redhat.com>) id 1gzndh-0008F5-2N
 	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:10 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri,  1 Mar 2019 14:15:40 -0500
-Message-Id: <20190301191545.8728-3-jsnow@redhat.com>
+Date: Fri,  1 Mar 2019 14:15:42 -0500
+Message-Id: <20190301191545.8728-5-jsnow@redhat.com>
 In-Reply-To: <20190301191545.8728-1-jsnow@redhat.com>
 References: <20190301191545.8728-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/7] block/dirty-bitmap: add inconsistent
- status
+Subject: [Qemu-devel] [PATCH v3 4/7] block/dirty-bitmaps: prohibit readonly
+ bitmaps for backups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +23,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Even though the status field is deprecated, we still have to support
-it for a few more releases. Since this is a very new kind of bitmap
-state, it makes sense for it to have its own status field.
+drive and blockdev backup cannot use readonly bitmaps, because the
+sync=incremental mechanism actually edits the bitmaps on success.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+If you really want to do this operation, use a copied bitmap.
+
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- qapi/block-core.json | 7 ++++++-
- block/dirty-bitmap.c | 7 ++++++-
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ blockdev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e639ef6d1c..ae55cd0704 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -442,10 +442,15 @@
- #          recording new writes. If the bitmap was @disabled, it is not
- #          recording new writes. (Since 2.12)
- #
-+# @inconsistent: This is a persistent dirty bitmap that was marked in-use on
-+#                disk, and is unusable by QEMU. It can only be deleted.
-+#                Please rely on the inconsistent field in @BlockDirtyInfo
-+#                instead, as the status field is deprecated. (Since 4.0)
-+#
- # Since: 2.4
- ##
- { 'enum': 'DirtyBitmapStatus',
--  'data': ['active', 'disabled', 'frozen', 'locked'] }
-+  'data': ['active', 'disabled', 'frozen', 'locked', 'inconsistent'] }
- 
- ##
- # @BlockDirtyInfo:
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 9e8630e1ac..71e0098396 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -209,10 +209,15 @@ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
-  *               or it can be Disabled and not recording writes.
-  * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
-  *               in any way from the monitor.
-+ * (5) Inconsistent: This is a persistent bitmap whose "in use" bit is set, and
-+ *                   is unusable by QEMU. It can be deleted to remove it from
-+ *                   the qcow2.
-  */
- DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
- {
--    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
-+    if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
-+        return DIRTY_BITMAP_STATUS_INCONSISTENT;
-+    } else if (bdrv_dirty_bitmap_has_successor(bitmap)) {
-         return DIRTY_BITMAP_STATUS_FROZEN;
-     } else if (bdrv_dirty_bitmap_busy(bitmap)) {
-         return DIRTY_BITMAP_STATUS_LOCKED;
+diff --git a/blockdev.c b/blockdev.c
+index 5d74479ba7..c8255dda0b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3526,7 +3526,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+             bdrv_unref(target_bs);
+             goto out;
+         }
+-        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_ALLOW_RO, errp)) {
++        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
+             goto out;
+         }
+     }
+@@ -3636,7 +3636,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+             error_setg(errp, "Bitmap '%s' could not be found", backup->bitmap);
+             goto out;
+         }
+-        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_ALLOW_RO, errp)) {
++        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
+             goto out;
+         }
+     }
 -- 
 2.17.2
