@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45191)
+Received: from eggs.gnu.org ([209.51.188.92]:48570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gzZKJ-0000bG-6a
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 22:59:12 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gzZlA-0004a9-22
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:26:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gzZKG-0001fQ-VV
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 22:59:11 -0500
-Received: from mx1.didichuxing.com ([111.202.154.82]:18206
-	helo=bsf02.didichuxing.com) by eggs.gnu.org with smtp (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gzZKG-0001cd-At
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 22:59:08 -0500
-From: =?utf-8?B?6ams5piK6aqiKOa7tOa7tOS6kSk=?= <mahaocong@didiglobal.com>
-Date: Fri, 1 Mar 2019 03:58:58 +0000
-Message-ID: <4E960789-CEBE-4C72-BF79-60110E5B89F7@didichuxing.com>
-References: <20190214064312.44794-1-mahaocong_work@163.com>
-	<f335dd82-1944-d367-b845-29dcc01e2f3e@redhat.com>
-In-Reply-To: <f335dd82-1944-d367-b845-29dcc01e2f3e@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F0B5B1253EFCD742AEFE92FB571BF697@didichuxing.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND v4] drive-mirror: add incremental
- mode
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gzZl8-0001oN-Ra
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:26:56 -0500
+Message-ID: <1551414405.2210.18.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Fri, 01 Mar 2019 15:26:45 +1100
+In-Reply-To: <20190301031912.28809-2-sjitindarsingh@gmail.com>
+References: <20190301031912.28809-1-sjitindarsingh@gmail.com>
+	<20190301031912.28809-2-sjitindarsingh@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 2/2] target/ppc/spapr: Add
+ SPAPR_CAP_CCF_ASSIST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +24,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, John Snow <jsnow@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>
+To: qemu-ppc@nongnu.org
+Cc: david@gibson.dropbear.id.au, qemu-devel@nongnu.org, mpe@ellerman.id.au
 
-PiBDQy1pbmcgSm9obiBiZWNhdXNlIG9mIHRoZSBrZXl3b3JkICJpbmNyZW1lbnRhbCIuDQpPaw0K
-Pg0KPk9uIDE0LjAyLjE5IDA3OjQzLCBtYWhhb2Nvbmcgd3JvdGU6DQo+PiBGcm9tOiBtYWhhb2Nv
-bmcgPGFkZHJlc3NAaGlkZGVuPg0KPj4NCj4+IFRoaXMgcGF0Y2ggYWRkcyBwb3NzaWJpbGl0eSB0
-byBzdGFydCBtaXJyb3Jpbmcgd2l0aCB1c2VyLWNyZWF0ZWQtYml0bWFwLg0KPj4gT24gZnVsbCBt
-b2RlLCBtaXJyb3IgY3JlYXRlIGEgbm9uLW5hbWVkLWJpdG1hcCBieSBzY2FubmluZyB3aG9sZSBi
-bG9jay0NCj4+IGNoYWluLCBhbmQgb24gdG9wIG1vZGUsIG1pcnJvciBjcmVhdGUgYSBiaXRtYXAg
-Ynkgc2Nhbm5pbmcgdGhlIHRvcCBibG9jaw0KPj4gbGF5ZXIuIFNvIEkgdGhpbmsgSSBjYW4gY29w
-eSBhIHVzZXItY3JlYXRlZC1iaXRtYXAgYW5kIHVzZSBpdCBhcyB0aGUNCj4+IGluaXRpYWwgc3Rh
-dGUgb2YgdGhlIG1pcnJvciwgdGhlIHNhbWUgYXMgaW5jcmVtZW50YWwgbW9kZSBkcml2ZS1iYWNr
-dXAsDQo+PiBhbmQgSSBjYWxsIHRoaXMgbmV3IG1vZGUgYXMgaW5jcmVtZW50YWwgbW9kZSBkcml2
-ZS1taXJyb3IuDQo+Pg0KPj4gQSBwb3NzaWJsZSB1c2FnZSBzY2VuZSBvZiBpbmNyZW1lbnRhbCBt
-b2RlIG1pcnJvciBpcyBsaXZlIG1pZ3JhdGlvbi4NCj4+IEZvciBtYWludGFpbiB0aGUgYmxvY2sg
-ZGF0YSBhbmQgcmVjb3ZlciBhZnRlciBhIG1hbGZ1bmN0aW9uLCBzb21lb25lIG1heQ0KPj4gYmFj
-a3VwIGRhdGEgdG8gY2VwaCBvciBvdGhlciBkaXN0cmlidXRlZCBzdG9yYWdlLiBPbiBxZW11IGlu
-Y3JlbWVudGFsDQo+PiBiYWNrdXAsIHdlIG5lZWQgdG8gY3JlYXRlIGEgbmV3IGJpdG1hcCBhbmQg
-YXR0YWNoIHRvIGJsb2NrIGRldmljZSBiZWZvcmUNCj4+IHRoZSBmaXJzdCBiYWNrdXAgam9iLiBU
-aGVuIHRoZSBiaXRtYXAgcmVjb3JkcyB0aGUgY2hhbmdlIGFmdGVyIHRoZSBiYWNrdXANCj4+IGpv
-Yi4gSWYgd2Ugd2FudCB0byBtaWdyYXRpb24gdGhpcyB2bSwgd2UgY2FuIG1pZ3JhdGUgYmxvY2sg
-ZGF0YSBiZXR3ZWVuDQo+PiBzb3VyY2UgYW5kIGRlc3Rpb25hdGlvbiBieSB1c2luZyBkcml2ZS1t
-aXJyb3IgZGlyZWN0bHksIG9yIHVzZSBiYWNrdXAgZGF0YQ0KPj4gYW5kIGJhY2t1cC1iaXRtYXAg
-dG8gcmVkdWNlIHRoZSBkYXRhIHNob3VsZCBiZSBzeW5jaHJvbml6ZS4gVG8gZG8gdGhpcywNCj4+
-IHdlIHNob3VsZCBmaXJzdCBjcmVhdGUgYSBuZXcgaW1hZ2UgaW4gZGVzdGluYXRpb24gYW5kIHNl
-dCBiYWNraW5nIGZpbGUNCj4+IGFzIGJhY2t1cCBpbWFnZSwgdGhlbiBzZXQgYmFja3VwLWJpdG1h
-cCBhcyB0aGUgaW5pdGlhbCBzdGF0ZSBvZiBpbmNyZW1lbnRhbA0KPj4gbW9kZSBkcml2ZS1taXJy
-b3IsIGFuZCBzeW5jaHJvbml6ZSBkaXJ0eSBibG9jayBzdGFydGluZyB3aXRoIHRoZSBzdGF0ZSBz
-ZXQNCj4+IGJ5IHRoZSBsYXN0IGluY3JlbWVudGFsIGJhY2t1cCBqb2IuIFdoZW4gdGhlIG1pcnJv
-ciBjb21wbGV0ZSwgd2UgZ2V0IGFuDQo+PiBhY3RpdmUgbGF5ZXIgb24gZGVzdGluYXRpb24sIGFu
-ZCBpdHMgYmFja2luZyBmaWxlIGlzIGJhY2t1cCBpbWFnZSBvbiBjZXBoLg0KPj4gVGhlbiB3ZSBj
-YW4gZG8gbGl2ZSBjb3B5IGRhdGEgZnJvbSBiYWNraW5nIGZpbGVzIGludG8gb3ZlcmxheSBpbWFn
-ZXMgYnkNCj4+IHVzaW5nIGJsb2NrLXN0cmVhbSwgb3IgZG8gYmFja3VwIGNvbnRpbnVhbGx5Lg0K
-Pj4NCj4+IEluIHRoaXMgc2NlbmUsIEl0IHNlZW1zIHRoYXQgSWYgdGhlIGd1ZXN0IG9zIGRvZXNu
-J3Qgd3JpdGUgdG9vIG1hbnkgZGF0YQ0KPj4gYWZ0ZXIgdGhlIGxhc3QgYmFja3VwLCB0aGUgaW5j
-cmVtZW50YWwgbW9kZSBtYXkgdHJhbnNtaXQgbGVzcyBkYXRhIHRoYW4NCj4+IGZ1bGwgbW9kZSBv
-ciB0b3AgbW9kZS4gSG93ZXZlciwgaWYgdGhlIHdyaXRlIGRhdGEgaXMgdG9vIG1hbnksIHRoZXJl
-IGlzDQo+PiBubyBhZHZhbnRhZ2Ugb24gaW5jcmVtZW50YWwgbW9kZSBjb21wYXJlIHdpdGggb3Ro
-ZXIgbW9kZS4NCj4+DQo+PiBUaGlzIHNjZW5lIGNhbiBiZSBkZXNjcmliZWQgYXMgZm9sbG93aW5n
-IHN0ZXBzOg0KPj4gMS5jcmVhdGUgcmJkIGltYWdlIGluIGNlcGgsIGFuZCBtYXAgbmJkIGRldmlj
-ZSB3aXRoIHJiZCBpbWFnZS4NCj4+IDIuY3JlYXRlIGEgbmV3IGJpdG1hcCBhbmQgYXR0YWNoIHRv
-IGJsb2NrIGRldmljZS4NCj4+IDMuZG8gZnVsbCBtb2RlIGJhY2t1cCBvbiBuYmQgZGV2aWNlIGFu
-ZCB0aHVzIHN5bmMgaXQgdG8gdGhlIHJiZCBpbWFnZS4NCj4+IDQuc2V2ZXJsIHRpbWVzIGluY3Jl
-bWVudGFsIG1vZGUgYmFja3VwLg0KPj4gNS5jcmVhdGUgbmV3IGltYWdlIGluIGRlc3RpbmF0aW9u
-IGFuZCBzZXQgaXRzIGJhY2tpbmcgZmlsZSBhcyBiYWNrdXAgaW1hZ2UuDQo+PiA2LmRvIGxpdmUt
-bWlncmF0aW9uLCBhbmQgbWlncmF0ZSBibG9jayBkYXRhIGJ5IGluY3JlbWVudGFsIG1vZGUgZHJp
-dmUtDQo+PiBtaXJyb3Igd2l0aCBiaXRtYXAgY3JlYXRlZCBmcm9tIHN0ZXAgMi4NCj4+DQo+PiBT
-aWduZWQtb2ZmLWJ5OiBNYSBIYW9jb25nIDxhZGRyZXNzQGhpZGRlbj4NCj4+IC0tLQ0KPg0KPlNv
-IG9uZSBpbXBvcnRhbnQgcG9pbnQgYWJvdXQgaW5jcmVtZW50YWwgYmFja3VwcyBpcyB0aGF0IHlv
-dSBjYW4NCj5hY3R1YWxseSBkbyB0aGVtIGluY3JlbWVudGFsbHk6IFRoZSBiaXRtYXAgaXMgZWZm
-ZWN0aXZlbHkgY2xlYXJlZCBhdCB0aGUNCj5iZWdpbm5pbmcgb2YgdGhlIGJhY2t1cCBwcm9jZXNz
-IChhIHN1Y2Nlc3NvciBiaXRtYXAgaXMgaW5zdGFsbGVkIHRoYXQgaXMNCj5jbGVhcmVkIGFuZCBy
-ZWNlaXZlcyBhbGwgY2hhbmdlczsgYXQgdGhlIGVuZCBvZiB0aGUgYmFja3VwLCBpdCBlaXRoZXIN
-Cj5yZXBsYWNlcyB0aGUgb2xkIGJpdG1hcCAob24gc3VjY2Vzcykgb3IgaXMgbWVyZ2VkIGludG8g
-aXQgKG9uIGZhaWx1cmUpKS4NCj4gVGhlcmVmb3JlLCB5b3UgY2FuIGRvIHRoZSBuZXh0IGluY3Jl
-bWVudGFsIGJhY2t1cCBieSB1c2luZyB0aGUgc2FtZSBiaXRtYXAuDQo+DQo+SG93IHdvdWxkIHRo
-aXMgd29yayB3aXRoIG1pcnJvcmluZz8gIEluc3RlYWQgb2YgY2xlYXJpbmcgdGhlIGJpdG1hcCBh
-dA0KPnRoZSBzdGFydCBvZiB0aGUgcHJvY2VzcywgaXQnZCBuZWVkIHRvIGJlIGNsZWFyZWQgYXQg
-dGhlIGVuZCAoYmVjYXVzZSB3ZQ0KPnJlYWNoIHN5bmNocm9uaXphdGlvbiBiZXR3ZWVuIHNvdXJj
-ZSBhbmQgdGFyZ2V0IHRoZW4pLiAgQnV0IGhvdyB3b3VsZA0KPmVycm9yIGhhbmRsaW5nIHdvcms/
-DQo+DQo+SSBzdXBwb3NlIHRoZSBuYW1lZCBiaXRtYXAgd291bGQgbmVlZCB0byBiZSBjb3BpZWQg
-dG8gYWN0IGFzIHRoZSBkaXJ0eQ0KPmJpdG1hcCBmb3IgdGhlIG1pcnJvciBqb2IgKGF0IHRoZSBz
-dGFydCBvZiB0aGUgam9iKS4gIElmIGEgZmFpbHVyZQ0KPm9jY3VycywgdGhlIGNvcHkgaXMgc2lt
-cGx5IGRpc2NhcmRlZC4gIE9uIHN1Y2Nlc3MsIHRoZSBuYW1lZCBiaXRtYXAgaXMNCj5jbGVhcmVk
-IHdoZW4gdGhlIGpvYiBpcyBjb21wbGV0ZWQuICBIbSwgdGhhdCBzZWVtcyB0byBtYWtlIHNlbnNl
-LiAgRGlkIEkNCj5mb3JnZXQgYW55dGhpbmcsIEpvaG4/DQo+DQo+SW4gYW55IGNhc2UsIEkgZG9u
-J3QgdGhpbmsgdGhpcyBwYXRjaCBpbXBsZW1lbnRlZCBhbnl0aGluZyB0byB0aGlzDQo+cmVnYXJk
-Li4uPyAgU28gaXQgZG9lc24ndCByZWFsbHkgaW1wbGVtZW50IGluY3JlbWVudGFsIG1pcnJvcmlu
-Zy4NCj5Ib3dldmVyLCBJIHRoaW5rIGl0IHNob3VsZCwgaWYgcG9zc2libGUuDQo+DQo+TWF4DQoN
-CkkgdGhpbmsgeW91IGFyZSByaWdodCwgdGhlIGJpdG1hcCB3aWxsIGJlIGNsZWFyZWQgYXQgdGhl
-IGVuZCBvZiBtaXJyb3JpbmcsDQpUaGVyZWZvcmUsIEkgY2FuJ3QgdXNlIHRoZSBzYW1lIGJpdG1h
-cCB0byBkbyB0aGUgbmV4dCBpbmNyZW1lbnRhbCBtaXJyb3IsDQphcyB0aGUgaW5jcmVtZW50YWwg
-YmFja3VwIGRvZXMuIFNvLCBpdCBpcyBub3QgYSByZWFsIGluY3JlbWVudGFsIG1pcnJvci4NCg0K
-SW4gb3VyIHNjZW5lLCB0aGUgbWFpbiBwdXJwb3NlIGlzIHRvIGxldCBtaXJyb3Igam9iIHVzZSB0
-aGUgc2FtZSBiaXRtYXAgYXMNCmJhY2t1cCBqb2IuIEFzIGJpdG1hcCB1c2VkIGJ5IGJhY2t1cCBq
-b2IgdHJhY2tzIGRpcnR5IGRhdGEgc2luY2UgbGFzdCB0aW1lDQpiYWNrdXAgam9iIGhhcHBlbmVk
-LCB3aXRoIHRoaXMgcGF0Y2gsIGlmIG1pcnJvciBqb2IgdXNlcyB0aGUgYmFja3VwIGJpdG1hcCwN
-Cm1pcnJvcmVkIGRhdGEgaXMgbGVzcyB0aGFuIGJlZm9yZSwgYW5kIHRoZW4gdGltZSBzcGVuZCBi
-eSBtaXJyb3Igam9iIGlzDQpzaG9ydGVuZWQuIFRvIGdldCB0aGUgZnVsbCBkYXRhLCBhIHN0cmVh
-bSBqb2IgY2FuIHB1bGwgdGhlIGJhY2t1cCBkYXRhIGludG8NCnRoZSBtaXJyb3JlZCBkYXRhLiBJ
-ZiBtaXJyb3Igam9iIGlzIHVzZWQgaW4gbGl2ZSBtaWdyYXRpb24sIHdpdGggdGhpcyBwYXRjaCwN
-CnRpbWUgc3BlbmQgYnkgbWlncmF0aW9uIGlzIHNob3J0ZW4sIHRyYW5zZmVycmVkIGRhdGEgaXMg
-cmVkdWNlZCwgcmVzb3VyY2VzDQp1c2VkIGJ5IHFlbXUgcHJvY2VzcyBvbiBzb3VyY2UgaG9zdCBj
-YW4gYmUgcmVsZWFzZWQgZWFybGllci4NCg0KU28sIHRoaXMgcGF0Y2ggaXMgYW4gb3B0aW1pemF0
-aW9uIHRvIG91ciBsaXZlIG1pZ3JhdGlvbiwgYWx0aG91Z2ggaXQgaXMgbm90DQphcHByb3ByaWF0
-ZSB0byBjYWxsIGl0IGFuIGluY3JlbWVudGFsIG1vZGUgbWlycm9yaW5nLg0KDQpUaGFua3MNCg0K
-TWEgaGFvY29uZyANCg0K
+On Fri, 2019-03-01 at 14:19 +1100, Suraj Jitindar Singh wrote:
+> Introduce a new spapr_cap SPAPR_CAP_CCF_ASSIST to be used to indicate
+> the requirement for a hw-assisted version of the count cache flush
+> workaround.
+> 
+> The count cache flush workaround is a software workaround which can
+> be
+> used to flush the count cache on context switch. Some revisions of
+> hardware may have a hardware accelerated flush, in which case the
+> software flush can be shortened. This cap is used to set the
+> availability of such hardware acceleration for the count cache flush
+> routine.
+> 
+> The availability of such hardware acceleration is indicated by the
+> H_CPU_CHAR_BCCTR_FLUSH_ASSIST flag being set in the characteristics
+> returned from the KVM_PPC_GET_CPU_CHAR ioctl.
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
+>  hw/ppc/spapr.c         |  2 ++
+>  hw/ppc/spapr_caps.c    | 25 +++++++++++++++++++++++++
+>  hw/ppc/spapr_hcall.c   |  3 +++
+>  include/hw/ppc/spapr.h |  5 ++++-
+>  target/ppc/kvm.c       | 14 ++++++++++++++
+>  target/ppc/kvm_ppc.h   |  6 ++++++
+>  6 files changed, 54 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1df324379f..708e18dcdf 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2086,6 +2086,7 @@ static const VMStateDescription vmstate_spapr =
+> {
+>          &vmstate_spapr_cap_nested_kvm_hv,
+>          &vmstate_spapr_dtb,
+>          &vmstate_spapr_cap_large_decr,
+> +        &vmstate_spapr_cap_ccf_assist,
+>          NULL
+>      }
+>  };
+> @@ -4319,6 +4320,7 @@ static void
+> spapr_machine_class_init(ObjectClass *oc, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 16; /* 64kiB
+> */
+>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =
+> SPAPR_CAP_ON;
+> +    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
+>      spapr_caps_add_properties(smc, &error_abort);
+>      smc->irq = &spapr_irq_xics;
+>      smc->dr_phb_enabled = true;
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 74a48a423a..f03f2f64e7 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -436,6 +436,21 @@ static void
+> cap_large_decr_cpu_apply(sPAPRMachineState *spapr,
+>      ppc_store_lpcr(cpu, lpcr);
+>  }
+>  
+> +static void cap_ccf_assist_apply(sPAPRMachineState *spapr, uint8_t
+> val,
+> +                                 Error **errp)
+> +{
+> +    uint8_t kvm_val = kvmppc_get_cap_count_cache_flush_assist();
+> +
+> +    if (tcg_enabled() && val) {
+> +        /* TODO - for now only allow broken for TCG */
+> +        error_setg(errp,
+> +"Requested count cache flush assist capability level not supported
+> by tcg, try cap-ccf-assist=off");
+> +    } else if (kvm_enabled() && (val > kvm_val)) {
+> +        error_setg(errp,
+> +"Requested count cache flush assist capability level not supported
+> by kvm, try cap-ccf-assist=off");
+> +    }
+
+Actually, this should probably be non-fatal if the count cache flush
+routine isn't enabled
+
+> +}
+> +
+>  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>      [SPAPR_CAP_HTM] = {
+>          .name = "htm",
+> @@ -525,6 +540,15 @@ sPAPRCapabilityInfo
+> capability_table[SPAPR_CAP_NUM] = {
+>          .apply = cap_large_decr_apply,
+>          .cpu_apply = cap_large_decr_cpu_apply,
+>      },
+> +    [SPAPR_CAP_CCF_ASSIST] = {
+> +        .name = "ccf-assist",
+> +        .description = "Count Cache Flush Assist via HW
+> Instruction",
+> +        .index = SPAPR_CAP_CCF_ASSIST,
+> +        .get = spapr_cap_get_bool,
+> +        .set = spapr_cap_set_bool,
+> +        .type = "bool",
+> +        .apply = cap_ccf_assist_apply,
+> +    },
+>  };
+>  
+>  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState
+> *spapr,
+> @@ -659,6 +683,7 @@ SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
+>  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
+>  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+>  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+> +SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+>  
+>  void spapr_caps_init(sPAPRMachineState *spapr)
+>  {
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 4aa8036fc0..8bfdddc964 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1693,6 +1693,7 @@ static target_ulong
+> h_get_cpu_characteristics(PowerPCCPU *cpu,
+>      uint8_t safe_cache = spapr_get_cap(spapr, SPAPR_CAP_CFPC);
+>      uint8_t safe_bounds_check = spapr_get_cap(spapr,
+> SPAPR_CAP_SBBC);
+>      uint8_t safe_indirect_branch = spapr_get_cap(spapr,
+> SPAPR_CAP_IBS);
+> +    uint8_t count_cache_flush_assist = spapr_get_cap(spapr,
+> SPAPR_CAP_CCF_ASSIST);
+>  
+>      switch (safe_cache) {
+>      case SPAPR_CAP_WORKAROUND:
+> @@ -1733,6 +1734,8 @@ static target_ulong
+> h_get_cpu_characteristics(PowerPCCPU *cpu,
+>          break;
+>      case SPAPR_CAP_WORKAROUND:
+>          behaviour |= H_CPU_BEHAV_FLUSH_COUNT_CACHE;
+> +        if (count_cache_flush_assist)
+> +            characteristics |= H_CPU_CHAR_BCCTR_FLUSH_ASSIST;
+>          break;
+>      default: /* broken */
+>          assert(safe_indirect_branch == SPAPR_CAP_BROKEN);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 80d33ea284..493a44700d 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -76,8 +76,10 @@ typedef enum {
+>  #define SPAPR_CAP_NESTED_KVM_HV         0x07
+>  /* Large Decrementer */
+>  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
+> +/* Count Cache Flush Assist HW Instruction */
+> +#define SPAPR_CAP_CCF_ASSIST            0x09
+>  /* Num Caps */
+> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_LARGE_DECREMENTER
+> + 1)
+> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
+>  
+>  /*
+>   * Capability Values
+> @@ -853,6 +855,7 @@ extern const VMStateDescription
+> vmstate_spapr_cap_sbbc;
+>  extern const VMStateDescription vmstate_spapr_cap_ibs;
+>  extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
+>  extern const VMStateDescription vmstate_spapr_cap_large_decr;
+> +extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
+>  
+>  static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int
+> cap)
+>  {
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 7a7a5adee3..e0f0de0ce0 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -90,6 +90,7 @@ static int cap_ppc_pvr_compat;
+>  static int cap_ppc_safe_cache;
+>  static int cap_ppc_safe_bounds_check;
+>  static int cap_ppc_safe_indirect_branch;
+> +static int cap_ppc_count_cache_flush_assist;
+>  static int cap_ppc_nested_kvm_hv;
+>  static int cap_large_decr;
+>  
+> @@ -2406,6 +2407,13 @@ static int
+> parse_cap_ppc_safe_indirect_branch(struct kvm_ppc_cpu_char c)
+>      return 0;
+>  }
+>  
+> +static int parse_cap_ppc_count_cache_flush_assist(struct
+> kvm_ppc_cpu_char c)
+> +{
+> +    if (c.character & c.character_mask &
+> H_CPU_CHAR_BCCTR_FLUSH_ASSIST)
+> +        return 1;
+> +    return 0;
+> +}
+> +
+>  static void kvmppc_get_cpu_characteristics(KVMState *s)
+>  {
+>      struct kvm_ppc_cpu_char c;
+> @@ -2428,6 +2436,7 @@ static void
+> kvmppc_get_cpu_characteristics(KVMState *s)
+>      cap_ppc_safe_cache = parse_cap_ppc_safe_cache(c);
+>      cap_ppc_safe_bounds_check = parse_cap_ppc_safe_bounds_check(c);
+>      cap_ppc_safe_indirect_branch =
+> parse_cap_ppc_safe_indirect_branch(c);
+> +    cap_ppc_count_cache_flush_assist =
+> parse_cap_ppc_count_cache_flush_assist(c);
+>  }
+>  
+>  int kvmppc_get_cap_safe_cache(void)
+> @@ -2445,6 +2454,11 @@ int kvmppc_get_cap_safe_indirect_branch(void)
+>      return cap_ppc_safe_indirect_branch;
+>  }
+>  
+> +int kvmppc_get_cap_count_cache_flush_assist(void)
+> +{
+> +    return cap_ppc_count_cache_flush_assist;
+> +}
+> +
+>  bool kvmppc_has_cap_nested_kvm_hv(void)
+>  {
+>      return !!cap_ppc_nested_kvm_hv;
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index a79835bd14..2937b36cae 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -62,6 +62,7 @@ bool kvmppc_has_cap_mmu_hash_v3(void);
+>  int kvmppc_get_cap_safe_cache(void);
+>  int kvmppc_get_cap_safe_bounds_check(void);
+>  int kvmppc_get_cap_safe_indirect_branch(void);
+> +int kvmppc_get_cap_count_cache_flush_assist(void);
+>  bool kvmppc_has_cap_nested_kvm_hv(void);
+>  int kvmppc_set_cap_nested_kvm_hv(int enable);
+>  int kvmppc_get_cap_large_decr(void);
+> @@ -324,6 +325,11 @@ static inline int
+> kvmppc_get_cap_safe_indirect_branch(void)
+>      return 0;
+>  }
+>  
+> +static inline int kvmppc_get_cap_count_cache_flush_assist(void)
+> +{
+> +    return 0;
+> +}
+> +
+>  static inline bool kvmppc_has_cap_nested_kvm_hv(void)
+>  {
+>      return false;
