@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52469)
+Received: from eggs.gnu.org ([209.51.188.92]:53598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzmRy-0000vg-GR
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:59:59 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gzmU6-0002C0-Ks
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:02:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzmRw-0004Gt-I3
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:59:58 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gzmRs-0004Co-Nk
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:59:56 -0500
-Received: by mail-wr1-x442.google.com with SMTP id i12so26880502wrw.0
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 09:59:51 -0800 (PST)
-References: <20190214180216.246707-1-sgarzare@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190214180216.246707-1-sgarzare@redhat.com>
-Date: Fri, 01 Mar 2019 17:59:48 +0000
-Message-ID: <87mumejx0r.fsf@zen.linaroharston>
+	(envelope-from <dgilbert@redhat.com>) id 1gzmU4-0006Mr-PU
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:02:10 -0500
+Date: Fri, 1 Mar 2019 18:01:52 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190301180151.GE2851@work-vm>
+References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
+	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
+	<20190301154947.GJ21251@redhat.com>
+	<20190301183328.20b63e23@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190301183328.20b63e23@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/i386/pc: run the multiboot loader
- before the PVH loader
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
+ parameter of '-numa node' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +27,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, George Kennedy <George.Kennedy@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Fri, 1 Mar 2019 15:49:47 +0000
+> Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
+>=20
+> > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote:
+> > > The parameter allows to configure fake NUMA topology where guest
+> > > VM simulates NUMA topology but not actually getting a performance
+> > > benefits from it. The same or better results could be achieved
+> > > using 'memdev' parameter. In light of that any VM that uses NUMA
+> > > to get its benefits should use 'memdev' and to allow transition
+> > > initial RAM to device based model, deprecate 'mem' parameter as
+> > > its ad-hoc partitioning of initial RAM MemoryRegion can't be
+> > > translated to memdev based backend transparently to users and in
+> > > compatible manner (migration wise).
+> > >=20
+> > > That will also allow to clean up a bit our numa code, leaving only
+> > > 'memdev' impl. in place and several boards that use node_mem
+> > > to generate FDT/ACPI description from it. =20
+> >=20
+> > Can you confirm that the  'mem' and 'memdev' parameters to -numa
+> > are 100% live migration compatible in both directions ?  Libvirt
+> > would need this to be the case in order to use the 'memdev' syntax
+> > instead.
+> Unfortunately they are not migration compatible in any direction,
+> if it where possible to translate them to each other I'd alias 'mem'
+> to 'memdev' without deprecation. The former sends over only one
+> MemoryRegion to target, while the later sends over several (one per
+> memdev).
+>=20
+> Mixed memory issue[1] first came from libvirt side RHBZ1624223,
+> back then it was resolved on libvirt side in favor of migration
+> compatibility vs correctness (i.e. bind policy doesn't work as expected=
+).
+> What worse that it was made default and affects all new machines,
+> as I understood it.
+>=20
+> In case of -mem-path + -mem-prealloc (with 1 numa node or numa less)
+> it's possible on QEMU side to make conversion to memdev in migration
+> compatible way (that's what stopped Michal from memdev approach).
+> But it's hard to do so in multi-nodes case as amount of MemoryRegions
+> is different.
+>=20
+> Point is to consider 'mem' as mis-configuration error, as the user
+> in the first place using broken numa configuration
+> (i.e. fake numa configuration doesn't actually improve performance).
+>=20
+> CCed David, maybe he could offer a way to do 1:n migration and other
+> way around.
 
-Stefano Garzarella <sgarzare@redhat.com> writes:
+I can't see a trivial way.
+About the easiest I can think of is if you had a way to create a memdev
+that was an alias to pc.ram (of a particular size and offset).
 
-> Some multiboot images could be in the ELF format. In the current
-> implementation QEMU fails because we try to load these images
-> as a PVH image.
->
-> In order to fix this issue, we should try multiboot first (we
-> already check the multiboot magic header before to load it).
-> If it is not a multiboot image, we can try the PVH loader.
->
-> Fixes: ab969087da6 ("pvh: Boot uncompressed kernel using direct boot ABI"=
-, 2019-01-15)
-> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Dave
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  hw/i386/pc.c | 17 +++++++++++------
->  1 file changed, 11 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 3889eccdc3..207c267093 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1209,6 +1209,17 @@ static void load_linux(PCMachineState *pcms,
->      if (ldl_p(header+0x202) =3D=3D 0x53726448) {
->          protocol =3D lduw_p(header+0x206);
->      } else {
-> +        /*
-> +         * This could be a multiboot kernel. If it is, let's stop treati=
-ng it
-> +         * like a Linux kernel.
-> +         * Note: some multiboot images could be in the ELF format (the s=
-ame of
-> +         * PVH), so we try multiboot first since we check the multiboot =
-magic
-> +         * header before to load it.
-> +         */
-> +        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
-> +                           kernel_cmdline, kernel_size, header)) {
-> +            return;
-> +        }
->          /*
->           * Check if the file is an uncompressed kernel file (ELF) and lo=
-ad it,
->           * saving the PVH entry point used by the x86/HVM direct boot AB=
-I.
-> @@ -1262,12 +1273,6 @@ static void load_linux(PCMachineState *pcms,
->
->              return;
->          }
-> -        /* This looks like a multiboot kernel. If it is, let's stop
-> -           treating it like a Linux kernel. */
-> -        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
-> -                           kernel_cmdline, kernel_size, header)) {
-> -            return;
-> -        }
->          protocol =3D 0;
->      }
-
-
+>=20
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > >  numa.c               |  2 ++
+> > >  qemu-deprecated.texi | 14 ++++++++++++++
+> > >  2 files changed, 16 insertions(+)
+> > >=20
+> > > diff --git a/numa.c b/numa.c
+> > > index 3875e1e..2205773 100644
+> > > --- a/numa.c
+> > > +++ b/numa.c
+> > > @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, N=
+umaNodeOptions *node,
+> > > =20
+> > >      if (node->has_mem) {
+> > >          numa_info[nodenr].node_mem =3D node->mem;
+> > > +        warn_report("Parameter -numa node,mem is deprecated,"
+> > > +                    " use -numa node,memdev instead");
+> > >      }
+> > >      if (node->has_memdev) {
+> > >          Object *o;
+> > > diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> > > index 45c5795..73f99d4 100644
+> > > --- a/qemu-deprecated.texi
+> > > +++ b/qemu-deprecated.texi
+> > > @@ -60,6 +60,20 @@ Support for invalid topologies will be removed, =
+the user must ensure
+> > >  topologies described with -smp include all possible cpus, i.e.
+> > >    @math{@var{sockets} * @var{cores} * @var{threads} =3D @var{maxcp=
+us}}.
+> > > =20
+> > > +@subsection -numa node,mem=3D@var{size} (since 4.0)
+> > > +
+> > > +The parameter @option{mem} of @option{-numa node} is used to assig=
+n a part of
+> > > +guest RAM to a NUMA node. But when using it, it's impossible to ma=
+nage specified
+> > > +size on the host side (like bind it to a host node, setting bind p=
+olicy, ...),
+> > > +so guest end-ups with the fake NUMA configuration with suboptiomal=
+ performance.
+> > > +However since 2014 there is an alternative way to assign RAM to a =
+NUMA node
+> > > +using parameter @option{memdev}, which does the same as @option{me=
+m} and has
+> > > +an ability to actualy manage node RAM on the host side. Use parame=
+ter
+> > > +@option{memdev} with @var{memory-backend-ram} backend as an replac=
+ement for
+> > > +parameter @option{mem} to achieve the same fake NUMA effect or a p=
+roperly
+> > > +configured @var{memory-backend-file} backend to actually benefit f=
+rom NUMA
+> > > +configuration.
+> > > +
+> > >  @section QEMU Machine Protocol (QMP) commands
+> > > =20
+> > >  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.1=
+2.0)
+> > > --=20
+> > > 2.7.4
+> > >=20
+> > > --
+> > > libvir-list mailing list
+> > > libvir-list@redhat.com
+> > > https://www.redhat.com/mailman/listinfo/libvir-list =20
+> >=20
+> > Regards,
+> > Daniel
+>=20
 --
-Alex Benn=C3=A9e
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
