@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57507)
+Received: from eggs.gnu.org ([209.51.188.92]:58103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gzkjC-0006Y4-Gl
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:09:42 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gzklF-0008EP-Ec
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:11:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gzkjB-0002oa-HU
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:09:38 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  1 Mar 2019 16:09:29 +0000
-Message-Id: <20190301160929.19892-1-stefanha@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gzklE-0004Ms-Pd
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:11:45 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gzklA-0004BI-UT
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:11:42 -0500
+Received: by mail-pg1-x543.google.com with SMTP id e17so9602678pgd.2
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 08:11:29 -0800 (PST)
+References: <20190301115413.27153-1-david@redhat.com>
+	<20190301115413.27153-6-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7787c1b6-82e4-cc11-15d4-1b3e8333295d@linaro.org>
+Date: Fri, 1 Mar 2019 08:11:25 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] file-posix: add drop-cache=on|off option
+In-Reply-To: <20190301115413.27153-6-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/32] s390x/tcg: Implement VECTOR
+ GENERATE BYTE MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,135 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Daniel Berrange <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Neil Skrypuch <neil@tembosocial.com>, Stefano Garzarella <sgarzare@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Commit dd577a26ff03b6829721b1ffbbf9e7c411b72378 ("block/file-posix:
-implement bdrv_co_invalidate_cache() on Linux") introduced page cache
-invalidation so that cache.direct=3Doff live migration is safe on Linux.
+On 3/1/19 3:53 AM, David Hildenbrand wrote:
+> Let's optimize it for the common cases (setting a vector to zero or all
+> ones) - courtesy of Richard.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-data.def      |  2 ++
+>  target/s390x/translate.c        |  1 +
+>  target/s390x/translate_vx.inc.c | 39 +++++++++++++++++++++++++++++++++
+>  3 files changed, 42 insertions(+)
 
-The invalidation takes a significant amount of time when the file is
-large and present in the page cache.  Normally this is not the case for
-cross-host live migration but it can happen when migrating between QEMU
-processes on the same host.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-On same-host migration we don't need to invalidate pages for correctness
-anyway, so an option to skip page cache invalidation is useful.  I
-investigated optimizing invalidation and detecting same-host migration,
-but both are hard to achieve so a user-visible option will suffice.
 
-Suggested-by: Neil Skrypuch <neil@tembosocial.com>
-Tested-by: Neil Skrypuch <neil@tembosocial.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-v2:
- * Remove outdated comment about libvirt feature detection [danpb]
----
- qapi/block-core.json |  5 +++++
- block/file-posix.c   | 14 ++++++++++++++
- 2 files changed, 19 insertions(+)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 2b8afbb924..d4cc3c4294 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2807,6 +2807,10 @@
- # @locking:     whether to enable file locking. If set to 'auto', only e=
-nable
- #               when Open File Descriptor (OFD) locking API is available
- #               (default: auto, since 2.10)
-+# @drop-cache:  invalidate page cache during live migration.  This preve=
-nts
-+#               stale data on the migration destination with cache.direc=
-t=3Doff.
-+#               Currently only supported on Linux hosts.
-+#               (default: on, since: 4.0)
- # @x-check-cache-dropped: whether to check that page cache was dropped o=
-n live
- #                         migration.  May cause noticeable delays if the=
- image
- #                         file is large, do not use in production.
-@@ -2819,6 +2823,7 @@
-             '*pr-manager': 'str',
-             '*locking': 'OnOffAuto',
-             '*aio': 'BlockdevAioOptions',
-+            '*drop-cache': 'bool',
-             '*x-check-cache-dropped': 'bool' } }
-=20
- ##
-diff --git a/block/file-posix.c b/block/file-posix.c
-index ba6ab62a38..7bb2c4762f 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -154,6 +154,7 @@ typedef struct BDRVRawState {
-     bool page_cache_inconsistent:1;
-     bool has_fallocate;
-     bool needs_alignment;
-+    bool drop_cache;
-     bool check_cache_dropped;
-=20
-     PRManager *pr_mgr;
-@@ -162,6 +163,7 @@ typedef struct BDRVRawState {
- typedef struct BDRVRawReopenState {
-     int fd;
-     int open_flags;
-+    bool drop_cache;
-     bool check_cache_dropped;
- } BDRVRawReopenState;
-=20
-@@ -422,6 +424,11 @@ static QemuOptsList raw_runtime_opts =3D {
-             .type =3D QEMU_OPT_STRING,
-             .help =3D "id of persistent reservation manager object (defa=
-ult: none)",
-         },
-+        {
-+            .name =3D "drop-cache",
-+            .type =3D QEMU_OPT_BOOL,
-+            .help =3D "invalidate page cache during live migration (defa=
-ult: on)",
-+        },
-         {
-             .name =3D "x-check-cache-dropped",
-             .type =3D QEMU_OPT_BOOL,
-@@ -511,6 +518,7 @@ static int raw_open_common(BlockDriverState *bs, QDic=
-t *options,
-         }
-     }
-=20
-+    s->drop_cache =3D qemu_opt_get_bool(opts, "drop-cache", true);
-     s->check_cache_dropped =3D qemu_opt_get_bool(opts, "x-check-cache-dr=
-opped",
-                                                false);
-=20
-@@ -869,6 +877,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
-         goto out;
-     }
-=20
-+    rs->drop_cache =3D qemu_opt_get_bool_del(opts, "drop-cache", true);
-     rs->check_cache_dropped =3D
-         qemu_opt_get_bool_del(opts, "x-check-cache-dropped", false);
-=20
-@@ -946,6 +955,7 @@ static void raw_reopen_commit(BDRVReopenState *state)
-     BDRVRawState *s =3D state->bs->opaque;
-     Error *local_err =3D NULL;
-=20
-+    s->drop_cache =3D rs->drop_cache;
-     s->check_cache_dropped =3D rs->check_cache_dropped;
-     s->open_flags =3D rs->open_flags;
-=20
-@@ -2531,6 +2541,10 @@ static void coroutine_fn raw_co_invalidate_cache(B=
-lockDriverState *bs,
-         return;
-     }
-=20
-+    if (!s->drop_cache) {
-+        return;
-+    }
-+
-     if (s->open_flags & O_DIRECT) {
-         return; /* No host kernel page cache */
-     }
---=20
-2.20.1
+r~
