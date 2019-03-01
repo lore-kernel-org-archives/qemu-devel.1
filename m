@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39767)
+Received: from eggs.gnu.org ([209.51.188.92]:39752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzgkH-0002k5-QZ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:30 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzgkF-0006Ey-8y
+	(envelope-from <david@redhat.com>) id 1gzgkE-0002jx-RJ
 	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:29 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <david@redhat.com>) id 1gzgkD-0006Dh-L4
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:26 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Fri,  1 Mar 2019 12:53:46 +0100
-Message-Id: <20190301115413.27153-6-david@redhat.com>
+Date: Fri,  1 Mar 2019 12:53:45 +0100
+Message-Id: <20190301115413.27153-5-david@redhat.com>
 In-Reply-To: <20190301115413.27153-1-david@redhat.com>
 References: <20190301115413.27153-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/32] s390x/tcg: Implement VECTOR GENERATE
- BYTE MASK
+Subject: [Qemu-devel] [PATCH v2 04/32] s390x/tcg: Implement VECTOR GATHER
+ ELEMENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +23,198 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Let's optimize it for the common cases (setting a vector to zero or all
-ones) - courtesy of Richard.
+Let's start with a more involved one, but it is the first in the list
+of vector support instructions (introduced with the vector facility).
 
+Good thing is, we need a lot of basic infrastructure for this. Reading
+and writing vector elements as well as checking element validity.
+
+All vector instruction related translation functions will reside in
+translate_vx.inc.c, to be included in translate.c - similar to how
+other architectures handle it.
+
+While at it, directly add some documentation (which contains parts about
+things added in follow-up patches, but splitting this up does not make
+too much sense). Also add ES_* defines heavily used later.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate.c        |  1 +
- target/s390x/translate_vx.inc.c | 39 +++++++++++++++++++++++++++++++++
- 3 files changed, 42 insertions(+)
+ target/s390x/insn-data.def      |   6 ++
+ target/s390x/translate.c        |   2 +
+ target/s390x/translate_vx.inc.c | 135 ++++++++++++++++++++++++++++++++
+ 3 files changed, 143 insertions(+)
+ create mode 100644 target/s390x/translate_vx.inc.c
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 7d128ac9d6..d3f66c858f 100644
+index 61b750a855..7d128ac9d6 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -977,6 +977,8 @@
- /* VECTOR GATHER ELEMENT */
-     E(0xe713, VGEF,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_32, IF_VEC)
-     E(0xe712, VGEG,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_64, IF_VEC)
-+/* VECTOR GENERATE BYTE MASK */
-+    F(0xe744, VGBM,    VRI_a, V,   0, 0, 0, 0, vgbm, 0, IF_VEC)
+@@ -972,6 +972,12 @@
+     D(0xb93e, KIMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KIMD)
+     D(0xb93f, KLMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KLMD)
  
++/* === Vector Support Instructions === */
++
++/* VECTOR GATHER ELEMENT */
++    E(0xe713, VGEF,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_32, IF_VEC)
++    E(0xe712, VGEG,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_64, IF_VEC)
++
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
+     E(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL, IF_PRIV)
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index a1c6698dea..588fc21dd2 100644
+index d52c02c572..a1c6698dea 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -34,6 +34,7 @@
- #include "disas/disas.h"
- #include "exec/exec-all.h"
- #include "tcg-op.h"
-+#include "tcg-op-gvec.h"
- #include "qemu/log.h"
- #include "qemu/host-utils.h"
- #include "exec/cpu_ldst.h"
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index 9864ec5134..395c0ebcc2 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -112,6 +112,9 @@ static void write_vec_element_i64(TCGv_i64 src, int reg, uint8_t enr,
-     }
+@@ -5120,6 +5120,8 @@ static DisasJumpType op_mpcifc(DisasContext *s, DisasOps *o)
  }
+ #endif
  
-+#define gen_gvec_dup64i(v1, c) \
-+    tcg_gen_gvec_dup64i(vec_full_reg_offset(v1), 16, 16, c)
++#include "translate_vx.inc.c"
 +
- static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
- {
-     const uint8_t es = s->insn->data;
-@@ -133,3 +136,39 @@ static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
-     tcg_temp_free_i64(tmp);
-     return DISAS_NEXT;
- }
+ /* ====================================================================== */
+ /* The "Cc OUTput" generators.  Given the generated output (and in some cases
+    the original inputs), update the various cc data structures in order to
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
+new file mode 100644
+index 0000000000..9864ec5134
+--- /dev/null
++++ b/target/s390x/translate_vx.inc.c
+@@ -0,0 +1,135 @@
++/*
++ * QEMU TCG support -- s390x vector instruction translation functions
++ *
++ * Copyright (C) 2019 Red Hat Inc
++ *
++ * Authors:
++ *   David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+static uint64_t generate_byte_mask(uint8_t mask)
++/*
++ * For most instructions that use the same element size for reads and
++ * writes, we can use real gvec vector expansion, which potantially uses
++ * real host vector instructions. As they only work up to 64 bit elements,
++ * 128 bit elements (vector is a single element) have to be handled
++ * differently. Operations that are too complicated to encode via TCG ops
++ * are handled via gvec ool (out-of-line) handlers.
++ *
++ * As soon as instructions use different element sizes for reads and writes
++ * or access elements "out of their element scope" we expand them manually
++ * in fancy loops, as gvec expansion does not deal with actual element
++ * numbers and does also not support access to other elements.
++ *
++ * 128 bit elements:
++ *  As we only have i32/i64, such elements have to be loaded into two
++ *  i64 values and can then be processed e.g. by tcg_gen_add2_i64.
++ *
++ * Sizes:
++ *  On s390x, the operand size (oprsz) and the maximum size (maxsz) are
++ *  always 16 (128 bit). What gvec code calls "vece", s390x calls "es",
++ *  a.k.a. "element size". These values nicely map to MO_8 ... MO_64. Only
++ *  128 bit element size has to be treated in a special way (MO_64 + 1).
++ *  We will use ES_* instead of MO_* for this reason in this file.
++ *
++ * CC handling:
++ *  As gvec ool-helpers can currently not return values (besides via
++ *  pointers like vectors or cpu_env), whenever we have to set the CC and
++ *  can't conclude the value from the result vector, we will directly
++ *  set it in "env->cc_op" and mark it as static via set_cc_static()".
++ *  Whenever this is done, the helper writes globals (cc_op).
++ */
++
++#define NUM_VEC_ELEMENT_BYTES(es) (1 << (es))
++#define NUM_VEC_ELEMENTS(es) (16 / NUM_VEC_ELEMENT_BYTES(es))
++
++#define ES_8    MO_8
++#define ES_16   MO_16
++#define ES_32   MO_32
++#define ES_64   MO_64
++#define ES_128  4
++
++static inline bool valid_vec_element(uint8_t enr, TCGMemOp es)
 +{
-+    uint64_t r = 0;
-+    int i;
-+
-+    for (i = 0; i < 8; i++) {
-+        if ((mask >> i) & 1) {
-+            r |= 0xffull << (i * 8);
-+        }
-+    }
-+    return r;
++    return !(enr & ~(NUM_VEC_ELEMENTS(es) - 1));
 +}
 +
-+static DisasJumpType op_vgbm(DisasContext *s, DisasOps *o)
++static void read_vec_element_i64(TCGv_i64 dst, uint8_t reg, uint8_t enr,
++                                 TCGMemOp memop)
 +{
-+    const uint16_t i2 = get_field(s->fields, i2);
++    const int offs = vec_reg_offset(reg, enr, memop & MO_SIZE);
 +
-+    if (i2 == (i2 & 0xff) * 0x0101) {
-+        /*
-+         * Masks for both 64 bit elements of the vector are the same.
-+         * Trust tcg to produce a good constant loading.
-+         */
-+        gen_gvec_dup64i(get_field(s->fields, v1),
-+                        generate_byte_mask(i2 & 0xff));
-+    } else {
-+        TCGv_i64 t = tcg_temp_new_i64();
-+
-+        tcg_gen_movi_i64(t, generate_byte_mask(i2 >> 8));
-+        write_vec_element_i64(t, get_field(s->fields, v1), 0, ES_64);
-+        tcg_gen_movi_i64(t, generate_byte_mask(i2));
-+        write_vec_element_i64(t, get_field(s->fields, v1), 1, ES_64);
-+        tcg_temp_free_i64(t);
++    switch (memop) {
++    case ES_8:
++        tcg_gen_ld8u_i64(dst, cpu_env, offs);
++        break;
++    case ES_16:
++        tcg_gen_ld16u_i64(dst, cpu_env, offs);
++        break;
++    case ES_32:
++        tcg_gen_ld32u_i64(dst, cpu_env, offs);
++        break;
++    case ES_8 | MO_SIGN:
++        tcg_gen_ld8s_i64(dst, cpu_env, offs);
++        break;
++    case ES_16 | MO_SIGN:
++        tcg_gen_ld16s_i64(dst, cpu_env, offs);
++        break;
++    case ES_32 | MO_SIGN:
++        tcg_gen_ld32s_i64(dst, cpu_env, offs);
++        break;
++    case ES_64:
++    case ES_64 | MO_SIGN:
++        tcg_gen_ld_i64(dst, cpu_env, offs);
++        break;
++    default:
++        g_assert_not_reached();
 +    }
++}
++
++static void write_vec_element_i64(TCGv_i64 src, int reg, uint8_t enr,
++                                  TCGMemOp memop)
++{
++    const int offs = vec_reg_offset(reg, enr, memop & MO_SIZE);
++
++    switch (memop) {
++    case ES_8:
++        tcg_gen_st8_i64(src, cpu_env, offs);
++        break;
++    case ES_16:
++        tcg_gen_st16_i64(src, cpu_env, offs);
++        break;
++    case ES_32:
++        tcg_gen_st32_i64(src, cpu_env, offs);
++        break;
++    case ES_64:
++        tcg_gen_st_i64(src, cpu_env, offs);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es = s->insn->data;
++    const uint8_t enr = get_field(s->fields, m3);
++    TCGv_i64 tmp;
++
++    if (!valid_vec_element(enr, es)) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    tmp = tcg_temp_new_i64();
++    read_vec_element_i64(tmp, get_field(s->fields, v2), enr, es);
++    tcg_gen_add_i64(o->addr1, o->addr1, tmp);
++    gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 0);
++
++    tcg_gen_qemu_ld_i64(tmp, o->addr1, get_mem_index(s), MO_TE | es);
++    write_vec_element_i64(tmp, get_field(s->fields, v1), enr, es);
++    tcg_temp_free_i64(tmp);
 +    return DISAS_NEXT;
 +}
 -- 
