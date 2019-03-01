@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60575)
+Received: from eggs.gnu.org ([209.51.188.92]:60675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzkuk-0007Fc-40
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:21:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gzkvB-0007ao-8T
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:22:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzkui-0005qj-Aj
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:21:34 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  1 Mar 2019 17:21:17 +0100
-Message-Id: <1551457277-884-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests: Do not use "\n" in g_test_message()
- strings
+	(envelope-from <richard.henderson@linaro.org>) id 1gzkvA-0006Z2-FJ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:22:01 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40903)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gzkv6-0006Vn-NI
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:21:58 -0500
+Received: by mail-pl1-x641.google.com with SMTP id bj4so11708140plb.7
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 08:21:56 -0800 (PST)
+References: <20190301115413.27153-1-david@redhat.com>
+	<20190301115413.27153-13-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2eb985d2-2a53-a615-dd51-7f44ed37e552@linaro.org>
+Date: Fri, 1 Mar 2019 08:21:51 -0800
+MIME-Version: 1.0
+In-Reply-To: <20190301115413.27153-13-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 12/32] s390x/tcg: Implement VECTOR LOAD
+ LOGICAL ELEMENT AND ZERO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,273 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-g_test_message() takes care of the newline on its own, so we
-should not use \n in the strings here.
+On 3/1/19 3:53 AM, David Hildenbrand wrote:
+> Fairly easy, zero out the vector before we load the desired element.
+> Load the element before touching the vector.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-data.def      |  2 ++
+>  target/s390x/translate_vx.inc.c | 46 +++++++++++++++++++++++++++++++++
+>  2 files changed, 48 insertions(+)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/ivshmem-test.c         |  4 ++--
- tests/m48t59-test.c          |  4 ++--
- tests/migration-test.c       |  4 ++--
- tests/rtc-test.c             |  4 ++--
- tests/rtl8139-test.c         |  6 +++---
- tests/test-aio-multithread.c |  8 ++++----
- tests/test-coroutine.c       | 10 ++++------
- tests/vhost-user-test.c      | 14 +++++++-------
- 8 files changed, 26 insertions(+), 28 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index 942ddc9..227561f 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -74,7 +74,7 @@ static inline unsigned in_reg(IVState *s, enum Reg reg)
-     unsigned res;
- 
-     res = qpci_io_readl(s->dev, s->reg_bar, reg);
--    g_test_message("*%s -> %x\n", name, res);
-+    g_test_message("*%s -> %x", name, res);
- 
-     return res;
- }
-@@ -83,7 +83,7 @@ static inline void out_reg(IVState *s, enum Reg reg, unsigned v)
- {
-     const char *name = reg2str(reg);
- 
--    g_test_message("%x -> *%s\n", v, name);
-+    g_test_message("%x -> *%s", v, name);
-     qpci_io_writel(s->dev, s->reg_bar, reg, v);
- }
- 
-diff --git a/tests/m48t59-test.c b/tests/m48t59-test.c
-index 4abf9c6..b94a123 100644
---- a/tests/m48t59-test.c
-+++ b/tests/m48t59-test.c
-@@ -199,9 +199,9 @@ static void bcd_check_time(void)
-         t = (long)mktime(datep);
-         s = (long)mktime(&start);
-         if (t < s) {
--            g_test_message("RTC is %ld second(s) behind wall-clock\n", (s - t));
-+            g_test_message("RTC is %ld second(s) behind wall-clock", (s - t));
-         } else {
--            g_test_message("RTC is %ld second(s) ahead of wall-clock\n", (t - s));
-+            g_test_message("RTC is %ld second(s) ahead of wall-clock", (t - s));
-         }
- 
-         g_assert_cmpint(ABS(t - s), <=, wiggle);
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 8352612..905d545 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -821,7 +821,7 @@ int main(int argc, char **argv)
- 
-     tmpfs = mkdtemp(template);
-     if (!tmpfs) {
--        g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
-+        g_test_message("mkdtemp on path (%s): %s", template, strerror(errno));
-     }
-     g_assert(tmpfs);
- 
-@@ -839,7 +839,7 @@ int main(int argc, char **argv)
- 
-     ret = rmdir(tmpfs);
-     if (ret != 0) {
--        g_test_message("unable to rmdir: path (%s): %s\n",
-+        g_test_message("unable to rmdir: path (%s): %s",
-                        tmpfs, strerror(errno));
-     }
- 
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index d7a96cb..509be70 100644
---- a/tests/rtc-test.c
-+++ b/tests/rtc-test.c
-@@ -165,9 +165,9 @@ static void check_time(int wiggle)
-         t = (long)mktime(datep);
-         s = (long)mktime(&start);
-         if (t < s) {
--            g_test_message("RTC is %ld second(s) behind wall-clock\n", (s - t));
-+            g_test_message("RTC is %ld second(s) behind wall-clock", (s - t));
-         } else {
--            g_test_message("RTC is %ld second(s) ahead of wall-clock\n", (t - s));
-+            g_test_message("RTC is %ld second(s) ahead of wall-clock", (t - s));
-         }
- 
-         g_assert_cmpint(ABS(t - s), <=, wiggle);
-diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
-index 68bfc42..49e3f03 100644
---- a/tests/rtl8139-test.c
-+++ b/tests/rtl8139-test.c
-@@ -46,12 +46,12 @@ static QPCIDevice *get_device(void)
- static unsigned __attribute__((unused)) in_##name(void) \
- { \
-     unsigned res = qpci_io_read##len(dev, dev_bar, (val));     \
--    g_test_message("*%s -> %x\n", #name, res); \
-+    g_test_message("*%s -> %x", #name, res); \
-     return res; \
- } \
- static void out_##name(unsigned v) \
- { \
--    g_test_message("%x -> *%s\n", v, #name); \
-+    g_test_message("%x -> *%s", v, #name); \
-     qpci_io_write##len(dev, dev_bar, (val), v);        \
- }
- 
-@@ -176,7 +176,7 @@ static void test_timer(void)
-         }
-     }
- 
--    g_test_message("Everythink is ok!\n");
-+    g_test_message("Everythink is ok!");
- }
- 
- 
-diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
-index 6440d54..d3144be 100644
---- a/tests/test-aio-multithread.c
-+++ b/tests/test-aio-multithread.c
-@@ -178,7 +178,7 @@ static void test_multi_co_schedule(int seconds)
-     }
- 
-     join_aio_contexts();
--    g_test_message("scheduled %d, queued %d, retry %d, total %d\n",
-+    g_test_message("scheduled %d, queued %d, retry %d, total %d",
-                   count_other, count_here, count_retry,
-                   count_here + count_other + count_retry);
- }
-@@ -242,7 +242,7 @@ static void test_multi_co_mutex(int threads, int seconds)
-     }
- 
-     join_aio_contexts();
--    g_test_message("%d iterations/second\n", counter / seconds);
-+    g_test_message("%d iterations/second", counter / seconds);
-     g_assert_cmpint(counter, ==, atomic_counter);
- }
- 
-@@ -361,7 +361,7 @@ static void test_multi_fair_mutex(int threads, int seconds)
-     }
- 
-     join_aio_contexts();
--    g_test_message("%d iterations/second\n", counter / seconds);
-+    g_test_message("%d iterations/second", counter / seconds);
-     g_assert_cmpint(counter, ==, atomic_counter);
- }
- 
-@@ -417,7 +417,7 @@ static void test_multi_mutex(int threads, int seconds)
-     }
- 
-     join_aio_contexts();
--    g_test_message("%d iterations/second\n", counter / seconds);
-+    g_test_message("%d iterations/second", counter / seconds);
-     g_assert_cmpint(counter, ==, atomic_counter);
- }
- 
-diff --git a/tests/test-coroutine.c b/tests/test-coroutine.c
-index 28e79b3..e946d93 100644
---- a/tests/test-coroutine.c
-+++ b/tests/test-coroutine.c
-@@ -369,7 +369,7 @@ static void perf_lifecycle(void)
-     }
-     duration = g_test_timer_elapsed();
- 
--    g_test_message("Lifecycle %u iterations: %f s\n", max, duration);
-+    g_test_message("Lifecycle %u iterations: %f s", max, duration);
- }
- 
- static void perf_nesting(void)
-@@ -393,7 +393,7 @@ static void perf_nesting(void)
-     }
-     duration = g_test_timer_elapsed();
- 
--    g_test_message("Nesting %u iterations of %u depth each: %f s\n",
-+    g_test_message("Nesting %u iterations of %u depth each: %f s",
-         maxcycles, maxnesting, duration);
- }
- 
-@@ -426,8 +426,7 @@ static void perf_yield(void)
-     }
-     duration = g_test_timer_elapsed();
- 
--    g_test_message("Yield %u iterations: %f s\n",
--        maxcycles, duration);
-+    g_test_message("Yield %u iterations: %f s", maxcycles, duration);
- }
- 
- static __attribute__((noinline)) void dummy(unsigned *i)
-@@ -449,8 +448,7 @@ static void perf_baseline(void)
-     }
-     duration = g_test_timer_elapsed();
- 
--    g_test_message("Function call %u iterations: %f s\n",
--        maxcycles, duration);
-+    g_test_message("Function call %u iterations: %f s", maxcycles, duration);
- }
- 
- static __attribute__((noinline)) void perf_cost_func(void *opaque)
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index d961bd0..b5af8c3 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -332,7 +332,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-     }
- 
-     if (size != VHOST_USER_HDR_SIZE) {
--        g_test_message("Wrong message size received %d\n", size);
-+        g_test_message("Wrong message size received %d", size);
-         return;
-     }
- 
-@@ -343,7 +343,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-         p += VHOST_USER_HDR_SIZE;
-         size = qemu_chr_fe_read_all(chr, p, msg.size);
-         if (size != msg.size) {
--            g_test_message("Wrong message size received %d != %d\n",
-+            g_test_message("Wrong message size received %d != %d",
-                            size, msg.size);
-             return;
-         }
-@@ -465,7 +465,7 @@ static const char *init_hugepagefs(const char *path)
-     int ret;
- 
-     if (access(path, R_OK | W_OK | X_OK)) {
--        g_test_message("access on path (%s): %s\n", path, strerror(errno));
-+        g_test_message("access on path (%s): %s", path, strerror(errno));
-         return NULL;
-     }
- 
-@@ -474,12 +474,12 @@ static const char *init_hugepagefs(const char *path)
-     } while (ret != 0 && errno == EINTR);
- 
-     if (ret != 0) {
--        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
-+        g_test_message("statfs on path (%s): %s", path, strerror(errno));
-         return NULL;
-     }
- 
-     if (fs.f_type != HUGETLBFS_MAGIC) {
--        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
-+        g_test_message("Warning: path not on HugeTLBFS: %s", path);
-         return NULL;
-     }
- 
-@@ -979,7 +979,7 @@ int main(int argc, char **argv)
- 
-     tmpfs = mkdtemp(template);
-     if (!tmpfs) {
--        g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
-+        g_test_message("mkdtemp on path (%s): %s", template, strerror(errno));
-     }
-     g_assert(tmpfs);
- 
-@@ -1032,7 +1032,7 @@ int main(int argc, char **argv)
- 
-     ret = rmdir(tmpfs);
-     if (ret != 0) {
--        g_test_message("unable to rmdir: path (%s): %s\n",
-+        g_test_message("unable to rmdir: path (%s): %s",
-                        tmpfs, strerror(errno));
-     }
-     g_assert_cmpint(ret, ==, 0);
--- 
-1.8.3.1
+
+r~
