@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46621)
+Received: from eggs.gnu.org ([209.51.188.92]:48938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gzhBg-0000Hv-W5
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:22:50 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gzhTC-00058K-2g
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:40:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gzhBf-0000sF-MQ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:22:48 -0500
-Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:36617)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gzhBf-0000rO-Fx
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:22:47 -0500
-Received: from player797.ha.ovh.net (unknown [10.109.146.50])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id DC9DC15D542
-	for <qemu-devel@nongnu.org>; Fri,  1 Mar 2019 13:22:44 +0100 (CET)
-Date: Fri, 1 Mar 2019 13:22:33 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190301132233.00bf8590@bahia.lan>
-In-Reply-To: <b26a4742-4e87-c65f-d3ed-4e37c87bf1fe@redhat.com>
-References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
-	<20190226045304.25618-41-david@gibson.dropbear.id.au>
-	<ec8e11d1-c966-b814-98da-a6ab56572834@redhat.com>
-	<155140389645.9499.14782774845761701651@sif>
-	<4038f585-feaa-2fca-cfb7-ba28416748bf@redhat.com>
-	<20190301114807.0d3a255a@bahia.lan>
-	<b26a4742-4e87-c65f-d3ed-4e37c87bf1fe@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gzhG4-0002Y0-1Z
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:27:21 -0500
+Resent-Message-Id: <E1gzhG4-0002Y0-1Z@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155144319936.7448.5176694153881799894@49fa7ef69f7b>
+In-Reply-To: <20190301115413.27153-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 40/50] spapr_events: add support for phb
- hotplug events
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Mar 2019 04:26:40 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 00/32] s390x/tcg: Vector Instruction
+ Support Part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,196 +24,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org
+To: david@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
 
-On Fri, 1 Mar 2019 11:49:30 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 01/03/2019 11.48, Greg Kurz wrote:
-> > On Fri, 1 Mar 2019 11:30:18 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 01.03.19 02:31, Michael Roth wrote:  
-> >>> Quoting Thomas Huth (2019-02-28 12:40:52)    
-> >>>> On 26/02/2019 05.52, David Gibson wrote:    
-> >>>>> From: Michael Roth <mdroth@linux.vnet.ibm.com>
-> >>>>>
-> >>>>> Extend the existing EPOW event format we use for PCI
-> >>>>> devices to emit PHB plug/unplug events.
-> >>>>>
-> >>>>> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> >>>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >>>>> Signed-off-by: Greg Kurz <groug@kaod.org>
-> >>>>> Message-Id: <155059671405.1466090.535964535260503283.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-> >>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> >>>>> ---
-> >>>>>  hw/ppc/spapr_events.c | 3 +++
-> >>>>>  1 file changed, 3 insertions(+)
-> >>>>>
-> >>>>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> >>>>> index b9c7ecb9e9..ab9a1f0063 100644
-> >>>>> --- a/hw/ppc/spapr_events.c
-> >>>>> +++ b/hw/ppc/spapr_events.c
-> >>>>> @@ -526,6 +526,9 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
-> >>>>>      case SPAPR_DR_CONNECTOR_TYPE_CPU:
-> >>>>>          hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_CPU;
-> >>>>>          break;
-> >>>>> +    case SPAPR_DR_CONNECTOR_TYPE_PHB:
-> >>>>> +        hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_PHB;
-> >>>>> +        break;
-> >>>>>      default:
-> >>>>>          /* we shouldn't be signaling hotplug events for resources
-> >>>>>           * that don't support them    
-> >>>>
-> >>>> I think this patch (or something else in this PULL request) broke CPU
-> >>>> hot-plugging with older machine types:
-> >>>>
-> >>>> $ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-test -m=slow
-> >>>> /ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=6: OK
-> >>>> /ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=6: OK
-> >>>> /ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=6: OK
-> >>>> /ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=6: OK
-> >>>> /ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=6: OK
-> >>>> /ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=6: OK
-> >>>> /ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=6: OK
-> >>>> /ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=6: **
-> >>>> ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_to_source: assertion failed: (source->enabled)
-> >>>> Broken pipe
-> >>>> /home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
-> >>>> Aborted (core dumped)
-> >>>>
-> >>>> Could you please have a look?    
-> >>>
-> >>> Bisected to:
-> >>>
-> >>>   commit b8165118f52ce5ee88565d3cec83d30374efdc96
-> >>>   Author: David Hildenbrand <david@redhat.com>
-> >>>   Date:   Mon Feb 18 10:21:58 2019 +0100
-> >>>   
-> >>>       spapr: support memory unplug for qtest
-> >>>       
-> >>>       Fake availability of OV5_HP_EVT, so we can test memory unplug in qtest.
-> >>>
-> >>> Which makes sense since OV5_HP_EVT assumes that
-> >>> spapr->spapr->use_hotplug_event_source == true, which isn't the default for
-> >>> 2.7 and below.
-> >>>
-> >>> If I revert that I think I hit the bug it was meant to fix:
-> >>>
-> >>>   mdroth@sif:~/w/qemu-build3$ make V=1 check-qtest-ppc64
-> >>>   ...
-> >>>   PASS 1 device-plug-test /ppc64/device-plug/pci-unplug-request
-> >>>   PASS 2 device-plug-test /ppc64/device-plug/spapr-cpu-unplug-request
-> >>>   **
-> >>>   ERROR:/home/mdroth/w/qemu3.git/tests/device-plug-test.c:28:device_del_finish: assertion failed: (qdict_haskey(resp, "return"))
-> >>>   ERROR - Bail out! ERROR:/home/mdroth/w/qemu3.git/tests/device-plug-test.c:28:device_del_finish: assertion failed: (qdict_haskey(resp, "return"))
-> >>>   Aborted (core dumped)
-> >>>   /home/mdroth/w/qemu3.git/tests/Makefile.include:875: recipe for target 'check-qtest-ppc64' failed
-> >>>   make: *** [check-qtest-ppc64] Error 1
-> >>>   mdroth@sif:~/w/qemu-build3$
-> >>>
-> >>> Which is probably due to this check in spapr_machine_device_unplug_request():
-> >>>
-> >>>     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> >>>         if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
-> >>>             spapr_memory_unplug_request(hotplug_dev, dev, errp);
-> >>>         } else {
-> >>>             /* NOTE: this means there is a window after guest reset, prior to
-> >>>              * CAS negotiation, where unplug requests will fail due to the
-> >>>              * capability not being detected yet. This is a bit different than
-> >>>              * the case with PCI unplug, where the events will be queued and
-> >>>              * eventually handled by the guest after boot
-> >>>              */
-> >>>             error_setg(errp, "Memory hot unplug not supported for this guest");
-> >>>         }
-> >>>
-> >>>
-> >>>
-> >>> This spapr-cpu-unplug-request test is failing because
-> >>> spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT) relies on the CAS-negotiated OV5 bit,
-> >>> which wouldn't have happened with qtest. If we want to make these tests run in
-> >>> this scenario we probably need a different approach than the original patch.    
-> >>
-> >> We could rip out the patch along with the spapr memory unplug test.
-> >> However it feels like a step back to not have any memory unplug tests
-> >> for QEMU at all.
-> >>
-> >> Any spapr experts here if we can work around this?
-> >>  
-> > 
-> > Not sure about the expertise :) but I'm currently looking into it. As
-> > you say, it would be unfortunate to drop a test because of that.
-> >   
-> 
-> Could this work:
-> 
-> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
-> --- a/hw/ppc/spapr_ovec.c
-> +++ b/hw/ppc/spapr_ovec.c
-> @@ -12,6 +12,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "hw/ppc/spapr.h"
->  #include "hw/ppc/spapr_ovec.h"
->  #include "qemu/bitmap.h"
->  #include "exec/address-spaces.h"
-> @@ -134,7 +135,9 @@ bool spapr_ovec_test(sPAPROptionVector *ov, long bitnr)
->  
->      /* support memory unplug for qtest */
->      if (qtest_enabled() && bitnr == OV5_HP_EVT) {
-> -        return true;
-> +        sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> +
-> +        return spapr->use_hotplug_event_source;
->      }
->  
-
-This patch definitely fixes make check but having to add yet another
-qdev_get_machine() here is an indication that something is wrong.
-An older machine type that doesn't have use_hotplug_event_source
-shouldn't even bother about OV5_HP_EVT in the first place.
-
-rtas_event_log_to_source() seems to assume that the machine has
-an hotplug event source based on the fact that the guest advertised
-it has support to use such a source. This might be true with a
-regular guest because CAS would always clear the OV5_HP_EVT bit
-if the machine didn't support it. Anyway, this is subtle and
-thus fragile. If the machine doesn't know about hotplug event
-source, we should step away from EVENT_CLASS_HOT_PLUG explicitly.
-
-Something like:
-
----
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index ab9a1f0063d5..1a09dab6857d 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -307,11 +307,13 @@ rtas_event_log_to_source(sPAPRMachineState *spapr, int lo>
- 
-     switch (log_type) {
-     case RTAS_LOG_TYPE_HOTPLUG:
--        source = spapr_event_sources_get_source(spapr->event_sources,
--                                                EVENT_CLASS_HOT_PLUG);
--        if (spapr_ovec_test(spapr->ov5_cas, OV5_HP_EVT)) {
--            g_assert(source->enabled);
--            break;
-+        if (spapr->use_hotplug_event_source) {
-+            source = spapr_event_sources_get_source(spapr->event_sources,
-+                                                    EVENT_CLASS_HOT_PLUG);
-+            if (spapr_ovec_test(spapr->ov5_cas, OV5_HP_EVT)) {
-+                g_assert(source->enabled);
-+                break;
-+            }
-         }
-         /* fall back to epow for legacy hotplug interrupt source */
-     case RTAS_LOG_TYPE_EPOW:
----
-
->      return test_bit(bitnr, ov->bitmap) ? true : false;
-> 
-> 
-> ?
-> 
->  Thomas
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwMTExNTQxMy4yNzE1
+My0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMzAxMTE1NDEzLjI3MTUzLTEtZGF2aWRAcmVkaGF0
+LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzMyXSBzMzkweC90Y2c6IFZl
+Y3RvciBJbnN0cnVjdGlvbiBTdXBwb3J0IFBhcnQgMQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
+IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDExMTU0MTMu
+MjcxNTMtMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDExMTU0MTMuMjcxNTMt
+MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmNmMWM5
+YmUzZSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKNzg5Nzg3MmE1OSBzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKZTY2ZWQxYzQyZSBzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKN2RmYzJmYmU1NyBzMzkweC90
+Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVApkMGNkZTg1OWQwIHMzOTB4L3RjZzog
+SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQo2ZGViMjgxZDZiIHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
+ZV93cml0ZSBoZWxwZXIKYmExMDIxNzBiNCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU0lH
+TiBFWFRFTkQgVE8gRE9VQkxFV09SRAo4ZmQyZjExNGQ5IHMzOTB4L3RjZzogSW1wbGVtZW50IFZF
+Q1RPUiBTRUxFQ1QKNTUzYjFhNTkyMiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU0NBVFRF
+UiBFTEVNRU5UCjFlYTc2YWIxYzQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFJFUExJQ0FU
+RSBJTU1FRElBVEUKMTY2MDRjMzYyMyBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElD
+QVRFCjYxMDYxZDA0MTQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBFUk1VVEUgRE9VQkxF
+V09SRCBJTU1FRElBVEUKMGJiNmZhNjMxMyBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
+TVVURQo3MmRkNzU5MmExIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQQUNLICoKNDY1OTUx
+NzQ2MSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKQpmZmNkNDVh
+MzQzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEggTEVOR1RICmUzNTk4YjZj
+ODUgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQK
+NzU4MGY0YmY3YSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBWUiBFTEVNRU5UIEZS
+T00gR1IKYWUyN2JmNmQxNSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBUTyBCTE9D
+SyBCT1VOREFSWQo4YWEyZTMzMDhiIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIE1V
+TFRJUExFCjRiMDlmMmVlY2UgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTE9HSUNB
+TCBFTEVNRU5UIEFORCBaRVJPCmE5YjVkODlmYTcgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
+IExPQUQgR1IgRlJPTSBWUiBFTEVNRU5UCjk4NGJiMDU1NDQgczM5MHgvdGNnOiBJbXBsZW1lbnQg
+VkVDVE9SIExPQUQgRUxFTUVOVCBJTU1FRElBVEUKMjdiMjZlMTc3NyBzMzkweC90Y2c6IEltcGxl
+bWVudCBWRUNUT1IgTE9BRCBFTEVNRU5UCmI0MmFjMmRkY2YgczM5MHgvdGNnOiBJbXBsZW1lbnQg
+VkVDVE9SIExPQUQgQU5EIFJFUExJQ0FURQphM2MxNDk1NWI3IHMzOTB4L3RjZzogSW1wbGVtZW50
+IFZFQ1RPUiBMT0FECjEyMjg0MDZhYjEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVS
+QVRFIE1BU0sKMzU4N2RjZDI5MCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgR0VORVJBVEUg
+QllURSBNQVNLCjg3ZjgzZmYxYmQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdBVEhFUiBF
+TEVNRU5UCmIyY2JjOGU1MWYgczM5MHgvdGNnOiBVdGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVj
+dGlvbiBoZWxwZXJzCmNlZDI4MTBkZGQgczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIg
+aW5zdHJ1Y3Rpb25zIGF0IGNlbnRyYWwgcG9pbnQKMDdhZGQ1MzU1YyBzMzkweC90Y2c6IERlZmlu
+ZSB2ZWN0b3IgaW5zdHJ1Y3Rpb24gZm9ybWF0cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8zMiBD
+aGVja2luZyBjb21taXQgMDdhZGQ1MzU1Yzk2IChzMzkweC90Y2c6IERlZmluZSB2ZWN0b3IgaW5z
+dHJ1Y3Rpb24gZm9ybWF0cykKMi8zMiBDaGVja2luZyBjb21taXQgY2VkMjgxMGRkZDZiIChzMzkw
+eC90Y2c6IENoZWNrIHZlY3RvciByZWdpc3RlciBpbnN0cnVjdGlvbnMgYXQgY2VudHJhbCBwb2lu
+dCkKMy8zMiBDaGVja2luZyBjb21taXQgYjJjYmM4ZTUxZjAxIChzMzkweC90Y2c6IFV0aWxpdGll
+cyBmb3IgdmVjdG9yIGluc3RydWN0aW9uIGhlbHBlcnMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
+ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMwOiAK
+bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTI4IGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDMvMzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8zMiBD
+aGVja2luZyBjb21taXQgODdmODNmZjFiZDhhIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
+R0FUSEVSIEVMRU1FTlQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU2OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTU1IGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDQvMzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8zMiBDaGVja2luZyBjb21taXQgMzU4
+N2RjZDI5MDFiIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgR0VORVJBVEUgQllURSBNQVNL
+KQo2LzMyIENoZWNraW5nIGNvbW1pdCAxMjI4NDA2YWIxNDkgKHMzOTB4L3RjZzogSW1wbGVtZW50
+IFZFQ1RPUiBHRU5FUkFURSBNQVNLKQo3LzMyIENoZWNraW5nIGNvbW1pdCBhM2MxNDk1NWI3YzIg
+KHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEKQo4LzMyIENoZWNraW5nIGNvbW1pdCBi
+NDJhYzJkZGNmNDEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNB
+VEUpCjkvMzIgQ2hlY2tpbmcgY29tbWl0IDI3YjI2ZTE3NzcyOSAoczM5MHgvdGNnOiBJbXBsZW1l
+bnQgVkVDVE9SIExPQUQgRUxFTUVOVCkKMTAvMzIgQ2hlY2tpbmcgY29tbWl0IDk4NGJiMDU1NDQ0
+NyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVCBJTU1FRElBVEUpCjEx
+LzMyIENoZWNraW5nIGNvbW1pdCBhOWI1ZDg5ZmE3MTYgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZF
+Q1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVCkKMTIvMzIgQ2hlY2tpbmcgY29tbWl0IDRiMDlm
+MmVlY2UyOSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTE9HSUNBTCBFTEVNRU5U
+IEFORCBaRVJPKQoxMy8zMiBDaGVja2luZyBjb21taXQgOGFhMmUzMzA4YjcyIChzMzkweC90Y2c6
+IEltcGxlbWVudCBWRUNUT1IgTE9BRCBNVUxUSVBMRSkKMTQvMzIgQ2hlY2tpbmcgY29tbWl0IGFl
+MjdiZjZkMTU3ZSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVE8gQkxPQ0sgQk9V
+TkRBUlkpCjE1LzMyIENoZWNraW5nIGNvbW1pdCA3NTgwZjRiZjdhMTggKHMzOTB4L3RjZzogSW1w
+bGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJPTSBHUikKMTYvMzIgQ2hlY2tpbmcgY29t
+bWl0IGUzNTk4YjZjODVjYSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJP
+TSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNvbW1pdCBmZmNkNDVhMzQzMzQgKHMzOTB4
+L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEggTEVOR1RIKQoxOC8zMiBDaGVja2luZyBj
+b21taXQgNDY1OTUxNzQ2MWM2IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJ
+R0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IDcyZGQ3NTkyYTE2OSAoczM5MHgvdGNnOiBJ
+bXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
+dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTgyOiBGSUxFOiB0YXJnZXQv
+czM5MHgvdmVjX2hlbHBlci5jOjEyMzoKK3R5cGVkZWYgdWludCMjVEJJVFMjI190ICgqdnBrIyNC
+SVRTIyNfZm4pKHVpbnQjI0JJVFMjI190LCBpbnQgKik7ICAgICAgICAgICAgICBcCgp0b3RhbDog
+MSBlcnJvcnMsIDAgd2FybmluZ3MsIDI0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxOS8zMiBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjAvMzIgQ2hlY2tpbmcgY29tbWl0IDBiYjZmYTYzMTNh
+YyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBFUk1VVEUpCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiMyMTogRklMRTogdGFyZ2V0L3MzOTB4L2hlbHBlci5oOjE0MzoKK0RF
+Rl9IRUxQRVJfRkxBR1NfNShndmVjX3ZwZXJtLCBUQ0dfQ0FMTF9OT19SV0csIHZvaWQsIHB0ciwg
+Y3B0ciwgY3B0ciwgY3B0ciwgaTMyKQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OCBs
+aW5lcyBjaGVja2VkCgpQYXRjaCAyMC8zMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMS8z
+MiBDaGVja2luZyBjb21taXQgNjEwNjFkMDQxNDEzIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNU
+T1IgUEVSTVVURSBET1VCTEVXT1JEIElNTUVESUFURSkKMjIvMzIgQ2hlY2tpbmcgY29tbWl0IDE2
+NjA0YzM2MjM2ZSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFJFUExJQ0FURSkKMjMvMzIg
+Q2hlY2tpbmcgY29tbWl0IDFlYTc2YWIxYzQ5MiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
+IFJFUExJQ0FURSBJTU1FRElBVEUpCjI0LzMyIENoZWNraW5nIGNvbW1pdCA1NTNiMWE1OTIyYTgg
+KHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTQ0FUVEVSIEVMRU1FTlQpCjI1LzMyIENoZWNr
+aW5nIGNvbW1pdCA4ZmQyZjExNGQ5NDIgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTRUxF
+Q1QpCjI2LzMyIENoZWNraW5nIGNvbW1pdCBiYTEwMjE3MGI0ZTcgKHMzOTB4L3RjZzogSW1wbGVt
+ZW50IFZFQ1RPUiBTSUdOIEVYVEVORCBUTyBET1VCTEVXT1JEKQoyNy8zMiBDaGVja2luZyBjb21t
+aXQgNmRlYjI4MWQ2YjYwIChzMzkweC90Y2c6IFByb3ZpZGUgcHJvYmVfd3JpdGUgaGVscGVyKQoy
+OC8zMiBDaGVja2luZyBjb21taXQgZDBjZGU4NTlkMDBlIChzMzkweC90Y2c6IEltcGxlbWVudCBW
+RUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5nIGNvbW1pdCA3ZGZjMmZiZTU3ODIgKHMzOTB4L3Rj
+ZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBFTEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQg
+ZTY2ZWQxYzQyZTQ5IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUp
+CjMxLzMyIENoZWNraW5nIGNvbW1pdCA3ODk3ODcyYTU5ZmQgKHMzOTB4L3RjZzogSW1wbGVtZW50
+IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkKMzIvMzIgQ2hlY2tpbmcgY29tbWl0IDJjZjFjOWJl
+M2U5NCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDMwMTExNTQxMy4yNzE1
+My0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
