@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37034)
+Received: from eggs.gnu.org ([209.51.188.92]:37932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzeYe-0007yc-CO
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:34:21 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gzedT-0001d9-No
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:39:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzeYd-0000yT-LO
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:34:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gzeYd-0000w6-9h
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:34:19 -0500
-Date: Fri, 1 Mar 2019 10:33:46 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190301103346.00389986@redhat.com>
-In-Reply-To: <20190301074448.8926-1-richardw.yang@linux.intel.com>
-References: <20190301074448.8926-1-richardw.yang@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qom: remove type_initialize() in
- object_new_with_type()
+	(envelope-from <cohuck@redhat.com>) id 1gzedO-00046i-5u
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:39:15 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Fri,  1 Mar 2019 10:38:56 +0100
+Message-Id: <20190301093902.27799-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/6] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +18,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, afaerber@suse.de
+To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-On Fri,  1 Mar 2019 15:44:48 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
+[This is the Linux kernel part, git tree is available at
+https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps-v3
 
-> Here is the abstraction of current call flow of object_new_with_type()
-> 
->     object_initialize_with_type
->         type_initialize
-> 	object_initialize_with_type
-> 	    type_initialize
-> 
-> This is not necessary to spread type_initialize in two places.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> ---
->  qom/object.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/qom/object.c b/qom/object.c
-> index b8c732063b..6252cca418 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -585,7 +585,6 @@ static Object *object_new_with_type(Type type)
->      Object *obj;
->  
->      g_assert(type != NULL);
-> -    type_initialize(type);
->  
->      obj = g_malloc(type->instance_size);
->      object_initialize_with_type(obj, type->instance_size, type);
-Are you sure it's correct?
+The companion QEMU patches are available at
+https://github.com/cohuck/qemu vfio-ccw-caps]
 
-see how type->instance_size
+Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
+device. This tends to work well for the most common 'good path' scenarios;
+however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
+clearing pending requests at the device is currently not supported.
+This may be a problem for e.g. error recovery.
 
-PS:
-there is also unit-tests which might detect issues in patches before
-one sends them. To execute them run: make  check
+This patch series introduces capabilities (similar to what vfio-pci uses)
+and exposes a new async region for handling hsch/csch.
+
+Lightly tested (I can interact with a dasd as before, and reserve/release
+seems to work well.) Not sure if there is a better way to test this, ideas
+welcome.
+
+Changes v3->v4:
+- shrunk the capability offset, we don't need to accommodate as much as pci
+- make checks in patch 1 more consistent and less buggy
+- rebased on top of my current vfio-ccw branch
+
+Changes v2->v3:
+- Unb0rked patch 1, improved scope
+- Split out the new mutex from patch 2 into new patch 3; added missing
+  locking and hopefully improved description
+- Patch 2 now reworks the state handling by splitting the BUSY state
+  into CP_PROCESSING and CP_PENDING
+- Patches 3 and 5 adapted on top of the reworked patches; hsch/csch
+  are allowed in CP_PENDING, but not in CP_PROCESSING (did not add
+  any R-b due to that)
+- Added missing free in patch 5
+- Probably some small changes I forgot to note down
+
+Changes v1->v2:
+- New patch 1: make it safe to use the cp accessors at any time; this
+  should avoid problems with unsolicited interrupt handling
+- New patch 2: handle concurrent accesses to the io region; the idea is
+  to return -EAGAIN to userspace more often (so it can simply retry)
+- also handle concurrent accesses to the async io region
+- change VFIO_REGION_TYPE_CCW
+- merge events for halt and clear to a single async event; this turned out
+  to make the code quite a bit simpler
+- probably some small changes I forgot to note down
+
+Cornelia Huck (6):
+  vfio-ccw: make it safe to access channel programs
+  vfio-ccw: rework ssch state handling
+  vfio-ccw: protect the I/O region
+  vfio-ccw: add capabilities chain
+  s390/cio: export hsch to modules
+  vfio-ccw: add handling for async channel instructions
+
+ drivers/s390/cio/Makefile           |   3 +-
+ drivers/s390/cio/ioasm.c            |   1 +
+ drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++
+ drivers/s390/cio/vfio_ccw_cp.c      |  21 ++-
+ drivers/s390/cio/vfio_ccw_cp.h      |   2 +
+ drivers/s390/cio/vfio_ccw_drv.c     |  57 ++++++--
+ drivers/s390/cio/vfio_ccw_fsm.c     | 143 +++++++++++++++++-
+ drivers/s390/cio/vfio_ccw_ops.c     | 215 +++++++++++++++++++++++-----
+ drivers/s390/cio/vfio_ccw_private.h |  48 ++++++-
+ include/uapi/linux/vfio.h           |   4 +
+ include/uapi/linux/vfio_ccw.h       |  12 ++
+ 11 files changed, 537 insertions(+), 57 deletions(-)
+ create mode 100644 drivers/s390/cio/vfio_ccw_async.c
+
+-- 
+2.17.2
