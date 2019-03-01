@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48407)
+Received: from eggs.gnu.org ([209.51.188.92]:48945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gzfJv-0005Zp-5H
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:23:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1gzfMM-0006ej-9i
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:25:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gzfJu-0003tU-Gd
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:23:11 -0500
-Date: Fri, 1 Mar 2019 11:22:55 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190301112255.3d09ba69.cohuck@redhat.com>
-In-Reply-To: <20190221005753.27955-5-crosa@redhat.com>
-References: <20190221005753.27955-1-crosa@redhat.com>
-	<20190221005753.27955-5-crosa@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gzfMJ-0005Js-Sn
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:25:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40524)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gzfMI-0005Ir-HJ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:25:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gzfMG-0002Xq-L5
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 10:25:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9C1DF2E8073
+	for <qemu-devel@nongnu.org>; Fri,  1 Mar 2019 10:25:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/20] Acceptance tests: fix doc
- reference to avocado_qemu directory
+Date: Fri, 01 Mar 2019 10:14:23 -0000
+From: Huan Xiong <1818207@bugs.launchpad.net>
+Reply-To: Bug 1818207 <1818207@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155143526311.31693.6210776474492711183.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818207] [NEW] [aarch64] VM status remains
+ "running" after it's suspended
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,24 +36,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: qemu-devel@nongnu.org
 
-On Wed, 20 Feb 2019 19:57:37 -0500
-Cleber Rosa <crosa@redhat.com> wrote:
+Public bug reported:
 
-> The "this directory" reference is misleading and confusing, it's a
-> leftover from when this text was proposed in a README file inside
-> the "tests/acceptance/avocado_qemu" directory.
->=20
-> When that text was moved to the top level docs directory, the
-> reference was not updated.
->=20
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  docs/devel/testing.rst | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+The issue is observed on aarch64 (I didn't check x86) with latest
+upstream QEMU bits.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Steps to reproduce:
+
+1) start guest
+
+2) suspend guest with this command:
+
+# echo mem > /sys/power/state
+
+  Check console messages, which should indicate that guest has been
+suspended.
+
+3) check guest status through HMP command "info status":
+
+  (qemu) info status
+   info status
+   VM status: running
+
+Note it's "running", which is incorrect.
+
+QEMU version:
+
+# qemu-system-aarch64 --version
+QEMU emulator version 3.1.50 (v3.1.0-2203-g9403bcc)
+Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+The issue prevents user from resuming a suspended guest through
+"system_wakeup" HMP command, because QEMU thinks the guest is in running
+state and does nothing.
+
+I think the issues occurs because qemu_system_wakeup_request() doesn't
+get called. It seems the root cause is with ACPI related code.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: aarch64
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818207
+
+Title:
+  [aarch64] VM status remains "running" after it's suspended
+
+Status in QEMU:
+  New
+
+Bug description:
+  The issue is observed on aarch64 (I didn't check x86) with latest
+  upstream QEMU bits.
+
+  Steps to reproduce:
+
+  1) start guest
+
+  2) suspend guest with this command:
+
+  # echo mem > /sys/power/state
+
+    Check console messages, which should indicate that guest has been
+  suspended.
+
+  3) check guest status through HMP command "info status":
+
+    (qemu) info status
+     info status
+     VM status: running
+
+  Note it's "running", which is incorrect.
+
+  QEMU version:
+
+  # qemu-system-aarch64 --version
+  QEMU emulator version 3.1.50 (v3.1.0-2203-g9403bcc)
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+  The issue prevents user from resuming a suspended guest through
+  "system_wakeup" HMP command, because QEMU thinks the guest is in
+  running state and does nothing.
+
+  I think the issues occurs because qemu_system_wakeup_request() doesn't
+  get called. It seems the root cause is with ACPI related code.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818207/+subscriptions
