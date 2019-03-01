@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37932)
+Received: from eggs.gnu.org ([209.51.188.92]:37948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gzedT-0001d9-No
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:39:20 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gzedW-0001ea-S9
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:39:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gzedO-00046i-5u
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:39:15 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gzedU-0004As-VW
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:39:22 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  1 Mar 2019 10:38:56 +0100
-Message-Id: <20190301093902.27799-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 0/6] vfio-ccw: support hsch/csch (kernel
- part)
+Date: Fri,  1 Mar 2019 10:38:57 +0100
+Message-Id: <20190301093902.27799-2-cohuck@redhat.com>
+In-Reply-To: <20190301093902.27799-1-cohuck@redhat.com>
+References: <20190301093902.27799-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 1/6] vfio-ccw: make it safe to access
+ channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,74 +23,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
 Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-[This is the Linux kernel part, git tree is available at
-https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps-v3
+When we get a solicited interrupt, the start function may have
+been cleared by a csch, but we still have a channel program
+structure allocated. Make it safe to call the cp accessors in
+any case, so we can call them unconditionally.
 
-The companion QEMU patches are available at
-https://github.com/cohuck/qemu vfio-ccw-caps]
+While at it, also make sure that functions called from other parts
+of the code return gracefully if the channel program structure
+has not been initialized (even though that is a bug in the caller).
 
-Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
-device. This tends to work well for the most common 'good path' scenarios;
-however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
-clearing pending requests at the device is currently not supported.
-This may be a problem for e.g. error recovery.
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ drivers/s390/cio/vfio_ccw_cp.c  | 21 ++++++++++++++++++++-
+ drivers/s390/cio/vfio_ccw_cp.h  |  2 ++
+ drivers/s390/cio/vfio_ccw_fsm.c |  5 +++++
+ 3 files changed, 27 insertions(+), 1 deletion(-)
 
-This patch series introduces capabilities (similar to what vfio-pci uses)
-and exposes a new async region for handling hsch/csch.
-
-Lightly tested (I can interact with a dasd as before, and reserve/release
-seems to work well.) Not sure if there is a better way to test this, ideas
-welcome.
-
-Changes v3->v4:
-- shrunk the capability offset, we don't need to accommodate as much as pci
-- make checks in patch 1 more consistent and less buggy
-- rebased on top of my current vfio-ccw branch
-
-Changes v2->v3:
-- Unb0rked patch 1, improved scope
-- Split out the new mutex from patch 2 into new patch 3; added missing
-  locking and hopefully improved description
-- Patch 2 now reworks the state handling by splitting the BUSY state
-  into CP_PROCESSING and CP_PENDING
-- Patches 3 and 5 adapted on top of the reworked patches; hsch/csch
-  are allowed in CP_PENDING, but not in CP_PROCESSING (did not add
-  any R-b due to that)
-- Added missing free in patch 5
-- Probably some small changes I forgot to note down
-
-Changes v1->v2:
-- New patch 1: make it safe to use the cp accessors at any time; this
-  should avoid problems with unsolicited interrupt handling
-- New patch 2: handle concurrent accesses to the io region; the idea is
-  to return -EAGAIN to userspace more often (so it can simply retry)
-- also handle concurrent accesses to the async io region
-- change VFIO_REGION_TYPE_CCW
-- merge events for halt and clear to a single async event; this turned out
-  to make the code quite a bit simpler
-- probably some small changes I forgot to note down
-
-Cornelia Huck (6):
-  vfio-ccw: make it safe to access channel programs
-  vfio-ccw: rework ssch state handling
-  vfio-ccw: protect the I/O region
-  vfio-ccw: add capabilities chain
-  s390/cio: export hsch to modules
-  vfio-ccw: add handling for async channel instructions
-
- drivers/s390/cio/Makefile           |   3 +-
- drivers/s390/cio/ioasm.c            |   1 +
- drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++
- drivers/s390/cio/vfio_ccw_cp.c      |  21 ++-
- drivers/s390/cio/vfio_ccw_cp.h      |   2 +
- drivers/s390/cio/vfio_ccw_drv.c     |  57 ++++++--
- drivers/s390/cio/vfio_ccw_fsm.c     | 143 +++++++++++++++++-
- drivers/s390/cio/vfio_ccw_ops.c     | 215 +++++++++++++++++++++++-----
- drivers/s390/cio/vfio_ccw_private.h |  48 ++++++-
- include/uapi/linux/vfio.h           |   4 +
- include/uapi/linux/vfio_ccw.h       |  12 ++
- 11 files changed, 537 insertions(+), 57 deletions(-)
- create mode 100644 drivers/s390/cio/vfio_ccw_async.c
-
+diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+index 384b3987eeb4..0e79799e9a71 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.c
++++ b/drivers/s390/cio/vfio_ccw_cp.c
+@@ -362,6 +362,7 @@ static void cp_unpin_free(struct channel_program *cp)
+ 	struct ccwchain *chain, *temp;
+ 	int i;
+ 
++	cp->initialized = false;
+ 	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
+ 		for (i = 0; i < chain->ch_len; i++) {
+ 			pfn_array_table_unpin_free(chain->ch_pat + i,
+@@ -732,6 +733,9 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+ 	 */
+ 	cp->orb.cmd.c64 = 1;
+ 
++	if (!ret)
++		cp->initialized = true;
++
+ 	return ret;
+ }
+ 
+@@ -746,7 +750,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+  */
+ void cp_free(struct channel_program *cp)
+ {
+-	cp_unpin_free(cp);
++	if (cp->initialized)
++		cp_unpin_free(cp);
+ }
+ 
+ /**
+@@ -791,6 +796,10 @@ int cp_prefetch(struct channel_program *cp)
+ 	struct ccwchain *chain;
+ 	int len, idx, ret;
+ 
++	/* this is an error in the caller */
++	if (!cp->initialized)
++		return -EINVAL;
++
+ 	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+ 		len = chain->ch_len;
+ 		for (idx = 0; idx < len; idx++) {
+@@ -826,6 +835,10 @@ union orb *cp_get_orb(struct channel_program *cp, u32 intparm, u8 lpm)
+ 	struct ccwchain *chain;
+ 	struct ccw1 *cpa;
+ 
++	/* this is an error in the caller */
++	if (!cp->initialized)
++		return NULL;
++
+ 	orb = &cp->orb;
+ 
+ 	orb->cmd.intparm = intparm;
+@@ -862,6 +875,9 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
+ 	u32 cpa = scsw->cmd.cpa;
+ 	u32 ccw_head;
+ 
++	if (!cp->initialized)
++		return;
++
+ 	/*
+ 	 * LATER:
+ 	 * For now, only update the cmd.cpa part. We may need to deal with
+@@ -898,6 +914,9 @@ bool cp_iova_pinned(struct channel_program *cp, u64 iova)
+ 	struct ccwchain *chain;
+ 	int i;
+ 
++	if (!cp->initialized)
++		return false;
++
+ 	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+ 		for (i = 0; i < chain->ch_len; i++)
+ 			if (pfn_array_table_iova_pinned(chain->ch_pat + i,
+diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
+index a4b74fb1aa57..3c20cd208da5 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.h
++++ b/drivers/s390/cio/vfio_ccw_cp.h
+@@ -21,6 +21,7 @@
+  * @ccwchain_list: list head of ccwchains
+  * @orb: orb for the currently processed ssch request
+  * @mdev: the mediated device to perform page pinning/unpinning
++ * @initialized: whether this instance is actually initialized
+  *
+  * @ccwchain_list is the head of a ccwchain list, that contents the
+  * translated result of the guest channel program that pointed out by
+@@ -30,6 +31,7 @@ struct channel_program {
+ 	struct list_head ccwchain_list;
+ 	union orb orb;
+ 	struct device *mdev;
++	bool initialized;
+ };
+ 
+ extern int cp_init(struct channel_program *cp, struct device *mdev,
+diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+index cab17865aafe..e7c9877c9f1e 100644
+--- a/drivers/s390/cio/vfio_ccw_fsm.c
++++ b/drivers/s390/cio/vfio_ccw_fsm.c
+@@ -31,6 +31,10 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+ 	private->state = VFIO_CCW_STATE_BUSY;
+ 
+ 	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
++	if (!orb) {
++		ret = -EIO;
++		goto out;
++	}
+ 
+ 	/* Issue "Start Subchannel" */
+ 	ccode = ssch(sch->schid, orb);
+@@ -64,6 +68,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+ 	default:
+ 		ret = ccode;
+ 	}
++out:
+ 	spin_unlock_irqrestore(sch->lock, flags);
+ 	return ret;
+ }
 -- 
 2.17.2
