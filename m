@@ -1,23 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41125)
+Received: from eggs.gnu.org ([209.51.188.92]:51320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gzn52-00016F-PC
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:40:32 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznO1-0006Al-MU
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gzn4o-00084Z-Ug
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:40:20 -0500
-Sender: Corey Minyard <tcminyard@gmail.com>
-Date: Fri, 1 Mar 2019 12:39:45 -0600
-From: Corey Minyard <minyard@acm.org>
-Message-ID: <20190301183945.GC19921@minyard.net>
-Reply-To: minyard@acm.org
-References: <1551456970-463-1-git-send-email-thuth@redhat.com>
-	<74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests: Remove (mostly) useless
- architecture checks
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznNx-0003kL-1V
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:59:55 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33670
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gznNt-0003X3-9F
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 13:59:52 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x21Ixj0H004295
+	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 13:59:46 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qy94w3gsf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 13:59:45 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Fri, 1 Mar 2019 18:59:42 -0000
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Fri,  1 Mar 2019 13:59:22 -0500
+In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+Message-Id: <1551466776-29123-3-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 02/16] s390-bios: decouple cio setup from
+ virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,126 +39,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On Fri, Mar 01, 2019 at 12:57:19PM -0500, John Snow wrote:
-> 
-> 
-> On 3/1/19 11:16 AM, Thomas Huth wrote:
-> > These checks at the beginning of some of the tests are mostly useless:
-> > We only run the tests on x86 anyway, and g_test_message() does not
-> > print anything unless you call g_test_init() first.
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  tests/fdc-test.c      | 7 -------
-> >  tests/ide-test.c      | 7 -------
-> >  tests/ipmi-bt-test.c  | 7 -------
-> >  tests/ipmi-kcs-test.c | 7 -------
-> >  4 files changed, 28 deletions(-)
-> > 
-> > diff --git a/tests/fdc-test.c b/tests/fdc-test.c
-> > index 88f1abf..31cd329 100644
-> > --- a/tests/fdc-test.c
-> > +++ b/tests/fdc-test.c
-> > @@ -548,16 +548,9 @@ static void fuzz_registers(void)
-> >  
-> >  int main(int argc, char **argv)
-> >  {
-> > -    const char *arch = qtest_get_arch();
-> >      int fd;
-> >      int ret;
-> >  
-> > -    /* Check architecture */
-> > -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
-> > -        g_test_message("Skipping test for non-x86\n");
-> > -        return 0;
-> > -    }
-> > -
-> >      /* Create a temporary raw image */
-> >      fd = mkstemp(test_image);
-> >      g_assert(fd >= 0);
-> > diff --git a/tests/ide-test.c b/tests/ide-test.c
-> > index f0280e6..300d64e 100644
-> > --- a/tests/ide-test.c
-> > +++ b/tests/ide-test.c
-> > @@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
-> >  
-> >  int main(int argc, char **argv)
-> >  {
-> > -    const char *arch = qtest_get_arch();
-> >      int fd;
-> >      int ret;
-> >  
-> > -    /* Check architecture */
-> > -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
-> > -        g_test_message("Skipping test for non-x86\n");
-> > -        return 0;
-> > -    }
-> > -
-> >      /* Create temporary blkdebug instructions */
-> >      fd = mkstemp(debug_path);
-> >      g_assert(fd >= 0);
-> > diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
-> > index f4a81b5..fc4c83b 100644
-> > --- a/tests/ipmi-bt-test.c
-> > +++ b/tests/ipmi-bt-test.c
-> > @@ -400,15 +400,8 @@ static void open_socket(void)
-> >  
-> >  int main(int argc, char **argv)
-> >  {
-> > -    const char *arch = qtest_get_arch();
-> >      int ret;
-> >  
-> > -    /* Check architecture */
-> > -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
-> > -        g_test_message("Skipping test for non-x86\n");
-> > -        return 0;
-> > -    }
-> > -
-> >      open_socket();
-> >  
-> >      /* Run the tests */
-> > diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
-> > index 178ffc1..a2354c1 100644
-> > --- a/tests/ipmi-kcs-test.c
-> > +++ b/tests/ipmi-kcs-test.c
-> > @@ -263,16 +263,9 @@ static void test_enable_irq(void)
-> >  
-> >  int main(int argc, char **argv)
-> >  {
-> > -    const char *arch = qtest_get_arch();
-> >      char *cmdline;
-> >      int ret;
-> >  
-> > -    /* Check architecture */
-> > -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
-> > -        g_test_message("Skipping test for non-x86\n");
-> > -        return 0;
-> > -    }
-> > -
-> >      /* Run the tests */
-> >      g_test_init(&argc, &argv, NULL);
-> >  
-> > 
-> 
-> Hm, if you insist. I have no strong feelings... Do we plan to split
-> tests out by architecture eventually? Clearly x86 only tests don't
-> really need to each individually check the arch, but I'm not sure what
-> the vision is.
+Move channel i/o setup code out to a separate function. This decouples cio
+setup from the virtio code path and allows us to make use of it for booting
+dasd devices.
 
-Hmm, I don't have strong feelings, either, but I assume that you
-would want to leave the door open for testing on arches besides
-x86.  The IPMI device is used by at least powerpc, and probably
-in some upcoming ARM64 systems.
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/main.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-But in that case you would want to remove these checks, anyway, and
-find some other way to know if you want to run the test.  So...
-
-Acked-by: Corey Minyard <cminyard@mvista.com>
-
-> 
-> Either way, since I have no horse in the race:
-> 
-> Acked-by: John Snow <jsnow@redhat.com>
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 544851d..e82fe2c 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -99,6 +99,18 @@ static void menu_setup(void)
+     }
+ }
+ 
++/*
++ * Initialize the channel I/O subsystem so we can talk to our ipl/boot device.
++ */
++static void css_setup(void)
++{
++    /*
++     * Unconditionally enable mss support. In every sane configuration this
++     * will succeed; and even if it doesn't, stsch_err() can handle it.
++     */
++    enable_mss_facility();
++}
++
+ static void virtio_setup(void)
+ {
+     Schib schib;
+@@ -109,13 +121,6 @@ static void virtio_setup(void)
+     VDev *vdev = virtio_get_device();
+     QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+ 
+-    /*
+-     * We unconditionally enable mss support. In every sane configuration,
+-     * this will succeed; and even if it doesn't, stsch_err() can deal
+-     * with the consequences.
+-     */
+-    enable_mss_facility();
+-
+     sclp_get_loadparm_ascii(loadparm_str);
+     memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+     sclp_print(ldp);
+@@ -168,6 +173,7 @@ static void virtio_setup(void)
+ int main(void)
+ {
+     sclp_setup();
++    css_setup();
+     virtio_setup();
+ 
+     zipl_load(); /* no return */
+-- 
+2.7.4
