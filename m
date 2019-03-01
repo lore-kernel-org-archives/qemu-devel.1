@@ -1,14 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38504)
+Received: from eggs.gnu.org ([209.51.188.92]:47644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gznic-0006VQ-NZ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:21:15 -0500
+	(envelope-from <groug@kaod.org>) id 1gznth-0007fj-7g
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:32:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gzniU-0005KQ-28
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:21:07 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Fri,  1 Mar 2019 14:15:38 -0500
-Message-Id: <20190301191545.8728-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/7] bitmaps: add inconsistent bit
+	(envelope-from <groug@kaod.org>) id 1gzntf-000246-Kl
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:32:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39632)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gznte-0001xk-1r
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:32:39 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x21JOEt8048953
+	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:32:34 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qyaegska1-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:32:34 -0500
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Fri, 1 Mar 2019 19:32:31 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 01 Mar 2019 20:32:24 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <155146874478.147873.5019623412212796259.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH 0/2] spapr: Fix CPU unplug tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,54 +37,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-Allow QEMU to read in bitmaps that have the in-use bit set, for the
-purposes of allowing users to delete those bitmaps.
+This series follows another approach suggested by Mike Roth in
+order to fix the recent breakage of CPU unplug tests caused by
+commit b8165118f52c, as discussed here:
 
-This is chosen in preference to a hard error on load to minimize
-impact for a non-critical error, but to force the user or management
-utility to acknowledge that the bitmap is no longer viable.
+https://patchwork.ozlabs.org/patch/1050227/
 
-1. Changed wording of meaning of persistent bit, inconsistent bit
-   Declining to optimize to avoid allocations for this revision.
+--
+Greg
 
-2. Add Reviewed-by from Eric.
+---
 
-3. Split into several patches that are more single-purpose, which
-   highlights the individual fixes more clearly;
+Greg Kurz (2):
+      Revert "spapr: support memory unplug for qtest"
+      spapr: Simulate CAS for qtest
 
-   - Prohibit BUSY or INCONSISTENT bitmaps from being merge sources.
 
-4. Declining feedback to prohibit disabling or enabling readonly bitmaps,
-   on the basis that users may wish to enable/disable them prior to
-   remounting their backing storage RW.
-
-   Decided to prohibit attempting to remove readonly bitmaps, so the
-   failure happens earlier.
-
-   Prohibit sync=incremental backups using readonly bitmaps, because
-   they're not capable of clearing the bitmap on success.
-   sync=differential would be acceptable here. (Good spot, Vladimir.)
-
-John Snow (7):
-  block/dirty-bitmaps: add inconsistent bit
-  block/dirty-bitmap: add inconsistent status
-  block/dirty-bitmaps: add block_dirty_bitmap_check function
-  block/dirty-bitmaps: prohibit readonly bitmaps for backups
-  block/dirty-bitmaps: prohibit removing readonly bitmaps
-  block/dirty-bitmaps: disallow busy bitmaps as merge source
-  block/dirty-bitmaps: implement inconsistent bit
-
- qapi/block-core.json           |  20 +++++--
- include/block/dirty-bitmap.h   |  15 ++++-
- block/dirty-bitmap.c           |  63 +++++++++++++++++---
- block/qcow2-bitmap.c           | 103 +++++++++++++++++----------------
- blockdev.c                     |  50 ++++------------
- migration/block-dirty-bitmap.c |  12 +---
- nbd/server.c                   |   3 +-
- 7 files changed, 151 insertions(+), 115 deletions(-)
-
--- 
-2.17.2
+ hw/ppc/spapr.c      |   11 +++++++++++
+ hw/ppc/spapr_ovec.c |    6 ------
+ 2 files changed, 11 insertions(+), 6 deletions(-)
