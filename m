@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42181)
+Received: from eggs.gnu.org ([209.51.188.92]:44585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gzjLs-00067U-Ho
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 09:41:30 -0500
+	(envelope-from <groug@kaod.org>) id 1gzjds-0003Sm-2i
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:00:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gzjLr-0001X2-GO
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 09:41:28 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:33296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1gzjLr-0001W7-72
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 09:41:27 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id i12so26187839wrw.0
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 06:41:27 -0800 (PST)
+	(envelope-from <groug@kaod.org>) id 1gzjdq-0005hN-6h
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:00:04 -0500
+Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:59417)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gzjdp-0005e8-7C
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:00:02 -0500
+Received: from player695.ha.ovh.net (unknown [10.109.146.20])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 714181FE8D7
+	for <qemu-devel@nongnu.org>; Fri,  1 Mar 2019 15:59:57 +0100 (CET)
+Date: Fri, 1 Mar 2019 15:59:51 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190301155951.11122086@bahia.lan>
+In-Reply-To: <CAFEAcA_B4fMvhP+cXhZQX0g5FMq1MvPxcfboT=pDSu9Ww_fFNA@mail.gmail.com>
+References: <155137665241.44413.528147250140332507.stgit@bahia.lan>
+	<CAFEAcA_B4fMvhP+cXhZQX0g5FMq1MvPxcfboT=pDSu9Ww_fFNA@mail.gmail.com>
 MIME-Version: 1.0
-References: <CAKyx-3Paa6_RreGZw3sT+qmwu1=_DLnR_RDxa_gN20vwD1EnLw@mail.gmail.com>
-	<20190225152618.r3epnypkpu6fyokt@sirius.home.kraxel.org>
-	<A17B6D30-F428-48E5-B9D0-6F6E7DEE3778@gmail.com>
-	<20190226064347.i5kvwazmz3xcupkj@sirius.home.kraxel.org>
-	<CAKyx-3OOkkdSQ=UAucP_ZpormrEczwNhEpAnVtFeQOSOrnD7Vg@mail.gmail.com>
-	<20190227052755.3lgo3265kaa6bzmi@sirius.home.kraxel.org>
-	<1ef851d2-4148-56f0-65ac-a0e75022f20e@ilande.co.uk>
-	<CAKyx-3OsujsekrxTa1e=4FNb=pNQxELr8XccS9r2-9_9SxoWtQ@mail.gmail.com>
-	<20190301054740.kmju3elrma5eqd4u@sirius.home.kraxel.org>
-In-Reply-To: <20190301054740.kmju3elrma5eqd4u@sirius.home.kraxel.org>
-From: G 3 <programmingkidx@gmail.com>
-Date: Fri, 1 Mar 2019 09:41:14 -0500
-Message-ID: <CAKyx-3P46nR5Gef2zTBJgzFVeGR5rcV_iRpXP=26C_=V5t=YiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Questions about EDID
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] usb-mtp: Fix build with gcc 9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,68 +30,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>
 
-If the value is already in the list, then something else must be happening
-that prevents the custom resolution from reaching the guest. Would you know
-where in the list the custom resolution is added? My guess right now is the
-size of the list is being reported incorrectly - the custom resolution
-isn't being counted. When the operating system iterates thru the list it
-might stop right before the custom resolution value, preventing its
-inclusion.
+On Thu, 28 Feb 2019 18:28:23 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-On Fri, Mar 1, 2019 at 12:47 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
-
-> On Thu, Feb 28, 2019 at 11:53:43AM -0500, G 3 wrote:
-> > On Thu, Feb 28, 2019 at 12:01 AM Mark Cave-Ayland <
-> > mark.cave-ayland@ilande.co.uk> wrote:
+> On Thu, 28 Feb 2019 at 17:57, Greg Kurz <groug@kaod.org> wrote:
 > >
-> > > On 27/02/2019 05:27, Gerd Hoffmann wrote:
-> > >
-> > > > On Tue, Feb 26, 2019 at 04:11:06PM -0500, G 3 wrote:
-> > > >> When I use edid=on, I do see a lot of extra resolutions available in
-> > > Mac OS
-> > > >> 9 and Mac OS X, just not the resolution I want to use. Is there some
-> > > kind
-> > > >> of rule like the resolution value has to be divisible by a certain
-> > > number?
-> > > >
-> > > > qemu doesn't have such a requirement.
-> > > > Might be the guest drivers have.
-> > > > Try making width/height multiple of 8 or 16.
-> > >
-> > > Right, at the moment all the MacOS driver does is parse the resolution
-> > > list from the
-> > > EDID and add them to the dropdown list - it doesn't support the xres
-> and
-> > > yres properties.
-> > >
+> > Build fails with gcc 9:
 > >
-> > Gerd, could the xres +yres numbers be added to the list of resolutions
-> > then?
->
-> That is already the case:
->
-> qemu-edid -x 1234 -y 567 | edid-decode
-> [ ... ]
-> First detailed timing is preferred timing
-> Established timings supported:
->   640x480@60Hz
->   800x600@60Hz
->   1024x768@60Hz
-> Standard timings supported:
->   2048x1152@60Hz
->   1920x1080@60Hz
-> Detailed mode: Clock 73.170 MHz, 485 mm x 223 mm
->                1234 1542 1579 1665 hborder 0
->                ^^^^
->                 567  569  571  586 vborder 0
->                 ^^^
->                -hsync -vsync
-> [ ... ]
->
-> cheers,
->   Gerd
->
->
+> >   CC      hw/usb/dev-mtp.o
+> > hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
+> > hw/usb/dev-mtp.c:1754:36: error: taking address of packed member of =E2=
+=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
+[-Werror=3Daddress-of-packed-member]
+> >  1754 |                             dataset->filename);
+> >       |                             ~~~~~~~^~~~~~~~~~
+> > cc1: all warnings being treated as errors
+> >
+> > The way the MTP protocol encodes strings with a leading 8-bit unsigned
+> > integer containing the string length causes the @filename field of the
+> > packed ObjectInfo structure to be unaligned.
+> >
+> > Use a temporary buffer for the utf16 filename instead of passing the
+> > dataset->filename pointer around.
+> >
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/usb/dev-mtp.c |   18 +++++++++++++++---
+> >  1 file changed, 15 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> > index 4ee4fc5a893a..8a0ef7f9f4a8 100644
+> > --- a/hw/usb/dev-mtp.c
+> > +++ b/hw/usb/dev-mtp.c
+> > @@ -1692,13 +1692,25 @@ static void usb_mtp_write_metadata(MTPState *s,=
+ uint64_t dlen)
+> >      MTPObject *o;
+> >      MTPObject *p =3D usb_mtp_object_lookup(s, s->dataset.parent_handle=
+);
+> >      uint32_t next_handle =3D s->next_handle;
+> > +    uint16_t *utf16_filename;
+> > +    uint8_t filename_len;
+> >
+> >      assert(!s->write_pending);
+> >      assert(p !=3D NULL);
+> >
+> > -    filename =3D utf16_to_str(MIN(dataset->length,
+> > -                                dlen - offsetof(ObjectInfo, filename)),
+> > -                            dataset->filename);
+> > +    /*
+> > +     * MTP Specification 3.2.3 Strings
+> > +     * Strings in PTP (and thus MTP) consist of standard 2-byte Unicode
+> > +     * characters as defined by ISO 10646. Strings begin with a single=
+, 8-bit
+> > +     * unsigned integer that identifies the number of characters to fo=
+llow (not
+> > +     * bytes).
+> > +     *
+> > +     * This causes dataset->filename to be unaligned.
+> > +     */
+> > +    filename_len =3D MIN(dataset->length, dlen - offsetof(ObjectInfo, =
+filename));
+> > +    utf16_filename =3D g_memdup(dataset->filename, filename_len * 2);
+> > +    filename =3D utf16_to_str(filename_len, utf16_filename);
+> > +    g_free(utf16_filename); =20
+>=20
+> I think there's an underlying problem with this code which we
+> should deal with differently. The 'dataset' local in this
+> file is (I think) pointing at on-the-wire information from
+> the USB device, but we're treating it as an array of
+> host-order uint16_t values. Is this really correct on a
+> big-endian host ?
+
+I don't know much about usb-mtp and the MTP spec says:
+
+https://theta360blog.files.wordpress.com/2016/04/mtpforusb-ifv1-1.pdf
+
+3.1.1 Multi-byte Data
+
+The standard format for multi-byte data in this specification is
+big-endian. That is, the bits within a byte will be read such that
+the most significant byte is read first. The actual multi-byte data
+sent over the transport may not necessarily adhere to this same
+format, and the actual multi-byte data used on the devices may also
+use a different multi-byte format. The big-endian convention only
+applies within this document, except where otherwise stated.
+
+So I'm not sure about what the code should really do here... :-\
+
+> Do we do the right thing if we are
+> passed a malicious USB packet that ends halfway through a
+> utf16_t character, or do we index off the end of the packet
+> data ?
+>=20
+
+Can you elaborate ?
+
+> I think that we should define the "filename" field in
+> ObjectInfo to be a uint8_t array, make utf16_to_str()
+> take a uint8_t* for its data array, and have it do the
+> reading of data from the array with lduw_he_p(), which
+> can handle accessing unaligned data.
+>=20
+> We should also check what the endianness of other fields in
+> the ObjectInfo struct is (eg "format" and "size" and see
+> whether we should be doing byte swapping here.
+>=20
+
+I don't have any idea on that... the code just seems to assume
+everything is host endian.
+
+> PS: it is a bit confusing that in this function the local
+> variable "dataset" is a pointer to a struct of entirely
+> different type to the one that s->dataset is.
+>=20
+
+Maybe Gerd or Bandan can comment on that.
+
+> thanks
+> -- PMM
