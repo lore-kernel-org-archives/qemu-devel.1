@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51220)
+Received: from eggs.gnu.org ([209.51.188.92]:51549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gzfTD-0002WC-M8
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:32:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzfUQ-0003ED-7b
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:34:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gzfTB-0001xd-Mb
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:32:47 -0500
-Date: Fri, 1 Mar 2019 11:32:27 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190301113227.04f1f128.cohuck@redhat.com>
-In-Reply-To: <20190221005753.27955-7-crosa@redhat.com>
-References: <20190221005753.27955-1-crosa@redhat.com>
-	<20190221005753.27955-7-crosa@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gzfUP-0002RR-CY
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:34:02 -0500
+Date: Fri, 1 Mar 2019 11:33:52 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190301113352.585d54f3@redhat.com>
+In-Reply-To: <20190301112635.40200742@redhat.com>
+References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
+	<20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
+	<20190301101204.361adfb6@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8392D81D6@lhreml524-mbs.china.huawei.com>
+	<20190301112635.40200742@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/20] Acceptance tests: use "arch:" tag
- to filter target specific tests
+Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+ hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,120 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, Linuxarm <linuxarm@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>
 
-On Wed, 20 Feb 2019 19:57:39 -0500
-Cleber Rosa <crosa@redhat.com> wrote:
+On Fri, 1 Mar 2019 11:26:35 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-> Currently, the only test that contains some target architecture
-> information is "boot_linux_console.py" which test contains a "x86_64"
-
-But there are two others changed by you here, aren't there?
-
-> tag.  But that tag is not respected in the default execution, that is,
-> "make check-acceptance" doesn't do anything with it.
+> On Fri, 1 Mar 2019 09:23:11 +0000
+> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 > 
-> That said, even the target architecture handling currently present in
-> the "avocado_qemu.Test" class, class is pretty limited.  For instance,
+> > > -----Original Message-----
+> > > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > > Sent: 01 March 2019 09:12
+> > > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > > Cc: eric.auger@redhat.com; shannon.zhaosl@gmail.com;
+> > > peter.maydell@linaro.org; qemu-devel@nongnu.org; qemu-arm@nongnu.org;
+> > > Linuxarm <linuxarm@huawei.com>; xuwei (O) <xuwei5@huawei.com>
+> > > Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+> > > hotplug support
+> > > 
+> > > On Mon, 28 Jan 2019 11:05:45 +0000
+> > > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> > >     
+> > > > pc-dimm memory hotplug is enabled using GPIO(Pin 2) based ACPI
+> > > > event. Hot removal functionality is not yet supported.
+> > > >
+> > > > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > > > ---
+> > > >  hw/arm/virt.c | 57    
+> > > +++++++++++++++++++++++++++++++++++++++++++++++++++++++--    
+> > > >  1 file changed, 55 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > > > index 884960d..cf64554 100644
+> > > > --- a/hw/arm/virt.c
+> > > > +++ b/hw/arm/virt.c
+> > > > @@ -62,6 +62,7 @@
+> > > >  #include "hw/mem/pc-dimm.h"
+> > > >  #include "hw/mem/nvdimm.h"
+> > > >  #include "hw/acpi/acpi.h"
+> > > > +#include "hw/acpi/pc-hotplug.h"    
+> > > it looks like x86 specific file, what is this here for?    
+> > 
+> > Yes. That is for ACPI_MEMORY_HOTPLUG_BASE which is only used by x86
+> > at the moment. I guess, it can be moved to hw/acpi/memory_hotplug.h ?  
+> it's GPA and pc/q35 impl. specific so you should use it,
+s/should/should not/
 
-s/class, class/class/
-
-> by default, it chooses a target based on the host architecture.
+> this address will always be board specific one.
+> Makeup a virt specific one
 > 
-> Because the original implementation of the tags feature in Avocado did
-> not include any time of namespace or "key:val" mechanism, no tag has
-> relation to another tag.  The new implementation of the tags feature
-> from version 67.0 onwards, allows "key:val" tags, and because of that,
-> a test can be classified with a tag in a given key.  For instance, the
-> new proposed version of the "boot_linux_console.py" test, which
-> downloads and attempts to run a x86_64 kernel, is now tagged as:
+> >   
+> > > >
+> > > >  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+> > > >      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> > > > @@ -1651,7 +1652,14 @@ static void machvirt_init(MachineState    
+> > > *machine)    
+> > > >          nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
+> > > >                                 vms->fw_cfg, OBJECT(vms));
+> > > >      }
+> > > > +    if (vms->acpi_memhp_state.is_enabled) {
+> > > > +        MemHotplugState *state =  &vms->acpi_memhp_state;
+> > > > +        hwaddr base;
+> > > >
+> > > > +        state->hw_reduced_acpi = true;
+> > > > +        base = vms->memmap[VIRT_ACPI_IO].base +    
+> > > ACPI_MEMORY_HOTPLUG_BASE;    
+> well, this is confusing, why adding 2 base addresses?
+> If vms->memmap[VIRT_ACPI_IO].base is already set than why not use it
+> as is without adding an offset?
 > 
->   :avocado: tags=arch:x86_64
 > 
-> This means that it can be filtered (out) when no x86_64 target is
-> available.  At the same time, tests that don't have a "arch:" tag,
-> will not be filtered out.
+> > > > +        acpi_memory_hotplug_init(sysmem, OBJECT(vms), state, base);
+> > > > +    }
+> > > >      vms->bootinfo.ram_size = machine->ram_size;
+> > > >      vms->bootinfo.kernel_filename = machine->kernel_filename;
+> > > >      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;    
+> > > [...]    
 > 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  tests/Makefile.include                 | 3 +++
->  tests/acceptance/boot_linux_console.py | 2 +-
->  tests/acceptance/linux_initrd.py       | 2 +-
->  tests/acceptance/virtio_version.py     | 2 +-
->  tests/requirements.txt                 | 2 +-
->  5 files changed, 7 insertions(+), 4 deletions(-)
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 93ea42553e..633992603d 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -1090,6 +1090,7 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
->  # Any number of command separated loggers are accepted.  For more
->  # information please refer to "avocado --help".
->  AVOCADO_SHOW=app
-> +AVOCADO_TAGS=$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARGET_DIRS)))
->  
->  ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
->  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-> @@ -1115,6 +1116,8 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
->  	$(call quiet-command, \
->              $(TESTS_VENV_DIR)/bin/python -m avocado \
->              --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-> +            --filter-by-tags-include-empty --filter-by-tags-include-empty-key \
-> +            $(AVOCADO_TAGS) \
->              --failfast=on $(SRC_PATH)/tests/acceptance, \
->              "AVOCADO", "tests/acceptance")
->  
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 98324f7591..46b20bdfe2 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -19,7 +19,7 @@ class BootLinuxConsole(Test):
->      and the kernel command line is properly passed from QEMU to the kernel
->  
->      :avocado: enable
-> -    :avocado: tags=x86_64
-> +    :avocado: tags=arch:x86_64
->      """
->  
->      timeout = 60
-> diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
-> index 737355c2ef..c75e29be70 100644
-> --- a/tests/acceptance/linux_initrd.py
-> +++ b/tests/acceptance/linux_initrd.py
-> @@ -19,7 +19,7 @@ class LinuxInitrd(Test):
->      Checks QEMU evaluates correctly the initrd file passed as -initrd option.
->  
->      :avocado: enable
-> -    :avocado: tags=x86_64
-> +    :avocado: tags=arch:x86_64
->      """
->  
->      timeout = 60
-> diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio_version.py
-> index ce990250d8..3b280e7fc3 100644
-> --- a/tests/acceptance/virtio_version.py
-> +++ b/tests/acceptance/virtio_version.py
-> @@ -62,7 +62,7 @@ class VirtioVersionCheck(Test):
->      `disable-legacy`.
->  
->      :avocado: enable
-> -    :avocado: tags=x86_64
-> +    :avocado: tags=arch:x86_64
->      """
->  
->      # just in case there are failures, show larger diff:
-> diff --git a/tests/requirements.txt b/tests/requirements.txt
-> index 64c6e27a94..002ded6a22 100644
-> --- a/tests/requirements.txt
-> +++ b/tests/requirements.txt
-> @@ -1,4 +1,4 @@
->  # Add Python module requirements, one per line, to be installed
->  # in the tests/venv Python virtual environment. For more info,
->  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> -avocado-framework==65.0
-> +avocado-framework==68.0
-
-I think you should explain why you bump the required version to 68.0
-instead of the 67.0 you mention above.
