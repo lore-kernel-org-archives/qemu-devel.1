@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50176)
+Received: from eggs.gnu.org ([209.51.188.92]:58161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.y.sun@linux.intel.com>) id 1gzd38-0002f8-Ac
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:57:42 -0500
+	(envelope-from <llyzs.vic@gmail.com>) id 1gzdqq-0008B3-FQ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 03:49:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.y.sun@linux.intel.com>) id 1gzd37-00077E-Ln
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:57:42 -0500
-Received: from mga18.intel.com ([134.134.136.126]:18289)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
-	id 1gzd37-000769-DW
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:57:41 -0500
-Date: Fri, 1 Mar 2019 15:54:17 +0800
-From: Yi Sun <yi.y.sun@linux.intel.com>
-Message-ID: <20190301075417.GE26129@yi.y.sun>
-References: <1551361677-28933-1-git-send-email-yi.y.sun@linux.intel.com>
-	<1551361677-28933-4-git-send-email-yi.y.sun@linux.intel.com>
-	<20190301070414.GC22229@xz-x1>
+	(envelope-from <llyzs.vic@gmail.com>) id 1gzdqm-0006gU-RR
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 03:49:02 -0500
+Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:34335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <llyzs.vic@gmail.com>) id 1gzdql-0006cq-Rr
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 03:49:00 -0500
+Received: by mail-pg1-x535.google.com with SMTP id i130so11133962pgd.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 00:48:55 -0800 (PST)
+From: Vic Lee <llyzs.vic@gmail.com>
+Date: Fri,  1 Mar 2019 16:48:14 +0800
+Message-Id: <20190301084814.11076-1-llyzs.vic@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190301070414.GC22229@xz-x1>
-Subject: Re: [Qemu-devel] [RFC v2 3/3] intel_iommu: add scalable-mode option
- to make scalable mode work
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3] slirp: check for ioctlsocket error and
+ 0-length udp payload.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
+To: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@gnu.org>, Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Vic Lee <llyzs.vic@gmail.com>
 
-On 19-03-01 15:04:14, Peter Xu wrote:
+Sometimes sorecvfrom() is called from slirp.c because revents == G_IO_IN,
+but there is 0 bytes available and recvfrom could be blocking indefinitely.
+This is likely due to 0-length udp payload. This also adds an error
+checking for ioctlsocket.
 
-[...]
+Signed-off-by: Vic Lee <llyzs.vic@gmail.com>
+---
+ slirp/socket.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-> > @@ -3540,6 +3555,15 @@ static void vtd_init(IntelIOMMUState *s)
-> >          s->cap |= VTD_CAP_CM;
-> >      }
-> >  
-> > +    /* TODO: read cap/ecap from host to decide which cap to be exposed. */
-> > +    if (s->scalable_mode) {
-> > +        if (!s->dma_drain) {
-> > +            error_report("Need to set dma_drain for scalable mode");
-> > +            exit(1);
-> > +        }
-> 
-> This patch looks mostly good to me, only that can we move this check
-> to vtd_decide_config()?  That's where most similar checks are done.
->
-I think that is fine. Thanks!
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 4876ea3f31..af732f78fb 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -529,6 +529,15 @@ sorecvfrom(struct socket *so)
+           int n;
+ #endif
+ 
++            if (ioctlsocket(so->s, FIONREAD, &n) != 0) {
++                DEBUG_MISC((dfd, " ioctlsocket errno = %d-%s\n",
++                            errno, strerror(errno)));
++                return;
++            }
++            if (n == 0) {
++                return;
++            }
++
+ 	  m = m_get(so->slirp);
+ 	  if (!m) {
+ 	      return;
+@@ -552,7 +561,6 @@ sorecvfrom(struct socket *so)
+ 	   */
+ 	  len = M_FREEROOM(m);
+ 	  /* if (so->so_fport != htons(53)) { */
+-	  ioctlsocket(so->s, FIONREAD, &n);
+ 
+ 	  if (n > len) {
+ 	    n = (m->m_data - m->m_dat) + m->m_len + n + 1;
+-- 
+2.20.1
