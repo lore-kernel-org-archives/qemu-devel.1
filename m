@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36791)
+Received: from eggs.gnu.org ([209.51.188.92]:37093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzlBx-0005Jf-3V
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:39:22 -0500
+	(envelope-from <david@redhat.com>) id 1gzlDE-0006Ti-Fi
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:40:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzlBu-0002xQ-W3
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:39:20 -0500
-Resent-Message-Id: <E1gzlBu-0002xQ-W3@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155145833243.7448.7712285846219985320@49fa7ef69f7b>
-In-Reply-To: <20190301115413.27153-1-david@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gzlDC-0003j1-7h
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:40:40 -0500
+References: <155145833243.7448.7712285846219985320@49fa7ef69f7b>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <65aa2ecc-6109-27b3-f81c-a9f9d6f32e4b@redhat.com>
+Date: Fri, 1 Mar 2019 17:40:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Mar 2019 08:38:53 -0800 (PST)
+In-Reply-To: <155145833243.7448.7712285846219985320@49fa7ef69f7b>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v2 00/32] s390x/tcg: Vector Instruction
  Support Part 1
 List-Id: <qemu-devel.nongnu.org>
@@ -24,129 +24,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwMTExNTQxMy4yNzE1
-My0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMzAxMTE1NDEzLjI3MTUzLTEtZGF2aWRAcmVkaGF0
-LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzMyXSBzMzkweC90Y2c6IFZl
-Y3RvciBJbnN0cnVjdGlvbiBTdXBwb3J0IFBhcnQgMQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDExMTU0MTMu
-MjcxNTMtMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDExMTU0MTMuMjcxNTMt
-MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGFjMTFj
-OWMxNSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKNWE0OWViZjRlOCBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKNGQzMzc3YzQzNCBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKOGI3YmVmN2JiMSBzMzkweC90
-Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVAo0YzEzODlkNDk5IHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQpmMjYzYmQ1YWJmIHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
-ZV93cml0ZSBoZWxwZXIKMjY1NjI5OGNlNCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU0lH
-TiBFWFRFTkQgVE8gRE9VQkxFV09SRAoxMWExOGE3YzdhIHMzOTB4L3RjZzogSW1wbGVtZW50IFZF
-Q1RPUiBTRUxFQ1QKY2ZlZmUzYjRlNSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU0NBVFRF
-UiBFTEVNRU5UCmQzN2U3NzFmOTMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFJFUExJQ0FU
-RSBJTU1FRElBVEUKZmUxNmEzNGFmZiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElD
-QVRFCjQ0ODIwNmVhYzIgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBFUk1VVEUgRE9VQkxF
-V09SRCBJTU1FRElBVEUKYjAwNGI4YWNhNyBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
-TVVURQowZWNhOTYwODdlIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQQUNLICoKODkxMDNk
-MTcyNiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKQozMTZlZjIy
-ZmUwIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEggTEVOR1RICmFhYTIzZDQw
-NDYgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQK
-MmFkOWM4YWY3MCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBWUiBFTEVNRU5UIEZS
-T00gR1IKMGNiMGUwYzhkZCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBUTyBCTE9D
-SyBCT1VOREFSWQo4OTU2ZDRiMjk5IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIE1V
-TFRJUExFCjZiMDIxNWNiYTUgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTE9HSUNB
-TCBFTEVNRU5UIEFORCBaRVJPCjA0MDJhNmI1MTUgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IExPQUQgR1IgRlJPTSBWUiBFTEVNRU5UCjdlNjljNjg4MTAgczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIExPQUQgRUxFTUVOVCBJTU1FRElBVEUKYTczMDk5ZTJmMyBzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgTE9BRCBFTEVNRU5UCjNiNDVlMmNlZGMgczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIExPQUQgQU5EIFJFUExJQ0FURQplZTBjMGZkN2U5IHMzOTB4L3RjZzogSW1wbGVtZW50
-IFZFQ1RPUiBMT0FECjgxYjlkZmRlNmEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVS
-QVRFIE1BU0sKNDY5MjJiMGRhNyBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgR0VORVJBVEUg
-QllURSBNQVNLCjAzYjNmZTI1NWQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdBVEhFUiBF
-TEVNRU5UCmViZDlkY2VkNGEgczM5MHgvdGNnOiBVdGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVj
-dGlvbiBoZWxwZXJzCjg1ZGZmMTA3ZTIgczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIg
-aW5zdHJ1Y3Rpb25zIGF0IGNlbnRyYWwgcG9pbnQKM2MwNjNhMDI3MCBzMzkweC90Y2c6IERlZmlu
-ZSB2ZWN0b3IgaW5zdHJ1Y3Rpb24gZm9ybWF0cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8zMiBD
-aGVja2luZyBjb21taXQgM2MwNjNhMDI3MDc1IChzMzkweC90Y2c6IERlZmluZSB2ZWN0b3IgaW5z
-dHJ1Y3Rpb24gZm9ybWF0cykKMi8zMiBDaGVja2luZyBjb21taXQgODVkZmYxMDdlMjMzIChzMzkw
-eC90Y2c6IENoZWNrIHZlY3RvciByZWdpc3RlciBpbnN0cnVjdGlvbnMgYXQgY2VudHJhbCBwb2lu
-dCkKMy8zMiBDaGVja2luZyBjb21taXQgZWJkOWRjZWQ0YTRhIChzMzkweC90Y2c6IFV0aWxpdGll
-cyBmb3IgdmVjdG9yIGluc3RydWN0aW9uIGhlbHBlcnMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
-ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMwOiAK
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTI4IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDMvMzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8zMiBD
-aGVja2luZyBjb21taXQgMDNiM2ZlMjU1ZDM4IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
-R0FUSEVSIEVMRU1FTlQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU2OiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTU1IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDQvMzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8zMiBDaGVja2luZyBjb21taXQgNDY5
-MjJiMGRhNzVlIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgR0VORVJBVEUgQllURSBNQVNL
-KQo2LzMyIENoZWNraW5nIGNvbW1pdCA4MWI5ZGZkZTZhM2UgKHMzOTB4L3RjZzogSW1wbGVtZW50
-IFZFQ1RPUiBHRU5FUkFURSBNQVNLKQo3LzMyIENoZWNraW5nIGNvbW1pdCBlZTBjMGZkN2U5NDAg
-KHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEKQo4LzMyIENoZWNraW5nIGNvbW1pdCAz
-YjQ1ZTJjZWRjMGEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNB
-VEUpCjkvMzIgQ2hlY2tpbmcgY29tbWl0IGE3MzA5OWUyZjM5YiAoczM5MHgvdGNnOiBJbXBsZW1l
-bnQgVkVDVE9SIExPQUQgRUxFTUVOVCkKMTAvMzIgQ2hlY2tpbmcgY29tbWl0IDdlNjljNjg4MTA5
-MSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVCBJTU1FRElBVEUpCjEx
-LzMyIENoZWNraW5nIGNvbW1pdCAwNDAyYTZiNTE1ZDAgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZF
-Q1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVCkKMTIvMzIgQ2hlY2tpbmcgY29tbWl0IDZiMDIx
-NWNiYTUzMyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTE9HSUNBTCBFTEVNRU5U
-IEFORCBaRVJPKQoxMy8zMiBDaGVja2luZyBjb21taXQgODk1NmQ0YjI5OWE5IChzMzkweC90Y2c6
-IEltcGxlbWVudCBWRUNUT1IgTE9BRCBNVUxUSVBMRSkKMTQvMzIgQ2hlY2tpbmcgY29tbWl0IDBj
-YjBlMGM4ZGQ2MCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVE8gQkxPQ0sgQk9V
-TkRBUlkpCjE1LzMyIENoZWNraW5nIGNvbW1pdCAyYWQ5YzhhZjcwOTEgKHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJPTSBHUikKMTYvMzIgQ2hlY2tpbmcgY29t
-bWl0IGFhYTIzZDQwNDY3ZiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJP
-TSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNvbW1pdCAzMTZlZjIyZmUwYmYgKHMzOTB4
-L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEggTEVOR1RIKQoxOC8zMiBDaGVja2luZyBj
-b21taXQgODkxMDNkMTcyNjFiIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJ
-R0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IDBlY2E5NjA4N2VjNSAoczM5MHgvdGNnOiBJ
-bXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
-dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTgyOiBGSUxFOiB0YXJnZXQv
-czM5MHgvdmVjX2hlbHBlci5jOjEyMzoKK3R5cGVkZWYgdWludCMjVEJJVFMjI190ICgqdnBrIyNC
-SVRTIyNfZm4pKHVpbnQjI0JJVFMjI190LCBpbnQgKik7ICAgICAgICAgICAgICBcCgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDI0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxOS8zMiBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjAvMzIgQ2hlY2tpbmcgY29tbWl0IGIwMDRiOGFjYTc5
-ZCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBFUk1VVEUpCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiMyMTogRklMRTogdGFyZ2V0L3MzOTB4L2hlbHBlci5oOjE0MzoKK0RF
-Rl9IRUxQRVJfRkxBR1NfNShndmVjX3ZwZXJtLCBUQ0dfQ0FMTF9OT19SV0csIHZvaWQsIHB0ciwg
-Y3B0ciwgY3B0ciwgY3B0ciwgaTMyKQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OCBs
-aW5lcyBjaGVja2VkCgpQYXRjaCAyMC8zMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMS8z
-MiBDaGVja2luZyBjb21taXQgNDQ4MjA2ZWFjMmY1IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNU
-T1IgUEVSTVVURSBET1VCTEVXT1JEIElNTUVESUFURSkKMjIvMzIgQ2hlY2tpbmcgY29tbWl0IGZl
-MTZhMzRhZmY5YiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFJFUExJQ0FURSkKMjMvMzIg
-Q2hlY2tpbmcgY29tbWl0IGQzN2U3NzFmOTNlMCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFJFUExJQ0FURSBJTU1FRElBVEUpCjI0LzMyIENoZWNraW5nIGNvbW1pdCBjZmVmZTNiNGU1MTkg
-KHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTQ0FUVEVSIEVMRU1FTlQpCjI1LzMyIENoZWNr
-aW5nIGNvbW1pdCAxMWExOGE3YzdhNjcgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTRUxF
-Q1QpCjI2LzMyIENoZWNraW5nIGNvbW1pdCAyNjU2Mjk4Y2U0MDIgKHMzOTB4L3RjZzogSW1wbGVt
-ZW50IFZFQ1RPUiBTSUdOIEVYVEVORCBUTyBET1VCTEVXT1JEKQoyNy8zMiBDaGVja2luZyBjb21t
-aXQgZjI2M2JkNWFiZjhiIChzMzkweC90Y2c6IFByb3ZpZGUgcHJvYmVfd3JpdGUgaGVscGVyKQoy
-OC8zMiBDaGVja2luZyBjb21taXQgNGMxMzg5ZDQ5OWNiIChzMzkweC90Y2c6IEltcGxlbWVudCBW
-RUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5nIGNvbW1pdCA4YjdiZWY3YmIxOGUgKHMzOTB4L3Rj
-ZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBFTEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQg
-NGQzMzc3YzQzNGNkIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUp
-CjMxLzMyIENoZWNraW5nIGNvbW1pdCA1YTQ5ZWJmNGU4ODQgKHMzOTB4L3RjZzogSW1wbGVtZW50
-IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkKMzIvMzIgQ2hlY2tpbmcgY29tbWl0IDBhYzExYzlj
-MTU1MyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
-IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDMwMTExNTQxMy4yNzE1
-My0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+On 01.03.19 17:38, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190301115413.27153-1-david@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Message-id: 20190301115413.27153-1-david@redhat.com
+> Subject: [Qemu-devel] [PATCH v2 00/32] s390x/tcg: Vector Instruction Support Part 1
+> Type: series
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  t [tag update]            patchew/20190301115413.27153-1-david@redhat.com -> patchew/20190301115413.27153-1-david@redhat.com
+> Switched to a new branch 'test'
+> 0ac11c9c15 s390x/tcg: Implement VECTOR UNPACK *
+> 5a49ebf4e8 s390x/tcg: Implement VECTOR STORE WITH LENGTH
+> 4d3377c434 s390x/tcg: Implement VECTOR STORE MULTIPLE
+> 8b7bef7bb1 s390x/tcg: Implement VECTOR STORE ELEMENT
+> 4c1389d499 s390x/tcg: Implement VECTOR STORE
+> f263bd5abf s390x/tcg: Provide probe_write helper
+> 2656298ce4 s390x/tcg: Implement VECTOR SIGN EXTEND TO DOUBLEWORD
+> 11a18a7c7a s390x/tcg: Implement VECTOR SELECT
+> cfefe3b4e5 s390x/tcg: Implement VECTOR SCATTER ELEMENT
+> d37e771f93 s390x/tcg: Implement VECTOR REPLICATE IMMEDIATE
+> fe16a34aff s390x/tcg: Implement VECTOR REPLICATE
+> 448206eac2 s390x/tcg: Implement VECTOR PERMUTE DOUBLEWORD IMMEDIATE
+> b004b8aca7 s390x/tcg: Implement VECTOR PERMUTE
+> 0eca96087e s390x/tcg: Implement VECTOR PACK *
+> 89103d1726 s390x/tcg: Implement VECTOR MERGE (HIGH|LOW)
+> 316ef22fe0 s390x/tcg: Implement VECTOR LOAD WITH LENGTH
+> aaa23d4046 s390x/tcg: Implement VECTOR LOAD VR FROM GRS DISJOINT
+> 2ad9c8af70 s390x/tcg: Implement VECTOR LOAD VR ELEMENT FROM GR
+> 0cb0e0c8dd s390x/tcg: Implement VECTOR LOAD TO BLOCK BOUNDARY
+> 8956d4b299 s390x/tcg: Implement VECTOR LOAD MULTIPLE
+> 6b0215cba5 s390x/tcg: Implement VECTOR LOAD LOGICAL ELEMENT AND ZERO
+> 0402a6b515 s390x/tcg: Implement VECTOR LOAD GR FROM VR ELEMENT
+> 7e69c68810 s390x/tcg: Implement VECTOR LOAD ELEMENT IMMEDIATE
+> a73099e2f3 s390x/tcg: Implement VECTOR LOAD ELEMENT
+> 3b45e2cedc s390x/tcg: Implement VECTOR LOAD AND REPLICATE
+> ee0c0fd7e9 s390x/tcg: Implement VECTOR LOAD
+> 81b9dfde6a s390x/tcg: Implement VECTOR GENERATE MASK
+> 46922b0da7 s390x/tcg: Implement VECTOR GENERATE BYTE MASK
+> 03b3fe255d s390x/tcg: Implement VECTOR GATHER ELEMENT
+> ebd9dced4a s390x/tcg: Utilities for vector instruction helpers
+> 85dff107e2 s390x/tcg: Check vector register instructions at central point
+> 3c063a0270 s390x/tcg: Define vector instruction formats
+> 
+> === OUTPUT BEGIN ===
+> 1/32 Checking commit 3c063a027075 (s390x/tcg: Define vector instruction formats)
+> 2/32 Checking commit 85dff107e233 (s390x/tcg: Check vector register instructions at central point)
+> 3/32 Checking commit ebd9dced4a4a (s390x/tcg: Utilities for vector instruction helpers)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #30: 
+> new file mode 100644
+> 
+> total: 0 errors, 1 warnings, 128 lines checked
+> 
+> Patch 3/32 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 4/32 Checking commit 03b3fe255d38 (s390x/tcg: Implement VECTOR GATHER ELEMENT)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #56: 
+> new file mode 100644
+> 
+> total: 0 errors, 1 warnings, 155 lines checked
+> 
+> Patch 4/32 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 5/32 Checking commit 46922b0da75e (s390x/tcg: Implement VECTOR GENERATE BYTE MASK)
+> 6/32 Checking commit 81b9dfde6a3e (s390x/tcg: Implement VECTOR GENERATE MASK)
+> 7/32 Checking commit ee0c0fd7e940 (s390x/tcg: Implement VECTOR LOAD)
+> 8/32 Checking commit 3b45e2cedc0a (s390x/tcg: Implement VECTOR LOAD AND REPLICATE)
+> 9/32 Checking commit a73099e2f39b (s390x/tcg: Implement VECTOR LOAD ELEMENT)
+> 10/32 Checking commit 7e69c6881091 (s390x/tcg: Implement VECTOR LOAD ELEMENT IMMEDIATE)
+> 11/32 Checking commit 0402a6b515d0 (s390x/tcg: Implement VECTOR LOAD GR FROM VR ELEMENT)
+> 12/32 Checking commit 6b0215cba533 (s390x/tcg: Implement VECTOR LOAD LOGICAL ELEMENT AND ZERO)
+> 13/32 Checking commit 8956d4b299a9 (s390x/tcg: Implement VECTOR LOAD MULTIPLE)
+> 14/32 Checking commit 0cb0e0c8dd60 (s390x/tcg: Implement VECTOR LOAD TO BLOCK BOUNDARY)
+> 15/32 Checking commit 2ad9c8af7091 (s390x/tcg: Implement VECTOR LOAD VR ELEMENT FROM GR)
+> 16/32 Checking commit aaa23d40467f (s390x/tcg: Implement VECTOR LOAD VR FROM GRS DISJOINT)
+> 17/32 Checking commit 316ef22fe0bf (s390x/tcg: Implement VECTOR LOAD WITH LENGTH)
+> 18/32 Checking commit 89103d17261b (s390x/tcg: Implement VECTOR MERGE (HIGH|LOW))
+> 19/32 Checking commit 0eca96087ec5 (s390x/tcg: Implement VECTOR PACK *)
+> ERROR: space prohibited between function name and open parenthesis '('
+> #182: FILE: target/s390x/vec_helper.c:123:
+> +typedef uint##TBITS##_t (*vpk##BITS##_fn)(uint##BITS##_t, int *);              \
+> 
+> total: 1 errors, 0 warnings, 245 lines checked
+> 
+> Patch 19/32 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> 20/32 Checking commit b004b8aca79d (s390x/tcg: Implement VECTOR PERMUTE)
+> WARNING: line over 80 characters
+> #21: FILE: target/s390x/helper.h:143:
+> +DEF_HELPER_FLAGS_5(gvec_vperm, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, cptr, i32)
+> 
+> total: 0 errors, 1 warnings, 58 lines checked
+> 
+> Patch 20/32 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 21/32 Checking commit 448206eac2f5 (s390x/tcg: Implement VECTOR PERMUTE DOUBLEWORD IMMEDIATE)
+> 22/32 Checking commit fe16a34aff9b (s390x/tcg: Implement VECTOR REPLICATE)
+> 23/32 Checking commit d37e771f93e0 (s390x/tcg: Implement VECTOR REPLICATE IMMEDIATE)
+> 24/32 Checking commit cfefe3b4e519 (s390x/tcg: Implement VECTOR SCATTER ELEMENT)
+> 25/32 Checking commit 11a18a7c7a67 (s390x/tcg: Implement VECTOR SELECT)
+> 26/32 Checking commit 2656298ce402 (s390x/tcg: Implement VECTOR SIGN EXTEND TO DOUBLEWORD)
+> 27/32 Checking commit f263bd5abf8b (s390x/tcg: Provide probe_write helper)
+> 28/32 Checking commit 4c1389d499cb (s390x/tcg: Implement VECTOR STORE)
+> 29/32 Checking commit 8b7bef7bb18e (s390x/tcg: Implement VECTOR STORE ELEMENT)
+> 30/32 Checking commit 4d3377c434cd (s390x/tcg: Implement VECTOR STORE MULTIPLE)
+> 31/32 Checking commit 5a49ebf4e884 (s390x/tcg: Implement VECTOR STORE WITH LENGTH)
+> 32/32 Checking commit 0ac11c9c1553 (s390x/tcg: Implement VECTOR UNPACK *)
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20190301115413.27153-1-david@redhat.com/testing.checkpatch/?type=message.
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
+
+Yes Patchew, I get it, no need to resend 10 times :D
+
+Seriously, one false positive and other stuff that is to be ignored.
+
+-- 
+
+Thanks,
+
+David / dhildenb
