@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37658)
+Received: from eggs.gnu.org ([209.51.188.92]:37832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzlFq-0008Vo-Ox
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:43:23 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gzlGa-0000ah-Lh
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:44:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzlFq-000584-2B
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:43:22 -0500
-References: <20190227172256.30368-1-kwolf@redhat.com>
-	<20190227172256.30368-2-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <47be1186-69de-3216-960a-d3fdcf1127a5@redhat.com>
-Date: Fri, 1 Mar 2019 10:43:18 -0600
+	(envelope-from <stefanha@gmail.com>) id 1gzlGa-0005U0-00
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:44:08 -0500
+Date: Fri, 1 Mar 2019 16:44:05 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190301164405.GD18260@stefanha-x1.localdomain>
+References: <63559cf027d4ebd95a844b73b1f20444fb72fb2c.camel@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190227172256.30368-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/20] qemu-iotests: Test qcow2
- preallocation modes
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="SO98HVl1bnMOfKZd"
+Content-Disposition: inline
+In-Reply-To: <63559cf027d4ebd95a844b73b1f20444fb72fb2c.camel@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3] trivial fix of malloc to g_new in thunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+To: Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Julia Suvorova <jusual@mail.ru>, eblake@redhat.com
 
-On 2/27/19 11:22 AM, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+
+--SO98HVl1bnMOfKZd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Feb 28, 2019 at 10:16:57PM +0530, Aarushi Mehta wrote:
+> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> Note that since thunking occurs throughout the lifetime of the QEMU
+> instance, there is no matching 'free' to correct.
+>=20
 > ---
 
-> +++ b/tests/qemu-iotests/243
-> @@ -0,0 +1,63 @@
+Hi Aarushi,
+The following formatting is commonly used:
 
+  Subject: [PATCH v3] thunk: fix of malloc to g_new
 
-> +
-> +    echo -n "File size: "
+  Note that since thunking occurs throughout the lifetime of the QEMU
+  instance, there is no matching 'free' to correct.
 
-echo -n is non-portable (bash has shopt -s xpg_echo); better is to just
-use printf.  See commit b43671f8
+  Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+  Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> +    du -b $TEST_IMG | cut -f1
-> +
-> +    # Can't use precise numbers here because they differ between filesystems
-> +    echo -n "Disk usage: "
+I changed the subject to include the prefix of the component being
+modified.  You can look up the preferred prefix using "git log thunk.c"
+to see what other commits have used.
 
-and again
+The Signed-off-by: goes at the bottom of the commit description.
 
-> +    [ $(du -B1 $TEST_IMG | cut -f1) -lt 1048576 ] && echo "low" || echo "high"
+Don't worry if it takes a few tries to get the formatting conventions.
+There is scripts/checkpatch.pl for scanning patches for coding style
+violations but I think it wouldn't have detected these things.
 
-du -b/-B are not portable to POSIX, but you did limit the test to just
-Linux where they are fairly likely, so I don't have any better
-suggestions.  I like the masking into high/low to work around file
-system granularity quirks as well as image metadata size differences.
+The code change itself looks good:
 
-As using printf instead of echo -n is trivial,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+--SO98HVl1bnMOfKZd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJceWFVAAoJEJykq7OBq3PIXL0IAKzztJnOQH0wMHMkHZmbGxyJ
+TCYFOyxYS5w0fSTv9m14e2n4CsRwvh5XAsUGqtP638FnNcWuwv+gh9FF64NS0G7v
+mOzqvCzOULi5NIHmejF4x8Zt7VOMmaB5m5a4Ujaxb6VUzdiFcHiAfqZoIHx3/2U7
+9g6nZdnKA31PlCMXxTUSydAJP56OuQC6IW8bGLCMEBSchaTV3pz9UFWZAI4J0vRK
+/AljZkBn5zAa5AuB/z5fGSOf2o4+7LUYtVWrP1mongeXvsnP6oKBgtmd+OGnlQiU
+J1iYuftoz6FzFAVVNz0GFwVV8qt55ZbPuhOjgW/zhWL3yuLk/PxF6N/S9cQQD6E=
+=7B5C
+-----END PGP SIGNATURE-----
+
+--SO98HVl1bnMOfKZd--
