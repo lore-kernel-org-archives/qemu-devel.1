@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58161)
+Received: from eggs.gnu.org ([209.51.188.92]:33836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <llyzs.vic@gmail.com>) id 1gzdqq-0008B3-FQ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 03:49:05 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzeDK-0003pW-0e
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:12:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <llyzs.vic@gmail.com>) id 1gzdqm-0006gU-RR
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 03:49:02 -0500
-Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:34335)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <llyzs.vic@gmail.com>) id 1gzdql-0006cq-Rr
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 03:49:00 -0500
-Received: by mail-pg1-x535.google.com with SMTP id i130so11133962pgd.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 00:48:55 -0800 (PST)
-From: Vic Lee <llyzs.vic@gmail.com>
-Date: Fri,  1 Mar 2019 16:48:14 +0800
-Message-Id: <20190301084814.11076-1-llyzs.vic@gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1gzeDJ-0002Ia-Af
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:12:18 -0500
+Date: Fri, 1 Mar 2019 10:12:04 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190301101204.361adfb6@redhat.com>
+In-Reply-To: <20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
+References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
+	<20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] slirp: check for ioctlsocket error and
- 0-length udp payload.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+ hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@gnu.org>, Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Vic Lee <llyzs.vic@gmail.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: eric.auger@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, linuxarm@huawei.com, xuwei5@huawei.com
 
-Sometimes sorecvfrom() is called from slirp.c because revents == G_IO_IN,
-but there is 0 bytes available and recvfrom could be blocking indefinitely.
-This is likely due to 0-length udp payload. This also adds an error
-checking for ioctlsocket.
+On Mon, 28 Jan 2019 11:05:45 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-Signed-off-by: Vic Lee <llyzs.vic@gmail.com>
----
- slirp/socket.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+> pc-dimm memory hotplug is enabled using GPIO(Pin 2) based ACPI
+> event. Hot removal functionality is not yet supported.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  hw/arm/virt.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 55 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 884960d..cf64554 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -62,6 +62,7 @@
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/mem/nvdimm.h"
+>  #include "hw/acpi/acpi.h"
+> +#include "hw/acpi/pc-hotplug.h"
+it looks like x86 specific file, what is this here for?
 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 4876ea3f31..af732f78fb 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -529,6 +529,15 @@ sorecvfrom(struct socket *so)
-           int n;
- #endif
- 
-+            if (ioctlsocket(so->s, FIONREAD, &n) != 0) {
-+                DEBUG_MISC((dfd, " ioctlsocket errno = %d-%s\n",
-+                            errno, strerror(errno)));
-+                return;
-+            }
-+            if (n == 0) {
-+                return;
-+            }
-+
- 	  m = m_get(so->slirp);
- 	  if (!m) {
- 	      return;
-@@ -552,7 +561,6 @@ sorecvfrom(struct socket *so)
- 	   */
- 	  len = M_FREEROOM(m);
- 	  /* if (so->so_fport != htons(53)) { */
--	  ioctlsocket(so->s, FIONREAD, &n);
- 
- 	  if (n > len) {
- 	    n = (m->m_data - m->m_dat) + m->m_len + n + 1;
--- 
-2.20.1
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -1651,7 +1652,14 @@ static void machvirt_init(MachineState *machine)
+>          nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
+>                                 vms->fw_cfg, OBJECT(vms));
+>      }
+> +    if (vms->acpi_memhp_state.is_enabled) {
+> +        MemHotplugState *state =  &vms->acpi_memhp_state;
+> +        hwaddr base;
+>  
+> +        state->hw_reduced_acpi = true;
+> +        base = vms->memmap[VIRT_ACPI_IO].base + ACPI_MEMORY_HOTPLUG_BASE;
+> +        acpi_memory_hotplug_init(sysmem, OBJECT(vms), state, base);
+> +    }
+>      vms->bootinfo.ram_size = machine->ram_size;
+>      vms->bootinfo.kernel_filename = machine->kernel_filename;
+>      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+[...]
