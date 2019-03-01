@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40177)
+Received: from eggs.gnu.org ([209.51.188.92]:40295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gzc23-0006et-UA
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:52:33 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gzc2c-0006vM-1n
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:53:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gzc22-0002vC-Q0
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:52:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60896)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gzc22-0002sz-Fe
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:52:30 -0500
-Date: Fri, 1 Mar 2019 14:52:19 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190301065219.GA22229@xz-x1>
-References: <1551361677-28933-1-git-send-email-yi.y.sun@linux.intel.com>
-	<1551361677-28933-2-git-send-email-yi.y.sun@linux.intel.com>
+	(envelope-from <no-reply@patchew.org>) id 1gzc2a-0003WE-Sw
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:53:06 -0500
+Resent-Message-Id: <E1gzc2a-0003WE-Sw@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21025)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gzc2a-0003Up-NT
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:53:04 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155142315557.7448.6826117398052655325@49fa7ef69f7b>
+In-Reply-To: <20190301064809.3074-1-llyzs.vic@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1551361677-28933-2-git-send-email-yi.y.sun@linux.intel.com>
-Subject: Re: [Qemu-devel] [RFC v2 1/3] intel_iommu: scalable mode emulation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 28 Feb 2019 22:52:36 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2] slirp: check for ioctlsocket error and
+ 0-length udp payload.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,196 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
+To: llyzs.vic@gmail.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, jan.kiszka@siemens.com, marcandre.lureau@gmail.com, samuel.thibault@gnu.org
 
-On Thu, Feb 28, 2019 at 09:47:55PM +0800, Yi Sun wrote:
-> From: "Liu, Yi L" <yi.l.liu@intel.com>
-> 
-> Intel(R) VT-d 3.0 spec introduces scalable mode address translation to
-> replace extended context mode. This patch extends current emulator to
-> support Scalable Mode which includes root table, context table and new
-> pasid table format change. Now intel_iommu emulates both legacy mode
-> and scalable mode (with legacy-equivalent capability set).
-> 
-> The key points are below:
-> 1. Extend root table operations to support both legacy mode and scalable
->    mode.
-> 2. Extend context table operations to support both legacy mode and
->    scalable mode.
-> 3. Add pasid tabled operations to support scalable mode.
-> 
-> Signed-off-by: Liu, Yi L <yi.l.liu@intel.com>
-> [Yi Sun is co-developer to contribute much to refine the whole commit.]
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-
-Hi, Yi,
-
-The Patch looks very good to me already, though I still have some
-trivial comments below.
-
-[...]
-
-> -static inline bool vtd_ce_present(VTDContextEntry *context)
-> +static inline bool vtd_ce_present(VTDContextEntry *ce)
->  {
-> -    return context->lo & VTD_CONTEXT_ENTRY_P;
-> +    return ce->lo & VTD_CONTEXT_ENTRY_P;
-
-The renaming seems not needed.
-
->  }
->  
-> -static int vtd_get_context_entry_from_root(VTDRootEntry *root, uint8_t index,
-> +static int vtd_get_context_entry_from_root(IntelIOMMUState *s,
-> +                                           VTDRootEntry *re,
-> +                                           uint8_t index,
->                                             VTDContextEntry *ce)
->  {
-> -    dma_addr_t addr;
-> +    dma_addr_t addr, ce_size;
->  
->      /* we have checked that root entry is present */
-> -    addr = (root->val & VTD_ROOT_ENTRY_CTP) + index * sizeof(*ce);
-> -    if (dma_memory_read(&address_space_memory, addr, ce, sizeof(*ce))) {
-> +    ce_size = s->root_scalable ? VTD_CTX_ENTRY_SCALABLE_SIZE :
-> +              VTD_CTX_ENTRY_LEGACY_SIZE;
-> +
-> +    if (s->root_scalable && index > UINT8_MAX / 2) {
-> +        index = index & (~VTD_DEVFN_CHECK_MASK);
-> +        addr = re->hi & VTD_ROOT_ENTRY_CTP;
-> +    } else {
-> +        addr = re->lo & VTD_ROOT_ENTRY_CTP;
-> +    }
-> +
-> +    addr = addr + index * ce_size;
-> +    if (dma_memory_read(&address_space_memory, addr, ce, ce_size)) {
->          return -VTD_FR_CONTEXT_TABLE_INV;
->      }
-> +
->      ce->lo = le64_to_cpu(ce->lo);
->      ce->hi = le64_to_cpu(ce->hi);
-> +    if (s->root_scalable) {
-
-(or use ce_size which might be more obvious)
-
-> +        ce->val[2] = le64_to_cpu(ce->val[2]);
-> +        ce->val[3] = le64_to_cpu(ce->val[3]);
-> +    }
->      return 0;
->  }
-
-[...]
-
-> +static inline int vtd_ce_get_rid2pasid_entry(IntelIOMMUState *s,
-> +                                             VTDContextEntry *ce,
-> +                                             VTDPASIDEntry *pe)
-> +{
-> +    uint32_t pasid;
-> +    dma_addr_t pasid_dir_base;
-> +    int ret = 0;
-> +
-> +    pasid = VTD_CE_GET_RID2PASID(ce);
-> +    pasid_dir_base = VTD_CE_GET_PASID_DIR_TABLE(ce);
-> +    ret = vtd_get_pasid_entry_from_pasid(s, pasid_dir_base, pasid, pe);
-> +
-> +    return ret;
-> +}
-> +
-> +static inline int vtd_ce_get_pasid_fpd(IntelIOMMUState *s,
-> +                                       VTDContextEntry *ce,
-> +                                       bool *pe_fpd_set)
-
-Many functions are defined as inlined (even some functions that may
-not be that short IMHO) and many of them are not.  Could you share how
-you decide which function should be inlined?
-
-[...]
-
->  static inline bool vtd_ce_type_check(X86IOMMUState *x86_iommu,
->                                       VTDContextEntry *ce)
->  {
-> +    IntelIOMMUState *s = INTEL_IOMMU_DEVICE(x86_iommu);
-> +
-> +    if (s->root_scalable) {
-> +        /*
-> +         * Translation Type locates in context entry only when VTD is in
-> +         * legacy mode. For scalable mode, need to return true to avoid
-> +         * unnecessary fault.
-> +         */
-> +        return true;
-> +    }
-
-Do you think we can move this check directly into caller of
-vtd_ce_type_check() which is vtd_dev_to_context_entry()?  Then:
-
-  if (scalable_mode)
-    vtd_ce_rid2pasid_check()
-  else
-    vtd_ce_type_check()
-
-You can comment on function vtd_ce_type_check() that this only checks
-legacy context entries, since calling vtd_ce_type_check() upon an
-scalable mode context entry does not make much sense itself already.
-
-[...]
-
->  /* Return whether the device is using IOMMU translation. */
-> @@ -1322,9 +1636,24 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
->                                 cc_entry->context_cache_gen);
->          ce = cc_entry->context_entry;
->          is_fpd_set = ce.lo & VTD_CONTEXT_ENTRY_FPD;
-> +        if (!is_fpd_set && s->root_scalable) {
-> +            ret_fr = vtd_ce_get_pasid_fpd(s, &ce, &is_fpd_set);
-> +            if (ret_fr) {
-> +                ret_fr = -ret_fr;
-> +                if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
-
-I noticed that I can't find how's vtd_qualified_faults defined and how
-that was reflected in the vt-d spec...  Do you know?  Meanwhile, do
-you need to add the new error VTD_FR_PASID_TABLE_INV into the table?
-
-Also, this pattern repeated for times.  Maybe it's time to introduce a
-new helper.  Your call on this:
-
-        if (ret_fr) {
-            ret_fr = -ret_fr;
-            if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
-                trace_vtd_fault_disabled();
-            } else {
-                vtd_report_dmar_fault(s, source_id, addr, ret_fr, is_write);
-            }
-            goto error;
-        }
-
-> +                    trace_vtd_fault_disabled();
-> +                } else {
-> +                    vtd_report_dmar_fault(s, source_id, addr, ret_fr, is_write);
-> +                }
-> +                goto error;
-> +            }
-> +        }
-
-[...]
-
-> @@ -2629,6 +2958,7 @@ static const VMStateDescription vtd_vmstate = {
->          VMSTATE_UINT8_ARRAY(csr, IntelIOMMUState, DMAR_REG_SIZE),
->          VMSTATE_UINT8(iq_last_desc_type, IntelIOMMUState),
->          VMSTATE_BOOL(root_extended, IntelIOMMUState),
-> +        VMSTATE_BOOL(root_scalable, IntelIOMMUState),
->          VMSTATE_BOOL(dmar_enabled, IntelIOMMUState),
->          VMSTATE_BOOL(qi_enabled, IntelIOMMUState),
->          VMSTATE_BOOL(intr_enabled, IntelIOMMUState),
-> @@ -3098,9 +3428,10 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->      vtd_address_space_unmap(vtd_as, n);
->  
->      if (vtd_dev_to_context_entry(s, bus_n, vtd_as->devfn, &ce) == 0) {
-> -        trace_vtd_replay_ce_valid(bus_n, PCI_SLOT(vtd_as->devfn),
-> +        trace_vtd_replay_ce_valid(s->root_scalable ? "scalable mode" : "",
-
-"scalable mode" : "legacy mode"?
-
-Regards,
-
--- 
-Peter Xu
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwMTA2NDgwOS4zMDc0
+LTEtbGx5enMudmljQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAzMDEwNjQ4MDkuMzA3NC0xLWxseXpzLnZpY0Bn
+bWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2Ml0gc2xpcnA6IGNoZWNrIGZv
+ciBpb2N0bHNvY2tldCBlcnJvciBhbmQgMC1sZW5ndGggdWRwIHBheWxvYWQuClR5cGU6IHNlcmll
+cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJh
+c2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
+cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8y
+MDE5MDMwMTA2NDgwOS4zMDc0LTEtbGx5enMudmljQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkw
+MzAxMDY0ODA5LjMwNzQtMS1sbHl6cy52aWNAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKMDk4N2U0ODUxZiBzbGlycDogY2hlY2sgZm9yIGlvY3Rsc29ja2V0IGVycm9y
+IGFuZCAwLWxlbmd0aCB1ZHAgcGF5bG9hZC4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIzOiBGSUxFOiBzbGlycC9zb2NrZXQu
+Yzo1MzI6CiteSSAgaWYgKGlvY3Rsc29ja2V0KHNvLT5zLCBGSU9OUkVBRCwgJm4pICE9IDApIHsk
+CgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAo
+MTAsIDE0KQojMjM6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjUzMjoKKyAgICAgICAgIGlmIChpb2N0
+bHNvY2tldChzby0+cywgRklPTlJFQUQsICZuKSAhPSAwKSB7CisgICAgICAgICAgICAgREVCVUdf
+TUlTQygoZGZkLCIgaW9jdGxzb2NrZXQgZXJybm8gPSAlZC0lc1xuIiwKCkVSUk9SOiBjb2RlIGlu
+ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI0OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo1MzM6
+CiteSSAgICAgIERFQlVHX01JU0MoKGRmZCwiIGlvY3Rsc29ja2V0IGVycm5vID0gJWQtJXNcbiIs
+JAoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMjQ6IEZJ
+TEU6IHNsaXJwL3NvY2tldC5jOjUzMzoKKyAgICAgICAgICAgICBERUJVR19NSVNDKChkZmQsIiBp
+b2N0bHNvY2tldCBlcnJubyA9ICVkLSVzXG4iLAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IF4KCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI1OiBGSUxFOiBz
+bGlycC9zb2NrZXQuYzo1MzQ6CiteSV5JXkkgIGVycm5vLHN0cmVycm9yKGVycm5vKSkpOyQKCkVS
+Uk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzI1OiBGSUxFOiBz
+bGlycC9zb2NrZXQuYzo1MzQ6CisgICAgICAgICAgICAgICAgICAgICAgICAgZXJybm8sc3RyZXJy
+b3IoZXJybm8pKSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNjogRklMRTogc2xpcnAvc29ja2V0LmM6
+NTM1OgorXkkgICAgICByZXR1cm47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojMjc6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjUzNjoKK15JICB9JAoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjg6IEZJTEU6IHNsaXJwL3NvY2tldC5j
+OjUzNzoKK15JICBpZiAobiA9PSAwKSB7JAoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9y
+IGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDEwLCAxNCkKIzI4OiBGSUxFOiBzbGlycC9zb2NrZXQu
+Yzo1Mzc6CisgICAgICAgICBpZiAobiA9PSAwKSB7CisgICAgICAgICAgICAgcmV0dXJuOwoKRVJS
+T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjk6IEZJTEU6IHNsaXJwL3Nv
+Y2tldC5jOjUzODoKK15JICAgICAgcmV0dXJuOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
+bmV2ZXIgdXNlIHRhYnMKIzMwOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo1Mzk6CiteSSAgfSQKCnRv
+dGFsOiAxMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIyIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCAwOTg3
+ZTQ4NTFmNjAgKHNsaXJwOiBjaGVjayBmb3IgaW9jdGxzb2NrZXQgZXJyb3IgYW5kIDAtbGVuZ3Ro
+IHVkcCBwYXlsb2FkLikgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDEwNjQ4MDkuMzA3NC0x
+LWxseXpzLnZpY0BnbWFpbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
