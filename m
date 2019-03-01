@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44660)
+Received: from eggs.gnu.org ([209.51.188.92]:44658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzoPM-0004Ic-Dn
+	(envelope-from <richard.henderson@linaro.org>) id 1gzoPM-0004IZ-DE
 	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzoPJ-0001nm-TP
+	(envelope-from <richard.henderson@linaro.org>) id 1gzoPJ-0001o2-U2
 	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:23 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:40799)
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36776)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzoPH-0001iJ-Pe
+	id 1gzoPH-0001fE-Oh
 	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:20 -0500
-Received: by mail-pg1-x542.google.com with SMTP id u9so11929339pgo.7
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:05:17 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id n22so11916254pfa.3
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:05:11 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Mar 2019 12:04:59 -0800
-Message-Id: <20190301200501.16533-9-richard.henderson@linaro.org>
+Date: Fri,  1 Mar 2019 12:04:55 -0800
+Message-Id: <20190301200501.16533-5-richard.henderson@linaro.org>
 In-Reply-To: <20190301200501.16533-1-richard.henderson@linaro.org>
 References: <20190301200501.16533-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 08/10] target/arm: Implement ARMv8.5-CondM
+Subject: [Qemu-devel] [PATCH v3 04/10] target/arm: Split helper_msr_i_pstate
+ into 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +30,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+The EL0+UMA check is unique to DAIF.  While SPSel had avoided the
+check by nature of already checking EL >= 1, the other post v8.0
+extensions to MSR (imm) allow EL0 and do not require UMA.  Avoid
+the unconditional write to pc and use raise_exception_ra to unwind.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Update ID_AA64ISAR0.TS.
----
- target/arm/cpu.h           |  5 ++++
- target/arm/cpu64.c         |  2 +-
- target/arm/translate-a64.c | 58 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 64 insertions(+), 1 deletion(-)
+ target/arm/helper-a64.h    |  3 +++
+ target/arm/helper.h        |  1 -
+ target/arm/internals.h     | 15 ++++++++++++++
+ target/arm/helper-a64.c    | 30 +++++++++++++++++++++++++++
+ target/arm/op_helper.c     | 42 --------------------------------------
+ target/arm/translate-a64.c | 41 ++++++++++++++++++++++---------------
+ 6 files changed, 73 insertions(+), 59 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index fc2909ea6d..a7aaec63d7 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3436,6 +3436,11 @@ static inline bool isar_feature_aa64_condm_4(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, TS) != 0;
- }
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index aff8d6c9f3..a915c1247f 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -19,6 +19,9 @@
+ DEF_HELPER_FLAGS_2(udiv64, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+ DEF_HELPER_FLAGS_2(sdiv64, TCG_CALL_NO_RWG_SE, s64, s64, s64)
+ DEF_HELPER_FLAGS_1(rbit64, TCG_CALL_NO_RWG_SE, i64, i64)
++DEF_HELPER_2(msr_i_spsel, void, env, i32)
++DEF_HELPER_2(msr_i_daifset, void, env, i32)
++DEF_HELPER_2(msr_i_daifclear, void, env, i32)
+ DEF_HELPER_3(vfp_cmph_a64, i64, f16, f16, ptr)
+ DEF_HELPER_3(vfp_cmpeh_a64, i64, f16, f16, ptr)
+ DEF_HELPER_3(vfp_cmps_a64, i64, f32, f32, ptr)
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index d363904278..6f0f386926 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -77,7 +77,6 @@ DEF_HELPER_2(get_cp_reg, i32, env, ptr)
+ DEF_HELPER_3(set_cp_reg64, void, env, ptr, i64)
+ DEF_HELPER_2(get_cp_reg64, i64, env, ptr)
  
-+static inline bool isar_feature_aa64_condm_5(const ARMISARegisters *id)
+-DEF_HELPER_3(msr_i_pstate, void, env, i32, i32)
+ DEF_HELPER_1(clear_pstate_ss, void, env)
+ 
+ DEF_HELPER_2(get_r13_banked, i32, env, i32)
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index a4bd1becb7..587a1ddf58 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -968,4 +968,19 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+ ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
+                                    ARMMMUIdx mmu_idx, bool data);
+ 
++static inline int exception_target_el(CPUARMState *env)
 +{
-+    return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, TS) >= 2;
-+}
-+
- static inline bool isar_feature_aa64_jscvt(const ARMISARegisters *id)
- {
-     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, JSCVT) != 0;
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index fcf79321e2..9fe0844a82 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -309,7 +309,7 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64ISAR0, SM4, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR0, DP, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR0, FHM, 1);
--        t = FIELD_DP64(t, ID_AA64ISAR0, TS, 1);
-+        t = FIELD_DP64(t, ID_AA64ISAR0, TS, 2); /* v8.5-CondM */
-         cpu->isar.id_aa64isar0 = t;
- 
-         t = cpu->isar.id_aa64isar1;
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 49a09b58e3..c2b9e800c8 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1646,6 +1646,48 @@ static void handle_sync(DisasContext *s, uint32_t insn,
-     }
- }
- 
-+static void gen_xaflag(void)
-+{
-+    TCGv_i32 z = tcg_temp_new_i32();
-+
-+    tcg_gen_setcondi_i32(TCG_COND_EQ, z, cpu_ZF, 0);
++    int target_el = MAX(1, arm_current_el(env));
 +
 +    /*
-+     * (!C & !Z) << 31
-+     * (!(C | Z)) << 31
-+     * ~((C | Z) << 31)
-+     * ~-(C | Z)
-+     * (C | Z) - 1
++     * No such thing as secure EL1 if EL3 is aarch32,
++     * so update the target EL to EL3 in this case.
 +     */
-+    tcg_gen_or_i32(cpu_NF, cpu_CF, z);
-+    tcg_gen_subi_i32(cpu_NF, cpu_NF, 1);
++    if (arm_is_secure(env) && !arm_el_is_aa64(env, 3) && target_el == 1) {
++        target_el = 3;
++    }
 +
-+    /* !(Z & C) */
-+    tcg_gen_and_i32(cpu_ZF, z, cpu_CF);
-+    tcg_gen_xori_i32(cpu_ZF, cpu_ZF, 1);
-+
-+    /* (!C & Z) << 31 -> -(Z & ~C) */
-+    tcg_gen_andc_i32(cpu_VF, z, cpu_CF);
-+    tcg_gen_neg_i32(cpu_VF, cpu_VF);
-+
-+    /* C | Z */
-+    tcg_gen_or_i32(cpu_CF, cpu_CF, z);
-+
-+    tcg_temp_free_i32(z);
++    return target_el;
 +}
 +
-+static void gen_axflag(void)
+ #endif
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 70850e564d..796ef34b55 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -61,6 +61,36 @@ uint64_t HELPER(rbit64)(uint64_t x)
+     return revbit64(x);
+ }
+ 
++void HELPER(msr_i_spsel)(CPUARMState *env, uint32_t imm)
 +{
-+    tcg_gen_sari_i32(cpu_VF, cpu_VF, 31);         /* V ? -1 : 0 */
-+    tcg_gen_andc_i32(cpu_CF, cpu_CF, cpu_VF);     /* C & !V */
-+
-+    /* !(Z | V) -> !(!ZF | V) -> ZF & !V -> ZF & ~VF */
-+    tcg_gen_andc_i32(cpu_ZF, cpu_ZF, cpu_VF);
-+
-+    tcg_gen_movi_i32(cpu_NF, 0);
-+    tcg_gen_movi_i32(cpu_VF, 0);
++    update_spsel(env, imm);
 +}
 +
- /* MSR (immediate) - move immediate to processor state field */
++static void daif_check(CPUARMState *env, uint32_t op,
++                       uint32_t imm, uintptr_t ra)
++{
++    /* DAIF update to PSTATE. This is OK from EL0 only if UMA is set.  */
++    if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_UMA)) {
++        raise_exception_ra(env, EXCP_UDEF,
++                           syn_aa64_sysregtrap(0, extract32(op, 0, 3),
++                                               extract32(op, 3, 3), 4,
++                                               imm, 0x1f, 0),
++                           exception_target_el(env), ra);
++    }
++}
++
++void HELPER(msr_i_daifset)(CPUARMState *env, uint32_t imm)
++{
++    daif_check(env, 0x1e, imm, GETPC());
++    env->daif |= (imm << 6) & PSTATE_DAIF;
++}
++
++void HELPER(msr_i_daifclear)(CPUARMState *env, uint32_t imm)
++{
++    daif_check(env, 0x1f, imm, GETPC());
++    env->daif &= ~((imm << 6) & PSTATE_DAIF);
++}
++
+ /* Convert a softfloat float_relation_ (as returned by
+  * the float*_compare functions) to the correct ARM
+  * NZCV flag state.
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index c998eadfaa..c5721a866d 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -68,20 +68,6 @@ void raise_exception_ra(CPUARMState *env, uint32_t excp, uint32_t syndrome,
+     cpu_loop_exit_restore(cs, ra);
+ }
+ 
+-static int exception_target_el(CPUARMState *env)
+-{
+-    int target_el = MAX(1, arm_current_el(env));
+-
+-    /* No such thing as secure EL1 if EL3 is aarch32, so update the target EL
+-     * to EL3 in this case.
+-     */
+-    if (arm_is_secure(env) && !arm_el_is_aa64(env, 3) && target_el == 1) {
+-        target_el = 3;
+-    }
+-
+-    return target_el;
+-}
+-
+ uint32_t HELPER(neon_tbl)(uint32_t ireg, uint32_t def, void *vn,
+                           uint32_t maxindex)
+ {
+@@ -875,34 +861,6 @@ uint64_t HELPER(get_cp_reg64)(CPUARMState *env, void *rip)
+     return res;
+ }
+ 
+-void HELPER(msr_i_pstate)(CPUARMState *env, uint32_t op, uint32_t imm)
+-{
+-    /* MSR_i to update PSTATE. This is OK from EL0 only if UMA is set.
+-     * Note that SPSel is never OK from EL0; we rely on handle_msr_i()
+-     * to catch that case at translate time.
+-     */
+-    if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_UMA)) {
+-        uint32_t syndrome = syn_aa64_sysregtrap(0, extract32(op, 0, 3),
+-                                                extract32(op, 3, 3), 4,
+-                                                imm, 0x1f, 0);
+-        raise_exception(env, EXCP_UDEF, syndrome, exception_target_el(env));
+-    }
+-
+-    switch (op) {
+-    case 0x05: /* SPSel */
+-        update_spsel(env, imm);
+-        break;
+-    case 0x1e: /* DAIFSet */
+-        env->daif |= (imm << 6) & PSTATE_DAIF;
+-        break;
+-    case 0x1f: /* DAIFClear */
+-        env->daif &= ~((imm << 6) & PSTATE_DAIF);
+-        break;
+-    default:
+-        g_assert_not_reached();
+-    }
+-}
+-
+ void HELPER(clear_pstate_ss)(CPUARMState *env)
+ {
+     env->pstate &= ~PSTATE_SS;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 4aa5a307e4..1e49d33365 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1661,29 +1661,38 @@ static void handle_sync(DisasContext *s, uint32_t insn,
  static void handle_msr_i(DisasContext *s, uint32_t insn,
                           unsigned int op1, unsigned int op2, unsigned int crm)
-@@ -1665,6 +1707,22 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
-         s->base.is_jmp = DISAS_NEXT;
-         break;
- 
-+    case 0x01: /* XAFlag */
-+        if (crm != 0 || !dc_isar_feature(aa64_condm_5, s)) {
-+            goto do_unallocated;
-+        }
-+        gen_xaflag();
-+        s->base.is_jmp = DISAS_NEXT;
-+        break;
+ {
++    TCGv_i32 t1;
+     int op = op1 << 3 | op2;
 +
-+    case 0x02: /* AXFlag */
-+        if (crm != 0 || !dc_isar_feature(aa64_condm_5, s)) {
-+            goto do_unallocated;
-+        }
-+        gen_axflag();
-+        s->base.is_jmp = DISAS_NEXT;
-+        break;
++    /* End the TB by default, chaining is ok.  */
++    s->base.is_jmp = DISAS_TOO_MANY;
 +
+     switch (op) {
      case 0x05: /* SPSel */
          if (s->current_el == 0) {
-             goto do_unallocated;
+-            unallocated_encoding(s);
+-            return;
++            goto do_unallocated;
+         }
+-        /* fall through */
+-    case 0x1e: /* DAIFSet */
+-    case 0x1f: /* DAIFClear */
+-    {
+-        TCGv_i32 tcg_imm = tcg_const_i32(crm);
+-        TCGv_i32 tcg_op = tcg_const_i32(op);
+-        gen_a64_set_pc_im(s->pc - 4);
+-        gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
+-        tcg_temp_free_i32(tcg_imm);
+-        tcg_temp_free_i32(tcg_op);
+-        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
+-        gen_a64_set_pc_im(s->pc);
+-        s->base.is_jmp = (op == 0x1f ? DISAS_EXIT : DISAS_JUMP);
++        t1 = tcg_const_i32(crm & PSTATE_SP);
++        gen_helper_msr_i_spsel(cpu_env, t1);
++        tcg_temp_free_i32(t1);
+         break;
+-    }
++
++    case 0x1e: /* DAIFSet */
++        t1 = tcg_const_i32(crm);
++        gen_helper_msr_i_daifset(cpu_env, t1);
++        tcg_temp_free_i32(t1);
++        break;
++
++    case 0x1f: /* DAIFClear */
++        t1 = tcg_const_i32(crm);
++        gen_helper_msr_i_daifclear(cpu_env, t1);
++        tcg_temp_free_i32(t1);
++        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
++        s->base.is_jmp = DISAS_UPDATE;
++        break;
++
+     default:
++    do_unallocated:
+         unallocated_encoding(s);
+         return;
+     }
 -- 
 2.17.2
