@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51213)
+Received: from eggs.gnu.org ([209.51.188.92]:51710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzmMk-0005ol-Oy
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:54:35 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gzmOp-0007Jl-Iz
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:56:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzmMj-0000Xx-RV
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:54:34 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40357)
+	(envelope-from <alex.bennee@linaro.org>) id 1gzmOo-00029N-Gh
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:56:43 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43112)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzmMj-0000Wl-6O
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:54:33 -0500
-Received: by mail-pl1-x644.google.com with SMTP id bj4so11817868plb.7
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 09:54:33 -0800 (PST)
-References: <20190301115413.27153-1-david@redhat.com>
-	<20190301115413.27153-28-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bccdbc0a-1dd9-5675-557a-15e69058ef9d@linaro.org>
-Date: Fri, 1 Mar 2019 09:54:27 -0800
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gzmOo-00026j-9f
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:56:42 -0500
+Received: by mail-wr1-x443.google.com with SMTP id d17so26763594wre.10
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 09:56:39 -0800 (PST)
+References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
+	<1549390526-24246-14-git-send-email-pbonzini@redhat.com>
+	<87sgw6k02i.fsf@zen.linaroharston>
+	<20190301171343.dyuqan3ok6gzuotw@steredhat>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190301171343.dyuqan3ok6gzuotw@steredhat>
+Date: Fri, 01 Mar 2019 17:56:36 +0000
+Message-ID: <87o96ujx63.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190301115413.27153-28-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 27/32] s390x/tcg: Provide probe_write
- helper
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 13/76] pvh: Add x86/HVM direct boot ABI
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +33,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
-
-On 3/1/19 3:54 AM, David Hildenbrand wrote:
-> Instead of checking e.g. the first access on every touched page, we should
-> check the actual access, otherwise we might get false positives when Low
-> Address Protection (LAP) is active. As probe_write() can only deal with
-> accesses to one page, we have to loop.
-> 
-> Use i64 for the length, although not needed - easier to reuse
-> TCG temps we already have in the translation functions where this will
-> be used. Also allow it to be used from other helpers.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/helper.h     |  1 +
->  target/s390x/internal.h   |  2 ++
->  target/s390x/mem_helper.c | 21 +++++++++++++++++++++
->  3 files changed, 24 insertions(+)
-> 
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 577edb384f..e2710f4fb3 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -123,6 +123,7 @@ DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
->  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
->  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
->  DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
-> +DEF_HELPER_FLAGS_3(probe_write_access, TCG_CALL_NO_WG, void, env, i64, i64)
->  
->  /* === Vector Support Instructions === */
->  DEF_HELPER_FLAGS_4(vll, TCG_CALL_NO_WG, void, env, ptr, i64, i64)
-> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-> index 7baf0e2404..848d6c36d0 100644
-> --- a/target/s390x/internal.h
-> +++ b/target/s390x/internal.h
-> @@ -386,6 +386,8 @@ void ioinst_handle_sal(S390CPU *cpu, uint64_t reg1, uintptr_t ra);
->  
->  /* mem_helper.c */
->  target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr);
-> +void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
-> +                        uintptr_t ra);
->  
->  
->  /* mmu_helper.c */
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index a506d9ef99..efd5256ebf 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -2623,3 +2623,24 @@ uint32_t HELPER(cu42)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
->      return convert_unicode(env, r1, r2, m3, GETPC(),
->                             decode_utf32, encode_utf16);
->  }
-> +
-> +void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
-> +                        uintptr_t ra)
-> +{
-> +#ifndef CONFIG_USER_ONLY
-> +    /* test the actual access, not just any access to the page due to LAP */
-> +    while (len) {
-> +        uint64_t curlen = MIN(TARGET_PAGE_SIZE - (addr % TARGET_PAGE_SIZE),
-> +                              len);
-
-pagelen = -(addr | TARGET_PAGE_MASK);
-curlen = MIN(pagelen, len);
-
-> +
-> +        probe_write(env, addr, curlen, cpu_mmu_index(env, false), ra);
-> +        addr = wrap_address(env, addr + curlen);
-> +        len -= curlen;
-> +    }
-> +#endif
-
-That's annoying.  I thought we defined probe_write for user-only as well.
-
-The user-only version would look something like
-
-  uint64_t end = addr + len - 1;
-
-  if (!h2g_valid(addr) ||
-      !h2g_valid(end) ||
-      page_check_range(addr, len, PAGE_WRITE) < 0) {
-    // raise PGM_ADDRESSING
-  }
-
-Ah, I see why -- there's no user-only equivalent of tlb_fill with which to
-produce the exception in the failure case.
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
-r~
+Stefano Garzarella <sgarzare@redhat.com> writes:
+
+> On Fri, Mar 01, 2019 at 04:53:57PM +0000, Alex Benn=C3=A9e wrote:
+>>
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>
+>> > From: Liam Merwick <Liam.Merwick@oracle.com>
+>> >
+>> > The x86/HVM direct boot ABI permits Qemu to be able to boot directly
+>> > into the uncompressed Linux kernel binary with minimal firmware involv=
+ement.
+>> >
+>> > 	https://xenbits.xen.org/docs/unstable/misc/pvh.html
+>> >
+>> > This commit adds the header file that defines the start_info struct
+>> > that needs to be populated in order to use this ABI.
+>> >
+>> > The canonical version of start_info.h is in the Xen codebase.
+>> > (like QEMU, the Linux kernel uses a copy as well).
+>> >
+>> > Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+>> > Reviewed-by: Konrad Rzeszutek Wilk <Konrad.Wilk@oracle.com>
+>> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> This has changed behaviour of a boot. Previously:
+>>
+>>   qemu-system-i386 -serial mon:stdio -nographic -device \
+>>      isa-debugcon,chardev=3Dserial0 -kernel ./tests/hello
+>>
+>
+> Hi Alex,
+> is your image in multiboot format?
+
+AFAICT yes, I'm not super familiar with x86 so I'm mostly cribbing from:
+
+  https://github.com/doug65536/qemu-bmibug
+
+> I sent a patch few weeks ago that fix the loading of multiboot images:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg596424.html
+
+That certainly fixes things. Although I'm wondering if it's worth making
+my test image PVH compatible anyway (if it's easy to do) as all I really
+want to do is exercise the softmmu code. It might be simpler to use
+paravirtualised serial ports rather than banging an IO port, IDK?
+
+>
+> Thanks,
+> Stefano
+>
+>> would boot seabios which then loads the -kernel. Now we get:
+>>
+>>   qemu-system-i386: Error loading uncompressed kernel without PVH ELF No=
+te
+>>
+>> I'm personally not overly concerned (and being able to boot directly
+>> sounds like a win for my test case). However is this likely to break
+>> anybodies existing workflow?
+>>
+>> Are there any examples of the minimum setup for a directly booted i386
+>> kernel image anywhere?
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
+
+
+--
+Alex Benn=C3=A9e
