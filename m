@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37289)
+Received: from eggs.gnu.org ([209.51.188.92]:37374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1gzgZC-0007b8-E9
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:43:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzgZk-0007tb-Pm
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:43:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1gzgZB-0004Hf-Cl
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:43:02 -0500
-References: <1551407310-32413-1-git-send-email-guoheyi@huawei.com>
-	<20190301114403.1e8324f4@redhat.com>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <86b71e1e-2e4d-a3f0-dff0-750662be2af8@huawei.com>
-Date: Fri, 1 Mar 2019 19:37:40 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1gzgZg-0005xJ-TZ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:43:35 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gzgZf-0005or-SQ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:43:32 -0500
+Received: by mail-oi1-x243.google.com with SMTP id b4so19239805oif.6
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 03:43:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190301114403.1e8324f4@redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/acpi: enable SHPC native hot plug
+References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
+In-Reply-To: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 1 Mar 2019 11:43:17 +0000
+Message-ID: <CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC] multi phase reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +28,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Heyi Guo <heyi.guo@linaro.org>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>
 
+On Mon, 25 Feb 2019 at 10:49, Damien Hedde <damien.hedde@greensocs.com> wrote:
+> I had more thought about the reset problem and what we want to achieve
+> (add power gating and clock support).
+> Feel free to comment. I'll start to implement this and send a first
+> version with a reroll of everything when it's ready.
 
+I generally like this; I have some comments below.
 
-On 2019/3/1 18:44, Igor Mammedov wrote:
-> On Fri, 1 Mar 2019 10:28:30 +0800
-> Heyi Guo <guoheyi@huawei.com> wrote:
+> # CONTEXT
 >
->> After the introduction of generic PCIe root port and PCIe-PCI bridge,
->> we will also have SHPC controller on ARM, so just enalbe SHPC native
->> hot plug.
-> Just out of curiosity,
-> An understand the need for SHPC on plain PCI but in case of PCIe
-> why native PCIe hotplug isn't sufficient?
-For future extension and completeness:
-1. PCI is sometimes more flexible than PCIe, for it can have up to 32 devices in virtual world. The shortage for PCIe hot plug is that the number of PCIe root ports is fixed.
-2. We have SHPC when booting through device tree mode, but don't have it through ACPI mode.
+> We want to model the clock distribution between devices in qemu
+> (https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00310.html).
+> To this end, we need to make some changes in the reset procedure because
+> the current one does not allow to propagate things (like clocks or IOs)
+> between devices.
+>
+> In the other hand, we also want to add power gating support. For that we
+> need state support in devices. This is related to reset because powering
+> down then up a device is like a reset.
+>
+> # CURRENT STATE
+> First here is a current state of reset usage:
+>
+> * Buses and Devices have a single reset method taking no parameter
+>   (apart from bus/device object)
+> * `qdev_reset_all`/`qbus_reset_all` functions call these reset methods
+>   for a bus/dev subtree
+>     + theses functions are used in ~20 places (mostly pci and scsi)
+> * `device_reset` function only do a device local reset (does not walk
+>   the bus subtree)
+>     + device_reset is used in ~10 places
+> * qemu_register_reset is used to register the:
+>     + `qbus_reset_all` of top-level/orphan buses (2 places)
+>     + ~100 of other reset functions (a lot of cpu related reset)
+> * qemu_devices_reset reset everythings that has been registered with
+>   qemu_register_reset
+> * Machines may define a reset method that overrides qemu_devices_reset
+>   global function (few machines do that)
+>
+> # PROPOSAL OVERVIEW
+>
+> I propose to add a Resetable interface and a ResetDomain object.
+>
+> Having an interface simplify things since there is several reset entry
+> points (at least Buses and Devices).
+> Device and Bus objects will implement this interface.
+>
+> The ResetDomain will hold several Resetable objects and implement the
+> interface too. The ResetDomain is needed to have at least a global/main
+> ResetDomain to place buses and devices to replace the current
+> qemu_register_reset system which only allow to register a function.
 
-If I missed something, please let me know.
+How does the ResetDomain fit in for a typical case where
+we have an SoC container object with a handful of devices
+(which are children of the container object)? Does the
+SoC container object just directly implement the Resettable
+interface and handle the propagation as ResetDomain would?
+Does the SoC container create one or more ResetDomains and
+add its child devices to them (if so, with what API)?
 
-Thanks,
-Heyi
+> I also propose to handle the warm/cold reset distinction. This point is
+> explained below.
+>
+> # RESETABLE INTERFACE
+>
+> This Resetable interface describes the methods corresponding to a multi-
+> phase reset system. This is based on Peter's proposal (see
+> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03302.html).
+>
+> Here's the phases (I've tried to find adequate names):
+
+I think this naming definitely works better than my 1/2/3 numbering...
 
 >
->> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->> Signed-off-by: Heyi Guo <heyi.guo@linaro.org>
->> ---
->>   hw/arm/virt-acpi-build.c | 7 ++++++-
->>   1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index 04b62c7..7849ec5 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -265,7 +265,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>           aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
->>       aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
->>       aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
->> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
->> +
->> +    /*
->> +     * Allow OS control for all 5 features:
->> +     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
->> +     */
->> +    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1F), NULL),
->>                                   aml_name("CTRL")));
->>   
->>       ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+> INIT PHASE: (Peter's phase 1)
+>     Reset the object internal state, put a resetting flag and do the
+>     same for the reset subtree. No side effect on other devices to
+>     guarantee that, in a reset domain, everything get initialized first.
+>     This corresponds mostly to what is currently done in the device/bus
+>     reset method.
 >
-> .
+> HOLD PHASE: (This phase was not in Peter's proposal)
+>     This phase allows to control a reset with a IO. When a IO control
+>     reset procedure based on the IO level (not edge), we may need to
+>     assert the reset, wait some time, and finally de-assert the reset.
+>     The consequence is that such a device can stay in a "resetting
+>     state" and may need to show this state to other devices through
+>     its outputs. For example, a clock controller will typically shutdown
+>     its clocks when it is in resetting state.
 >
+> RELEASE PHASE: (Peter's phase 2, modified)
+>     This phase sets outputs to state after reset. For a clock controller
+>     it starts the clocks. It also clears the "resetting" flag (this is
+>     where is differs from Peter's phase 2). A device should not react to
+>     inputs until this flag has been cleared. During this phase, outputs
+>     are propagated in the reset domain (and outside the reset domain).
+>
+> POST PHASE: (Peter's phase 3)
+>     This phase is kind of post-reset phase to do things that need the
+>     guarantee to be after the propagation of outputs inside the reset
+>     domain.
+
+In my design the only thing that I thought would happen in phase 3
+was the "clear the resetting flag", but you've moved that to RELEASE.
+What's left ? Do you have a concrete example where we'd need this?
+
+> The interface contains a method per phase:
+>  void (*reset_init)(Resetable *rst, bool cold);
+>  void (*reset_hold)(Resetable *rst);
+>  void (*reset_release)(Resetable *rst);
+>  void (*reset_post)(Resetable *rst);
+>
+> # WARM/COLD RESET
+>
+> Warm/Cold reset differences may exists in devices. We want a cold reset
+> to handle power gating. (IMO powering off a device is identical to
+> putting it in a cold reset state).
+>
+> To handle the difference between warm and cold reset, I propose to have
+> a parameter to the init phase of Resetable interface.
+> Other phases do not need the parameter since init phase should
+> put warm/cold difference in the device state.
+>
+> # How to do a reset on a Resetable object
+>
+> There is 3 entry points. The first one is when we do a reset event. I
+> call it `void resetable_trigger_reset(Resetable *rst, bool cold)`. This
+> the one used for example at machine startup to initialize everything.
+> this should do the init, release and postphases in a row. I don't think
+> hold phase must be done here since release will do the opposite just after.
+>
+> The 2 other entry points are dedicated to io control.
+> void resetable_assert_reset(Resetable *rst, bool cold);
+> void resetable_deassert_reset(Resetable *rst);
+> assert will do init and hold phases while deassert will release and post
+> phase.
+
+Could we avoid having these two flavours of reset (init->release->post
+vs init->hold->release->post) by just saying that if you only care
+about triggering reset you just call assert then deassert ?
+
+> Obviously to correctly support this assert/de-assert a device must have
+> special support in order to handle migration in "resetting" state. There
+> is no migration problem while we only use trigger because there is no
+> point during the reset were migration could occur.
+
+What would need to be different? Just needing to migrate the state
+of the 'resetting' flag ? (I think we could handle that in the
+device base class.)
+
+> # DeviceClass impact
+>
+> 4 new methods are added in Device:
+> + 3 corresponding to the hold/release/post phases.
+> + 1 to handle the cold reset init phase.
+>
+> The existing `reset` method is now the warm reset init phase. To handle
+> the cold reset, a new `cold_reset` is added. The default behavior of
+> this method is to call `reset` so that without any specific support cold
+> and warm reset are the same.
+
+I think it would be nicer if devices just implemented the Resettable
+interface, so that we don't have two similar but not identical APIs
+for handling the various phases.
+
+> Instead of adding a cold reset method, we could add a parameter to the
+> current reset. But there is a lot of places that would need some changes
+> and I am really not sure we can do it automatically.
+
+Coccinelle is very good for making wide-scale automatic changes.
+I would prefer that we design (and work out a path for transitioning
+to) the right API, rather than producing a weird API because we're
+trying to retain some legacy method names and fit them into the
+scheme.
+
+If I'm a device that's aware of the new reset scheme, what
+do I need to implement? Do I declare that I implement Resettable,
+and provide the various methods for the phases? Or do I rely
+on DeviceClass to implement Resettable, and provide DeviceClass
+methods ?
+
+(perhaps what we want is for new-system-aware devices to implement
+Resettable directly, and also for DeviceClass to implement
+Resettable with some methods that call old-school DeviceClass::reset,
+for back-compatibility ? This feels like it's going to end up
+with our "preferred" API being more boilerplatey than the
+"deprecated" old API, though :-( )
+
+> # BusClass impact
+>
+> I don't think we need to add any new method to the bus. Since a bus has
+> no gpio, there is no propagation so phase hold/release/term are probably
+> meaningless here. Maybe a cold reset method is useful here ?
+
+I suspect buses in general should also be using the same APIs. For
+instance a PCI controller can do a bus reset which should reset
+all the devices on the bus. We don't model the individual
+GPIO lines in a PCI bus connection but that doesn't mean there
+isn't a logical equivalent there. Our support for bus resets
+(mainly as you say SCSI and PCI) is basically a half-baked
+implementation of a reset domain.
+
+> # Impact on existing code
+>
+> There is not much impact. Basically the global qemu_reset should be
+> changed to handle Resetable objects with a global ResetDomain. Also the
+> 2 occurrences of qemu_register_reset(qbus_reset_all, ...) must be
+> replaced to add the buses in the global ResetDomain.
+>
+> qdev/qbus_reset_all/device_reset behavior will be changed to trigger
+> phase reset (instead of doing one dev/bus walk, there will be a walk per
+> reset phase). We can add the cold/warm parameter (and modify the places
+> were the functions are called) or choose a default (anyway until support
+> is added to devices, both are identical).
+
+thanks
+-- PMM
