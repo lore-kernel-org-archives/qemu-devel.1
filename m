@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37374)
+Received: from eggs.gnu.org ([209.51.188.92]:37655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzgZk-0007tb-Pm
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:43:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gzgap-0000Bn-7V
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:44:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzgZg-0005xJ-TZ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:43:35 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39396)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gzgZf-0005or-SQ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:43:32 -0500
-Received: by mail-oi1-x243.google.com with SMTP id b4so19239805oif.6
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 03:43:30 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1gzgam-0001Yi-EC
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:44:43 -0500
+Date: Fri, 1 Mar 2019 12:44:26 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190301114426.GA5861@localhost.localdomain>
+References: <20190227165212.34901-1-slp@redhat.com>
+	<20190227173714.GA6276@localhost.localdomain>
+	<20190228150119.c77xcmrp4ogg32eu@dritchie>
+	<20190228155053.GB5563@linux.fritz.box>
+	<20190228170436.mifnzx6agowzxyq3@dritchie>
+	<20190228172202.GC5563@linux.fritz.box>
+	<20190228183637.f7v6phv3kqtin3ps@dritchie>
 MIME-Version: 1.0
-References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
-In-Reply-To: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Mar 2019 11:43:17 +0000
-Message-ID: <CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC] multi phase reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190228183637.f7v6phv3kqtin3ps@dritchie>
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: dataplane: release AioContext
+ before blk_set_aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,223 +29,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Damien Hedde <damien.hedde@greensocs.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-On Mon, 25 Feb 2019 at 10:49, Damien Hedde <damien.hedde@greensocs.com> wrote:
-> I had more thought about the reset problem and what we want to achieve
-> (add power gating and clock support).
-> Feel free to comment. I'll start to implement this and send a first
-> version with a reroll of everything when it's ready.
+Am 28.02.2019 um 19:36 hat Sergio Lopez geschrieben:
+> On Thu, Feb 28, 2019 at 06:22:02PM +0100, Kevin Wolf wrote:
+> > Am 28.02.2019 um 18:04 hat Sergio Lopez geschrieben:
+> > > On Thu, Feb 28, 2019 at 04:50:53PM +0100, Kevin Wolf wrote:
+> > > > Am 28.02.2019 um 16:01 hat Sergio Lopez geschrieben:
+> > > > > On Wed, Feb 27, 2019 at 06:37:14PM +0100, Kevin Wolf wrote:
+> > > > > > Am 27.02.2019 um 17:52 hat Sergio Lopez geschrieben:
+> > > > > > > Stopping the dataplane requires calling to blk_set_aio_context, which
+> > > > > > > may need to wait for a running job to be completed or paused.
+> > > > > > > 
+> > > > > > > As stopping the dataplane is something that can be triggered from a vcpu
+> > > > > > > thread (due to the Guest requesting to stop the device), while the job
+> > > > > > > itself may be managed by an iothread, holding the AioContext will lead
+> > > > > > > to a deadlock, where the first one is waiting for the job to pause or
+> > > > > > > finish, while the second can't make any progress as it's waiting for the
+> > > > > > > AioContext to be released:
+> > > > > > > 
+> > > > > > >  Thread 6 (LWP 90472)
+> > > > > > >  #0  0x000055a6f8497aee in blk_root_drained_end
+> > > > > > >  #1  0x000055a6f84a7926 in bdrv_parent_drained_end
+> > > > > > >  #2  0x000055a6f84a799f in bdrv_do_drained_end
+> > > > > > >  #3  0x000055a6f84a82ab in bdrv_drained_end
+> > > > > > >  #4  0x000055a6f8498be8 in blk_drain
+> > > > > > >  #5  0x000055a6f84a22cd in mirror_drain
+> > > > > > >  #6  0x000055a6f8457708 in block_job_detach_aio_context
+> > > > > > >  #7  0x000055a6f84538f1 in bdrv_detach_aio_context
+> > > > > > >  #8  0x000055a6f8453a96 in bdrv_set_aio_context
+> > > > > > >  #9  0x000055a6f84999f8 in blk_set_aio_context
+> > > > > > >  #10 0x000055a6f81802c8 in virtio_blk_data_plane_stop
+> > > > > > >  #11 0x000055a6f83cfc95 in virtio_bus_stop_ioeventfd
+> > > > > > >  #12 0x000055a6f83d1f81 in virtio_pci_common_write
+> > > > > > >  #13 0x000055a6f83d1f81 in virtio_pci_common_write
+> > > > > > >  #14 0x000055a6f8148d62 in memory_region_write_accessor
+> > > > > > >  #15 0x000055a6f81459c9 in access_with_adjusted_size
+> > > > > > >  #16 0x000055a6f814a608 in memory_region_dispatch_write
+> > > > > > >  #17 0x000055a6f80f1f98 in flatview_write_continue
+> > > > > > >  #18 0x000055a6f80f214f in flatview_write
+> > > > > > >  #19 0x000055a6f80f6a7b in address_space_write
+> > > > > > >  #20 0x000055a6f80f6b15 in address_space_rw
+> > > > > > >  #21 0x000055a6f815da08 in kvm_cpu_exec
+> > > > > > >  #22 0x000055a6f8132fee in qemu_kvm_cpu_thread_fn
+> > > > > > >  #23 0x000055a6f8551306 in qemu_thread_start
+> > > > > > >  #24 0x00007f9bdf5b9dd5 in start_thread
+> > > > > > >  #25 0x00007f9bdf2e2ead in clone
+> > > > > > > 
+> > > > > > >  Thread 8 (LWP 90467)
+> > > > > > >  #0  0x00007f9bdf5c04ed in __lll_lock_wait
+> > > > > > >  #1  0x00007f9bdf5bbde6 in _L_lock_941
+> > > > > > >  #2  0x00007f9bdf5bbcdf in __GI___pthread_mutex_lock
+> > > > > > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl
+> > > > > > >  #4  0x000055a6f854be77 in co_schedule_bh_cb
+> > > > > > >  #5  0x000055a6f854b781 in aio_bh_poll
+> > > > > > >  #6  0x000055a6f854b781 in aio_bh_poll
+> > > > > > >  #7  0x000055a6f854f01b in aio_poll
+> > > > > > >  #8  0x000055a6f825a488 in iothread_run
+> > > > > > >  #9  0x000055a6f8551306 in qemu_thread_start
+> > > > > > >  #10 0x00007f9bdf5b9dd5 in start_thread
+> > > > > > >  #11 0x00007f9bdf2e2ead in clone
+> > > > > > > 
+> > > > > > >  (gdb) thread 8
+> > > > > > >  [Switching to thread 8 (Thread 0x7f9bd6dae700 (LWP 90467))]
+> > > > > > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl (mutex=0x55a6fac8fea0,
+> > > > > > >      file=0x55a6f8730c3f "util/async.c", line=511) at util/qemu-thread-posix.c:66
+> > > > > > >  66	    err = pthread_mutex_lock(&mutex->lock);
+> > > > > > >  (gdb) up 3
+> > > > > > >  #3  0x000055a6f8551447 in qemu_mutex_lock_impl (mutex=0x55a6fac8fea0,
+> > > > > > >      file=0x55a6f8730c3f "util/async.c", line=511) at util/qemu-thread-posix.c:66
+> > > > > > >  66	    err = pthread_mutex_lock(&mutex->lock);
+> > > > > > >  (gdb) p mutex.lock.__data.__owner
+> > > > > > >  $6 = 90472
+> > > > > > > 
+> > > > > > > Signed-off-by: Sergio Lopez <slp@redhat.com>
+> > > > > > > ---
+> > > > > > >  hw/block/dataplane/virtio-blk.c | 3 +--
+> > > > > > >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > > > > > > 
+> > > > > > > diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+> > > > > > > index 8c37bd314a..358e6ae89b 100644
+> > > > > > > --- a/hw/block/dataplane/virtio-blk.c
+> > > > > > > +++ b/hw/block/dataplane/virtio-blk.c
+> > > > > > > @@ -280,12 +280,11 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+> > > > > > >  
+> > > > > > >      aio_context_acquire(s->ctx);
+> > > > > > >      aio_wait_bh_oneshot(s->ctx, virtio_blk_data_plane_stop_bh, s);
+> > > > > > > +    aio_context_release(s->ctx);
+> > > > > > >  
+> > > > > > >      /* Drain and switch bs back to the QEMU main loop */
+> > > > > > >      blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
+> > > > > > >  
+> > > > > > > -    aio_context_release(s->ctx);
+> > > > > > > -
+> > > > > > 
+> > > > > > blk_set_aio_context() requires that the caller hold the lock for the
+> > > > > > source context, so I'm afraid this is wrong.
+> > > > > 
+> > > > > TBH, I was quite sure this patch was wrong myself, but I thought it was
+> > > > > still a good way to illustrate the issue.
+> > > > > 
+> > > > > > However, I think the problem might already be fixed with my "block: Use
+> > > > > > normal drain for bdrv_set_aio_context()" (contained in a pull request,
+> > > > > > which isn't merged yet), which makes bdrv_set_aio_context() use a real
+> > > > > > drain operation. This way, the requests of the mirror jobs should be
+> > > > > > already drained before we even call into block_job_detach_aio_context().
+> > > > > > 
+> > > > > > Can you give this a try and see whether it fixes your problem?
+> > > > > 
+> > > > > I've applied your patchset to my local copy, but it doesn't fix the
+> > > > > issue.
+> > > > > 
+> > > > > The problem is the coroutine is already scheduled to be run in the
+> > > > > iothread context, which means job->busy == true, so we can't switch to
+> > > > > it from any other place.
+> > > > 
+> > > > I still don't understand this because with job->paused == true the
+> > > > hanging loop wouldn't even be started. And after bdrv_drained_begin()
+> > > > returns, all jobs that use the node in question should be paused (see
+> > > > child_job_drained_begin/poll).
+> > > > 
+> > > > So somehow that drain (called in bdrv_set_aio_context()) doesn't seem to
+> > > > fully do what it is supposed to do?
+> > > 
+> > > IIUC, child_job_drained_begin() requests the job to be paused (something
+> > > that block_job_detach_aio_context() also does), but we don't get to
+> > > child_job_drained_poll() as bdrv_parent_drained_begin_single() is called
+> > > with "poll == false" by bdrv_parent_drained_begin().
+> > > 
+> > > But even if we did, that probably won't help in some scenarios, as
+> > > mirror's drained_poll implementation just checks if there are in_flight
+> > > requests, so it might happen that BDRV_POLL_WHILE returns without having
+> > > called aio_wait() a single time.
+> > > 
+> > > In other words, I think the drain code makes sure there aren't any
+> > > in_flight requests in the chain, but doesn't provide by itself a
+> > > guarantee that the jobs have been paused.
+> > 
+> > Yes, seems this is what it does. But I think that's not enough because
+> > if the job isn't paused, it can still issue new requests.
+> > 
+> > I'm not sure whether mirror_drained_poll() or child_job_drained_poll()
+> > is to blame, but the logic is wrong there: We should only return that
+> > the job is quiescent when it has reached a pause point _and_
+> > s->in_flight == 0.
+> 
+> If we expect this to be the case even when
+> bdrv_parent_drained_begin_single() is called from
+> bdrv_parent_drained_begin() with poll == false, then we need to make the
+> job_pause() at child_job_drained_begin() to take effect immeditaly,
+> probaly putting an AIO_WAIT_WHILE afterwards.
 
-I generally like this; I have some comments below.
+.drained_begin callbacks must not call AIO_WAIT_WHILE (or any kind of
+aio_poll()) because that could run callbacks that change the graph,
+which would mess with the drained_begin recursion.
 
-> # CONTEXT
->
-> We want to model the clock distribution between devices in qemu
-> (https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00310.html).
-> To this end, we need to make some changes in the reset procedure because
-> the current one does not allow to propagate things (like clocks or IOs)
-> between devices.
->
-> In the other hand, we also want to add power gating support. For that we
-> need state support in devices. This is related to reset because powering
-> down then up a device is like a reset.
->
-> # CURRENT STATE
-> First here is a current state of reset usage:
->
-> * Buses and Devices have a single reset method taking no parameter
->   (apart from bus/device object)
-> * `qdev_reset_all`/`qbus_reset_all` functions call these reset methods
->   for a bus/dev subtree
->     + theses functions are used in ~20 places (mostly pci and scsi)
-> * `device_reset` function only do a device local reset (does not walk
->   the bus subtree)
->     + device_reset is used in ~10 places
-> * qemu_register_reset is used to register the:
->     + `qbus_reset_all` of top-level/orphan buses (2 places)
->     + ~100 of other reset functions (a lot of cpu related reset)
-> * qemu_devices_reset reset everythings that has been registered with
->   qemu_register_reset
-> * Machines may define a reset method that overrides qemu_devices_reset
->   global function (few machines do that)
->
-> # PROPOSAL OVERVIEW
->
-> I propose to add a Resetable interface and a ResetDomain object.
->
-> Having an interface simplify things since there is several reset entry
-> points (at least Buses and Devices).
-> Device and Bus objects will implement this interface.
->
-> The ResetDomain will hold several Resetable objects and implement the
-> interface too. The ResetDomain is needed to have at least a global/main
-> ResetDomain to place buses and devices to replace the current
-> qemu_register_reset system which only allow to register a function.
+The design of drain after my recent fixes is that .drained_begin does
+whatever is needed to initiate tbat things can become quiescent, and
+then there is only a single AIO_WAIT_WHILE() at the top level which
+recursively calls .drained_poll callbacks to check whether we need to
+wait longer (and which may not make further aio_poll() calls either).
 
-How does the ResetDomain fit in for a typical case where
-we have an SoC container object with a handful of devices
-(which are children of the container object)? Does the
-SoC container object just directly implement the Resettable
-interface and handle the propagation as ResetDomain would?
-Does the SoC container create one or more ResetDomains and
-add its child devices to them (if so, with what API)?
+This way, graph changes can never occur during a recursion.
 
-> I also propose to handle the warm/cold reset distinction. This point is
-> explained below.
->
-> # RESETABLE INTERFACE
->
-> This Resetable interface describes the methods corresponding to a multi-
-> phase reset system. This is based on Peter's proposal (see
-> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03302.html).
->
-> Here's the phases (I've tried to find adequate names):
+bdrv_parent_drained_begin_single) is only called with poll == false if
+we know that the caller will already poll.
 
-I think this naming definitely works better than my 1/2/3 numbering...
+> Otherwise, we can simply add an extra condition at
+> child_job_drained_poll(), before the drv->drained_poll(), to return
+> true if the job isn't yet paused.
 
->
-> INIT PHASE: (Peter's phase 1)
->     Reset the object internal state, put a resetting flag and do the
->     same for the reset subtree. No side effect on other devices to
->     guarantee that, in a reset domain, everything get initialized first.
->     This corresponds mostly to what is currently done in the device/bus
->     reset method.
->
-> HOLD PHASE: (This phase was not in Peter's proposal)
->     This phase allows to control a reset with a IO. When a IO control
->     reset procedure based on the IO level (not edge), we may need to
->     assert the reset, wait some time, and finally de-assert the reset.
->     The consequence is that such a device can stay in a "resetting
->     state" and may need to show this state to other devices through
->     its outputs. For example, a clock controller will typically shutdown
->     its clocks when it is in resetting state.
->
-> RELEASE PHASE: (Peter's phase 2, modified)
->     This phase sets outputs to state after reset. For a clock controller
->     it starts the clocks. It also clears the "resetting" flag (this is
->     where is differs from Peter's phase 2). A device should not react to
->     inputs until this flag has been cleared. During this phase, outputs
->     are propagated in the reset domain (and outside the reset domain).
->
-> POST PHASE: (Peter's phase 3)
->     This phase is kind of post-reset phase to do things that need the
->     guarantee to be after the propagation of outputs inside the reset
->     domain.
+Yes, I think something like this is this right fix.
 
-In my design the only thing that I thought would happen in phase 3
-was the "clear the resetting flag", but you've moved that to RELEASE.
-What's left ? Do you have a concrete example where we'd need this?
-
-> The interface contains a method per phase:
->  void (*reset_init)(Resetable *rst, bool cold);
->  void (*reset_hold)(Resetable *rst);
->  void (*reset_release)(Resetable *rst);
->  void (*reset_post)(Resetable *rst);
->
-> # WARM/COLD RESET
->
-> Warm/Cold reset differences may exists in devices. We want a cold reset
-> to handle power gating. (IMO powering off a device is identical to
-> putting it in a cold reset state).
->
-> To handle the difference between warm and cold reset, I propose to have
-> a parameter to the init phase of Resetable interface.
-> Other phases do not need the parameter since init phase should
-> put warm/cold difference in the device state.
->
-> # How to do a reset on a Resetable object
->
-> There is 3 entry points. The first one is when we do a reset event. I
-> call it `void resetable_trigger_reset(Resetable *rst, bool cold)`. This
-> the one used for example at machine startup to initialize everything.
-> this should do the init, release and postphases in a row. I don't think
-> hold phase must be done here since release will do the opposite just after.
->
-> The 2 other entry points are dedicated to io control.
-> void resetable_assert_reset(Resetable *rst, bool cold);
-> void resetable_deassert_reset(Resetable *rst);
-> assert will do init and hold phases while deassert will release and post
-> phase.
-
-Could we avoid having these two flavours of reset (init->release->post
-vs init->hold->release->post) by just saying that if you only care
-about triggering reset you just call assert then deassert ?
-
-> Obviously to correctly support this assert/de-assert a device must have
-> special support in order to handle migration in "resetting" state. There
-> is no migration problem while we only use trigger because there is no
-> point during the reset were migration could occur.
-
-What would need to be different? Just needing to migrate the state
-of the 'resetting' flag ? (I think we could handle that in the
-device base class.)
-
-> # DeviceClass impact
->
-> 4 new methods are added in Device:
-> + 3 corresponding to the hold/release/post phases.
-> + 1 to handle the cold reset init phase.
->
-> The existing `reset` method is now the warm reset init phase. To handle
-> the cold reset, a new `cold_reset` is added. The default behavior of
-> this method is to call `reset` so that without any specific support cold
-> and warm reset are the same.
-
-I think it would be nicer if devices just implemented the Resettable
-interface, so that we don't have two similar but not identical APIs
-for handling the various phases.
-
-> Instead of adding a cold reset method, we could add a parameter to the
-> current reset. But there is a lot of places that would need some changes
-> and I am really not sure we can do it automatically.
-
-Coccinelle is very good for making wide-scale automatic changes.
-I would prefer that we design (and work out a path for transitioning
-to) the right API, rather than producing a weird API because we're
-trying to retain some legacy method names and fit them into the
-scheme.
-
-If I'm a device that's aware of the new reset scheme, what
-do I need to implement? Do I declare that I implement Resettable,
-and provide the various methods for the phases? Or do I rely
-on DeviceClass to implement Resettable, and provide DeviceClass
-methods ?
-
-(perhaps what we want is for new-system-aware devices to implement
-Resettable directly, and also for DeviceClass to implement
-Resettable with some methods that call old-school DeviceClass::reset,
-for back-compatibility ? This feels like it's going to end up
-with our "preferred" API being more boilerplatey than the
-"deprecated" old API, though :-( )
-
-> # BusClass impact
->
-> I don't think we need to add any new method to the bus. Since a bus has
-> no gpio, there is no propagation so phase hold/release/term are probably
-> meaningless here. Maybe a cold reset method is useful here ?
-
-I suspect buses in general should also be using the same APIs. For
-instance a PCI controller can do a bus reset which should reset
-all the devices on the bus. We don't model the individual
-GPIO lines in a PCI bus connection but that doesn't mean there
-isn't a logical equivalent there. Our support for bus resets
-(mainly as you say SCSI and PCI) is basically a half-baked
-implementation of a reset domain.
-
-> # Impact on existing code
->
-> There is not much impact. Basically the global qemu_reset should be
-> changed to handle Resetable objects with a global ResetDomain. Also the
-> 2 occurrences of qemu_register_reset(qbus_reset_all, ...) must be
-> replaced to add the buses in the global ResetDomain.
->
-> qdev/qbus_reset_all/device_reset behavior will be changed to trigger
-> phase reset (instead of doing one dev/bus walk, there will be a walk per
-> reset phase). We can add the cold/warm parameter (and modify the places
-> were the functions are called) or choose a default (anyway until support
-> is added to devices, both are identical).
-
-thanks
--- PMM
+Kevin
