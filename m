@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35563)
+Received: from eggs.gnu.org ([209.51.188.92]:35654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gzl6o-0000uQ-1a
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:34:02 -0500
+	(envelope-from <david@redhat.com>) id 1gzl7E-0001EK-N1
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:34:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gzl6n-0007Fy-9P
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:34:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46453)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gzl6j-00074p-C9
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:33:59 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B3F803088A9C
-	for <qemu-devel@nongnu.org>; Fri,  1 Mar 2019 16:33:48 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri,  1 Mar 2019 16:33:46 +0000
-Message-Id: <20190301163346.6545-1-berrange@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gzl7D-0007ft-RV
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:34:28 -0500
+References: <20190301115413.27153-1-david@redhat.com>
+	<20190301115413.27153-14-david@redhat.com>
+	<546b95fb-09a7-d406-40d0-f33a55deecb4@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <ec74ce07-b585-9248-5e60-ee8e611eb215@redhat.com>
+Date: Fri, 1 Mar 2019 17:33:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] configure: automatically pick python3 is
- available
+In-Reply-To: <546b95fb-09a7-d406-40d0-f33a55deecb4@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 13/32] s390x/tcg: Implement VECTOR LOAD
+ MULTIPLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Unless overridden via an env var or configure arg, QEMU will only look
-for the 'python' binary in $PATH. This is unhelpful on distros which
-are only shipping Python 3.x (eg Fedora) in their default install as,
-if they comply with PEP 394, the bare 'python' binary won't exist.
+On 01.03.19 17:26, Richard Henderson wrote:
+> On 3/1/19 3:53 AM, David Hildenbrand wrote:
+>> +    /*
+>> +     * Check for possible access exceptions by trying to load the last
+>> +     * element. The first element will be checked first next.
+>> +     */
+>> +    t = tcg_temp_new_i64();
+>> +    gen_addi_and_wrap_i64(s, t, o->addr1, (v3 - v1) * 16 + 8);
+>> +    tcg_gen_qemu_ld_i64(t, t, get_mem_index(s), MO_TEQ);
+> 
+> qemu_ld expands to enough code that it is a shame to discard this value and
+> reload it during this loop.  Perhaps load this to t2...
+> 
+>> +
+>> +    for (;; v1++) {
+>> +        tcg_gen_qemu_ld_i64(t, o->addr1, get_mem_index(s), MO_TEQ);
+>> +        write_vec_element_i64(t, v1, 0, ES_64);
+> 
+> Move v1 == v3 break here...
+> 
+>> +        gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
+>> +        tcg_gen_qemu_ld_i64(t, o->addr1, get_mem_index(s), MO_TEQ);
+>> +        write_vec_element_i64(t, v1, 1, ES_64);
+>> +        if (v1 == v3) {
+>> +            break;
+>> +        }
+>> +        gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
+>> +    }
+> 
+> ... and store t2 into v3 element 1 after the loop.
 
-This changes configure so that by default it will search for all three
-common python binaries, preferring to find Python 3.x versions.
+Yes, makes perfect sense, thanks!
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- configure | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/configure b/configure
-index 540bee19ba..ef2e5bf9f5 100755
---- a/configure
-+++ b/configure
-@@ -902,7 +902,10 @@ fi
-=20
- : ${make=3D${MAKE-make}}
- : ${install=3D${INSTALL-install}}
--: ${python=3D${PYTHON-python}}
-+# We prefer python 3.x. A bare 'python' is traditionally
-+# python 2.x, but some distros have it as python 3.x, so
-+# we check that before python2
-+: ${python=3D${PYTHON-python3 python python2}}
- : ${smbd=3D${SMBD-/usr/sbin/smbd}}
-=20
- # Default objcc to clang if available, otherwise use CC
-@@ -1797,8 +1800,20 @@ EOF
- exit 0
- fi
-=20
--if ! has $python; then
--  error_exit "Python not found. Use --python=3D/path/to/python"
-+try_python=3D"$python"
-+python=3D
-+for binary in $try_python
-+do
-+    if has $binary
-+    then
-+       python=3D$binary
-+       break
-+    fi
-+done
-+
-+if test -z "$python"
-+then
-+    error_exit "Python not found. Use --python=3D/path/to/python"
- fi
-=20
- # Note that if the Python conditional here evaluates True we will exit
---=20
-2.20.1
+-- 
+
+Thanks,
+
+David / dhildenb
