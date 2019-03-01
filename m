@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55232)
+Received: from eggs.gnu.org ([209.51.188.92]:55342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gznTV-00025Q-J2
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:38 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznTY-00028U-VY
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gznTT-0002mt-9C
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39192
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznTW-0002rI-8s
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38464
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gznTS-0002fM-T6
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:35 -0500
+	id 1gznTV-0002Fz-Cd
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:38 -0500
 Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x21J3bAa007021
-	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:05:26 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qy7geg16b-1
+	x21J3wGJ007097
+	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:05:05 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qy7geg15c-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:04:04 -0500
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:04:58 -0500
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Fri, 1 Mar 2019 18:59:45 -0000
+	Fri, 1 Mar 2019 18:59:43 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Fri,  1 Mar 2019 13:59:33 -0500
+Date: Fri,  1 Mar 2019 13:59:30 -0500
 In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
 References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1551466776-29123-14-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 13/16] s390-bios: Use control unit type to
- determine boot method
+Message-Id: <1551466776-29123-11-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 10/16] s390-bios: Support for running
+ format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,49 +41,416 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-The boot method is different depending on which device type we are
-booting from. Let's examine the control unit type to determine if we're
-a virtio device. We'll eventually add a case to check for a real dasd device
-here as well.
+Add struct for format-0 ccws. Support executing format-0 channel
+programs and waiting for their completion before continuing execution.
+This will be used for real dasd ipl.
 
-Since we have to call enable_subchannel() in main now, might as well
-remove that call from virtio.c : run_ccw().
+Add cu_type() to channel io library. This will be used to query control
+unit type which is used to determine if we are booting a virtio device or a
+real dasd device.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 ---
- pc-bios/s390-ccw/main.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ pc-bios/s390-ccw/cio.c      | 141 ++++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/cio.h      | 127 ++++++++++++++++++++++++++++++++++++++-
+ pc-bios/s390-ccw/s390-ccw.h |   1 +
+ pc-bios/s390-ccw/start.S    |  31 ++++++++++
+ 4 files changed, 297 insertions(+), 3 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 0670c14..ed79b7a 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -198,13 +198,24 @@ static void virtio_setup(void)
+diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+index 605f6f0..e61cfd3 100644
+--- a/pc-bios/s390-ccw/cio.c
++++ b/pc-bios/s390-ccw/cio.c
+@@ -12,6 +12,8 @@
  
- int main(void)
- {
-+    uint16_t cutype;
+ #include "libc.h"
+ #include "s390-ccw.h"
++#include "s390-arch.h"
++#include "helper.h"
+ #include "cio.h"
+ 
+ static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+@@ -41,3 +43,142 @@ void enable_subchannel(SubChannelId schid)
+     schib.pmcw.ena = 1;
+     msch(schid, &schib);
+ }
 +
-     sclp_setup();
-     css_setup();
-     boot_setup();
-     find_boot_device();
-+    enable_subchannel(blk_schid);
- 
--    virtio_setup();
--    zipl_load(); /* no return */
-+    cutype = cu_type(blk_schid);
-+    switch (cutype) {
-+    case CU_TYPE_VIRTIO:
-+        virtio_setup();
-+        zipl_load(); /* no return */
-+        break;
-+    default:
-+        print_int("Attempting to boot from unexpected device type", cutype);
-+        panic("");
++uint16_t cu_type(SubChannelId schid)
++{
++    Ccw1 sense_id_ccw;
++    SenseId sense_data;
++
++    sense_id_ccw.cmd_code = CCW_CMD_SENSE_ID;
++    sense_id_ccw.cda = ptr2u32(&sense_data);
++    sense_id_ccw.count = sizeof(sense_data);
++    sense_id_ccw.flags |= CCW_FLAG_SLI;
++
++    if (do_cio(schid, ptr2u32(&sense_id_ccw), CCW_FMT1)) {
++        panic("Failed to run SenseID CCw\n");
 +    }
++
++    return sense_data.cu_type;
++}
++
++void basic_sense(SubChannelId schid, void *sense_data, uint16_t data_size)
++{
++    Ccw1 senseCcw;
++
++    senseCcw.cmd_code = CCW_CMD_BASIC_SENSE;
++    senseCcw.cda = ptr2u32(sense_data);
++    senseCcw.count = data_size;
++
++    if (do_cio(schid, ptr2u32(&senseCcw), CCW_FMT1)) {
++        panic("Failed to run Basic Sense CCW\n");
++    }
++}
++
++static bool irb_error(Irb *irb)
++{
++    if (irb->scsw.cstat) {
++        return true;
++    }
++    return irb->scsw.dstat != (SCSW_DSTAT_DEVEND | SCSW_DSTAT_CHEND);
++}
++
++/*
++ * Handles executing ssch, tsch and returns the irb obtained from tsch.
++ * Returns 0 on success, -1 if unexpected status pending and we need to retry,
++ * otherwse returns condition code from ssch/tsch for error cases.
++ */
++static int __do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt, Irb *irb)
++{
++    CmdOrb orb = {};
++    int rc;
++
++    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
++
++    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
++    if (fmt == 0) {
++        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
++    }
++
++    orb.fmt = fmt ;
++    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
++    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
++    orb.lpm = 0xFF; /* All paths allowed */
++    orb.cpa = ccw_addr;
++
++    rc = ssch(schid, &orb);
++    if (rc == 1) {
++        /* Status pending, not sure why. Eat status and ask for retry. */
++        tsch(schid, irb);
++        return -1;
++    }
++    if (rc) {
++        print_int("ssch failed with rc=", rc);
++        return rc;
++    }
++
++    consume_io_int();
++
++    /* collect status */
++    rc = tsch(schid, irb);
++    if (rc) {
++        print_int("tsch failed with rc=", rc);
++    }
++
++    return rc;
++}
++
++/*
++ * Executes a channel program at a given subchannel. The request to run the
++ * channel program is sent to the subchannel, we then wait for the interrupt
++ * signaling completion of the I/O operation(s) performed by the channel
++ * program. Lastly we verify that the i/o operation completed without error and
++ * that the interrupt we received was for the subchannel used to run the
++ * channel program.
++ *
++ * Note: This function assumes it is running in an environment where no other
++ * cpus are generating or receiving I/O interrupts. So either run it in a
++ * single-cpu environment or make sure all other cpus are not doing I/O and
++ * have I/O interrupts masked off.
++ *
++ * Returns non-zero on error.
++ */
++int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
++{
++    Irb irb = {};
++    SenseDataEckdDasd sd;
++    int rc, retries = 0;
++
++    while (true) {
++        rc = __do_cio(schid, ccw_addr, fmt, &irb);
++
++        if (rc == -1) {
++            retries++;
++            continue;
++        }
++        if (rc) {
++            /* ssch/tsch error. Message already reported by __do_cio */
++            break;
++        }
++
++        if (!irb_error(&irb)) {
++            break;
++        }
++
++        /*
++         * Unexpected unit check, or interface-control-check. Use sense to
++         * clear (unit check only) then retry.
++         */
++        if ((unit_check(&irb) || iface_ctrl_check(&irb)) && retries <= 2) {
++            if (unit_check(&irb)) {
++                basic_sense(schid, &sd, sizeof(sd));
++            }
++            retries++;
++            continue;
++        }
++
++        rc = -1;
++        break;
++    }
++
++    return rc;
++}
+diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+index d454050..9de67ec 100644
+--- a/pc-bios/s390-ccw/cio.h
++++ b/pc-bios/s390-ccw/cio.h
+@@ -70,9 +70,46 @@ struct scsw {
+     __u16 count;
+ } __attribute__ ((packed));
  
-     panic("Failed to load OS from hard disk\n");
-     return 0; /* make compiler happy */
+-#define SCSW_FCTL_CLEAR_FUNC 0x1000
+-#define SCSW_FCTL_HALT_FUNC 0x2000
++/* Function Control */
+ #define SCSW_FCTL_START_FUNC 0x4000
++#define SCSW_FCTL_HALT_FUNC 0x2000
++#define SCSW_FCTL_CLEAR_FUNC 0x1000
++
++/* Activity Control */
++#define SCSW_ACTL_RESUME_PEND   0x0800
++#define SCSW_ACTL_START_PEND    0x0400
++#define SCSW_ACTL_HALT_PEND     0x0200
++#define SCSW_ACTL_CLEAR_PEND    0x0100
++#define SCSW_ACTL_CH_ACTIVE     0x0080
++#define SCSW_ACTL_DEV_ACTIVE    0x0040
++#define SCSW_ACTL_SUSPENDED     0x0020
++
++/* Status Control */
++#define SCSW_SCTL_ALERT         0x0010
++#define SCSW_SCTL_INTERMED      0x0008
++#define SCSW_SCTL_PRIMARY       0x0004
++#define SCSW_SCTL_SECONDARY     0x0002
++#define SCSW_SCTL_STATUS_PEND   0x0001
++
++/* SCSW Device Status Flags */
++#define SCSW_DSTAT_ATTN     0x80
++#define SCSW_DSTAT_STATMOD  0x40
++#define SCSW_DSTAT_CUEND    0x20
++#define SCSW_DSTAT_BUSY     0x10
++#define SCSW_DSTAT_CHEND    0x08
++#define SCSW_DSTAT_DEVEND   0x04
++#define SCSW_DSTAT_UCHK     0x02
++#define SCSW_DSTAT_UEXCP    0x01
++
++/* SCSW Subchannel Status Flags */
++#define SCSW_CSTAT_PCINT    0x80
++#define SCSW_CSTAT_BADLEN   0x40
++#define SCSW_CSTAT_PROGCHK  0x20
++#define SCSW_CSTAT_PROTCHK  0x10
++#define SCSW_CSTAT_CHDCHK   0x08
++#define SCSW_CSTAT_CHCCHK   0x04
++#define SCSW_CSTAT_ICCHK    0x02
++#define SCSW_CSTAT_CHAINCHK 0x01
+ 
+ /*
+  * subchannel information block
+@@ -127,7 +164,23 @@ struct tpi_info {
+     __u32 reserved4:12;
+ } __attribute__ ((packed, aligned(4)));
+ 
+-/* channel command word (type 1) */
++/* channel command word (format 0) */
++typedef struct ccw0 {
++    __u8 cmd_code;
++    __u32 cda:24;
++    __u32 chainData:1;
++    __u32 chain:1;
++    __u32 sli:1;
++    __u32 skip:1;
++    __u32 pci:1;
++    __u32 ida:1;
++    __u32 suspend:1;
++    __u32 mida:1;
++    __u8 reserved;
++    __u16 count;
++} __attribute__ ((packed, aligned(8))) Ccw0;
++
++/* channel command word (format 1) */
+ typedef struct ccw1 {
+     __u8 cmd_code;
+     __u8 flags;
+@@ -135,6 +188,10 @@ typedef struct ccw1 {
+     __u32 cda;
+ } __attribute__ ((packed, aligned(8))) Ccw1;
+ 
++/* do_cio() CCW formats */
++#define CCW_FMT0                 0x00
++#define CCW_FMT1                 0x01
++
+ #define CCW_FLAG_DC              0x80
+ #define CCW_FLAG_CC              0x40
+ #define CCW_FLAG_SLI             0x20
+@@ -190,6 +247,9 @@ struct ciw {
+     __u16 count;
+ };
+ 
++#define CU_TYPE_VIRTIO          0x3832
++#define CU_TYPE_DASD_3990       0x3990
++
+ /*
+  * sense-id response buffer layout
+  */
+@@ -205,6 +265,64 @@ typedef struct senseid {
+     struct ciw ciw[62];
+ }  __attribute__ ((packed, aligned(4))) SenseId;
+ 
++/*
++ * architected values for first sense byte - common_status. Bits 0-5 of this
++ * field are common to all device types.
++ */
++#define SNS_STAT0_CMD_REJECT         0x80
++#define SNS_STAT0_INTERVENTION_REQ   0x40
++#define SNS_STAT0_BUS_OUT_CHECK      0x20
++#define SNS_STAT0_EQUIPMENT_CHECK    0x10
++#define SNS_STAT0_DATA_CHECK         0x08
++#define SNS_STAT0_OVERRUN            0x04
++#define SNS_STAT0_INCOMPL_DOMAIN     0x01
++
++/* ECKD DASD status[0] byte */
++#define SNS_STAT1_PERM_ERR           0x80
++#define SNS_STAT1_INV_TRACK_FORMAT   0x40
++#define SNS_STAT1_EOC                0x20
++#define SNS_STAT1_MESSAGE_TO_OPER    0x10
++#define SNS_STAT1_NO_REC_FOUND       0x08
++#define SNS_STAT1_FILE_PROTECTED     0x04
++#define SNS_STAT1_WRITE_INHIBITED    0x02
++#define SNS_STAT1_IMPRECISE_END      0x01
++
++/* ECKD DASD status[1] byte */
++#define SNS_STAT2_REQ_INH_WRITE      0x80
++#define SNS_STAT2_CORRECTABLE        0x40
++#define SNS_STAT2_FIRST_LOG_ERR      0x20
++#define SNS_STAT2_ENV_DATA_PRESENT   0x10
++#define SNS_STAT2_IMPRECISE_END      0x04
++
++/* ECKD DASD 24-byte Sense fmt_msg codes */
++#define SENSE24_FMT_PROG_SYS    0x0
++#define SENSE24_FMT_EQUIPMENT   0x2
++#define SENSE24_FMT_CONTROLLER  0x3
++#define SENSE24_FMT_MISC        0xF
++
++/* basic sense response buffer layout */
++typedef struct SenseDataEckdDasd {
++    uint8_t common_status;
++    uint8_t status[2];
++    uint8_t res_count;
++    uint8_t phys_drive_id;
++    uint8_t low_cyl_addr;
++    uint8_t head_high_cyl_addr;
++    uint8_t fmt_msg;
++    uint64_t fmt_dependent_info[2];
++    uint8_t reserved;
++    uint8_t program_action_code;
++    uint16_t config_info;
++    uint8_t mcode_hicyl;
++    uint8_t cyl_head_addr[3];
++}  __attribute__ ((packed, aligned(4))) SenseDataEckdDasd;
++
++#define ECKD_SENSE24_GET_FMT(sd)     (sd->fmt_msg & 0xF0 >> 4)
++#define ECKD_SENSE24_GET_MSG(sd)     (sd->fmt_msg & 0x0F)
++
++#define unit_check(irb)         ((irb)->scsw.dstat & SCSW_DSTAT_UCHK)
++#define iface_ctrl_check(irb)   ((irb)->scsw.cstat & SCSW_CSTAT_ICCHK)
++
+ /* interruption response block */
+ typedef struct irb {
+     struct scsw scsw;
+@@ -215,6 +333,9 @@ typedef struct irb {
+ 
+ int enable_mss_facility(void);
+ void enable_subchannel(SubChannelId schid);
++uint16_t cu_type(SubChannelId schid);
++void basic_sense(SubChannelId schid, void *sense_data, uint16_t data_size);
++int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt);
+ 
+ /*
+  * Some S390 specific IO instructions as inline
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index b39ee5d..11bce7d 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -52,6 +52,7 @@ typedef unsigned long long __u64;
+ /* start.s */
+ void disabled_wait(void);
+ void consume_sclp_int(void);
++void consume_io_int(void);
+ 
+ /* main.c */
+ void panic(const char *string);
+diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+index 5c22cb0..2b4ea4c 100644
+--- a/pc-bios/s390-ccw/start.S
++++ b/pc-bios/s390-ccw/start.S
+@@ -71,6 +71,26 @@ consume_sclp_int:
+         larl %r1, enabled_wait_psw
+         lpswe 0(%r1)
+ 
++/*
++ * void consume_io_int(void)
++ *
++ * eats one I/O interrupt
++ */
++        .globl consume_io_int
++consume_io_int:
++        /* enable I/O interrupts in cr6 */
++        stctg 6,6,0(15)
++        oi 4(15), 0xff
++        lctlg 6,6,0(15)
++        /* prepare i/o call handler */
++        larl %r1, io_new_code
++        stg %r1, 0x1f8
++        larl %r1, io_new_mask
++        mvc 0x1f0(8),0(%r1)
++        /* load enabled wait PSW */
++        larl %r1, enabled_wait_psw
++        lpswe 0(%r1)
++
+ external_new_code:
+         /* disable service interrupts in cr0 */
+         stctg   %c0,%c0,0(%r15)
+@@ -78,6 +98,15 @@ external_new_code:
+         lctlg   %c0,%c0,0(%r15)
+         br      %r14
+ 
++io_new_code:
++        /* disable I/O interrupts in cr6 */
++        stctg 6,6,0(15)
++        ni 4(15), 0x00
++        lctlg 6,6,0(15)
++        br 14
++
++
++
+         .align  8
+ disabled_wait_psw:
+         .quad   0x0002000180000000,0x0000000000000000
+@@ -85,3 +114,5 @@ enabled_wait_psw:
+         .quad   0x0302000180000000,0x0000000000000000
+ external_new_mask:
+         .quad   0x0000000180000000
++io_new_mask:
++        .quad   0x0000000180000000
 -- 
 2.7.4
