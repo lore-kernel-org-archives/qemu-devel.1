@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40604)
+Received: from eggs.gnu.org ([209.51.188.92]:44499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzglW-00048R-Uc
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:55:47 -0500
+	(envelope-from <berto@igalia.com>) id 1gzh1p-0000t6-HQ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:12:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzglV-000764-SD
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:55:46 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Fri,  1 Mar 2019 12:54:13 +0100
-Message-Id: <20190301115413.27153-33-david@redhat.com>
-In-Reply-To: <20190301115413.27153-1-david@redhat.com>
-References: <20190301115413.27153-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 32/32] s390x/tcg: Implement VECTOR UNPACK *
+	(envelope-from <berto@igalia.com>) id 1gzh1o-0004Vc-Ak
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 07:12:37 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190212180231.GJ5283@localhost.localdomain>
+References: <cover.1547739122.git.berto@igalia.com>
+	<61bbfa3721938326edb03db58a6a246b384f3260.1547739122.git.berto@igalia.com>
+	<20190212180231.GJ5283@localhost.localdomain>
+Date: Fri, 01 Mar 2019 13:12:14 +0100
+Message-ID: <w51zhqe7q01.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 09/13] block: Add 'runtime_opts' and
+ 'mutable_opts' fields to BlockDriver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,85 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Combine all variant in a single handler. As source and destination
-have different element sizes, we can't use gvec expansion. Expand
-manually. Also watch out for overlapping source and destination
-registers. Use a safe evaluation order depending on the operation.
+On Tue 12 Feb 2019 07:02:31 PM CET, Kevin Wolf wrote:
+>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>> index fd0e88d17a..e680dda86b 100644
+>> --- a/include/block/block_int.h
+>> +++ b/include/block/block_int.h
+>> @@ -345,6 +345,13 @@ struct BlockDriver {
+>>  
+>>      /* List of options for creating images, terminated by name == NULL */
+>>      QemuOptsList *create_opts;
+>> +    /* Runtime options for a block device, terminated by name == NULL */
+>> +    QemuOptsList *runtime_opts;
+>
+> I'm not sure if using a QemuOptsList here is a good idea. Currently,
+> we use QemuOptsLists for most options, but there are some drivers that
+> use it only for part of their options, or not at all, using direct
+> QDict accesses or QAPI objects for the rest.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/insn-data.def      |  8 +++++++
- target/s390x/translate_vx.inc.c | 38 +++++++++++++++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+My intention was to avoid having two separate lists with the runtime
+options of a driver. For this feature we really need that list to
+contain all options, otherwise there's no way to know whether a missing
+option is really missing or if it doesn't exist in the first place.
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 00ba9444a3..71fa9b8d6c 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1045,6 +1045,14 @@
-     F(0xe73e, VSTM,    VRS_a, V,   la2, 0, 0, 0, vstm, 0, IF_VEC)
- /* VECTOR STORE WITH LENGTH */
-     F(0xe73f, VSTL,    VRS_b, V,   la2, r3_32u, 0, 0, vstl, 0, IF_VEC)
-+/* VECTOR UNPACK HIGH */
-+    F(0xe7d7, VUPH,    VRR_a, V,   0, 0, 0, 0, vup, 0, IF_VEC)
-+/* VECTOR UNPACK LOGICAL HIGH */
-+    F(0xe7d5, VUPLH,   VRR_a, V,   0, 0, 0, 0, vup, 0, IF_VEC)
-+/* VECTOR UNPACK LOW */
-+    F(0xe7d6, VUPL,    VRR_a, V,   0, 0, 0, 0, vup, 0, IF_VEC)
-+/* VECTOR UNPACK LOGICAL LOW */
-+    F(0xe7d4, VUPLL,   VRR_a, V,   0, 0, 0, 0, vup, 0, IF_VEC)
- 
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index 2e7e5391c5..23e4afd643 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -891,3 +891,41 @@ static DisasJumpType op_vstl(DisasContext *s, DisasOps *o)
-     tcg_temp_free_ptr(a0);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vup(DisasContext *s, DisasOps *o)
-+{
-+    const bool logical = s->fields->op2 == 0xd4 || s->fields->op2 == 0xd5;
-+    const uint8_t v1 = get_field(s->fields, v1);
-+    const uint8_t v2 = get_field(s->fields, v2);
-+    const uint8_t src_es = get_field(s->fields, m3);
-+    const uint8_t dst_es = src_es + 1;
-+    int dst_idx, src_idx;
-+    TCGv_i64 tmp;
-+
-+    if (src_es > ES_32) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    tmp = tcg_temp_new_i64();
-+    if (s->fields->op2 == 0xd7 || s->fields->op2 == 0xd5) {
-+        /* iterate backwards to avoid overwriting data we might need later */
-+        for (dst_idx = NUM_VEC_ELEMENTS(dst_es) - 1; dst_idx >= 0; dst_idx--) {
-+            src_idx = dst_idx;
-+            read_vec_element_i64(tmp, v2, src_idx,
-+                                 src_es | (logical ? 0 : MO_SIGN));
-+            write_vec_element_i64(tmp, v1, dst_idx, dst_es);
-+        }
-+
-+    } else {
-+        /* iterate forward to avoid overwriting data we might need later */
-+        for (dst_idx = 0; dst_idx < NUM_VEC_ELEMENTS(dst_es); dst_idx++) {
-+            src_idx = dst_idx + NUM_VEC_ELEMENTS(src_es) / 2;
-+            read_vec_element_i64(tmp, v2, src_idx,
-+                                 src_es | (logical ? 0 : MO_SIGN));
-+            write_vec_element_i64(tmp, v1, dst_idx, dst_es);
-+        }
-+    }
-+    tcg_temp_free_i64(tmp);
-+    return DISAS_NEXT;
-+}
--- 
-2.17.2
+Berto
