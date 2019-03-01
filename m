@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48667)
+Received: from eggs.gnu.org ([209.51.188.92]:51641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <llyzs.vic@gmail.com>) id 1gzZlw-0004xl-M3
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:27:45 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gzaHQ-0000yq-OQ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 00:00:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <llyzs.vic@gmail.com>) id 1gzZlv-00025p-RO
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:27:44 -0500
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:44206)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <llyzs.vic@gmail.com>) id 1gzZlv-00025S-M4
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:27:43 -0500
-Received: by mail-io1-xd41.google.com with SMTP id y13so18535011iop.11
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 20:27:43 -0800 (PST)
-MIME-Version: 1.0
-References: <CACxphuFGAODB_=X1fVFqJa=U14E_YSJMreWJcOgzdsooke1wxg@mail.gmail.com>
-	<20190228205109.hmldtldbnlw3pnqq@function>
-In-Reply-To: <20190228205109.hmldtldbnlw3pnqq@function>
-From: llyzs <llyzs.vic@gmail.com>
-Date: Fri, 1 Mar 2019 12:27:31 +0800
-Message-ID: <CACxphuHr-Eo6JoPzZWvaZ_29GjxRzP=saWUKCKQxTuBa8qC9mg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] socket: fix blocking udp recvfrom.
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gza40-0004kG-2L
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:46:24 -0500
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Fri,  1 Mar 2019 15:46:08 +1100
+Message-Id: <20190301044609.9626-2-sjitindarsingh@gmail.com>
+In-Reply-To: <20190301044609.9626-1-sjitindarsingh@gmail.com>
+References: <20190301044609.9626-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH 1/2] target/ppc/tcg: make spapr_caps
+ apply cap-[cfpc/sbbc/ibs] non-fatal for tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +20,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+To: qemu-ppc@nongnu.org
+Cc: david@gibson.dropbear.id.au, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Hi,
+The spapr_caps cap-cfpc, cap-sbbc and cap-ibs are used to control the
+availability of certain mitigations to the guest. These haven't been
+implemented under TCG, it is unlikely they ever will be, and it is unclear
+as to whether they even need to be.
 
-I believe this is because UDP packet can have 0 length payload. I
-quote some resources here:
-https://stackoverflow.com/questions/12505892/under-linux-can-recv-ever-retu=
-rn-0-on-udp
-https://stackoverflow.com/questions/5307031/how-to-detect-receipt-of-a-0-le=
-ngth-udp-datagram
+As such, make failure to apply these capabilities under TCG non-fatal.
+Instead we print a warning message to the user but still allow the guest
+to continue.
 
-I also found out that sometimes ioctlsocket() call can return error
-(probably caused by my unstable wifi linux driver), in which case we
-can also return immediately.
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ hw/ppc/spapr_caps.c | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
 
-I will submit a new version of the patch according to your suggestions.
-
-On Fri, 1 Mar 2019 at 04:51, Samuel Thibault <samuel.thibault@gnu.org> wrot=
-e:
->
-> Hello,
->
-> llyzs, le jeu. 28 f=C3=A9vr. 2019 19:59:12 +0800, a ecrit:
-> > Sometimes sorecvfrom() is called from slirp.c because revents =3D=3D G_=
-IO_IN,
-> > however inside sorecvfrom() function, ioctlsocket() returns 0 bytes ava=
-ilable
-> > and recvfrom could be blocking indefinitely. This adds a non-blocking f=
-lag to
-> > recvfrom and checks data availability.
->
-> When ioctlsocket() returns 0 bytes available, we could as well just
-> immediately return, without even calling recvfrom. We could just move
-> that ioctlsocket call above the m_get() call, so we can just return
-> without having to clean up anything.
->
-> This however still looks weird. AFAIK, G_IO_IN means that we can make
-> one recv call and be sure that it won't block. Do you have an idea why
-> it wouldn't necessarily be the case?
->
-> Samuel
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index f03f2f64e7..b68d767d63 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -239,17 +239,22 @@ sPAPRCapPossible cap_cfpc_possible = {
+ static void cap_safe_cache_apply(sPAPRMachineState *spapr, uint8_t val,
+                                  Error **errp)
+ {
++    Error *local_err = NULL;
+     uint8_t kvm_val =  kvmppc_get_cap_safe_cache();
+ 
+     if (tcg_enabled() && val) {
+-        /* TODO - for now only allow broken for TCG */
+-        error_setg(errp,
+-"Requested safe cache capability level not supported by tcg, try a different value for cap-cfpc");
++        /* TCG only supports broken, allow other values and print a warning */
++        error_setg(&local_err,
++                   "TCG doesn't support requested feature, cap-cfpc=%s",
++                   cap_cfpc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+ "Requested safe cache capability level not supported by kvm, try cap-cfpc=%s",
+                    cap_cfpc_possible.vals[kvm_val]);
+     }
++
++    if (local_err != NULL)
++        warn_report_err(local_err);
+ }
+ 
+ sPAPRCapPossible cap_sbbc_possible = {
+@@ -262,17 +267,22 @@ sPAPRCapPossible cap_sbbc_possible = {
+ static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_t val,
+                                         Error **errp)
+ {
++    Error *local_err = NULL;
+     uint8_t kvm_val =  kvmppc_get_cap_safe_bounds_check();
+ 
+     if (tcg_enabled() && val) {
+-        /* TODO - for now only allow broken for TCG */
+-        error_setg(errp,
+-"Requested safe bounds check capability level not supported by tcg, try a different value for cap-sbbc");
++        /* TCG only supports broken, allow other values and print a warning */
++        error_setg(&local_err,
++                   "TCG doesn't support requested feature, cap-sbbc=%s",
++                   cap_sbbc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+ "Requested safe bounds check capability level not supported by kvm, try cap-sbbc=%s",
+                    cap_sbbc_possible.vals[kvm_val]);
+     }
++
++    if (local_err != NULL)
++        warn_report_err(local_err);
+ }
+ 
+ sPAPRCapPossible cap_ibs_possible = {
+@@ -288,17 +298,22 @@ sPAPRCapPossible cap_ibs_possible = {
+ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+                                            uint8_t val, Error **errp)
+ {
++    Error *local_err = NULL;
+     uint8_t kvm_val = kvmppc_get_cap_safe_indirect_branch();
+ 
+     if (tcg_enabled() && val) {
+-        /* TODO - for now only allow broken for TCG */
+-        error_setg(errp,
+-"Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
++        /* TCG only supports broken, allow other values and print a warning */
++        error_setg(&local_err,
++                   "TCG doesn't support requested feature, cap-ibs=%s",
++                   cap_ibs_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+ "Requested safe indirect branch capability level not supported by kvm, try cap-ibs=%s",
+                    cap_ibs_possible.vals[kvm_val]);
+     }
++
++    if (local_err != NULL)
++        warn_report_err(local_err);
+ }
+ 
+ #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
+-- 
+2.13.6
