@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60675)
+Received: from eggs.gnu.org ([209.51.188.92]:60801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzkvB-0007ao-8T
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:22:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gzkvl-00083i-UO
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:22:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gzkvA-0006Z2-FJ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:22:01 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40903)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gzkv6-0006Vn-NI
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:21:58 -0500
-Received: by mail-pl1-x641.google.com with SMTP id bj4so11708140plb.7
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 08:21:56 -0800 (PST)
-References: <20190301115413.27153-1-david@redhat.com>
-	<20190301115413.27153-13-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2eb985d2-2a53-a615-dd51-7f44ed37e552@linaro.org>
-Date: Fri, 1 Mar 2019 08:21:51 -0800
+	(envelope-from <eblake@redhat.com>) id 1gzkvl-00076k-93
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:22:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59248)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gzkvl-000761-2e
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:22:37 -0500
+References: <20190301154051.23317-1-armbru@redhat.com>
+	<20190301154051.23317-7-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a36623d3-0df7-3177-ca51-e71ef66147cc@redhat.com>
+Date: Fri, 1 Mar 2019 10:22:35 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190301115413.27153-13-david@redhat.com>
+In-Reply-To: <20190301154051.23317-7-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/32] s390x/tcg: Implement VECTOR LOAD
- LOGICAL ELEMENT AND ZERO
+Subject: Re: [Qemu-devel] [PATCH 6/7] tests/qapi-schema: Cover forward
+ reference to sub-module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, quintela@redhat.com
 
-On 3/1/19 3:53 AM, David Hildenbrand wrote:
-> Fairly easy, zero out the vector before we load the desired element.
-> Load the element before touching the vector.
+On 3/1/19 9:40 AM, Markus Armbruster wrote:
+> The forward reference from the main module to the sub-module works
+> fine, except for an issue visible in qapi-schema-test.out: the array
+> type wrapped around the forward reference ends up in the main module,
+> not the sub-module.  The next commit will explain why that's bad, and
+> fix it.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  target/s390x/insn-data.def      |  2 ++
->  target/s390x/translate_vx.inc.c | 46 +++++++++++++++++++++++++++++++++
->  2 files changed, 48 insertions(+)
+>  tests/qapi-schema/qapi-schema-test.json | 3 ++-
+>  tests/qapi-schema/qapi-schema-test.out  | 5 +++++
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
