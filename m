@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46402)
+Received: from eggs.gnu.org ([209.51.188.92]:46486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzcd5-0001sH-Ta
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:30:48 -0500
+	(envelope-from <kevin.tian@intel.com>) id 1gzcdO-0001zF-1b
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:31:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzcd5-0007v5-0v
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:30:47 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34802)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gzcd4-0007so-Nx
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:30:46 -0500
-Received: by mail-wr1-x443.google.com with SMTP id f14so24719463wrg.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Feb 2019 23:30:46 -0800 (PST)
-References: <20190228202537.4638-1-alex.bennee@linaro.org>
-	<20190228202537.4638-8-alex.bennee@linaro.org>
-	<CAMo8BfKw-ewHXQPfz6XDFBqoxPk1vTGaEhjVEdKLm3-diuTUmg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAMo8BfKw-ewHXQPfz6XDFBqoxPk1vTGaEhjVEdKLm3-diuTUmg@mail.gmail.com>
-Date: Fri, 01 Mar 2019 07:30:44 +0000
-Message-ID: <87woljjbkr.fsf@zen.linaroharston>
+	(envelope-from <kevin.tian@intel.com>) id 1gzcdM-00086N-DX
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:31:05 -0500
+Received: from mga03.intel.com ([134.134.136.65]:64109)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1gzcdK-0007zK-Ie
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 02:31:04 -0500
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Fri, 1 Mar 2019 07:30:49 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19C96EE3E@SHSMSX104.ccr.corp.intel.com>
+References: <1551361677-28933-1-git-send-email-yi.y.sun@linux.intel.com>
+	<20190301070734.GD22229@xz-x1> <20190301071304.GB26129@yi.y.sun>
+In-Reply-To: <20190301071304.GB26129@yi.y.sun>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/16] tests/tcg/xtensa: enable system
- tests
+Subject: Re: [Qemu-devel] [RFC v2 0/3] intel_iommu: support scalable mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Yi Sun <yi.y.sun@linux.intel.com>, Peter Xu <peterx@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
 
-
-Max Filippov <jcmvbkbc@gmail.com> writes:
-
-> Hi Alex,
->
-> On Thu, Feb 28, 2019 at 12:25 PM Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
->
-> [...]
->
->> diff --git a/tests/tcg/xtensa/Makefile.softmmu-target b/tests/tcg/xtensa=
-/Makefile.softmmu-target
->> new file mode 100644
->> index 0000000000..1a4014506f
->> --- /dev/null
->> +++ b/tests/tcg/xtensa/Makefile.softmmu-target
->> @@ -0,0 +1,40 @@
->> +#
->> +# Xtensa softmmu tests
->> +#
->> +
->> +ifneq ($(TARGET_WORDS_BIGENDIAN),y)
->
-> I've recently posted a series that makes it possible to run
-> TCG tests on wider variety of xtensa cores, including
-> big-endian cores:
-> http://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg04843.html
-
-Ahh I missed that, will have a look.
-
---
-Alex Benn=C3=A9e
+PiBGcm9tOiBZaSBTdW4gW21haWx0bzp5aS55LnN1bkBsaW51eC5pbnRlbC5jb21dDQo+IFNlbnQ6
+IEZyaWRheSwgTWFyY2ggMSwgMjAxOSAzOjEzIFBNDQo+IA0KPiBPbiAxOS0wMy0wMSAxNTowNzoz
+NCwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gT24gVGh1LCBGZWIgMjgsIDIwMTkgYXQgMDk6NDc6NTRQ
+TSArMDgwMCwgWWkgU3VuIHdyb3RlOg0KPiA+ID4gSW50ZWwgdnQtZCByZXYzLjAgWzFdIGludHJv
+ZHVjZXMgYSBuZXcgdHJhbnNsYXRpb24gbW9kZSBjYWxsZWQNCj4gPiA+ICdzY2FsYWJsZSBtb2Rl
+Jywgd2hpY2ggZW5hYmxlcyBQQVNJRC1ncmFudWxhciB0cmFuc2xhdGlvbnMgZm9yDQo+ID4gPiBm
+aXJzdCBsZXZlbCwgc2Vjb25kIGxldmVsLCBuZXN0ZWQgYW5kIHBhc3MtdGhyb3VnaCBtb2Rlcy4g
+VGhlDQo+ID4gPiB2dC1kIHNjYWxhYmxlIG1vZGUgaXMgdGhlIGtleSBpbmdyZWRpZW50IHRvIGVu
+YWJsZSBTY2FsYWJsZSBJL08NCj4gPiA+IFZpcnR1YWxpemF0aW9uIChTY2FsYWJsZSBJT1YpIFsy
+XSBbM10sIHdoaWNoIGFsbG93cyBzaGFyaW5nIGENCj4gPiA+IGRldmljZSBpbiBtaW5pbWFsIHBv
+c3NpYmxlIGdyYW51bGFyaXR5IChBREkgLSBBc3NpZ25hYmxlIERldmljZQ0KPiA+ID4gSW50ZXJm
+YWNlKS4gQXMgYSByZXN1bHQsIHByZXZpb3VzIEV4dGVuZGVkIENvbnRleHQgKEVDUykgbW9kZQ0K
+PiA+ID4gaXMgZGVwcmVjYXRlZCAobm8gcHJvZHVjdGlvbiBldmVyIGltcGxlbWVudHMgRUNTKS4N
+Cj4gPiA+DQo+ID4gPiBUaGlzIHBhdGNoIHNldCBlbXVsYXRlcyBhIG1pbmltYWwgY2FwYWJpbGl0
+eSBzZXQgb2YgVlQtZCBzY2FsYWJsZQ0KPiA+ID4gbW9kZSwgZXF1aXZhbGVudCB0byB3aGF0IGlz
+IGF2YWlsYWJsZSBpbiBWVC1kIGxlZ2FjeSBtb2RlIHRvZGF5Og0KPiA+ID4gICAgIDEuIFNjYWxh
+YmxlIG1vZGUgcm9vdCBlbnRyeSwgY29udGV4dCBlbnRyeSBhbmQgUEFTSUQgdGFibGUNCj4gPiA+
+ICAgICAyLiBTZWNvbmRzIGxldmVsIHRyYW5zbGF0aW9uIHVuZGVyIHNjYWxhYmxlIG1vZGUNCj4g
+PiA+ICAgICAzLiBRdWV1ZWQgaW52YWxpZGF0aW9uICh3aXRoIDI1NiBiaXRzIGRlc2NyaXB0b3Ip
+DQo+ID4gPiAgICAgNC4gUGFzcy10aHJvdWdoIG1vZGUNCj4gPiA+DQo+ID4gPiBDb3JyZXNwb25k
+aW5nIGludGVsLWlvbW11IGRyaXZlciBzdXBwb3J0IHdpbGwgYmUgaW5jbHVkZWQgaW4NCj4gPiA+
+IGtlcm5lbCA1LjA6DQo+ID4gPiAgICAgaHR0cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMva2Vy
+bmVsL21zZzI5ODUyNzkuaHRtbA0KPiA+ID4NCj4gPiA+IFdlIHdpbGwgYWRkIGVtdWxhdGlvbiBv
+ZiBmdWxsIHNjYWxhYmxlIG1vZGUgY2FwYWJpbGl0eSBhbG9uZyB3aXRoDQo+ID4gPiBndWVzdCBp
+b21tdSBkcml2ZXIgcHJvZ3Jlc3MgbGF0ZXIsIGUuZy46DQo+ID4gPiAgICAgMS4gRmlyc3QgbGV2
+ZWwgdHJhbnNsYXRpb24NCj4gPiA+ICAgICAyLiBOZXN0ZWQgdHJhbnNsYXRpb24NCj4gPiA+ICAg
+ICAzLiBQZXItUEFTSUQgaW52YWxpZGF0aW9uIGRlc2NyaXB0b3JzDQo+ID4gPiAgICAgNC4gUGFn
+ZSByZXF1ZXN0IHNlcnZpY2VzIGZvciBoYW5kbGluZyByZWNvdmVyYWJsZSBmYXVsdHMNCj4gPiA+
+DQo+ID4gPiBUbyB2ZXJpZnkgdGhlIHBhdGNoZXMsIGJlbG93IGNhc2VzIHdlcmUgdGVzdGVkIGFj
+Y29yZGluZyB0byBQZXRlciBYdSdzDQo+ID4gPiBzdWdnZXN0aW9ucy4NCj4gPiA+ICAgICArLS0t
+LS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQo+ID4gPiAgICAgfCAgICAgICAgIHwgICAgICAg
+ICAgICAgICAgICAgICAgdy8gRGV2aWNlIFBhc3N0aHIgICAgICAgICAgICAgICAgICAgICAgICAg
+fCAgICAgICAgICAgICAgICAgICAgIHcvbyBEZXZpY2UNCj4gUGFzc3RociAgICAgICAgICAgICAg
+ICAgICAgICAgICB8DQo+ID4gPiAgICAgfCAgICAgICAgICstLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0NCj4gLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0K
+PiA+ID4gICAgIHwgICAgICAgICB8IHZpcnRpby1uZXQtcGNpLCB2aG9zdD1vbiAgICAgIHwgdmly
+dGlvLW5ldC1wY2ksIHZob3N0PW9mZiAgICAgIHwgdmlydGlvLQ0KPiBuZXQtcGNpLCB2aG9zdD1v
+biAgICAgIHwgdmlydGlvLW5ldC1wY2ksIHZob3N0PW9mZiAgICAgIHwNCj4gPiA+ICAgICB8ICAg
+ICAgICAgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAtLS0tLS0rLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQo+ID4gPiAgICAgfCAgICAgICAgIHwgbmV0cGVy
+ZiB8IGtlcm5lbCBibGQgfCBkYXRhIGNwfCBuZXRwZXJmIHwga2VybmVsIGJsZCB8IGRhdGEgY3Ag
+fA0KPiBuZXRwZXJmIHwga2VybmVsIGJsZCB8IGRhdGEgY3B8IG5ldHBlcmYgfCBrZXJuZWwgYmxk
+IHwgZGF0YSBjcCB8DQo+ID4gPiAgICAgKy0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0NCj4gLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0K
+PiA+ID4gICAgIHwgTGVnYWN5ICB8IFBhc3MgICAgfCBQYXNzICAgICAgIHwgUGFzcyAgIHwgUGFz
+cyAgICB8IFBhc3MgICAgICAgfCBQYXNzICAgIHwgUGFzcyAgICB8DQo+IFBhc3MgICAgICAgfCBQ
+YXNzICAgfCBQYXNzICAgIHwgUGFzcyAgICAgICB8IFBhc3MgICAgfA0KPiA+ID4gICAgICstLS0t
+LS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IC0tLS0tLS0tLSstLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsNCj4gPiA+ICAgICB8IFNjYWxhYmxlfCBQYXNzICAg
+IHwgUGFzcyAgICAgICB8IFBhc3MgICB8IFBhc3MgICAgfCBQYXNzICAgICAgIHwgUGFzcyAgICB8
+IFBhc3MgICAgfA0KPiBQYXNzICAgICAgIHwgUGFzcyAgIHwgUGFzcyAgICB8IFBhc3MgICAgICAg
+fCBQYXNzICAgIHwNCj4gPiA+ICAgICArLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQ0KPiAtLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQo+
+ID4NCj4gPiBIaSwgWWksDQo+ID4NCj4gPiBUaGFua3MgdmVyeSBtdWNoIGZvciB0aGUgdGhvcm91
+Z2ggdGVzdCBtYXRyaXghDQo+ID4NCj4gVGhhbmtzIGZvciB0aGUgcmV2aWV3IGFuZCBjb21tZW50
+cyEgOikNCj4gDQo+ID4gVGhlIGxhc3QgdGhpbmcgSSdkIGxpa2UgdG8gY29uZmlybSBpcyBoYXZl
+IHlvdSB0ZXN0ZWQgZGV2aWNlDQo+ID4gYXNzaWdubWVudCB3aXRoIHYyPyAgQW5kIG5vdGUgdGhh
+dCB3aGVuIHlvdSB0ZXN0IHdpdGggdmlydGlvIGRldmljZXMNCj4gDQo+IFllcywgSSB0ZXN0ZWQg
+YSBNREVWIGFzc2lnbm1lbnQgd2hpY2ggY2FuIHdhbGsgdGhlIFNjYWxhYmxlIE1vZGUNCj4gcGF0
+Y2hlcyBmbG93cyAoYm90aCBrZXJuZWwgYW5kIHFlbXUpLg0KDQpub3QganVzdCBNREVWLiBZb3Ug
+c2hvdWxkIGFsc28gdHJ5IHBoeXNpY2FsIFBDSSBlbmRwb2ludCBkZXZpY2UuDQoNCj4gDQo+ID4g
+eW91IHNob3VsZCBub3QgbmVlZCBjYWNoaW5nLW1vZGU9b24gKGJ1dCBjYWNoaW5nLW1vZGU9b24g
+c2hvdWxkIG5vdA0KPiA+IGJyZWFrIGFueW9uZSB0aG91Z2gpLg0KPiA+DQo+IEZvciB2aXJ0aW8t
+bmV0LXBjaSB3aXRob3V0IGRldmljZSBhc3NpZ25tZW50LCBJIGRpZCBub3QgdXNlDQo+ICJjYWNo
+aW5nLW1vZGU9b24iLg0KPiANCj4gPiBJJ3ZlIHN0aWxsIGdvdCBzb21lIGNvbW1lbnRzIGhlcmUg
+YW5kIHRoZXJlIGJ1dCBpdCBsb29rcyB2ZXJ5IGdvb2QgYXQNCj4gPiBsZWFzdCB0byBtZSBvdmVy
+YWxsLg0KPiA+DQo+ID4gVGhhbmtzLA0KPiA+DQo+ID4gLS0NCj4gPiBQZXRlciBYdQ0K
