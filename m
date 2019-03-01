@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53785)
+Received: from eggs.gnu.org ([209.51.188.92]:56692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1gzocI-0000Ns-2B
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:18:47 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gzogG-0001V1-7m
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:22:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1gzocF-0005qW-OR
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:18:45 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34568)
+	(envelope-from <richard.henderson@linaro.org>) id 1gzogE-0001F4-4q
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:22:51 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34673)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1gzocF-0005Aj-5H
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:18:43 -0500
-Received: by mail-pl1-x644.google.com with SMTP id d15so12008154plr.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:18:27 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20190301100310.22345-1-alex.bennee@linaro.org>
-	<20190301100310.22345-4-alex.bennee@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <4741bd0d-5d01-ae48-58c0-f0020c0722a5@twiddle.net>
-Date: Fri, 1 Mar 2019 12:18:22 -0800
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gzog7-0000pa-1e
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:22:48 -0500
+Received: by mail-pf1-x443.google.com with SMTP id u9so11936760pfn.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:22:42 -0800 (PST)
+References: <20190301134709.4695-1-eric.auger@redhat.com>
+	<20190301134709.4695-2-eric.auger@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <48f9a583-b3ed-7e46-dd8b-e47d8b387901@linaro.org>
+Date: Fri, 1 Mar 2019 12:22:38 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190301100310.22345-4-alex.bennee@linaro.org>
+In-Reply-To: <20190301134709.4695-2-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] contrib: gitdm: add more individual
- contributors
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 01/10] hw/arm/boot: introduce
+ fdt_add_memory_node helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: Fredrik Noring <noring@nocrew.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+Cc: pbonzini@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-On 3/1/19 2:03 AM, Alex Bennée wrote:
-> I know Richard's is right because I asked him in the pub. I'm guessing
-> Fredrik's based on the fact I vaguely remember an Atari demo. The
-> others I attributed to academic institutions last time I posted so
-> have moved them to individuals as requested.
+On 3/1/19 5:47 AM, Eric Auger wrote:
+> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > 
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Fredrik Noring <noring@nocrew.org>
-> Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: BALATON Zoltan <balaton@eik.bme.hu>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> We introduce an helper to create a memory node.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> 
 > ---
->  contrib/gitdm/group-map-individuals | 5 +++++
->  1 file changed, 5 insertions(+)
+> v7 -> v8:
+> - Added Igor's R-b
+> 
+> v6 -> v7:
+> - msg error in the caller
+> - add comment about NUMA ID
+> ---
+>  hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 34 insertions(+), 20 deletions(-)
 
-Acked-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
