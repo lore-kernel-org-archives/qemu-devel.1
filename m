@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40190)
+Received: from eggs.gnu.org ([209.51.188.92]:40310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzlPM-0006IC-T0
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:53:14 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gzlQ9-0006je-1v
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:54:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzlPL-00033R-Gw
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:53:12 -0500
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:33339)
+	(envelope-from <alex.bennee@linaro.org>) id 1gzlQ8-0003Sg-7L
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:54:01 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gzlPL-0002z6-8v
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:53:11 -0500
-Received: by mail-ot1-x32c.google.com with SMTP id q24so21573946otk.0
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 08:53:10 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gzlQ8-0003Ry-07
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:54:00 -0500
+Received: by mail-wr1-x442.google.com with SMTP id o17so26638807wrw.3
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 08:53:59 -0800 (PST)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	t14sm23243012wrr.49.2019.03.01.08.53.57 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 01 Mar 2019 08:53:57 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 6669A1FF82
+	for <qemu-devel@nongnu.org>; Fri,  1 Mar 2019 16:53:57 +0000 (UTC)
+References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
+	<1549390526-24246-14-git-send-email-pbonzini@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1549390526-24246-14-git-send-email-pbonzini@redhat.com>
+Date: Fri, 01 Mar 2019 16:53:57 +0000
+Message-ID: <87sgw6k02i.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
-	<CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
-	<fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
-In-Reply-To: <fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Mar 2019 16:52:58 +0000
-Message-ID: <CAFEAcA_OrJ-1SzE5UpT4eHbzi-KS_GqX13KZdHzEzovXnsnsUg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC] multi phase reset
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 13/76] pvh: Add x86/HVM direct boot ABI
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,153 +39,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Damien Hedde <damien.hedde@greensocs.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>
+To: qemu-devel@nongnu.org
 
-On Fri, 1 Mar 2019 at 15:34, Damien Hedde <damien.hedde@greensocs.com> wrote:
+
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> From: Liam Merwick <Liam.Merwick@oracle.com>
 >
-> On 3/1/19 12:43 PM, Peter Maydell wrote:
-> > On Mon, 25 Feb 2019 at 10:49, Damien Hedde <damien.hedde@greensocs.com> wrote:
-> >> I had more thought about the reset problem and what we want to achieve
-> >> (add power gating and clock support).
-> >> Feel free to comment. I'll start to implement this and send a first
-> >> version with a reroll of everything when it's ready.
-> >
-> > I generally like this; I have some comments below.
-> >
-> >> # PROPOSAL OVERVIEW
-> >>
-> >> I propose to add a Resetable interface and a ResetDomain object.
-> >>
-> >> Having an interface simplify things since there is several reset entry
-> >> points (at least Buses and Devices).
-> >> Device and Bus objects will implement this interface.
-> >>
-> >> The ResetDomain will hold several Resetable objects and implement the
-> >> interface too. The ResetDomain is needed to have at least a global/main
-> >> ResetDomain to place buses and devices to replace the current
-> >> qemu_register_reset system which only allow to register a function.
-> >
-> > How does the ResetDomain fit in for a typical case where
-> > we have an SoC container object with a handful of devices
-> > (which are children of the container object)? Does the
-> > SoC container object just directly implement the Resettable
-> > interface and handle the propagation as ResetDomain would?
-> > Does the SoC container create one or more ResetDomains and
-> > add its child devices to them (if so, with what API)?
+> The x86/HVM direct boot ABI permits Qemu to be able to boot directly
+> into the uncompressed Linux kernel binary with minimal firmware involveme=
+nt.
 >
-> By SoC container, I suppose you mean a Machine object.
-
-No, I mean something like the TYPE_NRF51_SOC device.
-This isn't a machine, it's a device that represents an SoC,
-and which is pretty much just a container that wires up
-all the devices that an SoC has. The Machine represents
-an entire board, and usually will create an SoC, some memory
-and perhaps a few other devices.
-
-> Right now, I only have 2 functions reset_domain_[un]register_object to
-> add/remove an object in a reset domain (which is just a list of Resettable).
-
-OK, so whether devices are in a reset domain object
-is distinct from what object they are QOM children of ?
-
-> > In my design the only thing that I thought would happen in phase 3
-> > was the "clear the resetting flag", but you've moved that to RELEASE.
-> > What's left ? Do you have a concrete example where we'd need this?
+> 	https://xenbits.xen.org/docs/unstable/misc/pvh.html
 >
-> I hesitated to remove this phase (would be easy to add it after if it is
-> really needed). I see 2 cases where it might be useful.
+> This commit adds the header file that defines the start_info struct
+> that needs to be populated in order to use this ABI.
 >
-> To stay in my use case for clocks, here how it can be used: For an uart,
-> during release phase, the clock will propagate and only after every
-> release phases has been executed we will have the final/valid input
-> frequency.
-> So we can either recompute the uart baudrate every time the clock change
-> due to propagation or wait till post phase to do it once for all (and
-> initialize the backend parameters). But it is probably no big deal for
-> this case if we don't have post phase.
-
-I think I'd rather have the model be simpler rather than
-complicate it for the sake of optimisation. It's not like
-we reset very frequently...
-
-> Another place where it may be needed is cases like the pc's machine
-> reset case (hw/i386/p.c) that reset everything then reset interrupt
-> controllers.
-> static void pc_machine_reset(void)
-> {
->     CPUState *cs;
->     X86CPU *cpu;
->     qemu_devices_reset();
+> The canonical version of start_info.h is in the Xen codebase.
+> (like QEMU, the Linux kernel uses a copy as well).
 >
->     /* Reset APIC after devices have been reset to cancel
->      * any changes that qemu_devices_reset() might have done.
->      */
->     CPU_FOREACH(cs) {
->         cpu = X86_CPU(cs);
->
->         if (cpu->apic_state) {
->             device_reset(cpu->apic_state);
->         }
->     }
-> }
+> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+> Reviewed-by: Konrad Rzeszutek Wilk <Konrad.Wilk@oracle.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I think this is just working around the fact that we don't
-have a multiphase reset, so the APIC doesn't know whether it
-got an inbound asserted interrupt while it is being
-reset or not. We should be able to get rid of this code once
-we have converted things, I hope.
+This has changed behaviour of a boot. Previously:
 
-> >> Obviously to correctly support this assert/de-assert a device must have
-> >> special support in order to handle migration in "resetting" state. There
-> >> is no migration problem while we only use trigger because there is no
-> >> point during the reset were migration could occur.
-> >
-> > What would need to be different? Just needing to migrate the state
-> > of the 'resetting' flag ? (I think we could handle that in the
-> > device base class.)
->
-> That's it. It would be nice to handle this in the base class but I don't
-> know how I can do that. vmsd field has no inheritance mechanism. Should
-> we add some base/background migration to every device ?
+  qemu-system-i386 -serial mon:stdio -nographic -device \
+     isa-debugcon,chardev=3Dserial0 -kernel ./tests/hello
 
-I'm not sure exactly. (What I was thinking we ought to end up
-with is a migration subsection which is used only if the flag
-happens to be true; but I'm not sure how to add subsections
-from the base class.) I suggest you do the first version
-with a TODO note about handling migration of the resetting
-flag and we'll look at how to do it cleanly then.
+would boot seabios which then loads the -kernel. Now we get:
 
-> > (perhaps what we want is for new-system-aware devices to implement
-> > Resettable directly, and also for DeviceClass to implement
-> > Resettable with some methods that call old-school DeviceClass::reset,
-> > for back-compatibility ? This feels like it's going to end up
-> > with our "preferred" API being more boilerplatey than the
-> > "deprecated" old API, though :-( )
->
-> What I started to do is make Deviceclass implements Resettable and add
-> additional methods in DeviceClass corresponding to the "local" version
-> of the Resettable methods.
->
-> So in DeviceClass I have 4 news methods
->    cold_reset (this forms reset_init with existing reset, we could name
->                it reset_init and see how to replace existing reset)
->    reset_release
->    reset_hold
->    reset_post
-> These methods are empty by default and should be implemented by
-> specialization classes to do local reset operations.
->
-> And there is the 4 methods of the resettable interface:
->    reset_init
->    reset_release
->    reset_hold
->    reset_post
-> These methods are implemented by default to:
-> + call the local version
-> + call the sub-buses methods
+  qemu-system-i386: Error loading uncompressed kernel without PVH ELF Note
 
-OK, but I'd definitely prefer to have the names match up here.
+I'm personally not overly concerned (and being able to boot directly
+sounds like a win for my test case). However is this likely to break
+anybodies existing workflow?
 
-thanks
--- PMM
+Are there any examples of the minimum setup for a directly booted i386
+kernel image anywhere?
+
+--
+Alex Benn=C3=A9e
