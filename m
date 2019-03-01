@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50041)
+Received: from eggs.gnu.org ([209.51.188.92]:50233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzfQR-0000Zh-6J
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:29:56 -0500
+	(envelope-from <david@redhat.com>) id 1gzfQu-0000ud-08
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:30:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gzfQQ-0008M2-6B
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:29:55 -0500
-Date: Fri, 1 Mar 2019 11:29:42 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190301112942.3e024f02@redhat.com>
-In-Reply-To: <b27b4a41-6967-9535-2a3f-467a5d54c491@redhat.com>
-References: <20190228150324.25973-1-eric.auger@redhat.com>
-	<20190228150324.25973-11-eric.auger@redhat.com>
-	<20190228172938.1993ed57@redhat.com>
-	<b27b4a41-6967-9535-2a3f-467a5d54c491@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gzfQs-0000Fb-FT
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:30:23 -0500
+References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
+	<20190226045304.25618-41-david@gibson.dropbear.id.au>
+	<ec8e11d1-c966-b814-98da-a6ab56572834@redhat.com>
+	<155140389645.9499.14782774845761701651@sif>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <4038f585-feaa-2fca-cfb7-ba28416748bf@redhat.com>
+Date: Fri, 1 Mar 2019 11:30:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <155140389645.9499.14782774845761701651@sif>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 10/10] hw/arm/virt: Bump the 255GB
- initial RAM limit
+Subject: Re: [Qemu-devel] [PULL 40/50] spapr_events: add support for phb
+ hotplug events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +27,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, clg@kaod.org
 
-On Fri, 1 Mar 2019 11:08:17 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+On 01.03.19 02:31, Michael Roth wrote:
+> Quoting Thomas Huth (2019-02-28 12:40:52)
+>> On 26/02/2019 05.52, David Gibson wrote:
+>>> From: Michael Roth <mdroth@linux.vnet.ibm.com>
+>>>
+>>> Extend the existing EPOW event format we use for PCI
+>>> devices to emit PHB plug/unplug events.
+>>>
+>>> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>> Message-Id: <155059671405.1466090.535964535260503283.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>> ---
+>>>  hw/ppc/spapr_events.c | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>>> index b9c7ecb9e9..ab9a1f0063 100644
+>>> --- a/hw/ppc/spapr_events.c
+>>> +++ b/hw/ppc/spapr_events.c
+>>> @@ -526,6 +526,9 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
+>>>      case SPAPR_DR_CONNECTOR_TYPE_CPU:
+>>>          hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_CPU;
+>>>          break;
+>>> +    case SPAPR_DR_CONNECTOR_TYPE_PHB:
+>>> +        hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_PHB;
+>>> +        break;
+>>>      default:
+>>>          /* we shouldn't be signaling hotplug events for resources
+>>>           * that don't support them
+>>
+>> I think this patch (or something else in this PULL request) broke CPU
+>> hot-plugging with older machine types:
+>>
+>> $ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-test -m=slow
+>> /ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=6: OK
+>> /ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=6: OK
+>> /ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=6: OK
+>> /ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=6: OK
+>> /ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=6: OK
+>> /ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=6: OK
+>> /ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=6: OK
+>> /ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=6: **
+>> ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_to_source: assertion failed: (source->enabled)
+>> Broken pipe
+>> /home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
+>> Aborted (core dumped)
+>>
+>> Could you please have a look?
+> 
+> Bisected to:
+> 
+>   commit b8165118f52ce5ee88565d3cec83d30374efdc96
+>   Author: David Hildenbrand <david@redhat.com>
+>   Date:   Mon Feb 18 10:21:58 2019 +0100
+>   
+>       spapr: support memory unplug for qtest
+>       
+>       Fake availability of OV5_HP_EVT, so we can test memory unplug in qtest.
+> 
+> Which makes sense since OV5_HP_EVT assumes that
+> spapr->spapr->use_hotplug_event_source == true, which isn't the default for
+> 2.7 and below.
+> 
+> If I revert that I think I hit the bug it was meant to fix:
+> 
+>   mdroth@sif:~/w/qemu-build3$ make V=1 check-qtest-ppc64
+>   ...
+>   PASS 1 device-plug-test /ppc64/device-plug/pci-unplug-request
+>   PASS 2 device-plug-test /ppc64/device-plug/spapr-cpu-unplug-request
+>   **
+>   ERROR:/home/mdroth/w/qemu3.git/tests/device-plug-test.c:28:device_del_finish: assertion failed: (qdict_haskey(resp, "return"))
+>   ERROR - Bail out! ERROR:/home/mdroth/w/qemu3.git/tests/device-plug-test.c:28:device_del_finish: assertion failed: (qdict_haskey(resp, "return"))
+>   Aborted (core dumped)
+>   /home/mdroth/w/qemu3.git/tests/Makefile.include:875: recipe for target 'check-qtest-ppc64' failed
+>   make: *** [check-qtest-ppc64] Error 1
+>   mdroth@sif:~/w/qemu-build3$
+> 
+> Which is probably due to this check in spapr_machine_device_unplug_request():
+> 
+>     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>         if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
+>             spapr_memory_unplug_request(hotplug_dev, dev, errp);
+>         } else {
+>             /* NOTE: this means there is a window after guest reset, prior to
+>              * CAS negotiation, where unplug requests will fail due to the
+>              * capability not being detected yet. This is a bit different than
+>              * the case with PCI unplug, where the events will be queued and
+>              * eventually handled by the guest after boot
+>              */
+>             error_setg(errp, "Memory hot unplug not supported for this guest");
+>         }
+> 
+> 
+> 
+> This spapr-cpu-unplug-request test is failing because
+> spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT) relies on the CAS-negotiated OV5 bit,
+> which wouldn't have happened with qtest. If we want to make these tests run in
+> this scenario we probably need a different approach than the original patch.
 
-> Hi Igor,
-> 
-> On 2/28/19 5:29 PM, Igor Mammedov wrote:
-> > On Thu, 28 Feb 2019 16:03:24 +0100
-> > Eric Auger <eric.auger@redhat.com> wrote:
-> >   
-> >> Now we have the extended memory map (high IO regions beyond the
-> >> scalable RAM) and dynamic IPA range support at KVM/ARM level
-> >> we can bump the legacy 255GB initial RAM limit. The actual maximum
-> >> RAM size now depends on the physical CPU and host kernel, in
-> >> accelerated mode. In TCG mode, it depends on the VCPU
-> >> AA64MMFR0.PARANGE.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >> v7 -> v8:
-> >> - TCG PAMAX check moved in a separate patch
-> >>
-> >> v6 -> v7
-> >> - handle TCG case
-> >> - set_memmap modifications moved to previous patches
-> >> ---
-> >>  hw/arm/virt.c | 21 +--------------------
-> >>  1 file changed, 1 insertion(+), 20 deletions(-)
-> >>
-> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> >> index a3da75a5ae..a45f0fcf79 100644
-> >> --- a/hw/arm/virt.c
-> >> +++ b/hw/arm/virt.c
-> >> @@ -95,21 +95,8 @@
-> >>  
-> >>  #define PLATFORM_BUS_NUM_IRQS 64
-> >>  
-> >> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
-> >> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
-> >> - * address space unallocated and free for future use between 256G and 512G.
-> >> - * If we need to provide more RAM to VMs in the future then we need to:
-> >> - *  * allocate a second bank of RAM starting at 2TB and working up
-> >> - *  * fix the DT and ACPI table generation code in QEMU to correctly
-> >> - *    report two split lumps of RAM to the guest
-> >> - *  * fix KVM in the host kernel to allow guests with >40 bit address spaces
-> >> - * (We don't want to fill all the way up to 512GB with RAM because
-> >> - * we might want it for non-RAM purposes later. Conversely it seems
-> >> - * reasonable to assume that anybody configuring a VM with a quarter
-> >> - * of a terabyte of RAM will be doing it on a host with more than a
-> >> - * terabyte of physical address space.)
-> >> - */
-> >>  #define RAMBASE GiB
-> >> +/* Legacy RAM limit in GB (< version 4.0) */
-> >>  #define LEGACY_RAMLIMIT_GB 255
-> >>  #define LEGACY_RAMLIMIT_BYTES (LEGACY_RAMLIMIT_GB * GiB)  
-> > do we need to keep these couple around?
-> > 
-> > it's used only in
-> >  [VIRT_MEM] = { RAMBASE, LEGACY_RAMLIMIT_BYTES },
-> > and doesn't have any effect whatsoever.
-> > I'd set initial  VIRT_MEM.size to 0 and drop LEGACY_RAMLIMIT_*
-> > maybe add comment above entry that size is defined by ram_size  
-> 
-> in virt_set_memmap I was checking if (high_io_base < 256 GiB) then
-> high_io_base = 256GiB. Maybe this 256GiB value comes out of the blue and
-> I should also replace it with vms->memmap[VIRT_MEM].base +
-> LEGACY_RAMLIMIT_BYTES.
-I'd go for it + comment on top of it.
+We could rip out the patch along with the spapr memory unplug test.
+However it feels like a step back to not have any memory unplug tests
+for QEMU at all.
 
-> We maintain some kind of compatibility with the old memmap so I prefer
-> to keep this info somewhere.
-> 
-> I added a comment though:
-> /* Actual RAM size depends on initial RAM and device memory options */
-> 
-> Thanks
-> 
-> Eric
-> 
-> 
-> >   
-> >>  
-> >> @@ -1515,12 +1502,6 @@ static void machvirt_init(MachineState *machine)
-> >>  
-> >>      vms->smp_cpus = smp_cpus;
-> >>  
-> >> -    if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
-> >> -        error_report("mach-virt: cannot model more than %dGB RAM",
-> >> -                     LEGACY_RAMLIMIT_GB);
-> >> -        exit(1);
-> >> -    }
-> >> -
-> >>      if (vms->virt && kvm_enabled()) {
-> >>          error_report("mach-virt: KVM does not support providing "
-> >>                       "Virtualization extensions to the guest CPU");  
-> >   
+Any spapr experts here if we can work around this?
+
+-- 
+
+Thanks,
+
+David / dhildenb
