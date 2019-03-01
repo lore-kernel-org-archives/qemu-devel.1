@@ -1,33 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50816)
+Received: from eggs.gnu.org ([209.51.188.92]:50913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gzkN1-0004sY-Hu
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:46:44 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzkN8-0004vs-0S
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gzkJ0-0007mc-89
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:42:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gzkJ0-0007lp-1W
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:42:34 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 57524A148A
-	for <qemu-devel@nongnu.org>; Fri,  1 Mar 2019 15:42:33 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190220092214.2384-1-quintela@redhat.com>
-	<20190220092214.2384-3-quintela@redhat.com>
-	<2bcdaa5b-4ce2-cf40-5774-a3c81690b1e3@redhat.com>
-	<87d0nl1e0b.fsf@dusky.pond.sub.org>
-Date: Fri, 01 Mar 2019 16:42:27 +0100
-In-Reply-To: <87d0nl1e0b.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Thu, 21 Feb 2019 14:12:52 +0100")
-Message-ID: <87d0namwik.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v13 2/3] migration: Create socket-address
- parameter
+	(envelope-from <imammedo@redhat.com>) id 1gzkIo-0007Yp-V9
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 10:42:23 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Fri,  1 Mar 2019 16:42:14 +0100
+Message-Id: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] numa: deprecate -numa node,
+ mem and default memory distribution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +18,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, libvir-list@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-arm@nongnu.org
 
-Markus Armbruster <armbru@redhat.com> writes:
 
-> Eric Blake <eblake@redhat.com> writes:
-[...]
->> That says we have a bug in our QAPI generator - the type
->> SocketAddressList should be auto-generated at the point where it is
->> needed in migration.json. Markus, any ideas why we are not properly
->> auto-generating an array type when the only use of that array comes from
->> a different module than where the original type was declared?
->
-> With the DummyStruct, we generate SocketAddressList stuff into
-> qapi-{types,visit}-sockets.[ch].
->
-> Without it, we it ends up in qapi-{types,visit}-block-core.[ch].  How
-> come?
->
-> We create non-builtin array types on demand, i.e. on first use, by
-> calling ._make_array_type().
->
-> Like any other non-builtin type, an array type takes an info tuple
-> describing where it's defined.  We pass it the info of whatever
-> triggered its creation.  That's not as silly as it may sound; it can be
-> viewed as a definition.
->
-> However, it falls apart when we use the info to set the type's module,
-> in ._def_entity().  The module dicates where the generated code goes.
-> The array type's module becomes whatever module uses it first.  It
-> should be its element type's module instead.
->
-> Needs fixing.
->
-> If you don't want to wait for the fix, commit the DummyStruct
-> work-around with a big fat FIXME comment.
+ 1) "I'm considering to deprecating -mem-path/prealloc CLI options and replacing
+them with a single memdev Machine property to allow interested users to pick
+used backend for initial RAM (fixes mixed -mem-path+hostmem backends issues)
+and as a transition step to modeling initial as a Device instead of (ab)using
+MemoryRegion APIs."
+(for more details see: https://www.mail-archive.com/qemu-devel@nongnu.org/msg596314.html)
 
-Proposed fix:
-Subject: [PATCH 0/7] qapi: Code generation fixes
-Message-Id: <20190301154051.23317-1-armbru@redhat.com>
+However there is a couple of roadblocks on the way (s390x and numa memory handling).
+I think I finally thought out a way to hack s390x in migration compatible manner,
+but I don't see a way to do it for -numa node,mem and default RAM assignement to
+nodes. Considering both numa usecases aren't meaningfully using NUMA (aside guest
+side testing), and could be replaced with explicitly used memdev parameter, I'd
+like to propose removing these fake NUMA friends, hence this deprecation.
+
+As result of removing deprecated options and replacing initial RAM allocation
+with 'memdev's (1), QEMU will allocate guest RAM in consistent way, fixing mixed
+use-case and allowing boards to move towards modelling initial RAM as Device(s).
+Which in its own turn should allow to cleanup NUMA/HMP/memory accounting code
+more by dropping ad-hoc node_mem tracking and reusing device enumeration instead.
+
+Igor Mammedov (2):
+  numa: deprecate 'mem' parameter of '-numa node' option
+  numa: deprecate implict memory distribution between nodes
+
+ numa.c               |  5 +++++
+ qemu-deprecated.texi | 21 +++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
+
+-- 
+2.7.4
