@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56578)
+Received: from eggs.gnu.org ([209.51.188.92]:57225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzkgN-0004JQ-BC
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:06:49 -0500
+	(envelope-from <david@redhat.com>) id 1gzkhw-0005Yd-By
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:08:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzkgL-00015l-Or
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:06:43 -0500
-References: <155144987334.126105.2493613675615671242.stgit@bahia.lan>
+	(envelope-from <david@redhat.com>) id 1gzkhv-00027r-NO
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:08:20 -0500
+References: <20190228122849.4296-1-david@redhat.com>
+	<20190228171706.GC4925@habkost.net>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <3240a5a6-c82c-149d-b823-a0be5c2bea42@redhat.com>
-Date: Fri, 1 Mar 2019 17:06:37 +0100
+Message-ID: <c36b0ab8-7c50-7e0b-262f-95f1304e8379@redhat.com>
+Date: Fri, 1 Mar 2019 17:08:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <155144987334.126105.2493613675615671242.stgit@bahia.lan>
+In-Reply-To: <20190228171706.GC4925@habkost.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr: Explicitly check machine support
- before using EVENT_CLASS_HOT_PLUG
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 0/3] qdev: Hotplug handler
+ chaining
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Greg Kurz <groug@kaod.org>, Richard Henderson <rth@twiddle.net>, Eric Auger <eric.auger@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 01.03.19 15:17, Greg Kurz wrote:
-> Recent commit b8165118f52c "spapr: support memory unplug for qtest" bro=
-ke
-> CPU hotplug tests for old machine types:
->=20
-> $ QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-=
-test -m=3Dslow
-> /ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=3D6: OK
-> /ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=3D6: **
-> ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_t=
-o_source: assertion failed: (source->enabled)
-> Broken pipe
-> /home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU =
-death from signal 6 (Aborted) (core dumped)
-> Aborted (core dumped)
->=20
-> The rtas_event_log_to_source() function is supposed to return the event
-> source to be used for a given event type. In the case of hotplug, it fi=
-rst
-> tries EVENT_CLASS_HOT_PLUG and, if the guest doesn't support it, it fal=
-ls
-> back to EVENT_CLASS_EPOW.
->=20
-> This works well for machine types that enable EVENT_CLASS_HOT_PLUG. For
-> older machine types, this happened to work because they don't set the
-> OV5_HP_EVT bit in spapr->ov5. CAS hence logically keeps the bit cleared
-> in spapr->ov5_cas and we avoid the assert.
->=20
-> As shown by commit b8165118f52c, the logic is fragile and we need a
-> bigger hammer to ensure that rtas_event_log_to_source() doesn't go
-> down the EVENT_CLASS_HOT_PLUG path with older machine types.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr_events.c |   12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index ab9a1f0063d5..1a09dab6857d 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -307,11 +307,13 @@ rtas_event_log_to_source(sPAPRMachineState *spapr=
-, int log_type)
-> =20
->      switch (log_type) {
->      case RTAS_LOG_TYPE_HOTPLUG:
-> -        source =3D spapr_event_sources_get_source(spapr->event_sources=
-,
-> -                                                EVENT_CLASS_HOT_PLUG);
-> -        if (spapr_ovec_test(spapr->ov5_cas, OV5_HP_EVT)) {
-> -            g_assert(source->enabled);
-> -            break;
-> +        if (spapr->use_hotplug_event_source) {
-> +            source =3D spapr_event_sources_get_source(spapr->event_sou=
-rces,
-> +                                                    EVENT_CLASS_HOT_PL=
-UG);
-> +            if (spapr_ovec_test(spapr->ov5_cas, OV5_HP_EVT)) {
-> +                g_assert(source->enabled);
-> +                break;
-> +            }
->          }
->          /* fall back to epow for legacy hotplug interrupt source */
->      case RTAS_LOG_TYPE_EPOW:
->=20
+On 28.02.19 18:17, Eduardo Habkost wrote:
+> On Thu, Feb 28, 2019 at 01:28:46PM +0100, David Hildenbrand wrote:
+>> Can somebody please pick this up in the near future? (@Eduardo, @MST,
+>> @Paolo, @David - I have no idea who the right person is :) )
+>>
+>> The longer we wait, the more likely it is that some stuff gets upstreamed
+>> that conflicts with patch 1 and will break unnoticed. (e.g. spapr PHB
+>> hotplug was just upstreamed and required a fixup, luckily I was CC'ed on
+>> that one).
+> 
+> I'm queueing it on machine-next, thanks!
+> 
 
-Thanks a lot for taking care of this, highly appreciated!
+Thanks Eduardo! Have a great weekend!
 
---=20
+-- 
 
 Thanks,
 
