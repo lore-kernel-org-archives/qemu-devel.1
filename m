@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60878)
+Received: from eggs.gnu.org ([209.51.188.92]:47013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gzbJB-0006ry-MQ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:06:10 -0500
+	(envelope-from <08005325@163.com>) id 1gzZY6-00036p-Gy
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:13:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gzbJA-0006VT-OX
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:06:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gzbJA-0006RJ-H5
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 01:06:08 -0500
-Date: Fri, 1 Mar 2019 07:05:51 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190301060551.xxnzbgf64b6pjusw@sirius.home.kraxel.org>
-References: <1551413588-36475-1-git-send-email-08005325@163.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1551413588-36475-1-git-send-email-08005325@163.com>
-Subject: Re: [Qemu-devel] [PATCH] Fix coredump when using virtio-vga
+	(envelope-from <08005325@163.com>) id 1gzZY5-0001XB-Lh
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:13:26 -0500
+Received: from m50-138.163.com ([123.125.50.138]:50584)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <08005325@163.com>) id 1gzZY4-0001Uc-GM
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 23:13:25 -0500
+From: 08005325@163.com
+Date: Fri,  1 Mar 2019 12:13:08 +0800
+Message-Id: <1551413588-36475-1-git-send-email-08005325@163.com>
+Subject: [Qemu-devel] [PATCH] Fix coredump when using virtio-vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +21,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 08005325@163.com
-Cc: qemu-devel@nongnu.org, Michael Qiu <qiudayu@huayun.com>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, Michael Qiu <qiudayu@huayun.com>
 
-On Fri, Mar 01, 2019 at 12:13:08PM +0800, 08005325@163.com wrote:
-> From: Michael Qiu <qiudayu@huayun.com>
-> 
-> When using command -device virtio-vga,virgl=on
-> the default max_outputs is 0, this will lead coredump,
+From: Michael Qiu <qiudayu@huayun.com>
 
-The default is 1.
+When using command -device virtio-vga,virgl=on
+the default max_outputs is 0, this will lead coredump,
 
-> @@ -46,6 +46,11 @@ static void virtio_gpu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->      int i;
->      Error *local_error = NULL;
->  
-> +    if (g->conf.max_outputs <= 0) {
-> +        qemu_log("WARNING: virtio gpu max_outputs must greater than 1");
-> +        g->conf.max_outputs = 1;
-> +    }
+    (con=0x0, hw_ops=0x5555564452e0 <virtio_vga_ops>,
+     opaque=0x55555754ec60) at ui/console.c:1872
+    (vpci_dev=0x55555754ec60, errp=0x7fffffffdbb8)
+     at qemu/hw/display/virtio-vga.c:160
+    (pci_dev=0x55555754ec60, errp=0x7fffffffdbb8)
+     at hw/virtio/virtio-pci.c:1786
+...
 
-There already is a sanity check in virtio_gpu_device_realize().
-You can extend that to also throw an error in case max_outputs
-is 0.  Fixing things up and continuing is a bad idea.  Yes there
-are places in the qemu code base still doing that, for backward
-compatibility with old versions, but we should not add new
-instances of this.
+This patch force ths max_outputs to 1 when it not greater
+than 0.
 
-cheers,
-  Gerd
+Signed-off-by: Michael Qiu <qiudayu@huayun.com>
+---
+ hw/display/virtio-gpu-pci.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hw/display/virtio-gpu-pci.c b/hw/display/virtio-gpu-pci.c
+index bdcd33c..59b571d 100644
+--- a/hw/display/virtio-gpu-pci.c
++++ b/hw/display/virtio-gpu-pci.c
+@@ -46,6 +46,11 @@ static void virtio_gpu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+     int i;
+     Error *local_error = NULL;
+ 
++    if (g->conf.max_outputs <= 0) {
++        qemu_log("WARNING: virtio gpu max_outputs must greater than 1");
++        g->conf.max_outputs = 1;
++    }
++
+     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+     virtio_pci_force_virtio_1(vpci_dev);
+     object_property_set_bool(OBJECT(vdev), true, "realized", &local_error);
+-- 
+1.8.3.1
