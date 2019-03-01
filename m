@@ -1,35 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56611)
+Received: from eggs.gnu.org ([209.51.188.92]:34709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gznV3-0003N1-67
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:07:15 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gzndh-0002Ab-2k
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gznV0-0004jS-Gi
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:07:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36048
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gznUx-0004FZ-IQ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:07:10 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x21J0rYF032340
-	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:06:45 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qy7ygxxq8-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:04:53 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Fri, 1 Mar 2019 18:59:45 -0000
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Fri,  1 Mar 2019 13:59:31 -0500
-In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1551466776-29123-12-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 11/16] s390-bios: cio error handling
+	(envelope-from <jsnow@redhat.com>) id 1gzndc-0008BP-Vv
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:16:06 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Fri,  1 Mar 2019 14:15:39 -0500
+Message-Id: <20190301191545.8728-2-jsnow@redhat.com>
+In-Reply-To: <20190301191545.8728-1-jsnow@redhat.com>
+References: <20190301191545.8728-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/7] block/dirty-bitmaps: add inconsistent
+ bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,317 +20,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Add verbose error output for when unexpected i/o errors happen. This eases the
-burden of debugging and reporting i/o errors. No error information is printed
-in the success case, here is an example of what is output on error:
+Add an inconsistent bit to dirty-bitmaps that allows us to report a bitmap as
+persistent but potentially inconsistent, i.e. if we find bitmaps on a qcow2
+that have been marked as "in use".
 
-cio device error
-  ssid  : 0x0000000000000000
-  cssid : 0x0000000000000000
-  sch_no: 0x0000000000000000
-
-Interrupt Response Block Data:
-    Function Ctrl : [Start]
-    Activity Ctrl : [Start-Pending]
-    Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
-    Device Status : [Unit-Check]
-    Channel Status :
-    cpa=: 0x000000007f8d6038
-    prev_ccw=: 0x0000000000000000
-    this_ccw=: 0x0000000000000000
-Eckd Dasd Sense Data (fmt 32-bytes):
-    Sense Condition Flags :
-    Residual Count     =: 0x0000000000000000
-    Phys Drive ID      =: 0x000000000000009e
-    low cyl address    =: 0x0000000000000000
-    head addr & hi cyl =: 0x0000000000000000
-    format/message     =: 0x0000000000000008
-    fmt-dependent[0-7] =: 0x0000000000000004
-    fmt-dependent[8-15]=: 0xe561282305082fff
-    prog action code   =: 0x0000000000000016
-    Configuration info =: 0x00000000000040e0
-    mcode / hi-cyl     =: 0x0000000000000000
-    cyl & head addr [0]=: 0x0000000000000000
-    cyl & head addr [1]=: 0x0000000000000000
-    cyl & head addr [2]=: 0x0000000000000000
-
-Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- pc-bios/s390-ccw/cio.c  | 230 ++++++++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/libc.h |  11 +++
- 2 files changed, 241 insertions(+)
+ qapi/block-core.json         | 13 +++++++++----
+ include/block/dirty-bitmap.h |  2 ++
+ block/dirty-bitmap.c         | 19 +++++++++++++++++++
+ 3 files changed, 30 insertions(+), 4 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
-index e61cfd3..c528bbf 100644
---- a/pc-bios/s390-ccw/cio.c
-+++ b/pc-bios/s390-ccw/cio.c
-@@ -82,6 +82,228 @@ static bool irb_error(Irb *irb)
-     return irb->scsw.dstat != (SCSW_DSTAT_DEVEND | SCSW_DSTAT_CHEND);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 6e543594b3..e639ef6d1c 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -467,15 +467,20 @@
+ #        and cannot be modified via QMP or used by another operation.
+ #        Replaces `locked` and `frozen` statuses. (since 4.0)
+ #
+-# @persistent: true if the bitmap will eventually be flushed to persistent
+-#              storage (since 4.0)
++# @persistent: true if the bitmap was stored on disk, is scheduled to be stored
++#              on disk, or both. (since 4.0)
++#
++# @inconsistent: true if this is a persistent bitmap that was improperly
++#                stored. Implies @persistent to be true; @recording and
++#                @busy to be false. This bitmap cannot be used. To remove
++#                it, use @block-dirty-bitmap-remove. (Since 4.0)
+ #
+ # Since: 1.3
+ ##
+ { 'struct': 'BlockDirtyInfo',
+   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
+-           'recording': 'bool', 'busy': 'bool',
+-           'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
++           'recording': 'bool', 'busy': 'bool', 'status': 'DirtyBitmapStatus',
++           'persistent': 'bool', '*inconsistent': 'bool' } }
+ 
+ ##
+ # @Qcow2BitmapInfoFlags:
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index ba8477b73f..bd1b6479df 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -68,6 +68,7 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
+ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+                                        bool persistent);
++void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap);
+ void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy);
+ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+                              HBitmap **backup, Error **errp);
+@@ -91,6 +92,7 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+ bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
++bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_busy(BdrvDirtyBitmap *bitmap);
+ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 980cae4fa3..9e8630e1ac 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -46,6 +46,9 @@ struct BdrvDirtyBitmap {
+                                    and this bitmap must remain unchanged while
+                                    this flag is set. */
+     bool persistent;            /* bitmap must be saved to owner disk image */
++    bool inconsistent;          /* bitmap is persistent, but inconsistent.
++                                 * It cannot be used at all in any way, except
++                                 * a QMP user can remove it. */
+     bool migration;             /* Bitmap is selected for migration, it should
+                                    not be stored on the next inactivation
+                                    (persistent flag doesn't matter until next
+@@ -464,6 +467,8 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+         info->recording = bdrv_dirty_bitmap_recording(bm);
+         info->busy = bdrv_dirty_bitmap_busy(bm);
+         info->persistent = bm->persistent;
++        info->has_inconsistent = bm->inconsistent;
++        info->inconsistent = bm->inconsistent;
+         entry->value = info;
+         *plist = entry;
+         plist = &entry->next;
+@@ -711,6 +716,15 @@ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool persistent)
+     qemu_mutex_unlock(bitmap->mutex);
  }
  
-+static void print_eckd_dasd_sense_data(SenseDataEckdDasd *sd)
++/* Called with BQL taken. */
++void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap)
 +{
-+    char msgline[512];
-+
-+    if (sd->config_info & 0x8000) {
-+        sclp_print("Eckd Dasd Sense Data (fmt 24-bytes):\n");
-+    } else {
-+        sclp_print("Eckd Dasd Sense Data (fmt 32-bytes):\n");
-+    }
-+
-+    strcat(msgline, "    Sense Condition Flags :");
-+    if (sd->status[0] & SNS_STAT0_CMD_REJECT) {
-+        strcat(msgline, " [Cmd-Reject]");
-+    }
-+    if (sd->status[0] & SNS_STAT0_INTERVENTION_REQ) {
-+        strcat(msgline, " [Intervention-Required]");
-+    }
-+    if (sd->status[0] & SNS_STAT0_BUS_OUT_CHECK) {
-+        strcat(msgline, " [Bus-Out-Parity-Check]");
-+    }
-+    if (sd->status[0] & SNS_STAT0_EQUIPMENT_CHECK) {
-+        strcat(msgline, " [Equipment-Check]");
-+    }
-+    if (sd->status[0] & SNS_STAT0_DATA_CHECK) {
-+        strcat(msgline, " [Data-Check]");
-+    }
-+    if (sd->status[0] & SNS_STAT0_OVERRUN) {
-+        strcat(msgline, " [Overrun]");
-+    }
-+    if (sd->status[0] & SNS_STAT0_INCOMPL_DOMAIN) {
-+        strcat(msgline, " [Incomplete-Domain]");
-+    }
-+
-+    if (sd->status[1] & SNS_STAT1_PERM_ERR) {
-+        strcat(msgline, " [Permanent-Error]");
-+    }
-+    if (sd->status[1] & SNS_STAT1_INV_TRACK_FORMAT) {
-+        strcat(msgline, " [Invalid-Track-Fmt]");
-+    }
-+    if (sd->status[1] & SNS_STAT1_EOC) {
-+        strcat(msgline, " [End-of-Cyl]");
-+    }
-+    if (sd->status[1] & SNS_STAT1_MESSAGE_TO_OPER) {
-+        strcat(msgline, " [Operator-Msg]");
-+    }
-+    if (sd->status[1] & SNS_STAT1_NO_REC_FOUND) {
-+        strcat(msgline, " [No-Record-Found]");
-+    }
-+    if (sd->status[1] & SNS_STAT1_FILE_PROTECTED) {
-+        strcat(msgline, " [File-Protected]");
-+    }
-+    if (sd->status[1] & SNS_STAT1_WRITE_INHIBITED) {
-+        strcat(msgline, " [Write-Inhibited]");
-+    }
-+    if (sd->status[1] & SNS_STAT1_IMPRECISE_END) {
-+        strcat(msgline, " [Imprecise-Ending]");
-+    }
-+
-+    if (sd->status[2] & SNS_STAT2_REQ_INH_WRITE) {
-+        strcat(msgline, " [Req-Inhibit-Write]");
-+    }
-+    if (sd->status[2] & SNS_STAT2_CORRECTABLE) {
-+        strcat(msgline, " [Correctable-Data-Check]");
-+    }
-+    if (sd->status[2] & SNS_STAT2_FIRST_LOG_ERR) {
-+        strcat(msgline, " [First-Error-Log]");
-+    }
-+    if (sd->status[2] & SNS_STAT2_ENV_DATA_PRESENT) {
-+        strcat(msgline, " [Env-Data-Present]");
-+    }
-+    if (sd->status[2] & SNS_STAT2_IMPRECISE_END) {
-+        strcat(msgline, " [Imprecise-End]");
-+    }
-+    strcat(msgline, "\n");
-+    sclp_print(msgline);
-+
-+    print_int("    Residual Count     =", sd->res_count);
-+    print_int("    Phys Drive ID      =", sd->phys_drive_id);
-+    print_int("    low cyl address    =", sd->low_cyl_addr);
-+    print_int("    head addr & hi cyl =", sd->head_high_cyl_addr);
-+    print_int("    format/message     =", sd->fmt_msg);
-+    print_int("    fmt-dependent[0-7] =", sd->fmt_dependent_info[0]);
-+    print_int("    fmt-dependent[8-15]=", sd->fmt_dependent_info[1]);
-+    print_int("    prog action code   =", sd->program_action_code);
-+    print_int("    Configuration info =", sd->config_info);
-+    print_int("    mcode / hi-cyl     =", sd->mcode_hicyl);
-+    print_int("    cyl & head addr [0]=", sd->cyl_head_addr[0]);
-+    print_int("    cyl & head addr [1]=", sd->cyl_head_addr[1]);
-+    print_int("    cyl & head addr [2]=", sd->cyl_head_addr[2]);
++    qemu_mutex_lock(bitmap->mutex);
++    bitmap->inconsistent = true;
++    bitmap->disabled = true;
++    qemu_mutex_unlock(bitmap->mutex);
 +}
 +
-+static void print_irb_err(Irb *irb)
-+{
-+    uint64_t this_ccw = *(uint64_t *)u32toptr(irb->scsw.cpa);
-+    uint64_t prev_ccw = *(uint64_t *)u32toptr(irb->scsw.cpa - 8);
-+    char msgline[256];
-+
-+    sclp_print("Interrupt Response Block Data:\n");
-+
-+    strcat(msgline, "    Function Ctrl :");
-+    if (irb->scsw.ctrl & SCSW_FCTL_START_FUNC) {
-+        strcat(msgline, " [Start]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_FCTL_HALT_FUNC) {
-+        strcat(msgline, " [Halt]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_FCTL_CLEAR_FUNC) {
-+        strcat(msgline, " [Clear]");
-+    }
-+    strcat(msgline, "\n");
-+    sclp_print(msgline);
-+
-+    msgline[0] = '\0';
-+    strcat(msgline, "    Activity Ctrl :");
-+    if (irb->scsw.ctrl & SCSW_ACTL_RESUME_PEND) {
-+        strcat(msgline, " [Resume-Pending]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_ACTL_START_PEND) {
-+        strcat(msgline, " [Start-Pending]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_ACTL_HALT_PEND) {
-+        strcat(msgline, " [Halt-Pending]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_ACTL_CLEAR_PEND) {
-+        strcat(msgline, " [Clear-Pending]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_ACTL_CH_ACTIVE) {
-+        strcat(msgline, " [Channel-Active]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_ACTL_DEV_ACTIVE) {
-+        strcat(msgline, " [Device-Active]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_ACTL_SUSPENDED) {
-+        strcat(msgline, " [Suspended]");
-+    }
-+    strcat(msgline, "\n");
-+    sclp_print(msgline);
-+
-+    msgline[0] = '\0';
-+    strcat(msgline, "    Status Ctrl :");
-+    if (irb->scsw.ctrl & SCSW_SCTL_ALERT) {
-+        strcat(msgline, " [Alert]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_SCTL_INTERMED) {
-+        strcat(msgline, " [Intermediate]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_SCTL_PRIMARY) {
-+        strcat(msgline, " [Primary]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_SCTL_SECONDARY) {
-+        strcat(msgline, " [Secondary]");
-+    }
-+    if (irb->scsw.ctrl & SCSW_SCTL_STATUS_PEND) {
-+        strcat(msgline, " [Status-Pending]");
-+    }
-+
-+    strcat(msgline, "\n");
-+    sclp_print(msgline);
-+
-+    msgline[0] = '\0';
-+    strcat(msgline, "    Device Status :");
-+    if (irb->scsw.dstat & SCSW_DSTAT_ATTN) {
-+        strcat(msgline, " [Attention]");
-+    }
-+    if (irb->scsw.dstat & SCSW_DSTAT_STATMOD) {
-+        strcat(msgline, " [Status-Modifier]");
-+    }
-+    if (irb->scsw.dstat & SCSW_DSTAT_CUEND) {
-+        strcat(msgline, " [Ctrl-Unit-End]");
-+    }
-+    if (irb->scsw.dstat & SCSW_DSTAT_BUSY) {
-+        strcat(msgline, " [Busy]");
-+    }
-+    if (irb->scsw.dstat & SCSW_DSTAT_CHEND) {
-+        strcat(msgline, " [Channel-End]");
-+    }
-+    if (irb->scsw.dstat & SCSW_DSTAT_DEVEND) {
-+        strcat(msgline, " [Device-End]");
-+    }
-+    if (irb->scsw.dstat & SCSW_DSTAT_UCHK) {
-+        strcat(msgline, " [Unit-Check]");
-+    }
-+    if (irb->scsw.dstat & SCSW_DSTAT_UEXCP) {
-+        strcat(msgline, " [Unit-Exception]");
-+    }
-+    strcat(msgline, "\n");
-+    sclp_print(msgline);
-+
-+    msgline[0] = '\0';
-+    strcat(msgline, "    Channel Status :");
-+    if (irb->scsw.cstat & SCSW_CSTAT_PCINT) {
-+        strcat(msgline, " [Program-Ctrl-Interruption]");
-+    }
-+    if (irb->scsw.cstat & SCSW_CSTAT_BADLEN) {
-+        strcat(msgline, " [Incorrect-Length]");
-+    }
-+    if (irb->scsw.cstat & SCSW_CSTAT_PROGCHK) {
-+        strcat(msgline, " [Program-Check]");
-+    }
-+    if (irb->scsw.cstat & SCSW_CSTAT_PROTCHK) {
-+        strcat(msgline, " [Protection-Check]");
-+    }
-+    if (irb->scsw.cstat & SCSW_CSTAT_CHDCHK) {
-+        strcat(msgline, " [Channel-Data-Check]");
-+    }
-+    if (irb->scsw.cstat & SCSW_CSTAT_CHCCHK) {
-+        strcat(msgline, " [Channel-Ctrl-Check]");
-+    }
-+    if (irb->scsw.cstat & SCSW_CSTAT_ICCHK) {
-+        strcat(msgline, " [Interface-Ctrl-Check]");
-+    }
-+    if (irb->scsw.cstat & SCSW_CSTAT_CHAINCHK) {
-+        strcat(msgline, " [Chaining-Check]");
-+    }
-+    strcat(msgline, "\n");
-+    sclp_print(msgline);
-+
-+    print_int("    cpa=", irb->scsw.cpa);
-+    print_int("    prev_ccw=", prev_ccw);
-+    print_int("    this_ccw=", this_ccw);
-+}
-+
- /*
-  * Handles executing ssch, tsch and returns the irb obtained from tsch.
-  * Returns 0 on success, -1 if unexpected status pending and we need to retry,
-@@ -176,6 +398,14 @@ int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
-             continue;
-         }
- 
-+        sclp_print("cio device error\n");
-+        print_int("  ssid  ", schid.ssid);
-+        print_int("  cssid ", schid.cssid);
-+        print_int("  sch_no", schid.sch_no);
-+        sclp_print("\n");
-+        print_irb_err(&irb);
-+        basic_sense(schid, &sd, sizeof(sd));
-+        print_eckd_dasd_sense_data(&sd);
-         rc = -1;
-         break;
-     }
-diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
-index 818517f..bcdc457 100644
---- a/pc-bios/s390-ccw/libc.h
-+++ b/pc-bios/s390-ccw/libc.h
-@@ -67,6 +67,17 @@ static inline size_t strlen(const char *str)
-     return i;
- }
- 
-+static inline char *strcat(char *dest, const char *src)
-+{
-+    int i;
-+    char *dest_end = dest + strlen(dest);
-+
-+    for (i = 0; i <= strlen(src); i++) {
-+        dest_end[i] = src[i];
-+    }
-+    return dest;
-+}
-+
- static inline int isdigit(int c)
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_migration(BdrvDirtyBitmap *bitmap, bool migration)
  {
-     return (c >= '0') && (c <= '9');
+@@ -724,6 +738,11 @@ bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap)
+     return bitmap->persistent && !bitmap->migration;
+ }
+ 
++bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap)
++{
++    return bitmap->inconsistent;
++}
++
+ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs)
+ {
+     BdrvDirtyBitmap *bm;
 -- 
-2.7.4
+2.17.2
