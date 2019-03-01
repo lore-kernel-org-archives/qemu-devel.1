@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39990)
+Received: from eggs.gnu.org ([209.51.188.92]:40209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzelJ-0000FV-UD
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:47:29 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gzem8-0000qK-B5
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:48:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gzelI-0000gT-Qj
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:47:25 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41531)
+	(envelope-from <peter.maydell@linaro.org>) id 1gzem7-00010J-Fm
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:48:16 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:44681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gzelH-0000ex-Vl
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:47:24 -0500
-Received: by mail-oi1-x242.google.com with SMTP id e7so18999351oia.8
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 01:47:21 -0800 (PST)
+	id 1gzem7-000109-Ar
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 04:48:15 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id g1so20389817otj.11
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 01:48:15 -0800 (PST)
 MIME-Version: 1.0
-References: <20190225102433.22401-1-peter.maydell@linaro.org>
-	<20190225102433.22401-2-peter.maydell@linaro.org>
-	<CAKyx-3PZyhNN64O2MQP20MT6Xv2A3yLUsTCD6D08s+NtWMeTXg@mail.gmail.com>
-In-Reply-To: <CAKyx-3PZyhNN64O2MQP20MT6Xv2A3yLUsTCD6D08s+NtWMeTXg@mail.gmail.com>
+References: <20190228221033.14484-1-jcmvbkbc@gmail.com>
+In-Reply-To: <20190228221033.14484-1-jcmvbkbc@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Mar 2019 09:47:09 +0000
-Message-ID: <CAFEAcA_uKj+DTxtTcmFyO+OFibxTFccFBfSbZAAZDL2aGH9-Pg@mail.gmail.com>
+Date: Fri, 1 Mar 2019 09:48:03 +0000
+Message-ID: <CAFEAcA-MjQXvyi=FdYh6X+CdssvhqmCN0va3V6B3pZ6NXe37xw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] ui/cocoa: Ensure we have the
- iothread lock when calling into QEMU
+Subject: Re: [Qemu-devel] [PULL v2 00/40] target/xtensa queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Roman Bolshakov <r.bolshakv@yadro.com>, BALATON Zoltan <balaton@eik.bme.hu>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 28 Feb 2019 at 21:53, G 3 <programmingkidx@gmail.com> wrote:
-> On Mon, Feb 25, 2019 at 5:24 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->> +// Utility function to run specified code block with iothread lock held
->> +typedef void (^CodeBlock)(void);
+On Thu, 28 Feb 2019 at 22:10, Max Filippov <jcmvbkbc@gmail.com> wrote:
 >
+> Hi Peter,
 >
-> Please don't use blocks. It would lock Mac OS X users into having to use CLang. GCC does not support this non-standard extension.
+> please pull the following batch of target/xtensa updates.
+> Changes v1->v2:
+> - fix build with clang.
 >
-> C function pointers and Objective-C's selectors could work in place of blocks.
+> The following changes since commit 1c3d45df5e94042d5fb2bb31416072563ab30e49:
+>
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-02-04' into staging (2019-02-05 12:46:18 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/OSLL/qemu-xtensa.git tags/20190228-xtensa
+>
+> for you to fetch changes up to de0cebd93089ff2ebf2ebf9d287381eb73cbb9aa:
+>
+>   tests/tcg/xtensa: add FPU2000 coprocessor tests (2019-02-28 04:43:24 -0800)
+>
+> ----------------------------------------------------------------
+> target/xtensa: FLIX support, various fixes and test improvements
+>
+> - add FLIX (flexible length instructions extension) support;
+> - make testsuite runnable on wider range of xtensa cores;
+> - add floating point opcode tests;
+> - don't add duplicate 'static' in import_core.sh script;
+> - fix undefined opcodes detection in test_mmuhifi_c3 overlay.
+>
+> ----------------------------------------------------------------
 
-Clang is the standard toolchain for this OS. We have such
-little developer resource for OSX that I don't think we
-can reasonably support two toolchains here. Besides,
-we need blocks to use dispatch_async(), which is a much
-simpler way to achieve what we're trying to do than
-the 10.6 compatible approach.
+Applied, thanks.
 
-Similarly, I am not prepared to continue to support 10.6
-at this point:
- * 10.6's last release was over seven years ago
- * Apple stopped supporting it four years ago
- * there have been multiple OSX releases since then
- * attempting to maintain support for 10.6 would make the
-   code less readable and maintainable for newer OSes
-   we do care about
- * we do not have either the user base or the developer
-   base on OSX to justify maintaining support for this
-   ancient OS version
- * it would be out of line with our overall host OS
-   support policy, which targets only the last LTS
-   version or two of distros and OSes
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-I'm sorry if this is inconvenient to you personally, but
-I don't think it makes any sense as a project to try to
-support this any longer.
-
-thanks
 -- PMM
