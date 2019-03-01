@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43414)
+Received: from eggs.gnu.org ([209.51.188.92]:44570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzoO3-0002YE-7X
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:04:04 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gzoPF-00047J-9i
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gzoO0-0008RS-1y
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:04:02 -0500
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-4-jsnow@redhat.com>
-	<66ebf636-43e1-f16a-bd05-e9a8a766d4bd@redhat.com>
-	<4ee8a7b7-d110-8253-2caa-c8f6ec105bba@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4a58f266-dca6-8208-a046-85b718ed72fc@redhat.com>
-Date: Fri, 1 Mar 2019 14:03:41 -0600
-MIME-Version: 1.0
-In-Reply-To: <4ee8a7b7-d110-8253-2caa-c8f6ec105bba@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] block/dirty-bitmaps: add
- block_dirty_bitmap_check function
+	(envelope-from <richard.henderson@linaro.org>) id 1gzoP5-0001cu-TL
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:10 -0500
+Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:44473)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gzoP3-0001XY-HN
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 15:05:07 -0500
+Received: by mail-pg1-x52e.google.com with SMTP id j3so11905593pgm.11
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 12:05:05 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri,  1 Mar 2019 12:04:51 -0800
+Message-Id: <20190301200501.16533-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 00/10] target/arm: SB, PredInv, CondM,
+ FRINT extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 3/1/19 1:57 PM, John Snow wrote:
+These 5 extensions are small, and all previous editions have
+minor patch conflicts with master.  Therefore, rebase them all
+together for simplicity.
 
->>> +    if ((flags & BDRV_BITMAP_BUSY) && bdrv_dirty_bitmap_busy(bitmap)) {
->>> +        error_setg(errp, "Bitmap '%s' is currently in use by another"
->>> +                   " operation and cannot be used", bitmap->name);
->>
->> Split before space,
->>
 
->>> +        error_setg(errp, "Bitmap '%s' is inconsistent and cannot be used",
->>> +                   bitmap->name);
->>> +        error_append_hint(errp, "Try block-dirty-bitmap-remove to delete "
->>> +                          "this bitmap from disk");
->>
->> split after space.  Looks inconsistent within a single function (pardon
->> the pun :)
->>
-> 
-> Ah... I've never known how to split strings. In fact, does anyone?
-> I'll address this either in staging or as a follow-up, as I assume
-> Vladimir will have some comments for me.
+r~
 
-I don't care which way you go. git says we have both styles with enough
-frequency that I wouldn't rule out the other style in HACKING.  But it
-also says split after space seems more common, if you trust my regex:
 
-$ git grep '"[^"]* "$' | wc
-  11597  120619 1261416
-$ git grep '^[[:space:]]*" [^"]*"' | wc
-   4070   19423  271036
+Richard Henderson (10):
+  target/arm: Split out arm_sctlr
+  target/arm: Implement ARMv8.0-SB
+  target/arm: Implement ARMv8.0-PredInv
+  target/arm: Split helper_msr_i_pstate into 3
+  target/arm: Add set/clear_pstate_bits, share gen_ss_advance
+  target/arm: Rearrange disas_data_proc_reg
+  target/arm: Implement ARMv8.4-CondM
+  target/arm: Implement ARMv8.5-CondM
+  target/arm: Restructure handle_fp_1src_{single,double}
+  target/arm: Implement ARMv8.5-FRINT
+
+ target/arm/cpu.h           |  64 ++++-
+ target/arm/helper-a64.h    |   3 +
+ target/arm/helper.h        |   8 +-
+ target/arm/internals.h     |  15 ++
+ target/arm/translate.h     |  34 +++
+ linux-user/elfload.c       |   2 +
+ target/arm/cpu.c           |   2 +
+ target/arm/cpu64.c         |   6 +
+ target/arm/helper-a64.c    |  30 +++
+ target/arm/helper.c        |  63 ++++-
+ target/arm/op_helper.c     |  47 ----
+ target/arm/translate-a64.c | 476 ++++++++++++++++++++++++++++---------
+ target/arm/translate.c     |  33 ++-
+ target/arm/vfp_helper.c    |  96 ++++++++
+ 14 files changed, 688 insertions(+), 191 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.17.2
