@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54363)
+Received: from eggs.gnu.org ([209.51.188.92]:54376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gzhvI-0006yi-An
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:09:57 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gzhvJ-0006zp-Gp
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:09:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1gzhvH-0004LX-5B
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:09:56 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:58446 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1gzhvG-0003n1-Qn
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:09:55 -0500
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Fri,  1 Mar 2019 14:08:40 +0100
-Message-Id: <1551445720-19622-5-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1551445720-19622-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1551445720-19622-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	(envelope-from <imammedo@redhat.com>) id 1gzhvI-0004MD-6Y
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 08:09:57 -0500
+Date: Fri, 1 Mar 2019 14:09:45 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190301140945.238b5e80@redhat.com>
+In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA8392D8366@lhreml524-mbs.china.huawei.com>
+References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
+	<20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
+	<20190301101204.361adfb6@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8392D81D6@lhreml524-mbs.china.huawei.com>
+	<20190301112635.40200742@redhat.com>
+	<20190301113352.585d54f3@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8392D8366@lhreml524-mbs.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 4/4] target/mips: Optimize support for MSA
- instructions ILVR.<B|H|W|D>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+ hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +29,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+On Fri, 1 Mar 2019 10:51:45 +0000
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-Optimize support for MSA instructions ILVR.B, ILVR.H, ILVR.W, and
-ILVR.D.
+> > -----Original Message-----
+> > From: Qemu-devel
+> > [mailto:qemu-devel-bounces+shameerali.kolothum.thodi=huawei.com@nongn
+> > u.org] On Behalf Of Igor Mammedov
+> > Sent: 01 March 2019 10:34
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
+> > qemu-devel@nongnu.org; Linuxarm <linuxarm@huawei.com>;
+> > eric.auger@redhat.com; qemu-arm@nongnu.org; xuwei (O)
+> > <xuwei5@huawei.com>
+> > Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+> > hotplug support
+> > 
+> > On Fri, 1 Mar 2019 11:26:35 +0100
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >   
+> > > On Fri, 1 Mar 2019 09:23:11 +0000
+> > > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>  
+> > wrote:  
+> > >  
+> > > > > -----Original Message-----
+> > > > > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > > > > Sent: 01 March 2019 09:12
+> > > > > To: Shameerali Kolothum Thodi  
+> > <shameerali.kolothum.thodi@huawei.com>  
+> > > > > Cc: eric.auger@redhat.com; shannon.zhaosl@gmail.com;
+> > > > > peter.maydell@linaro.org; qemu-devel@nongnu.org;  
+> > qemu-arm@nongnu.org;  
+> > > > > Linuxarm <linuxarm@huawei.com>; xuwei (O) <xuwei5@huawei.com>
+> > > > > Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+> > > > > hotplug support
+> > > > >
+> > > > > On Mon, 28 Jan 2019 11:05:45 +0000
+> > > > > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> > > > >  
+> > > > > > pc-dimm memory hotplug is enabled using GPIO(Pin 2) based ACPI
+> > > > > > event. Hot removal functionality is not yet supported.
+> > > > > >
+> > > > > > Signed-off-by: Shameer Kolothum  
+> > <shameerali.kolothum.thodi@huawei.com>  
+> > > > > > ---
+> > > > > >  hw/arm/virt.c | 57  
+> > > > > +++++++++++++++++++++++++++++++++++++++++++++++++++++++--  
+> > > > > >  1 file changed, 55 insertions(+), 2 deletions(-)
+> > > > > >
+> > > > > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > > > > > index 884960d..cf64554 100644
+> > > > > > --- a/hw/arm/virt.c
+> > > > > > +++ b/hw/arm/virt.c
+> > > > > > @@ -62,6 +62,7 @@
+> > > > > >  #include "hw/mem/pc-dimm.h"
+> > > > > >  #include "hw/mem/nvdimm.h"
+> > > > > >  #include "hw/acpi/acpi.h"
+> > > > > > +#include "hw/acpi/pc-hotplug.h"  
+> > > > > it looks like x86 specific file, what is this here for?  
+> > > >
+> > > > Yes. That is for ACPI_MEMORY_HOTPLUG_BASE which is only used by x86
+> > > > at the moment. I guess, it can be moved to hw/acpi/memory_hotplug.h ?  
+> > > it's GPA and pc/q35 impl. specific so you should use it,  
+> > s/should/should not/
+> >   
+> > > this address will always be board specific one.
+> > > Makeup a virt specific one  
+> 
+> Ok. I was under the impression that the offsets can be reused as it is defined
+> here docs/specs/acpi_mem_hotplug.txt(though that is GPE and pc/q35 acpi dev 
+> specific). But agree, it doesn't make sense to make it generic.
+Offsets defined by docs/specs/acpi_mem_hotplug.txt are meant to be reused
+but IO port address (0xa00) where interface's address space starts is board specific.
 
-Optimization is done by eliminating loops, and explicitly assigning
-desired values to individual data elements. Performance measurement
-is done by executing the instructions large number of times on a
-computer with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
 
-Measured time before optimization:
-  ILVR.B:  115.84 ms
-  ILVR.H:   94.20 ms
-  ILVR.W:  121.12 ms
-  ILVR.D:   41.36 ms
+> > > >  
+> > > > > >
+> > > > > >  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+> > > > > >      static void virt_##major##_##minor##_class_init(ObjectClass *oc,  
+> > \  
+> > > > > > @@ -1651,7 +1652,14 @@ static void machvirt_init(MachineState  
+> > > > > *machine)  
+> > > > > >          nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
+> > > > > >                                 vms->fw_cfg, OBJECT(vms));
+> > > > > >      }
+> > > > > > +    if (vms->acpi_memhp_state.is_enabled) {
+> > > > > > +        MemHotplugState *state =  &vms->acpi_memhp_state;
+> > > > > > +        hwaddr base;
+> > > > > >
+> > > > > > +        state->hw_reduced_acpi = true;
+> > > > > > +        base = vms->memmap[VIRT_ACPI_IO].base +  
+> > > > > ACPI_MEMORY_HOTPLUG_BASE;  
+> > > well, this is confusing, why adding 2 base addresses?
+> > > If vms->memmap[VIRT_ACPI_IO].base is already set than why not use it
+> > > as is without adding an offset?  
+> 
+> Well, Eric's work on which this was based had one NVDIMM_ACPI_IO_BASE offset
+> from what appears to be a generic VIRT_ACPI_IO region. Now I see that, it is
+> renamed to VIRT_NVDIMM_ACPI_IO. Do we really need two separate regions?
+I'm afraid we can't reuse MMIO regions as ther might be used at the same time
+and do different things (we would have done this for x86 if it was possible)
 
-Measured time after optimization:
-  ILVR.B:   61.06 ms
-  ILVR.H:   43.03 ms
-  ILVR.W:   39.21 ms
-  ILVR.D:   39.18 ms
+As for naming try to find some consensus/coordinate it with Eric
 
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/msa_helper.c | 59 +++++++++++++++++++++++++++++++++++++++++-=
-------
- 1 file changed, 51 insertions(+), 8 deletions(-)
 
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index a91f5a6..4c7ec05 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1182,14 +1182,6 @@ MSA_FN_DF(pckev_df)
- MSA_FN_DF(pckod_df)
- #undef MSA_DO
-=20
--#define MSA_DO(DF)                      \
--    do {                                \
--        pwx->DF[2*i]   =3D R##DF(pwt, i); \
--        pwx->DF[2*i+1] =3D R##DF(pws, i); \
--    } while (0)
--MSA_FN_DF(ilvr_df)
--#undef MSA_DO
--
- #undef MSA_LOOP_COND
-=20
- #define MSA_LOOP_COND(DF) \
-@@ -1361,6 +1353,57 @@ void helper_msa_ilvl_df(CPUMIPSState *env, uint32_=
-t df, uint32_t wd,
-     }
- }
-=20
-+void helper_msa_ilvr_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-+                        uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
-+
-+    switch (df) {
-+    case DF_BYTE:
-+        pwd->b[15] =3D pws->b[7];
-+        pwd->b[14] =3D pwt->b[7];
-+        pwd->b[13] =3D pws->b[6];
-+        pwd->b[12] =3D pwt->b[6];
-+        pwd->b[11] =3D pws->b[5];
-+        pwd->b[10] =3D pwt->b[5];
-+        pwd->b[9]  =3D pws->b[4];
-+        pwd->b[8]  =3D pwt->b[4];
-+        pwd->b[7]  =3D pws->b[3];
-+        pwd->b[6]  =3D pwt->b[3];
-+        pwd->b[5]  =3D pws->b[2];
-+        pwd->b[4]  =3D pwt->b[2];
-+        pwd->b[3]  =3D pws->b[1];
-+        pwd->b[2]  =3D pwt->b[1];
-+        pwd->b[1]  =3D pws->b[0];
-+        pwd->b[0]  =3D pwt->b[0];
-+        break;
-+    case DF_HALF:
-+        pwd->h[7] =3D pws->h[3];
-+        pwd->h[6] =3D pwt->h[3];
-+        pwd->h[5] =3D pws->h[2];
-+        pwd->h[4] =3D pwt->h[2];
-+        pwd->h[3] =3D pws->h[1];
-+        pwd->h[2] =3D pwt->h[1];
-+        pwd->h[1] =3D pws->h[0];
-+        pwd->h[0] =3D pwt->h[0];
-+        break;
-+    case DF_WORD:
-+        pwd->w[3] =3D pws->w[1];
-+        pwd->w[2] =3D pwt->w[1];
-+        pwd->w[1] =3D pws->w[0];
-+        pwd->w[0] =3D pwt->w[0];
-+        break;
-+    case DF_DOUBLE:
-+        pwd->d[1] =3D pws->d[0];
-+        pwd->d[0] =3D pwt->d[0];
-+        break;
-+    default:
-+        assert(0);
-+    }
-+}
-+
- void helper_msa_sldi_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-                         uint32_t ws, uint32_t n)
- {
---=20
-2.7.4
+> Thanks,
+> Shameer
+> 
+> > >  
+> > > > > > +        acpi_memory_hotplug_init(sysmem, OBJECT(vms), state,  
+> > base);  
+> > > > > > +    }
+> > > > > >      vms->bootinfo.ram_size = machine->ram_size;
+> > > > > >      vms->bootinfo.kernel_filename = machine->kernel_filename;
+> > > > > >      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;  
+> > > > > [...]  
+> > >
+> > >  
+> >   
+> 
