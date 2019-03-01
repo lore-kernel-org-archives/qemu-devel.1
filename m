@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55070)
+Received: from eggs.gnu.org ([209.51.188.92]:55562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzfjb-0003X9-CK
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:49:44 -0500
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1gzflt-0004uf-An
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:52:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzfja-0002ZT-58
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:49:43 -0500
-References: <20190226045304.25618-1-david@gibson.dropbear.id.au>
-	<20190226045304.25618-41-david@gibson.dropbear.id.au>
-	<ec8e11d1-c966-b814-98da-a6ab56572834@redhat.com>
-	<155140389645.9499.14782774845761701651@sif>
-	<4038f585-feaa-2fca-cfb7-ba28416748bf@redhat.com>
-	<20190301114807.0d3a255a@bahia.lan>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b26a4742-4e87-c65f-d3ed-4e37c87bf1fe@redhat.com>
-Date: Fri, 1 Mar 2019 11:49:30 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190301114807.0d3a255a@bahia.lan>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1gzflq-0003kL-O1
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 05:52:04 -0500
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Fri, 1 Mar 2019 10:51:45 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8392D8366@lhreml524-mbs.china.huawei.com>
+References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
+	<20190128110545.20644-4-shameerali.kolothum.thodi@huawei.com>
+	<20190301101204.361adfb6@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8392D81D6@lhreml524-mbs.china.huawei.com>
+	<20190301112635.40200742@redhat.com>
+	<20190301113352.585d54f3@redhat.com>
+In-Reply-To: <20190301113352.585d54f3@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 40/50] spapr_events: add support for phb
- hotplug events
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+ hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,151 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, David Hildenbrand <david@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org
-
-On 01/03/2019 11.48, Greg Kurz wrote:
-> On Fri, 1 Mar 2019 11:30:18 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 01.03.19 02:31, Michael Roth wrote:
->>> Quoting Thomas Huth (2019-02-28 12:40:52)  
->>>> On 26/02/2019 05.52, David Gibson wrote:  
->>>>> From: Michael Roth <mdroth@linux.vnet.ibm.com>
->>>>>
->>>>> Extend the existing EPOW event format we use for PCI
->>>>> devices to emit PHB plug/unplug events.
->>>>>
->>>>> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->>>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>>>> Signed-off-by: Greg Kurz <groug@kaod.org>
->>>>> Message-Id: <155059671405.1466090.535964535260503283.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
->>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>>>> ---
->>>>>  hw/ppc/spapr_events.c | 3 +++
->>>>>  1 file changed, 3 insertions(+)
->>>>>
->>>>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->>>>> index b9c7ecb9e9..ab9a1f0063 100644
->>>>> --- a/hw/ppc/spapr_events.c
->>>>> +++ b/hw/ppc/spapr_events.c
->>>>> @@ -526,6 +526,9 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
->>>>>      case SPAPR_DR_CONNECTOR_TYPE_CPU:
->>>>>          hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_CPU;
->>>>>          break;
->>>>> +    case SPAPR_DR_CONNECTOR_TYPE_PHB:
->>>>> +        hp->hotplug_type = RTAS_LOG_V6_HP_TYPE_PHB;
->>>>> +        break;
->>>>>      default:
->>>>>          /* we shouldn't be signaling hotplug events for resources
->>>>>           * that don't support them  
->>>>
->>>> I think this patch (or something else in this PULL request) broke CPU
->>>> hot-plugging with older machine types:
->>>>
->>>> $ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-test -m=slow
->>>> /ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=6: OK
->>>> /ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=6: OK
->>>> /ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=6: OK
->>>> /ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=6: OK
->>>> /ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=6: OK
->>>> /ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=6: OK
->>>> /ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=6: OK
->>>> /ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=6: **
->>>> ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_to_source: assertion failed: (source->enabled)
->>>> Broken pipe
->>>> /home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
->>>> Aborted (core dumped)
->>>>
->>>> Could you please have a look?  
->>>
->>> Bisected to:
->>>
->>>   commit b8165118f52ce5ee88565d3cec83d30374efdc96
->>>   Author: David Hildenbrand <david@redhat.com>
->>>   Date:   Mon Feb 18 10:21:58 2019 +0100
->>>   
->>>       spapr: support memory unplug for qtest
->>>       
->>>       Fake availability of OV5_HP_EVT, so we can test memory unplug in qtest.
->>>
->>> Which makes sense since OV5_HP_EVT assumes that
->>> spapr->spapr->use_hotplug_event_source == true, which isn't the default for
->>> 2.7 and below.
->>>
->>> If I revert that I think I hit the bug it was meant to fix:
->>>
->>>   mdroth@sif:~/w/qemu-build3$ make V=1 check-qtest-ppc64
->>>   ...
->>>   PASS 1 device-plug-test /ppc64/device-plug/pci-unplug-request
->>>   PASS 2 device-plug-test /ppc64/device-plug/spapr-cpu-unplug-request
->>>   **
->>>   ERROR:/home/mdroth/w/qemu3.git/tests/device-plug-test.c:28:device_del_finish: assertion failed: (qdict_haskey(resp, "return"))
->>>   ERROR - Bail out! ERROR:/home/mdroth/w/qemu3.git/tests/device-plug-test.c:28:device_del_finish: assertion failed: (qdict_haskey(resp, "return"))
->>>   Aborted (core dumped)
->>>   /home/mdroth/w/qemu3.git/tests/Makefile.include:875: recipe for target 'check-qtest-ppc64' failed
->>>   make: *** [check-qtest-ppc64] Error 1
->>>   mdroth@sif:~/w/qemu-build3$
->>>
->>> Which is probably due to this check in spapr_machine_device_unplug_request():
->>>
->>>     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->>>         if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
->>>             spapr_memory_unplug_request(hotplug_dev, dev, errp);
->>>         } else {
->>>             /* NOTE: this means there is a window after guest reset, prior to
->>>              * CAS negotiation, where unplug requests will fail due to the
->>>              * capability not being detected yet. This is a bit different than
->>>              * the case with PCI unplug, where the events will be queued and
->>>              * eventually handled by the guest after boot
->>>              */
->>>             error_setg(errp, "Memory hot unplug not supported for this guest");
->>>         }
->>>
->>>
->>>
->>> This spapr-cpu-unplug-request test is failing because
->>> spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT) relies on the CAS-negotiated OV5 bit,
->>> which wouldn't have happened with qtest. If we want to make these tests run in
->>> this scenario we probably need a different approach than the original patch.  
->>
->> We could rip out the patch along with the spapr memory unplug test.
->> However it feels like a step back to not have any memory unplug tests
->> for QEMU at all.
->>
->> Any spapr experts here if we can work around this?
->>
-> 
-> Not sure about the expertise :) but I'm currently looking into it. As
-> you say, it would be unfortunate to drop a test because of that.
-> 
-
-Could this work:
-
-diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
---- a/hw/ppc/spapr_ovec.c
-+++ b/hw/ppc/spapr_ovec.c
-@@ -12,6 +12,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_ovec.h"
- #include "qemu/bitmap.h"
- #include "exec/address-spaces.h"
-@@ -134,7 +135,9 @@ bool spapr_ovec_test(sPAPROptionVector *ov, long bitnr)
- 
-     /* support memory unplug for qtest */
-     if (qtest_enabled() && bitnr == OV5_HP_EVT) {
--        return true;
-+        sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-+
-+        return spapr->use_hotplug_event_source;
-     }
- 
-     return test_bit(bitnr, ov->bitmap) ? true : false;
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>
 
 
-?
 
- Thomas
+> -----Original Message-----
+> From: Qemu-devel
+> [mailto:qemu-devel-bounces+shameerali.kolothum.thodi=3Dhuawei.com@nongn
+> u.org] On Behalf Of Igor Mammedov
+> Sent: 01 March 2019 10:34
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
+> qemu-devel@nongnu.org; Linuxarm <linuxarm@huawei.com>;
+> eric.auger@redhat.com; qemu-arm@nongnu.org; xuwei (O)
+> <xuwei5@huawei.com>
+> Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-dimm
+> hotplug support
+>=20
+> On Fri, 1 Mar 2019 11:26:35 +0100
+> Igor Mammedov <imammedo@redhat.com> wrote:
+>=20
+> > On Fri, 1 Mar 2019 09:23:11 +0000
+> > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> wrote:
+> >
+> > > > -----Original Message-----
+> > > > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > > > Sent: 01 March 2019 09:12
+> > > > To: Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>
+> > > > Cc: eric.auger@redhat.com; shannon.zhaosl@gmail.com;
+> > > > peter.maydell@linaro.org; qemu-devel@nongnu.org;
+> qemu-arm@nongnu.org;
+> > > > Linuxarm <linuxarm@huawei.com>; xuwei (O) <xuwei5@huawei.com>
+> > > > Subject: Re: [Qemu-devel] [RFC PATCH 3/4] hw/arm/virt: Enable pc-di=
+mm
+> > > > hotplug support
+> > > >
+> > > > On Mon, 28 Jan 2019 11:05:45 +0000
+> > > > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> > > >
+> > > > > pc-dimm memory hotplug is enabled using GPIO(Pin 2) based ACPI
+> > > > > event. Hot removal functionality is not yet supported.
+> > > > >
+> > > > > Signed-off-by: Shameer Kolothum
+> <shameerali.kolothum.thodi@huawei.com>
+> > > > > ---
+> > > > >  hw/arm/virt.c | 57
+> > > > +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> > > > >  1 file changed, 55 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > > > > index 884960d..cf64554 100644
+> > > > > --- a/hw/arm/virt.c
+> > > > > +++ b/hw/arm/virt.c
+> > > > > @@ -62,6 +62,7 @@
+> > > > >  #include "hw/mem/pc-dimm.h"
+> > > > >  #include "hw/mem/nvdimm.h"
+> > > > >  #include "hw/acpi/acpi.h"
+> > > > > +#include "hw/acpi/pc-hotplug.h"
+> > > > it looks like x86 specific file, what is this here for?
+> > >
+> > > Yes. That is for ACPI_MEMORY_HOTPLUG_BASE which is only used by x86
+> > > at the moment. I guess, it can be moved to hw/acpi/memory_hotplug.h ?
+> > it's GPA and pc/q35 impl. specific so you should use it,
+> s/should/should not/
+>=20
+> > this address will always be board specific one.
+> > Makeup a virt specific one
+
+Ok. I was under the impression that the offsets can be reused as it is defi=
+ned
+here docs/specs/acpi_mem_hotplug.txt(though that is GPE and pc/q35 acpi dev=
+=20
+specific). But agree, it doesn't make sense to make it generic.
+
+> > >
+> > > > >
+> > > > >  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+> > > > >      static void virt_##major##_##minor##_class_init(ObjectClass =
+*oc,
+> \
+> > > > > @@ -1651,7 +1652,14 @@ static void machvirt_init(MachineState
+> > > > *machine)
+> > > > >          nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
+> > > > >                                 vms->fw_cfg, OBJECT(vms));
+> > > > >      }
+> > > > > +    if (vms->acpi_memhp_state.is_enabled) {
+> > > > > +        MemHotplugState *state =3D  &vms->acpi_memhp_state;
+> > > > > +        hwaddr base;
+> > > > >
+> > > > > +        state->hw_reduced_acpi =3D true;
+> > > > > +        base =3D vms->memmap[VIRT_ACPI_IO].base +
+> > > > ACPI_MEMORY_HOTPLUG_BASE;
+> > well, this is confusing, why adding 2 base addresses?
+> > If vms->memmap[VIRT_ACPI_IO].base is already set than why not use it
+> > as is without adding an offset?
+
+Well, Eric's work on which this was based had one NVDIMM_ACPI_IO_BASE offse=
+t
+from what appears to be a generic VIRT_ACPI_IO region. Now I see that, it i=
+s
+renamed to VIRT_NVDIMM_ACPI_IO. Do we really need two separate regions?
+
+Thanks,
+Shameer
+
+> >
+> > > > > +        acpi_memory_hotplug_init(sysmem, OBJECT(vms), state,
+> base);
+> > > > > +    }
+> > > > >      vms->bootinfo.ram_size =3D machine->ram_size;
+> > > > >      vms->bootinfo.kernel_filename =3D machine->kernel_filename;
+> > > > >      vms->bootinfo.kernel_cmdline =3D machine->kernel_cmdline;
+> > > > [...]
+> >
+> >
+>=20
