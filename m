@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39724)
+Received: from eggs.gnu.org ([209.51.188.92]:39767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzgkD-0002jV-4n
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:29 -0500
+	(envelope-from <david@redhat.com>) id 1gzgkH-0002k5-QZ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gzgkB-0006CK-W2
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:25 -0500
+	(envelope-from <david@redhat.com>) id 1gzgkF-0006Ey-8y
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 06:54:29 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Fri,  1 Mar 2019 12:53:44 +0100
-Message-Id: <20190301115413.27153-4-david@redhat.com>
+Date: Fri,  1 Mar 2019 12:53:46 +0100
+Message-Id: <20190301115413.27153-6-david@redhat.com>
 In-Reply-To: <20190301115413.27153-1-david@redhat.com>
 References: <20190301115413.27153-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/32] s390x/tcg: Utilities for vector
- instruction helpers
+Subject: [Qemu-devel] [PATCH v2 05/32] s390x/tcg: Implement VECTOR GENERATE
+ BYTE MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,166 +23,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-We'll have to read/write vector elements quite frequently from helpers.
-The tricky bit is properly taking care of endianess. Handle it similar
-to aarch64.
-
-target/s390x/vec_helper.c will later also contain vector support
-instruction helpers.
+Let's optimize it for the common cases (setting a vector to zero or all
+ones) - courtesy of Richard.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/Makefile.objs |  1 +
- target/s390x/vec.h         | 31 +++++++++++++
- target/s390x/vec_helper.c  | 90 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 122 insertions(+)
- create mode 100644 target/s390x/vec.h
- create mode 100644 target/s390x/vec_helper.c
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate.c        |  1 +
+ target/s390x/translate_vx.inc.c | 39 +++++++++++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+)
 
-diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
-index 22a9a9927a..68eeee3d2f 100644
---- a/target/s390x/Makefile.objs
-+++ b/target/s390x/Makefile.objs
-@@ -1,6 +1,7 @@
- obj-y += cpu.o cpu_models.o cpu_features.o gdbstub.o interrupt.o helper.o
- obj-$(CONFIG_TCG) += translate.o cc_helper.o excp_helper.o fpu_helper.o
- obj-$(CONFIG_TCG) += int_helper.o mem_helper.o misc_helper.o crypto_helper.o
-+obj-$(CONFIG_TCG) += vec_helper.o
- obj-$(CONFIG_SOFTMMU) += machine.o ioinst.o arch_dump.o mmu_helper.o diag.o
- obj-$(CONFIG_SOFTMMU) += sigp.o
- obj-$(CONFIG_KVM) += kvm.o
-diff --git a/target/s390x/vec.h b/target/s390x/vec.h
-new file mode 100644
-index 0000000000..c03be1a9c9
---- /dev/null
-+++ b/target/s390x/vec.h
-@@ -0,0 +1,31 @@
-+/*
-+ * QEMU TCG support -- s390x vector utilitites
-+ *
-+ * Copyright (C) 2019 Red Hat Inc
-+ *
-+ * Authors:
-+ *   David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#ifndef S390X_VEC_H
-+#define S390X_VEC_H
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 7d128ac9d6..d3f66c858f 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -977,6 +977,8 @@
+ /* VECTOR GATHER ELEMENT */
+     E(0xe713, VGEF,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_32, IF_VEC)
+     E(0xe712, VGEG,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_64, IF_VEC)
++/* VECTOR GENERATE BYTE MASK */
++    F(0xe744, VGBM,    VRI_a, V,   0, 0, 0, 0, vgbm, 0, IF_VEC)
+ 
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index a1c6698dea..588fc21dd2 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -34,6 +34,7 @@
+ #include "disas/disas.h"
+ #include "exec/exec-all.h"
+ #include "tcg-op.h"
++#include "tcg-op-gvec.h"
+ #include "qemu/log.h"
+ #include "qemu/host-utils.h"
+ #include "exec/cpu_ldst.h"
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
+index 9864ec5134..395c0ebcc2 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -112,6 +112,9 @@ static void write_vec_element_i64(TCGv_i64 src, int reg, uint8_t enr,
+     }
+ }
+ 
++#define gen_gvec_dup64i(v1, c) \
++    tcg_gen_gvec_dup64i(vec_full_reg_offset(v1), 16, 16, c)
 +
-+typedef union S390Vector {
-+    uint64_t doubleword[2];
-+    uint32_t word[4];
-+    uint16_t halfword[8];
-+    uint8_t byte[16];
-+} S390Vector;
+ static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
+ {
+     const uint8_t es = s->insn->data;
+@@ -133,3 +136,39 @@ static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
+     tcg_temp_free_i64(tmp);
+     return DISAS_NEXT;
+ }
 +
-+uint8_t s390_vec_read_element8(const S390Vector *v, uint8_t enr);
-+uint16_t s390_vec_read_element16(const S390Vector *v, uint8_t enr);
-+uint32_t s390_vec_read_element32(const S390Vector *v, uint8_t enr);
-+uint64_t s390_vec_read_element64(const S390Vector *v, uint8_t enr);
-+void s390_vec_write_element8(S390Vector *v, uint8_t enr, uint8_t data);
-+void s390_vec_write_element16(S390Vector *v, uint8_t enr, uint16_t data);
-+void s390_vec_write_element32(S390Vector *v, uint8_t enr, uint32_t data);
-+void s390_vec_write_element64(S390Vector *v, uint8_t enr, uint64_t data);
-+
-+#endif /* S390X_VEC_H */
-diff --git a/target/s390x/vec_helper.c b/target/s390x/vec_helper.c
-new file mode 100644
-index 0000000000..3e21e440ba
---- /dev/null
-+++ b/target/s390x/vec_helper.c
-@@ -0,0 +1,90 @@
-+/*
-+ * QEMU TCG support -- s390x vector support instructions and utilitites
-+ *
-+ * Copyright (C) 2019 Red Hat Inc
-+ *
-+ * Authors:
-+ *   David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "vec.h"
-+#include "tcg/tcg.h"
-+
-+/*
-+ * Each vector is stored as two 64bit host values. So when talking about
-+ * byte/halfword/word numbers, we have to take care of proper translation
-+ * between element numbers.
-+ *
-+ * Big Endian (target/possible host)
-+ * B:  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7] - [ 8][ 9][10][11][12][13][14][15]
-+ * HW: [     0][     1][     2][     3] - [     4][     5][     6][     7]
-+ * W:  [             0][             1] - [             2][             3]
-+ * DW: [                             0] - [                             1]
-+ *
-+ * Little Endian (possible host)
-+ * B:  [ 7][ 6][ 5][ 4][ 3][ 2][ 1][ 0] - [15][14][13][12][11][10][ 9][ 8]
-+ * HW: [     3][     2][     1][     0] - [     7][     6][     5][     4]
-+ * W:  [             1][             0] - [             3][             2]
-+ * DW: [                             0] - [                             1]
-+ */
-+#ifndef HOST_WORDS_BIGENDIAN
-+#define H1(x)  ((x) ^ 7)
-+#define H2(x)  ((x) ^ 3)
-+#define H4(x)  ((x) ^ 1)
-+#else
-+#define H1(x)  (x)
-+#define H2(x)  (x)
-+#define H4(x)  (x)
-+#endif
-+
-+uint8_t s390_vec_read_element8(const S390Vector *v, uint8_t enr)
++static uint64_t generate_byte_mask(uint8_t mask)
 +{
-+    g_assert(enr < 16);
-+    return v->byte[H1(enr)];
++    uint64_t r = 0;
++    int i;
++
++    for (i = 0; i < 8; i++) {
++        if ((mask >> i) & 1) {
++            r |= 0xffull << (i * 8);
++        }
++    }
++    return r;
 +}
 +
-+uint16_t s390_vec_read_element16(const S390Vector *v, uint8_t enr)
++static DisasJumpType op_vgbm(DisasContext *s, DisasOps *o)
 +{
-+    g_assert(enr < 8);
-+    return v->halfword[H2(enr)];
-+}
++    const uint16_t i2 = get_field(s->fields, i2);
 +
-+uint32_t s390_vec_read_element32(const S390Vector *v, uint8_t enr)
-+{
-+    g_assert(enr < 4);
-+    return v->word[H4(enr)];
-+}
++    if (i2 == (i2 & 0xff) * 0x0101) {
++        /*
++         * Masks for both 64 bit elements of the vector are the same.
++         * Trust tcg to produce a good constant loading.
++         */
++        gen_gvec_dup64i(get_field(s->fields, v1),
++                        generate_byte_mask(i2 & 0xff));
++    } else {
++        TCGv_i64 t = tcg_temp_new_i64();
 +
-+uint64_t s390_vec_read_element64(const S390Vector *v, uint8_t enr)
-+{
-+    g_assert(enr < 2);
-+    return v->doubleword[enr];
-+}
-+
-+void s390_vec_write_element8(S390Vector *v, uint8_t enr, uint8_t data)
-+{
-+    g_assert(enr < 16);
-+    v->byte[H1(enr)] = data;
-+}
-+
-+void s390_vec_write_element16(S390Vector *v, uint8_t enr, uint16_t data)
-+{
-+    g_assert(enr < 8);
-+    v->halfword[H2(enr)] = data;
-+}
-+
-+void s390_vec_write_element32(S390Vector *v, uint8_t enr, uint32_t data)
-+{
-+    g_assert(enr < 4);
-+    v->word[H4(enr)] = data;
-+}
-+
-+void s390_vec_write_element64(S390Vector *v, uint8_t enr, uint64_t data)
-+{
-+    g_assert(enr < 2);
-+    v->doubleword[enr] = data;
++        tcg_gen_movi_i64(t, generate_byte_mask(i2 >> 8));
++        write_vec_element_i64(t, get_field(s->fields, v1), 0, ES_64);
++        tcg_gen_movi_i64(t, generate_byte_mask(i2));
++        write_vec_element_i64(t, get_field(s->fields, v1), 1, ES_64);
++        tcg_temp_free_i64(t);
++    }
++    return DISAS_NEXT;
 +}
 -- 
 2.17.2
