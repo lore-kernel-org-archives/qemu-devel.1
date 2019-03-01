@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54925)
+Received: from eggs.gnu.org ([209.51.188.92]:55232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gznSV-0001DI-U8
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:04:37 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznTV-00025Q-J2
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gznSU-0001f0-A7
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:04:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37508
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznTT-0002mt-9C
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:37 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39192
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gznST-0001bA-8M
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:04:34 -0500
+	id 1gznTS-0002fM-T6
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:05:35 -0500
 Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x21J3hGU007043
-	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:04:32 -0500
+	x21J3bAa007021
+	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:05:26 -0500
 Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qy7geg154-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qy7geg16b-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:04:15 -0500
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:04:04 -0500
 Received: from localhost
 	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Fri, 1 Mar 2019 18:59:43 -0000
+	Fri, 1 Mar 2019 18:59:45 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Fri,  1 Mar 2019 13:59:27 -0500
+Date: Fri,  1 Mar 2019 13:59:33 -0500
 In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
 References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1551466776-29123-8-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 07/16] s390-bios: Decouple channel i/o logic
- from virtio
+Message-Id: <1551466776-29123-14-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 13/16] s390-bios: Use control unit type to
+ determine boot method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,205 +41,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Create a separate library for channel i/o related code. This decouples
-channel i/o operations from virtio and allows us to make use of them for
-the real dasd boot path.
+The boot method is different depending on which device type we are
+booting from. Let's examine the control unit type to determine if we're
+a virtio device. We'll eventually add a case to check for a real dasd device
+here as well.
+
+Since we have to call enable_subchannel() in main now, might as well
+remove that call from virtio.c : run_ccw().
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 ---
- pc-bios/s390-ccw/Makefile    |  2 +-
- pc-bios/s390-ccw/cio.c       | 43 +++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/cio.h       |  3 +++
- pc-bios/s390-ccw/main.c      |  1 +
- pc-bios/s390-ccw/netboot.mak |  2 +-
- pc-bios/s390-ccw/netmain.c   |  1 +
- pc-bios/s390-ccw/s390-ccw.h  |  1 -
- pc-bios/s390-ccw/virtio.c    | 27 ++-------------------------
- 8 files changed, 52 insertions(+), 28 deletions(-)
- create mode 100644 pc-bios/s390-ccw/cio.c
+ pc-bios/s390-ccw/main.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 1eb316b..12ad9c1 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -10,7 +10,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
- .PHONY : all clean build-all
- 
- OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
--	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o
-+	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o cio.o
- 
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
-diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
-new file mode 100644
-index 0000000..605f6f0
---- /dev/null
-+++ b/pc-bios/s390-ccw/cio.c
-@@ -0,0 +1,43 @@
-+/*
-+ * S390 Channel I/O
-+ *
-+ * Copyright 2017 Alexander Graf & IBM Corp.
-+ * Author(s): Alexander Graf <agraf@suse.de>
-+ *            Jason J. Herne <jjherne@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "libc.h"
-+#include "s390-ccw.h"
-+#include "cio.h"
-+
-+static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
-+
-+int enable_mss_facility(void)
-+{
-+    int ret;
-+    ChscAreaSda *sda_area = (ChscAreaSda *) chsc_page;
-+
-+    memset(sda_area, 0, PAGE_SIZE);
-+    sda_area->request.length = 0x0400;
-+    sda_area->request.code = 0x0031;
-+    sda_area->operation_code = 0x2;
-+
-+    ret = chsc(sda_area);
-+    if ((ret == 0) && (sda_area->response.code == 0x0001)) {
-+        return 0;
-+    }
-+    return -EIO;
-+}
-+
-+void enable_subchannel(SubChannelId schid)
-+{
-+    Schib schib;
-+
-+    stsch_err(schid, &schib);
-+    schib.pmcw.ena = 1;
-+    msch(schid, &schib);
-+}
-diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-index 2f58256..d454050 100644
---- a/pc-bios/s390-ccw/cio.h
-+++ b/pc-bios/s390-ccw/cio.h
-@@ -213,6 +213,9 @@ typedef struct irb {
-     __u32 emw[8];
- }  __attribute__ ((packed, aligned(4))) Irb;
- 
-+int enable_mss_facility(void);
-+void enable_subchannel(SubChannelId schid);
-+
- /*
-  * Some S390 specific IO instructions as inline
-  */
 diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 5b2b941..2d912cb 100644
+index 0670c14..ed79b7a 100644
 --- a/pc-bios/s390-ccw/main.c
 +++ b/pc-bios/s390-ccw/main.c
-@@ -10,6 +10,7 @@
+@@ -198,13 +198,24 @@ static void virtio_setup(void)
  
- #include "libc.h"
- #include "s390-ccw.h"
-+#include "cio.h"
- #include "virtio.h"
- 
- char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
-diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
-index 14e96b2..5eefb7c 100644
---- a/pc-bios/s390-ccw/netboot.mak
-+++ b/pc-bios/s390-ccw/netboot.mak
-@@ -1,7 +1,7 @@
- 
- SLOF_DIR := $(SRC_PATH)/roms/SLOF
- 
--NETOBJS := start.o sclp.o virtio.o virtio-net.o jump2ipl.o netmain.o \
-+NETOBJS := start.o sclp.o cio.o virtio.o virtio-net.o jump2ipl.o netmain.o \
- 	   libnet.a libc.a
- 
- LIBC_INC := -nostdinc -I$(SLOF_DIR)/lib/libc/include
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index 0392131..5189c0f 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -33,6 +33,7 @@
- #include <pxelinux.h>
- 
- #include "s390-ccw.h"
-+#include "cio.h"
- #include "virtio.h"
- 
- #define DEFAULT_BOOT_RETRIES 10
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 241c6d0..b39ee5d 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -72,7 +72,6 @@ unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
- bool virtio_is_supported(SubChannelId schid);
- void virtio_blk_setup_device(SubChannelId schid);
- int virtio_read(ulong sector, void *load_addr);
--int enable_mss_facility(void);
- u64 get_clock(void);
- ulong get_second(void);
- 
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index cdb66f4..aa9da72 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -10,6 +10,7 @@
- 
- #include "libc.h"
- #include "s390-ccw.h"
-+#include "cio.h"
- #include "virtio.h"
- #include "virtio-scsi.h"
- #include "bswap.h"
-@@ -20,8 +21,6 @@ static VRing block[VIRTIO_MAX_VQS];
- static char ring_area[VIRTIO_RING_SIZE * VIRTIO_MAX_VQS]
-                      __attribute__((__aligned__(PAGE_SIZE)));
- 
--static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
--
- static VDev vdev = {
-     .nr_vqs = 1,
-     .vrings = block,
-@@ -94,14 +93,9 @@ static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
+ int main(void)
  {
-     Ccw1 ccw = {};
-     CmdOrb orb = {};
--    Schib schib;
-     int r;
++    uint16_t cutype;
++
+     sclp_setup();
+     css_setup();
+     boot_setup();
+     find_boot_device();
++    enable_subchannel(blk_schid);
  
--    /* start command processing */
--    stsch_err(vdev->schid, &schib);
--    /* enable the subchannel for IPL device */
--    schib.pmcw.ena = 1;
--    msch(vdev->schid, &schib);
-+    enable_subchannel(vdev->schid);
+-    virtio_setup();
+-    zipl_load(); /* no return */
++    cutype = cu_type(blk_schid);
++    switch (cutype) {
++    case CU_TYPE_VIRTIO:
++        virtio_setup();
++        zipl_load(); /* no return */
++        break;
++    default:
++        print_int("Attempting to boot from unexpected device type", cutype);
++        panic("");
++    }
  
-     /* start subchannel command */
-     orb.fmt = 1;
-@@ -343,20 +337,3 @@ bool virtio_is_supported(SubChannelId schid)
-     }
-     return false;
- }
--
--int enable_mss_facility(void)
--{
--    int ret;
--    ChscAreaSda *sda_area = (ChscAreaSda *) chsc_page;
--
--    memset(sda_area, 0, PAGE_SIZE);
--    sda_area->request.length = 0x0400;
--    sda_area->request.code = 0x0031;
--    sda_area->operation_code = 0x2;
--
--    ret = chsc(sda_area);
--    if ((ret == 0) && (sda_area->response.code == 0x0001)) {
--        return 0;
--    }
--    return -EIO;
--}
+     panic("Failed to load OS from hard disk\n");
+     return 0; /* make compiler happy */
 -- 
 2.7.4
