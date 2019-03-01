@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52490)
+Received: from eggs.gnu.org ([209.51.188.92]:52546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gznPL-0007BS-FQ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:01:20 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznPV-0007HB-Jx
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gznPJ-0005fI-2O
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:01:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53204)
+	(envelope-from <jjherne@linux.ibm.com>) id 1gznPL-0005jU-EC
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:01:23 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54724)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gznPE-0005Xm-IC
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:01:15 -0500
+	id 1gznPJ-0005cN-0K
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 14:01:17 -0500
 Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x21J109c018553
-	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:01:09 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qy8grdhe7-1
+	x21J0pA8018263
+	for <qemu-devel@nongnu.org>; Fri, 1 Mar 2019 14:01:14 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qy8grdhf5-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:01:05 -0500
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 14:01:02 -0500
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Fri, 1 Mar 2019 18:59:44 -0000
+	Fri, 1 Mar 2019 18:59:45 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Fri,  1 Mar 2019 13:59:28 -0500
+Date: Fri,  1 Mar 2019 13:59:32 -0500
 In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
 References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1551466776-29123-9-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 08/16] s390-bios: Map low core memory
+Message-Id: <1551466776-29123-13-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 12/16] s390-bios: Refactor virtio to run
+ channel programs via cio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,144 +40,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Create a new header for basic architecture specific definitions and add a
-mapping of low core memory. This mapping will be used by the real dasd boot
-process.
+Now that we have a Channel I/O library let's modify virtio boot code to
+make use of it for running channel programs.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 ---
- pc-bios/s390-ccw/main.c      |   2 +
- pc-bios/s390-ccw/s390-arch.h | 102 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 104 insertions(+)
- create mode 100644 pc-bios/s390-ccw/s390-arch.h
+ pc-bios/s390-ccw/virtio.c | 49 +++++++++++++++++++----------------------------
+ 1 file changed, 20 insertions(+), 29 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 2d912cb..0670c14 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -9,6 +9,7 @@
-  */
- 
- #include "libc.h"
-+#include "s390-arch.h"
- #include "s390-ccw.h"
- #include "cio.h"
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index aa9da72..711daf5 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -14,6 +14,7 @@
  #include "virtio.h"
-@@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static bool have_iplb;
-+const LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
+ #include "virtio-scsi.h"
+ #include "bswap.h"
++#include "helper.h"
  
- #define LOADPARM_PROMPT "PROMPT  "
- #define LOADPARM_EMPTY  "        "
-diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-new file mode 100644
-index 0000000..6facce0
---- /dev/null
-+++ b/pc-bios/s390-ccw/s390-arch.h
-@@ -0,0 +1,102 @@
-+/*
-+ * S390 Basic Architecture
-+ *
-+ * Copyright (c) 2019 Jason J. Herne <jjherne@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
+ #define VRING_WAIT_REPLY_TIMEOUT 30
+ 
+@@ -89,33 +90,20 @@ int drain_irqs(SubChannelId schid)
+     }
+ }
+ 
+-static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
++static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
+ {
+     Ccw1 ccw = {};
+-    CmdOrb orb = {};
+-    int r;
+-
+-    enable_subchannel(vdev->schid);
+-
+-    /* start subchannel command */
+-    orb.fmt = 1;
+-    orb.cpa = (u32)(long)&ccw;
+-    orb.lpm = 0x80;
+ 
+     ccw.cmd_code = cmd;
+     ccw.cda = (long)ptr;
+     ccw.count = len;
+ 
+-    r = ssch(vdev->schid, &orb);
+-    /*
+-     * XXX Wait until device is done processing the CCW. For now we can
+-     *     assume that a simple tsch will have finished the CCW processing,
+-     *     but the architecture allows for asynchronous operation
+-     */
+-    if (!r) {
+-        r = drain_irqs(vdev->schid);
++    if (sli) {
++        ccw.flags |= CCW_FLAG_SLI;
+     }
+-    return r;
 +
-+#ifndef S390_ARCH_H
-+#define S390_ARCH_H
-+
-+typedef struct PSW {
-+    uint64_t mask;
-+    uint64_t addr;
-+} __attribute__ ((aligned(8))) PSW;
-+_Static_assert(sizeof(struct PSW) == 16, "PSW size incorrect");
-+
-+/* Older PSW format used by LPSW instruction */
-+typedef struct PSWLegacy {
-+    uint32_t mask;
-+    uint32_t addr;
-+} __attribute__ ((aligned(8))) PSWLegacy;
-+_Static_assert(sizeof(struct PSWLegacy) == 8, "PSWLegacy size incorrect");
-+
-+/* s390 psw bit masks */
-+#define PSW_MASK_IOINT      0x0200000000000000ULL
-+#define PSW_MASK_WAIT       0x0002000000000000ULL
-+#define PSW_MASK_EAMODE     0x0000000100000000ULL
-+#define PSW_MASK_BAMODE     0x0000000080000000ULL
-+#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
-+
-+/* Low core mapping */
-+typedef struct LowCore {
-+    /* prefix area: defined by architecture */
-+    PSWLegacy       ipl_psw;                  /* 0x000 */
-+    uint32_t        ccw1[2];                  /* 0x008 */
-+    uint32_t        ccw2[2];                  /* 0x010 */
-+    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
-+    uint32_t        ext_params;               /* 0x080 */
-+    uint16_t        cpu_addr;                 /* 0x084 */
-+    uint16_t        ext_int_code;             /* 0x086 */
-+    uint16_t        svc_ilen;                 /* 0x088 */
-+    uint16_t        svc_code;                 /* 0x08a */
-+    uint16_t        pgm_ilen;                 /* 0x08c */
-+    uint16_t        pgm_code;                 /* 0x08e */
-+    uint32_t        data_exc_code;            /* 0x090 */
-+    uint16_t        mon_class_num;            /* 0x094 */
-+    uint16_t        per_perc_atmid;           /* 0x096 */
-+    uint64_t        per_address;              /* 0x098 */
-+    uint8_t         exc_access_id;            /* 0x0a0 */
-+    uint8_t         per_access_id;            /* 0x0a1 */
-+    uint8_t         op_access_id;             /* 0x0a2 */
-+    uint8_t         ar_access_id;             /* 0x0a3 */
-+    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
-+    uint64_t        trans_exc_code;           /* 0x0a8 */
-+    uint64_t        monitor_code;             /* 0x0b0 */
-+    uint16_t        subchannel_id;            /* 0x0b8 */
-+    uint16_t        subchannel_nr;            /* 0x0ba */
-+    uint32_t        io_int_parm;              /* 0x0bc */
-+    uint32_t        io_int_word;              /* 0x0c0 */
-+    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
-+    uint32_t        stfl_fac_list;            /* 0x0c8 */
-+    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
-+    uint64_t        mcic;                     /* 0x0e8 */
-+    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
-+    uint32_t        external_damage_code;     /* 0x0f4 */
-+    uint64_t        failing_storage_address;  /* 0x0f8 */
-+    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
-+    uint64_t        per_breaking_event_addr;  /* 0x110 */
-+    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
-+    PSW             restart_old_psw;          /* 0x120 */
-+    PSW             external_old_psw;         /* 0x130 */
-+    PSW             svc_old_psw;              /* 0x140 */
-+    PSW             program_old_psw;          /* 0x150 */
-+    PSW             mcck_old_psw;             /* 0x160 */
-+    PSW             io_old_psw;               /* 0x170 */
-+    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
-+    PSW             restart_new_psw;          /* 0x1a0 */
-+    PSW             external_new_psw;         /* 0x1b0 */
-+    PSW             svc_new_psw;              /* 0x1c0 */
-+    PSW             program_new_psw;          /* 0x1d0 */
-+    PSW             mcck_new_psw;             /* 0x1e0 */
-+    PSW             io_new_psw;               /* 0x1f0 */
-+    PSW             return_psw;               /* 0x200 */
-+    uint8_t         irb[64];                  /* 0x210 */
-+    uint64_t        sync_enter_timer;         /* 0x250 */
-+    uint64_t        async_enter_timer;        /* 0x258 */
-+    uint64_t        exit_timer;               /* 0x260 */
-+    uint64_t        last_update_timer;        /* 0x268 */
-+    uint64_t        user_timer;               /* 0x270 */
-+    uint64_t        system_timer;             /* 0x278 */
-+    uint64_t        last_update_clock;        /* 0x280 */
-+    uint64_t        steal_clock;              /* 0x288 */
-+    PSW             return_mcck_psw;          /* 0x290 */
-+    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
-+} __attribute__((packed, aligned(8192))) LowCore;
-+
-+extern const LowCore *lowcore;
-+
-+#endif
++    enable_subchannel(vdev->schid);
++    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
+ }
+ 
+ static void vring_init(VRing *vr, VqInfo *info)
+@@ -257,7 +245,7 @@ void virtio_setup_ccw(VDev *vdev)
+     vdev->config.blk.blk_size = 0; /* mark "illegal" - setup started... */
+     vdev->guessed_disk_nature = VIRTIO_GDN_NONE;
+ 
+-    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
++    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0, false);
+ 
+     switch (vdev->senseid.cu_model) {
+     case VIRTIO_ID_NET:
+@@ -278,18 +266,19 @@ void virtio_setup_ccw(VDev *vdev)
+     default:
+         panic("Unsupported virtio device\n");
+     }
+-    IPL_assert(run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size) == 0,
+-               "Could not get block device configuration");
++    IPL_assert(
++        run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size, false) == 0,
++       "Could not get block device configuration");
+ 
+     /* Feature negotiation */
+     for (i = 0; i < ARRAY_SIZE(vdev->guest_features); i++) {
+         feats.features = 0;
+         feats.index = i;
+-        rc = run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats));
++        rc = run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats), false);
+         IPL_assert(rc == 0, "Could not get features bits");
+         vdev->guest_features[i] &= bswap32(feats.features);
+         feats.features = bswap32(vdev->guest_features[i]);
+-        rc = run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats));
++        rc = run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats), false);
+         IPL_assert(rc == 0, "Could not set features bits");
+     }
+ 
+@@ -306,16 +295,17 @@ void virtio_setup_ccw(VDev *vdev)
+         };
+ 
+         IPL_assert(
+-            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config)) == 0,
++            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config), false) == 0,
+             "Could not get block device VQ configuration");
+         info.num = config.num;
+         vring_init(&vdev->vrings[i], &info);
+         vdev->vrings[i].schid = vdev->schid;
+-        IPL_assert(run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info)) == 0,
+-                   "Cannot set VQ info");
++        IPL_assert(
++            run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info), false) == 0,
++            "Cannot set VQ info");
+     }
+     IPL_assert(
+-        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status)) == 0,
++        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status), false) == 0,
+         "Could not write status to host");
+ }
+ 
+@@ -324,7 +314,8 @@ bool virtio_is_supported(SubChannelId schid)
+     vdev.schid = schid;
+     memset(&vdev.senseid, 0, sizeof(vdev.senseid));
+     /* run sense id command */
+-    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid))) {
++    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid),
++                true)) {
+         return false;
+     }
+     if (vdev.senseid.cu_type == 0x3832) {
 -- 
 2.7.4
