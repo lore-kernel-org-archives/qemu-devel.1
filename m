@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34525)
+Received: from eggs.gnu.org ([209.51.188.92]:34521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1gzY9M-0002MS-IJ
-	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 21:43:49 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gzY9M-0002MH-Dg
+	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 21:43:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1gzY9L-0000tG-Ez
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gzY9K-0000sY-Kt
 	for qemu-devel@nongnu.org; Thu, 28 Feb 2019 21:43:48 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri,  1 Mar 2019 13:43:16 +1100
-Message-Id: <20190301024317.22137-3-sjitindarsingh@gmail.com>
+Date: Fri,  1 Mar 2019 13:43:15 +1100
+Message-Id: <20190301024317.22137-2-sjitindarsingh@gmail.com>
 In-Reply-To: <20190301024317.22137-1-sjitindarsingh@gmail.com>
 References: <20190301024317.22137-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH v3 3/4] target/ppc: Implement large
- decrementer support for KVM
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH v3 2/4] target/ppc: Implement large
+ decrementer support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,167 +26,391 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: david@gibson.dropbear.id.au, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Implement support to allow KVM guests to take advantage of the large
-decrementer introduced on POWER9 cpus.
+Prior to POWER9 the decrementer was a 32-bit register which decremented
+with each tick of the timebase. From POWER9 onwards the decrementer can
+be set to operate in a mode called large decrementer where it acts as a
+n-bit decrementing register which is visible as a 64-bit register, that
+is the value of the decrementer is sign extended to 64 bits (where n is
+implementation dependant).
 
-To determine if the host can support the requested large decrementer
-size, we check it matches that specified in the ibm,dec-bits device-tree
-property. We also need to enable it in KVM by setting the LPCR_LD bit in
-the LPCR. Note that to do this we need to try and set the bit, then read
-it back to check the host allowed us to set it, if so we can use it but
-if we were unable to set it the host cannot support it and we must not
-use the large decrementer.
+The mode in which the decrementer operates is controlled by the LPCR_LD
+bit in the logical paritition control register (LPCR).
+
+>From POWER9 onwards the HDEC (hypervisor decrementer) was enlarged to
+h-bits, also sign extended to 64 bits (where h is implementation
+dependant). Note this isn't configurable and is always enabled.
+
+On POWER9 the large decrementer and hdec are both 56 bits, as
+represented by the lrg_decr_bits cpu class property. Since they are the
+same size we only add one property for now, which could be extended in
+the case they ever differ in the future.
+
+We also add the lrg_decr_bits property for POWER5+/7/8 since it is used
+to determine the size of the hdec, which is only generated on the
+POWER5+ processor and later. On these processors it is 32 bits.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr_caps.c  | 17 +++++++++++++++--
- target/ppc/kvm.c     | 39 +++++++++++++++++++++++++++++++++++++++
- target/ppc/kvm_ppc.h | 12 ++++++++++++
- 3 files changed, 66 insertions(+), 2 deletions(-)
+ hw/ppc/ppc.c                    | 85 ++++++++++++++++++++++++++++-------------
+ hw/ppc/spapr.c                  |  8 ++++
+ hw/ppc/spapr_caps.c             | 31 ++++++++++++++-
+ target/ppc/cpu-qom.h            |  1 +
+ target/ppc/cpu.h                |  8 ++--
+ target/ppc/mmu-hash64.c         |  2 +-
+ target/ppc/translate.c          |  2 +-
+ target/ppc/translate_init.inc.c |  4 ++
+ 8 files changed, 108 insertions(+), 33 deletions(-)
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 32f68cbd9e..1e76685199 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -406,8 +406,16 @@ static void cap_large_decr_apply(sPAPRMachineState *spapr,
-                 "Large decrementer only supported on POWER9, try -cpu POWER9");
-             return;
-         }
--    } else {
--        error_setg(errp, "No large decrementer support, try cap-large-decr=off");
-+    } else if (kvm_enabled()) {
-+        int kvm_nr_bits = kvmppc_get_cap_large_decr();
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index d1e3d4cd20..9145aeddcb 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -744,11 +744,10 @@ bool ppc_decr_clear_on_delivery(CPUPPCState *env)
+     return ((tb_env->flags & flags) == PPC_DECR_UNDERFLOW_TRIGGERED);
+ }
+ 
+-static inline uint32_t _cpu_ppc_load_decr(CPUPPCState *env, uint64_t next)
++static inline int64_t _cpu_ppc_load_decr(CPUPPCState *env, uint64_t next)
+ {
+     ppc_tb_t *tb_env = env->tb_env;
+-    uint32_t decr;
+-    int64_t diff;
++    int64_t decr, diff;
+ 
+     diff = next - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     if (diff >= 0) {
+@@ -758,27 +757,47 @@ static inline uint32_t _cpu_ppc_load_decr(CPUPPCState *env, uint64_t next)
+     }  else {
+         decr = -muldiv64(-diff, tb_env->decr_freq, NANOSECONDS_PER_SECOND);
+     }
+-    LOG_TB("%s: %08" PRIx32 "\n", __func__, decr);
++    LOG_TB("%s: %016" PRIx64 "\n", __func__, decr);
+ 
+     return decr;
+ }
+ 
+-uint32_t cpu_ppc_load_decr (CPUPPCState *env)
++target_ulong cpu_ppc_load_decr (CPUPPCState *env)
+ {
+     ppc_tb_t *tb_env = env->tb_env;
++    uint64_t decr;
+ 
+     if (kvm_enabled()) {
+         return env->spr[SPR_DECR];
+     }
+ 
+-    return _cpu_ppc_load_decr(env, tb_env->decr_next);
++    decr = _cpu_ppc_load_decr(env, tb_env->decr_next);
 +
-+        if (!kvm_nr_bits) {
-+            error_setg(errp, "No large decrementer support, try cap-large-decr=off");
-+        } else if (pcc->lrg_decr_bits != kvm_nr_bits) {
-+            error_setg(errp,
-+"KVM large decrementer size (%d) differs to model (%d), try -cap-large-decr=off",
-+                kvm_nr_bits, pcc->lrg_decr_bits);
-+        }
++    /*
++     * If large decrementer is enabled then the decrementer is signed extened
++     * to 64 bits, otherwise it is a 32 bit value.
++     */
++    if (env->spr[SPR_LPCR] & LPCR_LD)
++        return decr;
++    return (uint32_t) decr;
+ }
+ 
+-uint32_t cpu_ppc_load_hdecr (CPUPPCState *env)
++target_ulong cpu_ppc_load_hdecr (CPUPPCState *env)
+ {
++    PowerPCCPU *cpu = ppc_env_get_cpu(env);
++    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+     ppc_tb_t *tb_env = env->tb_env;
++    uint64_t hdecr;
+ 
+-    return _cpu_ppc_load_decr(env, tb_env->hdecr_next);
++    hdecr =  _cpu_ppc_load_decr(env, tb_env->hdecr_next);
++
++    /*
++     * If we have a large decrementer (POWER9 or later) then hdecr is sign
++     * extended to 64 bits, otherwise it is 32 bits.
++     */
++    if (pcc->lrg_decr_bits > 32)
++        return hdecr;
++    return (uint32_t) hdecr;
+ }
+ 
+ uint64_t cpu_ppc_load_purr (CPUPPCState *env)
+@@ -832,13 +851,21 @@ static void __cpu_ppc_store_decr(PowerPCCPU *cpu, uint64_t *nextp,
+                                  QEMUTimer *timer,
+                                  void (*raise_excp)(void *),
+                                  void (*lower_excp)(PowerPCCPU *),
+-                                 uint32_t decr, uint32_t value)
++                                 target_ulong decr, target_ulong value,
++                                 int nr_bits)
+ {
+     CPUPPCState *env = &cpu->env;
+     ppc_tb_t *tb_env = env->tb_env;
+     uint64_t now, next;
++    bool negative;
++
++    /* Truncate value to decr_width and sign extend for simplicity */
++    value &= ((1ULL << nr_bits) - 1);
++    negative = !!(value & (1ULL << (nr_bits - 1)));
++    if (negative)
++        value |= (0xFFFFFFFFULL << nr_bits);
+ 
+-    LOG_TB("%s: %08" PRIx32 " => %08" PRIx32 "\n", __func__,
++    LOG_TB("%s: " TARGET_FMT_lx " => " TARGET_FMT_lx "\n", __func__,
+                 decr, value);
+ 
+     if (kvm_enabled()) {
+@@ -860,15 +887,15 @@ static void __cpu_ppc_store_decr(PowerPCCPU *cpu, uint64_t *nextp,
+      * an edge interrupt, so raise it here too.
+      */
+     if ((value < 3) ||
+-        ((tb_env->flags & PPC_DECR_UNDERFLOW_LEVEL) && (value & 0x80000000)) ||
+-        ((tb_env->flags & PPC_DECR_UNDERFLOW_TRIGGERED) && (value & 0x80000000)
+-          && !(decr & 0x80000000))) {
++        ((tb_env->flags & PPC_DECR_UNDERFLOW_LEVEL) && negative) ||
++        ((tb_env->flags & PPC_DECR_UNDERFLOW_TRIGGERED) && negative
++          && !(decr & (1ULL << (nr_bits - 1))))) {
+         (*raise_excp)(cpu);
+         return;
+     }
+ 
+     /* On MSB level based systems a 0 for the MSB stops interrupt delivery */
+-    if (!(value & 0x80000000) && (tb_env->flags & PPC_DECR_UNDERFLOW_LEVEL)) {
++    if (!negative && (tb_env->flags & PPC_DECR_UNDERFLOW_LEVEL)) {
+         (*lower_excp)(cpu);
+     }
+ 
+@@ -881,21 +908,25 @@ static void __cpu_ppc_store_decr(PowerPCCPU *cpu, uint64_t *nextp,
+     timer_mod(timer, next);
+ }
+ 
+-static inline void _cpu_ppc_store_decr(PowerPCCPU *cpu, uint32_t decr,
+-                                       uint32_t value)
++static inline void _cpu_ppc_store_decr(PowerPCCPU *cpu, target_ulong decr,
++                                       target_ulong value, int nr_bits)
+ {
+     ppc_tb_t *tb_env = cpu->env.tb_env;
+ 
+     __cpu_ppc_store_decr(cpu, &tb_env->decr_next, tb_env->decr_timer,
+                          tb_env->decr_timer->cb, &cpu_ppc_decr_lower, decr,
+-                         value);
++                         value, nr_bits);
+ }
+ 
+-void cpu_ppc_store_decr (CPUPPCState *env, uint32_t value)
++void cpu_ppc_store_decr (CPUPPCState *env, target_ulong value)
+ {
+     PowerPCCPU *cpu = ppc_env_get_cpu(env);
++    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
++    int nr_bits = 32;
++    if (env->spr[SPR_LPCR] & LPCR_LD)
++        nr_bits = pcc->lrg_decr_bits;
+ 
+-    _cpu_ppc_store_decr(cpu, cpu_ppc_load_decr(env), value);
++    _cpu_ppc_store_decr(cpu, cpu_ppc_load_decr(env), value, nr_bits);
+ }
+ 
+ static void cpu_ppc_decr_cb(void *opaque)
+@@ -905,23 +936,25 @@ static void cpu_ppc_decr_cb(void *opaque)
+     cpu_ppc_decr_excp(cpu);
+ }
+ 
+-static inline void _cpu_ppc_store_hdecr(PowerPCCPU *cpu, uint32_t hdecr,
+-                                        uint32_t value)
++static inline void _cpu_ppc_store_hdecr(PowerPCCPU *cpu, target_ulong hdecr,
++                                        target_ulong value, int nr_bits)
+ {
+     ppc_tb_t *tb_env = cpu->env.tb_env;
+ 
+     if (tb_env->hdecr_timer != NULL) {
+         __cpu_ppc_store_decr(cpu, &tb_env->hdecr_next, tb_env->hdecr_timer,
+                              tb_env->hdecr_timer->cb, &cpu_ppc_hdecr_lower,
+-                             hdecr, value);
++                             hdecr, value, nr_bits);
      }
  }
  
-@@ -418,6 +426,11 @@ static void cap_large_decr_cpu_apply(sPAPRMachineState *spapr,
-     CPUPPCState *env = &cpu->env;
-     target_ulong lpcr = env->spr[SPR_LPCR];
+-void cpu_ppc_store_hdecr (CPUPPCState *env, uint32_t value)
++void cpu_ppc_store_hdecr (CPUPPCState *env, target_ulong value)
+ {
+     PowerPCCPU *cpu = ppc_env_get_cpu(env);
++    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
  
-+    if (kvm_enabled()) {
-+        if (kvmppc_enable_cap_large_decr(cpu, val))
-+            error_setg(errp, "No large decrementer support, try cap-large-decr=off");
+-    _cpu_ppc_store_hdecr(cpu, cpu_ppc_load_hdecr(env), value);
++    _cpu_ppc_store_hdecr(cpu, cpu_ppc_load_hdecr(env), value,
++                         pcc->lrg_decr_bits);
+ }
+ 
+ static void cpu_ppc_hdecr_cb(void *opaque)
+@@ -951,8 +984,8 @@ static void cpu_ppc_set_tb_clk (void *opaque, uint32_t freq)
+      * if a decrementer exception is pending when it enables msr_ee at startup,
+      * it's not ready to handle it...
+      */
+-    _cpu_ppc_store_decr(cpu, 0xFFFFFFFF, 0xFFFFFFFF);
+-    _cpu_ppc_store_hdecr(cpu, 0xFFFFFFFF, 0xFFFFFFFF);
++    _cpu_ppc_store_decr(cpu, 0xFFFFFFFF, 0xFFFFFFFF, 32);
++    _cpu_ppc_store_hdecr(cpu, 0xFFFFFFFF, 0xFFFFFFFF, 32);
+     cpu_ppc_store_purr(cpu, 0x0000000000000000ULL);
+ }
+ 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index d068982a5e..9942b270df 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -557,6 +557,14 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+                           pcc->radix_page_info->count *
+                           sizeof(radix_AP_encodings[0]))));
+     }
++
++    /*
++     * We set this property to let the guest know that it can use the large
++     * decrementer and its width in bits.
++     */
++    if (spapr_get_cap(spapr, SPAPR_CAP_LARGE_DECREMENTER) != SPAPR_CAP_OFF)
++        _FDT((fdt_setprop_u32(fdt, offset, "ibm,dec-bits",
++                              pcc->lrg_decr_bits)));
+ }
+ 
+ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 3f90f5823e..32f68cbd9e 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -393,8 +393,36 @@ static void cap_nested_kvm_hv_apply(sPAPRMachineState *spapr,
+ static void cap_large_decr_apply(sPAPRMachineState *spapr,
+                                  uint8_t val, Error **errp)
+ {
+-    if (val)
++    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
++    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
++
++    if (!val)
++        return; /* Disabled by default */
++
++    if (tcg_enabled()) {
++        if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
++                              spapr->max_compat_pvr)) {
++            error_setg(errp,
++                "Large decrementer only supported on POWER9, try -cpu POWER9");
++            return;
++        }
++    } else {
+         error_setg(errp, "No large decrementer support, try cap-large-decr=off");
 +    }
++}
 +
-     if (val)
-         lpcr |= LPCR_LD;
-     else
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index d01852fe31..3f650c8fc4 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -91,6 +91,7 @@ static int cap_ppc_safe_cache;
- static int cap_ppc_safe_bounds_check;
- static int cap_ppc_safe_indirect_branch;
- static int cap_ppc_nested_kvm_hv;
-+static int cap_large_decr;
- 
- static uint32_t debug_inst_opcode;
- 
-@@ -124,6 +125,7 @@ static bool kvmppc_is_pr(KVMState *ks)
- 
- static int kvm_ppc_register_host_cpu_type(MachineState *ms);
- static void kvmppc_get_cpu_characteristics(KVMState *s);
-+static int kvmppc_get_dec_bits(void);
- 
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-@@ -151,6 +153,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
-     kvmppc_get_cpu_characteristics(s);
-     cap_ppc_nested_kvm_hv = kvm_vm_check_extension(s, KVM_CAP_PPC_NESTED_HV);
-+    cap_large_decr = kvmppc_get_dec_bits();
-     /*
-      * Note: setting it to false because there is not such capability
-      * in KVM at this moment.
-@@ -1927,6 +1930,15 @@ uint64_t kvmppc_get_clockfreq(void)
-     return kvmppc_read_int_cpu_dt("clock-frequency");
++static void cap_large_decr_cpu_apply(sPAPRMachineState *spapr,
++                                     PowerPCCPU *cpu,
++                                     uint8_t val, Error **errp)
++{
++    CPUPPCState *env = &cpu->env;
++    target_ulong lpcr = env->spr[SPR_LPCR];
++
++    if (val)
++        lpcr |= LPCR_LD;
++    else
++        lpcr &= ~LPCR_LD;
++    ppc_store_lpcr(cpu, lpcr);
  }
  
-+static int kvmppc_get_dec_bits(void)
-+{
-+    int nr_bits = kvmppc_read_int_cpu_dt("ibm,dec-bits");
-+
-+    if (nr_bits > 0)
-+        return nr_bits;
-+    return 0;
-+}
-+
- static int kvmppc_get_pvinfo(CPUPPCState *env, struct kvm_ppc_pvinfo *pvinfo)
-  {
-      PowerPCCPU *cpu = ppc_env_get_cpu(env);
-@@ -2442,6 +2454,33 @@ bool kvmppc_has_cap_spapr_vfio(void)
-     return cap_spapr_vfio;
- }
+ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+@@ -483,6 +511,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+         .set = spapr_cap_set_bool,
+         .type = "bool",
+         .apply = cap_large_decr_apply,
++        .cpu_apply = cap_large_decr_cpu_apply,
+     },
+ };
  
-+int kvmppc_get_cap_large_decr(void)
-+{
-+    return cap_large_decr;
-+}
-+
-+int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable)
-+{
-+    CPUState *cs = CPU(cpu);
-+    uint64_t lpcr;
-+
-+    kvm_get_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-+    /* Do we need to modify the LPCR? */
-+    if (!!(lpcr & LPCR_LD) != !!enable) {
-+        if (enable)
-+            lpcr |= LPCR_LD;
-+        else
-+            lpcr &= ~LPCR_LD;
-+        kvm_set_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-+        kvm_get_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-+
-+        if (!!(lpcr & LPCR_LD) != !!enable)
-+            return -1;
-+    }
-+
-+    return 0;
-+}
-+
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
- {
-     uint32_t host_pvr = mfpvr();
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index bdfaa4e70a..a79835bd14 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -64,6 +64,8 @@ int kvmppc_get_cap_safe_bounds_check(void);
- int kvmppc_get_cap_safe_indirect_branch(void);
- bool kvmppc_has_cap_nested_kvm_hv(void);
- int kvmppc_set_cap_nested_kvm_hv(int enable);
-+int kvmppc_get_cap_large_decr(void);
-+int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable);
- int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-@@ -332,6 +334,16 @@ static inline int kvmppc_set_cap_nested_kvm_hv(int enable)
-     return -1;
- }
- 
-+static inline int kvmppc_get_cap_large_decr(void)
-+{
-+    return 0;
-+}
-+
-+static inline int kvmppc_enable_cap_large_decr(PowerPCCPU *cpu, int enable)
-+{
-+    return -1;
-+}
-+
- static inline int kvmppc_enable_hwrng(void)
- {
-     return -1;
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index ae51fe754e..be9b4c30c3 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -190,6 +190,7 @@ typedef struct PowerPCCPUClass {
+ #endif
+     const PPCHash64Options *hash64_opts;
+     struct ppc_radix_page_info *radix_page_info;
++    uint32_t lrg_decr_bits;
+     void (*init_proc)(CPUPPCState *env);
+     int  (*check_pow)(CPUPPCState *env);
+     int (*handle_mmu_fault)(PowerPCCPU *cpu, vaddr eaddr, int rwx, int mmu_idx);
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 26604ddf98..81763d72f9 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1321,10 +1321,10 @@ uint32_t cpu_ppc_load_atbu (CPUPPCState *env);
+ void cpu_ppc_store_atbl (CPUPPCState *env, uint32_t value);
+ void cpu_ppc_store_atbu (CPUPPCState *env, uint32_t value);
+ bool ppc_decr_clear_on_delivery(CPUPPCState *env);
+-uint32_t cpu_ppc_load_decr (CPUPPCState *env);
+-void cpu_ppc_store_decr (CPUPPCState *env, uint32_t value);
+-uint32_t cpu_ppc_load_hdecr (CPUPPCState *env);
+-void cpu_ppc_store_hdecr (CPUPPCState *env, uint32_t value);
++target_ulong cpu_ppc_load_decr (CPUPPCState *env);
++void cpu_ppc_store_decr (CPUPPCState *env, target_ulong value);
++target_ulong cpu_ppc_load_hdecr (CPUPPCState *env);
++void cpu_ppc_store_hdecr (CPUPPCState *env, target_ulong value);
+ uint64_t cpu_ppc_load_purr (CPUPPCState *env);
+ uint32_t cpu_ppc601_load_rtcl (CPUPPCState *env);
+ uint32_t cpu_ppc601_load_rtcu (CPUPPCState *env);
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index c431303eff..a2b1ec5040 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -1109,7 +1109,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
+     case POWERPC_MMU_3_00: /* P9 */
+         lpcr = val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
+                       (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_AIL |
+-                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR |
++                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LPCR_LD |
+                       (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
+                       LPCR_DEE | LPCR_OEE)) | LPCR_MER | LPCR_GTSE | LPCR_TC |
+                       LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 819221f246..b156be4d98 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7417,7 +7417,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+ #if !defined(NO_TIMER_DUMP)
+     cpu_fprintf(f, "TB %08" PRIu32 " %08" PRIu64
+ #if !defined(CONFIG_USER_ONLY)
+-                " DECR %08" PRIu32
++                " DECR " TARGET_FMT_lu
+ #endif
+                 "\n",
+                 cpu_ppc_load_tbu(env), cpu_ppc_load_tbl(env)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 58542c0fe0..af70a3b78c 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8376,6 +8376,7 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data)
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
+     pcc->hash64_opts = &ppc_hash64_opts_basic;
++    pcc->lrg_decr_bits = 32;
+ #endif
+     pcc->excp_model = POWERPC_EXCP_970;
+     pcc->bus_model = PPC_FLAGS_INPUT_970;
+@@ -8550,6 +8551,7 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
+     pcc->hash64_opts = &ppc_hash64_opts_POWER7;
++    pcc->lrg_decr_bits = 32;
+ #endif
+     pcc->excp_model = POWERPC_EXCP_POWER7;
+     pcc->bus_model = PPC_FLAGS_INPUT_POWER7;
+@@ -8718,6 +8720,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
+     pcc->hash64_opts = &ppc_hash64_opts_POWER7;
++    pcc->lrg_decr_bits = 32;
+ #endif
+     pcc->excp_model = POWERPC_EXCP_POWER8;
+     pcc->bus_model = PPC_FLAGS_INPUT_POWER7;
+@@ -8926,6 +8929,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+     /* segment page size remain the same */
+     pcc->hash64_opts = &ppc_hash64_opts_POWER7;
+     pcc->radix_page_info = &POWER9_radix_page_info;
++    pcc->lrg_decr_bits = 56;
+ #endif
+     pcc->excp_model = POWERPC_EXCP_POWER9;
+     pcc->bus_model = PPC_FLAGS_INPUT_POWER9;
 -- 
 2.13.6
