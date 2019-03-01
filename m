@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51710)
+Received: from eggs.gnu.org ([209.51.188.92]:51865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzmOp-0007Jl-Iz
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:56:44 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gzmPd-0007p0-Fs
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:57:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gzmOo-00029N-Gh
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:56:43 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43112)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gzmOo-00026j-9f
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:56:42 -0500
-Received: by mail-wr1-x443.google.com with SMTP id d17so26763594wre.10
-	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 09:56:39 -0800 (PST)
-References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-	<1549390526-24246-14-git-send-email-pbonzini@redhat.com>
-	<87sgw6k02i.fsf@zen.linaroharston>
-	<20190301171343.dyuqan3ok6gzuotw@steredhat>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190301171343.dyuqan3ok6gzuotw@steredhat>
-Date: Fri, 01 Mar 2019 17:56:36 +0000
-Message-ID: <87o96ujx63.fsf@zen.linaroharston>
+	(envelope-from <jsnow@redhat.com>) id 1gzmPc-0002a8-G9
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 12:57:33 -0500
+References: <1551456970-463-1-git-send-email-thuth@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
+Date: Fri, 1 Mar 2019 12:57:19 -0500
 MIME-Version: 1.0
+In-Reply-To: <1551456970-463-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 13/76] pvh: Add x86/HVM direct boot ABI
- header file
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: Remove (mostly) useless
+ architecture checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +24,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <minyard@acm.org>
 
 
-Stefano Garzarella <sgarzare@redhat.com> writes:
 
-> On Fri, Mar 01, 2019 at 04:53:57PM +0000, Alex Benn=C3=A9e wrote:
->>
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>
->> > From: Liam Merwick <Liam.Merwick@oracle.com>
->> >
->> > The x86/HVM direct boot ABI permits Qemu to be able to boot directly
->> > into the uncompressed Linux kernel binary with minimal firmware involv=
-ement.
->> >
->> > 	https://xenbits.xen.org/docs/unstable/misc/pvh.html
->> >
->> > This commit adds the header file that defines the start_info struct
->> > that needs to be populated in order to use this ABI.
->> >
->> > The canonical version of start_info.h is in the Xen codebase.
->> > (like QEMU, the Linux kernel uses a copy as well).
->> >
->> > Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
->> > Reviewed-by: Konrad Rzeszutek Wilk <Konrad.Wilk@oracle.com>
->> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->> This has changed behaviour of a boot. Previously:
->>
->>   qemu-system-i386 -serial mon:stdio -nographic -device \
->>      isa-debugcon,chardev=3Dserial0 -kernel ./tests/hello
->>
->
-> Hi Alex,
-> is your image in multiboot format?
+On 3/1/19 11:16 AM, Thomas Huth wrote:
+> These checks at the beginning of some of the tests are mostly useless:
+> We only run the tests on x86 anyway, and g_test_message() does not
+> print anything unless you call g_test_init() first.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/fdc-test.c      | 7 -------
+>  tests/ide-test.c      | 7 -------
+>  tests/ipmi-bt-test.c  | 7 -------
+>  tests/ipmi-kcs-test.c | 7 -------
+>  4 files changed, 28 deletions(-)
+> 
+> diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+> index 88f1abf..31cd329 100644
+> --- a/tests/fdc-test.c
+> +++ b/tests/fdc-test.c
+> @@ -548,16 +548,9 @@ static void fuzz_registers(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    const char *arch = qtest_get_arch();
+>      int fd;
+>      int ret;
+>  
+> -    /* Check architecture */
+> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> -        g_test_message("Skipping test for non-x86\n");
+> -        return 0;
+> -    }
+> -
+>      /* Create a temporary raw image */
+>      fd = mkstemp(test_image);
+>      g_assert(fd >= 0);
+> diff --git a/tests/ide-test.c b/tests/ide-test.c
+> index f0280e6..300d64e 100644
+> --- a/tests/ide-test.c
+> +++ b/tests/ide-test.c
+> @@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    const char *arch = qtest_get_arch();
+>      int fd;
+>      int ret;
+>  
+> -    /* Check architecture */
+> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> -        g_test_message("Skipping test for non-x86\n");
+> -        return 0;
+> -    }
+> -
+>      /* Create temporary blkdebug instructions */
+>      fd = mkstemp(debug_path);
+>      g_assert(fd >= 0);
+> diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
+> index f4a81b5..fc4c83b 100644
+> --- a/tests/ipmi-bt-test.c
+> +++ b/tests/ipmi-bt-test.c
+> @@ -400,15 +400,8 @@ static void open_socket(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    const char *arch = qtest_get_arch();
+>      int ret;
+>  
+> -    /* Check architecture */
+> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> -        g_test_message("Skipping test for non-x86\n");
+> -        return 0;
+> -    }
+> -
+>      open_socket();
+>  
+>      /* Run the tests */
+> diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
+> index 178ffc1..a2354c1 100644
+> --- a/tests/ipmi-kcs-test.c
+> +++ b/tests/ipmi-kcs-test.c
+> @@ -263,16 +263,9 @@ static void test_enable_irq(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    const char *arch = qtest_get_arch();
+>      char *cmdline;
+>      int ret;
+>  
+> -    /* Check architecture */
+> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> -        g_test_message("Skipping test for non-x86\n");
+> -        return 0;
+> -    }
+> -
+>      /* Run the tests */
+>      g_test_init(&argc, &argv, NULL);
+>  
+> 
 
-AFAICT yes, I'm not super familiar with x86 so I'm mostly cribbing from:
+Hm, if you insist. I have no strong feelings... Do we plan to split
+tests out by architecture eventually? Clearly x86 only tests don't
+really need to each individually check the arch, but I'm not sure what
+the vision is.
 
-  https://github.com/doug65536/qemu-bmibug
+Either way, since I have no horse in the race:
 
-> I sent a patch few weeks ago that fix the loading of multiboot images:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg596424.html
-
-That certainly fixes things. Although I'm wondering if it's worth making
-my test image PVH compatible anyway (if it's easy to do) as all I really
-want to do is exercise the softmmu code. It might be simpler to use
-paravirtualised serial ports rather than banging an IO port, IDK?
-
->
-> Thanks,
-> Stefano
->
->> would boot seabios which then loads the -kernel. Now we get:
->>
->>   qemu-system-i386: Error loading uncompressed kernel without PVH ELF No=
-te
->>
->> I'm personally not overly concerned (and being able to boot directly
->> sounds like a win for my test case). However is this likely to break
->> anybodies existing workflow?
->>
->> Are there any examples of the minimum setup for a directly booted i386
->> kernel image anywhere?
->>
->> --
->> Alex Benn=C3=A9e
->>
-
-
---
-Alex Benn=C3=A9e
+Acked-by: John Snow <jsnow@redhat.com>
