@@ -1,15 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59192)
+Received: from eggs.gnu.org ([209.51.188.92]:59231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzkpk-0003K8-E1
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:16:25 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gzkq4-0003Us-MC
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:16:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gzkpj-0000Jx-Lv
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:16:24 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  1 Mar 2019 17:16:10 +0100
-Message-Id: <1551456970-463-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests: Remove (mostly) useless architecture
- checks
+	(envelope-from <richard.henderson@linaro.org>) id 1gzkq4-0000ZV-2s
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:16:44 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41542)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gzkq1-0000X3-Hs
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 11:16:42 -0500
+Received: by mail-pl1-x642.google.com with SMTP id y5so11700783plk.8
+	for <qemu-devel@nongnu.org>; Fri, 01 Mar 2019 08:16:41 -0800 (PST)
+References: <20190301115413.27153-1-david@redhat.com>
+	<20190301115413.27153-4-david@redhat.com>
+	<4f8ff92c-9770-b69a-0857-2b85a87090f1@linaro.org>
+	<b44d3dde-fdc0-3ba5-051d-255723d9c71c@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <89c00071-7a4d-a34a-50d0-f09de72fd139@linaro.org>
+Date: Fri, 1 Mar 2019 08:16:31 -0800
+MIME-Version: 1.0
+In-Reply-To: <b44d3dde-fdc0-3ba5-051d-255723d9c71c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/32] s390x/tcg: Utilities for vector
+ instruction helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,103 +34,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <minyard@acm.org>, John Snow <jsnow@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-These checks at the beginning of some of the tests are mostly useless:
-We only run the tests on x86 anyway, and g_test_message() does not
-print anything unless you call g_test_init() first.
+On 3/1/19 8:13 AM, David Hildenbrand wrote:
+>> These, I think, should be static inline.  Certainly I think they're too small
+>> to warrant a real call across modules, as you appear to be preparing for...
+> 
+> I'm wondering, won't link-time optimization properly handle this? (so
+> far the theory I know of)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/fdc-test.c      | 7 -------
- tests/ide-test.c      | 7 -------
- tests/ipmi-bt-test.c  | 7 -------
- tests/ipmi-kcs-test.c | 7 -------
- 4 files changed, 28 deletions(-)
+It would, but who does that?  It's certainly not in -O2.
 
-diff --git a/tests/fdc-test.c b/tests/fdc-test.c
-index 88f1abf..31cd329 100644
---- a/tests/fdc-test.c
-+++ b/tests/fdc-test.c
-@@ -548,16 +548,9 @@ static void fuzz_registers(void)
- 
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
-     int fd;
-     int ret;
- 
--    /* Check architecture */
--    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
--        g_test_message("Skipping test for non-x86\n");
--        return 0;
--    }
--
-     /* Create a temporary raw image */
-     fd = mkstemp(test_image);
-     g_assert(fd >= 0);
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index f0280e6..300d64e 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
- 
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
-     int fd;
-     int ret;
- 
--    /* Check architecture */
--    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
--        g_test_message("Skipping test for non-x86\n");
--        return 0;
--    }
--
-     /* Create temporary blkdebug instructions */
-     fd = mkstemp(debug_path);
-     g_assert(fd >= 0);
-diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
-index f4a81b5..fc4c83b 100644
---- a/tests/ipmi-bt-test.c
-+++ b/tests/ipmi-bt-test.c
-@@ -400,15 +400,8 @@ static void open_socket(void)
- 
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
-     int ret;
- 
--    /* Check architecture */
--    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
--        g_test_message("Skipping test for non-x86\n");
--        return 0;
--    }
--
-     open_socket();
- 
-     /* Run the tests */
-diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
-index 178ffc1..a2354c1 100644
---- a/tests/ipmi-kcs-test.c
-+++ b/tests/ipmi-kcs-test.c
-@@ -263,16 +263,9 @@ static void test_enable_irq(void)
- 
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
-     char *cmdline;
-     int ret;
- 
--    /* Check architecture */
--    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
--        g_test_message("Skipping test for non-x86\n");
--        return 0;
--    }
--
-     /* Run the tests */
-     g_test_init(&argc, &argv, NULL);
- 
--- 
-1.8.3.1
+I suspect -flto is a set of -Werror and other sorts of compiler appeasement
+changes beyond what anyone has tried.
+
+
+r~
