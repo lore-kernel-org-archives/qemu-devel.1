@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59237)
+Received: from eggs.gnu.org ([209.51.188.92]:51497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gzqjC-0006cO-Py
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 17:34:03 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gztYB-0006fg-AQ
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 20:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gzqjB-0006mV-F0
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 17:34:02 -0500
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gztY7-0004Fd-JO
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 20:34:50 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:46392)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gztY3-0003of-9G
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 20:34:44 -0500
+Date: Fri, 1 Mar 2019 17:33:40 -0800
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190302013340.xf5saersxutpgvmk@function>
+References: <155143315831.102868.17515265400523392682.stgit@bahia.lan>
+	<CAFEAcA-8XTSCOp_6kbx_7zo_JK1BC9gpkFF4LqSxTjfhC8iCXA@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-8XTSCOp_6kbx_7zo_JK1BC9gpkFF4LqSxTjfhC8iCXA@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <155146875704.147873.10563808578795890265.stgit@bahia.lan>
-References: <155146874478.147873.5019623412212796259.stgit@bahia.lan>
-	<155146875704.147873.10563808578795890265.stgit@bahia.lan>
-Message-ID: <155147961832.30057.4167728683124961502@sif>
-Date: Fri, 01 Mar 2019 16:33:38 -0600
-Subject: Re: [Qemu-devel] [PATCH 2/2] spapr: Simulate CAS for qtest
+Subject: Re: [Qemu-devel] [PATCH v2] slirp: Fix build with gcc 9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
 
-Quoting Greg Kurz (2019-03-01 13:32:37)
-> The RTAS event hotplug code for machine types 2.8 and newer depends on
-> the CAS negotiated ov5 in order to work properly. However, there's no
-> CAS when running under qtest. There has been a tentative to trick the
-> code by faking the OV5_HP_EVT bit, but it turned out to break other
-> assumptions in the code and the change got reverted.
-> =
-
-> Go for a more general approach and simulate a CAS when running under
-> qtest. For simplicity, this pseudo CAS simple simulates the case where
-> the guest supports the same features as the machine. It is done at
-> reset time, just before we reset the DRCs, which could potentially
-> exercise the unplug code.
-> =
-
-> This allows to test unplug on spapr with both older and newer machine
-> types.
-> =
-
-> Suggested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-Thanks for sending this!
-
-Just now realizing we should probably apply the revert after this patch
-however, since the commit we're reverting fixes a `make check` test that
-is run by default, whereas this patch fixes one that only gets run if we
-run the tests with -m=3Dslow specified.
-
-Maybe David can do that on his end?
-
-> ---
->  hw/ppc/spapr.c |   11 +++++++++++
->  1 file changed, 11 insertions(+)
-> =
-
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b6a571b6f184..6da64ef7ee2b 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -29,6 +29,7 @@
->  #include "qapi/visitor.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/numa.h"
-> +#include "sysemu/qtest.h"
->  #include "hw/hw.h"
->  #include "qemu/log.h"
->  #include "hw/fw-path-provider.h"
-> @@ -1711,6 +1712,16 @@ static void spapr_machine_reset(void)
->       */
->      spapr_irq_reset(spapr, &error_fatal);
-> =
-
-> +    /*
-> +     * There is no CAS under qtest. Simulate one to please the code that
-> +     * depends on spapr->ov5_cas. This is especially needed to test devi=
-ce
-> +     * unplug, so we do that before resetting the DRCs.
-> +     */
-> +    if (qtest_enabled()) {
-> +        spapr_ovec_cleanup(spapr->ov5_cas);
-> +        spapr->ov5_cas =3D spapr_ovec_clone(spapr->ov5);
-> +    }
-> +
->      /* DRC reset may cause a device to be unplugged. This will cause tro=
-ubles
->       * if this device is used by another device (eg, a running vhost bac=
-kend
->       * will crash QEMU if the DIMM holding the vring goes away). To avoi=
-d such
+Peter Maydell, le ven. 01 mars 2019 09:49:26 +0000, a ecrit:
+> On Fri, 1 Mar 2019 at 09:39, Greg Kurz <groug@kaod.org> wrote:
+> >
+> > Build fails with gcc 9:
+> >
+> >   CC      slirp/ndp_table.o
+> > slirp/ndp_table.c: In function =E2=80=98ndp_table_add=E2=80=99:
+> > slirp/ndp_table.c:31:23: error: taking address of packed member of =E2=
+=80=98struct ndpentry=E2=80=99 may result in an unaligned pointer value [=
+-Werror=3Daddress-of-packed-member]
+> >    31 |         if (in6_equal(&ndp_table->table[i].ip_addr, &ip_addr)=
+) {
+> >       |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > slirp/ndp_table.c: In function =E2=80=98ndp_table_search=E2=80=99:
+> > slirp/ndp_table.c:75:23: error: taking address of packed member of =E2=
+=80=98struct ndpentry=E2=80=99 may result in an unaligned pointer value [=
+-Werror=3Daddress-of-packed-member]
+> >    75 |         if (in6_equal(&ndp_table->table[i].ip_addr, &ip_addr)=
+) {
+> >       |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > cc1: all warnings being treated as errors
+> >
+> > The ndpentry structure isn't used to model on-the-wire data or anythi=
+ng
+> > else that would care for the struct layout. It doesn't need to be pac=
+ked
+> > actually. Just drop SLIRP_PACKED.
+> >
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > v2: - don't check the struct size at compile time
+> > ---
+> >  slirp/slirp.h |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/slirp/slirp.h b/slirp/slirp.h
+> > index 752a4cd8c81c..8068ba1d1e9e 100644
+> > --- a/slirp/slirp.h
+> > +++ b/slirp/slirp.h
+> > @@ -106,7 +106,7 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_a=
+ddr,
+> >  struct ndpentry {
+> >      unsigned char   eth_addr[ETH_ALEN];     /* sender hardware addre=
+ss */
+> >      struct in6_addr ip_addr;                /* sender IP address    =
+   */
+> > -} SLIRP_PACKED;
+> > +};
+> >
+> >  #define NDP_TABLE_SIZE 16
 >=20
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+Applied to my tree, thanks!
+
+Samuel
