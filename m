@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57339)
+Received: from eggs.gnu.org ([209.51.188.92]:58057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzyI4-0002zM-RQ
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:38:34 -0500
+	(envelope-from <ysato@users.sourceforge.jp>) id 1gzyJa-00042S-Dc
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:40:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gzyI1-0002ii-FC
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:38:30 -0500
-Resent-Message-Id: <E1gzyI1-0002ii-FC@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21711)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gzyI0-0002YS-6z
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:38:28 -0500
-Message-ID: <155150867666.24.17373762740214159143@6acff2cf482b>
-In-Reply-To: <20190302062138.10713-1-ysato@users.sourceforge.jp>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Mar 2019 22:37:57 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH RFC v3 00/11] Add RX archtecture support
+	(envelope-from <ysato@users.sourceforge.jp>) id 1gzyJS-0004Yc-LZ
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:40:02 -0500
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:38393)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1gzyJI-0004LH-2x
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:39:49 -0500
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+Date: Sat,  2 Mar 2019 15:39:26 +0900
+Message-Id: <20190302063926.11488-1-ysato@users.sourceforge.jp>
+In-Reply-To: <20190131210851.9842-1-richard.henderson@linaro.org>
+References: <20190131210851.9842-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] decodetree: Add DisasContext to function part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +23,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ysato@users.sourceforge.jp
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, richard.henderson@linaro.org
+To: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwMjA2MjEzOC4xMDcx
-My0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAzMDIwNjIx
-MzguMTA3MTMtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcApTdWJqZWN0OiBbUWVtdS1kZXZl
-bF0gW1BBVENIIFJGQyB2MyAwMC8xMV0gQWRkIFJYIGFyY2h0ZWN0dXJlIHN1cHBvcnQKCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rl
-di9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
-YmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
-cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDIw
-NjIxMzguMTA3MTMtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcCAtPiBwYXRjaGV3LzIwMTkw
-MzAyMDYyMTM4LjEwNzEzLTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0JwplNjBmYmIzNWU2IE1BSU5UQUlORVJTOiBBZGQgUlggZW50cnku
-CjNiZGMxNmY1OTEgQWRkIHJ4LXNvZnRtbXUKMzhjMDQyNGU3MiBSWCBUYXJnZXQgaGFyZHdhcmUg
-ZGVmaW5pdGlvbgphNmVjODUyMTY0IFJYNjJOIGludGVybmFsIHNlcmlhbCBjb21tdW5pY2F0aW9u
-IGludGVyZmFjZQoxNzk3MzljYjkzIFJYNjJOIGludGVybmFsIHRpbWVyIG1vZHVsZXMKNTJjNjJk
-OWQzMCBSWDYyTiBpbnRlcnJ1cHQgY29udG9yb2wgdWludApjZWUyOTZiMWMzIHRhcmdldC9yeDog
-bWlzY2VsbGFuZW91cyBmdW5jdGlvbnMKZDIwNTBjMGU4MiB0YXJnZXQvcng6IFJYIGRpc2Fzc2Vt
-Ymxlcgo4MjNhNzVkOTE5IHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24KZDU5MjdmYzM3OCB0YXJn
-ZXQvcng6IFRDRyBoZWxwZXIKNmM4MGQ1Y2M2OCB0YXJnZXQvcng6IFRDRyBUcmFuc2xhdGlvbgoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgNmM4MGQ1Y2M2ODZhICh0
-YXJnZXQvcng6IFRDRyBUcmFuc2xhdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
-ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTU6IApuZXcgZmls
-ZSBtb2RlIDEwMDY0NAoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0
-eDpXeFYpCiMyMDg5OiBGSUxFOiB0YXJnZXQvcngvdHJhbnNsYXRlLmM6MTcyODoKK3N0YXRpYyBi
-b29sIHRyYW5zX0ZDTVBfcmkoRGlzYXNDb250ZXh0ICpjdHgsIGFyZ19GQ01QX3JpICphKQogICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
-RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMyMTExOiBG
-SUxFOiB0YXJnZXQvcngvdHJhbnNsYXRlLmM6MTc1MDoKK3N0YXRpYyBib29sIHRyYW5zX0lUT0Yo
-RGlzYXNDb250ZXh0ICpjdHgsIGFyZ19JVE9GICphKQogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
-bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMyMjMyOiBGSUxFOiB0YXJnZXQvcngvdHJhbnNsYXRlLmM6
-MTg3MToKK3N0YXRpYyBib29sIHRyYW5zX0JOT1RfbHIoRGlzYXNDb250ZXh0ICpjdHgsIGFyZ19C
-Tk9UX2xyICphKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKdG90YWw6IDMgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNTU2IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDEvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIvMTEgQ2hlY2tp
-bmcgY29tbWl0IGQ1OTI3ZmMzNzhlNSAodGFyZ2V0L3J4OiBUQ0cgaGVscGVyKQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiMxMTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDg5MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzExIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCjMvMTEgQ2hlY2tpbmcgY29tbWl0IDgyM2E3NWQ5MTk4OSAodGFyZ2V0L3J4OiBDUFUg
-ZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
-cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0OTAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8x
-MSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0LzExIENoZWNraW5nIGNvbW1pdCBkMjA1MGMw
-ZTgyMTcgKHRhcmdldC9yeDogUlggZGlzYXNzZW1ibGVyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzNDog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1ODcg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzEx
-IENoZWNraW5nIGNvbW1pdCBjZWUyOTZiMWMzMWMgKHRhcmdldC9yeDogbWlzY2VsbGFuZW91cyBm
-dW5jdGlvbnMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzExOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTYyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvMTEg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi8xMSBDaGVja2luZyBjb21taXQgNTJjNjJkOWQz
-MGQ5IChSWDYyTiBpbnRlcnJ1cHQgY29udG9yb2wgdWludCkKV0FSTklORzogYWRkZWQsIG1vdmVk
-IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjQ6
-IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzNzYg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzEx
-IENoZWNraW5nIGNvbW1pdCAxNzk3MzljYjkzZWUgKFJYNjJOIGludGVybmFsIHRpbWVyIG1vZHVs
-ZXMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzMwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgNzMwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMTEgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xMSBDaGVja2luZyBjb21taXQgYTZlYzg1MjE2NGFlIChS
-WDYyTiBpbnRlcm5hbCBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UpCldBUk5JTkc6IGFk
-ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
-dGluZz8KIzI4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
-aW5ncywgMzM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KOS8xMSBDaGVja2luZyBjb21taXQgMzhjMDQyNGU3MmRkIChSWCBUYXJnZXQgaGFyZHdh
-cmUgZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
-ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTQ6IApuZXcgZmlsZSBtb2RlIDEwMDY0
-NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzODkgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
-OS8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMC8xMSBDaGVja2luZyBjb21taXQgM2Jk
-YzE2ZjU5MWI5IChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
-ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTA6IApuZXcgZmls
-ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0MiBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAxMC8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8xMSBDaGVja2lu
-ZyBjb21taXQgZTYwZmJiMzVlNjg2IChNQUlOVEFJTkVSUzogQWRkIFJYIGVudHJ5LikKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDIwNjIx
-MzguMTA3MTMtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcC90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+OK. RX decoder works fine.
+
+Since it is necessary to read additional bytes in the function
+of the operand, we need to have DisasContext passed as an argument.
+
+> %b2_li_2	18:2 !function=li
+"li" read more extra byte. It use cpu_env in DisasContext.
+
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ scripts/decodetree.py | 32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index e23d43e354..fa9a75ccad 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -387,7 +387,11 @@ class FunctionField:
+         return self.func + '(' + str(self.base) + ')'
+ 
+     def str_extract(self):
+-        return self.func + '(' + self.base.str_extract() + ')'
++        if variablewidth:
++            ctx = 'ctx, '
++        else:
++            ctx = ''
++        return self.func + '(' + ctx + self.base.str_extract() + ')'
+ 
+     def __eq__(self, other):
+         return self.func == other.func and self.base == other.base
+@@ -454,7 +458,11 @@ class Format(General):
+         return 'extract_' + self.name
+ 
+     def output_extract(self):
+-        output('static void ', self.extract_name(), '(',
++        if variablewidth:
++            ctx_p = 'DisasContext *ctx, '
++        else:
++            ctx_p = ''
++        output('static void ', self.extract_name(), '(' + ctx_p,
+                self.base.struct_name(), ' *a, ', insntype, ' insn)\n{\n')
+         for n, f in self.fields.items():
+             output('    a->', n, ' = ', f.str_extract(), ';\n')
+@@ -468,10 +476,14 @@ class Pattern(General):
+     def output_decl(self):
+         global translate_scope
+         global translate_prefix
++        if variablewidth:
++            ctx_p = 'DisasContext *ctx, '
++        else:
++            ctx_p = ''
+         output('typedef ', self.base.base.struct_name(),
+                ' arg_', self.name, ';\n')
+         output(translate_scope, 'bool ', translate_prefix, '_', self.name,
+-               '(DisasContext *ctx, arg_', self.name, ' *a);\n')
++               '(', ctx_p, 'arg_', self.name, ' *a);\n')
+ 
+     def output_code(self, i, extracted, outerbits, outermask):
+         global translate_prefix
+@@ -479,7 +491,8 @@ class Pattern(General):
+         arg = self.base.base.name
+         output(ind, '/* ', self.file, ':', str(self.lineno), ' */\n')
+         if not extracted:
+-            output(ind, self.base.extract_name(), '(&u.f_', arg, ', insn);\n')
++            output(ind, self.base.extract_name(),
++                   '(ctx, &u.f_', arg, ', insn);\n')
+         for n, f in self.fields.items():
+             output(ind, 'u.f_', arg, '.', n, ' = ', f.str_extract(), ';\n')
+         output(ind, 'return ', translate_prefix, '_', self.name,
+@@ -890,11 +903,16 @@ class Tree:
+     def output_code(self, i, extracted, outerbits, outermask):
+         ind = str_indent(i)
+ 
++        if variablewidth:
++            ctx = 'ctx, '
++        else:
++            ctx = ''
+         # If we identified all nodes below have the same format,
+         # extract the fields now.
+         if not extracted and self.base:
+             output(ind, self.base.extract_name(),
+-                   '(&u.f_', self.base.base.name, ', insn);\n')
++                   '(', ctx, '&u.f_', self.base.base.name,
++                   ', insn);\n')
+             extracted = True
+ 
+         # Attempt to aid the compiler in producing compact switch statements.
+@@ -994,7 +1012,7 @@ class SizeTree:
+         # If we need to load more bytes to test, do so now.
+         if extracted < self.width:
+             output(ind, 'insn = ', decode_function,
+-                   '_load_bytes(s, insn, {0}, {1});\n'
++                   '_load_bytes(ctx, insn, {0}, {1});\n'
+                    .format(extracted / 8, self.width / 8));
+             extracted = self.width
+ 
+@@ -1048,7 +1066,7 @@ class SizeLeaf:
+         # If we need to load more bytes, do so now.
+         if extracted < self.width:
+             output(ind, 'insn = ', decode_function,
+-                   '_load_bytes(s, insn, {0}, {1});\n'
++                   '_load_bytes(ctx, insn, {0}, {1});\n'
+                    .format(extracted / 8, self.width / 8));
+             extracted = self.width
+         output(ind, 'return insn;\n')
+-- 
+2.11.0
