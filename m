@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54870)
+Received: from eggs.gnu.org ([209.51.188.92]:57501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h09Z6-00054z-Jm
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:40:53 -0500
+	(envelope-from <philmd@redhat.com>) id 1h09s2-0007rL-Lf
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 14:00:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h09Z5-0004n8-Jv
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:40:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51038)
+	(envelope-from <philmd@redhat.com>) id 1h09jB-0007p7-Rq
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:51:18 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55568)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h09Z4-0004kF-AR
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:40:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h09Z2-0007XF-E6
-	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 18:40:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6802B2E80CB
-	for <qemu-devel@nongnu.org>; Sat,  2 Mar 2019 18:40:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h09jB-0007oa-Ju
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:51:17 -0500
+Received: by mail-wm1-f67.google.com with SMTP id q187so1068631wme.5
+	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 10:51:17 -0800 (PST)
+References: <20190122121413.31437-1-ysato@users.sourceforge.jp>
+	<20190302062138.10713-1-ysato@users.sourceforge.jp>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ce64ecf0-5dff-fb8f-a29a-d73e556a8479@redhat.com>
+Date: Sat, 2 Mar 2019 19:51:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 02 Mar 2019 11:36:02 -0000
-From: Ahzo <1815889@bugs.launchpad.net>
-Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
-Message-Id: <155155197177.21453.11181624525492584119.launchpad@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815889]
+In-Reply-To: <20190302062138.10713-1-ysato@users.sourceforge.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v3 00/11] Add RX archtecture support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,91 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
 
-(In reply to Daniel P. Berrange from comment #3)
-> (In reply to Ahzo from comment #2)
-> > To check for the availability of the syscall, one can try it in a child
-> > process and see if the child is terminated by a signal, e.g. like this:
-> =
+Hi Yoshinori,
 
-> Afraid not, QEMU's seccomp filter blocks use of fork() too :-)
+On 3/2/19 7:21 AM, Yoshinori Sato wrote:
+> Hello.
+> This patch series is added Renesas RX target emulation.
+> 
+> My git repository is bellow.
+> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git
+> 
+> Since my understanding is not enough,
+> I want many comments to make this a good one.
 
-Maybe it should, at least when using the spawn=3Ddeny option, but currently=
- it doesn't. That option only blocks the fork, vfork and execve syscalls, b=
-ut glibc's fork() function uses the clone syscall, and thus continues to wo=
-rk.
-However, that behavior might be different when using other C library implem=
-entations, so it wouldn't be correct to rely on this.
-One could use clone() instead of fork(), but future versions of qemu might =
-block the clone syscall, as well.
+OK :)
 
-Unfortunately, I'm not aware of a proper solution for this bug short of
-adding a new API to the kernel.
+Can you provide notes about how to test your port?
+Such: links to toolchains, how to build, what firmware/OS we can run...
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815889
-
-Title:
-  qemu-system-x86_64 crashed with signal 31 in
-  __pthread_setaffinity_new()
-
-Status in Mesa:
-  Confirmed
-Status in QEMU:
-  New
-Status in mesa package in Ubuntu:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  Unable to launch Default Fedora 29 images in gnome-boxes
-
-  ProblemType: Crash
-  DistroRelease: Ubuntu 19.04
-  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
-  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
-  Uname: Linux 4.19.0-12-generic x86_64
-  ApportVersion: 2.20.10-0ubuntu20
-  Architecture: amd64
-  Date: Thu Feb 14 11:00:45 2019
-  ExecutablePath: /usr/bin/qemu-system-x86_64
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: Dell Inc. Precision T3610
-  ProcEnviron: PATH=3D(custom, user)
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
-ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
-  Signal: 31
-  SourcePackage: qemu
-  StacktraceTop:
-   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
-t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
-   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
-   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
-   start_thread (arg=3D<optimized out>) at pthread_create.c:486
-   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
-_new()
-  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
-  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
-  dmi.bios.date: 11/14/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: A18
-  dmi.board.name: 09M8Y8
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A01
-  dmi.chassis.type: 7
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
-T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
-  dmi.product.name: Precision T3610
-  dmi.product.sku: 05D2
-  dmi.product.version: 00
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/mesa/+bug/1815889/+subscriptions
+> 
+> Thanks.
+> 
+> Changes v2
+> Rewrite translate. using decodetree.py
+> 
+> Yoshinori Sato (11):
+>   target/rx: TCG Translation
+>   target/rx: TCG helper
+>   target/rx: CPU definition
+>   target/rx: RX disassembler
+>   target/rx: miscellaneous functions
+>   RX62N interrupt contorol uint
+>   RX62N internal timer modules
+>   RX62N internal serial communication interface
+>   RX Target hardware definition
+>   Add rx-softmmu
+>   MAINTAINERS: Add RX entry.
+> 
+>  MAINTAINERS                    |   20 +
+>  arch_init.c                    |    2 +
+>  configure                      |    8 +
+>  default-configs/rx-softmmu.mak |    7 +
+>  hw/char/Makefile.objs          |    2 +-
+>  hw/char/renesas_sci.c          |  288 ++++++
+>  hw/intc/Makefile.objs          |    1 +
+>  hw/intc/rx_icu.c               |  323 ++++++
+>  hw/rx/Makefile.objs            |    1 +
+>  hw/rx/rx62n.c                  |  227 ++++
+>  hw/rx/rxqemu.c                 |  100 ++
+>  hw/timer/Makefile.objs         |    2 +
+>  hw/timer/renesas_cmt.c         |  235 +++++
+>  hw/timer/renesas_tmr.c         |  412 ++++++++
+>  include/disas/bfd.h            |    5 +
+>  include/hw/char/renesas_sci.h  |   42 +
+>  include/hw/intc/rx_icu.h       |   49 +
+>  include/hw/rx/rx.h             |    7 +
+>  include/hw/rx/rx62n.h          |   54 +
+>  include/hw/timer/renesas_cmt.h |   33 +
+>  include/hw/timer/renesas_tmr.h |   42 +
+>  include/sysemu/arch_init.h     |    1 +
+>  target/rx/Makefile.objs        |   11 +
+>  target/rx/cpu-qom.h            |   52 +
+>  target/rx/cpu.c                |  224 ++++
+>  target/rx/cpu.h                |  214 ++++
+>  target/rx/disas.c              | 1570 ++++++++++++++++++++++++++++
+>  target/rx/gdbstub.c            |  113 ++
+>  target/rx/helper.c             |  252 +++++
+>  target/rx/helper.h             |   39 +
+>  target/rx/insns.decode         |  336 ++++++
+>  target/rx/monitor.c            |   38 +
+>  target/rx/op_helper.c          |  602 +++++++++++
+>  target/rx/translate.c          | 2220 ++++++++++++++++++++++++++++++++++++++++
+>  34 files changed, 7531 insertions(+), 1 deletion(-)
+>  create mode 100644 default-configs/rx-softmmu.mak
+>  create mode 100644 hw/char/renesas_sci.c
+>  create mode 100644 hw/intc/rx_icu.c
+>  create mode 100644 hw/rx/Makefile.objs
+>  create mode 100644 hw/rx/rx62n.c
+>  create mode 100644 hw/rx/rxqemu.c
+>  create mode 100644 hw/timer/renesas_cmt.c
+>  create mode 100644 hw/timer/renesas_tmr.c
+>  create mode 100644 include/hw/char/renesas_sci.h
+>  create mode 100644 include/hw/intc/rx_icu.h
+>  create mode 100644 include/hw/rx/rx.h
+>  create mode 100644 include/hw/rx/rx62n.h
+>  create mode 100644 include/hw/timer/renesas_cmt.h
+>  create mode 100644 include/hw/timer/renesas_tmr.h
+>  create mode 100644 target/rx/Makefile.objs
+>  create mode 100644 target/rx/cpu-qom.h
+>  create mode 100644 target/rx/cpu.c
+>  create mode 100644 target/rx/cpu.h
+>  create mode 100644 target/rx/disas.c
+>  create mode 100644 target/rx/gdbstub.c
+>  create mode 100644 target/rx/helper.c
+>  create mode 100644 target/rx/helper.h
+>  create mode 100644 target/rx/insns.decode
+>  create mode 100644 target/rx/monitor.c
+>  create mode 100644 target/rx/op_helper.c
+>  create mode 100644 target/rx/translate.c
+> 
