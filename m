@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46767)
+Received: from eggs.gnu.org ([209.51.188.92]:36271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <will@wbowling.info>) id 1gzpzL-0001fB-FJ
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:46:40 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gztvM-0004bz-OK
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 20:58:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <will@wbowling.info>) id 1gzpzK-0005By-9J
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:46:39 -0500
-Received: from wbowling.info ([2400:8901::f03c:91ff:fe59:6f11]:51508)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <will@wbowling.info>) id 1gzpzG-0004wT-TF
-	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 16:46:38 -0500
-From: William Bowling <will@wbowling.info>
-Date: Fri,  1 Mar 2019 21:45:56 +0000
-Message-Id: <1551476756-25749-1-git-send-email-will@wbowling.info>
-Subject: [Qemu-devel] [PATCH] slirp: check sscanf result when emulating ident
+	(envelope-from <no-reply@patchew.org>) id 1gztvL-0004Nr-FC
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 20:58:48 -0500
+Resent-Message-Id: <E1gztvL-0004Nr-FC@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21797)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gztvJ-00049W-At
+	for qemu-devel@nongnu.org; Fri, 01 Mar 2019 20:58:47 -0500
+Message-ID: <155149190891.24.9184293577287300375@6acff2cf482b>
+In-Reply-To: <20190222024106.9167-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Mar 2019 17:58:30 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] target/arm: Reduce overhead of
+ cpu_get_tb_cpu_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,40 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: secalert@redhat.com, William Bowling <will@wbowling.info>
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, cota@braap.org, alex.bennee@linaro.org
 
-When emulating ident in tcp_emu, if the strchr checks passed but the
-sscanf check failed, two uninitialized variables would be copied and
-sent in the reply.
-
-Signed-off-by: William Bowling <will@wbowling.info>
----
- slirp/tcp_subr.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 262a42d6c8..73a160ba16 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -664,12 +664,12 @@ tcp_emu(struct socket *so, struct mbuf *m)
- 							break;
- 						}
- 					}
--				}
--                                so_rcv->sb_cc = snprintf(so_rcv->sb_data,
--                                                         so_rcv->sb_datalen,
--                                                         "%d,%d\r\n", n1, n2);
--				so_rcv->sb_rptr = so_rcv->sb_data;
--				so_rcv->sb_wptr = so_rcv->sb_data + so_rcv->sb_cc;
-+                    so_rcv->sb_cc = snprintf(so_rcv->sb_data,
-+                                             so_rcv->sb_datalen,
-+                                             "%d,%d\r\n", n1, n2);
-+                    so_rcv->sb_rptr = so_rcv->sb_data;
-+                    so_rcv->sb_wptr = so_rcv->sb_data + so_rcv->sb_cc;
-+                }
- 			}
- 			m_free(m);
- 			return 0;
--- 
-2.15.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyMjAyNDEwNi45MTY3
+LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMjIyMDI0
+MTA2LjkxNjctMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRl
+dmVsXSBbUEFUQ0ggdjMgMC8zXSB0YXJnZXQvYXJtOiBSZWR1Y2Ugb3ZlcmhlYWQgb2YgY3B1X2dl
+dF90Yl9jcHVfc3RhdGUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
+IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAg
+ICAgIHBhdGNoZXcvMjAxOTAyMjIwMjQxMDYuOTE2Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
+by5vcmcgLT4gcGF0Y2hldy8yMDE5MDIyMjAyNDEwNi45MTY3LTEtcmljaGFyZC5oZW5kZXJzb25A
+bGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk4MTllNDZkNzAgdGFy
+Z2V0L2FybTogUmVseSBvbiBoZmxhZ3MgY29ycmVjdCBpbiBjcHVfZ2V0X3RiX2NwdV9zdGF0ZQph
+MGY3NjVkYmE4IHRhcmdldC9hcm06IFJlYnVpbGQgaGZsYWdzIGF0IGVsIGNoYW5nZXMgYW5kIE1T
+UiB3cml0ZXMKZDY1ZWJhYTFhOCB0YXJnZXQvYXJtOiBTcGxpdCBvdXQgcmVjb21wdXRlX2hmbGFn
+cyBldCBhbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8zIENoZWNraW5nIGNvbW1pdCBkNjVlYmFh
+MWE4MjYgKHRhcmdldC9hcm06IFNwbGl0IG91dCByZWNvbXB1dGVfaGZsYWdzIGV0IGFsKQpXQVJO
+SU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQoj
+MTI3OiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjEyODM3OgorICAgIC8qIHY4TSBhbHdheXMg
+YXBwbGllcyBzdGFjayBsaW1pdCBjaGVja3MgdW5sZXNzIENDUi5TVEtPRkhGTk1JR04gaXMKCldB
+Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5l
+CiMxNzI6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTI4ODI6CisgICAgICAgIC8qIElmIFNW
+RSBpcyBkaXNhYmxlZCwgYnV0IEZQIGlzIGVuYWJsZWQsCgp0b3RhbDogMCBlcnJvcnMsIDIgd2Fy
+bmluZ3MsIDM2OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KMi8zIENoZWNraW5nIGNvbW1pdCBhMGY3NjVkYmE4YTEgKHRhcmdldC9hcm06IFJlYnVp
+bGQgaGZsYWdzIGF0IGVsIGNoYW5nZXMgYW5kIE1TUiB3cml0ZXMpCjMvMyBDaGVja2luZyBjb21t
+aXQgOTgxOWU0NmQ3MDJlICh0YXJnZXQvYXJtOiBSZWx5IG9uIGhmbGFncyBjb3JyZWN0IGluIGNw
+dV9nZXRfdGJfY3B1X3N0YXRlKQpFUlJPUjogVXNlIGdfYXNzZXJ0IG9yIGdfYXNzZXJ0X25vdF9y
+ZWFjaGVkCiM3NjogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxMjk1OToKKyAgICAgICAgZ19h
+c3NlcnRfY21waGV4KGZsYWdzLCA9PSwgY2hlY2tfZmxhZ3MpOwoKdG90YWw6IDEgZXJyb3JzLCAw
+IHdhcm5pbmdzLCAzNCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
+b2dzLzIwMTkwMjIyMDI0MTA2LjkxNjctMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rl
+c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
