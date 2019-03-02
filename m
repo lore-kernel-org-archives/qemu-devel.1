@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44238)
+Received: from eggs.gnu.org ([209.51.188.92]:46207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0Dpy-00031l-FA
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 18:14:35 -0500
+	(envelope-from <will@wbowling.info>) id 1h0E3j-0005Jn-Cm
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 18:28:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0Dpx-0003vl-Gn
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 18:14:34 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:34585)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0Dpw-0003v3-RC
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 18:14:33 -0500
-Date: Sat, 2 Mar 2019 18:14:31 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190302231431.GB16678@flamenco>
-References: <20190130004811.27372-1-cota@braap.org>
-	<20190130004811.27372-41-cota@braap.org>
-	<87d0o2msz4.fsf@zen.linaroharston>
+	(envelope-from <will@wbowling.info>) id 1h0E3i-0001Um-BN
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 18:28:47 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38466)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <will@wbowling.info>) id 1h0E3h-0001Re-QL
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 18:28:46 -0500
+Received: by mail-wr1-x443.google.com with SMTP id g12so1586090wrm.5
+	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 15:28:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87d0o2msz4.fsf@zen.linaroharston>
-Subject: Re: [Qemu-devel] [PATCH v6 40/73] i386/kvm: convert to
- cpu_interrupt_request
+References: <1551476756-25749-1-git-send-email-will@wbowling.info>
+	<77613668-7b49-0c45-70ed-0684831a5b03@redhat.com>
+In-Reply-To: <77613668-7b49-0c45-70ed-0684831a5b03@redhat.com>
+From: William Bowling <will@wbowling.info>
+Date: Sun, 3 Mar 2019 10:28:32 +1100
+Message-ID: <CAPWJUnwimpOopQzmfmWBZBWVu8U1rzKTggw7qz1rGhUc82tAVw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: check sscanf result when emulating
+ ident
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, secalert@redhat.com, qemu-stable@nongnu.org
 
-On Fri, Feb 08, 2019 at 11:15:27 +0000, Alex Bennée wrote:
-> 
-> Emilio G. Cota <cota@braap.org> writes:
-> 
-> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+Hi Phil,
+
+William: How did you notice that? Using a static analyzer?
+
+
+It was while looking into a previous CVE in tcp_emu, just with a manual
+code review.
+
+We have a data leak, Cc'ing qemu-stable.
+> (Adding the address I noticed you Cc'ed secalert@redhat.com, so that
+> confirms my guess).
+
+
+Yeah the report and patch went via the security list initially due to the
+info leak.
+
+Cheers,
+Will
+
+On Sun, Mar 3, 2019 at 4:42 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om>
+wrote:
+
+> Hi William, Samuel,
+>
+> On 3/1/19 10:45 PM, William Bowling wrote:
+> > When emulating ident in tcp_emu, if the strchr checks passed but the
+> > sscanf check failed, two uninitialized variables would be copied and
+> > sent in the reply.
+>
+> William: How did you notice that? Using a static analyzer?
+>
+> Samuel: since this diff is not obvious without looking at the context
+> (also due to the code re-indent), can you improve the commit
+> description, such (or better):
+>
+> "Move this code inside the if(sscanf()) clause".
+>
+> We have a data leak, Cc'ing qemu-stable.
+> (Adding the address I noticed you Cc'ed secalert@redhat.com, so that
+> confirms my guess).
+>
+> >
+> > Signed-off-by: William Bowling <will@wbowling.info>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> Thanks,
+>
+> Phil.
+>
 > > ---
-> >  target/i386/kvm.c | 54 +++++++++++++++++++++++++++--------------------
-> >  1 file changed, 31 insertions(+), 23 deletions(-)
+> >  slirp/tcp_subr.c | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
 > >
-> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > index ca2629f0fe..3f3c670897 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> <snip>
-> > @@ -3183,14 +3186,14 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-> >  {
-> >      X86CPU *x86_cpu = X86_CPU(cpu);
-> >      CPUX86State *env = &x86_cpu->env;
-> > +    uint32_t interrupt_request;
-> >      int ret;
+> > diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+> > index 262a42d6c8..73a160ba16 100644
+> > --- a/slirp/tcp_subr.c
+> > +++ b/slirp/tcp_subr.c
+> > @@ -664,12 +664,12 @@ tcp_emu(struct socket *so, struct mbuf *m)
+> >                                                       break;
+> >                                               }
+> >                                       }
+> > -                             }
+> > -                                so_rcv->sb_cc =3D
+> snprintf(so_rcv->sb_data,
+> > -
+>  so_rcv->sb_datalen,
+> > -                                                         "%d,%d\r\n",
+> n1, n2);
+> > -                             so_rcv->sb_rptr =3D so_rcv->sb_data;
+> > -                             so_rcv->sb_wptr =3D so_rcv->sb_data +
+> so_rcv->sb_cc;
+> > +                    so_rcv->sb_cc =3D snprintf(so_rcv->sb_data,
+> > +                                             so_rcv->sb_datalen,
+> > +                                             "%d,%d\r\n", n1, n2);
+> > +                    so_rcv->sb_rptr =3D so_rcv->sb_data;
+> > +                    so_rcv->sb_wptr =3D so_rcv->sb_data + so_rcv->sb_c=
+c;
+> > +                }
+> >                       }
+> >                       m_free(m);
+> >                       return 0;
 > >
-> > +    interrupt_request = cpu_interrupt_request(cpu);
-> >      /* Inject NMI */
-> > -    if (cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
-> > -        if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
-> > -            qemu_mutex_lock_iothread();
-> > +    if (interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
-> > +        if (interrupt_request & CPU_INTERRUPT_NMI) {
-> >              cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
-> > -            qemu_mutex_unlock_iothread();
-> >              DPRINTF("injected NMI\n");
-> >              ret = kvm_vcpu_ioctl(cpu, KVM_NMI);
-> >              if (ret < 0) {
-> > @@ -3198,10 +3201,8 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-> >                          strerror(-ret));
-> >              }
-> >          }
-> > -        if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
-> > -            qemu_mutex_lock_iothread();
-> > +        if (interrupt_request & CPU_INTERRUPT_SMI) {
-> >              cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
-> > -            qemu_mutex_unlock_iothread();
-> >              DPRINTF("injected SMI\n");
-> >              ret = kvm_vcpu_ioctl(cpu, KVM_SMI);
-> >              if (ret < 0) {
-> > @@ -3215,16 +3216,18 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-> >          qemu_mutex_lock_iothread();
-> >      }
-> >
-> > +    interrupt_request = cpu_interrupt_request(cpu);
-> > +
-> 
-> This seems a bit smelly as we have already read interrupt_request once
-> before. So this says that something may have triggered an IRQ while we
-> were dealing with the above. It requires a comment at least.
+>
 
-There are a few cpu_reset_interrupt() calls above, so I thought a comment
-wasn't necessary. I've added the following comment:
 
-+    /*
-+     * We might have cleared some bits in cpu->interrupt_request since reading
-+     * it; read it again.
-+     */
-     interrupt_request = cpu_interrupt_request(cpu);
+--=20
 
-> Otherwise:
-> 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+GPG Key ID: 0x980F711A
 
-Thanks,
-
-		E.
+GPG Key Fingerprint: AA38 2A0E 7D22 18A9 6086  0289 41DC E04B 980F 711A
