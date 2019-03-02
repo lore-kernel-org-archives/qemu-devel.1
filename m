@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52336)
+Received: from eggs.gnu.org ([209.51.188.92]:44877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h01Nx-0004bp-DC
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 04:56:50 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1h01wo-0002D1-5Y
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 05:32:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h01Nv-0000gu-RD
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 04:56:49 -0500
-References: <1551407310-32413-1-git-send-email-guoheyi@huawei.com>
-	<20190301084619-mutt-send-email-mst@kernel.org>
-	<cc3c8e42-0632-0c90-41cc-27bfdcaef11d@huawei.com>
-	<20190301091214-mutt-send-email-mst@kernel.org>
-	<20190301153311.79c0d287@redhat.com>
-	<20190301104928-mutt-send-email-mst@kernel.org>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <a80e6101-00c6-e414-4d4b-764f05386100@huawei.com>
-Date: Sat, 2 Mar 2019 17:56:00 +0800
+	(envelope-from <sgarzare@redhat.com>) id 1h01is-0006cS-5i
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 05:18:27 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34483)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1h01im-0005N2-AQ
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 05:18:25 -0500
+Received: by mail-wr1-f66.google.com with SMTP id f14so422973wrg.1
+	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 02:18:02 -0800 (PST)
+Date: Sat, 2 Mar 2019 11:17:58 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190302101758.g37atuvjk4qg4cn4@steredhat>
+References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
+	<1549390526-24246-14-git-send-email-pbonzini@redhat.com>
+	<87sgw6k02i.fsf@zen.linaroharston>
+	<20190301171343.dyuqan3ok6gzuotw@steredhat>
+	<87o96ujx63.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190301104928-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/acpi: enable SHPC native hot plug
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87o96ujx63.fsf@zen.linaroharston>
+Subject: Re: [Qemu-devel] [PULL 13/76] pvh: Add x86/HVM direct boot ABI
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Heyi Guo <heyi.guo@linaro.org>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
+On Fri, Mar 01, 2019 at 05:56:36PM +0000, Alex Bennée wrote:
+> 
+> Stefano Garzarella <sgarzare@redhat.com> writes:
+> 
+> > On Fri, Mar 01, 2019 at 04:53:57PM +0000, Alex Bennée wrote:
+> >>
+> >> Paolo Bonzini <pbonzini@redhat.com> writes:
+> >>
+> >> > From: Liam Merwick <Liam.Merwick@oracle.com>
+> >> >
+> >> > The x86/HVM direct boot ABI permits Qemu to be able to boot directly
+> >> > into the uncompressed Linux kernel binary with minimal firmware involvement.
+> >> >
+> >> > 	https://xenbits.xen.org/docs/unstable/misc/pvh.html
+> >> >
+> >> > This commit adds the header file that defines the start_info struct
+> >> > that needs to be populated in order to use this ABI.
+> >> >
+> >> > The canonical version of start_info.h is in the Xen codebase.
+> >> > (like QEMU, the Linux kernel uses a copy as well).
+> >> >
+> >> > Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+> >> > Reviewed-by: Konrad Rzeszutek Wilk <Konrad.Wilk@oracle.com>
+> >> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> >>
+> >> This has changed behaviour of a boot. Previously:
+> >>
+> >>   qemu-system-i386 -serial mon:stdio -nographic -device \
+> >>      isa-debugcon,chardev=serial0 -kernel ./tests/hello
+> >>
+> >
+> > Hi Alex,
+> > is your image in multiboot format?
+> 
+> AFAICT yes, I'm not super familiar with x86 so I'm mostly cribbing from:
+> 
+>   https://github.com/doug65536/qemu-bmibug
+> 
+> > I sent a patch few weeks ago that fix the loading of multiboot images:
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg596424.html
+> 
+> That certainly fixes things. Although I'm wondering if it's worth making
+> my test image PVH compatible anyway (if it's easy to do) as all I really
+> want to do is exercise the softmmu code. It might be simpler to use
+> paravirtualised serial ports rather than banging an IO port, IDK?
 
+I don't have a lot of experience too, but I don't think there are a lot
+of differences in terms of how to use ports.
 
-On 2019/3/1 23:49, Michael S. Tsirkin wrote:
-> On Fri, Mar 01, 2019 at 03:33:11PM +0100, Igor Mammedov wrote:
->> On Fri, 1 Mar 2019 09:12:33 -0500
->> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>
->>> On Fri, Mar 01, 2019 at 10:04:38PM +0800, Heyi Guo wrote:
->>>>
->>>> On 2019/3/1 21:47, Michael S. Tsirkin wrote:
->>>>> On Fri, Mar 01, 2019 at 10:28:30AM +0800, Heyi Guo wrote:
->>>>>> After the introduction of generic PCIe root port and PCIe-PCI bridge,
->>>>>> we will also have SHPC controller on ARM, so just enalbe SHPC native
->>>>>> hot plug.
->>>>>>
->>>>>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
->>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>>>>> Cc: Igor Mammedov <imammedo@redhat.com>
->>>>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->>>>>> Signed-off-by: Heyi Guo <heyi.guo@linaro.org>
->>>>> So when OS enables SHPC, should we block ACPI hotplug events?
->>>> I supposed we don't support ACPI hotplug events on ARM virt; do we have any currently?
->>>>
->>>> Thanks,
->>>> Heyi
->>> Oh I didn't realise. That explains it sorry about the noise.
->> And I thought we did not support them on PCIe completely (I mean q35/ich9).
->> (Or did I miss something)?
-> True for PCIe.
-So may I consider your comments as ACK for this patch :)
+Multiboot and PVH change the way how to jump to your image.
+Both provide a structure where your image can found the e820 memory map and
+PVH provides also the RSDP (ACPI) pointer.
 
-Thanks,
-Heyi
+Maybe create a PVH image should be simpler because you only need to put in the
+ELF note the entry point of your ELF image. Then, EBX will contain the address
+of start_info structure (where you can find the e820 mmap).
 
->>>>>    
->>>>>> ---
->>>>>>    hw/arm/virt-acpi-build.c | 7 ++++++-
->>>>>>    1 file changed, 6 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>>>> index 04b62c7..7849ec5 100644
->>>>>> --- a/hw/arm/virt-acpi-build.c
->>>>>> +++ b/hw/arm/virt-acpi-build.c
->>>>>> @@ -265,7 +265,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>>>>>            aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
->>>>>>        aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
->>>>>>        aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
->>>>>> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
->>>>>> +
->>>>>> +    /*
->>>>>> +     * Allow OS control for all 5 features:
->>>>>> +     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
->>>>>> +     */
->>>>>> +    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1F), NULL),
->>>>>>                                    aml_name("CTRL")));
->>>>>>        ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
->>>>>> -- 
->>>>>> 1.8.3.1
->>>>> .
->>>>>    
->>>>    
-> .
->
+You can take a look of this file in Linux: arch/x86/platform/pvh/head.S
+
+I hope this can help :)
+
+Cheers,
+Stefano
