@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43374)
+Received: from eggs.gnu.org ([209.51.188.92]:46909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h08es-0005SJ-Rj
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 12:42:47 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h08yj-0001OE-Vc
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:03:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h08es-00061L-10
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 12:42:46 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38875)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h08er-0005yr-PI
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 12:42:45 -0500
-Received: by mail-wm1-f67.google.com with SMTP id a188so987382wmf.3
-	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 09:42:44 -0800 (PST)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h08lf-0006ma-LN
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 12:49:48 -0500
+Date: Sat, 2 Mar 2019 09:49:35 -0800
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190302174935.iocl7vnsm6k3l3jn@function>
 References: <1551476756-25749-1-git-send-email-will@wbowling.info>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <77613668-7b49-0c45-70ed-0684831a5b03@redhat.com>
-Date: Sat, 2 Mar 2019 18:42:42 +0100
+	<77613668-7b49-0c45-70ed-0684831a5b03@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1551476756-25749-1-git-send-email-will@wbowling.info>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <77613668-7b49-0c45-70ed-0684831a5b03@redhat.com>
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] slirp: check sscanf result when emulating
  ident
 List-Id: <qemu-devel.nongnu.org>
@@ -30,62 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: William Bowling <will@wbowling.info>, qemu-devel@nongnu.org
-Cc: secalert@redhat.com, qemu-stable@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: William Bowling <will@wbowling.info>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, secalert@redhat.com
 
-Hi William, Samuel,
+Hello,
 
-On 3/1/19 10:45 PM, William Bowling wrote:
-> When emulating ident in tcp_emu, if the strchr checks passed but the
-> sscanf check failed, two uninitialized variables would be copied and
-> sent in the reply.
+Philippe Mathieu-Daud=C3=A9, le sam. 02 mars 2019 18:42:42 +0100, a ecrit=
+:
+> Samuel: since this diff is not obvious without looking at the context
+> (also due to the code re-indent),
 
-William: How did you notice that? Using a static analyzer?
+I dropped the code re-indent to make the change obvious. I still added
+the commit description, always better goes with saying it :)
 
-Samuel: since this diff is not obvious without looking at the context
-(also due to the code re-indent), can you improve the commit
-description, such (or better):
+Thanks!
 
-"Move this code inside the if(sscanf()) clause".
-
-We have a data leak, Cc'ing qemu-stable.
-(Adding the address I noticed you Cc'ed secalert@redhat.com, so that
-confirms my guess).
-
-> 
-> Signed-off-by: William Bowling <will@wbowling.info>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-Thanks,
-
-Phil.
-
-> ---
->  slirp/tcp_subr.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-> index 262a42d6c8..73a160ba16 100644
-> --- a/slirp/tcp_subr.c
-> +++ b/slirp/tcp_subr.c
-> @@ -664,12 +664,12 @@ tcp_emu(struct socket *so, struct mbuf *m)
->  							break;
->  						}
->  					}
-> -				}
-> -                                so_rcv->sb_cc = snprintf(so_rcv->sb_data,
-> -                                                         so_rcv->sb_datalen,
-> -                                                         "%d,%d\r\n", n1, n2);
-> -				so_rcv->sb_rptr = so_rcv->sb_data;
-> -				so_rcv->sb_wptr = so_rcv->sb_data + so_rcv->sb_cc;
-> +                    so_rcv->sb_cc = snprintf(so_rcv->sb_data,
-> +                                             so_rcv->sb_datalen,
-> +                                             "%d,%d\r\n", n1, n2);
-> +                    so_rcv->sb_rptr = so_rcv->sb_data;
-> +                    so_rcv->sb_wptr = so_rcv->sb_data + so_rcv->sb_cc;
-> +                }
->  			}
->  			m_free(m);
->  			return 0;
-> 
+Samuel
