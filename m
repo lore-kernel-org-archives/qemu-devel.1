@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59216)
+Received: from eggs.gnu.org ([209.51.188.92]:58287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h0CR4-0001iz-1z
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 16:44:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1h0CNH-0007w0-BU
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 16:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h0CR2-0005d5-0s
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 16:44:45 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44151)
+	(envelope-from <bounces@canonical.com>) id 1h0CNF-0003bc-L3
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 16:40:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h0CR1-0005ZZ-P9
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 16:44:43 -0500
-Received: by mail-wr1-f68.google.com with SMTP id w2so1452630wrt.11
-	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 13:44:43 -0800 (PST)
-References: <20190221005753.27955-1-crosa@redhat.com>
-	<20190221005753.27955-15-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <110a1e39-22de-5071-5061-e08b402fb5d3@redhat.com>
-Date: Sat, 2 Mar 2019 22:44:41 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h0CNF-0003T4-7z
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 16:40:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h0CNC-0007UA-OQ
+	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 21:40:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B68DD2E8031
+	for <qemu-devel@nongnu.org>; Sat,  2 Mar 2019 21:40:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190221005753.27955-15-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 14/20] Boot Linux Console Test: add a
- test for mips + malta
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 02 Mar 2019 21:35:27 -0000
+From: =?utf-8?q?Jos=C3=A9_Pekkarinen?= <jose.pekkarinen@canonical.com>
+Reply-To: Bug 1818367 <1818367@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155156252741.17588.3363806743942119527.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818367] [NEW] Initialization of device
+ cfi.pflash01 failed: Block node is read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,112 +36,795 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 2/21/19 1:57 AM, Cleber Rosa wrote:
-> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
-> board and verify the serial is working.  Also, it relies on the serial
-> device set by the machine itself.
-> 
-> If mips is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:mips" tags.
-> 
-> Alternatively, this test can be run using:
-> 
->     $ avocado run -t arch:mips tests/acceptance
->     $ avocado run -t machine:malta tests/acceptance
->     $ avocado run -t endian:big tests/acceptance
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  .travis.yml                            |  2 +-
->  tests/acceptance/boot_linux_console.py | 41 ++++++++++++++++++++++++++
->  2 files changed, 42 insertions(+), 1 deletion(-)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 42971484ab..0a5e0613be 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -198,7 +198,7 @@ matrix:
->  
->      # Acceptance (Functional) tests
->      - env:
-> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
-> +        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu"
->          - TEST_CMD="make check-acceptance"
->        addons:
->          apt:
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index e2ef43e7ce..05e43360b8 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -8,9 +8,12 @@
->  # This work is licensed under the terms of the GNU GPL, version 2 or
->  # later.  See the COPYING file in the top-level directory.
->  
-> +import os
->  import logging
->  
->  from avocado_qemu import Test
-> +from avocado.utils import process
-> +from avocado.utils import archive
->  
->  
->  class BootLinuxConsole(Test):
-> @@ -44,6 +47,21 @@ class BootLinuxConsole(Test):
->                  fail = 'Failure message found in console: %s' % failure_message
->                  self.fail(fail)
->  
-> +    def extract_from_deb(self, deb, path):
-> +        """
-> +        Extracts a file from a deb package into the test workdir
-> +
-> +        :param deb: path to the deb archive
-> +        :param file: path within the deb archive of the file to be extracted
-> +        :returns: path of the extracted file
-> +        """
-> +        cwd = os.getcwd()
-> +        os.chdir(self.workdir)
-> +        process.run("ar x %s data.tar.gz" % deb)
-> +        archive.extract("data.tar.gz", self.workdir)
-> +        os.chdir(cwd)
-> +        return self.workdir + path
+Public bug reported:
 
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Hi,
 
-> +
->      def test_x86_64_pc(self):
->          """
->          :avocado: tags=arch:x86_64
-> @@ -62,3 +80,26 @@ class BootLinuxConsole(Test):
->          self.vm.launch()
->          console_pattern = 'Kernel command line: %s' % kernel_command_line
->          self.wait_for_console_pattern(console_pattern)
-> +
-> +    def test_mips_malta(self):
-> +        """
-> +        :avocado: tags=arch:mips
-> +        :avocado: tags=machine:malta
-> +        :avocado: tags=endian:big
-> +        """
-> +        deb_url = ('http://snapshot.debian.org/archive/debian/'
-> +                   '20130217T032700Z/pool/main/l/linux-2.6/'
-> +                   'linux-image-2.6.32-5-4kc-malta_2.6.32-48_mips.deb')
-> +        deb_hash = 'a8cfc28ad8f45f54811fc6cf74fc43ffcfe0ba04'
-> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> +        kernel_path = self.extract_from_deb(deb_path,
-> +                                            '/boot/vmlinux-2.6.32-5-4kc-malta')
-> +
-> +        self.vm.set_machine('malta')
-> +        self.vm.set_console()
-> +        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE + 'console=ttyS0'
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +        console_pattern = 'Kernel command line: %s' % kernel_command_line
-> +        self.wait_for_console_pattern(console_pattern)
-> 
+I have several vms defined in libvirt using ovmf for uefi, since a later
+update of my server I'm unable to start any of the domains defined. This is
+an example of the output given:
+
+# virsh start os-1
+error: Failed to start domain os-1
+error: internal error: qemu unexpectedly closed the monitor: 2019-03-02T21:=
+23:51.726446Z qemu-system-x86_64: Initialization of device cfi.pflash01 fai=
+led: Block node is read-only
+
+an example of domain is like this:
+
+<domain type=3D'kvm'>                                                      =
+                                                                           =
+                                                                           =
+                                                =
+
+  <name>os-1</name>                                                        =
+                                                                           =
+                                                                           =
+                                              =
+
+  <uuid>34c41008-ab91-483b-959c-81a7a12ae9be</uuid>                        =
+                                                                           =
+                                                                           =
+                                              =
+
+  <memory unit=3D'KiB'>8388608</memory>                                    =
+                                                                           =
+                                                                           =
+                                                =
+
+  <currentMemory unit=3D'KiB'>8388608</currentMemory>                      =
+                                                                           =
+                                                                           =
+                                                =
+
+  <memoryBacking>                                                          =
+                                                                           =
+                                                                           =
+                                              =
+
+    <hugepages/>                                                           =
+                                                                           =
+                                                                           =
+                                              =
+
+  </memoryBacking>                                                         =
+                                                                           =
+                                                                           =
+                                              =
+
+  <vcpu placement=3D'static' cpuset=3D'10-11,34-35'>4</vcpu>               =
+                                                                           =
+                                                                           =
+                                                  =
+
+  <os>                                                                     =
+                                                                           =
+                                                                           =
+                                              =
+
+    <type arch=3D'x86_64' machine=3D'pc-i440fx-2.12'>hvm</type>            =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <loader type=3D'pflash'>/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd</loade=
+r>                                                                         =
+                                                                           =
+                                                =
+
+    <boot dev=3D'network'/>                                                =
+                                                                           =
+                                                                           =
+                                                =
+
+    <boot dev=3D'hd'/>                                                     =
+                                                                           =
+                                                                           =
+                                                =
+
+  </os>                                                                    =
+                                                                           =
+                                                                           =
+                                              =
+
+  <features>                                                               =
+                                                                           =
+                                                                           =
+                                              =
+
+    <acpi/>                                                                =
+                                                                           =
+                                                                           =
+                                              =
+
+    <apic/>                                                                =
+                                                                           =
+                                                                           =
+                                              =
+
+  </features>                                                              =
+                                                                           =
+                                                                           =
+                                              =
+
+  <cpu mode=3D'host-passthrough' check=3D'partial'/>                       =
+                                                                           =
+                                                                           =
+                                                  =
+
+  <clock offset=3D'utc'>                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+    <timer name=3D'rtc' tickpolicy=3D'catchup'/>                           =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <timer name=3D'pit' tickpolicy=3D'delay'/>                             =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <timer name=3D'hpet' present=3D'no'/>                                  =
+                                                                           =
+                                                                           =
+                                                  =
+
+  </clock>                                                                 =
+                                                                           =
+                                                                           =
+                                              =
+
+  <on_poweroff>destroy</on_poweroff>                                       =
+                                                                           =
+                                                                           =
+                                              =
+
+  <on_reboot>restart</on_reboot>                                           =
+                                                                           =
+                                                                           =
+                                              =
+
+  <on_crash>destroy</on_crash>                                             =
+                                                                           =
+                                                                           =
+                                              =
+
+  <pm>                                                                     =
+                                                                           =
+                                                                           =
+                                              =
+
+    <suspend-to-mem enabled=3D'no'/>                                       =
+                                                                           =
+                                                                           =
+                                                =
+
+    <suspend-to-disk enabled=3D'no'/>                                      =
+                                                                           =
+                                                                           =
+                                                =
+
+  </pm>                                                                    =
+                                                                           =
+                                                                           =
+                                              =
+
+  <devices>                                                                =
+                                                                           =
+                                                                           =
+                                              =
+
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>                       =
+                                                                           =
+                                                                           =
+                                              =
+
+    <disk type=3D'block' device=3D'disk'>                                  =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>    =
+                                                                           =
+                                                                           =
+                                                      =
+
+      <source dev=3D'/dev/vg0/os-1-vda'/>                                  =
+                                                                           =
+                                                                           =
+                                           =
+
+      <target dev=3D'vda' bus=3D'virtio'/>                                 =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' fu=
+nction=3D'0x0'/>                                                           =
+                                                                           =
+                                                        =
+
+    </disk>                                                                =
+                                                                           =
+                                                                           =
+                                              =
+
+    <disk type=3D'block' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+      <source dev=3D'/dev/vg0/os-1-vdb'/>
+      <target dev=3D'vdb' bus=3D'virtio'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' fu=
+nction=3D'0x0'/>
+    </disk>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x7'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+      <master startport=3D'0'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x0' multifunction=3D'on'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+      <master startport=3D'2'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x1'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+      <master startport=3D'4'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x2'/>
+    </controller>
+    <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+    <controller type=3D'ide' index=3D'0'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' fu=
+nction=3D'0x1'/>
+    </controller>
+    <interface type=3D'bridge'>
+      <mac address=3D'52:54:00:78:cb:97'/>
+      <source bridge=3D'virbr0'/>
+      <model type=3D'rtl8139'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' fu=
+nction=3D'0x0'/>
+    </interface>
+    <interface type=3D'bridge'>
+      <mac address=3D'52:54:00:1c:4f:22'/>
+      <source bridge=3D'virbr1'/>
+      <model type=3D'rtl8139'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' fu=
+nction=3D'0x0'/>
+    </interface>
+    <serial type=3D'pty'>
+      <target type=3D'isa-serial' port=3D'0'>
+        <model name=3D'isa-serial'/>
+      </target>
+    </serial>
+    <console type=3D'pty'>
+      <target type=3D'serial' port=3D'0'/>
+    </console>
+    <input type=3D'mouse' bus=3D'ps2'/>
+    <input type=3D'keyboard' bus=3D'ps2'/>
+    <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'>
+      <listen type=3D'address'/>
+    </graphics>
+    <video>
+      <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' fu=
+nction=3D'0x0'/>
+    </video>
+    <memballoon model=3D'virtio'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' fu=
+nction=3D'0x0'/>
+    </memballoon>
+  </devices>
+</domain>
+
+where /var/lib/libvirt/qemu/nvram/os-1-ovmf.fd is a copy of
+/usr/share/edk2-ovmf/OVMF_VARS.fd. An the extract from my
+/etc/libvirt/qemu.conf to define ovmf:
+
+...
+# Location of master nvram file                                            =
+                                                                           =
+                                                                           =
+                                              =
+
+#                                                                          =
+                                                                           =
+                                                                           =
+                                              =
+
+# When a domain is configured to use UEFI instead of standard              =
+                                                                           =
+                                                                           =
+                                              =
+
+# BIOS it may use a separate storage for UEFI variables. If                =
+                                                                           =
+                                                                           =
+                                              =
+
+# that's the case libvirt creates the variable store per domain            =
+                                                                           =
+                                                                           =
+                                              =
+
+# using this master file as image. Each UEFI firmware can,                 =
+                                                                           =
+                                                                           =
+                                              =
+
+# however, have different variables store. Therefore the nvram is          =
+                                                                           =
+                                                                           =
+                                              =
+
+# a list of strings when a single item is in form of:                      =
+                                                                           =
+                                                                           =
+                                              =
+
+#   ${PATH_TO_UEFI_FW}:${PATH_TO_UEFI_VARS}.                               =
+                                                                           =
+                                                                           =
+                                              =
+
+# Later, when libvirt creates per domain variable store, this list is      =
+                                                                           =
+                                                                           =
+                                              =
+
+# searched for the master image. The UEFI firmware can be called           =
+                                                                           =
+                                                                           =
+                                              =
+
+# differently for different guest architectures. For instance, it's OVMF   =
+                                                                           =
+                                                                           =
+                                              =
+
+# for x86_64 and i686, but it's AAVMF for aarch64. The libvirt default     =
+                                                                           =
+                                                                           =
+                                              =
+
+# follows this scheme.                                                     =
+                                                                           =
+                                                                           =
+                                              =
+
+nvram =3D [                                                                =
+                                                                           =
+                                                                           =
+                                                =
+
+   "/usr/share/edk2-ovmf/OVMF_CODE.fd:/usr/share/edk2-ovmf/OVMF_VARS.fd",  =
+                                                                           =
+                                                                           =
+                                              =
+
+]
+...
+
+This setup used to work one month ago, now it's setup with:
+
+QEMU emulator version 3.1.0
+libvirt-5.0.0
+linux-4.19.20
+
+Any help appreciated.
+
+Best regards.
+
+Jos=C3=A9
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818367
+
+Title:
+  Initialization of device cfi.pflash01 failed: Block node is read-only
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I have several vms defined in libvirt using ovmf for uefi, since a later
+  update of my server I'm unable to start any of the domains defined. This =
+is
+  an example of the output given:
+
+  # virsh start os-1
+  error: Failed to start domain os-1
+  error: internal error: qemu unexpectedly closed the monitor: 2019-03-02T2=
+1:23:51.726446Z qemu-system-x86_64: Initialization of device cfi.pflash01 f=
+ailed: Block node is read-only
+
+  an example of domain is like this:
+
+  <domain type=3D'kvm'>                                                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <name>os-1</name>                                                      =
+                                                                           =
+                                                                           =
+                                                =
+
+    <uuid>34c41008-ab91-483b-959c-81a7a12ae9be</uuid>                      =
+                                                                           =
+                                                                           =
+                                                =
+
+    <memory unit=3D'KiB'>8388608</memory>                                  =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <currentMemory unit=3D'KiB'>8388608</currentMemory>                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <memoryBacking>                                                        =
+                                                                           =
+                                                                           =
+                                                =
+
+      <hugepages/>                                                         =
+                                                                           =
+                                                                           =
+                                                =
+
+    </memoryBacking>                                                       =
+                                                                           =
+                                                                           =
+                                                =
+
+    <vcpu placement=3D'static' cpuset=3D'10-11,34-35'>4</vcpu>             =
+                                                                           =
+                                                                           =
+                                                    =
+
+    <os>                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-2.12'>hvm</type>          =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <loader type=3D'pflash'>/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd</loa=
+der>                                                                       =
+                                                                           =
+                                                  =
+
+      <boot dev=3D'network'/>                                              =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <boot dev=3D'hd'/>                                                   =
+                                                                           =
+                                                                           =
+                                                  =
+
+    </os>                                                                  =
+                                                                           =
+                                                                           =
+                                                =
+
+    <features>                                                             =
+                                                                           =
+                                                                           =
+                                                =
+
+      <acpi/>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <apic/>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+    </features>                                                            =
+                                                                           =
+                                                                           =
+                                                =
+
+    <cpu mode=3D'host-passthrough' check=3D'partial'/>                     =
+                                                                           =
+                                                                           =
+                                                    =
+
+    <clock offset=3D'utc'>                                                 =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <timer name=3D'rtc' tickpolicy=3D'catchup'/>                         =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <timer name=3D'pit' tickpolicy=3D'delay'/>                           =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <timer name=3D'hpet' present=3D'no'/>                                =
+                                                                           =
+                                                                           =
+                                                    =
+
+    </clock>                                                               =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_poweroff>destroy</on_poweroff>                                     =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_reboot>restart</on_reboot>                                         =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_crash>destroy</on_crash>                                           =
+                                                                           =
+                                                                           =
+                                                =
+
+    <pm>                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+      <suspend-to-mem enabled=3D'no'/>                                     =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <suspend-to-disk enabled=3D'no'/>                                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    </pm>                                                                  =
+                                                                           =
+                                                                           =
+                                                =
+
+    <devices>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <emulator>/usr/bin/qemu-system-x86_64</emulator>                     =
+                                                                           =
+                                                                           =
+                                                =
+
+      <disk type=3D'block' device=3D'disk'>                                =
+                                                                           =
+                                                                           =
+                                                    =
+
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>  =
+                                                                           =
+                                                                           =
+                                                        =
+
+        <source dev=3D'/dev/vg0/os-1-vda'/>                                =
+                                                                           =
+                                                                           =
+                                             =
+
+        <target dev=3D'vda' bus=3D'virtio'/>                               =
+                                                                           =
+                                                                           =
+                                                    =
+
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>                                                         =
+                                                                           =
+                                                          =
+
+      </disk>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <disk type=3D'block' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+        <source dev=3D'/dev/vg0/os-1-vdb'/>
+        <target dev=3D'vdb' bus=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' =
+function=3D'0x0'/>
+      </disk>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x7'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+        <master startport=3D'0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0' multifunction=3D'on'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+        <master startport=3D'2'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x1'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+        <master startport=3D'4'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x2'/>
+      </controller>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+      <controller type=3D'ide' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:78:cb:97'/>
+        <source bridge=3D'virbr0'/>
+        <model type=3D'rtl8139'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </interface>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:1c:4f:22'/>
+        <source bridge=3D'virbr1'/>
+        <model type=3D'rtl8139'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <serial type=3D'pty'>
+        <target type=3D'isa-serial' port=3D'0'>
+          <model name=3D'isa-serial'/>
+        </target>
+      </serial>
+      <console type=3D'pty'>
+        <target type=3D'serial' port=3D'0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <input type=3D'keyboard' bus=3D'ps2'/>
+      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'>
+        <listen type=3D'address'/>
+      </graphics>
+      <video>
+        <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+  </domain>
+
+  where /var/lib/libvirt/qemu/nvram/os-1-ovmf.fd is a copy of
+  /usr/share/edk2-ovmf/OVMF_VARS.fd. An the extract from my
+  /etc/libvirt/qemu.conf to define ovmf:
+
+  ...
+  # Location of master nvram file                                          =
+                                                                           =
+                                                                           =
+                                                =
+
+  #                                                                        =
+                                                                           =
+                                                                           =
+                                                =
+
+  # When a domain is configured to use UEFI instead of standard            =
+                                                                           =
+                                                                           =
+                                                =
+
+  # BIOS it may use a separate storage for UEFI variables. If              =
+                                                                           =
+                                                                           =
+                                                =
+
+  # that's the case libvirt creates the variable store per domain          =
+                                                                           =
+                                                                           =
+                                                =
+
+  # using this master file as image. Each UEFI firmware can,               =
+                                                                           =
+                                                                           =
+                                                =
+
+  # however, have different variables store. Therefore the nvram is        =
+                                                                           =
+                                                                           =
+                                                =
+
+  # a list of strings when a single item is in form of:                    =
+                                                                           =
+                                                                           =
+                                                =
+
+  #   ${PATH_TO_UEFI_FW}:${PATH_TO_UEFI_VARS}.                             =
+                                                                           =
+                                                                           =
+                                                =
+
+  # Later, when libvirt creates per domain variable store, this list is    =
+                                                                           =
+                                                                           =
+                                                =
+
+  # searched for the master image. The UEFI firmware can be called         =
+                                                                           =
+                                                                           =
+                                                =
+
+  # differently for different guest architectures. For instance, it's OVMF =
+                                                                           =
+                                                                           =
+                                                =
+
+  # for x86_64 and i686, but it's AAVMF for aarch64. The libvirt default   =
+                                                                           =
+                                                                           =
+                                                =
+
+  # follows this scheme.                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+  nvram =3D [                                                              =
+                                                                           =
+                                                                           =
+                                                  =
+
+     "/usr/share/edk2-ovmf/OVMF_CODE.fd:/usr/share/edk2-ovmf/OVMF_VARS.fd",=
+                                                                           =
+                                                                           =
+                                                =
+
+  ]
+  ...
+
+  This setup used to work one month ago, now it's setup with:
+
+  QEMU emulator version 3.1.0
+  libvirt-5.0.0
+  linux-4.19.20
+
+  Any help appreciated.
+
+  Best regards.
+
+  Jos=C3=A9
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818367/+subscriptions
