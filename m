@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58057)
+Received: from eggs.gnu.org ([209.51.188.92]:52336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1gzyJa-00042S-Dc
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:40:07 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1h01Nx-0004bp-DC
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 04:56:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1gzyJS-0004Yc-LZ
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:40:02 -0500
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:38393)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1gzyJI-0004LH-2x
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 01:39:49 -0500
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-Date: Sat,  2 Mar 2019 15:39:26 +0900
-Message-Id: <20190302063926.11488-1-ysato@users.sourceforge.jp>
-In-Reply-To: <20190131210851.9842-1-richard.henderson@linaro.org>
-References: <20190131210851.9842-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] decodetree: Add DisasContext to function part
+	(envelope-from <guoheyi@huawei.com>) id 1h01Nv-0000gu-RD
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 04:56:49 -0500
+References: <1551407310-32413-1-git-send-email-guoheyi@huawei.com>
+	<20190301084619-mutt-send-email-mst@kernel.org>
+	<cc3c8e42-0632-0c90-41cc-27bfdcaef11d@huawei.com>
+	<20190301091214-mutt-send-email-mst@kernel.org>
+	<20190301153311.79c0d287@redhat.com>
+	<20190301104928-mutt-send-email-mst@kernel.org>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <a80e6101-00c6-e414-4d4b-764f05386100@huawei.com>
+Date: Sat, 2 Mar 2019 17:56:00 +0800
+MIME-Version: 1.0
+In-Reply-To: <20190301104928-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/acpi: enable SHPC native hot plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,113 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Heyi Guo <heyi.guo@linaro.org>
 
-OK. RX decoder works fine.
 
-Since it is necessary to read additional bytes in the function
-of the operand, we need to have DisasContext passed as an argument.
 
-> %b2_li_2	18:2 !function=li
-"li" read more extra byte. It use cpu_env in DisasContext.
+On 2019/3/1 23:49, Michael S. Tsirkin wrote:
+> On Fri, Mar 01, 2019 at 03:33:11PM +0100, Igor Mammedov wrote:
+>> On Fri, 1 Mar 2019 09:12:33 -0500
+>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>
+>>> On Fri, Mar 01, 2019 at 10:04:38PM +0800, Heyi Guo wrote:
+>>>>
+>>>> On 2019/3/1 21:47, Michael S. Tsirkin wrote:
+>>>>> On Fri, Mar 01, 2019 at 10:28:30AM +0800, Heyi Guo wrote:
+>>>>>> After the introduction of generic PCIe root port and PCIe-PCI bridge,
+>>>>>> we will also have SHPC controller on ARM, so just enalbe SHPC native
+>>>>>> hot plug.
+>>>>>>
+>>>>>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+>>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>>>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>>>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>>>>>> Signed-off-by: Heyi Guo <heyi.guo@linaro.org>
+>>>>> So when OS enables SHPC, should we block ACPI hotplug events?
+>>>> I supposed we don't support ACPI hotplug events on ARM virt; do we have any currently?
+>>>>
+>>>> Thanks,
+>>>> Heyi
+>>> Oh I didn't realise. That explains it sorry about the noise.
+>> And I thought we did not support them on PCIe completely (I mean q35/ich9).
+>> (Or did I miss something)?
+> True for PCIe.
+So may I consider your comments as ACK for this patch :)
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- scripts/decodetree.py | 32 +++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+Thanks,
+Heyi
 
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index e23d43e354..fa9a75ccad 100755
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
-@@ -387,7 +387,11 @@ class FunctionField:
-         return self.func + '(' + str(self.base) + ')'
- 
-     def str_extract(self):
--        return self.func + '(' + self.base.str_extract() + ')'
-+        if variablewidth:
-+            ctx = 'ctx, '
-+        else:
-+            ctx = ''
-+        return self.func + '(' + ctx + self.base.str_extract() + ')'
- 
-     def __eq__(self, other):
-         return self.func == other.func and self.base == other.base
-@@ -454,7 +458,11 @@ class Format(General):
-         return 'extract_' + self.name
- 
-     def output_extract(self):
--        output('static void ', self.extract_name(), '(',
-+        if variablewidth:
-+            ctx_p = 'DisasContext *ctx, '
-+        else:
-+            ctx_p = ''
-+        output('static void ', self.extract_name(), '(' + ctx_p,
-                self.base.struct_name(), ' *a, ', insntype, ' insn)\n{\n')
-         for n, f in self.fields.items():
-             output('    a->', n, ' = ', f.str_extract(), ';\n')
-@@ -468,10 +476,14 @@ class Pattern(General):
-     def output_decl(self):
-         global translate_scope
-         global translate_prefix
-+        if variablewidth:
-+            ctx_p = 'DisasContext *ctx, '
-+        else:
-+            ctx_p = ''
-         output('typedef ', self.base.base.struct_name(),
-                ' arg_', self.name, ';\n')
-         output(translate_scope, 'bool ', translate_prefix, '_', self.name,
--               '(DisasContext *ctx, arg_', self.name, ' *a);\n')
-+               '(', ctx_p, 'arg_', self.name, ' *a);\n')
- 
-     def output_code(self, i, extracted, outerbits, outermask):
-         global translate_prefix
-@@ -479,7 +491,8 @@ class Pattern(General):
-         arg = self.base.base.name
-         output(ind, '/* ', self.file, ':', str(self.lineno), ' */\n')
-         if not extracted:
--            output(ind, self.base.extract_name(), '(&u.f_', arg, ', insn);\n')
-+            output(ind, self.base.extract_name(),
-+                   '(ctx, &u.f_', arg, ', insn);\n')
-         for n, f in self.fields.items():
-             output(ind, 'u.f_', arg, '.', n, ' = ', f.str_extract(), ';\n')
-         output(ind, 'return ', translate_prefix, '_', self.name,
-@@ -890,11 +903,16 @@ class Tree:
-     def output_code(self, i, extracted, outerbits, outermask):
-         ind = str_indent(i)
- 
-+        if variablewidth:
-+            ctx = 'ctx, '
-+        else:
-+            ctx = ''
-         # If we identified all nodes below have the same format,
-         # extract the fields now.
-         if not extracted and self.base:
-             output(ind, self.base.extract_name(),
--                   '(&u.f_', self.base.base.name, ', insn);\n')
-+                   '(', ctx, '&u.f_', self.base.base.name,
-+                   ', insn);\n')
-             extracted = True
- 
-         # Attempt to aid the compiler in producing compact switch statements.
-@@ -994,7 +1012,7 @@ class SizeTree:
-         # If we need to load more bytes to test, do so now.
-         if extracted < self.width:
-             output(ind, 'insn = ', decode_function,
--                   '_load_bytes(s, insn, {0}, {1});\n'
-+                   '_load_bytes(ctx, insn, {0}, {1});\n'
-                    .format(extracted / 8, self.width / 8));
-             extracted = self.width
- 
-@@ -1048,7 +1066,7 @@ class SizeLeaf:
-         # If we need to load more bytes, do so now.
-         if extracted < self.width:
-             output(ind, 'insn = ', decode_function,
--                   '_load_bytes(s, insn, {0}, {1});\n'
-+                   '_load_bytes(ctx, insn, {0}, {1});\n'
-                    .format(extracted / 8, self.width / 8));
-             extracted = self.width
-         output(ind, 'return insn;\n')
--- 
-2.11.0
+>>>>>    
+>>>>>> ---
+>>>>>>    hw/arm/virt-acpi-build.c | 7 ++++++-
+>>>>>>    1 file changed, 6 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>>>>> index 04b62c7..7849ec5 100644
+>>>>>> --- a/hw/arm/virt-acpi-build.c
+>>>>>> +++ b/hw/arm/virt-acpi-build.c
+>>>>>> @@ -265,7 +265,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>>>>>>            aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+>>>>>>        aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+>>>>>>        aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
+>>>>>> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
+>>>>>> +
+>>>>>> +    /*
+>>>>>> +     * Allow OS control for all 5 features:
+>>>>>> +     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
+>>>>>> +     */
+>>>>>> +    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1F), NULL),
+>>>>>>                                    aml_name("CTRL")));
+>>>>>>        ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+>>>>>> -- 
+>>>>>> 1.8.3.1
+>>>>> .
+>>>>>    
+>>>>    
+> .
+>
