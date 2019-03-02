@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46792)
+Received: from eggs.gnu.org ([209.51.188.92]:54870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h08yk-0001Gw-6n
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:03:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1h09Z6-00054z-Jm
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h08la-0006d9-Hh
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 12:49:43 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36593)
+	(envelope-from <bounces@canonical.com>) id 1h09Z5-0004n8-Jv
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:40:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51038)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h08la-0006cG-AS
-	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 12:49:42 -0500
-Received: by mail-wm1-f67.google.com with SMTP id j125so1003090wmj.1
-	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 09:49:41 -0800 (PST)
-References: <20190302022518.18719-1-samuel.thibault@ens-lyon.org>
-	<5b0be3f1-85c1-bb1a-2692-e0f2650bcb4f@redhat.com>
-	<20190302173629.3tfpiems2plii6gc@function>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <22ad88a1-e38b-25c1-bd7f-6fc0e8e29b80@redhat.com>
-Date: Sat, 2 Mar 2019 18:49:39 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h09Z4-0004kF-AR
+	for qemu-devel@nongnu.org; Sat, 02 Mar 2019 13:40:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h09Z2-0007XF-E6
+	for <qemu-devel@nongnu.org>; Sat, 02 Mar 2019 18:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6802B2E80CB
+	for <qemu-devel@nongnu.org>; Sat,  2 Mar 2019 18:40:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190302173629.3tfpiems2plii6gc@function>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] slirp: fix big/little endian conversion in
- ident protocol
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 02 Mar 2019 11:36:02 -0000
+From: Ahzo <1815889@bugs.launchpad.net>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <155155197177.21453.11181624525492584119.launchpad@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815889]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +36,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: qemu-devel@nongnu.org, will@wbowling.info, stefanha@redhat.com, jan.kiszka@siemens.com
+To: qemu-devel@nongnu.org
 
-On 3/2/19 6:36 PM, Samuel Thibault wrote:
-> Philippe Mathieu-Daudé, le sam. 02 mars 2019 18:31:56 +0100, a ecrit:
->> On 3/2/19 3:25 AM, Samuel Thibault wrote:
->>> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
->>> ---
->>
->> I got:
->>
->> Applying: slirp: fix big/little endian conversion in ident protocol
->> error: patch failed: slirp/tcp_subr.c:660
->> error: slirp/tcp_subr.c: patch does not apply
->>
->> Then noticed another slirp patch, applied first then this one succeed,
->> so you missed:
->>
->> Based-on: <1551476756-25749-1-git-send-email-will@wbowling.info>
-> 
-> Oh, I didn't know about that one.
+(In reply to Daniel P. Berrange from comment #3)
+> (In reply to Ahzo from comment #2)
+> > To check for the availability of the syscall, one can try it in a child
+> > process and see if the child is terminated by a signal, e.g. like this:
+> =
 
-BTW 'Based-on' is a hint for the reviewers and automatic testing bots,
-telling "this commit is <based on> this other <series|patch>", and
-without applying the base it is unlikely this patch|series applies.
+> Afraid not, QEMU's seccomp filter blocks use of fork() too :-)
 
-It is not meant the git history, so for single commit we add it under
-the first '---' separator (automatically stripped out when applied) or
-for series we add it to the cover.
+Maybe it should, at least when using the spawn=3Ddeny option, but currently=
+ it doesn't. That option only blocks the fork, vfork and execve syscalls, b=
+ut glibc's fork() function uses the clone syscall, and thus continues to wo=
+rk.
+However, that behavior might be different when using other C library implem=
+entations, so it wouldn't be correct to rely on this.
+One could use clone() instead of fork(), but future versions of qemu might =
+block the clone syscall, as well.
 
-I guess there are no doc about that hint in HACKING neither in the wiki,
-I remember the post where it was introduced:
-https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01288.html
+Unfortunately, I'm not aware of a proper solution for this bug short of
+adding a new API to the kernel.
 
-Regards,
+-- =
 
-Phil.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
 
-> 
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> Thanks!
-> 
-> Samuel
-> 
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
+
+Status in Mesa:
+  Confirmed
+Status in QEMU:
+  New
+Status in mesa package in Ubuntu:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
+
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/mesa/+bug/1815889/+subscriptions
