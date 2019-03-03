@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43231)
+Received: from eggs.gnu.org ([209.51.188.92]:43862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h0aO7-00033e-27
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:19:19 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h0aPJ-0003xp-St
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:20:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h0aO5-0004r5-El
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:19:19 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38953)
+	(envelope-from <richard.henderson@linaro.org>) id 1h0aPJ-0005mt-1j
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:20:33 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:43629)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h0aO4-0004nq-GU
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:19:17 -0500
-Received: by mail-pg1-x544.google.com with SMTP id h8so1661325pgp.6
-	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 15:19:13 -0800 (PST)
+	id 1h0aPI-0005lG-Kf
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:20:32 -0500
+Received: by mail-pf1-x441.google.com with SMTP id q17so1588601pfh.10
+	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 15:20:32 -0800 (PST)
 References: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
-	<20190303172343.13406-2-mark.cave-ayland@ilande.co.uk>
+	<20190303172343.13406-3-mark.cave-ayland@ilande.co.uk>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bdf231c7-fbc0-4b4a-9887-b86201e19813@linaro.org>
-Date: Sun, 3 Mar 2019 15:19:08 -0800
+Message-ID: <975e69cd-d956-dda0-8955-8b864f5a496f@linaro.org>
+Date: Sun, 3 Mar 2019 15:20:28 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190303172343.13406-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190303172343.13406-3-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/8] target/ppc: introduce single
- fpr_offset() function
+Subject: Re: [Qemu-devel] [PATCH 2/8] target/ppc: introduce single
+ vsrl_offset() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,13 +36,16 @@ To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qem
 
 On 3/3/19 9:23 AM, Mark Cave-Ayland wrote:
 > Instead of having multiple copies of the offset calculation logic, move it to a
-> single fpr_offset() function.
+> single vsrl_offset() function.
+> 
+> This commit also renames the existing get_vsr()/set_vsr() functions to
+> get_vsrl()/set_vsrl() which better describes their purpose.
 > 
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  target/ppc/cpu.h       | 7 ++++++-
->  target/ppc/translate.c | 4 ++--
->  2 files changed, 8 insertions(+), 3 deletions(-)
+>  target/ppc/cpu.h                    |  7 ++++++-
+>  target/ppc/translate/vsx-impl.inc.c | 12 ++++++------
+>  2 files changed, 12 insertions(+), 7 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
