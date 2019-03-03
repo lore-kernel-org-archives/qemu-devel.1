@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42008)
+Received: from eggs.gnu.org ([209.51.188.92]:55815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0Oru-0000Ol-2S
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 06:01:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1h0QQF-0008A6-SJ
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 07:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0OqO-0001AX-SZ
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 05:59:45 -0500
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:34678)
+	(envelope-from <bounces@canonical.com>) id 1h0QQD-0005US-Mi
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 07:40:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h0OqN-000194-A7
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 05:59:44 -0500
-Received: by mail-oi1-x236.google.com with SMTP id g16so1668970oib.1
-	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 02:59:42 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h0QQD-0005TJ-Fk
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 07:40:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h0QQA-00043z-R9
+	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 12:40:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C8D242E8031
+	for <qemu-devel@nongnu.org>; Sun,  3 Mar 2019 12:40:46 +0000 (UTC)
 MIME-Version: 1.0
-References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
-	<CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
-	<fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
-	<CAFEAcA_OrJ-1SzE5UpT4eHbzi-KS_GqX13KZdHzEzovXnsnsUg@mail.gmail.com>
-	<63b980a2-6b28-d5e2-891c-6245ddb1e851@redhat.com>
-In-Reply-To: <63b980a2-6b28-d5e2-891c-6245ddb1e851@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 3 Mar 2019 10:59:30 +0000
-Message-ID: <CAFEAcA8L1qKaNwpr8sMZC8jQXbaLtCctaV8ecTFxXTVy0sWjVw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] multi phase reset
+Date: Sun, 03 Mar 2019 12:31:35 -0000
+From: Yohann Agrebbe <1818398@bugs.launchpad.net>
+Reply-To: Bug 1818398 <1818398@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155161629551.17312.8753163653910781588.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818398] [NEW] No evdev mouse passthrough with
+ virtio-vga or kvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +36,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Sat, 2 Mar 2019 at 19:41, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
->
-> Hi Damien,
->
-> On 3/1/19 5:52 PM, Peter Maydell wrote:
-> > On Fri, 1 Mar 2019 at 15:34, Damien Hedde <damien.hedde@greensocs.com> =
-wrote:
-> >> On 3/1/19 12:43 PM, Peter Maydell wrote:
-> >>> In my design the only thing that I thought would happen in phase 3
-> >>> was the "clear the resetting flag", but you've moved that to RELEASE.
-> >>> What's left ? Do you have a concrete example where we'd need this?
-> >>
-> >> I hesitated to remove this phase (would be easy to add it after if it =
-is
-> >> really needed). I see 2 cases where it might be useful.
->
-> If I RELEASE a PLL which need some time to warm up and stabilize, once
-> stabilized it moves the device to the POST phase where it is ready?
+Public bug reported:
 
-No, I think that things like that where the device is not ready
-for some period of time after reset should be handled by
-the device itself. Typically we just ignore this and have
-PLLs become stable instantaneously. If you really needed to
-model it you'd just have a timer of some kind inside the
-device model.
+Hi,
 
-(This matches h/w behaviour -- a PLL which is not yet stable
-is not still in reset, it's out of reset but has different
-behaviour for an initial period of time before it stabilizes.)
+Using qemu version 3.1.0-1 on a host with the latest Archlinux 64-bit
+distribution, and running the same OS as guest, the mouse doesn't work
+when using both evdev passthrough and virtio-vga, or when using both
+evdev passthrough and kvm.
 
-thanks
--- PMM
+The following command line runs a machine that does not receive any mouse e=
+vent:
+qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host -accel kvm -bo=
+ot order=3Ddc,menu=3Don -m size=3D2048 -net nic -device virtio-vga -device =
+intel-hda -name Linux -drive file=3D/mnt/data/nobody/linux/arch.img,if=3Dvi=
+rtio -display sdl,gl=3Don -full-screen -net user -D /dev/null -rtc base=3Du=
+tc,clock=3Dhost,driftfix=3Dslew -nodefaults -object input-linux,id=3Dkbd1,e=
+vdev=3D/dev/input/event6,grab_all=3Don,repeat=3Don -object input-linux,id=
+=3Dmouse1,evdev=3D/dev/input/event7
+
+But with this command line, removing virtio-vga and kvm, the mouse works as=
+ expected:
+qemu-system-x86_64 -machine type=3Dq35 -boot order=3Ddc,menu=3Don -m size=
+=3D2048 -net nic -device cirrus-vga -device intel-hda -name Linux -drive fi=
+le=3D/mnt/data/nobody/linux/arch.img,if=3Dvirtio -display sdl,gl=3Don -full=
+-screen -net user -D /dev/null -rtc base=3Dutc,clock=3Dhost,driftfix=3Dslew=
+ -nodefaults -object input-linux,id=3Dkbd1,evdev=3D/dev/input/event6,grab_a=
+ll=3Don,repeat=3Don -object input-linux,id=3Dmouse1,evdev=3D/dev/input/even=
+t7
+
+Note: Passing a keyboard by evdev in the same way always works, the
+problem is mouse specific.
+
+Thanks in advance for the analysis,
+gatestallman
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: evdev kvm mouse virtio-vga
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818398
+
+Title:
+  No evdev mouse passthrough with virtio-vga or kvm
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  Using qemu version 3.1.0-1 on a host with the latest Archlinux 64-bit
+  distribution, and running the same OS as guest, the mouse doesn't work
+  when using both evdev passthrough and virtio-vga, or when using both
+  evdev passthrough and kvm.
+
+  The following command line runs a machine that does not receive any mouse=
+ event:
+  qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host -accel kvm -=
+boot order=3Ddc,menu=3Don -m size=3D2048 -net nic -device virtio-vga -devic=
+e intel-hda -name Linux -drive file=3D/mnt/data/nobody/linux/arch.img,if=3D=
+virtio -display sdl,gl=3Don -full-screen -net user -D /dev/null -rtc base=
+=3Dutc,clock=3Dhost,driftfix=3Dslew -nodefaults -object input-linux,id=3Dkb=
+d1,evdev=3D/dev/input/event6,grab_all=3Don,repeat=3Don -object input-linux,=
+id=3Dmouse1,evdev=3D/dev/input/event7
+
+  But with this command line, removing virtio-vga and kvm, the mouse works =
+as expected:
+  qemu-system-x86_64 -machine type=3Dq35 -boot order=3Ddc,menu=3Don -m size=
+=3D2048 -net nic -device cirrus-vga -device intel-hda -name Linux -drive fi=
+le=3D/mnt/data/nobody/linux/arch.img,if=3Dvirtio -display sdl,gl=3Don -full=
+-screen -net user -D /dev/null -rtc base=3Dutc,clock=3Dhost,driftfix=3Dslew=
+ -nodefaults -object input-linux,id=3Dkbd1,evdev=3D/dev/input/event6,grab_a=
+ll=3Don,repeat=3Don -object input-linux,id=3Dmouse1,evdev=3D/dev/input/even=
+t7
+
+  Note: Passing a keyboard by evdev in the same way always works, the
+  problem is mouse specific.
+
+  Thanks in advance for the analysis,
+  gatestallman
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818398/+subscriptions
