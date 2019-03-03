@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49667)
+Received: from eggs.gnu.org ([209.51.188.92]:50027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1h0SiO-0005ud-R1
+	(envelope-from <chen.zhang@intel.com>) id 1h0SiO-0006Fd-P4
 	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 10:07:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1h0SUu-00065F-Ly
+	(envelope-from <chen.zhang@intel.com>) id 1h0SUv-00066T-56
 	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:53:49 -0500
 Received: from mga09.intel.com ([134.134.136.24]:42882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1h0SUu-0005rf-CD
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:53:48 -0500
+	id 1h0SUu-0005rf-Su
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:53:49 -0500
 From: Zhang Chen <chen.zhang@intel.com >
-Date: Sun,  3 Mar 2019 22:50:14 +0800
-Message-Id: <20190303145021.2962-1-chen.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH V3 0/7] Migration/colo: Fix upstream bugs when
- occur failover
+Date: Sun,  3 Mar 2019 22:50:16 +0800
+Message-Id: <20190303145021.2962-3-chen.zhang@intel.com>
+In-Reply-To: <20190303145021.2962-1-chen.zhang@intel.com>
+References: <20190303145021.2962-1-chen.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH V3 2/7] Migration/colo.c: Fix COLO failover
+ status error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +30,52 @@ Cc: Zhang Chen <chen.zhang@intel.com>
 
 From: Zhang Chen <chen.zhang@intel.com>
 
-This series focus on COLO failover bug fix and optimization.
+When finished COLO failover, the status is FAILOVER_STATUS_COMPLETED.
+The origin codes misunderstand the FAILOVER_STATUS_REQUIRE.
 
-V3:
- - Fix grammer issues in patch 4/7.
- - Add more information in commit log of patch 5/7.
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+---
+ migration/colo.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-V2:
- - Add patch 4/7 to handle failover state.
- - Add new patches to optimize failover status.
-
-V1:
- - Init patch.
-
-
-Zhang Chen (7):
-  Migration/colo.c: Fix double close bug when occur COLO failover
-  Migration/colo.c: Fix COLO failover status error
-  Migration/colo.c: Make COLO node running after failover
-  Migration/colo.c: Add new COLOExitReason to handle all failover state
-  qapi/migration.json: Remove a variable that doesn't exist in example
-  Migration/colo.c: Add the necessary checks for colo_do_failover
-  Migration/colo.c: Make user obtain the COLO mode info after failover
-
- migration/colo.c      | 69 ++++++++++++++++++++++++++++++-------------
- migration/migration.c |  3 ++
- qapi/migration.json   | 17 ++++++-----
- 3 files changed, 61 insertions(+), 28 deletions(-)
-
+diff --git a/migration/colo.c b/migration/colo.c
+index a916dc178c..a13acac192 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -121,6 +121,7 @@ static void secondary_vm_do_failover(void)
+     }
+     /* Notify COLO incoming thread that failover work is finished */
+     qemu_sem_post(&mis->colo_incoming_sem);
++
+     /* For Secondary VM, jump to incoming co */
+     if (mis->migration_incoming_co) {
+         qemu_coroutine_enter(mis->migration_incoming_co);
+@@ -262,7 +263,7 @@ COLOStatus *qmp_query_colo_status(Error **errp)
+     case FAILOVER_STATUS_NONE:
+         s->reason = COLO_EXIT_REASON_NONE;
+         break;
+-    case FAILOVER_STATUS_REQUIRE:
++    case FAILOVER_STATUS_COMPLETED:
+         s->reason = COLO_EXIT_REASON_REQUEST;
+         break;
+     default:
+@@ -582,7 +583,7 @@ out:
+         qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
+                                   COLO_EXIT_REASON_ERROR);
+         break;
+-    case FAILOVER_STATUS_REQUIRE:
++    case FAILOVER_STATUS_COMPLETED:
+         qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
+                                   COLO_EXIT_REASON_REQUEST);
+         break;
+@@ -854,7 +855,7 @@ out:
+         qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
+                                   COLO_EXIT_REASON_ERROR);
+         break;
+-    case FAILOVER_STATUS_REQUIRE:
++    case FAILOVER_STATUS_COMPLETED:
+         qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
+                                   COLO_EXIT_REASON_REQUEST);
+         break;
 -- 
 2.17.GIT
