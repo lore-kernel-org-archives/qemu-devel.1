@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39978)
+Received: from eggs.gnu.org ([209.51.188.92]:42008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h0Obm-0005Aj-GR
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 05:44:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h0Oru-0000Ol-2S
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 06:01:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h0Obk-0000jF-Sx
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 05:44:38 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:41438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1h0Obk-0000iE-IT
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 05:44:36 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun,  3 Mar 2019 11:44:30 +0100
-Message-Id: <20190303104430.7692-3-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190303104430.7692-1-samuel.thibault@ens-lyon.org>
-References: <20190303104430.7692-1-samuel.thibault@ens-lyon.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1h0OqO-0001AX-SZ
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 05:59:45 -0500
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:34678)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h0OqN-000194-A7
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 05:59:44 -0500
+Received: by mail-oi1-x236.google.com with SMTP id g16so1668970oib.1
+	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 02:59:42 -0800 (PST)
 MIME-Version: 1.0
+References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
+	<CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
+	<fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
+	<CAFEAcA_OrJ-1SzE5UpT4eHbzi-KS_GqX13KZdHzEzovXnsnsUg@mail.gmail.com>
+	<63b980a2-6b28-d5e2-891c-6245ddb1e851@redhat.com>
+In-Reply-To: <63b980a2-6b28-d5e2-891c-6245ddb1e851@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 3 Mar 2019 10:59:30 +0000
+Message-ID: <CAFEAcA8L1qKaNwpr8sMZC8jQXbaLtCctaV8ecTFxXTVy0sWjVw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/2] curses: add option to specify VGA font
- encoding
+Subject: Re: [Qemu-devel] [RFC] multi phase reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,469 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, kraxel@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, Eddie Kohler <ekohler@gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This uses iconv to convert glyphs from the specified VGA font encoding to
-unicode, and makes use of cchar_t instead of chtype when using ncursesw,
-which allows to store all wide char as well as the WACS values.
+On Sat, 2 Mar 2019 at 19:41, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>
+> Hi Damien,
+>
+> On 3/1/19 5:52 PM, Peter Maydell wrote:
+> > On Fri, 1 Mar 2019 at 15:34, Damien Hedde <damien.hedde@greensocs.com> =
+wrote:
+> >> On 3/1/19 12:43 PM, Peter Maydell wrote:
+> >>> In my design the only thing that I thought would happen in phase 3
+> >>> was the "clear the resetting flag", but you've moved that to RELEASE.
+> >>> What's left ? Do you have a concrete example where we'd need this?
+> >>
+> >> I hesitated to remove this phase (would be easy to add it after if it =
+is
+> >> really needed). I see 2 cases where it might be useful.
+>
+> If I RELEASE a PLL which need some time to warm up and stabilize, once
+> stabilized it moves the device to the POST phase where it is ready?
 
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: Eddie Kohler <ekohler@gmail.com>
----
- configure       |   5 +-
- qapi/ui.json    |   4 +-
- qemu-options.hx |   5 +-
- ui/curses.c     | 315 ++++++++++++++++++++++++++++++++++++++++--------
- 4 files changed, 279 insertions(+), 50 deletions(-)
+No, I think that things like that where the device is not ready
+for some period of time after reset should be handled by
+the device itself. Typically we just ignore this and have
+PLLs become stable instantaneously. If you really needed to
+model it you'd just have a timer of some kind inside the
+device model.
 
-diff --git a/configure b/configure
-index 9979ca708d..1270dc8dc0 100755
---- a/configure
-+++ b/configure
-@@ -3449,14 +3449,17 @@ if test "$curses" !=3D "no" ; then
- #include <locale.h>
- #include <curses.h>
- #include <wchar.h>
-+#include <langinfo.h>
- int main(void) {
-+  const char *codeset;
-   wchar_t wch =3D L'w';
-   setlocale(LC_ALL, "");
-   resize_term(0, 0);
-   addwstr(L"wide chars\n");
-   addnwstr(&wch, 1);
-   add_wch(WACS_DEGREE);
--  return 0;
-+  codeset =3D nl_langinfo(CODESET);
-+  return codeset !=3D 0;
- }
- EOF
-   IFS=3D:
-diff --git a/qapi/ui.json b/qapi/ui.json
-index c5d1d7f099..12d3a2c751 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1131,6 +1131,7 @@
- # @full-screen:   Start user interface in fullscreen mode (default: off)=
-.
- # @window-close:  Allow to quit qemu with window close button (default: =
-on).
- # @gl:            Enable OpenGL support (default: off).
-+# @charset:       Font charset used by guest (default: CP437).
- #
- # Since: 2.12
- #
-@@ -1139,7 +1140,8 @@
-   'base'    : { 'type'           : 'DisplayType',
-                 '*full-screen'   : 'bool',
-                 '*window-close'  : 'bool',
--                '*gl'            : 'DisplayGLMode' },
-+                '*gl'            : 'DisplayGLMode',
-+                '*charset'       : 'str' },
-   'discriminator' : 'type',
-   'data'    : { 'gtk'            : 'DisplayGTK',
-                 'egl-headless'   : 'DisplayEGLHeadless'} }
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 1cf9aac1fe..4bc4e736bb 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1216,7 +1216,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
-     "            [,window_close=3Don|off][,gl=3Don|core|es|off]\n"
-     "-display gtk[,grab_on_hover=3Don|off][,gl=3Don|off]|\n"
-     "-display vnc=3D<display>[,<optargs>]\n"
--    "-display curses\n"
-+    "-display curses[,charset=3D<encoding>]\n"
-     "-display none\n"
-     "-display egl-headless[,rendernode=3D<file>]"
-     "                select display type\n"
-@@ -1248,6 +1248,9 @@ support a text mode, QEMU can display this output u=
-sing a
- curses/ncurses interface. Nothing is displayed when the graphics
- device is in graphical mode or if the graphics device does not support
- a text mode. Generally only the VGA device models support text mode.
-+The font charset used by the guest can be specified with the
-+@code{charset} option, for example @code{charset=3DCP850} for IBM CP850
-+encoding. The default is @code{CP437}.
- @item none
- Do not display video output. The guest will still see an emulated
- graphics card, but its output will not be displayed to the QEMU
-diff --git a/ui/curses.c b/ui/curses.c
-index 1724dd57d4..203cc075d0 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -27,6 +27,10 @@
- #include <sys/ioctl.h>
- #include <termios.h>
- #endif
-+#include <locale.h>
-+#include <wchar.h>
-+#include <langinfo.h>
-+#include <iconv.h>
-=20
- #include "qapi/error.h"
- #include "qemu-common.h"
-@@ -54,7 +58,8 @@ static WINDOW *screenpad =3D NULL;
- static int width, height, gwidth, gheight, invalidate;
- static int px, py, sminx, sminy, smaxx, smaxy;
-=20
--static chtype vga_to_curses[256];
-+static const char *font_charset =3D "CP437";
-+static cchar_t vga_to_curses[256];
-=20
- static wint_t console_getch(enum maybe_keycode *maybe_keycode)
- {
-@@ -77,19 +82,23 @@ static void curses_update(DisplayChangeListener *dcl,
-                           int x, int y, int w, int h)
- {
-     console_ch_t *line;
--    chtype curses_line[width];
-+    cchar_t curses_line[width];
-=20
-     line =3D screen + y * width;
-     for (h +=3D y; y < h; y ++, line +=3D width) {
-         for (x =3D 0; x < width; x++) {
-             chtype ch =3D line[x] & 0xff;
-             chtype at =3D line[x] & ~0xff;
--            if (vga_to_curses[ch]) {
--                ch =3D vga_to_curses[ch];
-+            if (vga_to_curses[ch].chars[0]) {
-+                curses_line[x] =3D vga_to_curses[ch];
-+            } else {
-+                curses_line[x].chars[0] =3D ch;
-+                curses_line[x].chars[1] =3D 0;
-+                curses_line[x].attr =3D 0;
-             }
--            curses_line[x] =3D ch | at;
-+            curses_line[x].attr |=3D  at;
-         }
--        mvwaddchnstr(screenpad, y, 0, curses_line, width);
-+        mvwadd_wchnstr(screenpad, y, 0, curses_line, width);
-     }
-=20
-     pnoutrefresh(screenpad, py, px, sminy, sminx, smaxy - 1, smaxx - 1);
-@@ -391,6 +400,254 @@ static void curses_atexit(void)
-     endwin();
- }
-=20
-+/* Setup wchar glyph for one UCS-2 char */
-+static void convert_ucs(int glyph, uint16_t ch, iconv_t conv)
-+{
-+    wchar_t wch;
-+    char *pch, *pwch;
-+    size_t sch, swch;
-+
-+    pch =3D (char *) &ch;
-+    pwch =3D (char *) &wch;
-+    sch =3D sizeof(ch);
-+    swch =3D sizeof(wch);
-+
-+    if (iconv(conv, &pch, &sch, &pwch, &swch) =3D=3D (size_t) -1) {
-+        fprintf(stderr, "Could not convert 0x%04x from UCS-2 to WCHAR_T:=
- %s\n",
-+                        ch, strerror(errno));
-+    } else {
-+        vga_to_curses[glyph].chars[0] =3D wch;
-+    }
-+}
-+
-+/* Setup wchar glyph for one font character */
-+static void convert_font(unsigned char ch, iconv_t conv)
-+{
-+    wchar_t wch;
-+    char *pch, *pwch;
-+    size_t sch, swch;
-+
-+    pch =3D (char *) &ch;
-+    pwch =3D (char *) &wch;
-+    sch =3D sizeof(ch);
-+    swch =3D sizeof(wch);
-+
-+    if (iconv(conv, &pch, &sch, &pwch, &swch) =3D=3D (size_t) -1) {
-+        fprintf(stderr, "Could not convert 0x%02x from %s to WCHAR_T: %s=
-\n",
-+                        ch, font_charset, strerror(errno));
-+    } else {
-+        vga_to_curses[ch].chars[0] =3D wch;
-+    }
-+}
-+
-+/* Convert one wchar to UCS-2 */
-+static uint16_t get_ucs(wchar_t wch, iconv_t conv)
-+{
-+    uint16_t ch;
-+    char *pch, *pwch;
-+    size_t sch, swch;
-+
-+    pch =3D (char *) &ch;
-+    pwch =3D (char *) &wch;
-+    sch =3D sizeof(ch);
-+    swch =3D sizeof(wch);
-+
-+    if (iconv(conv, &pwch, &swch, &pch, &sch) =3D=3D (size_t) -1) {
-+        fprintf(stderr, "Could not convert 0x%02x from WCHAR_T to UCS-2:=
- %s\n",
-+                        wch, strerror(errno));
-+        return 0xFFFD;
-+    }
-+
-+    return ch;
-+}
-+
-+/*
-+ * Setup mapping for vga to curses line graphics.
-+ */
-+static void font_setup(void)
-+{
-+    /*
-+     * Control characters are normally non-printable, but VGA does have
-+     * well-known glyphs for them.
-+     */
-+    static uint16_t control_characters[0x20] =3D {
-+      0x0020,
-+      0x263a,
-+      0x263b,
-+      0x2665,
-+      0x2666,
-+      0x2663,
-+      0x2660,
-+      0x2022,
-+      0x25d8,
-+      0x25cb,
-+      0x25d9,
-+      0x2642,
-+      0x2640,
-+      0x266a,
-+      0x266b,
-+      0x263c,
-+      0x25ba,
-+      0x25c4,
-+      0x2195,
-+      0x203c,
-+      0x00b6,
-+      0x00a7,
-+      0x25ac,
-+      0x21a8,
-+      0x2191,
-+      0x2193,
-+      0x2192,
-+      0x2190,
-+      0x221f,
-+      0x2194,
-+      0x25b2,
-+      0x25bc
-+    };
-+
-+    iconv_t ucs_to_wchar_conv;
-+    iconv_t wchar_to_ucs_conv;
-+    iconv_t font_conv;
-+    int i;
-+
-+    ucs_to_wchar_conv =3D iconv_open("WCHAR_T", "UCS-2");
-+    if (ucs_to_wchar_conv =3D=3D (iconv_t) -1) {
-+        fprintf(stderr, "Could not convert font glyphs from UCS-2: '%s'\=
-n",
-+                        strerror(errno));
-+        exit(1);
-+    }
-+
-+    wchar_to_ucs_conv =3D iconv_open("UCS-2", "WCHAR_T");
-+    if (wchar_to_ucs_conv =3D=3D (iconv_t) -1) {
-+        fprintf(stderr, "Could not convert font glyphs to UCS-2: '%s'\n"=
-,
-+                        strerror(errno));
-+        exit(1);
-+    }
-+
-+    font_conv =3D iconv_open("WCHAR_T", font_charset);
-+    if (font_conv =3D=3D (iconv_t) -1) {
-+        fprintf(stderr, "Could not convert font glyphs from %s: '%s'\n",
-+                        font_charset, strerror(errno));
-+        exit(1);
-+    }
-+
-+    /* Control characters */
-+    for (i =3D 0; i <=3D 0x1F; i++) {
-+        convert_ucs(i, control_characters[i], ucs_to_wchar_conv);
-+    }
-+
-+    for (i =3D 0x20; i <=3D 0xFF; i++) {
-+        convert_font(i, font_conv);
-+    }
-+
-+    /* DEL */
-+    convert_ucs(0x7F, 0x2302, ucs_to_wchar_conv);
-+
-+    if (strcmp(nl_langinfo(CODESET), "UTF-8")) {
-+        /* Non-Unicode capable, use termcap equivalents for those availa=
-ble */
-+        for (i =3D 0; i <=3D 0xFF; i++) {
-+            switch (get_ucs(vga_to_curses[i].chars[0], wchar_to_ucs_conv=
-)) {
-+            case 0x00a3:
-+                vga_to_curses[i] =3D *WACS_STERLING;
-+                break;
-+            case 0x2591:
-+                vga_to_curses[i] =3D *WACS_BOARD;
-+                break;
-+            case 0x2592:
-+                vga_to_curses[i] =3D *WACS_CKBOARD;
-+                break;
-+            case 0x2502:
-+                vga_to_curses[i] =3D *WACS_VLINE;
-+                break;
-+            case 0x2524:
-+                vga_to_curses[i] =3D *WACS_RTEE;
-+                break;
-+            case 0x2510:
-+                vga_to_curses[i] =3D *WACS_URCORNER;
-+                break;
-+            case 0x2514:
-+                vga_to_curses[i] =3D *WACS_LLCORNER;
-+                break;
-+            case 0x2534:
-+                vga_to_curses[i] =3D *WACS_BTEE;
-+                break;
-+            case 0x252c:
-+                vga_to_curses[i] =3D *WACS_TTEE;
-+                break;
-+            case 0x251c:
-+                vga_to_curses[i] =3D *WACS_LTEE;
-+                break;
-+            case 0x2500:
-+                vga_to_curses[i] =3D *WACS_HLINE;
-+                break;
-+            case 0x253c:
-+                vga_to_curses[i] =3D *WACS_PLUS;
-+                break;
-+            case 0x256c:
-+                vga_to_curses[i] =3D *WACS_LANTERN;
-+                break;
-+            case 0x256a:
-+                vga_to_curses[i] =3D *WACS_NEQUAL;
-+                break;
-+            case 0x2518:
-+                vga_to_curses[i] =3D *WACS_LRCORNER;
-+                break;
-+            case 0x250c:
-+                vga_to_curses[i] =3D *WACS_ULCORNER;
-+                break;
-+            case 0x2588:
-+                vga_to_curses[i] =3D *WACS_BLOCK;
-+                break;
-+            case 0x03c0:
-+                vga_to_curses[i] =3D *WACS_PI;
-+                break;
-+            case 0x00b1:
-+                vga_to_curses[i] =3D *WACS_PLMINUS;
-+                break;
-+            case 0x2265:
-+                vga_to_curses[i] =3D *WACS_GEQUAL;
-+                break;
-+            case 0x2264:
-+                vga_to_curses[i] =3D *WACS_LEQUAL;
-+                break;
-+            case 0x00b0:
-+                vga_to_curses[i] =3D *WACS_DEGREE;
-+                break;
-+            case 0x25a0:
-+                vga_to_curses[i] =3D *WACS_BULLET;
-+                break;
-+            case 0x2666:
-+                vga_to_curses[i] =3D *WACS_DIAMOND;
-+                break;
-+            case 0x2192:
-+                vga_to_curses[i] =3D *WACS_RARROW;
-+                break;
-+            case 0x2190:
-+                vga_to_curses[i] =3D *WACS_LARROW;
-+                break;
-+            case 0x2191:
-+                vga_to_curses[i] =3D *WACS_UARROW;
-+                break;
-+            case 0x2193:
-+                vga_to_curses[i] =3D *WACS_DARROW;
-+                break;
-+            case 0x23ba:
-+                vga_to_curses[i] =3D *WACS_S1;
-+                break;
-+            case 0x23bb:
-+                vga_to_curses[i] =3D *WACS_S3;
-+                break;
-+            case 0x23bc:
-+                vga_to_curses[i] =3D *WACS_S7;
-+                break;
-+            case 0x23bd:
-+                vga_to_curses[i] =3D *WACS_S9;
-+                break;
-+            }
-+        }
-+    }
-+}
-+
- static void curses_setup(void)
- {
-     int i, colour_default[8] =3D {
-@@ -419,47 +676,7 @@ static void curses_setup(void)
-         init_pair(i, COLOR_WHITE, COLOR_BLACK);
-     }
-=20
--    /*
--     * Setup mapping for vga to curses line graphics.
--     * FIXME: for better font, have to use ncursesw and setlocale()
--     */
--#if 0
--    /* FIXME: map from where? */
--    ACS_S1;
--    ACS_S3;
--    ACS_S7;
--    ACS_S9;
--#endif
--    /* ACS_* is not constant. So, we can't initialize statically. */
--    vga_to_curses['\0'] =3D ' ';
--    vga_to_curses[0x04] =3D ACS_DIAMOND;
--    vga_to_curses[0x18] =3D ACS_UARROW;
--    vga_to_curses[0x19] =3D ACS_DARROW;
--    vga_to_curses[0x1a] =3D ACS_RARROW;
--    vga_to_curses[0x1b] =3D ACS_LARROW;
--    vga_to_curses[0x9c] =3D ACS_STERLING;
--    vga_to_curses[0xb0] =3D ACS_BOARD;
--    vga_to_curses[0xb1] =3D ACS_CKBOARD;
--    vga_to_curses[0xb3] =3D ACS_VLINE;
--    vga_to_curses[0xb4] =3D ACS_RTEE;
--    vga_to_curses[0xbf] =3D ACS_URCORNER;
--    vga_to_curses[0xc0] =3D ACS_LLCORNER;
--    vga_to_curses[0xc1] =3D ACS_BTEE;
--    vga_to_curses[0xc2] =3D ACS_TTEE;
--    vga_to_curses[0xc3] =3D ACS_LTEE;
--    vga_to_curses[0xc4] =3D ACS_HLINE;
--    vga_to_curses[0xc5] =3D ACS_PLUS;
--    vga_to_curses[0xce] =3D ACS_LANTERN;
--    vga_to_curses[0xd8] =3D ACS_NEQUAL;
--    vga_to_curses[0xd9] =3D ACS_LRCORNER;
--    vga_to_curses[0xda] =3D ACS_ULCORNER;
--    vga_to_curses[0xdb] =3D ACS_BLOCK;
--    vga_to_curses[0xe3] =3D ACS_PI;
--    vga_to_curses[0xf1] =3D ACS_PLMINUS;
--    vga_to_curses[0xf2] =3D ACS_GEQUAL;
--    vga_to_curses[0xf3] =3D ACS_LEQUAL;
--    vga_to_curses[0xf8] =3D ACS_DEGREE;
--    vga_to_curses[0xfe] =3D ACS_BULLET;
-+    font_setup();
- }
-=20
- static void curses_keyboard_setup(void)
-@@ -492,6 +709,10 @@ static void curses_display_init(DisplayState *ds, Di=
-splayOptions *opts)
-     }
- #endif
-=20
-+    setlocale(LC_CTYPE, "");
-+    if (opts->charset) {
-+        font_charset =3D opts->charset;
-+    }
-     curses_setup();
-     curses_keyboard_setup();
-     atexit(curses_atexit);
---=20
-2.20.1
+(This matches h/w behaviour -- a PLL which is not yet stable
+is not still in reset, it's out of reset but has different
+behaviour for an initial period of time before it stabilizes.)
+
+thanks
+-- PMM
