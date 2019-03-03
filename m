@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45469)
+Received: from eggs.gnu.org ([209.51.188.92]:45462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqB-0004vm-4e
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqA-0004vk-VV
 	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqA-0001qN-2t
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:23:55 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqA-0001qS-3K
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:23:54 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun,  3 Mar 2019 17:23:35 +0000
-Message-Id: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 0/8] target/ppc: switch fpr/vsrl registers so
- all VSX registers are in host endian order
+Date: Sun,  3 Mar 2019 17:23:37 +0000
+Message-Id: <20190303172343.13406-3-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
+References: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 2/8] target/ppc: introduce single vsrl_offset()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,50 +22,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org
 
-After some investigation into Andrew's report of corruption in his ppc64le
-tests at https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07234.html, I
-discovered the underlying cause was that the first 32 VSX registers are not
-stored in host endian order.
+Instead of having multiple copies of the offset calculation logic, move it to a
+single vsrl_offset() function.
 
-This is something that Richard and I had discussed before, but missed that with
-VSX if you have source registers from different register sets then even logical
-operations will give you the wrong result.
-
-Rather than revert 7b8fe477e1 "target/ppc: convert VSX logical operations to
-vector operations" let's keep the use of the accelerated vector instructions,
-and instead fix the real problem which is to switch the first 32 VSX registers
-to host endian order matching the VMX registers.
-
-Patches 1-5 aim to consolidate the offset calculations for both CPUPPCState
-and the associated _ptr() functions into one single place.
-
-With this preliminary work complete, patch 6 switches the first 32 registers
-into host endian order without too much difficulty.
-
-Finally now that all VSX registers are stored in the same way, the vsr offset
-functions and get_cpu_vsrh()/get_cpu_vsrl() can be simplified accordingly.
+This commit also renames the existing get_vsr()/set_vsr() functions to
+get_vsrl()/set_vsrl() which better describes their purpose.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ target/ppc/cpu.h                    |  7 ++++++-
+ target/ppc/translate/vsx-impl.inc.c | 12 ++++++------
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
-
-Mark Cave-Ayland (8):
-  target/ppc: introduce single fpr_offset() function
-  target/ppc: introduce single vsrl_offset() function
-  target/ppc: move Vsr* macros from internal.h to cpu.h
-  target/ppc: introduce avrh_offset() and avrl_offset() functions
-  target/ppc: introduce avr_offset() function
-  target/ppc: switch fpr/vsrl registers so all VSX registers are in host
-    endian order
-  target/ppc: introduce vsrh_offset() function
-  target/ppc: simplify get_cpu_vsrh() and get_cpu_vsrl() functions
-
- target/ppc/cpu.h                    | 56 +++++++++++++++++++++++++++++++++++--
- target/ppc/internal.h               | 27 +++---------------
- target/ppc/machine.c                |  8 +++---
- target/ppc/translate.c              | 28 ++++++++-----------
- target/ppc/translate/vmx-impl.inc.c | 27 ++++++++----------
- target/ppc/translate/vsx-impl.inc.c | 39 +++-----------------------
- 6 files changed, 88 insertions(+), 97 deletions(-)
-
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 4bb4e42670..4a7df13c2d 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -2573,9 +2573,14 @@ static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
+     return (uint64_t *)((uintptr_t)env + fpr_offset(i));
+ }
+ 
++static inline int vsrl_offset(int i)
++{
++    return offsetof(CPUPPCState, vsr[i].u64[1]);
++}
++
+ static inline uint64_t *cpu_vsrl_ptr(CPUPPCState *env, int i)
+ {
+-    return &env->vsr[i].u64[1];
++    return (uint64_t *)((uintptr_t)env + vsrl_offset(i));
+ }
+ 
+ static inline ppc_avr_t *cpu_avr_ptr(CPUPPCState *env, int i)
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index e73197e717..381ae0f2e9 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1,13 +1,13 @@
+ /***                           VSX extension                               ***/
+ 
+-static inline void get_vsr(TCGv_i64 dst, int n)
++static inline void get_vsrl(TCGv_i64 dst, int n)
+ {
+-    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
++    tcg_gen_ld_i64(dst, cpu_env, vsrl_offset(n));
+ }
+ 
+-static inline void set_vsr(int n, TCGv_i64 src)
++static inline void set_vsrl(int n, TCGv_i64 src)
+ {
+-    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
++    tcg_gen_st_i64(src, cpu_env, vsrl_offset(n));
+ }
+ 
+ static inline int vsr_full_offset(int n)
+@@ -27,7 +27,7 @@ static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
+ static inline void get_cpu_vsrl(TCGv_i64 dst, int n)
+ {
+     if (n < 32) {
+-        get_vsr(dst, n);
++        get_vsrl(dst, n);
+     } else {
+         get_avr64(dst, n - 32, false);
+     }
+@@ -45,7 +45,7 @@ static inline void set_cpu_vsrh(int n, TCGv_i64 src)
+ static inline void set_cpu_vsrl(int n, TCGv_i64 src)
+ {
+     if (n < 32) {
+-        set_vsr(n, src);
++        set_vsrl(n, src);
+     } else {
+         set_avr64(n - 32, src, false);
+     }
 -- 
 2.11.0
