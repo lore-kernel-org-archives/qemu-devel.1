@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46219)
+Received: from eggs.gnu.org ([209.51.188.92]:46234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1h0XoK-0004cI-7Y
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 15:34:13 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1h0XoL-0004dM-CQ
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 15:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1h0XoJ-00073Y-9n
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 15:34:12 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:34238)
+	(envelope-from <yuval.shaia@oracle.com>) id 1h0XoK-000780-H8
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 15:34:13 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:34260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1h0XoJ-00070K-0d
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 15:34:11 -0500
+	id 1h0XoK-00074E-7X
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 15:34:12 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Sun,  3 Mar 2019 22:33:43 +0200
-Message-Id: <20190303203345.2472-8-yuval.shaia@oracle.com>
+Date: Sun,  3 Mar 2019 22:33:41 +0200
+Message-Id: <20190303203345.2472-6-yuval.shaia@oracle.com>
 In-Reply-To: <20190303203345.2472-1-yuval.shaia@oracle.com>
 References: <20190303203345.2472-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v4 7/9] hw/pvrdma: Delete unneeded function
- argument
+Subject: [Qemu-devel] [PATCH v4 5/9] hw/rdma: Free all MAD receive buffers
+ when device is closed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +27,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-The function's argument rdma_dev_res is not needed as it is stored in
-the backend_dev object at init.
+When device is going down free all saved MAD buffers.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c      | 13 ++++++-------
- hw/rdma/rdma_backend.h      |  1 -
- hw/rdma/vmw/pvrdma_qp_ops.c |  3 +--
- 3 files changed, 7 insertions(+), 10 deletions(-)
+ hw/rdma/rdma_backend.c    | 34 +++++++++++++++++++++++++++++++++-
+ hw/rdma/vmw/pvrdma_main.c |  2 ++
+ 2 files changed, 35 insertions(+), 1 deletion(-)
 
 diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index d511ca282b..66185bd487 100644
+index bc2fefcf93..a65f5737e4 100644
 --- a/hw/rdma/rdma_backend.c
 +++ b/hw/rdma/rdma_backend.c
-@@ -594,7 +594,6 @@ static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev,
+@@ -64,6 +64,33 @@ static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
+     comp_handler(ctx, &wc);
  }
  
- void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
--                            RdmaDeviceResources *rdma_dev_res,
-                             RdmaBackendQP *qp, uint8_t qp_type,
-                             struct ibv_sge *sge, uint32_t num_sge, void *ctx)
++static void free_cqe_ctx(gpointer data, gpointer user_data)
++{
++    BackendCtx *bctx;
++    RdmaDeviceResources *rdma_dev_res = user_data;
++    unsigned long cqe_ctx_id = GPOINTER_TO_INT(data);
++
++    bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, cqe_ctx_id);
++    if (bctx) {
++        rdma_rm_dealloc_cqe_ctx(rdma_dev_res, cqe_ctx_id);
++    }
++    g_free(bctx);
++}
++
++static void clean_recv_mads(RdmaBackendDev *backend_dev)
++{
++    unsigned long cqe_ctx_id;
++
++    do {
++        cqe_ctx_id = rdma_protected_qlist_pop_int64(&backend_dev->
++                                                    recv_mads_list);
++        if (cqe_ctx_id != -ENOENT) {
++            free_cqe_ctx(GINT_TO_POINTER(cqe_ctx_id),
++                         backend_dev->rdma_dev_res);
++        }
++    } while (cqe_ctx_id != -ENOENT);
++}
++
+ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
  {
-@@ -613,9 +612,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-             rc = save_mad_recv_buffer(backend_dev, sge, num_sge, ctx);
-             if (rc) {
-                 complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
--                rdma_dev_res->stats.mad_rx_bufs_err++;
-+                backend_dev->rdma_dev_res->stats.mad_rx_bufs_err++;
-             } else {
--                rdma_dev_res->stats.mad_rx_bufs++;
-+                backend_dev->rdma_dev_res->stats.mad_rx_bufs++;
-             }
-         }
-         return;
-@@ -625,7 +624,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-     bctx->up_ctx = ctx;
-     bctx->backend_qp = qp;
+     int i, ne, total_ne = 0;
+@@ -1037,6 +1064,11 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
+     return 0;
+ }
  
--    rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
-+    rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
-     if (unlikely(rc)) {
-         complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-         goto err_free_bctx;
-@@ -633,7 +632,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
++static void mad_stop(RdmaBackendDev *backend_dev)
++{
++    clean_recv_mads(backend_dev);
++}
++
+ static void mad_fini(RdmaBackendDev *backend_dev)
+ {
+     disable_rdmacm_mux_async(backend_dev);
+@@ -1224,12 +1256,12 @@ void rdma_backend_start(RdmaBackendDev *backend_dev)
  
-     rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
+ void rdma_backend_stop(RdmaBackendDev *backend_dev)
+ {
++    mad_stop(backend_dev);
+     stop_backend_thread(&backend_dev->comp_thread);
+ }
  
--    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge,
-+    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
-     if (rc) {
-         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-@@ -652,13 +651,13 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-     }
+ void rdma_backend_fini(RdmaBackendDev *backend_dev)
+ {
+-    rdma_backend_stop(backend_dev);
+     mad_fini(backend_dev);
+     g_hash_table_destroy(ah_hash);
+     ibv_destroy_comp_channel(backend_dev->channel);
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 659331ac93..b795f80666 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -305,6 +305,8 @@ static void pvrdma_fini(PCIDevice *pdev)
  
-     atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
--    rdma_dev_res->stats.rx_bufs++;
-+    backend_dev->rdma_dev_res->stats.rx_bufs++;
+     pvrdma_qp_ops_fini();
  
-     return;
- 
- err_dealloc_cqe_ctx:
-     backend_dev->rdma_dev_res->stats.rx_bufs_err++;
--    rdma_rm_dealloc_cqe_ctx(rdma_dev_res, bctx_id);
-+    rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
- 
- err_free_bctx:
-     g_free(bctx);
-diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-index cb5efa2a3a..5d507a1c41 100644
---- a/hw/rdma/rdma_backend.h
-+++ b/hw/rdma/rdma_backend.h
-@@ -111,7 +111,6 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-                             union ibv_gid *dgid, uint32_t dqpn, uint32_t dqkey,
-                             void *ctx);
- void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
--                            RdmaDeviceResources *rdma_dev_res,
-                             RdmaBackendQP *qp, uint8_t qp_type,
-                             struct ibv_sge *sge, uint32_t num_sge, void *ctx);
- 
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index 16db726dac..508d8fca3c 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -231,8 +231,7 @@ void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
-             continue;
-         }
- 
--        rdma_backend_post_recv(&dev->backend_dev, &dev->rdma_dev_res,
--                               &qp->backend_qp, qp->qp_type,
-+        rdma_backend_post_recv(&dev->backend_dev, &qp->backend_qp, qp->qp_type,
-                                (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
-                                comp_ctx);
++    rdma_backend_stop(&dev->backend_dev);
++
+     rdma_rm_fini(&dev->rdma_dev_res, &dev->backend_dev,
+                  dev->backend_eth_device_name);
  
 -- 
 2.17.2
