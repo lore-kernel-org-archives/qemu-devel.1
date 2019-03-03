@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45471)
+Received: from eggs.gnu.org ([209.51.188.92]:45472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqB-0004vn-Ag
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqB-0004vo-Ai
 	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqA-0001qe-7k
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqA-0001qY-5J
 	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:23:55 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun,  3 Mar 2019 17:23:42 +0000
-Message-Id: <20190303172343.13406-8-mark.cave-ayland@ilande.co.uk>
+Date: Sun,  3 Mar 2019 17:23:38 +0000
+Message-Id: <20190303172343.13406-4-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
 References: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 7/8] target/ppc: introduce vsrh_offset()
- function
+Subject: [Qemu-devel] [PATCH 3/8] target/ppc: move Vsr* macros from
+ internal.h to cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,85 +22,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org
 
-Now that both VSX and VMX registers are in host-endian order we can introduce
-a vsrh_offset() function as a replacement for fpr_offset().
-
-In addition the avrh_offset() and avrl_offset() functions can be simplified in
-terms of vsrh_offset() and vsrl_offset().
+It isn't possible to include internal.h from cpu.h so move the Vsr* macros
+into cpu.h alongside the other VMX/VSX register access functions.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- target/ppc/cpu.h       | 16 ++++++++--------
- target/ppc/translate.c |  4 ++--
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ target/ppc/cpu.h      | 20 ++++++++++++++++++++
+ target/ppc/internal.h | 19 -------------------
+ 2 files changed, 20 insertions(+), 19 deletions(-)
 
 diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index faae25a566..9f8eb0bdc0 100644
+index 4a7df13c2d..d0580c6b6d 100644
 --- a/target/ppc/cpu.h
 +++ b/target/ppc/cpu.h
-@@ -2583,16 +2583,11 @@ static inline bool lsw_reg_in_range(int start, int nregs, int rx)
- #define VsrSD(i) s64[1 - (i)]
- #endif
- 
--static inline int fpr_offset(int i)
-+static inline int vsrh_offset(int i)
- {
-     return offsetof(CPUPPCState, vsr[i].VsrD(0));
+@@ -2563,6 +2563,26 @@ static inline bool lsw_reg_in_range(int start, int nregs, int rx)
  }
  
--static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
--{
--    return (uint64_t *)((uintptr_t)env + fpr_offset(i));
--}
--
- static inline int vsrl_offset(int i)
- {
-     return offsetof(CPUPPCState, vsr[i].VsrD(1));
-@@ -2603,6 +2598,11 @@ static inline int vsr_full_offset(int i)
-     return offsetof(CPUPPCState, vsr[i].u64[0]);
- }
- 
-+static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
-+{
-+    return (uint64_t *)((uintptr_t)env + vsrh_offset(i));
-+}
+ /* Accessors for FP, VMX and VSX registers */
++#if defined(HOST_WORDS_BIGENDIAN)
++#define VsrB(i) u8[i]
++#define VsrSB(i) s8[i]
++#define VsrH(i) u16[i]
++#define VsrSH(i) s16[i]
++#define VsrW(i) u32[i]
++#define VsrSW(i) s32[i]
++#define VsrD(i) u64[i]
++#define VsrSD(i) s64[i]
++#else
++#define VsrB(i) u8[15 - (i)]
++#define VsrSB(i) s8[15 - (i)]
++#define VsrH(i) u16[7 - (i)]
++#define VsrSH(i) s16[7 - (i)]
++#define VsrW(i) u32[3 - (i)]
++#define VsrSW(i) s32[3 - (i)]
++#define VsrD(i) u64[1 - (i)]
++#define VsrSD(i) s64[1 - (i)]
++#endif
 +
- static inline uint64_t *cpu_vsrl_ptr(CPUPPCState *env, int i)
+ static inline int fpr_offset(int i)
  {
-     return (uint64_t *)((uintptr_t)env + vsrl_offset(i));
-@@ -2610,12 +2610,12 @@ static inline uint64_t *cpu_vsrl_ptr(CPUPPCState *env, int i)
+     return offsetof(CPUPPCState, vsr[i].u64[0]);
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index f26a71ffcf..3ebbdf4da4 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -204,25 +204,6 @@ EXTRACT_HELPER(IMM8, 11, 8);
+ EXTRACT_HELPER(DCMX, 16, 7);
+ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
  
- static inline int avrh_offset(int i)
+-#if defined(HOST_WORDS_BIGENDIAN)
+-#define VsrB(i) u8[i]
+-#define VsrSB(i) s8[i]
+-#define VsrH(i) u16[i]
+-#define VsrSH(i) s16[i]
+-#define VsrW(i) u32[i]
+-#define VsrSW(i) s32[i]
+-#define VsrD(i) u64[i]
+-#define VsrSD(i) s64[i]
+-#else
+-#define VsrB(i) u8[15 - (i)]
+-#define VsrSB(i) s8[15 - (i)]
+-#define VsrH(i) u16[7 - (i)]
+-#define VsrSH(i) s16[7 - (i)]
+-#define VsrW(i) u32[3 - (i)]
+-#define VsrSW(i) s32[3 - (i)]
+-#define VsrD(i) u64[1 - (i)]
+-#define VsrSD(i) s64[1 - (i)]
+-#endif
+ static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
  {
--    return offsetof(CPUPPCState, vsr[32 + i].VsrD(0));
-+    return vsrh_offset(i + 32);
- }
- 
- static inline int avrl_offset(int i)
- {
--    return offsetof(CPUPPCState, vsr[32 + i].VsrD(1));
-+    return vsrl_offset(i + 32);
- }
- 
- static inline int avr_offset(int i)
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index f646f359e7..1c7377d588 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6677,12 +6677,12 @@ GEN_TM_PRIV_NOOP(trechkpt);
- 
- static inline void get_fpr(TCGv_i64 dst, int regno)
- {
--    tcg_gen_ld_i64(dst, cpu_env, fpr_offset(regno));
-+    tcg_gen_ld_i64(dst, cpu_env, vsrh_offset(regno));
- }
- 
- static inline void set_fpr(int regno, TCGv_i64 src)
- {
--    tcg_gen_st_i64(src, cpu_env, fpr_offset(regno));
-+    tcg_gen_st_i64(src, cpu_env, vsrh_offset(regno));
- }
- 
- static inline void get_avr64(TCGv_i64 dst, int regno, bool high)
+     vsr->VsrD(0) = env->vsr[n].u64[0];
 -- 
 2.11.0
