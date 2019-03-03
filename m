@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46849)
+Received: from eggs.gnu.org ([209.51.188.92]:47409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h0adg-0000rW-3m
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:35:24 -0500
+	(envelope-from <mst@redhat.com>) id 1h0agy-00026K-6r
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:38:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h0adf-0005cL-86
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:35:24 -0500
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:46232)
+	(envelope-from <mst@redhat.com>) id 1h0agw-00084O-PI
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:38:48 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:44626)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h0ade-0005bj-Ut
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:35:23 -0500
-Received: by mail-pg1-x52d.google.com with SMTP id 196so1667084pgf.13
-	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 15:35:22 -0800 (PST)
-References: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
-	<20190303172343.13406-9-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5c37085e-2c33-32d0-235c-76a9100d4bbf@linaro.org>
-Date: Sun, 3 Mar 2019 15:35:18 -0800
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h0agu-00082j-Qm
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 18:38:44 -0500
+Received: by mail-qt1-f195.google.com with SMTP id d2so3393597qti.11
+	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 15:38:43 -0800 (PST)
+Date: Sun, 3 Mar 2019 18:38:39 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190303183805-mutt-send-email-mst@kernel.org>
+References: <1551407310-32413-1-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190303172343.13406-9-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 8/8] target/ppc: simplify get_cpu_vsrh()
- and get_cpu_vsrl() functions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1551407310-32413-1-git-send-email-guoheyi@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/acpi: enable SHPC native hot plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Heyi Guo <guoheyi@huawei.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Heyi Guo <heyi.guo@linaro.org>
 
-On 3/3/19 9:23 AM, Mark Cave-Ayland wrote:
->  static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
->  {
-> -    if (n < 32) {
-> -        get_fpr(dst, n);
-> -    } else {
-> -        get_avr64(dst, n - 32, true);
-> -    }
-> +    tcg_gen_ld_i64(dst, cpu_env, vsrh_offset(n));
->  }
+On Fri, Mar 01, 2019 at 10:28:30AM +0800, Heyi Guo wrote:
+> After the introduction of generic PCIe root port and PCIe-PCI bridge,
+> we will also have SHPC controller on ARM, so just enalbe SHPC native
+> hot plug.
+> 
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> Signed-off-by: Heyi Guo <heyi.guo@linaro.org>
+
+I don't think you need two Signed-off-by lines.
+Besides that:
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+Pls feel free to merge through the ARM tree.
+
+> ---
+>  hw/arm/virt-acpi-build.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 04b62c7..7849ec5 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -265,7 +265,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>          aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+>      aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+>      aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
+> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
+> +
+> +    /*
+> +     * Allow OS control for all 5 features:
+> +     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
+> +     */
+> +    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1F), NULL),
+>                                  aml_name("CTRL")));
 >  
->  static inline void get_cpu_vsrl(TCGv_i64 dst, int n)
->  {
-> -    if (n < 32) {
-> -        get_vsrl(dst, n);
-> -    } else {
-> -        get_avr64(dst, n - 32, false);
-> -    }
-> +    tcg_gen_ld_i64(dst, cpu_env, vsrl_offset(n));
->  }
->  
->  static inline void set_cpu_vsrh(int n, TCGv_i64 src)
->  {
-> -    if (n < 32) {
-> -        set_fpr(n, src);
-> -    } else {
-> -        set_avr64(n - 32, src, true);
-> -    }
-> +    tcg_gen_st_i64(src, cpu_env, vsrh_offset(n));
->  }
-
-I think these ought to have a "high" parameter, like set/get_avr64.
-
-
-r~
+>      ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+> -- 
+> 1.8.3.1
