@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45980)
+Received: from eggs.gnu.org ([209.51.188.92]:41671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h0UsK-0006ht-CM
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:26:09 -0500
+	(envelope-from <cota@braap.org>) id 1h0XJ9-0006J6-T1
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 15:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h0UsJ-00037G-KD
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:26:08 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:48406)
+	(envelope-from <cota@braap.org>) id 1h0X9a-0002CB-6F
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 14:52:06 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:38145)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1h0UsJ-00036J-Bm
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:26:07 -0500
-Date: Sun, 3 Mar 2019 18:26:02 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20190303172602.4ceyyf4734teu4xg@function>
-References: <20190303061406.7631-1-samuel.thibault@ens-lyon.org>
-	<CANCZdfpiyw32LGt5A5=V59nv3xFiVT8o1xPf6aDt3oEgPeJUmw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0X9Z-000262-FP
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 14:52:06 -0500
+Date: Sun, 3 Mar 2019 14:52:02 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20190303195202.GA12447@flamenco>
+References: <20190130004811.27372-1-cota@braap.org>
+	<20190130004811.27372-63-cota@braap.org>
+	<877eeams4z.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CANCZdfpiyw32LGt5A5=V59nv3xFiVT8o1xPf6aDt3oEgPeJUmw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Reduce curses escdelay from 1s to 0.2s
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <877eeams4z.fsf@zen.linaroharston>
+Subject: Re: [Qemu-devel] [PATCH v6 62/73] cpu: introduce
+ cpu_has_work_with_iothread_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Warner Losh <imp@bsdimp.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-Warner Losh, le dim. 03 mars 2019 10:11:52 -0700, a ecrit:
-> On Sun, Mar 3, 2019, 12:45 AM Samuel Thibault <[1]samuel.thibault@ens-lyon.org>
-> wrote:
+On Fri, Feb 08, 2019 at 11:33:32 +0000, Alex Bennée wrote:
 > 
->     By default, curses will only report single ESC key event after 1s delay,
->     since ESC is also used for keypad escape sequences. This however makes
->     users
->     believe that ESC is not working. Reducing to 0.2s provides good enough user
->     experience, while still allowing 200ms for keypad sequences to get in,
->     which
->     should be more than enough.
+> Emilio G. Cota <cota@braap.org> writes:
 > 
-> How did you come up with this number?
+> > It will gain some users soon.
+> >
+> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> > ---
+> >  include/qom/cpu.h | 36 +++++++++++++++++++++++++++++++++---
+(snip)
+> >  static inline bool cpu_has_work(CPUState *cpu)
+> >  {
+> >      CPUClass *cc = CPU_GET_CLASS(cpu);
+> > +    bool has_cpu_lock = cpu_mutex_locked(cpu);
+> > +    bool (*func)(CPUState *cpu);
+> >      bool ret;
+> >
+> > +    if (cc->has_work_with_iothread_lock) {
+> > +        if (qemu_mutex_iothread_locked()) {
+> > +            func = cc->has_work_with_iothread_lock;
+> > +            goto call_func;
+> > +        }
+> > +
+> > +        if (has_cpu_lock) {
+> > +            /* avoid deadlock by acquiring the locks in order */
+> 
+> This is fine here but can we expand the comment above:
+> 
+>  * cpu_has_work:
+>  * @cpu: The vCPU to check.
+>  *
+>  * Checks whether the CPU has work to do. If the vCPU helper needs to
+>  * check it's work status with the BQL held ensure we hold the BQL
+>  * before taking the CPU lock.
 
-Since the default was very long, I chose a value that felt fast enough
-for the user.
+I added a comment to the body of the function:
 
-> Still seems a bit long for the ESC ESC case where the user hits ESC
-> twice in quick succession.
++    /* some targets require us to hold the BQL when checking for work */
+     if (cc->has_work_with_iothread_lock) {
 
-Right, there might be such double-press.
+> Where is our canonical description of the locking interaction between
+> BQL and CPU locks?
 
-> Even back in the day, terminals would send the characters back to back
-> at 1200 baud, which is 8ms per character. 32ms is 4x that, 32x 9600
-> baud rates. 25 or 50ms is suggested from these figures.
+It's in a few places, for instance cpu_mutex_lock's documentation
+in include/qom/cpu.h.
 
-Alright, let's try 25 then.
+I've added a comment about the locking order to @lock's documentation,
+also in cpu.h:
 
-Samuel
+- * @lock: Lock to prevent multiple access to per-CPU fields.
++ * @lock: Lock to prevent multiple access to per-CPU fields. Must be acqrd
++ *        after the BQL.
+
+> Otherwise:
+> 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+Thanks!
+
+		Emilio
