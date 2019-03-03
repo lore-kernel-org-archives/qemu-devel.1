@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43707)
+Received: from eggs.gnu.org ([209.51.188.92]:43896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1h0S2V-0005xC-LS
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:24:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1h0S3g-0006ti-Ow
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:25:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1h0S2U-0004rA-Tc
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:24:27 -0500
-Received: from mga12.intel.com ([192.55.52.136]:15338)
+	(envelope-from <thuth@redhat.com>) id 1h0S3f-0005ko-T0
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:25:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1h0S2T-0004pX-3f
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:24:26 -0500
-From: "Zhang, Chen" <chen.zhang@intel.com>
-Date: Sun, 3 Mar 2019 14:24:20 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D7806067D90@shsmsx102.ccr.corp.intel.com>
-References: <20190228165508.21594-1-chen.zhang@intel.com>
-	<20190228165508.21594-6-chen.zhang@intel.com>
-	<bd6dbeb3-d22b-e432-8fd4-155141c64ef2@redhat.com>
-In-Reply-To: <bd6dbeb3-d22b-e432-8fd4-155141c64ef2@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h0S3f-0005jR-L5
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 09:25:39 -0500
+References: <1551456970-463-1-git-send-email-thuth@redhat.com>
+	<74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <257d080a-27f9-52e5-76e4-d6929b80cad5@redhat.com>
+Date: Sun, 3 Mar 2019 15:15:32 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH V2 5/7] qapi/migration.json: Remove a
- variable that doesn't exist in example
+In-Reply-To: <74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: Remove (mostly) useless
+ architecture checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +29,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <minyard@acm.org>
 
-DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBFcmljIEJsYWtlIFttYWlsdG86
-ZWJsYWtlQHJlZGhhdC5jb21dIA0KU2VudDogRnJpZGF5LCBNYXJjaCAxLCAyMDE5IDE6MDcgQU0N
-ClRvOiBaaGFuZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+OyBMaSBaaGlqaWFuIDxsaXpo
-aWppYW5AY24uZnVqaXRzdS5jb20+OyBaaGFuZyBDaGVuIDx6aGFuZ2NraWRAZ21haWwuY29tPjsg
-RHIuIERhdmlkIEFsYW4gR2lsYmVydCA8ZGdpbGJlcnRAcmVkaGF0LmNvbT47IEp1YW4gUXVpbnRl
-bGEgPHF1aW50ZWxhQHJlZGhhdC5jb20+OyB6aGFuZ2hhaWxpYW5nIDx6aGFuZy56aGFuZ2hhaWxp
-YW5nQGh1YXdlaS5jb20+OyBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+OyBx
-ZW11LWRldiA8cWVtdS1kZXZlbEBub25nbnUub3JnPg0KU3ViamVjdDogUmU6IFtQQVRDSCBWMiA1
-LzddIHFhcGkvbWlncmF0aW9uLmpzb246IFJlbW92ZSBhIHZhcmlhYmxlIHRoYXQgZG9lc24ndCBl
-eGlzdCBpbiBleGFtcGxlDQoNCk9uIDIvMjgvMTkgMTA6NTUgQU0sIFpoYW5nIENoZW4gd3JvdGU6
-DQo+IEZyb206IFpoYW5nIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPg0KPiANCj4gUmVtb3Zl
-IHRoZSAiYWN0aXZlIiB2YXJpYWJsZSBpbiBleGFtcGxlIGZvciBxdWVyeS1jb2xvLXN0YXR1cy4N
-Cj4gDQo+IFNpZ25lZC1vZmYtYnk6IFpoYW5nIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPg0K
-PiAtLS0NCj4gIHFhcGkvbWlncmF0aW9uLmpzb24gfCAyICstDQo+ICAxIGZpbGUgY2hhbmdlZCwg
-MSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCg0KUmV2aWV3ZWQtYnk6IEVyaWMgQmxha2Ug
-PGVibGFrZUByZWRoYXQuY29tPg0KDQpNaWdodCBiZSBuaWNlIHRvIG1lbnRpb24gdGhhdCB0aGUg
-ZG9jIGJ1ZyBoYXMgYmVlbiBwcmVzZW50IHNpbmNlIHRoZSBjb21tYW5kJ3MgaW50cm9kdWN0aW9u
-IGluIGNvbW1pdCBmNTZjMDA2NS4NCg0KU3VyZSwgd2lsbCB3cml0ZSBpbiBuZXh0IHZlcnNpb24u
-DQoNClRoYW5rcw0KWmhhbmcgQ2hlbg0KDQo+IA0KPiBkaWZmIC0tZ2l0IGEvcWFwaS9taWdyYXRp
-b24uanNvbiBiL3FhcGkvbWlncmF0aW9uLmpzb24gaW5kZXggDQo+IDQ4ZTIxODgwYTMuLmY0YzE3
-NjJkZmMgMTAwNjQ0DQo+IC0tLSBhL3FhcGkvbWlncmF0aW9uLmpzb24NCj4gKysrIGIvcWFwaS9t
-aWdyYXRpb24uanNvbg0KPiBAQCAtMTM0Miw3ICsxMzQyLDcgQEANCj4gICMgRXhhbXBsZToNCj4g
-ICMNCj4gICMgLT4geyAiZXhlY3V0ZSI6ICJxdWVyeS1jb2xvLXN0YXR1cyIgfSAtIyA8LSB7ICJy
-ZXR1cm4iOiB7ICJtb2RlIjogDQo+ICJwcmltYXJ5IiwgImFjdGl2ZSI6IHRydWUsICJyZWFzb24i
-OiAicmVxdWVzdCIgfSB9DQo+ICsjIDwtIHsgInJldHVybiI6IHsgIm1vZGUiOiAicHJpbWFyeSIs
-ICJyZWFzb24iOiAicmVxdWVzdCIgfSB9DQo+ICAjDQo+ICAjIFNpbmNlOiAzLjENCj4gICMjDQo+
-IA0KDQotLQ0KRXJpYyBCbGFrZSwgUHJpbmNpcGFsIFNvZnR3YXJlIEVuZ2luZWVyDQpSZWQgSGF0
-LCBJbmMuICAgICAgICAgICArMS05MTktMzAxLTMyMjYNClZpcnR1YWxpemF0aW9uOiAgcWVtdS5v
-cmcgfCBsaWJ2aXJ0Lm9yZw0K
+On 01/03/2019 18.57, John Snow wrote:
+>=20
+>=20
+> On 3/1/19 11:16 AM, Thomas Huth wrote:
+>> These checks at the beginning of some of the tests are mostly useless:
+>> We only run the tests on x86 anyway, and g_test_message() does not
+>> print anything unless you call g_test_init() first.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/fdc-test.c      | 7 -------
+>>  tests/ide-test.c      | 7 -------
+>>  tests/ipmi-bt-test.c  | 7 -------
+>>  tests/ipmi-kcs-test.c | 7 -------
+>>  4 files changed, 28 deletions(-)
+>>
+>> diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+>> index 88f1abf..31cd329 100644
+>> --- a/tests/fdc-test.c
+>> +++ b/tests/fdc-test.c
+>> @@ -548,16 +548,9 @@ static void fuzz_registers(void)
+>> =20
+>>  int main(int argc, char **argv)
+>>  {
+>> -    const char *arch =3D qtest_get_arch();
+>>      int fd;
+>>      int ret;
+>> =20
+>> -    /* Check architecture */
+>> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+>> -        g_test_message("Skipping test for non-x86\n");
+>> -        return 0;
+>> -    }
+>> -
+>>      /* Create a temporary raw image */
+>>      fd =3D mkstemp(test_image);
+>>      g_assert(fd >=3D 0);
+>> diff --git a/tests/ide-test.c b/tests/ide-test.c
+>> index f0280e6..300d64e 100644
+>> --- a/tests/ide-test.c
+>> +++ b/tests/ide-test.c
+>> @@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
+>> =20
+>>  int main(int argc, char **argv)
+>>  {
+>> -    const char *arch =3D qtest_get_arch();
+>>      int fd;
+>>      int ret;
+>> =20
+>> -    /* Check architecture */
+>> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+>> -        g_test_message("Skipping test for non-x86\n");
+>> -        return 0;
+>> -    }
+>> -
+>>      /* Create temporary blkdebug instructions */
+>>      fd =3D mkstemp(debug_path);
+>>      g_assert(fd >=3D 0);
+>> diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
+>> index f4a81b5..fc4c83b 100644
+>> --- a/tests/ipmi-bt-test.c
+>> +++ b/tests/ipmi-bt-test.c
+>> @@ -400,15 +400,8 @@ static void open_socket(void)
+>> =20
+>>  int main(int argc, char **argv)
+>>  {
+>> -    const char *arch =3D qtest_get_arch();
+>>      int ret;
+>> =20
+>> -    /* Check architecture */
+>> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+>> -        g_test_message("Skipping test for non-x86\n");
+>> -        return 0;
+>> -    }
+>> -
+>>      open_socket();
+>> =20
+>>      /* Run the tests */
+>> diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
+>> index 178ffc1..a2354c1 100644
+>> --- a/tests/ipmi-kcs-test.c
+>> +++ b/tests/ipmi-kcs-test.c
+>> @@ -263,16 +263,9 @@ static void test_enable_irq(void)
+>> =20
+>>  int main(int argc, char **argv)
+>>  {
+>> -    const char *arch =3D qtest_get_arch();
+>>      char *cmdline;
+>>      int ret;
+>> =20
+>> -    /* Check architecture */
+>> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+>> -        g_test_message("Skipping test for non-x86\n");
+>> -        return 0;
+>> -    }
+>> -
+>>      /* Run the tests */
+>>      g_test_init(&argc, &argv, NULL);
+>> =20
+>>
+>=20
+> Hm, if you insist. I have no strong feelings... Do we plan to split
+> tests out by architecture eventually? Clearly x86 only tests don't
+> really need to each individually check the arch, but I'm not sure what
+> the vision is.
+
+We could also fix the g_test_message() output by moving it after the
+g_test_init() ... I don't mind too much which way we go, but at least
+the current state is bad.
+
+Looking at other tests, we seem to be pretty inconsistent in checking
+the architecture at the beginning. For example q35-test.c,
+pvpanic-test.c and test-x86-cpuid.c do not check for x86, while
+rtas-test.c has a check for ppc64...
+
+> Either way, since I have no horse in the race:
+>=20
+> Acked-by: John Snow <jsnow@redhat.com>
+
+Thanks!
+
+ Thomas
