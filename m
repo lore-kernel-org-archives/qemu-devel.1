@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45516)
+Received: from eggs.gnu.org ([209.51.188.92]:45457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqC-0004vr-FE
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqA-0004vj-RP
 	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqB-0001s8-Jr
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:23:56 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h0UqA-0001qA-0O
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 12:23:54 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun,  3 Mar 2019 17:23:41 +0000
-Message-Id: <20190303172343.13406-7-mark.cave-ayland@ilande.co.uk>
+Date: Sun,  3 Mar 2019 17:23:36 +0000
+Message-Id: <20190303172343.13406-2-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
 References: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 6/8] target/ppc: switch fpr/vsrl registers so
- all VSX registers are in host endian order
+Subject: [Qemu-devel] [PATCH 1/8] target/ppc: introduce single fpr_offset()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,107 +22,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org
 
-When VSX support was initially added, the fpr registers were added at
-offset 0 of the VSR register and the vsrl registers were added at offset
-1. This is in contrast to the VMX registers (the last 32 VSX registers) which
-are stored in host-endian order.
-
-Switch the fpr/vsrl registers so that the lower 32 VSX registers are now also
-stored in host endian order to match the VMX registers. This ensures that TCG
-vector operations involving mixed VMX and VSX registers will function
-correctly.
+Instead of having multiple copies of the offset calculation logic, move it to a
+single fpr_offset() function.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- target/ppc/cpu.h      | 4 ++--
- target/ppc/internal.h | 8 ++++----
- target/ppc/machine.c  | 8 ++++----
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ target/ppc/cpu.h       | 7 ++++++-
+ target/ppc/translate.c | 4 ++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 89651988ab..faae25a566 100644
+index 26604ddf98..4bb4e42670 100644
 --- a/target/ppc/cpu.h
 +++ b/target/ppc/cpu.h
-@@ -2585,7 +2585,7 @@ static inline bool lsw_reg_in_range(int start, int nregs, int rx)
- 
- static inline int fpr_offset(int i)
- {
--    return offsetof(CPUPPCState, vsr[i].u64[0]);
-+    return offsetof(CPUPPCState, vsr[i].VsrD(0));
+@@ -2563,9 +2563,14 @@ static inline bool lsw_reg_in_range(int start, int nregs, int rx)
  }
  
+ /* Accessors for FP, VMX and VSX registers */
++static inline int fpr_offset(int i)
++{
++    return offsetof(CPUPPCState, vsr[i].u64[0]);
++}
++
  static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
-@@ -2595,7 +2595,7 @@ static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
- 
- static inline int vsrl_offset(int i)
  {
--    return offsetof(CPUPPCState, vsr[i].u64[1]);
-+    return offsetof(CPUPPCState, vsr[i].VsrD(1));
+-    return &env->vsr[i].u64[0];
++    return (uint64_t *)((uintptr_t)env + fpr_offset(i));
  }
  
- static inline int vsr_full_offset(int i)
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index 3ebbdf4da4..fb6f64ed1e 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -206,14 +206,14 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
+ static inline uint64_t *cpu_vsrl_ptr(CPUPPCState *env, int i)
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 819221f246..3b1992faf1 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6677,12 +6677,12 @@ GEN_TM_PRIV_NOOP(trechkpt);
  
- static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+ static inline void get_fpr(TCGv_i64 dst, int regno)
  {
--    vsr->VsrD(0) = env->vsr[n].u64[0];
--    vsr->VsrD(1) = env->vsr[n].u64[1];
-+    vsr->VsrD(0) = env->vsr[n].VsrD(0);
-+    vsr->VsrD(1) = env->vsr[n].VsrD(1);
+-    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[regno].u64[0]));
++    tcg_gen_ld_i64(dst, cpu_env, fpr_offset(regno));
  }
  
- static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+ static inline void set_fpr(int regno, TCGv_i64 src)
  {
--    env->vsr[n].u64[0] = vsr->VsrD(0);
--    env->vsr[n].u64[1] = vsr->VsrD(1);
-+    env->vsr[n].VsrD(0) = vsr->VsrD(0);
-+    env->vsr[n].VsrD(1) = vsr->VsrD(1);
+-    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[regno].u64[0]));
++    tcg_gen_st_i64(src, cpu_env, fpr_offset(regno));
  }
  
- void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index 756b6d2971..a92d0ad3a3 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -150,7 +150,7 @@ static int get_fpr(QEMUFile *f, void *pv, size_t size,
- {
-     ppc_vsr_t *v = pv;
- 
--    v->u64[0] = qemu_get_be64(f);
-+    v->VsrD(0) = qemu_get_be64(f);
- 
-     return 0;
- }
-@@ -160,7 +160,7 @@ static int put_fpr(QEMUFile *f, void *pv, size_t size,
- {
-     ppc_vsr_t *v = pv;
- 
--    qemu_put_be64(f, v->u64[0]);
-+    qemu_put_be64(f, v->VsrD(0));
-     return 0;
- }
- 
-@@ -181,7 +181,7 @@ static int get_vsr(QEMUFile *f, void *pv, size_t size,
- {
-     ppc_vsr_t *v = pv;
- 
--    v->u64[1] = qemu_get_be64(f);
-+    v->VsrD(1) = qemu_get_be64(f);
- 
-     return 0;
- }
-@@ -191,7 +191,7 @@ static int put_vsr(QEMUFile *f, void *pv, size_t size,
- {
-     ppc_vsr_t *v = pv;
- 
--    qemu_put_be64(f, v->u64[1]);
-+    qemu_put_be64(f, v->VsrD(1));
-     return 0;
- }
- 
+ static inline void get_avr64(TCGv_i64 dst, int regno, bool high)
 -- 
 2.11.0
