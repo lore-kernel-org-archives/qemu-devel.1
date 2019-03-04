@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43418)
+Received: from eggs.gnu.org ([209.51.188.92]:44961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1h0oCe-0003c7-Pf
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:04:31 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0oJj-0007Vj-Eo
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:11:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1h0oCa-0004qB-Fa
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:04:22 -0500
-Received: from greensocs.com ([193.104.36.180]:39433)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1h0oCY-0004dz-Er
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:04:20 -0500
-References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
-	<CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
-	<fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
-	<CAFEAcA_OrJ-1SzE5UpT4eHbzi-KS_GqX13KZdHzEzovXnsnsUg@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <39fbf4a3-d6eb-9623-ed11-ceb21e8305c7@greensocs.com>
-Date: Mon, 4 Mar 2019 15:04:13 +0100
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0oJi-0002Ab-Fk
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:11:43 -0500
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:38988)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
+	id 1h0oJi-00028Y-7F
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:11:42 -0500
+Received: by mail-ot1-x330.google.com with SMTP id e15so4293718otk.6
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 06:11:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_OrJ-1SzE5UpT4eHbzi-KS_GqX13KZdHzEzovXnsnsUg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] multi phase reset
+References: <20190223105421.1290-1-davidkiarie4@gmail.com>
+	<20190223105421.1290-2-davidkiarie4@gmail.com>
+	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
+	<CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
+	<CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
+In-Reply-To: <CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Mon, 4 Mar 2019 17:10:52 +0300
+Message-ID: <CABdVeABUzvwA8jV8ZfTcDY8eWN5=M2Otku6eukaBsPeMqPNOhQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +33,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
 
+On Mon, Mar 4, 2019 at 4:42 PM David Kiarie <davidkiarie4@gmail.com> wrote:
 
-
-On 3/1/19 5:52 PM, Peter Maydell wrote:
-> On Fri, 1 Mar 2019 at 15:34, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+>
+> On Mon, Mar 4, 2019 at 3:57 PM David Kiarie <davidkiarie4@gmail.com>
+> wrote:
+>
 >>
->> On 3/1/19 12:43 PM, Peter Maydell wrote:
->>> On Mon, 25 Feb 2019 at 10:49, Damien Hedde <damien.hedde@greensocs.com> wrote:
->>>> I had more thought about the reset problem and what we want to achieve
->>>> (add power gating and clock support).
->>>> Feel free to comment. I'll start to implement this and send a first
->>>> version with a reroll of everything when it's ready.
->>>
->>> I generally like this; I have some comments below.
->>>
->>>> # PROPOSAL OVERVIEW
->>>>
->>>> I propose to add a Resetable interface and a ResetDomain object.
->>>>
->>>> Having an interface simplify things since there is several reset entry
->>>> points (at least Buses and Devices).
->>>> Device and Bus objects will implement this interface.
->>>>
->>>> The ResetDomain will hold several Resetable objects and implement the
->>>> interface too. The ResetDomain is needed to have at least a global/main
->>>> ResetDomain to place buses and devices to replace the current
->>>> qemu_register_reset system which only allow to register a function.
->>>
->>> How does the ResetDomain fit in for a typical case where
->>> we have an SoC container object with a handful of devices
->>> (which are children of the container object)? Does the
->>> SoC container object just directly implement the Resettable
->>> interface and handle the propagation as ResetDomain would?
->>> Does the SoC container create one or more ResetDomains and
->>> add its child devices to them (if so, with what API)?
 >>
->> By SoC container, I suppose you mean a Machine object.
-> 
-> No, I mean something like the TYPE_NRF51_SOC device.
-> This isn't a machine, it's a device that represents an SoC,
-> and which is pretty much just a container that wires up
-> all the devices that an SoC has. The Machine represents
-> an entire board, and usually will create an SoC, some memory
-> and perhaps a few other devices.
-> 
->> Right now, I only have 2 functions reset_domain_[un]register_object to
->> add/remove an object in a reset domain (which is just a list of Resettable).
-> 
-> OK, so whether devices are in a reset domain object
-> is distinct from what object they are QOM children of ?
+>> On Mon, Mar 4, 2019 at 2:57 PM Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com>
+>> wrote:
+>>
+>>> Hi David,
+>>>
+>>> On 2/23/19 11:54 AM, David Kiarie wrote:
+>>> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
+>>> > ---
+>>> >  hw/i386/amd_iommu.c | 2 +-
+>>> >  hw/i386/amd_iommu.h | 2 +-
+>>> >  2 files changed, 2 insertions(+), 2 deletions(-)
+>>> >
+>>> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+>>> > index 8ad707a..4f179da 100644
+>>> > --- a/hw/i386/amd_iommu.c
+>>> > +++ b/hw/i386/amd_iommu.c
+>>> > @@ -2,7 +2,7 @@
+>>> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
+>>> >   *
+>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+>>> > + * Copyright (C) 2016 David Kiarie Kahurani
+>>>
+>>> Why do you change the year? Because your work was merged in 2016?
+>>>
+>>
+>> no.
+>>
+>>
+>
+> though, if you have a legitimate issue with the change, you can always ai=
+r
+> it.
+>
 
-Yes, it is a totally independent pool of objects.
+you might think random emails are weird but Paolo, i don't expect to see
+any activity from you, on Qemu repo before this issue is sorted ;-)
 
-Regarding device composition, such as in the soc container you mention,
-we can choose to handle it in the base class (TYPE_DEVICE or
-TYPE_SYSBUS_DEVICE) by walking the children and look for Resettable
-objects. But this would change the current reset way of doing things
-which requires composed device to explicitly reset sub-devices.
 
-I choose to implicitly use device/bus hierarchy to propagate reset but
-it is maybe a bad idea. We can instead use qom parent/child relationship
-and make some explicit bus-level reset domains (right now it is explicit
-through the qdev/bus_reset_all). What do you think is best ?
-
-Thanks,
-Damien
+>
+>
+>>
+>>> >   *
+>>> >   * This program is free software; you can redistribute it and/or
+>>> modify
+>>> >   * it under the terms of the GNU General Public License as published
+>>> by
+>>> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+>>> > index c52886f..cb258a7 100644
+>>> > --- a/hw/i386/amd_iommu.h
+>>> > +++ b/hw/i386/amd_iommu.h
+>>> > @@ -2,7 +2,7 @@
+>>> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
+>>> >   *
+>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+>>> > + * Copyright (C) 2016 David Kiarie Kahurani
+>>> >   *
+>>> >   * This program is free software; you can redistribute it and/or
+>>> modify
+>>> >   * it under the terms of the GNU General Public License as published
+>>> by
+>>> >
+>>>
+>>
