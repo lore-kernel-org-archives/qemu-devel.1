@@ -1,27 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36220)
+Received: from eggs.gnu.org ([209.51.188.92]:36281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1h0phA-0007df-Fs
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:01 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0phR-0007vY-Vn
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1h0ph9-0004sw-GT
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:00 -0500
-Received: from mail-oln040092001075.outbound.protection.outlook.com
-	([40.92.1.75]:25184
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
-	id 1h0ph8-0004mh-FJ
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:39:58 -0500
-From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
-Date: Mon, 4 Mar 2019 15:39:53 +0000
-Message-ID: <RO1P152MB14836FF855F37ED3E6BF606C97710@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <19CCCB4091969348BEEDB07D72C403E9@LAMP152.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0phQ-0005CV-Oi
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:17 -0500
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:33701)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
+	id 1h0phQ-0005Bt-F2
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:16 -0500
+Received: by mail-oi1-x231.google.com with SMTP id z14so4175265oid.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 07:40:16 -0800 (PST)
 MIME-Version: 1.0
-Subject: [Qemu-devel] After patch to fix non repeating keys,
- keys get stuck on Windows guests
+References: <20190223105421.1290-1-davidkiarie4@gmail.com>
+	<20190223105421.1290-2-davidkiarie4@gmail.com>
+	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
+	<CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
+	<CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
+	<CABdVeABUzvwA8jV8ZfTcDY8eWN5=M2Otku6eukaBsPeMqPNOhQ@mail.gmail.com>
+	<CABdVeABnosV3-u9aepP=kSrb9P0X6-vUWZ2kDATUmNLmaJ_5+g@mail.gmail.com>
+	<CABdVeACgD7NrRa+P9yzkjhNJAtf9JEaJKuzo+J3CMCxLUO3phQ@mail.gmail.com>
+	<CABdVeACYb_TpARadx1FkQwODY7pqFp=Bm4RyZ3easb4Hm1JAyw@mail.gmail.com>
+	<CABdVeAD2mfUR5-29NQ=jkWjLRt6wyQNJEk4hFOZYFsnKCgYZFg@mail.gmail.com>
+	<b1eb9632-3322-bad3-8cd1-d716b8ae9322@redhat.com>
+	<CABdVeADy4DerQj+9On5HP_M6Qa4jRJU0CvkUgiab+LV_XYa-6g@mail.gmail.com>
+	<CABdVeABf7Rg5sBzvWZ6ujwHMjwLo8jBRkoVGjDBR4fHRuLv1gw@mail.gmail.com>
+	<CABdVeACnHqyBcBCXq08idKL0xaf14Pa8_mOFBRxkbcvJh6SEOg@mail.gmail.com>
+In-Reply-To: <CABdVeACnHqyBcBCXq08idKL0xaf14Pa8_mOFBRxkbcvJh6SEOg@mail.gmail.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Mon, 4 Mar 2019 18:39:27 +0300
+Message-ID: <CABdVeACc3y67MW3aiMnsArqaqe_ZdiGBaja+ctN-nL0Yv82TCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +41,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-VXNpbmcgUUVNVSB2ZXJzaW9uIDMuMS41MCAodjMuMS4wLTIzMzgtZzFiYTUzMGE0ZWMtZGlydHkp
-LCBhZnRlciB0aGUNCmNvbW1pdCAzNTkyMTg2MDE1NmUzOWYxN2ZmZDdlMThkMGY4NGQyMzk2YTZl
-OGY0DQprYmQtc3RhdGU6IGRvbid0IGJsb2NrIGF1dG8tcmVwZWF0IGV2ZW50cw0KDQpJdCB3YXMg
-bm90aWNlZCB0aGF0IGtleXMgY2FuIGdldCBzdHVjayBvbiBhbiBJbnRlbCBHVlQtZyAoaUdWVC1n
-KQ0KV2luZG93cyAxMCBndWVzdC4gRm9yIGV4YW1wbGUsIHByZXNzaW5nICJlIiB3aWxsIHJlc3Vs
-dCBvbg0KImVlZWVlZWVlZWVlZWVlZWVlZWVlZWUiIHVudGlsIHRoZSBrZXkgImUiIGlzIHByZXNz
-ZWQgYWdhaW4uIEkgdHJpZWQgdG8NCnJlcHJvZHVjZSB0aGlzIG9uIHNpbXBsZSBMaW51eCBndWVz
-dHMgYW5kIHNpbXBsZSBXaW5kb3dzIDEwIGd1ZXN0cyBidXQNCmZhaWxlZCB0byBkbyBzby4NCg0K
-VGhlIFFFTVUgY29tbWFuZCBsaW5lIGlzIHByZXR0eSBsb25nOg0KDQpzdWRvIGVudiBRRU1VX0FV
-RElPX0RSVj1wYSBRRU1VX0FVRElPX0RBQ19GSVhFRF9GUkVRPTk2MDAwDQpRRU1VX0FVRElPX0FE
-Q19GSVhFRF9GUkVRPTk2MDAwDQpRRU1VX1BBX1NFUlZFUj0vcnVuL3VzZXIvMTAwMC9wdWxzZS9u
-YXRpdmUgUUVNVV9BVURJT19BRENfVk9JQ0VTPTANClBVTFNFX0xBVEVOQ1lfTVNFQz0xMCBxZW11
-LXN5c3RlbS14ODZfNjQgLW5hbWUgJ1dpbmRvd3MgMTAnIC1rIHB0LWJyDQotbm9kZWZhdWx0cyAt
-ZGV2aWNlIG5lYy11c2IteGhjaSxpZD1uZWN4aGNpIC1oZGENCi9ob21lL3VzdWFyaW8vLmxvY2Fs
-L3NoYXJlL2xpYnZpcnQvaW1hZ2VzL3JlZG0ucWNvdzIgLWVuYWJsZS1rdm0gLWNwdQ0KU2t5bGFr
-ZS1DbGllbnQsaHZfdGltZSxodl9yZWxheGVkLGh2X3ZhcGljLGh2X3NwaW5sb2Nrcz0weDFmZmYs
-aHZfcnVudGltZQ0KLXNtcCBjb3Jlcz0yLHRocmVhZHM9MiAtbSAzMDcyTSAtYmlvcyAvdXNyL2xv
-Y2FsL3NoYXJlL3FlbXUvYmlvcy5iaW4NCi1kZXZpY2UgdXNiLXRhYmxldCxpZD10YWJsZXQgLWRl
-dmljZSB1c2ItYXVkaW8saWQ9dXNiYXVkdmlyLGJ1ZmZlcj02MTQ0DQotZGV2aWNlIHVzYi1ob3N0
-LHZlbmRvcmlkPTB4MDA3OSxpZD1yZWRyYWdvbiAtZGV2aWNlDQp1c2ItaG9zdCx2ZW5kb3JpZD0w
-eDA0NTgsaWQ9bW91c2VnZW5pdXMgLXZnYSBub25lIC1tb25pdG9yIHZjIC1zZXJpYWwNCnN0ZGlv
-IC1kaXNwbGF5IGd0ayxnbD1vbiAtZGV2aWNlDQp2ZmlvLXBjaSxzeXNmc2Rldj0vc3lzL2J1cy9w
-Y2kvZGV2aWNlcy8wMDAwOjAwOjAyLjAvMTIzZjA5YjAtNGMwMC0xMWU4LWE2Y2EtZjNjMjFlNDdl
-MDEyLHgtaWdkLW9wcmVnaW9uPW9uLHJvbWJhcj0wLGRpc3BsYXk9b24sYWRkcj0weDMsaWQ9aUhE
-NTIwDQotbWFjaGluZSBrZXJuZWxfaXJxY2hpcD1vbiAtZ2xvYmFsIFBJSVg0X1BNLmRpc2FibGVf
-czM9MSAtZ2xvYmFsDQpQSUlYNF9QTS5kaXNhYmxlX3M0PTEgLU0gcGMsdXNiPWZhbHNlIC1uZXRk
-ZXYgdXNlcixpZD1uZXQwIC1kZXZpY2UNCmUxMDAwLG5ldGRldj1uZXQwLGlkPW4wLGFkZHI9MHg4
-IC1kZXZpY2UNCnVzYi1ob3N0LHZlbmRvcmlkPTB4MDQ4MCxwcm9kdWN0aWQ9MHgwMjAwLGlkPXRv
-c2hpYmENCg0KInJlZHJhZ29uIiBpcyBhIGdhbWVwYWQsICJ0b3NoaWJhIiBhbiBleHRlcm5hbCBI
-REQgYW5kICJtb3VzZWdlbml1cyIgaXMNCmEgbW91c2UuIFRoZSBwcm9ibGVtIHdhcyBub3RpY2Vk
-IGJvdGggd2l0aCBkZXZpY2VzIGNvbm5lY3RlZCBhbmQNCmRpc2Nvbm5lY3RlZCwgYW5kIHdoZW4g
-dGhleSB3ZXJlIHJlbW92ZWQgdXNpbmcgZGV2aWNlX2RlbC4NCg0KV2hpbGUgSSBmYWNlZCB0aGlz
-IG9uIG11bHRpcGxlIHNpdHVhdGlvbnMgKGV2ZW4gdXNpbmcgbm90ZXBhZCwgZm9yDQpleGFtcGxl
-KSwgdGhpcyBidWcgaXMgZWFzeSB0byB0cmlnZ2VyIHdpdGggZ2FtZXMuIEl0IHNlZW1zIHRoZSB1
-c2ItYXVkaW8NCmVtdWxhdGlvbiBwbHVzIGlHVlQtZyBsb2FkIHBsdXMgaGlnaCBDUFUgbG9hZCBt
-YWtlcyB0aGUga2V5IHJlbGVhc2UNCmV2ZW50IG5ldmVyIHRvIGJlIHNlbnQgdG8gdGhlIGd1ZXN0
-LCBtYWtpbmcgdGhlIGtleSBnZXQgc3R1Y2sgb24gdGhlDQpndWVzdCB1bnRpbCBpdCBpcyBwcmVz
-c2VkIGFnYWluLg0K
+On Mon, Mar 4, 2019 at 6:33 PM David Kiarie <davidkiarie4@gmail.com> wrote:
+
+>
+>
+> On Mon, Mar 4, 2019 at 6:32 PM David Kiarie <davidkiarie4@gmail.com>
+> wrote:
+>
+>>
+>>
+>> On Mon, Mar 4, 2019 at 6:27 PM David Kiarie <davidkiarie4@gmail.com>
+>> wrote:
+>>
+>>>
+>>>
+>>> On Mon, Mar 4, 2019 at 6:23 PM Thomas Huth <thuth@redhat.com> wrote:
+>>>
+>>>> On 04/03/2019 16.13, David Kiarie wrote:
+>>>> >
+>>>> >                             Hi David,
+>>>> >
+>>>> >                             On 2/23/19 11:54 AM, David Kiarie wrote:
+>>>> >                             > Signed-off-by: David Kiarie
+>>>> >                             <davidkiarie4@gmail.com
+>>>> >                             <mailto:davidkiarie4@gmail.com>>
+>>>> >                             > ---
+>>>> >                             >  hw/i386/amd_iommu.c | 2 +-
+>>>> >                             >  hw/i386/amd_iommu.h | 2 +-
+>>>> >                             >  2 files changed, 2 insertions(+), 2
+>>>> >                             deletions(-)
+>>>> >                             >
+>>>> >                             > diff --git a/hw/i386/amd_iommu.c
+>>>> >                             b/hw/i386/amd_iommu.c
+>>>> >                             > index 8ad707a..4f179da 100644
+>>>> >                             > --- a/hw/i386/amd_iommu.c
+>>>> >                             > +++ b/hw/i386/amd_iommu.c
+>>>> >                             > @@ -2,7 +2,7 @@
+>>>> >                             >   * QEMU emulation of AMD IOMMU (AMD-Vi)
+>>>> >                             >   *
+>>>> >                             >   * Copyright (C) 2011 Eduard - Gabriel
+>>>> >                             Munteanu
+>>>> >                             > - * Copyright (C) 2015 David Kiarie,
+>>>> >                             <davidkiarie4@gmail.com
+>>>> >                             <mailto:davidkiarie4@gmail.com>>
+>>>> >                             > + * Copyright (C) 2016 David Kiarie
+>>>> Kahurani
+>>>> >
+>>>> >                             Why do you change the year? Because your
+>>>> >                             work was merged in 2016?
+>>>> >
+>>>> >
+>>>> >                         no.
+>>>> >
+>>>> >
+>>>> >
+>>>> >                     though, if you have a legitimate issue with the
+>>>> >                     change, you can always air it.
+>>>> >
+>>>> >
+>>>> >                 you might think random emails are weird but Paolo, i
+>>>> >                 don't expect to see any activity from you, on Qemu
+>>>> repo
+>>>> >                 before this issue is sorted ;-)
+>>>> >
+>>>> >
+>>>> >             i mostly don't care about this code but i *wrote* it. if i
+>>>> >             am not allowed even make such minor(which i not a
+>>>> routine),
+>>>> >             why shouldn't i ask you to take the files down?
+>>>> >
+>>>> >
+>>>> >         or, rather, a small issue turns into a scene about how clean
+>>>> >         Qemu is. why not take down all my dirty code?
+>>>> >
+>>>> >
+>>>> >     look i'm resending this patch and next time we're having this
+>>>> >     conversation, i'll be defacing qemu.
+>>>> >
+>>>> > either you have to update my code to what i think it should look like
+>>>> or
+>>>> > you have to take down - wtf
+>>>> >
+>>>> > then you try to cook rubbish over it.
+>>>>
+>>>> Hey, calm down. Paolo said that he'd queue your patch, so it will
+>>>> eventually get applied. But that just might take some time, the
+>>>> maintainers only send PULL requests for their queued patches after a
+>>>> couple of days. So relax, wait some days, and if your patch still did
+>>>> not get applied in a week, then you can start complaining again.
+>>>>
+>>>
+>>> i'll not complain again, i'm make a patch to clean my code from your
+>>> codebase.
+>>>
+>>
+>>
+>> Qemu have never been important to me like it's important to the
+>> maintainers.
+>>
+>>
+> i'm sure you can write your own AMD IOMMU.
+>
+
+in fact, i'll write the other patch then you can just choose what to merge.
+
+you're not as important as you try to pose.
+
+
+>
+>
+>>
+>>
+>>>
+>>>
+>>>>
+>>>>  Thomas
+>>>>
+>>>
