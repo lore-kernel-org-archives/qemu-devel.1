@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44215)
+Received: from eggs.gnu.org ([209.51.188.92]:44210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAN-00088y-Ti
+	(envelope-from <cota@braap.org>) id 1h0sAN-00088x-Qq
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAM-0000dL-Qn
+	(envelope-from <cota@braap.org>) id 1h0sAM-0000d0-OD
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:19 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:44109)
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:34547)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAM-0000bJ-Gk
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAM-0000bC-F1
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:18 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:08 -0500
-Message-Id: <20190304181813.8075-9-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:06 -0500
+Message-Id: <20190304181813.8075-7-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 08/73] tcg-runtime: define
- helper_cpu_halted_set
+Subject: [Qemu-devel] [PATCH v7 06/73] cpu: introduce
+ process_queued_cpu_work_locked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +30,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+This completes the conversion to cpu_mutex_lock/unlock in the file.
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/tcg-runtime.h | 2 ++
- accel/tcg/tcg-runtime.c | 7 +++++++
- 2 files changed, 9 insertions(+)
+ cpus-common.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-index dfe325625c..46386bb564 100644
---- a/accel/tcg/tcg-runtime.h
-+++ b/accel/tcg/tcg-runtime.h
-@@ -28,6 +28,8 @@ DEF_HELPER_FLAGS_1(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env)
+diff --git a/cpus-common.c b/cpus-common.c
+index 85a61eb970..99662bfa87 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -337,20 +337,19 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+     queue_work_on_cpu(cpu, wi);
+ }
  
- DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
- 
-+DEF_HELPER_FLAGS_2(cpu_halted_set, TCG_CALL_NO_RWG, void, env, i32)
-+
- #ifdef CONFIG_SOFTMMU
- 
- DEF_HELPER_FLAGS_5(atomic_cmpxchgb, TCG_CALL_NO_WG,
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index d0d4484406..4aa038465f 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -167,3 +167,10 @@ void HELPER(exit_atomic)(CPUArchState *env)
+-void process_queued_cpu_work(CPUState *cpu)
++/* Called with the CPU's lock held */
++static void process_queued_cpu_work_locked(CPUState *cpu)
  {
-     cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
+     struct qemu_work_item *wi;
+     bool has_bql = qemu_mutex_iothread_locked();
+ 
+-    qemu_mutex_lock(&cpu->lock);
+     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+-        qemu_mutex_unlock(&cpu->lock);
+         return;
+     }
+     while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
+         wi = QSIMPLEQ_FIRST(&cpu->work_list);
+         QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
+-        qemu_mutex_unlock(&cpu->lock);
++        cpu_mutex_unlock(cpu);
+         if (wi->exclusive) {
+             /* Running work items outside the BQL avoids the following deadlock:
+              * 1) start_exclusive() is called with the BQL taken while another
+@@ -376,13 +375,19 @@ void process_queued_cpu_work(CPUState *cpu)
+                 qemu_mutex_unlock_iothread();
+             }
+         }
+-        qemu_mutex_lock(&cpu->lock);
++        cpu_mutex_lock(cpu);
+         if (wi->free) {
+             g_free(wi);
+         } else {
+             atomic_mb_set(&wi->done, true);
+         }
+     }
+-    qemu_mutex_unlock(&cpu->lock);
+     qemu_cond_broadcast(&cpu->cond);
  }
 +
-+void HELPER(cpu_halted_set)(CPUArchState *env, uint32_t val)
++void process_queued_cpu_work(CPUState *cpu)
 +{
-+    CPUState *cpu = ENV_GET_CPU(env);
-+
-+    cpu->halted = val;
++    cpu_mutex_lock(cpu);
++    process_queued_cpu_work_locked(cpu);
++    cpu_mutex_unlock(cpu);
 +}
 -- 
 2.17.1
