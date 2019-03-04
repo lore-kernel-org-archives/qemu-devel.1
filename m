@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46572)
+Received: from eggs.gnu.org ([209.51.188.92]:46617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mJQ-0000SW-OT
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mJW-0000Wd-EY
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mJP-0001EO-UE
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:16 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mJV-0001MH-GY
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:22 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  4 Mar 2019 13:01:57 +0100
-Message-Id: <20190304120210.31500-15-cohuck@redhat.com>
+Date: Mon,  4 Mar 2019 13:01:58 +0100
+Message-Id: <20190304120210.31500-16-cohuck@redhat.com>
 In-Reply-To: <20190304120210.31500-1-cohuck@redhat.com>
 References: <20190304120210.31500-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 14/27] s390x/tcg: Fix rounding from float128 to
- uint64_t/uint32_t
+Subject: [Qemu-devel] [PULL 15/27] s390x/tcg: Factor out conversion of
+ softfloat exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +25,79 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redha
 
 From: David Hildenbrand <david@redhat.com>
 
-Let's use the proper conversion functions now that we have them.
+We want to reuse that function in vector instruction context. While at it,
+cleanup the code, using defines for magic values and avoiding the
+handcrafted bit conversion.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190218122710.23639-3-david@redhat.com>
+Message-Id: <20190218122710.23639-4-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/fpu_helper.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ target/s390x/fpu_helper.c | 25 +++++++++++++------------
+ target/s390x/internal.h   |  7 +++++++
+ 2 files changed, 20 insertions(+), 12 deletions(-)
 
 diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index 0e9247bf7ef4..21236caed869 100644
+index 21236caed869..de02cf792d87 100644
 --- a/target/s390x/fpu_helper.c
 +++ b/target/s390x/fpu_helper.c
-@@ -509,9 +509,7 @@ uint64_t HELPER(clgdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
- uint64_t HELPER(clgxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
- {
-     int hold = swap_round_mode(env, m3);
--    float128 v2 = make_float128(h, l);
--    /* ??? Not 100% correct.  */
--    uint64_t ret = float128_to_int64(v2, &env->fpu_status);
-+    uint64_t ret = float128_to_uint64(make_float128(h, l), &env->fpu_status);
-     set_float_rounding_mode(hold, &env->fpu_status);
-     handle_exceptions(env, GETPC());
-     return ret;
-@@ -541,9 +539,7 @@ uint64_t HELPER(clfdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
- uint64_t HELPER(clfxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
- {
-     int hold = swap_round_mode(env, m3);
--    float128 v2 = make_float128(h, l);
--    /* Not 100% correct.  */
--    uint32_t ret = float128_to_int64(v2, &env->fpu_status);
-+    uint32_t ret = float128_to_uint32(make_float128(h, l), &env->fpu_status);
-     set_float_rounding_mode(hold, &env->fpu_status);
-     handle_exceptions(env, GETPC());
-     return ret;
+@@ -36,10 +36,18 @@
+ 
+ #define RET128(F) (env->retxl = F.low, F.high)
+ 
+-#define convert_bit(mask, from, to) \
+-    (to < from                      \
+-     ? (mask / (from / to)) & to    \
+-     : (mask & from) * (to / from))
++uint8_t s390_softfloat_exc_to_ieee(unsigned int exc)
++{
++    uint8_t s390_exc = 0;
++
++    s390_exc |= (exc & float_flag_invalid) ? S390_IEEE_MASK_INVALID : 0;
++    s390_exc |= (exc & float_flag_divbyzero) ? S390_IEEE_MASK_DIVBYZERO : 0;
++    s390_exc |= (exc & float_flag_overflow) ? S390_IEEE_MASK_OVERFLOW : 0;
++    s390_exc |= (exc & float_flag_underflow) ? S390_IEEE_MASK_UNDERFLOW : 0;
++    s390_exc |= (exc & float_flag_inexact) ? S390_IEEE_MASK_INEXACT : 0;
++
++    return s390_exc;
++}
+ 
+ /* Should be called after any operation that may raise IEEE exceptions.  */
+ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
+@@ -53,14 +61,7 @@ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
+         return;
+     }
+     env->fpu_status.float_exception_flags = 0;
+-
+-    /* Convert softfloat exception bits to s390 exception bits.  */
+-    s390_exc = 0;
+-    s390_exc |= convert_bit(qemu_exc, float_flag_invalid, 0x80);
+-    s390_exc |= convert_bit(qemu_exc, float_flag_divbyzero, 0x40);
+-    s390_exc |= convert_bit(qemu_exc, float_flag_overflow, 0x20);
+-    s390_exc |= convert_bit(qemu_exc, float_flag_underflow, 0x10);
+-    s390_exc |= convert_bit(qemu_exc, float_flag_inexact, 0x08);
++    s390_exc = s390_softfloat_exc_to_ieee(qemu_exc);
+ 
+     /* Install the exceptions that we raised.  */
+     env->fpc |= s390_exc << 16;
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index 9d0a45d1fef7..4db736b6acfd 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -311,6 +311,13 @@ void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+ uint32_t set_cc_nz_f32(float32 v);
+ uint32_t set_cc_nz_f64(float64 v);
+ uint32_t set_cc_nz_f128(float128 v);
++#define S390_IEEE_MASK_INVALID   0x80
++#define S390_IEEE_MASK_DIVBYZERO 0x40
++#define S390_IEEE_MASK_OVERFLOW  0x20
++#define S390_IEEE_MASK_UNDERFLOW 0x10
++#define S390_IEEE_MASK_INEXACT   0x08
++#define S390_IEEE_MASK_QUANTUM   0x04
++uint8_t s390_softfloat_exc_to_ieee(unsigned int exc);
+ 
+ 
+ /* gdbstub.c */
 -- 
 2.17.2
