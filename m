@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47546)
+Received: from eggs.gnu.org ([209.51.188.92]:51587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mLW-0002HM-0T
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:05:26 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1h0mWw-0004Oo-La
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:17:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mLU-0003JU-SP
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:05:25 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  4 Mar 2019 13:02:10 +0100
-Message-Id: <20190304120210.31500-28-cohuck@redhat.com>
-In-Reply-To: <20190304120210.31500-1-cohuck@redhat.com>
-References: <20190304120210.31500-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 27/27] s390x: Add floating-point extension
- facility to "qemu" cpu model
+	(envelope-from <dovgaluk@ispras.ru>) id 1h0mWv-0006iZ-Qf
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:17:14 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:33758)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1h0mWv-0006fX-CS
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:17:13 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
+	<155074715265.32129.1158027635780211224.stgit@pasha-VirtualBox>
+	<20190304103353.GA6059@localhost.localdomain>
+In-Reply-To: <20190304103353.GA6059@localhost.localdomain>
+Date: Mon, 4 Mar 2019 15:17:09 +0300
+Message-ID: <002b01d4d284$3109aa20$931cfe60$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v13 19/25] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,60 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: 'Kevin Wolf' <kwolf@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-From: David Hildenbrand <david@redhat.com>
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Am 21.02.2019 um 12:05 hat Pavel Dovgalyuk geschrieben:
+> > Replay is capable of recording normal BH events, but sometimes
+> > there are single use callbacks scheduled with aio_bh_schedule_oneshot
+> > function. This patch enables recording and replaying such callbacks.
+> > Block layer uses these events for calling the completion function.
+> > Replaying these calls makes the execution deterministic.
+> >
+> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> >
+> > --
+> >
+> > v6:
+> >  - moved stub function to the separate file for fixing linux-user build
+> > v10:
+> >  - replaced all block layer aio_bh_schedule_oneshot calls
+> This still doesn't catch all instances, e.g. everything that goes
+> through aio_co_schedule() is missing.
 
-The floating-point extension facility implemented certain changes to
-BFP, HFP and DFP instructions.
+It seems, that everything else is synchronized with blkreplay driver
+which is mandatory when using block devices in rr mode.
 
-As we don't implement HFP/DFP, we can ignore those completely. Related
-to BFP, the changes include
-- SET BFP ROUNDING MODE (SRNMB) instruction
-- BFP-rounding-mode field in the FPC register is changed to 3 bits
-- CONVERT FROM LOGICAL instructions
-- CONVERT TO LOGICAL instructions
-- Changes (rounding mode + XxC) added to
--- CONVERT TO FIXED
--- CONVERT FROM FIXED
--- LOAD FP INTEGER
--- LOAD ROUNDED
--- DIVIDE TO INTEGER
+> But I fully expect this to get broken anyway all the time because nobody
+> understands which function to use, and if it works for your special case
+> now and we'll fix other stuff as you encouter it, maybe that's good
+> enough for you.
 
-For TCG, we don't implement DIVIDE TO INTEGER, and it is harder to
-implement, so skip that. Also, as we don't implement PFPO, we can skip
-changes to that as well. The other parts are now implemented, we can
-indicate the facility.
+This problem exists in every subsystem and it is ok for now, when record/replay
+is not mature enough, and not familiar for others.
+When virtual devices are updated, developers may miss correct loadvm/savevm
+implementation. For example, loading the audio device state may miss
+shift the phase of the output signal. Nobody will notice that bug
+in the migration process, but it reveals when we use record/replay.
 
-z14 PoP mentions that "The floating-point extension facility is installed
-in the z/Architecture architectural mode. When bit 37 is one, bit 42 is
-also one.", meaning that the DFP (decimal-floating-point) facility also
-has to be indicated. We can ignore that for now.
+We can't cover everything with record/replay tests. Most of the new bugs
+can be revealed in complex configurations after billions of executed instructions.
+But when this feature will be available out of the box, we'll
+at least get more smoke testing.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190218122710.23639-16-david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/gen-features.c | 5 +++++
- 1 file changed, 5 insertions(+)
+> 
+> > @@ -1349,8 +1351,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int
+> bytes,
+> >
+> >      acb->has_returned = true;
+> >      if (acb->rwco.ret != NOT_DONE) {
+> > -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
+> > -                                blk_aio_complete_bh, acb);
+> > +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
+> > +                                         blk_aio_complete_bh, acb);
+> >      }
+> 
+> This, and a few other places that you convert, are in fast paths and add
+> some calls that are unnecessary for non-replay cases.
 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 44eca4547475..e4739a6b9f61 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -601,6 +601,11 @@ static uint16_t qemu_V3_1[] = {
- };
- 
- static uint16_t qemu_LATEST[] = {
-+    /*
-+     * Only BFP bits are implemented (HFP, DFP, PFPO and DIVIDE TO INTEGER not
-+     * implemented yet).
-+     */
-+    S390_FEAT_FLOATING_POINT_EXT,
-     S390_FEAT_ZPCI,
- };
- 
--- 
-2.17.2
+I don't think that this can make a noticeable slowdown, but we can run
+the tests if you want.
+We have the test suite which performs disk-intensive computation.
+It was created to measure the effect of running BH callbacks through
+the virtual timer infrastructure.
+
+> I wonder if we could make replay optional in ./configure and then make
+> replay_bh_schedule_oneshot_event() a static inline function that can get
+> optimised away at compile time if the feature is disabled.
+
+It is coupled with icount. However, some icount calls are also lie on
+the fast paths and are completely useless when icount is not enabled.
+
+Pavel Dovgalyuk
