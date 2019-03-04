@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57217)
+Received: from eggs.gnu.org ([209.51.188.92]:57753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h0inQ-0007ZY-0w
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:18:00 -0500
+	(envelope-from <svens@stackframe.org>) id 1h0isJ-0000Jc-Dc
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h0inP-00041q-Ax
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:17:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h0inP-0003z7-4C
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:17:59 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190301154051.23317-1-armbru@redhat.com>
-	<20190301154051.23317-2-armbru@redhat.com>
-	<af1fb55b-cb3d-f3d4-2edc-7ce23c54ed36@redhat.com>
-Date: Mon, 04 Mar 2019 09:17:50 +0100
-In-Reply-To: <af1fb55b-cb3d-f3d4-2edc-7ce23c54ed36@redhat.com> (Eric Blake's
-	message of "Fri, 1 Mar 2019 09:45:18 -0600")
-Message-ID: <87bm2rcatt.fsf@dusky.pond.sub.org>
+	(envelope-from <svens@stackframe.org>) id 1h0isI-0007Tg-G7
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:23:03 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:48645)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <svens@stackframe.org>)
+	id 1h0isI-0007SP-2L
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:23:02 -0500
+Date: Mon, 4 Mar 2019 09:22:58 +0100
+From: Sven Schnelle <svens@stackframe.org>
+Message-ID: <20190304082258.GA4629@t470p.stackframe.org>
+References: <65d59485-9973-4ed1-b08f-084ed4db7ef1@redhat.com>
+	<20190215194021.20543-1-svens@stackframe.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/7] tests/qapi-schema: Make test-qapi.py
- print arrays
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190215194021.20543-1-svens@stackframe.org>
+Subject: Re: [Qemu-devel] [PATCH v2] lsi: implement basic SBCL functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +28,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+Hi All,
 
-> On 3/1/19 9:40 AM, Markus Armbruster wrote:
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
-> Sparse on the why, but I can guess - you intend for the rest of the
-> series to fix the bug where we don't generate arrays in the same module
-> as their underlying type when their only use is in a different module,
-> but to prove that works you need them listed in dump output.
+is this patch going to be accepted?
 
-Could amend like this:
+Thanks
+Sven
 
-    tests/qapi-schema: Make test-qapi.py print arrays
-
-    The next few commits mess with array types, and having the changes
-    exposed in output of test-qapi.py will be useful.
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+On Fri, Feb 15, 2019 at 08:40:21PM +0100, Sven Schnelle wrote:
+> HP-UX checks this register after sending data to the target. If there's no valid
+> information present, it assumes the client disconnected because the kernel sent
+> to much data. Implement at least some of the SBCL functionality that is possible
+> without having a real SCSI bus.
+> 
+> Signed-off-by: Sven Schnelle <svens@stackframe.org>
+> ---
+>  hw/scsi/lsi53c895a.c | 31 +++++++++++++++++++++++++++----
+>  1 file changed, 27 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+> index 89def1421f..8ba07f8756 100644
+> --- a/hw/scsi/lsi53c895a.c
+> +++ b/hw/scsi/lsi53c895a.c
+> @@ -160,6 +160,11 @@ static const char *names[] = {
+>  #define LSI_CCNTL1_DDAC      0x08
+>  #define LSI_CCNTL1_ZMOD      0x80
+>  
+> +#define LSI_SBCL_ATN         0x08
+> +#define LSI_SBCL_BSY         0x20
+> +#define LSI_SBCL_ACK         0x40
+> +#define LSI_SBCL_REQ         0x80
+> +
+>  /* Enable Response to Reselection */
+>  #define LSI_SCID_RRE      0x60
+>  
+> @@ -258,6 +263,7 @@ typedef struct {
+>      uint8_t sdid;
+>      uint8_t ssid;
+>      uint8_t sfbr;
+> +    uint8_t sbcl;
+>      uint8_t stest1;
+>      uint8_t stest2;
+>      uint8_t stest3;
+> @@ -356,6 +362,7 @@ static void lsi_soft_reset(LSIState *s)
+>      s->socl = 0;
+>      s->sdid = 0;
+>      s->ssid = 0;
+> +    s->sbcl = 0;
+>      s->stest1 = 0;
+>      s->stest2 = 0;
+>      s->stest3 = 0;
+> @@ -530,6 +537,8 @@ static void lsi_script_dma_interrupt(LSIState *s, int stat)
+>  
+>  static inline void lsi_set_phase(LSIState *s, int phase)
+>  {
+> +    s->sbcl &= ~PHASE_MASK;
+> +    s->sbcl |= phase | LSI_SBCL_REQ;
+>      s->sstat1 = (s->sstat1 & ~PHASE_MASK) | phase;
+>  }
+>  
+> @@ -567,6 +576,7 @@ static void lsi_disconnect(LSIState *s)
+>  {
+>      s->scntl1 &= ~LSI_SCNTL1_CON;
+>      s->sstat1 &= ~PHASE_MASK;
+> +    s->sbcl = 0;
+>  }
+>  
+>  static void lsi_bad_selection(LSIState *s, uint32_t id)
+> @@ -1265,7 +1275,9 @@ again:
+>                  s->scntl1 |= LSI_SCNTL1_CON;
+>                  if (insn & (1 << 3)) {
+>                      s->socl |= LSI_SOCL_ATN;
+> +                    s->sbcl |= LSI_SBCL_ATN;
+>                  }
+> +                s->sbcl |= LSI_SBCL_BSY;
+>                  lsi_set_phase(s, PHASE_MO);
+>                  break;
+>              case 1: /* Disconnect */
+> @@ -1297,8 +1309,14 @@ again:
+>                          insn & (1 << 10) ? " CC" : "");
+>                  if (insn & (1 << 3)) {
+>                      s->socl |= LSI_SOCL_ATN;
+> +                    s->sbcl |= LSI_SBCL_ATN;
+>                      lsi_set_phase(s, PHASE_MO);
+>                  }
+> +
+> +                if (insn & (1 << 6)) {
+> +                    s->sbcl |= LSI_SBCL_ACK;
+> +                }
+> +
+>                  if (insn & (1 << 9)) {
+>                      qemu_log_mask(LOG_UNIMP,
+>                          "lsi_scsi: Target mode not implemented\n");
+> @@ -1314,7 +1332,13 @@ again:
+>                          insn & (1 << 10) ? " CC" : "");
+>                  if (insn & (1 << 3)) {
+>                      s->socl &= ~LSI_SOCL_ATN;
+> +                    s->sbcl &= ~LSI_SBCL_ATN;
+>                  }
+> +
+> +                if (insn & (1 << 6)) {
+> +                    s->sbcl &= ~LSI_SBCL_ACK;
+> +                }
+> +
+>                  if (insn & (1 << 10))
+>                      s->carry = 0;
+>                  break;
+> @@ -1591,9 +1615,7 @@ static uint8_t lsi_reg_readb(LSIState *s, int offset)
+>          ret = s->ssid;
+>          break;
+>      case 0xb: /* SBCL */
+> -        /* ??? This is not correct. However it's (hopefully) only
+> -           used for diagnostics, so should be ok.  */
+> -        ret = 0;
+> +        ret = s->sbcl;
+>          break;
+>      case 0xc: /* DSTAT */
+>          ret = s->dstat | LSI_DSTAT_DFE;
+> @@ -2143,7 +2165,7 @@ static int lsi_post_load(void *opaque, int version_id)
+>  
+>  static const VMStateDescription vmstate_lsi_scsi = {
+>      .name = "lsiscsi",
+> -    .version_id = 0,
+> +    .version_id = 1,
+>      .minimum_version_id = 0,
+>      .pre_save = lsi_pre_save,
+>      .post_load = lsi_post_load,
+> @@ -2202,6 +2224,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
+>          VMSTATE_UINT8(stime0, LSIState),
+>          VMSTATE_UINT8(respid0, LSIState),
+>          VMSTATE_UINT8(respid1, LSIState),
+> +        VMSTATE_UINT8_V(sbcl, LSIState, 1),
+>          VMSTATE_UINT32(mmrs, LSIState),
+>          VMSTATE_UINT32(mmws, LSIState),
+>          VMSTATE_UINT32(sfs, LSIState),
+> -- 
+> 2.20.1
+> 
+> 
