@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58374)
+Received: from eggs.gnu.org ([209.51.188.92]:59706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h0dJx-0006dI-4x
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:27:14 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1h0dTM-0008EU-1K
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h0dJw-0006Mf-1m
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:27:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1h0dJv-0006Lw-Om
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:27:11 -0500
-Date: Mon, 4 Mar 2019 10:26:58 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190304022658.GE22229@xz-x1>
-References: <20190222031413.20250-1-peterx@redhat.com>
-	<20190222031413.20250-5-peterx@redhat.com>
-	<CAMxuvax9+NNe6Mh3TnFgt6p+q=kcgR1tEiQNr+be8bJRDUPCJw@mail.gmail.com>
-	<20190222065724.GH8904@xz-x1>
-	<20190227133838.GB22539@stefanha-x1.localdomain>
-	<20190228055856.GV13653@xz-x1>
-	<20190301162517.GC18260@stefanha-x1.localdomain>
+	(envelope-from <jcmvbkbc@gmail.com>) id 1h0dTL-0007Sz-2t
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:36:55 -0500
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:33421)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1h0dTK-0007QO-Ql
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:36:55 -0500
+Received: by mail-yw1-xc42.google.com with SMTP id i204so2978780ywb.0
+	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 18:36:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190301162517.GC18260@stefanha-x1.localdomain>
+References: <20181209193749.12277-1-cota@braap.org>
+	<20181209193749.12277-32-cota@braap.org>
+	<878sy3ncjp.fsf@zen.linaroharston>
+In-Reply-To: <878sy3ncjp.fsf@zen.linaroharston>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Sun, 3 Mar 2019 18:36:42 -0800
+Message-ID: <CAMo8BfKAGOCNqY3tHrF5DhB16n8Goia3LcFrNk1R0=bGH3SoLg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] iothread: push gcontext earlier in the
- thread_fn
+Subject: Re: [Qemu-devel] [RFC v2 31/38] target/xtensa: fetch code with
+ translator_ld
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,115 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-On Fri, Mar 01, 2019 at 04:25:17PM +0000, Stefan Hajnoczi wrote:
-> On Thu, Feb 28, 2019 at 01:58:56PM +0800, Peter Xu wrote:
-> > On Wed, Feb 27, 2019 at 01:38:38PM +0000, Stefan Hajnoczi wrote:
-> > > On Fri, Feb 22, 2019 at 02:57:24PM +0800, Peter Xu wrote:
-> > > > On Fri, Feb 22, 2019 at 07:37:02AM +0100, Marc-Andr=C3=A9 Lureau =
-wrote:
-> > > > > Hi
-> > > > >=20
-> > > > > On Fri, Feb 22, 2019 at 4:14 AM Peter Xu <peterx@redhat.com> wr=
-ote:
-> > > > > >
-> > > > > > We were pushing the context until right before running the gm=
-ainloop.
-> > > > > > Now since we have everything unconditionally, we can move thi=
-s
-> > > > > > earlier.
-> > > > > >
-> > > > > > One benefit is that now it's done even before init_done_sem, =
-so as
-> > > > > > long as the iothread user calls iothread_create() and complet=
-es, we
-> > > > > > know that the thread stack is ready.
-> > > > > >
-> > > > >=20
-> > > > > This will change the default context in the iothread, for code =
-running
-> > > > > there. This may not be a good idea. Until now, only sources dis=
-patched
-> > > > > from iothread_get_g_main_context() would have default context
-> > > > > associated to it.
-> > > > >=20
-> > > > > I don't know if the current behaviour is intentional, but it ha=
-s some
-> > > > > logic. With this change, you may create hidden races, by changi=
-ng the
-> > > > > default context of sources to the iothread.
-> > > >=20
-> > > > Yes I agree that the behavior will be changed in this patch that =
-even
-> > > > if the iothread user does not use the gcontext they'll also have =
-the
-> > > > context set.  I would think it should be ok because IMHO events h=
-ooked
-> > > > onto the aio context should not depend on the gcontext, but indee=
-d I'd
-> > > > like to get some confirmation from others, especially the block l=
-ayer.
-> > >=20
-> > > I don't understand why Patch 4 is desirable.  The comment about
-> > > init_done_sem isn't clear to me but I also wondered the same thing =
-as
-> > > Marc-Andr=C3=A9.
-> > >=20
-> > > Can you explain why we should apply this patch?
-> >=20
-> > Hi, Stefan,
-> >=20
-> > The patch 4 itself does not help much for current QEMU, but it should
-> > be required to replace the patch that Marc-Andre proposed below:
-> >=20
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05460.html [=
-1]
-> >=20
-> > And IMHO patch 4 along with this whole series should be a cleaner
-> > approach comparing to the one proposed in [1].  Here if my
-> > understanding is correct the problem is that
-> > g_main_context_push_thread_default() is really designed to be called
-> > at the very beginning of a thread creation but not dynamically called
-> > during the execution of a thread (prove is that it even does not have
-> > any error to return when failed to acquire the context so the caller
-> > will never know if it failed! see [2] below), in that sense this patc=
-h
-> > 4 can be seen as a tiny cleanup too.
-> >=20
-> > g_main_context_push_thread_default (GMainContext *context)
-> > {
-> >   GQueue *stack;
-> >   gboolean acquired_context;
-> >=20
-> >   acquired_context =3D g_main_context_acquire (context);
-> >   g_return_if_fail (acquired_context);  <------------- [2]
-> >=20
-> >   ...
-> > }
->=20
-> I see.  This explains why you want to call it early.  If you're worried
-> about that then there should also be a comment warning people that this
-> must happen first before anything implicitly uses the thread's
-> GMainContext.
+On Mon, Feb 25, 2019 at 6:55 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+> Emilio G. Cota <cota@braap.org> writes:
+> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> > ---
+> >  target/xtensa/translate.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+> > index 46e1338448..c140742562 100644
+> > --- a/target/xtensa/translate.c
+> > +++ b/target/xtensa/translate.c
+> > @@ -882,7 +882,7 @@ static inline unsigned xtensa_op0_insn_len(DisasCon=
+text *dc, uint8_t op0)
+> >  static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+> >  {
+> >      xtensa_isa isa =3D dc->config->isa;
+> > -    unsigned char b[MAX_INSN_LENGTH] =3D {cpu_ldub_code(env, dc->pc)};
+> > +    unsigned char b[MAX_INSN_LENGTH] =3D {translator_ldub(env, dc->pc)=
+};
+> >      unsigned len =3D xtensa_op0_insn_len(dc, b[0]);
+> >      xtensa_format fmt;
+> >      int slot, slots;
+> > @@ -914,7 +914,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, =
+DisasContext *dc)
+> >                        dc->pc);
+> >      }
+> >      for (i =3D 1; i < len; ++i) {
+> > -        b[i] =3D cpu_ldub_code(env, dc->pc + i);
+> > +        b[i] =3D translator_ldub(env, dc->pc + i);
+> >      }
+> >      xtensa_insnbuf_from_chars(isa, dc->insnbuf, b, len);
+> >      fmt =3D xtensa_format_decode(isa, dc->insnbuf);
+>
+> There is also:
+>
+>   static inline unsigned xtensa_insn_len(CPUXtensaState *env, DisasContex=
+t *dc)
+>   {
+>       uint8_t b0 =3D cpu_ldub_code(env, dc->pc);
+>       return xtensa_op0_insn_len(dc, b0);
+>   }
+>
+> Or is this usage a re-read of something we've already got?
 
-Sure, I can add a comment above g_main_context_push_thread_default()
-to emphasize why it's preferred at the entry.
-
->=20
-> What about Marc-Andr=C3=A9's concern about the change in behavior?  Now=
- this
-> thread is associated with the GMainContext that isn't processed at in
-> aio_poll().  Previously the default main context would be used.
-
-IIUC Paolo has answered this question (Message-ID:
-<0faeceb2-68fa-59b0-48c3-b8e907b2a75f@redhat.com>) - if the block
-layer (or say, the explicit aio_poll in the iothread_run) does not use
-the GMainContext at all then it should affect nothing, and with that
-there should have no real functional change.
-
-Regards,
+FWIW xtensa_insn_len is used to look into the instruction that
+follows the one that has just been translated, but it may only
+touch the same page as the last translated instruction.
 
 --=20
-Peter Xu
+Thanks.
+-- Max
