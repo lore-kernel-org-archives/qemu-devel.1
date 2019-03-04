@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53744)
+Received: from eggs.gnu.org ([209.51.188.92]:55183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h0kjl-00084T-Lp
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:22:24 -0500
+	(envelope-from <edgar@xilinx.com>) id 1h0kqj-000519-Np
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:29:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h0kjk-0006Ca-Rt
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:22:21 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  4 Mar 2019 11:13:30 +0100
-Message-Id: <20190304101339.25970-2-eric.auger@redhat.com>
-In-Reply-To: <20190304101339.25970-1-eric.auger@redhat.com>
-References: <20190304101339.25970-1-eric.auger@redhat.com>
+	(envelope-from <edgar@xilinx.com>) id 1h0kqi-0003ga-VC
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:29:33 -0500
+Received: from mail-eopbgr810053.outbound.protection.outlook.com
+	([40.107.81.53]:45711
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <edgar@xilinx.com>) id 1h0kqi-0003Z0-GB
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:29:32 -0500
+Date: Mon, 4 Mar 2019 11:29:12 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20190304102912.GC6010@toto>
+References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
+	<CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
+	<fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
+	<CAFEAcA_OrJ-1SzE5UpT4eHbzi-KS_GqX13KZdHzEzovXnsnsUg@mail.gmail.com>
+	<63b980a2-6b28-d5e2-891c-6245ddb1e851@redhat.com>
+	<CAFEAcA8L1qKaNwpr8sMZC8jQXbaLtCctaV8ecTFxXTVy0sWjVw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 01/10] hw/arm/boot: introduce
- fdt_add_memory_node helper
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8L1qKaNwpr8sMZC8jQXbaLtCctaV8ecTFxXTVy0sWjVw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC] multi phase reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,125 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
-Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Damien Hedde <damien.hedde@greensocs.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Hi Damien and others,
 
-We introduce an helper to create a memory node.
+A few questions from my side.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+We sometimes see that wires from generic GPIO blocks get connected to reset inputs.
+This happens both to off-chip perihperals but we also see it on-chip.
 
----
-v7 -> v8:
-- Added Igor's R-b
+To avoid having GPIO modules know that some of their outputs are being used as
+reset signals it would be nice to have a reset proxy that allows any qemu_irq to
+drive resets for a given device. Perhaps even with built-in options for both interpreting
+"active-low" and "active-high". I think it would even be useful to have this
+in qdev but that may be pushing it too far. Any thoughts on that?
 
-v6 -> v7:
-- msg error in the caller
-- add comment about NUMA ID
----
- hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 34 insertions(+), 20 deletions(-)
+Have you thought about what happens if someone does an MMIO access to a device while
+its reset is active? Were you planning to have some "default" SysBus level handling to
+block MMIO while in reset or anything like that? Or would that be handled individually
+by each device model?
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index d90af2f17d..a830655e1a 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -423,6 +423,32 @@ static void set_kernel_args_old(const struct arm_boo=
-t_info *info,
-     }
- }
-=20
-+static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_ba=
-se,
-+                               uint32_t scells, hwaddr mem_len,
-+                               int numa_node_id)
-+{
-+    char *nodename;
-+    int ret;
-+
-+    nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
-+    ret =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, m=
-em_base,
-+                                       scells, mem_len);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-+    /* only set the NUMA ID if it is specified */
-+    if (numa_node_id >=3D 0) {
-+        ret =3D qemu_fdt_setprop_cell(fdt, nodename,
-+                                    "numa-node-id", numa_node_id);
-+    }
-+out:
-+    g_free(nodename);
-+    return ret;
-+}
-+
- static void fdt_add_psci_node(void *fdt)
- {
-     uint32_t cpu_suspend_fn;
-@@ -502,7 +528,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_i=
-nfo *binfo,
-     void *fdt =3D NULL;
-     int size, rc, n =3D 0;
-     uint32_t acells, scells;
--    char *nodename;
-     unsigned int i;
-     hwaddr mem_base, mem_len;
-     char **node_path;
-@@ -576,35 +601,24 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot=
-_info *binfo,
-         mem_base =3D binfo->loader_start;
-         for (i =3D 0; i < nb_numa_nodes; i++) {
-             mem_len =3D numa_info[i].node_mem;
--            nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
--            qemu_fdt_add_subnode(fdt, nodename);
--            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memor=
-y");
--            rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
--                                              acells, mem_base,
--                                              scells, mem_len);
-+            rc =3D fdt_add_memory_node(fdt, acells, mem_base,
-+                                     scells, mem_len, i);
-             if (rc < 0) {
--                fprintf(stderr, "couldn't set %s/reg for node %d\n", nod=
-ename,
--                        i);
-+                fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
-+                        mem_base);
-                 goto fail;
-             }
-=20
--            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
-             mem_base +=3D mem_len;
--            g_free(nodename);
-         }
-     } else {
--        nodename =3D g_strdup_printf("/memory@%" PRIx64, binfo->loader_s=
-tart);
--        qemu_fdt_add_subnode(fdt, nodename);
--        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
--
--        rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
--                                          acells, binfo->loader_start,
--                                          scells, binfo->ram_size);
-+        rc =3D fdt_add_memory_node(fdt, acells, binfo->loader_start,
-+                                 scells, binfo->ram_size, -1);
-         if (rc < 0) {
--            fprintf(stderr, "couldn't set %s reg\n", nodename);
-+            fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
-+                    binfo->loader_start);
-             goto fail;
-         }
--        g_free(nodename);
-     }
-=20
-     rc =3D fdt_path_offset(fdt, "/chosen");
---=20
-2.20.1
+Another question is regarding reset of CPUs. It would be nice to be able to expose
+similar interfaces and have some defined behaviour for CPUs that are in reset. E.g,
+if reset is active the CPU does not execute etc.
+
+Cheers,
+Edgar
