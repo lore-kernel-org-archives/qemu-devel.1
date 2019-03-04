@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47113)
+Received: from eggs.gnu.org ([209.51.188.92]:47157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1h0oWH-0002NZ-V6
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:24:42 -0500
+	(envelope-from <berrange@redhat.com>) id 1h0oWP-0002Rd-PB
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:24:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1h0oWG-0006CA-00
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:24:41 -0500
+	(envelope-from <berrange@redhat.com>) id 1h0oWN-0006Lm-TW
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:24:49 -0500
+Date: Mon, 4 Mar 2019 14:24:32 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190304142432.GM4239@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
 	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
 	<20190301154947.GJ21251@redhat.com>
 	<20190301183328.20b63e23@redhat.com>
-	<20190301174806.GN21251@redhat.com> <87va0zcdse.fsf@dusky.pond.sub.org>
-	<20190304101911.GE4239@redhat.com>
-From: Michal Privoznik <mprivozn@redhat.com>
-Message-ID: <96d58188-65f8-6a39-4ce2-9fe88b89f228@redhat.com>
-Date: Mon, 4 Mar 2019 15:24:28 +0100
+	<20190301174806.GN21251@redhat.com>
+	<87va0zcdse.fsf@dusky.pond.sub.org>
+	<20190304132507.39273826@redhat.com>
+	<20190304123908.GK4239@redhat.com>
+	<20190304151641.3deefc3b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190304101911.GE4239@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190304151641.3deefc3b@redhat.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
  parameter of '-numa node' option
@@ -29,72 +33,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, david@gibson.dropbear.id.au
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au, mprivozn@redhat.com
 
-[Thanks Igor for bringing this onto my radar. I don't follow qemu-devel=20
-that close]
-
-On 3/4/19 11:19 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Mon, Mar 04, 2019 at 08:13:53AM +0100, Markus Armbruster wrote:
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->>
->>> On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wrote:
->>>> On Fri, 1 Mar 2019 15:49:47 +0000
->>>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->>>>
->>>>> On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote:
->>>>>> The parameter allows to configure fake NUMA topology where guest
->>>>>> VM simulates NUMA topology but not actually getting a performance
->>>>>> benefits from it. The same or better results could be achieved
->>>>>> using 'memdev' parameter. In light of that any VM that uses NUMA
->>>>>> to get its benefits should use 'memdev' and to allow transition
->>>>>> initial RAM to device based model, deprecate 'mem' parameter as
->>>>>> its ad-hoc partitioning of initial RAM MemoryRegion can't be
->>>>>> translated to memdev based backend transparently to users and in
->>>>>> compatible manner (migration wise).
->>>>>>
->>>>>> That will also allow to clean up a bit our numa code, leaving only
->>>>>> 'memdev' impl. in place and several boards that use node_mem
->>>>>> to generate FDT/ACPI description from it.
->>>>>
->>>>> Can you confirm that the  'mem' and 'memdev' parameters to -numa
->>>>> are 100% live migration compatible in both directions ?  Libvirt
->>>>> would need this to be the case in order to use the 'memdev' syntax
->>>>> instead.
->>>> Unfortunately they are not migration compatible in any direction,
->>>> if it where possible to translate them to each other I'd alias 'mem'
->>>> to 'memdev' without deprecation. The former sends over only one
->>>> MemoryRegion to target, while the later sends over several (one per
->>>> memdev).
->>>
->>> If we can't migration from one to the other, then we can not deprecat=
+On Mon, Mar 04, 2019 at 03:16:41PM +0100, Igor Mammedov wrote:
+> On Mon, 4 Mar 2019 12:39:08 +0000
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+>=20
+> > On Mon, Mar 04, 2019 at 01:25:07PM +0100, Igor Mammedov wrote:
+> > > On Mon, 04 Mar 2019 08:13:53 +0100
+> > > Markus Armbruster <armbru@redhat.com> wrote:
+> > >  =20
+> > > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+> > > >  =20
+> > > > > On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wrote: =
+  =20
+> > > > >> On Fri, 1 Mar 2019 15:49:47 +0000
+> > > > >> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> > > > >>    =20
+> > > > >> > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrot=
+e:   =20
+> > > > >> > > The parameter allows to configure fake NUMA topology where=
+ guest
+> > > > >> > > VM simulates NUMA topology but not actually getting a perf=
+ormance
+> > > > >> > > benefits from it. The same or better results could be achi=
+eved
+> > > > >> > > using 'memdev' parameter. In light of that any VM that use=
+s NUMA
+> > > > >> > > to get its benefits should use 'memdev' and to allow trans=
+ition
+> > > > >> > > initial RAM to device based model, deprecate 'mem' paramet=
+er as
+> > > > >> > > its ad-hoc partitioning of initial RAM MemoryRegion can't =
+be
+> > > > >> > > translated to memdev based backend transparently to users =
+and in
+> > > > >> > > compatible manner (migration wise).
+> > > > >> > >=20
+> > > > >> > > That will also allow to clean up a bit our numa code, leav=
+ing only
+> > > > >> > > 'memdev' impl. in place and several boards that use node_m=
+em
+> > > > >> > > to generate FDT/ACPI description from it.     =20
+> > > > >> >=20
+> > > > >> > Can you confirm that the  'mem' and 'memdev' parameters to -=
+numa
+> > > > >> > are 100% live migration compatible in both directions ?  Lib=
+virt
+> > > > >> > would need this to be the case in order to use the 'memdev' =
+syntax
+> > > > >> > instead.   =20
+> > > > >> Unfortunately they are not migration compatible in any directi=
+on,
+> > > > >> if it where possible to translate them to each other I'd alias=
+ 'mem'
+> > > > >> to 'memdev' without deprecation. The former sends over only on=
 e
->>> the existing 'mem' syntax. Even if libvirt were to provide a config
->>> option to let apps opt-in to the new syntax, we need to be able to
->>> support live migration of existing running VMs indefinitely. Effectiv=
-ely
->>> this means we need the to keep 'mem' support forever, or at least suc=
-h
->>> a long time that it effectively means forever.
+> > > > >> MemoryRegion to target, while the later sends over several (on=
+e per
+> > > > >> memdev).   =20
+> > > > >
+> > > > > If we can't migration from one to the other, then we can not de=
+precate
+> > > > > the existing 'mem' syntax. Even if libvirt were to provide a co=
+nfig
+> > > > > option to let apps opt-in to the new syntax, we need to be able=
+ to
+> > > > > support live migration of existing running VMs indefinitely. Ef=
+fectively
+> > > > > this means we need the to keep 'mem' support forever, or at lea=
+st such
+> > > > > a long time that it effectively means forever.
+> > > > >
+> > > > > So I think this patch has to be dropped & replaced with one tha=
+t
+> > > > > simply documents that memdev syntax is preferred.   =20
+> > > >=20
+> > > > We have this habit of postulating absolutes like "can not depreca=
+te"
+> > > > instead of engaging with the tradeoffs.  We need to kick it.
+> > > >=20
+> > > > So let's have an actual look at the tradeoffs.
+> > > >=20
+> > > > We don't actually "support live migration of existing running VMs
+> > > > indefinitely".
+> > > >=20
+> > > > We support live migration to any newer version of QEMU that still
+> > > > supports the machine type.
+> > > >=20
+> > > > We support live migration to any older version of QEMU that alrea=
+dy
+> > > > supports the machine type and all the devices the machine uses.
+> > > >=20
+> > > > Aside: "support" is really an honest best effort here.  If you re=
+ly on
+> > > > it, use a downstream that puts in the (substantial!) QA work real
+> > > > support takes.
+> > > >=20
+> > > > Feature deprecation is not a contract to drop the feature after t=
+wo
+> > > > releases, or even five.  It's a formal notice that users of the f=
+eature
+> > > > should transition to its replacement in an orderly manner.
+> > > >=20
+> > > > If I understand Igor correctly, all users should transition away =
+from
+> > > > outdated NUMA configurations at least for new VMs in an orderly m=
+anner. =20
+> > > Yes, we can postpone removing options until there are machines type
+> > > versions that were capable to use it (unfortunate but probably=20
+> > > unavoidable unless there is a migration trick to make transition
+> > > transparent) but that should not stop us from disabling broken
+> > > options on new machine types at least.
+> > >=20
+> > > This series can serve as formal notice with follow up disabling of
+> > > deprecated options for new machine types. (As Thomas noted, just wa=
+rnings
+> > > do not work and users continue to use broken features regardless wh=
+ether
+> > > they are don't know about issues or aware of it [*])
+> > >=20
+> > > Hence suggested deprecation approach and enforced rejection of lega=
+cy
+> > > numa options for new machine types in 2 releases so users would sto=
+p
+> > > using them eventually. =20
+> >=20
+> > When we deprecate something, we need to have a way for apps to use th=
+e
+> > new alternative approach *at the same time*.  So even if we only want=
+ to
+> > deprecate for new machine types, we still have to first solve the pro=
+blem
+> > of how mgmt apps will introspect QEMU to learn which machine types ex=
+pect
+> > the new options.
+> I'm not aware any mechanism to introspect machine type options (existin=
+g
+> or something being developed). Are/were there any ideas about it that w=
+ere
+> discussed in the past?
+>=20
+> Aside from developing a new mechanism what are alternative approaches?
+> I mean when we delete deprecated CLI option, how it's solved on libvirt
+> side currently?
+>=20
+> For example I don't see anything introspection related when we have bee=
+n
+> removing deprecated options recently.
 
-I'm with Daniel on this. The reason why libvirt still defaults to '-numa=20
-node,mem=3D' is exactly because of backward compatibility. Since a machin=
-e=20
-can't be migrated from '-numa node,mem=3D' to '-numa node,memdev=3D +=20
--object memory-backend-*' libvirt hast to play it safe and chose a=20
-combination that is acessible the widest.
+Right, with other stuff we deprecate we've had a simpler time, as it
+either didn't affect migration at all, or the new replacement stuff
+was fully compatible with the migration data stream. IOW, libvirt
+could unconditionally use the new feature as soon as it saw that it
+exists in QEMU. We didn't have any machine type dependancy to deal
+with before now.
 
-If you remove this, how would you expect older machines to migrate to=20
-newer cmd line?
+> More exact question specific to this series usecase,
+> how libvirt decides when to use -numa node,memdev or not currently?
 
-I'm all for deprecating old stuff. In fact, I've suggested that in=20
-libvirt(!) here and there, but I'm afraid we can't just remove=20
-functionatlity unless we give users a way to migrate to the one we=20
-prefer now.
+It is pretty hard to follow the code, but IIUC we only use memdev when
+stting up NVDIMMs, or for guests configured to have the "shared" flag
+on the memory region.
 
-And if libvirt doesn't follow qemu's warnings then it definitely should.=20
-It's a libvirt bug if it doesn't follow the best practicies (well, if can=
-).
-
-Michal
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
