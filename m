@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39394)
+Received: from eggs.gnu.org ([209.51.188.92]:39734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h0rpb-0007Hl-T9
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:56:53 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1h0rrN-00084S-T6
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:58:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h0rpa-0000CZ-Le
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:56:51 -0500
-Received: from mail-eopbgr810118.outbound.protection.outlook.com
-	([40.107.81.118]:58881
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1h0rpa-0000BR-8e
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:56:50 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 4 Mar 2019 17:56:47 +0000
-Message-ID: <BN6PR2201MB125160A7F940511C9376D487C6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>,
-	<1551712405-2530-6-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1551712405-2530-6-git-send-email-mateja.marjanovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <balaton@eik.bme.hu>) id 1h0rrN-0001P7-4l
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:58:41 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:45758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h0rrM-0001N0-U5
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:58:41 -0500
+Date: Mon, 4 Mar 2019 18:58:36 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <e72fd744-3440-a684-38c4-75d6d604cddb@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1903041858020.32794@zero.eik.bme.hu>
+References: <alpine.BSF.2.21.9999.1811292101280.5887@zero.eik.bme.hu>
+	<alpine.BSF.2.21.9999.1901151926320.72972@zero.eik.bme.hu>
+	<e72fd744-3440-a684-38c4-75d6d604cddb@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 05/13] target/mips: Add emulation of MMI
- instruction PEXCW
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,256 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> Subject: [PATCH v3 05/13] target/mips: Add emulation of MMI instruction P=
-EXCW
+Hello,
+
+On Tue, 15 Jan 2019, Philippe Mathieu-Daud=E9 wrote:
+> On 1/15/19 7:29 PM, BALATON Zoltan wrote:
+>> On Thu, 29 Nov 2018, BALATON Zoltan wrote:
+>>> Then I've tried the same with the pll patches posted by Philippe
+>>> Mathieu-Daud=E9 here:
+>>>
+>>> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg00191.html
+>>>
+>>> on top of v3.1.0-rc3 which helped to get rid of the cprman warnings
+>>
+>> Will these patches be merged eventually? These seem to at least get ri=
+d
+>> of some annoying warnings in Linux boot dmesg.
 >
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+> I'll respin this series addressing Peter's comments.
 >
-> Add emulation of MMI instruction PEXCW. The emulation is implemented
-> using TCG front end operations directly to achieve better performance.
->
-> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> ---
->  target/mips/translate.c | 73 +++++++++++++++++++++++++++++++++++++++++++=
-+++++-
->  1 file changed, 72 insertions(+), 1 deletion(-)
->
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 9472477..64eb10c 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -24581,6 +24581,75 @@ static void gen_mmi_pexch(DisasContext *ctx)
->      }
->  }
->
-> +/*
-> + *  PEXCW rd, rt
-> + *
-> + *  Parallel Exchange Center Word
-> + *
-> + *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-> + *  +-----------+---------+---------+---------+---------+-----------+
-> + *  |    MMI    |0 0 0 0 0|   rt    |   rd    |  PEXCW  |    MMI3   |
-> + *  +-----------+---------+---------+---------+---------+-----------+
-> + */
-> +
-> +static void gen_mmi_pexcw(DisasContext *ctx)
-> +{
-> +    uint32_t pd, rt, rd;
-> +    uint32_t opcode;
-> +
-> +    opcode =3D ctx->opcode;
-> +
-> +    pd =3D extract32(opcode, 21, 5);
-> +    rt =3D extract32(opcode, 16, 5);
-> +    rd =3D extract32(opcode, 11, 5);
-> +
-> +    if (unlikely(pd !=3D 0)) {
-> +        generate_exception_end(ctx, EXCP_RI);
-> +    } else if (rd =3D=3D 0) {
-> +        /* nop */
-> +    } else if (rt =3D=3D 0) {
-> +        tcg_gen_movi_i64(cpu_gpr[rd], 0);
-> +        tcg_gen_movi_i64(cpu_mmr[rd], 0);
-> +    } else if (rt =3D=3D rd) {
-> +        TCGv_i64 t0 =3D tcg_temp_new();
-> +        TCGv_i64 t1 =3D tcg_temp_new();
-> +        uint64_t mask0 =3D (1ULL << 32) - 1;
-> +        uint64_t mask1 =3D mask0 << 32;
-> +
-> +        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask1);
-> +        tcg_gen_shri_i64(t0, t0, 32);
-> +        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask0);
-> +        tcg_gen_shli_i64(t1, t1, 32);
-> +
-> +        tcg_gen_andi_i64(cpu_mmr[rd], cpu_mmr[rd], mask1);
-> +        tcg_gen_or_i64(cpu_mmr[rd], cpu_mmr[rd], t0);
-> +
-> +        tcg_gen_andi_i64(cpu_gpr[rd], cpu_gpr[rd], mask0);
-> +        tcg_gen_or_i64(cpu_gpr[rd], cpu_gpr[rd], t1);
-> +
-> +        tcg_temp_free(t0);
-> +        tcg_temp_free(t1);
-> +    } else {
+> Thanks for reminding me ;)
 
-Yes, this block works only for the case rt =3D=3D rd...
+What happened to these? Will they make it in master before the freeze?
 
-> +        TCGv_i64 t0 =3D tcg_temp_new();
-> +        TCGv_i64 t1 =3D tcg_temp_new();
-> +        uint64_t mask0 =3D (1ULL << 32) - 1;
-> +        uint64_t mask1 =3D mask0 << 32;
-> +
-> +        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask1);
-> +        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask1);
-> +        tcg_gen_shri_i64(t1, t1, 32);
-> +        tcg_gen_or_i64(cpu_mmr[rd], t0, t1);
-> +
-> +        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask0);
-> +        tcg_gen_shli_i64(t0, t0, 32);
-> +        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask0);
-> +        tcg_gen_or_i64(cpu_gpr[rd], t0, t1);
-> +
-> +        tcg_temp_free(t0);
-> +        tcg_temp_free(t1);
-> +    }
-
-... while this block works only for the case rt !=3D rd.
-
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-> +}
-> +
->  #endif
->
->
-> @@ -27633,7 +27702,6 @@ static void decode_mmi3(CPUMIPSState *env, DisasC=
-ontext *ctx)
->      case MMI_OPC_3_PDIVUW:     /* TODO: MMI_OPC_3_PDIVUW */
->      case MMI_OPC_3_POR:        /* TODO: MMI_OPC_3_POR */
->      case MMI_OPC_3_PNOR:       /* TODO: MMI_OPC_3_PNOR */
-> -    case MMI_OPC_3_PEXCW:      /* TODO: MMI_OPC_3_PEXCW */
->          generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-3 */
->          break;
->      case MMI_OPC_3_PCPYH:
-> @@ -27645,6 +27713,9 @@ static void decode_mmi3(CPUMIPSState *env, DisasC=
-ontext *ctx)
->      case MMI_OPC_3_PEXCH:
->          gen_mmi_pexch(ctx);
->          break;
-> +    case MMI_OPC_3_PEXCW:
-> +        gen_mmi_pexcw(ctx);
-> +        break;
->      default:
->          MIPS_INVAL("TX79 MMI class MMI3");
->          generate_exception_end(ctx, EXCP_RI);
-> --
-> 2.7.4
-
-
-________________________________________
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Sent: Monday, March 4, 2019 4:13:17 PM
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo
-Subject: [PATCH v3 05/13] target/mips: Add emulation of MMI instruction PEX=
-CW
-
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-
-Add emulation of MMI instruction PEXCW. The emulation is implemented
-using TCG front end operations directly to achieve better performance.
-
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/translate.c | 73 +++++++++++++++++++++++++++++++++++++++++++++=
-+++-
- 1 file changed, 72 insertions(+), 1 deletion(-)
-
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 9472477..64eb10c 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -24581,6 +24581,75 @@ static void gen_mmi_pexch(DisasContext *ctx)
-     }
- }
-
-+/*
-+ *  PEXCW rd, rt
-+ *
-+ *  Parallel Exchange Center Word
-+ *
-+ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *  +-----------+---------+---------+---------+---------+-----------+
-+ *  |    MMI    |0 0 0 0 0|   rt    |   rd    |  PEXCW  |    MMI3   |
-+ *  +-----------+---------+---------+---------+---------+-----------+
-+ */
-+
-+static void gen_mmi_pexcw(DisasContext *ctx)
-+{
-+    uint32_t pd, rt, rd;
-+    uint32_t opcode;
-+
-+    opcode =3D ctx->opcode;
-+
-+    pd =3D extract32(opcode, 21, 5);
-+    rt =3D extract32(opcode, 16, 5);
-+    rd =3D extract32(opcode, 11, 5);
-+
-+    if (unlikely(pd !=3D 0)) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    } else if (rd =3D=3D 0) {
-+        /* nop */
-+    } else if (rt =3D=3D 0) {
-+        tcg_gen_movi_i64(cpu_gpr[rd], 0);
-+        tcg_gen_movi_i64(cpu_mmr[rd], 0);
-+    } else if (rt =3D=3D rd) {
-+        TCGv_i64 t0 =3D tcg_temp_new();
-+        TCGv_i64 t1 =3D tcg_temp_new();
-+        uint64_t mask0 =3D (1ULL << 32) - 1;
-+        uint64_t mask1 =3D mask0 << 32;
-+
-+        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask1);
-+        tcg_gen_shri_i64(t0, t0, 32);
-+        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask0);
-+        tcg_gen_shli_i64(t1, t1, 32);
-+
-+        tcg_gen_andi_i64(cpu_mmr[rd], cpu_mmr[rd], mask1);
-+        tcg_gen_or_i64(cpu_mmr[rd], cpu_mmr[rd], t0);
-+
-+        tcg_gen_andi_i64(cpu_gpr[rd], cpu_gpr[rd], mask0);
-+        tcg_gen_or_i64(cpu_gpr[rd], cpu_gpr[rd], t1);
-+
-+        tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+    } else {
-+        TCGv_i64 t0 =3D tcg_temp_new();
-+        TCGv_i64 t1 =3D tcg_temp_new();
-+        uint64_t mask0 =3D (1ULL << 32) - 1;
-+        uint64_t mask1 =3D mask0 << 32;
-+
-+        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask1);
-+        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask1);
-+        tcg_gen_shri_i64(t1, t1, 32);
-+        tcg_gen_or_i64(cpu_mmr[rd], t0, t1);
-+
-+        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask0);
-+        tcg_gen_shli_i64(t0, t0, 32);
-+        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask0);
-+        tcg_gen_or_i64(cpu_gpr[rd], t0, t1);
-+
-+        tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+    }
-+}
-+
- #endif
-
-
-@@ -27633,7 +27702,6 @@ static void decode_mmi3(CPUMIPSState *env, DisasCon=
-text *ctx)
-     case MMI_OPC_3_PDIVUW:     /* TODO: MMI_OPC_3_PDIVUW */
-     case MMI_OPC_3_POR:        /* TODO: MMI_OPC_3_POR */
-     case MMI_OPC_3_PNOR:       /* TODO: MMI_OPC_3_PNOR */
--    case MMI_OPC_3_PEXCW:      /* TODO: MMI_OPC_3_PEXCW */
-         generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI3 =
-*/
-         break;
-     case MMI_OPC_3_PCPYH:
-@@ -27645,6 +27713,9 @@ static void decode_mmi3(CPUMIPSState *env, DisasCon=
-text *ctx)
-     case MMI_OPC_3_PEXCH:
-         gen_mmi_pexch(ctx);
-         break;
-+    case MMI_OPC_3_PEXCW:
-+        gen_mmi_pexcw(ctx);
-+        break;
-     default:
-         MIPS_INVAL("TX79 MMI class MMI3");
-         generate_exception_end(ctx, EXCP_RI);
---
-2.7.4
+Regards,
+BALATON Zoltan
