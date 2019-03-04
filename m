@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44476)
+Received: from eggs.gnu.org ([209.51.188.92]:44393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAb-0008Mo-P2
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:38 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAa-00012U-3z
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:33 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:36553)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAZ-0000iZ-Nb
+	(envelope-from <cota@braap.org>) id 1h0sAY-0008Jb-Vm
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:31 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <cota@braap.org>) id 1h0sAY-0000xH-4V
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:30 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:55543)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAX-0000wL-VM
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:30 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:20 -0500
-Message-Id: <20190304181813.8075-21-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:18:04 -0500
+Message-Id: <20190304181813.8075-65-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 20/73] i386: convert to cpu_halted
+Subject: [Qemu-devel] [PATCH v7 64/73] mips: convert to
+ cpu_has_work_with_iothread_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,228 +25,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Soon we will call cpu_has_work without the BQL.
+
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/cpu.h         |  2 +-
- target/i386/cpu.c         |  2 +-
- target/i386/hax-all.c     |  4 ++--
- target/i386/helper.c      |  4 ++--
- target/i386/hvf/hvf.c     |  4 ++--
- target/i386/hvf/x86hvf.c  |  4 ++--
- target/i386/kvm.c         | 10 +++++-----
- target/i386/misc_helper.c |  2 +-
- target/i386/whpx-all.c    |  6 +++---
- 9 files changed, 19 insertions(+), 19 deletions(-)
+ target/mips/cpu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 95112b9118..65b4e5341b 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1617,7 +1617,7 @@ static inline void cpu_x86_load_seg_cache_sipi(X86CPU *cpu,
-                            sipi_vector << 12,
-                            env->segs[R_CS].limit,
-                            env->segs[R_CS].flags);
--    cs->halted = 0;
-+    cpu_halted_set(cs, 0);
- }
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index fdae8cf440..de1eb771fa 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -58,6 +58,8 @@ static bool mips_cpu_has_work(CPUState *cs)
+     bool has_work = false;
+     uint32_t interrupt_request = cpu_interrupt_request(cs);
  
- int cpu_x86_get_descr_debug(CPUX86State *env, unsigned int selector,
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d3aa6a815b..fe23d684db 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4731,7 +4731,7 @@ static void x86_cpu_reset(CPUState *s)
-     /* We hard-wire the BSP to the first CPU. */
-     apic_designate_bsp(cpu->apic_state, s->cpu_index == 0);
++    g_assert(qemu_mutex_iothread_locked());
++
+     /* Prior to MIPS Release 6 it is implementation dependent if non-enabled
+        interrupts wake-up the CPU, however most of the implementations only
+        check for interrupts that can be taken. */
+@@ -190,7 +192,7 @@ static void mips_cpu_class_init(ObjectClass *c, void *data)
+     cc->reset = mips_cpu_reset;
  
--    s->halted = !cpu_is_bsp(cpu);
-+    cpu_halted_set(s, !cpu_is_bsp(cpu));
- 
-     if (kvm_enabled()) {
-         kvm_arch_reset_vcpu(cpu);
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index b978a9b821..22951017cf 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -471,7 +471,7 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-         return 0;
-     }
- 
--    cpu->halted = 0;
-+    cpu_halted_set(cpu, 0);
- 
-     if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
-         cpu->interrupt_request &= ~CPU_INTERRUPT_POLL;
-@@ -548,7 +548,7 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-                 !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-                 /* hlt instruction with interrupt disabled is shutdown */
-                 env->eflags |= IF_MASK;
--                cpu->halted = 1;
-+                cpu_halted_set(cpu, 1);
-                 cpu->exception_index = EXCP_HLT;
-                 ret = 1;
-             }
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index e695f8ba7a..a75278f954 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -454,7 +454,7 @@ void x86_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-                     (env->hflags >> HF_INHIBIT_IRQ_SHIFT) & 1,
-                     (env->a20_mask >> 20) & 1,
-                     (env->hflags >> HF_SMM_SHIFT) & 1,
--                    cs->halted);
-+                    cpu_halted(cs));
-     } else
- #endif
-     {
-@@ -481,7 +481,7 @@ void x86_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-                     (env->hflags >> HF_INHIBIT_IRQ_SHIFT) & 1,
-                     (env->a20_mask >> 20) & 1,
-                     (env->hflags >> HF_SMM_SHIFT) & 1,
--                    cs->halted);
-+                    cpu_halted(cs));
-     }
- 
-     for(i = 0; i < 6; i++) {
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index 42f9447303..7dc1d721ff 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -672,7 +672,7 @@ int hvf_vcpu_exec(CPUState *cpu)
-         vmx_update_tpr(cpu);
- 
-         qemu_mutex_unlock_iothread();
--        if (!cpu_is_bsp(X86_CPU(cpu)) && cpu->halted) {
-+        if (!cpu_is_bsp(X86_CPU(cpu)) && cpu_halted(cpu)) {
-             qemu_mutex_lock_iothread();
-             return EXCP_HLT;
-         }
-@@ -706,7 +706,7 @@ int hvf_vcpu_exec(CPUState *cpu)
-                 (EFLAGS(env) & IF_MASK))
-                 && !(cpu->interrupt_request & CPU_INTERRUPT_NMI) &&
-                 !(idtvec_info & VMCS_IDT_VEC_VALID)) {
--                cpu->halted = 1;
-+                cpu_halted_set(cpu, 1);
-                 ret = EXCP_HLT;
-             }
-             ret = EXCP_INTERRUPT;
-diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-index df8e946fbc..163bbed23f 100644
---- a/target/i386/hvf/x86hvf.c
-+++ b/target/i386/hvf/x86hvf.c
-@@ -446,7 +446,7 @@ int hvf_process_events(CPUState *cpu_state)
-     if (((cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
-         (EFLAGS(env) & IF_MASK)) ||
-         (cpu_state->interrupt_request & CPU_INTERRUPT_NMI)) {
--        cpu_state->halted = 0;
-+        cpu_halted_set(cpu_state, 0);
-     }
-     if (cpu_state->interrupt_request & CPU_INTERRUPT_SIPI) {
-         hvf_cpu_synchronize_state(cpu_state);
-@@ -458,5 +458,5 @@ int hvf_process_events(CPUState *cpu_state)
-         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
-                                       env->tpr_access_type);
-     }
--    return cpu_state->halted;
-+    return cpu_halted(cpu);
- }
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index beae1b99da..81e3d65cc9 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2836,7 +2836,7 @@ static int kvm_get_mp_state(X86CPU *cpu)
-     }
-     env->mp_state = mp_state.mp_state;
-     if (kvm_irqchip_in_kernel()) {
--        cs->halted = (mp_state.mp_state == KVM_MP_STATE_HALTED);
-+        cpu_halted_set(cs, mp_state.mp_state == KVM_MP_STATE_HALTED);
-     }
-     return 0;
- }
-@@ -3320,7 +3320,7 @@ int kvm_arch_process_async_events(CPUState *cs)
-         env->exception_injected = EXCP12_MCHK;
-         env->has_error_code = 0;
- 
--        cs->halted = 0;
-+        cpu_halted_set(cs, 0);
-         if (kvm_irqchip_in_kernel() && env->mp_state == KVM_MP_STATE_HALTED) {
-             env->mp_state = KVM_MP_STATE_RUNNABLE;
-         }
-@@ -3343,7 +3343,7 @@ int kvm_arch_process_async_events(CPUState *cs)
-     if (((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-          (env->eflags & IF_MASK)) ||
-         (cs->interrupt_request & CPU_INTERRUPT_NMI)) {
--        cs->halted = 0;
-+        cpu_halted_set(cs, 0);
-     }
-     if (cs->interrupt_request & CPU_INTERRUPT_SIPI) {
-         kvm_cpu_synchronize_state(cs);
-@@ -3356,7 +3356,7 @@ int kvm_arch_process_async_events(CPUState *cs)
-                                       env->tpr_access_type);
-     }
- 
--    return cs->halted;
-+    return cpu_halted(cs);
- }
- 
- static int kvm_handle_halt(X86CPU *cpu)
-@@ -3367,7 +3367,7 @@ static int kvm_handle_halt(X86CPU *cpu)
-     if (!((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-           (env->eflags & IF_MASK)) &&
-         !(cs->interrupt_request & CPU_INTERRUPT_NMI)) {
--        cs->halted = 1;
-+        cpu_halted_set(cs, 1);
-         return EXCP_HLT;
-     }
- 
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index 78f2020ef2..fcd6d833e8 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -554,7 +554,7 @@ static void do_hlt(X86CPU *cpu)
-     CPUX86State *env = &cpu->env;
- 
-     env->hflags &= ~HF_INHIBIT_IRQ_MASK; /* needed if sti is just before */
--    cs->halted = 1;
-+    cpu_halted_set(cs, 1);
-     cs->exception_index = EXCP_HLT;
-     cpu_loop_exit(cs);
- }
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 57e53e1f1f..b9c79ccd99 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -697,7 +697,7 @@ static int whpx_handle_halt(CPUState *cpu)
-           (env->eflags & IF_MASK)) &&
-         !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu->exception_index = EXCP_HLT;
--        cpu->halted = true;
-+        cpu_halted_set(cpu, true);
-         ret = 1;
-     }
-     qemu_mutex_unlock_iothread();
-@@ -857,7 +857,7 @@ static void whpx_vcpu_process_async_events(CPUState *cpu)
-     if (((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-          (env->eflags & IF_MASK)) ||
-         (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
--        cpu->halted = false;
-+        cpu_halted_set(cpu, false);
-     }
- 
-     if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
-@@ -887,7 +887,7 @@ static int whpx_vcpu_run(CPUState *cpu)
-     int ret;
- 
-     whpx_vcpu_process_async_events(cpu);
--    if (cpu->halted) {
-+    if (cpu_halted(cpu)) {
-         cpu->exception_index = EXCP_HLT;
-         atomic_set(&cpu->exit_request, false);
-         return 0;
+     cc->class_by_name = mips_cpu_class_by_name;
+-    cc->has_work = mips_cpu_has_work;
++    cc->has_work_with_iothread_lock = mips_cpu_has_work;
+     cc->do_interrupt = mips_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = mips_cpu_exec_interrupt;
+     cc->dump_state = mips_cpu_dump_state;
 -- 
 2.17.1
