@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44682)
+Received: from eggs.gnu.org ([209.51.188.92]:44740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAt-000098-Ks
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:53 -0500
+	(envelope-from <cota@braap.org>) id 1h0sB6-0000Oe-Gg
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAp-0001SZ-TB
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:51 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:56031)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAm-00012h-34
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:45 -0500
+	(envelope-from <cota@braap.org>) id 1h0sB0-0001qi-Mq
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:03 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:35 -0500
-Message-Id: <20190304181813.8075-36-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:25 -0500
+Message-Id: <20190304181813.8075-26-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 35/73] i386: use cpu_reset_interrupt
+Subject: [Qemu-devel] [PATCH v7 25/73] s390x: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,262 +23,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
-
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/hax-all.c    |  4 ++--
- target/i386/hvf/x86hvf.c |  8 ++++----
- target/i386/kvm.c        | 14 +++++++-------
- target/i386/seg_helper.c | 13 ++++++-------
- target/i386/svm_helper.c |  2 +-
- target/i386/whpx-all.c   | 10 +++++-----
- 6 files changed, 25 insertions(+), 26 deletions(-)
+ hw/intc/s390_flic.c        |  2 +-
+ target/s390x/cpu.c         | 22 +++++++++++++++-------
+ target/s390x/excp_helper.c |  2 +-
+ target/s390x/kvm.c         |  2 +-
+ target/s390x/sigp.c        |  8 ++++----
+ 5 files changed, 22 insertions(+), 14 deletions(-)
 
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 22951017cf..518c6ff103 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -424,7 +424,7 @@ static int hax_vcpu_interrupt(CPUArchState *env)
-         irq = cpu_get_pic_interrupt(env);
-         if (irq >= 0) {
-             hax_inject_interrupt(env, irq);
--            cpu->interrupt_request &= ~CPU_INTERRUPT_HARD;
-+            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HARD);
+diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+index 5f8168f0f0..bfb5cf1d07 100644
+--- a/hw/intc/s390_flic.c
++++ b/hw/intc/s390_flic.c
+@@ -198,7 +198,7 @@ static void qemu_s390_flic_notify(uint32_t type)
          }
-     }
  
-@@ -474,7 +474,7 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-     cpu_halted_set(cpu, 0);
+         /* we always kick running CPUs for now, this is tricky */
+-        if (cs->halted) {
++        if (cpu_halted(cs)) {
+             /* don't check for subclasses, CPUs double check when waking up */
+             if (type & FLIC_PENDING_SERVICE) {
+                 if (!(cpu->env.psw.mask & PSW_MASK_EXT)) {
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 698dd9cb82..4e17df5c39 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -285,7 +285,7 @@ static void s390_cpu_initfn(Object *obj)
+     CPUS390XState *env = &cpu->env;
  
-     if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
--        cpu->interrupt_request &= ~CPU_INTERRUPT_POLL;
-+        cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
-         apic_poll_irq(x86_cpu->apic_state);
-     }
- 
-diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-index 163bbed23f..e8b13ed534 100644
---- a/target/i386/hvf/x86hvf.c
-+++ b/target/i386/hvf/x86hvf.c
-@@ -402,7 +402,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
- 
-     if (cpu_state->interrupt_request & CPU_INTERRUPT_NMI) {
-         if (!(env->hflags2 & HF2_NMI_MASK) && !(info & VMCS_INTR_VALID)) {
--            cpu_state->interrupt_request &= ~CPU_INTERRUPT_NMI;
-+            cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_NMI);
-             info = VMCS_INTR_VALID | VMCS_INTR_T_NMI | NMI_VEC;
-             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
-         } else {
-@@ -414,7 +414,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
-         (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
-         (EFLAGS(env) & IF_MASK) && !(info & VMCS_INTR_VALID)) {
-         int line = cpu_get_pic_interrupt(&x86cpu->env);
--        cpu_state->interrupt_request &= ~CPU_INTERRUPT_HARD;
-+        cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_HARD);
-         if (line >= 0) {
-             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, line |
-                   VMCS_INTR_VALID | VMCS_INTR_T_HWINTR);
-@@ -440,7 +440,7 @@ int hvf_process_events(CPUState *cpu_state)
-     }
- 
-     if (cpu_state->interrupt_request & CPU_INTERRUPT_POLL) {
--        cpu_state->interrupt_request &= ~CPU_INTERRUPT_POLL;
-+        cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_POLL);
-         apic_poll_irq(cpu->apic_state);
-     }
-     if (((cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
-@@ -453,7 +453,7 @@ int hvf_process_events(CPUState *cpu_state)
-         do_cpu_sipi(cpu);
-     }
-     if (cpu_state->interrupt_request & CPU_INTERRUPT_TPR) {
--        cpu_state->interrupt_request &= ~CPU_INTERRUPT_TPR;
-+        cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_TPR);
-         hvf_cpu_synchronize_state(cpu_state);
-         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
-                                       env->tpr_access_type);
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 81e3d65cc9..f2e187e40f 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2893,7 +2893,7 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-              */
-             events.smi.pending = cs->interrupt_request & CPU_INTERRUPT_SMI;
-             events.smi.latched_init = cs->interrupt_request & CPU_INTERRUPT_INIT;
--            cs->interrupt_request &= ~(CPU_INTERRUPT_INIT | CPU_INTERRUPT_SMI);
-+            cpu_reset_interrupt(cs, CPU_INTERRUPT_INIT | CPU_INTERRUPT_SMI);
-         } else {
-             /* Keep these in cs->interrupt_request.  */
-             events.smi.pending = 0;
-@@ -3189,7 +3189,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-     if (cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
-         if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
-             qemu_mutex_lock_iothread();
--            cpu->interrupt_request &= ~CPU_INTERRUPT_NMI;
-+            cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
-             qemu_mutex_unlock_iothread();
-             DPRINTF("injected NMI\n");
-             ret = kvm_vcpu_ioctl(cpu, KVM_NMI);
-@@ -3200,7 +3200,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-         }
-         if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
-             qemu_mutex_lock_iothread();
--            cpu->interrupt_request &= ~CPU_INTERRUPT_SMI;
-+            cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
-             qemu_mutex_unlock_iothread();
-             DPRINTF("injected SMI\n");
-             ret = kvm_vcpu_ioctl(cpu, KVM_SMI);
-@@ -3236,7 +3236,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
-             (env->eflags & IF_MASK)) {
-             int irq;
- 
--            cpu->interrupt_request &= ~CPU_INTERRUPT_HARD;
-+            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HARD);
-             irq = cpu_get_pic_interrupt(env);
-             if (irq >= 0) {
-                 struct kvm_interrupt intr;
-@@ -3307,7 +3307,7 @@ int kvm_arch_process_async_events(CPUState *cs)
-         /* We must not raise CPU_INTERRUPT_MCE if it's not supported. */
-         assert(env->mcg_cap);
- 
--        cs->interrupt_request &= ~CPU_INTERRUPT_MCE;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_MCE);
- 
-         kvm_cpu_synchronize_state(cs);
- 
-@@ -3337,7 +3337,7 @@ int kvm_arch_process_async_events(CPUState *cs)
-     }
- 
-     if (cs->interrupt_request & CPU_INTERRUPT_POLL) {
--        cs->interrupt_request &= ~CPU_INTERRUPT_POLL;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_POLL);
-         apic_poll_irq(cpu->apic_state);
-     }
-     if (((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-@@ -3350,7 +3350,7 @@ int kvm_arch_process_async_events(CPUState *cs)
-         do_cpu_sipi(cpu);
-     }
-     if (cs->interrupt_request & CPU_INTERRUPT_TPR) {
--        cs->interrupt_request &= ~CPU_INTERRUPT_TPR;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_TPR);
-         kvm_cpu_synchronize_state(cs);
-         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
-                                       env->tpr_access_type);
-diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-index 63e265cb38..b580403ef4 100644
---- a/target/i386/seg_helper.c
-+++ b/target/i386/seg_helper.c
-@@ -1332,7 +1332,7 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     switch (interrupt_request) {
+     cs->env_ptr = env;
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
+     cs->exception_index = EXCP_HLT;
+     object_property_add(obj, "crash-information", "GuestPanicInformation",
+                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
+@@ -310,8 +310,8 @@ static void s390_cpu_finalize(Object *obj)
  #if !defined(CONFIG_USER_ONLY)
-     case CPU_INTERRUPT_POLL:
--        cs->interrupt_request &= ~CPU_INTERRUPT_POLL;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_POLL);
-         apic_poll_irq(cpu->apic_state);
-         break;
- #endif
-@@ -1341,23 +1341,22 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-         break;
-     case CPU_INTERRUPT_SMI:
-         cpu_svm_check_intercept_param(env, SVM_EXIT_SMI, 0, 0);
--        cs->interrupt_request &= ~CPU_INTERRUPT_SMI;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_SMI);
-         do_smm_enter(cpu);
-         break;
-     case CPU_INTERRUPT_NMI:
-         cpu_svm_check_intercept_param(env, SVM_EXIT_NMI, 0, 0);
--        cs->interrupt_request &= ~CPU_INTERRUPT_NMI;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_NMI);
-         env->hflags2 |= HF2_NMI_MASK;
-         do_interrupt_x86_hardirq(env, EXCP02_NMI, 1);
-         break;
-     case CPU_INTERRUPT_MCE:
--        cs->interrupt_request &= ~CPU_INTERRUPT_MCE;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_MCE);
-         do_interrupt_x86_hardirq(env, EXCP12_MCHK, 0);
-         break;
-     case CPU_INTERRUPT_HARD:
-         cpu_svm_check_intercept_param(env, SVM_EXIT_INTR, 0, 0);
--        cs->interrupt_request &= ~(CPU_INTERRUPT_HARD |
--                                   CPU_INTERRUPT_VIRQ);
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD | CPU_INTERRUPT_VIRQ);
-         intno = cpu_get_pic_interrupt(env);
-         qemu_log_mask(CPU_LOG_TB_IN_ASM,
-                       "Servicing hardware INT=0x%02x\n", intno);
-@@ -1372,7 +1371,7 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-         qemu_log_mask(CPU_LOG_TB_IN_ASM,
-                       "Servicing virtual hardware INT=0x%02x\n", intno);
-         do_interrupt_x86_hardirq(env, intno, 1);
--        cs->interrupt_request &= ~CPU_INTERRUPT_VIRQ;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_VIRQ);
-         break;
- #endif
-     }
-diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
-index 9fd22a883b..a6d33e55d8 100644
---- a/target/i386/svm_helper.c
-+++ b/target/i386/svm_helper.c
-@@ -700,7 +700,7 @@ void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
-     env->hflags &= ~HF_GUEST_MASK;
-     env->intercept = 0;
-     env->intercept_exceptions = 0;
--    cs->interrupt_request &= ~CPU_INTERRUPT_VIRQ;
-+    cpu_reset_interrupt(cs, CPU_INTERRUPT_VIRQ);
-     env->tsc_offset = 0;
+ static bool disabled_wait(CPUState *cpu)
+ {
+-    return cpu->halted && !(S390_CPU(cpu)->env.psw.mask &
+-                            (PSW_MASK_IO | PSW_MASK_EXT | PSW_MASK_MCHECK));
++    return cpu_halted(cpu) && !(S390_CPU(cpu)->env.psw.mask &
++                                (PSW_MASK_IO | PSW_MASK_EXT | PSW_MASK_MCHECK));
+ }
  
-     env->gdt.base  = x86_ldq_phys(cs, env->vm_hsave + offsetof(struct vmcb,
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index b9c79ccd99..9673bdc219 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -728,14 +728,14 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-     if (!vcpu->interruption_pending &&
-         cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
-         if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
--            cpu->interrupt_request &= ~CPU_INTERRUPT_NMI;
-+            cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
-             vcpu->interruptable = false;
-             new_int.InterruptionType = WHvX64PendingNmi;
-             new_int.InterruptionPending = 1;
-             new_int.InterruptionVector = 2;
-         }
-         if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
--            cpu->interrupt_request &= ~CPU_INTERRUPT_SMI;
-+            cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
-         }
-     }
+ static unsigned s390_count_running_cpus(void)
+@@ -337,10 +337,16 @@ unsigned int s390_cpu_halt(S390CPU *cpu)
+     CPUState *cs = CPU(cpu);
+     trace_cpu_halt(cs->cpu_index);
  
-@@ -758,7 +758,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-         vcpu->interruptable && (env->eflags & IF_MASK)) {
-         assert(!new_int.InterruptionPending);
-         if (cpu->interrupt_request & CPU_INTERRUPT_HARD) {
--            cpu->interrupt_request &= ~CPU_INTERRUPT_HARD;
-+            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HARD);
-             irq = cpu_get_pic_interrupt(env);
-             if (irq >= 0) {
-                 new_int.InterruptionType = WHvX64PendingInterrupt;
-@@ -850,7 +850,7 @@ static void whpx_vcpu_process_async_events(CPUState *cpu)
+-    if (!cs->halted) {
+-        cs->halted = 1;
++    /*
++     * cpu_halted and cpu_halted_set acquire the cpu lock if it
++     * isn't already held, so acquire it first.
++     */
++    cpu_mutex_lock(cs);
++    if (!cpu_halted(cs)) {
++        cpu_halted_set(cs, 1);
+         cs->exception_index = EXCP_HLT;
+     }
++    cpu_mutex_unlock(cs);
+ 
+     return s390_count_running_cpus();
+ }
+@@ -350,10 +356,12 @@ void s390_cpu_unhalt(S390CPU *cpu)
+     CPUState *cs = CPU(cpu);
+     trace_cpu_unhalt(cs->cpu_index);
+ 
+-    if (cs->halted) {
+-        cs->halted = 0;
++    cpu_mutex_lock(cs);
++    if (cpu_halted(cs)) {
++        cpu_halted_set(cs, 0);
+         cs->exception_index = -1;
+     }
++    cpu_mutex_unlock(cs);
+ }
+ 
+ unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index a758649f47..633d59346b 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -461,7 +461,7 @@ try_deliver:
+     if ((env->psw.mask & PSW_MASK_WAIT) || stopped) {
+         /* don't trigger a cpu_loop_exit(), use an interrupt instead */
+         cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
+-    } else if (cs->halted) {
++    } else if (cpu_halted(cs)) {
+         /* unhalt if we had a WAIT PSW somehwere in our injection chain */
+         s390_cpu_unhalt(cpu);
+     }
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 19530fb94e..433a7e4573 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1003,7 +1003,7 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+ 
+ int kvm_arch_process_async_events(CPUState *cs)
+ {
+-    return cs->halted;
++    return cpu_halted(cs);
+ }
+ 
+ static int s390_kvm_irq_to_interrupt(struct kvm_s390_irq *irq,
+diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+index c1f9245797..d410da797a 100644
+--- a/target/s390x/sigp.c
++++ b/target/s390x/sigp.c
+@@ -115,7 +115,7 @@ static void sigp_stop(CPUState *cs, run_on_cpu_data arg)
      }
  
-     if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
--        cpu->interrupt_request &= ~CPU_INTERRUPT_POLL;
-+        cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
-         apic_poll_irq(x86_cpu->apic_state);
+     /* disabled wait - sleeping in user space */
+-    if (cs->halted) {
++    if (cpu_halted(cs)) {
+         s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+     } else {
+         /* execute the stop function */
+@@ -131,7 +131,7 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
+     SigpInfo *si = arg.host_ptr;
+ 
+     /* disabled wait - sleeping in user space */
+-    if (s390_cpu_get_state(cpu) == S390_CPU_STATE_OPERATING && cs->halted) {
++    if (s390_cpu_get_state(cpu) == S390_CPU_STATE_OPERATING && cpu_halted(cs)) {
+         s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
      }
  
-@@ -868,7 +868,7 @@ static void whpx_vcpu_process_async_events(CPUState *cpu)
+@@ -313,7 +313,7 @@ static void sigp_cond_emergency(S390CPU *src_cpu, S390CPU *dst_cpu,
      }
  
-     if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
--        cpu->interrupt_request &= ~CPU_INTERRUPT_TPR;
-+        cpu_reset_interrupt(cpu, CPU_INTERRUPT_TPR);
-         if (!cpu->vcpu_dirty) {
-             whpx_get_registers(cpu);
-         }
+     /* this looks racy, but these values are only used when STOPPED */
+-    idle = CPU(dst_cpu)->halted;
++    idle = cpu_halted(CPU(dst_cpu));
+     psw_addr = dst_cpu->env.psw.addr;
+     psw_mask = dst_cpu->env.psw.mask;
+     asn = si->param;
+@@ -347,7 +347,7 @@ static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
+     }
+ 
+     /* If halted (which includes also STOPPED), it is not running */
+-    if (CPU(dst_cpu)->halted) {
++    if (cpu_halted(CPU(dst_cpu))) {
+         si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+     } else {
+         set_sigp_status(si, SIGP_STAT_NOT_RUNNING);
 -- 
 2.17.1
