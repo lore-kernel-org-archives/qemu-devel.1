@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46056)
+Received: from eggs.gnu.org ([209.51.188.92]:46088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mIa-0008JK-1r
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:26 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mIc-0008JW-CP
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mIS-00083H-Br
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:23 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mIa-00088R-2k
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:26 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  4 Mar 2019 13:01:43 +0100
-Message-Id: <20190304120210.31500-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 00/27] s390x updates
+Date: Mon,  4 Mar 2019 13:01:45 +0100
+Message-Id: <20190304120210.31500-3-cohuck@redhat.com>
+In-Reply-To: <20190304120210.31500-1-cohuck@redhat.com>
+References: <20190304120210.31500-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 02/27] s390x: use a QEMU-style typedef + name
+ for SIGP save area struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,73 +21,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-The following changes since commit 20b084c4b1401b7f8fbc385649d48c67b6f43d44:
+From: David Hildenbrand <david@redhat.com>
 
-  Merge remote-tracking branch 'remotes/cminyard/tags/i2c-for-release-20190228' into staging (2019-03-01 11:20:49 +0000)
+Convert this to QEMU style.
 
-are available in the Git repository at:
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20190222081153.14206-3-david@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/helper.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-  https://github.com/cohuck/qemu tags/s390x-20190304
-
-for you to fetch changes up to df192fbc517a0954dda644282e52ba943e22ec18:
-
-  s390x: Add floating-point extension facility to "qemu" cpu model (2019-03-04 11:49:31 +0100)
-
-----------------------------------------------------------------
-s390x updates:
-- tcg: support the floating-point extension facility
-- vfio-ap: support hot(un)plug of vfio-ap device
-- fixes + cleanups
-
-----------------------------------------------------------------
-
-David Hildenbrand (25):
-  s390x: Use cpu_to_be64 in SIGP STORE ADDITIONAL STATUS
-  s390x: use a QEMU-style typedef + name for SIGP save area struct
-  s390x/tcg: Save vregs to extended mchk save area
-  s390x/tcg: RXE has an optional M3 field
-  s390x/tcg: Simplify disassembler operands initialization
-  s390x/tcg: Clarify terminology in vec_reg_offset()
-  s390x/tcg: Factor out vec_full_reg_offset()
-  s390x/tcg: Factor out gen_addi_and_wrap_i64() from get_address()
-  s390x/tcg: Implement LOAD LENGTHENED short HFP to long HFP
-  s390x/tcg: Implement LOAD COUNT TO BLOCK BOUNDARY
-  s390x/tcg: Fix TEST DATA CLASS instructions
-  s390x/tcg: Fix rounding from float128 to uint64_t/uint32_t
-  s390x/tcg: Factor out conversion of softfloat exceptions
-  s390x/tcg: Fix parts of IEEE exception handling
-  s390x/tcg: Hide IEEE underflows in some scenarios
-  s390x/tcg: Refactor SET FPC AND SIGNAL handling
-  s390x/tcg: Fix simulated-IEEE exceptions
-  s390x/tcg: Handle SET FPC AND LOAD FPC 3-bit BFP rounding modes
-  s390x/tcg: Check for exceptions in SET BFP ROUNDING MODE
-  s390x/tcg: Refactor saving/restoring the bfp rounding mode
-  s390x/tcg: Prepare for IEEE-inexact-exception control (XxC)
-  s390x/tcg: Implement XxC and checks for most FP instructions
-  s390x/tcg: Implement rounding mode and XxC for LOAD ROUNDED
-  s390x/tcg: Handle all rounding modes overwritten by BFP instructions
-  s390x: Add floating-point extension facility to "qemu" cpu model
-
-Tony Krowiak (2):
-  s390x/vfio-ap: Implement hot plug/unplug of vfio-ap device
-  s390x/vfio-ap: document hot plug/unplug of vfio-ap device
-
- docs/vfio-ap.txt             |  61 +++-
- hw/s390x/ap-bridge.c         |  12 +-
- hw/vfio/ap.c                 |   2 +-
- target/s390x/cc_helper.c     |   8 +
- target/s390x/excp_helper.c   |  46 ++-
- target/s390x/fpu_helper.c    | 541 +++++++++++++++++++++--------------
- target/s390x/gen-features.c  |   5 +
- target/s390x/helper.c        |  40 ++-
- target/s390x/helper.h        |   9 +-
- target/s390x/insn-data.def   |  16 +-
- target/s390x/insn-format.def |   2 +-
- target/s390x/internal.h      |  14 +-
- target/s390x/translate.c     | 409 ++++++++++++++++++--------
- 13 files changed, 792 insertions(+), 373 deletions(-)
-
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index f3fcf96482ef..a7edd5df7d59 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -211,7 +211,7 @@ void s390_cpu_recompute_watchpoints(CPUState *cs)
+     }
+ }
+ 
+-struct sigp_save_area {
++typedef struct SigpSaveArea {
+     uint64_t    fprs[16];                       /* 0x0000 */
+     uint64_t    grs[16];                        /* 0x0080 */
+     PSW         psw;                            /* 0x0100 */
+@@ -225,13 +225,13 @@ struct sigp_save_area {
+     uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
+     uint32_t    ars[16];                        /* 0x0140 */
+     uint64_t    crs[16];                        /* 0x0384 */
+-};
+-QEMU_BUILD_BUG_ON(sizeof(struct sigp_save_area) != 512);
++} SigpSaveArea;
++QEMU_BUILD_BUG_ON(sizeof(SigpSaveArea) != 512);
+ 
+ int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
+ {
+     static const uint8_t ar_id = 1;
+-    struct sigp_save_area *sa;
++    SigpSaveArea *sa;
+     hwaddr len = sizeof(*sa);
+     int i;
+ 
 -- 
 2.17.2
