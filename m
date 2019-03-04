@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45082)
+Received: from eggs.gnu.org ([209.51.188.92]:45970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h0k5i-0005zQ-JQ
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 04:40:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1h0kAF-0007VP-ON
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 04:45:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h0k5f-0003pG-MO
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 04:40:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38018)
+	(envelope-from <bounces@canonical.com>) id 1h0kAE-0007Vh-Jz
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 04:45:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38530)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h0k5Y-0003jG-8n
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 04:40:50 -0500
+	id 1h0kAD-0007VP-Mv
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 04:45:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h0k5U-0007LM-81
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 09:40:44 +0000
+	id 1h0kAC-0007cp-78
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 09:45:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2ECEE2E80CE
-	for <qemu-devel@nongnu.org>; Mon,  4 Mar 2019 09:40:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 338E62E80C7
+	for <qemu-devel@nongnu.org>; Mon,  4 Mar 2019 09:45:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Mar 2019 09:32:34 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1815889@bugs.launchpad.net>
+Date: Mon, 04 Mar 2019 09:40:15 -0000
+From: Timo Aaltonen <tjaalton@ubuntu.com>
 Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
-Message-Id: <155169195529.31917.6786588247268324517.launchpad@wampee.canonical.com>
+Message-Id: <155169241584.32171.17939137260198963494.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
  signal 31 in __pthread_setaffinity_new()
@@ -39,24 +39,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Also affects: mesa (Ubuntu Disco)
-   Importance: Medium
-       Status: Confirmed
+You can test 19.0~rc6 with this reverted on a ppa:
 
-** Also affects: qemu (Ubuntu Disco)
-   Importance: Undecided
-       Status: Triaged
+ppa:canonical-x/x-staging
 
-** No longer affects: qemu (Ubuntu Disco)
-
-** Changed in: mesa (Ubuntu Disco)
-       Status: Confirmed =3D> Triaged
-
-** Changed in: mesa (Ubuntu Disco)
-     Assignee: (unassigned) =3D> Timo Aaltonen (tjaalton)
-
-** Changed in: mesa (Ubuntu Disco)
-    Milestone: None =3D> ubuntu-19.04
+should be built in 30min
 
 -- =
 
