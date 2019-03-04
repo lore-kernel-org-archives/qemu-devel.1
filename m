@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52500)
+Received: from eggs.gnu.org ([209.51.188.92]:52508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0qn2-0004P3-Hm
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:50:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h0qn2-0004PI-QS
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:50:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0qn1-0005ka-G2
+	(envelope-from <peter.maydell@linaro.org>) id 1h0qn0-0005ja-HG
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:50:08 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:36970)
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:46994)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h0qn1-0005k0-6J
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:50:07 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id w6so6320563wrs.4
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 08:50:07 -0800 (PST)
+	id 1h0qn0-0005is-7Y
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:50:06 -0500
+Received: by mail-wr1-x429.google.com with SMTP id i16so6301901wrs.13
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 08:50:06 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	x74sm7238018wmf.22.2019.03.04.08.50.04 for <qemu-devel@nongnu.org>
+	x74sm7238018wmf.22.2019.03.04.08.50.03 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 04 Mar 2019 08:50:05 -0800 (PST)
+	Mon, 04 Mar 2019 08:50:04 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  4 Mar 2019 16:49:56 +0000
-Message-Id: <20190304164958.9362-6-peter.maydell@linaro.org>
+Date: Mon,  4 Mar 2019 16:49:55 +0000
+Message-Id: <20190304164958.9362-5-peter.maydell@linaro.org>
 In-Reply-To: <20190304164958.9362-1-peter.maydell@linaro.org>
 References: <20190304164958.9362-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 5/7] ui/cocoa: Don't call NSApp sendEvent
- directly from handleEvent
+Subject: [Qemu-devel] [PULL 4/7] ui/cocoa: Move console/device menu creation
+ code up in file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,159 +36,225 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Currently the handleEvent method will directly call the NSApp
-sendEvent method for any events that we want to let OSX deal
-with. When we rearrange the event handling code, the way that
-we say "let OSX have this event" is going to change. Prepare
-for that by refactoring so that handleEvent returns a flag
-indicating whether it consumed the event.
+Move the console/device menu creation code functions
+further up in the source file, next to the code which
+creates the initial menus. We're going to want to
+change the location we call these functions from in
+the next patch.
 
-Suggested-by: BALATON Zoltan <balaton@eik.bme.hu>
+This commit is a pure code move with no other changes.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
 Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-id: 20190225102433.22401-6-peter.maydell@linaro.org
-Message-id: 20190214102816.3393-6-peter.maydell@linaro.org
+Message-id: 20190225102433.22401-5-peter.maydell@linaro.org
+Message-id: 20190214102816.3393-5-peter.maydell@linaro.org
 ---
- ui/cocoa.m | 49 ++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 34 insertions(+), 15 deletions(-)
+ ui/cocoa.m | 184 ++++++++++++++++++++++++++---------------------------
+ 1 file changed, 92 insertions(+), 92 deletions(-)
 
 diff --git a/ui/cocoa.m b/ui/cocoa.m
-index d1fc1a6aff4..1b54d42aba6 100644
+index 4baec0b2ff7..d1fc1a6aff4 100644
 --- a/ui/cocoa.m
 +++ b/ui/cocoa.m
-@@ -129,8 +129,9 @@ bool stretch_video;
- NSTextField *pauseLabel;
- NSArray * supportedImageFileTypes;
- 
--// Utility function to run specified code block with iothread lock held
-+// Utility functions to run specified code block with iothread lock held
- typedef void (^CodeBlock)(void);
-+typedef bool (^BoolCodeBlock)(void);
- 
- static void with_iothread_lock(CodeBlock block)
- {
-@@ -144,6 +145,21 @@ static void with_iothread_lock(CodeBlock block)
-     }
+@@ -1552,6 +1552,98 @@ static void create_initial_menus(void)
+     [[NSApp mainMenu] addItem:menuItem];
  }
  
-+static bool bool_with_iothread_lock(BoolCodeBlock block)
++/* Returns a name for a given console */
++static NSString * getConsoleName(QemuConsole * console)
 +{
-+    bool locked = qemu_mutex_iothread_locked();
-+    bool val;
-+
-+    if (!locked) {
-+        qemu_mutex_lock_iothread();
-+    }
-+    val = block();
-+    if (!locked) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    return val;
++    return [NSString stringWithFormat: @"%s", qemu_console_get_label(console)];
 +}
 +
- // Mac to QKeyCode conversion
- const int mac_to_qkeycode_map[] = {
-     [kVK_ANSI_A] = Q_KEY_CODE_A,
-@@ -320,8 +336,8 @@ static void handleAnyDeviceErrors(Error * err)
- - (void) ungrabMouse;
- - (void) toggleFullScreen:(id)sender;
- - (void) handleMonitorInput:(NSEvent *)event;
--- (void) handleEvent:(NSEvent *)event;
--- (void) handleEventLocked:(NSEvent *)event;
-+- (bool) handleEvent:(NSEvent *)event;
-+- (bool) handleEventLocked:(NSEvent *)event;
- - (void) setAbsoluteEnabled:(BOOL)tIsAbsoluteEnabled;
- /* The state surrounding mouse grabbing is potentially confusing.
-  * isAbsoluteEnabled tracks qemu_input_is_absolute() [ie "is the emulated
-@@ -664,15 +680,16 @@ QemuCocoaView *cocoaView;
-     }
- }
++/* Add an entry to the View menu for each console */
++static void add_console_menu_entries(void)
++{
++    NSMenu *menu;
++    NSMenuItem *menuItem;
++    int index = 0;
++
++    menu = [[[NSApp mainMenu] itemWithTitle:@"View"] submenu];
++
++    [menu addItem:[NSMenuItem separatorItem]];
++
++    while (qemu_console_lookup_by_index(index) != NULL) {
++        menuItem = [[[NSMenuItem alloc] initWithTitle: getConsoleName(qemu_console_lookup_by_index(index))
++                                               action: @selector(displayConsole:) keyEquivalent: @""] autorelease];
++        [menuItem setTag: index];
++        [menu addItem: menuItem];
++        index++;
++    }
++}
++
++/* Make menu items for all removable devices.
++ * Each device is given an 'Eject' and 'Change' menu item.
++ */
++static void addRemovableDevicesMenuItems(void)
++{
++    NSMenu *menu;
++    NSMenuItem *menuItem;
++    BlockInfoList *currentDevice, *pointerToFree;
++    NSString *deviceName;
++
++    currentDevice = qmp_query_block(NULL);
++    pointerToFree = currentDevice;
++    if(currentDevice == NULL) {
++        NSBeep();
++        QEMU_Alert(@"Failed to query for block devices!");
++        return;
++    }
++
++    menu = [[[NSApp mainMenu] itemWithTitle:@"Machine"] submenu];
++
++    // Add a separator between related groups of menu items
++    [menu addItem:[NSMenuItem separatorItem]];
++
++    // Set the attributes to the "Removable Media" menu item
++    NSString *titleString = @"Removable Media";
++    NSMutableAttributedString *attString=[[NSMutableAttributedString alloc] initWithString:titleString];
++    NSColor *newColor = [NSColor blackColor];
++    NSFontManager *fontManager = [NSFontManager sharedFontManager];
++    NSFont *font = [fontManager fontWithFamily:@"Helvetica"
++                                          traits:NSBoldFontMask|NSItalicFontMask
++                                          weight:0
++                                            size:14];
++    [attString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, [titleString length])];
++    [attString addAttribute:NSForegroundColorAttributeName value:newColor range:NSMakeRange(0, [titleString length])];
++    [attString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt: 1] range:NSMakeRange(0, [titleString length])];
++
++    // Add the "Removable Media" menu item
++    menuItem = [NSMenuItem new];
++    [menuItem setAttributedTitle: attString];
++    [menuItem setEnabled: NO];
++    [menu addItem: menuItem];
++
++    /* Loop through all the block devices in the emulator */
++    while (currentDevice) {
++        deviceName = [[NSString stringWithFormat: @"%s", currentDevice->value->device] retain];
++
++        if(currentDevice->value->removable) {
++            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Change %s...", currentDevice->value->device]
++                                                  action: @selector(changeDeviceMedia:)
++                                           keyEquivalent: @""];
++            [menu addItem: menuItem];
++            [menuItem setRepresentedObject: deviceName];
++            [menuItem autorelease];
++
++            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Eject %s", currentDevice->value->device]
++                                                  action: @selector(ejectDeviceMedia:)
++                                           keyEquivalent: @""];
++            [menu addItem: menuItem];
++            [menuItem setRepresentedObject: deviceName];
++            [menuItem autorelease];
++        }
++        currentDevice = currentDevice->next;
++    }
++    qapi_free_BlockInfoList(pointerToFree);
++}
++
+ int main (int argc, const char * argv[]) {
  
--- (void) handleEvent:(NSEvent *)event
-+- (bool) handleEvent:(NSEvent *)event
+     gArgc = argc;
+@@ -1680,98 +1772,6 @@ static const DisplayChangeListenerOps dcl_ops = {
+     .dpy_refresh = cocoa_refresh,
+ };
+ 
+-/* Returns a name for a given console */
+-static NSString * getConsoleName(QemuConsole * console)
+-{
+-    return [NSString stringWithFormat: @"%s", qemu_console_get_label(console)];
+-}
+-
+-/* Add an entry to the View menu for each console */
+-static void add_console_menu_entries(void)
+-{
+-    NSMenu *menu;
+-    NSMenuItem *menuItem;
+-    int index = 0;
+-
+-    menu = [[[NSApp mainMenu] itemWithTitle:@"View"] submenu];
+-
+-    [menu addItem:[NSMenuItem separatorItem]];
+-
+-    while (qemu_console_lookup_by_index(index) != NULL) {
+-        menuItem = [[[NSMenuItem alloc] initWithTitle: getConsoleName(qemu_console_lookup_by_index(index))
+-                                               action: @selector(displayConsole:) keyEquivalent: @""] autorelease];
+-        [menuItem setTag: index];
+-        [menu addItem: menuItem];
+-        index++;
+-    }
+-}
+-
+-/* Make menu items for all removable devices.
+- * Each device is given an 'Eject' and 'Change' menu item.
+- */
+-static void addRemovableDevicesMenuItems(void)
+-{
+-    NSMenu *menu;
+-    NSMenuItem *menuItem;
+-    BlockInfoList *currentDevice, *pointerToFree;
+-    NSString *deviceName;
+-
+-    currentDevice = qmp_query_block(NULL);
+-    pointerToFree = currentDevice;
+-    if(currentDevice == NULL) {
+-        NSBeep();
+-        QEMU_Alert(@"Failed to query for block devices!");
+-        return;
+-    }
+-
+-    menu = [[[NSApp mainMenu] itemWithTitle:@"Machine"] submenu];
+-
+-    // Add a separator between related groups of menu items
+-    [menu addItem:[NSMenuItem separatorItem]];
+-
+-    // Set the attributes to the "Removable Media" menu item
+-    NSString *titleString = @"Removable Media";
+-    NSMutableAttributedString *attString=[[NSMutableAttributedString alloc] initWithString:titleString];
+-    NSColor *newColor = [NSColor blackColor];
+-    NSFontManager *fontManager = [NSFontManager sharedFontManager];
+-    NSFont *font = [fontManager fontWithFamily:@"Helvetica"
+-                                          traits:NSBoldFontMask|NSItalicFontMask
+-                                          weight:0
+-                                            size:14];
+-    [attString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, [titleString length])];
+-    [attString addAttribute:NSForegroundColorAttributeName value:newColor range:NSMakeRange(0, [titleString length])];
+-    [attString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt: 1] range:NSMakeRange(0, [titleString length])];
+-
+-    // Add the "Removable Media" menu item
+-    menuItem = [NSMenuItem new];
+-    [menuItem setAttributedTitle: attString];
+-    [menuItem setEnabled: NO];
+-    [menu addItem: menuItem];
+-
+-    /* Loop through all the block devices in the emulator */
+-    while (currentDevice) {
+-        deviceName = [[NSString stringWithFormat: @"%s", currentDevice->value->device] retain];
+-
+-        if(currentDevice->value->removable) {
+-            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Change %s...", currentDevice->value->device]
+-                                                  action: @selector(changeDeviceMedia:)
+-                                           keyEquivalent: @""];
+-            [menu addItem: menuItem];
+-            [menuItem setRepresentedObject: deviceName];
+-            [menuItem autorelease];
+-
+-            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Eject %s", currentDevice->value->device]
+-                                                  action: @selector(ejectDeviceMedia:)
+-                                           keyEquivalent: @""];
+-            [menu addItem: menuItem];
+-            [menuItem setRepresentedObject: deviceName];
+-            [menuItem autorelease];
+-        }
+-        currentDevice = currentDevice->next;
+-    }
+-    qapi_free_BlockInfoList(pointerToFree);
+-}
+-
+ static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
  {
--    with_iothread_lock(^{
--        [self handleEventLocked:event];
-+    return bool_with_iothread_lock(^{
-+        return [self handleEventLocked:event];
-     });
- }
- 
--- (void) handleEventLocked:(NSEvent *)event
-+- (bool) handleEventLocked:(NSEvent *)event
- {
-+    /* Return true if we handled the event, false if it should be given to OSX */
-     COCOA_DEBUG("QemuCocoaView: handleEvent\n");
-     int buttons = 0;
-     int keycode = 0;
-@@ -743,8 +760,7 @@ QemuCocoaView *cocoaView;
-                 if (keycode == Q_KEY_CODE_F) {
-                     switched_to_fullscreen = true;
-                 }
--                [NSApp sendEvent:event];
--                return;
-+                return false;
-             }
- 
-             // default
-@@ -759,12 +775,12 @@ QemuCocoaView *cocoaView;
-                         // enable graphic console
-                         case '1' ... '9':
-                             console_select(key - '0' - 1); /* ascii math */
--                            return;
-+                            return true;
- 
-                         // release the mouse grab
-                         case 'g':
-                             [self ungrabMouse];
--                            return;
-+                            return true;
-                     }
-                 }
-             }
-@@ -781,7 +797,7 @@ QemuCocoaView *cocoaView;
-             // don't pass the guest a spurious key-up if we treated this
-             // command-key combo as a host UI action
-             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
--                return;
-+                return true;
-             }
- 
-             if (qemu_console_is_graphic(NULL)) {
-@@ -875,7 +891,7 @@ QemuCocoaView *cocoaView;
-             mouse_event = false;
-             break;
-         default:
--            [NSApp sendEvent:event];
-+            return false;
-     }
- 
-     if (mouse_event) {
-@@ -911,10 +927,11 @@ QemuCocoaView *cocoaView;
-                 qemu_input_queue_rel(dcl->con, INPUT_AXIS_Y, (int)[event deltaY]);
-             }
-         } else {
--            [NSApp sendEvent:event];
-+            return false;
-         }
-         qemu_input_event_sync();
-     }
-+    return true;
- }
- 
- - (void) grabMouse
-@@ -1753,7 +1770,9 @@ static void cocoa_refresh(DisplayChangeListener *dcl)
-         event = [NSApp nextEventMatchingMask:NSEventMaskAny untilDate:distantPast
-                         inMode: NSDefaultRunLoopMode dequeue:YES];
-         if (event != nil) {
--            [cocoaView handleEvent:event];
-+            if (![cocoaView handleEvent:event]) {
-+                [NSApp sendEvent:event];
-+            }
-         }
-     } while(event != nil);
-     [pool release];
+     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
 -- 
 2.20.1
