@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52659)
+Received: from eggs.gnu.org ([209.51.188.92]:52921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1h0kg6-0004yt-SG
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:18:36 -0500
+	(envelope-from <berrange@redhat.com>) id 1h0kgx-0005eI-Cy
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:19:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1h0kg6-0003dE-5X
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:18:34 -0500
-Received: from mail-eopbgr810040.outbound.protection.outlook.com
-	([40.107.81.40]:54314
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgar@xilinx.com>) id 1h0kg5-0003aU-Of
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:18:34 -0500
-Date: Mon, 4 Mar 2019 11:18:19 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20190304101819.GB6010@toto>
-References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
-	<CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
-	<fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
-	<CAFEAcA_OrJ-1SzE5UpT4eHbzi-KS_GqX13KZdHzEzovXnsnsUg@mail.gmail.com>
-	<63b980a2-6b28-d5e2-891c-6245ddb1e851@redhat.com>
-	<CAFEAcA8L1qKaNwpr8sMZC8jQXbaLtCctaV8ecTFxXTVy0sWjVw@mail.gmail.com>
+	(envelope-from <berrange@redhat.com>) id 1h0kgw-0004CR-7G
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:19:27 -0500
+Date: Mon, 4 Mar 2019 10:19:11 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190304101911.GE4239@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
+	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
+	<20190301154947.GJ21251@redhat.com>
+	<20190301183328.20b63e23@redhat.com>
+	<20190301174806.GN21251@redhat.com>
+	<87va0zcdse.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <87va0zcdse.fsf@dusky.pond.sub.org>
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAFEAcA8L1qKaNwpr8sMZC8jQXbaLtCctaV8ecTFxXTVy0sWjVw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC] multi phase reset
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
+ parameter of '-numa node' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +30,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Damien Hedde <damien.hedde@greensocs.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Sun, Mar 03, 2019 at 10:59:30AM +0000, Peter Maydell wrote:
-> On Sat, 2 Mar 2019 at 19:41, Philippe Mathieu-Daud=E9 <philmd@redhat.com>=
- wrote:
-> >
-> > Hi Damien,
-> >
-> > On 3/1/19 5:52 PM, Peter Maydell wrote:
-> > > On Fri, 1 Mar 2019 at 15:34, Damien Hedde <damien.hedde@greensocs.com=
-> wrote:
-> > >> On 3/1/19 12:43 PM, Peter Maydell wrote:
-> > >>> In my design the only thing that I thought would happen in phase 3
-> > >>> was the "clear the resetting flag", but you've moved that to RELEAS=
-E.
-> > >>> What's left ? Do you have a concrete example where we'd need this?
-> > >>
-> > >> I hesitated to remove this phase (would be easy to add it after if i=
-t is
-> > >> really needed). I see 2 cases where it might be useful.
-> >
-> > If I RELEASE a PLL which need some time to warm up and stabilize, once
-> > stabilized it moves the device to the POST phase where it is ready?
+On Mon, Mar 04, 2019 at 08:13:53AM +0100, Markus Armbruster wrote:
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 >=20
-> No, I think that things like that where the device is not ready
-> for some period of time after reset should be handled by
-> the device itself. Typically we just ignore this and have
-> PLLs become stable instantaneously. If you really needed to
-> model it you'd just have a timer of some kind inside the
-> device model.
-
-Right, this is how we tend to model things for the Xilinx parts. We usually=
- don't care
-about the delayed behaviour though.
-
-
+> > On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wrote:
+> >> On Fri, 1 Mar 2019 15:49:47 +0000
+> >> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >>=20
+> >> > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote:
+> >> > > The parameter allows to configure fake NUMA topology where guest
+> >> > > VM simulates NUMA topology but not actually getting a performanc=
+e
+> >> > > benefits from it. The same or better results could be achieved
+> >> > > using 'memdev' parameter. In light of that any VM that uses NUMA
+> >> > > to get its benefits should use 'memdev' and to allow transition
+> >> > > initial RAM to device based model, deprecate 'mem' parameter as
+> >> > > its ad-hoc partitioning of initial RAM MemoryRegion can't be
+> >> > > translated to memdev based backend transparently to users and in
+> >> > > compatible manner (migration wise).
+> >> > >=20
+> >> > > That will also allow to clean up a bit our numa code, leaving on=
+ly
+> >> > > 'memdev' impl. in place and several boards that use node_mem
+> >> > > to generate FDT/ACPI description from it. =20
+> >> >=20
+> >> > Can you confirm that the  'mem' and 'memdev' parameters to -numa
+> >> > are 100% live migration compatible in both directions ?  Libvirt
+> >> > would need this to be the case in order to use the 'memdev' syntax
+> >> > instead.
+> >> Unfortunately they are not migration compatible in any direction,
+> >> if it where possible to translate them to each other I'd alias 'mem'
+> >> to 'memdev' without deprecation. The former sends over only one
+> >> MemoryRegion to target, while the later sends over several (one per
+> >> memdev).
+> >
+> > If we can't migration from one to the other, then we can not deprecat=
+e
+> > the existing 'mem' syntax. Even if libvirt were to provide a config
+> > option to let apps opt-in to the new syntax, we need to be able to
+> > support live migration of existing running VMs indefinitely. Effectiv=
+ely
+> > this means we need the to keep 'mem' support forever, or at least suc=
+h
+> > a long time that it effectively means forever.
+> >
+> > So I think this patch has to be dropped & replaced with one that
+> > simply documents that memdev syntax is preferred.
 >=20
-> (This matches h/w behaviour -- a PLL which is not yet stable
-> is not still in reset, it's out of reset but has different
-> behaviour for an initial period of time before it stabilizes.)
+> We have this habit of postulating absolutes like "can not deprecate"
+> instead of engaging with the tradeoffs.  We need to kick it.
 >=20
-> thanks
-> -- PMM
+> So let's have an actual look at the tradeoffs.
+>=20
+> We don't actually "support live migration of existing running VMs
+> indefinitely".
+>
+> We support live migration to any newer version of QEMU that still
+> supports the machine type.
+>=20
+> We support live migration to any older version of QEMU that already
+> supports the machine type and all the devices the machine uses.
+>=20
+> Aside: "support" is really an honest best effort here.  If you rely on
+> it, use a downstream that puts in the (substantial!) QA work real
+> support takes.
+
+If upstream deletes the feature, then that in turn breaks the downstream
+unless downstream reverts the upstream change. When we have large overlap
+between downstream & upstream maintainer, it is not beneficial to delete
+the feature upstream as any effort saved upstream usually expands into
+larger effort downstream.
+
+> Feature deprecation is not a contract to drop the feature after two
+> releases, or even five.  It's a formal notice that users of the feature
+> should transition to its replacement in an orderly manner.
+>=20
+> If I understand Igor correctly, all users should transition away from
+> outdated NUMA configurations at least for new VMs in an orderly manner.
+>=20
+> So, how could this formal notice be served constructively?
+>=20
+> If we reject outdated NUMA configurations starting with machine type T,
+> we can remove the means to create those configurations along with
+> machine type T-1.  Won't happen anytime soon, will happen eventually,
+> because in the long run, all machine types are dead (apologies to
+> Keynes).
+>=20
+> If we deprecate outdated NUMA configurations now, we can start rejectin=
+g
+> them with new machine types after a suitable grace period.
+
+How is libvirt going to know what machines it can use with the feature ?
+We don't have any way to introspect machine type specific logic, since we
+run all probing with "-machine none", and QEMU can't report anything abou=
+t
+machines without instantiating them.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
