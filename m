@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47208)
+Received: from eggs.gnu.org ([209.51.188.92]:49380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h0hz6-0002lh-SS
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:26:01 -0500
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1h0iCz-0005pZ-7w
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:40:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h0hz5-0002ST-Pc
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:26:00 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-7-armbru@redhat.com>
-	<CAFEAcA_OLYno=YNS6bHOemwEp0gnc3fwRn8Rjvmo9v-i89xrMA@mail.gmail.com>
-	<87d0nnsrx0.fsf@dusky.pond.sub.org>
-	<c6d4c021-8d62-ada0-d152-b1d4f2b7aff2@redhat.com>
-	<87ftsjptxk.fsf@dusky.pond.sub.org>
-	<CANqRtoSOF8uvh-9-_CgsuhB_N18NhSiS=DPsY1+3+ff4NzgE+w@mail.gmail.com>
-Date: Mon, 04 Mar 2019 08:25:47 +0100
-In-Reply-To: <CANqRtoSOF8uvh-9-_CgsuhB_N18NhSiS=DPsY1+3+ff4NzgE+w@mail.gmail.com>
-	(Magnus Damm's message of "Mon, 4 Mar 2019 13:57:29 +0900")
-Message-ID: <87mumbcd8k.fsf@dusky.pond.sub.org>
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1h0iCu-0003De-1D
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:40:20 -0500
+Received: from sonic309-21.consmr.mail.sg3.yahoo.com ([106.10.244.84]:46712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
+	id 1h0iCo-0002z2-UR
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:40:13 -0500
+From: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
+Date: Mon,  4 Mar 2019 16:39:36 +0900
+Message-Id: <20190304073936.55294-1-lucienmp_antispam@yahoo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
- confused about size, mark FIXME
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] Fix for RSP vCont packet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Magnus Damm <magnus.damm@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Qemu-block <qemu-block@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-ppc <qemu-ppc@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, Luc Michel <luc.michel@greensocs.com>, Eric Blake <eblake@redhat.com>, lucienmp_antispam@yahoo.com
 
-Magnus Damm <magnus.damm@gmail.com> writes:
+This fixes a regression in rsp packet vCont, this was due to the
+recently added multiprocess support. (Short commit hash: e40e520).
 
-> Hi guys,
->
-> On Wed, Feb 20, 2019 at 2:31 AM Markus Armbruster <armbru@redhat.com> wro=
-te:
->>
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>
->> > On 2/19/19 4:45 PM, Markus Armbruster wrote:
->> >> Peter Maydell <peter.maydell@linaro.org> writes:
->> >>
->> >>> On Mon, 18 Feb 2019 at 13:07, Markus Armbruster <armbru@redhat.com> =
-wrote:
->> >>>>
->> >>>> pflash_cfi02_register() takes a size in bytes, a block size in bytes
->> >>>> and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
->> >>>> FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
->> >>>> number of blocks.  The latter happens to win.  I tried to find
->> >>>> documentation on the physcial hardware, no luck.
->> >
->> > "physical"
->>
->> Thanks, will fix.
->>
->> >>>>
->> >>>> For now, adjust the byte size passed to match the actual size creat=
-ed,
->> >>>> and add a FIXME comment.
->> >>>
->> >>> I'm pretty sure that FLASH_SIZE here is supposed to be a
->> >>> byte count of the size of the pflash. That matches what
->> >>> Linux has in arch/sh/boards/mach-r2d/setup.c where it
->> >>> sets up the flash_resource struct.
->> >>
->> >> Okay, that's some evidence for size 0x02000000 (32MiB).
->> >>
->> >> However, we've created size (16 * KiB) * (FLASH_SIZE >> 16), i.e. 8Mi=
-B,
->> >> since at least commit 368a354f02b (v1.3.0), possibly since forever.
->> >>
->> >>> The r2dplus board is also I think known as RTS7751R2D. That
->> >>> takes us to https://elinux.org/RTS7751R2D_Handling_Manual
->> >>> (sadly the link to the "hardware manual" is broken).
->> >>
->> >> Quote section Flash ROM Mapping:
->> >>
->> >>     Currently, MTD device mapping on Flash ROM is set as below.
->> >>     0x00000000-0x00020000    "bootloader"
->> >>     0x00020000-0x00320000    "mtdblock1"     XIP kernel
->> >>     0x00320000-0x00520000    "mtdblock2"
->> >>     0x00520000-0x01000000    "mtdblock3"
->> >>
->> >> Suggests a size of 0x01000000 (16MiB).  Now we have three candidates.
->> >>
->> >> Pick one, any one, and I'll adjust my patch.  All I really care about=
- is
->> >> getting argument @size consistent with arguments @sector_len and
->> >> @nb_blocs, so I can ditch @nb_blocs in PATCH 09.
->> >>
->> >>> No idea what the block size would be.
->> >>
->> >> As long as that's the case, inertia wins by default.
->> >
->> > There is also a paper [*]:
->> >
->> >   The Renesas Technology R0P751RLC001RL (R2DPLUS) board was used
->> >   as our target device.
->> >   This board is often used to evaluate software for CE devices.
->> >   The specification is shown below.
->> >     CPU: SH7751R(SH4) 240Mhz
->> >     RAM: 64Mbyte
->> >     Compact flash: 512Mbyte
->> >     Flash ROM: 64Mbyte (32Mbyte available for root file system)
->>
->> Candidate #4: 64MiB.  Bring 'em on!
->>
->> >
->> > Let's use at least 16MB to be able to run the elinux cited kernel.
->> >
->> > [*] https://www.kernel.org/doc/ols/2008/ols2008v2-pages-125-134.pdf
->>
->> That's a vote for changing the status quo (8 MiB).
->>
->> Perhaps Magnus, who maintains the machine, can pick a new value for us.
->
-> According to the old board user document in Japanese (under NDA) what
-> is referred to as FROM (Area0) is connected via a 32-bit bus and CS0
-> to CN8. The docs mention s29pl127j60tfi130 but since I don't have the
-> board handy ATM I don't know how the chips are connected.
->
-> Hope this helps,
+The result is that vCont now does not recognise the case where
+no process/thread is provided after the action.
 
-If you want me to change our emulated flash memory's size, please give
-me a number.
+This may not show up with GDB, but using Lauterbach Trace32,
+and Hexrays IDA Pro this issue is immediately seen.
+
+The response is a "$#00" empty packet, showing it is unsupported packet.
+
+This is defined in the RSP document as "An action with no thread-id
+matches all threads."
+(https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html#vCont-packet)
+
+This is where the document lacks details. It says that the vCont packet
+is used to "Resume the inferior, specifying different actions for each
+thread."
+
+So it seems to target only one inferior (i.e. one process).
+
+When multiprocess extension is in use, this packet must be supported,
+and used in place of 'Hc' (which modifies s->c_cpu) and other action
+packets (s, S, ...) which are deprecated.
+
+So the question is: when the vCont packet does not specifies a
+thread-id, what _process_ we should choose?
+
+Going for all process is probably ok because:
+  - we don't have to bother choosing a PID,
+  - it will cover the mono-process case correctly (main use-case of this
+form of vCont packet I think).
+
+The alternative would be can go for GDB_ALL_THREAD and take the PID of the
+first attached CPU.  But may lead to problems, so I have chosen the
+GDB_ALL_PROCESSES.
+
+A request for improved documentation has been made at;
+https://sourceware.org/bugzilla/show_bug.cgi?id=24177
+
+Thus, for now, the valid vCont packets now are as below.
+However, parsing is still not very strict and many other invalid arguments
+formats are possible but they are not expected from standard debuggers.
+
+ * vCont;c/s
+ ** Step/Continue all threads
+
+ * vCont;c/s:[pX.]Y
+ ** Step/Continue optional process X, thread Y
+
+ * vCont;C##/S##:[pX.]Y
+ ** Step/Continue with signal ## on optional process X, thread Y
+
+ * If X or Y are -1 then it applies the action to all processes/threads.
+
+Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
+---
+Third attempt, taking greatly valued input on formatting.
+Also includes a change to the way kind is handled for no-action vcont
+---
+ gdbstub.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index a4be63f6eb..f8680f7ee8 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1145,6 +1145,7 @@ static int is_query_packet(const char *p, const char *query, char separator)
+  */
+ static int gdb_handle_vcont(GDBState *s, const char *p)
+ {
++    GDBThreadIdKind kind;
+     int res, signal = 0;
+     char cur_action;
+     char *newstates;
+@@ -1194,12 +1195,24 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
+             goto out;
+         }
+ 
+-        if (*p++ != ':') {
++        /*
++         * When we have vCont;c or vCont;s - action is on all threads
++         * Alternatively action maybe followed by a ';' and more specifiers
++         * such as vCont;c;s:p1.1 is a possible, but meaningless format.
++         * Otherwise if the action is followed by a ':' then
++         * the pPID.TID format is expected (for example "vCont;c:p1.1;...).
++         */
++        if (*p == '\0' || *p == ';') {
++            /* unclear behavior in RSP spec, assume GDB_ALL_PROCESSES is ok */
++            kind = GDB_ALL_PROCESSES;
++        } else if (*p++ == ':') {
++            kind = read_thread_id(p, &p, &pid, &tid);
++        } else {
+             res = -ENOTSUP;
+             goto out;
+         }
+ 
+-        switch (read_thread_id(p, &p, &pid, &tid)) {
++        switch (kind) {
+         case GDB_READ_THREAD_ERR:
+             res = -EINVAL;
+             goto out;
+-- 
+2.20.1
