@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57753)
+Received: from eggs.gnu.org ([209.51.188.92]:58157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1h0isJ-0000Jc-Dc
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:23:07 -0500
+	(envelope-from <svens@stackframe.org>) id 1h0iu1-0001Ft-S4
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:24:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1h0isI-0007Tg-G7
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:23:03 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:48645)
+	(envelope-from <svens@stackframe.org>) id 1h0iu1-0000XZ-22
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:24:49 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:35987)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1h0isI-0007SP-2L
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:23:02 -0500
-Date: Mon, 4 Mar 2019 09:22:58 +0100
+	id 1h0iu0-0000Ww-Qu
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:24:48 -0500
+Date: Mon, 4 Mar 2019 09:24:46 +0100
 From: Sven Schnelle <svens@stackframe.org>
-Message-ID: <20190304082258.GA4629@t470p.stackframe.org>
-References: <65d59485-9973-4ed1-b08f-084ed4db7ef1@redhat.com>
-	<20190215194021.20543-1-svens@stackframe.org>
+Message-ID: <20190304082446.GB4629@t470p.stackframe.org>
+References: <20190217113717.7077-1-svens@stackframe.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190215194021.20543-1-svens@stackframe.org>
-Subject: Re: [Qemu-devel] [PATCH v2] lsi: implement basic SBCL functionality
+In-Reply-To: <20190217113717.7077-1-svens@stackframe.org>
+Subject: Re: [Qemu-devel] [PATCH] lsi: check if SIGP bit is already set in
+ Wait reselect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +29,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>, Helge Deller <deller@gmx.de>
 
-Hi All,
+Hi List,
 
 is this patch going to be accepted?
 
 Thanks
 Sven
 
-On Fri, Feb 15, 2019 at 08:40:21PM +0100, Sven Schnelle wrote:
-> HP-UX checks this register after sending data to the target. If there's no valid
-> information present, it assumes the client disconnected because the kernel sent
-> to much data. Implement at least some of the SBCL functionality that is possible
-> without having a real SCSI bus.
+On Sun, Feb 17, 2019 at 12:37:17PM +0100, Sven Schnelle wrote:
+> If SIGP is set, the 'Wait for Reselection' command should jump
+> immediately to the address stored in the second DWORD of the
+> instruction. This fixes spurious hangs in the HP-UX 11.11
+> installer when the SIGP bit gets set by the kernel before the
+> 'Wait for Reselection' command is executed by SCRIPTS.
 > 
 > Signed-off-by: Sven Schnelle <svens@stackframe.org>
+> Tested-by: Helge Deller <deller@gmx.de>
 > ---
->  hw/scsi/lsi53c895a.c | 31 +++++++++++++++++++++++++++----
->  1 file changed, 27 insertions(+), 4 deletions(-)
+>  hw/scsi/lsi53c895a.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
 > diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-> index 89def1421f..8ba07f8756 100644
+> index 8ba07f8756..bcff859bac 100644
 > --- a/hw/scsi/lsi53c895a.c
 > +++ b/hw/scsi/lsi53c895a.c
-> @@ -160,6 +160,11 @@ static const char *names[] = {
->  #define LSI_CCNTL1_DDAC      0x08
->  #define LSI_CCNTL1_ZMOD      0x80
->  
-> +#define LSI_SBCL_ATN         0x08
-> +#define LSI_SBCL_BSY         0x20
-> +#define LSI_SBCL_ACK         0x40
-> +#define LSI_SBCL_REQ         0x80
-> +
->  /* Enable Response to Reselection */
->  #define LSI_SCID_RRE      0x60
->  
-> @@ -258,6 +263,7 @@ typedef struct {
->      uint8_t sdid;
->      uint8_t ssid;
->      uint8_t sfbr;
-> +    uint8_t sbcl;
->      uint8_t stest1;
->      uint8_t stest2;
->      uint8_t stest3;
-> @@ -356,6 +362,7 @@ static void lsi_soft_reset(LSIState *s)
->      s->socl = 0;
->      s->sdid = 0;
->      s->ssid = 0;
-> +    s->sbcl = 0;
->      s->stest1 = 0;
->      s->stest2 = 0;
->      s->stest3 = 0;
-> @@ -530,6 +537,8 @@ static void lsi_script_dma_interrupt(LSIState *s, int stat)
->  
->  static inline void lsi_set_phase(LSIState *s, int phase)
->  {
-> +    s->sbcl &= ~PHASE_MASK;
-> +    s->sbcl |= phase | LSI_SBCL_REQ;
->      s->sstat1 = (s->sstat1 & ~PHASE_MASK) | phase;
->  }
->  
-> @@ -567,6 +576,7 @@ static void lsi_disconnect(LSIState *s)
->  {
->      s->scntl1 &= ~LSI_SCNTL1_CON;
->      s->sstat1 &= ~PHASE_MASK;
-> +    s->sbcl = 0;
->  }
->  
->  static void lsi_bad_selection(LSIState *s, uint32_t id)
-> @@ -1265,7 +1275,9 @@ again:
->                  s->scntl1 |= LSI_SCNTL1_CON;
->                  if (insn & (1 << 3)) {
->                      s->socl |= LSI_SOCL_ATN;
-> +                    s->sbcl |= LSI_SBCL_ATN;
+> @@ -1297,8 +1297,10 @@ again:
 >                  }
-> +                s->sbcl |= LSI_SBCL_BSY;
->                  lsi_set_phase(s, PHASE_MO);
 >                  break;
->              case 1: /* Disconnect */
-> @@ -1297,8 +1309,14 @@ again:
->                          insn & (1 << 10) ? " CC" : "");
->                  if (insn & (1 << 3)) {
->                      s->socl |= LSI_SOCL_ATN;
-> +                    s->sbcl |= LSI_SBCL_ATN;
->                      lsi_set_phase(s, PHASE_MO);
+>              case 2: /* Wait Reselect */
+> -                if (!lsi_irq_on_rsl(s)) {
+> -                    lsi_wait_reselect(s);
+> +                if (s->istat0 & LSI_ISTAT0_SIGP) {
+> +                    s->dsp = s->dnad;
+> +                } else if (!lsi_irq_on_rsl(s)) {
+> +                        lsi_wait_reselect(s);
 >                  }
-> +
-> +                if (insn & (1 << 6)) {
-> +                    s->sbcl |= LSI_SBCL_ACK;
-> +                }
-> +
->                  if (insn & (1 << 9)) {
->                      qemu_log_mask(LOG_UNIMP,
->                          "lsi_scsi: Target mode not implemented\n");
-> @@ -1314,7 +1332,13 @@ again:
->                          insn & (1 << 10) ? " CC" : "");
->                  if (insn & (1 << 3)) {
->                      s->socl &= ~LSI_SOCL_ATN;
-> +                    s->sbcl &= ~LSI_SBCL_ATN;
->                  }
-> +
-> +                if (insn & (1 << 6)) {
-> +                    s->sbcl &= ~LSI_SBCL_ACK;
-> +                }
-> +
->                  if (insn & (1 << 10))
->                      s->carry = 0;
 >                  break;
-> @@ -1591,9 +1615,7 @@ static uint8_t lsi_reg_readb(LSIState *s, int offset)
->          ret = s->ssid;
->          break;
->      case 0xb: /* SBCL */
-> -        /* ??? This is not correct. However it's (hopefully) only
-> -           used for diagnostics, so should be ok.  */
-> -        ret = 0;
-> +        ret = s->sbcl;
->          break;
->      case 0xc: /* DSTAT */
->          ret = s->dstat | LSI_DSTAT_DFE;
-> @@ -2143,7 +2165,7 @@ static int lsi_post_load(void *opaque, int version_id)
->  
->  static const VMStateDescription vmstate_lsi_scsi = {
->      .name = "lsiscsi",
-> -    .version_id = 0,
-> +    .version_id = 1,
->      .minimum_version_id = 0,
->      .pre_save = lsi_pre_save,
->      .post_load = lsi_post_load,
-> @@ -2202,6 +2224,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
->          VMSTATE_UINT8(stime0, LSIState),
->          VMSTATE_UINT8(respid0, LSIState),
->          VMSTATE_UINT8(respid1, LSIState),
-> +        VMSTATE_UINT8_V(sbcl, LSIState, 1),
->          VMSTATE_UINT32(mmrs, LSIState),
->          VMSTATE_UINT32(mmws, LSIState),
->          VMSTATE_UINT32(sfs, LSIState),
+>              case 3: /* Set */
 > -- 
 > 2.20.1
 > 
