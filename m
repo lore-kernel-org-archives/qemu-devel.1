@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45605)
+Received: from eggs.gnu.org ([209.51.188.92]:45654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCK-0001jv-Lb
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:22 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCO-0001lE-AJ
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCJ-0003bC-7U
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:20 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:43865)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCM-0003gC-Ok
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:24 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:35403)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h0sCI-0003ZM-SU
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:19 -0500
-Received: by mail-wr1-x435.google.com with SMTP id d17so6636227wre.10
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:18 -0800 (PST)
+	id 1h0sCM-0003eH-GF
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:22 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id y15so144129wma.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:22 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Mar 2019 19:19:20 +0100
-Message-Id: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/54] Kconfig conversion, excluding ARM and MIPS
+Date: Mon,  4 Mar 2019 19:19:25 +0100
+Message-Id: <1551723614-1823-6-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 05/54] minikconfig: add AST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,267 +30,210 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
-The following changes since commit 1ba530a4ecba6015d52d8f392fd327cfa07bc37a:
+Add Python classes that represent the Kconfig abstract syntax tree.
+The abstract syntax tree is stored as a list of clauses.  For example:
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190304' into staging (2019-03-04 13:38:54 +0000)
+    config FOO
+        depends on BAR
+        select BAZ
 
-are available in the git repository at:
+is represented as three clauses:
 
+    FOO depends on BAR
+    FOO default n
+    select BAZ if FOO
 
-  git://github.com/bonzini/qemu.git tags/for-upstream-kconfig
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20190123065618.3520-24-yang.zhong@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/minikconf.py | 121 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 102 insertions(+), 19 deletions(-)
 
-for you to fetch changes up to b1d8b9a6cc37e33dde1873379174de78957830ca:
-
-  kconfig: add documentation (2019-03-04 19:09:35 +0100)
-
-----------------------------------------------------------------
-Initial Kconfig work, excluding ARM and MIPS
-
-----------------------------------------------------------------
-Paolo Bonzini (42):
-      block: fix recursion in hw/block/dataplane
-      9pfs: remove unnecessary conditionals
-      xtensa: rename CONFIG_XTENSA_FPGA to CONFIG_XTENSA_XTFPGA
-      minikconfig: add parser skeleton
-      minikconfig: add AST
-      minikconfig: add semantic analysis
-      kconfig: introduce kconfig files
-      build: switch to Kconfig
-      minikconfig: implement allnoconfig and defconfig modes
-      kconfig: introduce CONFIG_TEST_DEVICES
-      ide: express dependencies with Kconfig
-      isa: express dependencies with kconfig
-      build: convert pci.mak to Kconfig
-      build: convert sound.mak to Kconfig
-      scsi: express dependencies with Kconfig
-      build: convert usb.mak to Kconfig
-      i386: express dependencies with Kconfig
-      i2c: express dependencies with Kconfig
-      ptimer: express dependencies with Kconfig
-      vfio: express vfio dependencies with Kconfig
-      tpm: express dependencies with Kconfig
-      isa: express SuperIO dependencies with Kconfig
-      ssi: express dependencies with kconfig
-      sd: express dependencies with kconfig
-      ipmi: express dependencies with kconfig
-      alpha-softmmu.mak: express dependencies with Kconfig
-      cris-softmmu.mak: express dependencies with Kconfig
-      hppa-softmmu.mak: express dependencies with Kconfig
-      lm32-softmmu.mak: express dependencies with Kconfig
-      m68k-softmmu.mak: express dependencies with Kconfig
-      microblaze-softmmu.mak: express dependencies with Kconfig
-      moxie-softmmu.mak: express dependencies with Kconfig
-      nios2-softmmu.mak: express dependencies with Kconfig
-      or1k-softmmu.mak: express dependencies with Kconfig
-      riscv-softmmu.mak: replace CONFIG_* with Kconfig "select" directives
-      sh4-softmmu.mak: express dependencies with Kconfig
-      sparc-softmmu.mak: express dependencies with Kconfig
-      sparc64-softmmu.mak: express dependencies with Kconfig
-      unicore32-softmmu.mak: express dependencies with Kconfig
-      xtensa-softmmu.mak: express dependencies with Kconfig
-      .travis.yml: test that no-default-device builds do not regress
-      kconfig: add documentation
-
-Thomas Huth (6):
-      ppc64: Express dependencies of 'pseries' and 'powernv' machines with kconfig
-      ppc: Express dependencies of the 'prep' and '40p' machines with kconfig
-      ppc: Express dependencies of the Mac machines with kconfig
-      ppc: Express dependencies of the Sam460EX machines with kconfig
-      ppc: Express dependencies of the embedded machines with kconfig
-      s390x: express dependencies with Kconfig
-
-Yang Zhong (6):
-      hw/display: make edid configurable
-      hw/pci/Makefile.objs: make pcie configurable
-      display: express dependencies with kconfig
-      hyperv: express dependencies with kconfig
-      virtio: express virtio dependencies with Kconfig
-      i386-softmmu.mak: remove all CONFIG_* except boards definitions
-
- .travis.yml                             |   6 +
- Kconfig.host                            |  36 ++
- Makefile                                |  27 +-
- Makefile.target                         |   7 +-
- configure                               |  18 +-
- default-configs/alpha-softmmu.mak       |  26 +-
- default-configs/arm-softmmu.mak         |  18 +-
- default-configs/cris-softmmu.mak        |   6 +-
- default-configs/hppa-softmmu.mak        |  20 +-
- default-configs/hyperv.mak              |   2 -
- default-configs/i386-softmmu.mak        |  93 ++---
- default-configs/lm32-softmmu.mak        |  12 +-
- default-configs/m68k-softmmu.mak        |   4 +-
- default-configs/microblaze-softmmu.mak  |  12 +-
- default-configs/mips-softmmu-common.mak |  10 +-
- default-configs/mips64el-softmmu.mak    |   2 +
- default-configs/moxie-softmmu.mak       |   7 +-
- default-configs/nios2-softmmu.mak       |   6 +-
- default-configs/or1k-softmmu.mak        |   5 +-
- default-configs/pci.mak                 |  51 ---
- default-configs/ppc-softmmu.mak         |  60 ---
- default-configs/ppc64-softmmu.mak       |  13 -
- default-configs/riscv32-softmmu.mak     |  21 +-
- default-configs/riscv64-softmmu.mak     |  22 +-
- default-configs/s390x-softmmu.mak       |  23 +-
- default-configs/sh4-softmmu.mak         |  28 +-
- default-configs/sh4eb-softmmu.mak       |  22 +-
- default-configs/sound.mak               |   4 -
- default-configs/sparc-softmmu.mak       |  24 +-
- default-configs/sparc64-softmmu.mak     |  25 +-
- default-configs/unicore32-softmmu.mak   |   6 +-
- default-configs/usb.mak                 |  11 -
- default-configs/virtio.mak              |  15 -
- default-configs/xtensa-softmmu.mak      |   8 +-
- default-configs/xtensaeb-softmmu.mak    |   7 +-
- docs/devel/build-system.txt             |   1 -
- docs/devel/kconfig.rst                  | 305 ++++++++++++++
- hw/9pfs/Kconfig                         |   4 +
- hw/9pfs/Makefile.objs                   |   2 -
- hw/Kconfig                              |  73 ++++
- hw/Makefile.objs                        |   4 +-
- hw/acpi/Kconfig                         |  29 ++
- hw/adc/Kconfig                          |   2 +
- hw/alpha/Kconfig                        |  12 +
- hw/arm/Kconfig                          | 124 ++++++
- hw/audio/Kconfig                        |  52 +++
- hw/block/Kconfig                        |  39 ++
- hw/block/Makefile.objs                  |   3 +-
- hw/block/dataplane/Makefile.objs        |   2 +-
- hw/bt/Kconfig                           |   2 +
- hw/char/Kconfig                         |  42 ++
- hw/core/Kconfig                         |  11 +
- hw/cpu/Kconfig                          |   8 +
- hw/cris/Kconfig                         |   9 +
- hw/display/Kconfig                      | 108 +++++
- hw/display/Makefile.objs                |   4 +-
- hw/dma/Kconfig                          |  21 +
- hw/gpio/Kconfig                         |   9 +
- hw/hppa/Kconfig                         |  10 +
- hw/hyperv/Kconfig                       |   8 +
- hw/i2c/Kconfig                          |  27 ++
- hw/i2c/Makefile.objs                    |   2 +-
- hw/i386/Kconfig                         |  99 +++++
- hw/i386/Makefile.objs                   |   5 +-
- hw/ide/Kconfig                          |  54 +++
- hw/input/Kconfig                        |  33 ++
- hw/intc/Kconfig                         |  57 +++
- hw/ipack/Kconfig                        |   4 +
- hw/ipmi/Kconfig                         |  22 +
- hw/isa/Kconfig                          |  53 +++
- hw/lm32/Kconfig                         |  13 +
- hw/m68k/Kconfig                         |   9 +
- hw/mem/Kconfig                          |  11 +
- hw/microblaze/Kconfig                   |  20 +
- hw/mips/Kconfig                         |  21 +
- hw/misc/Kconfig                         | 118 ++++++
- hw/misc/macio/Kconfig                   |  11 +
- hw/moxie/Kconfig                        |   3 +
- hw/net/Kconfig                          | 125 ++++++
- hw/nios2/Kconfig                        |   8 +
- hw/nvram/Kconfig                        |   9 +
- hw/openrisc/Kconfig                     |   5 +
- hw/pci-bridge/Kconfig                   |  29 ++
- hw/pci-host/Kconfig                     |  51 +++
- hw/pci/Kconfig                          |   9 +
- hw/pci/Makefile.objs                    |   9 +-
- hw/pcmcia/Kconfig                       |   2 +
- hw/ppc/Kconfig                          | 121 ++++++
- hw/riscv/Kconfig                        |  33 ++
- hw/s390x/Kconfig                        |  11 +
- hw/s390x/Makefile.objs                  |   4 +-
- hw/scsi/Kconfig                         |  54 +++
- hw/scsi/Makefile.objs                   |   2 +-
- hw/sd/Kconfig                           |  17 +
- hw/sh4/Kconfig                          |  23 ++
- hw/smbios/Kconfig                       |   2 +
- hw/sparc/Kconfig                        |  26 ++
- hw/sparc64/Kconfig                      |  19 +
- hw/ssi/Kconfig                          |  18 +
- hw/timer/Kconfig                        |  63 +++
- hw/tpm/Kconfig                          |  23 ++
- hw/tricore/Kconfig                      |   2 +
- hw/unicore32/Kconfig                    |   5 +
- hw/usb/Kconfig                          |  91 ++++
- hw/usb/Makefile.objs                    |   2 +-
- hw/vfio/Kconfig                         |  36 ++
- hw/virtio/Kconfig                       |  31 ++
- hw/virtio/Makefile.objs                 |   2 +
- hw/watchdog/Kconfig                     |  16 +
- hw/xtensa/Kconfig                       |   8 +
- hw/xtensa/Makefile.objs                 |   2 +-
- rules.mak                               |   2 +-
- scripts/make_device_config.sh           |  30 --
- scripts/minikconf.py                    | 708 ++++++++++++++++++++++++++++++++
- 114 files changed, 3199 insertions(+), 502 deletions(-)
- create mode 100644 Kconfig.host
- delete mode 100644 default-configs/hyperv.mak
- delete mode 100644 default-configs/pci.mak
- delete mode 100644 default-configs/sound.mak
- delete mode 100644 default-configs/usb.mak
- delete mode 100644 default-configs/virtio.mak
- create mode 100644 docs/devel/kconfig.rst
- create mode 100644 hw/9pfs/Kconfig
- create mode 100644 hw/Kconfig
- create mode 100644 hw/acpi/Kconfig
- create mode 100644 hw/adc/Kconfig
- create mode 100644 hw/alpha/Kconfig
- create mode 100644 hw/arm/Kconfig
- create mode 100644 hw/audio/Kconfig
- create mode 100644 hw/block/Kconfig
- create mode 100644 hw/bt/Kconfig
- create mode 100644 hw/char/Kconfig
- create mode 100644 hw/core/Kconfig
- create mode 100644 hw/cpu/Kconfig
- create mode 100644 hw/cris/Kconfig
- create mode 100644 hw/display/Kconfig
- create mode 100644 hw/dma/Kconfig
- create mode 100644 hw/gpio/Kconfig
- create mode 100644 hw/hppa/Kconfig
- create mode 100644 hw/hyperv/Kconfig
- create mode 100644 hw/i2c/Kconfig
- create mode 100644 hw/i386/Kconfig
- create mode 100644 hw/ide/Kconfig
- create mode 100644 hw/input/Kconfig
- create mode 100644 hw/intc/Kconfig
- create mode 100644 hw/ipack/Kconfig
- create mode 100644 hw/ipmi/Kconfig
- create mode 100644 hw/isa/Kconfig
- create mode 100644 hw/lm32/Kconfig
- create mode 100644 hw/m68k/Kconfig
- create mode 100644 hw/mem/Kconfig
- create mode 100644 hw/microblaze/Kconfig
- create mode 100644 hw/mips/Kconfig
- create mode 100644 hw/misc/Kconfig
- create mode 100644 hw/misc/macio/Kconfig
- create mode 100644 hw/moxie/Kconfig
- create mode 100644 hw/net/Kconfig
- create mode 100644 hw/nios2/Kconfig
- create mode 100644 hw/nvram/Kconfig
- create mode 100644 hw/openrisc/Kconfig
- create mode 100644 hw/pci-bridge/Kconfig
- create mode 100644 hw/pci-host/Kconfig
- create mode 100644 hw/pci/Kconfig
- create mode 100644 hw/pcmcia/Kconfig
- create mode 100644 hw/ppc/Kconfig
- create mode 100644 hw/riscv/Kconfig
- create mode 100644 hw/s390x/Kconfig
- create mode 100644 hw/scsi/Kconfig
- create mode 100644 hw/sd/Kconfig
- create mode 100644 hw/sh4/Kconfig
- create mode 100644 hw/smbios/Kconfig
- create mode 100644 hw/sparc/Kconfig
- create mode 100644 hw/sparc64/Kconfig
- create mode 100644 hw/ssi/Kconfig
- create mode 100644 hw/timer/Kconfig
- create mode 100644 hw/tpm/Kconfig
- create mode 100644 hw/tricore/Kconfig
- create mode 100644 hw/unicore32/Kconfig
- create mode 100644 hw/usb/Kconfig
- create mode 100644 hw/vfio/Kconfig
- create mode 100644 hw/virtio/Kconfig
- create mode 100644 hw/watchdog/Kconfig
- create mode 100644 hw/xtensa/Kconfig
- delete mode 100644 scripts/make_device_config.sh
- create mode 100644 scripts/minikconf.py
+diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+index fd75d96..f0cc3b9 100644
+--- a/scripts/minikconf.py
++++ b/scripts/minikconf.py
+@@ -31,11 +31,84 @@ def debug_print(*args):
+ # -------------------------------------------
+ 
+ class KconfigData:
++    class Expr:
++        def __and__(self, rhs):
++            return KconfigData.AND(self, rhs)
++        def __or__(self, rhs):
++            return KconfigData.OR(self, rhs)
++        def __invert__(self):
++            return KconfigData.NOT(self)
++
++    class AND(Expr):
++        def __init__(self, lhs, rhs):
++            self.lhs = lhs
++            self.rhs = rhs
++        def __str__(self):
++            return "(%s && %s)" % (self.lhs, self.rhs)
++
++    class OR(Expr):
++        def __init__(self, lhs, rhs):
++            self.lhs = lhs
++            self.rhs = rhs
++        def __str__(self):
++            return "(%s || %s)" % (self.lhs, self.rhs)
++
++    class NOT(Expr):
++        def __init__(self, lhs):
++            self.lhs = lhs
++        def __str__(self):
++            return "!%s" % (self.lhs)
++
++    class Var(Expr):
++        def __init__(self, name):
++            self.name = name
++            self.value = None
++        def __str__(self):
++            return self.name
++
++    class Clause:
++        def __init__(self, dest):
++            self.dest = dest
++
++    class AssignmentClause(Clause):
++        def __init__(self, dest, value):
++            KconfigData.Clause.__init__(self, dest)
++            self.value = value
++        def __str__(self):
++            return "%s=%s" % (self.dest, 'y' if self.value else 'n')
++
++    class DefaultClause(Clause):
++        def __init__(self, dest, value, cond=None):
++            KconfigData.Clause.__init__(self, dest)
++            self.value = value
++            self.cond = cond
++        def __str__(self):
++            value = 'y' if self.value else 'n'
++            if self.cond is None:
++                return "config %s default %s" % (self.dest, value)
++            else:
++                return "config %s default %s if %s" % (self.dest, value, self.cond)
++
++    class DependsOnClause(Clause):
++        def __init__(self, dest, expr):
++            KconfigData.Clause.__init__(self, dest)
++            self.expr = expr
++        def __str__(self):
++            return "config %s depends on %s" % (self.dest, self.expr)
++
++    class SelectClause(Clause):
++        def __init__(self, dest, cond):
++            KconfigData.Clause.__init__(self, dest)
++            self.cond = cond
++        def __str__(self):
++            return "select %s if %s" % (self.dest, self.cond)
++
+     def __init__(self):
+         self.previously_included = []
+         self.incl_info = None
+         self.defined_vars = set()
+-        self.referenced_vars = set()
++        self.referenced_vars = dict()
++        self.clauses = list()
+ 
+     # semantic analysis -------------
+ 
+@@ -53,29 +126,34 @@ class KconfigData:
+         if (var in self.defined_vars):
+             raise Exception('variable "' + var + '" defined twice')
+ 
+-        self.defined_vars.add(var)
++        self.defined_vars.add(var.name)
+ 
+     # var is a string with the variable's name.
+-    #
+-    # For now this just returns the variable's name itself.
+     def do_var(self, var):
+-        self.referenced_vars.add(var)
+-        return var
++        if (var in self.referenced_vars):
++            return self.referenced_vars[var]
++
++        var_obj = self.referenced_vars[var] = KconfigData.Var(var)
++        return var_obj
+ 
+     def do_assignment(self, var, val):
+-        pass
++        self.clauses.append(KconfigData.AssignmentClause(var, val))
+ 
+     def do_default(self, var, val, cond=None):
+-        pass
++        self.clauses.append(KconfigData.DefaultClause(var, val, cond))
+ 
+     def do_depends_on(self, var, expr):
+-        pass
++        self.clauses.append(KconfigData.DependsOnClause(var, expr))
+ 
+     def do_select(self, var, symbol, cond=None):
+-        pass
++        cond = (cond & var) if cond is not None else var
++        self.clauses.append(KconfigData.SelectClause(symbol, cond))
+ 
+     def do_imply(self, var, symbol, cond=None):
+-        pass
++        # "config X imply Y [if COND]" is the same as
++        # "config Y default y if X [&& COND]"
++        cond = (cond & var) if cond is not None else var
++        self.do_default(symbol, True, cond)
+ 
+ # -------------------------------------------
+ # KconfigParser implements a recursive descent parser for (simplified)
+@@ -237,31 +315,34 @@ class KconfigParser:
+     def parse_primary(self):
+         if self.tok == TOK_NOT:
+             self.get_token()
+-            self.parse_primary()
++            val = ~self.parse_primary()
+         elif self.tok == TOK_LPAREN:
+             self.get_token()
+-            self.parse_expr()
++            val = self.parse_expr()
+             if self.tok != TOK_RPAREN:
+                 raise KconfigParserError(self, 'Expected ")"')
+             self.get_token()
+         elif self.tok == TOK_ID:
+-            self.parse_var()
++            val = self.parse_var()
+         else:
+             raise KconfigParserError(self, 'Expected "!" or "(" or identifier')
++        return val
+ 
+     # disj: primary (OR primary)*
+     def parse_disj(self):
+-        self.parse_primary()
++        lhs = self.parse_primary()
+         while self.tok == TOK_OR:
+             self.get_token()
+-            self.parse_primary()
++            lhs = lhs | self.parse_primary()
++        return lhs
+ 
+     # expr: disj (AND disj)*
+     def parse_expr(self):
+-        self.parse_disj()
++        lhs = self.parse_disj()
+         while self.tok == TOK_AND:
+             self.get_token()
+-            self.parse_disj()
++            lhs = lhs & self.parse_disj()
++        return lhs
+ 
+     # condition: IF expr
+     #       | empty
+@@ -438,4 +519,6 @@ class KconfigParser:
+ 
+ if __name__ == '__main__':
+     fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
+-    KconfigParser.parse(open(fname, 'r'))
++    data = KconfigParser.parse(open(fname, 'r'))
++    for i in data.clauses:
++        print i
 -- 
 1.8.3.1
