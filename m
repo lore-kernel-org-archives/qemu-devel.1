@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46617)
+Received: from eggs.gnu.org ([209.51.188.92]:46658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mJW-0000Wd-EY
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:23 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mJc-0000bd-3t
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mJV-0001MH-GY
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:22 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mJa-0001W6-7P
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:28 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  4 Mar 2019 13:01:58 +0100
-Message-Id: <20190304120210.31500-16-cohuck@redhat.com>
+Date: Mon,  4 Mar 2019 13:01:59 +0100
+Message-Id: <20190304120210.31500-17-cohuck@redhat.com>
 In-Reply-To: <20190304120210.31500-1-cohuck@redhat.com>
 References: <20190304120210.31500-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 15/27] s390x/tcg: Factor out conversion of
- softfloat exceptions
+Subject: [Qemu-devel] [PULL 16/27] s390x/tcg: Fix parts of IEEE exception
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +25,77 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redha
 
 From: David Hildenbrand <david@redhat.com>
 
-We want to reuse that function in vector instruction context. While at it,
-cleanup the code, using defines for magic values and avoiding the
-handcrafted bit conversion.
+Many things are wrong and some parts cannot be fixed yet. Fix what we
+can fix easily and add two FIXMEs:
+
+The fpc flags are not updated in case an exception is actually injected.
+Inexact exceptions have to be handled separately, as they are the only
+exceptions that can coexist with underflows and overflows.
+
+I reread the horribly complicated chapters in the PoP at least 5 times
+and hope I got it right.
+
+For references:
+- z14 PoP, 9-18, "IEEE Exceptions"
+- z14 PoP, 19-9, Figure 19-8
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190218122710.23639-4-david@redhat.com>
+Message-Id: <20190218122710.23639-5-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/fpu_helper.c | 25 +++++++++++++------------
- target/s390x/internal.h   |  7 +++++++
- 2 files changed, 20 insertions(+), 12 deletions(-)
+ target/s390x/fpu_helper.c | 38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
 
 diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index 21236caed869..de02cf792d87 100644
+index de02cf792d87..dcad9c367a5c 100644
 --- a/target/s390x/fpu_helper.c
 +++ b/target/s390x/fpu_helper.c
-@@ -36,10 +36,18 @@
- 
- #define RET128(F) (env->retxl = F.low, F.high)
- 
--#define convert_bit(mask, from, to) \
--    (to < from                      \
--     ? (mask / (from / to)) & to    \
--     : (mask & from) * (to / from))
-+uint8_t s390_softfloat_exc_to_ieee(unsigned int exc)
-+{
-+    uint8_t s390_exc = 0;
-+
-+    s390_exc |= (exc & float_flag_invalid) ? S390_IEEE_MASK_INVALID : 0;
-+    s390_exc |= (exc & float_flag_divbyzero) ? S390_IEEE_MASK_DIVBYZERO : 0;
-+    s390_exc |= (exc & float_flag_overflow) ? S390_IEEE_MASK_OVERFLOW : 0;
-+    s390_exc |= (exc & float_flag_underflow) ? S390_IEEE_MASK_UNDERFLOW : 0;
-+    s390_exc |= (exc & float_flag_inexact) ? S390_IEEE_MASK_INEXACT : 0;
-+
-+    return s390_exc;
-+}
- 
- /* Should be called after any operation that may raise IEEE exceptions.  */
- static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
-@@ -53,14 +61,7 @@ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
-         return;
-     }
+@@ -63,13 +63,39 @@ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
      env->fpu_status.float_exception_flags = 0;
--
--    /* Convert softfloat exception bits to s390 exception bits.  */
--    s390_exc = 0;
--    s390_exc |= convert_bit(qemu_exc, float_flag_invalid, 0x80);
--    s390_exc |= convert_bit(qemu_exc, float_flag_divbyzero, 0x40);
--    s390_exc |= convert_bit(qemu_exc, float_flag_overflow, 0x20);
--    s390_exc |= convert_bit(qemu_exc, float_flag_underflow, 0x10);
--    s390_exc |= convert_bit(qemu_exc, float_flag_inexact, 0x08);
-+    s390_exc = s390_softfloat_exc_to_ieee(qemu_exc);
+     s390_exc = s390_softfloat_exc_to_ieee(qemu_exc);
  
-     /* Install the exceptions that we raised.  */
-     env->fpc |= s390_exc << 16;
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 9d0a45d1fef7..4db736b6acfd 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -311,6 +311,13 @@ void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
- uint32_t set_cc_nz_f32(float32 v);
- uint32_t set_cc_nz_f64(float64 v);
- uint32_t set_cc_nz_f128(float128 v);
-+#define S390_IEEE_MASK_INVALID   0x80
-+#define S390_IEEE_MASK_DIVBYZERO 0x40
-+#define S390_IEEE_MASK_OVERFLOW  0x20
-+#define S390_IEEE_MASK_UNDERFLOW 0x10
-+#define S390_IEEE_MASK_INEXACT   0x08
-+#define S390_IEEE_MASK_QUANTUM   0x04
-+uint8_t s390_softfloat_exc_to_ieee(unsigned int exc);
+-    /* Install the exceptions that we raised.  */
+-    env->fpc |= s390_exc << 16;
++    /*
++     * FIXME:
++     * 1. Right now, all inexact conditions are inidicated as
++     *    "truncated" (0) and never as "incremented" (1) in the DXC.
++     * 2. Only traps due to invalid/divbyzero are suppressing. Other traps
++     *    are completing, meaning the target register has to be written!
++     *    This, however will mean that we have to write the register before
++     *    triggering the trap - impossible right now.
++     */
++
++    /*
++     * invalid/divbyzero cannot coexist with other conditions.
++     * overflow/underflow however can coexist with inexact, we have to
++     * handle it separatly.
++     */
++    if (s390_exc & ~S390_IEEE_MASK_INEXACT) {
++        if (s390_exc & ~S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
++            /* trap condition - inexact reported along */
++            tcg_s390_data_exception(env, s390_exc, retaddr);
++        }
++        /* nontrap condition - inexact handled differently */
++        env->fpc |= (s390_exc & ~S390_IEEE_MASK_INEXACT) << 16;
++    }
  
+-    /* Send signals for enabled exceptions.  */
+-    s390_exc &= env->fpc >> 24;
+-    if (s390_exc) {
+-        tcg_s390_data_exception(env, s390_exc, retaddr);
++    /* inexact handling */
++    if (s390_exc & S390_IEEE_MASK_INEXACT) {
++        /* trap condition - overflow/underflow _not_ reported along */
++        if (s390_exc & S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
++            tcg_s390_data_exception(env, s390_exc & S390_IEEE_MASK_INEXACT,
++                                    retaddr);
++        }
++        /* nontrap condition */
++        env->fpc |= (s390_exc & S390_IEEE_MASK_INEXACT) << 16;
+     }
+ }
  
- /* gdbstub.c */
 -- 
 2.17.2
