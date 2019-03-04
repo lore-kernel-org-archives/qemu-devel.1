@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46108)
+Received: from eggs.gnu.org ([209.51.188.92]:46109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCv-0002Hy-7A
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCv-0002Hz-7B
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCq-0004cs-Rg
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCq-0004cm-Rj
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:53 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44394)
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:37625)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h0sCo-0004Q3-0u
+	id 1h0sCo-0004Om-0f
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:50 -0500
-Received: by mail-wr1-x442.google.com with SMTP id w2so6625988wrt.11
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:46 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id w6so6634077wrs.4
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:44 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Mar 2019 19:19:50 +0100
-Message-Id: <1551723614-1823-31-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Mar 2019 19:19:48 +0100
+Message-Id: <1551723614-1823-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
 References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 30/54] ipmi: express dependencies with kconfig
+Subject: [Qemu-devel] [PULL 28/54] ssi: express dependencies with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +31,71 @@ To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Message-Id: <20190123065618.3520-36-yang.zhong@intel.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/i386-softmmu.mak  | 3 ---
- default-configs/ppc64-softmmu.mak | 3 ---
- hw/ipmi/Kconfig                   | 6 ++++++
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ default-configs/arm-softmmu.mak        | 1 -
+ default-configs/microblaze-softmmu.mak | 1 -
+ hw/sd/Kconfig                          | 1 +
+ hw/ssi/Kconfig                         | 4 ++++
+ 4 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 53e9d5e..e779ee1 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -1,9 +1,6 @@
- # Default configuration for i386-softmmu
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 40e1a1a..8bb4fd1 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -24,7 +24,6 @@ CONFIG_DDC=y
+ CONFIG_SII9022=y
+ CONFIG_ADS7846=y
+ CONFIG_MAX111X=y
+-CONFIG_SSI=y
+ CONFIG_SSI_SD=y
+ CONFIG_SSI_M25P80=y
+ CONFIG_LAN9118=y
+diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/microblaze-softmmu.mak
+index a4a6770..7140ef3 100644
+--- a/default-configs/microblaze-softmmu.mak
++++ b/default-configs/microblaze-softmmu.mak
+@@ -6,7 +6,6 @@ CONFIG_XILINX=y
+ CONFIG_XILINX_AXI=y
+ CONFIG_XILINX_SPI=y
+ CONFIG_XILINX_ETHLITE=y
+-CONFIG_SSI=y
+ CONFIG_SSI_M25P80=y
+ CONFIG_XLNX_ZYNQMP=y
+ CONFIG_PETALOGIX_S3ADSP1800=y
+diff --git a/hw/sd/Kconfig b/hw/sd/Kconfig
+index c6c5dfb..8f12d9c 100644
+--- a/hw/sd/Kconfig
++++ b/hw/sd/Kconfig
+@@ -3,6 +3,7 @@ config PL181
  
- CONFIG_VMXNET3_PCI=y
--CONFIG_IPMI=y
--CONFIG_IPMI_LOCAL=y
--CONFIG_IPMI_EXTERN=y
- CONFIG_ISA_IPMI_KCS=y
- CONFIG_ISA_IPMI_BT=y
- 
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-index a0a9151..d642b67 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -5,9 +5,6 @@ include ppc-softmmu.mak
- 
- # For PowerNV
- CONFIG_POWERNV=y
--CONFIG_IPMI=y
--CONFIG_IPMI_LOCAL=y
--CONFIG_IPMI_EXTERN=y
- CONFIG_ISA_IPMI_BT=y
- 
- # For pSeries
-diff --git a/hw/ipmi/Kconfig b/hw/ipmi/Kconfig
-index 6a4f08f..b944fae 100644
---- a/hw/ipmi/Kconfig
-+++ b/hw/ipmi/Kconfig
-@@ -3,14 +3,20 @@ config IPMI
- 
- config IPMI_LOCAL
+ config SSI_SD
      bool
-+    default y
-+    depends on IPMI
++    depends on SSI
  
- config IPMI_EXTERN
+ config SD
      bool
-+    default y
-+    depends on IPMI
+diff --git a/hw/ssi/Kconfig b/hw/ssi/Kconfig
+index 5a03110..9e54a0c 100644
+--- a/hw/ssi/Kconfig
++++ b/hw/ssi/Kconfig
+@@ -1,14 +1,18 @@
+ config PL022
+     bool
++    select SSI
  
- config ISA_IPMI_KCS
+ config SSI
      bool
-     depends on ISA_BUS
-+    select IPMI
  
- config ISA_IPMI_BT
+ config XILINX_SPI
      bool
-     depends on ISA_BUS
-+    select IPMI
++    select SSI
+ 
+ config XILINX_SPIPS
+     bool
++    select SSI
+ 
+ config STM32F2XX_SPI
+     bool
++    select SSI
 -- 
 1.8.3.1
