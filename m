@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57191)
+Received: from eggs.gnu.org ([209.51.188.92]:58201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h0pIe-00041B-Pd
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1h0pMD-0007A1-OR
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:18:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h0pIc-0007rS-R7
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:40 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:39728 helo=mail.rt-rk.com)
+	(envelope-from <armbru@redhat.com>) id 1h0pMC-0004p5-QJ
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:18:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57598)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1h0pIc-0007oB-9g
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:38 -0500
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Mon,  4 Mar 2019 16:13:18 +0100
-Message-Id: <1551712405-2530-7-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 06/13] target/mips: Add emulation of MMI
- instruction PEXEH
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h0pMC-0004nK-Hg
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:18:20 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181218113717.29130-1-philmd@redhat.com>
+Date: Mon, 04 Mar 2019 16:18:14 +0100
+In-Reply-To: <20181218113717.29130-1-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue,
+	18 Dec 2018 12:37:17 +0100")
+Message-ID: <871s3m3byh.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: Move qdict-test-data.txt to
+ tests/data/qobject/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+I'm afraid I let this one fall through the cracks.  qemu-trivial is fine
+with me.
 
-Add emulation of MMI instruction PEXEH. The emulation is implemented
-using TCG front end operations directly to achieve better performance.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/translate.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 74 insertions(+), 1 deletion(-)
+> Move qdict-test-data.txt to the tests/data/qobject/ subdirectory,
+> and remove the unnecessary symlinking.
+> (See 4b2ff65a1f3 for similar test-data cleanup).
+>
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  MAINTAINERS                                         | 1 +
+>  configure                                           | 2 +-
+>  tests/check-qdict.c                                 | 2 +-
+>  qdict-test-data.txt =3D> tests/data/qobject/qdict.txt | 0
+>  4 files changed, 3 insertions(+), 2 deletions(-)
+>  rename qdict-test-data.txt =3D> tests/data/qobject/qdict.txt (100%)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 83c127f0d6..269427c3f3 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1891,6 +1891,7 @@ F: tests/check-qnum.c
+>  F: tests/check-qjson.c
+>  F: tests/check-qlist.c
+>  F: tests/check-qstring.c
+> +F: tests/data/qobject/qdict.txt
+>  T: git https://repo.or.cz/qemu/armbru.git qapi-next
+>=20=20
+>  QEMU Guest Agent
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 64eb10c..01efcde 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -24650,6 +24650,77 @@ static void gen_mmi_pexcw(DisasContext *ctx)
-     }
- }
- 
-+/*
-+ *  PEXEH rd, rt
-+ *
-+ *  Parallel Exchange Even Halfword
-+ *
-+ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *  +-----------+---------+---------+---------+---------+-----------+
-+ *  |    MMI    |0 0 0 0 0|   rt    |   rd    |  PEXEH  |    MMI2   |
-+ *  +-----------+---------+---------+---------+---------+-----------+
-+ */
-+
-+static void gen_mmi_pexeh(DisasContext *ctx)
-+{
-+    uint32_t pd, rt, rd;
-+    uint32_t opcode;
-+
-+    opcode = ctx->opcode;
-+
-+    pd = extract32(opcode, 21, 5);
-+    rt = extract32(opcode, 16, 5);
-+    rd = extract32(opcode, 11, 5);
-+
-+    if (unlikely(pd != 0)) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    } else if (rd == 0) {
-+        /* nop */
-+    } else if (rt == 0) {
-+        tcg_gen_movi_i64(cpu_gpr[rd], 0);
-+        tcg_gen_movi_i64(cpu_mmr[rd], 0);
-+    } else {
-+        TCGv_i64 t0 = tcg_temp_new();
-+        TCGv_i64 t1 = tcg_temp_new();
-+        uint64_t mask0 = (1ULL << 16) - 1;
-+        uint64_t mask1 = mask0 << 16;
-+        uint64_t mask2 = mask1 << 16;
-+        uint64_t mask3 = mask2 << 16;
-+
-+        tcg_gen_movi_i64(t1, 0);
-+
-+        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask0);
-+        tcg_gen_shli_i64(t0, t0, 32);
-+        tcg_gen_or_i64(t1, t0, t1);
-+        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask1);
-+        tcg_gen_or_i64(t1, t0, t1);
-+        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask2);
-+        tcg_gen_shri_i64(t0, t0, 32);
-+        tcg_gen_or_i64(t1, t0, t1);
-+        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask3);
-+        tcg_gen_or_i64(t1, t0, t1);
-+
-+        tcg_gen_mov_i64(cpu_gpr[rd], t1);
-+        tcg_gen_movi_i64(t1, 0);
-+
-+        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask0);
-+        tcg_gen_shli_i64(t0, t0, 32);
-+        tcg_gen_or_i64(t1, t0, t1);
-+        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask1);
-+        tcg_gen_or_i64(t1, t0, t1);
-+        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask2);
-+        tcg_gen_shri_i64(t0, t0, 32);
-+        tcg_gen_or_i64(t1, t0, t1);
-+        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask3);
-+        tcg_gen_or_i64(t1, t0, t1);
-+
-+        tcg_gen_mov_i64(cpu_mmr[rd], t1);
-+
-+        tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+    }
-+}
-+
- #endif
- 
- 
-@@ -27670,7 +27741,6 @@ static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
-     case MMI_OPC_2_PXOR:      /* TODO: MMI_OPC_2_PXOR */
-     case MMI_OPC_2_PMSUBH:    /* TODO: MMI_OPC_2_PMSUBH */
-     case MMI_OPC_2_PHMSBH:    /* TODO: MMI_OPC_2_PHMSBH */
--    case MMI_OPC_2_PEXEH:     /* TODO: MMI_OPC_2_PEXEH */
-     case MMI_OPC_2_PREVH:     /* TODO: MMI_OPC_2_PREVH */
-     case MMI_OPC_2_PMULTH:    /* TODO: MMI_OPC_2_PMULTH */
-     case MMI_OPC_2_PDIVBW:    /* TODO: MMI_OPC_2_PDIVBW */
-@@ -27681,6 +27751,9 @@ static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
-     case MMI_OPC_2_PCPYLD:
-         gen_mmi_pcpyld(ctx);
-         break;
-+    case MMI_OPC_2_PEXEH:
-+        gen_mmi_pexeh(ctx);
-+        break;
-     default:
-         MIPS_INVAL("TX79 MMI class MMI2");
-         generate_exception_end(ctx, EXCP_RI);
--- 
-2.7.4
+Trivial conflict with your commit cd81e02b1e4.
+
+> diff --git a/configure b/configure
+> index 224d3071ac..8022f4b999 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7534,7 +7534,7 @@ DIRS=3D"$DIRS tests/fp"
+>  DIRS=3D"$DIRS docs docs/interop fsdev scsi"
+>  DIRS=3D"$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
+>  DIRS=3D"$DIRS roms/seabios roms/vgabios"
+> -LINKS=3D"Makefile tests/tcg/Makefile qdict-test-data.txt"
+> +LINKS=3D"Makefile tests/tcg/Makefile"
+>  LINKS=3D"$LINKS tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
+>  LINKS=3D"$LINKS tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Mak=
+efile"
+>  LINKS=3D"$LINKS tests/fp/Makefile"
+> diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+> index a1e8305066..b5efa859b0 100644
+> --- a/tests/check-qdict.c
+> +++ b/tests/check-qdict.c
+> @@ -291,7 +291,7 @@ static void qdict_stress_test(void)
+>      FILE *test_file;
+>      QDict *qdict;
+>      QString *value;
+> -    const char *test_file_path =3D "qdict-test-data.txt";
+> +    const char *test_file_path =3D "tests/data/qobject/qdict.txt";
+>=20=20
+>      test_file =3D fopen(test_file_path, "r");
+>      g_assert(test_file !=3D NULL);
+> diff --git a/qdict-test-data.txt b/tests/data/qobject/qdict.txt
+> similarity index 100%
+> rename from qdict-test-data.txt
+> rename to tests/data/qobject/qdict.txt
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
