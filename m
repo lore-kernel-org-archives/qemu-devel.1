@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60337)
+Received: from eggs.gnu.org ([209.51.188.92]:60407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0pTJ-0004vH-OV
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:25:42 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h0pTO-0004zN-FN
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0pTG-0000YG-Gr
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:25:40 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:36330)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1h0pTC-0008MW-OV
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:25:38 -0500
-Received: by mail-oi1-x234.google.com with SMTP id t206so4120029oib.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 07:25:31 -0800 (PST)
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h0pTN-00013t-FE
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:25:46 -0500
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+References: <20190301214945.4353-1-palmer@sifive.com>
+	<CAFEAcA-ZbFf+_Bt4QGu6ZchOZtvizWPR_5pFz4vOVVYAf23mgA@mail.gmail.com>
+	<36b17c57-7caf-1e49-d500-bf2eddcd1f25@mail.uni-paderborn.de>
+Message-ID: <35469245-ab32-5cb9-52d7-9ead8ffe6c42@mail.uni-paderborn.de>
+Date: Mon, 4 Mar 2019 16:25:40 +0100
 MIME-Version: 1.0
-References: <20190223105421.1290-1-davidkiarie4@gmail.com>
-	<20190223105421.1290-2-davidkiarie4@gmail.com>
-	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
-	<CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
-	<CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
-	<CABdVeABUzvwA8jV8ZfTcDY8eWN5=M2Otku6eukaBsPeMqPNOhQ@mail.gmail.com>
-	<CABdVeABnosV3-u9aepP=kSrb9P0X6-vUWZ2kDATUmNLmaJ_5+g@mail.gmail.com>
-	<CABdVeACgD7NrRa+P9yzkjhNJAtf9JEaJKuzo+J3CMCxLUO3phQ@mail.gmail.com>
-	<CABdVeACYb_TpARadx1FkQwODY7pqFp=Bm4RyZ3easb4Hm1JAyw@mail.gmail.com>
-	<CABdVeAD2mfUR5-29NQ=jkWjLRt6wyQNJEk4hFOZYFsnKCgYZFg@mail.gmail.com>
-	<CABdVeADEkyu20gB58pLgsPSCM23dPb+VgVtGOKR6XaX8=orwkg@mail.gmail.com>
-In-Reply-To: <CABdVeADEkyu20gB58pLgsPSCM23dPb+VgVtGOKR6XaX8=orwkg@mail.gmail.com>
-From: David Kiarie <davidkiarie4@gmail.com>
-Date: Mon, 4 Mar 2019 18:24:42 +0300
-Message-ID: <CABdVeABuPqS9wNV_TWTyS4FV-PnYt8qL1CdRxs89gj88ErXPqw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
+In-Reply-To: <36b17c57-7caf-1e49-d500-bf2eddcd1f25@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PULL] target/riscv: Convert to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,119 +25,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, "open list:RISC-V" <qemu-riscv@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Mar 4, 2019 at 6:22 PM David Kiarie <davidkiarie4@gmail.com> wrote:
 
+On 3/4/19 1:52 PM, Bastian Koppelmann wrote:
 >
->
-> On Mon, Mar 4, 2019 at 6:13 PM David Kiarie <davidkiarie4@gmail.com>
-> wrote:
->
->>
->>
->>
->>>>>>>>
->>>>>>>> Hi David,
->>>>>>>>>
->>>>>>>>> On 2/23/19 11:54 AM, David Kiarie wrote:
->>>>>>>>> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
->>>>>>>>> > ---
->>>>>>>>> >  hw/i386/amd_iommu.c | 2 +-
->>>>>>>>> >  hw/i386/amd_iommu.h | 2 +-
->>>>>>>>> >  2 files changed, 2 insertions(+), 2 deletions(-)
->>>>>>>>> >
->>>>>>>>> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
->>>>>>>>> > index 8ad707a..4f179da 100644
->>>>>>>>> > --- a/hw/i386/amd_iommu.c
->>>>>>>>> > +++ b/hw/i386/amd_iommu.c
->>>>>>>>> > @@ -2,7 +2,7 @@
->>>>>>>>> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
->>>>>>>>> >   *
->>>>>>>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->>>>>>>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->>>>>>>>> > + * Copyright (C) 2016 David Kiarie Kahurani
->>>>>>>>>
->>>>>>>>> Why do you change the year? Because your work was merged in 2016?
->>>>>>>>>
->>>>>>>>
->>>>>>>> no.
->>>>>>>>
->>>>>>>>
->>>>>>>
->>>>>>> though, if you have a legitimate issue with the change, you can
->>>>>>> always air it.
->>>>>>>
->>>>>>
->>>>>> you might think random emails are weird but Paolo, i don't expect to
->>>>>> see any activity from you, on Qemu repo before this issue is sorted ;-)
->>>>>>
->>>>>
->>>>> i mostly don't care about this code but i *wrote* it. if i am not
->>>>> allowed even make such minor(which i not a routine), why shouldn't i ask
->>>>> you to take the files down?
->>>>>
->>>>
->>>> or, rather, a small issue turns into a scene about how clean Qemu is.
->>>> why not take down all my dirty code?
->>>>
+> On 3/4/19 12:02 PM, Peter Maydell wrote:
+>> On Fri, 1 Mar 2019 at 21:49, Palmer Dabbelt <palmer@sifive.com> wrote:
+>>> merged tag 'i2c-for-release-20190228'
+>>> Primary key fingerprint: FD0D 5CE6 7CE0 F59A 6688  2686 61F3 8C90 
+>>> 919B FF81
+>>> The following changes since commit 
+>>> 20b084c4b1401b7f8fbc385649d48c67b6f43d44:
 >>>
->>> look i'm resending this patch and next time we're having this
->>> conversation, i'll be defacing qemu.
+>>>    Merge remote-tracking branch 
+>>> 'remotes/cminyard/tags/i2c-for-release-20190228' into staging 
+>>> (2019-03-01 11:20:49 +0000)
 >>>
->>
->>
->> either you have to update my code to what i think it should look like or
->> you have to take down - wtf
->>
->> then you try to cook rubbish over it.
->>
->
-> being a maintainer makes you special but let's see if you'll have
-> something to maintain.
->
-
-because i'm the troll on Qemu ML and maintainers can professionally be
-total rubbish.
-
-
->
->
->
->>
->>
+>>> are available in the Git repository at:
 >>>
+>>>    git://github.com/palmer-dabbelt/qemu.git 
+>>> tags/riscv-for-master-4.0-sf2
 >>>
->>>>
->>>>
->>>>>
->>>>>
->>>>>>
->>>>>>
->>>>>>>
->>>>>>>
->>>>>>>>
->>>>>>>>> >   *
->>>>>>>>> >   * This program is free software; you can redistribute it
->>>>>>>>> and/or modify
->>>>>>>>> >   * it under the terms of the GNU General Public License as
->>>>>>>>> published by
->>>>>>>>> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
->>>>>>>>> > index c52886f..cb258a7 100644
->>>>>>>>> > --- a/hw/i386/amd_iommu.h
->>>>>>>>> > +++ b/hw/i386/amd_iommu.h
->>>>>>>>> > @@ -2,7 +2,7 @@
->>>>>>>>> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
->>>>>>>>> >   *
->>>>>>>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->>>>>>>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->>>>>>>>> > + * Copyright (C) 2016 David Kiarie Kahurani
->>>>>>>>> >   *
->>>>>>>>> >   * This program is free software; you can redistribute it
->>>>>>>>> and/or modify
->>>>>>>>> >   * it under the terms of the GNU General Public License as
->>>>>>>>> published by
->>>>>>>>> >
->>>>>>>>>
->>>>>>>>
+>>> for you to fetch changes up to 
+>>> 0bcba29464ea9969fc69cd729e4c8bddfb2e18e3:
+>>>
+>>>    target/riscv: Remaining rvc insn reuse 32 bit translators 
+>>> (2019-03-01 13:16:18 -0800)
+>>>
+>>> ----------------------------------------------------------------
+>>> target/riscv: Convert to decodetree
+>>>
+>>> Bastian: this patchset converts the RISC-V decoder to decodetree in 
+>>> four major steps:
+>>>
+>>> 1) Convert 32-bit instructions to decodetree [Patch 1-15]:
+>>>      Many of the gen_* functions are called by the decode functions 
+>>> for 16-bit
+>>>      and 32-bit functions. If we move translation code from the gen_*
+>>>      functions to the generated trans_* functions of decode-tree, we 
+>>> get a lot of
+>>>      duplication. Therefore, we mostly generate calls to the old 
+>>> gen_* function
+>>>      which are properly replaced after step 2).
+>>>
+>>>      Each of the trans_ functions are grouped into files 
+>>> corresponding to their
+>>>      ISA extension, e.g. addi which is in RV32I is translated in the 
+>>> file
+>>>      'trans_rvi.inc.c'.
+>>>
+>>> 2) Convert 16-bit instructions to decodetree [Patch 16-18]:
+>>>      All 16 bit instructions have a direct mapping to a 32 bit 
+>>> instruction. Thus,
+>>>      we convert the arguments in the 16 bit trans_ function to the 
+>>> arguments of
+>>>      the corresponding 32 bit instruction and call the 32 bit trans_ 
+>>> function.
+>>>
+>>> 3) Remove old manual decoding in gen_* function [Patch 19-29]:
+>>>      this move all manual translation code into the trans_* 
+>>> instructions of
+>>>      decode tree, such that we can remove the old decode_* functions.
+>>>
+>>> 4) Simplify RVC by reusing as much as possible from the RVG decoder 
+>>> as suggested
+>>>     by Richard. [Patch 30-34]
+>>>
+>>> Palmer: This passed Alistar's testing on rv32 and rv64 as well as my
+>>> testing on rv64, so I think it's good to go.  Thanks for the cleanup!
+>>>
+>> Hi; I'm afraid this has compile errors on the OSX build:
+>>
+>>
+>> In file included from
+>> /Users/pm215/src/qemu-for-merges/target/riscv/translate.c:377:
+>> target/riscv/decode_insn16.inc.c:37:15: error: redefinition of typedef
+>> 'arg_fld' is a C11 feature [-Werror,-Wtypedef-redefinition]
+>> typedef arg_i arg_fld;
+>>                ^
+>> target/riscv/decode_insn32.inc.c:293:15: note: previous definition is 
+>> here
+>> typedef arg_i arg_fld;
+>
+>
+> This looks like an unforeseen decodetree problem (CC' Richard). As 
+> these 16/32 instructions share the same trans_* function, we emit the 
+> same typedef once for 16 bit and once for 32 bit. I don't see an easy 
+> fix in decodetree other than annotating one of the instructions with 
+> something like !shared , since both insn are parsed in two runs of 
+> decodetree and later included together into one file. I'll try to 
+> prepare a patch.
+
+This is something we can figure out after this PR. @Palmer I think you 
+can drop patches 30-34 for now as these are the offenders and the rest 
+of the PR is fine.
+
+Cheers,
+
+Bastian
