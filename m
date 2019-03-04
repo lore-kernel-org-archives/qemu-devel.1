@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42827)
+Received: from eggs.gnu.org ([209.51.188.92]:42874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jerry.lilijun@huawei.com>) id 1h0m3q-0003ZI-1K
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:47:10 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0m3t-0003c8-Qz
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:47:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jerry.lilijun@huawei.com>) id 1h0m3o-0006rE-EU
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:47:10 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2423 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jerry.lilijun@huawei.com>)
-	id 1h0m3o-0006kU-2d
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:47:08 -0500
-From: "Lilijun (Jerry, Cloud Networking)" <jerry.lilijun@huawei.com>
-Date: Mon, 4 Mar 2019 11:46:32 +0000
-Message-ID: <40280F65B1B0B44E8089ED31C01616EBA3947E6A@dggeml529-mbx.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0m3s-0006vv-U9
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:47:13 -0500
 MIME-Version: 1.0
-Subject: [Qemu-devel] Question about VM virtio device's link down delay when
- vhost-user reconnect
+References: <20190223105421.1290-1-davidkiarie4@gmail.com>
+	<20190223105421.1290-2-davidkiarie4@gmail.com>
+	<20190225103856.GE29260@redhat.com>
+	<CABdVeAA0f9ra1RnJDQfvuecSwmYLKiTNoMTSLEfkysV+KjedTw@mail.gmail.com>
+	<fb6d8090-baa3-cb78-c975-2c5383874e19@redhat.com>
+In-Reply-To: <fb6d8090-baa3-cb78-c975-2c5383874e19@redhat.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Mon, 4 Mar 2019 14:46:23 +0300
+Message-ID: <CABdVeADcw9s8_ux9zQtG1LAp_0jFQXrY0EqCET8d-Xcj1J+zVw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>, "lixiao (H)" <lixiao91@huawei.com>, wangyunjian <wangyunjian@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Richard Henderson <rth@twiddle.net>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-Hi all,
+On Mon, Mar 4, 2019 at 2:45 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-      I am running my VM using vhost-user NIC with OVS-DPDK.  The steps of =
-my question is shown as follows:
-     1) In the VM, I add one route entry manually on the vNIC eth0 using "r=
-oute add default gw 192.168.1.2".=20
-     2) If openvswitch service was restarted, or the process ovs-vswitchd w=
-as aborted, the new process may be started successfully after long seconds =
-such as 40s for the initialization of DPDK huge page memory.
-     3) And Qemu's vhost-user closed the connection and reconnected success=
-fully after 40s. =20
-     4) Here VM's vNIC will receive link down and up events, the interval b=
-etween the two events is about 40s.
-     5) Then I found that route entry disappeared unexpectedly. This will c=
-ause some network traffic problems.
+> On 04/03/19 12:22, David Kiarie wrote:
+> >
+> >
+> >
+> > On Mon, Feb 25, 2019 at 1:39 PM Daniel P. Berrang=C3=A9 <berrange@redha=
+t.com
+> > <mailto:berrange@redhat.com>> wrote:
+> >
+> >     On Sat, Feb 23, 2019 at 01:54:21PM +0300, David Kiarie wrote:
+> >     > Signed-off-by: David Kiarie <davidkiarie4@gmail.com
+> >     <mailto:davidkiarie4@gmail.com>>
+> >     > ---
+> >     >  hw/i386/amd_iommu.c | 2 +-
+> >     >  hw/i386/amd_iommu.h | 2 +-
+> >     >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> >     Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com
+> >     <mailto:berrange@redhat.com>>
+> >
+> >
+> > hello,
+> >
+> > i expected this really simple patch to probably get merged right away.
+>
+> Patches are usually bundled by maintainers, they do not get merged right
+> away unless they fix a broken build.
+>
 
-     I have an idea about this problem. We can add a parameter " link_down_=
-delay" for all virtio devices that use vhost-user socket such as virtio-net=
- and virtio-blk.=20
+i see.
 
-    If vhost-user socket get a connection closed event when the backend pro=
-cess was aborted or restarted, we don't notify VM virtio-net device link do=
-wn right now.
-   When the vhost-user backend recover this socket's connections before the=
- time of "link_down_delay" ms passed, we need not do that link down notific=
-ation to VM.
-   Or else, if that's timeout, VM can be notified the link down event as be=
-fore.
 
-    Is there any other opinions about this solution?  Or some better ideas?=
- Thanks.
+>
+> In any case I've queued the patch now.
 
-B.R.
 
-Jerry
+thanks.
+
+
+>
+>
+Paolo
+>
+> > i don't have time to follow up on old issues and not in the mood to be
+> > losing any of my work to sluggishness.
+>
+>
