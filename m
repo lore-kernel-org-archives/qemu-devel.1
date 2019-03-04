@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42294)
+Received: from eggs.gnu.org ([209.51.188.92]:44181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h0s3a-0003Tb-1p
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:11:18 -0500
+	(envelope-from <cota@braap.org>) id 1h0sAM-00088r-T7
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h0s3Y-0006Gb-1H
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:11:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41592)
+	(envelope-from <cota@braap.org>) id 1h0sAM-0000bT-2v
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:18 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:38827)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h0s3X-0006Bc-Lf
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:11:15 -0500
-References: <20190304084238.13481-1-marcel.apfelbaum@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <550bead8-a9a5-d9f4-1204-a6130f8c8e14@redhat.com>
-Date: Mon, 4 Mar 2019 12:11:10 -0600
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAL-0000Zn-PV
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:18 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:05 -0500
+Message-Id: <20190304181813.8075-6-cota@braap.org>
+In-Reply-To: <20190304181813.8075-1-cota@braap.org>
+References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
-In-Reply-To: <20190304084238.13481-1-marcel.apfelbaum@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration/rdma: clang compilation fix
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 05/73] cpu: move run_on_cpu to cpus-common
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 3/4/19 2:42 AM, Marcel Apfelbaum wrote:
-> Configuring QEMU with:
->          ../configure --cc=clang --enable-rdma
-> 
-> Leads to compilation error:
-> 
->    CC      migration/rdma.o
->    CC      migration/block.o
->    qemu/migration/rdma.c:3615:58: error: taking address of packed member 'rkey' of class or structure
->        'RDMARegisterResult' may result in an unaligned pointer value [-Werror,-Waddress-of-packed-member]
->                              (uintptr_t)host_addr, NULL, &reg_result->rkey,
->                                                           ^~~~~~~~~~~~~~~~
-> 
-> This is a false warning; even if RDMARegisterResult is "packed", rkey
-> is the first field so is guaranteed to be aligned.
+We don't pass a pointer to qemu_global_mutex anymore.
 
-Not so. If you packed struct, gcc is free to abut that struct next to 
-some other unaligned field in a larger struct:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ include/qom/cpu.h | 10 ----------
+ cpus-common.c     |  2 +-
+ cpus.c            |  5 -----
+ 3 files changed, 1 insertion(+), 16 deletions(-)
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06743.html
-
-> 
-> Fix it by disabling the warning only for this instance.
-
-Ignoring the bug is not the same as fixing the bug.  You need to rework 
-this, as the compiler warning is not a false negative.
-
-> 
-> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> ---
->   migration/rdma.c | 3 +++
->   1 file changed, 3 insertions(+)
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 62f4dc9025..eab86205c1 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -781,16 +781,6 @@ void qemu_cpu_kick(CPUState *cpu);
+  */
+ bool cpu_is_stopped(CPUState *cpu);
+ 
+-/**
+- * do_run_on_cpu:
+- * @cpu: The vCPU to run on.
+- * @func: The function to be executed.
+- * @data: Data to pass to the function.
+- *
+- * Used internally in the implementation of run_on_cpu.
+- */
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
+-
+ /**
+  * run_on_cpu:
+  * @cpu: The vCPU to run on.
+diff --git a/cpus-common.c b/cpus-common.c
+index daf1531868..85a61eb970 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -127,7 +127,7 @@ static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+     cpu_mutex_unlock(cpu);
+ }
+ 
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
++void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+     struct qemu_work_item wi;
+     bool has_bql = qemu_mutex_iothread_locked();
+diff --git a/cpus.c b/cpus.c
+index 4057c3a7e5..253c1f1a59 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1234,11 +1234,6 @@ void qemu_init_cpu_loop(void)
+     qemu_thread_get_self(&io_thread);
+ }
+ 
+-void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+-{
+-    do_run_on_cpu(cpu, func, data);
+-}
+-
+ static void qemu_kvm_destroy_vcpu(CPUState *cpu)
+ {
+     if (kvm_destroy_vcpu(cpu) < 0) {
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.17.1
