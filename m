@@ -1,21 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58552)
+Received: from eggs.gnu.org ([209.51.188.92]:60681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h0n50-0001gx-K6
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:52:27 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1h0nLT-0004sC-2p
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:09:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h0n4y-0005LM-KV
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:52:26 -0500
-References: <20190301214945.4353-1-palmer@sifive.com>
-	<CAFEAcA-ZbFf+_Bt4QGu6ZchOZtvizWPR_5pFz4vOVVYAf23mgA@mail.gmail.com>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <36b17c57-7caf-1e49-d500-bf2eddcd1f25@mail.uni-paderborn.de>
-Date: Mon, 4 Mar 2019 13:52:17 +0100
+	(envelope-from <farosas@linux.ibm.com>) id 1h0nBA-00037K-Dy
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:58:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
+	id 1h0nB8-0002zd-EL
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:58:48 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x24Cp5Q7128787
+	for <qemu-devel@nongnu.org>; Mon, 4 Mar 2019 07:58:38 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r121bxmj2-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 07:58:37 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
+	Mon, 4 Mar 2019 12:58:36 -0000
+From: Fabiano Rosas <farosas@linux.ibm.com>
+In-Reply-To: <20190304055018.GM7792@umbus.fritz.box>
+References: <20190228225759.21328-1-farosas@linux.ibm.com>
+	<20190228225759.21328-3-farosas@linux.ibm.com>
+	<20190304055018.GM7792@umbus.fritz.box>
+Date: Mon, 04 Mar 2019 09:58:28 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-ZbFf+_Bt4QGu6ZchOZtvizWPR_5pFz4vOVVYAf23mgA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PULL] target/riscv: Convert to decodetree
+Content-Type: text/plain
+Message-Id: <87d0n623uz.fsf@linux.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 2/5] kvm-all: Introduce
+ kvm_set_singlestep
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +42,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-On 3/4/19 12:02 PM, Peter Maydell wrote:
-> On Fri, 1 Mar 2019 at 21:49, Palmer Dabbelt <palmer@sifive.com> wrote:
->> merged tag 'i2c-for-release-20190228'
->> Primary key fingerprint: FD0D 5CE6 7CE0 F59A 6688  2686 61F3 8C90 919B FF81
->> The following changes since commit 20b084c4b1401b7f8fbc385649d48c67b6f43d44:
->>
->>    Merge remote-tracking branch 'remotes/cminyard/tags/i2c-for-release-20190228' into staging (2019-03-01 11:20:49 +0000)
->>
->> are available in the Git repository at:
->>
->>    git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-4.0-sf2
->>
->> for you to fetch changes up to 0bcba29464ea9969fc69cd729e4c8bddfb2e18e3:
->>
->>    target/riscv: Remaining rvc insn reuse 32 bit translators (2019-03-01 13:16:18 -0800)
->>
->> ----------------------------------------------------------------
->> target/riscv: Convert to decodetree
->>
->> Bastian: this patchset converts the RISC-V decoder to decodetree in four major steps:
->>
->> 1) Convert 32-bit instructions to decodetree [Patch 1-15]:
->>      Many of the gen_* functions are called by the decode functions for 16-bit
->>      and 32-bit functions. If we move translation code from the gen_*
->>      functions to the generated trans_* functions of decode-tree, we get a lot of
->>      duplication. Therefore, we mostly generate calls to the old gen_* function
->>      which are properly replaced after step 2).
->>
->>      Each of the trans_ functions are grouped into files corresponding to their
->>      ISA extension, e.g. addi which is in RV32I is translated in the file
->>      'trans_rvi.inc.c'.
->>
->> 2) Convert 16-bit instructions to decodetree [Patch 16-18]:
->>      All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
->>      we convert the arguments in the 16 bit trans_ function to the arguments of
->>      the corresponding 32 bit instruction and call the 32 bit trans_ function.
->>
->> 3) Remove old manual decoding in gen_* function [Patch 19-29]:
->>      this move all manual translation code into the trans_* instructions of
->>      decode tree, such that we can remove the old decode_* functions.
->>
->> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
->>     by Richard. [Patch 30-34]
->>
->> Palmer: This passed Alistar's testing on rv32 and rv64 as well as my
->> testing on rv64, so I think it's good to go.  Thanks for the cleanup!
->>
-> Hi; I'm afraid this has compile errors on the OSX build:
+>> +/* Whether the KVM_SET_GUEST_DEBUG ioctl supports single stepping */
+>> +int kvm_has_guestdbg_singlestep(void)
+>> +{
+>> +    /* return kvm_check_extension(kvm_state, KVM_CAP_GUEST_DEBUG_SSTEP); */
 >
+> I don't see a KVM_CAP_GUEST_DEBUG_SSTEP in either the qemu or kernel
+> trees.  Where does that come from?
 >
-> In file included from
-> /Users/pm215/src/qemu-for-merges/target/riscv/translate.c:377:
-> target/riscv/decode_insn16.inc.c:37:15: error: redefinition of typedef
-> 'arg_fld' is a C11 feature [-Werror,-Wtypedef-redefinition]
-> typedef arg_i arg_fld;
->                ^
-> target/riscv/decode_insn32.inc.c:293:15: note: previous definition is here
-> typedef arg_i arg_fld;
 
-
-This looks like an unforeseen decodetree problem (CC' Richard). As these 
-16/32 instructions share the same trans_* function, we emit the same 
-typedef once for 16 bit and once for 32 bit. I don't see an easy fix in 
-decodetree other than annotating one of the instructions with something 
-like !shared , since both insn are parsed in two runs of decodetree and 
-later included together into one file. I'll try to prepare a patch.
-
-Cheers,
-
-Bastian
+I'll submit that to the kernel this week. I was waiting to make sure this
+wouldn't change too much on QEMU side first.
