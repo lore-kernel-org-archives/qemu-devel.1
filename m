@@ -1,13 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48200)
+Received: from eggs.gnu.org ([209.51.188.92]:49238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h0qVQ-0002Yz-3m
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:31:57 -0500
+	(envelope-from <berrange@redhat.com>) id 1h0qYt-0005Af-OA
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:35:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h0qVO-0004oa-Gu
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:31:56 -0500
-Date: Mon, 4 Mar 2019 16:31:44 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190304163143.GB2596@work-vm>
+	(envelope-from <berrange@redhat.com>) id 1h0qYs-0003gT-49
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:35:31 -0500
+Date: Mon, 4 Mar 2019 16:35:16 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190304163516.GQ4239@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <1551454936-205218-2-git-send-email-imammedo@redhat.com>
 	<20190301154947.GJ21251@redhat.com>
 	<20190301183328.20b63e23@redhat.com>
@@ -19,7 +20,7 @@ References: <1551454936-205218-2-git-send-email-imammedo@redhat.com>
 	<20190304142432.GM4239@redhat.com>
 	<a6081774-c9d5-0496-3e65-ffb885408261@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <a6081774-c9d5-0496-3e65-ffb885408261@redhat.com>
 Content-Transfer-Encoding: quoted-printable
@@ -34,22 +35,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Michal Privoznik <mprivozn@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
+Cc: Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-* Michal Privoznik (mprivozn@redhat.com) wrote:
-> On 3/4/19 3:24 PM, Daniel P. Berrang=E9 wrote:
+On Mon, Mar 04, 2019 at 05:20:13PM +0100, Michal Privoznik wrote:
+> On 3/4/19 3:24 PM, Daniel P. Berrang=C3=A9 wrote:
 > > On Mon, Mar 04, 2019 at 03:16:41PM +0100, Igor Mammedov wrote:
 > > > On Mon, 4 Mar 2019 12:39:08 +0000
-> > > Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
+> > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 > > >=20
 > > > > On Mon, Mar 04, 2019 at 01:25:07PM +0100, Igor Mammedov wrote:
 > > > > > On Mon, 04 Mar 2019 08:13:53 +0100
 > > > > > Markus Armbruster <armbru@redhat.com> wrote:
-> > > > > > Daniel P. Berrang=E9 <berrange@redhat.com> writes:
+> > > > > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 > > > > > > > On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wro=
 te:
 > > > > > > > > On Fri, 1 Mar 2019 15:49:47 +0000
-> > > > > > > > Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
+> > > > > > > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 > > > > > > > > > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov=
  wrote:
 > > > > > > > > > > The parameter allows to configure fake NUMA topology =
@@ -225,7 +226,7 @@ ed
 > 1) whenever so called cold booting a new machine (fresh, brand new star=
 t of
 > a new domain) libvirt would default to modern cmd line,
->
+>=20
 > 2) on migration, libvirt would record in the migration stream (or statu=
 s XML
 > or wherever) that modern cmd line was generated and thus it'll make the
@@ -241,18 +242,29 @@ e the
 write
 > those migration patches).
 
-What's interesting here is that this problem isn't really machine-type
-related; so providing introspection on the machine type doesn't
-immediately help.  What we're actually trying to do here is (mis)use a
-machine type as a proxy for knowing that both sides are new enough to
-handle the new command line.
+Yeah supporting backwards migration is a non-optional requirement from at
+least one of the mgmt apps using libvirt, so breaking the new to old case
+is something we always aim to avoid.
 
-That's an OK thing to do, and if we did have introspection we could
-add a fudge flag to say it's allowed now.
+These incompabilities are reminding me why we haven't tied these kind of
+changes to machine type versions in the past. New machine type !=3D new
+libvirt, so we can't tie usage of a feature in livirt to a new machine
+type.
 
-Dave
+I'm wondering exactly which cases libvirt will still use the "mem" option
+in  as opposed to "memdev".  If none of the cases using "mem" actually
+suffer from the ill-effects of "mem", then there's not a compelling reaso=
+n
+to stop using it. It can be discouraged in QEMU documentation but otherwi=
+se
+left alone.
 
-
-> Michal
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
