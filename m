@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46457)
+Received: from eggs.gnu.org ([209.51.188.92]:46480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mJ7-0000Ck-DU
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:58 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mJB-0000FD-65
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mJ6-0000Zu-Aq
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:57 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mJ8-0000gU-Rs
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:59 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  4 Mar 2019 13:01:53 +0100
-Message-Id: <20190304120210.31500-11-cohuck@redhat.com>
+Date: Mon,  4 Mar 2019 13:01:54 +0100
+Message-Id: <20190304120210.31500-12-cohuck@redhat.com>
 In-Reply-To: <20190304120210.31500-1-cohuck@redhat.com>
 References: <20190304120210.31500-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 10/27] s390x/tcg: Factor out
- gen_addi_and_wrap_i64() from get_address()
+Subject: [Qemu-devel] [PULL 11/27] s390x/tcg: Implement LOAD LENGTHENED
+ short HFP to long HFP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +25,48 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redha
 
 From: David Hildenbrand <david@redhat.com>
 
-Also properly wrap in 24bit mode. While at it, convert the comment (and
-drop the comment about fundamental TCG optimizations).
+Nice trick to load a 32 bit value into vector element 0 (32 bit element
+size) from memory, zeroing out element1. The short HFP to long HFP
+conversion really only is a shift.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190225200318.16102-6-david@redhat.com>
+Message-Id: <20190225200318.16102-7-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/translate.c | 41 +++++++++++++++++++++++++---------------
- 1 file changed, 26 insertions(+), 15 deletions(-)
+ target/s390x/insn-data.def | 2 ++
+ target/s390x/translate.c   | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 61582372abb7..fb6ee1865057 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -598,6 +598,8 @@
+     F(0xed04, LDEB,    RXE,   Z,   0, m2_32u, new, f1, ldeb, 0, IF_BFP)
+     F(0xed05, LXDB,    RXE,   Z,   0, m2_64, new_P, x1, lxdb, 0, IF_BFP)
+     F(0xed06, LXEB,    RXE,   Z,   0, m2_32u, new_P, x1, lxeb, 0, IF_BFP)
++    F(0xb324, LDER,    RXE,   Z,   0, e2, new, f1, lde, 0, IF_AFP1)
++    F(0xed24, LDE,     RXE,   Z,   0, m2_32u, new, f1, lde, 0, IF_AFP1)
+ /* LOAD ROUNDED */
+     F(0xb344, LEDBR,   RRE,   Z,   0, f2, new, e1, ledb, 0, IF_BFP)
+     F(0xb345, LDXBR,   RRE,   Z,   x2h, x2l, new, f1, ldxb, 0, IF_BFP)
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 933bf29331a2..f7de77192c7e 100644
+index f7de77192c7e..59e71128d2bf 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -382,32 +382,43 @@ static inline void gen_trap(DisasContext *s)
-     gen_data_exception(0xff);
+@@ -2725,6 +2725,12 @@ static DisasJumpType op_lxeb(DisasContext *s, DisasOps *o)
+     return DISAS_NEXT;
  }
  
-+static void gen_addi_and_wrap_i64(DisasContext *s, TCGv_i64 dst, TCGv_i64 src,
-+                                  int64_t imm)
++static DisasJumpType op_lde(DisasContext *s, DisasOps *o)
 +{
-+    tcg_gen_addi_i64(dst, src, imm);
-+    if (!(s->base.tb->flags & FLAG_MASK_64)) {
-+        if (s->base.tb->flags & FLAG_MASK_32) {
-+            tcg_gen_andi_i64(dst, dst, 0x7fffffff);
-+        } else {
-+            tcg_gen_andi_i64(dst, dst, 0x00ffffff);
-+        }
-+    }
++    tcg_gen_shli_i64(o->out, o->in2, 32);
++    return DISAS_NEXT;
 +}
 +
- static TCGv_i64 get_address(DisasContext *s, int x2, int b2, int d2)
+ static DisasJumpType op_llgt(DisasContext *s, DisasOps *o)
  {
-     TCGv_i64 tmp = tcg_temp_new_i64();
--    bool need_31 = !(s->base.tb->flags & FLAG_MASK_64);
--
--    /* Note that d2 is limited to 20 bits, signed.  If we crop negative
--       displacements early we create larger immedate addends.  */
- 
--    /* Note that addi optimizes the imm==0 case.  */
-+    /*
-+     * Note that d2 is limited to 20 bits, signed.  If we crop negative
-+     * displacements early we create larger immedate addends.
-+     */
-     if (b2 && x2) {
-         tcg_gen_add_i64(tmp, regs[b2], regs[x2]);
--        tcg_gen_addi_i64(tmp, tmp, d2);
-+        gen_addi_and_wrap_i64(s, tmp, tmp, d2);
-     } else if (b2) {
--        tcg_gen_addi_i64(tmp, regs[b2], d2);
-+        gen_addi_and_wrap_i64(s, tmp, regs[b2], d2);
-     } else if (x2) {
--        tcg_gen_addi_i64(tmp, regs[x2], d2);
--    } else {
--        if (need_31) {
--            d2 &= 0x7fffffff;
--            need_31 = false;
-+        gen_addi_and_wrap_i64(s, tmp, regs[x2], d2);
-+    } else if (!(s->base.tb->flags & FLAG_MASK_64)) {
-+        if (s->base.tb->flags & FLAG_MASK_32) {
-+            tcg_gen_movi_i64(tmp, d2 & 0x7fffffff);
-+        } else {
-+            tcg_gen_movi_i64(tmp, d2 & 0x00ffffff);
-         }
-+    } else {
-         tcg_gen_movi_i64(tmp, d2);
-     }
--    if (need_31) {
--        tcg_gen_andi_i64(tmp, tmp, 0x7fffffff);
--    }
- 
-     return tmp;
- }
+     tcg_gen_andi_i64(o->out, o->in2, 0x7fffffff);
 -- 
 2.17.2
