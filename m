@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58157)
+Received: from eggs.gnu.org ([209.51.188.92]:58525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1h0iu1-0001Ft-S4
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:24:50 -0500
+	(envelope-from <jerry.lilijun@huawei.com>) id 1h0ivp-00025N-Or
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:26:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1h0iu1-0000XZ-22
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:24:49 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:35987)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1h0iu0-0000Ww-Qu
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:24:48 -0500
-Date: Mon, 4 Mar 2019 09:24:46 +0100
-From: Sven Schnelle <svens@stackframe.org>
-Message-ID: <20190304082446.GB4629@t470p.stackframe.org>
-References: <20190217113717.7077-1-svens@stackframe.org>
+	(envelope-from <jerry.lilijun@huawei.com>) id 1h0ivp-0001vE-3s
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:26:41 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:53592 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jerry.lilijun@huawei.com>)
+	id 1h0ivo-0001qh-P1
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:26:41 -0500
+Received: from DGGEML403-HUB.china.huawei.com (unknown [172.30.72.53])
+	by Forcepoint Email with ESMTP id 80474B834345EE87BA6E
+	for <qemu-devel@nongnu.org>; Mon,  4 Mar 2019 16:26:30 +0800 (CST)
+From: "Lilijun (Jerry, Cloud Networking)" <jerry.lilijun@huawei.com>
+Date: Mon, 4 Mar 2019 08:26:23 +0000
+Message-ID: <40280F65B1B0B44E8089ED31C01616EBA3947B1A@dggeml529-mbx.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190217113717.7077-1-svens@stackframe.org>
-Subject: Re: [Qemu-devel] [PATCH] lsi: check if SIGP bit is already set in
- Wait reselect
+Subject: [Qemu-devel] Question about VM inner route entry's lost when
+ vhost-user reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>, Helge Deller <deller@gmx.de>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: wangyunjian <wangyunjian@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
 
-Hi List,
-
-is this patch going to be accepted?
-
-Thanks
-Sven
-
-On Sun, Feb 17, 2019 at 12:37:17PM +0100, Sven Schnelle wrote:
-> If SIGP is set, the 'Wait for Reselection' command should jump
-> immediately to the address stored in the second DWORD of the
-> instruction. This fixes spurious hangs in the HP-UX 11.11
-> installer when the SIGP bit gets set by the kernel before the
-> 'Wait for Reselection' command is executed by SCRIPTS.
-> 
-> Signed-off-by: Sven Schnelle <svens@stackframe.org>
-> Tested-by: Helge Deller <deller@gmx.de>
-> ---
->  hw/scsi/lsi53c895a.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-> index 8ba07f8756..bcff859bac 100644
-> --- a/hw/scsi/lsi53c895a.c
-> +++ b/hw/scsi/lsi53c895a.c
-> @@ -1297,8 +1297,10 @@ again:
->                  }
->                  break;
->              case 2: /* Wait Reselect */
-> -                if (!lsi_irq_on_rsl(s)) {
-> -                    lsi_wait_reselect(s);
-> +                if (s->istat0 & LSI_ISTAT0_SIGP) {
-> +                    s->dsp = s->dnad;
-> +                } else if (!lsi_irq_on_rsl(s)) {
-> +                        lsi_wait_reselect(s);
->                  }
->                  break;
->              case 3: /* Set */
-> -- 
-> 2.20.1
-> 
-> 
+DQpIaSBhbGwsDQoNCiAgICAgIEkgYW0gcnVubmluZyBteSBWTSB1c2luZyB2aG9zdC11c2VyIE5J
+QyB3aXRoIE9WUy1EUERLLiAgVGhlIHN0ZXBzIG9mIG15IHF1ZXN0aW9uIGlzIHNob3duIGFzIGZv
+bGxvd3M6DQogICAgIDEpIEluIHRoZSBWTSwgSSBhZGQgb25lIHJvdXRlIGVudHJ5IG1hbnVhbGx5
+IG9uIHRoZSB2TklDIGV0aDAgdXNpbmcgdGhlIGxpbnV4IHRvb2wgcm91dGUuIA0KICAgICAyKSBX
+aGVuIHJlc3RhcnRpbmcgb3BlbnZzd2l0Y2ggc2VydmljZSBmb3IgdGhlIGNyYXNoIG9mIHRoZSBv
+dnMtdnN3aXRjaGQsIHFlbXUncyB2aG9zdC11c2VyIHJlY29ubmVjdGVkIHN1Y2Nlc3NmdWxseSBh
+ZnRlciA0MHMuICANCiAgICAgMykgSGVyZSBWTSdzIHZOSUMgd2lsbCByZWNlaXZlIGxpbmsgZG93
+biBhbmQgdXAgZXZlbnRzLCB0aGUgaW50ZXJ2YWwgYmV0d2VlbiB0aGUgdHdvIGV2ZW50cyBpcyBh
+Ym91dCA0MHMuDQogICAgIDMpIEJ1dCB0aGF0IHJvdXRlIGVudHJ5IGRpc2FwcGVhcmVkIGFuZCB0
+aGF0IHdpbGwgY2F1c2UgdXNlcidzIG5ldHdvcmsgdHJhZmZpYyBpbnRlcnJ1cHRpb24gYW5kIHRo
+ZSBzZXJ2aWNlIGZhaWxlZC4NCg0KICAgICBJcyB0aGVyZSBzb21lIHdvcmsgb24gdGhpcyBwcm9i
+bGVtPyAgQ2FuIHdlIGtlZXAgdGhlIHZOSUMncyBsaW5rIHVwIHN0YXR1cyB3aGVuIGRvIHZob3N0
+LXVzZXIncyByZWNvbm5lY3Rpbmcgd29yaz8NCg0KICAgICBUaGFua3MuDQoNCkplcnJ5DQoNCg==
