@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56533)
+Received: from eggs.gnu.org ([209.51.188.92]:56985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1h0pEp-0002h6-Tq
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:10:44 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0pI0-0003ew-Ln
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1h0pEo-0003BY-Uq
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:10:43 -0500
-Received: from mail-ve1eur03on0726.outbound.protection.outlook.com
-	([2a01:111:f400:fe09::726]:51943
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1h0pEn-00032O-RX
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:10:42 -0500
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Mon, 4 Mar 2019 15:10:34 +0000
-Message-ID: <8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
-References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <67C0EAEAA643D345A10F19F6067C8BCF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0pHz-0006ry-OO
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:00 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
+	id 1h0pHz-0006pW-CR
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:13:59 -0500
+Received: by mail-ot1-x344.google.com with SMTP id i5so4470716oto.9
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 07:13:59 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/3] migration: add sztd compression
+References: <20190223105421.1290-1-davidkiarie4@gmail.com>
+	<20190223105421.1290-2-davidkiarie4@gmail.com>
+	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
+	<CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
+	<CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
+	<CABdVeABUzvwA8jV8ZfTcDY8eWN5=M2Otku6eukaBsPeMqPNOhQ@mail.gmail.com>
+	<CABdVeABnosV3-u9aepP=kSrb9P0X6-vUWZ2kDATUmNLmaJ_5+g@mail.gmail.com>
+	<CABdVeACgD7NrRa+P9yzkjhNJAtf9JEaJKuzo+J3CMCxLUO3phQ@mail.gmail.com>
+	<CABdVeACYb_TpARadx1FkQwODY7pqFp=Bm4RyZ3easb4Hm1JAyw@mail.gmail.com>
+In-Reply-To: <CABdVeACYb_TpARadx1FkQwODY7pqFp=Bm4RyZ3easb4Hm1JAyw@mail.gmail.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Mon, 4 Mar 2019 18:13:10 +0300
+Message-ID: <CABdVeAD2mfUR5-29NQ=jkWjLRt6wyQNJEk4hFOZYFsnKCgYZFg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +36,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
-Cc: Denis Lunev <den@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
 
-cGluZyENCg0KT24gMjYuMDIuMjAxOSAxNjoxNSwgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPiB6
-c3RkIGRhdGUgY29tcHJlc3Npb24gYWxnb3JpdGhtIHNob3dzIGJldHRlciBwZXJmb3JtYW5jZSBv
-biBkYXRhIGNvbXByZXNzaW9uLg0KPiBJdCBtaWdodCBiZSB1c2VmdWwgdG8gZW1wbG95IHRoZSBh
-bGdvcml0aG0gaW4gVk0gbWlncmF0aW9uIHRvIHJlZHVjZSBDUFUgdXNhZ2UuDQo+IEEgdXNlciB3
-aWxsIGJlIGFibGUgdG8gY2hvb3NlIGJldHdlZW4gdGhvc2UgYWxnb3JpdGhtcywgdGhlcmVmb3Ig
-Y29tcHJlc3MtdHlwZQ0KPiBtaWdyYXRpb24gcGFyYW1ldGVyIGlzIGFkZGVkLg0KPiANCj4gSGVy
-ZSBhcmUgc29tZSByZXN1bHRzIG9mIHBlcmZvcm1hbmNlIGNvbXBhcmlzb24genN0ZCB2cyBnemlw
-Og0KPiANCj4gaG9zdDogaTctNDc5MCA4eENQVSBAIDMuNjBHSHosIDE2RyBSQU0NCj4gbWlncmF0
-aW9uIHRvIHRoZSBzYW1lIGhvc3QNCj4gVk06IDJ4VkNQVSwgOEcgUkFNIHRvdGFsDQo+IDVHIFJB
-TSB1c2VkLCBtZW1vcnkgcG9wdWxhdGVkIHdpdGggcG9zdGdyZXFzbCBkYXRhDQo+IHByb2R1Y2Vk
-IGJ5IHBnYmVuY2ggcGVyZm9ybWFuY2UgYmVuY2htYXJrDQo+IA0KPiANCj4gVGhyZWFkczogMSBj
-b21wcmVzcyDigJMgMSBkZWNvbXByZXNzDQo+IA0KPiB6c3RkIHByb3ZpZGVzIHNsaWdodGx5IGxl
-c3MgY29tcHJlc3Npb24gcmF0aW8gd2l0aCBhbG1vc3QgdGhlIHNhbWUNCj4gQ1BVIHVzYWdlIGJ1
-dCBjb3BlcyB3aXRoIFJBTSAgY29tcHJlc3Npb24gcm9naGx5IDIgdGltZXMgZmFzdGVyDQo+IA0K
-PiBjb21wcmVzc2lvbiB0eXBlICAgICAgICAgICAgICB6bGliICAgICAgIHwgICAgICB6c3RkDQo+
-IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LQ0KPiBjb21wcmVzc2lvbiBsZXZlbCAgICAgICAgICAxICAgICAgIDUgICAgIHwgICAxICAgICAg
-IDUNCj4gY29tcHJlc3Npb24gcmF0aW8gICAgICAgICAgNi45MiAgICA3LjA1ICB8ICAgNi42OSAg
-ICA2Ljg5DQo+IGNwdSBpZGxlLCAlICAgICAgICAgICAgICAgIDgyICAgICAgODMgICAgfCAgIDg2
-ICAgICAgODANCj4gdGltZSwgc2VjICAgICAgICAgICAgICAgICAgNDkgICAgICA3MSAgICB8ICAg
-MjYgICAgICAzMQ0KPiB0aW1lIGRpZmYgdG8gemxpYiwgc2VjICAgICAgICAgICAgICAgICAgICAg
-IC0yNSAgICAgLTQxDQo+IA0KPiANCj4gVGhyZWFkczogOCBjb21wcmVzcyDigJMgMiBkZWNvbXBy
-ZXNzDQo+IA0KPiB6c3RkIHByb3ZpZGVzIHRoZSBzYW1lIG1pZ3JhdGlvbiB0aW1lIHdpdGggbGVz
-cyBjcHUgY29uc3VtcHRpb24NCj4gDQo+IGNvbXByZXNzaW9uIHR5cGUgICAgICAgICBub25lICB8
-ICAgICAgICBnemlwKHpsaWIpICAgIHwgICAgICAgICAgenN0ZA0KPiAtLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0NCj4gY29tcHJlc3Npb24gbGV2ZWwgICAgICAgIC0gICAgIHwgIDEgICAgICA1ICAgICAg
-IDkgICAgfCAgIDEgICAgICAgNSAgICAgICAxNQ0KPiBjb21wcmVzc2lvbiByYXRpbyAgICAgICAg
-LSAgICAgfCAgNi45NCAgIDYuOTkgICAgNy4xNCB8ICAgNi42NCAgICA2Ljg5ICAgIDYuOTMNCj4g
-dGltZSwgc2VjICAgICAgICAgICAgICAgIDE1NCAgIHwgIDIyICAgICAyMyAgICAgIDI3ICAgfCAg
-IDIzICAgICAgMjMgICAgICAyNQ0KPiBjcHUgaWRsZSwgJSAgICAgICAgICAgICAgOTkgICAgfCAg
-NDUgICAgIDMwICAgICAgMTIgICB8ICAgNzAgICAgICA1MiAgICAgIDIzDQo+IGNwdSBpZGxlIGRp
-ZmYgdG8gemxpYiAgICAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgIHwgIC0yNSUgICAgLTIy
-JSAgICAtMTElDQo+IA0KPiANCj4gRGVuaXMgUGxvdG5pa292ICgzKToNCj4gICAgbWlncmF0aW9u
-OiByZXdvcmsgY29tcHJlc3Npb24gY29kZSBmb3IgYWRkaW5nIG1vcmUgZGF0YSBjb21wcmVzc29y
-cw0KPiAgICBobXA6IGFkZCBjb21wcmVzcy10eXBlIHBhcmFtZXRlciB0byBtaWdyYXRpb24gcGFy
-YW1ldGVycw0KPiAgICBtaWdyYXRpb246IGFkZCB6c3RkIGNvbXByZXNzaW9uDQo+IA0KPiAgIGNv
-bmZpZ3VyZSAgICAgICAgICAgICB8ICAyNiArKysrDQo+ICAgaG1wLmMgICAgICAgICAgICAgICAg
-IHwgICA4ICsrDQo+ICAgbWlncmF0aW9uL21pZ3JhdGlvbi5jIHwgIDQ1ICsrKysrKy0NCj4gICBt
-aWdyYXRpb24vbWlncmF0aW9uLmggfCAgIDEgKw0KPiAgIG1pZ3JhdGlvbi9xZW11LWZpbGUuYyB8
-ICAzOSArKy0tLS0NCj4gICBtaWdyYXRpb24vcWVtdS1maWxlLmggfCAgMTggKystDQo+ICAgbWln
-cmF0aW9uL3JhbS5jICAgICAgIHwgMjkxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KystLS0tLS0tLQ0KPiAgIHFhcGkvbWlncmF0aW9uLmpzb24gICB8ICAyNiArKystDQo+ICAgOCBm
-aWxlcyBjaGFuZ2VkLCAzNjkgaW5zZXJ0aW9ucygrKSwgODUgZGVsZXRpb25zKC0pDQo+IA0KDQot
-LSANCkJlc3QsDQpEZW5pcw0K
+>>>>>>
+>>>>>> Hi David,
+>>>>>>>
+>>>>>>> On 2/23/19 11:54 AM, David Kiarie wrote:
+>>>>>>> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
+>>>>>>> > ---
+>>>>>>> >  hw/i386/amd_iommu.c | 2 +-
+>>>>>>> >  hw/i386/amd_iommu.h | 2 +-
+>>>>>>> >  2 files changed, 2 insertions(+), 2 deletions(-)
+>>>>>>> >
+>>>>>>> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+>>>>>>> > index 8ad707a..4f179da 100644
+>>>>>>> > --- a/hw/i386/amd_iommu.c
+>>>>>>> > +++ b/hw/i386/amd_iommu.c
+>>>>>>> > @@ -2,7 +2,7 @@
+>>>>>>> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
+>>>>>>> >   *
+>>>>>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+>>>>>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+>>>>>>> > + * Copyright (C) 2016 David Kiarie Kahurani
+>>>>>>>
+>>>>>>> Why do you change the year? Because your work was merged in 2016?
+>>>>>>>
+>>>>>>
+>>>>>> no.
+>>>>>>
+>>>>>>
+>>>>>
+>>>>> though, if you have a legitimate issue with the change, you can always
+>>>>> air it.
+>>>>>
+>>>>
+>>>> you might think random emails are weird but Paolo, i don't expect to
+>>>> see any activity from you, on Qemu repo before this issue is sorted ;-)
+>>>>
+>>>
+>>> i mostly don't care about this code but i *wrote* it. if i am not
+>>> allowed even make such minor(which i not a routine), why shouldn't i ask
+>>> you to take the files down?
+>>>
+>>
+>> or, rather, a small issue turns into a scene about how clean Qemu is. why
+>> not take down all my dirty code?
+>>
+>
+> look i'm resending this patch and next time we're having this
+> conversation, i'll be defacing qemu.
+>
+
+
+either you have to update my code to what i think it should look like or
+you have to take down - wtf
+
+then you try to cook rubbish over it.
+
+
+>
+>
+>>
+>>
+>>>
+>>>
+>>>>
+>>>>
+>>>>>
+>>>>>
+>>>>>>
+>>>>>>> >   *
+>>>>>>> >   * This program is free software; you can redistribute it and/or
+>>>>>>> modify
+>>>>>>> >   * it under the terms of the GNU General Public License as
+>>>>>>> published by
+>>>>>>> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+>>>>>>> > index c52886f..cb258a7 100644
+>>>>>>> > --- a/hw/i386/amd_iommu.h
+>>>>>>> > +++ b/hw/i386/amd_iommu.h
+>>>>>>> > @@ -2,7 +2,7 @@
+>>>>>>> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
+>>>>>>> >   *
+>>>>>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+>>>>>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+>>>>>>> > + * Copyright (C) 2016 David Kiarie Kahurani
+>>>>>>> >   *
+>>>>>>> >   * This program is free software; you can redistribute it and/or
+>>>>>>> modify
+>>>>>>> >   * it under the terms of the GNU General Public License as
+>>>>>>> published by
+>>>>>>> >
+>>>>>>>
+>>>>>>
