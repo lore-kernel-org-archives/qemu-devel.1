@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45303)
+Received: from eggs.gnu.org ([209.51.188.92]:45449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBe-00014J-IL
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:39 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h0sBz-0001Ka-FL
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBX-0002dq-11
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:34 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:44 -0500
-Message-Id: <20190304181813.8075-45-cota@braap.org>
-In-Reply-To: <20190304181813.8075-1-cota@braap.org>
-References: <20190304181813.8075-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v7 44/73] ppc: convert to cpu_interrupt_request
+	(envelope-from <jsnow@redhat.com>) id 1h0sBx-00034D-FP
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:59 -0500
+References: <1551456970-463-1-git-send-email-thuth@redhat.com>
+	<74a6796e-1242-69dd-a74d-74525955f100@redhat.com>
+	<257d080a-27f9-52e5-76e4-d6929b80cad5@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <33777032-b737-6ece-02f5-ec62f44e7a8d@redhat.com>
+Date: Mon, 4 Mar 2019 13:13:12 -0500
+MIME-Version: 1.0
+In-Reply-To: <257d080a-27f9-52e5-76e4-d6929b80cad5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: Remove (mostly) useless
+ architecture checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,121 +26,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <minyard@acm.org>
 
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- hw/ppc/ppc.c                    |  2 +-
- target/ppc/kvm.c                |  4 ++--
- target/ppc/translate_init.inc.c | 14 +++++++-------
- 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index 45e212390a..100badefe4 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -89,7 +89,7 @@ void ppc_set_irq(PowerPCCPU *cpu, int n_IRQ, int level)
- 
-     LOG_IRQ("%s: %p n_IRQ %d level %d => pending %08" PRIx32
-                 "req %08x\n", __func__, env, n_IRQ, level,
--                env->pending_interrupts, CPU(cpu)->interrupt_request);
-+                env->pending_interrupts, cpu_interrupt_request(CPU(cpu)));
- 
-     if (locked) {
-         qemu_mutex_unlock_iothread();
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index faa757c417..16f09c504d 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1339,7 +1339,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
-      * interrupt, reset, etc) in PPC-specific env->irq_input_state. */
-     if (!cap_interrupt_level &&
-         run->ready_for_interrupt_injection &&
--        (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+        (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
-         (env->irq_input_state & (1<<PPC_INPUT_INT)))
-     {
-         /* For now KVM disregards the 'irq' argument. However, in the
-@@ -1381,7 +1381,7 @@ static int kvmppc_handle_halt(PowerPCCPU *cpu)
-     CPUState *cs = CPU(cpu);
-     CPUPPCState *env = &cpu->env;
- 
--    if (!(cs->interrupt_request & CPU_INTERRUPT_HARD) && (msr_ee)) {
-+    if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) && (msr_ee)) {
-         cpu_halted_set(cs, 1);
-         cs->exception_index = EXCP_HLT;
-     }
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index b2cad43e2a..f387404913 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8469,7 +8469,7 @@ static bool cpu_has_work_POWER7(CPUState *cs)
-     CPUPPCState *env = &cpu->env;
- 
-     if (cpu_halted(cs)) {
--        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-             return false;
-         }
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
-@@ -8493,7 +8493,7 @@ static bool cpu_has_work_POWER7(CPUState *cs)
-         }
-         return false;
-     } else {
--        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
-     }
- }
- 
-@@ -8623,7 +8623,7 @@ static bool cpu_has_work_POWER8(CPUState *cs)
-     CPUPPCState *env = &cpu->env;
- 
-     if (cpu_halted(cs)) {
--        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-             return false;
-         }
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
-@@ -8655,7 +8655,7 @@ static bool cpu_has_work_POWER8(CPUState *cs)
-         }
-         return false;
-     } else {
--        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
-     }
- }
- 
-@@ -8817,7 +8817,7 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-     if (cpu_halted(cs)) {
-         uint64_t psscr = env->spr[SPR_PSSCR];
- 
--        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-             return false;
-         }
- 
-@@ -8863,7 +8863,7 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-         }
-         return false;
-     } else {
--        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
-     }
- }
- 
-@@ -10332,7 +10332,7 @@ static bool ppc_cpu_has_work(CPUState *cs)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
- 
--    return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+    return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
- }
- 
- /* CPUClass::reset() */
--- 
-2.17.1
+
+On 3/3/19 9:15 AM, Thomas Huth wrote:
+> On 01/03/2019 18.57, John Snow wrote:
+>>
+>>
+>> On 3/1/19 11:16 AM, Thomas Huth wrote:
+>>> These checks at the beginning of some of the tests are mostly useless:
+>>> We only run the tests on x86 anyway, and g_test_message() does not
+>>> print anything unless you call g_test_init() first.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  tests/fdc-test.c      | 7 -------
+>>>  tests/ide-test.c      | 7 -------
+>>>  tests/ipmi-bt-test.c  | 7 -------
+>>>  tests/ipmi-kcs-test.c | 7 -------
+>>>  4 files changed, 28 deletions(-)
+>>>
+>>> diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+>>> index 88f1abf..31cd329 100644
+>>> --- a/tests/fdc-test.c
+>>> +++ b/tests/fdc-test.c
+>>> @@ -548,16 +548,9 @@ static void fuzz_registers(void)
+>>>  
+>>>  int main(int argc, char **argv)
+>>>  {
+>>> -    const char *arch = qtest_get_arch();
+>>>      int fd;
+>>>      int ret;
+>>>  
+>>> -    /* Check architecture */
+>>> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+>>> -        g_test_message("Skipping test for non-x86\n");
+>>> -        return 0;
+>>> -    }
+>>> -
+>>>      /* Create a temporary raw image */
+>>>      fd = mkstemp(test_image);
+>>>      g_assert(fd >= 0);
+>>> diff --git a/tests/ide-test.c b/tests/ide-test.c
+>>> index f0280e6..300d64e 100644
+>>> --- a/tests/ide-test.c
+>>> +++ b/tests/ide-test.c
+>>> @@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
+>>>  
+>>>  int main(int argc, char **argv)
+>>>  {
+>>> -    const char *arch = qtest_get_arch();
+>>>      int fd;
+>>>      int ret;
+>>>  
+>>> -    /* Check architecture */
+>>> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+>>> -        g_test_message("Skipping test for non-x86\n");
+>>> -        return 0;
+>>> -    }
+>>> -
+>>>      /* Create temporary blkdebug instructions */
+>>>      fd = mkstemp(debug_path);
+>>>      g_assert(fd >= 0);
+>>> diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
+>>> index f4a81b5..fc4c83b 100644
+>>> --- a/tests/ipmi-bt-test.c
+>>> +++ b/tests/ipmi-bt-test.c
+>>> @@ -400,15 +400,8 @@ static void open_socket(void)
+>>>  
+>>>  int main(int argc, char **argv)
+>>>  {
+>>> -    const char *arch = qtest_get_arch();
+>>>      int ret;
+>>>  
+>>> -    /* Check architecture */
+>>> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+>>> -        g_test_message("Skipping test for non-x86\n");
+>>> -        return 0;
+>>> -    }
+>>> -
+>>>      open_socket();
+>>>  
+>>>      /* Run the tests */
+>>> diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
+>>> index 178ffc1..a2354c1 100644
+>>> --- a/tests/ipmi-kcs-test.c
+>>> +++ b/tests/ipmi-kcs-test.c
+>>> @@ -263,16 +263,9 @@ static void test_enable_irq(void)
+>>>  
+>>>  int main(int argc, char **argv)
+>>>  {
+>>> -    const char *arch = qtest_get_arch();
+>>>      char *cmdline;
+>>>      int ret;
+>>>  
+>>> -    /* Check architecture */
+>>> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+>>> -        g_test_message("Skipping test for non-x86\n");
+>>> -        return 0;
+>>> -    }
+>>> -
+>>>      /* Run the tests */
+>>>      g_test_init(&argc, &argv, NULL);
+>>>  
+>>>
+>>
+>> Hm, if you insist. I have no strong feelings... Do we plan to split
+>> tests out by architecture eventually? Clearly x86 only tests don't
+>> really need to each individually check the arch, but I'm not sure what
+>> the vision is.
+> 
+> We could also fix the g_test_message() output by moving it after the
+> g_test_init() ... I don't mind too much which way we go, but at least
+> the current state is bad.
+> 
+> Looking at other tests, we seem to be pretty inconsistent in checking
+> the architecture at the beginning. For example q35-test.c,
+> pvpanic-test.c and test-x86-cpuid.c do not check for x86, while
+> rtas-test.c has a check for ppc64...
+> 
+>> Either way, since I have no horse in the race:
+>>
+>> Acked-by: John Snow <jsnow@redhat.com>
+> 
+> Thanks!
+> 
+>  Thomas
+> 
+
+In that case, might as well be consistent first and we can refactor our
+test suite when we have a reason to want to do that.
+
+Thanks for the explanation!
+
+--js
