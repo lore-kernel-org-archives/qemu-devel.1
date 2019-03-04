@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46089)
+Received: from eggs.gnu.org ([209.51.188.92]:46218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mIc-0008JX-DF
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:34 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mIm-0008QW-Nm
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mIW-00085f-3g
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:26 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mIl-0008Sm-5o
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:36 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  4 Mar 2019 13:01:44 +0100
-Message-Id: <20190304120210.31500-2-cohuck@redhat.com>
+Date: Mon,  4 Mar 2019 13:01:48 +0100
+Message-Id: <20190304120210.31500-6-cohuck@redhat.com>
 In-Reply-To: <20190304120210.31500-1-cohuck@redhat.com>
 References: <20190304120210.31500-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 01/27] s390x: Use cpu_to_be64 in SIGP STORE
- ADDITIONAL STATUS
+Subject: [Qemu-devel] [PULL 05/27] s390x/vfio-ap: document hot plug/unplug
+ of vfio-ap device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,80 +21,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Tony Krowiak <akrowiak@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
 
-As we will support vector instructions soon, and vector registers are
-stored in 64bit host chunks, let's use cpu_to_be64. Same applies to the
-guarded storage control block.
+Let's update the vfio-ap.txt document to include the hot plug/unplug
+support.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190222081153.14206-2-david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Message-Id: <1550519397-25359-3-git-send-email-akrowiak@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/helper.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ docs/vfio-ap.txt | 61 ++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 56 insertions(+), 5 deletions(-)
 
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 3d74836a8394..f3fcf96482ef 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -272,32 +272,43 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
-     return 0;
- }
+diff --git a/docs/vfio-ap.txt b/docs/vfio-ap.txt
+index 12339684cd52..8cd060a01e10 100644
+--- a/docs/vfio-ap.txt
++++ b/docs/vfio-ap.txt
+@@ -440,8 +440,7 @@ unassign_control_domain
+    'unassign_domain' file. This may be done multiple times to unassign more than
+    one control domain.
  
--#define ADTL_GS_OFFSET   1024 /* offset of GS data in adtl save area */
-+typedef struct SigpAdtlSaveArea {
-+    uint64_t    vregs[32][2];                     /* 0x0000 */
-+    uint8_t     pad_0x0200[0x0400 - 0x0200];      /* 0x0200 */
-+    uint64_t    gscb[4];                          /* 0x0400 */
-+    uint8_t     pad_0x0420[0x1000 - 0x0420];      /* 0x0420 */
-+} SigpAdtlSaveArea;
-+QEMU_BUILD_BUG_ON(sizeof(SigpAdtlSaveArea) != 4096);
+-Notes: Hot plug/unplug is not currently supported for mediated AP matrix
+-devices, so no changes to the AP matrix will be allowed while a guest using
++Notes: No changes to the AP matrix will be allowed while a guest using
+ the mediated matrix device is running. Attempts to assign an adapter,
+ domain or control domain will be rejected and an error (EBUSY) returned.
+ 
+@@ -562,6 +561,54 @@ facilities:
+                      for guest usage, no AP devices can be made accessible to a
+                      guest started without APFT installed.
+ 
++Hot plug a vfio-ap device into a running guest:
++==============================================
++Only one vfio-ap device can be attached to the virtual machine's ap-bus, so a
++vfio-ap device can be hot plugged if and only if no vfio-ap device is attached
++to the bus already, whether via the QEMU command line or a prior hot plug
++action.
 +
- #define ADTL_GS_MIN_SIZE 2048 /* minimal size of adtl save area for GS */
- int s390_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len)
- {
-+    SigpAdtlSaveArea *sa;
-     hwaddr save = len;
--    void *mem;
-+    int i;
++To hot plug a vfio-ap device, use the QEMU device_add command:
++
++    (qemu) device_add vfio-ap,sysfsdev="$path-to-mdev"
++
++    Where the '$path-to-mdev' value specifies the absolute path to a mediated
++    device to which AP resources to be used by the guest have been assigned.
++
++Note that on Linux guests, the AP devices will be created in the
++/sys/bus/ap/devices directory when the AP bus subsequently performs its periodic
++scan, so there may be a short delay before the AP devices are accessible on the
++guest.
++
++The command will fail if:
++
++* A vfio-ap device has already been attached to the virtual machine's ap-bus.
++
++* The CPU model features for controlling guest access to AP facilities are not
++  enabled (see 'CPU model features' subsection in the previous section).
++
++Hot unplug a vfio-ap device from a running guest:
++================================================
++A vfio-ap device can be unplugged from a running KVM guest if a vfio-ap device
++has been attached to the virtual machine's ap-bus via the QEMU command line
++or a prior hot plug action.
++
++To hot unplug a vfio-ap device, use the QEMU device_del command:
++
++    (qemu) device_del vfio-ap,sysfsdev="$path-to-mdev"
++
++    Where $path-to-mdev is the same as the path specified when the vfio-ap
++    device was attached to the virtual machine's ap-bus.
++
++On a Linux guest, the AP devices will be removed from the /sys/bus/ap/devices
++directory on the guest when the AP bus subsequently performs its periodic scan,
++so there may be a short delay before the AP devices are no longer accessible by
++the guest.
++
++The command will fail if the $path-to-mdev specified on the device_del command
++does not match the value specified when the vfio-ap device was attached to
++the virtual machine's ap-bus.
++
+ Example: Configure AP Matrixes for Three Linux Guests:
+ =====================================================
+ Let's now provide an example to illustrate how KVM guests may be given
+@@ -819,7 +866,11 @@ Limitations
+   assigned lest the host be given access to the private data of the AP queue
+   device, such as a private key configured specifically for the guest.
  
--    mem = cpu_physical_memory_map(addr, &save, 1);
--    if (!mem) {
-+    sa = cpu_physical_memory_map(addr, &save, 1);
-+    if (!sa) {
-         return -EFAULT;
-     }
-     if (save != len) {
--        cpu_physical_memory_unmap(mem, len, 1, 0);
-+        cpu_physical_memory_unmap(sa, len, 1, 0);
-         return -EFAULT;
-     }
+-* Dynamically modifying the AP matrix for a running guest (which would amount to
+-  hot(un)plug of AP devices for the guest) is currently not supported
++* Dynamically assigning AP resources to or unassigning AP resources from a
++  mediated matrix device - see 'Configuring an AP matrix for a linux guest'
++  section above - while a running guest is using it is currently not supported.
  
--    /* FIXME: as soon as TCG supports these features, convert cpu->be */
-     if (s390_has_feat(S390_FEAT_VECTOR)) {
--        memcpy(mem, &cpu->env.vregs, 512);
-+        for (i = 0; i < 32; i++) {
-+            sa->vregs[i][0] = cpu_to_be64(cpu->env.vregs[i][0].ll);
-+            sa->vregs[i][1] = cpu_to_be64(cpu->env.vregs[i][1].ll);
-+        }
-     }
-     if (s390_has_feat(S390_FEAT_GUARDED_STORAGE) && len >= ADTL_GS_MIN_SIZE) {
--        memcpy(mem + ADTL_GS_OFFSET, &cpu->env.gscb, 32);
-+        for (i = 0; i < 4; i++) {
-+            sa->gscb[i] = cpu_to_be64(cpu->env.gscb[i]);
-+        }
-     }
- 
--    cpu_physical_memory_unmap(mem, len, 1, len);
--
-+    cpu_physical_memory_unmap(sa, len, 1, len);
-     return 0;
- }
- #endif /* CONFIG_USER_ONLY */
+-* Live guest migration is not supported for guests using AP devices.
++* Live guest migration is not supported for guests using AP devices. If a guest
++  is using AP devices, the vfio-ap device configured for the guest must be
++  unplugged before migrating the guest (see 'Hot unplug a vfio-ap device from a
++  running guest' section above.
 -- 
 2.17.2
