@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57172)
+Received: from eggs.gnu.org ([209.51.188.92]:57168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h0pIe-00040k-9d
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h0pIe-00040i-91
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h0pIc-0007r7-O6
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h0pIc-0007qk-Jr
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:40 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:39727 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:39729 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1h0pIc-0007o9-7q
+	id 1h0pIc-0007oD-6z
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:38 -0500
 From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Mon,  4 Mar 2019 16:13:21 +0100
-Message-Id: <1551712405-2530-10-git-send-email-mateja.marjanovic@rt-rk.com>
+Date: Mon,  4 Mar 2019 16:13:25 +0100
+Message-Id: <1551712405-2530-14-git-send-email-mateja.marjanovic@rt-rk.com>
 In-Reply-To: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>
 References: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 09/13] target/mips: Add emulation of MMI
- instruction PEXTLH
+Subject: [Qemu-devel] [PATCH v3 13/13] target/mips: Add emulation of MMI
+ instruction PEXTUW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +30,34 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-Add emulation of MMI instruction PEXTLH. The emulation is implemented
+Add emulation of MMI instruction PEXTUW. The emulation is implemented
 using TCG front end operations directly to achieve better performance.
 
 Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 ---
- target/mips/translate.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 69 insertions(+), 1 deletion(-)
+ target/mips/translate.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e84262f..5c2fc07 100644
+index da3fcad..5848f7a 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -24874,6 +24874,72 @@ static void gen_mmi_pextlb(DisasContext *ctx)
+@@ -25151,6 +25151,60 @@ static void gen_mmi_pextuh(DisasContext *ctx)
      }
  }
  
 +/*
-+ *  PEXTLH rd, rs, rt
++ *  PEXTUW rd, rs, rt
 + *
-+ *  Parallel Extend Lower from Halfword
++ *  Parallel Extend Upper from Word
 + *
 + *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
 + *  +-----------+---------+---------+---------+---------+-----------+
-+ *  |    MMI    |    rs   |   rt    |   rd    | PEXTLH  |    MMI0   |
++ *  |    MMI    |    rs   |   rt    |   rd    | PEXTUW  |    MMI1   |
 + *  +-----------+---------+---------+---------+---------+-----------+
 + */
 +
-+static void gen_mmi_pextlh(DisasContext *ctx)
++static void gen_mmi_pextuw(DisasContext *ctx)
 +{
 +    uint32_t rs, rt, rd;
 +    uint32_t opcode;
@@ -73,37 +73,25 @@ index e84262f..5c2fc07 100644
 +    } else {
 +        TCGv_i64 t0 = tcg_temp_new();
 +        TCGv_i64 t1 = tcg_temp_new();
-+        uint64_t mask = ((1ULL << 16) - 1) << 48;
++        uint64_t mask = (1ULL << 32) - 1;
 +
 +        tcg_gen_movi_i64(t1, 0);
-+        tcg_gen_andi_i64(t0, cpu_gpr[rs], mask);
-+        tcg_gen_or_i64(t1, t0, t1);
++
 +        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask);
-+        tcg_gen_shri_i64(t0, t0, 16);
 +        tcg_gen_or_i64(t1, t0, t1);
-+        mask >>= 16;
 +        tcg_gen_andi_i64(t0, cpu_gpr[rs], mask);
++        tcg_gen_shli_i64(t0, t0, 32);
 +        tcg_gen_or_i64(t1, t0, t1);
-+        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask);
-+        tcg_gen_shri_i64(t0, t0, 16);
-+        tcg_gen_or_i64(t1, t0, t1);
++        mask <<= 32;
 +
 +        tcg_gen_mov_i64(cpu_mmr[rd], t1);
-+
-+        mask >>= 16;
 +        tcg_gen_movi_i64(t1, 0);
-+        tcg_gen_andi_i64(t0, cpu_gpr[rs], mask);
-+        tcg_gen_or_i64(t1, t0, t1);
++
 +        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask);
-+        tcg_gen_shri_i64(t0, t0, 16);
 +        tcg_gen_or_i64(t1, t0, t1);
-+        mask >>= 16;
 +        tcg_gen_andi_i64(t0, cpu_gpr[rs], mask);
++        tcg_gen_shli_i64(t0, t0, 32);
 +        tcg_gen_or_i64(t1, t0, t1);
-+        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask);
-+        tcg_gen_shri_i64(t0, t0, 16);
-+        tcg_gen_or_i64(t1, t0, t1);
-+        mask >>= 16;
 +
 +        tcg_gen_mov_i64(cpu_gpr[rd], t1);
 +
@@ -115,23 +103,23 @@ index e84262f..5c2fc07 100644
  #endif
  
  
-@@ -27825,7 +27891,6 @@ static void decode_mmi0(CPUMIPSState *env, DisasContext *ctx)
-     case MMI_OPC_0_PPACW:     /* TODO: MMI_OPC_0_PPACW */
-     case MMI_OPC_0_PADDSH:    /* TODO: MMI_OPC_0_PADDSH */
-     case MMI_OPC_0_PSUBSH:    /* TODO: MMI_OPC_0_PSUBSH */
--    case MMI_OPC_0_PEXTLH:    /* TODO: MMI_OPC_0_PEXTLH */
-     case MMI_OPC_0_PPACH:     /* TODO: MMI_OPC_0_PPACH */
-     case MMI_OPC_0_PADDSB:    /* TODO: MMI_OPC_0_PADDSB */
-     case MMI_OPC_0_PSUBSB:    /* TODO: MMI_OPC_0_PSUBSB */
-@@ -27837,6 +27902,9 @@ static void decode_mmi0(CPUMIPSState *env, DisasContext *ctx)
-    case MMI_OPC_0_PEXTLB:
-         gen_mmi_pextlb(ctx);
+@@ -28140,7 +28194,6 @@ static void decode_mmi1(CPUMIPSState *env, DisasContext *ctx)
+     case MMI_OPC_1_PCEQB:     /* TODO: MMI_OPC_1_PCEQB */
+     case MMI_OPC_1_PADDUW:    /* TODO: MMI_OPC_1_PADDUW */
+     case MMI_OPC_1_PSUBUW:    /* TODO: MMI_OPC_1_PSUBUW */
+-    case MMI_OPC_1_PEXTUW:    /* TODO: MMI_OPC_1_PEXTUW */
+     case MMI_OPC_1_PADDUH:    /* TODO: MMI_OPC_1_PADDUH */
+     case MMI_OPC_1_PSUBUH:    /* TODO: MMI_OPC_1_PSUBUH */
+     case MMI_OPC_1_PADDUB:    /* TODO: MMI_OPC_1_PADDUB */
+@@ -28154,6 +28207,9 @@ static void decode_mmi1(CPUMIPSState *env, DisasContext *ctx)
+     case MMI_OPC_1_PEXTUH:
+         gen_mmi_pextuh(ctx);
          break;
-+    case MMI_OPC_0_PEXTLH:
-+        gen_mmi_pextlh(ctx);
++    case MMI_OPC_1_PEXTUW:
++        gen_mmi_pextuw(ctx);
 +        break;
      default:
-         MIPS_INVAL("TX79 MMI class MMI0");
+         MIPS_INVAL("TX79 MMI class MMI1");
          generate_exception_end(ctx, EXCP_RI);
 -- 
 2.7.4
