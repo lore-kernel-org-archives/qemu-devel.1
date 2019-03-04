@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39202)
+Received: from eggs.gnu.org ([209.51.188.92]:40884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0nsj-0006Oj-CA
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:43:50 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h0o2A-00083B-R9
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:53:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0nsi-0004kF-GE
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:43:49 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:39830)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1h0nsi-0004iN-8E
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:43:48 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id e15so4219988otk.6
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 05:43:48 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1h0o29-0007yM-Gg
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:53:34 -0500
+Date: Mon, 4 Mar 2019 14:52:30 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190304145230.4435c998@redhat.com>
+In-Reply-To: <20190301180151.GE2851@work-vm>
+References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
+	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
+	<20190301154947.GJ21251@redhat.com>
+	<20190301183328.20b63e23@redhat.com>
+	<20190301180151.GE2851@work-vm>
 MIME-Version: 1.0
-References: <20190223105421.1290-1-davidkiarie4@gmail.com>
-	<20190223105421.1290-2-davidkiarie4@gmail.com>
-	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
-	<CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
-In-Reply-To: <CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
-From: David Kiarie <davidkiarie4@gmail.com>
-Date: Mon, 4 Mar 2019 16:42:58 +0300
-Message-ID: <CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
+ parameter of '-numa node' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +27,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Mon, Mar 4, 2019 at 3:57 PM David Kiarie <davidkiarie4@gmail.com> wrote:
+On Fri, 1 Mar 2019 18:01:52 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
->
->
-> On Mon, Mar 4, 2019 at 2:57 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
-.com>
-> wrote:
->
->> Hi David,
->>
->> On 2/23/19 11:54 AM, David Kiarie wrote:
->> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
->> > ---
->> >  hw/i386/amd_iommu.c | 2 +-
->> >  hw/i386/amd_iommu.h | 2 +-
->> >  2 files changed, 2 insertions(+), 2 deletions(-)
->> >
->> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
->> > index 8ad707a..4f179da 100644
->> > --- a/hw/i386/amd_iommu.c
->> > +++ b/hw/i386/amd_iommu.c
->> > @@ -2,7 +2,7 @@
->> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
->> >   *
->> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->> > + * Copyright (C) 2016 David Kiarie Kahurani
->>
->> Why do you change the year? Because your work was merged in 2016?
->>
->
-> no.
->
->
+> * Igor Mammedov (imammedo@redhat.com) wrote:
+> > On Fri, 1 Mar 2019 15:49:47 +0000
+> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >  =20
+> > > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote: =20
+> > > > The parameter allows to configure fake NUMA topology where guest
+> > > > VM simulates NUMA topology but not actually getting a performance
+> > > > benefits from it. The same or better results could be achieved
+> > > > using 'memdev' parameter. In light of that any VM that uses NUMA
+> > > > to get its benefits should use 'memdev' and to allow transition
+> > > > initial RAM to device based model, deprecate 'mem' parameter as
+> > > > its ad-hoc partitioning of initial RAM MemoryRegion can't be
+> > > > translated to memdev based backend transparently to users and in
+> > > > compatible manner (migration wise).
+> > > >=20
+> > > > That will also allow to clean up a bit our numa code, leaving only
+> > > > 'memdev' impl. in place and several boards that use node_mem
+> > > > to generate FDT/ACPI description from it.   =20
+> > >=20
+> > > Can you confirm that the  'mem' and 'memdev' parameters to -numa
+> > > are 100% live migration compatible in both directions ?  Libvirt
+> > > would need this to be the case in order to use the 'memdev' syntax
+> > > instead. =20
+> > Unfortunately they are not migration compatible in any direction,
+> > if it where possible to translate them to each other I'd alias 'mem'
+> > to 'memdev' without deprecation. The former sends over only one
+> > MemoryRegion to target, while the later sends over several (one per
+> > memdev).
+> >=20
+> > Mixed memory issue[1] first came from libvirt side RHBZ1624223,
+> > back then it was resolved on libvirt side in favor of migration
+> > compatibility vs correctness (i.e. bind policy doesn't work as expected=
+).
+> > What worse that it was made default and affects all new machines,
+> > as I understood it.
+> >=20
+> > In case of -mem-path + -mem-prealloc (with 1 numa node or numa less)
+> > it's possible on QEMU side to make conversion to memdev in migration
+> > compatible way (that's what stopped Michal from memdev approach).
+> > But it's hard to do so in multi-nodes case as amount of MemoryRegions
+> > is different.
+> >=20
+> > Point is to consider 'mem' as mis-configuration error, as the user
+> > in the first place using broken numa configuration
+> > (i.e. fake numa configuration doesn't actually improve performance).
+> >=20
+> > CCed David, maybe he could offer a way to do 1:n migration and other
+> > way around. =20
+>=20
+> I can't see a trivial way.
+> About the easiest I can think of is if you had a way to create a memdev
+> that was an alias to pc.ram (of a particular size and offset).
+If I get you right that's what I was planning to do for numa-less machines
+that use -mem-path/prealloc options, where it's possible to replace
+an initial RAM MemoryRegion with a correspondingly named memdev and its
+backing MemoryRegion.
 
-though, if you have a legitimate issue with the change, you can always air
-it.
+But I don't see how it could work in case of legacy NUMA 'mem' options
+where initial RAM is 1 MemoryRegion (it's a fake numa after all) and how to
+translate that into several MemoryRegions (one per node/memdev).
 
-
->
->> >   *
->> >   * This program is free software; you can redistribute it and/or modi=
-fy
->> >   * it under the terms of the GNU General Public License as published =
-by
->> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
->> > index c52886f..cb258a7 100644
->> > --- a/hw/i386/amd_iommu.h
->> > +++ b/hw/i386/amd_iommu.h
->> > @@ -2,7 +2,7 @@
->> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
->> >   *
->> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->> > + * Copyright (C) 2016 David Kiarie Kahurani
->> >   *
->> >   * This program is free software; you can redistribute it and/or modi=
-fy
->> >   * it under the terms of the GNU General Public License as published =
-by
->> >
->>
->
+> Dave
+>=20
+> >  =20
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > ---
+> > > >  numa.c               |  2 ++
+> > > >  qemu-deprecated.texi | 14 ++++++++++++++
+> > > >  2 files changed, 16 insertions(+)
+> > > >=20
+> > > > diff --git a/numa.c b/numa.c
+> > > > index 3875e1e..2205773 100644
+> > > > --- a/numa.c
+> > > > +++ b/numa.c
+> > > > @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, N=
+umaNodeOptions *node,
+> > > > =20
+> > > >      if (node->has_mem) {
+> > > >          numa_info[nodenr].node_mem =3D node->mem;
+> > > > +        warn_report("Parameter -numa node,mem is deprecated,"
+> > > > +                    " use -numa node,memdev instead");
+> > > >      }
+> > > >      if (node->has_memdev) {
+> > > >          Object *o;
+> > > > diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> > > > index 45c5795..73f99d4 100644
+> > > > --- a/qemu-deprecated.texi
+> > > > +++ b/qemu-deprecated.texi
+> > > > @@ -60,6 +60,20 @@ Support for invalid topologies will be removed, =
+the user must ensure
+> > > >  topologies described with -smp include all possible cpus, i.e.
+> > > >    @math{@var{sockets} * @var{cores} * @var{threads} =3D @var{maxcp=
+us}}.
+> > > > =20
+> > > > +@subsection -numa node,mem=3D@var{size} (since 4.0)
+> > > > +
+> > > > +The parameter @option{mem} of @option{-numa node} is used to assig=
+n a part of
+> > > > +guest RAM to a NUMA node. But when using it, it's impossible to ma=
+nage specified
+> > > > +size on the host side (like bind it to a host node, setting bind p=
+olicy, ...),
+> > > > +so guest end-ups with the fake NUMA configuration with suboptiomal=
+ performance.
+> > > > +However since 2014 there is an alternative way to assign RAM to a =
+NUMA node
+> > > > +using parameter @option{memdev}, which does the same as @option{me=
+m} and has
+> > > > +an ability to actualy manage node RAM on the host side. Use parame=
+ter
+> > > > +@option{memdev} with @var{memory-backend-ram} backend as an replac=
+ement for
+> > > > +parameter @option{mem} to achieve the same fake NUMA effect or a p=
+roperly
+> > > > +configured @var{memory-backend-file} backend to actually benefit f=
+rom NUMA
+> > > > +configuration.
+> > > > +
+> > > >  @section QEMU Machine Protocol (QMP) commands
+> > > > =20
+> > > >  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.1=
+2.0)
+> > > > --=20
+> > > > 2.7.4
+> > > >=20
+> > > > --
+> > > > libvir-list mailing list
+> > > > libvir-list@redhat.com
+> > > > https://www.redhat.com/mailman/listinfo/libvir-list   =20
+> > >=20
+> > > Regards,
+> > > Daniel =20
+> >  =20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
