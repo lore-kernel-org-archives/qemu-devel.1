@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35189)
+Received: from eggs.gnu.org ([209.51.188.92]:54535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1h0rT9-0003rb-N3
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:33:41 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1h0seY-0001OH-FP
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:49:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1h0rT8-0003Ct-Bn
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:33:39 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:42250)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1h0rT7-0003BW-U0
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:33:38 -0500
-Date: Mon, 04 Mar 2019 09:33:26 -0800
-From: Wei Li <wei.d.li@oracle.com>
-Message-ID: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-Mime-version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1h0seW-0006eU-Eo
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:49:29 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46752)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1h0seW-0006cU-4H
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:49:28 -0500
+Received: by mail-wr1-x443.google.com with SMTP id i16so6705481wrs.13
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:49:28 -0800 (PST)
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Date: Mon,  4 Mar 2019 20:49:23 +0200
+Message-Id: <20190304184923.24215-1-marcel.apfelbaum@gmail.com>
+Subject: [Qemu-devel]  [PATCH V2] migration/rdma: clang compilation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,122 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, eblake@redhat.com
 
-Hi Stefan and all,
+Configuring QEMU with:
+        ../configure --cc=clang --enable-rdma
 
-=20
+Leads to compilation error:
 
-I spent some time on getting familiar with QEMU and relevant concepts. My p=
-roject is using QEMU 2.9 with virtio-scsi backend, and I am exploring proper=
- way to improve the IOPS of my project.
+  CC      migration/rdma.o
+  CC      migration/block.o
+  qemu/migration/rdma.c:3615:58: error: taking address of packed member 'rkey' of class or structure
+      'RDMARegisterResult' may result in an unaligned pointer value [-Werror,-Waddress-of-packed-member]
+                            (uintptr_t)host_addr, NULL, &reg_result->rkey,
+                                                         ^~~~~~~~~~~~~~~~
+Fix it by using a temp local variable.
 
-=20
+Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+---
 
-Thanks @Stefan for the response and advices!
+v1 -> v2: 
+ - Use a temp local variable (Dave)
 
-=20
+ migration/rdma.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Could you please help review and clarify following questions:
-While @Stefan mentioned about additional iothread object support of virtio-=
-blk, Is the feature also supported by virtio-scsi? I am trying to exploring =
-the perf multiple IO threads / per VM via followings:
-QMP setup example to create 2 io threads in QEMU, one io thread per device:
-
-(QEMU) object-add qom-type=3Diothread id=3Diothread0
-
-(QEMU) object-add qom-type=3Diothread id=3Diothread1
-
-=20
-
-(QEMU) device_add driver=3Dvirtio-scsi-pci id=3Dtest0 iothread=3Diothread0
-
-(QEMU) device_add driver=3Dvirtio-scsi-pci id=3Dtest1 iothread=3Diothread1
-
-=20
-
-(QEMU) device_add driver=3Dscsi-block drive=3Dnone0 id=3Dv0 bus=3Dtest0.0
-
-(QEMU) device_add driver=3Dscsi-block drive=3Dnone1 id=3Dv1 bus=3Dtest1.0
-You mentioned about the multi-queue devices feature, it seems like the mult=
-i-queue feature will help improve the IOPS of =C2=A0single Device. Could you ple=
-ase provide more details?
-What=E2=80=99s the current plan of support multi-queue device? Which release will=
- include the support or it has already been included in any existing release=
- newer than 2.9?
-Is there any feature branch which I would get more details about the code a=
-nd in progress status?
-In addition, Someone posted related to multi-queue https://marc.info/?l=3Dlin=
-ux-virtualization&m=3D135583400026151&w=3D2, but it only measure the bandwidth, =
-do we have any perf result about IOPS improvement of Multi-Queue approach?
-=20
-
-Thanks again,
-
-Wei
-
-=20
-
-=20
-
-On 2/18/19, 2:24 AM, "Stefan Hajnoczi" <stefanha@redhat.com> wrote:
-
-=20
-
-=C2=A0=C2=A0=C2=A0 On Thu, Feb 14, 2019 at 08:21:30AM -0800, Wei Li wrote:
-
-=C2=A0=C2=A0=C2=A0 > I learnt that QEMU iothread architecture has one QEMU thread per v=
-CPU and a dedicated event loop thread which is iothread, and I want to bette=
-r understand whether there is any specific reason to have a single iothead i=
-nstead of multiple iothreads?
-
-=C2=A0=C2=A0=C2=A0 > Given that single iothread becomes a performance bottleneck in my =
-project, if there any proper way to support multiple iothreads? E.g. have on=
-e iothread per volume attachment instead of single iothread per host?=C2=A0 But =
-I am not quite sure whether it is feasible or not. Please let me know if you=
- have any advices.
-
-=C2=A0=C2=A0=C2=A0=20
-
-=C2=A0=C2=A0=C2=A0=C2=A0Hi,
-
-=C2=A0=C2=A0=C2=A0 Please send general questions to qemu-devel@nongnu.org and CC me in =
-the
-
-=C2=A0=C2=A0=C2=A0 future.=C2=A0 That way others can participate in the discussion and it w=
-ill
-
-=C2=A0=C2=A0=C2=A0 be archived so someone searching for the same question will find the
-
-=C2=A0=C2=A0=C2=A0 answer in the future.
-
-=C2=A0=C2=A0=C2=A0=20
-
-=C2=A0=C2=A0=C2=A0=C2=A0QEMU supports additional IOThread objects:
-
-=C2=A0=C2=A0=C2=A0=20
-
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-object iothread,id=3Diothread0
-
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -device virtio-blk-pci,iothread=3Diothread0,drive=3Ddrive0
-
-=C2=A0=C2=A0=C2=A0=20
-
-=C2=A0=C2=A0=C2=A0=C2=A0This virtio-blk device will perform device emulation and I/O in
-
-=C2=A0=C2=A0=C2=A0 iothread0 instead of the main loop thread.
-
-=C2=A0=C2=A0=C2=A0=20
-
-=C2=A0=C2=A0=C2=A0=C2=A0Currently only 1:1 device<->IOThread association is possible.=C2=A0 In =
-the
-
-=C2=A0=C2=A0=C2=A0 future 1:N should be possible and will allow multi-queue devices to
-
-=C2=A0=C2=A0=C2=A0 achieve better performance.
-
-=C2=A0=C2=A0=C2=A0=20
-
-=C2=A0=C2=A0=C2=A0=C2=A0Stefan
-
-=20
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 54a3c11540..e39ee77558 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -3611,13 +3611,16 @@ static int qemu_rdma_registration_handle(QEMUFile *f, void *opaque)
+                 }
+                 chunk_start = ram_chunk_start(block, chunk);
+                 chunk_end = ram_chunk_end(block, chunk + reg->chunks);
++                /* avoid "-Waddress-of-packed-member" warning */
++                uint32_t tmp_rkey = 0;
+                 if (qemu_rdma_register_and_get_keys(rdma, block,
+-                            (uintptr_t)host_addr, NULL, &reg_result->rkey,
++                            (uintptr_t)host_addr, NULL, &tmp_rkey,
+                             chunk, chunk_start, chunk_end)) {
+                     error_report("cannot get rkey");
+                     ret = -EINVAL;
+                     goto out;
+                 }
++                reg_result->rkey = tmp_rkey;
+ 
+                 reg_result->host_addr = (uintptr_t)block->local_host_addr;
+ 
+-- 
+2.17.1
