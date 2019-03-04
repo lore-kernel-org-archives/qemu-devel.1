@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44346)
+Received: from eggs.gnu.org ([209.51.188.92]:44187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAW-0008G2-6S
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:29 -0500
+	(envelope-from <cota@braap.org>) id 1h0sAN-00088t-2a
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAV-0000sW-BA
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:28 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:50649)
+	(envelope-from <cota@braap.org>) id 1h0sAL-0000aW-Pc
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:19 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:42923)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAV-0000s6-6B
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:27 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAL-0000Yj-88
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:17 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:50 -0500
-Message-Id: <20190304181813.8075-51-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:03 -0500
+Message-Id: <20190304181813.8075-4-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v7 50/73] mips: convert to cpu_interrupt_request
+Subject: [Qemu-devel] [PATCH v7 03/73] cpu: introduce cpu_mutex_lock/unlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +24,189 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, James Hogan <jhogan@kernel.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: James Hogan <jhogan@kernel.org>
+The few direct users of &cpu->lock will be converted soon.
+
+The per-thread bitmap introduced here might seem unnecessary,
+since a bool could just do. However, once we complete the
+conversion to per-vCPU locks, we will need to cover the use
+case where all vCPUs are locked by the same thread, which
+explains why the bitmap is introduced here.
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/mips/cpu.c | 7 ++++---
- target/mips/kvm.c | 2 +-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ include/qom/cpu.h   | 33 +++++++++++++++++++++++++++++++
+ cpus.c              | 48 +++++++++++++++++++++++++++++++++++++++++++--
+ stubs/cpu-lock.c    | 28 ++++++++++++++++++++++++++
+ stubs/Makefile.objs |  1 +
+ 4 files changed, 108 insertions(+), 2 deletions(-)
+ create mode 100644 stubs/cpu-lock.c
 
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index e217fb3e36..fdae8cf440 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -56,11 +56,12 @@ static bool mips_cpu_has_work(CPUState *cs)
-     MIPSCPU *cpu = MIPS_CPU(cs);
-     CPUMIPSState *env = &cpu->env;
-     bool has_work = false;
-+    uint32_t interrupt_request = cpu_interrupt_request(cs);
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 721a324199..44b42d86dd 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -467,6 +467,39 @@ extern CPUTailQ cpus;
  
-     /* Prior to MIPS Release 6 it is implementation dependent if non-enabled
-        interrupts wake-up the CPU, however most of the implementations only
-        check for interrupts that can be taken. */
--    if ((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    if ((interrupt_request & CPU_INTERRUPT_HARD) &&
-         cpu_mips_hw_interrupts_pending(env)) {
-         if (cpu_mips_hw_interrupts_enabled(env) ||
-             (env->insn_flags & ISA_MIPS32R6)) {
-@@ -72,7 +73,7 @@ static bool mips_cpu_has_work(CPUState *cs)
-     if (env->CP0_Config3 & (1 << CP0C3_MT)) {
-         /* The QEMU model will issue an _WAKE request whenever the CPUs
-            should be woken up.  */
--        if (cs->interrupt_request & CPU_INTERRUPT_WAKE) {
-+        if (interrupt_request & CPU_INTERRUPT_WAKE) {
-             has_work = true;
-         }
+ extern __thread CPUState *current_cpu;
  
-@@ -82,7 +83,7 @@ static bool mips_cpu_has_work(CPUState *cs)
-     }
-     /* MIPS Release 6 has the ability to halt the CPU.  */
-     if (env->CP0_Config5 & (1 << CP0C5_VP)) {
--        if (cs->interrupt_request & CPU_INTERRUPT_WAKE) {
-+        if (interrupt_request & CPU_INTERRUPT_WAKE) {
-             has_work = true;
-         }
-         if (!mips_vp_active(env)) {
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index 0b177a7577..568c3d8f4a 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -135,7 +135,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
++/**
++ * cpu_mutex_lock - lock a CPU's mutex
++ * @cpu: the CPU whose mutex is to be locked
++ *
++ * To avoid deadlock, a CPU's mutex must be acquired after the BQL.
++ */
++#define cpu_mutex_lock(cpu)                             \
++    cpu_mutex_lock_impl(cpu, __FILE__, __LINE__)
++void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line);
++
++/**
++ * cpu_mutex_unlock - unlock a CPU's mutex
++ * @cpu: the CPU whose mutex is to be unlocked
++ */
++#define cpu_mutex_unlock(cpu)                           \
++    cpu_mutex_unlock_impl(cpu, __FILE__, __LINE__)
++void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line);
++
++/**
++ * cpu_mutex_locked - check whether a CPU's mutex is locked
++ * @cpu: the CPU of interest
++ *
++ * Returns true if the calling thread is currently holding the CPU's mutex.
++ */
++bool cpu_mutex_locked(const CPUState *cpu);
++
++/**
++ * no_cpu_mutex_locked - check whether any CPU mutex is held
++ *
++ * Returns true if the calling thread is not holding any CPU mutex.
++ */
++bool no_cpu_mutex_locked(void);
++
+ static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
+ {
+     unsigned int i;
+diff --git a/cpus.c b/cpus.c
+index acd453a3ae..e4b54706ce 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -83,6 +83,47 @@ static unsigned int throttle_percentage;
+ #define CPU_THROTTLE_PCT_MAX 99
+ #define CPU_THROTTLE_TIMESLICE_NS 10000000
  
-     qemu_mutex_lock_iothread();
++/* XXX: is this really the max number of CPUs? */
++#define CPU_LOCK_BITMAP_SIZE 2048
++
++/*
++ * Note: we index the bitmap with cpu->cpu_index + 1 so that the logic
++ * also works during early CPU initialization, when cpu->cpu_index is set to
++ * UNASSIGNED_CPU_INDEX == -1.
++ */
++static __thread DECLARE_BITMAP(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
++
++bool no_cpu_mutex_locked(void)
++{
++    return bitmap_empty(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
++}
++
++void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
++{
++/* coverity gets confused by the indirect function call */
++#ifdef __COVERITY__
++    qemu_mutex_lock_impl(&cpu->lock, file, line);
++#else
++    QemuMutexLockFunc f = atomic_read(&qemu_mutex_lock_func);
++
++    g_assert(!cpu_mutex_locked(cpu));
++    set_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
++    f(&cpu->lock, file, line);
++#endif
++}
++
++void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
++{
++    g_assert(cpu_mutex_locked(cpu));
++    qemu_mutex_unlock_impl(&cpu->lock, file, line);
++    clear_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
++}
++
++bool cpu_mutex_locked(const CPUState *cpu)
++{
++    return test_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
++}
++
+ bool cpu_is_stopped(CPUState *cpu)
+ {
+     return cpu->stopped || !runstate_is_running();
+@@ -92,9 +133,9 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
+ {
+     bool ret;
  
--    if ((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    if ((cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
-             cpu_mips_io_interrupts_pending(cpu)) {
-         intr.cpu = -1;
-         intr.irq = 2;
+-    qemu_mutex_lock(&cpu->lock);
++    cpu_mutex_lock(cpu);
+     ret = QSIMPLEQ_EMPTY(&cpu->work_list);
+-    qemu_mutex_unlock(&cpu->lock);
++    cpu_mutex_unlock(cpu);
+     return ret;
+ }
+ 
+@@ -1856,6 +1897,9 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line)
+ {
+     QemuMutexLockFunc bql_lock = atomic_read(&qemu_bql_mutex_lock_func);
+ 
++    /* enforce locking order */
++    g_assert(no_cpu_mutex_locked());
++
+     g_assert(!qemu_mutex_iothread_locked());
+     bql_lock(&qemu_global_mutex, file, line);
+     iothread_locked = true;
+diff --git a/stubs/cpu-lock.c b/stubs/cpu-lock.c
+new file mode 100644
+index 0000000000..3f07d3a28b
+--- /dev/null
++++ b/stubs/cpu-lock.c
+@@ -0,0 +1,28 @@
++#include "qemu/osdep.h"
++#include "qom/cpu.h"
++
++void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
++{
++/* coverity gets confused by the indirect function call */
++#ifdef __COVERITY__
++    qemu_mutex_lock_impl(&cpu->lock, file, line);
++#else
++    QemuMutexLockFunc f = atomic_read(&qemu_mutex_lock_func);
++    f(&cpu->lock, file, line);
++#endif
++}
++
++void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
++{
++    qemu_mutex_unlock_impl(&cpu->lock, file, line);
++}
++
++bool cpu_mutex_locked(const CPUState *cpu)
++{
++    return true;
++}
++
++bool no_cpu_mutex_locked(void)
++{
++    return true;
++}
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 269dfa5832..2e47e5edf4 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -4,6 +4,7 @@ stub-obj-y += blockdev-close-all-bdrv-states.o
+ stub-obj-y += clock-warp.o
+ stub-obj-y += cpu-get-clock.o
+ stub-obj-y += cpu-get-icount.o
++stub-obj-y += cpu-lock.o
+ stub-obj-y += dump.o
+ stub-obj-y += error-printf.o
+ stub-obj-y += fdset.o
 -- 
 2.17.1
