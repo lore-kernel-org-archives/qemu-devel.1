@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58762)
+Received: from eggs.gnu.org ([209.51.188.92]:34267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1h0bsX-0006Ek-Gq
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 19:54:51 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h0cHb-0001uH-Rr
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 20:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1h0bsV-0000Vg-Da
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 19:54:49 -0500
-From: Andrew Randrianasulu <randrianasulu@gmail.com>
-Date: Mon, 4 Mar 2019 03:51:05 +0300
-References: <201903030021.22070.randrianasulu@gmail.com>
-	<20190303235728.GB7792@umbus.fritz.box>
-In-Reply-To: <20190303235728.GB7792@umbus.fritz.box>
+	(envelope-from <dgibson@ozlabs.org>) id 1h0cHZ-0007Xc-UX
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 20:20:43 -0500
+Date: Mon, 4 Mar 2019 11:35:06 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190304003506.GD7792@umbus.fritz.box>
+References: <155146874478.147873.5019623412212796259.stgit@bahia.lan>
+	<155146875704.147873.10563808578795890265.stgit@bahia.lan>
+	<155147961832.30057.4167728683124961502@sif>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="windows-1251"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="iVCmgExH7+hIHJ1A"
 Content-Disposition: inline
-Message-Id: <201903040351.06172.randrianasulu@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Re-applying Freescale PPC E500 i2c/RTC
- patch
+In-Reply-To: <155147961832.30057.4167728683124961502@sif>
+Subject: Re: [Qemu-devel] [PATCH 2/2] spapr: Simulate CAS for qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,556 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-=C2 =F1=EE=EE=E1=F9=E5=ED=E8=E8 =EE=F2 Monday 04 March 2019 02:57:28 David =
-Gibson =ED=E0=EF=E8=F1=E0=EB(=E0):
-> On Sun, Mar 03, 2019 at 12:21:21AM +0300, Andrew Randrianasulu wrote:
-> > From ad2b4baf8b369c8ef354e56f75ae780413acd989 Mon Sep 17 00:00:00 2001
-> > From: Amit Singh Tomar <amit.tomar@freescale.com>
-> > Date: Sun, 3 Mar 2019 00:05:04 +0300
-> > Subject: [PATCH] Re-applying Freescale PPC E500 i2c/RTC patch
+
+--iVCmgExH7+hIHJ1A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Mar 01, 2019 at 04:33:38PM -0600, Michael Roth wrote:
+> Quoting Greg Kurz (2019-03-01 13:32:37)
+> > The RTAS event hotplug code for machine types 2.8 and newer depends on
+> > the CAS negotiated ov5 in order to work properly. However, there's no
+> > CAS when running under qtest. There has been a tentative to trick the
+> > code by faking the OV5_HP_EVT bit, but it turned out to break other
+> > assumptions in the code and the change got reverted.
 > >=20
-> > Patch was originally writen by Amit Singh Tomar <amit.tomar@freescale.c=
-om>
-> > see http://patchwork.ozlabs.org/patch/431475/
-> > I only fixed it enough for application on top of current qemu master
-> > 20b084c4b1401b7f8fbc385649d48c67b6f43d44, and hopefully fixed
-> > checkpatch errors
+> > Go for a more general approach and simulate a CAS when running under
+> > qtest. For simplicity, this pseudo CAS simple simulates the case where
+> > the guest supports the same features as the machine. It is done at
+> > reset time, just before we reset the DRCs, which could potentially
+> > exercise the unplug code.
+> >=20
+> > This allows to test unplug on spapr with both older and newer machine
+> > types.
+> >=20
+> > Suggested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
 >=20
-> So.. that tells me some of the patch's history, but doesn't mention
-> what the patch actually does and why it's a good thing to have, which
-> are the most important things to go in the commit message.
+> Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+>=20
+> Thanks for sending this!
+>=20
+> Just now realizing we should probably apply the revert after this patch
+> however, since the commit we're reverting fixes a `make check` test that
+> is run by default, whereas this patch fixes one that only gets run if we
+> run the tests with -m=3Dslow specified.
+>=20
+> Maybe David can do that on his end?
 
-Then I should add original commit message, i think?
-
-=2D----------
-This patch adds an emulation model for i2c controller found on most of the =
-=46SL SoCs.
-It also integrates the RTC (ds1338) that sits on the i2c Bus with e500 mach=
-ine model.
-=2D-----------
-
-I hopefully set up git-send-email this time, so will try to send v2 with fi=
-xed=20
-commit message.
-
+Applied in reverse order as suggested to ppc-for-4.0.  Thanks.
 
 >=20
-> >=20
-> > Tested by booting Linux kernel 4.20.12.
-> >=20
-> > Signed-off-by: Andrew Randrianasulu <randrianasulu@gmail.com>
 > > ---
-> >  default-configs/ppc-softmmu.mak |   2 +
-> >  hw/i2c/Makefile.objs            |   1 +
-> >  hw/i2c/mpc_i2c.c                | 357 ++++++++++++++++++++++++++++++++=
-++++++++
-> >  hw/ppc/e500.c                   |  54 ++++++
-> >  4 files changed, 414 insertions(+)
-> >  create mode 100644 hw/i2c/mpc_i2c.c
+> >  hw/ppc/spapr.c |   11 +++++++++++
+> >  1 file changed, 11 insertions(+)
 > >=20
-> > diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-soft=
-mmu.mak
-> > index 52acb7cf39..a560971f0c 100644
-> > --- a/default-configs/ppc-softmmu.mak
-> > +++ b/default-configs/ppc-softmmu.mak
-> > @@ -8,6 +8,8 @@ include usb.mak
-> >  CONFIG_PPC4XX=3Dy
-> >  CONFIG_M48T59=3Dy
-> >  CONFIG_SERIAL=3Dy
-> > +CONFIG_MPC_I2C=3Dy
-> > +CONFIG_DS1338=3Dy
-> >  CONFIG_I8257=3Dy
-> >  CONFIG_OPENPIC=3Dy
-> >  CONFIG_PPCE500_PCI=3Dy
-> > diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-> > index 9205cbee16..3eb584254f 100644
-> > --- a/hw/i2c/Makefile.objs
-> > +++ b/hw/i2c/Makefile.objs
-> > @@ -9,5 +9,6 @@ common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_i2c.o
-> >  common-obj-$(CONFIG_IMX_I2C) +=3D imx_i2c.o
-> >  common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_i2c.o
-> >  common-obj-$(CONFIG_NRF51_SOC) +=3D microbit_i2c.o
-> > +common-obj-$(CONFIG_MPC_I2C) +=3D mpc_i2c.o
-> >  obj-$(CONFIG_OMAP) +=3D omap_i2c.o
-> >  obj-$(CONFIG_PPC4XX) +=3D ppc4xx_i2c.o
-> > diff --git a/hw/i2c/mpc_i2c.c b/hw/i2c/mpc_i2c.c
-> > new file mode 100644
-> > index 0000000000..693ca7ef6b
-> > --- /dev/null
-> > +++ b/hw/i2c/mpc_i2c.c
-> > @@ -0,0 +1,357 @@
-> > +/*
-> > + * Copyright (C) 2014 Freescale Semiconductor, Inc. All rights reserve=
-d.
-> > + *
-> > + * Author: Amit Tomar, <Amit.Tomar@freescale.com>
-> > + *
-> > + * Description:
-> > + * This file is derived from IMX I2C controller,
-> > + * by Jean-Christophe DUBOIS .
-> > + *
-> > + * Thanks to Scott Wood and Alexander Graf for their kind help on this.
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify
-> > + * it under the terms of the GNU General Public License, version 2 or =
-later,
-> > + * as published by the Free Software Foundation.
-> > + *
-> > + * You should have received a copy of the GNU Lesser General Public
-> > + * License along with this library; if not, see <http://www.gnu.org/li=
-censes/>.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "hw/i2c/i2c.h"
-> > +#include "qemu/log.h"
-> > +#include "hw/sysbus.h"
-> > +
-> > +/* #define DEBUG_I2C */
-> > +
-> > +#ifdef DEBUG_I2C
-> > +#define DPRINTF(fmt, ...)              \
-> > +    do { fprintf(stderr, "mpc_i2c[%s]: " fmt, __func__, ## __VA_ARGS__=
-); \
-> > +    } while (0)
-> > +#else
-> > +#define DPRINTF(fmt, ...) do {} while (0)
-> > +#endif
-> > +
-> > +#define TYPE_MPC_I2C "mpc-i2c"
-> > +#define MPC_I2C(obj) \
-> > +    OBJECT_CHECK(MPCI2CState, (obj), TYPE_MPC_I2C)
-> > +
-> > +#define MPC_I2C_ADR   0x00
-> > +#define MPC_I2C_FDR   0x04
-> > +#define MPC_I2C_CR    0x08
-> > +#define MPC_I2C_SR    0x0c
-> > +#define MPC_I2C_DR    0x10
-> > +#define MPC_I2C_DFSRR 0x14
-> > +
-> > +#define CCR_MEN  (1 << 7)
-> > +#define CCR_MIEN (1 << 6)
-> > +#define CCR_MSTA (1 << 5)
-> > +#define CCR_MTX  (1 << 4)
-> > +#define CCR_TXAK (1 << 3)
-> > +#define CCR_RSTA (1 << 2)
-> > +#define CCR_BCST (1 << 0)
-> > +
-> > +#define CSR_MCF  (1 << 7)
-> > +#define CSR_MAAS (1 << 6)
-> > +#define CSR_MBB  (1 << 5)
-> > +#define CSR_MAL  (1 << 4)
-> > +#define CSR_SRW  (1 << 2)
-> > +#define CSR_MIF  (1 << 1)
-> > +#define CSR_RXAK (1 << 0)
-> > +
-> > +#define CADR_MASK 0xFE
-> > +#define CFDR_MASK 0x3F
-> > +#define CCR_MASK  0xFC
-> > +#define CSR_MASK  0xED
-> > +#define CDR_MASK  0xFF
-> > +
-> > +#define CYCLE_RESET 0xFF
-> > +
-> > +typedef struct MPCI2CState {
-> > +    SysBusDevice parent_obj;
-> > +
-> > +    I2CBus *bus;
-> > +    qemu_irq irq;
-> > +    MemoryRegion iomem;
-> > +
-> > +    uint8_t address;
-> > +    uint8_t adr;
-> > +    uint8_t fdr;
-> > +    uint8_t cr;
-> > +    uint8_t sr;
-> > +    uint8_t dr;
-> > +    uint8_t dfssr;
-> > +} MPCI2CState;
-> > +
-> > +static bool mpc_i2c_is_enabled(MPCI2CState *s)
-> > +{
-> > +    return s->cr & CCR_MEN;
-> > +}
-> > +
-> > +static bool mpc_i2c_is_master(MPCI2CState *s)
-> > +{
-> > +    return s->cr & CCR_MSTA;
-> > +}
-> > +
-> > +static bool mpc_i2c_direction_is_tx(MPCI2CState *s)
-> > +{
-> > +    return s->cr & CCR_MTX;
-> > +}
-> > +
-> > +static bool mpc_i2c_irq_pending(MPCI2CState *s)
-> > +{
-> > +    return s->sr & CSR_MIF;
-> > +}
-> > +
-> > +static bool mpc_i2c_irq_is_enabled(MPCI2CState *s)
-> > +{
-> > +    return s->cr & CCR_MIEN;
-> > +}
-> > +
-> > +static void mpc_i2c_reset(DeviceState *dev)
-> > +{
-> > +    MPCI2CState *i2c =3D MPC_I2C(dev);
-> > +
-> > +    i2c->address =3D 0xFF;
-> > +    i2c->adr =3D 0x00;
-> > +    i2c->fdr =3D 0x00;
-> > +    i2c->cr =3D  0x00;
-> > +    i2c->sr =3D  0x81;
-> > +    i2c->dr =3D  0x00;
-> > +}
-> > +
-> > +static void mpc_i2c_irq(MPCI2CState *s)
-> > +{
-> > +    bool irq_active =3D false;
-> > +
-> > +    if (mpc_i2c_is_enabled(s) && mpc_i2c_irq_is_enabled(s)
-> > +                              && mpc_i2c_irq_pending(s)) {
-> > +        irq_active =3D true;
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index b6a571b6f184..6da64ef7ee2b 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -29,6 +29,7 @@
+> >  #include "qapi/visitor.h"
+> >  #include "sysemu/sysemu.h"
+> >  #include "sysemu/numa.h"
+> > +#include "sysemu/qtest.h"
+> >  #include "hw/hw.h"
+> >  #include "qemu/log.h"
+> >  #include "hw/fw-path-provider.h"
+> > @@ -1711,6 +1712,16 @@ static void spapr_machine_reset(void)
+> >       */
+> >      spapr_irq_reset(spapr, &error_fatal);
+> >=20
+> > +    /*
+> > +     * There is no CAS under qtest. Simulate one to please the code th=
+at
+> > +     * depends on spapr->ov5_cas. This is especially needed to test de=
+vice
+> > +     * unplug, so we do that before resetting the DRCs.
+> > +     */
+> > +    if (qtest_enabled()) {
+> > +        spapr_ovec_cleanup(spapr->ov5_cas);
+> > +        spapr->ov5_cas =3D spapr_ovec_clone(spapr->ov5);
 > > +    }
 > > +
-> > +    if (irq_active) {
-> > +        qemu_irq_raise(s->irq);
-> > +    } else {
-> > +        qemu_irq_lower(s->irq);
-> > +    }
-> > +}
-> > +
-> > +static void mpc_i2c_soft_reset(MPCI2CState *s)
-> > +{
-> > +    /* This is a soft reset. ADR is preserved during soft resets */
-> > +    uint8_t adr =3D s->adr;
-> > +    mpc_i2c_reset(DEVICE(s));
-> > +    s->adr =3D adr;
-> > +}
-> > +
-> > +static void  mpc_i2c_address_send(MPCI2CState *s)
-> > +{
-> > +    /* if returns non zero slave address is not right */
-> > +    if (i2c_start_transfer(s->bus, s->dr >> 1, s->dr & (0x01))) {
-> > +        s->sr |=3D CSR_RXAK;
-> > +    } else {
-> > +        s->address =3D s->dr;
-> > +        s->sr &=3D ~CSR_RXAK;
-> > +        s->sr |=3D  CSR_MCF; /* Set after Byte Transfer is completed */
-> > +        s->sr |=3D  CSR_MIF; /* Set after Byte Transfer is completed */
-> > +        mpc_i2c_irq(s);
-> > +    }
-> > +}
-> > +
-> > +static void  mpc_i2c_data_send(MPCI2CState *s)
-> > +{
-> > +    if (i2c_send(s->bus, s->dr)) {
-> > +        /* End of transfer */
-> > +        s->sr |=3D CSR_RXAK;
-> > +        i2c_end_transfer(s->bus);
-> > +    } else {
-> > +        s->sr &=3D ~CSR_RXAK;
-> > +        s->sr |=3D  CSR_MCF; /* Set after Byte Transfer is completed */
-> > +        s->sr |=3D  CSR_MIF; /* Set after Byte Transfer is completed */
-> > +        mpc_i2c_irq(s);
-> > +    }
-> > +}
-> > +
-> > +static void  mpc_i2c_data_recive(MPCI2CState *s)
-> > +{
-> > +    int ret;
-> > +    /* get the next byte */
-> > +    ret =3D i2c_recv(s->bus);
-> > +    if (ret >=3D 0) {
-> > +        s->sr |=3D CSR_MCF; /* Set after Byte Transfer is completed */
-> > +        s->sr |=3D CSR_MIF; /* Set after Byte Transfer is completed */
-> > +        mpc_i2c_irq(s);
-> > +    } else {
-> > +        DPRINTF("read failed for device");
-> > +        ret =3D 0xff;
-> > +    }
-> > +    s->dr =3D ret;
-> > +}
-> > +
-> > +static uint64_t mpc_i2c_read(void *opaque, hwaddr addr, unsigned size)
-> > +{
-> > +    MPCI2CState *s =3D opaque;
-> > +    uint8_t value;
-> > +
-> > +    switch (addr) {
-> > +    case MPC_I2C_ADR:
-> > +        value =3D s->adr;
-> > +        break;
-> > +    case MPC_I2C_FDR:
-> > +        value =3D s->fdr;
-> > +        break;
-> > +    case MPC_I2C_CR:
-> > +        value =3D s->cr;
-> > +        break;
-> > +    case MPC_I2C_SR:
-> > +        value =3D s->sr;
-> > +        break;
-> > +    case MPC_I2C_DR:
-> > +        value =3D s->dr;
-> > +        if (mpc_i2c_is_master(s)) { /* master mode */
-> > +            if (mpc_i2c_direction_is_tx(s)) {
-> > +                DPRINTF("MTX is set not in recv mode\n");
-> > +            } else {
-> > +                mpc_i2c_data_recive(s);
-> > +            }
-> > +        }
-> > +        break;
-> > +    default:
-> > +        value =3D 0;
-> > +        DPRINTF("ERROR: Bad read addr 0x%x\n", (unsigned int)addr);
-> > +        break;
-> > +    }
-> > +
-> > +    DPRINTF("%s: addr " TARGET_FMT_plx " %02" PRIx32 "\n", __func__,
-> > +                                         addr, value);
-> > +    return (uint64_t)value;
-> > +}
-> > +
-> > +static void mpc_i2c_write(void *opaque, hwaddr addr,
-> > +                            uint64_t value, unsigned size)
-> > +{
-> > +    MPCI2CState *s =3D opaque;
-> > +
-> > +    DPRINTF("%s: addr " TARGET_FMT_plx " val %08" PRIx64 "\n", __func_=
-_,
-> > +                                             addr, value);
-> > +    switch (addr) {
-> > +    case MPC_I2C_ADR:
-> > +        s->adr =3D value & CADR_MASK;
-> > +        break;
-> > +    case MPC_I2C_FDR:
-> > +        s->fdr =3D value & CFDR_MASK;
-> > +        break;
-> > +    case MPC_I2C_CR:
-> > +        if (mpc_i2c_is_enabled(s) && ((value & CCR_MEN) =3D=3D 0)) {
-> > +            mpc_i2c_soft_reset(s);
-> > +            break;
-> > +        }
-> > +        /* normal write */
-> > +        s->cr =3D value & CCR_MASK;
-> > +        if (mpc_i2c_is_master(s)) { /* master mode */
-> > +            /* set the bus to busy after master is set as per RM */
-> > +            s->sr |=3D CSR_MBB;
-> > +        } else {
-> > +            /* bus is not busy anymore */
-> > +            s->sr &=3D ~CSR_MBB;
-> > +            /* Reset the address for fresh write/read cycle */
-> > +        if (s->address !=3D CYCLE_RESET) {
-> > +            i2c_end_transfer(s->bus);
-> > +            s->address =3D CYCLE_RESET;
-> > +            }
-> > +        }
-> > +        /* For restart end the onging transfer */
-> > +        if (s->cr & CCR_RSTA) {
-> > +            if (s->address !=3D CYCLE_RESET) {
-> > +                s->address =3D CYCLE_RESET;
-> > +                i2c_end_transfer(s->bus);
-> > +                s->cr &=3D ~CCR_RSTA;
-> > +            }
-> > +        }
-> > +        break;
-> > +    case MPC_I2C_SR:
-> > +        s->sr =3D value & CSR_MASK;
-> > +        /* Lower the interrupt */
-> > +        if (!(s->sr & CSR_MIF) || !(s->sr & CSR_MAL)) {
-> > +            mpc_i2c_irq(s);
-> > +        }
-> > +        break;
-> > +    case MPC_I2C_DR:
-> > +        /* if the device is not enabled, nothing to do */
-> > +        if (!mpc_i2c_is_enabled(s)) {
-> > +            break;
-> > +        }
-> > +        s->dr =3D value & CDR_MASK;
-> > +        if (mpc_i2c_is_master(s)) { /* master mode */
-> > +            if (s->address =3D=3D CYCLE_RESET) {
-> > +                mpc_i2c_address_send(s);
-> > +            } else {
-> > +                mpc_i2c_data_send(s);
-> > +            }
-> > +        }
-> > +        break;
-> > +    case MPC_I2C_DFSRR:
-> > +        s->dfssr =3D value;
-> > +        break;
-> > +    default:
-> > +        DPRINTF("ERROR: Bad write addr 0x%x\n", (unsigned int)addr);
-> > +        break;
-> > +    }
-> > +}
-> > +
-> > +static const MemoryRegionOps i2c_ops =3D {
-> > +    .read =3D  mpc_i2c_read,
-> > +    .write =3D  mpc_i2c_write,
-> > +    .valid.max_access_size =3D 1,
-> > +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> > +};
-> > +
-> > +static const VMStateDescription mpc_i2c_vmstate =3D {
-> > +    .name =3D TYPE_MPC_I2C,
-> > +    .version_id =3D 1,
-> > +    .minimum_version_id =3D 1,
-> > +    .fields =3D (VMStateField[]) {
-> > +        VMSTATE_UINT8(address, MPCI2CState),
-> > +        VMSTATE_UINT8(adr, MPCI2CState),
-> > +        VMSTATE_UINT8(fdr, MPCI2CState),
-> > +        VMSTATE_UINT8(cr, MPCI2CState),
-> > +        VMSTATE_UINT8(sr, MPCI2CState),
-> > +        VMSTATE_UINT8(dr, MPCI2CState),
-> > +        VMSTATE_UINT8(dfssr, MPCI2CState),
-> > +        VMSTATE_END_OF_LIST()
-> > +    }
-> > +};
-> > +
-> > +static void mpc_i2c_realize(DeviceState *dev, Error **errp)
-> > +{
-> > +    MPCI2CState  *i2c =3D MPC_I2C(dev);
-> > +    sysbus_init_irq(SYS_BUS_DEVICE(dev), &i2c->irq);
-> > +    memory_region_init_io(&i2c->iomem, OBJECT(i2c), &i2c_ops, i2c,
-> > +                          "mpc-i2c", 0x14);
-> > +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &i2c->iomem);
-> > +    i2c->bus =3D i2c_init_bus(DEVICE(dev), "i2c");
-> > +}
-> > +
-> > +static void mpc_i2c_class_init(ObjectClass *klass, void *data)
-> > +{
-> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > +
-> > +    dc->vmsd  =3D &mpc_i2c_vmstate ;
-> > +    dc->reset =3D mpc_i2c_reset;
-> > +    dc->realize =3D mpc_i2c_realize;
-> > +    dc->desc =3D "MPC I2C Controller";
-> > +}
-> > +
-> > +static const TypeInfo mpc_i2c_type_info =3D {
-> > +    .name          =3D TYPE_MPC_I2C,
-> > +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> > +    .instance_size =3D sizeof(MPCI2CState),
-> > +    .class_init    =3D mpc_i2c_class_init,
-> > +};
-> > +
-> > +static void mpc_i2c_register_types(void)
-> > +{
-> > +    type_register_static(&mpc_i2c_type_info);
-> > +}
-> > +
-> > +type_init(mpc_i2c_register_types)
-> > diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> > index 7553f674c9..beb2efd694 100644
-> > --- a/hw/ppc/e500.c
-> > +++ b/hw/ppc/e500.c
-> > @@ -42,6 +42,7 @@
-> >  #include "qemu/error-report.h"
-> >  #include "hw/platform-bus.h"
-> >  #include "hw/net/fsl_etsec/etsec.h"
-> > +#include "hw/i2c/i2c.h"
-> > =20
-> >  #define EPAPR_MAGIC                (0x45504150)
-> >  #define BINARY_DEVICE_TREE_FILE    "mpc8544ds.dtb"
-> > @@ -63,7 +64,10 @@
-> >  #define MPC8544_PCI_REGS_SIZE      0x1000ULL
-> >  #define MPC8544_UTIL_OFFSET        0xe0000ULL
-> >  #define MPC8XXX_GPIO_OFFSET        0x000FF000ULL
-> > +#define MPC8544_I2C_REGS_OFFSET    0x3000ULL
-> >  #define MPC8XXX_GPIO_IRQ           47
-> > +#define MPC8544_I2C_IRQ            43
-> > +#define RTC_REGS_OFFSET            0x68
-> > =20
-> >  struct boot_info
-> >  {
-> > @@ -161,6 +165,39 @@ static void create_dt_mpc8xxx_gpio(void *fdt, cons=
-t char=20
-> > *soc, const char *mpic)
-> >      g_free(poweroff);
-> >  }
-> > =20
-> > +static void dt_rtc_create(void *fdt, const char *i2c, const char *alia=
-s)
-> > +{
-> > +    int offset =3D RTC_REGS_OFFSET;
-> > +
-> > +    gchar *rtc =3D g_strdup_printf("%s/rtc@%"PRIx32, i2c, offset);
-> > +    qemu_fdt_add_subnode(fdt, rtc);
-> > +    qemu_fdt_setprop_string(fdt, rtc, "compatible", "pericom,pt7c4338"=
-);
-> > +    qemu_fdt_setprop_cells(fdt, rtc, "reg", offset);
-> > +    qemu_fdt_setprop_string(fdt, "/aliases", alias, rtc);
-> > +
-> > +    g_free(rtc);
-> > +}
-> > +
-> > +static void dt_i2c_create(void *fdt, const char *soc, const char *mpic,
-> > +                             const char *alias)
-> > +{
-> > +    hwaddr mmio0 =3D MPC8544_I2C_REGS_OFFSET;
-> > +    int irq0 =3D MPC8544_I2C_IRQ;
-> > +
-> > +    gchar *i2c =3D g_strdup_printf("%s/i2c@%"PRIx64, soc, mmio0);
-> > +    qemu_fdt_add_subnode(fdt, i2c);
-> > +    qemu_fdt_setprop_string(fdt, i2c, "device_type", "i2c");
-> > +    qemu_fdt_setprop_string(fdt, i2c, "compatible", "fsl-i2c");
-> > +    qemu_fdt_setprop_cells(fdt, i2c, "reg", mmio0, 0x14);
-> > +    qemu_fdt_setprop_cells(fdt, i2c, "cell-index", 0);
-> > +    qemu_fdt_setprop_cells(fdt, i2c, "interrupts", irq0, 0x2);
-> > +    qemu_fdt_setprop_phandle(fdt, i2c, "interrupt-parent", mpic);
-> > +    qemu_fdt_setprop_string(fdt, "/aliases", alias, i2c);
-> > +
-> > +    g_free(i2c);
-> > +}
-> > +
-> > +
-> >  typedef struct PlatformDevtreeData {
-> >      void *fdt;
-> >      const char *mpic;
-> > @@ -464,6 +501,12 @@ static int ppce500_load_device_tree(PPCE500Machine=
-State=20
-> > *pms,
-> >                           soc, mpic, "serial0", 0, true);
-> >      }
-> > =20
-> > +    /* i2c */
-> > +    dt_i2c_create(fdt, soc, mpic, "i2c");
-> > +
-> > +    dt_rtc_create(fdt, "i2c", "rtc");
-> > +
-> > +
-> >      gutil =3D g_strdup_printf("%s/global-utilities@%llx", soc,
-> >                              MPC8544_UTIL_OFFSET);
-> >      qemu_fdt_add_subnode(fdt, gutil);
-> > @@ -812,6 +855,7 @@ void ppce500_init(MachineState *machine)
-> >      MemoryRegion *ccsr_addr_space;
-> >      SysBusDevice *s;
-> >      PPCE500CCSRState *ccsr;
-> > +    I2CBus *i2c;
-> > =20
-> >      irqs =3D g_new0(IrqLines, smp_cpus);
-> >      for (i =3D 0; i < smp_cpus; i++) {
-> > @@ -887,6 +931,16 @@ void ppce500_init(MachineState *machine)
-> >                         0, qdev_get_gpio_in(mpicdev, 42), 399193,
-> >                         serial_hd(1), DEVICE_BIG_ENDIAN);
-> >      }
-> > +        /* I2C */
-> > +    dev =3D qdev_create(NULL, "mpc-i2c");
-> > +    s =3D SYS_BUS_DEVICE(dev);
-> > +    qdev_init_nofail(dev);
-> > +    sysbus_connect_irq(s, 0, qdev_get_gpio_in(mpicdev, MPC8544_I2C_IRQ=
-));
-> > +    memory_region_add_subregion(ccsr_addr_space, MPC8544_I2C_REGS_OFFS=
-ET,
-> > +                                sysbus_mmio_get_region(s, 0));
-> > +    i2c =3D (I2CBus *)qdev_get_child_bus(dev, "i2c");
-> > +    i2c_create_slave(i2c, "ds1338", RTC_REGS_OFFSET);
-> > +
-> > =20
-> >      /* General Utility device */
-> >      dev =3D qdev_create(NULL, "mpc8544-guts");
+> >      /* DRC reset may cause a device to be unplugged. This will cause t=
+roubles
+> >       * if this device is used by another device (eg, a running vhost b=
+ackend
+> >       * will crash QEMU if the DIMM holding the vring goes away). To av=
+oid such
+> >=20
 >=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--iVCmgExH7+hIHJ1A
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx8crgACgkQbDjKyiDZ
+s5IDpQ//VJl7oOaQ6H8jjuAQ5q+m2ouCZNJJmjCY4vM0C1fe6Jn4lx0/ExplfAT0
+VlYYVMSrNsqwKZdnDmr3YVtbC7FkV6a2mXQAx7AGtnLAkU/G8/SGgjz4Iph/Lh6c
+VPaDviSyhn3ggglbyqGEr05Cf2TPFBqDTzzDoky5zNXzNd+RYeIOi+4tPl22T3uq
+mqGa7IzY/EThlybldBys44H8fuopLCriH4L+piwQCR7L77qiJaDvpmDFV77GPojs
+HavLs9J6bKYUfmVJ7+DdQSCHUpGh2aVcevfIybaJudEyJ4f7XDi4KEaaKaV4JewF
+FQjYCC70qSOa7HWTFPVEvOpGpsxO1ORJCkog6JKDqk/GaeWW6lS599GaXpmwx3uK
++QPhYn+MpjtocJBxqMKeTqzGeu+JThpr6iolX6iOwTG0meG9f670uo/fGCGnrRkt
+6v6QmsZx6spRfmtpAMAA9W/ka94rzACrquC1K81I7jpcyzdNBf+IzstJebzrDfF/
+1MWI+OGDMNUBpSmNtvQqeFVS2SW3256OLNcozx9kVMbF8J4O2gF4YeVzJi+Nj+3S
+CfSrKs93CgD10ayAwpqEY4kYLpe+N//C2VlYdJvpvzcfePN1fxynTDyFqevZiyHz
+DroBENWMVm4qBZE3rLkYdjmMI+mkbohFVDpuXKv19taojIzxX+g=
+=fSJ1
+-----END PGP SIGNATURE-----
+
+--iVCmgExH7+hIHJ1A--
