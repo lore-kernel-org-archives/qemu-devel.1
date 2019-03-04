@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45557)
+Received: from eggs.gnu.org ([209.51.188.92]:45832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1h0hqp-0007UU-GS
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:17:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1h0hrr-0008Au-Tj
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:18:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1h0hqn-0007sw-Po
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:17:27 -0500
-From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Mon,  4 Mar 2019 15:16:31 +0800
-Message-Id: <20190304071631.27567-3-richardw.yang@linux.intel.com>
-In-Reply-To: <20190304071631.27567-1-richardw.yang@linux.intel.com>
-References: <20190304071631.27567-1-richardw.yang@linux.intel.com>
+	(envelope-from <armbru@redhat.com>) id 1h0hrr-0001Rj-D1
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:18:31 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1551457277-884-1-git-send-email-thuth@redhat.com>
+Date: Mon, 04 Mar 2019 08:18:25 +0100
+In-Reply-To: <1551457277-884-1-git-send-email-thuth@redhat.com> (Thomas Huth's
+	message of "Fri, 1 Mar 2019 17:21:17 +0100")
+Message-ID: <87r2bncdku.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 2/2] CODING_STYLE: indent example code as
- all others
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] tests: Do not use "\n" in g_test_message()
+ strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +23,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: mjt@tls.msk.ru, imammedo@redhat.com, philmd@redhat.com, eblake@redhat.com, peter.maydell@linaro.org, sgarzare@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-All the example code are indented with four spaces except this one.
+Thomas Huth <thuth@redhat.com> writes:
 
-Fix this by adding four spaces here.
+> g_test_message() takes care of the newline on its own, so we
+> should not use \n in the strings here.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- CODING_STYLE | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Without "[PATCH] tests: Remove (mostly) useless architecture checks",
+the patch misses four instances of '\n', so:
 
-diff --git a/CODING_STYLE b/CODING_STYLE
-index 90321e9c28..cb8edcbb36 100644
---- a/CODING_STYLE
-+++ b/CODING_STYLE
-@@ -147,10 +147,10 @@ block to a separate function altogether.
- When comparing a variable for (in)equality with a constant, list the
- constant on the right, as in:
- 
--if (a == 1) {
--    /* Reads like: "If a equals 1" */
--    do_something();
--}
-+    if (a == 1) {
-+        /* Reads like: "If a equals 1" */
-+        do_something();
-+    }
- 
- Rationale: Yoda conditions (as in 'if (1 == a)') are awkward to read.
- Besides, good compilers already warn users when '==' is mis-typed as '=',
--- 
-2.19.1
+Based-on: <1551456970-463-1-git-send-email-thuth@redhat.com>
