@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56272)
+Received: from eggs.gnu.org ([209.51.188.92]:56533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0pDc-0001tf-Ha
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:09:29 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1h0pEp-0002h6-Tq
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:10:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0pDb-0001J2-Ot
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:09:28 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h0pDb-0001GL-G7
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:09:27 -0500
-Received: by mail-ot1-x343.google.com with SMTP id g1so4453960otj.11
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 07:09:27 -0800 (PST)
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1h0pEo-0003BY-Uq
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:10:43 -0500
+Received: from mail-ve1eur03on0726.outbound.protection.outlook.com
+	([2a01:111:f400:fe09::726]:51943
+	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1h0pEn-00032O-RX
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:10:42 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Mon, 4 Mar 2019 15:10:34 +0000
+Message-ID: <8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
+References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <67C0EAEAA643D345A10F19F6067C8BCF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190301202921.21209-1-richard.henderson@linaro.org>
-	<b2d06943-feef-789d-dab7-482bc78a7ea2@redhat.com>
-In-Reply-To: <b2d06943-feef-789d-dab7-482bc78a7ea2@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Mar 2019 15:09:15 +0000
-Message-ID: <CAFEAcA-7vOvt3LVSsXhgDKHL6TPMfHYpVExrJD7pYgEMiYm1dQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Fix PC test for LDM (exception
- return)
+Subject: Re: [Qemu-devel] [PATCH 0/3] migration: add sztd compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
+Cc: Denis Lunev <den@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Sat, 2 Mar 2019 at 19:10, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
->
-> On 3/1/19 9:29 PM, Richard Henderson wrote:
-> > Found by inspection: Rn is the base register against which the
-> > load began; I is the register within the mask being processed.
-> > The exception return should of course be procesed from the loaded PC.
->
-> "processed"
->
-> >
-> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> > ---
-> >  target/arm/translate.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/target/arm/translate.c b/target/arm/translate.c
-> > index 8f7f5b95aa..ad879e3480 100644
-> > --- a/target/arm/translate.c
-> > +++ b/target/arm/translate.c
-> > @@ -10612,7 +10612,7 @@ static void disas_arm_insn(DisasContext *s, uns=
-igned int insn)
-> >                              } else if (i =3D=3D rn) {
-> >                                  loaded_var =3D tmp;
-> >                                  loaded_base =3D 1;
-> > -                            } else if (rn =3D=3D 15 && exc_return) {
-> > +                            } else if (i =3D=3D 15 && exc_return) {
-> >                                  store_pc_exc_ret(s, tmp);
-> >                              } else {
-> >                                  store_reg_from_load(s, i, tmp);
-> >
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-
-Applied to target-arm.next (with the typo fixed), thanks.
-
--- PMM
+cGluZyENCg0KT24gMjYuMDIuMjAxOSAxNjoxNSwgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPiB6
+c3RkIGRhdGUgY29tcHJlc3Npb24gYWxnb3JpdGhtIHNob3dzIGJldHRlciBwZXJmb3JtYW5jZSBv
+biBkYXRhIGNvbXByZXNzaW9uLg0KPiBJdCBtaWdodCBiZSB1c2VmdWwgdG8gZW1wbG95IHRoZSBh
+bGdvcml0aG0gaW4gVk0gbWlncmF0aW9uIHRvIHJlZHVjZSBDUFUgdXNhZ2UuDQo+IEEgdXNlciB3
+aWxsIGJlIGFibGUgdG8gY2hvb3NlIGJldHdlZW4gdGhvc2UgYWxnb3JpdGhtcywgdGhlcmVmb3Ig
+Y29tcHJlc3MtdHlwZQ0KPiBtaWdyYXRpb24gcGFyYW1ldGVyIGlzIGFkZGVkLg0KPiANCj4gSGVy
+ZSBhcmUgc29tZSByZXN1bHRzIG9mIHBlcmZvcm1hbmNlIGNvbXBhcmlzb24genN0ZCB2cyBnemlw
+Og0KPiANCj4gaG9zdDogaTctNDc5MCA4eENQVSBAIDMuNjBHSHosIDE2RyBSQU0NCj4gbWlncmF0
+aW9uIHRvIHRoZSBzYW1lIGhvc3QNCj4gVk06IDJ4VkNQVSwgOEcgUkFNIHRvdGFsDQo+IDVHIFJB
+TSB1c2VkLCBtZW1vcnkgcG9wdWxhdGVkIHdpdGggcG9zdGdyZXFzbCBkYXRhDQo+IHByb2R1Y2Vk
+IGJ5IHBnYmVuY2ggcGVyZm9ybWFuY2UgYmVuY2htYXJrDQo+IA0KPiANCj4gVGhyZWFkczogMSBj
+b21wcmVzcyDigJMgMSBkZWNvbXByZXNzDQo+IA0KPiB6c3RkIHByb3ZpZGVzIHNsaWdodGx5IGxl
+c3MgY29tcHJlc3Npb24gcmF0aW8gd2l0aCBhbG1vc3QgdGhlIHNhbWUNCj4gQ1BVIHVzYWdlIGJ1
+dCBjb3BlcyB3aXRoIFJBTSAgY29tcHJlc3Npb24gcm9naGx5IDIgdGltZXMgZmFzdGVyDQo+IA0K
+PiBjb21wcmVzc2lvbiB0eXBlICAgICAgICAgICAgICB6bGliICAgICAgIHwgICAgICB6c3RkDQo+
+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQ0KPiBjb21wcmVzc2lvbiBsZXZlbCAgICAgICAgICAxICAgICAgIDUgICAgIHwgICAxICAgICAg
+IDUNCj4gY29tcHJlc3Npb24gcmF0aW8gICAgICAgICAgNi45MiAgICA3LjA1ICB8ICAgNi42OSAg
+ICA2Ljg5DQo+IGNwdSBpZGxlLCAlICAgICAgICAgICAgICAgIDgyICAgICAgODMgICAgfCAgIDg2
+ICAgICAgODANCj4gdGltZSwgc2VjICAgICAgICAgICAgICAgICAgNDkgICAgICA3MSAgICB8ICAg
+MjYgICAgICAzMQ0KPiB0aW1lIGRpZmYgdG8gemxpYiwgc2VjICAgICAgICAgICAgICAgICAgICAg
+IC0yNSAgICAgLTQxDQo+IA0KPiANCj4gVGhyZWFkczogOCBjb21wcmVzcyDigJMgMiBkZWNvbXBy
+ZXNzDQo+IA0KPiB6c3RkIHByb3ZpZGVzIHRoZSBzYW1lIG1pZ3JhdGlvbiB0aW1lIHdpdGggbGVz
+cyBjcHUgY29uc3VtcHRpb24NCj4gDQo+IGNvbXByZXNzaW9uIHR5cGUgICAgICAgICBub25lICB8
+ICAgICAgICBnemlwKHpsaWIpICAgIHwgICAgICAgICAgenN0ZA0KPiAtLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0NCj4gY29tcHJlc3Npb24gbGV2ZWwgICAgICAgIC0gICAgIHwgIDEgICAgICA1ICAgICAg
+IDkgICAgfCAgIDEgICAgICAgNSAgICAgICAxNQ0KPiBjb21wcmVzc2lvbiByYXRpbyAgICAgICAg
+LSAgICAgfCAgNi45NCAgIDYuOTkgICAgNy4xNCB8ICAgNi42NCAgICA2Ljg5ICAgIDYuOTMNCj4g
+dGltZSwgc2VjICAgICAgICAgICAgICAgIDE1NCAgIHwgIDIyICAgICAyMyAgICAgIDI3ICAgfCAg
+IDIzICAgICAgMjMgICAgICAyNQ0KPiBjcHUgaWRsZSwgJSAgICAgICAgICAgICAgOTkgICAgfCAg
+NDUgICAgIDMwICAgICAgMTIgICB8ICAgNzAgICAgICA1MiAgICAgIDIzDQo+IGNwdSBpZGxlIGRp
+ZmYgdG8gemxpYiAgICAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgIHwgIC0yNSUgICAgLTIy
+JSAgICAtMTElDQo+IA0KPiANCj4gRGVuaXMgUGxvdG5pa292ICgzKToNCj4gICAgbWlncmF0aW9u
+OiByZXdvcmsgY29tcHJlc3Npb24gY29kZSBmb3IgYWRkaW5nIG1vcmUgZGF0YSBjb21wcmVzc29y
+cw0KPiAgICBobXA6IGFkZCBjb21wcmVzcy10eXBlIHBhcmFtZXRlciB0byBtaWdyYXRpb24gcGFy
+YW1ldGVycw0KPiAgICBtaWdyYXRpb246IGFkZCB6c3RkIGNvbXByZXNzaW9uDQo+IA0KPiAgIGNv
+bmZpZ3VyZSAgICAgICAgICAgICB8ICAyNiArKysrDQo+ICAgaG1wLmMgICAgICAgICAgICAgICAg
+IHwgICA4ICsrDQo+ICAgbWlncmF0aW9uL21pZ3JhdGlvbi5jIHwgIDQ1ICsrKysrKy0NCj4gICBt
+aWdyYXRpb24vbWlncmF0aW9uLmggfCAgIDEgKw0KPiAgIG1pZ3JhdGlvbi9xZW11LWZpbGUuYyB8
+ICAzOSArKy0tLS0NCj4gICBtaWdyYXRpb24vcWVtdS1maWxlLmggfCAgMTggKystDQo+ICAgbWln
+cmF0aW9uL3JhbS5jICAgICAgIHwgMjkxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KystLS0tLS0tLQ0KPiAgIHFhcGkvbWlncmF0aW9uLmpzb24gICB8ICAyNiArKystDQo+ICAgOCBm
+aWxlcyBjaGFuZ2VkLCAzNjkgaW5zZXJ0aW9ucygrKSwgODUgZGVsZXRpb25zKC0pDQo+IA0KDQot
+LSANCkJlc3QsDQpEZW5pcw0K
