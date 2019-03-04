@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34474)
+Received: from eggs.gnu.org ([209.51.188.92]:38303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h0lSR-0000NY-Ap
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:08:32 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0lgg-0004ZR-Nr
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:23:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h0lSQ-0008Vb-B8
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:08:31 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:33000)
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0lge-0008NC-Ec
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:23:14 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:35130)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h0lSP-0008RU-AJ
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:08:29 -0500
-Received: by mail-wr1-f68.google.com with SMTP id i12so5061864wrw.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 03:08:26 -0800 (PST)
-References: <1551695576-13205-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a0b53ff0-1ded-2a6e-aa4d-b1f4fcc407c1@redhat.com>
-Date: Mon, 4 Mar 2019 12:08:22 +0100
+	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
+	id 1h0lge-0008Ka-3S
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:23:12 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id z19so3921949otm.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 03:23:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1551695576-13205-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] cirrus.yml: Add macOS continuous
- integration task
+References: <20190223105421.1290-1-davidkiarie4@gmail.com>
+	<20190223105421.1290-2-davidkiarie4@gmail.com>
+	<20190225103856.GE29260@redhat.com>
+In-Reply-To: <20190225103856.GE29260@redhat.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Mon, 4 Mar 2019 14:22:22 +0300
+Message-ID: <CABdVeAA0f9ra1RnJDQfvuecSwmYLKiTNoMTSLEfkysV+KjedTw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Ed Maste <emaste@freebsd.org>, Li-Wen Hsu <lwhsu@freebsd.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 3/4/19 11:32 AM, Thomas Huth wrote:
-> cirrus-ci.com also has the possibility to run CI tasks on macOS.
-> Since most of the QEMU developers do not have access to macOS yet,
-> let's add a CI pipeline for this operating system here, too.
+On Mon, Feb 25, 2019 at 1:39 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m>
+wrote:
 
-Can we get report of failures? (IRC, mail to ML, patchew icon)
+> On Sat, Feb 23, 2019 at 01:54:21PM +0300, David Kiarie wrote:
+> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
+> > ---
+> >  hw/i386/amd_iommu.c | 2 +-
+> >  hw/i386/amd_iommu.h | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+hello,
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+i expected this really simple patch to probably get merged right away.
 
-> ---
->  You can see an example here: https://cirrus-ci.com/task/5099494325616640
-> 
->  .cirrus.yml | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> index 303fe72..e3d375b 100644
-> --- a/.cirrus.yml
-> +++ b/.cirrus.yml
-> @@ -14,3 +14,15 @@ freebsd_12_task:
->      - ../configure || { cat config.log; exit 1; }
->      - gmake -j8
->      - gmake -j8 V=1 check
-> +
-> +macos_task:
-> +  osx_instance:
-> +    image: high-sierra-base
-> +  env:
-> +    CIRRUS_CLONE_DEPTH: 1
-> +  install_script:
-> +    - brew install pkg-config glib pixman make sdl2
-> +  script:
-> +    - ./configure || { cat config.log; exit 1; }
-> +    - gmake -j$(sysctl -n hw.ncpu)
-> +    - gmake check -j$(sysctl -n hw.ncpu)
-> 
+i don't have time to follow up on old issues and not in the mood to be
+losing any of my work to sluggishness.
