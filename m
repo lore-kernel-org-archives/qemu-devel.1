@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35273)
+Received: from eggs.gnu.org ([209.51.188.92]:35875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h0uuS-00036R-Di
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:14:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1h0uvk-0004Tz-60
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:15:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h0ujB-00027n-F1
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:02:26 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:47702)
+	(envelope-from <eblake@redhat.com>) id 1h0uvi-0002ZC-Am
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:15:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53276)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1h0ujB-0001yj-1L
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:02:25 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon,  4 Mar 2019 22:02:15 +0100
-Message-Id: <20190304210217.7056-1-samuel.thibault@ens-lyon.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h0uvg-0002Wp-HH
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:15:21 -0500
+References: <20190304180920.21534-1-svens@stackframe.org>
+	<905f71d7-3df9-d738-3514-87a49c8aceb0@redhat.com>
+	<20190304203826.GA2995@t470p.stackframe.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <332beed4-4753-0f25-18ed-4fce944f2b76@redhat.com>
+Date: Mon, 4 Mar 2019 15:15:18 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCHv2 0/2] curses: Add support for wide output
+In-Reply-To: <20190304203826.GA2995@t470p.stackframe.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] lsi: use ldn_le_p()/stn_le_p()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, pbonzini@redhat.com, kraxel@redhat.com, armbru@redhat.com, ekohler@gmail.com, eblake@redhat.com
+To: Sven Schnelle <svens@stackframe.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-Hello,
+On 3/4/19 2:38 PM, Sven Schnelle wrote:
+> Hi Eric,
+> 
+> On Mon, Mar 04, 2019 at 12:40:50PM -0600, Eric Blake wrote:
+>> On 3/4/19 12:09 PM, Sven Schnelle wrote:
+>>> Signed-off-by: Sven Schnelle <svens@stackframe.org>
+>>
+>> The commit header says "what" (good), but the commit body says nothing at
+>> all (generally, it should say "why"). If you give your reviewers a reason
+>> why it is good to use the new functions, it makes it easier to apply your
+>> patch.
+>>
+>> Also, don't forget to send a 0/5 cover letter when sending a patch series;
+>> you can have git do this for you with 'git config format.coverletter auto'.
+>> https://wiki.qemu.org/Contribute/SubmitAPatch has more hints for improved
+>> patch handling.
+> 
+> Thanks, will keep this in mind, sorry. Should i resend the series?
 
-This adds support for wide output in the curses frontend
+Up to you, but if it were me, I'd probably wait a day or two for any 
+other review comments to address those at the same time, or for a 
+definitive answer from the particular maintainer that will be including 
+your patches.
 
-Difference with previous version:
-- Add more rationale in commit message
-- Move charset option to curses-only section.
-
-Samuel Thibault (2):
-  iconv: detect and make curses depend on it
-  curses: add option to specify VGA font encoding
-
- configure       |  45 ++++++-
- qapi/ui.json    |  14 +++
- qemu-options.hx |   5 +-
- ui/curses.c     | 315 ++++++++++++++++++++++++++++++++++++++++--------
- vl.c            |   2 +-
- 5 files changed, 331 insertions(+), 50 deletions(-)
-
---=20
-2.20.1
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
