@@ -1,28 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60716)
+Received: from eggs.gnu.org ([209.51.188.92]:35833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0nLb-0004uO-Fv
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:09:37 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1h0ncP-0001dA-0k
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:26:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0nAQ-0002Vt-FN
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:58:03 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:39459)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1h0nAQ-0002UE-6P
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:58:02 -0500
-Received: by mail-oi1-x234.google.com with SMTP id b4so3739985oif.6
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 04:58:00 -0800 (PST)
+	(envelope-from <guoheyi@huawei.com>) id 1h0ncO-0007vy-6R
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:26:56 -0500
+From: Heyi Guo <guoheyi@huawei.com>
+Date: Mon, 4 Mar 2019 21:25:34 +0800
+Message-ID: <1551705934-28745-1-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
-References: <20190223105421.1290-1-davidkiarie4@gmail.com>
-	<20190223105421.1290-2-davidkiarie4@gmail.com>
-	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
-In-Reply-To: <105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
-From: David Kiarie <davidkiarie4@gmail.com>
-Date: Mon, 4 Mar 2019 15:57:11 +0300
-Message-ID: <CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] hw/arm/acpi: enable SHPC native hot plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +19,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: wanghaibin.wang@huawei.com, Heyi Guo <guoheyi@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Mon, Mar 4, 2019 at 2:57 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om>
-wrote:
+After the introduction of generic PCIe root port and PCIe-PCI bridge,
+we will also have SHPC controller on ARM, so just enalbe SHPC native
+hot plug.
 
-> Hi David,
->
-> On 2/23/19 11:54 AM, David Kiarie wrote:
-> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
-> > ---
-> >  hw/i386/amd_iommu.c | 2 +-
-> >  hw/i386/amd_iommu.h | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-> > index 8ad707a..4f179da 100644
-> > --- a/hw/i386/amd_iommu.c
-> > +++ b/hw/i386/amd_iommu.c
-> > @@ -2,7 +2,7 @@
-> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
-> >   *
-> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
-> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
-> > + * Copyright (C) 2016 David Kiarie Kahurani
->
-> Why do you change the year? Because your work was merged in 2016?
->
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+---
+ hw/arm/virt-acpi-build.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-no.
-
-
->
-> >   *
-> >   * This program is free software; you can redistribute it and/or modif=
-y
-> >   * it under the terms of the GNU General Public License as published b=
-y
-> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
-> > index c52886f..cb258a7 100644
-> > --- a/hw/i386/amd_iommu.h
-> > +++ b/hw/i386/amd_iommu.h
-> > @@ -2,7 +2,7 @@
-> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
-> >   *
-> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
-> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
-> > + * Copyright (C) 2016 David Kiarie Kahurani
-> >   *
-> >   * This program is free software; you can redistribute it and/or modif=
-y
-> >   * it under the terms of the GNU General Public License as published b=
-y
-> >
->
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 04b62c7..7849ec5 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -265,7 +265,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+         aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+     aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+     aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
+-    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
++
++    /*
++     * Allow OS control for all 5 features:
++     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
++     */
++    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1F), NULL),
+                                 aml_name("CTRL")));
+ 
+     ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+-- 
+1.8.3.1
