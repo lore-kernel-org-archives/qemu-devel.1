@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51587)
+Received: from eggs.gnu.org ([209.51.188.92]:54301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1h0mWw-0004Oo-La
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:17:15 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h0mm1-0003du-O5
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1h0mWv-0006iZ-Qf
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:17:14 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:33758)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1h0mWv-0006fX-CS
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:17:13 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
-	<155074715265.32129.1158027635780211224.stgit@pasha-VirtualBox>
-	<20190304103353.GA6059@localhost.localdomain>
-In-Reply-To: <20190304103353.GA6059@localhost.localdomain>
-Date: Mon, 4 Mar 2019 15:17:09 +0300
-Message-ID: <002b01d4d284$3109aa20$931cfe60$@ru>
+	(envelope-from <imammedo@redhat.com>) id 1h0mek-0002l9-0o
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:25:20 -0500
+Date: Mon, 4 Mar 2019 13:25:07 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190304132507.39273826@redhat.com>
+In-Reply-To: <87va0zcdse.fsf@dusky.pond.sub.org>
+References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
+	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
+	<20190301154947.GJ21251@redhat.com>
+	<20190301183328.20b63e23@redhat.com>
+	<20190301174806.GN21251@redhat.com>
+	<87va0zcdse.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v13 19/25] replay: add BH oneshot event for
- block layer
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
+ parameter of '-numa node' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Kevin Wolf' <kwolf@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au, mprivozn@redhat.com
 
-> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> Am 21.02.2019 um 12:05 hat Pavel Dovgalyuk geschrieben:
-> > Replay is capable of recording normal BH events, but sometimes
-> > there are single use callbacks scheduled with aio_bh_schedule_oneshot
-> > function. This patch enables recording and replaying such callbacks.
-> > Block layer uses these events for calling the completion function.
-> > Replaying these calls makes the execution deterministic.
+On Mon, 04 Mar 2019 08:13:53 +0100
+Markus Armbruster <armbru@redhat.com> wrote:
+
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>=20
+> > On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wrote: =20
+> >> On Fri, 1 Mar 2019 15:49:47 +0000
+> >> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >>  =20
+> >> > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote: =20
+> >> > > The parameter allows to configure fake NUMA topology where guest
+> >> > > VM simulates NUMA topology but not actually getting a performance
+> >> > > benefits from it. The same or better results could be achieved
+> >> > > using 'memdev' parameter. In light of that any VM that uses NUMA
+> >> > > to get its benefits should use 'memdev' and to allow transition
+> >> > > initial RAM to device based model, deprecate 'mem' parameter as
+> >> > > its ad-hoc partitioning of initial RAM MemoryRegion can't be
+> >> > > translated to memdev based backend transparently to users and in
+> >> > > compatible manner (migration wise).
+> >> > >=20
+> >> > > That will also allow to clean up a bit our numa code, leaving only
+> >> > > 'memdev' impl. in place and several boards that use node_mem
+> >> > > to generate FDT/ACPI description from it.   =20
+> >> >=20
+> >> > Can you confirm that the  'mem' and 'memdev' parameters to -numa
+> >> > are 100% live migration compatible in both directions ?  Libvirt
+> >> > would need this to be the case in order to use the 'memdev' syntax
+> >> > instead. =20
+> >> Unfortunately they are not migration compatible in any direction,
+> >> if it where possible to translate them to each other I'd alias 'mem'
+> >> to 'memdev' without deprecation. The former sends over only one
+> >> MemoryRegion to target, while the later sends over several (one per
+> >> memdev). =20
 > >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > If we can't migration from one to the other, then we can not deprecate
+> > the existing 'mem' syntax. Even if libvirt were to provide a config
+> > option to let apps opt-in to the new syntax, we need to be able to
+> > support live migration of existing running VMs indefinitely. Effectively
+> > this means we need the to keep 'mem' support forever, or at least such
+> > a long time that it effectively means forever.
 > >
-> > --
-> >
-> > v6:
-> >  - moved stub function to the separate file for fixing linux-user build
-> > v10:
-> >  - replaced all block layer aio_bh_schedule_oneshot calls
-> This still doesn't catch all instances, e.g. everything that goes
-> through aio_co_schedule() is missing.
+> > So I think this patch has to be dropped & replaced with one that
+> > simply documents that memdev syntax is preferred. =20
+>=20
+> We have this habit of postulating absolutes like "can not deprecate"
+> instead of engaging with the tradeoffs.  We need to kick it.
+>=20
+> So let's have an actual look at the tradeoffs.
+>=20
+> We don't actually "support live migration of existing running VMs
+> indefinitely".
+>=20
+> We support live migration to any newer version of QEMU that still
+> supports the machine type.
+>=20
+> We support live migration to any older version of QEMU that already
+> supports the machine type and all the devices the machine uses.
+>=20
+> Aside: "support" is really an honest best effort here.  If you rely on
+> it, use a downstream that puts in the (substantial!) QA work real
+> support takes.
+>=20
+> Feature deprecation is not a contract to drop the feature after two
+> releases, or even five.  It's a formal notice that users of the feature
+> should transition to its replacement in an orderly manner.
+>=20
+> If I understand Igor correctly, all users should transition away from
+> outdated NUMA configurations at least for new VMs in an orderly manner.
+Yes, we can postpone removing options until there are machines type
+versions that were capable to use it (unfortunate but probably=20
+unavoidable unless there is a migration trick to make transition
+transparent) but that should not stop us from disabling broken
+options on new machine types at least.
 
-It seems, that everything else is synchronized with blkreplay driver
-which is mandatory when using block devices in rr mode.
+This series can serve as formal notice with follow up disabling of
+deprecated options for new machine types. (As Thomas noted, just warnings
+do not work and users continue to use broken features regardless whether
+they are don't know about issues or aware of it [*])
 
-> But I fully expect this to get broken anyway all the time because nobody
-> understands which function to use, and if it works for your special case
-> now and we'll fix other stuff as you encouter it, maybe that's good
-> enough for you.
+Hence suggested deprecation approach and enforced rejection of legacy
+numa options for new machine types in 2 releases so users would stop
+using them eventually.
 
-This problem exists in every subsystem and it is ok for now, when record/replay
-is not mature enough, and not familiar for others.
-When virtual devices are updated, developers may miss correct loadvm/savevm
-implementation. For example, loading the audio device state may miss
-shift the phase of the output signal. Nobody will notice that bug
-in the migration process, but it reveals when we use record/replay.
+*) https://www.redhat.com/archives/libvir-list/2018-November/msg00159.html
 
-We can't cover everything with record/replay tests. Most of the new bugs
-can be revealed in complex configurations after billions of executed instructions.
-But when this feature will be available out of the box, we'll
-at least get more smoke testing.
-
-> 
-> > @@ -1349,8 +1351,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int
-> bytes,
-> >
-> >      acb->has_returned = true;
-> >      if (acb->rwco.ret != NOT_DONE) {
-> > -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
-> > -                                blk_aio_complete_bh, acb);
-> > +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-> > +                                         blk_aio_complete_bh, acb);
-> >      }
-> 
-> This, and a few other places that you convert, are in fast paths and add
-> some calls that are unnecessary for non-replay cases.
-
-I don't think that this can make a noticeable slowdown, but we can run
-the tests if you want.
-We have the test suite which performs disk-intensive computation.
-It was created to measure the effect of running BH callbacks through
-the virtual timer infrastructure.
-
-> I wonder if we could make replay optional in ./configure and then make
-> replay_bh_schedule_oneshot_event() a static inline function that can get
-> optimised away at compile time if the feature is disabled.
-
-It is coupled with icount. However, some icount calls are also lie on
-the fast paths and are completely useless when icount is not enabled.
-
-Pavel Dovgalyuk
+> So, how could this formal notice be served constructively?
+>=20
+> If we reject outdated NUMA configurations starting with machine type T,
+> we can remove the means to create those configurations along with
+> machine type T-1.  Won't happen anytime soon, will happen eventually,
+> because in the long run, all machine types are dead (apologies to
+> Keynes).
+>=20
+> If we deprecate outdated NUMA configurations now, we can start rejecting
+> them with new machine types after a suitable grace period.
+>=20
