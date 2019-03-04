@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46125)
+Received: from eggs.gnu.org ([209.51.188.92]:46176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCw-0002Iv-55
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:58 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sD1-0002Pm-H4
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCr-0004dx-R3
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:55 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:38343)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCz-0004xE-LF
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:03 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:53712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h0sCo-0004Wm-1t
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:50 -0500
-Received: by mail-wm1-x335.google.com with SMTP id a188so121729wmf.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:49 -0800 (PST)
+	id 1h0sCx-0004bX-GP
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:01 -0500
+Received: by mail-wm1-x331.google.com with SMTP id e74so128930wmg.3
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:51 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Mar 2019 19:19:53 +0100
-Message-Id: <1551723614-1823-34-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Mar 2019 19:19:56 +0100
+Message-Id: <1551723614-1823-37-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
 References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 33/54] ppc: Express dependencies of the 'prep'
- and '40p' machines with kconfig
+Subject: [Qemu-devel] [PULL 36/54] ppc: Express dependencies of the embedded
+ machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +29,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, Yang Zhong <yang.zhong@intel.com>, =?UTF-8?q?Herv=C3=83=C2=A9=20Poussineau?= <hpoussin@reactos.org>
+Cc: thuth@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
 From: Thomas Huth <thuth@redhat.com>
 
-Select the required devices in hw/ppc/Kconfig instead, so that
-ppc-softmmu.mak only contains the user-selectable PREP switch.
-Plug-in devices like NE2000_ISA are pulled in automatically by the
-Kconfig build system now.
+This makes it much easier if the users want to disable some of
+the embedded machines for their builds.
 
-Cc: HervÃ© Poussineau <hpoussin@reactos.org>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/ppc-softmmu.mak |  8 --------
- hw/ppc/Kconfig                  | 10 ++++++++++
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ default-configs/ppc-softmmu.mak | 17 -----------------
+ hw/ppc/Kconfig                  | 19 +++++++++++++++++++
+ 2 files changed, 19 insertions(+), 17 deletions(-)
 
 diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 9ad307a..066cec9 100644
+index fb43cba..6ea36d4 100644
 --- a/default-configs/ppc-softmmu.mak
 +++ b/default-configs/ppc-softmmu.mak
-@@ -55,11 +55,3 @@ CONFIG_MAC_NEWWORLD=y
+@@ -1,27 +1,10 @@
+ # Default configuration for ppc-softmmu
  
- # For PReP
- CONFIG_PREP=y
--CONFIG_PREP_PCI=y
--CONFIG_RS6000_MC=y
--CONFIG_I82374=y
--CONFIG_I82378=y
--CONFIG_PCKBD=y
--CONFIG_NE2000_ISA=y
--CONFIG_PC87312=y
--CONFIG_CS4231A=y
+-CONFIG_ISA_BUS=y
+-CONFIG_PCI=y
+-CONFIG_PCI_DEVICES=y
+-CONFIG_TEST_DEVICES=y
+-
+ # For embedded PPCs:
+-CONFIG_PPC4XX=y
+-CONFIG_M48T59=y
+-CONFIG_SERIAL=y
+-CONFIG_OPENPIC=y
+-CONFIG_PPCE500_PCI=y
+-CONFIG_PFLASH_CFI01=y
+-CONFIG_PFLASH_CFI02=y
+-CONFIG_XILINX=y
+-CONFIG_XILINX_ETHLITE=y
+ CONFIG_E500=y
+-CONFIG_PLATFORM_BUS=y
+-CONFIG_ETSEC=y
+ CONFIG_PPC405=y
+ CONFIG_PPC440=y
+ CONFIG_VIRTEX=y
+-CONFIG_PCI_EXPRESS=y
+ 
+ # For Sam460ex
+ CONFIG_SAM460EX=y
 diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-index 30e3e81..24e4ed9 100644
+index f4fce16..e759a3f 100644
 --- a/hw/ppc/Kconfig
 +++ b/hw/ppc/Kconfig
-@@ -39,6 +39,16 @@ config SAM460EX
+@@ -27,9 +27,18 @@ config POWERNV
  
- config PREP
+ config PPC405
+     bool
++    select M48T59
++    select PFLASH_CFI02
++    select PPC4XX
++    select SERIAL
+ 
+ config PPC440
      bool
 +    imply PCI_DEVICES
 +    imply TEST_DEVICES
-+    select CS4231A
-+    select PREP_PCI
-+    select I82374
-+    select I82378
-+    select LSI_SCSI_PCI
-+    select M48T59
-+    select PC87312
-+    select RS6000_MC
++    select PCI_EXPRESS
++    select PPC4XX
++    select SERIAL
  
- config RS6000_MC
+ config PPC4XX
+     bool
+@@ -87,9 +96,19 @@ config MAC_NEWWORLD
+ 
+ config E500
+     bool
++    imply AT24C
++    select ETSEC
++    select OPENPIC
++    select PLATFORM_BUS
++    select PPCE500_PCI
++    select SERIAL
+ 
+ config VIRTEX
+     bool
++    select PFLASH_CFI01
++    select SERIAL
++    select XILINX
++    select XILINX_ETHLITE
+ 
+ config XIVE
      bool
 -- 
 1.8.3.1
