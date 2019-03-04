@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39795)
+Received: from eggs.gnu.org ([209.51.188.92]:40086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h0hS6-0007K4-LS
+	(envelope-from <dgibson@ozlabs.org>) id 1h0hS5-0007aY-Qe
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:51:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h0hIM-00041M-2p
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:41:51 -0500
-Date: Mon, 4 Mar 2019 16:50:18 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1h0hIN-00045V-Ck
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:41:53 -0500
+Date: Mon, 4 Mar 2019 16:56:37 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190304055018.GM7792@umbus.fritz.box>
+Message-ID: <20190304055637.GO7792@umbus.fritz.box>
 References: <20190228225759.21328-1-farosas@linux.ibm.com>
-	<20190228225759.21328-3-farosas@linux.ibm.com>
+	<20190228225759.21328-5-farosas@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HVCoas+krw6dou6l"
+	protocol="application/pgp-signature"; boundary="nljfjKcp9HDtPSOP"
 Content-Disposition: inline
-In-Reply-To: <20190228225759.21328-3-farosas@linux.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v4 2/5] kvm-all: Introduce
- kvm_set_singlestep
+In-Reply-To: <20190228225759.21328-5-farosas@linux.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 4/5] target/ppc: Refactor
+ kvm_handle_debug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,161 +29,139 @@ To: Fabiano Rosas <farosas@linux.ibm.com>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
---HVCoas+krw6dou6l
+--nljfjKcp9HDtPSOP
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 28, 2019 at 07:57:56PM -0300, Fabiano Rosas wrote:
-> For single stepping (via KVM) of a guest vcpu to work, KVM needs not
-> only to support the SET_GUEST_DEBUG ioctl but to also recognize the
-> KVM_GUESTDBG_SINGLESTEP bit in the control field of the
-> kvm_guest_debug struct.
+On Thu, Feb 28, 2019 at 07:57:58PM -0300, Fabiano Rosas wrote:
+> There are four scenarios being handled in this function:
 >=20
-> This patch adds support for querying the single step capability so
-> that QEMU can decide what to do for the platforms that do not have
-> such support.
+> - single stepping
+> - hardware breakpoints
+> - software breakpoints
+> - fallback (no debug supported)
 >=20
-> This will allow architecture-specific implementations of a fallback
-> mechanism for single stepping in cases where KVM does not support it.
+> A future patch will add code to handle specific single step and
+> software breakpoints cases so let's split each scenario into its own
+> function now to avoid hurting readability.
 >=20
 > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+
+Again, a nice cleanup regardless of anything else.  Applied.
+
 > ---
->  accel/kvm/kvm-all.c             | 16 ++++++++++++++++
->  accel/stubs/kvm-stub.c          |  4 ++++
->  exec.c                          |  2 +-
->  include/sysemu/kvm.h            |  3 +++
->  stubs/Makefile.objs             |  1 +
->  stubs/kvm-arch-set-singlestep.c |  8 ++++++++
->  6 files changed, 33 insertions(+), 1 deletion(-)
->  create mode 100644 stubs/kvm-arch-set-singlestep.c
+>  target/ppc/kvm.c | 86 ++++++++++++++++++++++++++++--------------------
+>  1 file changed, 50 insertions(+), 36 deletions(-)
 >=20
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index fd92b6f375..d3ac5a9e5c 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2267,6 +2267,13 @@ bool kvm_arm_supports_user_irq(void)
->      return kvm_check_extension(kvm_state, KVM_CAP_ARM_USER_IRQ);
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 941c4e7523..9392fba192 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -1620,52 +1620,66 @@ static int kvm_handle_hw_breakpoint(CPUState *cs,
+>      return handle;
 >  }
 > =20
-> +/* Whether the KVM_SET_GUEST_DEBUG ioctl supports single stepping */
-> +int kvm_has_guestdbg_singlestep(void)
+> +static int kvm_handle_singlestep(void)
 > +{
-> +    /* return kvm_check_extension(kvm_state, KVM_CAP_GUEST_DEBUG_SSTEP);=
- */
-
-I don't see a KVM_CAP_GUEST_DEBUG_SSTEP in either the qemu or kernel
-trees.  Where does that come from?
-
-> +    return 0;
+> +    return 1;
 > +}
 > +
->  #ifdef KVM_CAP_SET_GUEST_DEBUG
->  struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu,
->                                                   target_ulong pc)
-> @@ -2316,6 +2323,15 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned=
- long reinject_trap)
->      return data.err;
->  }
-> =20
-> +void kvm_set_singlestep(CPUState *cs, int enabled)
+> +static int kvm_handle_sw_breakpoint(void)
 > +{
-> +    if (kvm_has_guestdbg_singlestep()) {
-> +        kvm_update_guest_debug(cs, 0);
-> +    } else {
-> +        kvm_arch_set_singlestep(cs, enabled);
+> +    return 1;
+> +}
+> +
+>  static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
+>  {
+>      CPUState *cs =3D CPU(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+>      struct kvm_debug_exit_arch *arch_info =3D &run->debug.arch;
+> -    int handle =3D 0;
+> =20
+>      if (cs->singlestep_enabled) {
+> -        handle =3D 1;
+> -    } else if (arch_info->status) {
+> -        handle =3D kvm_handle_hw_breakpoint(cs, arch_info);
+> -    } else if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
+> -        handle =3D 1;
+> -    } else {
+> -        /* QEMU is not able to handle debug exception, so inject
+> -         * program exception to guest;
+> -         * Yes program exception NOT debug exception !!
+> -         * When QEMU is using debug resources then debug exception must
+> -         * be always set. To achieve this we set MSR_DE and also set
+> -         * MSRP_DEP so guest cannot change MSR_DE.
+> -         * When emulating debug resource for guest we want guest
+> -         * to control MSR_DE (enable/disable debug interrupt on need).
+> -         * Supporting both configurations are NOT possible.
+> -         * So the result is that we cannot share debug resources
+> -         * between QEMU and Guest on BOOKE architecture.
+> -         * In the current design QEMU gets the priority over guest,
+> -         * this means that if QEMU is using debug resources then guest
+> -         * cannot use them;
+> -         * For software breakpoint QEMU uses a privileged instruction;
+> -         * So there cannot be any reason that we are here for guest
+> -         * set debug exception, only possibility is guest executed a
+> -         * privileged / illegal instruction and that's why we are
+> -         * injecting a program interrupt.
+> -         */
+> +        return kvm_handle_singlestep();
 > +    }
-> +}
 > +
->  int kvm_insert_breakpoint(CPUState *cpu, target_ulong addr,
->                            target_ulong len, int type)
->  {
-> diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-> index 02d5170031..69bd07f50e 100644
-> --- a/accel/stubs/kvm-stub.c
-> +++ b/accel/stubs/kvm-stub.c
-> @@ -79,6 +79,10 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned lon=
-g reinject_trap)
->      return -ENOSYS;
+> +    if (arch_info->status) {
+> +        return kvm_handle_hw_breakpoint(cs, arch_info);
+> +    }
+> =20
+> -        cpu_synchronize_state(cs);
+> -        /* env->nip is PC, so increment this by 4 to use
+> -         * ppc_cpu_do_interrupt(), which set srr0 =3D env->nip - 4.
+> -         */
+> -        env->nip +=3D 4;
+> -        cs->exception_index =3D POWERPC_EXCP_PROGRAM;
+> -        env->error_code =3D POWERPC_EXCP_INVAL;
+> -        ppc_cpu_do_interrupt(cs);
+> +    if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
+> +        return kvm_handle_sw_breakpoint();
+>      }
+> =20
+> -    return handle;
+> +    /*
+> +     * QEMU is not able to handle debug exception, so inject
+> +     * program exception to guest;
+> +     * Yes program exception NOT debug exception !!
+> +     * When QEMU is using debug resources then debug exception must
+> +     * be always set. To achieve this we set MSR_DE and also set
+> +     * MSRP_DEP so guest cannot change MSR_DE.
+> +     * When emulating debug resource for guest we want guest
+> +     * to control MSR_DE (enable/disable debug interrupt on need).
+> +     * Supporting both configurations are NOT possible.
+> +     * So the result is that we cannot share debug resources
+> +     * between QEMU and Guest on BOOKE architecture.
+> +     * In the current design QEMU gets the priority over guest,
+> +     * this means that if QEMU is using debug resources then guest
+> +     * cannot use them;
+> +     * For software breakpoint QEMU uses a privileged instruction;
+> +     * So there cannot be any reason that we are here for guest
+> +     * set debug exception, only possibility is guest executed a
+> +     * privileged / illegal instruction and that's why we are
+> +     * injecting a program interrupt.
+> +     */
+> +    cpu_synchronize_state(cs);
+> +    /*
+> +     * env->nip is PC, so increment this by 4 to use
+> +     * ppc_cpu_do_interrupt(), which set srr0 =3D env->nip - 4.
+> +     */
+> +    env->nip +=3D 4;
+> +    cs->exception_index =3D POWERPC_EXCP_PROGRAM;
+> +    env->error_code =3D POWERPC_EXCP_INVAL;
+> +    ppc_cpu_do_interrupt(cs);
+> +
+> +    return 0;
 >  }
 > =20
-> +void kvm_set_singlestep(CPUState *cs, int enabled)
-> +{
-> +}
-> +
->  int kvm_insert_breakpoint(CPUState *cpu, target_ulong addr,
->                            target_ulong len, int type)
->  {
-> diff --git a/exec.c b/exec.c
-> index 518064530b..8817513e26 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1236,7 +1236,7 @@ void cpu_single_step(CPUState *cpu, int enabled)
->      if (cpu->singlestep_enabled !=3D enabled) {
->          cpu->singlestep_enabled =3D enabled;
->          if (kvm_enabled()) {
-> -            kvm_update_guest_debug(cpu, 0);
-> +            kvm_set_singlestep(cpu, enabled);
->          } else {
->              /* must flush all the translated code to avoid inconsistenci=
-es */
->              /* XXX: only flush what is necessary */
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index a6d1cd190f..e1ef2f5b99 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -214,6 +214,7 @@ int kvm_has_pit_state2(void);
->  int kvm_has_many_ioeventfds(void);
->  int kvm_has_gsi_routing(void);
->  int kvm_has_intx_set_mask(void);
-> +int kvm_has_guestdbg_singlestep(void);
-> =20
->  int kvm_init_vcpu(CPUState *cpu);
->  int kvm_cpu_exec(CPUState *cpu);
-> @@ -246,6 +247,7 @@ bool kvm_memcrypt_enabled(void);
->   */
->  int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
-> =20
-> +void kvm_arch_set_singlestep(CPUState *cpu, int enabled);
-> =20
->  #ifdef NEED_CPU_H
->  #include "cpu.h"
-> @@ -258,6 +260,7 @@ int kvm_remove_breakpoint(CPUState *cpu, target_ulong=
- addr,
->                            target_ulong len, int type);
->  void kvm_remove_all_breakpoints(CPUState *cpu);
->  int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap);
-> +void kvm_set_singlestep(CPUState *cs, int enabled);
-> =20
->  int kvm_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
->  int kvm_on_sigbus(int code, void *addr);
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 269dfa5832..884f9b2268 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -12,6 +12,7 @@ stub-obj-y +=3D get-vm-name.o
->  stub-obj-y +=3D iothread.o
->  stub-obj-y +=3D iothread-lock.o
->  stub-obj-y +=3D is-daemonized.o
-> +stub-obj-y +=3D kvm-arch-set-singlestep.o
->  stub-obj-$(CONFIG_LINUX_AIO) +=3D linux-aio.o
->  stub-obj-y +=3D machine-init-done.o
->  stub-obj-y +=3D migr-blocker.o
-> diff --git a/stubs/kvm-arch-set-singlestep.c b/stubs/kvm-arch-set-singles=
-tep.c
-> new file mode 100644
-> index 0000000000..ba6e0323d6
-> --- /dev/null
-> +++ b/stubs/kvm-arch-set-singlestep.c
-> @@ -0,0 +1,8 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "sysemu/kvm.h"
-> +
-> +void kvm_arch_set_singlestep(CPUState *cpu, int enabled)
-> +{
-> +    warn_report("KVM does not support single stepping");
-> +}
+>  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -191,24 +169,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---HVCoas+krw6dou6l
+--nljfjKcp9HDtPSOP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx8vJoACgkQbDjKyiDZ
-s5LxYQ/8CgC6cTgKbRbwItlb4aRx1wjbBv76wf5q0RTsiMJTT96TTeOTwoN1K788
-ZASxZG5o9bt7wo6AJYZBp7E/yb5QulwjLK5E4kgStpXqPyVpUI0hSYoPaACldI/v
-5XvBKStZET+qZxsOtK5I4ZEYeycWm0NsIgucpkaUm25O9kI1lrqtqsmdOAtrC12e
-7e2Si2DRNlrlINc2PiAPQujkv92MXx9QA1/+YWInGBpmMl5MJDc0rbqnlRb0gEpx
-MYQEs2TVUY85tMBGQQ6e9+4M0GkIRJQhufdQr2jHYvLynvWjs0aPoA1c5MsJwSbf
-V5Qr1nymJGH5j5pkYqICM0t7ux5E258EFrEkGBgzo57bbUqaSdXfr9lwtQQtAxTZ
-hESBSQJEVcRnG0ejWoKs0QrpnLbCvO8aZCPVOSAW7PbGlF8WBCPXRpvTYXtmrsnV
-xsY18YknuK52DgeGrcDIasolNxtUaLUsYN35U9jLbFj2P3Dr0/5kDMsMBQcQN8y7
-NZVkdsPNLuli+4+PFbXl/67YEBO5dYbt6iAuWeD48I3KAFhg5cY/kIboMeooG0cD
-n5ltkYmry+RRT074HPWi/x8NwQQpCI5P/J6+Kpi/0Xiwf3G5NAnAHeb2X1wVUlm6
-NYVzKp774KqyFL5hDBgqcnU+wTylmBRlIMB7b+Ss3/1Gmje0wjQ=
-=nGhn
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx8vhUACgkQbDjKyiDZ
+s5L8ZA/+PSBxKZ8tZBskUmcdvTZznmhQBA00AWKqAURxRUBOJMQA2JUpYb3JWNZq
+kHVeQX8g3tKNXQ/C3ZfljmNRnt9dhUl3aq2nMxK0EAnU5oOyo+C88myy+ltJmmfC
+hq+0Pny6yjErfAMv9gIhlRPra44Eki/LlDfiK6WHhhO1ph05WIfdf0EtSetid3Ht
+KoeLz2afFMjuWffMjmle0POSnj0NeCg9oC5lsXMMHVO/mdDUvaNfGp8wTxjtx4a9
+Rg0QmccjJJHbCeIfwovUI5zArXoF3T16GcezVzxLCX1vY8XFH1/FZd3qUCq7huQc
+2bIYy4SmEfdLQ0rJRXALcxDJDWf0IkcgrLRvAiSRfb8PHOLiMjXmG8HFi/ruCzFP
+2drpEntqa0CBoMb+BvHw1YA+6TpS1kNSSbbKqixqyAduV5iWeWxaIjwCX6WduevS
+S78j++WaInxPuurs8iCXmJyFiXuXPzE5f/qxL10mC/hAwGZop+kCkVlsCnkMolen
+ChzE3obRfPH7hktqQJalMGC43vvHY9I++oS6kEwPeW/Nc+g0utD+9MyZoonMBYvR
+PE5n5nAA0yYvbmTVicxc3SFdjXw7ZJMowLhfrappnhlxx1CY16y0sWcXnZJuR6Yw
+/EYm9bIcE2S/OeInmSLQqQAksPQ1VnjFLWcNZo72tAEt8zLkXFg=
+=5Mxh
 -----END PGP SIGNATURE-----
 
---HVCoas+krw6dou6l--
+--nljfjKcp9HDtPSOP--
