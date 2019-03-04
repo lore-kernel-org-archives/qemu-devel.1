@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37752)
+Received: from eggs.gnu.org ([209.51.188.92]:37870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0tHn-0001za-Gd
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 14:30:04 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h0tIE-0002Sk-Ob
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 14:30:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0tHm-0007yU-20
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 14:30:03 -0500
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:41124)
+	(envelope-from <richard.henderson@linaro.org>) id 1h0tID-0008Cl-Sy
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 14:30:30 -0500
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:37301)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1h0tHj-0007wI-4q
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 14:29:59 -0500
-Received: by mail-ot1-x336.google.com with SMTP id t7so5223448otk.8
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 11:29:58 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h0tID-0008AS-Aj
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 14:30:29 -0500
+Received: by mail-pg1-x532.google.com with SMTP id q206so3775451pgq.4
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 11:30:27 -0800 (PST)
+References: <20190301214945.4353-1-palmer@sifive.com>
+	<CAFEAcA-ZbFf+_Bt4QGu6ZchOZtvizWPR_5pFz4vOVVYAf23mgA@mail.gmail.com>
+	<36b17c57-7caf-1e49-d500-bf2eddcd1f25@mail.uni-paderborn.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a652de39-fae2-9885-1197-fbb70b28b7cf@linaro.org>
+Date: Mon, 4 Mar 2019 11:30:21 -0800
 MIME-Version: 1.0
-References: <20190304151827.1813-1-davidkiarie4@gmail.com>
-	<20190304151827.1813-2-davidkiarie4@gmail.com>
-	<50ec8aca-252e-792f-9a9a-a5dc606eca9c@redhat.com>
-	<CABdVeAAZXbC-5tPJd1ziAeKBVo+Bqt8We-hHDv_6bRd99YXmrg@mail.gmail.com>
-In-Reply-To: <CABdVeAAZXbC-5tPJd1ziAeKBVo+Bqt8We-hHDv_6bRd99YXmrg@mail.gmail.com>
-From: David Kiarie <davidkiarie4@gmail.com>
-Date: Mon, 4 Mar 2019 22:29:10 +0300
-Message-ID: <CABdVeADyxZ9Fpr0=ZqDJhH3hnBJ8F3RpoBuqk7ywKwT6WF4BGQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] update copyright notice
+In-Reply-To: <36b17c57-7caf-1e49-d500-bf2eddcd1f25@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL] target/riscv: Convert to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Mar 4, 2019 at 10:20 PM David Kiarie <davidkiarie4@gmail.com> wrote=
-:
+On 3/4/19 4:52 AM, Bastian Koppelmann wrote:
+> This looks like an unforeseen decodetree problem (CC' Richard). As these 16/32
+> instructions share the same trans_* function, we emit the same typedef once for
+> 16 bit and once for 32 bit. I don't see an easy fix in decodetree
 
->
->
-> On Mon, Mar 4, 2019 at 8:48 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
-.com>
-> wrote:
->
->> On 3/4/19 4:18 PM, David Kiarie wrote:
->> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
->>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>
->
-> would i be wrong to say this patch received unwarranted scrutiny from you=
-,
-> Philippe?
->
+Use an argument set, and add !extern to the argument set definition for the
+"second" decoder.
 
-i mean, given you have never been involved in any IOMMU work, i wouldn't
-expect that you're in a position to asking questions about the copyright.
+(Leastwise I don't think that feature is sitting on the branch...)
 
 
->
->
->> > ---
->> >  hw/i386/amd_iommu.c | 2 +-
->> >  hw/i386/amd_iommu.h | 2 +-
->> >  2 files changed, 2 insertions(+), 2 deletions(-)
->> >
->> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
->> > index 8ad707a..6eabdf9 100644
->> > --- a/hw/i386/amd_iommu.c
->> > +++ b/hw/i386/amd_iommu.c
->> > @@ -2,7 +2,7 @@
->> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
->> >   *
->> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->> > + * Copyright (C) 2015, 2016 David Kiarie Kahurani
->> >   *
->> >   * This program is free software; you can redistribute it and/or modi=
-fy
->> >   * it under the terms of the GNU General Public License as published =
-by
->> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
->> > index c52886f..0ff9095 100644
->> > --- a/hw/i386/amd_iommu.h
->> > +++ b/hw/i386/amd_iommu.h
->> > @@ -2,7 +2,7 @@
->> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
->> >   *
->> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->> > + * Copyright (C) 2015, 2016 David Kiarie Kahurani
->> >   *
->> >   * This program is free software; you can redistribute it and/or modi=
-fy
->> >   * it under the terms of the GNU General Public License as published =
-by
->> >
->>
->
+r~
