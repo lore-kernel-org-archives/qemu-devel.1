@@ -1,38 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36281)
+Received: from eggs.gnu.org ([209.51.188.92]:37439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0phR-0007vY-Vn
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:19 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h0pnY-00038j-Ba
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:46:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0phQ-0005CV-Oi
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:17 -0500
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:33701)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1h0phQ-0005Bt-F2
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:16 -0500
-Received: by mail-oi1-x231.google.com with SMTP id z14so4175265oid.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 07:40:16 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1h0pnX-0004Qo-GP
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:46:36 -0500
+Date: Mon, 4 Mar 2019 16:46:23 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190304164623.6643b5ce@redhat.com>
+In-Reply-To: <20190304152811.GO4239@redhat.com>
+References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
+	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
+	<20190301154947.GJ21251@redhat.com>
+	<20190301183328.20b63e23@redhat.com>
+	<20190301174806.GN21251@redhat.com>
+	<87va0zcdse.fsf@dusky.pond.sub.org>
+	<20190304101911.GE4239@redhat.com>
+	<87y35u3lth.fsf@dusky.pond.sub.org>
+	<20190304152811.GO4239@redhat.com>
 MIME-Version: 1.0
-References: <20190223105421.1290-1-davidkiarie4@gmail.com>
-	<20190223105421.1290-2-davidkiarie4@gmail.com>
-	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
-	<CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
-	<CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
-	<CABdVeABUzvwA8jV8ZfTcDY8eWN5=M2Otku6eukaBsPeMqPNOhQ@mail.gmail.com>
-	<CABdVeABnosV3-u9aepP=kSrb9P0X6-vUWZ2kDATUmNLmaJ_5+g@mail.gmail.com>
-	<CABdVeACgD7NrRa+P9yzkjhNJAtf9JEaJKuzo+J3CMCxLUO3phQ@mail.gmail.com>
-	<CABdVeACYb_TpARadx1FkQwODY7pqFp=Bm4RyZ3easb4Hm1JAyw@mail.gmail.com>
-	<CABdVeAD2mfUR5-29NQ=jkWjLRt6wyQNJEk4hFOZYFsnKCgYZFg@mail.gmail.com>
-	<b1eb9632-3322-bad3-8cd1-d716b8ae9322@redhat.com>
-	<CABdVeADy4DerQj+9On5HP_M6Qa4jRJU0CvkUgiab+LV_XYa-6g@mail.gmail.com>
-	<CABdVeABf7Rg5sBzvWZ6ujwHMjwLo8jBRkoVGjDBR4fHRuLv1gw@mail.gmail.com>
-	<CABdVeACnHqyBcBCXq08idKL0xaf14Pa8_mOFBRxkbcvJh6SEOg@mail.gmail.com>
-In-Reply-To: <CABdVeACnHqyBcBCXq08idKL0xaf14Pa8_mOFBRxkbcvJh6SEOg@mail.gmail.com>
-From: David Kiarie <davidkiarie4@gmail.com>
-Date: Mon, 4 Mar 2019 18:39:27 +0300
-Message-ID: <CABdVeACc3y67MW3aiMnsArqaqe_ZdiGBaja+ctN-nL0Yv82TCw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
+ parameter of '-numa node' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,123 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Mon, Mar 4, 2019 at 6:33 PM David Kiarie <davidkiarie4@gmail.com> wrote:
+On Mon, 4 Mar 2019 15:28:11 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
->
->
-> On Mon, Mar 4, 2019 at 6:32 PM David Kiarie <davidkiarie4@gmail.com>
-> wrote:
->
->>
->>
->> On Mon, Mar 4, 2019 at 6:27 PM David Kiarie <davidkiarie4@gmail.com>
->> wrote:
->>
->>>
->>>
->>> On Mon, Mar 4, 2019 at 6:23 PM Thomas Huth <thuth@redhat.com> wrote:
->>>
->>>> On 04/03/2019 16.13, David Kiarie wrote:
->>>> >
->>>> >                             Hi David,
->>>> >
->>>> >                             On 2/23/19 11:54 AM, David Kiarie wrote:
->>>> >                             > Signed-off-by: David Kiarie
->>>> >                             <davidkiarie4@gmail.com
->>>> >                             <mailto:davidkiarie4@gmail.com>>
->>>> >                             > ---
->>>> >                             >  hw/i386/amd_iommu.c | 2 +-
->>>> >                             >  hw/i386/amd_iommu.h | 2 +-
->>>> >                             >  2 files changed, 2 insertions(+), 2
->>>> >                             deletions(-)
->>>> >                             >
->>>> >                             > diff --git a/hw/i386/amd_iommu.c
->>>> >                             b/hw/i386/amd_iommu.c
->>>> >                             > index 8ad707a..4f179da 100644
->>>> >                             > --- a/hw/i386/amd_iommu.c
->>>> >                             > +++ b/hw/i386/amd_iommu.c
->>>> >                             > @@ -2,7 +2,7 @@
->>>> >                             >   * QEMU emulation of AMD IOMMU (AMD-Vi)
->>>> >                             >   *
->>>> >                             >   * Copyright (C) 2011 Eduard - Gabriel
->>>> >                             Munteanu
->>>> >                             > - * Copyright (C) 2015 David Kiarie,
->>>> >                             <davidkiarie4@gmail.com
->>>> >                             <mailto:davidkiarie4@gmail.com>>
->>>> >                             > + * Copyright (C) 2016 David Kiarie
->>>> Kahurani
->>>> >
->>>> >                             Why do you change the year? Because your
->>>> >                             work was merged in 2016?
->>>> >
->>>> >
->>>> >                         no.
->>>> >
->>>> >
->>>> >
->>>> >                     though, if you have a legitimate issue with the
->>>> >                     change, you can always air it.
->>>> >
->>>> >
->>>> >                 you might think random emails are weird but Paolo, i
->>>> >                 don't expect to see any activity from you, on Qemu
->>>> repo
->>>> >                 before this issue is sorted ;-)
->>>> >
->>>> >
->>>> >             i mostly don't care about this code but i *wrote* it. if i
->>>> >             am not allowed even make such minor(which i not a
->>>> routine),
->>>> >             why shouldn't i ask you to take the files down?
->>>> >
->>>> >
->>>> >         or, rather, a small issue turns into a scene about how clean
->>>> >         Qemu is. why not take down all my dirty code?
->>>> >
->>>> >
->>>> >     look i'm resending this patch and next time we're having this
->>>> >     conversation, i'll be defacing qemu.
->>>> >
->>>> > either you have to update my code to what i think it should look like
->>>> or
->>>> > you have to take down - wtf
->>>> >
->>>> > then you try to cook rubbish over it.
->>>>
->>>> Hey, calm down. Paolo said that he'd queue your patch, so it will
->>>> eventually get applied. But that just might take some time, the
->>>> maintainers only send PULL requests for their queued patches after a
->>>> couple of days. So relax, wait some days, and if your patch still did
->>>> not get applied in a week, then you can start complaining again.
->>>>
->>>
->>> i'll not complain again, i'm make a patch to clean my code from your
->>> codebase.
->>>
->>
->>
->> Qemu have never been important to me like it's important to the
->> maintainers.
->>
->>
-> i'm sure you can write your own AMD IOMMU.
->
+> On Mon, Mar 04, 2019 at 12:45:14PM +0100, Markus Armbruster wrote:
+> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+> >  =20
+> > > On Mon, Mar 04, 2019 at 08:13:53AM +0100, Markus Armbruster wrote: =20
+> > >> If we deprecate outdated NUMA configurations now, we can start rejec=
+ting
+> > >> them with new machine types after a suitable grace period. =20
+> > >
+> > > How is libvirt going to know what machines it can use with the featur=
+e ?
+> > > We don't have any way to introspect machine type specific logic, sinc=
+e we
+> > > run all probing with "-machine none", and QEMU can't report anything =
+about
+> > > machines without instantiating them. =20
+> >=20
+> > Fair point.  A practical way for management applications to decide which
+> > of the two interfaces they can use with which machine type may be
+> > required for deprecating one of the interfaces with new machine types. =
+=20
+>=20
+> We currently have  "qom-list-properties" which can report on the
+> existance of properties registered against object types. What it
+> can't do though is report on the default values of these properties.
+>=20
+> What's interesting though is that qmp_qom_list_properties will actually
+> instantiate objects in order to query properties, if the type isn't an
+> abstract type.
+>=20
+> IOW, even if you are running "$QEMU -machine none", then if at the qmp-sh=
+ell
+> you do
+>=20
+>    (QEMU) qom-list-properties typename=3Dpc-q35-2.6-machine
+>=20
+> it will have actually instantiate the pc-q35-2.6-machine machine type.
+> Since it has instantiated the machine, the object initializer function
+> will have run and initialized the default values for various properties.
+>=20
+> IOW, it is possible for qom-list-properties to report on default values
+> for non-abstract types.
+>=20
+> I did a quick hack to PoC the theory:
+>=20
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 8b3ca4fdd3..906dfbf3b5 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1368,7 +1368,8 @@
+>  # Since: 1.2
+>  ##
+>  { 'struct': 'ObjectPropertyInfo',
+> -  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
+> +  'data': { 'name': 'str', 'type': 'str', '*description': 'str',
+> +            '*default': 'str'} }
+> =20
+>  ##
+>  # @qom-list:
+> diff --git a/qmp.c b/qmp.c
+> index b92d62cd5f..a45669032c 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -594,6 +594,11 @@ ObjectPropertyInfoList *qmp_qom_list_properties(cons=
+t char *typename,
+>          info->has_description =3D !!prop->description;
+>          info->description =3D g_strdup(prop->description);
+> =20
+> +        if (obj && g_str_equal(info->type, "string")) {
+> +            info->q_default =3D g_strdup(object_property_get_str(obj, in=
+fo->name, NULL));
+> +            info->has_q_default =3D info->q_default !=3D NULL;
+> +        }
+> +
+>          entry =3D g_malloc0(sizeof(*entry));
+>          entry->value =3D info;
+>          entry->next =3D prop_list;
+>=20
+>=20
+> If we could make this hack less of a hack, then perhaps this is good
+> enough to cope reporting machine types which forbid use of "mem" in
+> favour of "memdev" ? They would need to have a property registered
+> against them of course to identify the "memdev" requirement.
 
-in fact, i'll write the other patch then you can just choose what to merge.
+Thanks, I'll look into it and try to come up with patches.
 
-you're not as important as you try to pose.
-
-
->
->
->>
->>
->>>
->>>
->>>>
->>>>  Thomas
->>>>
->>>
+> Regards,
+> Daniel
