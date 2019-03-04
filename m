@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37351)
+Received: from eggs.gnu.org ([209.51.188.92]:37646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0rgC-0000Aq-7d
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:47:08 -0500
+	(envelope-from <philmd@redhat.com>) id 1h0rhS-0000xe-6W
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:48:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0rgB-0000AO-GP
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:47:08 -0500
-Date: Mon, 4 Mar 2019 18:46:59 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190304184659.3ca35a01.cohuck@redhat.com>
-In-Reply-To: <1551466776-29123-9-git-send-email-jjherne@linux.ibm.com>
-References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-	<1551466776-29123-9-git-send-email-jjherne@linux.ibm.com>
+	(envelope-from <philmd@redhat.com>) id 1h0rhR-00014G-AT
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:48:26 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45599)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h0rhR-000132-14
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:48:25 -0500
+Received: by mail-wr1-f65.google.com with SMTP id w17so6521131wrn.12
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 09:48:24 -0800 (PST)
+References: <20190304151827.1813-1-davidkiarie4@gmail.com>
+	<20190304151827.1813-2-davidkiarie4@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <50ec8aca-252e-792f-9a9a-a5dc606eca9c@redhat.com>
+Date: Mon, 4 Mar 2019 18:48:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 08/16] s390-bios: Map low core memory
+In-Reply-To: <20190304151827.1813-2-davidkiarie4@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,23 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: David Kiarie <davidkiarie4@gmail.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, jan.kiszka@siemens.com, peterx@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-On Fri,  1 Mar 2019 13:59:28 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+On 3/4/19 4:18 PM, David Kiarie wrote:
+> Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
 
-> Create a new header for basic architecture specific definitions and add a
-> mapping of low core memory. This mapping will be used by the real dasd boot
-> process.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  pc-bios/s390-ccw/main.c      |   2 +
->  pc-bios/s390-ccw/s390-arch.h | 102 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 104 insertions(+)
->  create mode 100644 pc-bios/s390-ccw/s390-arch.h
-
-I did not check all fields, but looks sane.
-
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+>  hw/i386/amd_iommu.c | 2 +-
+>  hw/i386/amd_iommu.h | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+> index 8ad707a..6eabdf9 100644
+> --- a/hw/i386/amd_iommu.c
+> +++ b/hw/i386/amd_iommu.c
+> @@ -2,7 +2,7 @@
+>   * QEMU emulation of AMD IOMMU (AMD-Vi)
+>   *
+>   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+> - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+> + * Copyright (C) 2015, 2016 David Kiarie Kahurani
+>   *
+>   * This program is free software; you can redistribute it and/or modify
+>   * it under the terms of the GNU General Public License as published by
+> diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+> index c52886f..0ff9095 100644
+> --- a/hw/i386/amd_iommu.h
+> +++ b/hw/i386/amd_iommu.h
+> @@ -2,7 +2,7 @@
+>   * QEMU emulation of an AMD IOMMU (AMD-Vi)
+>   *
+>   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+> - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+> + * Copyright (C) 2015, 2016 David Kiarie Kahurani
+>   *
+>   * This program is free software; you can redistribute it and/or modify
+>   * it under the terms of the GNU General Public License as published by
+> 
