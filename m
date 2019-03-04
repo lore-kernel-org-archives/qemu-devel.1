@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52969)
+Received: from eggs.gnu.org ([209.51.188.92]:53014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0kh3-0005mD-Pp
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:19:35 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1h0khA-0005rB-L1
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:19:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0kh3-0004Fz-5I
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:19:33 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39460)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h0kh2-0004Fa-VX
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:19:33 -0500
-Received: by mail-oi1-x241.google.com with SMTP id b4so3423068oif.6
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 02:19:32 -0800 (PST)
+	(envelope-from <eric.auger@redhat.com>) id 1h0kh9-0004I0-GY
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:19:40 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon,  4 Mar 2019 11:13:29 +0100
+Message-Id: <20190304101339.25970-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-References: <20190214220453.15858-1-svens@stackframe.org>
-	<65d59485-9973-4ed1-b08f-084ed4db7ef1@redhat.com>
-In-Reply-To: <65d59485-9973-4ed1-b08f-084ed4db7ef1@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Mar 2019 10:19:20 +0000
-Message-ID: <CAFEAcA-autqypsBsOkKjkKNuRd1tVW9dOLrdswA-HGUfgLNA1A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] lsi: implement basic SBCL functionality
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 00/10] ARM virt: Initial RAM expansion and
+ extended memory map
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +20,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sven Schnelle <svens@stackframe.org>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <fam@euphon.net>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-On Fri, 15 Feb 2019 at 09:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 14/02/19 23:04, Sven Schnelle wrote:
-> > @@ -2202,6 +2224,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
-> >          VMSTATE_UINT8(stime0, LSIState),
-> >          VMSTATE_UINT8(respid0, LSIState),
-> >          VMSTATE_UINT8(respid1, LSIState),
-> > +        VMSTATE_UINT8(sbcl, LSIState),
->
-> This breaks live migration.  You need to bump the version number higher
-> in vmstate_lsi_scsi and use "VMSTATE_UINT8_V(sbcl, LSIState, 1)" so that
-> the field is only marshalled/unmarshalled for version 1 of the migration
-> state.
+This series aims to bump the 255GB RAM limit in machvirt and paves the
+way to device memory addition.
 
-I thought we preferred to do this with migration subsections
-rather than versioning fields these days ? In this case I
-think a subsection that says "needed if sbcl is non-zero" would
-do the right thing.
+In machvirt versions < 4.0, the initial RAM starts at 1GB and can
+grow up to 255GB. From 256GB onwards we find IO regions such as the
+additional GICv3 RDIST region, high PCIe ECAM region and high PCIe
+MMIO region. The address map was 1TB large. This corresponded to
+the max IPA capacity KVM was able to manage.
 
-thanks
--- PMM
+Since 4.20, the host kernel is able to support a larger and dynamic
+IPA range. So the guest physical address can go beyond the 1TB. The
+max GPA size depends on the host kernel configuration and physical CPUs.
+
+In this series we use this feature and allow the RAM to grow without
+any other limit than the one put by the host kernel.
+
+The RAM still starts at 1GB. First comes the initial ram (-m) of size
+ram_size and then we provision sufficient space for the looming
+device memory (dimensionned using ,maxmem and slots options).
+
+IO regions previously located between 256GB and 1TB are moved after
+the RAM. Their offset is dynamically computed, depends on ram_size,
+slots, maxram_size. Size alignment is enforced.
+
+In case maxmem value is inferior to 255GB, the legacy memory map
+still is used.
+
+As we keep the initial RAM at 1GB base address, we do not need to do
+invasive changes in the EDK2 FW. It seems nobody is eager to do
+that job at the moment.
+
+Device memory being put just after the initial RAM, it will be
+possible to get access to this feature while keeping a 1TB address
+map.
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/qemu/tree/v3.1.0-extended-memmap-v12
+
+History:
+v11 -> v12:
+- collected last Igor's and Richard's R-b's
+- removed the memmap initialization to NULL
+
+v10 -> v11:
+- remove vms->high_io_base
+- remove RAM_BASE
+- see individual change logs for other adjustments
+
+v9 -> v10:
+- only the keep the first 10 patches which move to the extended memmap
+- remove the 1GB alignment check on maxram_size
+
+v8 -> v9:
+- fixed make check SIGSEV
+- fixed TCG issue (restored virt_set_memmap in machvirt_init)
+- removed Igor's R-b on "hw/arm/boot: Expose the PC-DIMM nodes in the DT"
+
+v7 -> v8:
+- addressed Igor's comments"
+- remove no_extended_memmap knob
+- moved acpi_nvdimm_state into MachineState
+- separate "hw/arm/virt: Check the VCPU PA range in TCG mode" patch
+
+v6 -> v7:
+- Addressed Peter and Igor comments (exceptions sent my email)
+- Fixed TCG case. Now device memory works also for TCG and vcpu
+  pamax is checked
+- See individual logs for more details
+
+v5 -> v6:
+- mingw compilation issue fix
+- kvm_arm_get_max_vm_phys_shift always returns the number of supported
+  IPA bits
+- new patch "hw/arm/virt: Rename highmem IO regions" that eases the revie=
+w
+  of "hw/arm/virt: Split the memory map description"
+- "hw/arm/virt: Move memory map initialization into machvirt_init"
+  squashed into the previous patch
+- change alignment of IO regions beyond the RAM so that it matches their
+  size
+
+v4 -> v5:
+- change in the memory map
+- see individual logs
+
+v3 -> v4:
+- rebase on David's "pc-dimm: next bunch of cleanups" and
+  "pc-dimm: pre_plug "slot" and "addr" assignment"
+- kvm-type option not used anymore. We directly use
+  maxram_size and ram_size machine fields to compute the
+  MAX IPA range. Migration is naturally handled as CLI
+  option are kept between source and destination. This was
+  suggested by David.
+- device_memory_start and device_memory_size not stored
+  anymore in vms->bootinfo
+- I did not take into account 2 Igor's comments: the one
+  related to the refactoring of arm_load_dtb and the one
+  related to the generation of the dtb after system_reset
+  which would contain nodes of hotplugged devices (we do
+  not support hotplug at this stage)
+- check the end-user does not attempt to hotplug a device
+- addition of "vl: Set machine ram_size, maxram_size and
+  ram_slots earlier"
+
+v2 -> v3:
+- fix pc_q35 and pc_piix compilation error
+- kwangwoo's email being not valid anymore, remove his address
+
+v1 -> v2:
+- kvm_get_max_vm_phys_shift moved in arch specific file
+- addition of NVDIMM part
+- single series
+- rebase on David's refactoring
+
+v1:
+- was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
+- was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
+
+Eric Auger (9):
+  hw/arm/virt: Rename highmem IO regions
+  hw/arm/virt: Split the memory map description
+  hw/boards: Add a MachineState parameter to kvm_type callback
+  kvm: add kvm_arm_get_max_vm_ipa_size
+  vl: Set machine ram_size, maxram_size and ram_slots earlier
+  hw/arm/virt: Dynamic memory map depending on RAM requirements
+  hw/arm/virt: Implement kvm_type function for 4.0 machine
+  hw/arm/virt: Check the VCPU PA range in TCG mode
+  hw/arm/virt: Bump the 255GB initial RAM limit
+
+Shameer Kolothum (1):
+  hw/arm/boot: introduce fdt_add_memory_node helper
+
+ accel/kvm/kvm-all.c      |   2 +-
+ hw/arm/boot.c            |  54 +++++++----
+ hw/arm/virt-acpi-build.c |  10 +-
+ hw/arm/virt.c            | 196 +++++++++++++++++++++++++++++++--------
+ hw/ppc/mac_newworld.c    |   3 +-
+ hw/ppc/mac_oldworld.c    |   2 +-
+ hw/ppc/spapr.c           |   2 +-
+ include/hw/arm/virt.h    |  16 +++-
+ include/hw/boards.h      |   5 +-
+ target/arm/kvm.c         |  10 ++
+ target/arm/kvm_arm.h     |  13 +++
+ vl.c                     |   6 +-
+ 12 files changed, 241 insertions(+), 78 deletions(-)
+
+--=20
+2.20.1
