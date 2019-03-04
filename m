@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39972)
+Received: from eggs.gnu.org ([209.51.188.92]:39847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1h0hRw-0007WR-0l
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:51:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h0hS5-0007NB-Qj
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:51:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1h0hRu-0003cN-1s
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:51:43 -0500
-Received: from mga04.intel.com ([192.55.52.120]:52781)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1h0hRr-0003YB-Uy
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:51:41 -0500
-From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Mon,  4 Mar 2019 14:51:02 +0800
-Message-Id: <20190304065102.26447-1-richardw.yang@linux.intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1h0hIO-00047G-1c
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:41:53 -0500
+Date: Mon, 4 Mar 2019 16:51:38 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190304055138.GN7792@umbus.fritz.box>
+References: <20190228225759.21328-1-farosas@linux.ibm.com>
+	<20190228225759.21328-4-farosas@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] exec.c: remove an unnecessary condition in
- flatview_add_to_dispatch()
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/TUrtqMIkCP4YtJm"
+Content-Disposition: inline
+In-Reply-To: <20190228225759.21328-4-farosas@linux.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 3/5] target/ppc: Move handling of
+ hardware breakpoints to a separate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +25,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, pbonzini@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-flatview_add_to_dispatch() registers page based on the condition of
-*section*, which may looks like this:
 
-    |s|PPPPPPP|s|
+--/TUrtqMIkCP4YtJm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-where s stands for subpage and P for page.
+On Thu, Feb 28, 2019 at 07:57:57PM -0300, Fabiano Rosas wrote:
+> This is in preparation for a refactoring of the kvm_handle_debug
+> function in the next patch.
+>=20
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-The procedure of this function could be described as:
+Nice cleanup regardless of anything else.  Applied to ppc-for-4.0.
 
-    - register first subpage
-    - register page
-    - register last subpage
+> ---
+>  target/ppc/kvm.c | 47 ++++++++++++++++++++++++++++-------------------
+>  1 file changed, 28 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index d01852fe31..941c4e7523 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -1593,35 +1593,44 @@ void kvm_arch_update_guest_debug(CPUState *cs, st=
+ruct kvm_guest_debug *dbg)
+>      }
+>  }
+> =20
+> +static int kvm_handle_hw_breakpoint(CPUState *cs,
+> +                                    struct kvm_debug_exit_arch *arch_inf=
+o)
+> +{
+> +    int handle =3D 0;
+> +    int n;
+> +    int flag =3D 0;
+> +
+> +    if (nb_hw_breakpoint + nb_hw_watchpoint > 0) {
+> +        if (arch_info->status & KVMPPC_DEBUG_BREAKPOINT) {
+> +            n =3D find_hw_breakpoint(arch_info->address, GDB_BREAKPOINT_=
+HW);
+> +            if (n >=3D 0) {
+> +                handle =3D 1;
+> +            }
+> +        } else if (arch_info->status & (KVMPPC_DEBUG_WATCH_READ |
+> +                                        KVMPPC_DEBUG_WATCH_WRITE)) {
+> +            n =3D find_hw_watchpoint(arch_info->address,  &flag);
+> +            if (n >=3D 0) {
+> +                handle =3D 1;
+> +                cs->watchpoint_hit =3D &hw_watchpoint;
+> +                hw_watchpoint.vaddr =3D hw_debug_points[n].addr;
+> +                hw_watchpoint.flags =3D flag;
+> +            }
+> +        }
+> +    }
+> +    return handle;
+> +}
+> +
+>  static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
+>  {
+>      CPUState *cs =3D CPU(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+>      struct kvm_debug_exit_arch *arch_info =3D &run->debug.arch;
+>      int handle =3D 0;
+> -    int n;
+> -    int flag =3D 0;
+> =20
+>      if (cs->singlestep_enabled) {
+>          handle =3D 1;
+>      } else if (arch_info->status) {
+> -        if (nb_hw_breakpoint + nb_hw_watchpoint > 0) {
+> -            if (arch_info->status & KVMPPC_DEBUG_BREAKPOINT) {
+> -                n =3D find_hw_breakpoint(arch_info->address, GDB_BREAKPO=
+INT_HW);
+> -                if (n >=3D 0) {
+> -                    handle =3D 1;
+> -                }
+> -            } else if (arch_info->status & (KVMPPC_DEBUG_WATCH_READ |
+> -                                            KVMPPC_DEBUG_WATCH_WRITE)) {
+> -                n =3D find_hw_watchpoint(arch_info->address,  &flag);
+> -                if (n >=3D 0) {
+> -                    handle =3D 1;
+> -                    cs->watchpoint_hit =3D &hw_watchpoint;
+> -                    hw_watchpoint.vaddr =3D hw_debug_points[n].addr;
+> -                    hw_watchpoint.flags =3D flag;
+> -                }
+> -            }
+> -        }
+> +        handle =3D kvm_handle_hw_breakpoint(cs, arch_info);
+>      } else if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
+>          handle =3D 1;
+>      } else {
 
-This means only the first offset_within_address_space could be not
-TARGET_PAGE_SIZE aligned. During the wile loop, this will not happen.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-This patch just removes the unnecessary condition and adds some comment
-to clarify it.
+--/TUrtqMIkCP4YtJm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- exec.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/exec.c b/exec.c
-index 518064530b..e6221d52ba 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1599,12 +1599,26 @@ static void register_multipage(FlatView *fv,
-     phys_page_set(d, start_addr >> TARGET_PAGE_BITS, num_pages, section_index);
- }
- 
-+/*
-+ * The range in *section* may look like this:
-+ *
-+ *      |s|PPPPPPP|s|
-+ *
-+ * where s stands for subpage and P for page.
-+ *
-+ * The procedure in following function could be described as:
-+ *
-+ * - register first subpage
-+ * - register page
-+ * - register last subpage
-+ */
- void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section)
- {
-     MemoryRegionSection now = *section, remain = *section;
-     Int128 page_size = int128_make64(TARGET_PAGE_SIZE);
- 
-     if (now.offset_within_address_space & ~TARGET_PAGE_MASK) {
-+        /* register first subpage */
-         uint64_t left = TARGET_PAGE_ALIGN(now.offset_within_address_space)
-                        - now.offset_within_address_space;
- 
-@@ -1619,11 +1633,10 @@ void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section)
-         remain.offset_within_region += int128_get64(now.size);
-         now = remain;
-         if (int128_lt(remain.size, page_size)) {
--            register_subpage(fv, &now);
--        } else if (remain.offset_within_address_space & ~TARGET_PAGE_MASK) {
--            now.size = page_size;
-+            /* register last subpage */
-             register_subpage(fv, &now);
-         } else {
-+            /* register page */
-             now.size = int128_and(now.size, int128_neg(page_size));
-             register_multipage(fv, &now);
-         }
--- 
-2.19.1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx8vOoACgkQbDjKyiDZ
+s5J3DxAA5059wHnBhQ2Lg47Rx5N/FMcZ3v4XiulmsMxR3ZI7Eby8B2z56JRTm2yl
+iqjDVGTEtl64rfKGDKvUKgIGvfrtnJ7dXw36RzFQwykdcdvlvRFea32i3SSOOMSm
+dnirVWXGz+WmNdPB8MWnvm8VMqslE3UhIANkvBMmYyf0tS7OTfOcTI3TZZFU1dz9
+qeKe5pFxtnrwECvLlIlVtO6a0Sbtq17KE16lxzBLVFkU0ZeSuJiSQYyENcmtBGZC
+O3TBGj5V/EpG3HzNTb+VJO0ehJMp+RtkBPCT+qkWlC7E17UhQY/P2UyMUexWIeUe
+rVtRD7Ruy02raZhQvxi32qsUAgxnnlCAF0T1gyPCn012mBae33mcGfAdOHclV4EK
+6aiTVIZdn69yiAJ3nsL0a/Z/TMv7aVN4Tl1n9gRCVeBHq13JXIvdaAOIiJ7HQ6lb
+g9qNtDXghGU0h/uUXxf7l6tuoS3DBZo4vcMvaiM44WRCERwxMf8Wee4HabPAyCCV
+ZvrlQAMCqSBk72csMJvwFp8c6ECxiSd57LMuy58OZLIVq5f6fHTpa7eUPP+Uad+e
+l3lE4uMA+32jNb3CVHah2VLFCejgx4p+QABR5yPplkDFlQokEgyZ4djjakaIseM0
+yDGcQlTf3k6I13Lempdkw83076WEzavhwEGS3NbxuBvkgiiGrHE=
+=xwJw
+-----END PGP SIGNATURE-----
+
+--/TUrtqMIkCP4YtJm--
