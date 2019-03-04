@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54284)
+Received: from eggs.gnu.org ([209.51.188.92]:55433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robin.jarry@6wind.com>) id 1h0qtV-0001Lr-Ue
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:56:50 -0500
+	(envelope-from <bounces@canonical.com>) id 1h0qyM-0005bY-HI
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robin.jarry@6wind.com>) id 1h0qtU-0006mg-W8
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:56:49 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:32948)
+	(envelope-from <bounces@canonical.com>) id 1h0qyG-0005gU-AB
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:01:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54178)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <robin.jarry@6wind.com>)
-	id 1h0qtU-0006it-Hj
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:56:48 -0500
-Received: by mail-wr1-x435.google.com with SMTP id i12so6349954wrw.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 08:56:48 -0800 (PST)
-Date: Mon, 4 Mar 2019 17:56:44 +0100
-From: Robin Jarry <robin.jarry@6wind.com>
-Message-ID: <20190304165644.d3qtlai63eokriwy@6wind.com>
-References: <20190211170924.uw6a6xyvmznk7w72@6wind.com>
-	<20190220030707.GA5504@minyard.net>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h0qy5-0004zH-6w
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:01:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h0qxs-000683-2D
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 17:01:20 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7DBAA2E80EB
+	for <qemu-devel@nongnu.org>; Mon,  4 Mar 2019 17:01:19 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190220030707.GA5504@minyard.net>
-Subject: Re: [Qemu-devel] -device ipmi-bmc-sim attached to -netdev vde
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Mar 2019 16:55:25 -0000
+From: Timo Aaltonen <tjaalton@ubuntu.com>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <155171852535.31424.3405052150666695904.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
+ signal 31 in __pthread_setaffinity_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Hi Corey,
+I don't have that issue on a chroot, so you should at least tell me why
+it would refuse to upgrade them all.. apt should show an error
 
-Thanks a lot for your detailed answer!
+-- =
 
-2019-02-19, Corey Minyard:
-> If you really wanted to do this, you would need to implement the IPMI
-> LAN protocol inside QEMU and sit it on top of a UDP chardev.  It could
-> then plug into the standard IPMI infrastructure in QEMU.  The power
-> management functions are already there.
-> 
-> The openipmi lanserv code is something you can steal from, it's at
-> https://github.com/cminyard/openipmi/tree/master/lanserv
-> 
-> My suggestion, though, would be to implement something that ran over
-> TLS with two-way authentication.  It doesn't look too hard to do
-> in qemu (though I haven't tried it) but you could have a qemu console
-> running over TLS that would allow you control from another qemu session.
-> Plus it would give you authorization and encryption on your qemu
-> console logins, which is probably a good thing.
-> 
-> <shameless-plug> I have been working on a library that makes it easy
-> (easier?  The pain is always in the key management) to make TLS
-> connections.  It's at https://github.com/cminyard/gensio and you
-> can use it from C or Python.</shameless-plug>
-> But there are many tools to accomplish this.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
 
-Ugh, I feared this would not be a walk in the park :)
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
 
-This is unfortunately too much work for me at the moment. I don't like
-it but I think I will have to live with vms communicating through
-a SLIRP device to access the ipmi lanserv daemon.
+Status in Mesa:
+  Confirmed
+Status in QEMU:
+  New
+Status in mesa package in Ubuntu:
+  Triaged
+Status in qemu package in Ubuntu:
+  Triaged
+Status in mesa source package in Disco:
+  Triaged
 
-I just need to figure out how this works, because vbmc-qemu does not cut
-it for me. It does not allow fine-tuning the QEMU command line.
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
 
--- 
-Robin
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/mesa/+bug/1815889/+subscriptions
