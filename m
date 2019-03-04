@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53237)
+Received: from eggs.gnu.org ([209.51.188.92]:53368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0oza-0004VV-Lo
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:54:59 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h0p01-0004rN-Bw
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:55:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0ozY-0008QP-6R
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:54:58 -0500
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:36730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h0ozW-0008D5-Ap
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:54:54 -0500
-Received: by mail-ot1-x332.google.com with SMTP id v62so4426292otb.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 06:54:53 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1h0ozv-00016s-Hu
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:55:24 -0500
+Date: Mon, 4 Mar 2019 15:54:57 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190304155457.206a7ff7@redhat.com>
+In-Reply-To: <20190304135909.GL4239@redhat.com>
+References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
+	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
+	<20190301154947.GJ21251@redhat.com>
+	<20190301183328.20b63e23@redhat.com>
+	<20190301174806.GN21251@redhat.com>
+	<15464582-e8a6-6654-7679-15d87c10af38@redhat.com>
+	<20190304145510.57c73177@redhat.com>
+	<20190304135909.GL4239@redhat.com>
 MIME-Version: 1.0
-References: <1551564698-9922-1-git-send-email-michelheily@gmail.com>
-In-Reply-To: <1551564698-9922-1-git-send-email-michelheily@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Mar 2019 14:54:40 +0000
-Message-ID: <CAFEAcA9Y_ZM0tDuvK+bOO+4+hT8ApLYR9EsKPojL9zGG=LJ-Rw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/stellaris: Implement watchdog
- timer
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [libvirt] [PATCH 1/2] numa: deprecate
+ 'mem' parameter of '-numa node' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,174 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michel Heily <michelheily@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "open list:Stellaris" <qemu-arm@nongnu.org>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Sat, 2 Mar 2019 at 22:11, <michelheily@gmail.com> wrote:
->
-> From: Michel Heily <michelheily@gmail.com>
->
-> I've added the stellaris watchdog functionality because I needed it for a home project.
-> Documentation for the hardware can be found at http://www.ti.com/lit/ds/symlink/lm3s6965.pdf.
->
-> Signed-off-by: Michel Heily <michelheily@gmail.com>
+On Mon, 4 Mar 2019 13:59:09 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-Thanks; this is looking pretty good. I have some minor
-comments below. We're getting quite close to softfreeze now,
-but if you can manage to get a v3 to the list some time this
-week I should be able to squeeze it into the next release.
+> On Mon, Mar 04, 2019 at 02:55:10PM +0100, Igor Mammedov wrote:
+> > On Mon, 4 Mar 2019 09:11:19 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >  =20
+> > > On 01/03/2019 18.48, Daniel P. Berrang=C3=A9 wrote:
+> > > [...] =20
+> > > > So I think this patch has to be dropped & replaced with one that
+> > > > simply documents that memdev syntax is preferred.   =20
+> > >=20
+> > > That's definitely not enough. I've had a couple of cases already where
+> > > we documented that certain options should not be used anymore, and
+> > > people simply ignored it (aka. if it ain't broken, don't do any chang=
+e).
+> > > Then they just started to complain when I really tried to remove the
+> > > option after the deprecation period. =20
+> >  =20
+> > > So Igor, if you can not officially deprecate these things here yet, y=
+ou
+> > > should at least make sure that they can not be used with new machine
+> > > types anymore. Then, after a couple of years, when we feel sure that
+> > > there are only some few or no people left who still use it with the o=
+ld
+> > > machine types, we can start to discuss the deprecation process again,=
+ I
+> > > think. =20
+> > Is it acceptable to silently disable CLI options (even if they are brok=
+en
+> > like in this case) for new machine types?
+> > I was under impression that it should go through deprecation first. =20
+>=20
+> Yes, it must go through deprecation. I was saying we can't disable
+> the CLI options at all, until there is a way for libvirt to correctly
+> use the new options.
 
-> @@ -1338,6 +1339,24 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
->      stellaris_sys_init(0x400fe000, qdev_get_gpio_in(nvic, 28),
->                         board, nd_table[0].macaddr.a);
->
-> +
-> +    if (board->dc1 & (1  << 3)) { /* watchdog present */
+I'm not adding new options (nor plan to for numa case (yet)),
+-numa node,memdev is around several years by now and should be used
+as default for creating new configs.
 
-Stray extra space before "<<"
+In light of keeping 'mem' option around for old machines,
+Deprecation should have served for notifying users that legacy
+options will be disabled later on (for new machines at least
+if no way found for migration compatible transition for older ones).
 
-> diff --git a/hw/watchdog/cmsdk-apb-watchdog.c b/hw/watchdog/cmsdk-apb-watchdog.c
-> index eb79a73..5029838 100644
-> --- a/hw/watchdog/cmsdk-apb-watchdog.c
-> +++ b/hw/watchdog/cmsdk-apb-watchdog.c
-> @@ -37,6 +37,7 @@ REG32(WDOGINTCLR, 0xc)
->  REG32(WDOGRIS, 0x10)
->      FIELD(WDOGRIS, INT, 0, 1)
->  REG32(WDOGMIS, 0x14)
-> +REG32(WDOTEST, 0x418)
+What I'm mainly aiming here is to prevent using broken legacy options
+for new VMs (like in RHBZ1624223 case) and deprecation is the only way
+we have now to notify users about CLI breaking changes.
 
-Typo. This should either be "WDOGTEST" to follow the naming convention
-of the other registers, or "WDTTEST" to follow the Stellaris datasheet's
-name. I'd go with "WDOGTEST" but it doesn't much matter which.
+In the -mem-path/prealloc case, there will be a new machine option 'memdev'
+to replace them but that's migration compatible, so libvirt could use new
+CLI syntax to replace even old configs.
+(If there is a mechanism for introducing/introspecting a new options
+per-machine or whole QEMU, I'd happy to add a new option there on top of
+just deprecation notice that we have now).
 
-Also worth a comment
-/* only in the Stellaris/Luminary version of the device */
-
->  REG32(WDOGLOCK, 0xc00)
->  #define WDOG_UNLOCK_VALUE 0x1ACCE551
->  REG32(WDOGITCR, 0xf00)
-> @@ -61,12 +62,18 @@ REG32(CID2, 0xff8)
->  REG32(CID3, 0xffc)
->
->  /* PID/CID values */
-> -static const int watchdog_id[] = {
-> +static const uint32_t cmsdk_apb_watchdog_id[] = {
->      0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
->      0x24, 0xb8, 0x1b, 0x00, /* PID0..PID3 */
->      0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
->  };
->
-> +static const uint32_t luminary_watchdog_id[] = {
-> +    0x00, 0x00, 0x00, 0x00, /* PID4..PID7 */
-> +    0x05, 0x18, 0x18, 0x01, /* PID0..PID3 */
-> +    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
-> +};
-> +
->  static bool cmsdk_apb_watchdog_intstatus(CMSDKAPBWatchdog *s)
->  {
->      /* Return masked interrupt status */
-> @@ -102,6 +109,7 @@ static uint64_t cmsdk_apb_watchdog_read(void *opaque, hwaddr offset,
->                                          unsigned size)
->  {
->      CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(opaque);
-> +    bool _default = false;
-
-Don't name variables with leading underscores.
-In any case you don't need this one...
-
->      uint64_t r;
->
->      switch (offset) {
-> @@ -124,24 +132,46 @@ static uint64_t cmsdk_apb_watchdog_read(void *opaque, hwaddr offset,
->          r = s->lock;
->          break;
->      case A_WDOGITCR:
-> +        if (s->is_luminary) {
-> +            _default = true;
-> +            break;
-> +        }
-
-Just use
- if (s->is_luminary) {
-     goto bad_offset;
- }
-
-and then add the bad_offset: label after default:.
-This is clearer than having a flag that modifies the program flow.
-
-
-> @@ -150,6 +180,7 @@ static void cmsdk_apb_watchdog_write(void *opaque, hwaddr offset,
->                                       uint64_t value, unsigned size)
->  {
->      CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(opaque);
-> +    bool _default = false;
-
-Similarly here.
-
-> @@ -197,11 +240,23 @@ static void cmsdk_apb_watchdog_write(void *opaque, hwaddr offset,
->                        "CMSDK APB watchdog write: write to RO offset 0x%x\n",
->                        (int)offset);
->          break;
-> +    case A_WDOTEST:
-> +        if (s->is_luminary) {
-> +            qemu_log_mask(LOG_UNIMP,
-> +                      "Luminary watchdog write: stall not implemented\n");
-> +            break;
-> +        }
-> +        _default = true;
-> +        break;
->      default:
-> +        _default = true;
-> +        break;
-> +    }
-> +
-> +    if (_default) {
->          qemu_log_mask(LOG_GUEST_ERROR,
->                        "CMSDK APB watchdog write: bad offset 0x%x\n",
->                        (int)offset);
-> -        break;
->      }
->  }
->
-> @@ -256,6 +311,9 @@ static void cmsdk_apb_watchdog_init(Object *obj)
->                            s, "cmsdk-apb-watchdog", 0x1000);
->      sysbus_init_mmio(sbd, &s->iomem);
->      sysbus_init_irq(sbd, &s->wdogint);
-> +
-> +    s->is_luminary = false;
-> +    memcpy(s->id, cmsdk_apb_watchdog_id, sizeof(s->id));
-
-You don't need a memcpy here -- just make s->id a const uint32_t*,
-and then you can do "s->id = cmsdk_apb_watchdog_id;"
-
->  }
->
->  static void cmsdk_apb_watchdog_realize(DeviceState *dev, Error **errp)
-> @@ -291,6 +349,7 @@ static const VMStateDescription cmsdk_apb_watchdog_vmstate = {
->          VMSTATE_UINT32(itcr, CMSDKAPBWatchdog),
->          VMSTATE_UINT32(itop, CMSDKAPBWatchdog),
->          VMSTATE_UINT32(resetstatus, CMSDKAPBWatchdog),
-> +        VMSTATE_UINT32_ARRAY(id, CMSDKAPBWatchdog, 12),
-
-The ID registers are constant so they don't need to be transferred
-as part of the VM migration state, so you don't need to change
-anything here.
-
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> @@ -318,9 +377,24 @@ static const TypeInfo cmsdk_apb_watchdog_info = {
->      .class_init = cmsdk_apb_watchdog_class_init,
->  };
->
-> +static void luminary_watchdog_init(Object *obj)
-> +{
-> +    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(obj);
-> +
-> +    s->is_luminary = true;
-> +    memcpy(s->id, luminary_watchdog_id, sizeof(s->id));
-
-Similarly this memcpy isn't needed.
-
-thanks
--- PMM
+> Regards,
+> Daniel
