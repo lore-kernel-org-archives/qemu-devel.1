@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42908)
+Received: from eggs.gnu.org ([209.51.188.92]:42913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDP-0004ud-Rx
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:22 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDQ-0004uv-3Q
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDN-0005ac-19
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:19 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:55441 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDI-0005Vu-Vz
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:20 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:60065 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1h0qDM-0004U6-Gv
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:16 -0500
+	id 1h0qDI-0005U6-4b
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:12 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  4 Mar 2019 17:11:41 +0100
-Message-Id: <1551715911-8440-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  4 Mar 2019 17:11:51 +0100
+Message-Id: <1551715911-8440-12-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1551715911-8440-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1551715911-8440-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 01/11] disas: nanoMIPS: Correct comments to
- handlers of some DSP instructions
+Subject: [Qemu-devel] [PATCH v6 11/11] tests/tcg: target/mips: Add tests for
+ MSA pack instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,874 +30,1960 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Correct comments to handlers of some DSP instructions.
+Add tests for MSA pack instructions. This includes following
+instructions:
+
+  * PCKEV.B - pack even (bytes)
+  * PCKEV.H - pack even (halfwords)
+  * PCKEV.W - pack even (words)
+  * PCKEV.D - pack even (doublewords)
+  * PCKOD.B - pack odd (bytes)
+  * PCKOD.H - pack odd (halfwords)
+  * PCKOD.W - pack odd (words)
+  * PCKOD.D - pack odd (doublewords)
+  * VSHF.B - data preserving shuffle (bytes)
+  * VSHF.H - data preserving shuffle (halfwords)
+  * VSHF.W - data preserving shuffle (words)
+  * VSHF.D - data preserving shuffle (doublewords)
+
+Each test consists of 80 test cases, so altogether there are 960
+test cases.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- disas/nanomips.cpp | 285 ++++++++++++++++++++++++++++-------------------------
- 1 file changed, 150 insertions(+), 135 deletions(-)
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c  | 153 +++++++++++++++++++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c  | 153 +++++++++++++++++++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c  | 153 +++++++++++++++++++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c  | 153 +++++++++++++++++++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c  | 153 +++++++++++++++++++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c  | 153 +++++++++++++++++++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c  | 153 +++++++++++++++++++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c  | 153 +++++++++++++++++++++
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c | 153 +++++++++++++++++++++
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c | 153 +++++++++++++++++++++
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c | 153 +++++++++++++++++++++
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c | 153 +++++++++++++++++++++
+ 12 files changed, 1836 insertions(+)
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
 
-diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index f090f61..10f6d96 100644
---- a/disas/nanomips.cpp
-+++ b/disas/nanomips.cpp
-@@ -10183,14 +10183,13 @@ std::string NMD::MFHGC0(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MFHI rs, ac - Move from HI register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000     xxxxx  00000001111111
-  *     rt -----
-- *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MFHI_DSP_(uint64 instruction)
- {
-@@ -10231,14 +10230,13 @@ std::string NMD::MFHTR(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MFLO rs, ac - Move from HI register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000     xxxxx  01000001111111
-  *     rt -----
-- *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MFLO_DSP_(uint64 instruction)
- {
-@@ -10399,7 +10397,7 @@ std::string NMD::MOD(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MODSUB rd, rs, rt - Modular subtraction on an index value
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -10427,7 +10425,7 @@ std::string NMD::MODSUB(uint64 instruction)
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000               x1010010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -10639,14 +10637,14 @@ std::string NMD::MOVZ(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MSUB ac, rs, rt - Multiply word and subtract from accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            10101010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MSUB_DSP_(uint64 instruction)
- {
-@@ -10711,14 +10709,14 @@ std::string NMD::MSUBF_S(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MSUBU ac, rs, rt - Multiply word and add to accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            11101010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MSUBU_DSP_(uint64 instruction)
- {
-@@ -10919,14 +10917,13 @@ std::string NMD::MTHGC0(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MTHI rs, ac - Move to HI register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-- *     rt -----
-+ *  001000xxxxx       10000001111111
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MTHI_DSP_(uint64 instruction)
- {
-@@ -10941,14 +10938,13 @@ std::string NMD::MTHI_DSP_(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MTHLIP rs, ac - Copy LO to HI and a GPR to LO and increment pos by 32
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-- *     rt -----
-+ *  001000xxxxx       00001001111111
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MTHLIP(uint64 instruction)
- {
-@@ -10989,14 +10985,13 @@ std::string NMD::MTHTR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MTLO rs, ac - Move to LO register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-- *     rt -----
-+ *  001000xxxxx       11000001111111
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MTLO_DSP_(uint64 instruction)
- {
-@@ -11155,11 +11150,12 @@ std::string NMD::MUL_D(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MUL.PH rd, rs, rt - Multiply vector integer half words to same size
-+ *   products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               00000101101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11179,11 +11175,12 @@ std::string NMD::MUL_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MUL_S.PH rd, rs, rt - Multiply vector integer half words to same size
-+ *   products (saturated)
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               10000101101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11227,11 +11224,12 @@ std::string NMD::MUL_S(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULEQ_S.W.PHL rd, rs, rt - Multiply vector fractional left halfwords
-+ *   to expanded width products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0000100101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11251,11 +11249,12 @@ std::string NMD::MULEQ_S_W_PHL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULEQ_S.W.PHR rd, rs, rt - Multiply vector fractional right halfwords
-+ *   to expanded width products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0001100101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11275,11 +11274,12 @@ std::string NMD::MULEQ_S_W_PHR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULEU_S.PH.QBL rd, rs, rt - Multiply vector fractional left bytes
-+ *   by halfwords to halfword products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0010010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11299,11 +11299,12 @@ std::string NMD::MULEU_S_PH_QBL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULEU_S.PH.QBR rd, rs, rt - Multiply vector fractional right bytes
-+ *   by halfwords to halfword products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0011010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11323,11 +11324,12 @@ std::string NMD::MULEU_S_PH_QBR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULQ_RS.PH rd, rs, rt - Multiply vector fractional halfwords
-+ *   to fractional halfword products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0100010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11347,11 +11349,12 @@ std::string NMD::MULQ_RS_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULQ_RS.W rd, rs, rt - Multiply fractional words to same size
-+ *   product with saturation and rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0110010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11371,11 +11374,12 @@ std::string NMD::MULQ_RS_W(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULQ_S.PH rd, rs, rt - Multiply fractional halfwords to same size
-+ *   products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0101010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11395,11 +11399,12 @@ std::string NMD::MULQ_S_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULQ_S.W rd, rs, rt - Multiply fractional words to same size product
-+ *   with saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0111010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11419,14 +11424,15 @@ std::string NMD::MULQ_S_W(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULSA.W.PH ac, rs, rt - Multiply and subtract vector integer halfword
-+ *   elements and accumulate
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            10110010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MULSA_W_PH(uint64 instruction)
- {
-@@ -11443,14 +11449,15 @@ std::string NMD::MULSA_W_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULSAQ_S.W.PH ac, rs, rt - Multiply and subtract vector fractional
-+ *   halfwords and accumulate
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            11110010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MULSAQ_S_W_PH(uint64 instruction)
- {
-@@ -11467,14 +11474,14 @@ std::string NMD::MULSAQ_S_W_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULT ac, rs, rt - Multiply word
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            00110010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MULT_DSP_(uint64 instruction)
- {
-@@ -11491,14 +11498,14 @@ std::string NMD::MULT_DSP_(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULTU ac, rs, rt - Multiply unsigned word
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            01110010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MULTU_DSP_(uint64 instruction)
- {
-@@ -12060,11 +12067,12 @@ std::string NMD::PRECEU_PH_QBR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECR.QB.PH rd, rs, rt - Reduce the precision of four integer
-+ *   halfwords to four bytes
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0001101101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -12084,7 +12092,8 @@ std::string NMD::PRECR_QB_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] PRECR_SRA.PH.W rt, rs, sa - Reduce the precision of two integer
-+ *   words to halfwords after a right shift
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -12108,7 +12117,8 @@ std::string NMD::PRECR_SRA_PH_W(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] PRECR_SRA_R.PH.W rt, rs, sa - Reduce the precision of two integer
-+ *   words to halfwords after a right shift with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -12132,7 +12142,8 @@ std::string NMD::PRECR_SRA_R_PH_W(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] PRECRQ.PH.W rd, rs, rt - Reduce the precision of fractional
-+ *   words to fractional halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -12156,11 +12167,12 @@ std::string NMD::PRECRQ_PH_W(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] PRECRQ.QB.PH rd, rs, rt - Reduce the precision of four fractional
-+ *   halfwords to four bytes
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000               x0010101101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -12180,7 +12192,8 @@ std::string NMD::PRECRQ_QB_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] PRECRQ_RS.PH.W rd, rs, rt - Reduce the precision of fractional
-+ *   words to halfwords with rounding and saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -12204,7 +12217,8 @@ std::string NMD::PRECRQ_RS_PH_W(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] PRECRQU_S.QB.PH rd, rs, rt - Reduce the precision of fractional
-+ *   halfwords to unsigned bytes with saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -12300,7 +12314,7 @@ std::string NMD::PREFE(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] PREPEND rt, rs, sa - Right shift and prepend bits to the MSB
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -12324,14 +12338,13 @@ std::string NMD::PREPEND(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] RADDU.W.QB rt, rs - Unsigned reduction add of vector quad bytes
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000          1111000100111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-  */
- std::string NMD::RADDU_W_QB(uint64 instruction)
- {
-@@ -12346,14 +12359,13 @@ std::string NMD::RADDU_W_QB(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] RDDSP rt, mask - Read DSPControl register fields to a GPR
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000            00011001111111
-  *     rt -----
-- *          rs -----
-- *               rd -----
-+ *        mask -------
-  */
- std::string NMD::RDDSP(uint64 instruction)
- {
-@@ -12458,14 +12470,14 @@ std::string NMD::RECIP_S(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] REPL.PH rd, s - Replicate immediate integer into all vector element
-+ *   positions
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000               x0000111101
-  *     rt -----
-- *          rs -----
-- *               rd -----
-+ *           s ----------
-  */
- std::string NMD::REPL_PH(uint64 instruction)
- {
-@@ -12480,14 +12492,14 @@ std::string NMD::REPL_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] REPL.QB rd, u - Replicate immediate integer into all vector element
-+ *   positions
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000             x010111111111
-  *     rt -----
-- *          rs -----
-- *               rd -----
-+ *           u --------
-  */
- std::string NMD::REPL_QB(uint64 instruction)
- {
-@@ -12502,14 +12514,14 @@ std::string NMD::REPL_QB(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] REPLV.PH rt, rs - Replicate a halfword into all vector element
-+ *   positions
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000          0000001100111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-  */
- std::string NMD::REPLV_PH(uint64 instruction)
- {
-@@ -12524,14 +12536,13 @@ std::string NMD::REPLV_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] REPLV.QB rt, rs - Replicate byte into all vector element positions
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000          0001001100111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-  */
- std::string NMD::REPLV_QB(uint64 instruction)
- {
-@@ -13920,8 +13931,8 @@ std::string NMD::SHE(uint64 instruction)
- 
- 
- /*
-- * SHILO ac, shift - Shift an Accumulator Value Leaving the Result in the Same
-- *                     Accumulator
-+ * [DSP] SHILO ac, shift - Shift an accumulator value leaving the result in
-+ *   the same accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -13942,8 +13953,8 @@ std::string NMD::SHILO(uint64 instruction)
- 
- 
- /*
-- * SHILOV ac, rs - Variable Shift of Accumulator Value Leaving the Result in
-- *                   the Same Accumulator
-+ * [DSP] SHILOV ac, rs - Variable shift of accumulator value leaving the result
-+ *   in the same accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -13964,7 +13975,7 @@ std::string NMD::SHILOV(uint64 instruction)
- 
- 
- /*
-- * SHLL.PH rt, rs, sa - Shift Left Logical Vector Pair Halfwords
-+ * [DSP] SHLL.PH rt, rs, sa - Shift left logical vector pair halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -13988,7 +13999,7 @@ std::string NMD::SHLL_PH(uint64 instruction)
- 
- 
- /*
-- * SHLL.QB rt, rs, sa - Shift Left Logical Vector Quad Bytes
-+ * [DSP] SHLL.QB rt, rs, sa - Shift left logical vector quad bytes
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -14012,7 +14023,8 @@ std::string NMD::SHLL_QB(uint64 instruction)
- 
- 
- /*
-- * SHLL_S.PH rt, rs, sa - Shift Left Logical Vector Pair Halfwords (saturated)
-+ * [DSP] SHLL_S.PH rt, rs, sa - Shift left logical vector pair halfwords
-+ *   with saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -14036,14 +14048,14 @@ std::string NMD::SHLL_S_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHLL_S.PH rt, rs, sa - Shift left logical word with saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000               x1111110101
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               sa -----
-  */
- std::string NMD::SHLL_S_W(uint64 instruction)
- {
-@@ -14060,11 +14072,12 @@ std::string NMD::SHLL_S_W(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHLLV.PH rd, rt, rs - Shift left logical variable vector pair
-+ *   halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000               01110001101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -14084,11 +14097,11 @@ std::string NMD::SHLLV_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHLLV_S.QB rd, rt, rs - Shift left logical variable vector quad bytes
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000               x1110010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -14108,11 +14121,12 @@ std::string NMD::SHLLV_QB(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHLLV.PH rd, rt, rs - Shift left logical variable vector pair
-+ *   halfwords with saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000               11110001101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -14132,11 +14146,11 @@ std::string NMD::SHLLV_S_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHLLV_S.W rd, rt, rs - Shift left logical variable vector word
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000               x1111010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -14396,14 +14410,14 @@ std::string NMD::SHRAV_R_W(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHRL.PH rt, rs, sa - Shift right logical two halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000              001111111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               sa ----
-  */
- std::string NMD::SHRL_PH(uint64 instruction)
- {
-@@ -14420,14 +14434,14 @@ std::string NMD::SHRL_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHRL.QB rt, rs, sa - Shift right logical vector quad bytes
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000             1100001111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               sa ---
-  */
- std::string NMD::SHRL_QB(uint64 instruction)
- {
-@@ -14444,11 +14458,12 @@ std::string NMD::SHRL_QB(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHLLV.PH rd, rt, rs - Shift right logical variable vector pair of
-+ *   halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000               x1100010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -14468,11 +14483,11 @@ std::string NMD::SHRLV_PH(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] SHLLV.QB rd, rt, rs - Shift right logical variable vector quad bytes
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               01001001101
-+ *  001000               x1101010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -15032,8 +15047,8 @@ std::string NMD::SUBQ_PH(uint64 instruction)
- 
- 
- /*
-- * SUBQH.PH rd, rt, rs - Subtract Fractional Halfword Vectors And Shift Right
-- *                         to Halve Results
-+ * [DSP] SUBQ.S.PH rd, rt, rs - Subtract fractional halfword vectors and shift
-+ *   right to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15057,8 +15072,8 @@ std::string NMD::SUBQ_S_PH(uint64 instruction)
- 
- 
- /*
-- * SUBQH.PH rd, rt, rs - Subtract Fractional Halfword Vectors And Shift Right
-- *                         to Halve Results
-+ * [DSP] SUBQ.S.W rd, rt, rs - Subtract fractional halfword vectors and shift
-+ *   right to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15082,8 +15097,8 @@ std::string NMD::SUBQ_S_W(uint64 instruction)
- 
- 
- /*
-- * SUBQH.PH rd, rt, rs - Subtract Fractional Halfword Vectors And Shift Right
-- *                         to Halve Results
-+ * [DSP] SUBQH.PH rd, rt, rs - Subtract fractional halfword vectors and shift
-+ *   right to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15107,8 +15122,8 @@ std::string NMD::SUBQH_PH(uint64 instruction)
- 
- 
- /*
-- * SUBQH.PH rd, rt, rs - Subtract Fractional Halfword Vectors And Shift Right
-- *                         to Halve Results
-+ * [DSP] SUBQH_R.PH rd, rt, rs - Subtract fractional halfword vectors and shift
-+ *   right to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15132,8 +15147,8 @@ std::string NMD::SUBQH_R_PH(uint64 instruction)
- 
- 
- /*
-- * SUBQH_R.PH rd, rt, rs - Subtract Fractional Halfword Vectors And Shift Right
-- *                           to Halve Results (rounding)
-+ * [DSP] SUBQH_R.W rd, rt, rs - Subtract fractional halfword vectors and shift
-+ *   right to halve results with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15157,8 +15172,8 @@ std::string NMD::SUBQH_R_W(uint64 instruction)
- 
- 
- /*
-- * SUBQH.W rd, rs, rt - Subtract Fractional Words And Shift Right to Halve
-- *                        Results
-+ * [DSP] SUBQH.W rd, rs, rt - Subtract fractional words and shift right to
-+ *   halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15279,7 +15294,7 @@ std::string NMD::SUBU_QB(uint64 instruction)
- 
- /*
-  * [DSP] SUBU_S.PH rd, rs, rt - Subtract unsigned unsigned halfwords with
-- *         8-bit saturation
-+ *   8-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15304,7 +15319,7 @@ std::string NMD::SUBU_S_PH(uint64 instruction)
- 
- /*
-  * [DSP] SUBU_S.QB rd, rs, rt - Subtract unsigned quad byte vectors with
-- *         8-bit saturation
-+ *   8-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15329,7 +15344,7 @@ std::string NMD::SUBU_S_QB(uint64 instruction)
- 
- /*
-  * [DSP] SUBUH.QB rd, rs, rt - Subtract unsigned bytes and right shift
-- *         to halve results
-+ *   to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15354,7 +15369,7 @@ std::string NMD::SUBUH_QB(uint64 instruction)
- 
- /*
-  * [DSP] SUBUH_R.QB rd, rs, rt - Subtract unsigned bytes and right shift
-- *         to halve results with rounding
-+ *   to halve results with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
+new file mode 100644
+index 0000000..d98dd22
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction PCKEV.B
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "PCKEV.B";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
++        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
++        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
++        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
++        { 0xe3388ee38ee3388eULL, 0xffffffffffffffffULL, },
++        { 0x1cc7711c711cc771ULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
++        { 0xe3388ee38ee3388eULL, 0x0000000000000000ULL, },
++        { 0x1cc7711c711cc771ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xe3388ee38ee3388eULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x1cc7711c711cc771ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
++        { 0xe3388ee38ee3388eULL, 0x5555555555555555ULL, },
++        { 0x1cc7711c711cc771ULL, 0x5555555555555555ULL, },
++        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
++        { 0xe3388ee38ee3388eULL, 0xccccccccccccccccULL, },
++        { 0x1cc7711c711cc771ULL, 0xccccccccccccccccULL, },
++        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe3388ee38ee3388eULL, 0x3333333333333333ULL, },
++        { 0x1cc7711c711cc771ULL, 0x3333333333333333ULL, },
++        { 0xffffffffffffffffULL, 0xe3388ee38ee3388eULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0xe3388ee38ee3388eULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xe3388ee38ee3388eULL, },
++        { 0x5555555555555555ULL, 0xe3388ee38ee3388eULL, },
++        { 0xccccccccccccccccULL, 0xe3388ee38ee3388eULL, },
++        { 0x3333333333333333ULL, 0xe3388ee38ee3388eULL, },
++        { 0xe3388ee38ee3388eULL, 0xe3388ee38ee3388eULL, },
++        { 0x1cc7711c711cc771ULL, 0xe3388ee38ee3388eULL, },
++        { 0xffffffffffffffffULL, 0x1cc7711c711cc771ULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x1cc7711c711cc771ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x1cc7711c711cc771ULL, },
++        { 0x5555555555555555ULL, 0x1cc7711c711cc771ULL, },
++        { 0xccccccccccccccccULL, 0x1cc7711c711cc771ULL, },
++        { 0x3333333333333333ULL, 0x1cc7711c711cc771ULL, },
++        { 0xe3388ee38ee3388eULL, 0x1cc7711c711cc771ULL, },
++        { 0x1cc7711c711cc771ULL, 0x1cc7711c711cc771ULL, },
++        { 0x675e7b0c6acc6240ULL, 0x675e7b0c6acc6240ULL, },    /*  64  */
++        { 0xf71a3ffcbe639308ULL, 0x675e7b0c6acc6240ULL, },
++        { 0xd8ff2b145aaacf80ULL, 0x675e7b0c6acc6240ULL, },
++        { 0xf1d842a04f4d314eULL, 0x675e7b0c6acc6240ULL, },
++        { 0x675e7b0c6acc6240ULL, 0xf71a3ffcbe639308ULL, },
++        { 0xf71a3ffcbe639308ULL, 0xf71a3ffcbe639308ULL, },
++        { 0xd8ff2b145aaacf80ULL, 0xf71a3ffcbe639308ULL, },
++        { 0xf1d842a04f4d314eULL, 0xf71a3ffcbe639308ULL, },
++        { 0x675e7b0c6acc6240ULL, 0xd8ff2b145aaacf80ULL, },    /*  72  */
++        { 0xf71a3ffcbe639308ULL, 0xd8ff2b145aaacf80ULL, },
++        { 0xd8ff2b145aaacf80ULL, 0xd8ff2b145aaacf80ULL, },
++        { 0xf1d842a04f4d314eULL, 0xd8ff2b145aaacf80ULL, },
++        { 0x675e7b0c6acc6240ULL, 0xf1d842a04f4d314eULL, },
++        { 0xf71a3ffcbe639308ULL, 0xf1d842a04f4d314eULL, },
++        { 0xd8ff2b145aaacf80ULL, 0xf1d842a04f4d314eULL, },
++        { 0xf1d842a04f4d314eULL, 0xf1d842a04f4d314eULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_B(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_B(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
+new file mode 100644
+index 0000000..543fb6a
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction PCKEV.D
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "PCKEV.D";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
++        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
++        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
++        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
++        { 0xe38e38e38e38e38eULL, 0xffffffffffffffffULL, },
++        { 0x1c71c71c71c71c71ULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0x0000000000000000ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xe38e38e38e38e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
++        { 0xe38e38e38e38e38eULL, 0x5555555555555555ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x5555555555555555ULL, },
++        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
++        { 0xe38e38e38e38e38eULL, 0xccccccccccccccccULL, },
++        { 0x1c71c71c71c71c71ULL, 0xccccccccccccccccULL, },
++        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x3333333333333333ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x3333333333333333ULL, },
++        { 0xffffffffffffffffULL, 0xe38e38e38e38e38eULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0xe38e38e38e38e38eULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xe38e38e38e38e38eULL, },
++        { 0x5555555555555555ULL, 0xe38e38e38e38e38eULL, },
++        { 0xccccccccccccccccULL, 0xe38e38e38e38e38eULL, },
++        { 0x3333333333333333ULL, 0xe38e38e38e38e38eULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x1c71c71c71c71c71ULL, 0xe38e38e38e38e38eULL, },
++        { 0xffffffffffffffffULL, 0x1c71c71c71c71c71ULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x1c71c71c71c71c71ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x1c71c71c71c71c71ULL, },
++        { 0x5555555555555555ULL, 0x1c71c71c71c71c71ULL, },
++        { 0xccccccccccccccccULL, 0x1c71c71c71c71c71ULL, },
++        { 0x3333333333333333ULL, 0x1c71c71c71c71c71ULL, },
++        { 0xe38e38e38e38e38eULL, 0x1c71c71c71c71c71ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x1c71c71c71c71c71ULL, },
++        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },    /*  64  */
++        { 0xfbbe00634d93c708ULL, 0x886ae6cc28625540ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x886ae6cc28625540ULL, },
++        { 0x704f164d5e31e24eULL, 0x886ae6cc28625540ULL, },
++        { 0x886ae6cc28625540ULL, 0xfbbe00634d93c708ULL, },
++        { 0xfbbe00634d93c708ULL, 0xfbbe00634d93c708ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0xfbbe00634d93c708ULL, },
++        { 0x704f164d5e31e24eULL, 0xfbbe00634d93c708ULL, },
++        { 0x886ae6cc28625540ULL, 0xac5aaeaab9cf8b80ULL, },    /*  72  */
++        { 0xfbbe00634d93c708ULL, 0xac5aaeaab9cf8b80ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
++        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
++        { 0x886ae6cc28625540ULL, 0x704f164d5e31e24eULL, },
++        { 0xfbbe00634d93c708ULL, 0x704f164d5e31e24eULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x704f164d5e31e24eULL, },
++        { 0x704f164d5e31e24eULL, 0x704f164d5e31e24eULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_D(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_D(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
+new file mode 100644
+index 0000000..64a18c0
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction PCKEV.H
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "PCKEV.H";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
++        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
++        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
++        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
++        { 0x8e3838e338e3e38eULL, 0xffffffffffffffffULL, },
++        { 0x71c7c71cc71c1c71ULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
++        { 0x8e3838e338e3e38eULL, 0x0000000000000000ULL, },
++        { 0x71c7c71cc71c1c71ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x8e3838e338e3e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x71c7c71cc71c1c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
++        { 0x8e3838e338e3e38eULL, 0x5555555555555555ULL, },
++        { 0x71c7c71cc71c1c71ULL, 0x5555555555555555ULL, },
++        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
++        { 0x8e3838e338e3e38eULL, 0xccccccccccccccccULL, },
++        { 0x71c7c71cc71c1c71ULL, 0xccccccccccccccccULL, },
++        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x8e3838e338e3e38eULL, 0x3333333333333333ULL, },
++        { 0x71c7c71cc71c1c71ULL, 0x3333333333333333ULL, },
++        { 0xffffffffffffffffULL, 0x8e3838e338e3e38eULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x8e3838e338e3e38eULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x8e3838e338e3e38eULL, },
++        { 0x5555555555555555ULL, 0x8e3838e338e3e38eULL, },
++        { 0xccccccccccccccccULL, 0x8e3838e338e3e38eULL, },
++        { 0x3333333333333333ULL, 0x8e3838e338e3e38eULL, },
++        { 0x8e3838e338e3e38eULL, 0x8e3838e338e3e38eULL, },
++        { 0x71c7c71cc71c1c71ULL, 0x8e3838e338e3e38eULL, },
++        { 0xffffffffffffffffULL, 0x71c7c71cc71c1c71ULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x71c7c71cc71c1c71ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x71c7c71cc71c1c71ULL, },
++        { 0x5555555555555555ULL, 0x71c7c71cc71c1c71ULL, },
++        { 0xccccccccccccccccULL, 0x71c7c71cc71c1c71ULL, },
++        { 0x3333333333333333ULL, 0x71c7c71cc71c1c71ULL, },
++        { 0x8e3838e338e3e38eULL, 0x71c7c71cc71c1c71ULL, },
++        { 0x71c7c71cc71c1c71ULL, 0x71c7c71cc71c1c71ULL, },
++        { 0x0b5eb00ce6cc5540ULL, 0x0b5eb00ce6cc5540ULL, },    /*  64  */
++        { 0xbb1a52fc0063c708ULL, 0x0b5eb00ce6cc5540ULL, },
++        { 0xc6ff2514aeaa8b80ULL, 0x0b5eb00ce6cc5540ULL, },
++        { 0x88d8e2a0164de24eULL, 0x0b5eb00ce6cc5540ULL, },
++        { 0x0b5eb00ce6cc5540ULL, 0xbb1a52fc0063c708ULL, },
++        { 0xbb1a52fc0063c708ULL, 0xbb1a52fc0063c708ULL, },
++        { 0xc6ff2514aeaa8b80ULL, 0xbb1a52fc0063c708ULL, },
++        { 0x88d8e2a0164de24eULL, 0xbb1a52fc0063c708ULL, },
++        { 0x0b5eb00ce6cc5540ULL, 0xc6ff2514aeaa8b80ULL, },    /*  72  */
++        { 0xbb1a52fc0063c708ULL, 0xc6ff2514aeaa8b80ULL, },
++        { 0xc6ff2514aeaa8b80ULL, 0xc6ff2514aeaa8b80ULL, },
++        { 0x88d8e2a0164de24eULL, 0xc6ff2514aeaa8b80ULL, },
++        { 0x0b5eb00ce6cc5540ULL, 0x88d8e2a0164de24eULL, },
++        { 0xbb1a52fc0063c708ULL, 0x88d8e2a0164de24eULL, },
++        { 0xc6ff2514aeaa8b80ULL, 0x88d8e2a0164de24eULL, },
++        { 0x88d8e2a0164de24eULL, 0x88d8e2a0164de24eULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_H(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_H(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
+new file mode 100644
+index 0000000..a0acacd
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction PCKEV.W
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "PCKEV.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
++        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
++        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
++        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
++        { 0xe38e38e38e38e38eULL, 0xffffffffffffffffULL, },
++        { 0x1c71c71c71c71c71ULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0x0000000000000000ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xe38e38e38e38e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
++        { 0xe38e38e38e38e38eULL, 0x5555555555555555ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x5555555555555555ULL, },
++        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
++        { 0xe38e38e38e38e38eULL, 0xccccccccccccccccULL, },
++        { 0x1c71c71c71c71c71ULL, 0xccccccccccccccccULL, },
++        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x3333333333333333ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x3333333333333333ULL, },
++        { 0xffffffffffffffffULL, 0xe38e38e38e38e38eULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0xe38e38e38e38e38eULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xe38e38e38e38e38eULL, },
++        { 0x5555555555555555ULL, 0xe38e38e38e38e38eULL, },
++        { 0xccccccccccccccccULL, 0xe38e38e38e38e38eULL, },
++        { 0x3333333333333333ULL, 0xe38e38e38e38e38eULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x1c71c71c71c71c71ULL, 0xe38e38e38e38e38eULL, },
++        { 0xffffffffffffffffULL, 0x1c71c71c71c71c71ULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x1c71c71c71c71c71ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x1c71c71c71c71c71ULL, },
++        { 0x5555555555555555ULL, 0x1c71c71c71c71c71ULL, },
++        { 0xccccccccccccccccULL, 0x1c71c71c71c71c71ULL, },
++        { 0x3333333333333333ULL, 0x1c71c71c71c71c71ULL, },
++        { 0xe38e38e38e38e38eULL, 0x1c71c71c71c71c71ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x1c71c71c71c71c71ULL, },
++        { 0xfe7bb00c28625540ULL, 0xfe7bb00c28625540ULL, },    /*  64  */
++        { 0x153f52fc4d93c708ULL, 0xfe7bb00c28625540ULL, },
++        { 0xab2b2514b9cf8b80ULL, 0xfe7bb00c28625540ULL, },
++        { 0xa942e2a05e31e24eULL, 0xfe7bb00c28625540ULL, },
++        { 0xfe7bb00c28625540ULL, 0x153f52fc4d93c708ULL, },
++        { 0x153f52fc4d93c708ULL, 0x153f52fc4d93c708ULL, },
++        { 0xab2b2514b9cf8b80ULL, 0x153f52fc4d93c708ULL, },
++        { 0xa942e2a05e31e24eULL, 0x153f52fc4d93c708ULL, },
++        { 0xfe7bb00c28625540ULL, 0xab2b2514b9cf8b80ULL, },    /*  72  */
++        { 0x153f52fc4d93c708ULL, 0xab2b2514b9cf8b80ULL, },
++        { 0xab2b2514b9cf8b80ULL, 0xab2b2514b9cf8b80ULL, },
++        { 0xa942e2a05e31e24eULL, 0xab2b2514b9cf8b80ULL, },
++        { 0xfe7bb00c28625540ULL, 0xa942e2a05e31e24eULL, },
++        { 0x153f52fc4d93c708ULL, 0xa942e2a05e31e24eULL, },
++        { 0xab2b2514b9cf8b80ULL, 0xa942e2a05e31e24eULL, },
++        { 0xa942e2a05e31e24eULL, 0xa942e2a05e31e24eULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_W(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_W(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
+new file mode 100644
+index 0000000..7bf86fc
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction PCKOD.B
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "PCKOD.B";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
++        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
++        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
++        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
++        { 0x388ee338e3388ee3ULL, 0xffffffffffffffffULL, },
++        { 0xc7711cc71cc7711cULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
++        { 0x388ee338e3388ee3ULL, 0x0000000000000000ULL, },
++        { 0xc7711cc71cc7711cULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x388ee338e3388ee3ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xc7711cc71cc7711cULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
++        { 0x388ee338e3388ee3ULL, 0x5555555555555555ULL, },
++        { 0xc7711cc71cc7711cULL, 0x5555555555555555ULL, },
++        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
++        { 0x388ee338e3388ee3ULL, 0xccccccccccccccccULL, },
++        { 0xc7711cc71cc7711cULL, 0xccccccccccccccccULL, },
++        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x388ee338e3388ee3ULL, 0x3333333333333333ULL, },
++        { 0xc7711cc71cc7711cULL, 0x3333333333333333ULL, },
++        { 0xffffffffffffffffULL, 0x388ee338e3388ee3ULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x388ee338e3388ee3ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x388ee338e3388ee3ULL, },
++        { 0x5555555555555555ULL, 0x388ee338e3388ee3ULL, },
++        { 0xccccccccccccccccULL, 0x388ee338e3388ee3ULL, },
++        { 0x3333333333333333ULL, 0x388ee338e3388ee3ULL, },
++        { 0x388ee338e3388ee3ULL, 0x388ee338e3388ee3ULL, },
++        { 0xc7711cc71cc7711cULL, 0x388ee338e3388ee3ULL, },
++        { 0xffffffffffffffffULL, 0xc7711cc71cc7711cULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0xc7711cc71cc7711cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc7711cc71cc7711cULL, },
++        { 0x5555555555555555ULL, 0xc7711cc71cc7711cULL, },
++        { 0xccccccccccccccccULL, 0xc7711cc71cc7711cULL, },
++        { 0x3333333333333333ULL, 0xc7711cc71cc7711cULL, },
++        { 0x388ee338e3388ee3ULL, 0xc7711cc71cc7711cULL, },
++        { 0xc7711cc71cc7711cULL, 0xc7711cc71cc7711cULL, },
++        { 0x4b0bfeb088e62855ULL, 0x4b0bfeb088e62855ULL, },    /*  64  */
++        { 0x12bb1552fb004dc7ULL, 0x4b0bfeb088e62855ULL, },
++        { 0x27c6ab25acaeb98bULL, 0x4b0bfeb088e62855ULL, },
++        { 0x8d88a9e270165ee2ULL, 0x4b0bfeb088e62855ULL, },
++        { 0x4b0bfeb088e62855ULL, 0x12bb1552fb004dc7ULL, },
++        { 0x12bb1552fb004dc7ULL, 0x12bb1552fb004dc7ULL, },
++        { 0x27c6ab25acaeb98bULL, 0x12bb1552fb004dc7ULL, },
++        { 0x8d88a9e270165ee2ULL, 0x12bb1552fb004dc7ULL, },
++        { 0x4b0bfeb088e62855ULL, 0x27c6ab25acaeb98bULL, },    /*  72  */
++        { 0x12bb1552fb004dc7ULL, 0x27c6ab25acaeb98bULL, },
++        { 0x27c6ab25acaeb98bULL, 0x27c6ab25acaeb98bULL, },
++        { 0x8d88a9e270165ee2ULL, 0x27c6ab25acaeb98bULL, },
++        { 0x4b0bfeb088e62855ULL, 0x8d88a9e270165ee2ULL, },
++        { 0x12bb1552fb004dc7ULL, 0x8d88a9e270165ee2ULL, },
++        { 0x27c6ab25acaeb98bULL, 0x8d88a9e270165ee2ULL, },
++        { 0x8d88a9e270165ee2ULL, 0x8d88a9e270165ee2ULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_B(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_B(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
+new file mode 100644
+index 0000000..3c4d55b
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction PCKOD.D
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "PCKOD.D";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
++        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
++        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
++        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
++        { 0x38e38e38e38e38e3ULL, 0xffffffffffffffffULL, },
++        { 0xc71c71c71c71c71cULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
++        { 0x38e38e38e38e38e3ULL, 0x0000000000000000ULL, },
++        { 0xc71c71c71c71c71cULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x38e38e38e38e38e3ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xc71c71c71c71c71cULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
++        { 0x38e38e38e38e38e3ULL, 0x5555555555555555ULL, },
++        { 0xc71c71c71c71c71cULL, 0x5555555555555555ULL, },
++        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
++        { 0x38e38e38e38e38e3ULL, 0xccccccccccccccccULL, },
++        { 0xc71c71c71c71c71cULL, 0xccccccccccccccccULL, },
++        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x38e38e38e38e38e3ULL, 0x3333333333333333ULL, },
++        { 0xc71c71c71c71c71cULL, 0x3333333333333333ULL, },
++        { 0xffffffffffffffffULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x38e38e38e38e38e3ULL, },
++        { 0x5555555555555555ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xccccccccccccccccULL, 0x38e38e38e38e38e3ULL, },
++        { 0x3333333333333333ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x38e38e38e38e38e3ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xc71c71c71c71c71cULL, 0x38e38e38e38e38e3ULL, },
++        { 0xffffffffffffffffULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0xc71c71c71c71c71cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c71c71c71cULL, },
++        { 0x5555555555555555ULL, 0xc71c71c71c71c71cULL, },
++        { 0xccccccccccccccccULL, 0xc71c71c71c71c71cULL, },
++        { 0x3333333333333333ULL, 0xc71c71c71c71c71cULL, },
++        { 0x38e38e38e38e38e3ULL, 0xc71c71c71c71c71cULL, },
++        { 0xc71c71c71c71c71cULL, 0xc71c71c71c71c71cULL, },
++        { 0x4b670b5efe7bb00cULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0x12f7bb1a153f52fcULL, 0x4b670b5efe7bb00cULL, },
++        { 0x27d8c6ffab2b2514ULL, 0x4b670b5efe7bb00cULL, },
++        { 0x8df188d8a942e2a0ULL, 0x4b670b5efe7bb00cULL, },
++        { 0x4b670b5efe7bb00cULL, 0x12f7bb1a153f52fcULL, },
++        { 0x12f7bb1a153f52fcULL, 0x12f7bb1a153f52fcULL, },
++        { 0x27d8c6ffab2b2514ULL, 0x12f7bb1a153f52fcULL, },
++        { 0x8df188d8a942e2a0ULL, 0x12f7bb1a153f52fcULL, },
++        { 0x4b670b5efe7bb00cULL, 0x27d8c6ffab2b2514ULL, },    /*  72  */
++        { 0x12f7bb1a153f52fcULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x27d8c6ffab2b2514ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x8df188d8a942e2a0ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x4b670b5efe7bb00cULL, 0x8df188d8a942e2a0ULL, },
++        { 0x12f7bb1a153f52fcULL, 0x8df188d8a942e2a0ULL, },
++        { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_D(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_D(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
+new file mode 100644
+index 0000000..5c3c529
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction PCKOD.H
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "PCKOD.H";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
++        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
++        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
++        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
++        { 0x38e3e38ee38e8e38ULL, 0xffffffffffffffffULL, },
++        { 0xc71c1c711c7171c7ULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
++        { 0x38e3e38ee38e8e38ULL, 0x0000000000000000ULL, },
++        { 0xc71c1c711c7171c7ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x38e3e38ee38e8e38ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xc71c1c711c7171c7ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
++        { 0x38e3e38ee38e8e38ULL, 0x5555555555555555ULL, },
++        { 0xc71c1c711c7171c7ULL, 0x5555555555555555ULL, },
++        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
++        { 0x38e3e38ee38e8e38ULL, 0xccccccccccccccccULL, },
++        { 0xc71c1c711c7171c7ULL, 0xccccccccccccccccULL, },
++        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x38e3e38ee38e8e38ULL, 0x3333333333333333ULL, },
++        { 0xc71c1c711c7171c7ULL, 0x3333333333333333ULL, },
++        { 0xffffffffffffffffULL, 0x38e3e38ee38e8e38ULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x38e3e38ee38e8e38ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x38e3e38ee38e8e38ULL, },
++        { 0x5555555555555555ULL, 0x38e3e38ee38e8e38ULL, },
++        { 0xccccccccccccccccULL, 0x38e3e38ee38e8e38ULL, },
++        { 0x3333333333333333ULL, 0x38e3e38ee38e8e38ULL, },
++        { 0x38e3e38ee38e8e38ULL, 0x38e3e38ee38e8e38ULL, },
++        { 0xc71c1c711c7171c7ULL, 0x38e3e38ee38e8e38ULL, },
++        { 0xffffffffffffffffULL, 0xc71c1c711c7171c7ULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0xc71c1c711c7171c7ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c1c711c7171c7ULL, },
++        { 0x5555555555555555ULL, 0xc71c1c711c7171c7ULL, },
++        { 0xccccccccccccccccULL, 0xc71c1c711c7171c7ULL, },
++        { 0x3333333333333333ULL, 0xc71c1c711c7171c7ULL, },
++        { 0x38e3e38ee38e8e38ULL, 0xc71c1c711c7171c7ULL, },
++        { 0xc71c1c711c7171c7ULL, 0xc71c1c711c7171c7ULL, },
++        { 0x4b67fe7b886a2862ULL, 0x4b67fe7b886a2862ULL, },    /*  64  */
++        { 0x12f7153ffbbe4d93ULL, 0x4b67fe7b886a2862ULL, },
++        { 0x27d8ab2bac5ab9cfULL, 0x4b67fe7b886a2862ULL, },
++        { 0x8df1a942704f5e31ULL, 0x4b67fe7b886a2862ULL, },
++        { 0x4b67fe7b886a2862ULL, 0x12f7153ffbbe4d93ULL, },
++        { 0x12f7153ffbbe4d93ULL, 0x12f7153ffbbe4d93ULL, },
++        { 0x27d8ab2bac5ab9cfULL, 0x12f7153ffbbe4d93ULL, },
++        { 0x8df1a942704f5e31ULL, 0x12f7153ffbbe4d93ULL, },
++        { 0x4b67fe7b886a2862ULL, 0x27d8ab2bac5ab9cfULL, },    /*  72  */
++        { 0x12f7153ffbbe4d93ULL, 0x27d8ab2bac5ab9cfULL, },
++        { 0x27d8ab2bac5ab9cfULL, 0x27d8ab2bac5ab9cfULL, },
++        { 0x8df1a942704f5e31ULL, 0x27d8ab2bac5ab9cfULL, },
++        { 0x4b67fe7b886a2862ULL, 0x8df1a942704f5e31ULL, },
++        { 0x12f7153ffbbe4d93ULL, 0x8df1a942704f5e31ULL, },
++        { 0x27d8ab2bac5ab9cfULL, 0x8df1a942704f5e31ULL, },
++        { 0x8df1a942704f5e31ULL, 0x8df1a942704f5e31ULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_H(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_H(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
+new file mode 100644
+index 0000000..9275890
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction PCKOD.W
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "PCKOD.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
++        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
++        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
++        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
++        { 0x38e38e38e38e38e3ULL, 0xffffffffffffffffULL, },
++        { 0xc71c71c71c71c71cULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
++        { 0x38e38e38e38e38e3ULL, 0x0000000000000000ULL, },
++        { 0xc71c71c71c71c71cULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x38e38e38e38e38e3ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xc71c71c71c71c71cULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
++        { 0x38e38e38e38e38e3ULL, 0x5555555555555555ULL, },
++        { 0xc71c71c71c71c71cULL, 0x5555555555555555ULL, },
++        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
++        { 0x38e38e38e38e38e3ULL, 0xccccccccccccccccULL, },
++        { 0xc71c71c71c71c71cULL, 0xccccccccccccccccULL, },
++        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x38e38e38e38e38e3ULL, 0x3333333333333333ULL, },
++        { 0xc71c71c71c71c71cULL, 0x3333333333333333ULL, },
++        { 0xffffffffffffffffULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x38e38e38e38e38e3ULL, },
++        { 0x5555555555555555ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xccccccccccccccccULL, 0x38e38e38e38e38e3ULL, },
++        { 0x3333333333333333ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x38e38e38e38e38e3ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xc71c71c71c71c71cULL, 0x38e38e38e38e38e3ULL, },
++        { 0xffffffffffffffffULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0xc71c71c71c71c71cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c71c71c71cULL, },
++        { 0x5555555555555555ULL, 0xc71c71c71c71c71cULL, },
++        { 0xccccccccccccccccULL, 0xc71c71c71c71c71cULL, },
++        { 0x3333333333333333ULL, 0xc71c71c71c71c71cULL, },
++        { 0x38e38e38e38e38e3ULL, 0xc71c71c71c71c71cULL, },
++        { 0xc71c71c71c71c71cULL, 0xc71c71c71c71c71cULL, },
++        { 0x4b670b5e886ae6ccULL, 0x4b670b5e886ae6ccULL, },    /*  64  */
++        { 0x12f7bb1afbbe0063ULL, 0x4b670b5e886ae6ccULL, },
++        { 0x27d8c6ffac5aaeaaULL, 0x4b670b5e886ae6ccULL, },
++        { 0x8df188d8704f164dULL, 0x4b670b5e886ae6ccULL, },
++        { 0x4b670b5e886ae6ccULL, 0x12f7bb1afbbe0063ULL, },
++        { 0x12f7bb1afbbe0063ULL, 0x12f7bb1afbbe0063ULL, },
++        { 0x27d8c6ffac5aaeaaULL, 0x12f7bb1afbbe0063ULL, },
++        { 0x8df188d8704f164dULL, 0x12f7bb1afbbe0063ULL, },
++        { 0x4b670b5e886ae6ccULL, 0x27d8c6ffac5aaeaaULL, },    /*  72  */
++        { 0x12f7bb1afbbe0063ULL, 0x27d8c6ffac5aaeaaULL, },
++        { 0x27d8c6ffac5aaeaaULL, 0x27d8c6ffac5aaeaaULL, },
++        { 0x8df188d8704f164dULL, 0x27d8c6ffac5aaeaaULL, },
++        { 0x4b670b5e886ae6ccULL, 0x8df188d8704f164dULL, },
++        { 0x12f7bb1afbbe0063ULL, 0x8df188d8704f164dULL, },
++        { 0x27d8c6ffac5aaeaaULL, 0x8df188d8704f164dULL, },
++        { 0x8df188d8704f164dULL, 0x8df188d8704f164dULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_W(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_W(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
+new file mode 100644
+index 0000000..fcf857a
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction VSHF.B
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "VSHF.B";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x4040404040404040ULL, 0x4040404040404040ULL, },    /*  64  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x4040404040404040ULL, 0x4040404040404040ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x4040404040404040ULL, 0x4040404040404040ULL, },    /*  72  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x4040404040404040ULL, 0x4040404040404040ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_B(b128_pattern[i], b128_pattern[j],
++                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_B(b128_random[i], b128_random[j],
++                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
+new file mode 100644
+index 0000000..700c159
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction VSHF.D
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "VSHF.D";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },    /*  64  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },    /*  72  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_D(b128_pattern[i], b128_pattern[j],
++                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_D(b128_random[i], b128_random[j],
++                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
+new file mode 100644
+index 0000000..3d6c1dc
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction VSHF.H
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "VSHF.H";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x5540554055405540ULL, 0x5540554055405540ULL, },    /*  64  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x5540554055405540ULL, 0x5540554055405540ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x5540554055405540ULL, 0x5540554055405540ULL, },    /*  72  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x5540554055405540ULL, 0x5540554055405540ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_H(b128_pattern[i], b128_pattern[j],
++                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_H(b128_random[i], b128_random[j],
++                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
+new file mode 100644
+index 0000000..6030762
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
+@@ -0,0 +1,153 @@
++/*
++ *  Test program for MSA instruction VSHF.W
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *`
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "VSHF.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x2862554028625540ULL, 0x2862554028625540ULL, },    /*  64  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x2862554028625540ULL, 0x2862554028625540ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x2862554028625540ULL, 0x2862554028625540ULL, },    /*  72  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x2862554028625540ULL, 0x2862554028625540ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_W(b128_pattern[i], b128_pattern[j],
++                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_W(b128_random[i], b128_random[j],
++                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
 -- 
 2.7.4
