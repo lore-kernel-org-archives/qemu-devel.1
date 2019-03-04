@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46380)
+Received: from eggs.gnu.org ([209.51.188.92]:46474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sD7-0002UA-FG
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:10 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sDC-0002Xq-Sm
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sD5-00059M-Oo
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:09 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45377)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sD9-0005EW-Nc
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:14 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54968)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h0sD3-0004z5-V2
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:06 -0500
-Received: by mail-wr1-x444.google.com with SMTP id w17so6627528wrn.12
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:21:03 -0800 (PST)
+	id 1h0sD7-00053n-CF
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:21:09 -0500
+Received: by mail-wm1-x342.google.com with SMTP id f3so123662wmj.4
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:21:06 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Mar 2019 19:20:09 +0100
-Message-Id: <1551723614-1823-50-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Mar 2019 19:20:12 +0100
+Message-Id: <1551723614-1823-53-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
 References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 49/54] sparc-softmmu.mak: express dependencies
+Subject: [Qemu-devel] [PULL 52/54] xtensa-softmmu.mak: express dependencies
  with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,93 +36,50 @@ definitions in Kconfig mode.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/sparc-softmmu.mak | 22 ++++++----------------
- hw/misc/Kconfig                   |  1 +
- hw/net/Kconfig                    |  1 +
- hw/sparc/Kconfig                  | 13 +++++++++++++
- 4 files changed, 21 insertions(+), 16 deletions(-)
+ default-configs/xtensa-softmmu.mak   | 6 ++----
+ default-configs/xtensaeb-softmmu.mak | 7 +------
+ hw/xtensa/Kconfig                    | 3 +++
+ 3 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
-index b31a9f2..ee85218 100644
---- a/default-configs/sparc-softmmu.mak
-+++ b/default-configs/sparc-softmmu.mak
-@@ -1,21 +1,11 @@
- # Default configuration for sparc-softmmu
+diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/xtensa-softmmu.mak
+index 7aa7fa6..7e4d1cc 100644
+--- a/default-configs/xtensa-softmmu.mak
++++ b/default-configs/xtensa-softmmu.mak
+@@ -1,8 +1,6 @@
+ # Default configuration for Xtensa
  
--CONFIG_ISA_BUS=y
--CONFIG_ECC=y
--CONFIG_ESP=y
--CONFIG_ESCC=y
--CONFIG_M48T59=y
--CONFIG_FDC=y
--CONFIG_EMPTY_SLOT=y
--CONFIG_PCNET_COMMON=y
--CONFIG_LANCE=y
--CONFIG_TCX=y
--CONFIG_CG3=y
--CONFIG_SLAVIO=y
--CONFIG_CS4231=y
--CONFIG_GRLIB=y
--CONFIG_STP2000=y
--CONFIG_ECCMEMCTL=y
-+# Uncomment the following lines to disable these optional devices:
-+#
-+#CONFIG_TCX=n
-+#CONFIG_CG3=n
- 
+-CONFIG_SERIAL=y
+-CONFIG_OPENCORES_ETH=y
+-CONFIG_PFLASH_CFI01=y
+-
 +# Boards:
 +#
- CONFIG_SUN4M=y
- CONFIG_LEON3=y
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index a012d2c..2c60be9 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -71,6 +71,7 @@ config IVSHMEM_DEVICE
+ CONFIG_XTENSA_SIM=y
+ CONFIG_XTENSA_XTFPGA=y
+diff --git a/default-configs/xtensaeb-softmmu.mak b/default-configs/xtensaeb-softmmu.mak
+index 7aa7fa6..f7e48c7 100644
+--- a/default-configs/xtensaeb-softmmu.mak
++++ b/default-configs/xtensaeb-softmmu.mak
+@@ -1,8 +1,3 @@
+ # Default configuration for Xtensa
  
- config ECCMEMCTL
-     bool
-+    select ECC
+-CONFIG_SERIAL=y
+-CONFIG_OPENCORES_ETH=y
+-CONFIG_PFLASH_CFI01=y
+-
+-CONFIG_XTENSA_SIM=y
+-CONFIG_XTENSA_XTFPGA=y
++include xtensa-softmmu.mak
+diff --git a/hw/xtensa/Kconfig b/hw/xtensa/Kconfig
+index dc8eaf6..d72817d 100644
+--- a/hw/xtensa/Kconfig
++++ b/hw/xtensa/Kconfig
+@@ -3,3 +3,6 @@ config XTENSA_SIM
  
- config IMX
+ config XTENSA_XTFPGA
      bool
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index 6b4633b..c00ec03 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -77,6 +77,7 @@ config STELLARIS_ENET
- 
- config LANCE
-     bool
-+    select PCNET_COMMON
- 
- config SUNHME
-     bool
-diff --git a/hw/sparc/Kconfig b/hw/sparc/Kconfig
-index c9c2142..2a83a80 100644
---- a/hw/sparc/Kconfig
-+++ b/hw/sparc/Kconfig
-@@ -1,8 +1,21 @@
- config SUN4M
-     bool
-+    imply TCX
-+    imply CG3
-+    select CS4231
-+    select ECCMEMCTL
-+    select EMPTY_SLOT
-+    select ESCC
-+    select ESP
-+    select FDC
-+    select SLAVIO
-+    select LANCE
-+    select M48T59
-+    select STP2000
- 
- config LEON3
-     bool
-+    select GRLIB
- 
- config GRLIB
-     bool
++    select OPENCORES_ETH
++    select PFLASH_CFI01
++    select SERIAL
 -- 
 1.8.3.1
