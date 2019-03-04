@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33388)
+Received: from eggs.gnu.org ([209.51.188.92]:33441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h0rO9-0001Ea-8v
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:28:30 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0rOJ-0001P5-Dd
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:28:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h0rO7-0002Pi-Rs
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:28:29 -0500
-Resent-Message-Id: <E1h0rO7-0002Pi-Rs@eggs.gnu.org>
-Message-ID: <155172048155.24.16045969174488067706@6acff2cf482b>
-In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cohuck@redhat.com>) id 1h0rOI-00033J-Ir
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:28:39 -0500
+Date: Mon, 4 Mar 2019 18:28:32 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190304182832.1f619a03.cohuck@redhat.com>
+In-Reply-To: <1551466776-29123-8-git-send-email-jjherne@linux.ibm.com>
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-8-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Mar 2019 09:28:02 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] s390: vfio-ccw dasd ipl support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 07/16] s390-bios: Decouple channel i/o
+ logic from virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxNDY2Nzc2LTI5MTIzLTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MTQ2
-Njc3Ni0yOTEyMy0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzE2XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
-dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
-aGV3LzE1NTE0NjY3NzYtMjkxMjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
-b20gLT4gcGF0Y2hldy8xNTUxNDY2Nzc2LTI5MTIzLTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
-aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYTUxOTNlNmQyOSBz
-MzkwLWJpb3M6IGRhc2QtaXBsOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVy
-cm9yIGRhdGEKYWQxMmNlY2MxOSBzMzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwg
-ZGFzZCBkZXZpY2UKOWMwMWM4ZmI0ZSBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29k
-ZXMvc3RydWN0cyBuZWVkZWQgZm9yIGRhc2QtaXBsCmZhMTgzNTVmYWEgczM5MC1iaW9zOiBVc2Ug
-Y29udHJvbCB1bml0IHR5cGUgdG8gZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCmFlZWUzNWFiMTUgczM5
-MC1iaW9zOiBSZWZhY3RvciB2aXJ0aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwpk
-NzgwMTcyNDdhIHMzOTAtYmlvczogY2lvIGVycm9yIGhhbmRsaW5nCjU4NWFlNWZkNGIgczM5MC1i
-aW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwo4N2Nl
-MzA4NDZiIHMzOTAtYmlvczogcHRyMnUzMiBhbmQgdTMydG9wdHIKZGFmZWE1ZDU2YiBzMzkwLWJp
-b3M6IE1hcCBsb3cgY29yZSBtZW1vcnkKM2I0YTkxYjg4NiBzMzkwLWJpb3M6IERlY291cGxlIGNo
-YW5uZWwgaS9vIGxvZ2ljIGZyb20gdmlydGlvCjBmZmFiZmFiOWUgczM5MC1iaW9zOiBDbGVhbiB1
-cCBjaW8uaAo5NTMyOGJiNmJjIHMzOTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ug
-b3V0IG9mIHZpcnRpbyBjb2RlIHBhdGgKMzg3YTlkMjg3NSBzMzkwLWJpb3M6IEV4dGVuZCBmaW5k
-X2RldigpIGZvciBub24tdmlydGlvIGRldmljZXMKZTJiY2YxNTgxNyBzMzkwLWJpb3M6IGRlY291
-cGxlIGNvbW1vbiBib290IGxvZ2ljIGZyb20gdmlydGlvCjk0MDJiOTNmYTUgczM5MC1iaW9zOiBk
-ZWNvdXBsZSBjaW8gc2V0dXAgZnJvbSB2aXJ0aW8KMzE2N2Q1YjdjYiBzMzkwIHZmaW8tY2N3OiBB
-ZGQgYm9vdGluZGV4IHByb3BlcnR5IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvMTYgQ2hlY2tpbmcgY29tbWl0IDMxNjdkNWI3Y2JkYiAoczM5MCB2ZmlvLWNjdzogQWRkIGJv
-b3RpbmRleCBwcm9wZXJ0eSBhbmQgSVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDU6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxODEgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE2IENo
-ZWNraW5nIGNvbW1pdCA5NDAyYjkzZmE1M2EgKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVw
-IGZyb20gdmlydGlvKQozLzE2IENoZWNraW5nIGNvbW1pdCBlMmJjZjE1ODE3ZDIgKHMzOTAtYmlv
-czogZGVjb3VwbGUgY29tbW9uIGJvb3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5z
-IHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNj
-dy9tYWluLmM6MTk6CitJcGxQYXJhbWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxp
-Z25lZF9fKFBBR0VfU0laRSkpKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMy8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNiBD
-aGVja2luZyBjb21taXQgMzg3YTlkMjg3NTA2IChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2Rldigp
-IGZvciBub24tdmlydGlvIGRldmljZXMpCjUvMTYgQ2hlY2tpbmcgY29tbWl0IDk1MzI4YmI2YmNm
-NyAoczM5MC1iaW9zOiBGYWN0b3IgZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNv
-ZGUgcGF0aCkKNi8xNiBDaGVja2luZyBjb21taXQgMGZmYWJmYWI5ZTU3IChzMzkwLWJpb3M6IENs
-ZWFuIHVwIGNpby5oKQo3LzE2IENoZWNraW5nIGNvbW1pdCAzYjRhOTFiODg2NTAgKHMzOTAtYmlv
-czogRGVjb3VwbGUgY2hhbm5lbCBpL28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzI4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgMTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KOC8xNiBDaGVja2luZyBjb21taXQgZGFmZWE1ZDU2YjBhIChzMzkwLWJpb3M6IE1hcCBsb3cg
-Y29yZSBtZW1vcnkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgv
-MTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS8xNiBDaGVja2luZyBjb21taXQgODdjZTMw
-ODQ2YjcxIChzMzkwLWJpb3M6IHB0cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-MTAvMTYgQ2hlY2tpbmcgY29tbWl0IDU4NWFlNWZkNGI0NiAoczM5MC1iaW9zOiBTdXBwb3J0IGZv
-ciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcykKMTEvMTYgQ2hlY2tpbmcgY29t
-bWl0IGQ3ODAxNzI0N2FjNCAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEyLzE2IENo
-ZWNraW5nIGNvbW1pdCBhZWVlMzVhYjE1MmEgKHMzOTAtYmlvczogUmVmYWN0b3IgdmlydGlvIHRv
-IHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4OgorICAgICAg
-ICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywgc2l6ZW9m
-KGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAgIHJ1bl9j
-Y3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0dXMpLCBm
-YWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDEyLzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE2IENoZWNraW5n
-IGNvbW1pdCBmYTE4MzU1ZmFhYWIgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0eXBlIHRv
-IGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IDljMDFjOGZiNGUz
-YSAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVlZGVkIGZv
-ciBkYXNkLWlwbCkKMTUvMTYgQ2hlY2tpbmcgY29tbWl0IGFkMTJjZWNjMTk1MyAoczM5MC1iaW9z
-OiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMyNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDQ0NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoxNi8xNiBDaGVja2luZyBjb21taXQgYTUxOTNlNmQyOTdiIChzMzkwLWJpb3M6IGRhc2QtaXBs
-OiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVycm9yIGRhdGEpCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTE0NjY3NzYtMjkx
-MjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5jb20vdGVzdGluZy5jaGVja3Bh
-dGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri,  1 Mar 2019 13:59:27 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+
+> Create a separate library for channel i/o related code. This decouples
+> channel i/o operations from virtio and allows us to make use of them for
+> the real dasd boot path.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/Makefile    |  2 +-
+>  pc-bios/s390-ccw/cio.c       | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/cio.h       |  3 +++
+>  pc-bios/s390-ccw/main.c      |  1 +
+>  pc-bios/s390-ccw/netboot.mak |  2 +-
+>  pc-bios/s390-ccw/netmain.c   |  1 +
+>  pc-bios/s390-ccw/s390-ccw.h  |  1 -
+>  pc-bios/s390-ccw/virtio.c    | 27 ++-------------------------
+>  8 files changed, 52 insertions(+), 28 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/cio.c
+(...)
+> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+> new file mode 100644
+> index 0000000..605f6f0
+> --- /dev/null
+> +++ b/pc-bios/s390-ccw/cio.c
+> @@ -0,0 +1,43 @@
+> +/*
+> + * S390 Channel I/O
+> + *
+> + * Copyright 2017 Alexander Graf & IBM Corp.
+
+This looks a bit odd. Should probably be two copyright lines (one for
+agraf, one for IBM) and one author line for you? (Especially as
+virtio.c has a 2013 copyright, not 2017.)
+
+> + * Author(s): Alexander Graf <agraf@suse.de>
+> + *            Jason J. Herne <jjherne@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#include "libc.h"
+> +#include "s390-ccw.h"
+> +#include "cio.h"
+> +
+> +static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+> +
+> +int enable_mss_facility(void)
+> +{
+> +    int ret;
+> +    ChscAreaSda *sda_area = (ChscAreaSda *) chsc_page;
+> +
+> +    memset(sda_area, 0, PAGE_SIZE);
+> +    sda_area->request.length = 0x0400;
+> +    sda_area->request.code = 0x0031;
+> +    sda_area->operation_code = 0x2;
+> +
+> +    ret = chsc(sda_area);
+> +    if ((ret == 0) && (sda_area->response.code == 0x0001)) {
+> +        return 0;
+> +    }
+> +    return -EIO;
+> +}
+> +
+> +void enable_subchannel(SubChannelId schid)
+> +{
+> +    Schib schib;
+> +
+> +    stsch_err(schid, &schib);
+> +    schib.pmcw.ena = 1;
+> +    msch(schid, &schib);
+> +}
+
+The code movement looks reasonable.
