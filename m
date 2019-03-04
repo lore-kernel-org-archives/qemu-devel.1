@@ -1,22 +1,22 @@
 Received: from eggs.gnu.org ([209.51.188.92]:35273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0uuH-00036R-G5
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:13:54 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0uuI-00036R-8w
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:13:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0uq9-0002ny-Bb
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:09:39 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:41378 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0uq5-0002kY-Tg
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:09:35 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:41379 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1h0uq5-0002iY-Oe
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:09:35 -0500
+	id 1h0uq5-0002iX-Lt
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 16:09:33 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  4 Mar 2019 22:09:03 +0100
-Message-Id: <1551733750-4902-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  4 Mar 2019 22:09:02 +0100
+Message-Id: <1551733750-4902-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1551733750-4902-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1551733750-4902-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 07/14] tests/tcg: target/mips: Extend
- functionality of MSA wrapper macros
+Subject: [Qemu-devel] [PATCH v7 06/14] tests/tcg: target/mips: Fix test
+ utilities for 128-bit tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +30,71 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add macros that will allow testing cases when one of the source
-registers is identical to the destination register.
+Add "static" and "const" modifiers where appropriate, and fix other
+minor issues.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/tcg/mips/include/wrappers_msa.h | 51 +++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ tests/tcg/mips/include/test_inputs.h |  4 ++--
+ tests/tcg/mips/include/test_utils.h  | 15 ++++++++-------
+ 2 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
-index c650ed2..9cffd55 100644
---- a/tests/tcg/mips/include/wrappers_msa.h
-+++ b/tests/tcg/mips/include/wrappers_msa.h
-@@ -38,6 +38,21 @@ static inline void do_msa_##suffix(void *input, void *output)          \
-    );                                                                  \
- }
+diff --git a/tests/tcg/mips/include/test_inputs.h b/tests/tcg/mips/include/test_inputs.h
+index c173d58..5406e4e 100644
+--- a/tests/tcg/mips/include/test_inputs.h
++++ b/tests/tcg/mips/include/test_inputs.h
+@@ -28,7 +28,7 @@
+ #define PATTERN_INPUTS_COUNT          64
+ #define PATTERN_INPUTS_SHORT_COUNT     8
  
-+#define DO_MSA__WD__WD(suffix, mnemonic)                               \
-+static inline void do_msa_##suffix(void *input, void *output)          \
-+{                                                                      \
-+   __asm__ volatile (                                                  \
-+      "move $t0, %0\n\t"                                               \
-+      "ld.d $w11, 0($t0)\n\t"                                          \
-+      #mnemonic " $w10, $w10\n\t"                                      \
-+      "move $t0, %1\n\t"                                               \
-+      "st.d $w10, 0($t0)\n\t"                                          \
-+      :                                                                \
-+      : "r" (input), "r" (output)                                      \
-+      : "t0", "memory"                                                 \
-+   );                                                                  \
-+}
-+
- DO_MSA__WD__WS(NLOC_B, nloc.b)
- DO_MSA__WD__WS(NLOC_H, nloc.h)
- DO_MSA__WD__WS(NLOC_W, nloc.w)
-@@ -72,6 +87,42 @@ static inline void do_msa_##suffix(void *input1, void *input2,         \
-    );                                                                  \
- }
+-uint64_t b128_pattern[PATTERN_INPUTS_COUNT][2] = {
++static const uint64_t b128_pattern[PATTERN_INPUTS_COUNT][2] = {
+     { 0xFFFFFFFFFFFFFFFFULL, 0xFFFFFFFFFFFFFFFFULL, },   /*   0 */
+     { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+     { 0xAAAAAAAAAAAAAAAAULL, 0xAAAAAAAAAAAAAAAAULL, },
+@@ -99,7 +99,7 @@ uint64_t b128_pattern[PATTERN_INPUTS_COUNT][2] = {
+ #define RANDOM_INPUTS_COUNT           16
+ #define RANDOM_INPUTS_SHORT_COUNT      4
  
-+#define DO_MSA__WD__WD_WT(suffix, mnemonic)                            \
-+static inline void do_msa_##suffix(void *input1, void *input2,         \
-+                                   void *output)                       \
-+{                                                                      \
-+   __asm__ volatile (                                                  \
-+      "move $t0, %0\n\t"                                               \
-+      "ld.d $w11, 0($t0)\n\t"                                          \
-+      "move $t0, %1\n\t"                                               \
-+      "ld.d $w12, 0($t0)\n\t"                                          \
-+      #mnemonic " $w10, $w10, $w12\n\t"                                \
-+      "move $t0, %2\n\t"                                               \
-+      "st.d $w10, 0($t0)\n\t"                                          \
-+      :                                                                \
-+      : "r" (input1), "r" (input2), "r" (output)                       \
-+      : "t0", "memory"                                                 \
-+   );                                                                  \
-+}
-+
-+#define DO_MSA__WD__WS_WD(suffix, mnemonic)                            \
-+static inline void do_msa_##suffix(void *input1, void *input2,         \
-+                                   void *output)                       \
-+{                                                                      \
-+   __asm__ volatile (                                                  \
-+      "move $t0, %0\n\t"                                               \
-+      "ld.d $w11, 0($t0)\n\t"                                          \
-+      "move $t0, %1\n\t"                                               \
-+      "ld.d $w12, 0($t0)\n\t"                                          \
-+      #mnemonic " $w10, $w11, $w10\n\t"                                \
-+      "move $t0, %2\n\t"                                               \
-+      "st.d $w10, 0($t0)\n\t"                                          \
-+      :                                                                \
-+      : "r" (input1), "r" (input2), "r" (output)                       \
-+      : "t0", "memory"                                                 \
-+   );                                                                  \
-+}
-+
- DO_MSA__WD__WS_WT(ILVEV_B, ilvev.b)
- DO_MSA__WD__WS_WT(ILVEV_H, ilvev.h)
- DO_MSA__WD__WS_WT(ILVEV_W, ilvev.w)
+-uint64_t b128_random[RANDOM_INPUTS_COUNT][2] = {
++static const uint64_t b128_random[RANDOM_INPUTS_COUNT][2] = {
+     { 0x886AE6CC28625540ULL, 0x4B670B5EFE7BB00CULL, },   /*   0 */
+     { 0xFBBE00634D93C708ULL, 0x12F7BB1A153F52FCULL, },
+     { 0xAC5AAEAAB9CF8B80ULL, 0x27D8C6FFAB2B2514ULL, },
+diff --git a/tests/tcg/mips/include/test_utils.h b/tests/tcg/mips/include/test_utils.h
+index 82f4b5b..9672903 100644
+--- a/tests/tcg/mips/include/test_utils.h
++++ b/tests/tcg/mips/include/test_utils.h
+@@ -27,14 +27,14 @@
+ #include <inttypes.h>
+ #include <string.h>
+ 
+-#define PRINT_RESULTS 1
++#define PRINT_RESULTS 0
+ 
+ 
+-static inline int32_t check_results(char *instruction_name,
+-                                    uint32_t test_count,
+-                                    double elapsed_time,
+-                                    uint64_t *b128_result,
+-                                    uint64_t *b128_expect)
++static inline int32_t check_results(const char *instruction_name,
++                                    const uint32_t test_count,
++                                    const double elapsed_time,
++                                    const uint64_t *b128_result,
++                                    const uint64_t *b128_expect)
+ {
+ #if PRINT_RESULTS
+     uint32_t ii;
+@@ -58,7 +58,8 @@ static inline int32_t check_results(char *instruction_name,
+ 
+     printf("%s:   ", instruction_name);
+     for (i = 0; i < test_count; i++) {
+-        if (b128_result[i] == b128_expect[i]) {
++        if ((b128_result[2 * i] == b128_expect[2 * i]) &&
++            (b128_result[2 * i + 1] == b128_expect[2 * i + 1])) {
+             pass_count++;
+         } else {
+             fail_count++;
 -- 
 2.7.4
