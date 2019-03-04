@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47839)
+Received: from eggs.gnu.org ([209.51.188.92]:48509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h0oZ8-0004WC-1n
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:27:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h0obJ-0005l6-RZ
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:29:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h0oZ6-0002Aw-1x
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:27:37 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:11300)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h0oZ4-00025c-3E
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:27:35 -0500
-Date: Mon, 4 Mar 2019 15:27:27 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <BN6PR2201MB1251959BC139F153BD5760A2C6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Message-ID: <alpine.BSF.2.21.9999.1903041514430.72040@zero.eik.bme.hu>
-References: <cover.1550491301.git.balaton@eik.bme.hu>
-	<BN6PR2201MB1251959BC139F153BD5760A2C6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1h0obG-00051n-81
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:29:52 -0500
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:44906)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h0obE-00050B-Ef
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:29:50 -0500
+Received: by mail-oi1-x22d.google.com with SMTP id a81so3947317oii.11
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 06:29:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Misc MIPS fulong2e improvements
+References: <20190304120210.31500-1-cohuck@redhat.com>
+In-Reply-To: <20190304120210.31500-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Mar 2019 14:29:34 +0000
+Message-ID: <CAFEAcA9kGkU+9PES48hkS-uwEv-zFBZxUbOLK4D8oaQk=dBdSg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/27] s390x updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Huacai Chen <zltjiangshi@gmail.com>, "philmd@redhat.com" <philmd@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 4 Mar 2019, Aleksandar Markovic wrote:
->> From: BALATON Zoltan <balaton@eik.bme.hu>
->> v2 of http://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg02477.html
->> Addressed review comments and removed last patch (sending it
->> separately) to make this series not depend on my ati-vga patch so it
->> can be applied independently.
+On Mon, 4 Mar 2019 at 12:02, Cornelia Huck <cohuck@redhat.com> wrote:
 >
-> I plan to add bin file (that you mentioned) used for Fulong 2E tests into our
-> tree (in pc-bios directory, with an appropriate comment in pc-bios/README).
-> Please let me know if you this I should not do that, of if I should perhaps include
-> more files, or different files, etc.
+> The following changes since commit 20b084c4b1401b7f8fbc385649d48c67b6f43d44:
+>
+>   Merge remote-tracking branch 'remotes/cminyard/tags/i2c-for-release-20190228' into staging (2019-03-01 11:20:49 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190304
+>
+> for you to fetch changes up to df192fbc517a0954dda644282e52ba943e22ec18:
+>
+>   s390x: Add floating-point extension facility to "qemu" cpu model (2019-03-04 11:49:31 +0100)
+>
+> ----------------------------------------------------------------
+> s390x updates:
+> - tcg: support the floating-point extension facility
+> - vfio-ap: support hot(un)plug of vfio-ap device
+> - fixes + cleanups
+>
+> ----------------------------------------------------------------
 
-I think you cannot do that because distributing binary also requires to 
-provide sources to comply with GPL. Therefore you should include source in 
-roms and build binary from that like done for sam460ex for example (see: 
-git log roms/u-boot-sam460ex). Problem is you have to figure out which 
-sources and config was used to build that binary with the original 
-lemote.com site mentioned in a comment in mips_fulong2e.c that used to 
-host the source seemingly gone. So you probably will need to find a mirror 
-and figure out how to build the pmon binary from that. The comment in 
-source mentions that pmon is under BSD licence in which case it may be 
-distributed without source but including random binaries may not be the 
-best way even if it would be allowed by licence so building a firmware 
-from source is the best way if possible.
+Applied, thanks.
 
-Regards,
-BALATON Zoltan
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
