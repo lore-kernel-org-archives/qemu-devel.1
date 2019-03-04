@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54890)
+Received: from eggs.gnu.org ([209.51.188.92]:56355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h0sfb-0002LR-1e
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:50:36 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h0sij-0004v2-8j
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:53:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h0sfV-00082I-Lj
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:50:33 -0500
-References: <20190225183757.27378-1-armbru@redhat.com>
-	<20190225183757.27378-5-armbru@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9218d2e9-5519-055b-dfb9-e78f99559b80@redhat.com>
-Date: Mon, 4 Mar 2019 19:45:07 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1h0sih-0002dM-AN
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:53:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h0sif-0002YR-AH
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:53:46 -0500
+Date: Mon, 4 Mar 2019 18:53:39 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190304185339.GF2596@work-vm>
+References: <20190304184923.24215-1-marcel.apfelbaum@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190225183757.27378-5-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 4/6] sysbus: Fix latent bug with
- onboard devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190304184923.24215-1-marcel.apfelbaum@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V2] migration/rdma: clang compilation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com
 
-On 25/02/2019 19.37, Markus Armbruster wrote:
-> The first call of sysbus_get_default() creates the main system bus and
-> stores it in QOM as "/machine/unattached/sysbus".  This must not
-> happen before main() creates "/machine", or else container_get() would
-> "helpfully" create it as "container" object, and the real creation of
-> "/machine" would later abort with "attempt to add duplicate property
-> 'machine' to object (type 'container')".  Has been that way ever since
-> we wired up busses in QOM (commit f968fc6892d, v1.2.0).
->=20
-> I believe the bug is latent.  I got it to bite by trying to
-> qdev_create() a sysbus device from a machine's .instance_init()
-> method.
->=20
-> The fix is obvious: store the main system bus in QOM right after
-> creating "/machine".
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+* Marcel Apfelbaum (marcel.apfelbaum@gmail.com) wrote:
+> Configuring QEMU with:
+>         ../configure --cc=clang --enable-rdma
+> 
+> Leads to compilation error:
+> 
+>   CC      migration/rdma.o
+>   CC      migration/block.o
+>   qemu/migration/rdma.c:3615:58: error: taking address of packed member 'rkey' of class or structure
+>       'RDMARegisterResult' may result in an unaligned pointer value [-Werror,-Waddress-of-packed-member]
+>                             (uintptr_t)host_addr, NULL, &reg_result->rkey,
+>                                                          ^~~~~~~~~~~~~~~~
+> Fix it by using a temp local variable.
+> 
+> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  hw/core/sysbus.c | 3 ---
->  vl.c             | 4 ++++
->  2 files changed, 4 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-> index 9f9edbcab9..307cf90a51 100644
-> --- a/hw/core/sysbus.c
-> +++ b/hw/core/sysbus.c
-> @@ -357,9 +357,6 @@ static void main_system_bus_create(void)
->      qbus_create_inplace(main_system_bus, system_bus_info.instance_size=
-,
->                          TYPE_SYSTEM_BUS, NULL, "main-system-bus");
->      OBJECT(main_system_bus)->free =3D g_free;
-> -    object_property_add_child(container_get(qdev_get_machine(),
-> -                                            "/unattached"),
-> -                              "sysbus", OBJECT(main_system_bus), NULL)=
-;
->  }
-> =20
->  BusState *sysbus_get_default(void)
-> diff --git a/vl.c b/vl.c
-> index e3fdce410f..6ce3d2d448 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3990,6 +3990,10 @@ int main(int argc, char **argv, char **envp)
->      }
->      object_property_add_child(object_get_root(), "machine",
->                                OBJECT(current_machine), &error_abort);
-> +    object_property_add_child(container_get(OBJECT(current_machine),
-> +                                            "/unattached"),
-> +                              "sysbus", OBJECT(sysbus_get_default()),
-> +                              NULL);
-> =20
->      if (machine_class->minimum_page_bits) {
->          if (!set_preferred_target_page_bits(machine_class->minimum_pag=
-e_bits)) {
->=20
-
-Looks right. Especially, a device should also not add itself to a
-parent, so this definitely should not be done in sysbus.c
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-
-PS: Not directly related to your patch, but in a separate patch we
-should also object_unref(current_machine) here to drop the superfluous
-second reference to current_machine after we added it as a child of the
-root object.
+> 
+> v1 -> v2: 
+>  - Use a temp local variable (Dave)
+> 
+>  migration/rdma.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index 54a3c11540..e39ee77558 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -3611,13 +3611,16 @@ static int qemu_rdma_registration_handle(QEMUFile *f, void *opaque)
+>                  }
+>                  chunk_start = ram_chunk_start(block, chunk);
+>                  chunk_end = ram_chunk_end(block, chunk + reg->chunks);
+> +                /* avoid "-Waddress-of-packed-member" warning */
+> +                uint32_t tmp_rkey = 0;
+>                  if (qemu_rdma_register_and_get_keys(rdma, block,
+> -                            (uintptr_t)host_addr, NULL, &reg_result->rkey,
+> +                            (uintptr_t)host_addr, NULL, &tmp_rkey,
+>                              chunk, chunk_start, chunk_end)) {
+>                      error_report("cannot get rkey");
+>                      ret = -EINVAL;
+>                      goto out;
+>                  }
+> +                reg_result->rkey = tmp_rkey;
+>  
+>                  reg_result->host_addr = (uintptr_t)block->local_host_addr;
+>  
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
