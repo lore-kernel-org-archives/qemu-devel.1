@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51279)
+Received: from eggs.gnu.org ([209.51.188.92]:51565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0qhB-0000wF-Ka
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:44:06 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h0qiO-0001al-DA
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:45:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h0qhA-0007iw-Rc
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:44:05 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43232)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h0qhA-0007gs-Le
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:44:04 -0500
-Received: by mail-oi1-x243.google.com with SMTP id i8so4341904oib.10
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 08:44:04 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1h0qiN-0000am-Ev
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:45:20 -0500
+Date: Mon, 4 Mar 2019 17:45:01 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190304174501.65381c02@redhat.com>
+In-Reply-To: <20190304150218.GN4239@redhat.com>
+References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
+	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
+	<20190301154947.GJ21251@redhat.com>
+	<20190301183328.20b63e23@redhat.com>
+	<20190301174806.GN21251@redhat.com>
+	<15464582-e8a6-6654-7679-15d87c10af38@redhat.com>
+	<20190304145510.57c73177@redhat.com>
+	<20190304135909.GL4239@redhat.com>
+	<20190304155457.206a7ff7@redhat.com>
+	<20190304150218.GN4239@redhat.com>
 MIME-Version: 1.0
-References: <20190304154739.758486-1-stefanb@linux.vnet.ibm.com>
-In-Reply-To: <20190304154739.758486-1-stefanb@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Mar 2019 16:43:51 +0000
-Message-ID: <CAFEAcA98oP70F9xDKwr8_9w4ATOmZvzbDuYHZF8MLH0paRHPyg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 0/2] Merge tpm 2019/02/25 v1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [libvirt] [PATCH 1/2] numa: deprecate
+ 'mem' parameter of '-numa node' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +32,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Mon, 4 Mar 2019 at 15:47, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
->
-> The 1st patch in this series fixes a bug in the TPM TIS emulator that
-> skipped a locality when resetting the seize flag when a higher locality
-> seized access from a lower locality. The 2nd patch converts debugging
-> code to tracing.
->
->    Stefan
->
->
-> The following changes since commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62be116:
->
->   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20190221.0' into staging (2019-02-22 15:48:04 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2019-02-25-1
->
-> for you to fetch changes up to cd38cc519b60bbe5dd8d85f6aaa72b2d7902930b:
->
->   tpm_tis: convert tpm_tis_show_buffer() to use trace event (2019-02-24 14:46:14 -0500)
->
-> ----------------------------------------------------------------
-> Liam Merwick (2):
->       tpm_tis: fix loop that cancels any seizure by a lower locality
->       tpm_tis: convert tpm_tis_show_buffer() to use trace event
+On Mon, 4 Mar 2019 15:02:18 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-Applied, thanks.
+> On Mon, Mar 04, 2019 at 03:54:57PM +0100, Igor Mammedov wrote:
+> > On Mon, 4 Mar 2019 13:59:09 +0000
+> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >  =20
+> > > On Mon, Mar 04, 2019 at 02:55:10PM +0100, Igor Mammedov wrote: =20
+> > > > On Mon, 4 Mar 2019 09:11:19 +0100
+> > > > Thomas Huth <thuth@redhat.com> wrote:
+> > > >    =20
+> > > > > On 01/03/2019 18.48, Daniel P. Berrang=C3=A9 wrote:
+> > > > > [...]   =20
+> > > > > > So I think this patch has to be dropped & replaced with one that
+> > > > > > simply documents that memdev syntax is preferred.     =20
+> > > > >=20
+> > > > > That's definitely not enough. I've had a couple of cases already =
+where
+> > > > > we documented that certain options should not be used anymore, and
+> > > > > people simply ignored it (aka. if it ain't broken, don't do any c=
+hange).
+> > > > > Then they just started to complain when I really tried to remove =
+the
+> > > > > option after the deprecation period.   =20
+> > > >    =20
+> > > > > So Igor, if you can not officially deprecate these things here ye=
+t, you
+> > > > > should at least make sure that they can not be used with new mach=
+ine
+> > > > > types anymore. Then, after a couple of years, when we feel sure t=
+hat
+> > > > > there are only some few or no people left who still use it with t=
+he old
+> > > > > machine types, we can start to discuss the deprecation process ag=
+ain, I
+> > > > > think.   =20
+> > > > Is it acceptable to silently disable CLI options (even if they are =
+broken
+> > > > like in this case) for new machine types?
+> > > > I was under impression that it should go through deprecation first.=
+   =20
+> > >=20
+> > > Yes, it must go through deprecation. I was saying we can't disable
+> > > the CLI options at all, until there is a way for libvirt to correctly
+> > > use the new options. =20
+> >=20
+> > I'm not adding new options (nor plan to for numa case (yet)),
+> > -numa node,memdev is around several years by now and should be used
+> > as default for creating new configs.
+> >=20
+> > In light of keeping 'mem' option around for old machines,
+> > Deprecation should have served for notifying users that legacy
+> > options will be disabled later on (for new machines at least
+> > if no way found for migration compatible transition for older ones).
+> >=20
+> > What I'm mainly aiming here is to prevent using broken legacy options
+> > for new VMs (like in RHBZ1624223 case) and deprecation is the only way
+> > we have now to notify users about CLI breaking changes. =20
+>=20
+> The idea of doing advance warnings via deprecations is that applications
+> have time to adapt to the new mechanism several releases before the old
+> mechanism is removed/disabled.  Since the new mechanism isn't fully
+> usable yet, applications can't adapt to use it. So we can't start the
+> deprecation process yet, as it would be telling apps to do a switch
+> that isn't possible for many to actually do.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+At least a hope attempt to deprecate 'mem', served its purpose somewhat.
+Now it's clear that libvirt defaults to wrong legacy mode and should use
+'memdev' instead. I hope that it will be addressed on libvirt side
+regardless of the fate of 'mem' deprecation process.
+Basically new VM should default to 'memdev' if it's available.=20
 
--- PMM
+
+> In the meantime, qemu-options.hx could be updated. It documents both
+> "mem" and "memdev" currently but doesn't tell people that "memdev" is
+> the preferred syntax for future usage / warn against using "mem".
+
+Will do so.
+
+>=20
+> Regards,
+> Daniel
