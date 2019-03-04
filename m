@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45146)
+Received: from eggs.gnu.org ([209.51.188.92]:44956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBI-0000an-4L
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:16 -0500
+	(envelope-from <cota@braap.org>) id 1h0sBC-0000TD-OL
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBH-0002MR-C4
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:16 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:33949)
+	(envelope-from <cota@braap.org>) id 1h0sBA-00026u-Q9
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:10 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:45863)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBH-0001r1-2N
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:15 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBA-0001Gi-Fb
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:08 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:18:09 -0500
-Message-Id: <20190304181813.8075-70-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:39 -0500
+Message-Id: <20190304181813.8075-40-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 69/73] cpu: rename all_cpu_threads_idle to
- qemu_tcg_rr_all_cpu_threads_idle
+Subject: [Qemu-devel] [PATCH v7 39/73] i386: convert to cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +29,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This function is only called from TCG rr mode, so add
-a prefix to mark this as well as an assertion.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- cpus.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ target/i386/cpu.c        | 2 +-
+ target/i386/helper.c     | 4 ++--
+ target/i386/svm_helper.c | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index c6806184ee..61fb6e033f 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -211,10 +211,12 @@ static bool cpu_thread_is_idle(CPUState *cpu)
-     return true;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index fe23d684db..ec87f611ba 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5686,7 +5686,7 @@ int x86_cpu_pending_interrupt(CPUState *cs, int interrupt_request)
+ 
+ static bool x86_cpu_has_work(CPUState *cs)
+ {
+-    return x86_cpu_pending_interrupt(cs, cs->interrupt_request) != 0;
++    return x86_cpu_pending_interrupt(cs, cpu_interrupt_request(cs)) != 0;
  }
  
--static bool all_cpu_threads_idle(void)
-+static bool qemu_tcg_rr_all_cpu_threads_idle(void)
- {
-     CPUState *cpu;
+ static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index a75278f954..9197fb4edc 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -1035,12 +1035,12 @@ void do_cpu_init(X86CPU *cpu)
+     CPUState *cs = CPU(cpu);
+     CPUX86State *env = &cpu->env;
+     CPUX86State *save = g_new(CPUX86State, 1);
+-    int sipi = cs->interrupt_request & CPU_INTERRUPT_SIPI;
++    int sipi = cpu_interrupt_request(cs) & CPU_INTERRUPT_SIPI;
  
-+    g_assert(qemu_is_tcg_rr());
-+
-     CPU_FOREACH(cpu) {
-         if (!cpu_thread_is_idle(cpu)) {
-             return false;
-@@ -692,7 +694,7 @@ void qemu_start_warp_timer(void)
+     *save = *env;
+ 
+     cpu_reset(cs);
+-    cs->interrupt_request = sipi;
++    cpu_interrupt_request_set(cs, sipi);
+     memcpy(&env->start_init_save, &save->start_init_save,
+            offsetof(CPUX86State, end_init_save) -
+            offsetof(CPUX86State, start_init_save));
+diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
+index a6d33e55d8..ebf3643ba7 100644
+--- a/target/i386/svm_helper.c
++++ b/target/i386/svm_helper.c
+@@ -316,7 +316,7 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
+     if (int_ctl & V_IRQ_MASK) {
+         CPUState *cs = CPU(x86_env_get_cpu(env));
+ 
+-        cs->interrupt_request |= CPU_INTERRUPT_VIRQ;
++        cpu_interrupt_request_or(cs, CPU_INTERRUPT_VIRQ);
      }
  
-     if (replay_mode != REPLAY_MODE_PLAY) {
--        if (!all_cpu_threads_idle()) {
-+        if (!qemu_tcg_rr_all_cpu_threads_idle()) {
-             return;
-         }
- 
-@@ -1325,7 +1327,7 @@ static void qemu_tcg_rr_wait_io_event(void)
- {
-     CPUState *cpu;
- 
--    while (all_cpu_threads_idle()) {
-+    while (qemu_tcg_rr_all_cpu_threads_idle()) {
-         stop_tcg_kick_timer();
-         qemu_cond_wait(first_cpu->halt_cond, &qemu_global_mutex);
+     /* maybe we need to inject an event */
+@@ -674,7 +674,7 @@ void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
+                        env->vm_vmcb + offsetof(struct vmcb, control.int_ctl));
+     int_ctl &= ~(V_TPR_MASK | V_IRQ_MASK);
+     int_ctl |= env->v_tpr & V_TPR_MASK;
+-    if (cs->interrupt_request & CPU_INTERRUPT_VIRQ) {
++    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_VIRQ) {
+         int_ctl |= V_IRQ_MASK;
      }
-@@ -1660,7 +1662,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-             atomic_mb_set(&cpu->exit_request, 0);
-         }
- 
--        if (use_icount && all_cpu_threads_idle()) {
-+        if (use_icount && qemu_tcg_rr_all_cpu_threads_idle()) {
-             /*
-              * When all cpus are sleeping (e.g in WFI), to avoid a deadlock
-              * in the main_loop, wake it up in order to start the warp timer.
+     x86_stl_phys(cs,
 -- 
 2.17.1
