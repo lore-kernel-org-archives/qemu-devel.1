@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45182)
+Received: from eggs.gnu.org ([209.51.188.92]:44934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBJ-0000c4-BG
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:20 -0500
+	(envelope-from <cota@braap.org>) id 1h0sBC-0000T5-Ny
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBI-0002Ny-6T
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:17 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:37775)
+	(envelope-from <cota@braap.org>) id 1h0sBA-00026m-Np
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:10 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:57031)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBH-0001yh-Su
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:16 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBA-0001Ku-Ci
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:08 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:18:13 -0500
-Message-Id: <20190304181813.8075-74-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:56 -0500
+Message-Id: <20190304181813.8075-57-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 73/73] cputlb: queue async flush jobs
- without the BQL
+Subject: [Qemu-devel] [PATCH v7 56/73] openrisc: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,130 +28,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stafford Horne <shorne@gmail.com>
 
-This yields sizable scalability improvements, as the below results show.
-
-Host: Two Intel E5-2683 v3 14-core CPUs at 2.00 GHz (Haswell)
-
-Workload: Ubuntu 18.04 ppc64 compiling the linux kernel with
-"make -j N", where N is the number of cores in the guest.
-
-                      Speedup vs a single thread (higher is better):
-
-         14 +---------------------------------------------------------------+
-            |       +    +       +      +       +      +      $$$$$$  +     |
-            |                                            $$$$$              |
-            |                                      $$$$$$                   |
-         12 |-+                                $A$$                       +-|
-            |                                $$                             |
-            |                             $$$                               |
-         10 |-+                         $$    ##D#####################D   +-|
-            |                        $$$ #####**B****************           |
-            |                      $$####*****                   *****      |
-            |                    A$#*****                             B     |
-          8 |-+                $$B**                                      +-|
-            |                $$**                                           |
-            |               $**                                             |
-          6 |-+           $$*                                             +-|
-            |            A**                                                |
-            |           $B                                                  |
-            |           $                                                   |
-          4 |-+        $*                                                 +-|
-            |          $                                                    |
-            |         $                                                     |
-          2 |-+      $                                                    +-|
-            |        $                                 +cputlb-no-bql $$A$$ |
-            |       A                                   +per-cpu-lock ##D## |
-            |       +    +       +      +       +      +     baseline **B** |
-          0 +---------------------------------------------------------------+
-                    1    4       8      12      16     20      24     28
-                                       Guest vCPUs
-  png: https://imgur.com/zZRvS7q
-
-Some notes:
-- baseline corresponds to the commit before this series
-
-- per-cpu-lock is the commit that converts the CPU loop to per-cpu locks.
-
-- cputlb-no-bql is this commit.
-
-- I'm using taskset to assign cores to threads, favouring locality whenever
-  possible but not using SMT. When N=1, I'm using a single host core, which
-  leads to superlinear speedups (since with more cores the I/O thread can execute
-  while vCPU threads sleep). In the future I might use N+1 host cores for N
-  guest cores to avoid this, or perhaps pin guest threads to cores one-by-one.
-
-Single-threaded performance is affected very lightly. Results
-below for debian aarch64 bootup+test for the entire series
-on an Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz host:
-
-- Before:
-
- Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
-
-       7269.033478      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.06% )
-    30,659,870,302      cycles                    #    4.218 GHz                      ( +-  0.06% )
-    54,790,540,051      instructions              #    1.79  insns per cycle          ( +-  0.05% )
-     9,796,441,380      branches                  # 1347.695 M/sec                    ( +-  0.05% )
-       165,132,201      branch-misses             #    1.69% of all branches          ( +-  0.12% )
-
-       7.287011656 seconds time elapsed                                          ( +-  0.10% )
-
-- After:
-
-       7375.924053      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.13% )
-    31,107,548,846      cycles                    #    4.217 GHz                      ( +-  0.12% )
-    55,355,668,947      instructions              #    1.78  insns per cycle          ( +-  0.05% )
-     9,929,917,664      branches                  # 1346.261 M/sec                    ( +-  0.04% )
-       166,547,442      branch-misses             #    1.68% of all branches          ( +-  0.09% )
-
-       7.389068145 seconds time elapsed                                          ( +-  0.13% )
-
-That is, a 1.37% slowdown.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Stafford Horne <shorne@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/cputlb.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/openrisc/cputimer.c | 2 +-
+ target/openrisc/cpu.c  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 88cc8389e9..d9e0814b5c 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -260,7 +260,7 @@ static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
+diff --git a/hw/openrisc/cputimer.c b/hw/openrisc/cputimer.c
+index 850f88761c..739404e4f5 100644
+--- a/hw/openrisc/cputimer.c
++++ b/hw/openrisc/cputimer.c
+@@ -102,7 +102,7 @@ static void openrisc_timer_cb(void *opaque)
+         CPUState *cs = CPU(cpu);
  
-     CPU_FOREACH(cpu) {
-         if (cpu != src) {
--            async_run_on_cpu(cpu, fn, d);
-+            async_run_on_cpu_no_bql(cpu, fn, d);
-         }
+         cpu->env.ttmr |= TTMR_IP;
+-        cs->interrupt_request |= CPU_INTERRUPT_TIMER;
++        cpu_interrupt_request_or(cs, CPU_INTERRUPT_TIMER);
      }
+ 
+     switch (cpu->env.ttmr & TTMR_M) {
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index 541b2a66c7..a01737dfda 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -32,8 +32,8 @@ static void openrisc_cpu_set_pc(CPUState *cs, vaddr value)
+ 
+ static bool openrisc_cpu_has_work(CPUState *cs)
+ {
+-    return cs->interrupt_request & (CPU_INTERRUPT_HARD |
+-                                    CPU_INTERRUPT_TIMER);
++    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD |
++                                        CPU_INTERRUPT_TIMER);
  }
-@@ -336,8 +336,8 @@ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
-     tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
  
-     if (cpu->created && !qemu_cpu_is_self(cpu)) {
--        async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
--                         RUN_ON_CPU_HOST_INT(idxmap));
-+        async_run_on_cpu_no_bql(cpu, tlb_flush_by_mmuidx_async_work,
-+                                RUN_ON_CPU_HOST_INT(idxmap));
-     } else {
-         tlb_flush_by_mmuidx_async_work(cpu, RUN_ON_CPU_HOST_INT(idxmap));
-     }
-@@ -481,8 +481,8 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
-     addr_and_mmu_idx |= idxmap;
- 
-     if (!qemu_cpu_is_self(cpu)) {
--        async_run_on_cpu(cpu, tlb_flush_page_by_mmuidx_async_work,
--                         RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
-+        async_run_on_cpu_no_bql(cpu, tlb_flush_page_by_mmuidx_async_work,
-+                                RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
-     } else {
-         tlb_flush_page_by_mmuidx_async_work(
-             cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+ static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *info)
 -- 
 2.17.1
