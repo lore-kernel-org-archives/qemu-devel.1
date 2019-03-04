@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44938)
+Received: from eggs.gnu.org ([209.51.188.92]:44881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBC-0000T6-Nz
+	(envelope-from <cota@braap.org>) id 1h0sBC-0000T1-O0
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBA-00027L-U8
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:10 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:49827)
+	(envelope-from <cota@braap.org>) id 1h0sBA-000253-CC
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:09 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:44891)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBA-0001Hf-I2
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sB9-0001IJ-S6
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:08 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:45 -0500
-Message-Id: <20190304181813.8075-46-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:55 -0500
+Message-Id: <20190304181813.8075-56-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 45/73] sh4: convert to cpu_interrupt_request
+Subject: [Qemu-devel] [PATCH v7 55/73] sparc: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +28,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/sh4/cpu.c    | 2 +-
- target/sh4/helper.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/sparc64/sparc64.c | 4 ++--
+ target/sparc/cpu.c   | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index b9f393b7c7..58ea212f53 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -45,7 +45,7 @@ static void superh_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
+diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+index 372bbd4f5b..58faeb111a 100644
+--- a/hw/sparc64/sparc64.c
++++ b/hw/sparc64/sparc64.c
+@@ -56,7 +56,7 @@ void cpu_check_irqs(CPUSPARCState *env)
+     /* The bit corresponding to psrpil is (1<< psrpil), the next bit
+        is (2 << psrpil). */
+     if (pil < (2 << env->psrpil)) {
+-        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
++        if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
+             trace_sparc64_cpu_check_irqs_reset_irq(env->interrupt_index);
+             env->interrupt_index = 0;
+             cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+@@ -87,7 +87,7 @@ void cpu_check_irqs(CPUSPARCState *env)
+                 break;
+             }
+         }
+-    } else if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
++    } else if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
+         trace_sparc64_cpu_check_irqs_disabled(pil, env->pil_in, env->softint,
+                                               env->interrupt_index);
+         env->interrupt_index = 0;
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index 4a4445bdf5..933fd8e954 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -708,7 +708,7 @@ static bool sparc_cpu_has_work(CPUState *cs)
+     SPARCCPU *cpu = SPARC_CPU(cs);
+     CPUSPARCState *env = &cpu->env;
  
- static bool superh_cpu_has_work(CPUState *cs)
- {
--    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
+-    return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
++    return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
+            cpu_interrupts_enabled(env);
  }
  
- /* CPUClass::reset() */
-diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-index 2ff0cf4060..8463da5bc8 100644
---- a/target/sh4/helper.c
-+++ b/target/sh4/helper.c
-@@ -83,7 +83,7 @@ void superh_cpu_do_interrupt(CPUState *cs)
- {
-     SuperHCPU *cpu = SUPERH_CPU(cs);
-     CPUSH4State *env = &cpu->env;
--    int do_irq = cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    int do_irq = cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
-     int do_exp, irq_vector = cs->exception_index;
- 
-     /* prioritize exceptions over interrupts */
 -- 
 2.17.1
