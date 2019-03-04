@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51678)
+Received: from eggs.gnu.org ([209.51.188.92]:51790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h0kcd-0001yH-UA
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:15:00 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1h0kcw-0002LQ-P5
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h0kcc-0000jJ-VE
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:14:59 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1h0kcu-00013B-KU
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:15:18 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  4 Mar 2019 11:13:37 +0100
-Message-Id: <20190304101339.25970-9-eric.auger@redhat.com>
+Date: Mon,  4 Mar 2019 11:13:38 +0100
+Message-Id: <20190304101339.25970-10-eric.auger@redhat.com>
 In-Reply-To: <20190304101339.25970-1-eric.auger@redhat.com>
 References: <20190304101339.25970-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 08/10] hw/arm/virt: Implement kvm_type
- function for 4.0 machine
+Subject: [Qemu-devel] [PATCH v12 09/10] hw/arm/virt: Check the VCPU PA range
+ in TCG mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,107 +25,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com, pbonzini@redhat.com
 
-This patch implements the machine class kvm_type() callback.
-It returns the number of bits requested to implement the whole GPA
-range including the RAM and IO regions located beyond.
-The returned value is passed though the KVM_CREATE_VM ioctl and
-this allows KVM to set the stage2 tables dynamically.
+We are about to allow the memory map to grow beyond 1TB and
+potentially overshoot the VCPU AA64MMFR0.PARANGE.
 
-To compute the highest GPA used in the memory map, kvm_type()
-must freeze the memory map by calling virt_set_memmap().
+In aarch64 mode and when highmem is set, let's check the VCPU
+PA range is sufficient to address the highest GPA of the memory
+map.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
 ---
-v11 -> v12:
-- added Igor's R-b
-
-v10 -> v11:
-- replace !kvm_enabled check by !vms->memmap
-
-v7 -> v8:
-- remove vmc->no_extended_memmap and vms->extended_memmap
-
-v6 -> v7:
-- Introduce RAMBASE and rename add LEGACY_ prefix in that patch
-- use local variables with explicit names in virt_set_memmap:
-  device_memory_base, device_memory_size
-- add an extended_memmap field in the class
-
-v5 -> v6:
-- add some comments
-- high IO region cannot start before 256GiB
----
- hw/arm/virt.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+ hw/arm/virt.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 2e788a0361..3ac6b152f5 100644
+index 3ac6b152f5..d725daefdf 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -1440,7 +1440,13 @@ static void machvirt_init(MachineState *machine)
-     bool firmware_loaded =3D bios_name || drive_get(IF_PFLASH, 0, 0);
-     bool aarch64 =3D true;
+@@ -60,6 +60,7 @@
+ #include "standard-headers/linux/input.h"
+ #include "hw/arm/smmuv3.h"
+ #include "hw/acpi/acpi.h"
++#include "target/arm/internals.h"
 =20
--    virt_set_memmap(vms);
-+    /*
-+     * In accelerated mode, the memory map is computed earlier in kvm_ty=
-pe()
-+     * to create a VM with the right number of IPA bits.
-+     */
-+    if (!vms->memmap) {
-+        virt_set_memmap(vms);
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -1608,6 +1609,22 @@ static void machvirt_init(MachineState *machine)
+     fdt_add_timer_nodes(vms);
+     fdt_add_cpu_nodes(vms);
+=20
++   if (!kvm_enabled()) {
++        ARMCPU *cpu =3D ARM_CPU(first_cpu);
++        bool aarch64 =3D object_property_get_bool(OBJECT(cpu), "aarch64"=
+, NULL);
++
++        if (aarch64 && vms->highmem) {
++            int requested_pa_size, pamax =3D arm_pamax(cpu);
++
++            requested_pa_size =3D 64 - clz64(vms->highest_gpa);
++            if (pamax < requested_pa_size) {
++                error_report("VCPU supports less PA bits (%d) than reque=
+sted "
++                            "by the memory map (%d)", pamax, requested_p=
+a_size);
++                exit(1);
++            }
++        }
 +    }
-=20
-     /* We can probe only here because during property set
-      * KVM is not available yet
-@@ -1829,6 +1835,36 @@ static HotplugHandler *virt_machine_get_hotplug_ha=
-ndler(MachineState *machine,
-     return NULL;
- }
-=20
-+/*
-+ * for arm64 kvm_type [7-0] encodes the requested number of bits
-+ * in the IPA address space
-+ */
-+static int virt_kvm_type(MachineState *ms, const char *type_str)
-+{
-+    VirtMachineState *vms =3D VIRT_MACHINE(ms);
-+    int max_vm_pa_size =3D kvm_arm_get_max_vm_ipa_size(ms);
-+    int requested_pa_size;
 +
-+    /* we freeze the memory map to compute the highest gpa */
-+    virt_set_memmap(vms);
-+
-+    requested_pa_size =3D 64 - clz64(vms->highest_gpa);
-+
-+    if (requested_pa_size > max_vm_pa_size) {
-+        error_report("-m and ,maxmem option values "
-+                     "require an IPA range (%d bits) larger than "
-+                     "the one supported by the host (%d bits)",
-+                     requested_pa_size, max_vm_pa_size);
-+       exit(1);
-+    }
-+    /*
-+     * By default we return 0 which corresponds to an implicit legacy
-+     * 40b IPA setting. Otherwise we return the actual requested PA
-+     * logsize
-+     */
-+    return requested_pa_size > 40 ? requested_pa_size : 0;
-+}
-+
- static void virt_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-@@ -1853,6 +1889,7 @@ static void virt_machine_class_init(ObjectClass *oc=
-, void *data)
-     mc->cpu_index_to_instance_props =3D virt_cpu_index_to_props;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a15");
-     mc->get_default_cpu_node_id =3D virt_get_default_cpu_node_id;
-+    mc->kvm_type =3D virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler =3D virt_machine_get_hotplug_handler;
-     hc->plug =3D virt_machine_device_plug_cb;
+     memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+                                          machine->ram_size);
+     memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram)=
+;
 --=20
 2.20.1
