@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49836)
+Received: from eggs.gnu.org ([209.51.188.92]:50826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0oiI-0008Qh-0V
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:37:06 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0omm-0001eS-Vg
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:41:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0oiG-0001cg-AT
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:37:05 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:44562)
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0oml-0005nN-2A
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:41:44 -0500
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:37614)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1h0oiG-0001bi-1h
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:37:04 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id g1so4357772otj.11
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 06:37:03 -0800 (PST)
+	id 1h0omg-0005gk-1Y
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 09:41:40 -0500
+Received: by mail-ot1-x333.google.com with SMTP id b3so4378526otp.4
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 06:41:36 -0800 (PST)
 MIME-Version: 1.0
 References: <20190223105421.1290-1-davidkiarie4@gmail.com>
 	<20190223105421.1290-2-davidkiarie4@gmail.com>
@@ -19,10 +19,11 @@ References: <20190223105421.1290-1-davidkiarie4@gmail.com>
 	<CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
 	<CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
 	<CABdVeABUzvwA8jV8ZfTcDY8eWN5=M2Otku6eukaBsPeMqPNOhQ@mail.gmail.com>
-In-Reply-To: <CABdVeABUzvwA8jV8ZfTcDY8eWN5=M2Otku6eukaBsPeMqPNOhQ@mail.gmail.com>
+	<CABdVeABnosV3-u9aepP=kSrb9P0X6-vUWZ2kDATUmNLmaJ_5+g@mail.gmail.com>
+In-Reply-To: <CABdVeABnosV3-u9aepP=kSrb9P0X6-vUWZ2kDATUmNLmaJ_5+g@mail.gmail.com>
 From: David Kiarie <davidkiarie4@gmail.com>
-Date: Mon, 4 Mar 2019 17:36:13 +0300
-Message-ID: <CABdVeABnosV3-u9aepP=kSrb9P0X6-vUWZ2kDATUmNLmaJ_5+g@mail.gmail.com>
+Date: Mon, 4 Mar 2019 17:40:47 +0300
+Message-ID: <CABdVeACgD7NrRa+P9yzkjhNJAtf9JEaJKuzo+J3CMCxLUO3phQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
@@ -37,62 +38,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
 
-On Mon, Mar 4, 2019 at 5:10 PM David Kiarie <davidkiarie4@gmail.com> wrote:
+On Mon, Mar 4, 2019 at 5:36 PM David Kiarie <davidkiarie4@gmail.com> wrote:
 
 >
 >
-> On Mon, Mar 4, 2019 at 4:42 PM David Kiarie <davidkiarie4@gmail.com>
+> On Mon, Mar 4, 2019 at 5:10 PM David Kiarie <davidkiarie4@gmail.com>
 > wrote:
 >
 >>
 >>
->> On Mon, Mar 4, 2019 at 3:57 PM David Kiarie <davidkiarie4@gmail.com>
+>> On Mon, Mar 4, 2019 at 4:42 PM David Kiarie <davidkiarie4@gmail.com>
 >> wrote:
 >>
 >>>
 >>>
->>> On Mon, Mar 4, 2019 at 2:57 PM Philippe Mathieu-Daud=C3=A9 <philmd@redh=
-at.com>
+>>> On Mon, Mar 4, 2019 at 3:57 PM David Kiarie <davidkiarie4@gmail.com>
 >>> wrote:
 >>>
->>>> Hi David,
 >>>>
->>>> On 2/23/19 11:54 AM, David Kiarie wrote:
->>>> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
->>>> > ---
->>>> >  hw/i386/amd_iommu.c | 2 +-
->>>> >  hw/i386/amd_iommu.h | 2 +-
->>>> >  2 files changed, 2 insertions(+), 2 deletions(-)
->>>> >
->>>> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
->>>> > index 8ad707a..4f179da 100644
->>>> > --- a/hw/i386/amd_iommu.c
->>>> > +++ b/hw/i386/amd_iommu.c
->>>> > @@ -2,7 +2,7 @@
->>>> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
->>>> >   *
->>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->>>> > + * Copyright (C) 2016 David Kiarie Kahurani
 >>>>
->>>> Why do you change the year? Because your work was merged in 2016?
+>>>> On Mon, Mar 4, 2019 at 2:57 PM Philippe Mathieu-Daud=C3=A9 <
+>>>> philmd@redhat.com> wrote:
+>>>>
+>>>>> Hi David,
+>>>>>
+>>>>> On 2/23/19 11:54 AM, David Kiarie wrote:
+>>>>> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
+>>>>> > ---
+>>>>> >  hw/i386/amd_iommu.c | 2 +-
+>>>>> >  hw/i386/amd_iommu.h | 2 +-
+>>>>> >  2 files changed, 2 insertions(+), 2 deletions(-)
+>>>>> >
+>>>>> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+>>>>> > index 8ad707a..4f179da 100644
+>>>>> > --- a/hw/i386/amd_iommu.c
+>>>>> > +++ b/hw/i386/amd_iommu.c
+>>>>> > @@ -2,7 +2,7 @@
+>>>>> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
+>>>>> >   *
+>>>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+>>>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+>>>>> > + * Copyright (C) 2016 David Kiarie Kahurani
+>>>>>
+>>>>> Why do you change the year? Because your work was merged in 2016?
+>>>>>
+>>>>
+>>>> no.
+>>>>
 >>>>
 >>>
->>> no.
->>>
+>>> though, if you have a legitimate issue with the change, you can always
+>>> air it.
 >>>
 >>
->> though, if you have a legitimate issue with the change, you can always
->> air it.
+>> you might think random emails are weird but Paolo, i don't expect to see
+>> any activity from you, on Qemu repo before this issue is sorted ;-)
 >>
 >
-> you might think random emails are weird but Paolo, i don't expect to see
-> any activity from you, on Qemu repo before this issue is sorted ;-)
+> i mostly don't care about this code but i *wrote* it. if i am not allowed
+> even make such minor(which i not a routine), why shouldn't i ask you to
+> take the files down?
 >
 
-i mostly don't care about this code but i *wrote* it. if i am not allowed
-even make such minor(which i not a routine), why shouldn't i ask you to
-take the files down?
+or, rather, a small issue turns into a scene about how clean Qemu is. why
+not take down all my dirty code?
 
 
 >
@@ -100,28 +109,28 @@ take the files down?
 >>
 >>
 >>>
->>>> >   *
->>>> >   * This program is free software; you can redistribute it and/or
->>>> modify
->>>> >   * it under the terms of the GNU General Public License as publishe=
-d
->>>> by
->>>> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
->>>> > index c52886f..cb258a7 100644
->>>> > --- a/hw/i386/amd_iommu.h
->>>> > +++ b/hw/i386/amd_iommu.h
->>>> > @@ -2,7 +2,7 @@
->>>> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
->>>> >   *
->>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->>>> > + * Copyright (C) 2016 David Kiarie Kahurani
->>>> >   *
->>>> >   * This program is free software; you can redistribute it and/or
->>>> modify
->>>> >   * it under the terms of the GNU General Public License as publishe=
-d
->>>> by
->>>> >
+>>>
 >>>>
->>>
+>>>>> >   *
+>>>>> >   * This program is free software; you can redistribute it and/or
+>>>>> modify
+>>>>> >   * it under the terms of the GNU General Public License as
+>>>>> published by
+>>>>> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+>>>>> > index c52886f..cb258a7 100644
+>>>>> > --- a/hw/i386/amd_iommu.h
+>>>>> > +++ b/hw/i386/amd_iommu.h
+>>>>> > @@ -2,7 +2,7 @@
+>>>>> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
+>>>>> >   *
+>>>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+>>>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+>>>>> > + * Copyright (C) 2016 David Kiarie Kahurani
+>>>>> >   *
+>>>>> >   * This program is free software; you can redistribute it and/or
+>>>>> modify
+>>>>> >   * it under the terms of the GNU General Public License as
+>>>>> published by
+>>>>> >
+>>>>>
+>>>>
