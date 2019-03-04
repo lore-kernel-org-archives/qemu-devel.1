@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52468)
+Received: from eggs.gnu.org ([209.51.188.92]:57018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <magnus.damm@gmail.com>) id 1h0ffe-0005pW-Cv
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 23:57:47 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h0gEP-0003Q6-FE
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 00:33:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <magnus.damm@gmail.com>) id 1h0ffd-0001Pa-B4
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 23:57:46 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h0gEO-0003FM-Ku
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 00:33:41 -0500
+Date: Mon, 4 Mar 2019 12:27:54 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190304012754.GH7792@umbus.fritz.box>
+References: <20190301044609.9626-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-7-armbru@redhat.com>
-	<CAFEAcA_OLYno=YNS6bHOemwEp0gnc3fwRn8Rjvmo9v-i89xrMA@mail.gmail.com>
-	<87d0nnsrx0.fsf@dusky.pond.sub.org>
-	<c6d4c021-8d62-ada0-d152-b1d4f2b7aff2@redhat.com>
-	<87ftsjptxk.fsf@dusky.pond.sub.org>
-In-Reply-To: <87ftsjptxk.fsf@dusky.pond.sub.org>
-From: Magnus Damm <magnus.damm@gmail.com>
-Date: Mon, 4 Mar 2019 13:57:29 +0900
-Message-ID: <CANqRtoSOF8uvh-9-_CgsuhB_N18NhSiS=DPsY1+3+ff4NzgE+w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
- confused about size, mark FIXME
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="X+8siUETKMkW99st"
+Content-Disposition: inline
+In-Reply-To: <20190301044609.9626-1-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 0/2] Enable mitigations by
+ default for pseries-4.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hi guys,
 
-On Wed, Feb 20, 2019 at 2:31 AM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->
-> > On 2/19/19 4:45 PM, Markus Armbruster wrote:
-> >> Peter Maydell <peter.maydell@linaro.org> writes:
-> >>
-> >>> On Mon, 18 Feb 2019 at 13:07, Markus Armbruster <armbru@redhat.com> w=
-rote:
-> >>>>
-> >>>> pflash_cfi02_register() takes a size in bytes, a block size in bytes
-> >>>> and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
-> >>>> FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
-> >>>> number of blocks.  The latter happens to win.  I tried to find
-> >>>> documentation on the physcial hardware, no luck.
-> >
-> > "physical"
->
-> Thanks, will fix.
->
-> >>>>
-> >>>> For now, adjust the byte size passed to match the actual size create=
-d,
-> >>>> and add a FIXME comment.
-> >>>
-> >>> I'm pretty sure that FLASH_SIZE here is supposed to be a
-> >>> byte count of the size of the pflash. That matches what
-> >>> Linux has in arch/sh/boards/mach-r2d/setup.c where it
-> >>> sets up the flash_resource struct.
-> >>
-> >> Okay, that's some evidence for size 0x02000000 (32MiB).
-> >>
-> >> However, we've created size (16 * KiB) * (FLASH_SIZE >> 16), i.e. 8MiB=
-,
-> >> since at least commit 368a354f02b (v1.3.0), possibly since forever.
-> >>
-> >>> The r2dplus board is also I think known as RTS7751R2D. That
-> >>> takes us to https://elinux.org/RTS7751R2D_Handling_Manual
-> >>> (sadly the link to the "hardware manual" is broken).
-> >>
-> >> Quote section Flash ROM Mapping:
-> >>
-> >>     Currently, MTD device mapping on Flash ROM is set as below.
-> >>     0x00000000-0x00020000    "bootloader"
-> >>     0x00020000-0x00320000    "mtdblock1"     XIP kernel
-> >>     0x00320000-0x00520000    "mtdblock2"
-> >>     0x00520000-0x01000000    "mtdblock3"
-> >>
-> >> Suggests a size of 0x01000000 (16MiB).  Now we have three candidates.
-> >>
-> >> Pick one, any one, and I'll adjust my patch.  All I really care about =
-is
-> >> getting argument @size consistent with arguments @sector_len and
-> >> @nb_blocs, so I can ditch @nb_blocs in PATCH 09.
-> >>
-> >>> No idea what the block size would be.
-> >>
-> >> As long as that's the case, inertia wins by default.
-> >
-> > There is also a paper [*]:
-> >
-> >   The Renesas Technology R0P751RLC001RL (R2DPLUS) board was used
-> >   as our target device.
-> >   This board is often used to evaluate software for CE devices.
-> >   The specification is shown below.
-> >     CPU: SH7751R(SH4) 240Mhz
-> >     RAM: 64Mbyte
-> >     Compact flash: 512Mbyte
-> >     Flash ROM: 64Mbyte (32Mbyte available for root file system)
->
-> Candidate #4: 64MiB.  Bring 'em on!
->
-> >
-> > Let's use at least 16MB to be able to run the elinux cited kernel.
-> >
-> > [*] https://www.kernel.org/doc/ols/2008/ols2008v2-pages-125-134.pdf
->
-> That's a vote for changing the status quo (8 MiB).
->
-> Perhaps Magnus, who maintains the machine, can pick a new value for us.
+--X+8siUETKMkW99st
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-According to the old board user document in Japanese (under NDA) what
-is referred to as FROM (Area0) is connected via a 32-bit bus and CS0
-to CN8. The docs mention s29pl127j60tfi130 but since I don't have the
-board handy ATM I don't know how the chips are connected.
+On Fri, Mar 01, 2019 at 03:46:07PM +1100, Suraj Jitindar Singh wrote:
+> This series is based on the ppc-for-4.0 branch with my large-decrementer
+> and count-cache-flush series applied.
+>=20
+> Suraj Jitindar Singh (2):
+>   target/ppc/tcg: make spapr_caps apply cap-[cfpc/sbbc/ibs] non-fatal
+>     for tcg
+>   target/ppc/spapr: Enable mitigations by default for pseries-4.0
+>     machine type
 
-Hope this helps,
+Applied to ppc-for-4.0, thanks.
 
-/ magnus
+>=20
+>  hw/ppc/spapr.c      |  9 ++++++---
+>  hw/ppc/spapr_caps.c | 33 ++++++++++++++++++++++++---------
+>  2 files changed, 30 insertions(+), 12 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--X+8siUETKMkW99st
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx8fxgACgkQbDjKyiDZ
+s5KbCA//RCFVlgSqn9HW4nPmm3xHTQtENGQJDgwkEP7qfCdKPvoDSwvouPCp4MJ/
+eI6xGbZGBSA67+f9m+KGoz7M+eQn0dixB9+fDBMGzxdvxApTuj+rRRzvkyeTifmz
+M12NIB+GKmtr2fOUUSU6KWvbMlSd9UpMs/bJYFxPpHKLGDvQs2pi6OdrZCEREnJy
+SQkhWgdQiFqp2JM+PS7UGJCgsmX3m9l4N3eNiJdhm64fPKgvGfIQj4ioUMlr+tgw
+exyUoXgXsLe0VSOEeuyImnjbaxNI90nWFOdN5T5HyKyaxiWIOksxqbbKy0OrVfR4
+e6E5QWeR6gjel8WWwL7SN3xiZkbdok/6X9HAv5ZhIYyzBl9Nr58wfHZO/gSfBmwS
+ePbQcc0uUJcBc7LYKJwTih0ME44fcvrLJcFOLbd+OJT+DEpEMWOHgZ7RkgUq0qqX
+ydcWXoyF7VUuPfQ3HxRZn8UASpcC43PRA86A7P/q1o2UkPjuJvKhGgYzdCRIkI8S
+G+D/2Xv1QhUE7R4WR6ZNB6tIQvKZxcJT97o3VCL8UzckSKrC4cjJc+vSDGMQystb
+Q0kA8KMJ6RMY/1hWYD9sLNJEmdBW5jKd4tOsiFV2fXOJ6BM3D1vN8z72n9ItAI9z
+1I+EpPg1n1I1HUfKyR0TdEdtRyLLCU7sAAMP8QzID+a16Kh4OIc=
+=aCp+
+-----END PGP SIGNATURE-----
+
+--X+8siUETKMkW99st--
