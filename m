@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42873)
+Received: from eggs.gnu.org ([209.51.188.92]:42881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDO-0004sm-5Y
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDO-0004t4-EB
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDM-0005aT-Vi
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDM-0005aN-Uv
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:18 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:55448 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:55454 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1h0qDM-0004UE-Jb
+	id 1h0qDM-0004UL-Ix
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:16 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  4 Mar 2019 17:11:43 +0100
-Message-Id: <1551715911-8440-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  4 Mar 2019 17:11:44 +0100
+Message-Id: <1551715911-8440-5-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1551715911-8440-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1551715911-8440-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 03/11] tests/tcg: target/mips: Add test
- utilities for 32-bit tests
+Subject: [Qemu-devel] [PATCH v6 04/11] tests/tcg: target/mips: Add test
+ utilities for 64-bit tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +30,24 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add test utilities for 32-bit tests.
+Add test utilities for 64-bit tests. Some of MIPS64R6 instructions
+require 64-bit inputs to be 32-bit integers sign-extedned to 64 bits,
+hence the need for sets of such inputs.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/tcg/mips/include/test_inputs_32.h | 122 ++++++++++++++++++++++++++++++++
- tests/tcg/mips/include/test_utils_32.h  |  78 ++++++++++++++++++++
- 2 files changed, 200 insertions(+)
- create mode 100644 tests/tcg/mips/include/test_inputs_32.h
- create mode 100644 tests/tcg/mips/include/test_utils_32.h
+ tests/tcg/mips/include/test_inputs_64.h | 208 ++++++++++++++++++++++++++++++++
+ tests/tcg/mips/include/test_utils_64.h  |  78 ++++++++++++
+ 2 files changed, 286 insertions(+)
+ create mode 100644 tests/tcg/mips/include/test_inputs_64.h
+ create mode 100644 tests/tcg/mips/include/test_utils_64.h
 
-diff --git a/tests/tcg/mips/include/test_inputs_32.h b/tests/tcg/mips/include/test_inputs_32.h
+diff --git a/tests/tcg/mips/include/test_inputs_64.h b/tests/tcg/mips/include/test_inputs_64.h
 new file mode 100644
-index 0000000..a3b7e54
+index 0000000..6891a36
 --- /dev/null
-+++ b/tests/tcg/mips/include/test_inputs_32.h
-@@ -0,0 +1,122 @@
++++ b/tests/tcg/mips/include/test_inputs_64.h
+@@ -0,0 +1,208 @@
 +/*
 + *  Header file for pattern and random test inputs
 + *
@@ -67,112 +69,198 @@ index 0000000..a3b7e54
 + *
 + */
 +
-+#ifndef TEST_INPUTS_32_H
-+#define TEST_INPUTS_32_H
++#ifndef TEST_INPUTS_64_H
++#define TEST_INPUTS_64_H
 +
 +#include <stdint.h>
 +
 +
-+#define PATTERN_INPUTS_32_COUNT          64
-+#define PATTERN_INPUTS_32_SHORT_COUNT     8
++#define PATTERN_INPUTS_64_COUNT          64
++#define PATTERN_INPUTS_64_SHORT_COUNT     8
 +
-+static const uint32_t b32_pattern[PATTERN_INPUTS_32_COUNT] = {
-+    0xFFFFFFFF,                                          /*   0 */
-+    0x00000000,
-+    0xAAAAAAAA,
-+    0x55555555,
-+    0xCCCCCCCC,
-+    0x33333333,
-+    0xE38E38E3,
-+    0x1C71C71C,
-+    0xF0F0F0F0,                                          /*   8 */
-+    0x0F0F0F0F,
-+    0xF83E0F83,
-+    0x07C1F07C,
-+    0xFC0FC0FC,
-+    0x03F03F03,
-+    0xFE03F80F,
-+    0x01FC07F0,
-+    0xFF00FF00,                                          /*  16 */
-+    0x00FF00FF,
-+    0xFF803FE0,
-+    0x007FC01F,
-+    0xFFC00FFC,
-+    0x003FF003,
-+    0xFFE003FF,
-+    0x001FFC00,
-+    0xFFF000FF,                                          /*  24 */
-+    0x000FFF00,
-+    0xFFF8003F,
-+    0x0007FFC0,
-+    0xFFFC000F,
-+    0x0003FFF0,
-+    0xFFFE0003,
-+    0x0001FFFC,
-+    0xFFFF0000,                                          /*  32 */
-+    0x0000FFFF,
-+    0xFFFF8000,
-+    0x00007FFF,
-+    0xFFFFC000,
-+    0x00003FFF,
-+    0xFFFFE000,
-+    0x00001FFF,
-+    0xFFFFF000,                                          /*  40 */
-+    0x00000FFF,
-+    0xFFFFF800,
-+    0x000007FF,
-+    0xFFFFFC00,
-+    0x000003FF,
-+    0xFFFFFE00,
-+    0x000001FF,
-+    0xFFFFFF00,                                          /*  48 */
-+    0x000000FF,
-+    0xFFFFFF80,
-+    0x0000007F,
-+    0xFFFFFFC0,
-+    0x0000003F,
-+    0xFFFFFFE0,
-+    0x0000001F,
-+    0xFFFFFFF0,                                          /*  56 */
-+    0x0000000F,
-+    0xFFFFFFF8,
-+    0x00000007,
-+    0xFFFFFFFC,
-+    0x00000003,
-+    0xFFFFFFFE,
-+    0x00000001,
++static const uint64_t b64_pattern[PATTERN_INPUTS_64_COUNT] = {
++    0xFFFFFFFFFFFFFFFFULL,                               /*   0 */
++    0x0000000000000000ULL,
++    0xAAAAAAAAAAAAAAAAULL,
++    0x5555555555555555ULL,
++    0xCCCCCCCCCCCCCCCCULL,
++    0x3333333333333333ULL,
++    0xE38E38E38E38E38EULL,
++    0x1C71C71C71C71C71ULL,
++    0xF0F0F0F0F0F0F0F0ULL,                               /*   8 */
++    0x0F0F0F0F0F0F0F0FULL,
++    0xF83E0F83E0F83E0FULL,
++    0x07C1F07C1F07C1F0ULL,
++    0xFC0FC0FC0FC0FC0FULL,
++    0x03F03F03F03F03F0ULL,
++    0xFE03F80FE03F80FEULL,
++    0x01FC07F01FC07F01ULL,
++    0xFF00FF00FF00FF00ULL,                               /*  16 */
++    0x00FF00FF00FF00FFULL,
++    0xFF803FE00FF803FEULL,
++    0x007FC01FF007FC01ULL,
++    0xFFC00FFC00FFC00FULL,
++    0x003FF003FF003FF0ULL,
++    0xFFE003FF800FFE00ULL,
++    0x001FFC007FF001FFULL,
++    0xFFF000FFF000FFF0ULL,                               /*  24 */
++    0x000FFF000FFF000FULL,
++    0xFFF8003FFE000FFFULL,
++    0x0007FFC001FFF000ULL,
++    0xFFFC000FFFC000FFULL,
++    0x0003FFF0003FFF00ULL,
++    0xFFFE0003FFF8000FULL,
++    0x0001FFFC0007FFF0ULL,
++    0xFFFF0000FFFF0000ULL,                               /*  32 */
++    0x0000FFFF0000FFFFULL,
++    0xFFFF80003FFFE000ULL,
++    0x00007FFFC0001FFFULL,
++    0xFFFFC0000FFFFC00ULL,
++    0x00003FFFF00003FFULL,
++    0xFFFFE00003FFFF80ULL,
++    0x00001FFFFC00007FULL,
++    0xFFFFF00000FFFFF0ULL,                               /*  40 */
++    0x00000FFFFF00000FULL,
++    0xFFFFF800003FFFFEULL,
++    0x000007FFFFC00001ULL,
++    0xFFFFFC00000FFFFFULL,
++    0x000003FFFFF00000ULL,
++    0xFFFFFE000003FFFFULL,
++    0x000001FFFFFC0000ULL,
++    0xFFFFFF000000FFFFULL,                               /*  48 */
++    0x000000FFFFFF0000ULL,
++    0xFFFFFF8000003FFFULL,
++    0x0000007FFFFFC000ULL,
++    0xFFFFFFC000000FFFULL,
++    0x0000003FFFFFF000ULL,
++    0xFFFFFFE0000003FFULL,
++    0x0000001FFFFFFC00ULL,
++    0xFFFFFFF0000000FFULL,                               /*  56 */
++    0x0000000FFFFFFF00ULL,
++    0xFFFFFFF80000003FULL,
++    0x00000007FFFFFFC0ULL,
++    0xFFFFFFFC0000000FULL,
++    0x00000003FFFFFFF0ULL,
++    0xFFFFFFFE00000003ULL,
++    0x00000001FFFFFFFCULL,
++};
++
++static const uint64_t b64_pattern_se[PATTERN_INPUTS_64_COUNT] = {
++    0xFFFFFFFFFFFFFFFFULL,                               /*   0 */
++    0x0000000000000000ULL,
++    0xFFFFFFFFAAAAAAAAULL,
++    0x0000000055555555ULL,
++    0xFFFFFFFFCCCCCCCCULL,
++    0x0000000033333333ULL,
++    0xFFFFFFFFE38E38E3ULL,
++    0x000000001C71C71CULL,
++    0xFFFFFFFFF0F0F0F0ULL,                               /*   8 */
++    0x000000000F0F0F0FULL,
++    0xFFFFFFFFF83E0F83ULL,
++    0x0000000007C1F07CULL,
++    0xFFFFFFFFFC0FC0FCULL,
++    0x0000000003F03F03ULL,
++    0xFFFFFFFFFE03F80FULL,
++    0x0000000001FC07F0ULL,
++    0xFFFFFFFFFF00FF00ULL,                               /*  16 */
++    0x0000000000FF00FFULL,
++    0xFFFFFFFFFF803FE0ULL,
++    0x00000000007FC01FULL,
++    0xFFFFFFFFFFC00FFCULL,
++    0x00000000003FF003ULL,
++    0xFFFFFFFFFFE003FFULL,
++    0x00000000001FFC00ULL,
++    0xFFFFFFFFFFF000FFULL,                               /*  24 */
++    0x00000000000FFF00ULL,
++    0xFFFFFFFFFFF8003FULL,
++    0x000000000007FFC0ULL,
++    0xFFFFFFFFFFFC000FULL,
++    0x000000000003FFF0ULL,
++    0xFFFFFFFFFFFE0003ULL,
++    0x000000000001FFFCULL,
++    0xFFFFFFFFFFFF0000ULL,                               /*  32 */
++    0x000000000000FFFFULL,
++    0xFFFFFFFFFFFF8000ULL,
++    0x0000000000007FFFULL,
++    0xFFFFFFFFFFFFC000ULL,
++    0x0000000000003FFFULL,
++    0xFFFFFFFFFFFFE000ULL,
++    0x0000000000001FFFULL,
++    0xFFFFFFFFFFFFF000ULL,                               /*  40 */
++    0x0000000000000FFFULL,
++    0xFFFFFFFFFFFFF800ULL,
++    0x00000000000007FFULL,
++    0xFFFFFFFFFFFFFC00ULL,
++    0x00000000000003FFULL,
++    0xFFFFFFFFFFFFFE00ULL,
++    0x00000000000001FFULL,
++    0xFFFFFFFFFFFFFF00ULL,                               /*  48 */
++    0x00000000000000FFULL,
++    0xFFFFFFFFFFFFFF80ULL,
++    0x000000000000007FULL,
++    0xFFFFFFFFFFFFFFC0ULL,
++    0x000000000000003FULL,
++    0xFFFFFFFFFFFFFFE0ULL,
++    0x000000000000001FULL,
++    0xFFFFFFFFFFFFFFF0ULL,                               /*  56 */
++    0x000000000000000FULL,
++    0xFFFFFFFFFFFFFFF8ULL,
++    0x0000000000000007ULL,
++    0xFFFFFFFFFFFFFFFCULL,
++    0x0000000000000003ULL,
++    0xFFFFFFFFFFFFFFFEULL,
++    0x0000000000000001ULL,
 +};
 +
 +
-+#define RANDOM_INPUTS_32_COUNT           16
-+#define RANDOM_INPUTS_32_SHORT_COUNT      4
++#define RANDOM_INPUTS_64_COUNT           16
++#define RANDOM_INPUTS_64_SHORT_COUNT      4
 +
-+static const uint32_t b32_random[RANDOM_INPUTS_32_COUNT] = {
-+    0x886AE6CC,                                          /*   0 */
-+    0xFBBE0063,
-+    0xAC5AAEAA,
-+    0x704F164D,
-+    0xB9926B7C,
-+    0xD027BE89,
-+    0xB83B5806,
-+    0xFC8F23F0,
-+    0x201E09CD,                                          /*   8 */
-+    0xA57CD913,
-+    0xA2E8F6F5,
-+    0xA89CF2F1,
-+    0xE61438E9,
-+    0x944A35FD,
-+    0x46304263,
-+    0x8B5AA7A2,
++static const uint64_t b64_random[RANDOM_INPUTS_64_COUNT] = {
++    0x886AE6CC28625540ULL,                               /*   0 */
++    0xFBBE00634D93C708ULL,
++    0xAC5AAEAAB9CF8B80ULL,
++    0x704F164D5E31E24EULL,
++    0xB9926B7C7DAF4258ULL,
++    0xD027BE89FF0A2EF9ULL,
++    0xB83B580665CABC4AULL,
++    0xFC8F23F09AA6B782ULL,
++    0x201E09CD56AEE649ULL,                               /*   8 */
++    0xA57CD91365D9E5D7ULL,
++    0xA2E8F6F5C9CBC61BULL,
++    0xA89CF2F131A864AEULL,
++    0xE61438E9A652EA0AULL,
++    0x944A35FD192361A8ULL,
++    0x4630426322BEF79CULL,
++    0x8B5AA7A2F259DEADULL,
++};
++
++static const uint64_t b64_random_se[RANDOM_INPUTS_64_COUNT] = {
++    0xFFFFFFFF886AE6CCULL,                               /*   0 */
++    0xFFFFFFFFFBBE0063ULL,
++    0xFFFFFFFFAC5AAEAAULL,
++    0x00000000704F164DULL,
++    0xFFFFFFFFB9926B7CULL,
++    0xFFFFFFFFD027BE89ULL,
++    0xFFFFFFFFB83B5806ULL,
++    0xFFFFFFFFFC8F23F0ULL,
++    0x00000000201E09CDULL,                               /*   8 */
++    0xFFFFFFFFA57CD913ULL,
++    0xFFFFFFFFA2E8F6F5ULL,
++    0xFFFFFFFFA89CF2F1ULL,
++    0xFFFFFFFFE61438E9ULL,
++    0xFFFFFFFF944A35FDULL,
++    0x0000000046304263ULL,
++    0xFFFFFFFF8B5AA7A2ULL,
 +};
 +
 +
 +#endif
-diff --git a/tests/tcg/mips/include/test_utils_32.h b/tests/tcg/mips/include/test_utils_32.h
+diff --git a/tests/tcg/mips/include/test_utils_64.h b/tests/tcg/mips/include/test_utils_64.h
 new file mode 100644
-index 0000000..8d8bae7
+index 0000000..e67f363
 --- /dev/null
-+++ b/tests/tcg/mips/include/test_utils_32.h
++++ b/tests/tcg/mips/include/test_utils_64.h
 @@ -0,0 +1,78 @@
 +/*
 + *  Header file for test utilities
@@ -195,8 +283,8 @@ index 0000000..8d8bae7
 + *
 + */
 +
-+#ifndef TEST_UTILS_32_H
-+#define TEST_UTILS_32_H
++#ifndef TEST_UTILS_64_H
++#define TEST_UTILS_64_H
 +
 +#include <stdio.h>
 +#include <stdint.h>
@@ -206,22 +294,22 @@ index 0000000..8d8bae7
 +#define PRINT_RESULTS 1
 +
 +
-+static inline int32_t check_results_32(const char *instruction_name,
++static inline int32_t check_results_64(const char *instruction_name,
 +                                       const uint32_t test_count,
 +                                       const double elapsed_time,
-+                                       const uint32_t *b32_result,
-+                                       const uint32_t *b32_expect)
++                                       const uint64_t *b64_result,
++                                       const uint64_t *b64_expect)
 +{
 +#if PRINT_RESULTS
 +    uint32_t ii;
 +    printf("\n");
 +    for (ii = 0; ii < test_count; ii++) {
 +        uint64_t a;
-+        memcpy(&a, (b32_result + ii), 8);
++        memcpy(&a, (b64_result + ii), 8);
 +        if (ii % 8 != 0) {
-+            printf("        0x%08lxULL,\n", a);
++            printf("        0x%016llxULL,\n", a);
 +        } else {
-+            printf("        0x%08lxULL,                   /* %3d  */\n",
++            printf("        0x%016llxULL,                    /* %3d  */\n",
 +                   a, ii);
 +        }
 +    }
@@ -233,7 +321,7 @@ index 0000000..8d8bae7
 +
 +    printf("%s:   ", instruction_name);
 +    for (i = 0; i < test_count; i++) {
-+        if (b32_result[i] == b32_expect[i]) {
++        if (b64_result[i] == b64_expect[i]) {
 +            pass_count++;
 +        } else {
 +            fail_count++;
