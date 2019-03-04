@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58491)
+Received: from eggs.gnu.org ([209.51.188.92]:39795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h0gNq-0005B9-Bu
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 00:43:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1h0hRX-0007K4-9o
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:51:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h0gNm-0005fY-Ll
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 00:43:26 -0500
-Date: Mon, 4 Mar 2019 16:36:47 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190304053647.GI7792@umbus.fritz.box>
-References: <20190228225759.21328-1-farosas@linux.ibm.com>
-	<20190228225759.21328-2-farosas@linux.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1h0hR5-00035s-EQ
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:50:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h0hR3-000346-8y
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 01:50:50 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190303104430.7692-1-samuel.thibault@ens-lyon.org>
+	<20190303104430.7692-3-samuel.thibault@ens-lyon.org>
+Date: Mon, 04 Mar 2019 07:44:34 +0100
+In-Reply-To: <20190303104430.7692-3-samuel.thibault@ens-lyon.org> (Samuel
+	Thibault's message of "Sun, 3 Mar 2019 11:44:30 +0100")
+Message-ID: <87h8cjdtpp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="h22Fi9ANawrtbNPX"
-Content-Disposition: inline
-In-Reply-To: <20190228225759.21328-2-farosas@linux.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v4 1/5] target/ppc: Move exception
- vector offset computation into a function
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2] curses: add option to specify VGA font
+ encoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +28,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabiano Rosas <farosas@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: qemu-devel@nongnu.org, Eddie Kohler <ekohler@gmail.com>, armbru@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
 
+Samuel Thibault <samuel.thibault@ens-lyon.org> writes:
 
---h22Fi9ANawrtbNPX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Feb 28, 2019 at 07:57:55PM -0300, Fabiano Rosas wrote:
-> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-This is a nice cleanup, regardless of the rest of the series.  Applied
-to ppc-for-4.0.
-
+> This uses iconv to convert glyphs from the specified VGA font encoding to
+> unicode, and makes use of cchar_t instead of chtype when using ncursesw,
+> which allows to store all wide char as well as the WACS values.
+>
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> Cc: Eddie Kohler <ekohler@gmail.com>
 > ---
->  target/ppc/excp_helper.c | 30 +++++++++++++++++++-----------
->  1 file changed, 19 insertions(+), 11 deletions(-)
->=20
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 39bedbb11d..beafcf1ebd 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -107,6 +107,24 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPC=
-State *env, int excp,
->      return POWERPC_EXCP_RESET;
+>  configure       |   5 +-
+>  qapi/ui.json    |   4 +-
+>  qemu-options.hx |   5 +-
+>  ui/curses.c     | 315 ++++++++++++++++++++++++++++++++++++++++--------
+>  4 files changed, 279 insertions(+), 50 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 9979ca708d..1270dc8dc0 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3449,14 +3449,17 @@ if test "$curses" != "no" ; then
+>  #include <locale.h>
+>  #include <curses.h>
+>  #include <wchar.h>
+> +#include <langinfo.h>
+>  int main(void) {
+> +  const char *codeset;
+>    wchar_t wch = L'w';
+>    setlocale(LC_ALL, "");
+>    resize_term(0, 0);
+>    addwstr(L"wide chars\n");
+>    addnwstr(&wch, 1);
+>    add_wch(WACS_DEGREE);
+> -  return 0;
+> +  codeset = nl_langinfo(CODESET);
+> +  return codeset != 0;
 >  }
-> =20
-> +static uint64_t ppc_excp_vector_offset(CPUState *cs, int ail)
-> +{
-> +    uint64_t offset =3D 0;
-> +
-> +    switch (ail) {
-> +    case AIL_0001_8000:
-> +        offset =3D 0x18000;
-> +        break;
-> +    case AIL_C000_0000_0000_4000:
-> +        offset =3D 0xc000000000004000ull;
-> +        break;
-> +    default:
-> +        cpu_abort(cs, "Invalid AIL combination %d\n", ail);
-> +        break;
-> +    }
-> +
-> +    return offset;
-> +}
-> =20
->  /* Note that this function should be greatly optimized
->   * when called with a constant excp, from ppc_hw_interrupt
-> @@ -708,17 +726,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
->      /* Handle AIL */
->      if (ail) {
->          new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
-> -        switch(ail) {
-> -        case AIL_0001_8000:
-> -            vector |=3D 0x18000;
-> -            break;
-> -        case AIL_C000_0000_0000_4000:
-> -            vector |=3D 0xc000000000004000ull;
-> -            break;
-> -        default:
-> -            cpu_abort(cs, "Invalid AIL combination %d\n", ail);
-> -            break;
-> -        }
-> +        vector |=3D ppc_excp_vector_offset(cs, ail);
+>  EOF
+>    IFS=:
+> diff --git a/qapi/ui.json b/qapi/ui.json
+> index c5d1d7f099..12d3a2c751 100644
+> --- a/qapi/ui.json
+> +++ b/qapi/ui.json
+> @@ -1131,6 +1131,7 @@
+>  # @full-screen:   Start user interface in fullscreen mode (default: off).
+>  # @window-close:  Allow to quit qemu with window close button (default: on).
+>  # @gl:            Enable OpenGL support (default: off).
+> +# @charset:       Font charset used by guest (default: CP437).
+
+Can you give brief rationale for defaulting to CP437?
+
+>  #
+>  # Since: 2.12
+>  #
+> @@ -1139,7 +1140,8 @@
+>    'base'    : { 'type'           : 'DisplayType',
+>                  '*full-screen'   : 'bool',
+>                  '*window-close'  : 'bool',
+> -                '*gl'            : 'DisplayGLMode' },
+> +                '*gl'            : 'DisplayGLMode',
+> +                '*charset'       : 'str' },
+>    'discriminator' : 'type',
+>    'data'    : { 'gtk'            : 'DisplayGTK',
+>                  'egl-headless'   : 'DisplayEGLHeadless'} }
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 1cf9aac1fe..4bc4e736bb 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1216,7 +1216,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
+>      "            [,window_close=on|off][,gl=on|core|es|off]\n"
+>      "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
+>      "-display vnc=<display>[,<optargs>]\n"
+> -    "-display curses\n"
+> +    "-display curses[,charset=<encoding>]\n"
+>      "-display none\n"
+>      "-display egl-headless[,rendernode=<file>]"
+>      "                select display type\n"
+> @@ -1248,6 +1248,9 @@ support a text mode, QEMU can display this output using a
+>  curses/ncurses interface. Nothing is displayed when the graphics
+>  device is in graphical mode or if the graphics device does not support
+>  a text mode. Generally only the VGA device models support text mode.
+> +The font charset used by the guest can be specified with the
+> +@code{charset} option, for example @code{charset=CP850} for IBM CP850
+> +encoding. The default is @code{CP437}.
+>  @item none
+>  Do not display video output. The guest will still see an emulated
+>  graphics card, but its output will not be displayed to the QEMU
+> diff --git a/ui/curses.c b/ui/curses.c
+> index 1724dd57d4..203cc075d0 100644
+> --- a/ui/curses.c
+> +++ b/ui/curses.c
+[...]
+> @@ -492,6 +709,10 @@ static void curses_display_init(DisplayState *ds, DisplayOptions *opts)
 >      }
-> =20
->  #if defined(TARGET_PPC64)
+>  #endif
+>  
+> +    setlocale(LC_CTYPE, "");
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+General principles: any change to locale deserves prominent mention in
+the commit message.
 
---h22Fi9ANawrtbNPX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx8uWwACgkQbDjKyiDZ
-s5JaWg/9Hvpi11qPxVEmZNjnwSL7isSKHLUzv82Lla+gWC0cUubLxVvFZzdDRa1N
-PxKeeB5jH57PubHDZnkKHQ6IK7j7TX36MS89Y2bZI6/xfo9eWiw03ziSS+90MDUm
-SECT3dkynJ3+LX3JPdoXPmjZmsmHLrcHhEG+dgvusN6EfLFuSzHclgn/6SLQDc73
-Y+mX0nsfk6z4rBjzaM943ffFJgHGD+QdUlHElPl0heOFI8PBO6ees4LQ3kCUvCxn
-GF2NaCp5rGWvrr3vSm9TlSDW5tC5vnBJqpzKJ7c937N4huYPXiKAWigk8EQAc1jW
-beCdsXnU+/YYsHxeQxzmMwAsZvWfqkTx1FU67vgxsba4SqSrM5lz+27q+llEKo0W
-+c5C/1G7KorHN1xhloYGewf7ozHt1a8oRRSQM1I6u2KD59v85ZkwZKhtuDegPzRi
-0odGDQDjmkntH2Ww+/kI+Zo65l+yH1F+LTQEET9cjKI3fkXigi6Lt33sSuXbn4K6
-m66fHJl38xFRB70qk+xM2bviL6ljCm3urEPW97j/NkxmFnwEJ3FiWLhEGFxSTsmM
-bffz0TfxEDFv6Eyxy1Yk840Wt/GQSklj082pNhCzumd5BJKCIWCbpf1Nm29bvVqp
-n5odH9Iy6G0JM+orWYdzc7QnCJA4lWBVvsZagWrNgqdxF8FHsus=
-=ABJL
------END PGP SIGNATURE-----
-
---h22Fi9ANawrtbNPX--
+> +    if (opts->charset) {
+> +        font_charset = opts->charset;
+> +    }
+>      curses_setup();
+>      curses_keyboard_setup();
+>      atexit(curses_atexit);
