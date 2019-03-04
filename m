@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46109)
+Received: from eggs.gnu.org ([209.51.188.92]:46107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCv-0002Hz-7B
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:57 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCv-0002Hx-7C
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCq-0004cm-Rj
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCq-0004bw-1B
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:53 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:37625)
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54968)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h0sCo-0004Om-0f
+	id 1h0sCn-0004UX-Uh
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:50 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id w6so6634077wrs.4
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:44 -0800 (PST)
+Received: by mail-wm1-x344.google.com with SMTP id f3so122947wmj.4
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:48 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Mar 2019 19:19:48 +0100
-Message-Id: <1551723614-1823-29-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Mar 2019 19:19:52 +0100
+Message-Id: <1551723614-1823-33-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
 References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 28/54] ssi: express dependencies with kconfig
+Subject: [Qemu-devel] [PULL 32/54] ppc64: Express dependencies of 'pseries'
+ and 'powernv' machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +31,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
+From: Thomas Huth <thuth@redhat.com>
+
+The POWERNV switch should always select ISA_IPMI_BT, then the other
+IPMI options are turned on automatically now.
+CONFIG_DIMM should always be selected by the pseries machine,
+which in turn depends on CONFIG_MEM_DEVICE since DIMM implements
+this interface.
+CONFIG_VIRTIO_VGA can be dropped from default-configs/ppc64-softmmu.mak
+completely since this device is already automatically enabled via
+hw/display/Kconfig now.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/arm-softmmu.mak        | 1 -
- default-configs/microblaze-softmmu.mak | 1 -
- hw/sd/Kconfig                          | 1 +
- hw/ssi/Kconfig                         | 4 ++++
- 4 files changed, 5 insertions(+), 2 deletions(-)
+ default-configs/ppc64-softmmu.mak |  5 -----
+ hw/intc/Kconfig                   |  6 ++----
+ hw/mem/Kconfig                    |  1 +
+ hw/ppc/Kconfig                    | 21 +++++++++++++++++++--
+ 4 files changed, 22 insertions(+), 11 deletions(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 40e1a1a..8bb4fd1 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -24,7 +24,6 @@ CONFIG_DDC=y
- CONFIG_SII9022=y
- CONFIG_ADS7846=y
- CONFIG_MAX111X=y
--CONFIG_SSI=y
- CONFIG_SSI_SD=y
- CONFIG_SSI_M25P80=y
- CONFIG_LAN9118=y
-diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/microblaze-softmmu.mak
-index a4a6770..7140ef3 100644
---- a/default-configs/microblaze-softmmu.mak
-+++ b/default-configs/microblaze-softmmu.mak
-@@ -6,7 +6,6 @@ CONFIG_XILINX=y
- CONFIG_XILINX_AXI=y
- CONFIG_XILINX_SPI=y
- CONFIG_XILINX_ETHLITE=y
--CONFIG_SSI=y
- CONFIG_SSI_M25P80=y
- CONFIG_XLNX_ZYNQMP=y
- CONFIG_PETALOGIX_S3ADSP1800=y
-diff --git a/hw/sd/Kconfig b/hw/sd/Kconfig
-index c6c5dfb..8f12d9c 100644
---- a/hw/sd/Kconfig
-+++ b/hw/sd/Kconfig
-@@ -3,6 +3,7 @@ config PL181
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index d642b67..cca5266 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -5,11 +5,6 @@ include ppc-softmmu.mak
  
- config SSI_SD
-     bool
-+    depends on SSI
+ # For PowerNV
+ CONFIG_POWERNV=y
+-CONFIG_ISA_IPMI_BT=y
  
- config SD
-     bool
-diff --git a/hw/ssi/Kconfig b/hw/ssi/Kconfig
-index 5a03110..9e54a0c 100644
---- a/hw/ssi/Kconfig
-+++ b/hw/ssi/Kconfig
-@@ -1,14 +1,18 @@
- config PL022
-     bool
-+    select SSI
+ # For pSeries
+ CONFIG_PSERIES=y
+-CONFIG_VIRTIO_VGA=y
+-CONFIG_MEM_DEVICE=y
+-CONFIG_DIMM=y
+-CONFIG_SPAPR_RNG=y
+diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+index 6eea14e..de10a6b 100644
+--- a/hw/intc/Kconfig
++++ b/hw/intc/Kconfig
+@@ -31,13 +31,11 @@ config OPENPIC_KVM
  
- config SSI
+ config XICS
      bool
+-    default y
+-    depends on PSERIES
++    depends on POWERNV || PSERIES
  
- config XILINX_SPI
+ config XICS_SPAPR
      bool
-+    select SSI
+-    default y
+-    depends on PSERIES
++    select XICS
  
- config XILINX_SPIPS
+ config XICS_KVM
      bool
-+    select SSI
+diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
+index d1e635c..620fd4c 100644
+--- a/hw/mem/Kconfig
++++ b/hw/mem/Kconfig
+@@ -1,5 +1,6 @@
+ config DIMM
+     bool
++    select MEM_DEVICE
  
- config STM32F2XX_SPI
+ config MEM_DEVICE
      bool
-+    select SSI
+diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
+index 1d5d72f..30e3e81 100644
+--- a/hw/ppc/Kconfig
++++ b/hw/ppc/Kconfig
+@@ -1,12 +1,29 @@
+ config PSERIES
+     bool
++    imply PCI_DEVICES
++    imply TEST_DEVICES
++    select DIMM
++    select PCI
++    select SPAPR_VSCSI
+     select VFIO if LINUX
++    select XICS_SPAPR
++    select XIVE_SPAPR
+ 
+ config SPAPR_RNG
+     bool
++    default y
++    depends on PSERIES
+ 
+ config POWERNV
+     bool
++    imply PCI_DEVICES
++    imply TEST_DEVICES
++    select ISA_IPMI_BT
++    select IPMI_LOCAL
++    select ISA_BUS
++    select MC146818RTC
++    select XICS
++    select XIVE
+ 
+ config PPC405
+     bool
+@@ -40,10 +57,10 @@ config VIRTEX
+ 
+ config XIVE
+     bool
+-    default y
+-    depends on PSERIES
++    depends on POWERNV || PSERIES
+ 
+ config XIVE_SPAPR
+     bool
+     default y
+     depends on PSERIES
++    select XIVE
 -- 
 1.8.3.1
