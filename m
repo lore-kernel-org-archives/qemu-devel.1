@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44957)
+Received: from eggs.gnu.org ([209.51.188.92]:45106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBC-0000TE-OE
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:13 -0500
+	(envelope-from <cota@braap.org>) id 1h0sBF-0000Wo-G5
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBA-00025a-EX
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:10 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:59819)
+	(envelope-from <cota@braap.org>) id 1h0sBD-0002Eh-RG
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:13 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:41047)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBA-0001Go-1Q
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:08 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBD-0001Sr-GK
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:11 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:42 -0500
-Message-Id: <20190304181813.8075-43-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:18:07 -0500
+Message-Id: <20190304181813.8075-68-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v7 42/73] i386/whpx-all: convert to
- cpu_interrupt_request
+Subject: [Qemu-devel] [PATCH v7 67/73] sparc: convert to
+ cpu_has_work_with_iothread_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,151 +25,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
+Soon we will call cpu_has_work without the BQL.
+
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/whpx-all.c | 41 ++++++++++++++++++++++++-----------------
- 1 file changed, 24 insertions(+), 17 deletions(-)
+ target/sparc/cpu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 9673bdc219..0d8cfa3a19 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -690,12 +690,14 @@ static int whpx_handle_portio(CPUState *cpu,
- static int whpx_handle_halt(CPUState *cpu)
- {
-     struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
-+    uint32_t interrupt_request;
-     int ret = 0;
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index 933fd8e954..b15f6ef180 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -708,6 +708,8 @@ static bool sparc_cpu_has_work(CPUState *cs)
+     SPARCCPU *cpu = SPARC_CPU(cs);
+     CPUSPARCState *env = &cpu->env;
  
-     qemu_mutex_lock_iothread();
--    if (!((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    interrupt_request = cpu_interrupt_request(cpu);
-+    if (!((interrupt_request & CPU_INTERRUPT_HARD) &&
-           (env->eflags & IF_MASK)) &&
--        !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        !(interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu->exception_index = EXCP_HLT;
-         cpu_halted_set(cpu, true);
-         ret = 1;
-@@ -713,6 +715,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-     struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
-     X86CPU *x86_cpu = X86_CPU(cpu);
-     int irq;
-+    uint32_t interrupt_request;
-     uint8_t tpr;
-     WHV_X64_PENDING_INTERRUPTION_REGISTER new_int;
-     UINT32 reg_count = 0;
-@@ -724,17 +727,19 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
- 
-     qemu_mutex_lock_iothread();
- 
-+    interrupt_request = cpu_interrupt_request(cpu);
++    g_assert(qemu_mutex_iothread_locked());
 +
-     /* Inject NMI */
-     if (!vcpu->interruption_pending &&
--        cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
--        if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
-+        interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
-+        if (interrupt_request & CPU_INTERRUPT_NMI) {
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
-             vcpu->interruptable = false;
-             new_int.InterruptionType = WHvX64PendingNmi;
-             new_int.InterruptionPending = 1;
-             new_int.InterruptionVector = 2;
-         }
--        if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
-+        if (interrupt_request & CPU_INTERRUPT_SMI) {
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
-         }
-     }
-@@ -743,12 +748,12 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-      * Force the VCPU out of its inner loop to process any INIT requests or
-      * commit pending TPR access.
-      */
--    if (cpu->interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
--        if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
-+    if (interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
-+        if ((interrupt_request & CPU_INTERRUPT_INIT) &&
-             !(env->hflags & HF_SMM_MASK)) {
-             cpu->exit_request = 1;
-         }
--        if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
-+        if (interrupt_request & CPU_INTERRUPT_TPR) {
-             cpu->exit_request = 1;
-         }
-     }
-@@ -757,7 +762,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-     if (!vcpu->interruption_pending &&
-         vcpu->interruptable && (env->eflags & IF_MASK)) {
-         assert(!new_int.InterruptionPending);
--        if (cpu->interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (interrupt_request & CPU_INTERRUPT_HARD) {
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_HARD);
-             irq = cpu_get_pic_interrupt(env);
-             if (irq >= 0) {
-@@ -787,7 +792,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
+     return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
+            cpu_interrupts_enabled(env);
+ }
+@@ -869,7 +871,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
  
-     /* Update the state of the interrupt delivery notification */
-     if (!vcpu->window_registered &&
--        cpu->interrupt_request & CPU_INTERRUPT_HARD) {
-+        cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD) {
-         reg_values[reg_count].DeliverabilityNotifications.InterruptNotification
-             = 1;
-         vcpu->window_registered = 1;
-@@ -840,8 +845,9 @@ static void whpx_vcpu_process_async_events(CPUState *cpu)
-     struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
-     X86CPU *x86_cpu = X86_CPU(cpu);
-     struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
-+    uint32_t interrupt_request;
- 
--    if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
-+    if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_INIT) &&
-         !(env->hflags & HF_SMM_MASK)) {
- 
-         do_cpu_init(x86_cpu);
-@@ -849,25 +855,26 @@ static void whpx_vcpu_process_async_events(CPUState *cpu)
-         vcpu->interruptable = true;
-     }
- 
--    if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
-+    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_POLL) {
-         cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
-         apic_poll_irq(x86_cpu->apic_state);
-     }
- 
--    if (((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    interrupt_request = cpu_interrupt_request(cpu);
-+    if (((interrupt_request & CPU_INTERRUPT_HARD) &&
-          (env->eflags & IF_MASK)) ||
--        (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        (interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu_halted_set(cpu, false);
-     }
- 
--    if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
-+    if (interrupt_request & CPU_INTERRUPT_SIPI) {
-         if (!cpu->vcpu_dirty) {
-             whpx_get_registers(cpu);
-         }
-         do_cpu_sipi(x86_cpu);
-     }
- 
--    if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
-+    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_TPR) {
-         cpu_reset_interrupt(cpu, CPU_INTERRUPT_TPR);
-         if (!cpu->vcpu_dirty) {
-             whpx_get_registers(cpu);
-@@ -1350,7 +1357,7 @@ static void whpx_memory_init(void)
- 
- static void whpx_handle_interrupt(CPUState *cpu, int mask)
- {
--    cpu->interrupt_request |= mask;
-+    cpu_interrupt_request_or(cpu, mask);
- 
-     if (!qemu_cpu_is_self(cpu)) {
-         qemu_cpu_kick(cpu);
+     cc->class_by_name = sparc_cpu_class_by_name;
+     cc->parse_features = sparc_cpu_parse_features;
+-    cc->has_work = sparc_cpu_has_work;
++    cc->has_work_with_iothread_lock = sparc_cpu_has_work;
+     cc->do_interrupt = sparc_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = sparc_cpu_exec_interrupt;
+     cc->dump_state = sparc_cpu_dump_state;
 -- 
 2.17.1
