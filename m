@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44440)
+Received: from eggs.gnu.org ([209.51.188.92]:44474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAa-0008Kq-2l
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:32 -0500
+	(envelope-from <cota@braap.org>) id 1h0sAb-0008Ma-NZ
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAZ-00010a-6c
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:32 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:35349)
+	(envelope-from <cota@braap.org>) id 1h0sAa-00013S-KT
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:33 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:38551)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAY-0000gM-UB
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:31 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAa-0000jC-2c
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:32 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:16 -0500
-Message-Id: <20190304181813.8075-17-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:21 -0500
+Message-Id: <20190304181813.8075-22-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 16/73] tcg-runtime: convert to cpu_halted_set
+Subject: [Qemu-devel] [PATCH v7 21/73] lm32: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +27,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Michael Walle <michael@walle.cc>
 
+Cc: Michael Walle <michael@walle.cc>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/tcg-runtime.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/lm32/op_helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index 4aa038465f..70e3c9de71 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -172,5 +172,5 @@ void HELPER(cpu_halted_set)(CPUArchState *env, uint32_t val)
+diff --git a/target/lm32/op_helper.c b/target/lm32/op_helper.c
+index 234d55e056..392634441b 100644
+--- a/target/lm32/op_helper.c
++++ b/target/lm32/op_helper.c
+@@ -31,7 +31,7 @@ void HELPER(hlt)(CPULM32State *env)
  {
-     CPUState *cpu = ENV_GET_CPU(env);
+     CPUState *cs = CPU(lm32_env_get_cpu(env));
  
--    cpu->halted = val;
-+    cpu_halted_set(cpu, val);
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
+     cs->exception_index = EXCP_HLT;
+     cpu_loop_exit(cs);
+ }
+@@ -44,7 +44,7 @@ void HELPER(ill)(CPULM32State *env)
+             "Connect a debugger or switch to the monitor console "
+             "to find out more.\n");
+     vm_stop(RUN_STATE_PAUSED);
+-    cs->halted = 1;
++    cpu_halted_set(cs, 1);
+     raise_exception(env, EXCP_HALTED);
+ #endif
  }
 -- 
 2.17.1
