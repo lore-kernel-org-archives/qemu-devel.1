@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42765)
+Received: from eggs.gnu.org ([209.51.188.92]:42777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDF-0004kt-El
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:10 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDG-0004le-H0
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDE-0005QM-6g
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:09 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:55335 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h0qDF-0005S1-Ik
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:10 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:59424 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1h0qDD-0004Hq-Rc
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:08 -0500
+	id 1h0qDF-0005Qj-63
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 11:13:09 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  4 Mar 2019 17:11:40 +0100
-Message-Id: <1551715911-8440-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 00/11] Misc target/mips fixes and
- improvements
+Date: Mon,  4 Mar 2019 17:11:45 +0100
+Message-Id: <1551715911-8440-6-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1551715911-8440-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1551715911-8440-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v6 05/11] tests/tcg: target/mips: Add wrappers
+ for some MIPS64R6 instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,143 +30,102 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-A collection of misc target/mips fixes and improvements for
-March 2019.
+Add wrappers for some MIPS64R6 instructions.
 
-v5->v6:
-
-  - addressed Philippe's comments from v5
-  - all patches on MSA wrappers squashed
-  - added a patch on 32-bit test infrastructure
-  - added a patch on MIPS64R6 bit count instructions tests
-  - added a patch on MIPS64R6 shift instructions tests
-  - added a patch on MIPS64R6 integer multiply instructions tests
-  - added a patch on MSA pack instructions tests
-
-v4->v5:
-
-  - accepted patches removed
-  - DSPRAM patch will be sent separately, so it is also removed
-  - added several new patches on test infrastructue
-
-v3->v4:
-
-  - added a patch on DSPRAM support
-  - order of patches slightly changed
-  - minor changes in commit messages
-  - rebased to the latest code
-
-v2->v3:
-
-  - added a patches on documenting Boston board
-  - added two patches on testing integer max/min MSA instructions
-  - removed four patches that had been accepted
-  - amended patch on DSP-related comments
-
-v1->v2:
-
-  - added two patches on updating end user documentation
-  - minor updates to commit messages
-
-Aleksandar Markovic (11):
-  disas: nanoMIPS: Correct comments to handlers of some DSP instructions
-  tests/tcg: target/mips: Add wrappers for various MSA instructions
-  tests/tcg: target/mips: Add test utilities for 32-bit tests
-  tests/tcg: target/mips: Add test utilities for 64-bit tests
-  tests/tcg: target/mips: Add wrappers for some MIPS64R6 instructions
-  tests/tcg: target/mips: Add tests for MIPS64R6 logic instructions
-  tests/tcg: target/mips: Add tests for MIPS64R6 bit swap instructions
-  tests/tcg: target/mips: Add tests for MIPS64R6 shift instructions
-  tests/tcg: target/mips: Add tests for MIPS64R6 int multiply
-    instructions
-  tests/tcg: target/mips: Add tests for MIPS64R6 bit count instructions
-  tests/tcg: target/mips: Add tests for MSA pack instructions
-
- disas/nanomips.cpp                                 | 285 +++++++++++----------
- tests/tcg/mips/include/test_inputs_32.h            | 122 +++++++++
- tests/tcg/mips/include/test_inputs_64.h            | 208 +++++++++++++++
- tests/tcg/mips/include/test_utils_32.h             |  78 ++++++
- tests/tcg/mips/include/test_utils_64.h             |  78 ++++++
- tests/tcg/mips/include/wrappers_mips64r6.h         |  83 ++++++
- tests/tcg/mips/include/wrappers_msa.h              |  70 +++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c  | 153 +++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c  | 153 +++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c  | 153 +++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c  | 153 +++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c  | 153 +++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c  | 153 +++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c  | 153 +++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c  | 153 +++++++++++
- tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c | 153 +++++++++++
- tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c | 153 +++++++++++
- tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c | 153 +++++++++++
- tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c | 153 +++++++++++
- .../isa/mips64r6/bit-count/test_mips64r6_clo.c     | 144 +++++++++++
- .../isa/mips64r6/bit-count/test_mips64r6_clz.c     | 144 +++++++++++
- .../isa/mips64r6/bit-count/test_mips64r6_dclo.c    | 144 +++++++++++
- .../isa/mips64r6/bit-count/test_mips64r6_dclz.c    | 144 +++++++++++
- .../isa/mips64r6/bit-swap/test_mips64r6_bitswap.c  | 144 +++++++++++
- .../isa/mips64r6/bit-swap/test_mips64r6_dbitswap.c | 144 +++++++++++
- .../isa/mips64r6/int-multiply/test_mips64r6_dmuh.c | 151 +++++++++++
- .../mips64r6/int-multiply/test_mips64r6_dmuhu.c    | 151 +++++++++++
- .../isa/mips64r6/int-multiply/test_mips64r6_dmul.c | 151 +++++++++++
- .../mips64r6/int-multiply/test_mips64r6_dmulu.c    | 151 +++++++++++
- .../isa/mips64r6/int-multiply/test_mips64r6_muh.c  | 151 +++++++++++
- .../isa/mips64r6/int-multiply/test_mips64r6_muhu.c | 151 +++++++++++
- .../isa/mips64r6/int-multiply/test_mips64r6_mul.c  | 151 +++++++++++
- .../isa/mips64r6/int-multiply/test_mips64r6_mulu.c | 151 +++++++++++
- .../user/isa/mips64r6/logic/test_mips64r6_and.c    | 151 +++++++++++
- .../user/isa/mips64r6/logic/test_mips64r6_nor.c    | 151 +++++++++++
- .../user/isa/mips64r6/logic/test_mips64r6_or.c     | 151 +++++++++++
- .../user/isa/mips64r6/logic/test_mips64r6_xor.c    | 151 +++++++++++
- .../user/isa/mips64r6/shift/test_mips64r6_dsllv.c  | 151 +++++++++++
- .../user/isa/mips64r6/shift/test_mips64r6_dsrav.c  | 151 +++++++++++
- .../user/isa/mips64r6/shift/test_mips64r6_dsrlv.c  | 151 +++++++++++
- .../user/isa/mips64r6/shift/test_mips64r6_sllv.c   | 151 +++++++++++
- .../user/isa/mips64r6/shift/test_mips64r6_srav.c   | 151 +++++++++++
- .../user/isa/mips64r6/shift/test_mips64r6_srlv.c   | 151 +++++++++++
- 43 files changed, 6207 insertions(+), 135 deletions(-)
- create mode 100644 tests/tcg/mips/include/test_inputs_32.h
- create mode 100644 tests/tcg/mips/include/test_inputs_64.h
- create mode 100644 tests/tcg/mips/include/test_utils_32.h
- create mode 100644 tests/tcg/mips/include/test_utils_64.h
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ tests/tcg/mips/include/wrappers_mips64r6.h | 83 ++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
  create mode 100644 tests/tcg/mips/include/wrappers_mips64r6.h
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-count/test_mips64r6_clo.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-count/test_mips64r6_clz.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-count/test_mips64r6_dclo.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-count/test_mips64r6_dclz.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_bitswap.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_dbitswap.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuh.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuhu.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmul.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmulu.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muh.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muhu.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mul.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mulu.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/logic/test_mips64r6_and.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/logic/test_mips64r6_nor.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/logic/test_mips64r6_or.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/logic/test_mips64r6_xor.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_dsllv.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_dsrav.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_dsrlv.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_sllv.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_srav.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_srlv.c
 
+diff --git a/tests/tcg/mips/include/wrappers_mips64r6.h b/tests/tcg/mips/include/wrappers_mips64r6.h
+new file mode 100644
+index 0000000..d1e5edb
+--- /dev/null
++++ b/tests/tcg/mips/include/wrappers_mips64r6.h
+@@ -0,0 +1,83 @@
++/*
++ *  Header file for wrappers around MIPS64R6 instructions assembler
++ *  invocations
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef WRAPPERS_MIPS64R6_H
++#define WRAPPERS_MIPS64R6_H
++
++
++#define DO_MIPS64R6__RD__RS(suffix, mnemonic)                          \
++static inline void do_mips64r6_##suffix(const void *input,             \
++                                        void *output)                  \
++{                                                                      \
++   __asm__ volatile (                                                  \
++      "ld $t1, 0(%0)\n\t"                                              \
++      #mnemonic " $t0, $t1\n\t"                                        \
++      "sd $t0, 0(%1)\n\t"                                              \
++      :                                                                \
++      : "r" (input), "r" (output)                                      \
++      : "t0", "t1", "memory"                                           \
++   );                                                                  \
++}
++
++DO_MIPS64R6__RD__RS(CLO, clo)
++DO_MIPS64R6__RD__RS(CLZ, clz)
++DO_MIPS64R6__RD__RS(DCLO, dclo)
++DO_MIPS64R6__RD__RS(DCLZ, dclz)
++
++DO_MIPS64R6__RD__RS(BITSWAP, bitswap)
++DO_MIPS64R6__RD__RS(DBITSWAP, dbitswap)
++
++
++#define DO_MIPS64R6__RD__RS_RT(suffix, mnemonic)                       \
++static inline void do_mips64r6_##suffix(const void *input1,            \
++                                        const void *input2,            \
++                                        void *output)                  \
++{                                                                      \
++   __asm__ volatile (                                                  \
++      "ld $t1, 0(%0)\n\t"                                              \
++      "ld $t2, 0(%1)\n\t"                                              \
++      #mnemonic " $t0, $t1, $t2\n\t"                                   \
++      "sd $t0, 0(%2)\n\t"                                              \
++      :                                                                \
++      : "r" (input1), "r" (input2), "r" (output)                       \
++      : "t0", "t1", "memory"                                           \
++   );                                                                  \
++}
++
++DO_MIPS64R6__RD__RS_RT(SLLV, sllv)
++DO_MIPS64R6__RD__RS_RT(SRLV, srlv)
++DO_MIPS64R6__RD__RS_RT(SRAV, srav)
++DO_MIPS64R6__RD__RS_RT(DSLLV, dsllv)
++DO_MIPS64R6__RD__RS_RT(DSRLV, dsrlv)
++DO_MIPS64R6__RD__RS_RT(DSRAV, dsrav)
++
++DO_MIPS64R6__RD__RS_RT(MUL, mul)
++DO_MIPS64R6__RD__RS_RT(MUH, muh)
++DO_MIPS64R6__RD__RS_RT(MULU, mulu)
++DO_MIPS64R6__RD__RS_RT(MUHU, muhu)
++DO_MIPS64R6__RD__RS_RT(DMUL, dmul)
++DO_MIPS64R6__RD__RS_RT(DMUH, dmuh)
++DO_MIPS64R6__RD__RS_RT(DMULU, dmulu)
++DO_MIPS64R6__RD__RS_RT(DMUHU, dmuhu)
++
++
++#endif
 -- 
 2.7.4
