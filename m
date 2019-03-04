@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58490)
+Received: from eggs.gnu.org ([209.51.188.92]:58491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h0gNq-0005B8-BZ
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 00:43:27 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h0gNq-0005B9-Bu
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 00:43:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h0gNm-0005fN-LA
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 00:43:24 -0500
-Date: Mon, 4 Mar 2019 16:39:38 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1h0gNm-0005fY-Ll
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 00:43:26 -0500
+Date: Mon, 4 Mar 2019 16:36:47 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190304053938.GK7792@umbus.fritz.box>
-References: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
-	<20190303172343.13406-3-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20190304053647.GI7792@umbus.fritz.box>
+References: <20190228225759.21328-1-farosas@linux.ibm.com>
+	<20190228225759.21328-2-farosas@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rnP2AJ7yb1j09OW/"
+	protocol="application/pgp-signature"; boundary="h22Fi9ANawrtbNPX"
 Content-Disposition: inline
-In-Reply-To: <20190303172343.13406-3-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 2/8] target/ppc: introduce single
- vsrl_offset() function
+In-Reply-To: <20190228225759.21328-2-farosas@linux.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 1/5] target/ppc: Move exception
+ vector offset computation into a function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
---rnP2AJ7yb1j09OW/
+--h22Fi9ANawrtbNPX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 03, 2019 at 05:23:37PM +0000, Mark Cave-Ayland wrote:
-> Instead of having multiple copies of the offset calculation logic, move i=
-t to a
-> single vsrl_offset() function.
->=20
-> This commit also renames the existing get_vsr()/set_vsr() functions to
-> get_vsrl()/set_vsrl() which better describes their purpose.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+On Thu, Feb 28, 2019 at 07:57:55PM -0300, Fabiano Rosas wrote:
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Applied to ppc-for-4.0, thanks.
+This is a nice cleanup, regardless of the rest of the series.  Applied
+to ppc-for-4.0.
 
 > ---
->  target/ppc/cpu.h                    |  7 ++++++-
->  target/ppc/translate/vsx-impl.inc.c | 12 ++++++------
->  2 files changed, 12 insertions(+), 7 deletions(-)
+>  target/ppc/excp_helper.c | 30 +++++++++++++++++++-----------
+>  1 file changed, 19 insertions(+), 11 deletions(-)
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 4bb4e42670..4a7df13c2d 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -2573,9 +2573,14 @@ static inline uint64_t *cpu_fpr_ptr(CPUPPCState *e=
-nv, int i)
->      return (uint64_t *)((uintptr_t)env + fpr_offset(i));
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 39bedbb11d..beafcf1ebd 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -107,6 +107,24 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPC=
+State *env, int excp,
+>      return POWERPC_EXCP_RESET;
 >  }
 > =20
-> +static inline int vsrl_offset(int i)
+> +static uint64_t ppc_excp_vector_offset(CPUState *cs, int ail)
 > +{
-> +    return offsetof(CPUPPCState, vsr[i].u64[1]);
-> +}
+> +    uint64_t offset =3D 0;
 > +
->  static inline uint64_t *cpu_vsrl_ptr(CPUPPCState *env, int i)
->  {
-> -    return &env->vsr[i].u64[1];
-> +    return (uint64_t *)((uintptr_t)env + vsrl_offset(i));
->  }
+> +    switch (ail) {
+> +    case AIL_0001_8000:
+> +        offset =3D 0x18000;
+> +        break;
+> +    case AIL_C000_0000_0000_4000:
+> +        offset =3D 0xc000000000004000ull;
+> +        break;
+> +    default:
+> +        cpu_abort(cs, "Invalid AIL combination %d\n", ail);
+> +        break;
+> +    }
+> +
+> +    return offset;
+> +}
 > =20
->  static inline ppc_avr_t *cpu_avr_ptr(CPUPPCState *env, int i)
-> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
-sx-impl.inc.c
-> index e73197e717..381ae0f2e9 100644
-> --- a/target/ppc/translate/vsx-impl.inc.c
-> +++ b/target/ppc/translate/vsx-impl.inc.c
-> @@ -1,13 +1,13 @@
->  /***                           VSX extension                            =
-   ***/
-> =20
-> -static inline void get_vsr(TCGv_i64 dst, int n)
-> +static inline void get_vsrl(TCGv_i64 dst, int n)
->  {
-> -    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
-> +    tcg_gen_ld_i64(dst, cpu_env, vsrl_offset(n));
->  }
-> =20
-> -static inline void set_vsr(int n, TCGv_i64 src)
-> +static inline void set_vsrl(int n, TCGv_i64 src)
->  {
-> -    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
-> +    tcg_gen_st_i64(src, cpu_env, vsrl_offset(n));
->  }
-> =20
->  static inline int vsr_full_offset(int n)
-> @@ -27,7 +27,7 @@ static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
->  static inline void get_cpu_vsrl(TCGv_i64 dst, int n)
->  {
->      if (n < 32) {
-> -        get_vsr(dst, n);
-> +        get_vsrl(dst, n);
->      } else {
->          get_avr64(dst, n - 32, false);
+>  /* Note that this function should be greatly optimized
+>   * when called with a constant excp, from ppc_hw_interrupt
+> @@ -708,17 +726,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
+ excp_model, int excp)
+>      /* Handle AIL */
+>      if (ail) {
+>          new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
+> -        switch(ail) {
+> -        case AIL_0001_8000:
+> -            vector |=3D 0x18000;
+> -            break;
+> -        case AIL_C000_0000_0000_4000:
+> -            vector |=3D 0xc000000000004000ull;
+> -            break;
+> -        default:
+> -            cpu_abort(cs, "Invalid AIL combination %d\n", ail);
+> -            break;
+> -        }
+> +        vector |=3D ppc_excp_vector_offset(cs, ail);
 >      }
-> @@ -45,7 +45,7 @@ static inline void set_cpu_vsrh(int n, TCGv_i64 src)
->  static inline void set_cpu_vsrl(int n, TCGv_i64 src)
->  {
->      if (n < 32) {
-> -        set_vsr(n, src);
-> +        set_vsrl(n, src);
->      } else {
->          set_avr64(n - 32, src, false);
->      }
+> =20
+>  #if defined(TARGET_PPC64)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -121,24 +102,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---rnP2AJ7yb1j09OW/
+--h22Fi9ANawrtbNPX
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx8uhoACgkQbDjKyiDZ
-s5J5HBAAzpXZtkt2tczUUqM5EbYoibJxxS0JyqWKhtpwpZGzzR/kqA5Fi42httIF
-DXyx6QneQePQJ9wfqgmPXyEzSa6IHS04UjDh1Clxc5Lh7LHJ+zbZoo77wHgq8AYB
-75Hm8/SNyluabZOjpM17+iGfs6+fArQDLHyxcyz2V5EX2oM7OwTdqrAHrY7MFzwS
-zRnCi5KPWT+20Ga3Zbu4c5pHD/ZWBO84y500w4CnTUI8o0xCRqcvZyhHDO38ytne
-4kuWiU5gTZKJWRQOqsOyt3wC3l/Csv6SYupypxnZuKp6tIYmvk0LHtyIFHHX9cWZ
-SKT2p4pakXwLGK28dhjGIGcPh931fHsc69GT0PQX0f9E7mKS2G64jfbhZazfKhLY
-lPnc8tgdN6rTjrhN7Kx9C/BNTNN6Xfs1WbloonH7QJh/7qzF6yQy72j6Rem756ap
-vcJQBfrcqzlb7uhoF3c+TKfjJxs3qSEkWSKNRmC9Xmz7UQln7qaC0tBY0uYTS10I
-HG9uTuFCqTZiOYq3MinCoFP2OvZ2cgGSSawXwy4Y/AYY1dpP+vwcYqiy+X+lsKHR
-mm4w+WK4i18sHJilcWE0pSh5l412GtsdKa6Uc2/X75ge+vsbtvh2DrEfO8Y15r62
-sQngGWuk9YKE1hCLaVsdiCZz+Q8BdP+7d3lOU9s0bIahUE8pwk8=
-=d/zD
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx8uWwACgkQbDjKyiDZ
+s5JaWg/9Hvpi11qPxVEmZNjnwSL7isSKHLUzv82Lla+gWC0cUubLxVvFZzdDRa1N
+PxKeeB5jH57PubHDZnkKHQ6IK7j7TX36MS89Y2bZI6/xfo9eWiw03ziSS+90MDUm
+SECT3dkynJ3+LX3JPdoXPmjZmsmHLrcHhEG+dgvusN6EfLFuSzHclgn/6SLQDc73
+Y+mX0nsfk6z4rBjzaM943ffFJgHGD+QdUlHElPl0heOFI8PBO6ees4LQ3kCUvCxn
+GF2NaCp5rGWvrr3vSm9TlSDW5tC5vnBJqpzKJ7c937N4huYPXiKAWigk8EQAc1jW
+beCdsXnU+/YYsHxeQxzmMwAsZvWfqkTx1FU67vgxsba4SqSrM5lz+27q+llEKo0W
++c5C/1G7KorHN1xhloYGewf7ozHt1a8oRRSQM1I6u2KD59v85ZkwZKhtuDegPzRi
+0odGDQDjmkntH2Ww+/kI+Zo65l+yH1F+LTQEET9cjKI3fkXigi6Lt33sSuXbn4K6
+m66fHJl38xFRB70qk+xM2bviL6ljCm3urEPW97j/NkxmFnwEJ3FiWLhEGFxSTsmM
+bffz0TfxEDFv6Eyxy1Yk840Wt/GQSklj082pNhCzumd5BJKCIWCbpf1Nm29bvVqp
+n5odH9Iy6G0JM+orWYdzc7QnCJA4lWBVvsZagWrNgqdxF8FHsus=
+=ABJL
 -----END PGP SIGNATURE-----
 
---rnP2AJ7yb1j09OW/--
+--h22Fi9ANawrtbNPX--
