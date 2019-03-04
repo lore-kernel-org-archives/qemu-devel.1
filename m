@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44870)
+Received: from eggs.gnu.org ([209.51.188.92]:44905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBC-0000Sv-Ny
+	(envelope-from <cota@braap.org>) id 1h0sBC-0000T3-O9
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBA-00024Q-1n
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:08 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:32989)
+	(envelope-from <cota@braap.org>) id 1h0sBA-00027B-Sg
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:09 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:58241)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sB7-0001Hw-VL
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:07 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBA-0001Hq-JA
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:08 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:51 -0500
-Message-Id: <20190304181813.8075-52-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:47 -0500
+Message-Id: <20190304181813.8075-48-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 51/73] nios: convert to cpu_interrupt_request
+Subject: [Qemu-devel] [PATCH v7 47/73] hppa: convert to cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +27,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Cc: Chris Wulff <crwulff@gmail.com>
-Cc: Marek Vasut <marex@denx.de>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/nios2/cpu.c | 2 +-
+ target/hppa/cpu.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
-index fbfaa2ce26..49a75414d3 100644
---- a/target/nios2/cpu.c
-+++ b/target/nios2/cpu.c
-@@ -36,7 +36,7 @@ static void nios2_cpu_set_pc(CPUState *cs, vaddr value)
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index 00bf444620..1ab4e62850 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -60,7 +60,7 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
  
- static bool nios2_cpu_has_work(CPUState *cs)
+ static bool hppa_cpu_has_work(CPUState *cs)
  {
--    return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI);
-+    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI);
+-    return cs->interrupt_request & CPU_INTERRUPT_HARD;
++    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
  }
  
- /* CPUClass::reset() */
+ static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
 -- 
 2.17.1
