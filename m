@@ -1,38 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35461)
+Received: from eggs.gnu.org ([209.51.188.92]:35703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1h0rV9-0004Qa-NH
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:35:47 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1h0rWJ-00057e-5h
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1h0rV8-0005XL-Pg
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:35:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33022)
+	(envelope-from <amarkovic@wavecomp.com>) id 1h0rWH-0007BQ-Q0
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:36:55 -0500
+Received: from mail-eopbgr680093.outbound.protection.outlook.com
+	([40.107.68.93]:16692
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1h0rV8-0005U8-Cc
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:35:42 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x24HUFHk058091
-	for <qemu-devel@nongnu.org>; Mon, 4 Mar 2019 12:35:39 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2r16vvmycu-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 12:35:38 -0500
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Mon, 4 Mar 2019 17:35:37 -0000
-References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Mon, 4 Mar 2019 12:35:32 -0500
-MIME-Version: 1.0
-In-Reply-To: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1h0rWH-0007AU-Iq
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 12:36:53 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 4 Mar 2019 17:36:51 +0000
+Message-ID: <BN6PR2201MB12511044BA7BCD1A16D0EA7EC6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>,
+	<1551712405-2530-5-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1551712405-2530-5-git-send-email-mateja.marjanovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <3b9ea255-6a77-9309-56d4-6d7fe5a2044c@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 04/13] target/mips: Add emulation of MMI
+ instruction PEXCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,88 +32,325 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pasic@linux.ibm.com, imammedo@redhat.com, pmorel@linux.ibm.com
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On 12/17/18 10:57 AM, Tony Krowiak wrote:
 
-Ping!! I'm wondering who might be responsible for merging this fix?
-
-> The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
-> value of the BusState structure with the max_dev value of the BusClass structure
-> to determine whether the maximum number of children has been reached for the
-> bus. The problem is, the max_index field of the BusState structure does not
-> necessarily reflect the number of devices that have been plugged into
-> the bus.
-> 
-> Whenever a child device is plugged into the bus, the bus's max_index value is
-> assigned to the child device and then incremented. If the child is subsequently
-> unplugged, the value of the max_index does not change and no longer reflects the
-> number of children.
-> 
-> When the bus's max_index value reaches the maximum number of devices
-> allowed for the bus (i.e., the max_dev field in the BusClass structure),
-> attempts to plug another device will be rejected claiming that the bus is
-> full -- even if the bus is actually empty.
-> 
-> To resolve the problem, a new 'num_children' field is being added to the
-> BusState structure to keep track of the number of children plugged into the
-> bus. It will be incremented when a child is plugged, and decremented when a
-> child is unplugged.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> Subject: [PATCH v3 04/13] target/mips: Add emulation of MMI instruction P=
+EXCH
+>
+> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+>
+> Add emulation of MMI instruction PEXCH. The emulation is implemented
+> using TCG front end operations directly to achieve better performance.
+>
+> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 > ---
->   hw/core/qdev.c         | 3 +++
->   include/hw/qdev-core.h | 1 +
->   qdev-monitor.c         | 2 +-
->   3 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 6b3cc55b27c2..956923f33520 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
->               snprintf(name, sizeof(name), "child[%d]", kid->index);
->               QTAILQ_REMOVE(&bus->children, kid, sibling);
->   
-> +            bus->num_children--;
+>  target/mips/translate.c | 97 +++++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  1 file changed, 96 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 4763e06..9472477 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -24488,6 +24488,99 @@ static void gen_mmi_pcpyud(DisasContext *ctx)
+>      }
+>  }
+>
+> +/*
+> + *  PEXCH rd, rt
+> + *
+> + *  Parallel Exchange Center Halfword
+
+The text in the last line should be indented for consistency with previuos\
+patches:
+
+ *    Parallel Exchange Center Halfword
+
+> + *
+> + *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+> + *  +-----------+---------+---------+---------+---------+-----------+
+> + *  |    MMI    |0 0 0 0 0|   rt    |   rd    |  PEXCH  |    MMI3   |
+> + *  +-----------+---------+---------+---------+---------+-----------+
+> + */
+> +static void gen_mmi_pexch(DisasContext *ctx)
+> +{
+> +    uint32_t pd, rt, rd;
+> +    uint32_t opcode;
 > +
->               /* This gives back ownership of kid->child back to us.  */
->               object_property_del(OBJECT(bus), name, NULL);
->               object_unref(OBJECT(kid->child));
-> @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
->       char name[32];
->       BusChild *kid = g_malloc0(sizeof(*kid));
->   
-> +    bus->num_children++;
->       kid->index = bus->max_index++;
->       kid->child = child;
->       object_ref(OBJECT(kid->child));
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index a24d0dd566e3..521f0a947ead 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -206,6 +206,7 @@ struct BusState {
->       HotplugHandler *hotplug_handler;
->       int max_index;
->       bool realized;
-> +    int num_children;
->       QTAILQ_HEAD(ChildrenHead, BusChild) children;
->       QLIST_ENTRY(BusState) sibling;
->   };
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index 07147c63bf8b..45a8ba49644c 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
->   static inline bool qbus_is_full(BusState *bus)
->   {
->       BusClass *bus_class = BUS_GET_CLASS(bus);
-> -    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
-> +    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
->   }
->   
->   /*
-> 
+> +    opcode =3D ctx->opcode;
+> +
+> +    pd =3D extract32(opcode, 21, 5);
+> +    rt =3D extract32(opcode, 16, 5);
+> +    rd =3D extract32(opcode, 11, 5);
+> +
+> +    if (unlikely(pd !=3D 0)) {
+> +        generate_exception_end(ctx, EXCP_RI);
+> +    } else if (rd =3D=3D 0) {
+> +        /* nop */
+> +    } else if (rt =3D=3D 0) {
+> +        tcg_gen_movi_i64(cpu_gpr[rd], 0);
+> +        tcg_gen_movi_i64(cpu_mmr[rd], 0);
+> +    } else if (rd =3D=3D rt) {
+> +        TCGv_i64 t0 =3D tcg_temp_new();
+> +        TCGv_i64 t1 =3D tcg_temp_new();
+> +        uint64_t mask0 =3D (1ULL << 16) - 1;
+> +        uint64_t mask1 =3D mask0 << 16;
+> +        uint64_t mask2 =3D mask1 << 16;
+
+The last line is clearer this way, IMHO:
+
+        uint64_t mask2 =3D mask0 << 32;
+
+> +        uint64_t mask3 =3D (mask2 << 16) | mask0;
+
+...and this line this way:
+
+        uint64_t mask3 =3D (mask0 << 48) | mask0;
+
+> +
+> +        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask1);
+> +        tcg_gen_shli_i64(t0, t0, 16);
+> +        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask2);
+> +        tcg_gen_shri_i64(t1, t1, 16);
+> +
+> +        tcg_gen_andi_i64(cpu_gpr[rd], cpu_gpr[rd], mask3);
+> +        tcg_gen_or_i64(cpu_gpr[rd], cpu_gpr[rd], t0);
+> +        tcg_gen_or_i64(cpu_gpr[rd], cpu_gpr[rd], t1);
+> +
+> +        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask1);
+> +        tcg_gen_shli_i64(t0, t0, 16);
+> +        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask2);
+> +        tcg_gen_shri_i64(t1, t1, 16);
+> +
+> +        tcg_gen_andi_i64(cpu_mmr[rd], cpu_mmr[rd], mask3);
+> +        tcg_gen_or_i64(cpu_mmr[rd], cpu_mmr[rd], t0);
+> +        tcg_gen_or_i64(cpu_mmr[rd], cpu_mmr[rd], t1);
+> +
+> +        tcg_temp_free(t0);
+> +        tcg_temp_free(t1);
+> +    } else {
+> +        TCGv_i64 t0 =3D tcg_temp_new();
+> +        TCGv_i64 t1 =3D tcg_temp_new();
+> +        uint64_t mask0 =3D (1ULL << 16) - 1;
+> +        uint64_t mask1 =3D mask0 << 16;
+> +        uint64_t mask2 =3D mask1 << 16;
+> +        uint64_t mask3 =3D mask2 << 16;
+
+The last two lines are clearer this way:
+
+        uint64_t mask2 =3D mask0 << 32;
+        uint64_t mask3 =3D mask0 << 48;
+
+> +
+> +        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask3);
+> +        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask2);
+> +        tcg_gen_shri_i64(t1, t1, 16);
+> +        tcg_gen_or_i64(t0, t0, t1);
+> +        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask1);
+> +        tcg_gen_shli_i64(t1, t1, 16);
+> +        tcg_gen_or_i64(t0, t0, t1);
+> +        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask0);
+> +        tcg_gen_or_i64(t0, t0, t1);
+> +
+> +        tcg_gen_mov_i64(cpu_gpr[rd], t0);
+> +
+> +        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask3);
+> +        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask2);
+> +        tcg_gen_shri_i64(t1, t1, 16);
+> +        tcg_gen_or_i64(t0, t0, t1);
+> +        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask1);
+> +        tcg_gen_shli_i64(t1, t1, 16);
+> +        tcg_gen_or_i64(t0, t0, t1);
+> +        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask0);
+> +        tcg_gen_or_i64(t0, t0, t1);
+> +
+> +        tcg_gen_mov_i64(cpu_mmr[rd], t0);
+> +
+> +        tcg_temp_free(t0);
+> +        tcg_temp_free(t1);
+> +    }
+> +}
+> +
+>  #endif
+>
+>
+> @@ -27540,7 +27633,6 @@ static void decode_mmi3(CPUMIPSState *env, DisasC=
+ontext *ctx)
+>      case MMI_OPC_3_PDIVUW:     /* TODO: MMI_OPC_3_PDIVUW */
+>      case MMI_OPC_3_POR:        /* TODO: MMI_OPC_3_POR */
+>      case MMI_OPC_3_PNOR:       /* TODO: MMI_OPC_3_PNOR */
+> -    case MMI_OPC_3_PEXCH:      /* TODO: MMI_OPC_3_PEXCH */
+>      case MMI_OPC_3_PEXCW:      /* TODO: MMI_OPC_3_PEXCW */
+>          generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
+3 */
+>          break;
+> @@ -27550,6 +27642,9 @@ static void decode_mmi3(CPUMIPSState *env, DisasC=
+ontext *ctx)
+>      case MMI_OPC_3_PCPYUD:
+>          gen_mmi_pcpyud(ctx);
+>          break;
+> +    case MMI_OPC_3_PEXCH:
+> +        gen_mmi_pexch(ctx);
+> +        break;
+>      default:
+>          MIPS_INVAL("TX79 MMI class MMI3");
+>          generate_exception_end(ctx, EXCP_RI);
+> --
+
+Apart from minor hints above:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+> 2.7.4
+>
+>
+
+________________________________________
+From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Sent: Monday, March 4, 2019 4:13:16 PM
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo
+Subject: [PATCH v3 04/13] target/mips: Add emulation of MMI instruction PEX=
+CH
+
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+
+Add emulation of MMI instruction PEXCH. The emulation is implemented
+using TCG front end operations directly to achieve better performance.
+
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+---
+ target/mips/translate.c | 97 +++++++++++++++++++++++++++++++++++++++++++++=
++++-
+ 1 file changed, 96 insertions(+), 1 deletion(-)
+
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 4763e06..9472477 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -24488,6 +24488,99 @@ static void gen_mmi_pcpyud(DisasContext *ctx)
+     }
+ }
+
++/*
++ *  PEXCH rd, rt
++ *
++ *  Parallel Exchange Center Halfword
++ *
++ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
++ *  +-----------+---------+---------+---------+---------+-----------+
++ *  |    MMI    |0 0 0 0 0|   rt    |   rd    |  PEXCH  |    MMI3   |
++ *  +-----------+---------+---------+---------+---------+-----------+
++ */
++static void gen_mmi_pexch(DisasContext *ctx)
++{
++    uint32_t pd, rt, rd;
++    uint32_t opcode;
++
++    opcode =3D ctx->opcode;
++
++    pd =3D extract32(opcode, 21, 5);
++    rt =3D extract32(opcode, 16, 5);
++    rd =3D extract32(opcode, 11, 5);
++
++    if (unlikely(pd !=3D 0)) {
++        generate_exception_end(ctx, EXCP_RI);
++    } else if (rd =3D=3D 0) {
++        /* nop */
++    } else if (rt =3D=3D 0) {
++        tcg_gen_movi_i64(cpu_gpr[rd], 0);
++        tcg_gen_movi_i64(cpu_mmr[rd], 0);
++    } else if (rd =3D=3D rt) {
++        TCGv_i64 t0 =3D tcg_temp_new();
++        TCGv_i64 t1 =3D tcg_temp_new();
++        uint64_t mask0 =3D (1ULL << 16) - 1;
++        uint64_t mask1 =3D mask0 << 16;
++        uint64_t mask2 =3D mask1 << 16;
++        uint64_t mask3 =3D (mask2 << 16) | mask0;
++
++        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask1);
++        tcg_gen_shli_i64(t0, t0, 16);
++        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask2);
++        tcg_gen_shri_i64(t1, t1, 16);
++
++        tcg_gen_andi_i64(cpu_gpr[rd], cpu_gpr[rd], mask3);
++        tcg_gen_or_i64(cpu_gpr[rd], cpu_gpr[rd], t0);
++        tcg_gen_or_i64(cpu_gpr[rd], cpu_gpr[rd], t1);
++
++        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask1);
++        tcg_gen_shli_i64(t0, t0, 16);
++        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask2);
++        tcg_gen_shri_i64(t1, t1, 16);
++
++        tcg_gen_andi_i64(cpu_mmr[rd], cpu_mmr[rd], mask3);
++        tcg_gen_or_i64(cpu_mmr[rd], cpu_mmr[rd], t0);
++        tcg_gen_or_i64(cpu_mmr[rd], cpu_mmr[rd], t1);
++
++        tcg_temp_free(t0);
++        tcg_temp_free(t1);
++    } else {
++        TCGv_i64 t0 =3D tcg_temp_new();
++        TCGv_i64 t1 =3D tcg_temp_new();
++        uint64_t mask0 =3D (1ULL << 16) - 1;
++        uint64_t mask1 =3D mask0 << 16;
++        uint64_t mask2 =3D mask1 << 16;
++        uint64_t mask3 =3D mask2 << 16;
++
++        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask3);
++        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask2);
++        tcg_gen_shri_i64(t1, t1, 16);
++        tcg_gen_or_i64(t0, t0, t1);
++        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask1);
++        tcg_gen_shli_i64(t1, t1, 16);
++        tcg_gen_or_i64(t0, t0, t1);
++        tcg_gen_andi_i64(t1, cpu_gpr[rt], mask0);
++        tcg_gen_or_i64(t0, t0, t1);
++
++        tcg_gen_mov_i64(cpu_gpr[rd], t0);
++
++        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask3);
++        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask2);
++        tcg_gen_shri_i64(t1, t1, 16);
++        tcg_gen_or_i64(t0, t0, t1);
++        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask1);
++        tcg_gen_shli_i64(t1, t1, 16);
++        tcg_gen_or_i64(t0, t0, t1);
++        tcg_gen_andi_i64(t1, cpu_mmr[rt], mask0);
++        tcg_gen_or_i64(t0, t0, t1);
++
++        tcg_gen_mov_i64(cpu_mmr[rd], t0);
++
++        tcg_temp_free(t0);
++        tcg_temp_free(t1);
++    }
++}
++
+ #endif
+
+
+@@ -27540,7 +27633,6 @@ static void decode_mmi3(CPUMIPSState *env, DisasCon=
+text *ctx)
+     case MMI_OPC_3_PDIVUW:     /* TODO: MMI_OPC_3_PDIVUW */
+     case MMI_OPC_3_POR:        /* TODO: MMI_OPC_3_POR */
+     case MMI_OPC_3_PNOR:       /* TODO: MMI_OPC_3_PNOR */
+-    case MMI_OPC_3_PEXCH:      /* TODO: MMI_OPC_3_PEXCH */
+     case MMI_OPC_3_PEXCW:      /* TODO: MMI_OPC_3_PEXCW */
+         generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI3 =
+*/
+         break;
+@@ -27550,6 +27642,9 @@ static void decode_mmi3(CPUMIPSState *env, DisasCon=
+text *ctx)
+     case MMI_OPC_3_PCPYUD:
+         gen_mmi_pcpyud(ctx);
+         break;
++    case MMI_OPC_3_PEXCH:
++        gen_mmi_pexch(ctx);
++        break;
+     default:
+         MIPS_INVAL("TX79 MMI class MMI3");
+         generate_exception_end(ctx, EXCP_RI);
+--
+2.7.4
