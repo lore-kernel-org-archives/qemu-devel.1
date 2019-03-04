@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44941)
+Received: from eggs.gnu.org ([209.51.188.92]:44958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBC-0000T7-O3
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:12 -0500
+	(envelope-from <cota@braap.org>) id 1h0sBC-0000TF-OC
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sBA-00025U-FC
+	(envelope-from <cota@braap.org>) id 1h0sBA-000275-T8
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:10 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:55515)
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:34333)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sB9-0001M0-WF
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sBA-0001Gp-Gw
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:19:08 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:18:00 -0500
-Message-Id: <20190304181813.8075-61-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:41 -0500
+Message-Id: <20190304181813.8075-42-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 60/73] cpu: convert to interrupt_request
+Subject: [Qemu-devel] [PATCH v7 41/73] i386/hax-all: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +30,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This finishes the conversion to interrupt_request.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- qom/cpu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/i386/hax-all.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 00add81a7f..f2695be9b2 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -275,7 +275,7 @@ static void cpu_common_reset(CPUState *cpu)
-         log_cpu_state(cpu, cc->reset_dump_flags);
-     }
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index 518c6ff103..18da1808c6 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -284,7 +284,7 @@ int hax_vm_destroy(struct hax_vm *vm)
  
--    cpu->interrupt_request = 0;
-+    cpu_interrupt_request_set(cpu, 0);
-     cpu_halted_set(cpu, 0);
-     cpu->mem_io_pc = 0;
-     cpu->mem_io_vaddr = 0;
-@@ -412,7 +412,7 @@ static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
- 
- static void generic_handle_interrupt(CPUState *cpu, int mask)
+ static void hax_handle_interrupt(CPUState *cpu, int mask)
  {
 -    cpu->interrupt_request |= mask;
 +    cpu_interrupt_request_or(cpu, mask);
  
      if (!qemu_cpu_is_self(cpu)) {
          qemu_cpu_kick(cpu);
+@@ -418,7 +418,7 @@ static int hax_vcpu_interrupt(CPUArchState *env)
+      * Unlike KVM, HAX kernel check for the eflags, instead of qemu
+      */
+     if (ht->ready_for_interrupt_injection &&
+-        (cpu->interrupt_request & CPU_INTERRUPT_HARD)) {
++        (cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD)) {
+         int irq;
+ 
+         irq = cpu_get_pic_interrupt(env);
+@@ -432,7 +432,7 @@ static int hax_vcpu_interrupt(CPUArchState *env)
+      * interrupt, request an interrupt window exit.  This will
+      * cause a return to userspace as soon as the guest is ready to
+      * receive interrupts. */
+-    if ((cpu->interrupt_request & CPU_INTERRUPT_HARD)) {
++    if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD)) {
+         ht->request_interrupt_window = 1;
+     } else {
+         ht->request_interrupt_window = 0;
+@@ -473,19 +473,19 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
+ 
+     cpu_halted_set(cpu, 0);
+ 
+-    if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
++    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_POLL) {
+         cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
+         apic_poll_irq(x86_cpu->apic_state);
+     }
+ 
+-    if (cpu->interrupt_request & CPU_INTERRUPT_INIT) {
++    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_INIT) {
+         DPRINTF("\nhax_vcpu_hax_exec: handling INIT for %d\n",
+                 cpu->cpu_index);
+         do_cpu_init(x86_cpu);
+         hax_vcpu_sync_state(env, 1);
+     }
+ 
+-    if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
++    if (cpu_interrupt_request(cpu) & CPU_INTERRUPT_SIPI) {
+         DPRINTF("hax_vcpu_hax_exec: handling SIPI for %d\n",
+                 cpu->cpu_index);
+         hax_vcpu_sync_state(env, 0);
+@@ -544,13 +544,17 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
+             ret = -1;
+             break;
+         case HAX_EXIT_HLT:
+-            if (!(cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
+-                !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
+-                /* hlt instruction with interrupt disabled is shutdown */
+-                env->eflags |= IF_MASK;
+-                cpu_halted_set(cpu, 1);
+-                cpu->exception_index = EXCP_HLT;
+-                ret = 1;
++            {
++                uint32_t interrupt_request = cpu_interrupt_request(cpu);
++
++                if (!(interrupt_request & CPU_INTERRUPT_HARD) &&
++                    !(interrupt_request & CPU_INTERRUPT_NMI)) {
++                    /* hlt instruction with interrupt disabled is shutdown */
++                    env->eflags |= IF_MASK;
++                    cpu_halted_set(cpu, 1);
++                    cpu->exception_index = EXCP_HLT;
++                    ret = 1;
++                }
+             }
+             break;
+         /* these situations will continue to hax module */
 -- 
 2.17.1
