@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46480)
+Received: from eggs.gnu.org ([209.51.188.92]:46551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mJB-0000FD-65
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:03 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mJO-0000QX-HV
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h0mJ8-0000gU-Rs
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:02:59 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0mJN-0001AZ-Ie
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:03:14 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  4 Mar 2019 13:01:54 +0100
-Message-Id: <20190304120210.31500-12-cohuck@redhat.com>
+Date: Mon,  4 Mar 2019 13:01:56 +0100
+Message-Id: <20190304120210.31500-14-cohuck@redhat.com>
 In-Reply-To: <20190304120210.31500-1-cohuck@redhat.com>
 References: <20190304120210.31500-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 11/27] s390x/tcg: Implement LOAD LENGTHENED
- short HFP to long HFP
+Subject: [Qemu-devel] [PULL 13/27] s390x/tcg: Fix TEST DATA CLASS
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +25,135 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redha
 
 From: David Hildenbrand <david@redhat.com>
 
-Nice trick to load a 32 bit value into vector element 0 (32 bit element
-size) from memory, zeroing out element1. The short HFP to long HFP
-conversion really only is a shift.
+Let's detect normal and denormal ("subnormal") numbers reliably. Also
+test for quiet NaN's. As only one class is possible, test common cases
+first.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+While at it, use a better check to test for the mask bits in the data
+class mask. The data class mask has 12 bits, whereby bit 0 is the
+leftmost bit and bit 11 the rightmost bit. In the PoP an easy to read
+table with the numbers is provided for the VECTOR FP TEST DATA CLASS
+IMMEDIATE instruction, the table for TEST DATA CLASS is more confusing
+as it is based on 64 bit values.
+
+Factor the checks out into separate functions, as they will also be
+needed for floating point vector instructions. We can use a makro to
+generate the functions.
+
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190225200318.16102-7-david@redhat.com>
+Message-Id: <20190218122710.23639-2-david@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/insn-data.def | 2 ++
- target/s390x/translate.c   | 6 ++++++
- 2 files changed, 8 insertions(+)
+ target/s390x/fpu_helper.c | 85 ++++++++++++++++-----------------------
+ 1 file changed, 35 insertions(+), 50 deletions(-)
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 61582372abb7..fb6ee1865057 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -598,6 +598,8 @@
-     F(0xed04, LDEB,    RXE,   Z,   0, m2_32u, new, f1, ldeb, 0, IF_BFP)
-     F(0xed05, LXDB,    RXE,   Z,   0, m2_64, new_P, x1, lxdb, 0, IF_BFP)
-     F(0xed06, LXEB,    RXE,   Z,   0, m2_32u, new_P, x1, lxeb, 0, IF_BFP)
-+    F(0xb324, LDER,    RXE,   Z,   0, e2, new, f1, lde, 0, IF_AFP1)
-+    F(0xed24, LDE,     RXE,   Z,   0, m2_32u, new, f1, lde, 0, IF_AFP1)
- /* LOAD ROUNDED */
-     F(0xb344, LEDBR,   RRE,   Z,   0, f2, new, e1, ledb, 0, IF_BFP)
-     F(0xb345, LDXBR,   RRE,   Z,   x2h, x2l, new, f1, ldxb, 0, IF_BFP)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index f7de77192c7e..59e71128d2bf 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2725,6 +2725,12 @@ static DisasJumpType op_lxeb(DisasContext *s, DisasOps *o)
-     return DISAS_NEXT;
+diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
+index e921172bc424..0e9247bf7ef4 100644
+--- a/target/s390x/fpu_helper.c
++++ b/target/s390x/fpu_helper.c
+@@ -645,67 +645,52 @@ uint64_t HELPER(msdb)(CPUS390XState *env, uint64_t f1,
+     return ret;
  }
  
-+static DisasJumpType op_lde(DisasContext *s, DisasOps *o)
++/* The rightmost bit has the number 11. */
++static inline uint16_t dcmask(int bit, bool neg)
 +{
-+    tcg_gen_shli_i64(o->out, o->in2, 32);
-+    return DISAS_NEXT;
++    return 1 << (11 - bit - neg);
 +}
 +
- static DisasJumpType op_llgt(DisasContext *s, DisasOps *o)
++#define DEF_FLOAT_DCMASK(_TYPE) \
++static uint16_t _TYPE##_dcmask(CPUS390XState *env, _TYPE f1)       \
++{                                                                  \
++    const bool neg = _TYPE##_is_neg(f1);                           \
++                                                                   \
++    /* Sorted by most common cases - only one class is possible */ \
++    if (_TYPE##_is_normal(f1)) {                                   \
++        return dcmask(2, neg);                                     \
++    } else if (_TYPE##_is_zero(f1)) {                              \
++        return dcmask(0, neg);                                     \
++    } else if (_TYPE##_is_denormal(f1)) {                          \
++        return dcmask(4, neg);                                     \
++    } else if (_TYPE##_is_infinity(f1)) {                          \
++        return dcmask(6, neg);                                     \
++    } else if (_TYPE##_is_quiet_nan(f1, &env->fpu_status)) {       \
++        return dcmask(8, neg);                                     \
++    }                                                              \
++    /* signaling nan, as last remaining case */                    \
++    return dcmask(10, neg);                                        \
++}
++DEF_FLOAT_DCMASK(float32)
++DEF_FLOAT_DCMASK(float64)
++DEF_FLOAT_DCMASK(float128)
++
+ /* test data class 32-bit */
+ uint32_t HELPER(tceb)(CPUS390XState *env, uint64_t f1, uint64_t m2)
  {
-     tcg_gen_andi_i64(o->out, o->in2, 0x7fffffff);
+-    float32 v1 = f1;
+-    int neg = float32_is_neg(v1);
+-    uint32_t cc = 0;
+-
+-    if ((float32_is_zero(v1) && (m2 & (1 << (11-neg)))) ||
+-        (float32_is_infinity(v1) && (m2 & (1 << (5-neg)))) ||
+-        (float32_is_any_nan(v1) && (m2 & (1 << (3-neg)))) ||
+-        (float32_is_signaling_nan(v1, &env->fpu_status) &&
+-         (m2 & (1 << (1-neg))))) {
+-        cc = 1;
+-    } else if (m2 & (1 << (9-neg))) {
+-        /* assume normalized number */
+-        cc = 1;
+-    }
+-    /* FIXME: denormalized? */
+-    return cc;
++    return (m2 & float32_dcmask(env, f1)) != 0;
+ }
+ 
+ /* test data class 64-bit */
+ uint32_t HELPER(tcdb)(CPUS390XState *env, uint64_t v1, uint64_t m2)
+ {
+-    int neg = float64_is_neg(v1);
+-    uint32_t cc = 0;
+-
+-    if ((float64_is_zero(v1) && (m2 & (1 << (11-neg)))) ||
+-        (float64_is_infinity(v1) && (m2 & (1 << (5-neg)))) ||
+-        (float64_is_any_nan(v1) && (m2 & (1 << (3-neg)))) ||
+-        (float64_is_signaling_nan(v1, &env->fpu_status) &&
+-         (m2 & (1 << (1-neg))))) {
+-        cc = 1;
+-    } else if (m2 & (1 << (9-neg))) {
+-        /* assume normalized number */
+-        cc = 1;
+-    }
+-    /* FIXME: denormalized? */
+-    return cc;
++    return (m2 & float64_dcmask(env, v1)) != 0;
+ }
+ 
+ /* test data class 128-bit */
+-uint32_t HELPER(tcxb)(CPUS390XState *env, uint64_t ah,
+-                      uint64_t al, uint64_t m2)
+-{
+-    float128 v1 = make_float128(ah, al);
+-    int neg = float128_is_neg(v1);
+-    uint32_t cc = 0;
+-
+-    if ((float128_is_zero(v1) && (m2 & (1 << (11-neg)))) ||
+-        (float128_is_infinity(v1) && (m2 & (1 << (5-neg)))) ||
+-        (float128_is_any_nan(v1) && (m2 & (1 << (3-neg)))) ||
+-        (float128_is_signaling_nan(v1, &env->fpu_status) &&
+-         (m2 & (1 << (1-neg))))) {
+-        cc = 1;
+-    } else if (m2 & (1 << (9-neg))) {
+-        /* assume normalized number */
+-        cc = 1;
+-    }
+-    /* FIXME: denormalized? */
+-    return cc;
++uint32_t HELPER(tcxb)(CPUS390XState *env, uint64_t ah, uint64_t al, uint64_t m2)
++{
++    return (m2 & float128_dcmask(env, make_float128(ah, al))) != 0;
+ }
+ 
+ /* square root 32-bit */
 -- 
 2.17.2
