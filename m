@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58555)
+Received: from eggs.gnu.org ([209.51.188.92]:33719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h0ivy-00029F-G6
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:26:51 -0500
+	(envelope-from <bounces@canonical.com>) id 1h0j9Z-00059x-MC
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:40:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h0ivx-00021y-Jp
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:26:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h0ivw-00020P-Gy
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:26:48 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190301154051.23317-1-armbru@redhat.com>
-	<20190301154051.23317-5-armbru@redhat.com>
-	<1432b833-99b1-90f1-7a0a-3dd1f8301c3b@redhat.com>
-Date: Mon, 04 Mar 2019 09:26:44 +0100
-In-Reply-To: <1432b833-99b1-90f1-7a0a-3dd1f8301c3b@redhat.com> (Eric Blake's
-	message of "Fri, 1 Mar 2019 10:00:44 -0600")
-Message-ID: <874l8jcaez.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1h0j9Y-0001kY-Dl
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:40:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54094)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h0j9Y-0001e5-5H
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 03:40:52 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h0j9U-0008TE-Rq
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 08:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C9DE52E80C7
+	for <qemu-devel@nongnu.org>; Mon,  4 Mar 2019 08:40:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/7] qapi: Fix code generation for
- sub-modules in other directories
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Mar 2019 08:26:49 -0000
+From: Luyou Peng <1818483@bugs.launchpad.net>
+Reply-To: Bug 1818483 <1818483@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155168800961.29550.2360664198558693792.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818483] [NEW] qemu user mode does not support
+ binfmt_misc config with flags=P
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +36,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+Public bug reported:
 
-> On 3/1/19 9:40 AM, Markus Armbruster wrote:
->> The #include directives to pull in sub-modules use file names relative
->> to the main module.  Works only when all modules are in the same
->> directory, or the main module's output directory is in the compiler's
->> include path.  Use relative file names instead.
->> 
->> The dummy variable we generate to avoid empty .o files has an invalid
->> name for sub-modules in other directories.  Fix that.
->> 
->> Both messed up in commit 252dc3105fc "qapi: Generate separate .h, .c
->> for each module".  Escaped testing because tests/qapi-schema-test.json
->> doesn't cover sub-modules in other directories, only
->> tests/qapi-schema/include-relpath.json does, and we generate and
->> compile C code only for the former, not the latter.  Fold the latter
->> into the former.  This would have caught the mistakes fixed in this
->> commit.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
->> +++ b/tests/.gitignore
->> @@ -11,9 +11,17 @@ test-*
->>  !test-*.c
->>  !docker/test-*
->>  test-qapi-commands.[ch]
->> +include/test-qapi-commands-sub-module.[ch]
->> +test-qapi-commands-sub-sub-module.[ch]
->>  test-qapi-events.[ch]
->> +include/test-qapi-events-sub-module.[ch]
->> +test-qapi-events-sub-sub-module.[ch]
->>  test-qapi-types.[ch]
->> +include/test-qapi-types-sub-module.[ch]
->> +test-qapi-types-sub-sub-module.[ch]
->>  test-qapi-visit.[ch]
->> +include/test-qapi-visit-sub-module.[ch]
->> +test-qapi-visit-sub-sub-module.[ch]
->>  test-qapi-introspect.[ch]
->>  *-test
->
-> Messes with sorting, and makes me wonder if any globs could compress it
-> further, but I can live with it (as I don't have any concrete
-> suggestions on how better to write it).
+Hi Sir:
+During our test in chroot environment with qemu-user-static, we got some te=
+st cases failed because of program output warning with unexpected full path=
+ name.
+For example in test module "Devscripts"
+the test item for broken tarball expected the warning info:
+<tar: This does not look like a tar archive
+tar: ******* >
+but the output was:
+</bin/tar: This does not look like a tar archive
+/bin/tar: ******>
+the cause is the config file of binfmt_misc was set not to send argv0, for =
+example:
+type command "tar" after chroot:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
+[sudo] password for lpeng: =
 
-I do: support only out-of-tree builds ;-P
+root@lpeng-VirtualBox:/# tar
+/bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-lab=
+el' options
+Try '/bin/tar --help' or '/bin/tar --usage' for more information.
+root@lpeng-VirtualBox:/# =
 
->> @@ -505,8 +504,18 @@ qapi-schema += unknown-expr-key.json
->>  
->>  check-qapi-schema-y := $(addprefix tests/qapi-schema/, $(qapi-schema))
->>  
->> -GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
->> -	tests/test-qapi-commands.h tests/test-qapi-events.h \
->> +GENERATED_FILES += tests/test-qapi-types.h \
->> +	tests/include/test-qapi-types-sub-module.h \
->> +	tests/test-qapi-types-sub-sub-module.h \
->> +	tests/test-qapi-visit.h \
->> +	tests/include/test-qapi-visit-sub-module.h \
->> +	tests/test-qapi-visit-sub-sub-module.h \
->> +	tests/test-qapi-commands.h \
->> +	tests/include/test-qapi-commands-sub-module.h \
->> +	tests/test-qapi-commands-sub-sub-module.h \
->> +	tests/test-qapi-events.h \
->> +	tests/include/test-qapi-events-sub-module.h \
->> +	tests/test-qapi-events-sub-sub-module.h \
->>  	tests/test-qapi-introspect.h
->
-> Worth declaring a good portion of this list in a separate variable, then
-> appending that variable to GENERATED FILES as well as...
->
->
->> @@ -609,12 +623,32 @@ tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-obj-y) \
->>  	$(test-block-obj-y)
->>  
->>  tests/test-qapi-types.c tests/test-qapi-types.h \
->> +tests/include/test-qapi-types-sub-module.c \
->> +tests/include/test-qapi-types-sub-module.h \
->> +tests/test-qapi-types-sub-sub-module.c \
->> +tests/test-qapi-types-sub-sub-module.h \
->>  tests/test-qapi-visit.c tests/test-qapi-visit.h \
->> +tests/include/test-qapi-visit-sub-module.c \
->> +tests/include/test-qapi-visit-sub-module.h \
->> +tests/test-qapi-visit-sub-sub-module.c \
->> +tests/test-qapi-visit-sub-sub-module.h \
->>  tests/test-qapi-commands.h tests/test-qapi-commands.c \
->> +tests/include/test-qapi-commands-sub-module.h \
->> +tests/include/test-qapi-commands-sub-module.c \
->> +tests/test-qapi-commands-sub-sub-module.h \
->> +tests/test-qapi-commands-sub-sub-module.c \
->>  tests/test-qapi-events.c tests/test-qapi-events.h \
->> +tests/include/test-qapi-events-sub-module.c \
->> +tests/include/test-qapi-events-sub-module.h \
->> +tests/test-qapi-events-sub-sub-module.c \
->> +tests/test-qapi-events-sub-sub-module.h \
->>  tests/test-qapi-introspect.c tests/test-qapi-introspect.h: \
->
-> ...reusing it here for less duplication?
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
 
-We compute stuff from ${QAPI_MODULES} for qapi/qapi-schema.json.
-Reduces verbosity somewhat, for a price in complexity.  Verbosity
-increases with number of modules, complexity stays flat.
-qapi/qapi-schema.json has 20 sub-modules,
-tests/qapi-schema/qapi-schema-test.json has two.  I'd prefer to stick
-with stupid for now.
+by adding output log in main()@qemu/Linux-user/main.c
+we found the original input command was changed, and qemu do not know that,=
+ we got the input args:
+argv_0----/usr/bin/qemu-mips64el-static---
+argv_1----/bin/tar---
+argv_2----NULL---
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+Next step we modified the flags=3DP in the corresponding config under folde=
+r /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
+But chroot could not start bash because in current qemu dose not consider a=
+bout this unexpected one more"argv[0]"
 
-Thanks!
+
+After modified qemu code temporary to handle the new argv list we got the i=
+nput args, and from argv[2] is the original input command
+argv_0----/usr/bin/qemu-mips64el-static---
+argv_1----/bin/tar---
+argv_2----tar---
+
+We need the original input from command line, so is it possible that let bi=
+nfmt_misc to pass one more additional args or env to qemu as a token of the=
+ binfmt_misc flag, then qemu can judge how to parse the input args by it?
+looking forward your suggestions.
+
+Thanks
+luyou
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818483
+
+Title:
+  qemu user mode does not support binfmt_misc config with flags=3DP
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi Sir:
+  During our test in chroot environment with qemu-user-static, we got some =
+test cases failed because of program output warning with unexpected full pa=
+th name.
+  For example in test module "Devscripts"
+  the test item for broken tarball expected the warning info:
+  <tar: This does not look like a tar archive
+  tar: ******* >
+  but the output was:
+  </bin/tar: This does not look like a tar archive
+  /bin/tar: ******>
+  the cause is the config file of binfmt_misc was set not to send argv0, fo=
+r example:
+  type command "tar" after chroot:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+  lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
+  [sudo] password for lpeng: =
+
+  root@lpeng-VirtualBox:/# tar
+  /bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-l=
+abel' options
+  Try '/bin/tar --help' or '/bin/tar --usage' for more information.
+  root@lpeng-VirtualBox:/# =
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+  by adding output log in main()@qemu/Linux-user/main.c
+  we found the original input command was changed, and qemu do not know tha=
+t, we got the input args:
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----NULL---
+
+  Next step we modified the flags=3DP in the corresponding config under fol=
+der /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
+  But chroot could not start bash because in current qemu dose not consider=
+ about this unexpected one more"argv[0]"
+
+  =
+
+  After modified qemu code temporary to handle the new argv list we got the=
+ input args, and from argv[2] is the original input command
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----tar---
+
+  We need the original input from command line, so is it possible that let =
+binfmt_misc to pass one more additional args or env to qemu as a token of t=
+he binfmt_misc flag, then qemu can judge how to parse the input args by it?
+  looking forward your suggestions.
+
+  Thanks
+  luyou
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818483/+subscriptions
