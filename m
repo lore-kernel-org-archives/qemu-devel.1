@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45958)
+Received: from eggs.gnu.org ([209.51.188.92]:45928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCe-00020E-BH
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:41 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCc-0004EV-VJ
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCc-0001yE-TM
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:40 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:38430)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCb-0004CD-IY
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:38 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:39621)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h0sCc-0004Cv-Hk
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:38 -0500
-Received: by mail-wr1-x435.google.com with SMTP id g12so6639441wrm.5
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:38 -0800 (PST)
+	id 1h0sCb-00049w-86
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:37 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id l5so6631183wrw.6
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:37 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Mar 2019 19:19:41 +0100
-Message-Id: <1551723614-1823-22-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Mar 2019 19:19:40 +0100
+Message-Id: <1551723614-1823-21-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
 References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 21/54] ptimer: express dependencies with Kconfig
+Subject: [Qemu-devel] [PULL 20/54] i2c: express dependencies with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,377 +32,297 @@ Cc: thuth@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190123065618.3520-39-yang.zhong@intel.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190123065618.3520-38-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/arm-softmmu.mak        | 1 -
- default-configs/cris-softmmu.mak       | 1 -
- default-configs/lm32-softmmu.mak       | 1 -
- default-configs/m68k-softmmu.mak       | 1 -
- default-configs/microblaze-softmmu.mak | 1 -
- default-configs/nios2-softmmu.mak      | 1 -
- default-configs/ppc-softmmu.mak        | 1 -
- default-configs/sh4-softmmu.mak        | 1 -
- default-configs/sh4eb-softmmu.mak      | 1 -
- default-configs/sparc-softmmu.mak      | 1 -
- default-configs/sparc64-softmmu.mak    | 1 -
- default-configs/unicore32-softmmu.mak  | 1 -
- hw/Kconfig                             | 2 ++
- hw/arm/Kconfig                         | 4 ++++
- hw/cris/Kconfig                        | 1 +
- hw/lm32/Kconfig                        | 2 ++
- hw/m68k/Kconfig                        | 2 ++
- hw/mips/Kconfig                        | 1 +
- hw/misc/Kconfig                        | 1 +
- hw/net/Kconfig                         | 2 ++
- hw/sh4/Kconfig                         | 1 +
- hw/sparc/Kconfig                       | 2 ++
- hw/timer/Kconfig                       | 6 ++++++
- hw/unicore32/Kconfig                   | 1 +
- hw/watchdog/Kconfig                    | 1 +
- 25 files changed, 26 insertions(+), 12 deletions(-)
+ default-configs/arm-softmmu.mak         | 1 -
+ default-configs/i386-softmmu.mak        | 2 --
+ default-configs/mips-softmmu-common.mak | 1 -
+ default-configs/ppc-softmmu.mak         | 1 -
+ default-configs/sh4-softmmu.mak         | 1 -
+ default-configs/sh4eb-softmmu.mak       | 1 -
+ hw/Makefile.objs                        | 2 +-
+ hw/audio/Kconfig                        | 1 +
+ hw/display/Kconfig                      | 3 +++
+ hw/gpio/Kconfig                         | 1 +
+ hw/i2c/Kconfig                          | 6 ++++++
+ hw/i386/Kconfig                         | 1 +
+ hw/input/Kconfig                        | 1 +
+ hw/isa/Kconfig                          | 1 +
+ hw/misc/Kconfig                         | 4 ++++
+ hw/nvram/Kconfig                        | 1 +
+ hw/timer/Kconfig                        | 3 +++
+ 17 files changed, 23 insertions(+), 8 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 8ced4e8..b7b0542 100644
+index 917b18d..8ced4e8 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -6,7 +6,6 @@ CONFIG_VGA=y
- CONFIG_NAND=y
- CONFIG_ECC=y
- CONFIG_SERIAL=y
--CONFIG_PTIMER=y
- CONFIG_SD=y
- CONFIG_MAX7310=y
- CONFIG_WM8750=y
-diff --git a/default-configs/cris-softmmu.mak b/default-configs/cris-softmmu.mak
-index a637c4b..b3cae59 100644
---- a/default-configs/cris-softmmu.mak
-+++ b/default-configs/cris-softmmu.mak
-@@ -2,6 +2,5 @@
- 
- CONFIG_ETRAXFS=y
- CONFIG_NAND=y
--CONFIG_PTIMER=y
- CONFIG_PFLASH_CFI02=y
- CONFIG_AXIS=y
-diff --git a/default-configs/lm32-softmmu.mak b/default-configs/lm32-softmmu.mak
-index ef0f4ba..f489838 100644
---- a/default-configs/lm32-softmmu.mak
-+++ b/default-configs/lm32-softmmu.mak
-@@ -3,7 +3,6 @@
- CONFIG_LM32=y
- CONFIG_MILKYMIST=y
+@@ -69,7 +69,6 @@ CONFIG_CADENCE=y
+ CONFIG_XGMAC=y
+ CONFIG_EXYNOS4=y
+ CONFIG_PXA2XX=y
+-CONFIG_I2C=y
+ CONFIG_BITBANG_I2C=y
  CONFIG_FRAMEBUFFER=y
--CONFIG_PTIMER=y
- CONFIG_PFLASH_CFI01=y
- CONFIG_PFLASH_CFI02=y
- CONFIG_SD=y
-diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
-index 27f5274..a12eece 100644
---- a/default-configs/m68k-softmmu.mak
-+++ b/default-configs/m68k-softmmu.mak
-@@ -1,6 +1,5 @@
- # Default configuration for m68k-softmmu
+ CONFIG_XILINX_SPIPS=y
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index ed234c1..98552e1 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -24,8 +24,6 @@ CONFIG_NVDIMM=y
+ CONFIG_ACPI_NVDIMM=y
+ CONFIG_PXB=y
+ CONFIG_ACPI_VMGENID=y
+-CONFIG_SMBUS_EEPROM=y
+-CONFIG_I2C=y
+ CONFIG_PCI_DEVICES=y
  
- CONFIG_COLDFIRE=y
--CONFIG_PTIMER=y
- CONFIG_AN5206=y
- CONFIG_MCF5208=y
-diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/microblaze-softmmu.mak
-index 14837cf..a4a6770 100644
---- a/default-configs/microblaze-softmmu.mak
-+++ b/default-configs/microblaze-softmmu.mak
-@@ -1,6 +1,5 @@
- # Default configuration for microblaze-softmmu
- 
--CONFIG_PTIMER=y
- CONFIG_PFLASH_CFI01=y
- CONFIG_SERIAL=y
- CONFIG_XILINX=y
-diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
-index ab42d0f..b3c507e 100644
---- a/default-configs/nios2-softmmu.mak
-+++ b/default-configs/nios2-softmmu.mak
-@@ -2,6 +2,5 @@
- 
- CONFIG_NIOS2=y
- CONFIG_SERIAL=y
--CONFIG_PTIMER=y
- CONFIG_ALTERA_TIMER=y
- CONFIG_NIOS2_10M50=y
+ # Boards:
+diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+index 45c599b..0795d52 100644
+--- a/default-configs/mips-softmmu-common.mak
++++ b/default-configs/mips-softmmu-common.mak
+@@ -33,7 +33,6 @@ CONFIG_MC146818RTC=y
+ CONFIG_EMPTY_SLOT=y
+ CONFIG_MIPS_CPS=y
+ CONFIG_MIPS_ITU=y
+-CONFIG_I2C=y
+ CONFIG_R4K=y
+ CONFIG_MALTA=y
+ CONFIG_MIPSSIM=y
 diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 0e46d6a..0dcd863 100644
+index d4807b3..0e46d6a 100644
 --- a/default-configs/ppc-softmmu.mak
 +++ b/default-configs/ppc-softmmu.mak
-@@ -14,7 +14,6 @@ CONFIG_OPENPIC=y
- CONFIG_PPCE500_PCI=y
- CONFIG_PFLASH_CFI01=y
- CONFIG_PFLASH_CFI02=y
--CONFIG_PTIMER=y
- CONFIG_I8259=y
- CONFIG_XILINX=y
- CONFIG_XILINX_ETHLITE=y
+@@ -32,7 +32,6 @@ CONFIG_USB_EHCI_SYSBUS=y
+ CONFIG_SM501=y
+ CONFIG_DDC=y
+ CONFIG_IDE_SII3112=y
+-CONFIG_I2C=y
+ CONFIG_AT24C=y
+ CONFIG_BITBANG_I2C=y
+ CONFIG_M41T80=y
 diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
-index 8b003e1..7172c8b 100644
+index 3f7fbe2..8b003e1 100644
 --- a/default-configs/sh4-softmmu.mak
 +++ b/default-configs/sh4-softmmu.mak
-@@ -4,7 +4,6 @@ CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
--CONFIG_PTIMER=y
- CONFIG_PFLASH_CFI02=y
+@@ -9,7 +9,6 @@ CONFIG_PFLASH_CFI02=y
  CONFIG_SH4=y
  CONFIG_IDE_MMIO=y
+ CONFIG_SM501=y
+-CONFIG_I2C=y
+ CONFIG_DDC=y
+ CONFIG_TEST_DEVICES=y
+ CONFIG_I82378=y
 diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
-index 6f58242..3622afc 100644
+index 17f07a4..6f58242 100644
 --- a/default-configs/sh4eb-softmmu.mak
 +++ b/default-configs/sh4eb-softmmu.mak
-@@ -4,7 +4,6 @@ CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
--CONFIG_PTIMER=y
- CONFIG_PFLASH_CFI02=y
+@@ -9,7 +9,6 @@ CONFIG_PFLASH_CFI02=y
  CONFIG_SH4=y
  CONFIG_IDE_MMIO=y
-diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
-index 805c400..b31a9f2 100644
---- a/default-configs/sparc-softmmu.mak
-+++ b/default-configs/sparc-softmmu.mak
-@@ -5,7 +5,6 @@ CONFIG_ECC=y
- CONFIG_ESP=y
- CONFIG_ESCC=y
- CONFIG_M48T59=y
--CONFIG_PTIMER=y
- CONFIG_FDC=y
- CONFIG_EMPTY_SLOT=y
- CONFIG_PCNET_COMMON=y
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index 2d23b0c..528af8f 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -3,7 +3,6 @@
- CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
- CONFIG_M48T59=y
--CONFIG_PTIMER=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
- CONFIG_PARALLEL=y
-diff --git a/default-configs/unicore32-softmmu.mak b/default-configs/unicore32-softmmu.mak
-index 5f6c4a8..17a7915 100644
---- a/default-configs/unicore32-softmmu.mak
-+++ b/default-configs/unicore32-softmmu.mak
-@@ -1,5 +1,4 @@
- # Default configuration for unicore32-softmmu
- CONFIG_ISA_BUS=y
- CONFIG_PUV3=y
--CONFIG_PTIMER=y
- CONFIG_PCKBD=y
-diff --git a/hw/Kconfig b/hw/Kconfig
-index f902c8f..d5ecd02 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -66,6 +66,8 @@ config TEST_DEVICES
+ CONFIG_SM501=y
+-CONFIG_I2C=y
+ CONFIG_DDC=y
+ CONFIG_TEST_DEVICES=y
+ CONFIG_I82378=y
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 2d9b42d..82aa7fa 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -10,7 +10,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += display/
+ devices-dirs-$(CONFIG_SOFTMMU) += dma/
+ devices-dirs-$(CONFIG_SOFTMMU) += gpio/
+ devices-dirs-$(CONFIG_HYPERV) += hyperv/
+-devices-dirs-$(CONFIG_SOFTMMU) += i2c/
++devices-dirs-$(CONFIG_I2C) += i2c/
+ devices-dirs-$(CONFIG_SOFTMMU) += ide/
+ devices-dirs-$(CONFIG_SOFTMMU) += input/
+ devices-dirs-$(CONFIG_SOFTMMU) += intc/
+diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
+index 01aea55..e9c6fed 100644
+--- a/hw/audio/Kconfig
++++ b/hw/audio/Kconfig
+@@ -40,6 +40,7 @@ config PCSPK
  
- config XILINX
+ config WM8750
      bool
-+    select PTIMER # for hw/timer/xilinx_timer.c
++    depends on I2C
  
- config XILINX_AXI
+ config PL041
      bool
-+    select PTIMER # for hw/dma/xilinx_axidma.c
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 9eab67b..d298fbd 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -4,9 +4,11 @@ config ARM_VIRT
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 4941773..fc129f6 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -24,9 +24,11 @@ config PL110
  
- config DIGIC
+ config SII9022
      bool
-+    select PTIMER
++    depends on I2C
  
- config EXYNOS4
+ config SSD0303
      bool
-+    select PTIMER
++    depends on I2C
  
- config HIGHBANK
+ config SSD0323
      bool
-@@ -19,6 +21,7 @@ config MAINSTONE
+@@ -71,6 +73,7 @@ config MILKYMIST_TMU2
  
- config MUSICPAL
+ config SM501
      bool
-+    select PTIMER
++    select I2C
  
- config NETDUINO2
+ config TCX
      bool
-@@ -94,6 +97,7 @@ config NRF51_SOC
- 
- config MSF2
+diff --git a/hw/gpio/Kconfig b/hw/gpio/Kconfig
+index d0a4abf..9227cb5 100644
+--- a/hw/gpio/Kconfig
++++ b/hw/gpio/Kconfig
+@@ -1,5 +1,6 @@
+ config MAX7310
      bool
-+    select PTIMER
++    depends on I2C
  
- config ZAURUS
+ config PL061
      bool
-diff --git a/hw/cris/Kconfig b/hw/cris/Kconfig
-index 86954ab..b7738ab 100644
---- a/hw/cris/Kconfig
-+++ b/hw/cris/Kconfig
-@@ -3,3 +3,4 @@ config AXIS
+diff --git a/hw/i2c/Kconfig b/hw/i2c/Kconfig
+index d6d4402..74c9328 100644
+--- a/hw/i2c/Kconfig
++++ b/hw/i2c/Kconfig
+@@ -3,18 +3,24 @@ config I2C
  
- config ETRAXFS
-    bool
-+   select PTIMER
-diff --git a/hw/lm32/Kconfig b/hw/lm32/Kconfig
-index 84c530e..4f45840 100644
---- a/hw/lm32/Kconfig
-+++ b/hw/lm32/Kconfig
-@@ -1,5 +1,7 @@
- config LM32
+ config SMBUS_EEPROM
      bool
-+    select PTIMER
++    depends on I2C
  
- config MILKYMIST
+ config DDC
      bool
-+    select PTIMER
-diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-index cd66ada..8e91eda 100644
---- a/hw/m68k/Kconfig
-+++ b/hw/m68k/Kconfig
-@@ -3,6 +3,8 @@ config AN5206
++    depends on I2C
  
- config MCF5206
+ config VERSATILE_I2C
      bool
-+    select PTIMER
++    select I2C
  
- config MCF5208
+ config ACPI_SMBUS
      bool
-+    select PTIMER
-diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
-index 348c9bf..cdc07e5 100644
---- a/hw/mips/Kconfig
-+++ b/hw/mips/Kconfig
-@@ -15,6 +15,7 @@ config FULONG
++    select I2C
  
- config MIPS_CPS
+ config BITBANG_I2C
      bool
-+    select PTIMER
++    select I2C
  
- config MIPS_BOSTON
+ config IMX_I2C
+     bool
++    select I2C
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index 081855e..9cd24d7 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -28,6 +28,7 @@ config PC_ACPI
+     select ACPI_X86
+     select ACPI_CPU_HOTPLUG
+     select ACPI_MEMORY_HOTPLUG
++    select SMBUS_EEPROM
+     depends on ACPI_SMBUS
+ 
+ config I440FX
+diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+index 814f87f..e05b7be 100644
+--- a/hw/input/Kconfig
++++ b/hw/input/Kconfig
+@@ -3,6 +3,7 @@ config ADB
+ 
+ config LM832X
+     bool
++    depends on I2C
+ 
+ config PCKBD
+     bool
+diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
+index 6f0812d..fcd87b4 100644
+--- a/hw/isa/Kconfig
++++ b/hw/isa/Kconfig
+@@ -19,6 +19,7 @@ config PIIX4
+ config VT82C686
+     bool
+     select ISA_BUS
++    select ACPI_SMBUS
+ 
+ config SMC37C669
      bool
 diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 5f63701..2433d1b 100644
+index 41d8633..5f63701 100644
 --- a/hw/misc/Kconfig
 +++ b/hw/misc/Kconfig
-@@ -68,6 +68,7 @@ config ECCMEMCTL
+@@ -7,9 +7,11 @@ config MAX111X
  
- config IMX
+ config TMP105
      bool
-+    select PTIMER
++    depends on I2C
  
- config STM32F2XX_SYSCFG
+ config TMP421
      bool
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index a309831..86b880b 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -45,6 +45,7 @@ config SMC91C111
++    depends on I2C
  
- config LAN9118
+ config ISA_DEBUG
      bool
-+    select PTIMER
+@@ -36,6 +38,7 @@ config EDU
  
- config NE2000_ISA
+ config PCA9552
      bool
-@@ -97,6 +98,7 @@ config VIRTIO_NET
++    depends on I2C
  
- config ETSEC
+ config PL310
      bool
-+    select PTIMER
+@@ -102,5 +105,6 @@ config PVPANIC
  
- config ROCKER
+ config AUX
      bool
-diff --git a/hw/sh4/Kconfig b/hw/sh4/Kconfig
-index 417a72f..1ea2bc3 100644
---- a/hw/sh4/Kconfig
-+++ b/hw/sh4/Kconfig
-@@ -9,3 +9,4 @@ config SH7750
++    select I2C
  
- config SH4
-     bool
-+    select PTIMER
-diff --git a/hw/sparc/Kconfig b/hw/sparc/Kconfig
-index 3795754..c9c2142 100644
---- a/hw/sparc/Kconfig
-+++ b/hw/sparc/Kconfig
-@@ -6,6 +6,8 @@ config LEON3
+ source macio/Kconfig
+diff --git a/hw/nvram/Kconfig b/hw/nvram/Kconfig
+index 1f5ec95..ebaa749 100644
+--- a/hw/nvram/Kconfig
++++ b/hw/nvram/Kconfig
+@@ -3,6 +3,7 @@ config DS1225Y
  
- config GRLIB
+ config AT24C
      bool
-+    select PTIMER
++    depends on I2C
  
- config SLAVIO
+ config MAC_NVRAM
      bool
-+    select PTIMER
 diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index e1a6e74..a021c74 100644
+index 7dbc121..e1a6e74 100644
 --- a/hw/timer/Kconfig
 +++ b/hw/timer/Kconfig
-@@ -1,8 +1,10 @@
- config ARM_TIMER
-     bool
-+    select PTIMER
+@@ -9,6 +9,7 @@ config A9_GTIMER
  
- config ARM_MPTIMER
+ config DS1338
      bool
-+    select PTIMER
++    depends on I2C
  
- config A9_GTIMER
+ config HPET
      bool
-@@ -36,12 +38,14 @@ config XLNX_ZYNQMP
+@@ -18,6 +19,7 @@ config I8254
  
- config ALTERA_TIMER
+ config M41T80
      bool
-+    select PTIMER
++    depends on I2C
  
- config MC146818RTC
+ config M48T59
      bool
+@@ -27,6 +29,7 @@ config PL031
  
- config ALLWINNER_A10_PIT
+ config TWL92230
      bool
-+    select PTIMER
++    depends on I2C
  
- config STM32F2XX_TIMER
-     bool
-@@ -51,6 +55,8 @@ config SUN4V_RTC
- 
- config CMSDK_APB_TIMER
-     bool
-+    select PTIMER
- 
- config CMSDK_APB_DUALTIMER
-     bool
-+    select PTIMER
-diff --git a/hw/unicore32/Kconfig b/hw/unicore32/Kconfig
-index b3cf294..a03a996 100644
---- a/hw/unicore32/Kconfig
-+++ b/hw/unicore32/Kconfig
-@@ -1,2 +1,3 @@
- config PUV3
-     bool
-+    select PTIMER
-diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
-index 35ccb72..2118d89 100644
---- a/hw/watchdog/Kconfig
-+++ b/hw/watchdog/Kconfig
-@@ -1,5 +1,6 @@
- config CMSDK_APB_WATCHDOG
-     bool
-+    select PTIMER
- 
- config WDT_IB6300ESB
+ config XLNX_ZYNQMP
      bool
 -- 
 1.8.3.1
