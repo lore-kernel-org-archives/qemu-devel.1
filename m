@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45654)
+Received: from eggs.gnu.org ([209.51.188.92]:45619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCO-0001lE-AJ
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:25 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCM-0003gC-Ok
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCL-0001kX-Fe
 	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:24 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:35403)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCK-0003cy-Sp
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:21 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40556)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h0sCM-0003eH-GF
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:22 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id y15so144129wma.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:22 -0800 (PST)
+	id 1h0sCK-0003bn-Lc
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:20 -0500
+Received: by mail-wr1-x429.google.com with SMTP id q1so6645667wrp.7
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:20 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Mar 2019 19:19:25 +0100
-Message-Id: <1551723614-1823-6-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Mar 2019 19:19:23 +0100
+Message-Id: <1551723614-1823-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
 References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 05/54] minikconfig: add AST
+Subject: [Qemu-devel] [PULL 03/54] xtensa: rename CONFIG_XTENSA_FPGA to
+ CONFIG_XTENSA_XTFPGA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,210 +31,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
-Add Python classes that represent the Kconfig abstract syntax tree.
-The abstract syntax tree is stored as a list of clauses.  For example:
+Match the symbol name that is used e.g. in Linux (drivers/spi/Kconfig).
 
-    config FOO
-        depends on BAR
-        select BAZ
-
-is represented as three clauses:
-
-    FOO depends on BAR
-    FOO default n
-    select BAZ if FOO
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20190123065618.3520-24-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/minikconf.py | 121 +++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 102 insertions(+), 19 deletions(-)
+ default-configs/xtensa-softmmu.mak   | 2 +-
+ default-configs/xtensaeb-softmmu.mak | 2 +-
+ hw/xtensa/Makefile.objs              | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/minikconf.py b/scripts/minikconf.py
-index fd75d96..f0cc3b9 100644
---- a/scripts/minikconf.py
-+++ b/scripts/minikconf.py
-@@ -31,11 +31,84 @@ def debug_print(*args):
- # -------------------------------------------
+diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/xtensa-softmmu.mak
+index baf90ca..7aa7fa6 100644
+--- a/default-configs/xtensa-softmmu.mak
++++ b/default-configs/xtensa-softmmu.mak
+@@ -5,4 +5,4 @@ CONFIG_OPENCORES_ETH=y
+ CONFIG_PFLASH_CFI01=y
  
- class KconfigData:
-+    class Expr:
-+        def __and__(self, rhs):
-+            return KconfigData.AND(self, rhs)
-+        def __or__(self, rhs):
-+            return KconfigData.OR(self, rhs)
-+        def __invert__(self):
-+            return KconfigData.NOT(self)
-+
-+    class AND(Expr):
-+        def __init__(self, lhs, rhs):
-+            self.lhs = lhs
-+            self.rhs = rhs
-+        def __str__(self):
-+            return "(%s && %s)" % (self.lhs, self.rhs)
-+
-+    class OR(Expr):
-+        def __init__(self, lhs, rhs):
-+            self.lhs = lhs
-+            self.rhs = rhs
-+        def __str__(self):
-+            return "(%s || %s)" % (self.lhs, self.rhs)
-+
-+    class NOT(Expr):
-+        def __init__(self, lhs):
-+            self.lhs = lhs
-+        def __str__(self):
-+            return "!%s" % (self.lhs)
-+
-+    class Var(Expr):
-+        def __init__(self, name):
-+            self.name = name
-+            self.value = None
-+        def __str__(self):
-+            return self.name
-+
-+    class Clause:
-+        def __init__(self, dest):
-+            self.dest = dest
-+
-+    class AssignmentClause(Clause):
-+        def __init__(self, dest, value):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.value = value
-+        def __str__(self):
-+            return "%s=%s" % (self.dest, 'y' if self.value else 'n')
-+
-+    class DefaultClause(Clause):
-+        def __init__(self, dest, value, cond=None):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.value = value
-+            self.cond = cond
-+        def __str__(self):
-+            value = 'y' if self.value else 'n'
-+            if self.cond is None:
-+                return "config %s default %s" % (self.dest, value)
-+            else:
-+                return "config %s default %s if %s" % (self.dest, value, self.cond)
-+
-+    class DependsOnClause(Clause):
-+        def __init__(self, dest, expr):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.expr = expr
-+        def __str__(self):
-+            return "config %s depends on %s" % (self.dest, self.expr)
-+
-+    class SelectClause(Clause):
-+        def __init__(self, dest, cond):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.cond = cond
-+        def __str__(self):
-+            return "select %s if %s" % (self.dest, self.cond)
-+
-     def __init__(self):
-         self.previously_included = []
-         self.incl_info = None
-         self.defined_vars = set()
--        self.referenced_vars = set()
-+        self.referenced_vars = dict()
-+        self.clauses = list()
+ CONFIG_XTENSA_SIM=y
+-CONFIG_XTENSA_FPGA=y
++CONFIG_XTENSA_XTFPGA=y
+diff --git a/default-configs/xtensaeb-softmmu.mak b/default-configs/xtensaeb-softmmu.mak
+index baf90ca..7aa7fa6 100644
+--- a/default-configs/xtensaeb-softmmu.mak
++++ b/default-configs/xtensaeb-softmmu.mak
+@@ -5,4 +5,4 @@ CONFIG_OPENCORES_ETH=y
+ CONFIG_PFLASH_CFI01=y
  
-     # semantic analysis -------------
- 
-@@ -53,29 +126,34 @@ class KconfigData:
-         if (var in self.defined_vars):
-             raise Exception('variable "' + var + '" defined twice')
- 
--        self.defined_vars.add(var)
-+        self.defined_vars.add(var.name)
- 
-     # var is a string with the variable's name.
--    #
--    # For now this just returns the variable's name itself.
-     def do_var(self, var):
--        self.referenced_vars.add(var)
--        return var
-+        if (var in self.referenced_vars):
-+            return self.referenced_vars[var]
-+
-+        var_obj = self.referenced_vars[var] = KconfigData.Var(var)
-+        return var_obj
- 
-     def do_assignment(self, var, val):
--        pass
-+        self.clauses.append(KconfigData.AssignmentClause(var, val))
- 
-     def do_default(self, var, val, cond=None):
--        pass
-+        self.clauses.append(KconfigData.DefaultClause(var, val, cond))
- 
-     def do_depends_on(self, var, expr):
--        pass
-+        self.clauses.append(KconfigData.DependsOnClause(var, expr))
- 
-     def do_select(self, var, symbol, cond=None):
--        pass
-+        cond = (cond & var) if cond is not None else var
-+        self.clauses.append(KconfigData.SelectClause(symbol, cond))
- 
-     def do_imply(self, var, symbol, cond=None):
--        pass
-+        # "config X imply Y [if COND]" is the same as
-+        # "config Y default y if X [&& COND]"
-+        cond = (cond & var) if cond is not None else var
-+        self.do_default(symbol, True, cond)
- 
- # -------------------------------------------
- # KconfigParser implements a recursive descent parser for (simplified)
-@@ -237,31 +315,34 @@ class KconfigParser:
-     def parse_primary(self):
-         if self.tok == TOK_NOT:
-             self.get_token()
--            self.parse_primary()
-+            val = ~self.parse_primary()
-         elif self.tok == TOK_LPAREN:
-             self.get_token()
--            self.parse_expr()
-+            val = self.parse_expr()
-             if self.tok != TOK_RPAREN:
-                 raise KconfigParserError(self, 'Expected ")"')
-             self.get_token()
-         elif self.tok == TOK_ID:
--            self.parse_var()
-+            val = self.parse_var()
-         else:
-             raise KconfigParserError(self, 'Expected "!" or "(" or identifier')
-+        return val
- 
-     # disj: primary (OR primary)*
-     def parse_disj(self):
--        self.parse_primary()
-+        lhs = self.parse_primary()
-         while self.tok == TOK_OR:
-             self.get_token()
--            self.parse_primary()
-+            lhs = lhs | self.parse_primary()
-+        return lhs
- 
-     # expr: disj (AND disj)*
-     def parse_expr(self):
--        self.parse_disj()
-+        lhs = self.parse_disj()
-         while self.tok == TOK_AND:
-             self.get_token()
--            self.parse_disj()
-+            lhs = lhs & self.parse_disj()
-+        return lhs
- 
-     # condition: IF expr
-     #       | empty
-@@ -438,4 +519,6 @@ class KconfigParser:
- 
- if __name__ == '__main__':
-     fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
--    KconfigParser.parse(open(fname, 'r'))
-+    data = KconfigParser.parse(open(fname, 'r'))
-+    for i in data.clauses:
-+        print i
+ CONFIG_XTENSA_SIM=y
+-CONFIG_XTENSA_FPGA=y
++CONFIG_XTENSA_XTFPGA=y
+diff --git a/hw/xtensa/Makefile.objs b/hw/xtensa/Makefile.objs
+index fa86730..0bbfccd 100644
+--- a/hw/xtensa/Makefile.objs
++++ b/hw/xtensa/Makefile.objs
+@@ -2,4 +2,4 @@ obj-y += mx_pic.o
+ obj-y += pic_cpu.o
+ obj-y += xtensa_memory.o
+ obj-$(CONFIG_XTENSA_SIM) += sim.o
+-obj-$(CONFIG_XTENSA_FPGA) += xtfpga.o
++obj-$(CONFIG_XTENSA_XTFPGA) += xtfpga.o
 -- 
 1.8.3.1
