@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59706)
+Received: from eggs.gnu.org ([209.51.188.92]:56421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1h0dTM-0008EU-1K
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:36:56 -0500
+	(envelope-from <xiaoyao.li@linux.intel.com>) id 1h0d5A-0004ru-V9
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:11:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1h0dTL-0007Sz-2t
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:36:55 -0500
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:33421)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1h0dTK-0007QO-Ql
-	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:36:55 -0500
-Received: by mail-yw1-xc42.google.com with SMTP id i204so2978780ywb.0
-	for <qemu-devel@nongnu.org>; Sun, 03 Mar 2019 18:36:54 -0800 (PST)
+	(envelope-from <xiaoyao.li@linux.intel.com>) id 1h0d59-0001hf-TF
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:11:56 -0500
+Received: from mga18.intel.com ([134.134.136.126]:8723)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xiaoyao.li@linux.intel.com>)
+	id 1h0d59-0001hK-JU
+	for qemu-devel@nongnu.org; Sun, 03 Mar 2019 21:11:55 -0500
+From: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Date: Mon,  4 Mar 2019 10:00:42 +0800
+Message-Id: <20190304020042.211830-1-xiaoyao.li@linux.intel.com>
 MIME-Version: 1.0
-References: <20181209193749.12277-1-cota@braap.org>
-	<20181209193749.12277-32-cota@braap.org>
-	<878sy3ncjp.fsf@zen.linaroharston>
-In-Reply-To: <878sy3ncjp.fsf@zen.linaroharston>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sun, 3 Mar 2019 18:36:42 -0800
-Message-ID: <CAMo8BfKAGOCNqY3tHrF5DhB16n8Goia3LcFrNk1R0=bGH3SoLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 31/38] target/xtensa: fetch code with
- translator_ld
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] x86: define a new MSR based feature word --
+ FEAT_CORE_CAPABILITY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +25,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: Xiaoyao Li <xiaoyao.li@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On Mon, Feb 25, 2019 at 6:55 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
-> Emilio G. Cota <cota@braap.org> writes:
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> > ---
-> >  target/xtensa/translate.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-> > index 46e1338448..c140742562 100644
-> > --- a/target/xtensa/translate.c
-> > +++ b/target/xtensa/translate.c
-> > @@ -882,7 +882,7 @@ static inline unsigned xtensa_op0_insn_len(DisasCon=
-text *dc, uint8_t op0)
-> >  static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
-> >  {
-> >      xtensa_isa isa =3D dc->config->isa;
-> > -    unsigned char b[MAX_INSN_LENGTH] =3D {cpu_ldub_code(env, dc->pc)};
-> > +    unsigned char b[MAX_INSN_LENGTH] =3D {translator_ldub(env, dc->pc)=
-};
-> >      unsigned len =3D xtensa_op0_insn_len(dc, b[0]);
-> >      xtensa_format fmt;
-> >      int slot, slots;
-> > @@ -914,7 +914,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, =
-DisasContext *dc)
-> >                        dc->pc);
-> >      }
-> >      for (i =3D 1; i < len; ++i) {
-> > -        b[i] =3D cpu_ldub_code(env, dc->pc + i);
-> > +        b[i] =3D translator_ldub(env, dc->pc + i);
-> >      }
-> >      xtensa_insnbuf_from_chars(isa, dc->insnbuf, b, len);
-> >      fmt =3D xtensa_format_decode(isa, dc->insnbuf);
->
-> There is also:
->
->   static inline unsigned xtensa_insn_len(CPUXtensaState *env, DisasContex=
-t *dc)
->   {
->       uint8_t b0 =3D cpu_ldub_code(env, dc->pc);
->       return xtensa_op0_insn_len(dc, b0);
->   }
->
-> Or is this usage a re-read of something we've already got?
+MSR IA32_CORE_CAPABILITY is a feature-enumerating MSR, which
+enumerates the capabilitiy of enabling detection of split locks (bit 5
+of MSR_TEST_CTL).
 
-FWIW xtensa_insn_len is used to look into the instruction that
-follows the one that has just been translated, but it may only
-touch the same page as the last translated instruction.
+MSR IA32_CORE_CAPABILITY can be enumerated by CPUID.0X7.0:EDX[30].
 
---=20
-Thanks.
--- Max
+Related kernel patches can be found here:
+https://lkml.org/lkml/2019/3/1/749
+Patches 15-17 of kvm are exposing this feature to guest.
+
+If host has split lock detection feature, we can expose it to guest by
+using '-cpu host' with this patch and kernel's patches.
+
+Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+---
+ target/i386/cpu.c | 22 +++++++++++++++++++++-
+ target/i386/cpu.h |  3 +++
+ target/i386/kvm.c |  9 +++++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index d3aa6a815b..32df1d358a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1081,7 +1081,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "spec-ctrl", "stibp",
+-            NULL, "arch-capabilities", NULL, "ssbd",
++            NULL, "arch-capabilities", "core-capability", "ssbd",
+         },
+         .cpuid = {
+             .eax = 7,
+@@ -1200,6 +1200,26 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             }
+         },
+     },
++    [FEAT_CORE_CAPABILITY] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            NULL, "split-lock-detect", NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++    },
++        .msr = {
++            .index = MSR_IA32_CORE_CAPABILITY,
++            .cpuid_dep = {
++                FEAT_7_0_EDX,
++                CPUID_7_0_EDX_CORE_CAPABILITY
++            },
++        },
++    },
+ };
+ 
+ typedef struct X86RegisterInfo32 {
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 95112b9118..6eb89ac735 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -355,6 +355,7 @@ typedef enum X86Seg {
+ #define MSR_IA32_SPEC_CTRL              0x48
+ #define MSR_VIRT_SSBD                   0xc001011f
+ #define MSR_IA32_PRED_CMD               0x49
++#define MSR_IA32_CORE_CAPABILITY        0xcf
+ #define MSR_IA32_ARCH_CAPABILITIES      0x10a
+ #define MSR_IA32_TSCDEADLINE            0x6e0
+ 
+@@ -505,6 +506,7 @@ typedef enum FeatureWord {
+     FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
+     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
+     FEAT_ARCH_CAPABILITIES,
++    FEAT_CORE_CAPABILITY,
+     FEATURE_WORDS,
+ } FeatureWord;
+ 
+@@ -696,6 +698,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+ #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+ #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
++#define CPUID_7_0_EDX_CORE_CAPABILITY (1U << 30)  /*Core Capabilities*/
+ #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+ 
+ #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index beae1b99da..8aafd1db77 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -96,6 +96,7 @@ static bool has_msr_spec_ctrl;
+ static bool has_msr_virt_ssbd;
+ static bool has_msr_smi_count;
+ static bool has_msr_arch_capabs;
++static bool has_msr_core_capabs;
+ 
+ static uint32_t has_architectural_pmu_version;
+ static uint32_t num_architectural_pmu_gp_counters;
+@@ -1507,6 +1508,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+                 case MSR_IA32_ARCH_CAPABILITIES:
+                     has_msr_arch_capabs = true;
+                     break;
++                case MSR_IA32_CORE_CAPABILITY:
++                    has_msr_core_capabs = true;
++                    break;
+                 }
+             }
+         }
+@@ -2033,6 +2037,11 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+                           env->features[FEAT_ARCH_CAPABILITIES]);
+     }
+ 
++    if (has_msr_core_capabs) {
++        kvm_msr_entry_add(cpu, MSR_IA32_CORE_CAPABILITY,
++                          env->features[FEAT_CORE_CAPABILITY]);
++    }
++
+     /*
+      * The following MSRs have side effects on the guest or are too heavy
+      * for normal writeback. Limit them to reset or full state updates.
+-- 
+2.19.1
