@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44899)
+Received: from eggs.gnu.org ([209.51.188.92]:45511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h0hnW-00069J-ES
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:14:03 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1h0hqk-0007SH-R7
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:17:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h0hnV-0003yt-GX
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:14:02 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
-	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
-	<20190301154947.GJ21251@redhat.com>
-	<20190301183328.20b63e23@redhat.com>
-	<20190301174806.GN21251@redhat.com>
-Date: Mon, 04 Mar 2019 08:13:53 +0100
-In-Reply-To: <20190301174806.GN21251@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Fri, 1 Mar 2019 17:48:06 +0000")
-Message-ID: <87va0zcdse.fsf@dusky.pond.sub.org>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1h0hqk-0007o7-20
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:17:22 -0500
+From: Wei Yang <richardw.yang@linux.intel.com>
+Date: Mon,  4 Mar 2019 15:16:29 +0800
+Message-Id: <20190304071631.27567-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
- parameter of '-numa node' option
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 0/2] CODING_STYLE: trivial update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +20,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: mjt@tls.msk.ru, imammedo@redhat.com, philmd@redhat.com, eblake@redhat.com, peter.maydell@linaro.org, sgarzare@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+The first one is suggested by Igor Mammedov to provide rule for multiline
+code.
 
-> On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wrote:
->> On Fri, 1 Mar 2019 15:49:47 +0000
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->>=20
->> > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote:
->> > > The parameter allows to configure fake NUMA topology where guest
->> > > VM simulates NUMA topology but not actually getting a performance
->> > > benefits from it. The same or better results could be achieved
->> > > using 'memdev' parameter. In light of that any VM that uses NUMA
->> > > to get its benefits should use 'memdev' and to allow transition
->> > > initial RAM to device based model, deprecate 'mem' parameter as
->> > > its ad-hoc partitioning of initial RAM MemoryRegion can't be
->> > > translated to memdev based backend transparently to users and in
->> > > compatible manner (migration wise).
->> > >=20
->> > > That will also allow to clean up a bit our numa code, leaving only
->> > > 'memdev' impl. in place and several boards that use node_mem
->> > > to generate FDT/ACPI description from it.=20=20
->> >=20
->> > Can you confirm that the  'mem' and 'memdev' parameters to -numa
->> > are 100% live migration compatible in both directions ?  Libvirt
->> > would need this to be the case in order to use the 'memdev' syntax
->> > instead.
->> Unfortunately they are not migration compatible in any direction,
->> if it where possible to translate them to each other I'd alias 'mem'
->> to 'memdev' without deprecation. The former sends over only one
->> MemoryRegion to target, while the later sends over several (one per
->> memdev).
->
-> If we can't migration from one to the other, then we can not deprecate
-> the existing 'mem' syntax. Even if libvirt were to provide a config
-> option to let apps opt-in to the new syntax, we need to be able to
-> support live migration of existing running VMs indefinitely. Effectively
-> this means we need the to keep 'mem' support forever, or at least such
-> a long time that it effectively means forever.
->
-> So I think this patch has to be dropped & replaced with one that
-> simply documents that memdev syntax is preferred.
+The second is a trivial fix to make example code all indented with 4 spaces.
 
-We have this habit of postulating absolutes like "can not deprecate"
-instead of engaging with the tradeoffs.  We need to kick it.
+v6:
+  * add ) for last example of function
+v5:
+  * mostly address function variants
+v4:
+  * one exception case for function
+v3:
+  * fix typo in both changelog and example
+v2:
+  * adjust Patch 1 as suggested by Eric
 
-So let's have an actual look at the tradeoffs.
+Wei Yang (2):
+  CODING_STYLE: specify the indent rule for multiline code
+  CODING_STYLE: indent example code as all others
 
-We don't actually "support live migration of existing running VMs
-indefinitely".
+ CODING_STYLE | 47 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 43 insertions(+), 4 deletions(-)
 
-We support live migration to any newer version of QEMU that still
-supports the machine type.
-
-We support live migration to any older version of QEMU that already
-supports the machine type and all the devices the machine uses.
-
-Aside: "support" is really an honest best effort here.  If you rely on
-it, use a downstream that puts in the (substantial!) QA work real
-support takes.
-
-Feature deprecation is not a contract to drop the feature after two
-releases, or even five.  It's a formal notice that users of the feature
-should transition to its replacement in an orderly manner.
-
-If I understand Igor correctly, all users should transition away from
-outdated NUMA configurations at least for new VMs in an orderly manner.
-
-So, how could this formal notice be served constructively?
-
-If we reject outdated NUMA configurations starting with machine type T,
-we can remove the means to create those configurations along with
-machine type T-1.  Won't happen anytime soon, will happen eventually,
-because in the long run, all machine types are dead (apologies to
-Keynes).
-
-If we deprecate outdated NUMA configurations now, we can start rejecting
-them with new machine types after a suitable grace period.
+-- 
+2.19.1
