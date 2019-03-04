@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45655)
+Received: from eggs.gnu.org ([209.51.188.92]:45731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCO-0001lF-AL
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:26 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCS-0001oS-FS
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCM-0003eq-3h
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:24 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39620)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h0sCR-0003pM-CU
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:28 -0500
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:37677)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h0sCL-0003dR-Nr
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:22 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id l5so6630487wrw.6
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:21 -0800 (PST)
+	id 1h0sCR-0003nw-5Q
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:20:27 -0500
+Received: by mail-wm1-x333.google.com with SMTP id x10so126551wmg.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 10:20:27 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Mar 2019 19:19:24 +0100
-Message-Id: <1551723614-1823-5-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Mar 2019 19:19:30 +0100
+Message-Id: <1551723614-1823-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
 References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/54] minikconfig: add parser skeleton
+Subject: [Qemu-devel] [PULL 10/54] minikconfig: implement allnoconfig and
+ defconfig modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,482 +31,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
-This implements a scanner and recursive descent parser for Kconfig-like
-configuration files.  The only "action" of the parser is for now to
-detect undefined variables and process include files.
+Apart from defconfig (which is a no-op),
+allyesconfig/allnoconfig/randcondfig can be implemented simply by ignoring
+the RHS of assignments and "default" statements.  The RHS is replaced
+respectively by "true", "false" or a random value.
 
-The main differences between Kconfig and this are:
+However, allyesconfig and randconfig do not quite work, because all the
+files for hw/ARCH/Kconfig are sourced and therefore you could end up
+enabling some ARM boards in x86 or things like that.  This is left for
+future work, but I am leaving it in to help debugging minikconf itself.
 
-* only the "bool" type is supported
+allnoconfig mode is tied to a new configure option, --without-default-devices.
 
-* variables can only be defined once
-
-* choices are not supported (but they could be added as syntactic
-sugar for multiple Boolean values)
-
-* menus and other graphical concepts (prompts, help text) are not
-supported
-
-* assignments ("CONFIG_FOO=y", "CONFIG_FOO=n") are parsed as part
-of the Kconfig language, not as a separate file.
-
-The idea was originally by Ákos Kovács, but I could not find his
-implementation so I had to redo it.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20190123065618.3520-23-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/minikconf.py | 441 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 441 insertions(+)
- create mode 100644 scripts/minikconf.py
+ Makefile             |  1 +
+ configure            | 12 +++++++++++-
+ scripts/minikconf.py | 39 ++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 46 insertions(+), 6 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 0c9cc3e..b0293aa 100644
+--- a/Makefile
++++ b/Makefile
+@@ -331,6 +331,7 @@ endif
+ 
+ # This has to be kept in sync with Kconfig.host.
+ MINIKCONF_ARGS = \
++    $(CONFIG_MINIKCONF_MODE) \
+     $@ $*-config.devices.mak.d $< $(MINIKCONF_INPUTS) \
+     CONFIG_KVM=$(CONFIG_KVM) \
+     CONFIG_SPICE=$(CONFIG_SPICE) \
+diff --git a/configure b/configure
+index 3cc6a94..0fdbab4 100755
+--- a/configure
++++ b/configure
+@@ -487,7 +487,7 @@ libxml2=""
+ docker="no"
+ debug_mutex="no"
+ libpmem=""
+-libudev="no"
++default_devices="yes"
+ 
+ # cross compilers defaults, can be overridden with --cross-cc-ARCH
+ cross_cc_aarch64="aarch64-linux-gnu-gcc"
+@@ -996,6 +996,10 @@ for opt do
+   ;;
+   --with-trace-file=*) trace_file="$optarg"
+   ;;
++  --with-default-devices) default_devices="yes"
++  ;;
++  --without-default-devices) default_devices="no"
++  ;;
+   --enable-gprof) gprof="yes"
+   ;;
+   --enable-gcov) gcov="yes"
+@@ -6250,6 +6254,7 @@ echo "capstone          $capstone"
+ echo "docker            $docker"
+ echo "libpmem support   $libpmem"
+ echo "libudev           $libudev"
++echo "default devices   $default_devices"
+ 
+ if test "$supported_cpu" = "no"; then
+     echo
+@@ -6311,6 +6316,11 @@ echo "GIT_UPDATE=$git_update" >> $config_host_mak
+ 
+ echo "ARCH=$ARCH" >> $config_host_mak
+ 
++if test "$default_devices" = "yes" ; then
++  echo "CONFIG_MINIKCONF_MODE=--defconfig" >> $config_host_mak
++else
++  echo "CONFIG_MINIKCONF_MODE=--allnoconfig" >> $config_host_mak
++fi
+ if test "$debug_tcg" = "yes" ; then
+   echo "CONFIG_DEBUG_TCG=y" >> $config_host_mak
+ fi
 diff --git a/scripts/minikconf.py b/scripts/minikconf.py
-new file mode 100644
-index 0000000..fd75d96
---- /dev/null
+index 6bedc57..5421db0 100644
+--- a/scripts/minikconf.py
 +++ b/scripts/minikconf.py
-@@ -0,0 +1,441 @@
-+#
-+# Mini-Kconfig parser
-+#
-+# Copyright (c) 2015 Red Hat Inc.
-+#
-+# Authors:
-+#  Paolo Bonzini <pbonzini@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or, at your option, any later version.  See the COPYING file in
-+# the top-level directory.
+@@ -14,9 +14,11 @@ from __future__ import print_function
+ import os
+ import sys
+ import re
++import random
+ 
+ __all__ = [ 'KconfigDataError', 'KconfigParserError',
+-            'KconfigData', 'KconfigParser' ]
++            'KconfigData', 'KconfigParser' ,
++            'defconfig', 'allyesconfig', 'allnoconfig', 'randconfig' ]
+ 
+ def debug_print(*args):
+     #print('# ' + (' '.join(str(x) for x in args)))
+@@ -39,6 +41,11 @@ class KconfigDataError(Exception):
+     def __str__(self):
+         return self.msg
+ 
++allyesconfig = lambda x: True
++allnoconfig = lambda x: False
++defconfig = lambda x: x
++randconfig = lambda x: random.randint(0, 1) == 1
 +
-+from __future__ import print_function
-+import os
-+import sys
+ class KconfigData:
+     class Expr:
+         def __and__(self, rhs):
+@@ -192,7 +199,8 @@ class KconfigData:
+             if self.cond.evaluate():
+                 self.dest.set_value(True, self)
+ 
+-    def __init__(self):
++    def __init__(self, value_mangler=defconfig):
++        self.value_mangler = value_mangler
+         self.previously_included = []
+         self.incl_info = None
+         self.defined_vars = set()
+@@ -272,6 +280,7 @@ class KconfigData:
+         self.clauses.append(KconfigData.AssignmentClause(var, val))
+ 
+     def do_default(self, var, val, cond=None):
++        val = self.value_mangler(val)
+         self.clauses.append(KconfigData.DefaultClause(var, val, cond))
+ 
+     def do_depends_on(self, var, expr):
+@@ -328,9 +337,10 @@ class KconfigParserError(Exception):
+         return "%s: %s" % (self.loc, self.msg)
+ 
+ class KconfigParser:
 +
-+__all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
+     @classmethod
+-    def parse(self, fp):
+-        data = KconfigData()
++    def parse(self, fp, mode=None):
++        data = KconfigData(mode or KconfigParser.defconfig)
+         parser = KconfigParser(data)
+         parser.parse_file(fp)
+         return data
+@@ -653,11 +663,30 @@ class KconfigParser:
+ 
+ if __name__ == '__main__':
+     argv = sys.argv
++    mode = defconfig
++    if len(sys.argv) > 1:
++        if argv[1] == '--defconfig':
++            del argv[1]
++        elif argv[1] == '--randconfig':
++            random.seed()
++            mode = randconfig
++            del argv[1]
++        elif argv[1] == '--allyesconfig':
++            mode = allyesconfig
++            del argv[1]
++        elif argv[1] == '--allnoconfig':
++            mode = allnoconfig
++            del argv[1]
 +
-+def debug_print(*args):
-+    #print('# ' + (' '.join(str(x) for x in args)))
-+    pass
+     if len(argv) == 1:
+         print ("%s: at least one argument is required" % argv[0], file=sys.stderr)
+         sys.exit(1)
+ 
+-    data = KconfigData()
++    if argv[1].startswith('-'):
++        print ("%s: invalid option %s" % (argv[0], argv[1]), file=sys.stderr)
++        sys.exit(1)
 +
-+# -------------------------------------------
-+# KconfigData implements the Kconfig semantics.  For now it can only
-+# detect undefined symbols, i.e. symbols that were referenced in
-+# assignments or dependencies but were not declared with "config FOO".
-+#
-+# Semantic actions are represented by methods called do_*.  The do_var
-+# method return the semantic value of a variable (which right now is
-+# just its name).
-+# -------------------------------------------
-+
-+class KconfigData:
-+    def __init__(self):
-+        self.previously_included = []
-+        self.incl_info = None
-+        self.defined_vars = set()
-+        self.referenced_vars = set()
-+
-+    # semantic analysis -------------
-+
-+    def check_undefined(self):
-+        undef = False
-+        for i in self.referenced_vars:
-+            if not (i in self.defined_vars):
-+                print("undefined symbol %s" % (i), file=sys.stderr)
-+                undef = True
-+        return undef
-+
-+    # semantic actions -------------
-+
-+    def do_declaration(self, var):
-+        if (var in self.defined_vars):
-+            raise Exception('variable "' + var + '" defined twice')
-+
-+        self.defined_vars.add(var)
-+
-+    # var is a string with the variable's name.
-+    #
-+    # For now this just returns the variable's name itself.
-+    def do_var(self, var):
-+        self.referenced_vars.add(var)
-+        return var
-+
-+    def do_assignment(self, var, val):
-+        pass
-+
-+    def do_default(self, var, val, cond=None):
-+        pass
-+
-+    def do_depends_on(self, var, expr):
-+        pass
-+
-+    def do_select(self, var, symbol, cond=None):
-+        pass
-+
-+    def do_imply(self, var, symbol, cond=None):
-+        pass
-+
-+# -------------------------------------------
-+# KconfigParser implements a recursive descent parser for (simplified)
-+# Kconfig syntax.
-+# -------------------------------------------
-+
-+# tokens table
-+TOKENS = {}
-+TOK_NONE = -1
-+TOK_LPAREN = 0;   TOKENS[TOK_LPAREN] = '"("';
-+TOK_RPAREN = 1;   TOKENS[TOK_RPAREN] = '")"';
-+TOK_EQUAL = 2;    TOKENS[TOK_EQUAL] = '"="';
-+TOK_AND = 3;      TOKENS[TOK_AND] = '"&&"';
-+TOK_OR = 4;       TOKENS[TOK_OR] = '"||"';
-+TOK_NOT = 5;      TOKENS[TOK_NOT] = '"!"';
-+TOK_DEPENDS = 6;  TOKENS[TOK_DEPENDS] = '"depends"';
-+TOK_ON = 7;       TOKENS[TOK_ON] = '"on"';
-+TOK_SELECT = 8;   TOKENS[TOK_SELECT] = '"select"';
-+TOK_IMPLY = 9;    TOKENS[TOK_IMPLY] = '"imply"';
-+TOK_CONFIG = 10;  TOKENS[TOK_CONFIG] = '"config"';
-+TOK_DEFAULT = 11; TOKENS[TOK_DEFAULT] = '"default"';
-+TOK_Y = 12;       TOKENS[TOK_Y] = '"y"';
-+TOK_N = 13;       TOKENS[TOK_N] = '"n"';
-+TOK_SOURCE = 14;  TOKENS[TOK_SOURCE] = '"source"';
-+TOK_BOOL = 15;    TOKENS[TOK_BOOL] = '"bool"';
-+TOK_IF = 16;      TOKENS[TOK_IF] = '"if"';
-+TOK_ID = 17;      TOKENS[TOK_ID] = 'identifier';
-+TOK_EOF = 18;     TOKENS[TOK_EOF] = 'end of file';
-+
-+class KconfigParserError(Exception):
-+    def __init__(self, parser, msg, tok=None):
-+        self.loc = parser.location()
-+        tok = tok or parser.tok
-+        if tok != TOK_NONE:
-+            location = TOKENS.get(tok, None) or ('"%s"' % tok)
-+            msg = '%s before %s' % (msg, location)
-+        self.msg = msg
-+
-+    def __str__(self):
-+        return "%s: %s" % (self.loc, self.msg)
-+
-+class KconfigParser:
-+    @classmethod
-+    def parse(self, fp):
-+        data = KconfigData()
-+        parser = KconfigParser(data)
-+        parser.parse_file(fp)
-+        if data.check_undefined():
-+            raise KconfigParserError(parser, "there were undefined symbols")
-+
-+        return data
-+
-+    def __init__(self, data):
-+        self.data = data
-+
-+    def parse_file(self, fp):
-+        self.abs_fname = os.path.abspath(fp.name)
-+        self.fname = fp.name
-+        self.data.previously_included.append(self.abs_fname)
-+        self.src = fp.read()
-+        if self.src == '' or self.src[-1] != '\n':
-+            self.src += '\n'
-+        self.cursor = 0
-+        self.line = 1
-+        self.line_pos = 0
-+        self.get_token()
-+        self.parse_config()
-+
-+    # file management -----
-+
-+    def error_path(self):
-+        inf = self.data.incl_info
-+        res = ""
-+        while inf:
-+            res = ("In file included from %s:%d:\n" % (inf['file'],
-+                                                       inf['line'])) + res
-+            inf = inf['parent']
-+        return res
-+
-+    def location(self):
-+        col = 1
-+        for ch in self.src[self.line_pos:self.pos]:
-+            if ch == '\t':
-+                col += 8 - ((col - 1) % 8)
-+            else:
-+                col += 1
-+        return '%s%s:%d:%d' %(self.error_path(), self.fname, self.line, col)
-+
-+    def do_include(self, include):
-+        incl_abs_fname = os.path.join(os.path.dirname(self.abs_fname),
-+                                      include)
-+        # catch inclusion cycle
-+        inf = self.data.incl_info
-+        while inf:
-+            if incl_abs_fname == os.path.abspath(inf['file']):
-+                raise KconfigParserError(self, "Inclusion loop for %s"
-+                                    % include)
-+            inf = inf['parent']
-+
-+        # skip multiple include of the same file
-+        if incl_abs_fname in self.data.previously_included:
-+            return
-+        try:
-+            fp = open(incl_abs_fname, 'r')
-+        except IOError as e:
-+            raise KconfigParserError(self,
-+                                '%s: %s' % (e.strerror, include))
-+
-+        inf = self.data.incl_info
-+        self.data.incl_info = { 'file': self.fname, 'line': self.line,
-+                'parent': inf }
-+        KconfigParser(self.data).parse_file(fp)
-+        self.data.incl_info = inf
-+
-+    # recursive descent parser -----
-+
-+    # y_or_n: Y | N
-+    def parse_y_or_n(self):
-+        if self.tok == TOK_Y:
-+            self.get_token()
-+            return True
-+        if self.tok == TOK_N:
-+            self.get_token()
-+            return False
-+        raise KconfigParserError(self, 'Expected "y" or "n"')
-+
-+    # var: ID
-+    def parse_var(self):
-+        if self.tok == TOK_ID:
-+            val = self.val
-+            self.get_token()
-+            return self.data.do_var(val)
-+        else:
-+            raise KconfigParserError(self, 'Expected identifier')
-+
-+    # assignment_var: ID (starting with "CONFIG_")
-+    def parse_assignment_var(self):
-+        if self.tok == TOK_ID:
-+            val = self.val
-+            if not val.startswith("CONFIG_"):
-+                raise KconfigParserError(self,
-+                           'Expected identifier starting with "CONFIG_"', TOK_NONE)
-+            self.get_token()
-+            return self.data.do_var(val[7:])
-+        else:
-+            raise KconfigParserError(self, 'Expected identifier')
-+
-+    # assignment: var EQUAL y_or_n
-+    def parse_assignment(self):
-+        var = self.parse_assignment_var()
-+        if self.tok != TOK_EQUAL:
-+            raise KconfigParserError(self, 'Expected "="')
-+        self.get_token()
-+        self.data.do_assignment(var, self.parse_y_or_n())
-+
-+    # primary: NOT primary
-+    #       | LPAREN expr RPAREN
-+    #       | var
-+    def parse_primary(self):
-+        if self.tok == TOK_NOT:
-+            self.get_token()
-+            self.parse_primary()
-+        elif self.tok == TOK_LPAREN:
-+            self.get_token()
-+            self.parse_expr()
-+            if self.tok != TOK_RPAREN:
-+                raise KconfigParserError(self, 'Expected ")"')
-+            self.get_token()
-+        elif self.tok == TOK_ID:
-+            self.parse_var()
-+        else:
-+            raise KconfigParserError(self, 'Expected "!" or "(" or identifier')
-+
-+    # disj: primary (OR primary)*
-+    def parse_disj(self):
-+        self.parse_primary()
-+        while self.tok == TOK_OR:
-+            self.get_token()
-+            self.parse_primary()
-+
-+    # expr: disj (AND disj)*
-+    def parse_expr(self):
-+        self.parse_disj()
-+        while self.tok == TOK_AND:
-+            self.get_token()
-+            self.parse_disj()
-+
-+    # condition: IF expr
-+    #       | empty
-+    def parse_condition(self):
-+        if self.tok == TOK_IF:
-+            self.get_token()
-+            return self.parse_expr()
-+        else:
-+            return None
-+
-+    # property: DEFAULT y_or_n condition
-+    #       | DEPENDS ON expr
-+    #       | SELECT var condition
-+    #       | BOOL
-+    def parse_property(self, var):
-+        if self.tok == TOK_DEFAULT:
-+            self.get_token()
-+            val = self.parse_y_or_n()
-+            cond = self.parse_condition()
-+            self.data.do_default(var, val, cond)
-+        elif self.tok == TOK_DEPENDS:
-+            self.get_token()
-+            if self.tok != TOK_ON:
-+                raise KconfigParserError(self, 'Expected "on"')
-+            self.get_token()
-+            self.data.do_depends_on(var, self.parse_expr())
-+        elif self.tok == TOK_SELECT:
-+            self.get_token()
-+            symbol = self.parse_var()
-+            cond = self.parse_condition()
-+            self.data.do_select(var, symbol, cond)
-+        elif self.tok == TOK_IMPLY:
-+            self.get_token()
-+            symbol = self.parse_var()
-+            cond = self.parse_condition()
-+            self.data.do_imply(var, symbol, cond)
-+        elif self.tok == TOK_BOOL:
-+            self.get_token()
-+        else:
-+            raise KconfigParserError(self, 'Error in recursive descent?')
-+
-+    # properties: properties property
-+    #       | /* empty */
-+    def parse_properties(self, var):
-+        had_default = False
-+        while self.tok == TOK_DEFAULT or self.tok == TOK_DEPENDS or \
-+              self.tok == TOK_SELECT or self.tok == TOK_BOOL or \
-+              self.tok == TOK_IMPLY:
-+            self.parse_property(var)
-+        self.data.do_default(var, False)
-+
-+        # for nicer error message
-+        if self.tok != TOK_SOURCE and self.tok != TOK_CONFIG and \
-+           self.tok != TOK_ID and self.tok != TOK_EOF:
-+            raise KconfigParserError(self, 'expected "source", "config", identifier, '
-+                    + '"default", "depends on", "imply" or "select"')
-+
-+    # declaration: config var properties
-+    def parse_declaration(self):
-+        if self.tok == TOK_CONFIG:
-+            self.get_token()
-+            var = self.parse_var()
-+            self.data.do_declaration(var)
-+            self.parse_properties(var)
-+        else:
-+            raise KconfigParserError(self, 'Error in recursive descent?')
-+
-+    # clause: SOURCE
-+    #       | declaration
-+    #       | assignment
-+    def parse_clause(self):
-+        if self.tok == TOK_SOURCE:
-+            val = self.val
-+            self.get_token()
-+            self.do_include(val)
-+        elif self.tok == TOK_CONFIG:
-+            self.parse_declaration()
-+        elif self.tok == TOK_ID:
-+            self.parse_assignment()
-+        else:
-+            raise KconfigParserError(self, 'expected "source", "config" or identifier')
-+
-+    # config: clause+ EOF
-+    def parse_config(self):
-+        while self.tok != TOK_EOF:
-+            self.parse_clause()
-+        return self.data
-+
-+    # scanner -----
-+
-+    def get_token(self):
-+        while True:
-+            self.tok = self.src[self.cursor]
-+            self.pos = self.cursor
-+            self.cursor += 1
-+
-+            self.val = None
-+            self.tok = self.scan_token()
-+            if self.tok is not None:
-+                return
-+
-+    def check_keyword(self, rest):
-+        if not self.src.startswith(rest, self.cursor):
-+            return False
-+        length = len(rest)
-+        if self.src[self.cursor + length].isalnum() or self.src[self.cursor + length] == '|':
-+            return False
-+        self.cursor += length
-+        return True
-+
-+    def scan_token(self):
-+        if self.tok == '#':
-+            self.cursor = self.src.find('\n', self.cursor)
-+            return None
-+        elif self.tok == '=':
-+            return TOK_EQUAL
-+        elif self.tok == '(':
-+            return TOK_LPAREN
-+        elif self.tok == ')':
-+            return TOK_RPAREN
-+        elif self.tok == '&' and self.src[self.pos+1] == '&':
-+            self.cursor += 1
-+            return TOK_AND
-+        elif self.tok == '|' and self.src[self.pos+1] == '|':
-+            self.cursor += 1
-+            return TOK_OR
-+        elif self.tok == '!':
-+            return TOK_NOT
-+        elif self.tok == 'd' and self.check_keyword("epends"):
-+            return TOK_DEPENDS
-+        elif self.tok == 'o' and self.check_keyword("n"):
-+            return TOK_ON
-+        elif self.tok == 's' and self.check_keyword("elect"):
-+            return TOK_SELECT
-+        elif self.tok == 'i' and self.check_keyword("mply"):
-+            return TOK_IMPLY
-+        elif self.tok == 'c' and self.check_keyword("onfig"):
-+            return TOK_CONFIG
-+        elif self.tok == 'd' and self.check_keyword("efault"):
-+            return TOK_DEFAULT
-+        elif self.tok == 'b' and self.check_keyword("ool"):
-+            return TOK_BOOL
-+        elif self.tok == 'i' and self.check_keyword("f"):
-+            return TOK_IF
-+        elif self.tok == 'y' and self.check_keyword(""):
-+            return TOK_Y
-+        elif self.tok == 'n' and self.check_keyword(""):
-+            return TOK_N
-+        elif (self.tok == 's' and self.check_keyword("ource")) or \
-+              self.tok == 'i' and self.check_keyword("nclude"):
-+            # source FILENAME
-+            # include FILENAME
-+            while self.src[self.cursor].isspace():
-+                self.cursor += 1
-+            start = self.cursor
-+            self.cursor = self.src.find('\n', self.cursor)
-+            self.val = self.src[start:self.cursor]
-+            return TOK_SOURCE
-+        elif self.tok.isalpha():
-+            # identifier
-+            while self.src[self.cursor].isalnum() or self.src[self.cursor] == '_':
-+                self.cursor += 1
-+            self.val = self.src[self.pos:self.cursor]
-+            return TOK_ID
-+        elif self.tok == '\n':
-+            if self.cursor == len(self.src):
-+                return TOK_EOF
-+            self.line += 1
-+            self.line_pos = self.cursor
-+        elif not self.tok.isspace():
-+            raise KconfigParserError(self, 'invalid input')
-+
-+        return None
-+
-+if __name__ == '__main__':
-+    fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
-+    KconfigParser.parse(open(fname, 'r'))
++    data = KconfigData(mode)
+     parser = KconfigParser(data)
+     for arg in argv[3:]:
+         m = re.match(r'^(CONFIG_[A-Z0-9_]+)=([yn]?)$', arg)
 -- 
 1.8.3.1
