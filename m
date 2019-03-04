@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56985)
+Received: from eggs.gnu.org ([209.51.188.92]:57092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0pI0-0003ew-Ln
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:01 -0500
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h0pIb-0003z9-Ri
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h0pHz-0006ry-OO
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:00 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42520)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1h0pHz-0006pW-CR
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:13:59 -0500
-Received: by mail-ot1-x344.google.com with SMTP id i5so4470716oto.9
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 07:13:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20190223105421.1290-1-davidkiarie4@gmail.com>
-	<20190223105421.1290-2-davidkiarie4@gmail.com>
-	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
-	<CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
-	<CABdVeAAmbW-hAq41KwbNtqbmndPd_nzB4Mw_7U8J+uBB5P=5Lw@mail.gmail.com>
-	<CABdVeABUzvwA8jV8ZfTcDY8eWN5=M2Otku6eukaBsPeMqPNOhQ@mail.gmail.com>
-	<CABdVeABnosV3-u9aepP=kSrb9P0X6-vUWZ2kDATUmNLmaJ_5+g@mail.gmail.com>
-	<CABdVeACgD7NrRa+P9yzkjhNJAtf9JEaJKuzo+J3CMCxLUO3phQ@mail.gmail.com>
-	<CABdVeACYb_TpARadx1FkQwODY7pqFp=Bm4RyZ3easb4Hm1JAyw@mail.gmail.com>
-In-Reply-To: <CABdVeACYb_TpARadx1FkQwODY7pqFp=Bm4RyZ3easb4Hm1JAyw@mail.gmail.com>
-From: David Kiarie <davidkiarie4@gmail.com>
-Date: Mon, 4 Mar 2019 18:13:10 +0300
-Message-ID: <CABdVeAD2mfUR5-29NQ=jkWjLRt6wyQNJEk4hFOZYFsnKCgYZFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h0pIa-0007na-TX
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:37 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:39135 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
+	id 1h0pIa-0006Kk-Jc
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:14:36 -0500
+From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Date: Mon,  4 Mar 2019 16:13:12 +0100
+Message-Id: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v3 00/13] target/mips: Add emulation of data
+ communication MMI instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,96 +23,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
->>>>>>
->>>>>> Hi David,
->>>>>>>
->>>>>>> On 2/23/19 11:54 AM, David Kiarie wrote:
->>>>>>> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
->>>>>>> > ---
->>>>>>> >  hw/i386/amd_iommu.c | 2 +-
->>>>>>> >  hw/i386/amd_iommu.h | 2 +-
->>>>>>> >  2 files changed, 2 insertions(+), 2 deletions(-)
->>>>>>> >
->>>>>>> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
->>>>>>> > index 8ad707a..4f179da 100644
->>>>>>> > --- a/hw/i386/amd_iommu.c
->>>>>>> > +++ b/hw/i386/amd_iommu.c
->>>>>>> > @@ -2,7 +2,7 @@
->>>>>>> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
->>>>>>> >   *
->>>>>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->>>>>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->>>>>>> > + * Copyright (C) 2016 David Kiarie Kahurani
->>>>>>>
->>>>>>> Why do you change the year? Because your work was merged in 2016?
->>>>>>>
->>>>>>
->>>>>> no.
->>>>>>
->>>>>>
->>>>>
->>>>> though, if you have a legitimate issue with the change, you can always
->>>>> air it.
->>>>>
->>>>
->>>> you might think random emails are weird but Paolo, i don't expect to
->>>> see any activity from you, on Qemu repo before this issue is sorted ;-)
->>>>
->>>
->>> i mostly don't care about this code but i *wrote* it. if i am not
->>> allowed even make such minor(which i not a routine), why shouldn't i ask
->>> you to take the files down?
->>>
->>
->> or, rather, a small issue turns into a scene about how clean Qemu is. why
->> not take down all my dirty code?
->>
->
-> look i'm resending this patch and next time we're having this
-> conversation, i'll be defacing qemu.
->
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
+This series adds emulation of PCPYH, PCPYLD, and PCPYUD MMI
+instructions.
 
-either you have to update my code to what i think it should look like or
-you have to take down - wtf
+v3:
+  - Added MMI instructions PEXEH, PEXEW, PEXTLB, PEXTLH, PEXTLW,
+  PEXTUB, PEXTUH, and PEXTUW
+  - Minor bugs fixed from previous patches
 
-then you try to cook rubbish over it.
+v2:
 
+  - The patch for PCPYH is split into two patches
+  - Cleaned up handler for PCPYH
+  - Fixed bugs and cleaned up in handler for PCPYLD 
+  - Fixed bugs and cleaned up in handler for PCPYUD
+  - Added handler for MMI instruction PEXCH
+  - Added handler for MMI instruction PEXCW
 
->
->
->>
->>
->>>
->>>
->>>>
->>>>
->>>>>
->>>>>
->>>>>>
->>>>>>> >   *
->>>>>>> >   * This program is free software; you can redistribute it and/or
->>>>>>> modify
->>>>>>> >   * it under the terms of the GNU General Public License as
->>>>>>> published by
->>>>>>> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
->>>>>>> > index c52886f..cb258a7 100644
->>>>>>> > --- a/hw/i386/amd_iommu.h
->>>>>>> > +++ b/hw/i386/amd_iommu.h
->>>>>>> > @@ -2,7 +2,7 @@
->>>>>>> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
->>>>>>> >   *
->>>>>>> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
->>>>>>> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
->>>>>>> > + * Copyright (C) 2016 David Kiarie Kahurani
->>>>>>> >   *
->>>>>>> >   * This program is free software; you can redistribute it and/or
->>>>>>> modify
->>>>>>> >   * it under the terms of the GNU General Public License as
->>>>>>> published by
->>>>>>> >
->>>>>>>
->>>>>>
+Mateja Marjanovic (13):
+  target/mips: Add emulation of MMI instruction PCPYH
+  target/mips: Add emulation of MMI instruction PCPYLD
+  target/mips: Add emulation of MMI instruction PCPYUD
+  target/mips: Add emulation of MMI instruction PEXCH
+  target/mips: Add emulation of MMI instruction PEXCW
+  target/mips: Add emulation of MMI instruction PEXEH
+  target/mips: Add emulation of MMI instruction PEXEW
+  target/mips: Add emulation of MMI instruction PEXTLB
+  target/mips: Add emulation of MMI instruction PEXTLH
+  target/mips: Add emulation of MMI instruction PEXTLW
+  target/mips: Add emulation of MMI instruction PEXTUB
+  target/mips: Add emulation of MMI instruction PEXTUH
+  target/mips: Add emulation of MMI instruction PEXTUW
+
+ target/mips/translate.c | 909 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 896 insertions(+), 13 deletions(-)
+
+-- 
+2.7.4
