@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44639)
+Received: from eggs.gnu.org ([209.51.188.92]:44683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAp-00005H-QP
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:49 -0500
+	(envelope-from <cota@braap.org>) id 1h0sAt-000099-L3
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h0sAl-0001Kv-VI
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:45 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:49679)
+	(envelope-from <cota@braap.org>) id 1h0sAp-0001SP-Sq
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:51 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:37955)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAj-00010n-VJ
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:42 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h0sAm-00012i-2k
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:18:45 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  4 Mar 2019 13:17:32 -0500
-Message-Id: <20190304181813.8075-33-cota@braap.org>
+Date: Mon,  4 Mar 2019 13:17:37 -0500
+Message-Id: <20190304181813.8075-38-cota@braap.org>
 In-Reply-To: <20190304181813.8075-1-cota@braap.org>
 References: <20190304181813.8075-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 32/73] cpu: define cpu_interrupt_request
- helpers
+Subject: [Qemu-devel] [PATCH v7 37/73] openrisc: use cpu_reset_interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +27,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>
 
-Add a comment about how atomic_read works here. The comment refers to
-a "BQL-less CPU loop", which will materialize toward the end
-of this series.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Note that the modifications to cpu_reset_interrupt are there to
-avoid deadlock during the CPU lock transition; once that is complete,
-cpu_interrupt_request will be simple again.
-
+Cc: Stafford Horne <shorne@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qom/cpu.h | 37 +++++++++++++++++++++++++++++++++++++
- qom/cpu.c         | 27 +++++++++++++++++++++------
- 2 files changed, 58 insertions(+), 6 deletions(-)
+ target/openrisc/sys_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 9fe74e4392..c92a8c544a 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -526,6 +526,43 @@ static inline void cpu_halted_set(CPUState *cpu, uint32_t val)
-     cpu_mutex_unlock(cpu);
- }
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index 0915e622e6..1f367de6f2 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -170,7 +170,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+                 env->ttmr = (rb & ~TTMR_IP) | ip;
+             } else {    /* Clear IP bit.  */
+                 env->ttmr = rb & ~TTMR_IP;
+-                cs->interrupt_request &= ~CPU_INTERRUPT_TIMER;
++                cpu_reset_interrupt(cs, CPU_INTERRUPT_TIMER);
+             }
  
-+/*
-+ * When sending an interrupt, setters OR the appropriate bit and kick the
-+ * destination vCPU. The latter can then read interrupt_request without
-+ * acquiring the CPU lock, because once the kick-induced completes, they'll read
-+ * an up-to-date interrupt_request.
-+ * Setters always acquire the lock, which guarantees that (1) concurrent
-+ * updates from different threads won't result in data races, and (2) the
-+ * BQL-less CPU loop will always see an up-to-date interrupt_request, since the
-+ * loop holds the CPU lock.
-+ */
-+static inline uint32_t cpu_interrupt_request(CPUState *cpu)
-+{
-+    return atomic_read(&cpu->interrupt_request);
-+}
-+
-+static inline void cpu_interrupt_request_or(CPUState *cpu, uint32_t mask)
-+{
-+    if (cpu_mutex_locked(cpu)) {
-+        atomic_set(&cpu->interrupt_request, cpu->interrupt_request | mask);
-+        return;
-+    }
-+    cpu_mutex_lock(cpu);
-+    atomic_set(&cpu->interrupt_request, cpu->interrupt_request | mask);
-+    cpu_mutex_unlock(cpu);
-+}
-+
-+static inline void cpu_interrupt_request_set(CPUState *cpu, uint32_t val)
-+{
-+    if (cpu_mutex_locked(cpu)) {
-+        atomic_set(&cpu->interrupt_request, val);
-+        return;
-+    }
-+    cpu_mutex_lock(cpu);
-+    atomic_set(&cpu->interrupt_request, val);
-+    cpu_mutex_unlock(cpu);
-+}
-+
- static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
- {
-     unsigned int i;
-diff --git a/qom/cpu.c b/qom/cpu.c
-index c5106d5af8..00add81a7f 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -98,14 +98,29 @@ static void cpu_common_get_memory_mapping(CPUState *cpu,
-  * BQL here if we need to.  cpu_interrupt assumes it is held.*/
- void cpu_reset_interrupt(CPUState *cpu, int mask)
- {
--    bool need_lock = !qemu_mutex_iothread_locked();
-+    bool has_bql = qemu_mutex_iothread_locked();
-+    bool has_cpu_lock = cpu_mutex_locked(cpu);
- 
--    if (need_lock) {
--        qemu_mutex_lock_iothread();
-+    if (has_bql) {
-+        if (has_cpu_lock) {
-+            atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
-+        } else {
-+            cpu_mutex_lock(cpu);
-+            atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
-+            cpu_mutex_unlock(cpu);
-+        }
-+        return;
-+    }
-+
-+    if (has_cpu_lock) {
-+        cpu_mutex_unlock(cpu);
-     }
--    cpu->interrupt_request &= ~mask;
--    if (need_lock) {
--        qemu_mutex_unlock_iothread();
-+    qemu_mutex_lock_iothread();
-+    cpu_mutex_lock(cpu);
-+    atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
-+    qemu_mutex_unlock_iothread();
-+    if (!has_cpu_lock) {
-+        cpu_mutex_unlock(cpu);
-     }
- }
- 
+             cpu_openrisc_timer_update(cpu);
 -- 
 2.17.1
