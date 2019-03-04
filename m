@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49380)
+Received: from eggs.gnu.org ([209.51.188.92]:50691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1h0iCz-0005pZ-7w
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:40:22 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1h0iJ9-0007V4-NL
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:46:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1h0iCu-0003De-1D
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:40:20 -0500
-Received: from sonic309-21.consmr.mail.sg3.yahoo.com ([106.10.244.84]:46712)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
-	id 1h0iCo-0002z2-UR
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:40:13 -0500
-From: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
-Date: Mon,  4 Mar 2019 16:39:36 +0900
-Message-Id: <20190304073936.55294-1-lucienmp_antispam@yahoo.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1h0iJ8-0007wv-6w
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:46:43 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:35964)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1h0iJ7-0007vi-Pp
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 02:46:42 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
+In-Reply-To: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
+Date: Mon, 4 Mar 2019 10:46:37 +0300
+Message-ID: <001201d4d25e$66458d60$32d0a820$@ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] Fix for RSP vCont packet
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v13 00/25] Fixing record/replay and adding
+ reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,110 +29,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, Luc Michel <luc.michel@greensocs.com>, Eric Blake <eblake@redhat.com>, lucienmp_antispam@yahoo.com
+To: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-This fixes a regression in rsp packet vCont, this was due to the
-recently added multiprocess support. (Short commit hash: e40e520).
+Ping.
+Can anyone review block-related patches?
 
-The result is that vCont now does not recognise the case where
-no process/thread is provided after the action.
+Pavel Dovgalyuk
 
-This may not show up with GDB, but using Lauterbach Trace32,
-and Hexrays IDA Pro this issue is immediately seen.
-
-The response is a "$#00" empty packet, showing it is unsupported packet.
-
-This is defined in the RSP document as "An action with no thread-id
-matches all threads."
-(https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html#vCont-packet)
-
-This is where the document lacks details. It says that the vCont packet
-is used to "Resume the inferior, specifying different actions for each
-thread."
-
-So it seems to target only one inferior (i.e. one process).
-
-When multiprocess extension is in use, this packet must be supported,
-and used in place of 'Hc' (which modifies s->c_cpu) and other action
-packets (s, S, ...) which are deprecated.
-
-So the question is: when the vCont packet does not specifies a
-thread-id, what _process_ we should choose?
-
-Going for all process is probably ok because:
-  - we don't have to bother choosing a PID,
-  - it will cover the mono-process case correctly (main use-case of this
-form of vCont packet I think).
-
-The alternative would be can go for GDB_ALL_THREAD and take the PID of the
-first attached CPU.  But may lead to problems, so I have chosen the
-GDB_ALL_PROCESSES.
-
-A request for improved documentation has been made at;
-https://sourceware.org/bugzilla/show_bug.cgi?id=24177
-
-Thus, for now, the valid vCont packets now are as below.
-However, parsing is still not very strict and many other invalid arguments
-formats are possible but they are not expected from standard debuggers.
-
- * vCont;c/s
- ** Step/Continue all threads
-
- * vCont;c/s:[pX.]Y
- ** Step/Continue optional process X, thread Y
-
- * vCont;C##/S##:[pX.]Y
- ** Step/Continue with signal ## on optional process X, thread Y
-
- * If X or Y are -1 then it applies the action to all processes/threads.
-
-Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
----
-Third attempt, taking greatly valued input on formatting.
-Also includes a change to the way kind is handled for no-action vcont
----
- gdbstub.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index a4be63f6eb..f8680f7ee8 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1145,6 +1145,7 @@ static int is_query_packet(const char *p, const char *query, char separator)
-  */
- static int gdb_handle_vcont(GDBState *s, const char *p)
- {
-+    GDBThreadIdKind kind;
-     int res, signal = 0;
-     char cur_action;
-     char *newstates;
-@@ -1194,12 +1195,24 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
-             goto out;
-         }
- 
--        if (*p++ != ':') {
-+        /*
-+         * When we have vCont;c or vCont;s - action is on all threads
-+         * Alternatively action maybe followed by a ';' and more specifiers
-+         * such as vCont;c;s:p1.1 is a possible, but meaningless format.
-+         * Otherwise if the action is followed by a ':' then
-+         * the pPID.TID format is expected (for example "vCont;c:p1.1;...).
-+         */
-+        if (*p == '\0' || *p == ';') {
-+            /* unclear behavior in RSP spec, assume GDB_ALL_PROCESSES is ok */
-+            kind = GDB_ALL_PROCESSES;
-+        } else if (*p++ == ':') {
-+            kind = read_thread_id(p, &p, &pid, &tid);
-+        } else {
-             res = -ENOTSUP;
-             goto out;
-         }
- 
--        switch (read_thread_id(p, &p, &pid, &tid)) {
-+        switch (kind) {
-         case GDB_READ_THREAD_ERR:
-             res = -EINVAL;
-             goto out;
--- 
-2.20.1
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:Pavel.Dovgaluk@ispras.ru]
+> Sent: Thursday, February 21, 2019 2:04 PM
+> To: qemu-devel@nongnu.org
+> Cc: kwolf@redhat.com; peter.maydell@linaro.org; war2jordan@live.com;
+> crosthwaite.peter@gmail.com; boost.lists@gmail.com; artem.k.pisarenko@gmail.com;
+> quintela@redhat.com; ciro.santilli@gmail.com; jasowang@redhat.com; mst@redhat.com;
+> armbru@redhat.com; mreitz@redhat.com; maria.klimushenkova@ispras.ru; dovgaluk@ispras.ru;
+> kraxel@redhat.com; pavel.dovgaluk@ispras.ru; thomas.dullien@googlemail.com;
+> pbonzini@redhat.com; alex.bennee@linaro.org; dgilbert@redhat.com; rth@twiddle.net
+> Subject: [PATCH v13 00/25] Fixing record/replay and adding reverse debugging
+> 
+> GDB remote protocol supports reverse debugging of the targets.
+> It includes 'reverse step' and 'reverse continue' operations.
+> The first one finds the previous step of the execution,
+> and the second one is intended to stop at the last breakpoint that
+> would happen when the program is executed normally.
+> 
+> Reverse debugging is possible in the replay mode, when at least
+> one snapshot was created at the record or replay phase.
+> QEMU can use these snapshots for travelling back in time with GDB.
+> 
+> Running the execution in replay mode allows using GDB reverse debugging
+> commands:
+>  - reverse-stepi (or rsi): Steps one instruction to the past.
+>    QEMU loads on of the prior snapshots and proceeds to the desired
+>    instruction forward. When that step is reaches, execution stops.
+>  - reverse-continue (or rc): Runs execution "backwards".
+>    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+>    and replaying the execution. Then QEMU loads snapshots again and
+>    replays to the latest breakpoint. When there are no breakpoints in
+>    the examined section of the execution, QEMU finds one more snapshot
+>    and tries again. After the first snapshot is processed, execution
+>    stops at this snapshot.
+> 
+> The set of patches include the following modifications:
+>  - gdbstub update for reverse debugging support
+>  - functions that automatically perform reverse step and reverse
+>    continue operations
+>  - hmp/qmp commands for manipulating the replay process
+>  - improvement of the snapshotting for saving the execution step
+>    in the snapshot parameters
+>  - other record/replay fixes
+> 
+> The patches are available in the repository:
+> https://github.com/ispras/qemu/tree/rr-190221
+> 
+> v13 changes:
+>  - rebased to make QAPI stuff applicable
+>  - minor reverse step/reverse continue fix
+> 
+> v12 changes:
+>  - style fixes
+> 
+> v11 changes:
+>  - added can_do_io resetting before jumping to the next block in the chain
+>  - rebase to the latest master
+> 
+> v10 changes:
+>  - added patch for correct deadline calculation with external timers
+>  - updated icount-related documentation in json files
+>    (suggested by Markus Armbruster)
+>  - fixed replay shutdown
+>  - renamed some functions and variables to make them consistent with
+>    the documentation and displayed messages
+>  - minor changes
+> 
+> v9 changes:
+>  - moved rr qapi stuff to the separate file (suggested by Markus Armbruster)
+>  - minor coding style fixes
+> 
+> v8 changes:
+>  - rebased to the new master
+>  - added missing fix for prior rr patch
+>  - updated 'since' version number in json-related patches
+> 
+> v7 changes:
+>  - rebased to the new master with upstreamed patches from the series
+>  - several improvements in hmp/qmp commands handling (suggested by Markus Armbruster)
+>  - fixed record/replay with '-rtc base' option enabled
+>  - added document with virtual hardware requirements
+> 
+> v6 changes:
+>  - rebased to the new version of master
+>  - fixed build of linux-user configurations
+>  - added new clock for slirp and vnc timers
+> 
+> v5 changes:
+>  - multiple fixes of record/replay bugs appeared after QEMU core update
+>  - changed reverse debugging to 'since 3.1'
+> 
+> v4 changes:
+>  - changed 'since 2.13' to 'since 3.0' in json (as suggested by Eric Blake)
+> 
+> v3 changes:
+>  - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
+>  - Rebased to the new code base.
+>  - Minor fixes.
+> 
+> v2 changes:
+>  - documented reverse debugging
+>  - fixed start vmstate loading in record mode
+>  - documented qcow2 changes (as suggested by Eric Blake)
+>  - made icount SnapshotInfo field optional (as suggested by Eric Blake)
+>  - renamed qmp commands (as suggested by Eric Blake)
+>  - minor changes
+> 
+> ---
+> 
+> Pavel Dovgalyuk (24):
+>       block: implement bdrv_snapshot_goto for blkreplay
+>       replay: disable default snapshot for record/replay
+>       replay: update docs for record/replay with block devices
+>       replay: don't drain/flush bdrv queue while RR is working
+>       replay: finish record/replay before closing the disks
+>       qcow2: introduce icount field for snapshots
+>       migration: introduce icount field for snapshots
+>       replay: provide an accessor for rr filename
+>       qapi: introduce replay.json for record/replay-related stuff
+>       replay: introduce info hmp/qmp command
+>       replay: introduce breakpoint at the specified step
+>       replay: implement replay-seek command
+>       replay: refine replay-time module
+>       replay: flush rr queue before loading the vmstate
+>       gdbstub: add reverse step support in replay mode
+>       gdbstub: add reverse continue support in replay mode
+>       replay: describe reverse debugging in docs/replay.txt
+>       replay: add BH oneshot event for block layer
+>       replay: init rtc after enabling the replay
+>       replay: document development rules
+>       util/qemu-timer: refactor deadline calculation for external timers
+>       replay: fix replay shutdown
+>       replay: rename step-related variables and functions
+>       icount: clean up cpu_can_io before jumping to the next block
+> 
+> pbonzini@redhat.com (1):
+>       replay: add missing fix for internal function
+> 
+> 
+>  MAINTAINERS               |    1
+>  accel/tcg/tcg-runtime.c   |    2
+>  accel/tcg/translator.c    |    1
+>  block/blkreplay.c         |    8 +
+>  block/block-backend.c     |    8 +
+>  block/io.c                |   32 ++++
+>  block/iscsi.c             |    5 -
+>  block/nfs.c               |    5 -
+>  block/null.c              |    4 -
+>  block/nvme.c              |    6 +
+>  block/qapi.c              |   18 ++
+>  block/qcow2-snapshot.c    |    9 +
+>  block/qcow2.h             |    2
+>  block/rbd.c               |    5 -
+>  block/vxhs.c              |    5 -
+>  blockdev.c                |   10 +
+>  cpus.c                    |   30 +++-
+>  docs/devel/replay.txt     |   46 ++++++
+>  docs/interop/qcow2.txt    |    4 +
+>  docs/replay.txt           |   45 ++++++
+>  exec.c                    |    8 +
+>  gdbstub.c                 |   52 +++++++
+>  hmp-commands-info.hx      |   14 ++
+>  hmp-commands.hx           |   53 +++++++
+>  hmp.h                     |    4 +
+>  include/block/snapshot.h  |    1
+>  include/qemu/timer.h      |    7 -
+>  include/sysemu/replay.h   |   30 ++++
+>  migration/savevm.c        |   11 ++
+>  qapi/Makefile.objs        |    2
+>  qapi/block-core.json      |    8 +
+>  qapi/block.json           |    3
+>  qapi/misc.json            |   18 --
+>  qapi/qapi-schema.json     |    1
+>  qapi/replay.json          |  121 +++++++++++++++++
+>  qtest.c                   |    2
+>  replay/Makefile.objs      |    3
+>  replay/replay-debugging.c |  327 +++++++++++++++++++++++++++++++++++++++++++++
+>  replay/replay-events.c    |   18 ++
+>  replay/replay-internal.c  |   10 +
+>  replay/replay-internal.h  |   17 +-
+>  replay/replay-snapshot.c  |    6 -
+>  replay/replay-time.c      |   36 ++---
+>  replay/replay.c           |   56 ++++++--
+>  stubs/Makefile.objs       |    1
+>  stubs/replay-user.c       |    9 +
+>  stubs/replay.c            |   10 +
+>  tests/ptimer-test-stubs.c |    2
+>  tests/ptimer-test.c       |    4 -
+>  util/qemu-timer.c         |   41 +++++-
+>  vl.c                      |   21 ++-
+>  51 files changed, 1009 insertions(+), 133 deletions(-)
+>  create mode 100644 docs/devel/replay.txt
+>  create mode 100644 qapi/replay.json
+>  create mode 100644 replay/replay-debugging.c
+>  create mode 100644 stubs/replay-user.c
+> 
+> --
+> Pavel Dovgalyuk
