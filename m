@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56291)
+Received: from eggs.gnu.org ([209.51.188.92]:58552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h0msS-0007iJ-Ud
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:39:30 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h0n50-0001gx-K6
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:52:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h0msO-0000ul-2B
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:39:26 -0500
-Date: Mon, 4 Mar 2019 12:39:08 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190304123908.GK4239@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1551454936-205218-1-git-send-email-imammedo@redhat.com>
-	<1551454936-205218-2-git-send-email-imammedo@redhat.com>
-	<20190301154947.GJ21251@redhat.com>
-	<20190301183328.20b63e23@redhat.com>
-	<20190301174806.GN21251@redhat.com>
-	<87va0zcdse.fsf@dusky.pond.sub.org>
-	<20190304132507.39273826@redhat.com>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h0n4y-0005LM-KV
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:52:26 -0500
+References: <20190301214945.4353-1-palmer@sifive.com>
+	<CAFEAcA-ZbFf+_Bt4QGu6ZchOZtvizWPR_5pFz4vOVVYAf23mgA@mail.gmail.com>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <36b17c57-7caf-1e49-d500-bf2eddcd1f25@mail.uni-paderborn.de>
+Date: Mon, 4 Mar 2019 13:52:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190304132507.39273826@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
- parameter of '-numa node' option
+In-Reply-To: <CAFEAcA-ZbFf+_Bt4QGu6ZchOZtvizWPR_5pFz4vOVVYAf23mgA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PULL] target/riscv: Convert to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,123 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au, mprivozn@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On Mon, Mar 04, 2019 at 01:25:07PM +0100, Igor Mammedov wrote:
-> On Mon, 04 Mar 2019 08:13:53 +0100
-> Markus Armbruster <armbru@redhat.com> wrote:
->=20
-> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-> >=20
-> > > On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wrote: =20
-> > >> On Fri, 1 Mar 2019 15:49:47 +0000
-> > >> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> > >>  =20
-> > >> > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov wrote: =20
-> > >> > > The parameter allows to configure fake NUMA topology where gue=
-st
-> > >> > > VM simulates NUMA topology but not actually getting a performa=
-nce
-> > >> > > benefits from it. The same or better results could be achieved
-> > >> > > using 'memdev' parameter. In light of that any VM that uses NU=
-MA
-> > >> > > to get its benefits should use 'memdev' and to allow transitio=
-n
-> > >> > > initial RAM to device based model, deprecate 'mem' parameter a=
-s
-> > >> > > its ad-hoc partitioning of initial RAM MemoryRegion can't be
-> > >> > > translated to memdev based backend transparently to users and =
-in
-> > >> > > compatible manner (migration wise).
-> > >> > >=20
-> > >> > > That will also allow to clean up a bit our numa code, leaving =
-only
-> > >> > > 'memdev' impl. in place and several boards that use node_mem
-> > >> > > to generate FDT/ACPI description from it.   =20
-> > >> >=20
-> > >> > Can you confirm that the  'mem' and 'memdev' parameters to -numa
-> > >> > are 100% live migration compatible in both directions ?  Libvirt
-> > >> > would need this to be the case in order to use the 'memdev' synt=
-ax
-> > >> > instead. =20
-> > >> Unfortunately they are not migration compatible in any direction,
-> > >> if it where possible to translate them to each other I'd alias 'me=
-m'
-> > >> to 'memdev' without deprecation. The former sends over only one
-> > >> MemoryRegion to target, while the later sends over several (one pe=
-r
-> > >> memdev). =20
-> > >
-> > > If we can't migration from one to the other, then we can not deprec=
-ate
-> > > the existing 'mem' syntax. Even if libvirt were to provide a config
-> > > option to let apps opt-in to the new syntax, we need to be able to
-> > > support live migration of existing running VMs indefinitely. Effect=
-ively
-> > > this means we need the to keep 'mem' support forever, or at least s=
-uch
-> > > a long time that it effectively means forever.
-> > >
-> > > So I think this patch has to be dropped & replaced with one that
-> > > simply documents that memdev syntax is preferred. =20
-> >=20
-> > We have this habit of postulating absolutes like "can not deprecate"
-> > instead of engaging with the tradeoffs.  We need to kick it.
-> >=20
-> > So let's have an actual look at the tradeoffs.
-> >=20
-> > We don't actually "support live migration of existing running VMs
-> > indefinitely".
-> >=20
-> > We support live migration to any newer version of QEMU that still
-> > supports the machine type.
-> >=20
-> > We support live migration to any older version of QEMU that already
-> > supports the machine type and all the devices the machine uses.
-> >=20
-> > Aside: "support" is really an honest best effort here.  If you rely o=
-n
-> > it, use a downstream that puts in the (substantial!) QA work real
-> > support takes.
-> >=20
-> > Feature deprecation is not a contract to drop the feature after two
-> > releases, or even five.  It's a formal notice that users of the featu=
-re
-> > should transition to its replacement in an orderly manner.
-> >=20
-> > If I understand Igor correctly, all users should transition away from
-> > outdated NUMA configurations at least for new VMs in an orderly manne=
-r.
-> Yes, we can postpone removing options until there are machines type
-> versions that were capable to use it (unfortunate but probably=20
-> unavoidable unless there is a migration trick to make transition
-> transparent) but that should not stop us from disabling broken
-> options on new machine types at least.
->=20
-> This series can serve as formal notice with follow up disabling of
-> deprecated options for new machine types. (As Thomas noted, just warnin=
-gs
-> do not work and users continue to use broken features regardless whethe=
-r
-> they are don't know about issues or aware of it [*])
->=20
-> Hence suggested deprecation approach and enforced rejection of legacy
-> numa options for new machine types in 2 releases so users would stop
-> using them eventually.
 
-When we deprecate something, we need to have a way for apps to use the
-new alternative approach *at the same time*.  So even if we only want to
-deprecate for new machine types, we still have to first solve the problem
-of how mgmt apps will introspect QEMU to learn which machine types expect
-the new options.
+On 3/4/19 12:02 PM, Peter Maydell wrote:
+> On Fri, 1 Mar 2019 at 21:49, Palmer Dabbelt <palmer@sifive.com> wrote:
+>> merged tag 'i2c-for-release-20190228'
+>> Primary key fingerprint: FD0D 5CE6 7CE0 F59A 6688  2686 61F3 8C90 919B FF81
+>> The following changes since commit 20b084c4b1401b7f8fbc385649d48c67b6f43d44:
+>>
+>>    Merge remote-tracking branch 'remotes/cminyard/tags/i2c-for-release-20190228' into staging (2019-03-01 11:20:49 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>    git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-4.0-sf2
+>>
+>> for you to fetch changes up to 0bcba29464ea9969fc69cd729e4c8bddfb2e18e3:
+>>
+>>    target/riscv: Remaining rvc insn reuse 32 bit translators (2019-03-01 13:16:18 -0800)
+>>
+>> ----------------------------------------------------------------
+>> target/riscv: Convert to decodetree
+>>
+>> Bastian: this patchset converts the RISC-V decoder to decodetree in four major steps:
+>>
+>> 1) Convert 32-bit instructions to decodetree [Patch 1-15]:
+>>      Many of the gen_* functions are called by the decode functions for 16-bit
+>>      and 32-bit functions. If we move translation code from the gen_*
+>>      functions to the generated trans_* functions of decode-tree, we get a lot of
+>>      duplication. Therefore, we mostly generate calls to the old gen_* function
+>>      which are properly replaced after step 2).
+>>
+>>      Each of the trans_ functions are grouped into files corresponding to their
+>>      ISA extension, e.g. addi which is in RV32I is translated in the file
+>>      'trans_rvi.inc.c'.
+>>
+>> 2) Convert 16-bit instructions to decodetree [Patch 16-18]:
+>>      All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
+>>      we convert the arguments in the 16 bit trans_ function to the arguments of
+>>      the corresponding 32 bit instruction and call the 32 bit trans_ function.
+>>
+>> 3) Remove old manual decoding in gen_* function [Patch 19-29]:
+>>      this move all manual translation code into the trans_* instructions of
+>>      decode tree, such that we can remove the old decode_* functions.
+>>
+>> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
+>>     by Richard. [Patch 30-34]
+>>
+>> Palmer: This passed Alistar's testing on rv32 and rv64 as well as my
+>> testing on rv64, so I think it's good to go.  Thanks for the cleanup!
+>>
+> Hi; I'm afraid this has compile errors on the OSX build:
+>
+>
+> In file included from
+> /Users/pm215/src/qemu-for-merges/target/riscv/translate.c:377:
+> target/riscv/decode_insn16.inc.c:37:15: error: redefinition of typedef
+> 'arg_fld' is a C11 feature [-Werror,-Wtypedef-redefinition]
+> typedef arg_i arg_fld;
+>                ^
+> target/riscv/decode_insn32.inc.c:293:15: note: previous definition is here
+> typedef arg_i arg_fld;
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+This looks like an unforeseen decodetree problem (CC' Richard). As these 
+16/32 instructions share the same trans_* function, we emit the same 
+typedef once for 16 bit and once for 32 bit. I don't see an easy fix in 
+decodetree other than annotating one of the instructions with something 
+like !shared , since both insn are parsed in two runs of decodetree and 
+later included together into one file. I'll try to prepare a patch.
+
+Cheers,
+
+Bastian
