@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60681)
+Received: from eggs.gnu.org ([209.51.188.92]:60716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1h0nLT-0004sC-2p
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:09:27 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0nLb-0004uO-Fv
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 08:09:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1h0nBA-00037K-Dy
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:58:51 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36278)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1h0nB8-0002zd-EL
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:58:48 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x24Cp5Q7128787
-	for <qemu-devel@nongnu.org>; Mon, 4 Mar 2019 07:58:38 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2r121bxmj2-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 07:58:37 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Mon, 4 Mar 2019 12:58:36 -0000
-From: Fabiano Rosas <farosas@linux.ibm.com>
-In-Reply-To: <20190304055018.GM7792@umbus.fritz.box>
-References: <20190228225759.21328-1-farosas@linux.ibm.com>
-	<20190228225759.21328-3-farosas@linux.ibm.com>
-	<20190304055018.GM7792@umbus.fritz.box>
-Date: Mon, 04 Mar 2019 09:58:28 -0300
+	(envelope-from <davidkiarie4@gmail.com>) id 1h0nAQ-0002Vt-FN
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:58:03 -0500
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:39459)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
+	id 1h0nAQ-0002UE-6P
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 07:58:02 -0500
+Received: by mail-oi1-x234.google.com with SMTP id b4so3739985oif.6
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 04:58:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87d0n623uz.fsf@linux.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v4 2/5] kvm-all: Introduce
- kvm_set_singlestep
+References: <20190223105421.1290-1-davidkiarie4@gmail.com>
+	<20190223105421.1290-2-davidkiarie4@gmail.com>
+	<105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
+In-Reply-To: <105ba509-af60-b47c-51cc-1e1c01fac56e@redhat.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Mon, 4 Mar 2019 15:57:11 +0300
+Message-ID: <CABdVeAAAMf=yDpuUvv3RxueGgrn+FOkQWy4J1DMq2fLXjv=bFQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/i386: update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,19 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+On Mon, Mar 4, 2019 at 2:57 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om>
+wrote:
 
->> +/* Whether the KVM_SET_GUEST_DEBUG ioctl supports single stepping */
->> +int kvm_has_guestdbg_singlestep(void)
->> +{
->> +    /* return kvm_check_extension(kvm_state, KVM_CAP_GUEST_DEBUG_SSTEP); */
+> Hi David,
 >
-> I don't see a KVM_CAP_GUEST_DEBUG_SSTEP in either the qemu or kernel
-> trees.  Where does that come from?
+> On 2/23/19 11:54 AM, David Kiarie wrote:
+> > Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
+> > ---
+> >  hw/i386/amd_iommu.c | 2 +-
+> >  hw/i386/amd_iommu.h | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+> > index 8ad707a..4f179da 100644
+> > --- a/hw/i386/amd_iommu.c
+> > +++ b/hw/i386/amd_iommu.c
+> > @@ -2,7 +2,7 @@
+> >   * QEMU emulation of AMD IOMMU (AMD-Vi)
+> >   *
+> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+> > + * Copyright (C) 2016 David Kiarie Kahurani
+>
+> Why do you change the year? Because your work was merged in 2016?
 >
 
-I'll submit that to the kernel this week. I was waiting to make sure this
-wouldn't change too much on QEMU side first.
+no.
+
+
+>
+> >   *
+> >   * This program is free software; you can redistribute it and/or modif=
+y
+> >   * it under the terms of the GNU General Public License as published b=
+y
+> > diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+> > index c52886f..cb258a7 100644
+> > --- a/hw/i386/amd_iommu.h
+> > +++ b/hw/i386/amd_iommu.h
+> > @@ -2,7 +2,7 @@
+> >   * QEMU emulation of an AMD IOMMU (AMD-Vi)
+> >   *
+> >   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+> > - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+> > + * Copyright (C) 2016 David Kiarie Kahurani
+> >   *
+> >   * This program is free software; you can redistribute it and/or modif=
+y
+> >   * it under the terms of the GNU General Public License as published b=
+y
+> >
+>
