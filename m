@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35902)
+Received: from eggs.gnu.org ([209.51.188.92]:36220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h0pfl-0006SL-PL
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:38:35 -0500
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1h0phA-0007df-Fs
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h0pfj-0003Gq-Vm
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:38:33 -0500
-Received: from mail-eopbgr680091.outbound.protection.outlook.com
-	([40.107.68.91]:3332
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1h0ph9-0004sw-GT
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:40:00 -0500
+Received: from mail-oln040092001075.outbound.protection.outlook.com
+	([40.92.1.75]:25184
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1h0pfh-0003BC-L2
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:38:30 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 4 Mar 2019 15:38:24 +0000
-Message-ID: <BN6PR2201MB1251C1431A41622EDBCB077FC6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1550491301.git.balaton@eik.bme.hu>
-	<BN6PR2201MB1251959BC139F153BD5760A2C6710@BN6PR2201MB1251.namprd22.prod.outlook.com>,
-	<alpine.BSF.2.21.9999.1903041514430.72040@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.21.9999.1903041514430.72040@zero.eik.bme.hu>
+	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
+	id 1h0ph8-0004mh-FJ
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 10:39:58 -0500
+From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
+Date: Mon, 4 Mar 2019 15:39:53 +0000
+Message-ID: <RO1P152MB14836FF855F37ED3E6BF606C97710@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <19CCCB4091969348BEEDB07D72C403E9@LAMP152.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Misc MIPS fulong2e improvements
+Subject: [Qemu-devel] After patch to fix non repeating keys,
+ keys get stuck on Windows guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,83 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Huacai Chen <zltjiangshi@gmail.com>, "philmd@redhat.com" <philmd@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-> From: BALATON Zoltan <balaton@eik.bme.hu>
-> Subject: Re: [PATCH v2 0/3] Misc MIPS fulong2e improvements
->
-> On Mon, 4 Mar 2019, Aleksandar Markovic wrote:
-> >> From: BALATON Zoltan <balaton@eik.bme.hu>
-> >> v2 of http://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg02477=
-.html
-> >> Addressed review comments and removed last patch (sending it
-> >> separately) to make this series not depend on my ati-vga patch so it
-> >> can be applied independently.
-> >
-> > I plan to add bin file (that you mentioned) used for Fulong 2E tests in=
-to our
-> > tree (in pc-bios directory, with an appropriate comment in pc-bios/READ=
-ME).
-> > Please let me know if you this I should not do that, of if I should per=
-haps > include
-> > more files, or different files, etc.
->
-> I think you cannot do that because distributing binary also requires to
-> provide sources to comply with GPL. Therefore you should include source i=
-n
-> roms and build binary from that like done for sam460ex for example (see:
-> git log roms/u-boot-sam460ex). Problem is you have to figure out which
-> sources and config was used to build that binary with the original
-> lemote.com site mentioned in a comment in mips_fulong2e.c that used to
-> host the source seemingly gone. So you probably will need to find a mirro=
-r
-> and figure out how to build the pmon binary from that. The comment in
-> source mentions that pmon is under BSD licence in which case it may be
-> distributed without source but including random binaries may not be the
-> best way even if it would be allowed by licence so building a firmware
-> from source is the best way if possible.
-
-OK, I will for now give up integrating the binary until all is clarified.
-
-Thanks!
-Aleksandar
-
-________________________________________
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Sent: Monday, March 4, 2019 3:27:27 PM
-To: Aleksandar Markovic
-Cc: qemu-devel@nongnu.org; Aurelien Jarno; Huacai Chen; philmd@redhat.com
-Subject: Re: [PATCH v2 0/3] Misc MIPS fulong2e improvements
-
-On Mon, 4 Mar 2019, Aleksandar Markovic wrote:
->> From: BALATON Zoltan <balaton@eik.bme.hu>
->> v2 of http://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg02477.h=
-tml
->> Addressed review comments and removed last patch (sending it
->> separately) to make this series not depend on my ati-vga patch so it
->> can be applied independently.
->
-> I plan to add bin file (that you mentioned) used for Fulong 2E tests into=
- our
-> tree (in pc-bios directory, with an appropriate comment in pc-bios/README=
-).
-> Please let me know if you this I should not do that, of if I should perha=
-ps include
-> more files, or different files, etc.
-
-I think you cannot do that because distributing binary also requires to
-provide sources to comply with GPL. Therefore you should include source in
-roms and build binary from that like done for sam460ex for example (see:
-git log roms/u-boot-sam460ex). Problem is you have to figure out which
-sources and config was used to build that binary with the original
-lemote.com site mentioned in a comment in mips_fulong2e.c that used to
-host the source seemingly gone. So you probably will need to find a mirror
-and figure out how to build the pmon binary from that. The comment in
-source mentions that pmon is under BSD licence in which case it may be
-distributed without source but including random binaries may not be the
-best way even if it would be allowed by licence so building a firmware
-from source is the best way if possible.
-
-Regards,
-BALATON Zoltan
+VXNpbmcgUUVNVSB2ZXJzaW9uIDMuMS41MCAodjMuMS4wLTIzMzgtZzFiYTUzMGE0ZWMtZGlydHkp
+LCBhZnRlciB0aGUNCmNvbW1pdCAzNTkyMTg2MDE1NmUzOWYxN2ZmZDdlMThkMGY4NGQyMzk2YTZl
+OGY0DQprYmQtc3RhdGU6IGRvbid0IGJsb2NrIGF1dG8tcmVwZWF0IGV2ZW50cw0KDQpJdCB3YXMg
+bm90aWNlZCB0aGF0IGtleXMgY2FuIGdldCBzdHVjayBvbiBhbiBJbnRlbCBHVlQtZyAoaUdWVC1n
+KQ0KV2luZG93cyAxMCBndWVzdC4gRm9yIGV4YW1wbGUsIHByZXNzaW5nICJlIiB3aWxsIHJlc3Vs
+dCBvbg0KImVlZWVlZWVlZWVlZWVlZWVlZWVlZWUiIHVudGlsIHRoZSBrZXkgImUiIGlzIHByZXNz
+ZWQgYWdhaW4uIEkgdHJpZWQgdG8NCnJlcHJvZHVjZSB0aGlzIG9uIHNpbXBsZSBMaW51eCBndWVz
+dHMgYW5kIHNpbXBsZSBXaW5kb3dzIDEwIGd1ZXN0cyBidXQNCmZhaWxlZCB0byBkbyBzby4NCg0K
+VGhlIFFFTVUgY29tbWFuZCBsaW5lIGlzIHByZXR0eSBsb25nOg0KDQpzdWRvIGVudiBRRU1VX0FV
+RElPX0RSVj1wYSBRRU1VX0FVRElPX0RBQ19GSVhFRF9GUkVRPTk2MDAwDQpRRU1VX0FVRElPX0FE
+Q19GSVhFRF9GUkVRPTk2MDAwDQpRRU1VX1BBX1NFUlZFUj0vcnVuL3VzZXIvMTAwMC9wdWxzZS9u
+YXRpdmUgUUVNVV9BVURJT19BRENfVk9JQ0VTPTANClBVTFNFX0xBVEVOQ1lfTVNFQz0xMCBxZW11
+LXN5c3RlbS14ODZfNjQgLW5hbWUgJ1dpbmRvd3MgMTAnIC1rIHB0LWJyDQotbm9kZWZhdWx0cyAt
+ZGV2aWNlIG5lYy11c2IteGhjaSxpZD1uZWN4aGNpIC1oZGENCi9ob21lL3VzdWFyaW8vLmxvY2Fs
+L3NoYXJlL2xpYnZpcnQvaW1hZ2VzL3JlZG0ucWNvdzIgLWVuYWJsZS1rdm0gLWNwdQ0KU2t5bGFr
+ZS1DbGllbnQsaHZfdGltZSxodl9yZWxheGVkLGh2X3ZhcGljLGh2X3NwaW5sb2Nrcz0weDFmZmYs
+aHZfcnVudGltZQ0KLXNtcCBjb3Jlcz0yLHRocmVhZHM9MiAtbSAzMDcyTSAtYmlvcyAvdXNyL2xv
+Y2FsL3NoYXJlL3FlbXUvYmlvcy5iaW4NCi1kZXZpY2UgdXNiLXRhYmxldCxpZD10YWJsZXQgLWRl
+dmljZSB1c2ItYXVkaW8saWQ9dXNiYXVkdmlyLGJ1ZmZlcj02MTQ0DQotZGV2aWNlIHVzYi1ob3N0
+LHZlbmRvcmlkPTB4MDA3OSxpZD1yZWRyYWdvbiAtZGV2aWNlDQp1c2ItaG9zdCx2ZW5kb3JpZD0w
+eDA0NTgsaWQ9bW91c2VnZW5pdXMgLXZnYSBub25lIC1tb25pdG9yIHZjIC1zZXJpYWwNCnN0ZGlv
+IC1kaXNwbGF5IGd0ayxnbD1vbiAtZGV2aWNlDQp2ZmlvLXBjaSxzeXNmc2Rldj0vc3lzL2J1cy9w
+Y2kvZGV2aWNlcy8wMDAwOjAwOjAyLjAvMTIzZjA5YjAtNGMwMC0xMWU4LWE2Y2EtZjNjMjFlNDdl
+MDEyLHgtaWdkLW9wcmVnaW9uPW9uLHJvbWJhcj0wLGRpc3BsYXk9b24sYWRkcj0weDMsaWQ9aUhE
+NTIwDQotbWFjaGluZSBrZXJuZWxfaXJxY2hpcD1vbiAtZ2xvYmFsIFBJSVg0X1BNLmRpc2FibGVf
+czM9MSAtZ2xvYmFsDQpQSUlYNF9QTS5kaXNhYmxlX3M0PTEgLU0gcGMsdXNiPWZhbHNlIC1uZXRk
+ZXYgdXNlcixpZD1uZXQwIC1kZXZpY2UNCmUxMDAwLG5ldGRldj1uZXQwLGlkPW4wLGFkZHI9MHg4
+IC1kZXZpY2UNCnVzYi1ob3N0LHZlbmRvcmlkPTB4MDQ4MCxwcm9kdWN0aWQ9MHgwMjAwLGlkPXRv
+c2hpYmENCg0KInJlZHJhZ29uIiBpcyBhIGdhbWVwYWQsICJ0b3NoaWJhIiBhbiBleHRlcm5hbCBI
+REQgYW5kICJtb3VzZWdlbml1cyIgaXMNCmEgbW91c2UuIFRoZSBwcm9ibGVtIHdhcyBub3RpY2Vk
+IGJvdGggd2l0aCBkZXZpY2VzIGNvbm5lY3RlZCBhbmQNCmRpc2Nvbm5lY3RlZCwgYW5kIHdoZW4g
+dGhleSB3ZXJlIHJlbW92ZWQgdXNpbmcgZGV2aWNlX2RlbC4NCg0KV2hpbGUgSSBmYWNlZCB0aGlz
+IG9uIG11bHRpcGxlIHNpdHVhdGlvbnMgKGV2ZW4gdXNpbmcgbm90ZXBhZCwgZm9yDQpleGFtcGxl
+KSwgdGhpcyBidWcgaXMgZWFzeSB0byB0cmlnZ2VyIHdpdGggZ2FtZXMuIEl0IHNlZW1zIHRoZSB1
+c2ItYXVkaW8NCmVtdWxhdGlvbiBwbHVzIGlHVlQtZyBsb2FkIHBsdXMgaGlnaCBDUFUgbG9hZCBt
+YWtlcyB0aGUga2V5IHJlbGVhc2UNCmV2ZW50IG5ldmVyIHRvIGJlIHNlbnQgdG8gdGhlIGd1ZXN0
+LCBtYWtpbmcgdGhlIGtleSBnZXQgc3R1Y2sgb24gdGhlDQpndWVzdCB1bnRpbCBpdCBpcyBwcmVz
+c2VkIGFnYWluLg0K
