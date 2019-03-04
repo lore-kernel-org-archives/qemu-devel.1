@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49663)
+Received: from eggs.gnu.org ([209.51.188.92]:50539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h0sNu-0003xz-TO
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:32:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h0sQm-0006JD-1f
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:35:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h0sNu-0003OT-54
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:32:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h0sNt-0003LD-T7
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:32:18 -0500
-References: <20190303104430.7692-1-samuel.thibault@ens-lyon.org>
-	<20190303104430.7692-3-samuel.thibault@ens-lyon.org>
-	<20190304080338.jalgvluxwqiygqi2@sirius.home.kraxel.org>
-	<20190304080622.fvrsvkkq4h4k2z37@function>
-	<CAF0C5SLZzDpR3qin4kixXpb-ewLoYThFLHBHG26=pi5Oa-6dGw@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2b019fbb-ef70-1f57-b08a-0bed20365c18@redhat.com>
-Date: Mon, 4 Mar 2019 12:32:06 -0600
+	(envelope-from <cohuck@redhat.com>) id 1h0sQk-0002fb-VI
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 13:35:15 -0500
+Date: Mon, 4 Mar 2019 19:35:09 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190304193509.5eae1b41.cohuck@redhat.com>
+In-Reply-To: <1551466776-29123-12-git-send-email-jjherne@linux.ibm.com>
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-12-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAF0C5SLZzDpR3qin4kixXpb-ewLoYThFLHBHG26=pi5Oa-6dGw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] curses: add option to specify VGA font
- encoding
+Subject: Re: [Qemu-devel] [PATCH v3 11/16] s390-bios: cio error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +23,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kohler@seas.harvard.edu, Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On 3/4/19 10:56 AM, Eddie Kohler wrote:
-> Another difference is that Samuel's patch supports platforms on which
-> wchar_t is not Unicode.
+On Fri,  1 Mar 2019 13:59:31 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+
+> Add verbose error output for when unexpected i/o errors happen. This eases the
+> burden of debugging and reporting i/o errors. No error information is printed
+> in the success case, here is an example of what is output on error:
 > 
-> I don't know if there are many/any such platforms but it does support them!
+> cio device error
+>   ssid  : 0x0000000000000000
+>   cssid : 0x0000000000000000
+>   sch_no: 0x0000000000000000
+> 
+> Interrupt Response Block Data:
+>     Function Ctrl : [Start]
+>     Activity Ctrl : [Start-Pending]
+>     Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
+>     Device Status : [Unit-Check]
+>     Channel Status :
+>     cpa=: 0x000000007f8d6038
+>     prev_ccw=: 0x0000000000000000
+>     this_ccw=: 0x0000000000000000
+> Eckd Dasd Sense Data (fmt 32-bytes):
+>     Sense Condition Flags :
+>     Residual Count     =: 0x0000000000000000
+>     Phys Drive ID      =: 0x000000000000009e
+>     low cyl address    =: 0x0000000000000000
+>     head addr & hi cyl =: 0x0000000000000000
+>     format/message     =: 0x0000000000000008
+>     fmt-dependent[0-7] =: 0x0000000000000004
+>     fmt-dependent[8-15]=: 0xe561282305082fff
+>     prog action code   =: 0x0000000000000016
+>     Configuration info =: 0x00000000000040e0
+>     mcode / hi-cyl     =: 0x0000000000000000
+>     cyl & head addr [0]=: 0x0000000000000000
+>     cyl & head addr [1]=: 0x0000000000000000
+>     cyl & head addr [2]=: 0x0000000000000000
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/cio.c  | 230 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/libc.h |  11 +++
+>  2 files changed, 241 insertions(+)
+> 
+> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+> index e61cfd3..c528bbf 100644
+> --- a/pc-bios/s390-ccw/cio.c
+> +++ b/pc-bios/s390-ccw/cio.c
+> @@ -82,6 +82,228 @@ static bool irb_error(Irb *irb)
+>      return irb->scsw.dstat != (SCSW_DSTAT_DEVEND | SCSW_DSTAT_CHEND);
+>  }
+>  
+> +static void print_eckd_dasd_sense_data(SenseDataEckdDasd *sd)
+> +{
+> +    char msgline[512];
+> +
+> +    if (sd->config_info & 0x8000) {
+> +        sclp_print("Eckd Dasd Sense Data (fmt 24-bytes):\n");
+> +    } else {
+> +        sclp_print("Eckd Dasd Sense Data (fmt 32-bytes):\n");
+> +    }
+> +
+> +    strcat(msgline, "    Sense Condition Flags :");
+> +    if (sd->status[0] & SNS_STAT0_CMD_REJECT) {
+> +        strcat(msgline, " [Cmd-Reject]");
+> +    }
+> +    if (sd->status[0] & SNS_STAT0_INTERVENTION_REQ) {
+> +        strcat(msgline, " [Intervention-Required]");
+> +    }
+> +    if (sd->status[0] & SNS_STAT0_BUS_OUT_CHECK) {
+> +        strcat(msgline, " [Bus-Out-Parity-Check]");
+> +    }
+> +    if (sd->status[0] & SNS_STAT0_EQUIPMENT_CHECK) {
+> +        strcat(msgline, " [Equipment-Check]");
+> +    }
+> +    if (sd->status[0] & SNS_STAT0_DATA_CHECK) {
+> +        strcat(msgline, " [Data-Check]");
 
-I know Cygwin is such a platform, and suspect that mingw is too 
-(although I didn't actually check) - in general, Windows picked wchar_t 
-to be 2 bytes, which is incompatible with full Unicode support requiring 
-4-byte wchar_t, and hence explaining why C11 introduced char16_t and 
-char32_t to work around the legacy mess that wchar_t causes.
+I'm wondering whether it would make sense to factor the common bits
+out. Might be overkill, though.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> +    }
+> +    if (sd->status[0] & SNS_STAT0_OVERRUN) {
+> +        strcat(msgline, " [Overrun]");
+> +    }
+> +    if (sd->status[0] & SNS_STAT0_INCOMPL_DOMAIN) {
+> +        strcat(msgline, " [Incomplete-Domain]");
+> +    }
+(...)
+> +        sclp_print("cio device error\n");
+> +        print_int("  ssid  ", schid.ssid);
+> +        print_int("  cssid ", schid.cssid);
+> +        print_int("  sch_no", schid.sch_no);
+> +        sclp_print("\n");
+> +        print_irb_err(&irb);
+
+Maybe do basic_sense + print sense data only if there's actually a unit
+check?
+
+(Also, I'm not sure if you can even do a basic_sense in case e.g. of
+unexpected busy.)
+
+> +        basic_sense(schid, &sd, sizeof(sd));
+> +        print_eckd_dasd_sense_data(&sd);
+>          rc = -1;
+>          break;
+>      }
