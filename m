@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60511)
+Received: from eggs.gnu.org ([209.51.188.92]:33333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h0lGP-0005xT-OD
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:56:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h0lMe-0007J4-3K
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:02:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h0lGO-0005Yn-1k
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:56:05 -0500
-Received: from mail-wr1-f51.google.com ([209.85.221.51]:39110)
+	(envelope-from <peter.maydell@linaro.org>) id 1h0lMc-0003MF-TJ
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:02:32 -0500
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:43384)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h0lGN-0005Wn-RM
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 05:56:03 -0500
-Received: by mail-wr1-f51.google.com with SMTP id l5so5001118wrw.6
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 02:56:02 -0800 (PST)
-References: <20190221173326.31874-1-mst@redhat.com>
-	<20190225101718-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a84fe47c-e755-b13e-b176-89b233820bc7@redhat.com>
-Date: Mon, 4 Mar 2019 11:55:59 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h0lMc-0003Io-Bm
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 06:02:30 -0500
+Received: by mail-ot1-x332.google.com with SMTP id n71so3853032ota.10
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 03:02:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190225101718-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL v2 resend 00/26] pci, pc, virtio: fixes,
- cleanups, tests
+References: <20190301214945.4353-1-palmer@sifive.com>
+In-Reply-To: <20190301214945.4353-1-palmer@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Mar 2019 11:02:14 +0000
+Message-ID: <CAFEAcA-ZbFf+_Bt4QGu6ZchOZtvizWPR_5pFz4vOVVYAf23mgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL] target/riscv: Convert to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,147 +28,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "open list:RISC-V" <qemu-riscv@nongnu.org>
 
-On 25/02/19 16:19, Michael S. Tsirkin wrote:
-> The following changes since commit fc3dbb90f2eb069801bfb4cfe9cbc83cf9c5f4a9:
-> 
->   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-02-21 13:09:33 +0000)
-> 
+On Fri, 1 Mar 2019 at 21:49, Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> merged tag 'i2c-for-release-20190228'
+> Primary key fingerprint: FD0D 5CE6 7CE0 F59A 6688  2686 61F3 8C90 919B FF81
+> The following changes since commit 20b084c4b1401b7f8fbc385649d48c67b6f43d44:
+>
+>   Merge remote-tracking branch 'remotes/cminyard/tags/i2c-for-release-20190228' into staging (2019-03-01 11:20:49 +0000)
+>
 > are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> 
-> for you to fetch changes up to 88c869198aa630e0477d653d0abf3f42c7c44d1f
-> 
->   pci: Sanity test minimum downstream LNKSTA (2019-02-21 12:28:41 -0500)
-> 
+>
+>   git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-4.0-sf2
+>
+> for you to fetch changes up to 0bcba29464ea9969fc69cd729e4c8bddfb2e18e3:
+>
+>   target/riscv: Remaining rvc insn reuse 32 bit translators (2019-03-01 13:16:18 -0800)
+>
 > ----------------------------------------------------------------
-> 
-> Note: this is same as a fixup I sent earlier, this is just a resend to
-> make sure it's not missed.  This should also help me figure out whether
-> this is a good format to use.
+> target/riscv: Convert to decodetree
+>
+> Bastian: this patchset converts the RISC-V decoder to decodetree in four major steps:
+>
+> 1) Convert 32-bit instructions to decodetree [Patch 1-15]:
+>     Many of the gen_* functions are called by the decode functions for 16-bit
+>     and 32-bit functions. If we move translation code from the gen_*
+>     functions to the generated trans_* functions of decode-tree, we get a lot of
+>     duplication. Therefore, we mostly generate calls to the old gen_* function
+>     which are properly replaced after step 2).
+>
+>     Each of the trans_ functions are grouped into files corresponding to their
+>     ISA extension, e.g. addi which is in RV32I is translated in the file
+>     'trans_rvi.inc.c'.
+>
+> 2) Convert 16-bit instructions to decodetree [Patch 16-18]:
+>     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
+>     we convert the arguments in the 16 bit trans_ function to the arguments of
+>     the corresponding 32 bit instruction and call the 32 bit trans_ function.
+>
+> 3) Remove old manual decoding in gen_* function [Patch 19-29]:
+>     this move all manual translation code into the trans_* instructions of
+>     decode tree, such that we can remove the old decode_* functions.
+>
+> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
+>    by Richard. [Patch 30-34]
+>
+> Palmer: This passed Alistar's testing on rv32 and rv64 as well as my
+> testing on rv64, so I think it's good to go.  Thanks for the cleanup!
+>
 
-You should have sent it as a new toplevel message, too, otherwise Peter
-doesn't see it.
+Hi; I'm afraid this has compile errors on the OSX build:
 
-Paolo
 
-> ----------------------------------------------------------------
-> pci, pc, virtio: fixes, cleanups, tests
-> 
-> Lots of work on tests: BiosTablesTest UEFI app,
-> vhost-user testing for non-Linux hosts.
-> Misc cleanups and fixes all over the place
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> ----------------------------------------------------------------
-> Alex Williamson (1):
->       pci: Sanity test minimum downstream LNKSTA
-> 
-> Alexey Kardashevskiy (1):
->       pci: Move NVIDIA vendor id to the rest of ids
-> 
-> Changpeng Liu (1):
->       contrib/vhost-user-blk: fix the compilation issue
-> 
-> Daniel P. Berrangé (1):
->       hw/smbios: fix offset of type 3 sku field
-> 
-> David Gibson (5):
->       virtio-balloon: Remove unnecessary MADV_WILLNEED on deflate
->       virtio-balloon: Corrections to address verification
->       virtio-balloon: Rework ballon_page() interface
->       virtio-balloon: Use ram_block_discard_range() instead of raw madvise()
->       virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size
-> 
-> Laszlo Ersek (5):
->       roms: add the edk2 project as a git submodule
->       roms: build the EfiRom utility from the roms/edk2 submodule
->       tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
->       tests/uefi-test-tools: add build scripts
->       tests/data: introduce "uefi-boot-images" with the "bios-tables-test" ISOs
-> 
-> Paolo Bonzini (9):
->       vhost-net: move stubs to a separate file
->       vhost-net-user: add stubs for when no virtio-net device is present
->       vhost: restrict Linux dependency to kernel vhost
->       vhost-user: support cross-endian vnet headers
->       vhost-net: compile it on all targets that have virtio-net.
->       vhost-net: revamp configure logic
->       vhost-user-test: create a main loop per TestServer
->       vhost-user-test: small changes to init_hugepagefs
->       vhost-user-test: create a temporary directory per TestServer
-> 
-> Peter Xu (1):
->       i386/kvm: ignore masked irqs when update msi routes
-> 
-> Philippe Mathieu-Daudé (1):
->       Revert "contrib/vhost-user-blk: fix the compilation issue"
-> 
-> Wei Yang (1):
->       pc-dimm: use same mechanism for [get|set]_addr
-> 
->  configure                                          | 102 ++++++++-----
->  Makefile                                           |   6 +-
->  default-configs/virtio.mak                         |   4 +-
->  include/exec/poison.h                              |   1 -
->  include/hw/firmware/smbios.h                       |   1 +
->  include/hw/pci/pci_ids.h                           |   2 +
->  include/hw/virtio/virtio-balloon.h                 |   3 +
->  .../UefiTestToolsPkg/Include/Guid/BiosTablesTest.h |  67 +++++++++
->  hw/mem/pc-dimm.c                                   |   4 +-
->  hw/net/vhost_net-stub.c                            |  92 ++++++++++++
->  hw/net/vhost_net.c                                 |  85 +----------
->  hw/pci/pcie.c                                      |  13 +-
->  hw/smbios/smbios.c                                 |   1 +
->  hw/vfio/pci-quirks.c                               |   2 -
->  hw/virtio/vhost-backend.c                          |  12 +-
->  hw/virtio/vhost-user.c                             |  13 +-
->  hw/virtio/vhost.c                                  |   2 +-
->  hw/virtio/virtio-balloon.c                         | 102 ++++++++++---
->  net/net.c                                          |   2 +-
->  net/vhost-user-stub.c                              |  23 +++
->  net/vhost-user.c                                   |  13 ++
->  .../BiosTablesTest/BiosTablesTest.c                | 130 +++++++++++++++++
->  tests/vhost-user-test.c                            | 160 +++++++++++----------
->  .gitmodules                                        |   3 +
->  backends/Makefile.objs                             |   5 +-
->  hw/net/Makefile.objs                               |   4 +-
->  hw/virtio/Makefile.objs                            |   8 +-
->  net/Makefile.objs                                  |   4 +-
->  roms/Makefile                                      |  13 +-
->  roms/edk2                                          |   1 +
->  tests/Makefile.include                             |   5 +-
->  .../bios-tables-test.aarch64.iso.qcow2             | Bin 0 -> 11776 bytes
->  .../bios-tables-test.arm.iso.qcow2                 | Bin 0 -> 11776 bytes
->  .../bios-tables-test.i386.iso.qcow2                | Bin 0 -> 12800 bytes
->  .../bios-tables-test.x86_64.iso.qcow2              | Bin 0 -> 13312 bytes
->  tests/uefi-test-tools/.gitignore                   |   3 +
->  tests/uefi-test-tools/LICENSE                      |  25 ++++
->  tests/uefi-test-tools/Makefile                     | 106 ++++++++++++++
->  .../BiosTablesTest/BiosTablesTest.inf              |  41 ++++++
->  .../UefiTestToolsPkg/UefiTestToolsPkg.dec          |  27 ++++
->  .../UefiTestToolsPkg/UefiTestToolsPkg.dsc          |  69 +++++++++
->  tests/uefi-test-tools/build.sh                     | 145 +++++++++++++++++++
->  42 files changed, 1051 insertions(+), 248 deletions(-)
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
->  create mode 100644 hw/net/vhost_net-stub.c
->  create mode 100644 net/vhost-user-stub.c
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c
->  create mode 160000 roms/edk2
->  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2
->  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2
->  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2
->  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2
->  create mode 100644 tests/uefi-test-tools/.gitignore
->  create mode 100644 tests/uefi-test-tools/LICENSE
->  create mode 100644 tests/uefi-test-tools/Makefile
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc
->  create mode 100755 tests/uefi-test-tools/build.sh
-> 
-> 
+In file included from
+/Users/pm215/src/qemu-for-merges/target/riscv/translate.c:377:
+target/riscv/decode_insn16.inc.c:37:15: error: redefinition of typedef
+'arg_fld' is a C11 feature [-Werror,-Wtypedef-redefinition]
+typedef arg_i arg_fld;
+              ^
+target/riscv/decode_insn32.inc.c:293:15: note: previous definition is here
+typedef arg_i arg_fld;
+              ^
+In file included from
+/Users/pm215/src/qemu-for-merges/target/riscv/translate.c:377:
+target/riscv/decode_insn16.inc.c:39:15: error: redefinition of typedef
+'arg_lw' is a C11 feature [-Werror,-Wtypedef-redefinition]
+typedef arg_i arg_lw;
+              ^
+target/riscv/decode_insn32.inc.c:137:15: note: previous definition is here
+typedef arg_i arg_lw;
+              ^
+In file included from
+/Users/pm215/src/qemu-for-merges/target/riscv/translate.c:377:
+target/riscv/decode_insn16.inc.c:41:15: error: redefinition of typedef
+'arg_fsd' is a C11 feature [-Werror,-Wtypedef-redefinition]
+typedef arg_s arg_fsd;
+              ^
+target/riscv/decode_insn32.inc.c:295:15: note: previous definition is here
+typedef arg_s arg_fsd;
+              ^
+In file included from
+/Users/pm215/src/qemu-for-merges/target/riscv/translate.c:377:
+target/riscv/decode_insn16.inc.c:43:15: error: redefinition of typedef
+'arg_sw' is a C11 feature [-Werror,-Wtypedef-redefinition]
+typedef arg_s arg_sw;
+              ^
+target/riscv/decode_insn32.inc.c:147:15: note: previous definition is here
+typedef arg_s arg_sw;
+              ^
+In file included from
+/Users/pm215/src/qemu-for-merges/target/riscv/translate.c:377:
+target/riscv/decode_insn16.inc.c:49:28: error: redefinition of typedef
+'arg_c_addi16sp_lui' is a C11 feature [-Werror,-Wtypedef-redefinition]
+typedef arg_c_addi16sp_lui arg_c_addi16sp_lui;
+                           ^
+target/riscv/decode_insn16.inc.c:7:3: note: previous definition is here
+} arg_c_addi16sp_lui;
+  ^
+
+(and a lot of other similar errors)
+
+thanks
+-- PMM
