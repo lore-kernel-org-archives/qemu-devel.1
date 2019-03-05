@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58955)
+Received: from eggs.gnu.org ([209.51.188.92]:59982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h1H7M-0006HL-CK
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 15:56:53 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1HC4-0007ep-TV
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:01:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h1H7L-0004KK-E3
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 15:56:52 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:34382)
+	(envelope-from <philmd@redhat.com>) id 1h1HC2-0008SZ-UT
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:01:44 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:33454)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h1H7J-0004II-Jo
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 15:56:51 -0500
-Received: by mail-qt1-f196.google.com with SMTP id w4so10465849qtc.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 12:56:49 -0800 (PST)
-Date: Tue, 5 Mar 2019 15:56:45 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190305155635-mutt-send-email-mst@kernel.org>
-References: <20190227103017.29515-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1HC0-0008OL-6N
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:01:41 -0500
+Received: by mail-wm1-f66.google.com with SMTP id c13so2980137wmb.0
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 13:01:38 -0800 (PST)
+References: <20181207170400.5129-1-philmd@redhat.com>
+	<20181207170400.5129-2-philmd@redhat.com>
+	<b7a09e97-093e-6e27-4c7f-cc5244d63726@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5c595af2-e9c6-61eb-ab83-bdbc59b37967@redhat.com>
+Date: Tue, 5 Mar 2019 22:01:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <b7a09e97-093e-6e27-4c7f-cc5244d63726@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190227103017.29515-1-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 00/12] vhost-user-backend &
- vhost-user-input
+Subject: Re: [Qemu-devel] [PATCH 1/6] hw/arm/virt: Remove null-check in
+ virt_build_smbios()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 
-On Wed, Feb 27, 2019 at 11:30:05AM +0100, Marc-AndrÈ Lureau wrote:
-> Hi,
-> 
-> This series is based on previously discussed "[PATCH v4 00/29]
-> vhost-user for input & GPU" and "vhost-user: define conventions for
-> vhost-user backends" work. The GPU part is left off for now.
-> 
-> This series introduces a "vhost-user-backend": an helper object to be
-> used by vhost-user devices to ease with backend initialization and
-> handling. As a simple showcase, a "vhost-user-input-pci" device is
-> introduced, which can be used with the "contrib: add vhost-user-input"
-> example. vhost-user-input isn't meant to be installed, discovered or
-> used by libvirt: no installation is done (no vhost-user JSON file is
-> provided either).
-> 
-> thanks
-can you rebase on top of master pls?
+Hi Laszlo,
 
-> v4:
-> - drop "RFC: add explicit can_migrate to vhost_user_backend_dev_init()"
-> - remove useless "cmd" struct field leftover
+On 12/10/18 5:02 PM, Laszlo Ersek wrote:
+> On 12/07/18 18:03, Philippe Mathieu-Daud√© wrote:
+>> Since af1f60a4022, the fw_cfg field is always created in machvirt_init().
+>> There is no need to null check it.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud√© <philmd@redhat.com>
+>> ---
+>>  hw/arm/virt.c | 4 ----
+>>  1 file changed, 4 deletions(-)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index f69e7eb399..36303ed59c 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -1279,10 +1279,6 @@ static void virt_build_smbios(VirtMachineState *vms)
+>>      size_t smbios_tables_len, smbios_anchor_len;
+>>      const char *product = "QEMU Virtual Machine";
+>>  
+>> -    if (!vms->fw_cfg) {
+>> -        return;
+>> -    }
+>> -
+>>      if (kvm_enabled()) {
+>>          product = "KVM Virtual Machine";
+>>      }
+>>
 > 
-> v3:
-> - add previously sent patch "libvhost-user: fix clang enum-conversion
->   warning" to fix clang build
-> - "define conventions for vhost-user backends" updates after Eric review
-> - Drop user-creatable from vhost-user-backend
-> - Make vhost-user-input-pci take a chardev= (instead of vhost-user=)
+> This patch looks correct to me; however, the fact that fw_cfg is always
+> present on the virt board does not seem related to commit af1f60a4022
+> af1f60a40226 ("hw/arm/virt: remove VirtGuestInfo", 2017-01-09). Said
+> commit only flattened the contents of VirtGuestInfo into
+> VirtMachineState; the conditions under which fw_cfg would be created
+> were not changed.
+
+This is certainly not related to commit af1f60a4022... This is not the
+commit I remember I wanted to refer to, I suppose I did a copy/paste
+mistake, thanks for carefully reviewing me and catching this!
+
+> As far as I can see (from a number of git-blame / git-show commands),
+> fw_cfg was added unconditionally to the virt board in commit
+> 578f3c7b0835 ("arm: add fw_cfg to "virt" board", 2014-12-22). And the
+> check that you are now (correctly) removing has always been superfluous
+> -- it was superfluous already when it was first added in commit
+> c30e15658b1b ("smbios: implement smbios support for mach-virt", 2015-09-07).
 > 
-> v2:
-> - rebased (VhostUserInputPCI got most of the changes, due to split)
-> - added "RFC: add explicit can_migrate to
->   vhost_user_backend_dev_init()" to attempt to address Michael
->   concerns about migration.
+> As far as I can tell, anyway.
 > 
-> Marc-AndrÈ Lureau (12):
->   libvhost-user: fix clang enum-conversion warning
->   vhost-user: define conventions for vhost-user backends
->   vhost-user: simplify vhost_user_init/vhost_user_cleanup
->   libvhost-user: exit by default on VHOST_USER_NONE
->   vhost-user: wrap some read/write with retry handling
->   Add vhost-user-backend
->   vhost-user: split vhost_user_read()
->   vhost-user: add vhost_user_input_get_config()
->   libvhost-user-glib: export vug_source_new()
->   libvhost-user: add vu_queue_unpop()
->   Add vhost-user-input-pci
->   contrib: add vhost-user-input
+> If you agree, I suggest mentioning commit c30e15658b1b in the commit
+> message, rather than commit af1f60a4022.
+
+Yes, this one makes more sense ;)
+
 > 
->  contrib/libvhost-user/libvhost-user-glib.h |   3 +
->  contrib/libvhost-user/libvhost-user.h      |  17 +-
->  include/hw/virtio/vhost-backend.h          |   4 +
->  include/hw/virtio/vhost-user-blk.h         |   2 +-
->  include/hw/virtio/vhost-user-scsi.h        |   2 +-
->  include/hw/virtio/vhost-user.h             |   2 +-
->  include/hw/virtio/virtio-input.h           |  14 +
->  include/sysemu/vhost-user-backend.h        |  58 +++
->  backends/cryptodev-vhost-user.c            |  18 +-
->  backends/vhost-user.c                      | 213 +++++++++++
->  contrib/libvhost-user/libvhost-user-glib.c |  11 +-
->  contrib/libvhost-user/libvhost-user.c      |  19 +-
->  contrib/vhost-user-input/main.c            | 398 +++++++++++++++++++++
->  hw/block/vhost-user-blk.c                  |  22 +-
->  hw/input/vhost-user-input.c                |  99 +++++
->  hw/scsi/vhost-user-scsi.c                  |  20 +-
->  hw/virtio/vhost-stub.c                     |   4 +-
->  hw/virtio/vhost-user-input-pci.c           |  53 +++
->  hw/virtio/vhost-user.c                     | 118 +++++-
->  net/vhost-user.c                           |  13 +-
->  MAINTAINERS                                |   5 +
->  Makefile                                   |   3 +
->  Makefile.objs                              |   1 +
->  backends/Makefile.objs                     |   3 +-
->  configure                                  |   3 +
->  contrib/vhost-user-input/Makefile.objs     |   1 +
->  default-configs/virtio.mak                 |   1 +
->  docs/interop/vhost-user.json               | 232 ++++++++++++
->  docs/interop/vhost-user.txt                | 109 +++++-
->  hw/input/Makefile.objs                     |   1 +
->  hw/virtio/Makefile.objs                    |   1 +
->  31 files changed, 1363 insertions(+), 87 deletions(-)
->  create mode 100644 include/sysemu/vhost-user-backend.h
->  create mode 100644 backends/vhost-user.c
->  create mode 100644 contrib/vhost-user-input/main.c
->  create mode 100644 hw/input/vhost-user-input.c
->  create mode 100644 hw/virtio/vhost-user-input-pci.c
->  create mode 100644 contrib/vhost-user-input/Makefile.objs
->  create mode 100644 docs/interop/vhost-user.json
+> With such an update:
 > 
-> -- 
-> 2.21.0
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks!
+
+Phil.
+
+> 
+> Thanks
+> Laszlo
+> 
