@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35496)
+Received: from eggs.gnu.org ([209.51.188.92]:35543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DlE-00028S-II
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:50 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DlH-0002B9-98
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DlD-0000Yi-1L
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:48 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:47090)
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DlG-0000o2-E9
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:51 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:43303)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1DlC-0000U0-MF
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:46 -0500
-Received: by mail-wr1-x443.google.com with SMTP id i16so10341457wrs.13
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:21:46 -0800 (PST)
+	id 1h1DlG-0000iu-7M
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:50 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id d17so10362219wre.10
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:21:50 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Mar 2019 17:21:29 +0000
-Message-Id: <20190305172139.32662-3-peter.maydell@linaro.org>
+Date: Tue,  5 Mar 2019 17:21:32 +0000
+Message-Id: <20190305172139.32662-6-peter.maydell@linaro.org>
 In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
 References: <20190305172139.32662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 02/12] docs: Convert memory.txt to rst format
+Subject: [Qemu-devel] [PATCH v3 05/12] docs/conf.py: Configure the
+ 'alabaster' theme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,233 +33,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Convert the memory API documentation from plain text
-to restructured text format.
+Add the 'navigation' bar to the sidebar, which for some
+reason is not enabled by default. Remove 'relations', which
+is effectively disabled anyway and isn't useful for us.
 
-This is a very minimal conversion: all I had to change
-was to mark up the ASCII art parts as Sphinx expects
-for 'literal blocks', and fix up the bulleted lists
-(Sphinx expects no leading space before the bullet, and
-wants a blank line before after any list).
+This requires that we mandate having at least Sphinx 1.3,
+where the theme was added.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-id: 20190228145624.24885-3-peter.maydell@linaro.org
+Message-id: 20190228145624.24885-6-peter.maydell@linaro.org
 ---
- docs/devel/{memory.txt => memory.rst} | 128 ++++++++++++++------------
- 1 file changed, 70 insertions(+), 58 deletions(-)
- rename docs/devel/{memory.txt => memory.rst} (85%)
+ docs/conf.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/docs/devel/memory.txt b/docs/devel/memory.rst
-similarity index 85%
-rename from docs/devel/memory.txt
-rename to docs/devel/memory.rst
-index 42577e1d860..b6a4c37ea5e 100644
---- a/docs/devel/memory.txt
-+++ b/docs/devel/memory.rst
-@@ -1,19 +1,20 @@
-+==============
- The memory API
- ==============
+diff --git a/docs/conf.py b/docs/conf.py
+index e1d08a34a65..d118757cbd3 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -25,7 +25,8 @@
  
- The memory API models the memory and I/O buses and controllers of a QEMU
- machine.  It attempts to allow modelling of:
+ # If your documentation needs a minimal Sphinx version, state it here.
+ #
+-# needs_sphinx = '1.0'
++# 1.3 is where the 'alabaster' theme was shipped with Sphinx.
++needs_sphinx = '1.3'
  
-- - ordinary RAM
-- - memory-mapped I/O (MMIO)
-- - memory controllers that can dynamically reroute physical memory regions
--   to different destinations
-+- ordinary RAM
-+- memory-mapped I/O (MMIO)
-+- memory controllers that can dynamically reroute physical memory regions
-+  to different destinations
- 
- The memory model provides support for
- 
-- - tracking RAM changes by the guest
-- - setting up coalesced memory for kvm
-- - setting up ioeventfd regions for kvm
-+- tracking RAM changes by the guest
-+- setting up coalesced memory for kvm
-+- setting up ioeventfd regions for kvm
- 
- Memory is modelled as an acyclic graph of MemoryRegion objects.  Sinks
- (leaves) are RAM and MMIO regions, while other nodes represent
-@@ -98,25 +99,30 @@ ROM device memory region types), this host memory needs to be
- copied to the destination on migration. These APIs which allocate
- the host memory for you will also register the memory so it is
- migrated:
-- - memory_region_init_ram()
-- - memory_region_init_rom()
-- - memory_region_init_rom_device()
-+
-+- memory_region_init_ram()
-+- memory_region_init_rom()
-+- memory_region_init_rom_device()
- 
- For most devices and boards this is the correct thing. If you
- have a special case where you need to manage the migration of
- the backing memory yourself, you can call the functions:
-- - memory_region_init_ram_nomigrate()
-- - memory_region_init_rom_nomigrate()
-- - memory_region_init_rom_device_nomigrate()
-+
-+- memory_region_init_ram_nomigrate()
-+- memory_region_init_rom_nomigrate()
-+- memory_region_init_rom_device_nomigrate()
-+
- which only initialize the MemoryRegion and leave handling
- migration to the caller.
- 
- The functions:
-- - memory_region_init_resizeable_ram()
-- - memory_region_init_ram_from_file()
-- - memory_region_init_ram_from_fd()
-- - memory_region_init_ram_ptr()
-- - memory_region_init_ram_device_ptr()
-+
-+- memory_region_init_resizeable_ram()
-+- memory_region_init_ram_from_file()
-+- memory_region_init_ram_from_fd()
-+- memory_region_init_ram_ptr()
-+- memory_region_init_ram_device_ptr()
-+
- are for special cases only, and so they do not automatically
- register the backing memory for migration; the caller must
- manage migration if necessary.
-@@ -218,7 +224,7 @@ For example, suppose we have a container A of size 0x8000 with two subregions
- B and C. B is a container mapped at 0x2000, size 0x4000, priority 2; C is
- an MMIO region mapped at 0x0, size 0x6000, priority 1. B currently has two
- of its own subregions: D of size 0x1000 at offset 0 and E of size 0x1000 at
--offset 0x2000. As a diagram:
-+offset 0x2000. As a diagram::
- 
-         0      1000   2000   3000   4000   5000   6000   7000   8000
-         |------|------|------|------|------|------|------|------|
-@@ -228,8 +234,9 @@ offset 0x2000. As a diagram:
-   D:                  [DDDDD]
-   E:                                [EEEEE]
- 
--The regions that will be seen within this address range then are:
--        [CCCCCCCCCCCC][DDDDD][CCCCC][EEEEE][CCCCC]
-+The regions that will be seen within this address range then are::
-+
-+  [CCCCCCCCCCCC][DDDDD][CCCCC][EEEEE][CCCCC]
- 
- Since B has higher priority than C, its subregions appear in the flat map
- even where they overlap with C. In ranges where B has not mapped anything
-@@ -237,8 +244,9 @@ C's region appears.
- 
- If B had provided its own MMIO operations (ie it was not a pure container)
- then these would be used for any addresses in its range not handled by
--D or E, and the result would be:
--        [CCCCCCCCCCCC][DDDDD][BBBBB][EEEEE][BBBBB]
-+D or E, and the result would be::
-+
-+  [CCCCCCCCCCCC][DDDDD][BBBBB][EEEEE][BBBBB]
- 
- Priority values are local to a container, because the priorities of two
- regions are only compared when they are both children of the same container.
-@@ -257,6 +265,7 @@ guest accesses an address:
- 
- - all direct subregions of the root region are matched against the address, in
-   descending priority order
-+
-   - if the address lies outside the region offset/size, the subregion is
-     discarded
-   - if the subregion is a leaf (RAM or MMIO), the search terminates, returning
-@@ -270,36 +279,39 @@ guest accesses an address:
-     address range), then if this is a container with its own MMIO or RAM
-     backing the search terminates, returning the container itself. Otherwise
-     we continue with the next subregion in priority order
-+
- - if none of the subregions match the address then the search terminates
-   with no match found
- 
- Example memory map
- ------------------
- 
--system_memory: container@0-2^48-1
-- |
-- +---- lomem: alias@0-0xdfffffff ---> #ram (0-0xdfffffff)
-- |
-- +---- himem: alias@0x100000000-0x11fffffff ---> #ram (0xe0000000-0xffffffff)
-- |
-- +---- vga-window: alias@0xa0000-0xbffff ---> #pci (0xa0000-0xbffff)
-- |      (prio 1)
-- |
-- +---- pci-hole: alias@0xe0000000-0xffffffff ---> #pci (0xe0000000-0xffffffff)
-+::
- 
--pci (0-2^32-1)
-- |
-- +--- vga-area: container@0xa0000-0xbffff
-- |      |
-- |      +--- alias@0x00000-0x7fff  ---> #vram (0x010000-0x017fff)
-- |      |
-- |      +--- alias@0x08000-0xffff  ---> #vram (0x020000-0x027fff)
-- |
-- +---- vram: ram@0xe1000000-0xe1ffffff
-- |
-- +---- vga-mmio: mmio@0xe2000000-0xe200ffff
-+  system_memory: container@0-2^48-1
-+   |
-+   +---- lomem: alias@0-0xdfffffff ---> #ram (0-0xdfffffff)
-+   |
-+   +---- himem: alias@0x100000000-0x11fffffff ---> #ram (0xe0000000-0xffffffff)
-+   |
-+   +---- vga-window: alias@0xa0000-0xbffff ---> #pci (0xa0000-0xbffff)
-+   |      (prio 1)
-+   |
-+   +---- pci-hole: alias@0xe0000000-0xffffffff ---> #pci (0xe0000000-0xffffffff)
- 
--ram: ram@0x00000000-0xffffffff
-+  pci (0-2^32-1)
-+   |
-+   +--- vga-area: container@0xa0000-0xbffff
-+   |      |
-+   |      +--- alias@0x00000-0x7fff  ---> #vram (0x010000-0x017fff)
-+   |      |
-+   |      +--- alias@0x08000-0xffff  ---> #vram (0x020000-0x027fff)
-+   |
-+   +---- vram: ram@0xe1000000-0xe1ffffff
-+   |
-+   +---- vga-mmio: mmio@0xe2000000-0xe200ffff
-+
-+  ram: ram@0x00000000-0xffffffff
- 
- This is a (simplified) PC memory map. The 4GB RAM block is mapped into the
- system address space via two aliases: "lomem" is a 1:1 mapping of the first
-@@ -336,16 +348,16 @@ rather than completing successfully; those devices can use the
- In addition various constraints can be supplied to control how these
- callbacks are called:
- 
-- - .valid.min_access_size, .valid.max_access_size define the access sizes
--   (in bytes) which the device accepts; accesses outside this range will
--   have device and bus specific behaviour (ignored, or machine check)
-- - .valid.unaligned specifies that the *device being modelled* supports
--    unaligned accesses; if false, unaligned accesses will invoke the
--    appropriate bus or CPU specific behaviour.
-- - .impl.min_access_size, .impl.max_access_size define the access sizes
--   (in bytes) supported by the *implementation*; other access sizes will be
--   emulated using the ones available.  For example a 4-byte write will be
--   emulated using four 1-byte writes, if .impl.max_access_size = 1.
-- - .impl.unaligned specifies that the *implementation* supports unaligned
--   accesses; if false, unaligned accesses will be emulated by two aligned
--   accesses.
-+- .valid.min_access_size, .valid.max_access_size define the access sizes
-+  (in bytes) which the device accepts; accesses outside this range will
-+  have device and bus specific behaviour (ignored, or machine check)
-+- .valid.unaligned specifies that the *device being modelled* supports
-+  unaligned accesses; if false, unaligned accesses will invoke the
-+  appropriate bus or CPU specific behaviour.
-+- .impl.min_access_size, .impl.max_access_size define the access sizes
-+  (in bytes) supported by the *implementation*; other access sizes will be
-+  emulated using the ones available.  For example a 4-byte write will be
-+  emulated using four 1-byte writes, if .impl.max_access_size = 1.
-+- .impl.unaligned specifies that the *implementation* supports unaligned
-+  accesses; if false, unaligned accesses will be emulated by two aligned
-+  accesses.
+ # Add any Sphinx extension module names here, as strings. They can be
+ # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+@@ -106,7 +107,8 @@ html_theme = 'alabaster'
+ # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
+ html_sidebars = {
+     '**': [
+-        'relations.html',  # needs 'show_related': True theme option to display
++        'about.html',
++        'navigation.html',
+         'searchbox.html',
+     ]
+ }
 -- 
 2.20.1
