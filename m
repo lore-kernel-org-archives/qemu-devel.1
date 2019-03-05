@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57247)
+Received: from eggs.gnu.org ([209.51.188.92]:57854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1h0zhl-0006vU-P0
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:21:18 -0500
+	(envelope-from <philmd@redhat.com>) id 1h0zkW-0007mA-MG
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:24:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1h0zhk-0003Aq-TO
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:21:17 -0500
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Tue,  5 Mar 2019 13:21:02 +1100
-Message-Id: <20190305022102.17610-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH] target/ppc/spapr: Clear partition
- table entry when allocating hash table
+	(envelope-from <philmd@redhat.com>) id 1h0zkV-0006NG-Tx
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:24:08 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35793)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h0zkV-0006Ig-N3
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:24:07 -0500
+Received: by mail-wm1-f67.google.com with SMTP id y15so1029607wma.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 18:24:07 -0800 (PST)
+References: <1515509463-2675-1-git-send-email-mst@redhat.com>
+	<d29cfb63-233a-f9ae-c326-8ff7c1b490f3@redhat.com>
+	<20190304210359-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f89bdfa8-0027-843f-1751-6a8e1ef59812@redhat.com>
+Date: Tue, 5 Mar 2019 03:24:04 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190304210359-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] isa/piix: move to mips malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,79 +31,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: david@gibson.dropbear.id.au, qemu-devel@nongnu.org, clg@kaod.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Michael Tokarev <mjt@tls.msk.ru>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-If we allocate a hash page table then we know that the guest won't be
-using process tables, so set the partition table entry maintained for
-the guest to zero. If this isn't done, then the guest radix bit will
-remain set in the entry. This means that when the guest calls
-H_REGISTER_PROCESS_TABLE there will be a mismatch between then flags
-and the value in spapr->patb_entry, and the call will fail. The guest
-will then panic:
+On 3/5/19 3:11 AM, Michael S. Tsirkin wrote:
+> On Tue, Mar 05, 2019 at 01:53:45AM +0100, Philippe Mathieu-Daudé wrote:
+>> Hi Michael,
+>>
+>> On 1/9/18 3:59 PM, Michael S. Tsirkin wrote:
+>>> This device is only used on mips malta, move it to the maintainer
+>>> that's actually testing it.
+>>
+>> Slighly related to this patch, since I included it while working on
+>> Kconfig/MIPS.
+>> I splitted PIIX3/PIIX4 (Actually PIIX3 was mixed with I440FX).
+>> These are indeed 2 different chipsets, PIIX4 is an improved PIIX3.
+>>
+>> I compiled MIPS with PIIX4 and it works, however when I ran all the
+>> testsuite X86 failed due to PIIX4_PM missing.
+>> I looked where it is used:
+>>
+>> $ git grep PIIX4_PM
+>> docs/interop/firmware.json:96:#           enabled with "-global
+>> PIIX4_PM.disable_s3=0" and disabled
+>> docs/interop/firmware.json:97:#           with "-global
+>> PIIX4_PM.disable_s3=1". On the "pc-q35-*"
+>> docs/interop/firmware.json:105:#           can be enabled with "-global
+>> PIIX4_PM.disable_s4=0" and
+>> docs/interop/firmware.json:106:#           disabled with "-global
+>> PIIX4_PM.disable_s4=1". On the
+>> hw/i386/pc.c:282:    { "PIIX4_PM", "memory-hotplug-support", "off" },
+>> hw/i386/pc.c:299:    { "PIIX4_PM",
+>> "acpi-pci-hotplug-with-bridge-support", "off" },
+>>
+>> So now I'm confused, looking at git history I see you introduced this in
+>> commit 9e047b98245.
+>>
+>> What chipset do use the PC machine? An unreal hybrid of PIIX3/PIIX4?
+>>
+>> Thanks,
+>>
+>> Phil.
+> 
+> Yes I think it does not match any real hardware at this point.
 
-Failed to register process table (rc=-4)
-kernel BUG at arch/powerpc/platforms/pseries/lpar.c:959
+This is unfortunate :( I'll try to sort this out.
 
-The result being that it isn't possible to boot a hash guest on a P9
-system.
+> 
+> Not sure what does grep above show: to create piix4 pm
+> pc_init1 calls piix4_pm_init.
 
-Also fix a bug in the flags parsing in h_register_process_table() which
-was introduced by the same patch, and simplify the handling to make it
-less likely that errors will be introduced in the future. The effect
-would have been setting the host radix bit LPCR_HR for a hash guest
-using process tables, which currently isn't supported and so couldn't
-have been triggered.
+Indeed, which makes me wonder what I'm running =)
 
-Fixes: 00fd075e18 "target/ppc/spapr: Set LPCR:HR when using Radix mode"
+Thanks for the quick answer,
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- hw/ppc/spapr.c       |  1 +
- hw/ppc/spapr_hcall.c | 12 ++++++++----
- 2 files changed, 9 insertions(+), 4 deletions(-)
+Phil.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e39068578e..cf1ef9ebd4 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1632,6 +1632,7 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-         }
-     }
-     /* We're setting up a hash table, so that means we're not radix */
-+    spapr->patb_entry = 0;
-     spapr_set_all_lpcrs(0, LPCR_HR | LPCR_UPRT);
- }
- 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 8bfdddc964..7016a09386 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1339,6 +1339,7 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
-     target_ulong proc_tbl = args[1];
-     target_ulong page_size = args[2];
-     target_ulong table_size = args[3];
-+    target_ulong update_lpcr = 0;
-     uint64_t cproc;
- 
-     if (flags & ~FLAGS_MASK) { /* Check no reserved bits are set */
-@@ -1394,10 +1395,13 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
-     spapr->patb_entry = cproc; /* Save new process table */
- 
-     /* Update the UPRT, HR and GTSE bits in the LPCR for all cpus */
--    spapr_set_all_lpcrs(((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ?
--                         (LPCR_UPRT | LPCR_HR) : 0) |
--                        ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
--                        LPCR_UPRT | LPCR_HR | LPCR_GTSE);
-+    if (flags & FLAG_RADIX)     /* Radix must use process tables, also set HR */
-+        update_lpcr |= (LPCR_UPRT | LPCR_HR);
-+    else if (flags & FLAG_HASH_PROC_TBL) /* Hash with process tables */
-+        update_lpcr |= LPCR_UPRT;
-+    if (flags & FLAG_GTSE)      /* Guest translation shootdown enable */
-+        update_lpcr |= FLAG_GTSE;
-+    spapr_set_all_lpcrs(update_lpcr, LPCR_UPRT | LPCR_HR | LPCR_GTSE);
- 
-     if (kvm_enabled()) {
-         return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
--- 
-2.13.6
+>>>
+>>> Cc: Aurelien Jarno <aurelien@aurel32.net>
+>>> Cc: Yongbok Kim <yongbok.kim@mips.com>
+>>> Cc: Hervé Poussineau <hpoussin@reactos.org>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>>
+>>> Aurelien, pls feel free to merge this or v1.
+>>>
+>>>  MAINTAINERS | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 0255113..0b8a5e7 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -641,6 +641,7 @@ Malta
+>>>  M: Aurelien Jarno <aurelien@aurel32.net>
+>>>  S: Maintained
+>>>  F: hw/mips/mips_malta.c
+>>> +F: hw/isa/piix4.c
+>>>  
+>>>  Mipssim
+>>>  M: Yongbok Kim <yongbok.kim@mips.com>
+>>> @@ -849,7 +850,6 @@ F: hw/pci-host/q35.c
+>>>  F: hw/pci-host/pam.c
+>>>  F: include/hw/pci-host/q35.h
+>>>  F: include/hw/pci-host/pam.h
+>>> -F: hw/isa/piix4.c
+>>>  F: hw/isa/lpc_ich9.c
+>>>  F: hw/i2c/smbus_ich9.c
+>>>  F: hw/acpi/piix4.c
+>>>
