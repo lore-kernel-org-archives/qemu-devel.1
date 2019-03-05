@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37602)
+Received: from eggs.gnu.org ([209.51.188.92]:38005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h10QE-0002Bn-W4
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:07:15 -0500
+	(envelope-from <peterx@redhat.com>) id 1h10Sf-0003QM-Ej
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:09:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h10QE-0005ER-2L
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:07:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56116)
+	(envelope-from <peterx@redhat.com>) id 1h10Se-0000cP-4P
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:09:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1h10QD-0005BG-Rn
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:07:14 -0500
-Date: Tue, 5 Mar 2019 11:07:04 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1h10Sd-0000bj-RV
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:09:44 -0500
+Date: Tue, 5 Mar 2019 11:09:34 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190305030704.GG1657@xz-x1>
+Message-ID: <20190305030934.GH1657@xz-x1>
 References: <1551753295-30167-1-git-send-email-yi.y.sun@linux.intel.com>
-	<1551753295-30167-4-git-send-email-yi.y.sun@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1551753295-30167-4-git-send-email-yi.y.sun@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v1 3/3] intel_iommu: add scalable-mode
- option to make scalable mode work
+In-Reply-To: <1551753295-30167-1-git-send-email-yi.y.sun@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v1 0/3] intel_iommu: support scalable mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +29,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Yi Sun <yi.y.sun@linux.intel.com>
 Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
-On Tue, Mar 05, 2019 at 10:34:55AM +0800, Yi Sun wrote:
-> This patch adds an option to provide flexibility for user to expose
-> Scalable Mode to guest. User could expose Scalable Mode to guest by
-> the config as below:
+On Tue, Mar 05, 2019 at 10:34:52AM +0800, Yi Sun wrote:
+> Intel vt-d rev3.0 [1] introduces a new translation mode called
+> 'scalable mode', which enables PASID-granular translations for
+> first level, second level, nested and pass-through modes. The
+> vt-d scalable mode is the key ingredient to enable Scalable I/O
+> Virtualization (Scalable IOV) [2] [3], which allows sharing a
+> device in minimal possible granularity (ADI - Assignable Device
+> Interface). As a result, previous Extended Context (ECS) mode
+> is deprecated (no production ever implements ECS).
 > 
-> "-device intel-iommu,caching-mode=on,scalable-mode=on"
+> This patch set emulates a minimal capability set of VT-d scalable
+> mode, equivalent to what is available in VT-d legacy mode today:
+>     1. Scalable mode root entry, context entry and PASID table
+>     2. Seconds level translation under scalable mode
+>     3. Queued invalidation (with 256 bits descriptor)
+>     4. Pass-through mode
 > 
-> The Linux iommu driver has supported scalable mode. Please refer below
-> patch set:
-> 
+> Corresponding intel-iommu driver support will be included in
+> kernel 5.0:
 >     https://www.spinics.net/lists/kernel/msg2985279.html
 > 
-> Signed-off-by: Liu, Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> ---
-> RFC v2->v1:
->     - move 's->dma_drain' check from 'vtd_init' to 'vtd_decide_config'.
+> We will add emulation of full scalable mode capability along with
+> guest iommu driver progress later, e.g.:
+>     1. First level translation
+>     2. Nested translation
+>     3. Per-PASID invalidation descriptors
+>     4. Page request services for handling recoverable faults
+> 
+> To verify the patches, below cases were tested according to Peter Xu's
+> suggestions.
+>     +---------+----------------------------------------------------------------+----------------------------------------------------------------+
+>     |         |                      w/ Device Passthr                         |                     w/o Device Passthr                         |
+>     |         +-------------------------------+--------------------------------+-------------------------------+--------------------------------+
+>     |         | virtio-net-pci, vhost=on      | virtio-net-pci, vhost=off      | virtio-net-pci, vhost=on      | virtio-net-pci, vhost=off      |
+>     |         +-------------------------------+--------------------------------+-------------------------------+--------------------------------+
+>     |         | netperf | kernel bld | data cp| netperf | kernel bld | data cp | netperf | kernel bld | data cp| netperf | kernel bld | data cp |
+>     +---------+-------------------------------+--------------------------------+-------------------------------+--------------------------------+
+>     | Legacy  | Pass    | Pass       | Pass   | Pass    | Pass       | Pass    | Pass    | Pass       | Pass   | Pass    | Pass       | Pass    |
+>     +---------+-------------------------------+--------------------------------+-------------------------------+--------------------------------+
+>     | Scalable| Pass    | Pass       | Pass   | Pass    | Pass       | Pass    | Pass    | Pass       | Pass   | Pass    | Pass       | Pass    |
+>     +---------+-------------------------------+--------------------------------+-------------------------------+--------------------------------+
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Legacy vfio-pci?
+
+I've reviewed the whole series, I would assume that the maintainer
+might still test it a bit before a pull but again even before that I
+would really like to double confirm this series won't break anything.
+
+Thanks,
 
 -- 
 Peter Xu
