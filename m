@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59553)
+Received: from eggs.gnu.org ([209.51.188.92]:33062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h15RM-0004X1-6q
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:28:45 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h15ag-0006LG-LF
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:38:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h15RL-0000op-Ax
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:28:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1h15RK-0000li-Vx
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:28:43 -0500
-Date: Tue, 5 Mar 2019 09:28:38 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190305092838.4131fb8a@redhat.com>
-In-Reply-To: <3b9ea255-6a77-9309-56d4-6d7fe5a2044c@linux.ibm.com>
-References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-	<3b9ea255-6a77-9309-56d4-6d7fe5a2044c@linux.ibm.com>
+	(envelope-from <cohuck@redhat.com>) id 1h15ac-0003m5-UG
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:38:20 -0500
+Date: Tue, 5 Mar 2019 09:38:09 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190305093809.751f91b9.cohuck@redhat.com>
+In-Reply-To: <5de5cda9-5db2-6207-5b90-52206be1da72@redhat.com>
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-6-git-send-email-jjherne@linux.ibm.com>
+	<20190304180742.486c8994.cohuck@redhat.com>
+	<5de5cda9-5db2-6207-5b90-52206be1da72@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 05/16] s390-bios: Factor
+ finding boot device out of virtio code path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, pmorel@linux.ibm.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, alifm@linux.ibm.com, qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
 
-On Mon, 4 Mar 2019 12:35:32 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Mon, 4 Mar 2019 20:26:17 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-> On 12/17/18 10:57 AM, Tony Krowiak wrote:
+> On 04/03/2019 18.07, Cornelia Huck wrote:
+> > On Fri,  1 Mar 2019 13:59:25 -0500
+> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> >   
+> >> Make a new routine find_boot_device to locate the boot device for all
+> >> cases, not just virtio.
+> >>
+> >> The error message for the case where no boot device has been specified
+> >> and a suitable boot device cannot be auto detected was specific to
+> >> virtio devices. We update this message to remove virtio specific wording.  
+> > 
+> > ...and, consequently, need to tweak the serial output boot test.
+> >   
+> >>
+> >> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> >> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+> >> ---
+> >>  pc-bios/s390-ccw/main.c  | 85 ++++++++++++++++++++++++++----------------------
+> >>  tests/boot-serial-test.c |  2 +-
+> >>  2 files changed, 47 insertions(+), 40 deletions(-)
+> >>  
+> > (...)  
+> >> -    IPL_assert(found, "No virtio device found");
+> >> +    IPL_assert(found, "Boot device not found\n");  
+> > 
+> > You change the output in the bios here...
+> > 
+> > (...)  
+> >> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> >> index 58a48f3..9daf2cb 100644
+> >> --- a/tests/boot-serial-test.c
+> >> +++ b/tests/boot-serial-test.c
+> >> @@ -112,7 +112,7 @@ static testdef_t tests[] = {
+> >>      { "sparc", "SS-4", "", "MB86904" },
+> >>      { "sparc", "SS-600MP", "", "TMS390Z55" },
+> >>      { "sparc64", "sun4u", "", "UltraSPARC" },
+> >> -    { "s390x", "s390-ccw-virtio", "", "virtio device" },
+> >> +    { "s390x", "s390-ccw-virtio", "", "device" },  
+> > 
+> > ...and therefore need to change the expected string here. Question: is
+> > that ok ("device" looks a bit generic), or would "Boot device" be a
+> > better match?  
 > 
-> Ping!! I'm wondering who might be responsible for merging this fix?
-See reply from Eduardo,
+> Just "device" should be OK. The exact string in the boot-serial-test
+> does not matter too much, as long as it comes from the same print statement.
 
-It's queued and will be in his next pull request
+Ok, makes sense.
 
-> 
-> > The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
-> > value of the BusState structure with the max_dev value of the BusClass structure
-> > to determine whether the maximum number of children has been reached for the
-> > bus. The problem is, the max_index field of the BusState structure does not
-> > necessarily reflect the number of devices that have been plugged into
-> > the bus.
-> > 
-> > Whenever a child device is plugged into the bus, the bus's max_index value is
-> > assigned to the child device and then incremented. If the child is subsequently
-> > unplugged, the value of the max_index does not change and no longer reflects the
-> > number of children.
-> > 
-> > When the bus's max_index value reaches the maximum number of devices
-> > allowed for the bus (i.e., the max_dev field in the BusClass structure),
-> > attempts to plug another device will be rejected claiming that the bus is
-> > full -- even if the bus is actually empty.
-> > 
-> > To resolve the problem, a new 'num_children' field is being added to the
-> > BusState structure to keep track of the number of children plugged into the
-> > bus. It will be incremented when a child is plugged, and decremented when a
-> > child is unplugged.
-> > 
-> > Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> > Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> > Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> > ---
-> >   hw/core/qdev.c         | 3 +++
-> >   include/hw/qdev-core.h | 1 +
-> >   qdev-monitor.c         | 2 +-
-> >   3 files changed, 5 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index 6b3cc55b27c2..956923f33520 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
-> > @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
-> >               snprintf(name, sizeof(name), "child[%d]", kid->index);
-> >               QTAILQ_REMOVE(&bus->children, kid, sibling);
-> >   
-> > +            bus->num_children--;
-> > +
-> >               /* This gives back ownership of kid->child back to us.  */
-> >               object_property_del(OBJECT(bus), name, NULL);
-> >               object_unref(OBJECT(kid->child));
-> > @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
-> >       char name[32];
-> >       BusChild *kid = g_malloc0(sizeof(*kid));
-> >   
-> > +    bus->num_children++;
-> >       kid->index = bus->max_index++;
-> >       kid->child = child;
-> >       object_ref(OBJECT(kid->child));
-> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> > index a24d0dd566e3..521f0a947ead 100644
-> > --- a/include/hw/qdev-core.h
-> > +++ b/include/hw/qdev-core.h
-> > @@ -206,6 +206,7 @@ struct BusState {
-> >       HotplugHandler *hotplug_handler;
-> >       int max_index;
-> >       bool realized;
-> > +    int num_children;
-> >       QTAILQ_HEAD(ChildrenHead, BusChild) children;
-> >       QLIST_ENTRY(BusState) sibling;
-> >   };
-> > diff --git a/qdev-monitor.c b/qdev-monitor.c
-> > index 07147c63bf8b..45a8ba49644c 100644
-> > --- a/qdev-monitor.c
-> > +++ b/qdev-monitor.c
-> > @@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
-> >   static inline bool qbus_is_full(BusState *bus)
-> >   {
-> >       BusClass *bus_class = BUS_GET_CLASS(bus);
-> > -    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
-> > +    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
-> >   }
-> >   
-> >   /*
-> >   
-> 
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
