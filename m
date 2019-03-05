@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47496)
+Received: from eggs.gnu.org ([209.51.188.92]:49958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1AvJ-0002aB-Is
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:20:03 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h1B69-0006oe-TF
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1AvI-0002NU-73
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:20:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57556)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1AvG-0002IS-8y
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:20:00 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 76E57307E04A
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 14:19:56 +0000 (UTC)
-Date: Tue, 5 Mar 2019 14:19:49 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190305141949.GE9811@work-vm>
-References: <20190227105128.1655-1-quintela@redhat.com>
+	(envelope-from <davidkiarie4@gmail.com>) id 1h1B68-0007U7-0e
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:31:13 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44702)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
+	id 1h1B66-0007Rh-27
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:31:10 -0500
+Received: by mail-oi1-x241.google.com with SMTP id a81so6942648oii.11
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 06:31:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190227105128.1655-1-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v14 0/3] Add make check tests for Migration
+References: <20190304151827.1813-1-davidkiarie4@gmail.com>
+	<82c88a70-13e1-d4e9-4faf-420a56fbba92@redhat.com>
+	<CABdVeAD5RseQ4WKapozTjUfUarAikpngiX-yb+CGnD3AmuqdLg@mail.gmail.com>
+In-Reply-To: <CABdVeAD5RseQ4WKapozTjUfUarAikpngiX-yb+CGnD3AmuqdLg@mail.gmail.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Tue, 5 Mar 2019 17:30:20 +0300
+Message-ID: <CABdVeACiTQhihP_WG9W0M8wtR4QEjJQya_DjamJrUkKC43NwiQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4? 0/1] update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,201 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> In v14:
-> - updates commets to 4.0
-> - Update migration-test copy of SocketAddress_str
+On Tue, Mar 5, 2019 at 5:16 PM David Kiarie <davidkiarie4@gmail.com> wrote:
 
-Queued
+>
+>
+> On Mon, Mar 4, 2019 at 11:52 PM Eric Blake <eblake@redhat.com> wrote:
+>
+>> On 3/4/19 9:18 AM, David Kiarie wrote:
+>> > i think it is best put as i've updated.
+>> >
+>> > David Kiarie (1):
+>> >    update copyright notice
+>> >
+>> >   hw/i386/amd_iommu.c | 2 +-
+>> >   hw/i386/amd_iommu.h | 2 +-
+>> >   2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> You have now posted two separate threads with identical subjects but
+>> with different contents. As a courtesy to your reviewers, and to help
+>> the maintainers know for sure which version you want incorporated, it
+>> would have been nicer if you had used 'git send-email -v4' for this
+>> series, to differentiate it from v3 (if I counted right) sent at
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06457.html, as
+>> well as summarizing how this version differs from the previous.
+>>
+>> That said, I do not think you need to send a v5 just to fix the subject
+>> line in the cover letter (as the cover letter doesn't end up in git
+>> anyways), especially since Paolo has already said he will queue your
+>> patch, and I trust Paolo to get the right version included.
+>>
+>
+> i am not okay with maintainer behaviour, this is just something personal.
+>
 
-> In v13:
-> - Rename socket_address to socket_address_list (dave)
-> - Remove useless breaks (dave)
-> 
-> If nothing pops out, everything is reviewed and will be sent on next
-> pull requset.
-> 
-> Later, Juan.
-> 
-> In v12:
-> - drop multifd case (caming in next series)
-> - fix leak of socketaddress (eric)
-> - handle vsock printing correctly (eric)
-> 
-> Iv v11:
-> - Rebase to lastest
-> - Remove the compress test.  It didin't worked really.
->   See my next series.
-> - Only patch missing review-by is the second one.
-> 
-> Please, consider them.
-> 
-> In v10:
-> - rebase to latest upstream
-> - code changed quite a bit with qmp refactorings
->   apllied them
-> - make it work again
-> - compress threads test, continue working there, not trivial.
-> 
-> Two question-:
-> - should we integrate them on this cycle?
->   they are tests
-> - should we enable them only on baremetal, and not on emulation?
->   There is still a problem on TCG that sometimes fails the migration
->   thread
-> 
-> ToDo:
-> - Finish debug compress test
->   Still stuck why the test wonk when I launch qemu by hand but not
->   trough qtest.  Creatuve uses of launching gdb through launched
->   guests have not help so far.
-> 
-> - Finish fd transport test
->   Not very difficult in principle, need more checking to see if it
->   don't fail in other setups.
-> 
-> - Finish tl trasport test
->   I already knew that I hate certificates, but this is too much.  Trying
->   to understand how to use them.
-> 
-> Please commet, Juan.
-> 
-> In v9:
-> - Dropp Export SocketAddress_to_str
->   just create the functions where I need them.
-> - drop precopy test and xbzrle (on pull requset)
->   Use 100M for cache as dave suggests
-> - drop ppc improvemnet (on pull request)
-> - drop RFH, will work on tha later
-> - move socket_address to info migrate
-> 
-> Please, review.
-> 
-> Later, Juan.
-> 
-> v8:
-> - just rebase to make things continue to wonk
-> 
-> New in the other v7:
-> - SocketAddress is now a list (a.k.a make happy danp)
-> - Rebase on top of upstream
->   network listener is *interesting*
-> - *HACK* to make SocketAddress list in common
->   see patch: create-socket-paramenter
-> 
-> Please review, Juan.
-> 
-> CC: berrange@redhat.com
-> 
-> [v7]
-> This is v6, it differest from the patches that I sent with previous
-> multifd post:
-> - Rename x-tcp-port to x-socket-address
->   This is more *complicated* that it looks as:
-> 
->   * it is a pointer, so I need to use QAPI_CLONE() to make info
->     migrate work
-> 
->   * this is an union of structs.  In QAPI. So, a dict of strings.  The
->     only way that I was able to make things work is parsing the qdict
->     to a SocketAddress and then output a SocketAddress as an str.  It
->     needs to be an easier way, for sure.
-> 
->   * Cleanups here andthere.
-> 
-> Please, review, Juan.
-> 
-> [v5]
-> - Several patches moved to pull request
-> - merge info_migrate and migration_tests
->   only missing bit is tcp_port, needed for tcp tests
-> - Rename tcp-port to x-tcp-port
->   We will get better naming from David at some point, and we will use that bit
-> - ppc: use inline code as suggested by lvivier
-> 
-> Please, review.
-> 
-> It is based on my previous pull request
-> 
-> Based-on: 20180129120932.12874-1-quintela@redhat.com
-> 
-> [v4]
-> - rebase on top on v4 info_migrate patches
-> - Tune sleeps to make patches fast
-> - Create a deprecated test for deprecated commands (i.e. make peterxu happy)
-> - create migrate_start_postcopy function
-> - fix naming/sizes between power and x86
-> - cleanup comments to match code
-> 
-> [v3]
-> 
-> - No more tests for deprecated parameters. Now I only use
->   migrate_set_parameter.  If there is a deprecated command for that,
->   we tests it there.
-> - free "result" string, always good to return memory (Peter found it)
-> - use the new tcp_port parameter from info migrate.  So we are
->   handling well the tcp case.
-> - lots of code movement around to make everything consistent.
-> - Several patches already integrated upstream.
-> 
-> [v2]
-> - to make review easier, I started renaming postcopy-test.c to migration-test.c
-> - Did cleanups/refactoring there
-> - Don't use global-qtest anymore
-> - check that the parameters that we sent got really set
-> - RFH: comrpress threads tests is not working for some weird reason.  Using the same code on command line works.
->   still investigating why.
-> 
-> ToDoo:
-> 
-> - tcp: after discussions with dave, we ended in conclusion that we
->   need to use the 0 port and let the system gives us a free one
-> 
->   But .... that means that we need to be able to get that port back somehow.
->   "info migrate" woring on destination side?
-> 
-> - compression threads.  There is some weird interaction with the test
->   hardness and every migration thread get waiting in a different
->   semaphore.  Investigating if it is a race/bug/whateverr
-> 
-> - deprecated commands: There was a suggestion to make
->   migrate_set_parameter look at the parameter name and test old/new
->   depending on something.  Not sure what to do here.
-> 
-> - testing commands: Is there a way to launch qemu and just sent
->   qmp/hmp commands without having to really run anything else?
-> 
-> [v1]
-> - add test for precopy for unix/tcp
->   exec and fd to came, don't know how to test rdma without hardware
-> - add tests using deprecated interfaces
-> - add test for xbzrle
->   Note to myself, there is no way to set the cache size with migraton_set_parameters
-> - Add test for compress threads
->   disabled on the series, right now it appears that compression is not working at all
-> - Move postcopy to use new results
->   Idea is to move it on top of migration-test.c, but first I want some reviews on basic idea
-> 
-> Juan Quintela (3):
->   tests: Add migration xbzrle test
->   migration: Create socket-address parameter
->   tests: Add basic migration precopy tcp test
-> 
->  hmp.c                  |  33 ++++++++
->  migration/migration.c  |  24 ++++++
->  migration/migration.h  |   4 +
->  migration/socket.c     |  11 +++
->  qapi/migration.json    |   6 +-
->  qapi/sockets.json      |  18 +++++
->  tests/migration-test.c | 174 +++++++++++++++++++++++++++++++++++++++--
->  7 files changed, 264 insertions(+), 6 deletions(-)
-> 
-> -- 
-> 2.20.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo noted that code doesn't get merged right away on Qemu.
+
+consider this:
+
+i)  i don't have any interests whatsoever in Qemu and will never have
+
+ii) i will never have any interests in Qemu
+
+iii) i have zero interests in the code we are updating let alone the bugs i
+recently helped report on this list.
+
+iv)i am taking my own time to send this patch which was merely supposed to
+reduce any such confusion reporting bugs in the future.
+
+v)* maintainer - patches don't merged right away unless they fix broken
+things, i have your patch queued. honestly?*
+
+what are we queuing for? why not just rid of rest of my code because this
+is the epitome of maintainer arrogance.
+
+
+> i will definitely send v4 but this series will include a patch stripping
+> all AMD IOMMU code from for Paolo to choose what to merge.
+>
+>
+>> --
+>> Eric Blake, Principal Software Engineer
+>> Red Hat, Inc.           +1-919-301-3226
+>> Virtualization:  qemu.org | libvirt.org
+>>
+>
