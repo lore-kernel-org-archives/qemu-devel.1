@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42806)
+Received: from eggs.gnu.org ([209.51.188.92]:43327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h14D3-0001jI-Sn
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:09:54 -0500
+	(envelope-from <jasowang@redhat.com>) id 1h14Fb-0002bq-1r
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h14D3-0004vJ-7v
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:09:53 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  5 Mar 2019 08:09:45 +0100
-Message-Id: <1551769785-17717-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] target/s390x: Remove non-architected entries
- from struct LowCore
+	(envelope-from <jasowang@redhat.com>) id 1h14FX-0000PQ-Dv
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14FV-0000NG-Kb
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:26 -0500
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue,  5 Mar 2019 15:12:07 +0800
+Message-Id: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL V2 00/13] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,75 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, "Jason J. Herne" <jjherne@linux.ibm.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: Jason Wang <jasowang@redhat.com>
 
-There are some fields in our struct LowCore which apparently have
-been copied from a very old version of the Linux kernel. These
-fields are not architected in the "Principles of Operation", and
-only used on these memory locations in Linux kernels older than
-2.6.29. Newer Linux kernels moved the entries to different locations
-or are not using them at all anymore. Thus we should never access
-these fields from the QEMU side, so they should be removed.
+The following changes since commit b6179aaff961627fcb59d7b234297966b81ac7=
+26:
 
-While we're at it, also add a QEMU_BUILD_BUG_MSG() statement to
-assert that struct LowCore has the right size.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-cocoa-20190304=
+' into staging (2019-03-04 16:50:41 +0000)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- target/s390x/internal.h | 40 +---------------------------------------
- 1 file changed, 1 insertion(+), 39 deletions(-)
+are available in the git repository at:
 
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 7baf0e2..4752ab0 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -63,45 +63,7 @@ typedef struct LowCore {
-     PSW             program_new_psw;          /* 0x1d0 */
-     PSW             mcck_new_psw;             /* 0x1e0 */
-     PSW             io_new_psw;               /* 0x1f0 */
--    PSW             return_psw;               /* 0x200 */
--    uint8_t         irb[64];                  /* 0x210 */
--    uint64_t        sync_enter_timer;         /* 0x250 */
--    uint64_t        async_enter_timer;        /* 0x258 */
--    uint64_t        exit_timer;               /* 0x260 */
--    uint64_t        last_update_timer;        /* 0x268 */
--    uint64_t        user_timer;               /* 0x270 */
--    uint64_t        system_timer;             /* 0x278 */
--    uint64_t        last_update_clock;        /* 0x280 */
--    uint64_t        steal_clock;              /* 0x288 */
--    PSW             return_mcck_psw;          /* 0x290 */
--    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
--    /* System info area */
--    uint64_t        save_area[16];            /* 0xc00 */
--    uint8_t         pad10[0xd40 - 0xc80];     /* 0xc80 */
--    uint64_t        kernel_stack;             /* 0xd40 */
--    uint64_t        thread_info;              /* 0xd48 */
--    uint64_t        async_stack;              /* 0xd50 */
--    uint64_t        kernel_asce;              /* 0xd58 */
--    uint64_t        user_asce;                /* 0xd60 */
--    uint64_t        panic_stack;              /* 0xd68 */
--    uint64_t        user_exec_asce;           /* 0xd70 */
--    uint8_t         pad11[0xdc0 - 0xd78];     /* 0xd78 */
--
--    /* SMP info area: defined by DJB */
--    uint64_t        clock_comparator;         /* 0xdc0 */
--    uint64_t        ext_call_fast;            /* 0xdc8 */
--    uint64_t        percpu_offset;            /* 0xdd0 */
--    uint64_t        current_task;             /* 0xdd8 */
--    uint32_t        softirq_pending;          /* 0xde0 */
--    uint32_t        pad_0x0de4;               /* 0xde4 */
--    uint64_t        int_clock;                /* 0xde8 */
--    uint8_t         pad12[0xe00 - 0xdf0];     /* 0xdf0 */
--
--    /* 0xe00 is used as indicator for dump tools */
--    /* whether the kernel died with panic() or not */
--    uint32_t        panic_magic;              /* 0xe00 */
--
--    uint8_t         pad13[0x11b0 - 0xe04];    /* 0xe04 */
-+    uint8_t         pad13[0x11b0 - 0x200];    /* 0x200 */
- 
-     uint64_t        mcesad;                    /* 0x11B0 */
- 
--- 
-1.8.3.1
+  https://github.com/jasowang/qemu.git tags/net-pull-request
+
+for you to fetch changes up to 4b9b70000218640a42c3ea908a12665e5840b6cd:
+
+  tests: Add a test for qemu self announcements (2019-03-05 11:27:41 +080=
+0)
+
+----------------------------------------------------------------
+
+Changes from V1:
+- build fixes for qmp controlled announcing
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (9):
+      net: Introduce announce timer
+      migration: Add announce parameters
+      virtio-net: Switch to using announce timer
+      migration: Switch to using announce timer
+      net: Add a network device specific self-announcement ability
+      virtio-net: Allow qemu_announce_self to trigger virtio announcement=
+s
+      qmp: Add announce-self command
+      hmp: Add hmp_announce_self
+      tests: Add a test for qemu self announcements
+
+Vincenzo Maffione (3):
+      net: netmap: small improvements netmap_send()
+      net: netmap: simplify netmap_receive()
+      net: netmap: improve netmap_receive_iov()
+
+Zhang Chen (1):
+      net/colo-compare.c: Remove duplicated code
+
+ hmp-commands.hx                |  16 +++++
+ hmp.c                          |  33 ++++++++++
+ hmp.h                          |   1 +
+ hw/net/trace-events            |   6 ++
+ hw/net/virtio-net.c            |  69 +++++++++++++++-----
+ include/hw/virtio/virtio-net.h |   4 +-
+ include/migration/misc.h       |  12 +---
+ include/net/announce.h         |  41 ++++++++++++
+ include/net/net.h              |   2 +
+ include/qemu/typedefs.h        |   1 +
+ include/sysemu/sysemu.h        |   2 -
+ migration/migration.c          | 103 +++++++++++++++++++++++++++++-
+ migration/migration.h          |   4 ++
+ migration/savevm.c             |  72 +--------------------
+ migration/trace-events         |   1 -
+ net/Makefile.objs              |   1 +
+ net/announce.c                 | 140 +++++++++++++++++++++++++++++++++++=
+++++++
+ net/colo-compare.c             |   8 ---
+ net/netmap.c                   | 110 ++++++++++++++------------------
+ net/trace-events               |   3 +
+ qapi/migration.json            |  53 +++++++++++++++-
+ qapi/net.json                  |  43 +++++++++++++
+ tests/Makefile.include         |   3 +
+ tests/test-announce-self.c     |  82 ++++++++++++++++++++++++
+ tests/test-hmp.c               |   1 +
+ 25 files changed, 637 insertions(+), 174 deletions(-)
+ create mode 100644 include/net/announce.h
+ create mode 100644 net/announce.c
+ create mode 100644 tests/test-announce-self.c
