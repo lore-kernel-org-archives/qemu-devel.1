@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54586)
+Received: from eggs.gnu.org ([209.51.188.92]:54619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DHY-0001bZ-5K
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DHa-0001dE-T6
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DHX-0000sQ-3l
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:08 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:45679)
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DHZ-0000v6-Hj
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:10 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:41441)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1DHW-0000rR-SF
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:07 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id w17so10240829wrn.12
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 08:51:06 -0800 (PST)
+	id 1h1DHZ-0000uR-Aj
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:09 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id n2so10244776wrw.8
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 08:51:09 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id 2sm10071495wrg.89.2019.03.05.08.51.04
+	by smtp.gmail.com with ESMTPSA id 2sm10071495wrg.89.2019.03.05.08.51.06
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 05 Mar 2019 08:51:04 -0800 (PST)
+	Tue, 05 Mar 2019 08:51:07 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Mar 2019 16:50:39 +0000
-Message-Id: <20190305165051.26860-11-peter.maydell@linaro.org>
+Date: Tue,  5 Mar 2019 16:50:41 +0000
+Message-Id: <20190305165051.26860-13-peter.maydell@linaro.org>
 In-Reply-To: <20190305165051.26860-1-peter.maydell@linaro.org>
 References: <20190305165051.26860-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/22] target/arm: Restructure
- handle_fp_1src_{single, double}
+Subject: [Qemu-devel] [PULL 12/22] hw/arm/boot: introduce
+ fdt_add_memory_node helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,187 +36,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-This will allow sharing code that adjusts rmode beyond
-the existing users.
+We introduce an helper to create a memory node.
 
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190301200501.16533-10-richard.henderson@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190304101339.25970-2-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 90 +++++++++++++++++++++-----------------
- 1 file changed, 49 insertions(+), 41 deletions(-)
+ hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 34 insertions(+), 20 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 0cfd07d3abd..90336318194 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5688,55 +5688,59 @@ static void handle_fp_1src_half(DisasContext *s, int opcode, int rd, int rn)
- /* Floating-point data-processing (1 source) - single precision */
- static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
- {
-+    void (*gen_fpst)(TCGv_i32, TCGv_i32, TCGv_ptr);
-+    TCGv_i32 tcg_op, tcg_res;
-     TCGv_ptr fpst;
--    TCGv_i32 tcg_op;
--    TCGv_i32 tcg_res;
-+    int rmode = -1;
- 
--    fpst = get_fpstatus_ptr(false);
-     tcg_op = read_fp_sreg(s, rn);
-     tcg_res = tcg_temp_new_i32();
- 
-     switch (opcode) {
-     case 0x0: /* FMOV */
-         tcg_gen_mov_i32(tcg_res, tcg_op);
--        break;
-+        goto done;
-     case 0x1: /* FABS */
-         gen_helper_vfp_abss(tcg_res, tcg_op);
--        break;
-+        goto done;
-     case 0x2: /* FNEG */
-         gen_helper_vfp_negs(tcg_res, tcg_op);
--        break;
-+        goto done;
-     case 0x3: /* FSQRT */
-         gen_helper_vfp_sqrts(tcg_res, tcg_op, cpu_env);
--        break;
-+        goto done;
-     case 0x8: /* FRINTN */
-     case 0x9: /* FRINTP */
-     case 0xa: /* FRINTM */
-     case 0xb: /* FRINTZ */
-     case 0xc: /* FRINTA */
--    {
--        TCGv_i32 tcg_rmode = tcg_const_i32(arm_rmode_to_sf(opcode & 7));
--
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
--        gen_helper_rints(tcg_res, tcg_op, fpst);
--
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
--        tcg_temp_free_i32(tcg_rmode);
-+        rmode = arm_rmode_to_sf(opcode & 7);
-+        gen_fpst = gen_helper_rints;
-         break;
--    }
-     case 0xe: /* FRINTX */
--        gen_helper_rints_exact(tcg_res, tcg_op, fpst);
-+        gen_fpst = gen_helper_rints_exact;
-         break;
-     case 0xf: /* FRINTI */
--        gen_helper_rints(tcg_res, tcg_op, fpst);
-+        gen_fpst = gen_helper_rints;
-         break;
-     default:
--        abort();
-+        g_assert_not_reached();
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index d90af2f17d2..a830655e1af 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -423,6 +423,32 @@ static void set_kernel_args_old(const struct arm_boot_info *info,
      }
- 
--    write_fp_sreg(s, rd, tcg_res);
--
-+    fpst = get_fpstatus_ptr(false);
-+    if (rmode >= 0) {
-+        TCGv_i32 tcg_rmode = tcg_const_i32(rmode);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-+        gen_fpst(tcg_res, tcg_op, fpst);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-+        tcg_temp_free_i32(tcg_rmode);
-+    } else {
-+        gen_fpst(tcg_res, tcg_op, fpst);
-+    }
-     tcg_temp_free_ptr(fpst);
-+
-+ done:
-+    write_fp_sreg(s, rd, tcg_res);
-     tcg_temp_free_i32(tcg_op);
-     tcg_temp_free_i32(tcg_res);
  }
-@@ -5744,9 +5748,10 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
- /* Floating-point data-processing (1 source) - double precision */
- static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
- {
-+    void (*gen_fpst)(TCGv_i64, TCGv_i64, TCGv_ptr);
-+    TCGv_i64 tcg_op, tcg_res;
-     TCGv_ptr fpst;
--    TCGv_i64 tcg_op;
--    TCGv_i64 tcg_res;
-+    int rmode = -1;
  
-     switch (opcode) {
-     case 0x0: /* FMOV */
-@@ -5754,48 +5759,51 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
-         return;
-     }
- 
--    fpst = get_fpstatus_ptr(false);
-     tcg_op = read_fp_dreg(s, rn);
-     tcg_res = tcg_temp_new_i64();
- 
-     switch (opcode) {
-     case 0x1: /* FABS */
-         gen_helper_vfp_absd(tcg_res, tcg_op);
--        break;
-+        goto done;
-     case 0x2: /* FNEG */
-         gen_helper_vfp_negd(tcg_res, tcg_op);
--        break;
-+        goto done;
-     case 0x3: /* FSQRT */
-         gen_helper_vfp_sqrtd(tcg_res, tcg_op, cpu_env);
--        break;
-+        goto done;
-     case 0x8: /* FRINTN */
-     case 0x9: /* FRINTP */
-     case 0xa: /* FRINTM */
-     case 0xb: /* FRINTZ */
-     case 0xc: /* FRINTA */
--    {
--        TCGv_i32 tcg_rmode = tcg_const_i32(arm_rmode_to_sf(opcode & 7));
--
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
--        gen_helper_rintd(tcg_res, tcg_op, fpst);
--
--        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
--        tcg_temp_free_i32(tcg_rmode);
-+        rmode = arm_rmode_to_sf(opcode & 7);
-+        gen_fpst = gen_helper_rintd;
-         break;
--    }
-     case 0xe: /* FRINTX */
--        gen_helper_rintd_exact(tcg_res, tcg_op, fpst);
-+        gen_fpst = gen_helper_rintd_exact;
-         break;
-     case 0xf: /* FRINTI */
--        gen_helper_rintd(tcg_res, tcg_op, fpst);
-+        gen_fpst = gen_helper_rintd;
-         break;
-     default:
--        abort();
-+        g_assert_not_reached();
-     }
- 
--    write_fp_dreg(s, rd, tcg_res);
--
-+    fpst = get_fpstatus_ptr(false);
-+    if (rmode >= 0) {
-+        TCGv_i32 tcg_rmode = tcg_const_i32(rmode);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-+        gen_fpst(tcg_res, tcg_op, fpst);
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-+        tcg_temp_free_i32(tcg_rmode);
-+    } else {
-+        gen_fpst(tcg_res, tcg_op, fpst);
-+    }
-     tcg_temp_free_ptr(fpst);
++static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_base,
++                               uint32_t scells, hwaddr mem_len,
++                               int numa_node_id)
++{
++    char *nodename;
++    int ret;
 +
-+ done:
-+    write_fp_dreg(s, rd, tcg_res);
-     tcg_temp_free_i64(tcg_op);
-     tcg_temp_free_i64(tcg_res);
- }
++    nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    ret = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, mem_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        goto out;
++    }
++
++    /* only set the NUMA ID if it is specified */
++    if (numa_node_id >= 0) {
++        ret = qemu_fdt_setprop_cell(fdt, nodename,
++                                    "numa-node-id", numa_node_id);
++    }
++out:
++    g_free(nodename);
++    return ret;
++}
++
+ static void fdt_add_psci_node(void *fdt)
+ {
+     uint32_t cpu_suspend_fn;
+@@ -502,7 +528,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+     void *fdt = NULL;
+     int size, rc, n = 0;
+     uint32_t acells, scells;
+-    char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
+     char **node_path;
+@@ -576,35 +601,24 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+         mem_base = binfo->loader_start;
+         for (i = 0; i < nb_numa_nodes; i++) {
+             mem_len = numa_info[i].node_mem;
+-            nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
+-            qemu_fdt_add_subnode(fdt, nodename);
+-            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-            rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                              acells, mem_base,
+-                                              scells, mem_len);
++            rc = fdt_add_memory_node(fdt, acells, mem_base,
++                                     scells, mem_len, i);
+             if (rc < 0) {
+-                fprintf(stderr, "couldn't set %s/reg for node %d\n", nodename,
+-                        i);
++                fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
++                        mem_base);
+                 goto fail;
+             }
+ 
+-            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+             mem_base += mem_len;
+-            g_free(nodename);
+         }
+     } else {
+-        nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
+-        qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-
+-        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                          acells, binfo->loader_start,
+-                                          scells, binfo->ram_size);
++        rc = fdt_add_memory_node(fdt, acells, binfo->loader_start,
++                                 scells, binfo->ram_size, -1);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set %s reg\n", nodename);
++            fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
++                    binfo->loader_start);
+             goto fail;
+         }
+-        g_free(nodename);
+     }
+ 
+     rc = fdt_path_offset(fdt, "/chosen");
 -- 
 2.20.1
