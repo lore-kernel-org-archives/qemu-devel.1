@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42437)
+Received: from eggs.gnu.org ([209.51.188.92]:42456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1Jpy-0003U5-8Z
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:51:08 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1Jpz-0003UV-4x
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1Jpx-000613-68
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:51:06 -0500
-Received: from ozlabs.org ([203.11.71.1]:53925)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1h1Jpv-0005We-M7
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:51:05 -0500
-Date: Wed, 6 Mar 2019 10:33:24 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1h1Jpy-00061s-3U
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:51:07 -0500
+Date: Wed, 6 Mar 2019 10:40:33 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190305233324.GA19715@umbus.fritz.box>
-References: <20190221173326.31874-1-mst@redhat.com>
-	<20190214043916.22128-6-david@gibson.dropbear.id.au>
-	<CAFEAcA_Xc6A017YJNvxHReC_D2d0C4cJ_pbro+E3EEcGLfbhhQ@mail.gmail.com>
+Message-ID: <20190305234033.GC19715@umbus.fritz.box>
+References: <20190305051134.27930-1-david@gibson.dropbear.id.au>
+	<20190305051134.27930-3-david@gibson.dropbear.id.au>
+	<00e325d4-b23c-7239-46e6-a55fd1f9d5f4@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="EeQfGwPcQSOJBaQU"
+	protocol="application/pgp-signature"; boundary="R+My9LyyhiUvIEro"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_Xc6A017YJNvxHReC_D2d0C4cJ_pbro+E3EEcGLfbhhQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 23/26] virtio-balloon: Safely handle
- BALLOON_PAGE_SIZE < host page size
+In-Reply-To: <00e325d4-b23c-7239-46e6-a55fd1f9d5f4@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 2/2] virtio-balloon: Restore MADV_WILLNEED
+ hint on balloon deflate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: mst@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---EeQfGwPcQSOJBaQU
+--R+My9LyyhiUvIEro
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 05, 2019 at 04:06:54PM +0000, Peter Maydell wrote:
-> On Fri, 22 Feb 2019 at 02:41, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > From: David Gibson <david@gibson.dropbear.id.au>
-> >
-> > The virtio-balloon always works in units of 4kiB (BALLOON_PAGE_SIZE), b=
-ut
-> > we can only actually discard memory in units of the host page size.
+On Tue, Mar 05, 2019 at 03:15:38PM +0100, David Hildenbrand wrote:
+> On 05.03.19 06:11, David Gibson wrote:
+> > Prior to f6deb6d9 "virtio-balloon: Remove unnecessary MADV_WILLNEED on
+> > deflate", the balloon device issued an madvise() MADV_WILLNEED on
+> > pages removed from the balloon.  That would hint to the host kernel
+> > that the pages were likely to be needed by the guest in the near
+> > future.
+> >=20
+> > It's unclear if this is actually valuable or not, and so f6deb6d9
+> > removed this, essentially ignoring balloon deflate requests.  However,
+> > concerns have been raised that this might cause a performance
+> > regression by causing extra latency for the guest in certain
+> > configurations.
 >=20
-> Hi -- Coverity points out an issue in this patch (CID 1399146):
+> I mean, it will mainly create page tables as far as I know. Any write to
+> a page will have an overhead either way (COW zero page). Reads *might*
+> be faster.
 >=20
-> > +    /* Hard case
-> > +     *
-> > +     * We've put a piece of a larger host page into the balloon - we
-> > +     * need to keep track until we have a whole host page to
-> > +     * discard
-> > +     */
-> > +    warn_report_once(
-> > +"Balloon used with backing page size > 4kiB, this may not be reliable"=
-);
-> > +
-> > +    subpages =3D rb_page_size / BALLOON_PAGE_SIZE;
-> > +
-> > +    if (balloon->pbp
-> > +        && (rb !=3D balloon->pbp->rb
-> > +            || host_page_base !=3D balloon->pbp->base)) {
-> > +        /* We've partially ballooned part of a host page, but now
-> > +         * we're trying to balloon part of a different one.  Too hard,
-> > +         * give up on the old partial page */
-> > +        free(balloon->pbp);
-> > +        balloon->pbp =3D NULL;
-> >      }
-> >
-> > -    ram_block_discard_range(rb, ram_offset, rb_page_size);
-> > -    /* We ignore errors from ram_block_discard_range(), because it has
-> > -     * already reported them, and failing to discard a balloon page is
-> > -     * not fatal */
-> > +    if (!balloon->pbp) {
-> > +        /* Starting on a new host page */
-> > +        size_t bitlen =3D BITS_TO_LONGS(subpages) * sizeof(unsigned lo=
-ng);
-> > +        balloon->pbp =3D g_malloc0(sizeof(PartiallyBalloonedPage) + bi=
-tlen);
+> As we are working on 4k granularity in the balloon (and doing
+> MADV_DONTNEED on 4k granularity!), there will most probably be page
+> tables already either way. A page table could only be zapped if all
+> pages of that page table are MADV_DONTNEED'ed (or I assume never were
+> touched), and I am not sure if "random MADV_DONTNEED'ing of 4k pages"
+> will actually get rid of page tables (my assumption would be: only if a
+> complete range is zapped at once). I haven't looked into the details,
+> though (plenty of other stuff to do).
 >=20
+> I am not sure if I share the concerns. Real-time workload should never
+> use the virtio-balloon in a way that anything like that would be possible.
 >=20
-> We allocate balloon->pbp with g_malloc0() here...
+> >=20
+> > So, until we can get actual benchmark data to see if that's the case,
+> > this restores (by default) the old behaviour, issuing a MADV_WILLNEED
+> > when a page is removed from the balloon.  A new property on the
+> > balloon device "hint-on-deflate" can be set to false to remove this
+> > behaviour for testing.
 >=20
-> > +        balloon->pbp->rb =3D rb;
-> > +        balloon->pbp->base =3D host_page_base;
-> > +    }
-> > +
-> > +    bitmap_set(balloon->pbp->bitmap,
-> > +               (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
-> > +               subpages);
-> > +
-> > +    if (bitmap_full(balloon->pbp->bitmap, subpages)) {
-> > +        /* We've accumulated a full host page, we can actually discard
-> > +         * it now */
-> > +
-> > +        ram_block_discard_range(rb, balloon->pbp->base, rb_page_size);
-> > +        /* We ignore errors from ram_block_discard_range(), because it
-> > +         * has already reported them, and failing to discard a balloon
-> > +         * page is not fatal */
-> > +
-> > +        free(balloon->pbp);
+> This is certainly a good approach for you to finally be able to leave
+> the ugly land of virtio-balloon :)
 >=20
-> ...but we free it (here and elsewhere) with free(), not g_free().
+> But at least to me, this looks completely useless. I'll be happy to be
+> proven wrong as always :)
 
-Ah.  Whoops.
-
-I'll put a fix for that in the series of followup balloon patches I'm
-working on right now.
+Frankly, I agree.  But mst was nervous about us making that change to
+the balloon's previous behaviour.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -118,24 +87,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---EeQfGwPcQSOJBaQU
+--R+My9LyyhiUvIEro
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx/B0QACgkQbDjKyiDZ
-s5JguhAAlIS4vrwcU0sQMxxM2pj97TOtRN27LJIQN2arOvzXX5FVjBDu00D1jQz5
-vbOVH5FtrSltz8XLOaPseL4LHB/zbnuXBHa2u1GxUnkgJw1nIopIW802eThZEBB0
-uz+8cS0dOb7SNjFuzLaBw1jVY4o7HAKmKVtoE2KXARhZsPqaeC5UExoy2GGOHf9n
-YQ+yusmnI2yZd7ov9yR2gjS+SpkEmzPACeFi9l/dVDJbQU37hgD44zo8HrW6ttbI
-P/CU6yoQ2kh+zMZHElAZWYhjFIUX3InyYC4jNVcA79nwtb4krmFjiqpxKOW3Ka7J
-nO3E2YOWDE7O5WSVoR7BieSzqJRayUtm4UYvfsoWLs8+7AygfxKFv1kHMm5mZHOL
-j3bFOtn/W6AdsX1HhB98j+CA6VIQ1K3ZTaQyGw1HjuUDSTedMo6jB+1bDFPFRUZ4
-GI2+l3j5xfcdCuDTuixFbgT3Mu4gqDIrZ68uRmoWfpt1F7BHK6FVKay6Hml6qqoi
-ORp6L1JCZQJSpEno5/S91oehZcA/2+BI+itcaG7aJb5vikcGgPCC8V6c7rNfRHon
-Ie9pzsV1v0ylY0zHhjrAV8mvXYx8W322A7UFLpjIE5EKI4vBTfpW1JuCriEzlt1e
-xDmNSilodalpabUaACOeQ7VL3UQhYSxJhmVOIZknUXLw/ZGHUdk=
-=kt9X
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx/CPAACgkQbDjKyiDZ
+s5K0WQ/8CmvTnRS3Wfg5nPrkCFd6p+Mz3PGN9DA6VfjorCyn9fuobvhMnLe50jvg
+MiPAoDdWLevBRCCybEW+5xBxzOtcLeN97YGrbJ+mXJP/fF6jSAlI+INid+dumoLk
+KTT0LYg+zN5QkHeZF6zRG4TELanHuB9mkyAwrPxnMKDKgvj5vUDv0ZaISfkyaF2Q
+6Qnovn7JeS4asRz7iPnbIlE+oAVSeyqm0HxsP6A5X+/p4oLb+nLIPmeSEPEdXpEH
+O2NTnO5kEd64SkoVwVetxO1mroEIs8+sN+YYo1AMl3e8yBoHyxQIB4lgCbBJRxQ3
+eEDaqgg0wsRi6HNhHuBZVjAWKhC9KY5xlGdJxXgWedbpfo1t/reTwex5NaDUL4e4
+W1NgM81RQm7uml8pl1IIwYESz7gqAtOekuKMm0huyMlIZgWV8sQtSgzHbEBoHu6W
+Sy+KR4GBISedhZoEUjJNwnhLM84D4o9Ke9B0FIqfuHL1DsehUi5o+r+Ux73cy+K9
+DLxD2n+Do4VIwdXanwKnBNUsH4QoPmyuCLVXGnmcin5qZ276hRCBjcBD2K+ZlHuv
+kzVtKxp7JlYaSXnFS8H0jxcmvZdFIN0IGPGKy65Ffa1Qa/5BAKYV7ryyj928RY0s
+pyhcvrbRkQMqDOALVW3kL5Agp0dhcjil+fj9CnL0w9ZtQpVJh+4=
+=zO7M
 -----END PGP SIGNATURE-----
 
---EeQfGwPcQSOJBaQU--
+--R+My9LyyhiUvIEro--
