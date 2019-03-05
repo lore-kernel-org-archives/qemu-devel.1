@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50513)
+Received: from eggs.gnu.org ([209.51.188.92]:51982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1EdU-0002CO-OY
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:17:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1h1Eja-0007Bl-7f
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:24:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1EdT-0002yB-Ir
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:17:52 -0500
-Resent-Message-Id: <E1h1EdT-0002yB-Ir@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21060)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1EdT-0002vx-8z
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:17:51 -0500
-Message-ID: <155180984513.19275.8930444890753479327@6acff2cf482b>
-In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1h1EjZ-0001LK-EX
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:24:10 -0500
+References: <w51y35tb8ul.fsf@maestria.local.igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f2fab5f3-9321-9dac-450c-429caf9e55fb@redhat.com>
+Date: Tue, 5 Mar 2019 12:24:02 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 5 Mar 2019 10:17:26 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Enable build and install of our
- rST docs
+In-Reply-To: <w51y35tb8ul.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] iotest 223 is flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +23,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, amarkovic@wavecomp.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNTE3MjEzOS4zMjY2
-Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA1MTcyMTM5
-LjMyNjYyLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0ggdjMgMDAvMTJdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
-OTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
-MDE5MDMwNTE3MjEzOS4zMjY2Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY1OWZlMjlkN2YgTUFJTlRBSU5FUlM6IEFkZCBlbnRyeSBm
-b3IgU3BoaW54IGRvY3VtZW50YXRpb24gaW5mcmFzdHJ1Y3R1cmUKN2I1OWIxOTA0MSBkb2NzL2Nv
-bmYucHk6IERvbid0IGhhcmQtY29kZSBRRU1VIHZlcnNpb24KYjhmNzcwNThlYyBNYWtlZmlsZTog
-QWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVyc2lvbiIgY29kZQowYzZjMmZkM2E0IE1h
-a2VmaWxlLCBjb25maWd1cmU6IFN1cHBvcnQgYnVpbGRpbmcgclNUIGRvY3VtZW50YXRpb24KYzg4
-ZTEwYjBiNiBkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdl
-IHdhbnQKZTMwYjVhNTZmNyBkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCjM0
-OTZlZTY3ZDYgZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwg
-YnVpbGQKMDQ5N2Y2MDVkMiBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3Rlcicg
-dGhlbWUKZTM0MzYwMjYwOCBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGly
-ZWN0b3J5CmI4ZWI2NWFmYjcgZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngt
-cXVpY2tzdGFydApmZWI4ZWNiY2RkIGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9y
-bWF0CjY0OWI4YmU1YmQgZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgNjQ5YjhiZTViZDNj
-IChkb2NzL2NwdS1ob3RwbHVnLnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzEyIENoZWNr
-aW5nIGNvbW1pdCBmZWI4ZWNiY2RkYmEgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
-Zm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNDogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVt
-b3J5LnR4dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzEyIENoZWNraW5nIGNvbW1p
-dCBiOGViNjVhZmI3ZmYgKGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1
-aWNrc3RhcnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE3OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTIg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMiBDaGVja2luZyBjb21taXQgZTM0MzYwMjYw
-OGU4IChkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5KQo1LzEy
-IENoZWNraW5nIGNvbW1pdCAwNDk3ZjYwNWQyYmIgKGRvY3MvY29uZi5weTogQ29uZmlndXJlIHRo
-ZSAnYWxhYmFzdGVyJyB0aGVtZSkKNi8xMiBDaGVja2luZyBjb21taXQgMzQ5NmVlNjdkNjc1IChk
-b2NzL2NvbmYucHk6IERvbid0IGluY2x1ZGUgclNUIHNvdXJjZXMgaW4gSFRNTCBidWlsZCkKNy8x
-MiBDaGVja2luZyBjb21taXQgZTMwYjVhNTZmN2ZlIChkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0
-aW9uIHdhcm5pbmdzKQo4LzEyIENoZWNraW5nIGNvbW1pdCBjODhlMTBiMGI2ZTQgKGRvY3M6IFBy
-b3ZpZGUgc2VwYXJhdGUgY29uZi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudCkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMTAyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojMTg3OiBGSUxFOiBkb2NzL2ludGVyb3AvY29uZi5weToxNToKK2h0bWxfdGhl
-bWVfb3B0aW9uc1snZGVzY3JpcHRpb24nXSA9IHUnU3lzdGVtIEVtdWxhdGlvbiBNYW5hZ2VtZW50
-IGFuZCBJbnRlcm9wZXJhYmlsaXR5IEd1aWRlJwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdz
-LCAxMzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKOS8xMiBDaGVja2luZyBjb21taXQgMGM2YzJmZDNhNDY0IChNYWtlZmlsZSwgY29uZmlndXJl
-OiBTdXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uKQoxMC8xMiBDaGVja2luZyBjb21t
-aXQgYjhmNzcwNThlYzkxIChNYWtlZmlsZTogQWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtn
-dmVyc2lvbiIgY29kZSkKMTEvMTIgQ2hlY2tpbmcgY29tbWl0IDdiNTliMTkwNDEwMyAoZG9jcy9j
-b25mLnB5OiBEb24ndCBoYXJkLWNvZGUgUUVNVSB2ZXJzaW9uKQoxMi8xMiBDaGVja2luZyBjb21t
-aXQgZjU5ZmUyOWQ3ZjlhIChNQUlOVEFJTkVSUzogQWRkIGVudHJ5IGZvciBTcGhpbnggZG9jdW1l
-bnRhdGlvbiBpbmZyYXN0cnVjdHVyZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxp
-bmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 3/5/19 10:10 AM, Alberto Garcia wrote:
+> I can make it fail by running it a few times:
+> 
+> 223 1s ... - output mismatch (see 223.out.bad)
+> --- tests/qemu-iotests/223.out       2019-02-08 17:25:15.584387100 +0200
+> +++ tests/qemu-iotests/223.out.bad     2019-03-05 18:05:16.855223976 +0200
+> @@ -92,9 +92,10 @@
+>   
+>   === Use qemu-nbd as server ===
+>   
+> -[{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": false},
+> -{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": true},
+> -{ "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data": false}]
+> +qemu-nbd: Failed to blk_new_open 'tests/qemu-iotests/scratch/t.qcow2': Failed to get shared "write" lock
+> +Is another process using the image [tests/qemu-iotests/scratch/t.qcow2]?
+
+I haven't been able to reproduce it yet, but see what might be the problem:
+
+_send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
+
+echo
+echo "=== Use qemu-nbd as server ==="
+echo
+
+nbd_server_start_unix_socket -r -f $IMGFMT -B b "$TEST_IMG"
+
+There was nothing in the qemu process to let go of t.qcow2 prior to the 
+quit request. And although the quit command may have had time to reply 
+over the socket that the command was accepted, there may still be a 
+delay before the process actually dies, where under sufficient load, the 
+qemu-nbd process can start up during that window.
+
+Patch coming up; since I couldn't reproduce the failure, I'd appreciate 
+if you could confirm if it seems to help in your setup.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
