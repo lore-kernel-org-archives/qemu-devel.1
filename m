@@ -1,22 +1,42 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35604)
+Received: from eggs.gnu.org ([209.51.188.92]:35729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1C6a-0002uG-Jq
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:52 -0500
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h1C6m-000345-VC
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1C6P-0005tv-Ne
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:43 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54939 helo=mail.rt-rk.com)
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h1C6e-0007zE-9j
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:53 -0500
+Received: from smtp.lg.ehu.es ([158.227.0.66]:17071 helo=smtp.ehu.eus)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1h1C6F-0002sN-Cl
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:25 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue,  5 Mar 2019 16:34:36 +0100
-Message-Id: <1551800076-8104-15-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1551800076-8104-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1551800076-8104-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 14/14] tests/tcg: target/mips: Add tests for
- MSA pack instructions
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h1C6d-0007V3-Mx
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:48 -0500
+Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
+	by postfix.smtp1.imsva1 (Postfix) with ESMTPS id 6433F30842
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:35:44 +0100 (CET)
+Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 11BCA110056
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:35:44 +0100 (CET)
+Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E66B2110053
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:35:43 +0100 (CET)
+Received: from smtp.ehu.eus (unknown [10.0.100.73])
+	by imsva1.lgp.ehu.es (Postfix) with ESMTPS
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:35:43 +0100 (CET)
+Received: from mail-it1-f169.google.com (mail-it1-f169.google.com
+	[209.85.166.169]) by smtp1 (Postfix) with ESMTPSA id 6854930842
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:35:43 +0100 (CET)
+Received: by mail-it1-f169.google.com with SMTP id l15so5089118iti.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 07:35:43 -0800 (PST)
+MIME-Version: 1.0
+References: <CAGZZdDHc12gHaNNisqqBek+2ox1BiuHhwR2k0Tavmt_t+x_D5A@mail.gmail.com>
+In-Reply-To: <CAGZZdDHc12gHaNNisqqBek+2ox1BiuHhwR2k0Tavmt_t+x_D5A@mail.gmail.com>
+Reply-To: unai.martinezcorral@ehu.eus
+From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
+Date: Tue, 5 Mar 2019 16:35:32 +0100
+Message-ID: <CAGZZdDGct2XqP8FHBhnH0ujCRtcTLPBX=68OLwhhigSJpn3diw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [PATCH] qemu-binfmt-conf.sh: add CPUS, add --reset,
+ make -p and -c boolean (no arg)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,1966 +45,314 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: =?UTF-8?Q?Unai_Mart=C3=ADnez_Corral?= <unai.martinezcorral@ehu.eus>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, riku.voipio@iki.fi
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Related to https://bugs.launchpad.net/qemu/+bug/1817239
 
-Add tests for MSA pack instructions. This includes following
-instructions:
+- Positional parameters are supported as [CPUS]. This can be a single
+target arch, a comma separated list or a space separated list. This
+parameter replaces qemu_target_list for any mode (default, systemd
+or debian). If it is left empty or ALL is provided, all the targets are
+registered. If NONE is provided, no target is registered.
+- Option [--systemd CPU] is modified to [--systemd], since the
+functionality is supported by [CPUS] now.
+- [--credential yes|no] and [--persistent yes|no] are modified to
+[--credential] and [--persistent], respectively. They are 'no' by default,
+and 'yes' if the corresponding flag is provided.
+- [--reset ARCHS] is added. This allows to remove registered interpreters.
+Supported formats are a single target name or a comma separated list of
+targets. If ALL is provided, all the existing 'qemu-*' interpreters are
+removed.
+- 'usage' is updated according to the changes above.
 
-  * PCKEV.B - pack even (bytes)
-  * PCKEV.H - pack even (halfwords)
-  * PCKEV.W - pack even (words)
-  * PCKEV.D - pack even (doublewords)
-  * PCKOD.B - pack odd (bytes)
-  * PCKOD.H - pack odd (halfwords)
-  * PCKOD.W - pack odd (words)
-  * PCKOD.D - pack odd (doublewords)
-  * VSHF.B - data preserving shuffle (bytes)
-  * VSHF.H - data preserving shuffle (halfwords)
-  * VSHF.W - data preserving shuffle (words)
-  * VSHF.D - data preserving shuffle (doublewords)
+Note that I don't know how to proceed when `--reset` is used together with
+`--systemd` or `--debian`. At the moment, if `--reset` is provided first,
+both options are used, one after the other. However, if any of the other
+two is
+provided first, a error is shown: 'option reset not implemented for this
+mode yet'.
 
-Each test consists of 80 test cases, so altogether there are 960
-test cases.
+Some example use cases that are to be supported by this patch:
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+qemu-binfmt-conf.sh -p aarch64
+qemu-binfmt-conf.sh -p aarch64 riscv64
+qemu-binfmt-conf.sh -p aarch64,riscv64
+qemu-binfmt-conf.sh -r ALL -p aarch64
+qemu-binfmt-conf.sh -r aarch64 -p aarch64
+qemu-binfmt-conf.sh -r ALL -p aarch64 riscv64
+qemu-binfmt-conf.sh -r ALL -p aarch64,riscv64
+qemu-binfmt-conf.sh -r aarch64,riscv64 -p aarch64 riscv64
+qemu-binfmt-conf.sh -r aarch64,riscv64 -p aarch64,riscv64
+qemu-binfmt-conf.sh -r ALL NONE
+
+The main purpose of these changes is to make it easier to use
+qemu-user-static to
+build docker images for foreign architectures.
+See https://github.com/umarcor/qus/tree/qemu-update
+
+Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
 ---
- .../tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c  | 153 +++++++++++++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c  | 153 +++++++++++++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c  | 153 +++++++++++++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c  | 153 +++++++++++++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c  | 153 +++++++++++++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c  | 153 +++++++++++++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c  | 153 +++++++++++++++++++++
- .../tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c  | 153 +++++++++++++++++++++
- tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c | 153 +++++++++++++++++++++
- tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c | 153 +++++++++++++++++++++
- tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c | 153 +++++++++++++++++++++
- tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c | 153 +++++++++++++++++++++
- 12 files changed, 1836 insertions(+)
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
- create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
+ scripts/qemu-binfmt-conf.sh | 174 +++++++++++++++++++++++-------------
+ 1 file changed, 110 insertions(+), 64 deletions(-)
 
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
-new file mode 100644
-index 0000000..d98dd22
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction PCKEV.B
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "PCKEV.B";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0xe3388ee38ee3388eULL, 0xffffffffffffffffULL, },
-+        { 0x1cc7711c711cc771ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x0000000000000000ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xe3388ee38ee3388eULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x1cc7711c711cc771ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x5555555555555555ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0xe3388ee38ee3388eULL, 0xccccccccccccccccULL, },
-+        { 0x1cc7711c711cc771ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x3333333333333333ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0xe3388ee38ee3388eULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xe3388ee38ee3388eULL, },
-+        { 0x5555555555555555ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xccccccccccccccccULL, 0xe3388ee38ee3388eULL, },
-+        { 0x3333333333333333ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xe3388ee38ee3388eULL, 0xe3388ee38ee3388eULL, },
-+        { 0x1cc7711c711cc771ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xffffffffffffffffULL, 0x1cc7711c711cc771ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x1cc7711c711cc771ULL, },
-+        { 0x5555555555555555ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xccccccccccccccccULL, 0x1cc7711c711cc771ULL, },
-+        { 0x3333333333333333ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x1cc7711c711cc771ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x1cc7711c711cc771ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0x675e7b0c6acc6240ULL, },    /*  64  */
-+        { 0xf71a3ffcbe639308ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xf1d842a04f4d314eULL, 0x675e7b0c6acc6240ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf71a3ffcbe639308ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xd8ff2b145aaacf80ULL, },    /*  72  */
-+        { 0xf71a3ffcbe639308ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf1d842a04f4d314eULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKEV_B(b128_pattern[i], b128_pattern[j],
-+                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKEV_B(b128_random[i], b128_random[j],
-+                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                        (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index b5a16742a1..f044446d5c 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -6,6 +6,32 @@ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+ sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
+ microblaze microblazeel or1k x86_64"
+
++# check if given target CPUS is/are in the supported target list
++qemu_check_target_list() {
++    all="$qemu_target_list"
++    if [ "$1" = "ALL" ]; then
++      checked_target_list="$all"
++      return
++    fi
++    list=""
++    for target in $@; do
++        unknown_target="true"
++        for cpu in $all ; do
++            if [ "$cpu" = "$target" ] ; then
++                list="$list $target"
++                unknown_target="false"
++                break
++            fi
++        done
++        if [ "$unknown_target" = "true" ] ; then
++            echo "ERROR: unknown CPU \"$target\"" 1>&2
++            usage
++            exit 1
++        fi
++    done
++    checked_target_list="$list"
 +}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
-new file mode 100644
-index 0000000..543fb6a
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction PCKEV.D
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
 +
-+#include <sys/time.h>
-+#include <stdint.h>
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+ i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ i386_family=i386
+@@ -167,45 +193,48 @@ qemu_get_family() {
+
+ usage() {
+     cat <<EOF
+-Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+-                           [--help][--credential yes|no][--exportdir PATH]
+-                           [--persistent yes|no][--qemu-suffix SUFFIX]
+-
+-       Configure binfmt_misc to use qemu interpreter
+-
+-       --help:        display this usage
+-       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
+-       --qemu-suffix: add a suffix to the default interpreter name
+-       --debian:      don't write into /proc,
+-                      instead generate update-binfmts templates
+-       --systemd:     don't write into /proc,
+-                      instead generate file for systemd-binfmt.service
+-                      for the given CPU. If CPU is "ALL", generate a
+-                      file for all known cpus
+-       --exportdir:   define where to write configuration files
+-                      (default: $SYSTEMDDIR or $DEBIANDIR)
+-       --credential:  if yes, credential and security tokens are
+-                      calculated according to the binary to interpret
+-       --persistent:  if yes, the interpreter is loaded when binfmt is
+-                      configured and remains in memory. All future uses
+-                      are cloned from the open file.
+-
+-    To import templates with update-binfmts, use :
+-
+-        sudo update-binfmts --importdir ${EXPORTDIR:-$DEBIANDIR} --import
+qemu-CPU
+-
+-    To remove interpreter, use :
+-
+-        sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
+-
+-    With systemd, binfmt files are loaded by systemd-binfmt.service
+-
+-    The environment variable HOST_ARCH allows to override 'uname' to
+generate
+-    configuration files for a different architecture than the current one.
+-
+-    where CPU is one of:
+-
+-        $qemu_target_list
++Usage: qemu-binfmt-conf.sh [--help][--qemu-path PATH][--qemu-suffix SUFFIX]
++                           [--persistent][--credential][--exportdir PATH]
++                           [--reset ARCHS][--systemd][--debian][CPUS]
 +
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
++    Configure binfmt_misc to use qemu interpreter for the given target
+CPUS.
++    Supported formats for CPUS are: single arch or comma/space separated
+list.
++    If CPUS is empty, configure all known cpus. See QEMU target list below.
 +
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++    --help:        display this usage.
++    --qemu-path:   set path to qemu interpreter ($QEMU_PATH).
++    --qemu-suffix: add a suffix to the default interpreter name.
++    --persistent:  if present, the interpreter is loaded when binfmt is
++                   configured and remains in memory. All future uses
++                   are cloned from the open file.
++    --credential:  if present, credential and security tokens are
++                   calculated according to the binary to interpret.
++    --exportdir:   define where to write configuration files
++                   (default: $SYSTEMDDIR or $DEBIANDIR).
++    --reset:       remove registered interpreter for target ARCHS (comma
++                   separated list). If ARCHS is 'ALL', remove all
+registered
++                   'qemu-*' interpreters.
++    --systemd:     don't write into /proc,
++                   instead generate file(s) for systemd-binfmt.service;
++                   environment variable HOST_ARCH allows to override
+'uname'
++                   to generate configuration files for a different
++                   architecture than the current one.
++    --debian:      don't write into /proc,
++                   instead generate update-binfmts templates.
 +
++      To import templates with update-binfmts, use :
 +
-+int32_t main(void)
-+{
-+    char *instruction_name = "PCKEV.D";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
++        sudo update-binfmts \\
++             --importdir ${EXPORTDIR:-$DEBIANDIR} \\
++             --import qemu-CPU
 +
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0xe38e38e38e38e38eULL, 0xffffffffffffffffULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x0000000000000000ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xe38e38e38e38e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x5555555555555555ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0xe38e38e38e38e38eULL, 0xccccccccccccccccULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x3333333333333333ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0xe38e38e38e38e38eULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0xe38e38e38e38e38eULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xe38e38e38e38e38eULL, },
-+        { 0x5555555555555555ULL, 0xe38e38e38e38e38eULL, },
-+        { 0xccccccccccccccccULL, 0xe38e38e38e38e38eULL, },
-+        { 0x3333333333333333ULL, 0xe38e38e38e38e38eULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xe38e38e38e38e38eULL, },
-+        { 0xffffffffffffffffULL, 0x1c71c71c71c71c71ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x1c71c71c71c71c71ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x1c71c71c71c71c71ULL, },
-+        { 0x5555555555555555ULL, 0x1c71c71c71c71c71ULL, },
-+        { 0xccccccccccccccccULL, 0x1c71c71c71c71c71ULL, },
-+        { 0x3333333333333333ULL, 0x1c71c71c71c71c71ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x1c71c71c71c71c71ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0x1c71c71c71c71c71ULL, },
-+        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },    /*  64  */
-+        { 0xfbbe00634d93c708ULL, 0x886ae6cc28625540ULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0x886ae6cc28625540ULL, },
-+        { 0x704f164d5e31e24eULL, 0x886ae6cc28625540ULL, },
-+        { 0x886ae6cc28625540ULL, 0xfbbe00634d93c708ULL, },
-+        { 0xfbbe00634d93c708ULL, 0xfbbe00634d93c708ULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0xfbbe00634d93c708ULL, },
-+        { 0x704f164d5e31e24eULL, 0xfbbe00634d93c708ULL, },
-+        { 0x886ae6cc28625540ULL, 0xac5aaeaab9cf8b80ULL, },    /*  72  */
-+        { 0xfbbe00634d93c708ULL, 0xac5aaeaab9cf8b80ULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
-+        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
-+        { 0x886ae6cc28625540ULL, 0x704f164d5e31e24eULL, },
-+        { 0xfbbe00634d93c708ULL, 0x704f164d5e31e24eULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0x704f164d5e31e24eULL, },
-+        { 0x704f164d5e31e24eULL, 0x704f164d5e31e24eULL, },
-+    };
++      To remove interpreter, use :
 +
-+    gettimeofday(&start, NULL);
++        sudo update-binfmts \\
++             --package qemu-CPU \\
++             --remove qemu-CPU $QEMU_PATH
 +
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKEV_D(b128_pattern[i], b128_pattern[j],
-+                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
++    QEMU target list: $qemu_target_list
+
+ EOF
+ }
+@@ -286,12 +315,22 @@ EOF
+ }
+
+ qemu_set_binfmts() {
++    if [ "$1" = "NONE" ]; then
++      return
++    fi
 +
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKEV_D(b128_random[i], b128_random[j],
-+                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                        (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
+     # probe cpu type
+     host_family=$(qemu_get_family)
+
+-    # register the interpreter for each cpu except for the native one
++    # reduce the list of target interpreters to those given in the CLI
++    targets="$@"
++    if [ $# -eq 0 ]; then
++      targets="ALL"
++    fi
++    qemu_check_target_list $(echo "$targets" | tr ',' ' ')
+
+-    for cpu in ${qemu_target_list} ; do
++    # register the interpreter for each target except for the native one
++    for cpu in $checked_target_list; do
+         magic=$(eval echo \$${cpu}_magic)
+         mask=$(eval echo \$${cpu}_mask)
+         family=$(eval echo \$${cpu}_family)
+@@ -313,8 +352,26 @@ qemu_set_binfmts() {
+     done
+ }
+
++qemu_remove_notimplemented() {
++    echo "ERROR: option reset not implemented for this mode yet" 1>&2
++    usage
++    exit 1
 +}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
-new file mode 100644
-index 0000000..64a18c0
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction PCKEV.H
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
 +
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "PCKEV.H";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0x8e3838e338e3e38eULL, 0xffffffffffffffffULL, },
-+        { 0x71c7c71cc71c1c71ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0x8e3838e338e3e38eULL, 0x0000000000000000ULL, },
-+        { 0x71c7c71cc71c1c71ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x8e3838e338e3e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x71c7c71cc71c1c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0x8e3838e338e3e38eULL, 0x5555555555555555ULL, },
-+        { 0x71c7c71cc71c1c71ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0x8e3838e338e3e38eULL, 0xccccccccccccccccULL, },
-+        { 0x71c7c71cc71c1c71ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0x8e3838e338e3e38eULL, 0x3333333333333333ULL, },
-+        { 0x71c7c71cc71c1c71ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0x8e3838e338e3e38eULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x8e3838e338e3e38eULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x8e3838e338e3e38eULL, },
-+        { 0x5555555555555555ULL, 0x8e3838e338e3e38eULL, },
-+        { 0xccccccccccccccccULL, 0x8e3838e338e3e38eULL, },
-+        { 0x3333333333333333ULL, 0x8e3838e338e3e38eULL, },
-+        { 0x8e3838e338e3e38eULL, 0x8e3838e338e3e38eULL, },
-+        { 0x71c7c71cc71c1c71ULL, 0x8e3838e338e3e38eULL, },
-+        { 0xffffffffffffffffULL, 0x71c7c71cc71c1c71ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x71c7c71cc71c1c71ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x71c7c71cc71c1c71ULL, },
-+        { 0x5555555555555555ULL, 0x71c7c71cc71c1c71ULL, },
-+        { 0xccccccccccccccccULL, 0x71c7c71cc71c1c71ULL, },
-+        { 0x3333333333333333ULL, 0x71c7c71cc71c1c71ULL, },
-+        { 0x8e3838e338e3e38eULL, 0x71c7c71cc71c1c71ULL, },
-+        { 0x71c7c71cc71c1c71ULL, 0x71c7c71cc71c1c71ULL, },
-+        { 0x0b5eb00ce6cc5540ULL, 0x0b5eb00ce6cc5540ULL, },    /*  64  */
-+        { 0xbb1a52fc0063c708ULL, 0x0b5eb00ce6cc5540ULL, },
-+        { 0xc6ff2514aeaa8b80ULL, 0x0b5eb00ce6cc5540ULL, },
-+        { 0x88d8e2a0164de24eULL, 0x0b5eb00ce6cc5540ULL, },
-+        { 0x0b5eb00ce6cc5540ULL, 0xbb1a52fc0063c708ULL, },
-+        { 0xbb1a52fc0063c708ULL, 0xbb1a52fc0063c708ULL, },
-+        { 0xc6ff2514aeaa8b80ULL, 0xbb1a52fc0063c708ULL, },
-+        { 0x88d8e2a0164de24eULL, 0xbb1a52fc0063c708ULL, },
-+        { 0x0b5eb00ce6cc5540ULL, 0xc6ff2514aeaa8b80ULL, },    /*  72  */
-+        { 0xbb1a52fc0063c708ULL, 0xc6ff2514aeaa8b80ULL, },
-+        { 0xc6ff2514aeaa8b80ULL, 0xc6ff2514aeaa8b80ULL, },
-+        { 0x88d8e2a0164de24eULL, 0xc6ff2514aeaa8b80ULL, },
-+        { 0x0b5eb00ce6cc5540ULL, 0x88d8e2a0164de24eULL, },
-+        { 0xbb1a52fc0063c708ULL, 0x88d8e2a0164de24eULL, },
-+        { 0xc6ff2514aeaa8b80ULL, 0x88d8e2a0164de24eULL, },
-+        { 0x88d8e2a0164de24eULL, 0x88d8e2a0164de24eULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKEV_H(b128_pattern[i], b128_pattern[j],
-+                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKEV_H(b128_random[i], b128_random[j],
-+                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                        (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
++qemu_remove_interpreter() {
++    if [ "$1" = "ALL" ]; then
++      find /proc/sys/fs/binfmt_misc/ -type f -name 'qemu-*' -exec sh -c
+'echo -1 > {}' \;
++    else
++        qemu_check_target_list $(echo "$1" | tr ',' ' ')
++        for t in $checked_target_list; do
++            find /proc/sys/fs/binfmt_misc/ -type f -name "qemu-$t" -exec
+sh -c 'echo -1 > {}' \;
++        done
++    fi
 +}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
-new file mode 100644
-index 0000000..a0acacd
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction PCKEV.W
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
 +
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "PCKEV.W";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0xe38e38e38e38e38eULL, 0xffffffffffffffffULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x0000000000000000ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xe38e38e38e38e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x5555555555555555ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0xe38e38e38e38e38eULL, 0xccccccccccccccccULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x3333333333333333ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0xe38e38e38e38e38eULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0xe38e38e38e38e38eULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xe38e38e38e38e38eULL, },
-+        { 0x5555555555555555ULL, 0xe38e38e38e38e38eULL, },
-+        { 0xccccccccccccccccULL, 0xe38e38e38e38e38eULL, },
-+        { 0x3333333333333333ULL, 0xe38e38e38e38e38eULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xe38e38e38e38e38eULL, },
-+        { 0xffffffffffffffffULL, 0x1c71c71c71c71c71ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x1c71c71c71c71c71ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x1c71c71c71c71c71ULL, },
-+        { 0x5555555555555555ULL, 0x1c71c71c71c71c71ULL, },
-+        { 0xccccccccccccccccULL, 0x1c71c71c71c71c71ULL, },
-+        { 0x3333333333333333ULL, 0x1c71c71c71c71c71ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x1c71c71c71c71c71ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0x1c71c71c71c71c71ULL, },
-+        { 0xfe7bb00c28625540ULL, 0xfe7bb00c28625540ULL, },    /*  64  */
-+        { 0x153f52fc4d93c708ULL, 0xfe7bb00c28625540ULL, },
-+        { 0xab2b2514b9cf8b80ULL, 0xfe7bb00c28625540ULL, },
-+        { 0xa942e2a05e31e24eULL, 0xfe7bb00c28625540ULL, },
-+        { 0xfe7bb00c28625540ULL, 0x153f52fc4d93c708ULL, },
-+        { 0x153f52fc4d93c708ULL, 0x153f52fc4d93c708ULL, },
-+        { 0xab2b2514b9cf8b80ULL, 0x153f52fc4d93c708ULL, },
-+        { 0xa942e2a05e31e24eULL, 0x153f52fc4d93c708ULL, },
-+        { 0xfe7bb00c28625540ULL, 0xab2b2514b9cf8b80ULL, },    /*  72  */
-+        { 0x153f52fc4d93c708ULL, 0xab2b2514b9cf8b80ULL, },
-+        { 0xab2b2514b9cf8b80ULL, 0xab2b2514b9cf8b80ULL, },
-+        { 0xa942e2a05e31e24eULL, 0xab2b2514b9cf8b80ULL, },
-+        { 0xfe7bb00c28625540ULL, 0xa942e2a05e31e24eULL, },
-+        { 0x153f52fc4d93c708ULL, 0xa942e2a05e31e24eULL, },
-+        { 0xab2b2514b9cf8b80ULL, 0xa942e2a05e31e24eULL, },
-+        { 0xa942e2a05e31e24eULL, 0xa942e2a05e31e24eULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKEV_W(b128_pattern[i], b128_pattern[j],
-+                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKEV_W(b128_random[i], b128_random[j],
-+                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                        (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
-new file mode 100644
-index 0000000..7bf86fc
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction PCKOD.B
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "PCKOD.B";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0x388ee338e3388ee3ULL, 0xffffffffffffffffULL, },
-+        { 0xc7711cc71cc7711cULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0x388ee338e3388ee3ULL, 0x0000000000000000ULL, },
-+        { 0xc7711cc71cc7711cULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x388ee338e3388ee3ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xc7711cc71cc7711cULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0x388ee338e3388ee3ULL, 0x5555555555555555ULL, },
-+        { 0xc7711cc71cc7711cULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0x388ee338e3388ee3ULL, 0xccccccccccccccccULL, },
-+        { 0xc7711cc71cc7711cULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0x388ee338e3388ee3ULL, 0x3333333333333333ULL, },
-+        { 0xc7711cc71cc7711cULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0x388ee338e3388ee3ULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x388ee338e3388ee3ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x388ee338e3388ee3ULL, },
-+        { 0x5555555555555555ULL, 0x388ee338e3388ee3ULL, },
-+        { 0xccccccccccccccccULL, 0x388ee338e3388ee3ULL, },
-+        { 0x3333333333333333ULL, 0x388ee338e3388ee3ULL, },
-+        { 0x388ee338e3388ee3ULL, 0x388ee338e3388ee3ULL, },
-+        { 0xc7711cc71cc7711cULL, 0x388ee338e3388ee3ULL, },
-+        { 0xffffffffffffffffULL, 0xc7711cc71cc7711cULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0xc7711cc71cc7711cULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xc7711cc71cc7711cULL, },
-+        { 0x5555555555555555ULL, 0xc7711cc71cc7711cULL, },
-+        { 0xccccccccccccccccULL, 0xc7711cc71cc7711cULL, },
-+        { 0x3333333333333333ULL, 0xc7711cc71cc7711cULL, },
-+        { 0x388ee338e3388ee3ULL, 0xc7711cc71cc7711cULL, },
-+        { 0xc7711cc71cc7711cULL, 0xc7711cc71cc7711cULL, },
-+        { 0x4b0bfeb088e62855ULL, 0x4b0bfeb088e62855ULL, },    /*  64  */
-+        { 0x12bb1552fb004dc7ULL, 0x4b0bfeb088e62855ULL, },
-+        { 0x27c6ab25acaeb98bULL, 0x4b0bfeb088e62855ULL, },
-+        { 0x8d88a9e270165ee2ULL, 0x4b0bfeb088e62855ULL, },
-+        { 0x4b0bfeb088e62855ULL, 0x12bb1552fb004dc7ULL, },
-+        { 0x12bb1552fb004dc7ULL, 0x12bb1552fb004dc7ULL, },
-+        { 0x27c6ab25acaeb98bULL, 0x12bb1552fb004dc7ULL, },
-+        { 0x8d88a9e270165ee2ULL, 0x12bb1552fb004dc7ULL, },
-+        { 0x4b0bfeb088e62855ULL, 0x27c6ab25acaeb98bULL, },    /*  72  */
-+        { 0x12bb1552fb004dc7ULL, 0x27c6ab25acaeb98bULL, },
-+        { 0x27c6ab25acaeb98bULL, 0x27c6ab25acaeb98bULL, },
-+        { 0x8d88a9e270165ee2ULL, 0x27c6ab25acaeb98bULL, },
-+        { 0x4b0bfeb088e62855ULL, 0x8d88a9e270165ee2ULL, },
-+        { 0x12bb1552fb004dc7ULL, 0x8d88a9e270165ee2ULL, },
-+        { 0x27c6ab25acaeb98bULL, 0x8d88a9e270165ee2ULL, },
-+        { 0x8d88a9e270165ee2ULL, 0x8d88a9e270165ee2ULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKOD_B(b128_pattern[i], b128_pattern[j],
-+                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKOD_B(b128_random[i], b128_random[j],
-+                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                        (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
-new file mode 100644
-index 0000000..3c4d55b
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction PCKOD.D
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "PCKOD.D";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0x38e38e38e38e38e3ULL, 0xffffffffffffffffULL, },
-+        { 0xc71c71c71c71c71cULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0x38e38e38e38e38e3ULL, 0x0000000000000000ULL, },
-+        { 0xc71c71c71c71c71cULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x38e38e38e38e38e3ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xc71c71c71c71c71cULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0x38e38e38e38e38e3ULL, 0x5555555555555555ULL, },
-+        { 0xc71c71c71c71c71cULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0x38e38e38e38e38e3ULL, 0xccccccccccccccccULL, },
-+        { 0xc71c71c71c71c71cULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0x38e38e38e38e38e3ULL, 0x3333333333333333ULL, },
-+        { 0xc71c71c71c71c71cULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x38e38e38e38e38e3ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x38e38e38e38e38e3ULL, },
-+        { 0x5555555555555555ULL, 0x38e38e38e38e38e3ULL, },
-+        { 0xccccccccccccccccULL, 0x38e38e38e38e38e3ULL, },
-+        { 0x3333333333333333ULL, 0x38e38e38e38e38e3ULL, },
-+        { 0x38e38e38e38e38e3ULL, 0x38e38e38e38e38e3ULL, },
-+        { 0xc71c71c71c71c71cULL, 0x38e38e38e38e38e3ULL, },
-+        { 0xffffffffffffffffULL, 0xc71c71c71c71c71cULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0xc71c71c71c71c71cULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c71c71c71cULL, },
-+        { 0x5555555555555555ULL, 0xc71c71c71c71c71cULL, },
-+        { 0xccccccccccccccccULL, 0xc71c71c71c71c71cULL, },
-+        { 0x3333333333333333ULL, 0xc71c71c71c71c71cULL, },
-+        { 0x38e38e38e38e38e3ULL, 0xc71c71c71c71c71cULL, },
-+        { 0xc71c71c71c71c71cULL, 0xc71c71c71c71c71cULL, },
-+        { 0x4b670b5efe7bb00cULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
-+        { 0x12f7bb1a153f52fcULL, 0x4b670b5efe7bb00cULL, },
-+        { 0x27d8c6ffab2b2514ULL, 0x4b670b5efe7bb00cULL, },
-+        { 0x8df188d8a942e2a0ULL, 0x4b670b5efe7bb00cULL, },
-+        { 0x4b670b5efe7bb00cULL, 0x12f7bb1a153f52fcULL, },
-+        { 0x12f7bb1a153f52fcULL, 0x12f7bb1a153f52fcULL, },
-+        { 0x27d8c6ffab2b2514ULL, 0x12f7bb1a153f52fcULL, },
-+        { 0x8df188d8a942e2a0ULL, 0x12f7bb1a153f52fcULL, },
-+        { 0x4b670b5efe7bb00cULL, 0x27d8c6ffab2b2514ULL, },    /*  72  */
-+        { 0x12f7bb1a153f52fcULL, 0x27d8c6ffab2b2514ULL, },
-+        { 0x27d8c6ffab2b2514ULL, 0x27d8c6ffab2b2514ULL, },
-+        { 0x8df188d8a942e2a0ULL, 0x27d8c6ffab2b2514ULL, },
-+        { 0x4b670b5efe7bb00cULL, 0x8df188d8a942e2a0ULL, },
-+        { 0x12f7bb1a153f52fcULL, 0x8df188d8a942e2a0ULL, },
-+        { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
-+        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKOD_D(b128_pattern[i], b128_pattern[j],
-+                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKOD_D(b128_random[i], b128_random[j],
-+                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                        (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
-new file mode 100644
-index 0000000..5c3c529
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction PCKOD.H
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "PCKOD.H";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0x38e3e38ee38e8e38ULL, 0xffffffffffffffffULL, },
-+        { 0xc71c1c711c7171c7ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0x38e3e38ee38e8e38ULL, 0x0000000000000000ULL, },
-+        { 0xc71c1c711c7171c7ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x38e3e38ee38e8e38ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xc71c1c711c7171c7ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0x38e3e38ee38e8e38ULL, 0x5555555555555555ULL, },
-+        { 0xc71c1c711c7171c7ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0x38e3e38ee38e8e38ULL, 0xccccccccccccccccULL, },
-+        { 0xc71c1c711c7171c7ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0x38e3e38ee38e8e38ULL, 0x3333333333333333ULL, },
-+        { 0xc71c1c711c7171c7ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0x38e3e38ee38e8e38ULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x38e3e38ee38e8e38ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x38e3e38ee38e8e38ULL, },
-+        { 0x5555555555555555ULL, 0x38e3e38ee38e8e38ULL, },
-+        { 0xccccccccccccccccULL, 0x38e3e38ee38e8e38ULL, },
-+        { 0x3333333333333333ULL, 0x38e3e38ee38e8e38ULL, },
-+        { 0x38e3e38ee38e8e38ULL, 0x38e3e38ee38e8e38ULL, },
-+        { 0xc71c1c711c7171c7ULL, 0x38e3e38ee38e8e38ULL, },
-+        { 0xffffffffffffffffULL, 0xc71c1c711c7171c7ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0xc71c1c711c7171c7ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c1c711c7171c7ULL, },
-+        { 0x5555555555555555ULL, 0xc71c1c711c7171c7ULL, },
-+        { 0xccccccccccccccccULL, 0xc71c1c711c7171c7ULL, },
-+        { 0x3333333333333333ULL, 0xc71c1c711c7171c7ULL, },
-+        { 0x38e3e38ee38e8e38ULL, 0xc71c1c711c7171c7ULL, },
-+        { 0xc71c1c711c7171c7ULL, 0xc71c1c711c7171c7ULL, },
-+        { 0x4b67fe7b886a2862ULL, 0x4b67fe7b886a2862ULL, },    /*  64  */
-+        { 0x12f7153ffbbe4d93ULL, 0x4b67fe7b886a2862ULL, },
-+        { 0x27d8ab2bac5ab9cfULL, 0x4b67fe7b886a2862ULL, },
-+        { 0x8df1a942704f5e31ULL, 0x4b67fe7b886a2862ULL, },
-+        { 0x4b67fe7b886a2862ULL, 0x12f7153ffbbe4d93ULL, },
-+        { 0x12f7153ffbbe4d93ULL, 0x12f7153ffbbe4d93ULL, },
-+        { 0x27d8ab2bac5ab9cfULL, 0x12f7153ffbbe4d93ULL, },
-+        { 0x8df1a942704f5e31ULL, 0x12f7153ffbbe4d93ULL, },
-+        { 0x4b67fe7b886a2862ULL, 0x27d8ab2bac5ab9cfULL, },    /*  72  */
-+        { 0x12f7153ffbbe4d93ULL, 0x27d8ab2bac5ab9cfULL, },
-+        { 0x27d8ab2bac5ab9cfULL, 0x27d8ab2bac5ab9cfULL, },
-+        { 0x8df1a942704f5e31ULL, 0x27d8ab2bac5ab9cfULL, },
-+        { 0x4b67fe7b886a2862ULL, 0x8df1a942704f5e31ULL, },
-+        { 0x12f7153ffbbe4d93ULL, 0x8df1a942704f5e31ULL, },
-+        { 0x27d8ab2bac5ab9cfULL, 0x8df1a942704f5e31ULL, },
-+        { 0x8df1a942704f5e31ULL, 0x8df1a942704f5e31ULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKOD_H(b128_pattern[i], b128_pattern[j],
-+                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKOD_H(b128_random[i], b128_random[j],
-+                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                        (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
-new file mode 100644
-index 0000000..9275890
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction PCKOD.W
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "PCKOD.W";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0x38e38e38e38e38e3ULL, 0xffffffffffffffffULL, },
-+        { 0xc71c71c71c71c71cULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0x38e38e38e38e38e3ULL, 0x0000000000000000ULL, },
-+        { 0xc71c71c71c71c71cULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x38e38e38e38e38e3ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xc71c71c71c71c71cULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0x38e38e38e38e38e3ULL, 0x5555555555555555ULL, },
-+        { 0xc71c71c71c71c71cULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0x38e38e38e38e38e3ULL, 0xccccccccccccccccULL, },
-+        { 0xc71c71c71c71c71cULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0x38e38e38e38e38e3ULL, 0x3333333333333333ULL, },
-+        { 0xc71c71c71c71c71cULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x38e38e38e38e38e3ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x38e38e38e38e38e3ULL, },
-+        { 0x5555555555555555ULL, 0x38e38e38e38e38e3ULL, },
-+        { 0xccccccccccccccccULL, 0x38e38e38e38e38e3ULL, },
-+        { 0x3333333333333333ULL, 0x38e38e38e38e38e3ULL, },
-+        { 0x38e38e38e38e38e3ULL, 0x38e38e38e38e38e3ULL, },
-+        { 0xc71c71c71c71c71cULL, 0x38e38e38e38e38e3ULL, },
-+        { 0xffffffffffffffffULL, 0xc71c71c71c71c71cULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0xc71c71c71c71c71cULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c71c71c71cULL, },
-+        { 0x5555555555555555ULL, 0xc71c71c71c71c71cULL, },
-+        { 0xccccccccccccccccULL, 0xc71c71c71c71c71cULL, },
-+        { 0x3333333333333333ULL, 0xc71c71c71c71c71cULL, },
-+        { 0x38e38e38e38e38e3ULL, 0xc71c71c71c71c71cULL, },
-+        { 0xc71c71c71c71c71cULL, 0xc71c71c71c71c71cULL, },
-+        { 0x4b670b5e886ae6ccULL, 0x4b670b5e886ae6ccULL, },    /*  64  */
-+        { 0x12f7bb1afbbe0063ULL, 0x4b670b5e886ae6ccULL, },
-+        { 0x27d8c6ffac5aaeaaULL, 0x4b670b5e886ae6ccULL, },
-+        { 0x8df188d8704f164dULL, 0x4b670b5e886ae6ccULL, },
-+        { 0x4b670b5e886ae6ccULL, 0x12f7bb1afbbe0063ULL, },
-+        { 0x12f7bb1afbbe0063ULL, 0x12f7bb1afbbe0063ULL, },
-+        { 0x27d8c6ffac5aaeaaULL, 0x12f7bb1afbbe0063ULL, },
-+        { 0x8df188d8704f164dULL, 0x12f7bb1afbbe0063ULL, },
-+        { 0x4b670b5e886ae6ccULL, 0x27d8c6ffac5aaeaaULL, },    /*  72  */
-+        { 0x12f7bb1afbbe0063ULL, 0x27d8c6ffac5aaeaaULL, },
-+        { 0x27d8c6ffac5aaeaaULL, 0x27d8c6ffac5aaeaaULL, },
-+        { 0x8df188d8704f164dULL, 0x27d8c6ffac5aaeaaULL, },
-+        { 0x4b670b5e886ae6ccULL, 0x8df188d8704f164dULL, },
-+        { 0x12f7bb1afbbe0063ULL, 0x8df188d8704f164dULL, },
-+        { 0x27d8c6ffac5aaeaaULL, 0x8df188d8704f164dULL, },
-+        { 0x8df188d8704f164dULL, 0x8df188d8704f164dULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKOD_W(b128_pattern[i], b128_pattern[j],
-+                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_PCKOD_W(b128_random[i], b128_random[j],
-+                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                        (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
-new file mode 100644
-index 0000000..fcf857a
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction VSHF.B
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "VSHF.B";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x4040404040404040ULL, 0x4040404040404040ULL, },    /*  64  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x4040404040404040ULL, 0x4040404040404040ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x4040404040404040ULL, 0x4040404040404040ULL, },    /*  72  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x4040404040404040ULL, 0x4040404040404040ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_VSHF_B(b128_pattern[i], b128_pattern[j],
-+                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_VSHF_B(b128_random[i], b128_random[j],
-+                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                       (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
-new file mode 100644
-index 0000000..700c159
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction VSHF.D
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "VSHF.D";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38e38e38e38e38eULL, 0xe38e38e38e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },    /*  64  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },    /*  72  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_VSHF_D(b128_pattern[i], b128_pattern[j],
-+                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_VSHF_D(b128_random[i], b128_random[j],
-+                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                       (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
-new file mode 100644
-index 0000000..3d6c1dc
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction VSHF.H
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "VSHF.H";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xe38ee38ee38ee38eULL, 0xe38ee38ee38ee38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x5540554055405540ULL, 0x5540554055405540ULL, },    /*  64  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x5540554055405540ULL, 0x5540554055405540ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x5540554055405540ULL, 0x5540554055405540ULL, },    /*  72  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x5540554055405540ULL, 0x5540554055405540ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_VSHF_H(b128_pattern[i], b128_pattern[j],
-+                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_VSHF_H(b128_random[i], b128_random[j],
-+                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                       (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
-new file mode 100644
-index 0000000..6030762
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
-@@ -0,0 +1,153 @@
-+/*
-+ *  Test program for MSA instruction VSHF.W
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs.h"
-+#include "../../../../include/test_utils.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *instruction_name = "VSHF.W";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x8e38e38e8e38e38eULL, 0x8e38e38e8e38e38eULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x2862554028625540ULL, 0x2862554028625540ULL, },    /*  64  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x2862554028625540ULL, 0x2862554028625540ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x2862554028625540ULL, 0x2862554028625540ULL, },    /*  72  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x2862554028625540ULL, 0x2862554028625540ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+    };
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_VSHF_W(b128_pattern[i], b128_pattern[j],
-+                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_VSHF_W(b128_random[i], b128_random[j],
-+                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                       (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
-+                        &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
--- 
-2.7.4
+ CHECK=qemu_check_bintfmt_misc
+ BINFMT_SET=qemu_register_interpreter
++BINFMT_REMOVE=qemu_remove_interpreter
+
+ SYSTEMDDIR="/etc/binfmt.d"
+ DEBIANDIR="/usr/share/binfmts"
+@@ -324,37 +381,26 @@ CREDENTIAL=no
+ PERSISTENT=no
+ QEMU_SUFFIX=""
+
+-options=$(getopt -o ds:Q:S:e:hc:p: -l
+debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent:
+-- "$@")
++options=$(getopt -o r:dsQ:S:e:hcp -l
+reset:,debian,systemd,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent
+-- "$@")
+ eval set -- "$options"
+
+ while true ; do
+     case "$1" in
++    -r|--reset)
++        shift
++        qemu_remove_interpreter $1
++        ;;
+     -d|--debian)
+         CHECK=qemu_check_debian
+         BINFMT_SET=qemu_generate_debian
++        BINFMT_REMOVE=qemu_remove_notimplemented
+         EXPORTDIR=${EXPORTDIR:-$DEBIANDIR}
+         ;;
+     -s|--systemd)
+         CHECK=qemu_check_systemd
+         BINFMT_SET=qemu_generate_systemd
++        BINFMT_REMOVE=qemu_remove_notimplemented
+         EXPORTDIR=${EXPORTDIR:-$SYSTEMDDIR}
+-        shift
+-        # check given cpu is in the supported CPU list
+-        if [ "$1" != "ALL" ] ; then
+-            for cpu in ${qemu_target_list} ; do
+-                if [ "$cpu" = "$1" ] ; then
+-                    break
+-                fi
+-            done
+-
+-            if [ "$cpu" = "$1" ] ; then
+-                qemu_target_list="$1"
+-            else
+-                echo "ERROR: unknown CPU \"$1\"" 1>&2
+-                usage
+-                exit 1
+-            fi
+-        fi
+         ;;
+     -Q|--qemu-path)
+         shift
+@@ -373,12 +419,10 @@ while true ; do
+         exit 1
+         ;;
+     -c|--credential)
+-        shift
+-        CREDENTIAL="$1"
++        CREDENTIAL=yes
+         ;;
+     -p|--persistent)
+-        shift
+-        PERSISTENT="$1"
++        PERSISTENT=yes
+         ;;
+     *)
+         break
+@@ -387,5 +431,7 @@ while true ; do
+     shift
+ done
+
++shift
++
+ $CHECK
+-qemu_set_binfmts
++qemu_set_binfmts $@
+--
+2.20.1
