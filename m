@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39946)
+Received: from eggs.gnu.org ([209.51.188.92]:40770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h10g7-0005dP-M2
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:23:40 -0500
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1h10kE-0007I9-TE
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:27:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h10g6-0004Jk-Jn
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:23:39 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:34893)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h10g6-0004JX-ER
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:23:38 -0500
-Received: by mail-qk1-f196.google.com with SMTP id z13so4065003qki.2
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 19:23:38 -0800 (PST)
-Date: Mon, 4 Mar 2019 22:23:34 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190304222241-mutt-send-email-mst@kernel.org>
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1h10kD-0000e2-3h
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:27:54 -0500
+Received: from mga07.intel.com ([134.134.136.100]:20458)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
+	id 1h10kC-0000Yz-2q
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:27:52 -0500
+Date: Tue, 5 Mar 2019 11:24:24 +0800
+From: Yi Sun <yi.y.sun@linux.intel.com>
+Message-ID: <20190305032424.GJ26129@yi.y.sun>
 References: <1551753295-30167-1-git-send-email-yi.y.sun@linux.intel.com>
 	<20190305030934.GH1657@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20190305030934.GH1657@xz-x1>
 Subject: Re: [Qemu-devel] [PATCH v1 0/3] intel_iommu: support scalable mode
@@ -30,9 +29,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, marcel.apfelbaum@gmail.com, jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
-On Tue, Mar 05, 2019 at 11:09:34AM +0800, Peter Xu wrote:
+On 19-03-05 11:09:34, Peter Xu wrote:
 > On Tue, Mar 05, 2019 at 10:34:52AM +0800, Yi Sun wrote:
 > > Intel vt-d rev3.0 [1] introduces a new translation mode called
 > > 'scalable mode', which enables PASID-granular translations for
@@ -77,14 +76,24 @@ On Tue, Mar 05, 2019 at 11:09:34AM +0800, Peter Xu wrote:
 > 
 > Legacy vfio-pci?
 > 
+I tested legacy mode with below command.
+
+w/o passthr
+    -device intel-iommu \
+    -netdev tap,id=net1,vhost=off|on \
+    -device virtio-net-pci,netdev=net1 \
+
+w/ passthr: tried net card, graphic card, and a MDEV (cmd is different)
+    -device intel-iommu,caching-mode=on \
+    -netdev tap,id=net1,vhost=off|on \
+    -device virtio-net-pci,netdev=net1 \
+    -device vfio-pci,host=0000:00:1f.6 \
+
 > I've reviewed the whole series, I would assume that the maintainer
 > might still test it a bit before a pull but again even before that I
 > would really like to double confirm this series won't break anything.
 > 
 > Thanks,
-
-If that's me FYI I don't normally test with vfio either.
-Yes I'd appreciate testing with that from contributor.
-
+> 
 > -- 
 > Peter Xu
