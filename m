@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34350)
+Received: from eggs.gnu.org ([209.51.188.92]:34537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1A3D-0001nu-DZ
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:24:08 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1A4F-0002Tf-Ff
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:25:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1A3C-00070w-Pr
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:24:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46220)
+	(envelope-from <dgilbert@redhat.com>) id 1h1A4E-0000AF-OE
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:25:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43768)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1A3C-00070J-J9
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:24:06 -0500
-Date: Tue, 5 Mar 2019 13:23:59 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1A4E-00008z-H7
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:25:10 -0500
+Date: Tue, 5 Mar 2019 13:25:06 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190305132359.GB9811@work-vm>
-References: <20190214185351.5927-1-dgilbert@redhat.com>
+Message-ID: <20190305132505.GC9811@work-vm>
+References: <20190304184923.24215-1-marcel.apfelbaum@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190214185351.5927-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/rdma: Fix qemu_rdma_cleanup null
- check
+In-Reply-To: <20190304184923.24215-1-marcel.apfelbaum@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V2] migration/rdma: clang compilation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com
 
-* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+* Marcel Apfelbaum (marcel.apfelbaum@gmail.com) wrote:
+> Configuring QEMU with:
+>         ../configure --cc=clang --enable-rdma
 > 
-> If the migration fails before the channel is open (e.g. a bad
-> address) we end up in the cleanup with rdma->channel==NULL.
+> Leads to compilation error:
 > 
-> Spotted by Coverity: CID 1398634
-> Fixes: fbbaacab2758cb3f32a0
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>   CC      migration/rdma.o
+>   CC      migration/block.o
+>   qemu/migration/rdma.c:3615:58: error: taking address of packed member 'rkey' of class or structure
+>       'RDMARegisterResult' may result in an unaligned pointer value [-Werror,-Waddress-of-packed-member]
+>                             (uintptr_t)host_addr, NULL, &reg_result->rkey,
+>                                                          ^~~~~~~~~~~~~~~~
+> Fix it by using a temp local variable.
+> 
+> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
 Queued
 
 > ---
->  migration/rdma.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> v1 -> v2: 
+>  - Use a temp local variable (Dave)
+> 
+>  migration/rdma.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
 > diff --git a/migration/rdma.c b/migration/rdma.c
-> index 54a3c11540..9fa3b176eb 100644
+> index 54a3c11540..e39ee77558 100644
 > --- a/migration/rdma.c
 > +++ b/migration/rdma.c
-> @@ -2321,7 +2321,9 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
->          rdma->connected = false;
->      }
+> @@ -3611,13 +3611,16 @@ static int qemu_rdma_registration_handle(QEMUFile *f, void *opaque)
+>                  }
+>                  chunk_start = ram_chunk_start(block, chunk);
+>                  chunk_end = ram_chunk_end(block, chunk + reg->chunks);
+> +                /* avoid "-Waddress-of-packed-member" warning */
+> +                uint32_t tmp_rkey = 0;
+>                  if (qemu_rdma_register_and_get_keys(rdma, block,
+> -                            (uintptr_t)host_addr, NULL, &reg_result->rkey,
+> +                            (uintptr_t)host_addr, NULL, &tmp_rkey,
+>                              chunk, chunk_start, chunk_end)) {
+>                      error_report("cannot get rkey");
+>                      ret = -EINVAL;
+>                      goto out;
+>                  }
+> +                reg_result->rkey = tmp_rkey;
 >  
-> -    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> +    if (rdma->channel) {
-> +        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> +    }
->      g_free(rdma->dest_blocks);
->      rdma->dest_blocks = NULL;
+>                  reg_result->host_addr = (uintptr_t)block->local_host_addr;
 >  
 > -- 
-> 2.20.1
+> 2.17.1
 > 
 > 
 --
