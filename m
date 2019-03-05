@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39105)
+Received: from eggs.gnu.org ([209.51.188.92]:39150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h1Dxs-0004C4-2s
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:34:52 -0500
+	(envelope-from <lersek@redhat.com>) id 1h1Dxv-0004FP-Vy
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:34:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h1Dxr-00037v-Di
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:34:52 -0500
-Date: Tue, 5 Mar 2019 17:25:13 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190305172513.GC13806@stefanha-x1.localdomain>
-References: <1551457277-884-1-git-send-email-thuth@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1h1Dxv-0003BV-53
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:34:55 -0500
+From: Laszlo Ersek <lersek@redhat.com>
+References: <20190304194857.9780-1-philmd@redhat.com>
+	<20190304194857.9780-5-philmd@redhat.com>
+Message-ID: <97cb7eaa-f3ed-ed66-c57e-e6686be2ce8d@redhat.com>
+Date: Tue, 5 Mar 2019 18:34:35 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="t0UkRYy7tHLRMCai"
-Content-Disposition: inline
-In-Reply-To: <1551457277-884-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests: Do not use "\n" in g_test_message()
- strings
+In-Reply-To: <20190304194857.9780-5-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 4/4] pc: Support firmware configuration
+ with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
+Hi Phil,
 
---t0UkRYy7tHLRMCai
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 03/04/19 20:48, Philippe Mathieu-Daud=C3=A9 wrote:
 
-On Fri, Mar 01, 2019 at 05:21:17PM +0100, Thomas Huth wrote:
-> g_test_message() takes care of the newline on its own, so we
-> should not use \n in the strings here.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/ivshmem-test.c         |  4 ++--
->  tests/m48t59-test.c          |  4 ++--
->  tests/migration-test.c       |  4 ++--
->  tests/rtc-test.c             |  4 ++--
->  tests/rtl8139-test.c         |  6 +++---
->  tests/test-aio-multithread.c |  8 ++++----
->  tests/test-coroutine.c       | 10 ++++------
->  tests/vhost-user-test.c      | 14 +++++++-------
->  8 files changed, 26 insertions(+), 28 deletions(-)
+> [PMD: rebased on 'pflash: Fixes and cleanups'
+>       replaced CFI_PFLASH01 -> PFLASH_CFI01]
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+[...]
 
---t0UkRYy7tHLRMCai
-Content-Type: application/pgp-signature; name="signature.asc"
+> -#define FLASH_MAP_UNIT_MAX 2
+> +static PFlashCFI01 *pc_pflash_create(const char *name)
+> +{
+> +    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
+> +
+> +    qdev_prop_set_uint64(dev, "sector-length", 4096);
 
------BEGIN PGP SIGNATURE-----
+[...]
 
-iQEcBAEBAgAGBQJcfrD5AAoJEJykq7OBq3PIGpYH/ikCAYAW4TOKAQt42VCeUXq4
-W4isCPukg2LBEthp8ArGT5kwAek08F9w8tHQZuETFjcp2hxU+nZcESOPfsDetEXj
-QpPjV/0rOwQsfrwpSs68tUPBbPLt95H8vLHaxk7TuhIOKJW52u1mce84Ixf3qe/z
-ohI9WTcZ2PywVMtYH23yq/7znjXgWvQnSXZiqW3UYqWbhbAzALWIF0BaFWpSZc7E
-s2ax8p6mSlHVnZLaFu4cyKxtiorQZsaizrYtT5Fo36tNoqVIgN6FfqBU0MRtFc65
-UwCgdhyD8nkgX5FVwDCDmbAWhKWEroltDzsuF0rM75kYGHTvKN39lqrtx1EBYIg=
-=w0Cp
------END PGP SIGNATURE-----
+> -static void pc_system_flash_init(MemoryRegion *rom_memory)
+> +static void pc_system_flash_map(PCMachineState *pcms,
+> +                                MemoryRegion *rom_memory)
+>  {
+> -    int unit;
+> -    DriveInfo *pflash_drv;
+> +    hwaddr total_size =3D 0;
+> +    int i;
+>      BlockBackend *blk;
+>      int64_t size;
+> -    char *fatal_errmsg =3D NULL;
+> -    hwaddr phys_addr =3D 0x100000000ULL;
+>      uint32_t sector_size =3D 4096;
 
---t0UkRYy7tHLRMCai--
+[...]
+
+> +        if (size =3D=3D 0) {
+> +            error_report("system firmware block device %s is empty",
+> +                         blk_name(blk));
+> +            exit(1);
+> +        }
+> +        if (size =3D=3D 0 || size % sector_size !=3D 0) {
+
+I think you missed my points (1) and (2), and Markus's followup, here:
+
+https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07018.html
+
+Thanks
+Laszlo
