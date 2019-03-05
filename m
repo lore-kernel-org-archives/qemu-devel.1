@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46539)
+Received: from eggs.gnu.org ([209.51.188.92]:46831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1ArH-0008S7-DK
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:15:53 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h1AsN-0000Z3-3M
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:17:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1ArF-0005Tb-EK
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:15:51 -0500
-References: <20190305051134.27930-1-david@gibson.dropbear.id.au>
-	<20190305051134.27930-3-david@gibson.dropbear.id.au>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <00e325d4-b23c-7239-46e6-a55fd1f9d5f4@redhat.com>
-Date: Tue, 5 Mar 2019 15:15:38 +0100
+	(envelope-from <davidkiarie4@gmail.com>) id 1h1AsM-0007ov-0R
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:16:59 -0500
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:33662)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
+	id 1h1AsL-0007nJ-MY
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:16:57 -0500
+Received: by mail-oi1-x22e.google.com with SMTP id z14so6930479oid.0
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 06:16:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190305051134.27930-3-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 2/2] virtio-balloon: Restore MADV_WILLNEED
- hint on balloon deflate
+References: <20190304151827.1813-1-davidkiarie4@gmail.com>
+	<82c88a70-13e1-d4e9-4faf-420a56fbba92@redhat.com>
+In-Reply-To: <82c88a70-13e1-d4e9-4faf-420a56fbba92@redhat.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Tue, 5 Mar 2019 17:16:07 +0300
+Message-ID: <CABdVeAD5RseQ4WKapozTjUfUarAikpngiX-yb+CGnD3AmuqdLg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4? 0/1] update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,117 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, mst@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 05.03.19 06:11, David Gibson wrote:
-> Prior to f6deb6d9 "virtio-balloon: Remove unnecessary MADV_WILLNEED on
-> deflate", the balloon device issued an madvise() MADV_WILLNEED on
-> pages removed from the balloon.  That would hint to the host kernel
-> that the pages were likely to be needed by the guest in the near
-> future.
->=20
-> It's unclear if this is actually valuable or not, and so f6deb6d9
-> removed this, essentially ignoring balloon deflate requests.  However,
-> concerns have been raised that this might cause a performance
-> regression by causing extra latency for the guest in certain
-> configurations.
+On Mon, Mar 4, 2019 at 11:52 PM Eric Blake <eblake@redhat.com> wrote:
 
-I mean, it will mainly create page tables as far as I know. Any write to
-a page will have an overhead either way (COW zero page). Reads *might*
-be faster.
+> On 3/4/19 9:18 AM, David Kiarie wrote:
+> > i think it is best put as i've updated.
+> >
+> > David Kiarie (1):
+> >    update copyright notice
+> >
+> >   hw/i386/amd_iommu.c | 2 +-
+> >   hw/i386/amd_iommu.h | 2 +-
+> >   2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> You have now posted two separate threads with identical subjects but
+> with different contents. As a courtesy to your reviewers, and to help
+> the maintainers know for sure which version you want incorporated, it
+> would have been nicer if you had used 'git send-email -v4' for this
+> series, to differentiate it from v3 (if I counted right) sent at
+> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06457.html, as
+> well as summarizing how this version differs from the previous.
+>
+> That said, I do not think you need to send a v5 just to fix the subject
+> line in the cover letter (as the cover letter doesn't end up in git
+> anyways), especially since Paolo has already said he will queue your
+> patch, and I trust Paolo to get the right version included.
+>
 
-As we are working on 4k granularity in the balloon (and doing
-MADV_DONTNEED on 4k granularity!), there will most probably be page
-tables already either way. A page table could only be zapped if all
-pages of that page table are MADV_DONTNEED'ed (or I assume never were
-touched), and I am not sure if "random MADV_DONTNEED'ing of 4k pages"
-will actually get rid of page tables (my assumption would be: only if a
-complete range is zapped at once). I haven't looked into the details,
-though (plenty of other stuff to do).
+i am not okay with maintainer behaviour, this is just something personal.
 
-I am not sure if I share the concerns. Real-time workload should never
-use the virtio-balloon in a way that anything like that would be possible=
-.
-
->=20
-> So, until we can get actual benchmark data to see if that's the case,
-> this restores (by default) the old behaviour, issuing a MADV_WILLNEED
-> when a page is removed from the balloon.  A new property on the
-> balloon device "hint-on-deflate" can be set to false to remove this
-> behaviour for testing.
-
-This is certainly a good approach for you to finally be able to leave
-the ugly land of virtio-balloon :)
-
-But at least to me, this looks completely useless. I'll be happy to be
-proven wrong as always :)
-
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/virtio/virtio-balloon.c         | 15 +++++++++++++++
->  include/hw/virtio/virtio-balloon.h |  1 +
->  2 files changed, 16 insertions(+)
->=20
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index e5e82b556d..69968502d9 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -146,6 +146,20 @@ static void balloon_deflate_page(VirtIOBalloon *ba=
-lloon,
->              balloon->pbp =3D NULL;
->          }
->      }
-> +
-> +    if (balloon->hint_on_deflate) {
-> +        void *host_addr =3D (void *)((uintptr_t)addr & ~(rb_page_size =
-- 1));
-> +        int ret;
-> +
-> +        /* When a page is deflated, we hint the whole host page it
-> +         * lives on, since we can't do anything smaller */
-> +        ret =3D qemu_madvise(host_addr, rb_page_size, QEMU_MADV_WILLNE=
-ED);
-> +        if (ret !=3D 0) {
-> +            warn_report("Couldn't MADV_WILLNEED on balloon deflate: %s=
-",
-> +                        strerror(errno));
-> +            /* Otherwise ignore, failing to page hint shouldn't be fat=
-al */
-> +        }
-> +    }
->  }
-> =20
->  static const char *balloon_stat_names[] =3D {
-> @@ -622,6 +636,7 @@ static const VMStateDescription vmstate_virtio_ball=
-oon =3D {
->  static Property virtio_balloon_properties[] =3D {
->      DEFINE_PROP_BIT("deflate-on-oom", VirtIOBalloon, host_features,
->                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
-> +    DEFINE_PROP_BOOL("hint-on-deflate", VirtIOBalloon, hint_on_deflate=
-, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> =20
-> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/vir=
-tio-balloon.h
-> index 99dcd6d105..69732cedaa 100644
-> --- a/include/hw/virtio/virtio-balloon.h
-> +++ b/include/hw/virtio/virtio-balloon.h
-> @@ -45,6 +45,7 @@ typedef struct VirtIOBalloon {
->      int64_t stats_poll_interval;
->      uint32_t host_features;
->      PartiallyBalloonedPage *pbp;
-> +    bool hint_on_deflate;
->  } VirtIOBalloon;
-> =20
->  #endif
->=20
+i will definitely send v4 but this series will include a patch stripping
+all AMD IOMMU code from for Paolo to choose what to merge.
 
 
---=20
-
-Thanks,
-
-David / dhildenb
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+>
