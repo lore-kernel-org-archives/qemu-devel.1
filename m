@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38216)
+Received: from eggs.gnu.org ([209.51.188.92]:38978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1Fbt-0003mz-Sj
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:20:18 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1Fee-0004wf-29
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:23:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1Fbr-0008Gn-Vu
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:20:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38603)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h1Fbr-0008EJ-Nf
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:20:15 -0500
-References: <CAGZZdDHc12gHaNNisqqBek+2ox1BiuHhwR2k0Tavmt_t+x_D5A@mail.gmail.com>
-	<0ac05885-96d6-9355-0333-31a909fd943b@redhat.com>
-	<CAGZZdDEp7vxzxbWoHn5AF3g28FKSwka1WQB=U5MTv6X=XLeL7A@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3249d2a0-f981-9da1-c4a0-f61dc0acd66d@redhat.com>
-Date: Tue, 5 Mar 2019 13:20:11 -0600
+	(envelope-from <philmd@redhat.com>) id 1h1Fec-0004Zk-T6
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:23:08 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43806)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1Fec-0004Xf-ID
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:23:06 -0500
+Received: by mail-wr1-f68.google.com with SMTP id d17so10745907wre.10
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 11:23:06 -0800 (PST)
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-8-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f214a92d-4f17-db61-d5f5-b9bbd6220968@redhat.com>
+Date: Tue, 5 Mar 2019 20:23:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAGZZdDEp7vxzxbWoHn5AF3g28FKSwka1WQB=U5MTv6X=XLeL7A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190226193408.23862-8-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-binfmt-conf.sh: add CPUS, add --reset,
- make -p and -c boolean (no arg)
+Subject: Re: [Qemu-devel] [PATCH v2 07/11] ppc405_boards: Don't size flash
+ memory to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +31,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: unai.martinezcorral@ehu.eus
-Cc: qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-On 3/5/19 1:15 PM, Unai Martinez Corral wrote:
-
->>> +      find /proc/sys/fs/binfmt_misc/ -type f -name 'qemu-*' -exec sh -c
->>> 'echo -1 > {}' \;
->>
->> echo -1 is not portable (you are not guaranteed that echo won't try to
->> treat it as an option); better would be using printf.
+On 2/26/19 8:34 PM, Markus Armbruster wrote:
+> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+> Image size is rounded up to the next multiple of 64KiB.  Useless,
+> because pflash_cfi02_realize() fails with "failed to read the initial
+> flash content" unless the rounding is a no-op.
 > 
-> Incidentally, I tried with MSYS2 and fedora:29 docker container. On
-> both of them , 'echo -1' works, while 'printf -1' does not. Anyway, I
-> replaced it with 'printf %s -1'. Hope it is ok.
+> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+> other stuff.  No idea how that would play out, but a useful outcomes
+> seem unlikely.
+> 
+> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+> regardless of image size, to match the physical hardware.
+> 
+> Machine "taihu" maps its boot flash memory similarly.  The code even
+> has a comment /* XXX: should check that size is 2MB */, followed by
+> disabled code to adjust the size to 2MiB regardless of image size.
+> 
+> Its code to map its application flash memory looks the same, except
+> there the XXX comment asks for 32MiB, and the code to adjust the size
+> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+> to read the initial flash content" for images smaller than 32MiB.
+> 
+> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+> to match the physical hardware.  Delete dead code from application
+> flash mapping, and simplify some.
+> 
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/ppc405_boards.c | 51 +++++++++++++-----------------------------
+>  1 file changed, 15 insertions(+), 36 deletions(-)
+> 
+> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+> index f47b15f10e..672717ef1b 100644
+> --- a/hw/ppc/ppc405_boards.c
+> +++ b/hw/ppc/ppc405_boards.c
+> @@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
+>      target_ulong kernel_base, initrd_base;
+>      long kernel_size, initrd_size;
+>      int linux_boot;
+> -    int fl_idx, fl_sectors, len;
+> +    int len;
+>      DriveInfo *dinfo;
+>      MemoryRegion *sysmem = get_system_memory();
+>  
+> @@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
+>  #ifdef DEBUG_BOARD_INIT
+>      printf("%s: register BIOS\n", __func__);
+>  #endif
+> -    fl_idx = 0;
+>  #ifdef USE_FLASH_BIOS
+> -    dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+> +    dinfo = drive_get(IF_PFLASH, 0, 0);
+>      if (dinfo) {
+> -        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size = blk_getlength(blk);
+> -        fl_sectors = (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr %lx '%s' %d\n",
+> -               fl_idx, bios_size, -bios_size,
+> -               blk_name(blk), fl_sectors);
+> +        printf("Register parallel flash\n");
+>  #endif
+> +        bios_size = 8 * MiB;
+>          pflash_cfi02_register((uint32_t)(-bios_size),
+>                                NULL, "ef405ep.bios", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              64 * KiB, bios_size / (64 * KiB), 1,
+>                                2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+>                                1);
+> -        fl_idx++;
+>      } else
+>  #endif
+>      {
+> @@ -455,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
+>      target_ulong kernel_base, initrd_base;
+>      long kernel_size, initrd_size;
+>      int linux_boot;
+> -    int fl_idx, fl_sectors;
+> +    int fl_idx;
+>      DriveInfo *dinfo;
+>  
+>      /* RAM is soldered to the board so the size cannot be changed */
+> @@ -486,21 +479,14 @@ static void taihu_405ep_init(MachineState *machine)
+>  #if defined(USE_FLASH_BIOS)
+>      dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+>      if (dinfo) {
+> -        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size = blk_getlength(blk);
+> -        /* XXX: should check that size is 2MB */
+> -        //        bios_size = 2 * 1024 * 1024;
+> -        fl_sectors = (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr %lx '%s' %d\n",
+> -               fl_idx, bios_size, -bios_size,
+> -               blk_name(blk), fl_sectors);
+> +        printf("Register boot flash\n");
+>  #endif
+> -        pflash_cfi02_register((uint32_t)(-bios_size),
+> +        bios_size = 2 * MiB;
+> +        pflash_cfi02_register(0xFFE00000,
+>                                NULL, "taihu_405ep.bios", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              64 * KiB, bios_size / (64 * KiB), 1,
+>                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+>                                1);
+>          fl_idx++;
+> @@ -536,20 +522,13 @@ static void taihu_405ep_init(MachineState *machine)
+>      /* Register Linux flash */
+>      dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+>      if (dinfo) {
+> -        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size = blk_getlength(blk);
+> -        /* XXX: should check that size is 32MB */
+>          bios_size = 32 * MiB;
+> -        fl_sectors = (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr " TARGET_FMT_lx " '%s'\n",
+> -               fl_idx, bios_size, (target_ulong)0xfc000000,
+> -               blk_name(blk));
+> +        printf("Register application flash\n"
+>  #endif
+>          pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              64 * KiB, bios_size / (64 * KiB), 1,
+>                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+>                                1);
+>          fl_idx++;
+> 
 
-You are correct that 'printf -1' is likely to fail, 'printf -- -1' is 
-portable but unusual, and 'printf %s\\n -1' is identical to the common 
-(but non-portable) behavior of 'echo -1'. Is the newline important?
+The same comments I sent to the previous patch of this series apply here:
+https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg01274.html
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Regards,
+
+Phil.
