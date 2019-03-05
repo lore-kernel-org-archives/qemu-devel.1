@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54566)
+Received: from eggs.gnu.org ([209.51.188.92]:54571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DHX-0001a5-0k
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DHX-0001aH-4k
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DHQ-0000ko-Sd
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:06 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:33897)
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DHW-0000rN-69
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:07 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:37843)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1DHQ-0000jO-I8
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:00 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id f14so10258692wrg.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 08:51:00 -0800 (PST)
+	id 1h1DHV-0000qe-VB
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:51:06 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id w6so10241974wrs.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 08:51:05 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id 2sm10071495wrg.89.2019.03.05.08.50.57
+	by smtp.gmail.com with ESMTPSA id 2sm10071495wrg.89.2019.03.05.08.51.03
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 05 Mar 2019 08:50:58 -0800 (PST)
+	Tue, 05 Mar 2019 08:51:03 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Mar 2019 16:50:33 +0000
-Message-Id: <20190305165051.26860-5-peter.maydell@linaro.org>
+Date: Tue,  5 Mar 2019 16:50:38 +0000
+Message-Id: <20190305165051.26860-10-peter.maydell@linaro.org>
 In-Reply-To: <20190305165051.26860-1-peter.maydell@linaro.org>
 References: <20190305165051.26860-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/22] target/arm: Implement ARMv8.0-PredInv
+Subject: [Qemu-devel] [PULL 09/22] target/arm: Implement ARMv8.5-CondM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,159 +37,121 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190301200501.16533-4-richard.henderson@linaro.org
+Message-id: 20190301200501.16533-9-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h    | 13 ++++++++++-
- target/arm/cpu.c    |  1 +
- target/arm/cpu64.c  |  2 ++
- target/arm/helper.c | 55 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 70 insertions(+), 1 deletion(-)
+ target/arm/cpu.h           |  5 ++++
+ target/arm/cpu64.c         |  2 +-
+ target/arm/translate-a64.c | 58 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 64 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 361e51143c7..c822f94236c 100644
+index fc2909ea6dc..a7aaec63d74 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -1060,7 +1060,8 @@ void pmu_init(ARMCPU *cpu);
- #define SCTLR_R       (1U << 9) /* up to v6; RAZ in v7 */
- #define SCTLR_UMA     (1U << 9) /* v8 onward, AArch64 only */
- #define SCTLR_F       (1U << 10) /* up to v6 */
--#define SCTLR_SW      (1U << 10) /* v7, RES0 in v8 */
-+#define SCTLR_SW      (1U << 10) /* v7 */
-+#define SCTLR_EnRCTX  (1U << 10) /* in v8.0-PredInv */
- #define SCTLR_Z       (1U << 11) /* in v7, RES1 in v8 */
- #define SCTLR_EOS     (1U << 11) /* v8.5-ExS */
- #define SCTLR_I       (1U << 12)
-@@ -3312,6 +3313,11 @@ static inline bool isar_feature_aa32_sb(const ARMISARegisters *id)
-     return FIELD_EX32(id->id_isar6, ID_ISAR6, SB) != 0;
+@@ -3436,6 +3436,11 @@ static inline bool isar_feature_aa64_condm_4(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, TS) != 0;
  }
  
-+static inline bool isar_feature_aa32_predinv(const ARMISARegisters *id)
++static inline bool isar_feature_aa64_condm_5(const ARMISARegisters *id)
 +{
-+    return FIELD_EX32(id->id_isar6, ID_ISAR6, SPECRES) != 0;
++    return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, TS) >= 2;
 +}
 +
- static inline bool isar_feature_aa32_fp16_arith(const ARMISARegisters *id)
+ static inline bool isar_feature_aa64_jscvt(const ARMISARegisters *id)
  {
-     /*
-@@ -3455,6 +3461,11 @@ static inline bool isar_feature_aa64_sb(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, SB) != 0;
- }
- 
-+static inline bool isar_feature_aa64_predinv(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, SPECRES) != 0;
-+}
-+
- static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
- {
-     /* We always set the AdvSIMD and FP fields identically wrt FP16.  */
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index ef069c268df..96f0ff0ec72 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2022,6 +2022,7 @@ static void arm_max_initfn(Object *obj)
-             t = FIELD_DP32(t, ID_ISAR6, DP, 1);
-             t = FIELD_DP32(t, ID_ISAR6, FHM, 1);
-             t = FIELD_DP32(t, ID_ISAR6, SB, 1);
-+            t = FIELD_DP32(t, ID_ISAR6, SPECRES, 1);
-             cpu->isar.id_isar6 = t;
- 
-             t = cpu->id_mmfr4;
+     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, JSCVT) != 0;
 diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 6788c0f6ff7..87337b63855 100644
+index fcf79321e2f..9fe0844a828 100644
 --- a/target/arm/cpu64.c
 +++ b/target/arm/cpu64.c
-@@ -319,6 +319,7 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64ISAR1, GPA, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR1, GPI, 0);
-         t = FIELD_DP64(t, ID_AA64ISAR1, SB, 1);
-+        t = FIELD_DP64(t, ID_AA64ISAR1, SPECRES, 1);
-         cpu->isar.id_aa64isar1 = t;
+@@ -309,7 +309,7 @@ static void aarch64_max_initfn(Object *obj)
+         t = FIELD_DP64(t, ID_AA64ISAR0, SM4, 1);
+         t = FIELD_DP64(t, ID_AA64ISAR0, DP, 1);
+         t = FIELD_DP64(t, ID_AA64ISAR0, FHM, 1);
+-        t = FIELD_DP64(t, ID_AA64ISAR0, TS, 1);
++        t = FIELD_DP64(t, ID_AA64ISAR0, TS, 2); /* v8.5-CondM */
+         cpu->isar.id_aa64isar0 = t;
  
-         t = cpu->isar.id_aa64pfr0;
-@@ -351,6 +352,7 @@ static void aarch64_max_initfn(Object *obj)
-         u = FIELD_DP32(u, ID_ISAR6, DP, 1);
-         u = FIELD_DP32(u, ID_ISAR6, FHM, 1);
-         u = FIELD_DP32(u, ID_ISAR6, SB, 1);
-+        u = FIELD_DP32(u, ID_ISAR6, SPECRES, 1);
-         cpu->isar.id_isar6 = u;
- 
-         /*
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 49ff79a146b..2607d39ad1c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5719,6 +5719,50 @@ static const ARMCPRegInfo pauth_reginfo[] = {
- };
- #endif
- 
-+static CPAccessResult access_predinv(CPUARMState *env, const ARMCPRegInfo *ri,
-+                                     bool isread)
-+{
-+    int el = arm_current_el(env);
-+
-+    if (el == 0) {
-+        uint64_t sctlr = arm_sctlr(env, el);
-+        if (!(sctlr & SCTLR_EnRCTX)) {
-+            return CP_ACCESS_TRAP;
-+        }
-+    } else if (el == 1) {
-+        uint64_t hcr = arm_hcr_el2_eff(env);
-+        if (hcr & HCR_NV) {
-+            return CP_ACCESS_TRAP_EL2;
-+        }
-+    }
-+    return CP_ACCESS_OK;
-+}
-+
-+static const ARMCPRegInfo predinv_reginfo[] = {
-+    { .name = "CFP_RCTX", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 3, .opc2 = 4,
-+      .type = ARM_CP_NOP, .access = PL0_W, .accessfn = access_predinv },
-+    { .name = "DVP_RCTX", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 3, .opc2 = 5,
-+      .type = ARM_CP_NOP, .access = PL0_W, .accessfn = access_predinv },
-+    { .name = "CPP_RCTX", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 3, .opc2 = 7,
-+      .type = ARM_CP_NOP, .access = PL0_W, .accessfn = access_predinv },
-+    /*
-+     * Note the AArch32 opcodes have a different OPC1.
-+     */
-+    { .name = "CFPRCTX", .state = ARM_CP_STATE_AA32,
-+      .cp = 15, .opc1 = 0, .crn = 7, .crm = 3, .opc2 = 4,
-+      .type = ARM_CP_NOP, .access = PL0_W, .accessfn = access_predinv },
-+    { .name = "DVPRCTX", .state = ARM_CP_STATE_AA32,
-+      .cp = 15, .opc1 = 0, .crn = 7, .crm = 3, .opc2 = 5,
-+      .type = ARM_CP_NOP, .access = PL0_W, .accessfn = access_predinv },
-+    { .name = "CPPRCTX", .state = ARM_CP_STATE_AA32,
-+      .cp = 15, .opc1 = 0, .crn = 7, .crm = 3, .opc2 = 7,
-+      .type = ARM_CP_NOP, .access = PL0_W, .accessfn = access_predinv },
-+    REGINFO_SENTINEL
-+};
-+
- void register_cp_regs_for_features(ARMCPU *cpu)
- {
-     /* Register all the coprocessor registers based on feature bits */
-@@ -6618,6 +6662,17 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         define_arm_cp_regs(cpu, pauth_reginfo);
+         t = cpu->isar.id_aa64isar1;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 3cc9a99a9cb..0cfd07d3abd 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1646,6 +1646,48 @@ static void handle_sync(DisasContext *s, uint32_t insn,
      }
- #endif
-+
-+    /*
-+     * While all v8.0 cpus support aarch64, QEMU does have configurations
-+     * that do not set ID_AA64ISAR1, e.g. user-only qemu-arm -cpu max,
-+     * which will set ID_ISAR6.
-+     */
-+    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)
-+        ? cpu_isar_feature(aa64_predinv, cpu)
-+        : cpu_isar_feature(aa32_predinv, cpu)) {
-+        define_arm_cp_regs(cpu, predinv_reginfo);
-+    }
  }
  
- void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
++static void gen_xaflag(void)
++{
++    TCGv_i32 z = tcg_temp_new_i32();
++
++    tcg_gen_setcondi_i32(TCG_COND_EQ, z, cpu_ZF, 0);
++
++    /*
++     * (!C & !Z) << 31
++     * (!(C | Z)) << 31
++     * ~((C | Z) << 31)
++     * ~-(C | Z)
++     * (C | Z) - 1
++     */
++    tcg_gen_or_i32(cpu_NF, cpu_CF, z);
++    tcg_gen_subi_i32(cpu_NF, cpu_NF, 1);
++
++    /* !(Z & C) */
++    tcg_gen_and_i32(cpu_ZF, z, cpu_CF);
++    tcg_gen_xori_i32(cpu_ZF, cpu_ZF, 1);
++
++    /* (!C & Z) << 31 -> -(Z & ~C) */
++    tcg_gen_andc_i32(cpu_VF, z, cpu_CF);
++    tcg_gen_neg_i32(cpu_VF, cpu_VF);
++
++    /* C | Z */
++    tcg_gen_or_i32(cpu_CF, cpu_CF, z);
++
++    tcg_temp_free_i32(z);
++}
++
++static void gen_axflag(void)
++{
++    tcg_gen_sari_i32(cpu_VF, cpu_VF, 31);         /* V ? -1 : 0 */
++    tcg_gen_andc_i32(cpu_CF, cpu_CF, cpu_VF);     /* C & !V */
++
++    /* !(Z | V) -> !(!ZF | V) -> ZF & !V -> ZF & ~VF */
++    tcg_gen_andc_i32(cpu_ZF, cpu_ZF, cpu_VF);
++
++    tcg_gen_movi_i32(cpu_NF, 0);
++    tcg_gen_movi_i32(cpu_VF, 0);
++}
++
+ /* MSR (immediate) - move immediate to processor state field */
+ static void handle_msr_i(DisasContext *s, uint32_t insn,
+                          unsigned int op1, unsigned int op2, unsigned int crm)
+@@ -1665,6 +1707,22 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+         s->base.is_jmp = DISAS_NEXT;
+         break;
+ 
++    case 0x01: /* XAFlag */
++        if (crm != 0 || !dc_isar_feature(aa64_condm_5, s)) {
++            goto do_unallocated;
++        }
++        gen_xaflag();
++        s->base.is_jmp = DISAS_NEXT;
++        break;
++
++    case 0x02: /* AXFlag */
++        if (crm != 0 || !dc_isar_feature(aa64_condm_5, s)) {
++            goto do_unallocated;
++        }
++        gen_axflag();
++        s->base.is_jmp = DISAS_NEXT;
++        break;
++
+     case 0x05: /* SPSel */
+         if (s->current_el == 0) {
+             goto do_unallocated;
 -- 
 2.20.1
