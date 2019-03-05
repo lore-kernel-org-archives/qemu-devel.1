@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52882)
+Received: from eggs.gnu.org ([209.51.188.92]:54103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h19Fo-0005gh-CR
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:33:04 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1h19Lx-00070F-Cc
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:39:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h19Fm-0003Uo-LD
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:33:04 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36776)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h19Fm-0003Qg-8w
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:33:02 -0500
-Received: by mail-pg1-x542.google.com with SMTP id r124so5557545pgr.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 04:33:02 -0800 (PST)
-References: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1551712405-2530-8-git-send-email-mateja.marjanovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <467c2597-c0c1-7a59-bc90-080a74be2935@linaro.org>
-Date: Tue, 5 Mar 2019 04:32:57 -0800
-MIME-Version: 1.0
-In-Reply-To: <1551712405-2530-8-git-send-email-mateja.marjanovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1h19Lw-000169-66
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:39:25 -0500
+Received: from mail-dm3nam03on072a.outbound.protection.outlook.com
+	([2a01:111:f400:fe49::72a]:30899
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1h19Lu-0000It-D2
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:39:24 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 5 Mar 2019 12:39:12 +0000
+Message-ID: <BN6PR2201MB12512A365C6D47928700801CC6720@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1551733750-4902-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1551733750-4902-3-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<8acd73e1-219f-b5f7-e001-6f6dd086171d@redhat.com>
+In-Reply-To: <8acd73e1-219f-b5f7-e001-6f6dd086171d@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 07/13] target/mips: Add emulation of MMI
- instruction PEXEW
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v7 02/14] disas: nanoMIPS: Add graphical
+ description of pool organization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +33,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
+To: =?gb2312?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkqKY=?= <philmd@redhat.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-On 3/4/19 7:13 AM, Mateja Marjanovic wrote:
-> +    } else {
-> +        TCGv_i64 t0 = tcg_temp_new();
-> +        TCGv_i64 t1 = tcg_temp_new();
-> +        TCGv_i64 t2 = tcg_temp_new();
-> +        uint64_t mask0 = (1ULL << 32) - 1;
-> +        uint64_t mask1 = mask0 << 32;
-> +
-> +        tcg_gen_movi_i64(t1, 0);
-> +        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask1);
-> +        tcg_gen_or_i64(t1, t0, t1);
-> +        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask0);
-> +        tcg_gen_shri_i64(t0, t0, 64);
-
-This line should abort, since the shift count is out of range.
-Are you testing with --enable-debug-tcg?
-
-> +        tcg_gen_or_i64(t1, t0, t1);
-> +        tcg_gen_mov_i64(t2, t1);
-
-But again, this whole thing is two deposit operations:
-
-    tcg_gen_mov_i64(t0, cpu_gpr[rt]);
-    tcg_gen_deposit_i64(cpu_gpr[rd], cpu_gpr[rt], cpu_mmr[rt], 0, 32);
-    tcg_gen_deposit_i64(cpu_mmr[rd], cpu_mmr[rt], t0, 0, 32);
-
-
-r~
+PiBGcm9tOiBQaGlsaXBwZSBNYXRoaWV1LURhdWSopiA8cGhpbG1kQHJlZGhhdC5jb20+DQo+IFN1
+YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1BBVENIIHY3IDAyLzE0XSBkaXNhczogbmFub01JUFM6
+IEFkZCBncmFwaGljYWwgZGVzY3JpcHRpb24gb2YgPiBwb29sIG9yZ2FuaXphdGlvbg0KPiANCj4g
+T24gMy80LzE5IDEwOjA4IFBNLCBBbGVrc2FuZGFyIE1hcmtvdmljIHdyb3RlOg0KPiA+IEZyb206
+IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+ID4NCj4gPiBB
+ZGQgZ3JhcGhpY2FsIGRlc2NyaXB0aW9uIG9mIG5hbm9NSVBTIGluc3RydWN0aW9uIHBvb2wgb3Jn
+YW5pemF0aW9uLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQWxla3NhbmRhciBNYXJrb3ZpYyA8
+YW1hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gPiAtLS0NCj4gPiAgZGlzYXMvbmFub21pcHMuY3Bw
+IHwgMTAyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxMDIgaW5zZXJ0aW9ucygrKQ0KPiA+DQo+ID4gZGlm
+ZiAtLWdpdCBhL2Rpc2FzL25hbm9taXBzLmNwcCBiL2Rpc2FzL25hbm9taXBzLmNwcA0KPiA+IGlu
+ZGV4IDEwZjZkOTYuLjliNDQyMDggMTAwNjQ0DQo+ID4gLS0tIGEvZGlzYXMvbmFub21pcHMuY3Bw
+DQo+ID4gKysrIGIvZGlzYXMvbmFub21pcHMuY3BwDQo+ID4gQEAgLTE2NTkyLDYgKzE2NTkyLDEw
+OCBAQCBzdGQ6OnN0cmluZyBOTUQ6OllJRUxEKHVpbnQ2NCBpbnN0cnVjdGlvbikNCj4gPg0KPiA+
+DQo+ID4NCj4gPiArLyoNCj4gPiArICogICAgICAgICAgICAgICAgbmFub01JUFMgaW5zdHJ1Y3Rp
+b24gcG9vbCBvcmdhbml6YXRpb24NCj4gPiArICogICAgICAgICAgICAgICAgfn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4NCj4gPiArICoNCj4gPiArICoNCj4gPiArICogICAg
+ICAgICAgICAgICAgIKmwqaQgUC5BRERJVSCppKmkqaQgUC5SSSCppKmkqaQgUC5TWVNDQUxMDQo+
+ID4gKyAqICAgICAgICAgICAgICAgICCppg0KPiA+ICsgKiAgICAgICAgICAgICAgICAgqaYgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIKmwqaQgUC5UUkFQDQo+ID4gKyAqICAg
+ICAgICAgICAgICAgICCppiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgqaYN
+Cj4gPiArICogICAgICAgICAgICAgICAgIKmmICAgICAgICAgICAgICAgICAgICAgIKmwqaQgX1BP
+T0wzMkEwXzAgqaSp4KmkIFAuQ01PVkUNCj4gPiArICogICAgICAgICAgICAgICAgIKmmICAgICAg
+ICAgICAgICAgICAgICAgIKmmICAgICAgICAgICAgICAgqaYNCj4gPiArICogICAgICAgICAgICAg
+ICAgIKmmICAgICAgICAgICAgICAgICAgICAgIKmmICAgICAgICAgICAgICAgqbippCBQLlNMVFUN
+Cj4gPiArICogICAgICAgICAgICAgICAgIKmmICAgICAgICCpsKmkIF9QT09MMzJBMCCppKnIDQo+
+ID4gKyAqICAgICAgICAgICAgICAgICCppiAgICAgICAgqaYgICAgICAgICAgICAgqaYNCj4gPiAr
+ICogICAgICAgICAgICAgICAgIKmmICAgICAgICCppiAgICAgICAgICAgICCppg0KPiA+ICsgKiAg
+ICAgICAgICAgICAgICAgqaYgICAgICAgIKmmICAgICAgICAgICAgIKm4qaQgX1BPT0wzMkEwXzEg
+qaSppKmkIENSQzMyDQo+ID4gKyAqICAgICAgICAgICAgICAgICCppiAgICAgICAgqaYNCj4gPiAr
+ICogICAgICAgICAgICAgICAgIKnAqaQgUDMyQSCppKnIDQo+ID4gKyAqICAgICAgICAgICAgICAg
+ICCppiAgICAgICAgqaYgICAgICAgICAgICAgICAgICAgICAgICAgICCpsKmkIFBQLkxTWA0KPiA+
+ICsgKiAgICAgICAgICAgICAgICAgqaYgICAgICAgIKmmICAgICAgICAgICAgIKmwqaQgUC5MU1gg
+qaSppKmkqaSppKnIDQo+ID4gKyAqICAgICAgICAgICAgICAgICCppiAgICAgICAgqaYgICAgICAg
+ICAgICAgqaYgICAgICAgICAgICAgqbippCBQUC5MU1hTDQo+ID4gKyAqICAgICAgICAgICAgICAg
+ICCppiAgICAgICAgqbippCBfUE9PTDMyQTcgqaSpyA0KPiA+ICsgKiAgICAgICAgICAgICAgICAg
+qaYgICAgICAgICAgICAgICAgICAgICAgqaYgICAgICAgICAgICAgqbCppCBQT09MMzJBeGZfNA0K
+PiA+ICsgKiAgICAgICAgICAgICAgICAgqaYgICAgICAgICAgICAgICAgICAgICAgqbippCBQT09M
+MzJBeGYgqaSpyA0KPiA+ICsgKiAgICAgICAgICAgICAgICAgqaYgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICCpuKmkIFBPT0wzMkF4Zl81DQo+ID4gKyAqICAgICAgICAgICAgICAg
+ICCppg0KPiA+ICsgKiAgICAgICAgICAgICAgICAgqcCppCBQQkFMDQo+ID4gKyAqICAgICAgICAg
+ICAgICAgICCppg0KPiA+ICsgKiAgICAgICAgICAgICAgICAgqcCppCBQLkdQLlcgICCpsKmkIFBQ
+LkxTWA0KPiA+ICsgKiAgICAgICAgIKmwqaQgUDMyIKmkqcggICAgICAgICAgIKmmDQo+ID4gKyAq
+ICAgICAgICAgqaYgICAgICAgqcCppCBQLkdQLkJIIKmkqdippCBQUC5MU1hTDQo+ID4gKyAqICAg
+ICAgICAgqaYgICAgICAgqaYNCj4gPiArICogICAgICAgICCppiAgICAgICCpwKmkIFAuSiCppKmk
+qaSppKmkqaSppCBQUC5CQUxSU0MNCj4gPiArICogICAgICAgICCppiAgICAgICCppg0KPiA+ICsg
+KiAgICAgICAgIKmmICAgICAgIKnAqaQgUDQ4SQ0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKmm
+ICAgICAgICAgICCpsKmkIFAuU1INCj4gPiArICogICAgICAgICCppiAgICAgICCppiAgICAgICAg
+ICAgqaYNCj4gPiArICogICAgICAgICCppiAgICAgICCppiAgICAgICAgICAgqcCppCBQLlNISUZU
+DQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYgICAgICAgICAgIKmmDQo+ID4gKyAqICAgICAg
+ICAgqaYgICAgICAgqcCppCBQLlUxMiCppKmkqaSp4KmkIFAuUk9UWA0KPiA+ICsgKiAgICAgICAg
+IKmmICAgICAgIKmmICAgICAgICAgICCppg0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKmmICAg
+ICAgICAgICCpwKmkIFAuSU5TDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYgICAgICAgICAg
+IKmmDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYgICAgICAgICAgIKm4qaQgUC5FWFQNCj4g
+PiArICogICAgICAgICCppiAgICAgICCppg0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKnAqaQg
+UC5MUy5VMTIgqaSppCBQLlBSRUYuVTEyDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYNCj4g
+PiArICogICAgICAgICCppiAgICAgICCpwKmkIFAuQlIxIKmkqaSppKmkqaQgUC5CUjNBDQo+ID4g
+KyAqICAgICAgICAgqaYgICAgICAgqaYNCj4gPiArICogICAgICAgICCppiAgICAgICCppiAgICAg
+ICAgICAgqbCppCBQLkxTLlMwIKmkqaSppCBQMTYuU1lTQ0FMTA0KPiA+ICsgKiAgICAgICAgIKmm
+ICAgICAgIKmmICAgICAgICAgICCppg0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKmmICAgICAg
+ICAgICCppiAgICAgICAgICAgqbCppCBQLkxMDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYg
+ICAgICAgICAgIKnAqaQgUC5MUy5TMSCppKnIDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYg
+ICAgICAgICAgIKmmICAgICAgICAgICCpuKmkIFAuU0MNCj4gPiArICogICAgICAgICCppiAgICAg
+ICCppiAgICAgICAgICAgqaYNCj4gPiArICogICAgICAgICCppiAgICAgICCppiAgICAgICAgICAg
+qaYgICAgICAgICAgIKmwqaQgUC5QUkVGRQ0KPiA+ICsgKiAgTUFKT1IgqaSpyCAgICAgICCpwKmk
+IFAuTFMuUzkgqaSpyCAgICAgICAgICAgqaYNCj4gPiArICogICAgICAgICCppiAgICAgICCppiAg
+ICAgICAgICAgqcCppCBQLkxTLkUwIKmkqeCppCBQLkxMRQ0KPiA+ICsgKiAgICAgICAgIKmmICAg
+ICAgIKmmICAgICAgICAgICCppiAgICAgICAgICAgqaYNCj4gPiArICogICAgICAgICCppiAgICAg
+ICCppiAgICAgICAgICAgqaYgICAgICAgICAgIKm4qaQgUC5TQ0UNCj4gPiArICogICAgICAgICCp
+piAgICAgICCppiAgICAgICAgICAgqaYNCj4gPiArICogICAgICAgICCppiAgICAgICCppiAgICAg
+ICAgICAgqcCppCBQLkxTLldNDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYgICAgICAgICAg
+IKmmDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYgICAgICAgICAgIKm4qaQgUC5MUy5VQVdN
+DQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYNCj4gPiArICogICAgICAgICCppiAgICAgICCp
+pg0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKnAqaQgUC5CUjINCj4gPiArICogICAgICAgICCp
+piAgICAgICCppg0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKnAqaQgUC5CUkkNCj4gPiArICog
+ICAgICAgICCppiAgICAgICCppg0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKm4qaQgUC5MVUkN
+Cj4gPiArICogICAgICAgICCppg0KPiA+ICsgKiAgICAgICAgIKmmDQo+ID4gKyAqICAgICAgICAg
+qaYgICAgICAgqbCppCBQMTYuTVYgqaSppKmkqaQgUDE2LlJJIKmkqaSppCBQMTYuU1lTQ0FMTA0K
+PiA+ICsgKiAgICAgICAgIKmmICAgICAgIKmmDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqcCp
+pCBQMTYuU1INCj4gPiArICogICAgICAgICCppiAgICAgICCppg0KPiA+ICsgKiAgICAgICAgIKmm
+ICAgICAgIKnAqaQgUDE2LlNISUZUDQo+ID4gKyAqICAgICAgICAgqaYgICAgICAgqaYNCj4gPiAr
+ICogICAgICAgICCppiAgICAgICCpwKmkIFAxNi40eDQNCj4gPiArICogICAgICAgICCppiAgICAg
+ICCppg0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKnAqaQgUDE2QyCppKmkqaSppKmkqaQgUE9P
+TDE2Q18wIKmkqaQgUE9PTDE2Q18wMA0KPiA+ICsgKiAgICAgICAgIKmmICAgICAgIKmmDQo+ID4g
+KyAqICAgICAgICAgqbippCBQMTYgqaSp4KmkIFAxNi5MQg0KPiA+ICsgKiAgICAgICAgICAgICAg
+ICAgqaYNCj4gPiArICogICAgICAgICAgICAgICAgIKnAqaQgUDE2LkExDQo+ID4gKyAqICAgICAg
+ICAgICAgICAgICCppg0KPiA+ICsgKiAgICAgICAgICAgICAgICAgqcCppCBQMTYuTEgNCj4gPiAr
+ICogICAgICAgICAgICAgICAgIKmmDQo+ID4gKyAqICAgICAgICAgICAgICAgICCpwKmkIFAxNi5B
+MiCppKmkqaSppCBQLkFERElVW1JTNV0NCj4gPiArICogICAgICAgICAgICAgICAgIKmmDQo+ID4g
+KyAqICAgICAgICAgICAgICAgICCpwKmkIFAxNi5BRERVDQo+ID4gKyAqICAgICAgICAgICAgICAg
+ICCppg0KPiA+ICsgKiAgICAgICAgICAgICAgICAgqbippCBQMTYuQlIgqaSppKnQqaQgUDE2LkpS
+Qw0KPiA+ICsgKiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgqaYNCj4gPiArICogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIKm4qaQgUDE2LkJSMQ0KPiANCj4gTmljZSBBU0NJSSB0cmVl
+ISBBbmQgeW91IGdvdCBpdCBmaXRzIHRoZSA4MCBjaGFycyBwZXIgbGluZSBsaW1pdCA9KQ0KPiAN
+Cg0KVG9vIGJhZCB3ZSBkb24ndCBoYXZlIGEgbWFyayAiRW5qb3llZC1ieToiIDspLg0KDQpZZXMs
+IGl0IGRvZXMgZml0IDgwIGNoYXJhY3RlcnMgbGltaXQuIEl0IHdhcyBjcmVhdGVkIG1hbnVhbGx5
+LiBJIHN0dW1ibGVkDQp1cG9uIGh0dHBzOi8vcHl0aG9uaG9zdGVkLm9yZy9hc2NpaXRyZWUvI2Fz
+Y2lpLXRyZWVzIHRoZSBvdGhlciBkYXksIGJ1dA0KbmV2ZXIgdXNlZCBpdCwgeW91IG1heSBmaW5k
+IGl0IHVzZWZ1bC4NCg0KQnkgdGhlIHdheSwgdGhlcmUgaXMgYSBzZXJpb3VzIHNjaWVuY2Ugb24g
+Y3JlYXRpbmcgc3VjaCB0cmVlcyBpbiB0aGUgbW9zdA0KY29tcGFjdCBvciBiYWxhbmNlZCB3YXku
+IFNlZSwgZm9yIGV4YW1wbGUsIFJlaW5nb2xkLVRpbGZvcmQgYWxnb3JpdGhtDQooIlRpZGllciBE
+cmF3aW5ncyBvZiBUcmVlcyIsIDE5ODEpLg0KDQpBbGVrc2FuZGFy
