@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59471)
+Received: from eggs.gnu.org ([209.51.188.92]:59488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1LG8-0004hC-Ab
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:13 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1LGA-0004jf-SV
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1LG7-0004Ks-Ha
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:12 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:32922)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1LGA-0004Lk-6K
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:14 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35407)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1LG7-0004KU-B1
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:11 -0500
-Received: by mail-pg1-x544.google.com with SMTP id h11so6957487pgl.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 17:22:11 -0800 (PST)
+	id 1h1LGA-0004LX-04
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:14 -0500
+Received: by mail-pf1-x442.google.com with SMTP id j5so7114756pfa.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 17:22:13 -0800 (PST)
 References: <20190305172139.32662-1-peter.maydell@linaro.org>
-	<20190305172139.32662-8-peter.maydell@linaro.org>
+	<20190305172139.32662-10-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e8018441-d5eb-cc67-ab41-12d90eb8ae7c@linaro.org>
-Date: Tue, 5 Mar 2019 14:42:52 -0800
+Message-ID: <b45d8f38-4832-fca8-8e42-6410081c8f7f@linaro.org>
+Date: Tue, 5 Mar 2019 14:45:52 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190305172139.32662-8-peter.maydell@linaro.org>
+In-Reply-To: <20190305172139.32662-10-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 07/12] docs/conf.py: Disable option
- warnings
+Subject: Re: [Qemu-devel] [PATCH v3 09/12] Makefile,
+ configure: Support building rST documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,21 +36,26 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
 On 3/5/19 9:21 AM, Peter Maydell wrote:
-> sphinx-build complains about using :option: to mark up option
-> flags that it doesn't know about (because they were not defined
-> using the "option::" directive):
-> docs/pr-manager.rst:68: WARNING: unknown option: -d
+> Add support to our configure and makefile machinery for building
+> our rST docs into HTML files.
 > 
-> Suppress these warnings. This way we get the semantic markup
-> of the option flag but no cross-referencing hyperlink.
+> Building the documentation now requires that sphinx-build is
+> available; this seems better than allowing half the docs to
+> be built if it is not present but having half of them missing.
+> (In particular it means that assuming that distros configured with
+> --enable-docs they'll get a helpful error from configure telling
+> them the new build dependency.)
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Message-id: 20190228145624.24885-8-peter.maydell@linaro.org
+> Message-id: 20190228145624.24885-10-peter.maydell@linaro.org
 > ---
->  docs/conf.py | 3 +++
->  1 file changed, 3 insertions(+)
+>  configure  | 15 +++++++++++++--
+>  Makefile   | 45 ++++++++++++++++++++++++++++++++++++++++++---
+>  .gitignore |  1 +
+>  3 files changed, 56 insertions(+), 5 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
