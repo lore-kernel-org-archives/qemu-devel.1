@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41719)
+Received: from eggs.gnu.org ([209.51.188.92]:42516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1E7F-0003LY-K7
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:44:34 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1EBU-0004oR-Sx
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:48:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1E7E-0003Kn-B2
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:44:33 -0500
-Resent-Message-Id: <E1h1E7E-0003Kn-B2@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1E7D-0003IF-Ov
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:44:32 -0500
-Message-ID: <155180783907.19275.12048848774588584138@6acff2cf482b>
-In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philmd@redhat.com>) id 1h1EBU-0008CN-2x
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:48:56 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:35707)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1EBT-00089s-9x
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:48:56 -0500
+Received: by mail-wr1-f65.google.com with SMTP id t18so10463513wrx.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:48:53 -0800 (PST)
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-9-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <71bfd7e6-abda-d26d-b3d3-e4c2ed9e98f8@redhat.com>
+Date: Tue, 5 Mar 2019 18:48:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 5 Mar 2019 09:44:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Enable build and install of our
- rST docs
+In-Reply-To: <20190226193408.23862-9-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/11] r2d: Flash memory creation is
+ confused about size, mark FIXME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, amarkovic@wavecomp.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, Magnus Damm <magnus.damm@gmail.com>, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNTE3MjEzOS4zMjY2
-Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA1MTcyMTM5
-LjMyNjYyLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0ggdjMgMDAvMTJdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
-OTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
-MDE5MDMwNTE3MjEzOS4zMjY2Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNlMWJiZjQ1OTIgTUFJTlRBSU5FUlM6IEFkZCBlbnRyeSBm
-b3IgU3BoaW54IGRvY3VtZW50YXRpb24gaW5mcmFzdHJ1Y3R1cmUKNThjYWJhMTllNSBkb2NzL2Nv
-bmYucHk6IERvbid0IGhhcmQtY29kZSBRRU1VIHZlcnNpb24KYTExMTdiNzBmYiBNYWtlZmlsZTog
-QWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVyc2lvbiIgY29kZQpkZDE4MjVmMmJiIE1h
-a2VmaWxlLCBjb25maWd1cmU6IFN1cHBvcnQgYnVpbGRpbmcgclNUIGRvY3VtZW50YXRpb24KM2Q1
-MDMwMmNjYyBkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdl
-IHdhbnQKNjgyMGFmODVmNyBkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCmQ3
-YjM2MGRkZWUgZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwg
-YnVpbGQKMzg4ZDJjOGFjZSBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3Rlcicg
-dGhlbWUKYjljNTE4MzkxNyBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGly
-ZWN0b3J5CmFkOWY0NzJlMzAgZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngt
-cXVpY2tzdGFydAoxNzc3MmNkNjZjIGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9y
-bWF0CmM3MDBmYzhkNDIgZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgYzcwMGZjOGQ0MjI3
-IChkb2NzL2NwdS1ob3RwbHVnLnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzEyIENoZWNr
-aW5nIGNvbW1pdCAxNzc3MmNkNjZjZWQgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
-Zm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNDogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVt
-b3J5LnR4dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzEyIENoZWNraW5nIGNvbW1p
-dCBhZDlmNDcyZTMwYmIgKGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1
-aWNrc3RhcnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE3OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTIg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMiBDaGVja2luZyBjb21taXQgYjljNTE4Mzkx
-N2UzIChkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5KQo1LzEy
-IENoZWNraW5nIGNvbW1pdCAzODhkMmM4YWNlNTEgKGRvY3MvY29uZi5weTogQ29uZmlndXJlIHRo
-ZSAnYWxhYmFzdGVyJyB0aGVtZSkKNi8xMiBDaGVja2luZyBjb21taXQgZDdiMzYwZGRlZWVjIChk
-b2NzL2NvbmYucHk6IERvbid0IGluY2x1ZGUgclNUIHNvdXJjZXMgaW4gSFRNTCBidWlsZCkKNy8x
-MiBDaGVja2luZyBjb21taXQgNjgyMGFmODVmN2M5IChkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0
-aW9uIHdhcm5pbmdzKQo4LzEyIENoZWNraW5nIGNvbW1pdCAzZDUwMzAyY2NjNmMgKGRvY3M6IFBy
-b3ZpZGUgc2VwYXJhdGUgY29uZi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudCkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMTAyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojMTg3OiBGSUxFOiBkb2NzL2ludGVyb3AvY29uZi5weToxNToKK2h0bWxfdGhl
-bWVfb3B0aW9uc1snZGVzY3JpcHRpb24nXSA9IHUnU3lzdGVtIEVtdWxhdGlvbiBNYW5hZ2VtZW50
-IGFuZCBJbnRlcm9wZXJhYmlsaXR5IEd1aWRlJwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdz
-LCAxMzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKOS8xMiBDaGVja2luZyBjb21taXQgZGQxODI1ZjJiYjgxIChNYWtlZmlsZSwgY29uZmlndXJl
-OiBTdXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uKQoxMC8xMiBDaGVja2luZyBjb21t
-aXQgYTExMTdiNzBmYmM5IChNYWtlZmlsZTogQWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtn
-dmVyc2lvbiIgY29kZSkKMTEvMTIgQ2hlY2tpbmcgY29tbWl0IDU4Y2FiYTE5ZTU3OCAoZG9jcy9j
-b25mLnB5OiBEb24ndCBoYXJkLWNvZGUgUUVNVSB2ZXJzaW9uKQoxMi8xMiBDaGVja2luZyBjb21t
-aXQgY2UxYmJmNDU5MjE2IChNQUlOVEFJTkVSUzogQWRkIGVudHJ5IGZvciBTcGhpbnggZG9jdW1l
-bnRhdGlvbiBpbmZyYXN0cnVjdHVyZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxp
-bmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 2/26/19 8:34 PM, Markus Armbruster wrote:
+> pflash_cfi02_register() takes a size in bytes, a block size in bytes
+> and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
+> FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
+> number of blocks.  The latter happens to win.  I tried to find
+> documentation on the physical hardware, no luck.
+> 
+> For now, adjust the byte size passed to match the actual size created,
+> and add a FIXME comment.
+> 
+> Cc: Magnus Damm <magnus.damm@gmail.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/sh4/r2d.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+> index dcdb3728cb..ed18d1f351 100644
+> --- a/hw/sh4/r2d.c
+> +++ b/hw/sh4/r2d.c
+> @@ -290,7 +290,14 @@ static void r2d_init(MachineState *machine)
+>  
+>      /* onboard flash memory */
+>      dinfo = drive_get(IF_PFLASH, 0, 0);
+> -    pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE,
+> +    /*
+> +     * FIXME The code is confused about the size of the flash.  It
+> +     * used to pass FLASH_SIZE bytes, in FLASH_SIZE >> 16 blocks of
+> +     * 16KiB each, which does not compute, but creates one of
+> +     * FLASH_SIZE / 4 bytes anyway.  The current code does so too, but
+> +     * whether it's the right size is anybody's guess.
+> +     */
+> +    pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE / 4,
+
+NAck, please see suggestion on v1:
+https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg01206.html
+
+>                            dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+>                            16 * KiB, FLASH_SIZE >> 16,
+>                            1, 4, 0x0000, 0x0000, 0x0000, 0x0000,
+> 
