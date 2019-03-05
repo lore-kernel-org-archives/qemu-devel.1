@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39290)
+Received: from eggs.gnu.org ([209.51.188.92]:39999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h168k-00051u-FH
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:13:36 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1h16Bx-000667-7x
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:16:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h168d-0003mK-8Y
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:13:31 -0500
-Date: Tue, 5 Mar 2019 10:13:13 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190305101313.4ddfe305@redhat.com>
-In-Reply-To: <493bad73-70e0-f352-b5aa-6cb2120677f7@linux.ibm.com>
-References: <154943058200.27958.11497653677605446596.stgit@lep8c.aus.stglabs.ibm.com>
-	<154943078167.27958.5009288263168039462.stgit@lep8c.aus.stglabs.ibm.com>
-	<20190219091102.52fa630a@redhat.com>
-	<4c8d6511-dc77-24f3-71a7-cafc54a80b44@linux.ibm.com>
-	<20190221151240.68a96192@redhat.com>
-	<493bad73-70e0-f352-b5aa-6cb2120677f7@linux.ibm.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1h16Bu-0000IY-42
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:16:51 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41498)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1h16Bq-0008VQ-Sz
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:16:47 -0500
+Received: by mail-wr1-x441.google.com with SMTP id n2so8565068wrw.8
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 01:16:45 -0800 (PST)
+References: <20190304181813.8075-1-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190304181813.8075-1-cota@braap.org>
+Date: Tue, 05 Mar 2019 09:16:41 +0000
+Message-ID: <87zhq9fzpi.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 3/4] spapr: Add NVDIMM device support
+Subject: Re: [Qemu-devel] [PATCH v7 00/73] per-CPU locks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,578 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, xiaoguangrong.eric@gmail.com, mst@redhat.com, bharata@linux.ibm.com, qemu-ppc@nongnu.org, vaibhav@linux.ibm.com, david@gibson.dropbear.id.au
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
 
-On Thu, 28 Feb 2019 14:24:07 +0530
-Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
 
-> Hi Igor,
->=20
-> Thanks for the elaboration. Please find my response inline.
->=20
->=20
-> On 02/21/2019 07:42 PM, Igor Mammedov wrote:
-> > On Tue, 19 Feb 2019 14:59:25 +0530
-> > Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
-> > =20
-> >> On 02/19/2019 01:41 PM, Igor Mammedov wrote: =20
-> >>> On Tue, 05 Feb 2019 23:26:27 -0600
-> >>> Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
-> >>>    =20
-> >>>> Add support for NVDIMM devices for sPAPR. Piggyback on existing nvdi=
-mm
-> >>>> device interface in QEMU to support virtual NVDIMM devices for Power=
- (May have
-> >>>> to re-look at this later).  Create the required DT entries for the
-> >>>> device (some entries have dummy values right now).
-> >>>>
-> >>>> The patch creates the required DT node and sends a hotplug
-> >>>> interrupt to the guest. Guest is expected to undertake the normal
-> >>>> DR resource add path in response and start issuing PAPR SCM hcalls.
-> >>>>
-> >>>> This is how it can be used ..
-> >>>> Add nvdimm=3Don to the qemu machine argument.
-> >>>> Ex : -machine pseries,nvdimm=3Don
-> >>>> For coldplug, the device to be added in qemu command line as shown b=
-elow
-> >>>> -object memory-backend-file,id=3Dmemnvdimm0,prealloc=3Dyes,mem-path=
-=3D/tmp/nvdimm0.img,share=3Dyes,size=3D512m
-> >>>> -device nvdimm,label-size=3D128k,memdev=3Dmemnvdimm0,id=3Dnvdimm0,sl=
-ot=3D0
-> >>>>
-> >>>> For hotplug, the device to be added from monitor as below
-> >>>> object_add memory-backend-file,id=3Dmemnvdimm0,prealloc=3Dyes,mem-pa=
-th=3D/tmp/nvdimm0.img,share=3Dyes,size=3D512m
-> >>>> device_add nvdimm,label-size=3D128k,memdev=3Dmemnvdimm0,id=3Dnvdimm0=
-,slot=3D0
-> >>>>
-> >>>> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-> >>>> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-> >>>>                  [Early implementation]
-> >>>> ---
-> >>>>    default-configs/ppc64-softmmu.mak |    1
-> >>>>    hw/ppc/spapr.c                    |  212 ++++++++++++++++++++++++=
-+++++++++++--
-> >>>>    hw/ppc/spapr_drc.c                |   17 +++
-> >>>>    hw/ppc/spapr_events.c             |    4 +
-> >>>>    include/hw/ppc/spapr.h            |   10 ++
-> >>>>    include/hw/ppc/spapr_drc.h        |    9 ++
-> >>>>    6 files changed, 241 insertions(+), 12 deletions(-)
-> >>>>
-> >>>> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc=
-64-softmmu.mak
-> >>>> index 7f34ad0528..b6e1aa5125 100644
-> >>>> --- a/default-configs/ppc64-softmmu.mak
-> >>>> +++ b/default-configs/ppc64-softmmu.mak
-> >>>> @@ -20,4 +20,5 @@ CONFIG_XIVE=3D$(CONFIG_PSERIES)
-> >>>>    CONFIG_XIVE_SPAPR=3D$(CONFIG_PSERIES)
-> >>>>    CONFIG_MEM_DEVICE=3Dy
-> >>>>    CONFIG_DIMM=3Dy
-> >>>> +CONFIG_NVDIMM=3Dy
-> >>>>    CONFIG_SPAPR_RNG=3Dy
-> >>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>>> index 0fcdd35cbe..7e7a1a8041 100644
-> >>>> --- a/hw/ppc/spapr.c
-> >>>> +++ b/hw/ppc/spapr.c
-> >>>> @@ -73,6 +73,7 @@
-> >>>>    #include "qemu/cutils.h"
-> >>>>    #include "hw/ppc/spapr_cpu_core.h"
-> >>>>    #include "hw/mem/memory-device.h"
-> >>>> +#include "hw/mem/nvdimm.h"
-> >>>>   =20
-> >>>>    #include <libfdt.h>
-> >>>>   =20
-> >>>> @@ -690,6 +691,7 @@ static int spapr_populate_drmem_v2(sPAPRMachineS=
-tate *spapr, void *fdt,
-> >>>>        uint8_t *int_buf, *cur_index, buf_len;
-> >>>>        int ret;
-> >>>>        uint64_t lmb_size =3D SPAPR_MEMORY_BLOCK_SIZE;
-> >>>> +    uint64_t scm_block_size =3D SPAPR_MINIMUM_SCM_BLOCK_SIZE;
-> >>>>        uint64_t addr, cur_addr, size;
-> >>>>        uint32_t nr_boot_lmbs =3D (machine->device_memory->base / lmb=
-_size);
-> >>>>        uint64_t mem_end =3D machine->device_memory->base +
-> >>>> @@ -726,15 +728,24 @@ static int spapr_populate_drmem_v2(sPAPRMachin=
-eState *spapr, void *fdt,
-> >>>>                nr_entries++;
-> >>>>            }
-> >>>>   =20
-> >>>> -        /* Entry for DIMM */
-> >>>> -        drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_LMB, addr / lmb_size=
-);
-> >>>> -        g_assert(drc);
-> >>>> -        elem =3D spapr_get_drconf_cell(size / lmb_size, addr,
-> >>>> -                                     spapr_drc_index(drc), node,
-> >>>> -                                     SPAPR_LMB_FLAGS_ASSIGNED);
-> >>>> +        if (info->value->type =3D=3D MEMORY_DEVICE_INFO_KIND_NVDIMM=
-) {
-> >>>> +            /* Entry for NVDIMM */
-> >>>> +            drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PMEM, addr / scm=
-_block_size);
-> >>>> +            g_assert(drc);
-> >>>> +            elem =3D spapr_get_drconf_cell(size / scm_block_size, a=
-ddr,
-> >>>> +                                         spapr_drc_index(drc), -1, =
-0);
-> >>>> +            cur_addr =3D ROUND_UP(addr + size, scm_block_size);
-> >>>> +        } else {
-> >>>> +            /* Entry for DIMM */
-> >>>> +            drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_LMB, addr / lmb_=
-size);
-> >>>> +            g_assert(drc);
-> >>>> +            elem =3D spapr_get_drconf_cell(size / lmb_size, addr,
-> >>>> +                                         spapr_drc_index(drc), node,
-> >>>> +                                         SPAPR_LMB_FLAGS_ASSIGNED);
-> >>>> +            cur_addr =3D addr + size;
-> >>>> +        }
-> >>>>            QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
-> >>>>            nr_entries++;
-> >>>> -        cur_addr =3D addr + size;
-> >>>>        }
-> >>>>   =20
-> >>>>        /* Entry for remaining hotpluggable area */
-> >>>> @@ -1225,6 +1236,42 @@ static void spapr_dt_hypervisor(sPAPRMachineS=
-tate *spapr, void *fdt)
-> >>>>        }
-> >>>>    }
-> >>>>   =20
-> >>>> +static int spapr_populate_nvdimm_node(void *fdt, int fdt_offset,
-> >>>> +                                      uint32_t node, uint64_t addr,
-> >>>> +                                      uint64_t size, uint64_t label=
-_size);
-> >>>> +static void spapr_create_nvdimm(void *fdt)
-> >>>> +{
-> >>>> +    int offset =3D fdt_subnode_offset(fdt, 0, "persistent-memory");
-> >>>> +    GSList *dimms =3D NULL;
-> >>>> +
-> >>>> +    if (offset < 0) {
-> >>>> +        offset =3D fdt_add_subnode(fdt, 0, "persistent-memory");
-> >>>> +        _FDT(offset);
-> >>>> +        _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x2))=
-);
-> >>>> +        _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
-> >>>> +        _FDT((fdt_setprop_string(fdt, offset, "name", "persistent-m=
-emory")));
-> >>>> +        _FDT((fdt_setprop_string(fdt, offset, "device_type",
-> >>>> +                                 "ibm,persistent-memory")));
-> >>>> +    }
-> >>>> +
-> >>>> +    /*NB : Add drc-info array here */
-> >>>> +
-> >>>> +    /* Create DT entries for cold plugged NVDIMM devices */
-> >>>> +    dimms =3D nvdimm_get_device_list();
-> >>>> +    for (; dimms; dimms =3D dimms->next) {
-> >>>> +        NVDIMMDevice *nvdimm =3D dimms->data;
-> >>>> +        PCDIMMDevice *di =3D PC_DIMM(nvdimm);
-> >>>> +        uint64_t lsize =3D nvdimm->label_size;
-> >>>> +        int size =3D object_property_get_int(OBJECT(nvdimm), PC_DIM=
-M_SIZE_PROP,
-> >>>> +                                           NULL);
-> >>>> +
-> >>>> +        spapr_populate_nvdimm_node(fdt, offset, di->node, di->addr,
-> >>>> +                                   size, lsize);
-> >>>> +    }
-> >>>> +    g_slist_free(dimms);
-> >>>> +    return;
-> >>>> +}
-> >>>> +
-> >>>>    static void *spapr_build_fdt(sPAPRMachineState *spapr)
-> >>>>    {
-> >>>>        MachineState *machine =3D MACHINE(spapr);
-> >>>> @@ -1348,6 +1395,11 @@ static void *spapr_build_fdt(sPAPRMachineStat=
-e *spapr)
-> >>>>            exit(1);
-> >>>>        }
-> >>>>   =20
-> >>>> +    /* NVDIMM devices */
-> >>>> +    if (spapr->nvdimm_enabled) {
-> >>>> +        spapr_create_nvdimm(fdt);
-> >>>> +    }
-> >>>> +
-> >>>>        return fdt;
-> >>>>    }
-> >>>>   =20
-> >>>> @@ -3143,6 +3195,20 @@ static void spapr_set_ic_mode(Object *obj, co=
-nst char *value, Error **errp)
-> >>>>        }
-> >>>>    }
-> >>>>   =20
-> >>>> +static bool spapr_get_nvdimm(Object *obj, Error **errp)
-> >>>> +{
-> >>>> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> >>>> +
-> >>>> +    return spapr->nvdimm_enabled;
-> >>>> +}
-> >>>> +
-> >>>> +static void spapr_set_nvdimm(Object *obj, bool value, Error **errp)
-> >>>> +{
-> >>>> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> >>>> +
-> >>>> +    spapr->nvdimm_enabled =3D value;
-> >>>> +}
-> >>>> +
-> >>>>    static void spapr_instance_init(Object *obj)
-> >>>>    {
-> >>>>        sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> >>>> @@ -3188,6 +3254,11 @@ static void spapr_instance_init(Object *obj)
-> >>>>        object_property_set_description(obj, "ic-mode",
-> >>>>                     "Specifies the interrupt controller mode (xics, =
-xive, dual)",
-> >>>>                     NULL);
-> >>>> +    object_property_add_bool(obj, "nvdimm",
-> >>>> +                            spapr_get_nvdimm, spapr_set_nvdimm, NUL=
-L);
-> >>>> +    object_property_set_description(obj, "nvdimm",
-> >>>> +                                    "Enable support for nvdimm devi=
-ces",
-> >>>> +                                    NULL);
-> >>>>    }
-> >>>>   =20
-> >>>>    static void spapr_machine_finalizefn(Object *obj)
-> >>>> @@ -3267,12 +3338,103 @@ static void spapr_add_lmbs(DeviceState *dev=
-, uint64_t addr_start, uint64_t size,
-> >>>>        }
-> >>>>    }
-> >>>>   =20
-> >>>> +static int spapr_populate_nvdimm_node(void *fdt, int fdt_offset, ui=
-nt32_t node,
-> >>>> +                                      uint64_t addr, uint64_t size,
-> >>>> +                                      uint64_t label_size)
-> >>>> +{
-> >>>> +    int offset;
-> >>>> +    char buf[40];
-> >>>> +    GString *lcode =3D g_string_sized_new(10);
-> >>>> +    sPAPRDRConnector *drc;
-> >>>> +    QemuUUID uuid;
-> >>>> +    uint32_t drc_idx;
-> >>>> +    uint32_t associativity[] =3D {
-> >>>> +        cpu_to_be32(0x4), /* length */
-> >>>> +        cpu_to_be32(0x0), cpu_to_be32(0x0),
-> >>>> +        cpu_to_be32(0x0), cpu_to_be32(node)
-> >>>> +    };
-> >>>> +
-> >>>> +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PMEM,
-> >>>> +                          addr / SPAPR_MINIMUM_SCM_BLOCK_SIZE);
-> >>>> +    g_assert(drc);
-> >>>> +
-> >>>> +    drc_idx =3D spapr_drc_index(drc);
-> >>>> +
-> >>>> +    sprintf(buf, "pmem@%x", drc_idx);
-> >>>> +    offset =3D fdt_add_subnode(fdt, fdt_offset, buf);
-> >>>> +    _FDT(offset);
-> >>>> +
-> >>>> +    _FDT((fdt_setprop_cell(fdt, offset, "reg", drc_idx)));
-> >>>> +    _FDT((fdt_setprop_string(fdt, offset, "compatible", "ibm,pmemor=
-y")));
-> >>>> +    _FDT((fdt_setprop_string(fdt, offset, "name", "pmem")));
-> >>>> +    _FDT((fdt_setprop_string(fdt, offset, "device_type", "ibm,pmemo=
-ry")));
-> >>>> +
-> >>>> +    /*NB : Supposed to be random strings. Currently empty 10 string=
-s! */
-> >>>> +    _FDT((fdt_setprop(fdt, offset, "ibm,loc-code", lcode->str, lcod=
-e->len)));
-> >>>> +    g_string_free(lcode, TRUE);
-> >>>> +
-> >>>> +    _FDT((fdt_setprop(fdt, offset, "ibm,associativity", associativi=
-ty,
-> >>>> +                      sizeof(associativity))));
-> >>>> +    g_random_set_seed(drc_idx);
-> >>>> +    qemu_uuid_generate(&uuid);
-> >>>> +
-> >>>> +    qemu_uuid_unparse(&uuid, buf);
-> >>>> +    _FDT((fdt_setprop_string(fdt, offset, "ibm,unit-guid", buf)));
-> >>>> +
-> >>>> +    _FDT((fdt_setprop_cell(fdt, offset, "ibm,my-drc-index", drc_idx=
-)));
-> >>>> +
-> >>>> +    /*NB : What it should be? */
-> >>>> +    _FDT(fdt_setprop_cell(fdt, offset, "ibm,latency-attribute", 828=
-));
-> >>>> +
-> >>>> +    _FDT((fdt_setprop_u64(fdt, offset, "ibm,block-size",
-> >>>> +                          SPAPR_MINIMUM_SCM_BLOCK_SIZE)));
-> >>>> +    _FDT((fdt_setprop_u64(fdt, offset, "ibm,number-of-blocks",
-> >>>> +                          size / SPAPR_MINIMUM_SCM_BLOCK_SIZE)));
-> >>>> +    _FDT((fdt_setprop_cell(fdt, offset, "ibm,metadata-size", label_=
-size)));
-> >>>> +
-> >>>> +    return offset;
-> >>>> +}
-> >>>> +
-> >>>> +static void spapr_add_nvdimm(DeviceState *dev, uint64_t addr,
-> >>>> +                             uint64_t size, uint32_t node,
-> >>>> +                             Error **errp)
-> >>>> +{
-> >>>> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_hotplug_han=
-dler(dev));
-> >>>> +    sPAPRDRConnector *drc;
-> >>>> +    bool hotplugged =3D spapr_drc_hotplugged(dev);
-> >>>> +    NVDIMMDevice *nvdimm =3D NVDIMM(OBJECT(dev));
-> >>>> +    void *fdt;
-> >>>> +    int fdt_offset, fdt_size;
-> >>>> +    Error *local_err =3D NULL;
-> >>>> +
-> >>>> +    spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_PMEM,
-> >>>> +                           addr / SPAPR_MINIMUM_SCM_BLOCK_SIZE);
-> >>>> +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PMEM,
-> >>>> +                          addr / SPAPR_MINIMUM_SCM_BLOCK_SIZE);
-> >>>> +    g_assert(drc);
-> >>>> +
-> >>>> +    fdt =3D create_device_tree(&fdt_size);
-> >>>> +    fdt_offset =3D spapr_populate_nvdimm_node(fdt, 0, node, addr,
-> >>>> +                                            size, nvdimm->label_siz=
-e);
-> >>>> +
-> >>>> +    spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
-> >>>> +    if (local_err) {
-> >>>> +        error_propagate(errp, local_err);
-> >>>> +        return;
-> >>>> +    }
-> >>>> +
-> >>>> +    if (hotplugged) {
-> >>>> +        spapr_hotplug_req_add_by_index(drc);
-> >>>> +    }
-> >>>> +}
-> >>>> +
-> >>>>    static void spapr_memory_plug(HotplugHandler *hotplug_dev, Device=
-State *dev,
-> >>>>                                  Error **errp)
-> >>>>    {
-> >>>>        Error *local_err =3D NULL;
-> >>>>        sPAPRMachineState *ms =3D SPAPR_MACHINE(hotplug_dev);
-> >>>>        PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> >>>> +    bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM=
-);
-> >>>>        uint64_t size, addr;
-> >>>>        uint32_t node;
-> >>>>   =20
-> >>>> @@ -3291,9 +3453,14 @@ static void spapr_memory_plug(HotplugHandler =
-*hotplug_dev, DeviceState *dev,
-> >>>>   =20
-> >>>>        node =3D object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_P=
-ROP,
-> >>>>                                        &error_abort);
-> >>>> -    spapr_add_lmbs(dev, addr, size, node,
-> >>>> -                   spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
-> >>>> -                   &local_err);
-> >>>> +    if (!is_nvdimm) {
-> >>>> +        spapr_add_lmbs(dev, addr, size, node,
-> >>>> +                       spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
-> >>>> +                       &local_err);
-> >>>> +    } else {
-> >>>> +        spapr_add_nvdimm(dev, addr, size, node, &local_err);
-> >>>> +    }
-> >>>> +
-> >>>>        if (local_err) {
-> >>>>            goto out_unplug;
-> >>>>        }
-> >>>> @@ -3311,6 +3478,7 @@ static void spapr_memory_pre_plug(HotplugHandl=
-er *hotplug_dev, DeviceState *dev,
-> >>>>    {
-> >>>>        const sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(hotp=
-lug_dev);
-> >>>>        sPAPRMachineState *spapr =3D SPAPR_MACHINE(hotplug_dev);
-> >>>> +    bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM=
-);
-> >>>>        PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> >>>>        Error *local_err =3D NULL;
-> >>>>        uint64_t size;
-> >>>> @@ -3328,10 +3496,30 @@ static void spapr_memory_pre_plug(HotplugHan=
-dler *hotplug_dev, DeviceState *dev,
-> >>>>            return;
-> >>>>        }
-> >>>>   =20
-> >>>> -    if (size % SPAPR_MEMORY_BLOCK_SIZE) {
-> >>>> +    if (!is_nvdimm && size % SPAPR_MEMORY_BLOCK_SIZE) {
-> >>>>            error_setg(errp, "Hotplugged memory size must be a multip=
-le of "
-> >>>> -                      "%" PRIu64 " MB", SPAPR_MEMORY_BLOCK_SIZE / M=
-iB);
-> >>>> +                          "%" PRIu64 " MB", SPAPR_MEMORY_BLOCK_SIZE=
- / MiB);
-> >>>>            return;
-> >>>> +    } else if (is_nvdimm) {
-> >>>> +        NVDIMMDevice *nvdimm =3D NVDIMM(OBJECT(dev));
-> >>>> +        if ((nvdimm->label_size + size) % SPAPR_MINIMUM_SCM_BLOCK_S=
-IZE) {
-> >>>> +            error_setg(errp, "NVDIMM memory size must be a multiple=
- of "
-> >>>> +                       "%" PRIu64 "MB", SPAPR_MINIMUM_SCM_BLOCK_SIZ=
-E / MiB);
-> >>>> +            return;
-> >>>> +        }
-> >>>> +        if (((nvdimm->label_size + size) / SPAPR_MINIMUM_SCM_BLOCK_=
-SIZE) =3D=3D 1) {
-> >>>> +            error_setg(errp, "NVDIMM size must be atleast "
-> >>>> +                       "%" PRIu64 "MB", 2 * SPAPR_MINIMUM_SCM_BLOCK=
-_SIZE / MiB);
-> >>>> +            return;
-> >>>> +        } =20
-> > on the second glance 2 things looks weird here:
-> >    1. we shouldn't poke inside of nvdimm object directly, there is NVDI=
-MM_LABEL_SIZE_PROP
-> >       if you really need to get label size =20
->=20
-> Ok. Will use the property.
->=20
-> >    2. why do we need to care about label_size here at all? =20
->=20
-> On PPC, there is no explicit way to specify the size of the NVDIMM=20
-> device for the guest.
-> It is inferred by the (number of SCM blocks) * (SCM block-size) as=20
-> specified in the
-> device tree. The label area is part of the nvdimm but not exposed to the=
-=20
-> guest
-> as you mentioned. So, if user specified size=3D1GB, and label_size=3D3MB,=
-=20
-> the qemu
-> will say (1GB-3MB)/256MB(block size) =3D 3 number of blocks and block siz=
-e=20
-> as 256MB.
-> The user gets 768MB of the device. Since the minimum required size is 256=
-MB,
-> and label_area being outside, and we want it to be aligned to 256MB, I=20
-> am forcing the minimum
-> device size to be 512MB. Actually it can be anything above 256MB +=20
-> label_size. I see
-> your point, I can just not care about label_size but care only about the=
-=20
-> nvdimm size(-label_size)
-> is aligned to 256MB or not.
->=20
-> >>>> +        /* Align to scm block size, exclude the label */
-> >>>> +        memory_device_set_region_size(MEMORY_DEVICE(nvdimm),
-> >>>> +               QEMU_ALIGN_DOWN(size, SPAPR_MINIMUM_SCM_BLOCK_SIZE),=
- &local_err); =20
-> >>> I'm not sure that arbitrarily fixing up region size is the right thin=
-g to do
-> >>> and also what you are trying to achieve here isn't clear, could you e=
-xplain it some more? =20
-> >> The resize is required to allow the subsequent memory hotplugs to work=
-. The
-> >> base address(if not specified) for the next dimm hotplug, starts at the
-> >> end of
-> >> this region. If the region is not aligned to LMB size, guest refuses to
-> >> claim the
-> >> newly hotplugged memory.=C2=A0 The label area can be small and need no=
-t be
-> >> aligned to (LMB/SCM block) size. The region size is actually the size
-> >> minus the
-> >> label_size which can be unaligned to LMB size. So, align down to SCM b=
-lock
-> >> size is necessary here. =20
-> > Well fixing up object(MemoryRegion) which belongs to the backend from
-> > machine level to satisfy machine specific alignment requirements looks
-> > like a wrong thing to do. =20
->=20
-> For a 1GB device with say 3MB label_size, the qemu exposes 3 SCM blocks=20
-> of 256MB each
-> and guest actually accesses 768MB of the region, even though the memory=20
-> region size
-> is (1GB-3MB). But on x86, the guest actually sees (1GB-3MB), not any less.
-> The memory region size is larger than 768 and is unaligned to 256MB, the
-> subsequent dimm hotplug would fail as the next free address got from
-> memory_device_get_free_addr is not aligned to 256MB.
->=20
-> [=C2=A0=C2=A0 35.617767] pseries-hotplug-mem: dlpar_memory: Memory add LM=
-Bs
-> [=C2=A0=C2=A0 35.619598] pseries-hotplug-mem: Attempting to hot-add 1 LMB=
-(s) at=20
-> index 80000040
-> [=C2=A0=C2=A0 35.619966] pseries-hotplug-mem: Attempting to hot-add in ra=
-nge=20
-> 40fe00000 - 40fe00000
-> [=C2=A0=C2=A0 35.620416] pseries-hotplug-mem: Attempting to hot-add in ra=
-nge=20
-> 40fe00000 - 40fe00000
-> [=C2=A0=C2=A0 35.621330] Block size [0x10000000 or 268435456] unaligned h=
-otplug=20
-> range: start 0x40fe00000, size 0x10000000
-> [=C2=A0=C2=A0 35.621432] pseries-hotplug-mem: Memory indexed-count-add fa=
-iled,=20
-> removing any added LMBs
->=20
-> This alignment problem is not unique to Power, I see the same happening=20
-> on x86_64 too as the
-> memory block size is required to be aligned to 128MB there.
->=20
-> [=C2=A0=C2=A0 26.558423] Block size [0x8000000] unaligned hotplug range: =
-start=20
-> 0x11ffe0000, size 0x8000000
-> [=C2=A0=C2=A0 26.558427] acpi PNP0C80:00: add_memory failed
-> [=C2=A0=C2=A0 26.558431] acpi PNP0C80:00: acpi_memory_enable_device() err=
-or
-> [=C2=A0=C2=A0 26.558433] acpi PNP0C80:00: Enumeration failure
->=20
-> The user has to circumvent this alignment issue by explicitly giving the=
-=20
-> 256MB and 128MB as the align size on the
-> memory-backend-file object option on PPC and X86_64 respectively.
->=20
-> > So we need to come up with another approach.
-> > I'm sill not sure what problem is there but nvdimm already
-> > has a notion of data region (without label size) look for
-> > nvdimm->nvdimm_mr and mdc->get_memory_region and that's what you have in
-> > local var 'size'.
-> >   =20
-> >
-> > So what you are doing here look incorrect even more,
-> > i.e. beside we shouldn't do it at all and the second thing is that you =
-are
-> > sizing down data area which already excludes label size. =20
->=20
-> To get the things(nvdimm & dimm) working together, the user has to give=20
-> align=3D256m on
-> memory-backend-file device option for nvdimm device backend object.
-> With the align option, the nvdimm_prepare_memory_region() does the=20
-> QEMU_ALIGN_DOWN of the
-> memory region which I am doing here by default. Doing it by default=20
-> still makes sense as the
-> actual size the guest gets to use is only 768MB in this case. However, I=
-=20
-> should probably do align down
-> only if the user has not specified the value by himself, and let=20
-> nvdimm_prepare_memory_region() do
-> it in such a case.
->=20
-> Since this is PPC specific alignment requirement, I think this is the=20
-> right place to enforce it & size down
-> by default here. There are checks for PPC specific DIMM size alignment=20
-> requirement same way here.
-> If this is not the right place, could you suggest me a better place as the
-> nvdimm_prepare_memory_region() is generic and I cant set machine=20
-> specific device properties there?
->=20
->=20
-> > What I'd suggest is to align up GPA of being added memory on
-> >     MAX(LMB size, backend_page_size, max supported huge page size)
-> > so hotplugged dimm or whatever else would be properly aligned,
-> > see pc_dimm_pre_plug(,legacy_align,) and how PC uses it. =20
->=20
-> This approach though assures to give an address aligned to the=20
-> legacy_align mentioned from
-> memory_device_get_free_addr(), requires the size of the device also to=20
-> be aligned to
-> the legacy_align specified. If I am not sizing down the region size, the=
-=20
-> size-label_size will not
-> be aligned to this size.=C2=A0 That is another reason why sizing down the=
-=20
-> region size is still needed.
-The thing with size alignment is that it's a guest specific requirement
-that varies depending on OS is running inside. So if spec doesn't specify
-alignment I'd look at backend page size as such. It's upto mgmt layer to
-configure size properly as upper stack should be aware of which guest it ru=
-ns.
+Emilio G. Cota <cota@braap.org> writes:
 
-In case of SPAPR, is size alignment an architectural requirement or it's ju=
-st
-specific guest impl?
-If it's the former I'd replace sizing down with a check and refuse improper=
-ly
-sized nvdimm in case of the later I'd let mgmt to properly pick size depend=
-ing
-on guest OS.
+> v6: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg07650.html
+>
+> All patches in the series have reviews now. Thanks everyone!
+>
+> I've tested all patches with `make check-qtest -j' for all targets.
+> The series is checkpatch-clean (just some warnings about __COVERITY__).
+>
+> You can fetch the series from:
+>   https://github.com/cota/qemu/tree/cpu-lock-v7
+
+Just to say I've applied and tested the whole series and I'm still
+seeing the improvements so I think it's ready to be picked up:
+
+  Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+
+>
+> ---
+> v6->v7:
+>
+> - Rebase on master
+>   - Add a cpu_halted_set call to arm code that wasn't there in v6
+>
+> - Add R-b's and Ack's.
+>
+> - Add comment to patch 3's log to explain why the bitmap is added
+>   there, even though it only gains a user at the end of the series.
+>
+> - Fix "prevent deadlock" comments before assertions; use
+>   "enforce locking order" instead, which is more accurate.
+>
+> - Add a few more comments, as suggested by Alex.
+>
+> v6->v7 diff (before rebase) below.
+>
+> Thanks,
+>
+> 		Emilio
+> ---
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index e4ae04f72c..a513457520 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -435,7 +435,7 @@ static inline bool cpu_handle_halt_locked(CPUState *c=
+pu)
+>              && replay_interrupt()) {
+>              X86CPU *x86_cpu =3D X86_CPU(cpu);
+>
+> -            /* prevent deadlock; cpu_mutex must be acquired _after_ the =
+BQL */
+> +            /* locking order: cpu_mutex must be acquired _after_ the BQL=
+ */
+>              cpu_mutex_unlock(cpu);
+>              qemu_mutex_lock_iothread();
+>              cpu_mutex_lock(cpu);
+> diff --git a/cpus.c b/cpus.c
+> index 4f17fe25bf..82a93f2a5a 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -2062,7 +2062,7 @@ void qemu_mutex_lock_iothread_impl(const char *file=
+, int line)
+>  {
+>      QemuMutexLockFunc bql_lock =3D atomic_read(&qemu_bql_mutex_lock_func=
+);
+>
+> -    /* prevent deadlock with CPU mutex */
+> +    /* enforce locking order */
+>      g_assert(no_cpu_mutex_locked());
+>
+>      g_assert(!qemu_mutex_iothread_locked());
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index bb0729f969..726cb7b090 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -322,7 +322,8 @@ struct qemu_work_item;
+>   * @mem_io_pc: Host Program Counter at which the memory was accessed.
+>   * @mem_io_vaddr: Target virtual address at which the memory was accesse=
+d.
+>   * @kvm_fd: vCPU file descriptor for KVM.
+> - * @lock: Lock to prevent multiple access to per-CPU fields.
+> + * @lock: Lock to prevent multiple access to per-CPU fields. Must be acq=
+uired
+> + *        after the BQL.
+>   * @cond: Condition variable for per-CPU events.
+>   * @work_list: List of pending asynchronous work.
+>   * @halted: Nonzero if the CPU is in suspended state.
+> @@ -804,6 +805,7 @@ static inline bool cpu_has_work(CPUState *cpu)
+>      bool (*func)(CPUState *cpu);
+>      bool ret;
+>
+> +    /* some targets require us to hold the BQL when checking for work */
+>      if (cc->has_work_with_iothread_lock) {
+>          if (qemu_mutex_iothread_locked()) {
+>              func =3D cc->has_work_with_iothread_lock;
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 3f3c670897..65a14deb2f 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -3216,6 +3216,10 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_ru=
+n *run)
+>          qemu_mutex_lock_iothread();
+>      }
+>
+> +    /*
+> +     * We might have cleared some bits in cpu->interrupt_request since r=
+eading
+> +     * it; read it again.
+> +     */
+>      interrupt_request =3D cpu_interrupt_request(cpu);
+>
+>      /* Force the VCPU out of its inner loop to process any INIT requests
+
+
+--
+Alex Benn=C3=A9e
