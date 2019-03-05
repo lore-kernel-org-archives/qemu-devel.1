@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43361)
+Received: from eggs.gnu.org ([209.51.188.92]:43360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14Fe-0002cf-Qx
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:35 -0500
+	(envelope-from <jasowang@redhat.com>) id 1h14Fe-0002ce-Qr
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14Fc-0000WG-IO
+	(envelope-from <jasowang@redhat.com>) id 1h14Fc-0000X3-Rj
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36284)
+Received: from mx1.redhat.com ([209.132.183.28]:50560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14Fb-0000Rk-1a
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14Fc-0000Uv-Gx
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:32 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  5 Mar 2019 15:12:09 +0800
-Message-Id: <1551769940-22739-3-git-send-email-jasowang@redhat.com>
+Date: Tue,  5 Mar 2019 15:12:10 +0800
+Message-Id: <1551769940-22739-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
 References: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 02/13] net: netmap: small improvements
- netmap_send()
+Subject: [Qemu-devel] [PULL V2 03/13] net: netmap: simplify netmap_receive()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +28,82 @@ Cc: Vincenzo Maffione <v.maffione@gmail.com>, Jason Wang <jasowang@redhat.com>
 
 From: Vincenzo Maffione <v.maffione@gmail.com>
 
-This change improves the handling of incomplete multi-slot packets
-(e.g. with the NS_MOREFRAG set), by advancing ring->head only on
-complete packets. The ring->cur pointer is advanced in any case in
-order to acknowledge the kernel and move the wake-up point (thus
-avoiding repeated wake-ups).
-Also don't be verbose when incomplete packets are found.
+Improve code reuse by implementing netmap_receive() with a call
+to netmap_receive_iov().
 
 Signed-off-by: Vincenzo Maffione <v.maffione@gmail.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/netmap.c | 31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+ net/netmap.c | 50 +++++++++++---------------------------------------
+ 1 file changed, 11 insertions(+), 39 deletions(-)
 
 diff --git a/net/netmap.c b/net/netmap.c
-index 2d11a8f..71a8122 100644
+index 71a8122..852106a 100644
 --- a/net/netmap.c
 +++ b/net/netmap.c
-@@ -272,39 +272,46 @@ static void netmap_send(void *opaque)
+@@ -154,45 +154,6 @@ static void netmap_writable(void *opaque)
+     qemu_flush_queued_packets(&s->nc);
+ }
+ 
+-static ssize_t netmap_receive(NetClientState *nc,
+-      const uint8_t *buf, size_t size)
+-{
+-    NetmapState *s = DO_UPCAST(NetmapState, nc, nc);
+-    struct netmap_ring *ring = s->tx;
+-    uint32_t i;
+-    uint32_t idx;
+-    uint8_t *dst;
+-
+-    if (unlikely(!ring)) {
+-        /* Drop. */
+-        return size;
+-    }
+-
+-    if (unlikely(size > ring->nr_buf_size)) {
+-        RD(5, "[netmap_receive] drop packet of size %d > %d\n",
+-                                    (int)size, ring->nr_buf_size);
+-        return size;
+-    }
+-
+-    if (nm_ring_empty(ring)) {
+-        /* No available slots in the netmap TX ring. */
+-        netmap_write_poll(s, true);
+-        return 0;
+-    }
+-
+-    i = ring->cur;
+-    idx = ring->slot[i].buf_idx;
+-    dst = (uint8_t *)NETMAP_BUF(ring, idx);
+-
+-    ring->slot[i].len = size;
+-    ring->slot[i].flags = 0;
+-    pkt_copy(buf, dst, size);
+-    ring->cur = ring->head = nm_ring_next(ring, i);
+-    ioctl(s->nmd->fd, NIOCTXSYNC, NULL);
+-
+-    return size;
+-}
+-
+ static ssize_t netmap_receive_iov(NetClientState *nc,
+                     const struct iovec *iov, int iovcnt)
  {
-     NetmapState *s = opaque;
-     struct netmap_ring *ring = s->rx;
-+    unsigned int tail = ring->tail;
+@@ -259,6 +220,17 @@ static ssize_t netmap_receive_iov(NetClientState *nc,
+     return iov_size(iov, iovcnt);
+ }
  
--    /* Keep sending while there are available packets into the netmap
-+    /* Keep sending while there are available slots in the netmap
-        RX ring and the forwarding path towards the peer is open. */
--    while (!nm_ring_empty(ring)) {
--        uint32_t i;
-+    while (ring->head != tail) {
-+        uint32_t i = ring->head;
-         uint32_t idx;
-         bool morefrag;
-         int iovcnt = 0;
-         int iovsize;
- 
-+        /* Get a (possibly multi-slot) packet. */
-         do {
--            i = ring->cur;
-             idx = ring->slot[i].buf_idx;
-             morefrag = (ring->slot[i].flags & NS_MOREFRAG);
--            s->iov[iovcnt].iov_base = (u_char *)NETMAP_BUF(ring, idx);
-+            s->iov[iovcnt].iov_base = (void *)NETMAP_BUF(ring, idx);
-             s->iov[iovcnt].iov_len = ring->slot[i].len;
-             iovcnt++;
-+            i = nm_ring_next(ring, i);
-+        } while (i != tail && morefrag);
- 
--            ring->cur = ring->head = nm_ring_next(ring, i);
--        } while (!nm_ring_empty(ring) && morefrag);
-+        /* Advance ring->cur to tell the kernel that we have seen the slots. */
-+        ring->cur = i;
- 
--        if (unlikely(nm_ring_empty(ring) && morefrag)) {
--            RD(5, "[netmap_send] ran out of slots, with a pending"
--                   "incomplete packet\n");
-+        if (unlikely(morefrag)) {
-+            /* This is a truncated packet, so we can stop without releasing the
-+             * incomplete slots by updating ring->head. We will hopefully
-+             * re-read the complete packet the next time we are called. */
-+            break;
-         }
- 
-         iovsize = qemu_sendv_packet_async(&s->nc, s->iov, iovcnt,
-                                             netmap_send_completed);
- 
-+        /* Release the slots to the kernel. */
-+        ring->head = i;
++static ssize_t netmap_receive(NetClientState *nc,
++      const uint8_t *buf, size_t size)
++{
++    struct iovec iov;
 +
-         if (iovsize == 0) {
-             /* The peer does not receive anymore. Packet is queued, stop
--             * reading from the backend until netmap_send_completed()
--             */
-+             * reading from the backend until netmap_send_completed(). */
-             netmap_read_poll(s, false);
-             break;
-         }
++    iov.iov_base = (void *)buf;
++    iov.iov_len = size;
++
++    return netmap_receive_iov(nc, &iov, 1);
++}
++
+ /* Complete a previous send (backend --> guest) and enable the
+    fd_read callback. */
+ static void netmap_send_completed(NetClientState *nc, ssize_t len)
 -- 
 2.5.0
