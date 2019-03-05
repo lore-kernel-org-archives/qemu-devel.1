@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33546)
+Received: from eggs.gnu.org ([209.51.188.92]:42610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h0xQO-0004kF-5d
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 18:55:12 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h0yMa-00066q-TY
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 19:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h0xQN-0005nm-Cx
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 18:55:12 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38813)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h0xQN-0005lZ-4l
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 18:55:11 -0500
-Received: by mail-wm1-f67.google.com with SMTP id a188so815474wmf.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 15:55:10 -0800 (PST)
-References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-	<1551723614-1823-41-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <fcdcc732-74de-c334-ae6b-dd13ba2a75c5@redhat.com>
-Date: Tue, 5 Mar 2019 00:55:07 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1h0yLF-0002ZL-Ir
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 19:53:58 -0500
+Date: Tue, 5 Mar 2019 11:53:32 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190305005332.GB7877@umbus.fritz.box>
+References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
+	<20190228083821-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1551723614-1823-41-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 40/54] lm32-softmmu.mak: express
- dependencies with Kconfig
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="7ZAtKRhVyVSsbBD2"
+Content-Disposition: inline
+In-Reply-To: <20190228083821-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH 0/5] Improve balloon handling of pagesizes
+ other than 4kiB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>, thuth@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 3/4/19 7:20 PM, Paolo Bonzini wrote:
-> %-softmmu.mak only keep boards and optional device
-> definitions in Kconfig mode.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  default-configs/lm32-softmmu.mak | 10 ++++++----
->  hw/display/Kconfig               |  3 +--
->  hw/lm32/Kconfig                  |  6 ++++++
->  3 files changed, 13 insertions(+), 6 deletions(-)
-> 
-> diff --git a/default-configs/lm32-softmmu.mak b/default-configs/lm32-softmmu.mak
-> index f489838..6d25966 100644
-> --- a/default-configs/lm32-softmmu.mak
-> +++ b/default-configs/lm32-softmmu.mak
-> @@ -1,8 +1,10 @@
->  # Default configuration for lm32-softmmu
->  
-> +# Uncomment the following lines to disable these optional devices:
-> +#
-> +#CONFIG_MILKYMIST_TMU2=n        # disabling it actually causes compile-time failures
-> +
-> +# Boards:
-> +#
->  CONFIG_LM32=y
->  CONFIG_MILKYMIST=y
-> -CONFIG_FRAMEBUFFER=y
-> -CONFIG_PFLASH_CFI01=y
-> -CONFIG_PFLASH_CFI02=y
-> -CONFIG_SD=y
-> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-> index e126cbb..a96ea76 100644
-> --- a/hw/display/Kconfig
-> +++ b/hw/display/Kconfig
-> @@ -70,8 +70,7 @@ config FRAMEBUFFER
->  
->  config MILKYMIST_TMU2
->      bool
-> -    default y
-> -    depends on OPENGL && X11 && MILKYMIST
-> +    depends on OPENGL && X11
->  
->  config SM501
->      bool
-> diff --git a/hw/lm32/Kconfig b/hw/lm32/Kconfig
-> index 4f45840..3d09c2d 100644
-> --- a/hw/lm32/Kconfig
-> +++ b/hw/lm32/Kconfig
-> @@ -1,7 +1,13 @@
->  config LM32
->      bool
->      select PTIMER
-> +    select PFLASH_CFI02
->  
->  config MILKYMIST
->      bool
-> +    # FIXME: disabling it results in compile-time errors
-> +    select MILKYMIST_TMU2 if OPENGL && X11
 
-This should be fixed by 57d434407a... which got merged recently, maybe
-you didn't tried again after rebasing?
+--7ZAtKRhVyVSsbBD2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->      select PTIMER
-> +    select PFLASH_CFI01
-> +    select FRAMEBUFFER
-> +    select SD
-> 
+On Thu, Feb 28, 2019 at 08:39:21AM -0500, Michael S. Tsirkin wrote:
+> On Thu, Feb 14, 2019 at 03:39:11PM +1100, David Gibson wrote:
+> > I posted some RFCs for this back in December, but didn't wrap it up in
+> > time for 3.1.  Posting again for inclusion in 4.0.
+> >=20
+> > The virtio-balloon devices was never really thought out for cases
+> > other than 4kiB pagesize on both guest and host.  It works in some
+> > cases, but in others can be ineffectual or even cause guest memory
+> > corruption.
+> >=20
+> > This series makes a handful of preliminary cleanups, then makes a
+> > change to safely, though not perfectly, handle cases with non 4kiB
+> > pagesizes.
+>=20
+> I'd like to see a version of this that does not depend on patch 1 which
+> is not a cleanup nor a bugfix. Could you look into this please?
+
+Ok... the original series is already applied to master, so I'm not
+exactly sure what you want me to do here.  Should I try to come up
+with a "logical revert" of the first patch?  Or do you intend to
+revert the whole series, and I rewrite the series without the first
+patch?
+
+> We can then debate merits of patch 1 separately.
+>=20
+>=20
+> > Changes since RFC:
+> >  * Further refinement of when to issue warnings in 5/5
+> >=20
+> > David Gibson (5):
+> >   virtio-balloon: Remove unnecessary MADV_WILLNEED on deflate
+> >   virtio-balloon: Corrections to address verification
+> >   virtio-balloon: Rework ballon_page() interface
+> >   virtio-balloon: Use ram_block_discard_range() instead of raw madvise()
+> >   virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size
+> >=20
+> >  hw/virtio/virtio-balloon.c         | 102 ++++++++++++++++++++++++-----
+> >  include/hw/virtio/virtio-balloon.h |   3 +
+> >  2 files changed, 89 insertions(+), 16 deletions(-)
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--7ZAtKRhVyVSsbBD2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx9yIwACgkQbDjKyiDZ
+s5JwKxAAo8AjgSggCZwoBz8Hn/gp/Z4FipGSxBqM6iAo7vzvi3pdo6ufXrHIVQm6
+WCYL0VSpb4fdlAVrc9zFcghsvAiKz5h3vA0/PLfhsHc6nlYNE4QGjNu9brn77puy
+Yv5ZpcHby8W8Ggyi09tK0g9Bg1iPFgca4vuKPcSLFCZ2TkiywxVQ81iMrolZCTgp
+xt07feV8ae0T/G2zSIdxLav3OgErHUJuLIA24L/Vtt9pYQt9EgGt5M5sDvrxJw2M
+gKG8N+7ZwxN+dmEyNDG1W5SD1fLBeSgPxXTgCEHeqwxs48RLG2/RUFEwQyQ1kvTF
+3M7FnUkXw8GyJA8EjN4Edn7gqugwgntNXAJa7wwNIsCf9Dw+MiIj3LLA9N61vq+5
+4NY/VUNsilzf2j1Kd0w4kcpJ86IHFonKsyY2XCZSdYr/QJc5a7dbQfrr7QgR5OOF
+D64El6cSLw4zsK/XVUIMMqybm6HRJWftfKtdzPRYwFYY4G72/iI/CKuXNsEI+MB9
+sPsVGzsXPR0dmRXVGhhrU5vFPAbPHDpXx+DYTWnfCOK1hkynScVf/Fo2rD5Wp41x
+f0cDFaJNqGI/kiOT4L+CbotYp0D2QUTlSeLZSo2FdTLDsERnX0Xk0DsuWujM/JyA
+YRjihOiMNxw2nIa8guuCqoJOYGq4fZAxk0ZBxZEgVEIKJaLA9JQ=
+=Qy4S
+-----END PGP SIGNATURE-----
+
+--7ZAtKRhVyVSsbBD2--
