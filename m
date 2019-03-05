@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44421)
+Received: from eggs.gnu.org ([209.51.188.92]:44443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1Aiv-0004DZ-Ey
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:07:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1Aj1-0004G9-Pf
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:07:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1Aip-0004mG-Nq
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:07:13 -0500
-Received: from mail-wr1-f51.google.com ([209.85.221.51]:46138)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1Aip-0004lK-E0
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:07:07 -0500
-Received: by mail-wr1-f51.google.com with SMTP id i16so9579478wrs.13
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 06:07:07 -0800 (PST)
-References: <1551733750-4902-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1551733750-4902-3-git-send-email-aleksandar.markovic@rt-rk.com>
-	<8acd73e1-219f-b5f7-e001-6f6dd086171d@redhat.com>
-	<BN6PR2201MB12512A365C6D47928700801CC6720@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <96d80f22-8f7b-950a-283d-2c814827cd82@redhat.com>
-Date: Tue, 5 Mar 2019 15:07:04 +0100
+	(envelope-from <armbru@redhat.com>) id 1h1Aj0-0004u1-Lu
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:07:19 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190225183757.27378-1-armbru@redhat.com>
+	<20190225183757.27378-6-armbru@redhat.com>
+	<8691f7df-c802-9528-a474-3bcdfa2aa498@redhat.com>
+	<8736o1vc5g.fsf@dusky.pond.sub.org>
+	<f1cff39e-9612-397a-d408-f0ef8610f699@redhat.com>
+Date: Tue, 05 Mar 2019 15:07:11 +0100
+In-Reply-To: <f1cff39e-9612-397a-d408-f0ef8610f699@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Mar 2019 12:34:36
+	+0100")
+Message-ID: <87k1hd76uo.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB12512A365C6D47928700801CC6720@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=gbk
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 02/14] disas: nanoMIPS: Add graphical
- description of pool organization
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 5/6] vl: Create block backends before
+ setting machine properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,147 +29,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On 3/5/19 1:39 PM, Aleksandar Markovic wrote:
->> From: Philippe Mathieu-Daud¨¦ <philmd@redhat.com>
->> Subject: Re: [Qemu-devel] [PATCH v7 02/14] disas: nanoMIPS: Add graphical description of > pool organization
->>
->> On 3/4/19 10:08 PM, Aleksandar Markovic wrote:
->>> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> On 3/5/19 11:38 AM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>> On 2/25/19 7:37 PM, Markus Armbruster wrote:
+>>>> qemu-system-FOO's main() acts on command line arguments in its own
+>>>> idiosyncratic order.  There's not much method to its madness.
+>>>> Whenever we find a case where one kind of command line argument needs
+>>>> to refer to something created for another kind later, we rejigger the
+>>>> order.
+>>>>
+>>>> Block devices get created long after machine properties get processed.
+>>>> Therefore, block device machine properties can be created, but not
+>>>> set.  No such properties exist.  But the next commit will create some.
+>>>> Time to rejigger again: create block devices earlier.
+>>>>
+>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>> ---
+>>>>  vl.c | 66 ++++++++++++++++++++++++++++++------------------------------
+>>>>  1 file changed, 33 insertions(+), 33 deletions(-)
+>>>>
+>>>> diff --git a/vl.c b/vl.c
+>>>> index 6ce3d2d448..5cb0810ffa 100644
+>>>> --- a/vl.c
+>>>> +++ b/vl.c
+>>>> @@ -4232,6 +4232,39 @@ int main(int argc, char **argv, char **envp)
+>>>>          exit(0);
+>>>>      }
+>>>>=20=20
 >>>
->>> Add graphical description of nanoMIPS instruction pool organization.
+>>> Can we extract this from the main, maybe as "parse_blockdev()"? This
+>>> will ease further 	 :)
+>>=20
+>> I can try and see whether I like it.
+>>=20
+>>>> +    /* If the currently selected machine wishes to override the units=
+-per-bus
+>>>> +     * property of its default HBA interface type, do so now. */
+>>>> +    if (machine_class->units_per_default_bus) {
+>>>> +        override_max_devs(machine_class->block_default_type,
+>>>> +                          machine_class->units_per_default_bus);
+>>>> +    }
+>>>> +
+>>>> +    /* open the virtual block devices */
+>>>> +    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
+>>>> +        BlockdevOptions_queue *bdo =3D QSIMPLEQ_FIRST(&bdo_queue);
+>>>> +
+>>>> +        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
+>>>> +        loc_push_restore(&bdo->loc);
+>>>> +        qmp_blockdev_add(bdo->bdo, &error_fatal);
+>>>> +        loc_pop(&bdo->loc);
+>>>> +        qapi_free_BlockdevOptions(bdo->bdo);
+>>>> +        g_free(bdo);
+>>>> +    }
+>>>> +    if (snapshot || replay_mode !=3D REPLAY_MODE_NONE) {
+>>>> +        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snaps=
+hot,
+>>>> +                          NULL, NULL);
+>>>> +    }
+>>>> +    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
+>>>> +                          &machine_class->block_default_type, &error_=
+fatal)) {
+>>>> +        /* We printed help */
+>>>> +        exit(0);
+>>>> +    }
+>>>> +
+>>>> +    default_drive(default_cdrom, snapshot, machine_class->block_defau=
+lt_type, 2,
+>>>> +                  CDROM_OPTS);
+>>>> +    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+>>>> +    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
+>>>> +
 >>>
->>> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->>> ---
->>>  disas/nanomips.cpp | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>  1 file changed, 102 insertions(+)
+>>> Can you add a comment here such:
 >>>
->>> diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
->>> index 10f6d96..9b44208 100644
->>> --- a/disas/nanomips.cpp
->>> +++ b/disas/nanomips.cpp
->>> @@ -16592,6 +16592,108 @@ std::string NMD::YIELD(uint64 instruction)
->>>
->>>
->>>
->>> +/*
->>> + *                nanoMIPS instruction pool organization
->>> + *                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>> + *
->>> + *
->>> + *                 ©°©¤ P.ADDIU ©¤©¤©¤ P.RI ©¤©¤©¤ P.SYSCALL
->>> + *                 ©¦
->>> + *                 ©¦                                      ©°©¤ P.TRAP
->>> + *                 ©¦                                      ©¦
->>> + *                 ©¦                      ©°©¤ _POOL32A0_0 ©¤©à©¤ P.CMOVE
->>> + *                 ©¦                      ©¦               ©¦
->>> + *                 ©¦                      ©¦               ©¸©¤ P.SLTU
->>> + *                 ©¦        ©°©¤ _POOL32A0 ©¤©È
->>> + *                 ©¦        ©¦             ©¦
->>> + *                 ©¦        ©¦             ©¦
->>> + *                 ©¦        ©¦             ©¸©¤ _POOL32A0_1 ©¤©¤©¤ CRC32
->>> + *                 ©¦        ©¦
->>> + *                 ©À©¤ P32A ©¤©È
->>> + *                 ©¦        ©¦                           ©°©¤ PP.LSX
->>> + *                 ©¦        ©¦             ©°©¤ P.LSX ©¤©¤©¤©¤©¤©È
->>> + *                 ©¦        ©¦             ©¦             ©¸©¤ PP.LSXS
->>> + *                 ©¦        ©¸©¤ _POOL32A7 ©¤©È
->>> + *                 ©¦                      ©¦             ©°©¤ POOL32Axf_4
->>> + *                 ©¦                      ©¸©¤ POOL32Axf ©¤©È
->>> + *                 ©¦                                    ©¸©¤ POOL32Axf_5
->>> + *                 ©¦
->>> + *                 ©À©¤ PBAL
->>> + *                 ©¦
->>> + *                 ©À©¤ P.GP.W   ©°©¤ PP.LSX
->>> + *         ©°©¤ P32 ©¤©È           ©¦
->>> + *         ©¦       ©À©¤ P.GP.BH ©¤©Ø©¤ PP.LSXS
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P.J ©¤©¤©¤©¤©¤©¤©¤ PP.BALRSC
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P48I
->>> + *         ©¦       ©¦           ©°©¤ P.SR
->>> + *         ©¦       ©¦           ©¦
->>> + *         ©¦       ©¦           ©À©¤ P.SHIFT
->>> + *         ©¦       ©¦           ©¦
->>> + *         ©¦       ©À©¤ P.U12 ©¤©¤©¤©à©¤ P.ROTX
->>> + *         ©¦       ©¦           ©¦
->>> + *         ©¦       ©¦           ©À©¤ P.INS
->>> + *         ©¦       ©¦           ©¦
->>> + *         ©¦       ©¦           ©¸©¤ P.EXT
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P.LS.U12 ©¤©¤ P.PREF.U12
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P.BR1 ©¤©¤©¤©¤©¤ P.BR3A
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©¦           ©°©¤ P.LS.S0 ©¤©¤©¤ P16.SYSCALL
->>> + *         ©¦       ©¦           ©¦
->>> + *         ©¦       ©¦           ©¦           ©°©¤ P.LL
->>> + *         ©¦       ©¦           ©À©¤ P.LS.S1 ©¤©È
->>> + *         ©¦       ©¦           ©¦           ©¸©¤ P.SC
->>> + *         ©¦       ©¦           ©¦
->>> + *         ©¦       ©¦           ©¦           ©°©¤ P.PREFE
->>> + *  MAJOR ©¤©È       ©À©¤ P.LS.S9 ©¤©È           ©¦
->>> + *         ©¦       ©¦           ©À©¤ P.LS.E0 ©¤©à©¤ P.LLE
->>> + *         ©¦       ©¦           ©¦           ©¦
->>> + *         ©¦       ©¦           ©¦           ©¸©¤ P.SCE
->>> + *         ©¦       ©¦           ©¦
->>> + *         ©¦       ©¦           ©À©¤ P.LS.WM
->>> + *         ©¦       ©¦           ©¦
->>> + *         ©¦       ©¦           ©¸©¤ P.LS.UAWM
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P.BR2
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P.BRI
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©¸©¤ P.LUI
->>> + *         ©¦
->>> + *         ©¦
->>> + *         ©¦       ©°©¤ P16.MV ©¤©¤©¤©¤ P16.RI ©¤©¤©¤ P16.SYSCALL
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P16.SR
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P16.SHIFT
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P16.4x4
->>> + *         ©¦       ©¦
->>> + *         ©¦       ©À©¤ P16C ©¤©¤©¤©¤©¤©¤ POOL16C_0 ©¤©¤ POOL16C_00
->>> + *         ©¦       ©¦
->>> + *         ©¸©¤ P16 ©¤©à©¤ P16.LB
->>> + *                 ©¦
->>> + *                 ©À©¤ P16.A1
->>> + *                 ©¦
->>> + *                 ©À©¤ P16.LH
->>> + *                 ©¦
->>> + *                 ©À©¤ P16.A2 ©¤©¤©¤©¤ P.ADDIU[RS5]
->>> + *                 ©¦
->>> + *                 ©À©¤ P16.ADDU
->>> + *                 ©¦
->>> + *                 ©¸©¤ P16.BR ©¤©¤©Ð©¤ P16.JRC
->>> + *                             ©¦
->>> + *                             ©¸©¤ P16.BR1
->>
->> Nice ASCII tree! And you got it fits the 80 chars per line limit =)
->>
-> 
-> Too bad we don't have a mark "Enjoyed-by:" ;).
+>>>    /*
+>>>     * Arguments setting properties on devices has to be processed before
+>>>     * the following qemu_opt_foreach(...machine_set_property...) call.
+>>>     */
+>>=20
+>> Hmm, is this accurate?  The issue this patch addresses is
+>>=20
+>>     "arguments creating block backends have to be processed before
+>>     machine_set_property()",
+>>=20
+>> which is an instance of
+>>=20
+>>     "arguments creating backends ...",
+>>=20
+>> which is an instance of
+>>=20
+>>     "arguments creating stuff machine property values can reference ..."
+>>=20
+>> The patch only addresses the instance "block backends".  I have no
+>> appetite for attacking more general problems right now.
+>>=20
+>> See also
+>>=20
+>>     Subject: Re: [Qemu-devel] [PATCH RFC 0/3] qdev: order devices by pri=
+ority before creating them
+>>     Date: Wed, 11 May 2016 09:51:39 +0200
+>>     Message-ID: <87y47hhw1g.fsf@dusky.pond.sub.org>
+>>     https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg01589.ht=
+ml
+>>=20
+>>     Subject: Re: [Qemu-devel] [PATCH] vl: Delay initialization of memory=
+ backends
+>>     Date: Fri, 02 Sep 2016 08:13:17 +0200
+>>     Message-ID: <87poomg77m.fsf@dusky.pond.sub.org>
+>>     https://lists.nongnu.org/archive/html/qemu-devel/2016-09/msg00163.ht=
+ml
+>>=20
+>> That said, I'm fine with adding a comment explaining the more general
+>> mess.  Can you give me some hints on what future readers will find
+>> useful?
+>
+> This can be as simple as:
+>
+>      /*
+>       * Arguments creating block backends have to be processed before
+>       * machine_set_property().
+>       */
+>      parse_blockdev(...);
+>
+> So if I have to hack around in the future I'd look at the commit
+> introducing this comment:
+>
+>   Block devices get created long after machine properties get processed.
+>   Therefore, block device machine properties can be created, but not
+>   set.  No such properties exist.  But the next commit will create some.
+>
+> So I won't rejig this at his previous place :)
 
-There is an "Inspired-by:" although!
+Makes sense, thanks.
 
-> Yes, it does fit 80 characters limit. It was created manually. I stumbled
-> upon https://pythonhosted.org/asciitree/#ascii-trees the other day, but
-> never used it, you may find it useful.
-
-I'm tempted add it to the decodetree script...
-
-> By the way, there is a serious science on creating such trees in the most
-> compact or balanced way. See, for example, Reingold-Tilford algorithm
-> ("Tidier Drawings of Trees", 1981).
-
-Is this how nanoMIPS came with a rebalanced ISA?
-
-Regards,
-
-Phil.
+[...]
