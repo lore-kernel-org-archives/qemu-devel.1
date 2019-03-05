@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49725)
+Received: from eggs.gnu.org ([209.51.188.92]:49798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1Ebw-0000vF-C1
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:17 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1Ebz-0000xz-Ec
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1Ebv-0001eG-3P
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48276)
+	(envelope-from <dgilbert@redhat.com>) id 1h1Eby-0001i7-0T
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1Ebu-0001ab-ME
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:14 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1Ebx-0001gb-M3
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:17 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue,  5 Mar 2019 18:15:41 +0000
-Message-Id: <20190305181602.9051-1-dgilbert@redhat.com>
+Date: Tue,  5 Mar 2019 18:15:45 +0000
+Message-Id: <20190305181602.9051-5-dgilbert@redhat.com>
+In-Reply-To: <20190305181602.9051-1-dgilbert@redhat.com>
+References: <20190305181602.9051-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/21] migration queue
+Subject: [Qemu-devel] [PULL 04/21] exec: Change RAMBlockIterFunc definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +27,278 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Yury Kotov <yury-kotov@yandex-team.ru>
 
-The following changes since commit 0984a157c1c053394adbf64ed7de97f1aebe6a=
-2d:
+Currently, qemu_ram_foreach_* calls RAMBlockIterFunc with many
+block-specific arguments. But often iter func needs RAMBlock*.
+This refactoring is needed for fast access to RAMBlock flags from
+qemu_ram_foreach_block's callback. The only way to achieve this now
+is to call qemu_ram_block_from_host (which also enumerates blocks).
 
-  Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' i=
-nto staging (2019-03-05 09:33:20 +0000)
+So, this patch reduces complexity of
+qemu_ram_foreach_block() -> cb() -> qemu_ram_block_from_host()
+from O(n^2) to O(n).
 
-are available in the Git repository at:
+Fix RAMBlockIterFunc definition and add some functions to read
+RAMBlock* fields witch were passed.
 
-  git://github.com/dagrh/qemu.git tags/pull-migration-20190305a
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Message-Id: <20190215174548.2630-2-yury-kotov@yandex-team.ru>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ exec.c                    | 21 +++++++++++++++++----
+ include/exec/cpu-common.h |  6 ++++--
+ migration/postcopy-ram.c  | 36 +++++++++++++++++++++---------------
+ migration/rdma.c          |  7 +++++--
+ stubs/ram-block.c         | 15 +++++++++++++++
+ util/vfio-helpers.c       |  6 +++---
+ 6 files changed, 65 insertions(+), 26 deletions(-)
 
-for you to fetch changes up to 3feabbb5fc5e3d5504c735a77ebd1d7fc1eabb9b:
-
-  qapi/migration.json: Remove a variable that doesn't exist in example (2=
-019-03-05 18:04:05 +0000)
-
-----------------------------------------------------------------
-Migration pull 2019-03-05
-
-   a) 3 small fixes including the cancel problem
-     that caused the ahci migration test to fail
-     intermittently
-   b) Yury's ignore-shared feature
-   c) Juan's extra tests
-   d) Wei Wang's free page hinting
-   e) Some Colo fixes from Zhang Chen
-
-----------------------------------------------------------------
-Dr. David Alan Gilbert (2):
-      migration: Fix cancel state
-      migration/rdma: Fix qemu_rdma_cleanup null check
-
-Juan Quintela (3):
-      tests: Add migration xbzrle test
-      migration: Create socket-address parameter
-      tests: Add basic migration precopy tcp test
-
-Marcel Apfelbaum (1):
-      migration/rdma: clang compilation fix
-
-Wei Wang (7):
-      bitmap: fix bitmap_count_one
-      bitmap: bitmap_count_one_with_offset
-      migration: use bitmap_mutex in migration_bitmap_clear_dirty
-      migration: API to clear bits of guest free pages from the dirty bit=
-map
-      migration/ram.c: add a notifier chain for precopy
-      migration/ram.c: add the free page optimization enable flag
-      virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT
-
-Yury Kotov (5):
-      exec: Change RAMBlockIterFunc definition
-      migration: Introduce ignore-shared capability
-      migration: Add an ability to ignore shared RAM blocks
-      tests/migration-test: Add a test for ignore-shared capability
-      migration: Add capabilities validation
-
-Zhang Chen (3):
-      Migration/colo.c: Fix double close bug when occur COLO failover
-      Migration/colo.c: Make COLO node running after failover
-      qapi/migration.json: Remove a variable that doesn't exist in exampl=
-e
-
- exec.c                             |  38 ++---
- hmp.c                              |  33 ++++
- hw/virtio/virtio-balloon.c         | 263 +++++++++++++++++++++++++++++++
- include/exec/cpu-common.h          |   7 +-
- include/hw/virtio/virtio-balloon.h |  28 +++-
- include/migration/misc.h           |  22 +++
- include/qemu/bitmap.h              |  17 ++
- migration/colo.c                   |   2 +-
- migration/migration.c              |  52 ++++++-
- migration/migration.h              |   9 +-
- migration/postcopy-ram.c           |  48 +++---
- migration/ram.c                    | 231 ++++++++++++++++++++++++----
- migration/rdma.c                   |  18 ++-
- migration/savevm.c                 | 152 ++++++++++++++++++
- migration/socket.c                 |  11 ++
- qapi/migration.json                |  13 +-
- qapi/sockets.json                  |  18 +++
- stubs/ram-block.c                  |  15 ++
- tests/migration-test.c             | 308 +++++++++++++++++++++++++++++++=
-++----
- util/vfio-helpers.c                |   6 +-
- vl.c                               |   1 +
- 21 files changed, 1169 insertions(+), 123 deletions(-)
+diff --git a/exec.c b/exec.c
+index 518064530b..bf71462929 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1972,6 +1972,21 @@ const char *qemu_ram_get_idstr(RAMBlock *rb)
+     return rb->idstr;
+ }
+=20
++void *qemu_ram_get_host_addr(RAMBlock *rb)
++{
++    return rb->host;
++}
++
++ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
++{
++    return rb->offset;
++}
++
++ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
++{
++    return rb->used_length;
++}
++
+ bool qemu_ram_is_shared(RAMBlock *rb)
+ {
+     return rb->flags & RAM_SHARED;
+@@ -3961,8 +3976,7 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, v=
+oid *opaque)
+=20
+     rcu_read_lock();
+     RAMBLOCK_FOREACH(block) {
+-        ret =3D func(block->idstr, block->host, block->offset,
+-                   block->used_length, opaque);
++        ret =3D func(block, opaque);
+         if (ret) {
+             break;
+         }
+@@ -3981,8 +3995,7 @@ int qemu_ram_foreach_migratable_block(RAMBlockIterF=
+unc func, void *opaque)
+         if (!qemu_ram_is_migratable(block)) {
+             continue;
+         }
+-        ret =3D func(block->idstr, block->host, block->offset,
+-                   block->used_length, opaque);
++        ret =3D func(block, opaque);
+         if (ret) {
+             break;
+         }
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 63ec1f9b37..9cd1f94bc5 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -72,6 +72,9 @@ ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, voi=
+d *host);
+ void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *=
+dev);
+ void qemu_ram_unset_idstr(RAMBlock *block);
+ const char *qemu_ram_get_idstr(RAMBlock *rb);
++void *qemu_ram_get_host_addr(RAMBlock *rb);
++ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
++ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
+ bool qemu_ram_is_shared(RAMBlock *rb);
+ bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+ void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+@@ -116,8 +119,7 @@ void cpu_flush_icache_range(hwaddr start, hwaddr len)=
+;
+ extern struct MemoryRegion io_mem_rom;
+ extern struct MemoryRegion io_mem_notdirty;
+=20
+-typedef int (RAMBlockIterFunc)(const char *block_name, void *host_addr,
+-    ram_addr_t offset, ram_addr_t length, void *opaque);
++typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
+=20
+ int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
+ int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaqu=
+e);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index fa09dba534..b098816221 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -319,10 +319,10 @@ static bool ufd_check_and_apply(int ufd, MigrationI=
+ncomingState *mis)
+=20
+ /* Callback from postcopy_ram_supported_by_host block iterator.
+  */
+-static int test_ramblock_postcopiable(const char *block_name, void *host=
+_addr,
+-                             ram_addr_t offset, ram_addr_t length, void =
+*opaque)
++static int test_ramblock_postcopiable(RAMBlock *rb, void *opaque)
+ {
+-    RAMBlock *rb =3D qemu_ram_block_by_name(block_name);
++    const char *block_name =3D qemu_ram_get_idstr(rb);
++    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+     size_t pagesize =3D qemu_ram_pagesize(rb);
+=20
+     if (length % pagesize) {
+@@ -443,9 +443,12 @@ out:
+  * must be done right at the start prior to pre-copy.
+  * opaque should be the MIS.
+  */
+-static int init_range(const char *block_name, void *host_addr,
+-                      ram_addr_t offset, ram_addr_t length, void *opaque=
+)
++static int init_range(RAMBlock *rb, void *opaque)
+ {
++    const char *block_name =3D qemu_ram_get_idstr(rb);
++    void *host_addr =3D qemu_ram_get_host_addr(rb);
++    ram_addr_t offset =3D qemu_ram_get_offset(rb);
++    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+     trace_postcopy_init_range(block_name, host_addr, offset, length);
+=20
+     /*
+@@ -465,9 +468,12 @@ static int init_range(const char *block_name, void *=
+host_addr,
+  * At the end of migration, undo the effects of init_range
+  * opaque should be the MIS.
+  */
+-static int cleanup_range(const char *block_name, void *host_addr,
+-                        ram_addr_t offset, ram_addr_t length, void *opaq=
+ue)
++static int cleanup_range(RAMBlock *rb, void *opaque)
+ {
++    const char *block_name =3D qemu_ram_get_idstr(rb);
++    void *host_addr =3D qemu_ram_get_host_addr(rb);
++    ram_addr_t offset =3D qemu_ram_get_offset(rb);
++    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+     MigrationIncomingState *mis =3D opaque;
+     struct uffdio_range range_struct;
+     trace_postcopy_cleanup_range(block_name, host_addr, offset, length);
+@@ -586,9 +592,12 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingS=
+tate *mis)
+ /*
+  * Disable huge pages on an area
+  */
+-static int nhp_range(const char *block_name, void *host_addr,
+-                    ram_addr_t offset, ram_addr_t length, void *opaque)
++static int nhp_range(RAMBlock *rb, void *opaque)
+ {
++    const char *block_name =3D qemu_ram_get_idstr(rb);
++    void *host_addr =3D qemu_ram_get_host_addr(rb);
++    ram_addr_t offset =3D qemu_ram_get_offset(rb);
++    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+     trace_postcopy_nhp_range(block_name, host_addr, offset, length);
+=20
+     /*
+@@ -626,15 +635,13 @@ int postcopy_ram_prepare_discard(MigrationIncomingS=
+tate *mis)
+  *   opaque: MigrationIncomingState pointer
+  * Returns 0 on success
+  */
+-static int ram_block_enable_notify(const char *block_name, void *host_ad=
+dr,
+-                                   ram_addr_t offset, ram_addr_t length,
+-                                   void *opaque)
++static int ram_block_enable_notify(RAMBlock *rb, void *opaque)
+ {
+     MigrationIncomingState *mis =3D opaque;
+     struct uffdio_register reg_struct;
+=20
+-    reg_struct.range.start =3D (uintptr_t)host_addr;
+-    reg_struct.range.len =3D length;
++    reg_struct.range.start =3D (uintptr_t)qemu_ram_get_host_addr(rb);
++    reg_struct.range.len =3D qemu_ram_get_used_length(rb);
+     reg_struct.mode =3D UFFDIO_REGISTER_MODE_MISSING;
+=20
+     /* Now tell our userfault_fd that it's responsible for this area */
+@@ -647,7 +654,6 @@ static int ram_block_enable_notify(const char *block_=
+name, void *host_addr,
+         return -1;
+     }
+     if (reg_struct.ioctls & ((__u64)1 << _UFFDIO_ZEROPAGE)) {
+-        RAMBlock *rb =3D qemu_ram_block_by_name(block_name);
+         qemu_ram_set_uf_zeroable(rb);
+     }
+=20
+diff --git a/migration/rdma.c b/migration/rdma.c
+index d5251cd820..b0115e4de5 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -624,9 +624,12 @@ static int rdma_add_block(RDMAContext *rdma, const c=
+har *block_name,
+  * in advanced before the migration starts. This tells us where the RAM =
+blocks
+  * are so that we can register them individually.
+  */
+-static int qemu_rdma_init_one_block(const char *block_name, void *host_a=
+ddr,
+-    ram_addr_t block_offset, ram_addr_t length, void *opaque)
++static int qemu_rdma_init_one_block(RAMBlock *rb, void *opaque)
+ {
++    const char *block_name =3D qemu_ram_get_idstr(rb);
++    void *host_addr =3D qemu_ram_get_host_addr(rb);
++    ram_addr_t block_offset =3D qemu_ram_get_offset(rb);
++    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+     return rdma_add_block(opaque, block_name, host_addr, block_offset, l=
+ength);
+ }
+=20
+diff --git a/stubs/ram-block.c b/stubs/ram-block.c
+index cfa5d8678f..73c0a3ee08 100644
+--- a/stubs/ram-block.c
++++ b/stubs/ram-block.c
+@@ -2,6 +2,21 @@
+ #include "exec/ramlist.h"
+ #include "exec/cpu-common.h"
+=20
++void *qemu_ram_get_host_addr(RAMBlock *rb)
++{
++    return 0;
++}
++
++ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
++{
++    return 0;
++}
++
++ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
++{
++    return 0;
++}
++
+ void ram_block_notifier_add(RAMBlockNotifier *n)
+ {
+ }
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index 342d4a2285..2367fe8f7f 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -391,10 +391,10 @@ static void qemu_vfio_ram_block_removed(RAMBlockNot=
+ifier *n,
+     }
+ }
+=20
+-static int qemu_vfio_init_ramblock(const char *block_name, void *host_ad=
+dr,
+-                                   ram_addr_t offset, ram_addr_t length,
+-                                   void *opaque)
++static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
+ {
++    void *host_addr =3D qemu_ram_get_host_addr(rb);
++    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+     int ret;
+     QEMUVFIOState *s =3D opaque;
+=20
+--=20
+2.20.1
