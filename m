@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52480)
+Received: from eggs.gnu.org ([209.51.188.92]:52882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h19Dt-0004yb-05
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:31:05 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h19Fo-0005gh-CR
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:33:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h19Ds-0004Kn-53
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:31:04 -0500
-Date: Tue, 5 Mar 2019 13:30:58 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190305133058.536c2eeb.cohuck@redhat.com>
-In-Reply-To: <1551466776-29123-13-git-send-email-jjherne@linux.ibm.com>
-References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-	<1551466776-29123-13-git-send-email-jjherne@linux.ibm.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1h19Fm-0003Uo-LD
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:33:04 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h19Fm-0003Qg-8w
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:33:02 -0500
+Received: by mail-pg1-x542.google.com with SMTP id r124so5557545pgr.3
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 04:33:02 -0800 (PST)
+References: <1551712405-2530-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1551712405-2530-8-git-send-email-mateja.marjanovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <467c2597-c0c1-7a59-bc90-080a74be2935@linaro.org>
+Date: Tue, 5 Mar 2019 04:32:57 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1551712405-2530-8-git-send-email-mateja.marjanovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 12/16] s390-bios: Refactor virtio to run
- channel programs via cio
+Subject: Re: [Qemu-devel] [PATCH v3 07/13] target/mips: Add emulation of MMI
+ instruction PEXEW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
 
-On Fri,  1 Mar 2019 13:59:32 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-
-> Now that we have a Channel I/O library let's modify virtio boot code to
-> make use of it for running channel programs.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/virtio.c | 49 +++++++++++++++++++----------------------------
->  1 file changed, 20 insertions(+), 29 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-> index aa9da72..711daf5 100644
-> --- a/pc-bios/s390-ccw/virtio.c
-> +++ b/pc-bios/s390-ccw/virtio.c
-> @@ -14,6 +14,7 @@
->  #include "virtio.h"
->  #include "virtio-scsi.h"
->  #include "bswap.h"
-> +#include "helper.h"
->  
->  #define VRING_WAIT_REPLY_TIMEOUT 30
->  
-> @@ -89,33 +90,20 @@ int drain_irqs(SubChannelId schid)
->      }
->  }
->  
-> -static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
-> +static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
->  {
->      Ccw1 ccw = {};
-> -    CmdOrb orb = {};
-> -    int r;
-> -
-> -    enable_subchannel(vdev->schid);
-> -
-> -    /* start subchannel command */
-> -    orb.fmt = 1;
-> -    orb.cpa = (u32)(long)&ccw;
-> -    orb.lpm = 0x80;
->  
->      ccw.cmd_code = cmd;
->      ccw.cda = (long)ptr;
->      ccw.count = len;
->  
-> -    r = ssch(vdev->schid, &orb);
-> -    /*
-> -     * XXX Wait until device is done processing the CCW. For now we can
-> -     *     assume that a simple tsch will have finished the CCW processing,
-> -     *     but the architecture allows for asynchronous operation
-> -     */
-> -    if (!r) {
-> -        r = drain_irqs(vdev->schid);
-> +    if (sli) {
-> +        ccw.flags |= CCW_FLAG_SLI;
->      }
-> -    return r;
+On 3/4/19 7:13 AM, Mateja Marjanovic wrote:
+> +    } else {
+> +        TCGv_i64 t0 = tcg_temp_new();
+> +        TCGv_i64 t1 = tcg_temp_new();
+> +        TCGv_i64 t2 = tcg_temp_new();
+> +        uint64_t mask0 = (1ULL << 32) - 1;
+> +        uint64_t mask1 = mask0 << 32;
 > +
-> +    enable_subchannel(vdev->schid);
+> +        tcg_gen_movi_i64(t1, 0);
+> +        tcg_gen_andi_i64(t0, cpu_gpr[rt], mask1);
+> +        tcg_gen_or_i64(t1, t0, t1);
+> +        tcg_gen_andi_i64(t0, cpu_mmr[rt], mask0);
+> +        tcg_gen_shri_i64(t0, t0, 64);
 
-As said, maybe just move this to the main routine, instead of having to
-call this here again and again.
+This line should abort, since the shift count is out of range.
+Are you testing with --enable-debug-tcg?
 
-> +    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
->  }
->  
->  static void vring_init(VRing *vr, VqInfo *info)
+> +        tcg_gen_or_i64(t1, t0, t1);
+> +        tcg_gen_mov_i64(t2, t1);
 
-(...)
+But again, this whole thing is two deposit operations:
 
-> @@ -324,7 +314,8 @@ bool virtio_is_supported(SubChannelId schid)
->      vdev.schid = schid;
->      memset(&vdev.senseid, 0, sizeof(vdev.senseid));
->      /* run sense id command */
-> -    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid))) {
-> +    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid),
-> +                true)) {
->          return false;
->      }
->      if (vdev.senseid.cu_type == 0x3832) {
+    tcg_gen_mov_i64(t0, cpu_gpr[rt]);
+    tcg_gen_deposit_i64(cpu_gpr[rd], cpu_gpr[rt], cpu_mmr[rt], 0, 32);
+    tcg_gen_deposit_i64(cpu_mmr[rd], cpu_mmr[rt], t0, 0, 32);
 
-Can't you use the new routine for obtaining the cu type here?
+
+r~
