@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33556)
+Received: from eggs.gnu.org ([209.51.188.92]:35967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1HIR-0002Ly-MC
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:08:20 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1HQR-0004Wg-5t
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1HIM-0005bX-Ab
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:08:16 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:34050)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1HQN-0004ry-1S
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:16:32 -0500
+Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:39559)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1HIC-0004j0-38
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:08:09 -0500
-Received: by mail-oi1-x234.google.com with SMTP id g16so8037549oib.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 13:07:01 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h1HQG-0004dS-1c
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 16:16:27 -0500
+Received: by mail-pf1-x433.google.com with SMTP id i20so6654802pfo.6
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 13:16:20 -0800 (PST)
+References: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
+	<20190303172343.13406-6-mark.cave-ayland@ilande.co.uk>
+	<dac4fce0-f063-5d41-1fc5-66e1eeac3c2c@linaro.org>
+	<a1ffd292-ffd6-0458-7f25-daf064273186@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <19f4a3e9-d58f-b4af-e402-c36100707c38@linaro.org>
+Date: Tue, 5 Mar 2019 13:16:16 -0800
 MIME-Version: 1.0
-References: <20190305165236.8389-1-armbru@redhat.com>
-In-Reply-To: <20190305165236.8389-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Mar 2019 21:06:49 +0000
-Message-ID: <CAFEAcA9L2Z+NXyBAHRGoj5wPzOferogVwGAdh2kd4iU7qwG+yw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] QAPI patches for 2019-03-05
+In-Reply-To: <a1ffd292-ffd6-0458-7f25-daf064273186@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/8] target/ppc: introduce avr_offset()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +34,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Tue, 5 Mar 2019 at 17:07, Markus Armbruster <armbru@redhat.com> wrote:
->
-> The following changes since commit 0984a157c1c053394adbf64ed7de97f1aebe6a2d:
->
->   Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' into staging (2019-03-05 09:33:20 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2019-03-05
->
-> for you to fetch changes up to 56a4689582433125d7042ba506a081e08dc264d4:
->
->   qapi: Fix array first used in a different module (2019-03-05 14:43:11 +0100)
->
-> ----------------------------------------------------------------
-> QAPI patches for 2019-03-05
->
-> ----------------------------------------------------------------
-> Markus Armbruster (7):
->       tests/qapi-schema: Make test-qapi.py print arrays
->       tests/qapi-schema: Cover conditional arrays
->       qapi: Pass file name to QAPIGen constructor instead of methods
->       qapi: Fix code generation for sub-modules in other directories
->       tests: Rename UserDefNativeListUnion to UserDefListUnion
->       tests/qapi-schema: Cover forward reference to sub-module
->       qapi: Fix array first used in a different module
->
+On 3/5/19 9:16 AM, Mark Cave-Ayland wrote:
+> Really though I don't feel too strongly about this, so would you like me to
+> rename it avr_full_offset() to match the existing vsr_full_offset()?
+I do think matching the names makes things clearer.
 
-Applied, thanks.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+r~
