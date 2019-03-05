@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43384)
+Received: from eggs.gnu.org ([209.51.188.92]:43396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14Fj-0002gz-Cr
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:40 -0500
+	(envelope-from <jasowang@redhat.com>) id 1h14Fk-0002hR-0L
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14Fi-0000b2-H2
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46422)
+	(envelope-from <jasowang@redhat.com>) id 1h14Fi-0000bL-SK
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14Fg-0000ZT-KJ
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:36 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14Fi-0000aU-JM
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:12:38 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  5 Mar 2019 15:12:11 +0800
-Message-Id: <1551769940-22739-5-git-send-email-jasowang@redhat.com>
+Date: Tue,  5 Mar 2019 15:12:12 +0800
+Message-Id: <1551769940-22739-6-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
 References: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 04/13] net: netmap: improve
- netmap_receive_iov()
+Subject: [Qemu-devel] [PULL V2 05/13] net: Introduce announce timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +24,207 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: Vincenzo Maffione <v.maffione@gmail.com>, Jason Wang <jasowang@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-From: Vincenzo Maffione <v.maffione@gmail.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Changes:
-  - Save CPU cycles by computing the return value while scanning the
-    input iovec, rather than calling iov_size() at the end.
-  - Remove check for s->tx != NULL, because it cannot happen.
-  - Cache ring->tail in a local variable and use it to check for
-    space in the TX ring. The use of nm_ring_empty() was invalid,
-    because nobody is updating ring->cur and ring->head at that point.
-  - In case we run out of netmap slots in the middle of a packet,
-    move the wake-up point by advancing ring->cur, but do not
-    expose the incomplete packet (i.e., by updating also ring->head).
+The 'announce timer' will be used by migration, and explicit
+requests for qemu to perform network announces.
 
-Signed-off-by: Vincenzo Maffione <v.maffione@gmail.com>
+Based on the work by Germano Veit Michel <germano@redhat.com>
+ and Vlad Yasevich <vyasevic@redhat.com>
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/netmap.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ include/net/announce.h  | 39 ++++++++++++++++++++++++++++++++
+ include/qemu/typedefs.h |  1 +
+ migration/migration.c   |  1 +
+ net/Makefile.objs       |  1 +
+ net/announce.c          | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/net.json           | 23 +++++++++++++++++++
+ 6 files changed, 125 insertions(+)
+ create mode 100644 include/net/announce.h
+ create mode 100644 net/announce.c
 
-diff --git a/net/netmap.c b/net/netmap.c
-index 852106a..0cc8f54 100644
---- a/net/netmap.c
-+++ b/net/netmap.c
-@@ -159,21 +159,22 @@ static ssize_t netmap_receive_iov(NetClientState *nc,
- {
-     NetmapState *s = DO_UPCAST(NetmapState, nc, nc);
-     struct netmap_ring *ring = s->tx;
-+    unsigned int tail = ring->tail;
-+    ssize_t totlen = 0;
-     uint32_t last;
-     uint32_t idx;
-     uint8_t *dst;
-     int j;
-     uint32_t i;
- 
--    if (unlikely(!ring)) {
--        /* Drop the packet. */
--        return iov_size(iov, iovcnt);
--    }
--
--    last = i = ring->cur;
-+    last = i = ring->head;
- 
-     if (nm_ring_space(ring) < iovcnt) {
--        /* Not enough netmap slots. */
-+        /* Not enough netmap slots. Tell the kernel that we have seen the new
-+         * available slots (so that it notifies us again when it has more
-+         * ones), but without publishing any new slots to be processed
-+         * (e.g., we don't advance ring->head). */
-+        ring->cur = tail;
-         netmap_write_poll(s, true);
-         return 0;
-     }
-@@ -183,14 +184,17 @@ static ssize_t netmap_receive_iov(NetClientState *nc,
-         int offset = 0;
-         int nm_frag_size;
- 
-+        totlen += iov_frag_size;
+diff --git a/include/net/announce.h b/include/net/announce.h
+new file mode 100644
+index 0000000..b89f1c2
+--- /dev/null
++++ b/include/net/announce.h
+@@ -0,0 +1,39 @@
++/*
++ *  Self-announce facility
++ *  (c) 2017-2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-         /* Split each iovec fragment over more netmap slots, if
-            necessary. */
-         while (iov_frag_size) {
-             nm_frag_size = MIN(iov_frag_size, ring->nr_buf_size);
++#ifndef QEMU_NET_ANNOUNCE_H
++#define QEMU_NET_ANNOUNCE_H
++
++#include "qemu-common.h"
++#include "qapi/qapi-types-net.h"
++#include "qemu/timer.h"
++
++struct AnnounceTimer {
++    QEMUTimer *tm;
++    AnnounceParameters params;
++    QEMUClockType type;
++    int round;
++};
++
++/* Returns: update the timer to the next time point */
++int64_t qemu_announce_timer_step(AnnounceTimer *timer);
++
++/* Delete the underlying timer */
++void qemu_announce_timer_del(AnnounceTimer *timer);
++
++/*
++ * Under BQL/main thread
++ * Reset the timer to the given parameters/type/notifier.
++ */
++void qemu_announce_timer_reset(AnnounceTimer *timer,
++                               AnnounceParameters *params,
++                               QEMUClockType type,
++                               QEMUTimerCB *cb,
++                               void *opaque);
++
++#endif
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 5d1a2d8..e4a0a65 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -8,6 +8,7 @@
+ typedef struct AdapterInfo AdapterInfo;
+ typedef struct AddressSpace AddressSpace;
+ typedef struct AioContext AioContext;
++typedef struct AnnounceTimer AnnounceTimer;
+ typedef struct BdrvDirtyBitmap BdrvDirtyBitmap;
+ typedef struct BdrvDirtyBitmapIter BdrvDirtyBitmapIter;
+ typedef struct BlockBackend BlockBackend;
+diff --git a/migration/migration.c b/migration/migration.c
+index 37e06b7..a9c4c6f 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -45,6 +45,7 @@
+ #include "migration/colo.h"
+ #include "hw/boards.h"
+ #include "monitor/monitor.h"
++#include "net/announce.h"
  
--            if (unlikely(nm_ring_empty(ring))) {
--                /* We run out of netmap slots while splitting the
-+            if (unlikely(i == tail)) {
-+                /* We ran out of netmap slots while splitting the
-                    iovec fragments. */
-+                ring->cur = tail;
-                 netmap_write_poll(s, true);
-                 return 0;
-             }
-@@ -212,12 +216,13 @@ static ssize_t netmap_receive_iov(NetClientState *nc,
-     /* The last slot must not have NS_MOREFRAG set. */
-     ring->slot[last].flags &= ~NS_MOREFRAG;
+ #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
  
--    /* Now update ring->cur and ring->head. */
--    ring->cur = ring->head = i;
-+    /* Now update ring->head and ring->cur to publish the new slots and
-+     * the new wakeup point. */
-+    ring->head = ring->cur = i;
- 
-     ioctl(s->nmd->fd, NIOCTXSYNC, NULL);
- 
--    return iov_size(iov, iovcnt);
-+    return totlen;
- }
- 
- static ssize_t netmap_receive(NetClientState *nc,
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+index df2b409..8262f03 100644
+--- a/net/Makefile.objs
++++ b/net/Makefile.objs
+@@ -2,6 +2,7 @@ common-obj-y = net.o queue.o checksum.o util.o hub.o
+ common-obj-y += socket.o
+ common-obj-y += dump.o
+ common-obj-y += eth.o
++common-obj-y += announce.o
+ common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
+ common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET_USER)) += vhost-user.o
+ common-obj-$(call land,$(call lnot,$(CONFIG_VIRTIO_NET)),$(CONFIG_VHOST_NET_USER)) += vhost-user-stub.o
+diff --git a/net/announce.c b/net/announce.c
+new file mode 100644
+index 0000000..8876eb6
+--- /dev/null
++++ b/net/announce.c
+@@ -0,0 +1,60 @@
++/*
++ *  Self-announce
++ *  (c) 2017-2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "net/announce.h"
++#include "qapi/clone-visitor.h"
++#include "qapi/qapi-visit-net.h"
++
++int64_t qemu_announce_timer_step(AnnounceTimer *timer)
++{
++    int64_t step;
++
++    step =  timer->params.initial +
++            (timer->params.rounds - timer->round - 1) *
++            timer->params.step;
++
++    if (step < 0 || step > timer->params.max) {
++        step = timer->params.max;
++    }
++    timer_mod(timer->tm, qemu_clock_get_ms(timer->type) + step);
++
++    return step;
++}
++
++void qemu_announce_timer_del(AnnounceTimer *timer)
++{
++    if (timer->tm) {
++        timer_del(timer->tm);
++        timer_free(timer->tm);
++        timer->tm = NULL;
++    }
++}
++
++/*
++ * Under BQL/main thread
++ * Reset the timer to the given parameters/type/notifier.
++ */
++void qemu_announce_timer_reset(AnnounceTimer *timer,
++                               AnnounceParameters *params,
++                               QEMUClockType type,
++                               QEMUTimerCB *cb,
++                               void *opaque)
++{
++    /*
++     * We're under the BQL, so the current timer can't
++     * be firing, so we should be able to delete it.
++     */
++    qemu_announce_timer_del(timer);
++
++    QAPI_CLONE_MEMBERS(AnnounceParameters, &timer->params, params);
++    timer->round = params->rounds;
++    timer->type = type;
++    timer->tm = timer_new_ms(type, cb, opaque);
++}
+diff --git a/qapi/net.json b/qapi/net.json
+index a1a0f39..5face0c 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -684,3 +684,26 @@
+ ##
+ { 'event': 'NIC_RX_FILTER_CHANGED',
+   'data': { '*name': 'str', 'path': 'str' } }
++
++##
++# @AnnounceParameters:
++#
++# Parameters for self-announce timers
++#
++# @initial: Initial delay (in ms) before sending the first GARP/RARP
++#       announcement
++#
++# @max: Maximum delay (in ms) between GARP/RARP announcement packets
++#
++# @rounds: Number of self-announcement attempts
++#
++# @step: Delay increase (in ms) after each self-announcement attempt
++#
++# Since: 4.0
++##
++
++{ 'struct': 'AnnounceParameters',
++  'data': { 'initial': 'int',
++            'max': 'int',
++            'rounds': 'int',
++            'step': 'int' } }
 -- 
 2.5.0
