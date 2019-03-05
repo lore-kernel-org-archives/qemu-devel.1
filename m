@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37295)
+Received: from eggs.gnu.org ([209.51.188.92]:38216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h1FXu-0002Qi-PO
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:16:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1h1Fbt-0003mz-Sj
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:20:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h1FXq-0000cB-PS
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:16:08 -0500
-Received: from smtp.lg.ehu.es ([158.227.0.66]:15897 helo=smtp.ehu.eus)
+	(envelope-from <eblake@redhat.com>) id 1h1Fbr-0008Gn-Vu
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:20:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38603)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
-	id 1h1FXo-0008DK-Be
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:16:05 -0500
-Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
-	by postfix.smtp1.imsva1 (Postfix) with ESMTPS id 1BBEC2C28E
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 20:15:36 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F34C81100C7
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 20:15:35 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E72781100C6
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 20:15:35 +0100 (CET)
-Received: from smtp.ehu.eus (unknown [10.0.100.73])
-	by imsva1.lgp.ehu.es (Postfix) with ESMTPS
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 20:15:35 +0100 (CET)
-Received: from mail-it1-f172.google.com (mail-it1-f172.google.com
-	[209.85.166.172]) by smtp1 (Postfix) with ESMTPSA id 9EE5A2CE1F
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 20:15:35 +0100 (CET)
-Received: by mail-it1-f172.google.com with SMTP id l15so6245804iti.4
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 11:15:35 -0800 (PST)
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h1Fbr-0008EJ-Nf
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 14:20:15 -0500
 References: <CAGZZdDHc12gHaNNisqqBek+2ox1BiuHhwR2k0Tavmt_t+x_D5A@mail.gmail.com>
 	<0ac05885-96d6-9355-0333-31a909fd943b@redhat.com>
-In-Reply-To: <0ac05885-96d6-9355-0333-31a909fd943b@redhat.com>
-Reply-To: unai.martinezcorral@ehu.eus
-From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
-Date: Tue, 5 Mar 2019 20:15:24 +0100
-Message-ID: <CAGZZdDEp7vxzxbWoHn5AF3g28FKSwka1WQB=U5MTv6X=XLeL7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAGZZdDEp7vxzxbWoHn5AF3g28FKSwka1WQB=U5MTv6X=XLeL7A@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3249d2a0-f981-9da1-c4a0-f61dc0acd66d@redhat.com>
+Date: Tue, 5 Mar 2019 13:20:11 -0600
+MIME-Version: 1.0
+In-Reply-To: <CAGZZdDEp7vxzxbWoHn5AF3g28FKSwka1WQB=U5MTv6X=XLeL7A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] qemu-binfmt-conf.sh: add CPUS, add --reset,
  make -p and -c boolean (no arg)
 List-Id: <qemu-devel.nongnu.org>
@@ -46,41 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?Q?Unai_Mart=C3=ADnez_Corral?= <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: unai.martinezcorral@ehu.eus
+Cc: qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-Hi Eric! Thanks for your suggestions.
+On 3/5/19 1:15 PM, Unai Martinez Corral wrote:
 
-2019/3/5 17:57, Eric Blake:
+>>> +      find /proc/sys/fs/binfmt_misc/ -type f -name 'qemu-*' -exec sh -c
+>>> 'echo -1 > {}' \;
+>>
+>> echo -1 is not portable (you are not guaranteed that echo won't try to
+>> treat it as an option); better would be using printf.
+> 
+> Incidentally, I tried with MSYS2 and fedora:29 docker container. On
+> both of them , 'echo -1' works, while 'printf -1' does not. Anyway, I
+> replaced it with 'printf %s -1'. Hope it is ok.
 
-> > +    if [ "$1" = "ALL" ]; then
->
-> Risky, if $1 can ever be "!" (I didn't trace whether the parameters for
-> this function can come from a user deliberately trying to provoke a
-> syntax error).  Better would be:
->
-> if [ "x$1" = xALL ]; then
+You are correct that 'printf -1' is likely to fail, 'printf -- -1' is 
+portable but unusual, and 'printf %s\\n -1' is identical to the common 
+(but non-portable) behavior of 'echo -1'. Is the newline important?
 
-Certainly, I just kept the style that was used before all along the
-script. Nonetheless, as you point out, fixing it does not hurt, so I
-now made all the tests safe by preprending 'x' to both sides. No
-matter where variables come from.
-
-> > +    qemu_check_target_list $(echo "$targets" | tr ',' ' ')
->
-> If desired, you could have used the shell's own splitting via IFS=, (and
-> restoring IFS afterwards) instead of fork()ing out to echo|tr.
-
-Done. Now IFS is used inside qemu_check_target_list.
-
-> > +      find /proc/sys/fs/binfmt_misc/ -type f -name 'qemu-*' -exec sh -c
-> > 'echo -1 > {}' \;
->
-> echo -1 is not portable (you are not guaranteed that echo won't try to
-> treat it as an option); better would be using printf.
-
-Incidentally, I tried with MSYS2 and fedora:29 docker container. On
-both of them , 'echo -1' works, while 'printf -1' does not. Anyway, I
-replaced it with 'printf %s -1'. Hope it is ok.
-
-Unai
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
