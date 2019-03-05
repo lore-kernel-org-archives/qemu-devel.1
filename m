@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59961)
+Received: from eggs.gnu.org ([209.51.188.92]:34076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h1DYS-0007ys-55
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:08:36 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h1DgN-0006q6-Nv
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:16:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h1DYR-0003yI-G6
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:08:36 -0500
-References: <20190225183757.27378-1-armbru@redhat.com>
-	<20190225183757.27378-7-armbru@redhat.com>
-	<87bm2qzfyn.fsf@dusky.pond.sub.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <d610dae9-9c16-9ccc-762a-79cff5ed2be8@redhat.com>
-Date: Tue, 5 Mar 2019 18:08:11 +0100
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h1DgM-0008VN-SM
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:16:47 -0500
+References: <20190303172343.13406-1-mark.cave-ayland@ilande.co.uk>
+	<20190303172343.13406-6-mark.cave-ayland@ilande.co.uk>
+	<dac4fce0-f063-5d41-1fc5-66e1eeac3c2c@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <a1ffd292-ffd6-0458-7f25-daf064273186@ilande.co.uk>
+Date: Tue, 5 Mar 2019 17:16:33 +0000
 MIME-Version: 1.0
-In-Reply-To: <87bm2qzfyn.fsf@dusky.pond.sub.org>
+In-Reply-To: <dac4fce0-f063-5d41-1fc5-66e1eeac3c2c@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 6/6] pc: Support firmware configuration
- with -blockdev
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 5/8] target/ppc: introduce avr_offset()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On 03/04/19 18:50, Markus Armbruster wrote:
+On 03/03/2019 23:29, Richard Henderson wrote:
 
-> Alright, we can call object_get_class(dev_obj)->unparent(dev_obj).
+> On 3/3/19 9:23 AM, Mark Cave-Ayland wrote:
+>> All TCG vector operations require pointers to the base address of the vector
+>> rather than separate access to the top and bottom 64-bits. Convert
+>> the VMX TCG instructions to use a new avr_offset() function instead of
+>> avr64_offset(), which can itself be written as a simple wrapper onto
+>> vsr_full_offset().
+>>
+>> After the conversion is complete then avr64_offset() can be removed since its
+>> functionality is now completely within get_avr64()/set_avr64().
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>  target/ppc/cpu.h                    | 12 +++++++++++-
+>>  target/ppc/translate/vmx-impl.inc.c | 27 +++++++++++----------------
+>>  target/ppc/translate/vsx-impl.inc.c |  5 -----
+>>  3 files changed, 22 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+>> index 326593e0e7..89651988ab 100644
+>> --- a/target/ppc/cpu.h
+>> +++ b/target/ppc/cpu.h
+>> @@ -2598,6 +2598,11 @@ static inline int vsrl_offset(int i)
+>>      return offsetof(CPUPPCState, vsr[i].u64[1]);
+>>  }
+>>  
+>> +static inline int vsr_full_offset(int i)
+>> +{
+>> +    return offsetof(CPUPPCState, vsr[i].u64[0]);
+>> +}
+>> +
+>>  static inline uint64_t *cpu_vsrl_ptr(CPUPPCState *env, int i)
+>>  {
+>>      return (uint64_t *)((uintptr_t)env + vsrl_offset(i));
+>> @@ -2613,9 +2618,14 @@ static inline int avrl_offset(int i)
+>>      return offsetof(CPUPPCState, vsr[32 + i].VsrD(1));
+>>  }
+>>  
+>> +static inline int avr_offset(int i)
+>> +{
+>> +    return vsr_full_offset(i + 32);
+>> +}
 > 
-> Final complication: if I call just that, the device's reference counter
-> goes down to zero in the middle of device_unparent(), and we use after
-> free.  So I bracket he call with object_ref() and object_unref().
+> avr_full_offset?
 
-I don't think that requiring such a bracketing is necessarily a problem.
-I vaguely remember reviewing a kernel patch 6 or so years ago where the
-patch used the same idea, with those "get" and "put" functions (the bug
-the patch was fixing was that the last reference was "temporarily" lost
-mid-operation).
+I chose avr_offset() because once you get to the end of the patchset, everything uses
+offsets to the first byte of the register regardless of endian except for the avr64
+functions (i.e. full becomes the new normal which seems like a fairly standard
+expectation for offset).
 
-So perhaps this can be addressed, for the general case, by extending the
-documentation of device_unparent(). (The function has no documentation
-at all, at the moment.)
+Really though I don't feel too strongly about this, so would you like me to rename it
+avr_full_offset() to match the existing vsr_full_offset()?
 
-Thanks
-Laszlo
+
+
+ATB,
+
+Mark.
