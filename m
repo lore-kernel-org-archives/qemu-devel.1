@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35670)
+Received: from eggs.gnu.org ([209.51.188.92]:35637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DlN-0002GA-2h
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:58 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DlL-0001AJ-PK
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DlL-0002Ee-U2
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:57 -0500
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:51251)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DlK-00016b-Ch
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:55 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:39099)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1DlL-00017Y-E2
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:55 -0500
-Received: by mail-wm1-x32e.google.com with SMTP id n19so3358618wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:21:55 -0800 (PST)
+	id 1h1DlK-00014W-2U
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:54 -0500
+Received: by mail-wr1-x433.google.com with SMTP id l5so10353145wrw.6
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:21:53 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Mar 2019 17:21:36 +0000
-Message-Id: <20190305172139.32662-10-peter.maydell@linaro.org>
+Date: Tue,  5 Mar 2019 17:21:35 +0000
+Message-Id: <20190305172139.32662-9-peter.maydell@linaro.org>
 In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
 References: <20190305172139.32662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 09/12] Makefile,
- configure: Support building rST documentation
+Subject: [Qemu-devel] [PATCH v3 08/12] docs: Provide separate conf.py for
+ each manual we want
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,157 +33,221 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add support to our configure and makefile machinery for building
-our rST docs into HTML files.
+By default Sphinx wants to build a single manual at once.
+For QEMU, this doesn't suit us, because we want to have
+separate manuals for "Developer's Guide", "User Manual",
+and so on, and we don't want to ship the Developer's Guide
+to end-users. However, we don't want to completely duplicate
+conf.py for each manual, and we'd like to continue to
+support "build all docs in one run" for third-party sites
+like readthedocs.org.
 
-Building the documentation now requires that sphinx-build is
-available; this seems better than allowing half the docs to
-be built if it is not present but having half of them missing.
-(In particular it means that assuming that distros configured with
---enable-docs they'll get a helpful error from configure telling
-them the new build dependency.)
+Make the top-level conf.py support two usage forms:
+ (1) as a common config file which is included by the conf.py
+ for each of QEMU's manuals: in this case sphinx-build is run
+ multiple times, once per subdirectory.
+ (2) as a top level conf file which will result in building all
+ the manuals into a single document: in this case sphinx-build is
+ run once, on the top-level docs directory.
 
+Provide per-manual conf.py files and top level pages for
+our first two manuals:
+ * QEMU Developer's Guide (docs/devel)
+ * QEMU System Emulation Management and Interoperability Guide
+   (docs/interop)
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-id: 20190228145624.24885-10-peter.maydell@linaro.org
+Message-id: 20190228145624.24885-9-peter.maydell@linaro.org
 ---
- configure  | 15 +++++++++++++--
- Makefile   | 45 ++++++++++++++++++++++++++++++++++++++++++---
- .gitignore |  1 +
- 3 files changed, 56 insertions(+), 5 deletions(-)
+ docs/conf.py           | 37 +++++++++++++++++++++++++++++++------
+ docs/devel/conf.py     | 15 +++++++++++++++
+ docs/devel/index.rst   | 21 +++++++++++++++++++++
+ docs/index.rst         |  9 ++-------
+ docs/interop/conf.py   | 15 +++++++++++++++
+ docs/interop/index.rst | 18 ++++++++++++++++++
+ 6 files changed, 102 insertions(+), 13 deletions(-)
+ create mode 100644 docs/devel/conf.py
+ create mode 100644 docs/devel/index.rst
+ create mode 100644 docs/interop/conf.py
+ create mode 100644 docs/interop/index.rst
 
-diff --git a/configure b/configure
-index cefeb8fcce4..47bf617fcc5 100755
---- a/configure
-+++ b/configure
-@@ -4589,13 +4589,24 @@ if compile_prog "" "" ; then
-   syncfs=yes
- fi
+diff --git a/docs/conf.py b/docs/conf.py
+index 56a74e0fcb3..f452e424cfe 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -3,6 +3,20 @@
+ # QEMU documentation build configuration file, created by
+ # sphinx-quickstart on Thu Jan 31 16:40:14 2019.
+ #
++# This config file can be used in one of two ways:
++# (1) as a common config file which is included by the conf.py
++# for each of QEMU's manuals: in this case sphinx-build is run multiple
++# times, once per subdirectory.
++# (2) as a top level conf file which will result in building all
++# the manuals into a single document: in this case sphinx-build is
++# run once, on the top-level docs directory.
++#
++# QEMU's makefiles take option (1), which allows us to install
++# only the ones the user cares about (in particular we don't want
++# to ship the 'devel' manual to end-users).
++# Third-party sites such as readthedocs.org will take option (2).
++#
++#
+ # This file is execfile()d with the current directory set to its
+ # containing dir.
+ #
+@@ -12,13 +26,22 @@
+ # All configuration values have a default; values that are commented out
+ # serve to show the default.
  
-+# Check we have a new enough version of sphinx-build
-+has_sphinx_build() {
-+    # This is a bit awkward but works: create a trivial document and
-+    # try to run it with our configuration file (which enforces a
-+    # version requirement). This will fail if either
-+    # sphinx-build doesn't exist at all or if it is too old.
-+    mkdir -p "$TMPDIR1/sphinx"
-+    touch "$TMPDIR1/sphinx/index.rst"
-+    sphinx-build -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
++import os
++import sys
++
++# The per-manual conf.py will set qemu_docdir for a single-manual build;
++# otherwise set it here if this is an entire-manual-set build.
++# This is always the absolute path of the docs/ directory in the source tree.
++try:
++    qemu_docdir
++except NameError:
++    qemu_docdir = os.path.abspath(".")
++
+ # If extensions (or modules to document with autodoc) are in another directory,
+ # add these directories to sys.path here. If the directory is relative to the
+-# documentation root, use os.path.abspath to make it absolute, like shown here.
++# documentation root, use an absolute path starting from qemu_docdir.
+ #
+-# import os
+-# import sys
+-# sys.path.insert(0, os.path.abspath('.'))
++# sys.path.insert(0, os.path.join(qemu_docdir, "my_subdir"))
+ 
+ 
+ # -- General configuration ------------------------------------------------
+@@ -91,8 +114,10 @@ html_theme = 'alabaster'
+ # Theme options are theme-specific and customize the look and feel of a theme
+ # further.  For a list of options available for each theme, see the
+ # documentation.
+-#
+-# html_theme_options = {}
++# We initialize this to empty here, so the per-manual conf.py can just
++# add individual key/value entries.
++html_theme_options = {
 +}
-+
- # Check if tools are available to build documentation.
- if test "$docs" != "no" ; then
--  if has makeinfo && has pod2man; then
-+  if has makeinfo && has pod2man && has_sphinx_build; then
-     docs=yes
-   else
-     if test "$docs" = "yes" ; then
--      feature_not_found "docs" "Install texinfo and Perl/perl-podlators"
-+      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and python-sphinx"
-     fi
-     docs=no
-   fi
-diff --git a/Makefile b/Makefile
-index 2208bde4196..add22cf2947 100644
---- a/Makefile
-+++ b/Makefile
-@@ -388,7 +388,7 @@ dummy := $(call unnest-vars,, \
  
- include $(SRC_PATH)/tests/Makefile.include
- 
--all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
-+all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules
- 
- qemu-version.h: FORCE
- 	$(call quiet-command, \
-@@ -637,6 +637,14 @@ dist: qemu-$(VERSION).tar.bz2
- qemu-%.tar.bz2:
- 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
- 
-+# Note that these commands assume that there are no HTML files in
-+# the docs subdir in the source tree! If there are then this will
-+# blow them away for an in-source-tree 'make clean'.
-+define clean-manual =
-+rm -rf docs/$1/_static
-+rm -f docs/$1/objects.inv docs/$1/searchindex.js docs/$1/*.html
-+endef
+ # Add any paths that contain custom static files (such as style sheets) here,
+ # relative to this directory. They are copied after the builtin static files,
+diff --git a/docs/devel/conf.py b/docs/devel/conf.py
+new file mode 100644
+index 00000000000..7441f87e7f5
+--- /dev/null
++++ b/docs/devel/conf.py
+@@ -0,0 +1,15 @@
++# -*- coding: utf-8 -*-
++#
++# QEMU documentation build configuration file for the 'devel' manual.
++#
++# This includes the top level conf file and then makes any necessary tweaks.
++import sys
++import os
 +
- distclean: clean
- 	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-options.texi qemu-img-cmds.texi qemu-monitor.texi qemu-monitor-info.texi
- 	rm -f config-all-devices.mak config-all-disas.mak config.status
-@@ -657,6 +665,9 @@ distclean: clean
- 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
- 	rm -f docs/qemu-block-drivers.7
- 	rm -f docs/qemu-cpu-models.7
-+	rm -f .doctrees
-+	$(call clean-manual,devel)
-+	$(call clean-manual,interop)
- 	for d in $(TARGET_DIRS); do \
- 	rm -rf $$d || exit 1 ; \
-         done
-@@ -690,7 +701,18 @@ else
- BLOBS=
- endif
++qemu_docdir = os.path.abspath("..")
++parent_config = os.path.join(qemu_docdir, "conf.py")
++exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
++
++# This slightly misuses the 'description', but is the best way to get
++# the manual title to appear in the sidebar.
++html_theme_options['description'] = u'Developer''s Guide'
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+new file mode 100644
+index 00000000000..cd0fa6c9ba2
+--- /dev/null
++++ b/docs/devel/index.rst
+@@ -0,0 +1,21 @@
++.. This is the top level page for the 'devel' manual.
++
++
++QEMU Developer's Guide
++======================
++
++This manual documents various parts of the internals of QEMU.
++You only need to read it if you are interested in reading or
++modifying QEMU's source code.
++
++Contents:
++
++.. toctree::
++   :maxdepth: 2
++
++   loads-stores
++   memory
++   migration
++   stable-process
++   testing
++
+diff --git a/docs/index.rst b/docs/index.rst
+index 93f82228310..3690955dd1f 100644
+--- a/docs/index.rst
++++ b/docs/index.rst
+@@ -10,11 +10,6 @@ Welcome to QEMU's documentation!
+    :maxdepth: 2
+    :caption: Contents:
  
--install-doc: $(DOCS)
-+define install-manual =
-+for d in $$(cd docs && find $1 -type d); do $(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/$$d"; done
-+for f in $$(cd docs && find $1 -type f); do $(INSTALL_DATA) "docs/$$f" "$(DESTDIR)$(qemu_docdir)/$$f"; done
-+endef
-+
-+# Note that we deliberately do not install the "devel" manual: it is
-+# for QEMU developers, and not interesting to our users.
-+.PHONY: install-sphinxdocs
-+install-sphinxdocs: sphinxdocs
-+	$(call install-manual,interop)
-+
-+install-doc: $(DOCS) install-sphinxdocs
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
- 	$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
- 	$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
-@@ -841,6 +863,23 @@ docs/version.texi: $(SRC_PATH)/VERSION
- %.pdf: %.texi docs/version.texi
- 	$(call quiet-command,texi2pdf $(TEXI2PDFFLAGS) $< -o $@,"GEN","$@")
++   interop/index
++   devel/index
  
-+# Sphinx builds all its documentation at once in one invocation
-+# and handles "don't rebuild things unless necessary" itself.
-+# The '.doctrees' files are cached information to speed this up.
-+.PHONY: sphinxdocs
-+sphinxdocs: docs/devel/index.html docs/interop/index.html
+-
+-Indices and tables
+-==================
+-
+-* :ref:`genindex`
+-* :ref:`modindex`
+-* :ref:`search`
+diff --git a/docs/interop/conf.py b/docs/interop/conf.py
+new file mode 100644
+index 00000000000..cf3c69d4a7e
+--- /dev/null
++++ b/docs/interop/conf.py
+@@ -0,0 +1,15 @@
++# -*- coding: utf-8 -*-
++#
++# QEMU documentation build configuration file for the 'interop' manual.
++#
++# This includes the top level conf file and then makes any necessary tweaks.
++import sys
++import os
 +
-+# Canned command to build a single manual
-+build-manual = $(call quiet-command,sphinx-build $(if $(V),,-q) -b html -d .doctrees/$1 $(SRC_PATH)/docs/$1 docs/$1 ,"SPHINX","docs/$1")
-+# We assume all RST files in the manual's directory are used in it
-+manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
++qemu_docdir = os.path.abspath("..")
++parent_config = os.path.join(qemu_docdir, "conf.py")
++exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
 +
-+docs/devel/index.html: $(call manual-deps,devel)
-+	$(call build-manual,devel)
++# This slightly misuses the 'description', but is the best way to get
++# the manual title to appear in the sidebar.
++html_theme_options['description'] = u'System Emulation Management and Interoperability Guide'
+diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+new file mode 100644
+index 00000000000..2df977dd529
+--- /dev/null
++++ b/docs/interop/index.rst
+@@ -0,0 +1,18 @@
++.. This is the top level page for the 'interop' manual.
 +
-+docs/interop/index.html: $(call manual-deps,interop)
-+	$(call build-manual,interop)
 +
- qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
- 
-@@ -869,7 +908,7 @@ docs/qemu-block-drivers.7: docs/qemu-block-drivers.texi
- docs/qemu-cpu-models.7: docs/qemu-cpu-models.texi
- scripts/qemu-trace-stap.1: scripts/qemu-trace-stap.texi
- 
--html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
-+html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html sphinxdocs
- info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
- pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
- txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
-diff --git a/.gitignore b/.gitignore
-index b66b7725512..77522561b8e 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -1,3 +1,4 @@
-+/.doctrees
- /config-devices.*
- /config-all-devices.*
- /config-all-disas.*
++QEMU System Emulation Management and Interoperability Guide
++===========================================================
++
++This manual contains documents and specifications that are useful
++for making QEMU interoperate with other software.
++
++Contents:
++
++.. toctree::
++   :maxdepth: 2
++
++   bitmaps
++   live-block-operations
++   pr-helper
++
 -- 
 2.20.1
