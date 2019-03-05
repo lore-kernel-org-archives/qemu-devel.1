@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60413)
+Received: from eggs.gnu.org ([209.51.188.92]:60655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1BuJ-0005XL-Rh
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:23:04 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1h1BvI-00065C-Og
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1BuI-0001Dk-8A
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:23:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37712)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1h1BvI-0002Ja-1c
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:24:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:61097)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1BuH-00018g-TX
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:23:02 -0500
-Date: Tue, 5 Mar 2019 15:22:49 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190305152249.GG9811@work-vm>
-References: <20190303145021.2962-1-chen.zhang@intel.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1h1BvH-0002Dj-Ps
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:24:03 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue,  5 Mar 2019 16:15:00 +0100
+Message-Id: <20190305151500.25038-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190303145021.2962-1-chen.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH V3 0/7] Migration/colo: Fix upstream bugs
- when occur failover
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] linux-user: fix "may be used uninitialized"
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <chen.zhang@intel.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-* Zhang Chen (chen.zhang@intel.com) wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
-> 
-> This series focus on COLO failover bug fix and optimization.
-> 
-> V3:
->  - Fix grammer issues in patch 4/7.
->  - Add more information in commit log of patch 5/7.
+Fixes:
 
-I've queued 1,3,5 but not the others yet, I need to look 
-to do the reviews on them.
+/home/elmarco/src/qemu/linux-user/syscall.c: In function =E2=80=98do_ioct=
+l_rt=E2=80=99:
+/home/elmarco/src/qemu/linux-user/syscall.c:4773:9: error: =E2=80=98host_=
+rt_dev_ptr=E2=80=99 may be used uninitialized in this function [-Werror=3D=
+maybe-uninitialized]
+     if (*host_rt_dev_ptr !=3D 0) {
+         ^~~~~~~~~~~~~~~~
+/home/elmarco/src/qemu/linux-user/syscall.c:4774:9: error: =E2=80=98targe=
+t_rt_dev_ptr=E2=80=99 may be used uninitialized in this function [-Werror=
+=3Dmaybe-uninitialized]
+         unlock_user((void *)*host_rt_dev_ptr,
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                     *target_rt_dev_ptr, 0);
+                     ~~~~~~~~~~~~~~~~~~~~~~
 
-Dave
+Based on previous discussion from patch "linux-users/syscall: make
+do_ioctl_rt safer" by Alex Benn=C3=A9e.
 
-> V2:
->  - Add patch 4/7 to handle failover state.
->  - Add new patches to optimize failover status.
-> 
-> V1:
->  - Init patch.
-> 
-> 
-> Zhang Chen (7):
->   Migration/colo.c: Fix double close bug when occur COLO failover
->   Migration/colo.c: Fix COLO failover status error
->   Migration/colo.c: Make COLO node running after failover
->   Migration/colo.c: Add new COLOExitReason to handle all failover state
->   qapi/migration.json: Remove a variable that doesn't exist in example
->   Migration/colo.c: Add the necessary checks for colo_do_failover
->   Migration/colo.c: Make user obtain the COLO mode info after failover
-> 
->  migration/colo.c      | 69 ++++++++++++++++++++++++++++++-------------
->  migration/migration.c |  3 ++
->  qapi/migration.json   | 17 ++++++-----
->  3 files changed, 61 insertions(+), 28 deletions(-)
-> 
-> -- 
-> 2.17.GIT
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ linux-user/syscall.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 5bbb72f3d5..a15340b302 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -4723,8 +4723,8 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, u=
+int8_t *buf_temp,
+     const int *dst_offsets, *src_offsets;
+     int target_size;
+     void *argptr;
+-    abi_ulong *target_rt_dev_ptr;
+-    unsigned long *host_rt_dev_ptr;
++    abi_ulong *target_rt_dev_ptr =3D NULL;
++    unsigned long *host_rt_dev_ptr =3D NULL;
+     abi_long ret;
+     int i;
+=20
+@@ -4770,6 +4770,9 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, u=
+int8_t *buf_temp,
+     unlock_user(argptr, arg, 0);
+=20
+     ret =3D get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
++
++    assert(host_rt_dev_ptr !=3D NULL);
++    assert(target_rt_dev_ptr !=3D NULL);
+     if (*host_rt_dev_ptr !=3D 0) {
+         unlock_user((void *)*host_rt_dev_ptr,
+                     *target_rt_dev_ptr, 0);
+--=20
+2.21.0
