@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56128)
+Received: from eggs.gnu.org ([209.51.188.92]:60763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h17TS-0006MJ-S8
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 05:39:04 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1h17sD-0002EN-LD
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:04:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h17TR-0004ou-JR
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 05:39:02 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190225183757.27378-1-armbru@redhat.com>
-	<20190225183757.27378-6-armbru@redhat.com>
-	<8691f7df-c802-9528-a474-3bcdfa2aa498@redhat.com>
-Date: Tue, 05 Mar 2019 11:38:51 +0100
-In-Reply-To: <8691f7df-c802-9528-a474-3bcdfa2aa498@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 4 Mar 2019 17:14:32
-	+0100")
-Message-ID: <8736o1vc5g.fsf@dusky.pond.sub.org>
+	(envelope-from <dovgaluk@ispras.ru>) id 1h17sC-00072W-L7
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:04:37 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:33060)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1h17sC-0006tT-84
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:04:36 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
+	<155074715265.32129.1158027635780211224.stgit@pasha-VirtualBox>
+	<20190304103353.GA6059@localhost.localdomain>
+	<002b01d4d284$3109aa20$931cfe60$@ru>
+	<20190305095238.GB5280@dhcp-200-226.str.redhat.com>
+In-Reply-To: <20190305095238.GB5280@dhcp-200-226.str.redhat.com>
+Date: Tue, 5 Mar 2019 14:04:33 +0300
+Message-ID: <000901d4d343$3750f8b0$a5f2ea10$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 5/6] vl: Create block backends before
- setting machine properties
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v13 19/25] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,170 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: 'Kevin Wolf' <kwolf@redhat.com>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Am 04.03.2019 um 13:17 hat Pavel Dovgalyuk geschrieben:
+> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > Am 21.02.2019 um 12:05 hat Pavel Dovgalyuk geschrieben:
+> > > > Replay is capable of recording normal BH events, but sometimes
+> > > > there are single use callbacks scheduled with aio_bh_schedule_oneshot
+> > > > function. This patch enables recording and replaying such callbacks.
+> > > > Block layer uses these events for calling the completion function.
+> > > > Replaying these calls makes the execution deterministic.
+> > > >
+> > > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > > >
+> > > > --
+> > > >
+> > > > v6:
+> > > >  - moved stub function to the separate file for fixing linux-user build
+> > > > v10:
+> > > >  - replaced all block layer aio_bh_schedule_oneshot calls
+> > > This still doesn't catch all instances, e.g. everything that goes
+> > > through aio_co_schedule() is missing.
+> >
+> > It seems, that everything else is synchronized with blkreplay driver
+> > which is mandatory when using block devices in rr mode.
+> 
+> Ah, yes, this is a good point. blkreplay goes through
+> replay_block_event(), which is where things get synchronised, right?
 
-> On 2/25/19 7:37 PM, Markus Armbruster wrote:
->> qemu-system-FOO's main() acts on command line arguments in its own
->> idiosyncratic order.  There's not much method to its madness.
->> Whenever we find a case where one kind of command line argument needs
->> to refer to something created for another kind later, we rejigger the
->> order.
->>=20
->> Block devices get created long after machine properties get processed.
->> Therefore, block device machine properties can be created, but not
->> set.  No such properties exist.  But the next commit will create some.
->> Time to rejigger again: create block devices earlier.
->>=20
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  vl.c | 66 ++++++++++++++++++++++++++++++------------------------------
->>  1 file changed, 33 insertions(+), 33 deletions(-)
->>=20
->> diff --git a/vl.c b/vl.c
->> index 6ce3d2d448..5cb0810ffa 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -4232,6 +4232,39 @@ int main(int argc, char **argv, char **envp)
->>          exit(0);
->>      }
->>=20=20
->
-> Can we extract this from the main, maybe as "parse_blockdev()"? This
-> will ease further rejigger :)
+Right.
 
-I can try and see whether I like it.
+> Does this mean that most of the places where you replaced a BH with your
+> new function don't actually need it either because they are called
+> through blkreplay and will go through replay_block_event() before
+> reaching the guest?
 
->> +    /* If the currently selected machine wishes to override the units-p=
-er-bus
->> +     * property of its default HBA interface type, do so now. */
->> +    if (machine_class->units_per_default_bus) {
->> +        override_max_devs(machine_class->block_default_type,
->> +                          machine_class->units_per_default_bus);
->> +    }
->> +
->> +    /* open the virtual block devices */
->> +    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
->> +        BlockdevOptions_queue *bdo =3D QSIMPLEQ_FIRST(&bdo_queue);
->> +
->> +        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
->> +        loc_push_restore(&bdo->loc);
->> +        qmp_blockdev_add(bdo->bdo, &error_fatal);
->> +        loc_pop(&bdo->loc);
->> +        qapi_free_BlockdevOptions(bdo->bdo);
->> +        g_free(bdo);
->> +    }
->> +    if (snapshot || replay_mode !=3D REPLAY_MODE_NONE) {
->> +        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapsho=
-t,
->> +                          NULL, NULL);
->> +    }
->> +    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
->> +                          &machine_class->block_default_type, &error_fa=
-tal)) {
->> +        /* We printed help */
->> +        exit(0);
->> +    }
->> +
->> +    default_drive(default_cdrom, snapshot, machine_class->block_default=
-_type, 2,
->> +                  CDROM_OPTS);
->> +    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
->> +    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
->> +
->
-> Can you add a comment here such:
->
->    /*
->     * Arguments setting properties on devices has to be processed before
->     * the following qemu_opt_foreach(...machine_set_property...) call.
->     */
+I'm not sure, maybe some of them are going through the blkreplay driver.
 
-Hmm, is this accurate?  The issue this patch addresses is
+> > > > @@ -1349,8 +1351,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset,
+> int
+> > > bytes,
+> > > >
+> > > >      acb->has_returned = true;
+> > > >      if (acb->rwco.ret != NOT_DONE) {
+> > > > -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
+> > > > -                                blk_aio_complete_bh, acb);
+> > > > +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
+> > > > +                                         blk_aio_complete_bh, acb);
+> > > >      }
+> > >
+> > > This, and a few other places that you convert, are in fast paths and add
+> > > some calls that are unnecessary for non-replay cases.
+> >
+> > I don't think that this can make a noticeable slowdown, but we can run
+> > the tests if you want.
+> > We have the test suite which performs disk-intensive computation.
+> > It was created to measure the effect of running BH callbacks through
+> > the virtual timer infrastructure.
+> 
+> I think this requires quite fast storage to possibly make a difference.
 
-    "arguments creating block backends have to be processed before
-    machine_set_property()",
+True.
 
-which is an instance of
+> Or if you don't have that, maybe a ramdisk or even a null-co:// backend
+> could do the trick. Maybe null-co:// is actually the best option.
 
-    "arguments creating backends ...",
+We've got tests with file copying and compression on qcow2 disks.
+How the null backend can be applied there?
 
-which is an instance of
+> Anyway, if it's not too much work for you, running some tests would be
+> good.
+> 
+> > > I wonder if we could make replay optional in ./configure and then make
+> > > replay_bh_schedule_oneshot_event() a static inline function that can get
+> > > optimised away at compile time if the feature is disabled.
+> >
+> > It is coupled with icount. However, some icount calls are also lie on
+> > the fast paths and are completely useless when icount is not enabled.
+> 
+> Well, the common fast path is KVM, which doesn't have icount at all, so
+> that might make it less critical. :-)
 
-    "arguments creating stuff machine property values can reference ..."
+I see.
 
-The patch only addresses the instance "block backends".  I have no
-appetite for attacking more general problems right now.
+> I get your point, though maybe that just means that both should be
+> possible to be disabled at configure time.
 
-See also
+Right, it may be reasonable for some TCG use cases.
+This could be a separate patch set, because everything changes.
 
-    Subject: Re: [Qemu-devel] [PATCH RFC 0/3] qdev: order devices by priori=
-ty before creating them
-    Date: Wed, 11 May 2016 09:51:39 +0200
-    Message-ID: <87y47hhw1g.fsf@dusky.pond.sub.org>
-    https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg01589.html
-
-    Subject: Re: [Qemu-devel] [PATCH] vl: Delay initialization of memory ba=
-ckends
-    Date: Fri, 02 Sep 2016 08:13:17 +0200
-    Message-ID: <87poomg77m.fsf@dusky.pond.sub.org>
-    https://lists.nongnu.org/archive/html/qemu-devel/2016-09/msg00163.html
-
-That said, I'm fine with adding a comment explaining the more general
-mess.  Can you give me some hints on what future readers will find
-useful?
-
->>      machine_opts =3D qemu_get_machine_opts();
->>      qemu_opt_foreach(machine_opts, machine_set_property, current_machin=
-e,
->>                       &error_fatal);
->> @@ -4355,39 +4388,6 @@ int main(int argc, char **argv, char **envp)
->>      ram_mig_init();
->>      dirty_bitmap_mig_init();
->>=20=20
->> -    /* If the currently selected machine wishes to override the units-p=
-er-bus
->> -     * property of its default HBA interface type, do so now. */
->> -    if (machine_class->units_per_default_bus) {
->> -        override_max_devs(machine_class->block_default_type,
->> -                          machine_class->units_per_default_bus);
->> -    }
->> -
->> -    /* open the virtual block devices */
->> -    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
->> -        BlockdevOptions_queue *bdo =3D QSIMPLEQ_FIRST(&bdo_queue);
->> -
->> -        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
->> -        loc_push_restore(&bdo->loc);
->> -        qmp_blockdev_add(bdo->bdo, &error_fatal);
->> -        loc_pop(&bdo->loc);
->> -        qapi_free_BlockdevOptions(bdo->bdo);
->> -        g_free(bdo);
->> -    }
->> -    if (snapshot || replay_mode !=3D REPLAY_MODE_NONE) {
->> -        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapsho=
-t,
->> -                          NULL, NULL);
->> -    }
->> -    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
->> -                          &machine_class->block_default_type, &error_fa=
-tal)) {
->> -        /* We printed help */
->> -        exit(0);
->> -    }
->> -
->> -    default_drive(default_cdrom, snapshot, machine_class->block_default=
-_type, 2,
->> -                  CDROM_OPTS);
->> -    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
->> -    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
->> -
->>      qemu_opts_foreach(qemu_find_opts("mon"),
->>                        mon_init_func, NULL, &error_fatal);
->>=20=20
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Thanks!
+Pavel Dovgalyuk
