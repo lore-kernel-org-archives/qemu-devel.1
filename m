@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43574)
+Received: from eggs.gnu.org ([209.51.188.92]:43828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14GP-0003Hl-U9
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:22 -0500
+	(envelope-from <thuth@redhat.com>) id 1h14HR-00049n-7f
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:14:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14GN-0000wQ-JQ
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36912)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14GL-0000si-JX
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:18 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  5 Mar 2019 15:12:20 +0800
-Message-Id: <1551769940-22739-14-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-References: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 13/13] tests: Add a test for qemu self
- announcements
+	(envelope-from <thuth@redhat.com>) id 1h14HQ-0001bd-An
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:14:25 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  5 Mar 2019 08:14:14 +0100
+Message-Id: <1551770054-18493-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] target/s390x: Remove non-architected
+ entries from struct LowCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,139 +18,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vlad Yasevich <vyasevic@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, "Jason J. Herne" <jjherne@linux.ibm.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+There are some fields in our struct LowCore which apparently have
+been copied from a very old version of the Linux kernel. These
+fields are not architected in the "Principles of Operation", and
+only used on these memory locations in Linux kernels older than
+2.6.29. Newer Linux kernels moved the entries to different locations
+or are not using them at all anymore. Thus we should never access
+these fields from the QEMU side, so they should be removed.
 
-We now expose qemu_announce_self through QMP and HMP.  Add a test
-with some very basic packet validation (make sure we get a RARP).
+While we're at it, also add a QEMU_BUILD_BUG_MSG() statement to
+assert that struct LowCore has the right size.
 
-Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include     |  3 ++
- tests/test-announce-self.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+)
- create mode 100644 tests/test-announce-self.c
+ v2: Now really added the QEMU_BUILD_BUG_MSG()
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c2ac4b8..5527581 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -225,6 +225,7 @@ check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
- check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-i386-$(CONFIG_RTL8139_PCI) += tests/test-filter-redirector$(EXESUF)
- check-qtest-i386-y += tests/migration-test$(EXESUF)
-+check-qtest-i386-y += tests/test-announce-self$(EXESUF)
- check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
- check-qtest-i386-y += tests/numa-test$(EXESUF)
- check-qtest-x86_64-y += $(check-qtest-i386-y)
-@@ -263,6 +264,7 @@ check-qtest-ppc64-$(CONFIG_PSERIES) += tests/spapr-phb-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_PSERIES) += tests/device-plug-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_POWERNV) += tests/pnv-xscom-test$(EXESUF)
- check-qtest-ppc64-y += tests/migration-test$(EXESUF)
-+check-qtest-ppc64-y += tests/test-announce-self$(EXESUF)
- check-qtest-ppc64-$(CONFIG_PSERIES) += tests/rtas-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
-@@ -779,6 +781,7 @@ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
- tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
- tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
- tests/migration-test$(EXESUF): tests/migration-test.o
-+tests/test-announce-self$(EXESUF): tests/test-announce-self.o
- tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
- 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) \
- 	$(chardev-obj-y)
-diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
-new file mode 100644
-index 0000000..1644d34
---- /dev/null
-+++ b/tests/test-announce-self.c
-@@ -0,0 +1,82 @@
-+/*
-+ * QTest testcase for qemu_announce_self
-+ *
-+ * Copyright (c) 2017 Red hat, Inc.
-+ * Copyright (c) 2014 SUSE LINUX Products GmbH
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qemu-common.h"
-+#include "qemu/sockets.h"
-+#include "qemu/iov.h"
-+#include "libqos/libqos-pc.h"
-+#include "libqos/libqos-spapr.h"
-+
-+#ifndef ETH_P_RARP
-+#define ETH_P_RARP 0x8035
-+#endif
-+
-+static QTestState *test_init(int socket)
-+{
-+    char *args;
-+
-+    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
-+                           "virtio-net-pci,netdev=hs0", socket);
-+
-+    return qtest_start(args);
-+}
-+
-+
-+static void test_announce(int socket)
-+{
-+    char buffer[60];
-+    int len;
-+    QDict *rsp;
-+    int ret;
-+    uint16_t *proto = (uint16_t *)&buffer[12];
-+
-+    rsp = qmp("{ 'execute' : 'announce-self', "
-+                  " 'arguments': {"
-+                      " 'initial': 50, 'max': 550,"
-+                      " 'rounds': 10, 'step': 50 } }");
-+    assert(!qdict_haskey(rsp, "error"));
-+    qobject_unref(rsp);
-+
-+    /* Catch the packet and make sure it's a RARP */
-+    ret = qemu_recv(socket, &len, sizeof(len), 0);
-+    g_assert_cmpint(ret, ==,  sizeof(len));
-+    len = ntohl(len);
-+
-+    ret = qemu_recv(socket, buffer, len, 0);
-+    g_assert_cmpint(*proto, ==, htons(ETH_P_RARP));
-+}
-+
-+static void setup(gconstpointer data)
-+{
-+    QTestState *qs;
-+    void (*func) (int socket) = data;
-+    int sv[2], ret;
-+
-+    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
-+    g_assert_cmpint(ret, !=, -1);
-+
-+    qs = test_init(sv[1]);
-+    func(sv[0]);
-+
-+    /* End test */
-+    close(sv[0]);
-+    qtest_quit(qs);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+    qtest_add_data_func("/virtio/net/test_announce_self", test_announce, setup);
-+
-+    return g_test_run();
-+}
+ target/s390x/internal.h | 41 ++---------------------------------------
+ 1 file changed, 2 insertions(+), 39 deletions(-)
+
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index 7baf0e2..84ce090 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -63,45 +63,7 @@ typedef struct LowCore {
+     PSW             program_new_psw;          /* 0x1d0 */
+     PSW             mcck_new_psw;             /* 0x1e0 */
+     PSW             io_new_psw;               /* 0x1f0 */
+-    PSW             return_psw;               /* 0x200 */
+-    uint8_t         irb[64];                  /* 0x210 */
+-    uint64_t        sync_enter_timer;         /* 0x250 */
+-    uint64_t        async_enter_timer;        /* 0x258 */
+-    uint64_t        exit_timer;               /* 0x260 */
+-    uint64_t        last_update_timer;        /* 0x268 */
+-    uint64_t        user_timer;               /* 0x270 */
+-    uint64_t        system_timer;             /* 0x278 */
+-    uint64_t        last_update_clock;        /* 0x280 */
+-    uint64_t        steal_clock;              /* 0x288 */
+-    PSW             return_mcck_psw;          /* 0x290 */
+-    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
+-    /* System info area */
+-    uint64_t        save_area[16];            /* 0xc00 */
+-    uint8_t         pad10[0xd40 - 0xc80];     /* 0xc80 */
+-    uint64_t        kernel_stack;             /* 0xd40 */
+-    uint64_t        thread_info;              /* 0xd48 */
+-    uint64_t        async_stack;              /* 0xd50 */
+-    uint64_t        kernel_asce;              /* 0xd58 */
+-    uint64_t        user_asce;                /* 0xd60 */
+-    uint64_t        panic_stack;              /* 0xd68 */
+-    uint64_t        user_exec_asce;           /* 0xd70 */
+-    uint8_t         pad11[0xdc0 - 0xd78];     /* 0xd78 */
+-
+-    /* SMP info area: defined by DJB */
+-    uint64_t        clock_comparator;         /* 0xdc0 */
+-    uint64_t        ext_call_fast;            /* 0xdc8 */
+-    uint64_t        percpu_offset;            /* 0xdd0 */
+-    uint64_t        current_task;             /* 0xdd8 */
+-    uint32_t        softirq_pending;          /* 0xde0 */
+-    uint32_t        pad_0x0de4;               /* 0xde4 */
+-    uint64_t        int_clock;                /* 0xde8 */
+-    uint8_t         pad12[0xe00 - 0xdf0];     /* 0xdf0 */
+-
+-    /* 0xe00 is used as indicator for dump tools */
+-    /* whether the kernel died with panic() or not */
+-    uint32_t        panic_magic;              /* 0xe00 */
+-
+-    uint8_t         pad13[0x11b0 - 0xe04];    /* 0xe04 */
++    uint8_t         pad13[0x11b0 - 0x200];    /* 0x200 */
+ 
+     uint64_t        mcesad;                    /* 0x11B0 */
+ 
+@@ -130,6 +92,7 @@ typedef struct LowCore {
+ 
+     uint8_t         pad18[0x2000 - 0x1400];    /* 0x1400 */
+ } QEMU_PACKED LowCore;
++QEMU_BUILD_BUG_MSG(sizeof(LowCore) != 8192, "size of LowCore");
+ #endif /* CONFIG_USER_ONLY */
+ 
+ #define MAX_ILEN 6
 -- 
-2.5.0
+1.8.3.1
