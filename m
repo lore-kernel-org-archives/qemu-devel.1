@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57139)
+Received: from eggs.gnu.org ([209.51.188.92]:58536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1h1IuU-0008NC-32
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:51:42 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1h1J0J-0001Oi-FZ
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:57:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1h1IuT-0002eD-Aj
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:51:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43138)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1h1J0I-0007Ai-Hd
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:57:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46244)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1h1IuT-0002cp-3n
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:51:41 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1h1J0I-0007AK-7E
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:57:42 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CFC983083362
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 22:51:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6B5B33087BA8
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 22:57:41 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  5 Mar 2019 23:51:35 +0100
-Message-Id: <20190305225135.7060-1-marcandre.lureau@redhat.com>
+Date: Tue,  5 Mar 2019 23:57:19 +0100
+Message-Id: <20190305225731.15074-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] vhost-user-test: fix leaks
+Subject: [Qemu-devel] [PATCH v5 00/12] vhost-user-backend & vhost-user-input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +32,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: kraxel@redhat.com, mst@redhat.com
 
-Spotted by ASAN.
+Hi,
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/vhost-user-test.c | 3 +++
- 1 file changed, 3 insertions(+)
+This series is based on previously discussed "[PATCH v4 00/29]
+vhost-user for input & GPU" and "vhost-user: define conventions for
+vhost-user backends" work. The GPU part is left off for now.
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 4cd0a97f13..9364227ba4 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -588,6 +588,7 @@ static void test_server_free(TestServer *server)
-         g_test_message("unable to rmdir: path (%s): %s",
-                        server->tmpfs, strerror(errno));
-     }
-+    g_free(server->tmpfs);
-=20
-     qemu_chr_fe_deinit(&server->chr, true);
-=20
-@@ -605,6 +606,8 @@ static void test_server_free(TestServer *server)
-=20
-     g_main_loop_unref(server->loop);
-     g_main_context_unref(server->context);
-+    g_cond_clear(&server->data_cond);
-+    g_mutex_clear(&server->data_mutex);
-     g_free(server);
- }
-=20
+This series introduces a "vhost-user-backend": an helper object to be
+used by vhost-user devices to ease with backend initialization and
+handling. As a simple showcase, a "vhost-user-input-pci" device is
+introduced, which can be used with the "contrib: add vhost-user-input"
+example. vhost-user-input isn't meant to be installed, discovered or
+used by libvirt: no installation is done (no vhost-user JSON file is
+provided either).
+
+thanks
+
+v5:
+- rebased
+- removed useless "child" struct field leftover
+- add Gerd r-b tags
+
+v4:
+- drop "RFC: add explicit can_migrate to vhost_user_backend_dev_init()"
+- remove useless "cmd" struct field leftover
+
+v3:
+- add previously sent patch "libvhost-user: fix clang enum-conversion
+  warning" to fix clang build
+- "define conventions for vhost-user backends" updates after Eric review
+- Drop user-creatable from vhost-user-backend
+- Make vhost-user-input-pci take a chardev=3D (instead of vhost-user=3D)
+
+v2:
+- rebased (VhostUserInputPCI got most of the changes, due to split)
+- added "RFC: add explicit can_migrate to
+  vhost_user_backend_dev_init()" to attempt to address Michael
+  concerns about migration.
+
+Marc-Andr=C3=A9 Lureau (12):
+  libvhost-user: fix clang enum-conversion warning
+  vhost-user: define conventions for vhost-user backends
+  vhost-user: simplify vhost_user_init/vhost_user_cleanup
+  libvhost-user: exit by default on VHOST_USER_NONE
+  vhost-user: wrap some read/write with retry handling
+  Add vhost-user-backend
+  vhost-user: split vhost_user_read()
+  vhost-user: add vhost_user_input_get_config()
+  libvhost-user-glib: export vug_source_new()
+  libvhost-user: add vu_queue_unpop()
+  Add vhost-user-input-pci
+  contrib: add vhost-user-input
+
+ contrib/libvhost-user/libvhost-user-glib.h |   3 +
+ contrib/libvhost-user/libvhost-user.h      |  17 +-
+ include/hw/virtio/vhost-backend.h          |   4 +
+ include/hw/virtio/vhost-user-blk.h         |   2 +-
+ include/hw/virtio/vhost-user-scsi.h        |   2 +-
+ include/hw/virtio/vhost-user.h             |   2 +-
+ include/hw/virtio/virtio-input.h           |  14 +
+ include/sysemu/vhost-user-backend.h        |  57 +++
+ backends/cryptodev-vhost-user.c            |  18 +-
+ backends/vhost-user.c                      | 209 +++++++++++
+ contrib/libvhost-user/libvhost-user-glib.c |  11 +-
+ contrib/libvhost-user/libvhost-user.c      |  19 +-
+ contrib/vhost-user-input/main.c            | 398 +++++++++++++++++++++
+ hw/block/vhost-user-blk.c                  |  22 +-
+ hw/input/vhost-user-input.c                |  99 +++++
+ hw/scsi/vhost-user-scsi.c                  |  20 +-
+ hw/virtio/vhost-stub.c                     |   4 +-
+ hw/virtio/vhost-user-input-pci.c           |  53 +++
+ hw/virtio/vhost-user.c                     | 118 +++++-
+ net/vhost-user.c                           |  13 +-
+ MAINTAINERS                                |   5 +
+ Makefile                                   |   3 +
+ Makefile.objs                              |   1 +
+ backends/Makefile.objs                     |   3 +
+ configure                                  |   3 +
+ contrib/vhost-user-input/Makefile.objs     |   1 +
+ default-configs/virtio.mak                 |   1 +
+ docs/interop/vhost-user.json               | 232 ++++++++++++
+ docs/interop/vhost-user.txt                | 109 +++++-
+ hw/input/Makefile.objs                     |   1 +
+ hw/virtio/Makefile.objs                    |   1 +
+ 31 files changed, 1359 insertions(+), 86 deletions(-)
+ create mode 100644 include/sysemu/vhost-user-backend.h
+ create mode 100644 backends/vhost-user.c
+ create mode 100644 contrib/vhost-user-input/main.c
+ create mode 100644 hw/input/vhost-user-input.c
+ create mode 100644 hw/virtio/vhost-user-input-pci.c
+ create mode 100644 contrib/vhost-user-input/Makefile.objs
+ create mode 100644 docs/interop/vhost-user.json
+
 --=20
 2.21.0.4.g36eb1cb9cf
