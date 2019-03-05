@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44661)
+Received: from eggs.gnu.org ([209.51.188.92]:45913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h14KW-0006tt-UW
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:17:38 -0500
+	(envelope-from <thuth@redhat.com>) id 1h14PK-0002FW-P4
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:22:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h14KW-00040N-6y
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:17:36 -0500
-References: <20190225183757.27378-1-armbru@redhat.com>
-	<20190225183757.27378-5-armbru@redhat.com>
-	<9218d2e9-5519-055b-dfb9-e78f99559b80@redhat.com>
-	<87mum9x136.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1h14PJ-0000L9-WE
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:22:34 -0500
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-10-git-send-email-jjherne@linux.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <233045ac-e990-bf8c-9a3b-ae0036d65b9b@redhat.com>
-Date: Tue, 5 Mar 2019 08:17:24 +0100
+Message-ID: <e6f488bd-a83d-c550-857b-f1cacf73eccd@redhat.com>
+Date: Tue, 5 Mar 2019 08:22:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <87mum9x136.fsf@dusky.pond.sub.org>
+In-Reply-To: <1551466776-29123-10-git-send-email-jjherne@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/6] sysbus: Fix latent bug with
- onboard devices
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 09/16] s390-bios: ptr2u32
+ and u32toptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On 05/03/2019 07.54, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
+On 01/03/2019 19.59, Jason J. Herne wrote:
+> Introduce inline functions to convert between pointers and unsigned 32-bit
+> ints. These are used to hide the ugliness required to  avoid compiler
+> warnings.
 > 
->> On 25/02/2019 19.37, Markus Armbruster wrote:
-[...]
->>> diff --git a/vl.c b/vl.c
->>> index e3fdce410f..6ce3d2d448 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -3990,6 +3990,10 @@ int main(int argc, char **argv, char **envp)
->>>      }
->>>      object_property_add_child(object_get_root(), "machine",
->>>                                OBJECT(current_machine), &error_abort);
-[...]
->>
->> PS: Not directly related to your patch, but in a separate patch we
->> should also object_unref(current_machine) here to drop the superfluous
->> second reference to current_machine after we added it as a child of the
->> root object.
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  pc-bios/s390-ccw/helper.h | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>  create mode 100644 pc-bios/s390-ccw/helper.h
 > 
-> Just for cleanliness.  Makes sense.
+> diff --git a/pc-bios/s390-ccw/helper.h b/pc-bios/s390-ccw/helper.h
+> new file mode 100644
+> index 0000000..b8bc61b
+> --- /dev/null
+> +++ b/pc-bios/s390-ccw/helper.h
+> @@ -0,0 +1,16 @@
+> +#ifndef S390_CCW_HELPER_H
+> +#define S390_CCW_HELPER_H
+> +
+> +/* Avoids compiler warnings when casting a pointer to a u32 */
+> +static inline uint32_t ptr2u32(void *ptr)
+> +{
 
-Not only for cleanliness ... there is a TODO at the very end of vl.c
-which we should fix one day, and for that we'd need the unref here.
+Would it make sense to add an IPL_assert(ptr <= 0xffffffff) here?
 
- Thomas
+> +    return (uint32_t)(uint64_t)ptr;
+> +}
+> +
+> +/* Avoids compiler warnings when casting a u32 to a pointer */
+> +static inline void *u32toptr(uint32_t n)
+> +{
+> +    return (void *)(uint64_t)n;
+> +}
+> +
+> +#endif
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
