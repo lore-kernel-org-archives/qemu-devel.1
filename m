@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40938)
+Received: from eggs.gnu.org ([209.51.188.92]:40966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h10lK-0007u6-Mt
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:29:03 -0500
+	(envelope-from <jasowang@redhat.com>) id 1h10lR-0007zc-Qm
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:29:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h10lJ-0002f6-6a
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:29:02 -0500
-Date: Tue, 5 Mar 2019 14:28:46 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190305032846.GE7877@umbus.fritz.box>
-References: <20190227085149.38596-1-aik@ozlabs.ru>
-	<20190227085149.38596-5-aik@ozlabs.ru>
-	<20190227153303.7b890f19@bahia.lan>
-	<a31bddd9-dfaf-1a4c-e04b-5f863218c87a@ozlabs.ru>
-	<20190228034950.GB27799@umbus.fritz.box>
-	<3644d6d1-b971-aa51-09c9-f90416147fc7@ozlabs.ru>
+	(envelope-from <jasowang@redhat.com>) id 1h10lQ-0002qa-SB
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:29:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52144)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h10lQ-0002nD-Hw
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:29:08 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2AA00309264D
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 03:21:30 +0000 (UTC)
+References: <20190227132413.13213-1-dgilbert@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <802718c2-eab0-5557-7d3c-1c407bed5bc5@redhat.com>
+Date: Tue, 5 Mar 2019 11:21:22 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="CGDBiGfvSTbxKZlW"
-Content-Disposition: inline
-In-Reply-To: <3644d6d1-b971-aa51-09c9-f90416147fc7@ozlabs.ru>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu v3 4/6] spapr_iommu: Do not
- replay mappings from just created DMA window
+In-Reply-To: <20190227132413.13213-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 0/9] Network announce changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,217 +33,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, qemu-ppc@nongnu.org, Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: quintela@redhat.com, armbru@redhat.com, thuth@redhat.com
 
 
---CGDBiGfvSTbxKZlW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Feb 28, 2019 at 04:37:25PM +1100, Alexey Kardashevskiy wrote:
-> On 28/02/2019 14:49, David Gibson wrote:
-> > On Thu, Feb 28, 2019 at 10:59:56AM +1100, Alexey Kardashevskiy wrote:
-> >>
-> >>
-> >> On 28/02/2019 01:33, Greg Kurz wrote:
-> >>> On Wed, 27 Feb 2019 19:51:47 +1100
-> >>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >>>
-> >>>> On sPAPR vfio_listener_region_add() is called in 2 situations:
-> >>>> 1. a new listener is registered from vfio_connect_container();
-> >>>> 2. a new IOMMU Memory Region is added from rtas_ibm_create_pe_dma_wi=
-ndow().
-> >>>>
-> >>>> In both cases vfio_listener_region_add() calls
-> >>>> memory_region_iommu_replay() to notify newly registered IOMMU notifi=
-ers
-> >>>> about existing mappings which is totally desirable for case 1.
-> >>>>
-> >>>> However for case 2 it is nothing but noop as the window has just been
-> >>>> created and has no valid mappings so replaying those does not do any=
-thing.
-> >>>> It is barely noticeable with usual guests but if the window happens =
-to be
-> >>>> really big, such no-op replay might take minutes and trigger RCU sta=
-ll
-> >>>> warnings in the guest.
-> >>>>
-> >>>> For example, a upcoming GPU RAM memory region mapped at 64TiB (right
-> >>>> after SPAPR_PCI_LIMIT) causes a 64bit DMA window to be at least 128T=
-iB
-> >>>> which is (128<<40)/0x10000=3D2.147.483.648 TCEs to replay.
-> >>>>
-> >>>> This mitigates the problem by adding an "skipping_replay" flag to
-> >>>> sPAPRTCETable and defining sPAPR own IOMMU MR replay() hook which do=
-es
-> >>>> exactly the same thing as the generic one except it returns early if
-> >>>> @skipping_replay=3D=3Dtrue.
-> >>>>
-> >>>> When "ibm,create-pe-dma-window" is complete, the guest will map only
-> >>>> required regions of the huge DMA window.
-> >>>>
-> >>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >>>> ---
-> >>>>  include/hw/ppc/spapr.h  |  1 +
-> >>>>  hw/ppc/spapr_iommu.c    | 31 +++++++++++++++++++++++++++++++
-> >>>>  hw/ppc/spapr_rtas_ddw.c |  7 +++++++
-> >>>>  3 files changed, 39 insertions(+)
-> >>>>
-> >>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >>>> index 86b0488..358bb38 100644
-> >>>> --- a/include/hw/ppc/spapr.h
-> >>>> +++ b/include/hw/ppc/spapr.h
-> >>>> @@ -727,6 +727,7 @@ struct sPAPRTCETable {
-> >>>>      uint64_t *mig_table;
-> >>>>      bool bypass;
-> >>>>      bool need_vfio;
-> >>>> +    bool skipping_replay;
-> >>>>      int fd;
-> >>>>      MemoryRegion root;
-> >>>>      IOMMUMemoryRegion iommu;
-> >>>> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-> >>>> index 37e98f9..8f23179 100644
-> >>>> --- a/hw/ppc/spapr_iommu.c
-> >>>> +++ b/hw/ppc/spapr_iommu.c
-> >>>> @@ -141,6 +141,36 @@ static IOMMUTLBEntry spapr_tce_translate_iommu(=
-IOMMUMemoryRegion *iommu,
-> >>>>      return ret;
-> >>>>  }
-> >>>> =20
-> >>>> +static void spapr_tce_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNoti=
-fier *n)
-> >>>> +{
-> >>>> +    MemoryRegion *mr =3D MEMORY_REGION(iommu_mr);
-> >>>> +    IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_GET_CLASS(=
-iommu_mr);
-> >>>> +    hwaddr addr, granularity;
-> >>>> +    IOMMUTLBEntry iotlb;
-> >>>> +    sPAPRTCETable *tcet =3D container_of(iommu_mr, sPAPRTCETable, i=
-ommu);
-> >>>> +
-> >>>> +    if (tcet->skipping_replay) {
-> >>>> +        return;
-> >>>> +    }
-> >>>> +
-> >>>> +    granularity =3D memory_region_iommu_get_min_page_size(iommu_mr);
-> >>>> +
-> >>>> +    for (addr =3D 0; addr < memory_region_size(mr); addr +=3D granu=
-larity) {
-> >>>> +        iotlb =3D imrc->translate(iommu_mr, addr, IOMMU_NONE, n->io=
-mmu_idx);
-> >>>> +        if (iotlb.perm !=3D IOMMU_NONE) {
-> >>>> +            n->notify(n, &iotlb);
-> >>>> +        }
-> >>>> +
-> >>>> +        /*
-> >>>> +         * if (2^64 - MR size) < granularity, it's possible to get =
-an
-> >>>> +         * infinite loop here.  This should catch such a wraparound.
-> >>>> +         */
-> >>>> +        if ((addr + granularity) < addr) {
-> >>>> +            break;
-> >>>> +        }
-> >>>> +    }
-> >>>> +}
-> >>>
-> >>> It is a bit unfortunate to duplicate all that code. What about making
-> >>> a memory_region_iommu_replay_generic() helper out of it and call it
-> >>> from spapr_tce_replay() and memory_region_iommu_replay() ?
-> >>
-> >>
-> >> I really do not want to mess with generic code to solve our local sPAPR
-> >> problem, especially when there is a way not to do so.
-> >=20
-> > Well, the thing is, I think we're actually the only user of the
-> > current generic replay - everything else has more efficient structure
-> > aware replay hooks AFAIK.  Which makes this hack even hackier.
->=20
-> If that so, then we are better off removing that loop from
-> memory_region_iommu_replay() at all rather than keeping it generic.
-
-Well.. maybe.  In theory this logic should work, albeit slowly, for
-any IOMMU implementation, it's just that everyone else has more
-efficient implementations at the moment.
-
-> >> And as a next step, I was thinking of removing (i.e. making this replay
-> >> a no-op) from QEMU later and do replay in KVM instead when an IOMMU
-> >> group is attaching to KVM as this is the only case when we need replay
-> >> and KVM has a lot better idea what TCEs are actually valid and can skip
-> >> most of them. This is a bit bigger thing as it requires a KVM capabili=
-ty
-> >> "KVM replays mappings" but when we get it, spapr_tce_replay() will
-> >> become no-op.
-> >=20
-> > That's a good idea longer term.
-> >=20
-> >>> Apart from that, LGTM.
-> >>
-> >> Well. It is a hack, I just do not have taste to tell how nasty it is
-> >> :)
-> >=20
-> > As an interim step until the kernel change, I think we can do a bit
-> > better than this.  First, as Greg suggests we should have the
-> > "generic" replay be a helper and have the spapr one call that with a
-> > little in the way of extra checking.
-> >=20
-> > Second, rather than having an explicit "skip_replay" flag, what we
-> > really want here is to have the replay be a fast no-op if there are no
-> > existing mappings rather than a slow no-op.  So instead I think we
-> > should have a flag which records if any mappings have been made in the
-> > region yet, initialized to false.
-> > The new replay would do nothing if
-> > it's still false.
->=20
-> If QEMU controlled the mappings - sure. But it does not - KVM does it
-> instead via that fast path. So QEMU does not know if there are mappings
-> until it reads all TCEs from mmap'ed KVM TCE table which will fault in
-> all these pages.
-
-Oops, I forgot that; good point.
-
-> We could implement some tricks such are allow reading (or ioctl) from
-> that KVM TCE fd and it could tell what is mapped and what is not in a
-> very condensed format (for example a bit per every 256MB of the guest
-> address space)  ooooor  implement different behavior for mapping with RW
-> or readonly - the latter would fail if there is no backing page
-> allocated yet - and then QEMU could skip these regions when replaying.
-
-Urgh, yeah, this is trickier than I initially thought.  About the
-cleanest approach I can see is to delay allocation of the IOMMU table
-until the first H_PUT_TCE, and only then actually bind the table to
-KVM and allow for H_PUT_TCE acceleration.
-
-Seems pretty awkward, though.  Ok, your hack seems the best way
-forward in the short to medium term, just make sure there are some
-comments there explaining why the hack is valuable.
+On 2019/2/27 =E4=B8=8B=E5=8D=889:24, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Hi,
+>    This is a reworking of a few sets of patches from 2017
+> that were put together by myself, Germano and Vlad that make
+> the network announce system more flexible.
+>
+>    Firstly, it's parameterised, so that you can change the number
+> of packets and the gap between them; the number can be set to 0
+> to disable announce completely.
+>
+>    Secondly, you can force an announce by a qmp or hmp command at
+> any time.  This is useful if you need the guest to do an announce
+> for a different reason; for example if the management layer
+> has just juggled some bonding configuration around.
+>
+>    The packet creation and timing also moves to net/ from migration/
+>
+>    The previous set was:
+>       https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05594.ht=
+ml
+>
+> Dave
+>
+> v6
+>    qmp format change (from Markus's review)
+>    removed gcov line from test (from Thomas's review)
+>    slightly expanded HMP help text (from Thomas's review)
+>
+>
+> Dr. David Alan Gilbert (9):
+>    net: Introduce announce timer
+>    migration: Add announce parameters
+>    virtio-net: Switch to using announce timer
+>    migration: Switch to using announce timer
+>    net: Add a network device specific self-announcement ability
+>    virtio-net: Allow qemu_announce_self to trigger virtio announcements
+>    qmp: Add announce-self command
+>    hmp: Add hmp_announce_self
+>    tests: Add a test for qemu self announcements
+>
+>   hmp-commands.hx                |  16 ++++
+>   hmp.c                          |  33 ++++++++
+>   hmp.h                          |   1 +
+>   hw/net/trace-events            |   6 ++
+>   hw/net/virtio-net.c            |  69 ++++++++++++----
+>   include/hw/virtio/virtio-net.h |   4 +-
+>   include/migration/misc.h       |  12 +--
+>   include/net/announce.h         |  41 ++++++++++
+>   include/net/net.h              |   2 +
+>   include/qemu/typedefs.h        |   1 +
+>   include/sysemu/sysemu.h        |   2 -
+>   migration/migration.c          | 103 +++++++++++++++++++++++-
+>   migration/migration.h          |   4 +
+>   migration/savevm.c             |  72 +----------------
+>   migration/trace-events         |   1 -
+>   net/Makefile.objs              |   1 +
+>   net/announce.c                 | 140 ++++++++++++++++++++++++++++++++=
++
+>   net/trace-events               |   3 +
+>   qapi/migration.json            |  53 ++++++++++++-
+>   qapi/net.json                  |  43 ++++++++++
+>   tests/Makefile.include         |   3 +
+>   tests/test-announce-self.c     |  82 +++++++++++++++++++
+>   tests/test-hmp.c               |   1 +
+>   23 files changed, 590 insertions(+), 103 deletions(-)
+>   create mode 100644 include/net/announce.h
+>   create mode 100644 net/announce.c
+>   create mode 100644 tests/test-announce-self.c
 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Applied.
 
---CGDBiGfvSTbxKZlW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx97OwACgkQbDjKyiDZ
-s5IAWRAAul2YL/bQxDtno1OahaYJZzZb16sgXwIwVnLgvvCUsD1k3ANloltZunrz
-j6y92mmCPktRTmtClkD5mYciQUTIiEcOnIb237yDb/qzEeAnDq0832t2LSA3woTu
-q0d6qvt2PRXobn8xMcMA13agnCPxvc68HvtXQuKKu7dXL7FAW/xAL8/OmOo5NyNI
-orwAwxWsYNof5HfYeCuS6GRYjwA5yoCEh3y75OynQqndnR+hoJRpcIvOVBPtpo9E
-hdSd3NYMERHLm0qUoIn9B4Shi7fMb69KHAqN2wskLdE02p8rivBGG4KoN/Zq/fEj
-OvuS7YTPmfQb6G3ZmQGYIyrhQNfgJljOGXeYxH+VGXFW4qPAJTmWsMk9RqEeToKh
-nxoeTJTfXNRdrnWWLspGK4wP6Q2a1TD7NPvw9xZkDQlmoAaTndNWl6RMfVL/l5Mn
-TOUCUK6e8eb513OEva8OL88RjABrTREareiKpjMK35Kkm2iwKBJbLO1vndPlDcoY
-6Tuf43lMo+EO0YoROk2ZEJkgZukAvFEROL8dFXAbH478uKcFRFisfynupL+vMyTk
-LbsJg6C/AppkSn4IBoFcY6joAG5/WGCQgRLVhifU+pWl/OvCL0ZQYD1WoYUYcRJI
-scE2Q3a7igr2K7Sl/SH1pdhVuNZl9BS/cjQM5Z72DTI4916KY5E=
-=hPzF
------END PGP SIGNATURE-----
-
---CGDBiGfvSTbxKZlW--
+Thanks
