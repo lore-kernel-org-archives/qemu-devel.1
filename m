@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51741)
+Received: from eggs.gnu.org ([209.51.188.92]:52935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1D4J-0004ro-TQ
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:37:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1D9d-00070D-Ez
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:42:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1D4J-0003lS-28
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:37:27 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36554)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1D4I-0003kM-D3
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:37:26 -0500
-Received: by mail-ot1-x342.google.com with SMTP id v62so7970794otb.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 08:37:26 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1h1D9c-0000WG-MG
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:42:57 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-12-armbru@redhat.com>
+	<a20fe845-4f14-4f23-7feb-bb7ca899c2d5@redhat.com>
+Date: Tue, 05 Mar 2019 17:42:42 +0100
+In-Reply-To: <a20fe845-4f14-4f23-7feb-bb7ca899c2d5@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Mar 2019 14:55:57
+	+0100")
+Message-ID: <878sxt5l31.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <CADYoBw1HTzqTjfyDgDbP042AH1EkS1DD7Sf4um8eO7d22t4CDA@mail.gmail.com>
-	<CAFEAcA9UzFdyAFkAuWzcV5x1JDBCTVr=okdLN-MpiduvACt4tw@mail.gmail.com>
-	<CADYoBw3yj9yuxUSFuwCqKbTZNFFDF7Je4Kgxt-Rvd71x3JusQA@mail.gmail.com>
-In-Reply-To: <CADYoBw3yj9yuxUSFuwCqKbTZNFFDF7Je4Kgxt-Rvd71x3JusQA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Mar 2019 16:37:13 +0000
-Message-ID: <CAFEAcA_N83yo8xV3hCpVPFOhQj+R95+8fVePjEXgxKZtQPUP3w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Added periodic IRQ support for
- bcm2836_control local timer
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 11/11] pflash: Clean up after commit
+ 368a354f02b part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bzt <bztemail@gmail.com>
-Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, qemu-ppc@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Mon, 4 Mar 2019 at 19:27, bzt <bztemail@gmail.com> wrote:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> Hi Markus,
 >
-> On 3/4/19, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >> + * The IRQ_TIMER support is still very basic, does not handle timer
-> >> access,
-> >> + * and such there's no point in enabling it without the interrupt flag
-> >> set.
-> >
-> > Can you be more precise about what's missing here? I didn't
+> On 2/26/19 8:34 PM, Markus Armbruster wrote:
+>> QOMification left parameter @size unused in pflash_cfi01_register()
+>> and pflash_cfi02_register().  Obviously, @size should match
+>> @sector_len and @nb_blocs, i.e. size =3D=3D sector_len * nb_blocs.  All
+>> callers satisfy this.
+>>=20
+>> Remove @nb_blocs and compute it from @size and @sector_len.
 >
-> The local timer (as per the referenced QA7 doc calls it, section
-> 4.11), means 3 registers in the ARM Control MMIO, at addresses 0x24,
-> 0x34, 0x38. Please note that I haven't named IRQ_TIMER bit in the
-> irqsrc and fiqsrc fields, that was already defined. This patch
-> implements that one.
+> The pflash devices are simplistically modelled has having a single
+> sector size. This is not true for real hw (pflash have different sector
+> sizes). It is however true for the unofficial VirtPFlash device, which
+> doesn't have any spec.
 >
-> > see anything in the spec that looked like a register for
-> > reading the current timer value (though it would certainly
-> > be usual to provide one).
+> The only valid parameter is @size. The @sector_len and @nb_blocs don't
+> match the hardwares. QEMU @sector_len is currently "The biggest
+> sector_size the device has" and QEMU @nb_blocs is really "@size /
+> @sector_len", although it doesn't match the nb_blocs the hardware has.
 >
-> Those are registers 0x1C and 0x20, called "Core timer access LS/MS",
-> section 4.3. I'll make the comment more clear. Those are not local
-> timer IRQ related, because they could use a different frequency than
-> the IRQ, just happen to be enabled with a bit in the local timer's
-> control register (and not in the core timer control register at 0x0),
-> and on real hardware triggering an IRQ requires both the timer enable
-> and interrupt enable bits to be set. The timer counter is a 64 bits
-> one, while the IRQ's counter is only 28 bit wide, which cannot be
-> directly read, does not use the prescaler, and it's reload value
-> stored in the local timer control register itself (unusal, but that's
-> how it is).
+> I don't disagree with the patch content, but the description is not
+> accurate. We can indeed drop the @nb_blocs argument because we model an
+> unique sector size, thus we can calculate "@nb_blocs =3D @size /
+> @sector_len" in the model.
+>
+> With the patch description fixed:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-OK, so that's just an entirely separate timer whose control bit
-happens to be in the same register? I'd assumed that the enable
-bit here was so you could have the local timer be running but
-not generate interrupts -- in which case when it expired it would
-set the "interrupt flag" (and reload), but it wouldn't assert
-the external interrupt line.
+Let me try to fix it.
 
-In fact thinking about it that does seem like the more plausible
-reading of that specification:
- * bit 28 (Timer enable) enables the timer
- * when it gets to zero we set bit 31 "Interrupt flag"
- * the outbound interrupt line is the logical OR of
-   bits 31 ('interrupt flag') and 29 ('interrupt enable')
+    Our pflash devices are simplistically modelled has having
+    "num-blocks" sectors of equal size "sector-length".  Real hardware
+    commonly has sectors of different sizes.  How our "sector-length"
+    property is related to the physical device's multiple sector sizes
+    is unclear.
 
-Are you sure it doesn't work that way ?
+    Helper functions pflash_cfi01_register() and pflash_cfi02_register()
+    create a pflash device, set properties including "sector-length" and
+    "num-blocks", and realize.  They take parameters @size, @sector_len
+    and @nb_blocs.
 
-I'd have thought that any enable bit for the "core timer" would
-be in the core timer control register at 0x4000_0000. Since the
-"core timer" is (apparently) the source of the clock for all the
-per-CPU architected generic timers, it seems more likely that
-it just runs constantly without an enable bit.
+    QOMification left parameter @size unused.  Obviously, @size should
+    match @sector_len and @nb_blocs, i.e. size =3D=3D sector_len * nb_blocs.
+    All callers satisfy this.
 
-thanks
--- PMM
+    Remove @nb_blocs and compute it from @size and @sector_len.
+
+D'accord?
