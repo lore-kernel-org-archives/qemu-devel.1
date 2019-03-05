@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55200)
+Received: from eggs.gnu.org ([209.51.188.92]:55225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1DJJ-00032X-3T
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:52:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1DJJ-00033S-T0
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:52:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1DJH-0002fg-HQ
+	(envelope-from <armbru@redhat.com>) id 1h1DJH-0002fs-KM
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:52:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49694)
+Received: from mx1.redhat.com ([209.132.183.28]:32870)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h1DJH-0002Yh-2d
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h1DJH-0002Xe-7g
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 11:52:55 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A3E0308338F
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:52:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C4AC7309264C
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:52:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-92.ams2.redhat.com
 	[10.36.116.92])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A4E8860A9A
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:52:44 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4252E5D9CC
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 16:52:42 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  5 Mar 2019 17:52:36 +0100
-Message-Id: <20190305165236.8389-8-armbru@redhat.com>
+Date: Tue,  5 Mar 2019 17:52:33 +0100
+Message-Id: <20190305165236.8389-5-armbru@redhat.com>
 In-Reply-To: <20190305165236.8389-1-armbru@redhat.com>
 References: <20190305165236.8389-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] qapi: Fix array first used in a different
- module
+Subject: [Qemu-devel] [PULL 4/7] qapi: Fix code generation for sub-modules
+ in other directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,107 +36,357 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-We generally put implicitly defined types in whatever module triggered
-their definition.  This is wrong for array types, as the included test
-case demonstrates.  Let's have a closer look at it.
+The #include directives to pull in sub-modules use file names relative
+to the main module.  Works only when all modules are in the same
+directory, or the main module's output directory is in the compiler's
+include path.  Use relative file names instead.
 
-Type 'Status' is defined sub-sub-module.json.  Array type ['Status']
-occurs in main module qapi-schema-test.json and in
-include/sub-module.json.  The main module's use is first, so the array
-type gets put into the main module.
+The dummy variable we generate to avoid empty .o files has an invalid
+name for sub-modules in other directories.  Fix that.
 
-The generated C headers define StatusList in qapi-types.h.  But
-include/qapi-types-sub-module.h uses it without including
-qapi-types.h.  Oops.
-
-To fix that, put the array type into its element type's module.
-
-Now StatusList gets generated into qapi-types-sub-module.h, which all
-its users include.
+Both messed up in commit 252dc3105fc "qapi: Generate separate .h, .c
+for each module".  Escaped testing because tests/qapi-schema-test.json
+doesn't cover sub-modules in other directories, only
+tests/qapi-schema/include-relpath.json does, and we generate and
+compile C code only for the former, not the latter.  Fold the latter
+into the former.  This would have caught the mistakes fixed in this
+commit.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190301154051.23317-8-armbru@redhat.com>
+Message-Id: <20190301154051.23317-5-armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi/common.py                    | 9 +++++----
- tests/qapi-schema/include/sub-module.json | 2 ++
- tests/qapi-schema/qapi-schema-test.out    | 5 +++++
- 3 files changed, 12 insertions(+), 4 deletions(-)
+ scripts/qapi/common.py                     | 33 ++++++++++------
+ tests/.gitignore                           |  8 ++++
+ tests/Makefile.include                     | 44 +++++++++++++++++++---
+ tests/qapi-schema/include-relpath-sub.json |  2 -
+ tests/qapi-schema/include-relpath.err      |  0
+ tests/qapi-schema/include-relpath.exit     |  1 -
+ tests/qapi-schema/include-relpath.json     |  1 -
+ tests/qapi-schema/include-relpath.out      | 20 ----------
+ tests/qapi-schema/include/relpath.json     |  1 -
+ tests/qapi-schema/include/sub-module.json  |  5 +++
+ tests/qapi-schema/qapi-schema-test.json    |  3 ++
+ tests/qapi-schema/qapi-schema-test.out     |  9 +++++
+ tests/qapi-schema/sub-sub-module.json      |  6 +++
+ 13 files changed, 91 insertions(+), 42 deletions(-)
+ delete mode 100644 tests/qapi-schema/include-relpath-sub.json
+ delete mode 100644 tests/qapi-schema/include-relpath.err
+ delete mode 100644 tests/qapi-schema/include-relpath.exit
+ delete mode 100644 tests/qapi-schema/include-relpath.json
+ delete mode 100644 tests/qapi-schema/include-relpath.out
+ delete mode 100644 tests/qapi-schema/include/relpath.json
+ create mode 100644 tests/qapi-schema/include/sub-module.json
+ create mode 100644 tests/qapi-schema/sub-sub-module.json
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index f51948364c..f07869ec73 100644
+index 8512cac427..f51948364c 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -1089,6 +1089,9 @@ class QAPISchemaEntity(object):
-             self.ifcond = typ.ifcond
-         else:
-             self.ifcond = listify_cond(self._ifcond)
-+        if self.info:
-+            self.module = os.path.relpath(self.info['file'],
-+                                          os.path.dirname(schema.fname))
+@@ -2017,8 +2017,8 @@ def mcgen(code, **kwds):
+     return cgen(code, **kwds)
  
-     def is_implicit(self):
-         return not self.info
-@@ -1262,6 +1265,7 @@ class QAPISchemaArrayType(QAPISchemaType):
-         self.element_type = schema.lookup_type(self._element_type_name)
-         assert self.element_type
-         self.element_type.check(schema)
-+        self.module = self.element_type.module
-         self.ifcond = self.element_type.ifcond
  
-     def is_implicit(self):
-@@ -1603,7 +1607,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
+-def guardname(filename):
+-    return re.sub(r'[^A-Za-z0-9_]', '_', filename).upper()
++def c_fname(filename):
++    return re.sub(r'[^A-Za-z0-9_]', '_', filename)
  
- class QAPISchema(object):
-     def __init__(self, fname):
--        self._fname = fname
-+        self.fname = fname
-         if sys.version_info[0] >= 3:
-             f = open(fname, 'r', encoding='utf-8')
-         else:
-@@ -1626,9 +1630,6 @@ class QAPISchema(object):
-         self._entity_list.append(ent)
-         if ent.name is not None:
-             self._entity_dict[ent.name] = ent
--        if ent.info:
--            ent.module = os.path.relpath(ent.info['file'],
--                                         os.path.dirname(self._fname))
  
-     def lookup_entity(self, name, typ=None):
-         ent = self._entity_dict.get(name)
-diff --git a/tests/qapi-schema/include/sub-module.json b/tests/qapi-schema/include/sub-module.json
-index f2bdbd3990..afdb267228 100644
---- a/tests/qapi-schema/include/sub-module.json
-+++ b/tests/qapi-schema/include/sub-module.json
-@@ -3,3 +3,5 @@
- # Sub-module of ../qapi-schema-test.json
+ def guardstart(name):
+@@ -2027,7 +2027,7 @@ def guardstart(name):
+ #define %(name)s
  
- { 'include': '../sub-sub-module.json' }
+ ''',
+-                 name=guardname(name))
++                 name=c_fname(name).upper())
+ 
+ 
+ def guardend(name):
+@@ -2035,7 +2035,7 @@ def guardend(name):
+ 
+ #endif /* %(name)s */
+ ''',
+-                 name=guardname(name))
++                 name=c_fname(name).upper())
+ 
+ 
+ def gen_if(ifcond):
+@@ -2281,9 +2281,9 @@ class QAPIGenC(QAPIGenCCode):
+         return mcgen('''
+ 
+ /* Dummy declaration to prevent empty .o file */
+-char dummy_%(name)s;
++char qapi_dummy_%(name)s;
+ ''',
+-                     name=c_name(self.fname))
++                     name=c_fname(self.fname))
+ 
+ 
+ class QAPIGenH(QAPIGenC):
+@@ -2337,21 +2337,29 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+     def _is_builtin_module(name):
+         return not name
+ 
++    def _module_dirname(self, what, name):
++        if self._is_user_module(name):
++            return os.path.dirname(name)
++        return ''
 +
-+{ 'struct': 'SecondArrayRef', 'data': { 's': ['Status'] } }
+     def _module_basename(self, what, name):
+         ret = '' if self._is_builtin_module(name) else self._prefix
+         if self._is_user_module(name):
+-            dirname, basename = os.path.split(name)
++            basename = os.path.basename(name)
+             ret += what
+             if name != self._main_module:
+                 ret += '-' + os.path.splitext(basename)[0]
+-            ret = os.path.join(dirname, ret)
+         else:
+             name = name[2:] if name else 'builtin'
+             ret += re.sub(r'-', '-' + name + '-', what)
+         return ret
+ 
++    def _module_filename(self, what, name):
++        return os.path.join(self._module_dirname(what, name),
++                            self._module_basename(what, name))
++
+     def _add_module(self, name, blurb):
+-        basename = self._module_basename(self._what, name)
++        basename = self._module_filename(self._what, name)
+         genc = QAPIGenC(basename + '.c', blurb, self._pydoc)
+         genh = QAPIGenH(basename + '.h', blurb, self._pydoc)
+         self._module[name] = (genc, genh)
+@@ -2393,8 +2401,9 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+             self._begin_user_module(name)
+ 
+     def visit_include(self, name, info):
+-        basename = self._module_basename(self._what, name)
++        relname = os.path.relpath(self._module_filename(self._what, name),
++                                  os.path.dirname(self._genh.fname))
+         self._genh.preamble_add(mcgen('''
+-#include "%(basename)s.h"
++#include "%(relname)s.h"
+ ''',
+-                                      basename=basename))
++                                      relname=relname))
+diff --git a/tests/.gitignore b/tests/.gitignore
+index f2bf85c8c4..c88f8f2537 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -12,9 +12,17 @@ test-*
+ !test-*.c
+ !docker/test-*
+ test-qapi-commands.[ch]
++include/test-qapi-commands-sub-module.[ch]
++test-qapi-commands-sub-sub-module.[ch]
+ test-qapi-events.[ch]
++include/test-qapi-events-sub-module.[ch]
++test-qapi-events-sub-sub-module.[ch]
+ test-qapi-types.[ch]
++include/test-qapi-types-sub-module.[ch]
++test-qapi-types-sub-sub-module.[ch]
+ test-qapi-visit.[ch]
++include/test-qapi-visit-sub-module.[ch]
++test-qapi-visit-sub-sub-module.[ch]
+ test-qapi-introspect.[ch]
+ *-test
+ qapi-schema/*.test.*
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 5527581f67..97e1cb90a3 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -441,7 +441,6 @@ qapi-schema += include-format-err.json
+ qapi-schema += include-nested-err.json
+ qapi-schema += include-no-file.json
+ qapi-schema += include-non-file.json
+-qapi-schema += include-relpath.json
+ qapi-schema += include-repetition.json
+ qapi-schema += include-self-cycle.json
+ qapi-schema += include-simple.json
+@@ -508,8 +507,18 @@ qapi-schema += unknown-expr-key.json
+ 
+ check-qapi-schema-y := $(addprefix tests/qapi-schema/, $(qapi-schema))
+ 
+-GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
+-	tests/test-qapi-commands.h tests/test-qapi-events.h \
++GENERATED_FILES += tests/test-qapi-types.h \
++	tests/include/test-qapi-types-sub-module.h \
++	tests/test-qapi-types-sub-sub-module.h \
++	tests/test-qapi-visit.h \
++	tests/include/test-qapi-visit-sub-module.h \
++	tests/test-qapi-visit-sub-sub-module.h \
++	tests/test-qapi-commands.h \
++	tests/include/test-qapi-commands-sub-module.h \
++	tests/test-qapi-commands-sub-sub-module.h \
++	tests/test-qapi-events.h \
++	tests/include/test-qapi-events-sub-module.h \
++	tests/test-qapi-events-sub-sub-module.h \
+ 	tests/test-qapi-introspect.h
+ 
+ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+@@ -537,7 +546,12 @@ QEMU_CFLAGS += -I$(SRC_PATH)/tests
+ # Deps that are common to various different sets of tests below
+ test-util-obj-y = libqemuutil.a
+ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+-test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
++test-qapi-obj-y = tests/test-qapi-types.o \
++	tests/include/test-qapi-types-sub-module.o \
++	tests/test-qapi-types-sub-sub-module.o \
++	tests/test-qapi-visit.o \
++	tests/include/test-qapi-visit-sub-module.o \
++	tests/test-qapi-visit-sub-sub-module.o \
+ 	tests/test-qapi-introspect.o \
+ 	$(test-qom-obj-y)
+ benchmark-crypto-obj-y = $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj-y)
+@@ -613,12 +627,32 @@ tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-obj-y) \
+ 	$(test-block-obj-y)
+ 
+ tests/test-qapi-types.c tests/test-qapi-types.h \
++tests/include/test-qapi-types-sub-module.c \
++tests/include/test-qapi-types-sub-module.h \
++tests/test-qapi-types-sub-sub-module.c \
++tests/test-qapi-types-sub-sub-module.h \
+ tests/test-qapi-visit.c tests/test-qapi-visit.h \
++tests/include/test-qapi-visit-sub-module.c \
++tests/include/test-qapi-visit-sub-module.h \
++tests/test-qapi-visit-sub-sub-module.c \
++tests/test-qapi-visit-sub-sub-module.h \
+ tests/test-qapi-commands.h tests/test-qapi-commands.c \
++tests/include/test-qapi-commands-sub-module.h \
++tests/include/test-qapi-commands-sub-module.c \
++tests/test-qapi-commands-sub-sub-module.h \
++tests/test-qapi-commands-sub-sub-module.c \
+ tests/test-qapi-events.c tests/test-qapi-events.h \
++tests/include/test-qapi-events-sub-module.c \
++tests/include/test-qapi-events-sub-module.h \
++tests/test-qapi-events-sub-sub-module.c \
++tests/test-qapi-events-sub-sub-module.h \
+ tests/test-qapi-introspect.c tests/test-qapi-introspect.h: \
+ tests/test-qapi-gen-timestamp ;
+-tests/test-qapi-gen-timestamp: $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(qapi-py)
++tests/test-qapi-gen-timestamp: \
++		$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json \
++		$(SRC_PATH)/tests/qapi-schema/include/sub-module.json \
++		$(SRC_PATH)/tests/qapi-schema/sub-sub-module.json \
++		$(qapi-py)
+ 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+ 		-o tests -p "test-" $<, \
+ 		"GEN","$(@:%-timestamp=%)")
+diff --git a/tests/qapi-schema/include-relpath-sub.json b/tests/qapi-schema/include-relpath-sub.json
+deleted file mode 100644
+index 4bd4af4162..0000000000
+--- a/tests/qapi-schema/include-relpath-sub.json
++++ /dev/null
+@@ -1,2 +0,0 @@
+-{ 'enum': 'Status',
+-  'data': [ 'good', 'bad', 'ugly' ] }
+diff --git a/tests/qapi-schema/include-relpath.err b/tests/qapi-schema/include-relpath.err
+deleted file mode 100644
+index e69de29bb2..0000000000
+diff --git a/tests/qapi-schema/include-relpath.exit b/tests/qapi-schema/include-relpath.exit
+deleted file mode 100644
+index 573541ac97..0000000000
+--- a/tests/qapi-schema/include-relpath.exit
++++ /dev/null
+@@ -1 +0,0 @@
+-0
+diff --git a/tests/qapi-schema/include-relpath.json b/tests/qapi-schema/include-relpath.json
+deleted file mode 100644
+index 05018f3908..0000000000
+--- a/tests/qapi-schema/include-relpath.json
++++ /dev/null
+@@ -1 +0,0 @@
+-{ 'include': 'include/relpath.json' }
+diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/include-relpath.out
+deleted file mode 100644
+index cf8636b78f..0000000000
+--- a/tests/qapi-schema/include-relpath.out
++++ /dev/null
+@@ -1,20 +0,0 @@
+-module None
+-object q_empty
+-enum QType
+-    prefix QTYPE
+-    member none
+-    member qnull
+-    member qnum
+-    member qstring
+-    member qdict
+-    member qlist
+-    member qbool
+-module include-relpath.json
+-include include/relpath.json
+-module include/relpath.json
+-include include-relpath-sub.json
+-module include-relpath-sub.json
+-enum Status
+-    member good
+-    member bad
+-    member ugly
+diff --git a/tests/qapi-schema/include/relpath.json b/tests/qapi-schema/include/relpath.json
+deleted file mode 100644
+index 45dee24704..0000000000
+--- a/tests/qapi-schema/include/relpath.json
++++ /dev/null
+@@ -1 +0,0 @@
+-{ 'include': '../include-relpath-sub.json' }
+diff --git a/tests/qapi-schema/include/sub-module.json b/tests/qapi-schema/include/sub-module.json
+new file mode 100644
+index 0000000000..f2bdbd3990
+--- /dev/null
++++ b/tests/qapi-schema/include/sub-module.json
+@@ -0,0 +1,5 @@
++# *-*- Mode: Python -*-*
++
++# Sub-module of ../qapi-schema-test.json
++
++{ 'include': '../sub-sub-module.json' }
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
+index 70612f394e..1f130a0491 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -130,6 +130,9 @@
+             'sizes': ['size'],
+             'any': ['any'] } }
+ 
++# for testing sub-modules
++{ 'include': 'include/sub-module.json' }
++
+ # testing commands
+ { 'command': 'user_def_cmd', 'data': {} }
+ { 'command': 'user_def_cmd1', 'data': {'ud1a': 'UserDefOne'} }
 diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index 38c1de70d8..77fb1e1aa9 100644
+index 97f671ca5f..baba4c8384 100644
 --- a/tests/qapi-schema/qapi-schema-test.out
 +++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -144,7 +144,9 @@ object q_obj_sizeList-wrapper
-     member data: sizeList optional=False
- object q_obj_anyList-wrapper
-     member data: anyList optional=False
-+module sub-sub-module.json
- array StatusList Status
-+module qapi-schema-test.json
- object q_obj_StatusList-wrapper
-     member data: StatusList optional=False
- enum UserDefListUnionKind
-@@ -189,6 +191,9 @@ enum Status
-     member good
-     member bad
-     member ugly
+@@ -176,6 +176,15 @@ object UserDefNativeListUnion
+     case string: q_obj_strList-wrapper
+     case sizes: q_obj_sizeList-wrapper
+     case any: q_obj_anyList-wrapper
++include include/sub-module.json
 +module include/sub-module.json
-+object SecondArrayRef
-+    member s: StatusList optional=False
- module qapi-schema-test.json
++include sub-sub-module.json
++module sub-sub-module.json
++enum Status
++    member good
++    member bad
++    member ugly
++module qapi-schema-test.json
  command user_def_cmd None -> None
     gen=True success_response=True boxed=False oob=False preconfig=False
+ object q_obj_user_def_cmd1-arg
+diff --git a/tests/qapi-schema/sub-sub-module.json b/tests/qapi-schema/sub-sub-module.json
+new file mode 100644
+index 0000000000..524ef9b83f
+--- /dev/null
++++ b/tests/qapi-schema/sub-sub-module.json
+@@ -0,0 +1,6 @@
++# *-*- Mode: Python -*-*
++
++# Sub-module of sub-module include/sub-module.json of qapi-schema-test.json
++
++{ 'enum': 'Status',
++  'data': [ 'good', 'bad', 'ugly' ] }
 -- 
 2.17.2
