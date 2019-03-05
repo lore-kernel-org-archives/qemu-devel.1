@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40918)
+Received: from eggs.gnu.org ([209.51.188.92]:42280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h18LK-0007g3-Ne
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:34:44 -0500
+	(envelope-from <bounces@canonical.com>) id 1h18RH-0000yL-Gv
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h18LJ-00047d-9r
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:34:42 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51914)
+	(envelope-from <bounces@canonical.com>) id 1h18RG-0006H3-Dk
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:40:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59038)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h18LJ-0003yA-3N
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:34:41 -0500
-Received: by mail-wm1-f67.google.com with SMTP id n19so2211242wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 03:34:39 -0800 (PST)
-References: <20190225183757.27378-1-armbru@redhat.com>
-	<20190225183757.27378-6-armbru@redhat.com>
-	<8691f7df-c802-9528-a474-3bcdfa2aa498@redhat.com>
-	<8736o1vc5g.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f1cff39e-9612-397a-d408-f0ef8610f699@redhat.com>
-Date: Tue, 5 Mar 2019 12:34:36 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h18RG-0006B6-6N
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:40:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h18RE-0000aA-CB
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 11:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 551C12E8070
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 11:40:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <8736o1vc5g.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 5/6] vl: Create block backends before
- setting machine properties
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 05 Mar 2019 11:30:34 -0000
+From: Luyou Peng <1818483@bugs.launchpad.net>
+Reply-To: Bug 1818483 <1818483@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155168800961.29550.2360664198558693792.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155178543508.32254.15607485178241220659.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818483] Re: qemu user mode does not support
+ binfmt_misc config with flags=P
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,178 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: qemu-devel@nongnu.org
 
-On 3/5/19 11:38 AM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
->> On 2/25/19 7:37 PM, Markus Armbruster wrote:
->>> qemu-system-FOO's main() acts on command line arguments in its own
->>> idiosyncratic order.  There's not much method to its madness.
->>> Whenever we find a case where one kind of command line argument needs
->>> to refer to something created for another kind later, we rejigger the
->>> order.
->>>
->>> Block devices get created long after machine properties get processed.
->>> Therefore, block device machine properties can be created, but not
->>> set.  No such properties exist.  But the next commit will create some.
->>> Time to rejigger again: create block devices earlier.
->>>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  vl.c | 66 ++++++++++++++++++++++++++++++------------------------------
->>>  1 file changed, 33 insertions(+), 33 deletions(-)
->>>
->>> diff --git a/vl.c b/vl.c
->>> index 6ce3d2d448..5cb0810ffa 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -4232,6 +4232,39 @@ int main(int argc, char **argv, char **envp)
->>>          exit(0);
->>>      }
->>>  
->>
->> Can we extract this from the main, maybe as "parse_blockdev()"? This
->> will ease further 	 :)
-> 
-> I can try and see whether I like it.
-> 
->>> +    /* If the currently selected machine wishes to override the units-per-bus
->>> +     * property of its default HBA interface type, do so now. */
->>> +    if (machine_class->units_per_default_bus) {
->>> +        override_max_devs(machine_class->block_default_type,
->>> +                          machine_class->units_per_default_bus);
->>> +    }
->>> +
->>> +    /* open the virtual block devices */
->>> +    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
->>> +        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
->>> +
->>> +        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
->>> +        loc_push_restore(&bdo->loc);
->>> +        qmp_blockdev_add(bdo->bdo, &error_fatal);
->>> +        loc_pop(&bdo->loc);
->>> +        qapi_free_BlockdevOptions(bdo->bdo);
->>> +        g_free(bdo);
->>> +    }
->>> +    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
->>> +        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
->>> +                          NULL, NULL);
->>> +    }
->>> +    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
->>> +                          &machine_class->block_default_type, &error_fatal)) {
->>> +        /* We printed help */
->>> +        exit(0);
->>> +    }
->>> +
->>> +    default_drive(default_cdrom, snapshot, machine_class->block_default_type, 2,
->>> +                  CDROM_OPTS);
->>> +    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
->>> +    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
->>> +
->>
->> Can you add a comment here such:
->>
->>    /*
->>     * Arguments setting properties on devices has to be processed before
->>     * the following qemu_opt_foreach(...machine_set_property...) call.
->>     */
-> 
-> Hmm, is this accurate?  The issue this patch addresses is
-> 
->     "arguments creating block backends have to be processed before
->     machine_set_property()",
-> 
-> which is an instance of
-> 
->     "arguments creating backends ...",
-> 
-> which is an instance of
-> 
->     "arguments creating stuff machine property values can reference ..."
-> 
-> The patch only addresses the instance "block backends".  I have no
-> appetite for attacking more general problems right now.
-> 
-> See also
-> 
->     Subject: Re: [Qemu-devel] [PATCH RFC 0/3] qdev: order devices by priority before creating them
->     Date: Wed, 11 May 2016 09:51:39 +0200
->     Message-ID: <87y47hhw1g.fsf@dusky.pond.sub.org>
->     https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg01589.html
-> 
->     Subject: Re: [Qemu-devel] [PATCH] vl: Delay initialization of memory backends
->     Date: Fri, 02 Sep 2016 08:13:17 +0200
->     Message-ID: <87poomg77m.fsf@dusky.pond.sub.org>
->     https://lists.nongnu.org/archive/html/qemu-devel/2016-09/msg00163.html
-> 
-> That said, I'm fine with adding a comment explaining the more general
-> mess.  Can you give me some hints on what future readers will find
-> useful?
+I modified binfmt_misc.c to let it send one more args if the corresponding =
+binfmt_misc flags include "P", also I modified main.c in qemu as attached p=
+atch_qemu_main.patch to check if the input args include such string. Then q=
+emu user could support both scenarios.
+Is this modification feasible?
 
-This can be as simple as:
+** Patch added: "patch_qemu_main.patch"
+   https://bugs.launchpad.net/qemu/+bug/1818483/+attachment/5243644/+files/=
+patch_qemu_main.patch
 
-     /*
-      * Arguments creating block backends have to be processed before
-      * machine_set_property().
-      */
-     parse_blockdev(...);
+** Summary changed:
 
-So if I have to hack around in the future I'd look at the commit
-introducing this comment:
+- qemu user mode does not support binfmt_misc config with flags=3DP
++ qemu user mode does not support binfmt_misc config with flags include "P"
 
-  Block devices get created long after machine properties get processed.
-  Therefore, block device machine properties can be created, but not
-  set.  No such properties exist.  But the next commit will create some.
+-- =
 
-So I won't rejig this at his previous place :)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818483
 
-> 
->>>      machine_opts = qemu_get_machine_opts();
->>>      qemu_opt_foreach(machine_opts, machine_set_property, current_machine,
->>>                       &error_fatal);
->>> @@ -4355,39 +4388,6 @@ int main(int argc, char **argv, char **envp)
->>>      ram_mig_init();
->>>      dirty_bitmap_mig_init();
->>>  
->>> -    /* If the currently selected machine wishes to override the units-per-bus
->>> -     * property of its default HBA interface type, do so now. */
->>> -    if (machine_class->units_per_default_bus) {
->>> -        override_max_devs(machine_class->block_default_type,
->>> -                          machine_class->units_per_default_bus);
->>> -    }
->>> -
->>> -    /* open the virtual block devices */
->>> -    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
->>> -        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
->>> -
->>> -        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
->>> -        loc_push_restore(&bdo->loc);
->>> -        qmp_blockdev_add(bdo->bdo, &error_fatal);
->>> -        loc_pop(&bdo->loc);
->>> -        qapi_free_BlockdevOptions(bdo->bdo);
->>> -        g_free(bdo);
->>> -    }
->>> -    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
->>> -        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
->>> -                          NULL, NULL);
->>> -    }
->>> -    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
->>> -                          &machine_class->block_default_type, &error_fatal)) {
->>> -        /* We printed help */
->>> -        exit(0);
->>> -    }
->>> -
->>> -    default_drive(default_cdrom, snapshot, machine_class->block_default_type, 2,
->>> -                  CDROM_OPTS);
->>> -    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
->>> -    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
->>> -
->>>      qemu_opts_foreach(qemu_find_opts("mon"),
->>>                        mon_init_func, NULL, &error_fatal);
->>>  
->>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> Thanks!
-> 
+Title:
+  qemu user mode does not support binfmt_misc config with flags include
+  "P"
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi Sir:
+  During our test in chroot environment with qemu-user-static, we got some =
+test cases failed because of program output warning with unexpected full pa=
+th name.
+  For example in test module "Devscripts"
+  the test item for broken tarball expected the warning info:
+  <tar: This does not look like a tar archive
+  tar: ******* >
+  but the output was:
+  </bin/tar: This does not look like a tar archive
+  /bin/tar: ******>
+  the cause is the config file of binfmt_misc was set not to send argv0, fo=
+r example:
+  type command "tar" after chroot:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+  lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
+  [sudo] password for lpeng: =
+
+  root@lpeng-VirtualBox:/# tar
+  /bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-l=
+abel' options
+  Try '/bin/tar --help' or '/bin/tar --usage' for more information.
+  root@lpeng-VirtualBox:/# =
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+  by adding output log in main()@qemu/Linux-user/main.c
+  we found the original input command was changed, and qemu do not know tha=
+t, we got the input args:
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----NULL---
+
+  Next step we modified the flags=3DP in the corresponding config under fol=
+der /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
+  But chroot could not start bash because in current qemu dose not consider=
+ about this unexpected one more"argv[0]"
+
+  =
+
+  After modified qemu code temporary to handle the new argv list we got the=
+ input args, and from argv[2] is the original input command
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----tar---
+
+  We need the original input from command line, so is it possible that let =
+binfmt_misc to pass one more additional args or env to qemu as a token of t=
+he binfmt_misc flag, then qemu can judge how to parse the input args by it?
+  looking forward your suggestions.
+
+  Thanks
+  luyou
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818483/+subscriptions
