@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59530)
+Received: from eggs.gnu.org ([209.51.188.92]:59543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1LGI-0004ql-D1
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:23 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1LGL-0004tX-6X
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1LGH-0004UI-Nz
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:22 -0500
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:46782)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1LGK-0004V5-MH
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:25 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42070)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1LGH-0004SG-HM
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:21 -0500
-Received: by mail-pg1-x52f.google.com with SMTP id 196so6940445pgf.13
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 17:22:21 -0800 (PST)
+	id 1h1LGK-0004Ux-G7
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:22:24 -0500
+Received: by mail-pf1-x444.google.com with SMTP id n74so7107302pfi.9
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 17:22:24 -0800 (PST)
 References: <20190305162829.20079-1-philmd@redhat.com>
-	<20190305162829.20079-5-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <99f44997-9abb-9e14-04c1-2a78fc76e765@linaro.org>
-Date: Tue, 5 Mar 2019 15:53:17 -0800
+Message-ID: <cfdd3844-8c4e-4b4c-a6f5-a02c8fab945d@linaro.org>
+Date: Tue, 5 Mar 2019 15:54:02 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190305162829.20079-5-philmd@redhat.com>
+In-Reply-To: <20190305162829.20079-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] hw/mips/malta: Only accept 'monitor'
- pflash of 4MiB
+Subject: Re: [Qemu-devel] [PATCH 0/5] mips_malta: Clean up definition of
+ flash memory size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,13 +35,19 @@ To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nong
 Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
 On 3/5/19 8:28 AM, Philippe Mathieu-Daudé wrote:
-> +
-> +        if (blk_getlength(pflash_blk) != FLASH_SIZE) {
-> +                error_report("Malta CoreLV card expects a bios of 4MB");
-> +                exit(1);
-> +        }
+> Markus Armbruster (1):
+>   mips_malta: Clean up definition of flash memory size somewhat
+> 
+> Philippe Mathieu-Daudé (4):
+>   hw/mips/malta: Fix the DEBUG_BOARD_INIT code
+>   hw/mips/malta: Remove fl_sectors variable (used one single time)
+>   hw/mips/malta: Restrict 'bios_size' variable scope
+>   hw/mips/malta: Only accept 'monitor' pflash of 4MiB
+> 
+>  hw/mips/mips_malta.c | 27 +++++++++++++++++----------
+>  1 file changed, 17 insertions(+), 10 deletions(-)
 
-Indentation is off, somehow.  Tabs or extra spaces?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
