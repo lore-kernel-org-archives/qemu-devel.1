@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47436)
+Received: from eggs.gnu.org ([209.51.188.92]:47725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h18no-0004x5-HB
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:04:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1h18pJ-0005hL-Ub
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:05:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h18nn-0001jr-Ep
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:04:08 -0500
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:52524)
+	(envelope-from <bounces@canonical.com>) id 1h18pI-0000ez-S3
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:05:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37612)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h18nn-0001eW-7K
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:04:07 -0500
-Received: by mail-wm1-f42.google.com with SMTP id f65so2298488wma.2
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 04:04:06 -0800 (PST)
-References: <1551733750-4902-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1551733750-4902-3-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8acd73e1-219f-b5f7-e001-6f6dd086171d@redhat.com>
-Date: Tue, 5 Mar 2019 13:04:04 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h18pI-0000X5-JX
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:05:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h18pG-0004O5-AW
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 12:05:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4BC142E807C
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 12:05:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1551733750-4902-3-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 02/14] disas: nanoMIPS: Add graphical
- description of pool organization
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 05 Mar 2019 11:56:06 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1818483 <1818483@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155168800961.29550.2360664198558693792.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155178696627.16954.4847359402212307072.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818483] Re: qemu user mode does not support
+ binfmt_misc config with flags include "P"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,133 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
+To: qemu-devel@nongnu.org
 
-On 3/4/19 10:08 PM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> Add graphical description of nanoMIPS instruction pool organization.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  disas/nanomips.cpp | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 102 insertions(+)
-> 
-> diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-> index 10f6d96..9b44208 100644
-> --- a/disas/nanomips.cpp
-> +++ b/disas/nanomips.cpp
-> @@ -16592,6 +16592,108 @@ std::string NMD::YIELD(uint64 instruction)
->  
->  
->  
-> +/*
-> + *                nanoMIPS instruction pool organization
-> + *                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> + *
-> + *
-> + *                 ┌─ P.ADDIU ─── P.RI ─── P.SYSCALL
-> + *                 │
-> + *                 │                                      ┌─ P.TRAP
-> + *                 │                                      │
-> + *                 │                      ┌─ _POOL32A0_0 ─┼─ P.CMOVE
-> + *                 │                      │               │
-> + *                 │                      │               └─ P.SLTU
-> + *                 │        ┌─ _POOL32A0 ─┤
-> + *                 │        │             │
-> + *                 │        │             │
-> + *                 │        │             └─ _POOL32A0_1 ─── CRC32
-> + *                 │        │
-> + *                 ├─ P32A ─┤
-> + *                 │        │                           ┌─ PP.LSX
-> + *                 │        │             ┌─ P.LSX ─────┤
-> + *                 │        │             │             └─ PP.LSXS
-> + *                 │        └─ _POOL32A7 ─┤
-> + *                 │                      │             ┌─ POOL32Axf_4
-> + *                 │                      └─ POOL32Axf ─┤
-> + *                 │                                    └─ POOL32Axf_5
-> + *                 │
-> + *                 ├─ PBAL
-> + *                 │
-> + *                 ├─ P.GP.W   ┌─ PP.LSX
-> + *         ┌─ P32 ─┤           │
-> + *         │       ├─ P.GP.BH ─┴─ PP.LSXS
-> + *         │       │
-> + *         │       ├─ P.J ─────── PP.BALRSC
-> + *         │       │
-> + *         │       ├─ P48I
-> + *         │       │           ┌─ P.SR
-> + *         │       │           │
-> + *         │       │           ├─ P.SHIFT
-> + *         │       │           │
-> + *         │       ├─ P.U12 ───┼─ P.ROTX
-> + *         │       │           │
-> + *         │       │           ├─ P.INS
-> + *         │       │           │
-> + *         │       │           └─ P.EXT
-> + *         │       │
-> + *         │       ├─ P.LS.U12 ── P.PREF.U12
-> + *         │       │
-> + *         │       ├─ P.BR1 ───── P.BR3A
-> + *         │       │
-> + *         │       │           ┌─ P.LS.S0 ─── P16.SYSCALL
-> + *         │       │           │
-> + *         │       │           │           ┌─ P.LL
-> + *         │       │           ├─ P.LS.S1 ─┤
-> + *         │       │           │           └─ P.SC
-> + *         │       │           │
-> + *         │       │           │           ┌─ P.PREFE
-> + *  MAJOR ─┤       ├─ P.LS.S9 ─┤           │
-> + *         │       │           ├─ P.LS.E0 ─┼─ P.LLE
-> + *         │       │           │           │
-> + *         │       │           │           └─ P.SCE
-> + *         │       │           │
-> + *         │       │           ├─ P.LS.WM
-> + *         │       │           │
-> + *         │       │           └─ P.LS.UAWM
-> + *         │       │
-> + *         │       │
-> + *         │       ├─ P.BR2
-> + *         │       │
-> + *         │       ├─ P.BRI
-> + *         │       │
-> + *         │       └─ P.LUI
-> + *         │
-> + *         │
-> + *         │       ┌─ P16.MV ──── P16.RI ─── P16.SYSCALL
-> + *         │       │
-> + *         │       ├─ P16.SR
-> + *         │       │
-> + *         │       ├─ P16.SHIFT
-> + *         │       │
-> + *         │       ├─ P16.4x4
-> + *         │       │
-> + *         │       ├─ P16C ────── POOL16C_0 ── POOL16C_00
-> + *         │       │
-> + *         └─ P16 ─┼─ P16.LB
-> + *                 │
-> + *                 ├─ P16.A1
-> + *                 │
-> + *                 ├─ P16.LH
-> + *                 │
-> + *                 ├─ P16.A2 ──── P.ADDIU[RS5]
-> + *                 │
-> + *                 ├─ P16.ADDU
-> + *                 │
-> + *                 └─ P16.BR ──┬─ P16.JRC
-> + *                             │
-> + *                             └─ P16.BR1
+Doesn't doing the check like that break execution of a command like
+"echo 'MISC_FMT_PRESERVE_ARGV0'" in a chroot environment that isn't
+using -P ?
 
-Nice ASCII tree! And you got it fits the 80 chars per line limit =)
+-- =
 
-> + *
-> + *
-> + *  (FP, DPS, and some minor instruction pools are omitted from the diagram)
-> + *
-> + */
-> +
->  NMD::Pool NMD::P_SYSCALL[2] = {
->      { instruction         , 0                   , 0   , 32,
->         0xfffc0000, 0x00080000, &NMD::SYSCALL_32_      , 0,
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818483
+
+Title:
+  qemu user mode does not support binfmt_misc config with flags include
+  "P"
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi Sir:
+  During our test in chroot environment with qemu-user-static, we got some =
+test cases failed because of program output warning with unexpected full pa=
+th name.
+  For example in test module "Devscripts"
+  the test item for broken tarball expected the warning info:
+  <tar: This does not look like a tar archive
+  tar: ******* >
+  but the output was:
+  </bin/tar: This does not look like a tar archive
+  /bin/tar: ******>
+  the cause is the config file of binfmt_misc was set not to send argv0, fo=
+r example:
+  type command "tar" after chroot:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+  lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
+  [sudo] password for lpeng: =
+
+  root@lpeng-VirtualBox:/# tar
+  /bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-l=
+abel' options
+  Try '/bin/tar --help' or '/bin/tar --usage' for more information.
+  root@lpeng-VirtualBox:/# =
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+  by adding output log in main()@qemu/Linux-user/main.c
+  we found the original input command was changed, and qemu do not know tha=
+t, we got the input args:
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----NULL---
+
+  Next step we modified the flags=3DP in the corresponding config under fol=
+der /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
+  But chroot could not start bash because in current qemu dose not consider=
+ about this unexpected one more"argv[0]"
+
+  =
+
+  After modified qemu code temporary to handle the new argv list we got the=
+ input args, and from argv[2] is the original input command
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----tar---
+
+  We need the original input from command line, so is it possible that let =
+binfmt_misc to pass one more additional args or env to qemu as a token of t=
+he binfmt_misc flag, then qemu can judge how to parse the input args by it?
+  looking forward your suggestions.
+
+  Thanks
+  luyou
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818483/+subscriptions
