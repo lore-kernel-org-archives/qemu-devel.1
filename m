@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33062)
+Received: from eggs.gnu.org ([209.51.188.92]:33863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h15ag-0006LG-LF
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:38:23 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h15f9-0007a0-C6
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:43:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h15ac-0003m5-UG
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:38:20 -0500
-Date: Tue, 5 Mar 2019 09:38:09 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190305093809.751f91b9.cohuck@redhat.com>
-In-Reply-To: <5de5cda9-5db2-6207-5b90-52206be1da72@redhat.com>
-References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-	<1551466776-29123-6-git-send-email-jjherne@linux.ibm.com>
-	<20190304180742.486c8994.cohuck@redhat.com>
-	<5de5cda9-5db2-6207-5b90-52206be1da72@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1h15f7-0008In-VE
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:42:59 -0500
+Resent-Message-Id: <E1h15f7-0008In-VE@eggs.gnu.org>
+Message-ID: <155177535483.19275.8800806976944857333@6acff2cf482b>
+In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 05/16] s390-bios: Factor
- finding boot device out of virtio code path
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 5 Mar 2019 00:42:36 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/16] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +23,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, alifm@linux.ibm.com, qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
+To: jjherne@linux.ibm.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On Mon, 4 Mar 2019 20:26:17 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 04/03/2019 18.07, Cornelia Huck wrote:
-> > On Fri,  1 Mar 2019 13:59:25 -0500
-> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-> >   
-> >> Make a new routine find_boot_device to locate the boot device for all
-> >> cases, not just virtio.
-> >>
-> >> The error message for the case where no boot device has been specified
-> >> and a suitable boot device cannot be auto detected was specific to
-> >> virtio devices. We update this message to remove virtio specific wording.  
-> > 
-> > ...and, consequently, need to tweak the serial output boot test.
-> >   
-> >>
-> >> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> >> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-> >> ---
-> >>  pc-bios/s390-ccw/main.c  | 85 ++++++++++++++++++++++++++----------------------
-> >>  tests/boot-serial-test.c |  2 +-
-> >>  2 files changed, 47 insertions(+), 40 deletions(-)
-> >>  
-> > (...)  
-> >> -    IPL_assert(found, "No virtio device found");
-> >> +    IPL_assert(found, "Boot device not found\n");  
-> > 
-> > You change the output in the bios here...
-> > 
-> > (...)  
-> >> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> >> index 58a48f3..9daf2cb 100644
-> >> --- a/tests/boot-serial-test.c
-> >> +++ b/tests/boot-serial-test.c
-> >> @@ -112,7 +112,7 @@ static testdef_t tests[] = {
-> >>      { "sparc", "SS-4", "", "MB86904" },
-> >>      { "sparc", "SS-600MP", "", "TMS390Z55" },
-> >>      { "sparc64", "sun4u", "", "UltraSPARC" },
-> >> -    { "s390x", "s390-ccw-virtio", "", "virtio device" },
-> >> +    { "s390x", "s390-ccw-virtio", "", "device" },  
-> > 
-> > ...and therefore need to change the expected string here. Question: is
-> > that ok ("device" looks a bit generic), or would "Boot device" be a
-> > better match?  
-> 
-> Just "device" should be OK. The exact string in the boot-serial-test
-> does not matter too much, as long as it comes from the same print statement.
-
-Ok, makes sense.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxNDY2Nzc2LTI5MTIzLTEt
+Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
+b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MTQ2
+Njc3Ni0yOTEyMy0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzE2XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
+dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzE1NTE0NjY3NzYtMjkxMjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
+b20gLT4gcGF0Y2hldy8xNTUxNDY2Nzc2LTI5MTIzLTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
+aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjdhYWE5YzcwMyBz
+MzkwLWJpb3M6IGRhc2QtaXBsOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVy
+cm9yIGRhdGEKNTIwODViOGY4MyBzMzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwg
+ZGFzZCBkZXZpY2UKNjk0MDg2MTBmNCBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29k
+ZXMvc3RydWN0cyBuZWVkZWQgZm9yIGRhc2QtaXBsCmNjMGFhYWM2YzcgczM5MC1iaW9zOiBVc2Ug
+Y29udHJvbCB1bml0IHR5cGUgdG8gZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCjQzNGVlYzk1YmYgczM5
+MC1iaW9zOiBSZWZhY3RvciB2aXJ0aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwo2
+NmRkODBjMThjIHMzOTAtYmlvczogY2lvIGVycm9yIGhhbmRsaW5nCjY1NzU5MmVmYTUgczM5MC1i
+aW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwoxMzc1
+YzUwZGExIHMzOTAtYmlvczogcHRyMnUzMiBhbmQgdTMydG9wdHIKNjM3Yjk1NzM2MSBzMzkwLWJp
+b3M6IE1hcCBsb3cgY29yZSBtZW1vcnkKNjZlNDI0NTQ2OCBzMzkwLWJpb3M6IERlY291cGxlIGNo
+YW5uZWwgaS9vIGxvZ2ljIGZyb20gdmlydGlvCjMxZDhlYzBhZmYgczM5MC1iaW9zOiBDbGVhbiB1
+cCBjaW8uaAo4OGM4ZDAwNTJlIHMzOTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ug
+b3V0IG9mIHZpcnRpbyBjb2RlIHBhdGgKZmUyYjUwZjU4NSBzMzkwLWJpb3M6IEV4dGVuZCBmaW5k
+X2RldigpIGZvciBub24tdmlydGlvIGRldmljZXMKYWQ5NjcxNTYwNCBzMzkwLWJpb3M6IGRlY291
+cGxlIGNvbW1vbiBib290IGxvZ2ljIGZyb20gdmlydGlvCjI1NDFlZTA1MjAgczM5MC1iaW9zOiBk
+ZWNvdXBsZSBjaW8gc2V0dXAgZnJvbSB2aXJ0aW8KZTA4ZGM5ZTEzNiBzMzkwIHZmaW8tY2N3OiBB
+ZGQgYm9vdGluZGV4IHByb3BlcnR5IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvMTYgQ2hlY2tpbmcgY29tbWl0IGUwOGRjOWUxMzY1ZiAoczM5MCB2ZmlvLWNjdzogQWRkIGJv
+b3RpbmRleCBwcm9wZXJ0eSBhbmQgSVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
+ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDU6IApu
+ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxODEgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggMS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE2IENo
+ZWNraW5nIGNvbW1pdCAyNTQxZWUwNTIwOGUgKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVw
+IGZyb20gdmlydGlvKQozLzE2IENoZWNraW5nIGNvbW1pdCBhZDk2NzE1NjA0NmIgKHMzOTAtYmlv
+czogZGVjb3VwbGUgY29tbW9uIGJvb3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5z
+IHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNj
+dy9tYWluLmM6MTk6CitJcGxQYXJhbWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxp
+Z25lZF9fKFBBR0VfU0laRSkpKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggMy8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNiBD
+aGVja2luZyBjb21taXQgZmUyYjUwZjU4NWFmIChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2Rldigp
+IGZvciBub24tdmlydGlvIGRldmljZXMpCjUvMTYgQ2hlY2tpbmcgY29tbWl0IDg4YzhkMDA1MmUw
+YyAoczM5MC1iaW9zOiBGYWN0b3IgZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNv
+ZGUgcGF0aCkKNi8xNiBDaGVja2luZyBjb21taXQgMzFkOGVjMGFmZjVkIChzMzkwLWJpb3M6IENs
+ZWFuIHVwIGNpby5oKQo3LzE2IENoZWNraW5nIGNvbW1pdCA2NmU0MjQ1NDY4MjcgKHMzOTAtYmlv
+czogRGVjb3VwbGUgY2hhbm5lbCBpL28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzI4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
+cywgMTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KOC8xNiBDaGVja2luZyBjb21taXQgNjM3Yjk1NzM2MTg1IChzMzkwLWJpb3M6IE1hcCBsb3cg
+Y29yZSBtZW1vcnkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgv
+MTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS8xNiBDaGVja2luZyBjb21taXQgMTM3NWM1
+MGRhMWJkIChzMzkwLWJpb3M6IHB0cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+MTAvMTYgQ2hlY2tpbmcgY29tbWl0IDY1NzU5MmVmYTU4YSAoczM5MC1iaW9zOiBTdXBwb3J0IGZv
+ciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcykKMTEvMTYgQ2hlY2tpbmcgY29t
+bWl0IDY2ZGQ4MGMxOGNlYyAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEyLzE2IENo
+ZWNraW5nIGNvbW1pdCA0MzRlZWM5NWJmMzcgKHMzOTAtYmlvczogUmVmYWN0b3IgdmlydGlvIHRv
+IHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4OgorICAgICAg
+ICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywgc2l6ZW9m
+KGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAgIHJ1bl9j
+Y3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0dXMpLCBm
+YWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVzIGNoZWNr
+ZWQKClBhdGNoIDEyLzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE2IENoZWNraW5n
+IGNvbW1pdCBjYzBhYWFjNmM3ZjQgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0eXBlIHRv
+IGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IDY5NDA4NjEwZjQw
+MyAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVlZGVkIGZv
+ciBkYXNkLWlwbCkKMTUvMTYgQ2hlY2tpbmcgY29tbWl0IDUyMDg1YjhmODNjNiAoczM5MC1iaW9z
+OiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMyNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDQ0NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoxNi8xNiBDaGVja2luZyBjb21taXQgYjdhYWE5YzcwM2UxIChzMzkwLWJpb3M6IGRhc2QtaXBs
+OiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVycm9yIGRhdGEpCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
+b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTE0NjY3NzYtMjkx
+MjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5jb20vdGVzdGluZy5jaGVja3Bh
+dGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
