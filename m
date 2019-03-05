@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49958)
+Received: from eggs.gnu.org ([209.51.188.92]:51013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h1B69-0006oe-TF
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:31:19 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h1BBu-0008C0-4V
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:37:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidkiarie4@gmail.com>) id 1h1B68-0007U7-0e
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:31:13 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44702)
+	(envelope-from <davidkiarie4@gmail.com>) id 1h1BBr-0004y0-4Y
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:37:10 -0500
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:40188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
-	id 1h1B66-0007Rh-27
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:31:10 -0500
-Received: by mail-oi1-x241.google.com with SMTP id a81so6942648oii.11
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 06:31:09 -0800 (PST)
+	id 1h1BBq-0004w4-R4
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:37:07 -0500
+Received: by mail-ot1-x32f.google.com with SMTP id v20so7587065otk.7
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 06:37:06 -0800 (PST)
 MIME-Version: 1.0
 References: <20190304151827.1813-1-davidkiarie4@gmail.com>
-	<82c88a70-13e1-d4e9-4faf-420a56fbba92@redhat.com>
-	<CABdVeAD5RseQ4WKapozTjUfUarAikpngiX-yb+CGnD3AmuqdLg@mail.gmail.com>
-In-Reply-To: <CABdVeAD5RseQ4WKapozTjUfUarAikpngiX-yb+CGnD3AmuqdLg@mail.gmail.com>
+	<20190304151827.1813-2-davidkiarie4@gmail.com>
+	<50ec8aca-252e-792f-9a9a-a5dc606eca9c@redhat.com>
+	<CABdVeAAZXbC-5tPJd1ziAeKBVo+Bqt8We-hHDv_6bRd99YXmrg@mail.gmail.com>
+	<546a3879-6cf6-b248-c6df-62489730be57@redhat.com>
+In-Reply-To: <546a3879-6cf6-b248-c6df-62489730be57@redhat.com>
 From: David Kiarie <davidkiarie4@gmail.com>
-Date: Tue, 5 Mar 2019 17:30:20 +0300
-Message-ID: <CABdVeACiTQhihP_WG9W0M8wtR4QEjJQya_DjamJrUkKC43NwiQ@mail.gmail.com>
+Date: Tue, 5 Mar 2019 17:36:16 +0300
+Message-ID: <CABdVeAAWr3F6hN5mtXP9YoA7WvBOzgy-iv3dcZ+4crBfbRmtkA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4? 0/1] update copyright notice
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Fwd:  [PATCH 1/1] update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Jan Kiszka <jan.kiszka@siemens.com>, Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 
-On Tue, Mar 5, 2019 at 5:16 PM David Kiarie <davidkiarie4@gmail.com> wrote:
+i hope you don't find this offensive, Eric but i'm forwarding this message
+to all the people on this thread.
 
+i don't find anything exactly private in this email.
+
+[off-list]
+
+On 3/4/19 1:20 PM, David Kiarie wrote:
+> On Mon, Mar 4, 2019 at 8:48 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+.com>
+> wrote:
 >
->
-> On Mon, Mar 4, 2019 at 11:52 PM Eric Blake <eblake@redhat.com> wrote:
->
->> On 3/4/19 9:18 AM, David Kiarie wrote:
->> > i think it is best put as i've updated.
->> >
->> > David Kiarie (1):
->> >    update copyright notice
->> >
->> >   hw/i386/amd_iommu.c | 2 +-
->> >   hw/i386/amd_iommu.h | 2 +-
->> >   2 files changed, 2 insertions(+), 2 deletions(-)
+>> On 3/4/19 4:18 PM, David Kiarie wrote:
+>>> Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
 >>
->> You have now posted two separate threads with identical subjects but
->> with different contents. As a courtesy to your reviewers, and to help
->> the maintainers know for sure which version you want incorporated, it
->> would have been nicer if you had used 'git send-email -v4' for this
->> series, to differentiate it from v3 (if I counted right) sent at
->> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06457.html, as
->> well as summarizing how this version differs from the previous.
->>
->> That said, I do not think you need to send a v5 just to fix the subject
->> line in the cover letter (as the cover letter doesn't end up in git
->> anyways), especially since Paolo has already said he will queue your
->> patch, and I trust Paolo to get the right version included.
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >>
 >
-> i am not okay with maintainer behaviour, this is just something personal.
->
+> would i be wrong to say this patch received unwarranted scrutiny from you=
+,
+> Philippe?
 
-Paolo noted that code doesn't get merged right away on Qemu.
+David, please calm down, and don't write emails that can sound like you
+are attacking your reviewers on list.  Assume good intent - Philippe
+reviewed your patch with the same level of scrutiny as many other
+patches he reviews, and his question for your previous patch revision
+about whether you intended to change the copyright year was not an
+attack, but an honest question.
 
-consider this:
+Open source works best when anyone feels like they can contribute.
+Copyright lines are an interesting beast - they carry legal
+significance, so care should be taken that they aren't changed by
+mistake, but at the same time, you do not have to know the code that the
+copyright is protecting to ask an honest question about whether a change
+is intentional.
 
-i)  i don't have any interests whatsoever in Qemu and will never have
-
-ii) i will never have any interests in Qemu
-
-iii) i have zero interests in the code we are updating let alone the bugs i
-recently helped report on this list.
-
-iv)i am taking my own time to send this patch which was merely supposed to
-reduce any such confusion reporting bugs in the future.
-
-v)* maintainer - patches don't merged right away unless they fix broken
-things, i have your patch queued. honestly?*
-
-what are we queuing for? why not just rid of rest of my code because this
-is the epitome of maintainer arrogance.
-
-
-> i will definitely send v4 but this series will include a patch stripping
-> all AMD IOMMU code from for Paolo to choose what to merge.
->
->
->> --
->> Eric Blake, Principal Software Engineer
->> Red Hat, Inc.           +1-919-301-3226
->> Virtualization:  qemu.org | libvirt.org
->>
->
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
