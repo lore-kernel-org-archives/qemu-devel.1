@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48594)
+Received: from eggs.gnu.org ([209.51.188.92]:49721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h1EXW-0005LP-ED
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:11:43 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1Ebw-0000v4-3p
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h1EXU-0006lv-Jw
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:11:41 -0500
-Received: from mail-co1nam03on0709.outbound.protection.outlook.com
-	([2a01:111:f400:fe48::709]:4608
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1h1EXQ-0006fq-Um
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:11:38 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 5 Mar 2019 18:11:11 +0000
-Message-ID: <BN6PR2201MB1251476FF88E92F0C0696A50C6720@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1551733750-4902-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1551733750-4902-3-git-send-email-aleksandar.markovic@rt-rk.com>
-	<8acd73e1-219f-b5f7-e001-6f6dd086171d@redhat.com>
-	<BN6PR2201MB12512A365C6D47928700801CC6720@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<96d80f22-8f7b-950a-283d-2c814827cd82@redhat.com>,
-	<bb8af505-4bfb-0488-7278-8dd5748ee0fd@redhat.com>
-In-Reply-To: <bb8af505-4bfb-0488-7278-8dd5748ee0fd@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgilbert@redhat.com>) id 1h1Ebv-0001e1-1k
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1Ebu-0001bg-Od
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:14 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue,  5 Mar 2019 18:15:42 +0000
+Message-Id: <20190305181602.9051-2-dgilbert@redhat.com>
+In-Reply-To: <20190305181602.9051-1-dgilbert@redhat.com>
+References: <20190305181602.9051-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 02/14] disas: nanoMIPS: Add graphical
- description of pool organization
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 01/21] migration: Fix cancel state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
 
-> From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Subject: Re: [Qemu-devel] [PATCH v7 02/14] disas: nanoMIPS: Add graphical=
- description of pool organization
->=20
-> >> ... upon https://pythonhosted.org/asciitree/#ascii-trees the other day=
-, but
-> >> never used it, you may find it useful.
-> >
-> > I'm tempted add it to the decodetree script...
->=20
-> "I'm tempted [to] add it" ...
-> (I'm not suggesting you to add it)
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-All is well, Philippe, I understood it from the beginning as you originally=
- meant.
+During a cancelled migration there's a race where the fd can
+go into an error state before we get back around the migration loop
+and migration_detect_error transitions from cancelling->failed.
 
-Aleksandar=
+Check for cancelled/cancelling and don't change the state.
+
+Red Hat bug: https://bugzilla.redhat.com/show_bug.cgi?id=3D1608649
+
+Fixes: b23c2ade250
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20190219195928.12289-1-dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/migration.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/migration/migration.c b/migration/migration.c
+index c39d3054ec..e44f77af02 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2911,6 +2911,13 @@ static MigThrError postcopy_pause(MigrationState *=
+s)
+ static MigThrError migration_detect_error(MigrationState *s)
+ {
+     int ret;
++    int state =3D s->state;
++
++    if (state =3D=3D MIGRATION_STATUS_CANCELLING ||
++        state =3D=3D MIGRATION_STATUS_CANCELLED) {
++        /* End the migration, but don't set the state to failed */
++        return MIG_THR_ERR_FATAL;
++    }
+=20
+     /* Try to detect any file errors */
+     ret =3D qemu_file_get_error(s->to_dst_file);
+@@ -2920,7 +2927,7 @@ static MigThrError migration_detect_error(Migration=
+State *s)
+         return MIG_THR_ERR_NONE;
+     }
+=20
+-    if (s->state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE && ret =3D=3D -=
+EIO) {
++    if (state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE && ret =3D=3D -EIO=
+) {
+         /*
+          * For postcopy, we allow the network to be down for a
+          * while. After that, it can be continued by a
+@@ -2932,7 +2939,7 @@ static MigThrError migration_detect_error(Migration=
+State *s)
+          * For precopy (or postcopy with error outside IO), we fail
+          * with no time.
+          */
+-        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
++        migrate_set_state(&s->state, state, MIGRATION_STATUS_FAILED);
+         trace_migration_thread_file_err();
+=20
+         /* Time to stop the migration, now. */
+--=20
+2.20.1
