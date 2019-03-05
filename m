@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55545)
+Received: from eggs.gnu.org ([209.51.188.92]:55905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h0zYn-0003wj-M6
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:12:05 -0500
+	(envelope-from <mst@redhat.com>) id 1h0zaC-0004nC-CJ
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:13:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h0zYm-0003UT-8h
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:12:01 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:44216)
+	(envelope-from <mst@redhat.com>) id 1h0za6-0004hl-PT
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:13:25 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:43840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h0zYh-0003OV-Tx
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:11:57 -0500
-Received: by mail-qt1-f196.google.com with SMTP id d2so7429704qti.11
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 18:11:51 -0800 (PST)
-Date: Mon, 4 Mar 2019 21:11:47 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h0zZz-0004Y8-Kb
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:13:17 -0500
+Received: by mail-qt1-f196.google.com with SMTP id y4so7447725qtc.10
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 18:13:11 -0800 (PST)
+Date: Mon, 4 Mar 2019 21:13:03 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190304210359-mutt-send-email-mst@kernel.org>
-References: <1515509463-2675-1-git-send-email-mst@redhat.com>
-	<d29cfb63-233a-f9ae-c326-8ff7c1b490f3@redhat.com>
+Message-ID: <20190304211210-mutt-send-email-mst@kernel.org>
+References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
+	<20190228083821-mutt-send-email-mst@kernel.org>
+	<20190305005332.GB7877@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d29cfb63-233a-f9ae-c326-8ff7c1b490f3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] isa/piix: move to mips malta
+In-Reply-To: <20190305005332.GB7877@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH 0/5] Improve balloon handling of pagesizes
+ other than 4kiB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Igor Mammedov <imammedo@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Michael Tokarev <mjt@tls.msk.ru>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Tue, Mar 05, 2019 at 01:53:45AM +0100, Philippe Mathieu-Daudé wrote:
-> Hi Michael,
+On Tue, Mar 05, 2019 at 11:53:32AM +1100, David Gibson wrote:
+> On Thu, Feb 28, 2019 at 08:39:21AM -0500, Michael S. Tsirkin wrote:
+> > On Thu, Feb 14, 2019 at 03:39:11PM +1100, David Gibson wrote:
+> > > I posted some RFCs for this back in December, but didn't wrap it up in
+> > > time for 3.1.  Posting again for inclusion in 4.0.
+> > > 
+> > > The virtio-balloon devices was never really thought out for cases
+> > > other than 4kiB pagesize on both guest and host.  It works in some
+> > > cases, but in others can be ineffectual or even cause guest memory
+> > > corruption.
+> > > 
+> > > This series makes a handful of preliminary cleanups, then makes a
+> > > change to safely, though not perfectly, handle cases with non 4kiB
+> > > pagesizes.
+> > 
+> > I'd like to see a version of this that does not depend on patch 1 which
+> > is not a cleanup nor a bugfix. Could you look into this please?
 > 
-> On 1/9/18 3:59 PM, Michael S. Tsirkin wrote:
-> > This device is only used on mips malta, move it to the maintainer
-> > that's actually testing it.
-> 
-> Slighly related to this patch, since I included it while working on
-> Kconfig/MIPS.
-> I splitted PIIX3/PIIX4 (Actually PIIX3 was mixed with I440FX).
-> These are indeed 2 different chipsets, PIIX4 is an improved PIIX3.
-> 
-> I compiled MIPS with PIIX4 and it works, however when I ran all the
-> testsuite X86 failed due to PIIX4_PM missing.
-> I looked where it is used:
-> 
-> $ git grep PIIX4_PM
-> docs/interop/firmware.json:96:#           enabled with "-global
-> PIIX4_PM.disable_s3=0" and disabled
-> docs/interop/firmware.json:97:#           with "-global
-> PIIX4_PM.disable_s3=1". On the "pc-q35-*"
-> docs/interop/firmware.json:105:#           can be enabled with "-global
-> PIIX4_PM.disable_s4=0" and
-> docs/interop/firmware.json:106:#           disabled with "-global
-> PIIX4_PM.disable_s4=1". On the
-> hw/i386/pc.c:282:    { "PIIX4_PM", "memory-hotplug-support", "off" },
-> hw/i386/pc.c:299:    { "PIIX4_PM",
-> "acpi-pci-hotplug-with-bridge-support", "off" },
-> 
-> So now I'm confused, looking at git history I see you introduced this in
-> commit 9e047b98245.
-> 
-> What chipset do use the PC machine? An unreal hybrid of PIIX3/PIIX4?
-> 
-> Thanks,
-> 
-> Phil.
+> Ok... the original series is already applied to master, so I'm not
+> exactly sure what you want me to do here.  Should I try to come up
+> with a "logical revert" of the first patch?  Or do you intend to
+> revert the whole series, and I rewrite the series without the first
+> patch?
 
-Yes I think it does not match any real hardware at this point.
-
-Not sure what does grep above show: to create piix4 pm
-pc_init1 calls piix4_pm_init.
+Whatever you prefer. Maybe the best idea is to add a flag
+that says whether to madvise or not. Default can be compatible.
+Hmm?
 
 
+> > We can then debate merits of patch 1 separately.
 > > 
-> > Cc: Aurelien Jarno <aurelien@aurel32.net>
-> > Cc: Yongbok Kim <yongbok.kim@mips.com>
-> > Cc: Hervé Poussineau <hpoussin@reactos.org>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
 > > 
-> > Aurelien, pls feel free to merge this or v1.
+> > > Changes since RFC:
+> > >  * Further refinement of when to issue warnings in 5/5
+> > > 
+> > > David Gibson (5):
+> > >   virtio-balloon: Remove unnecessary MADV_WILLNEED on deflate
+> > >   virtio-balloon: Corrections to address verification
+> > >   virtio-balloon: Rework ballon_page() interface
+> > >   virtio-balloon: Use ram_block_discard_range() instead of raw madvise()
+> > >   virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size
+> > > 
+> > >  hw/virtio/virtio-balloon.c         | 102 ++++++++++++++++++++++++-----
+> > >  include/hw/virtio/virtio-balloon.h |   3 +
+> > >  2 files changed, 89 insertions(+), 16 deletions(-)
+> > > 
 > > 
-> >  MAINTAINERS | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 0255113..0b8a5e7 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -641,6 +641,7 @@ Malta
-> >  M: Aurelien Jarno <aurelien@aurel32.net>
-> >  S: Maintained
-> >  F: hw/mips/mips_malta.c
-> > +F: hw/isa/piix4.c
-> >  
-> >  Mipssim
-> >  M: Yongbok Kim <yongbok.kim@mips.com>
-> > @@ -849,7 +850,6 @@ F: hw/pci-host/q35.c
-> >  F: hw/pci-host/pam.c
-> >  F: include/hw/pci-host/q35.h
-> >  F: include/hw/pci-host/pam.h
-> > -F: hw/isa/piix4.c
-> >  F: hw/isa/lpc_ich9.c
-> >  F: hw/i2c/smbus_ich9.c
-> >  F: hw/acpi/piix4.c
-> > 
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
