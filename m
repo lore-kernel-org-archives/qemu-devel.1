@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53184)
+Received: from eggs.gnu.org ([209.51.188.92]:53187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h12EW-0005Uc-0I
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 00:03:16 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h12EW-0005Ue-0s
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 00:03:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h12ES-0008SN-Ei
+	(envelope-from <dgibson@ozlabs.org>) id 1h12ET-0008TH-06
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 00:03:14 -0500
-Date: Tue, 5 Mar 2019 14:32:07 +1100
+Date: Tue, 5 Mar 2019 16:03:00 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190305033207.GF7877@umbus.fritz.box>
-References: <20190305022102.17610-1-sjitindarsingh@gmail.com>
+Message-ID: <20190305050300.GI7877@umbus.fritz.box>
+References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
+	<20190214043916.22128-2-david@gibson.dropbear.id.au>
+	<20190228083317-mutt-send-email-mst@kernel.org>
+	<20190305005207.GA7877@umbus.fritz.box>
+	<20190304211451-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FeAIMMcddNRN4P4/"
+	protocol="application/pgp-signature"; boundary="y96v7rNg6HAoELs5"
 Content-Disposition: inline
-In-Reply-To: <20190305022102.17610-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH] target/ppc/spapr: Clear
- partition table entry when allocating hash table
+In-Reply-To: <20190304211451-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-balloon: Remove unnecessary
+ MADV_WILLNEED on deflate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
 
 
---FeAIMMcddNRN4P4/
+--y96v7rNg6HAoELs5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 05, 2019 at 01:21:02PM +1100, Suraj Jitindar Singh wrote:
-> If we allocate a hash page table then we know that the guest won't be
-> using process tables, so set the partition table entry maintained for
-> the guest to zero. If this isn't done, then the guest radix bit will
-> remain set in the entry. This means that when the guest calls
-> H_REGISTER_PROCESS_TABLE there will be a mismatch between then flags
-> and the value in spapr->patb_entry, and the call will fail. The guest
-> will then panic:
+On Mon, Mar 04, 2019 at 09:29:24PM -0500, Michael S. Tsirkin wrote:
+> On Tue, Mar 05, 2019 at 11:52:08AM +1100, David Gibson wrote:
+> > On Thu, Feb 28, 2019 at 08:36:58AM -0500, Michael S. Tsirkin wrote:
+> > > On Thu, Feb 14, 2019 at 03:39:12PM +1100, David Gibson wrote:
+> > > > When the balloon is inflated, we discard memory place in it using m=
+advise()
+> > > > with MADV_DONTNEED.  And when we deflate it we use MADV_WILLNEED, w=
+hich
+> > > > sounds like it makes sense but is actually unnecessary.
+> > > >=20
+> > > > The misleadingly named MADV_DONTNEED just discards the memory in qu=
+estion,
+> > > > it doesn't set any persistent state on it in-kernel; all that's nec=
+essary
+> > > > to bring the memory back is to touch it.  MADV_WILLNEED in contrast
+> > > > specifically says that the memory will be used soon and faults it i=
+n.
+> > > >=20
+> > > > This patch simplify's the balloon operation by dropping the madvise=
+()
+> > > > on deflate.  This might have an impact on performance - it will mov=
+e a
+> > > > delay at deflate time until that memory is actually touched, which
+> > > > might be more latency sensitive.  However:
+> > > >=20
+> > > >   * Memory that's being given back to the guest by deflating the
+> > > >     balloon *might* be used soon, but it equally could just sit aro=
+und
+> > > >     in the guest's pools until needed (or even be faulted out again=
+ if
+> > > >     the host is under memory pressure).
+> > > >=20
+> > > >   * Usually, the timescale over which you'll be adjusting the ballo=
+on
+> > > >     is long enough that a few extra faults after deflation aren't
+> > > >     going to make a difference.
+> > > >=20
+> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > Reviewed-by: David Hildenbrand <david@redhat.com>
+> > > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > >=20
+> > > I'm having second thoughts about this. It might affect performance but
+> > > probably won't but we have no idea.  Might cause latency jitter after
+> > > deflate where it previously didn't happen.  This kind of patch should
+> > > really be accompanied by benchmarking results, not philosophy.
+> >=20
+> > I guess I see your point, much as it's annoying to spend time
+> > benchmarking a device that's basically broken by design.
 >=20
-> Failed to register process table (rc=3D-4)
-> kernel BUG at arch/powerpc/platforms/pseries/lpar.c:959
->=20
-> The result being that it isn't possible to boot a hash guest on a P9
-> system.
->=20
-> Also fix a bug in the flags parsing in h_register_process_table() which
-> was introduced by the same patch, and simplify the handling to make it
-> less likely that errors will be introduced in the future. The effect
-> would have been setting the host radix bit LPCR_HR for a hash guest
-> using process tables, which currently isn't supported and so couldn't
-> have been triggered.
->=20
-> Fixes: 00fd075e18 "target/ppc/spapr: Set LPCR:HR when using Radix mode"
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Because of 4K page thing?
 
-Applied, thanks.
+For one thing.  I believe David H has bunch of other reasons.
 
-> ---
->  hw/ppc/spapr.c       |  1 +
->  hw/ppc/spapr_hcall.c | 12 ++++++++----
->  2 files changed, 9 insertions(+), 4 deletions(-)
+> It's an annoying bug for sure.  There were
+> patches to add a feature bit to just switch to plan s/g format, but they
+> were abandoned. You are welcome to revive them though.
+> Additionally or alternatively, we can easily add a field specifying
+> page size.
+
+We could, but I'm pretty disinclined to work on this when virtio-mem
+is a better solution in nearly every way.
+
+> > That said.. I don't really know how I'd go about benchmarking it.  Any
+> > guesses at a suitable workload which would be most likely to show a
+> > performance degradation here?
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e39068578e..cf1ef9ebd4 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1632,6 +1632,7 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr,=
- int shift,
->          }
->      }
->      /* We're setting up a hash table, so that means we're not radix */
-> +    spapr->patb_entry =3D 0;
->      spapr_set_all_lpcrs(0, LPCR_HR | LPCR_UPRT);
->  }
-> =20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 8bfdddc964..7016a09386 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1339,6 +1339,7 @@ static target_ulong h_register_process_table(PowerP=
-CCPU *cpu,
->      target_ulong proc_tbl =3D args[1];
->      target_ulong page_size =3D args[2];
->      target_ulong table_size =3D args[3];
-> +    target_ulong update_lpcr =3D 0;
->      uint64_t cproc;
-> =20
->      if (flags & ~FLAGS_MASK) { /* Check no reserved bits are set */
-> @@ -1394,10 +1395,13 @@ static target_ulong h_register_process_table(Powe=
-rPCCPU *cpu,
->      spapr->patb_entry =3D cproc; /* Save new process table */
-> =20
->      /* Update the UPRT, HR and GTSE bits in the LPCR for all cpus */
-> -    spapr_set_all_lpcrs(((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ?
-> -                         (LPCR_UPRT | LPCR_HR) : 0) |
-> -                        ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
-> -                        LPCR_UPRT | LPCR_HR | LPCR_GTSE);
-> +    if (flags & FLAG_RADIX)     /* Radix must use process tables, also s=
-et HR */
-> +        update_lpcr |=3D (LPCR_UPRT | LPCR_HR);
-> +    else if (flags & FLAG_HASH_PROC_TBL) /* Hash with process tables */
-> +        update_lpcr |=3D LPCR_UPRT;
-> +    if (flags & FLAG_GTSE)      /* Guest translation shootdown enable */
-> +        update_lpcr |=3D FLAG_GTSE;
-> +    spapr_set_all_lpcrs(update_lpcr, LPCR_UPRT | LPCR_HR | LPCR_GTSE);
-> =20
->      if (kvm_enabled()) {
->          return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
+> Here's one idea - I tried to come up with a worst case scenario here.
+> Basically based on idea by Alex Duyck. All credits are his, all bugs are
+> mine:
+
+Ok.  I'll try to find time to implement this and test it.
+
+> Setup:
+> Memory-15837 MB
+> Guest Memory Size-5 GB
+> Swap-Disabled
+> Test Program-Simple program which allocates 4GB memory via malloc, touche=
+s it via memset and exits.
+> Use case-Number of guests that can be launched completely including the s=
+uccessful execution of the test program.
+> Procedure:
+> Setup:
+> A first guest is launched and once its console is up,
+> test allocation program is executed with 4 GB memory request (Due to
+> this the guest occupies almost 4-5 GB of memory in the host)
+> Afterwards balloon is inflated by 4Gbyte in the guest.
+> We continue launching the guests until a guest gets
+> killed due to low memory condition in the host.
+>=20
+>=20
+> Now repeatedly, in each guest in turn, balloon is deflated and
+> test allocation program is executed with 4 GB memory request (Due to
+> this the guest occupies almost 4-5 GB of memory in the host)
+> After program finishes balloon is inflated by 4GB again.
+>=20
+> Then we switch to another guest.
+>=20
+> Time how many cycles of this we can do.
+>=20
+>=20
+> Hope this helps.
+>=20
+>=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -119,24 +148,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---FeAIMMcddNRN4P4/
+--y96v7rNg6HAoELs5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx97bcACgkQbDjKyiDZ
-s5Isjg/+KETaMhVTimyxRYRKekMQHnMXJhfAPnPRnxBT29gMWgJwQxDNtPEli8Tj
-o9w8vtS8a8tv6cyfvEoAHybpf5ansO81sznmbgMyOnWGQvC+fr+DikYEOswrctGb
-qFblyDYiHfoTQwxNpQNVyM/IQ/aMFa6ficyvjwwByyQ54XsYGWt5cshuhWwSta0R
-fBwqsjzGD3PoEw7EaMmyQDi89xsJ/t0ysDIKsSXpeF1z6LxXWxUqIYHNHcHPd6Nt
-WDJVXJg2ViVj3ecc26tJYqjKCYv33Hgu45kOLG/prQeIxWF44qWnImD7sdPYMPwX
-b05cMmATQi5CbcrDHKKDaj3TbJlBXfHcgkXprwyXgiCS/74Wpm55sf08dvMiplOK
-V3W39auvWRfxsVOIvIDpu3s74yDw2IYiIw6Jhe7MWv3tObPakZlX9/ZcWMW2lOuv
-J266TpY41Qv9GiPoripnl1HImPHa6UG1JadtpCmZU7J6T+dDijRTgvKFqgkHQuT9
-nA6T7FnG11swNoFOH13RV2e2CIFkyIL4HnXMXvxhe0852uCEfsjhJGDF8wweZun+
-+J4aFSE5QsrWE/PVWSHr1VNKRxmLo72pcctdSS6lCJquV4VkIIZZjWOHlDcwigau
-/MtzzKpP8v9+EtVY55Y98jw6y1aey7D0xgYK2U2KCZLobEFmriQ=
-=OTai
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx+AwQACgkQbDjKyiDZ
+s5IVHhAAm/wRMSXDrGCVM21vrIsT0VuUCQRTiUt8R7pDFuJo9/pojyuxeuUue+WC
+QZ2SGofel0npecK8J4GeALsMRIIMS7YqczlhmuHVn9JYTnsFeC2DNUfDlguSZ2nm
+R7npagi0q+iZVq3vEZ8EGEapXXGJwXKIh7RrkXCxgPdM3+k0WnzPsCYQ7sIo8Hws
+LS9yk9khT5PCrFNtSwiIwf5f1PvM1frtwz6MNX1LON0dEoQpqKPAdRIlH1qOph4j
+ZIPNgCXkZVn+MSj9w2c6+/UMIEAzRkUk+qHgJha30AVtOAxY5TGItWtwIhijV4gN
+dALM0nEJLpQ8oqgLCSFrDTsxbIvgUXSw/+iwcnh7g8z1TpasDH2wwOAIhCAd9rrC
+QWEMFhwqbOVHISiL4MarA5wTe9LMF0NMslyfKT7Bjm8d2/eF5KyXJMDP8l9EAQtW
+qmsTHpvIL9XsmcgIfMGcrKE7sc+w56LYc8qgK7GrV1WHPcWB+57TNf9WO3nb0m5U
+TsxIUgxcifdwWxi/dPlwfq5+DeLy4KRRj5iCuyHTISOdJgZv2qQYYVVkUtAeOS2t
+jhaOk9zb3199gs+zszhw9ZhHNJ7ZMkWcRXTxPT7f5IG0hNdUyHUU/o9JTnCc9mad
+IgNTZezjxD7lM6GOvRa5FTuyFEiCqwABuMD99gAAA7CGMum5obk=
+=ov6n
 -----END PGP SIGNATURE-----
 
---FeAIMMcddNRN4P4/--
+--y96v7rNg6HAoELs5--
