@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40681)
+Received: from eggs.gnu.org ([209.51.188.92]:42806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h13yf-0007H2-4N
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 01:55:01 -0500
+	(envelope-from <thuth@redhat.com>) id 1h14D3-0001jI-Sn
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:09:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h13ye-00030r-9n
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 01:55:01 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190225183757.27378-1-armbru@redhat.com>
-	<20190225183757.27378-5-armbru@redhat.com>
-	<9218d2e9-5519-055b-dfb9-e78f99559b80@redhat.com>
-Date: Tue, 05 Mar 2019 07:54:53 +0100
-In-Reply-To: <9218d2e9-5519-055b-dfb9-e78f99559b80@redhat.com> (Thomas Huth's
-	message of "Mon, 4 Mar 2019 19:45:07 +0100")
-Message-ID: <87mum9x136.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 4/6] sysbus: Fix latent bug with
- onboard devices
+	(envelope-from <thuth@redhat.com>) id 1h14D3-0004vJ-7v
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:09:53 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  5 Mar 2019 08:09:45 +0100
+Message-Id: <1551769785-17717-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] target/s390x: Remove non-architected entries
+ from struct LowCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +18,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, "Jason J. Herne" <jjherne@linux.ibm.com>
 
-Thomas Huth <thuth@redhat.com> writes:
+There are some fields in our struct LowCore which apparently have
+been copied from a very old version of the Linux kernel. These
+fields are not architected in the "Principles of Operation", and
+only used on these memory locations in Linux kernels older than
+2.6.29. Newer Linux kernels moved the entries to different locations
+or are not using them at all anymore. Thus we should never access
+these fields from the QEMU side, so they should be removed.
 
-> On 25/02/2019 19.37, Markus Armbruster wrote:
->> The first call of sysbus_get_default() creates the main system bus and
->> stores it in QOM as "/machine/unattached/sysbus".  This must not
->> happen before main() creates "/machine", or else container_get() would
->> "helpfully" create it as "container" object, and the real creation of
->> "/machine" would later abort with "attempt to add duplicate property
->> 'machine' to object (type 'container')".  Has been that way ever since
->> we wired up busses in QOM (commit f968fc6892d, v1.2.0).
->> 
->> I believe the bug is latent.  I got it to bite by trying to
->> qdev_create() a sysbus device from a machine's .instance_init()
->> method.
->> 
->> The fix is obvious: store the main system bus in QOM right after
->> creating "/machine".
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/core/sysbus.c | 3 ---
->>  vl.c             | 4 ++++
->>  2 files changed, 4 insertions(+), 3 deletions(-)
->> 
->> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
->> index 9f9edbcab9..307cf90a51 100644
->> --- a/hw/core/sysbus.c
->> +++ b/hw/core/sysbus.c
->> @@ -357,9 +357,6 @@ static void main_system_bus_create(void)
->>      qbus_create_inplace(main_system_bus, system_bus_info.instance_size,
->>                          TYPE_SYSTEM_BUS, NULL, "main-system-bus");
->>      OBJECT(main_system_bus)->free = g_free;
->> -    object_property_add_child(container_get(qdev_get_machine(),
->> -                                            "/unattached"),
->> -                              "sysbus", OBJECT(main_system_bus), NULL);
->>  }
->>  
->>  BusState *sysbus_get_default(void)
->> diff --git a/vl.c b/vl.c
->> index e3fdce410f..6ce3d2d448 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -3990,6 +3990,10 @@ int main(int argc, char **argv, char **envp)
->>      }
->>      object_property_add_child(object_get_root(), "machine",
->>                                OBJECT(current_machine), &error_abort);
->> +    object_property_add_child(container_get(OBJECT(current_machine),
->> +                                            "/unattached"),
->> +                              "sysbus", OBJECT(sysbus_get_default()),
->> +                              NULL);
->>  
->>      if (machine_class->minimum_page_bits) {
->>          if (!set_preferred_target_page_bits(machine_class->minimum_page_bits)) {
->> 
->
-> Looks right. Especially, a device should also not add itself to a
-> parent, so this definitely should not be done in sysbus.c
->
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
->
->
-> PS: Not directly related to your patch, but in a separate patch we
-> should also object_unref(current_machine) here to drop the superfluous
-> second reference to current_machine after we added it as a child of the
-> root object.
+While we're at it, also add a QEMU_BUILD_BUG_MSG() statement to
+assert that struct LowCore has the right size.
 
-Just for cleanliness.  Makes sense.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ target/s390x/internal.h | 40 +---------------------------------------
+ 1 file changed, 1 insertion(+), 39 deletions(-)
 
-Thanks!
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index 7baf0e2..4752ab0 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -63,45 +63,7 @@ typedef struct LowCore {
+     PSW             program_new_psw;          /* 0x1d0 */
+     PSW             mcck_new_psw;             /* 0x1e0 */
+     PSW             io_new_psw;               /* 0x1f0 */
+-    PSW             return_psw;               /* 0x200 */
+-    uint8_t         irb[64];                  /* 0x210 */
+-    uint64_t        sync_enter_timer;         /* 0x250 */
+-    uint64_t        async_enter_timer;        /* 0x258 */
+-    uint64_t        exit_timer;               /* 0x260 */
+-    uint64_t        last_update_timer;        /* 0x268 */
+-    uint64_t        user_timer;               /* 0x270 */
+-    uint64_t        system_timer;             /* 0x278 */
+-    uint64_t        last_update_clock;        /* 0x280 */
+-    uint64_t        steal_clock;              /* 0x288 */
+-    PSW             return_mcck_psw;          /* 0x290 */
+-    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
+-    /* System info area */
+-    uint64_t        save_area[16];            /* 0xc00 */
+-    uint8_t         pad10[0xd40 - 0xc80];     /* 0xc80 */
+-    uint64_t        kernel_stack;             /* 0xd40 */
+-    uint64_t        thread_info;              /* 0xd48 */
+-    uint64_t        async_stack;              /* 0xd50 */
+-    uint64_t        kernel_asce;              /* 0xd58 */
+-    uint64_t        user_asce;                /* 0xd60 */
+-    uint64_t        panic_stack;              /* 0xd68 */
+-    uint64_t        user_exec_asce;           /* 0xd70 */
+-    uint8_t         pad11[0xdc0 - 0xd78];     /* 0xd78 */
+-
+-    /* SMP info area: defined by DJB */
+-    uint64_t        clock_comparator;         /* 0xdc0 */
+-    uint64_t        ext_call_fast;            /* 0xdc8 */
+-    uint64_t        percpu_offset;            /* 0xdd0 */
+-    uint64_t        current_task;             /* 0xdd8 */
+-    uint32_t        softirq_pending;          /* 0xde0 */
+-    uint32_t        pad_0x0de4;               /* 0xde4 */
+-    uint64_t        int_clock;                /* 0xde8 */
+-    uint8_t         pad12[0xe00 - 0xdf0];     /* 0xdf0 */
+-
+-    /* 0xe00 is used as indicator for dump tools */
+-    /* whether the kernel died with panic() or not */
+-    uint32_t        panic_magic;              /* 0xe00 */
+-
+-    uint8_t         pad13[0x11b0 - 0xe04];    /* 0xe04 */
++    uint8_t         pad13[0x11b0 - 0x200];    /* 0x200 */
+ 
+     uint64_t        mcesad;                    /* 0x11B0 */
+ 
+-- 
+1.8.3.1
