@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48319)
+Received: from eggs.gnu.org ([209.51.188.92]:52591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h14ZU-0000UU-SQ
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:33:05 -0500
+	(envelope-from <david@redhat.com>) id 1h14yL-0005Ws-KN
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:58:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h14ZU-0008OX-4f
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:33:04 -0500
-References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-	<1551466776-29123-11-git-send-email-jjherne@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6127a424-50cc-7a8a-3142-4797127f9282@redhat.com>
-Date: Tue, 5 Mar 2019 08:32:59 +0100
+	(envelope-from <david@redhat.com>) id 1h14yK-0004s1-Oh
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:58:45 -0500
+References: <1551770054-18493-1-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <11bd7030-359a-d99c-3af1-9cd768112e68@redhat.com>
+Date: Tue, 5 Mar 2019 08:58:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <1551466776-29123-11-git-send-email-jjherne@linux.ibm.com>
+In-Reply-To: <1551770054-18493-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 10/16] s390-bios: Support
- for running format-0/1 channel programs
+Subject: Re: [Qemu-devel] [PATCH v2] target/s390x: Remove non-architected
+ entries from struct LowCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +24,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, "Jason J. Herne" <jjherne@linux.ibm.com>
 
-On 01/03/2019 19.59, Jason J. Herne wrote:
-> Add struct for format-0 ccws. Support executing format-0 channel
-> programs and waiting for their completion before continuing execution.
-> This will be used for real dasd ipl.
+On 05.03.19 08:14, Thomas Huth wrote:
+> There are some fields in our struct LowCore which apparently have
+> been copied from a very old version of the Linux kernel. These
+> fields are not architected in the "Principles of Operation", and
+> only used on these memory locations in Linux kernels older than
+> 2.6.29. Newer Linux kernels moved the entries to different locations
+> or are not using them at all anymore. Thus we should never access
+> these fields from the QEMU side, so they should be removed.
 > 
-> Add cu_type() to channel io library. This will be used to query control
-> unit type which is used to determine if we are booting a virtio device or a
-> real dasd device.
+> While we're at it, also add a QEMU_BUILD_BUG_MSG() statement to
+> assert that struct LowCore has the right size.
 > 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-[...]
-> diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
-> index 5c22cb0..2b4ea4c 100644
-> --- a/pc-bios/s390-ccw/start.S
-> +++ b/pc-bios/s390-ccw/start.S
-> @@ -71,6 +71,26 @@ consume_sclp_int:
->          larl %r1, enabled_wait_psw
->          lpswe 0(%r1)
+>  v2: Now really added the QEMU_BUILD_BUG_MSG()
+> 
+>  target/s390x/internal.h | 41 ++---------------------------------------
+>  1 file changed, 2 insertions(+), 39 deletions(-)
+> 
+> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+> index 7baf0e2..84ce090 100644
+> --- a/target/s390x/internal.h
+> +++ b/target/s390x/internal.h
+> @@ -63,45 +63,7 @@ typedef struct LowCore {
+>      PSW             program_new_psw;          /* 0x1d0 */
+>      PSW             mcck_new_psw;             /* 0x1e0 */
+>      PSW             io_new_psw;               /* 0x1f0 */
+> -    PSW             return_psw;               /* 0x200 */
+> -    uint8_t         irb[64];                  /* 0x210 */
+> -    uint64_t        sync_enter_timer;         /* 0x250 */
+> -    uint64_t        async_enter_timer;        /* 0x258 */
+> -    uint64_t        exit_timer;               /* 0x260 */
+> -    uint64_t        last_update_timer;        /* 0x268 */
+> -    uint64_t        user_timer;               /* 0x270 */
+> -    uint64_t        system_timer;             /* 0x278 */
+> -    uint64_t        last_update_clock;        /* 0x280 */
+> -    uint64_t        steal_clock;              /* 0x288 */
+> -    PSW             return_mcck_psw;          /* 0x290 */
+> -    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
+> -    /* System info area */
+> -    uint64_t        save_area[16];            /* 0xc00 */
+> -    uint8_t         pad10[0xd40 - 0xc80];     /* 0xc80 */
+> -    uint64_t        kernel_stack;             /* 0xd40 */
+> -    uint64_t        thread_info;              /* 0xd48 */
+> -    uint64_t        async_stack;              /* 0xd50 */
+> -    uint64_t        kernel_asce;              /* 0xd58 */
+> -    uint64_t        user_asce;                /* 0xd60 */
+> -    uint64_t        panic_stack;              /* 0xd68 */
+> -    uint64_t        user_exec_asce;           /* 0xd70 */
+> -    uint8_t         pad11[0xdc0 - 0xd78];     /* 0xd78 */
+> -
+> -    /* SMP info area: defined by DJB */
+> -    uint64_t        clock_comparator;         /* 0xdc0 */
+> -    uint64_t        ext_call_fast;            /* 0xdc8 */
+> -    uint64_t        percpu_offset;            /* 0xdd0 */
+> -    uint64_t        current_task;             /* 0xdd8 */
+> -    uint32_t        softirq_pending;          /* 0xde0 */
+> -    uint32_t        pad_0x0de4;               /* 0xde4 */
+> -    uint64_t        int_clock;                /* 0xde8 */
+> -    uint8_t         pad12[0xe00 - 0xdf0];     /* 0xdf0 */
+> -
+> -    /* 0xe00 is used as indicator for dump tools */
+> -    /* whether the kernel died with panic() or not */
+> -    uint32_t        panic_magic;              /* 0xe00 */
+> -
+> -    uint8_t         pad13[0x11b0 - 0xe04];    /* 0xe04 */
+> +    uint8_t         pad13[0x11b0 - 0x200];    /* 0x200 */
 >  
-> +/*
-> + * void consume_io_int(void)
-> + *
-> + * eats one I/O interrupt
-> + */
-> +        .globl consume_io_int
-> +consume_io_int:
-> +        /* enable I/O interrupts in cr6 */
-> +        stctg 6,6,0(15)
-> +        oi 4(15), 0xff
-> +        lctlg 6,6,0(15)
-
-Could you please use %-register names? If we ever want to compile the
-code with Clang again, this will likely be required (see commit
-0d3a76139827f7d08f1b for example). I.e.:
-
-        stctg   %c6,%c6,0(%r15)
-        oi      4(%r15),0xff
-        lctlg   %c6,%c6,0(%r15)
-
-(indenting the parameters of the instruction would also be nice)
-
-> +        /* prepare i/o call handler */
-> +        larl %r1, io_new_code
-> +        stg %r1, 0x1f8
-> +        larl %r1, io_new_mask
-> +        mvc 0x1f0(8),0(%r1)
-> +        /* load enabled wait PSW */
-> +        larl %r1, enabled_wait_psw
-> +        lpswe 0(%r1)
-> +
->  external_new_code:
->          /* disable service interrupts in cr0 */
->          stctg   %c0,%c0,0(%r15)
-> @@ -78,6 +98,15 @@ external_new_code:
->          lctlg   %c0,%c0,0(%r15)
->          br      %r14
+>      uint64_t        mcesad;                    /* 0x11B0 */
 >  
-> +io_new_code:
-> +        /* disable I/O interrupts in cr6 */
-> +        stctg 6,6,0(15)
-> +        ni 4(15), 0x00
-> +        lctlg 6,6,0(15)
+> @@ -130,6 +92,7 @@ typedef struct LowCore {
+>  
+>      uint8_t         pad18[0x2000 - 0x1400];    /* 0x1400 */
+>  } QEMU_PACKED LowCore;
+> +QEMU_BUILD_BUG_MSG(sizeof(LowCore) != 8192, "size of LowCore");
 
-dito
+I don't consider this message any useful. It is literally self
+documenting code what we have here.
 
- Thanks,
-  Thomas
+Anyhow,
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
