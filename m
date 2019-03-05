@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42224)
+Received: from eggs.gnu.org ([209.51.188.92]:47496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lpeng@wavecomp.com>) id 1h18Qt-0000vf-VL
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:40:29 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1AvJ-0002aB-Is
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:20:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lpeng@wavecomp.com>) id 1h18Qs-0005Dk-Rc
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:40:27 -0500
-Received: from mail-eopbgr740138.outbound.protection.outlook.com
-	([40.107.74.138]:6209
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lpeng@wavecomp.com>) id 1h18Qs-0005AZ-Fx
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:40:26 -0500
-From: Luyou Peng <lpeng@wavecomp.com>
-Date: Tue, 5 Mar 2019 11:40:24 +0000
-Message-ID: <BN6PR2201MB13474AAB9F74F5C17C72CD8BD1720@BN6PR2201MB1347.namprd22.prod.outlook.com>
-Content-Language: en-US
+	(envelope-from <dgilbert@redhat.com>) id 1h1AvI-0002NU-73
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:20:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1AvG-0002IS-8y
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:20:00 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 76E57307E04A
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 14:19:56 +0000 (UTC)
+Date: Tue, 5 Mar 2019 14:19:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190305141949.GE9811@work-vm>
+References: <20190227105128.1655-1-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] qemu user mode could not support binfmt_misc config
- with flags include "P"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190227105128.1655-1-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v14 0/3] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +32,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Yunqiang Su <ysu@wavecomp.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Hi Sir:
-During our test in chroot environment with qemu-user-static, we got some te=
-st cases failed because of program output warning with unexpected full path=
- name.
-For example in test module "Devscripts"
-the test item for broken tarball expected the warning info:
-< tar: This does not look like a tar archive
-tar: ******* >
-but the output was:
-< /bin/tar: This does not look like a tar archive
-/bin/tar: ******>
-the cause is the config file of binfmt_misc was set not to send argv0, for =
-example:
-type command "tar" after chroot:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
-[sudo] password for lpeng:
-root@lpeng-VirtualBox:/# tar
-/bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-lab=
-el' options
-Try '/bin/tar --help' or '/bin/tar --usage' for more information.
-root@lpeng-VirtualBox:/#
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
+* Juan Quintela (quintela@redhat.com) wrote:
+> In v14:
+> - updates commets to 4.0
+> - Update migration-test copy of SocketAddress_str
 
-by adding output log in main()@qemu/Linux-user/main.c
-we found the original input command was changed, and qemu do not know that,=
- we got the input args:
-argv_0----/usr/bin/qemu-mips64el-static---
-argv_1----/bin/tar---
-argv_2----NULL---
+Queued
 
-Next step we modified the flags=3DP in the corresponding config under folde=
-r /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
-But chroot could not start bash because in current qemu dose not consider a=
-bout this unexpected one more"argv[0]"
-
-After modified qemu code temporary to handle the new argv list we got the i=
-nput args, and from argv[2] is the original input command
-argv_0----/usr/bin/qemu-mips64el-static---
-argv_1----/bin/tar---
-argv_2----tar---
-
-I have submitted a ticket:https://bugs.launchpad.net/qemu/+bug/1818483, and=
- I tried to modified binfmt_misc.c to let it send one more args if the corr=
-esponding binfmt_misc flags include "P", also I modified main.c in qemu as =
-attached patch_qemu_main.patch to check if the input args include such stri=
-ng. Then qemu user could support both scenarios.
-Is this modification feasible?
-Thanks so much!
-
-Regards
-Luyou
+> In v13:
+> - Rename socket_address to socket_address_list (dave)
+> - Remove useless breaks (dave)
+> 
+> If nothing pops out, everything is reviewed and will be sent on next
+> pull requset.
+> 
+> Later, Juan.
+> 
+> In v12:
+> - drop multifd case (caming in next series)
+> - fix leak of socketaddress (eric)
+> - handle vsock printing correctly (eric)
+> 
+> Iv v11:
+> - Rebase to lastest
+> - Remove the compress test.  It didin't worked really.
+>   See my next series.
+> - Only patch missing review-by is the second one.
+> 
+> Please, consider them.
+> 
+> In v10:
+> - rebase to latest upstream
+> - code changed quite a bit with qmp refactorings
+>   apllied them
+> - make it work again
+> - compress threads test, continue working there, not trivial.
+> 
+> Two question-:
+> - should we integrate them on this cycle?
+>   they are tests
+> - should we enable them only on baremetal, and not on emulation?
+>   There is still a problem on TCG that sometimes fails the migration
+>   thread
+> 
+> ToDo:
+> - Finish debug compress test
+>   Still stuck why the test wonk when I launch qemu by hand but not
+>   trough qtest.  Creatuve uses of launching gdb through launched
+>   guests have not help so far.
+> 
+> - Finish fd transport test
+>   Not very difficult in principle, need more checking to see if it
+>   don't fail in other setups.
+> 
+> - Finish tl trasport test
+>   I already knew that I hate certificates, but this is too much.  Trying
+>   to understand how to use them.
+> 
+> Please commet, Juan.
+> 
+> In v9:
+> - Dropp Export SocketAddress_to_str
+>   just create the functions where I need them.
+> - drop precopy test and xbzrle (on pull requset)
+>   Use 100M for cache as dave suggests
+> - drop ppc improvemnet (on pull request)
+> - drop RFH, will work on tha later
+> - move socket_address to info migrate
+> 
+> Please, review.
+> 
+> Later, Juan.
+> 
+> v8:
+> - just rebase to make things continue to wonk
+> 
+> New in the other v7:
+> - SocketAddress is now a list (a.k.a make happy danp)
+> - Rebase on top of upstream
+>   network listener is *interesting*
+> - *HACK* to make SocketAddress list in common
+>   see patch: create-socket-paramenter
+> 
+> Please review, Juan.
+> 
+> CC: berrange@redhat.com
+> 
+> [v7]
+> This is v6, it differest from the patches that I sent with previous
+> multifd post:
+> - Rename x-tcp-port to x-socket-address
+>   This is more *complicated* that it looks as:
+> 
+>   * it is a pointer, so I need to use QAPI_CLONE() to make info
+>     migrate work
+> 
+>   * this is an union of structs.  In QAPI. So, a dict of strings.  The
+>     only way that I was able to make things work is parsing the qdict
+>     to a SocketAddress and then output a SocketAddress as an str.  It
+>     needs to be an easier way, for sure.
+> 
+>   * Cleanups here andthere.
+> 
+> Please, review, Juan.
+> 
+> [v5]
+> - Several patches moved to pull request
+> - merge info_migrate and migration_tests
+>   only missing bit is tcp_port, needed for tcp tests
+> - Rename tcp-port to x-tcp-port
+>   We will get better naming from David at some point, and we will use that bit
+> - ppc: use inline code as suggested by lvivier
+> 
+> Please, review.
+> 
+> It is based on my previous pull request
+> 
+> Based-on: 20180129120932.12874-1-quintela@redhat.com
+> 
+> [v4]
+> - rebase on top on v4 info_migrate patches
+> - Tune sleeps to make patches fast
+> - Create a deprecated test for deprecated commands (i.e. make peterxu happy)
+> - create migrate_start_postcopy function
+> - fix naming/sizes between power and x86
+> - cleanup comments to match code
+> 
+> [v3]
+> 
+> - No more tests for deprecated parameters. Now I only use
+>   migrate_set_parameter.  If there is a deprecated command for that,
+>   we tests it there.
+> - free "result" string, always good to return memory (Peter found it)
+> - use the new tcp_port parameter from info migrate.  So we are
+>   handling well the tcp case.
+> - lots of code movement around to make everything consistent.
+> - Several patches already integrated upstream.
+> 
+> [v2]
+> - to make review easier, I started renaming postcopy-test.c to migration-test.c
+> - Did cleanups/refactoring there
+> - Don't use global-qtest anymore
+> - check that the parameters that we sent got really set
+> - RFH: comrpress threads tests is not working for some weird reason.  Using the same code on command line works.
+>   still investigating why.
+> 
+> ToDoo:
+> 
+> - tcp: after discussions with dave, we ended in conclusion that we
+>   need to use the 0 port and let the system gives us a free one
+> 
+>   But .... that means that we need to be able to get that port back somehow.
+>   "info migrate" woring on destination side?
+> 
+> - compression threads.  There is some weird interaction with the test
+>   hardness and every migration thread get waiting in a different
+>   semaphore.  Investigating if it is a race/bug/whateverr
+> 
+> - deprecated commands: There was a suggestion to make
+>   migrate_set_parameter look at the parameter name and test old/new
+>   depending on something.  Not sure what to do here.
+> 
+> - testing commands: Is there a way to launch qemu and just sent
+>   qmp/hmp commands without having to really run anything else?
+> 
+> [v1]
+> - add test for precopy for unix/tcp
+>   exec and fd to came, don't know how to test rdma without hardware
+> - add tests using deprecated interfaces
+> - add test for xbzrle
+>   Note to myself, there is no way to set the cache size with migraton_set_parameters
+> - Add test for compress threads
+>   disabled on the series, right now it appears that compression is not working at all
+> - Move postcopy to use new results
+>   Idea is to move it on top of migration-test.c, but first I want some reviews on basic idea
+> 
+> Juan Quintela (3):
+>   tests: Add migration xbzrle test
+>   migration: Create socket-address parameter
+>   tests: Add basic migration precopy tcp test
+> 
+>  hmp.c                  |  33 ++++++++
+>  migration/migration.c  |  24 ++++++
+>  migration/migration.h  |   4 +
+>  migration/socket.c     |  11 +++
+>  qapi/migration.json    |   6 +-
+>  qapi/sockets.json      |  18 +++++
+>  tests/migration-test.c | 174 +++++++++++++++++++++++++++++++++++++++--
+>  7 files changed, 264 insertions(+), 6 deletions(-)
+> 
+> -- 
+> 2.20.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
