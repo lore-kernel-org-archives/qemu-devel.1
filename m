@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43474)
+Received: from eggs.gnu.org ([209.51.188.92]:43489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14G7-00032t-Ck
+	(envelope-from <thuth@redhat.com>) id 1h14G7-00033O-TX
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14G6-0000lX-KN
+	(envelope-from <thuth@redhat.com>) id 1h14G7-0000lz-7h
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14G5-0000kd-3T
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:02 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  5 Mar 2019 15:12:17 +0800
-Message-Id: <1551769940-22739-11-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-References: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 10/13] virtio-net: Allow qemu_announce_self
- to trigger virtio announcements
+From: Thomas Huth <thuth@redhat.com>
+References: <1551769785-17717-1-git-send-email-thuth@redhat.com>
+Message-ID: <a1d91dfd-a6dc-d06c-332c-1865cbc3c08a@redhat.com>
+Date: Tue, 5 Mar 2019 08:12:55 +0100
+MIME-Version: 1.0
+In-Reply-To: <1551769785-17717-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] target/s390x: Remove
+ non-architected entries from struct LowCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vladislav Yasevich <vyasevic@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 05/03/2019 08.09, Thomas Huth wrote:
+> There are some fields in our struct LowCore which apparently have
+> been copied from a very old version of the Linux kernel. These
+> fields are not architected in the "Principles of Operation", and
+> only used on these memory locations in Linux kernels older than
+> 2.6.29. Newer Linux kernels moved the entries to different locations
+> or are not using them at all anymore. Thus we should never access
+> these fields from the QEMU side, so they should be removed.
+> 
+> While we're at it, also add a QEMU_BUILD_BUG_MSG() statement to
+> assert that struct LowCore has the right size.
 
-Expose the virtio-net self announcement capability and allow
-qemu_announce_self() to call it.
+Uh, sorry, wrong version of the patch, please ignore, I did not add the
+QEMU_BUILD_BUG_MSG() here yet. I'll send a v2 in a minute...
 
-These announces are caused by something external (i.e. the
-announce-self command); they won't trigger if the migration
-counter is triggering announces at the same time.
-
-Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/net/trace-events |  1 +
- hw/net/virtio-net.c | 35 ++++++++++++++++++++++++++++++++---
- 2 files changed, 33 insertions(+), 3 deletions(-)
-
-diff --git a/hw/net/trace-events b/hw/net/trace-events
-index b237d90..3a86004 100644
---- a/hw/net/trace-events
-+++ b/hw/net/trace-events
-@@ -361,6 +361,7 @@ sunhme_rx_desc(uint32_t addr, int offset, uint32_t status, int len, int cr, int
- sunhme_rx_xsum_calc(uint16_t xsum) "calculated incoming xsum as 0x%x"
- 
- # hw/net/virtio-net.c
-+virtio_net_announce_notify(void) ""
- virtio_net_announce_timer(int round) "%d"
- virtio_net_handle_announce(int round) "%d"
- virtio_net_post_load_device(void)
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 38b8974..7e2c2a6 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -150,15 +150,42 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
-         (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
- }
- 
-+static void virtio_net_announce_notify(VirtIONet *net)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(net);
-+    trace_virtio_net_announce_notify();
-+
-+    net->status |= VIRTIO_NET_S_ANNOUNCE;
-+    virtio_notify_config(vdev);
-+}
-+
- static void virtio_net_announce_timer(void *opaque)
- {
-     VirtIONet *n = opaque;
--    VirtIODevice *vdev = VIRTIO_DEVICE(n);
-     trace_virtio_net_announce_timer(n->announce_timer.round);
- 
-     n->announce_timer.round--;
--    n->status |= VIRTIO_NET_S_ANNOUNCE;
--    virtio_notify_config(vdev);
-+    virtio_net_announce_notify(n);
-+}
-+
-+static void virtio_net_announce(NetClientState *nc)
-+{
-+    VirtIONet *n = qemu_get_nic_opaque(nc);
-+    VirtIODevice *vdev = VIRTIO_DEVICE(n);
-+
-+    /*
-+     * Make sure the virtio migration announcement timer isn't running
-+     * If it is, let it trigger announcement so that we do not cause
-+     * confusion.
-+     */
-+    if (n->announce_timer.round) {
-+        return;
-+    }
-+
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
-+        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
-+            virtio_net_announce_notify(n);
-+    }
- }
- 
- static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
-@@ -2556,6 +2583,7 @@ static NetClientInfo net_virtio_info = {
-     .receive = virtio_net_receive,
-     .link_status_changed = virtio_net_set_link_status,
-     .query_rx_filter = virtio_net_query_rxfilter,
-+    .announce = virtio_net_announce,
- };
- 
- static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
-@@ -2692,6 +2720,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-     qemu_announce_timer_reset(&n->announce_timer, migrate_announce_params(),
-                               QEMU_CLOCK_VIRTUAL,
-                               virtio_net_announce_timer, n);
-+    n->announce_timer.round = 0;
- 
-     if (n->netclient_type) {
-         /*
--- 
-2.5.0
+ Thomas
