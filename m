@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35467)
+Received: from eggs.gnu.org ([209.51.188.92]:35471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DlB-00025l-M9
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DlC-000260-0z
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DlA-0000LK-DD
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DlB-0000Qa-57
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:45 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:51257)
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:51247)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1Dl9-0000EV-W8
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:44 -0500
-Received: by mail-wm1-x336.google.com with SMTP id n19so3357982wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:21:43 -0800 (PST)
+	id 1h1DlA-0000KV-UB
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:45 -0500
+Received: by mail-wm1-x32b.google.com with SMTP id n19so3358051wmi.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:21:44 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Mar 2019 17:21:27 +0000
-Message-Id: <20190305172139.32662-1-peter.maydell@linaro.org>
+Date: Tue,  5 Mar 2019 17:21:28 +0000
+Message-Id: <20190305172139.32662-2-peter.maydell@linaro.org>
+In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
+References: <20190305172139.32662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 00/12] Enable build and install of our rST
- docs
+Subject: [Qemu-devel] [PATCH v3 01/12] docs/cpu-hotplug.rst: Fix rST markup
+ issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +33,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-This patchset enables building and installing the various rST
-docs we have started to accumulate in our docs/ directory.
+sphinx-build complains:
 
-Version 3 is almost the same as version 2: the only
-differences are:
- * patch 5 enabling the Alabaster theme also adds
-   "needs_sphinx = '1.3'" to docs/conf.py, since that is
-   where the Alabaster theme was added to Sphinx proper
- * patch 9 has a new has_sphinx_build() function which
-   specifically tests that sphinx-build can handle our
-   conf.py, rather than just testing the executable
-   is present
- * patch 9 adds /.doctrees to the .gitignore
- * patch 12 is new and provides a MAINTAINERS entry
-   for the conf.py files (ie the build infrastructure,
-   as distinct from the content)
+docs/cpu-hotplug.rst:67: ERROR: Unexpected indentation.
+docs/cpu-hotplug.rst:69: ERROR: Unexpected indentation.
+docs/cpu-hotplug.rst:74: WARNING: Block quote ends without a blank line; unexpected unindent.
+docs/cpu-hotplug.rst:75: WARNING: Block quote ends without a blank line; unexpected unindent.
+docs/cpu-hotplug.rst:76: SEVERE: Unexpected section title.
 
-I figured the changes in patches 5 and 9 were small enough
-that I've kept the various reviewed/tested/etc tags.
+}
+{
+docs/cpu-hotplug.rst:78: WARNING: Block quote ends without a blank line; unexpected unindent.
 
-thanks
--- PMM
+These are the result of not indicating one of the literal
+blocks by finishing the preceding paragraph with the "::" marker.
 
-Peter Maydell (12):
-  docs/cpu-hotplug.rst: Fix rST markup issues
-  docs: Convert memory.txt to rst format
-  docs: Commit initial files from sphinx-quickstart
-  docs/conf.py: Disable unused _static directory
-  docs/conf.py: Configure the 'alabaster' theme
-  docs/conf.py: Don't include rST sources in HTML build
-  docs/conf.py: Disable option warnings
-  docs: Provide separate conf.py for each manual we want
-  Makefile, configure: Support building rST documentation
-  Makefile: Abstract out "identify the pkgversion" code
-  docs/conf.py: Don't hard-code QEMU version
-  MAINTAINERS: Add entry for Sphinx documentation infrastructure
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-id: 20190228145624.24885-2-peter.maydell@linaro.org
+---
+ docs/cpu-hotplug.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- configure                             |  15 +-
- Makefile                              |  78 +++++++---
- .gitignore                            |   1 +
- MAINTAINERS                           |   6 +
- docs/conf.py                          | 216 ++++++++++++++++++++++++++
- docs/cpu-hotplug.rst                  |   2 +-
- docs/devel/conf.py                    |  15 ++
- docs/devel/index.rst                  |  21 +++
- docs/devel/{memory.txt => memory.rst} | 128 ++++++++-------
- docs/index.rst                        |  15 ++
- docs/interop/conf.py                  |  15 ++
- docs/interop/index.rst                |  18 +++
- 12 files changed, 449 insertions(+), 81 deletions(-)
- create mode 100644 docs/conf.py
- create mode 100644 docs/devel/conf.py
- create mode 100644 docs/devel/index.rst
- rename docs/devel/{memory.txt => memory.rst} (85%)
- create mode 100644 docs/index.rst
- create mode 100644 docs/interop/conf.py
- create mode 100644 docs/interop/index.rst
-
+diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
+index 1c268e00b41..e2d4e893b01 100644
+--- a/docs/cpu-hotplug.rst
++++ b/docs/cpu-hotplug.rst
+@@ -60,7 +60,7 @@ vCPU hotplug
+     hot-plugged (no "qom-path" member).  From its output in step (3), we
+     can see that ``IvyBridge-IBRS-x86_64-cpu`` is present in socket 0,
+     while hot-plugging a CPU into socket 1 requires passing the listed
+-    properties to QMP ``device_add``:
++    properties to QMP ``device_add``::
+ 
+       (QEMU) device_add id=cpu-2 driver=IvyBridge-IBRS-x86_64-cpu socket-id=1 core-id=0 thread-id=0
+       {
 -- 
 2.20.1
