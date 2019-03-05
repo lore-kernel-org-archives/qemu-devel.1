@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40356)
+Received: from eggs.gnu.org ([209.51.188.92]:40359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1Jiw-0007Ht-S5
+	(envelope-from <jsnow@redhat.com>) id 1h1Jiw-0007Hy-Ss
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:43:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1Jiu-0005mr-Ux
+	(envelope-from <jsnow@redhat.com>) id 1h1Jiu-0005mu-Up
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:43:50 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  5 Mar 2019 18:43:34 -0500
-Message-Id: <20190305234337.18353-3-jsnow@redhat.com>
+Date: Tue,  5 Mar 2019 18:43:33 -0500
+Message-Id: <20190305234337.18353-2-jsnow@redhat.com>
 In-Reply-To: <20190305234337.18353-1-jsnow@redhat.com>
 References: <20190305234337.18353-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/5] block/qcow2-bitmap: Allow bitmap flushing
+Subject: [Qemu-devel] [PATCH 1/5] block/qcow2-bitmap: Skip length check in
+ some cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,109 +23,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-Usually, we only write out bitmaps when we're about to close out the file,
-so we always remove the bitmaps after to make it easier to determine the
-source of truth for migration purposes.
+If we were to allow resizes, the length check that happens when we load
+bitmap headers from disk when we read or store bitmaps would begin to
+fail:
 
-However, there may be times we want to flush bitmap data more aggressively,
-like after a truncate event where we need to make the metadata consistent
-again.
+Imagine the circumstance where we've resized bitmaps in memory, but they still
+have the old values on-disk. The lengths will no longer match bdrv_getlength,
+so we must allow this check to be skipped when flushing bitmaps to disk.
+
+Limit this to when we are about to overwrite the headers: we will verify the
+outgoing headers, but we will skip verifying the known stale headers.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/qcow2.h        |  1 +
- block/qcow2-bitmap.c | 45 ++++++++++++++++++++++++++++++--------------
- 2 files changed, 32 insertions(+), 14 deletions(-)
+ block/qcow2-bitmap.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 9dd02df831..4c1fdfcbec 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -690,6 +690,7 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-+void qcow2_flush_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
- bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-                                       const char *name,
 diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index d02730004a..4e11b6b05a 100644
+index c3b210ede1..d02730004a 100644
 --- a/block/qcow2-bitmap.c
 +++ b/block/qcow2-bitmap.c
-@@ -1392,7 +1392,7 @@ fail:
-     bitmap_list_free(bm_list);
+@@ -435,7 +435,8 @@ static inline Qcow2BitmapDirEntry *next_dir_entry(Qcow2BitmapDirEntry *entry)
+     return (Qcow2BitmapDirEntry *)((uint8_t *)entry + dir_entry_size(entry));
  }
  
--void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-+static void do_store_bitmaps(BlockDriverState *bs, bool remove, Error **errp)
+-static int check_dir_entry(BlockDriverState *bs, Qcow2BitmapDirEntry *entry)
++static int check_dir_entry(BlockDriverState *bs, Qcow2BitmapDirEntry *entry,
++                           bool allow_resize)
  {
-     BdrvDirtyBitmap *bitmap;
      BDRVQcow2State *s = bs->opaque;
-@@ -1474,6 +1474,9 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-             QSIMPLEQ_INSERT_TAIL(&drop_tables, tb, entry);
-         }
-         bm->flags = bdrv_dirty_bitmap_enabled(bitmap) ? BME_FLAG_AUTO : 0;
-+        if (!remove) {
-+            bm->flags |= BME_FLAG_IN_USE;
-+        }
-         bm->granularity_bits = ctz32(bdrv_dirty_bitmap_granularity(bitmap));
-         bm->dirty_bitmap = bitmap;
-     }
-@@ -1503,20 +1506,14 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-         g_free(tb);
+     uint64_t phys_bitmap_bytes;
+@@ -462,8 +463,14 @@ static int check_dir_entry(BlockDriverState *bs, Qcow2BitmapDirEntry *entry)
+         return len;
      }
  
--    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
--        /* For safety, we remove bitmap after storing.
--         * We may be here in two cases:
--         * 1. bdrv_close. It's ok to drop bitmap.
--         * 2. inactivation. It means migration without 'dirty-bitmaps'
--         *    capability, so bitmaps are not marked with
--         *    BdrvDirtyBitmap.migration flags. It's not bad to drop them too,
--         *    and reload on invalidation.
--         */
--        if (bm->dirty_bitmap == NULL) {
--            continue;
--        }
-+    if (remove) {
-+        QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-+            if (bm->dirty_bitmap == NULL) {
-+                continue;
-+            }
+-    fail = (phys_bitmap_bytes > BME_MAX_PHYS_SIZE) ||
+-           (len > ((phys_bitmap_bytes * 8) << entry->granularity_bits));
++    if (phys_bitmap_bytes > BME_MAX_PHYS_SIZE) {
++        return -EINVAL;
++    }
++
++    if (!allow_resize &&
++        (len > ((phys_bitmap_bytes * 8) << entry->granularity_bits))) {
++        return -EINVAL;
++    }
  
--        bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
-+            bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
-+        }
-     }
- 
-     bitmap_list_free(bm_list);
-@@ -1538,6 +1535,26 @@ fail:
-     bitmap_list_free(bm_list);
+     return fail ? -EINVAL : 0;
  }
- 
-+void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-+{
-+    /* For safety, we remove bitmap after storing.
-+     * We may be here in two cases:
-+     * 1. bdrv_close. It's ok to drop bitmap.
-+     * 2. inactivation. It means migration without 'dirty-bitmaps'
-+     *    capability, so bitmaps are not marked with
-+     *    BdrvDirtyBitmap.migration flags. It's not bad to drop them too,
-+     *    and reload on invalidation.
-+     */
-+    do_store_bitmaps(bs, true, errp);
-+}
-+
-+void qcow2_flush_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-+{
-+    /* We're here because of some event like resize or reopen_ro, and we want
-+     * to flush bitmaps to disk without removing them from memory. */
-+    do_store_bitmaps(bs, false, errp);
-+}
-+
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
+@@ -534,7 +541,8 @@ static uint32_t bitmap_list_count(Qcow2BitmapList *bm_list)
+  * checks it and convert to bitmap list.
+  */
+ static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, uint64_t offset,
+-                                         uint64_t size, Error **errp)
++                                         uint64_t size, bool allow_resize,
++                                         Error **errp)
  {
-     BdrvDirtyBitmap *bitmap;
+     int ret;
+     BDRVQcow2State *s = bs->opaque;
+@@ -593,7 +601,7 @@ static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, uint64_t offset,
+             goto fail;
+         }
+ 
+-        ret = check_dir_entry(bs, e);
++        ret = check_dir_entry(bs, e, allow_resize);
+         if (ret < 0) {
+             error_setg(errp, "Bitmap '%.*s' doesn't satisfy the constraints",
+                        e->name_size, dir_entry_name_field(e));
+@@ -654,7 +662,7 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+     }
+ 
+     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+-                               s->bitmap_directory_size, NULL);
++                               s->bitmap_directory_size, false, NULL);
+     if (bm_list == NULL) {
+         res->corruptions++;
+         return -EINVAL;
+@@ -755,7 +763,7 @@ static int bitmap_list_store(BlockDriverState *bs, Qcow2BitmapList *bm_list,
+         e->extra_data_size = 0;
+         memcpy(e + 1, bm->name, e->name_size);
+ 
+-        if (check_dir_entry(bs, e) < 0) {
++        if (check_dir_entry(bs, e, false) < 0) {
+             ret = -EINVAL;
+             goto fail;
+         }
+@@ -957,7 +965,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+     }
+ 
+     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+-                               s->bitmap_directory_size, errp);
++                               s->bitmap_directory_size, false, errp);
+     if (bm_list == NULL) {
+         return false;
+     }
+@@ -1066,7 +1074,7 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+     }
+ 
+     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+-                               s->bitmap_directory_size, errp);
++                               s->bitmap_directory_size, false, errp);
+     if (bm_list == NULL) {
+         return NULL;
+     }
+@@ -1111,7 +1119,7 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
+     }
+ 
+     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+-                               s->bitmap_directory_size, errp);
++                               s->bitmap_directory_size, false, errp);
+     if (bm_list == NULL) {
+         return -EINVAL;
+     }
+@@ -1359,7 +1367,7 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+     }
+ 
+     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+-                               s->bitmap_directory_size, errp);
++                               s->bitmap_directory_size, false, errp);
+     if (bm_list == NULL) {
+         return;
+     }
+@@ -1412,7 +1420,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+         bm_list = bitmap_list_new();
+     } else {
+         bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+-                                   s->bitmap_directory_size, errp);
++                                   s->bitmap_directory_size, true, errp);
+         if (bm_list == NULL) {
+             return;
+         }
+@@ -1593,7 +1601,7 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+     }
+ 
+     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+-                               s->bitmap_directory_size, errp);
++                               s->bitmap_directory_size, false, errp);
+     if (bm_list == NULL) {
+         goto fail;
+     }
 -- 
 2.17.2
