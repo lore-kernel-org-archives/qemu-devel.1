@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60320)
+Received: from eggs.gnu.org ([209.51.188.92]:37552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h0zzE-0005Dd-JW
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:39:21 -0500
+	(envelope-from <peterx@redhat.com>) id 1h10Po-00020A-I7
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:06:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h0zzD-0002ak-Pa
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:39:20 -0500
-Received: from mail-qt1-f170.google.com ([209.85.160.170]:44701)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h0zzD-0002ZY-Kw
-	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 21:39:19 -0500
-Received: by mail-qt1-f170.google.com with SMTP id d2so7483602qti.11
-	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 18:39:18 -0800 (PST)
-Date: Mon, 4 Mar 2019 21:39:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190304213517-mutt-send-email-mst@kernel.org>
-References: <40280F65B1B0B44E8089ED31C01616EBA3947E6A@dggeml529-mbx.china.huawei.com>
+	(envelope-from <peterx@redhat.com>) id 1h10Pn-0004Mz-Sk
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:06:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1h10Pn-0004Jv-MN
+	for qemu-devel@nongnu.org; Mon, 04 Mar 2019 22:06:47 -0500
+Date: Tue, 5 Mar 2019 11:06:36 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190305030636.GF1657@xz-x1>
+References: <1551753295-30167-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1551753295-30167-2-git-send-email-yi.y.sun@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <40280F65B1B0B44E8089ED31C01616EBA3947E6A@dggeml529-mbx.china.huawei.com>
-Subject: Re: [Qemu-devel] Question about VM virtio device's link down delay
- when vhost-user reconnect
+In-Reply-To: <1551753295-30167-2-git-send-email-yi.y.sun@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/3] intel_iommu: scalable mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Lilijun (Jerry, Cloud Networking)" <jerry.lilijun@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>, "lixiao (H)" <lixiao91@huawei.com>, wangyunjian <wangyunjian@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
-On Mon, Mar 04, 2019 at 11:46:32AM +0000, Lilijun (Jerry, Cloud Networking) wrote:
-> Hi all,
+On Tue, Mar 05, 2019 at 10:34:53AM +0800, Yi Sun wrote:
+> From: "Liu, Yi L" <yi.l.liu@intel.com>
 > 
->       I am running my VM using vhost-user NIC with OVS-DPDK.  The steps of my question is shown as follows:
->      1) In the VM, I add one route entry manually on the vNIC eth0 using "route add default gw 192.168.1.2". 
->      2) If openvswitch service was restarted, or the process ovs-vswitchd was aborted, the new process may be started successfully after long seconds such as 40s for the initialization of DPDK huge page memory.
->      3) And Qemu's vhost-user closed the connection and reconnected successfully after 40s.  
->      4) Here VM's vNIC will receive link down and up events, the interval between the two events is about 40s.
->      5) Then I found that route entry disappeared unexpectedly. This will cause some network traffic problems.
+> Intel(R) VT-d 3.0 spec introduces scalable mode address translation to
+> replace extended context mode. This patch extends current emulator to
+> support Scalable Mode which includes root table, context table and new
+> pasid table format change. Now intel_iommu emulates both legacy mode
+> and scalable mode (with legacy-equivalent capability set).
 > 
->      I have an idea about this problem. We can add a parameter " link_down_delay" for all virtio devices that use vhost-user socket such as virtio-net and virtio-blk. 
+> The key points are below:
+> 1. Extend root table operations to support both legacy mode and scalable
+>    mode.
+> 2. Extend context table operations to support both legacy mode and
+>    scalable mode.
+> 3. Add pasid tabled operations to support scalable mode.
 > 
->     If vhost-user socket get a connection closed event when the backend process was aborted or restarted, we don't notify VM virtio-net device link down right now.
->    When the vhost-user backend recover this socket's connections before the time of "link_down_delay" ms passed, we need not do that link down notification to VM.
->    Or else, if that's timeout, VM can be notified the link down event as before.
-> 
->     Is there any other opinions about this solution?  Or some better ideas? Thanks.
-> 
-> B.R.
-> 
-> Jerry
-> 
+> Signed-off-by: Liu, Yi L <yi.l.liu@intel.com>
+> [Yi Sun is co-developer to contribute much to refine the whole commit.]
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+> RFC v2->v1
+>     - revert unnecessary rename in 'vtd_ce_present".
+>     - use 'ce_size' to judge if it is scalable mode in
+>       'vtd_get_context_entry_from_root'.
+>     - remove some 'inline' declarations.
+>     - remove unnecessary scalable mode check in 'vtd_ce_type_check' and
+>       make corresponding changes in 'vtd_dev_to_context_entry'.
+>     - add 'VTD_FR_PASID_TABLE_INV' case in 'vtd_qualified_faults[]'.
+>     - create a macro function to handle a repeated pattern about 'is_fpd_set'.
+>     - explicitly print 'legacy mode' when calling 'trace_vtd_replay_ce_valid'.
 
-Rather than hardcode a specific timeout policy, I would go further and
-start with an option to just hide disconnects from guest completely.
-Instead add commands to monitor status of connection and events to
-report changes.  Management tools can then mirror connection status to
-link if they want to.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
 -- 
-MST
+Peter Xu
