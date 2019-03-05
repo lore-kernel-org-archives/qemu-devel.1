@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35470)
+Received: from eggs.gnu.org ([209.51.188.92]:35498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1C6A-0002Qk-56
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:19 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1C6D-0002TF-6L
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1C65-00036j-VO
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:16 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54884 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1C66-000397-BX
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:20 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:54937 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1h1C64-0002q9-VN
+	id 1h1C64-0002sD-UB
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:35:13 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue,  5 Mar 2019 16:34:32 +0100
-Message-Id: <1551800076-8104-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue,  5 Mar 2019 16:34:35 +0100
+Message-Id: <1551800076-8104-14-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1551800076-8104-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1551800076-8104-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 10/14] tests/tcg: target/mips: Add tests for
- MIPS64R6 bit swap instructions
+Subject: [Qemu-devel] [PATCH v8 13/14] tests/tcg: target/mips: Add tests for
+ MIPS64R6 int multiply instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +30,41 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add tests for MIPS64R6 bit swap instructions: BITSWAP and DBITSWAP.
+Add tests for MIPS64R6 integer multiply instructions: MUL, MUH, MULU,
+MUHU, DMUL, DMUH, DMULU, and DMUHU.
+
+MUH and MUHU require 64 bit inputs in the form of 64-bit sign-extended
+32-bit inputs.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 ---
- .../isa/mips64r6/bit-swap/test_mips64r6_bitswap.c  | 144 +++++++++++++++++++++
- .../isa/mips64r6/bit-swap/test_mips64r6_dbitswap.c | 144 +++++++++++++++++++++
- 2 files changed, 288 insertions(+)
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_bitswap.c
- create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_dbitswap.c
+ .../isa/mips64r6/int-multiply/test_mips64r6_dmuh.c | 151 +++++++++++++++++++++
+ .../mips64r6/int-multiply/test_mips64r6_dmuhu.c    | 151 +++++++++++++++++++++
+ .../isa/mips64r6/int-multiply/test_mips64r6_dmul.c | 151 +++++++++++++++++++++
+ .../mips64r6/int-multiply/test_mips64r6_dmulu.c    | 151 +++++++++++++++++++++
+ .../isa/mips64r6/int-multiply/test_mips64r6_muh.c  | 151 +++++++++++++++++++++
+ .../isa/mips64r6/int-multiply/test_mips64r6_muhu.c | 151 +++++++++++++++++++++
+ .../isa/mips64r6/int-multiply/test_mips64r6_mul.c  | 151 +++++++++++++++++++++
+ .../isa/mips64r6/int-multiply/test_mips64r6_mulu.c | 151 +++++++++++++++++++++
+ 8 files changed, 1208 insertions(+)
+ create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuh.c
+ create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuhu.c
+ create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmul.c
+ create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmulu.c
+ create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muh.c
+ create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muhu.c
+ create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mul.c
+ create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mulu.c
 
-diff --git a/tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_bitswap.c b/tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_bitswap.c
+diff --git a/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuh.c b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuh.c
 new file mode 100644
-index 0000000..639850d
+index 0000000..c049378
 --- /dev/null
-+++ b/tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_bitswap.c
-@@ -0,0 +1,144 @@
++++ b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuh.c
+@@ -0,0 +1,151 @@
 +/*
-+ *  Test program for MIPS64R6 instruction BITSWAP
++ *  Test program for MIPS64R6 instruction DMUH
 + *
 + *  Copyright (C) 2019  Wave Computing, Inc.
 + *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
@@ -80,104 +96,111 @@ index 0000000..639850d
 +
 +int32_t main(void)
 +{
-+    char *instruction_name = "BITSWAP";
++    char *instruction_name = "DMUH";
 +    int32_t ret;
-+    uint32_t i;
++    uint32_t i, j;
 +    struct timeval start, end;
 +    double elapsed_time;
 +
 +    uint64_t b64_result[TEST_COUNT_TOTAL];
 +    uint64_t b64_expect[TEST_COUNT_TOTAL] = {
-+        0xffffffffffffffffULL,                    /*   0  */
++        0x0000000000000000ULL,                    /*   0  */
 +        0x0000000000000000ULL,
-+        0x0000000055555555ULL,
-+        0xffffffffaaaaaaaaULL,
-+        0x0000000033333333ULL,
-+        0xffffffffccccccccULL,
-+        0x00000000711cc771ULL,
-+        0xffffffff8ee3388eULL,
-+        0x000000000f0f0f0fULL,                    /*   8  */
-+        0xfffffffff0f0f0f0ULL,
-+        0x00000000071f7cf0ULL,
-+        0xfffffffff8e0830fULL,
-+        0xfffffffff0033ff0ULL,
-+        0x000000000ffcc00fULL,
-+        0x0000000007fc017fULL,
-+        0xfffffffff803fe80ULL,
-+        0xffffffffff00ff00ULL,                    /*  16  */
-+        0x0000000000ff00ffULL,
-+        0xfffffffff01fc07fULL,
-+        0x000000000fe03f80ULL,
-+        0x0000000000ff03f0ULL,
-+        0xffffffffff00fc0fULL,
-+        0x0000000001f07f00ULL,
-+        0xfffffffffe0f80ffULL,
-+        0x000000000f00ff0fULL,                    /*  24  */
-+        0xfffffffff0ff00f0ULL,
-+        0x000000007f00f0ffULL,
-+        0xffffffff80ff0f00ULL,
-+        0xffffffffff0300ffULL,
-+        0x0000000000fcff00ULL,
-+        0xffffffffff1f00f0ULL,
-+        0x0000000000e0ff0fULL,
-+        0xffffffffffff0000ULL,                    /*  32  */
-+        0x000000000000ffffULL,
-+        0xfffffffffcff0700ULL,
-+        0x000000000300f8ffULL,
-+        0xfffffffff0ff3f00ULL,
-+        0x000000000f00c0ffULL,
-+        0xffffffffc0ffff01ULL,
-+        0x000000003f0000feULL,
-+        0x0000000000ffff0fULL,                    /*  40  */
-+        0xffffffffff0000f0ULL,
-+        0x0000000000fcff7fULL,
-+        0xffffffffff030080ULL,
-+        0x0000000000f0ffffULL,
-+        0xffffffffff0f0000ULL,
-+        0x0000000000c0ffffULL,
-+        0xffffffffff3f0000ULL,
-+        0x000000000000ffffULL,                    /*  48  */
-+        0xffffffffffff0000ULL,
-+        0x000000000000fcffULL,
-+        0xffffffffffff0300ULL,
-+        0x000000000000f0ffULL,
-+        0xffffffffffff0f00ULL,
-+        0x000000000000c0ffULL,
-+        0xffffffffffff3f00ULL,
-+        0x00000000000000ffULL,                    /*  56  */
-+        0xffffffffffffff00ULL,
-+        0x00000000000000fcULL,
-+        0xffffffffffffff03ULL,
-+        0x00000000000000f0ULL,
-+        0xffffffffffffff0fULL,
-+        0x00000000000000c0ULL,
-+        0xffffffffffffff3fULL,
-+        0x000000001446aa02ULL,                    /*  64  */
-+        0xffffffffb2c9e310ULL,
-+        0xffffffff9df3d101ULL,
-+        0x000000007a8c4772ULL,
-+        0xffffffffbef5421aULL,
-+        0xffffffffff50749fULL,
-+        0xffffffffa6533d52ULL,
-+        0x000000005965ed41ULL,
-+        0x000000006a756792ULL,                    /*  72  */
-+        0xffffffffa69ba7ebULL,
-+        0xffffffff93d363d8ULL,
-+        0xffffffff8c152675ULL,
-+        0x00000000654a5750ULL,
-+        0xffffffff98c48615ULL,
-+        0x00000000447def39ULL,
-+        0x000000004f9a7bb5ULL,
++        0x0000000000000000ULL,
++        0xffffffffffffffffULL,
++        0x0000000000000000ULL,
++        0xffffffffffffffffULL,
++        0x0000000000000000ULL,
++        0xffffffffffffffffULL,
++        0x0000000000000000ULL,                    /*   8  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,                    /*  16  */
++        0x0000000000000000ULL,
++        0x1c71c71c71c71c72ULL,
++        0xe38e38e38e38e38eULL,
++        0x1111111111111111ULL,
++        0xeeeeeeeeeeeeeeeeULL,
++        0x097b425ed097b426ULL,
++        0xf684bda12f684bdaULL,
++        0xffffffffffffffffULL,                    /*  24  */
++        0x0000000000000000ULL,
++        0xe38e38e38e38e38eULL,
++        0x1c71c71c71c71c71ULL,
++        0xeeeeeeeeeeeeeeeeULL,
++        0x1111111111111110ULL,
++        0xf684bda12f684bdaULL,
++        0x097b425ed097b425ULL,
++        0x0000000000000000ULL,                    /*  32  */
++        0x0000000000000000ULL,
++        0x1111111111111111ULL,
++        0xeeeeeeeeeeeeeeeeULL,
++        0x0a3d70a3d70a3d70ULL,
++        0xf5c28f5c28f5c28fULL,
++        0x05b05b05b05b05b0ULL,
++        0xfa4fa4fa4fa4fa4fULL,
++        0xffffffffffffffffULL,                    /*  40  */
++        0x0000000000000000ULL,
++        0xeeeeeeeeeeeeeeeeULL,
++        0x1111111111111110ULL,
++        0xf5c28f5c28f5c28fULL,
++        0x0a3d70a3d70a3d70ULL,
++        0xfa4fa4fa4fa4fa4fULL,
++        0x05b05b05b05b05b0ULL,
++        0x0000000000000000ULL,                    /*  48  */
++        0x0000000000000000ULL,
++        0x097b425ed097b426ULL,
++        0xf684bda12f684bdaULL,
++        0x05b05b05b05b05b0ULL,
++        0xfa4fa4fa4fa4fa4fULL,
++        0x0329161f9add3c0cULL,
++        0xfcd6e9e06522c3f3ULL,
++        0xffffffffffffffffULL,                    /*  56  */
++        0x0000000000000000ULL,
++        0xf684bda12f684bdaULL,
++        0x097b425ed097b425ULL,
++        0xfa4fa4fa4fa4fa4fULL,
++        0x05b05b05b05b05b0ULL,
++        0xfcd6e9e06522c3f3ULL,
++        0x0329161f9add3c0cULL,
++        0x37dbf4448b48bce3ULL,                    /*  64  */
++        0x01fd28a6ebd66e19ULL,
++        0x271290430f9643afULL,
++        0xcb89d38b96a86603ULL,
++        0x01fd28a6ebd66e19ULL,
++        0x00122100b25f881aULL,
++        0x016425c3dacd63e9ULL,
++        0xfe21cf6e9b332df5ULL,
++        0x271290430f9643afULL,                    /*  72  */
++        0x016425c3dacd63e9ULL,
++        0x1b549d7f3d46f8d3ULL,
++        0xdb4dd51d1b7c58f2ULL,
++        0xcb89d38b96a86603ULL,
++        0xfe21cf6e9b332df5ULL,
++        0xdb4dd51d1b7c58f2ULL,
++        0x31454bf2781d2c60ULL,
 +    };
 +
 +    gettimeofday(&start, NULL);
 +
-+    for (i = 0; i < TEST_COUNT_TOTAL; i++) {
-+        if (i < PATTERN_INPUTS_64_COUNT) {
-+            do_mips64r6_BITSWAP(b64_pattern + i, b64_result + i);
-+        } else {
-+            do_mips64r6_BITSWAP(b64_random + (i - PATTERN_INPUTS_64_COUNT),
-+                                b64_result + i);
++    for (i = 0; i < PATTERN_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_DMUH(b64_pattern + i, b64_pattern + j,
++                b64_result + (PATTERN_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_DMUH(b64_random + i, b64_random + j,
++                b64_result + (((PATTERN_INPUTS_64_SHORT_COUNT) *
++                                (PATTERN_INPUTS_64_SHORT_COUNT)) +
++                               RANDOM_INPUTS_64_SHORT_COUNT * i + j));
 +        }
 +    }
 +
@@ -191,14 +214,14 @@ index 0000000..639850d
 +
 +    return ret;
 +}
-diff --git a/tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_dbitswap.c b/tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_dbitswap.c
+diff --git a/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuhu.c b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuhu.c
 new file mode 100644
-index 0000000..366fe61
+index 0000000..dfb4195
 --- /dev/null
-+++ b/tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64r6_dbitswap.c
-@@ -0,0 +1,144 @@
++++ b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmuhu.c
+@@ -0,0 +1,151 @@
 +/*
-+ *  Test program for MIPS64R6 instruction DBITSWAP
++ *  Test program for MIPS64R6 instruction DMUHU
 + *
 + *  Copyright (C) 2019  Wave Computing, Inc.
 + *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
@@ -230,104 +253,1053 @@ index 0000000..366fe61
 +
 +int32_t main(void)
 +{
-+    char *instruction_name = "DBITSWAP";
++    char *instruction_name = "DMUHU";
 +    int32_t ret;
-+    uint32_t i;
++    uint32_t i, j;
 +    struct timeval start, end;
 +    double elapsed_time;
 +
 +    uint64_t b64_result[TEST_COUNT_TOTAL];
 +    uint64_t b64_expect[TEST_COUNT_TOTAL] = {
-+        0xffffffffffffffffULL,                    /*   0  */
++        0xfffffffffffffffeULL,                    /*   0  */
 +        0x0000000000000000ULL,
-+        0x5555555555555555ULL,
-+        0xaaaaaaaaaaaaaaaaULL,
-+        0x3333333333333333ULL,
-+        0xccccccccccccccccULL,
-+        0xc7711cc7711cc771ULL,
-+        0x388ee3388ee3388eULL,
-+        0x0f0f0f0f0f0f0f0fULL,                    /*   8  */
-+        0xf0f0f0f0f0f0f0f0ULL,
-+        0x1f7cf0c1071f7cf0ULL,
-+        0xe0830f3ef8e0830fULL,
-+        0x3ff0033ff0033ff0ULL,
-+        0xc00ffcc00ffcc00fULL,
-+        0x7fc01ff007fc017fULL,
-+        0x803fe00ff803fe80ULL,
-+        0xff00ff00ff00ff00ULL,                    /*  16  */
-+        0x00ff00ff00ff00ffULL,
-+        0xff01fc07f01fc07fULL,
-+        0x00fe03f80fe03f80ULL,
-+        0xff03f03f00ff03f0ULL,
-+        0x00fc0fc0ff00fc0fULL,
-+        0xff07c0ff01f07f00ULL,
-+        0x00f83f00fe0f80ffULL,
-+        0xff0f00ff0f00ff0fULL,                    /*  24  */
-+        0x00f0ff00f0ff00f0ULL,
-+        0xff1f00fc7f00f0ffULL,
-+        0x00e0ff0380ff0f00ULL,
-+        0xff3f00f0ff0300ffULL,
-+        0x00c0ff0f00fcff00ULL,
-+        0xff7f00c0ff1f00f0ULL,
-+        0x0080ff3f00e0ff0fULL,
-+        0xffff0000ffff0000ULL,                    /*  32  */
-+        0x0000ffff0000ffffULL,
-+        0xffff0100fcff0700ULL,
-+        0x0000feff0300f8ffULL,
-+        0xffff0300f0ff3f00ULL,
-+        0x0000fcff0f00c0ffULL,
-+        0xffff0700c0ffff01ULL,
-+        0x0000f8ff3f0000feULL,
-+        0xffff0f0000ffff0fULL,                    /*  40  */
-+        0x0000f0ffff0000f0ULL,
-+        0xffff1f0000fcff7fULL,
-+        0x0000e0ffff030080ULL,
-+        0xffff3f0000f0ffffULL,
-+        0x0000c0ffff0f0000ULL,
-+        0xffff7f0000c0ffffULL,
-+        0x000080ffff3f0000ULL,
-+        0xffffff000000ffffULL,                    /*  48  */
-+        0x000000ffffff0000ULL,
-+        0xffffff010000fcffULL,
-+        0x000000feffff0300ULL,
-+        0xffffff030000f0ffULL,
-+        0x000000fcffff0f00ULL,
-+        0xffffff070000c0ffULL,
-+        0x000000f8ffff3f00ULL,
-+        0xffffff0f000000ffULL,                    /*  56  */
-+        0x000000f0ffffff00ULL,
-+        0xffffff1f000000fcULL,
-+        0x000000e0ffffff03ULL,
-+        0xffffff3f000000f0ULL,
-+        0x000000c0ffffff0fULL,
-+        0xffffff7f000000c0ULL,
-+        0x00000080ffffff3fULL,
-+        0x115667331446aa02ULL,                    /*  64  */
-+        0xdf7d00c6b2c9e310ULL,
-+        0x355a75559df3d101ULL,
-+        0x0ef268b27a8c4772ULL,
-+        0x9d49d63ebef5421aULL,
-+        0x0be47d91ff50749fULL,
-+        0x1ddc1a60a6533d52ULL,
-+        0x3ff1c40f5965ed41ULL,
-+        0x047890b36a756792ULL,                    /*  72  */
-+        0xa53e9bc8a69ba7ebULL,
-+        0x45176faf93d363d8ULL,
-+        0x15394f8f8c152675ULL,
-+        0x67281c97654a5750ULL,
-+        0x2952acbf98c48615ULL,
-+        0x620c42c6447def39ULL,
-+        0xd15ae5454f9a7bb5ULL,
++        0xaaaaaaaaaaaaaaa9ULL,
++        0x5555555555555554ULL,
++        0xcccccccccccccccbULL,
++        0x3333333333333332ULL,
++        0xe38e38e38e38e38dULL,
++        0x1c71c71c71c71c70ULL,
++        0x0000000000000000ULL,                    /*   8  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0xaaaaaaaaaaaaaaa9ULL,                    /*  16  */
++        0x0000000000000000ULL,
++        0x71c71c71c71c71c6ULL,
++        0x38e38e38e38e38e3ULL,
++        0x8888888888888887ULL,
++        0x2222222222222221ULL,
++        0x97b425ed097b425eULL,
++        0x12f684bda12f684bULL,
++        0x5555555555555554ULL,                    /*  24  */
++        0x0000000000000000ULL,
++        0x38e38e38e38e38e3ULL,
++        0x1c71c71c71c71c71ULL,
++        0x4444444444444443ULL,
++        0x1111111111111110ULL,
++        0x4bda12f684bda12fULL,
++        0x097b425ed097b425ULL,
++        0xcccccccccccccccbULL,                    /*  32  */
++        0x0000000000000000ULL,
++        0x8888888888888887ULL,
++        0x4444444444444443ULL,
++        0xa3d70a3d70a3d708ULL,
++        0x28f5c28f5c28f5c2ULL,
++        0xb60b60b60b60b60aULL,
++        0x16c16c16c16c16c0ULL,
++        0x3333333333333332ULL,                    /*  40  */
++        0x0000000000000000ULL,
++        0x2222222222222221ULL,
++        0x1111111111111110ULL,
++        0x28f5c28f5c28f5c2ULL,
++        0x0a3d70a3d70a3d70ULL,
++        0x2d82d82d82d82d82ULL,
++        0x05b05b05b05b05b0ULL,
++        0xe38e38e38e38e38dULL,                    /*  48  */
++        0x0000000000000000ULL,
++        0x97b425ed097b425eULL,
++        0x4bda12f684bda12fULL,
++        0xb60b60b60b60b60aULL,
++        0x2d82d82d82d82d82ULL,
++        0xca4587e6b74f0328ULL,
++        0x1948b0fcd6e9e064ULL,
++        0x1c71c71c71c71c70ULL,                    /*  56  */
++        0x0000000000000000ULL,
++        0x12f684bda12f684bULL,
++        0x097b425ed097b425ULL,
++        0x16c16c16c16c16c0ULL,
++        0x05b05b05b05b05b0ULL,
++        0x1948b0fcd6e9e064ULL,
++        0x0329161f9add3c0cULL,
++        0x48b1c1dcdc0d6763ULL,                    /*  64  */
++        0x86260fd661cc8a61ULL,
++        0x5bd825b9f1c8246fULL,
++        0x3bd8e9d8f4da4851ULL,
++        0x86260fd661cc8a61ULL,
++        0xf78e21c74d87162aULL,
++        0xa97cd4d1e230b671ULL,
++        0x6e70e5bbf9651043ULL,
++        0x5bd825b9f1c8246fULL,                    /*  72  */
++        0xa97cd4d1e230b671ULL,
++        0x7409fad4b0e60fd3ULL,
++        0x4b9ceb6a79ae3b40ULL,
++        0x3bd8e9d8f4da4851ULL,
++        0x6e70e5bbf9651043ULL,
++        0x4b9ceb6a79ae3b40ULL,
++        0x31454bf2781d2c60ULL,
 +    };
 +
 +    gettimeofday(&start, NULL);
 +
-+    for (i = 0; i < TEST_COUNT_TOTAL; i++) {
-+        if (i < PATTERN_INPUTS_64_COUNT) {
-+            do_mips64r6_DBITSWAP(b64_pattern + i, b64_result + i);
-+        } else {
-+            do_mips64r6_DBITSWAP(b64_random + (i - PATTERN_INPUTS_64_COUNT),
-+                                 b64_result + i);
++    for (i = 0; i < PATTERN_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_DMUHU(b64_pattern + i, b64_pattern + j,
++                b64_result + (PATTERN_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_DMUHU(b64_random + i, b64_random + j,
++                b64_result + (((PATTERN_INPUTS_64_SHORT_COUNT) *
++                                (PATTERN_INPUTS_64_SHORT_COUNT)) +
++                               RANDOM_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_64(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                           b64_result, b64_expect);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmul.c b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmul.c
+new file mode 100644
+index 0000000..3c337dd
+--- /dev/null
++++ b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmul.c
+@@ -0,0 +1,151 @@
++/*
++ *  Test program for MIPS64R6 instruction DMUL
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_mips64r6.h"
++#include "../../../../include/test_inputs_64.h"
++#include "../../../../include/test_utils_64.h"
++
++#define TEST_COUNT_TOTAL (PATTERN_INPUTS_64_COUNT + RANDOM_INPUTS_64_COUNT)
++
++
++int32_t main(void)
++{
++    char *instruction_name = "DMUL";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b64_result[TEST_COUNT_TOTAL];
++    uint64_t b64_expect[TEST_COUNT_TOTAL] = {
++        0x0000000000000001ULL,                    /*   0  */
++        0x0000000000000000ULL,
++        0x5555555555555556ULL,
++        0xaaaaaaaaaaaaaaabULL,
++        0x3333333333333334ULL,
++        0xcccccccccccccccdULL,
++        0x1c71c71c71c71c72ULL,
++        0xe38e38e38e38e38fULL,
++        0x0000000000000000ULL,                    /*   8  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x5555555555555556ULL,                    /*  16  */
++        0x0000000000000000ULL,
++        0x38e38e38e38e38e4ULL,
++        0x1c71c71c71c71c72ULL,
++        0x7777777777777778ULL,
++        0xdddddddddddddddeULL,
++        0x12f684bda12f684cULL,
++        0x425ed097b425ed0aULL,
++        0xaaaaaaaaaaaaaaabULL,                    /*  24  */
++        0x0000000000000000ULL,
++        0x1c71c71c71c71c72ULL,
++        0x8e38e38e38e38e39ULL,
++        0xbbbbbbbbbbbbbbbcULL,
++        0xeeeeeeeeeeeeeeefULL,
++        0x097b425ed097b426ULL,
++        0xa12f684bda12f685ULL,
++        0x3333333333333334ULL,                    /*  32  */
++        0x0000000000000000ULL,
++        0x7777777777777778ULL,
++        0xbbbbbbbbbbbbbbbcULL,
++        0xf5c28f5c28f5c290ULL,
++        0x3d70a3d70a3d70a4ULL,
++        0x7d27d27d27d27d28ULL,
++        0xb60b60b60b60b60cULL,
++        0xcccccccccccccccdULL,                    /*  40  */
++        0x0000000000000000ULL,
++        0xdddddddddddddddeULL,
++        0xeeeeeeeeeeeeeeefULL,
++        0x3d70a3d70a3d70a4ULL,
++        0x8f5c28f5c28f5c29ULL,
++        0x9f49f49f49f49f4aULL,
++        0x2d82d82d82d82d83ULL,
++        0x1c71c71c71c71c72ULL,                    /*  48  */
++        0x0000000000000000ULL,
++        0x12f684bda12f684cULL,
++        0x097b425ed097b426ULL,
++        0x7d27d27d27d27d28ULL,
++        0x9f49f49f49f49f4aULL,
++        0xb0fcd6e9e06522c4ULL,
++        0x6b74f0329161f9aeULL,
++        0xe38e38e38e38e38fULL,                    /*  56  */
++        0x0000000000000000ULL,
++        0x425ed097b425ed0aULL,
++        0xa12f684bda12f685ULL,
++        0xb60b60b60b60b60cULL,
++        0x2d82d82d82d82d83ULL,
++        0x6b74f0329161f9aeULL,
++        0x781948b0fcd6e9e1ULL,
++        0xad45be6961639000ULL,                    /*  64  */
++        0xefa7a5a0e7176a00ULL,
++        0x08c6139fc4346000ULL,
++        0xfbe1883aee787980ULL,
++        0xefa7a5a0e7176a00ULL,
++        0x37ae2b38fded7040ULL,
++        0x6acb3d68be6cdc00ULL,
++        0xedbf72842143b470ULL,
++        0x08c6139fc4346000ULL,                    /*  72  */
++        0x6acb3d68be6cdc00ULL,
++        0x8624e5e1e5044000ULL,
++        0x76a5ab8089e38100ULL,
++        0xfbe1883aee787980ULL,
++        0xedbf72842143b470ULL,
++        0x76a5ab8089e38100ULL,
++        0x4bb436d5b1e9cfc4ULL,
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_DMUL(b64_pattern + i, b64_pattern + j,
++                b64_result + (PATTERN_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_DMUL(b64_random + i, b64_random + j,
++                b64_result + (((PATTERN_INPUTS_64_SHORT_COUNT) *
++                                (PATTERN_INPUTS_64_SHORT_COUNT)) +
++                               RANDOM_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_64(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                           b64_result, b64_expect);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmulu.c b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmulu.c
+new file mode 100644
+index 0000000..b20a1ba
+--- /dev/null
++++ b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_dmulu.c
+@@ -0,0 +1,151 @@
++/*
++ *  Test program for MIPS64R6 instruction DMULU
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_mips64r6.h"
++#include "../../../../include/test_inputs_64.h"
++#include "../../../../include/test_utils_64.h"
++
++#define TEST_COUNT_TOTAL (PATTERN_INPUTS_64_COUNT + RANDOM_INPUTS_64_COUNT)
++
++
++int32_t main(void)
++{
++    char *instruction_name = "DMULU";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b64_result[TEST_COUNT_TOTAL];
++    uint64_t b64_expect[TEST_COUNT_TOTAL] = {
++        0x0000000000000001ULL,                    /*   0  */
++        0x0000000000000000ULL,
++        0x5555555555555556ULL,
++        0xaaaaaaaaaaaaaaabULL,
++        0x3333333333333334ULL,
++        0xcccccccccccccccdULL,
++        0x1c71c71c71c71c72ULL,
++        0xe38e38e38e38e38fULL,
++        0x0000000000000000ULL,                    /*   8  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x5555555555555556ULL,                    /*  16  */
++        0x0000000000000000ULL,
++        0x38e38e38e38e38e4ULL,
++        0x1c71c71c71c71c72ULL,
++        0x7777777777777778ULL,
++        0xdddddddddddddddeULL,
++        0x12f684bda12f684cULL,
++        0x425ed097b425ed0aULL,
++        0xaaaaaaaaaaaaaaabULL,                    /*  24  */
++        0x0000000000000000ULL,
++        0x1c71c71c71c71c72ULL,
++        0x8e38e38e38e38e39ULL,
++        0xbbbbbbbbbbbbbbbcULL,
++        0xeeeeeeeeeeeeeeefULL,
++        0x097b425ed097b426ULL,
++        0xa12f684bda12f685ULL,
++        0x3333333333333334ULL,                    /*  32  */
++        0x0000000000000000ULL,
++        0x7777777777777778ULL,
++        0xbbbbbbbbbbbbbbbcULL,
++        0xf5c28f5c28f5c290ULL,
++        0x3d70a3d70a3d70a4ULL,
++        0x7d27d27d27d27d28ULL,
++        0xb60b60b60b60b60cULL,
++        0xcccccccccccccccdULL,                    /*  40  */
++        0x0000000000000000ULL,
++        0xdddddddddddddddeULL,
++        0xeeeeeeeeeeeeeeefULL,
++        0x3d70a3d70a3d70a4ULL,
++        0x8f5c28f5c28f5c29ULL,
++        0x9f49f49f49f49f4aULL,
++        0x2d82d82d82d82d83ULL,
++        0x1c71c71c71c71c72ULL,                    /*  48  */
++        0x0000000000000000ULL,
++        0x12f684bda12f684cULL,
++        0x097b425ed097b426ULL,
++        0x7d27d27d27d27d28ULL,
++        0x9f49f49f49f49f4aULL,
++        0xb0fcd6e9e06522c4ULL,
++        0x6b74f0329161f9aeULL,
++        0xe38e38e38e38e38fULL,                    /*  56  */
++        0x0000000000000000ULL,
++        0x425ed097b425ed0aULL,
++        0xa12f684bda12f685ULL,
++        0xb60b60b60b60b60cULL,
++        0x2d82d82d82d82d83ULL,
++        0x6b74f0329161f9aeULL,
++        0x781948b0fcd6e9e1ULL,
++        0xad45be6961639000ULL,                    /*  64  */
++        0xefa7a5a0e7176a00ULL,
++        0x08c6139fc4346000ULL,
++        0xfbe1883aee787980ULL,
++        0xefa7a5a0e7176a00ULL,
++        0x37ae2b38fded7040ULL,
++        0x6acb3d68be6cdc00ULL,
++        0xedbf72842143b470ULL,
++        0x08c6139fc4346000ULL,                    /*  72  */
++        0x6acb3d68be6cdc00ULL,
++        0x8624e5e1e5044000ULL,
++        0x76a5ab8089e38100ULL,
++        0xfbe1883aee787980ULL,
++        0xedbf72842143b470ULL,
++        0x76a5ab8089e38100ULL,
++        0x4bb436d5b1e9cfc4ULL,
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_DMULU(b64_pattern + i, b64_pattern + j,
++                b64_result + (PATTERN_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_DMULU(b64_random + i, b64_random + j,
++                b64_result + (((PATTERN_INPUTS_64_SHORT_COUNT) *
++                                (PATTERN_INPUTS_64_SHORT_COUNT)) +
++                               RANDOM_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_64(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                           b64_result, b64_expect);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muh.c b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muh.c
+new file mode 100644
+index 0000000..9134074
+--- /dev/null
++++ b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muh.c
+@@ -0,0 +1,151 @@
++/*
++ *  Test program for MIPS64R6 instruction MUH
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_mips64r6.h"
++#include "../../../../include/test_inputs_64.h"
++#include "../../../../include/test_utils_64.h"
++
++#define TEST_COUNT_TOTAL (PATTERN_INPUTS_64_COUNT + RANDOM_INPUTS_64_COUNT)
++
++
++int32_t main(void)
++{
++    char *instruction_name = "MUH";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b64_result[TEST_COUNT_TOTAL];
++    uint64_t b64_expect[TEST_COUNT_TOTAL] = {
++        0x0000000000000000ULL,                    /*   0  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0xffffffffffffffffULL,
++        0x0000000000000000ULL,
++        0xffffffffffffffffULL,
++        0x0000000000000000ULL,
++        0xffffffffffffffffULL,
++        0x0000000000000000ULL,                    /*   8  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,                    /*  16  */
++        0x0000000000000000ULL,
++        0x000000001c71c71cULL,
++        0xffffffffe38e38e3ULL,
++        0x0000000011111111ULL,
++        0xffffffffeeeeeeeeULL,
++        0x00000000097b425fULL,
++        0xfffffffff684bda1ULL,
++        0xffffffffffffffffULL,                    /*  24  */
++        0x0000000000000000ULL,
++        0xffffffffe38e38e3ULL,
++        0x000000001c71c71cULL,
++        0xffffffffeeeeeeeeULL,
++        0x0000000011111110ULL,
++        0xfffffffff684bda1ULL,
++        0x00000000097b425eULL,
++        0x0000000000000000ULL,                    /*  32  */
++        0x0000000000000000ULL,
++        0x0000000011111111ULL,
++        0xffffffffeeeeeeeeULL,
++        0x000000000a3d70a4ULL,
++        0xfffffffff5c28f5cULL,
++        0x0000000005b05b05ULL,
++        0xfffffffffa4fa4faULL,
++        0xffffffffffffffffULL,                    /*  40  */
++        0x0000000000000000ULL,
++        0xffffffffeeeeeeeeULL,
++        0x0000000011111110ULL,
++        0xfffffffff5c28f5cULL,
++        0x000000000a3d70a3ULL,
++        0xfffffffffa4fa4faULL,
++        0x0000000005b05b05ULL,
++        0x0000000000000000ULL,                    /*  48  */
++        0x0000000000000000ULL,
++        0x00000000097b425fULL,
++        0xfffffffff684bda1ULL,
++        0x0000000005b05b05ULL,
++        0xfffffffffa4fa4faULL,
++        0x000000000329161fULL,
++        0xfffffffffcd6e9e0ULL,
++        0xffffffffffffffffULL,                    /*  56  */
++        0x0000000000000000ULL,
++        0xfffffffff684bda1ULL,
++        0x00000000097b425eULL,
++        0xfffffffffa4fa4faULL,
++        0x0000000005b05b05ULL,
++        0xfffffffffcd6e9e0ULL,
++        0x000000000329161fULL,
++        0x0000000037dbf444ULL,                    /*  64  */
++        0x0000000001fd28a7ULL,
++        0x0000000027129043ULL,
++        0xffffffffcb89d38bULL,
++        0x0000000001fd28a7ULL,
++        0x0000000000122100ULL,
++        0x00000000016425c3ULL,
++        0xfffffffffe21cf6eULL,
++        0x0000000027129043ULL,                    /*  72  */
++        0x00000000016425c3ULL,
++        0x000000001b549d7fULL,
++        0xffffffffdb4dd51cULL,
++        0xffffffffcb89d38bULL,
++        0xfffffffffe21cf6eULL,
++        0xffffffffdb4dd51cULL,
++        0x0000000031454bf2ULL,
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_MUH(b64_pattern_se + i, b64_pattern_se + j,
++                b64_result + (PATTERN_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_MUH(b64_random_se + i, b64_random_se + j,
++                b64_result + (((PATTERN_INPUTS_64_SHORT_COUNT) *
++                               (PATTERN_INPUTS_64_SHORT_COUNT)) +
++                              RANDOM_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_64(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                           b64_result, b64_expect);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muhu.c b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muhu.c
+new file mode 100644
+index 0000000..2485060
+--- /dev/null
++++ b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_muhu.c
+@@ -0,0 +1,151 @@
++/*
++ *  Test program for MIPS64R6 instruction MUHU
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_mips64r6.h"
++#include "../../../../include/test_inputs_64.h"
++#include "../../../../include/test_utils_64.h"
++
++#define TEST_COUNT_TOTAL (PATTERN_INPUTS_64_COUNT + RANDOM_INPUTS_64_COUNT)
++
++
++int32_t main(void)
++{
++    char *instruction_name = "MUHU";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b64_result[TEST_COUNT_TOTAL];
++    uint64_t b64_expect[TEST_COUNT_TOTAL] = {
++        0xfffffffffffffffeULL,                    /*   0  */
++        0x0000000000000000ULL,
++        0xffffffffaaaaaaa9ULL,
++        0x0000000055555554ULL,
++        0xffffffffcccccccbULL,
++        0x0000000033333332ULL,
++        0xffffffffe38e38e2ULL,
++        0x000000001c71c71bULL,
++        0x0000000000000000ULL,                    /*   8  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0xffffffffaaaaaaa9ULL,                    /*  16  */
++        0x0000000000000000ULL,
++        0x0000000071c71c70ULL,
++        0x0000000038e38e38ULL,
++        0xffffffff88888887ULL,
++        0x0000000022222221ULL,
++        0xffffffff97b425ecULL,
++        0x0000000012f684bdULL,
++        0x0000000055555554ULL,                    /*  24  */
++        0x0000000000000000ULL,
++        0x0000000038e38e38ULL,
++        0x000000001c71c71cULL,
++        0x0000000044444443ULL,
++        0x0000000011111110ULL,
++        0x000000004bda12f6ULL,
++        0x00000000097b425eULL,
++        0xffffffffcccccccbULL,                    /*  32  */
++        0x0000000000000000ULL,
++        0xffffffff88888887ULL,
++        0x0000000044444443ULL,
++        0xffffffffa3d70a3cULL,
++        0x0000000028f5c28fULL,
++        0xffffffffb60b60b4ULL,
++        0x0000000016c16c16ULL,
++        0x0000000033333332ULL,                    /*  40  */
++        0x0000000000000000ULL,
++        0x0000000022222221ULL,
++        0x0000000011111110ULL,
++        0x0000000028f5c28fULL,
++        0x000000000a3d70a3ULL,
++        0x000000002d82d82dULL,
++        0x0000000005b05b05ULL,
++        0xffffffffe38e38e2ULL,                    /*  48  */
++        0x0000000000000000ULL,
++        0xffffffff97b425ecULL,
++        0x000000004bda12f6ULL,
++        0xffffffffb60b60b4ULL,
++        0x000000002d82d82dULL,
++        0xffffffffca4587e5ULL,
++        0x000000001948b0fcULL,
++        0x000000001c71c71bULL,                    /*  56  */
++        0x0000000000000000ULL,
++        0x0000000012f684bdULL,
++        0x00000000097b425eULL,
++        0x0000000016c16c16ULL,
++        0x0000000005b05b05ULL,
++        0x000000001948b0fcULL,
++        0x000000000329161fULL,
++        0x0000000048b1c1dcULL,                    /*  64  */
++        0xffffffff86260fd6ULL,
++        0x000000005bd825b9ULL,
++        0x000000003bd8e9d8ULL,
++        0xffffffff86260fd6ULL,
++        0xfffffffff78e21c6ULL,
++        0xffffffffa97cd4d0ULL,
++        0x000000006e70e5bbULL,
++        0x000000005bd825b9ULL,                    /*  72  */
++        0xffffffffa97cd4d0ULL,
++        0x000000007409fad3ULL,
++        0x000000004b9ceb69ULL,
++        0x000000003bd8e9d8ULL,
++        0x000000006e70e5bbULL,
++        0x000000004b9ceb69ULL,
++        0x0000000031454bf2ULL,
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_MUHU(b64_pattern_se + i, b64_pattern_se + j,
++                b64_result + (PATTERN_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_MUHU(b64_random_se + i, b64_random_se + j,
++                b64_result + (((PATTERN_INPUTS_64_SHORT_COUNT) *
++                               (PATTERN_INPUTS_64_SHORT_COUNT)) +
++                              RANDOM_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_64(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                           b64_result, b64_expect);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mul.c b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mul.c
+new file mode 100644
+index 0000000..acf779c
+--- /dev/null
++++ b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mul.c
+@@ -0,0 +1,151 @@
++/*
++ *  Test program for MIPS64R6 instruction MUL
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_mips64r6.h"
++#include "../../../../include/test_inputs_64.h"
++#include "../../../../include/test_utils_64.h"
++
++#define TEST_COUNT_TOTAL (PATTERN_INPUTS_64_COUNT + RANDOM_INPUTS_64_COUNT)
++
++
++int32_t main(void)
++{
++    char *instruction_name = "MUL";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b64_result[TEST_COUNT_TOTAL];
++    uint64_t b64_expect[TEST_COUNT_TOTAL] = {
++        0x0000000000000001ULL,                    /*   0  */
++        0x0000000000000000ULL,
++        0x0000000055555556ULL,
++        0xffffffffaaaaaaabULL,
++        0x0000000033333334ULL,
++        0xffffffffcccccccdULL,
++        0x0000000071c71c72ULL,
++        0xffffffff8e38e38fULL,
++        0x0000000000000000ULL,                    /*   8  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000055555556ULL,                    /*  16  */
++        0x0000000000000000ULL,
++        0xffffffffe38e38e4ULL,
++        0x0000000071c71c72ULL,
++        0x0000000077777778ULL,
++        0xffffffffdddddddeULL,
++        0xffffffffa12f684cULL,
++        0xffffffffb425ed0aULL,
++        0xffffffffaaaaaaabULL,                    /*  24  */
++        0x0000000000000000ULL,
++        0x0000000071c71c72ULL,
++        0x0000000038e38e39ULL,
++        0xffffffffbbbbbbbcULL,
++        0xffffffffeeeeeeefULL,
++        0xffffffffd097b426ULL,
++        0xffffffffda12f685ULL,
++        0x0000000033333334ULL,                    /*  32  */
++        0x0000000000000000ULL,
++        0x0000000077777778ULL,
++        0xffffffffbbbbbbbcULL,
++        0x0000000028f5c290ULL,
++        0x000000000a3d70a4ULL,
++        0x0000000027d27d28ULL,
++        0x000000000b60b60cULL,
++        0xffffffffcccccccdULL,                    /*  40  */
++        0x0000000000000000ULL,
++        0xffffffffdddddddeULL,
++        0xffffffffeeeeeeefULL,
++        0x000000000a3d70a4ULL,
++        0xffffffffc28f5c29ULL,
++        0x0000000049f49f4aULL,
++        0xffffffff82d82d83ULL,
++        0x0000000071c71c72ULL,                    /*  48  */
++        0x0000000000000000ULL,
++        0xffffffffa12f684cULL,
++        0xffffffffd097b426ULL,
++        0x0000000027d27d28ULL,
++        0x0000000049f49f4aULL,
++        0xffffffffe06522c4ULL,
++        0xffffffff9161f9aeULL,
++        0xffffffff8e38e38fULL,                    /*  56  */
++        0x0000000000000000ULL,
++        0xffffffffb425ed0aULL,
++        0xffffffffda12f685ULL,
++        0x000000000b60b60cULL,
++        0xffffffff82d82d83ULL,
++        0xffffffff9161f9aeULL,
++        0xfffffffffcd6e9e1ULL,
++        0x0000000061639000ULL,                    /*  64  */
++        0xffffffffe7176a00ULL,
++        0xffffffffc4346000ULL,
++        0xffffffffee787980ULL,
++        0xffffffffe7176a00ULL,
++        0xfffffffffded7040ULL,
++        0xffffffffbe6cdc00ULL,
++        0x000000002143b470ULL,
++        0xffffffffc4346000ULL,                    /*  72  */
++        0xffffffffbe6cdc00ULL,
++        0xffffffffe5044000ULL,
++        0xffffffff89e38100ULL,
++        0xffffffffee787980ULL,
++        0x000000002143b470ULL,
++        0xffffffff89e38100ULL,
++        0xffffffffb1e9cfc4ULL,
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_MUL(b64_pattern + i, b64_pattern + j,
++                b64_result + (PATTERN_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_MUL(b64_random + i, b64_random + j,
++                b64_result + (((PATTERN_INPUTS_64_SHORT_COUNT) *
++                               (PATTERN_INPUTS_64_SHORT_COUNT)) +
++                              RANDOM_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_64(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                           b64_result, b64_expect);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mulu.c b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mulu.c
+new file mode 100644
+index 0000000..65d5803
+--- /dev/null
++++ b/tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mips64r6_mulu.c
+@@ -0,0 +1,151 @@
++/*
++ *  Test program for MIPS64R6 instruction MULU
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_mips64r6.h"
++#include "../../../../include/test_inputs_64.h"
++#include "../../../../include/test_utils_64.h"
++
++#define TEST_COUNT_TOTAL (PATTERN_INPUTS_64_COUNT + RANDOM_INPUTS_64_COUNT)
++
++
++int32_t main(void)
++{
++    char *instruction_name = "MULU";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b64_result[TEST_COUNT_TOTAL];
++    uint64_t b64_expect[TEST_COUNT_TOTAL] = {
++        0x0000000000000001ULL,                    /*   0  */
++        0x0000000000000000ULL,
++        0x0000000055555556ULL,
++        0xffffffffaaaaaaabULL,
++        0x0000000033333334ULL,
++        0xffffffffcccccccdULL,
++        0x0000000071c71c72ULL,
++        0xffffffff8e38e38fULL,
++        0x0000000000000000ULL,                    /*   8  */
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000000000000ULL,
++        0x0000000055555556ULL,                    /*  16  */
++        0x0000000000000000ULL,
++        0xffffffffe38e38e4ULL,
++        0x0000000071c71c72ULL,
++        0x0000000077777778ULL,
++        0xffffffffdddddddeULL,
++        0xffffffffa12f684cULL,
++        0xffffffffb425ed0aULL,
++        0xffffffffaaaaaaabULL,                    /*  24  */
++        0x0000000000000000ULL,
++        0x0000000071c71c72ULL,
++        0x0000000038e38e39ULL,
++        0xffffffffbbbbbbbcULL,
++        0xffffffffeeeeeeefULL,
++        0xffffffffd097b426ULL,
++        0xffffffffda12f685ULL,
++        0x0000000033333334ULL,                    /*  32  */
++        0x0000000000000000ULL,
++        0x0000000077777778ULL,
++        0xffffffffbbbbbbbcULL,
++        0x0000000028f5c290ULL,
++        0x000000000a3d70a4ULL,
++        0x0000000027d27d28ULL,
++        0x000000000b60b60cULL,
++        0xffffffffcccccccdULL,                    /*  40  */
++        0x0000000000000000ULL,
++        0xffffffffdddddddeULL,
++        0xffffffffeeeeeeefULL,
++        0x000000000a3d70a4ULL,
++        0xffffffffc28f5c29ULL,
++        0x0000000049f49f4aULL,
++        0xffffffff82d82d83ULL,
++        0x0000000071c71c72ULL,                    /*  48  */
++        0x0000000000000000ULL,
++        0xffffffffa12f684cULL,
++        0xffffffffd097b426ULL,
++        0x0000000027d27d28ULL,
++        0x0000000049f49f4aULL,
++        0xffffffffe06522c4ULL,
++        0xffffffff9161f9aeULL,
++        0xffffffff8e38e38fULL,                    /*  56  */
++        0x0000000000000000ULL,
++        0xffffffffb425ed0aULL,
++        0xffffffffda12f685ULL,
++        0x000000000b60b60cULL,
++        0xffffffff82d82d83ULL,
++        0xffffffff9161f9aeULL,
++        0xfffffffffcd6e9e1ULL,
++        0x0000000061639000ULL,                    /*  64  */
++        0xffffffffe7176a00ULL,
++        0xffffffffc4346000ULL,
++        0xffffffffee787980ULL,
++        0xffffffffe7176a00ULL,
++        0xfffffffffded7040ULL,
++        0xffffffffbe6cdc00ULL,
++        0x000000002143b470ULL,
++        0xffffffffc4346000ULL,                    /*  72  */
++        0xffffffffbe6cdc00ULL,
++        0xffffffffe5044000ULL,
++        0xffffffff89e38100ULL,
++        0xffffffffee787980ULL,
++        0x000000002143b470ULL,
++        0xffffffff89e38100ULL,
++        0xffffffffb1e9cfc4ULL,
++    };
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_MULU(b64_pattern + i, b64_pattern + j,
++                b64_result + (PATTERN_INPUTS_64_SHORT_COUNT * i + j));
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_64_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_64_SHORT_COUNT; j++) {
++            do_mips64r6_MULU(b64_random + i, b64_random + j,
++                b64_result + (((PATTERN_INPUTS_64_SHORT_COUNT) *
++                               (PATTERN_INPUTS_64_SHORT_COUNT)) +
++                              RANDOM_INPUTS_64_SHORT_COUNT * i + j));
 +        }
 +    }
 +
