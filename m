@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45734)
+Received: from eggs.gnu.org ([209.51.188.92]:47436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1h18eH-0002w6-Au
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:54:19 -0500
+	(envelope-from <philmd@redhat.com>) id 1h18no-0004x5-HB
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:04:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1h18eF-0001rs-2l
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:54:17 -0500
-Received: from mail-eopbgr820131.outbound.protection.outlook.com
-	([40.107.82.131]:61511
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
-	id 1h18eE-0001nC-FB
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:54:15 -0500
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
-Date: Tue, 5 Mar 2019 11:54:11 +0000
-Message-ID: <DM5PR22MB16580590FD9B8C9B4DBAFC60D2720@DM5PR22MB1658.namprd22.prod.outlook.com>
+	(envelope-from <philmd@redhat.com>) id 1h18nn-0001jr-Ep
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:04:08 -0500
+Received: from mail-wm1-f42.google.com ([209.85.128.42]:52524)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h18nn-0001eW-7K
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:04:07 -0500
+Received: by mail-wm1-f42.google.com with SMTP id f65so2298488wma.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 04:04:06 -0800 (PST)
 References: <1551733750-4902-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1551733750-4902-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
+	<1551733750-4902-3-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8acd73e1-219f-b5f7-e001-6f6dd086171d@redhat.com>
+Date: Tue, 5 Mar 2019 13:04:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 00/14] Misc target/mips fixes and
- improvements
+In-Reply-To: <1551733750-4902-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 02/14] disas: nanoMIPS: Add graphical
+ description of pool organization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,189 +31,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
 
-> A collection of misc target/mips fixes and improvements for March 2019.
->
-> v6->v7:
->
->   - added a patch on nanomips instruction pool organization in disas
->   - added a patch on fixing 128-bit test infrastructure
->   - added a patch on extending MSA wrappers macro functionality
->   - added a patch on MIPS64R6 bit count instructions tests
->   - minor improvements in other patches
->   - order of patches slightly changed
->
-> v5->v6:
->
->   - addressed Philippe's comments from v5
->   - all patches on MSA wrappers squashed
->   - added a patch on 32-bit test infrastructure
->   - added a patch on MIPS64R6 bit count instructions tests
->   - added a patch on MIPS64R6 shift instructions tests
->   - added a patch on MIPS64R6 integer multiply instructions tests
->   - added a patch on MSA pack instructions tests
->
-> v4->v5:
->
->   - accepted patches removed
->   - DSPRAM patch will be sent separately, so it is also removed
->   - added several new patches on test infrastructue
->
-> v3->v4:
->
->   - added a patch on DSPRAM support
->   - order of patches slightly changed
->   - minor changes in commit messages
->   - rebased to the latest code
->
-> v2->v3:
->
->   - added a patches on documenting Boston board
->   - added two patches on testing integer max/min MSA instructions
->   - removed four patches that had been accepted
->   - amended patch on DSP-related comments
->
-> v1->v2:
->
->   - added two patches on updating end user documentation
->   - minor updates to commit messages
->
-> Aleksandar Markovic (14):
->   disas: nanoMIPS: Correct comments to handlers of some DSP instructions
->   disas: nanoMIPS: Add graphical description of pool organization
->   tests/tcg: target/mips: Add wrappers for various MSA instructions
->   tests/tcg: target/mips: Add test utilities for 32-bit tests
->   tests/tcg: target/mips: Add test utilities for 64-bit tests
->   tests/tcg: target/mips: Fix test utilities for 128-bit tests
->   tests/tcg: target/mips: Extend functionality of MSA wrapper macros
->   tests/tcg: target/mips: Add wrappers for some MIPS64R6 instructions
->   tests/tcg: target/mips: Add tests for MIPS64R6 logic instructions
->   tests/tcg: target/mips: Add tests for MIPS64R6 bit swap instructions
->   tests/tcg: target/mips: Add tests for MIPS64R6 bit count instructions
->   tests/tcg: target/mips: Add tests for MIPS64R6 shift instructions
->   tests/tcg: target/mips: Add tests for MIPS64R6 int multiply
->     instructions
->   tests/tcg: target/mips: Add tests for MSA pack instructions
->
->  disas/nanomips.cpp                                 | 387 ++++++++++++++-=
-------
->  tests/tcg/mips/include/test_inputs.h               |   4 +-
->  tests/tcg/mips/include/test_inputs_32.h            | 122 +++++++
->  tests/tcg/mips/include/test_inputs_64.h            | 208 +++++++++++
->  tests/tcg/mips/include/test_utils.h                |  15 +-
->  tests/tcg/mips/include/test_utils_32.h             |  78 +++++
->  tests/tcg/mips/include/test_utils_64.h             |  78 +++++
->  tests/tcg/mips/include/wrappers_mips64r6.h         |  83 +++++
->  tests/tcg/mips/include/wrappers_msa.h              | 121 +++++++
->  .../tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c  | 153 ++++++++
->  .../tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c  | 153 ++++++++
->  .../tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c  | 153 ++++++++
->  .../tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c  | 153 ++++++++
->  .../tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c  | 153 ++++++++
->  .../tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c  | 153 ++++++++
->  .../tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c  | 153 ++++++++
->  .../tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c  | 153 ++++++++
->  tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c | 153 ++++++++
->  tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c | 153 ++++++++
->  tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c | 153 ++++++++
->  tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c | 153 ++++++++
->  .../isa/mips64r6/bit-count/test_mips64r6_clo.c     | 144 ++++++++
->  .../isa/mips64r6/bit-count/test_mips64r6_clz.c     | 144 ++++++++
->  .../isa/mips64r6/bit-count/test_mips64r6_dclo.c    | 144 ++++++++
->  .../isa/mips64r6/bit-count/test_mips64r6_dclz.c    | 144 ++++++++
->  .../isa/mips64r6/bit-swap/test_mips64r6_bitswap.c  | 144 ++++++++
->  .../isa/mips64r6/bit-swap/test_mips64r6_dbitswap.c | 144 ++++++++
->  .../isa/mips64r6/int-multiply/test_mips64r6_dmuh.c | 151 ++++++++
->  .../mips64r6/int-multiply/test_mips64r6_dmuhu.c    | 151 ++++++++
->  .../isa/mips64r6/int-multiply/test_mips64r6_dmul.c | 151 ++++++++
->  .../mips64r6/int-multiply/test_mips64r6_dmulu.c    | 151 ++++++++
->  .../isa/mips64r6/int-multiply/test_mips64r6_muh.c  | 151 ++++++++
->  .../isa/mips64r6/int-multiply/test_mips64r6_muhu.c | 151 ++++++++
->  .../isa/mips64r6/int-multiply/test_mips64r6_mul.c  | 151 ++++++++
->  .../isa/mips64r6/int-multiply/test_mips64r6_mulu.c | 151 ++++++++
->  .../user/isa/mips64r6/logic/test_mips64r6_and.c    | 151 ++++++++
->  .../user/isa/mips64r6/logic/test_mips64r6_nor.c    | 151 ++++++++
->  .../user/isa/mips64r6/logic/test_mips64r6_or.c     | 151 ++++++++
->  .../user/isa/mips64r6/logic/test_mips64r6_xor.c    | 151 ++++++++
->  .../user/isa/mips64r6/shift/test_mips64r6_dsllv.c  | 151 ++++++++
->  .../user/isa/mips64r6/shift/test_mips64r6_dsrav.c  | 151 ++++++++
->  .../user/isa/mips64r6/shift/test_mips64r6_dsrlv.c  | 151 ++++++++
->  .../user/isa/mips64r6/shift/test_mips64r6_sllv.c   | 151 ++++++++
->  .../user/isa/mips64r6/shift/test_mips64r6_srav.c   | 151 ++++++++
->  .../user/isa/mips64r6/shift/test_mips64r6_srlv.c   | 151 ++++++++
->  45 files changed, 6370 insertions(+), 144 deletions(-)
->  create mode 100644 tests/tcg/mips/include/test_inputs_32.h
->  create mode 100644 tests/tcg/mips/include/test_inputs_64.h
->  create mode 100644 tests/tcg/mips/include/test_utils_32.h
->  create mode 100644 tests/tcg/mips/include/test_utils_64.h
->  create mode 100644 tests/tcg/mips/include/wrappers_mips64r6.h
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
->  create mode 100644 tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-count/test_mips6=
-4r6_clo.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-count/test_mips6=
-4r6_clz.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-count/test_mips6=
-4r6_dclo.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-count/test_mips6=
-4r6_dclz.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64=
-r6_bitswap.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/bit-swap/test_mips64=
-r6_dbitswap.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mi=
-ps64r6_dmuh.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mi=
-ps64r6_dmuhu.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mi=
-ps64r6_dmul.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mi=
-ps64r6_dmulu.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mi=
-ps64r6_muh.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mi=
-ps64r6_muhu.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mi=
-ps64r6_mul.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/int-multiply/test_mi=
-ps64r6_mulu.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/logic/test_mips64r6_=
-and.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/logic/test_mips64r6_=
-nor.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/logic/test_mips64r6_=
-or.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/logic/test_mips64r6_=
-xor.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_=
-dsllv.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_=
-dsrav.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_=
-dsrlv.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_=
-sllv.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_=
-srav.c
->  create mode 100644 tests/tcg/mips/user/isa/mips64r6/shift/test_mips64r6_=
-srlv.c
->
-> --
-> 2.7.4
->
->
-For all patches in this series:
+On 3/4/19 10:08 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> Add graphical description of nanoMIPS instruction pool organization.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  disas/nanomips.cpp | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 102 insertions(+)
+> 
+> diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+> index 10f6d96..9b44208 100644
+> --- a/disas/nanomips.cpp
+> +++ b/disas/nanomips.cpp
+> @@ -16592,6 +16592,108 @@ std::string NMD::YIELD(uint64 instruction)
+>  
+>  
+>  
+> +/*
+> + *                nanoMIPS instruction pool organization
+> + *                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> + *
+> + *
+> + *                 ┌─ P.ADDIU ─── P.RI ─── P.SYSCALL
+> + *                 │
+> + *                 │                                      ┌─ P.TRAP
+> + *                 │                                      │
+> + *                 │                      ┌─ _POOL32A0_0 ─┼─ P.CMOVE
+> + *                 │                      │               │
+> + *                 │                      │               └─ P.SLTU
+> + *                 │        ┌─ _POOL32A0 ─┤
+> + *                 │        │             │
+> + *                 │        │             │
+> + *                 │        │             └─ _POOL32A0_1 ─── CRC32
+> + *                 │        │
+> + *                 ├─ P32A ─┤
+> + *                 │        │                           ┌─ PP.LSX
+> + *                 │        │             ┌─ P.LSX ─────┤
+> + *                 │        │             │             └─ PP.LSXS
+> + *                 │        └─ _POOL32A7 ─┤
+> + *                 │                      │             ┌─ POOL32Axf_4
+> + *                 │                      └─ POOL32Axf ─┤
+> + *                 │                                    └─ POOL32Axf_5
+> + *                 │
+> + *                 ├─ PBAL
+> + *                 │
+> + *                 ├─ P.GP.W   ┌─ PP.LSX
+> + *         ┌─ P32 ─┤           │
+> + *         │       ├─ P.GP.BH ─┴─ PP.LSXS
+> + *         │       │
+> + *         │       ├─ P.J ─────── PP.BALRSC
+> + *         │       │
+> + *         │       ├─ P48I
+> + *         │       │           ┌─ P.SR
+> + *         │       │           │
+> + *         │       │           ├─ P.SHIFT
+> + *         │       │           │
+> + *         │       ├─ P.U12 ───┼─ P.ROTX
+> + *         │       │           │
+> + *         │       │           ├─ P.INS
+> + *         │       │           │
+> + *         │       │           └─ P.EXT
+> + *         │       │
+> + *         │       ├─ P.LS.U12 ── P.PREF.U12
+> + *         │       │
+> + *         │       ├─ P.BR1 ───── P.BR3A
+> + *         │       │
+> + *         │       │           ┌─ P.LS.S0 ─── P16.SYSCALL
+> + *         │       │           │
+> + *         │       │           │           ┌─ P.LL
+> + *         │       │           ├─ P.LS.S1 ─┤
+> + *         │       │           │           └─ P.SC
+> + *         │       │           │
+> + *         │       │           │           ┌─ P.PREFE
+> + *  MAJOR ─┤       ├─ P.LS.S9 ─┤           │
+> + *         │       │           ├─ P.LS.E0 ─┼─ P.LLE
+> + *         │       │           │           │
+> + *         │       │           │           └─ P.SCE
+> + *         │       │           │
+> + *         │       │           ├─ P.LS.WM
+> + *         │       │           │
+> + *         │       │           └─ P.LS.UAWM
+> + *         │       │
+> + *         │       │
+> + *         │       ├─ P.BR2
+> + *         │       │
+> + *         │       ├─ P.BRI
+> + *         │       │
+> + *         │       └─ P.LUI
+> + *         │
+> + *         │
+> + *         │       ┌─ P16.MV ──── P16.RI ─── P16.SYSCALL
+> + *         │       │
+> + *         │       ├─ P16.SR
+> + *         │       │
+> + *         │       ├─ P16.SHIFT
+> + *         │       │
+> + *         │       ├─ P16.4x4
+> + *         │       │
+> + *         │       ├─ P16C ────── POOL16C_0 ── POOL16C_00
+> + *         │       │
+> + *         └─ P16 ─┼─ P16.LB
+> + *                 │
+> + *                 ├─ P16.A1
+> + *                 │
+> + *                 ├─ P16.LH
+> + *                 │
+> + *                 ├─ P16.A2 ──── P.ADDIU[RS5]
+> + *                 │
+> + *                 ├─ P16.ADDU
+> + *                 │
+> + *                 └─ P16.BR ──┬─ P16.JRC
+> + *                             │
+> + *                             └─ P16.BR1
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Nice ASCII tree! And you got it fits the 80 chars per line limit =)
+
+> + *
+> + *
+> + *  (FP, DPS, and some minor instruction pools are omitted from the diagram)
+> + *
+> + */
+> +
+>  NMD::Pool NMD::P_SYSCALL[2] = {
+>      { instruction         , 0                   , 0   , 32,
+>         0xfffc0000, 0x00080000, &NMD::SYSCALL_32_      , 0,
+> 
