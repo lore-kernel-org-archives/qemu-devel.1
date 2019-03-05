@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43500)
+Received: from eggs.gnu.org ([209.51.188.92]:43474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14G8-00033S-OE
+	(envelope-from <jasowang@redhat.com>) id 1h14G7-00032t-Ck
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14G7-0000mO-U5
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14G7-0000lq-Mu
+	(envelope-from <jasowang@redhat.com>) id 1h14G6-0000lX-KN
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14G5-0000kd-3T
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:02 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  5 Mar 2019 15:12:18 +0800
-Message-Id: <1551769940-22739-12-git-send-email-jasowang@redhat.com>
+Date: Tue,  5 Mar 2019 15:12:17 +0800
+Message-Id: <1551769940-22739-11-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
 References: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 11/13] qmp: Add announce-self command
+Subject: [Qemu-devel] [PULL V2 10/13] virtio-net: Allow qemu_announce_self
+ to trigger virtio announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,78 +25,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vladislav Yasevich <vyasevic@redhat.com>, Jason Wang <jasowang@redhat.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add a qmp command that can trigger guest announcements.
+Expose the virtio-net self announcement capability and allow
+qemu_announce_self() to call it.
 
-It uses its own announce-timer instance, and parameters
-passed to it explicitly in the command.
+These announces are caused by something external (i.e. the
+announce-self command); they won't trigger if the migration
+counter is triggering announces at the same time.
 
-Like most qmp commands, it's in the main thread/bql, so
-there's no racing with any outstanding timer.
-
-Based on work of Germano Veit Michel <germano@redhat.com> and
-                 Vladislav Yasevich <vyasevic@redhat.com>
-
+Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/announce.c |  7 +++++++
- qapi/net.json  | 20 ++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ hw/net/trace-events |  1 +
+ hw/net/virtio-net.c | 35 ++++++++++++++++++++++++++++++++---
+ 2 files changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/net/announce.c b/net/announce.c
-index 070f37a..91e9a6e 100644
---- a/net/announce.c
-+++ b/net/announce.c
-@@ -12,6 +12,7 @@
- #include "net/net.h"
- #include "qapi/clone-visitor.h"
- #include "qapi/qapi-visit-net.h"
-+#include "qapi/qapi-commands-net.h"
- #include "trace.h"
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index b237d90..3a86004 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -361,6 +361,7 @@ sunhme_rx_desc(uint32_t addr, int offset, uint32_t status, int len, int cr, int
+ sunhme_rx_xsum_calc(uint16_t xsum) "calculated incoming xsum as 0x%x"
  
- int64_t qemu_announce_timer_step(AnnounceTimer *timer)
-@@ -131,3 +132,9 @@ void qemu_announce_self(AnnounceTimer *timer, AnnounceParameters *params)
-         qemu_announce_timer_del(timer);
-     }
+ # hw/net/virtio-net.c
++virtio_net_announce_notify(void) ""
+ virtio_net_announce_timer(int round) "%d"
+ virtio_net_handle_announce(int round) "%d"
+ virtio_net_post_load_device(void)
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 38b8974..7e2c2a6 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -150,15 +150,42 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
+         (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
  }
-+
-+void qmp_announce_self(AnnounceParameters *params, Error **errp)
+ 
++static void virtio_net_announce_notify(VirtIONet *net)
 +{
-+    static AnnounceTimer announce_timer;
-+    qemu_announce_self(&announce_timer, params);
-+}
-diff --git a/qapi/net.json b/qapi/net.json
-index 5face0c..5f7bff1 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -707,3 +707,23 @@
-             'max': 'int',
-             'rounds': 'int',
-             'step': 'int' } }
++    VirtIODevice *vdev = VIRTIO_DEVICE(net);
++    trace_virtio_net_announce_notify();
 +
-+##
-+# @announce-self:
-+#
-+# Trigger generation of broadcast RARP frames to update network switches.
-+# This can be useful when network bonds fail-over the active slave.
-+#
-+# @params: AnnounceParameters giving timing and repetition count of announce
-+#
-+# Example:
-+#
-+# -> { "execute": "announce-self"
-+#      "arguments": {
-+#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } }
-+# <- { "return": {} }
-+#
-+# Since: 4.0
-+##
-+{ 'command': 'announce-self', 'boxed': true,
-+  'data' : 'AnnounceParameters'}
++    net->status |= VIRTIO_NET_S_ANNOUNCE;
++    virtio_notify_config(vdev);
++}
++
+ static void virtio_net_announce_timer(void *opaque)
+ {
+     VirtIONet *n = opaque;
+-    VirtIODevice *vdev = VIRTIO_DEVICE(n);
+     trace_virtio_net_announce_timer(n->announce_timer.round);
+ 
+     n->announce_timer.round--;
+-    n->status |= VIRTIO_NET_S_ANNOUNCE;
+-    virtio_notify_config(vdev);
++    virtio_net_announce_notify(n);
++}
++
++static void virtio_net_announce(NetClientState *nc)
++{
++    VirtIONet *n = qemu_get_nic_opaque(nc);
++    VirtIODevice *vdev = VIRTIO_DEVICE(n);
++
++    /*
++     * Make sure the virtio migration announcement timer isn't running
++     * If it is, let it trigger announcement so that we do not cause
++     * confusion.
++     */
++    if (n->announce_timer.round) {
++        return;
++    }
++
++    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
++        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
++            virtio_net_announce_notify(n);
++    }
+ }
+ 
+ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+@@ -2556,6 +2583,7 @@ static NetClientInfo net_virtio_info = {
+     .receive = virtio_net_receive,
+     .link_status_changed = virtio_net_set_link_status,
+     .query_rx_filter = virtio_net_query_rxfilter,
++    .announce = virtio_net_announce,
+ };
+ 
+ static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
+@@ -2692,6 +2720,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+     qemu_announce_timer_reset(&n->announce_timer, migrate_announce_params(),
+                               QEMU_CLOCK_VIRTUAL,
+                               virtio_net_announce_timer, n);
++    n->announce_timer.round = 0;
+ 
+     if (n->netclient_type) {
+         /*
 -- 
 2.5.0
