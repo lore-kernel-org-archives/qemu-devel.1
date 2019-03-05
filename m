@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47019)
+Received: from eggs.gnu.org ([209.51.188.92]:47093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1ESk-0001Am-J2
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:48 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1ESq-0001Dp-35
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1ESj-0002AT-7R
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:46 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51690 helo=mail.rt-rk.com)
+	(envelope-from <dgilbert@redhat.com>) id 1h1ESo-0002FG-6O
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59508)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1h1ESi-00028K-5M
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:44 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue,  5 Mar 2019 19:05:20 +0100
-Message-Id: <1551809127-3658-9-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1551809127-3658-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1551809127-3658-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 08/15] tests/tcg: target/mips: Add wrappers for
- some MIPS64R6 instructions
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1ESm-0002A9-7B
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:48 -0500
+Date: Tue, 5 Mar 2019 18:06:35 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190305180635.GA3803@work-vm>
+References: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
+	<20190305140536.GD9811@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190305140536.GD9811@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, wrfsh@yandex-team.ru, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, peter.maydell@linaro.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> > Hi,
+> > 
+> > The series adds a migration capability, which allows to skip shared RAM blocks
+> > during the migration. It's useful for fast local migration. E.g. to update QEMU
+> > for the running guests.
+> 
+> Queued
 
-Add wrappers for some MIPS64R6 instructions.
+Hi Yury,
+  The test is failing badly on aarch64 tcg for me (i.e. aarch64 tcg on
+x86);  I'm going to keep it merged but keep the test disabled for now.
+Can you have a look to see if you can see what's going wrong?
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Message-Id: <1551800076-8104-9-git-send-email-aleksandar.markovic@rt-rk.com>
----
- tests/tcg/mips/include/wrappers_mips64r6.h | 83 ++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
- create mode 100644 tests/tcg/mips/include/wrappers_mips64r6.h
+Dave
 
-diff --git a/tests/tcg/mips/include/wrappers_mips64r6.h b/tests/tcg/mips/include/wrappers_mips64r6.h
-new file mode 100644
-index 0000000..d1e5edb
---- /dev/null
-+++ b/tests/tcg/mips/include/wrappers_mips64r6.h
-@@ -0,0 +1,83 @@
-+/*
-+ *  Header file for wrappers around MIPS64R6 instructions assembler
-+ *  invocations
-+ *
-+ *  Copyright (C) 2019  Wave Computing, Inc.
-+ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef WRAPPERS_MIPS64R6_H
-+#define WRAPPERS_MIPS64R6_H
-+
-+
-+#define DO_MIPS64R6__RD__RS(suffix, mnemonic)                          \
-+static inline void do_mips64r6_##suffix(const void *input,             \
-+                                        void *output)                  \
-+{                                                                      \
-+   __asm__ volatile (                                                  \
-+      "ld $t1, 0(%0)\n\t"                                              \
-+      #mnemonic " $t0, $t1\n\t"                                        \
-+      "sd $t0, 0(%1)\n\t"                                              \
-+      :                                                                \
-+      : "r" (input), "r" (output)                                      \
-+      : "t0", "t1", "memory"                                           \
-+   );                                                                  \
-+}
-+
-+DO_MIPS64R6__RD__RS(CLO, clo)
-+DO_MIPS64R6__RD__RS(CLZ, clz)
-+DO_MIPS64R6__RD__RS(DCLO, dclo)
-+DO_MIPS64R6__RD__RS(DCLZ, dclz)
-+
-+DO_MIPS64R6__RD__RS(BITSWAP, bitswap)
-+DO_MIPS64R6__RD__RS(DBITSWAP, dbitswap)
-+
-+
-+#define DO_MIPS64R6__RD__RS_RT(suffix, mnemonic)                       \
-+static inline void do_mips64r6_##suffix(const void *input1,            \
-+                                        const void *input2,            \
-+                                        void *output)                  \
-+{                                                                      \
-+   __asm__ volatile (                                                  \
-+      "ld $t1, 0(%0)\n\t"                                              \
-+      "ld $t2, 0(%1)\n\t"                                              \
-+      #mnemonic " $t0, $t1, $t2\n\t"                                   \
-+      "sd $t0, 0(%2)\n\t"                                              \
-+      :                                                                \
-+      : "r" (input1), "r" (input2), "r" (output)                       \
-+      : "t0", "t1", "memory"                                           \
-+   );                                                                  \
-+}
-+
-+DO_MIPS64R6__RD__RS_RT(SLLV, sllv)
-+DO_MIPS64R6__RD__RS_RT(SRLV, srlv)
-+DO_MIPS64R6__RD__RS_RT(SRAV, srav)
-+DO_MIPS64R6__RD__RS_RT(DSLLV, dsllv)
-+DO_MIPS64R6__RD__RS_RT(DSRLV, dsrlv)
-+DO_MIPS64R6__RD__RS_RT(DSRAV, dsrav)
-+
-+DO_MIPS64R6__RD__RS_RT(MUL, mul)
-+DO_MIPS64R6__RD__RS_RT(MUH, muh)
-+DO_MIPS64R6__RD__RS_RT(MULU, mulu)
-+DO_MIPS64R6__RD__RS_RT(MUHU, muhu)
-+DO_MIPS64R6__RD__RS_RT(DMUL, dmul)
-+DO_MIPS64R6__RD__RS_RT(DMUH, dmuh)
-+DO_MIPS64R6__RD__RS_RT(DMULU, dmulu)
-+DO_MIPS64R6__RD__RS_RT(DMUHU, dmuhu)
-+
-+
-+#endif
--- 
-2.7.4
+> > 
+> > Usage example:
+> > 1. Start source VM:
+> >    qemu-system-x86 \
+> >      -m 4G \
+> >      -object memory-backend-file,id=mem0,size=4G,share=on,mem-path=/dev/shm/mem0 \
+> >      -numa node,memdev=mem0 \
+> >      -qmp unix:/tmp/qemu-qmp-1.sock,server,nowait \
+> > 
+> > 2. Start target VM:
+> >    qemu-system-x86 \
+> >      -m 4G \
+> >      -object memory-backend-file,id=mem0,size=4G,share=on,mem-path=/dev/shm/mem0 \
+> >      -numa node,memdev=mem0 \
+> >      -qmp unix:/tmp/qemu-qmp-2.sock,server,nowait \
+> >      -incoming defer
+> > 
+> > 3. Enable ignore-shared capability on both VMs:
+> >    { "execute": "migrate-set-capabilities" , "arguments":
+> >      { "capabilities": [ { "capability": "x-ignore-shared", "state": true } ] } }
+> > 
+> > 4. Start migration.
+> > 
+> > Another use case I keep in mind is to migrate to file. Usage is very similar.
+> > 
+> > V2 to V3:
+> > * Split "migration: Introduce ignore-shared capability"
+> > * Serialize the capabilities as strings rather than as indexes
+> > * Don't allow to enable postcopy and ignore-shared together
+> > * Skip the test for OSs which don't have /dev/shm
+> > * Add a check whether shared RAM has been really skipped
+> > 
+> > V1 to V2:
+> > * Keep migration stream compatibility
+> > * Reuse the existing code to ignore unwanted RAMBlocks
+> > * Add capability validation feature
+> > * ignore-external -> ignore-shared
+> > 
+> > Regards,
+> > Yury
+> > 
+> > Yury Kotov (5):
+> >   exec: Change RAMBlockIterFunc definition
+> >   migration: Introduce ignore-shared capability
+> >   migration: Add an ability to ignore shared RAM blocks
+> >   tests/migration-test: Add a test for ignore-shared capability
+> >   migration: Add capabilities validation
+> > 
+> >  exec.c                    |  38 +++++------
+> >  include/exec/cpu-common.h |   7 +-
+> >  migration/migration.c     |  14 ++++
+> >  migration/migration.h     |   5 +-
+> >  migration/postcopy-ram.c  |  48 +++++++------
+> >  migration/ram.c           | 110 ++++++++++++++++++++++--------
+> >  migration/rdma.c          |   9 ++-
+> >  migration/savevm.c        | 137 ++++++++++++++++++++++++++++++++++++++
+> >  qapi/migration.json       |   5 +-
+> >  stubs/ram-block.c         |  15 +++++
+> >  tests/migration-test.c    | 131 +++++++++++++++++++++++++++++-------
+> >  util/vfio-helpers.c       |   6 +-
+> >  12 files changed, 420 insertions(+), 105 deletions(-)
+> > 
+> > -- 
+> > 2.20.1
+> > 
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
