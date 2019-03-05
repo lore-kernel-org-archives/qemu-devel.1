@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43283)
+Received: from eggs.gnu.org ([209.51.188.92]:43703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h1EDU-0005xK-Bf
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:51:01 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1EFt-0006nn-S3
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:53:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h1EDT-0001fy-9D
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:51:00 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:51407)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h1EDS-0001bU-Is
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:50:59 -0500
-Date: Tue, 5 Mar 2019 12:50:55 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190305175055.GA21325@flamenco>
-References: <20190305150123.25048-1-richard.henderson@linaro.org>
-	<CAFEAcA-1OaDU0T64TyXHfDZGLse5fknT7uVmRsX68mRcxqC4Xg@mail.gmail.com>
+	(envelope-from <philmd@redhat.com>) id 1h1EFq-0003zN-6c
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:53:28 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43543)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1EFp-0003nC-Ik
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:53:26 -0500
+Received: by mail-wr1-f65.google.com with SMTP id d17so10464555wre.10
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:53:18 -0800 (PST)
+References: <20190304194857.9780-1-philmd@redhat.com>
+	<20190304194857.9780-5-philmd@redhat.com>
+	<97cb7eaa-f3ed-ed66-c57e-e6686be2ce8d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ddf6d59f-36c1-f144-4f78-fefe5112e7d9@redhat.com>
+Date: Tue, 5 Mar 2019 18:53:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-1OaDU0T64TyXHfDZGLse5fknT7uVmRsX68mRcxqC4Xg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/73] tcg: per-cpu locks
+In-Reply-To: <97cb7eaa-f3ed-ed66-c57e-e6686be2ce8d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 4/4] pc: Support firmware configuration
+ with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Tue, Mar 05, 2019 at 16:01:45 +0000, Peter Maydell wrote:
-> On Tue, 5 Mar 2019 at 15:01, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
-> >
-> > This is Emilio's v7, unchanged, so I'm not re-posting the 73 patches.
-> >
-> > I also didn't want to add Signed-off-by to 73 patches, so I verified
-> > that there was nothing on Emilio's branch that shouldn't be there and
-> > then used git-merge -S --signoff.
+Hi Laszlo!
+
+On 3/5/19 6:34 PM, Laszlo Ersek wrote:
+> Hi Phil,
 > 
-> Hi; I'm afraid this doesn't build on OSX:
+> On 03/04/19 20:48, Philippe Mathieu-Daudé wrote:
 > 
-> /Users/pm215/src/qemu-for-merges/target/i386/hvf/x86hvf.c:361:14:
-> error: unused variable 'interrupt_request' [-Werror,-Wunused-variable]
->     uint32_t interrupt_request;
+>> [PMD: rebased on 'pflash: Fixes and cleanups'
+>>       replaced CFI_PFLASH01 -> PFLASH_CFI01]
+> 
+> [...]
+> 
+>> -#define FLASH_MAP_UNIT_MAX 2
+>> +static PFlashCFI01 *pc_pflash_create(const char *name)
+>> +{
+>> +    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
+>> +
+>> +    qdev_prop_set_uint64(dev, "sector-length", 4096);
+> 
+> [...]
+> 
+>> -static void pc_system_flash_init(MemoryRegion *rom_memory)
+>> +static void pc_system_flash_map(PCMachineState *pcms,
+>> +                                MemoryRegion *rom_memory)
+>>  {
+>> -    int unit;
+>> -    DriveInfo *pflash_drv;
+>> +    hwaddr total_size = 0;
+>> +    int i;
+>>      BlockBackend *blk;
+>>      int64_t size;
+>> -    char *fatal_errmsg = NULL;
+>> -    hwaddr phys_addr = 0x100000000ULL;
+>>      uint32_t sector_size = 4096;
+> 
+> [...]
+> 
+>> +        if (size == 0) {
+>> +            error_report("system firmware block device %s is empty",
+>> +                         blk_name(blk));
+>> +            exit(1);
+>> +        }
+>> +        if (size == 0 || size % sector_size != 0) {
+> 
+> I think you missed my points (1) and (2), and Markus's followup, here:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07018.html
 
-Fixed on "i386: convert to cpu_halted".
+Actually I missed your whole mail...
 
-> /Users/pm215/src/qemu-for-merges/target/i386/hvf/x86hvf.c:465:23:
-> error: incompatible pointer types passing 'X86CPU *' (aka 'struct
-> X86CPU *') to parameter of type 'CPUState *' (aka 'struct CPUState *')
-> [-Werror,-Wincompatible-pointer-types]
->     return cpu_halted(cpu);
->                       ^~~
-> /Users/pm215/src/qemu-for-merges/include/qom/cpu.h:510:45: note:
-> passing argument to parameter 'cpu' here
-> static inline uint32_t cpu_halted(CPUState *cpu)
->                                             ^
+I'll let Markus take what he likes from this 'splitting' series, and
+apply your comments on top if it :)
 
-Fixed on "i386/hvf: convert to cpu_request_interrupt".
+Markus: you can also drop patches 3/4 of this series if it makes your
+work harder.
 
+Thanks both!
 
-I've pushed a new branch with these two patches fixed up:
-  https://github.com/cota/qemu/tree/cpu-lock-v7b
-
-$ git diff cpu-lock-v7..cpu-lock-v7b
-diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-index 91feafeedc..c13d144fb3 100644
---- a/target/i386/hvf/x86hvf.c
-+++ b/target/i386/hvf/x86hvf.c
-@@ -358,7 +358,6 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
-
-     uint8_t vector;
-     uint64_t intr_type;
--    uint32_t interrupt_request;
-     bool have_event = true;
-     if (env->interrupt_injected != -1) {
-         vector = env->interrupt_injected;
-@@ -462,5 +461,5 @@ int hvf_process_events(CPUState *cpu_state)
-         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
-                                       env->tpr_access_type);
-     }
--    return cpu_halted(cpu);
-+    return cpu_halted(cpu_state);
- }
-
-Thanks,
-
-		Emilio
+Phil.
