@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35697)
+Received: from eggs.gnu.org ([209.51.188.92]:35714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DlP-0002Kx-JU
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:22:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DlQ-0002MI-R4
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:22:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1DlO-0001KO-Nh
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:59 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:39093)
+	(envelope-from <peter.maydell@linaro.org>) id 1h1DlQ-0001Pv-34
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:22:00 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:36690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1DlO-0001Gk-GZ
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:21:58 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id l5so10353399wrw.6
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:21:58 -0800 (PST)
+	id 1h1DlP-0001Lj-S5
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:22:00 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id j125so3381583wmj.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:21:59 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Mar 2019 17:21:38 +0000
-Message-Id: <20190305172139.32662-12-peter.maydell@linaro.org>
+Date: Tue,  5 Mar 2019 17:21:39 +0000
+Message-Id: <20190305172139.32662-13-peter.maydell@linaro.org>
 In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
 References: <20190305172139.32662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 11/12] docs/conf.py: Don't hard-code QEMU
- version
+Subject: [Qemu-devel] [PATCH v3 12/12] MAINTAINERS: Add entry for Sphinx
+ documentation infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +32,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Don't hard-code the QEMU version number into conf.py. Instead
-we either pass it to sphinx-build on the command line, or
-(if doing a standalone Sphinx run in a readthedocs.org setup)
-extract it from the VERSION file.
+Add a MAINTAINERS entry for Sphinx documentation infrastructure:
+this doesn't cover actual content, only the machinery we use to
+build the docs.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-id: 20190228145624.24885-12-peter.maydell@linaro.org
 ---
- Makefile     |  2 +-
- docs/conf.py | 21 ++++++++++++++++-----
- 2 files changed, 17 insertions(+), 6 deletions(-)
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 0f5fdc2d2b2..6b3732d114f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -869,7 +869,7 @@ docs/version.texi: $(SRC_PATH)/VERSION
- sphinxdocs: docs/devel/index.html docs/interop/index.html
- 
- # Canned command to build a single manual
--build-manual = $(call quiet-command,sphinx-build $(if $(V),,-q) -b html -d .doctrees/$1 $(SRC_PATH)/docs/$1 docs/$1 ,"SPHINX","docs/$1")
-+build-manual = $(call quiet-command,sphinx-build $(if $(V),,-q) -b html -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1 $(SRC_PATH)/docs/$1 docs/$1 ,"SPHINX","docs/$1")
- # We assume all RST files in the manual's directory are used in it
- manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
- 
-diff --git a/docs/conf.py b/docs/conf.py
-index f452e424cfe..befbcc6c3e1 100644
---- a/docs/conf.py
-+++ b/docs/conf.py
-@@ -76,11 +76,22 @@ author = u'The QEMU Project Developers'
- # The version info for the project you're documenting, acts as replacement for
- # |version| and |release|, also used in various other places throughout the
- # built documents.
--#
--# The short X.Y version.
--version = u'4.0'
--# The full version, including alpha/beta/rc tags.
--release = u'4.0'
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5040d9dfb12..074ad46d473 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2567,3 +2567,9 @@ GIT submodules
+ M: Daniel P. Berrange <berrange@redhat.com>
+ S: Odd Fixes
+ F: scripts/git-submodule.sh
 +
-+# Extract this information from the VERSION file, for the benefit of
-+# standalone Sphinx runs as used by readthedocs.org. Builds run from
-+# the Makefile will pass version and release on the sphinx-build
-+# command line, which override this.
-+try:
-+    extracted_version = None
-+    with open(os.path.join(qemu_docdir, '../VERSION')) as f:
-+        extracted_version = f.readline().strip()
-+except:
-+    pass
-+finally:
-+    if extracted_version:
-+        version = release = extracted_version
-+    else:
-+        version = release = "unknown version"
- 
- # The language for content autogenerated by Sphinx. Refer to documentation
- # for a list of supported languages.
++Sphinx documentation configuration and build machinery
++M: Peter Maydell <peter.maydell@linaro.org>
++S: Maintained
++F: docs/conf.py
++F: docs/*/conf.py
 -- 
 2.20.1
