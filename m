@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50048)
+Received: from eggs.gnu.org ([209.51.188.92]:49935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1EcL-0001Hi-3J
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:42 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1EcF-0001Di-58
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1EcK-00022v-7N
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36374)
+	(envelope-from <dgilbert@redhat.com>) id 1h1EcD-0001wJ-GR
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1EcJ-00022I-Ty
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:40 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1EcC-0001sG-TQ
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:33 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue,  5 Mar 2019 18:15:56 +0000
-Message-Id: <20190305181602.9051-16-dgilbert@redhat.com>
+Date: Tue,  5 Mar 2019 18:15:51 +0000
+Message-Id: <20190305181602.9051-11-dgilbert@redhat.com>
 In-Reply-To: <20190305181602.9051-1-dgilbert@redhat.com>
 References: <20190305181602.9051-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/21] migration: API to clear bits of guest
- free pages from the dirty bitmap
+Subject: [Qemu-devel] [PULL 10/21] migration: Create socket-address parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +27,280 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
 
-From: Wei Wang <wei.w.wang@intel.com>
+From: Juan Quintela <quintela@redhat.com>
 
-This patch adds an API to clear bits corresponding to guest free pages
-from the dirty bitmap. Spilt the free page block if it crosses the QEMU
-RAMBlock boundary.
+It will be used to store the uri parameters. We want this only for
+tcp, so we don't set it for other uris.  We need it to know what port
+is migration running.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Juan Quintela <quintela@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-CC: Peter Xu <peterx@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1544516693-5395-5-git-send-email-wei.w.wang@intel.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+--
+
+This used to be uri parameter, but it has so many troubles to
+reproduce that it don't just make sense.
+
+This used to be a port parameter.  I was asked to move to
+SocketAddress, done.
+I also merged the setting of the migration tcp port in this one
+because now I need to free the address, and this makes it easier.
+This used to be x-socket-address with a single direction, now it is a
+list of addresses.
+Move SocketAddress_to_str here.  I used to try to generalize the one
+in chardev/char-socket.c, but it is not worth it.
+
+Free string (eric)
+Handle VSOCK address nicely (not that migration can use them yet).
+Remove useless breaks (dave)
+rename socket_address to socket_address_list to avoid confusion
+Update to 4.0 (eric)
+Put a comment indicating that there is a problem on the qapi
+generator (markus).
+Message-Id: <20190227105128.1655-3-quintela@redhat.com>
+
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/misc.h |  2 ++
- migration/ram.c          | 47 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+)
+ hmp.c                 | 33 +++++++++++++++++++++++++++++++++
+ migration/migration.c | 24 ++++++++++++++++++++++++
+ migration/migration.h |  4 ++++
+ migration/socket.c    | 11 +++++++++++
+ qapi/migration.json   |  6 +++++-
+ qapi/sockets.json     | 18 ++++++++++++++++++
+ 6 files changed, 95 insertions(+), 1 deletion(-)
 
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 0471e04d1f..a3809fc67e 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -14,12 +14,14 @@
- #ifndef MIGRATION_MISC_H
- #define MIGRATION_MISC_H
-=20
-+#include "exec/cpu-common.h"
- #include "qemu/notify.h"
- #include "qapi/qapi-types-net.h"
-=20
- /* migration/ram.c */
-=20
- void ram_mig_init(void);
-+void qemu_guest_free_page_hint(void *addr, size_t len);
-=20
- /* migration/block.c */
-=20
-diff --git a/migration/ram.c b/migration/ram.c
-index 0747873ca9..32c0dbb98a 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3181,6 +3181,53 @@ static void ram_state_resume_prepare(RAMState *rs,=
- QEMUFile *out)
-     trace_ram_state_resume_prepare(pages);
+diff --git a/hmp.c b/hmp.c
+index 5f13b16e24..c2ad3f8251 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -166,6 +166,27 @@ void hmp_info_mice(Monitor *mon, const QDict *qdict)
+     qapi_free_MouseInfoList(mice_list);
  }
 =20
-+/*
-+ * This function clears bits of the free pages reported by the caller fr=
-om the
-+ * migration dirty bitmap. @addr is the host address corresponding to th=
-e
-+ * start of the continuous guest free pages, and @len is the total bytes=
- of
-+ * those pages.
-+ */
-+void qemu_guest_free_page_hint(void *addr, size_t len)
++static char *SocketAddress_to_str(SocketAddress *addr)
 +{
-+    RAMBlock *block;
-+    ram_addr_t offset;
-+    size_t used_len, start, npages;
-+    MigrationState *s =3D migrate_get_current();
-+
-+    /* This function is currently expected to be used during live migrat=
-ion */
-+    if (!migration_is_setup_or_active(s->state)) {
-+        return;
-+    }
-+
-+    for (; len > 0; len -=3D used_len, addr +=3D used_len) {
-+        block =3D qemu_ram_block_from_host(addr, false, &offset);
-+        if (unlikely(!block || offset >=3D block->used_length)) {
-+            /*
-+             * The implementation might not support RAMBlock resize duri=
-ng
-+             * live migration, but it could happen in theory with future
-+             * updates. So we add a check here to capture that case.
-+             */
-+            error_report_once("%s unexpected error", __func__);
-+            return;
-+        }
-+
-+        if (len <=3D block->used_length - offset) {
-+            used_len =3D len;
-+        } else {
-+            used_len =3D block->used_length - offset;
-+        }
-+
-+        start =3D offset >> TARGET_PAGE_BITS;
-+        npages =3D used_len >> TARGET_PAGE_BITS;
-+
-+        qemu_mutex_lock(&ram_state->bitmap_mutex);
-+        ram_state->migration_dirty_pages -=3D
-+                      bitmap_count_one_with_offset(block->bmap, start, n=
-pages);
-+        bitmap_clear(block->bmap, start, npages);
-+        qemu_mutex_unlock(&ram_state->bitmap_mutex);
++    switch (addr->type) {
++    case SOCKET_ADDRESS_TYPE_INET:
++        return g_strdup_printf("tcp:%s:%s",
++                               addr->u.inet.host,
++                               addr->u.inet.port);
++    case SOCKET_ADDRESS_TYPE_UNIX:
++        return g_strdup_printf("unix:%s",
++                               addr->u.q_unix.path);
++    case SOCKET_ADDRESS_TYPE_FD:
++        return g_strdup_printf("fd:%s", addr->u.fd.str);
++    case SOCKET_ADDRESS_TYPE_VSOCK:
++        return g_strdup_printf("tcp:%s:%s",
++                               addr->u.vsock.cid,
++                               addr->u.vsock.port);
++    default:
++        return g_strdup("unknown address type");
 +    }
 +}
 +
- /*
-  * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
-  * long-running RCU critical section.  When rcu-reclaims in the code
+ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+ {
+     MigrationInfo *info;
+@@ -306,6 +327,18 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdi=
+ct)
+         g_free(str);
+         visit_free(v);
+     }
++    if (info->has_socket_address) {
++        SocketAddressList *addr;
++
++        monitor_printf(mon, "socket address: [\n");
++
++        for (addr =3D info->socket_address; addr; addr =3D addr->next) {
++            char *s =3D SocketAddress_to_str(addr->value);
++            monitor_printf(mon, "\t%s\n", s);
++            g_free(s);
++        }
++        monitor_printf(mon, "]\n");
++    }
+     qapi_free_MigrationInfo(info);
+     qapi_free_MigrationCapabilityStatusList(caps);
+ }
+diff --git a/migration/migration.c b/migration/migration.c
+index 4ff195c901..501319aa14 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -31,6 +31,8 @@
+ #include "migration/vmstate.h"
+ #include "block/block.h"
+ #include "qapi/error.h"
++#include "qapi/clone-visitor.h"
++#include "qapi/qapi-visit-sockets.h"
+ #include "qapi/qapi-commands-migration.h"
+ #include "qapi/qapi-events-migration.h"
+ #include "qapi/qmp/qerror.h"
+@@ -207,6 +209,11 @@ void migration_incoming_state_destroy(void)
+     }
+=20
+     qemu_event_reset(&mis->main_thread_load_event);
++
++    if (mis->socket_address_list) {
++        qapi_free_SocketAddressList(mis->socket_address_list);
++        mis->socket_address_list =3D NULL;
++    }
+ }
+=20
+ static void migrate_generate_event(int new_state)
+@@ -322,6 +329,17 @@ void migration_incoming_enable_colo(void)
+     migration_colo_enabled =3D true;
+ }
+=20
++void migrate_add_address(SocketAddress *address)
++{
++    MigrationIncomingState *mis =3D migration_incoming_get_current();
++    SocketAddressList *addrs;
++
++    addrs =3D g_new0(SocketAddressList, 1);
++    addrs->next =3D mis->socket_address_list;
++    mis->socket_address_list =3D addrs;
++    addrs->value =3D QAPI_CLONE(SocketAddress, address);
++}
++
+ void qemu_start_incoming_migration(const char *uri, Error **errp)
+ {
+     const char *p;
+@@ -1003,6 +1021,12 @@ static void fill_destination_migration_info(Migrat=
+ionInfo *info)
+ {
+     MigrationIncomingState *mis =3D migration_incoming_get_current();
+=20
++    if (mis->socket_address_list) {
++        info->has_socket_address =3D true;
++        info->socket_address =3D
++            QAPI_CLONE(SocketAddressList, mis->socket_address_list);
++    }
++
+     switch (mis->state) {
+     case MIGRATION_STATUS_NONE:
+         return;
+diff --git a/migration/migration.h b/migration/migration.h
+index 81c261941d..99e99e56bd 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -84,6 +84,9 @@ struct MigrationIncomingState {
+     bool postcopy_recover_triggered;
+     QemuSemaphore postcopy_pause_sem_dst;
+     QemuSemaphore postcopy_pause_sem_fault;
++
++    /* List of listening socket addresses  */
++    SocketAddressList *socket_address_list;
+ };
+=20
+ MigrationIncomingState *migration_incoming_get_current(void);
+@@ -305,6 +308,7 @@ void migrate_send_rp_resume_ack(MigrationIncomingStat=
+e *mis, uint32_t value);
+=20
+ void dirty_bitmap_mig_before_vm_start(void);
+ void init_dirty_bitmap_incoming_migration(void);
++void migrate_add_address(SocketAddress *address);
+=20
+ int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
+=20
+diff --git a/migration/socket.c b/migration/socket.c
+index f4c8174400..239527fb1f 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -15,6 +15,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+=20
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+@@ -177,6 +178,7 @@ static void socket_start_incoming_migration(SocketAdd=
+ress *saddr,
+                                             Error **errp)
+ {
+     QIONetListener *listener =3D qio_net_listener_new();
++    size_t i;
+=20
+     qio_net_listener_set_name(listener, "migration-socket-listener");
+=20
+@@ -189,6 +191,15 @@ static void socket_start_incoming_migration(SocketAd=
+dress *saddr,
+                                           socket_accept_incoming_migrati=
+on,
+                                           NULL, NULL,
+                                           g_main_context_get_thread_defa=
+ult());
++
++    for (i =3D 0; i < listener->nsioc; i++)  {
++        SocketAddress *address =3D
++            qio_channel_socket_get_local_address(listener->sioc[i], errp=
+);
++        if (!address) {
++            return;
++        }
++        migrate_add_address(address);
++    }
+ }
+=20
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+diff --git a/qapi/migration.json b/qapi/migration.json
+index eab87340b2..6bd7fd3f1a 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -6,6 +6,7 @@
+ ##
+=20
+ { 'include': 'common.json' }
++{ 'include': 'sockets.json' }
+=20
+ ##
+ # @MigrationStats:
+@@ -199,6 +200,8 @@
+ # @compression: migration compression statistics, only returned if compr=
+ession
+ #           feature is on and status is 'active' or 'completed' (Since 3=
+.1)
+ #
++# @socket-address: Only used for tcp, to know what the real port is (Sin=
+ce 4.0)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'MigrationInfo',
+@@ -213,7 +216,8 @@
+            '*error-desc': 'str',
+            '*postcopy-blocktime' : 'uint32',
+            '*postcopy-vcpu-blocktime': ['uint32'],
+-           '*compression': 'CompressionStats'} }
++           '*compression': 'CompressionStats',
++           '*socket-address': ['SocketAddress'] } }
+=20
+ ##
+ # @query-migrate:
+diff --git a/qapi/sockets.json b/qapi/sockets.json
+index fc81d8d5e8..6eeda4a9d6 100644
+--- a/qapi/sockets.json
++++ b/qapi/sockets.json
+@@ -152,3 +152,21 @@
+             'unix': 'UnixSocketAddress',
+             'vsock': 'VsockSocketAddress',
+             'fd': 'String' } }
++
++##
++# @DummyStruct:
++#
++# Both block-core and migration needs SocketAddressList
++# I am open to comments about how to share it
++#
++# @dummy-list: A dummy list
++#
++# FIXME: This shouldn't be needed, but this struct has two users, and
++# current qapi generator generates it on the 1st place that uses it,
++# so the second user don't see it.  Putting it here it is seen in both
++# sides.
++#
++# Since: 4.0
++##
++{ 'struct': 'DummyStruct',
++  'data': { 'dummy-list': ['SocketAddress'] } }
 --=20
 2.20.1
