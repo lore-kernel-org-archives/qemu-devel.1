@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59911)
+Received: from eggs.gnu.org ([209.51.188.92]:59949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h19p5-00071T-Px
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:09:33 -0500
+	(envelope-from <kraxel@redhat.com>) id 1h19pB-00073d-Tc
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:09:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h19p2-00012B-De
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:09:31 -0500
-Resent-Message-Id: <E1h19p2-00012B-De@eggs.gnu.org>
-Message-ID: <155179133503.19275.4286306448977048580@6acff2cf482b>
-In-Reply-To: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 5 Mar 2019 05:08:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] s390: vfio-ccw dasd ipl support
+	(envelope-from <kraxel@redhat.com>) id 1h19pB-0001QQ-3O
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:09:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50242)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h19pA-0001LK-TU
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 08:09:37 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  5 Mar 2019 14:09:30 +0100
+Message-Id: <20190305130930.24516-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] vnc: fix update stalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +21,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: fangying1@huawei.com, Gerd Hoffmann <kraxel@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxNDY2Nzc2LTI5MTIzLTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MTQ2
-Njc3Ni0yOTEyMy0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzE2XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
-dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
-aGV3LzE1NTE0NjY3NzYtMjkxMjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
-b20gLT4gcGF0Y2hldy8xNTUxNDY2Nzc2LTI5MTIzLTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
-aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZWEzZjg0OTE3MiBz
-MzkwLWJpb3M6IGRhc2QtaXBsOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVy
-cm9yIGRhdGEKODYxYWYxZjI0YyBzMzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwg
-ZGFzZCBkZXZpY2UKY2M1MTllNTM2NiBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29k
-ZXMvc3RydWN0cyBuZWVkZWQgZm9yIGRhc2QtaXBsCjkzMWU1OGE1ZjAgczM5MC1iaW9zOiBVc2Ug
-Y29udHJvbCB1bml0IHR5cGUgdG8gZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCmYwMTc0MWQ5YjQgczM5
-MC1iaW9zOiBSZWZhY3RvciB2aXJ0aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwph
-ZmExZjlmODc2IHMzOTAtYmlvczogY2lvIGVycm9yIGhhbmRsaW5nCmYzM2U0NzJkNjIgczM5MC1i
-aW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwoyNGFm
-ZWFiN2FjIHMzOTAtYmlvczogcHRyMnUzMiBhbmQgdTMydG9wdHIKNTExZjU3YWVmOSBzMzkwLWJp
-b3M6IE1hcCBsb3cgY29yZSBtZW1vcnkKZjhjNmYwZGVmMCBzMzkwLWJpb3M6IERlY291cGxlIGNo
-YW5uZWwgaS9vIGxvZ2ljIGZyb20gdmlydGlvCmZkMGE4NGVjYWQgczM5MC1iaW9zOiBDbGVhbiB1
-cCBjaW8uaAowNjNjYmI5NDExIHMzOTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ug
-b3V0IG9mIHZpcnRpbyBjb2RlIHBhdGgKOWMxODZiZDUzZSBzMzkwLWJpb3M6IEV4dGVuZCBmaW5k
-X2RldigpIGZvciBub24tdmlydGlvIGRldmljZXMKNWJhZGNhMjk0MyBzMzkwLWJpb3M6IGRlY291
-cGxlIGNvbW1vbiBib290IGxvZ2ljIGZyb20gdmlydGlvCjhjZWVhMDEyYzEgczM5MC1iaW9zOiBk
-ZWNvdXBsZSBjaW8gc2V0dXAgZnJvbSB2aXJ0aW8KMTE0MmNiMTE5NSBzMzkwIHZmaW8tY2N3OiBB
-ZGQgYm9vdGluZGV4IHByb3BlcnR5IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvMTYgQ2hlY2tpbmcgY29tbWl0IDExNDJjYjExOTUwYSAoczM5MCB2ZmlvLWNjdzogQWRkIGJv
-b3RpbmRleCBwcm9wZXJ0eSBhbmQgSVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDU6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxODEgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE2IENo
-ZWNraW5nIGNvbW1pdCA4Y2VlYTAxMmMxMGUgKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVw
-IGZyb20gdmlydGlvKQozLzE2IENoZWNraW5nIGNvbW1pdCA1YmFkY2EyOTQzMTkgKHMzOTAtYmlv
-czogZGVjb3VwbGUgY29tbW9uIGJvb3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5z
-IHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNj
-dy9tYWluLmM6MTk6CitJcGxQYXJhbWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxp
-Z25lZF9fKFBBR0VfU0laRSkpKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMy8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNiBD
-aGVja2luZyBjb21taXQgOWMxODZiZDUzZWEyIChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2Rldigp
-IGZvciBub24tdmlydGlvIGRldmljZXMpCjUvMTYgQ2hlY2tpbmcgY29tbWl0IDA2M2NiYjk0MTFh
-MyAoczM5MC1iaW9zOiBGYWN0b3IgZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNv
-ZGUgcGF0aCkKNi8xNiBDaGVja2luZyBjb21taXQgZmQwYTg0ZWNhZGIxIChzMzkwLWJpb3M6IENs
-ZWFuIHVwIGNpby5oKQo3LzE2IENoZWNraW5nIGNvbW1pdCBmOGM2ZjBkZWYwOTQgKHMzOTAtYmlv
-czogRGVjb3VwbGUgY2hhbm5lbCBpL28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzI4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgMTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KOC8xNiBDaGVja2luZyBjb21taXQgNTExZjU3YWVmOWJiIChzMzkwLWJpb3M6IE1hcCBsb3cg
-Y29yZSBtZW1vcnkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgv
-MTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS8xNiBDaGVja2luZyBjb21taXQgMjRhZmVh
-YjdhYzlhIChzMzkwLWJpb3M6IHB0cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-MTAvMTYgQ2hlY2tpbmcgY29tbWl0IGYzM2U0NzJkNjI3MSAoczM5MC1iaW9zOiBTdXBwb3J0IGZv
-ciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcykKMTEvMTYgQ2hlY2tpbmcgY29t
-bWl0IGFmYTFmOWY4NzYxMSAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEyLzE2IENo
-ZWNraW5nIGNvbW1pdCBmMDE3NDFkOWI0YjEgKHMzOTAtYmlvczogUmVmYWN0b3IgdmlydGlvIHRv
-IHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4OgorICAgICAg
-ICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywgc2l6ZW9m
-KGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAgIHJ1bl9j
-Y3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0dXMpLCBm
-YWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDEyLzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE2IENoZWNraW5n
-IGNvbW1pdCA5MzFlNThhNWYwZGMgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0eXBlIHRv
-IGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IGNjNTE5ZTUzNjZj
-MCAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVlZGVkIGZv
-ciBkYXNkLWlwbCkKMTUvMTYgQ2hlY2tpbmcgY29tbWl0IDg2MWFmMWYyNGNkMSAoczM5MC1iaW9z
-OiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMyNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDQ0NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoxNi8xNiBDaGVja2luZyBjb21taXQgZWEzZjg0OTE3MjhiIChzMzkwLWJpb3M6IGRhc2QtaXBs
-OiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gY3VzdG9taXplIGVycm9yIGRhdGEpCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTE0NjY3NzYtMjkx
-MjMtMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5jb20vdGVzdGluZy5jaGVja3Bh
-dGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+vnc aborts display update jobs on video mode switches and page flips.
+That can cause vnc update stalls in case an unfinished vnc job gets
+aborted.  The vnc client will never receive the requested update then.
+Fix that by copying the state from job_update back to update in that
+case.
+
+Reports complain about stalls with two or more clients being connected
+at the same time, on some but not all connections.  I suspect it can
+also happen with a single connection, multiple connections only make
+this more much likely to happen.
+
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1662260
+Reported-by: Ying Fang <fangying1@huawei.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/vnc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/ui/vnc.c b/ui/vnc.c
+index da4a21d4ce94..2f2ab62fcf71 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -700,6 +700,12 @@ static void vnc_abort_display_jobs(VncDisplay *vd)
+     }
+     QTAILQ_FOREACH(vs, &vd->clients, next) {
+         vnc_lock_output(vs);
++        if (vs->update == VNC_STATE_UPDATE_NONE &&
++            vs->job_update != VNC_STATE_UPDATE_NONE) {
++            /* job aborted before completion */
++            vs->update = vs->job_update;
++            vs->job_update = VNC_STATE_UPDATE_NONE;
++        }
+         vs->abort = false;
+         vnc_unlock_output(vs);
+     }
+-- 
+2.18.1
