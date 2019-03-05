@@ -1,34 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52102)
+Received: from eggs.gnu.org ([209.51.188.92]:52505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1h1IV7-0003ER-Ex
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:25:31 -0500
+	(envelope-from <stefanb@linux.ibm.com>) id 1h1IWo-0003zh-GC
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:27:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1h1IV6-0000Ep-Q1
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:25:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52782
+	(envelope-from <stefanb@linux.ibm.com>) id 1h1IWj-0002Hm-PC
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:27:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44062
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1h1IV6-0000DL-KA
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:25:28 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+	id 1h1IWg-0002EN-Ff
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 17:27:07 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x25MO0Nm193629
-	for <qemu-devel@nongnu.org>; Tue, 5 Mar 2019 17:25:24 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2r1y0ygefg-1
+	x25MO3ZJ056693
+	for <qemu-devel@nongnu.org>; Tue, 5 Mar 2019 17:27:01 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2r21u0874q-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 17:25:24 -0500
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 17:27:01 -0500
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 5 Mar 2019 22:25:24 -0000
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue,  5 Mar 2019 17:25:04 -0500
-Message-Id: <20190305222504.835831-1-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH for-3.0.x/PATCH for-3.0.1] tpm_tis: fix loop
- that cancels any seizure by a lower locality
+	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
+	Tue, 5 Mar 2019 22:27:00 -0000
+References: <20190304154739.758486-1-stefanb@linux.vnet.ibm.com>
+	<CAFEAcA98oP70F9xDKwr8_9w4ATOmZvzbDuYHZF8MLH0paRHPyg@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Tue, 5 Mar 2019 17:26:56 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA98oP70F9xDKwr8_9w4ATOmZvzbDuYHZF8MLH0paRHPyg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-MW
+Message-Id: <3a65675e-cdb0-8f08-b658-1374e8acdeea@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PULL v1 0/2] Merge tpm 2019/02/25 v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +43,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-stable@nongnu.org, mdroth@linux.ibm.com
-Cc: qemu-devel@nongnu.org, Liam Merwick <liam.merwick@oracle.com>, Liam Merwick <Liam.Merwick@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: Liam Merwick <liam.merwick@oracle.com>
+On 3/4/19 11:43 AM, Peter Maydell wrote:
+> On Mon, 4 Mar 2019 at 15:47, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+>> The 1st patch in this series fixes a bug in the TPM TIS emulator that
+>> skipped a locality when resetting the seize flag when a higher locality
+>> seized access from a lower locality. The 2nd patch converts debugging
+>> code to tracing.
+>>
+>>     Stefan
+>>
+>>
+>> The following changes since commit 8eb29f1bf5a974dc4c11d2d1f5e7c7f7a62be116:
+>>
+>>    Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20190221.0' into staging (2019-02-22 15:48:04 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>    git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2019-02-25-1
+>>
+>> for you to fetch changes up to cd38cc519b60bbe5dd8d85f6aaa72b2d7902930b:
+>>
+>>    tpm_tis: convert tpm_tis_show_buffer() to use trace event (2019-02-24 14:46:14 -0500)
+>>
+>> ----------------------------------------------------------------
+>> Liam Merwick (2):
+>>        tpm_tis: fix loop that cancels any seizure by a lower locality
+>>        tpm_tis: convert tpm_tis_show_buffer() to use trace event
+> Applied, thanks.
+>
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+> for any user-visible changes.
 
-This patch is rev 37b55d67c0 from master.
 
-In tpm_tis_mmio_write() if the requesting locality is seizing
-access, any seizure by a lower locality is cancelled.  However the
-loop doing the seizure had an off-by-one error and the locality
-immediately preceding the requesting locality was not being cleared.
-This is fixed by adjusting the test in the for loop to check the
-localities up to the requesting locality.
+Done.
 
-Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- hw/tpm/tpm_tis.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index d9322692ee..f4c1b6e813 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -616,7 +616,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
-                 }
- 
-                 /* cancel any seize by a lower locality */
--                for (l = 0; l < locty - 1; l++) {
-+                for (l = 0; l < locty; l++) {
-                     s->loc[l].access &= ~TPM_TIS_ACCESS_SEIZE;
-                 }
- 
--- 
-2.17.2
+>
+> -- PMM
+>
