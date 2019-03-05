@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43703)
+Received: from eggs.gnu.org ([209.51.188.92]:43913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1EFt-0006nn-S3
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:53:30 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1EGz-0007W4-GM
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:54:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1EFq-0003zN-6c
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:53:28 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43543)
+	(envelope-from <philmd@redhat.com>) id 1h1EGn-0004tK-VB
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:54:30 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:35269)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1EFp-0003nC-Ik
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:53:26 -0500
-Received: by mail-wr1-f65.google.com with SMTP id d17so10464555wre.10
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:53:18 -0800 (PST)
-References: <20190304194857.9780-1-philmd@redhat.com>
-	<20190304194857.9780-5-philmd@redhat.com>
-	<97cb7eaa-f3ed-ed66-c57e-e6686be2ce8d@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1EGh-0004oQ-W3
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:54:21 -0500
+Received: by mail-wr1-f67.google.com with SMTP id t18so10481307wrx.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:54:19 -0800 (PST)
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-12-armbru@redhat.com>
+	<a20fe845-4f14-4f23-7feb-bb7ca899c2d5@redhat.com>
+	<878sxt5l31.fsf@dusky.pond.sub.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ddf6d59f-36c1-f144-4f78-fefe5112e7d9@redhat.com>
-Date: Tue, 5 Mar 2019 18:53:15 +0100
+Message-ID: <f37147d9-af24-4625-502e-1a51c3fa9a69@redhat.com>
+Date: Tue, 5 Mar 2019 18:54:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <97cb7eaa-f3ed-ed66-c57e-e6686be2ce8d@redhat.com>
+In-Reply-To: <878sxt5l31.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] pc: Support firmware configuration
- with -blockdev
+Subject: Re: [Qemu-devel] [PATCH v2 11/11] pflash: Clean up after commit
+ 368a354f02b part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, qemu-ppc@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-Hi Laszlo!
+On 3/5/19 5:42 PM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+> 
+>> Hi Markus,
+>>
+>> On 2/26/19 8:34 PM, Markus Armbruster wrote:
+>>> QOMification left parameter @size unused in pflash_cfi01_register()
+>>> and pflash_cfi02_register().  Obviously, @size should match
+>>> @sector_len and @nb_blocs, i.e. size == sector_len * nb_blocs.  All
+>>> callers satisfy this.
+>>>
+>>> Remove @nb_blocs and compute it from @size and @sector_len.
+>>
+>> The pflash devices are simplistically modelled has having a single
+>> sector size. This is not true for real hw (pflash have different sector
+>> sizes). It is however true for the unofficial VirtPFlash device, which
+>> doesn't have any spec.
+>>
+>> The only valid parameter is @size. The @sector_len and @nb_blocs don't
+>> match the hardwares. QEMU @sector_len is currently "The biggest
+>> sector_size the device has" and QEMU @nb_blocs is really "@size /
+>> @sector_len", although it doesn't match the nb_blocs the hardware has.
+>>
+>> I don't disagree with the patch content, but the description is not
+>> accurate. We can indeed drop the @nb_blocs argument because we model an
+>> unique sector size, thus we can calculate "@nb_blocs = @size /
+>> @sector_len" in the model.
+>>
+>> With the patch description fixed:
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> Let me try to fix it.
+> 
+>     Our pflash devices are simplistically modelled has having
+>     "num-blocks" sectors of equal size "sector-length".  Real hardware
+>     commonly has sectors of different sizes.  How our "sector-length"
+>     property is related to the physical device's multiple sector sizes
+>     is unclear.
+> 
+>     Helper functions pflash_cfi01_register() and pflash_cfi02_register()
+>     create a pflash device, set properties including "sector-length" and
+>     "num-blocks", and realize.  They take parameters @size, @sector_len
+>     and @nb_blocs.
+> 
+>     QOMification left parameter @size unused.  Obviously, @size should
+>     match @sector_len and @nb_blocs, i.e. size == sector_len * nb_blocs.
+>     All callers satisfy this.
+> 
+>     Remove @nb_blocs and compute it from @size and @sector_len.
+> 
+> D'accord?
 
-On 3/5/19 6:34 PM, Laszlo Ersek wrote:
-> Hi Phil,
-> 
-> On 03/04/19 20:48, Philippe Mathieu-Daudé wrote:
-> 
->> [PMD: rebased on 'pflash: Fixes and cleanups'
->>       replaced CFI_PFLASH01 -> PFLASH_CFI01]
-> 
-> [...]
-> 
->> -#define FLASH_MAP_UNIT_MAX 2
->> +static PFlashCFI01 *pc_pflash_create(const char *name)
->> +{
->> +    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
->> +
->> +    qdev_prop_set_uint64(dev, "sector-length", 4096);
-> 
-> [...]
-> 
->> -static void pc_system_flash_init(MemoryRegion *rom_memory)
->> +static void pc_system_flash_map(PCMachineState *pcms,
->> +                                MemoryRegion *rom_memory)
->>  {
->> -    int unit;
->> -    DriveInfo *pflash_drv;
->> +    hwaddr total_size = 0;
->> +    int i;
->>      BlockBackend *blk;
->>      int64_t size;
->> -    char *fatal_errmsg = NULL;
->> -    hwaddr phys_addr = 0x100000000ULL;
->>      uint32_t sector_size = 4096;
-> 
-> [...]
-> 
->> +        if (size == 0) {
->> +            error_report("system firmware block device %s is empty",
->> +                         blk_name(blk));
->> +            exit(1);
->> +        }
->> +        if (size == 0 || size % sector_size != 0) {
-> 
-> I think you missed my points (1) and (2), and Markus's followup, here:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07018.html
-
-Actually I missed your whole mail...
-
-I'll let Markus take what he likes from this 'splitting' series, and
-apply your comments on top if it :)
-
-Markus: you can also drop patches 3/4 of this series if it makes your
-work harder.
-
-Thanks both!
-
-Phil.
+Oui, parfait!
