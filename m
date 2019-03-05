@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59414)
+Received: from eggs.gnu.org ([209.51.188.92]:59531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1F6F-00013X-IJ
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:47:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1h1F6b-0001GI-Jx
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:47:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1F6E-0000HZ-BN
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:47:35 -0500
-Resent-Message-Id: <E1h1F6E-0000HZ-BN@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21113)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1F6E-00005i-4X
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:47:34 -0500
-Message-ID: <155181162882.19275.8296615947269852151@6acff2cf482b>
-In-Reply-To: <20190305181602.9051-1-dgilbert@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1h1F6Z-0001Nu-GP
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:47:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h1F6Z-0001Js-91
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:47:55 -0500
+References: <20190305181602.9051-1-dgilbert@redhat.com>
+	<20190305181602.9051-11-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <84195982-1d8f-0bae-5136-6443a1f63c2a@redhat.com>
+Date: Tue, 5 Mar 2019 12:47:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 5 Mar 2019 10:47:10 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/21] migration queue
+In-Reply-To: <20190305181602.9051-11-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 10/21] migration: Create socket-address
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNTE4MTYwMi45MDUx
-LTEtZGdpbGJlcnRAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA1MTgxNjAyLjkwNTEt
-MS1kZ2lsYmVydEByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8yMV0g
-bWlncmF0aW9uIHF1ZXVlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
-dCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
-ICAgICBwYXRjaGV3LzIwMTkwMzA1MTgxNjAyLjkwNTEtMS1kZ2lsYmVydEByZWRoYXQuY29tIC0+
-IHBhdGNoZXcvMjAxOTAzMDUxODE2MDIuOTA1MS0xLWRnaWxiZXJ0QHJlZGhhdC5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwphZTQ5M2RkMzQ1IHFhcGkvbWlncmF0aW9uLmpzb246
-IFJlbW92ZSBhIHZhcmlhYmxlIHRoYXQgZG9lc24ndCBleGlzdCBpbiBleGFtcGxlCmRhZTQ1MmFj
-ZjcgTWlncmF0aW9uL2NvbG8uYzogTWFrZSBDT0xPIG5vZGUgcnVubmluZyBhZnRlciBmYWlsb3Zl
-cgo4ZDc3NDUyOTViIE1pZ3JhdGlvbi9jb2xvLmM6IEZpeCBkb3VibGUgY2xvc2UgYnVnIHdoZW4g
-b2NjdXIgQ09MTyBmYWlsb3ZlcgowMDhiNTllZGM3IHZpcnRpby1iYWxsb29uOiBWSVJUSU9fQkFM
-TE9PTl9GX0ZSRUVfUEFHRV9ISU5UCjE0Zjg3MTk5YTEgbWlncmF0aW9uL3JhbS5jOiBhZGQgdGhl
-IGZyZWUgcGFnZSBvcHRpbWl6YXRpb24gZW5hYmxlIGZsYWcKY2EyNjk5ZTQ1NiBtaWdyYXRpb24v
-cmFtLmM6IGFkZCBhIG5vdGlmaWVyIGNoYWluIGZvciBwcmVjb3B5CjYwNmM2ZWY0MjkgbWlncmF0
-aW9uOiBBUEkgdG8gY2xlYXIgYml0cyBvZiBndWVzdCBmcmVlIHBhZ2VzIGZyb20gdGhlIGRpcnR5
-IGJpdG1hcAo4MDRlNzk2MzI3IG1pZ3JhdGlvbjogdXNlIGJpdG1hcF9tdXRleCBpbiBtaWdyYXRp
-b25fYml0bWFwX2NsZWFyX2RpcnR5CjA2MGRmYTc4YWMgYml0bWFwOiBiaXRtYXBfY291bnRfb25l
-X3dpdGhfb2Zmc2V0CjBjZmY2MjNjZTEgYml0bWFwOiBmaXggYml0bWFwX2NvdW50X29uZQpjYTli
-MmI2Y2RkIHRlc3RzOiBBZGQgYmFzaWMgbWlncmF0aW9uIHByZWNvcHkgdGNwIHRlc3QKMGMzZGQx
-ZDU0ZSBtaWdyYXRpb246IENyZWF0ZSBzb2NrZXQtYWRkcmVzcyBwYXJhbWV0ZXIKNzE5MDEyYzNj
-NyB0ZXN0czogQWRkIG1pZ3JhdGlvbiB4YnpybGUgdGVzdAo3NGMwZjlmZDQ0IG1pZ3JhdGlvbjog
-QWRkIGNhcGFiaWxpdGllcyB2YWxpZGF0aW9uCjhjNjUzN2RhMTMgdGVzdHMvbWlncmF0aW9uLXRl
-c3Q6IEFkZCBhIHRlc3QgZm9yIGlnbm9yZS1zaGFyZWQgY2FwYWJpbGl0eQoyZWUzNGVmZDE4IG1p
-Z3JhdGlvbjogQWRkIGFuIGFiaWxpdHkgdG8gaWdub3JlIHNoYXJlZCBSQU0gYmxvY2tzCjE5MGY1
-ODJlNGUgbWlncmF0aW9uOiBJbnRyb2R1Y2UgaWdub3JlLXNoYXJlZCBjYXBhYmlsaXR5CjAyYTgy
-MDBhZGYgZXhlYzogQ2hhbmdlIFJBTUJsb2NrSXRlckZ1bmMgZGVmaW5pdGlvbgoxOTkwYmEwMmVi
-IG1pZ3JhdGlvbi9yZG1hOiBjbGFuZyBjb21waWxhdGlvbiBmaXgKN2EyNmUzOTc3ZSBtaWdyYXRp
-b24vcmRtYTogRml4IHFlbXVfcmRtYV9jbGVhbnVwIG51bGwgY2hlY2sKMTA2NTE4Y2RhZCBtaWdy
-YXRpb246IEZpeCBjYW5jZWwgc3RhdGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjEgQ2hlY2tp
-bmcgY29tbWl0IDEwNjUxOGNkYWQ0MSAobWlncmF0aW9uOiBGaXggY2FuY2VsIHN0YXRlKQoyLzIx
-IENoZWNraW5nIGNvbW1pdCA3YTI2ZTM5NzdlYmMgKG1pZ3JhdGlvbi9yZG1hOiBGaXggcWVtdV9y
-ZG1hX2NsZWFudXAgbnVsbCBjaGVjaykKMy8yMSBDaGVja2luZyBjb21taXQgMTk5MGJhMDJlYjVk
-IChtaWdyYXRpb24vcmRtYTogY2xhbmcgY29tcGlsYXRpb24gZml4KQo0LzIxIENoZWNraW5nIGNv
-bW1pdCAwMmE4MjAwYWRmOTQgKGV4ZWM6IENoYW5nZSBSQU1CbG9ja0l0ZXJGdW5jIGRlZmluaXRp
-b24pCjUvMjEgQ2hlY2tpbmcgY29tbWl0IDE5MGY1ODJlNGU4YyAobWlncmF0aW9uOiBJbnRyb2R1
-Y2UgaWdub3JlLXNoYXJlZCBjYXBhYmlsaXR5KQo2LzIxIENoZWNraW5nIGNvbW1pdCAyZWUzNGVm
-ZDE4ZWUgKG1pZ3JhdGlvbjogQWRkIGFuIGFiaWxpdHkgdG8gaWdub3JlIHNoYXJlZCBSQU0gYmxv
-Y2tzKQpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5j
-bG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzE0OTogRklMRTogbWlncmF0aW9uL3JhbS5jOjE2
-OToKKyNkZWZpbmUgUkFNQkxPQ0tfRk9SRUFDSF9OT1RfSUdOT1JFRChibG9jaykgICAgICAgICAg
-ICBcCisgICAgSU5URVJOQUxfUkFNQkxPQ0tfRk9SRUFDSChibG9jaykgICAgICAgICAgICAgICAg
-ICAgXAorICAgICAgICBpZiAocmFtYmxvY2tfaXNfaWdub3JlZChibG9jaykpIHt9IGVsc2UKCkVS
-Uk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzE1MTogRklM
-RTogbWlncmF0aW9uL3JhbS5jOjE3MToKKyAgICAgICAgaWYgKHJhbWJsb2NrX2lzX2lnbm9yZWQo
-YmxvY2spKSB7fSBlbHNlCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDM4NiBsaW5lcyBj
-aGVja2VkCgpQYXRjaCA2LzIxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzIxIENoZWNr
-aW5nIGNvbW1pdCA4YzY1MzdkYTEzYTggKHRlc3RzL21pZ3JhdGlvbi10ZXN0OiBBZGQgYSB0ZXN0
-IGZvciBpZ25vcmUtc2hhcmVkIGNhcGFiaWxpdHkpCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMgcmVk
-dW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiMyMzU6IEZJTEU6IHRlc3RzL21pZ3JhdGlvbi10
-ZXN0LmM6ODI5OgorI2lmIDAKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjU1IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDcvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjgvMjEgQ2hl
-Y2tpbmcgY29tbWl0IDc0YzBmOWZkNDQ2ZSAobWlncmF0aW9uOiBBZGQgY2FwYWJpbGl0aWVzIHZh
-bGlkYXRpb24pCjkvMjEgQ2hlY2tpbmcgY29tbWl0IDcxOTAxMmMzYzdlMiAodGVzdHM6IEFkZCBt
-aWdyYXRpb24geGJ6cmxlIHRlc3QpCjEwLzIxIENoZWNraW5nIGNvbW1pdCAwYzNkZDFkNTRlYTUg
-KG1pZ3JhdGlvbjogQ3JlYXRlIHNvY2tldC1hZGRyZXNzIHBhcmFtZXRlcikKMTEvMjEgQ2hlY2tp
-bmcgY29tbWl0IGNhOWIyYjZjZGQ3NiAodGVzdHM6IEFkZCBiYXNpYyBtaWdyYXRpb24gcHJlY29w
-eSB0Y3AgdGVzdCkKMTIvMjEgQ2hlY2tpbmcgY29tbWl0IDBjZmY2MjNjZTFjYSAoYml0bWFwOiBm
-aXggYml0bWFwX2NvdW50X29uZSkKMTMvMjEgQ2hlY2tpbmcgY29tbWl0IDA2MGRmYTc4YWNiZCAo
-Yml0bWFwOiBiaXRtYXBfY291bnRfb25lX3dpdGhfb2Zmc2V0KQoxNC8yMSBDaGVja2luZyBjb21t
-aXQgODA0ZTc5NjMyNzA2IChtaWdyYXRpb246IHVzZSBiaXRtYXBfbXV0ZXggaW4gbWlncmF0aW9u
-X2JpdG1hcF9jbGVhcl9kaXJ0eSkKMTUvMjEgQ2hlY2tpbmcgY29tbWl0IDYwNmM2ZWY0Mjk4MiAo
-bWlncmF0aW9uOiBBUEkgdG8gY2xlYXIgYml0cyBvZiBndWVzdCBmcmVlIHBhZ2VzIGZyb20gdGhl
-IGRpcnR5IGJpdG1hcCkKMTYvMjEgQ2hlY2tpbmcgY29tbWl0IGNhMjY5OWU0NTY4OCAobWlncmF0
-aW9uL3JhbS5jOiBhZGQgYSBub3RpZmllciBjaGFpbiBmb3IgcHJlY29weSkKMTcvMjEgQ2hlY2tp
-bmcgY29tbWl0IDE0Zjg3MTk5YTE0MiAobWlncmF0aW9uL3JhbS5jOiBhZGQgdGhlIGZyZWUgcGFn
-ZSBvcHRpbWl6YXRpb24gZW5hYmxlIGZsYWcpCjE4LzIxIENoZWNraW5nIGNvbW1pdCAwMDhiNTll
-ZGM3ZTQgKHZpcnRpby1iYWxsb29uOiBWSVJUSU9fQkFMTE9PTl9GX0ZSRUVfUEFHRV9ISU5UKQox
-OS8yMSBDaGVja2luZyBjb21taXQgOGQ3NzQ1Mjk1YjQ3IChNaWdyYXRpb24vY29sby5jOiBGaXgg
-ZG91YmxlIGNsb3NlIGJ1ZyB3aGVuIG9jY3VyIENPTE8gZmFpbG92ZXIpCjIwLzIxIENoZWNraW5n
-IGNvbW1pdCBkYWU0NTJhY2Y3ZWYgKE1pZ3JhdGlvbi9jb2xvLmM6IE1ha2UgQ09MTyBub2RlIHJ1
-bm5pbmcgYWZ0ZXIgZmFpbG92ZXIpCjIxLzIxIENoZWNraW5nIGNvbW1pdCBhZTQ5M2RkMzQ1OWQg
-KHFhcGkvbWlncmF0aW9uLmpzb246IFJlbW92ZSBhIHZhcmlhYmxlIHRoYXQgZG9lc24ndCBleGlz
-dCBpbiBleGFtcGxlKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
-cmcvbG9ncy8yMDE5MDMwNTE4MTYwMi45MDUxLTEtZGdpbGJlcnRAcmVkaGF0LmNvbS90ZXN0aW5n
-LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 3/5/19 12:15 PM, Dr. David Alan Gilbert (git) wrote:
+> From: Juan Quintela <quintela@redhat.com>
+> 
+> It will be used to store the uri parameters. We want this only for
+> tcp, so we don't set it for other uris.  We need it to know what port
+> is migration running.
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+
+This was not the usual '---' divider, and hence:
+
+> This used to be uri parameter, but it has so many troubles to
+> reproduce that it don't just make sense.
+> 
+> This used to be a port parameter.  I was asked to move to
+> SocketAddress, done.
+> I also merged the setting of the migration tcp port in this one
+> because now I need to free the address, and this makes it easier.
+> This used to be x-socket-address with a single direction, now it is a
+> list of addresses.
+> Move SocketAddress_to_str here.  I used to try to generalize the one
+> in chardev/char-socket.c, but it is not worth it.
+> 
+> Free string (eric)
+> Handle VSOCK address nicely (not that migration can use them yet).
+> Remove useless breaks (dave)
+> rename socket_address to socket_address_list to avoid confusion
+> Update to 4.0 (eric)
+> Put a comment indicating that there is a problem on the qapi
+> generator (markus).
+
+...all this got included, even if it was perhaps not intended.
+
+> Message-Id: <20190227105128.1655-3-quintela@redhat.com>
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+At any rate, it certainly looks odd to split *-by: tags by so much text.
+
+> +++ b/qapi/sockets.json
+> @@ -152,3 +152,21 @@
+>               'unix': 'UnixSocketAddress',
+>               'vsock': 'VsockSocketAddress',
+>               'fd': 'String' } }
+> +
+> +##
+> +# @DummyStruct:
+> +#
+> +# Both block-core and migration needs SocketAddressList
+> +# I am open to comments about how to share it
+> +#
+> +# @dummy-list: A dummy list
+> +#
+> +# FIXME: This shouldn't be needed, but this struct has two users, and
+> +# current qapi generator generates it on the 1st place that uses it,
+> +# so the second user don't see it.  Putting it here it is seen in both
+> +# sides.
+
+If Markus' pull request lands first, we don't need this.
+https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg01185.html
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
