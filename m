@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36122)
+Received: from eggs.gnu.org ([209.51.188.92]:37486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1h1C83-00049m-U0
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:37:16 -0500
+	(envelope-from <davidkiarie4@gmail.com>) id 1h1CCV-00088l-MR
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:41:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1h1C81-0004qY-6U
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:37:15 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190213164853.32412-1-berto@igalia.com>
-References: <20190213164853.32412-1-berto@igalia.com>
-Date: Tue, 05 Mar 2019 16:36:42 +0100
-Message-ID: <w514l8hcoz9.fsf@maestria.local.igalia.com>
+	(envelope-from <davidkiarie4@gmail.com>) id 1h1CCU-0004BA-FK
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:41:51 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43306)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <davidkiarie4@gmail.com>)
+	id 1h1CCS-00047Q-HV
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:41:50 -0500
+Received: by mail-oi1-x241.google.com with SMTP id i8so7164228oib.10
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 07:41:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Default to 4KB for the qcow2 cache
- entry size
+References: <20190305151731.31213-1-davidkiarie4@gmail.com>
+	<20190305151731.31213-2-davidkiarie4@gmail.com>
+In-Reply-To: <20190305151731.31213-2-davidkiarie4@gmail.com>
+From: David Kiarie <davidkiarie4@gmail.com>
+Date: Tue, 5 Mar 2019 18:40:56 +0300
+Message-ID: <CABdVeACmvNaxfgH=Mc8g76taUH7v9rn_ZJS+8R9mmgAfwWMOFw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?Q?Alexandro_S=C3=A1nchez_Bach?= <alexaltea123@gmail.com>
 
-ping
+On Tue, Mar 5, 2019 at 6:18 PM David Kiarie <davidkiarie4@gmail.com> wrote:
 
-On Wed 13 Feb 2019 05:48:53 PM CET, Alberto Garcia wrote:
-> QEMU 2.12 (commit 1221fe6f636754ab5f2c1c87caa77633e9123622) introduced
-> a new setting called l2-cache-entry-size that allows making entries on
-> the qcow2 L2 cache smaller than the cluster size.
+> Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
+> ---
+>  hw/i386/amd_iommu.c | 2 +-
+>  hw/i386/amd_iommu.h | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >
-> I have been performing several tests with different cluster and entry
-> sizes and all of them show that reducing the entry size (aka L2 slice)
-> consistently improves I/O performance, notably during random I/O (all
-> tests done with sequential I/O show similar results). This is to be
-> expected because loading and evicting an L2 slice is more expensive
-> the larger the slice is.
+> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+> index 8ad707a..6eabdf9 100644
+> --- a/hw/i386/amd_iommu.c
+> +++ b/hw/i386/amd_iommu.c
+> @@ -2,7 +2,7 @@
+>   * QEMU emulation of AMD IOMMU (AMD-Vi)
+>   *
+>   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+> - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+> + * Copyright (C) 2015, 2016 David Kiarie Kahurani
+>   *
+>   * This program is free software; you can redistribute it and/or modify
+>   * it under the terms of the GNU General Public License as published by
+> diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+> index c52886f..1074723 100644
+> --- a/hw/i386/amd_iommu.h
+> +++ b/hw/i386/amd_iommu.h
+> @@ -2,7 +2,7 @@
+>   * QEMU emulation of an AMD IOMMU (AMD-Vi)
+>   *
+>   * Copyright (C) 2011 Eduard - Gabriel Munteanu
+> - * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
+> + * Copyright (C) 2015 David Kiarie Kahurani
+>   *
+>   * This program is free software; you can redistribute it and/or modify
+>   * it under the terms of the GNU General Public License as published by
 >
-> Here are some numbers on fully populated 40GB qcow2 images. The
-> rightmost column represents the maximum L2 cache size in both cases.
+
+don't bother responding either as i should probably be getting rid of email
+soon.
+
+
+> --
+> 2.21.0
 >
->    Cluster size = 64 KB
->    |-------------+--------------+--------------+--------------|
->    |             | 1MB L2 cache | 3MB L2 cache | 5MB L2 cache |
->    |-------------+--------------+--------------+--------------|
->    |  4KB slices |    6545 IOPS |   12045 IOPS |   55680 IOPS |
->    | 16KB slices |    5177 IOPS |    9798 IOPS |   56278 IOPS |
->    | 64KB slices |    2718 IOPS |    5326 IOPS |   57355 IOPS |
->    |-------------+--------------+--------------+--------------|
 >
->    Cluster size = 256 KB
->    |--------------+----------------+--------------+-----------------|
->    |              | 512KB L2 cache | 1MB L2 cache | 1280KB L2 cache |
->    |--------------+----------------+--------------+-----------------|
->    |   4KB slices |      8539 IOPS |   21071 IOPS |      55417 IOPS |
->    |  64KB slices |      3598 IOPS |    9772 IOPS |      57687 IOPS |
->    | 256KB slices |      1415 IOPS |    4120 IOPS |      58001 IOPS |
->    |--------------+----------------+--------------+-----------------|
->
-> As can be seen in the numbers, the only exception to the rule is when
-> the cache is large enough to hold all L2 tables. This is also to be
-> expected because in this case no cache entry is ever evicted so
-> reducing its size doesn't bring any benefit.
->
-> This patch sets the default L2 cache entry size to 4KB except when the
-> cache is large enough for the whole disk.
->
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
