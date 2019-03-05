@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49931)
+Received: from eggs.gnu.org ([209.51.188.92]:49926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1EcE-0001DE-Kr
+	(envelope-from <dgilbert@redhat.com>) id 1h1EcE-0001DB-Jq
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1EcD-0001wV-IU
+	(envelope-from <dgilbert@redhat.com>) id 1h1EcC-0001va-Sa
 	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40418)
+Received: from mx1.redhat.com ([209.132.183.28]:54516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1EcD-0001ul-8N
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:33 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1Ec9-0001qr-G9
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:29 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue,  5 Mar 2019 18:15:52 +0000
-Message-Id: <20190305181602.9051-12-dgilbert@redhat.com>
+Date: Tue,  5 Mar 2019 18:15:50 +0000
+Message-Id: <20190305181602.9051-10-dgilbert@redhat.com>
 In-Reply-To: <20190305181602.9051-1-dgilbert@redhat.com>
 References: <20190305181602.9051-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/21] tests: Add basic migration precopy tcp
- test
+Subject: [Qemu-devel] [PULL 09/21] tests: Add migration xbzrle test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +29,55 @@ To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelb
 
 From: Juan Quintela <quintela@redhat.com>
 
-Not sharing code from precopy/unix because we have to read back the
-tcp parameter.
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-Message-Id: <20190227105128.1655-4-quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <20190227105128.1655-2-quintela@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  dgilbert:  Fixup for clash with Yury's
+  dgilbert: Fixup for class with Yury's series
 ---
- tests/migration-test.c | 110 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 105 insertions(+), 5 deletions(-)
+ tests/migration-test.c | 64 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 4d2302079d..e3617ceaca 100644
+index 336b6e20cd..4d2302079d 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -20,6 +20,9 @@
- #include "qemu/sockets.h"
- #include "chardev/char.h"
- #include "sysemu/sysemu.h"
-+#include "qapi/qapi-visit-sockets.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi/qobject-output-visitor.h"
-=20
- #include "migration/migration-test.h"
-=20
-@@ -344,15 +347,68 @@ static char *get_shmem_opts(const char *mem_size, c=
-onst char *shmem_path)
-                            mem_size, shmem_path);
+@@ -629,6 +629,17 @@ static void deprecated_set_speed(QTestState *who, lo=
+ng long value)
+     migrate_check_parameter(who, "max-bandwidth", value);
  }
 =20
-+static char *SocketAddress_to_str(SocketAddress *addr)
-+{
-+    switch (addr->type) {
-+    case SOCKET_ADDRESS_TYPE_INET:
-+        return g_strdup_printf("tcp:%s:%s",
-+                               addr->u.inet.host,
-+                               addr->u.inet.port);
-+    case SOCKET_ADDRESS_TYPE_UNIX:
-+        return g_strdup_printf("unix:%s",
-+                               addr->u.q_unix.path);
-+    case SOCKET_ADDRESS_TYPE_FD:
-+        return g_strdup_printf("fd:%s", addr->u.fd.str);
-+    case SOCKET_ADDRESS_TYPE_VSOCK:
-+        return g_strdup_printf("tcp:%s:%s",
-+                               addr->u.vsock.cid,
-+                               addr->u.vsock.port);
-+    default:
-+        return g_strdup("unknown address type");
-+    }
-+}
-+
-+static char *migrate_get_socket_address(QTestState *who, const char *par=
-ameter)
++static void deprecated_set_cache_size(QTestState *who, long long value)
 +{
 +    QDict *rsp;
-+    char *result;
-+    Error *local_err =3D NULL;
-+    SocketAddressList *addrs;
-+    Visitor *iv =3D NULL;
-+    QObject *object;
 +
-+    rsp =3D migrate_query(who);
-+    object =3D qdict_get(rsp, parameter);
-+
-+    iv =3D qobject_input_visitor_new(object);
-+    visit_type_SocketAddressList(iv, NULL, &addrs, &local_err);
-+
-+    /* we are only using a single address */
-+    result =3D g_strdup_printf("%s", SocketAddress_to_str(addrs->value))=
-;
-+
-+    qapi_free_SocketAddressList(addrs);
++    rsp =3D qtest_qmp(who, "{ 'execute': 'migrate-set-cache-size',"
++                         "'arguments': { 'value': %lld } }", value);
++    g_assert(qdict_haskey(rsp, "return"));
 +    qobject_unref(rsp);
-+    return result;
++    migrate_check_parameter(who, "xbzrle-cache-size", value);
 +}
 +
-+static long long migrate_get_parameter(QTestState *who, const char *para=
-meter)
-+{
-+    QDict *rsp;
-+    long long result;
-+
-+    rsp =3D wait_command(who, "{ 'execute': 'query-migrate-parameters' }=
-");
-+    result =3D qdict_get_int(rsp, parameter);
-+    qobject_unref(rsp);
-+    return result;
-+}
-+
- static void migrate_check_parameter(QTestState *who, const char *paramet=
-er,
-                                     long long value)
+ static void test_deprecated(void)
  {
--    QDict *rsp_return;
-+    long long result;
+     QTestState *from;
+@@ -637,6 +648,7 @@ static void test_deprecated(void)
 =20
--    rsp_return =3D wait_command(who,
--                              "{ 'execute': 'query-migrate-parameters' }=
-");
--    g_assert_cmpint(qdict_get_int(rsp_return, parameter), =3D=3D, value)=
-;
--    qobject_unref(rsp_return);
-+    result =3D migrate_get_parameter(who, parameter);
-+    g_assert_cmpint(result, =3D=3D, value);
+     deprecated_set_downtime(from, 0.12345);
+     deprecated_set_speed(from, 12345);
++    deprecated_set_cache_size(from, 4096);
+=20
+     qtest_quit(from);
  }
-=20
- static void migrate_set_parameter(QTestState *who, const char *parameter=
-,
-@@ -927,6 +983,49 @@ static void test_xbzrle_unix(void)
-     g_free(uri);
+@@ -864,6 +876,57 @@ static void test_ignore_shared(void)
  }
+ #endif
 =20
-+static void test_precopy_tcp(void)
++static void test_xbzrle(const char *uri)
 +{
-+    char *uri;
 +    QTestState *from, *to;
 +
-+    if (test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false, false))=
- {
++    if (test_migrate_start(&from, &to, uri, false, false)) {
 +        return;
 +    }
 +
@@ -166,10 +91,12 @@ er,
 +    /* 1GB/s */
 +    migrate_set_parameter(from, "max-bandwidth", 1000000000);
 +
++    migrate_set_parameter(from, "xbzrle-cache-size", 33554432);
++
++    migrate_set_capability(from, "xbzrle", "true");
++    migrate_set_capability(to, "xbzrle", "true");
 +    /* Wait for the first serial output from the source */
 +    wait_for_serial("src_serial");
-+
-+    uri =3D migrate_get_socket_address(to, "socket-address");
 +
 +    migrate(from, uri, "{}");
 +
@@ -187,20 +114,27 @@ er,
 +    wait_for_migration_complete(from);
 +
 +    test_migrate_end(from, to, true);
++}
++
++static void test_xbzrle_unix(void)
++{
++    char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
++
++    test_xbzrle(uri);
 +    g_free(uri);
 +}
 +
  int main(int argc, char **argv)
  {
      char template[] =3D "/tmp/migration-test-XXXXXX";
-@@ -978,6 +1077,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/deprecated", test_deprecated);
+@@ -916,6 +979,7 @@ int main(int argc, char **argv)
      qtest_add_func("/migration/bad_dest", test_baddest);
      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-+    qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
      /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); *=
 /
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
++    qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+=20
+     ret =3D g_test_run();
 =20
 --=20
 2.20.1
