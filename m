@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43463)
+Received: from eggs.gnu.org ([209.51.188.92]:43500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14G6-00032E-J5
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:03 -0500
+	(envelope-from <jasowang@redhat.com>) id 1h14G8-00033S-OE
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h14G5-0000ky-1l
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58130)
+	(envelope-from <jasowang@redhat.com>) id 1h14G7-0000mO-U5
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36530)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14G0-0000hp-V5
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:00 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h14G7-0000lq-Mu
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:13:03 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  5 Mar 2019 15:12:16 +0800
-Message-Id: <1551769940-22739-10-git-send-email-jasowang@redhat.com>
+Date: Tue,  5 Mar 2019 15:12:18 +0800
+Message-Id: <1551769940-22739-12-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
 References: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2 09/13] net: Add a network device specific
- self-announcement ability
+Subject: [Qemu-devel] [PULL V2 11/13] qmp: Add announce-self command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +24,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vladislav Yasevich <vyasevic@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Some network devices have a capability to do self announcements
-(ex: virtio-net).  Add infrastructure that would allow devices
-to expose this ability.
+Add a qmp command that can trigger guest announcements.
 
-Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+It uses its own announce-timer instance, and parameters
+passed to it explicitly in the command.
+
+Like most qmp commands, it's in the main thread/bql, so
+there's no racing with any outstanding timer.
+
+Based on work of Germano Veit Michel <germano@redhat.com> and
+                 Vladislav Yasevich <vyasevic@redhat.com>
+
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- include/net/net.h | 2 ++
- net/announce.c    | 5 +++++
- 2 files changed, 7 insertions(+)
+ net/announce.c |  7 +++++++
+ qapi/net.json  | 20 ++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 075cc01..acf0451 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -60,6 +60,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
- typedef int (SetVnetBE)(NetClientState *, bool);
- typedef struct SocketReadState SocketReadState;
- typedef void (SocketReadStateFinalize)(SocketReadState *rs);
-+typedef void (NetAnnounce)(NetClientState *);
- 
- typedef struct NetClientInfo {
-     NetClientDriver type;
-@@ -80,6 +81,7 @@ typedef struct NetClientInfo {
-     SetVnetHdrLen *set_vnet_hdr_len;
-     SetVnetLE *set_vnet_le;
-     SetVnetBE *set_vnet_be;
-+    NetAnnounce *announce;
- } NetClientInfo;
- 
- struct NetClientState {
 diff --git a/net/announce.c b/net/announce.c
-index 13ad9c2..070f37a 100644
+index 070f37a..91e9a6e 100644
 --- a/net/announce.c
 +++ b/net/announce.c
-@@ -102,6 +102,11 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
-     len = announce_self_create(buf, nic->conf->macaddr.a);
+@@ -12,6 +12,7 @@
+ #include "net/net.h"
+ #include "qapi/clone-visitor.h"
+ #include "qapi/qapi-visit-net.h"
++#include "qapi/qapi-commands-net.h"
+ #include "trace.h"
  
-     qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
-+
-+    /* if the NIC provides it's own announcement support, use it as well */
-+    if (nic->ncs->info->announce) {
-+        nic->ncs->info->announce(nic->ncs);
-+    }
+ int64_t qemu_announce_timer_step(AnnounceTimer *timer)
+@@ -131,3 +132,9 @@ void qemu_announce_self(AnnounceTimer *timer, AnnounceParameters *params)
+         qemu_announce_timer_del(timer);
+     }
  }
- static void qemu_announce_self_once(void *opaque)
- {
++
++void qmp_announce_self(AnnounceParameters *params, Error **errp)
++{
++    static AnnounceTimer announce_timer;
++    qemu_announce_self(&announce_timer, params);
++}
+diff --git a/qapi/net.json b/qapi/net.json
+index 5face0c..5f7bff1 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -707,3 +707,23 @@
+             'max': 'int',
+             'rounds': 'int',
+             'step': 'int' } }
++
++##
++# @announce-self:
++#
++# Trigger generation of broadcast RARP frames to update network switches.
++# This can be useful when network bonds fail-over the active slave.
++#
++# @params: AnnounceParameters giving timing and repetition count of announce
++#
++# Example:
++#
++# -> { "execute": "announce-self"
++#      "arguments": {
++#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } }
++# <- { "return": {} }
++#
++# Since: 4.0
++##
++{ 'command': 'announce-self', 'boxed': true,
++  'data' : 'AnnounceParameters'}
 -- 
 2.5.0
