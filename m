@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53935)
+Received: from eggs.gnu.org ([209.51.188.92]:59553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1553-0008WD-PZ
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:05:44 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h15RM-0004X1-6q
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1552-0001m1-Vm
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:05:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50074)
+	(envelope-from <imammedo@redhat.com>) id 1h15RL-0000op-Ax
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:28:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40324)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h1552-0001ko-MR
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:05:40 -0500
-References: <CAEt6vxELvT1gadPihazzmKDsGgFDa1whxnKAVMEwsf_e7ycGdg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d856dc98-018b-3eec-fe05-26035a64e9bb@redhat.com>
-Date: Tue, 5 Mar 2019 09:05:04 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1h15RK-0000li-Vx
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:28:43 -0500
+Date: Tue, 5 Mar 2019 09:28:38 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190305092838.4131fb8a@redhat.com>
+In-Reply-To: <3b9ea255-6a77-9309-56d4-6d7fe5a2044c@linux.ibm.com>
+References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+	<3b9ea255-6a77-9309-56d4-6d7fe5a2044c@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEt6vxELvT1gadPihazzmKDsGgFDa1whxnKAVMEwsf_e7ycGdg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu bluetooth support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +27,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daryl Oliver <gen.dr.aireagoirdragesteam@gmail.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, pmorel@linux.ibm.com
 
-On 02/03/2019 13.46, Daryl Oliver wrote:
-> Hello there I don't know if this is till valid but I thought I should
-> mention my use cases for the bluetooth option in qemu.
->=20
-> Use case would be using Bluetooth controllers for gaming on kvm qemu si=
-nce
-> I don't know if kvm would be able to use my hosts Bluetooth chip or emu=
-late
-> one. since I manily use the windows port of qemu.
-> But my other use case would be using Bluetooth speakers or headphones.
+On Mon, 4 Mar 2019 12:35:32 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
- Hi!
+> On 12/17/18 10:57 AM, Tony Krowiak wrote:
+> 
+> Ping!! I'm wondering who might be responsible for merging this fix?
+See reply from Eduardo,
 
-Thanks for your report! Do you mean you are already using bluetooth for
-your KVM guest, or you just would like to use it (since you wrote "would
-be" and not "is")?
-In the first case, could you please elaborate on your set up? Which
-hardware are you exactly passing through to the guest, which parameters
-are you using for starting QEMU, which version of QEMU are you using, is
-it working without problems, etc. ?
-I ask because currently, I don't know anybody who is still using
-bluetooth passthrough with a recent version of QEMU, so it would be very
-interesting to know whether this still works at all or not...
+It's queued and will be in his next pull request
 
- Thanks,
-  Thomas
+> 
+> > The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
+> > value of the BusState structure with the max_dev value of the BusClass structure
+> > to determine whether the maximum number of children has been reached for the
+> > bus. The problem is, the max_index field of the BusState structure does not
+> > necessarily reflect the number of devices that have been plugged into
+> > the bus.
+> > 
+> > Whenever a child device is plugged into the bus, the bus's max_index value is
+> > assigned to the child device and then incremented. If the child is subsequently
+> > unplugged, the value of the max_index does not change and no longer reflects the
+> > number of children.
+> > 
+> > When the bus's max_index value reaches the maximum number of devices
+> > allowed for the bus (i.e., the max_dev field in the BusClass structure),
+> > attempts to plug another device will be rejected claiming that the bus is
+> > full -- even if the bus is actually empty.
+> > 
+> > To resolve the problem, a new 'num_children' field is being added to the
+> > BusState structure to keep track of the number of children plugged into the
+> > bus. It will be incremented when a child is plugged, and decremented when a
+> > child is unplugged.
+> > 
+> > Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> > Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+> > Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> > ---
+> >   hw/core/qdev.c         | 3 +++
+> >   include/hw/qdev-core.h | 1 +
+> >   qdev-monitor.c         | 2 +-
+> >   3 files changed, 5 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > index 6b3cc55b27c2..956923f33520 100644
+> > --- a/hw/core/qdev.c
+> > +++ b/hw/core/qdev.c
+> > @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
+> >               snprintf(name, sizeof(name), "child[%d]", kid->index);
+> >               QTAILQ_REMOVE(&bus->children, kid, sibling);
+> >   
+> > +            bus->num_children--;
+> > +
+> >               /* This gives back ownership of kid->child back to us.  */
+> >               object_property_del(OBJECT(bus), name, NULL);
+> >               object_unref(OBJECT(kid->child));
+> > @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+> >       char name[32];
+> >       BusChild *kid = g_malloc0(sizeof(*kid));
+> >   
+> > +    bus->num_children++;
+> >       kid->index = bus->max_index++;
+> >       kid->child = child;
+> >       object_ref(OBJECT(kid->child));
+> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> > index a24d0dd566e3..521f0a947ead 100644
+> > --- a/include/hw/qdev-core.h
+> > +++ b/include/hw/qdev-core.h
+> > @@ -206,6 +206,7 @@ struct BusState {
+> >       HotplugHandler *hotplug_handler;
+> >       int max_index;
+> >       bool realized;
+> > +    int num_children;
+> >       QTAILQ_HEAD(ChildrenHead, BusChild) children;
+> >       QLIST_ENTRY(BusState) sibling;
+> >   };
+> > diff --git a/qdev-monitor.c b/qdev-monitor.c
+> > index 07147c63bf8b..45a8ba49644c 100644
+> > --- a/qdev-monitor.c
+> > +++ b/qdev-monitor.c
+> > @@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
+> >   static inline bool qbus_is_full(BusState *bus)
+> >   {
+> >       BusClass *bus_class = BUS_GET_CLASS(bus);
+> > -    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
+> > +    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
+> >   }
+> >   
+> >   /*
+> >   
+> 
