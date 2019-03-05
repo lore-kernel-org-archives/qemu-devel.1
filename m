@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49849)
+Received: from eggs.gnu.org ([209.51.188.92]:49931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1Ec7-000140-5m
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:28 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1EcE-0001DE-Kr
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1Ec5-0001o6-Or
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55694)
+	(envelope-from <dgilbert@redhat.com>) id 1h1EcD-0001wV-IU
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1Ec3-0001m9-OY
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:25 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1EcD-0001ul-8N
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:16:33 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue,  5 Mar 2019 18:15:48 +0000
-Message-Id: <20190305181602.9051-8-dgilbert@redhat.com>
+Date: Tue,  5 Mar 2019 18:15:52 +0000
+Message-Id: <20190305181602.9051-12-dgilbert@redhat.com>
 In-Reply-To: <20190305181602.9051-1-dgilbert@redhat.com>
 References: <20190305181602.9051-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/21] tests/migration-test: Add a test for
- ignore-shared capability
+Subject: [Qemu-devel] [PULL 11/21] tests: Add basic migration precopy tcp
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,315 +28,179 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
 
-From: Yury Kotov <yury-kotov@yandex-team.ru>
+From: Juan Quintela <quintela@redhat.com>
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-Message-Id: <20190215174548.2630-5-yury-kotov@yandex-team.ru>
+Not sharing code from precopy/unix because we have to read back the
+tcp parameter.
+
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+Message-Id: <20190227105128.1655-4-quintela@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  dgilbert: Disabled the test for now, not happy on aarch64
+  dgilbert:  Fixup for clash with Yury's
 ---
- tests/migration-test.c | 134 +++++++++++++++++++++++++++++++++--------
- 1 file changed, 109 insertions(+), 25 deletions(-)
+ tests/migration-test.c | 110 +++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 105 insertions(+), 5 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 8352612364..336b6e20cd 100644
+index 4d2302079d..e3617ceaca 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -215,10 +215,10 @@ static gchar *migrate_query_status(QTestState *who)
-  * events suddenly appearing confuse the qmp()/hmp() responses.
-  */
+@@ -20,6 +20,9 @@
+ #include "qemu/sockets.h"
+ #include "chardev/char.h"
+ #include "sysemu/sysemu.h"
++#include "qapi/qapi-visit-sockets.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi/qobject-output-visitor.h"
 =20
--static uint64_t get_migration_pass(QTestState *who)
-+static int64_t read_ram_property_int(QTestState *who, const char *proper=
-ty)
- {
-     QDict *rsp_return, *rsp_ram;
--    uint64_t result;
-+    int64_t result;
+ #include "migration/migration-test.h"
 =20
-     rsp_return =3D migrate_query(who);
-     if (!qdict_haskey(rsp_return, "ram")) {
-@@ -226,12 +226,17 @@ static uint64_t get_migration_pass(QTestState *who)
-         result =3D 0;
-     } else {
-         rsp_ram =3D qdict_get_qdict(rsp_return, "ram");
--        result =3D qdict_get_try_int(rsp_ram, "dirty-sync-count", 0);
-+        result =3D qdict_get_try_int(rsp_ram, property, 0);
-     }
-     qobject_unref(rsp_return);
-     return result;
+@@ -344,15 +347,68 @@ static char *get_shmem_opts(const char *mem_size, c=
+onst char *shmem_path)
+                            mem_size, shmem_path);
  }
 =20
-+static uint64_t get_migration_pass(QTestState *who)
++static char *SocketAddress_to_str(SocketAddress *addr)
 +{
-+    return read_ram_property_int(who, "dirty-sync-count");
++    switch (addr->type) {
++    case SOCKET_ADDRESS_TYPE_INET:
++        return g_strdup_printf("tcp:%s:%s",
++                               addr->u.inet.host,
++                               addr->u.inet.port);
++    case SOCKET_ADDRESS_TYPE_UNIX:
++        return g_strdup_printf("unix:%s",
++                               addr->u.q_unix.path);
++    case SOCKET_ADDRESS_TYPE_FD:
++        return g_strdup_printf("fd:%s", addr->u.fd.str);
++    case SOCKET_ADDRESS_TYPE_VSOCK:
++        return g_strdup_printf("tcp:%s:%s",
++                               addr->u.vsock.cid,
++                               addr->u.vsock.port);
++    default:
++        return g_strdup("unknown address type");
++    }
 +}
 +
- static void read_blocktime(QTestState *who)
- {
-     QDict *rsp_return;
-@@ -332,6 +337,13 @@ static void cleanup(const char *filename)
-     g_free(path);
- }
-=20
-+static char *get_shmem_opts(const char *mem_size, const char *shmem_path=
-)
++static char *migrate_get_socket_address(QTestState *who, const char *par=
+ameter)
 +{
-+    return g_strdup_printf("-object memory-backend-file,id=3Dmem0,size=3D=
-%s"
-+                           ",mem-path=3D%s,share=3Don -numa node,memdev=3D=
-mem0",
-+                           mem_size, shmem_path);
++    QDict *rsp;
++    char *result;
++    Error *local_err =3D NULL;
++    SocketAddressList *addrs;
++    Visitor *iv =3D NULL;
++    QObject *object;
++
++    rsp =3D migrate_query(who);
++    object =3D qdict_get(rsp, parameter);
++
++    iv =3D qobject_input_visitor_new(object);
++    visit_type_SocketAddressList(iv, NULL, &addrs, &local_err);
++
++    /* we are only using a single address */
++    result =3D g_strdup_printf("%s", SocketAddress_to_str(addrs->value))=
+;
++
++    qapi_free_SocketAddressList(addrs);
++    qobject_unref(rsp);
++    return result;
++}
++
++static long long migrate_get_parameter(QTestState *who, const char *para=
+meter)
++{
++    QDict *rsp;
++    long long result;
++
++    rsp =3D wait_command(who, "{ 'execute': 'query-migrate-parameters' }=
+");
++    result =3D qdict_get_int(rsp, parameter);
++    qobject_unref(rsp);
++    return result;
 +}
 +
  static void migrate_check_parameter(QTestState *who, const char *paramet=
 er,
                                      long long value)
  {
-@@ -430,73 +442,95 @@ static void migrate_postcopy_start(QTestState *from=
-, QTestState *to)
+-    QDict *rsp_return;
++    long long result;
+=20
+-    rsp_return =3D wait_command(who,
+-                              "{ 'execute': 'query-migrate-parameters' }=
+");
+-    g_assert_cmpint(qdict_get_int(rsp_return, parameter), =3D=3D, value)=
+;
+-    qobject_unref(rsp_return);
++    result =3D migrate_get_parameter(who, parameter);
++    g_assert_cmpint(result, =3D=3D, value);
  }
 =20
- static int test_migrate_start(QTestState **from, QTestState **to,
--                               const char *uri, bool hide_stderr)
-+                               const char *uri, bool hide_stderr,
-+                               bool use_shmem)
- {
-     gchar *cmd_src, *cmd_dst;
--    char *bootpath =3D g_strdup_printf("%s/bootsect", tmpfs);
-+    char *bootpath =3D NULL;
-+    char *extra_opts =3D NULL;
-+    char *shmem_path =3D NULL;
-     const char *arch =3D qtest_get_arch();
-     const char *accel =3D "kvm:tcg";
-=20
--    got_stop =3D false;
-+    if (use_shmem) {
-+        if (!g_file_test("/dev/shm", G_FILE_TEST_IS_DIR)) {
-+            g_test_skip("/dev/shm is not supported");
-+            return -1;
-+        }
-+        shmem_path =3D g_strdup_printf("/dev/shm/qemu-%d", getpid());
-+    }
-=20
-+    got_stop =3D false;
-+    bootpath =3D g_strdup_printf("%s/bootsect", tmpfs);
-     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
-) {
-         init_bootfile(bootpath, x86_bootsect);
-+        extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) : =
-NULL;
-         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 150M"
-                                   " -name source,debug-threads=3Don"
-                                   " -serial file:%s/src_serial"
--                                  " -drive file=3D%s,format=3Draw",
--                                  accel, tmpfs, bootpath);
-+                                  " -drive file=3D%s,format=3Draw %s",
-+                                  accel, tmpfs, bootpath,
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 150M"
-                                   " -name target,debug-threads=3Don"
-                                   " -serial file:%s/dest_serial"
-                                   " -drive file=3D%s,format=3Draw"
--                                  " -incoming %s",
--                                  accel, tmpfs, bootpath, uri);
-+                                  " -incoming %s %s",
-+                                  accel, tmpfs, bootpath, uri,
-+                                  extra_opts ? extra_opts : "");
-         start_address =3D X86_TEST_MEM_START;
-         end_address =3D X86_TEST_MEM_END;
-     } else if (g_str_equal(arch, "s390x")) {
-         init_bootfile_s390x(bootpath);
-+        extra_opts =3D use_shmem ? get_shmem_opts("128M", shmem_path) : =
-NULL;
-         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 128M"
-                                   " -name source,debug-threads=3Don"
--                                  " -serial file:%s/src_serial -bios %s"=
+ static void migrate_set_parameter(QTestState *who, const char *parameter=
 ,
--                                  accel, tmpfs, bootpath);
-+                                  " -serial file:%s/src_serial -bios %s =
-%s",
-+                                  accel, tmpfs, bootpath,
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 128M"
-                                   " -name target,debug-threads=3Don"
-                                   " -serial file:%s/dest_serial -bios %s=
-"
--                                  " -incoming %s",
--                                  accel, tmpfs, bootpath, uri);
-+                                  " -incoming %s %s",
-+                                  accel, tmpfs, bootpath, uri,
-+                                  extra_opts ? extra_opts : "");
-         start_address =3D S390_TEST_MEM_START;
-         end_address =3D S390_TEST_MEM_END;
-     } else if (strcmp(arch, "ppc64") =3D=3D 0) {
-+        extra_opts =3D use_shmem ? get_shmem_opts("256M", shmem_path) : =
-NULL;
-         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 256M -nodefa=
-ults"
-                                   " -name source,debug-threads=3Don"
-                                   " -serial file:%s/src_serial"
-                                   " -prom-env 'use-nvramrc?=3Dtrue' -pro=
-m-env "
-                                   "'nvramrc=3Dhex .\" _\" begin %x %x "
-                                   "do i c@ 1 + i c! 1000 +loop .\" B\" 0=
- "
--                                  "until'",  accel, tmpfs, end_address,
--                                  start_address);
-+                                  "until' %s",  accel, tmpfs, end_addres=
-s,
-+                                  start_address, extra_opts ? extra_opts=
- : "");
-         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 256M"
-                                   " -name target,debug-threads=3Don"
-                                   " -serial file:%s/dest_serial"
--                                  " -incoming %s",
--                                  accel, tmpfs, uri);
-+                                  " -incoming %s %s",
-+                                  accel, tmpfs, uri,
-+                                  extra_opts ? extra_opts : "");
-=20
-         start_address =3D PPC_TEST_MEM_START;
-         end_address =3D PPC_TEST_MEM_END;
-     } else if (strcmp(arch, "aarch64") =3D=3D 0) {
-         init_bootfile(bootpath, aarch64_kernel);
-+        extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) : =
-NULL;
-         cmd_src =3D g_strdup_printf("-machine virt,accel=3D%s,gic-versio=
-n=3Dmax "
-                                   "-name vmsource,debug-threads=3Don -cp=
-u max "
-                                   "-m 150M -serial file:%s/src_serial "
--                                  "-kernel %s ",
--                                  accel, tmpfs, bootpath);
-+                                  "-kernel %s %s",
-+                                  accel, tmpfs, bootpath,
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst =3D g_strdup_printf("-machine virt,accel=3D%s,gic-versio=
-n=3Dmax "
-                                   "-name vmdest,debug-threads=3Don -cpu =
-max "
-                                   "-m 150M -serial file:%s/dest_serial "
-                                   "-kernel %s "
--                                  "-incoming %s ",
--                                  accel, tmpfs, bootpath, uri);
-+                                  "-incoming %s %s",
-+                                  accel, tmpfs, bootpath, uri,
-+                                  extra_opts ? extra_opts : "");
-=20
-         start_address =3D ARM_TEST_MEM_START;
-         end_address =3D ARM_TEST_MEM_END;
-@@ -507,6 +541,7 @@ static int test_migrate_start(QTestState **from, QTes=
-tState **to,
-     }
-=20
-     g_free(bootpath);
-+    g_free(extra_opts);
-=20
-     if (hide_stderr) {
-         gchar *tmp;
-@@ -524,6 +559,16 @@ static int test_migrate_start(QTestState **from, QTe=
-stState **to,
-=20
-     *to =3D qtest_init(cmd_dst);
-     g_free(cmd_dst);
-+
-+    /*
-+     * Remove shmem file immediately to avoid memory leak in test failed=
- case.
-+     * It's valid becase QEMU has already opened this file
-+     */
-+    if (use_shmem) {
-+        unlink(shmem_path);
-+        g_free(shmem_path);
-+    }
-+
-     return 0;
- }
-=20
-@@ -603,7 +648,7 @@ static int migrate_postcopy_prepare(QTestState **from=
-_ptr,
-     char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
-=20
--    if (test_migrate_start(&from, &to, uri, hide_error)) {
-+    if (test_migrate_start(&from, &to, uri, hide_error, false)) {
-         return -1;
-     }
-=20
-@@ -720,7 +765,7 @@ static void test_baddest(void)
-     char *status;
-     bool failed;
-=20
--    if (test_migrate_start(&from, &to, "tcp:0:0", true)) {
-+    if (test_migrate_start(&from, &to, "tcp:0:0", true, false)) {
-         return;
-     }
-     migrate(from, "tcp:0:0", "{}");
-@@ -745,7 +790,7 @@ static void test_precopy_unix(void)
-     char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
-=20
--    if (test_migrate_start(&from, &to, uri, false)) {
-+    if (test_migrate_start(&from, &to, uri, false, false)) {
-         return;
-     }
-=20
-@@ -781,6 +826,44 @@ static void test_precopy_unix(void)
+@@ -927,6 +983,49 @@ static void test_xbzrle_unix(void)
      g_free(uri);
  }
 =20
-+#if 0
-+/* Currently upset on aarch64 TCG */
-+static void test_ignore_shared(void)
++static void test_precopy_tcp(void)
 +{
-+    char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
++    char *uri;
 +    QTestState *from, *to;
 +
-+    if (test_migrate_start(&from, &to, uri, false, true)) {
++    if (test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false, false))=
+ {
 +        return;
 +    }
 +
-+    migrate_set_capability(from, "x-ignore-shared", true);
-+    migrate_set_capability(to, "x-ignore-shared", true);
++    /*
++     * We want to pick a speed slow enough that the test completes
++     * quickly, but that it doesn't complete precopy even on a slow
++     * machine, so also set the downtime.
++     */
++    /* 1 ms should make it not converge*/
++    migrate_set_parameter(from, "downtime-limit", 1);
++    /* 1GB/s */
++    migrate_set_parameter(from, "max-bandwidth", 1000000000);
 +
 +    /* Wait for the first serial output from the source */
 +    wait_for_serial("src_serial");
++
++    uri =3D migrate_get_socket_address(to, "socket-address");
 +
 +    migrate(from, uri, "{}");
 +
 +    wait_for_migration_pass(from);
 +
++    /* 300ms should converge */
++    migrate_set_parameter(from, "downtime-limit", 300);
++
 +    if (!got_stop) {
 +        qtest_qmp_eventwait(from, "STOP");
 +    }
-+
 +    qtest_qmp_eventwait(to, "RESUME");
 +
 +    wait_for_serial("dest_serial");
 +    wait_for_migration_complete(from);
 +
-+    /* Check whether shared RAM has been really skipped */
-+    g_assert_cmpint(read_ram_property_int(from, "transferred"), <, 1024 =
-* 1024);
-+
 +    test_migrate_end(from, to, true);
 +    g_free(uri);
 +}
-+#endif
 +
  int main(int argc, char **argv)
  {
      char template[] =3D "/tmp/migration-test-XXXXXX";
-@@ -832,6 +915,7 @@ int main(int argc, char **argv)
+@@ -978,6 +1077,7 @@ int main(int argc, char **argv)
      qtest_add_func("/migration/deprecated", test_deprecated);
      qtest_add_func("/migration/bad_dest", test_baddest);
      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-+    /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); *=
++    qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+     /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); *=
 /
-=20
-     ret =3D g_test_run();
+     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
 =20
 --=20
 2.20.1
