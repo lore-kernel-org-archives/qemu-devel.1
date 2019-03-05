@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40430)
+Received: from eggs.gnu.org ([209.51.188.92]:40464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1Jj1-0007NF-Jd
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:43:56 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h1JjB-0007Vx-5f
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:44:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1Jiy-0005pc-UO
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:43:54 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h1Jj1-0005qY-0K
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 18:43:58 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  5 Mar 2019 18:43:36 -0500
-Message-Id: <20190305234337.18353-5-jsnow@redhat.com>
+Date: Tue,  5 Mar 2019 18:43:37 -0500
+Message-Id: <20190305234337.18353-6-jsnow@redhat.com>
 In-Reply-To: <20190305234337.18353-1-jsnow@redhat.com>
 References: <20190305234337.18353-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] block/qcow2-bitmap: Allow resizes with
- persistent bitmaps
+Subject: [Qemu-devel] [PATCH 5/5] tests/qemu-iotests: add bitmap resize test
+ 246
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,146 +23,449 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-Since we now load all bitmaps into memory anyway, we can just truncate them
-in-memory and then flush them back to disk. Just in case, we will still check
-and enforce that this shortcut is valid -- i.e. that any bitmap described
-on-disk is indeed in-memory and can be modified.
-
-If there are any inconsistent bitmaps, we refuse to allow the truncate as
-we do not actually load these bitmaps into memory, and it isn't safe or
-reasonable to attempt to truncate corrupted data.
+Test that we can actually resize qcow2 images with persistent bitmaps
+correctly. Throw some other goofy stuff at the test while we're at it,
+like adding bitmaps of different granularities and at different times.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/qcow2.h        |  1 +
- block/qcow2-bitmap.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c        | 27 ++++++++++++++++++++-------
- 3 files changed, 63 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/246     | 114 ++++++++++++++
+ tests/qemu-iotests/246.out | 296 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 411 insertions(+)
+ create mode 100755 tests/qemu-iotests/246
+ create mode 100644 tests/qemu-iotests/246.out
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 4c1fdfcbec..b9227a72cc 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -689,6 +689,7 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
- int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
-+int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- void qcow2_flush_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 9373055d3b..24f280bccc 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1167,6 +1167,48 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-     return qcow2_reopen_bitmaps_rw_hint(bs, NULL, errp);
- }
- 
-+/* Checks to see if it's safe to resize bitmaps */
-+int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp)
+diff --git a/tests/qemu-iotests/246 b/tests/qemu-iotests/246
+new file mode 100755
+index 0000000000..e5bd1ce2d1
+--- /dev/null
++++ b/tests/qemu-iotests/246
+@@ -0,0 +1,114 @@
++#!/usr/bin/env python
++#
++# Test persistent bitmap resizing.
++#
++# Copyright (c) 2019 John Snow for Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# owner=jsnow@redhat.com
++
++import iotests
++from iotests import log
++
++iotests.verify_image_format(supported_fmts=['qcow2'])
++size = 64 * 1024 * 1024 * 1024
++gran_small = 32 * 1024
++gran_large = 128 * 1024
++
++def query_bitmaps(vm):
++    res = vm.qmp("query-block")
++    return { "bitmaps": { device['device']: device.get('dirty-bitmaps', []) for
++                          device in res['return'] } }
++
++with iotests.FilePath('img') as img_path, \
++     iotests.VM() as vm:
++
++    log('--- Preparing image & VM ---\n')
++    iotests.qemu_img_create('-f', iotests.imgfmt, img_path, str(size))
++    vm.add_drive(img_path)
++
++
++    log('--- 1st Boot (Establish Baseline Image) ---\n')
++    vm.launch()
++
++    log('\n--- Adding bitmaps Small, Medium, Large, and Transient ---\n')
++    vm.qmp_log("block-dirty-bitmap-add", node="drive0",
++               name="Small", granularity=gran_small, persistent=True)
++    vm.qmp_log("block-dirty-bitmap-add", node="drive0",
++               name="Medium", persistent=True)
++    vm.qmp_log("block-dirty-bitmap-add", node="drive0",
++               name="Large", granularity=gran_large, persistent=True)
++    vm.qmp_log("block-dirty-bitmap-add", node="drive0",
++               name="Transient", persistent=False)
++
++    log('--- Forcing flush of bitmaps to disk ---\n')
++    log(query_bitmaps(vm), indent=2)
++    vm.shutdown()
++
++
++    log('--- 2nd Boot (Grow Image) ---\n')
++    vm.launch()
++    log(query_bitmaps(vm), indent=2)
++
++    log('--- Adding new bitmap, growing image, and adding 2nd new bitmap ---')
++    vm.qmp_log("block-dirty-bitmap-add", node="drive0",
++               name="New", persistent=True)
++    vm.qmp_log("human-monitor-command",
++               command_line="block_resize drive0 70G")
++    vm.qmp_log("block-dirty-bitmap-add", node="drive0",
++               name="Newtwo", persistent=True)
++    log(query_bitmaps(vm), indent=2)
++
++    log('--- Forcing flush of bitmaps to disk ---\n')
++    vm.shutdown()
++
++
++    log('--- 3rd Boot (Shrink Image) ---\n')
++    vm.launch()
++    log(query_bitmaps(vm), indent=2)
++
++    log('--- Adding "NewB" bitmap, removing "New" bitmap ---')
++    vm.qmp_log("block-dirty-bitmap-add", node="drive0",
++               name="NewB", persistent=True)
++    vm.qmp_log("block-dirty-bitmap-remove", node="drive0",
++               name="New")
++
++    log('--- Truncating image ---\n')
++    vm.qmp_log("human-monitor-command",
++               command_line="block_resize drive0 50G")
++
++    log('--- Adding "NewC" bitmap, removing "NewTwo" bitmap ---')
++    vm.qmp_log("block-dirty-bitmap-add", node="drive0",
++               name="NewC", persistent=True)
++    vm.qmp_log("block-dirty-bitmap-remove", node="drive0", name="Newtwo")
++
++    log('--- Forcing flush of bitmaps to disk ---\n')
++    vm.shutdown()
++
++
++    log('--- 4th Boot (Verification and Cleanup) ---\n')
++    vm.launch()
++    log(query_bitmaps(vm), indent=2)
++
++    log('--- Removing all Bitmaps ---\n')
++    vm.qmp_log("block-dirty-bitmap-remove", node="drive0", name="Small")
++    vm.qmp_log("block-dirty-bitmap-remove", node="drive0", name="Medium")
++    vm.qmp_log("block-dirty-bitmap-remove", node="drive0", name="Large")
++    vm.qmp_log("block-dirty-bitmap-remove", node="drive0", name="NewB")
++    vm.qmp_log("block-dirty-bitmap-remove", node="drive0", name="NewC")
++    log(query_bitmaps(vm), indent=2)
++
++    log('\n--- Done ---\n')
++    vm.shutdown()
+diff --git a/tests/qemu-iotests/246.out b/tests/qemu-iotests/246.out
+new file mode 100644
+index 0000000000..ea591b0e46
+--- /dev/null
++++ b/tests/qemu-iotests/246.out
+@@ -0,0 +1,296 @@
++--- Preparing image & VM ---
++
++--- 1st Boot (Establish Baseline Image) ---
++
++
++--- Adding bitmaps Small, Medium, Large, and Transient ---
++
++{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 32768, "name": "Small", "node": "drive0", "persistent": true}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "Medium", "node": "drive0", "persistent": true}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 131072, "name": "Large", "node": "drive0", "persistent": true}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "Transient", "node": "drive0", "persistent": false}}
++{"return": {}}
++--- Forcing flush of bitmaps to disk ---
++
 +{
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2BitmapList *bm_list;
-+    Qcow2Bitmap *bm;
-+    int ret = 0;
++  "bitmaps": {
++    "drive0": [
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "Transient",
++        "persistent": false,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 131072,
++        "name": "Large",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "Medium",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 32768,
++        "name": "Small",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      }
++    ]
++  }
++}
++--- 2nd Boot (Grow Image) ---
 +
-+    if (s->nb_bitmaps == 0) {
-+        return 0;
-+    }
++{
++  "bitmaps": {
++    "drive0": [
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 32768,
++        "name": "Small",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "Medium",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 131072,
++        "name": "Large",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      }
++    ]
++  }
++}
++--- Adding new bitmap, growing image, and adding 2nd new bitmap ---
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "New", "node": "drive0", "persistent": true}}
++{"return": {}}
++{"execute": "human-monitor-command", "arguments": {"command-line": "block_resize drive0 70G"}}
++{"return": ""}
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "Newtwo", "node": "drive0", "persistent": true}}
++{"return": {}}
++{
++  "bitmaps": {
++    "drive0": [
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "Newtwo",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "New",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 32768,
++        "name": "Small",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "Medium",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 131072,
++        "name": "Large",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      }
++    ]
++  }
++}
++--- Forcing flush of bitmaps to disk ---
 +
-+    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-+                               s->bitmap_directory_size, false, errp);
-+    if (bm_list == NULL) {
-+        return -EINVAL;
-+    }
++--- 3rd Boot (Shrink Image) ---
 +
-+    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-+        BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
-+        if (bitmap == NULL) {
-+            /* We rely on all bitmaps being in-memory to be able to resize them,
-+             * Otherwise, we'd need to resize them on disk explicitly */
-+            error_setg(errp, "Cannot resize qcow2 with persistent bitmaps that "
-+                       "were not loaded into memory");
-+            ret = -ENOTSUP;
-+            goto out;
-+        }
++{
++  "bitmaps": {
++    "drive0": [
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "Newtwo",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "New",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 32768,
++        "name": "Small",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "Medium",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 131072,
++        "name": "Large",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      }
++    ]
++  }
++}
++--- Adding "NewB" bitmap, removing "New" bitmap ---
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "NewB", "node": "drive0", "persistent": true}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-remove", "arguments": {"name": "New", "node": "drive0"}}
++{"return": {}}
++--- Truncating image ---
 +
-+        /* The checks against readonly and busy are redundant, but certainly
-+         * do no harm. checks against inconsistent are crucial: */
-+        if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_DEFAULT, errp)) {
-+            ret = -ENOTSUP;
-+            goto out;
-+        }
-+    }
++{"execute": "human-monitor-command", "arguments": {"command-line": "block_resize drive0 50G"}}
++{"return": ""}
++--- Adding "NewC" bitmap, removing "NewTwo" bitmap ---
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "NewC", "node": "drive0", "persistent": true}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-remove", "arguments": {"name": "Newtwo", "node": "drive0"}}
++{"return": {}}
++--- Forcing flush of bitmaps to disk ---
 +
-+out:
-+    bitmap_list_free(bm_list);
-+    return ret;
++--- 4th Boot (Verification and Cleanup) ---
++
++{
++  "bitmaps": {
++    "drive0": [
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "NewC",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "NewB",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 32768,
++        "name": "Small",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 65536,
++        "name": "Medium",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      },
++      {
++        "busy": false,
++        "count": 0,
++        "granularity": 131072,
++        "name": "Large",
++        "persistent": true,
++        "recording": true,
++        "status": "active"
++      }
++    ]
++  }
++}
++--- Removing all Bitmaps ---
++
++{"execute": "block-dirty-bitmap-remove", "arguments": {"name": "Small", "node": "drive0"}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-remove", "arguments": {"name": "Medium", "node": "drive0"}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-remove", "arguments": {"name": "Large", "node": "drive0"}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-remove", "arguments": {"name": "NewB", "node": "drive0"}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-remove", "arguments": {"name": "NewC", "node": "drive0"}}
++{"return": {}}
++{
++  "bitmaps": {
++    "drive0": []
++  }
 +}
 +
- /* store_bitmap_data()
-  * Store bitmap to image, filling bitmap table accordingly.
-  */
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 7fb2730f09..6fd9252494 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3472,7 +3472,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
- {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t old_length;
--    int64_t new_l1_size;
-+    int64_t new_l1_size, offset_be;
-     int ret;
-     QDict *options;
- 
-@@ -3498,10 +3498,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-         goto fail;
-     }
- 
--    /* cannot proceed if image has bitmaps */
--    if (s->nb_bitmaps) {
--        /* TODO: resize bitmaps in the image */
--        error_setg(errp, "Can't resize an image which has bitmaps");
-+    /* Only certain persistent bitmaps can be resized: */
-+    if (qcow2_truncate_bitmaps_check(bs, errp)) {
-         ret = -ENOTSUP;
-         goto fail;
-     }
-@@ -3702,9 +3700,9 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-     bs->total_sectors = offset / BDRV_SECTOR_SIZE;
- 
-     /* write updated header.size */
--    offset = cpu_to_be64(offset);
-+    offset_be = cpu_to_be64(offset);
-     ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
--                           &offset, sizeof(uint64_t));
-+                           &offset_be, sizeof(uint64_t));
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Failed to update the image size");
-         goto fail;
-@@ -3719,6 +3717,21 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-     if (ret < 0) {
-         goto fail;
-     }
++--- Done ---
 +
-+    /* Flush bitmaps */
-+    if (s->nb_bitmaps) {
-+        Error *local_err = NULL;
-+
-+        /* Usually, bitmaps get resized after this call.
-+         * Force it earlier so we can make the metadata consistent. */
-+        bdrv_dirty_bitmap_truncate(bs, offset);
-+        qcow2_flush_persistent_dirty_bitmaps(bs, &local_err);
-+        if (local_err) {
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-+    }
-+
-     ret = 0;
- fail:
-     qemu_co_mutex_unlock(&s->lock);
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index b5ca63cf72..0683f6e10d 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -241,3 +241,4 @@
+ 239 rw auto quick
+ 240 auto quick
+ 242 rw auto quick
++246 rw auto quick
 -- 
 2.17.2
