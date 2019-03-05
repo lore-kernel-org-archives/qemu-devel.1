@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53188)
+Received: from eggs.gnu.org ([209.51.188.92]:54262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h12EW-0005Uf-10
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 00:03:17 -0500
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1h12LT-0000Wm-Ux
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 00:10:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h12ES-0008SF-Ct
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 00:03:14 -0500
-Date: Tue, 5 Mar 2019 14:42:59 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190305034259.GG7877@umbus.fritz.box>
-References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-6-clg@kaod.org>
-	<20190212054013.GL1884@umbus.fritz.box>
-	<ef18dbf0-87dc-1ec2-247f-28bae0aef308@kaod.org>
-	<20190221031316.GE13129@umbus.fritz.box>
-	<22310d64-31f2-537a-1b04-1f38683697f1@kaod.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Fnm8lRGFTVS/3GuM"
-Content-Disposition: inline
-In-Reply-To: <22310d64-31f2-537a-1b04-1f38683697f1@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 05/19] ppc/pnv: add XIVE support
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1h12LS-0004kW-Lg
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 00:10:27 -0500
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:40658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1h12LS-0004hW-C4
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 00:10:26 -0500
+Received: by mail-it1-x141.google.com with SMTP id l139so2474758ita.5
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 21:10:25 -0800 (PST)
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Date: Tue,  5 Mar 2019 00:10:07 -0500
+Message-Id: <20190305051007.56009-1-stephen.checkoway@oberlin.edu>
+Subject: [Qemu-devel] [PATCH] hw/char/escc: Lower irq when transmit buffer
+ is filled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,327 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+The SCC/ESCC will briefly stop asserting an interrupt when the
+transmit FIFO is filled.
 
---Fnm8lRGFTVS/3GuM
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This code doesn't model the transmit FIFO/shift register so the
+pending transmit interrupt is never deasserted which means that an
+edge-triggered interrupt controller will never see the low-to-high
+transition it needs to raise another interrupt. The practical
+consequence of this is that guest firmware with an interrupt service
+routine for the ESCC that does not send all of the data it has
+immediately will stop sending data if the following sequence of
+events occurs:
+1. Disable processor interrupts
+2. Write a character to the ESCC
+3. Add additional characters to a buffer which is drained by the ISR
+4. Enable processor interrupts
 
-On Thu, Feb 21, 2019 at 09:32:44AM +0100, C=E9dric Le Goater wrote:
-> On 2/21/19 4:13 AM, David Gibson wrote:
-> > On Tue, Feb 19, 2019 at 08:31:25AM +0100, C=E9dric Le Goater wrote:
-> >> On 2/12/19 6:40 AM, David Gibson wrote:
-> >>> On Mon, Jan 28, 2019 at 10:46:11AM +0100, C=E9dric Le Goater wrote:
-> > [snip]
-> >>>>  #endif /* _PPC_PNV_H */
-> >>>> diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-> >>>> index 9961ea3a92cd..8e57c064e661 100644
-> >>>> --- a/include/hw/ppc/pnv_core.h
-> >>>> +++ b/include/hw/ppc/pnv_core.h
-> >>>> @@ -49,6 +49,7 @@ typedef struct PnvCoreClass {
-> >>>> =20
-> >>>>  typedef struct PnvCPUState {
-> >>>>      struct ICPState *icp;
-> >>>> +    struct XiveTCTX *tctx;
-> >>>
-> >>> Unlike sPAPR, we really do always know in advance the interrupt
-> >>> controller for a particular machine.  I think it makes sense to
-> >>> further split the POWER8 and POWER9 cases here, so we only track one
-> >>> for any given setup.
-> >>
-> >> So, you would define a :=20
-> >>
-> >>   typedef struct Pnv9CPUState {
-> >>       struct XiveTCTX *tctx;
-> >>   } Pnv9CPUState;
-> >>
-> >> to be allocated when the core is realized ? and later the routine=20
-> >> pnv_chip_power9_intc_create() would assign the ->tctx pointer.
-> >=20
-> > Sounds about right.
-> >=20
-> > [snip]
-> >>>> +    uint32_t      nr_ends;
-> >>>> +    XiveENDSource end_source;
-> >>>> +
-> >>>> +    /* Interrupt controller registers */
-> >>>> +    uint64_t      regs[0x300];
-> >>>> +
-> >>>> +    /* Can be configured by FW */
-> >>>> +    uint32_t      tctx_chipid;
-> >>>> +    uint32_t      chip_id;
-> >>>
-> >>> Can't you derive that since you have a pointer to the owning chip?
-> >>
-> >> Not always, there are register fields to purposely override this value.
-> >> I can improve the current code a little I think.
-> >=20
-> > Ok.
-> >=20
-> > [snip]
-> >>>> +/*
-> >>>> + * Virtual structures table (VST)
-> >>>> + */
-> >>>> +typedef struct XiveVstInfo {
-> >>>> +    uint32_t    type;
-> >>>> +    const char *name;
-> >>>> +    uint32_t    size;
-> >>>> +    uint32_t    max_blocks;
-> >>>> +} XiveVstInfo;
-> >>>> +
-> >>>> +static const XiveVstInfo vst_infos[] =3D {
-> >>>> +    [VST_TSEL_IVT]  =3D { VST_TSEL_IVT,  "EAT",  sizeof(XiveEAS), 1=
-6 },
-> >>>
-> >>> I don't love explicitly storing the type/index in each record, as well
-> >>> as it being implicit in the table slot.
-> >>
-> >> The 'vst_infos' table decribes the different table types and the 'type=
-'=20
-> >> field is used to index the runtime table of VSDs. See
-> >> pnv_xive_vst_addr()
-> >=20
-> > Yes, I know what it's for but it's still redundant information.  You
-> > could avoid it, for example, by passing around an index instead of a
-> > pointer to a vst_infos[] slot - then you can look up both vst_infos
-> > and the other table using that index.
->=20
-> :) This is exactly what the code was doing before and I thought passing=
-=20
-> the pointer was cleaner ! No problem. This is minor. I will revert.
->=20
-> > [snip]
-> >>>> +    case CQ_TM1_BAR: /* TM BAR. 4 pages. Map only once */
-> >>>> +    case CQ_TM2_BAR: /* second TM BAR. for hotplug. Not modeled */
-> >>>> +        xive->tm_shift =3D val & CQ_TM_BAR_64K ? 16 : 12;
-> >>>> +        if (!(val & CQ_TM_BAR_VALID)) {
-> >>>> +            xive->tm_base =3D 0;
-> >>>> +            if (xive->regs[reg] & CQ_TM_BAR_VALID && xive->chip_id =
-=3D=3D 0) {
-> >>>> +                memory_region_del_subregion(sysmem, &xive->tm_mmio);
-> >>>> +            }
-> >>>> +        } else {
-> >>>> +            xive->tm_base =3D val & ~(CQ_TM_BAR_VALID | CQ_TM_BAR_6=
-4K);
-> >>>> +            if (!(xive->regs[reg] & CQ_TM_BAR_VALID) && xive->chip_=
-id =3D=3D 0) {
-> >>>> +                memory_region_add_subregion(sysmem, xive->tm_base,
-> >>>> +                                            &xive->tm_mmio);
-> >>>> +            }
-> >>>> +        }
-> >>>> +        break;
-> >>>> +
-> >>>> +    case CQ_PC_BARM:
-> >>>> +        xive->regs[reg] =3D val;
-> >>>
-> >>> As discussed elsewhere, this seems to be a big mix of writing things
-> >>> directly into regs[reg] and doing other things instead, and you really
-> >>> want to go one way or the other.  I'd suggest dropping xive->regs[]
-> >>> and instead putting the state you need persistent into its own
-> >>> variables.
-> >>
-> >> I made a big effort to introduce helper routines to avoid storing valu=
-es=20
-> >> that can be calculated under the PnvXive model, as you asked for it.=
-=20
-> >> The assignment above is only necessary for the pnv_xive_pc_size() below
-> >> and I don't know how handle this current case without duplicating the=
-=20
-> >> switch statement, which I think is ugly.
-> >=20
-> > I'm not sure quite what you mean about duplicating the case.
-> >> The point here is that since you're only storing in a couple of the
-> > switch cases, you can just have explicit data backing just those
-> > values and write to those in the switch cases instead of having a
-> > great big regs[] array of which only a few bits are used.
->=20
-> The model uses these registers :
->=20
->     xive->regs[PC_GLOBAL_CONFIG >> 3]
->     xive->regs[CQ_VC_BARM >> 3]
->     xive->regs[CQ_PC_BARM >> 3]
->     xive->regs[CQ_TAR >> 3]
->     xive->regs[VC_GLOBAL_CONFIG >> 3]
->     xive->regs[VC_VSD_TABLE_ADDR >> 3]);
->     xive->regs[CQ_IC_BAR]
->     xive->regs[CQ_TM1_BAR]
->     xive->regs[CQ_VC_BAR]
->     xive->regs[PC_THREAD_EN_REG0 >> 3]
->     xive->regs[PC_THREAD_EN_REG1 >> 3]
->     xive->regs[(VC_EQC_CWATCH_DAT0 >> 3) + i];
->     xive->regs[(PC_VPC_CWATCH_DAT0 >> 3) + i]
->     xive->regs[VC_EQC_CONFIG];
->     xive->regs[VC_EQC_SCRUB_TRIG]
->     xive->regs[PC_AT_KILL];
->     xive->regs[VC_AT_MACRO_KILL]
->     xive->regs[(PC_TCTXT_INDIR0 >> 3) + i]
->=20
-> The regs array is useful for the different cache watch but apart=20
-> from that, yes, we could use independent fields. I will see how much=20
-> energy I have to put into this change.=20
->=20
-> All the registers change in P10, may be this will be a better time
-> to share a common PnvXive model and isolate the HW interface of each
-> processor.
+In this case, the first character will be sent, the interrupt will
+fire and the ISR will output the second character. Since the pending
+transmit interrupt remains asserted, no additional interrupts will
+ever fire.
 
-Changes on P10 does seem like a pretty good reason to decouple the
-qemu internal state from the P9 register interface layout.
+This fixes that situation by explicitly lowering the IRQ when a
+character is written to the buffer.
 
-> >> So, I will keep the xive->regs[] and make the couple of fixes still ne=
-eded.
-> >=20
-> > [snip]
-> >>>> +/*
-> >>>> + * Virtualization Controller MMIO region containing the IPI and END=
- ESB pages
-> >>>> + */
-> >>>> +static uint64_t pnv_xive_vc_read(void *opaque, hwaddr offset,
-> >>>> +                                 unsigned size)
-> >>>> +{
-> >>>> +    PnvXive *xive =3D PNV_XIVE(opaque);
-> >>>> +    uint64_t edt_index =3D offset >> pnv_xive_edt_shift(xive);
-> >>>> +    uint64_t edt_type =3D 0;
-> >>>> +    uint64_t edt_offset;
-> >>>> +    MemTxResult result;
-> >>>> +    AddressSpace *edt_as =3D NULL;
-> >>>> +    uint64_t ret =3D -1;
-> >>>> +
-> >>>> +    if (edt_index < XIVE_TABLE_EDT_MAX) {
-> >>>> +        edt_type =3D GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[edt_index]=
-);
-> >>>> +    }
-> >>>> +
-> >>>> +    switch (edt_type) {
-> >>>> +    case CQ_TDR_EDT_IPI:
-> >>>> +        edt_as =3D &xive->ipi_as;
-> >>>> +        break;
-> >>>> +    case CQ_TDR_EDT_EQ:
-> >>>> +        edt_as =3D &xive->end_as;
-> >>>
-> >>> I'm not entirely understanding the function of these AddressSpace obj=
-ectz.
-> >>
-> >> The IPI and END ESB pages are exposed in the same VC region. But this =
-VC=20
-> >> region is not splitted between the two types with a single offset. It=
-=20
-> >> is segmented with the EDT tables which defines the type of each segmen=
-t.=20
-> >>
-> >> The purpose of these address spaces is to translate the load/stores in=
-=20
-> >> the VC region in the equivalent IPI or END region exposing contigously=
-=20
-> >> ESB pages of the same type: 'end_edt_mmio' and 'ipi_edt_mmio'.=20
-> >>
-> >> The memory regions of the XiveENDSource and the XiveSource for the IPI=
-s=20
-> >> are mapped in 'end_edt_mmio' and 'ipi_edt_mmio'.
-> >=20
-> > Hmm.  Ok, I'm not immediately seeing why you can't map the various IPI
-> > or END blocks directly into address_space memory rather than having
-> > this extra internal layer of indirection.
->=20
-> I think I see what you mean.
->=20
-> You would get rid of the intermediate MR &xive->ipi_edt_mmio and map=20
-> directly &xsrc->esb_mmio into &xive->ipi_mmio
->=20
-> same for the ENDs, map directly &end_xsrc->esb_mmio in &xive->end_mmio
->=20
-> That might be overkill indeed. I will check.
->=20
-> >> (This is changing for P10, should be simpler)  =20
-> >=20
-> > [snip]
-> >>>> +/*
-> >>>> + *  Maximum number of IRQs and ENDs supported by HW
-> >>>> + */
-> >>>> +#define PNV_XIVE_NR_IRQS (PNV9_XIVE_VC_SIZE / (1ull << XIVE_ESB_64K=
-_2PAGE))
-> >>>> +#define PNV_XIVE_NR_ENDS (PNV9_XIVE_VC_SIZE / (1ull << XIVE_ESB_64K=
-_2PAGE))
-> >>>> +
-> >>>> +static void pnv_xive_realize(DeviceState *dev, Error **errp)
-> >>>> +{
-> >>>> +    PnvXive *xive =3D PNV_XIVE(dev);
-> >>>> +    XiveSource *xsrc =3D &xive->source;
-> >>>> +    XiveENDSource *end_xsrc =3D &xive->end_source;
-> >>>> +    Error *local_err =3D NULL;
-> >>>> +    Object *obj;
-> >>>> +
-> >>>> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &local_er=
-r);
-> >>>> +    if (!obj) {
-> >>>> +        error_propagate(errp, local_err);
-> >>>> +        error_prepend(errp, "required link 'chip' not found: ");
-> >>>> +        return;
-> >>>> +    }
-> >>>> +
-> >>>> +    /* The PnvChip id identifies the XIVE interrupt controller. */
-> >>>> +    xive->chip =3D PNV_CHIP(obj);
-> >>>> +
-> >>>> +    /*
-> >>>> +     * Xive Interrupt source and END source object with the maximum
-> >>>> +     * allowed HW configuration. The ESB MMIO regions will be resiz=
-ed
-> >>>> +     * dynamically when the controller is configured by the FW to
-> >>>> +     * limit accesses to resources not provisioned.
-> >>>> +     */
-> >>>> +    object_property_set_int(OBJECT(xsrc), PNV_XIVE_NR_IRQS, "nr-irq=
-s",
-> >>>> +                            &error_fatal);
-> >>>
-> >>> You have a constant here, but your router object also includes a
-> >>> nr_irqs field.  What's up with that?
-> >>
-> >> The XiveSource object of PnvXive is realized for the maximum size allo=
-wed
-> >> by HW because we don't know how much IRQs the FW will provision for.
-> >>
-> >> The 'nr_irqs' is the number of IRQs configured by the FW (We changed t=
-he
-> >> name to 'nr_ipis') See routine pnv_xive_vst_set_exclusive()
-> >=20
-> > Ah, ok.
-> >=20
->=20
-> I will try to get that done for 4.0.=20
->=20
-> PSI and LPC P9 models should be less complex to review. =20
->=20
-> Thanks,
->=20
-> C.
->=20
+Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+---
+ hw/char/escc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Fnm8lRGFTVS/3GuM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx98EAACgkQbDjKyiDZ
-s5KW6xAA24Zsgf5jmOlUr7gS+eXFNWdFhWEmpR7zYL5ajoDB9DhMU+YM+/YKtieC
-UekB3c2V3Ad2LZ98QegkpTyh1TQempFXeGz5ejpmVJ/m5ojM0RSIFjEJRp3Uohpc
-BdYNPQBhIf8wqkiO+u2IjhFAgnNg9LgJnYv7JX5tKkzbqCHS2F2fyDPuw0zKMQ2w
-EXBUgEeq+H7TM7akkNv8gud5pdPkgt+Q48Cmn5CszxFdTWz6/2MZeQMexMSpJKWQ
-b9/YJ6MFyTmRneK9lqWMkZBv9W7GuRG9zwuf/yw/gPwBS4Fq7/2ijp5LOzGkbp4b
-vJP/VIWsmcZFt9r4QHgAFKmx3JL3R/qSLRWjnhqG+/uYdwo/wYnnPjCB9AN5H1Db
-3sZxAyCTwwckqOiPN3bhKenkBNpPX66e4h6CFQH3JrO0ygixGpLLUs+Lz/iJP7Xq
-rKNBSvX3/Tf2u3DZ1/HSDqn45FczODUYYMvouf8VZtElah7T1EsbvQ1ZR19ttIrh
-Ax35+Zi+2MmP7ApJ249gPtqbtc/UPQEN+ITu5G2l9BHKpgwgwvA/vh0kZKNYUJ4W
-58FlbQrPQ8G8O0CAUFNfFfTUdZ+hc4yz2SUudK6JEKAKZ62AlC/wY05/qOHRoCm2
-XMob8jS63CHlbBZAMgdx7Vhe24OzqUktt6b1j+PwVmCQjtaBJ6Y=
-=niC7
------END PGP SIGNATURE-----
-
---Fnm8lRGFTVS/3GuM--
+diff --git a/hw/char/escc.c b/hw/char/escc.c
+index 628f5f81f7..bea55ad8da 100644
+--- a/hw/char/escc.c
++++ b/hw/char/escc.c
+@@ -509,6 +509,7 @@ static void escc_mem_write(void *opaque, hwaddr addr,
+         break;
+     case SERIAL_DATA:
+         trace_escc_mem_writeb_data(CHN_C(s), val);
++        qemu_irq_lower(s->irq);
+         s->tx = val;
+         if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
+             if (qemu_chr_fe_backend_connected(&s->chr)) {
+-- 
+2.17.2 (Apple Git-113)
