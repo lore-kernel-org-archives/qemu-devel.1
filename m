@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38349)
+Received: from eggs.gnu.org ([209.51.188.92]:37049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangyan122@huawei.com>) id 1h18Hr-0005e4-P5
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:31:08 -0500
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h13ZS-0001QL-Cb
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 01:29:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangyan122@huawei.com>) id 1h18He-0003HF-I2
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:30:56 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2180 helo=huawei.com)
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h13ZP-0007b1-Gf
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 01:28:58 -0500
+Received: from smtp.lg.ehu.es ([158.227.0.66]:15301 helo=smtp.ehu.eus)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wangyan122@huawei.com>)
-	id 1h18Hc-00026u-JL
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 06:30:53 -0500
-References: <b9bd74df-62a0-5c1e-c356-b7cc641822ab@huawei.com>
-	<20190226101158.4bc3c88b@bahia.lan>
-From: wangyan <wangyan122@huawei.com>
-Message-ID: <51874464-caac-e5d7-8369-90f8a110c05f@huawei.com>
-Date: Tue, 5 Mar 2019 19:28:37 +0800
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h13ZN-0007Ja-79
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 01:28:55 -0500
+Received: from imsva2.lgp.ehu.es (imsva2.lgp.ehu.es [10.0.3.246])
+	by postfix.smtp2.imsva2 (Postfix) with ESMTPS id 3E8BE2F1A
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 07:28:42 +0100 (CET)
+Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F3AF95A050
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 07:28:41 +0100 (CET)
+Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D585E5A04F
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 07:28:41 +0100 (CET)
+Received: from smtp.ehu.eus (unknown [10.0.100.76])
+	by imsva2.lgp.ehu.es (Postfix) with ESMTPS
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 07:28:41 +0100 (CET)
+Received: from mail-it1-f169.google.com (mail-it1-f169.google.com
+	[209.85.166.169]) by smtp2 (Postfix) with ESMTPSA id 638F02F1A
+	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 07:28:41 +0100 (CET)
+Received: by mail-it1-f169.google.com with SMTP id v2so2566494ith.3
+	for <qemu-devel@nongnu.org>; Mon, 04 Mar 2019 22:28:41 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190226101158.4bc3c88b@bahia.lan>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Several questions about " [PATCH v3 0/5]
- virtio-9p: hotplug and migration support"
+Reply-To: unai.martinezcorral@ehu.eus
+From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
+Date: Tue, 5 Mar 2019 07:28:28 +0100
+Message-ID: <CAGZZdDHc12gHaNNisqqBek+2ox1BiuHhwR2k0Tavmt_t+x_D5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [PATCH] qemu-binfmt-conf.sh: add CPUS, add --reset,
+ make -p and -c boolean (no arg)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +43,320 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi
 
-I am very happy for your reply. 
+Related to https://bugs.launchpad.net/qemu/+bug/1817239
 
-I am very interested in your old WIP and want to take a look. 
+- Positional parameters are supported as [CPUS]. This can be a single
+target arch,
+a comma separated list or a space separated list.This parameter replaces
+qemu_target_list for any mode (default, systemd or debian). If it is left
+empty or
+ALL is provided, all the targets are registered. If NONE is provided, no
+target is
+registered.
+- Option [--systemd CPU] is modified to [--systemd], since the
+functionality is
+supported by [CPUS] now.
+- [--credential yes|no] and [--persistent yes|no] are modified to
+[--credential]
+and [--persistent], respectively. They are 'no' by default, and 'yes' if the
+corresponding flag is provided.
+- [--reset ARCHS] is added. This allows to remove registered interpreters.
+Supported
+formats are a single target name or a comma separated list of targets. If
+ALL is
+provided, all the existing 'qemu-*' interpreters are removed.
+- 'usage' is updated according to the changes above.
 
-Our project still use 9pfs, and it needs to live migrate the
-device while it is being used by the guest, is there any advice
-for us to make it come true or any WIP about this? 
+Note that I don't know how to proceed when `--reset` is used together with
+`--systemd` or `--debian`. At the moment, if `--reset` is provided first,
+both
+options are used, one after the other. However, if any of the other two is
+provided
+first, a error is shown: 'option reset not implemented for this mode yet'.
 
+Some example use cases that are to be supported by this patch:
 
-On 2019/2/26 17:11, Greg Kurz wrote:
-> On Tue, 26 Feb 2019 11:17:16 +0800
-> wangyan <wangyan122@huawei.com> wrote:
->
->> Dear Kurz,
->>
->> Good day.
->>
->> This is Yan Wang from china. Glad to contact with you.
->>
-> Hi Yan Wang,
->
->> I found your patch "[Qemu-devel] [PATCH v3 0/5] virtio-9p: hotplug and migration support" on the internet. Recently, our project need to use the feature of 9pfs living migration, and I want to know if you have the plan to merge the patch to the master branch of qemu, or do you have any other plans about the migration feature?
->>
-> AFAIK some of these patches have already been merged.
->
-> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=4652f1640e029e1f2433fa77ba6af285c7cd923a
-> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=6cecf093735f2e5af7d0e29d957350320044e354
->
-> These are enough to live-migrate a quiescent virtio-9p device, ie,
-> only if the 9p filesystem is NOT mounted in the guest.
->
-> If your need is to live migrate the device while it is being used by
-> the guest, then this is a different story. Basically, this requires
-> to quiesce the device so that its state can be captured. Also, some
-> state belongs to the host and maybe hard to capture/migrate. For
-> example, if the guest opens a file, write some data in it, unlinks the
-> file but keeps the fd, it expects to be able to read the same data
-> back, even after migration to some other host system.
->
-> 9pfs is no longer a priority for anyone in the industry. I have no
-> plan to make this go forward, an not much time to work on it. But
-> if you want to have a look, I guess I can share some old WIP I have
-> somewhere.
->
->> Sincerely,
->>
->> Yan Wang
->>
-> Cheers,
->
-> --
-> Greg
->
-> .
->
+qemu-binfmt-conf.sh -p aarch64
+qemu-binfmt-conf.sh -p aarch64 riscv64
+qemu-binfmt-conf.sh -p aarch64,riscv64
+qemu-binfmt-conf.sh -r ALL -p aarch64
+qemu-binfmt-conf.sh -r aarch64 -p aarch64
+qemu-binfmt-conf.sh -r ALL -p aarch64 riscv64
+qemu-binfmt-conf.sh -r ALL -p aarch64,riscv64
+qemu-binfmt-conf.sh -r aarch64,riscv64 -p aarch64 riscv64
+qemu-binfmt-conf.sh -r aarch64,riscv64 -p aarch64,riscv64
+qemu-binfmt-conf.sh -r ALL NONE
+
+The main purpose of these changes is to make it easier to use
+qemu-user-static to
+build docker images for foreign architectures.
+See https://github.com/umarcor/qus/tree/qemu-update
+
+Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+---
+ scripts/qemu-binfmt-conf.sh | 174 +++++++++++++++++++++++-------------
+ 1 file changed, 110 insertions(+), 64 deletions(-)
+
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index b5a16742a1..f044446d5c 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -6,6 +6,32 @@ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+ sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
+ microblaze microblazeel or1k x86_64"
+
++# check if given target CPUS is/are in the supported target list
++qemu_check_target_list() {
++    all="$qemu_target_list"
++    if [ "$1" = "ALL" ]; then
++      checked_target_list="$all"
++      return
++    fi
++    list=""
++    for target in $@; do
++        unknown_target="true"
++        for cpu in $all ; do
++            if [ "$cpu" = "$target" ] ; then
++                list="$list $target"
++                unknown_target="false"
++                break
++            fi
++        done
++        if [ "$unknown_target" = "true" ] ; then
++            echo "ERROR: unknown CPU \"$target\"" 1>&2
++            usage
++            exit 1
++        fi
++    done
++    checked_target_list="$list"
++}
++
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+ i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ i386_family=i386
+@@ -167,45 +193,48 @@ qemu_get_family() {
+
+ usage() {
+     cat <<EOF
+-Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+-                           [--help][--credential yes|no][--exportdir PATH]
+-                           [--persistent yes|no][--qemu-suffix SUFFIX]
+-
+-       Configure binfmt_misc to use qemu interpreter
+-
+-       --help:        display this usage
+-       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
+-       --qemu-suffix: add a suffix to the default interpreter name
+-       --debian:      don't write into /proc,
+-                      instead generate update-binfmts templates
+-       --systemd:     don't write into /proc,
+-                      instead generate file for systemd-binfmt.service
+-                      for the given CPU. If CPU is "ALL", generate a
+-                      file for all known cpus
+-       --exportdir:   define where to write configuration files
+-                      (default: $SYSTEMDDIR or $DEBIANDIR)
+-       --credential:  if yes, credential and security tokens are
+-                      calculated according to the binary to interpret
+-       --persistent:  if yes, the interpreter is loaded when binfmt is
+-                      configured and remains in memory. All future uses
+-                      are cloned from the open file.
+-
+-    To import templates with update-binfmts, use :
+-
+-        sudo update-binfmts --importdir ${EXPORTDIR:-$DEBIANDIR} --import
+qemu-CPU
+-
+-    To remove interpreter, use :
+-
+-        sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
+-
+-    With systemd, binfmt files are loaded by systemd-binfmt.service
+-
+-    The environment variable HOST_ARCH allows to override 'uname' to
+generate
+-    configuration files for a different architecture than the current one.
+-
+-    where CPU is one of:
+-
+-        $qemu_target_list
++Usage: qemu-binfmt-conf.sh [--help][--qemu-path PATH][--qemu-suffix SUFFIX]
++                           [--persistent][--credential][--exportdir PATH]
++                           [--reset ARCHS][--systemd][--debian][CPUS]
++
++    Configure binfmt_misc to use qemu interpreter for the given target
+CPUS.
++    Supported formats for CPUS are: single arch or comma/space separated
+list.
++    If CPUS is empty, configure all known cpus. See QEMU target list below.
++
++    --help:        display this usage.
++    --qemu-path:   set path to qemu interpreter ($QEMU_PATH).
++    --qemu-suffix: add a suffix to the default interpreter name.
++    --persistent:  if present, the interpreter is loaded when binfmt is
++                   configured and remains in memory. All future uses
++                   are cloned from the open file.
++    --credential:  if present, credential and security tokens are
++                   calculated according to the binary to interpret.
++    --exportdir:   define where to write configuration files
++                   (default: $SYSTEMDDIR or $DEBIANDIR).
++    --reset:       remove registered interpreter for target ARCHS (comma
++                   separated list). If ARCHS is 'ALL', remove all
+registered
++                   'qemu-*' interpreters.
++    --systemd:     don't write into /proc,
++                   instead generate file(s) for systemd-binfmt.service;
++                   environment variable HOST_ARCH allows to override
+'uname'
++                   to generate configuration files for a different
++                   architecture than the current one.
++    --debian:      don't write into /proc,
++                   instead generate update-binfmts templates.
++
++      To import templates with update-binfmts, use :
++
++        sudo update-binfmts \\
++             --importdir ${EXPORTDIR:-$DEBIANDIR} \\
++             --import qemu-CPU
++
++      To remove interpreter, use :
++
++        sudo update-binfmts \\
++             --package qemu-CPU \\
++             --remove qemu-CPU $QEMU_PATH
++
++    QEMU target list: $qemu_target_list
+
+ EOF
+ }
+@@ -286,12 +315,22 @@ EOF
+ }
+
+ qemu_set_binfmts() {
++    if [ "$1" = "NONE" ]; then
++      return
++    fi
++
+     # probe cpu type
+     host_family=$(qemu_get_family)
+
+-    # register the interpreter for each cpu except for the native one
++    # reduce the list of target interpreters to those given in the CLI
++    targets="$@"
++    if [ $# -eq 0 ]; then
++      targets="ALL"
++    fi
++    qemu_check_target_list $(echo "$targets" | tr ',' ' ')
+
+-    for cpu in ${qemu_target_list} ; do
++    # register the interpreter for each target except for the native one
++    for cpu in $checked_target_list; do
+         magic=$(eval echo \$${cpu}_magic)
+         mask=$(eval echo \$${cpu}_mask)
+         family=$(eval echo \$${cpu}_family)
+@@ -313,8 +352,26 @@ qemu_set_binfmts() {
+     done
+ }
+
++qemu_remove_notimplemented() {
++    echo "ERROR: option reset not implemented for this mode yet" 1>&2
++    usage
++    exit 1
++}
++
++qemu_remove_interpreter() {
++    if [ "$1" = "ALL" ]; then
++      find /proc/sys/fs/binfmt_misc/ -type f -name 'qemu-*' -exec sh -c
+'echo -1 > {}' \;
++    else
++        qemu_check_target_list $(echo "$1" | tr ',' ' ')
++        for t in $checked_target_list; do
++            find /proc/sys/fs/binfmt_misc/ -type f -name "qemu-$t" -exec
+sh -c 'echo -1 > {}' \;
++        done
++    fi
++}
++
+ CHECK=qemu_check_bintfmt_misc
+ BINFMT_SET=qemu_register_interpreter
++BINFMT_REMOVE=qemu_remove_interpreter
+
+ SYSTEMDDIR="/etc/binfmt.d"
+ DEBIANDIR="/usr/share/binfmts"
+@@ -324,37 +381,26 @@ CREDENTIAL=no
+ PERSISTENT=no
+ QEMU_SUFFIX=""
+
+-options=$(getopt -o ds:Q:S:e:hc:p: -l
+debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent:
+-- "$@")
++options=$(getopt -o r:dsQ:S:e:hcp -l
+reset:,debian,systemd,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent
+-- "$@")
+ eval set -- "$options"
+
+ while true ; do
+     case "$1" in
++    -r|--reset)
++        shift
++        qemu_remove_interpreter $1
++        ;;
+     -d|--debian)
+         CHECK=qemu_check_debian
+         BINFMT_SET=qemu_generate_debian
++        BINFMT_REMOVE=qemu_remove_notimplemented
+         EXPORTDIR=${EXPORTDIR:-$DEBIANDIR}
+         ;;
+     -s|--systemd)
+         CHECK=qemu_check_systemd
+         BINFMT_SET=qemu_generate_systemd
++        BINFMT_REMOVE=qemu_remove_notimplemented
+         EXPORTDIR=${EXPORTDIR:-$SYSTEMDDIR}
+-        shift
+-        # check given cpu is in the supported CPU list
+-        if [ "$1" != "ALL" ] ; then
+-            for cpu in ${qemu_target_list} ; do
+-                if [ "$cpu" = "$1" ] ; then
+-                    break
+-                fi
+-            done
+-
+-            if [ "$cpu" = "$1" ] ; then
+-                qemu_target_list="$1"
+-            else
+-                echo "ERROR: unknown CPU \"$1\"" 1>&2
+-                usage
+-                exit 1
+-            fi
+-        fi
+         ;;
+     -Q|--qemu-path)
+         shift
+@@ -373,12 +419,10 @@ while true ; do
+         exit 1
+         ;;
+     -c|--credential)
+-        shift
+-        CREDENTIAL="$1"
++        CREDENTIAL=yes
+         ;;
+     -p|--persistent)
+-        shift
+-        PERSISTENT="$1"
++        PERSISTENT=yes
+         ;;
+     *)
+         break
+@@ -387,5 +431,7 @@ while true ; do
+     shift
+ done
+
++shift
++
+ $CHECK
+-qemu_set_binfmts
++qemu_set_binfmts $@
+--
+2.20.1
