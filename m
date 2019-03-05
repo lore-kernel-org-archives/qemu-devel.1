@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46887)
+Received: from eggs.gnu.org ([209.51.188.92]:50164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h16kk-0005LU-5p
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:52:51 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h171G-00086T-9Q
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 05:09:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h16kj-0005GN-08
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:52:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45856)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1h16ki-0005Fg-MS
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:52:48 -0500
-Date: Tue, 5 Mar 2019 10:52:38 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190305095238.GB5280@dhcp-200-226.str.redhat.com>
-References: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
-	<155074715265.32129.1158027635780211224.stgit@pasha-VirtualBox>
-	<20190304103353.GA6059@localhost.localdomain>
-	<002b01d4d284$3109aa20$931cfe60$@ru>
+	(envelope-from <cohuck@redhat.com>) id 1h16nR-0001Bo-JC
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 04:55:38 -0500
+Date: Tue, 5 Mar 2019 10:55:28 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190305105528.60d4e4c3.cohuck@redhat.com>
+In-Reply-To: <1551775581-27989-1-git-send-email-thuth@redhat.com>
+References: <1551775581-27989-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <002b01d4d284$3109aa20$931cfe60$@ru>
-Subject: Re: [Qemu-devel] [PATCH v13 19/25] replay: add BH oneshot event for
- block layer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] target/s390x: Remove non-architected
+ entries from struct LowCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, "Jason J. Herne" <jjherne@linux.ibm.com>
 
-Am 04.03.2019 um 13:17 hat Pavel Dovgalyuk geschrieben:
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Am 21.02.2019 um 12:05 hat Pavel Dovgalyuk geschrieben:
-> > > Replay is capable of recording normal BH events, but sometimes
-> > > there are single use callbacks scheduled with aio_bh_schedule_oneshot
-> > > function. This patch enables recording and replaying such callbacks.
-> > > Block layer uses these events for calling the completion function.
-> > > Replaying these calls makes the execution deterministic.
-> > >
-> > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > >
-> > > --
-> > >
-> > > v6:
-> > >  - moved stub function to the separate file for fixing linux-user build
-> > > v10:
-> > >  - replaced all block layer aio_bh_schedule_oneshot calls
-> > This still doesn't catch all instances, e.g. everything that goes
-> > through aio_co_schedule() is missing.
+On Tue,  5 Mar 2019 09:46:21 +0100
+Thomas Huth <thuth@redhat.com> wrote:
+
+> There are some fields in our struct LowCore which apparently have
+> been copied from a very old version of the Linux kernel. These
+> fields are not architected in the "Principles of Operation", and
+> only used on these memory locations in Linux kernels older than
+> 2.6.29. Newer Linux kernels moved the entries to different locations
+> or are not using them at all anymore. Thus we should never access
+> these fields from the QEMU side, so they should be removed.
 > 
-> It seems, that everything else is synchronized with blkreplay driver
-> which is mandatory when using block devices in rr mode.
+> While we're at it, also add a QEMU_BUILD_BUG_MSG() statement to
 
-Ah, yes, this is a good point. blkreplay goes through
-replay_block_event(), which is where things get synchronised, right?
+s/QEMU_BUILD_BUG_MSG/QEMU_BUILD_BUG_ON/ :)
 
-Does this mean that most of the places where you replaced a BH with your
-new function don't actually need it either because they are called
-through blkreplay and will go through replay_block_event() before
-reaching the guest?
+(fixed up while applying)
 
-> > But I fully expect this to get broken anyway all the time because nobody
-> > understands which function to use, and if it works for your special case
-> > now and we'll fix other stuff as you encouter it, maybe that's good
-> > enough for you.
+> assert that struct LowCore has the right size.
 > 
-> This problem exists in every subsystem and it is ok for now, when
-> record/replay is not mature enough, and not familiar for others.  When
-> virtual devices are updated, developers may miss correct loadvm/savevm
-> implementation. For example, loading the audio device state may miss
-> shift the phase of the output signal. Nobody will notice that bug in
-> the migration process, but it reveals when we use record/replay.
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v3: Use QEMU_BUILD_BUG_ON instead of QEMU_BUILD_BUG_MSG
 > 
-> We can't cover everything with record/replay tests. Most of the new
-> bugs can be revealed in complex configurations after billions of
-> executed instructions.  But when this feature will be available out of
-> the box, we'll at least get more smoke testing.
+>  target/s390x/internal.h | 41 ++---------------------------------------
+>  1 file changed, 2 insertions(+), 39 deletions(-)
 
-Ok.
-
-> > > @@ -1349,8 +1351,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int
-> > bytes,
-> > >
-> > >      acb->has_returned = true;
-> > >      if (acb->rwco.ret != NOT_DONE) {
-> > > -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
-> > > -                                blk_aio_complete_bh, acb);
-> > > +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-> > > +                                         blk_aio_complete_bh, acb);
-> > >      }
-> > 
-> > This, and a few other places that you convert, are in fast paths and add
-> > some calls that are unnecessary for non-replay cases.
-> 
-> I don't think that this can make a noticeable slowdown, but we can run
-> the tests if you want.
-> We have the test suite which performs disk-intensive computation.
-> It was created to measure the effect of running BH callbacks through
-> the virtual timer infrastructure.
-
-I think this requires quite fast storage to possibly make a difference.
-Or if you don't have that, maybe a ramdisk or even a null-co:// backend
-could do the trick. Maybe null-co:// is actually the best option.
-
-Anyway, if it's not too much work for you, running some tests would be
-good.
-
-> > I wonder if we could make replay optional in ./configure and then make
-> > replay_bh_schedule_oneshot_event() a static inline function that can get
-> > optimised away at compile time if the feature is disabled.
-> 
-> It is coupled with icount. However, some icount calls are also lie on
-> the fast paths and are completely useless when icount is not enabled.
-
-Well, the common fast path is KVM, which doesn't have icount at all, so
-that might make it less critical. :-)
-
-I get your point, though maybe that just means that both should be
-possible to be disabled at configure time.
-
-Kevin
+Thanks, applied.
