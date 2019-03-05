@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53323)
+Received: from eggs.gnu.org ([209.51.188.92]:55933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1BPD-0003SU-Ou
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:50:57 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1BZh-0006rW-3p
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:01:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1BPA-00054W-Ma
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:50:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34318)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1BP9-0004sS-M8
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 09:50:52 -0500
-Date: Tue, 5 Mar 2019 14:50:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190305145034.GF9811@work-vm>
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1h1BZe-00020h-BH
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:01:44 -0500
+Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:45424)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h1BZa-0001Q7-Kx
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 10:01:40 -0500
+Received: by mail-pg1-x52b.google.com with SMTP id 125so5573628pgc.12
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 07:01:29 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue,  5 Mar 2019 07:01:23 -0800
+Message-Id: <20190305150123.25048-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/73] tcg: per-cpu locks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,289 +27,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, cota@braap.org
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> The new feature enables the virtio-balloon device to receive hints of
-> guest free pages from the free page vq.
-> 
-> A notifier is registered to the migration precopy notifier chain. The
-> notifier calls free_page_start after the migration thread syncs the dirty
-> bitmap, so that the free page optimization starts to clear bits of free
-> pages from the bitmap. It calls the free_page_stop before the migration
-> thread syncs the bitmap, which is the end of the current round of ram
-> save. The free_page_stop is also called to stop the optimization in the
-> case when there is an error occurred in the process of ram saving.
-> 
-> Note: balloon will report pages which were free at the time of this call.
-> As the reporting happens asynchronously, dirty bit logging must be
-> enabled before this free_page_start call is made. Guest reporting must be
-> disabled before the migration dirty bitmap is synchronized.
-> 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Peter Xu <peterx@redhat.com>
-> ---
->  hw/virtio/virtio-balloon.c                      | 263 ++++++++++++++++++++++++
->  include/hw/virtio/virtio-balloon.h              |  28 ++-
->  include/standard-headers/linux/virtio_balloon.h |   5 +
->  3 files changed, 295 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+This is Emilio's v7, unchanged, so I'm not re-posting the 73 patches.
 
-> +    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
-> +        config.free_page_report_cmd_id =
-> +                       cpu_to_le32(dev->free_page_report_cmd_id);
-> +    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
-> +        config.free_page_report_cmd_id =
-> +                       cpu_to_le32(VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID);
-> +    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
-> +        config.free_page_report_cmd_id =
-> +                       cpu_to_le32(VIRTIO_BALLOON_FREE_PAGE_REPORT_DONE_ID);
-> +    }
+I also didn't want to add Signed-off-by to 73 patches, so I verified
+that there was nothing on Emilio's branch that shouldn't be there and
+then used git-merge -S --signoff.
 
-It looks like somewhere in the last 3 months the name in the kernel
-changed; so I think I've fixed this correctly but please shout if it's
-wrong:
 
-    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
-        config.free_page_report_cmd_id =
-                       cpu_to_le32(dev->free_page_report_cmd_id);
-    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
-        config.free_page_report_cmd_id =
-                       cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
-    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
-        config.free_page_report_cmd_id =
-                       cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
-    }
+r~
 
-and I've dropped the kernel header update since it's already there.
 
-Dave
+The following changes since commit 0984a157c1c053394adbf64ed7de97f1aebe6a2d:
 
-> +
->      trace_virtio_balloon_get_config(config.num_pages, config.actual);
->      memcpy(config_data, &config, sizeof(struct virtio_balloon_config));
->  }
-> @@ -376,6 +566,7 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
->      VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
->      f |= dev->host_features;
->      virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
-> +
->      return f;
->  }
->  
-> @@ -412,6 +603,18 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
->      return 0;
->  }
->  
-> +static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
-> +    .name = "virtio-balloon-device/free-page-report",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = virtio_balloon_free_page_support,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
-> +        VMSTATE_UINT32(free_page_report_status, VirtIOBalloon),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_virtio_balloon_device = {
->      .name = "virtio-balloon-device",
->      .version_id = 1,
-> @@ -422,6 +625,10 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
->          VMSTATE_UINT32(actual, VirtIOBalloon),
->          VMSTATE_END_OF_LIST()
->      },
-> +    .subsections = (const VMStateDescription * []) {
-> +        &vmstate_virtio_balloon_free_page_report,
-> +        NULL
-> +    }
->  };
->  
->  static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-> @@ -446,6 +653,29 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
->      s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
->      s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
->  
-> +    if (virtio_has_feature(s->host_features,
-> +                           VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-> +        s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-> +                                           virtio_balloon_handle_free_page_vq);
-> +        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> +        s->free_page_report_cmd_id =
-> +                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-> +        s->free_page_report_notify.notify =
-> +                                       virtio_balloon_free_page_report_notify;
-> +        precopy_add_notifier(&s->free_page_report_notify);
-> +        if (s->iothread) {
-> +            object_ref(OBJECT(s->iothread));
-> +            s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
-> +                                       virtio_ballloon_get_free_page_hints, s);
-> +            qemu_mutex_init(&s->free_page_lock);
-> +            qemu_cond_init(&s->free_page_cond);
-> +            s->block_iothread = false;
-> +        } else {
-> +            /* Simply disable this feature if the iothread wasn't created. */
-> +            s->host_features &= ~(1 << VIRTIO_BALLOON_F_FREE_PAGE_HINT);
-> +            virtio_error(vdev, "iothread is missing");
-> +        }
-> +    }
->      reset_stats(s);
->  }
->  
-> @@ -454,6 +684,11 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
->      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->      VirtIOBalloon *s = VIRTIO_BALLOON(dev);
->  
-> +    if (virtio_balloon_free_page_support(s)) {
-> +        qemu_bh_delete(s->free_page_bh);
-> +        virtio_balloon_free_page_stop(s);
-> +        precopy_remove_notifier(&s->free_page_report_notify);
-> +    }
->      balloon_stats_destroy_timer(s);
->      qemu_remove_balloon_handler(s);
->      virtio_cleanup(vdev);
-> @@ -463,6 +698,10 @@ static void virtio_balloon_device_reset(VirtIODevice *vdev)
->  {
->      VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
->  
-> +    if (virtio_balloon_free_page_support(s)) {
-> +        virtio_balloon_free_page_stop(s);
-> +    }
-> +
->      if (s->stats_vq_elem != NULL) {
->          virtqueue_unpop(s->svq, s->stats_vq_elem, 0);
->          g_free(s->stats_vq_elem);
-> @@ -480,6 +719,26 @@ static void virtio_balloon_set_status(VirtIODevice *vdev, uint8_t status)
->           * was stopped */
->          virtio_balloon_receive_stats(vdev, s->svq);
->      }
-> +
-> +    if (virtio_balloon_free_page_support(s)) {
-> +        /*
-> +         * The VM is woken up and the iothread was blocked, so signal it to
-> +         * continue.
-> +         */
-> +        if (vdev->vm_running && s->block_iothread) {
-> +            qemu_mutex_lock(&s->free_page_lock);
-> +            s->block_iothread = false;
-> +            qemu_cond_signal(&s->free_page_cond);
-> +            qemu_mutex_unlock(&s->free_page_lock);
-> +        }
-> +
-> +        /* The VM is stopped, block the iothread. */
-> +        if (!vdev->vm_running) {
-> +            qemu_mutex_lock(&s->free_page_lock);
-> +            s->block_iothread = true;
-> +            qemu_mutex_unlock(&s->free_page_lock);
-> +        }
-> +    }
->  }
->  
->  static void virtio_balloon_instance_init(Object *obj)
-> @@ -508,6 +767,10 @@ static const VMStateDescription vmstate_virtio_balloon = {
->  static Property virtio_balloon_properties[] = {
->      DEFINE_PROP_BIT("deflate-on-oom", VirtIOBalloon, host_features,
->                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
-> +    DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
-> +                    VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
-> +    DEFINE_PROP_LINK("iothread", VirtIOBalloon, iothread, TYPE_IOTHREAD,
-> +                     IOThread *),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-> index e0df352..503349a 100644
-> --- a/include/hw/virtio/virtio-balloon.h
-> +++ b/include/hw/virtio/virtio-balloon.h
-> @@ -17,11 +17,14 @@
->  
->  #include "standard-headers/linux/virtio_balloon.h"
->  #include "hw/virtio/virtio.h"
-> +#include "sysemu/iothread.h"
->  
->  #define TYPE_VIRTIO_BALLOON "virtio-balloon-device"
->  #define VIRTIO_BALLOON(obj) \
->          OBJECT_CHECK(VirtIOBalloon, (obj), TYPE_VIRTIO_BALLOON)
->  
-> +#define VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN 0x80000000
-> +
->  typedef struct virtio_balloon_stat VirtIOBalloonStat;
->  
->  typedef struct virtio_balloon_stat_modern {
-> @@ -30,15 +33,38 @@ typedef struct virtio_balloon_stat_modern {
->         uint64_t val;
->  } VirtIOBalloonStatModern;
->  
-> +enum virtio_balloon_free_page_report_status {
-> +    FREE_PAGE_REPORT_S_STOP = 0,
-> +    FREE_PAGE_REPORT_S_REQUESTED = 1,
-> +    FREE_PAGE_REPORT_S_START = 2,
-> +    FREE_PAGE_REPORT_S_DONE = 3,
-> +};
-> +
->  typedef struct VirtIOBalloon {
->      VirtIODevice parent_obj;
-> -    VirtQueue *ivq, *dvq, *svq;
-> +    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-> +    uint32_t free_page_report_status;
->      uint32_t num_pages;
->      uint32_t actual;
-> +    uint32_t free_page_report_cmd_id;
->      uint64_t stats[VIRTIO_BALLOON_S_NR];
->      VirtQueueElement *stats_vq_elem;
->      size_t stats_vq_offset;
->      QEMUTimer *stats_timer;
-> +    IOThread *iothread;
-> +    QEMUBH *free_page_bh;
-> +    /*
-> +     * Lock to synchronize threads to access the free page reporting related
-> +     * fields (e.g. free_page_report_status).
-> +     */
-> +    QemuMutex free_page_lock;
-> +    QemuCond  free_page_cond;
-> +    /*
-> +     * Set to block iothread to continue reading free page hints as the VM is
-> +     * stopped.
-> +     */
-> +    bool block_iothread;
-> +    NotifierWithReturn free_page_report_notify;
->      int64_t stats_last_update;
->      int64_t stats_poll_interval;
->      uint32_t host_features;
-> diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-> index 4dbb7dc..9eee1c6 100644
-> --- a/include/standard-headers/linux/virtio_balloon.h
-> +++ b/include/standard-headers/linux/virtio_balloon.h
-> @@ -34,15 +34,20 @@
->  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
->  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
->  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
-> +#define VIRTIO_BALLOON_F_FREE_PAGE_HINT 3 /* VQ to report free pages */
->  
->  /* Size of a PFN in the balloon interface. */
->  #define VIRTIO_BALLOON_PFN_SHIFT 12
->  
-> +#define VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID 0
-> +#define VIRTIO_BALLOON_FREE_PAGE_REPORT_DONE_ID 1
->  struct virtio_balloon_config {
->  	/* Number of pages host wants Guest to give up. */
->  	uint32_t num_pages;
->  	/* Number of pages we've actually got in balloon. */
->  	uint32_t actual;
-> +	/* Free page report command id, readonly by guest */
-> +	uint32_t free_page_report_cmd_id;
->  };
->  
->  #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in */
-> -- 
-> 1.8.3.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' into staging (2019-03-05 09:33:20 +0000)
+
+are available in the Git repository at:
+
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20190305
+
+for you to fetch changes up to af7b762dc2dc519d12d1a36373c3e4f6e0f6d105:
+
+  Merge branch 'cpu-lock-v7' of https://github.com/cota/qemu into staging (2019-03-05 06:41:07 -0800)
+
+----------------------------------------------------------------
+* Per-cpu locks
+
+----------------------------------------------------------------
+Emilio G. Cota (69):
+      cpu: convert queued work to a QSIMPLEQ
+      cpu: rename cpu->work_mutex to cpu->lock
+      cpu: introduce cpu_mutex_lock/unlock
+      cpu: make qemu_work_cond per-cpu
+      cpu: move run_on_cpu to cpus-common
+      cpu: introduce process_queued_cpu_work_locked
+      cpu: make per-CPU locks an alias of the BQL in TCG rr mode
+      tcg-runtime: define helper_cpu_halted_set
+      ppc: convert to helper_cpu_halted_set
+      cris: convert to helper_cpu_halted_set
+      hppa: convert to helper_cpu_halted_set
+      m68k: convert to helper_cpu_halted_set
+      alpha: convert to helper_cpu_halted_set
+      microblaze: convert to helper_cpu_halted_set
+      cpu: define cpu_halted helpers
+      tcg-runtime: convert to cpu_halted_set
+      arm: convert to cpu_halted
+      ppc: convert to cpu_halted
+      sh4: convert to cpu_halted
+      i386: convert to cpu_halted
+      lm32: convert to cpu_halted
+      m68k: convert to cpu_halted
+      mips: convert to cpu_halted
+      riscv: convert to cpu_halted
+      s390x: convert to cpu_halted
+      sparc: convert to cpu_halted
+      xtensa: convert to cpu_halted
+      gdbstub: convert to cpu_halted
+      openrisc: convert to cpu_halted
+      cpu-exec: convert to cpu_halted
+      cpu: convert to cpu_halted
+      cpu: define cpu_interrupt_request helpers
+      exec: use cpu_reset_interrupt
+      arm: convert to cpu_interrupt_request
+      i386: convert to cpu_interrupt_request
+      i386/kvm: convert to cpu_interrupt_request
+      i386/hax-all: convert to cpu_interrupt_request
+      i386/whpx-all: convert to cpu_interrupt_request
+      i386/hvf: convert to cpu_request_interrupt
+      ppc: convert to cpu_interrupt_request
+      sh4: convert to cpu_interrupt_request
+      cris: convert to cpu_interrupt_request
+      hppa: convert to cpu_interrupt_request
+      lm32: convert to cpu_interrupt_request
+      m68k: convert to cpu_interrupt_request
+      mips: convert to cpu_interrupt_request
+      nios: convert to cpu_interrupt_request
+      s390x: convert to cpu_interrupt_request
+      alpha: convert to cpu_interrupt_request
+      moxie: convert to cpu_interrupt_request
+      sparc: convert to cpu_interrupt_request
+      openrisc: convert to cpu_interrupt_request
+      unicore32: convert to cpu_interrupt_request
+      microblaze: convert to cpu_interrupt_request
+      accel/tcg: convert to cpu_interrupt_request
+      cpu: convert to interrupt_request
+      cpu: call .cpu_has_work with the CPU lock held
+      cpu: introduce cpu_has_work_with_iothread_lock
+      ppc: convert to cpu_has_work_with_iothread_lock
+      mips: convert to cpu_has_work_with_iothread_lock
+      s390x: convert to cpu_has_work_with_iothread_lock
+      riscv: convert to cpu_has_work_with_iothread_lock
+      sparc: convert to cpu_has_work_with_iothread_lock
+      xtensa: convert to cpu_has_work_with_iothread_lock
+      cpu: rename all_cpu_threads_idle to qemu_tcg_rr_all_cpu_threads_idle
+      cpu: protect CPU state with cpu->lock instead of the BQL
+      cpus-common: release BQL earlier in run_on_cpu
+      cpu: add async_run_on_cpu_no_bql
+      cputlb: queue async flush jobs without the BQL
+
+Paolo Bonzini (4):
+      ppc: use cpu_reset_interrupt
+      i386: use cpu_reset_interrupt
+      s390x: use cpu_reset_interrupt
+      openrisc: use cpu_reset_interrupt
+
+Richard Henderson (1):
+      Merge branch 'cpu-lock-v7' of https://github.com/cota/qemu into staging
+
+ accel/tcg/tcg-runtime.h         |   2 +
+ include/qom/cpu.h               | 195 ++++++++++++++++---
+ target/i386/cpu.h               |   2 +-
+ target/ppc/helper_regs.h        |   2 +-
+ accel/tcg/cpu-exec.c            |  40 ++--
+ accel/tcg/cputlb.c              |  10 +-
+ accel/tcg/tcg-all.c             |  12 +-
+ accel/tcg/tcg-runtime.c         |   7 +
+ accel/tcg/translate-all.c       |   2 +-
+ cpus-common.c                   | 129 ++++++++----
+ cpus.c                          | 422 ++++++++++++++++++++++++++++++++--------
+ exec.c                          |   2 +-
+ gdbstub.c                       |   4 +-
+ hw/arm/omap1.c                  |   4 +-
+ hw/arm/pxa2xx_gpio.c            |   2 +-
+ hw/arm/pxa2xx_pic.c             |   2 +-
+ hw/intc/s390_flic.c             |   4 +-
+ hw/mips/cps.c                   |   2 +-
+ hw/misc/mips_itu.c              |   4 +-
+ hw/openrisc/cputimer.c          |   2 +-
+ hw/ppc/e500.c                   |   4 +-
+ hw/ppc/ppc.c                    |  12 +-
+ hw/ppc/ppce500_spin.c           |   6 +-
+ hw/ppc/spapr_cpu_core.c         |   4 +-
+ hw/ppc/spapr_hcall.c            |   4 +-
+ hw/ppc/spapr_rtas.c             |   6 +-
+ hw/sparc/leon3.c                |   2 +-
+ hw/sparc/sun4m.c                |   8 +-
+ hw/sparc64/sparc64.c            |   8 +-
+ qom/cpu.c                       |  27 ++-
+ stubs/cpu-lock.c                |  28 +++
+ target/alpha/cpu.c              |   8 +-
+ target/alpha/translate.c        |   6 +-
+ target/arm/arm-powerctl.c       |   6 +-
+ target/arm/cpu.c                |   8 +-
+ target/arm/helper.c             |  16 +-
+ target/arm/machine.c            |   2 +-
+ target/arm/op_helper.c          |   2 +-
+ target/cris/cpu.c               |   2 +-
+ target/cris/helper.c            |   6 +-
+ target/cris/translate.c         |   5 +-
+ target/hppa/cpu.c               |   2 +-
+ target/hppa/translate.c         |   3 +-
+ target/i386/cpu.c               |   4 +-
+ target/i386/hax-all.c           |  36 ++--
+ target/i386/helper.c            |   8 +-
+ target/i386/hvf/hvf.c           |  12 +-
+ target/i386/hvf/x86hvf.c        |  38 ++--
+ target/i386/kvm.c               |  82 ++++----
+ target/i386/misc_helper.c       |   2 +-
+ target/i386/seg_helper.c        |  13 +-
+ target/i386/svm_helper.c        |   6 +-
+ target/i386/whpx-all.c          |  57 +++---
+ target/lm32/cpu.c               |   2 +-
+ target/lm32/op_helper.c         |   4 +-
+ target/m68k/cpu.c               |   2 +-
+ target/m68k/op_helper.c         |   2 +-
+ target/m68k/translate.c         |   9 +-
+ target/microblaze/cpu.c         |   2 +-
+ target/microblaze/translate.c   |   4 +-
+ target/mips/cpu.c               |  11 +-
+ target/mips/kvm.c               |   4 +-
+ target/mips/op_helper.c         |   8 +-
+ target/mips/translate.c         |   4 +-
+ target/moxie/cpu.c              |   2 +-
+ target/nios2/cpu.c              |   2 +-
+ target/openrisc/cpu.c           |   4 +-
+ target/openrisc/sys_helper.c    |   4 +-
+ target/ppc/excp_helper.c        |   6 +-
+ target/ppc/kvm.c                |   8 +-
+ target/ppc/translate.c          |   6 +-
+ target/ppc/translate_init.inc.c |  36 ++--
+ target/riscv/cpu.c              |   5 +-
+ target/riscv/op_helper.c        |   2 +-
+ target/s390x/cpu.c              |  28 ++-
+ target/s390x/excp_helper.c      |   4 +-
+ target/s390x/kvm.c              |   2 +-
+ target/s390x/sigp.c             |   8 +-
+ target/sh4/cpu.c                |   2 +-
+ target/sh4/helper.c             |   2 +-
+ target/sh4/op_helper.c          |   2 +-
+ target/sparc/cpu.c              |   6 +-
+ target/sparc/helper.c           |   2 +-
+ target/unicore32/cpu.c          |   2 +-
+ target/unicore32/softmmu.c      |   2 +-
+ target/xtensa/cpu.c             |   6 +-
+ target/xtensa/exc_helper.c      |   2 +-
+ target/xtensa/helper.c          |   2 +-
+ stubs/Makefile.objs             |   1 +
+ 89 files changed, 1024 insertions(+), 456 deletions(-)
+ create mode 100644 stubs/cpu-lock.c
