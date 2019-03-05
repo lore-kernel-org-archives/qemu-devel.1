@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43913)
+Received: from eggs.gnu.org ([209.51.188.92]:46954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1EGz-0007W4-GM
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:54:38 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1ESi-0001AZ-Qd
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1EGn-0004tK-VB
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:54:30 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35269)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1EGh-0004oQ-W3
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 12:54:21 -0500
-Received: by mail-wr1-f67.google.com with SMTP id t18so10481307wrx.2
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 09:54:19 -0800 (PST)
-References: <20190226193408.23862-1-armbru@redhat.com>
-	<20190226193408.23862-12-armbru@redhat.com>
-	<a20fe845-4f14-4f23-7feb-bb7ca899c2d5@redhat.com>
-	<878sxt5l31.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f37147d9-af24-4625-502e-1a51c3fa9a69@redhat.com>
-Date: Tue, 5 Mar 2019 18:54:17 +0100
-MIME-Version: 1.0
-In-Reply-To: <878sxt5l31.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/11] pflash: Clean up after commit
- 368a354f02b part 2
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1h1ESh-000281-80
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:44 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:49681 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1h1ESg-0001A0-U6
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 13:06:43 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Tue,  5 Mar 2019 19:05:15 +0100
+Message-Id: <1551809127-3658-4-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1551809127-3658-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1551809127-3658-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 03/15] tests/tcg: target/mips: Add wrappers for
+ various MSA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, qemu-ppc@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-On 3/5/19 5:42 PM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
-> 
->> Hi Markus,
->>
->> On 2/26/19 8:34 PM, Markus Armbruster wrote:
->>> QOMification left parameter @size unused in pflash_cfi01_register()
->>> and pflash_cfi02_register().  Obviously, @size should match
->>> @sector_len and @nb_blocs, i.e. size == sector_len * nb_blocs.  All
->>> callers satisfy this.
->>>
->>> Remove @nb_blocs and compute it from @size and @sector_len.
->>
->> The pflash devices are simplistically modelled has having a single
->> sector size. This is not true for real hw (pflash have different sector
->> sizes). It is however true for the unofficial VirtPFlash device, which
->> doesn't have any spec.
->>
->> The only valid parameter is @size. The @sector_len and @nb_blocs don't
->> match the hardwares. QEMU @sector_len is currently "The biggest
->> sector_size the device has" and QEMU @nb_blocs is really "@size /
->> @sector_len", although it doesn't match the nb_blocs the hardware has.
->>
->> I don't disagree with the patch content, but the description is not
->> accurate. We can indeed drop the @nb_blocs argument because we model an
->> unique sector size, thus we can calculate "@nb_blocs = @size /
->> @sector_len" in the model.
->>
->> With the patch description fixed:
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> Let me try to fix it.
-> 
->     Our pflash devices are simplistically modelled has having
->     "num-blocks" sectors of equal size "sector-length".  Real hardware
->     commonly has sectors of different sizes.  How our "sector-length"
->     property is related to the physical device's multiple sector sizes
->     is unclear.
-> 
->     Helper functions pflash_cfi01_register() and pflash_cfi02_register()
->     create a pflash device, set properties including "sector-length" and
->     "num-blocks", and realize.  They take parameters @size, @sector_len
->     and @nb_blocs.
-> 
->     QOMification left parameter @size unused.  Obviously, @size should
->     match @sector_len and @nb_blocs, i.e. size == sector_len * nb_blocs.
->     All callers satisfy this.
-> 
->     Remove @nb_blocs and compute it from @size and @sector_len.
-> 
-> D'accord?
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Oui, parfait!
+Add wrappers for various MSA integer instructions.
+
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Message-Id: <1551800076-8104-4-git-send-email-aleksandar.markovic@rt-rk.com>
+---
+ tests/tcg/mips/include/wrappers_msa.h | 70 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 70 insertions(+)
+
+diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
+index 302f0ab..c650ed2 100644
+--- a/tests/tcg/mips/include/wrappers_msa.h
++++ b/tests/tcg/mips/include/wrappers_msa.h
+@@ -152,5 +152,75 @@ DO_MSA__WD__WS_WT(MIN_U_H, min_u.h)
+ DO_MSA__WD__WS_WT(MIN_U_W, min_u.w)
+ DO_MSA__WD__WS_WT(MIN_U_D, min_u.d)
+ 
++DO_MSA__WD__WS_WT(BCLR_B, bclr.b)
++DO_MSA__WD__WS_WT(BCLR_H, bclr.h)
++DO_MSA__WD__WS_WT(BCLR_W, bclr.w)
++DO_MSA__WD__WS_WT(BCLR_D, bclr.d)
++
++DO_MSA__WD__WS_WT(BSET_B, bset.b)
++DO_MSA__WD__WS_WT(BSET_H, bset.h)
++DO_MSA__WD__WS_WT(BSET_W, bset.w)
++DO_MSA__WD__WS_WT(BSET_D, bset.d)
++
++DO_MSA__WD__WS_WT(BNEG_B, bneg.b)
++DO_MSA__WD__WS_WT(BNEG_H, bneg.h)
++DO_MSA__WD__WS_WT(BNEG_W, bneg.w)
++DO_MSA__WD__WS_WT(BNEG_D, bneg.d)
++
++DO_MSA__WD__WS_WT(PCKEV_B, pckev.b)
++DO_MSA__WD__WS_WT(PCKEV_H, pckev.h)
++DO_MSA__WD__WS_WT(PCKEV_W, pckev.w)
++DO_MSA__WD__WS_WT(PCKEV_D, pckev.d)
++
++DO_MSA__WD__WS_WT(PCKOD_B, pckod.b)
++DO_MSA__WD__WS_WT(PCKOD_H, pckod.h)
++DO_MSA__WD__WS_WT(PCKOD_W, pckod.w)
++DO_MSA__WD__WS_WT(PCKOD_D, pckod.d)
++
++DO_MSA__WD__WS_WT(VSHF_B, vshf.b)
++DO_MSA__WD__WS_WT(VSHF_H, vshf.h)
++DO_MSA__WD__WS_WT(VSHF_W, vshf.w)
++DO_MSA__WD__WS_WT(VSHF_D, vshf.d)
++
++DO_MSA__WD__WS_WT(SLL_B, sll.b)
++DO_MSA__WD__WS_WT(SLL_H, sll.h)
++DO_MSA__WD__WS_WT(SLL_W, sll.w)
++DO_MSA__WD__WS_WT(SLL_D, sll.d)
++
++DO_MSA__WD__WS_WT(SRA_B, sra.b)
++DO_MSA__WD__WS_WT(SRA_H, sra.h)
++DO_MSA__WD__WS_WT(SRA_W, sra.w)
++DO_MSA__WD__WS_WT(SRA_D, sra.d)
++
++DO_MSA__WD__WS_WT(SRAR_B, srar.b)
++DO_MSA__WD__WS_WT(SRAR_H, srar.h)
++DO_MSA__WD__WS_WT(SRAR_W, srar.w)
++DO_MSA__WD__WS_WT(SRAR_D, srar.d)
++
++DO_MSA__WD__WS_WT(SRL_B, srl.b)
++DO_MSA__WD__WS_WT(SRL_H, srl.h)
++DO_MSA__WD__WS_WT(SRL_W, srl.w)
++DO_MSA__WD__WS_WT(SRL_D, srl.d)
++
++DO_MSA__WD__WS_WT(SRLR_B, srlr.b)
++DO_MSA__WD__WS_WT(SRLR_H, srlr.h)
++DO_MSA__WD__WS_WT(SRLR_W, srlr.w)
++DO_MSA__WD__WS_WT(SRLR_D, srlr.d)
++
++DO_MSA__WD__WS_WT(BMNZ_V, bmnz.v)
++DO_MSA__WD__WS_WT(BMZ_V, bmz.v)
++
++DO_MSA__WD__WS_WT(FMAX_W, fmax.w)
++DO_MSA__WD__WS_WT(FMAX_D, fmax.d)
++
++DO_MSA__WD__WS_WT(FMAX_A_W, fmax_a.w)
++DO_MSA__WD__WS_WT(FMAX_A_D, fmax_a.d)
++
++DO_MSA__WD__WS_WT(FMIN_W, fmin.w)
++DO_MSA__WD__WS_WT(FMIN_D, fmin.d)
++
++DO_MSA__WD__WS_WT(FMIN_A_W, fmin_a.w)
++DO_MSA__WD__WS_WT(FMIN_A_D, fmin_a.d)
++
+ 
+ #endif
+-- 
+2.7.4
