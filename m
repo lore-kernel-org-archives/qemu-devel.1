@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52591)
+Received: from eggs.gnu.org ([209.51.188.92]:53228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h14yL-0005Ws-KN
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:58:46 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1h151l-0006vc-Lw
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:02:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h14yK-0004s1-Oh
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:58:45 -0500
-References: <1551770054-18493-1-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <11bd7030-359a-d99c-3af1-9cd768112e68@redhat.com>
-Date: Tue, 5 Mar 2019 08:58:39 +0100
+	(envelope-from <pmorel@linux.ibm.com>) id 1h151e-0007gH-9C
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:02:17 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37518)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1h151a-0007Zg-NG
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 03:02:08 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x257xDtv132150
+	for <qemu-devel@nongnu.org>; Tue, 5 Mar 2019 03:02:02 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r1n0g0pa7-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 03:01:59 -0500
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Tue, 5 Mar 2019 08:01:54 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+	<3b9ea255-6a77-9309-56d4-6d7fe5a2044c@linux.ibm.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Tue, 5 Mar 2019 09:01:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <1551770054-18493-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <3b9ea255-6a77-9309-56d4-6d7fe5a2044c@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/s390x: Remove non-architected
- entries from struct LowCore
+Message-Id: <3eac7ebb-7fe8-6d4e-b7d8-6c676853253a@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +43,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, "Jason J. Herne" <jjherne@linux.ibm.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: pasic@linux.ibm.com, imammedo@redhat.com
 
-On 05.03.19 08:14, Thomas Huth wrote:
-> There are some fields in our struct LowCore which apparently have
-> been copied from a very old version of the Linux kernel. These
-> fields are not architected in the "Principles of Operation", and
-> only used on these memory locations in Linux kernels older than
-> 2.6.29. Newer Linux kernels moved the entries to different locations
-> or are not using them at all anymore. Thus we should never access
-> these fields from the QEMU side, so they should be removed.
-> 
-> While we're at it, also add a QEMU_BUILD_BUG_MSG() statement to
-> assert that struct LowCore has the right size.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: Now really added the QEMU_BUILD_BUG_MSG()
-> 
->  target/s390x/internal.h | 41 ++---------------------------------------
->  1 file changed, 2 insertions(+), 39 deletions(-)
-> 
-> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-> index 7baf0e2..84ce090 100644
-> --- a/target/s390x/internal.h
-> +++ b/target/s390x/internal.h
-> @@ -63,45 +63,7 @@ typedef struct LowCore {
->      PSW             program_new_psw;          /* 0x1d0 */
->      PSW             mcck_new_psw;             /* 0x1e0 */
->      PSW             io_new_psw;               /* 0x1f0 */
-> -    PSW             return_psw;               /* 0x200 */
-> -    uint8_t         irb[64];                  /* 0x210 */
-> -    uint64_t        sync_enter_timer;         /* 0x250 */
-> -    uint64_t        async_enter_timer;        /* 0x258 */
-> -    uint64_t        exit_timer;               /* 0x260 */
-> -    uint64_t        last_update_timer;        /* 0x268 */
-> -    uint64_t        user_timer;               /* 0x270 */
-> -    uint64_t        system_timer;             /* 0x278 */
-> -    uint64_t        last_update_clock;        /* 0x280 */
-> -    uint64_t        steal_clock;              /* 0x288 */
-> -    PSW             return_mcck_psw;          /* 0x290 */
-> -    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
-> -    /* System info area */
-> -    uint64_t        save_area[16];            /* 0xc00 */
-> -    uint8_t         pad10[0xd40 - 0xc80];     /* 0xc80 */
-> -    uint64_t        kernel_stack;             /* 0xd40 */
-> -    uint64_t        thread_info;              /* 0xd48 */
-> -    uint64_t        async_stack;              /* 0xd50 */
-> -    uint64_t        kernel_asce;              /* 0xd58 */
-> -    uint64_t        user_asce;                /* 0xd60 */
-> -    uint64_t        panic_stack;              /* 0xd68 */
-> -    uint64_t        user_exec_asce;           /* 0xd70 */
-> -    uint8_t         pad11[0xdc0 - 0xd78];     /* 0xd78 */
-> -
-> -    /* SMP info area: defined by DJB */
-> -    uint64_t        clock_comparator;         /* 0xdc0 */
-> -    uint64_t        ext_call_fast;            /* 0xdc8 */
-> -    uint64_t        percpu_offset;            /* 0xdd0 */
-> -    uint64_t        current_task;             /* 0xdd8 */
-> -    uint32_t        softirq_pending;          /* 0xde0 */
-> -    uint32_t        pad_0x0de4;               /* 0xde4 */
-> -    uint64_t        int_clock;                /* 0xde8 */
-> -    uint8_t         pad12[0xe00 - 0xdf0];     /* 0xdf0 */
-> -
-> -    /* 0xe00 is used as indicator for dump tools */
-> -    /* whether the kernel died with panic() or not */
-> -    uint32_t        panic_magic;              /* 0xe00 */
-> -
-> -    uint8_t         pad13[0x11b0 - 0xe04];    /* 0xe04 */
-> +    uint8_t         pad13[0x11b0 - 0x200];    /* 0x200 */
->  
->      uint64_t        mcesad;                    /* 0x11B0 */
->  
-> @@ -130,6 +92,7 @@ typedef struct LowCore {
->  
->      uint8_t         pad18[0x2000 - 0x1400];    /* 0x1400 */
->  } QEMU_PACKED LowCore;
-> +QEMU_BUILD_BUG_MSG(sizeof(LowCore) != 8192, "size of LowCore");
+On 04/03/2019 18:35, Tony Krowiak wrote:
+> On 12/17/18 10:57 AM, Tony Krowiak wrote:
+>=20
+> Ping!! I'm wondering who might be responsible for merging this fix?
 
-I don't consider this message any useful. It is literally self
-documenting code what we have here.
+To alert the maintainers, you must send the patch with putting them or=20
+part of them in CC and put the qemu mailing list in CC too.
 
-Anyhow,
+use get_maintainer.pl like:
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+$ ./scripts/get_maintainer.pl -f hw/core/qdev.c
+get_maintainer.pl: No maintainers found, printing recent contributors.
+get_maintainer.pl: Do not blindly cc: them on patches!  Use common sense.
+
+Markus Armbruster <armbru@redhat.com> (commit_signer:4/6=3D67%)
+Paolo Bonzini <pbonzini@redhat.com> (commit_signer:3/6=3D50%)
+Stefan Hajnoczi <stefanha@redhat.com> (commit_signer:2/6=3D33%)
+Peter Xu <peterx@redhat.com> (commit_signer:1/6=3D17%)
+"Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> (commit_signer:1/6=3D17%)
+qemu-devel@nongnu.org (open list:All patches CC here)
 
 
--- 
+Regards,
+Pierre
 
-Thanks,
 
-David / dhildenb
+>=20
+>> The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the=
+=20
+>> max_index
+>> value of the BusState structure with the max_dev value of the BusClass=
+=20
+>> structure
+>> to determine whether the maximum number of children has been reached=20
+>> for the
+>> bus. The problem is, the max_index field of the BusState structure=20
+>> does not
+>> necessarily reflect the number of devices that have been plugged into
+>> the bus.
+>>
+>> Whenever a child device is plugged into the bus, the bus's max_index=20
+>> value is
+>> assigned to the child device and then incremented. If the child is=20
+>> subsequently
+>> unplugged, the value of the max_index does not change and no longer=20
+>> reflects the
+>> number of children.
+>>
+>> When the bus's max_index value reaches the maximum number of devices
+>> allowed for the bus (i.e., the max_dev field in the BusClass structure=
+),
+>> attempts to plug another device will be rejected claiming that the bus=
+ is
+>> full -- even if the bus is actually empty.
+>>
+>> To resolve the problem, a new 'num_children' field is being added to t=
+he
+>> BusState structure to keep track of the number of children plugged=20
+>> into the
+>> bus. It will be incremented when a child is plugged, and decremented=20
+>> when a
+>> child is unplugged.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+>> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+>> ---
+>> =C2=A0 hw/core/qdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+| 3 +++
+>> =C2=A0 include/hw/qdev-core.h | 1 +
+>> =C2=A0 qdev-monitor.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+| 2 +-
+>> =C2=A0 3 files changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+>> index 6b3cc55b27c2..956923f33520 100644
+>> --- a/hw/core/qdev.c
+>> +++ b/hw/core/qdev.c
+>> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus,=20
+>> DeviceState *child)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 snprintf(name, sizeof(name), "child[%d]", kid->index);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 QTAILQ_REMOVE(&bus->children, kid, sibling);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bu=
+s->num_children--;
+>> +
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 /* This gives back ownership of kid->child back to us.=C2=A0 */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 object_property_del(OBJECT(bus), name, NULL);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 object_unref(OBJECT(kid->child));
+>> @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState=
+=20
+>> *child)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char name[32];
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BusChild *kid =3D g_malloc0(sizeof(*kid=
+));
+>> +=C2=A0=C2=A0=C2=A0 bus->num_children++;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kid->index =3D bus->max_index++;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kid->child =3D child;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_ref(OBJECT(kid->child));
+>> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+>> index a24d0dd566e3..521f0a947ead 100644
+>> --- a/include/hw/qdev-core.h
+>> +++ b/include/hw/qdev-core.h
+>> @@ -206,6 +206,7 @@ struct BusState {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HotplugHandler *hotplug_handler;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int max_index;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool realized;
+>> +=C2=A0=C2=A0=C2=A0 int num_children;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QTAILQ_HEAD(ChildrenHead, BusChild) chi=
+ldren;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QLIST_ENTRY(BusState) sibling;
+>> =C2=A0 };
+>> diff --git a/qdev-monitor.c b/qdev-monitor.c
+>> index 07147c63bf8b..45a8ba49644c 100644
+>> --- a/qdev-monitor.c
+>> +++ b/qdev-monitor.c
+>> @@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus,=20
+>> char *elem)
+>> =C2=A0 static inline bool qbus_is_full(BusState *bus)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BusClass *bus_class =3D BUS_GET_CLASS(b=
+us);
+>> -=C2=A0=C2=A0=C2=A0 return bus_class->max_dev && bus->max_index >=3D b=
+us_class->max_dev;
+>> +=C2=A0=C2=A0=C2=A0 return bus_class->max_dev && bus->num_children >=3D=
+=20
+>> bus_class->max_dev;
+>> =C2=A0 }
+>> =C2=A0 /*
+>>
+>=20
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
