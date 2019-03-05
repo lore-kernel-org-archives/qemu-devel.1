@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43828)
+Received: from eggs.gnu.org ([209.51.188.92]:44619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h14HR-00049n-7f
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:14:26 -0500
+	(envelope-from <svens@stackframe.org>) id 1h14KQ-0006qi-UY
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:17:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h14HQ-0001bd-An
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:14:25 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  5 Mar 2019 08:14:14 +0100
-Message-Id: <1551770054-18493-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] target/s390x: Remove non-architected
- entries from struct LowCore
+	(envelope-from <svens@stackframe.org>) id 1h14KO-0003tt-RB
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:17:30 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:53136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <svens@stackframe.org>)
+	id 1h14KM-0003pu-O6
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 02:17:27 -0500
+Date: Tue, 5 Mar 2019 08:17:12 +0100
+From: Sven Schnelle <svens@stackframe.org>
+Message-ID: <20190305071712.GA29106@t470p.stackframe.org>
+References: <20190304180920.21534-1-svens@stackframe.org>
+	<20190304180920.21534-2-svens@stackframe.org>
+	<2951e9ec-41c9-14cb-423c-4292c27965aa@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2951e9ec-41c9-14cb-423c-4292c27965aa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] lsi: use enum type for s->waiting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,85 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, "Jason J. Herne" <jjherne@linux.ibm.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-There are some fields in our struct LowCore which apparently have
-been copied from a very old version of the Linux kernel. These
-fields are not architected in the "Principles of Operation", and
-only used on these memory locations in Linux kernels older than
-2.6.29. Newer Linux kernels moved the entries to different locations
-or are not using them at all anymore. Thus we should never access
-these fields from the QEMU side, so they should be removed.
+Hi Philippe,
 
-While we're at it, also add a QEMU_BUILD_BUG_MSG() statement to
-assert that struct LowCore has the right size.
+On Tue, Mar 05, 2019 at 12:18:01AM +0100, Philippe Mathieu-Daudé wrote:
+> >  
+> > +enum {
+> > +    LSI_NOWAIT,
+> 
+> You forgot the comment for NOWAIT.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Now really added the QEMU_BUILD_BUG_MSG()
+I thought LSI_NOWAIT is self-explaining, but will add that.
 
- target/s390x/internal.h | 41 ++---------------------------------------
- 1 file changed, 2 insertions(+), 39 deletions(-)
+> >      int waiting;
+> 
+> When a field is not used by migration, you can declare it as enum:
+> 
+>        enum {
+>            LSI_NOWAIT = 0, /* SCRIPTS are running or stopped */
+>            LSI_WAIT_RESELECT = 1, /* Wait Reselect instruction has been
+> issued */
+>            LSI_DMA_SCRIPTS = 2, /* processing DMA from lsi_execute_script */
+>            LSI_DMA_IN_PROGRESS = 3, /* DMA operation is in progress */
+>        } waiting;
+> 
+> This gives hints to the compiler about values to check.
 
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 7baf0e2..84ce090 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -63,45 +63,7 @@ typedef struct LowCore {
-     PSW             program_new_psw;          /* 0x1d0 */
-     PSW             mcck_new_psw;             /* 0x1e0 */
-     PSW             io_new_psw;               /* 0x1f0 */
--    PSW             return_psw;               /* 0x200 */
--    uint8_t         irb[64];                  /* 0x210 */
--    uint64_t        sync_enter_timer;         /* 0x250 */
--    uint64_t        async_enter_timer;        /* 0x258 */
--    uint64_t        exit_timer;               /* 0x260 */
--    uint64_t        last_update_timer;        /* 0x268 */
--    uint64_t        user_timer;               /* 0x270 */
--    uint64_t        system_timer;             /* 0x278 */
--    uint64_t        last_update_clock;        /* 0x280 */
--    uint64_t        steal_clock;              /* 0x288 */
--    PSW             return_mcck_psw;          /* 0x290 */
--    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
--    /* System info area */
--    uint64_t        save_area[16];            /* 0xc00 */
--    uint8_t         pad10[0xd40 - 0xc80];     /* 0xc80 */
--    uint64_t        kernel_stack;             /* 0xd40 */
--    uint64_t        thread_info;              /* 0xd48 */
--    uint64_t        async_stack;              /* 0xd50 */
--    uint64_t        kernel_asce;              /* 0xd58 */
--    uint64_t        user_asce;                /* 0xd60 */
--    uint64_t        panic_stack;              /* 0xd68 */
--    uint64_t        user_exec_asce;           /* 0xd70 */
--    uint8_t         pad11[0xdc0 - 0xd78];     /* 0xd78 */
--
--    /* SMP info area: defined by DJB */
--    uint64_t        clock_comparator;         /* 0xdc0 */
--    uint64_t        ext_call_fast;            /* 0xdc8 */
--    uint64_t        percpu_offset;            /* 0xdd0 */
--    uint64_t        current_task;             /* 0xdd8 */
--    uint32_t        softirq_pending;          /* 0xde0 */
--    uint32_t        pad_0x0de4;               /* 0xde4 */
--    uint64_t        int_clock;                /* 0xde8 */
--    uint8_t         pad12[0xe00 - 0xdf0];     /* 0xdf0 */
--
--    /* 0xe00 is used as indicator for dump tools */
--    /* whether the kernel died with panic() or not */
--    uint32_t        panic_magic;              /* 0xe00 */
--
--    uint8_t         pad13[0x11b0 - 0xe04];    /* 0xe04 */
-+    uint8_t         pad13[0x11b0 - 0x200];    /* 0x200 */
- 
-     uint64_t        mcesad;                    /* 0x11B0 */
- 
-@@ -130,6 +92,7 @@ typedef struct LowCore {
- 
-     uint8_t         pad18[0x2000 - 0x1400];    /* 0x1400 */
- } QEMU_PACKED LowCore;
-+QEMU_BUILD_BUG_MSG(sizeof(LowCore) != 8192, "size of LowCore");
- #endif /* CONFIG_USER_ONLY */
- 
- #define MAX_ILEN 6
--- 
-1.8.3.1
+But it is used by migration, so this doesn't apply here? I had a typedef enum before,
+but this doesn't compile.
+
+Otherwise thanks for reviewing.
+
+Regards
+Sven
