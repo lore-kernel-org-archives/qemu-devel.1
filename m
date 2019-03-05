@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47725)
+Received: from eggs.gnu.org ([209.51.188.92]:48154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h18pJ-0005hL-Ub
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:05:43 -0500
+	(envelope-from <philmd@redhat.com>) id 1h18rY-0006d4-Vw
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:08:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h18pI-0000ez-S3
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:05:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37612)
+	(envelope-from <philmd@redhat.com>) id 1h18rW-0001XY-KV
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:08:00 -0500
+Received: from mail-wm1-f46.google.com ([209.85.128.46]:36195)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h18pI-0000X5-JX
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:05:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h18pG-0004O5-AW
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 12:05:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4BC142E807C
-	for <qemu-devel@nongnu.org>; Tue,  5 Mar 2019 12:05:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h18rU-0001G3-O6
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 07:07:57 -0500
+Received: by mail-wm1-f46.google.com with SMTP id j125so2321697wmj.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 04:07:55 -0800 (PST)
+References: <20190304180920.21534-1-svens@stackframe.org>
+	<20190304180920.21534-2-svens@stackframe.org>
+	<2951e9ec-41c9-14cb-423c-4292c27965aa@redhat.com>
+	<20190305071712.GA29106@t470p.stackframe.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4a136fc7-66a9-8695-25d5-3b964f4f32e0@redhat.com>
+Date: Tue, 5 Mar 2019 13:07:52 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 05 Mar 2019 11:56:06 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1818483 <1818483@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155168800961.29550.2360664198558693792.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155178696627.16954.4847359402212307072.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818483] Re: qemu user mode does not support
- binfmt_misc config with flags include "P"
+In-Reply-To: <20190305071712.GA29106@t470p.stackframe.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/5] lsi: use enum type for s->waiting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Sven Schnelle <svens@stackframe.org>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-Doesn't doing the check like that break execution of a command like
-"echo 'MISC_FMT_PRESERVE_ARGV0'" in a chroot environment that isn't
-using -P ?
+On 3/5/19 8:17 AM, Sven Schnelle wrote:
+> Hi Philippe,
+> 
+> On Tue, Mar 05, 2019 at 12:18:01AM +0100, Philippe Mathieu-Daudé wrote:
+>>>  
+>>> +enum {
+>>> +    LSI_NOWAIT,
+>>
+>> You forgot the comment for NOWAIT.
+> 
+> I thought LSI_NOWAIT is self-explaining, but will add that.
+> 
+>>>      int waiting;
+>>
+>> When a field is not used by migration, you can declare it as enum:
+>>
+>>        enum {
+>>            LSI_NOWAIT = 0, /* SCRIPTS are running or stopped */
+>>            LSI_WAIT_RESELECT = 1, /* Wait Reselect instruction has been
+>> issued */
+>>            LSI_DMA_SCRIPTS = 2, /* processing DMA from lsi_execute_script */
+>>            LSI_DMA_IN_PROGRESS = 3, /* DMA operation is in progress */
+>>        } waiting;
+>>
+>> This gives hints to the compiler about values to check.
+> 
+> But it is used by migration, so this doesn't apply here? I had a typedef enum before,
+> but this doesn't compile.
 
--- =
+Oh you are right, I didn't check... So with the updated comment:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818483
-
-Title:
-  qemu user mode does not support binfmt_misc config with flags include
-  "P"
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi Sir:
-  During our test in chroot environment with qemu-user-static, we got some =
-test cases failed because of program output warning with unexpected full pa=
-th name.
-  For example in test module "Devscripts"
-  the test item for broken tarball expected the warning info:
-  <tar: This does not look like a tar archive
-  tar: ******* >
-  but the output was:
-  </bin/tar: This does not look like a tar archive
-  /bin/tar: ******>
-  the cause is the config file of binfmt_misc was set not to send argv0, fo=
-r example:
-  type command "tar" after chroot:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-  lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
-  [sudo] password for lpeng: =
-
-  root@lpeng-VirtualBox:/# tar
-  /bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-l=
-abel' options
-  Try '/bin/tar --help' or '/bin/tar --usage' for more information.
-  root@lpeng-VirtualBox:/# =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-
-  by adding output log in main()@qemu/Linux-user/main.c
-  we found the original input command was changed, and qemu do not know tha=
-t, we got the input args:
-  argv_0----/usr/bin/qemu-mips64el-static---
-  argv_1----/bin/tar---
-  argv_2----NULL---
-
-  Next step we modified the flags=3DP in the corresponding config under fol=
-der /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
-  But chroot could not start bash because in current qemu dose not consider=
- about this unexpected one more"argv[0]"
-
-  =
-
-  After modified qemu code temporary to handle the new argv list we got the=
- input args, and from argv[2] is the original input command
-  argv_0----/usr/bin/qemu-mips64el-static---
-  argv_1----/bin/tar---
-  argv_2----tar---
-
-  We need the original input from command line, so is it possible that let =
-binfmt_misc to pass one more additional args or env to qemu as a token of t=
-he binfmt_misc flag, then qemu can judge how to parse the input args by it?
-  looking forward your suggestions.
-
-  Thanks
-  luyou
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818483/+subscriptions
+> 
+> Otherwise thanks for reviewing.
+> 
+> Regards
+> Sven
+> 
+> 
