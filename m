@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45556)
+Received: from eggs.gnu.org ([209.51.188.92]:46871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1T7A-0002o3-Gb
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:45:29 -0500
+	(envelope-from <stefanha@gmail.com>) id 1h1TDL-0004Qs-Ss
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:51:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1T79-0004pK-PM
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:45:28 -0500
-References: <155119086741.1037569.12734854713022304642.stgit@bahia.lan>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <c341d677-7749-5158-df45-b529b58ba45f@vivier.eu>
-Date: Wed, 6 Mar 2019 10:45:18 +0100
+	(envelope-from <stefanha@gmail.com>) id 1h1TDL-0000Oy-3J
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:51:51 -0500
+Date: Wed, 6 Mar 2019 09:51:47 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190306095147.GF22159@stefanha-x1.localdomain>
+References: <20190227172256.30368-1-kwolf@redhat.com>
+	<20190227172256.30368-4-kwolf@redhat.com>
+	<20190301161724.GB18260@stefanha-x1.localdomain>
+	<d6ba8e66-5ddf-9091-ff44-5024a53240a8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <155119086741.1037569.12734854713022304642.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] bswap: Fix accessors syntax
- in comment
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="HCdXmnRlPgeNBad2"
+Content-Disposition: inline
+In-Reply-To: <d6ba8e66-5ddf-9091-ff44-5024a53240a8@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 03/20] qcow2: Extend spec for
+ external data files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On 26/02/2019 15:21, Greg Kurz wrote:
-> All accessors that have an endian infix DO have an underscore between
-> {size} and {endian}.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  include/qemu/bswap.h |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
-> index a684c1a7a298..5a70f78c0ba4 100644
-> --- a/include/qemu/bswap.h
-> +++ b/include/qemu/bswap.h
-> @@ -255,9 +255,9 @@ typedef union {
->  /*
->   * the generic syntax is:
->   *
-> - * load: ld{type}{sign}{size}{endian}_p(ptr)
-> + * load: ld{type}{sign}{size}_{endian}_p(ptr)
->   *
-> - * store: st{type}{size}{endian}_p(ptr, val)
-> + * store: st{type}{size}_{endian}_p(ptr, val)
->   *
->   * Note there are small differences with the softmmu access API!
->   *
-> @@ -293,10 +293,10 @@ typedef union {
->   *
->   * For cases where the size to be used is not fixed at compile time,
->   * there are
-> - *  stn{endian}_p(ptr, sz, val)
-> + *  stn_{endian}_p(ptr, sz, val)
->   * which stores @val to @ptr as an @endian-order number @sz bytes in size
->   * and
-> - *  ldn{endian}_p(ptr, sz)
-> + *  ldn_{endian}_p(ptr, sz)
->   * which loads @sz bytes from @ptr as an unsigned @endian-order number
->   * and returns it in a uint64_t.
->   */
-> 
-> 
 
-Applied to my trivial-patches branch.
+--HCdXmnRlPgeNBad2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Laurent
+On Fri, Mar 01, 2019 at 10:32:27AM -0600, Eric Blake wrote:
+> On 3/1/19 10:17 AM, Stefan Hajnoczi wrote:
+> > On Wed, Feb 27, 2019 at 06:22:39PM +0100, Kevin Wolf wrote:
+> >> @@ -148,6 +170,7 @@ be stored. Each extension has a structure like the=
+ following:
+> >>                          0x6803f857 - Feature name table
+> >>                          0x23852875 - Bitmaps extension
+> >>                          0x0537be77 - Full disk encryption header poin=
+ter
+> >> +                        0x44415441 - External data file name
+> >=20
+> > This new header extension isn't described in this patch?
+>=20
+> I asked the same on v1, and the answer (which remains valid) is that
+> neither is 0xe2792aca Backing file format name.  (In other words, both
+> extensions are simple enough as a single file name to be implicitly
+> described by the reference to the header in the earlier text).  Making
+> both explicit wouldn't hurt my feelings, but I don't see it as a
+> showstopper to the patch as-is.
+
+The spec should make the representation clear.  Is it a NUL-terminated
+string or is the length dictated by the header extension length field?
+
+Otherwise implementors are forced to look at the QEMU source code or
+guess based on hex dumping example files :(.
+
+Stefan
+
+--HCdXmnRlPgeNBad2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcf5gzAAoJEJykq7OBq3PIF2oIAMbL6VbPd7Qj1x+SUxoos6rK
+NdfJSkxLalmfmSFOPznROvtkeM5NvwzjSPhcaoT/fcd2W5dufJvz+IL2dV2W5UWR
+bpKuqnzcYDN4hw5b8DIHVSN4pYo+2u4PcCCc2xpjdPNqbqLElrgyYJhfW0Od/Jnv
+WmtYk/alKSW9kN+KgRcSREdjspHIiUNMqX7dIirGv0qtqCy/oAGpbmThnAWArhJB
+WowkSxV+rkUkXEfOdCI2kI2zt2zpgPDkwhzEIlicqcx1bY7mEdiufbrVHCUFSqSf
+oY5EZGF7JHHKl0udHALkIPHSuT24gwJ5qDTi7nR3xgEku7GDIeKWASZJWsOHUwM=
+=0rQq
+-----END PGP SIGNATURE-----
+
+--HCdXmnRlPgeNBad2--
