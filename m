@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57626)
+Received: from eggs.gnu.org ([209.51.188.92]:58785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1TyX-0000sA-Cd
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:40:38 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1h1U4U-0002EO-4F
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:46:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1TyW-00017J-1N
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:40:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54898)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1TyV-0000zh-NJ
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:40:35 -0500
-Date: Wed, 6 Mar 2019 10:40:27 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190306104027.GB2727@work-vm>
-References: <20190305181602.9051-1-dgilbert@redhat.com>
-	<20190305181602.9051-11-dgilbert@redhat.com>
-	<84195982-1d8f-0bae-5136-6443a1f63c2a@redhat.com>
-	<87tvgg1ssw.fsf@dusky.pond.sub.org>
+	(envelope-from <sgarzare@redhat.com>) id 1h1U4S-000226-Vs
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:46:45 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40195)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1h1U4R-0001wY-OX
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:46:43 -0500
+Received: by mail-wr1-f65.google.com with SMTP id q1so12843204wrp.7
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 02:46:41 -0800 (PST)
+Date: Wed, 6 Mar 2019 11:46:37 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190306104637.fq2akqumjqpkzmgh@steredhat.homenet.telecomitalia.it>
+References: <20190305154634.4609-1-ndevos@redhat.com>
+	<20190305154634.4609-2-ndevos@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <87tvgg1ssw.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PULL 10/21] migration: Create socket-address
- parameter
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190305154634.4609-2-ndevos@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] block/gluster: Handle changed
+ glfs_ftruncate signature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +31,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
+To: Niels de Vos <ndevos@redhat.com>
+Cc: qemu-block@nongnu.org, integration@gluster.org, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>, qemu-devel@nongnu.org, Cole Robinson <crobinso@redhat.com>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Eric Blake <eblake@redhat.com> writes:
+Hi Niels,
+
+On Tue, Mar 05, 2019 at 04:46:33PM +0100, Niels de Vos wrote:
+> From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 > 
-> > On 3/5/19 12:15 PM, Dr. David Alan Gilbert (git) wrote:
-> >> From: Juan Quintela <quintela@redhat.com>
-> >>
-> >> It will be used to store the uri parameters. We want this only for
-> >> tcp, so we don't set it for other uris.  We need it to know what port
-> >> is migration running.
-> >>
-> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >>
-> >> --
-> >>
-> >
-> > This was not the usual '---' divider, and hence:
-> >
-> >> This used to be uri parameter, but it has so many troubles to
-> >> reproduce that it don't just make sense.
-> >>
-> >> This used to be a port parameter.  I was asked to move to
-> >> SocketAddress, done.
-> >> I also merged the setting of the migration tcp port in this one
-> >> because now I need to free the address, and this makes it easier.
-> >> This used to be x-socket-address with a single direction, now it is a
-> >> list of addresses.
-> >> Move SocketAddress_to_str here.  I used to try to generalize the one
-> >> in chardev/char-socket.c, but it is not worth it.
-> >>
-> >> Free string (eric)
-> >> Handle VSOCK address nicely (not that migration can use them yet).
-> >> Remove useless breaks (dave)
-> >> rename socket_address to socket_address_list to avoid confusion
-> >> Update to 4.0 (eric)
-> >> Put a comment indicating that there is a problem on the qapi
-> >> generator (markus).
-> >
-> > ...all this got included, even if it was perhaps not intended.
-> >
-> >> Message-Id: <20190227105128.1655-3-quintela@redhat.com>
-> >>
-> >> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >
-> > At any rate, it certainly looks odd to split *-by: tags by so much text.
-> >
-> >> +++ b/qapi/sockets.json
-> >> @@ -152,3 +152,21 @@
-> >>               'unix': 'UnixSocketAddress',
-> >>               'vsock': 'VsockSocketAddress',
-> >>               'fd': 'String' } }
-> >> +
-> >> +##
-> >> +# @DummyStruct:
-> >> +#
-> >> +# Both block-core and migration needs SocketAddressList
-> >> +# I am open to comments about how to share it
-> >> +#
-> >> +# @dummy-list: A dummy list
-> >> +#
-> >> +# FIXME: This shouldn't be needed, but this struct has two users, and
-> >> +# current qapi generator generates it on the 1st place that uses it,
-> >> +# so the second user don't see it.  Putting it here it is seen in both
-> >> +# sides.
-> >
-> > If Markus' pull request lands first, we don't need this.
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg01185.html
+> New versions of Glusters libgfapi.so have an updated glfs_ftruncate()
+> function that returns additional 'struct stat' structures to enable
+> advanced caching of attributes. This is useful for file servers, not so
+> much for QEMU. Nevertheless, the API has changed and needs to be
+> adopted.
 > 
-> It did: merge commit a3e3b0a7bd5.  Please drop this hunk, either in a
-> respin or in a follow-up patch.
+> Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+> Signed-off-by: Niels de Vos <ndevos@redhat.com>
 > 
-> A respin would give you a chance to clean up the commit message.
+> --
+> v5: pass default NULL arguments through macro (Daniel P. Berrangé)
+> v4: rebase to current master branch
+> v3: define old backwards compatible glfs_ftruncate() macro, from Eric Blake
+> v2: do a compile check as suggested by Eric Blake
 
-OK, respin coming up.
+to avoid to record these information in the commit message, you should use 3
+dashes or move these lines after the 3 dashes below.
 
-Dave
+> ---
+>  block/gluster.c |  4 ++++
+>  configure       | 18 ++++++++++++++++++
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/block/gluster.c b/block/gluster.c
+> index af64330211..f853aa87f4 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -20,6 +20,10 @@
+>  #include "qemu/option.h"
+>  #include "qemu/cutils.h"
+>  
+> +#ifdef CONFIG_GLUSTERFS_FTRUNCATE_HAS_STAT
+> +# define glfs_ftruncate(fd, offset) glfs_ftruncate(fd, offset, NULL, NULL)
+> +#endif
+> +
+>  #define GLUSTER_OPT_FILENAME        "filename"
+>  #define GLUSTER_OPT_VOLUME          "volume"
+>  #define GLUSTER_OPT_PATH            "path"
+> diff --git a/configure b/configure
+> index cefeb8fcce..bbfe587b88 100755
+> --- a/configure
+> +++ b/configure
+> @@ -456,6 +456,7 @@ glusterfs_xlator_opt="no"
+>  glusterfs_discard="no"
+>  glusterfs_fallocate="no"
+>  glusterfs_zerofill="no"
+> +glusterfs_ftruncate_has_stat="no"
+>  gtk=""
+>  gtk_gl="no"
+>  tls_priority="NORMAL"
+> @@ -4083,6 +4084,19 @@ if test "$glusterfs" != "no" ; then
+>        glusterfs_fallocate="yes"
+>        glusterfs_zerofill="yes"
+>      fi
+> +    cat > $TMPC << EOF
+> +#include <glusterfs/api/glfs.h>
+> +
+> +int
+> +main(void)
+> +{
+> +	/* new glfs_ftruncate() passes two additional args */
+> +	return glfs_ftruncate(NULL, 0, NULL, NULL);
+> +}
+> +EOF
+> +    if compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
+> +      glusterfs_ftruncate_has_stat="yes"
+> +    fi
+>    else
+>      if test "$glusterfs" = "yes" ; then
+>        feature_not_found "GlusterFS backend support" \
+> @@ -6885,6 +6899,10 @@ if test "$glusterfs_zerofill" = "yes" ; then
+>    echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
+>  fi
+>  
+> +if test "$glusterfs_ftruncate_has_stat" = "yes" ; then
+> +  echo "CONFIG_GLUSTERFS_FTRUNCATE_HAS_STAT=y" >> $config_host_mak
+> +fi
+> +
+>  if test "$libssh2" = "yes" ; then
+>    echo "CONFIG_LIBSSH2=m" >> $config_host_mak
+>    echo "LIBSSH2_CFLAGS=$libssh2_cflags" >> $config_host_mak
+> -- 
+> 2.20.1
+> 
+> 
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The patch LGTM.
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Thanks,
+Stefano
