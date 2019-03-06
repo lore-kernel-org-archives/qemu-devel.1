@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56539)
+Received: from eggs.gnu.org ([209.51.188.92]:57481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1YOz-0000jb-KV
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:24:14 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1YSx-0001qx-Tr
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:28:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1YOy-0002w3-K2
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:24:13 -0500
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-7-jsnow@redhat.com>
-	<5d204716-dc54-70ac-8b67-266ce8f44e0e@redhat.com>
-	<ce11fd2d-0b28-9b67-2382-506f0bfd8754@redhat.com>
-	<15751e4f-6415-219f-036b-26a3515a72ce@redhat.com>
-	<93e3f474-0235-7500-b4c7-3a4da17b29dd@redhat.com>
-	<eab2ced5-9079-d302-18ec-24eda2ea836d@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <7c1549db-3a4c-9100-ed7b-5e8bce39081b@redhat.com>
-Date: Wed, 6 Mar 2019 10:24:04 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1YSw-0006Zz-Qp
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:28:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1YSw-0006ZA-Gl
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:28:18 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C5B5E87630
+	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 15:28:17 +0000 (UTC)
+Date: Wed, 6 Mar 2019 15:28:13 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190306152812.GF2727@work-vm>
+References: <20190227110812.2185-1-quintela@redhat.com>
+	<20190227110812.2185-4-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <eab2ced5-9079-d302-18ec-24eda2ea836d@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/dirty-bitmaps: disallow busy
- bitmaps as merge source
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190227110812.2185-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/8] multifd: Create new
+ next_packet_size field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +34,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-
-
-On 3/6/19 8:57 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 01.03.2019 23:04, John Snow wrote:
->>
->>
->> On 3/1/19 2:57 PM, Eric Blake wrote:
->>> On 3/1/19 1:48 PM, John Snow wrote:
->>>
->>>>> I understand forbidding inconsistent sources (because if the source is
->>>>> potentially missing bits, then the merge destination will also be
->>>>> missing bits and thus be inconsistent), but why forbid busy?  If I've
->>>>> associated a bitmap with an NBD server (making it busy), it is still
->>>>> readable, and so I should still be able to merge its bits into another copy.
->>>>>
->>>>
->>>> True, do you rely on this, though?
->>>
->>> Not in my current libvirt code (as I create a temporary bitmap to hand
->>> to NBD, since it may be the merge of one or more disabled bitmaps in a
->>> differential backup case), so being tighter for now and relaxing later
->>> if we DO come up with a use is acceptable.
->>>
->>>>
->>>> I was working from a space of "busy" meant "actively in-use by an
->>>> operation, and COULD change" so I was forbidding it out of good hygiene.
->>>>
->>>> Clearly the ones in-use by NBD are actually static and unchanging, so
->>>> it's safer -- but that might not be true for push backups, where you
->>>> might not actually be getting what you think you are, because of the
->>>> bifurcated nature of those bitmaps.
->>>
->>> Oh, good point, especially after you worked so hard to merge
->>> locked/frozen into a single status - you WILL miss the bits from the
->>> successor (unless we teach the merge algorithm to pull in the busy
->>> bitmap's bits AND all the bits of its successors - but that feels like a
->>> lot of work if we don't have a client needing it now).  Okay, with the
->>> extra justification mentioned in the commit message,
->>>
->>
->> (Though I am being a little fast and loose here: when we split a bitmap,
->> the top-level one that retains the name actually stays unchanging and
->> the child bitmap is the one that starts accruing writes from a blank
->> canvas, but that STILL may not be what you expect when you choose it as
->> a merge source, however.)
->>
->>>>
->>>> If this causes a problem for you in the short-term I will simply roll
->>>> this back, but it stands out to me.
->>>>
->>>> (I can't stop myself from trying to protect the user from themselves.
->>>> It's clearly a recurring theme in my design and reviews.)
->>>>
->>>>>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->>>>>> index 769668ccdc..8403c9981d 100644
->>>>>> --- a/block/dirty-bitmap.c
->>>>>> +++ b/block/dirty-bitmap.c
->>>>>> @@ -825,6 +825,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
->>>>>>           goto out;
->>>>>>       }
->>>>>>   
->>>>>> +    if (bdrv_dirty_bitmap_check(src, BDRV_BITMAP_ALLOW_RO, errp)) {
->>>>>
->>>>> Thus, I think this should be BDRV_BITMAP_INCONSISTENT.
->>>
->>> then I retract my complaint, and the code is acceptable for now.
->>>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>
->>
->> We could always split it back out later, but in basic terms for
->> permissions and user perspective, "in use" seems robust enough of a
->> resolution. (It might be safe to read, it might not be, who knows --
->> it's in use.)
+* Juan Quintela (quintela@redhat.com) wrote:
+> We need to send this field when we add compression support.  As we are
+> still on x- stage, we can do this kind of changes.
 > 
-> I think, if we need some kind of sharing busy bitmaps, it should be two
-> busy states: one, which allows reads for other users and one that doesn't.
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+OK, so that kind of makes sense - in that what you want to do is read
+the whole compressed chunk in one go.
+
+Consider it might be a good idea to add some spare entries here;
+say a uint64_t dummy[4] so that if you need any more fields in the
+future it'll be easy to add them without breaking compatibility.
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  migration/ram.c        | 15 +++++++++++++--
+>  migration/trace-events |  4 ++--
+>  2 files changed, 15 insertions(+), 4 deletions(-)
 > 
-
-I think that's... hopefully premature. We don't need this NOW do we?
-
-I think this is OK as-is.
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 29f0d431a8..26ed26fc2d 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -534,6 +534,8 @@ typedef struct {
+>      /* maximum number of allocated pages */
+>      uint32_t pages_alloc;
+>      uint32_t pages_used;
+> +    /* size of the next packet that contains pages */
+> +    uint32_t next_packet_size;
+>      uint64_t packet_num;
+>      char ramblock[256];
+>      uint64_t offset[];
+> @@ -581,6 +583,8 @@ typedef struct {
+>      MultiFDPacket_t *packet;
+>      /* multifd flags for each packet */
+>      uint32_t flags;
+> +    /* size of the next packet that contains pages */
+> +    uint32_t next_packet_size;
+>      /* global number of generated multifd packets */
+>      uint64_t packet_num;
+>      /* thread local variables */
+> @@ -617,6 +621,8 @@ typedef struct {
+>      /* global number of generated multifd packets */
+>      uint64_t packet_num;
+>      /* thread local variables */
+> +    /* size of the next packet that contains pages */
+> +    uint32_t next_packet_size;
+>      /* packets sent through this channel */
+>      uint64_t num_packets;
+>      /* pages sent through this channel */
+> @@ -721,6 +727,7 @@ static void multifd_send_fill_packet(MultiFDSendParams *p)
+>      packet->flags = cpu_to_be32(p->flags);
+>      packet->pages_alloc = cpu_to_be32(migrate_multifd_page_count());
+>      packet->pages_used = cpu_to_be32(p->pages->used);
+> +    packet->next_packet_size = cpu_to_be32(p->next_packet_size);
+>      packet->packet_num = cpu_to_be64(p->packet_num);
+>  
+>      if (p->pages->block) {
+> @@ -772,6 +779,7 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
+>          return -1;
+>      }
+>  
+> +    p->next_packet_size = be32_to_cpu(packet->next_packet_size);
+>      p->packet_num = be64_to_cpu(packet->packet_num);
+>  
+>      if (p->pages->used) {
+> @@ -1011,6 +1019,7 @@ static void *multifd_send_thread(void *opaque)
+>              uint64_t packet_num = p->packet_num;
+>              uint32_t flags = p->flags;
+>  
+> +            p->next_packet_size = used * qemu_target_page_size();
+>              multifd_send_fill_packet(p);
+>              p->flags = 0;
+>              p->num_packets++;
+> @@ -1018,7 +1027,8 @@ static void *multifd_send_thread(void *opaque)
+>              p->pages->used = 0;
+>              qemu_mutex_unlock(&p->mutex);
+>  
+> -            trace_multifd_send(p->id, packet_num, used, flags);
+> +            trace_multifd_send(p->id, packet_num, used, flags,
+> +                               p->next_packet_size);
+>  
+>              ret = qio_channel_write_all(p->c, (void *)p->packet,
+>                                          p->packet_len, &local_err);
+> @@ -1253,7 +1263,8 @@ static void *multifd_recv_thread(void *opaque)
+>  
+>          used = p->pages->used;
+>          flags = p->flags;
+> -        trace_multifd_recv(p->id, p->packet_num, used, flags);
+> +        trace_multifd_recv(p->id, p->packet_num, used, flags,
+> +                           p->next_packet_size);
+>          p->num_packets++;
+>          p->num_pages += used;
+>          qemu_mutex_unlock(&p->mutex);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index bd2d0cd25a..a11e66e1d9 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -77,13 +77,13 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
+>  migration_bitmap_sync_start(void) ""
+>  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
+>  migration_throttle(void) ""
+> -multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags) "channel %d packet number %" PRIu64 " pages %d flags 0x%x"
+> +multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pages %d flags 0x%x next packet size %d"
+>  multifd_recv_sync_main(long packet_num) "packet num %ld"
+>  multifd_recv_sync_main_signal(uint8_t id) "channel %d"
+>  multifd_recv_sync_main_wait(uint8_t id) "channel %d"
+>  multifd_recv_thread_end(uint8_t id, uint64_t packets, uint64_t pages) "channel %d packets %" PRIu64 " pages %" PRIu64
+>  multifd_recv_thread_start(uint8_t id) "%d"
+> -multifd_send(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags) "channel %d packet_num %" PRIu64 " pages %d flags 0x%x"
+> +multifd_send(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet_num %" PRIu64 " pages %d flags 0x%x next packet size %d"
+>  multifd_send_sync_main(long packet_num) "packet num %ld"
+>  multifd_send_sync_main_signal(uint8_t id) "channel %d"
+>  multifd_send_sync_main_wait(uint8_t id) "channel %d"
+> -- 
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
