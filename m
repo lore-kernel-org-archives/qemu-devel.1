@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40541)
+Received: from eggs.gnu.org ([209.51.188.92]:41142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1ZI1-0001Sf-Vc
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:21:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1ZL2-0002XB-Mw
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1ZHz-0001w0-4p
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:21:04 -0500
-Date: Wed, 6 Mar 2019 17:20:45 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190306172045.14a58996@Igors-MacBook-Pro.local>
-In-Reply-To: <b904272b-9eca-36e7-d24b-4c84b6c4f4af@huawei.com>
-References: <1551823429-1440-1-git-send-email-guoheyi@huawei.com>
-	<20190306113354.5a98654b@redhat.com>
-	<b904272b-9eca-36e7-d24b-4c84b6c4f4af@huawei.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1h1ZL1-0004nf-UG
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:24:12 -0500
+Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:41454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h1ZL1-0004mk-NO
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:24:11 -0500
+Received: by mail-ot1-x32a.google.com with SMTP id t7so11237985otk.8
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 08:24:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw/arm/acpi: simplify AML bit
- and/or statement
+References: <20190306114227.9125-1-dgilbert@redhat.com>
+In-Reply-To: <20190306114227.9125-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 6 Mar 2019 16:23:58 +0000
+Message-ID: <CAFEAcA_88_uhEaeJ+52BfTVUDMw6UV+vdcozE176uujTDmb03A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/22] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Heyi Guo <guoheyi@huawei.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, wanghaibin.wang@huawei.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, Zhang Chen <chen.zhang@intel.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, 6 Mar 2019 21:09:11 +0800
-Heyi Guo <guoheyi@huawei.com> wrote:
+On Wed, 6 Mar 2019 at 11:44, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+>
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit b5b6b2b912bbcd3953407da938a8f969577ad3a1:
+>
+>   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-mar-05-2019' into staging (2019-03-05 21:07:29 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20190306a
+>
+> for you to fetch changes up to b5922fc5891261153f1a0f20e814c620aabeb6ac:
+>
+>   qapi/migration.json: Remove a variable that doesn't exist in example (2019-03-06 10:49:18 +0000)
+>
+> ----------------------------------------------------------------
+> Migation pull 2019-03-06
+>
+> (This replaces the pull sent yesterday)
+>
+>    a) 4 small fixes including the cancel problem
+>      that caused the ahci migration test to fail
+>      intermittently
+>    b) Yury's ignore-shared feature
+>    c) Juan's extra tests
+>    d) Wei Wang's free page hinting
+>    e) Some Colo fixes from Zhang Chen
+>
+> Diff from yesterdays pull:
+>   1) A missing fix of mine (cleanup during exit)
+>   2) Changes from Eric/Markus on 'Create socket-address parameter'
+>
+> ----------------------------------------------------------------
 
-> Sorry, I didn't know the indention policy of qemu code. So we need to indent the 2nd line just after the parentheses it belongs to?
+Applied, thanks.
 
-See "[PATCH v6 0/2] CODING_STYLE: trivial update" for clarification
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-> 
-> Will change that and send next version.
-> 
-> Thanks,
-> 
-> Heyi
-> 
-> 
-> On 2019/3/6 18:33, Igor Mammedov wrote:
-> > On Wed, 6 Mar 2019 06:03:48 +0800
-> > Heyi Guo <guoheyi@huawei.com> wrote:
-> >
-> >> The last argument of AML bit and/or statement is the target variable,
-> >> so we don't need to use a NULL target and then an additional store
-> >> operation; a single bit and/or statement is enough.
-> >>
-> >> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> >> Cc: Peter Maydell <peter.maydell@linaro.org>
-> >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> >> Cc: Igor Mammedov <imammedo@redhat.com>
-> >> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> >> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-> >> ---
-> >>   hw/arm/virt-acpi-build.c | 8 ++++----
-> >>   1 file changed, 4 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> >> index 04b62c7..1c84e87 100644
-> >> --- a/hw/arm/virt-acpi-build.c
-> >> +++ b/hw/arm/virt-acpi-build.c
-> >> @@ -265,16 +265,16 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-> >>           aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
-> >>       aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
-> >>       aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
-> >> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
-> >> +    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
-> >>                                   aml_name("CTRL")));
-> > pls fix indent in all such cases. I'd align it like this:
-> >     aml_append(ifctx,
-> >                aml_and(aml_name("CTRL"), aml_int(0x1D), aml_name("CTRL")));
-> >
-> > or
-> >     aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
-> >                               aml_name("CTRL")));
-> >
-> >
-> > PS:
-> > When making multi-patch series use --cover-letter git option
-> >
-> >>   
-> >>       ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
-> >> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
-> >> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x08),
-> >>                                    aml_name("CDW1")));
-> >>       aml_append(ifctx, ifctx1);
-> >>   
-> >>       ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
-> >> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
-> >> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x10),
-> >>                                    aml_name("CDW1")));
-> >>       aml_append(ifctx, ifctx1);
-> >>   
-> >> @@ -283,7 +283,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-> >>       aml_append(method, ifctx);
-> >>   
-> >>       elsectx = aml_else();
-> >> -    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
-> >> +    aml_append(elsectx, aml_or(aml_name("CDW1"), aml_int(4),
-> >>                                     aml_name("CDW1")));
-> >>       aml_append(elsectx, aml_return(aml_arg(3)));
-> >>       aml_append(method, elsectx);
-> >
-> > .
-> >
-> 
-> 
-> 
+-- PMM
