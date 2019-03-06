@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43781)
+Received: from eggs.gnu.org ([209.51.188.92]:43844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1XM0-0007Tc-LK
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:17:07 -0500
+	(envelope-from <mst@redhat.com>) id 1h1XMH-0007ab-32
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:17:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1XLz-0003CD-W6
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:17:04 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190304194857.9780-1-philmd@redhat.com>
-	<20190304194857.9780-2-philmd@redhat.com>
-	<9576f379-4ade-62ec-1a03-277148bdf8e4@redhat.com>
-Date: Wed, 06 Mar 2019 15:16:53 +0100
-In-Reply-To: <9576f379-4ade-62ec-1a03-277148bdf8e4@redhat.com> (Laszlo Ersek's
-	message of "Tue, 5 Mar 2019 18:17:42 +0100")
-Message-ID: <87tvggw0iy.fsf@dusky.pond.sub.org>
+	(envelope-from <mst@redhat.com>) id 1h1XMA-0003Qj-Kv
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:17:21 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:42103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h1XMA-0003QO-GW
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:17:14 -0500
+Received: by mail-qt1-f195.google.com with SMTP id u7so12931093qtg.9
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 06:17:14 -0800 (PST)
+Date: Wed, 6 Mar 2019 09:17:11 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190306091704-mutt-send-email-mst@kernel.org>
+References: <20190305225135.7060-1-marcandre.lureau@redhat.com>
+	<53bdf4ee-d791-9983-6f1c-72b2b96e7342@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] pflash_cfi01: Add
- pflash_cfi01_get_blk() helper
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <53bdf4ee-d791-9983-6f1c-72b2b96e7342@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost-user-test: fix leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Laurent Vivier <lvivier@redhat.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+On Wed, Mar 06, 2019 at 07:35:28AM +0100, Thomas Huth wrote:
+> On 05/03/2019 23.51, Marc-André Lureau wrote:
+> > Spotted by ASAN.
+> > 
+> > Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  tests/vhost-user-test.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+> > index 4cd0a97f13..9364227ba4 100644
+> > --- a/tests/vhost-user-test.c
+> > +++ b/tests/vhost-user-test.c
+> > @@ -588,6 +588,7 @@ static void test_server_free(TestServer *server)
+> >          g_test_message("unable to rmdir: path (%s): %s",
+> >                         server->tmpfs, strerror(errno));
+> >      }
+> > +    g_free(server->tmpfs);
+> >  
+> >      qemu_chr_fe_deinit(&server->chr, true);
+> >  
+> > @@ -605,6 +606,8 @@ static void test_server_free(TestServer *server)
+> >  
+> >      g_main_loop_unref(server->loop);
+> >      g_main_context_unref(server->context);
+> > +    g_cond_clear(&server->data_cond);
+> > +    g_mutex_clear(&server->data_mutex);
+> >      g_free(server);
+> >  }
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+> ... and queued to my qtest-next branch (unless Michael wants to take it
+> through hist vhost tree instead).
 
-> On 03/04/19 20:48, Philippe Mathieu-Daud=C3=A9 wrote:
->> Add an helper to access the opaque struct PFlashCFI01.
->>=20
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> [PMD: Extracted from bigger patch]
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>  hw/block/pflash_cfi01.c  | 5 +++++
->>  include/hw/block/flash.h | 1 +
->>  2 files changed, 6 insertions(+)
->>=20
->> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> index 9d1c356eb6..9ecab693e8 100644
->> --- a/hw/block/pflash_cfi01.c
->> +++ b/hw/block/pflash_cfi01.c
->> @@ -972,6 +972,11 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *=
-fl)
->>      return &fl->mem;
->>  }
->>=20=20
->> +BlockBackend *pflash_cfi01_get_blk(PFlashCFI01 *fl)
->> +{
->> +    return fl->blk;
->> +}
->> +
->>  static void postload_update_cb(void *opaque, int running, RunState stat=
-e)
->>  {
->>      PFlashCFI01 *pfl =3D opaque;
->> diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
->> index 914932eaec..a0f488732a 100644
->> --- a/include/hw/block/flash.h
->> +++ b/include/hw/block/flash.h
->> @@ -22,6 +22,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
->>                                     uint16_t id0, uint16_t id1,
->>                                     uint16_t id2, uint16_t id3,
->>                                     int be);
->> +BlockBackend *pflash_cfi01_get_blk(PFlashCFI01 *fl);
->>  MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
->>=20=20
->>  /* pflash_cfi02.c */
->>=20
->
-> I generally prefer to keep the same order between declarations of
-> functions, and definitions of the same functions. Compare
-> pflash_cfi01_get_memory() here.
+No it's fine.
 
-My fault, not Philippe's.
-
-> With that updated,
->
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks!
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
