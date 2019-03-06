@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35309)
+Received: from eggs.gnu.org ([209.51.188.92]:35415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1UPD-0004uC-D8
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:08:12 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1UPS-00054S-Fq
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:08:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1UPB-00029N-AK
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:08:11 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1UPQ-0002HC-4V
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:08:26 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed,  6 Mar 2019 12:07:06 +0100
-Message-Id: <20190306110711.309-6-laurent@vivier.eu>
+Date: Wed,  6 Mar 2019 12:07:08 +0100
+Message-Id: <20190306110711.309-8-laurent@vivier.eu>
 In-Reply-To: <20190306110711.309-1-laurent@vivier.eu>
 References: <20190306110711.309-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/10] block/pflash_cfi02: Fix memory leak and
- potential use-after-free
+Subject: [Qemu-devel] [PULL 07/10] bswap: Fix accessors syntax in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +23,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, John Snow <jsnow@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-s390x@nongnu.org, Corey Minyard <minyard@acm.org>, Pierre Morel <pmorel@linux.ibm.com>, Stephen Checkoway <stephen.checkoway@oberlin.edu>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, John Snow <jsnow@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-s390x@nongnu.org, Corey Minyard <minyard@acm.org>, Pierre Morel <pmorel@linux.ibm.com>, Greg Kurz <groug@kaod.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+From: Greg Kurz <groug@kaod.org>
 
-Don't dynamically allocate the pflash's timer. But do use timer_del in
-an unrealize function to make sure that the timer can't fire after the
-pflash_t has been freed.
+All accessors that have an endian infix DO have an underscore between
+{size} and {endian}.
 
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
-Message-Id: <20190219153727.62279-1-stephen.checkoway@oberlin.edu>
+Message-Id: <155119086741.1037569.12734854713022304642.stgit@bahia.lan>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/block/pflash_cfi02.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ include/qemu/bswap.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 0f8b7b8c7b36..1588aeff5a95 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -84,7 +84,7 @@ struct pflash_t {
-     uint16_t unlock_addr0;
-     uint16_t unlock_addr1;
-     uint8_t cfi_table[0x52];
--    QEMUTimer *timer;
-+    QEMUTimer timer;
-     /* The device replicates the flash memory across its memory space.  Emulate
-      * that by having a container (.mem) filled with an array of aliases
-      * (.mem_mappings) pointing to the flash memory (.orig_mem).
-@@ -429,7 +429,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
-             }
-             pfl->status = 0x00;
-             /* Let's wait 5 seconds before chip erase is done */
--            timer_mod(pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                       (NANOSECONDS_PER_SECOND * 5));
-             break;
-         case 0x30:
-@@ -444,7 +444,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
-             }
-             pfl->status = 0x00;
-             /* Let's wait 1/2 second before sector erase is done */
--            timer_mod(pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                       (NANOSECONDS_PER_SECOND / 2));
-             break;
-         default:
-@@ -596,7 +596,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
-     pfl->rom_mode = 1;
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &pfl->mem);
- 
--    pfl->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
-+    timer_init_ns(&pfl->timer, QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
-     pfl->wcycle = 0;
-     pfl->cmd = 0;
-     pfl->status = 0;
-@@ -695,11 +695,18 @@ static Property pflash_cfi02_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-+static void pflash_cfi02_unrealize(DeviceState *dev, Error **errp)
-+{
-+    pflash_t *pfl = CFI_PFLASH02(dev);
-+    timer_del(&pfl->timer);
-+}
-+
- static void pflash_cfi02_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->realize = pflash_cfi02_realize;
-+    dc->unrealize = pflash_cfi02_unrealize;
-     dc->props = pflash_cfi02_properties;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
- }
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index a684c1a7a298..5a70f78c0ba4 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -255,9 +255,9 @@ typedef union {
+ /*
+  * the generic syntax is:
+  *
+- * load: ld{type}{sign}{size}{endian}_p(ptr)
++ * load: ld{type}{sign}{size}_{endian}_p(ptr)
+  *
+- * store: st{type}{size}{endian}_p(ptr, val)
++ * store: st{type}{size}_{endian}_p(ptr, val)
+  *
+  * Note there are small differences with the softmmu access API!
+  *
+@@ -293,10 +293,10 @@ typedef union {
+  *
+  * For cases where the size to be used is not fixed at compile time,
+  * there are
+- *  stn{endian}_p(ptr, sz, val)
++ *  stn_{endian}_p(ptr, sz, val)
+  * which stores @val to @ptr as an @endian-order number @sz bytes in size
+  * and
+- *  ldn{endian}_p(ptr, sz)
++ *  ldn_{endian}_p(ptr, sz)
+  * which loads @sz bytes from @ptr as an unsigned @endian-order number
+  * and returns it in a uint64_t.
+  */
 -- 
 2.20.1
