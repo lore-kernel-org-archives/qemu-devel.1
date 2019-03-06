@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43197)
+Received: from eggs.gnu.org ([209.51.188.92]:44840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jtomko@redhat.com>) id 1h1Ryr-0001Oo-N1
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:32:51 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1h1Rzg-0001mA-Bs
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:33:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jtomko@redhat.com>) id 1h1Ryn-0003pQ-FD
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:32:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1h1Ryd-00024u-ON
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:32:37 -0500
-Date: Wed, 6 Mar 2019 09:30:32 +0100
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-Message-ID: <20190306083032.GZ1252@lpt>
-References: <20181205195704.17605-1-ehabkost@redhat.com>
-	<3571700849fab25a1bc69960ca24284f0760fe02.camel@redhat.com>
-	<20190305143801.lq4gpetubspftkda@sirius.home.kraxel.org>
-	<81d22ed88833ed22a1c3781c3c0c1eafad99b280.camel@redhat.com>
-	<20190306074148.GA9131@angien.pipo.sk>
+	(envelope-from <dovgaluk@ispras.ru>) id 1h1RzX-0004Zl-Td
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:33:39 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:59714)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1h1RzW-0004BY-EP
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:33:31 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
+	<155074715265.32129.1158027635780211224.stgit@pasha-VirtualBox>
+	<20190304103353.GA6059@localhost.localdomain>
+	<002b01d4d284$3109aa20$931cfe60$@ru>
+	<20190305095238.GB5280@dhcp-200-226.str.redhat.com>
+	<000901d4d343$3750f8b0$a5f2ea10$@ru>
+	<20190305111207.GE5280@dhcp-200-226.str.redhat.com>
+In-Reply-To: <20190305111207.GE5280@dhcp-200-226.str.redhat.com>
+Date: Wed, 6 Mar 2019 11:33:06 +0300
+Message-ID: <001201d4d3f7$38e82db0$aab88910$@ru>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="c1qHkdEbEbCG94PZ"
-Content-Disposition: inline
-In-Reply-To: <20190306074148.GA9131@angien.pipo.sk>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH for-4.0 v4 0/2] virtio: Provide
- version-specific variants of virtio PCI devices
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v13 19/25] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: Andrea Bolognani <abologna@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Amit Shah <amit@kernel.org>, Reitz <mreitz@redhat.com>, Max@angien.pipo.sk, Caio Carrara <ccarrara@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>
+To: 'Kevin Wolf' <kwolf@redhat.com>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Am 05.03.2019 um 12:04 hat Pavel Dovgalyuk geschrieben:
+> > > > > > @@ -1349,8 +1351,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t
+> offset,
+> > > int
+> > > > > bytes,
+> > > > > >
+> > > > > >      acb->has_returned = true;
+> > > > > >      if (acb->rwco.ret != NOT_DONE) {
+> > > > > > -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
+> > > > > > -                                blk_aio_complete_bh, acb);
+> > > > > > +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
+> > > > > > +                                         blk_aio_complete_bh, acb);
+> > > > > >      }
+> > > > >
+> > > > > This, and a few other places that you convert, are in fast paths and add
+> > > > > some calls that are unnecessary for non-replay cases.
+> > > >
+> > > > I don't think that this can make a noticeable slowdown, but we can run
+> > > > the tests if you want.
+> > > > We have the test suite which performs disk-intensive computation.
+> > > > It was created to measure the effect of running BH callbacks through
+> > > > the virtual timer infrastructure.
+> > >
+> > > I think this requires quite fast storage to possibly make a difference.
+> >
+> > True.
+> >
+> > > Or if you don't have that, maybe a ramdisk or even a null-co:// backend
+> > > could do the trick. Maybe null-co:// is actually the best option.
+> >
+> > We've got tests with file copying and compression on qcow2 disks.
+> > How the null backend can be applied there?
+> 
+> With qcow2, it can't really. null-co:// would work for running something
+> like fio directly against a virtual disk, without any image format
+> involved. Getting the image format out of the way makes things even a
+> little bit faster.
+> 
+> Maybe we should run a micro-benchmark fio with null-co just in addition
+> to your higher level tests?
 
---c1qHkdEbEbCG94PZ
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+We run something like that:
+  -drive file={},if=none,id=drv,snapshot -device ide-hd,drive=drv -drive
+file={},if=none,id=tst,snapshot -device ide-hd,drive=tst -net none -monitor stdio --enable-kvm -m 2G
 
-On Wed, Mar 06, 2019 at 08:41:48AM +0100, Peter Krempa wrote:
->On Tue, Mar 05, 2019 at 16:56:43 +0100, Andrea Bolognani wrote:
->> On Tue, 2019-03-05 at 15:38 +0100, Gerd Hoffmann wrote:
->
->[...]
->
->> So I agree neither scenario is exactly perfect, but I still think
->> adding non-transitional alias devices would overall be more
->> user-friendly.
->
->I don't think it makes sense to add it at the qemu level. From libvirt's
->point of view users should be shielded from any qemu impl detail or
->inconsistency as libvirt is the 'user friendly'[1] layer. In qemu the
->devices would be the same and thus does not make sense to do that
->because it would be more confusing.
->
->You can argue that we should add the alias at the libvirt level though.
->
+I don't really get your idea. What should be added to the command line to run null-co benchmark?
 
-You can, but please don't.
-
-Jano
-
->[1] Yes. I'm aware that statement is quite ironical.
-
-
-
->--
->libvir-list mailing list
->libvir-list@redhat.com
->https://www.redhat.com/mailman/listinfo/libvir-list
-
-
---c1qHkdEbEbCG94PZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAlx/hSQACgkQ+YPwO/Ma
-t53bBgf/c8FfX1nYaC1Ul61vNKBg33x+gi7xLYAY9LYd33Uy/i+w/ddxqOEost18
-VjO+vYXlK8U1rM5Erm+cJwgArqggbJtFcBSU9Tt45vcU/n6hWdJnN1XmLmGXhyiJ
-37XNv4atm4bzGQI7Vcc5XCHmelUWnuDFu+lhZdM7ow3W7lVpG8huWeKaI3xTcwdu
-UTP+NS3+JM8gHV9+MnVEESp30ktHbA6jLAuybxxg7qWz5w+h1cwNC6KyLABzda1k
-zJICbVCYngaCsiXysrOtp3k0hGj1nu5dIGHTaSWeEtvdhm34paQWdXXYQyOEj0QO
-GU3T9fTjjMHs8dH5dPWyo8rUtz9snw==
-=Xg87
------END PGP SIGNATURE-----
-
---c1qHkdEbEbCG94PZ--
+Pavel Dovgalyuk
