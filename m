@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35548)
+Received: from eggs.gnu.org ([209.51.188.92]:36188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1Sjt-00047w-Vz
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:21:26 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1SlL-00051f-BS
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:22:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1Sjs-0003po-W8
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:21:25 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54966)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1Sjs-0003o8-Oy
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:21:24 -0500
-Received: by mail-wm1-f65.google.com with SMTP id f3so5182984wmj.4
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 01:21:24 -0800 (PST)
-References: <20190305162829.20079-1-philmd@redhat.com>
-	<CAL1e-=gTsjAt1O63xuDwm7NfV6nKt3gMHk46Yjfg_PKp0a1m+w@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <11d78ce4-4646-ca1d-82a6-3db98298996b@redhat.com>
-Date: Wed, 6 Mar 2019 10:21:21 +0100
+	(envelope-from <laurent@vivier.eu>) id 1h1SlK-0005hA-Hy
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:22:55 -0500
+References: <20190214084939.20640-1-richardw.yang@linux.intel.com>
+	<20190214084939.20640-2-richardw.yang@linux.intel.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e57b08c7-72d2-17d7-565c-4f8cbf5dd1bf@vivier.eu>
+Date: Wed, 6 Mar 2019 10:22:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=gTsjAt1O63xuDwm7NfV6nKt3gMHk46Yjfg_PKp0a1m+w@mail.gmail.com>
+In-Reply-To: <20190214084939.20640-2-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] mips_malta: Clean up definition of
- flash memory size
+Subject: Re: [Qemu-devel] [Qemu-trivial] [Patch v4 1/3] hw/i386/pc.c: remove
+ unused function pc_acpi_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, mst@redhat.com, imammedo@redhat.com, philmd@redhat.com
 
-Hi Aleksandar,
+On 14/02/2019 09:49, Wei Yang wrote:
+> Function pc_acpi_init() is not used anymore.
+> 
+> Remove the definition and declaration.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/i386/pc.c         | 27 ---------------------------
+>  include/hw/i386/pc.h |  1 -
+>  2 files changed, 28 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 5317e08f60..734d3268fa 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1280,33 +1280,6 @@ void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
+>                                          pci_address_space, -1);
+>  }
+>  
+> -void pc_acpi_init(const char *default_dsdt)
+> -{
+> -    char *filename;
+> -
+> -    if (acpi_tables != NULL) {
+> -        /* manually set via -acpitable, leave it alone */
+> -        return;
+> -    }
+> -
+> -    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, default_dsdt);
+> -    if (filename == NULL) {
+> -        warn_report("failed to find %s", default_dsdt);
+> -    } else {
+> -        QemuOpts *opts = qemu_opts_create(qemu_find_opts("acpi"), NULL, 0,
+> -                                          &error_abort);
+> -        Error *err = NULL;
+> -
+> -        qemu_opt_set(opts, "file", filename, &error_abort);
+> -
+> -        acpi_table_add_builtin(opts, &err);
+> -        if (err) {
+> -            warn_reportf_err(err, "failed to load %s: ", filename);
+> -        }
+> -        g_free(filename);
+> -    }
+> -}
+> -
+>  void xen_load_linux(PCMachineState *pcms)
+>  {
+>      int i;
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 9d29c4b1df..541124ba6d 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -187,7 +187,6 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
+>  
+>  void pc_cpus_init(PCMachineState *pcms);
+>  void pc_hot_add_cpu(const int64_t id, Error **errp);
+> -void pc_acpi_init(const char *default_dsdt);
+>  
+>  void pc_guest_info_init(PCMachineState *pcms);
+>  
+> 
 
-On 3/6/19 7:38 AM, Aleksandar Markovic wrote:
-> On Tuesday, March 5, 2019, Philippe Mathieu-Daudé <philmd@redhat.com
-> <mailto:philmd@redhat.com>> wrote:
-> 
->     Hi Markus,
-> 
->     this is a rework of your 'mips_malta: Clean up definition of flash
->     memory size somewhat' patch:
->     https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07177.html
->     <https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07177.html>
-> 
->     Regards,
-> 
->     Phil.
-> 
-> 
-> Philippe,
-> 
-> Could you summarize end-user-visible changes resulting from this series?
-
-Good maintainer reflex :)
-
-There is an end-user visible change, if he provides a file that is not
-exactly 4MiB he will now get a "Malta CoreLV card expects a bios of 4MB"
-error message and QEMU will exit to his shell. This change is introduced
-by patch 4/5.
-
-Now I rather expect this series to get integrated in Markus current
-work, because his subsequent patches change the PFlash API and it is
-easier he takes this (to avoid merge conflicts).
-
-Note: Markus series is expected to include the following patch from Alex
-Bennée: "hw/block: better reporting on pflash backing file mismatch"
-https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07341.html
-which is a more important user visible change. I think the the changelog
-can be updated once, by Markus :)
-
-Meanwhile, if this series is taken by Markus can I have your Ack-by?
+Applied to my trivial-patches branch.
 
 Thanks,
-
-Phil.
+Laurent
