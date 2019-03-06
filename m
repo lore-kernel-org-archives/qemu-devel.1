@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50389)
+Received: from eggs.gnu.org ([209.51.188.92]:52808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1a8h-00067H-Hm
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:15:32 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h1aOc-0000fJ-Kf
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1a8f-0004vC-D3
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:15:31 -0500
-References: <201902270125.36158.randrianasulu@gmail.com>
-	<b3f9b42e-5895-51ca-9313-506b857e65d8@ilande.co.uk>
-	<201902281139.14787.randrianasulu@gmail.com>
-	<a984d6e6-4b9c-fecf-d0c6-3ff9b80cc07c@ilande.co.uk>
-	<95377a0f-a947-57d7-98af-82f105a23073@vivier.eu>
-	<ee99116d-3ba8-ce9d-6cc4-fb2a76c91a02@ilande.co.uk>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <a09ccd74-685d-491a-ae84-e640ae3dd6ce@vivier.eu>
-Date: Wed, 6 Mar 2019 18:15:14 +0100
+	(envelope-from <cohuck@redhat.com>) id 1h1aOZ-0006Ai-1v
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:31:56 -0500
+Date: Wed, 6 Mar 2019 18:31:48 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190306183148.665ef286.cohuck@redhat.com>
+In-Reply-To: <75da1e7f-3be4-ccb9-719e-c40c39f93f79@linux.ibm.com>
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-2-git-send-email-jjherne@linux.ibm.com>
+	<20190304144010.109e5ee1.cohuck@redhat.com>
+	<cf5e9c71-a78a-02b1-eaa8-4c8ba5c2c8a3@linux.ibm.com>
+	<20190306162729.0698ccb5.cohuck@redhat.com>
+	<75da1e7f-3be4-ccb9-719e-c40c39f93f79@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <ee99116d-3ba8-ce9d-6cc4-fb2a76c91a02@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] regression: target/ppc: convert VSX
- logical operations to vector operations broke X for ppc64le guest
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 01/16] s390 vfio-ccw: Add bootindex
+ property and IPLB data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Andrew Randrianasulu <randrianasulu@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On 06/03/2019 17:47, Mark Cave-Ayland wrote:
-> On 06/03/2019 16:42, Laurent Vivier wrote:
-> 
->> On 28/02/2019 17:59, Mark Cave-Ayland wrote:
->>> On 28/02/2019 08:39, Andrew Randrianasulu wrote:
->>>
->>>>>> configure line:
->>>>>> setarch i686 ./configure --target-list=ppc64-softmmu
->>>>>>
->>>>>> launch line:
->>>>>> ppc64-softmmu/qemu-system-ppc64 -display
->>>>>> sdl,gl=on -hda /mnt/sdb1/PPC-img/alpine_disk.img
->>>>>>
->>>>>> where alpine_disk.img is HDD installed Alpine 3.7 for ppc64le with xfce4
->>>>>> desktop.
->>>>>
->>>>> AFAICT the vector instructions converted here are independent of endian, so
->>>>> I can't see why this patch on its own would have any effect.
->>>>>
->>>>> Maybe it could be because the "setarch i686" part forces use of some
->>>>> lesser-used 32-bit paths in the vector code - is this required? And do you
->>>>> see the same issue on a x86_64 build?
->>>>
->>>> I use 32-bit Slackware userland with x86_64 kerenl - so setarch prevent most of 
->>>> configures from detecting my arch wrongly.
->>>>
->>>> Yes, bug was and is present with qemu compiled for x86_64 (inside chroot).
->>>> I initially discovered it there, and after dropping -O3 and even march=native, 
->>>> and even disabling avx2 via configure switch - moved to bisect.
->>>>
->>>> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06414.html
->>>
->>> Can you upload your alpine_disk.img somewhere and then email me the link off-list?
->>> I'll see if I can take a look when I get a spare moment.
->>
->> I've also bisected to this commit for a problem with qemu-pp64le.
->>
->> commit 7b8fe477e12b164dda97f79e27b55b805d90384f
->> Author: Richard Henderson <richard.henderson@linaro.org>
->> Date:   Fri Feb 15 10:00:46 2019 +0000
->>
->>     target/ppc: convert VSX logical operations to vector operations
->>
->>     Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>     Acked-by: David Gibson <david@gibson.dropbear.id.au>
->>     Message-Id: <20190215100058.20015-6-mark.cave-ayland@ilande.co.uk>
->>     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>
->>
->> debian stretch ppc64el fails to build the well known hello.c example:
->> # $ cat /tmp/hello.c
->> #include <stdio.h>
->> int main(void)
->> {
->>     printf("Hello World!\n");
->>     return 0;
->> }
->> # cc -o /tmp/hello /tmp/hello.c
->> In file included from <command-line>:0:0:
->> /usr/include/stdc-predef.h:26:2: error: unknown type name '_STDC_'
->>     explicitly includes a system header.  GCC knows the name of this
->>   ^ ~~~~
->> /usr/include/stdc-predef.h:28:1: error: expected '=', ',', ';', 'asm' or
->> '__attribute__' before '_STDC_PREDEF_H'
->>
->>  ^
->> /usr/include/stdc-predef.h:42:2: error: missing terminating ' character
->>  #endif
->>   ^~~~~
->> ...
-> 
-> Hi Laurent,
-> 
-> This should be fixed by the patchset at
-> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00473.html - can you test
-> and confirm that it also works for you?
-> 
-> I'm currently in the process of working on a v2 to address Richard's comments,
-> hopefully I will be able to send it through later this evening or tomorrow.
+On Wed, 6 Mar 2019 11:28:37 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-Thank you Mark.
+> On 3/6/19 10:27 AM, Cornelia Huck wrote:
+> > On Wed, 6 Mar 2019 09:55:40 -0500
+> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> >   
+> >> On 3/4/19 8:40 AM, Cornelia Huck wrote:  
+> >>> On Fri,  1 Mar 2019 13:59:21 -0500
+> >>> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:  
+> >   
+> >>>> @@ -532,7 +559,7 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+> >>>>            !ipl->netboot &&
+> >>>>            ipl->iplb.pbt == S390_IPL_TYPE_CCW &&
+> >>>>            is_virtio_scsi_device(&ipl->iplb)) {
+> >>>> -        CcwDevice *ccw_dev = s390_get_ccw_device(get_boot_device(0));
+> >>>> +        CcwDevice *ccw_dev = s390_get_ccw_device(get_boot_device(0), &devtype);  
+> >>>
+> >>> It feels wrong to have a variable that is not used later... what about
+> >>> either
+> >>> - making s390_get_ccw_device() capable of handling a NULL second
+> >>>     parameter, or
+> >>> - (what I think would be nicer) passing in the devtype as an optional
+> >>>     parameter to gen_initial_iplb() so you don't need to do the casting
+> >>>     dance twice?
+> >>>      
+> >>
+> >> I'm with you on everything suggested for this patch except this last item. I'm not sure
+> >> what you are suggesting here. I can easily visualize passing NULL for devtype when we want
+> >> to ignore it but I'm not sure what you mean by 'optional parameter'  
+> > 
+> > Hm, actually you'd need the device as well :) Basically,
+> > 
+> > static bool s390_gen_initial_iplb(S390IPLState *ipl, CcwDevice *ccw_dev, int devtype)
+> > {
+> > (...)
+> >      if (!ccw_dev) {
+> >          //get ccw_dev, which also gives us the devtype
+> >      }
+> > 
+> >      if (ccw_dev) {
+> >          //as before; devtype is valid here
+> >          (...)
+> >          return true;
+> >      }
+> >      return false;
+> > }
+> > 
+> > So you can call it with s390_gen_initial_iplb(ipl, NULL, 0) if you
+> > don't have the values already.
+> > 
+> >   
+> Ahh, makes sense now. Thanks for clarifying. I can do it that way, but it does seem a bit 
+> redundant to allow s390_gen_initial_iplb to be called either with, or without the device 
+> type data. In the case where it is called without, it just has to make the call to 
+> s390_get_ccw_device anyway. So, to me, it seems like added lines of code for very little 
+> benefit. Why not either always call s390_get_ccw_device from inside s390_gen_initial_iplb, 
+> or always require the parameters to be valid?
+> 
 
-yes, this series fixes the problem for me too.
-
-Thanks,
-Laurent
+My main goal was to avoid needing to do the casting twice. If that
+makes the code too ugly, we can also go back to making
+s390_get_ccw_device accept a NULL devtype (which I'd find less ugly
+than needing to pass in an unused variable.)
