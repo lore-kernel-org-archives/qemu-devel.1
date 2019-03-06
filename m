@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58061)
+Received: from eggs.gnu.org ([209.51.188.92]:58682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1h1ath-0001T1-6j
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:04:06 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h1aww-0002Qb-1w
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:07:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1h1atg-0002D5-2V
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:04:05 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Wed, 6 Mar 2019 18:03:54 +0000
-Message-ID: <9dbd4477-3f7a-1233-a22a-bc3678ed0b2e@virtuozzo.com>
+	(envelope-from <kwolf@redhat.com>) id 1h1awv-0003m1-E3
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:07:26 -0500
+Date: Wed, 6 Mar 2019 19:07:09 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190306180709.GL6818@localhost.localdomain>
 References: <1551694120-768127-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 	<1551694120-768127-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<20190306143117.GG6818@localhost.localdomain>
-In-Reply-To: <20190306143117.GG6818@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8D85472156722B4BB7481569B18143C1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<20190306145132.GH6818@localhost.localdomain>
+	<415d46bc-5b5a-fc1a-1b5c-6fc3dd2a73cc@virtuozzo.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <415d46bc-5b5a-fc1a-1b5c-6fc3dd2a73cc@virtuozzo.com>
 Subject: Re: [Qemu-devel] [PATCH 2/3] iotests: ask QEMU for supported formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,92 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-DQoNCk9uIDA2LzAzLzIwMTkgMTc6MzEsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDA0LjAzLjIw
-MTkgdW0gMTE6MDggaGF0IEFuZHJleSBTaGlua2V2aWNoIGdlc2NocmllYmVuOg0KPj4gU3VwcG9y
-dGVkIGZvcm1hdHMgbGlzdGVkIGJ5ICdxZW11JyBtYXkgZGlmZmVyIGZyb20gdGhvc2UgbGlzdGVk
-IGJ5DQo+PiAncWVtdS1pbWcnIGR1ZSB0byB3aGl0ZWxpc3RzLiBTb21lIHRlc3QgY2FzZXMgcmVx
-dWlyZSBzcGVjaWZpYyBmb3JtYXRzDQo+PiB0aGF0IG1heSBiZSB1c2VkIHdpdGggcWVtdS4gVGhl
-eSBjYW4gYmUgaW5xdWlyZWQgZGlyZWN0bHkgYnkgcnVubmluZw0KPj4gJ3FlbXUgLWRyaXZlIGZv
-cm1hdD1oZWxwJy4gVGhlIHJlc3BvbnNlIHRha2VzIHdoaXRlbGlzdHMgaW50byBhY2NvdW50Lg0K
-Pj4gVGhlIG1ldGhvZCBzdXBwb3J0ZWRfZm9ybWF0cygpIHNlcnZlcyBmb3IgdGhhdC4gVGhlIG1l
-dGhvZCBkZWNvcmF0b3INCj4+IHNraXBfaWZfdW5zdXBwb3J0ZWQoKSBjaGVja3MgaWYgYWxsIHJl
-cXVlc3RlZCBmb3JtYXRzIGFyZSB3aGl0ZWxpc3RlZC4NCj4+IElmIG5vdCwgdGhlIHRlc3QgY2Fz
-ZSB3aWxsIGJlIHNraXBwZWQuIFRoYXQgaGFzIGJlZW4gaW1wbGVtZW50ZWQgaW4NCj4+IHRoZSAn
-Y2hlY2snIGZpbGUgaW4gdGhlIHdheSBzaW1pbGFyIHRvIHRoZSAndGVzdCBub3RydW4nIG1lY2hh
-bmlzbS4NCj4+DQo+PiBTdWdnZXN0ZWQtYnk6IFJvbWFuIEthZ2FuIDxya2FnYW5AdmlydHVvenpv
-LmNvbT4NCj4+IFN1Z2dlc3RlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNl
-bWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogQW5kcmV5IFNoaW5rZXZp
-Y2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgdGVzdHMv
-cWVtdS1pb3Rlc3RzL2NoZWNrICAgICAgfCAxNiArKysrKysrKysrKysrLQ0KPj4gICB0ZXN0cy9x
-ZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8IDUwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysNCj4+ICAgMiBmaWxlcyBjaGFuZ2VkLCA2NSBpbnNlcnRpb25zKCspLCAx
-IGRlbGV0aW9uKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9jaGVj
-ayBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9jaGVjaw0KPj4gaW5kZXggODk1ZTFlMy4uYjlkNTM5YyAx
-MDA3NTUNCj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9jaGVjaw0KPj4gKysrIGIvdGVzdHMv
-cWVtdS1pb3Rlc3RzL2NoZWNrDQo+PiBAQCAtMjUsNiArMjUsNyBAQCB0cnk9MA0KPj4gICBuX2Jh
-ZD0wDQo+PiAgIGJhZD0iIg0KPj4gICBub3RydW49IiINCj4+ICtjYXNlbm90cnVuPSIiDQo+PiAg
-IGludGVycnVwdD10cnVlDQo+PiAgIA0KPj4gICAjIGJ5IGRlZmF1bHQgZG9uJ3Qgb3V0cHV0IHRp
-bWVzdGFtcHMNCj4+IEBAIC02NjQsNiArNjY1LDExIEBAIEVORCAgICAgICAgeyBpZiAoTlIgPiAw
-KSB7DQo+PiAgICAgICAgICAgICAgIGVjaG8gIk5vdCBydW46JG5vdHJ1biINCj4+ICAgICAgICAg
-ICAgICAgZWNobyAiTm90IHJ1bjokbm90cnVuIiA+PmNoZWNrLmxvZw0KPj4gICAgICAgICAgIGZp
-DQo+PiArICAgICAgICBpZiBbICEgLXogIiRjYXNlbm90cnVuIiBdDQo+PiArICAgICAgICB0aGVu
-DQo+PiArICAgICAgICAgICAgZWNobyAiU29tZSBjYXNlcyBub3QgcnVuIGluOiRjYXNlbm90cnVu
-Ig0KPj4gKyAgICAgICAgICAgIGVjaG8gIlNvbWUgY2FzZXMgbm90IHJ1biBpbjokY2FzZW5vdHJ1
-biIgPj5jaGVjay5sb2cNCj4+ICsgICAgICAgIGZpDQo+PiAgICAgICAgICAgaWYgWyAhIC16ICIk
-bl9iYWQiIC1hICRuX2JhZCAhPSAwIF0NCj4+ICAgICAgICAgICB0aGVuDQo+PiAgICAgICAgICAg
-ICAgIGVjaG8gIkZhaWx1cmVzOiRiYWQiDQo+PiBAQCAtNzQzLDYgKzc0OSwxMCBAQCBkbw0KPj4g
-ICAgICAgICAgICAgICAgICAgcHJpbnRmICIgICAgICAgICIgICAgICAgICMgcHJldHRpZXIgb3V0
-cHV0IHdpdGggdGltZXN0YW1wcy4NCj4+ICAgICAgICAgICBmaQ0KPj4gICAgICAgICAgIHJtIC1m
-IGNvcmUgJHNlcS5ub3RydW4NCj4+ICsgICAgICAgIGlmIFsgLWYgJHNlcS5jYXNlbm90cnVuIF0N
-Cj4+ICsgICAgICAgIHRoZW4NCj4+ICsgICAgICAgICAgICBybSAtZiAkc2VxLmNhc2Vub3RydW4N
-Cj4+ICsgICAgICAgIGZpDQo+IA0KPiBUaGUgaWYgaXMgdW5uZWNlc3NhcnkgaGVyZSwgJ3JtIC1m
-JyBkb2Vzbid0IHByaW50IGFuIGVycm9yIGlmIHRoZSBmaWxlDQo+IGRvZXNuJ3QgZXhpc3QuDQo+
-IA0KPj4gICAgICAgICAgIHN0YXJ0PSQoX3dhbGxjbG9jaykNCj4+ICAgICAgICAgICAkdGltZXN0
-YW1wICYmIHByaW50ZiAlcyAiICAgICAgICBbJChkYXRlICIrJVQiKV0iDQo+PiBAQCAtODIzLDcg
-KzgzMywxMSBAQCBkbw0KPj4gICAgICAgICAgICAgICAgICAgZmkNCj4+ICAgICAgICAgICAgICAg
-ZmkNCj4+ICAgICAgICAgICBmaQ0KPj4gLQ0KPj4gKyAgICAgICAgaWYgWyAtZiAkc2VxLmNhc2Vu
-b3RydW4gXQ0KPj4gKyAgICAgICAgdGhlbg0KPj4gKyAgICAgICAgICAgIGNhdCAkc2VxLmNhc2Vu
-b3RydW4NCj4+ICsgICAgICAgICAgICBjYXNlbm90cnVuPSIkY2FzZW5vdHJ1biAkc2VxIg0KPj4g
-KyAgICAgICAgZmkNCj4+ICAgICAgIGZpDQo+PiAgIA0KPj4gICAgICAgIyBjb21lIGhlcmUgZm9y
-IGVhY2ggdGVzdCwgZXhjZXB0IHdoZW4gJHNob3dtZSBpcyB0cnVlDQo+PiBkaWZmIC0tZ2l0IGEv
-dGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0
-cy5weQ0KPj4gaW5kZXggYjQ2MWY1My4uOGZlMTYyMCAxMDA2NDQNCj4+IC0tLSBhL3Rlc3RzL3Fl
-bXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+PiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0
-cy5weQ0KPj4gQEAgLTcyOCw2ICs3MjgsNTYgQEAgZGVmIHZlcmlmeV9xdW9ydW0oKToNCj4+ICAg
-ICAgIGlmIG5vdCBzdXBwb3J0c19xdW9ydW0oKToNCj4+ICAgICAgICAgICBub3RydW4oJ3F1b3J1
-bSBzdXBwb3J0IG1pc3NpbmcnKQ0KPj4gICANCj4+ICtkZWYgcWVtdV9waXBlKCphcmdzKToNCj4+
-ICsgICAgJycnUnVuIHFlbXUgd2l0aCBhbiBvcHRpb24gdG8gcHJpbnQgc29tZXRoaW5nIGFuZCBl
-eGl0IChlLmcuIGEgaGVscCBvcHRpb24pLA0KPj4gKyAgICBhbmQgcmV0dXJuIGl0cyBvdXRwdXQn
-JycNCj4+ICsgICAgYXJncyA9IFtxZW11X3Byb2ddICsgcWVtdV9vcHRzICsgbGlzdChhcmdzKQ0K
-Pj4gKyAgICBzdWJwID0gc3VicHJvY2Vzcy5Qb3BlbihhcmdzLCBzdGRvdXQ9c3VicHJvY2Vzcy5Q
-SVBFLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdGRlcnI9c3VicHJvY2Vzcy5T
-VERPVVQpDQo+PiArICAgIGV4aXRjb2RlID0gc3VicC53YWl0KCkNCj4+ICsgICAgaWYgZXhpdGNv
-ZGUgPCAwOg0KPj4gKyAgICAgICAgc3lzLnN0ZGVyci53cml0ZSgncWVtdSByZWNlaXZlZCBzaWdu
-YWwgJWk6ICVzXG4nICUgKC1leGl0Y29kZSwNCj4+ICsgICAgICAgICAgICAnICcuam9pbihhcmdz
-KSkpDQo+PiArICAgIHJldHVybiBzdWJwLmNvbW11bmljYXRlKClbMF0NCj4+ICsNCj4+ICtkZWYg
-c3VwcG9ydGVkX2Zvcm1hdHMocmVhZF9vbmx5PUZhbHNlKToNCj4+ICsgICAgJycnU2V0ICdyZWFk
-X29ubHknIHRvIFRydWUgdG8gY2hlY2sgcm8td2hpdGVsaXN0DQo+PiArICAgICAgIE90aGVyd2lz
-ZSwgcnctd2hpdGVsaXN0IGlzIGNoZWNrZWQnJycNCj4+ICsgICAgZm9ybWF0X21lc3NhZ2UgPSBx
-ZW11X3BpcGUoIi1kcml2ZSIsICJmb3JtYXQ9aGVscCIpDQo+PiArICAgIGF2YWlsYWJsZSA9IFtd
-DQo+PiArDQo+PiArICAgIGlmIHJlYWRfb25seToNCj4+ICsgICAgICAgICMgQ2hlY2sgcmVhZC1v
-bmx5IHdoaXRlbGlzdA0KPj4gKyAgICAgICAgYXZhaWxhYmxlID0gZm9ybWF0X21lc3NhZ2Uuc3Bs
-aXRsaW5lcygpWzFdLnNwbGl0KCI6IilbMV0uc3BsaXQoKQ0KPj4gKyAgICBlbHNlOg0KPj4gKyAg
-ICAgICAgIyBDaGVjayByZWFkLXdyaXRlIHdoaXRlbGlzdA0KPj4gKyAgICAgICAgYXZhaWxhYmxl
-ID0gZm9ybWF0X21lc3NhZ2Uuc3BsaXRsaW5lcygpWzBdLnNwbGl0KCI6IilbMV0uc3BsaXQoKQ0K
-Pj4gKw0KPj4gKyAgICByZXR1cm4gYXZhaWxhYmxlDQo+IA0KPiBXaGF0IGRvIHlvdSBuZWVkIGF2
-YWlsYWJsZSBmb3Igd2hlbiB5b3Ugb25seSBhc3NpZ24gaXQgYW5kIHRoZW4NCj4gaW1tZWRpYXRl
-bHkgcmV0dXJuIGl0IHdpdGhvdXQgdXNpbmcgaXQgYmVmb3JlPyBJIHRoaW5rIEkgd291bGQgd3Jp
-dGUNCj4gaXQgbXVjaCBzaG9ydGVyIGxpa2UgdGhpczoNCj4gDQo+IGxpbmUgPSAxIGlmIHJlYWRf
-b25seSBlbHNlIDANCj4gcmV0dXJuIGZvcm1hdF9tZXNzYWdlLnNwbGl0bGluZXMoKVtsaW5lXS5z
-cGxpdCgiOiIpWzFdLnNwbGl0KCkNCj4gDQoNClRoYW5rIHlvdSwgS2V2aW4sIGZvciB5b3VyIHVz
-ZWZ1bCByZXZpZXcuIEkgd2lsbCBhbWVuZCB0aGUgc2VyaWVzIHdpdGgNCnRoZSB2My4NCg0KQW5k
-cmV5DQoNCj4+ICtkZWYgY2FzZV9ub3RydW4ocmVhc29uKToNCj4+ICsgICAgJycnU2tpcCB0aGlz
-IHRlc3QgY2FzZScnJw0KPj4gKyAgICAjIEVhY2ggdGVzdCBpbiBxZW11LWlvdGVzdHMgaGFzIGEg
-bnVtYmVyICgic2VxIikNCj4+ICsgICAgc2VxID0gb3MucGF0aC5iYXNlbmFtZShzeXMuYXJndlsw
-XSkNCj4+ICsNCj4+ICsgICAgb3BlbignJXMvJXMuY2FzZW5vdHJ1bicgJSAob3V0cHV0X2Rpciwg
-c2VxKSwgJ2FiJykud3JpdGUoDQo+PiArICAgICAgICAnICAgIFtjYXNlIG5vdCBydW5dICcgKyBy
-ZWFzb24gKyAnXG4nKQ0KPiANCj4gTWF5YmUgbW92ZSB0aGlzIG5leHQgdG8gbm90cnVuKCksIHdo
-aWNoIGlzIHNpbWlsYXI/DQo+IA0KPiBLZXZpbg0KPiANCg==
+Am 06.03.2019 um 18:59 hat Andrey Shinkevich geschrieben:
+> On 06/03/2019 17:51, Kevin Wolf wrote:
+> > This fixes it for me (the first hunk is actually a bonus which fixes a
+> > preexisting bug, which somehow meant that the reason was not printed):
+> > 
+> > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> > index e6ae4e91b7..b41ac4be51 100644
+> > --- a/tests/qemu-iotests/iotests.py
+> > +++ b/tests/qemu-iotests/iotests.py
+> > @@ -712,7 +712,7 @@ def notrun(reason):
+> >       # Each test in qemu-iotests has a number ("seq")
+> >       seq = os.path.basename(sys.argv[0])
+> > 
+> > -    open('%s/%s.notrun' % (output_dir, seq), 'wb').write(reason + '\n')
+> > +    open('%s/%s.notrun' % (output_dir, seq), 'wt').write(reason + '\n')
+> >       print('%s not run: %s' % (seq, reason))
+> >       sys.exit(0)
+> > 
+> 
+> Thanks a lot. I am going to add the fix above as a separate patch in v3
+> with "Signed-off-by: Kevin Wolf <kwolf@redhat.com>"
+
+Sounds good to me, thanks!
+
+Kevin
