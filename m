@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40883)
+Received: from eggs.gnu.org ([209.51.188.92]:45993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1P0A-00083g-UL
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 00:21:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1Pec-0005BR-Hd
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:03:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1P09-0001AL-T4
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 00:21:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h1P09-0001A7-KU
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 00:21:57 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1Peb-00020J-I7
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:03:46 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20190305181602.9051-1-dgilbert@redhat.com>
-	<20190305181602.9051-11-dgilbert@redhat.com>
-	<84195982-1d8f-0bae-5136-6443a1f63c2a@redhat.com>
-Date: Wed, 06 Mar 2019 06:21:51 +0100
-In-Reply-To: <84195982-1d8f-0bae-5136-6443a1f63c2a@redhat.com> (Eric Blake's
-	message of "Tue, 5 Mar 2019 12:47:50 -0600")
-Message-ID: <87tvgg1ssw.fsf@dusky.pond.sub.org>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-7-armbru@redhat.com>
+	<CAFEAcA_OLYno=YNS6bHOemwEp0gnc3fwRn8Rjvmo9v-i89xrMA@mail.gmail.com>
+	<87d0nnsrx0.fsf@dusky.pond.sub.org>
+	<c6d4c021-8d62-ada0-d152-b1d4f2b7aff2@redhat.com>
+	<87ftsjptxk.fsf@dusky.pond.sub.org>
+	<CANqRtoSOF8uvh-9-_CgsuhB_N18NhSiS=DPsY1+3+ff4NzgE+w@mail.gmail.com>
+	<87mumbcd8k.fsf@dusky.pond.sub.org>
+	<f2c8f20d-17ad-b72b-28fb-c835d6b97c10@redhat.com>
+	<87k1he1wnz.fsf@dusky.pond.sub.org>
+	<e8b000bc-d457-7c5a-b7d2-4e3ff63d0c73@redhat.com>
+	<CAFEAcA-9U_D=UWTUH69mBBuC+a=FgXBC5kSawoCxDM4nB_FPZw@mail.gmail.com>
+	<90123914-f0c1-ea2e-f8e0-44fee62bb870@redhat.com>
+Date: Wed, 06 Mar 2019 07:03:31 +0100
+In-Reply-To: <90123914-f0c1-ea2e-f8e0-44fee62bb870@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Mar 2019 22:50:45
+	+0100")
+Message-ID: <87pnr41qvg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 10/21] migration: Create socket-address
- parameter
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
+ confused about size, mark FIXME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Eric Blake <eblake@redhat.com> writes:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> On 3/5/19 12:15 PM, Dr. David Alan Gilbert (git) wrote:
->> From: Juan Quintela <quintela@redhat.com>
->>
->> It will be used to store the uri parameters. We want this only for
->> tcp, so we don't set it for other uris.  We need it to know what port
->> is migration running.
->>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>
->> --
->>
+> On 3/5/19 6:25 PM, Peter Maydell wrote:
+>> On Tue, 5 Mar 2019 at 17:21, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+>>> But I'd recommend changing/fixing the sector size during the next dev
+>>> cycle, so we have more time for testing.
+>>=20
+>> Nobody in the upstream dev community is using or testing this board.
 >
-> This was not the usual '---' divider, and hence:
+> Well I submitted a Avocado test last year:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02749.html
 >
->> This used to be uri parameter, but it has so many troubles to
->> reproduce that it don't just make sense.
->>
->> This used to be a port parameter.  I was asked to move to
->> SocketAddress, done.
->> I also merged the setting of the migration tcp port in this one
->> because now I need to free the address, and this makes it easier.
->> This used to be x-socket-address with a single direction, now it is a
->> list of addresses.
->> Move SocketAddress_to_str here.  I used to try to generalize the one
->> in chardev/char-socket.c, but it is not worth it.
->>
->> Free string (eric)
->> Handle VSOCK address nicely (not that migration can use them yet).
->> Remove useless breaks (dave)
->> rename socket_address to socket_address_list to avoid confusion
->> Update to 4.0 (eric)
->> Put a comment indicating that there is a problem on the qapi
->> generator (markus).
+> And I rebase/run it from time to time.
 >
-> ...all this got included, even if it was perhaps not intended.
+>> The only way we'll find out if there's a problem with changing the
+>> sector size is to put the change in and get it into a release.
+>> I would vote for just making the change now.
 >
->> Message-Id: <20190227105128.1655-3-quintela@redhat.com>
->>
->> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> I'm happy with this vote, and am sure Markus will be too :)
 >
-> At any rate, it certainly looks odd to split *-by: tags by so much text.
+> Markus: the last field I wasn't sure about without double checking the
+> code is the @width one. I find it misleading, is that the size of the
+> data bus or the size of the flash words? Answer: this is the size of the
+> words in byte. NOR flash devices can not write less data than their word
+> boundary.
 >
->> +++ b/qapi/sockets.json
->> @@ -152,3 +152,21 @@
->>               'unix': 'UnixSocketAddress',
->>               'vsock': 'VsockSocketAddress',
->>               'fd': 'String' } }
->> +
->> +##
->> +# @DummyStruct:
->> +#
->> +# Both block-core and migration needs SocketAddressList
->> +# I am open to comments about how to share it
->> +#
->> +# @dummy-list: A dummy list
->> +#
->> +# FIXME: This shouldn't be needed, but this struct has two users, and
->> +# current qapi generator generates it on the 1st place that uses it,
->> +# so the second user don't see it.  Putting it here it is seen in both
->> +# sides.
+> The S29PL127J60TFI130 only support 16bit words, so using @width=3D2 is
+> correct.
 >
-> If Markus' pull request lands first, we don't need this.
-> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg01185.html
+> And the winner is.... ta-da!
+>
+>     pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE,
+>                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> -                         16 * KiB, FLASH_SIZE >> 16,
+> -                         1, 4, 0x0000, 0x0000, 0x0000, 0x0000,
+> +                         64 * KiB, FLASH_SIZE >> 16 /* will get removed
+> later */,
+> +                         1, 2, 0x0001, 0x227e, 0x2220, 0x2200
+>                           0x555, 0x2aa, 0);
 
-It did: merge commit a3e3b0a7bd5.  Please drop this hunk, either in a
-respin or in a follow-up patch.
+Sold!
 
-A respin would give you a chance to clean up the commit message.
+[...]
