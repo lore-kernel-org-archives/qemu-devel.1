@@ -1,30 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42381)
+Received: from eggs.gnu.org ([209.51.188.92]:48786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1bpp-0003MM-3F
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 14:04:10 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1h1cDi-0008LK-UD
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 14:28:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1bpn-0002zD-Gw
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 14:04:09 -0500
-Date: Wed, 6 Mar 2019 20:03:48 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190306200348.11e9eece@Igors-MacBook-Pro.local>
-In-Reply-To: <20190304163516.GQ4239@redhat.com>
-References: <1551454936-205218-2-git-send-email-imammedo@redhat.com>
-	<20190301154947.GJ21251@redhat.com>
-	<20190301183328.20b63e23@redhat.com>
-	<20190301174806.GN21251@redhat.com>
-	<87va0zcdse.fsf@dusky.pond.sub.org>
-	<20190304132507.39273826@redhat.com>
-	<20190304123908.GK4239@redhat.com>
-	<20190304151641.3deefc3b@redhat.com>
-	<20190304142432.GM4239@redhat.com>
-	<a6081774-c9d5-0496-3e65-ffb885408261@redhat.com>
-	<20190304163516.GQ4239@redhat.com>
+	(envelope-from <jjherne@linux.ibm.com>) id 1h1cDg-0003zU-TI
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 14:28:50 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38220
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1h1cDg-0003yi-L5
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 14:28:48 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x26JOMrv131596
+	for <qemu-devel@nongnu.org>; Wed, 6 Mar 2019 14:28:47 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2r2ks09ru6-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 14:28:47 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Wed, 6 Mar 2019 19:28:46 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-9-git-send-email-jjherne@linux.ibm.com>
+	<5d26b514-7d19-9323-c727-696ee5ed4f84@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Wed, 6 Mar 2019 14:28:42 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
- parameter of '-numa node' option
+In-Reply-To: <5d26b514-7d19-9323-c727-696ee5ed4f84@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <3beee536-d96e-390e-cb5f-db1c1e460f23@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 08/16] s390-bios: Map low
+ core memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,236 +46,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Michal Privoznik <mprivozn@redhat.com>, Markus Armbruster <armbru@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On Mon, 4 Mar 2019 16:35:16 +0000
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+On 3/5/19 1:27 AM, Thomas Huth wrote:
+> On 01/03/2019 19.59, Jason J. Herne wrote:
+>> Create a new header for basic architecture specific definitions and add a
+>> mapping of low core memory. This mapping will be used by the real dasd boot
+>> process.
+>>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/main.c      |   2 +
+>>   pc-bios/s390-ccw/s390-arch.h | 102 +++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 104 insertions(+)
+>>   create mode 100644 pc-bios/s390-ccw/s390-arch.h
+>>
+>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+>> index 2d912cb..0670c14 100644
+>> --- a/pc-bios/s390-ccw/main.c
+>> +++ b/pc-bios/s390-ccw/main.c
+>> @@ -9,6 +9,7 @@
+>>    */
+>>   
+>>   #include "libc.h"
+>> +#include "s390-arch.h"
+>>   #include "s390-ccw.h"
+>>   #include "cio.h"
+>>   #include "virtio.h"
+>> @@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+>>   QemuIplParameters qipl;
+>>   IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+>>   static bool have_iplb;
+>> +const LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
+> 
+> Shouldn't that rather be "LowCore const *lowcore" instead?
+> 
+>>   #define LOADPARM_PROMPT "PROMPT  "
+>>   #define LOADPARM_EMPTY  "        "
+>> diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
+>> new file mode 100644
+>> index 0000000..6facce0
+>> --- /dev/null
+>> +++ b/pc-bios/s390-ccw/s390-arch.h
+>> @@ -0,0 +1,102 @@
+>> +/*
+>> + * S390 Basic Architecture
+>> + *
+>> + * Copyright (c) 2019 Jason J. Herne <jjherne@us.ibm.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>> + * your option) any later version. See the COPYING file in the top-level
+>> + * directory.
+>> + */
+>> +
+>> +#ifndef S390_ARCH_H
+>> +#define S390_ARCH_H
+>> +
+>> +typedef struct PSW {
+>> +    uint64_t mask;
+>> +    uint64_t addr;
+>> +} __attribute__ ((aligned(8))) PSW;
+>> +_Static_assert(sizeof(struct PSW) == 16, "PSW size incorrect");
+>> +
+>> +/* Older PSW format used by LPSW instruction */
+>> +typedef struct PSWLegacy {
+>> +    uint32_t mask;
+>> +    uint32_t addr;
+>> +} __attribute__ ((aligned(8))) PSWLegacy;
+>> +_Static_assert(sizeof(struct PSWLegacy) == 8, "PSWLegacy size incorrect");
+>> +
+>> +/* s390 psw bit masks */
+>> +#define PSW_MASK_IOINT      0x0200000000000000ULL
+>> +#define PSW_MASK_WAIT       0x0002000000000000ULL
+>> +#define PSW_MASK_EAMODE     0x0000000100000000ULL
+>> +#define PSW_MASK_BAMODE     0x0000000080000000ULL
+>> +#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
+>> +
+>> +/* Low core mapping */
+>> +typedef struct LowCore {
+>> +    /* prefix area: defined by architecture */
+>> +    PSWLegacy       ipl_psw;                  /* 0x000 */
+> 
+> Maybe remove some white space between the variable type and name
+> everywhere in this struct?
+> 
+>> +    uint32_t        ccw1[2];                  /* 0x008 */
+>> +    uint32_t        ccw2[2];                  /* 0x010 */
+>> +    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
+>> +    uint32_t        ext_params;               /* 0x080 */
+>> +    uint16_t        cpu_addr;                 /* 0x084 */
+>> +    uint16_t        ext_int_code;             /* 0x086 */
+>> +    uint16_t        svc_ilen;                 /* 0x088 */
+>> +    uint16_t        svc_code;                 /* 0x08a */
+>> +    uint16_t        pgm_ilen;                 /* 0x08c */
+>> +    uint16_t        pgm_code;                 /* 0x08e */
+>> +    uint32_t        data_exc_code;            /* 0x090 */
+>> +    uint16_t        mon_class_num;            /* 0x094 */
+>> +    uint16_t        per_perc_atmid;           /* 0x096 */
+>> +    uint64_t        per_address;              /* 0x098 */
+>> +    uint8_t         exc_access_id;            /* 0x0a0 */
+>> +    uint8_t         per_access_id;            /* 0x0a1 */
+>> +    uint8_t         op_access_id;             /* 0x0a2 */
+>> +    uint8_t         ar_access_id;             /* 0x0a3 */
+>> +    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
+>> +    uint64_t        trans_exc_code;           /* 0x0a8 */
+>> +    uint64_t        monitor_code;             /* 0x0b0 */
+>> +    uint16_t        subchannel_id;            /* 0x0b8 */
+>> +    uint16_t        subchannel_nr;            /* 0x0ba */
+>> +    uint32_t        io_int_parm;              /* 0x0bc */
+>> +    uint32_t        io_int_word;              /* 0x0c0 */
+>> +    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
+>> +    uint32_t        stfl_fac_list;            /* 0x0c8 */
+>> +    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
+>> +    uint64_t        mcic;                     /* 0x0e8 */
+>> +    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
+>> +    uint32_t        external_damage_code;     /* 0x0f4 */
+>> +    uint64_t        failing_storage_address;  /* 0x0f8 */
+>> +    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
+>> +    uint64_t        per_breaking_event_addr;  /* 0x110 */
+>> +    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
+>> +    PSW             restart_old_psw;          /* 0x120 */
+>> +    PSW             external_old_psw;         /* 0x130 */
+>> +    PSW             svc_old_psw;              /* 0x140 */
+>> +    PSW             program_old_psw;          /* 0x150 */
+>> +    PSW             mcck_old_psw;             /* 0x160 */
+>> +    PSW             io_old_psw;               /* 0x170 */
+>> +    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
+>> +    PSW             restart_new_psw;          /* 0x1a0 */
+>> +    PSW             external_new_psw;         /* 0x1b0 */
+>> +    PSW             svc_new_psw;              /* 0x1c0 */
+>> +    PSW             program_new_psw;          /* 0x1d0 */
+>> +    PSW             mcck_new_psw;             /* 0x1e0 */
+>> +    PSW             io_new_psw;               /* 0x1f0 */
+> 
+> So far so good ...
+> 
+>> +    PSW             return_psw;               /* 0x200 */
+>> +    uint8_t         irb[64];                  /* 0x210 */
+>> +    uint64_t        sync_enter_timer;         /* 0x250 */
+>> +    uint64_t        async_enter_timer;        /* 0x258 */
+>> +    uint64_t        exit_timer;               /* 0x260 */
+>> +    uint64_t        last_update_timer;        /* 0x268 */
+>> +    uint64_t        user_timer;               /* 0x270 */
+>> +    uint64_t        system_timer;             /* 0x278 */
+>> +    uint64_t        last_update_clock;        /* 0x280 */
+>> +    uint64_t        steal_clock;              /* 0x288 */
+>> +    PSW             return_mcck_psw;          /* 0x290 */
+> 
+> ... but where do these entries between 0x200 and 0x2a0 come from? They
+> do not seem to be defined by the Principles of Operation?
+> 
 
-> On Mon, Mar 04, 2019 at 05:20:13PM +0100, Michal Privoznik wrote:
-> > On 3/4/19 3:24 PM, Daniel P. Berrang=C3=A9 wrote:
-> > > On Mon, Mar 04, 2019 at 03:16:41PM +0100, Igor Mammedov wrote:
-> > > > On Mon, 4 Mar 2019 12:39:08 +0000
-> > > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> > > >=20
-> > > > > On Mon, Mar 04, 2019 at 01:25:07PM +0100, Igor Mammedov wrote:
-> > > > > > On Mon, 04 Mar 2019 08:13:53 +0100
-> > > > > > Markus Armbruster <armbru@redhat.com> wrote:
-> > > > > > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-> > > > > > > > On Fri, Mar 01, 2019 at 06:33:28PM +0100, Igor Mammedov wro=
-te:
-> > > > > > > > > On Fri, 1 Mar 2019 15:49:47 +0000
-> > > > > > > > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> > > > > > > > > > On Fri, Mar 01, 2019 at 04:42:15PM +0100, Igor Mammedov=
- wrote:
-> > > > > > > > > > > The parameter allows to configure fake NUMA topology =
-where guest
-> > > > > > > > > > > VM simulates NUMA topology but not actually getting a=
- performance
-> > > > > > > > > > > benefits from it. The same or better results could be=
- achieved
-> > > > > > > > > > > using 'memdev' parameter. In light of that any VM tha=
-t uses NUMA
-> > > > > > > > > > > to get its benefits should use 'memdev' and to allow =
-transition
-> > > > > > > > > > > initial RAM to device based model, deprecate 'mem' pa=
-rameter as
-> > > > > > > > > > > its ad-hoc partitioning of initial RAM MemoryRegion c=
-an't be
-> > > > > > > > > > > translated to memdev based backend transparently to u=
-sers and in
-> > > > > > > > > > > compatible manner (migration wise).
-> > > > > > > > > > >=20
-> > > > > > > > > > > That will also allow to clean up a bit our numa code,=
- leaving only
-> > > > > > > > > > > 'memdev' impl. in place and several boards that use n=
-ode_mem
-> > > > > > > > > > > to generate FDT/ACPI description from it.
-> > > > > > > > > >=20
-> > > > > > > > > > Can you confirm that the  'mem' and 'memdev' parameters=
- to -numa
-> > > > > > > > > > are 100% live migration compatible in both directions ?=
-  Libvirt
-> > > > > > > > > > would need this to be the case in order to use the 'mem=
-dev' syntax
-> > > > > > > > > > instead.
-> > > > > > > > > Unfortunately they are not migration compatible in any di=
-rection,
-> > > > > > > > > if it where possible to translate them to each other I'd =
-alias 'mem'
-> > > > > > > > > to 'memdev' without deprecation. The former sends over on=
-ly one
-> > > > > > > > > MemoryRegion to target, while the later sends over severa=
-l (one per
-> > > > > > > > > memdev).
-> > > > > > > >=20
-> > > > > > > > If we can't migration from one to the other, then we can no=
-t deprecate
-> > > > > > > > the existing 'mem' syntax. Even if libvirt were to provide =
-a config
-> > > > > > > > option to let apps opt-in to the new syntax, we need to be =
-able to
-> > > > > > > > support live migration of existing running VMs indefinitely=
-. Effectively
-> > > > > > > > this means we need the to keep 'mem' support forever, or at=
- least such
-> > > > > > > > a long time that it effectively means forever.
-> > > > > > > >=20
-> > > > > > > > So I think this patch has to be dropped & replaced with one=
- that
-> > > > > > > > simply documents that memdev syntax is preferred.
-> > > > > > >=20
-> > > > > > > We have this habit of postulating absolutes like "can not dep=
-recate"
-> > > > > > > instead of engaging with the tradeoffs.  We need to kick it.
-> > > > > > >=20
-> > > > > > > So let's have an actual look at the tradeoffs.
-> > > > > > >=20
-> > > > > > > We don't actually "support live migration of existing running=
- VMs
-> > > > > > > indefinitely".
-> > > > > > >=20
-> > > > > > > We support live migration to any newer version of QEMU that s=
-till
-> > > > > > > supports the machine type.
-> > > > > > >=20
-> > > > > > > We support live migration to any older version of QEMU that a=
-lready
-> > > > > > > supports the machine type and all the devices the machine use=
-s.
-> > > > > > >=20
-> > > > > > > Aside: "support" is really an honest best effort here.  If yo=
-u rely on
-> > > > > > > it, use a downstream that puts in the (substantial!) QA work =
-real
-> > > > > > > support takes.
-> > > > > > >=20
-> > > > > > > Feature deprecation is not a contract to drop the feature aft=
-er two
-> > > > > > > releases, or even five.  It's a formal notice that users of t=
-he feature
-> > > > > > > should transition to its replacement in an orderly manner.
-> > > > > > >=20
-> > > > > > > If I understand Igor correctly, all users should transition a=
-way from
-> > > > > > > outdated NUMA configurations at least for new VMs in an order=
-ly manner.
-> > > > > > Yes, we can postpone removing options until there are machines =
-type
-> > > > > > versions that were capable to use it (unfortunate but probably
-> > > > > > unavoidable unless there is a migration trick to make transition
-> > > > > > transparent) but that should not stop us from disabling broken
-> > > > > > options on new machine types at least.
-> > > > > >=20
-> > > > > > This series can serve as formal notice with follow up disabling=
- of
-> > > > > > deprecated options for new machine types. (As Thomas noted, jus=
-t warnings
-> > > > > > do not work and users continue to use broken features regardles=
-s whether
-> > > > > > they are don't know about issues or aware of it [*])
-> > > > > >=20
-> > > > > > Hence suggested deprecation approach and enforced rejection of =
-legacy
-> > > > > > numa options for new machine types in 2 releases so users would=
- stop
-> > > > > > using them eventually.
-> > > > >=20
-> > > > > When we deprecate something, we need to have a way for apps to us=
-e the
-> > > > > new alternative approach *at the same time*.  So even if we only =
-want to
-> > > > > deprecate for new machine types, we still have to first solve the=
- problem
-> > > > > of how mgmt apps will introspect QEMU to learn which machine type=
-s expect
-> > > > > the new options.
-> > > > I'm not aware any mechanism to introspect machine type options (exi=
-sting
-> > > > or something being developed). Are/were there any ideas about it th=
-at were
-> > > > discussed in the past?
-> > > >=20
-> > > > Aside from developing a new mechanism what are alternative approach=
-es?
-> > > > I mean when we delete deprecated CLI option, how it's solved on lib=
-virt
-> > > > side currently?
-> > > >=20
-> > > > For example I don't see anything introspection related when we have=
- been
-> > > > removing deprecated options recently.
-> > >=20
-> > > Right, with other stuff we deprecate we've had a simpler time, as it
-> > > either didn't affect migration at all, or the new replacement stuff
-> > > was fully compatible with the migration data stream. IOW, libvirt
-> > > could unconditionally use the new feature as soon as it saw that it
-> > > exists in QEMU. We didn't have any machine type dependancy to deal
-> > > with before now.
-> >=20
-> > We couldn't have done that. How we would migrate from older qemu?
-> >=20
-> > Anyway, now that I look into this (esp. git log) I came accross:
-> >=20
-> > commit f309db1f4d51009bad0d32e12efc75530b66836b
-> > Author:     Michal Privoznik <mprivozn@redhat.com>
-> > AuthorDate: Thu Dec 18 12:36:48 2014 +0100
-> > Commit:     Michal Privoznik <mprivozn@redhat.com>
-> > CommitDate: Fri Dec 19 07:44:44 2014 +0100
-> >=20
-> >     qemu: Create memory-backend-{ram,file} iff needed
-> >=20
-> > Or this 7832fac84741d65e851dbdbfaf474785cbfdcf3c. We did try to generat=
-ed
-> > newer cmd line but then for various reasong (e.g. avoiding triggering a=
- qemu
-> > bug) we turned it off and make libvirt default to older (now deprecated=
-) cmd
-> > line.
-> >=20
-> > Frankly, I don't know how to proceed. Unless qemu is fixed to allow
-> > migration from deprecated to new cmd line (unlikely, if not impossible,
-> > right?) then I guess the only approach we can have is that:
-> >=20
-> > 1) whenever so called cold booting a new machine (fresh, brand new star=
-t of
-> > a new domain) libvirt would default to modern cmd line,
-> >=20
-> > 2) on migration, libvirt would record in the migration stream (or statu=
-s XML
-> > or wherever) that modern cmd line was generated and thus it'll make the
-> > destination generate modern cmd line too.
-> >=20
-> > This solution still suffers a couple of problems:
-> > a) migration to older libvirt will fail as older libvirt won't recogniz=
-e the
-> > flag set in 2) and therefore would default to deprecated cmd line
-> > b) migrating from one host to another won't modernize the cmd line
-> >=20
-> > But I guess we have to draw a line somewhere (if we are not willing to =
-write
-> > those migration patches).
->=20
-> Yeah supporting backwards migration is a non-optional requirement from at
-> least one of the mgmt apps using libvirt, so breaking the new to old case
-> is something we always aim to avoid.
-Aiming for support of=20
-"new QEMU + new machine type" =3D> "old QEMU + non-existing machine type"
-seems a bit difficult.
-Note old machine types will continue to work with old CLI.
-=20
+Taken from target/s390x/internal.h. I stopped at "/* System info area */". Now that I'm 
+looking at it, I'm not sue where these are coming from.... I will remove them in the next 
+version.
 
-> These incompabilities are reminding me why we haven't tied these kind of
-> changes to machine type versions in the past. New machine type !=3D new
-> libvirt, so we can't tie usage of a feature in livirt to a new machine
-> type.
->=20
-> I'm wondering exactly which cases libvirt will still use the "mem" option
-> in  as opposed to "memdev".  If none of the cases using "mem" actually
-> suffer from the ill-effects of "mem", then there's not a compelling reason
-> to stop using it. It can be discouraged in QEMU documentation but otherwi=
-se
-> left alone.
->=20
-> Regards,
-> Daniel
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
