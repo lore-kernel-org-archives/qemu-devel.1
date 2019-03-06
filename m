@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55336)
+Received: from eggs.gnu.org ([209.51.188.92]:55767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1W0s-000502-V5
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:51:11 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1W2T-0005wT-VJ
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:52:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1W0s-0003Wz-4s
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:51:10 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1W2T-0004Xn-AQ
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:52:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34458)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h1W2T-0004XL-3O
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:52:49 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20190301160929.19892-1-stefanha@redhat.com>
-	<bd5824cb-7adb-1e96-fbd2-eb666288c253@redhat.com>
-	<20190306101811.GJ22159@stefanha-x1.localdomain>
-Date: Wed, 06 Mar 2019 13:50:59 +0100
-In-Reply-To: <20190306101811.GJ22159@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Wed, 6 Mar 2019 10:18:11 +0000")
-Message-ID: <87sgw0yxn0.fsf@dusky.pond.sub.org>
+References: <20190305181602.9051-1-dgilbert@redhat.com>
+	<7f974735-1a97-cacc-2354-5f26bc0feda0@redhat.com>
+Date: Wed, 06 Mar 2019 13:52:41 +0100
+In-Reply-To: <7f974735-1a97-cacc-2354-5f26bc0feda0@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 6 Mar 2019 12:17:27
+	+0100")
+Message-ID: <87o96oyxk6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] file-posix: add drop-cache=on|off option
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/21] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Neil Skrypuch <neil@tembosocial.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com
 
-Stefan Hajnoczi <stefanha@gmail.com> writes:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> On Fri, Mar 01, 2019 at 10:30:07AM -0600, Eric Blake wrote:
->> On 3/1/19 10:09 AM, Stefan Hajnoczi wrote:
->> > Commit dd577a26ff03b6829721b1ffbbf9e7c411b72378 ("block/file-posix:
->> > implement bdrv_co_invalidate_cache() on Linux") introduced page cache
->> > invalidation so that cache.direct=off live migration is safe on Linux.
->> > 
->> > The invalidation takes a significant amount of time when the file is
->> > large and present in the page cache.  Normally this is not the case for
->> > cross-host live migration but it can happen when migrating between QEMU
->> > processes on the same host.
->> > 
->> > On same-host migration we don't need to invalidate pages for correctness
->> > anyway, so an option to skip page cache invalidation is useful.  I
->> > investigated optimizing invalidation and detecting same-host migration,
->> > but both are hard to achieve so a user-visible option will suffice.
->> > 
->> > Suggested-by: Neil Skrypuch <neil@tembosocial.com>
->> > Tested-by: Neil Skrypuch <neil@tembosocial.com>
->> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->> > Reviewed-by: Eric Blake <eblake@redhat.com>
->> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->> > ---
->> > v2:
->> >  * Remove outdated comment about libvirt feature detection [danpb]
->> 
->> Question - if we used qapi's 'if':COND to only declare the field on
->> platforms where we know at compile time that we can support it, would
->> that be enough for libvirt to introspect that if the field exists then
->> migration is safe, without having to rely on an query-qemu-features command?
+> On 3/5/19 7:15 PM, Dr. David Alan Gilbert (git) wrote:
+>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>=20
+>> The following changes since commit 0984a157c1c053394adbf64ed7de97f1aebe6=
+a2d:
+>>=20
+>>   Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' =
+into staging (2019-03-05 09:33:20 +0000)
+>>=20
+>> are available in the Git repository at:
+>>=20
+>>   git://github.com/dagrh/qemu.git tags/pull-migration-20190305a
+>>=20
+>> for you to fetch changes up to 3feabbb5fc5e3d5504c735a77ebd1d7fc1eabb9b:
+>>=20
+>>   qapi/migration.json: Remove a variable that doesn't exist in example (=
+2019-03-05 18:04:05 +0000)
+>>=20
+>> ----------------------------------------------------------------
+>> Migration pull 2019-03-05
+>>=20
+>>    a) 3 small fixes including the cancel problem
+>>      that caused the ahci migration test to fail
+>>      intermittently
+>>    b) Yury's ignore-shared feature
+>>    c) Juan's extra tests
+>>    d) Wei Wang's free page hinting
+>>    e) Some Colo fixes from Zhang Chen
+>>=20
+>> ----------------------------------------------------------------
+>> Dr. David Alan Gilbert (2):
+>>       migration: Fix cancel state
+>>       migration/rdma: Fix qemu_rdma_cleanup null check
+>>=20
+>> Juan Quintela (3):
+>>       tests: Add migration xbzrle test
+>>       migration: Create socket-address parameter
 >
-> Yes, although this raises another question:
+> Replying to cover for Peter scripts:
 >
-> The drop-cache implementation is not #ifdefed in file-posix.c.  If we
-> make the QMP schema conditional, should we also #ifdef the command-line
-> option in raw_runtime_opts[] to prevent QEMU from silently ignoring this
-> option?
+> In patch 10/21 Daniel said he'll respin.
 
-Silently ignoring user directives is generally a bad idea.  Possible
-exceptions include directives of a "$frobnicate if you can" kind.
+Just to make sure this sticks:
+
+NAK
+NACK
+NAcked-by: Markus Armbruster <armbru@redhat.com>
+
+;)
