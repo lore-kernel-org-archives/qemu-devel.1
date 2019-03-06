@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50826)
+Received: from eggs.gnu.org ([209.51.188.92]:51533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1VXj-0003QP-AL
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:21:05 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Vcq-0004dn-9Z
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1VXe-0000gj-Da
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:21:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49158)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1VXc-0000cx-SC
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:20:57 -0500
-Date: Wed, 6 Mar 2019 12:20:49 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190306122048.GE2727@work-vm>
-References: <20190303203345.2472-1-yuval.shaia@oracle.com>
-	<20190303203345.2472-5-yuval.shaia@oracle.com>
-	<20190306102218.GB7486@lap1>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Vcp-0003Xn-6B
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:26:20 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 6 Mar 2019 12:25:59 +0000
+Message-ID: <82ec6790-f366-3912-e85b-4908647d5c8d@virtuozzo.com>
+References: <20190301191545.8728-1-jsnow@redhat.com>
+	<20190301191545.8728-2-jsnow@redhat.com>
+In-Reply-To: <20190301191545.8728-2-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <59799916DD146548B5EFA4239732346A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190306102218.GB7486@lap1>
-Subject: Re: [Qemu-devel] [PATCH v4 4/9] {hmp,
- hw/pvrdma}: Expose device internals via monitor interface
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] block/dirty-bitmaps: add
+ inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,727 +26,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-* Yuval Shaia (yuval.shaia@oracle.com) wrote:
-> On Sun, Mar 03, 2019 at 10:33:40PM +0200, Yuval Shaia wrote:
-> > Allow interrogating device internals through HMP interface.
-> > The exposed indicators can be used for troubleshooting by developers or
-> > sysadmin.
-> > There is no need to expose these attributes to a management system (e.x.
-> > libvirt) because (1) most of them are not "device-management' related
-> > info and (2) there is no guarantee the interface is stable.
-> > 
-> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > ---
-> >  hmp-commands-info.hx       | 14 ++++++++
-> >  hmp.c                      | 27 +++++++++++++++
-> >  hmp.h                      |  1 +
-> >  hw/rdma/Makefile.objs      |  2 +-
-> >  hw/rdma/rdma_backend.c     | 70 +++++++++++++++++++++++++++++---------
-> >  hw/rdma/rdma_hmp.c         | 30 ++++++++++++++++
-> >  hw/rdma/rdma_rm.c          | 60 ++++++++++++++++++++++++++++++++
-> >  hw/rdma/rdma_rm.h          |  1 +
-> >  hw/rdma/rdma_rm_defs.h     | 27 ++++++++++++++-
-> >  hw/rdma/vmw/pvrdma.h       |  5 +++
-> >  hw/rdma/vmw/pvrdma_main.c  | 21 ++++++++++++
-> >  include/hw/rdma/rdma_hmp.h | 40 ++++++++++++++++++++++
-> >  12 files changed, 279 insertions(+), 19 deletions(-)
-> >  create mode 100644 hw/rdma/rdma_hmp.c
-> >  create mode 100644 include/hw/rdma/rdma_hmp.h
-> > 
-> > diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> > index cbee8b944d..c59444c461 100644
-> > --- a/hmp-commands-info.hx
-> > +++ b/hmp-commands-info.hx
-> > @@ -202,6 +202,20 @@ STEXI
-> >  @item info pic
-> >  @findex info pic
-> >  Show PIC state.
-> > +ETEXI
-> > +
-> > +    {
-> > +        .name       = "rdma",
-> > +        .args_type  = "",
-> > +        .params     = "",
-> > +        .help       = "show RDMA state",
-> > +        .cmd        = hmp_info_rdma,
-> > +    },
-> > +
-> > +STEXI
-> > +@item info rdma
-> > +@findex info rdma
-> > +Show RDMA state.
-> >  ETEXI
-> >  
-> >      {
-> > diff --git a/hmp.c b/hmp.c
-> > index 1e006eeb49..68511b2441 100644
-> > --- a/hmp.c
-> > +++ b/hmp.c
-> > @@ -51,6 +51,7 @@
-> >  #include "qemu/error-report.h"
-> >  #include "exec/ramlist.h"
-> >  #include "hw/intc/intc.h"
-> > +#include "hw/rdma/rdma_hmp.h"
-> >  #include "migration/snapshot.h"
-> >  #include "migration/misc.h"
-> >  
-> > @@ -968,6 +969,32 @@ void hmp_info_pic(Monitor *mon, const QDict *qdict)
-> >                                     hmp_info_pic_foreach, mon);
-> >  }
-> >  
-> > +static int hmp_info_rdma_foreach(Object *obj, void *opaque)
-> > +{
-> > +    RdmaStatsProvider *rdma;
-> > +    RdmaStatsProviderClass *k;
-> > +    Monitor *mon = opaque;
-> > +
-> > +    if (object_dynamic_cast(obj, TYPE_RDMA_STATS_PROVIDER)) {
-> > +        rdma = RDMA_STATS_PROVIDER(obj);
-> > +        k = RDMA_STATS_PROVIDER_GET_CLASS(obj);
-> > +        if (k->print_statistics) {
-> > +            k->print_statistics(mon, rdma);
-> > +        } else {
-> > +            monitor_printf(mon, "RDMA statistics not available for %s.\n",
-> > +                           object_get_typename(obj));
-> > +        }
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +void hmp_info_rdma(Monitor *mon, const QDict *qdict)
-> > +{
-> > +    object_child_foreach_recursive(object_get_root(),
-> > +                                   hmp_info_rdma_foreach, mon);
-> > +}
-> > +
-> 
-> Hi Markus and David,
-> Is this implementation is acceptable by you?
-
-I think from the HMP side I'm fine, so:
-
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-I would say that there's really two parts to this patch, all the places
-you change your code to gather the stats, and the separate pieces that
-wire it into HMP;  if you had to repost for another reason I'd
-split the patch like that.
-
-Dave
-
-> Thanks,
-> Yuval
-> 
-> 
-> >  void hmp_info_pci(Monitor *mon, const QDict *qdict)
-> >  {
-> >      PciInfoList *info_list, *info;
-> > diff --git a/hmp.h b/hmp.h
-> > index 5f1addcca2..666949afc3 100644
-> > --- a/hmp.h
-> > +++ b/hmp.h
-> > @@ -36,6 +36,7 @@ void hmp_info_spice(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_balloon(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_irq(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_pic(Monitor *mon, const QDict *qdict);
-> > +void hmp_info_rdma(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_pci(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_block_jobs(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_tpm(Monitor *mon, const QDict *qdict);
-> > diff --git a/hw/rdma/Makefile.objs b/hw/rdma/Makefile.objs
-> > index bd36cbf51c..dd59faff51 100644
-> > --- a/hw/rdma/Makefile.objs
-> > +++ b/hw/rdma/Makefile.objs
-> > @@ -1,5 +1,5 @@
-> >  ifeq ($(CONFIG_PVRDMA),y)
-> > -obj-$(CONFIG_PCI) += rdma_utils.o rdma_backend.o rdma_rm.o
-> > +obj-$(CONFIG_PCI) += rdma_utils.o rdma_backend.o rdma_rm.o rdma_hmp.o
-> >  obj-$(CONFIG_PCI) += vmw/pvrdma_dev_ring.o vmw/pvrdma_cmd.o \
-> >                       vmw/pvrdma_qp_ops.o vmw/pvrdma_main.o
-> >  endif
-> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> > index 9679b842d1..bc2fefcf93 100644
-> > --- a/hw/rdma/rdma_backend.c
-> > +++ b/hw/rdma/rdma_backend.c
-> > @@ -64,9 +64,9 @@ static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
-> >      comp_handler(ctx, &wc);
-> >  }
-> >  
-> > -static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
-> > +static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
-> >  {
-> > -    int i, ne;
-> > +    int i, ne, total_ne = 0;
-> >      BackendCtx *bctx;
-> >      struct ibv_wc wc[2];
-> >  
-> > @@ -89,12 +89,18 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
-> >              rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
-> >              g_free(bctx);
-> >          }
-> > +        total_ne += ne;
-> >      } while (ne > 0);
-> > +    atomic_sub(&rdma_dev_res->stats.missing_cqe, total_ne);
-> >      qemu_mutex_unlock(&rdma_dev_res->lock);
-> >  
-> >      if (ne < 0) {
-> >          rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
-> >      }
-> > +
-> > +    rdma_dev_res->stats.completions += total_ne;
-> > +
-> > +    return total_ne;
-> >  }
-> >  
-> >  static void *comp_handler_thread(void *arg)
-> > @@ -122,6 +128,9 @@ static void *comp_handler_thread(void *arg)
-> >      while (backend_dev->comp_thread.run) {
-> >          do {
-> >              rc = qemu_poll_ns(pfds, 1, THR_POLL_TO * (int64_t)SCALE_MS);
-> > +            if (!rc) {
-> > +                backend_dev->rdma_dev_res->stats.poll_cq_ppoll_to++;
-> > +            }
-> >          } while (!rc && backend_dev->comp_thread.run);
-> >  
-> >          if (backend_dev->comp_thread.run) {
-> > @@ -138,6 +147,7 @@ static void *comp_handler_thread(void *arg)
-> >                                    errno);
-> >              }
-> >  
-> > +            backend_dev->rdma_dev_res->stats.poll_cq_from_bk++;
-> >              rdma_poll_cq(backend_dev->rdma_dev_res, ev_cq);
-> >  
-> >              ibv_ack_cq_events(ev_cq, 1);
-> > @@ -271,7 +281,13 @@ int rdma_backend_query_port(RdmaBackendDev *backend_dev,
-> >  
-> >  void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
-> >  {
-> > -    rdma_poll_cq(rdma_dev_res, cq->ibcq);
-> > +    int polled;
-> > +
-> > +    rdma_dev_res->stats.poll_cq_from_guest++;
-> > +    polled = rdma_poll_cq(rdma_dev_res, cq->ibcq);
-> > +    if (!polled) {
-> > +        rdma_dev_res->stats.poll_cq_from_guest_empty++;
-> > +    }
-> >  }
-> >  
-> >  static GHashTable *ah_hash;
-> > @@ -333,7 +349,7 @@ static void ah_cache_init(void)
-> >  
-> >  static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
-> >                                  struct ibv_sge *dsge, struct ibv_sge *ssge,
-> > -                                uint8_t num_sge)
-> > +                                uint8_t num_sge, uint64_t *total_length)
-> >  {
-> >      RdmaRmMR *mr;
-> >      int ssge_idx;
-> > @@ -349,6 +365,8 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
-> >          dsge->length = ssge[ssge_idx].length;
-> >          dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
-> >  
-> > +        *total_length += dsge->length;
-> > +
-> >          dsge++;
-> >      }
-> >  
-> > @@ -445,8 +463,10 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-> >              rc = mad_send(backend_dev, sgid_idx, sgid, sge, num_sge);
-> >              if (rc) {
-> >                  complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
-> > +                backend_dev->rdma_dev_res->stats.mad_tx_err++;
-> >              } else {
-> >                  complete_work(IBV_WC_SUCCESS, 0, ctx);
-> > +                backend_dev->rdma_dev_res->stats.mad_tx++;
-> >              }
-> >          }
-> >          return;
-> > @@ -458,20 +478,21 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-> >      rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
-> >      if (unlikely(rc)) {
-> >          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-> > -        goto out_free_bctx;
-> > +        goto err_free_bctx;
-> >      }
-> >  
-> > -    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge);
-> > +    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-> > +                              &backend_dev->rdma_dev_res->stats.tx_len);
-> >      if (rc) {
-> >          complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-> > -        goto out_dealloc_cqe_ctx;
-> > +        goto err_dealloc_cqe_ctx;
-> >      }
-> >  
-> >      if (qp_type == IBV_QPT_UD) {
-> >          wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd, sgid_idx, dgid);
-> >          if (!wr.wr.ud.ah) {
-> >              complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-> > -            goto out_dealloc_cqe_ctx;
-> > +            goto err_dealloc_cqe_ctx;
-> >          }
-> >          wr.wr.ud.remote_qpn = dqpn;
-> >          wr.wr.ud.remote_qkey = dqkey;
-> > @@ -488,15 +509,19 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-> >          rdma_error_report("ibv_post_send fail, qpn=0x%x, rc=%d, errno=%d",
-> >                            qp->ibqp->qp_num, rc, errno);
-> >          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-> > -        goto out_dealloc_cqe_ctx;
-> > +        goto err_dealloc_cqe_ctx;
-> >      }
-> >  
-> > +    atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
-> > +    backend_dev->rdma_dev_res->stats.tx++;
-> > +
-> >      return;
-> >  
-> > -out_dealloc_cqe_ctx:
-> > +err_dealloc_cqe_ctx:
-> > +    backend_dev->rdma_dev_res->stats.tx_err++;
-> >      rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
-> >  
-> > -out_free_bctx:
-> > +err_free_bctx:
-> >      g_free(bctx);
-> >  }
-> >  
-> > @@ -554,6 +579,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-> >              rc = save_mad_recv_buffer(backend_dev, sge, num_sge, ctx);
-> >              if (rc) {
-> >                  complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-> > +                rdma_dev_res->stats.mad_rx_bufs_err++;
-> > +            } else {
-> > +                rdma_dev_res->stats.mad_rx_bufs++;
-> >              }
-> >          }
-> >          return;
-> > @@ -565,13 +593,14 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-> >      rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
-> >      if (unlikely(rc)) {
-> >          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-> > -        goto out_free_bctx;
-> > +        goto err_free_bctx;
-> >      }
-> >  
-> > -    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge);
-> > +    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge,
-> > +                              &backend_dev->rdma_dev_res->stats.rx_bufs_len);
-> >      if (rc) {
-> >          complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-> > -        goto out_dealloc_cqe_ctx;
-> > +        goto err_dealloc_cqe_ctx;
-> >      }
-> >  
-> >      wr.num_sge = num_sge;
-> > @@ -582,15 +611,19 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-> >          rdma_error_report("ibv_post_recv fail, qpn=0x%x, rc=%d, errno=%d",
-> >                            qp->ibqp->qp_num, rc, errno);
-> >          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-> > -        goto out_dealloc_cqe_ctx;
-> > +        goto err_dealloc_cqe_ctx;
-> >      }
-> >  
-> > +    atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
-> > +    rdma_dev_res->stats.rx_bufs++;
-> > +
-> >      return;
-> >  
-> > -out_dealloc_cqe_ctx:
-> > +err_dealloc_cqe_ctx:
-> > +    backend_dev->rdma_dev_res->stats.rx_bufs_err++;
-> >      rdma_rm_dealloc_cqe_ctx(rdma_dev_res, bctx_id);
-> >  
-> > -out_free_bctx:
-> > +err_free_bctx:
-> >      g_free(bctx);
-> >  }
-> >  
-> > @@ -929,12 +962,14 @@ static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
-> >      bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
-> >      if (unlikely(!bctx)) {
-> >          rdma_error_report("No matching ctx for req %ld", cqe_ctx_id);
-> > +        backend_dev->rdma_dev_res->stats.mad_rx_err++;
-> >          return;
-> >      }
-> >  
-> >      mad = rdma_pci_dma_map(backend_dev->dev, bctx->sge.addr,
-> >                             bctx->sge.length);
-> >      if (!mad || bctx->sge.length < msg->umad_len + MAD_HDR_SIZE) {
-> > +        backend_dev->rdma_dev_res->stats.mad_rx_err++;
-> >          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_MAD_BUFF,
-> >                        bctx->up_ctx);
-> >      } else {
-> > @@ -949,6 +984,7 @@ static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
-> >          wc.byte_len = msg->umad_len;
-> >          wc.status = IBV_WC_SUCCESS;
-> >          wc.wc_flags = IBV_WC_GRH;
-> > +        backend_dev->rdma_dev_res->stats.mad_rx++;
-> >          comp_handler(bctx->up_ctx, &wc);
-> >      }
-> >  
-> > diff --git a/hw/rdma/rdma_hmp.c b/hw/rdma/rdma_hmp.c
-> > new file mode 100644
-> > index 0000000000..c5814473c5
-> > --- /dev/null
-> > +++ b/hw/rdma/rdma_hmp.c
-> > @@ -0,0 +1,30 @@
-> > +/*
-> > + * RDMA device: Human Monitor interface
-> > + *
-> > + * Copyright (C) 2018 Oracle
-> > + * Copyright (C) 2018 Red Hat Inc
-> > + *
-> > + * Authors:
-> > + *     Yuval Shaia <yuval.shaia@oracle.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > + * See the COPYING file in the top-level directory.
-> > + *
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "hw/rdma/rdma_hmp.h"
-> > +#include "qemu/module.h"
-> > +
-> > +static const TypeInfo rdma_hmp_info = {
-> > +    .name = TYPE_RDMA_STATS_PROVIDER,
-> > +    .parent = TYPE_INTERFACE,
-> > +    .class_size = sizeof(RdmaStatsProviderClass),
-> > +};
-> > +
-> > +static void rdma_hmp_register_types(void)
-> > +{
-> > +    type_register_static(&rdma_hmp_info);
-> > +}
-> > +
-> > +type_init(rdma_hmp_register_types)
-> > diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> > index 14580ca379..e019de1a14 100644
-> > --- a/hw/rdma/rdma_rm.c
-> > +++ b/hw/rdma/rdma_rm.c
-> > @@ -16,6 +16,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qapi/error.h"
-> >  #include "cpu.h"
-> > +#include "monitor/monitor.h"
-> >  
-> >  #include "trace.h"
-> >  #include "rdma_utils.h"
-> > @@ -26,6 +27,58 @@
-> >  #define PG_DIR_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
-> >  #define PG_TBL_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
-> >  
-> > +void rdma_dump_device_counters(Monitor *mon, RdmaDeviceResources *dev_res)
-> > +{
-> > +    monitor_printf(mon, "\ttx               : %" PRId64 "\n",
-> > +                   dev_res->stats.tx);
-> > +    monitor_printf(mon, "\ttx_len           : %" PRId64 "\n",
-> > +                   dev_res->stats.tx_len);
-> > +    monitor_printf(mon, "\ttx_err           : %" PRId64 "\n",
-> > +                   dev_res->stats.tx_err);
-> > +    monitor_printf(mon, "\trx_bufs          : %" PRId64 "\n",
-> > +                   dev_res->stats.rx_bufs);
-> > +    monitor_printf(mon, "\trx_bufs_len      : %" PRId64 "\n",
-> > +                   dev_res->stats.rx_bufs_len);
-> > +    monitor_printf(mon, "\trx_bufs_err      : %" PRId64 "\n",
-> > +                   dev_res->stats.rx_bufs_err);
-> > +    monitor_printf(mon, "\tcomps            : %" PRId64 "\n",
-> > +                   dev_res->stats.completions);
-> > +    monitor_printf(mon, "\tmissing_comps    : %" PRId32 "\n",
-> > +                   dev_res->stats.missing_cqe);
-> > +    monitor_printf(mon, "\tpoll_cq (bk)     : %" PRId64 "\n",
-> > +                   dev_res->stats.poll_cq_from_bk);
-> > +    monitor_printf(mon, "\tpoll_cq_ppoll_to : %" PRId64 "\n",
-> > +                   dev_res->stats.poll_cq_ppoll_to);
-> > +    monitor_printf(mon, "\tpoll_cq (fe)     : %" PRId64 "\n",
-> > +                   dev_res->stats.poll_cq_from_guest);
-> > +    monitor_printf(mon, "\tpoll_cq_empty    : %" PRId64 "\n",
-> > +                   dev_res->stats.poll_cq_from_guest_empty);
-> > +    monitor_printf(mon, "\tmad_tx           : %" PRId64 "\n",
-> > +                   dev_res->stats.mad_tx);
-> > +    monitor_printf(mon, "\tmad_tx_err       : %" PRId64 "\n",
-> > +                   dev_res->stats.mad_tx_err);
-> > +    monitor_printf(mon, "\tmad_rx           : %" PRId64 "\n",
-> > +                   dev_res->stats.mad_rx);
-> > +    monitor_printf(mon, "\tmad_rx_err       : %" PRId64 "\n",
-> > +                   dev_res->stats.mad_rx_err);
-> > +    monitor_printf(mon, "\tmad_rx_bufs      : %" PRId64 "\n",
-> > +                   dev_res->stats.mad_rx_bufs);
-> > +    monitor_printf(mon, "\tmad_rx_bufs_err  : %" PRId64 "\n",
-> > +                   dev_res->stats.mad_rx_bufs_err);
-> > +    monitor_printf(mon, "\tPDs              : %" PRId32 "\n",
-> > +                   dev_res->pd_tbl.used);
-> > +    monitor_printf(mon, "\tMRs              : %" PRId32 "\n",
-> > +                   dev_res->mr_tbl.used);
-> > +    monitor_printf(mon, "\tUCs              : %" PRId32 "\n",
-> > +                   dev_res->uc_tbl.used);
-> > +    monitor_printf(mon, "\tQPs              : %" PRId32 "\n",
-> > +                   dev_res->qp_tbl.used);
-> > +    monitor_printf(mon, "\tCQs              : %" PRId32 "\n",
-> > +                   dev_res->cq_tbl.used);
-> > +    monitor_printf(mon, "\tCEQ_CTXs         : %" PRId32 "\n",
-> > +                   dev_res->cqe_ctx_tbl.used);
-> > +}
-> > +
-> >  static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
-> >                                  uint32_t tbl_sz, uint32_t res_sz)
-> >  {
-> > @@ -37,6 +90,7 @@ static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
-> >      tbl->bitmap = bitmap_new(tbl_sz);
-> >      tbl->tbl_sz = tbl_sz;
-> >      tbl->res_sz = res_sz;
-> > +    tbl->used = 0;
-> >      qemu_mutex_init(&tbl->lock);
-> >  }
-> >  
-> > @@ -76,6 +130,8 @@ static inline void *rdma_res_tbl_alloc(RdmaRmResTbl *tbl, uint32_t *handle)
-> >  
-> >      set_bit(*handle, tbl->bitmap);
-> >  
-> > +    tbl->used++;
-> > +
-> >      qemu_mutex_unlock(&tbl->lock);
-> >  
-> >      memset(tbl->tbl + *handle * tbl->res_sz, 0, tbl->res_sz);
-> > @@ -93,6 +149,7 @@ static inline void rdma_res_tbl_dealloc(RdmaRmResTbl *tbl, uint32_t handle)
-> >  
-> >      if (handle < tbl->tbl_sz) {
-> >          clear_bit(handle, tbl->bitmap);
-> > +        tbl->used--;
-> >      }
-> >  
-> >      qemu_mutex_unlock(&tbl->lock);
-> > @@ -620,6 +677,9 @@ int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
-> >  
-> >      qemu_mutex_init(&dev_res->lock);
-> >  
-> > +    memset(&dev_res->stats, 0, sizeof(dev_res->stats));
-> > +    atomic_set(&dev_res->stats.missing_cqe, 0);
-> > +
-> >      return 0;
-> >  }
-> >  
-> > diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
-> > index 9ec87d2667..a527d306f6 100644
-> > --- a/hw/rdma/rdma_rm.h
-> > +++ b/hw/rdma/rdma_rm.h
-> > @@ -20,6 +20,7 @@
-> >  #include "rdma_backend_defs.h"
-> >  #include "rdma_rm_defs.h"
-> >  
-> > +void rdma_dump_device_counters(Monitor *mon, RdmaDeviceResources *dev_res);
-> >  int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
-> >                   Error **errp);
-> >  void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-> > diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-> > index f0ee1f3072..4b8d704cfe 100644
-> > --- a/hw/rdma/rdma_rm_defs.h
-> > +++ b/hw/rdma/rdma_rm_defs.h
-> > @@ -34,7 +34,9 @@
-> >  #define MAX_QP_INIT_RD_ATOM   16
-> >  #define MAX_AH                64
-> >  
-> > -#define MAX_RM_TBL_NAME 16
-> > +#define MAX_RM_TBL_NAME             16
-> > +#define MAX_CONSEQ_EMPTY_POLL_CQ    4096 /* considered as error above this */
-> > +
-> >  typedef struct RdmaRmResTbl {
-> >      char name[MAX_RM_TBL_NAME];
-> >      QemuMutex lock;
-> > @@ -42,6 +44,7 @@ typedef struct RdmaRmResTbl {
-> >      size_t tbl_sz;
-> >      size_t res_sz;
-> >      void *tbl;
-> > +    uint32_t used; /* number of used entries in the table */
-> >  } RdmaRmResTbl;
-> >  
-> >  typedef struct RdmaRmPD {
-> > @@ -96,6 +99,27 @@ typedef struct RdmaRmPort {
-> >      enum ibv_port_state state;
-> >  } RdmaRmPort;
-> >  
-> > +typedef struct RdmaRmStats {
-> > +    uint64_t tx;
-> > +    uint64_t tx_len;
-> > +    uint64_t tx_err;
-> > +    uint64_t rx_bufs;
-> > +    uint64_t rx_bufs_len;
-> > +    uint64_t rx_bufs_err;
-> > +    uint64_t completions;
-> > +    uint64_t mad_tx;
-> > +    uint64_t mad_tx_err;
-> > +    uint64_t mad_rx;
-> > +    uint64_t mad_rx_err;
-> > +    uint64_t mad_rx_bufs;
-> > +    uint64_t mad_rx_bufs_err;
-> > +    uint64_t poll_cq_from_bk;
-> > +    uint64_t poll_cq_from_guest;
-> > +    uint64_t poll_cq_from_guest_empty;
-> > +    uint64_t poll_cq_ppoll_to;
-> > +    uint32_t missing_cqe;
-> > +} RdmaRmStats;
-> > +
-> >  typedef struct RdmaDeviceResources {
-> >      RdmaRmPort port;
-> >      RdmaRmResTbl pd_tbl;
-> > @@ -106,6 +130,7 @@ typedef struct RdmaDeviceResources {
-> >      RdmaRmResTbl cqe_ctx_tbl;
-> >      GHashTable *qp_hash; /* Keeps mapping between real and emulated */
-> >      QemuMutex lock;
-> > +    RdmaRmStats stats;
-> >  } RdmaDeviceResources;
-> >  
-> >  #endif
-> > diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-> > index 0879224957..167706ec2c 100644
-> > --- a/hw/rdma/vmw/pvrdma.h
-> > +++ b/hw/rdma/vmw/pvrdma.h
-> > @@ -70,6 +70,10 @@ typedef struct DSRInfo {
-> >      PvrdmaRing cq;
-> >  } DSRInfo;
-> >  
-> > +typedef struct PVRDMADevStats {
-> > +    uint64_t commands;
-> > +} PVRDMADevStats;
-> > +
-> >  typedef struct PVRDMADev {
-> >      PCIDevice parent_obj;
-> >      MemoryRegion msix;
-> > @@ -89,6 +93,7 @@ typedef struct PVRDMADev {
-> >      CharBackend mad_chr;
-> >      VMXNET3State *func0;
-> >      Notifier shutdown_notifier;
-> > +    PVRDMADevStats stats;
-> >  } PVRDMADev;
-> >  #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
-> >  
-> > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> > index b6061f4b6e..659331ac93 100644
-> > --- a/hw/rdma/vmw/pvrdma_main.c
-> > +++ b/hw/rdma/vmw/pvrdma_main.c
-> > @@ -25,6 +25,8 @@
-> >  #include "cpu.h"
-> >  #include "trace.h"
-> >  #include "sysemu/sysemu.h"
-> > +#include "monitor/monitor.h"
-> > +#include "hw/rdma/rdma_hmp.h"
-> >  
-> >  #include "../rdma_rm.h"
-> >  #include "../rdma_backend.h"
-> > @@ -55,6 +57,18 @@ static Property pvrdma_dev_properties[] = {
-> >      DEFINE_PROP_END_OF_LIST(),
-> >  };
-> >  
-> > +static void pvrdma_print_statistics(Monitor *mon, RdmaStatsProvider *obj)
-> > +{
-> > +    PVRDMADev *dev = PVRDMA_DEV(obj);
-> > +    PCIDevice *pdev = PCI_DEVICE(dev);
-> > +
-> > +    monitor_printf(mon, "%s, %x.%x\n", pdev->name, PCI_SLOT(pdev->devfn),
-> > +                   PCI_FUNC(pdev->devfn));
-> > +    monitor_printf(mon, "\tcommands         : %" PRId64 "\n",
-> > +                   dev->stats.commands);
-> > +    rdma_dump_device_counters(mon, &dev->rdma_dev_res);
-> > +}
-> > +
-> >  static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
-> >                            void *ring_state)
-> >  {
-> > @@ -394,6 +408,7 @@ static void pvrdma_regs_write(void *opaque, hwaddr addr, uint64_t val,
-> >          if (val == 0) {
-> >              trace_pvrdma_regs_write(addr, val, "REQUEST", "");
-> >              pvrdma_exec_cmd(dev);
-> > +            dev->stats.commands++;
-> >          }
-> >          break;
-> >      default:
-> > @@ -612,6 +627,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-> >          goto out;
-> >      }
-> >  
-> > +    memset(&dev->stats, 0, sizeof(dev->stats));
-> > +
-> >      dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
-> >      qemu_register_shutdown_notifier(&dev->shutdown_notifier);
-> >  
-> > @@ -631,6 +648,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
-> >  {
-> >      DeviceClass *dc = DEVICE_CLASS(klass);
-> >      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> > +    RdmaStatsProviderClass *ir = RDMA_STATS_PROVIDER_CLASS(klass);
-> >  
-> >      k->realize = pvrdma_realize;
-> >      k->exit = pvrdma_exit;
-> > @@ -642,6 +660,8 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
-> >      dc->desc = "RDMA Device";
-> >      dc->props = pvrdma_dev_properties;
-> >      set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-> > +
-> > +    ir->print_statistics = pvrdma_print_statistics;
-> >  }
-> >  
-> >  static const TypeInfo pvrdma_info = {
-> > @@ -651,6 +671,7 @@ static const TypeInfo pvrdma_info = {
-> >      .class_init = pvrdma_class_init,
-> >      .interfaces = (InterfaceInfo[]) {
-> >          { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-> > +        { TYPE_RDMA_STATS_PROVIDER },
-> >          { }
-> >      }
-> >  };
-> > diff --git a/include/hw/rdma/rdma_hmp.h b/include/hw/rdma/rdma_hmp.h
-> > new file mode 100644
-> > index 0000000000..dd23f2bc84
-> > --- /dev/null
-> > +++ b/include/hw/rdma/rdma_hmp.h
-> > @@ -0,0 +1,40 @@
-> > +/*
-> > + * RDMA device: Human Monitor interface
-> > + *
-> > + * Copyright (C) 2019 Oracle
-> > + * Copyright (C) 2019 Red Hat Inc
-> > + *
-> > + * Authors:
-> > + *     Yuval Shaia <yuval.shaia@oracle.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > + * See the COPYING file in the top-level directory.
-> > + *
-> > + */
-> > +
-> > +#ifndef RDMA_HMP_H
-> > +#define RDMA_HMP_H
-> > +
-> > +#include "qom/object.h"
-> > +
-> > +#define TYPE_RDMA_STATS_PROVIDER "rdma"
-> > +
-> > +#define RDMA_STATS_PROVIDER_CLASS(klass) \
-> > +    OBJECT_CLASS_CHECK(RdmaStatsProviderClass, (klass), \
-> > +                       TYPE_RDMA_STATS_PROVIDER)
-> > +#define RDMA_STATS_PROVIDER_GET_CLASS(obj) \
-> > +    OBJECT_GET_CLASS(RdmaStatsProviderClass, (obj), \
-> > +                     TYPE_RDMA_STATS_PROVIDER)
-> > +#define RDMA_STATS_PROVIDER(obj) \
-> > +    INTERFACE_CHECK(RdmaStatsProvider, (obj), \
-> > +                    TYPE_RDMA_STATS_PROVIDER)
-> > +
-> > +typedef struct RdmaStatsProvider RdmaStatsProvider;
-> > +
-> > +typedef struct RdmaStatsProviderClass {
-> > +    InterfaceClass parent;
-> > +
-> > +    void (*print_statistics)(Monitor *mon, RdmaStatsProvider *obj);
-> > +} RdmaStatsProviderClass;
-> > +
-> > +#endif
-> > -- 
-> > 2.17.2
-> > 
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+MDEuMDMuMjAxOSAyMjoxNSwgSm9obiBTbm93IHdyb3RlOg0KPiBBZGQgYW4gaW5jb25zaXN0ZW50
+IGJpdCB0byBkaXJ0eS1iaXRtYXBzIHRoYXQgYWxsb3dzIHVzIHRvIHJlcG9ydCBhIGJpdG1hcCBh
+cw0KPiBwZXJzaXN0ZW50IGJ1dCBwb3RlbnRpYWxseSBpbmNvbnNpc3RlbnQsIGkuZS4gaWYgd2Ug
+ZmluZCBiaXRtYXBzIG9uIGEgcWNvdzINCj4gdGhhdCBoYXZlIGJlZW4gbWFya2VkIGFzICJpbiB1
+c2UiLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0K
+PiAtLS0NCj4gICBxYXBpL2Jsb2NrLWNvcmUuanNvbiAgICAgICAgIHwgMTMgKysrKysrKysrLS0t
+LQ0KPiAgIGluY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmggfCAgMiArKw0KPiAgIGJsb2NrL2Rp
+cnR5LWJpdG1hcC5jICAgICAgICAgfCAxOSArKysrKysrKysrKysrKysrKysrDQo+ICAgMyBmaWxl
+cyBjaGFuZ2VkLCAzMCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAt
+LWdpdCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gaW5k
+ZXggNmU1NDM1OTRiMy4uZTYzOWVmNmQxYyAxMDA2NDQNCj4gLS0tIGEvcWFwaS9ibG9jay1jb3Jl
+Lmpzb24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTQ2NywxNSArNDY3LDIw
+IEBADQo+ICAgIyAgICAgICAgYW5kIGNhbm5vdCBiZSBtb2RpZmllZCB2aWEgUU1QIG9yIHVzZWQg
+YnkgYW5vdGhlciBvcGVyYXRpb24uDQo+ICAgIyAgICAgICAgUmVwbGFjZXMgYGxvY2tlZGAgYW5k
+IGBmcm96ZW5gIHN0YXR1c2VzLiAoc2luY2UgNC4wKQ0KPiAgICMNCj4gLSMgQHBlcnNpc3RlbnQ6
+IHRydWUgaWYgdGhlIGJpdG1hcCB3aWxsIGV2ZW50dWFsbHkgYmUgZmx1c2hlZCB0byBwZXJzaXN0
+ZW50DQo+IC0jICAgICAgICAgICAgICBzdG9yYWdlIChzaW5jZSA0LjApDQo+ICsjIEBwZXJzaXN0
+ZW50OiB0cnVlIGlmIHRoZSBiaXRtYXAgd2FzIHN0b3JlZCBvbiBkaXNrLCBpcyBzY2hlZHVsZWQg
+dG8gYmUgc3RvcmVkDQo+ICsjICAgICAgICAgICAgICBvbiBkaXNrLCBvciBib3RoLiAoc2luY2Ug
+NC4wKQ0KPiArIw0KPiArIyBAaW5jb25zaXN0ZW50OiB0cnVlIGlmIHRoaXMgaXMgYSBwZXJzaXN0
+ZW50IGJpdG1hcCB0aGF0IHdhcyBpbXByb3Blcmx5DQo+ICsjICAgICAgICAgICAgICAgIHN0b3Jl
+ZC4gSW1wbGllcyBAcGVyc2lzdGVudCB0byBiZSB0cnVlOyBAcmVjb3JkaW5nIGFuZA0KPiArIyAg
+ICAgICAgICAgICAgICBAYnVzeSB0byBiZSBmYWxzZS4gVGhpcyBiaXRtYXAgY2Fubm90IGJlIHVz
+ZWQuIFRvIHJlbW92ZQ0KPiArIyAgICAgICAgICAgICAgICBpdCwgdXNlIEBibG9jay1kaXJ0eS1i
+aXRtYXAtcmVtb3ZlLiAoU2luY2UgNC4wKQ0KPiAgICMNCj4gICAjIFNpbmNlOiAxLjMNCj4gICAj
+Iw0KPiAgIHsgJ3N0cnVjdCc6ICdCbG9ja0RpcnR5SW5mbycsDQo+ICAgICAnZGF0YSc6IHsnKm5h
+bWUnOiAnc3RyJywgJ2NvdW50JzogJ2ludCcsICdncmFudWxhcml0eSc6ICd1aW50MzInLA0KPiAt
+ICAgICAgICAgICAncmVjb3JkaW5nJzogJ2Jvb2wnLCAnYnVzeSc6ICdib29sJywNCj4gLSAgICAg
+ICAgICAgJ3N0YXR1cyc6ICdEaXJ0eUJpdG1hcFN0YXR1cycsICdwZXJzaXN0ZW50JzogJ2Jvb2wn
+IH0gfQ0KPiArICAgICAgICAgICAncmVjb3JkaW5nJzogJ2Jvb2wnLCAnYnVzeSc6ICdib29sJywg
+J3N0YXR1cyc6ICdEaXJ0eUJpdG1hcFN0YXR1cycsDQo+ICsgICAgICAgICAgICdwZXJzaXN0ZW50
+JzogJ2Jvb2wnLCAnKmluY29uc2lzdGVudCc6ICdib29sJyB9IH0NCj4gICANCj4gICAjIw0KPiAg
+ICMgQFFjb3cyQml0bWFwSW5mb0ZsYWdzOg0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9k
+aXJ0eS1iaXRtYXAuaCBiL2luY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmgNCj4gaW5kZXggYmE4
+NDc3YjczZi4uYmQxYjY0NzlkZiAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9jay9kaXJ0eS1i
+aXRtYXAuaA0KPiArKysgYi9pbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oDQo+IEBAIC02OCw2
+ICs2OCw3IEBAIHZvaWQgYmRydl9kaXJ0eV9iaXRtYXBfZGVzZXJpYWxpemVfZmluaXNoKEJkcnZE
+aXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICB2b2lkIGJkcnZfZGlydHlfYml0bWFwX3NldF9yZWFk
+b25seShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgYm9vbCB2YWx1ZSk7DQo+ICAgdm9pZCBiZHJ2
+X2RpcnR5X2JpdG1hcF9zZXRfcGVyc2lzdGFuY2UoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsDQo+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYm9vbCBwZXJzaXN0ZW50
+KTsNCj4gK3ZvaWQgYmRydl9kaXJ0eV9iaXRtYXBfc2V0X2luY29uc2lzdGVudChCZHJ2RGlydHlC
+aXRtYXAgKmJpdG1hcCk7DQo+ICAgdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfYnVzeShCZHJ2
+RGlydHlCaXRtYXAgKmJpdG1hcCwgYm9vbCBidXN5KTsNCj4gICB2b2lkIGJkcnZfbWVyZ2VfZGly
+dHlfYml0bWFwKEJkcnZEaXJ0eUJpdG1hcCAqZGVzdCwgY29uc3QgQmRydkRpcnR5Qml0bWFwICpz
+cmMsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBIQml0bWFwICoqYmFja3VwLCBF
+cnJvciAqKmVycnApOw0KPiBAQCAtOTEsNiArOTIsNyBAQCBib29sIGJkcnZfZGlydHlfYml0bWFw
+X3JlYWRvbmx5KGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICBib29sIGJkcnZf
+aGFzX3JlYWRvbmx5X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpOw0KPiAgIGJvb2wgYmRy
+dl9kaXJ0eV9iaXRtYXBfZ2V0X2F1dG9sb2FkKGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFw
+KTsNCj4gICBib29sIGJkcnZfZGlydHlfYml0bWFwX2dldF9wZXJzaXN0YW5jZShCZHJ2RGlydHlC
+aXRtYXAgKmJpdG1hcCk7DQo+ICtib29sIGJkcnZfZGlydHlfYml0bWFwX2luY29uc2lzdGVudChj
+b25zdCBCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCk7DQo+ICAgYm9vbCBiZHJ2X2RpcnR5X2JpdG1h
+cF9idXN5KEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICBib29sIGJkcnZfaGFzX2NoYW5n
+ZWRfcGVyc2lzdGVudF9iaXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzKTsNCj4gICBCZHJ2RGly
+dHlCaXRtYXAgKmJkcnZfZGlydHlfYml0bWFwX25leHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+
+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
+DQo+IGluZGV4IDk4MGNhZTRmYTMuLjllODYzMGUxYWMgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Rp
+cnR5LWJpdG1hcC5jDQo+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IEBAIC00Niw2ICs0
+Niw5IEBAIHN0cnVjdCBCZHJ2RGlydHlCaXRtYXAgew0KPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgYW5kIHRoaXMgYml0bWFwIG11c3QgcmVtYWluIHVuY2hhbmdlZCB3aGls
+ZQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyBmbGFnIGlzIHNl
+dC4gKi8NCj4gICAgICAgYm9vbCBwZXJzaXN0ZW50OyAgICAgICAgICAgIC8qIGJpdG1hcCBtdXN0
+IGJlIHNhdmVkIHRvIG93bmVyIGRpc2sgaW1hZ2UgKi8NCj4gKyAgICBib29sIGluY29uc2lzdGVu
+dDsgICAgICAgICAgLyogYml0bWFwIGlzIHBlcnNpc3RlbnQsIGJ1dCBpbmNvbnNpc3RlbnQuDQo+
+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqIEl0IGNhbm5vdCBiZSB1c2VkIGF0
+IGFsbCBpbiBhbnkgd2F5LCBleGNlcHQNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICogYSBRTVAgdXNlciBjYW4gcmVtb3ZlIGl0LiAqLw0KPiAgICAgICBib29sIG1pZ3JhdGlv
+bjsgICAgICAgICAgICAgLyogQml0bWFwIGlzIHNlbGVjdGVkIGZvciBtaWdyYXRpb24sIGl0IHNo
+b3VsZA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbm90IGJlIHN0b3Jl
+ZCBvbiB0aGUgbmV4dCBpbmFjdGl2YXRpb24NCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIChwZXJzaXN0ZW50IGZsYWcgZG9lc24ndCBtYXR0ZXIgdW50aWwgbmV4dA0KPiBA
+QCAtNDY0LDYgKzQ2Nyw4IEBAIEJsb2NrRGlydHlJbmZvTGlzdCAqYmRydl9xdWVyeV9kaXJ0eV9i
+aXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPiAgICAgICAgICAgaW5mby0+cmVjb3JkaW5n
+ID0gYmRydl9kaXJ0eV9iaXRtYXBfcmVjb3JkaW5nKGJtKTsNCj4gICAgICAgICAgIGluZm8tPmJ1
+c3kgPSBiZHJ2X2RpcnR5X2JpdG1hcF9idXN5KGJtKTsNCj4gICAgICAgICAgIGluZm8tPnBlcnNp
+c3RlbnQgPSBibS0+cGVyc2lzdGVudDsNCj4gKyAgICAgICAgaW5mby0+aGFzX2luY29uc2lzdGVu
+dCA9IGJtLT5pbmNvbnNpc3RlbnQ7DQo+ICsgICAgICAgIGluZm8tPmluY29uc2lzdGVudCA9IGJt
+LT5pbmNvbnNpc3RlbnQ7DQo+ICAgICAgICAgICBlbnRyeS0+dmFsdWUgPSBpbmZvOw0KPiAgICAg
+ICAgICAgKnBsaXN0ID0gZW50cnk7DQo+ICAgICAgICAgICBwbGlzdCA9ICZlbnRyeS0+bmV4dDsN
+Cj4gQEAgLTcxMSw2ICs3MTYsMTUgQEAgdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfcGVyc2lz
+dGFuY2UoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsIGJvb2wgcGVyc2lzdGVudCkNCj4gICAgICAg
+cWVtdV9tdXRleF91bmxvY2soYml0bWFwLT5tdXRleCk7DQo+ICAgfQ0KPiAgIA0KPiArLyogQ2Fs
+bGVkIHdpdGggQlFMIHRha2VuLiAqLw0KPiArdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfaW5j
+b25zaXN0ZW50KEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKQ0KPiArew0KPiArICAgIHFlbXVfbXV0
+ZXhfbG9jayhiaXRtYXAtPm11dGV4KTsNCj4gKyAgICBiaXRtYXAtPmluY29uc2lzdGVudCA9IHRy
+dWU7DQo+ICsgICAgYml0bWFwLT5kaXNhYmxlZCA9IHRydWU7DQoNCkFncmVlLCB0aGF0IGl0IHdv
+cnRoIHRvIGFzc2VydCBwZXJzaXN0YW5jZQ0KDQo+ICsgICAgcWVtdV9tdXRleF91bmxvY2soYml0
+bWFwLT5tdXRleCk7DQo+ICt9DQo+ICsNCj4gICAvKiBDYWxsZWQgd2l0aCBCUUwgdGFrZW4uICov
+DQo+ICAgdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfbWlncmF0aW9uKEJkcnZEaXJ0eUJpdG1h
+cCAqYml0bWFwLCBib29sIG1pZ3JhdGlvbikNCj4gICB7DQo+IEBAIC03MjQsNiArNzM4LDExIEBA
+IGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfZ2V0X3BlcnNpc3RhbmNlKEJkcnZEaXJ0eUJpdG1hcCAq
+Yml0bWFwKQ0KPiAgICAgICByZXR1cm4gYml0bWFwLT5wZXJzaXN0ZW50ICYmICFiaXRtYXAtPm1p
+Z3JhdGlvbjsNCj4gICB9DQo+ICAgDQo+ICtib29sIGJkcnZfZGlydHlfYml0bWFwX2luY29uc2lz
+dGVudChjb25zdCBCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCkNCj4gK3sNCj4gKyAgICByZXR1cm4g
+Yml0bWFwLT5pbmNvbnNpc3RlbnQ7DQo+ICt9DQo+ICsNCj4gICBib29sIGJkcnZfaGFzX2NoYW5n
+ZWRfcGVyc2lzdGVudF9iaXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPiAgIHsNCj4gICAg
+ICAgQmRydkRpcnR5Qml0bWFwICpibTsNCj4gDQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1l
+bnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNClNvcnJ5IGZvciBh
+IGRlbGF5LCBJJ20gdmVyeSBidXN5IHdpdGggb3VyIHJlYmFzZSB0byAyLjEyIDooDQoNCi0tIA0K
+QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
