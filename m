@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59500)
+Received: from eggs.gnu.org ([209.51.188.92]:59497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1h1b1e-0004D8-Aw
+	(envelope-from <berto@igalia.com>) id 1h1b1e-0004D6-At
 	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1h1b1a-0005sz-Vi
+	(envelope-from <berto@igalia.com>) id 1h1b1b-0005t5-0S
 	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:12:17 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  6 Mar 2019 20:11:05 +0200
-Message-Id: <9f901b066150df5e4f6afc2d07713bf2efdc8b99.1551895814.git.berto@igalia.com>
+Date: Wed,  6 Mar 2019 20:11:09 +0200
+Message-Id: <bc270e69717cb6bbf756e56ca8581abfb206b340.1551895814.git.berto@igalia.com>
 In-Reply-To: <cover.1551895813.git.berto@igalia.com>
 References: <cover.1551895813.git.berto@igalia.com>
 In-Reply-To: <cover.1551895813.git.berto@igalia.com>
 References: <cover.1551895813.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 05/13] block: Add 'keep_old_opts' parameter
- to bdrv_reopen_queue()
+Subject: [Qemu-devel] [PATCH v2 09/13] block: Add a 'mutable_opts' field to
+ BlockDriver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,161 +25,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-The bdrv_reopen_queue() function is used to create a queue with
-the BDSs that are going to be reopened and their new options. Once
-the queue is ready bdrv_reopen_multiple() is called to perform the
-operation.
+If we reopen a BlockDriverState and there is an option that is present
+in bs->options but missing from the new set of options then we have to
+return an error unless the driver is able to reset it to its default
+value.
 
-The original options from each one of the BDSs are kept, with the new
-options passed to bdrv_reopen_queue() applied on top of them.
-
-For "x-blockdev-reopen" we want a function that behaves much like
-"blockdev-add". We want to ignore the previous set of options so that
-only the ones actually specified by the user are applied, with the
-rest having their default values.
-
-One of the things that we need is a way to tell bdrv_reopen_queue()
-whether we want to keep the old set of options or not, and that's what
-this patch does. All current callers are setting this new parameter to
-true and x-blockdev-reopen will set it to false.
+This patch adds a new 'mutable_opts' field to BlockDriver. This is
+a list of runtime options that can be modified during reopen. If an
+option in this list is unspecified on reopen then it must be reset (or
+return an error).
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c               | 34 +++++++++++++++++++---------------
- block/replication.c   |  4 ++--
- include/block/block.h |  3 ++-
- qemu-io-cmds.c        |  2 +-
- 4 files changed, 24 insertions(+), 19 deletions(-)
+ block/file-posix.c        |  6 ++++++
+ block/qcow2.c             | 25 +++++++++++++++++++++++++
+ block/raw-format.c        |  3 +++
+ include/block/block_int.h |  8 ++++++++
+ 4 files changed, 42 insertions(+)
 
-diff --git a/block.c b/block.c
-index 6e9c72f0cd..e9ca49fb8e 100644
---- a/block.c
-+++ b/block.c
-@@ -3011,7 +3011,8 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-                                                  QDict *options,
-                                                  const BdrvChildRole *role,
-                                                  QDict *parent_options,
--                                                 int parent_flags)
-+                                                 int parent_flags,
-+                                                 bool keep_old_opts)
- {
-     assert(bs != NULL);
+diff --git a/block/file-posix.c b/block/file-posix.c
+index ba6ab62a38..07c91a985f 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -431,6 +431,8 @@ static QemuOptsList raw_runtime_opts = {
+     },
+ };
  
-@@ -3051,13 +3052,13 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-      */
++static const char *const mutable_opts[] = { "x-check-cache-dropped", NULL };
++
+ static int raw_open_common(BlockDriverState *bs, QDict *options,
+                            int bdrv_flags, int open_flags,
+                            bool device, Error **errp)
+@@ -2766,6 +2768,7 @@ BlockDriver bdrv_file = {
+     .bdrv_set_perm   = raw_set_perm,
+     .bdrv_abort_perm_update = raw_abort_perm_update,
+     .create_opts = &raw_create_opts,
++    .mutable_opts = mutable_opts,
+ };
  
-     /* Old explicitly set values (don't overwrite by inherited value) */
--    if (bs_entry) {
--        old_options = qdict_clone_shallow(bs_entry->state.explicit_options);
--    } else {
--        old_options = qdict_clone_shallow(bs->explicit_options);
-+    if (bs_entry || keep_old_opts) {
-+        old_options = qdict_clone_shallow(bs_entry ?
-+                                          bs_entry->state.explicit_options :
-+                                          bs->explicit_options);
-+        bdrv_join_options(bs, options, old_options);
-+        qobject_unref(old_options);
-     }
--    bdrv_join_options(bs, options, old_options);
--    qobject_unref(old_options);
+ /***********************************************/
+@@ -3217,6 +3220,7 @@ static BlockDriver bdrv_host_device = {
+     .bdrv_reopen_abort   = raw_reopen_abort,
+     .bdrv_co_create_opts = hdev_co_create_opts,
+     .create_opts         = &raw_create_opts,
++    .mutable_opts        = mutable_opts,
+     .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+     .bdrv_co_pwrite_zeroes = hdev_co_pwrite_zeroes,
  
-     explicit_options = qdict_clone_shallow(options);
+@@ -3343,6 +3347,7 @@ static BlockDriver bdrv_host_cdrom = {
+     .bdrv_reopen_abort   = raw_reopen_abort,
+     .bdrv_co_create_opts = hdev_co_create_opts,
+     .create_opts         = &raw_create_opts,
++    .mutable_opts        = mutable_opts,
+     .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
  
-@@ -3069,10 +3070,12 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-         flags = bdrv_get_flags(bs);
-     }
  
--    /* Old values are used for options that aren't set yet */
--    old_options = qdict_clone_shallow(bs->options);
--    bdrv_join_options(bs, options, old_options);
--    qobject_unref(old_options);
-+    if (keep_old_opts) {
-+        /* Old values are used for options that aren't set yet */
-+        old_options = qdict_clone_shallow(bs->options);
-+        bdrv_join_options(bs, options, old_options);
-+        qobject_unref(old_options);
-+    }
+@@ -3476,6 +3481,7 @@ static BlockDriver bdrv_host_cdrom = {
+     .bdrv_reopen_abort   = raw_reopen_abort,
+     .bdrv_co_create_opts = hdev_co_create_opts,
+     .create_opts        = &raw_create_opts,
++    .mutable_opts       = mutable_opts,
  
-     /* We have the final set of options so let's update the flags */
-     options_copy = qdict_clone_shallow(options);
-@@ -3122,7 +3125,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-         g_free(child_key_dot);
- 
-         bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options,
--                                child->role, options, flags);
-+                                child->role, options, flags, keep_old_opts);
-     }
- 
-     return bs_queue;
-@@ -3130,9 +3133,10 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     BlockDriverState *bs,
--                                    QDict *options)
-+                                    QDict *options, bool keep_old_opts)
- {
--    return bdrv_reopen_queue_child(bs_queue, bs, options, NULL, NULL, 0);
-+    return bdrv_reopen_queue_child(bs_queue, bs, options, NULL, NULL, 0,
-+                                   keep_old_opts);
+     .bdrv_co_preadv         = raw_co_preadv,
+     .bdrv_co_pwritev        = raw_co_pwritev,
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7fb2730f09..9421f0d847 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -611,6 +611,30 @@ int qcow2_validate_table(BlockDriverState *bs, uint64_t offset,
+     return 0;
  }
  
- /*
-@@ -3204,7 +3208,7 @@ int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-     qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
++static const char *const mutable_opts[] = {
++    QCOW2_OPT_LAZY_REFCOUNTS,
++    QCOW2_OPT_DISCARD_REQUEST,
++    QCOW2_OPT_DISCARD_SNAPSHOT,
++    QCOW2_OPT_DISCARD_OTHER,
++    QCOW2_OPT_OVERLAP,
++    QCOW2_OPT_OVERLAP_TEMPLATE,
++    QCOW2_OPT_OVERLAP_MAIN_HEADER,
++    QCOW2_OPT_OVERLAP_ACTIVE_L1,
++    QCOW2_OPT_OVERLAP_ACTIVE_L2,
++    QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
++    QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
++    QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
++    QCOW2_OPT_OVERLAP_INACTIVE_L1,
++    QCOW2_OPT_OVERLAP_INACTIVE_L2,
++    QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
++    QCOW2_OPT_CACHE_SIZE,
++    QCOW2_OPT_L2_CACHE_SIZE,
++    QCOW2_OPT_L2_CACHE_ENTRY_SIZE,
++    QCOW2_OPT_REFCOUNT_CACHE_SIZE,
++    QCOW2_OPT_CACHE_CLEAN_INTERVAL,
++    NULL
++};
++
+ static QemuOptsList qcow2_runtime_opts = {
+     .name = "qcow2",
+     .head = QTAILQ_HEAD_INITIALIZER(qcow2_runtime_opts.head),
+@@ -5053,6 +5077,7 @@ BlockDriver bdrv_qcow2 = {
  
-     bdrv_subtree_drained_begin(bs);
--    queue = bdrv_reopen_queue(NULL, bs, opts);
-+    queue = bdrv_reopen_queue(NULL, bs, opts, true);
-     ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, errp);
-     bdrv_subtree_drained_end(bs);
+     .create_opts         = &qcow2_create_opts,
+     .strong_runtime_opts = qcow2_strong_runtime_opts,
++    .mutable_opts        = mutable_opts,
+     .bdrv_co_check       = qcow2_co_check,
+     .bdrv_amend_options  = qcow2_amend_options,
  
-diff --git a/block/replication.c b/block/replication.c
-index 4c80b54daf..a2f3590310 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -374,14 +374,14 @@ static void reopen_backing_file(BlockDriverState *bs, bool writable,
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs,
--                                         opts);
-+                                         opts, true);
-     }
+diff --git a/block/raw-format.c b/block/raw-format.c
+index e3e5ba2c8a..cec29986cc 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -37,6 +37,8 @@ typedef struct BDRVRawState {
+     bool has_size;
+ } BDRVRawState;
  
-     if (s->orig_secondary_read_only) {
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->secondary_disk->bs,
--                                         opts);
-+                                         opts, true);
-     }
++static const char *const mutable_opts[] = { "offset", "size", NULL };
++
+ static QemuOptsList raw_runtime_opts = {
+     .name = "raw",
+     .head = QTAILQ_HEAD_INITIALIZER(raw_runtime_opts.head),
+@@ -570,6 +572,7 @@ BlockDriver bdrv_raw = {
+     .create_opts          = &raw_create_opts,
+     .bdrv_has_zero_init   = &raw_has_zero_init,
+     .strong_runtime_opts  = raw_strong_runtime_opts,
++    .mutable_opts         = mutable_opts,
+ };
  
-     if (reopen_queue) {
-diff --git a/include/block/block.h b/include/block/block.h
-index e4a25674b1..d36a3a3977 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -299,7 +299,8 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
- BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
-                                        int flags, Error **errp);
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
--                                    BlockDriverState *bs, QDict *options);
-+                                    BlockDriverState *bs, QDict *options,
-+                                    bool keep_old_opts);
- int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
- int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-                               Error **errp);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index b9f189f09b..ff9a5cd80f 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2080,7 +2080,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-     }
+ static void bdrv_raw_init(void)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index c8a83c3eea..8e3f3760a0 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -381,6 +381,14 @@ struct BlockDriver {
  
-     bdrv_subtree_drained_begin(bs);
--    brq = bdrv_reopen_queue(NULL, bs, opts);
-+    brq = bdrv_reopen_queue(NULL, bs, opts, true);
-     bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
-     bdrv_subtree_drained_end(bs);
+     /* List of options for creating images, terminated by name == NULL */
+     QemuOptsList *create_opts;
++    /*
++     * If this driver supports reopening images this contains a
++     * NULL-terminated list of the runtime options that can be
++     * modified. If an option in this list is unspecified during
++     * reopen then it _must_ be reset to its default value or return
++     * an error.
++     */
++    const char *const *mutable_opts;
  
+     /*
+      * Returns 0 for completed check, -errno for internal errors.
 -- 
 2.11.0
