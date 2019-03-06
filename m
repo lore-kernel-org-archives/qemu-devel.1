@@ -1,23 +1,42 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54505)
+Received: from eggs.gnu.org ([209.51.188.92]:54784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1YGt-0003Wj-Sf
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:15:52 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1h1YHq-0004Bu-Of
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:16:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1YGr-0004QI-T0
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:15:51 -0500
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-2-jsnow@redhat.com>
-	<82ec6790-f366-3912-e85b-4908647d5c8d@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a2d33717-48f8-2133-021e-48e34b3b0871@redhat.com>
-Date: Wed, 6 Mar 2019 10:15:42 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1h1YHp-0005Cy-Aa
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:16:50 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1h1YHo-0005BO-To
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:16:49 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x26F69Qp041330
+	for <qemu-devel@nongnu.org>; Wed, 6 Mar 2019 10:16:47 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r2ema85v9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 10:16:46 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Wed, 6 Mar 2019 15:16:45 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-2-git-send-email-jjherne@linux.ibm.com>
+	<b05950f4-f490-8874-79c4-169b900557d8@linux.ibm.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Wed, 6 Mar 2019 10:16:41 -0500
 MIME-Version: 1.0
-In-Reply-To: <82ec6790-f366-3912-e85b-4908647d5c8d@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <b05950f4-f490-8874-79c4-169b900557d8@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] block/dirty-bitmaps: add
- inconsistent bit
+Message-Id: <710c8bf0-1939-9019-fb5f-afa48eb14a46@linux.ibm.com>
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v3 01/16] s390 vfio-ccw: Add bootindex
+ property and IPLB data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,140 +45,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com
 
-
-
-On 3/6/19 7:25 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 01.03.2019 22:15, John Snow wrote:
->> Add an inconsistent bit to dirty-bitmaps that allows us to report a bitmap as
->> persistent but potentially inconsistent, i.e. if we find bitmaps on a qcow2
->> that have been marked as "in use".
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   qapi/block-core.json         | 13 +++++++++----
->>   include/block/dirty-bitmap.h |  2 ++
->>   block/dirty-bitmap.c         | 19 +++++++++++++++++++
->>   3 files changed, 30 insertions(+), 4 deletions(-)
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 6e543594b3..e639ef6d1c 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -467,15 +467,20 @@
->>   #        and cannot be modified via QMP or used by another operation.
->>   #        Replaces `locked` and `frozen` statuses. (since 4.0)
->>   #
->> -# @persistent: true if the bitmap will eventually be flushed to persistent
->> -#              storage (since 4.0)
->> +# @persistent: true if the bitmap was stored on disk, is scheduled to be stored
->> +#              on disk, or both. (since 4.0)
->> +#
->> +# @inconsistent: true if this is a persistent bitmap that was improperly
->> +#                stored. Implies @persistent to be true; @recording and
->> +#                @busy to be false. This bitmap cannot be used. To remove
->> +#                it, use @block-dirty-bitmap-remove. (Since 4.0)
->>   #
->>   # Since: 1.3
->>   ##
->>   { 'struct': 'BlockDirtyInfo',
->>     'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
->> -           'recording': 'bool', 'busy': 'bool',
->> -           'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
->> +           'recording': 'bool', 'busy': 'bool', 'status': 'DirtyBitmapStatus',
->> +           'persistent': 'bool', '*inconsistent': 'bool' } }
->>   
->>   ##
->>   # @Qcow2BitmapInfoFlags:
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
->> index ba8477b73f..bd1b6479df 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -68,6 +68,7 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
->>   void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
->>   void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
->>                                          bool persistent);
->> +void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap);
->>   void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy);
->>   void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
->>                                HBitmap **backup, Error **errp);
->> @@ -91,6 +92,7 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
->>   bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->>   bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
->>   bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
->> +bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap);
->>   bool bdrv_dirty_bitmap_busy(BdrvDirtyBitmap *bitmap);
->>   bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
->>   BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 980cae4fa3..9e8630e1ac 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -46,6 +46,9 @@ struct BdrvDirtyBitmap {
->>                                      and this bitmap must remain unchanged while
->>                                      this flag is set. */
->>       bool persistent;            /* bitmap must be saved to owner disk image */
->> +    bool inconsistent;          /* bitmap is persistent, but inconsistent.
->> +                                 * It cannot be used at all in any way, except
->> +                                 * a QMP user can remove it. */
->>       bool migration;             /* Bitmap is selected for migration, it should
->>                                      not be stored on the next inactivation
->>                                      (persistent flag doesn't matter until next
->> @@ -464,6 +467,8 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
->>           info->recording = bdrv_dirty_bitmap_recording(bm);
->>           info->busy = bdrv_dirty_bitmap_busy(bm);
->>           info->persistent = bm->persistent;
->> +        info->has_inconsistent = bm->inconsistent;
->> +        info->inconsistent = bm->inconsistent;
->>           entry->value = info;
->>           *plist = entry;
->>           plist = &entry->next;
->> @@ -711,6 +716,15 @@ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool persistent)
->>       qemu_mutex_unlock(bitmap->mutex);
->>   }
->>   
->> +/* Called with BQL taken. */
->> +void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap)
->> +{
->> +    qemu_mutex_lock(bitmap->mutex);
->> +    bitmap->inconsistent = true;
->> +    bitmap->disabled = true;
-> 
-> Agree, that it worth to assert persistance
-> 
-
-OK, I will do so.
-
->> +    qemu_mutex_unlock(bitmap->mutex);
->> +}
->> +
->>   /* Called with BQL taken. */
->>   void bdrv_dirty_bitmap_set_migration(BdrvDirtyBitmap *bitmap, bool migration)
->>   {
->> @@ -724,6 +738,11 @@ bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap)
->>       return bitmap->persistent && !bitmap->migration;
->>   }
->>   
->> +bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap)
->> +{
->> +    return bitmap->inconsistent;
->> +}
->> +
->>   bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs)
->>   {
->>       BdrvDirtyBitmap *bm;
->>
-> 
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> Sorry for a delay, I'm very busy with our rebase to 2.12 :(
-> 
-
-I am very genuinely the last person you would ever have to apologize for
-in being late. I'm only waiting for your reviews because you have
-contributed so much to this feature and I want to make sure I don't
-check in anything that you haven't had a chance to critique.
-
-Thanks for the reviews!
+T24gMy80LzE5IDExOjA5IEFNLCBGYXJoYW4gQWxpIHdyb3RlOg0KPiANCj4gDQo+IE9uIDAz
+LzAxLzIwMTkgMDE6NTkgUE0sIEphc29uIEouIEhlcm5lIHdyb3RlOg0KPj4gQWRkIGJvb3Rp
+bmRleCBwcm9wZXJ0eSBhbmQgaXBsYiBkYXRhIGZvciB2ZmlvLWNjdyBkZXZpY2VzLiBUaGlz
+IGFsbG93cyB1cyB0bw0KPj4gZm9yd2FyZCBib290IGluZm9ybWF0aW9uIGludG8gdGhlIGJp
+b3MgZm9yIHZmaW8tY2N3IGRldmljZXMuDQo+Pg0KPj4gUmVmYWN0b3IgczM5MF9nZXRfY2N3
+X2RldmljZSgpIHRvIHJldHVybiBkZXZpY2UgdHlwZS4gVGhpcyBwcmV2ZW50cyB1cyBmcm9t
+DQo+PiBoYXZpbmcgdG8gdXNlIG1lc3N5IGNhc3RpbmcgbG9naWMgaW4gc2V2ZXJhbCBwbGFj
+ZXMuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogSmFzb24gSi4gSGVybmU8ampoZXJuZUBsaW51
+eC5pYm0uY29tPg0KPj4gQWNrZWQtYnk6IEhhbGlsIFBhc2ljPHBhc2ljQGxpbnV4LnZuZXQu
+aWJtLmNvbT4NCj4+IC0tLQ0KPj4gwqAgTUFJTlRBSU5FUlPCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCB8wqAgMSArDQo+PiDCoCBody9zMzkweC9pcGwuY8KgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIHwgMzkgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+LS0tLS0tDQo+PiDCoCBody9zMzkweC9zMzkwLWNjdy5jwqDCoMKgwqDCoMKgwqDCoCB8wqAg
+OSArKysrKysrKysNCj4+IMKgIGh3L3ZmaW8vY2N3LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIHzCoCAyICstDQo+PiDCoCBpbmNsdWRlL2h3L3MzOTB4L3MzOTAtY2N3LmggfMKg
+IDEgKw0KPj4gwqAgaW5jbHVkZS9ody9zMzkweC92ZmlvLWNjdy5oIHwgMjggKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKw0KPj4gwqAgNiBmaWxlcyBjaGFuZ2VkLCA3MyBpbnNlcnRp
+b25zKCspLCA3IGRlbGV0aW9ucygtKQ0KPj4gwqAgY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1
+ZGUvaHcvczM5MHgvdmZpby1jY3cuaA0KPj4NCj4+IGRpZmYgLS1naXQgYS9NQUlOVEFJTkVS
+UyBiL01BSU5UQUlORVJTDQo+PiBpbmRleCA5YTc2ODQ1Li5hNzgwOTE2IDEwMDY0NA0KPj4g
+LS0tIGEvTUFJTlRBSU5FUlMNCj4+ICsrKyBiL01BSU5UQUlORVJTDQo+PiBAQCAtMTQwMCw2
+ICsxNDAwLDcgQEAgUzogU3VwcG9ydGVkDQo+PiDCoCBGOiBody92ZmlvL2Njdy5jDQo+PiDC
+oCBGOiBody9zMzkweC9zMzkwLWNjdy5jDQo+PiDCoCBGOiBpbmNsdWRlL2h3L3MzOTB4L3Mz
+OTAtY2N3LmgNCj4+ICtGOiBpbmNsdWRlL2h3L3MzOTB4L3ZmaW8tY2N3LmgNCj4+IMKgIFQ6
+IGdpdGh0dHBzOi8vZ2l0aHViLmNvbS9jb2h1Y2svcWVtdS5naXTCoCBzMzkwLW5leHQNCj4+
+IMKgIEw6cWVtdS1zMzkweEBub25nbnUub3JnDQo+PiBkaWZmIC0tZ2l0IGEvaHcvczM5MHgv
+aXBsLmMgYi9ody9zMzkweC9pcGwuYw0KPj4gaW5kZXggODk2ODg4Yi4uZGY4OTFiYiAxMDA2
+NDQNCj4+IC0tLSBhL2h3L3MzOTB4L2lwbC5jDQo+PiArKysgYi9ody9zMzkweC9pcGwuYw0K
+Pj4gQEAgLTE5LDYgKzE5LDcgQEANCj4+IMKgICNpbmNsdWRlICJody9sb2FkZXIuaCINCj4+
+IMKgICNpbmNsdWRlICJody9ib2FyZHMuaCINCj4+IMKgICNpbmNsdWRlICJody9zMzkweC92
+aXJ0aW8tY2N3LmgiDQo+PiArI2luY2x1ZGUgImh3L3MzOTB4L3ZmaW8tY2N3LmgiDQo+PiDC
+oCAjaW5jbHVkZSAiaHcvczM5MHgvY3NzLmgiDQo+PiDCoCAjaW5jbHVkZSAiaHcvczM5MHgv
+ZWJjZGljLmgiDQo+PiDCoCAjaW5jbHVkZSAiaXBsLmgiDQo+PiBAQCAtMzA1LDE2ICszMDYs
+MjkgQEAgc3RhdGljIHZvaWQgczM5MF9pcGxfc2V0X2Jvb3RfbWVudShTMzkwSVBMU3RhdGUg
+KmlwbCkNCj4+IMKgwqDCoMKgwqAgKnRpbWVvdXQgPSBjcHVfdG9fYmUzMihzcGxhc2hfdGlt
+ZSk7DQo+PiDCoCB9DQo+PiAtc3RhdGljIENjd0RldmljZSAqczM5MF9nZXRfY2N3X2Rldmlj
+ZShEZXZpY2VTdGF0ZSAqZGV2X3N0KQ0KPj4gKyNkZWZpbmUgQ0NXX0RFVlRZUEVfTk9ORcKg
+wqDCoCAweDAwDQo+PiArI2RlZmluZSBDQ1dfREVWVFlQRV9WSVJUSU/CoCAweDAxDQo+PiAr
+I2RlZmluZSBDQ1dfREVWVFlQRV9TQ1NJwqDCoMKgIDB4MDINCj4+ICsjZGVmaW5lIENDV19E
+RVZUWVBFX1ZGSU/CoMKgwqAgMHgwMw0KPj4gKw0KPj4gK3N0YXRpYyBDY3dEZXZpY2UqczM5
+MF9nZXRfY2N3X2RldmljZShEZXZpY2VTdGF0ZSAqZGV2X3N0LCBpbnQqwqAgZGV2dHlwZSkN
+Cj4+IMKgIHsNCj4+IMKgwqDCoMKgwqAgQ2N3RGV2aWNlICpjY3dfZGV2ID0gTlVMTDsNCj4+
+ICvCoMKgwqAgKmRldnR5cGUgPSBDQ1dfREVWVFlQRV9OT05FOw0KPj4gKw0KPj4gwqDCoMKg
+wqDCoCBpZiAoZGV2X3N0KSB7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgVmlydGlvQ2N3RGV2
+aWNlICp2aXJ0aW9fY2N3X2RldiA9IChWaXJ0aW9DY3dEZXZpY2UgKikNCj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIG9iamVjdF9keW5hbWljX2Nhc3QoT0JKRUNUKHFkZXZfZ2V0
+X3BhcmVudF9idXMoZGV2X3N0KS0+cGFyZW50KSwNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBUWVBFX1ZJ
+UlRJT19DQ1dfREVWSUNFKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCBWRklPQ0NXRGV2aWNlICp2
+ZmlvX2Njd19kZXYgPSAoVkZJT0NDV0RldmljZSAqKQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgb2JqZWN0X2R5bmFtaWNfY2FzdChPQkpFQ1QoZGV2X3N0KSwgVFlQRV9WRklPX0ND
+Vyk7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHZpcnRpb19jY3dfZGV2KSB7DQo+PiDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjY3dfZGV2ID0gQ0NXX0RFVklDRSh2aXJ0aW9f
+Y2N3X2Rldik7DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqZGV2dHlwZSA9IENDV19E
+RVZUWVBFX1ZJUlRJTzsNCj4+ICvCoMKgwqDCoMKgwqDCoCB9IGVsc2UgaWYgKHZmaW9fY2N3
+X2Rldikgew0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY2N3X2RldiA9IENDV19ERVZJ
+Q0UodmZpb19jY3dfZGV2KTsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICpkZXZ0eXBl
+ID0gQ0NXX0RFVlRZUEVfVkZJTzsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCB9IGVsc2Ugew0K
+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgU0NTSURldmljZSAqc2QgPSAoU0NTSURl
+dmljZSAqKQ0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBvYmplY3Rf
+ZHluYW1pY19jYXN0KE9CSkVDVChkZXZfc3QpLA0KPj4gQEAgLTMyNyw2ICszNDEsNyBAQCBz
+dGF0aWMgQ2N3RGV2aWNlICpzMzkwX2dldF9jY3dfZGV2aWNlKERldmljZVN0YXRlICpkZXZf
+c3QpDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNjd19kZXYgPSAo
+Q2N3RGV2aWNlICopb2JqZWN0X2R5bmFtaWNfY2FzdChPQkpFQ1Qoc2NzaV9jY3cpLA0KPj4g
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIFRZUEVfQ0NXX0RFVklDRSk7DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgICpkZXZ0eXBlID0gQ0NXX0RFVlRZUEVfU0NTSTsNCj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCB9DQo+PiDCoMKg
+wqDCoMKgIH0NCj4+IEBAIC0zMzcsMTAgKzM1MiwxMSBAQCBzdGF0aWMgYm9vbCBzMzkwX2dl
+bl9pbml0aWFsX2lwbGIoUzM5MElQTFN0YXRlICppcGwpDQo+PiDCoCB7DQo+PiDCoMKgwqDC
+oMKgIERldmljZVN0YXRlICpkZXZfc3Q7DQo+PiDCoMKgwqDCoMKgIENjd0RldmljZSAqY2N3
+X2RldiA9IE5VTEw7DQo+PiArwqDCoMKgIGludCBkZXZ0eXBlOw0KPj4gwqDCoMKgwqDCoCBk
+ZXZfc3QgPSBnZXRfYm9vdF9kZXZpY2UoMCk7DQo+PiDCoMKgwqDCoMKgIGlmIChkZXZfc3Qp
+IHsNCj4+IC3CoMKgwqDCoMKgwqDCoCBjY3dfZGV2ID0gczM5MF9nZXRfY2N3X2RldmljZShk
+ZXZfc3QpOw0KPj4gK8KgwqDCoMKgwqDCoMKgIGNjd19kZXYgPSBzMzkwX2dldF9jY3dfZGV2
+aWNlKGRldl9zdCwgJmRldnR5cGUpOw0KPj4gwqDCoMKgwqDCoCB9DQo+PiDCoMKgwqDCoMKg
+IC8qDQo+PiBAQCAtMzQ5LDggKzM2NSwxMCBAQCBzdGF0aWMgYm9vbCBzMzkwX2dlbl9pbml0
+aWFsX2lwbGIoUzM5MElQTFN0YXRlICppcGwpDQo+PiDCoMKgwqDCoMKgIGlmIChjY3dfZGV2
+KSB7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgU0NTSURldmljZSAqc2QgPSAoU0NTSURldmlj
+ZSAqKSBvYmplY3RfZHluYW1pY19jYXN0KE9CSkVDVChkZXZfc3QpLA0KPj4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgVFlQRV9TQ1NJX0RFVklDRSk7DQo+PiArwqDCoMKgwqDCoMKgwqAgVmlydElPTmV0
+ICp2bjsNCj4+IC3CoMKgwqDCoMKgwqDCoCBpZiAoc2QpIHsNCj4+ICvCoMKgwqDCoMKgwqDC
+oCBzd2l0Y2ggKGRldnR5cGUpIHsNCj4+ICvCoMKgwqDCoMKgwqDCoCBjYXNlIENDV19ERVZU
+WVBFX1NDU0k6DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpcGwtPmlwbGIubGVu
+ID0gY3B1X3RvX2JlMzIoUzM5MF9JUExCX01JTl9RRU1VX1NDU0lfTEVOKTsNCj4+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlwbC0+aXBsYi5ibGswX2xlbiA9DQo+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdV90b19iZTMyKFMzOTBfSVBMQl9NSU5f
+UUVNVV9TQ1NJX0xFTiAtIFMzOTBfSVBMQl9IRUFERVJfTEVOKTsNCj4+IEBAIC0zNjAsOCAr
+Mzc4LDE1IEBAIHN0YXRpYyBib29sIHMzOTBfZ2VuX2luaXRpYWxfaXBsYihTMzkwSVBMU3Rh
+dGUgKmlwbCkNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlwbC0+aXBsYi5zY3Np
+LmNoYW5uZWwgPSBjcHVfdG9fYmUxNihzZC0+Y2hhbm5lbCk7DQo+PiDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCBpcGwtPmlwbGIuc2NzaS5kZXZubyA9IGNwdV90b19iZTE2KGNjd19k
+ZXYtPnNjaC0+ZGV2bm8pOw0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaXBsLT5p
+cGxiLnNjc2kuc3NpZCA9IGNjd19kZXYtPnNjaC0+c3NpZCAmIDM7DQo+PiAtwqDCoMKgwqDC
+oMKgwqAgfSBlbHNlIHsNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFZpcnRJT05ldCAq
+dm4gPSAoVmlydElPTmV0ICopIG9iamVjdF9keW5hbWljX2Nhc3QoT0JKRUNUKGRldl9zdCks
+DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBicmVhazsNCj4+ICvCoMKgwqDCoMKgwqDC
+oCBjYXNlIENDV19ERVZUWVBFX1ZGSU86DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBp
+cGwtPmlwbGIubGVuID0gY3B1X3RvX2JlMzIoUzM5MF9JUExCX01JTl9DQ1dfTEVOKTsNCj4+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlwbC0+aXBsYi5wYnQgPSBTMzkwX0lQTF9UWVBF
+X0NDVzsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlwbC0+aXBsYi5jY3cuZGV2bm8g
+PSBjcHVfdG9fYmUxNihjY3dfZGV2LT5zY2gtPmRldm5vKTsNCj4+ICvCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIGlwbC0+aXBsYi5jY3cuc3NpZCA9IGNjd19kZXYtPnNjaC0+c3NpZCAmIDM7
+DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBicmVhazsNCj4gDQo+IEFsc28gZm9yIHZm
+aW8tY2N3IHdlIGFyZSBub3Qgc2V0dGluZyB0aGUgaXBsLT5pcGxiLmJsazBfbGVuIGxpa2Ug
+d2UgZG8gZm9yIHZpcnRpby4gSXMgDQo+IHRoZXJlIGEgcmVhc29uPw0KPiANCj4gSSBrbm93
+IHdlIGRvbid0IHJlZmVyZW5jZSB0aGUgdmFsdWUgaW4gdGhlIGJpb3MgZm9yIGJvdGggdmly
+dGlvIGFuZCB2ZmlvLg0KPiANCg0KTm8gcmVhc29uIG90aGVyIHRoYW4gSSBzYXcgbm8gcmVh
+c29uIHRvIHNldCBpdC4gSWYgeW91IGtub3cgb2YgYW55IHJlYXNvbnMgcGxlYXNlIGxldCBt
+ZSANCmtub3cuDQoNCi0tIA0KLS0gSmFzb24gSi4gSGVybmUgKGpqaGVybmVAbGludXguaWJt
+LmNvbSkNCg0K
