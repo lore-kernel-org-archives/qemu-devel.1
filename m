@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59155)
+Received: from eggs.gnu.org ([209.51.188.92]:59807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1h1SVC-0001Le-Fx
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:06:15 -0500
+	(envelope-from <abologna@redhat.com>) id 1h1SXe-00038t-55
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:08:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1h1SVB-0007Fn-93
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:06:14 -0500
-Received: from greensocs.com ([193.104.36.180]:44009)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1h1SVA-000708-2p
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:06:13 -0500
-From: Damien Hedde <damien.hedde@greensocs.com>
-References: <a6548846-c64d-a815-45a5-953ccc4b7ea0@greensocs.com>
-	<CAFEAcA8dM_DN9Mrep8O7XVPPis0v2XcSU3fWSHTbz2MJDqjEsg@mail.gmail.com>
-	<fe389f85-a52d-e469-96de-f34663a3c5a5@greensocs.com>
-	<CAFEAcA_OrJ-1SzE5UpT4eHbzi-KS_GqX13KZdHzEzovXnsnsUg@mail.gmail.com>
-	<63b980a2-6b28-d5e2-891c-6245ddb1e851@redhat.com>
-	<CAFEAcA8L1qKaNwpr8sMZC8jQXbaLtCctaV8ecTFxXTVy0sWjVw@mail.gmail.com>
-	<20190304102912.GC6010@toto>
-Message-ID: <4c1c9c2c-73e9-bacf-b4c4-3fa425480e3f@greensocs.com>
-Date: Wed, 6 Mar 2019 10:05:50 +0100
+	(envelope-from <abologna@redhat.com>) id 1h1SXP-0000RO-Rs
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:08:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1h1SXP-0000Pv-Kv
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:08:31 -0500
+Message-ID: <75658e81160627acaa723ae145bd5ad5106f1118.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Wed, 06 Mar 2019 10:08:08 +0100
+In-Reply-To: <20190306083032.GZ1252@lpt>
+References: <20181205195704.17605-1-ehabkost@redhat.com>
+	<3571700849fab25a1bc69960ca24284f0760fe02.camel@redhat.com>
+	<20190305143801.lq4gpetubspftkda@sirius.home.kraxel.org>
+	<81d22ed88833ed22a1c3781c3c0c1eafad99b280.camel@redhat.com>
+	<20190306074148.GA9131@angien.pipo.sk> <20190306083032.GZ1252@lpt>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <20190304102912.GC6010@toto>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] multi phase reset
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [PATCH for-4.0 v4 0/2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?ISO-8859-1?Q?J=E1n?= Tomko <jtomko@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Amit Shah <amit@kernel.org>, Reitz <mreitz@redhat.com>, Max@angien.pipo.sk, Caio Carrara <ccarrara@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-Hi Edgar,
+On Wed, 2019-03-06 at 09:30 +0100, J=C3=A1n Tomko wrote:
+> On Wed, Mar 06, 2019 at 08:41:48AM +0100, Peter Krempa wrote:
+> > On Tue, Mar 05, 2019 at 16:56:43 +0100, Andrea Bolognani wrote:
+> > > So I agree neither scenario is exactly perfect, but I still think
+> > > adding non-transitional alias devices would overall be more
+> > > user-friendly.
+> >=20
+> > I don't think it makes sense to add it at the qemu level. From libvir=
+t's
+> > point of view users should be shielded from any qemu impl detail or
+> > inconsistency as libvirt is the 'user friendly'[1] layer. In qemu the
+> > devices would be the same and thus does not make sense to do that
+> > because it would be more confusing.
+> >=20
+> > You can argue that we should add the alias at the libvirt level thoug=
+h.
+>=20
+> You can, but please don't.
 
-On 3/4/19 11:29 AM, Edgar E. Iglesias wrote:
-> Hi Damien and others,
-> 
-> A few questions from my side.
-> 
-> We sometimes see that wires from generic GPIO blocks get connected to reset inputs.
-> This happens both to off-chip perihperals but we also see it on-chip.
-> 
-> To avoid having GPIO modules know that some of their outputs are being used as
-> reset signals it would be nice to have a reset proxy that allows any qemu_irq to
-> drive resets for a given device. Perhaps even with built-in options for both interpreting
-> "active-low" and "active-high". I think it would even be useful to have this
-> in qdev but that may be pushing it too far. Any thoughts on that?
-Do you mean for Device or other objects as well ? I planned to add a
-function so that a Device could declare one of its gpio/irq input as
-reset. It is straightforward since we just need to set the proper
-handler to the irq. The device controlling the irq (output) would have
-no knowledge of that.
+It would seem nobody except me thinks this is a good idea, so I
+guess I'll just drop it now.
 
-> 
-> Have you thought about what happens if someone does an MMIO access to a device while
-> its reset is active? Were you planning to have some "default" SysBus level handling to
-> block MMIO while in reset or anything like that? Or would that be handled individually
-> by each device model?Right know it would be handled individually by each model. With
-In my first power/clock gating implementation (last year), I tried to do
-a kind of default deactivation of mmio memory region in SysbusDevice
-object and it appears to me it is complicated for 2 reasons:
-+ A device has to handle its memory region flag/properties during
-migration (if we automatically disable things, should we automatically
-migrate this ?)
-+ Some memory regions may already be disabled, so we cannot simply
-disabled the mmio array and re-enabled it later.
-
-Right know for the cadence_uart, I check this in the Device itself.
-
-I'm no expert of memory regions, so there is maybe a simple solution I
-don't see.
-> 
-> Another question is regarding reset of CPUs. It would be nice to be able to expose
-> similar interfaces and have some defined behaviour for CPUs that are in reset. E.g,
-> if reset is active the CPU does not execute etc.
-> 
-> Cheers,
-> Edgar
-> 
+--=20
+Andrea Bolognani / Red Hat / Virtualization
