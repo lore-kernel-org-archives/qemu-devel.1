@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47084)
+Received: from eggs.gnu.org ([209.51.188.92]:50820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h1KCM-00028T-HX
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 19:14:15 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1h1KQ0-0005H6-KD
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 19:28:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h1KCL-0002Z3-9N
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 19:14:14 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:37863)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h1KCL-0002Yh-3C
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 19:14:13 -0500
-Received: by mail-qt1-f196.google.com with SMTP id a48so10976382qtb.4
-	for <qemu-devel@nongnu.org>; Tue, 05 Mar 2019 16:14:12 -0800 (PST)
-Date: Tue, 5 Mar 2019 19:14:09 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190305191334-mutt-send-email-mst@kernel.org>
-References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
-	<20190214043916.22128-2-david@gibson.dropbear.id.au>
-	<20190228083317-mutt-send-email-mst@kernel.org>
-	<20190305005207.GA7877@umbus.fritz.box>
-	<20190304211451-mutt-send-email-mst@kernel.org>
-	<20190305050300.GI7877@umbus.fritz.box>
-	<20190305094050-mutt-send-email-mst@kernel.org>
-	<20190305233512.GB19715@umbus.fritz.box>
+	(envelope-from <yan.y.zhao@intel.com>) id 1h1KPx-0003Tp-EL
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 19:28:20 -0500
+Received: from mga06.intel.com ([134.134.136.31]:10592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1h1KPw-0003P7-V7
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 19:28:17 -0500
+Date: Tue, 5 Mar 2019 19:22:46 -0500
+From: Zhao Yan <yan.y.zhao@intel.com>
+Message-ID: <20190306002245.GA24293@joy-OptiPlex-7040>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<20190221134051.2c28893e@w520.home>
+	<20190225022255.GP16456@joy-OptiPlex-7040>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190305233512.GB19715@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-balloon: Remove unnecessary
- MADV_WILLNEED on deflate
+In-Reply-To: <20190225022255.GP16456@joy-OptiPlex-7040>
+Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,122 +29,672 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Liu, Changpeng" <changpeng.liu@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>
 
-On Wed, Mar 06, 2019 at 10:35:12AM +1100, David Gibson wrote:
-> On Tue, Mar 05, 2019 at 09:41:34AM -0500, Michael S. Tsirkin wrote:
-> > On Tue, Mar 05, 2019 at 04:03:00PM +1100, David Gibson wrote:
-> > > On Mon, Mar 04, 2019 at 09:29:24PM -0500, Michael S. Tsirkin wrote:
-> > > > On Tue, Mar 05, 2019 at 11:52:08AM +1100, David Gibson wrote:
-> > > > > On Thu, Feb 28, 2019 at 08:36:58AM -0500, Michael S. Tsirkin wrote:
-> > > > > > On Thu, Feb 14, 2019 at 03:39:12PM +1100, David Gibson wrote:
-> > > > > > > When the balloon is inflated, we discard memory place in it using madvise()
-> > > > > > > with MADV_DONTNEED.  And when we deflate it we use MADV_WILLNEED, which
-> > > > > > > sounds like it makes sense but is actually unnecessary.
-> > > > > > > 
-> > > > > > > The misleadingly named MADV_DONTNEED just discards the memory in question,
-> > > > > > > it doesn't set any persistent state on it in-kernel; all that's necessary
-> > > > > > > to bring the memory back is to touch it.  MADV_WILLNEED in contrast
-> > > > > > > specifically says that the memory will be used soon and faults it in.
-> > > > > > > 
-> > > > > > > This patch simplify's the balloon operation by dropping the madvise()
-> > > > > > > on deflate.  This might have an impact on performance - it will move a
-> > > > > > > delay at deflate time until that memory is actually touched, which
-> > > > > > > might be more latency sensitive.  However:
-> > > > > > > 
-> > > > > > >   * Memory that's being given back to the guest by deflating the
-> > > > > > >     balloon *might* be used soon, but it equally could just sit around
-> > > > > > >     in the guest's pools until needed (or even be faulted out again if
-> > > > > > >     the host is under memory pressure).
-> > > > > > > 
-> > > > > > >   * Usually, the timescale over which you'll be adjusting the balloon
-> > > > > > >     is long enough that a few extra faults after deflation aren't
-> > > > > > >     going to make a difference.
-> > > > > > > 
-> > > > > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > > > > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > > > > > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > 
-> > > > > > I'm having second thoughts about this. It might affect performance but
-> > > > > > probably won't but we have no idea.  Might cause latency jitter after
-> > > > > > deflate where it previously didn't happen.  This kind of patch should
-> > > > > > really be accompanied by benchmarking results, not philosophy.
-> > > > > 
-> > > > > I guess I see your point, much as it's annoying to spend time
-> > > > > benchmarking a device that's basically broken by design.
-> > > > 
-> > > > Because of 4K page thing?
-> > > 
-> > > For one thing.  I believe David H has bunch of other reasons.
-> > > 
-> > > > It's an annoying bug for sure.  There were
-> > > > patches to add a feature bit to just switch to plan s/g format, but they
-> > > > were abandoned. You are welcome to revive them though.
-> > > > Additionally or alternatively, we can easily add a field specifying
-> > > > page size.
-> > > 
-> > > We could, but I'm pretty disinclined to work on this when virtio-mem
-> > > is a better solution in nearly every way.
+hi Alex
+we still have some opens as below. could you kindly help review on that? :)
+
+Thanks
+Yan
+
+On Mon, Feb 25, 2019 at 10:22:56AM +0800, Zhao Yan wrote:
+> On Thu, Feb 21, 2019 at 01:40:51PM -0700, Alex Williamson wrote:
+> > Hi Yan,
 > > 
-> > Then one way would be to just let balloon be. Make it behave same as
-> > always and don't make changes to it :)
+> > Thanks for working on this!
+> > 
+> > On Tue, 19 Feb 2019 16:50:54 +0800
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > 
+> > > This patchset enables VFIO devices to have live migration capability.
+> > > Currently it does not support post-copy phase.
+> > > 
+> > > It follows Alex's comments on last version of VFIO live migration patches,
+> > > including device states, VFIO device state region layout, dirty bitmap's
+> > > query.
+> > > 
+> > > Device Data
+> > > -----------
+> > > Device data is divided into three types: device memory, device config,
+> > > and system memory dirty pages produced by device.
+> > > 
+> > > Device config: data like MMIOs, page tables...
+> > >         Every device is supposed to possess device config data.
+> > >     	Usually device config's size is small (no big than 10M), and it
+> > 
+> > I'm not sure how we can really impose a limit here, it is what it is
+> > for a device.  A smaller state is obviously desirable to reduce
+> > downtime, but some devices could have very large states.
+> > 
+> > >         needs to be loaded in certain strict order.
+> > >         Therefore, device config only needs to be saved/loaded in
+> > >         stop-and-copy phase.
+> > >         The data of device config is held in device config region.
+> > >         Size of device config data is smaller than or equal to that of
+> > >         device config region.
+> > 
+> > So the intention here is that this is the last data read from the
+> > device and it's done in one pass, so the region needs to be large
+> > enough to expose all config data at once.  On restore it's the last
+> > data written before switching the device to the run state.
+> > 
+> > > 
+> > > Device Memory: device's internal memory, standalone and outside system
+> > 
+> > s/system/VM/
+> > 
+> > >         memory. It is usually very big.
+> > 
+> > Or it doesn't exist.  Not sure we should be setting expectations since
+> > it will vary per device.
+> > 
+> > >         This kind of data needs to be saved / loaded in pre-copy and
+> > >         stop-and-copy phase.
+> > >         The data of device memory is held in device memory region.
+> > >         Size of devie memory is usually larger than that of device
+> > >         memory region. qemu needs to save/load it in chunks of size of
+> > >         device memory region.
+> > >         Not all device has device memory. Like IGD only uses system memory.
+> > 
+> > It seems a little gratuitous to me that this is a separate region or
+> > that this data is handled separately.  All of this data is opaque to
+> > QEMU, so why do we need to separate it?
+> hi Alex,
+> as the device state interfaces are provided by kernel, it is expected to
+> meet as general needs as possible. So, do you think there are such use
+> cases from user space that user space knows well of the device, and
+> it wants kernel to return desired data back to it.
+> E.g. It just wants to get whole device config data including all mmios,
+> page tables, pci config data...
+> or, It just wants to get current device memory snapshot, not including any
+> dirty data.
+> Or, It just needs the dirty pages in device memory or system memory.
+> With all this accurate query, quite a lot of useful features can be
+> developped in user space.
 > 
-> I'd love to, but it is in real world use, so I think we do need to fix
-> serious bugs in it - at least if they can be fixed on one side,
-> without needing to roll out both qemu and guest changes (which adding
-> page size negotiation would require).
-
-
-Absolutely I'm just saying don't add optimizations in that case :)
-
+> If all of this data is opaque to user app, seems the only use case is
+> for live migration.
+> 
+> From another aspect, if the final solution is to let the data opaque to
+> user space, like what NV did, kernel side's implementation will be more
+> complicated, and actually a little challenge to vendor driver.
+> in that case, in pre-copy phase,
+> 1. in not LOGGING state, vendor driver first returns full data including
+> full device memory snapshot
+> 2. user space reads some data (you can't expect it to finish reading all
+> data)
+> 3. then userspace set the device state to LOGGING to start dirty data
+> logging
+> 4. vendor driver starts dirty data logging, and appends the dirty data to
+> the tail of remaining unread full data and increase the pending data size?
+> 5. user space keeps reading data.
+> 6. vendor driver keeps appending new dirty data to the tail of remaining
+> unread full data/dirty data and increase the pending data size?
+> 
+> in stop-and-copy phase
+> 1. user space sets device state to exit LOGGING state,
+> 2. vendor driver stops data logging. it has to append device config
+>    data at the tail of remaining dirty data unread by userspace.
+> 
+> during this flow, when vendor driver should get dirty data? just keeps
+> logging and appends to tail? how to ensure dirty data is refresh new before
+> LOGGING state exit? how does vendor driver know whether certain dirty data
+> is copied or not?
+> 
+> I've no idea how NVidia handle this problem, and they don't open their
+> kernel side code. 
+> just feel it's a bit hard for other vendor drivers to follow:)
+> 
+> > > System memory dirty pages: If a device produces dirty pages in system
+> > >         memory, it is able to get dirty bitmap for certain range of system
+> > >         memory. This dirty bitmap is queried in pre-copy and stop-and-copy
+> > >         phase in .log_sync callback. By setting dirty bitmap in .log_sync
+> > >         callback, dirty pages in system memory will be save/loaded by ram's
+> > >         live migration code.
+> > >         The dirty bitmap of system memory is held in dirty bitmap region.
+> > >         If system memory range is larger than that dirty bitmap region can
+> > >         hold, qemu will cut it into several chunks and get dirty bitmap in
+> > >         succession.
+> > > 
+> > > 
+> > > Device State Regions
+> > > --------------------
+> > > Vendor driver is required to expose two mandatory regions and another two
+> > > optional regions if it plans to support device state management.
+> > > 
+> > > So, there are up to four regions in total.
+> > > One control region: mandatory.
+> > >         Get access via read/write system call.
+> > >         Its layout is defined in struct vfio_device_state_ctl
+> > > Three data regions: mmaped into qemu.
 > > 
-> > > > > That said.. I don't really know how I'd go about benchmarking it.  Any
-> > > > > guesses at a suitable workload which would be most likely to show a
-> > > > > performance degradation here?
-> > > > 
-> > > > Here's one idea - I tried to come up with a worst case scenario here.
-> > > > Basically based on idea by Alex Duyck. All credits are his, all bugs are
-> > > > mine:
+> > Is mmap mandatory?  I would think this would be defined by the mdev
+> > device what access they want to support per region.  We don't want to
+> > impose a more complicated interface if the device doesn't require it.
+> I think it's "mmap is preferred, but allowed to fail".
+> just like a normal region with MMAP flag on (like bar regions), we also
+> allow its mmap to fail, right?
+> 
+> > >         device config region: mandatory, holding data of device config
+> > >         device memory region: optional, holding data of device memory
+> > >         dirty bitmap region: optional, holding bitmap of system memory
+> > >                             dirty pages
 > > > 
-> > > Ok.  I'll try to find time to implement this and test it.
-> > > 
-> > > > Setup:
-> > > > Memory-15837 MB
-> > > > Guest Memory Size-5 GB
-> > > > Swap-Disabled
-> > > > Test Program-Simple program which allocates 4GB memory via malloc, touches it via memset and exits.
-> > > > Use case-Number of guests that can be launched completely including the successful execution of the test program.
-> > > > Procedure:
-> > > > Setup:
-> > > > A first guest is launched and once its console is up,
-> > > > test allocation program is executed with 4 GB memory request (Due to
-> > > > this the guest occupies almost 4-5 GB of memory in the host)
-> > > > Afterwards balloon is inflated by 4Gbyte in the guest.
-> > > > We continue launching the guests until a guest gets
-> > > > killed due to low memory condition in the host.
-> > > > 
-> > > > 
-> > > > Now repeatedly, in each guest in turn, balloon is deflated and
-> > > > test allocation program is executed with 4 GB memory request (Due to
-> > > > this the guest occupies almost 4-5 GB of memory in the host)
-> > > > After program finishes balloon is inflated by 4GB again.
-> > > > 
-> > > > Then we switch to another guest.
-> > > > 
-> > > > Time how many cycles of this we can do.
-> > > > 
-> > > > 
-> > > > Hope this helps.
-> > > > 
-> > > > 
-> > > > 
-> > > 
+> > > (The reason why four seperate regions are defined is that the unit of mmap
+> > > system call is PAGE_SIZE, i.e. 4k bytes. So one read/write region for
+> > > control and three mmaped regions for data seems better than one big region
+> > > padded and sparse mmaped).
 > > 
+> > It's not obvious to me how this is better, a big region isn't padded,
+> > there's simply a gap in the file descriptor.  Is having a sub-PAGE_SIZE
+> > gap in a file really of any consequence?  Each region beyond the header
+> > is more than likely larger than PAGE_SIZE, therefore they can be nicely
+> > aligned together.  We still need fields to tell us how much data is
+> > available in each area, so another to tell us the start of each area is
+> > a minor detail.  And I think we still want to allow drivers to specify
+> > which parts of which areas support mmap, so I don't think we're getting
+> > away from sparse mmap support.
+> 
+> with seperate regions and sub-region type defined, user space can explictly
+> know which region is which region after vfio_get_dev_region_info(). along
+> with it, user space knows region offset and size. mmap is allowed to fail
+> and falls back to normal read/write to the region.
+> 
+> But with one big region and sparse mmapped subregions (1 data subregion or
+> 3 data subregions, whatever), userspace can't tell which subregion is which
+> one.
+> So, if using one big region, I think we need to explictly define
+> subregions' sequence (like index 0 is dedicated to control subregion,
+> index 1 is for device config data subregion ...). Vendor driver cannot
+> freely change the sequence.
+> Then keep data offset the same as region->mmaps[i].offset, and data size
+> the same as region->mmaps[i].size. (i.e. let actual data starts immediatly
+> from first byte of its data subregion)
+> Also, mmaps for sparse mmaped subregions are not allowed to fail.
+> 
+> 
+> With one big region, we also need to consider the case when vendor driver
+> does not want the data subregion to be mmaped.
+> so, what is the data layout for that case?
+> data subregion immedately follows control subregion, or not?
+> Of couse, for this condition, we can specify the data filed's start offset
+> and size through control region. And we must not expect the data start
+> offset in source and target are equal.
+> (because the big region's fd_offset
+> may vary in source and target. consider the case when both source and
+> target have one opregion and one device state region, but source has
+> opregion in the first and target has device state region in the first.
+> If we think this case is illegal, we must be able to detect it in the first
+> place).
+> Also, we must keep the start offset and size consistent with the above mmap
+> case.
+> 
+> 
+> > > kernel device state interface [1]
+> > > --------------------------------------
+> > > #define VFIO_DEVICE_STATE_INTERFACE_VERSION 1
+> > > #define VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY 1
+> > > #define VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY 2
+> > 
+> > If we were to go with this multi-region solution, isn't it evident from
+> > the regions exposed that device memory and a dirty bitmap are
+> > provided?  Alternatively, I believe Kirti's proposal doesn't require
+> 
+> > this distinction between device memory and device config, a device not
+> > requiring runtime migration data would simply report no data until the
+> > device moved to the stopped state, making it consistent path for
+> > userspace.  Likewise, the dirty bitmap could report a zero page count
+> > in the bitmap rather than branching based on device support.
+> If the path in userspace is consistent for device config and device
+> memory, there will be many unnecessary call of getting data size into
+> vendor driver.
+>  
+> 
+> > Note that it seems that cap VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY implies
+> > VFIO_REGION_SUBTYPE_DEVICE_STATE_DATA_DIRTYBITMAP, but there's no
+> > consistency in the naming.
+> > 
+> > > #define VFIO_DEVICE_STATE_RUNNING 0 
+> > > #define VFIO_DEVICE_STATE_STOP 1
+> > > #define VFIO_DEVICE_STATE_LOGGING 2
+> > 
+> > It looks like these are being defined as bits, since patch 1 talks
+> > about RUNNING & LOGGING and STOP & LOGGING.  I think Connie already
+> > posted some comments about this.  I'm not sure anything prevents us
+> > from defining RUNNING a 1 and STOPPED as 0 so we don't have the
+> > polarity flip vs LOGGING though.
+> > 
+> > The state "STOP & LOGGING" also feels like a strange "device state", if
+> > the device is stopped, it's not logging any new state, so I think this
+> > is more that the device state is STOP, but the LOGGING feature is
+> > active.  Maybe we should consider these independent bits.  LOGGING is
+> > active as we stop a device so that we can fetch the last dirtied pages,
+> > but disabled as we load the state of the device into the target.
+> > 
+> > > #define VFIO_DEVICE_DATA_ACTION_GET_BUFFER 1
+> > > #define VFIO_DEVICE_DATA_ACTION_SET_BUFFER 2
+> > > #define VFIO_DEVICE_DATA_ACTION_GET_BITMAP 3
+> > > 
+> > > struct vfio_device_state_ctl {
+> > > 	__u32 version;		  /* ro */
+> > > 	__u32 device_state;       /* VFIO device state, wo */
+> > > 	__u32 caps;		 /* ro */
+> > >         struct {
+> > > 		__u32 action;  /* wo, GET_BUFFER or SET_BUFFER */ 
+> > > 		__u64 size;    /*rw*/
+> > > 	} device_config;
+> > 
+> > Patch 1 indicates that to get the config buffer we write GET_BUFFER to
+> > action and read from the config region.  The size is previously read
+> > and apparently constant.  To set the config buffer, the config region
+> > is written followed by writing SET_BUFFER to action.  Why is size
+> > listed as read-write?
+> this is the size of config data.
+> size of config data <= size of config data region.
+> 
+> 
+> > Doesn't this protocol also require that the mdev driver consume each
+> > full region's worth of host kernel memory for backing pages in
+> > anticipation of a rare event like migration?  This might be a strike
+> > against separate regions if the driver needs to provide backing pages
+> > for 3 separate regions vs 1.  To avoid this runtime overhead, would it
+> > be expected that the user only mmap the regions during migration and
+> > the mdev driver allocate backing pages on mmap?  Should the mmap be
+> > restricted to the LOGGING feature being enabled?  Maybe I'm mistaken in
+> > how the mdev driver would back these mmap'd pages.
+> >
+> yes, 3 seperate regions consume a little more memory than 1 region.
+> but it's just a little overhead.
+> As in intel's kernel implementation,
+> device config region's size is 9M, dirty bitmap region's size is 16k.
+> if there is device memory region, its size can be defined as 100M?
+> so it's 109M vs 100M ?
+> 
+> > > 	struct {
+> > > 		__u32 action;    /* wo, GET_BUFFER or SET_BUFFER */ 
+> > > 		__u64 size;     /* rw */  
+> > >                 __u64 pos; /*the offset in total buffer of device memory*/
+> > 
+> > Patch 1 outlines the protocol here that getting device memory begins
+> > with writing the position field, followed by reading from the device
+> > memory region.  Setting device memory begins with writing the data to
+> > the device memory region, followed by writing the position field.  Why
+> > does the user need to have visibility of data position?  This is opaque
+> > data to the user, the device should manage how the chunks fit together.
+> > 
+> > How does the user know when they reach the end?
+> sorry, maybe I didn't explain clearly here.
+> 
+> device  ________________________________________
+> memory  |    |    |////|    |    |    |    |    |
+> data:   |____|____|////|____|____|____|____|____|
+>                   :pos :
+>                   :    :
+> device            :____:
+> memory            |    |
+> region:           |____|
+> 
+> the whole sequence is like this:
+> 
+> 1. user space reads device_memory.size
+> 2. driver gets device memory's data(full snapshot or dirty data, depending
+> on it's in LOGGING state or not), and return the total size of
+> this data. 
+> 3. user space finishes reading device_memory.size (>= device memory
+> region's size)
+> 
+> 4. user space starts a loop like
+>   
+>    while (pos < total_len) {
+>         uint64_t len = region_devmem->size;
+> 
+>         if (pos + len >= total_len) {
+>             len = total_len - pos;
+>         }
+>         if (vfio_save_data_device_memory_chunk(vdev, f, pos, len)) {
+>             return -1;
+>         }
+> 	pos += len;
+>     }
+> 
+>  vfio_save_data_device_memory_chunk reads each chunk from device memory
+>  region by writing GET_BUFFER  to device_memory.action, and pos to
+>  device_memory.pos.
+> 
+> 
+> so. each time, userspace will finish getting device memory data in one
+> time.
+> 
+> specifying "pos" is just like the "lseek" before "write".
+> 
+> > Bullets 8 and 9 in patch 1 also discuss setting and getting the device
+> > memory size, but these aren't well integrated into the protocol for
+> > getting and setting the memory buffer.  Is getting the device memory
+> > really started by reading the size, which triggers the vendor driver to
+> > snapshot the state in an internal buffer which the user then iterates
+> > through using GET_BUFFER?  Therefore re-reading the size field could
+> > corrupt the data stream?  Wouldn't it be easier to report bytes
+> > available and countdown as the user marks them read?  What does
+> > position mean when we switch from snapshot to dirty data?
+> when switching to device memory's dirty data, pos means the pos in whole
+> dirty data.
+> 
+> .save_live_pending ==> driver gets dirty data in device memory and returns
+> total size.
+> 
+> .save_live_iterate ==> userspace reads all dirty data from device memory
+> region chunk by chunk
+> 
+> So, in an iteration, all dirty data are saved.
+> then in next iteration, dirty data is recalculated.
+> 
+> 
+> > 
+> > > 	} device_memory;
+> > > 	struct {
+> > > 		__u64 start_addr; /* wo */
+> > > 		__u64 page_nr;   /* wo */
+> > > 	} system_memory;
+> > > };
+> > 
+> > Why is one specified as an address and the other as pages?  Note that
+> Yes, start_addr ==> start pfn is better
+> 
+> > Kirti's implementation has an optimization to know how many pages are
+> > set within a range to avoid unnecessary buffer reads.
 > > 
 > 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+> Let's use start_pfn_all, page_nr_all to represent the start pfn and
+> page_nr passed in from qemu .log_sync interface.
+> 
+> and use start_pfn_i, page_nr_i to the value passed to driver.
+> 
+> 
+> start_pfn_all
+>   |         start_pfn_i
+>   |         |
+>  \ /_______\_/_____________________________
+>   |    |    |////|    |    |    |    |    |
+>   |____|____|////|____|____|____|____|____|
+>             :    :
+>             :    :
+>             :____:
+> bitmap      |    |
+> region:     |____|
+>            
+> 
+> 1. Each time QEMU queries dirty bitmap from driver, it passes in
+> start_pfn_i, and page_nr_i. (page_nr_i is the biggest page number the
+> bitmap region can hold).
+> 2. driver queries memory range from start_pfn_i with size page_nr_i.
+> 3. driver return a bitmap (if no dirty data, the bitmap is all 0).
+> 4. QEMU saves the pages according to the bitmap
+> 
+> If there's no dirty data found in step 2, step 4 can be skipped.
+> (I'll add this check before step 4 in future, thanks)
+> but if there's even 1 bit set in the bitmap, no step from 1-4 can be
+> skipped.
+> 
+> Honestly, after reviewing Kirti's implementation, I don't think it's an
+> optimization. As in below pseudo code for Kirti's code, I would think the
+> copied_pfns corresponds to the page_nr_i in my case. so, the case of
+> copied_pfns equaling to 0 is for the tail chunk? don't think it's working..
+> 
+> write start_pfn to driver
+> write page_size  to driver
+> write pfn_count to driver
+> 
+> do {
+>     read copied_pfns from driver.
+>     if (copied_pfns == 0) {
+>        break;
+>     }
+>    bitmap_size = (BITS_TO_LONGS(copied_pfns) + 1) * sizeof(unsigned long);
+>    buf = get bitmap from driver
+>    cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
+>                                            (start_pfn + count) * page_size,
+>                                                 copied_pfns);
+> 
+>      count +=  copied_pfns;
+> 
+> } while (count < pfn_count);
+> 
+> 
+> 
+> > > 
+> > > Devcie States
+> > > ------------- 
+> > > After migration is initialzed, it will set device state via writing to
+> > > device_state field of control region.
+> > > 
+> > > Four states are defined for a VFIO device:
+> > >         RUNNING, RUNNING & LOGGING, STOP & LOGGING, STOP 
+> > > 
+> > > RUNNING: In this state, a VFIO device is in active state ready to receive
+> > >         commands from device driver.
+> > >         It is the default state that a VFIO device enters initially.
+> > > 
+> > > STOP:  In this state, a VFIO device is deactivated to interact with
+> > >        device driver.
+> > > 
+> > > LOGGING: a special state that it CANNOT exist independently. It must be
+> > >        set alongside with state RUNNING or STOP (i.e. RUNNING & LOGGING,
+> > >        STOP & LOGGING).
+> > >        Qemu will set LOGGING state on in .save_setup callbacks, then vendor
+> > >        driver can start dirty data logging for device memory and system
+> > >        memory.
+> > >        LOGGING only impacts device/system memory. They return whole
+> > >        snapshot outside LOGGING and dirty data since last get operation
+> > >        inside LOGGING.
+> > >        Device config should be always accessible and return whole config
+> > >        snapshot regardless of LOGGING state.
+> > >        
+> > > Note:
+> > > The reason why RUNNING is the default state is that device's active state
+> > > must not depend on device state interface.
+> > > It is possible that region vfio_device_state_ctl fails to get registered.
+> > > In that condition, a device needs be in active state by default. 
+> > > 
+> > > Get Version & Get Caps
+> > > ----------------------
+> > > On migration init phase, qemu will probe the existence of device state
+> > > regions of vendor driver, then get version of the device state interface
+> > > from the r/w control region.
+> > > 
+> > > Then it will probe VFIO device's data capability by reading caps field of
+> > > control region.
+> > >         #define VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY 1
+> > >         #define VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY 2
+> > > If VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY is on, it will save/load data of
+> > >         device memory in pre-copy and stop-and-copy phase. The data of
+> > >         device memory is held in device memory region.
+> > > If VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY is on, it will query of dirty pages
+> > >         produced by VFIO device during pre-copy and stop-and-copy phase.
+> > >         The dirty bitmap of system memory is held in dirty bitmap region.
+> > 
+> > As above, these capabilities seem redundant to the existence of the
+> > device specific regions in this implementation.
+> >
+> seems so :)
+> 
+> > > If failing to find two mandatory regions and optional data regions
+> > > corresponding to data caps or version mismatching, it will setup a
+> > > migration blocker and disable live migration for VFIO device.
+> > > 
+> > > 
+> > > Flows to call device state interface for VFIO live migration
+> > > ------------------------------------------------------------
+> > > 
+> > > Live migration save path:
+> > > 
+> > > (QEMU LIVE MIGRATION STATE --> DEVICE STATE INTERFACE --> DEVICE STATE)
+> > > 
+> > > MIGRATION_STATUS_NONE --> VFIO_DEVICE_STATE_RUNNING
+> > >  |
+> > > MIGRATION_STATUS_SAVE_SETUP
+> > >  |
+> > >  .save_setup callback -->
+> > >  get device memory size (whole snapshot size)
+> > >  get device memory buffer (whole snapshot data)
+> > >  set device state --> VFIO_DEVICE_STATE_RUNNING & VFIO_DEVICE_STATE_LOGGING
+> > >  |
+> > > MIGRATION_STATUS_ACTIVE
+> > >  |
+> > >  .save_live_pending callback --> get device memory size (dirty data)
+> > >  .save_live_iteration callback --> get device memory buffer (dirty data)
+> > >  .log_sync callback --> get system memory dirty bitmap
+> > >  |
+> > > (vcpu stops) --> set device state -->
+> > >  VFIO_DEVICE_STATE_STOP & VFIO_DEVICE_STATE_LOGGING
+> > >  |
+> > > .save_live_complete_precopy callback -->
+> > >  get device memory size (dirty data)
+> > >  get device memory buffer (dirty data)
+> > >  get device config size (whole snapshot size)
+> > >  get device config buffer (whole snapshot data)
+> > >  |
+> > > .save_cleanup callback -->  set device state --> VFIO_DEVICE_STATE_STOP
+> > > MIGRATION_STATUS_COMPLETED
+> > > 
+> > > MIGRATION_STATUS_CANCELLED or
+> > > MIGRATION_STATUS_FAILED
+> > >  |
+> > > (vcpu starts) --> set device state --> VFIO_DEVICE_STATE_RUNNING
+> > > 
+> > > 
+> > > Live migration load path:
+> > > 
+> > > (QEMU LIVE MIGRATION STATE --> DEVICE STATE INTERFACE --> DEVICE STATE)
+> > > 
+> > > MIGRATION_STATUS_NONE --> VFIO_DEVICE_STATE_RUNNING
+> > >  |
+> > > (vcpu stops) --> set device state --> VFIO_DEVICE_STATE_STOP
+> > >  |
+> > > MIGRATION_STATUS_ACTIVE
+> > >  |
+> > > .load state callback -->
+> > >  set device memory size, set device memory buffer, set device config size,
+> > >  set device config buffer
+> > >  |
+> > > (vcpu starts) --> set device state --> VFIO_DEVICE_STATE_RUNNING
+> > >  |
+> > > MIGRATION_STATUS_COMPLETED
+> > > 
+> > > 
+> > > 
+> > > In source VM side,
+> > > In precopy phase,
+> > > if a device has VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY on,
+> > > qemu will first get whole snapshot of device memory in .save_setup
+> > > callback, and then it will get total size of dirty data in device memory in
+> > > .save_live_pending callback by reading device_memory.size field of control
+> > > region.
+> > 
+> > This requires iterative reads of device memory buffer but the protocol
+> > is unclear (to me) how the user knows how to do this or interact with
+> > the position field. 
+> > 
+> > > Then in .save_live_iteration callback, it will get buffer of device memory's
+> > > dirty data chunk by chunk from device memory region by writing pos &
+> > > action (GET_BUFFER) to device_memory.pos & device_memory.action fields of
+> > > control region. (size of each chunk is the size of device memory data
+> > > region).
+> > 
+> > What if there's not enough dirty data to fill the region?  The data is
+> > always padded to fill the region?
+> >
+> I think dirty data in vendor driver is orgnaized in a format like:
+> (addr0, len0, data0, addr1, len1, data1, addr2, len2, data2,....addrN,
+> lenN, dataN).
+> for full snapshot, it's like (addr0, len0, data0).
+> so, to userspace and data region, it doesn't matter whether it's full
+> snapshot or dirty data.
+> 
+> 
+> > > .save_live_pending and .save_live_iteration may be called several times in
+> > > precopy phase to get dirty data in device memory.
+> > > 
+> > > If VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY is off, callbacks in precopy phase
+> > > like .save_setup, .save_live_pending, .save_live_iteration will not call
+> > > vendor driver's device state interface to get data from devcie memory.
+> > 
+> > Therefore through the entire precopy phase we have no data from source
+> > to target to begin a compatibility check :-\  I think both proposals
+> > currently still lack any sort of device compatibility or data
+> > versioning check between source and target.  Thanks,
+> I checked the compatibility, though not good enough:)
+> 
+> in migration_init, vfio_check_devstate_version() checked version from
+> kernel with VFIO_DEVICE_STATE_INTERFACE_VERSION in both source and target,
+> and in target side, vfio_load_state() checked source side version.
+> 
+> 
+> int vfio_load_state(QEMUFile *f, void *opaque, int version_id)                          
+> {       
+>     ...
+>     if (version_id != VFIO_DEVICE_STATE_INTERFACE_VERSION) {                                   
+>         return -EINVAL;
+>     } 
+>     ...
+> }
+> 
+> Thanks
+> Yan
+> 
+> > Alex
+> > 
+> > > In precopy phase, if a device has VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY on,
+> > > .log_sync callback will get system memory dirty bitmap from dirty bitmap
+> > > region by writing system memory's start address, page count and action 
+> > > (GET_BITMAP) to "system_memory.start_addr", "system_memory.page_nr", and
+> > > "system_memory.action" fields of control region.
+> > > If page count passed in .log_sync callback is larger than the bitmap size
+> > > the dirty bitmap region supports, Qemu will cut it into chunks and call
+> > > vendor driver's get system memory dirty bitmap interface.
+> > > If VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY is off, .log_sync callback just
+> > > returns without call to vendor driver.
+> > > 
+> > > In stop-and-copy phase, device state will be set to STOP & LOGGING first.
+> > > in save_live_complete_precopy callback,
+> > > If VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY is on,
+> > > get device memory size and get device memory buffer will be called again.
+> > > After that,
+> > > device config data is get from device config region by reading
+> > > devcie_config.size of control region and writing action (GET_BITMAP) to
+> > > device_config.action of control region.
+> > > Then after migration completes, in cleanup handler, LOGGING state will be
+> > > cleared (i.e. deivce state is set to STOP).
+> > > Clearing LOGGING state in cleanup handler is in consideration of the case
+> > > of "migration failed" and "migration cancelled". They can also leverage
+> > > the cleanup handler to unset LOGGING state.
+> > > 
+> > > 
+> > > References
+> > > ----------
+> > > 1. kernel side implementation of Device state interfaces:
+> > > https://patchwork.freedesktop.org/series/56876/
+> > > 
+> > > 
+> > > Yan Zhao (5):
+> > >   vfio/migration: define kernel interfaces
+> > >   vfio/migration: support device of device config capability
+> > >   vfio/migration: tracking of dirty page in system memory
+> > >   vfio/migration: turn on migration
+> > >   vfio/migration: support device memory capability
+> > > 
+> > >  hw/vfio/Makefile.objs         |   2 +-
+> > >  hw/vfio/common.c              |  26 ++
+> > >  hw/vfio/migration.c           | 858 ++++++++++++++++++++++++++++++++++++++++++
+> > >  hw/vfio/pci.c                 |  10 +-
+> > >  hw/vfio/pci.h                 |  26 +-
+> > >  include/hw/vfio/vfio-common.h |   1 +
+> > >  linux-headers/linux/vfio.h    | 260 +++++++++++++
+> > >  7 files changed, 1174 insertions(+), 9 deletions(-)
+> > >  create mode 100644 hw/vfio/migration.c
+> > > 
+> > 
+> _______________________________________________
+> intel-gvt-dev mailing list
+> intel-gvt-dev@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
