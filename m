@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42574)
+Received: from eggs.gnu.org ([209.51.188.92]:43076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1ZSZ-0005nj-Ke
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:32:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h1ZV5-0006mS-Ug
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:34:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1ZSX-0003Kn-BW
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:31:59 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Mar 2019 16:31:37 +0000
-Message-ID: <82c6b3a3-e216-539c-ed86-500d6a6fbc05@virtuozzo.com>
-References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
-	<d582055f-6ee7-ad62-e178-023a283f89dd@redhat.com>
-In-Reply-To: <d582055f-6ee7-ad62-e178-023a283f89dd@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <62D35D1B24A2D34B9B8AF2000D1A7854@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1h1ZV4-0004qs-NM
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:34:35 -0500
+Date: Wed, 6 Mar 2019 17:34:20 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190306173420.3614a38b@Igors-MacBook-Pro.local>
+In-Reply-To: <1551879417-21031-2-git-send-email-guoheyi@huawei.com>
+References: <1551879417-21031-1-git-send-email-guoheyi@huawei.com>
+	<1551879417-21031-2-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/4] nbd: non-blocking negotiation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] hw/arm/acpi: simplify AML bit
+ and/or statement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "berrange@redhat.com" <berrange@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, wanghaibin.wang@huawei.com
 
-MDYuMDMuMjAxOSAxOToxMSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMi8xMS8xOSA2OjU1IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gSGkgYWxsIQ0KPj4NCj4+
-IEhlcmUgaXMgYSB0cnkgb2YgbW92aW5nIHRvIG5vbi1ibG9ja2luZyBuZWdvdGlhdGlvbiBpbiBu
-YmQNCj4+IGNvZGUsIHByb3Bvc2VkIGJ5IERlbmllbCBpbg0KPj4gaHR0cHM6Ly9saXN0cy5nbnUu
-b3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEvbXNnMDM4MTcuaHRtbA0KPj4NCj4+
-IGluIHRocmVhZCAiW1BBVENIIHY0IDAwLzEwXSBOQkQgcmVjb25uZWN0Ig0KPj4gaHR0cHM6Ly9s
-aXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMDcvbXNnMDU5NzMuaHRt
-bA0KPj4NCj4+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgKDQpOg0KPj4gICAgaW8vY2hh
-bm5lbDogYWRkIHFpb19jaGFubmVsX2dldF9hdHRhY2hlZF9haW9fY29udGV4dCgpDQo+PiAgICBu
-YmQvY2xpZW50OiBkbyBuZWdvdGlhdGlvbiBpbiBjb3JvdXRpbmUNCj4+ICAgIG5iZDogZG8gcWVt
-dV9jb3JvdXRpbmVfeWllbGQgZHVyaW5nIHRscyBoYW5kc2hha2UNCj4+ICAgIGJsb2NrL25iZC1j
-bGllbnQ6IHVzZSBub24tYmxvY2tpbmcgaW8gY2hhbm5lbCBmb3IgbmJkIG5lZ290aWF0aW9uDQo+
-IA0KPiBXaWxsIHRoZXJlIGJlIGEgdjIgb2YgdGhpcyBzZXJpZXM/ICBTb2Z0IGZyZWV6ZSBmb3Ig
-NC4wIGlzIGNvbWluZyB1cA0KPiB2ZXJ5IHJhcGlkbHksIHNvIEknbSB0cnlpbmcgdG8gZ2F1Z2Ug
-aWYgdGhpcyBpcyBzdGlsbCA0LjAgbWF0ZXJpYWwgKGFuZA0KPiBJIHNob3VsZCBob2xkIG9mZiBt
-eSBOQkQgcXVldWUgZm9yIGEgY2hhbmNlIHRvIGluY2x1ZGUgaXQpIG9yIGlmIGl0IGlzDQo+IG1v
-cmUgbGlrZWx5IHRvIHNsaXAgaW50byA0LjEgKGFuZCBJIHNob3VsZCBwb3N0IG15IE5CRCBwdWxs
-IHJlcXVlc3QNCj4gc29vbmVyIHRvIGF2b2lkIGJ1cmRlbmluZyBQZXRlciB3aXRoIGEgbGFzdC1t
-aW51dGUgcnVzaCBuZXh0IHdlZWspLg0KPiANCg0KSSBkZWNpZGVkIHRvIGdvIGFub3RoZXIgd2F5
-IGFzIEkgcmVhbGx5IHVuc3VyZSBhYm91dCB1c2luZyBhbGwgdGhpcyBzdGFmZg0KaW4gYSBjb250
-ZXh0IG9mIHRoZSB0aHJlYWQgaW4gbmJkIHNlcnZlci4gQW5kIGl0J2xsIGJlIDEtMiBwYXRjaGVz
-Lg0KUG9zc2libHksIHRoZXknbGwgYmUgcmVhZHkgb24gTWFyY2ggOS4NCg0KT24gdGhlIG90aGVy
-IGhhbmQsIHRoZSBtb3N0IGludGVyZXN0IHBhcnQgaXMgbmJkLXJlY29ubmVjdCBzZXJpZXMgYW5k
-IGl0DQpkb2Vzbid0IHNlZW0gZmVhc2libGUgdG8gZmluaXNoIGl0IGZvciA0LjAuIChpdCdzIHBv
-c3NpYmxlIHRoYXQgTWFyY2ggOQ0Kd291bGQgYmUgdGhlIG9ubHkgbXkgd29ya2luZyBkYXkgZnJv
-bSA3LTExKQ0KDQpTbywgSSB0aGluaywgbGV0J3MgbW92ZSB0aGlzIGFsbCB0byA0LjEuDQoNCg0K
-LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Wed, 6 Mar 2019 21:36:56 +0800
+Heyi Guo <guoheyi@huawei.com> wrote:
+
+> The last argument of AML bit and/or statement is the target variable,
+> so we don't need to use a NULL target and then an additional store
+> operation; a single bit and/or statement is enough.
+
+s: a single bit and/or : using just aml_and() or aml_and() "
+
+With commit message fixed up:
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> 
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> ---
+>  hw/arm/virt-acpi-build.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index d7e2e48..cebec4c 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -265,17 +265,17 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>          aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+>      aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+>      aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
+> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
+> -                                aml_name("CTRL")));
+> +    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
+> +                              aml_name("CTRL")));
+>  
+>      ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
+> -                                 aml_name("CDW1")));
+> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x08),
+> +                              aml_name("CDW1")));
+>      aml_append(ifctx, ifctx1);
+>  
+>      ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
+> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
+> -                                 aml_name("CDW1")));
+> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x10),
+> +                              aml_name("CDW1")));
+>      aml_append(ifctx, ifctx1);
+>  
+>      aml_append(ifctx, aml_store(aml_name("CTRL"), aml_name("CDW3")));
+> @@ -283,8 +283,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      aml_append(method, ifctx);
+>  
+>      elsectx = aml_else();
+> -    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
+> -                                  aml_name("CDW1")));
+> +    aml_append(elsectx, aml_or(aml_name("CDW1"), aml_int(4),
+> +                               aml_name("CDW1")));
+>      aml_append(elsectx, aml_return(aml_arg(3)));
+>      aml_append(method, elsectx);
+>      aml_append(dev, method);
