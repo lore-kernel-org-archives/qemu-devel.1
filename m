@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37062)
+Received: from eggs.gnu.org ([209.51.188.92]:37074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h1WkW-0008V1-UL
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:38:21 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1h1Wkb-000088-Qb
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:38:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h1WkW-000279-5C
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:38:20 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1h1WkW-000270-0u
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:38:25 -0500
 From: Heyi Guo <guoheyi@huawei.com>
-Date: Wed, 6 Mar 2019 21:36:57 +0800
-Message-ID: <1551879417-21031-3-git-send-email-guoheyi@huawei.com>
+Date: Wed, 6 Mar 2019 21:36:56 +0800
+Message-ID: <1551879417-21031-2-git-send-email-guoheyi@huawei.com>
 In-Reply-To: <1551879417-21031-1-git-send-email-guoheyi@huawei.com>
 References: <1551879417-21031-1-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 2/2] hw/arm/acpi: enable SHPC native hot plug
+Subject: [Qemu-devel] [PATCH v4 1/2] hw/arm/acpi: simplify AML bit and/or
+ statement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +25,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: wanghaibin.wang@huawei.com, Heyi Guo <guoheyi@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-After the introduction of generic PCIe root port and PCIe-PCI bridge,
-we will also have SHPC controller on ARM, so just enable SHPC native
-hot plug.
+The last argument of AML bit and/or statement is the target variable,
+so we don't need to use a NULL target and then an additional store
+operation; a single bit and/or statement is enough.
 
 Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Heyi Guo <guoheyi@huawei.com>
 ---
- hw/arm/virt-acpi-build.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/arm/virt-acpi-build.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index cebec4c..b6fef28 100644
+index d7e2e48..cebec4c 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -265,7 +265,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+@@ -265,17 +265,17 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
          aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
      aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
      aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
--    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
-+
-+    /*
-+     * Allow OS control for all 5 features:
-+     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
-+     */
-+    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1F),
-                               aml_name("CTRL")));
+-    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
+-                                aml_name("CTRL")));
++    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
++                              aml_name("CTRL")));
  
      ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+-    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
+-                                 aml_name("CDW1")));
++    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x08),
++                              aml_name("CDW1")));
+     aml_append(ifctx, ifctx1);
+ 
+     ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
+-    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
+-                                 aml_name("CDW1")));
++    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x10),
++                              aml_name("CDW1")));
+     aml_append(ifctx, ifctx1);
+ 
+     aml_append(ifctx, aml_store(aml_name("CTRL"), aml_name("CDW3")));
+@@ -283,8 +283,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+     aml_append(method, ifctx);
+ 
+     elsectx = aml_else();
+-    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
+-                                  aml_name("CDW1")));
++    aml_append(elsectx, aml_or(aml_name("CDW1"), aml_int(4),
++                               aml_name("CDW1")));
+     aml_append(elsectx, aml_return(aml_arg(3)));
+     aml_append(method, elsectx);
+     aml_append(dev, method);
 -- 
 1.8.3.1
