@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38955)
+Received: from eggs.gnu.org ([209.51.188.92]:46062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1h1Lql-0000tc-7o
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 21:00:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1MOt-00085C-TK
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 21:35:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1h1Lqj-0007QP-7D
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 21:00:03 -0500
-Received: from mga04.intel.com ([192.55.52.120]:21567)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1h1Lqf-0007IH-FN
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:59:59 -0500
-Message-ID: <5C7F2AC6.4080602@intel.com>
-Date: Wed, 06 Mar 2019 10:04:54 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1h1MOr-00081o-HR
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 21:35:19 -0500
+Date: Wed, 6 Mar 2019 11:58:24 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190306005824.GH19715@umbus.fritz.box>
+References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
+	<20190214043916.22128-2-david@gibson.dropbear.id.au>
+	<20190228083317-mutt-send-email-mst@kernel.org>
+	<20190305005207.GA7877@umbus.fritz.box>
+	<20190304211451-mutt-send-email-mst@kernel.org>
+	<20190305050300.GI7877@umbus.fritz.box>
+	<20190305094050-mutt-send-email-mst@kernel.org>
+	<20190305233512.GB19715@umbus.fritz.box>
+	<20190305191334-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
-	<20190305145034.GF9811@work-vm>
-In-Reply-To: <20190305145034.GF9811@work-vm>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="lrvsYIebpInmECXG"
+Content-Disposition: inline
+In-Reply-To: <20190305191334-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-balloon: Remove unnecessary
+ MADV_WILLNEED on deflate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +32,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
 
-On 03/05/2019 10:50 PM, Dr. David Alan Gilbert wrote:
-> * Wei Wang (wei.w.wang@intel.com) wrote:
->> The new feature enables the virtio-balloon device to receive hints of
->> guest free pages from the free page vq.
->>
->> A notifier is registered to the migration precopy notifier chain. The
->> notifier calls free_page_start after the migration thread syncs the dirty
->> bitmap, so that the free page optimization starts to clear bits of free
->> pages from the bitmap. It calls the free_page_stop before the migration
->> thread syncs the bitmap, which is the end of the current round of ram
->> save. The free_page_stop is also called to stop the optimization in the
->> case when there is an error occurred in the process of ram saving.
->>
->> Note: balloon will report pages which were free at the time of this call.
->> As the reporting happens asynchronously, dirty bit logging must be
->> enabled before this free_page_start call is made. Guest reporting must be
->> disabled before the migration dirty bitmap is synchronized.
->>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> CC: Michael S. Tsirkin <mst@redhat.com>
->> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> CC: Juan Quintela <quintela@redhat.com>
->> CC: Peter Xu <peterx@redhat.com>
->> ---
->>   hw/virtio/virtio-balloon.c                      | 263 ++++++++++++++++++++++++
->>   include/hw/virtio/virtio-balloon.h              |  28 ++-
->>   include/standard-headers/linux/virtio_balloon.h |   5 +
->>   3 files changed, 295 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->> +    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
->> +        config.free_page_report_cmd_id =
->> +                       cpu_to_le32(dev->free_page_report_cmd_id);
->> +    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
->> +        config.free_page_report_cmd_id =
->> +                       cpu_to_le32(VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID);
->> +    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
->> +        config.free_page_report_cmd_id =
->> +                       cpu_to_le32(VIRTIO_BALLOON_FREE_PAGE_REPORT_DONE_ID);
->> +    }
-> It looks like somewhere in the last 3 months the name in the kernel
-> changed; so I think I've fixed this correctly but please shout if it's
-> wrong:
->
->      if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
->          config.free_page_report_cmd_id =
->                         cpu_to_le32(dev->free_page_report_cmd_id);
->      } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
->          config.free_page_report_cmd_id =
->                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
->      } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
->          config.free_page_report_cmd_id =
->                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
->      }
->
-> and I've dropped the kernel header update since it's already there.
->
 
-Looks good. Thanks for the update.
+--lrvsYIebpInmECXG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best,
-Wei
+On Tue, Mar 05, 2019 at 07:14:09PM -0500, Michael S. Tsirkin wrote:
+> On Wed, Mar 06, 2019 at 10:35:12AM +1100, David Gibson wrote:
+> > On Tue, Mar 05, 2019 at 09:41:34AM -0500, Michael S. Tsirkin wrote:
+> > > On Tue, Mar 05, 2019 at 04:03:00PM +1100, David Gibson wrote:
+> > > > On Mon, Mar 04, 2019 at 09:29:24PM -0500, Michael S. Tsirkin wrote:
+> > > > > On Tue, Mar 05, 2019 at 11:52:08AM +1100, David Gibson wrote:
+> > > > > > On Thu, Feb 28, 2019 at 08:36:58AM -0500, Michael S. Tsirkin wr=
+ote:
+> > > > > > > On Thu, Feb 14, 2019 at 03:39:12PM +1100, David Gibson wrote:
+> > > > > > > > When the balloon is inflated, we discard memory place in it=
+ using madvise()
+> > > > > > > > with MADV_DONTNEED.  And when we deflate it we use MADV_WIL=
+LNEED, which
+> > > > > > > > sounds like it makes sense but is actually unnecessary.
+> > > > > > > >=20
+> > > > > > > > The misleadingly named MADV_DONTNEED just discards the memo=
+ry in question,
+> > > > > > > > it doesn't set any persistent state on it in-kernel; all th=
+at's necessary
+> > > > > > > > to bring the memory back is to touch it.  MADV_WILLNEED in =
+contrast
+> > > > > > > > specifically says that the memory will be used soon and fau=
+lts it in.
+> > > > > > > >=20
+> > > > > > > > This patch simplify's the balloon operation by dropping the=
+ madvise()
+> > > > > > > > on deflate.  This might have an impact on performance - it =
+will move a
+> > > > > > > > delay at deflate time until that memory is actually touched=
+, which
+> > > > > > > > might be more latency sensitive.  However:
+> > > > > > > >=20
+> > > > > > > >   * Memory that's being given back to the guest by deflatin=
+g the
+> > > > > > > >     balloon *might* be used soon, but it equally could just=
+ sit around
+> > > > > > > >     in the guest's pools until needed (or even be faulted o=
+ut again if
+> > > > > > > >     the host is under memory pressure).
+> > > > > > > >=20
+> > > > > > > >   * Usually, the timescale over which you'll be adjusting t=
+he balloon
+> > > > > > > >     is long enough that a few extra faults after deflation =
+aren't
+> > > > > > > >     going to make a difference.
+> > > > > > > >=20
+> > > > > > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > > > > > Reviewed-by: David Hildenbrand <david@redhat.com>
+> > > > > > > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > >=20
+> > > > > > > I'm having second thoughts about this. It might affect perfor=
+mance but
+> > > > > > > probably won't but we have no idea.  Might cause latency jitt=
+er after
+> > > > > > > deflate where it previously didn't happen.  This kind of patc=
+h should
+> > > > > > > really be accompanied by benchmarking results, not philosophy.
+> > > > > >=20
+> > > > > > I guess I see your point, much as it's annoying to spend time
+> > > > > > benchmarking a device that's basically broken by design.
+> > > > >=20
+> > > > > Because of 4K page thing?
+> > > >=20
+> > > > For one thing.  I believe David H has bunch of other reasons.
+> > > >=20
+> > > > > It's an annoying bug for sure.  There were
+> > > > > patches to add a feature bit to just switch to plan s/g format, b=
+ut they
+> > > > > were abandoned. You are welcome to revive them though.
+> > > > > Additionally or alternatively, we can easily add a field specifyi=
+ng
+> > > > > page size.
+> > > >=20
+> > > > We could, but I'm pretty disinclined to work on this when virtio-mem
+> > > > is a better solution in nearly every way.
+> > >=20
+> > > Then one way would be to just let balloon be. Make it behave same as
+> > > always and don't make changes to it :)
+> >=20
+> > I'd love to, but it is in real world use, so I think we do need to fix
+> > serious bugs in it - at least if they can be fixed on one side,
+> > without needing to roll out both qemu and guest changes (which adding
+> > page size negotiation would require).
+>=20
+>=20
+> Absolutely I'm just saying don't add optimizations in that case :)
+
+I don't plan to.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--lrvsYIebpInmECXG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlx/GzAACgkQbDjKyiDZ
+s5Kf+g//VpzlnFhtbrkaojSPN6pOAzcFa3DvEPw0nVq+x3qMu3jlwW0SuMbqUIv/
+YIgT4oroj/gYb7cdrmtkdnKCsPMITanJWKwPcB1moAW/g+giGmDKfPom5hSYrF8T
+NbJOHhfWyfDbAam00ZtPcIj3o2IRqmalbdUaId5BR0BxOl8gNtf6l9Ye+pn+Ahsu
+nNkoqt9QO/6mOpyXGlL048bXSUKzur/u7fDiXHJbRmQdTZboyaeD0i8U6KtzqlZC
+cNXYOD4OPhEwcGQWwGYFBde5LqAKRpVnkdV+7ruZJxbLe9agFFanhja9LDBheAT9
+i6JyMu/0Ql5/YTZjDNqOfD4pWvw1lO8UinQLyngWihqevKXr9UmorqSyTrVqJkby
+PuooTUw951kCFfq2bXt2tNtA3Fu53YCYwlmv5vVdkf1MAPuVtwWpS1TxNpaV66Up
+FtwU79rT5v3UQx9bvoOZ4qofgmGg2bQa4OktYZsdz3d2+Y65vXPfXNAGCBN7yM1p
+PQZkyWp5yKuP+O3ELhTsbSyZ8WKmgIxh8fueF0O9RPzFaAesWcusfK8xKEVn3rpM
+LBPDRC/kJ2Pk+mmyVKsqbYNvRyhnatqA4lefT+SqqDUecYGFmYxPZMZimwBkgHj2
+IfFDr9U1yEwaevk5Z1lq2CaArx/264xseunsW/+ZePg4MfsK6VY=
+=q2nz
+-----END PGP SIGNATURE-----
+
+--lrvsYIebpInmECXG--
