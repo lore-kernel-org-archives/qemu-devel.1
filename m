@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50036)
+Received: from eggs.gnu.org ([209.51.188.92]:50238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1XsX-0001sq-6y
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:50:41 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h1XtX-0002Sr-6O
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:51:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1XsV-0005GW-TH
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:50:41 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46915)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1XsV-00054F-Nv
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:50:39 -0500
-Received: by mail-oi1-x242.google.com with SMTP id j10so10012767oij.13
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 06:50:25 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1h1XtV-00068R-7G
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:51:43 -0500
+Date: Wed, 6 Mar 2019 15:51:32 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190306145132.GH6818@localhost.localdomain>
+References: <1551694120-768127-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1551694120-768127-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 MIME-Version: 1.0
-References: <20190306110711.309-1-laurent@vivier.eu>
-In-Reply-To: <20190306110711.309-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 6 Mar 2019 14:50:12 +0000
-Message-ID: <CAFEAcA9pjHpqtBCXZGDXEnzW8=FvnGER_MZkNC0NxZX6ORtwzQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/10] Trivial branch patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1551694120-768127-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] iotests: ask QEMU for supported formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +23,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-s390x <qemu-s390x@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Zhang Chen <zhangckid@gmail.com>, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, rkagan@virtuozzo.com
 
-On Wed, 6 Mar 2019 at 11:09, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2019-03-05' into staging (2019-03-05 19:23:45 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
->
-> for you to fetch changes up to 0e081fde8a3d80383adf2e802fc0c03af44c5436:
->
->   thunk: fix of malloc to g_new (2019-03-06 11:27:32 +0100)
->
-> ----------------------------------------------------------------
-> trivial patches pull request (20190206)
->
-> - acpi: remove unused functions/variables
-> - tests: remove useless architecture checks
-> - some typo fixes and documentation update
-> - flash_cfi02: fix memory leak
->
+Am 04.03.2019 um 11:08 hat Andrey Shinkevich geschrieben:
+> Supported formats listed by 'qemu' may differ from those listed by
+> 'qemu-img' due to whitelists. Some test cases require specific formats
+> that may be used with qemu. They can be inquired directly by running
+> 'qemu -drive format=help'. The response takes whitelists into account.
+> The method supported_formats() serves for that. The method decorator
+> skip_if_unsupported() checks if all requested formats are whitelisted.
+> If not, the test case will be skipped. That has been implemented in
+> the 'check' file in the way similar to the 'test notrun' mechanism.
+> 
+> Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/check      | 16 +++++++++++++-
+>  tests/qemu-iotests/iotests.py | 50 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 65 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index 895e1e3..b9d539c 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -25,6 +25,7 @@ try=0
+>  n_bad=0
+>  bad=""
+>  notrun=""
+> +casenotrun=""
+>  interrupt=true
+>  
+>  # by default don't output timestamps
+> @@ -664,6 +665,11 @@ END        { if (NR > 0) {
+>              echo "Not run:$notrun"
+>              echo "Not run:$notrun" >>check.log
+>          fi
+> +        if [ ! -z "$casenotrun" ]
+> +        then
+> +            echo "Some cases not run in:$casenotrun"
+> +            echo "Some cases not run in:$casenotrun" >>check.log
+> +        fi
+>          if [ ! -z "$n_bad" -a $n_bad != 0 ]
+>          then
+>              echo "Failures:$bad"
+> @@ -743,6 +749,10 @@ do
+>                  printf "        "        # prettier output with timestamps.
+>          fi
+>          rm -f core $seq.notrun
+> +        if [ -f $seq.casenotrun ]
+> +        then
+> +            rm -f $seq.casenotrun
+> +        fi
+>  
+>          start=$(_wallclock)
+>          $timestamp && printf %s "        [$(date "+%T")]"
+> @@ -823,7 +833,11 @@ do
+>                  fi
+>              fi
+>          fi
+> -
+> +        if [ -f $seq.casenotrun ]
+> +        then
+> +            cat $seq.casenotrun
+> +            casenotrun="$casenotrun $seq"
+> +        fi
+>      fi
+>  
+>      # come here for each test, except when $showme is true
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index b461f53..8fe1620 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -728,6 +728,56 @@ def verify_quorum():
+>      if not supports_quorum():
+>          notrun('quorum support missing')
+>  
+> +def qemu_pipe(*args):
+> +    '''Run qemu with an option to print something and exit (e.g. a help option),
+> +    and return its output'''
+> +    args = [qemu_prog] + qemu_opts + list(args)
+> +    subp = subprocess.Popen(args, stdout=subprocess.PIPE,
+> +                            stderr=subprocess.STDOUT)
+> +    exitcode = subp.wait()
+> +    if exitcode < 0:
+> +        sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode,
+> +            ' '.join(args)))
+> +    return subp.communicate()[0]
+> +
+> +def supported_formats(read_only=False):
+> +    '''Set 'read_only' to True to check ro-whitelist
+> +       Otherwise, rw-whitelist is checked'''
+> +    format_message = qemu_pipe("-drive", "format=help")
+> +    available = []
+> +
+> +    if read_only:
+> +        # Check read-only whitelist
+> +        available = format_message.splitlines()[1].split(":")[1].split()
+> +    else:
+> +        # Check read-write whitelist
+> +        available = format_message.splitlines()[0].split(":")[1].split()
+> +
+> +    return available
 
-Applied, thanks.
+With Python 3:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
++======================================================================
++ERROR: testBlkVerify (__main__.TestBlockdevDel)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "/home/kwolf/source/qemu/tests/qemu-iotests/iotests.py", line 800, in func_wrapper
++    set(supported_formats(read_only)))
++  File "/home/kwolf/source/qemu/tests/qemu-iotests/iotests.py", line 782, in supported_formats
++    available = format_message.splitlines()[0].split(":")[1].split()
++TypeError: a bytes-like object is required, not 'str'
++
++======================================================================
++ERROR: testQuorum (__main__.TestBlockdevDel)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "/home/kwolf/source/qemu/tests/qemu-iotests/iotests.py", line 800, in func_wrapper
++    set(supported_formats(read_only)))
++  File "/home/kwolf/source/qemu/tests/qemu-iotests/iotests.py", line 782, in supported_formats
++    available = format_message.splitlines()[0].split(":")[1].split()
++TypeError: a bytes-like object is required, not 'str'
++
 
--- PMM
+This fixes it for me (the first hunk is actually a bonus which fixes a
+preexisting bug, which somehow meant that the reason was not printed):
+
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index e6ae4e91b7..b41ac4be51 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -712,7 +712,7 @@ def notrun(reason):
+     # Each test in qemu-iotests has a number ("seq")
+     seq = os.path.basename(sys.argv[0])
+
+-    open('%s/%s.notrun' % (output_dir, seq), 'wb').write(reason + '\n')
++    open('%s/%s.notrun' % (output_dir, seq), 'wt').write(reason + '\n')
+     print('%s not run: %s' % (seq, reason))
+     sys.exit(0)
+
+@@ -761,7 +761,8 @@ def qemu_pipe(*args):
+     and return its output'''
+     args = [qemu_prog] + qemu_opts + list(args)
+     subp = subprocess.Popen(args, stdout=subprocess.PIPE,
+-                            stderr=subprocess.STDOUT)
++                            stderr=subprocess.STDOUT,
++                            universal_newlines=True)
+     exitcode = subp.wait()
+     if exitcode < 0:
+         sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode,
+@@ -788,7 +789,7 @@ def case_notrun(reason):
+     # Each test in qemu-iotests has a number ("seq")
+     seq = os.path.basename(sys.argv[0])
+
+-    open('%s/%s.casenotrun' % (output_dir, seq), 'ab').write(
++    open('%s/%s.casenotrun' % (output_dir, seq), 'at').write(
+         '    [case not run] ' + reason + '\n')
+
+ def skip_if_unsupported(required_formats=[], read_only=False):
