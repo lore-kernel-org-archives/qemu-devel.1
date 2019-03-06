@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37232)
+Received: from eggs.gnu.org ([209.51.188.92]:37910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Z5C-0003tM-TV
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:07:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h1Z85-00057n-N0
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:10:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Z5A-0000w6-Uo
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:07:50 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Mar 2019 16:07:31 +0000
-Message-ID: <714826c3-13a8-75e0-fbc8-b98f72edd359@virtuozzo.com>
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<20190305234337.18353-2-jsnow@redhat.com>
-In-Reply-To: <20190305234337.18353-2-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B22483B8A4D09342A03407807D8F20B7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1h1Z84-0002Rd-Jb
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:10:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1h1Z84-0002R6-6m
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:10:48 -0500
+Date: Wed, 6 Mar 2019 17:10:41 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190306171041.0bb86044@Igors-MacBook-Pro.local>
+In-Reply-To: <20190227075101.6263-4-richardw.yang@linux.intel.com>
+References: <20190227075101.6263-1-richardw.yang@linux.intel.com>
+	<20190227075101.6263-4-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/5] block/qcow2-bitmap: Skip length check
- in some cases
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] nvdimm: use NVDIMM_ACPI_IO_LEN for the
+ proper IO size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, xiaoguangrong.eric@gmail.com
 
-MDYuMDMuMjAxOSAyOjQzLCBKb2huIFNub3cgd3JvdGU6DQo+IElmIHdlIHdlcmUgdG8gYWxsb3cg
-cmVzaXplcywgdGhlIGxlbmd0aCBjaGVjayB0aGF0IGhhcHBlbnMgd2hlbiB3ZSBsb2FkDQo+IGJp
-dG1hcCBoZWFkZXJzIGZyb20gZGlzayB3aGVuIHdlIHJlYWQgb3Igc3RvcmUgYml0bWFwcyB3b3Vs
-ZCBiZWdpbiB0bw0KPiBmYWlsOg0KPiANCj4gSW1hZ2luZSB0aGUgY2lyY3Vtc3RhbmNlIHdoZXJl
-IHdlJ3ZlIHJlc2l6ZWQgYml0bWFwcyBpbiBtZW1vcnksIGJ1dCB0aGV5IHN0aWxsDQo+IGhhdmUg
-dGhlIG9sZCB2YWx1ZXMgb24tZGlzay4gVGhlIGxlbmd0aHMgd2lsbCBubyBsb25nZXIgbWF0Y2gg
-YmRydl9nZXRsZW5ndGgsDQo+IHNvIHdlIG11c3QgYWxsb3cgdGhpcyBjaGVjayB0byBiZSBza2lw
-cGVkIHdoZW4gZmx1c2hpbmcgYml0bWFwcyB0byBkaXNrLg0KPiANCj4gTGltaXQgdGhpcyB0byB3
-aGVuIHdlIGFyZSBhYm91dCB0byBvdmVyd3JpdGUgdGhlIGhlYWRlcnM6IHdlIHdpbGwgdmVyaWZ5
-IHRoZQ0KPiBvdXRnb2luZyBoZWFkZXJzLCBidXQgd2Ugd2lsbCBza2lwIHZlcmlmeWluZyB0aGUg
-a25vd24gc3RhbGUgaGVhZGVycy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNu
-b3dAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICAgYmxvY2svcWNvdzItYml0bWFwLmMgfCAzNCArKysr
-KysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIxIGlu
-c2VydGlvbnMoKyksIDEzIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fj
-b3cyLWJpdG1hcC5jIGIvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gaW5kZXggYzNiMjEwZWRlMS4u
-ZDAyNzMwMDA0YSAxMDA2NDQNCj4gLS0tIGEvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gKysrIGIv
-YmxvY2svcWNvdzItYml0bWFwLmMNCj4gQEAgLTQzNSw3ICs0MzUsOCBAQCBzdGF0aWMgaW5saW5l
-IFFjb3cyQml0bWFwRGlyRW50cnkgKm5leHRfZGlyX2VudHJ5KFFjb3cyQml0bWFwRGlyRW50cnkg
-KmVudHJ5KQ0KPiAgICAgICByZXR1cm4gKFFjb3cyQml0bWFwRGlyRW50cnkgKikoKHVpbnQ4X3Qg
-KillbnRyeSArIGRpcl9lbnRyeV9zaXplKGVudHJ5KSk7DQo+ICAgfQ0KPiAgIA0KPiAtc3RhdGlj
-IGludCBjaGVja19kaXJfZW50cnkoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIFFjb3cyQml0bWFwRGly
-RW50cnkgKmVudHJ5KQ0KPiArc3RhdGljIGludCBjaGVja19kaXJfZW50cnkoQmxvY2tEcml2ZXJT
-dGF0ZSAqYnMsIFFjb3cyQml0bWFwRGlyRW50cnkgKmVudHJ5LA0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgYm9vbCBhbGxvd19yZXNpemUpDQo+ICAgew0KPiAgICAgICBCRFJWUWNvdzJT
-dGF0ZSAqcyA9IGJzLT5vcGFxdWU7DQo+ICAgICAgIHVpbnQ2NF90IHBoeXNfYml0bWFwX2J5dGVz
-Ow0KPiBAQCAtNDYyLDggKzQ2MywxNCBAQCBzdGF0aWMgaW50IGNoZWNrX2Rpcl9lbnRyeShCbG9j
-a0RyaXZlclN0YXRlICpicywgUWNvdzJCaXRtYXBEaXJFbnRyeSAqZW50cnkpDQo+ICAgICAgICAg
-ICByZXR1cm4gbGVuOw0KPiAgICAgICB9DQo+ICAgDQo+IC0gICAgZmFpbCA9IChwaHlzX2JpdG1h
-cF9ieXRlcyA+IEJNRV9NQVhfUEhZU19TSVpFKSB8fA0KPiAtICAgICAgICAgICAobGVuID4gKChw
-aHlzX2JpdG1hcF9ieXRlcyAqIDgpIDw8IGVudHJ5LT5ncmFudWxhcml0eV9iaXRzKSk7DQo+ICsg
-ICAgaWYgKHBoeXNfYml0bWFwX2J5dGVzID4gQk1FX01BWF9QSFlTX1NJWkUpIHsNCj4gKyAgICAg
-ICAgcmV0dXJuIC1FSU5WQUw7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgaWYgKCFhbGxvd19yZXNp
-emUgJiYNCj4gKyAgICAgICAgKGxlbiA+ICgocGh5c19iaXRtYXBfYnl0ZXMgKiA4KSA8PCBlbnRy
-eS0+Z3JhbnVsYXJpdHlfYml0cykpKSB7DQo+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiAr
-ICAgIH0NCg0Kbm93IEkgdGhpbmssIHRoYXQgd2UgZG9uJ3QgbmVlZCBhZGRpdGlvbmFsIHBhcmFt
-ZXRlciwgYnV0IGluc3RlYWQgZG8gdGhpcyBjaGVjayBvbmx5IGlmDQohIGVudHJ5LT5mbGFncyAm
-IEJNRV9GTEFHX0lOX1VTRSwgd2hpY2ggd2lsbCBjb3JyZXNwb25kIHRvOg0KDQoxLiBpbmNvbWlu
-ZzogYml0bWFwIGxvYWRlZCBmcm9tIGltYWdlDQoyLiBvdXRnb2luZzogYml0bWFwIHN0b3JlZCB0
-byB0aGUgaW1hZ2UNCg0KPiAgIA0KPiAgICAgICByZXR1cm4gZmFpbCA/IC1FSU5WQUwgOiAwOw0K
-PiAgIH0NCj4gQEAgLTUzNCw3ICs1NDEsOCBAQCBzdGF0aWMgdWludDMyX3QgYml0bWFwX2xpc3Rf
-Y291bnQoUWNvdzJCaXRtYXBMaXN0ICpibV9saXN0KQ0KPiAgICAqIGNoZWNrcyBpdCBhbmQgY29u
-dmVydCB0byBiaXRtYXAgbGlzdC4NCj4gICAgKi8NCj4gICBzdGF0aWMgUWNvdzJCaXRtYXBMaXN0
-ICpiaXRtYXBfbGlzdF9sb2FkKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBvZmZzZXQs
-DQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IHNp
-emUsIEVycm9yICoqZXJycCkNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgdWludDY0X3Qgc2l6ZSwgYm9vbCBhbGxvd19yZXNpemUsDQo+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCj4gICB7DQo+ICAgICAg
-IGludCByZXQ7DQo+ICAgICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4gQEAg
-LTU5Myw3ICs2MDEsNyBAQCBzdGF0aWMgUWNvdzJCaXRtYXBMaXN0ICpiaXRtYXBfbGlzdF9sb2Fk
-KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBvZmZzZXQsDQo+ICAgICAgICAgICAgICAg
-Z290byBmYWlsOw0KPiAgICAgICAgICAgfQ0KPiAgIA0KPiAtICAgICAgICByZXQgPSBjaGVja19k
-aXJfZW50cnkoYnMsIGUpOw0KPiArICAgICAgICByZXQgPSBjaGVja19kaXJfZW50cnkoYnMsIGUs
-IGFsbG93X3Jlc2l6ZSk7DQo+ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPiAgICAgICAgICAg
-ICAgIGVycm9yX3NldGcoZXJycCwgIkJpdG1hcCAnJS4qcycgZG9lc24ndCBzYXRpc2Z5IHRoZSBj
-b25zdHJhaW50cyIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICBlLT5uYW1lX3NpemUsIGRp
-cl9lbnRyeV9uYW1lX2ZpZWxkKGUpKTsNCj4gQEAgLTY1NCw3ICs2NjIsNyBAQCBpbnQgcWNvdzJf
-Y2hlY2tfYml0bWFwc19yZWZjb3VudHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEJkcnZDaGVja1Jl
-c3VsdCAqcmVzLA0KPiAgICAgICB9DQo+ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlz
-dF9sb2FkKGJzLCBzLT5iaXRtYXBfZGlyZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUsIE5VTEwpOw0KPiArICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZmFs
-c2UsIE5VTEwpOw0KPiAgICAgICBpZiAoYm1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAgICAgICBy
-ZXMtPmNvcnJ1cHRpb25zKys7DQo+ICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gQEAgLTc1
-NSw3ICs3NjMsNyBAQCBzdGF0aWMgaW50IGJpdG1hcF9saXN0X3N0b3JlKEJsb2NrRHJpdmVyU3Rh
-dGUgKmJzLCBRY293MkJpdG1hcExpc3QgKmJtX2xpc3QsDQo+ICAgICAgICAgICBlLT5leHRyYV9k
-YXRhX3NpemUgPSAwOw0KPiAgICAgICAgICAgbWVtY3B5KGUgKyAxLCBibS0+bmFtZSwgZS0+bmFt
-ZV9zaXplKTsNCj4gICANCj4gLSAgICAgICAgaWYgKGNoZWNrX2Rpcl9lbnRyeShicywgZSkgPCAw
-KSB7DQo+ICsgICAgICAgIGlmIChjaGVja19kaXJfZW50cnkoYnMsIGUsIGZhbHNlKSA8IDApIHsN
-Cj4gICAgICAgICAgICAgICByZXQgPSAtRUlOVkFMOw0KPiAgICAgICAgICAgICAgIGdvdG8gZmFp
-bDsNCj4gICAgICAgICAgIH0NCj4gQEAgLTk1Nyw3ICs5NjUsNyBAQCBib29sIHFjb3cyX2xvYWRf
-ZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKQ0KPiAgICAg
-ICB9DQo+ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRt
-YXBfZGlyZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBz
-LT5iaXRtYXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0KPiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZmFsc2UsIGVycnApOw0KPiAgICAg
-ICBpZiAoYm1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+ICAg
-ICAgIH0NCj4gQEAgLTEwNjYsNyArMTA3NCw3IEBAIFFjb3cyQml0bWFwSW5mb0xpc3QgKnFjb3cy
-X2dldF9iaXRtYXBfaW5mb19saXN0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICB9DQo+
-ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGly
-ZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRt
-YXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZmFsc2UsIGVycnApOw0KPiAgICAgICBpZiAo
-Ym1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAgICAgICByZXR1cm4gTlVMTDsNCj4gICAgICAgfQ0K
-PiBAQCAtMTExMSw3ICsxMTE5LDcgQEAgaW50IHFjb3cyX3Jlb3Blbl9iaXRtYXBzX3J3X2hpbnQo
-QmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGJvb2wgKmhlYWRlcl91cGRhdGVkLA0KPiAgICAgICB9DQo+
-ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGly
-ZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRt
-YXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZmFsc2UsIGVycnApOw0KPiAgICAgICBpZiAo
-Ym1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gICAgICAg
-fQ0KPiBAQCAtMTM1OSw3ICsxMzY3LDcgQEAgdm9pZCBxY293Ml9yZW1vdmVfcGVyc2lzdGVudF9k
-aXJ0eV9iaXRtYXAoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgICAgIH0NCj4gICANCj4gICAg
-ICAgYm1fbGlzdCA9IGJpdG1hcF9saXN0X2xvYWQoYnMsIHMtPmJpdG1hcF9kaXJlY3Rvcnlfb2Zm
-c2V0LA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rv
-cnlfc2l6ZSwgZXJycCk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0
-bWFwX2RpcmVjdG9yeV9zaXplLCBmYWxzZSwgZXJycCk7DQo+ICAgICAgIGlmIChibV9saXN0ID09
-IE5VTEwpIHsNCj4gICAgICAgICAgIHJldHVybjsNCj4gICAgICAgfQ0KPiBAQCAtMTQxMiw3ICsx
-NDIwLDcgQEAgdm9pZCBxY293Ml9zdG9yZV9wZXJzaXN0ZW50X2RpcnR5X2JpdG1hcHMoQmxvY2tE
-cml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJycCkNCj4gICAgICAgICAgIGJtX2xpc3QgPSBiaXRt
-YXBfbGlzdF9uZXcoKTsNCj4gICAgICAgfSBlbHNlIHsNCj4gICAgICAgICAgIGJtX2xpc3QgPSBi
-aXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGlyZWN0b3J5X29mZnNldCwNCj4gLSAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0bWFwX2RpcmVjdG9yeV9zaXplLCBl
-cnJwKTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0bWFwX2Rp
-cmVjdG9yeV9zaXplLCB0cnVlLCBlcnJwKTsNCj4gICAgICAgICAgIGlmIChibV9saXN0ID09IE5V
-TEwpIHsNCj4gICAgICAgICAgICAgICByZXR1cm47DQo+ICAgICAgICAgICB9DQo+IEBAIC0xNTkz
-LDcgKzE2MDEsNyBAQCBib29sIHFjb3cyX2Nhbl9zdG9yZV9uZXdfZGlydHlfYml0bWFwKEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICB9DQo+ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRt
-YXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGlyZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0K
-PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6
-ZSwgZmFsc2UsIGVycnApOw0KPiAgICAgICBpZiAoYm1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAg
-ICAgICBnb3RvIGZhaWw7DQo+ICAgICAgIH0NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
-bGFkaW1pcg0K
+On Wed, 27 Feb 2019 15:51:00 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+
+> The IO range is defined to 4 bytes with NVDIMM_ACPI_IO_LEN, so it is
+> more proper to use this macro instead of calculating it by sizeof.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/acpi/nvdimm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+> index e63a1ef15d..2457c1aa44 100644
+> --- a/hw/acpi/nvdimm.c
+> +++ b/hw/acpi/nvdimm.c
+> @@ -992,7 +992,7 @@ static void nvdimm_build_common_dsm(Aml *dev)
+>      field = aml_field(NVDIMM_DSM_IOPORT, AML_DWORD_ACC, AML_NOLOCK,
+>                        AML_PRESERVE);
+>      aml_append(field, aml_named_field(NVDIMM_DSM_NOTIFY,
+> -               sizeof(uint32_t) * BITS_PER_BYTE));
+> +               NVDIMM_ACPI_IO_LEN * BITS_PER_BYTE));
+>      aml_append(method, field);
+>  
+>      /*
