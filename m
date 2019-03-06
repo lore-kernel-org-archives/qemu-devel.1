@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44418)
+Received: from eggs.gnu.org ([209.51.188.92]:45120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1ZaC-00018N-JR
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:39:55 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1ZdL-0002QB-FW
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1ZaB-0007zh-A1
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:39:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1Za9-0007wk-7D
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:39:50 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22A9F8110C
-	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 16:39:48 +0000 (UTC)
-Date: Wed, 6 Mar 2019 16:39:38 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190306163938.GI20806@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1551889825-227155-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1h1ZdK-0001da-8L
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:43:07 -0500
+References: <201902270125.36158.randrianasulu@gmail.com>
+	<b3f9b42e-5895-51ca-9313-506b857e65d8@ilande.co.uk>
+	<201902281139.14787.randrianasulu@gmail.com>
+	<a984d6e6-4b9c-fecf-d0c6-3ff9b80cc07c@ilande.co.uk>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <95377a0f-a947-57d7-98af-82f105a23073@vivier.eu>
+Date: Wed, 6 Mar 2019 17:42:59 +0100
 MIME-Version: 1.0
+In-Reply-To: <a984d6e6-4b9c-fecf-d0c6-3ff9b80cc07c@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1551889825-227155-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] numa: warn if numa 'mem' option or default
- RAM splitting between nodes is used.
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] regression: target/ppc: convert VSX
+ logical operations to vector operations broke X for ppc64le guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,84 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, libvir-list@redhat.com, eblake@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Andrew Randrianasulu <randrianasulu@gmail.com>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Mar 06, 2019 at 05:30:25PM +0100, Igor Mammedov wrote:
-> Ammend -numa option docs and print warnings if 'mem' option or default RAM
-> splitting between nodes is used. It's intended to discourage users from using
-> configuration that allows only to fake NUMA on guest side while leading
-> to reduced performance of the guest due to inability to properly configure
-> VM's RAM on the host.
+On 28/02/2019 17:59, Mark Cave-Ayland wrote:
+> On 28/02/2019 08:39, Andrew Randrianasulu wrote:
 > 
-> In NUMA case, it's recommended to always explicitly configure guest RAM
-> using -numa node,memdev={backend-id} option.
+>>>> configure line:
+>>>> setarch i686 ./configure --target-list=ppc64-softmmu
+>>>>
+>>>> launch line:
+>>>> ppc64-softmmu/qemu-system-ppc64 -display
+>>>> sdl,gl=on -hda /mnt/sdb1/PPC-img/alpine_disk.img
+>>>>
+>>>> where alpine_disk.img is HDD installed Alpine 3.7 for ppc64le with xfce4
+>>>> desktop.
+>>>
+>>> AFAICT the vector instructions converted here are independent of endian, so
+>>> I can't see why this patch on its own would have any effect.
+>>>
+>>> Maybe it could be because the "setarch i686" part forces use of some
+>>> lesser-used 32-bit paths in the vector code - is this required? And do you
+>>> see the same issue on a x86_64 build?
+>>
+>> I use 32-bit Slackware userland with x86_64 kerenl - so setarch prevent most of 
+>> configures from detecting my arch wrongly.
+>>
+>> Yes, bug was and is present with qemu compiled for x86_64 (inside chroot).
+>> I initially discovered it there, and after dropping -O3 and even march=native, 
+>> and even disabling avx2 via configure switch - moved to bisect.
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06414.html
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  numa.c          |  5 +++++
->  qemu-options.hx | 12 ++++++++----
->  2 files changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/numa.c b/numa.c
-> index 3875e1e..c6c2a6f 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
->  
->      if (node->has_mem) {
->          numa_info[nodenr].node_mem = node->mem;
-> +        warn_report("Parameter -numa node,mem is obsolete,"
-> +                    " use -numa node,memdev instead");
+> Can you upload your alpine_disk.img somewhere and then email me the link off-list?
+> I'll see if I can take a look when I get a spare moment.
 
-I don't think we should do this. Libvirt isn't going to stop using this
-option in the near term. When users see warnings like this in logs
-they'll often file bugs reports thinking something is broken which is
-not the case here. 
+I've also bisected to this commit for a problem with qemu-pp64le.
 
->      }
->      if (node->has_memdev) {
->          Object *o;
-> @@ -407,6 +409,9 @@ void numa_complete_configuration(MachineState *ms)
->          if (i == nb_numa_nodes) {
->              assert(mc->numa_auto_assign_ram);
->              mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
-> +            warn_report("Default splitting of RAM between nodes is obsolete,"
-> +                        " Use '-numa node,memdev' to explictly define RAM"
-> +                        " allocation per node");
+commit 7b8fe477e12b164dda97f79e27b55b805d90384f
+Author: Richard Henderson <richard.henderson@linaro.org>
+Date:   Fri Feb 15 10:00:46 2019 +0000
 
-I think this one is ok as I don't believe libvirt triggers this code path
+    target/ppc: convert VSX logical operations to vector operations
 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 1cf9aac..033e311 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -206,10 +206,14 @@ For example:
->  -numa cpu,node-id=0,socket-id=0 -numa cpu,node-id=1,socket-id=1
->  @end example
->  
-> -@samp{mem} assigns a given RAM amount to a node. @samp{memdev}
-> -assigns RAM from a given memory backend device to a node. If
-> -@samp{mem} and @samp{memdev} are omitted in all nodes, RAM is
-> -split equally between them.
-> +@samp{memdev} assigns RAM from a given memory backend device to a node.
-> +
-> +Legacy options/behaviour: @samp{mem} assigns a given RAM amount to a node.
-> +If @samp{mem} and @samp{memdev} are omitted in all nodes, RAM is split equally
-> +between them. Option @samp{mem} and default RAM splitting are obsolete as they
-> +do not provide means to manage RAM on host side and only allow QEMU to fake
-> +NUMA support which in practice could degrade VM performance.
-> +It's advised to always explicitly configure NUMA RAM using @samp{memdev} option.
->  
->  @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
->  if one node uses @samp{memdev}, all of them have to use it.
-> -- 
-> 2.7.4
-> 
+    Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+    Acked-by: David Gibson <david@gibson.dropbear.id.au>
+    Message-Id: <20190215100058.20015-6-mark.cave-ayland@ilande.co.uk>
+    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+debian stretch ppc64el fails to build the well known hello.c example:
+# $ cat /tmp/hello.c
+#include <stdio.h>
+int main(void)
+{
+    printf("Hello World!\n");
+    return 0;
+}
+# cc -o /tmp/hello /tmp/hello.c
+In file included from <command-line>:0:0:
+/usr/include/stdc-predef.h:26:2: error: unknown type name '_STDC_'
+    explicitly includes a system header.  GCC knows the name of this
+  ^ ~~~~
+/usr/include/stdc-predef.h:28:1: error: expected '=', ',', ';', 'asm' or
+'__attribute__' before '_STDC_PREDEF_H'
+
+ ^
+/usr/include/stdc-predef.h:42:2: error: missing terminating ' character
+ #endif
+  ^~~~~
+...
