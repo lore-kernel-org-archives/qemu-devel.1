@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54650)
+Received: from eggs.gnu.org ([209.51.188.92]:55914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1h1TkF-0000p2-BO
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:25:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h1Tqm-0003ew-FO
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:32:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1h1TkD-0000an-Sz
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:25:51 -0500
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:36065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
-	id 1h1TkC-0000VI-5Z
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:25:49 -0500
-Received: by mail-pf1-x42a.google.com with SMTP id n22so8249698pfa.3
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 02:25:41 -0800 (PST)
-From: Andrew Randrianasulu <randrianasulu@gmail.com>
-Date: Wed, 6 Mar 2019 13:21:58 +0300
+	(envelope-from <imammedo@redhat.com>) id 1h1Tqk-0005fc-Gp
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:32:36 -0500
+Date: Wed, 6 Mar 2019 11:23:57 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190306112357.168326d2@redhat.com>
+In-Reply-To: <25a67533-b557-25dd-c528-0034fe06c3e2@redhat.com>
+References: <20190301140623.5390-1-eric.auger@redhat.com>
+	<e0565169-23e6-5934-47b1-478130ee987e@linux.ibm.com>
+	<25a67533-b557-25dd-c528-0034fe06c3e2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="windows-1251"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Message-Id: <201903061321.58890.randrianasulu@gmail.com>
-Subject: [Qemu-devel] PMON2000 compilation and kernel question
+Subject: Re: [Qemu-devel] [PATCH] machine: Move acpi_nvdimm_state into
+ struct MachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,291 +25,476 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, balaton@eik.bme.hu
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Shivaprasad G Bhat <sbhat@linux.ibm.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, richard.henderson@linaro.org
 
-Hello, all.
+On Tue, 5 Mar 2019 10:39:49 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-I was compiling those pmons for last two days, and I happy to say most of m=
-y hackery was
-unnecessary.
+> Hi Shivaprasad,
+>=20
+> On 3/5/19 10:35 AM, Shivaprasad G Bhat wrote:
+> >=20
+> >=20
+> > On 03/01/2019 07:36 PM, Eric Auger wrote: =20
+> >> As NVDIMM support is looming for ARM and SPAPR, let's
+> >> move the acpi_nvdimm_state to the generic machine struct =20
+> > Name - "acpi_nvdimm_state" sounds very x86 specific.
+> >=20
+> > Could you please rename ? =20
+> Sure, do you have any suggestion?
+would "nvdimms_state" do?
 
-Just unpack pmon_1c.tar.gz and toolchain-pmon.tar.bz2
-compile tools in pmon/tools (just make), create  directory /opt/pmon2000/to=
-ols, install tools,
-be sure /opt/pmon2000/tools/bin in your $PATH, put compiler in /usr/local/c=
-omp, put build.sh=20
-script from unpacked toolchain tree into pmon.zloader dir, reset tree (git =
-checkout -b label)=20
-to some known or desired commit
-
-few of them I tested:
-
-9048810a267835e8efb0496fd99884bd500c43a0
-
-17471780223332a7016959bcb9784ba249bd8660
-
-dd26466da98371470af957993a600719466305f9
-
-for last one you probably want to revert "move highmemcpy highset into lib.=
-",
-because it was breaking zloader.2edev compilation for me.
-
-Now, most of my hacks were unnecessary, you can just use this Bonito file
-in Targets/Bonito2edev/conf/:
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-# $Id: Bonito,v 1.1.1.1 2006/09/14 01:59:09 root Exp $ # #      GENERIC con=
-figuration for Galileo EV64240 # #  This file is supposed to be included by=
- target file after #  endian has been defined.
-#
-machine         Bonito2edev        mips    # CPU Architecture, Platform
-config          pmon
-
-#
-#  Define target endian
-#
-makeoptions     ENDIAN=3DEL               # Little endian version.
-
-
-#include "conf/GENERIC_ALL"
-
-#
-# System Name and Target Name
-#
-option          SYSTYPE=3D"\"Bonito\""
-option          TARGETNAME=3D"\"Bonito\""
-
-#
-# Platform options
-#
-option          BONITOEL
-option      DEVBD2E
-option          MIPS
-option          INET
-
-select          mod_flash_amd           # AMD flash device programming
-select          mod_flash_intel         # intel flash device programming
-select          mod_flash_sst           # intel flash device programming
-select          mod_debugger            # Debugging module
-select          mod_symbols             # Symbol table handling
-select          mod_s3load              # Srecord loading
-#select         mod_fastload            # LSI Fastload
-select          mod_elfload             # ELF loading
-
-#
-# Command selection. Selects pmon commands
-#
-select          cmd_newmt
-select          cmd_setup
-select          mod_display
-select          cmd_about               # Display info about PMON
-select          cmd_boot                # Boot wrapper
-select          cmd_mycmd
-select          cmd_xmodem
-select          ramfiles
-select          cmd_newmt
-select          cmd_cache               # Cache enabling
-#select         cmd_call                # Call a function command
-select          cmd_date                # Time of day command
-select          cmd_env                 # Full blown environment command set
-select          cmd_flash               # Flash programming cmds
-select          cmd_hist                # Command history
-select          cmd_ifaddr              # Interface address command
-select          cmd_l                   # Disassemble
-select          cmd_mem                 # Memory manipulation commands
-select          cmd_more                # More paginator
-select          cmd_mt                  # Simple memory test command
-select          cmd_misc                # Reboot & Flush etc.
-#select         cmd_stty                # TTY setings command
-select          cmd_tr                  # Host port-through command
-select          cmd_devls               # Device list
-select          cmd_set                 # As cmd_env but not req. cmd_hist
-select          cmd_testdisk
-select          cmd_test
-select          pmon_zmodem_rz
-#
-select          cmd_shell               # Shell commands, vers, help, eval
-#
-#
-# Platform options
-#
-select          mod_uart_ns16550        # Standard UART driver
-#option         CONS_BAUD=3DB9600
-option          CONS_BAUD=3DB115200
-select          ext2
-select          fatfs
-#select         mod_x86emu              # X86 emulation for VGA
-option  MY40IO
-#select         mod_x86emu_int10
-select          mod_vgacon
-select          mod_framebuffer
-option          X640x480
-option          CONFIG_VIDEO_16BPP
-option          NOPCINAMES              # Save some space for x86emu
-#option         FASTBOOT
-select      vt82c686        #via686a/b code
-
-#
-# Functional options.
-#
-option          NOSNOOP                 # Caches are no-snooping
-
-#
-# HAVE options. What tgt level provide
-#
-option          HAVE_TOD                # Time-Of-Day clock
-option          HAVE_NVENV              #  Platform has non-volatile env mem
-option          HAVE_LOGO               # Output splash logo
-option          USE_SUPERIO_UART
-#option         USE_LEGACY_RTC
-#option         GODSONEV2A
-#option         LINUX_PC
-#option         LONGMENG
-option          RADEON7000
-#option         DEBUG_EMU_VGA
-option          AUTOLOAD
-#option         CONFIG_PCI0_LARGE_MEM
-#option         CONFIG_PCI0_HUGE_MEM
-#option         CONFIG_PCI0_GAINT_MEM
-option          CONFIG_CACHE_64K_4WAY
-option      NVRAM_IN_FLASH
-
-#
-#  Now the Machine specification
-#
-mainbus0        at root
-localbus0       at mainbus0
-#fd0         at mainbus0
-pcibr*          at mainbus0
-#pcibr1         at mainbus0
-pci*            at pcibr?
-#ppb*           at pci? dev ? function ?        # PCI-PCI bridges
-#pci*           at ppb? bus ?
-
-#### USB
-#uhci*          at pci? dev ? function ?
-
-#### SCSI support
-#siop*          at pci? dev ? function ?        # Symbios/NCR 53c...
-#scsibus*       at siop?
-#sd*            at scsibus? target ? lun ?
-#cd*            at scsibus? target ? lun ?
-
-#### Networking Devices
-#gt0            at localbus? base 4
-#gt1            at localbus? base 5
-#gt2            at localbus? base 6
-# fxp normally only used for debugging (enable/disable both)
-fxp*            at pci? dev ? function ?        # Intel 82559 Device
-inphy*          at mii? phy ?                   # Intel 82555 PHYs
-rtl*        at pci? dev ? function ?
-uhci*            at pci? dev ? function ?
-#ohci0           at pci? dev ? function ?
-usb*             at usbbus ?
-#ohci1           at pci? dev ? function ?
-
-select      mod_usb
-select          mod_usb_storage
-select      mod_usb_uhci
-#select                 mod_usb_ohci
-select      mod_usb_kbd
-
-
-#### IDE controllers
-pciide*         at pci ? dev ? function ? flags 0x0000
-atp*           at pci? dev ? function ?  #sata atp8620
-sata*       at atp?
-#### IDE hard drives
-wd*             at pciide? channel ? drive ? flags 0x0000
-
-#### Pseudo devices
-pseudo-device   loop    1       # network loopback
-
-ide_cd*         at pciide? channel ? drive ? flags 0x0001
-select          iso9660
-option IDECD
-#option HAVE_NB_SERIAL
-option USE_ENVMAC
-#option LOOKLIKE_PC
-#select cmd_lwdhcp
-#select cmd_bootp
-option WDC_NORESET
-option FOR_GXEMUL
-select fatfs
-option FLOATINGPT
-select gzip
-option VIA686B_POWERFIXUP
-option INPUT_FROM_BOTH
-option OUTPUT_TO_BOTH
-option PCI_IDSEL_VIA686B=3D17
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-In other words, just DISABLE both x86_emu and x86_emu_int10h, enable frameb=
-uffer,=20
-set 640x480 resolution and 16 bpp bit depth.
-
-After this, you can make it
-cd zloader.2edev
-LANG=3DC ./build.sh
-(otherwise in can put localized date in pmon, it will be shown wrong).
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-#!/bin/bash
-export MKDEP=3Dmakedepend
-export PATH=3D/usr/local/comp/mips-elf/gcc-2.95.3/bin/:$PATH
-make cfg            #=B8=FC=D0=C2=C5=E4=D6=C3
-make tgt=3Dram
-mv gzram pmon_ram.bin
-make tgt=3Drom    #=B2=FA=C9=FA=C9=D5=D6=C6=CE=C4=BC=FE gzrom.bin
-mv gzrom.bin  pmon.bin
-mkdir -d /var/lib/tftpboot
-cp pmon.bin pmon_ram.bin /var/lib/tftpboot
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-note, my mkdir doesn't understand 'd' option, but script finishes anyway.
-watch for errors, especially if you enabled some more options.
-
-Newer pmon source fails to compile for me due to some mtd changes.
-
-After this , I run resulted pmon like this=20
-(using Zoltan's patch for ati-vga device on top of current qemu):
-
-mips64el-softmmu/qemu-system-mips64el -M fulong2e  -cpu Loongson-2E -m 1G  =
-=2Dbios /dev/shm/pmon-my/pmon/zloader.2edev/pmon.bin -device ati-vga,model=
-=3Drv100 -hda /dev/shm/LONGSOON_disk  -cdrom /dev/shm/debian-8.0.0-mipsel-x=
-fce-CD-1.iso -display sdl,gl=3Don
-
-it can see both disk and CD, but sadly I was unable to find any working ker=
-nel?!
-
-vmlinux-2e just hangs early, and vmlinux-3.16.0-4-loongson-2e extracted fro=
-m debian pkg
-hangs a litle latter in boot process. Tried without -m option, and with 2F =
-CPU.=20
-I mean even with just -kernel, no bios involved.
-
-Also, while I was able to compile-in uhci support, adding usb-kbd device fr=
-eezes pmon. And newly-added=20
-EHCI support apparently limited to only some CPUs/boards :/ At least I was =
-unable to compile pmon in=20
-this config and with mod_usb_ehci.
-
-Oh, and sadly my little "disable bitblit" patch was still needed:
-
-diff --git a/fb/cfb_console.c b/fb/cfb_console.c
-index 6663ef7..f29c43f 100644
-=2D-- a/fb/cfb_console.c
-+++ b/fb/cfb_console.c
-@@ -113,7 +113,7 @@ CONFIG_VIDEO_HW_CURSOR:          - Uses the hardware cu=
-rsor capability of the
- #define CONFIG_VIDEO_LOGO
- #define        CONFIG_VIDEO_BMP_LOGO
- //#define DEBUG_CFG_CONSOLE
-=2D#define VIDEO_HW_BITBLT
-+//#define VIDEO_HW_BITBLT
- #elif defined(SMI712)
- #define CONFIG_VIDEO_SW_CURSOR
- //#define CONFIG_VIDEO_LOGO
-
-otherwise pmon was not scrolling help text or any messages up.
+>=20
+> Thanks
+>=20
+> Eric
+> >=20
+> > Thanks,
+> > Shivaprasad =20
+> >> instead of duplicating the same code in several machines.
+> >>
+> >> nvdimm and nvdimm-persistence become generic machine options.
+> >> We also add a description for those options.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> >> ---
+> >> =C2=A0 hw/core/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 5=
+7 ++++++++++++++++++++++++++++++++++++++++
+> >> =C2=A0 hw/i386/acpi-build.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 6 ++---
+> >> =C2=A0 hw/i386/pc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 | 56 +++------------------------------------
+> >> =C2=A0 hw/i386/pc_piix.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0 4 +--
+> >> =C2=A0 hw/i386/pc_q35.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 4 +--
+> >> =C2=A0 include/hw/boards.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 ++
+> >> =C2=A0 include/hw/i386/pc.h=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 4 ---
+> >> =C2=A0 include/hw/mem/pc-dimm.h |=C2=A0 1 -
+> >> =C2=A0 8 files changed, 70 insertions(+), 64 deletions(-)
+> >>
+> >> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> >> index 766ca5899d..19a5ee7cd8 100644
+> >> --- a/hw/core/machine.c
+> >> +++ b/hw/core/machine.c
+> >> @@ -481,6 +481,47 @@ static void machine_set_memory_encryption(Object
+> >> *obj, const char *value,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->memory_encryption =3D g_strdup(valu=
+e);
+> >> =C2=A0 }
+> >> =C2=A0 +static bool machine_get_nvdimm(Object *obj, Error **errp)
+> >> +{
+> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(obj);
+> >> +
+> >> +=C2=A0=C2=A0=C2=A0 return ms->acpi_nvdimm_state.is_enabled;
+> >> +}
+> >> +
+> >> +static void machine_set_nvdimm(Object *obj, bool value, Error **errp)
+> >> +{
+> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(obj);
+> >> +
+> >> +=C2=A0=C2=A0=C2=A0 ms->acpi_nvdimm_state.is_enabled =3D value;
+> >> +}
+> >> +
+> >> +static char *machine_get_nvdimm_persistence(Object *obj, Error **errp)
+> >> +{
+> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(obj);
+> >> +
+> >> +=C2=A0=C2=A0=C2=A0 return g_strdup(ms->acpi_nvdimm_state.persistence_=
+string);
+> >> +}
+> >> +
+> >> +static void machine_set_nvdimm_persistence(Object *obj, const char
+> >> *value,
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
+> >> +{
+> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(obj);
+> >> +=C2=A0=C2=A0=C2=A0 AcpiNVDIMMState *nvdimm_state =3D &ms->acpi_nvdimm=
+_state;
+> >> +
+> >> +=C2=A0=C2=A0=C2=A0 if (strcmp(value, "cpu") =3D=3D 0)
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence =
+=3D 3;
+> >> +=C2=A0=C2=A0=C2=A0 else if (strcmp(value, "mem-ctrl") =3D=3D 0)
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence =
+=3D 2;
+> >> +=C2=A0=C2=A0=C2=A0 else {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "-machine=
+ nvdimm-persistence=3D%s: unsupported
+> >> option",
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value);
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+> >> +=C2=A0=C2=A0=C2=A0 }
+> >> +
+> >> +=C2=A0=C2=A0=C2=A0 g_free(nvdimm_state->persistence_string);
+> >> +=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence_string =3D g_strdup(valu=
+e);
+> >> +}
+> >> +
+> >> =C2=A0 void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, c=
+onst
+> >> char *type)
+> >> =C2=A0 {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 strList *item =3D g_new0(strList, 1);
+> >> @@ -765,6 +806,20 @@ static void machine_class_init(ObjectClass *oc,
+> >> void *data)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &error_abort);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_class_property_set_description(o=
+c, "memory-encryption",
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Set memory enc=
+ryption object to use", &error_abort);
+> >> +
+> >> +=C2=A0=C2=A0=C2=A0 object_class_property_add_bool(oc, "nvdimm",
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_get_nvdimm, machin=
+e_set_nvdimm, &error_abort);
+> >> +=C2=A0=C2=A0=C2=A0 object_class_property_set_description(oc, "nvdimm",
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "Set on/off to
+> >> enable/disable NVDIMM "
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "instantiation", NULL);
+> >> +
+> >> +=C2=A0=C2=A0=C2=A0 object_class_property_add_str(oc, "nvdimm-persiste=
+nce",
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_get_nvdimm_p=
+ersistence,
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_set_nvdimm_p=
+ersistence,
+> >> &error_abort);
+> >> +=C2=A0=C2=A0=C2=A0 object_class_property_set_description(oc, "nvdimm-=
+persistence",
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Set NVDIMM persistence"
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Valid values are cpu and
+> >> mem-ctrl",
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 NULL);
+> >> =C2=A0 }
+> >> =C2=A0 =C2=A0 static void machine_class_base_init(ObjectClass *oc, voi=
+d *data)
+> >> @@ -790,6 +845,8 @@ static void machine_initfn(Object *obj)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->dump_guest_core =3D true;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->mem_merge =3D true;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->enable_graphics =3D true;
+> >> +=C2=A0=C2=A0=C2=A0 /* nvdimm is disabled on default. */
+> >> +=C2=A0=C2=A0=C2=A0 ms->acpi_nvdimm_state.is_enabled =3D false;
+> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Register notifier when init i=
+s done for sysbus sanity
+> >> checks */
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->sysbus_notifier.notify =3D machine_=
+init_notify;
+> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> >> index 9ecc96dcc7..622ccb9408 100644
+> >> --- a/hw/i386/acpi-build.c
+> >> +++ b/hw/i386/acpi-build.c
+> >> @@ -1867,7 +1867,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linke=
+r,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 aml_append(scope, method);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (pcms->acpi_nvdi=
+mm_state.is_enabled) {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (machine->acpi_nvdimm_s=
+tate.is_enabled) {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 method =3D aml_method("_E04", 0, AML_NOTSERIALIZED);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 aml_append(method, aml_notify(aml_name("\\_SB.NVDR"),
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aml_int(0x80)));
+> >> @@ -2704,9 +2704,9 @@ void acpi_build(AcpiBuildTables *tables,
+> >> MachineState *machine)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 build_dmar_q35(tables_blob, tables->linker);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> -=C2=A0=C2=A0=C2=A0 if (pcms->acpi_nvdimm_state.is_enabled) {
+> >> +=C2=A0=C2=A0=C2=A0 if (machine->acpi_nvdimm_state.is_enabled) {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_build_ac=
+pi(table_offsets, tables_blob, tables->linker,
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 &pcms->acpi_nvdimm_state, machine->ram_slots);
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 &machine->acpi_nvdimm_state,
+> >> machine->ram_slots);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Add tables supplied by user (=
+if any) */
+> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> >> index 3889eccdc3..356213e0b8 100644
+> >> --- a/hw/i386/pc.c
+> >> +++ b/hw/i386/pc.c
+> >> @@ -2096,6 +2096,7 @@ static void pc_memory_pre_plug(HotplugHandler
+> >> *hotplug_dev, DeviceState *dev,
+> >> =C2=A0 {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const PCMachineState *pcms =3D PC_MACHI=
+NE(hotplug_dev);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const PCMachineClass *pcmc =3D PC_MACHI=
+NE_GET_CLASS(pcms);
+> >> +=C2=A0=C2=A0=C2=A0 const MachineState *ms =3D MACHINE(hotplug_dev);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const bool is_nvdimm =3D object_dynamic=
+_cast(OBJECT(dev),
+> >> TYPE_NVDIMM);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const uint64_t legacy_align =3D TARGET_=
+PAGE_SIZE;
+> >> =C2=A0 @@ -2110,7 +2111,7 @@ static void pc_memory_pre_plug(HotplugHan=
+dler
+> >> *hotplug_dev, DeviceState *dev,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (is_nvdimm && !pcms->acpi_nvdimm_state.i=
+s_enabled) {
+> >> +=C2=A0=C2=A0=C2=A0 if (is_nvdimm && !ms->acpi_nvdimm_state.is_enabled=
+) {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp=
+, "nvdimm is not enabled: missing 'nvdimm' in
+> >> '-M'");
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> @@ -2124,6 +2125,7 @@ static void pc_memory_plug(HotplugHandler
+> >> *hotplug_dev,
+> >> =C2=A0 {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(hot=
+plug_dev);
+> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(hotplug_dev);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool is_nvdimm =3D object_dynamic_cast(=
+OBJECT(dev), TYPE_NVDIMM);
+> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_dimm_plug(PC_DIMM(dev), MACHI=
+NE(pcms), &local_err);
+> >> @@ -2132,7 +2134,7 @@ static void pc_memory_plug(HotplugHandler
+> >> *hotplug_dev,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (is_nvdimm) {
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_plug(&pcms->acpi_nv=
+dimm_state);
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_plug(&ms->acpi_nvdi=
+mm_state);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hotplug_handler_plug(HOTPLUG_HAN=
+DLER(pcms->acpi_dev), dev,
+> >> &error_abort);
+> >> @@ -2574,47 +2576,6 @@ static void pc_machine_set_smm(Object *obj,
+> >> Visitor *v, const char *name,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 visit_type_OnOffAuto(v, name, &pcms->sm=
+m, errp);
+> >> =C2=A0 }
+> >> =C2=A0 -static bool pc_machine_get_nvdimm(Object *obj, Error **errp)
+> >> -{
+> >> -=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj);
+> >> -
+> >> -=C2=A0=C2=A0=C2=A0 return pcms->acpi_nvdimm_state.is_enabled;
+> >> -}
+> >> -
+> >> -static void pc_machine_set_nvdimm(Object *obj, bool value, Error **er=
+rp)
+> >> -{
+> >> -=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj);
+> >> -
+> >> -=C2=A0=C2=A0=C2=A0 pcms->acpi_nvdimm_state.is_enabled =3D value;
+> >> -}
+> >> -
+> >> -static char *pc_machine_get_nvdimm_persistence(Object *obj, Error
+> >> **errp)
+> >> -{
+> >> -=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj);
+> >> -
+> >> -=C2=A0=C2=A0=C2=A0 return g_strdup(pcms->acpi_nvdimm_state.persistenc=
+e_string);
+> >> -}
+> >> -
+> >> -static void pc_machine_set_nvdimm_persistence(Object *obj, const char
+> >> *value,
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
+> >> -{
+> >> -=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj);
+> >> -=C2=A0=C2=A0=C2=A0 AcpiNVDIMMState *nvdimm_state =3D &pcms->acpi_nvdi=
+mm_state;
+> >> -
+> >> -=C2=A0=C2=A0=C2=A0 if (strcmp(value, "cpu") =3D=3D 0)
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence =
+=3D 3;
+> >> -=C2=A0=C2=A0=C2=A0 else if (strcmp(value, "mem-ctrl") =3D=3D 0)
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence =
+=3D 2;
+> >> -=C2=A0=C2=A0=C2=A0 else {
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "-machine=
+ nvdimm-persistence=3D%s: unsupported
+> >> option",
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value);
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+> >> -=C2=A0=C2=A0=C2=A0 }
+> >> -
+> >> -=C2=A0=C2=A0=C2=A0 g_free(nvdimm_state->persistence_string);
+> >> -=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence_string =3D g_strdup(valu=
+e);
+> >> -}
+> >> -
+> >> =C2=A0 static bool pc_machine_get_smbus(Object *obj, Error **errp)
+> >> =C2=A0 {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj=
+);
+> >> @@ -2664,8 +2625,6 @@ static void pc_machine_initfn(Object *obj)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->max_ram_below_4g =3D 0; /* use de=
+fault */
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->smm =3D ON_OFF_AUTO_AUTO;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->vmport =3D ON_OFF_AUTO_AUTO;
+> >> -=C2=A0=C2=A0=C2=A0 /* nvdimm is disabled on default. */
+> >> -=C2=A0=C2=A0=C2=A0 pcms->acpi_nvdimm_state.is_enabled =3D false;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* acpi build is enabled by default if =
+machine supports it */
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->acpi_build_enabled =3D
+> >> PC_MACHINE_GET_CLASS(pcms)->has_acpi_build;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->smbus_enabled =3D true;
+> >> @@ -2826,13 +2785,6 @@ static void pc_machine_class_init(ObjectClass
+> >> *oc, void *data)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_class_property_set_description(o=
+c, PC_MACHINE_VMPORT,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Enable vmport =
+(pc & q35)", &error_abort);
+> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 object_class_property_add_bool(oc, PC_MACHI=
+NE_NVDIMM,
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_machine_get_nvdimm, pc_=
+machine_set_nvdimm, &error_abort);
+> >> -
+> >> -=C2=A0=C2=A0=C2=A0 object_class_property_add_str(oc, PC_MACHINE_NVDIM=
+M_PERSIST,
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_machine_get_nvdimm_pers=
+istence,
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_machine_set_nvdimm_pers=
+istence, &error_abort);
+> >> -
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_class_property_add_bool(oc, PC_M=
+ACHINE_SMBUS,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_machine_get_=
+smbus, pc_machine_set_smbus, &error_abort);
+> >> =C2=A0 diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> >> index fd0f2c268f..8b94b70f14 100644
+> >> --- a/hw/i386/pc_piix.c
+> >> +++ b/hw/i386/pc_piix.c
+> >> @@ -297,8 +297,8 @@ static void pc_init1(MachineState *machine,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PC_MACHINE_ACP=
+I_DEVICE_PROP,
+> >> &error_abort);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (pcms->acpi_nvdimm_state.is_enabled) {
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_init_acpi_state(&pc=
+ms->acpi_nvdimm_state, system_io,
+> >> +=C2=A0=C2=A0=C2=A0 if (machine->acpi_nvdimm_state.is_enabled) {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_init_acpi_state(&ma=
+chine->acpi_nvdimm_state, system_io,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->fw_cfg, OBJECT(pcms)=
+);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0 }
+> >> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> >> index 4a175ea50e..26727c964d 100644
+> >> --- a/hw/i386/pc_q35.c
+> >> +++ b/hw/i386/pc_q35.c
+> >> @@ -329,8 +329,8 @@ static void pc_q35_init(MachineState *machine)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_vga_init(isa_bus, host_bus);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_nic_init(pcmc, isa_bus, host_bus);
+> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (pcms->acpi_nvdimm_state.is_enabled) {
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_init_acpi_state(&pc=
+ms->acpi_nvdimm_state, system_io,
+> >> +=C2=A0=C2=A0=C2=A0 if (machine->acpi_nvdimm_state.is_enabled) {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_init_acpi_state(&ma=
+chine->acpi_nvdimm_state, system_io,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->fw_cfg, OBJECT(pcms)=
+);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0 }
+> >> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> >> index 05f9f45c3d..b55c9cc087 100644
+> >> --- a/include/hw/boards.h
+> >> +++ b/include/hw/boards.h
+> >> @@ -8,6 +8,7 @@
+> >> =C2=A0 #include "hw/qdev.h"
+> >> =C2=A0 #include "qom/object.h"
+> >> =C2=A0 #include "qom/cpu.h"
+> >> +#include "hw/mem/nvdimm.h"
+> >> =C2=A0 =C2=A0 /**
+> >> =C2=A0=C2=A0 * memory_region_allocate_system_memory - Allocate a board=
+'s main
+> >> memory
+> >> @@ -268,6 +269,7 @@ struct MachineState {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *cpu_type;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AccelState *accelerator;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 CPUArchIdList *possible_cpus;
+> >> +=C2=A0=C2=A0=C2=A0 AcpiNVDIMMState acpi_nvdimm_state;
+> >> =C2=A0 };
+> >> =C2=A0 =C2=A0 #define DEFINE_MACHINE(namestr, machine_initfn) \
+> >> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> >> index 3ff127ebd0..f7c59743e0 100644
+> >> --- a/include/hw/i386/pc.h
+> >> +++ b/include/hw/i386/pc.h
+> >> @@ -45,8 +45,6 @@ struct PCMachineState {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 OnOffAuto vmport;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 OnOffAuto smm;
+> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 AcpiNVDIMMState acpi_nvdimm_state;
+> >> -
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool acpi_build_enabled;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool smbus_enabled;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool sata_enabled;
+> >> @@ -74,8 +72,6 @@ struct PCMachineState {
+> >> =C2=A0 #define PC_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
+> >> =C2=A0 #define PC_MACHINE_VMPORT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 "vmport"
+> >> =C2=A0 #define PC_MACHINE_SMM=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "smm"
+> >> -#define PC_MACHINE_NVDIMM=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 "nvdimm"
+> >> -#define PC_MACHINE_NVDIMM_PERSIST=C2=A0=C2=A0 "nvdimm-persistence"
+> >> =C2=A0 #define PC_MACHINE_SMBUS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 "smbus"
+> >> =C2=A0 #define PC_MACHINE_SATA=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "sata"
+> >> =C2=A0 #define PC_MACHINE_PIT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "pit"
+> >> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> >> index 01436b9f50..3e5489d3a1 100644
+> >> --- a/include/hw/mem/pc-dimm.h
+> >> +++ b/include/hw/mem/pc-dimm.h
+> >> @@ -19,7 +19,6 @@
+> >> =C2=A0 #include "exec/memory.h"
+> >> =C2=A0 #include "sysemu/hostmem.h"
+> >> =C2=A0 #include "hw/qdev.h"
+> >> -#include "hw/boards.h"
+> >> =C2=A0 =C2=A0 #define TYPE_PC_DIMM "pc-dimm"
+> >> =C2=A0 #define PC_DIMM(obj) \ =20
+> >=20
+> >  =20
