@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38355)
+Received: from eggs.gnu.org ([209.51.188.92]:38959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Z9k-00068q-G8
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:12:33 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h1ZBP-0007NI-HJ
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:14:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Z9i-0003Do-Da
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:12:32 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Mar 2019 16:12:13 +0000
-Message-ID: <d362b81a-1e9c-0761-3cbe-65739a051ce7@virtuozzo.com>
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<20190305234337.18353-3-jsnow@redhat.com>
-	<28d6183a-f654-de55-36ed-ee0bafb47739@redhat.com>
-	<fe8ae9ab-068d-cc24-76de-e2a99215ea5f@redhat.com>
-In-Reply-To: <fe8ae9ab-068d-cc24-76de-e2a99215ea5f@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6CB973945F7AC146A4F41DB68D5384DE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1h1ZBO-0004KU-G5
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:14:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53183)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1h1ZBO-0004Jk-5X
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:14:14 -0500
+Date: Wed, 6 Mar 2019 17:14:06 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190306171406.6e67d7ca@Igors-MacBook-Pro.local>
+In-Reply-To: <20190227075101.6263-5-richardw.yang@linux.intel.com>
+References: <20190227075101.6263-1-richardw.yang@linux.intel.com>
+	<20190227075101.6263-5-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/5] block/qcow2-bitmap: Allow bitmap
- flushing
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] nvdimm: build FIT in nvdimm_build_acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +27,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, xiaoguangrong.eric@gmail.com
 
-MDYuMDMuMjAxOSAxODo1OSwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDMvNi8xOSA3
-OjU4IEFNLCBFcmljIEJsYWtlIHdyb3RlOg0KPj4gT24gMy81LzE5IDU6NDMgUE0sIEpvaG4gU25v
-dyB3cm90ZToNCj4+PiBVc3VhbGx5LCB3ZSBvbmx5IHdyaXRlIG91dCBiaXRtYXBzIHdoZW4gd2Un
-cmUgYWJvdXQgdG8gY2xvc2Ugb3V0IHRoZSBmaWxlLA0KPj4+IHNvIHdlIGFsd2F5cyByZW1vdmUg
-dGhlIGJpdG1hcHMgYWZ0ZXIgdG8gbWFrZSBpdCBlYXNpZXIgdG8gZGV0ZXJtaW5lIHRoZQ0KPj4+
-IHNvdXJjZSBvZiB0cnV0aCBmb3IgbWlncmF0aW9uIHB1cnBvc2VzLg0KPj4+DQo+Pj4gSG93ZXZl
-ciwgdGhlcmUgbWF5IGJlIHRpbWVzIHdlIHdhbnQgdG8gZmx1c2ggYml0bWFwIGRhdGEgbW9yZSBh
-Z2dyZXNzaXZlbHksDQo+Pj4gbGlrZSBhZnRlciBhIHRydW5jYXRlIGV2ZW50IHdoZXJlIHdlIG5l
-ZWQgdG8gbWFrZSB0aGUgbWV0YWRhdGEgY29uc2lzdGVudA0KPj4+IGFnYWluLg0KPj4NCj4+IE9y
-LCBhcyBJJ3ZlIG1lbnRpb25lZCBpbiBvdGhlciB0aHJlYWRzLCBhZnRlciBldmVyeQ0KPj4gYml0
-bWFwLWFkZC9iaXRtYXAtZGVsZXRlIG9wZXJhdGlvbiwgc28gdGhhdCAncWVtdS1pbWcgaW5mbyAt
-VScgY2FuIHNlZQ0KPj4gd2hpY2ggcGVyc2lzdGVudCBiaXRtYXBzIGV4aXN0LiBCdXQgdGhhdCdz
-IG9uZSBzdGVwIGZ1cnRoZXIgdGhhbiB0aGlzDQo+PiBzZXJpZXMsIHNvIEkgd29uJ3QgaW5zaXN0
-IG9uIGl0IHRvZGF5Lg0KPj4NCj4gDQo+IFllcywgSSB3YXMga2VlcGluZyB0aGF0IGluIG1pbmQg
-YXMgSSB3cm90ZSB0aGlzLiBJIHRoaW5rIGl0IGV4dGVuZHMgdG8NCj4gdGhvc2UgY2FzZXMgdHJp
-dmlhbGx5LCBzbyBsb25nIGFzIFZsYWRpbWlyIGlzIE9LIHdpdGggd2hhdCBJJ20gdHJ5aW5nIHRv
-IGRvLg0KPiANCg0KSSBzdGlsbCBkb24ndCBzZWUgdGhlIHBvaW50IG9mIGZsdXNoaW5nIGJpdG1h
-cHMsIHRoZSBvbmx5IHRoaW5nIGlzIG9wdGltaXppbmcNCnFlbXUtaW1nIGluZm8gLS1mb3JjZS1z
-aGFyZSwgd2hpY2ggc2hvdWxkIG5ldmVyIHVzZWQgZXhjZXB0IGZvciBkZWJ1Z2dpbmcuDQoNClNv
-LCBhdCBsZWFzdCwgaWYgd2UnbGwgaGF2ZSBpdCwgSSdkIHByZWZlciBiaXRtYXAgZmx1c2hpbmcg
-dG8gYmUgb3B0aW9uYWwsDQphbmQgb3RoZXIgY29kZSBzaG91bGQgbm90IHJlbHkgb24gaXQuDQoN
-Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Wed, 27 Feb 2019 15:51:01 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+
+> Currently we initialize nvdimm device like below:
+> 
+>     device_set_realized
+>         dc->realize
+> 	nvdimm_plug
+> 	    nvdimm_build_fit_buffer
+>     acpi_build
+>         nvdimm_build_acpi
+> 
+> This shows nvdimm's acpi stuff is prepared in two places:
+> 
+>     * device plug stage
+>     * acpi_build stage
+> 
+> It would be more proper to build fit buffer in nvdimm_build_acpi, which
+> consolidate all acpi related initialization together.
+> 
+> This patch moves FIT build in nvdimm_build_acpi.
+
+Does hotplug work after this change?
+
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  hw/acpi/nvdimm.c        | 6 +-----
+>  hw/i386/pc.c            | 5 -----
+>  include/hw/mem/nvdimm.h | 1 -
+>  3 files changed, 1 insertion(+), 11 deletions(-)
+> 
+> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+> index 2457c1aa44..6fc0c65ee0 100644
+> --- a/hw/acpi/nvdimm.c
+> +++ b/hw/acpi/nvdimm.c
+> @@ -425,11 +425,6 @@ static void nvdimm_build_fit_buffer(AcpiNVDIMMState *state)
+>      fit_buf->dirty = true;
+>  }
+>  
+> -void nvdimm_plug(AcpiNVDIMMState *state)
+> -{
+> -    nvdimm_build_fit_buffer(state);
+> -}
+> -
+>  static void nvdimm_build_nfit(AcpiNVDIMMState *state, GArray *table_offsets,
+>                                GArray *table_data, BIOSLinker *linker)
+>  {
+> @@ -1338,6 +1333,7 @@ void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
+>          return;
+>      }
+>  
+> +    nvdimm_build_fit_buffer(state);
+>      nvdimm_build_nfit(state, table_offsets, table_data, linker);
+>      g_slist_free(device_list);
+>  }
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 64d9e756fa..686b610c50 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2099,17 +2099,12 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+>  {
+>      Error *local_err = NULL;
+>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> -    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>  
+>      pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms), &local_err);
+>      if (local_err) {
+>          goto out;
+>      }
+>  
+> -    if (is_nvdimm) {
+> -        nvdimm_plug(&pcms->acpi_nvdimm_state);
+> -    }
+> -
+>      hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
+>  out:
+>      error_propagate(errp, local_err);
+> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+> index c5c9b3c7f8..30869b4834 100644
+> --- a/include/hw/mem/nvdimm.h
+> +++ b/include/hw/mem/nvdimm.h
+> @@ -148,6 +148,5 @@ void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
+>  void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
+>                         BIOSLinker *linker, AcpiNVDIMMState *state,
+>                         uint32_t ram_slots);
+> -void nvdimm_plug(AcpiNVDIMMState *state);
+>  void nvdimm_acpi_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev);
+>  #endif
