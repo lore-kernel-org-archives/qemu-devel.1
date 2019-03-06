@@ -1,37 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55146)
+Received: from eggs.gnu.org ([209.51.188.92]:55210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h1SGq-0006GQ-RZ
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:51:25 -0500
+	(envelope-from <clg@kaod.org>) id 1h1SGy-0006Qa-GP
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:51:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h1SGo-0001lf-Sp
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:51:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37348)
+	(envelope-from <clg@kaod.org>) id 1h1SGv-0001uF-Jw
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:51:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1h1SGk-0001WG-JE
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:51:21 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1h1SGq-0001Th-Qt
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 03:51:26 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x268mWS4000702
-	for <qemu-devel@nongnu.org>; Wed, 6 Mar 2019 03:51:03 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2r2a9vtenr-1
+	x268mWpN103427
+	for <qemu-devel@nongnu.org>; Wed, 6 Mar 2019 03:51:00 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r2axy0bt1-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 03:51:02 -0500
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 03:51:00 -0500
 Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Wed, 6 Mar 2019 08:51:00 -0000
+	Wed, 6 Mar 2019 08:50:58 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed,  6 Mar 2019 09:50:31 +0100
+Date: Wed,  6 Mar 2019 09:50:29 +0100
 In-Reply-To: <20190306085032.15744-1-clg@kaod.org>
 References: <20190306085032.15744-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190306085032.15744-27-clg@kaod.org>
+Message-Id: <20190306085032.15744-25-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 26/27] ppc/pnv: add a "ibm,
- opal/power-mgt" device tree node on POWER9
+Subject: [Qemu-devel] [PATCH 24/27] ppc/pnv: activate XSCOM tests for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,47 +42,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Activate stop0 and stop1 levels.
-
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/pnv.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ tests/pnv-xscom-test.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 30153ad5acea..9d40b006c0af 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -456,6 +456,16 @@ static void pnv_dt_isa(PnvMachineState *pnv, void *f=
-dt)
-                        &args);
- }
+diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
+index 974f8da5b240..63d464048d53 100644
+--- a/tests/pnv-xscom-test.c
++++ b/tests/pnv-xscom-test.c
+@@ -39,7 +39,6 @@ static const PnvChip pnv_chips[] =3D {
+         .cfam_id    =3D 0x120d304980000000ull,
+         .first_core =3D 0x1,
+     },
+-#if 0 /* POWER9 support is not ready yet */
+     {
+         .chip_type  =3D PNV_CHIP_POWER9,
+         .cpu_model  =3D "POWER9",
+@@ -47,7 +46,6 @@ static const PnvChip pnv_chips[] =3D {
+         .cfam_id    =3D 0x220d104900008000ull,
+         .first_core =3D 0x0,
+     },
+-#endif
+ };
 =20
-+static void pnv_dt_power_mgt(void *fdt)
-+{
-+    int off;
-+
-+    off =3D fdt_add_subnode(fdt, 0, "ibm,opal");
-+    off =3D fdt_add_subnode(fdt, off, "power-mgt");
-+
-+    _FDT(fdt_setprop_cell(fdt, off, "ibm,enabled-stop-levels", 0xc000000=
-0));
-+}
-+
- static void *pnv_dt_create(MachineState *machine)
- {
-     const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
-@@ -511,6 +521,11 @@ static void *pnv_dt_create(MachineState *machine)
-         pnv_dt_bmc_sensors(pnv->bmc, fdt);
-     }
-=20
-+    /* Create an extra node for power management on Power9 */
-+    if (pnv_is_power9(pnv)) {
-+        pnv_dt_power_mgt(fdt);
-+    }
-+
-     return fdt;
- }
-=20
+ static uint64_t pnv_xscom_addr(const PnvChip *chip, uint32_t pcba)
 --=20
 2.20.1
