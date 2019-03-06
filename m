@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59929)
+Received: from eggs.gnu.org ([209.51.188.92]:60862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1h1b2f-00058a-6C
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:13:21 -0500
+	(envelope-from <berrange@redhat.com>) id 1h1b5m-0007wk-Lo
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1h1b2V-0006ma-Ml
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:13:16 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  6 Mar 2019 20:11:07 +0200
-Message-Id: <2aa65ff5c15e667d64aea53b6787205c0344b6c5.1551895814.git.berto@igalia.com>
-In-Reply-To: <cover.1551895813.git.berto@igalia.com>
-References: <cover.1551895813.git.berto@igalia.com>
-In-Reply-To: <cover.1551895813.git.berto@igalia.com>
-References: <cover.1551895813.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 07/13] block: Allow omitting the 'backing'
- option in certain cases
+	(envelope-from <berrange@redhat.com>) id 1h1b5k-0000kS-FW
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:16:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1b5i-0000bC-7k
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:16:32 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D8B63300B916
+	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 18:16:16 +0000 (UTC)
+Date: Wed, 6 Mar 2019 18:16:08 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190306181608.GL20806@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1551893605-236413-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1551893605-236413-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] numa: warn if numa 'mem' option or
+ default RAM splitting between nodes is used.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, libvir-list@redhat.com, eblake@redhat.com
 
-Of all options of type BlockdevRef used to specify children in
-BlockdevOptions, 'backing' is the only one that is optional.
+On Wed, Mar 06, 2019 at 06:33:25PM +0100, Igor Mammedov wrote:
+> Amend -numa option docs and print warnings if 'mem' option or default RAM
+> splitting between nodes is used. It's intended to discourage users from using
+> configuration that allows only to fake NUMA on guest side while leading
+> to reduced performance of the guest due to inability to properly configure
+> VM's RAM on the host.
+> 
+> In NUMA case, it's recommended to always explicitly configure guest RAM
+> using -numa node,memdev={backend-id} option.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  numa.c          |  5 +++++
+>  qemu-options.hx | 12 ++++++++----
+>  2 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/numa.c b/numa.c
+> index 3875e1e..42838f9 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>  
+>      if (node->has_mem) {
+>          numa_info[nodenr].node_mem = node->mem;
+> +        warn_report("Parameter -numa node,mem is obsolete,"
+> +                    " use -numa node,memdev instead");
 
-For "x-blockdev-reopen" we want that if an option is omitted then it
-must be reset to its default value. The default value of 'backing'
-means that QEMU opens the backing file specified in the image
-metadata, but this is not something that we want to support for the
-reopen operation.
+My comments from v1 still apply. We must not do this as long as
+libvirt has no choice but to continue using this feature.
 
-Because of this the 'backing' option has to be specified during
-reopen, pointing to the existing backing file if we want to keep it,
-or pointing to a different one (or NULL) if we want to replace it (to
-be implemented in a subsequent patch).
+>      }
+>      if (node->has_memdev) {
+>          Object *o;
+> @@ -407,6 +409,9 @@ void numa_complete_configuration(MachineState *ms)
+>          if (i == nb_numa_nodes) {
+>              assert(mc->numa_auto_assign_ram);
+>              mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
+> +            warn_report("Default splitting of RAM between nodes is obsolete,"
+> +                        " Use '-numa node,memdev' to explicitly define RAM"
+> +                        " allocation per node");
+>          }
+>  
+>          numa_total = 0;
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 1cf9aac..61035cb 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -206,10 +206,14 @@ For example:
+>  -numa cpu,node-id=0,socket-id=0 -numa cpu,node-id=1,socket-id=1
+>  @end example
+>  
+> -@samp{mem} assigns a given RAM amount to a node. @samp{memdev}
+> -assigns RAM from a given memory backend device to a node. If
+> -@samp{mem} and @samp{memdev} are omitted in all nodes, RAM is
+> -split equally between them.
+> +@samp{memdev} assigns RAM from a given memory backend device to a node.
+> +
+> +Legacy options/behaviour: @samp{mem} assigns a given RAM amount to a node.
+> +If @samp{mem} and @samp{memdev} are omitted in all nodes, RAM is split equally
+> +between them. Option @samp{mem} and default RAM splitting are obsolete as they
+> +do not provide means to manage RAM on the host side and only allow QEMU to fake
+> +NUMA support which in practice could degrade VM performance.
+> +It's advised to always explicitly configure NUMA RAM by using the @samp{memdev} option.
+>  
+>  @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
+>  if one node uses @samp{memdev}, all of them have to use it.
+> -- 
+> 2.7.4
+> 
 
-In order to simplify things a bit and not to require that the user
-passes the 'backing' option to every single block device even when
-it's clearly not necessary, this patch allows omitting this option if
-the block device being reopened doesn't have a backing file attached
-_and_ no default backing file is specified in the image metadata.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/block.c b/block.c
-index d7fa577c18..6db8a65e61 100644
---- a/block.c
-+++ b/block.c
-@@ -3414,7 +3414,13 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
- 
-     drv_prepared = true;
- 
--    if (drv->supports_backing && reopen_state->backing_missing) {
-+    /*
-+     * We must provide the 'backing' option if the BDS has a backing
-+     * file or if the image file has a backing file name as part of
-+     * its metadata. Otherwise the 'backing' option can be omitted.
-+     */
-+    if (drv->supports_backing && reopen_state->backing_missing &&
-+        (backing_bs(reopen_state->bs) || reopen_state->bs->backing_file[0])) {
-         error_setg(errp, "backing is missing for '%s'",
-                    reopen_state->bs->node_name);
-         ret = -EINVAL;
+Regards,
+Daniel
 -- 
-2.11.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
