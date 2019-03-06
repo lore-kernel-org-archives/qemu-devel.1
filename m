@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50182)
+Received: from eggs.gnu.org ([209.51.188.92]:51472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1TS0-0001Y8-8R
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:07:00 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1TXM-000376-47
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:12:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1TRx-0002XB-Gi
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:06:58 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:41903)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1h1TRv-0002RZ-1y
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:06:55 -0500
-Received: by mail-wr1-x431.google.com with SMTP id n2so12683175wrw.8
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 02:06:49 -0800 (PST)
-Date: Wed, 6 Mar 2019 10:06:46 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190306100646.GI22159@stefanha-x1.localdomain>
-References: <40280F65B1B0B44E8089ED31C01616EBA3947B1A@dggeml529-mbx.china.huawei.com>
+	(envelope-from <thuth@redhat.com>) id 1h1TXK-0005zU-Ac
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:12:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54992)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h1TXJ-0005yq-NV
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:12:30 -0500
+References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8WZuAmNFQqCsvsN35UnFJk=sGcCJmF27v3SS++FnpXXQ@mail.gmail.com>
+	<150efd5f-dea0-93bd-c74c-6d012f4ab7d1@redhat.com>
+	<d8dd795b-1f4c-a802-e4ea-6cf06cdab5c6@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6bd609b0-15e2-6a9e-2639-7904db417c0f@redhat.com>
+Date: Wed, 6 Mar 2019 11:12:25 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TA4f0niHM6tHt3xR"
-Content-Disposition: inline
-In-Reply-To: <40280F65B1B0B44E8089ED31C01616EBA3947B1A@dggeml529-mbx.china.huawei.com>
-Subject: Re: [Qemu-devel] Question about VM inner route entry's lost when
- vhost-user reconnect
+In-Reply-To: <d8dd795b-1f4c-a802-e4ea-6cf06cdab5c6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Lilijun (Jerry, Cloud Networking)" <jerry.lilijun@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxin (U)" <wangxinxin.wang@huawei.com>, wangyunjian <wangyunjian@huawei.com>
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 05/03/2019 21.08, Eric Blake wrote:
+[...]
+> 'make distclean' is a heavy hammer, is there anything smaller in scope
+> that will fix the problem without nuking everything, such as a strategi=
+c
+> touch or rm of one particular file?
 
---TA4f0niHM6tHt3xR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Try this in the top-level folder of your build directory:
 
-On Mon, Mar 04, 2019 at 08:26:23AM +0000, Lilijun (Jerry, Cloud Networking)=
- wrote:
->       I am running my VM using vhost-user NIC with OVS-DPDK.  The steps o=
-f my question is shown as follows:
->      1) In the VM, I add one route entry manually on the vNIC eth0 using =
-the linux tool route.=20
->      2) When restarting openvswitch service for the crash of the ovs-vswi=
-tchd, qemu's vhost-user reconnected successfully after 40s. =20
->      3) Here VM's vNIC will receive link down and up events, the interval=
- between the two events is about 40s.
->      3) But that route entry disappeared and that will cause user's netwo=
-rk traffic interruption and the service failed.
->=20
->      Is there some work on this problem?  Can we keep the vNIC's link up =
-status when do vhost-user's reconnecting work?
+ rm *.mak.d
 
-Can you add the custom route to the network management tool inside the
-guest so that it will be reinstated when the link comes back up?
+... not sure whether we can somehow integrate that into the Makefile
+magic, though...
 
-The details of how to do this depend on the guest's distro.
-
-Stefan
-
---TA4f0niHM6tHt3xR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcf5u2AAoJEJykq7OBq3PIT2gH+QHKQOrFgojQRLOfuMGkO9ws
-NtpMlGFCMJJBqYrUpqR8joqkGBxQ+u275Na4/GkEsXEqyjFGVthz3/QpyVTpGGwE
-xiSLD34s/lvv36EyD3lqNb5Wr68puKhEJ/5XhBv6GKSwjFEMbYBYx3CcWBUl8OvS
-mtzYO2A2Mevu0/IgFWXfZrVXNhiBRg6zRfS6vXCvbYD2ua2kaZwvrMBQKrnySVvJ
-4LKqH2PxMTuEkm/TF/4uKkdCagvBRFlV7PKa+yuyayg9P8mGAng9EvZ7G1lwcKnz
-7w7UHFmgD/sX+f0NPlQS/8SLeux3DgB1YcrCk/JskQ4gc9SyWkLCeL2/mUf7X4Q=
-=y2Kv
------END PGP SIGNATURE-----
-
---TA4f0niHM6tHt3xR--
+ Thomas
