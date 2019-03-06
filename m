@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53111)
+Received: from eggs.gnu.org ([209.51.188.92]:54701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1h1drI-0006nX-Me
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 16:13:49 -0500
+	(envelope-from <randrianasulu@gmail.com>) id 1h1e2k-00014a-Rh
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 16:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1h1drH-0007U0-Uj
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 16:13:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1h1drG-0007SJ-Tg
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 16:13:47 -0500
-From: Bandan Das <bsd@redhat.com>
-Date: Wed,  6 Mar 2019 16:04:08 -0500
-Message-Id: <20190306210409.14842-3-bsd@redhat.com>
-In-Reply-To: <20190306210409.14842-1-bsd@redhat.com>
-References: <20190306210409.14842-1-bsd@redhat.com>
+	(envelope-from <randrianasulu@gmail.com>) id 1h1e2g-0007Fw-Ek
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 16:25:35 -0500
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:36842)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
+	id 1h1e2e-0006zf-Fu
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 16:25:32 -0500
+Received: by mail-pg1-x52c.google.com with SMTP id r124so9427451pgr.3
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 13:25:11 -0800 (PST)
+From: Andrew Randrianasulu <randrianasulu@gmail.com>
+Date: Thu, 7 Mar 2019 00:21:35 +0300
 MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="windows-1251"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/3] usb-mtp: fix some usb_mtp_write_data
- return paths
+Content-Disposition: inline
+Message-Id: <201903070021.35672.randrianasulu@gmail.com>
+Subject: Re: [Qemu-devel] PMON2000 compilation and kernel question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,101 +29,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, peter.maydell@linaro.org
+To: balaton@eik.bme.hu, qemu-devel@nongnu.org
 
-During a write, free up the "path" before getting more data.
-Also, while we at it, remove the confusing usage of d->fd for
-storing mkdir status
+> What do you mean by DIMM size not detected?
 
-Spotted by Coverity: CID 1398642
+Sorry, I mean "No DIMM in slot 1" message.
 
-Signed-off-by: Bandan Das <bsd@redhat.com>
----
- hw/usb/dev-mtp.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+PMON2000 MIPS Initializing. Standby...
+ERRORPC=3D00000000 CONFIG=3D00030932
+ PRID=3D00006302
+DIMM read
+read memory type
+read number of rows
+read blocks per ddrram
+read number of sides
+read width
+00000002
+No DIMM in slot 1
+DIMM SIZE=3D10000000
+sdcfg=3D2d5043df
+msize=3D10000000
+Init SDRAM Done!
+Sizing caches...
+Init caches...
+godson2 caches found
+Init caches done, cfg =3D 00030932
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 4dde14fc78..1f22284949 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -1605,7 +1605,7 @@ static int usb_mtp_update_object(MTPObject *parent,=
- char *name)
-     return ret;
- }
-=20
--static void usb_mtp_write_data(MTPState *s)
-+static int usb_mtp_write_data(MTPState *s)
- {
-     MTPData *d =3D s->data_out;
-     MTPObject *parent =3D
-@@ -1613,6 +1613,7 @@ static void usb_mtp_write_data(MTPState *s)
-     char *path =3D NULL;
-     uint64_t rc;
-     mode_t mask =3D 0644;
-+    int ret =3D 0;
-=20
-     assert(d !=3D NULL);
-=20
-@@ -1621,13 +1622,13 @@ static void usb_mtp_write_data(MTPState *s)
-         if (!parent || !s->write_pending) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
-                 0, 0, 0, 0);
--        return;
-+        return 1;
-         }
-=20
-         if (s->dataset.filename) {
-             path =3D g_strdup_printf("%s/%s", parent->path, s->dataset.f=
-ilename);
-             if (s->dataset.format =3D=3D FMT_ASSOCIATION) {
--                d->fd =3D mkdir(path, mask);
-+                ret =3D mkdir(path, mask);
-                 goto free;
-             }
-             d->fd =3D open(path, O_CREAT | O_WRONLY |
-@@ -1657,7 +1658,8 @@ static void usb_mtp_write_data(MTPState *s)
-             goto done;
-         }
-         if (d->write_status !=3D WRITE_END) {
--            return;
-+            g_free(path);
-+            return ret;
-         } else {
-             /*
-              * Return an incomplete transfer if file size doesn't match
-@@ -1685,12 +1687,14 @@ done:
-      */
-     if (d->fd !=3D -1) {
-         close(d->fd);
-+        d->fd =3D -1;
-     }
- free:
-     g_free(s->dataset.filename);
-     s->dataset.size =3D 0;
-     g_free(path);
-     s->write_pending =3D false;
-+    return ret;
- }
-=20
- static void usb_mtp_write_metadata(MTPState *s, uint64_t dlen)
-@@ -1727,14 +1731,12 @@ static void usb_mtp_write_metadata(MTPState *s, u=
-int64_t dlen)
-     s->write_pending =3D true;
-=20
-     if (s->dataset.format =3D=3D FMT_ASSOCIATION) {
--        usb_mtp_write_data(s);
--        /* next_handle will be allocated to the newly created dir */
--        if (d->fd =3D=3D -1) {
-+        if (usb_mtp_write_data(s)) {
-+            /* next_handle will be allocated to the newly created dir */
-             usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
-                                  0, 0, 0, 0);
-             return;
-         }
--        d->fd =3D -1;
-     }
-=20
-     usb_mtp_queue_result(s, RES_OK, d->trans, 3, QEMU_STORAGE_ID,
---=20
-2.19.2
+Copy PMON to execute location...
+  start =3D 0x81000000
+  s0 =3D 0x3ec00000
+a1050000
+copy text section done.
+Copy PMON to execute location done.
+sp=3D80ffc000Uncompressing Bios........................OK,Booting Bios
+
+[...]
+
+with binary I got:
+
+PMON2000 MIPS Initializing. Standby...
+ERRORPC=3D00000000 CONFIG=3D00030932
+ PRID=3D00006302
+DIMM read
+00000080
+read memory type
+read number of rows
+read memory size per side
+read blocks per ddrram
+read number of sides
+read width
+DIMM SIZE=3D10000000
+sdcfg=3D3d5043df
+msize=3D10000000
+Init SDRAM Done!
+Sizing caches...
+Init caches...
+godson2 caches found
+Init caches done, cfg =3D 00030932
+
+Copy PMON to execute location...
+  start =3D 0x85000000
+  s0 =3D 0x3ac00000
+a5040000
+copy text section done.
+Copy PMON to execute location done.
+sp=3D84ffc000Uncompressing Bios........................OK,Booting Bios
+
+
+As far as I understand those values come from=20
+Targets/Bonito2edev/Bonito/start.S
+
+#include "i2c.S"
+        beqz msize,.nodimm
+        nop
+        b 2f
+        nop
+=2Enodimm:
+        move    dbg,a0
+        PRINTSTR ("\r\nNo DIMM in all slots,use default configure\r\n")
+        li  msize,0x10000000
+        li      sdCfg,0x055043df         /* zgj-8-7-14-13 */
+2:
+        PRINTSTR("DIMM SIZE=3D")
+        move    a0,msize
+        bal     hexserial
+        nop
+        PRINTSTR("\r\n")
+
+        li      t0, 0xbff00008
+        sd      sdCfg, 0(t0)
+
+        #### gx 2006-03-17: mode ####
+        #li     t1,0x20
+        li      t1,0x28
+        li      t0, 0xbff00000
+        sw      t1,0(t0)
+        nop
+        li      t1,0x0
+        li      t0, 0xbff00000
+        sw      t1,0x30(t0)
+        nop
+
+
+and in turn i2c.S has this:
+
+Targets/Bonito2edev/Bonito/i2c.S
+
+#define i2cread newi2cread
+        li      msize,0
+        PRINTSTR("DIMM read\r\n")
+
+        /* only one memory slot, slave address is 1010000b */
+        li      sdCfg,0x04000000 /*bit 26=CD=BB=B7=A2=CA=BD=B6=C1=D0=B4=CA=
+=B1=B5=C4=BF=E9=C4=DA=CB=B3=D0=F2*/
+        li      a1, 0x0
+    li      a0,0xa1
+    bal     i2cread
+        nop
+        beq     v0,0xff,1f
+        nop
+        beq v0,0x80,1f
+        nop
+        move a0,v0
+        bal hexserial
+        nop
+    PRINTSTR ("\r\nNo DIMM in slot 0 \r\n");
+        b 2f
+        nop
+1:
+        or      sdCfg, 0x1<<29
+        nop
+        li a0,0xa1
+        bal ii2c_cfg
+        nop
+2:
+        li      a1, 0x0
+    li      a0,0xa3
+    bal     i2cread
+        nop
+        li      a1,0x0
+        beq     v0,0xff,1f
+        nop
+        beq v0,0x80,1f
+        nop
+        move a0,v0
+        bal hexserial
+        nop
+    PRINTSTR ("\r\nNo DIMM in slot 1 \r\n");
+        b 2f
+        nop
+1:
+        li a0,0xa3
+        bal ii2c_cfg
+        nop
+
+        b 2f
+        nop
+
+2:
+        b 211f
+        nop
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Ah, it talks about SLOT _1_ ! So, slot _0_ apparently read correctly ....=20
+but config info still not printed.... by pmon
+
+
+Sorry, I misread output!
