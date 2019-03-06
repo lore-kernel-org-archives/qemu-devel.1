@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46850)
+Received: from eggs.gnu.org ([209.51.188.92]:47371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h1Pjq-0007Xk-V6
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:09:11 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1Pmt-0008VZ-1G
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1h1Pjl-0007NN-V9
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:09:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58150)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h1Pjl-0007Gi-4B
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:09:05 -0500
-References: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
-	<CAFEAcA8Z3V3gZa-ttX9HiHQn1EEN0Y9zi8kP7xwX6q_6NOAj_A@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <bed0ff83-117a-c4e4-6c1b-64c090a7f634@redhat.com>
-Date: Wed, 6 Mar 2019 14:08:55 +0800
+	(envelope-from <armbru@redhat.com>) id 1h1Pms-0000Nr-DM
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:12:19 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190225183757.27378-1-armbru@redhat.com>
+	<20190225183757.27378-7-armbru@redhat.com>
+	<87bm2qzfyn.fsf@dusky.pond.sub.org>
+	<d610dae9-9c16-9ccc-762a-79cff5ed2be8@redhat.com>
+Date: Wed, 06 Mar 2019 07:12:11 +0100
+In-Reply-To: <d610dae9-9c16-9ccc-762a-79cff5ed2be8@redhat.com> (Laszlo Ersek's
+	message of "Tue, 5 Mar 2019 18:08:11 +0100")
+Message-ID: <87lg1s1qh0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Z3V3gZa-ttX9HiHQn1EEN0Y9zi8kP7xwX6q_6NOAj_A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL V2 00/13] Net patches
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 6/6] pc: Support firmware configuration
+ with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
+Laszlo Ersek <lersek@redhat.com> writes:
 
-On 2019/3/5 =E4=B8=8B=E5=8D=887:21, Peter Maydell wrote:
-> On Tue, 5 Mar 2019 at 07:12, Jason Wang <jasowang@redhat.com> wrote:
->> The following changes since commit b6179aaff961627fcb59d7b234297966b81=
-ac726:
->>
->>    Merge remote-tracking branch 'remotes/pmaydell/tags/pull-cocoa-2019=
-0304' into staging (2019-03-04 16:50:41 +0000)
->>
->> are available in the git repository at:
->>
->>    https://github.com/jasowang/qemu.git tags/net-pull-request
->>
->> for you to fetch changes up to 4b9b70000218640a42c3ea908a12665e5840b6c=
-d:
->>
->>    tests: Add a test for qemu self announcements (2019-03-05 11:27:41 =
-+0800)
->>
->> ----------------------------------------------------------------
->>
->> Changes from V1:
->> - build fixes for qmp controlled announcing
->>
-> Applied, thanks.
+> On 03/04/19 18:50, Markus Armbruster wrote:
 >
-> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-> for any user-visible changes.
+>> Alright, we can call object_get_class(dev_obj)->unparent(dev_obj).
+>> 
+>> Final complication: if I call just that, the device's reference counter
+>> goes down to zero in the middle of device_unparent(), and we use after
+>> free.  So I bracket he call with object_ref() and object_unref().
 >
-> -- PMM
+> I don't think that requiring such a bracketing is necessarily a problem.
+> I vaguely remember reviewing a kernel patch 6 or so years ago where the
+> patch used the same idea, with those "get" and "put" functions (the bug
+> the patch was fixing was that the last reference was "temporarily" lost
+> mid-operation).
 
+I don't regard it as problem.  My voodoo coding just wasn't prepared for
+it.
 
-Done.
+> So perhaps this can be addressed, for the general case, by extending the
+> documentation of device_unparent(). (The function has no documentation
+> at all, at the moment.)
 
-Thanks
+I know just enough to be dangerous here, not enough to write
+documentation.
+
+We really need a complete life cycle diagram for devices.  The closest
+we have is the section on realization in qdev-core.h, which lets me
+divine only a part of the life cycle.  The missing part I struggled with
+here is how to go from device state "created, not realized" to
+"destroyed".
