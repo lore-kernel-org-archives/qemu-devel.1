@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44677)
+Received: from eggs.gnu.org ([209.51.188.92]:45945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1g7A-0007Jq-Km
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:38:21 -0500
+	(envelope-from <cota@braap.org>) id 1h1gI4-0000m4-QN
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1g79-0002Df-Q1
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:38:20 -0500
-Resent-Message-Id: <E1h1g79-0002Df-Q1@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1g79-0002DN-IR
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:38:19 -0500
-Message-ID: <155191546615.30942.17155475632261921933@6acff2cf482b>
-In-Reply-To: <20190301064809.3074-1-llyzs.vic@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cota@braap.org>) id 1h1gI4-0007we-5v
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:49:36 -0500
+Date: Wed, 6 Mar 2019 18:49:26 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20190306234926.GA6115@flamenco>
+References: <20190304181813.8075-1-cota@braap.org>
+	<2adf8423-458d-27c3-67bf-d4775104ad43@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 6 Mar 2019 15:37:47 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] slirp: check for ioctlsocket error and
- 0-length udp payload.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2adf8423-458d-27c3-67bf-d4775104ad43@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v7 00/73] per-CPU locks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +23,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: llyzs.vic@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, jan.kiszka@siemens.com, marcandre.lureau@gmail.com, samuel.thibault@gnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwMTA2NDgwOS4zMDc0
-LTEtbGx5enMudmljQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
-Y2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9y
-YSBTSE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogICAg
-ICAgICAgICAgICAgIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJwL3NsaXJwLmg6NTAsCiAg
-ICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvc2xpcnAvc29ja2V0LmM6ODoK
-L3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJwL3NvY2tldC5jOiBJbiBmdW5jdGlvbiAnc29yZWN2ZnJv
-bSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC9zb2NrZXQuYzo1MzM6MjA6IGVycm9yOiAnZGZk
-JyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKICAgICAgICBERUJVR19N
-SVNDKChkZmQsIiBpb2N0bHNvY2tldCBlcnJubyA9ICVkLSVzXG4iLAogICAgICAgICAgICAgICAg
-ICAgIF5+fgovdXNyL3g4Nl82NC13NjQtbWluZ3czMi9zeXMtcm9vdC9taW5ndy9pbmNsdWRlL2ds
-aWItMi4wL2dsaWIvZ21lc3NhZ2VzLmg6MzQ1OjMyOiBub3RlOiBpbiBkZWZpbml0aW9uIG9mIG1h
-Y3JvICdnX2RlYnVnJwotLS0KL3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJwL3NvY2tldC5jOjUzMzo4
-OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8gJ0RFQlVHX01JU0MnCiAgICAgICAgREVCVUdf
-TUlTQygoZGZkLCIgaW9jdGxzb2NrZXQgZXJybm8gPSAlZC0lc1xuIiwKICAgICAgICBefn5+fn5+
-fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC9zb2NrZXQuYzo1MzM6MjM6IGVycm9yOiBsZWZ0
-LWhhbmQgb3BlcmFuZCBvZiBjb21tYSBleHByZXNzaW9uIGhhcyBubyBlZmZlY3QgWy1XZXJyb3I9
-dW51c2VkLXZhbHVlXQogICAgICAgIERFQlVHX01JU0MoKGRmZCwiIGlvY3Rsc29ja2V0IGVycm5v
-ID0gJWQtJXNcbiIsCiAgICAgICAgICAgICAgICAgICAgICAgXgovdXNyL3g4Nl82NC13NjQtbWlu
-Z3czMi9zeXMtcm9vdC9taW5ndy9pbmNsdWRlL2dsaWItMi4wL2dsaWIvZ21lc3NhZ2VzLmg6MzQ1
-OjMyOiBub3RlOiBpbiBkZWZpbml0aW9uIG9mIG1hY3JvICdnX2RlYnVnJwotLS0KL3RtcC9xZW11
-LXRlc3Qvc3JjL3NsaXJwL3NvY2tldC5jOjUzMzo4OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFj
-cm8gJ0RFQlVHX01JU0MnCiAgICAgICAgREVCVUdfTUlTQygoZGZkLCIgaW9jdGxzb2NrZXQgZXJy
-bm8gPSAlZC0lc1xuIiwKICAgICAgICBefn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9zbGly
-cC9zb2NrZXQuYzo1MzM6NTQ6IGVycm9yOiBsZWZ0LWhhbmQgb3BlcmFuZCBvZiBjb21tYSBleHBy
-ZXNzaW9uIGhhcyBubyBlZmZlY3QgWy1XZXJyb3I9dW51c2VkLXZhbHVlXQogICAgICAgIERFQlVH
-X01JU0MoKGRmZCwiIGlvY3Rsc29ja2V0IGVycm5vID0gJWQtJXNcbiIsCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KL3Vzci94ODZfNjQtdzY0
-LW1pbmd3MzIvc3lzLXJvb3QvbWluZ3cvaW5jbHVkZS9nbGliLTIuMC9nbGliL2dtZXNzYWdlcy5o
-OjM0NTozMjogbm90ZTogaW4gZGVmaW5pdGlvbiBvZiBtYWNybyAnZ19kZWJ1ZycKLS0tCi90bXAv
-cWVtdS10ZXN0L3NyYy9zbGlycC9zb2NrZXQuYzo1MzM6ODogbm90ZTogaW4gZXhwYW5zaW9uIG9m
-IG1hY3JvICdERUJVR19NSVNDJwogICAgICAgIERFQlVHX01JU0MoKGRmZCwiIGlvY3Rsc29ja2V0
-IGVycm5vID0gJWQtJXNcbiIsCiAgICAgICAgXn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMv
-c2xpcnAvc29ja2V0LmM6NTMzOjg6IGVycm9yOiBmb3JtYXQgbm90IGEgc3RyaW5nIGxpdGVyYWwg
-YW5kIG5vIGZvcm1hdCBhcmd1bWVudHMgWy1XZXJyb3I9Zm9ybWF0LXNlY3VyaXR5XQpjYzE6IGFs
-bCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10
-ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHNsaXJwL3NvY2tldC5vXSBFcnJvciAxClRyYWNlYmFjayAo
-bW9zdCByZWNlbnQgY2FsbCBsYXN0KToKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMzAxMDY0ODA5LjMwNzQtMS1sbHl6cy52aWNAZ21h
-aWwuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Wed, Mar 06, 2019 at 11:40:57 -0800, Richard Henderson wrote:
+> Peter reported to me a hang on the x86_64
+> bios-tables-test with an arm32 host.  I have been able to replicate this.
+(snip)
+
+I reproduced this on a power7 machine (gcc110). However, after a few
+git checkout->build cycles I was not able to reproduce this again (!?).
+
+I currently have very little time to spend on this. Given how close we
+are to the soft freeze, I suggest we defer the merge of this series
+to post-v4.0.
+
+Thanks,
+
+		Emilio
