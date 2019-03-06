@@ -1,43 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37944)
+Received: from eggs.gnu.org ([209.51.188.92]:38664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h1bV8-0003IO-9Z
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:42:47 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1h1bYv-0004lr-Qr
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:46:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h1bV6-0007Eu-A1
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:42:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43106
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1h1bV4-0006yn-Ig
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:42:43 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x26IXtMt110301
-	for <qemu-devel@nongnu.org>; Wed, 6 Mar 2019 13:42:24 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2r2hn8puej-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 13:42:23 -0500
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Wed, 6 Mar 2019 18:42:23 -0000
-Reply-To: jjherne@linux.ibm.com
-References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-	<1551466776-29123-7-git-send-email-jjherne@linux.ibm.com>
-	<e3f0d9ab-c98b-d500-12e6-cfcc1a2b2a1b@redhat.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Wed, 6 Mar 2019 13:42:17 -0500
-MIME-Version: 1.0
-In-Reply-To: <e3f0d9ab-c98b-d500-12e6-cfcc1a2b2a1b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <96d70258-6ed8-136c-d824-a0403ace036f@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 06/16] s390-bios: Clean up
- cio.h
+	(envelope-from <ehabkost@redhat.com>) id 1h1bYu-00029T-RE
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:46:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51621)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1h1bYu-00028N-3N
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 13:46:40 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Wed,  6 Mar 2019 15:40:57 -0300
+Message-Id: <20190306184101.9974-2-ehabkost@redhat.com>
+In-Reply-To: <20190306184101.9974-1-ehabkost@redhat.com>
+References: <20190306184101.9974-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 1/5] qdev/core: fix qbus_is_full()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,46 +23,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>
 
-On 3/5/19 12:51 AM, Thomas Huth wrote:
-> On 01/03/2019 19.59, Jason J. Herne wrote:
->> Add proper typedefs to all structs and modify all bit fields to use consistent
->> formatting.
->>
->> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
->> Reviewed-by: Collin Walling <walling@linux.ibm.com>
->> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
->> ---
->>   pc-bios/s390-ccw/cio.h      | 152 ++++++++++++++++++++++----------------------
->>   pc-bios/s390-ccw/s390-ccw.h |   8 ---
->>   2 files changed, 76 insertions(+), 84 deletions(-)
->>
->> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
->> index 1a0795f..2f58256 100644
->> --- a/pc-bios/s390-ccw/cio.h
->> +++ b/pc-bios/s390-ccw/cio.h
-> [...]
->> -struct subchannel_id {
->> -        __u32 cssid  : 8;
->> -        __u32        : 4;
->> -        __u32 m      : 1;
->> -        __u32 ssid   : 2;
->> -        __u32 one    : 1;
->> -        __u32 sch_no : 16;
->> -} __attribute__ ((packed, aligned(4)));
->> +} __attribute__ ((packed, aligned(4))) Schib;
->> +
->> +typedef struct subchannel_id {
->> +        __u32 cssid:8;
->> +        __u32:4;
-> 
-> __u32:4 looks a little bit funny. Not sure, but maybe this should be
-> given a name like "reserved" or so?
-> 
+From: Tony Krowiak <akrowiak@linux.ibm.com>
 
-Perhaps, but this is not my code. I was just cleaning up the style. If you feel strongly 
-that this patch is the place to give this a name, I can do that.
+The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
+value of the BusState structure with the max_dev value of the BusClass structure
+to determine whether the maximum number of children has been reached for the
+bus. The problem is, the max_index field of the BusState structure does not
+necessarily reflect the number of devices that have been plugged into
+the bus.
 
+Whenever a child device is plugged into the bus, the bus's max_index value is
+assigned to the child device and then incremented. If the child is subsequently
+unplugged, the value of the max_index does not change and no longer reflects the
+number of children.
+
+When the bus's max_index value reaches the maximum number of devices
+allowed for the bus (i.e., the max_dev field in the BusClass structure),
+attempts to plug another device will be rejected claiming that the bus is
+full -- even if the bus is actually empty.
+
+To resolve the problem, a new 'num_children' field is being added to the
+BusState structure to keep track of the number of children plugged into the
+bus. It will be incremented when a child is plugged, and decremented when a
+child is unplugged.
+
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Message-Id: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/hw/qdev-core.h | 1 +
+ hw/core/qdev.c         | 3 +++
+ qdev-monitor.c         | 2 +-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index e70a4bfa49..35b8154e8b 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -206,6 +206,7 @@ struct BusState {
+     HotplugHandler *hotplug_handler;
+     int max_index;
+     bool realized;
++    int num_children;
+     QTAILQ_HEAD(, BusChild) children;
+     QLIST_ENTRY(BusState) sibling;
+ };
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index d59071b8ed..00a5a39c76 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
+             snprintf(name, sizeof(name), "child[%d]", kid->index);
+             QTAILQ_REMOVE(&bus->children, kid, sibling);
+ 
++            bus->num_children--;
++
+             /* This gives back ownership of kid->child back to us.  */
+             object_property_del(OBJECT(bus), name, NULL);
+             object_unref(OBJECT(kid->child));
+@@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+     char name[32];
+     BusChild *kid = g_malloc0(sizeof(*kid));
+ 
++    bus->num_children++;
+     kid->index = bus->max_index++;
+     kid->child = child;
+     object_ref(OBJECT(kid->child));
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 07147c63bf..45a8ba4964 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
+ static inline bool qbus_is_full(BusState *bus)
+ {
+     BusClass *bus_class = BUS_GET_CLASS(bus);
+-    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
++    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
+ }
+ 
+ /*
 -- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+2.18.0.rc1.1.g3f1ff2140
