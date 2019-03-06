@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55892)
+Received: from eggs.gnu.org ([209.51.188.92]:56539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1YM9-0007Qc-BY
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:21:18 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h1YOz-0000jb-KV
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:24:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1YM8-0000Gs-7f
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:21:17 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Mar 2019 15:21:02 +0000
-Message-ID: <533b0898-c7a6-13dc-2dd8-35605eb2877c@virtuozzo.com>
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<20190305234337.18353-2-jsnow@redhat.com>
-In-Reply-To: <20190305234337.18353-2-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CDFAF752D816BD47B67E2BCA65570698@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jsnow@redhat.com>) id 1h1YOy-0002w3-K2
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:24:13 -0500
+References: <20190301191545.8728-1-jsnow@redhat.com>
+	<20190301191545.8728-7-jsnow@redhat.com>
+	<5d204716-dc54-70ac-8b67-266ce8f44e0e@redhat.com>
+	<ce11fd2d-0b28-9b67-2382-506f0bfd8754@redhat.com>
+	<15751e4f-6415-219f-036b-26a3515a72ce@redhat.com>
+	<93e3f474-0235-7500-b4c7-3a4da17b29dd@redhat.com>
+	<eab2ced5-9079-d302-18ec-24eda2ea836d@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <7c1549db-3a4c-9100-ed7b-5e8bce39081b@redhat.com>
+Date: Wed, 6 Mar 2019 10:24:04 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/5] block/qcow2-bitmap: Skip length check
- in some cases
+In-Reply-To: <eab2ced5-9079-d302-18ec-24eda2ea836d@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/dirty-bitmaps: disallow busy
+ bitmaps as merge source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,117 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-MDYuMDMuMjAxOSAyOjQzLCBKb2huIFNub3cgd3JvdGU6DQo+IElmIHdlIHdlcmUgdG8gYWxsb3cg
-cmVzaXplcywgdGhlIGxlbmd0aCBjaGVjayB0aGF0IGhhcHBlbnMgd2hlbiB3ZSBsb2FkDQo+IGJp
-dG1hcCBoZWFkZXJzIGZyb20gZGlzayB3aGVuIHdlIHJlYWQgb3Igc3RvcmUgYml0bWFwcyB3b3Vs
-ZCBiZWdpbiB0bw0KPiBmYWlsOg0KPiANCj4gSW1hZ2luZSB0aGUgY2lyY3Vtc3RhbmNlIHdoZXJl
-IHdlJ3ZlIHJlc2l6ZWQgYml0bWFwcyBpbiBtZW1vcnksIGJ1dCB0aGV5IHN0aWxsDQo+IGhhdmUg
-dGhlIG9sZCB2YWx1ZXMgb24tZGlzay4gVGhlIGxlbmd0aHMgd2lsbCBubyBsb25nZXIgbWF0Y2gg
-YmRydl9nZXRsZW5ndGgsDQo+IHNvIHdlIG11c3QgYWxsb3cgdGhpcyBjaGVjayB0byBiZSBza2lw
-cGVkIHdoZW4gZmx1c2hpbmcgYml0bWFwcyB0byBkaXNrLg0KPiANCj4gTGltaXQgdGhpcyB0byB3
-aGVuIHdlIGFyZSBhYm91dCB0byBvdmVyd3JpdGUgdGhlIGhlYWRlcnM6IHdlIHdpbGwgdmVyaWZ5
-IHRoZQ0KPiBvdXRnb2luZyBoZWFkZXJzLCBidXQgd2Ugd2lsbCBza2lwIHZlcmlmeWluZyB0aGUg
-a25vd24gc3RhbGUgaGVhZGVycy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNu
-b3dAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICAgYmxvY2svcWNvdzItYml0bWFwLmMgfCAzNCArKysr
-KysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIxIGlu
-c2VydGlvbnMoKyksIDEzIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fj
-b3cyLWJpdG1hcC5jIGIvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gaW5kZXggYzNiMjEwZWRlMS4u
-ZDAyNzMwMDA0YSAxMDA2NDQNCj4gLS0tIGEvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gKysrIGIv
-YmxvY2svcWNvdzItYml0bWFwLmMNCj4gQEAgLTQzNSw3ICs0MzUsOCBAQCBzdGF0aWMgaW5saW5l
-IFFjb3cyQml0bWFwRGlyRW50cnkgKm5leHRfZGlyX2VudHJ5KFFjb3cyQml0bWFwRGlyRW50cnkg
-KmVudHJ5KQ0KPiAgICAgICByZXR1cm4gKFFjb3cyQml0bWFwRGlyRW50cnkgKikoKHVpbnQ4X3Qg
-KillbnRyeSArIGRpcl9lbnRyeV9zaXplKGVudHJ5KSk7DQo+ICAgfQ0KPiAgIA0KPiAtc3RhdGlj
-IGludCBjaGVja19kaXJfZW50cnkoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIFFjb3cyQml0bWFwRGly
-RW50cnkgKmVudHJ5KQ0KPiArc3RhdGljIGludCBjaGVja19kaXJfZW50cnkoQmxvY2tEcml2ZXJT
-dGF0ZSAqYnMsIFFjb3cyQml0bWFwRGlyRW50cnkgKmVudHJ5LA0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgYm9vbCBhbGxvd19yZXNpemUpDQo+ICAgew0KPiAgICAgICBCRFJWUWNvdzJT
-dGF0ZSAqcyA9IGJzLT5vcGFxdWU7DQo+ICAgICAgIHVpbnQ2NF90IHBoeXNfYml0bWFwX2J5dGVz
-Ow0KPiBAQCAtNDYyLDggKzQ2MywxNCBAQCBzdGF0aWMgaW50IGNoZWNrX2Rpcl9lbnRyeShCbG9j
-a0RyaXZlclN0YXRlICpicywgUWNvdzJCaXRtYXBEaXJFbnRyeSAqZW50cnkpDQo+ICAgICAgICAg
-ICByZXR1cm4gbGVuOw0KPiAgICAgICB9DQo+ICAgDQo+IC0gICAgZmFpbCA9IChwaHlzX2JpdG1h
-cF9ieXRlcyA+IEJNRV9NQVhfUEhZU19TSVpFKSB8fA0KPiAtICAgICAgICAgICAobGVuID4gKChw
-aHlzX2JpdG1hcF9ieXRlcyAqIDgpIDw8IGVudHJ5LT5ncmFudWxhcml0eV9iaXRzKSk7DQo+ICsg
-ICAgaWYgKHBoeXNfYml0bWFwX2J5dGVzID4gQk1FX01BWF9QSFlTX1NJWkUpIHsNCj4gKyAgICAg
-ICAgcmV0dXJuIC1FSU5WQUw7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgaWYgKCFhbGxvd19yZXNp
-emUgJiYNCj4gKyAgICAgICAgKGxlbiA+ICgocGh5c19iaXRtYXBfYnl0ZXMgKiA4KSA8PCBlbnRy
-eS0+Z3JhbnVsYXJpdHlfYml0cykpKSB7DQo+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiAr
-ICAgIH0NCj4gICANCj4gICAgICAgcmV0dXJuIGZhaWwgPyAtRUlOVkFMIDogMDsNCj4gICB9DQo+
-IEBAIC01MzQsNyArNTQxLDggQEAgc3RhdGljIHVpbnQzMl90IGJpdG1hcF9saXN0X2NvdW50KFFj
-b3cyQml0bWFwTGlzdCAqYm1fbGlzdCkNCj4gICAgKiBjaGVja3MgaXQgYW5kIGNvbnZlcnQgdG8g
-Yml0bWFwIGxpc3QuDQo+ICAgICovDQo+ICAgc3RhdGljIFFjb3cyQml0bWFwTGlzdCAqYml0bWFw
-X2xpc3RfbG9hZChCbG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3Qgb2Zmc2V0LA0KPiAtICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBzaXplLCBFcnJv
-ciAqKmVycnApDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVp
-bnQ2NF90IHNpemUsIGJvb2wgYWxsb3dfcmVzaXplLA0KPiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApDQo+ICAgew0KPiAgICAgICBpbnQgcmV0
-Ow0KPiAgICAgICBCRFJWUWNvdzJTdGF0ZSAqcyA9IGJzLT5vcGFxdWU7DQo+IEBAIC01OTMsNyAr
-NjAxLDcgQEAgc3RhdGljIFFjb3cyQml0bWFwTGlzdCAqYml0bWFwX2xpc3RfbG9hZChCbG9ja0Ry
-aXZlclN0YXRlICpicywgdWludDY0X3Qgb2Zmc2V0LA0KPiAgICAgICAgICAgICAgIGdvdG8gZmFp
-bDsNCj4gICAgICAgICAgIH0NCj4gICANCj4gLSAgICAgICAgcmV0ID0gY2hlY2tfZGlyX2VudHJ5
-KGJzLCBlKTsNCj4gKyAgICAgICAgcmV0ID0gY2hlY2tfZGlyX2VudHJ5KGJzLCBlLCBhbGxvd19y
-ZXNpemUpOw0KPiAgICAgICAgICAgaWYgKHJldCA8IDApIHsNCj4gICAgICAgICAgICAgICBlcnJv
-cl9zZXRnKGVycnAsICJCaXRtYXAgJyUuKnMnIGRvZXNuJ3Qgc2F0aXNmeSB0aGUgY29uc3RyYWlu
-dHMiLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgZS0+bmFtZV9zaXplLCBkaXJfZW50cnlf
-bmFtZV9maWVsZChlKSk7DQo+IEBAIC02NTQsNyArNjYyLDcgQEAgaW50IHFjb3cyX2NoZWNrX2Jp
-dG1hcHNfcmVmY291bnRzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBCZHJ2Q2hlY2tSZXN1bHQgKnJl
-cywNCj4gICAgICAgfQ0KPiAgIA0KPiAgICAgICBibV9saXN0ID0gYml0bWFwX2xpc3RfbG9hZChi
-cywgcy0+Yml0bWFwX2RpcmVjdG9yeV9vZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgcy0+Yml0bWFwX2RpcmVjdG9yeV9zaXplLCBOVUxMKTsNCj4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUsIGZhbHNlLCBOVUxM
-KTsNCj4gICAgICAgaWYgKGJtX2xpc3QgPT0gTlVMTCkgew0KPiAgICAgICAgICAgcmVzLT5jb3Jy
-dXB0aW9ucysrOw0KPiAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+IEBAIC03NTUsNyArNzYz
-LDcgQEAgc3RhdGljIGludCBiaXRtYXBfbGlzdF9zdG9yZShCbG9ja0RyaXZlclN0YXRlICpicywg
-UWNvdzJCaXRtYXBMaXN0ICpibV9saXN0LA0KPiAgICAgICAgICAgZS0+ZXh0cmFfZGF0YV9zaXpl
-ID0gMDsNCj4gICAgICAgICAgIG1lbWNweShlICsgMSwgYm0tPm5hbWUsIGUtPm5hbWVfc2l6ZSk7
-DQo+ICAgDQo+IC0gICAgICAgIGlmIChjaGVja19kaXJfZW50cnkoYnMsIGUpIDwgMCkgew0KPiAr
-ICAgICAgICBpZiAoY2hlY2tfZGlyX2VudHJ5KGJzLCBlLCBmYWxzZSkgPCAwKSB7DQo+ICAgICAg
-ICAgICAgICAgcmV0ID0gLUVJTlZBTDsNCj4gICAgICAgICAgICAgICBnb3RvIGZhaWw7DQo+ICAg
-ICAgICAgICB9DQo+IEBAIC05NTcsNyArOTY1LDcgQEAgYm9vbCBxY293Ml9sb2FkX2RpcnR5X2Jp
-dG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJycCkNCj4gICAgICAgfQ0KPiAg
-IA0KPiAgICAgICBibV9saXN0ID0gYml0bWFwX2xpc3RfbG9hZChicywgcy0+Yml0bWFwX2RpcmVj
-dG9yeV9vZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0bWFw
-X2RpcmVjdG9yeV9zaXplLCBlcnJwKTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUsIGZhbHNlLCBlcnJwKTsNCj4gICAgICAgaWYgKGJt
-X2xpc3QgPT0gTlVMTCkgew0KPiAgICAgICAgICAgcmV0dXJuIGZhbHNlOw0KPiAgICAgICB9DQo+
-IEBAIC0xMDY2LDcgKzEwNzQsNyBAQCBRY293MkJpdG1hcEluZm9MaXN0ICpxY293Ml9nZXRfYml0
-bWFwX2luZm9fbGlzdChCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgfQ0KPiAgIA0KPiAg
-ICAgICBibV9saXN0ID0gYml0bWFwX2xpc3RfbG9hZChicywgcy0+Yml0bWFwX2RpcmVjdG9yeV9v
-ZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0bWFwX2RpcmVj
-dG9yeV9zaXplLCBlcnJwKTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5i
-aXRtYXBfZGlyZWN0b3J5X3NpemUsIGZhbHNlLCBlcnJwKTsNCj4gICAgICAgaWYgKGJtX2xpc3Qg
-PT0gTlVMTCkgew0KPiAgICAgICAgICAgcmV0dXJuIE5VTEw7DQo+ICAgICAgIH0NCj4gQEAgLTEx
-MTEsNyArMTExOSw3IEBAIGludCBxY293Ml9yZW9wZW5fYml0bWFwc19yd19oaW50KEJsb2NrRHJp
-dmVyU3RhdGUgKmJzLCBib29sICpoZWFkZXJfdXBkYXRlZCwNCj4gICAgICAgfQ0KPiAgIA0KPiAg
-ICAgICBibV9saXN0ID0gYml0bWFwX2xpc3RfbG9hZChicywgcy0+Yml0bWFwX2RpcmVjdG9yeV9v
-ZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0bWFwX2RpcmVj
-dG9yeV9zaXplLCBlcnJwKTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5i
-aXRtYXBfZGlyZWN0b3J5X3NpemUsIGZhbHNlLCBlcnJwKTsNCj4gICAgICAgaWYgKGJtX2xpc3Qg
-PT0gTlVMTCkgew0KPiAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+ICAgICAgIH0NCj4gQEAg
-LTEzNTksNyArMTM2Nyw3IEBAIHZvaWQgcWNvdzJfcmVtb3ZlX3BlcnNpc3RlbnRfZGlydHlfYml0
-bWFwKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICB9DQo+ICAgDQo+ICAgICAgIGJtX2xp
-c3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGlyZWN0b3J5X29mZnNldCwNCj4g
-LSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUs
-IGVycnApOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmJpdG1hcF9kaXJl
-Y3Rvcnlfc2l6ZSwgZmFsc2UsIGVycnApOw0KPiAgICAgICBpZiAoYm1fbGlzdCA9PSBOVUxMKSB7
-DQo+ICAgICAgICAgICByZXR1cm47DQo+ICAgICAgIH0NCj4gQEAgLTE0MTIsNyArMTQyMCw3IEBA
-IHZvaWQgcWNvdzJfc3RvcmVfcGVyc2lzdGVudF9kaXJ0eV9iaXRtYXBzKEJsb2NrRHJpdmVyU3Rh
-dGUgKmJzLCBFcnJvciAqKmVycnApDQo+ICAgICAgICAgICBibV9saXN0ID0gYml0bWFwX2xpc3Rf
-bmV3KCk7DQo+ICAgICAgIH0gZWxzZSB7DQoNCldvcnRoIGNvbW1lbnQgaGVyZSwgdGhhdCB3ZSBh
-c3N1bWUgdGhhdCBpbWFnZSBtYXkgYmUgcmVzaXplZD8NCg0KPiAgICAgICAgICAgYm1fbGlzdCA9
-IGJpdG1hcF9saXN0X2xvYWQoYnMsIHMtPmJpdG1hcF9kaXJlY3Rvcnlfb2Zmc2V0LA0KPiAtICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUs
-IGVycnApOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRtYXBf
-ZGlyZWN0b3J5X3NpemUsIHRydWUsIGVycnApOw0KPiAgICAgICAgICAgaWYgKGJtX2xpc3QgPT0g
-TlVMTCkgew0KPiAgICAgICAgICAgICAgIHJldHVybjsNCj4gICAgICAgICAgIH0NCj4gQEAgLTE1
-OTMsNyArMTYwMSw3IEBAIGJvb2wgcWNvdzJfY2FuX3N0b3JlX25ld19kaXJ0eV9iaXRtYXAoQmxv
-Y2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgICAgIH0NCj4gICANCj4gICAgICAgYm1fbGlzdCA9IGJp
-dG1hcF9saXN0X2xvYWQoYnMsIHMtPmJpdG1hcF9kaXJlY3Rvcnlfb2Zmc2V0LA0KPiAtICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZXJycCk7
-DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0bWFwX2RpcmVjdG9yeV9z
-aXplLCBmYWxzZSwgZXJycCk7DQo+ICAgICAgIGlmIChibV9saXN0ID09IE5VTEwpIHsNCj4gICAg
-ICAgICAgIGdvdG8gZmFpbDsNCj4gICAgICAgfQ0KPiANCg0KV2l0aCBFcmljJ3Mgc3VnZ2VzdGlv
-bjoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
-QHZpcnR1b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+
+
+On 3/6/19 8:57 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 01.03.2019 23:04, John Snow wrote:
+>>
+>>
+>> On 3/1/19 2:57 PM, Eric Blake wrote:
+>>> On 3/1/19 1:48 PM, John Snow wrote:
+>>>
+>>>>> I understand forbidding inconsistent sources (because if the source is
+>>>>> potentially missing bits, then the merge destination will also be
+>>>>> missing bits and thus be inconsistent), but why forbid busy?  If I've
+>>>>> associated a bitmap with an NBD server (making it busy), it is still
+>>>>> readable, and so I should still be able to merge its bits into another copy.
+>>>>>
+>>>>
+>>>> True, do you rely on this, though?
+>>>
+>>> Not in my current libvirt code (as I create a temporary bitmap to hand
+>>> to NBD, since it may be the merge of one or more disabled bitmaps in a
+>>> differential backup case), so being tighter for now and relaxing later
+>>> if we DO come up with a use is acceptable.
+>>>
+>>>>
+>>>> I was working from a space of "busy" meant "actively in-use by an
+>>>> operation, and COULD change" so I was forbidding it out of good hygiene.
+>>>>
+>>>> Clearly the ones in-use by NBD are actually static and unchanging, so
+>>>> it's safer -- but that might not be true for push backups, where you
+>>>> might not actually be getting what you think you are, because of the
+>>>> bifurcated nature of those bitmaps.
+>>>
+>>> Oh, good point, especially after you worked so hard to merge
+>>> locked/frozen into a single status - you WILL miss the bits from the
+>>> successor (unless we teach the merge algorithm to pull in the busy
+>>> bitmap's bits AND all the bits of its successors - but that feels like a
+>>> lot of work if we don't have a client needing it now).  Okay, with the
+>>> extra justification mentioned in the commit message,
+>>>
+>>
+>> (Though I am being a little fast and loose here: when we split a bitmap,
+>> the top-level one that retains the name actually stays unchanging and
+>> the child bitmap is the one that starts accruing writes from a blank
+>> canvas, but that STILL may not be what you expect when you choose it as
+>> a merge source, however.)
+>>
+>>>>
+>>>> If this causes a problem for you in the short-term I will simply roll
+>>>> this back, but it stands out to me.
+>>>>
+>>>> (I can't stop myself from trying to protect the user from themselves.
+>>>> It's clearly a recurring theme in my design and reviews.)
+>>>>
+>>>>>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>>>>>> index 769668ccdc..8403c9981d 100644
+>>>>>> --- a/block/dirty-bitmap.c
+>>>>>> +++ b/block/dirty-bitmap.c
+>>>>>> @@ -825,6 +825,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>>>>>>           goto out;
+>>>>>>       }
+>>>>>>   
+>>>>>> +    if (bdrv_dirty_bitmap_check(src, BDRV_BITMAP_ALLOW_RO, errp)) {
+>>>>>
+>>>>> Thus, I think this should be BDRV_BITMAP_INCONSISTENT.
+>>>
+>>> then I retract my complaint, and the code is acceptable for now.
+>>>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>>
+>>
+>> We could always split it back out later, but in basic terms for
+>> permissions and user perspective, "in use" seems robust enough of a
+>> resolution. (It might be safe to read, it might not be, who knows --
+>> it's in use.)
+> 
+> I think, if we need some kind of sharing busy bitmaps, it should be two
+> busy states: one, which allows reads for other users and one that doesn't.
+> 
+
+I think that's... hopefully premature. We don't need this NOW do we?
+
+I think this is OK as-is.
