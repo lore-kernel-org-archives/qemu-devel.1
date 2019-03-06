@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46871)
+Received: from eggs.gnu.org ([209.51.188.92]:47888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1TDL-0004Qs-Ss
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:51:52 -0500
+	(envelope-from <stefanha@gmail.com>) id 1h1THn-0006JH-Ha
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:56:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1TDL-0000Oy-3J
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:51:51 -0500
-Date: Wed, 6 Mar 2019 09:51:47 +0000
+	(envelope-from <stefanha@gmail.com>) id 1h1THm-0002wq-LW
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:56:27 -0500
+Date: Wed, 6 Mar 2019 09:56:15 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190306095147.GF22159@stefanha-x1.localdomain>
-References: <20190227172256.30368-1-kwolf@redhat.com>
-	<20190227172256.30368-4-kwolf@redhat.com>
-	<20190301161724.GB18260@stefanha-x1.localdomain>
-	<d6ba8e66-5ddf-9091-ff44-5024a53240a8@redhat.com>
+Message-ID: <20190306095615.GG22159@stefanha-x1.localdomain>
+References: <5310bd5d152fa36c1828a7cbd19fc893739d1609.camel@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="HCdXmnRlPgeNBad2"
+	protocol="application/pgp-signature"; boundary="nqkreNcslJAfgyzk"
 Content-Disposition: inline
-In-Reply-To: <d6ba8e66-5ddf-9091-ff44-5024a53240a8@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 03/20] qcow2: Extend spec for
- external data files
+In-Reply-To: <5310bd5d152fa36c1828a7cbd19fc893739d1609.camel@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4] thunk: fix of malloc to g_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Aarushi Mehta <mehta.aaru20@gmail.com>
 
 
---HCdXmnRlPgeNBad2
+--nqkreNcslJAfgyzk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 01, 2019 at 10:32:27AM -0600, Eric Blake wrote:
-> On 3/1/19 10:17 AM, Stefan Hajnoczi wrote:
-> > On Wed, Feb 27, 2019 at 06:22:39PM +0100, Kevin Wolf wrote:
-> >> @@ -148,6 +170,7 @@ be stored. Each extension has a structure like the=
- following:
-> >>                          0x6803f857 - Feature name table
-> >>                          0x23852875 - Bitmaps extension
-> >>                          0x0537be77 - Full disk encryption header poin=
-ter
-> >> +                        0x44415441 - External data file name
-> >=20
-> > This new header extension isn't described in this patch?
+On Sat, Mar 02, 2019 at 01:22:29AM +0530, Aarushi Mehta wrote:
+> From 3c1cba63dc5070ab559a126e206557f27fbaea59 Mon Sep 17 00:00:00 2001
+> From: Aarushi Mehta <mehta.aaru20@gmail.com>
+> Date: Sat, 2 Mar 2019 01:11:42 +0530
+> Subject: [PATCH v4] thunk: fix of malloc to g_new
 >=20
-> I asked the same on v1, and the answer (which remains valid) is that
-> neither is 0xe2792aca Backing file format name.  (In other words, both
-> extensions are simple enough as a single file name to be implicitly
-> described by the reference to the header in the earlier text).  Making
-> both explicit wouldn't hurt my feelings, but I don't see it as a
-> showstopper to the patch as-is.
+> Note that since thunking occurs throughout the lifetime of the QEMU
+> instance, there is no matching 'free' to correct.
+>=20
+> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  thunk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-The spec should make the representation clear.  Is it a NUL-terminated
-string or is the length dictated by the header extension length field?
+Riku: Will you send a pull request?  Otherwise Peter might be willing to
+merge this patch through his tree.
 
-Otherwise implementors are forced to look at the QEMU source code or
-guess based on hex dumping example files :(.
+> diff --git a/thunk.c b/thunk.c
+> index d5d8645cd4..17f3d320bb 100644
+> --- a/thunk.c
+> +++ b/thunk.c
+> @@ -89,7 +89,7 @@ void thunk_register_struct(int id, const char *name, co=
+nst argtype *types)
+>      for(i =3D 0;i < 2; i++) {
+>          offset =3D 0;
+>          max_align =3D 1;
+> -        se->field_offsets[i] =3D malloc(nb_fields * sizeof(int));
+> +        se->field_offsets[i] =3D g_new(int, nb_fields);
+>          type_ptr =3D se->field_types;
+>          for(j =3D 0;j < nb_fields; j++) {
+>              size =3D thunk_type_size(type_ptr, i);
+> --=20
+> 2.17.1
+>=20
+>=20
 
-Stefan
-
---HCdXmnRlPgeNBad2
+--nqkreNcslJAfgyzk
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcf5gzAAoJEJykq7OBq3PIF2oIAMbL6VbPd7Qj1x+SUxoos6rK
-NdfJSkxLalmfmSFOPznROvtkeM5NvwzjSPhcaoT/fcd2W5dufJvz+IL2dV2W5UWR
-bpKuqnzcYDN4hw5b8DIHVSN4pYo+2u4PcCCc2xpjdPNqbqLElrgyYJhfW0Od/Jnv
-WmtYk/alKSW9kN+KgRcSREdjspHIiUNMqX7dIirGv0qtqCy/oAGpbmThnAWArhJB
-WowkSxV+rkUkXEfOdCI2kI2zt2zpgPDkwhzEIlicqcx1bY7mEdiufbrVHCUFSqSf
-oY5EZGF7JHHKl0udHALkIPHSuT24gwJ5qDTi7nR3xgEku7GDIeKWASZJWsOHUwM=
-=0rQq
+iQEcBAEBAgAGBQJcf5k/AAoJEJykq7OBq3PIIQgIAJ/fDj7VduzmgJ0GQy8mUTuN
+4RiInNRekzR1TcaR2xwhajma2Wy9homjS0/GQCeNi+hCFk2eXAp/Rpd1RJBre8Km
+a2QUxl1SFntz/PMF74HOp4KOa1ZF5J267Y2TRw7dtBKVXod2AqWiIgBkKVwiokwN
+oogQifwL+TLUmentvQNiH526iPauUDAPV3m8zJB2N3LnmY8oKm5yDocRe2KukEy0
+EC/0AUQKbtOTo3T1t4gnfb+Z4ghVnFsDnEIxvd+W5t/D06hON7357Ju4u1W7UBbN
+veKPrbyG/244+jrbUE9FxM48yBxx4f3QAXb04erRyQ8FwdbJsEhMdH+CmUIBvgc=
+=TX9f
 -----END PGP SIGNATURE-----
 
---HCdXmnRlPgeNBad2--
+--nqkreNcslJAfgyzk--
