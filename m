@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36188)
+Received: from eggs.gnu.org ([209.51.188.92]:36272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1SlL-00051f-BS
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:22:56 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1SlT-0005Ao-2g
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:23:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1SlK-0005hA-Hy
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:22:55 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1SlR-0005n0-59
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:23:03 -0500
 References: <20190214084939.20640-1-richardw.yang@linux.intel.com>
-	<20190214084939.20640-2-richardw.yang@linux.intel.com>
+	<20190214084939.20640-3-richardw.yang@linux.intel.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <e57b08c7-72d2-17d7-565c-4f8cbf5dd1bf@vivier.eu>
-Date: Wed, 6 Mar 2019 10:22:11 +0100
+Message-ID: <058cabac-89cb-c414-4e63-ff3264cf88dc@vivier.eu>
+Date: Wed, 6 Mar 2019 10:22:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190214084939.20640-2-richardw.yang@linux.intel.com>
+In-Reply-To: <20190214084939.20640-3-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [Patch v4 1/3] hw/i386/pc.c: remove
- unused function pc_acpi_init()
+Subject: Re: [Qemu-devel] [Qemu-trivial] [Patch v4 2/3] hw/acpi: remove
+ unused function acpi_table_add_builtin()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,7 +29,7 @@ To: Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-deve
 Cc: thuth@redhat.com, mst@redhat.com, imammedo@redhat.com, philmd@redhat.com
 
 On 14/02/2019 09:49, Wei Yang wrote:
-> Function pc_acpi_init() is not used anymore.
+> Function acpi_table_add_builtin() is not used anymore.
 > 
 > Remove the definition and declaration.
 > 
@@ -37,62 +37,40 @@ On 14/02/2019 09:49, Wei Yang wrote:
 > Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/i386/pc.c         | 27 ---------------------------
->  include/hw/i386/pc.h |  1 -
->  2 files changed, 28 deletions(-)
+>  hw/acpi/core.c         | 6 ------
+>  include/hw/acpi/acpi.h | 1 -
+>  2 files changed, 7 deletions(-)
 > 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 5317e08f60..734d3268fa 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1280,33 +1280,6 @@ void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
->                                          pci_address_space, -1);
->  }
+> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> index d6f0709691..e9b1a85e54 100644
+> --- a/hw/acpi/core.c
+> +++ b/hw/acpi/core.c
+> @@ -305,12 +305,6 @@ out:
 >  
-> -void pc_acpi_init(const char *default_dsdt)
+>  static bool acpi_table_builtin = false;
+>  
+> -void acpi_table_add_builtin(const QemuOpts *opts, Error **errp)
 > -{
-> -    char *filename;
-> -
-> -    if (acpi_tables != NULL) {
-> -        /* manually set via -acpitable, leave it alone */
-> -        return;
-> -    }
-> -
-> -    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, default_dsdt);
-> -    if (filename == NULL) {
-> -        warn_report("failed to find %s", default_dsdt);
-> -    } else {
-> -        QemuOpts *opts = qemu_opts_create(qemu_find_opts("acpi"), NULL, 0,
-> -                                          &error_abort);
-> -        Error *err = NULL;
-> -
-> -        qemu_opt_set(opts, "file", filename, &error_abort);
-> -
-> -        acpi_table_add_builtin(opts, &err);
-> -        if (err) {
-> -            warn_reportf_err(err, "failed to load %s: ", filename);
-> -        }
-> -        g_free(filename);
-> -    }
+> -    acpi_table_builtin = true;
+> -    acpi_table_add(opts, errp);
 > -}
 > -
->  void xen_load_linux(PCMachineState *pcms)
+>  unsigned acpi_table_len(void *current)
 >  {
->      int i;
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 9d29c4b1df..541124ba6d 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -187,7 +187,6 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
+>      struct acpi_table_header *hdr = current - sizeof(hdr->_length);
+> diff --git a/include/hw/acpi/acpi.h b/include/hw/acpi/acpi.h
+> index c20ace0d0b..4a8bbaf1b5 100644
+> --- a/include/hw/acpi/acpi.h
+> +++ b/include/hw/acpi/acpi.h
+> @@ -190,7 +190,6 @@ uint8_t *acpi_table_first(void);
+>  uint8_t *acpi_table_next(uint8_t *current);
+>  unsigned acpi_table_len(void *current);
+>  void acpi_table_add(const QemuOpts *opts, Error **errp);
+> -void acpi_table_add_builtin(const QemuOpts *opts, Error **errp);
 >  
->  void pc_cpus_init(PCMachineState *pcms);
->  void pc_hot_add_cpu(const int64_t id, Error **errp);
-> -void pc_acpi_init(const char *default_dsdt);
->  
->  void pc_guest_info_init(PCMachineState *pcms);
->  
+>  typedef struct AcpiSlicOem AcpiSlicOem;
+>  struct AcpiSlicOem {
 > 
 
 Applied to my trivial-patches branch.
