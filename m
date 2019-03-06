@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34521)
+Received: from eggs.gnu.org ([209.51.188.92]:34918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1ULs-0003Ep-SS
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:04:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h1UNc-0004CV-S1
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:06:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1ULn-0006wr-6r
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:04:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34114)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h1ULm-0006is-6C
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:04:39 -0500
-References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA8WZuAmNFQqCsvsN35UnFJk=sGcCJmF27v3SS++FnpXXQ@mail.gmail.com>
-	<ab98409f-89f3-62d2-f5aa-b460eaa0cd05@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3c67eb5e-6a7e-d884-9ce7-639584c0c63f@redhat.com>
-Date: Wed, 6 Mar 2019 12:04:22 +0100
+	(envelope-from <kwolf@redhat.com>) id 1h1UNW-0000cJ-R2
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:06:29 -0500
+Date: Wed, 6 Mar 2019 12:05:59 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190306110559.GF6818@localhost.localdomain>
+References: <20190305182908.13557-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ab98409f-89f3-62d2-f5aa-b460eaa0cd05@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
- excluding ARM and MIPS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190305182908.13557-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Wait for qemu to end in 223
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +22,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Yang Zhong <yang.zhong@intel.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, berto@igalia.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 06/03/2019 11.57, Paolo Bonzini wrote:
-> On 05/03/19 10:32, Peter Maydell wrote:
->> Everything fails to build with errors like
->> make: *** No rule to make target `config-all-devices.mak', needed by
->> `subdir-aarch64-softmmu'.  Stop.
->>
->> or
->> make: *** No rule to make target
->> `/home/pm215/qemu/default-configs/pci.mak', needed by
->> `aarch64-softmmu/config-devices.mak'.  Stop.
->>
->> If there are special instructions for what to do with
->> build trees over the transition to kconfig, the pullreq
->> cover letter would be a good place to mention them :-)
+Am 05.03.2019 um 19:29 hat Eric Blake geschrieben:
+> When iotest 223 was first written, it didn't matter if we waited for
+> the qemu process to clean up. But with the introduction of a later
+> qemu-nbd process trying to reuse the same file, there is a race where
+> even though the asynchronous qemu process has responded to "quit", it
+> has not yet had time to unlock the file and exit, resulting in:
 > 
-> As others mentioned, this is the "usual" stale dependency issue
-> requiring distclean.
+> -[{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": false},
+> -{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": true},
+> -{ "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data": false}]
+> +qemu-nbd: Failed to blk_new_open 'tests/qemu-iotests/scratch/t.qcow2': Failed to get shared "write" lock
+> +Is another process using the image [tests/qemu-iotests/scratch/t.qcow2]?
+> +qemu-img: Could not open 'driver=nbd,server.type=unix,server.path=tests/qemu-iotests/scratch/qemu-nbd.sock,x-dirty-bitmap=qemu:dirty-bitmap:b': Failed to connect socket tests/qemu-iotests/scratch/qemu-nbd.sock: Connection refused
+> +./common.nbd: line 33: kill: (11122) - No such process
+> 
+> Fixes: ddd09448
+> Reported-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Can't we somehow add a dependency for the *.mak.d file so that they get
-regenerated in this case? ... I tried to hack the Makefile, but so far I
-failed...
+Makes sense to me. Berto, can you test it?
 
- Thomas
+Kevin
