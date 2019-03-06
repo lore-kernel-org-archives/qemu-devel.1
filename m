@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35725)
+Received: from eggs.gnu.org ([209.51.188.92]:35806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1UPh-0005ML-CI
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:08:43 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1UPr-0005Ve-Qb
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:08:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1UPZ-0002Qy-L6
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:08:36 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1UPr-0002ZK-33
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:08:51 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed,  6 Mar 2019 12:07:07 +0100
-Message-Id: <20190306110711.309-7-laurent@vivier.eu>
+Date: Wed,  6 Mar 2019 12:07:10 +0100
+Message-Id: <20190306110711.309-10-laurent@vivier.eu>
 In-Reply-To: <20190306110711.309-1-laurent@vivier.eu>
 References: <20190306110711.309-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/10] doc: fix typos for documents in tree
+Subject: [Qemu-devel] [PULL 09/10] hostmem-file: simplify ifdef-s in
+ file_backend_memory_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,223 +23,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, John Snow <jsnow@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-s390x@nongnu.org, Corey Minyard <minyard@acm.org>, Pierre Morel <pmorel@linux.ibm.com>, Like Xu <like.xu@linux.intel.com>, Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, John Snow <jsnow@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-s390x@nongnu.org, Corey Minyard <minyard@acm.org>, Pierre Morel <pmorel@linux.ibm.com>, Wei Yang <richardw.yang@linux.intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1550640446-18788-1-git-send-email-like.xu@linux.intel.com>
+cleanup file_backend_memory_alloc() by using one CONFIG_POSIX ifdef
+instead of several ones within the function to make it simpler to follow.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+Message-Id: <20190213123858.24620-1-imammedo@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20190214031004.32522-2-stefanha@redhat.com>
+[lv: s/hostmem/hostmem-file/]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- docs/COLO-FT.txt               | 2 +-
- docs/amd-memory-encryption.txt | 2 +-
- docs/can.txt                   | 2 +-
- docs/colo-proxy.txt            | 6 +++---
- docs/cpu-hotplug.rst           | 2 +-
- docs/qcow2-cache.txt           | 2 +-
- docs/qemu-block-drivers.texi   | 2 +-
- docs/qemu-cpu-models.texi      | 8 ++++----
- docs/rdma.txt                  | 4 ++--
- docs/replay.txt                | 2 +-
- docs/vfio-ap.txt               | 2 +-
- 11 files changed, 17 insertions(+), 17 deletions(-)
+ backends/hostmem-file.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
-index e2686bb33882..ad24680d130e 100644
---- a/docs/COLO-FT.txt
-+++ b/docs/COLO-FT.txt
-@@ -102,7 +102,7 @@ to make sure the state of VM in Secondary side is always consistent with VM in
- Primary side.
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index ba601ce94088..ce5478804804 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -41,10 +41,12 @@ struct HostMemoryBackendFile {
+ static void
+ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+ {
++#ifndef CONFIG_POSIX
++    error_setg(errp, "backend '%s' not supported on this host",
++               object_get_typename(OBJECT(backend)));
++#else
+     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(backend);
+-#ifdef CONFIG_POSIX
+     gchar *name;
+-#endif
  
- COLO Proxy:
--Delivers packets to Primary and Seconday, and then compare the responses from
-+Delivers packets to Primary and Secondary, and then compare the responses from
- both side. Then decide whether to start a checkpoint according to some rules.
- Please refer to docs/colo-proxy.txt for more information.
- 
-diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
-index f483795eaafe..43bf3ee6a5a9 100644
---- a/docs/amd-memory-encryption.txt
-+++ b/docs/amd-memory-encryption.txt
-@@ -97,7 +97,7 @@ References
- AMD Memory Encryption whitepaper:
- http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
- 
--Secure Encrypted Virutualization Key Management:
-+Secure Encrypted Virtualization Key Management:
- [1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
- 
- KVM Forum slides:
-diff --git a/docs/can.txt b/docs/can.txt
-index 7ba23b259a48..9fa6ed51c823 100644
---- a/docs/can.txt
-+++ b/docs/can.txt
-@@ -99,7 +99,7 @@ Links to other resources
-      https://gitlab.fel.cvut.cz/canbus/qemu-canbus
-  (3) RTEMS page describing project
-      https://devel.rtems.org/wiki/Developer/Simulators/QEMU/CANEmulation
-- (4) RTLWS 2015 article about the projevt and its use with CANopen emulation
-+ (4) RTLWS 2015 article about the project and its use with CANopen emulation
-      http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can.pdf
-      Slides
-      http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can-slides.pdf
-diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
-index 1f8e4b4e7716..fa1cef0278a5 100644
---- a/docs/colo-proxy.txt
-+++ b/docs/colo-proxy.txt
-@@ -41,7 +41,7 @@ Below is a COLO proxy ascii figure:
- |         |  +------------------------------------------------------+  |                        |        |                              |
- |netfilter|  |                       |                         |    |  |   netfilter            |        |                              |
- | +----------+ +----------------------------+                  |    |  |  +-----------------------------------------------------------+ |
--| |       |  |                       |      |        out       |    |  |  |                     |        |  filter excute order       | |
-+| |       |  |                       |      |        out       |    |  |  |                     |        |  filter execute order      | |
- | |       |  |          +-----------------------------+        |    |  |  |                     |        | +------------------->      | |
- | |       |  |          |            |      |         |        |    |  |  |                     |        |   TCP                      | |
- | | +-----+--+-+  +-----v----+ +-----v----+ |pri +----+----+sec|    |  |  | +------------+  +---+----+---v+rewriter++  +------------+ | |
-@@ -53,7 +53,7 @@ Below is a COLO proxy ascii figure:
- | |      |   tx        |   rx           rx  |                  |  |    |  |            tx                        all       |  rx      | |
- | |      |             |                    |                  |  |    |  +-----------------------------------------------------------+ |
- | |      |             +--------------+     |                  |  |    |                                                   |            |
--| |      |   filter excute order      |     |                  |  |    |                                                   |            |
-+| |      |   filter execute order     |     |                  |  |    |                                                   |            |
- | |      |  +---------------->        |     |                  |  +--------------------------------------------------------+            |
- | +-----------------------------------------+                  |       |                                                                |
- |        |                            |                        |       |                                                                |
-@@ -92,7 +92,7 @@ but do nothing, just pass to next filter.
- 
- Redirect Server Filter --> COLO-Compare
- COLO-compare receive primary guest packet then
--waiting scondary redirect packet to compare it.
-+waiting secondary redirect packet to compare it.
- If packet same,send queued primary packet and clear
- queued secondary packet, Otherwise send primary packet
- and do checkpoint.
-diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
-index 1c268e00b41a..cfeb79f57111 100644
---- a/docs/cpu-hotplug.rst
-+++ b/docs/cpu-hotplug.rst
-@@ -137,6 +137,6 @@ From the 'qmp-shell', invoke the QMP ``device_del`` command::
-     vCPU hot-unplug requires guest cooperation; so the ``device_del``
-     command above does not guarantee vCPU removal -- it's a "request to
-     unplug".  At this point, the guest will get a System Control
--    Interupt (SCI) and calls the ACPI handler for the affected vCPU
-+    Interrupt (SCI) and calls the ACPI handler for the affected vCPU
-     device.  Then the guest kernel will bring the vCPU offline and tell
-     QEMU to unplug it.
-diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-index c459bf5dd3b5..c1e7751feae6 100644
---- a/docs/qcow2-cache.txt
-+++ b/docs/qcow2-cache.txt
-@@ -55,7 +55,7 @@ value can improve the I/O performance significantly.
- 
- The refcount blocks
- -------------------
--The qcow2 format also mantains a reference count for each cluster.
-+The qcow2 format also maintains a reference count for each cluster.
- Reference counts are used for cluster allocation and internal
- snapshots. The data is stored in a two-level structure similar to the
- L1/L2 tables described above.
-diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
-index 38e9f34cc9b8..da06a9bc838d 100644
---- a/docs/qemu-block-drivers.texi
-+++ b/docs/qemu-block-drivers.texi
-@@ -632,7 +632,7 @@ qemu-system-i386 -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
- @end example
- 
- 
--Howto set up a simple iSCSI target on loopback and accessing it via QEMU:
-+How to set up a simple iSCSI target on loopback and access it via QEMU:
- @example
- This example shows how to set up an iSCSI target with one CDROM and one DISK
- using the Linux STGT software target. This target is available on Red Hat based
-diff --git a/docs/qemu-cpu-models.texi b/docs/qemu-cpu-models.texi
-index 475d434d52f3..1b725841616b 100644
---- a/docs/qemu-cpu-models.texi
-+++ b/docs/qemu-cpu-models.texi
-@@ -49,7 +49,7 @@ live migration safe.
- The information that follows provides recommendations for configuring
- CPU models on x86 hosts. The goals are to maximise performance, while
- protecting guest OS against various CPU hardware flaws, and optionally
--enabling live migration between hosts with hetergeneous CPU models.
-+enabling live migration between hosts with heterogeneous CPU models.
- 
- @menu
- * preferred_cpu_models_intel_x86::       Preferred CPU models for Intel x86 hosts
-@@ -287,7 +287,7 @@ Must be explicitly turned on for all AMD CPU models.
- This provides higher performance than virt-ssbd so should be
- exposed to guests whenever available in the host. virt-ssbd
- should none the less also be exposed for maximum guest
--compatability as some kernels only know about virt-ssbd.
-+compatibility as some kernels only know about virt-ssbd.
- 
- 
- @item @code{amd-no-ssb}
-@@ -296,7 +296,7 @@ Recommended to indicate the host is not vulnerable CVE-2018-3639
- 
- Not included by default in any AMD CPU model.
- 
--Future hardware genarations of CPU will not be vulnerable to
-+Future hardware generations of CPU will not be vulnerable to
- CVE-2018-3639, and thus the guest should be told not to enable
- its mitigations, by exposing amd-no-ssb. This is mutually
- exclusive with virt-ssbd and amd-ssbd.
-@@ -451,7 +451,7 @@ MIPS64 Processor (Release 6, 2014)
- 
- @item @code{Loongson-2F}
- 
--MIPS64 Processor (Longsoon 2, 2008)
-+MIPS64 Processor (Loongson 2, 2008)
- 
- 
- @item @code{Loongson-2E}
-diff --git a/docs/rdma.txt b/docs/rdma.txt
-index e6f990261751..a86e992c8453 100644
---- a/docs/rdma.txt
-+++ b/docs/rdma.txt
-@@ -30,7 +30,7 @@ of the significantly lower latency and higher throughput over TCP/IP. This is
- because the RDMA I/O architecture reduces the number of interrupts and
- data copies by bypassing the host networking stack. In particular, a TCP-based
- migration, under certain types of memory-bound workloads, may take a more
--unpredicatable amount of time to complete the migration if the amount of
-+unpredictable amount of time to complete the migration if the amount of
- memory tracked during each live migration iteration round cannot keep pace
- with the rate of dirty memory produced by the workload.
- 
-@@ -408,7 +408,7 @@ socket is broken during a non-RDMA based migration.
- TODO:
- =====
- 1. Currently, 'ulimit -l' mlock() limits as well as cgroups swap limits
--   are not compatible with infinband memory pinning and will result in
-+   are not compatible with infiniband memory pinning and will result in
-    an aborted migration (but with the source VM left unaffected).
- 2. Use of the recent /proc/<pid>/pagemap would likely speed up
-    the use of KSM and ballooning while using RDMA.
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 3497585f5a39..ee6aee9861e7 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -290,7 +290,7 @@ E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
- Replay log format
- -----------------
- 
--Record/replay log consits of the header and the sequence of execution
-+Record/replay log consists of the header and the sequence of execution
- events. The header includes 4-byte replay version id and 8-byte reserved
- field. Version is updated every time replay log format changes to prevent
- using replay log created by another build of qemu.
-diff --git a/docs/vfio-ap.txt b/docs/vfio-ap.txt
-index 8cd060a01e10..b1eb2deeaf2f 100644
---- a/docs/vfio-ap.txt
-+++ b/docs/vfio-ap.txt
-@@ -671,7 +671,7 @@ These are the steps:
-       -> IOMMU Hardware Support
-          select S390 AP IOMMU Support
-       -> VFIO Non-Privileged userspace driver framework
--         -> Mediated device driver frramework
-+         -> Mediated device driver framework
-             -> VFIO driver for Mediated devices
-    -> I/O subsystem
-       -> VFIO support for AP devices
+     if (!backend->size) {
+         error_setg(errp, "can't create backend with size 0");
+@@ -54,9 +56,6 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+         error_setg(errp, "mem-path property not set");
+         return;
+     }
+-#ifndef CONFIG_POSIX
+-    error_setg(errp, "-mem-path not supported on this host");
+-#else
+     backend->force_prealloc = mem_prealloc;
+     name = host_memory_backend_get_name(backend);
+     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
 -- 
 2.20.1
