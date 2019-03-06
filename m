@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60118)
+Received: from eggs.gnu.org ([209.51.188.92]:32830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h1SYa-0003sS-IC
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:09:49 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1Sb4-0005l8-NU
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h1SYV-0001Wj-SY
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:09:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41686)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1h1SYV-0001Vr-Im
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:09:39 -0500
-Date: Wed, 6 Mar 2019 10:09:27 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190306090927.GA6818@localhost.localdomain>
-References: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
-	<155074715265.32129.1158027635780211224.stgit@pasha-VirtualBox>
-	<20190304103353.GA6059@localhost.localdomain>
-	<002b01d4d284$3109aa20$931cfe60$@ru>
-	<20190305095238.GB5280@dhcp-200-226.str.redhat.com>
-	<000901d4d343$3750f8b0$a5f2ea10$@ru>
-	<20190305111207.GE5280@dhcp-200-226.str.redhat.com>
-	<001201d4d3f7$38e82db0$aab88910$@ru>
+	(envelope-from <laurent@vivier.eu>) id 1h1Sb3-0003Mw-L1
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:12:18 -0500
+References: <1551456970-463-1-git-send-email-thuth@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <57cb47b1-9783-6f3d-a4d2-a150029b286a@vivier.eu>
+Date: Wed, 6 Mar 2019 10:12:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <001201d4d3f7$38e82db0$aab88910$@ru>
-Subject: Re: [Qemu-devel] [PATCH v13 19/25] replay: add BH oneshot event for
- block layer
+In-Reply-To: <1551456970-463-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] tests: Remove (mostly)
+ useless architecture checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, Corey Minyard <minyard@acm.org>
 
-Am 06.03.2019 um 09:33 hat Pavel Dovgalyuk geschrieben:
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Am 05.03.2019 um 12:04 hat Pavel Dovgalyuk geschrieben:
-> > > > > > > @@ -1349,8 +1351,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t
-> > offset,
-> > > > int
-> > > > > > bytes,
-> > > > > > >
-> > > > > > >      acb->has_returned = true;
-> > > > > > >      if (acb->rwco.ret != NOT_DONE) {
-> > > > > > > -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
-> > > > > > > -                                blk_aio_complete_bh, acb);
-> > > > > > > +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-> > > > > > > +                                         blk_aio_complete_bh, acb);
-> > > > > > >      }
-> > > > > >
-> > > > > > This, and a few other places that you convert, are in fast paths and add
-> > > > > > some calls that are unnecessary for non-replay cases.
-> > > > >
-> > > > > I don't think that this can make a noticeable slowdown, but we can run
-> > > > > the tests if you want.
-> > > > > We have the test suite which performs disk-intensive computation.
-> > > > > It was created to measure the effect of running BH callbacks through
-> > > > > the virtual timer infrastructure.
-> > > >
-> > > > I think this requires quite fast storage to possibly make a difference.
-> > >
-> > > True.
-> > >
-> > > > Or if you don't have that, maybe a ramdisk or even a null-co:// backend
-> > > > could do the trick. Maybe null-co:// is actually the best option.
-> > >
-> > > We've got tests with file copying and compression on qcow2 disks.
-> > > How the null backend can be applied there?
-> > 
-> > With qcow2, it can't really. null-co:// would work for running something
-> > like fio directly against a virtual disk, without any image format
-> > involved. Getting the image format out of the way makes things even a
-> > little bit faster.
-> > 
-> > Maybe we should run a micro-benchmark fio with null-co just in addition
-> > to your higher level tests?
+On 01/03/2019 17:16, Thomas Huth wrote:
+> These checks at the beginning of some of the tests are mostly useless:
+> We only run the tests on x86 anyway, and g_test_message() does not
+> print anything unless you call g_test_init() first.
 > 
-> We run something like that:
->   -drive file={},if=none,id=drv,snapshot -device ide-hd,drive=drv -drive
-> file={},if=none,id=tst,snapshot -device ide-hd,drive=tst -net none -monitor stdio --enable-kvm -m 2G
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/fdc-test.c      | 7 -------
+>  tests/ide-test.c      | 7 -------
+>  tests/ipmi-bt-test.c  | 7 -------
+>  tests/ipmi-kcs-test.c | 7 -------
+>  4 files changed, 28 deletions(-)
 > 
-> I don't really get your idea. What should be added to the command line
-> to run null-co benchmark?
+> diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+> index 88f1abf..31cd329 100644
+> --- a/tests/fdc-test.c
+> +++ b/tests/fdc-test.c
+> @@ -548,16 +548,9 @@ static void fuzz_registers(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    const char *arch = qtest_get_arch();
+>      int fd;
+>      int ret;
+>  
+> -    /* Check architecture */
+> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> -        g_test_message("Skipping test for non-x86\n");
+> -        return 0;
+> -    }
+> -
+>      /* Create a temporary raw image */
+>      fd = mkstemp(test_image);
+>      g_assert(fd >= 0);
+> diff --git a/tests/ide-test.c b/tests/ide-test.c
+> index f0280e6..300d64e 100644
+> --- a/tests/ide-test.c
+> +++ b/tests/ide-test.c
+> @@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    const char *arch = qtest_get_arch();
+>      int fd;
+>      int ret;
+>  
+> -    /* Check architecture */
+> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> -        g_test_message("Skipping test for non-x86\n");
+> -        return 0;
+> -    }
+> -
+>      /* Create temporary blkdebug instructions */
+>      fd = mkstemp(debug_path);
+>      g_assert(fd >= 0);
+> diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
+> index f4a81b5..fc4c83b 100644
+> --- a/tests/ipmi-bt-test.c
+> +++ b/tests/ipmi-bt-test.c
+> @@ -400,15 +400,8 @@ static void open_socket(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    const char *arch = qtest_get_arch();
+>      int ret;
+>  
+> -    /* Check architecture */
+> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> -        g_test_message("Skipping test for non-x86\n");
+> -        return 0;
+> -    }
+> -
+>      open_socket();
+>  
+>      /* Run the tests */
+> diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
+> index 178ffc1..a2354c1 100644
+> --- a/tests/ipmi-kcs-test.c
+> +++ b/tests/ipmi-kcs-test.c
+> @@ -263,16 +263,9 @@ static void test_enable_irq(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    const char *arch = qtest_get_arch();
+>      char *cmdline;
+>      int ret;
+>  
+> -    /* Check architecture */
+> -    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
+> -        g_test_message("Skipping test for non-x86\n");
+> -        return 0;
+> -    }
+> -
+>      /* Run the tests */
+>      g_test_init(&argc, &argv, NULL);
+>  
+> 
 
-Something like:
+Applied to my trivial-patches branch.
 
--drive file=null-co://,if=none,id=null -device virtio-blk,drive=null
-
-(Testing with IDE is useless, IDE is slow, you'll never get very high
-IOPS or bandwidth with it, neither before nor after your series.)
-
-Kevin
+Thanks,
+Laurent
