@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53476)
+Received: from eggs.gnu.org ([209.51.188.92]:55723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h1aSL-0002KD-A6
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:35:50 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1h1ahB-0004mT-Oe
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:51:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h1aSJ-0008Hr-Rd
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:35:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49714)
+	(envelope-from <alex.bennee@linaro.org>) id 1h1ahA-00025v-TX
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:51:09 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:36622)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h1aSJ-0008Ga-JX
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:35:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h1aSH-0000Rl-HE
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 17:35:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7AB232E80CB
-	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 17:35:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1h1ahA-00025H-Jj
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:51:08 -0500
+Received: by mail-wm1-x336.google.com with SMTP id j125so6799346wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 09:51:08 -0800 (PST)
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 06 Mar 2019 17:51:05 +0000
+Message-ID: <87va0vgad2.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Mar 2019 17:19:45 -0000
-From: "Heitor R. Alves de Siqueira" <1818880@bugs.launchpad.net>
-Reply-To: Bug 1818880 <1818880@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155189278546.17656.7588906080638087853.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818880] [NEW] Deadlock when detaching network
- interface
+Subject: [Qemu-devel] Booting kernels with PVHVM documentation?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,220 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-[Impact]
-Qemu guests hang indefinitely
-
-[Description]
-When running a Qemu guest with VirtIO network interfaces, detaching an inte=
-rface that's currently being used can result in a deadlock. The guest insta=
-nce will hang and become unresponsive to commands, and the only option is t=
-o kill -9 the instance.
-The reason for this is a dealock between a monitor and an RCU thread, which=
- will fight over the BQL (qemu_global_mutex) and the critical RCU section l=
-ocks. The monitor thread will acquire the BQL for detaching the network int=
-erface, and fire up a helper thread to deal with detaching the network adap=
-ter. That new thread needs to wait on the RCU thread to complete the deleti=
-on, but the RCU thread wants the BQL to commit its transactions.
-This bug is already fixed upstream (73c6e4013b4c rcu: completely disable pt=
-hread_atfork callbacks as soon as possible) and included for other series (=
-see below), so we don't need to backport it to Bionic onwards.
-
-Upstream commit:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D73c6e4013b4c
-
-$ git describe --contains 73c6e4013b4c
-v2.10.0-rc2~1^2~8
-
-$ rmadison qemu
-=3D=3D=3D> qemu | 1:2.5+dfsg-5ubuntu10.34 | xenial-updates/universe   | amd=
-64, ...
-     qemu | 1:2.11+dfsg-1ubuntu7    | bionic/universe           | amd64, ...
-     qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/universe           | amd64, ...
-     qemu | 1:3.1+dfsg-2ubuntu2     | disco/universe            | amd64, ...
-
-[Test Case]
-Being a racing condition, this is a tricky bug to reproduce consistently. W=
-e've had reports of users running into this with OpenStack deployments and =
-Windows Server guests, and the scenario is usually like this:
-1) Deploy a 16vCPU Windows Server 2012 R2 guest with a virtio network inter=
-face
-2) Stress the network interface with e.g. Windows HLK test suite or similar
-3) Repeatedly attach/detach the network adapter that's in use
-It usually takes more than ~4000 attach/detach cycles to trigger the bug.
-
-[Regression Potential]
-Regressions for this might arise from the fact that the fix changes RCU loc=
-k code. Since this patch has been upstream and in other series for a while,=
- it's unlikely that it would regressions in RCU code specifically. Other co=
-de that makes use of the RCU locks (MMIO and some monitor events) will be t=
-horoughly tested for any regressions with autokpkgtest and scripted Qemu ru=
-ns.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: Fix Released
-
-** Affects: qemu (Ubuntu)
-     Importance: Undecided
-     Assignee: Heitor R. Alves de Siqueira (halves)
-         Status: Fix Released
-
-** Affects: qemu (Ubuntu Xenial)
-     Importance: Undecided
-     Assignee: Heitor R. Alves de Siqueira (halves)
-         Status: Confirmed
-
-** Affects: qemu (Ubuntu Bionic)
-     Importance: Undecided
-     Assignee: Heitor R. Alves de Siqueira (halves)
-         Status: Fix Released
-
-** Affects: qemu (Ubuntu Cosmic)
-     Importance: Undecided
-     Assignee: Heitor R. Alves de Siqueira (halves)
-         Status: Fix Released
-
-** Affects: qemu (Ubuntu Disco)
-     Importance: Undecided
-     Assignee: Heitor R. Alves de Siqueira (halves)
-         Status: Fix Released
+To: Stefano Garzarella <sgarzare@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Paolo Bonzini <bonzini@gnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
-** Tags: sts
+Hi,
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+I've been looking at using PVH as an alternative to a long bios boot
+sequence to boot some x86_64 test kernels for tests/tcg. I'm finding it
+hard to piece together all the bits but I naively thought it would just
+be a case of adding a few ELF NOTES to my boot.S with something like:
 
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Released
+          ELFNOTE(Xen, XEN_ELFNOTE_VIRT_BASE,      _ASM_PTR 0x100000)
+          ELFNOTE(Xen, XEN_ELFNOTE_ENTRY,          _ASM_PTR _start)
+          ELFNOTE(Xen, XEN_ELFNOTE_PHYS32_ENTRY,   _ASM_PTR 0)    /* entry =
+=3D=3D virtbase */
+          ELFNOTE(Xen, XEN_ELFNOTE_PADDR_OFFSET,   _ASM_PTR 0)
 
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
+          .code64
+          .section .text
+          /* Kernel Entry Point */
+  .global _start
+  _start:
+          // Setup stack ASAP
+          movq $stack_end,%rsp
 
-** Changed in: qemu (Ubuntu)
-     Assignee: (unassigned) =3D> Heitor R. Alves de Siqueira (halves)
+However I'm running into lots of head scratching as the get_elf_note
+code seems to skip over the notes before failing:
 
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> Confirmed
+  ./qemu-system-x86_64 -monitor none -display none \
+    -chardev stdio,id=3Dout -device isa-debugcon,chardev=3Dout \
+    -device isa-debug-exit,iobase=3D0xf4,iosize=3D0x4 -kernel ./tests/hello
+  load_elf64: processing hdr:0 of type 1
+  load_elf64: processing hdr:1 of type 4
+  get_elf_note_type64: looking for type 18, first is 3
+  get_elf_note_type64: 4/20
+  get_elf_note_type64: offset is 36
+  get_elf_note_type64: note is 0
+  get_elf_note_type64: 0/123713
+  get_elf_note_type64: offset is 123728
+  load_elf64: processing hdr:2 of type 1685382481
+  qemu-system-x86_64: Error loading uncompressed kernel without PVH ELF Note
 
-** Also affects: qemu (Ubuntu Cosmic)
-   Importance: Undecided
-       Status: New
+So I thought I'd go back to the Linux kernel and see if I could get it
+to boot up. So I built an x86_64 kernel with:
 
-** Also affects: qemu (Ubuntu Xenial)
-   Importance: Undecided
-       Status: New
+  CONFIG_XEN_PVHVM=3Dy
+  CONFIG_XEN_PVHVM_SMP=3Dy
+  CONFIG_XEN_PVH=3Dy
+  CONFIG_PVH=3Dy
 
-** Also affects: qemu (Ubuntu Disco)
-   Importance: Undecided
-     Assignee: Heitor R. Alves de Siqueira (halves)
-       Status: Confirmed
+And tried to boot that, it certainly gets a lot further but in detecting
+the note 18 it's looking for but then doesn't provide any output. So I
+started digging around the patches and saw talk of a PVH option ROM
+which does all the x86 mode escalation before booting the kernel.
+However I was unable to find any documentation about if I should be
+adding this manually to my command line or if it is auto-magiced into
+place. So I have a number of questions:
 
-** Also affects: qemu (Ubuntu Bionic)
-   Importance: Undecided
-       Status: New
+  * what's the canonical command line for booting a Linux PVHVM kernel?
+  * should this work in TCG as well?
+  * are they any special linker rules required for the Xen.notes?
 
-** Changed in: qemu (Ubuntu Cosmic)
-     Assignee: (unassigned) =3D> Heitor R. Alves de Siqueira (halves)
+And finally:
 
-** Changed in: qemu (Ubuntu Bionic)
-     Assignee: (unassigned) =3D> Heitor R. Alves de Siqueira (halves)
+  * is this idea of mine a weird abuse of the PVHVM boot protocol or
+    does it make sense?
 
-** Changed in: qemu (Ubuntu Xenial)
-     Assignee: (unassigned) =3D> Heitor R. Alves de Siqueira (halves)
+Thanks in advance for any elucidation ;-)
 
-** Changed in: qemu (Ubuntu Disco)
-       Status: Confirmed =3D> Fix Released
-
-** Changed in: qemu (Ubuntu Cosmic)
-       Status: New =3D> Fix Released
-
-** Changed in: qemu (Ubuntu Bionic)
-       Status: New =3D> Fix Released
-
-** Changed in: qemu (Ubuntu Xenial)
-       Status: New =3D> Confirmed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818880
-
-Title:
-  Deadlock when detaching network interface
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Confirmed
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
-
-Bug description:
-  [Impact]
-  Qemu guests hang indefinitely
-
-  [Description]
-  When running a Qemu guest with VirtIO network interfaces, detaching an in=
-terface that's currently being used can result in a deadlock. The guest ins=
-tance will hang and become unresponsive to commands, and the only option is=
- to kill -9 the instance.
-  The reason for this is a dealock between a monitor and an RCU thread, whi=
-ch will fight over the BQL (qemu_global_mutex) and the critical RCU section=
- locks. The monitor thread will acquire the BQL for detaching the network i=
-nterface, and fire up a helper thread to deal with detaching the network ad=
-apter. That new thread needs to wait on the RCU thread to complete the dele=
-tion, but the RCU thread wants the BQL to commit its transactions.
-  This bug is already fixed upstream (73c6e4013b4c rcu: completely disable =
-pthread_atfork callbacks as soon as possible) and included for other series=
- (see below), so we don't need to backport it to Bionic onwards.
-
-  Upstream commit:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D73c6e4013b4c
-
-  $ git describe --contains 73c6e4013b4c
-  v2.10.0-rc2~1^2~8
-
-  $ rmadison qemu
-  =3D=3D=3D> qemu | 1:2.5+dfsg-5ubuntu10.34 | xenial-updates/universe   | a=
-md64, ...
-       qemu | 1:2.11+dfsg-1ubuntu7    | bionic/universe           | amd64, =
-...
-       qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/universe           | amd64, =
-...
-       qemu | 1:3.1+dfsg-2ubuntu2     | disco/universe            | amd64, =
-...
-
-  [Test Case]
-  Being a racing condition, this is a tricky bug to reproduce consistently.=
- We've had reports of users running into this with OpenStack deployments an=
-d Windows Server guests, and the scenario is usually like this:
-  1) Deploy a 16vCPU Windows Server 2012 R2 guest with a virtio network int=
-erface
-  2) Stress the network interface with e.g. Windows HLK test suite or simil=
-ar
-  3) Repeatedly attach/detach the network adapter that's in use
-  It usually takes more than ~4000 attach/detach cycles to trigger the bug.
-
-  [Regression Potential]
-  Regressions for this might arise from the fact that the fix changes RCU l=
-ock code. Since this patch has been upstream and in other series for a whil=
-e, it's unlikely that it would regressions in RCU code specifically. Other =
-code that makes use of the RCU locks (MMIO and some monitor events) will be=
- thoroughly tested for any regressions with autokpkgtest and scripted Qemu =
-runs.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818880/+subscriptions
+--
+Alex Benn=C3=A9e
