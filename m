@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33984)
+Received: from eggs.gnu.org ([209.51.188.92]:34835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1WVr-0002iI-Ci
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:23:12 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1h1Wbp-0004Es-Ur
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:29:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1WVq-0003Ey-Gk
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:23:11 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:27461)
+	(envelope-from <balaton@eik.bme.hu>) id 1h1Wbp-0005YK-6V
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:29:21 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:48980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h1WVq-0003EL-96
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:23:10 -0500
-Date: Wed, 6 Mar 2019 14:22:57 +0100 (CET)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h1Wbo-0005Xo-Qm
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:29:21 -0500
+Date: Wed, 6 Mar 2019 14:29:19 +0100 (CET)
 From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <201903061321.58890.randrianasulu@gmail.com>
-Message-ID: <alpine.BSF.2.21.9999.1903061409050.30260@zero.eik.bme.hu>
+In-Reply-To: <ad80f2f0-535f-0fe8-abef-6cd0855f09c1@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1903061423000.30260@zero.eik.bme.hu>
 References: <201903061321.58890.randrianasulu@gmail.com>
+	<ad80f2f0-535f-0fe8-abef-6cd0855f09c1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] PMON2000 compilation and kernel question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,48 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Randrianasulu <randrianasulu@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Andrew Randrianasulu <randrianasulu@gmail.com>, =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-devel@nongnu.org
 
-On Wed, 6 Mar 2019, Andrew Randrianasulu wrote:
-> I was compiling those pmons for last two days, and I happy to say most of my hackery was
-> unnecessary.
-
-Thanks. Just a few quick notes.
-
-> After this , I run resulted pmon like this
-> (using Zoltan's patch for ati-vga device on top of current qemu):
+On Wed, 6 Mar 2019, Philippe Mathieu-Daud=E9 wrote:
+>> Oh, and sadly my little "disable bitblit" patch was still needed:
+>>
+>> diff --git a/fb/cfb_console.c b/fb/cfb_console.c
+>> index 6663ef7..f29c43f 100644
+>> --- a/fb/cfb_console.c
+>> +++ b/fb/cfb_console.c
+>> @@ -113,7 +113,7 @@ CONFIG_VIDEO_HW_CURSOR:          - Uses the hardwa=
+re cursor capability of the
+>>  #define CONFIG_VIDEO_LOGO
+>>  #define        CONFIG_VIDEO_BMP_LOGO
+>>  //#define DEBUG_CFG_CONSOLE
+>> -#define VIDEO_HW_BITBLT
+>> +//#define VIDEO_HW_BITBLT
+>>  #elif defined(SMI712)
+>>  #define CONFIG_VIDEO_SW_CURSOR
+>>  //#define CONFIG_VIDEO_LOGO
+>>
+>> otherwise pmon was not scrolling help text or any messages up.
 >
-> mips64el-softmmu/qemu-system-mips64el -M fulong2e -cpu Loongson-2E -m 1G 
-> -bios /dev/shm/pmon-my/pmon/zloader.2edev/pmon.bin -device 
-> ati-vga,model=rv100 -hda /dev/shm/LONGSOON_disk -cdrom 
-> /dev/shm/debian-8.0.0-mipsel-xfce-CD-1.iso -display sdl,gl=on
+> This doesn't seem PMON related but a feature of the fulong2e that QEMU
+> doesn't model yet.
 
-I think you don't need -cpu option as board will set that anyway and 
-probably does not work with anything else. Also -m 1G is useless as memory 
-is currently fixed at 256 MB (see comment in mips_fulong2e.c:298) due to 
-me not knowing where to map highmem on mips in general or this board in 
-particular. If that's fixed and the line with the comment is removed you 
-may be able to use more than 256 MB RAM but not yet.
-
-> it can see both disk and CD, but sadly I was unable to find any working kernel?!
->
-> vmlinux-2e just hangs early, and vmlinux-3.16.0-4-loongson-2e extracted from debian pkg
-> hangs a litle latter in boot process. Tried without -m option, and with 2F CPU.
-> I mean even with just -kernel, no bios involved.
-
-This could be some missing or buggy emulation. Maybe if you can get some 
-debug logs from kernel that could tell what it's doing. Usually at least 
--d unimp,guest_errors options are recommended for debugging but if nothing 
-is printed then it's harder to find out what's causing the hang.
-
-> Also, while I was able to compile-in uhci support, adding usb-kbd device freezes pmon. And newly-added
-> EHCI support apparently limited to only some CPUs/boards :/ At least I was unable to compile pmon in
-> this config and with mod_usb_ehci.
-
-No idea about that but the default ps2 kbd and mouse that's set up by the 
-board should work so maybe it's not important and you should not need usb 
-for kbd.
+It is ati-vga specific not fulong2e specific and it's entirely possible=20
+(even likely) that my minimal ati-vga emulation is not correct for 2d=20
+acceleration yet but I've tested it with the pmon_2e.bin binary from the=20
+same place and it worked with that. So if it does not work with the binar=
+y=20
+pmon for you then that's not the same what I see or if it works with the=20
+binary but not with the one compiled then either you're compiling another=
+=20
+version that does something differently or there's a difference in config=
+.=20
+There are several Bonito configs in pmon and the fulong2e might use=20
+another one or different options.
 
 Regards,
 BALATON Zoltan
