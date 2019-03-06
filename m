@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46563)
+Received: from eggs.gnu.org ([209.51.188.92]:46850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h1PiZ-0006p4-9Q
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:07:52 -0500
+	(envelope-from <jasowang@redhat.com>) id 1h1Pjq-0007Xk-V6
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:09:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h1PiX-0005uG-Ae
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:07:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51728)
+	(envelope-from <jasowang@redhat.com>) id 1h1Pjl-0007NN-V9
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:09:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h1PiW-0005sS-5M
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:07:48 -0500
-Date: Wed, 6 Mar 2019 07:07:44 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190306060744.dxq75ak2knmzv4kv@sirius.home.kraxel.org>
-References: <alpine.BSF.2.21.9999.1903041535050.72040@zero.eik.bme.hu>
-	<20190305053842.m2u5ahgztybbzpaj@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.9999.1903052357200.40521@zero.eik.bme.hu>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h1Pjl-0007Gi-4B
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 01:09:05 -0500
+References: <1551769940-22739-1-git-send-email-jasowang@redhat.com>
+	<CAFEAcA8Z3V3gZa-ttX9HiHQn1EEN0Y9zi8kP7xwX6q_6NOAj_A@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <bed0ff83-117a-c4e4-6c1b-64c090a7f634@redhat.com>
+Date: Wed, 6 Mar 2019 14:08:55 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1903052357200.40521@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] Question about hardware cursor in VGA
+In-Reply-To: <CAFEAcA8Z3V3gZa-ttX9HiHQn1EEN0Y9zi8kP7xwX6q_6NOAj_A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL V2 00/13] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Mar 06, 2019 at 12:48:59AM +0100, BALATON Zoltan wrote:
-> On Tue, 5 Mar 2019, Gerd Hoffmann wrote:
-> > On Mon, Mar 04, 2019 at 03:58:00PM +0100, BALATON Zoltan wrote:
-> > > Hello,
-> > > 
-> > > I'm trying to implement hardware cursor for ati-vga before submitting the
-> > > last version of it before the freeze.
-> > 
-> > Use dpy_cursor_define().
-> 
-> I've done that but it's not working very well. The mouse pointer is quite
-> jumpy with this and there are some problems updating the pointer image when
-> the guest changes image data in video ram without changing registers. (Like
 
-When using a relative pointing device (i.e. mouse instead of tablet) you
-also need dpy_mouse_set(), to update the host mouse position when the
-guest moves the cursor sprite around.
+On 2019/3/5 =E4=B8=8B=E5=8D=887:21, Peter Maydell wrote:
+> On Tue, 5 Mar 2019 at 07:12, Jason Wang <jasowang@redhat.com> wrote:
+>> The following changes since commit b6179aaff961627fcb59d7b234297966b81=
+ac726:
+>>
+>>    Merge remote-tracking branch 'remotes/pmaydell/tags/pull-cocoa-2019=
+0304' into staging (2019-03-04 16:50:41 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>    https://github.com/jasowang/qemu.git tags/net-pull-request
+>>
+>> for you to fetch changes up to 4b9b70000218640a42c3ea908a12665e5840b6c=
+d:
+>>
+>>    tests: Add a test for qemu self announcements (2019-03-05 11:27:41 =
++0800)
+>>
+>> ----------------------------------------------------------------
+>>
+>> Changes from V1:
+>> - build fixes for qmp controlled announcing
+>>
+> Applied, thanks.
+>
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+> for any user-visible changes.
+>
+> -- PMM
 
-Is it possible to figure where the cursor hotspot is?
 
-> least doing hw cursor like this works somewhat but I note that the other
-> version with cursor_invalidate and cursor_draw_line callbacks worked much
-> smoother, alas I've found that cannot work with shared_surface.
+Done.
 
-There is a VGAComminState->force_shadow ...
-
-> should be? (Also note that draw_line callback could do complement pixels but
-> that's not possible with dpy_cursor_define.)
-
-Yep, dpy_cursor_define is designed for the way modern hardware handles
-hardware cursors, to allow it being used as hardware cursor on the host.
-cirrus has a few modes which modern hardware can't do, thats why it
-doesn't use dpy_cursor_define.
-
-Has ati cursor a complement pixel mode too?
-
-cheers,
-  Gerd
+Thanks
