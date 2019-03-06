@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33423)
+Received: from eggs.gnu.org ([209.51.188.92]:38955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1LQI-0004Zx-4Y
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:32:43 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1h1Lql-0000tc-7o
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 21:00:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1LQH-0002OE-36
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:32:42 -0500
-Resent-Message-Id: <E1h1LQH-0002OE-36@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21063)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1LQG-0002Np-QC
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:32:41 -0500
-Message-ID: <155183592875.19275.15406426189593821514@6acff2cf482b>
-In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <wei.w.wang@intel.com>) id 1h1Lqj-0007QP-7D
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 21:00:03 -0500
+Received: from mga04.intel.com ([192.55.52.120]:21567)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1h1Lqf-0007IH-FN
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 20:59:59 -0500
+Message-ID: <5C7F2AC6.4080602@intel.com>
+Date: Wed, 06 Mar 2019 10:04:54 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 5 Mar 2019 17:32:10 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Enable build and install of our
- rST docs
+References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+	<20190305145034.GF9811@work-vm>
+In-Reply-To: <20190305145034.GF9811@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, amarkovic@wavecomp.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNTE3MjEzOS4zMjY2
-Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA1MTcyMTM5
-LjMyNjYyLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0ggdjMgMDAvMTJdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
-OTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
-MDE5MDMwNTE3MjEzOS4zMjY2Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjczNTUzN2E3ZjQgTUFJTlRBSU5FUlM6IEFkZCBlbnRyeSBm
-b3IgU3BoaW54IGRvY3VtZW50YXRpb24gaW5mcmFzdHJ1Y3R1cmUKNDQyOGZiYWQwYSBkb2NzL2Nv
-bmYucHk6IERvbid0IGhhcmQtY29kZSBRRU1VIHZlcnNpb24KODliNWQwZTc0OSBNYWtlZmlsZTog
-QWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVyc2lvbiIgY29kZQpjZmUwMjg3YTU4IE1h
-a2VmaWxlLCBjb25maWd1cmU6IFN1cHBvcnQgYnVpbGRpbmcgclNUIGRvY3VtZW50YXRpb24KNWMz
-ZWMyY2RmYSBkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdl
-IHdhbnQKZDgwNDJjOWI1MCBkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCjRj
-ZGFmMzAwNGQgZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwg
-YnVpbGQKNWM2MTIwNGY1YyBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3Rlcicg
-dGhlbWUKNDFkYmM4N2M4NyBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGly
-ZWN0b3J5CjU0ZWZjNjQyMTggZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngt
-cXVpY2tzdGFydAozZGZkNTlhYTNjIGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9y
-bWF0CmU1ODgxYjVkZTEgZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgZTU4ODFiNWRlMWQ2
-IChkb2NzL2NwdS1ob3RwbHVnLnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzEyIENoZWNr
-aW5nIGNvbW1pdCAzZGZkNTlhYTNjMDUgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
-Zm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNTogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVt
-b3J5LnR4dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzEyIENoZWNraW5nIGNvbW1p
-dCA1NGVmYzY0MjE4ZGEgKGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1
-aWNrc3RhcnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTIg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMiBDaGVja2luZyBjb21taXQgNDFkYmM4N2M4
-NzBiIChkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5KQo1LzEy
-IENoZWNraW5nIGNvbW1pdCA1YzYxMjA0ZjVjNDQgKGRvY3MvY29uZi5weTogQ29uZmlndXJlIHRo
-ZSAnYWxhYmFzdGVyJyB0aGVtZSkKNi8xMiBDaGVja2luZyBjb21taXQgNGNkYWYzMDA0ZDU0IChk
-b2NzL2NvbmYucHk6IERvbid0IGluY2x1ZGUgclNUIHNvdXJjZXMgaW4gSFRNTCBidWlsZCkKNy8x
-MiBDaGVja2luZyBjb21taXQgZDgwNDJjOWI1MDdmIChkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0
-aW9uIHdhcm5pbmdzKQo4LzEyIENoZWNraW5nIGNvbW1pdCA1YzNlYzJjZGZhYjMgKGRvY3M6IFBy
-b3ZpZGUgc2VwYXJhdGUgY29uZi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudCkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMTAyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojMTg3OiBGSUxFOiBkb2NzL2ludGVyb3AvY29uZi5weToxNToKK2h0bWxfdGhl
-bWVfb3B0aW9uc1snZGVzY3JpcHRpb24nXSA9IHUnU3lzdGVtIEVtdWxhdGlvbiBNYW5hZ2VtZW50
-IGFuZCBJbnRlcm9wZXJhYmlsaXR5IEd1aWRlJwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdz
-LCAxMzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKOS8xMiBDaGVja2luZyBjb21taXQgY2ZlMDI4N2E1ODI2IChNYWtlZmlsZSwgY29uZmlndXJl
-OiBTdXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uKQoxMC8xMiBDaGVja2luZyBjb21t
-aXQgODliNWQwZTc0OTk1IChNYWtlZmlsZTogQWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtn
-dmVyc2lvbiIgY29kZSkKMTEvMTIgQ2hlY2tpbmcgY29tbWl0IDQ0MjhmYmFkMGFiYyAoZG9jcy9j
-b25mLnB5OiBEb24ndCBoYXJkLWNvZGUgUUVNVSB2ZXJzaW9uKQoxMi8xMiBDaGVja2luZyBjb21t
-aXQgNzM1NTM3YTdmNGJlIChNQUlOVEFJTkVSUzogQWRkIGVudHJ5IGZvciBTcGhpbnggZG9jdW1l
-bnRhdGlvbiBpbmZyYXN0cnVjdHVyZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxp
-bmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 03/05/2019 10:50 PM, Dr. David Alan Gilbert wrote:
+> * Wei Wang (wei.w.wang@intel.com) wrote:
+>> The new feature enables the virtio-balloon device to receive hints of
+>> guest free pages from the free page vq.
+>>
+>> A notifier is registered to the migration precopy notifier chain. The
+>> notifier calls free_page_start after the migration thread syncs the dirty
+>> bitmap, so that the free page optimization starts to clear bits of free
+>> pages from the bitmap. It calls the free_page_stop before the migration
+>> thread syncs the bitmap, which is the end of the current round of ram
+>> save. The free_page_stop is also called to stop the optimization in the
+>> case when there is an error occurred in the process of ram saving.
+>>
+>> Note: balloon will report pages which were free at the time of this call.
+>> As the reporting happens asynchronously, dirty bit logging must be
+>> enabled before this free_page_start call is made. Guest reporting must be
+>> disabled before the migration dirty bitmap is synchronized.
+>>
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> CC: Michael S. Tsirkin <mst@redhat.com>
+>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> CC: Juan Quintela <quintela@redhat.com>
+>> CC: Peter Xu <peterx@redhat.com>
+>> ---
+>>   hw/virtio/virtio-balloon.c                      | 263 ++++++++++++++++++++++++
+>>   include/hw/virtio/virtio-balloon.h              |  28 ++-
+>>   include/standard-headers/linux/virtio_balloon.h |   5 +
+>>   3 files changed, 295 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+>> +    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
+>> +        config.free_page_report_cmd_id =
+>> +                       cpu_to_le32(dev->free_page_report_cmd_id);
+>> +    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
+>> +        config.free_page_report_cmd_id =
+>> +                       cpu_to_le32(VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID);
+>> +    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
+>> +        config.free_page_report_cmd_id =
+>> +                       cpu_to_le32(VIRTIO_BALLOON_FREE_PAGE_REPORT_DONE_ID);
+>> +    }
+> It looks like somewhere in the last 3 months the name in the kernel
+> changed; so I think I've fixed this correctly but please shout if it's
+> wrong:
+>
+>      if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
+>          config.free_page_report_cmd_id =
+>                         cpu_to_le32(dev->free_page_report_cmd_id);
+>      } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
+>          config.free_page_report_cmd_id =
+>                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
+>      } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
+>          config.free_page_report_cmd_id =
+>                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
+>      }
+>
+> and I've dropped the kernel header update since it's already there.
+>
+
+Looks good. Thanks for the update.
+
+Best,
+Wei
