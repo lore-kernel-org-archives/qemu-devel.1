@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56583)
+Received: from eggs.gnu.org ([209.51.188.92]:57261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h1alw-0007PO-JI
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:56:05 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1h1aoy-0000IK-IK
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:59:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h1alt-00064x-QW
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:56:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36492)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h1aln-0005nd-41
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:55:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h1alh-00068m-89
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 17:55:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 340562E80C8
-	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 17:55:49 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1h1aox-0007KV-5X
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:59:12 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Wed, 6 Mar 2019 17:59:03 +0000
+Message-ID: <415d46bc-5b5a-fc1a-1b5c-6fc3dd2a73cc@virtuozzo.com>
+References: <1551694120-768127-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1551694120-768127-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<20190306145132.GH6818@localhost.localdomain>
+In-Reply-To: <20190306145132.GH6818@localhost.localdomain>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Mar 2019 17:48:26 -0000
-From: "Heitor R. Alves de Siqueira" <1818880@bugs.launchpad.net>
-Reply-To: Bug 1818880 <1818880@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155189278546.17656.7588906080638087853.malonedeb@gac.canonical.com>
-Message-Id: <155189450648.28579.1939298267103734444.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818880] Re: Deadlock when detaching network
- interface
+Content-ID: <FB6336CBFBE5254CBC352EDB2F23EDB4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 2/3] iotests: ask QEMU for supported formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +26,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-** Also affects: cloud-archive
-   Importance: Undecided
-       Status: New
-
-** Changed in: cloud-archive
-       Status: New =3D> Confirmed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818880
-
-Title:
-  Deadlock when detaching network interface
-
-Status in Ubuntu Cloud Archive:
-  Confirmed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Confirmed
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
-
-Bug description:
-  [Impact]
-  Qemu guests hang indefinitely
-
-  [Description]
-  When running a Qemu guest with VirtIO network interfaces, detaching an in=
-terface that's currently being used can result in a deadlock. The guest ins=
-tance will hang and become unresponsive to commands, and the only option is=
- to kill -9 the instance.
-  The reason for this is a dealock between a monitor and an RCU thread, whi=
-ch will fight over the BQL (qemu_global_mutex) and the critical RCU section=
- locks. The monitor thread will acquire the BQL for detaching the network i=
-nterface, and fire up a helper thread to deal with detaching the network ad=
-apter. That new thread needs to wait on the RCU thread to complete the dele=
-tion, but the RCU thread wants the BQL to commit its transactions.
-  This bug is already fixed upstream (73c6e4013b4c rcu: completely disable =
-pthread_atfork callbacks as soon as possible) and included for other series=
- (see below), so we don't need to backport it to Bionic onwards.
-
-  Upstream commit:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D73c6e4013b4c
-
-  $ git describe --contains 73c6e4013b4c
-  v2.10.0-rc2~1^2~8
-
-  $ rmadison qemu
-  =3D=3D=3D> qemu | 1:2.5+dfsg-5ubuntu10.34 | xenial-updates/universe   | a=
-md64, ...
-       qemu | 1:2.11+dfsg-1ubuntu7    | bionic/universe           | amd64, =
-...
-       qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/universe           | amd64, =
-...
-       qemu | 1:3.1+dfsg-2ubuntu2     | disco/universe            | amd64, =
-...
-
-  [Test Case]
-  Being a racing condition, this is a tricky bug to reproduce consistently.=
- We've had reports of users running into this with OpenStack deployments an=
-d Windows Server guests, and the scenario is usually like this:
-  1) Deploy a 16vCPU Windows Server 2012 R2 guest with a virtio network int=
-erface
-  2) Stress the network interface with e.g. Windows HLK test suite or simil=
-ar
-  3) Repeatedly attach/detach the network adapter that's in use
-  It usually takes more than ~4000 attach/detach cycles to trigger the bug.
-
-  [Regression Potential]
-  Regressions for this might arise from the fact that the fix changes RCU l=
-ock code. Since this patch has been upstream and in other series for a whil=
-e, it's unlikely that it would regressions in RCU code specifically. Other =
-code that makes use of the RCU locks (MMIO and some monitor events) will be=
- thoroughly tested for any regressions with autokpkgtest and scripted Qemu =
-runs.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1818880/+subscriptions
+DQoNCk9uIDA2LzAzLzIwMTkgMTc6NTEsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDA0LjAzLjIw
+MTkgdW0gMTE6MDggaGF0IEFuZHJleSBTaGlua2V2aWNoIGdlc2NocmllYmVuOg0KPj4gU3VwcG9y
+dGVkIGZvcm1hdHMgbGlzdGVkIGJ5ICdxZW11JyBtYXkgZGlmZmVyIGZyb20gdGhvc2UgbGlzdGVk
+IGJ5DQo+PiAncWVtdS1pbWcnIGR1ZSB0byB3aGl0ZWxpc3RzLiBTb21lIHRlc3QgY2FzZXMgcmVx
+dWlyZSBzcGVjaWZpYyBmb3JtYXRzDQo+PiB0aGF0IG1heSBiZSB1c2VkIHdpdGggcWVtdS4gVGhl
+eSBjYW4gYmUgaW5xdWlyZWQgZGlyZWN0bHkgYnkgcnVubmluZw0KPj4gJ3FlbXUgLWRyaXZlIGZv
+cm1hdD1oZWxwJy4gVGhlIHJlc3BvbnNlIHRha2VzIHdoaXRlbGlzdHMgaW50byBhY2NvdW50Lg0K
+Pj4gVGhlIG1ldGhvZCBzdXBwb3J0ZWRfZm9ybWF0cygpIHNlcnZlcyBmb3IgdGhhdC4gVGhlIG1l
+dGhvZCBkZWNvcmF0b3INCj4+IHNraXBfaWZfdW5zdXBwb3J0ZWQoKSBjaGVja3MgaWYgYWxsIHJl
+cXVlc3RlZCBmb3JtYXRzIGFyZSB3aGl0ZWxpc3RlZC4NCj4+IElmIG5vdCwgdGhlIHRlc3QgY2Fz
+ZSB3aWxsIGJlIHNraXBwZWQuIFRoYXQgaGFzIGJlZW4gaW1wbGVtZW50ZWQgaW4NCj4+IHRoZSAn
+Y2hlY2snIGZpbGUgaW4gdGhlIHdheSBzaW1pbGFyIHRvIHRoZSAndGVzdCBub3RydW4nIG1lY2hh
+bmlzbS4NCj4+DQo+PiBTdWdnZXN0ZWQtYnk6IFJvbWFuIEthZ2FuIDxya2FnYW5AdmlydHVvenpv
+LmNvbT4NCj4+IFN1Z2dlc3RlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNl
+bWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogQW5kcmV5IFNoaW5rZXZp
+Y2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgdGVzdHMv
+cWVtdS1pb3Rlc3RzL2NoZWNrICAgICAgfCAxNiArKysrKysrKysrKysrLQ0KPj4gICB0ZXN0cy9x
+ZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8IDUwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysNCj4+ICAgMiBmaWxlcyBjaGFuZ2VkLCA2NSBpbnNlcnRpb25zKCspLCAx
+IGRlbGV0aW9uKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9jaGVj
+ayBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9jaGVjaw0KPj4gaW5kZXggODk1ZTFlMy4uYjlkNTM5YyAx
+MDA3NTUNCj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9jaGVjaw0KPj4gKysrIGIvdGVzdHMv
+cWVtdS1pb3Rlc3RzL2NoZWNrDQo+PiBAQCAtMjUsNiArMjUsNyBAQCB0cnk9MA0KPj4gICBuX2Jh
+ZD0wDQo+PiAgIGJhZD0iIg0KPj4gICBub3RydW49IiINCj4+ICtjYXNlbm90cnVuPSIiDQo+PiAg
+IGludGVycnVwdD10cnVlDQo+PiAgIA0KPj4gICAjIGJ5IGRlZmF1bHQgZG9uJ3Qgb3V0cHV0IHRp
+bWVzdGFtcHMNCj4+IEBAIC02NjQsNiArNjY1LDExIEBAIEVORCAgICAgICAgeyBpZiAoTlIgPiAw
+KSB7DQo+PiAgICAgICAgICAgICAgIGVjaG8gIk5vdCBydW46JG5vdHJ1biINCj4+ICAgICAgICAg
+ICAgICAgZWNobyAiTm90IHJ1bjokbm90cnVuIiA+PmNoZWNrLmxvZw0KPj4gICAgICAgICAgIGZp
+DQo+PiArICAgICAgICBpZiBbICEgLXogIiRjYXNlbm90cnVuIiBdDQo+PiArICAgICAgICB0aGVu
+DQo+PiArICAgICAgICAgICAgZWNobyAiU29tZSBjYXNlcyBub3QgcnVuIGluOiRjYXNlbm90cnVu
+Ig0KPj4gKyAgICAgICAgICAgIGVjaG8gIlNvbWUgY2FzZXMgbm90IHJ1biBpbjokY2FzZW5vdHJ1
+biIgPj5jaGVjay5sb2cNCj4+ICsgICAgICAgIGZpDQo+PiAgICAgICAgICAgaWYgWyAhIC16ICIk
+bl9iYWQiIC1hICRuX2JhZCAhPSAwIF0NCj4+ICAgICAgICAgICB0aGVuDQo+PiAgICAgICAgICAg
+ICAgIGVjaG8gIkZhaWx1cmVzOiRiYWQiDQo+PiBAQCAtNzQzLDYgKzc0OSwxMCBAQCBkbw0KPj4g
+ICAgICAgICAgICAgICAgICAgcHJpbnRmICIgICAgICAgICIgICAgICAgICMgcHJldHRpZXIgb3V0
+cHV0IHdpdGggdGltZXN0YW1wcy4NCj4+ICAgICAgICAgICBmaQ0KPj4gICAgICAgICAgIHJtIC1m
+IGNvcmUgJHNlcS5ub3RydW4NCj4+ICsgICAgICAgIGlmIFsgLWYgJHNlcS5jYXNlbm90cnVuIF0N
+Cj4+ICsgICAgICAgIHRoZW4NCj4+ICsgICAgICAgICAgICBybSAtZiAkc2VxLmNhc2Vub3RydW4N
+Cj4+ICsgICAgICAgIGZpDQo+PiAgIA0KPj4gICAgICAgICAgIHN0YXJ0PSQoX3dhbGxjbG9jaykN
+Cj4+ICAgICAgICAgICAkdGltZXN0YW1wICYmIHByaW50ZiAlcyAiICAgICAgICBbJChkYXRlICIr
+JVQiKV0iDQo+PiBAQCAtODIzLDcgKzgzMywxMSBAQCBkbw0KPj4gICAgICAgICAgICAgICAgICAg
+ZmkNCj4+ICAgICAgICAgICAgICAgZmkNCj4+ICAgICAgICAgICBmaQ0KPj4gLQ0KPj4gKyAgICAg
+ICAgaWYgWyAtZiAkc2VxLmNhc2Vub3RydW4gXQ0KPj4gKyAgICAgICAgdGhlbg0KPj4gKyAgICAg
+ICAgICAgIGNhdCAkc2VxLmNhc2Vub3RydW4NCj4+ICsgICAgICAgICAgICBjYXNlbm90cnVuPSIk
+Y2FzZW5vdHJ1biAkc2VxIg0KPj4gKyAgICAgICAgZmkNCj4+ICAgICAgIGZpDQo+PiAgIA0KPj4g
+ICAgICAgIyBjb21lIGhlcmUgZm9yIGVhY2ggdGVzdCwgZXhjZXB0IHdoZW4gJHNob3dtZSBpcyB0
+cnVlDQo+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgYi90ZXN0
+cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPj4gaW5kZXggYjQ2MWY1My4uOGZlMTYyMCAxMDA2
+NDQNCj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+PiArKysgYi90ZXN0
+cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPj4gQEAgLTcyOCw2ICs3MjgsNTYgQEAgZGVmIHZl
+cmlmeV9xdW9ydW0oKToNCj4+ICAgICAgIGlmIG5vdCBzdXBwb3J0c19xdW9ydW0oKToNCj4+ICAg
+ICAgICAgICBub3RydW4oJ3F1b3J1bSBzdXBwb3J0IG1pc3NpbmcnKQ0KPj4gICANCj4+ICtkZWYg
+cWVtdV9waXBlKCphcmdzKToNCj4+ICsgICAgJycnUnVuIHFlbXUgd2l0aCBhbiBvcHRpb24gdG8g
+cHJpbnQgc29tZXRoaW5nIGFuZCBleGl0IChlLmcuIGEgaGVscCBvcHRpb24pLA0KPj4gKyAgICBh
+bmQgcmV0dXJuIGl0cyBvdXRwdXQnJycNCj4+ICsgICAgYXJncyA9IFtxZW11X3Byb2ddICsgcWVt
+dV9vcHRzICsgbGlzdChhcmdzKQ0KPj4gKyAgICBzdWJwID0gc3VicHJvY2Vzcy5Qb3Blbihhcmdz
+LCBzdGRvdXQ9c3VicHJvY2Vzcy5QSVBFLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBzdGRlcnI9c3VicHJvY2Vzcy5TVERPVVQpDQo+PiArICAgIGV4aXRjb2RlID0gc3VicC53YWl0
+KCkNCj4+ICsgICAgaWYgZXhpdGNvZGUgPCAwOg0KPj4gKyAgICAgICAgc3lzLnN0ZGVyci53cml0
+ZSgncWVtdSByZWNlaXZlZCBzaWduYWwgJWk6ICVzXG4nICUgKC1leGl0Y29kZSwNCj4+ICsgICAg
+ICAgICAgICAnICcuam9pbihhcmdzKSkpDQo+PiArICAgIHJldHVybiBzdWJwLmNvbW11bmljYXRl
+KClbMF0NCj4+ICsNCj4+ICtkZWYgc3VwcG9ydGVkX2Zvcm1hdHMocmVhZF9vbmx5PUZhbHNlKToN
+Cj4+ICsgICAgJycnU2V0ICdyZWFkX29ubHknIHRvIFRydWUgdG8gY2hlY2sgcm8td2hpdGVsaXN0
+DQo+PiArICAgICAgIE90aGVyd2lzZSwgcnctd2hpdGVsaXN0IGlzIGNoZWNrZWQnJycNCj4+ICsg
+ICAgZm9ybWF0X21lc3NhZ2UgPSBxZW11X3BpcGUoIi1kcml2ZSIsICJmb3JtYXQ9aGVscCIpDQo+
+PiArICAgIGF2YWlsYWJsZSA9IFtdDQo+PiArDQo+PiArICAgIGlmIHJlYWRfb25seToNCj4+ICsg
+ICAgICAgICMgQ2hlY2sgcmVhZC1vbmx5IHdoaXRlbGlzdA0KPj4gKyAgICAgICAgYXZhaWxhYmxl
+ID0gZm9ybWF0X21lc3NhZ2Uuc3BsaXRsaW5lcygpWzFdLnNwbGl0KCI6IilbMV0uc3BsaXQoKQ0K
+Pj4gKyAgICBlbHNlOg0KPj4gKyAgICAgICAgIyBDaGVjayByZWFkLXdyaXRlIHdoaXRlbGlzdA0K
+Pj4gKyAgICAgICAgYXZhaWxhYmxlID0gZm9ybWF0X21lc3NhZ2Uuc3BsaXRsaW5lcygpWzBdLnNw
+bGl0KCI6IilbMV0uc3BsaXQoKQ0KPj4gKw0KPj4gKyAgICByZXR1cm4gYXZhaWxhYmxlDQo+IA0K
+PiBXaXRoIFB5dGhvbiAzOg0KPiANCj4gKz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gK0VSUk9SOiB0ZXN0Qmxr
+VmVyaWZ5IChfX21haW5fXy5UZXN0QmxvY2tkZXZEZWwpDQo+ICstLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICtU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6DQo+ICsgIEZpbGUgIi9ob21lL2t3b2xm
+L3NvdXJjZS9xZW11L3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5IiwgbGluZSA4MDAsIGlu
+IGZ1bmNfd3JhcHBlcg0KPiArICAgIHNldChzdXBwb3J0ZWRfZm9ybWF0cyhyZWFkX29ubHkpKSkN
+Cj4gKyAgRmlsZSAiL2hvbWUva3dvbGYvc291cmNlL3FlbXUvdGVzdHMvcWVtdS1pb3Rlc3RzL2lv
+dGVzdHMucHkiLCBsaW5lIDc4MiwgaW4gc3VwcG9ydGVkX2Zvcm1hdHMNCj4gKyAgICBhdmFpbGFi
+bGUgPSBmb3JtYXRfbWVzc2FnZS5zcGxpdGxpbmVzKClbMF0uc3BsaXQoIjoiKVsxXS5zcGxpdCgp
+DQo+ICtUeXBlRXJyb3I6IGEgYnl0ZXMtbGlrZSBvYmplY3QgaXMgcmVxdWlyZWQsIG5vdCAnc3Ry
+Jw0KPiArDQo+ICs9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09DQo+ICtFUlJPUjogdGVzdFF1b3J1bSAoX19tYWluX18u
+VGVzdEJsb2NrZGV2RGVsKQ0KPiArLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiArVHJhY2ViYWNrIChtb3N0IHJl
+Y2VudCBjYWxsIGxhc3QpOg0KPiArICBGaWxlICIvaG9tZS9rd29sZi9zb3VyY2UvcWVtdS90ZXN0
+cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSIsIGxpbmUgODAwLCBpbiBmdW5jX3dyYXBwZXINCj4g
+KyAgICBzZXQoc3VwcG9ydGVkX2Zvcm1hdHMocmVhZF9vbmx5KSkpDQo+ICsgIEZpbGUgIi9ob21l
+L2t3b2xmL3NvdXJjZS9xZW11L3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5IiwgbGluZSA3
+ODIsIGluIHN1cHBvcnRlZF9mb3JtYXRzDQo+ICsgICAgYXZhaWxhYmxlID0gZm9ybWF0X21lc3Nh
+Z2Uuc3BsaXRsaW5lcygpWzBdLnNwbGl0KCI6IilbMV0uc3BsaXQoKQ0KPiArVHlwZUVycm9yOiBh
+IGJ5dGVzLWxpa2Ugb2JqZWN0IGlzIHJlcXVpcmVkLCBub3QgJ3N0cicNCj4gKw0KPiANCj4gVGhp
+cyBmaXhlcyBpdCBmb3IgbWUgKHRoZSBmaXJzdCBodW5rIGlzIGFjdHVhbGx5IGEgYm9udXMgd2hp
+Y2ggZml4ZXMgYQ0KPiBwcmVleGlzdGluZyBidWcsIHdoaWNoIHNvbWVob3cgbWVhbnQgdGhhdCB0
+aGUgcmVhc29uIHdhcyBub3QgcHJpbnRlZCk6DQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVt
+dS1pb3Rlc3RzL2lvdGVzdHMucHkgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBp
+bmRleCBlNmFlNGU5MWI3Li5iNDFhYzRiZTUxIDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9xZW11LWlv
+dGVzdHMvaW90ZXN0cy5weQ0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0K
+PiBAQCAtNzEyLDcgKzcxMiw3IEBAIGRlZiBub3RydW4ocmVhc29uKToNCj4gICAgICAgIyBFYWNo
+IHRlc3QgaW4gcWVtdS1pb3Rlc3RzIGhhcyBhIG51bWJlciAoInNlcSIpDQo+ICAgICAgIHNlcSA9
+IG9zLnBhdGguYmFzZW5hbWUoc3lzLmFyZ3ZbMF0pDQo+IA0KPiAtICAgIG9wZW4oJyVzLyVzLm5v
+dHJ1bicgJSAob3V0cHV0X2Rpciwgc2VxKSwgJ3diJykud3JpdGUocmVhc29uICsgJ1xuJykNCj4g
+KyAgICBvcGVuKCclcy8lcy5ub3RydW4nICUgKG91dHB1dF9kaXIsIHNlcSksICd3dCcpLndyaXRl
+KHJlYXNvbiArICdcbicpDQo+ICAgICAgIHByaW50KCclcyBub3QgcnVuOiAlcycgJSAoc2VxLCBy
+ZWFzb24pKQ0KPiAgICAgICBzeXMuZXhpdCgwKQ0KPiANCg0KVGhhbmtzIGEgbG90LiBJIGFtIGdv
+aW5nIHRvIGFkZCB0aGUgZml4IGFib3ZlIGFzIGEgc2VwYXJhdGUgcGF0Y2ggaW4gdjMNCndpdGgg
+IlNpZ25lZC1vZmYtYnk6IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5jb20+Ig0KDQpBbmRyZXkN
+Cg0KPiBAQCAtNzYxLDcgKzc2MSw4IEBAIGRlZiBxZW11X3BpcGUoKmFyZ3MpOg0KPiAgICAgICBh
+bmQgcmV0dXJuIGl0cyBvdXRwdXQnJycNCj4gICAgICAgYXJncyA9IFtxZW11X3Byb2ddICsgcWVt
+dV9vcHRzICsgbGlzdChhcmdzKQ0KPiAgICAgICBzdWJwID0gc3VicHJvY2Vzcy5Qb3Blbihhcmdz
+LCBzdGRvdXQ9c3VicHJvY2Vzcy5QSVBFLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IHN0ZGVycj1zdWJwcm9jZXNzLlNURE9VVCkNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBzdGRlcnI9c3VicHJvY2Vzcy5TVERPVVQsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgdW5pdmVyc2FsX25ld2xpbmVzPVRydWUpDQo+ICAgICAgIGV4aXRjb2RlID0gc3VicC53YWl0
+KCkNCj4gICAgICAgaWYgZXhpdGNvZGUgPCAwOg0KPiAgICAgICAgICAgc3lzLnN0ZGVyci53cml0
+ZSgncWVtdSByZWNlaXZlZCBzaWduYWwgJWk6ICVzXG4nICUgKC1leGl0Y29kZSwNCj4gQEAgLTc4
+OCw3ICs3ODksNyBAQCBkZWYgY2FzZV9ub3RydW4ocmVhc29uKToNCj4gICAgICAgIyBFYWNoIHRl
+c3QgaW4gcWVtdS1pb3Rlc3RzIGhhcyBhIG51bWJlciAoInNlcSIpDQo+ICAgICAgIHNlcSA9IG9z
+LnBhdGguYmFzZW5hbWUoc3lzLmFyZ3ZbMF0pDQo+IA0KPiAtICAgIG9wZW4oJyVzLyVzLmNhc2Vu
+b3RydW4nICUgKG91dHB1dF9kaXIsIHNlcSksICdhYicpLndyaXRlKA0KPiArICAgIG9wZW4oJyVz
+LyVzLmNhc2Vub3RydW4nICUgKG91dHB1dF9kaXIsIHNlcSksICdhdCcpLndyaXRlKA0KPiAgICAg
+ICAgICAgJyAgICBbY2FzZSBub3QgcnVuXSAnICsgcmVhc29uICsgJ1xuJykNCj4gDQo+ICAgZGVm
+IHNraXBfaWZfdW5zdXBwb3J0ZWQocmVxdWlyZWRfZm9ybWF0cz1bXSwgcmVhZF9vbmx5PUZhbHNl
+KToNCj4gDQo=
