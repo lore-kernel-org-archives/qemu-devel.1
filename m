@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48413)
+Received: from eggs.gnu.org ([209.51.188.92]:49328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1TIe-0006m0-UW
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:57:21 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1TNH-0000G7-Bl
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:02:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1TIe-0003PA-3y
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:57:20 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51686)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1h1TId-0003OY-Sp
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 04:57:20 -0500
-Received: by mail-wm1-x344.google.com with SMTP id n19so5257182wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 01:57:19 -0800 (PST)
-Date: Wed, 6 Mar 2019 09:57:17 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190306095717.GH22159@stefanha-x1.localdomain>
-References: <20190301163518.20702-1-stefanha@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1h1TNF-0006dD-HS
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:02:07 -0500
+References: <5310bd5d152fa36c1828a7cbd19fc893739d1609.camel@gmail.com>
+	<20190306095615.GG22159@stefanha-x1.localdomain>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <6b3cfcb7-747e-1dc7-6987-1ad9d1fde2a3@vivier.eu>
+Date: Wed, 6 Mar 2019 11:01:43 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="JI+G0+mN8WmwPnOn"
-Content-Disposition: inline
-In-Reply-To: <20190301163518.20702-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: add missing support status
- fields
+In-Reply-To: <20190306095615.GG22159@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wHed6j1HSAw0QV7eT6VQ6HgJEMHkbcQmK"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v4] thunk: fix of malloc to
+ g_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, thuth@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Riku Voipio <riku.voipio@iki.fi>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Julia Suvorova <jusual@mail.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aarushi Mehta <mehta.aaru20@gmail.com>
 
-
---JI+G0+mN8WmwPnOn
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wHed6j1HSAw0QV7eT6VQ6HgJEMHkbcQmK
+From: Laurent Vivier <laurent@vivier.eu>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Riku Voipio <riku.voipio@iki.fi>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Julia Suvorova <jusual@mail.ru>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>
+Message-ID: <6b3cfcb7-747e-1dc7-6987-1ad9d1fde2a3@vivier.eu>
+Subject: Re: [Qemu-trivial] [PATCH v4] thunk: fix of malloc to g_new
+References: <5310bd5d152fa36c1828a7cbd19fc893739d1609.camel@gmail.com>
+ <20190306095615.GG22159@stefanha-x1.localdomain>
+In-Reply-To: <20190306095615.GG22159@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 01, 2019 at 04:35:18PM +0000, Stefan Hajnoczi wrote:
-> This patch adds the "S:" line for areas of the codebase that currently
-> lack a support status field.
+On 06/03/2019 10:56, Stefan Hajnoczi wrote:
+> On Sat, Mar 02, 2019 at 01:22:29AM +0530, Aarushi Mehta wrote:
+>> From 3c1cba63dc5070ab559a126e206557f27fbaea59 Mon Sep 17 00:00:00 2001=
+
+>> From: Aarushi Mehta <mehta.aaru20@gmail.com>
+>> Date: Sat, 2 Mar 2019 01:11:42 +0530
+>> Subject: [PATCH v4] thunk: fix of malloc to g_new
+>>
+>> Note that since thunking occurs throughout the lifetime of the QEMU
+>> instance, there is no matching 'free' to correct.
+>>
+>> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>  thunk.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> Note that there are a few more areas that are more abstract and do not
-> correspond to a specific set of files.  They have not been modified.
+> Riku: Will you send a pull request?  Otherwise Peter might be willing t=
+o
+> merge this patch through his tree.
 >=20
-> Cc: Alex Benn=E9e <alex.bennee@linaro.org>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  MAINTAINERS | 3 +++
->  1 file changed, 3 insertions(+)
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+I can take this through the trivial patches branch.
 
-Stefan
+Thanks,
+Laurent
 
---JI+G0+mN8WmwPnOn
+
+
+--wHed6j1HSAw0QV7eT6VQ6HgJEMHkbcQmK
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcf5l9AAoJEJykq7OBq3PIC+wIALhYa/1EYF2WOSkMJg9AVDbP
-HE2F2CP3p03rWZdcxYjs5S9z1ZW7DtjZekHAryuI6TltvfxvSEMpgWJhnq1PX+80
-gJGgJ7//PR1LDiku4iJqrBf2Ag/jcIUT8WIQZrQDijq685ivzCTT5JxsKR2900BH
-NbMsEJMM8aoh+I1TCOUJ1NiuaHVwqh1UbP66eYqKO1m20wmkrukITt6sW9dyHFzD
-CpPYdjSH4czzCO/eGFi39wtWUPK8mpXlAeCGEvJhSxFMoaxwB3QTEIPycZaMyxBU
-rwH2Hw8OPlBK+hQ0YvbE3nvmx5Qv4gvRPsCeQfixHqesVo8EHWXE2VZv+uKQCBw=
-=CNsF
+iQIzBAEBCAAdFiEEzS913cjjpNwuT1Fz8ww4vT8vvjwFAlx/mocACgkQ8ww4vT8v
+vjyTJQ//dwFqbfExOnl4MfM9/d2he+DPRMcoGngG996z0VYYRue+6M85zLGHuKIp
+mmHxSvwqceASMTvSuapXFw7NgYSEKQBAzHJYDpfma8/BBpVeFkYWgu6Rv6v6jzYP
+4hIcLqLpA72HjM+8aNgx4ea2GkAv2LDVH0DmbiP1w68vZEVY4aMVGTviqw7HjXlh
+xkc9Z10spaR02lK59sAA/bcy1E6lFSvg6NzdJnv+Ww/F/Ac3BUaMmUxhQGARVOXo
+C5oezTWmVSl+NLm3QO2kbkfycy1B5etOBcqUsa2q8joaBLfeHdY9C/Smcvefgtle
+2KjHNf0AaeJCsQ7B+YuN9wBY/bXLPLvc2AgqjJtRR5bOh1+zaW71TIu4M8HyTwlo
+NWdwgXt0ctpI7GKAZe4RPmvFvf6spbGnl1AvFCs092wS8Q2B5Q8OtRW32ZqGKopi
+d3cgsWstZzvHmTtfJXDM9EWh4rICEALW9ZaPk1J4l5HzOvYDLMe5hH9Ru9PFzSe/
+AsUB7GmlRT3bgirn95bQES6+P2IOAAfZ1KlUkQ/3129zpISIseMhInlycy17qWFG
+PHFmuZWedCg4FH1hqODSKqESGA1ba807HHyHft7h4vQ00OZaKtON0rRQ5tjN/ilF
+jStcFSmnrpGi4VrSEPM22XnMXaLTOEQT69eMniyiKflzD7RmUB8=
+=tX4C
 -----END PGP SIGNATURE-----
 
---JI+G0+mN8WmwPnOn--
+--wHed6j1HSAw0QV7eT6VQ6HgJEMHkbcQmK--
