@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43296)
+Received: from eggs.gnu.org ([209.51.188.92]:43318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1UwW-0005vl-Ia
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:42:37 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1UwY-0005vt-H0
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:42:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1UwV-0004NR-NR
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:42:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49780)
+	(envelope-from <dgilbert@redhat.com>) id 1h1UwX-0004QK-KS
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:42:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1UwV-0004Ly-Dm
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:42:35 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1UwX-0004OY-DT
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:42:37 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed,  6 Mar 2019 11:42:05 +0000
-Message-Id: <20190306114227.9125-1-dgilbert@redhat.com>
+Date: Wed,  6 Mar 2019 11:42:06 +0000
+Message-Id: <20190306114227.9125-2-dgilbert@redhat.com>
+In-Reply-To: <20190306114227.9125-1-dgilbert@redhat.com>
+References: <20190306114227.9125-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/22] migration queue
+Subject: [Qemu-devel] [PULL 01/22] migration: Fix cancel state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +30,64 @@ Cc: eblake@redhat.com, armbru@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The following changes since commit b5b6b2b912bbcd3953407da938a8f969577ad3=
-a1:
+During a cancelled migration there's a race where the fd can
+go into an error state before we get back around the migration loop
+and migration_detect_error transitions from cancelling->failed.
 
-  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-mar-05-=
-2019' into staging (2019-03-05 21:07:29 +0000)
+Check for cancelled/cancelling and don't change the state.
 
-are available in the Git repository at:
+Red Hat bug: https://bugzilla.redhat.com/show_bug.cgi?id=3D1608649
 
-  git://github.com/dagrh/qemu.git tags/pull-migration-20190306a
+Fixes: b23c2ade250
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20190219195928.12289-1-dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/migration.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-for you to fetch changes up to b5922fc5891261153f1a0f20e814c620aabeb6ac:
-
-  qapi/migration.json: Remove a variable that doesn't exist in example (2=
-019-03-06 10:49:18 +0000)
-
-----------------------------------------------------------------
-Migation pull 2019-03-06
-
-(This replaces the pull sent yesterday)
-
-   a) 4 small fixes including the cancel problem
-     that caused the ahci migration test to fail
-     intermittently
-   b) Yury's ignore-shared feature
-   c) Juan's extra tests
-   d) Wei Wang's free page hinting
-   e) Some Colo fixes from Zhang Chen
-
-Diff from yesterdays pull:
-  1) A missing fix of mine (cleanup during exit)
-  2) Changes from Eric/Markus on 'Create socket-address parameter'
-
-----------------------------------------------------------------
-Dr. David Alan Gilbert (3):
-      migration: Fix cancel state
-      migration/rdma: Fix qemu_rdma_cleanup null check
-      migration: Cleanup during exit
-
-Juan Quintela (3):
-      tests: Add migration xbzrle test
-      migration: Create socket-address parameter
-      tests: Add basic migration precopy tcp test
-
-Marcel Apfelbaum (1):
-      migration/rdma: clang compilation fix
-
-Wei Wang (7):
-      bitmap: fix bitmap_count_one
-      bitmap: bitmap_count_one_with_offset
-      migration: use bitmap_mutex in migration_bitmap_clear_dirty
-      migration: API to clear bits of guest free pages from the dirty bit=
-map
-      migration/ram.c: add a notifier chain for precopy
-      migration/ram.c: add the free page optimization enable flag
-      virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT
-
-Yury Kotov (5):
-      exec: Change RAMBlockIterFunc definition
-      migration: Introduce ignore-shared capability
-      migration: Add an ability to ignore shared RAM blocks
-      tests/migration-test: Add a test for ignore-shared capability
-      migration: Add capabilities validation
-
-Zhang Chen (3):
-      Migration/colo.c: Fix double close bug when occur COLO failover
-      Migration/colo.c: Make COLO node running after failover
-      qapi/migration.json: Remove a variable that doesn't exist in exampl=
-e
-
- exec.c                             |  38 ++---
- hmp.c                              |  33 ++++
- hw/virtio/virtio-balloon.c         | 263 +++++++++++++++++++++++++++++++
- include/exec/cpu-common.h          |   7 +-
- include/hw/virtio/virtio-balloon.h |  28 +++-
- include/migration/misc.h           |  24 ++-
- include/qemu/bitmap.h              |  17 ++
- migration/colo.c                   |   2 +-
- migration/migration.c              |  62 +++++++-
- migration/migration.h              |   9 +-
- migration/postcopy-ram.c           |  48 +++---
- migration/ram.c                    | 231 ++++++++++++++++++++++++----
- migration/rdma.c                   |  18 ++-
- migration/savevm.c                 | 152 ++++++++++++++++++
- migration/socket.c                 |  11 ++
- qapi/migration.json                |  13 +-
- stubs/ram-block.c                  |  15 ++
- tests/migration-test.c             | 308 +++++++++++++++++++++++++++++++=
-++----
- util/vfio-helpers.c                |   6 +-
- vl.c                               |   8 +-
- 20 files changed, 1167 insertions(+), 126 deletions(-)
+diff --git a/migration/migration.c b/migration/migration.c
+index c39d3054ec..e44f77af02 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2911,6 +2911,13 @@ static MigThrError postcopy_pause(MigrationState *=
+s)
+ static MigThrError migration_detect_error(MigrationState *s)
+ {
+     int ret;
++    int state =3D s->state;
++
++    if (state =3D=3D MIGRATION_STATUS_CANCELLING ||
++        state =3D=3D MIGRATION_STATUS_CANCELLED) {
++        /* End the migration, but don't set the state to failed */
++        return MIG_THR_ERR_FATAL;
++    }
+=20
+     /* Try to detect any file errors */
+     ret =3D qemu_file_get_error(s->to_dst_file);
+@@ -2920,7 +2927,7 @@ static MigThrError migration_detect_error(Migration=
+State *s)
+         return MIG_THR_ERR_NONE;
+     }
+=20
+-    if (s->state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE && ret =3D=3D -=
+EIO) {
++    if (state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE && ret =3D=3D -EIO=
+) {
+         /*
+          * For postcopy, we allow the network to be down for a
+          * while. After that, it can be continued by a
+@@ -2932,7 +2939,7 @@ static MigThrError migration_detect_error(Migration=
+State *s)
+          * For precopy (or postcopy with error outside IO), we fail
+          * with no time.
+          */
+-        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
++        migrate_set_state(&s->state, state, MIGRATION_STATUS_FAILED);
+         trace_migration_thread_file_err();
+=20
+         /* Time to stop the migration, now. */
+--=20
+2.20.1
