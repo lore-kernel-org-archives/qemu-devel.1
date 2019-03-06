@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52310)
+Received: from eggs.gnu.org ([209.51.188.92]:53150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1Y2l-0007Yf-Qw
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:01:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h1Y81-0000Li-RI
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:06:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1Y2g-0003LH-6b
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:01:15 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190226193408.23862-1-armbru@redhat.com>
-	<20190226193408.23862-9-armbru@redhat.com>
-	<71bfd7e6-abda-d26d-b3d3-e4c2ed9e98f8@redhat.com>
-Date: Wed, 06 Mar 2019 16:00:51 +0100
-In-Reply-To: <71bfd7e6-abda-d26d-b3d3-e4c2ed9e98f8@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Mar 2019 18:48:51
-	+0100")
-Message-ID: <8736o0vyho.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1h1Y80-0006GY-JV
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:06:41 -0500
+Date: Wed, 6 Mar 2019 16:06:33 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190306150633.GK6818@localhost.localdomain>
+References: <20190227172256.30368-1-kwolf@redhat.com>
+	<20190227172256.30368-4-kwolf@redhat.com>
+	<20190301161724.GB18260@stefanha-x1.localdomain>
+	<d6ba8e66-5ddf-9091-ff44-5024a53240a8@redhat.com>
+	<20190306095147.GF22159@stefanha-x1.localdomain>
+	<ec417842-c9f4-7a7e-e49f-4d509115e540@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 08/11] r2d: Flash memory creation is
- confused about size, mark FIXME
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ftEhullJWpWg/VHq"
+Content-Disposition: inline
+In-Reply-To: <ec417842-c9f4-7a7e-e49f-4d509115e540@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 03/20] qcow2: Extend spec for
+ external data files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, lersek@redhat.com, Magnus Damm <magnus.damm@gmail.com>, mreitz@redhat.com, qemu-ppc@nongnu.org, alex.bennee@linaro.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> On 2/26/19 8:34 PM, Markus Armbruster wrote:
->> pflash_cfi02_register() takes a size in bytes, a block size in bytes
->> and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
->> FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
->> number of blocks.  The latter happens to win.  I tried to find
->> documentation on the physical hardware, no luck.
->>=20
->> For now, adjust the byte size passed to match the actual size created,
->> and add a FIXME comment.
->>=20
->> Cc: Magnus Damm <magnus.damm@gmail.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/sh4/r2d.c | 9 ++++++++-
->>  1 file changed, 8 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
->> index dcdb3728cb..ed18d1f351 100644
->> --- a/hw/sh4/r2d.c
->> +++ b/hw/sh4/r2d.c
->> @@ -290,7 +290,14 @@ static void r2d_init(MachineState *machine)
->>=20=20
->>      /* onboard flash memory */
->>      dinfo =3D drive_get(IF_PFLASH, 0, 0);
->> -    pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE,
->> +    /*
->> +     * FIXME The code is confused about the size of the flash.  It
->> +     * used to pass FLASH_SIZE bytes, in FLASH_SIZE >> 16 blocks of
->> +     * 16KiB each, which does not compute, but creates one of
->> +     * FLASH_SIZE / 4 bytes anyway.  The current code does so too, but
->> +     * whether it's the right size is anybody's guess.
->> +     */
->> +    pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE / 4,
->
-> NAck, please see suggestion on v1:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg01206.html
+--ftEhullJWpWg/VHq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'll use that to replace this patch in v3.  Thanks!
+Am 06.03.2019 um 13:43 hat Eric Blake geschrieben:
+> On 3/6/19 3:51 AM, Stefan Hajnoczi wrote:
+> > On Fri, Mar 01, 2019 at 10:32:27AM -0600, Eric Blake wrote:
+> >> On 3/1/19 10:17 AM, Stefan Hajnoczi wrote:
+> >>> On Wed, Feb 27, 2019 at 06:22:39PM +0100, Kevin Wolf wrote:
+> >>>> @@ -148,6 +170,7 @@ be stored. Each extension has a structure like t=
+he following:
+> >>>>                          0x6803f857 - Feature name table
+> >>>>                          0x23852875 - Bitmaps extension
+> >>>>                          0x0537be77 - Full disk encryption header po=
+inter
+> >>>> +                        0x44415441 - External data file name
+> >>>
+> >>> This new header extension isn't described in this patch?
+> >>
+> >> I asked the same on v1, and the answer (which remains valid) is that
+> >> neither is 0xe2792aca Backing file format name.  (In other words, both
+> >> extensions are simple enough as a single file name to be implicitly
+> >> described by the reference to the header in the earlier text).  Making
+> >> both explicit wouldn't hurt my feelings, but I don't see it as a
+> >> showstopper to the patch as-is.
+> >=20
+> > The spec should make the representation clear.  Is it a NUL-terminated
+> > string or is the length dictated by the header extension length field?
+>=20
+> My understanding is length determined by the header field, with optional
+> NUL padding out to the alignment boundary (but that also means that it
+> does NOT necessarily have a trailing NUL on disk if sizing matches
+> alignment).  But yes, being explicit never hurts.
+>=20
+> >=20
+> > Otherwise implementors are forced to look at the QEMU source code or
+> > guess based on hex dumping example files :(.
+>=20
+> Indeed, cleaning up the existing Backing file format name is worth doing
+> (at which point this should follow suit). But it still sounds like a
+> separate patch, at which point it becomes a question of ordering - if
+> the cleanup lands first, then this needs to rebase to do the same; if
+> this lands first, then the cleanup does both headers at once.
 
-[...]
+Maybe add a new section "String header extensions" that covers both?
+
+If this remains the only patch in the series that would need a
+significant change, I'd prefer a follow-up patch indeed.
+
+Kevin
+
+--ftEhullJWpWg/VHq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJcf+H5AAoJEH8JsnLIjy/WlFYP/3ew6aVbcE6LlJGsoCV9kTfg
+8tP2ryxrwwSeCWDrEvRKIlzVtmlm/p7JLEmy6g6M8ic/NndmgBRYJbd/MKKyL+JV
+TcpoFGv10CtIyfX9pDoJ1Ki85OqgtlYe64OzbL+J7k/+AR1Nyva0486kJlDswawk
+wvLvtJeZoPZV4+SXFJD1mW9g5gP7j/6lkmSkdTMKEAY6XetByxBffbCR5QkN32IF
+X8aU83DLH0gC0VqgRkuo8VcPBkc6tu0I7IAxje0OxywV7IeD5H4UJf5irSKp2xnk
+37+J98AgSV3ZglpPVlizD/W2CgnEPAd4O7aglw2yHPuAQHH++nY7nBzpoT2AHhTh
+MVYGTA2h7cfHxKCXJzSkyfxnzcnjhDKpPJrcPWNI+YuI+Y0UB5ml8L3bQJZ2gK8w
+4RhA30ZLwJ6gy9mq7NfF7LxwWlhQKuxKuMSiSfys7si2MSMgv34U9ez2+ozL+dYu
+kHQWTBclSZc5WM9DA0tVmxaUwR16FaLunqSgJfG8q5ZoUb/s5UCB9u8aR85Zk58y
+bhRJOXUYXiomgXUzqlNTMHlhUzPg4CSTrQe5hLxQoIa3DBtArtrscK7nT8wDwavD
+jWR+d45QJfb53nwojymxdePxp95xL/Lc+a+60fiF/skzZqfdhlh+lrlXH/huKlh1
+dCi0HZUHXiwWbr3OUV8C
+=RnZq
+-----END PGP SIGNATURE-----
+
+--ftEhullJWpWg/VHq--
