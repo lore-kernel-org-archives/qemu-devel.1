@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46471)
+Received: from eggs.gnu.org ([209.51.188.92]:49045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h1VA4-0000ak-AI
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:56:36 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h1VKS-0008Mp-9A
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:07:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h1V9u-0006Dv-FK
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:56:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54176)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1h1V9m-00067O-Dj
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:56:20 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 39C0330718CD
-	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 11:56:16 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed,  6 Mar 2019 19:55:32 +0800
-Message-Id: <20190306115532.23025-6-peterx@redhat.com>
-In-Reply-To: <20190306115532.23025-1-peterx@redhat.com>
-References: <20190306115532.23025-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] iothread: document about why we need
- explicit aio_poll()
+	(envelope-from <no-reply@patchew.org>) id 1h1VKP-00048L-TY
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:07:19 -0500
+Resent-Message-Id: <E1h1VKP-00048L-TY@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1h1VKP-00047j-Mh
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:07:17 -0500
+Message-ID: <155187401041.30942.9679051454830848472@6acff2cf482b>
+In-Reply-To: <20190306114227.9125-1-dgilbert@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 6 Mar 2019 04:06:51 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/22] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: dgilbert@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, marcel.apfelbaum@gmail.com, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, chen.zhang@intel.com, armbru@redhat.com
 
-After consulting Paolo I know why we'd better keep the explicit
-aio_poll() in iothread_run().  Document it directly into the code so
-that future readers will know the answer from day one.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- iothread.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/iothread.c b/iothread.c
-index 045825a348..14e9f3779e 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -64,6 +64,15 @@ static void *iothread_run(void *opaque)
-     qemu_sem_post(&iothread->init_done_sem);
- 
-     while (iothread->running) {
-+        /*
-+         * Note: from functional-wise the g_main_loop_run() below can
-+         * already cover the aio_poll() events, but we can't run the
-+         * main loop unconditionally because explicit aio_poll() here
-+         * is faster than g_main_loop_run() when we do not need the
-+         * gcontext at all (e.g., pure block layer iothreads).  In
-+         * other words, when we want to run the gcontext with the
-+         * iothread we need to pay some performance for functionality.
-+         */
-         aio_poll(iothread->ctx, true);
- 
-         /*
--- 
-2.17.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNjExNDIyNy45MTI1
+LTEtZGdpbGJlcnRAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA2MTE0MjI3LjkxMjUt
+MS1kZ2lsYmVydEByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8yMl0g
+bWlncmF0aW9uIHF1ZXVlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
+dCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hl
+Y2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzIwMTkwMzA2MTE0MjI3LjkxMjUtMS1kZ2lsYmVydEByZWRoYXQuY29tIC0+
+IHBhdGNoZXcvMjAxOTAzMDYxMTQyMjcuOTEyNS0xLWRnaWxiZXJ0QHJlZGhhdC5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowNjBmNTAxYmRjIHFhcGkvbWlncmF0aW9uLmpzb246
+IFJlbW92ZSBhIHZhcmlhYmxlIHRoYXQgZG9lc24ndCBleGlzdCBpbiBleGFtcGxlCjc5OTg1Yzg5
+YTEgTWlncmF0aW9uL2NvbG8uYzogTWFrZSBDT0xPIG5vZGUgcnVubmluZyBhZnRlciBmYWlsb3Zl
+cgowNGZhNDFmM2ZlIE1pZ3JhdGlvbi9jb2xvLmM6IEZpeCBkb3VibGUgY2xvc2UgYnVnIHdoZW4g
+b2NjdXIgQ09MTyBmYWlsb3ZlcgpmYWQ2YTdhMmZlIHZpcnRpby1iYWxsb29uOiBWSVJUSU9fQkFM
+TE9PTl9GX0ZSRUVfUEFHRV9ISU5UCmVhMDU1ODQzYTYgbWlncmF0aW9uL3JhbS5jOiBhZGQgdGhl
+IGZyZWUgcGFnZSBvcHRpbWl6YXRpb24gZW5hYmxlIGZsYWcKMDRmMTJmNDQ5MyBtaWdyYXRpb24v
+cmFtLmM6IGFkZCBhIG5vdGlmaWVyIGNoYWluIGZvciBwcmVjb3B5CmFjZmZlOGZhYzIgbWlncmF0
+aW9uOiBBUEkgdG8gY2xlYXIgYml0cyBvZiBndWVzdCBmcmVlIHBhZ2VzIGZyb20gdGhlIGRpcnR5
+IGJpdG1hcAoyOGJhNzkyMGI1IG1pZ3JhdGlvbjogdXNlIGJpdG1hcF9tdXRleCBpbiBtaWdyYXRp
+b25fYml0bWFwX2NsZWFyX2RpcnR5CjUwZDE0MWUyMWIgYml0bWFwOiBiaXRtYXBfY291bnRfb25l
+X3dpdGhfb2Zmc2V0CmQwOWQ4YzM0ZmUgYml0bWFwOiBmaXggYml0bWFwX2NvdW50X29uZQowYjNm
+ODc2ZjczIHRlc3RzOiBBZGQgYmFzaWMgbWlncmF0aW9uIHByZWNvcHkgdGNwIHRlc3QKYjliODg1
+ODIyNCBtaWdyYXRpb246IENyZWF0ZSBzb2NrZXQtYWRkcmVzcyBwYXJhbWV0ZXIKYzNlMTBlMzhk
+MCB0ZXN0czogQWRkIG1pZ3JhdGlvbiB4YnpybGUgdGVzdAo5ODkxYTE3OGUxIG1pZ3JhdGlvbjog
+QWRkIGNhcGFiaWxpdGllcyB2YWxpZGF0aW9uCmEzYmEwNzhlYTMgdGVzdHMvbWlncmF0aW9uLXRl
+c3Q6IEFkZCBhIHRlc3QgZm9yIGlnbm9yZS1zaGFyZWQgY2FwYWJpbGl0eQo0MGExMWY2ZDcyIG1p
+Z3JhdGlvbjogQWRkIGFuIGFiaWxpdHkgdG8gaWdub3JlIHNoYXJlZCBSQU0gYmxvY2tzCmIwOGE4
+YmNiOGYgbWlncmF0aW9uOiBJbnRyb2R1Y2UgaWdub3JlLXNoYXJlZCBjYXBhYmlsaXR5CjUwMmYz
+ZTc2OTAgZXhlYzogQ2hhbmdlIFJBTUJsb2NrSXRlckZ1bmMgZGVmaW5pdGlvbgoxNDE5ZmM0ZjY4
+IG1pZ3JhdGlvbi9yZG1hOiBjbGFuZyBjb21waWxhdGlvbiBmaXgKYWY0YThlMzRmNyBtaWdyYXRp
+b246IENsZWFudXAgZHVyaW5nIGV4aXQKNjA3ODY3NTk4NCBtaWdyYXRpb24vcmRtYTogRml4IHFl
+bXVfcmRtYV9jbGVhbnVwIG51bGwgY2hlY2sKZjQxNGEwZDU4YyBtaWdyYXRpb246IEZpeCBjYW5j
+ZWwgc3RhdGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjIgQ2hlY2tpbmcgY29tbWl0IGY0MTRh
+MGQ1OGM2MSAobWlncmF0aW9uOiBGaXggY2FuY2VsIHN0YXRlKQoyLzIyIENoZWNraW5nIGNvbW1p
+dCA2MDc4Njc1OTg0NmEgKG1pZ3JhdGlvbi9yZG1hOiBGaXggcWVtdV9yZG1hX2NsZWFudXAgbnVs
+bCBjaGVjaykKMy8yMiBDaGVja2luZyBjb21taXQgYWY0YThlMzRmNzZhIChtaWdyYXRpb246IENs
+ZWFudXAgZHVyaW5nIGV4aXQpCjQvMjIgQ2hlY2tpbmcgY29tbWl0IDE0MTlmYzRmNjhhNiAobWln
+cmF0aW9uL3JkbWE6IGNsYW5nIGNvbXBpbGF0aW9uIGZpeCkKNS8yMiBDaGVja2luZyBjb21taXQg
+NTAyZjNlNzY5MDMzIChleGVjOiBDaGFuZ2UgUkFNQmxvY2tJdGVyRnVuYyBkZWZpbml0aW9uKQo2
+LzIyIENoZWNraW5nIGNvbW1pdCBiMDhhOGJjYjhmNTUgKG1pZ3JhdGlvbjogSW50cm9kdWNlIGln
+bm9yZS1zaGFyZWQgY2FwYWJpbGl0eSkKNy8yMiBDaGVja2luZyBjb21taXQgNDBhMTFmNmQ3MjBi
+IChtaWdyYXRpb246IEFkZCBhbiBhYmlsaXR5IHRvIGlnbm9yZSBzaGFyZWQgUkFNIGJsb2NrcykK
+RVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2Vk
+IGluIGEgZG8gLSB3aGlsZSBsb29wCiMxNDk6IEZJTEU6IG1pZ3JhdGlvbi9yYW0uYzoxNjk6Cisj
+ZGVmaW5lIFJBTUJMT0NLX0ZPUkVBQ0hfTk9UX0lHTk9SRUQoYmxvY2spICAgICAgICAgICAgXAor
+ICAgIElOVEVSTkFMX1JBTUJMT0NLX0ZPUkVBQ0goYmxvY2spICAgICAgICAgICAgICAgICAgIFwK
+KyAgICAgICAgaWYgKHJhbWJsb2NrX2lzX2lnbm9yZWQoYmxvY2spKSB7fSBlbHNlCgpFUlJPUjog
+dHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMxNTE6IEZJTEU6IG1p
+Z3JhdGlvbi9yYW0uYzoxNzE6CisgICAgICAgIGlmIChyYW1ibG9ja19pc19pZ25vcmVkKGJsb2Nr
+KSkge30gZWxzZQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzODYgbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggNy8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKOC8yMiBDaGVja2luZyBj
+b21taXQgYTNiYTA3OGVhMzExICh0ZXN0cy9taWdyYXRpb24tdGVzdDogQWRkIGEgdGVzdCBmb3Ig
+aWdub3JlLXNoYXJlZCBjYXBhYmlsaXR5KQpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFu
+dCBjb25zaWRlciByZW1vdmluZyBpdAojMjM1OiBGSUxFOiB0ZXN0cy9taWdyYXRpb24tdGVzdC5j
+OjgyOToKKyNpZiAwCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI1NSBsaW5lcyBjaGVj
+a2VkCgpQYXRjaCA4LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo5LzIyIENoZWNraW5n
+IGNvbW1pdCA5ODkxYTE3OGUxY2IgKG1pZ3JhdGlvbjogQWRkIGNhcGFiaWxpdGllcyB2YWxpZGF0
+aW9uKQoxMC8yMiBDaGVja2luZyBjb21taXQgYzNlMTBlMzhkMGE1ICh0ZXN0czogQWRkIG1pZ3Jh
+dGlvbiB4YnpybGUgdGVzdCkKMTEvMjIgQ2hlY2tpbmcgY29tbWl0IGI5Yjg4NTgyMjQwOCAobWln
+cmF0aW9uOiBDcmVhdGUgc29ja2V0LWFkZHJlc3MgcGFyYW1ldGVyKQoxMi8yMiBDaGVja2luZyBj
+b21taXQgMGIzZjg3NmY3MzUyICh0ZXN0czogQWRkIGJhc2ljIG1pZ3JhdGlvbiBwcmVjb3B5IHRj
+cCB0ZXN0KQoxMy8yMiBDaGVja2luZyBjb21taXQgZDA5ZDhjMzRmZTVmIChiaXRtYXA6IGZpeCBi
+aXRtYXBfY291bnRfb25lKQoxNC8yMiBDaGVja2luZyBjb21taXQgNTBkMTQxZTIxYmRhIChiaXRt
+YXA6IGJpdG1hcF9jb3VudF9vbmVfd2l0aF9vZmZzZXQpCjE1LzIyIENoZWNraW5nIGNvbW1pdCAy
+OGJhNzkyMGI1ZTQgKG1pZ3JhdGlvbjogdXNlIGJpdG1hcF9tdXRleCBpbiBtaWdyYXRpb25fYml0
+bWFwX2NsZWFyX2RpcnR5KQoxNi8yMiBDaGVja2luZyBjb21taXQgYWNmZmU4ZmFjMmY0IChtaWdy
+YXRpb246IEFQSSB0byBjbGVhciBiaXRzIG9mIGd1ZXN0IGZyZWUgcGFnZXMgZnJvbSB0aGUgZGly
+dHkgYml0bWFwKQoxNy8yMiBDaGVja2luZyBjb21taXQgMDRmMTJmNDQ5MzFlIChtaWdyYXRpb24v
+cmFtLmM6IGFkZCBhIG5vdGlmaWVyIGNoYWluIGZvciBwcmVjb3B5KQoxOC8yMiBDaGVja2luZyBj
+b21taXQgZWEwNTU4NDNhNmY2IChtaWdyYXRpb24vcmFtLmM6IGFkZCB0aGUgZnJlZSBwYWdlIG9w
+dGltaXphdGlvbiBlbmFibGUgZmxhZykKMTkvMjIgQ2hlY2tpbmcgY29tbWl0IGZhZDZhN2EyZmU1
+ZSAodmlydGlvLWJhbGxvb246IFZJUlRJT19CQUxMT09OX0ZfRlJFRV9QQUdFX0hJTlQpCjIwLzIy
+IENoZWNraW5nIGNvbW1pdCAwNGZhNDFmM2ZlZDYgKE1pZ3JhdGlvbi9jb2xvLmM6IEZpeCBkb3Vi
+bGUgY2xvc2UgYnVnIHdoZW4gb2NjdXIgQ09MTyBmYWlsb3ZlcikKMjEvMjIgQ2hlY2tpbmcgY29t
+bWl0IDc5OTg1Yzg5YTFiZSAoTWlncmF0aW9uL2NvbG8uYzogTWFrZSBDT0xPIG5vZGUgcnVubmlu
+ZyBhZnRlciBmYWlsb3ZlcikKMjIvMjIgQ2hlY2tpbmcgY29tbWl0IDA2MGY1MDFiZGNiMiAocWFw
+aS9taWdyYXRpb24uanNvbjogUmVtb3ZlIGEgdmFyaWFibGUgdGhhdCBkb2Vzbid0IGV4aXN0IGlu
+IGV4YW1wbGUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
+b2dzLzIwMTkwMzA2MTE0MjI3LjkxMjUtMS1kZ2lsYmVydEByZWRoYXQuY29tL3Rlc3RpbmcuY2hl
+Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
