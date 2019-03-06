@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57762)
+Received: from eggs.gnu.org ([209.51.188.92]:58757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1YU8-0002a8-9q
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:29:32 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h1YXm-0004Gn-Jq
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:33:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1YU7-0007mP-Lm
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:29:32 -0500
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-7-jsnow@redhat.com>
-	<5d204716-dc54-70ac-8b67-266ce8f44e0e@redhat.com>
-	<ce11fd2d-0b28-9b67-2382-506f0bfd8754@redhat.com>
-	<15751e4f-6415-219f-036b-26a3515a72ce@redhat.com>
-	<93e3f474-0235-7500-b4c7-3a4da17b29dd@redhat.com>
-	<eab2ced5-9079-d302-18ec-24eda2ea836d@virtuozzo.com>
-	<7c1549db-3a4c-9100-ed7b-5e8bce39081b@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c2065cc3-7599-d7a6-17b5-c1362b02b5c2@redhat.com>
-Date: Wed, 6 Mar 2019 09:29:25 -0600
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h1YXl-0002NL-Eu
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:33:18 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 6 Mar 2019 15:33:11 +0000
+Message-ID: <6c9c5b9b-8093-e993-1027-db692d20e2e1@virtuozzo.com>
+References: <20190305234337.18353-1-jsnow@redhat.com>
+	<20190305234337.18353-5-jsnow@redhat.com>
+In-Reply-To: <20190305234337.18353-5-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4C1767D224096A4393E25D19FE5BED1D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <7c1549db-3a4c-9100-ed7b-5e8bce39081b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6cOw7EJrrLgI109JUTKOfYbC3P1a6bLeX"
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/dirty-bitmaps: disallow busy
- bitmaps as merge source
+Subject: Re: [Qemu-devel] [PATCH 4/5] block/qcow2-bitmap: Allow resizes with
+ persistent bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,84 +26,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6cOw7EJrrLgI109JUTKOfYbC3P1a6bLeX
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <c2065cc3-7599-d7a6-17b5-c1362b02b5c2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/dirty-bitmaps: disallow busy
- bitmaps as merge source
-References: <20190301191545.8728-1-jsnow@redhat.com>
- <20190301191545.8728-7-jsnow@redhat.com>
- <5d204716-dc54-70ac-8b67-266ce8f44e0e@redhat.com>
- <ce11fd2d-0b28-9b67-2382-506f0bfd8754@redhat.com>
- <15751e4f-6415-219f-036b-26a3515a72ce@redhat.com>
- <93e3f474-0235-7500-b4c7-3a4da17b29dd@redhat.com>
- <eab2ced5-9079-d302-18ec-24eda2ea836d@virtuozzo.com>
- <7c1549db-3a4c-9100-ed7b-5e8bce39081b@redhat.com>
-In-Reply-To: <7c1549db-3a4c-9100-ed7b-5e8bce39081b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 3/6/19 9:24 AM, John Snow wrote:
-
->>>
->>> We could always split it back out later, but in basic terms for
->>> permissions and user perspective, "in use" seems robust enough of a
->>> resolution. (It might be safe to read, it might not be, who knows --
->>> it's in use.)
->>
->> I think, if we need some kind of sharing busy bitmaps, it should be tw=
-o
->> busy states: one, which allows reads for other users and one that does=
-n't.
->>
-
-Indeed, similar to flock having shared (multiple read-only users) and
-exclusive (single writer) locks.  So it's nice to know we have a
-technical plan for growth, if we have a reason to use that plan.
-
->=20
-> I think that's... hopefully premature. We don't need this NOW do we?
-
-No, we don't need it now.
-
->=20
-> I think this is OK as-is.
-
-It sounds like we are in violent agreement ;)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---6cOw7EJrrLgI109JUTKOfYbC3P1a6bLeX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlx/51UACgkQp6FrSiUn
-Q2o+ogf/bdSFjOhhgjK09hYinpl9hYSsnBRgjIYPKR6DMbRdeTASavXhS/TSWJp7
-hAKl7ps3Px4ZG381djcFfvNyXP1p/coi1Qh9foPKl8u7zfrbWOnd5vjYoNhIjf4J
-DXuNWXpLWPKZuafI3ivcBcHdQfs+Et/SIGvS+DxkVOReFkdZ8vE6HjypJny/83A0
-udyBfKwstoG/wNEHvTpEk0RrHN3ytzBhjp7uRZtEC6szpgX1t2VxQJC+tQ4sez48
-b7rK34mNt4fEg8N2Q24lcbcPrKtdGGVsDdGUT5/FmuMgLhG0aUFQ78vCvnOHH5JY
-ypk2Nie+NmsmXGKesI3rZgsFnZNowA==
-=2H3i
------END PGP SIGNATURE-----
-
---6cOw7EJrrLgI109JUTKOfYbC3P1a6bLeX--
+MDYuMDMuMjAxOSAyOjQzLCBKb2huIFNub3cgd3JvdGU6DQo+IFNpbmNlIHdlIG5vdyBsb2FkIGFs
+bCBiaXRtYXBzIGludG8gbWVtb3J5IGFueXdheSwgd2UgY2FuIGp1c3QgdHJ1bmNhdGUgdGhlbQ0K
+PiBpbi1tZW1vcnkgYW5kIHRoZW4gZmx1c2ggdGhlbSBiYWNrIHRvIGRpc2suIEp1c3QgaW4gY2Fz
+ZSwgd2Ugd2lsbCBzdGlsbCBjaGVjaw0KPiBhbmQgZW5mb3JjZSB0aGF0IHRoaXMgc2hvcnRjdXQg
+aXMgdmFsaWQgLS0gaS5lLiB0aGF0IGFueSBiaXRtYXAgZGVzY3JpYmVkDQo+IG9uLWRpc2sgaXMg
+aW5kZWVkIGluLW1lbW9yeSBhbmQgY2FuIGJlIG1vZGlmaWVkLg0KPiANCj4gSWYgdGhlcmUgYXJl
+IGFueSBpbmNvbnNpc3RlbnQgYml0bWFwcywgd2UgcmVmdXNlIHRvIGFsbG93IHRoZSB0cnVuY2F0
+ZSBhcw0KPiB3ZSBkbyBub3QgYWN0dWFsbHkgbG9hZCB0aGVzZSBiaXRtYXBzIGludG8gbWVtb3J5
+LCBhbmQgaXQgaXNuJ3Qgc2FmZSBvcg0KPiByZWFzb25hYmxlIHRvIGF0dGVtcHQgdG8gdHJ1bmNh
+dGUgY29ycnVwdGVkIGRhdGEuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNub3cgPGpzbm93
+QHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgIGJsb2NrL3Fjb3cyLmggICAgICAgIHwgIDEgKw0KPiAg
+IGJsb2NrL3Fjb3cyLWJpdG1hcC5jIHwgNDIgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrDQo+ICAgYmxvY2svcWNvdzIuYyAgICAgICAgfCAyNyArKysrKysrKysrKysr
+KysrKysrKy0tLS0tLS0NCj4gICAzIGZpbGVzIGNoYW5nZWQsIDYzIGluc2VydGlvbnMoKyksIDcg
+ZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzIuaCBiL2Jsb2NrL3Fj
+b3cyLmgNCj4gaW5kZXggNGMxZmRmY2JlYy4uYjkyMjdhNzJjYyAxMDA2NDQNCj4gLS0tIGEvYmxv
+Y2svcWNvdzIuaA0KPiArKysgYi9ibG9jay9xY293Mi5oDQo+IEBAIC02ODksNiArNjg5LDcgQEAg
+UWNvdzJCaXRtYXBJbmZvTGlzdCAqcWNvdzJfZ2V0X2JpdG1hcF9pbmZvX2xpc3QoQmxvY2tEcml2
+ZXJTdGF0ZSAqYnMsDQo+ICAgaW50IHFjb3cyX3Jlb3Blbl9iaXRtYXBzX3J3X2hpbnQoQmxvY2tE
+cml2ZXJTdGF0ZSAqYnMsIGJvb2wgKmhlYWRlcl91cGRhdGVkLA0KPiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCk7DQo+ICAgaW50IHFjb3cyX3Jlb3Blbl9i
+aXRtYXBzX3J3KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBFcnJvciAqKmVycnApOw0KPiAraW50IHFj
+b3cyX3RydW5jYXRlX2JpdG1hcHNfY2hlY2soQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoq
+ZXJycCk7DQo+ICAgdm9pZCBxY293Ml9zdG9yZV9wZXJzaXN0ZW50X2RpcnR5X2JpdG1hcHMoQmxv
+Y2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJycCk7DQo+ICAgdm9pZCBxY293Ml9mbHVzaF9w
+ZXJzaXN0ZW50X2RpcnR5X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJy
+cCk7DQo+ICAgaW50IHFjb3cyX3Jlb3Blbl9iaXRtYXBzX3JvKEJsb2NrRHJpdmVyU3RhdGUgKmJz
+LCBFcnJvciAqKmVycnApOw0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItYml0bWFwLmMgYi9i
+bG9jay9xY293Mi1iaXRtYXAuYw0KPiBpbmRleCA5MzczMDU1ZDNiLi4yNGYyODBiY2NjIDEwMDY0
+NA0KPiAtLS0gYS9ibG9jay9xY293Mi1iaXRtYXAuYw0KPiArKysgYi9ibG9jay9xY293Mi1iaXRt
+YXAuYw0KPiBAQCAtMTE2Nyw2ICsxMTY3LDQ4IEBAIGludCBxY293Ml9yZW9wZW5fYml0bWFwc19y
+dyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKQ0KPiAgICAgICByZXR1cm4gcWNv
+dzJfcmVvcGVuX2JpdG1hcHNfcndfaGludChicywgTlVMTCwgZXJycCk7DQo+ICAgfQ0KPiAgIA0K
+PiArLyogQ2hlY2tzIHRvIHNlZSBpZiBpdCdzIHNhZmUgdG8gcmVzaXplIGJpdG1hcHMgKi8NCj4g
+K2ludCBxY293Ml90cnVuY2F0ZV9iaXRtYXBzX2NoZWNrKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBF
+cnJvciAqKmVycnApDQo+ICt7DQo+ICsgICAgQkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+b3BhcXVl
+Ow0KPiArICAgIFFjb3cyQml0bWFwTGlzdCAqYm1fbGlzdDsNCj4gKyAgICBRY293MkJpdG1hcCAq
+Ym07DQo+ICsgICAgaW50IHJldCA9IDA7DQo+ICsNCj4gKyAgICBpZiAocy0+bmJfYml0bWFwcyA9
+PSAwKSB7DQo+ICsgICAgICAgIHJldHVybiAwOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGJtX2xp
+c3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGlyZWN0b3J5X29mZnNldCwNCj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUs
+IGZhbHNlLCBlcnJwKTsNCj4gKyAgICBpZiAoYm1fbGlzdCA9PSBOVUxMKSB7DQo+ICsgICAgICAg
+IHJldHVybiAtRUlOVkFMOw0KPiArICAgIH0NCj4gKw0KPiArICAgIFFTSU1QTEVRX0ZPUkVBQ0go
+Ym0sIGJtX2xpc3QsIGVudHJ5KSB7DQo+ICsgICAgICAgIEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFw
+ID0gYmRydl9maW5kX2RpcnR5X2JpdG1hcChicywgYm0tPm5hbWUpOw0KPiArICAgICAgICBpZiAo
+Yml0bWFwID09IE5VTEwpIHsNCj4gKyAgICAgICAgICAgIC8qIFdlIHJlbHkgb24gYWxsIGJpdG1h
+cHMgYmVpbmcgaW4tbWVtb3J5IHRvIGJlIGFibGUgdG8gcmVzaXplIHRoZW0sDQo+ICsgICAgICAg
+ICAgICAgKiBPdGhlcndpc2UsIHdlJ2QgbmVlZCB0byByZXNpemUgdGhlbSBvbiBkaXNrIGV4cGxp
+Y2l0bHkgKi8NCj4gKyAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkNhbm5vdCByZXNpemUg
+cWNvdzIgd2l0aCBwZXJzaXN0ZW50IGJpdG1hcHMgdGhhdCAiDQo+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICJ3ZXJlIG5vdCBsb2FkZWQgaW50byBtZW1vcnkiKTsNCj4gKyAgICAgICAgICAgIHJl
+dCA9IC1FTk9UU1VQOw0KPiArICAgICAgICAgICAgZ290byBvdXQ7DQo+ICsgICAgICAgIH0NCj4g
+Kw0KPiArICAgICAgICAvKiBUaGUgY2hlY2tzIGFnYWluc3QgcmVhZG9ubHkgYW5kIGJ1c3kgYXJl
+IHJlZHVuZGFudCwgYnV0IGNlcnRhaW5seQ0KPiArICAgICAgICAgKiBkbyBubyBoYXJtLiBjaGVj
+a3MgYWdhaW5zdCBpbmNvbnNpc3RlbnQgYXJlIGNydWNpYWw6ICovDQo+ICsgICAgICAgIGlmIChi
+ZHJ2X2RpcnR5X2JpdG1hcF9jaGVjayhiaXRtYXAsIEJEUlZfQklUTUFQX0RFRkFVTFQsIGVycnAp
+KSB7DQo+ICsgICAgICAgICAgICByZXQgPSAtRU5PVFNVUDsNCj4gKyAgICAgICAgICAgIGdvdG8g
+b3V0Ow0KPiArICAgICAgICB9DQo+ICsgICAgfQ0KPiArDQo+ICtvdXQ6DQo+ICsgICAgYml0bWFw
+X2xpc3RfZnJlZShibV9saXN0KTsNCj4gKyAgICByZXR1cm4gcmV0Ow0KPiArfQ0KPiArDQo+ICAg
+Lyogc3RvcmVfYml0bWFwX2RhdGEoKQ0KPiAgICAqIFN0b3JlIGJpdG1hcCB0byBpbWFnZSwgZmls
+bGluZyBiaXRtYXAgdGFibGUgYWNjb3JkaW5nbHkuDQo+ICAgICovDQo+IGRpZmYgLS1naXQgYS9i
+bG9jay9xY293Mi5jIGIvYmxvY2svcWNvdzIuYw0KPiBpbmRleCA3ZmIyNzMwZjA5Li42ZmQ5MjUy
+NDk0IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5jDQo+ICsrKyBiL2Jsb2NrL3Fjb3cyLmMN
+Cj4gQEAgLTM0NzIsNyArMzQ3Miw3IEBAIHN0YXRpYyBpbnQgY29yb3V0aW5lX2ZuIHFjb3cyX2Nv
+X3RydW5jYXRlKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBpbnQ2NF90IG9mZnNldCwNCj4gICB7DQo+
+ICAgICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4gICAgICAgdWludDY0X3Qg
+b2xkX2xlbmd0aDsNCj4gLSAgICBpbnQ2NF90IG5ld19sMV9zaXplOw0KPiArICAgIGludDY0X3Qg
+bmV3X2wxX3NpemUsIG9mZnNldF9iZTsNCj4gICAgICAgaW50IHJldDsNCj4gICAgICAgUURpY3Qg
+Km9wdGlvbnM7DQo+ICAgDQo+IEBAIC0zNDk4LDEwICszNDk4LDggQEAgc3RhdGljIGludCBjb3Jv
+dXRpbmVfZm4gcWNvdzJfY29fdHJ1bmNhdGUoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGludDY0X3Qg
+b2Zmc2V0LA0KPiAgICAgICAgICAgZ290byBmYWlsOw0KPiAgICAgICB9DQo+ICAgDQo+IC0gICAg
+LyogY2Fubm90IHByb2NlZWQgaWYgaW1hZ2UgaGFzIGJpdG1hcHMgKi8NCj4gLSAgICBpZiAocy0+
+bmJfYml0bWFwcykgew0KPiAtICAgICAgICAvKiBUT0RPOiByZXNpemUgYml0bWFwcyBpbiB0aGUg
+aW1hZ2UgKi8NCj4gLSAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQ2FuJ3QgcmVzaXplIGFuIGlt
+YWdlIHdoaWNoIGhhcyBiaXRtYXBzIik7DQo+ICsgICAgLyogT25seSBjZXJ0YWluIHBlcnNpc3Rl
+bnQgYml0bWFwcyBjYW4gYmUgcmVzaXplZDogKi8NCj4gKyAgICBpZiAocWNvdzJfdHJ1bmNhdGVf
+Yml0bWFwc19jaGVjayhicywgZXJycCkpIHsNCj4gICAgICAgICAgIHJldCA9IC1FTk9UU1VQOw0K
+PiAgICAgICAgICAgZ290byBmYWlsOw0KPiAgICAgICB9DQo+IEBAIC0zNzAyLDkgKzM3MDAsOSBA
+QCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBxY293Ml9jb190cnVuY2F0ZShCbG9ja0RyaXZlclN0
+YXRlICpicywgaW50NjRfdCBvZmZzZXQsDQo+ICAgICAgIGJzLT50b3RhbF9zZWN0b3JzID0gb2Zm
+c2V0IC8gQkRSVl9TRUNUT1JfU0laRTsNCj4gICANCj4gICAgICAgLyogd3JpdGUgdXBkYXRlZCBo
+ZWFkZXIuc2l6ZSAqLw0KPiAtICAgIG9mZnNldCA9IGNwdV90b19iZTY0KG9mZnNldCk7DQo+ICsg
+ICAgb2Zmc2V0X2JlID0gY3B1X3RvX2JlNjQob2Zmc2V0KTsNCj4gICAgICAgcmV0ID0gYmRydl9w
+d3JpdGVfc3luYyhicy0+ZmlsZSwgb2Zmc2V0b2YoUUNvd0hlYWRlciwgc2l6ZSksDQo+IC0gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAmb2Zmc2V0LCBzaXplb2YodWludDY0X3QpKTsNCj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICZvZmZzZXRfYmUsIHNpemVvZih1aW50NjRfdCkpOw0K
+PiAgICAgICBpZiAocmV0IDwgMCkgew0KPiAgICAgICAgICAgZXJyb3Jfc2V0Z19lcnJubyhlcnJw
+LCAtcmV0LCAiRmFpbGVkIHRvIHVwZGF0ZSB0aGUgaW1hZ2Ugc2l6ZSIpOw0KPiAgICAgICAgICAg
+Z290byBmYWlsOw0KPiBAQCAtMzcxOSw2ICszNzE3LDIxIEBAIHN0YXRpYyBpbnQgY29yb3V0aW5l
+X2ZuIHFjb3cyX2NvX3RydW5jYXRlKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBpbnQ2NF90IG9mZnNl
+dCwNCj4gICAgICAgaWYgKHJldCA8IDApIHsNCj4gICAgICAgICAgIGdvdG8gZmFpbDsNCj4gICAg
+ICAgfQ0KPiArDQo+ICsgICAgLyogRmx1c2ggYml0bWFwcyAqLw0KPiArICAgIGlmIChzLT5uYl9i
+aXRtYXBzKSB7DQo+ICsgICAgICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPiArDQo+ICsg
+ICAgICAgIC8qIFVzdWFsbHksIGJpdG1hcHMgZ2V0IHJlc2l6ZWQgYWZ0ZXIgdGhpcyBjYWxsLg0K
+PiArICAgICAgICAgKiBGb3JjZSBpdCBlYXJsaWVyIHNvIHdlIGNhbiBtYWtlIHRoZSBtZXRhZGF0
+YSBjb25zaXN0ZW50LiAqLw0KPiArICAgICAgICBiZHJ2X2RpcnR5X2JpdG1hcF90cnVuY2F0ZShi
+cywgb2Zmc2V0KTsNCj4gKyAgICAgICAgcWNvdzJfZmx1c2hfcGVyc2lzdGVudF9kaXJ0eV9iaXRt
+YXBzKGJzLCAmbG9jYWxfZXJyKTsNCj4gKyAgICAgICAgaWYgKGxvY2FsX2Vycikgew0KPiArICAg
+ICAgICAgICAgcmV0ID0gLUVJTlZBTDsNCj4gKyAgICAgICAgICAgIGdvdG8gZmFpbDsNCj4gKyAg
+ICAgICAgfQ0KPiArICAgIH0NCg0KV2h5IHRvIGZsdXNoIGFmdGVyIHJlc2l6ZT8gQml0bWFwcyB3
+aWxsIGJlIElOX1VTRSBpbiB0aGUgaW1hZ2UgYW55d2F5Li4uDQoNCkNvdWxkIHdlIGltcGxlbWVu
+dCByZXNpemUgd2l0aG91dCBmbHVzaCBmaXJzdCwgIGl0IHdvdWxkIGJlIG9uZSBwYXRjaCArIHRl
+c3Q/IEFuZCB0aGVuIGNvbnNpZGVyDQpmbHVzaGluZyBpbiBzZXBhcmF0ZT8NCg0KPiArDQo+ICAg
+ICAgIHJldCA9IDA7DQo+ICAgZmFpbDoNCj4gICAgICAgcWVtdV9jb19tdXRleF91bmxvY2soJnMt
+PmxvY2spOw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
