@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52808)
+Received: from eggs.gnu.org ([209.51.188.92]:53052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h1aOc-0000fJ-Kf
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:31:59 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h1aQ1-0001PU-QE
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:33:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h1aOZ-0006Ai-1v
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:31:56 -0500
-Date: Wed, 6 Mar 2019 18:31:48 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190306183148.665ef286.cohuck@redhat.com>
-In-Reply-To: <75da1e7f-3be4-ccb9-719e-c40c39f93f79@linux.ibm.com>
-References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-	<1551466776-29123-2-git-send-email-jjherne@linux.ibm.com>
-	<20190304144010.109e5ee1.cohuck@redhat.com>
-	<cf5e9c71-a78a-02b1-eaa8-4c8ba5c2c8a3@linux.ibm.com>
-	<20190306162729.0698ccb5.cohuck@redhat.com>
-	<75da1e7f-3be4-ccb9-719e-c40c39f93f79@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/16] s390 vfio-ccw: Add bootindex
- property and IPLB data
+	(envelope-from <imammedo@redhat.com>) id 1h1aQ1-0006z3-1M
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:33:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1h1aQ0-0006yi-R5
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:33:24 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14B4D81DFF
+	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 17:33:24 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Wed,  6 Mar 2019 18:33:25 +0100
+Message-Id: <1551893605-236413-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] numa: warn if numa 'mem' option or default
+ RAM splitting between nodes is used.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, libvir-list@redhat.com, berrange@redhat.com, eblake@redhat.com
 
-On Wed, 6 Mar 2019 11:28:37 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+Amend -numa option docs and print warnings if 'mem' option or default RAM
+splitting between nodes is used. It's intended to discourage users from using
+configuration that allows only to fake NUMA on guest side while leading
+to reduced performance of the guest due to inability to properly configure
+VM's RAM on the host.
 
-> On 3/6/19 10:27 AM, Cornelia Huck wrote:
-> > On Wed, 6 Mar 2019 09:55:40 -0500
-> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-> >   
-> >> On 3/4/19 8:40 AM, Cornelia Huck wrote:  
-> >>> On Fri,  1 Mar 2019 13:59:21 -0500
-> >>> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:  
-> >   
-> >>>> @@ -532,7 +559,7 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
-> >>>>            !ipl->netboot &&
-> >>>>            ipl->iplb.pbt == S390_IPL_TYPE_CCW &&
-> >>>>            is_virtio_scsi_device(&ipl->iplb)) {
-> >>>> -        CcwDevice *ccw_dev = s390_get_ccw_device(get_boot_device(0));
-> >>>> +        CcwDevice *ccw_dev = s390_get_ccw_device(get_boot_device(0), &devtype);  
-> >>>
-> >>> It feels wrong to have a variable that is not used later... what about
-> >>> either
-> >>> - making s390_get_ccw_device() capable of handling a NULL second
-> >>>     parameter, or
-> >>> - (what I think would be nicer) passing in the devtype as an optional
-> >>>     parameter to gen_initial_iplb() so you don't need to do the casting
-> >>>     dance twice?
-> >>>      
-> >>
-> >> I'm with you on everything suggested for this patch except this last item. I'm not sure
-> >> what you are suggesting here. I can easily visualize passing NULL for devtype when we want
-> >> to ignore it but I'm not sure what you mean by 'optional parameter'  
-> > 
-> > Hm, actually you'd need the device as well :) Basically,
-> > 
-> > static bool s390_gen_initial_iplb(S390IPLState *ipl, CcwDevice *ccw_dev, int devtype)
-> > {
-> > (...)
-> >      if (!ccw_dev) {
-> >          //get ccw_dev, which also gives us the devtype
-> >      }
-> > 
-> >      if (ccw_dev) {
-> >          //as before; devtype is valid here
-> >          (...)
-> >          return true;
-> >      }
-> >      return false;
-> > }
-> > 
-> > So you can call it with s390_gen_initial_iplb(ipl, NULL, 0) if you
-> > don't have the values already.
-> > 
-> >   
-> Ahh, makes sense now. Thanks for clarifying. I can do it that way, but it does seem a bit 
-> redundant to allow s390_gen_initial_iplb to be called either with, or without the device 
-> type data. In the case where it is called without, it just has to make the call to 
-> s390_get_ccw_device anyway. So, to me, it seems like added lines of code for very little 
-> benefit. Why not either always call s390_get_ccw_device from inside s390_gen_initial_iplb, 
-> or always require the parameters to be valid?
-> 
+In NUMA case, it's recommended to always explicitly configure guest RAM
+using -numa node,memdev={backend-id} option.
 
-My main goal was to avoid needing to do the casting twice. If that
-makes the code too ugly, we can also go back to making
-s390_get_ccw_device accept a NULL devtype (which I'd find less ugly
-than needing to pass in an unused variable.)
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ numa.c          |  5 +++++
+ qemu-options.hx | 12 ++++++++----
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/numa.c b/numa.c
+index 3875e1e..42838f9 100644
+--- a/numa.c
++++ b/numa.c
+@@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+ 
+     if (node->has_mem) {
+         numa_info[nodenr].node_mem = node->mem;
++        warn_report("Parameter -numa node,mem is obsolete,"
++                    " use -numa node,memdev instead");
+     }
+     if (node->has_memdev) {
+         Object *o;
+@@ -407,6 +409,9 @@ void numa_complete_configuration(MachineState *ms)
+         if (i == nb_numa_nodes) {
+             assert(mc->numa_auto_assign_ram);
+             mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
++            warn_report("Default splitting of RAM between nodes is obsolete,"
++                        " Use '-numa node,memdev' to explicitly define RAM"
++                        " allocation per node");
+         }
+ 
+         numa_total = 0;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 1cf9aac..61035cb 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -206,10 +206,14 @@ For example:
+ -numa cpu,node-id=0,socket-id=0 -numa cpu,node-id=1,socket-id=1
+ @end example
+ 
+-@samp{mem} assigns a given RAM amount to a node. @samp{memdev}
+-assigns RAM from a given memory backend device to a node. If
+-@samp{mem} and @samp{memdev} are omitted in all nodes, RAM is
+-split equally between them.
++@samp{memdev} assigns RAM from a given memory backend device to a node.
++
++Legacy options/behaviour: @samp{mem} assigns a given RAM amount to a node.
++If @samp{mem} and @samp{memdev} are omitted in all nodes, RAM is split equally
++between them. Option @samp{mem} and default RAM splitting are obsolete as they
++do not provide means to manage RAM on the host side and only allow QEMU to fake
++NUMA support which in practice could degrade VM performance.
++It's advised to always explicitly configure NUMA RAM by using the @samp{memdev} option.
+ 
+ @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
+ if one node uses @samp{memdev}, all of them have to use it.
+-- 
+2.7.4
