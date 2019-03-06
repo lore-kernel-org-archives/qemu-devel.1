@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47434)
+Received: from eggs.gnu.org ([209.51.188.92]:47419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1gRB-0003CU-2G
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:59:01 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1gR8-00038P-5w
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:59:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1gRA-0003u9-8c
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:59:01 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:43760)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1gR7-0003mg-DY
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:58:58 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:43736)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1h1gRA-0003tW-1M
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:59:00 -0500
+	id 1h1gR7-0003lh-4X
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:58:57 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Mar 2019 00:58:46 +0100
-Message-Id: <20190306235850.30110-9-samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Mar 2019 00:58:48 +0100
+Message-Id: <20190306235850.30110-11-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190306235850.30110-1-samuel.thibault@ens-lyon.org>
 References: <20190306235850.30110-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/12] slirp: use "slirp_" prefix for
- inet_aton() win32 implementation
+Subject: [Qemu-devel] [PULL 10/12] slirp: add a standalone Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,59 +32,71 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-To avoid conflict with QEMU inet_aton() implementation, let's use the
-"slirp_" prefix. This allows to drop the WITH_QEMU, thus the source
-won't make a distinction when building with QEMU or not.
+Add a simple Makefile to build libslirp.a, a static library version of
+libslirp, to be used by QEMU during a transition period, until a
+shared library is available.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20190212162524.31504-4-marcandre.lureau@redhat.com>
+Message-Id: <20190212162524.31504-6-marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/Makefile.objs | 2 +-
- slirp/util.c        | 4 ++--
- slirp/util.h        | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ slirp/Makefile | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+ create mode 100644 slirp/Makefile
 
-diff --git a/slirp/Makefile.objs b/slirp/Makefile.objs
-index 69e140f965..e91daf0e91 100644
---- a/slirp/Makefile.objs
-+++ b/slirp/Makefile.objs
-@@ -33,4 +33,4 @@ slirp.mo-objs =3D \
- 	vmstate.o \
- 	$(NULL)
-=20
--slirp.mo-cflags =3D -DG_LOG_DOMAIN=3D\"Slirp\" -DWITH_QEMU
-+slirp.mo-cflags =3D -DG_LOG_DOMAIN=3D\"Slirp\"
-diff --git a/slirp/util.c b/slirp/util.c
-index 1cbaa26b60..5ec2fa87ab 100644
---- a/slirp/util.c
-+++ b/slirp/util.c
-@@ -31,8 +31,8 @@
- #include <fcntl.h>
- #include <stdint.h>
-=20
--#if defined(_WIN32) && !defined(WITH_QEMU)
--int inet_aton(const char *cp, struct in_addr *ia)
-+#if defined(_WIN32)
-+int slirp_inet_aton(const char *cp, struct in_addr *ia)
- {
-     uint32_t addr =3D inet_addr(cp);
-     if (addr =3D=3D 0xffffffff) {
-diff --git a/slirp/util.h b/slirp/util.h
-index c4207a49d6..e94ee4e7f1 100644
---- a/slirp/util.h
-+++ b/slirp/util.h
-@@ -138,8 +138,8 @@ int slirp_getsockopt_wrap(int sockfd, int level, int =
-optname,
- #define setsockopt slirp_setsockopt_wrap
- int slirp_setsockopt_wrap(int sockfd, int level, int optname,
-                           const void *optval, int optlen);
--
--int inet_aton(const char *cp, struct in_addr *ia);
-+#define inet_aton slirp_inet_aton
-+int slirp_inet_aton(const char *cp, struct in_addr *ia);
- #else
- #define closesocket(s) close(s)
- #define ioctlsocket(s, r, v) ioctl(s, r, v)
+diff --git a/slirp/Makefile b/slirp/Makefile
+new file mode 100644
+index 0000000000..6d48f626ba
+--- /dev/null
++++ b/slirp/Makefile
+@@ -0,0 +1,47 @@
++ROOT_DIR :=3D $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
++BUILD_DIR ?=3D .
++
++LIBSLIRP =3D $(BUILD_DIR)/libslirp.a
++
++all: $(LIBSLIRP)
++
++SRCS :=3D $(wildcard src/*.c)
++OBJS :=3D $(SRCS:%.c=3D$(BUILD_DIR)/%.o)
++DEPS :=3D $(OBJS:%.o=3D%.d)
++
++INC_DIRS :=3D $(BUILD_DIR)/src
++INC_FLAGS :=3D $(addprefix -I,$(INC_DIRS))
++
++override CFLAGS +=3D					\
++	-DG_LOG_DOMAIN=3D'"Slirp"'			\
++	$(shell $(PKG_CONFIG) --cflags glib-2.0)	\
++	$(INC_FLAGS)					\
++	-MMD -MP
++override LDFLAGS +=3D $(shell $(PKG_CONFIG) --libs glib-2.0)
++
++$(LIBSLIRP): $(OBJS)
++
++.PHONY: clean
++
++clean:
++	rm -r $(OBJS) $(DEPS) $(LIBSLIRP)
++
++$(BUILD_DIR)/src/%.o: $(ROOT_DIR)/src/%.c
++	@$(MKDIR_P) $(dir $@)
++	$(call quiet-command,$(CC) $(CFLAGS) -c -o $@ $<,"CC","$@")
++
++%.a:
++	$(call quiet-command,rm -f $@ && $(AR) rcs $@ $^,"AR","$@")
++
++PKG_CONFIG ?=3D pkg-config
++MKDIR_P ?=3D mkdir -p
++quiet-command-run =3D $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && )=
+)$1
++quiet-@ =3D $(if $(V),,@)
++quiet-command =3D $(quiet-@)$(call quiet-command-run,$1,$2,$3)
++
++print-%:
++	@echo '$*=3D$($*)'
++
++.SUFFIXES:
++
++-include $(DEPS)
 --=20
 2.20.1
