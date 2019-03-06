@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55914)
+Received: from eggs.gnu.org ([209.51.188.92]:55989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1Tqm-0003ew-FO
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:32:38 -0500
+	(envelope-from <randrianasulu@gmail.com>) id 1h1Tqu-0003io-O7
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:32:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1Tqk-0005fc-Gp
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:32:36 -0500
-Date: Wed, 6 Mar 2019 11:23:57 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190306112357.168326d2@redhat.com>
-In-Reply-To: <25a67533-b557-25dd-c528-0034fe06c3e2@redhat.com>
-References: <20190301140623.5390-1-eric.auger@redhat.com>
-	<e0565169-23e6-5934-47b1-478130ee987e@linux.ibm.com>
-	<25a67533-b557-25dd-c528-0034fe06c3e2@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] machine: Move acpi_nvdimm_state into
- struct MachineState
+	(envelope-from <randrianasulu@gmail.com>) id 1h1Tqs-00060B-M6
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:32:44 -0500
+From: Andrew Randrianasulu <randrianasulu@gmail.com>
+Date: Wed,  6 Mar 2019 13:28:12 +0300
+Message-Id: <20190306102812.28972-1-randrianasulu@gmail.com>
+Subject: [Qemu-devel] [PATCH v3] PPC: E500: Add FSL I2C controller and
+ integrate RTC with it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,476 +18,528 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Shivaprasad G Bhat <sbhat@linux.ibm.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, richard.henderson@linaro.org
+To: David Gibson <david@gibson.dropbear.id.au>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
+Cc: Andrew Randrianasulu <randrianasulu@gmail.com>, Amit Singh Tomar <amit.tomar@freescale.com>
 
-On Tue, 5 Mar 2019 10:39:49 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+Original commit message:
+This patch adds an emulation model for i2c controller found on most of the FSL SoCs.
+It also integrates the RTC (ds1338) that sits on the i2c Bus with e500 machine model.
 
-> Hi Shivaprasad,
->=20
-> On 3/5/19 10:35 AM, Shivaprasad G Bhat wrote:
-> >=20
-> >=20
-> > On 03/01/2019 07:36 PM, Eric Auger wrote: =20
-> >> As NVDIMM support is looming for ARM and SPAPR, let's
-> >> move the acpi_nvdimm_state to the generic machine struct =20
-> > Name - "acpi_nvdimm_state" sounds very x86 specific.
-> >=20
-> > Could you please rename ? =20
-> Sure, do you have any suggestion?
-would "nvdimms_state" do?
+Patch was originally written by Amit Singh Tomar <amit.tomar@freescale.com>
+see http://patchwork.ozlabs.org/patch/431475/
+I only fixed it enough for application on top of current qemu master
+20b084c4b1401b7f8fbc385649d48c67b6f43d44, and hopefully fixed checkpatch errors
 
->=20
-> Thanks
->=20
-> Eric
-> >=20
-> > Thanks,
-> > Shivaprasad =20
-> >> instead of duplicating the same code in several machines.
-> >>
-> >> nvdimm and nvdimm-persistence become generic machine options.
-> >> We also add a description for those options.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> >> ---
-> >> =C2=A0 hw/core/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 5=
-7 ++++++++++++++++++++++++++++++++++++++++
-> >> =C2=A0 hw/i386/acpi-build.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 6 ++---
-> >> =C2=A0 hw/i386/pc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 | 56 +++------------------------------------
-> >> =C2=A0 hw/i386/pc_piix.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0 4 +--
-> >> =C2=A0 hw/i386/pc_q35.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 4 +--
-> >> =C2=A0 include/hw/boards.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 ++
-> >> =C2=A0 include/hw/i386/pc.h=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 4 ---
-> >> =C2=A0 include/hw/mem/pc-dimm.h |=C2=A0 1 -
-> >> =C2=A0 8 files changed, 70 insertions(+), 64 deletions(-)
-> >>
-> >> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> >> index 766ca5899d..19a5ee7cd8 100644
-> >> --- a/hw/core/machine.c
-> >> +++ b/hw/core/machine.c
-> >> @@ -481,6 +481,47 @@ static void machine_set_memory_encryption(Object
-> >> *obj, const char *value,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->memory_encryption =3D g_strdup(valu=
-e);
-> >> =C2=A0 }
-> >> =C2=A0 +static bool machine_get_nvdimm(Object *obj, Error **errp)
-> >> +{
-> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(obj);
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 return ms->acpi_nvdimm_state.is_enabled;
-> >> +}
-> >> +
-> >> +static void machine_set_nvdimm(Object *obj, bool value, Error **errp)
-> >> +{
-> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(obj);
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 ms->acpi_nvdimm_state.is_enabled =3D value;
-> >> +}
-> >> +
-> >> +static char *machine_get_nvdimm_persistence(Object *obj, Error **errp)
-> >> +{
-> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(obj);
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 return g_strdup(ms->acpi_nvdimm_state.persistence_=
-string);
-> >> +}
-> >> +
-> >> +static void machine_set_nvdimm_persistence(Object *obj, const char
-> >> *value,
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
-> >> +{
-> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(obj);
-> >> +=C2=A0=C2=A0=C2=A0 AcpiNVDIMMState *nvdimm_state =3D &ms->acpi_nvdimm=
-_state;
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 if (strcmp(value, "cpu") =3D=3D 0)
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence =
-=3D 3;
-> >> +=C2=A0=C2=A0=C2=A0 else if (strcmp(value, "mem-ctrl") =3D=3D 0)
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence =
-=3D 2;
-> >> +=C2=A0=C2=A0=C2=A0 else {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "-machine=
- nvdimm-persistence=3D%s: unsupported
-> >> option",
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value);
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
-> >> +=C2=A0=C2=A0=C2=A0 }
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 g_free(nvdimm_state->persistence_string);
-> >> +=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence_string =3D g_strdup(valu=
-e);
-> >> +}
-> >> +
-> >> =C2=A0 void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, c=
-onst
-> >> char *type)
-> >> =C2=A0 {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 strList *item =3D g_new0(strList, 1);
-> >> @@ -765,6 +806,20 @@ static void machine_class_init(ObjectClass *oc,
-> >> void *data)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &error_abort);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_class_property_set_description(o=
-c, "memory-encryption",
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Set memory enc=
-ryption object to use", &error_abort);
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 object_class_property_add_bool(oc, "nvdimm",
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_get_nvdimm, machin=
-e_set_nvdimm, &error_abort);
-> >> +=C2=A0=C2=A0=C2=A0 object_class_property_set_description(oc, "nvdimm",
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 "Set on/off to
-> >> enable/disable NVDIMM "
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 "instantiation", NULL);
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 object_class_property_add_str(oc, "nvdimm-persiste=
-nce",
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_get_nvdimm_p=
-ersistence,
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_set_nvdimm_p=
-ersistence,
-> >> &error_abort);
-> >> +=C2=A0=C2=A0=C2=A0 object_class_property_set_description(oc, "nvdimm-=
-persistence",
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Set NVDIMM persistence"
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Valid values are cpu and
-> >> mem-ctrl",
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 NULL);
-> >> =C2=A0 }
-> >> =C2=A0 =C2=A0 static void machine_class_base_init(ObjectClass *oc, voi=
-d *data)
-> >> @@ -790,6 +845,8 @@ static void machine_initfn(Object *obj)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->dump_guest_core =3D true;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->mem_merge =3D true;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->enable_graphics =3D true;
-> >> +=C2=A0=C2=A0=C2=A0 /* nvdimm is disabled on default. */
-> >> +=C2=A0=C2=A0=C2=A0 ms->acpi_nvdimm_state.is_enabled =3D false;
-> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Register notifier when init i=
-s done for sysbus sanity
-> >> checks */
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->sysbus_notifier.notify =3D machine_=
-init_notify;
-> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> >> index 9ecc96dcc7..622ccb9408 100644
-> >> --- a/hw/i386/acpi-build.c
-> >> +++ b/hw/i386/acpi-build.c
-> >> @@ -1867,7 +1867,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linke=
-r,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 aml_append(scope, method);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (pcms->acpi_nvdi=
-mm_state.is_enabled) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (machine->acpi_nvdimm_s=
-tate.is_enabled) {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 method =3D aml_method("_E04", 0, AML_NOTSERIALIZED);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 aml_append(method, aml_notify(aml_name("\\_SB.NVDR"),
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aml_int(0x80)));
-> >> @@ -2704,9 +2704,9 @@ void acpi_build(AcpiBuildTables *tables,
-> >> MachineState *machine)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 build_dmar_q35(tables_blob, tables->linker);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> -=C2=A0=C2=A0=C2=A0 if (pcms->acpi_nvdimm_state.is_enabled) {
-> >> +=C2=A0=C2=A0=C2=A0 if (machine->acpi_nvdimm_state.is_enabled) {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_build_ac=
-pi(table_offsets, tables_blob, tables->linker,
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 &pcms->acpi_nvdimm_state, machine->ram_slots);
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 &machine->acpi_nvdimm_state,
-> >> machine->ram_slots);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Add tables supplied by user (=
-if any) */
-> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> >> index 3889eccdc3..356213e0b8 100644
-> >> --- a/hw/i386/pc.c
-> >> +++ b/hw/i386/pc.c
-> >> @@ -2096,6 +2096,7 @@ static void pc_memory_pre_plug(HotplugHandler
-> >> *hotplug_dev, DeviceState *dev,
-> >> =C2=A0 {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const PCMachineState *pcms =3D PC_MACHI=
-NE(hotplug_dev);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const PCMachineClass *pcmc =3D PC_MACHI=
-NE_GET_CLASS(pcms);
-> >> +=C2=A0=C2=A0=C2=A0 const MachineState *ms =3D MACHINE(hotplug_dev);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const bool is_nvdimm =3D object_dynamic=
-_cast(OBJECT(dev),
-> >> TYPE_NVDIMM);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const uint64_t legacy_align =3D TARGET_=
-PAGE_SIZE;
-> >> =C2=A0 @@ -2110,7 +2111,7 @@ static void pc_memory_pre_plug(HotplugHan=
-dler
-> >> *hotplug_dev, DeviceState *dev,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (is_nvdimm && !pcms->acpi_nvdimm_state.i=
-s_enabled) {
-> >> +=C2=A0=C2=A0=C2=A0 if (is_nvdimm && !ms->acpi_nvdimm_state.is_enabled=
-) {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp=
-, "nvdimm is not enabled: missing 'nvdimm' in
-> >> '-M'");
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> @@ -2124,6 +2125,7 @@ static void pc_memory_plug(HotplugHandler
-> >> *hotplug_dev,
-> >> =C2=A0 {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(hot=
-plug_dev);
-> >> +=C2=A0=C2=A0=C2=A0 MachineState *ms =3D MACHINE(hotplug_dev);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool is_nvdimm =3D object_dynamic_cast(=
-OBJECT(dev), TYPE_NVDIMM);
-> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_dimm_plug(PC_DIMM(dev), MACHI=
-NE(pcms), &local_err);
-> >> @@ -2132,7 +2134,7 @@ static void pc_memory_plug(HotplugHandler
-> >> *hotplug_dev,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (is_nvdimm) {
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_plug(&pcms->acpi_nv=
-dimm_state);
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_plug(&ms->acpi_nvdi=
-mm_state);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hotplug_handler_plug(HOTPLUG_HAN=
-DLER(pcms->acpi_dev), dev,
-> >> &error_abort);
-> >> @@ -2574,47 +2576,6 @@ static void pc_machine_set_smm(Object *obj,
-> >> Visitor *v, const char *name,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 visit_type_OnOffAuto(v, name, &pcms->sm=
-m, errp);
-> >> =C2=A0 }
-> >> =C2=A0 -static bool pc_machine_get_nvdimm(Object *obj, Error **errp)
-> >> -{
-> >> -=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj);
-> >> -
-> >> -=C2=A0=C2=A0=C2=A0 return pcms->acpi_nvdimm_state.is_enabled;
-> >> -}
-> >> -
-> >> -static void pc_machine_set_nvdimm(Object *obj, bool value, Error **er=
-rp)
-> >> -{
-> >> -=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj);
-> >> -
-> >> -=C2=A0=C2=A0=C2=A0 pcms->acpi_nvdimm_state.is_enabled =3D value;
-> >> -}
-> >> -
-> >> -static char *pc_machine_get_nvdimm_persistence(Object *obj, Error
-> >> **errp)
-> >> -{
-> >> -=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj);
-> >> -
-> >> -=C2=A0=C2=A0=C2=A0 return g_strdup(pcms->acpi_nvdimm_state.persistenc=
-e_string);
-> >> -}
-> >> -
-> >> -static void pc_machine_set_nvdimm_persistence(Object *obj, const char
-> >> *value,
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
-> >> -{
-> >> -=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj);
-> >> -=C2=A0=C2=A0=C2=A0 AcpiNVDIMMState *nvdimm_state =3D &pcms->acpi_nvdi=
-mm_state;
-> >> -
-> >> -=C2=A0=C2=A0=C2=A0 if (strcmp(value, "cpu") =3D=3D 0)
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence =
-=3D 3;
-> >> -=C2=A0=C2=A0=C2=A0 else if (strcmp(value, "mem-ctrl") =3D=3D 0)
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence =
-=3D 2;
-> >> -=C2=A0=C2=A0=C2=A0 else {
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "-machine=
- nvdimm-persistence=3D%s: unsupported
-> >> option",
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value);
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
-> >> -=C2=A0=C2=A0=C2=A0 }
-> >> -
-> >> -=C2=A0=C2=A0=C2=A0 g_free(nvdimm_state->persistence_string);
-> >> -=C2=A0=C2=A0=C2=A0 nvdimm_state->persistence_string =3D g_strdup(valu=
-e);
-> >> -}
-> >> -
-> >> =C2=A0 static bool pc_machine_get_smbus(Object *obj, Error **errp)
-> >> =C2=A0 {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PCMachineState *pcms =3D PC_MACHINE(obj=
-);
-> >> @@ -2664,8 +2625,6 @@ static void pc_machine_initfn(Object *obj)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->max_ram_below_4g =3D 0; /* use de=
-fault */
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->smm =3D ON_OFF_AUTO_AUTO;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->vmport =3D ON_OFF_AUTO_AUTO;
-> >> -=C2=A0=C2=A0=C2=A0 /* nvdimm is disabled on default. */
-> >> -=C2=A0=C2=A0=C2=A0 pcms->acpi_nvdimm_state.is_enabled =3D false;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* acpi build is enabled by default if =
-machine supports it */
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->acpi_build_enabled =3D
-> >> PC_MACHINE_GET_CLASS(pcms)->has_acpi_build;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->smbus_enabled =3D true;
-> >> @@ -2826,13 +2785,6 @@ static void pc_machine_class_init(ObjectClass
-> >> *oc, void *data)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_class_property_set_description(o=
-c, PC_MACHINE_VMPORT,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Enable vmport =
-(pc & q35)", &error_abort);
-> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 object_class_property_add_bool(oc, PC_MACHI=
-NE_NVDIMM,
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_machine_get_nvdimm, pc_=
-machine_set_nvdimm, &error_abort);
-> >> -
-> >> -=C2=A0=C2=A0=C2=A0 object_class_property_add_str(oc, PC_MACHINE_NVDIM=
-M_PERSIST,
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_machine_get_nvdimm_pers=
-istence,
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_machine_set_nvdimm_pers=
-istence, &error_abort);
-> >> -
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_class_property_add_bool(oc, PC_M=
-ACHINE_SMBUS,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_machine_get_=
-smbus, pc_machine_set_smbus, &error_abort);
-> >> =C2=A0 diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> >> index fd0f2c268f..8b94b70f14 100644
-> >> --- a/hw/i386/pc_piix.c
-> >> +++ b/hw/i386/pc_piix.c
-> >> @@ -297,8 +297,8 @@ static void pc_init1(MachineState *machine,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PC_MACHINE_ACP=
-I_DEVICE_PROP,
-> >> &error_abort);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (pcms->acpi_nvdimm_state.is_enabled) {
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_init_acpi_state(&pc=
-ms->acpi_nvdimm_state, system_io,
-> >> +=C2=A0=C2=A0=C2=A0 if (machine->acpi_nvdimm_state.is_enabled) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_init_acpi_state(&ma=
-chine->acpi_nvdimm_state, system_io,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->fw_cfg, OBJECT(pcms)=
-);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0 }
-> >> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> >> index 4a175ea50e..26727c964d 100644
-> >> --- a/hw/i386/pc_q35.c
-> >> +++ b/hw/i386/pc_q35.c
-> >> @@ -329,8 +329,8 @@ static void pc_q35_init(MachineState *machine)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_vga_init(isa_bus, host_bus);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc_nic_init(pcmc, isa_bus, host_bus);
-> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (pcms->acpi_nvdimm_state.is_enabled) {
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_init_acpi_state(&pc=
-ms->acpi_nvdimm_state, system_io,
-> >> +=C2=A0=C2=A0=C2=A0 if (machine->acpi_nvdimm_state.is_enabled) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvdimm_init_acpi_state(&ma=
-chine->acpi_nvdimm_state, system_io,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pcms->fw_cfg, OBJECT(pcms)=
-);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0 }
-> >> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> >> index 05f9f45c3d..b55c9cc087 100644
-> >> --- a/include/hw/boards.h
-> >> +++ b/include/hw/boards.h
-> >> @@ -8,6 +8,7 @@
-> >> =C2=A0 #include "hw/qdev.h"
-> >> =C2=A0 #include "qom/object.h"
-> >> =C2=A0 #include "qom/cpu.h"
-> >> +#include "hw/mem/nvdimm.h"
-> >> =C2=A0 =C2=A0 /**
-> >> =C2=A0=C2=A0 * memory_region_allocate_system_memory - Allocate a board=
-'s main
-> >> memory
-> >> @@ -268,6 +269,7 @@ struct MachineState {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *cpu_type;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AccelState *accelerator;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 CPUArchIdList *possible_cpus;
-> >> +=C2=A0=C2=A0=C2=A0 AcpiNVDIMMState acpi_nvdimm_state;
-> >> =C2=A0 };
-> >> =C2=A0 =C2=A0 #define DEFINE_MACHINE(namestr, machine_initfn) \
-> >> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> >> index 3ff127ebd0..f7c59743e0 100644
-> >> --- a/include/hw/i386/pc.h
-> >> +++ b/include/hw/i386/pc.h
-> >> @@ -45,8 +45,6 @@ struct PCMachineState {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 OnOffAuto vmport;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 OnOffAuto smm;
-> >> =C2=A0 -=C2=A0=C2=A0=C2=A0 AcpiNVDIMMState acpi_nvdimm_state;
-> >> -
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool acpi_build_enabled;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool smbus_enabled;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool sata_enabled;
-> >> @@ -74,8 +72,6 @@ struct PCMachineState {
-> >> =C2=A0 #define PC_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
-> >> =C2=A0 #define PC_MACHINE_VMPORT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 "vmport"
-> >> =C2=A0 #define PC_MACHINE_SMM=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "smm"
-> >> -#define PC_MACHINE_NVDIMM=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 "nvdimm"
-> >> -#define PC_MACHINE_NVDIMM_PERSIST=C2=A0=C2=A0 "nvdimm-persistence"
-> >> =C2=A0 #define PC_MACHINE_SMBUS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 "smbus"
-> >> =C2=A0 #define PC_MACHINE_SATA=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "sata"
-> >> =C2=A0 #define PC_MACHINE_PIT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "pit"
-> >> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> >> index 01436b9f50..3e5489d3a1 100644
-> >> --- a/include/hw/mem/pc-dimm.h
-> >> +++ b/include/hw/mem/pc-dimm.h
-> >> @@ -19,7 +19,6 @@
-> >> =C2=A0 #include "exec/memory.h"
-> >> =C2=A0 #include "sysemu/hostmem.h"
-> >> =C2=A0 #include "hw/qdev.h"
-> >> -#include "hw/boards.h"
-> >> =C2=A0 =C2=A0 #define TYPE_PC_DIMM "pc-dimm"
-> >> =C2=A0 #define PC_DIMM(obj) \ =20
-> >=20
-> >  =20
+Tested by booting Linux kernel 4.20.12. Now e500 machine doesn't need 
+network time protocol daemon because it will have working RTC 
+(before all timestamps on files were from 2016)
+
+
+Signed-off-by: Amit Singh Tomar <amit.tomar@freescale.com>
+Signed-off-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+---
+
+v1->v2: Expanded and fixed commit message
+
+v2->v3: Changed Subject line back to original and From: field to 
+my email address, moved my SoB line above first '---' and
+added Tomar's Signed-off line back.
+
+---
+ default-configs/ppc-softmmu.mak |   2 +
+ hw/i2c/Makefile.objs            |   1 +
+ hw/i2c/mpc_i2c.c                | 357 ++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/e500.c                   |  54 ++++++
+ 4 files changed, 414 insertions(+)
+ create mode 100644 hw/i2c/mpc_i2c.c
+
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 52acb7cf39..a560971f0c 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -8,6 +8,8 @@ include usb.mak
+ CONFIG_PPC4XX=y
+ CONFIG_M48T59=y
+ CONFIG_SERIAL=y
++CONFIG_MPC_I2C=y
++CONFIG_DS1338=y
+ CONFIG_I8257=y
+ CONFIG_OPENPIC=y
+ CONFIG_PPCE500_PCI=y
+diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
+index 9205cbee16..3eb584254f 100644
+--- a/hw/i2c/Makefile.objs
++++ b/hw/i2c/Makefile.objs
+@@ -9,5 +9,6 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
+ common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
+ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_i2c.o
+ common-obj-$(CONFIG_NRF51_SOC) += microbit_i2c.o
++common-obj-$(CONFIG_MPC_I2C) += mpc_i2c.o
+ obj-$(CONFIG_OMAP) += omap_i2c.o
+ obj-$(CONFIG_PPC4XX) += ppc4xx_i2c.o
+diff --git a/hw/i2c/mpc_i2c.c b/hw/i2c/mpc_i2c.c
+new file mode 100644
+index 0000000000..693ca7ef6b
+--- /dev/null
++++ b/hw/i2c/mpc_i2c.c
+@@ -0,0 +1,357 @@
++/*
++ * Copyright (C) 2014 Freescale Semiconductor, Inc. All rights reserved.
++ *
++ * Author: Amit Tomar, <Amit.Tomar@freescale.com>
++ *
++ * Description:
++ * This file is derived from IMX I2C controller,
++ * by Jean-Christophe DUBOIS .
++ *
++ * Thanks to Scott Wood and Alexander Graf for their kind help on this.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License, version 2 or later,
++ * as published by the Free Software Foundation.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/i2c/i2c.h"
++#include "qemu/log.h"
++#include "hw/sysbus.h"
++
++/* #define DEBUG_I2C */
++
++#ifdef DEBUG_I2C
++#define DPRINTF(fmt, ...)              \
++    do { fprintf(stderr, "mpc_i2c[%s]: " fmt, __func__, ## __VA_ARGS__); \
++    } while (0)
++#else
++#define DPRINTF(fmt, ...) do {} while (0)
++#endif
++
++#define TYPE_MPC_I2C "mpc-i2c"
++#define MPC_I2C(obj) \
++    OBJECT_CHECK(MPCI2CState, (obj), TYPE_MPC_I2C)
++
++#define MPC_I2C_ADR   0x00
++#define MPC_I2C_FDR   0x04
++#define MPC_I2C_CR    0x08
++#define MPC_I2C_SR    0x0c
++#define MPC_I2C_DR    0x10
++#define MPC_I2C_DFSRR 0x14
++
++#define CCR_MEN  (1 << 7)
++#define CCR_MIEN (1 << 6)
++#define CCR_MSTA (1 << 5)
++#define CCR_MTX  (1 << 4)
++#define CCR_TXAK (1 << 3)
++#define CCR_RSTA (1 << 2)
++#define CCR_BCST (1 << 0)
++
++#define CSR_MCF  (1 << 7)
++#define CSR_MAAS (1 << 6)
++#define CSR_MBB  (1 << 5)
++#define CSR_MAL  (1 << 4)
++#define CSR_SRW  (1 << 2)
++#define CSR_MIF  (1 << 1)
++#define CSR_RXAK (1 << 0)
++
++#define CADR_MASK 0xFE
++#define CFDR_MASK 0x3F
++#define CCR_MASK  0xFC
++#define CSR_MASK  0xED
++#define CDR_MASK  0xFF
++
++#define CYCLE_RESET 0xFF
++
++typedef struct MPCI2CState {
++    SysBusDevice parent_obj;
++
++    I2CBus *bus;
++    qemu_irq irq;
++    MemoryRegion iomem;
++
++    uint8_t address;
++    uint8_t adr;
++    uint8_t fdr;
++    uint8_t cr;
++    uint8_t sr;
++    uint8_t dr;
++    uint8_t dfssr;
++} MPCI2CState;
++
++static bool mpc_i2c_is_enabled(MPCI2CState *s)
++{
++    return s->cr & CCR_MEN;
++}
++
++static bool mpc_i2c_is_master(MPCI2CState *s)
++{
++    return s->cr & CCR_MSTA;
++}
++
++static bool mpc_i2c_direction_is_tx(MPCI2CState *s)
++{
++    return s->cr & CCR_MTX;
++}
++
++static bool mpc_i2c_irq_pending(MPCI2CState *s)
++{
++    return s->sr & CSR_MIF;
++}
++
++static bool mpc_i2c_irq_is_enabled(MPCI2CState *s)
++{
++    return s->cr & CCR_MIEN;
++}
++
++static void mpc_i2c_reset(DeviceState *dev)
++{
++    MPCI2CState *i2c = MPC_I2C(dev);
++
++    i2c->address = 0xFF;
++    i2c->adr = 0x00;
++    i2c->fdr = 0x00;
++    i2c->cr =  0x00;
++    i2c->sr =  0x81;
++    i2c->dr =  0x00;
++}
++
++static void mpc_i2c_irq(MPCI2CState *s)
++{
++    bool irq_active = false;
++
++    if (mpc_i2c_is_enabled(s) && mpc_i2c_irq_is_enabled(s)
++                              && mpc_i2c_irq_pending(s)) {
++        irq_active = true;
++    }
++
++    if (irq_active) {
++        qemu_irq_raise(s->irq);
++    } else {
++        qemu_irq_lower(s->irq);
++    }
++}
++
++static void mpc_i2c_soft_reset(MPCI2CState *s)
++{
++    /* This is a soft reset. ADR is preserved during soft resets */
++    uint8_t adr = s->adr;
++    mpc_i2c_reset(DEVICE(s));
++    s->adr = adr;
++}
++
++static void  mpc_i2c_address_send(MPCI2CState *s)
++{
++    /* if returns non zero slave address is not right */
++    if (i2c_start_transfer(s->bus, s->dr >> 1, s->dr & (0x01))) {
++        s->sr |= CSR_RXAK;
++    } else {
++        s->address = s->dr;
++        s->sr &= ~CSR_RXAK;
++        s->sr |=  CSR_MCF; /* Set after Byte Transfer is completed */
++        s->sr |=  CSR_MIF; /* Set after Byte Transfer is completed */
++        mpc_i2c_irq(s);
++    }
++}
++
++static void  mpc_i2c_data_send(MPCI2CState *s)
++{
++    if (i2c_send(s->bus, s->dr)) {
++        /* End of transfer */
++        s->sr |= CSR_RXAK;
++        i2c_end_transfer(s->bus);
++    } else {
++        s->sr &= ~CSR_RXAK;
++        s->sr |=  CSR_MCF; /* Set after Byte Transfer is completed */
++        s->sr |=  CSR_MIF; /* Set after Byte Transfer is completed */
++        mpc_i2c_irq(s);
++    }
++}
++
++static void  mpc_i2c_data_recive(MPCI2CState *s)
++{
++    int ret;
++    /* get the next byte */
++    ret = i2c_recv(s->bus);
++    if (ret >= 0) {
++        s->sr |= CSR_MCF; /* Set after Byte Transfer is completed */
++        s->sr |= CSR_MIF; /* Set after Byte Transfer is completed */
++        mpc_i2c_irq(s);
++    } else {
++        DPRINTF("read failed for device");
++        ret = 0xff;
++    }
++    s->dr = ret;
++}
++
++static uint64_t mpc_i2c_read(void *opaque, hwaddr addr, unsigned size)
++{
++    MPCI2CState *s = opaque;
++    uint8_t value;
++
++    switch (addr) {
++    case MPC_I2C_ADR:
++        value = s->adr;
++        break;
++    case MPC_I2C_FDR:
++        value = s->fdr;
++        break;
++    case MPC_I2C_CR:
++        value = s->cr;
++        break;
++    case MPC_I2C_SR:
++        value = s->sr;
++        break;
++    case MPC_I2C_DR:
++        value = s->dr;
++        if (mpc_i2c_is_master(s)) { /* master mode */
++            if (mpc_i2c_direction_is_tx(s)) {
++                DPRINTF("MTX is set not in recv mode\n");
++            } else {
++                mpc_i2c_data_recive(s);
++            }
++        }
++        break;
++    default:
++        value = 0;
++        DPRINTF("ERROR: Bad read addr 0x%x\n", (unsigned int)addr);
++        break;
++    }
++
++    DPRINTF("%s: addr " TARGET_FMT_plx " %02" PRIx32 "\n", __func__,
++                                         addr, value);
++    return (uint64_t)value;
++}
++
++static void mpc_i2c_write(void *opaque, hwaddr addr,
++                            uint64_t value, unsigned size)
++{
++    MPCI2CState *s = opaque;
++
++    DPRINTF("%s: addr " TARGET_FMT_plx " val %08" PRIx64 "\n", __func__,
++                                             addr, value);
++    switch (addr) {
++    case MPC_I2C_ADR:
++        s->adr = value & CADR_MASK;
++        break;
++    case MPC_I2C_FDR:
++        s->fdr = value & CFDR_MASK;
++        break;
++    case MPC_I2C_CR:
++        if (mpc_i2c_is_enabled(s) && ((value & CCR_MEN) == 0)) {
++            mpc_i2c_soft_reset(s);
++            break;
++        }
++        /* normal write */
++        s->cr = value & CCR_MASK;
++        if (mpc_i2c_is_master(s)) { /* master mode */
++            /* set the bus to busy after master is set as per RM */
++            s->sr |= CSR_MBB;
++        } else {
++            /* bus is not busy anymore */
++            s->sr &= ~CSR_MBB;
++            /* Reset the address for fresh write/read cycle */
++        if (s->address != CYCLE_RESET) {
++            i2c_end_transfer(s->bus);
++            s->address = CYCLE_RESET;
++            }
++        }
++        /* For restart end the onging transfer */
++        if (s->cr & CCR_RSTA) {
++            if (s->address != CYCLE_RESET) {
++                s->address = CYCLE_RESET;
++                i2c_end_transfer(s->bus);
++                s->cr &= ~CCR_RSTA;
++            }
++        }
++        break;
++    case MPC_I2C_SR:
++        s->sr = value & CSR_MASK;
++        /* Lower the interrupt */
++        if (!(s->sr & CSR_MIF) || !(s->sr & CSR_MAL)) {
++            mpc_i2c_irq(s);
++        }
++        break;
++    case MPC_I2C_DR:
++        /* if the device is not enabled, nothing to do */
++        if (!mpc_i2c_is_enabled(s)) {
++            break;
++        }
++        s->dr = value & CDR_MASK;
++        if (mpc_i2c_is_master(s)) { /* master mode */
++            if (s->address == CYCLE_RESET) {
++                mpc_i2c_address_send(s);
++            } else {
++                mpc_i2c_data_send(s);
++            }
++        }
++        break;
++    case MPC_I2C_DFSRR:
++        s->dfssr = value;
++        break;
++    default:
++        DPRINTF("ERROR: Bad write addr 0x%x\n", (unsigned int)addr);
++        break;
++    }
++}
++
++static const MemoryRegionOps i2c_ops = {
++    .read =  mpc_i2c_read,
++    .write =  mpc_i2c_write,
++    .valid.max_access_size = 1,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static const VMStateDescription mpc_i2c_vmstate = {
++    .name = TYPE_MPC_I2C,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(address, MPCI2CState),
++        VMSTATE_UINT8(adr, MPCI2CState),
++        VMSTATE_UINT8(fdr, MPCI2CState),
++        VMSTATE_UINT8(cr, MPCI2CState),
++        VMSTATE_UINT8(sr, MPCI2CState),
++        VMSTATE_UINT8(dr, MPCI2CState),
++        VMSTATE_UINT8(dfssr, MPCI2CState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void mpc_i2c_realize(DeviceState *dev, Error **errp)
++{
++    MPCI2CState  *i2c = MPC_I2C(dev);
++    sysbus_init_irq(SYS_BUS_DEVICE(dev), &i2c->irq);
++    memory_region_init_io(&i2c->iomem, OBJECT(i2c), &i2c_ops, i2c,
++                          "mpc-i2c", 0x14);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &i2c->iomem);
++    i2c->bus = i2c_init_bus(DEVICE(dev), "i2c");
++}
++
++static void mpc_i2c_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->vmsd  = &mpc_i2c_vmstate ;
++    dc->reset = mpc_i2c_reset;
++    dc->realize = mpc_i2c_realize;
++    dc->desc = "MPC I2C Controller";
++}
++
++static const TypeInfo mpc_i2c_type_info = {
++    .name          = TYPE_MPC_I2C,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(MPCI2CState),
++    .class_init    = mpc_i2c_class_init,
++};
++
++static void mpc_i2c_register_types(void)
++{
++    type_register_static(&mpc_i2c_type_info);
++}
++
++type_init(mpc_i2c_register_types)
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 7553f674c9..beb2efd694 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -42,6 +42,7 @@
+ #include "qemu/error-report.h"
+ #include "hw/platform-bus.h"
+ #include "hw/net/fsl_etsec/etsec.h"
++#include "hw/i2c/i2c.h"
+ 
+ #define EPAPR_MAGIC                (0x45504150)
+ #define BINARY_DEVICE_TREE_FILE    "mpc8544ds.dtb"
+@@ -63,7 +64,10 @@
+ #define MPC8544_PCI_REGS_SIZE      0x1000ULL
+ #define MPC8544_UTIL_OFFSET        0xe0000ULL
+ #define MPC8XXX_GPIO_OFFSET        0x000FF000ULL
++#define MPC8544_I2C_REGS_OFFSET    0x3000ULL
+ #define MPC8XXX_GPIO_IRQ           47
++#define MPC8544_I2C_IRQ            43
++#define RTC_REGS_OFFSET            0x68
+ 
+ struct boot_info
+ {
+@@ -161,6 +165,39 @@ static void create_dt_mpc8xxx_gpio(void *fdt, const char *soc, const char *mpic)
+     g_free(poweroff);
+ }
+ 
++static void dt_rtc_create(void *fdt, const char *i2c, const char *alias)
++{
++    int offset = RTC_REGS_OFFSET;
++
++    gchar *rtc = g_strdup_printf("%s/rtc@%"PRIx32, i2c, offset);
++    qemu_fdt_add_subnode(fdt, rtc);
++    qemu_fdt_setprop_string(fdt, rtc, "compatible", "pericom,pt7c4338");
++    qemu_fdt_setprop_cells(fdt, rtc, "reg", offset);
++    qemu_fdt_setprop_string(fdt, "/aliases", alias, rtc);
++
++    g_free(rtc);
++}
++
++static void dt_i2c_create(void *fdt, const char *soc, const char *mpic,
++                             const char *alias)
++{
++    hwaddr mmio0 = MPC8544_I2C_REGS_OFFSET;
++    int irq0 = MPC8544_I2C_IRQ;
++
++    gchar *i2c = g_strdup_printf("%s/i2c@%"PRIx64, soc, mmio0);
++    qemu_fdt_add_subnode(fdt, i2c);
++    qemu_fdt_setprop_string(fdt, i2c, "device_type", "i2c");
++    qemu_fdt_setprop_string(fdt, i2c, "compatible", "fsl-i2c");
++    qemu_fdt_setprop_cells(fdt, i2c, "reg", mmio0, 0x14);
++    qemu_fdt_setprop_cells(fdt, i2c, "cell-index", 0);
++    qemu_fdt_setprop_cells(fdt, i2c, "interrupts", irq0, 0x2);
++    qemu_fdt_setprop_phandle(fdt, i2c, "interrupt-parent", mpic);
++    qemu_fdt_setprop_string(fdt, "/aliases", alias, i2c);
++
++    g_free(i2c);
++}
++
++
+ typedef struct PlatformDevtreeData {
+     void *fdt;
+     const char *mpic;
+@@ -464,6 +501,12 @@ static int ppce500_load_device_tree(PPCE500MachineState *pms,
+                          soc, mpic, "serial0", 0, true);
+     }
+ 
++    /* i2c */
++    dt_i2c_create(fdt, soc, mpic, "i2c");
++
++    dt_rtc_create(fdt, "i2c", "rtc");
++
++
+     gutil = g_strdup_printf("%s/global-utilities@%llx", soc,
+                             MPC8544_UTIL_OFFSET);
+     qemu_fdt_add_subnode(fdt, gutil);
+@@ -812,6 +855,7 @@ void ppce500_init(MachineState *machine)
+     MemoryRegion *ccsr_addr_space;
+     SysBusDevice *s;
+     PPCE500CCSRState *ccsr;
++    I2CBus *i2c;
+ 
+     irqs = g_new0(IrqLines, smp_cpus);
+     for (i = 0; i < smp_cpus; i++) {
+@@ -887,6 +931,16 @@ void ppce500_init(MachineState *machine)
+                        0, qdev_get_gpio_in(mpicdev, 42), 399193,
+                        serial_hd(1), DEVICE_BIG_ENDIAN);
+     }
++        /* I2C */
++    dev = qdev_create(NULL, "mpc-i2c");
++    s = SYS_BUS_DEVICE(dev);
++    qdev_init_nofail(dev);
++    sysbus_connect_irq(s, 0, qdev_get_gpio_in(mpicdev, MPC8544_I2C_IRQ));
++    memory_region_add_subregion(ccsr_addr_space, MPC8544_I2C_REGS_OFFSET,
++                                sysbus_mmio_get_region(s, 0));
++    i2c = (I2CBus *)qdev_get_child_bus(dev, "i2c");
++    i2c_create_slave(i2c, "ds1338", RTC_REGS_OFFSET);
++
+ 
+     /* General Utility device */
+     dev = qdev_create(NULL, "mpc8544-guts");
+-- 
+2.14.4
