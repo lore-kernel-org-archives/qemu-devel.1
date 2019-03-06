@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51051)
+Received: from eggs.gnu.org ([209.51.188.92]:52656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1Msm-0005Kv-LY
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 22:06:13 -0500
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h1Myu-0008Rk-0D
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 22:12:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1Msl-0003sM-QT
-	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 22:06:12 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  6 Mar 2019 14:05:59 +1100
-Message-Id: <20190306030601.21986-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20190306030601.21986-1-david@gibson.dropbear.id.au>
-References: <20190306030601.21986-1-david@gibson.dropbear.id.au>
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h1Myt-00088K-53
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 22:12:31 -0500
+Received: from smtp.lg.ehu.es ([158.227.0.66]:35797 helo=smtp.ehu.eus)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h1Mys-00085k-QN
+	for qemu-devel@nongnu.org; Tue, 05 Mar 2019 22:12:31 -0500
+Date: Wed, 6 Mar 2019 03:12:21 +0000
+From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+Message-ID: <20190306031221.GA53@03612eec87fc>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/3] virtio-balloon: Don't mismatch
- g_malloc()/free (CID 1399146)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH v3 0/10] qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tsirkin <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, eblake@redhat.com
 
-ed48c59875b6 "virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host
-page size" introduced a new temporary data structure which tracks 4kiB
-chunks which have been inserted into the balloon by the guest but
-don't yet form a full host page which we can discard.
+Hi,
 
-Unfortunately, I had a thinko and allocated that structure with
-g_malloc0() but freed it with a plain free() rather than g_free().
-This corrects the problem.
+This series reworks qemu-binfmt-conf.sh:
 
-Fixes: ed48c59875b6
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/virtio/virtio-balloon.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+* Argument <CPU> from option '--systemd' is generalized to <TARGETS>, and it is
+  accepted for any mode (default, debian or systemd). It can be a single target
+  arch or a list of them. Valid separators are space, tab, newline and comma.
+  Keywords 'ALL' and 'NONE' are supported.
+* Option '--reset ARCHS' is added, which allows to remove an already registered
+  target interpreter or a list of them. Valid separator is comma. Keyword 'ALL'
+  is supported. The implementation is functional but partial. Please, see
+  the corresponding commit.
+* Support to set options through environment variables is added: QEMU_PATH,
+  QEMU_SUFFIX, QEMU_PERSISTENT, QEMU_CREDENTIAL and QEMU_TARGETS.
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index d3f2913a85..127289ae0e 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -81,7 +81,7 @@ static void balloon_inflate_page(VirtIOBalloon *balloon=
-,
-         /* We've partially ballooned part of a host page, but now
-          * we're trying to balloon part of a different one.  Too hard,
-          * give up on the old partial page */
--        free(balloon->pbp);
-+        g_free(balloon->pbp);
-         balloon->pbp =3D NULL;
-     }
-=20
-@@ -106,7 +106,7 @@ static void balloon_inflate_page(VirtIOBalloon *ballo=
-on,
-          * has already reported them, and failing to discard a balloon
-          * page is not fatal */
-=20
--        free(balloon->pbp);
-+        g_free(balloon->pbp);
-         balloon->pbp =3D NULL;
-     }
- }
---=20
-2.20.1
+The following changes are not backward compatible:
+
+* Option '--persistent' no longer requires/accepts an argument.
+* Option '--credential' no longer requires/accepts an argument.
+* Option '--systemd' no longer requires/accepts an argument.
+* Option '--qemu-path' is renamed to '--path'.
+* Option '--qemu-suffix' is renamed to '--suffix'.
+
+The functionality of all of them is untouched. Changes are related to syntax only.
+
+The main differences compared to version 2 are:
+
+* Suggestions by Eric Blake regarding syntax and style consistency have been addressed.
+* Changes are split in multiple patches, instead of a single one.
+* Option names and support of environament variables is more consistent.
+
+Based on:
+
+* [PATCH v2] qemu-binfmt-conf.sh: add CPUS, add --reset, make -p and -c boolean (no arg)
+* [PATCH] qemu-binfmt-conf.sh: add CPUS, add --reset, make -p and -c boolean (no arg)
+
+Regards
+
+Unai Martinez-Corral (10):
+  qemu-binfmt-conf.sh: enforce safe style consistency
+  qemu-binfmt-conf.sh: make opts -p and -c boolean
+  qemu-binfmt-conf.sh: add QEMU_CREDENTIAL and QEMU_PERSISTENT
+  qemu-binfmt-conf.sh: remove 'qemu' prefix from cli options
+  qemu-binfmt-conf.sh: honour QEMU_PATH and/or QEMU_SUFFIX
+  qemu-binfmt-conf.sh: generalize <CPU> to positional <CPUS>
+  qemu-binfmt-conf.sh: add option --reset <ARCHS>
+  qemu-binfmt-conf.sh: refactor usage()
+  qemu-binfmt-conf.sh: update usage()
+  qemu-binfmt-conf.sh: support QEMU_TARGETS
+
+ scripts/qemu-binfmt-conf.sh | 190
+ 1 file changed, 125 insertions(+), 65 deletions(-)
