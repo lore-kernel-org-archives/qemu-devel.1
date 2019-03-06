@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43471)
+Received: from eggs.gnu.org ([209.51.188.92]:43508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1Uws-0006Ab-V6
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:43:00 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1Uww-0006Eu-NG
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:43:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h1Uwr-0004ig-3H
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:42:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52676)
+	(envelope-from <dgilbert@redhat.com>) id 1h1Uwv-0004lm-81
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:43:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:15073)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1Uwq-0004i9-Qw
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:42:57 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1Uwu-0004lL-W6
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:43:01 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed,  6 Mar 2019 11:42:12 +0000
-Message-Id: <20190306114227.9125-8-dgilbert@redhat.com>
+Date: Wed,  6 Mar 2019 11:42:13 +0000
+Message-Id: <20190306114227.9125-9-dgilbert@redhat.com>
 In-Reply-To: <20190306114227.9125-1-dgilbert@redhat.com>
 References: <20190306114227.9125-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/22] migration: Add an ability to ignore
- shared RAM blocks
+Subject: [Qemu-devel] [PULL 08/22] tests/migration-test: Add a test for
+ ignore-shared capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,504 +31,313 @@ Cc: eblake@redhat.com, armbru@redhat.com
 
 From: Yury Kotov <yury-kotov@yandex-team.ru>
 
-If ignore-shared capability is set then skip shared RAMBlocks during the
-RAM migration.
-Also, move qemu_ram_foreach_migratable_block (and rename) to the
-migration code, because it requires access to the migration capabilities.
-
 Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-Message-Id: <20190215174548.2630-4-yury-kotov@yandex-team.ru>
+Message-Id: <20190215174548.2630-5-yury-kotov@yandex-team.ru>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+  dgilbert: Disabled the test for now, not happy on aarch64
 ---
- exec.c                    |  19 -------
- include/exec/cpu-common.h |   1 -
- migration/migration.h     |   4 +-
- migration/postcopy-ram.c  |  12 ++---
- migration/ram.c           | 110 +++++++++++++++++++++++++++++---------
- migration/rdma.c          |   2 +-
- 6 files changed, 94 insertions(+), 54 deletions(-)
+ tests/migration-test.c | 134 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 109 insertions(+), 25 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index bf71462929..1d4f3784d6 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3985,25 +3985,6 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, =
-void *opaque)
-     return ret;
- }
-=20
--int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaqu=
-e)
--{
--    RAMBlock *block;
--    int ret =3D 0;
--
--    rcu_read_lock();
--    RAMBLOCK_FOREACH(block) {
--        if (!qemu_ram_is_migratable(block)) {
--            continue;
--        }
--        ret =3D func(block, opaque);
--        if (ret) {
--            break;
--        }
--    }
--    rcu_read_unlock();
--    return ret;
--}
--
- /*
-  * Unmap pages of memory from start to start+length such that
-  * they a) read as 0, b) Trigger whatever fault mechanism
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 9cd1f94bc5..cef8b88a2a 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -122,7 +122,6 @@ extern struct MemoryRegion io_mem_notdirty;
- typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
-=20
- int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
--int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaqu=
-e);
- int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)=
-;
-=20
- #endif
-diff --git a/migration/migration.h b/migration/migration.h
-index 443051adb0..81c261941d 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -306,8 +306,10 @@ void migrate_send_rp_resume_ack(MigrationIncomingSta=
-te *mis, uint32_t value);
- void dirty_bitmap_mig_before_vm_start(void);
- void init_dirty_bitmap_incoming_migration(void);
-=20
-+int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
-+
- #define qemu_ram_foreach_block \
--  #warning "Use qemu_ram_foreach_block_migratable in migration code"
-+  #warning "Use foreach_not_ignored_block in migration code"
-=20
- void migration_make_urgent_request(void);
- void migration_consume_urgent_request(void);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index b098816221..e2aa57a701 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -374,7 +374,7 @@ bool postcopy_ram_supported_by_host(MigrationIncoming=
-State *mis)
-     }
-=20
-     /* We don't support postcopy with shared RAM yet */
--    if (qemu_ram_foreach_migratable_block(test_ramblock_postcopiable, NU=
-LL)) {
-+    if (foreach_not_ignored_block(test_ramblock_postcopiable, NULL)) {
-         goto out;
-     }
-=20
-@@ -508,7 +508,7 @@ static int cleanup_range(RAMBlock *rb, void *opaque)
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 8352612364..336b6e20cd 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -215,10 +215,10 @@ static gchar *migrate_query_status(QTestState *who)
+  * events suddenly appearing confuse the qmp()/hmp() responses.
   */
- int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+=20
+-static uint64_t get_migration_pass(QTestState *who)
++static int64_t read_ram_property_int(QTestState *who, const char *proper=
+ty)
  {
--    if (qemu_ram_foreach_migratable_block(init_range, NULL)) {
-+    if (foreach_not_ignored_block(init_range, NULL)) {
-         return -1;
+     QDict *rsp_return, *rsp_ram;
+-    uint64_t result;
++    int64_t result;
+=20
+     rsp_return =3D migrate_query(who);
+     if (!qdict_haskey(rsp_return, "ram")) {
+@@ -226,12 +226,17 @@ static uint64_t get_migration_pass(QTestState *who)
+         result =3D 0;
+     } else {
+         rsp_ram =3D qdict_get_qdict(rsp_return, "ram");
+-        result =3D qdict_get_try_int(rsp_ram, "dirty-sync-count", 0);
++        result =3D qdict_get_try_int(rsp_ram, property, 0);
      }
-=20
-@@ -550,7 +550,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingSt=
-ate *mis)
-             return -1;
-         }
-=20
--        if (qemu_ram_foreach_migratable_block(cleanup_range, mis)) {
-+        if (foreach_not_ignored_block(cleanup_range, mis)) {
-             return -1;
-         }
-=20
-@@ -617,7 +617,7 @@ static int nhp_range(RAMBlock *rb, void *opaque)
-  */
- int postcopy_ram_prepare_discard(MigrationIncomingState *mis)
- {
--    if (qemu_ram_foreach_migratable_block(nhp_range, mis)) {
-+    if (foreach_not_ignored_block(nhp_range, mis)) {
-         return -1;
-     }
-=20
-@@ -628,7 +628,7 @@ int postcopy_ram_prepare_discard(MigrationIncomingSta=
-te *mis)
-=20
- /*
-  * Mark the given area of RAM as requiring notification to unwritten are=
-as
-- * Used as a  callback on qemu_ram_foreach_migratable_block.
-+ * Used as a  callback on foreach_not_ignored_block.
-  *   host_addr: Base of area to mark
-  *   offset: Offset in the whole ram arena
-  *   length: Length of the section
-@@ -1122,7 +1122,7 @@ int postcopy_ram_enable_notify(MigrationIncomingSta=
-te *mis)
-     mis->have_fault_thread =3D true;
-=20
-     /* Mark so that we get notified of accesses to unwritten areas */
--    if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis))=
- {
-+    if (foreach_not_ignored_block(ram_block_enable_notify, mis)) {
-         error_report("ram_block_enable_notify failed");
-         return -1;
-     }
-diff --git a/migration/ram.c b/migration/ram.c
-index 59191c1ed2..01315edd66 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -159,18 +159,44 @@ out:
-     return ret;
+     qobject_unref(rsp_return);
+     return result;
  }
 =20
-+static bool ramblock_is_ignored(RAMBlock *block)
++static uint64_t get_migration_pass(QTestState *who)
 +{
-+    return !qemu_ram_is_migratable(block) ||
-+           (migrate_ignore_shared() && qemu_ram_is_shared(block));
++    return read_ram_property_int(who, "dirty-sync-count");
 +}
 +
- /* Should be holding either ram_list.mutex, or the RCU lock. */
-+#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
-+    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-+        if (ramblock_is_ignored(block)) {} else
-+
- #define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-     INTERNAL_RAMBLOCK_FOREACH(block)                   \
-         if (!qemu_ram_is_migratable(block)) {} else
-=20
- #undef RAMBLOCK_FOREACH
-=20
-+int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque)
-+{
-+    RAMBlock *block;
-+    int ret =3D 0;
-+
-+    rcu_read_lock();
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-+        ret =3D func(block, opaque);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+    rcu_read_unlock();
-+    return ret;
-+}
-+
- static void ramblock_recv_map_init(void)
+ static void read_blocktime(QTestState *who)
  {
-     RAMBlock *rb;
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
-         assert(!rb->receivedmap);
-         rb->receivedmap =3D bitmap_new(rb->max_length >> qemu_target_pag=
-e_bits());
-     }
-@@ -1545,7 +1571,7 @@ unsigned long migration_bitmap_find_dirty(RAMState =
-*rs, RAMBlock *rb,
-     unsigned long *bitmap =3D rb->bmap;
-     unsigned long next;
-=20
--    if (!qemu_ram_is_migratable(rb)) {
-+    if (ramblock_is_ignored(rb)) {
-         return size;
-     }
-=20
-@@ -1594,7 +1620,7 @@ uint64_t ram_pagesize_summary(void)
-     RAMBlock *block;
-     uint64_t summary =3D 0;
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         summary |=3D block->page_size;
-     }
-=20
-@@ -1664,7 +1690,7 @@ static void migration_bitmap_sync(RAMState *rs)
-=20
-     qemu_mutex_lock(&rs->bitmap_mutex);
-     rcu_read_lock();
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         migration_bitmap_sync_range(rs, block, 0, block->used_length);
-     }
-     ram_counters.remaining =3D ram_bytes_remaining();
-@@ -2388,7 +2414,7 @@ static int ram_save_host_page(RAMState *rs, PageSea=
-rchStatus *pss,
-     size_t pagesize_bits =3D
-         qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
-=20
--    if (!qemu_ram_is_migratable(pss->block)) {
-+    if (ramblock_is_ignored(pss->block)) {
-         error_report("block %s should not be migrated !", pss->block->id=
-str);
-         return 0;
-     }
-@@ -2486,19 +2512,30 @@ void acct_update_position(QEMUFile *f, size_t siz=
-e, bool zero)
-     }
+     QDict *rsp_return;
+@@ -332,6 +337,13 @@ static void cleanup(const char *filename)
+     g_free(path);
  }
 =20
--uint64_t ram_bytes_total(void)
-+static uint64_t ram_bytes_total_common(bool count_ignored)
- {
-     RAMBlock *block;
-     uint64_t total =3D 0;
-=20
-     rcu_read_lock();
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
--        total +=3D block->used_length;
-+    if (count_ignored) {
-+        RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+            total +=3D block->used_length;
-+        }
-+    } else {
-+        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-+            total +=3D block->used_length;
-+        }
-     }
-     rcu_read_unlock();
-     return total;
- }
-=20
-+uint64_t ram_bytes_total(void)
-+{
-+    return ram_bytes_total_common(false);
-+}
-+
- static void xbzrle_load_setup(void)
- {
-     XBZRLE.decoded_buf =3D g_malloc(TARGET_PAGE_SIZE);
-@@ -2547,7 +2584,7 @@ static void ram_save_cleanup(void *opaque)
-      */
-     memory_global_dirty_log_stop();
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         g_free(block->bmap);
-         block->bmap =3D NULL;
-         g_free(block->unsentmap);
-@@ -2610,7 +2647,7 @@ void ram_postcopy_migrated_memory_release(Migration=
-State *ms)
- {
-     struct RAMBlock *block;
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         unsigned long *bitmap =3D block->bmap;
-         unsigned long range =3D block->used_length >> TARGET_PAGE_BITS;
-         unsigned long run_start =3D find_next_zero_bit(bitmap, range, 0)=
-;
-@@ -2688,7 +2725,7 @@ static int postcopy_each_ram_send_discard(Migration=
-State *ms)
-     struct RAMBlock *block;
-     int ret;
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         PostcopyDiscardState *pds =3D
-             postcopy_discard_send_init(ms, block->idstr);
-=20
-@@ -2896,7 +2933,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState=
- *ms)
-     rs->last_sent_block =3D NULL;
-     rs->last_page =3D 0;
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         unsigned long pages =3D block->used_length >> TARGET_PAGE_BITS;
-         unsigned long *bitmap =3D block->bmap;
-         unsigned long *unsentmap =3D block->unsentmap;
-@@ -3062,7 +3099,7 @@ static void ram_list_init_bitmaps(void)
-=20
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
--        RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-             pages =3D block->max_length >> TARGET_PAGE_BITS;
-             block->bmap =3D bitmap_new(pages);
-             bitmap_set(block->bmap, 0, pages);
-@@ -3117,7 +3154,7 @@ static void ram_state_resume_prepare(RAMState *rs, =
-QEMUFile *out)
-      * about dirty page logging as well.
-      */
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         pages +=3D bitmap_count_one(block->bmap,
-                                   block->used_length >> TARGET_PAGE_BITS=
-);
-     }
-@@ -3176,7 +3213,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque=
++static char *get_shmem_opts(const char *mem_size, const char *shmem_path=
 )
++{
++    return g_strdup_printf("-object memory-backend-file,id=3Dmem0,size=3D=
+%s"
++                           ",mem-path=3D%s,share=3Don -numa node,memdev=3D=
+mem0",
++                           mem_size, shmem_path);
++}
++
+ static void migrate_check_parameter(QTestState *who, const char *paramet=
+er,
+                                     long long value)
+ {
+@@ -430,73 +442,95 @@ static void migrate_postcopy_start(QTestState *from=
+, QTestState *to)
+ }
 =20
-     rcu_read_lock();
+ static int test_migrate_start(QTestState **from, QTestState **to,
+-                               const char *uri, bool hide_stderr)
++                               const char *uri, bool hide_stderr,
++                               bool use_shmem)
+ {
+     gchar *cmd_src, *cmd_dst;
+-    char *bootpath =3D g_strdup_printf("%s/bootsect", tmpfs);
++    char *bootpath =3D NULL;
++    char *extra_opts =3D NULL;
++    char *shmem_path =3D NULL;
+     const char *arch =3D qtest_get_arch();
+     const char *accel =3D "kvm:tcg";
 =20
--    qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
-+    qemu_put_be64(f, ram_bytes_total_common(true) | RAM_SAVE_FLAG_MEM_SI=
-ZE);
-=20
-     RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         qemu_put_byte(f, strlen(block->idstr));
-@@ -3185,6 +3222,10 @@ static int ram_save_setup(QEMUFile *f, void *opaqu=
-e)
-         if (migrate_postcopy_ram() && block->page_size !=3D qemu_host_pa=
-ge_size) {
-             qemu_put_be64(f, block->page_size);
-         }
-+        if (migrate_ignore_shared()) {
-+            qemu_put_be64(f, block->mr->addr);
-+            qemu_put_byte(f, ramblock_is_ignored(block) ? 1 : 0);
+-    got_stop =3D false;
++    if (use_shmem) {
++        if (!g_file_test("/dev/shm", G_FILE_TEST_IS_DIR)) {
++            g_test_skip("/dev/shm is not supported");
++            return -1;
 +        }
++        shmem_path =3D g_strdup_printf("/dev/shm/qemu-%d", getpid());
++    }
+=20
++    got_stop =3D false;
++    bootpath =3D g_strdup_printf("%s/bootsect", tmpfs);
+     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
+) {
+         init_bootfile(bootpath, x86_bootsect);
++        extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) : =
+NULL;
+         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 150M"
+                                   " -name source,debug-threads=3Don"
+                                   " -serial file:%s/src_serial"
+-                                  " -drive file=3D%s,format=3Draw",
+-                                  accel, tmpfs, bootpath);
++                                  " -drive file=3D%s,format=3Draw %s",
++                                  accel, tmpfs, bootpath,
++                                  extra_opts ? extra_opts : "");
+         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 150M"
+                                   " -name target,debug-threads=3Don"
+                                   " -serial file:%s/dest_serial"
+                                   " -drive file=3D%s,format=3Draw"
+-                                  " -incoming %s",
+-                                  accel, tmpfs, bootpath, uri);
++                                  " -incoming %s %s",
++                                  accel, tmpfs, bootpath, uri,
++                                  extra_opts ? extra_opts : "");
+         start_address =3D X86_TEST_MEM_START;
+         end_address =3D X86_TEST_MEM_END;
+     } else if (g_str_equal(arch, "s390x")) {
+         init_bootfile_s390x(bootpath);
++        extra_opts =3D use_shmem ? get_shmem_opts("128M", shmem_path) : =
+NULL;
+         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 128M"
+                                   " -name source,debug-threads=3Don"
+-                                  " -serial file:%s/src_serial -bios %s"=
+,
+-                                  accel, tmpfs, bootpath);
++                                  " -serial file:%s/src_serial -bios %s =
+%s",
++                                  accel, tmpfs, bootpath,
++                                  extra_opts ? extra_opts : "");
+         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 128M"
+                                   " -name target,debug-threads=3Don"
+                                   " -serial file:%s/dest_serial -bios %s=
+"
+-                                  " -incoming %s",
+-                                  accel, tmpfs, bootpath, uri);
++                                  " -incoming %s %s",
++                                  accel, tmpfs, bootpath, uri,
++                                  extra_opts ? extra_opts : "");
+         start_address =3D S390_TEST_MEM_START;
+         end_address =3D S390_TEST_MEM_END;
+     } else if (strcmp(arch, "ppc64") =3D=3D 0) {
++        extra_opts =3D use_shmem ? get_shmem_opts("256M", shmem_path) : =
+NULL;
+         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 256M -nodefa=
+ults"
+                                   " -name source,debug-threads=3Don"
+                                   " -serial file:%s/src_serial"
+                                   " -prom-env 'use-nvramrc?=3Dtrue' -pro=
+m-env "
+                                   "'nvramrc=3Dhex .\" _\" begin %x %x "
+                                   "do i c@ 1 + i c! 1000 +loop .\" B\" 0=
+ "
+-                                  "until'",  accel, tmpfs, end_address,
+-                                  start_address);
++                                  "until' %s",  accel, tmpfs, end_addres=
+s,
++                                  start_address, extra_opts ? extra_opts=
+ : "");
+         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 256M"
+                                   " -name target,debug-threads=3Don"
+                                   " -serial file:%s/dest_serial"
+-                                  " -incoming %s",
+-                                  accel, tmpfs, uri);
++                                  " -incoming %s %s",
++                                  accel, tmpfs, uri,
++                                  extra_opts ? extra_opts : "");
+=20
+         start_address =3D PPC_TEST_MEM_START;
+         end_address =3D PPC_TEST_MEM_END;
+     } else if (strcmp(arch, "aarch64") =3D=3D 0) {
+         init_bootfile(bootpath, aarch64_kernel);
++        extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) : =
+NULL;
+         cmd_src =3D g_strdup_printf("-machine virt,accel=3D%s,gic-versio=
+n=3Dmax "
+                                   "-name vmsource,debug-threads=3Don -cp=
+u max "
+                                   "-m 150M -serial file:%s/src_serial "
+-                                  "-kernel %s ",
+-                                  accel, tmpfs, bootpath);
++                                  "-kernel %s %s",
++                                  accel, tmpfs, bootpath,
++                                  extra_opts ? extra_opts : "");
+         cmd_dst =3D g_strdup_printf("-machine virt,accel=3D%s,gic-versio=
+n=3Dmax "
+                                   "-name vmdest,debug-threads=3Don -cpu =
+max "
+                                   "-m 150M -serial file:%s/dest_serial "
+                                   "-kernel %s "
+-                                  "-incoming %s ",
+-                                  accel, tmpfs, bootpath, uri);
++                                  "-incoming %s %s",
++                                  accel, tmpfs, bootpath, uri,
++                                  extra_opts ? extra_opts : "");
+=20
+         start_address =3D ARM_TEST_MEM_START;
+         end_address =3D ARM_TEST_MEM_END;
+@@ -507,6 +541,7 @@ static int test_migrate_start(QTestState **from, QTes=
+tState **to,
      }
 =20
-     rcu_read_unlock();
-@@ -3443,7 +3484,7 @@ static inline RAMBlock *ram_block_from_stream(QEMUF=
-ile *f, int flags)
-         return NULL;
+     g_free(bootpath);
++    g_free(extra_opts);
+=20
+     if (hide_stderr) {
+         gchar *tmp;
+@@ -524,6 +559,16 @@ static int test_migrate_start(QTestState **from, QTe=
+stState **to,
+=20
+     *to =3D qtest_init(cmd_dst);
+     g_free(cmd_dst);
++
++    /*
++     * Remove shmem file immediately to avoid memory leak in test failed=
+ case.
++     * It's valid becase QEMU has already opened this file
++     */
++    if (use_shmem) {
++        unlink(shmem_path);
++        g_free(shmem_path);
++    }
++
+     return 0;
+ }
+=20
+@@ -603,7 +648,7 @@ static int migrate_postcopy_prepare(QTestState **from=
+_ptr,
+     char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
+=20
+-    if (test_migrate_start(&from, &to, uri, hide_error)) {
++    if (test_migrate_start(&from, &to, uri, hide_error, false)) {
+         return -1;
      }
 =20
--    if (!qemu_ram_is_migratable(block)) {
-+    if (ramblock_is_ignored(block)) {
-         error_report("block %s should not be migrated !", id);
-         return NULL;
+@@ -720,7 +765,7 @@ static void test_baddest(void)
+     char *status;
+     bool failed;
+=20
+-    if (test_migrate_start(&from, &to, "tcp:0:0", true)) {
++    if (test_migrate_start(&from, &to, "tcp:0:0", true, false)) {
+         return;
      }
-@@ -3698,7 +3739,7 @@ int colo_init_ram_cache(void)
-     RAMBlock *block;
+     migrate(from, "tcp:0:0", "{}");
+@@ -745,7 +790,7 @@ static void test_precopy_unix(void)
+     char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
 =20
-     rcu_read_lock();
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         block->colo_cache =3D qemu_anon_ram_alloc(block->used_length,
-                                                 NULL,
-                                                 false);
-@@ -3719,7 +3760,7 @@ int colo_init_ram_cache(void)
-     if (ram_bytes_total()) {
-         RAMBlock *block;
-=20
--        RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-             unsigned long pages =3D block->max_length >> TARGET_PAGE_BIT=
-S;
-=20
-             block->bmap =3D bitmap_new(pages);
-@@ -3734,7 +3775,7 @@ int colo_init_ram_cache(void)
-=20
- out_locked:
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         if (block->colo_cache) {
-             qemu_anon_ram_free(block->colo_cache, block->used_length);
-             block->colo_cache =3D NULL;
-@@ -3751,14 +3792,14 @@ void colo_release_ram_cache(void)
-     RAMBlock *block;
-=20
-     memory_global_dirty_log_stop();
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         g_free(block->bmap);
-         block->bmap =3D NULL;
+-    if (test_migrate_start(&from, &to, uri, false)) {
++    if (test_migrate_start(&from, &to, uri, false, false)) {
+         return;
      }
 =20
-     rcu_read_lock();
+@@ -781,6 +826,44 @@ static void test_precopy_unix(void)
+     g_free(uri);
+ }
 =20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         if (block->colo_cache) {
-             qemu_anon_ram_free(block->colo_cache, block->used_length);
-             block->colo_cache =3D NULL;
-@@ -3794,7 +3835,7 @@ static int ram_load_cleanup(void *opaque)
++#if 0
++/* Currently upset on aarch64 TCG */
++static void test_ignore_shared(void)
++{
++    char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
++    QTestState *from, *to;
++
++    if (test_migrate_start(&from, &to, uri, false, true)) {
++        return;
++    }
++
++    migrate_set_capability(from, "x-ignore-shared", true);
++    migrate_set_capability(to, "x-ignore-shared", true);
++
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    migrate(from, uri, "{}");
++
++    wait_for_migration_pass(from);
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++
++    /* Check whether shared RAM has been really skipped */
++    g_assert_cmpint(read_ram_property_int(from, "transferred"), <, 1024 =
+* 1024);
++
++    test_migrate_end(from, to, true);
++    g_free(uri);
++}
++#endif
++
+ int main(int argc, char **argv)
  {
-     RAMBlock *rb;
+     char template[] =3D "/tmp/migration-test-XXXXXX";
+@@ -832,6 +915,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
+     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
++    /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); *=
+/
 =20
--    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
-         if (ramblock_is_pmem(rb)) {
-             pmem_persist(rb->host, rb->used_length);
-         }
-@@ -3803,7 +3844,7 @@ static int ram_load_cleanup(void *opaque)
-     xbzrle_load_cleanup();
-     compress_threads_load_cleanup();
+     ret =3D g_test_run();
 =20
--    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
-         g_free(rb->receivedmap);
-         rb->receivedmap =3D NULL;
-     }
-@@ -4003,7 +4044,7 @@ static void colo_flush_ram_cache(void)
-=20
-     memory_global_dirty_log_sync();
-     rcu_read_lock();
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         migration_bitmap_sync_range(ram_state, block, 0, block->used_len=
-gth);
-     }
-     rcu_read_unlock();
-@@ -4146,6 +4187,23 @@ static int ram_load(QEMUFile *f, void *opaque, int=
- version_id)
-                             ret =3D -EINVAL;
-                         }
-                     }
-+                    if (migrate_ignore_shared()) {
-+                        hwaddr addr =3D qemu_get_be64(f);
-+                        bool ignored =3D qemu_get_byte(f);
-+                        if (ignored !=3D ramblock_is_ignored(block)) {
-+                            error_report("RAM block %s should %s be migr=
-ated",
-+                                         id, ignored ? "" : "not");
-+                            ret =3D -EINVAL;
-+                        }
-+                        if (ramblock_is_ignored(block) &&
-+                            block->mr->addr !=3D addr) {
-+                            error_report("Mismatched GPAs for block %s "
-+                                         "%" PRId64 "!=3D %" PRId64,
-+                                         id, (uint64_t)addr,
-+                                         (uint64_t)block->mr->addr);
-+                            ret =3D -EINVAL;
-+                        }
-+                    }
-                     ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
-                                           block->idstr);
-                 } else {
-@@ -4216,7 +4274,7 @@ static int ram_load(QEMUFile *f, void *opaque, int =
-version_id)
- static bool ram_has_postcopy(void *opaque)
- {
-     RAMBlock *rb;
--    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
-         if (ramblock_is_pmem(rb)) {
-             info_report("Block: %s, host: %p is a nvdimm memory, postcop=
-y"
-                          "is not supported now!", rb->idstr, rb->host);
-@@ -4236,7 +4294,7 @@ static int ram_dirty_bitmap_sync_all(MigrationState=
- *s, RAMState *rs)
-=20
-     trace_ram_dirty_bitmap_sync_start();
-=20
--    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-         qemu_savevm_send_recv_bitmap(file, block->idstr);
-         trace_ram_dirty_bitmap_request(block->idstr);
-         ramblock_count++;
-diff --git a/migration/rdma.c b/migration/rdma.c
-index b0115e4de5..63c118af09 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -644,7 +644,7 @@ static int qemu_rdma_init_ram_blocks(RDMAContext *rdm=
-a)
-=20
-     assert(rdma->blockmap =3D=3D NULL);
-     memset(local, 0, sizeof *local);
--    qemu_ram_foreach_migratable_block(qemu_rdma_init_one_block, rdma);
-+    foreach_not_ignored_block(qemu_rdma_init_one_block, rdma);
-     trace_qemu_rdma_init_ram_blocks(local->nb_blocks);
-     rdma->dest_blocks =3D g_new0(RDMADestBlock,
-                                rdma->local_ram_blocks.nb_blocks);
 --=20
 2.20.1
