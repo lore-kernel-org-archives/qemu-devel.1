@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42980)
+Received: from eggs.gnu.org ([209.51.188.92]:43781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1XGb-0005NQ-TJ
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:11:30 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1XM0-0007Tc-LK
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1XGb-0007dF-3n
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:11:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1XLz-0003CD-W6
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:17:04 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-7-armbru@redhat.com>
-	<CAFEAcA_OLYno=YNS6bHOemwEp0gnc3fwRn8Rjvmo9v-i89xrMA@mail.gmail.com>
-	<87d0nnsrx0.fsf@dusky.pond.sub.org>
-	<c6d4c021-8d62-ada0-d152-b1d4f2b7aff2@redhat.com>
-	<87ftsjptxk.fsf@dusky.pond.sub.org>
-	<CANqRtoSOF8uvh-9-_CgsuhB_N18NhSiS=DPsY1+3+ff4NzgE+w@mail.gmail.com>
-	<87mumbcd8k.fsf@dusky.pond.sub.org>
-	<f2c8f20d-17ad-b72b-28fb-c835d6b97c10@redhat.com>
-	<87k1he1wnz.fsf@dusky.pond.sub.org>
-	<e8b000bc-d457-7c5a-b7d2-4e3ff63d0c73@redhat.com>
-Date: Wed, 06 Mar 2019 15:11:22 +0100
-In-Reply-To: <e8b000bc-d457-7c5a-b7d2-4e3ff63d0c73@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Mar 2019 18:21:50
-	+0100")
-Message-ID: <87y35sw0s5.fsf@dusky.pond.sub.org>
+References: <20190304194857.9780-1-philmd@redhat.com>
+	<20190304194857.9780-2-philmd@redhat.com>
+	<9576f379-4ade-62ec-1a03-277148bdf8e4@redhat.com>
+Date: Wed, 06 Mar 2019 15:16:53 +0100
+In-Reply-To: <9576f379-4ade-62ec-1a03-277148bdf8e4@redhat.com> (Laszlo Ersek's
+	message of "Tue, 5 Mar 2019 18:17:42 +0100")
+Message-ID: <87tvggw0iy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
- confused about size, mark FIXME
+Subject: Re: [Qemu-devel] [PATCH 1/4] pflash_cfi01: Add
+ pflash_cfi01_get_blk() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Qemu-block <qemu-block@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Laszlo Ersek <lersek@redhat.com> writes:
 
-> On 3/4/19 4:33 PM, Markus Armbruster wrote:
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>> On 3/4/19 8:25 AM, Markus Armbruster wrote:
->>>> Magnus Damm <magnus.damm@gmail.com> writes:
->>>>> On Wed, Feb 20, 2019 at 2:31 AM Markus Armbruster <armbru@redhat.com>=
- wrote:
->>>>>> Perhaps Magnus, who maintains the machine, can pick a new value for =
-us.
->>>>>
->>>>> According to the old board user document in Japanese (under NDA) what
->>>>> is referred to as FROM (Area0) is connected via a 32-bit bus and CS0
->>>>> to CN8. The docs mention s29pl127j60tfi130 but since I don't have the
->>>>> board handy ATM I don't know how the chips are connected.
->>>>>
->>>>> Hope this helps,
->>>>
->>>> If you want me to change our emulated flash memory's size, please give
->>>> me a number.
->>>
->>> datasheet "S29PL-J 002-00615 Rev. *E":
->>> https://www.cypress.com/file/207091/download
->>>
->>> The S29PL127J60TFI130 is a 128Mbit NOR pflash addressable in words of 1=
-6bit.
->>>
->>> 128Mbit =3D 16 MiB
->>>
->>> At least it matches the "RTS7751R2D Handling Manual"!
->>> https://elinux.org/RTS7751R2D_Handling_Manual#Kernel_start_from_FROM_ex=
-tension_card_.28Kernel_space_XIP.29
->>>
->>> PL127J:
->>> - 4 Banks
->>>   -> we don't model banks.
->>> - sectors of 4Kw and 32Kw
->>>   -> we don't model different sector size and only use the
->>>      biggest available
->>>
->>> sector_size =3D 32Kw =3D 64KiB // sector_len
->>> (naive) sector_count =3D 256 // nb_blocs
->>>
->>> ManufID:  0001h
->>> DeviceID: 227Eh 2220h 2200h
->>>
->>> I understand "connected via a 32-bit bus and CS0 to CN8" as the full
->>> device wordsize is addressable, so this device
->>>
->>> So in pflash_cfi02_register() format:
->>>
->>> - name =3D "FROM (Area0)"
->>> - size =3D 16 * MiB
->>> - sector_len =3D 64 * KiB
->>> - nb_blocs =3D 256
->>> - nb_mappings =3D 1? /* Machine specific... */
->>> - width =3D 2
->>> - id0 =3D 0x0001
->>> - id1 =3D 0x227e
->>> - id2 =3D 0x2220
->>> - id3 =3D 0x2200
->>> - unlock_addr0 =3D 0x555,
->>> - unlock_addr1 =3D 0x2aa
->>> - be =3D 0 /* Arch specific... */
->>>
->>> Which hopefully is very similar to what we currently use :)
+> On 03/04/19 20:48, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Add an helper to access the opaque struct PFlashCFI01.
 >>=20
->> 'fraid not:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> [PMD: Extracted from bigger patch]
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>  hw/block/pflash_cfi01.c  | 5 +++++
+>>  include/hw/block/flash.h | 1 +
+>>  2 files changed, 6 insertions(+)
+>>=20
+>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+>> index 9d1c356eb6..9ecab693e8 100644
+>> --- a/hw/block/pflash_cfi01.c
+>> +++ b/hw/block/pflash_cfi01.c
+>> @@ -972,6 +972,11 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *=
+fl)
+>>      return &fl->mem;
+>>  }
+>>=20=20
+>> +BlockBackend *pflash_cfi01_get_blk(PFlashCFI01 *fl)
+>> +{
+>> +    return fl->blk;
+>> +}
+>> +
+>>  static void postload_update_cb(void *opaque, int running, RunState stat=
+e)
+>>  {
+>>      PFlashCFI01 *pfl =3D opaque;
+>> diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
+>> index 914932eaec..a0f488732a 100644
+>> --- a/include/hw/block/flash.h
+>> +++ b/include/hw/block/flash.h
+>> @@ -22,6 +22,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
+>>                                     uint16_t id0, uint16_t id1,
+>>                                     uint16_t id2, uint16_t id3,
+>>                                     int be);
+>> +BlockBackend *pflash_cfi01_get_blk(PFlashCFI01 *fl);
+>>  MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
+>>=20=20
+>>  /* pflash_cfi02.c */
+>>=20
 >
-> I was trying to be sarcastic :/
+> I generally prefer to keep the same order between declarations of
+> functions, and definitions of the same functions. Compare
+> pflash_cfi01_get_memory() here.
 
-And I fell for it, should've known better %-}
+My fault, not Philippe's.
+
+> With that updated,
+>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks!
