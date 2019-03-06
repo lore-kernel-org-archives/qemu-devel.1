@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42773)
+Received: from eggs.gnu.org ([209.51.188.92]:42980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h1XEq-0004Zt-Mk
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:09:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1XGb-0005NQ-TJ
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:11:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h1XEo-0005Ys-Vq
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:09:40 -0500
-Received: from mail-qt1-f171.google.com ([209.85.160.171]:41149)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h1XEo-0005XL-Pv
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:09:38 -0500
-Received: by mail-qt1-f171.google.com with SMTP id v10so12898246qtp.8
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 06:09:37 -0800 (PST)
-Date: Wed, 6 Mar 2019 09:09:33 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190306090412-mutt-send-email-mst@kernel.org>
-References: <40280F65B1B0B44E8089ED31C01616EBA3947E6A@dggeml529-mbx.china.huawei.com>
-	<20190304213517-mutt-send-email-mst@kernel.org>
-	<40280F65B1B0B44E8089ED31C01616EBA394A7DF@dggeml529-mbx.china.huawei.com>
+	(envelope-from <armbru@redhat.com>) id 1h1XGb-0007dF-3n
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 09:11:29 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-7-armbru@redhat.com>
+	<CAFEAcA_OLYno=YNS6bHOemwEp0gnc3fwRn8Rjvmo9v-i89xrMA@mail.gmail.com>
+	<87d0nnsrx0.fsf@dusky.pond.sub.org>
+	<c6d4c021-8d62-ada0-d152-b1d4f2b7aff2@redhat.com>
+	<87ftsjptxk.fsf@dusky.pond.sub.org>
+	<CANqRtoSOF8uvh-9-_CgsuhB_N18NhSiS=DPsY1+3+ff4NzgE+w@mail.gmail.com>
+	<87mumbcd8k.fsf@dusky.pond.sub.org>
+	<f2c8f20d-17ad-b72b-28fb-c835d6b97c10@redhat.com>
+	<87k1he1wnz.fsf@dusky.pond.sub.org>
+	<e8b000bc-d457-7c5a-b7d2-4e3ff63d0c73@redhat.com>
+Date: Wed, 06 Mar 2019 15:11:22 +0100
+In-Reply-To: <e8b000bc-d457-7c5a-b7d2-4e3ff63d0c73@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Mar 2019 18:21:50
+	+0100")
+Message-ID: <87y35sw0s5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <40280F65B1B0B44E8089ED31C01616EBA394A7DF@dggeml529-mbx.china.huawei.com>
-Subject: Re: [Qemu-devel] Question about VM virtio device's link down delay
- when vhost-user reconnect
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
+ confused about size, mark FIXME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +35,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Lilijun (Jerry, Cloud Networking)" <jerry.lilijun@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>, "lixiao (H)" <lixiao91@huawei.com>, wangyunjian <wangyunjian@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Qemu-block <qemu-block@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Wed, Mar 06, 2019 at 07:36:44AM +0000, Lilijun (Jerry, Cloud Networking) wrote:
-> Thanks a lot for your advice.
-> 
-> Maybe there are two methods to add this option:
-> 1) Firstly, add a vhost-user protocol feature to tell Qemu if hide the disconnects from the guest.  Here we just need the backend such as dpdk vhostuser to support this option and the feature.
-> 2) Secondly, add a VM XML vhost-user nic configuration parameters for Qemu.  This method need more modification and other components such as Libvirt and Nova in openstack to configure it.
-> 
-> I'd like to choose the first method,  Do you think so?   
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-What we need to decide this is - when is it a good idea to down the link
-on disconnect.
-If it depends on vm configuration then it belongs with qemu.
-If it depends on hardware or other host configuration it might
-belong with the backend.
+> On 3/4/19 4:33 PM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>> On 3/4/19 8:25 AM, Markus Armbruster wrote:
+>>>> Magnus Damm <magnus.damm@gmail.com> writes:
+>>>>> On Wed, Feb 20, 2019 at 2:31 AM Markus Armbruster <armbru@redhat.com>=
+ wrote:
+>>>>>> Perhaps Magnus, who maintains the machine, can pick a new value for =
+us.
+>>>>>
+>>>>> According to the old board user document in Japanese (under NDA) what
+>>>>> is referred to as FROM (Area0) is connected via a 32-bit bus and CS0
+>>>>> to CN8. The docs mention s29pl127j60tfi130 but since I don't have the
+>>>>> board handy ATM I don't know how the chips are connected.
+>>>>>
+>>>>> Hope this helps,
+>>>>
+>>>> If you want me to change our emulated flash memory's size, please give
+>>>> me a number.
+>>>
+>>> datasheet "S29PL-J 002-00615 Rev. *E":
+>>> https://www.cypress.com/file/207091/download
+>>>
+>>> The S29PL127J60TFI130 is a 128Mbit NOR pflash addressable in words of 1=
+6bit.
+>>>
+>>> 128Mbit =3D 16 MiB
+>>>
+>>> At least it matches the "RTS7751R2D Handling Manual"!
+>>> https://elinux.org/RTS7751R2D_Handling_Manual#Kernel_start_from_FROM_ex=
+tension_card_.28Kernel_space_XIP.29
+>>>
+>>> PL127J:
+>>> - 4 Banks
+>>>   -> we don't model banks.
+>>> - sectors of 4Kw and 32Kw
+>>>   -> we don't model different sector size and only use the
+>>>      biggest available
+>>>
+>>> sector_size =3D 32Kw =3D 64KiB // sector_len
+>>> (naive) sector_count =3D 256 // nb_blocs
+>>>
+>>> ManufID:  0001h
+>>> DeviceID: 227Eh 2220h 2200h
+>>>
+>>> I understand "connected via a 32-bit bus and CS0 to CN8" as the full
+>>> device wordsize is addressable, so this device
+>>>
+>>> So in pflash_cfi02_register() format:
+>>>
+>>> - name =3D "FROM (Area0)"
+>>> - size =3D 16 * MiB
+>>> - sector_len =3D 64 * KiB
+>>> - nb_blocs =3D 256
+>>> - nb_mappings =3D 1? /* Machine specific... */
+>>> - width =3D 2
+>>> - id0 =3D 0x0001
+>>> - id1 =3D 0x227e
+>>> - id2 =3D 0x2220
+>>> - id3 =3D 0x2200
+>>> - unlock_addr0 =3D 0x555,
+>>> - unlock_addr1 =3D 0x2aa
+>>> - be =3D 0 /* Arch specific... */
+>>>
+>>> Which hopefully is very similar to what we currently use :)
+>>=20
+>> 'fraid not:
+>
+> I was trying to be sarcastic :/
 
-
-
-> To monitor the status of connection, we can using the command " virsh qemu-monitor-command vm1 --hmp info chardev " to lookup that status. Another one is to add new type event for Qemu to notify libvirt or other upper level components.
-> 
-> Jerry
-> 
-> > -----Original Message-----
-> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > Sent: Tuesday, March 05, 2019 10:39 AM
-> > To: Lilijun (Jerry, Cloud Networking) <jerry.lilijun@huawei.com>
-> > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; Liujinsong (Paul)
-> > <liu.jinsong@huawei.com>; lixiao (H) <lixiao91@huawei.com>; wangyunjian
-> > <wangyunjian@huawei.com>; wangxin (U)
-> > <wangxinxin.wang@huawei.com>; Gonglei (Arei)
-> > <arei.gonglei@huawei.com>
-> > Subject: Re: Question about VM virtio device's link down delay when vhost-
-> > user reconnect
-> > 
-> > On Mon, Mar 04, 2019 at 11:46:32AM +0000, Lilijun (Jerry, Cloud Networking)
-> > wrote:
-> > > Hi all,
-> > >
-> > >       I am running my VM using vhost-user NIC with OVS-DPDK.  The steps of
-> > my question is shown as follows:
-> > >      1) In the VM, I add one route entry manually on the vNIC eth0 using
-> > "route add default gw 192.168.1.2".
-> > >      2) If openvswitch service was restarted, or the process ovs-vswitchd was
-> > aborted, the new process may be started successfully after long seconds
-> > such as 40s for the initialization of DPDK huge page memory.
-> > >      3) And Qemu's vhost-user closed the connection and reconnected
-> > successfully after 40s.
-> > >      4) Here VM's vNIC will receive link down and up events, the interval
-> > between the two events is about 40s.
-> > >      5) Then I found that route entry disappeared unexpectedly. This will
-> > cause some network traffic problems.
-> > >
-> > >      I have an idea about this problem. We can add a parameter "
-> > link_down_delay" for all virtio devices that use vhost-user socket such as
-> > virtio-net and virtio-blk.
-> > >
-> > >     If vhost-user socket get a connection closed event when the backend
-> > process was aborted or restarted, we don't notify VM virtio-net device link
-> > down right now.
-> > >    When the vhost-user backend recover this socket's connections before
-> > the time of "link_down_delay" ms passed, we need not do that link down
-> > notification to VM.
-> > >    Or else, if that's timeout, VM can be notified the link down event as
-> > before.
-> > >
-> > >     Is there any other opinions about this solution?  Or some better ideas?
-> > Thanks.
-> > >
-> > > B.R.
-> > >
-> > > Jerry
-> > >
-> > 
-> > Rather than hardcode a specific timeout policy, I would go further and start
-> > with an option to just hide disconnects from guest completely.
-> > Instead add commands to monitor status of connection and events to report
-> > changes.  Management tools can then mirror connection status to link if they
-> > want to.
-> > 
-> > --
-> > MST
+And I fell for it, should've known better %-}
