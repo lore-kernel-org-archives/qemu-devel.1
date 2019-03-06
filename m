@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58616)
+Received: from eggs.gnu.org ([209.51.188.92]:58953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1WHX-0003ss-5K
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:08:24 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1h1WIo-0004dY-IG
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:09:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1WHW-0003re-1O
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:08:23 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Mar 2019 13:08:11 +0000
-Message-ID: <02101146-665d-72b8-aff3-3eccf79e9e0c@virtuozzo.com>
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-2-jsnow@redhat.com>
-	<82ec6790-f366-3912-e85b-4908647d5c8d@virtuozzo.com>
-	<2c332a01-9cb6-d8ba-af00-4db325685037@virtuozzo.com>
-In-Reply-To: <2c332a01-9cb6-d8ba-af00-4db325685037@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <54F23C8D72F7AA449C50B5B3DD2E10D2@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <guoheyi@huawei.com>) id 1h1WIi-0004P4-LO
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:09:42 -0500
+References: <1551823429-1440-1-git-send-email-guoheyi@huawei.com>
+	<20190306113354.5a98654b@redhat.com>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <b904272b-9eca-36e7-d24b-4c84b6c4f4af@huawei.com>
+Date: Wed, 6 Mar 2019 21:09:11 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] block/dirty-bitmaps: add
- inconsistent bit
+In-Reply-To: <20190306113354.5a98654b@redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw/arm/acpi: simplify AML bit
+ and/or statement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon
+	Zhao <shannon.zhaosl@gmail.com>, wanghaibin.wang@huawei.com
 
-MDYuMDMuMjAxOSAxNjowNiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MDYuMDMuMjAxOSAxNToyNSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+
-IDAxLjAzLjIwMTkgMjI6MTUsIEpvaG4gU25vdyB3cm90ZToNCj4+PiBBZGQgYW4gaW5jb25zaXN0
-ZW50IGJpdCB0byBkaXJ0eS1iaXRtYXBzIHRoYXQgYWxsb3dzIHVzIHRvIHJlcG9ydCBhIGJpdG1h
-cCBhcw0KPj4+IHBlcnNpc3RlbnQgYnV0IHBvdGVudGlhbGx5IGluY29uc2lzdGVudCwgaS5lLiBp
-ZiB3ZSBmaW5kIGJpdG1hcHMgb24gYSBxY293Mg0KPj4+IHRoYXQgaGF2ZSBiZWVuIG1hcmtlZCBh
-cyAiaW4gdXNlIi4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVk
-aGF0LmNvbT4NCj4+PiAtLS0NCj4+PiDCoCBxYXBpL2Jsb2NrLWNvcmUuanNvbsKgwqDCoMKgwqDC
-oMKgwqAgfCAxMyArKysrKysrKystLS0tDQo+Pj4gwqAgaW5jbHVkZS9ibG9jay9kaXJ0eS1iaXRt
-YXAuaCB8wqAgMiArKw0KPj4+IMKgIGJsb2NrL2RpcnR5LWJpdG1hcC5jwqDCoMKgwqDCoMKgwqDC
-oCB8IDE5ICsrKysrKysrKysrKysrKysrKysNCj4+PiDCoCAzIGZpbGVzIGNoYW5nZWQsIDMwIGlu
-c2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvcWFwaS9i
-bG9jay1jb3JlLmpzb24gYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4+IGluZGV4IDZlNTQzNTk0
-YjMuLmU2MzllZjZkMWMgMTAwNjQ0DQo+Pj4gLS0tIGEvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+
-PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4+IEBAIC00NjcsMTUgKzQ2NywyMCBAQA0K
-Pj4+IMKgICPCoMKgwqDCoMKgwqDCoCBhbmQgY2Fubm90IGJlIG1vZGlmaWVkIHZpYSBRTVAgb3Ig
-dXNlZCBieSBhbm90aGVyIG9wZXJhdGlvbi4NCj4+PiDCoCAjwqDCoMKgwqDCoMKgwqAgUmVwbGFj
-ZXMgYGxvY2tlZGAgYW5kIGBmcm96ZW5gIHN0YXR1c2VzLiAoc2luY2UgNC4wKQ0KPj4+IMKgICMN
-Cj4+PiAtIyBAcGVyc2lzdGVudDogdHJ1ZSBpZiB0aGUgYml0bWFwIHdpbGwgZXZlbnR1YWxseSBi
-ZSBmbHVzaGVkIHRvIHBlcnNpc3RlbnQNCj4+PiAtI8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHN0b3JhZ2UgKHNpbmNlIDQuMCkNCj4+PiArIyBAcGVyc2lzdGVudDogdHJ1ZSBpZiB0aGUgYml0
-bWFwIHdhcyBzdG9yZWQgb24gZGlzaywgaXMgc2NoZWR1bGVkIHRvIGJlIHN0b3JlZA0KPj4+ICsj
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgb24gZGlzaywgb3IgYm90aC4gKHNpbmNlIDQuMCkN
-Cj4+PiArIw0KPj4+ICsjIEBpbmNvbnNpc3RlbnQ6IHRydWUgaWYgdGhpcyBpcyBhIHBlcnNpc3Rl
-bnQgYml0bWFwIHRoYXQgd2FzIGltcHJvcGVybHkNCj4+PiArI8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBzdG9yZWQuIEltcGxpZXMgQHBlcnNpc3RlbnQgdG8gYmUgdHJ1ZTsgQHJlY29y
-ZGluZyBhbmQNCj4+PiArI8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBAYnVzeSB0byBi
-ZSBmYWxzZS4gVGhpcyBiaXRtYXAgY2Fubm90IGJlIHVzZWQuIFRvIHJlbW92ZQ0KPj4+ICsjwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGl0LCB1c2UgQGJsb2NrLWRpcnR5LWJpdG1hcC1y
-ZW1vdmUuIChTaW5jZSA0LjApDQo+Pj4gwqAgIw0KPj4+IMKgICMgU2luY2U6IDEuMw0KPj4+IMKg
-ICMjDQo+Pj4gwqAgeyAnc3RydWN0JzogJ0Jsb2NrRGlydHlJbmZvJywNCj4+PiDCoMKgwqAgJ2Rh
-dGEnOiB7JypuYW1lJzogJ3N0cicsICdjb3VudCc6ICdpbnQnLCAnZ3JhbnVsYXJpdHknOiAndWlu
-dDMyJywNCj4+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqAgJ3JlY29yZGluZyc6ICdib29sJywgJ2J1
-c3knOiAnYm9vbCcsDQo+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgICdzdGF0dXMnOiAnRGlydHlC
-aXRtYXBTdGF0dXMnLCAncGVyc2lzdGVudCc6ICdib29sJyB9IH0NCj4+PiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgJ3JlY29yZGluZyc6ICdib29sJywgJ2J1c3knOiAnYm9vbCcsICdzdGF0dXMnOiAn
-RGlydHlCaXRtYXBTdGF0dXMnLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoCAncGVyc2lzdGVu
-dCc6ICdib29sJywgJyppbmNvbnNpc3RlbnQnOiAnYm9vbCcgfSB9DQo+Pj4gwqAgIyMNCj4+PiDC
-oCAjIEBRY293MkJpdG1hcEluZm9GbGFnczoNCj4+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9j
-ay9kaXJ0eS1iaXRtYXAuaCBiL2luY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmgNCj4+PiBpbmRl
-eCBiYTg0NzdiNzNmLi5iZDFiNjQ3OWRmIDEwMDY0NA0KPj4+IC0tLSBhL2luY2x1ZGUvYmxvY2sv
-ZGlydHktYml0bWFwLmgNCj4+PiArKysgYi9pbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oDQo+
-Pj4gQEAgLTY4LDYgKzY4LDcgQEAgdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9kZXNlcmlhbGl6ZV9m
-aW5pc2goQmRydkRpcnR5Qml0bWFwICpiaXRtYXApOw0KPj4+IMKgIHZvaWQgYmRydl9kaXJ0eV9i
-aXRtYXBfc2V0X3JlYWRvbmx5KEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLCBib29sIHZhbHVlKTsN
-Cj4+PiDCoCB2b2lkIGJkcnZfZGlydHlfYml0bWFwX3NldF9wZXJzaXN0YW5jZShCZHJ2RGlydHlC
-aXRtYXAgKmJpdG1hcCwNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBib29sIHBlcnNpc3Rl
-bnQpOw0KPj4+ICt2b2lkIGJkcnZfZGlydHlfYml0bWFwX3NldF9pbmNvbnNpc3RlbnQoQmRydkRp
-cnR5Qml0bWFwICpiaXRtYXApOw0KPj4+IMKgIHZvaWQgYmRydl9kaXJ0eV9iaXRtYXBfc2V0X2J1
-c3koQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsIGJvb2wgYnVzeSk7DQo+Pj4gwqAgdm9pZCBiZHJ2
-X21lcmdlX2RpcnR5X2JpdG1hcChCZHJ2RGlydHlCaXRtYXAgKmRlc3QsIGNvbnN0IEJkcnZEaXJ0
-eUJpdG1hcCAqc3JjLA0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBIQml0bWFwICoqYmFja3VwLCBFcnJvciAqKmVycnApOw0K
-Pj4+IEBAIC05MSw2ICs5Miw3IEBAIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHkoY29u
-c3QgQmRydkRpcnR5Qml0bWFwICpiaXRtYXApOw0KPj4+IMKgIGJvb2wgYmRydl9oYXNfcmVhZG9u
-bHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicyk7DQo+Pj4gwqAgYm9vbCBiZHJ2X2RpcnR5
-X2JpdG1hcF9nZXRfYXV0b2xvYWQoY29uc3QgQmRydkRpcnR5Qml0bWFwICpiaXRtYXApOw0KPj4+
-IMKgIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfZ2V0X3BlcnNpc3RhbmNlKEJkcnZEaXJ0eUJpdG1h
-cCAqYml0bWFwKTsNCj4+PiArYm9vbCBiZHJ2X2RpcnR5X2JpdG1hcF9pbmNvbnNpc3RlbnQoY29u
-c3QgQmRydkRpcnR5Qml0bWFwICpiaXRtYXApOw0KPj4+IMKgIGJvb2wgYmRydl9kaXJ0eV9iaXRt
-YXBfYnVzeShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCk7DQo+Pj4gwqAgYm9vbCBiZHJ2X2hhc19j
-aGFuZ2VkX3BlcnNpc3RlbnRfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicyk7DQo+Pj4gwqAg
-QmRydkRpcnR5Qml0bWFwICpiZHJ2X2RpcnR5X2JpdG1hcF9uZXh0KEJsb2NrRHJpdmVyU3RhdGUg
-KmJzLA0KPj4+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5
-LWJpdG1hcC5jDQo+Pj4gaW5kZXggOTgwY2FlNGZhMy4uOWU4NjMwZTFhYyAxMDA2NDQNCj4+PiAt
-LS0gYS9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPj4+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
-DQo+Pj4gQEAgLTQ2LDYgKzQ2LDkgQEAgc3RydWN0IEJkcnZEaXJ0eUJpdG1hcCB7DQo+Pj4gwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGFuZCB0aGlzIGJpdG1hcCBtdXN0IHJlbWFpbiB1bmNoYW5nZWQgd2hpbGUN
-Cj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgdGhpcyBmbGFnIGlzIHNldC4gKi8NCj4+PiDCoMKgwqDCoMKg
-IGJvb2wgcGVyc2lzdGVudDvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIGJpdG1hcCBtdXN0IGJl
-IHNhdmVkIHRvIG93bmVyIGRpc2sgaW1hZ2UgKi8NCj4+PiArwqDCoMKgIGJvb2wgaW5jb25zaXN0
-ZW50O8KgwqDCoMKgwqDCoMKgwqDCoCAvKiBiaXRtYXAgaXMgcGVyc2lzdGVudCwgYnV0IGluY29u
-c2lzdGVudC4NCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIEl0IGNhbm5vdCBiZSB1c2VkIGF0IGFsbCBpbiBhbnkg
-d2F5LCBleGNlcHQNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIGEgUU1QIHVzZXIgY2FuIHJlbW92ZSBpdC4gKi8N
-Cj4+PiDCoMKgwqDCoMKgIGJvb2wgbWlncmF0aW9uO8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAv
-KiBCaXRtYXAgaXMgc2VsZWN0ZWQgZm9yIG1pZ3JhdGlvbiwgaXQgc2hvdWxkDQo+Pj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIG5vdCBiZSBzdG9yZWQgb24gdGhlIG5leHQgaW5hY3RpdmF0aW9uDQo+Pj4gwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIChwZXJzaXN0ZW50IGZsYWcgZG9lc24ndCBtYXR0ZXIgdW50aWwgbmV4dA0K
-Pj4+IEBAIC00NjQsNiArNDY3LDggQEAgQmxvY2tEaXJ0eUluZm9MaXN0ICpiZHJ2X3F1ZXJ5X2Rp
-cnR5X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKg
-IGluZm8tPnJlY29yZGluZyA9IGJkcnZfZGlydHlfYml0bWFwX3JlY29yZGluZyhibSk7DQo+Pj4g
-wqDCoMKgwqDCoMKgwqDCoMKgIGluZm8tPmJ1c3kgPSBiZHJ2X2RpcnR5X2JpdG1hcF9idXN5KGJt
-KTsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgaW5mby0+cGVyc2lzdGVudCA9IGJtLT5wZXJzaXN0
-ZW50Ow0KPj4+ICvCoMKgwqDCoMKgwqDCoCBpbmZvLT5oYXNfaW5jb25zaXN0ZW50ID0gYm0tPmlu
-Y29uc2lzdGVudDsNCj4+PiArwqDCoMKgwqDCoMKgwqAgaW5mby0+aW5jb25zaXN0ZW50ID0gYm0t
-PmluY29uc2lzdGVudDsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgZW50cnktPnZhbHVlID0gaW5m
-bzsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgKnBsaXN0ID0gZW50cnk7DQo+Pj4gwqDCoMKgwqDC
-oMKgwqDCoMKgIHBsaXN0ID0gJmVudHJ5LT5uZXh0Ow0KPj4+IEBAIC03MTEsNiArNzE2LDE1IEBA
-IHZvaWQgYmRydl9kaXJ0eV9iaXRtYXBfc2V0X3BlcnNpc3RhbmNlKEJkcnZEaXJ0eUJpdG1hcCAq
-Yml0bWFwLCBib29sIHBlcnNpc3RlbnQpDQo+Pj4gwqDCoMKgwqDCoCBxZW11X211dGV4X3VubG9j
-ayhiaXRtYXAtPm11dGV4KTsNCj4+PiDCoCB9DQo+Pj4gKy8qIENhbGxlZCB3aXRoIEJRTCB0YWtl
-bi4gKi8NCj4+PiArdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfaW5jb25zaXN0ZW50KEJkcnZE
-aXJ0eUJpdG1hcCAqYml0bWFwKQ0KPj4+ICt7DQo+Pj4gK8KgwqDCoCBxZW11X211dGV4X2xvY2so
-Yml0bWFwLT5tdXRleCk7DQo+Pj4gK8KgwqDCoCBiaXRtYXAtPmluY29uc2lzdGVudCA9IHRydWU7
-DQo+Pj4gK8KgwqDCoCBiaXRtYXAtPmRpc2FibGVkID0gdHJ1ZTsNCj4+DQo+PiBBZ3JlZSwgdGhh
-dCBpdCB3b3J0aCB0byBhc3NlcnQgcGVyc2lzdGFuY2UNCj4gDQo+IEhtbSwgZGlkbid0IHdlIHdh
-bnQgdG8gbWFrZSBpdCByZWFkb25seSB0b28/DQoNCk1heSBiZSBiZXR0ZXIgbm90IGRvaW5nIGl0
-IHRvIG5vdCBpbnRlcmZlcmUgdGhlc2UgdHdvIHRoaW5ncy4NCg0KPiANCj4+DQo+Pj4gK8KgwqDC
-oCBxZW11X211dGV4X3VubG9jayhiaXRtYXAtPm11dGV4KTsNCj4+PiArfQ0KPj4+ICsNCj4+PiDC
-oCAvKiBDYWxsZWQgd2l0aCBCUUwgdGFrZW4uICovDQo+Pj4gwqAgdm9pZCBiZHJ2X2RpcnR5X2Jp
-dG1hcF9zZXRfbWlncmF0aW9uKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLCBib29sIG1pZ3JhdGlv
-bikNCj4+PiDCoCB7DQo+Pj4gQEAgLTcyNCw2ICs3MzgsMTEgQEAgYm9vbCBiZHJ2X2RpcnR5X2Jp
-dG1hcF9nZXRfcGVyc2lzdGFuY2UoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApDQo+Pj4gwqDCoMKg
-wqDCoCByZXR1cm4gYml0bWFwLT5wZXJzaXN0ZW50ICYmICFiaXRtYXAtPm1pZ3JhdGlvbjsNCj4+
-PiDCoCB9DQo+Pj4gK2Jvb2wgYmRydl9kaXJ0eV9iaXRtYXBfaW5jb25zaXN0ZW50KGNvbnN0IEJk
-cnZEaXJ0eUJpdG1hcCAqYml0bWFwKQ0KPj4+ICt7DQo+Pj4gK8KgwqDCoCByZXR1cm4gYml0bWFw
-LT5pbmNvbnNpc3RlbnQ7DQo+Pj4gK30NCj4+PiArDQo+Pj4gwqAgYm9vbCBiZHJ2X2hhc19jaGFu
-Z2VkX3BlcnNpc3RlbnRfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+PiDCoCB7DQo+
-Pj4gwqDCoMKgwqDCoCBCZHJ2RGlydHlCaXRtYXAgKmJtOw0KPj4+DQo+Pg0KPj4gUmV2aWV3ZWQt
-Ynk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
-bT4NCj4+DQo+PiBTb3JyeSBmb3IgYSBkZWxheSwgSSdtIHZlcnkgYnVzeSB3aXRoIG91ciByZWJh
-c2UgdG8gMi4xMiA6KA0KPj4NCj4gDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGlt
-aXINCg==
+Sorry, I didn't know the indention policy of qemu code. So we need to indent the 2nd line just after the parentheses it belongs to?
+
+Will change that and send next version.
+
+Thanks,
+
+Heyi
+
+
+On 2019/3/6 18:33, Igor Mammedov wrote:
+> On Wed, 6 Mar 2019 06:03:48 +0800
+> Heyi Guo <guoheyi@huawei.com> wrote:
+>
+>> The last argument of AML bit and/or statement is the target variable,
+>> so we don't need to use a NULL target and then an additional store
+>> operation; a single bit and/or statement is enough.
+>>
+>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>> ---
+>>   hw/arm/virt-acpi-build.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index 04b62c7..1c84e87 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -265,16 +265,16 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>>           aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+>>       aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+>>       aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
+>> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
+>> +    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
+>>                                   aml_name("CTRL")));
+> pls fix indent in all such cases. I'd align it like this:
+>     aml_append(ifctx,
+>                aml_and(aml_name("CTRL"), aml_int(0x1D), aml_name("CTRL")));
+>
+> or
+>     aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
+>                               aml_name("CTRL")));
+>
+>
+> PS:
+> When making multi-patch series use --cover-letter git option
+>
+>>   
+>>       ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+>> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
+>> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x08),
+>>                                    aml_name("CDW1")));
+>>       aml_append(ifctx, ifctx1);
+>>   
+>>       ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
+>> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
+>> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x10),
+>>                                    aml_name("CDW1")));
+>>       aml_append(ifctx, ifctx1);
+>>   
+>> @@ -283,7 +283,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>>       aml_append(method, ifctx);
+>>   
+>>       elsectx = aml_else();
+>> -    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
+>> +    aml_append(elsectx, aml_or(aml_name("CDW1"), aml_int(4),
+>>                                     aml_name("CDW1")));
+>>       aml_append(elsectx, aml_return(aml_arg(3)));
+>>       aml_append(method, elsectx);
+>
+> .
+>
