@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46977)
+Received: from eggs.gnu.org ([209.51.188.92]:47638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1ZsX-00068X-NR
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:58:50 -0500
+	(envelope-from <arusakova917@gmail.com>) id 1h1ZvZ-0008LK-Gd
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:01:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1ZsV-0001tv-NL
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:58:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48360)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1h1ZsS-0001rY-EP
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:58:45 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3F2F081F18
-	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 16:58:42 +0000 (UTC)
-Date: Wed, 6 Mar 2019 17:58:35 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190306175835.73cb31ad@Igors-MacBook-Pro.local>
-In-Reply-To: <20190306163938.GI20806@redhat.com>
-References: <1551889825-227155-1-git-send-email-imammedo@redhat.com>
-	<20190306163938.GI20806@redhat.com>
+	(envelope-from <arusakova917@gmail.com>) id 1h1ZvY-0003uF-G2
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:01:57 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39864)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arusakova917@gmail.com>)
+	id 1h1ZvY-0003ns-74
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 12:01:56 -0500
+Received: by mail-wr1-x444.google.com with SMTP id l5so14237862wrw.6
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 09:01:44 -0800 (PST)
+From: Anastasiia Rusakova <arusakova917@gmail.com>
+Date: Wed,  6 Mar 2019 19:00:25 +0200
+Message-Id: <20190306170025.3830-1-rusakova.nastasia@icloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] numa: warn if numa 'mem' option or default
- RAM splitting between nodes is used.
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] hw/block/virtio-blk: Clean req->dev repetitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,110 +26,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, libvir-list@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jusual@mail.ru, Anastasiia Rusakova <arusakova917@gmail.com>
 
-On Wed, 6 Mar 2019 16:39:38 +0000
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+From: Anastasiia Rusakova <arusakova917@gmail.com>
 
-> On Wed, Mar 06, 2019 at 05:30:25PM +0100, Igor Mammedov wrote:
-> > Ammend -numa option docs and print warnings if 'mem' option or default =
-RAM
-> > splitting between nodes is used. It's intended to discourage users from=
- using
-> > configuration that allows only to fake NUMA on guest side while leading
-> > to reduced performance of the guest due to inability to properly config=
-ure
-> > VM's RAM on the host.
-> >=20
-> > In NUMA case, it's recommended to always explicitly configure guest RAM
-> > using -numa node,memdev=3D{backend-id} option.
-> >=20
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  numa.c          |  5 +++++
-> >  qemu-options.hx | 12 ++++++++----
-> >  2 files changed, 13 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/numa.c b/numa.c
-> > index 3875e1e..c6c2a6f 100644
-> > --- a/numa.c
-> > +++ b/numa.c
-> > @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, NumaN=
-odeOptions *node,
-> > =20
-> >      if (node->has_mem) {
-> >          numa_info[nodenr].node_mem =3D node->mem;
-> > +        warn_report("Parameter -numa node,mem is obsolete,"
-> > +                    " use -numa node,memdev instead");
->=20
-> I don't think we should do this. Libvirt isn't going to stop using this
-> option in the near term. When users see warnings like this in logs
-well when it was the only option available libvirt had no other choice,
-but since memdev became available libvirt should try to use it whenever
-possible.
+Some functions sometimes uses req->dev even though a local variable
+VirtIOBlock* s = req->dev has already been defined.
+Updated places to use s everywhere in the file.
 
-> they'll often file bugs reports thinking something is broken which is
-> not the case here.=20
-It's the exact purpose of the warning, to force user asking questions
-and fix configuration, since he/she obviously not getting NUMA benefits
-and/or performance-wise
+Signed-off-by: Anastasiia Rusakova <arusakova917@gmail.com>
+---
+ hw/block/virtio-blk.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-I have to disagree here, I don't like ducking our head and ignoring broken
-configuration when there is working alternative. As end user I'd hate that
-problem was hidden from me.
-
-
-I'll respin v2 after fixing mistakes Eric pointed out.
-
->=20
-> >      }
-> >      if (node->has_memdev) {
-> >          Object *o;
-> > @@ -407,6 +409,9 @@ void numa_complete_configuration(MachineState *ms)
-> >          if (i =3D=3D nb_numa_nodes) {
-> >              assert(mc->numa_auto_assign_ram);
-> >              mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram=
-_size);
-> > +            warn_report("Default splitting of RAM between nodes is obs=
-olete,"
-> > +                        " Use '-numa node,memdev' to explictly define =
-RAM"
-> > +                        " allocation per node");
->=20
-> I think this one is ok as I don't believe libvirt triggers this code path
->=20
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 1cf9aac..033e311 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -206,10 +206,14 @@ For example:
-> >  -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D1,socket-id=3D1
-> >  @end example
-> > =20
-> > -@samp{mem} assigns a given RAM amount to a node. @samp{memdev}
-> > -assigns RAM from a given memory backend device to a node. If
-> > -@samp{mem} and @samp{memdev} are omitted in all nodes, RAM is
-> > -split equally between them.
-> > +@samp{memdev} assigns RAM from a given memory backend device to a node.
-> > +
-> > +Legacy options/behaviour: @samp{mem} assigns a given RAM amount to a n=
-ode.
-> > +If @samp{mem} and @samp{memdev} are omitted in all nodes, RAM is split=
- equally
-> > +between them. Option @samp{mem} and default RAM splitting are obsolete=
- as they
-> > +do not provide means to manage RAM on host side and only allow QEMU to=
- fake
-> > +NUMA support which in practice could degrade VM performance.
-> > +It's advised to always explicitly configure NUMA RAM using @samp{memde=
-v} option.
-> > =20
-> >  @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
-> >  if one node uses @samp{memdev}, all of them have to use it.
-> > --=20
-> > 2.7.4
-> >=20
->=20
-> Regards,
-> Daniel
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 0cc3c590b9..ab29eecd55 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -127,7 +127,7 @@ static void virtio_blk_rw_complete(void *opaque, int ret)
+         }
+ 
+         if (ret) {
+-            int p = virtio_ldl_p(VIRTIO_DEVICE(req->dev), &req->out.type);
++            int p = virtio_ldl_p(VIRTIO_DEVICE(s), &req->out.type);
+             bool is_read = !(p & VIRTIO_BLK_T_OUT);
+             /* Note that memory may be dirtied on read failure.  If the
+              * virtio request is not completed here, as is the case for
+@@ -143,7 +143,7 @@ static void virtio_blk_rw_complete(void *opaque, int ret)
+         }
+ 
+         virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
+-        block_acct_done(blk_get_stats(req->dev->blk), &req->acct);
++        block_acct_done(blk_get_stats(s->blk), &req->acct);
+         virtio_blk_free_request(req);
+     }
+     aio_context_release(blk_get_aio_context(s->conf.conf.blk));
+@@ -260,9 +260,10 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq *req)
+ {
+     int status = VIRTIO_BLK_S_OK;
+     struct virtio_scsi_inhdr *scsi = NULL;
+-    VirtIODevice *vdev = VIRTIO_DEVICE(req->dev);
++    VirtIOBlock *s = req->dev;
++    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+     VirtQueueElement *elem = &req->elem;
+-    VirtIOBlock *blk = req->dev;
++    VirtIOBlock *blk = s;
+ 
+ #ifdef __linux__
+     int i;
+@@ -492,16 +493,18 @@ static void virtio_blk_submit_multireq(BlockBackend *blk, MultiReqBuffer *mrb)
+ 
+ static void virtio_blk_handle_flush(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+ {
+-    block_acct_start(blk_get_stats(req->dev->blk), &req->acct, 0,
++    VirtIOBlock *s = req->dev;
++
++    block_acct_start(blk_get_stats(s->blk), &req->acct, 0,
+                      BLOCK_ACCT_FLUSH);
+ 
+     /*
+      * Make sure all outstanding writes are posted to the backing device.
+      */
+     if (mrb->is_write && mrb->num_reqs > 0) {
+-        virtio_blk_submit_multireq(req->dev->blk, mrb);
++        virtio_blk_submit_multireq(s->blk, mrb);
+     }
+-    blk_aio_flush(req->dev->blk, virtio_blk_flush_complete, req);
++    blk_aio_flush(s->blk, virtio_blk_flush_complete, req);
+ }
+ 
+ static bool virtio_blk_sect_range_ok(VirtIOBlock *dev,
+-- 
+2.20.1
