@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36808)
+Received: from eggs.gnu.org ([209.51.188.92]:37232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1h1Z39-0002lS-PN
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:05:44 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Z5C-0003tM-TV
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:07:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1h1Z38-000865-Ew
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:05:43 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
-	id 1h1Z36-0007yn-HX
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:05:41 -0500
-Received: by mail-pg1-x541.google.com with SMTP id e17so8771488pgd.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 08:05:29 -0800 (PST)
-From: Andrew Randrianasulu <randrianasulu@gmail.com>
-Date: Wed, 6 Mar 2019 19:01:52 +0300
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Z5A-0000w6-Uo
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:07:50 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 6 Mar 2019 16:07:31 +0000
+Message-ID: <714826c3-13a8-75e0-fbc8-b98f72edd359@virtuozzo.com>
+References: <20190305234337.18353-1-jsnow@redhat.com>
+	<20190305234337.18353-2-jsnow@redhat.com>
+In-Reply-To: <20190305234337.18353-2-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B22483B8A4D09342A03407807D8F20B7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <201903061901.52932.randrianasulu@gmail.com>
-Subject: Re: [Qemu-devel] PMON2000 compilation and kernel question
+Subject: Re: [Qemu-devel] [PATCH 1/5] block/qcow2-bitmap: Skip length check
+ in some cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +26,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: balaton@eik.bme.hu, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-> This could be some missing or buggy emulation. Maybe if you can get some debug logs from kernel that could tell what it's doing. Usually at least -d unimp,guest_errors options are recommended for debugging but if nothing is printed then it's harder to find out what's causing the hang.
-
-This was kernel dying in ata subsystem:
-
-[    1.340000] io scheduler noop registered
-[    1.340000] io scheduler deadline registered
-[    1.340000] io scheduler cfq registered (default)
-[    1.352000] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
-[    1.388000] console [ttyS0] disabled
-[    1.424000] serial8250.0: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
-[    1.432000] console [ttyS0] enabled
-[    1.432000] console [ttyS0] enabled
-[    1.432000] bootconsole [early0] disabled
-[    1.432000] bootconsole [early0] disabled
-[    1.472000] scsi0 : pata_via
-[    1.476000] scsi1 : pata_via
-[    1.480000] ata1: PATA max UDMA/100 cmd 0x4450 ctl 0x4460 bmdma 0x4440
-[    1.484000] ata2: PATA max UDMA/100 cmd 0x4458 ctl 0x4464 bmdma 0x4448
-[    1.524000] serio: i8042 KBD port at 0x60,0x64 irq 1
-[    1.524000] serio: i8042 AUX port at 0x60,0x64 irq 12
-[    1.532000] mousedev: PS/2 mouse device common for all mice
-[    1.552000] rtc_cmos rtc_cmos: rtc core: registered rtc_cmos as rtc0
-[    1.552000] rtc_cmos rtc_cmos: alarms up to one day, 114 bytes nvram
-[    1.556000] ledtrig-cpu: registered to indicate activity on CPUs
-[    1.556000] TCP: cubic registered
-[    1.560000] NET: Registered protocol family 10
-[    1.588000] mip6: Mobile IPv6
-[    1.588000] NET: Registered protocol family 17
-[    1.588000] mpls_gso: MPLS GSO support
-[    1.596000] registered taskstats version 1
-[    1.612000] rtc_cmos rtc_cmos: setting system clock to 2019-03-06 15:48:12 UTC (1551887292)
-[    1.684000] input: AT Raw Set 2 keyboard as /devices/platform/i8042/serio0/input/input0
-[    1.724000] ata1.00: ATA-7: QEMU HARDDISK, 2.5+, max UDMA/100
-[    1.724000] ata1.00: 204800 sectors, multi 16: LBA48
-[    1.728000] ata1.00: limited to UDMA/33 due to 40-wire cable
-[    1.736000] ata1.00: configured for UDMA/33
-[    1.796000] scsi 0:0:0:0: Direct-Access     ATA      QEMU HARDDISK    2.5+ PQ: 0 ANSI: 5
-[    1.820000] sd 0:0:0:0: [sda] 204800 512-byte logical blocks: (104 MB/100 MiB)
-[    1.832000] sd 0:0:0:0: [sda] Write Protect is off
-[    1.836000] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
-[    1.864000] Data bus error, epc == ffffffff804157d8, ra == ffffffff804f7ddc
-[    1.864000] Oops[#1]:
-
-for 
-
-mips64el-softmmu/qemu-system-mips64el -M fulong2e  -kernel /dev/shm/boot/vmlinux-3.16.0-4-loongson-2e -hda /dev/shm/LONGSOON_disk  -cdrom /dev/shm/debian-8.0.0-mipsel-xfce-CD-1.iso -nographic -d unimp,guest_errors -append "console=ttyS0" > VMLINUX_3.16.log 2>&1
-
-and without ata disk but with just CD it moved into 'normal' panic (no root device)
-
-[    1.480000] console [ttyS0] enabled
-[    1.480000] console [ttyS0] enabled
-[    1.484000] bootconsole [early0] disabled
-[    1.484000] bootconsole [early0] disabled
-[    1.524000] scsi0 : pata_via
-[    1.528000] scsi1 : pata_via
-[    1.532000] ata1: PATA max UDMA/100 cmd 0x4450 ctl 0x4460 bmdma 0x4440
-[    1.536000] ata2: PATA max UDMA/100 cmd 0x4458 ctl 0x4464 bmdma 0x4448
-[    1.580000] serio: i8042 KBD port at 0x60,0x64 irq 1
-[    1.584000] serio: i8042 AUX port at 0x60,0x64 irq 12
-[    1.596000] mousedev: PS/2 mouse device common for all mice
-[    1.616000] rtc_cmos rtc_cmos: rtc core: registered rtc_cmos as rtc0
-[    1.616000] rtc_cmos rtc_cmos: alarms up to one day, 114 bytes nvram
-[    1.620000] ledtrig-cpu: registered to indicate activity on CPUs
-[    1.624000] TCP: cubic registered
-[    1.624000] NET: Registered protocol family 10
-[    1.648000] mip6: Mobile IPv6
-[    1.652000] NET: Registered protocol family 17
-[    1.652000] mpls_gso: MPLS GSO support
-[    1.656000] registered taskstats version 1
-[    1.688000] rtc_cmos rtc_cmos: setting system clock to 2019-03-06 15:50:38 UTC (1551887438)
-[    1.752000] input: AT Raw Set 2 keyboard as /devices/platform/i8042/serio0/input/input0
-[    1.912000] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
-[    1.916000] ata2.00: limited to UDMA/33 due to 40-wire cable
-[    1.924000] ata2.00: configured for UDMA/33
-[    2.604000] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input2
-[    6.928000] ata2.00: qc timeout (cmd 0xa0)
-[    6.928000] ata2.00: TEST_UNIT_READY failed (err_mask=0x4)
-[    7.088000] ata2.00: configured for UDMA/33
-[   12.092000] ata2.00: qc timeout (cmd 0xa0)
-[   12.096000] ata2.00: TEST_UNIT_READY failed (err_mask=0x4)
-[   12.096000] ata2.00: limiting speed to UDMA/33:PIO3
-[   12.252000] ata2.00: configured for UDMA/33
-[   17.252000] ata2.00: qc timeout (cmd 0xa0)
-[   17.252000] ata2.00: TEST_UNIT_READY failed (err_mask=0x4)
-[   17.256000] ata2.00: disabled
-[   17.260000] ata2: soft resetting link
-[   17.420000] ata2: EH complete
-[   17.428000] VFS: Cannot open root device "(null)" or unknown-block(0,0): error -6
-[   17.428000] Please append a correct "root=" boot option; here are the available partitions:
-[   17.432000] Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
-[   17.432000] ---[ end Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
-
-vmlinux-2e also boots (if I redirect output to serial console), but not very verbose :/
-
-Scaning....
-=========================================================
-=========================================================
-not find usb drivers...
-
-mips64el-softmmu/qemu-system-mips64el -M fulong2e  -kernel /dev/shm/vmlinux-2e  -cdrom /dev/shm/debian-8.0.0-mipsel-xfce-CD-1.iso -nographic -d unimp,guest_errors -append "console=ttyS0"
-
-Hm. Note I skipped adding ati-vga device in those tests, because Debian 3.16 kernel was panicing in radeon code too.
+MDYuMDMuMjAxOSAyOjQzLCBKb2huIFNub3cgd3JvdGU6DQo+IElmIHdlIHdlcmUgdG8gYWxsb3cg
+cmVzaXplcywgdGhlIGxlbmd0aCBjaGVjayB0aGF0IGhhcHBlbnMgd2hlbiB3ZSBsb2FkDQo+IGJp
+dG1hcCBoZWFkZXJzIGZyb20gZGlzayB3aGVuIHdlIHJlYWQgb3Igc3RvcmUgYml0bWFwcyB3b3Vs
+ZCBiZWdpbiB0bw0KPiBmYWlsOg0KPiANCj4gSW1hZ2luZSB0aGUgY2lyY3Vtc3RhbmNlIHdoZXJl
+IHdlJ3ZlIHJlc2l6ZWQgYml0bWFwcyBpbiBtZW1vcnksIGJ1dCB0aGV5IHN0aWxsDQo+IGhhdmUg
+dGhlIG9sZCB2YWx1ZXMgb24tZGlzay4gVGhlIGxlbmd0aHMgd2lsbCBubyBsb25nZXIgbWF0Y2gg
+YmRydl9nZXRsZW5ndGgsDQo+IHNvIHdlIG11c3QgYWxsb3cgdGhpcyBjaGVjayB0byBiZSBza2lw
+cGVkIHdoZW4gZmx1c2hpbmcgYml0bWFwcyB0byBkaXNrLg0KPiANCj4gTGltaXQgdGhpcyB0byB3
+aGVuIHdlIGFyZSBhYm91dCB0byBvdmVyd3JpdGUgdGhlIGhlYWRlcnM6IHdlIHdpbGwgdmVyaWZ5
+IHRoZQ0KPiBvdXRnb2luZyBoZWFkZXJzLCBidXQgd2Ugd2lsbCBza2lwIHZlcmlmeWluZyB0aGUg
+a25vd24gc3RhbGUgaGVhZGVycy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNu
+b3dAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICAgYmxvY2svcWNvdzItYml0bWFwLmMgfCAzNCArKysr
+KysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIxIGlu
+c2VydGlvbnMoKyksIDEzIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fj
+b3cyLWJpdG1hcC5jIGIvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gaW5kZXggYzNiMjEwZWRlMS4u
+ZDAyNzMwMDA0YSAxMDA2NDQNCj4gLS0tIGEvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gKysrIGIv
+YmxvY2svcWNvdzItYml0bWFwLmMNCj4gQEAgLTQzNSw3ICs0MzUsOCBAQCBzdGF0aWMgaW5saW5l
+IFFjb3cyQml0bWFwRGlyRW50cnkgKm5leHRfZGlyX2VudHJ5KFFjb3cyQml0bWFwRGlyRW50cnkg
+KmVudHJ5KQ0KPiAgICAgICByZXR1cm4gKFFjb3cyQml0bWFwRGlyRW50cnkgKikoKHVpbnQ4X3Qg
+KillbnRyeSArIGRpcl9lbnRyeV9zaXplKGVudHJ5KSk7DQo+ICAgfQ0KPiAgIA0KPiAtc3RhdGlj
+IGludCBjaGVja19kaXJfZW50cnkoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIFFjb3cyQml0bWFwRGly
+RW50cnkgKmVudHJ5KQ0KPiArc3RhdGljIGludCBjaGVja19kaXJfZW50cnkoQmxvY2tEcml2ZXJT
+dGF0ZSAqYnMsIFFjb3cyQml0bWFwRGlyRW50cnkgKmVudHJ5LA0KPiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgYm9vbCBhbGxvd19yZXNpemUpDQo+ICAgew0KPiAgICAgICBCRFJWUWNvdzJT
+dGF0ZSAqcyA9IGJzLT5vcGFxdWU7DQo+ICAgICAgIHVpbnQ2NF90IHBoeXNfYml0bWFwX2J5dGVz
+Ow0KPiBAQCAtNDYyLDggKzQ2MywxNCBAQCBzdGF0aWMgaW50IGNoZWNrX2Rpcl9lbnRyeShCbG9j
+a0RyaXZlclN0YXRlICpicywgUWNvdzJCaXRtYXBEaXJFbnRyeSAqZW50cnkpDQo+ICAgICAgICAg
+ICByZXR1cm4gbGVuOw0KPiAgICAgICB9DQo+ICAgDQo+IC0gICAgZmFpbCA9IChwaHlzX2JpdG1h
+cF9ieXRlcyA+IEJNRV9NQVhfUEhZU19TSVpFKSB8fA0KPiAtICAgICAgICAgICAobGVuID4gKChw
+aHlzX2JpdG1hcF9ieXRlcyAqIDgpIDw8IGVudHJ5LT5ncmFudWxhcml0eV9iaXRzKSk7DQo+ICsg
+ICAgaWYgKHBoeXNfYml0bWFwX2J5dGVzID4gQk1FX01BWF9QSFlTX1NJWkUpIHsNCj4gKyAgICAg
+ICAgcmV0dXJuIC1FSU5WQUw7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgaWYgKCFhbGxvd19yZXNp
+emUgJiYNCj4gKyAgICAgICAgKGxlbiA+ICgocGh5c19iaXRtYXBfYnl0ZXMgKiA4KSA8PCBlbnRy
+eS0+Z3JhbnVsYXJpdHlfYml0cykpKSB7DQo+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiAr
+ICAgIH0NCg0Kbm93IEkgdGhpbmssIHRoYXQgd2UgZG9uJ3QgbmVlZCBhZGRpdGlvbmFsIHBhcmFt
+ZXRlciwgYnV0IGluc3RlYWQgZG8gdGhpcyBjaGVjayBvbmx5IGlmDQohIGVudHJ5LT5mbGFncyAm
+IEJNRV9GTEFHX0lOX1VTRSwgd2hpY2ggd2lsbCBjb3JyZXNwb25kIHRvOg0KDQoxLiBpbmNvbWlu
+ZzogYml0bWFwIGxvYWRlZCBmcm9tIGltYWdlDQoyLiBvdXRnb2luZzogYml0bWFwIHN0b3JlZCB0
+byB0aGUgaW1hZ2UNCg0KPiAgIA0KPiAgICAgICByZXR1cm4gZmFpbCA/IC1FSU5WQUwgOiAwOw0K
+PiAgIH0NCj4gQEAgLTUzNCw3ICs1NDEsOCBAQCBzdGF0aWMgdWludDMyX3QgYml0bWFwX2xpc3Rf
+Y291bnQoUWNvdzJCaXRtYXBMaXN0ICpibV9saXN0KQ0KPiAgICAqIGNoZWNrcyBpdCBhbmQgY29u
+dmVydCB0byBiaXRtYXAgbGlzdC4NCj4gICAgKi8NCj4gICBzdGF0aWMgUWNvdzJCaXRtYXBMaXN0
+ICpiaXRtYXBfbGlzdF9sb2FkKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBvZmZzZXQs
+DQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IHNp
+emUsIEVycm9yICoqZXJycCkNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgdWludDY0X3Qgc2l6ZSwgYm9vbCBhbGxvd19yZXNpemUsDQo+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCj4gICB7DQo+ICAgICAg
+IGludCByZXQ7DQo+ICAgICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4gQEAg
+LTU5Myw3ICs2MDEsNyBAQCBzdGF0aWMgUWNvdzJCaXRtYXBMaXN0ICpiaXRtYXBfbGlzdF9sb2Fk
+KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBvZmZzZXQsDQo+ICAgICAgICAgICAgICAg
+Z290byBmYWlsOw0KPiAgICAgICAgICAgfQ0KPiAgIA0KPiAtICAgICAgICByZXQgPSBjaGVja19k
+aXJfZW50cnkoYnMsIGUpOw0KPiArICAgICAgICByZXQgPSBjaGVja19kaXJfZW50cnkoYnMsIGUs
+IGFsbG93X3Jlc2l6ZSk7DQo+ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPiAgICAgICAgICAg
+ICAgIGVycm9yX3NldGcoZXJycCwgIkJpdG1hcCAnJS4qcycgZG9lc24ndCBzYXRpc2Z5IHRoZSBj
+b25zdHJhaW50cyIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICBlLT5uYW1lX3NpemUsIGRp
+cl9lbnRyeV9uYW1lX2ZpZWxkKGUpKTsNCj4gQEAgLTY1NCw3ICs2NjIsNyBAQCBpbnQgcWNvdzJf
+Y2hlY2tfYml0bWFwc19yZWZjb3VudHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEJkcnZDaGVja1Jl
+c3VsdCAqcmVzLA0KPiAgICAgICB9DQo+ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlz
+dF9sb2FkKGJzLCBzLT5iaXRtYXBfZGlyZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUsIE5VTEwpOw0KPiArICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZmFs
+c2UsIE5VTEwpOw0KPiAgICAgICBpZiAoYm1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAgICAgICBy
+ZXMtPmNvcnJ1cHRpb25zKys7DQo+ICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gQEAgLTc1
+NSw3ICs3NjMsNyBAQCBzdGF0aWMgaW50IGJpdG1hcF9saXN0X3N0b3JlKEJsb2NrRHJpdmVyU3Rh
+dGUgKmJzLCBRY293MkJpdG1hcExpc3QgKmJtX2xpc3QsDQo+ICAgICAgICAgICBlLT5leHRyYV9k
+YXRhX3NpemUgPSAwOw0KPiAgICAgICAgICAgbWVtY3B5KGUgKyAxLCBibS0+bmFtZSwgZS0+bmFt
+ZV9zaXplKTsNCj4gICANCj4gLSAgICAgICAgaWYgKGNoZWNrX2Rpcl9lbnRyeShicywgZSkgPCAw
+KSB7DQo+ICsgICAgICAgIGlmIChjaGVja19kaXJfZW50cnkoYnMsIGUsIGZhbHNlKSA8IDApIHsN
+Cj4gICAgICAgICAgICAgICByZXQgPSAtRUlOVkFMOw0KPiAgICAgICAgICAgICAgIGdvdG8gZmFp
+bDsNCj4gICAgICAgICAgIH0NCj4gQEAgLTk1Nyw3ICs5NjUsNyBAQCBib29sIHFjb3cyX2xvYWRf
+ZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKQ0KPiAgICAg
+ICB9DQo+ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRt
+YXBfZGlyZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBz
+LT5iaXRtYXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0KPiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZmFsc2UsIGVycnApOw0KPiAgICAg
+ICBpZiAoYm1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+ICAg
+ICAgIH0NCj4gQEAgLTEwNjYsNyArMTA3NCw3IEBAIFFjb3cyQml0bWFwSW5mb0xpc3QgKnFjb3cy
+X2dldF9iaXRtYXBfaW5mb19saXN0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICB9DQo+
+ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGly
+ZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRt
+YXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZmFsc2UsIGVycnApOw0KPiAgICAgICBpZiAo
+Ym1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAgICAgICByZXR1cm4gTlVMTDsNCj4gICAgICAgfQ0K
+PiBAQCAtMTExMSw3ICsxMTE5LDcgQEAgaW50IHFjb3cyX3Jlb3Blbl9iaXRtYXBzX3J3X2hpbnQo
+QmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGJvb2wgKmhlYWRlcl91cGRhdGVkLA0KPiAgICAgICB9DQo+
+ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGly
+ZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRt
+YXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZmFsc2UsIGVycnApOw0KPiAgICAgICBpZiAo
+Ym1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gICAgICAg
+fQ0KPiBAQCAtMTM1OSw3ICsxMzY3LDcgQEAgdm9pZCBxY293Ml9yZW1vdmVfcGVyc2lzdGVudF9k
+aXJ0eV9iaXRtYXAoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgICAgIH0NCj4gICANCj4gICAg
+ICAgYm1fbGlzdCA9IGJpdG1hcF9saXN0X2xvYWQoYnMsIHMtPmJpdG1hcF9kaXJlY3Rvcnlfb2Zm
+c2V0LA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rv
+cnlfc2l6ZSwgZXJycCk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0
+bWFwX2RpcmVjdG9yeV9zaXplLCBmYWxzZSwgZXJycCk7DQo+ICAgICAgIGlmIChibV9saXN0ID09
+IE5VTEwpIHsNCj4gICAgICAgICAgIHJldHVybjsNCj4gICAgICAgfQ0KPiBAQCAtMTQxMiw3ICsx
+NDIwLDcgQEAgdm9pZCBxY293Ml9zdG9yZV9wZXJzaXN0ZW50X2RpcnR5X2JpdG1hcHMoQmxvY2tE
+cml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJycCkNCj4gICAgICAgICAgIGJtX2xpc3QgPSBiaXRt
+YXBfbGlzdF9uZXcoKTsNCj4gICAgICAgfSBlbHNlIHsNCj4gICAgICAgICAgIGJtX2xpc3QgPSBi
+aXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGlyZWN0b3J5X29mZnNldCwNCj4gLSAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0bWFwX2RpcmVjdG9yeV9zaXplLCBl
+cnJwKTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+Yml0bWFwX2Rp
+cmVjdG9yeV9zaXplLCB0cnVlLCBlcnJwKTsNCj4gICAgICAgICAgIGlmIChibV9saXN0ID09IE5V
+TEwpIHsNCj4gICAgICAgICAgICAgICByZXR1cm47DQo+ICAgICAgICAgICB9DQo+IEBAIC0xNTkz
+LDcgKzE2MDEsNyBAQCBib29sIHFjb3cyX2Nhbl9zdG9yZV9uZXdfZGlydHlfYml0bWFwKEJsb2Nr
+RHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICB9DQo+ICAgDQo+ICAgICAgIGJtX2xpc3QgPSBiaXRt
+YXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGlyZWN0b3J5X29mZnNldCwNCj4gLSAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRtYXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0K
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6
+ZSwgZmFsc2UsIGVycnApOw0KPiAgICAgICBpZiAoYm1fbGlzdCA9PSBOVUxMKSB7DQo+ICAgICAg
+ICAgICBnb3RvIGZhaWw7DQo+ICAgICAgIH0NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
+bGFkaW1pcg0K
