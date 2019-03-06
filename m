@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33395)
+Received: from eggs.gnu.org ([209.51.188.92]:33984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1WSw-0001h4-SQ
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:20:13 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1h1WVr-0002iI-Ci
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:23:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1WSw-00023o-0r
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:20:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43386)
+	(envelope-from <balaton@eik.bme.hu>) id 1h1WVq-0003Ey-Gk
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:23:11 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:27461)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h1WSv-00022E-Nr
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:20:09 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190305162829.20079-1-philmd@redhat.com>
-	<20190305162829.20079-2-philmd@redhat.com>
-Date: Wed, 06 Mar 2019 14:20:04 +0100
-In-Reply-To: <20190305162829.20079-2-philmd@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Mar 2019 17:28:25
-	+0100")
-Message-ID: <874l8gywaj.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h1WVq-0003EL-96
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:23:10 -0500
+Date: Wed, 6 Mar 2019 14:22:57 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <201903061321.58890.randrianasulu@gmail.com>
+Message-ID: <alpine.BSF.2.21.9999.1903061409050.30260@zero.eik.bme.hu>
+References: <201903061321.58890.randrianasulu@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/5] hw/mips/malta: Fix the
- DEBUG_BOARD_INIT code
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] PMON2000 compilation and kernel question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Andrew Randrianasulu <randrianasulu@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+On Wed, 6 Mar 2019, Andrew Randrianasulu wrote:
+> I was compiling those pmons for last two days, and I happy to say most of my hackery was
+> unnecessary.
 
-> Commit fa1d36df746 missed to convert this ifdef'ed out code.
+Thanks. Just a few quick notes.
 
-My fault...
-
-> Introduce the pflash_blk variable.
+> After this , I run resulted pmon like this
+> (using Zoltan's patch for ati-vga device on top of current qemu):
 >
-> This fixes:
+> mips64el-softmmu/qemu-system-mips64el -M fulong2e -cpu Loongson-2E -m 1G 
+> -bios /dev/shm/pmon-my/pmon/zloader.2edev/pmon.bin -device 
+> ati-vga,model=rv100 -hda /dev/shm/LONGSOON_disk -cdrom 
+> /dev/shm/debian-8.0.0-mipsel-xfce-CD-1.iso -display sdl,gl=on
+
+I think you don't need -cpu option as board will set that anyway and 
+probably does not work with anything else. Also -m 1G is useless as memory 
+is currently fixed at 256 MB (see comment in mips_fulong2e.c:298) due to 
+me not knowing where to map highmem on mips in general or this board in 
+particular. If that's fixed and the line with the comment is removed you 
+may be able to use more than 256 MB RAM but not yet.
+
+> it can see both disk and CD, but sadly I was unable to find any working kernel?!
 >
->   hw/mips/mips_malta.c:1273:16: error: implicit declaration of function =
-=E2=80=98blk_name=E2=80=99; did you mean =E2=80=98basename=E2=80=99? [-Werr=
-or=3Dimplicit-function-declaration]
->                 blk_name(dinfo->bdrv), fl_sectors);
->                 ^~~~~~~~
->   hw/mips/mips_malta.c:1273:16: error: nested extern declaration of =E2=
-=80=98blk_name=E2=80=99 [-Werror=3Dnested-externs]
->   hw/mips/mips_malta.c:1273:30: error: =E2=80=98DriveInfo=E2=80=99 {aka =
-=E2=80=98struct DriveInfo=E2=80=99} has no member named =E2=80=98bdrv=E2=80=
-=99
->                 blk_name(dinfo->bdrv), fl_sectors);
->                                 ^~
->
-> Fixes: fa1d36df746
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/mips/mips_malta.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 2827074e9b..b4cd8f02ad 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -40,6 +40,7 @@
->  #include "hw/pci/pci.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/arch_init.h"
-> +#include "sysemu/block-backend.h"
->  #include "qemu/log.h"
->  #include "hw/mips/bios.h"
->  #include "hw/ide.h"
-> @@ -1205,6 +1206,7 @@ void mips_malta_init(MachineState *machine)
->      qemu_irq cbus_irq, i8259_irq;
->      int piix4_devfn;
->      I2CBus *smbus;
-> +    BlockBackend *pflash_blk =3D NULL;
->      DriveInfo *dinfo;
->      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->      int fl_idx =3D 0;
-> @@ -1265,17 +1267,18 @@ void mips_malta_init(MachineState *machine)
->=20=20
->      /* Load firmware in flash / BIOS. */
->      dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
-> -#ifdef DEBUG_BOARD_INIT
->      if (dinfo) {
-> +        pflash_blk =3D blk_by_legacy_dinfo(dinfo);
-> +#ifdef DEBUG_BOARD_INIT
->          printf("Register parallel flash %d size " TARGET_FMT_lx " at "
-> -               "addr %08llx '%s' %x\n",
-> -               fl_idx, bios_size, FLASH_ADDRESS,
-> -               blk_name(dinfo->bdrv), fl_sectors);
-> -    }
-> +               "addr %08llx '%s'\n",
-> +               fl_idx, blk_getlength(pflash_blk), FLASH_ADDRESS,
-> +               blk_name(pflash_blk));
+> vmlinux-2e just hangs early, and vmlinux-3.16.0-4-loongson-2e extracted from debian pkg
+> hangs a litle latter in boot process. Tried without -m option, and with 2F CPU.
+> I mean even with just -kernel, no bios involved.
 
-You stop printing @fl_sectors.  Intentional?
+This could be some missing or buggy emulation. Maybe if you can get some 
+debug logs from kernel that could tell what it's doing. Usually at least 
+-d unimp,guest_errors options are recommended for debugging but if nothing 
+is printed then it's harder to find out what's causing the hang.
 
-Would the next patch be a better fit?
+> Also, while I was able to compile-in uhci support, adding usb-kbd device freezes pmon. And newly-added
+> EHCI support apparently limited to only some CPUs/boards :/ At least I was unable to compile pmon in
+> this config and with mod_usb_ehci.
 
->  #endif
-> +    }
->      fl =3D pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
->                                 BIOS_SIZE,
-> -                               dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                               pflash_blk,
->                                 65536, fl_sectors,
->                                 4, 0x0000, 0x0000, 0x0000, 0x0000, be);
->      bios =3D pflash_cfi01_get_memory(fl);
+No idea about that but the default ps2 kbd and mouse that's set up by the 
+board should work so maybe it's not important and you should not need usb 
+for kbd.
 
-We should probably join lines here.
+Regards,
+BALATON Zoltan
