@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51533)
+Received: from eggs.gnu.org ([209.51.188.92]:52087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Vcq-0004dn-9Z
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:26:21 -0500
+	(envelope-from <lersek@redhat.com>) id 1h1Vgp-00062x-Kh
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:30:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1Vcp-0003Xn-6B
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:26:20 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Mar 2019 12:25:59 +0000
-Message-ID: <82ec6790-f366-3912-e85b-4908647d5c8d@virtuozzo.com>
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-2-jsnow@redhat.com>
-In-Reply-To: <20190301191545.8728-2-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <59799916DD146548B5EFA4239732346A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <lersek@redhat.com>) id 1h1Vgo-0006HL-Is
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:30:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35196)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1h1Vgk-0005vh-Ov
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 07:30:24 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 93F3730EBE6E
+	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 12:30:12 +0000 (UTC)
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <32ad1a44-5398-53de-9adf-9e6ac9f60805@redhat.com>
+Date: Wed, 6 Mar 2019 13:30:06 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] block/dirty-bitmaps: add
- inconsistent bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] recursive submodules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu devel list <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-MDEuMDMuMjAxOSAyMjoxNSwgSm9obiBTbm93IHdyb3RlOg0KPiBBZGQgYW4gaW5jb25zaXN0ZW50
-IGJpdCB0byBkaXJ0eS1iaXRtYXBzIHRoYXQgYWxsb3dzIHVzIHRvIHJlcG9ydCBhIGJpdG1hcCBh
-cw0KPiBwZXJzaXN0ZW50IGJ1dCBwb3RlbnRpYWxseSBpbmNvbnNpc3RlbnQsIGkuZS4gaWYgd2Ug
-ZmluZCBiaXRtYXBzIG9uIGEgcWNvdzINCj4gdGhhdCBoYXZlIGJlZW4gbWFya2VkIGFzICJpbiB1
-c2UiLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0K
-PiAtLS0NCj4gICBxYXBpL2Jsb2NrLWNvcmUuanNvbiAgICAgICAgIHwgMTMgKysrKysrKysrLS0t
-LQ0KPiAgIGluY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmggfCAgMiArKw0KPiAgIGJsb2NrL2Rp
-cnR5LWJpdG1hcC5jICAgICAgICAgfCAxOSArKysrKysrKysrKysrKysrKysrDQo+ICAgMyBmaWxl
-cyBjaGFuZ2VkLCAzMCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAt
-LWdpdCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gaW5k
-ZXggNmU1NDM1OTRiMy4uZTYzOWVmNmQxYyAxMDA2NDQNCj4gLS0tIGEvcWFwaS9ibG9jay1jb3Jl
-Lmpzb24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTQ2NywxNSArNDY3LDIw
-IEBADQo+ICAgIyAgICAgICAgYW5kIGNhbm5vdCBiZSBtb2RpZmllZCB2aWEgUU1QIG9yIHVzZWQg
-YnkgYW5vdGhlciBvcGVyYXRpb24uDQo+ICAgIyAgICAgICAgUmVwbGFjZXMgYGxvY2tlZGAgYW5k
-IGBmcm96ZW5gIHN0YXR1c2VzLiAoc2luY2UgNC4wKQ0KPiAgICMNCj4gLSMgQHBlcnNpc3RlbnQ6
-IHRydWUgaWYgdGhlIGJpdG1hcCB3aWxsIGV2ZW50dWFsbHkgYmUgZmx1c2hlZCB0byBwZXJzaXN0
-ZW50DQo+IC0jICAgICAgICAgICAgICBzdG9yYWdlIChzaW5jZSA0LjApDQo+ICsjIEBwZXJzaXN0
-ZW50OiB0cnVlIGlmIHRoZSBiaXRtYXAgd2FzIHN0b3JlZCBvbiBkaXNrLCBpcyBzY2hlZHVsZWQg
-dG8gYmUgc3RvcmVkDQo+ICsjICAgICAgICAgICAgICBvbiBkaXNrLCBvciBib3RoLiAoc2luY2Ug
-NC4wKQ0KPiArIw0KPiArIyBAaW5jb25zaXN0ZW50OiB0cnVlIGlmIHRoaXMgaXMgYSBwZXJzaXN0
-ZW50IGJpdG1hcCB0aGF0IHdhcyBpbXByb3Blcmx5DQo+ICsjICAgICAgICAgICAgICAgIHN0b3Jl
-ZC4gSW1wbGllcyBAcGVyc2lzdGVudCB0byBiZSB0cnVlOyBAcmVjb3JkaW5nIGFuZA0KPiArIyAg
-ICAgICAgICAgICAgICBAYnVzeSB0byBiZSBmYWxzZS4gVGhpcyBiaXRtYXAgY2Fubm90IGJlIHVz
-ZWQuIFRvIHJlbW92ZQ0KPiArIyAgICAgICAgICAgICAgICBpdCwgdXNlIEBibG9jay1kaXJ0eS1i
-aXRtYXAtcmVtb3ZlLiAoU2luY2UgNC4wKQ0KPiAgICMNCj4gICAjIFNpbmNlOiAxLjMNCj4gICAj
-Iw0KPiAgIHsgJ3N0cnVjdCc6ICdCbG9ja0RpcnR5SW5mbycsDQo+ICAgICAnZGF0YSc6IHsnKm5h
-bWUnOiAnc3RyJywgJ2NvdW50JzogJ2ludCcsICdncmFudWxhcml0eSc6ICd1aW50MzInLA0KPiAt
-ICAgICAgICAgICAncmVjb3JkaW5nJzogJ2Jvb2wnLCAnYnVzeSc6ICdib29sJywNCj4gLSAgICAg
-ICAgICAgJ3N0YXR1cyc6ICdEaXJ0eUJpdG1hcFN0YXR1cycsICdwZXJzaXN0ZW50JzogJ2Jvb2wn
-IH0gfQ0KPiArICAgICAgICAgICAncmVjb3JkaW5nJzogJ2Jvb2wnLCAnYnVzeSc6ICdib29sJywg
-J3N0YXR1cyc6ICdEaXJ0eUJpdG1hcFN0YXR1cycsDQo+ICsgICAgICAgICAgICdwZXJzaXN0ZW50
-JzogJ2Jvb2wnLCAnKmluY29uc2lzdGVudCc6ICdib29sJyB9IH0NCj4gICANCj4gICAjIw0KPiAg
-ICMgQFFjb3cyQml0bWFwSW5mb0ZsYWdzOg0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9k
-aXJ0eS1iaXRtYXAuaCBiL2luY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmgNCj4gaW5kZXggYmE4
-NDc3YjczZi4uYmQxYjY0NzlkZiAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9jay9kaXJ0eS1i
-aXRtYXAuaA0KPiArKysgYi9pbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oDQo+IEBAIC02OCw2
-ICs2OCw3IEBAIHZvaWQgYmRydl9kaXJ0eV9iaXRtYXBfZGVzZXJpYWxpemVfZmluaXNoKEJkcnZE
-aXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICB2b2lkIGJkcnZfZGlydHlfYml0bWFwX3NldF9yZWFk
-b25seShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgYm9vbCB2YWx1ZSk7DQo+ICAgdm9pZCBiZHJ2
-X2RpcnR5X2JpdG1hcF9zZXRfcGVyc2lzdGFuY2UoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsDQo+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYm9vbCBwZXJzaXN0ZW50
-KTsNCj4gK3ZvaWQgYmRydl9kaXJ0eV9iaXRtYXBfc2V0X2luY29uc2lzdGVudChCZHJ2RGlydHlC
-aXRtYXAgKmJpdG1hcCk7DQo+ICAgdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfYnVzeShCZHJ2
-RGlydHlCaXRtYXAgKmJpdG1hcCwgYm9vbCBidXN5KTsNCj4gICB2b2lkIGJkcnZfbWVyZ2VfZGly
-dHlfYml0bWFwKEJkcnZEaXJ0eUJpdG1hcCAqZGVzdCwgY29uc3QgQmRydkRpcnR5Qml0bWFwICpz
-cmMsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBIQml0bWFwICoqYmFja3VwLCBF
-cnJvciAqKmVycnApOw0KPiBAQCAtOTEsNiArOTIsNyBAQCBib29sIGJkcnZfZGlydHlfYml0bWFw
-X3JlYWRvbmx5KGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICBib29sIGJkcnZf
-aGFzX3JlYWRvbmx5X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpOw0KPiAgIGJvb2wgYmRy
-dl9kaXJ0eV9iaXRtYXBfZ2V0X2F1dG9sb2FkKGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFw
-KTsNCj4gICBib29sIGJkcnZfZGlydHlfYml0bWFwX2dldF9wZXJzaXN0YW5jZShCZHJ2RGlydHlC
-aXRtYXAgKmJpdG1hcCk7DQo+ICtib29sIGJkcnZfZGlydHlfYml0bWFwX2luY29uc2lzdGVudChj
-b25zdCBCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCk7DQo+ICAgYm9vbCBiZHJ2X2RpcnR5X2JpdG1h
-cF9idXN5KEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICBib29sIGJkcnZfaGFzX2NoYW5n
-ZWRfcGVyc2lzdGVudF9iaXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzKTsNCj4gICBCZHJ2RGly
-dHlCaXRtYXAgKmJkcnZfZGlydHlfYml0bWFwX25leHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+
-IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
-DQo+IGluZGV4IDk4MGNhZTRmYTMuLjllODYzMGUxYWMgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Rp
-cnR5LWJpdG1hcC5jDQo+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IEBAIC00Niw2ICs0
-Niw5IEBAIHN0cnVjdCBCZHJ2RGlydHlCaXRtYXAgew0KPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgYW5kIHRoaXMgYml0bWFwIG11c3QgcmVtYWluIHVuY2hhbmdlZCB3aGls
-ZQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyBmbGFnIGlzIHNl
-dC4gKi8NCj4gICAgICAgYm9vbCBwZXJzaXN0ZW50OyAgICAgICAgICAgIC8qIGJpdG1hcCBtdXN0
-IGJlIHNhdmVkIHRvIG93bmVyIGRpc2sgaW1hZ2UgKi8NCj4gKyAgICBib29sIGluY29uc2lzdGVu
-dDsgICAgICAgICAgLyogYml0bWFwIGlzIHBlcnNpc3RlbnQsIGJ1dCBpbmNvbnNpc3RlbnQuDQo+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqIEl0IGNhbm5vdCBiZSB1c2VkIGF0
-IGFsbCBpbiBhbnkgd2F5LCBleGNlcHQNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICogYSBRTVAgdXNlciBjYW4gcmVtb3ZlIGl0LiAqLw0KPiAgICAgICBib29sIG1pZ3JhdGlv
-bjsgICAgICAgICAgICAgLyogQml0bWFwIGlzIHNlbGVjdGVkIGZvciBtaWdyYXRpb24sIGl0IHNo
-b3VsZA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbm90IGJlIHN0b3Jl
-ZCBvbiB0aGUgbmV4dCBpbmFjdGl2YXRpb24NCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIChwZXJzaXN0ZW50IGZsYWcgZG9lc24ndCBtYXR0ZXIgdW50aWwgbmV4dA0KPiBA
-QCAtNDY0LDYgKzQ2Nyw4IEBAIEJsb2NrRGlydHlJbmZvTGlzdCAqYmRydl9xdWVyeV9kaXJ0eV9i
-aXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPiAgICAgICAgICAgaW5mby0+cmVjb3JkaW5n
-ID0gYmRydl9kaXJ0eV9iaXRtYXBfcmVjb3JkaW5nKGJtKTsNCj4gICAgICAgICAgIGluZm8tPmJ1
-c3kgPSBiZHJ2X2RpcnR5X2JpdG1hcF9idXN5KGJtKTsNCj4gICAgICAgICAgIGluZm8tPnBlcnNp
-c3RlbnQgPSBibS0+cGVyc2lzdGVudDsNCj4gKyAgICAgICAgaW5mby0+aGFzX2luY29uc2lzdGVu
-dCA9IGJtLT5pbmNvbnNpc3RlbnQ7DQo+ICsgICAgICAgIGluZm8tPmluY29uc2lzdGVudCA9IGJt
-LT5pbmNvbnNpc3RlbnQ7DQo+ICAgICAgICAgICBlbnRyeS0+dmFsdWUgPSBpbmZvOw0KPiAgICAg
-ICAgICAgKnBsaXN0ID0gZW50cnk7DQo+ICAgICAgICAgICBwbGlzdCA9ICZlbnRyeS0+bmV4dDsN
-Cj4gQEAgLTcxMSw2ICs3MTYsMTUgQEAgdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfcGVyc2lz
-dGFuY2UoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsIGJvb2wgcGVyc2lzdGVudCkNCj4gICAgICAg
-cWVtdV9tdXRleF91bmxvY2soYml0bWFwLT5tdXRleCk7DQo+ICAgfQ0KPiAgIA0KPiArLyogQ2Fs
-bGVkIHdpdGggQlFMIHRha2VuLiAqLw0KPiArdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfaW5j
-b25zaXN0ZW50KEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKQ0KPiArew0KPiArICAgIHFlbXVfbXV0
-ZXhfbG9jayhiaXRtYXAtPm11dGV4KTsNCj4gKyAgICBiaXRtYXAtPmluY29uc2lzdGVudCA9IHRy
-dWU7DQo+ICsgICAgYml0bWFwLT5kaXNhYmxlZCA9IHRydWU7DQoNCkFncmVlLCB0aGF0IGl0IHdv
-cnRoIHRvIGFzc2VydCBwZXJzaXN0YW5jZQ0KDQo+ICsgICAgcWVtdV9tdXRleF91bmxvY2soYml0
-bWFwLT5tdXRleCk7DQo+ICt9DQo+ICsNCj4gICAvKiBDYWxsZWQgd2l0aCBCUUwgdGFrZW4uICov
-DQo+ICAgdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfbWlncmF0aW9uKEJkcnZEaXJ0eUJpdG1h
-cCAqYml0bWFwLCBib29sIG1pZ3JhdGlvbikNCj4gICB7DQo+IEBAIC03MjQsNiArNzM4LDExIEBA
-IGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfZ2V0X3BlcnNpc3RhbmNlKEJkcnZEaXJ0eUJpdG1hcCAq
-Yml0bWFwKQ0KPiAgICAgICByZXR1cm4gYml0bWFwLT5wZXJzaXN0ZW50ICYmICFiaXRtYXAtPm1p
-Z3JhdGlvbjsNCj4gICB9DQo+ICAgDQo+ICtib29sIGJkcnZfZGlydHlfYml0bWFwX2luY29uc2lz
-dGVudChjb25zdCBCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCkNCj4gK3sNCj4gKyAgICByZXR1cm4g
-Yml0bWFwLT5pbmNvbnNpc3RlbnQ7DQo+ICt9DQo+ICsNCj4gICBib29sIGJkcnZfaGFzX2NoYW5n
-ZWRfcGVyc2lzdGVudF9iaXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPiAgIHsNCj4gICAg
-ICAgQmRydkRpcnR5Qml0bWFwICpibTsNCj4gDQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1l
-bnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNClNvcnJ5IGZvciBh
-IGRlbGF5LCBJJ20gdmVyeSBidXN5IHdpdGggb3VyIHJlYmFzZSB0byAyLjEyIDooDQoNCi0tIA0K
-QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Hi,
+
+in order to build any OVMF platform firmware image from the submodule at
+"roms/edk2", the (recursive) OpenSSL submodule at
+"roms/edk2/CryptoPkg/Library/OpensslLib/openssl" needs to be initialized
+as well.
+
+Am I right to think this would be the first recursive submodule in QEMU?
+How should I approach this? (I see we have a related script at
+"scripts/git-submodule.sh".)
+
+Thanks,
+Laszlo
