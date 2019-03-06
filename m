@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39413)
+Received: from eggs.gnu.org ([209.51.188.92]:39433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1cvW-0007qr-PW
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 15:14:07 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1h1cvY-0007s8-Oh
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 15:14:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1cvT-00073U-Vg
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 15:14:04 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:49135)
+	(envelope-from <balaton@eik.bme.hu>) id 1h1cvW-00074j-Rt
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 15:14:08 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:49139)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h1cvR-000708-Vo
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 15:14:03 -0500
-Message-Id: <cover.1551902740.git.balaton@eik.bme.hu>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h1cvU-00070T-Lc
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 15:14:04 -0500
+Message-Id: <12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1551902740.git.balaton@eik.bme.hu>
+References: <cover.1551902740.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Wed, 6 Mar 2019 21:05:40 +0100
-Subject: [Qemu-devel] [PATCH v5-resend 0/2] Basic ATI VGA emulation
+Date: Wed, 06 Mar 2019 21:05:40 +0100
+Subject: [Qemu-devel] [PATCH v5-resend 2/2] mips_fulong2e: Add on-board
+ graphics chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +25,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, philmd@redhat.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>, philmd@redhat.com
 
-Hello,
+Add (partial) emulation of the on-board GPU of the machine. This
+allows the PMON2000 firmware to run and should also work with Linux
+console but probably not with X yet.
 
-This is the latest version of the ati-vga patch, now also including
-the mips_fulong2e patch in a series so both can be merged together via
-the UI tree as agreed before to avoid needing to sync two maintainers.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ hw/mips/mips_fulong2e.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-That's probably all I can do before the freeze but the rest can be
-considered bugfixes (or given that there's nothing to regress from yet
-anything can be considered bugfix at this stage) so we may have some
-more chance to improve it before the release if it's merged now.
-
-At least Linux console and fulong2e PMON firmware should work but I
-wasn't able to completely find out how 2D accel should work so it
-still gives some garbled output for guests using it but I won't have
-time to figure this out before the freeze. I could take some help in
-this from someone knowing this hardware and pixman better than me.
-(Pixman not having any documentation does not help.)
-
-Please let me know if there's anything that needs to be fixed for it
-to be merged now. I can probably make another version before the
-freeze with those changes but not much more at the moment.
-
-Regards,
-BALATON Zoltan
-
-BALATON Zoltan (2):
-  hw/display: Add basic ATI VGA emulation
-  mips_fulong2e: Add on-board graphics chip
-
- default-configs/pci.mak  |   1 +
- hw/display/Makefile.objs |   2 +
- hw/display/ati.c         | 786 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/display/ati_2d.c      | 167 ++++++++++
- hw/display/ati_dbg.c     | 259 ++++++++++++++++
- hw/display/ati_int.h     |  93 ++++++
- hw/display/ati_regs.h    | 461 +++++++++++++++++++++++++++
- hw/display/trace-events  |   4 +
- hw/mips/mips_fulong2e.c  |   6 +
- vl.c                     |   1 +
- 10 files changed, 1780 insertions(+)
- create mode 100644 hw/display/ati.c
- create mode 100644 hw/display/ati_2d.c
- create mode 100644 hw/display/ati_dbg.c
- create mode 100644 hw/display/ati_int.h
- create mode 100644 hw/display/ati_regs.h
-
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index fbbc543eed..f877693766 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -287,6 +287,7 @@ static void mips_fulong2e_init(MachineState *machine)
+     I2CBus *smbus;
+     MIPSCPU *cpu;
+     CPUMIPSState *env;
++    DeviceState *dev;
+ 
+     /* init CPUs */
+     cpu = MIPS_CPU(cpu_create(machine->cpu_type));
+@@ -347,6 +348,11 @@ static void mips_fulong2e_init(MachineState *machine)
+     vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
+                                &smbus, &isa_bus);
+ 
++    /* GPU */
++    dev = DEVICE(pci_create(pci_bus, -1, "ati-vga"));
++    qdev_prop_set_uint16(dev, "x-device-id", 0x5159);
++    qdev_init_nofail(dev);
++
+     /* Populate SPD eeprom data */
+     spd_data = spd_data_generate(DDR, ram_size, &err);
+     if (err) {
 -- 
 2.13.7
