@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58953)
+Received: from eggs.gnu.org ([209.51.188.92]:59466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h1WIo-0004dY-IG
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:09:43 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1WKk-00068a-8T
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:11:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h1WIi-0004P4-LO
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:09:42 -0500
-References: <1551823429-1440-1-git-send-email-guoheyi@huawei.com>
-	<20190306113354.5a98654b@redhat.com>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <b904272b-9eca-36e7-d24b-4c84b6c4f4af@huawei.com>
-Date: Wed, 6 Mar 2019 21:09:11 +0800
+	(envelope-from <laurent@vivier.eu>) id 1h1WKj-0005kb-Jy
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:11:42 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:35049)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h1WKj-0005k1-8p
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:11:41 -0500
+References: <mvm5zsxz2we.fsf@suse.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <be7edb45-9fbe-68b6-6fc0-e4cd987a93e2@vivier.eu>
+Date: Wed, 6 Mar 2019 14:11:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190306113354.5a98654b@redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <mvm5zsxz2we.fsf@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw/arm/acpi: simplify AML bit
- and/or statement
+Subject: Re: [Qemu-devel] [PATCH] linux-user: don't short-circuit read with
+ zero length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon
-	Zhao <shannon.zhaosl@gmail.com>, wanghaibin.wang@huawei.com
+To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-Sorry, I didn't know the indention policy of qemu code. So we need to indent the 2nd line just after the parentheses it belongs to?
+On 05/03/2019 17:45, Andreas Schwab wrote:
+> A zero-length read still needs to do the usual checks, thus it may return
+> errors like EBADF.  This makes the read syscall emulation consistent with
+> the pread64 syscall emulation.
+> 
+> Signed-off-by: Andreas Schwab <schwab@suse.de>
+> ---
+>  linux-user/syscall.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index ff912e89e1..7fac8e318f 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7047,8 +7047,8 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>          _exit(arg1);
+>          return 0; /* avoid warning */
+>      case TARGET_NR_read:
+> -        if (arg3 == 0) {
+> -            return 0;
+> +        if (arg2 == 0 && arg3 == 0) {
+> +            return get_errno(safe_read(arg1, 0, 0));
+>          } else {
+>              if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+>                  return -TARGET_EFAULT;
+> 
 
-Will change that and send next version.
+Applied to my linux-user branch.
 
 Thanks,
-
-Heyi
-
-
-On 2019/3/6 18:33, Igor Mammedov wrote:
-> On Wed, 6 Mar 2019 06:03:48 +0800
-> Heyi Guo <guoheyi@huawei.com> wrote:
->
->> The last argument of AML bit and/or statement is the target variable,
->> so we don't need to use a NULL target and then an additional store
->> operation; a single bit and/or statement is enough.
->>
->> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->> ---
->>   hw/arm/virt-acpi-build.c | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index 04b62c7..1c84e87 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -265,16 +265,16 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>           aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
->>       aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
->>       aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
->> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
->> +    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
->>                                   aml_name("CTRL")));
-> pls fix indent in all such cases. I'd align it like this:
->     aml_append(ifctx,
->                aml_and(aml_name("CTRL"), aml_int(0x1D), aml_name("CTRL")));
->
-> or
->     aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
->                               aml_name("CTRL")));
->
->
-> PS:
-> When making multi-patch series use --cover-letter git option
->
->>   
->>       ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
->> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
->> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x08),
->>                                    aml_name("CDW1")));
->>       aml_append(ifctx, ifctx1);
->>   
->>       ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
->> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
->> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x10),
->>                                    aml_name("CDW1")));
->>       aml_append(ifctx, ifctx1);
->>   
->> @@ -283,7 +283,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>       aml_append(method, ifctx);
->>   
->>       elsectx = aml_else();
->> -    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
->> +    aml_append(elsectx, aml_or(aml_name("CDW1"), aml_int(4),
->>                                     aml_name("CDW1")));
->>       aml_append(elsectx, aml_return(aml_arg(3)));
->>       aml_append(method, elsectx);
->
-> .
->
+Laurent
