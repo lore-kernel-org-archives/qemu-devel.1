@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34088)
+Received: from eggs.gnu.org ([209.51.188.92]:34521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h1UJE-0002IZ-1Y
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:02:00 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1ULs-0003Ep-SS
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h1UJD-0005Gb-2v
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:01:59 -0500
-References: <20190305051007.56009-1-stephen.checkoway@oberlin.edu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <52a82d3a-3b79-c61d-93fa-f087af45f6fb@redhat.com>
-Date: Wed, 6 Mar 2019 12:01:50 +0100
+	(envelope-from <thuth@redhat.com>) id 1h1ULn-0006wr-6r
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:04:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34114)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h1ULm-0006is-6C
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:04:39 -0500
+References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8WZuAmNFQqCsvsN35UnFJk=sGcCJmF27v3SS++FnpXXQ@mail.gmail.com>
+	<ab98409f-89f3-62d2-f5aa-b460eaa0cd05@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3c67eb5e-6a7e-d884-9ce7-639584c0c63f@redhat.com>
+Date: Wed, 6 Mar 2019 12:04:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190305051007.56009-1-stephen.checkoway@oberlin.edu>
+In-Reply-To: <ab98409f-89f3-62d2-f5aa-b460eaa0cd05@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/char/escc: Lower irq when transmit
- buffer is filled
+Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yang Zhong <yang.zhong@intel.com>
 
-On 05/03/19 06:10, Stephen Checkoway wrote:
-> The SCC/ESCC will briefly stop asserting an interrupt when the
-> transmit FIFO is filled.
+On 06/03/2019 11.57, Paolo Bonzini wrote:
+> On 05/03/19 10:32, Peter Maydell wrote:
+>> Everything fails to build with errors like
+>> make: *** No rule to make target `config-all-devices.mak', needed by
+>> `subdir-aarch64-softmmu'.  Stop.
+>>
+>> or
+>> make: *** No rule to make target
+>> `/home/pm215/qemu/default-configs/pci.mak', needed by
+>> `aarch64-softmmu/config-devices.mak'.  Stop.
+>>
+>> If there are special instructions for what to do with
+>> build trees over the transition to kconfig, the pullreq
+>> cover letter would be a good place to mention them :-)
 > 
-> This code doesn't model the transmit FIFO/shift register so the
-> pending transmit interrupt is never deasserted which means that an
-> edge-triggered interrupt controller will never see the low-to-high
-> transition it needs to raise another interrupt. The practical
-> consequence of this is that guest firmware with an interrupt service
-> routine for the ESCC that does not send all of the data it has
-> immediately will stop sending data if the following sequence of
-> events occurs:
-> 1. Disable processor interrupts
-> 2. Write a character to the ESCC
-> 3. Add additional characters to a buffer which is drained by the ISR
-> 4. Enable processor interrupts
-> 
-> In this case, the first character will be sent, the interrupt will
-> fire and the ISR will output the second character. Since the pending
-> transmit interrupt remains asserted, no additional interrupts will
-> ever fire.
-> 
-> This fixes that situation by explicitly lowering the IRQ when a
-> character is written to the buffer.
-> 
-> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+> As others mentioned, this is the "usual" stale dependency issue
+> requiring distclean.
 
-Looks good but I would like Mark to give his ack as well.
+Can't we somehow add a dependency for the *.mak.d file so that they get
+regenerated in this case? ... I tried to hack the Makefile, but so far I
+failed...
 
-Mark, could you also add hw/char/escc.c to both SPARC and Mac sections
-of MAINTAINERS?
-
-Thanks,
-
-Paolo
-
-> ---
->  hw/char/escc.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/char/escc.c b/hw/char/escc.c
-> index 628f5f81f7..bea55ad8da 100644
-> --- a/hw/char/escc.c
-> +++ b/hw/char/escc.c
-> @@ -509,6 +509,7 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->          break;
->      case SERIAL_DATA:
->          trace_escc_mem_writeb_data(CHN_C(s), val);
-> +        qemu_irq_lower(s->irq);
->          s->tx = val;
->          if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
->              if (qemu_chr_fe_backend_connected(&s->chr)) {
-> 
+ Thomas
