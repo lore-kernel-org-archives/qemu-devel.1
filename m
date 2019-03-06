@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57929)
+Received: from eggs.gnu.org ([209.51.188.92]:58035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1WEg-00024m-2d
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:05:27 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1WF5-0002MR-1a
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h1WEf-0002H9-7K
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:05:26 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Mar 2019 13:05:18 +0000
-Message-ID: <d22251c0-bdca-4913-e8d3-aa6e032492db@virtuozzo.com>
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-3-jsnow@redhat.com>
-In-Reply-To: <20190301191545.8728-3-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1C2C5AFE6F67194B8A607865C26FB596@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <laurent@vivier.eu>) id 1h1WF4-0002VZ-AM
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:05:51 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:40831)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h1WF3-0002Uv-VV
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 08:05:50 -0500
+References: <20190227191556.GA20198@ls3530.dellerweb.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e6a8123c-20f9-8cc4-594f-8db02c3607cc@vivier.eu>
+Date: Wed, 6 Mar 2019 14:05:46 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] block/dirty-bitmap: add
- inconsistent status
+In-Reply-To: <20190227191556.GA20198@ls3530.dellerweb.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Add missing IPV6 sockopts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
 
-MDEuMDMuMjAxOSAyMjoxNSwgSm9obiBTbm93IHdyb3RlOg0KPiBFdmVuIHRob3VnaCB0aGUgc3Rh
-dHVzIGZpZWxkIGlzIGRlcHJlY2F0ZWQsIHdlIHN0aWxsIGhhdmUgdG8gc3VwcG9ydA0KPiBpdCBm
-b3IgYSBmZXcgbW9yZSByZWxlYXNlcy4gU2luY2UgdGhpcyBpcyBhIHZlcnkgbmV3IGtpbmQgb2Yg
-Yml0bWFwDQo+IHN0YXRlLCBpdCBtYWtlcyBzZW5zZSBmb3IgaXQgdG8gaGF2ZSBpdHMgb3duIHN0
-YXR1cyBmaWVsZC4NCj4gDQo+IFJldmlld2VkLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0
-LmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiAt
-LS0NCj4gICBxYXBpL2Jsb2NrLWNvcmUuanNvbiB8IDcgKysrKysrLQ0KPiAgIGJsb2NrL2RpcnR5
-LWJpdG1hcC5jIHwgNyArKysrKystDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCAxMiBpbnNlcnRpb25z
-KCspLCAyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29yZS5q
-c29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gaW5kZXggZTYzOWVmNmQxYy4uYWU1NWNkMDcw
-NCAxMDA2NDQNCj4gLS0tIGEvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gKysrIGIvcWFwaS9ibG9j
-ay1jb3JlLmpzb24NCj4gQEAgLTQ0MiwxMCArNDQyLDE1IEBADQo+ICAgIyAgICAgICAgICByZWNv
-cmRpbmcgbmV3IHdyaXRlcy4gSWYgdGhlIGJpdG1hcCB3YXMgQGRpc2FibGVkLCBpdCBpcyBub3QN
-Cj4gICAjICAgICAgICAgIHJlY29yZGluZyBuZXcgd3JpdGVzLiAoU2luY2UgMi4xMikNCj4gICAj
-DQo+ICsjIEBpbmNvbnNpc3RlbnQ6IFRoaXMgaXMgYSBwZXJzaXN0ZW50IGRpcnR5IGJpdG1hcCB0
-aGF0IHdhcyBtYXJrZWQgaW4tdXNlIG9uDQo+ICsjICAgICAgICAgICAgICAgIGRpc2ssIGFuZCBp
-cyB1bnVzYWJsZSBieSBRRU1VLiBJdCBjYW4gb25seSBiZSBkZWxldGVkLg0KPiArIyAgICAgICAg
-ICAgICAgICBQbGVhc2UgcmVseSBvbiB0aGUgaW5jb25zaXN0ZW50IGZpZWxkIGluIEBCbG9ja0Rp
-cnR5SW5mbw0KPiArIyAgICAgICAgICAgICAgICBpbnN0ZWFkLCBhcyB0aGUgc3RhdHVzIGZpZWxk
-IGlzIGRlcHJlY2F0ZWQuIChTaW5jZSA0LjApDQo+ICsjDQo+ICAgIyBTaW5jZTogMi40DQo+ICAg
-IyMNCj4gICB7ICdlbnVtJzogJ0RpcnR5Qml0bWFwU3RhdHVzJywNCj4gLSAgJ2RhdGEnOiBbJ2Fj
-dGl2ZScsICdkaXNhYmxlZCcsICdmcm96ZW4nLCAnbG9ja2VkJ10gfQ0KPiArICAnZGF0YSc6IFsn
-YWN0aXZlJywgJ2Rpc2FibGVkJywgJ2Zyb3plbicsICdsb2NrZWQnLCAnaW5jb25zaXN0ZW50J10g
-fQ0KPiAgIA0KPiAgICMjDQo+ICAgIyBAQmxvY2tEaXJ0eUluZm86DQo+IGRpZmYgLS1naXQgYS9i
-bG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IGluZGV4IDllODYz
-MGUxYWMuLjcxZTAwOTgzOTYgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+
-ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IEBAIC0yMDksMTAgKzIwOSwxNSBAQCBib29s
-IGJkcnZfZGlydHlfYml0bWFwX2VuYWJsZWQoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApDQo+ICAg
-ICogICAgICAgICAgICAgICBvciBpdCBjYW4gYmUgRGlzYWJsZWQgYW5kIG5vdCByZWNvcmRpbmcg
-d3JpdGVzLg0KPiAgICAqICg0KSBMb2NrZWQ6ICAgV2hldGhlciBBY3RpdmUgb3IgRGlzYWJsZWQs
-IHRoZSB1c2VyIGNhbm5vdCBtb2RpZnkgdGhpcyBiaXRtYXANCj4gICAgKiAgICAgICAgICAgICAg
-IGluIGFueSB3YXkgZnJvbSB0aGUgbW9uaXRvci4NCj4gKyAqICg1KSBJbmNvbnNpc3RlbnQ6IFRo
-aXMgaXMgYSBwZXJzaXN0ZW50IGJpdG1hcCB3aG9zZSAiaW4gdXNlIiBiaXQgaXMgc2V0LCBhbmQN
-Cg0KIndhcyIsIGxpa2UgaW4gcWFwaSBpcyBiZXR0ZXIgdGhhbiAiaXMiLCBhcyB3aGlsZSBxZW11
-IHJ1bm5pbmcgb3RoZXIgKG5vdCBpbmNvbnNpc3RlbnQpDQpiaXRtYXBzJyBJTl9VU0UgYml0IGlz
-IGFsc28gc2V0Li4NCg0KYnV0IEkgZG9uJ3QgcmVhbGx5IGNhcmUgYWJvdXQgZGVwcmVjYXRlZCBj
-b21tZW50OiksIGFueXdheToNCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
-dnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiArICogICAgICAgICAgICAgICAg
-ICAgaXMgdW51c2FibGUgYnkgUUVNVS4gSXQgY2FuIGJlIGRlbGV0ZWQgdG8gcmVtb3ZlIGl0IGZy
-b20NCj4gKyAqICAgICAgICAgICAgICAgICAgIHRoZSBxY293Mi4NCj4gICAgKi8NCj4gICBEaXJ0
-eUJpdG1hcFN0YXR1cyBiZHJ2X2RpcnR5X2JpdG1hcF9zdGF0dXMoQmRydkRpcnR5Qml0bWFwICpi
-aXRtYXApDQo+ICAgew0KPiAtICAgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF9oYXNfc3VjY2Vzc29y
-KGJpdG1hcCkpIHsNCj4gKyAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfaW5jb25zaXN0ZW50KGJp
-dG1hcCkpIHsNCj4gKyAgICAgICAgcmV0dXJuIERJUlRZX0JJVE1BUF9TVEFUVVNfSU5DT05TSVNU
-RU5UOw0KPiArICAgIH0gZWxzZSBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfaGFzX3N1Y2Nlc3Nvcihi
-aXRtYXApKSB7DQo+ICAgICAgICAgICByZXR1cm4gRElSVFlfQklUTUFQX1NUQVRVU19GUk9aRU47
-DQo+ICAgICAgIH0gZWxzZSBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfYnVzeShiaXRtYXApKSB7DQo+
-ICAgICAgICAgICByZXR1cm4gRElSVFlfQklUTUFQX1NUQVRVU19MT0NLRUQ7DQo+IA0KDQoNCi0t
-IA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 27/02/2019 20:15, Helge Deller wrote:
+> When running ssh over IPv6 with linux-user I faced this warning:
+>  Unsupported setsockopt level=41 optname=67
+>  setsockopt IPV6_TCLASS 32: Protocol not available:
+> 
+> This patch adds a few missing IPV6 options, including IPV6_TCLASS.
+> 
+> Signed-off-by: Helge Deller <deller@gmx.de>
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 5bbb72f3d5..08efbf14b6 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -1871,6 +1874,20 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+>          case IPV6_RECVHOPLIMIT:
+>          case IPV6_2292HOPLIMIT:
+>          case IPV6_CHECKSUM:
+> +        case IPV6_ADDRFORM:
+> +        case IPV6_2292PKTINFO:
+> +        case IPV6_RECVTCLASS:
+> +        case IPV6_RECVRTHDR:
+> +        case IPV6_2292RTHDR:
+> +        case IPV6_RECVHOPOPTS:
+> +        case IPV6_2292HOPOPTS:
+> +        case IPV6_RECVDSTOPTS:
+> +        case IPV6_2292DSTOPTS:
+> +        case IPV6_TCLASS:
+> +        case IPV6_RECVPATHMTU:
+> +        case IPV6_TRANSPARENT:
+> +        case IPV6_FREEBIND:
+> +        case IPV6_RECVORIGDSTADDR:
+>              val = 0;
+>              if (optlen < sizeof(uint32_t)) {
+>                  return -TARGET_EINVAL;
+> 
+
+It looks good. Could you also update do_getsockopt() list?
+
+Thanks,
+Laurent
