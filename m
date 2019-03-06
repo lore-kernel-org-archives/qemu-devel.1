@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42309)
+Received: from eggs.gnu.org ([209.51.188.92]:42574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1ZRE-00059Z-So
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:30:37 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h1ZSZ-0005nj-Ke
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:32:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1h1ZR8-00022T-7S
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:30:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47442)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1h1ZR6-0001yu-EG
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:30:29 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E7083003097
-	for <qemu-devel@nongnu.org>; Wed,  6 Mar 2019 16:30:26 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed,  6 Mar 2019 17:30:25 +0100
-Message-Id: <1551889825-227155-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH] numa: warn if numa 'mem' option or default RAM
- splitting between nodes is used.
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h1ZSX-0003Kn-BW
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 11:31:59 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 6 Mar 2019 16:31:37 +0000
+Message-ID: <82c6b3a3-e216-539c-ed86-500d6a6fbc05@virtuozzo.com>
+References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
+	<d582055f-6ee7-ad62-e178-023a283f89dd@redhat.com>
+In-Reply-To: <d582055f-6ee7-ad62-e178-023a283f89dd@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <62D35D1B24A2D34B9B8AF2000D1A7854@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/4] nbd: non-blocking negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, libvir-list@redhat.com, berrange@redhat.com, eblake@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "berrange@redhat.com" <berrange@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Ammend -numa option docs and print warnings if 'mem' option or default RAM
-splitting between nodes is used. It's intended to discourage users from using
-configuration that allows only to fake NUMA on guest side while leading
-to reduced performance of the guest due to inability to properly configure
-VM's RAM on the host.
-
-In NUMA case, it's recommended to always explicitly configure guest RAM
-using -numa node,memdev={backend-id} option.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- numa.c          |  5 +++++
- qemu-options.hx | 12 ++++++++----
- 2 files changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/numa.c b/numa.c
-index 3875e1e..c6c2a6f 100644
---- a/numa.c
-+++ b/numa.c
-@@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
- 
-     if (node->has_mem) {
-         numa_info[nodenr].node_mem = node->mem;
-+        warn_report("Parameter -numa node,mem is obsolete,"
-+                    " use -numa node,memdev instead");
-     }
-     if (node->has_memdev) {
-         Object *o;
-@@ -407,6 +409,9 @@ void numa_complete_configuration(MachineState *ms)
-         if (i == nb_numa_nodes) {
-             assert(mc->numa_auto_assign_ram);
-             mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
-+            warn_report("Default splitting of RAM between nodes is obsolete,"
-+                        " Use '-numa node,memdev' to explictly define RAM"
-+                        " allocation per node");
-         }
- 
-         numa_total = 0;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 1cf9aac..033e311 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -206,10 +206,14 @@ For example:
- -numa cpu,node-id=0,socket-id=0 -numa cpu,node-id=1,socket-id=1
- @end example
- 
--@samp{mem} assigns a given RAM amount to a node. @samp{memdev}
--assigns RAM from a given memory backend device to a node. If
--@samp{mem} and @samp{memdev} are omitted in all nodes, RAM is
--split equally between them.
-+@samp{memdev} assigns RAM from a given memory backend device to a node.
-+
-+Legacy options/behaviour: @samp{mem} assigns a given RAM amount to a node.
-+If @samp{mem} and @samp{memdev} are omitted in all nodes, RAM is split equally
-+between them. Option @samp{mem} and default RAM splitting are obsolete as they
-+do not provide means to manage RAM on host side and only allow QEMU to fake
-+NUMA support which in practice could degrade VM performance.
-+It's advised to always explicitly configure NUMA RAM using @samp{memdev} option.
- 
- @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
- if one node uses @samp{memdev}, all of them have to use it.
--- 
-2.7.4
+MDYuMDMuMjAxOSAxOToxMSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMi8xMS8xOSA2OjU1IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gSGkgYWxsIQ0KPj4NCj4+
+IEhlcmUgaXMgYSB0cnkgb2YgbW92aW5nIHRvIG5vbi1ibG9ja2luZyBuZWdvdGlhdGlvbiBpbiBu
+YmQNCj4+IGNvZGUsIHByb3Bvc2VkIGJ5IERlbmllbCBpbg0KPj4gaHR0cHM6Ly9saXN0cy5nbnUu
+b3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEvbXNnMDM4MTcuaHRtbA0KPj4NCj4+
+IGluIHRocmVhZCAiW1BBVENIIHY0IDAwLzEwXSBOQkQgcmVjb25uZWN0Ig0KPj4gaHR0cHM6Ly9s
+aXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMDcvbXNnMDU5NzMuaHRt
+bA0KPj4NCj4+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgKDQpOg0KPj4gICAgaW8vY2hh
+bm5lbDogYWRkIHFpb19jaGFubmVsX2dldF9hdHRhY2hlZF9haW9fY29udGV4dCgpDQo+PiAgICBu
+YmQvY2xpZW50OiBkbyBuZWdvdGlhdGlvbiBpbiBjb3JvdXRpbmUNCj4+ICAgIG5iZDogZG8gcWVt
+dV9jb3JvdXRpbmVfeWllbGQgZHVyaW5nIHRscyBoYW5kc2hha2UNCj4+ICAgIGJsb2NrL25iZC1j
+bGllbnQ6IHVzZSBub24tYmxvY2tpbmcgaW8gY2hhbm5lbCBmb3IgbmJkIG5lZ290aWF0aW9uDQo+
+IA0KPiBXaWxsIHRoZXJlIGJlIGEgdjIgb2YgdGhpcyBzZXJpZXM/ICBTb2Z0IGZyZWV6ZSBmb3Ig
+NC4wIGlzIGNvbWluZyB1cA0KPiB2ZXJ5IHJhcGlkbHksIHNvIEknbSB0cnlpbmcgdG8gZ2F1Z2Ug
+aWYgdGhpcyBpcyBzdGlsbCA0LjAgbWF0ZXJpYWwgKGFuZA0KPiBJIHNob3VsZCBob2xkIG9mZiBt
+eSBOQkQgcXVldWUgZm9yIGEgY2hhbmNlIHRvIGluY2x1ZGUgaXQpIG9yIGlmIGl0IGlzDQo+IG1v
+cmUgbGlrZWx5IHRvIHNsaXAgaW50byA0LjEgKGFuZCBJIHNob3VsZCBwb3N0IG15IE5CRCBwdWxs
+IHJlcXVlc3QNCj4gc29vbmVyIHRvIGF2b2lkIGJ1cmRlbmluZyBQZXRlciB3aXRoIGEgbGFzdC1t
+aW51dGUgcnVzaCBuZXh0IHdlZWspLg0KPiANCg0KSSBkZWNpZGVkIHRvIGdvIGFub3RoZXIgd2F5
+IGFzIEkgcmVhbGx5IHVuc3VyZSBhYm91dCB1c2luZyBhbGwgdGhpcyBzdGFmZg0KaW4gYSBjb250
+ZXh0IG9mIHRoZSB0aHJlYWQgaW4gbmJkIHNlcnZlci4gQW5kIGl0J2xsIGJlIDEtMiBwYXRjaGVz
+Lg0KUG9zc2libHksIHRoZXknbGwgYmUgcmVhZHkgb24gTWFyY2ggOS4NCg0KT24gdGhlIG90aGVy
+IGhhbmQsIHRoZSBtb3N0IGludGVyZXN0IHBhcnQgaXMgbmJkLXJlY29ubmVjdCBzZXJpZXMgYW5k
+IGl0DQpkb2Vzbid0IHNlZW0gZmVhc2libGUgdG8gZmluaXNoIGl0IGZvciA0LjAuIChpdCdzIHBv
+c3NpYmxlIHRoYXQgTWFyY2ggOQ0Kd291bGQgYmUgdGhlIG9ubHkgbXkgd29ya2luZyBkYXkgZnJv
+bSA3LTExKQ0KDQpTbywgSSB0aGluaywgbGV0J3MgbW92ZSB0aGlzIGFsbCB0byA0LjEuDQoNCg0K
+LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
