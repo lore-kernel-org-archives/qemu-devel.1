@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60944)
+Received: from eggs.gnu.org ([209.51.188.92]:32974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h1UBd-0006NC-IO
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:54:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h1UDG-00078v-8n
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h1UBc-0008Gm-Md
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:54:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h1UBc-0008Fl-DL
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:54:08 -0500
-References: <20190228145624.24885-1-peter.maydell@linaro.org>
-	<20190228145624.24885-10-peter.maydell@linaro.org>
-	<7ec8917a-eabd-6a14-3c1f-38b1d429c900@redhat.com>
-	<CAFEAcA-G8FN63M57JJt8K_0omq8kujABetsr31unCxxxno+MiA@mail.gmail.com>
-	<CAFEAcA-L=fQPvT_biEm0ko8jUP88H++Gf7ttMyZx=f6dcjd+bg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c45090c1-77c6-6741-e24b-46c2ff742d9f@redhat.com>
-Date: Wed, 6 Mar 2019 11:53:55 +0100
+	(envelope-from <kwolf@redhat.com>) id 1h1UDF-00016P-Gk
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 05:55:50 -0500
+Date: Wed, 6 Mar 2019 11:55:41 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190306105541.GE6818@localhost.localdomain>
+References: <20190213164853.32412-1-berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-L=fQPvT_biEm0ko8jUP88H++Gf7ttMyZx=f6dcjd+bg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] Makefile,
- configure: Support building rST documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190213164853.32412-1-berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Default to 4KB for the qcow2 cache
+ entry size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 05/03/19 16:24, Peter Maydell wrote:
-> On Tue, 5 Mar 2019 at 12:47, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
->>
->> On Thu, 28 Feb 2019 at 15:49, Philippe Mathieu-Daud=C3=A9 <philmd@redh=
-at.com> wrote:
->>>
->>> Hi Peter,
->>>
->>> On 2/28/19 3:56 PM, Peter Maydell wrote:
->>>> +# Sphinx builds all its documentation at once in one invocation
->>>> +# and handles "don't rebuild things unless necessary" itself.
->>>> +# The '.doctrees' files are cached information to speed this up.
->>>
->>> Can you add .doctrees to .gitignore?
->>
->> Since this was the only change request for this patchset,
->> I plan to send out a pullreq containing it, with this folded
->> into this patch:
->>
->> diff --git a/.gitignore b/.gitignore
->> index b66b7725512..77522561b8e 100644
->> --- a/.gitignore
->> +++ b/.gitignore
->> @@ -1,3 +1,4 @@
->> +/.doctrees
->>  /config-devices.*
->>  /config-all-devices.*
->>  /config-all-disas.*
->=20
-> Testing on various hosts revealed that we have a problem on
-> hosts with ancient versions of sphinx that predate the 'alabaster'
-> theme, so the configure test needs to be smarter. The fixup is
-> the change below.
->=20
-> Are people OK with me squashing this in too, or have we
-> reached the point where it really ought to have a v3 sent out ?
+Am 13.02.2019 um 17:48 hat Alberto Garcia geschrieben:
+> QEMU 2.12 (commit 1221fe6f636754ab5f2c1c87caa77633e9123622) introduced
+> a new setting called l2-cache-entry-size that allows making entries on
+> the qcow2 L2 cache smaller than the cluster size.
+> 
+> I have been performing several tests with different cluster and entry
+> sizes and all of them show that reducing the entry size (aka L2 slice)
+> consistently improves I/O performance, notably during random I/O (all
+> tests done with sequential I/O show similar results). This is to be
+> expected because loading and evicting an L2 slice is more expensive
+> the larger the slice is.
+> 
+> Here are some numbers on fully populated 40GB qcow2 images. The
+> rightmost column represents the maximum L2 cache size in both cases.
+> 
+>    Cluster size = 64 KB
+>    |-------------+--------------+--------------+--------------|
+>    |             | 1MB L2 cache | 3MB L2 cache | 5MB L2 cache |
+>    |-------------+--------------+--------------+--------------|
+>    |  4KB slices |    6545 IOPS |   12045 IOPS |   55680 IOPS |
+>    | 16KB slices |    5177 IOPS |    9798 IOPS |   56278 IOPS |
+>    | 64KB slices |    2718 IOPS |    5326 IOPS |   57355 IOPS |
+>    |-------------+--------------+--------------+--------------|
+> 
+>    Cluster size = 256 KB
+>    |--------------+----------------+--------------+-----------------|
+>    |              | 512KB L2 cache | 1MB L2 cache | 1280KB L2 cache |
+>    |--------------+----------------+--------------+-----------------|
+>    |   4KB slices |      8539 IOPS |   21071 IOPS |      55417 IOPS |
+>    |  64KB slices |      3598 IOPS |    9772 IOPS |      57687 IOPS |
+>    | 256KB slices |      1415 IOPS |    4120 IOPS |      58001 IOPS |
+>    |--------------+----------------+--------------+-----------------|
+> 
+> As can be seen in the numbers, the only exception to the rule is when
+> the cache is large enough to hold all L2 tables. This is also to be
+> expected because in this case no cache entry is ever evicted so
+> reducing its size doesn't bring any benefit.
+> 
+> This patch sets the default L2 cache entry size to 4KB except when the
+> cache is large enough for the whole disk.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-Nah, go ahead.
+Thanks, applied to the block branch.
 
-Paolo
+Kevin
