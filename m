@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60566)
+Received: from eggs.gnu.org ([209.51.188.92]:60926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1Yff-00016j-Ay
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:41:28 -0500
+	(envelope-from <randrianasulu@gmail.com>) id 1h1Yh9-0001yG-0k
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h1Yfd-00087b-JM
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:41:27 -0500
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<20190305234337.18353-5-jsnow@redhat.com>
-	<6c9c5b9b-8093-e993-1027-db692d20e2e1@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <737eb62f-47f4-1824-909d-8578584b8794@redhat.com>
-Date: Wed, 6 Mar 2019 10:41:00 -0500
+	(envelope-from <randrianasulu@gmail.com>) id 1h1Yh8-0000v6-8C
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:42:58 -0500
+Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:45934)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
+	id 1h1Yh7-0000rE-Tc
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 10:42:58 -0500
+Received: by mail-pg1-x52e.google.com with SMTP id 125so8471954pgc.12
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 07:42:52 -0800 (PST)
+From: Andrew Randrianasulu <randrianasulu@gmail.com>
+Date: Wed, 6 Mar 2019 18:39:15 +0300
 MIME-Version: 1.0
-In-Reply-To: <6c9c5b9b-8093-e993-1027-db692d20e2e1@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] block/qcow2-bitmap: Allow resizes with
- persistent bitmaps
+Content-Disposition: inline
+Message-Id: <201903061839.16488.randrianasulu@gmail.com>
+Subject: Re: [Qemu-devel] PMON2000 compilation and kernel question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,163 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: balaton@eik.bme.hu, qemu-devel@nongnu.org
+
+> It is ati-vga specific not fulong2e specific and it's entirely possible (even likely) that my minimal ati-vga emulation is not correct for 2d acceleration yet but I've tested it with the pmon_2e.bin binary from the same place and it worked with that. So if it does not work with the binary pmon for you then that's not the same what I see or if it works with the binary but not with the one compiled then either you're compiling another version that does something differently or there's a difference in config. There are several Bonito configs in pmon and the fulong2e might use another one or different options. 
 
 
+It worked fine with  binary pmon_2e.bin, and not for my self-compiled version. 
+Still, I'm not sure about what kind of config they used, and at that commit.
+In this sense newer pmon is more useful because it prints git commit and  build date.
 
-On 3/6/19 10:33 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 06.03.2019 2:43, John Snow wrote:
->> Since we now load all bitmaps into memory anyway, we can just truncate them
->> in-memory and then flush them back to disk. Just in case, we will still check
->> and enforce that this shortcut is valid -- i.e. that any bitmap described
->> on-disk is indeed in-memory and can be modified.
->>
->> If there are any inconsistent bitmaps, we refuse to allow the truncate as
->> we do not actually load these bitmaps into memory, and it isn't safe or
->> reasonable to attempt to truncate corrupted data.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   block/qcow2.h        |  1 +
->>   block/qcow2-bitmap.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->>   block/qcow2.c        | 27 ++++++++++++++++++++-------
->>   3 files changed, 63 insertions(+), 7 deletions(-)
->>
->> diff --git a/block/qcow2.h b/block/qcow2.h
->> index 4c1fdfcbec..b9227a72cc 100644
->> --- a/block/qcow2.h
->> +++ b/block/qcow2.h
->> @@ -689,6 +689,7 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
->>   int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
->>                                    Error **errp);
->>   int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
->> +int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
->>   void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
->>   void qcow2_flush_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
->>   int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
->> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->> index 9373055d3b..24f280bccc 100644
->> --- a/block/qcow2-bitmap.c
->> +++ b/block/qcow2-bitmap.c
->> @@ -1167,6 +1167,48 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
->>       return qcow2_reopen_bitmaps_rw_hint(bs, NULL, errp);
->>   }
->>   
->> +/* Checks to see if it's safe to resize bitmaps */
->> +int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp)
->> +{
->> +    BDRVQcow2State *s = bs->opaque;
->> +    Qcow2BitmapList *bm_list;
->> +    Qcow2Bitmap *bm;
->> +    int ret = 0;
->> +
->> +    if (s->nb_bitmaps == 0) {
->> +        return 0;
->> +    }
->> +
->> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
->> +                               s->bitmap_directory_size, false, errp);
->> +    if (bm_list == NULL) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
->> +        BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
->> +        if (bitmap == NULL) {
->> +            /* We rely on all bitmaps being in-memory to be able to resize them,
->> +             * Otherwise, we'd need to resize them on disk explicitly */
->> +            error_setg(errp, "Cannot resize qcow2 with persistent bitmaps that "
->> +                       "were not loaded into memory");
->> +            ret = -ENOTSUP;
->> +            goto out;
->> +        }
->> +
->> +        /* The checks against readonly and busy are redundant, but certainly
->> +         * do no harm. checks against inconsistent are crucial: */
->> +        if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_DEFAULT, errp)) {
->> +            ret = -ENOTSUP;
->> +            goto out;
->> +        }
->> +    }
->> +
->> +out:
->> +    bitmap_list_free(bm_list);
->> +    return ret;
->> +}
->> +
->>   /* store_bitmap_data()
->>    * Store bitmap to image, filling bitmap table accordingly.
->>    */
->> diff --git a/block/qcow2.c b/block/qcow2.c
->> index 7fb2730f09..6fd9252494 100644
->> --- a/block/qcow2.c
->> +++ b/block/qcow2.c
->> @@ -3472,7 +3472,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->>   {
->>       BDRVQcow2State *s = bs->opaque;
->>       uint64_t old_length;
->> -    int64_t new_l1_size;
->> +    int64_t new_l1_size, offset_be;
->>       int ret;
->>       QDict *options;
->>   
->> @@ -3498,10 +3498,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->>           goto fail;
->>       }
->>   
->> -    /* cannot proceed if image has bitmaps */
->> -    if (s->nb_bitmaps) {
->> -        /* TODO: resize bitmaps in the image */
->> -        error_setg(errp, "Can't resize an image which has bitmaps");
->> +    /* Only certain persistent bitmaps can be resized: */
->> +    if (qcow2_truncate_bitmaps_check(bs, errp)) {
->>           ret = -ENOTSUP;
->>           goto fail;
->>       }
->> @@ -3702,9 +3700,9 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->>       bs->total_sectors = offset / BDRV_SECTOR_SIZE;
->>   
->>       /* write updated header.size */
->> -    offset = cpu_to_be64(offset);
->> +    offset_be = cpu_to_be64(offset);
->>       ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
->> -                           &offset, sizeof(uint64_t));
->> +                           &offset_be, sizeof(uint64_t));
->>       if (ret < 0) {
->>           error_setg_errno(errp, -ret, "Failed to update the image size");
->>           goto fail;
->> @@ -3719,6 +3717,21 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->>       if (ret < 0) {
->>           goto fail;
->>       }
->> +
->> +    /* Flush bitmaps */
->> +    if (s->nb_bitmaps) {
->> +        Error *local_err = NULL;
->> +
->> +        /* Usually, bitmaps get resized after this call.
->> +         * Force it earlier so we can make the metadata consistent. */
->> +        bdrv_dirty_bitmap_truncate(bs, offset);
->> +        qcow2_flush_persistent_dirty_bitmaps(bs, &local_err);
->> +        if (local_err) {
->> +            ret = -EINVAL;
->> +            goto fail;
->> +        }
->> +    }
-> 
-> Why to flush after resize? Bitmaps will be IN_USE in the image anyway...
-> 
-> Could we implement resize without flush first,  it would be one patch + test? And then consider
-> flushing in separate?
-> 
 
-If you don't flush it to disk, all calls to retrieve the bm_list begin
-failing because of inconsistent metadata.
+Provided binary talks about pmon 1.1.2 (?) in top left corner.
+I think one of my earlier self-compiled binaries behaved like this one
+(printing a lot of pci info), but yes, something still not right  at my end
+because for example DIMM size not detected correctly in my version.
 
-Future calls to add bitmaps, remove bitmaps, etc will start failing. It
-seemed safest and easiest to just flush the whole suite to disk. I am
-trying to avoid premature optimizations at this stage, as I believe
-resizes will be very infrequent events.
+But it gives prompt at serial console! :}
 
---js
+Will look at machine emulation in qemu, and try to configure pmon correctly. 
