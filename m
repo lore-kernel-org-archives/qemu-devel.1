@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35890)
+Received: from eggs.gnu.org ([209.51.188.92]:37357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1UQ6-0005jj-RX
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:09:13 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1UVS-0002DV-1b
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:14:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1UQ0-0002gA-9s
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:09:06 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed,  6 Mar 2019 12:07:02 +0100
-Message-Id: <20190306110711.309-2-laurent@vivier.eu>
-In-Reply-To: <20190306110711.309-1-laurent@vivier.eu>
-References: <20190306110711.309-1-laurent@vivier.eu>
+	(envelope-from <philmd@redhat.com>) id 1h1UVR-0005dn-Dx
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:14:38 -0500
+Received: from mail-wm1-f50.google.com ([209.85.128.50]:33814)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1UVQ-0005cz-Va
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 06:14:37 -0500
+Received: by mail-wm1-f50.google.com with SMTP id o10so4178704wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 03:14:36 -0800 (PST)
+References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8WZuAmNFQqCsvsN35UnFJk=sGcCJmF27v3SS++FnpXXQ@mail.gmail.com>
+	<ab98409f-89f3-62d2-f5aa-b460eaa0cd05@redhat.com>
+	<3c67eb5e-6a7e-d884-9ce7-639584c0c63f@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <40d4a9eb-19aa-28ec-2430-2a3cdb310c7b@redhat.com>
+Date: Wed, 6 Mar 2019 12:14:34 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/10] tests: Remove (mostly) useless
- architecture checks
+In-Reply-To: <3c67eb5e-6a7e-d884-9ce7-639584c0c63f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,109 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, John Snow <jsnow@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-s390x@nongnu.org, Corey Minyard <minyard@acm.org>, Pierre Morel <pmorel@linux.ibm.com>, Corey Minyard <cminyard@mvista.com>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On 3/6/19 12:04 PM, Thomas Huth wrote:
+> On 06/03/2019 11.57, Paolo Bonzini wrote:
+>> On 05/03/19 10:32, Peter Maydell wrote:
+>>> Everything fails to build with errors like
+>>> make: *** No rule to make target `config-all-devices.mak', needed by
+>>> `subdir-aarch64-softmmu'.  Stop.
+>>>
+>>> or
+>>> make: *** No rule to make target
+>>> `/home/pm215/qemu/default-configs/pci.mak', needed by
+>>> `aarch64-softmmu/config-devices.mak'.  Stop.
+>>>
+>>> If there are special instructions for what to do with
+>>> build trees over the transition to kconfig, the pullreq
+>>> cover letter would be a good place to mention them :-)
+>>
+>> As others mentioned, this is the "usual" stale dependency issue
+>> requiring distclean.
+> 
+> Can't we somehow add a dependency for the *.mak.d file so that they get
+> regenerated in this case? ... I tried to hack the Makefile, but so far I
+> failed...
 
-These checks at the beginning of some of the tests are mostly useless:
-We only run the tests on x86 anyway, and g_test_message() does not
-print anything unless you call g_test_init() first.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Acked-by: John Snow <jsnow@redhat.com>
-Acked-by: Corey Minyard <cminyard@mvista.com>
-Message-Id: <1551456970-463-1-git-send-email-thuth@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- tests/fdc-test.c      | 7 -------
- tests/ide-test.c      | 7 -------
- tests/ipmi-bt-test.c  | 7 -------
- tests/ipmi-kcs-test.c | 7 -------
- 4 files changed, 28 deletions(-)
-
-diff --git a/tests/fdc-test.c b/tests/fdc-test.c
-index 88f1abfa10e2..31cd3295c102 100644
---- a/tests/fdc-test.c
-+++ b/tests/fdc-test.c
-@@ -548,16 +548,9 @@ static void fuzz_registers(void)
- 
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
-     int fd;
-     int ret;
- 
--    /* Check architecture */
--    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
--        g_test_message("Skipping test for non-x86\n");
--        return 0;
--    }
--
-     /* Create a temporary raw image */
-     fd = mkstemp(test_image);
-     g_assert(fd >= 0);
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index f0280e636b5d..300d64e77ddf 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -1009,16 +1009,9 @@ static void test_cdrom_dma(void)
- 
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
-     int fd;
-     int ret;
- 
--    /* Check architecture */
--    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
--        g_test_message("Skipping test for non-x86\n");
--        return 0;
--    }
--
-     /* Create temporary blkdebug instructions */
-     fd = mkstemp(debug_path);
-     g_assert(fd >= 0);
-diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
-index f4a81b526505..fc4c83b5db7c 100644
---- a/tests/ipmi-bt-test.c
-+++ b/tests/ipmi-bt-test.c
-@@ -400,15 +400,8 @@ static void open_socket(void)
- 
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
-     int ret;
- 
--    /* Check architecture */
--    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
--        g_test_message("Skipping test for non-x86\n");
--        return 0;
--    }
--
-     open_socket();
- 
-     /* Run the tests */
-diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
-index 178ffc179734..a2354c10c7fe 100644
---- a/tests/ipmi-kcs-test.c
-+++ b/tests/ipmi-kcs-test.c
-@@ -263,16 +263,9 @@ static void test_enable_irq(void)
- 
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
-     char *cmdline;
-     int ret;
- 
--    /* Check architecture */
--    if (strcmp(arch, "i386") && strcmp(arch, "x86_64")) {
--        g_test_message("Skipping test for non-x86\n");
--        return 0;
--    }
--
-     /* Run the tests */
-     g_test_init(&argc, &argv, NULL);
- 
--- 
-2.20.1
+Isn't that ./configure responsibility?
