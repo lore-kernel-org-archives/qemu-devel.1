@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43936)
+Received: from eggs.gnu.org ([209.51.188.92]:43953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1pvk-0003ze-DY
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:13 -0500
+	(envelope-from <laurent@vivier.eu>) id 1h1pvm-00041W-Tm
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1pvj-0007Rs-Iq
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1pvj-0007RX-9d
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:11 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 908B2307E07A
-	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 10:07:10 +0000 (UTC)
-Date: Thu, 7 Mar 2019 10:07:05 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190307100705.GH32268@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1551893605-236413-1-git-send-email-imammedo@redhat.com>
-	<20190306181608.GL20806@redhat.com>
-	<20190306195417.02ea9a4c@Igors-MacBook-Pro.local>
+	(envelope-from <laurent@vivier.eu>) id 1h1pvm-0007T2-1y
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:14 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:59449)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h1pvl-0007S4-3o
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:13 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu,  7 Mar 2019 11:06:47 +0100
+Message-Id: <20190307100656.14044-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190306195417.02ea9a4c@Igors-MacBook-Pro.local>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] numa: warn if numa 'mem' option or
- default RAM splitting between nodes is used.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/9] Linux user for 4.0 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, libvir-list@redhat.com, eblake@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-On Wed, Mar 06, 2019 at 07:54:17PM +0100, Igor Mammedov wrote:
-> On Wed, 6 Mar 2019 18:16:08 +0000
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->=20
-> > On Wed, Mar 06, 2019 at 06:33:25PM +0100, Igor Mammedov wrote:
-> > > Amend -numa option docs and print warnings if 'mem' option or defau=
-lt RAM
-> > > splitting between nodes is used. It's intended to discourage users =
-from using
-> > > configuration that allows only to fake NUMA on guest side while lea=
-ding
-> > > to reduced performance of the guest due to inability to properly co=
-nfigure
-> > > VM's RAM on the host.
-> > >=20
-> > > In NUMA case, it's recommended to always explicitly configure guest=
- RAM
-> > > using -numa node,memdev=3D{backend-id} option.
-> > >=20
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > >  numa.c          |  5 +++++
-> > >  qemu-options.hx | 12 ++++++++----
-> > >  2 files changed, 13 insertions(+), 4 deletions(-)
-> > >=20
-> > > diff --git a/numa.c b/numa.c
-> > > index 3875e1e..42838f9 100644
-> > > --- a/numa.c
-> > > +++ b/numa.c
-> > > @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, N=
-umaNodeOptions *node,
-> > > =20
-> > >      if (node->has_mem) {
-> > >          numa_info[nodenr].node_mem =3D node->mem;
-> > > +        warn_report("Parameter -numa node,mem is obsolete,"
-> > > +                    " use -numa node,memdev instead");
-> >=20
-> > My comments from v1 still apply. We must not do this as long as
-> > libvirt has no choice but to continue using this feature.
-> It has a choice to use 'memdev' whenever creating a new VM and continue
-> using 'mem' with exiting VMs.
+The following changes since commit 32694e98b8d7a246345448a8f707d2e11d6c65e2:
 
-Unfortunately we don't have such a choice. Libvirt has no concept of the
-distinction between an 'existing' and 'new' VM. It just receives an XML
-file from the mgmt application and with transient guests, we have no
-persistent configuration record of the VM. So we've no way of knowing
-whether this VM was previously running on this same host, or another
-host, or is completely new.
+  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2019-03-06 18:52:19 +0000)
 
+are available in the Git repository at:
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+  git://github.com/vivier/qemu.git tags/linux-user-for-4.0-pull-request
+
+for you to fetch changes up to 61b463fbf6cbf21fcd9abb5af765a19b88dbc1ba:
+
+  linux-user: add new netlink types (2019-03-07 11:02:33 +0100)
+
+----------------------------------------------------------------
+- Update netlink types to linux v5.0
+- fix accept4/getpeername/getsockname/recvfrom/recvmsg/read
+- add/fix ELF_PLATFORM ofr aarch64 and arm
+- fix "may be used uninitialized" warnings
+- Fix breakpoint support in Nios
+- Nicer strace output of chroot() syscall
+
+----------------------------------------------------------------
+
+Andreas Schwab (3):
+  linux-user: fix recvmsg emulation
+  linux-user: fix emulation of accept4/getpeername/getsockname/recvfrom
+    syscalls
+  linux-user: don't short-circuit read with zero length
+
+Helge Deller (1):
+  linux-user: Nicer strace output of chroot() syscall
+
+Laurent Vivier (1):
+  linux-user: add new netlink types
+
+Marc-André Lureau (1):
+  linux-user: fix "may be used uninitialized" warnings
+
+Richard Henderson (2):
+  linux-user: Add ELF_PLATFORM for arm
+  linux-user: Fix ELF_PLATFORM for aarch64_be-linux-user
+
+Sandra Loosemore (1):
+  Fix breakpoint support in Nios II user-mode emulation.
+
+ linux-user/elfload.c        | 37 +++++++++++++++++++++++++-
+ linux-user/fd-trans.c       |  9 +++++++
+ linux-user/nios2/cpu_loop.c |  6 +++++
+ linux-user/strace.c         | 12 +++++++++
+ linux-user/strace.list      |  2 +-
+ linux-user/syscall.c        | 53 +++++++++++++++++++++++--------------
+ 6 files changed, 97 insertions(+), 22 deletions(-)
+
+-- 
+2.20.1
