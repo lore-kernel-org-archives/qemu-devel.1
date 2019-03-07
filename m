@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43670)
+Received: from eggs.gnu.org ([209.51.188.92]:43729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1tsJ-0004oF-Bs
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:19:56 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1tsg-0005Cx-R3
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:20:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1tsI-0008PS-Md
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:19:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1tsd-0000D2-KG
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:20:18 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  7 Mar 2019 15:18:31 +0100
-Message-Id: <1551968334-18982-7-git-send-email-thuth@redhat.com>
+Date: Thu,  7 Mar 2019 15:18:32 +0100
+Message-Id: <1551968334-18982-8-git-send-email-thuth@redhat.com>
 In-Reply-To: <1551968334-18982-1-git-send-email-thuth@redhat.com>
 References: <1551968334-18982-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 06/29] hw/arm: Express dependencies of
- integratorcp with Kconfig
+Subject: [Qemu-devel] [PATCH v4 07/29] hw/arm: Express dependencies of the
+ fsl-imx31 machine with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +26,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-arm@nongnu.org, John Snow <jsnow@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
+Add Kconfig dependencies for the fsl-imx31 / kzm machine.
 This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
 e.
 his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 8 +-------
- hw/arm/Kconfig                  | 9 +++++++++
- hw/display/Kconfig              | 1 +
- 3 files changed, 11 insertions(+), 7 deletions(-)
+ default-configs/arm-softmmu.mak | 3 +--
+ hw/arm/Kconfig                  | 5 +++++
+ hw/misc/Kconfig                 | 2 ++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 13cfffa..51032c5 100644
+index 51032c5..a2e74cd 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -7,6 +7,7 @@ CONFIG_PCI_DEVICES=3Dy
-=20
+@@ -8,6 +8,7 @@ CONFIG_PCI_DEVICES=3Dy
  CONFIG_EXYNOS4=3Dy
  CONFIG_HIGHBANK=3Dy
-+CONFIG_INTEGRATOR=3Dy
+ CONFIG_INTEGRATOR=3Dy
++CONFIG_FSL_IMX31=3Dy
 =20
  CONFIG_VGA=3Dy
  CONFIG_NAND=3Dy
-@@ -31,7 +32,6 @@ CONFIG_ADS7846=3Dy
- CONFIG_MAX111X=3Dy
- CONFIG_SSI_SD=3Dy
- CONFIG_SSI_M25P80=3Dy
--CONFIG_SMC91C111=3Dy
- CONFIG_ALLWINNER_EMAC=3Dy
- CONFIG_IMX_FEC=3Dy
- CONFIG_FTGMAC100=3Dy
-@@ -48,10 +48,7 @@ CONFIG_ARM11MPCORE=3Dy
- CONFIG_NETDUINO2=3Dy
-=20
- CONFIG_PL041=3Dy
--CONFIG_PL050=3Dy
- CONFIG_PL080=3Dy
--CONFIG_PL110=3Dy
--CONFIG_PL181=3Dy
- CONFIG_PL190=3Dy
- CONFIG_PL330=3Dy
- CONFIG_CADENCE=3Dy
-@@ -111,9 +108,6 @@ CONFIG_VERSATILE_I2C=3Dy
- CONFIG_PCI_EXPRESS=3Dy
- CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=3Dy
-=20
--CONFIG_INTEGRATOR=3Dy
--CONFIG_INTEGRATOR_DEBUG=3Dy
--
- CONFIG_ALLWINNER_A10_PIT=3Dy
- CONFIG_ALLWINNER_A10_PIC=3Dy
+@@ -66,7 +67,6 @@ CONFIG_TSC210X=3Dy
+ CONFIG_BLIZZARD=3Dy
+ CONFIG_ONENAND=3Dy
+ CONFIG_TUSB6010=3Dy
+-CONFIG_IMX=3Dy
+ CONFIG_MAINSTONE=3Dy
+ CONFIG_MPS2=3Dy
+ CONFIG_MUSCA=3Dy
+@@ -113,7 +113,6 @@ CONFIG_ALLWINNER_A10_PIC=3Dy
  CONFIG_ALLWINNER_A10=3Dy
+=20
+ CONFIG_FSL_IMX6=3Dy
+-CONFIG_FSL_IMX31=3Dy
+ CONFIG_FSL_IMX25=3Dy
+ CONFIG_FSL_IMX7=3Dy
+ CONFIG_FSL_IMX6UL=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 2747e2b..a08a863 100644
+index a08a863..40c79d2 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -34,6 +34,15 @@ config HIGHBANK
+@@ -101,6 +101,11 @@ config FSL_IMX25
 =20
- config INTEGRATOR
+ config FSL_IMX31
      bool
-+    select ARM_TIMER
-+    select INTEGRATOR_DEBUG
-+    select PL011 # UART
-+    select PL031 # RTC
-+    select PL050 # keyboard/mouse
-+    select PL110 # pl111 LCD controller
-+    select PL181 # display
++    select SERIAL
++    select IMX
++    select IMX_I2C
++    select LAN9118
 +    select PCI
-+    select SMC91C111
 =20
- config MAINSTONE
+ config FSL_IMX6
      bool
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index a96ea76..364d628 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -21,6 +21,7 @@ config JAZZ_LED
-=20
- config PL110
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 2c60be9..4db73ec 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -76,6 +76,8 @@ config ECCMEMCTL
+ config IMX
      bool
-+    select FRAMEBUFFER
+     select PTIMER
++    select SSI
++    select USB_EHCI_SYSBUS
 =20
- config SII9022
+ config STM32F2XX_SYSCFG
      bool
 --=20
 1.8.3.1
