@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56101)
+Received: from eggs.gnu.org ([209.51.188.92]:56260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1sty-0007oK-UI
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:17:36 -0500
+	(envelope-from <crosa@redhat.com>) id 1h1suZ-00089n-F8
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:18:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1stx-0003FY-CB
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:17:34 -0500
-Resent-Message-Id: <E1h1stx-0003FY-CB@eggs.gnu.org>
-Message-ID: <155196463139.8146.3607540978161080023@6acff2cf482b>
-In-Reply-To: <20190307121539.12842-1-david@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <crosa@redhat.com>) id 1h1suY-0003dO-Cz
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:18:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43218)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1h1suY-0003ck-5v
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:18:10 -0500
+Date: Thu, 7 Mar 2019 08:18:04 -0500
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <20190307131804.te3thn7hzi6xo3ed@dhcp-17-118.bos.redhat.com>
+References: <20190305172139.32662-1-peter.maydell@linaro.org>
+	<20190305172139.32662-9-peter.maydell@linaro.org>
+	<20190307014028.hggeogcxuwldc5ms@localhost.localdomain>
+	<CAFEAcA8jcshKLW8+fQJ30Y02LTmqxrwpShZKDP7NNOOGSwaY3A@mail.gmail.com>
+	<20190307121417.fztvzzb6lyrpnjyx@dhcp-17-118.bos.redhat.com>
+	<CAFEAcA_rSdxsJLVyg-E1=1viw0f-p2G60VLvVZ-k8ERr6P_=gw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 05:17:12 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/32] s390x/tcg: Vector Instruction
- Support Part 1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_rSdxsJLVyg-E1=1viw0f-p2G60VLvVZ-k8ERr6P_=gw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 08/12] docs: Provide separate conf.py
+ for each manual we want
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,134 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzEyMTUzOS4xMjg0
-Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzEyMTUzOS4xMjg0Mi0x
-LWRhdmlkQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8zMl0g
-czM5MHgvdGNnOiBWZWN0b3IgSW5zdHJ1Y3Rpb24gU3VwcG9ydCBQYXJ0IDEKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDcxMjE1Mzku
-MTI4NDItMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDcxMjE1MzkuMTI4NDIt
-MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjY5NTRh
-NzkzOSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKNzliZGNhMzE4YSBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKYjkwMjFjNzcxZSBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKODNlMjc5NGUzZCBzMzkweC90
-Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVAo4MjllM2ZiM2U3IHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQpiZDc0MTViYTI4IHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
-ZV93cml0ZV9hY2Nlc3MgaGVscGVyCjFlNmUxNTMxMmIgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
-VE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdPUkQKOTM2NGY4MjZhNyBzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgU0VMRUNUCjExMDU5MTM5ZTkgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFNDQVRURVIgRUxFTUVOVAo5ZjI1MmZiZDQ5IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBS
-RVBMSUNBVEUgSU1NRURJQVRFCjFjNjI5MTIyOGYgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFJFUExJQ0FURQo5ZGEwN2E3NTg4IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRF
-IERPVUJMRVdPUkQgSU1NRURJQVRFCjdkM2UyMzUyNGQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
-VE9SIFBFUk1VVEUKZTE2NDQ4MWIzYSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEFDSyAq
-CjViY2RiYTVkNTkgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIE1FUkdFIChISUdIfExPVykK
-ODEzMWYwM2JjYiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBXSVRIIExFTkdUSAo2
-YjNlMWE1ODMzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEZST00gR1JTIERJ
-U0pPSU5UCjliOTQ1NmRmNmMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRUxF
-TUVOVCBGUk9NIEdSCjNlMzEzN2ZjNWEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQg
-VE8gQkxPQ0sgQk9VTkRBUlkKZTEzYjc4ZmEzYSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
-TE9BRCBNVUxUSVBMRQo1ZGQwOTJjNDQzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FE
-IExPR0lDQUwgRUxFTUVOVCBBTkQgWkVSTwo3M2E3ZDU5MzZmIHMzOTB4L3RjZzogSW1wbGVtZW50
-IFZFQ1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVAo0YzNjYWM3ZGVhIHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJQVRFCjJlZTc4Y2UxNjcgczM5MHgvdGNn
-OiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVAo2NTRjNjE0YzU2IHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNBVEUKZDYwNmQwYjdmMiBzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgTE9BRAoxNWFlOGZhNzQwIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RP
-UiBHRU5FUkFURSBNQVNLCjgwY2I3NTMyNzggczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdF
-TkVSQVRFIEJZVEUgTUFTSwozODIyZGQyNjMzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBH
-QVRIRVIgRUxFTUVOVAozYzM2MGI4YjJhIHMzOTB4L3RjZzogVXRpbGl0aWVzIGZvciB2ZWN0b3Ig
-aW5zdHJ1Y3Rpb24gaGVscGVycwoyMWM2MjE5N2M1IHMzOTB4L3RjZzogQ2hlY2sgdmVjdG9yIHJl
-Z2lzdGVyIGluc3RydWN0aW9ucyBhdCBjZW50cmFsIHBvaW50CjFlZWEwZjhiN2EgczM5MHgvdGNn
-OiBEZWZpbmUgdmVjdG9yIGluc3RydWN0aW9uIGZvcm1hdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvMzIgQ2hlY2tpbmcgY29tbWl0IDFlZWEwZjhiN2E0YyAoczM5MHgvdGNnOiBEZWZpbmUgdmVj
-dG9yIGluc3RydWN0aW9uIGZvcm1hdHMpCjIvMzIgQ2hlY2tpbmcgY29tbWl0IDIxYzYyMTk3YzVk
-NSAoczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIgaW5zdHJ1Y3Rpb25zIGF0IGNlbnRy
-YWwgcG9pbnQpCjMvMzIgQ2hlY2tpbmcgY29tbWl0IDNjMzYwYjhiMmFlNiAoczM5MHgvdGNnOiBV
-dGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVjdGlvbiBoZWxwZXJzKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDEwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CjQvMzIgQ2hlY2tpbmcgY29tbWl0IDM4MjJkZDI2MzMzNiAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIEdBVEhFUiBFTEVNRU5UKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCA0LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMzIgQ2hlY2tpbmcgY29t
-bWl0IDgwY2I3NTMyNzg5YyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVSQVRFIEJZ
-VEUgTUFTSykKNi8zMiBDaGVja2luZyBjb21taXQgMTVhZThmYTc0MGRiIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgR0VORVJBVEUgTUFTSykKNy8zMiBDaGVja2luZyBjb21taXQgZDYwNmQw
-YjdmMjc1IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCkKOC8zMiBDaGVja2luZyBj
-b21taXQgNjU0YzYxNGM1NjllIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBBTkQg
-UkVQTElDQVRFKQo5LzMyIENoZWNraW5nIGNvbW1pdCAyZWU3OGNlMTY3YzcgKHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQpCjEwLzMyIENoZWNraW5nIGNvbW1pdCA0YzNj
-YWM3ZGVhMTQgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJ
-QVRFKQoxMS8zMiBDaGVja2luZyBjb21taXQgNzNhN2Q1OTM2ZmNiIChzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgTE9BRCBHUiBGUk9NIFZSIEVMRU1FTlQpCjEyLzMyIENoZWNraW5nIGNvbW1p
-dCA1ZGQwOTJjNDQzOTkgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIExPR0lDQUwg
-RUxFTUVOVCBBTkQgWkVSTykKMTMvMzIgQ2hlY2tpbmcgY29tbWl0IGUxM2I3OGZhM2EyZiAoczM5
-MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTVVMVElQTEUpCjE0LzMyIENoZWNraW5nIGNv
-bW1pdCAzZTMxMzdmYzVhZGEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFRPIEJM
-T0NLIEJPVU5EQVJZKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM5NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0
-LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzMyIENoZWNraW5nIGNvbW1pdCA5Yjk0
-NTZkZjZjNGYgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJP
-TSBHUikKMTYvMzIgQ2hlY2tpbmcgY29tbWl0IDZiM2UxYTU4MzNmOCAoczM5MHgvdGNnOiBJbXBs
-ZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNv
-bW1pdCA4MTMxZjAzYmNiMjEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEgg
-TEVOR1RIKQoxOC8zMiBDaGVja2luZyBjb21taXQgNWJjZGJhNWQ1OTNkIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IGUx
-NjQ0ODFiM2EyYSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
-ICcoJwojMTgzOiBGSUxFOiB0YXJnZXQvczM5MHgvdmVjX2hlbHBlci5jOjQ4OgordHlwZWRlZiB1
-aW50IyNUQklUUyMjX3QgKCp2cGsjI0JJVFMjI19mbikodWludCMjQklUUyMjX3QsIGludCAqKTsg
-ICAgICAgICAgICAgIFwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQ1IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDE5LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMC8zMiBDaGVj
-a2luZyBjb21taXQgN2QzZTIzNTI0ZDMwIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
-TVVURSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQv
-czM5MHgvaGVscGVyLmg6MTQ0OgorREVGX0hFTFBFUl9GTEFHU181KGd2ZWNfdnBlcm0sIFRDR19D
-QUxMX05PX1JXRywgdm9pZCwgcHRyLCBjcHRyLCBjcHRyLCBjcHRyLCBpMzIpCgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIwLzMyIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjIxLzMyIENoZWNraW5nIGNvbW1pdCA5ZGEwN2E3NTg4N2IgKHMz
-OTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRFIERPVUJMRVdPUkQgSU1NRURJQVRFKQoy
-Mi8zMiBDaGVja2luZyBjb21taXQgMWM2MjkxMjI4ZjU1IChzMzkweC90Y2c6IEltcGxlbWVudCBW
-RUNUT1IgUkVQTElDQVRFKQoyMy8zMiBDaGVja2luZyBjb21taXQgOWYyNTJmYmQ0OWQ1IChzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElDQVRFIElNTUVESUFURSkKMjQvMzIgQ2hlY2tp
-bmcgY29tbWl0IDExMDU5MTM5ZTljMiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNDQVRU
-RVIgRUxFTUVOVCkKMjUvMzIgQ2hlY2tpbmcgY29tbWl0IDkzNjRmODI2YTcwYSAoczM5MHgvdGNn
-OiBJbXBsZW1lbnQgVkVDVE9SIFNFTEVDVCkKMjYvMzIgQ2hlY2tpbmcgY29tbWl0IDFlNmUxNTMx
-MmIxZiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdP
-UkQpCjI3LzMyIENoZWNraW5nIGNvbW1pdCBiZDc0MTViYTI4NzEgKHMzOTB4L3RjZzogUHJvdmlk
-ZSBwcm9iZV93cml0ZV9hY2Nlc3MgaGVscGVyKQoyOC8zMiBDaGVja2luZyBjb21taXQgODI5ZTNm
-YjNlN2JmIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5n
-IGNvbW1pdCA4M2UyNzk0ZTNkN2YgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBF
-TEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQgYjkwMjFjNzcxZTUxIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUpCjMxLzMyIENoZWNraW5nIGNvbW1pdCA3OWJk
-Y2EzMThhMjggKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkK
-MzIvMzIgQ2hlY2tpbmcgY29tbWl0IGY2OTU0YTc5Mzk2MCAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDMwNzEyMTUzOS4xMjg0Mi0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGlu
-Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, Mar 07, 2019 at 12:29:08PM +0000, Peter Maydell wrote:
+> On Thu, 7 Mar 2019 at 12:14, Cleber Rosa <crosa@redhat.com> wrote:
+> >
+> > On Thu, Mar 07, 2019 at 09:49:44AM +0000, Peter Maydell wrote:
+> > > On Thu, 7 Mar 2019 at 01:40, Cleber Rosa <crosa@redhat.com> wrote:
+> > > Thanks for pointing out the tags functionality. That said,
+> > > this won't do what we want, will it?
+> > >  * building the docs gives all the docs in the build tree
+> > >  * but we only install via 'make install' the ones the user wants
+> > >
+> >
+> > It should be doable.  I put a PoC here:
+> >
+> >   https://github.com/clebergnu/sphinx-conditional-project/tree/master
+> >
+> > I'm understanding that the `make install` step is nothing but a copy
+> > of the produced build.  For this PoC, I used an HTML builder.
+> 
+> I'm still not clear how this helps. Either the top level
+> index file has everything in it (in which case it's no good
+> for 'make install'), or we just have separate manuals per
+
+IIRC, it shouldn't matter what the "top level" index file (index.rst)
+has, because it's the resulting build (not the source index.rst) that
+will be 'make install'ed.  Or am I missing something?
+
+> document (which doesn't seem to me to gain much over what
+> we currently have in this patchset, and you end up listing
+> everything multiple times in the index.rst).
+
+I don't see the multiple listings you mention here, but I guess you're
+referring to the "include" of the individual manual's index (devel.rst
+and interop.rst in this example).  I chose to implement the logic for
+choosing the content in the rst file, but an alternative would be to
+do it in conf.py:
+
+ if tags.has('devel'):
+    master_doc = 'devel.rst'
+ elif tags.has('interop'):
+    master_doc = 'interop.rst'
+ else:
+    master_doc = 'index.rst'
+
+IMO all options add a bit of poison (pick yours).  I do feel that the
+tag approach reuses sphinx functionality, and thus facilitate
+maintanance and minimize duplication.
+
+Anyway, if it's not clear to you as it's to me, then I'm probably
+biased or missing something.
+
+> 
+> thanks
+> -- PMM
+
+Best regards,
+- Cleber.
