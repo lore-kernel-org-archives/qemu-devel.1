@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57288)
+Received: from eggs.gnu.org ([209.51.188.92]:57354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1szH-0002ge-Uc
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:23:04 -0500
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h1szb-0002u4-QR
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:23:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1szG-00064X-S5
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:23:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59148)
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1h1szY-0006EP-O0
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:23:23 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:33684 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1szG-000643-L0
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:23:02 -0500
-Date: Thu, 7 Mar 2019 13:22:54 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190307132254.GB32268@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<87r2bigarf.fsf@zen.linaroharston>
-	<a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
-	<CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
-Subject: Re: [Qemu-devel] converting build system to Meson?
+	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
+	id 1h1szY-0005eV-Bh
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:23:20 -0500
+From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Date: Thu,  7 Mar 2019 14:22:04 +0100
+Message-Id: <1551964929-17845-1-git-send-email-mateja.marjanovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH 0/5] target/mips: Add tests for a variety of
+ MSA int binary ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +23,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
-On Thu, Mar 07, 2019 at 01:09:52PM +0000, Peter Maydell wrote:
-> On Thu, 7 Mar 2019 at 12:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > In any case, this wouldn't change; as you suggest below, configure could
-> > remain as a front-end (well, in-srcdir builds are not supported by
-> > Meson, so "../configure && ninja" perhaps).
-> 
-> As an aside, it might be a nice idea to drop the in-srcdir
-> build altogether for QEMU anyway -- it's not really a very
-> good idea and it means our build system has to cope with two
-> different ways of working to no particularly useful end.
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-I'd be in favour of that. A huge amount of the pain I felt when
-making previous changes to QEMU's makefiles has been caused by
-trying to support both in-srcdir & vpath build with the same
-set of rules. Fixing one often breaks the other, so you have
-to cycle back & forth doing a fix in one, then testing the
-other, repeat, repeat, scream, repeat.
+These are regression tests for MSA integer binary operations.
 
-Personally I always do in-srcdir builds, but I'd be fine to
-switch to vpath builds to reduce our maint burden in the build
-system as it would be a net win overall.
+Mateja Marjanovic (5):
+  target/mips: Add tests for a variety of MSA integer average
+    instructions
+  target/mips: Add tests for a variety of MSA integer divide
+    instructions
+  target/mips: Add tests for a variety of MSA integer dot product
+    instructions
+  target/mips: Add tests for a variety of MSA integer multiply
+    instructions
+  target/mips: Add tests for a variety of MSA integer subtract
+    instructions
 
-Regards,
-Daniel
+ .../user/ase/msa/int-average/test_msa_ave_s_b.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_ave_s_d.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_ave_s_h.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_ave_s_w.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_ave_u_b.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_ave_u_d.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_ave_u_h.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_ave_u_w.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_aver_s_b.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_aver_s_d.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_aver_s_h.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_aver_s_w.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_aver_u_b.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_aver_u_d.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_aver_u_h.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-average/test_msa_aver_u_w.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-divide/test_msa_div_s_b.c     | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-divide/test_msa_div_s_d.c     | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-divide/test_msa_div_s_h.c     | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-divide/test_msa_div_s_w.c     | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-divide/test_msa_div_u_b.c     | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-divide/test_msa_div_u_d.c     | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-divide/test_msa_div_u_h.c     | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-divide/test_msa_div_u_w.c     | 151 ++++++++++++++++++++
+ .../ase/msa/int-dot-product/test_msa_dotp_s_d.c    | 151 ++++++++++++++++++++
+ .../ase/msa/int-dot-product/test_msa_dotp_s_h.c    | 151 ++++++++++++++++++++
+ .../ase/msa/int-dot-product/test_msa_dotp_s_w.c    | 151 ++++++++++++++++++++
+ .../ase/msa/int-dot-product/test_msa_dotp_u_d.c    | 151 ++++++++++++++++++++
+ .../ase/msa/int-dot-product/test_msa_dotp_u_h.c    | 151 ++++++++++++++++++++
+ .../ase/msa/int-dot-product/test_msa_dotp_u_w.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-multiply/test_msa_mul_q_h.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-multiply/test_msa_mul_q_w.c   | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-multiply/test_msa_mulr_q_h.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-multiply/test_msa_mulr_q_w.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-multiply/test_msa_mulv_b.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-multiply/test_msa_mulv_d.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-multiply/test_msa_mulv_h.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-multiply/test_msa_mulv_w.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subs_s_b.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subs_s_d.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subs_s_h.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subs_s_w.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subs_u_b.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subs_u_d.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subs_u_h.c  | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subs_u_w.c  | 151 ++++++++++++++++++++
+ .../ase/msa/int-subtract/test_msa_subsus_u_b.c     | 151 ++++++++++++++++++++
+ .../ase/msa/int-subtract/test_msa_subsus_u_d.c     | 151 ++++++++++++++++++++
+ .../ase/msa/int-subtract/test_msa_subsus_u_h.c     | 151 ++++++++++++++++++++
+ .../ase/msa/int-subtract/test_msa_subsus_u_w.c     | 151 ++++++++++++++++++++
+ .../ase/msa/int-subtract/test_msa_subsuu_s_b.c     | 151 ++++++++++++++++++++
+ .../ase/msa/int-subtract/test_msa_subsuu_s_d.c     | 151 ++++++++++++++++++++
+ .../ase/msa/int-subtract/test_msa_subsuu_s_h.c     | 151 ++++++++++++++++++++
+ .../ase/msa/int-subtract/test_msa_subsuu_s_w.c     | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subv_b.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subv_d.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subv_h.c    | 151 ++++++++++++++++++++
+ .../user/ase/msa/int-subtract/test_msa_subv_w.c    | 153 +++++++++++++++++++++
+ 58 files changed, 8760 insertions(+)
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_ave_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_ave_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_ave_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_ave_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_ave_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_ave_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_ave_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_ave_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_aver_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_aver_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_aver_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_aver_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_aver_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_aver_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_aver_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-average/test_msa_aver_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-divide/test_msa_div_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-divide/test_msa_div_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-divide/test_msa_div_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-divide/test_msa_div_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-divide/test_msa_div_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-divide/test_msa_div_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-divide/test_msa_div_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-divide/test_msa_div_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dotp_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dotp_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dotp_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dotp_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dotp_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dotp_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mul_q_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mul_q_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulr_q_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulr_q_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulv_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulv_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulv_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulv_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subs_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subs_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subs_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subs_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subs_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subs_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subs_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subs_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subsus_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subsus_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subsus_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subsus_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subsuu_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subsuu_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subsuu_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subsuu_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subv_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subv_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subv_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_subv_w.c
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.7.4
