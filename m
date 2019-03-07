@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39673)
+Received: from eggs.gnu.org ([209.51.188.92]:40175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1vFZ-0005ik-C2
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:48:03 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1h1vHL-0007Bw-H4
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:49:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1vFX-0006p0-2k
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:48:01 -0500
-Resent-Message-Id: <E1h1vFX-0006p0-2k@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21038)
+	(envelope-from <amarkovic@wavecomp.com>) id 1h1vHK-0008Dq-5U
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:49:51 -0500
+Received: from mail-eopbgr770135.outbound.protection.outlook.com
+	([40.107.77.135]:5063
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1vFV-0006nL-9c
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:47:58 -0500
-Message-ID: <155197364921.8146.12044245038167805443@6acff2cf482b>
-In-Reply-To: <20190307144126.31847-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1h1vHJ-0008D8-Q1
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:49:50 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 7 Mar 2019 15:49:45 +0000
+Message-ID: <BN6PR2201MB1251F6E7D424C96970DAEC62C64C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1551964929-17845-1-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1551964929-17845-1-git-send-email-mateja.marjanovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 07:47:30 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
+Subject: Re: [Qemu-devel] [PATCH 0/5] target/mips: Add tests for a variety
+ of MSA int binary ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, david@redhat.com
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE0NDEyNi4zMTg0
-Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzE0
-NDEyNi4zMTg0Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwLzldIHRjZzogQWRkIHRjZ19nZW5fZXh0cmFjdDJfe2kzMixpNjR9Cgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
-IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
-aGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkw
-MzA3MTQ0MTI2LjMxODQ3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3
-LzIwMTkwMzA3MTQ0MTI2LjMxODQ3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjE3MmNiMWMyNjQgdGFyZ2V0L2FybTogU2ltcGxp
-ZnkgQkZYSUwgZXhwYW5zaW9uCjU2Yzg3YmM4ODIgdGFyZ2V0L2FybTogVXNlIGV4dHJhY3QyIGZv
-ciBFWFRSCmVhODgwNmU0NjggdGNnL2FhcmNoNjQ6IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJf
-e2kzMiwgaTY0fQo2OTFkNjc1ZjRiIHRjZy9hcm06IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJf
-aTMyCjVlYzEzYzgzZjIgdGNnL2kzODY6IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMiwg
-aTY0fQozYzdhM2Y3NTA2IHRjZzogVXNlIGV4dHJhY3QyIGluIHRjZ19nZW5fZGVwb3NpdF97aTMy
-LCBpNjR9CmQzYzFkZjIwMTYgdGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9zaGlmdGlfaTY0
-CjcxY2QxNTdmOGEgdGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9CjYyNzRkNjU3
-YjMgdGNnOiBJbXBsZW1lbnQgdGNnX2dlbl9leHRyYWN0Ml97aTMyLCBpNjR9Cgo9PT0gT1VUUFVU
-IEJFR0lOID09PQoxLzkgQ2hlY2tpbmcgY29tbWl0IDYyNzRkNjU3YjNiYSAodGNnOiBJbXBsZW1l
-bnQgdGNnX2dlbl9leHRyYWN0Ml97aTMyLCBpNjR9KQoyLzkgQ2hlY2tpbmcgY29tbWl0IDcxY2Qx
-NTdmOGE0YyAodGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9KQpFUlJPUjogc3Bh
-Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzEwOTogRklMRTogdGNnL29w
-dGltaXplLmM6MTIwNToKKyAgICAgICAgQ0FTRV9PUF8zMl82NChleHRyYWN0Mik6CiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
-OTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoz
-LzkgQ2hlY2tpbmcgY29tbWl0IGQzYzFkZjIwMTY0OSAodGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNn
-X2dlbl9zaGlmdGlfaTY0KQo0LzkgQ2hlY2tpbmcgY29tbWl0IDNjN2EzZjc1MDY4YiAodGNnOiBV
-c2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9kZXBvc2l0X3tpMzIsIGk2NH0pCjUvOSBDaGVja2luZyBj
-b21taXQgNWVjMTNjODNmMmY1ICh0Y2cvaTM4NjogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml97
-aTMyLCBpNjR9KQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4
-RSkKIzQ4OiBGSUxFOiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0LmluYy5jOjI1OTE6CisgICAgT1BfMzJf
-NjQoZXh0cmFjdDIpOgogICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgNTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS85IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgo2LzkgQ2hlY2tpbmcgY29tbWl0IDY5MWQ2NzVmNGI3NCAodGNnL2FybTogU3Vw
-cG9ydCBJTkRFWF9vcF9leHRyYWN0Ml9pMzIpCjcvOSBDaGVja2luZyBjb21taXQgZWE4ODA2ZTQ2
-OGE3ICh0Y2cvYWFyY2g2NDogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml97aTMyLCBpNjR9KQo4
-LzkgQ2hlY2tpbmcgY29tbWl0IDU2Yzg3YmM4ODJkYyAodGFyZ2V0L2FybTogVXNlIGV4dHJhY3Qy
-IGZvciBFWFRSKQo5LzkgQ2hlY2tpbmcgY29tbWl0IDE3MmNiMWMyNjRhZSAodGFyZ2V0L2FybTog
-U2ltcGxpZnkgQkZYSUwgZXhwYW5zaW9uKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDMwNzE0NDEyNi4zMTg0Ny0xLXJpY2hhcmQuaGVuZGVy
-c29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> Subject: [PATCH 0/5] target/mips: Add tests for a variety of MSA int bina=
+ry ops
+>=20
+> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+>=20
+> These are regression tests for MSA integer binary operations.
+
+Some minor cleanups are needed in preambles and commit messages, but
+nevertheless:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
