@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41983)
+Received: from eggs.gnu.org ([209.51.188.92]:42818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1po7-0000ia-Pd
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:59:20 -0500
+	(envelope-from <bounces@canonical.com>) id 1h1pqA-0001mb-Eg
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:01:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1po6-00036P-Kl
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:59:19 -0500
-Date: Thu, 7 Mar 2019 09:59:01 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190307095901.GF32268@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190301183328.20b63e23@redhat.com>
-	<20190301174806.GN21251@redhat.com>
-	<87va0zcdse.fsf@dusky.pond.sub.org>
-	<20190304132507.39273826@redhat.com>
-	<20190304123908.GK4239@redhat.com>
-	<20190304151641.3deefc3b@redhat.com>
-	<20190304142432.GM4239@redhat.com>
-	<a6081774-c9d5-0496-3e65-ffb885408261@redhat.com>
-	<20190304163516.GQ4239@redhat.com>
-	<20190306200348.11e9eece@Igors-MacBook-Pro.local>
+	(envelope-from <bounces@canonical.com>) id 1h1pq5-0004Gk-0P
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:01:26 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45756)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h1pq2-0004EM-Uo
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:01:20 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h1ppz-00076f-8o
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 10:01:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 40D6A2E80CC
+	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 10:01:15 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190306200348.11e9eece@Igors-MacBook-Pro.local>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
- parameter of '-numa node' option
+Date: Thu, 07 Mar 2019 09:52:27 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1818483 <1818483@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155168800961.29550.2360664198558693792.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155195234774.17622.798344608284858374.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818483] Re: qemu user mode does not support
+ binfmt_misc config with flags include "P"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,86 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Michal Privoznik <mprivozn@redhat.com>, Markus Armbruster <armbru@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-On Wed, Mar 06, 2019 at 08:03:48PM +0100, Igor Mammedov wrote:
-> On Mon, 4 Mar 2019 16:35:16 +0000
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->=20
-> > On Mon, Mar 04, 2019 at 05:20:13PM +0100, Michal Privoznik wrote:
-> > > We couldn't have done that. How we would migrate from older qemu?
-> > >=20
-> > > Anyway, now that I look into this (esp. git log) I came accross:
-> > >=20
-> > > commit f309db1f4d51009bad0d32e12efc75530b66836b
-> > > Author:     Michal Privoznik <mprivozn@redhat.com>
-> > > AuthorDate: Thu Dec 18 12:36:48 2014 +0100
-> > > Commit:     Michal Privoznik <mprivozn@redhat.com>
-> > > CommitDate: Fri Dec 19 07:44:44 2014 +0100
-> > >=20
-> > >     qemu: Create memory-backend-{ram,file} iff needed
-> > >=20
-> > > Or this 7832fac84741d65e851dbdbfaf474785cbfdcf3c. We did try to gen=
-erated
-> > > newer cmd line but then for various reasong (e.g. avoiding triggeri=
-ng a qemu
-> > > bug) we turned it off and make libvirt default to older (now deprec=
-ated) cmd
-> > > line.
-> > >=20
-> > > Frankly, I don't know how to proceed. Unless qemu is fixed to allow
-> > > migration from deprecated to new cmd line (unlikely, if not impossi=
-ble,
-> > > right?) then I guess the only approach we can have is that:
-> > >=20
-> > > 1) whenever so called cold booting a new machine (fresh, brand new =
-start of
-> > > a new domain) libvirt would default to modern cmd line,
-> > >=20
-> > > 2) on migration, libvirt would record in the migration stream (or s=
-tatus XML
-> > > or wherever) that modern cmd line was generated and thus it'll make=
- the
-> > > destination generate modern cmd line too.
-> > >=20
-> > > This solution still suffers a couple of problems:
-> > > a) migration to older libvirt will fail as older libvirt won't reco=
-gnize the
-> > > flag set in 2) and therefore would default to deprecated cmd line
-> > > b) migrating from one host to another won't modernize the cmd line
-> > >=20
-> > > But I guess we have to draw a line somewhere (if we are not willing=
- to write
-> > > those migration patches).
-> >=20
-> > Yeah supporting backwards migration is a non-optional requirement fro=
-m at
-> > least one of the mgmt apps using libvirt, so breaking the new to old =
-case
-> > is something we always aim to avoid.
-> Aiming for support of=20
-> "new QEMU + new machine type" =3D> "old QEMU + non-existing machine typ=
-e"
-> seems a bit difficult.
+The question is: can we have one set of QEMU code that copes correctly
+with both 'binfmt_misc with P flag' and 'binfmt_misc without P flag' ?
 
-That's not the scenario that's the problem. The problem is
+Your patch makes -P work but breaks some cases without it. That means
+it's not backwards compatible with all the existing QEMU installations
+and use cases in the world, which means it's awkward to move to. It
+would be better if there were a mechanism which would allow us to make
+them both work.
 
-   new QEMU + new machine type + new libvirt   -> new QEMU + new machine =
-type + old libvirt
+-- =
 
-Previously released versions of libvirt will happily use any new machine
-type that QEMU introduces. So we can't make new libvirt use a different
-options, only for new machine types, as old libvirt supports those machin=
-e
-types too.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818483
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Title:
+  qemu user mode does not support binfmt_misc config with flags include
+  "P"
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi Sir:
+  During our test in chroot environment with qemu-user-static, we got some =
+test cases failed because of program output warning with unexpected full pa=
+th name.
+  For example in test module "Devscripts"
+  the test item for broken tarball expected the warning info:
+  <tar: This does not look like a tar archive
+  tar: ******* >
+  but the output was:
+  </bin/tar: This does not look like a tar archive
+  /bin/tar: ******>
+  the cause is the config file of binfmt_misc was set not to send argv0, fo=
+r example:
+  type command "tar" after chroot:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+  lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
+  [sudo] password for lpeng: =
+
+  root@lpeng-VirtualBox:/# tar
+  /bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-l=
+abel' options
+  Try '/bin/tar --help' or '/bin/tar --usage' for more information.
+  root@lpeng-VirtualBox:/# =
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+  by adding output log in main()@qemu/Linux-user/main.c
+  we found the original input command was changed, and qemu do not know tha=
+t, we got the input args:
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----NULL---
+
+  Next step we modified the flags=3DP in the corresponding config under fol=
+der /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
+  But chroot could not start bash because in current qemu dose not consider=
+ about this unexpected one more"argv[0]"
+
+  =
+
+  After modified qemu code temporary to handle the new argv list we got the=
+ input args, and from argv[2] is the original input command
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----tar---
+
+  We need the original input from command line, so is it possible that let =
+binfmt_misc to pass one more additional args or env to qemu as a token of t=
+he binfmt_misc flag, then qemu can judge how to parse the input args by it?
+  looking forward your suggestions.
+
+  Thanks
+  luyou
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818483/+subscriptions
