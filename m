@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43151)
+Received: from eggs.gnu.org ([209.51.188.92]:45980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1h1oGm-0003Jd-JC
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:20:49 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1h1oZ4-0007TX-6T
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:39:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1h1oGl-0004Mw-JU
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:20:48 -0500
-Date: Thu, 7 Mar 2019 16:20:18 +0800
-From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-Message-ID: <20190307082018.GA26350@byw>
-Reply-To: baiyaowei@cmss.chinamobile.com
-References: <1545387387-9613-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-	<20190306215633.GM6818@localhost.localdomain>
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1h1oZ3-00076A-FR
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:39:42 -0500
+Received: from mail-eopbgr150104.outbound.protection.outlook.com
+	([40.107.15.104]:17103
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1h1oZ2-00075B-Ke
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:39:41 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Thu, 7 Mar 2019 08:39:36 +0000
+Message-ID: <1a45c99c-ca33-7ab4-06b6-5c2e581f5082@virtuozzo.com>
+References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
+	<8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
+In-Reply-To: <8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <19CA354118B4F44EAD90E60ABB9FD7A2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190306215633.GM6818@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tcmu: Introduce qemu-tcmu
- utility
+Subject: Re: [Qemu-devel] [PATCH 0/3] migration: add sztd compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Amar Tumballi <atumball@redhat.com>, Mike Christie <mchristi@redhat.com>, Prasanna Kalever <pkalever@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiubo Li <xiubli@redhat.com>, Fam Zheng <fam@euphoh.net>, stefanha <stefanha@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Wed, Mar 06, 2019 at 10:56:33PM +0100, Kevin Wolf wrote:
-> Am 21.12.2018 um 11:16 hat Yaowei Bai geschrieben:
-> > This patch introduces a new utility, qemu-tcmu. Apart from the
-> > underlaying protocol it interacts with the world much like
-> > qemu-nbd. This patch bases on Fam's version.
-> > 
-> > Qemu-tcmu handles SCSI commands which are passed through userspace
-> > from kernel by LIO subsystem using TCMU protocol. Libtcmu is the
-> > library for processing TCMU protocol in userspace. With qemu-tcmu,
-> > we can export images/formats like qcow2, rbd, etc. that qemu supports
-> > using iSCSI protocol or loopback for remote or local access.
-> > 
-> > Currently qemu-tcmu implements several SCSI command helper functions
-> > to work. Our goal is to refactor and reuse SCSI code in scsi-disk.
-> > 
-> > Please refer to docs/tcmu.txt to use qemu-tcmu. We test it on CentOS
-> > 7.3.(Please use 3.10.0-514 or lower version kernel, there's one issuse
-> > in higher kernel version we're resolving.)
-> > 
-> > Cc: Mike Christie <mchristi@redhat.com>
-> > Cc: Amar Tumballi<atumball@redhat.com>
-> > Cc: Prasanna Kalever <pkalever@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-> > Signed-off-by: Xiubo Li <xiubli@redhat.com>
-> 
-> Sorry, with the email backlog after the Christmas break, this patch went
-> completely unnoticed on my side.
-> 
-> I'm not going to review the code in detail yet, because I think there
-> are a few very high level points that need to be addressed first:
-> 
-> * Patchew replied with a ton of coding style problems. This patch isn't
->   mergable without these problems fixed.
-
-These problems've been fixed in the V2 and it'll be sent out soon.
-Thanks.
-
-> 
-> * The first priority should be adding an in-process iscsi target that
->   can be managed with QMP, similar to the built-in NBD server.
-
-Well, people used to manage iscsi targets through targetcli, a command
-line utility. Our intention is, with targetcli and qemu-tcmu, user can
-create/remove targets and backstores totally in just one place, so you
-don't need to create targets in targetcli and then turn to configure
-backstores in qemu-tcmu with QMP or command line, it's convenient. So
-we decide to implement QMP in the future release but it's definitely
-in our plan.
-
-> 
-> * The standalone tool should configure its block backend using -blockdev
->   based code paths instead of duplicating legacy -drive code, which
->   cannot provide advanced functionality.
-
-OK, will turn into -blockdev based code paths. Thanks.
-
-> 
-> * Even worse, you can't get the configuration from the iscsi initiator.
->   This would be a security nightmare. Instead, the user needs to
->   configure named exports either in QMP or on the command line for the
->   tool and the initiator then connects to an export name.
-
-So you mean we should configure exports through iscsi initiator? Sorry i
-don't understand the problems here, could you please explain more?
-
-> 
-> * It should be considered if we can have a single standalone tool for
->   all export mechanisms (NBD, TCMU, vhost-user, fuse, and whatever new
->   ideas we will have in the future) that could have advanced
->   functionality like a QMP monitor instead of adding a minimal
->   specialised tool for each of them.
-
-That's a great and exciting idea so we don't need one qemu-nbd, one
-qemu-tcmu, or more qemu-xxx at the same time, there's just one standalone
-tool to use, maybe we can even instead add a new 'export' subcommand to
-qemu-img for this purpose.
-
-> 
-> Kevin
+cGluZyBwaW5nDQoNCk9uIDA0LjAzLjIwMTkgMTg6MTAsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToN
+Cj4gcGluZyENCj4gDQo+IE9uIDI2LjAyLjIwMTkgMTY6MTUsIERlbmlzIFBsb3RuaWtvdiB3cm90
+ZToNCj4+IHpzdGQgZGF0ZSBjb21wcmVzc2lvbiBhbGdvcml0aG0gc2hvd3MgYmV0dGVyIHBlcmZv
+cm1hbmNlIG9uIGRhdGEgY29tcHJlc3Npb24uDQo+PiBJdCBtaWdodCBiZSB1c2VmdWwgdG8gZW1w
+bG95IHRoZSBhbGdvcml0aG0gaW4gVk0gbWlncmF0aW9uIHRvIHJlZHVjZSBDUFUgdXNhZ2UuDQo+
+PiBBIHVzZXIgd2lsbCBiZSBhYmxlIHRvIGNob29zZSBiZXR3ZWVuIHRob3NlIGFsZ29yaXRobXMs
+IHRoZXJlZm9yIGNvbXByZXNzLXR5cGUNCj4+IG1pZ3JhdGlvbiBwYXJhbWV0ZXIgaXMgYWRkZWQu
+DQo+Pg0KPj4gSGVyZSBhcmUgc29tZSByZXN1bHRzIG9mIHBlcmZvcm1hbmNlIGNvbXBhcmlzb24g
+enN0ZCB2cyBnemlwOg0KPj4NCj4+IGhvc3Q6IGk3LTQ3OTAgOHhDUFUgQCAzLjYwR0h6LCAxNkcg
+UkFNDQo+PiBtaWdyYXRpb24gdG8gdGhlIHNhbWUgaG9zdA0KPj4gVk06IDJ4VkNQVSwgOEcgUkFN
+IHRvdGFsDQo+PiA1RyBSQU0gdXNlZCwgbWVtb3J5IHBvcHVsYXRlZCB3aXRoIHBvc3RncmVxc2wg
+ZGF0YQ0KPj4gcHJvZHVjZWQgYnkgcGdiZW5jaCBwZXJmb3JtYW5jZSBiZW5jaG1hcmsNCj4+DQo+
+Pg0KPj4gVGhyZWFkczogMSBjb21wcmVzcyDigJMgMSBkZWNvbXByZXNzDQo+Pg0KPj4genN0ZCBw
+cm92aWRlcyBzbGlnaHRseSBsZXNzIGNvbXByZXNzaW9uIHJhdGlvIHdpdGggYWxtb3N0IHRoZSBz
+YW1lDQo+PiBDUFUgdXNhZ2UgYnV0IGNvcGVzIHdpdGggUkFNICBjb21wcmVzc2lvbiByb2dobHkg
+MiB0aW1lcyBmYXN0ZXINCj4+DQo+PiBjb21wcmVzc2lvbiB0eXBlICAgICAgICAgICAgICB6bGli
+ICAgICAgIHwgICAgICB6c3RkDQo+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+IGNvbXByZXNzaW9uIGxldmVsICAgICAgICAgIDEg
+ICAgICAgNSAgICAgfCAgIDEgICAgICAgNQ0KPj4gY29tcHJlc3Npb24gcmF0aW8gICAgICAgICAg
+Ni45MiAgICA3LjA1ICB8ICAgNi42OSAgICA2Ljg5DQo+PiBjcHUgaWRsZSwgJSAgICAgICAgICAg
+ICAgICA4MiAgICAgIDgzICAgIHwgICA4NiAgICAgIDgwDQo+PiB0aW1lLCBzZWMgICAgICAgICAg
+ICAgICAgICA0OSAgICAgIDcxICAgIHwgICAyNiAgICAgIDMxDQo+PiB0aW1lIGRpZmYgdG8gemxp
+Yiwgc2VjICAgICAgICAgICAgICAgICAgICAgIC0yNSAgICAgLTQxDQo+Pg0KPj4NCj4+IFRocmVh
+ZHM6IDggY29tcHJlc3Mg4oCTIDIgZGVjb21wcmVzcw0KPj4NCj4+IHpzdGQgcHJvdmlkZXMgdGhl
+IHNhbWUgbWlncmF0aW9uIHRpbWUgd2l0aCBsZXNzIGNwdSBjb25zdW1wdGlvbg0KPj4NCj4+IGNv
+bXByZXNzaW9uIHR5cGUgICAgICAgICBub25lICB8ICAgICAgICBnemlwKHpsaWIpICAgIHwgICAg
+ICAgICAgenN0ZA0KPj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiBjb21wcmVzc2lvbiBsZXZl
+bCAgICAgICAgLSAgICAgfCAgMSAgICAgIDUgICAgICAgOSAgICB8ICAgMSAgICAgICA1ICAgICAg
+IDE1DQo+PiBjb21wcmVzc2lvbiByYXRpbyAgICAgICAgLSAgICAgfCAgNi45NCAgIDYuOTkgICAg
+Ny4xNCB8ICAgNi42NCAgICA2Ljg5ICAgIDYuOTMNCj4+IHRpbWUsIHNlYyAgICAgICAgICAgICAg
+ICAxNTQgICB8ICAyMiAgICAgMjMgICAgICAyNyAgIHwgICAyMyAgICAgIDIzICAgICAgMjUNCj4+
+IGNwdSBpZGxlLCAlICAgICAgICAgICAgICA5OSAgICB8ICA0NSAgICAgMzAgICAgICAxMiAgIHwg
+ICA3MCAgICAgIDUyICAgICAgMjMNCj4+IGNwdSBpZGxlIGRpZmYgdG8gemxpYiAgICAgICAgICB8
+ICAgICAgICAgICAgICAgICAgICAgIHwgIC0yNSUgICAgLTIyJSAgICAtMTElDQo+Pg0KPj4NCj4+
+IERlbmlzIFBsb3RuaWtvdiAoMyk6DQo+PiAgICAgbWlncmF0aW9uOiByZXdvcmsgY29tcHJlc3Np
+b24gY29kZSBmb3IgYWRkaW5nIG1vcmUgZGF0YSBjb21wcmVzc29ycw0KPj4gICAgIGhtcDogYWRk
+IGNvbXByZXNzLXR5cGUgcGFyYW1ldGVyIHRvIG1pZ3JhdGlvbiBwYXJhbWV0ZXJzDQo+PiAgICAg
+bWlncmF0aW9uOiBhZGQgenN0ZCBjb21wcmVzc2lvbg0KPj4NCj4+ICAgIGNvbmZpZ3VyZSAgICAg
+ICAgICAgICB8ICAyNiArKysrDQo+PiAgICBobXAuYyAgICAgICAgICAgICAgICAgfCAgIDggKysN
+Cj4+ICAgIG1pZ3JhdGlvbi9taWdyYXRpb24uYyB8ICA0NSArKysrKystDQo+PiAgICBtaWdyYXRp
+b24vbWlncmF0aW9uLmggfCAgIDEgKw0KPj4gICAgbWlncmF0aW9uL3FlbXUtZmlsZS5jIHwgIDM5
+ICsrLS0tLQ0KPj4gICAgbWlncmF0aW9uL3FlbXUtZmlsZS5oIHwgIDE4ICsrLQ0KPj4gICAgbWln
+cmF0aW9uL3JhbS5jICAgICAgIHwgMjkxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KystLS0tLS0tLQ0KPj4gICAgcWFwaS9taWdyYXRpb24uanNvbiAgIHwgIDI2ICsrKy0NCj4+ICAg
+IDggZmlsZXMgY2hhbmdlZCwgMzY5IGluc2VydGlvbnMoKyksIDg1IGRlbGV0aW9ucygtKQ0KPj4N
+Cj4gDQoNCi0tIA0KQmVzdCwNCkRlbmlzDQo=
