@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59615)
+Received: from eggs.gnu.org ([209.51.188.92]:59612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLS-0001pG-Nq
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLS-0001p5-HB
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLR-0004tH-Cr
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLQ-0004ss-C2
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:34 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:47798)
+Received: from userp2130.oracle.com ([156.151.31.86]:47778)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1h1nLR-0004sw-2x
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:33 -0500
+	id 1h1nLQ-0004r8-2O
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:32 -0500
 From: elena.ufimtseva@oracle.com
-Date: Wed,  6 Mar 2019 23:21:26 -0800
-Message-Id: <20190307072126.8520-1-elena.ufimtseva@oracle.com>
-Subject: [Qemu-devel] [multiprocess RFC PATCH 10/37] multi-process: setup a
- machine object for remote device process
+Date: Wed,  6 Mar 2019 23:21:09 -0800
+Message-Id: <20190307072109.8334-1-elena.ufimtseva@oracle.com>
+Subject: [Qemu-devel] [multiprocess RFC PATCH 06/37] multi-process: build
+ system for remote device process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,130 +24,331 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, kwolf@redhat.com, mreitz@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, fam@euphon.net, quintela@redhat.com, dgilbert@redhat.com, afaerber@suse.de
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-remote-machine object sets up various subsystems of the remote device
-process. Instantiate PCI host bridge object and initialize RAM, IO &
-PCI memory regions.
+Modify Makefile to support the building of the remote
+device process. Implements main() function of remote
+device process.
 
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- exec.c                        |   3 +-
- include/exec/address-spaces.h |   2 +
- include/remote/machine.h      |  46 ++++++++++++++++
- remote/Makefile.objs          |   1 +
- remote/machine.c              | 118 ++++++++++++++++++++++++++++++++++++++++++
- remote/remote-main.c          |   7 +++
- 6 files changed, 175 insertions(+), 2 deletions(-)
- create mode 100644 include/remote/machine.h
- create mode 100644 remote/machine.c
+ Makefile                |  5 ++++-
+ Makefile.objs           | 22 ++++++++++++++++++++++
+ Makefile.target         | 50 +++++++++++++++++++++++++++++++++++++++++++++++--
+ backends/Makefile.objs  |  2 ++
+ block/Makefile.objs     |  2 ++
+ hw/Makefile.objs        |  7 +++++++
+ hw/block/Makefile.objs  |  2 ++
+ hw/core/Makefile.objs   | 14 ++++++++++++++
+ hw/nvram/Makefile.objs  |  2 ++
+ hw/pci/Makefile.objs    |  4 ++++
+ hw/scsi/Makefile.objs   |  2 ++
+ migration/Makefile.objs |  2 ++
+ qom/Makefile.objs       |  4 ++++
+ remote/Makefile.objs    |  1 +
+ remote/remote-main.c    | 35 ++++++++++++++++++++++++++++++++++
+ 15 files changed, 151 insertions(+), 3 deletions(-)
+ create mode 100644 remote/Makefile.objs
+ create mode 100644 remote/remote-main.c
 
-diff --git a/exec.c b/exec.c
-index dcef041..4b7b3bc 100644
---- a/exec.c
-+++ b/exec.c
-@@ -193,7 +193,6 @@ typedef struct subpage_t {
- #define PHYS_SECTION_WATCH 3
+diff --git a/Makefile b/Makefile
+index 2208bde..e325297 100644
+--- a/Makefile
++++ b/Makefile
+@@ -378,6 +378,8 @@ dummy := $(call unnest-vars,, \
+                 qom-obj-y \
+                 io-obj-y \
+                 common-obj-y \
++                remote-pci-obj-y \
++                remote-lsi-obj-y \
+                 common-obj-m \
+                 ui-obj-y \
+                 ui-obj-m \
+@@ -459,7 +461,8 @@ subdir-capstone: .git-submodule-status
+ 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
  
- static void io_mem_init(void);
--static void memory_map_init(void);
- static void tcg_commit(MemoryListener *listener);
+ $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) $(slirp-obj-y) \
+-	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
++	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY)) \
++	$(remote-pci-obj-y) $(remote-lsi-obj-y)
  
- static MemoryRegion io_mem_watch;
-@@ -3090,7 +3089,7 @@ static void tcg_commit(MemoryListener *listener)
-     tlb_flush(cpuas->cpu);
- }
+ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
+ # Only keep -O and -g cflags
+diff --git a/Makefile.objs b/Makefile.objs
+index 6e91ee5..702acc8 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -22,6 +22,28 @@ block-obj-$(CONFIG_REPLICATION) += replication.o
  
--static void memory_map_init(void)
-+void memory_map_init(void)
- {
-     system_memory = g_malloc(sizeof(*system_memory));
+ block-obj-m = block/
  
-diff --git a/include/exec/address-spaces.h b/include/exec/address-spaces.h
-index db8bfa9..56a877b 100644
---- a/include/exec/address-spaces.h
-+++ b/include/exec/address-spaces.h
-@@ -33,6 +33,8 @@ MemoryRegion *get_system_memory(void);
-  */
- MemoryRegion *get_system_io(void);
++#########################################################
++# remote-pci-obj-y is common code used by remote devices
++
++remote-pci-obj-$(CONFIG_MPQEMU) += hw/
++remote-pci-obj-$(CONFIG_MPQEMU) += qom/
++remote-pci-obj-$(CONFIG_MPQEMU) += backends/
++remote-pci-obj-$(CONFIG_MPQEMU) += block/
++remote-pci-obj-$(CONFIG_MPQEMU) += migration/
++remote-pci-obj-$(CONFIG_MPQEMU) += remote/
++
++remote-pci-obj-$(CONFIG_MPQEMU) += cpus-common.o
++remote-pci-obj-$(CONFIG_MPQEMU) += dma-helpers.o
++remote-pci-obj-$(CONFIG_MPQEMU) += blockdev.o
++remote-pci-obj-$(CONFIG_MPQEMU) += qdev-monitor.o
++remote-pci-obj-$(CONFIG_MPQEMU) += bootdevice.o
++remote-pci-obj-$(CONFIG_MPQEMU) += iothread.o
++
++##############################################################
++# remote-lsi-obj-y is code used to implement remote LSI device
++
++remote-lsi-obj-$(CONFIG_MPQEMU) += hw/
++
+ #######################################################################
+ # crypto-obj-y is code used by both qemu system emulation and qemu-img
  
-+void memory_map_init(void);
-+
- extern AddressSpace address_space_memory;
- extern AddressSpace address_space_io;
+diff --git a/Makefile.target b/Makefile.target
+index 3b79e70..81335c6 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -33,7 +33,12 @@ QEMU_PROG_BUILD = $(QEMU_PROG)
+ endif
+ endif
  
-diff --git a/include/remote/machine.h b/include/remote/machine.h
-new file mode 100644
-index 0000000..fe1e11b
---- /dev/null
-+++ b/include/remote/machine.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Remote machine configuration
-+ *
-+ * Copyright 2019, Oracle and/or its affiliates. All rights reserved.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+-PROGS=$(QEMU_PROG) $(QEMU_PROGW)
++ifdef CONFIG_MPQEMU
++SCSI_DEV_PROG=qemu-scsi-dev
++SCSI_DEV_BUILD = $(SCSI_DEV_PROG)
++endif
 +
-+#ifndef REMOTE_MACHINE_H
-+#define REMOTE_MACHINE_H
++PROGS=$(QEMU_PROG) $(QEMU_PROGW) $(SCSI_DEV_PROG)
+ STPFILES=
+ 
+ # Makefile Tests
+@@ -115,6 +120,16 @@ obj-y += target/$(TARGET_BASE_ARCH)/
+ obj-y += disas.o
+ obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
+ 
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/kvm-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/tcg-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/hax-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/whpx-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/vl-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/net-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/replay.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/xen-mapcache.o
 +
-+#include "qemu/osdep.h"
-+#include "qom/object.h"
-+#include "hw/boards.h"
-+#include "remote/pcihost.h"
-+#include "qemu/notify.h"
+ #########################################################
+ # Linux user emulator target
+ 
+@@ -170,11 +185,22 @@ endif # CONFIG_SOFTMMU
+ dummy := $(call unnest-vars,,obj-y)
+ all-obj-y := $(obj-y)
+ 
++dummy := $(call unnest-vars,..,remote-pci-tgt-obj-y)
++all-remote-pci-obj-y := $(remote-pci-tgt-obj-y)
 +
-+typedef struct RemMachineState {
-+    MachineState parent_obj;
++all-remote-pci-obj-y += memory.o
++all-remote-pci-obj-y += exec.o
++all-remote-pci-obj-y += numa.o
++all-remote-pci-obj-y += ioport.o
++all-remote-pci-obj-y += cpus.o
 +
-+    RemPCIHost *host;
-+} RemMachineState;
+ target-obj-y :=
+ block-obj-y :=
+ common-obj-y :=
+ chardev-obj-y :=
+ slirp-obj-y :=
++remote-pci-obj-y :=
++remote-lsi-obj-y :=
+ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call unnest-vars,,target-obj-y)
+ target-obj-y-save := $(target-obj-y)
+@@ -189,7 +215,9 @@ dummy := $(call unnest-vars,.., \
+                io-obj-y \
+                common-obj-y \
+                common-obj-m \
+-               slirp-obj-y)
++               slirp-obj-y \
++               remote-pci-obj-y \
++               remote-lsi-obj-y)
+ target-obj-y := $(target-obj-y-save)
+ all-obj-y += $(common-obj-y)
+ all-obj-y += $(target-obj-y)
+@@ -201,7 +229,18 @@ all-obj-$(CONFIG_SOFTMMU) += $(crypto-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(slirp-obj-y)
+ 
++all-remote-pci-obj-y += $(authz-obj-y)
++all-remote-pci-obj-y += $(block-obj-y)
++all-remote-pci-obj-y += $(crypto-obj-y)
++all-remote-pci-obj-y += $(io-obj-y)
++all-remote-pci-obj-y += $(chardev-obj-y)
++all-remote-pci-obj-y += $(remote-pci-obj-y)
 +
-+#define TYPE_REMOTE_MACHINE "remote-machine"
-+#define REMOTE_MACHINE(obj) \
-+    OBJECT_CHECK(RemMachineState, (obj), TYPE_REMOTE_MACHINE)
 +
-+void qemu_run_machine_init_done_notifiers(void);
++all-remote-lsi-obj-y += $(all-remote-pci-obj-y) $(remote-lsi-obj-y)
 +
-+#endif
-diff --git a/remote/Makefile.objs b/remote/Makefile.objs
-index 2757f5a..13d4c48 100644
---- a/remote/Makefile.objs
-+++ b/remote/Makefile.objs
-@@ -1,2 +1,3 @@
- remote-pci-obj-$(CONFIG_MPQEMU) += remote-main.o
- remote-pci-obj-$(CONFIG_MPQEMU) += pcihost.o
+ $(QEMU_PROG_BUILD): config-devices.mak
++$(SCSI_DEV_BUILD): config-devices.mak
+ 
+ COMMON_LDADDS = ../libqemuutil.a
+ 
+@@ -213,6 +252,13 @@ ifdef CONFIG_DARWIN
+ 	$(call quiet-command,SetFile -a C $@,"SETFILE","$(TARGET_DIR)$@")
+ endif
+ 
++$(SCSI_DEV_BUILD): $(all-remote-lsi-obj-y) $(COMMON_LDADDS)
++	$(call LINK, $(filter-out %.mak, $^))
++ifdef CONFIG_DARWIN
++	$(call quiet-command,Rez -append $(SRC_PATH)/pc-bios/qemu.rsrc -o $@,"REZ","$(TARGET_DIR)$@")
++	$(call quiet-command,SetFile -a C $@,"SETFILE","$(TARGET_DIR)$@")
++endif
++
+ gdbstub-xml.c: $(TARGET_XML_FILES) $(SRC_PATH)/scripts/feature_to_c.sh
+ 	$(call quiet-command,rm -f $@ && $(SHELL) $(SRC_PATH)/scripts/feature_to_c.sh $@ $(TARGET_XML_FILES),"GEN","$(TARGET_DIR)$@")
+ 
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index ff619d3..47c4161 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -15,3 +15,5 @@ common-obj-$(CONFIG_VHOST_CRYPTO) += cryptodev-vhost-user.o
+ endif
+ 
+ common-obj-$(CONFIG_LINUX) += hostmem-memfd.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) += hostmem.o
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 7a81892..cfc7719 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -63,3 +63,5 @@ qcow.o-libs        := -lz
+ linux-aio.o-libs   := -laio
+ parallels.o-cflags := $(LIBXML2_CFLAGS)
+ parallels.o-libs   := $(LIBXML2_LIBS)
++
++remote-pci-obj-$(CONFIG_MPQEMU) += stream.o
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index e2fcd6a..4cbfdff 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -39,3 +39,10 @@ devices-dirs-$(CONFIG_SOFTMMU) += smbios/
+ devices-dirs-y += core/
+ common-obj-y += $(devices-dirs-y)
+ obj-y += $(devices-dirs-y)
++
++remote-pci-obj-$(CONFIG_MPQEMU) += core/
++remote-pci-obj-$(CONFIG_MPQEMU) += block/
++remote-pci-obj-$(CONFIG_MPQEMU) += pci/
++remote-pci-obj-$(CONFIG_MPQEMU) += nvram/
++
++remote-lsi-obj-$(CONFIG_MPQEMU) += scsi/
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index e206b8e..d3bafab 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -14,3 +14,5 @@ obj-$(CONFIG_SH4) += tc58128.o
+ obj-$(CONFIG_VIRTIO_BLK) += virtio-blk.o
+ obj-$(CONFIG_VIRTIO_BLK) += dataplane/
+ obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) += block.o cdrom.o hd-geometry.o
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index a799c83..3e3afaa 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -22,3 +22,17 @@ common-obj-$(CONFIG_SOFTMMU) += split-irq.o
+ common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
+ common-obj-$(CONFIG_SOFTMMU) += generic-loader.o
+ common-obj-$(CONFIG_SOFTMMU) += null-machine.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) += qdev-properties.o
++remote-pci-obj-$(CONFIG_MPQEMU) += qdev.o
++remote-pci-obj-$(CONFIG_MPQEMU) += bus.o
++remote-pci-obj-$(CONFIG_MPQEMU) += irq.o
++remote-pci-obj-$(CONFIG_MPQEMU) += hotplug.o
 +remote-pci-obj-$(CONFIG_MPQEMU) += machine.o
-diff --git a/remote/machine.c b/remote/machine.c
++remote-pci-obj-$(CONFIG_MPQEMU) += fw-path-provider.o
++remote-pci-obj-$(CONFIG_MPQEMU) += reset.o
++remote-pci-obj-$(CONFIG_MPQEMU) += sysbus.o
++remote-pci-obj-$(CONFIG_MPQEMU) += loader.o
++remote-pci-obj-$(CONFIG_MPQEMU) += nmi.o
++remote-pci-obj-$(CONFIG_MPQEMU) += qdev-properties-system.o
++remote-pci-obj-$(CONFIG_MPQEMU) += qdev-fw.o
+diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
+index 26f7b4c..9802a31 100644
+--- a/hw/nvram/Makefile.objs
++++ b/hw/nvram/Makefile.objs
+@@ -6,3 +6,5 @@ common-obj-y += chrp_nvram.o
+ common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
+ obj-$(CONFIG_PSERIES) += spapr_nvram.o
+ obj-$(CONFIG_NRF51_SOC) += nrf51_nvm.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) += fw_cfg.o
+diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
+index 9f905e6..f62025c 100644
+--- a/hw/pci/Makefile.objs
++++ b/hw/pci/Makefile.objs
+@@ -7,3 +7,7 @@ common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o pcie_port.o
+ 
+ common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
+ common-obj-$(CONFIG_ALL) += pci-stub.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) += pci.o pci_bridge.o
++remote-pci-obj-$(CONFIG_MPQEMU) += msi.o msix.o
++remote-pci-obj-$(CONFIG_MPQEMU) += pcie.o
+diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+index 45167ba..3052650 100644
+--- a/hw/scsi/Makefile.objs
++++ b/hw/scsi/Makefile.objs
+@@ -13,3 +13,5 @@ obj-y += virtio-scsi.o virtio-scsi-dataplane.o
+ obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-common.o vhost-scsi.o
+ obj-$(CONFIG_VHOST_USER_SCSI) += vhost-scsi-common.o vhost-user-scsi.o
+ endif
++
++remote-lsi-obj-$(CONFIG_MPQEMU) += scsi-generic.o scsi-bus.o lsi53c895a.o scsi-disk.o emulation.o
+diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+index a4f3baf..016b6ab 100644
+--- a/migration/Makefile.objs
++++ b/migration/Makefile.objs
+@@ -13,3 +13,5 @@ common-obj-$(CONFIG_RDMA) += rdma.o
+ common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) += block.o
+ 
+ rdma.o-libs := $(RDMA_LIBS)
++
++remote-pci-obj-$(CONFIG_MPQEMU) += qemu-file.o vmstate.o qjson.o vmstate-types.o
+diff --git a/qom/Makefile.objs b/qom/Makefile.objs
+index 516349e..f0392c2 100644
+--- a/qom/Makefile.objs
++++ b/qom/Makefile.objs
+@@ -2,3 +2,7 @@ qom-obj-y = object.o container.o qom-qobject.o
+ qom-obj-y += object_interfaces.o
+ 
+ common-obj-y = cpu.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) += object.o qom-qobject.o container.o
++remote-pci-obj-$(CONFIG_MPQEMU) += object_interfaces.o
++remote-pci-obj-$(CONFIG_MPQEMU) += cpu.o
+diff --git a/remote/Makefile.objs b/remote/Makefile.objs
 new file mode 100644
-index 0000000..7001789
+index 0000000..a9b2256
 --- /dev/null
-+++ b/remote/machine.c
-@@ -0,0 +1,118 @@
++++ b/remote/Makefile.objs
+@@ -0,0 +1 @@
++remote-pci-obj-$(CONFIG_MPQEMU) += remote-main.o
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+new file mode 100644
+index 0000000..53c2aa5
+--- /dev/null
++++ b/remote/remote-main.c
+@@ -0,0 +1,35 @@
 +/*
-+ * Machine for remote device
++ * Remote device initialization
 + *
 + * Copyright 2019, Oracle and/or its affiliates. All rights reserved.
 + *
@@ -170,121 +371,16 @@ index 0000000..7001789
 + * THE SOFTWARE.
 + */
 +
-+#include <stdint.h>
-+#include <sys/types.h>
++#include <stdio.h>
 +
 +#include "qemu/osdep.h"
-+#include "remote/pcihost.h"
-+#include "remote/machine.h"
-+#include "exec/address-spaces.h"
-+#include "exec/memory.h"
-+#include "exec/ioport.h"
-+#include "exec/ramlist.h"
-+#include "qemu/thread.h"
-+#include "qom/object.h"
 +#include "qemu/module.h"
-+#include "qapi/error.h"
-+#include "qemu/main-loop.h"
-+#include "qemu-common.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/notify.h"
 +
-+static NotifierList machine_init_done_notifiers =
-+    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
-+
-+bool machine_init_done;
-+
-+void qemu_add_machine_init_done_notifier(Notifier *notify)
++int main(int argc, char *argv[])
 +{
-+    notifier_list_add(&machine_init_done_notifiers, notify);
-+    if (machine_init_done) {
-+        notify->notify(notify, NULL);
-+    }
++    module_call_init(MODULE_INIT_QOM);
++
++    return 0;
 +}
-+
-+void qemu_remove_machine_init_done_notifier(Notifier *notify)
-+{
-+    notifier_remove(notify);
-+}
-+
-+void qemu_run_machine_init_done_notifiers(void)
-+{
-+    machine_init_done = true;
-+    notifier_list_notify(&machine_init_done_notifiers, NULL);
-+}
-+
-+static void remote_machine_init(Object *obj)
-+{
-+    RemMachineState *s = REMOTE_MACHINE(obj);
-+    RemPCIHost *rem_host;
-+    MemoryRegion *system_memory, *system_io, *pci_memory;
-+
-+    Error *error_abort = NULL;
-+
-+    qemu_mutex_init(&ram_list.mutex);
-+
-+    object_property_add_child(object_get_root(), "machine", obj, &error_abort);
-+    if (error_abort) {
-+        error_report_err(error_abort);
-+    }
-+
-+    memory_map_init();
-+
-+    system_memory = get_system_memory();
-+    system_io = get_system_io();
-+
-+    pci_memory = g_new(MemoryRegion, 1);
-+    memory_region_init(pci_memory, NULL, "pci", UINT64_MAX);
-+
-+    rem_host = REMOTE_HOST_DEVICE(qdev_create(NULL, TYPE_REMOTE_HOST_DEVICE));
-+
-+    rem_host->mr_pci_mem = pci_memory;
-+    rem_host->mr_sys_mem = system_memory;
-+    rem_host->mr_sys_io = system_io;
-+
-+    s->host = rem_host;
-+
-+    qemu_mutex_lock_iothread();
-+    memory_region_add_subregion_overlap(system_memory, 0x0, pci_memory, -1);
-+    qemu_mutex_unlock_iothread();
-+
-+    qdev_init_nofail(DEVICE(rem_host));
-+}
-+
-+static const TypeInfo remote_machine = {
-+    .name = TYPE_REMOTE_MACHINE,
-+    .parent = TYPE_MACHINE,
-+    .instance_size = sizeof(RemMachineState),
-+    .instance_init = remote_machine_init,
-+};
-+
-+static void remote_machine_register_types(void)
-+{
-+    type_register_static(&remote_machine);
-+}
-+
-+type_init(remote_machine_register_types);
-diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 53c2aa5..d5304fb 100644
---- a/remote/remote-main.c
-+++ b/remote/remote-main.c
-@@ -26,10 +26,17 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/module.h"
-+#include "remote/pcihost.h"
-+#include "remote/machine.h"
-+#include "hw/boards.h"
-+#include "hw/qdev-core.h"
-+#include "qemu/main-loop.h"
- 
- int main(int argc, char *argv[])
- {
-     module_call_init(MODULE_INIT_QOM);
- 
-+    current_machine = MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MACHINE)));
-+
-     return 0;
- }
 -- 
 1.8.3.1
