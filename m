@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47362)
+Received: from eggs.gnu.org ([209.51.188.92]:47405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1q6N-0004yZ-HB
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:18:12 -0500
+	(envelope-from <berrange@redhat.com>) id 1h1q6d-00057M-OH
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:18:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1q6I-00049P-0W
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:18:11 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38361)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1h1q6H-00049B-NF
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:18:05 -0500
-Received: by mail-wr1-x441.google.com with SMTP id g12so16733297wrm.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 02:18:05 -0800 (PST)
-Date: Thu, 7 Mar 2019 10:18:02 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190307101802.GB2843@stefanha-x1.localdomain>
-References: <20190306170025.3830-1-rusakova.nastasia@icloud.com>
+	(envelope-from <berrange@redhat.com>) id 1h1q6c-0004EO-NB
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:18:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1q6c-0004Dd-Fk
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:18:26 -0500
+Date: Thu, 7 Mar 2019 10:18:19 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190307101819.GI32268@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="24zk1gE8NUlDmwG9"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190306170025.3830-1-rusakova.nastasia@icloud.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/block/virtio-blk: Clean req->dev
- repetitions
+In-Reply-To: <9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anastasiia Rusakova <arusakova917@gmail.com>
-Cc: qemu-devel@nongnu.org, jusual@mail.ru, stefanha@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
+On Thu, Mar 07, 2019 at 07:39:46AM +0100, Thomas Huth wrote:
+> On 06/03/2019 19.12, Paolo Bonzini wrote:
+> > Hi all,
+> > 
+> > lately I have been thinking of converting the QEMU build system to
+> > Meson.  Meson is a relatively new build system that can replace
+> > Autotools or hand-written Makefiles such as QEMU; as a die-hard
+> > Autotools fan, I must say that Meson is by far better than anything else
+> > that has ever tried to replace Autotools, and actually has the potential
+> > to do so.
+> > 
+> > Advantages of Meson that directly matter for QEMU include:[...]
+> 
+> I'm not objecting a new build system per se, but could you elaborate on
+>  problems of the current QEMU build system that will be fixed by this
+> change? Since apart from some minor glitches (with the *.mak file
+> dependencies for example), the current build system seems to work quite
+> well for me ... so at least I currently don't feel enough pain yet to do
+> such a big step, just because there is another new cool build system
+> around...
 
---24zk1gE8NUlDmwG9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Despite my effort to document how QEMU's makefiles are structured
+(docs/devel/build-system.txt) I still find them to be pretty unintelligable
+and painful to deal with. The way we have recursive make with some objects
+built once & others built twice is particularly painful to deal with when
+making non-trivial changes to the makefiles.
 
-On Wed, Mar 06, 2019 at 07:00:25PM +0200, Anastasiia Rusakova wrote:
-> @@ -260,9 +260,10 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq *req)
->  {
->      int status = VIRTIO_BLK_S_OK;
->      struct virtio_scsi_inhdr *scsi = NULL;
-> -    VirtIODevice *vdev = VIRTIO_DEVICE(req->dev);
-> +    VirtIOBlock *s = req->dev;
-> +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
->      VirtQueueElement *elem = &req->elem;
-> -    VirtIOBlock *blk = req->dev;
-> +    VirtIOBlock *blk = s;
+The configure script I think is very compelling to replace on the general
+principle that any shell script longer than one line is better off being
+written in another programming language. Portable shell programming (to
+/bin/sh standards as opposed to /bn/bash) is difficult & we constantly
+get it wrong introducing bash-isms. Error handling in shell is a complete
+disaster zone and string quoting is not much better. 
 
-Hi Anastasiia,
-Thanks for the patch!
+The domain specific language used by meson is more attractive avoiding
+these pitfalls of shell and reducing the need for write boilerplate
+code to check features, letting you just write declarative statements
+to a large extent.
 
-This function calls it 'blk' instead of 's'.  's' can be eliminated by
-reordering the variable definitions:
-
-  VirtIOBlock *blk = req->dev;
-  VirtIODevice *vdev = VIRTIO_DEVICE(blk);
-
-The rest looks good to me.
-
-Stefan
-
---24zk1gE8NUlDmwG9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcgO/aAAoJEJykq7OBq3PIRRwIAKW3AeqBquTHgkhp/JVHNQ19
-Pbgf1bPKV93k9k9rgiVNjbkZKBuI0xOjmYq0HBVkpebNmIP2ZhssLxMujFgwCcZo
-cSnN+sYmf7C+OYMCofiX6XbVm4TaKb2s9ZQnLgJ1ottiUCqwgTl5sDn8GY7t48hd
-AW8ynamqq1kiEKd7AXyBuhsPm1G9kKLXP39qUctf9l8KiPFHRBONvtE4O59rLfbq
-J8/DBmm4GDwQ9Zv6XYd2SjGf1iOtlt4hGn8UBgGMPSl3Byq7IOZAYipfhXHdT1g1
-owO/jHgwrBQEx6AWQ45ThHmwluNEwOKSL8BF6TpsHO8SRYEwlzzAz7I4Dogj4VY=
-=3qE4
------END PGP SIGNATURE-----
-
---24zk1gE8NUlDmwG9--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
