@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58850)
+Received: from eggs.gnu.org ([209.51.188.92]:58958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1wS8-0006Je-Sn
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:10 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1wSW-0006jg-Gs
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1wRz-0004S9-VQ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:04:58 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46274)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1wSS-0005H2-G2
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:26 -0500
+Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:33042)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1wRx-0004Nu-1U
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:04:54 -0500
-Received: by mail-pf1-x442.google.com with SMTP id g6so11888790pfh.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:04:51 -0800 (PST)
+	id 1h1wSL-0004sR-Ph
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:20 -0500
+Received: by mail-pf1-x42a.google.com with SMTP id i19so11905557pfd.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:05:10 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Mar 2019 09:04:24 -0800
-Message-Id: <20190307170440.3113-7-richard.henderson@linaro.org>
+Date: Thu,  7 Mar 2019 09:04:39 -0800
+Message-Id: <20190307170440.3113-22-richard.henderson@linaro.org>
 In-Reply-To: <20190307170440.3113-1-richard.henderson@linaro.org>
 References: <20190307170440.3113-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 06/22] target/arm: Implement the IRG
- instruction
+Subject: [Qemu-devel] [PATCH v4 21/22] target/arm: Add allocation tag
+ storage for system mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,113 +32,77 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Update to 00eac5.
-    Merge choose_random_nonexcluded_tag into helper_irg since
-    that pseudo function no longer exists separately.
----
- target/arm/helper-a64.h    |  1 +
- target/arm/mte_helper.c    | 57 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c |  7 +++++
- 3 files changed, 65 insertions(+)
+ target/arm/mte_helper.c | 56 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index c88797a922..0f6e78c77e 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -105,3 +105,4 @@ DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
- 
- DEF_HELPER_FLAGS_2(mte_check1, TCG_CALL_NO_WG, i64, env, i64)
- DEF_HELPER_FLAGS_3(mte_check2, TCG_CALL_NO_WG, i64, env, i64, i32)
-+DEF_HELPER_FLAGS_3(irg, TCG_CALL_NO_RWG, i64, env, i64, i64)
 diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index bcd82a9be0..cd04e4954b 100644
+index 6d0f82eb99..6657f57ca6 100644
 --- a/target/arm/mte_helper.c
 +++ b/target/arm/mte_helper.c
-@@ -37,6 +37,31 @@ static int allocation_tag_from_addr(uint64_t ptr)
-     return extract64(ptr, 56, 4);
+@@ -28,8 +28,64 @@
+ static uint8_t *allocation_tag_mem(CPUARMState *env, uint64_t ptr,
+                                    bool write, uintptr_t ra)
+ {
++#ifdef CONFIG_USER_ONLY
+     /* Tag storage not implemented.  */
+     return NULL;
++#else
++    ARMCPU *cpu = arm_env_get_cpu(env);
++    CPUState *cs = CPU(cpu);
++    uintptr_t index;
++    int mmu_idx;
++    CPUTLBEntry *te;
++    CPUIOTLBEntry *iotlbentry;
++    MemoryRegionSection *section;
++    hwaddr physaddr, tag_physaddr;
++
++    /*
++     * Find the TLB entry for this access.
++     * As a side effect, this also raises an exception for invalid access.
++     */
++    mmu_idx = cpu_mmu_index(env, false);
++    index = tlb_index(env, mmu_idx, ptr);
++    te = tlb_entry(env, mmu_idx, ptr);
++    if (!tlb_hit(write ? tlb_addr_write(te) : te->addr_read, ptr)) {
++        /* ??? Expose VICTIM_TLB_HIT from accel/tcg/cputlb.c.  */
++        tlb_fill(cs, ptr, 16, write ? MMU_DATA_STORE : MMU_DATA_LOAD,
++                 mmu_idx, ra);
++        index = tlb_index(env, mmu_idx, ptr);
++        te = tlb_entry(env, mmu_idx, ptr);
++    }
++
++    /* If the virtual page MemAttr != Tagged, nothing to do.  */
++    iotlbentry = &env->iotlb[mmu_idx][index];
++    if (!iotlbentry->attrs.target_tlb_bit1) {
++        return NULL;
++    }
++
++    /* If the board did not allocate tag memory, nothing to do.  */
++    if (!cpu_get_address_space(cs, ARMASIdx_TAG)) {
++        return NULL;
++    }
++
++    /* Find the physical address for the virtual access.  */
++    section = iotlb_to_section(cs, iotlbentry->addr, iotlbentry->attrs);
++    physaddr = ((iotlbentry->addr & TARGET_PAGE_MASK) + ptr
++                + section->offset_within_address_space
++                - section->offset_within_region);
++    tag_physaddr = physaddr >> (LOG2_TAG_GRANULE + 1);
++
++    /* Find the memory backing the tag address in tag address space.  */
++    mmu_idx = arm_to_core_mmu_idx(ARMMMUIdx_TagNS);
++    te = tlb_entry(env, mmu_idx, tag_physaddr);
++    if (!tlb_hit(write ? tlb_addr_write(te) : te->addr_read, tag_physaddr)) {
++        /* ??? Expose VICTIM_TLB_HIT from accel/tcg/cputlb.c.  */
++        tlb_fill(cs, tag_physaddr, 1, write ? MMU_DATA_STORE : MMU_DATA_LOAD,
++                 mmu_idx, ra);
++        te = tlb_entry(env, mmu_idx, tag_physaddr);
++    }
++
++    return (void *)(tag_physaddr + te->addend);
++#endif
  }
  
-+static int choose_nonexcluded_tag(int tag, int offset, uint16_t exclude)
-+{
-+    if (exclude == 0xffff) {
-+        return 0;
-+    }
-+    if (offset == 0) {
-+        while (exclude & (1 << tag)) {
-+            tag = (tag + 1) & 15;
-+        }
-+    } else {
-+        do {
-+            do {
-+                tag = (tag + 1) & 15;
-+            } while (exclude & (1 << tag));
-+        } while (--offset > 0);
-+    }
-+    return tag;
-+}
-+
-+static uint64_t address_with_allocation_tag(uint64_t ptr, int rtag)
-+{
-+    rtag -= extract64(ptr, 55, 1);
-+    return deposit64(ptr, 56, 4, rtag);
-+}
-+
- /*
-  * Perform a checked access for MTE.
-  * On arrival, TBI is known to enabled, as is allocation_tag_access_enabled.
-@@ -131,3 +156,35 @@ uint64_t HELPER(mte_check2)(CPUARMState *env, uint64_t dirty_ptr, uint32_t tbi)
-         return dirty_ptr;
-     }
- }
-+
-+uint64_t HELPER(irg)(CPUARMState *env, uint64_t rn, uint64_t rm)
-+{
-+    int el = arm_current_el(env);
-+    uint64_t sctlr = arm_sctlr(env, el);
-+    int rtag = 0;
-+
-+    if (allocation_tag_access_enabled(env, el, sctlr)) {
-+        /*
-+         * Our IMPDEF choice for GCR_EL1.RRND==1 is to behave as if
-+         * GCR_EL1.RRND==0, always producing deterministic results.
-+         */
-+        uint16_t exclude = extract32(rm | env->cp15.gcr_el1, 0, 16);
-+        int start = extract32(env->cp15.rgsr_el1, 0, 4);
-+        int seed = extract32(env->cp15.rgsr_el1, 8, 16);
-+        int offset, i;
-+
-+        /* RandomTag */
-+        for (i = offset = 0; i < 4; ++i) {
-+            /* NextRandomTagBit */
-+            int top = (extract32(seed, 5, 1) ^ extract32(seed, 3, 1) ^
-+                       extract32(seed, 2, 1) ^ extract32(seed, 0, 1));
-+            seed = (top << 15) | (seed >> 1);
-+            offset |= top << i;
-+        }
-+        rtag = choose_nonexcluded_tag(start, offset, exclude);
-+
-+        env->cp15.rgsr_el1 = rtag | (seed << 8);
-+    }
-+
-+    return address_with_allocation_tag(rn, rtag);
-+}
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 0d35c07504..6d8fd045da 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5284,6 +5284,13 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
-     case 3: /* SDIV */
-         handle_div(s, true, sf, rm, rn, rd);
-         break;
-+    case 4: /* IRG */
-+        if (sf == 0 || !dc_isar_feature(aa64_mte_insn_reg, s)) {
-+            goto do_unallocated;
-+        }
-+        gen_helper_irg(cpu_reg_sp(s, rd), cpu_env,
-+                       cpu_reg_sp(s, rn), cpu_reg(s, rm));
-+        break;
-     case 8: /* LSLV */
-         handle_shift_reg(s, A64_SHIFT_TYPE_LSL, sf, rm, rn, rd);
-         break;
+ static int get_allocation_tag(CPUARMState *env, uint64_t ptr, uintptr_t ra)
 -- 
 2.17.2
