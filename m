@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53173)
+Received: from eggs.gnu.org ([209.51.188.92]:53647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h1uR3-000225-IT
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:55:50 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1uSS-0003MH-UB
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:57:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h1uR2-0006XI-2S
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:55:49 -0500
-Date: Thu, 7 Mar 2019 15:55:32 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190307145532.GG5786@linux.fritz.box>
-References: <20190307093723.655-1-armbru@redhat.com>
-	<20190307093723.655-3-armbru@redhat.com>
-	<87h8cft2x6.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1h1uSR-0007hL-Su
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:57:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42066)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h1uSR-0007g3-IG
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:57:15 -0500
+References: <20190307142822.8531-1-philmd@redhat.com>
+	<20190307142822.8531-3-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6ea02dad-37bb-1c22-19c9-168a99048504@redhat.com>
+Date: Thu, 7 Mar 2019 15:57:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87h8cft2x6.fsf@dusky.pond.sub.org>
+In-Reply-To: <20190307142822.8531-3-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v6 2/4] hw/block: Pad undersized
- read-only images with 0xFF
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] configure: Disable W^X on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, lersek@redhat.com, philmd@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Brad Smith <brad@comstyle.com>
 
-Am 07.03.2019 um 11:05 hat Markus Armbruster geschrieben:
-> Markus Armbruster <armbru@redhat.com> writes:
+On 07/03/2019 15.28, Philippe Mathieu-Daud=C3=A9 wrote:
+> Since OpenBSD 6.0 [1], W^X is enforced by default [2].
+> TCG requires WX access. Disable W^X if it is available.
+> This fixes:
 >=20
-> > From: Alex Benn=E9e <alex.bennee@linaro.org>
-> >
-> > We reject undersized images.  As of the previous commit, even with a
-> > decent error message.  Still, this is a potentially confusing
-> > stumbling block when you move from using -bios to using -drive
-> > if=3Dpflash,file=3Dblob,format=3Draw,readonly for loading your firmwa=
-re
-> > code. To mitigate that we automatically pad in the read-only case and
-> > warn the user when we have performed magic to enable things to Just
-> > Work (tm).
-> >
-> > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> > Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>   # lm32-softmmu/qemu-system-lm32
+>   Could not allocate dynamic translator buffer
 >=20
-> I think this convenience feature is a bad idea, and this patch should
-> not be applied.  Here are my reasons.
+>   # sysctl kern.wxabort=3D1
+>   kern.wxabort: 0 -> 1
+>   # lm32-softmmu/qemu-system-lm32
+>   mmap: Not supported
+>   Abort trap (core dumped)
+>   # gdb -q lm32-softmmu/qemu-system-lm32 qemu-system-lm32.core
+>   (gdb) bt
+>   #0  0x000017e3c156c50a in _thread_sys___syscall () at {standard input=
+}:5
+>   #1  0x000017e3c15e5d7a in *_libc_mmap (addr=3DVariable "addr" is not =
+available.) at /usr/src/lib/libc/sys/mmap.c:47
+>   #2  0x000017e17d9abc8b in alloc_code_gen_buffer () at /usr/src/qemu/a=
+ccel/tcg/translate-all.c:1064
+>   #3  0x000017e17d9abd04 in code_gen_alloc (tb_size=3D0) at /usr/src/qe=
+mu/accel/tcg/translate-all.c:1112
+>   #4  0x000017e17d9abe81 in tcg_exec_init (tb_size=3D0) at /usr/src/qem=
+u/accel/tcg/translate-all.c:1149
+>   #5  0x000017e17d9897e9 in tcg_init (ms=3D0x17e45e456800) at /usr/src/=
+qemu/accel/tcg/tcg-all.c:66
+>   #6  0x000017e17d9891b8 in accel_init_machine (acc=3D0x17e3c3f50800, m=
+s=3D0x17e45e456800) at /usr/src/qemu/accel/accel.c:63
+>   #7  0x000017e17d989312 in configure_accelerator (ms=3D0x17e45e456800,=
+ progname=3D0x7f7fffff07b0 "lm32-softmmu/qemu-system-lm32") at /usr/src/q=
+emu/accel/accel.c:111
+>   #8  0x000017e17d9d8616 in main (argc=3D1, argv=3D0x7f7fffff06b8, envp=
+=3D0x7f7fffff06c8) at vl.c:4325
 >=20
-> 1. As I explained in my disccussion of v5[*], there is no single true
->    way to pad.  This patch pads with 0xFF.  When working with physical
->    devices, you'd sometimes pad that way, but at other times, you'd pad
->    differently.
+> [1] https://www.openbsd.org/faq/upgrade60.html
+> [2] https://undeadly.org/cgi?action=3Darticle&sid=3D20160527203200
 >=20
-> 2. Except this patch doesn't *actually* pad with 0xFF.  The block layer
->    silently pads with zeros up to the next multiple of 512.  Evidence:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  configure | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >=20
->     $ yes | dd of=3D4090b.img bs=3D1 count=3D4090
->     4090+0 records in
->     4090+0 records out
->     4090 bytes (4.1 kB, 4.0 KiB) copied, 0.0186459 s, 219 kB/s
->     $ qemu-io -f raw -c 'read -v 4000 96' 4090b.img
->     00000fa0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
-.y.y.y.y.
->     00000fb0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
-.y.y.y.y.
->     00000fc0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
-.y.y.y.y.
->     00000fd0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
-.y.y.y.y.
->     00000fe0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
-.y.y.y.y.
->     00000ff0:  79 0a 79 0a 79 0a 79 0a 79 0a 00 00 00 00 00 00  y.y.y.y=
-.y.......
->     read 96/96 bytes at offset 4000
->     96 bytes, 1 ops; 0.0001 sec (694.444 KiB/sec and 7407.4074 ops/sec)
->=20
->    This patch then pads some more with 0xFF to the flash memory size.
->=20
->    Because of that the way the magic padding works makes no sense, to b=
-e
->    frank.  Going back to v3's zero padding would at least be explainabl=
-e
->    without blushing.
->=20
->    I consider the block layer's padding a misfeature here, but right no=
-w
->    we got to play the hand we've been dealt.
+> diff --git a/configure b/configure
+> index cefeb8fcce..abfd60923a 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5835,6 +5835,17 @@ if test "$mingw32" =3D "yes" ; then
+>      done
+>  fi
+> =20
+> +# Disable OpenBSD W^X if available
+> +if test "$tcg" =3D "yes" && test "$targetos" =3D "OpenBSD"; then
+> +    cat > $TMPC <<EOF
+> +    int main(void) { return 0; }
+> +EOF
 
-That will be solved as soon as the block layer is consistently converted
-to byte granularity. We've already converted a lot, but bdrv_getlength()
-is still sector (512 bytes) granularity.
+You can use write_c_skeleton for this instead.
 
-You could argue that file-posix should just reject files that are not
-sector aligned, but that's probably not right either because image
-formats don't necessarily have that alignment for their files.
-
-Maybe disk device should reject being attached to nodes that aren't a
-multiple of their physical and logical sector size. A 512-byte aligned
-image is probably suitable for most disks, but might not be for a virtual
-native 4k disk.
-
-> 3. Convenience magic has bitten us in the posterior so many times.  Jus=
-t
->    say no unless there's a really compelling use case.  Where's the use
->    case for this one?  We've rejected undersized images for ages, and
->    nobody complained.  Why add convenience magic now?
-
-I agree.
-
-Kevin
+ Thomas
