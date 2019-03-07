@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40026)
+Received: from eggs.gnu.org ([209.51.188.92]:40037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrP-0003t9-7z
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrP-0003tb-Pf
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrO-0000CA-8G
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrL-0000AM-1y
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:11 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:46337)
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:38204)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1wrO-0000BN-0n
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:10 -0500
-Received: by mail-wr1-x432.google.com with SMTP id i16so18390732wrs.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:31:09 -0800 (PST)
+	id 1h1wrK-00009s-Qb
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:06 -0500
+Received: by mail-wr1-x435.google.com with SMTP id g12so18408222wrm.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:31:06 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 18:30:00 +0100
-Message-Id: <1551979804-6060-54-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 18:29:58 +0100
+Message-Id: <1551979804-6060-52-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
 References: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 53/57] qos-test: vmxnet3 test node
+Subject: [Qemu-devel] [PULL 51/57] qos-test: spapr-phb test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +32,93 @@ Cc: thuth@redhat.com, lviver@redhat.com, Emanuele Giuseppe Esposito <e.emanueleg
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Convert tests/vmxnet3-test to a driver node; currently it runs
-the PCI nop test only, therefore we're not placing it in tests/libqos.
+Convert tests/spapr-phb-test to a qgraph test node,
+spapr-phb-test. This test adds another
+spapr-pci-host-bridge device in the
+ppc64/pseries machine
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
  tests/Makefile.include |  3 +--
- tests/vmxnet3-test.c   | 46 ++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 37 insertions(+), 12 deletions(-)
+ tests/spapr-phb-test.c | 32 ++++++++++++++------------------
+ 2 files changed, 15 insertions(+), 20 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 8ba8e27..5be98d7 100644
+index 0442be8..f257b50 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -180,7 +180,6 @@ check-qtest-i386-y += tests/drive_del-test$(EXESUF)
- check-qtest-i386-$(CONFIG_WDT_IB700) += tests/wdt_ib700-test$(EXESUF)
- check-qtest-i386-y += tests/tco-test$(EXESUF)
- check-qtest-i386-y += $(check-qtest-pci-y)
--check-qtest-i386-$(CONFIG_VMXNET3_PCI) += tests/vmxnet3-test$(EXESUF)
- check-qtest-i386-$(CONFIG_PVPANIC) += tests/pvpanic-test$(EXESUF)
- check-qtest-i386-$(CONFIG_I82801B11) += tests/i82801b11-test$(EXESUF)
- check-qtest-i386-$(CONFIG_IOH3420) += tests/ioh3420-test$(EXESUF)
-@@ -762,6 +761,7 @@ qos-test-obj-y += tests/virtio-net-test.o
- qos-test-obj-y += tests/virtio-rng-test.o
- qos-test-obj-y += tests/virtio-scsi-test.o
- qos-test-obj-y += tests/virtio-serial-test.o
-+qos-test-obj-y += tests/vmxnet3-test.o
+@@ -235,7 +235,6 @@ check-qtest-ppc-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-ppc-$(CONFIG_M48T59) += tests/m48t59-test$(EXESUF)
  
- check-unit-y += tests/test-qgraph$(EXESUF)
- tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
-@@ -801,7 +801,6 @@ tests/e1000-test$(EXESUF): tests/e1000-test.o
- tests/rtl8139-test$(EXESUF): tests/rtl8139-test.o $(libqos-pc-obj-y)
- tests/pnv-xscom-test$(EXESUF): tests/pnv-xscom-test.o
- tests/eepro100-test$(EXESUF): tests/eepro100-test.o
--tests/vmxnet3-test$(EXESUF): tests/vmxnet3-test.o
- tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
- tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
-diff --git a/tests/vmxnet3-test.c b/tests/vmxnet3-test.c
-index 159c0ad..35cdea9 100644
---- a/tests/vmxnet3-test.c
-+++ b/tests/vmxnet3-test.c
-@@ -9,23 +9,49 @@
+ check-qtest-ppc64-y += $(check-qtest-ppc-y)
+-check-qtest-ppc64-$(CONFIG_PSERIES) += tests/spapr-phb-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_PSERIES) += tests/device-plug-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_POWERNV) += tests/pnv-xscom-test$(EXESUF)
+ check-qtest-ppc64-y += tests/migration-test$(EXESUF)
+@@ -755,6 +754,7 @@ qos-test-obj-y += tests/nvme-test.o
+ qos-test-obj-y += tests/pci-test.o
+ qos-test-obj-y += tests/pcnet-test.o
+ qos-test-obj-y += tests/sdhci-test.o
++qos-test-obj-y += tests/spapr-phb-test.o
+ qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test.o $(chardev-obj-y) $(test-io-obj-y)
+ qos-test-obj-y += tests/virtio-test.o
+ qos-test-obj-$(CONFIG_VIRTFS) += tests/virtio-9p-test.o
+@@ -777,7 +777,6 @@ tests/rtc-test$(EXESUF): tests/rtc-test.o
+ tests/m48t59-test$(EXESUF): tests/m48t59-test.o
+ tests/hexloader-test$(EXESUF): tests/hexloader-test.o
+ tests/endianness-test$(EXESUF): tests/endianness-test.o
+-tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
+ tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
+ tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
+ tests/fdc-test$(EXESUF): tests/fdc-test.o
+diff --git a/tests/spapr-phb-test.c b/tests/spapr-phb-test.c
+index d3522ea..39b5766 100644
+--- a/tests/spapr-phb-test.c
++++ b/tests/spapr-phb-test.c
+@@ -7,29 +7,25 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+  */
+-#include "qemu/osdep.h"
  
- #include "qemu/osdep.h"
++#include "qemu/osdep.h"
  #include "libqtest.h"
 +#include "libqos/qgraph.h"
-+#include "libqos/pci.h"
  
+-#define TYPE_SPAPR_PCI_HOST_BRIDGE "spapr-pci-host-bridge"
+-
 -/* Tests only initialization so far. TODO: Replace with functional tests */
--static void nop(void)
-+typedef struct QVmxnet3 QVmxnet3;
-+
-+struct QVmxnet3 {
-+    QOSGraphObject obj;
-+    QPCIDevice dev;
-+};
-+
-+static void *vmxnet3_get_driver(void *obj, const char *interface)
+-static void test_phb_device(void)
++/* Tests only initialization so far. TODO: Replace with functional tests,
++ * for example by producing pci-bus.
++ */
++static void test_phb_device(void *obj, void *data, QGuestAllocator *alloc)
  {
-+    QVmxnet3 *vmxnet3 = obj;
-+
-+    if (!g_strcmp0(interface, "pci-device")) {
-+        return &vmxnet3->dev;
-+    }
-+
-+    fprintf(stderr, "%s not present in vmxnet3\n", interface);
-+    g_assert_not_reached();
  }
  
 -int main(int argc, char **argv)
-+static void *vmxnet3_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
++static void register_phb_test(void)
  {
 -    int ret;
-+    QVmxnet3 *vmxnet3 = g_new0(QVmxnet3, 1);
-+    QPCIBus *bus = pci_bus;
- 
+-
 -    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/vmxnet3/nop", nop);
-+    qpci_device_init(&vmxnet3->dev, bus, addr);
-+    vmxnet3->obj.get_driver = vmxnet3_get_driver;
- 
--    qtest_start("-device vmxnet3");
+-    qtest_add_func("/spapr-phb/device", test_phb_device);
+-
+-    qtest_start("-device " TYPE_SPAPR_PCI_HOST_BRIDGE ",index=30");
+-
 -    ret = g_test_run();
-+    return &vmxnet3->obj;
-+}
- 
+-
 -    qtest_end();
-+static void vmxnet3_register_nodes(void)
-+{
-+    QOSGraphEdgeOptions opts = {
-+        .extra_device_opts = "addr=04.0",
-+    };
-+    add_qpci_address(&opts, &(QPCIAddress) { .devfn = QPCI_DEVFN(4, 0) });
- 
+-
 -    return ret;
-+    qos_node_create_driver("vmxnet3", vmxnet3_create);
-+    qos_node_consumes("vmxnet3", "pci-bus", &opts);
-+    qos_node_produces("vmxnet3", "pci-device");
++    qos_add_test("spapr-phb-test", "ppc64/pseries",
++                 test_phb_device, &(QOSGraphTestOptions) {
++                     .edge.before_cmd_line = "-device spapr-pci-host-bridge"
++                                             ",index=30",
++                 });
  }
 +
-+libqos_init(vmxnet3_register_nodes);
++libqos_init(register_phb_test);
 -- 
 1.8.3.1
