@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42940)
+Received: from eggs.gnu.org ([209.51.188.92]:46614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h1iA2-0001qp-Ha
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:49:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1h1ieD-0006lc-RT
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 21:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1h1iA1-0000sr-Ij
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:49:26 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:48553)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h1iA0-0000sI-OQ
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:49:25 -0500
-Date: Wed, 6 Mar 2019 20:49:22 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190307014922.GA15870@flamenco>
-References: <5F2C0013-1D18-44A9-ADAF-F86EC6FD1174@oberlin.edu>
-	<CAFEAcA8VzJRMSThWQ=CgNbB8BY0EAmi77oAJuHQt5iQnkiZmzg@mail.gmail.com>
-	<63A30600-CCE3-4412-A3EB-8D535A8B21B3@oberlin.edu>
-	<4F8E4327-9F59-4F50-A22D-20A3F939899F@oberlin.edu>
-	<9108923c-076b-034c-9d68-af355861ae0c@linaro.org>
-	<1FBF59F3-F256-4680-B2AD-199C197814C9@oberlin.edu>
-	<013f91f0-1968-1400-84b2-4d4fe2ece9a6@linaro.org>
-	<8F89FA7E-E952-425F-A587-66BEECF4A295@oberlin.edu>
-	<a244b0af-9b69-3760-0663-dbf9a0315789@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1h1ieC-0004RM-KB
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 21:20:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39276)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h1ieC-0004R0-BG
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 21:20:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h1ieB-00080O-28
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 02:20:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0B27F2E80C9
+	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 02:20:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a244b0af-9b69-3760-0663-dbf9a0315789@linaro.org>
-Subject: Re: [Qemu-devel] x86 segment limits enforcement with TCG
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Mar 2019 02:12:00 -0000
+From: Chen Zhang <1818937@bugs.launchpad.net>
+Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818937] [NEW] Crash with HV_ERROR on macOS host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +35,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Stephen Checkoway <stephen.checkoway@oberlin.edu>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Thu, Feb 28, 2019 at 10:05:02 -0800, Richard Henderson wrote:
-> On 2/28/19 9:18 AM, Stephen Checkoway wrote:
-> > I wonder if it would make sense to maintain a small cache of TLBs. The
-> > majority of cases are likely to involving setting segment registers to one
-> > of a handful of segments (e.g., setting es to ds or ss). So it might be nice
-> > to avoid the flushes entirely.
-> Hmm.
-> 
-> The straight-forward approach to this would change the mapping between segment
-> and mmu index, which would need to force a new translation (since mmu indexes
-> are built into the generated code as constants).  It would be easy for this
-> scheme to generate too many translations and slow down the system as a whole.
-> 
-> However, since the change to dynamic tlbs, the actual tlb is now a pointer.  So
-> it might not be out of the question to simply swap TLB contents around when
-> changing segment registers.  All you would need is N+1 tlbs to support the
-> (easy?) case of es swapping.
-> 
-> With some additional work in cputlb, it might even be possible to have
-> different mmu indexes share the same backing tlb.  This would be tricky to
-> manage during a tlb resize, but perhaps not impossible.
-> 
-> Emilio, do you have any thoughts here?
+Public bug reported:
 
-I like the approach you propose. If I understood correctly, we could:
+On macOS host running Windows 10 guest, qemu crashed with error message:
+Error: HV_ERROR.
 
-- Let target code manipulate the pointer in TLB[mmu_idx]. This way the
-  target can keep for each idx a set of tables, indexed by segment register
-  value. The target would detect changes to segment registers and
-  update the pointer in TLB[mmu_idx].
+Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5 4=
+278U.
+QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
+QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvirt=
+io,discard=3Dunmap -accel hvf -soundhw hda -smp 3
 
-- Add a hook from cputlb to target-specific code, so that the latter
-  is notified of flushes and can therefore flush the set of tables.
-  Note that resizes only occur during flushes, which makes things
-  simpler.
+thread list
+Process 56054 stopped
+  thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Plana=
+r16 + 970, queue =3D 'com.apple.main-thread'
+  thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`__=
+psynch_cvwait + 10
+  thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`__=
+select + 10
+  thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`__=
+sigwait + 10
+* thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`__=
+pthread_kill + 10, stop reason =3D signal SIGABRT
+  thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`__=
+psynch_cvwait + 10
+  thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`__=
+psynch_cvwait + 10
+  thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib`m=
+ach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
+  thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dylib`=
+start_wqthread
+  thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dylib`=
+start_wqthread
+  thread #32: tid =3D 0x300c17, 0x0000000000000000
+  thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib`_=
+_psynch_cvwait + 10
 
-Seems like a reasonable amount of work and won't affect much the
-common path (i.e. no segmentation) -- at worst it will add the overhead
-of using helpers for a small number of instructions.
 
-Thanks,
+Crashed thread:
 
-		Emilio
+* thread #6, stop reason =3D signal SIGABRT
+  * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + 10
+    frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 285
+    frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
+    frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<un=
+available>) at hvf.c:106 [opt]
+    frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0x0=
+0007f8e5283de00) at hvf.c:681 [opt]
+    frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_fn(=
+arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
+    frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(args=
+=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
+    frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + 126
+    frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start + 70
+    frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: crash hvf macos
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818937
+
+Title:
+  Crash with HV_ERROR on macOS host
+
+Status in QEMU:
+  New
+
+Bug description:
+  On macOS host running Windows 10 guest, qemu crashed with error
+  message: Error: HV_ERROR.
+
+  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
+ 4278U.
+  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
+  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
+rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
+
+  thread list
+  Process 56054 stopped
+    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
+nar16 + 970, queue =3D 'com.apple.main-thread'
+    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
+__select + 10
+    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
+__sigwait + 10
+  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
+__pthread_kill + 10, stop reason =3D signal SIGABRT
+    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
+`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
+    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
+b`start_wqthread
+    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
+b`start_wqthread
+    thread #32: tid =3D 0x300c17, 0x0000000000000000
+    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
+`__psynch_cvwait + 10
+
+  =
+
+  Crashed thread:
+
+  * thread #6, stop reason =3D signal SIGABRT
+    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
+10
+      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
+85
+      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
+      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
+unavailable>) at hvf.c:106 [opt]
+      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
+x00007f8e5283de00) at hvf.c:681 [opt]
+      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
+n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
+      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
+s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
+      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
+126
+      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
+ 70
+      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
