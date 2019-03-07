@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48622)
+Received: from eggs.gnu.org ([209.51.188.92]:49001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1viQ-0004gM-DQ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:17:51 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1h1vjg-0005ZQ-0x
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1viP-0006cI-JU
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:17:50 -0500
-References: <20190307151046.15086-1-philmd@redhat.com>
-	<20190307151046.15086-3-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <208f5374-eef9-f467-9040-a576179e3ca4@redhat.com>
-Date: Thu, 7 Mar 2019 10:17:39 -0600
+	(envelope-from <marcandre.lureau@gmail.com>) id 1h1vjZ-0007fl-V1
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:08 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1h1vjZ-0007ev-N1
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:01 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a188so9765814wmf.3
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 08:19:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190307151046.15086-3-philmd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Zxw3KU7fqeudQvSqfCLo238oMLtqCCMhk"
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] qemu-iotests: Add dependency to
- qemu-nbd tool
+References: <20181109195653.11867-1-marcandre.lureau@redhat.com>
+	<dcc8d960-e970-b8b9-f17c-8cba0c871d0b@redhat.com>
+	<CAMxuvaz5mM6hVR=HknCLO27+zQsuxij1F2Jzgr7yVuLAP52Jog@mail.gmail.com>
+	<760d978d-2edb-9576-455f-120ca689493c@redhat.com>
+In-Reply-To: <760d978d-2edb-9576-455f-120ca689493c@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 7 Mar 2019 17:18:48 +0100
+Message-ID: <CAJ+F1C+jfoirwxzh8ERGxpbwwCHZTtCLk+-_eq2G+42YRmiHDQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] RFC: net/socket: learn to talk with a unix
+ dgram socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +33,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Jones <rjones@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Zxw3KU7fqeudQvSqfCLo238oMLtqCCMhk
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <208f5374-eef9-f467-9040-a576179e3ca4@redhat.com>
-Subject: Re: [PATCH v4 2/2] qemu-iotests: Add dependency to qemu-nbd tool
-References: <20190307151046.15086-1-philmd@redhat.com>
- <20190307151046.15086-3-philmd@redhat.com>
-In-Reply-To: <20190307151046.15086-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Jason
 
-On 3/7/19 9:10 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Since a9660664fde, some iotests use qemu-nbd.
-> Add a dependency to build it before using it.
-> This fixes:
->=20
->   $ make check-block
->     GEN     qemu-img-cmds.h
->     CC      qemu-img.o
->     LINK    qemu-img
->     CC      qemu-io.o
->     LINK    qemu-io
->     CC      tests/qemu-iotests/socket_scm_helper.o
->     LINK    tests/qemu-iotests/socket_scm_helper
->   tests/qemu-iotests-quick.sh
->   check: qemu-nbd not found
->   make: *** [tests/Makefile.include:1059: check-tests/qemu-iotests-quic=
-k.sh] Error 1
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  tests/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Nov 15, 2018 at 3:39 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2018/11/14 =E4=B8=8B=E5=8D=889:01, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Wed, Nov 14, 2018 at 7:46 AM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> On 2018/11/10 =E4=B8=8A=E5=8D=883:56, Marc-Andr=C3=A9 Lureau wrote:
+> >>> -net socket has a fd argument, and may be passed pre-opened sockets.
+> >>>
+> >>> TCP sockets use framing.
+> >>> UDP sockets have datagram boundaries.
+> >>>
+> >>> When given a unix dgram socket, it will be able to read from it, but
+> >>> will attempt to send on the dgram_dst, which is unset. The other end
+> >>> will not receive the data.
+> >>>
+> >>> Let's teach -net socket to recognize a UNIX DGRAM socket, and use the
+> >>> regular send() command (without dgram_dst).
+> >>>
+> >>> This makes running slirp out-of-process possible that
+> >>> way (python pseudo-code):
+> >>>
+> >>> a, b =3D socket.socketpair(socket.AF_UNIX, socket.SOCK_DGRAM)
+> >>>
+> >>> subprocess.Popen('qemu -net socket,fd=3D%d -net user' % a.fileno(), s=
+hell=3DTrue)
+> >>> subprocess.Popen('qemu ... -net nic -net socket,fd=3D%d' % b.fileno()=
+, shell=3DTrue)
+> >>>
+> >>> (to make slirp a seperate project altogether, we would have to have
+> >>> some compatibility code and/or deprecate various options & HMP
+> >>> commands for dynamic port forwarding etc - but this looks like a
+> >>> reachable goal)
+> >>>
+> >>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >>
+> >> I believe instead of supporting unnamed sockets, we should also suppor=
+t
+> >> named one through cli?
+> > This could be a later patch, I have no need for it yet. Perhaps it
+> > should be a chardev then?
+>
+>
+> I mean something like: -socket id=3Dud0,path=3D/tmp/XXX
+>
 
-I still have an NBD pull request coming up before soft freeze. Should I
-be planning to take this patch (as it is NBD-related) or the whole
-series (even though the first is more of a stretch), or is there a
-better tree for this to be staged through?
+Why not, but I have no need for it. If somebody has, he can make a patch.
+
+> >
+> >>> ---
+> >>>    net/socket.c | 25 +++++++++++++++++++++----
+> >>>    1 file changed, 21 insertions(+), 4 deletions(-)
+> >>>
+> >>> diff --git a/net/socket.c b/net/socket.c
+> >>> index 7095eb749f..8a9c30892d 100644
+> >>> --- a/net/socket.c
+> >>> +++ b/net/socket.c
+> >>> @@ -119,9 +119,13 @@ static ssize_t net_socket_receive_dgram(NetClien=
+tState *nc, const uint8_t *buf,
+> >>>        ssize_t ret;
+> >>>
+> >>>        do {
+> >>> -        ret =3D qemu_sendto(s->fd, buf, size, 0,
+> >>> -                          (struct sockaddr *)&s->dgram_dst,
+> >>> -                          sizeof(s->dgram_dst));
+> >>> +        if (s->dgram_dst.sin_family !=3D AF_UNIX) {
+> >>> +            ret =3D qemu_sendto(s->fd, buf, size, 0,
+> >>> +                              (struct sockaddr *)&s->dgram_dst,
+> >>> +                              sizeof(s->dgram_dst));
+> >>> +        } else {
+> >>> +            ret =3D send(s->fd, buf, size, 0);
+> >>> +        }
+> >>
+> >> Any reason that send is a must here? send(2) said:
+> >>          call
+> >>
+> >>              send(sockfd, buf, len, flags);
+> >>
+> >>          is equivalent to
+> >>
+> >>              sendto(sockfd, buf, len, flags, NULL, 0);
+> > Yes they should be equivalent, but then we need to add ?: operators
+> > for the dest arguments. I preferred to have an if() instead.
+> >
+> > thanks
+>
+>
+> One possible issue here is I'm not sure there's a equivalent send() in
+> e.g non POSIX system.
+
+send() should be as common as sendto().
+
+Should I resend the patch without RFC? no other changes needed?
+
+thanks!
+
+>
+> Thanks
+>
+>
+> >
+> >>>        } while (ret =3D=3D -1 && errno =3D=3D EINTR);
+> >>>
+> >>>        if (ret =3D=3D -1 && errno =3D=3D EAGAIN) {
+> >>> @@ -322,6 +326,15 @@ static NetSocketState *net_socket_fd_init_dgram(=
+NetClientState *peer,
+> >>>        int newfd;
+> >>>        NetClientState *nc;
+> >>>        NetSocketState *s;
+> >>> +    SocketAddress *sa;
+> >>> +    SocketAddressType sa_type;
+> >>> +
+> >>> +    sa =3D socket_local_address(fd, errp);
+> >>> +    if (!sa) {
+> >>> +        return NULL;
+> >>> +    }
+> >>> +    sa_type =3D sa->type;
+> >>> +    qapi_free_SocketAddress(sa);
+> >>>
+> >>>        /* fd passed: multicast: "learn" dgram_dst address from bound =
+address and save it
+> >>>         * Because this may be "shared" socket from a "master" process=
+, datagrams would be recv()
+> >>> @@ -365,8 +378,12 @@ static NetSocketState *net_socket_fd_init_dgram(=
+NetClientState *peer,
+> >>>                     "socket: fd=3D%d (cloned mcast=3D%s:%d)",
+> >>>                     fd, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_po=
+rt));
+> >>>        } else {
+> >>> +        if (sa_type =3D=3D SOCKET_ADDRESS_TYPE_UNIX) {
+> >>> +            s->dgram_dst.sin_family =3D AF_UNIX;
+> >>> +        }
+> >>> +
+> >>>            snprintf(nc->info_str, sizeof(nc->info_str),
+> >>> -                 "socket: fd=3D%d", fd);
+> >>> +                 "socket: fd=3D%d %s", fd, SocketAddressType_str(sa_=
+type));
+> >>>        }
+> >>>
+> >>>        return s;
+>
+
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---Zxw3KU7fqeudQvSqfCLo238oMLtqCCMhk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBRCMACgkQp6FrSiUn
-Q2pnsAf9HjLJLuP7PEvD8rpYmPiSAX0d5jsGrts/PXdQQNsVdy9Qyi1eyk11rWAg
-zLa53jFBeeU4l5JOLvti7SDvbNSoLtK5lbmN++Iv3YfWShiwZTbh8N39h9r2FeWU
-vKWUKDDRJDvN93yZm888qGU0FbvUTmDC/ZyDa8qX1M/JuCXHX8HMqQV1KqE1QGLA
-MeI2hxnBOFLbLfcyY7cGvvndEZN/FDmb153g95IcOs5wAm5ljBH91oKQ650V8idP
-LbzFEKDyarPXZoNRRUks/pU0nBTuspc9NcssfLGXSvELrDPmuyYN/eQRVkEMp/Nx
-DfAl0zBQ8EiAMZnSN36MehULLt8YUw==
-=sFul
------END PGP SIGNATURE-----
-
---Zxw3KU7fqeudQvSqfCLo238oMLtqCCMhk--
+Marc-Andr=C3=A9 Lureau
