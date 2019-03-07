@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59196)
+Received: from eggs.gnu.org ([209.51.188.92]:59233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1wTQ-0007RJ-6e
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:06:25 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1wTV-0007U8-Tv
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:06:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1wTN-0006Lx-CZ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:06:23 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36177)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1wTU-0006Yl-OX
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:06:29 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:33217)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1wTJ-0004Xv-4P
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:06:18 -0500
-Received: by mail-pg1-x544.google.com with SMTP id r124so11742192pgr.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:05:00 -0800 (PST)
+	id 1h1wTT-0004Vy-DE
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:06:28 -0500
+Received: by mail-pg1-x543.google.com with SMTP id h11so11749714pgl.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:04:58 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Mar 2019 09:04:31 -0800
-Message-Id: <20190307170440.3113-14-richard.henderson@linaro.org>
+Date: Thu,  7 Mar 2019 09:04:30 -0800
+Message-Id: <20190307170440.3113-13-richard.henderson@linaro.org>
 In-Reply-To: <20190307170440.3113-1-richard.henderson@linaro.org>
 References: <20190307170440.3113-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 13/22] target/arm: Implement the LDGM and
- STGM instructions
+Subject: [Qemu-devel] [PATCH v4 12/22] target/arm: Implement the STGP
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,212 +32,62 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3: Require pre-cleaned addresses.
+v3: Handle atomicity, require pre-cleaned address.
 ---
- target/arm/helper-a64.h    |  3 ++
- target/arm/mte_helper.c    | 96 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c | 42 +++++++++++++----
- 3 files changed, 132 insertions(+), 9 deletions(-)
+ target/arm/translate-a64.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 91e6a6ea94..5bcdfcf81b 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -114,3 +114,6 @@ DEF_HELPER_FLAGS_3(stg, TCG_CALL_NO_WG, void, env, i64, i64)
- DEF_HELPER_FLAGS_3(st2g, TCG_CALL_NO_WG, void, env, i64, i64)
- DEF_HELPER_FLAGS_3(stg_parallel, TCG_CALL_NO_WG, void, env, i64, i64)
- DEF_HELPER_FLAGS_3(st2g_parallel, TCG_CALL_NO_WG, void, env, i64, i64)
-+DEF_HELPER_FLAGS_2(ldgm, TCG_CALL_NO_WG, i64, env, i64)
-+DEF_HELPER_FLAGS_3(stgm, TCG_CALL_NO_WG, void, env, i64, i64)
-+DEF_HELPER_FLAGS_3(stzgm, TCG_CALL_NO_WG, void, env, i64, i64)
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index e8873f1e75..afa4c26535 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -377,3 +377,99 @@ void HELPER(st2g_parallel)(CPUARMState *env, uint64_t ptr, uint64_t xt)
- {
-     do_st2g(env, ptr, xt, GETPC(), store_tag1_parallel);
- }
-+
-+uint64_t HELPER(ldgm)(CPUARMState *env, uint64_t ptr)
-+{
-+    const int size = 4 << GMID_EL1_BS;
-+    int el;
-+    uint64_t sctlr;
-+    void *mem;
-+
-+    ptr = QEMU_ALIGN_DOWN(ptr, size);
-+
-+    /* Trap if accessing an invalid page(s).  */
-+    mem = allocation_tag_mem(env, ptr, false, GETPC());
-+
-+    /*
-+     * The tag is squashed to zero if the page does not support tags,
-+     * or if the OS is denying access to the tags.
-+     */
-+    el = arm_current_el(env);
-+    sctlr = arm_sctlr(env, el);
-+    if (!mem || !allocation_tag_access_enabled(env, el, sctlr)) {
-+        return 0;
-+    }
-+
-+#if GMID_EL1_BS != 6
-+# error "Fill in the blanks for other sizes"
-+#endif
-+    /*
-+     * We are loading 64-bits worth of tags.  The ordering of elements
-+     * within the word corresponds to a 64-bit little-endian operation.
-+     */
-+    return ldq_le_p(mem);
-+}
-+
-+static uint64_t do_stgm(CPUARMState *env, uint64_t ptr,
-+                        uint64_t val, uintptr_t ra)
-+{
-+    const int size = 4 << GMID_EL1_BS;
-+    int el;
-+    uint64_t sctlr;
-+    void *mem;
-+
-+    ptr = QEMU_ALIGN_DOWN(ptr, size);
-+
-+    /* Trap if accessing an invalid page(s).  */
-+    mem = allocation_tag_mem(env, ptr, true, ra);
-+
-+    /*
-+     * No action if the page does not support tags,
-+     * or if the OS is denying access to the tags.
-+     */
-+    el = arm_current_el(env);
-+    sctlr = arm_sctlr(env, el);
-+    if (!mem || !allocation_tag_access_enabled(env, el, sctlr)) {
-+        return ptr;
-+    }
-+
-+#if GMID_EL1_BS != 6
-+# error "Fill in the blanks for other sizes"
-+#endif
-+    /*
-+     * We are storing 64-bits worth of tags.  The ordering of elements
-+     * within the word corresponds to a 64-bit little-endian operation.
-+     */
-+    stq_le_p(mem, val);
-+
-+    return ptr;
-+}
-+
-+void HELPER(stgm)(CPUARMState *env, uint64_t ptr, uint64_t val)
-+{
-+    do_stgm(env, ptr, val, GETPC());
-+}
-+
-+void HELPER(stzgm)(CPUARMState *env, uint64_t ptr, uint64_t val)
-+{
-+    int i, mmu_idx, size = 4 << GMID_EL1_BS;
-+    uintptr_t ra = GETPC();
-+    void *mem;
-+
-+    ptr = do_stgm(env, ptr, val, ra);
-+
-+    /*
-+     * We will have just probed this virtual address in do_stgm.
-+     * If the tlb_vaddr_to_host fails, then the memory is not ram,
-+     * or is monitored in some other way.  Fall back to stores.
-+     */
-+    mmu_idx = cpu_mmu_index(env, false);
-+    mem = tlb_vaddr_to_host(env, ptr, MMU_DATA_STORE, mmu_idx);
-+    if (mem) {
-+        memset(mem, 0, size);
-+    } else {
-+        for (i = 0; i < size; i += 8) {
-+            cpu_stq_data_ra(env, ptr + i, 0, ra);
-+        }
-+    }
-+}
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index b7175897e4..e02d85f317 100644
+index b94a5571e0..b7175897e4 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -3722,7 +3722,7 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-     uint64_t offset = sextract64(insn, 12, 9) << LOG2_TAG_GRANULE;
-     int op2 = extract32(insn, 10, 3);
-     int op1 = extract32(insn, 22, 2);
--    bool is_load = false, is_pair = false, is_zero = false;
-+    bool is_load = false, is_pair = false, is_zero = false, is_mult = false;
-     int index = 0;
-     TCGv_i64 dirty_addr, clean_addr, tcg_rt;
+@@ -2787,7 +2787,7 @@ static void disas_ld_lit(DisasContext *s, uint32_t insn)
+  * +-----+-------+---+---+-------+---+-------+-------+------+------+
+  *
+  * opc: LDP/STP/LDNP/STNP        00 -> 32 bit, 10 -> 64 bit
+- *      LDPSW                    01
++ *      LDPSW/STGP               01
+  *      LDP/STP/LDNP/STNP (SIMD) 00 -> 32 bit, 01 -> 64 bit, 10 -> 128 bit
+  *   V: 0 -> GPR, 1 -> Vector
+  * idx: 00 -> signed offset with non-temporal hint, 01 -> post-index,
+@@ -2812,6 +2812,7 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+     bool is_signed = false;
+     bool postindex = false;
+     bool wback = false;
++    bool set_tag = false;
  
-@@ -3732,13 +3732,18 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-     }
+     TCGv_i64 clean_addr, dirty_addr;
  
-     switch (op1) {
--    case 0: /* STG */
-+    case 0:
-         if (op2 != 0) {
-             /* STG */
-             index = op2 - 2;
--            break;
-+        } else {
-+            /* STZGM */
-+            if (s->current_el == 0 || offset != 0) {
-+                goto do_unallocated;
-+            }
-+            is_mult = is_zero = true;
-         }
--        goto do_unallocated;
-+        break;
-     case 1:
-         if (op2 != 0) {
-             /* STZG */
-@@ -3754,17 +3759,27 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-             /* ST2G */
-             is_pair = true;
-             index = op2 - 2;
--            break;
-+        } else {
-+            /* STGM */
-+            if (s->current_el == 0 || offset != 0) {
-+                goto do_unallocated;
-+            }
-+            is_mult = true;
-         }
--        goto do_unallocated;
-+        break;
-     case 3:
-         if (op2 != 0) {
-             /* STZ2G */
-             is_pair = is_zero = true;
-             index = op2 - 2;
--            break;
-+        } else {
-+            /* LDGM */
-+            if (s->current_el == 0 || offset != 0) {
-+                goto do_unallocated;
-+            }
-+            is_mult = is_load = true;
-         }
--        goto do_unallocated;
-+        break;
+@@ -2824,6 +2825,14 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
  
-     default:
-     do_unallocated:
-@@ -3781,7 +3796,16 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-     clean_addr = clean_data_tbi(s, dirty_addr, false);
-     tcg_rt = cpu_reg(s, rt);
- 
--    if (is_load) {
-+    if (is_mult) {
-+        if (is_load) {
-+            gen_helper_ldgm(tcg_rt, cpu_env, clean_addr);
-+        } else if (is_zero) {
-+            gen_helper_stzgm(cpu_env, clean_addr, tcg_rt);
-+        } else {
-+            gen_helper_stgm(cpu_env, clean_addr, tcg_rt);
+     if (is_vector) {
+         size = 2 + opc;
++    } else if (opc == 1 && !is_load) {
++        /* STGP */
++        if (!dc_isar_feature(aa64_mte_insn_reg, s) || index == 0) {
++            unallocated_encoding(s);
++            return;
 +        }
-+        return;
-+    } else if (is_load) {
-         gen_helper_ldg(tcg_rt, cpu_env, clean_addr, tcg_rt);
-     } else if (tb_cflags(s->base.tb) & CF_PARALLEL) {
-         if (is_pair) {
++        size = 3;
++        set_tag = true;
+     } else {
+         size = 2 + extract32(opc, 1, 1);
+         is_signed = extract32(opc, 0, 1);
+@@ -2876,6 +2885,15 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+     }
+     clean_addr = clean_data_tbi(s, dirty_addr, wback || rn != 31);
+ 
++    if (set_tag) {
++        TCGv_i64 tcg_rn = cpu_reg_sp(s, rn);
++        if (tb_cflags(s->base.tb) & CF_PARALLEL) {
++            gen_helper_stg_parallel(cpu_env, clean_addr, tcg_rn);
++        } else {
++            gen_helper_stg(cpu_env, clean_addr, tcg_rn);
++        }
++    }
++
+     if (is_vector) {
+         if (is_load) {
+             do_fp_ld(s, rt, clean_addr, size);
 -- 
 2.17.2
