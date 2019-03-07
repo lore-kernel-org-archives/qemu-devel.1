@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42914)
+Received: from eggs.gnu.org ([209.51.188.92]:43422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h1tpK-0002r7-Py
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:16:53 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1trd-0004DI-CZ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:19:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h1tpJ-0006rb-Pi
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:16:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51616)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1h1tpJ-0006np-Gn
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:16:49 -0500
-Date: Thu, 7 Mar 2019 15:16:42 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190307141642.GE5786@linux.fritz.box>
-References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
-	<8b794ba1-f719-e1f4-5a17-ba261aeebea6@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1h1trc-0007yt-Av
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:19:13 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  7 Mar 2019 15:18:25 +0100
+Message-Id: <1551968334-18982-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b794ba1-f719-e1f4-5a17-ba261aeebea6@redhat.com>
-Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
- the concept description to docs/devel/qemu-multiprocess
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 00/29] Kconfig dependencies for ARM machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +20,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org, john.g.johnson@oracle.com, sstabellini@kernel.org, jag.raman@oracle.com, konrad.wilk@oracle.com, ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com
+To: yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-arm@nongnu.org, John Snow <jsnow@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Am 07.03.2019 um 09:14 hat Thomas Huth geschrieben:
-> On 07/03/2019 08.22, elena.ufimtseva@oracle.com wrote:
-> > From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > 
-> > TODO: Make relevant changes to the doc.
-> > 
-> > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> > ---
-> >  docs/devel/qemu-multiprocess.txt | 1109 ++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 1109 insertions(+)
-> >  create mode 100644 docs/devel/qemu-multiprocess.txt
-> > 
-> > diff --git a/docs/devel/qemu-multiprocess.txt b/docs/devel/qemu-multiprocess.txt
-> > new file mode 100644
-> > index 0000000..e29c6c8
-> > --- /dev/null
-> > +++ b/docs/devel/qemu-multiprocess.txt
-> > @@ -0,0 +1,1109 @@
-> > +/*
-> > + * Copyright 2019, Oracle and/or its affiliates. All rights reserved.
-> > + *
-> > + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> > + * of this software and associated documentation files (the "Software"), to deal
-> > + * in the Software without restriction, including without limitation the rights
-> > + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> > + * copies of the Software, and to permit persons to whom the Software is
-> > + * furnished to do so, subject to the following conditions:
-> > + *
-> > + * The above copyright notice and this permission notice shall be included in
-> > + * all copies or substantial portions of the Software.
-> > + *
-> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> > + * THE SOFTWARE.
-> > + */
-> 
-> Somehow weird to see such a big license statement talking about
-> "software", but which applies to a text file only... Not sure if it is
-> an option for you, but maybe one of the Creative Common licenses
-> (dual-licensed with the GPLv2+) would be a better fit? E.g. for the QEMU
-> website, the content is dual-licensed: https://www.qemu.org/license.html
+This series reworks the default-configs/arm-softmmu.mak and
+default-configs/aarch64-softmmu.mak files to use the new Kconfig-style
+dependencies instead.
 
-While we're talking about licenses, the "All rights reserved." notice is
-out of place in a license header that declares that a lot of permissions
-are granted. Better to remove it to avoid any ambiguities that could
-result from the contradiction. (Applies to the whole series.)
+Based-on: 1551723614-1823-1-git-send-email-pbonzini@redhat.com
+          ("Support Kconfig in QEMU")
 
-Kevin
+Some of the patches are slightly based on the work by =C3=81kos Kov=C3=A1=
+cs:
+
+https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03730.html
+
+The other patches have been created by looking at the sources and finding
+out the dependencies the hard way via trial-and-error (i.e. by enabling
+only one machine at a time and checking whether it can be compiled and
+started).
+
+v4:
+ - Rebased the series to Paolo's latest kconfig tree
+
+v3:
+ - Addressed review feedback from v2
+ - Included patches to clean up the PCI dependencies of AHCI and SDHCI
+   (so CONFIG_AHCI and CONFIG_SDHCI do not depend on CONFIG_PCI anymore)
+ - Added an additional patch for the new "musca" machines
+
+v2: Adressed review-feedback from v1
+ - CONFIG_SDHCI and CONFIG_AHCI now select CONFIG_PCI
+ - Added switches for MICROBIT and EMCRAFT_SF2
+
+Thomas Huth (29):
+  hw/pci/pci-stub: Add msi_enabled() and msi_notify() to the pci stubs
+  hw/ide/ahci: Add a Kconfig switch for the AHDI-ICH9 device
+  hw/sd/sdhci: Move PCI-related code into a separate file
+  hw/arm: Express dependencies of the exynos machines with Kconfig
+  hw/arm: Express dependencies of the highbank machines with Kconfig
+  hw/arm: Express dependencies of integratorcp with Kconfig
+  hw/arm: Express dependencies of the fsl-imx31 machine with Kconfig
+  hw/arm: Express dependencies of musicpal with Kconfig
+  hw/arm: Express dependencies of the OMAP machines with Kconfig
+  hw/arm: Express dependencies of stellaris with Kconfig
+  hw/arm: Express dependencies of realview, versatile and vexpress with
+    Kconfig
+  hw/arm: Express dependencies of the PXA2xx machines with Kconfig
+  hw/arm: Express dependencies of xilinx-zynq with Kconfig
+  hw/arm: Express dependencies of collie with Kconfig
+  hw/arm: Express dependencies of the aspeed boards with Kconfig
+  hw/arm: Express dependencies of the virt machine with Kconfig
+  hw/arm: Express dependencies of netduino / stm32f2xx with Kconfig
+  hw/arm: Express dependencies of allwinner / cubieboard with Kconfig
+  hw/arm: Express dependencies of the MPS2 boards with Kconfig
+  hw/arm: Express dependencies of the raspi machines with Kconfig
+  hw/arm: Express dependencies of canon-a1100 with Kconfig
+  hw/arm: Express dependencies of sabrelite with Kconfig
+  hw/arm: Express dependencies of the MSF2 / EMCRAFT_SF2 machine with
+    Kconfig
+  hw/arm: Express dependencies for remaining IMX boards with Kconfig
+  hw/arm: Express dependencies of the microbit / nrf51 machine with
+    Kconfig
+  hw/arm: Express dependencies of the ZynqMP zcu102 machine with Kconfig
+  hw/arm: Express dependencies of the xlnx-versal-virt machine with
+    Kconfig
+  hw/arm: Express dependencies of the musca machines with Kconfig
+  hw/arm: Remove hard-enablement of the remaining PCI devices
+
+ default-configs/aarch64-softmmu.mak |   4 -
+ default-configs/arm-softmmu.mak     | 175 +++-----------------
+ hw/arm/Kconfig                      | 319 ++++++++++++++++++++++++++++++=
++++++-
+ hw/arm/Makefile.objs                |  25 ++-
+ hw/display/Kconfig                  |   3 +
+ hw/i2c/Kconfig                      |   2 +-
+ hw/ide/Kconfig                      |   6 +-
+ hw/ide/Makefile.objs                |   2 +-
+ hw/misc/Kconfig                     |   2 +
+ hw/pci/pci-stub.c                   |  11 ++
+ hw/sd/Kconfig                       |   6 +-
+ hw/sd/Makefile.objs                 |   1 +
+ hw/sd/sdhci-internal.h              |  34 ++++
+ hw/sd/sdhci-pci.c                   |  87 ++++++++++
+ hw/sd/sdhci.c                       |  98 +----------
+ 15 files changed, 514 insertions(+), 261 deletions(-)
+ create mode 100644 hw/sd/sdhci-pci.c
+
+--=20
+1.8.3.1
