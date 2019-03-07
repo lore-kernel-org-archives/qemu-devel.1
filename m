@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35029)
+Received: from eggs.gnu.org ([209.51.188.92]:35062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h1pjk-0005aC-6U
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:54:49 -0500
+	(envelope-from <kraxel@redhat.com>) id 1h1pjl-0005aq-CN
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:54:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h1pji-0007rv-Qx
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:54:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36852)
+	(envelope-from <kraxel@redhat.com>) id 1h1pjk-0007tC-I8
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:54:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h1pji-0007rG-Go
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:54:46 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h1pjk-0007sW-88
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:54:48 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8513386679
+	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 09:54:47 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  7 Mar 2019 10:54:41 +0100
-Message-Id: <20190307095441.31921-5-kraxel@redhat.com>
+Date: Thu,  7 Mar 2019 10:54:39 +0100
+Message-Id: <20190307095441.31921-3-kraxel@redhat.com>
 In-Reply-To: <20190307095441.31921-1-kraxel@redhat.com>
 References: <20190307095441.31921-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 4/4] Introduce new "no_guest_reset" parameter
- for usb-host device
+Subject: [Qemu-devel] [PULL 2/4] usb-mtp: fix some usb_mtp_write_data return
+ paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,127 +31,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Alexander Kappner <agk@godking.net>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>
 
-From: Alexander Kappner <agk@godking.net>
+From: Bandan Das <bsd@redhat.com>
 
-With certain USB devices passed through via usb-host, a guest attempting to
-reset a usb-host device can trigger a reset loop that renders the USB device
-unusable. In my use case, the device was an iPhone XR that was passed through to
-a Mac OS X Mojave guest. Upon connecting the device, the following happens:
+During a write, free up the "path" before getting more data.
+Also, while we at it, remove the confusing usage of d->fd for
+storing mkdir status
 
-1) Guest recognizes new device, sends reset to emulated USB host
-2) QEMU's USB host sends reset to host kernel
-3) Host kernel resets device
-4) After reset, host kernel determines that some part of the device descriptor
-has changed ("device firmware changed" in dmesg), so host kernel decides to
-re-enumerate the device.
-5) Re-enumeration causes QEMU to disconnect and reconnect the device in the
-guest.
-6) goto 1)
+Spotted by Coverity: CID 1398642
 
-Here's from the host kernel (note the "device firmware changed" lines")
-
-[3677704.473050] usb 1-1.3: new high-speed USB device number 53 using ehci-pci
-[3677704.555594] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
-[3677704.555599] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-[3677704.555602] usb 1-1.3: Product: iPhone
-[3677704.555605] usb 1-1.3: Manufacturer: Apple Inc.
-[3677704.555607] usb 1-1.3: SerialNumber: [[removed]]
-[3677709.401040] usb 1-1.3: reset high-speed USB device number 53 using ehci-pci
-[3677709.479486] usb 1-1.3: device firmware changed
-[3677709.479842] usb 1-1.3: USB disconnect, device number 53
-[3677709.546039] usb 1-1.3: new high-speed USB device number 54 using ehci-pci
-[3677709.627471] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
-[3677709.627476] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-[3677709.627479] usb 1-1.3: Product: iPhone
-[3677709.627481] usb 1-1.3: Manufacturer: Apple Inc.
-[3677709.627483] usb 1-1.3: SerialNumber: [[removed]]
-[3677762.320044] usb 1-1.3: reset high-speed USB device number 54 using ehci-pci
-[3677762.615630] usb 1-1.3: USB disconnect, device number 54
-[3677762.787043] usb 1-1.3: new high-speed USB device number 55 using ehci-pci
-[3677762.869016] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
-[3677762.869024] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-[3677762.869028] usb 1-1.3: Product: iPhone
-[3677762.869032] usb 1-1.3: Manufacturer: Apple Inc.
-[3677762.869035] usb 1-1.3: SerialNumber: [[removed]]
-[3677815.662036] usb 1-1.3: reset high-speed USB device number 55 using ehci-pci
-
-Here's from QEMU:
-
-libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/022: No such file or directory
-libusb: error [udev_hotplug_event] ignoring udev action bind
-libusb: error [udev_hotplug_event] ignoring udev action bind
-libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/5-1/bConfigurationValue failed ret=-1 errno=2
-libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try again
-
-libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/024: No such file or directory
-libusb: error [udev_hotplug_event] ignoring udev action bind
-libusb: error [udev_hotplug_event] ignoring udev action bind
-libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/5-1/bConfigurationValue failed ret=-1 errno=2
-libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try again
-
-libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/026: No such file or directory
-
-The result of this is that the device remains permanently unusable in the guest.
-The same problem has been previously reported for an iPad:
-https://stackoverflow.com/questions/52617634/how-do-i-get-qemu-usb-passthrough-to-work-for-ipad-iphone
-
-This problem can be elegantly solved by interrupting step 2) above. Instead of
-passing through the reset, QEMU simply ignores it. To allow this to be
-configured on a per-device level,  a new parameter "no_guest_reset" is
-introduced for the usb-host device. I can confirm that the configuration
-described above (iPhone XS + Mojave guest) works flawlessly with
-no_guest_reset=True specified.
-
-Working command line for my scenario:
-device_add usb-host,vendorid=0x05ac,productid=0x12a8,no_guest_reset=True,id=iphone
-
-Best regards
-Alexander
-
-Signed-off-by: Alexander Kappner <agk@godking.net>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20190128140027.9448-1-kraxel@redhat.com
-
-[ kraxel: rename parameter to "guest-reset" ]
-
+Signed-off-by: Bandan Das <bsd@redhat.com>
+Message-id: 20190306210409.14842-3-bsd@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/host-libusb.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/usb/dev-mtp.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index 833250a886af..67b7465915f5 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -82,7 +82,7 @@ struct USBHostDevice {
-     uint32_t                         options;
-     uint32_t                         loglevel;
-     bool                             needs_autoscan;
--
-+    bool                             allow_guest_reset;
-     /* state */
-     QTAILQ_ENTRY(USBHostDevice)      next;
-     int                              seen, errcount;
-@@ -1456,6 +1456,10 @@ static void usb_host_handle_reset(USBDevice *udev)
-     USBHostDevice *s = USB_HOST_DEVICE(udev);
-     int rc;
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 4dde14fc7887..1f22284949df 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1605,7 +1605,7 @@ static int usb_mtp_update_object(MTPObject *parent, char *name)
+     return ret;
+ }
  
-+    if (!s->allow_guest_reset) {
-+        return;
-+    }
-+
-     trace_usb_host_reset(s->bus_num, s->addr);
+-static void usb_mtp_write_data(MTPState *s)
++static int usb_mtp_write_data(MTPState *s)
+ {
+     MTPData *d = s->data_out;
+     MTPObject *parent =
+@@ -1613,6 +1613,7 @@ static void usb_mtp_write_data(MTPState *s)
+     char *path = NULL;
+     uint64_t rc;
+     mode_t mask = 0644;
++    int ret = 0;
  
-     rc = libusb_reset_device(s->dh);
-@@ -1573,6 +1577,7 @@ static Property usb_host_dev_properties[] = {
-     DEFINE_PROP_UINT32("productid", USBHostDevice, match.product_id, 0),
-     DEFINE_PROP_UINT32("isobufs",  USBHostDevice, iso_urb_count,    4),
-     DEFINE_PROP_UINT32("isobsize", USBHostDevice, iso_urb_frames,   32),
-+    DEFINE_PROP_BOOL("guest-reset", USBHostDevice, allow_guest_reset, true),
-     DEFINE_PROP_UINT32("loglevel",  USBHostDevice, loglevel,
-                        LIBUSB_LOG_LEVEL_WARNING),
-     DEFINE_PROP_BIT("pipeline",    USBHostDevice, options,
+     assert(d != NULL);
+ 
+@@ -1621,13 +1622,13 @@ static void usb_mtp_write_data(MTPState *s)
+         if (!parent || !s->write_pending) {
+             usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
+                 0, 0, 0, 0);
+-        return;
++        return 1;
+         }
+ 
+         if (s->dataset.filename) {
+             path = g_strdup_printf("%s/%s", parent->path, s->dataset.filename);
+             if (s->dataset.format == FMT_ASSOCIATION) {
+-                d->fd = mkdir(path, mask);
++                ret = mkdir(path, mask);
+                 goto free;
+             }
+             d->fd = open(path, O_CREAT | O_WRONLY |
+@@ -1657,7 +1658,8 @@ static void usb_mtp_write_data(MTPState *s)
+             goto done;
+         }
+         if (d->write_status != WRITE_END) {
+-            return;
++            g_free(path);
++            return ret;
+         } else {
+             /*
+              * Return an incomplete transfer if file size doesn't match
+@@ -1685,12 +1687,14 @@ done:
+      */
+     if (d->fd != -1) {
+         close(d->fd);
++        d->fd = -1;
+     }
+ free:
+     g_free(s->dataset.filename);
+     s->dataset.size = 0;
+     g_free(path);
+     s->write_pending = false;
++    return ret;
+ }
+ 
+ static void usb_mtp_write_metadata(MTPState *s, uint64_t dlen)
+@@ -1727,14 +1731,12 @@ static void usb_mtp_write_metadata(MTPState *s, uint64_t dlen)
+     s->write_pending = true;
+ 
+     if (s->dataset.format == FMT_ASSOCIATION) {
+-        usb_mtp_write_data(s);
+-        /* next_handle will be allocated to the newly created dir */
+-        if (d->fd == -1) {
++        if (usb_mtp_write_data(s)) {
++            /* next_handle will be allocated to the newly created dir */
+             usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
+                                  0, 0, 0, 0);
+             return;
+         }
+-        d->fd = -1;
+     }
+ 
+     usb_mtp_queue_result(s, RES_OK, d->trans, 3, QEMU_STORAGE_ID,
 -- 
 2.18.1
