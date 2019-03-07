@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54467)
+Received: from eggs.gnu.org ([209.51.188.92]:57001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1zAy-0003LK-Lf
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:59:33 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1zNq-0006Hv-9k
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:12:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1zAx-0007Tt-OY
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:59:32 -0500
-Resent-Message-Id: <E1h1zAx-0007Tt-OY@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1zAx-0007Sy-H5
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:59:31 -0500
-Message-ID: <155198873851.8146.11476150031667361826@6acff2cf482b>
-In-Reply-To: <20190301084814.11076-1-llyzs.vic@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 11:58:59 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3] slirp: check for ioctlsocket error and
- 0-length udp payload.
+	(envelope-from <richard.henderson@linaro.org>) id 1h1zNp-0001xc-Ji
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:12:50 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42250)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h1zNp-0001wN-Bf
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:12:49 -0500
+Received: by mail-pg1-x541.google.com with SMTP id b2so12118850pgl.9
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 12:12:48 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu,  7 Mar 2019 12:12:42 -0800
+Message-Id: <20190307201244.8971-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] target/arm: gdbstub system registers
+ refinement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: llyzs.vic@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, jan.kiszka@siemens.com, marcandre.lureau@gmail.com, samuel.thibault@gnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwMTA4NDgxNC4xMTA3
-Ni0xLWxseXpzLnZpY0BnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
-bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
-ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
-cmEgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICAg
-ICAgICAgICAgICAgICBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC9zbGlycC5oOjUwLAog
-ICAgICAgICAgICAgICAgIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJwL3NvY2tldC5jOjg6
-Ci90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC9zb2NrZXQuYzogSW4gZnVuY3Rpb24gJ3NvcmVjdmZy
-b20nOgovdG1wL3FlbXUtdGVzdC9zcmMvc2xpcnAvc29ja2V0LmM6NTMzOjI5OiBlcnJvcjogJ2Rm
-ZCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCiAgICAgICAgICAgICAg
-ICAgREVCVUdfTUlTQygoZGZkLCAiIGlvY3Rsc29ja2V0IGVycm5vID0gJWQtJXNcbiIsCiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXn5+Ci91c3IveDg2XzY0LXc2NC1taW5ndzMyL3N5cy1y
-b290L21pbmd3L2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi9nbWVzc2FnZXMuaDozNDU6MzI6IG5vdGU6
-IGluIGRlZmluaXRpb24gb2YgbWFjcm8gJ2dfZGVidWcnCi0tLQovdG1wL3FlbXUtdGVzdC9zcmMv
-c2xpcnAvc29ja2V0LmM6NTMzOjE3OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8gJ0RFQlVH
-X01JU0MnCiAgICAgICAgICAgICAgICAgREVCVUdfTUlTQygoZGZkLCAiIGlvY3Rsc29ja2V0IGVy
-cm5vID0gJWQtJXNcbiIsCiAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fgovdG1wL3FlbXUtdGVz
-dC9zcmMvc2xpcnAvc29ja2V0LmM6NTMzOjMyOiBlcnJvcjogbGVmdC1oYW5kIG9wZXJhbmQgb2Yg
-Y29tbWEgZXhwcmVzc2lvbiBoYXMgbm8gZWZmZWN0IFstV2Vycm9yPXVudXNlZC12YWx1ZV0KICAg
-ICAgICAgICAgICAgICBERUJVR19NSVNDKChkZmQsICIgaW9jdGxzb2NrZXQgZXJybm8gPSAlZC0l
-c1xuIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi91c3IveDg2XzY0LXc2NC1t
-aW5ndzMyL3N5cy1yb290L21pbmd3L2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi9nbWVzc2FnZXMuaDoz
-NDU6MzI6IG5vdGU6IGluIGRlZmluaXRpb24gb2YgbWFjcm8gJ2dfZGVidWcnCi0tLQovdG1wL3Fl
-bXUtdGVzdC9zcmMvc2xpcnAvc29ja2V0LmM6NTMzOjE3OiBub3RlOiBpbiBleHBhbnNpb24gb2Yg
-bWFjcm8gJ0RFQlVHX01JU0MnCiAgICAgICAgICAgICAgICAgREVCVUdfTUlTQygoZGZkLCAiIGlv
-Y3Rsc29ja2V0IGVycm5vID0gJWQtJXNcbiIsCiAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fgov
-dG1wL3FlbXUtdGVzdC9zcmMvc2xpcnAvc29ja2V0LmM6NTMzOjY0OiBlcnJvcjogbGVmdC1oYW5k
-IG9wZXJhbmQgb2YgY29tbWEgZXhwcmVzc2lvbiBoYXMgbm8gZWZmZWN0IFstV2Vycm9yPXVudXNl
-ZC12YWx1ZV0KICAgICAgICAgICAgICAgICBERUJVR19NSVNDKChkZmQsICIgaW9jdGxzb2NrZXQg
-ZXJybm8gPSAlZC0lc1xuIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4KL3Vzci94ODZfNjQtdzY0LW1pbmd3MzIvc3lzLXJv
-b3QvbWluZ3cvaW5jbHVkZS9nbGliLTIuMC9nbGliL2dtZXNzYWdlcy5oOjM0NTozMjogbm90ZTog
-aW4gZGVmaW5pdGlvbiBvZiBtYWNybyAnZ19kZWJ1ZycKLS0tCi90bXAvcWVtdS10ZXN0L3NyYy9z
-bGlycC9zb2NrZXQuYzo1MzM6MTc6IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyAnREVCVUdf
-TUlTQycKICAgICAgICAgICAgICAgICBERUJVR19NSVNDKChkZmQsICIgaW9jdGxzb2NrZXQgZXJy
-bm8gPSAlZC0lc1xuIiwKICAgICAgICAgICAgICAgICBefn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0
-L3NyYy9zbGlycC9zb2NrZXQuYzo1MzM6MTc6IGVycm9yOiBmb3JtYXQgbm90IGEgc3RyaW5nIGxp
-dGVyYWwgYW5kIG5vIGZvcm1hdCBhcmd1bWVudHMgWy1XZXJyb3I9Zm9ybWF0LXNlY3VyaXR5XQpj
-YzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAv
-cWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHNsaXJwL3NvY2tldC5vXSBFcnJvciAxClRyYWNl
-YmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
-IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMzAxMDg0ODE0LjExMDc2LTEtbGx5enMu
-dmljQGdtYWlsLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
-aGF0LmNvbQ==
+This was working toward fixing 
+
+  https://bugs.linaro.org/show_bug.cgi?id=4274
+
+although I don't think I'm entirely successful.  I would argue,
+however, that gdb's behaviour in this is odd.  Why are registers
+that are clearly marked "system" being added to "general" simply
+because they have integer type?
+
+In the meantime, we don't really need to present these registers
+to the user for CONFIG_USER_ONLY.
+
+
+r~
+
+
+Richard Henderson (2):
+  target/arm: Put system registers in "system" group
+  target/arm: Don't add system-registers.xml for user-only
+
+ target/arm/gdbstub.c | 2 +-
+ target/arm/helper.c  | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+-- 
+2.17.2
