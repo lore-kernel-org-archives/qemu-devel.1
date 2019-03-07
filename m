@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37177)
+Received: from eggs.gnu.org ([209.51.188.92]:37969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h203T-0000EE-8J
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:55:52 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1h205N-00012i-RU
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:57:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h203R-0003lL-PB
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:55:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59110)
+	(envelope-from <pbonzini@redhat.com>) id 1h205I-0005dz-2C
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:57:47 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:38133)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h203R-0003k2-HD
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:55:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h203Q-0007UE-1V
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 20:55:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0A5142E80C9
-	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 20:55:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h205F-0005b0-UX
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:57:42 -0500
+Received: by mail-wm1-f66.google.com with SMTP id a188so10535427wmf.3
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 12:57:40 -0800 (PST)
+References: <1551968191-10821-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA9=eKhnL40T8nZuktoVGabq8MoGoYLiRO1fjg9dsNXLXQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2d2db167-2b50-3c51-6739-6b72339bc90c@redhat.com>
+Date: Thu, 7 Mar 2019 21:57:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Mar 2019 20:44:41 -0000
-From: Dan Streetman <dan.streetman@canonical.com>
-Reply-To: Bug 1818880 <1818880@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155189278546.17656.7588906080638087853.malonedeb@gac.canonical.com>
-Message-Id: <155199148294.9171.4112681710924811082.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818880] Re: Deadlock when detaching network
- interface
+In-Reply-To: <CAFEAcA9=eKhnL40T8nZuktoVGabq8MoGoYLiRO1fjg9dsNXLXQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL v2 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,87 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-** Tags added: sts-sponsor-ddstreet
+On 07/03/19 19:35, Peter Maydell wrote:
+> On Thu, 7 Mar 2019 at 14:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The following changes since commit 1ba530a4ecba6015d52d8f392fd327cfa07bc37a:
+>>
+>>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190304' into staging (2019-03-04 13:38:54 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>
+>>   git://github.com/bonzini/qemu.git tags/for-upstream-kconfig
+>>
+>> for you to fetch changes up to 1f749c0626f6f79cfc27fc3e6b910a6df03d3488:
+>>
+>>   kconfig: add documentation (2019-03-07 15:06:29 +0100)
+>>
+>> ----------------------------------------------------------------
+>> Initial Kconfig work, excluding ARM and MIPS
+> 
+> This passes my build tests, but something in your workflow
+> has mangled a Cc: line in one of the commit messages.
+> In commit 11db78e98317e1a0c the accented character in
+> Hervé Poussineau's name has been mangled and isn't correct
+> UTF-8. Could you fix that up and resend, please?
+> 
+> PS: since the sphinx patchset just got in ahead of
+> yours, Sphinx now warns:
+> docs/devel/kconfig.rst: WARNING: document isn't included in any toctree
+> 
+> I'll send a followup patch which adds 'kconfig' to
+> docs/devel/index.rst once this is merged.
 
--- =
+I just rebased and did the change myself, which was a good idea because
+I also had to use ==== headings instead of ---- for the ToC to come out
+right.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818880
+Thanks for working on Sphinx!  I will dig out the Texinfo->Sphinx
+patches for 4.1, as well as the small changes to kerneldoc that support
+QEMU's hybrid of kerneldoc and gtkdoc.
 
-Title:
-  Deadlock when detaching network interface
-
-Status in Ubuntu Cloud Archive:
-  Confirmed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Confirmed
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
-
-Bug description:
-  [Impact]
-  Qemu guests hang indefinitely
-
-  [Description]
-  When running a Qemu guest with VirtIO network interfaces, detaching an in=
-terface that's currently being used can result in a deadlock. The guest ins=
-tance will hang and become unresponsive to commands, and the only option is=
- to kill -9 the instance.
-  The reason for this is a dealock between a monitor and an RCU thread, whi=
-ch will fight over the BQL (qemu_global_mutex) and the critical RCU section=
- locks. The monitor thread will acquire the BQL for detaching the network i=
-nterface, and fire up a helper thread to deal with detaching the network ad=
-apter. That new thread needs to wait on the RCU thread to complete the dele=
-tion, but the RCU thread wants the BQL to commit its transactions.
-  This bug is already fixed upstream (73c6e4013b4c rcu: completely disable =
-pthread_atfork callbacks as soon as possible) and included for other series=
- (see below), so we don't need to backport it to Bionic onwards.
-
-  Upstream commit:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D73c6e4013b4c
-
-  $ git describe --contains 73c6e4013b4c
-  v2.10.0-rc2~1^2~8
-
-  $ rmadison qemu
-  =3D=3D=3D> qemu | 1:2.5+dfsg-5ubuntu10.34 | xenial-updates/universe   | a=
-md64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.11+dfsg-1ubuntu7    | bionic/uni=
-verse           | amd64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/uni=
-verse           | amd64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:3.1+dfsg-2ubuntu2     | disco/univ=
-erse            | amd64, ...
-
-  [Test Case]
-  Being a racing condition, this is a tricky bug to reproduce consistently.=
- We've had reports of users running into this with OpenStack deployments an=
-d Windows Server guests, and the scenario is usually like this:
-  1) Deploy a 16vCPU Windows Server 2012 R2 guest with a virtio network int=
-erface
-  2) Stress the network interface with e.g. Windows HLK test suite or simil=
-ar
-  3) Repeatedly attach/detach the network adapter that's in use
-  It usually takes more than ~4000 attach/detach cycles to trigger the bug.
-
-  [Regression Potential]
-  Regressions for this might arise from the fact that the fix changes RCU l=
-ock code. Since this patch has been upstream and in other series for a whil=
-e, it's unlikely that it would regressions in RCU code specifically. Other =
-code that makes use of the RCU locks (MMIO and some monitor events) will be=
- thoroughly tested for any regressions with use-case scenarios and scripted=
- runs.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1818880/+subscriptions
+Paolo
