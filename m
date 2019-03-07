@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37383)
+Received: from eggs.gnu.org ([209.51.188.92]:37750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h1tSJ-0006Ac-LX
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:53:04 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1h1tUU-00077Y-DB
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:55:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h1tSI-0008J3-R7
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:53:03 -0500
-Received: from mail-eopbgr810129.outbound.protection.outlook.com
-	([40.107.81.129]:6077
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1h1tSI-0008IJ-Ip
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:53:02 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 7 Mar 2019 13:53:00 +0000
-Message-ID: <BN6PR2201MB12516CCA44229DC013614570C64C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190305162829.20079-1-philmd@redhat.com>
-	<20190305162829.20079-2-philmd@redhat.com>,
-	<87pnr3upsq.fsf@dusky.pond.sub.org>,
-	<BN6PR2201MB125115C44ECE81BE1E1C9576C64C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB125115C44ECE81BE1E1C9576C64C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <pbonzini@redhat.com>) id 1h1tUT-0001Bl-NG
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:55:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h1tUT-0001Ac-Cy
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:55:17 -0500
+References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA-nGLVySjjK65Bfedr5H-6XP1_t1rpnupjL89KB-HN8wQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <daccd090-d192-4a84-6df7-a5fce7155485@redhat.com>
+Date: Thu, 7 Mar 2019 14:55:11 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/5] hw/mips/malta: Fix the
- DEBUG_BOARD_INIT code
+In-Reply-To: <CAFEAcA-nGLVySjjK65Bfedr5H-6XP1_t1rpnupjL89KB-HN8wQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,57 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, =?Windows-1252?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yang Zhong <yang.zhong@intel.com>, Thomas Huth <thuth@redhat.com>
 
-> > From: Markus Armbruster <armbru@redhat.com>
-> > Subject: Re: [Qemu-devel] [PATCH 1/5] hw/mips/malta: Fix the DEBUG_BOAR=
-D_INIT code
-> >=20
-> > Philippe Mathieu-Daud=E9 <philmd@redhat.com> writes:
-> >=20
-> > > Commit fa1d36df746 missed to convert this ifdef'ed out code.
-> > > Introduce the pflash_blk variable.
-> > >=20
-> > > This fixes:
-> > >=20
-> > >    hw/mips/mips_malta.c:1273:16: error: implicit declaration of funct=
-ion =91blk_name=92; > did you mean =91basename=92? [-Werror=3Dimplicit-func=
-tion-declaration]
-> > >                 blk_name(dinfo->bdrv), fl_sectors);
-> > >                 ^~~~~~~~
-> > >   hw/mips/mips_malta.c:1273:16: error: nested extern declaration of =
-=91blk_name=92
-> [-Werror=3Dnested-externs]
-> > >   hw/mips/mips_malta.c:1273:30: error: =91DriveInfo=92 {aka =91struct=
- DriveInfo=92} has no
-> member named =91bdrv=92
-> > >                 blk_name(dinfo->bdrv), fl_sectors);
-> > >                                 ^~
-> > >=20
-> > > Fixes: fa1d36df746
-> > > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> >=20
-> > Question for the maintainers: Aurelien, Aleksandar, fix the
-> > DEBUG_BOARD_INIT code or drop it?  It looks rather stale...
->=20
-> Markus,
->=20
-> My vote is: drop it.
->=20
-> And, Markus, yes, if you agree with any patch from this series,
-> please let them all go > though your pull request.
->=20
-> Regards,
-> Aleksandar
+On 07/03/19 14:25, Peter Maydell wrote:
+> In file included from /home/petmay01/qemu-for-merges/hw/tpm/tpm_emulator.c:37:0:
+> /home/petmay01/qemu-for-merges/hw/tpm/tpm_ioctl.h:11:21: fatal error:
+> sys/uio.h: No such file or directory
+> 
+> I'm not sure what's happened here. It looks like the Kconfig machinery
+> is putting CONFIG_TPM_EMULATOR in build/x86-64-softmmu/config-devices.mak,
+> but configure is trying to put it into config-host.mak. The configure
+> code is where the "don't do TPM on windows" check is, but the Kconfig
+> entry in config-devices.mak overrides that and tries to build this
+> code on Windows anyway.
+> 
+> All the other builds seemed to run ok (I'm just rerunning one lot
+> which failed due to an issue on my end; will follow up if there's
+> any failure there).
 
-Markus, if you decide to drop the code segment, you have my
+I did the final push to github from the wrong machine. :(  Resending.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-in advance.
-
-I believe the whole patch series was also reviewed by Richard.
-
-Sincerely,
-Aleksandar
+Paolo
