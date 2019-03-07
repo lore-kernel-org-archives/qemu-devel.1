@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38313)
+Received: from eggs.gnu.org ([209.51.188.92]:38327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h206O-0001fU-Qo
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:54 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h206Q-0001gl-UV
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h206M-0006Vl-Bd
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:51 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:46697)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h206P-0006YG-55
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:54 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:41324)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h206L-0006UP-Tr
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:50 -0500
-Received: by mail-wr1-x432.google.com with SMTP id i16so19058295wrs.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 12:58:49 -0800 (PST)
+	id 1h206O-0006W7-P5
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:53 -0500
+Received: by mail-wr1-x434.google.com with SMTP id n2so19076554wrw.8
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 12:58:51 -0800 (PST)
 Received: from donizetti.lan ([2001:b07:6468:f312:c1b:dbd7:15a6:4014])
 	by smtp.gmail.com with ESMTPSA id
-	h126sm5581833wmf.2.2019.03.07.12.58.45 for <qemu-devel@nongnu.org>
+	h126sm5581833wmf.2.2019.03.07.12.58.48 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 07 Mar 2019 12:58:46 -0800 (PST)
+	Thu, 07 Mar 2019 12:58:49 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 21:58:42 +0100
-Message-Id: <20190307205844.20236-1-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 21:58:44 +0100
+Message-Id: <20190307205844.20236-3-pbonzini@redhat.com>
+In-Reply-To: <20190307205844.20236-1-pbonzini@redhat.com>
+References: <20190307205844.20236-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 00/54] Kconfig conversion,
- excluding ARM and MIPS
+Subject: [Qemu-devel] [PULL v3 54/54] kconfig: add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,270 +36,336 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The following changes since commit 6cb4f6db4f4367faa33da85b15f75bbbd2bed2a6:
-
-  Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-request' into staging (2019-03-07 16:16:02 +0000)
-
-are available in the Git repository at:
-
-  git://github.com/bonzini/qemu.git tags/for-upstream-kconfig
-
-for you to fetch changes up to 576c3f2f16e7392e28cc9fe10d9a920d67d3645b:
-
-  kconfig: add documentation (2019-03-07 21:54:22 +0100)
-
-----------------------------------------------------------------
-Initial Kconfig work, excluding ARM and MIPS
-
-----------------------------------------------------------------
-
-v2->v3: fix UTF-8, adjust documentation patch for Sphinx
-
-Paolo Bonzini (42):
-      9pfs: remove unnecessary conditionals
-      xtensa: rename CONFIG_XTENSA_FPGA to CONFIG_XTENSA_XTFPGA
-      minikconfig: add parser skeleton
-      minikconfig: add AST
-      minikconfig: add semantic analysis
-      kconfig: introduce kconfig files
-      build: switch to Kconfig
-      minikconfig: implement allnoconfig and defconfig modes
-      kconfig: introduce CONFIG_TEST_DEVICES
-      ide: express dependencies with Kconfig
-      build: convert pci.mak to Kconfig
-      build: convert sound.mak to Kconfig
-      build: convert usb.mak to Kconfig
-      block: fix recursion in hw/block/dataplane
-      scsi: express dependencies with Kconfig
-      isa: express dependencies with kconfig
-      i386: express dependencies with Kconfig
-      i2c: express dependencies with Kconfig
-      ptimer: express dependencies with Kconfig
-      vfio: express vfio dependencies with Kconfig
-      tpm: express dependencies with Kconfig
-      isa: express SuperIO dependencies with Kconfig
-      ssi: express dependencies with kconfig
-      sd: express dependencies with kconfig
-      ipmi: express dependencies with kconfig
-      alpha-softmmu.mak: express dependencies with Kconfig
-      cris-softmmu.mak: express dependencies with Kconfig
-      hppa-softmmu.mak: express dependencies with Kconfig
-      lm32-softmmu.mak: express dependencies with Kconfig
-      m68k-softmmu.mak: express dependencies with Kconfig
-      microblaze-softmmu.mak: express dependencies with Kconfig
-      moxie-softmmu.mak: express dependencies with Kconfig
-      nios2-softmmu.mak: express dependencies with Kconfig
-      or1k-softmmu.mak: express dependencies with Kconfig
-      riscv-softmmu.mak: replace CONFIG_* with Kconfig "select" directives
-      sh4-softmmu.mak: express dependencies with Kconfig
-      sparc-softmmu.mak: express dependencies with Kconfig
-      sparc64-softmmu.mak: express dependencies with Kconfig
-      unicore32-softmmu.mak: express dependencies with Kconfig
-      xtensa-softmmu.mak: express dependencies with Kconfig
-      .travis.yml: test that no-default-device builds do not regress
-      kconfig: add documentation
-
-Thomas Huth (6):
-      ppc64: Express dependencies of 'pseries' and 'powernv' machines with kconfig
-      ppc: Express dependencies of the 'prep' and '40p' machines with kconfig
-      ppc: Express dependencies of the Mac machines with kconfig
-      ppc: Express dependencies of the Sam460EX machines with kconfig
-      ppc: Express dependencies of the embedded machines with kconfig
-      s390x: express dependencies with Kconfig
-
-Yang Zhong (6):
-      hw/display: make edid configurable
-      hw/pci/Makefile.objs: make pcie configurable
-      display: express dependencies with kconfig
-      hyperv: express dependencies with kconfig
-      virtio: express virtio dependencies with Kconfig
-      i386-softmmu.mak: remove all CONFIG_* except boards definitions
-
- .travis.yml                             |   6 +
- Kconfig.host                            |  33 ++
- Makefile                                |  27 +-
- Makefile.target                         |   7 +-
- configure                               |  42 +-
- default-configs/alpha-softmmu.mak       |  26 +-
- default-configs/arm-softmmu.mak         |  18 +-
- default-configs/cris-softmmu.mak        |   6 +-
- default-configs/hppa-softmmu.mak        |  20 +-
- default-configs/hyperv.mak              |   2 -
- default-configs/i386-softmmu.mak        |  93 ++---
- default-configs/lm32-softmmu.mak        |  12 +-
- default-configs/m68k-softmmu.mak        |   4 +-
- default-configs/microblaze-softmmu.mak  |  12 +-
- default-configs/mips-softmmu-common.mak |  10 +-
- default-configs/mips64el-softmmu.mak    |   2 +
- default-configs/moxie-softmmu.mak       |   7 +-
- default-configs/nios2-softmmu.mak       |   6 +-
- default-configs/or1k-softmmu.mak        |   5 +-
- default-configs/pci.mak                 |  51 ---
- default-configs/ppc-softmmu.mak         |  60 ---
- default-configs/ppc64-softmmu.mak       |  13 -
- default-configs/riscv32-softmmu.mak     |  21 +-
- default-configs/riscv64-softmmu.mak     |  22 +-
- default-configs/s390x-softmmu.mak       |  23 +-
- default-configs/sh4-softmmu.mak         |  28 +-
- default-configs/sh4eb-softmmu.mak       |  22 +-
- default-configs/sound.mak               |   4 -
- default-configs/sparc-softmmu.mak       |  24 +-
- default-configs/sparc64-softmmu.mak     |  25 +-
- default-configs/unicore32-softmmu.mak   |   6 +-
- default-configs/usb.mak                 |  11 -
- default-configs/virtio.mak              |  15 -
- default-configs/xtensa-softmmu.mak      |   8 +-
- default-configs/xtensaeb-softmmu.mak    |   7 +-
- docs/devel/build-system.txt             |   1 -
- docs/devel/index.rst                    |   1 +
- docs/devel/kconfig.rst                  | 306 ++++++++++++++
- hw/9pfs/Kconfig                         |   4 +
- hw/9pfs/Makefile.objs                   |   2 -
- hw/Kconfig                              |  73 ++++
- hw/Makefile.objs                        |   4 +-
- hw/acpi/Kconfig                         |  29 ++
- hw/adc/Kconfig                          |   2 +
- hw/alpha/Kconfig                        |  12 +
- hw/arm/Kconfig                          | 124 ++++++
- hw/audio/Kconfig                        |  52 +++
- hw/block/Kconfig                        |  39 ++
- hw/block/Makefile.objs                  |   3 +-
- hw/block/dataplane/Makefile.objs        |   2 +-
- hw/bt/Kconfig                           |   2 +
- hw/char/Kconfig                         |  42 ++
- hw/core/Kconfig                         |  11 +
- hw/cpu/Kconfig                          |   8 +
- hw/cris/Kconfig                         |   9 +
- hw/display/Kconfig                      | 108 +++++
- hw/display/Makefile.objs                |   4 +-
- hw/dma/Kconfig                          |  21 +
- hw/gpio/Kconfig                         |   9 +
- hw/hppa/Kconfig                         |  10 +
- hw/hyperv/Kconfig                       |   8 +
- hw/i2c/Kconfig                          |  27 ++
- hw/i2c/Makefile.objs                    |   2 +-
- hw/i386/Kconfig                         |  99 +++++
- hw/i386/Makefile.objs                   |   5 +-
- hw/ide/Kconfig                          |  54 +++
- hw/input/Kconfig                        |  33 ++
- hw/intc/Kconfig                         |  57 +++
- hw/ipack/Kconfig                        |   4 +
- hw/ipmi/Kconfig                         |  22 +
- hw/isa/Kconfig                          |  53 +++
- hw/lm32/Kconfig                         |  13 +
- hw/m68k/Kconfig                         |   9 +
- hw/mem/Kconfig                          |  11 +
- hw/microblaze/Kconfig                   |  20 +
- hw/mips/Kconfig                         |  21 +
- hw/misc/Kconfig                         | 118 ++++++
- hw/misc/macio/Kconfig                   |  11 +
- hw/moxie/Kconfig                        |   3 +
- hw/net/Kconfig                          | 125 ++++++
- hw/nios2/Kconfig                        |   8 +
- hw/nvram/Kconfig                        |   9 +
- hw/openrisc/Kconfig                     |   5 +
- hw/pci-bridge/Kconfig                   |  29 ++
- hw/pci-host/Kconfig                     |  51 +++
- hw/pci/Kconfig                          |   9 +
- hw/pci/Makefile.objs                    |   9 +-
- hw/pcmcia/Kconfig                       |   2 +
- hw/ppc/Kconfig                          | 121 ++++++
- hw/riscv/Kconfig                        |  33 ++
- hw/s390x/Kconfig                        |  11 +
- hw/s390x/Makefile.objs                  |   4 +-
- hw/scsi/Kconfig                         |  54 +++
- hw/scsi/Makefile.objs                   |   2 +-
- hw/sd/Kconfig                           |  17 +
- hw/sh4/Kconfig                          |  23 ++
- hw/smbios/Kconfig                       |   2 +
- hw/sparc/Kconfig                        |  26 ++
- hw/sparc64/Kconfig                      |  19 +
- hw/ssi/Kconfig                          |  18 +
- hw/timer/Kconfig                        |  63 +++
- hw/tpm/Kconfig                          |  24 ++
- hw/tricore/Kconfig                      |   2 +
- hw/unicore32/Kconfig                    |   5 +
- hw/usb/Kconfig                          |  91 ++++
- hw/usb/Makefile.objs                    |   2 +-
- hw/vfio/Kconfig                         |  36 ++
- hw/virtio/Kconfig                       |  31 ++
- hw/virtio/Makefile.objs                 |   2 +
- hw/watchdog/Kconfig                     |  16 +
- hw/xtensa/Kconfig                       |   8 +
- hw/xtensa/Makefile.objs                 |   2 +-
- rules.mak                               |   2 +-
- scripts/make_device_config.sh           |  30 --
- scripts/minikconf.py                    | 708 ++++++++++++++++++++++++++++++++
- 115 files changed, 3211 insertions(+), 514 deletions(-)
- create mode 100644 Kconfig.host
- delete mode 100644 default-configs/hyperv.mak
- delete mode 100644 default-configs/pci.mak
- delete mode 100644 default-configs/sound.mak
- delete mode 100644 default-configs/usb.mak
- delete mode 100644 default-configs/virtio.mak
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ docs/devel/index.rst   |   1 +
+ docs/devel/kconfig.rst | 306 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 307 insertions(+)
  create mode 100644 docs/devel/kconfig.rst
- create mode 100644 hw/9pfs/Kconfig
- create mode 100644 hw/Kconfig
- create mode 100644 hw/acpi/Kconfig
- create mode 100644 hw/adc/Kconfig
- create mode 100644 hw/alpha/Kconfig
- create mode 100644 hw/arm/Kconfig
- create mode 100644 hw/audio/Kconfig
- create mode 100644 hw/block/Kconfig
- create mode 100644 hw/bt/Kconfig
- create mode 100644 hw/char/Kconfig
- create mode 100644 hw/core/Kconfig
- create mode 100644 hw/cpu/Kconfig
- create mode 100644 hw/cris/Kconfig
- create mode 100644 hw/display/Kconfig
- create mode 100644 hw/dma/Kconfig
- create mode 100644 hw/gpio/Kconfig
- create mode 100644 hw/hppa/Kconfig
- create mode 100644 hw/hyperv/Kconfig
- create mode 100644 hw/i2c/Kconfig
- create mode 100644 hw/i386/Kconfig
- create mode 100644 hw/ide/Kconfig
- create mode 100644 hw/input/Kconfig
- create mode 100644 hw/intc/Kconfig
- create mode 100644 hw/ipack/Kconfig
- create mode 100644 hw/ipmi/Kconfig
- create mode 100644 hw/isa/Kconfig
- create mode 100644 hw/lm32/Kconfig
- create mode 100644 hw/m68k/Kconfig
- create mode 100644 hw/mem/Kconfig
- create mode 100644 hw/microblaze/Kconfig
- create mode 100644 hw/mips/Kconfig
- create mode 100644 hw/misc/Kconfig
- create mode 100644 hw/misc/macio/Kconfig
- create mode 100644 hw/moxie/Kconfig
- create mode 100644 hw/net/Kconfig
- create mode 100644 hw/nios2/Kconfig
- create mode 100644 hw/nvram/Kconfig
- create mode 100644 hw/openrisc/Kconfig
- create mode 100644 hw/pci-bridge/Kconfig
- create mode 100644 hw/pci-host/Kconfig
- create mode 100644 hw/pci/Kconfig
- create mode 100644 hw/pcmcia/Kconfig
- create mode 100644 hw/ppc/Kconfig
- create mode 100644 hw/riscv/Kconfig
- create mode 100644 hw/s390x/Kconfig
- create mode 100644 hw/scsi/Kconfig
- create mode 100644 hw/sd/Kconfig
- create mode 100644 hw/sh4/Kconfig
- create mode 100644 hw/smbios/Kconfig
- create mode 100644 hw/sparc/Kconfig
- create mode 100644 hw/sparc64/Kconfig
- create mode 100644 hw/ssi/Kconfig
- create mode 100644 hw/timer/Kconfig
- create mode 100644 hw/tpm/Kconfig
- create mode 100644 hw/tricore/Kconfig
- create mode 100644 hw/unicore32/Kconfig
- create mode 100644 hw/usb/Kconfig
- create mode 100644 hw/vfio/Kconfig
- create mode 100644 hw/virtio/Kconfig
- create mode 100644 hw/watchdog/Kconfig
- create mode 100644 hw/xtensa/Kconfig
- delete mode 100644 scripts/make_device_config.sh
- create mode 100644 scripts/minikconf.py
+
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index cd0fa6c9ba..6b11e49caa 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -13,6 +13,7 @@ Contents:
+ .. toctree::
+    :maxdepth: 2
+ 
++   kconfig
+    loads-stores
+    memory
+    migration
+diff --git a/docs/devel/kconfig.rst b/docs/devel/kconfig.rst
+new file mode 100644
+index 0000000000..cce146f87d
+--- /dev/null
++++ b/docs/devel/kconfig.rst
+@@ -0,0 +1,306 @@
++================
++QEMU and Kconfig
++================
++
++QEMU is a very versatile emulator; it can be built for a variety of
++targets, where each target can emulate various boards and at the same
++time different targets can share large amounts of code.  For example,
++a POWER and an x86 board can run the same code to emulate a PCI network
++card, even though the boards use different PCI host bridges, and they
++can run the same code to emulate a SCSI disk while using different
++SCSI adapters.  ARM, s390 and x86 boards can all present a virtio-blk
++disk to their guests, but with three different virtio guest interfaces.
++
++Each QEMU target enables a subset of the boards, devices and buses that
++are included in QEMU's source code.  As a result, each QEMU executable
++only links a small subset of the files that form QEMU's source code;
++anything that is not needed to support a particular target is culled.
++
++QEMU uses a simple domain-specific language to describe the dependencies
++between components.  This is useful for two reasons:
++
++* new targets and boards can be added without knowing in detail the
++  architecture of the hardware emulation subsystems.  Boards only have
++  to list the components they need, and the compiled executable will
++  include all the required dependencies and all the devices that the
++  user can add to that board;
++
++* users can easily build reduced versions of QEMU that support only a subset
++  of boards or devices.  For example, by default most targets will include
++  all emulated PCI devices that QEMU supports, but the build process is
++  configurable and it is easy to drop unnecessary (or otherwise unwanted)
++  code to make a leaner binary.
++
++This domain-specific language is based on the Kconfig language that
++originated in the Linux kernel, though it was heavily simplified and
++the handling of dependencies is stricter in QEMU.
++
++Unlike Linux, there is no user interface to edit the configuration, which
++is instead specified in per-target files under the ``default-configs/``
++directory of the QEMU source tree.  This is because, unlike Linux,
++configuration and dependencies can be treated as a black box when building
++QEMU; the default configuration that QEMU ships with should be okay in
++almost all cases.
++
++The Kconfig language
++--------------------
++
++Kconfig defines configurable components in files named ``hw/*/Kconfig``.
++Note that configurable components are _not_ visible in C code as preprocessor
++symbols; they are only visible in the Makefile.  Each configurable component
++defines a Makefile variable whose name starts with ``CONFIG_``.
++
++All elements have boolean (true/false) type; truth is written as ``y``, while
++falsehood is written ``n``.  They are defined in a Kconfig
++stanza like the following::
++
++      config ARM_VIRT
++         bool
++         imply PCI_DEVICES
++         imply VFIO_AMD_XGBE
++         imply VFIO_XGMAC
++         select A15MPCORE
++         select ACPI
++         select ARM_SMMUV3
++
++The ``config`` keyword introduces a new configuration element.  In the example
++above, Makefiles will have access to a variable named ``CONFIG_ARM_VIRT``,
++with value ``y`` or ``n`` (respectively for boolean true and false).
++
++Boolean expressions can be used within the language, whenever ``<expr>``
++is written in the remainder of this section.  The ``&&``, ``||`` and
++``!`` operators respectively denote conjunction (AND), disjunction (OR)
++and negation (NOT).
++
++The ``bool`` data type declaration is optional, but it is suggested to
++include it for clarity and future-proofing.  After ``bool`` the following
++directives can be included:
++
++**dependencies**: ``depends on <expr>``
++
++  This defines a dependency for this configurable element. Dependencies
++  evaluate an expression and force the value of the variable to false
++  if the expression is false.
++
++**reverse dependencies**: ``select <symbol> [if <expr>]``
++
++  While ``depends on`` can force a symbol to false, reverse dependencies can
++  be used to force another symbol to true.  In the following example,
++  ``CONFIG_BAZ`` will be true whenever ``CONFIG_FOO`` is true::
++
++    config FOO
++      select BAZ
++
++  The optional expression will prevent ``select`` from having any effect
++  unless it is true.
++
++  Note that unlike Linux's Kconfig implementation, QEMU will detect
++  contradictions between ``depends on`` and ``select`` statements and prevent
++  you from building such a configuration.
++
++**default value**: ``default <value> [if <expr>]``
++
++  Default values are assigned to the config symbol if no other value was
++  set by the user via ``default-configs/*.mak`` files, and only if
++  ``select`` or ``depends on`` directives do not force the value to true
++  or false respectively.  ``<value>`` can be ``y`` or ``n``; it cannot
++  be an arbitrary Boolean expression.  However, a condition for applying
++  the default value can be added with ``if``.
++
++  A configuration element can have any number of default values (usually,
++  if more than one default is present, they will have different
++  conditions). If multiple default values satisfy their condition,
++  only the first defined one is active.
++
++**reverse default** (weak reverse dependency): ``imply <symbol> [if <expr>]``
++
++  This is similar to ``select`` as it applies a lower limit of ``y``
++  to another symbol.  However, the lower limit is only a default
++  and the "implied" symbol's value may still be set to ``n`` from a
++  ``default-configs/*.mak`` files.  The following two examples are
++  equivalent::
++
++    config FOO
++      bool
++      imply BAZ
++
++    config BAZ
++      bool
++      default y if FOO
++
++  The next section explains where to use ``imply`` or ``default y``.
++
++Guidelines for writing Kconfig files
++------------------------------------
++
++Configurable elements in QEMU fall under five broad groups.  Each group
++declares its dependencies in different ways:
++
++**subsystems**, of which **buses** are a special case
++
++  Example::
++
++    config SCSI
++      bool
++
++  Subsystems always default to false (they have no ``default`` directive)
++  and are never visible in ``default-configs/*.mak`` files.  It's
++  up to other symbols to ``select`` whatever subsystems they require.
++
++  They sometimes have ``select`` directives to bring in other required
++  subsystems or buses.  For example, ``AUX`` (the DisplayPort auxiliary
++  channel "bus") selects ``I2C`` because it can act as an I2C master too.
++
++**devices**
++
++  Example::
++
++    config MEGASAS_SCSI_PCI
++      bool
++      default y if PCI_DEVICES
++      depends on PCI
++      select SCSI
++
++  Devices are the most complex of the five.  They can have a variety
++  of directives that cooperate so that a default configuration includes
++  all the devices that can be accessed from QEMU.
++
++  Devices *depend on* the bus that they lie on, for example a PCI
++  device would specify ``depends on PCI``.  An MMIO device will likely
++  have no ``depends on`` directive.  Devices also *select* the buses
++  that the device provides, for example a SCSI adapter would specify
++  ``select SCSI``.  Finally, devices are usually ``default y`` if and
++  only if they have at least one ``depends on``; the default could be
++  conditional on a device group.
++
++  Devices also select any optional subsystem that they use; for example
++  a video card might specify ``select EDID`` if it needs to build EDID
++  information and publish it to the guest.
++
++**device groups**
++
++  Example::
++
++    config PCI_DEVICES
++      bool
++
++  Device groups provide a convenient mechanism to enable/disable many
++  devices in one go.  This is useful when a set of devices is likely to
++  be enabled/disabled by several targets.  Device groups usually need
++  no directive and are not used in the Makefile either; they only appear
++  as conditions for ``default y`` directives.
++
++  QEMU currently has two device groups, ``PCI_DEVICES`` and
++  ``TEST_DEVICES``.  PCI devices usually have a ``default y if
++  PCI_DEVICES`` directive rather than just ``default y``.  This lets
++  some boards (notably s390) easily support a subset of PCI devices,
++  for example only VFIO (passthrough) and virtio-pci devices.
++  ``TEST_DEVICES`` instead is used for devices that are rarely used on
++  production virtual machines, but provide useful hooks to test QEMU
++  or KVM.
++
++**boards**
++
++  Example::
++
++    config SUN4M
++      bool
++      imply TCX
++      imply CG3
++      select CS4231
++      select ECCMEMCTL
++      select EMPTY_SLOT
++      select ESCC
++      select ESP
++      select FDC
++      select SLAVIO
++      select LANCE
++      select M48T59
++      select STP2000
++
++  Boards specify their constituent devices using ``imply`` and ``select``
++  directives.  A device should be listed under ``select`` if the board
++  cannot be started at all without it.  It should be listed under
++  ``imply`` if (depending on the QEMU command line) the board may or
++  may not be started without it.  Boards also default to false; they are
++  enabled by the ``default-configs/*.mak`` for the target they apply to.
++
++**internal elements**
++
++  Example::
++
++    config ECCMEMCTL
++      bool
++      select ECC
++
++  Internal elements group code that is useful in several boards or
++  devices.  They are usually enabled with ``select`` and in turn select
++  other elements; they are never visible in ``default-configs/*.mak``
++  files, and often not even in the Makefile.
++
++Writing and modifying default configurations
++--------------------------------------------
++
++In addition to the Kconfig files under hw/, each target also includes
++a file called ``default-configs/TARGETNAME-softmmu.mak``.  These files
++initialize some Kconfig variables to non-default values and provide the
++starting point to turn on devices and subsystems.
++
++A file in ``default-configs/`` looks like the following example::
++
++    # Default configuration for alpha-softmmu
++
++    # Uncomment the following lines to disable these optional devices:
++    #
++    #CONFIG_PCI_DEVICES=n
++    #CONFIG_TEST_DEVICES=n
++
++    # Boards:
++    #
++    CONFIG_DP264=y
++
++The first part, consisting of commented-out ``=n`` assignments, tells
++the user which devices or device groups are implied by the boards.
++The second part, consisting of ``=y`` assignments, tells the user which
++boards are supported by the target.  The user will typically modify
++the default configuration by uncommenting lines in the first group,
++or commenting out lines in the second group.
++
++It is also possible to run QEMU's configure script with the
++``--with-default-devices`` option.  When this is done, everything defaults
++to ``n`` unless it is ``select``ed or explicitly switched on in the
++``.mak`` files.  In other words, ``default`` and ``imply`` directives
++are disabled.  When QEMU is built with this option, the user will probably
++want to change some lines in the first group, for example like this::
++
++   CONFIG_PCI_DEVICES=y
++   #CONFIG_TEST_DEVICES=n
++
++and/or pick a subset of the devices in those device groups.  Right now
++there is no single place that lists all the optional devices for
++``CONFIG_PCI_DEVICES`` and ``CONFIG_TEST_DEVICES``.  In the future,
++we expect that ``.mak`` files will be automatically generated, so that
++they will include all these symbols and some help text on what they do.
++
++``Kconfig.host``
++----------------
++
++In some special cases, a configurable element depends on host features
++that are detected by QEMU's configure script; for example some devices
++depend on the availability of KVM or on the presence of a library on
++the host.
++
++These symbols should be listed in ``Kconfig.host`` like this::
++
++    config KVM
++      bool
++
++and also listed as follows in the top-level Makefile's ``MINIKCONF_ARGS``
++variable::
++
++    MINIKCONF_ARGS = \
++      $@ $*-config.devices.mak.d $< $(MINIKCONF_INPUTS) \
++      CONFIG_KVM=$(CONFIG_KVM) \
++      CONFIG_SPICE=$(CONFIG_SPICE) \
++      CONFIG_TPM=$(CONFIG_TPM) \
++      ...
 -- 
 2.20.1
