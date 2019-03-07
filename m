@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41655)
+Received: from eggs.gnu.org ([209.51.188.92]:41599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwa-0004LI-SH
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:13 -0500
+	(envelope-from <david@redhat.com>) id 1h1rwW-0004Jg-HJ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwZ-0008Oo-2e
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:12 -0500
+	(envelope-from <david@redhat.com>) id 1h1rwU-0008Ig-4U
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:08 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Mar 2019 13:15:21 +0100
-Message-Id: <20190307121539.12842-15-david@redhat.com>
+Date: Thu,  7 Mar 2019 13:15:18 +0100
+Message-Id: <20190307121539.12842-12-david@redhat.com>
 In-Reply-To: <20190307121539.12842-1-david@redhat.com>
 References: <20190307121539.12842-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 14/32] s390x/tcg: Implement VECTOR LOAD TO
- BLOCK BOUNDARY
+Subject: [Qemu-devel] [PATCH v3 11/32] s390x/tcg: Implement VECTOR LOAD GR
+ FROM VR ELEMENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,151 +23,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Very similar to LOAD COUNT TO BLOCK BOUNDARY, but instead of only
-calculating, the actual vector is loaded. Use a temporary vector to
-not modify the real vector on exceptions. Initialize that one to zero,
-to not leak any data. Provide a fast path if we're loading a full
-vector.
-
-As we don't have gvec ool handlers for single vectors, just calculate
-the vector address manually.
-
-We can reuse the helper later on for VECTOR LOAD WITH LENGTH. In fact,
-we are going to name it "vll" right from the beginning, because that's
-a better match.
+To avoid an helper, we have to do the actual calculation of the element
+address (offset in cpu_env + cpu_env) manually. Factor that out into
+get_vec_element_ptr_i64(). The same logic will be reused for "VECTOR
+LOAD VR ELEMENT FROM GR".
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/Makefile.objs      |  1 +
- target/s390x/helper.h           |  3 +++
  target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 25 +++++++++++++++++++
- target/s390x/vec_helper.c       | 44 +++++++++++++++++++++++++++++++++
- 5 files changed, 75 insertions(+)
- create mode 100644 target/s390x/vec_helper.c
+ target/s390x/translate_vx.inc.c | 63 +++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
 
-diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
-index 22a9a9927a..68eeee3d2f 100644
---- a/target/s390x/Makefile.objs
-+++ b/target/s390x/Makefile.objs
-@@ -1,6 +1,7 @@
- obj-y += cpu.o cpu_models.o cpu_features.o gdbstub.o interrupt.o helper.o
- obj-$(CONFIG_TCG) += translate.o cc_helper.o excp_helper.o fpu_helper.o
- obj-$(CONFIG_TCG) += int_helper.o mem_helper.o misc_helper.o crypto_helper.o
-+obj-$(CONFIG_TCG) += vec_helper.o
- obj-$(CONFIG_SOFTMMU) += machine.o ioinst.o arch_dump.o mmu_helper.o diag.o
- obj-$(CONFIG_SOFTMMU) += sigp.o
- obj-$(CONFIG_KVM) += kvm.o
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index bb659257f6..6c745ba0f6 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -124,6 +124,9 @@ DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
- DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
- DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
- 
-+/* === Vector Support Instructions === */
-+DEF_HELPER_FLAGS_4(vll, TCG_CALL_NO_WG, void, env, ptr, i64, i64)
-+
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
- DEF_HELPER_4(diag, void, env, i32, i32, i32)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index fa0f3a9003..ad8df5283c 100644
+index 782d49e1db..de811ddc47 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1002,6 +1002,8 @@
-     F(0xe704, VLLEZ,   VRX,   V,   la2, 0, 0, 0, vllez, 0, IF_VEC)
- /* VECTOR LOAD MULTIPLE */
-     F(0xe736, VLM,     VRS_a, V,   la2, 0, 0, 0, vlm, 0, IF_VEC)
-+/* VECTOR LOAD TO BLOCK BOUNDARY */
-+    F(0xe707, VLBB,    VRX,   V,   la2, 0, 0, 0, vlbb, 0, IF_VEC)
+@@ -996,6 +996,8 @@
+     E(0xe741, VLEIH,   VRI_a, V,   0, 0, 0, 0, vlei, 0, ES_16, IF_VEC)
+     E(0xe743, VLEIF,   VRI_a, V,   0, 0, 0, 0, vlei, 0, ES_32, IF_VEC)
+     E(0xe742, VLEIG,   VRI_a, V,   0, 0, 0, 0, vlei, 0, ES_64, IF_VEC)
++/* VECTOR LOAD GR FROM VR ELEMENT */
++    F(0xe721, VLGV,    VRS_c, V,   la2, 0, r1, 0, vlgv, 0, IF_VEC)
  
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index 083f5c6213..f1eb458902 100644
+index d450ce2d2b..b163100b0d 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -446,3 +446,28 @@ static DisasJumpType op_vlm(DisasContext *s, DisasOps *o)
-     tcg_temp_free_i64(t1);
+@@ -113,6 +113,28 @@ static void write_vec_element_i64(TCGv_i64 src, int reg, uint8_t enr,
+     }
+ }
+ 
++static void get_vec_element_ptr_i64(TCGv_ptr ptr, uint8_t reg, TCGv_i64 enr,
++                                    uint8_t es)
++{
++    TCGv_i64 tmp = tcg_temp_new_i64();
++
++    /* mask off invalid parts from the element nr */
++    tcg_gen_andi_i64(tmp, enr, NUM_VEC_ELEMENTS(es) - 1);
++
++    /* convert it to an element offset relative to cpu_env (vec_reg_offset() */
++    tcg_gen_shli_i64(tmp, tmp, es);
++#ifndef HOST_WORDS_BIGENDIAN
++    tcg_gen_xori_i64(tmp, tmp, 8 - NUM_VEC_ELEMENT_BYTES(es));
++#endif
++    tcg_gen_addi_i64(tmp, tmp, vec_full_reg_offset(reg));
++
++    /* generate the final ptr by adding cpu_env */
++    tcg_gen_trunc_i64_ptr(ptr, tmp);
++    tcg_gen_add_ptr(ptr, ptr, cpu_env);
++
++    tcg_temp_free_i64(tmp);
++}
++
+ #define gen_gvec_dup_i64(es, v1, c) \
+     tcg_gen_gvec_dup_i64(es, vec_full_reg_offset(v1), 16, 16, c)
+ #define gen_gvec_mov(v1, v2) \
+@@ -297,3 +319,44 @@ static DisasJumpType op_vlei(DisasContext *s, DisasOps *o)
+     tcg_temp_free_i64(tmp);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vlbb(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vlgv(DisasContext *s, DisasOps *o)
 +{
-+    const int64_t block_size = (1ull << (get_field(s->fields, m3) + 6));
-+    const int v1_offs = vec_full_reg_offset(get_field(s->fields, v1));
-+    TCGv_ptr a0;
-+    TCGv_i64 bytes;
++    const uint8_t es = get_field(s->fields, m4);
++    TCGv_ptr ptr;
 +
-+    if (get_field(s->fields, m3) > 6) {
++    if (es > ES_64) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
 +    }
 +
-+    bytes = tcg_temp_new_i64();
-+    a0 = tcg_temp_new_ptr();
-+    /* calculate the number of bytes until the next block boundary */
-+    tcg_gen_ori_i64(bytes, o->addr1, -block_size);
-+    tcg_gen_neg_i64(bytes, bytes);
++    /* fast path if we don't need the register content */
++    if (!get_field(s->fields, b2)) {
++        uint8_t enr = get_field(s->fields, d2) & (NUM_VEC_ELEMENTS(es) - 1);
 +
-+    tcg_gen_addi_ptr(a0, cpu_env, v1_offs);
-+    gen_helper_vll(cpu_env, a0, o->addr1, bytes);
-+    tcg_temp_free_i64(bytes);
-+    tcg_temp_free_ptr(a0);
-+    return DISAS_NEXT;
-+}
-diff --git a/target/s390x/vec_helper.c b/target/s390x/vec_helper.c
-new file mode 100644
-index 0000000000..5b2333a8d6
---- /dev/null
-+++ b/target/s390x/vec_helper.c
-@@ -0,0 +1,44 @@
-+/*
-+ * QEMU TCG support -- s390x vector support instructions
-+ *
-+ * Copyright (C) 2019 Red Hat Inc
-+ *
-+ * Authors:
-+ *   David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "internal.h"
-+#include "vec.h"
-+#include "tcg/tcg.h"
-+#include "exec/helper-proto.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/exec-all.h"
-+
-+void HELPER(vll)(CPUS390XState *env, void *v1, uint64_t addr, uint64_t bytes)
-+{
-+    if (likely(bytes >= 16)) {
-+        uint64_t t0, t1;
-+
-+        t0 = cpu_ldq_data_ra(env, addr, GETPC());
-+        addr = wrap_address(env, addr + 8);
-+        t1 = cpu_ldq_data_ra(env, addr, GETPC());
-+        s390_vec_write_element64(v1, 0, t0);
-+        s390_vec_write_element64(v1, 1, t1);
-+    } else {
-+        S390Vector tmp = {};
-+        int i;
-+
-+        for (i = 0; i < bytes; i++) {
-+            uint8_t byte = cpu_ldub_data_ra(env, addr, GETPC());
-+
-+            s390_vec_write_element8(&tmp, i, byte);
-+            addr = wrap_address(env, addr + 1);
-+        }
-+        *(S390Vector *)v1 = tmp;
++        read_vec_element_i64(o->out, get_field(s->fields, v3), enr, es);
++        return DISAS_NEXT;
 +    }
++
++    ptr = tcg_temp_new_ptr();
++    get_vec_element_ptr_i64(ptr, get_field(s->fields, v3), o->addr1, es);
++    switch (es) {
++    case ES_8:
++        tcg_gen_ld8u_i64(o->out, ptr, 0);
++        break;
++    case ES_16:
++        tcg_gen_ld16u_i64(o->out, ptr, 0);
++        break;
++    case ES_32:
++        tcg_gen_ld32u_i64(o->out, ptr, 0);
++        break;
++    case ES_64:
++        tcg_gen_ld_i64(o->out, ptr, 0);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    tcg_temp_free_ptr(ptr);
++
++    return DISAS_NEXT;
 +}
 -- 
 2.17.2
