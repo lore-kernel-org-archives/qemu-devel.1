@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43595)
+Received: from eggs.gnu.org ([209.51.188.92]:43936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1puQ-00036L-Tt
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:05:53 -0500
+	(envelope-from <berrange@redhat.com>) id 1h1pvk-0003ze-DY
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1puP-0006rW-Us
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:05:50 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190307093723.655-1-armbru@redhat.com>
-	<20190307093723.655-3-armbru@redhat.com>
-Date: Thu, 07 Mar 2019 11:05:41 +0100
-In-Reply-To: <20190307093723.655-3-armbru@redhat.com> (Markus Armbruster's
-	message of "Thu, 7 Mar 2019 10:37:21 +0100")
-Message-ID: <87h8cft2x6.fsf@dusky.pond.sub.org>
+	(envelope-from <berrange@redhat.com>) id 1h1pvj-0007Rs-Iq
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1pvj-0007RX-9d
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:11 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 908B2307E07A
+	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 10:07:10 +0000 (UTC)
+Date: Thu, 7 Mar 2019 10:07:05 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190307100705.GH32268@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1551893605-236413-1-git-send-email-imammedo@redhat.com>
+	<20190306181608.GL20806@redhat.com>
+	<20190306195417.02ea9a4c@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190306195417.02ea9a4c@Igors-MacBook-Pro.local>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v6 2/4] hw/block: Pad undersized
- read-only images with 0xFF
+Subject: Re: [Qemu-devel] [PATCH v2] numa: warn if numa 'mem' option or
+ default RAM splitting between nodes is used.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, philmd@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, libvir-list@redhat.com, eblake@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Wed, Mar 06, 2019 at 07:54:17PM +0100, Igor Mammedov wrote:
+> On Wed, 6 Mar 2019 18:16:08 +0000
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+>=20
+> > On Wed, Mar 06, 2019 at 06:33:25PM +0100, Igor Mammedov wrote:
+> > > Amend -numa option docs and print warnings if 'mem' option or defau=
+lt RAM
+> > > splitting between nodes is used. It's intended to discourage users =
+from using
+> > > configuration that allows only to fake NUMA on guest side while lea=
+ding
+> > > to reduced performance of the guest due to inability to properly co=
+nfigure
+> > > VM's RAM on the host.
+> > >=20
+> > > In NUMA case, it's recommended to always explicitly configure guest=
+ RAM
+> > > using -numa node,memdev=3D{backend-id} option.
+> > >=20
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > >  numa.c          |  5 +++++
+> > >  qemu-options.hx | 12 ++++++++----
+> > >  2 files changed, 13 insertions(+), 4 deletions(-)
+> > >=20
+> > > diff --git a/numa.c b/numa.c
+> > > index 3875e1e..42838f9 100644
+> > > --- a/numa.c
+> > > +++ b/numa.c
+> > > @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, N=
+umaNodeOptions *node,
+> > > =20
+> > >      if (node->has_mem) {
+> > >          numa_info[nodenr].node_mem =3D node->mem;
+> > > +        warn_report("Parameter -numa node,mem is obsolete,"
+> > > +                    " use -numa node,memdev instead");
+> >=20
+> > My comments from v1 still apply. We must not do this as long as
+> > libvirt has no choice but to continue using this feature.
+> It has a choice to use 'memdev' whenever creating a new VM and continue
+> using 'mem' with exiting VMs.
 
-> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> We reject undersized images.  As of the previous commit, even with a
-> decent error message.  Still, this is a potentially confusing
-> stumbling block when you move from using -bios to using -drive
-> if=3Dpflash,file=3Dblob,format=3Draw,readonly for loading your firmware
-> code. To mitigate that we automatically pad in the read-only case and
-> warn the user when we have performed magic to enable things to Just
-> Work (tm).
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-I think this convenience feature is a bad idea, and this patch should
-not be applied.  Here are my reasons.
-
-1. As I explained in my disccussion of v5[*], there is no single true
-   way to pad.  This patch pads with 0xFF.  When working with physical
-   devices, you'd sometimes pad that way, but at other times, you'd pad
-   differently.
-
-2. Except this patch doesn't *actually* pad with 0xFF.  The block layer
-   silently pads with zeros up to the next multiple of 512.  Evidence:
-
-    $ yes | dd of=3D4090b.img bs=3D1 count=3D4090
-    4090+0 records in
-    4090+0 records out
-    4090 bytes (4.1 kB, 4.0 KiB) copied, 0.0186459 s, 219 kB/s
-    $ qemu-io -f raw -c 'read -v 4000 96' 4090b.img
-    00000fa0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y.y.y=
-.y.y.
-    00000fb0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y.y.y=
-.y.y.
-    00000fc0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y.y.y=
-.y.y.
-    00000fd0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y.y.y=
-.y.y.
-    00000fe0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y.y.y=
-.y.y.
-    00000ff0:  79 0a 79 0a 79 0a 79 0a 79 0a 00 00 00 00 00 00  y.y.y.y.y..=
-.....
-    read 96/96 bytes at offset 4000
-    96 bytes, 1 ops; 0.0001 sec (694.444 KiB/sec and 7407.4074 ops/sec)
-
-   This patch then pads some more with 0xFF to the flash memory size.
-
-   Because of that the way the magic padding works makes no sense, to be
-   frank.  Going back to v3's zero padding would at least be explainable
-   without blushing.
-
-   I consider the block layer's padding a misfeature here, but right now
-   we got to play the hand we've been dealt.
-
-3. Convenience magic has bitten us in the posterior so many times.  Just
-   say no unless there's a really compelling use case.  Where's the use
-   case for this one?  We've rejected undersized images for ages, and
-   nobody complained.  Why add convenience magic now?
+Unfortunately we don't have such a choice. Libvirt has no concept of the
+distinction between an 'existing' and 'new' VM. It just receives an XML
+file from the mgmt application and with transient guests, we have no
+persistent configuration record of the VM. So we've no way of knowing
+whether this VM was previously running on this same host, or another
+host, or is completely new.
 
 
-[*] Message-ID: <87r2bl5oah.fsf@dusky.pond.sub.org>
-https://lists.nongnu.org/archive/html/qemu-devel/2019-03/msg01115.html
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
