@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33606)
+Received: from eggs.gnu.org ([209.51.188.92]:33836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1usS-0001ei-Gx
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1utD-0002V7-7O
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1usR-00042p-9U
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:08 -0500
-Resent-Message-Id: <E1h1usR-00042p-9U@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21148)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1usP-0003xe-EF
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:07 -0500
-Message-ID: <155197221517.8146.11938772707709440420@6acff2cf482b>
-In-Reply-To: <20190307144126.31847-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1h1utC-0004kA-Aw
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:55 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:39120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h1utC-0004jO-3V
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:54 -0500
+Received: by mail-wm1-x336.google.com with SMTP id z84so9649162wmg.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 07:24:53 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id d1sm5338345wrs.13.2019.03.07.07.24.51
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 07 Mar 2019 07:24:51 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu,  7 Mar 2019 15:24:38 +0000
+Message-Id: <20190307152450.20340-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 07:23:36 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/12] sphinx queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, david@redhat.com
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE0NDEyNi4zMTg0
-Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzE0
-NDEyNi4zMTg0Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwLzldIHRjZzogQWRkIHRjZ19nZW5fZXh0cmFjdDJfe2kzMixpNjR9Cgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
-IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
-aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkw
-MzA3MTQ0MTI2LjMxODQ3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3
-LzIwMTkwMzA3MTQ0MTI2LjMxODQ3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmE1YWI0YzI0MmIgdGFyZ2V0L2FybTogU2ltcGxp
-ZnkgQkZYSUwgZXhwYW5zaW9uCmQxZmNiOGFlY2QgdGFyZ2V0L2FybTogVXNlIGV4dHJhY3QyIGZv
-ciBFWFRSCjE5NzQxMzY0MmYgdGNnL2FhcmNoNjQ6IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJf
-e2kzMiwgaTY0fQo2NWNjMjZmY2VkIHRjZy9hcm06IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJf
-aTMyCjBmN2ZmYzUyYWQgdGNnL2kzODY6IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMiwg
-aTY0fQpmMTFmNWVkNWRhIHRjZzogVXNlIGV4dHJhY3QyIGluIHRjZ19nZW5fZGVwb3NpdF97aTMy
-LCBpNjR9CmI1MTY0MWFlOTUgdGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9zaGlmdGlfaTY0
-Cjk1MjYyMzk0OTUgdGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9CjQ4NDZkNDcw
-MjAgdGNnOiBJbXBsZW1lbnQgdGNnX2dlbl9leHRyYWN0Ml97aTMyLCBpNjR9Cgo9PT0gT1VUUFVU
-IEJFR0lOID09PQoxLzkgQ2hlY2tpbmcgY29tbWl0IDQ4NDZkNDcwMjAyYyAodGNnOiBJbXBsZW1l
-bnQgdGNnX2dlbl9leHRyYWN0Ml97aTMyLCBpNjR9KQoyLzkgQ2hlY2tpbmcgY29tbWl0IDk1MjYy
-Mzk0OTVkOSAodGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9KQpFUlJPUjogc3Bh
-Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzEwODogRklMRTogdGNnL29w
-dGltaXplLmM6MTIwNToKKyAgICAgICAgQ0FTRV9PUF8zMl82NChleHRyYWN0Mik6CiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
-OTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoz
-LzkgQ2hlY2tpbmcgY29tbWl0IGI1MTY0MWFlOTUyNSAodGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNn
-X2dlbl9zaGlmdGlfaTY0KQo0LzkgQ2hlY2tpbmcgY29tbWl0IGYxMWY1ZWQ1ZGE3ZiAodGNnOiBV
-c2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9kZXBvc2l0X3tpMzIsIGk2NH0pCjUvOSBDaGVja2luZyBj
-b21taXQgMGY3ZmZjNTJhZDFiICh0Y2cvaTM4NjogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml97
-aTMyLCBpNjR9KQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4
-RSkKIzQ4OiBGSUxFOiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0LmluYy5jOjI1OTE6CisgICAgT1BfMzJf
-NjQoZXh0cmFjdDIpOgogICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgNTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS85IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgo2LzkgQ2hlY2tpbmcgY29tbWl0IDY1Y2MyNmZjZWQ0NCAodGNnL2FybTogU3Vw
-cG9ydCBJTkRFWF9vcF9leHRyYWN0Ml9pMzIpCjcvOSBDaGVja2luZyBjb21taXQgMTk3NDEzNjQy
-ZjE5ICh0Y2cvYWFyY2g2NDogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml97aTMyLCBpNjR9KQo4
-LzkgQ2hlY2tpbmcgY29tbWl0IGQxZmNiOGFlY2QyZiAodGFyZ2V0L2FybTogVXNlIGV4dHJhY3Qy
-IGZvciBFWFRSKQo5LzkgQ2hlY2tpbmcgY29tbWl0IGE1YWI0YzI0MmJhNiAodGFyZ2V0L2FybTog
-U2ltcGxpZnkgQkZYSUwgZXhwYW5zaW9uKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDMwNzE0NDEyNi4zMTg0Ny0xLXJpY2hhcmQuaGVuZGVy
-c29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+The only difference from the v3 patchset is that I've
+changed a -d to -e in patch 10 as suggested by RTH.
+
+thanks
+-- PMM
+
+The following changes since commit 32694e98b8d7a246345448a8f707d2e11d6c65e2:
+
+  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2019-03-06 18:52:19 +0000)
+
+are available in the Git repository at:
+
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-sphinx-20190307
+
+for you to fetch changes up to c10e01b996df09f6cb4eceb2b7a9754bece927c9:
+
+  MAINTAINERS: Add entry for Sphinx documentation infrastructure (2019-03-07 14:26:47 +0000)
+
+----------------------------------------------------------------
+Enable building and installing rST docs with Sphinx
+
+----------------------------------------------------------------
+Peter Maydell (12):
+      docs/cpu-hotplug.rst: Fix rST markup issues
+      docs: Convert memory.txt to rst format
+      docs: Commit initial files from sphinx-quickstart
+      docs/conf.py: Disable unused _static directory
+      docs/conf.py: Configure the 'alabaster' theme
+      docs/conf.py: Don't include rST sources in HTML build
+      docs/conf.py: Disable option warnings
+      docs: Provide separate conf.py for each manual we want
+      Makefile, configure: Support building rST documentation
+      Makefile: Abstract out "identify the pkgversion" code
+      docs/conf.py: Don't hard-code QEMU version
+      MAINTAINERS: Add entry for Sphinx documentation infrastructure
+
+ configure                             |  15 ++-
+ Makefile                              |  78 ++++++++----
+ .gitignore                            |   1 +
+ MAINTAINERS                           |   6 +
+ docs/conf.py                          | 216 ++++++++++++++++++++++++++++++++++
+ docs/cpu-hotplug.rst                  |   2 +-
+ docs/devel/conf.py                    |  15 +++
+ docs/devel/index.rst                  |  21 ++++
+ docs/devel/{memory.txt => memory.rst} | 128 +++++++++++---------
+ docs/index.rst                        |  15 +++
+ docs/interop/conf.py                  |  15 +++
+ docs/interop/index.rst                |  18 +++
+ 12 files changed, 449 insertions(+), 81 deletions(-)
+ create mode 100644 docs/conf.py
+ create mode 100644 docs/devel/conf.py
+ create mode 100644 docs/devel/index.rst
+ rename docs/devel/{memory.txt => memory.rst} (85%)
+ create mode 100644 docs/index.rst
+ create mode 100644 docs/interop/conf.py
+ create mode 100644 docs/interop/index.rst
