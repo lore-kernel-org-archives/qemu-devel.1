@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32907)
+Received: from eggs.gnu.org ([209.51.188.92]:40792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1hbP-0001U9-3x
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:13:39 -0500
+	(envelope-from <crosa@redhat.com>) id 1h1i1V-0007P6-Pg
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1hbO-0001Vj-5P
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:13:38 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1hbL-0001V8-Qk
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:13:37 -0500
-Received: by mail-wm1-f65.google.com with SMTP id x7so7694318wmj.0
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 17:13:35 -0800 (PST)
-References: <20190306200925.17605-1-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c756da8a-2545-2349-dfa1-a2c44f21195d@redhat.com>
-Date: Thu, 7 Mar 2019 02:13:32 +0100
+	(envelope-from <crosa@redhat.com>) id 1h1i1U-0005Tu-SM
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:40:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1h1i1U-0005Sv-LH
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:40:36 -0500
+Date: Wed, 6 Mar 2019 20:40:28 -0500
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <20190307014028.hggeogcxuwldc5ms@localhost.localdomain>
+References: <20190305172139.32662-1-peter.maydell@linaro.org>
+	<20190305172139.32662-9-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190306200925.17605-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: add new netlink types
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190305172139.32662-9-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v3 08/12] docs: Provide separate conf.py
+ for each manual we want
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-On 3/6/19 9:09 PM, Laurent Vivier wrote:
-> Add QEMU_IFLA_BR_VLAN_STATS_PER_PORT (from linux v4.20),
->     QEMU_IFLA_BR_MULTI_BOOLOPT (from linux v5.0).
+On Tue, Mar 05, 2019 at 05:21:35PM +0000, Peter Maydell wrote:
+> By default Sphinx wants to build a single manual at once.
+> For QEMU, this doesn't suit us, because we want to have
+> separate manuals for "Developer's Guide", "User Manual",
+> and so on, and we don't want to ship the Developer's Guide
+> to end-users. However, we don't want to completely duplicate
+> conf.py for each manual, and we'd like to continue to
+> support "build all docs in one run" for third-party sites
+> like readthedocs.org.
 > 
-> The first new entry fixes the following error:
+> Make the top-level conf.py support two usage forms:
+>  (1) as a common config file which is included by the conf.py
+>  for each of QEMU's manuals: in this case sphinx-build is run
+>  multiple times, once per subdirectory.
+>  (2) as a top level conf file which will result in building all
+>  the manuals into a single document: in this case sphinx-build is
+>  run once, on the top-level docs directory.
 > 
->   Unknown QEMU_IFLA_BR type 45
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Provide per-manual conf.py files and top level pages for
+> our first two manuals:
+>  * QEMU Developer's Guide (docs/devel)
+>  * QEMU System Emulation Management and Interoperability Guide
+>    (docs/interop)
+>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I have the impression that this can be simplified by making use of
+"only" tags:
 
-> ---
->  linux-user/fd-trans.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
-> index 30425c9df6bc..612819c1b1ec 100644
-> --- a/linux-user/fd-trans.c
-> +++ b/linux-user/fd-trans.c
-> @@ -75,6 +75,8 @@ enum {
->      QEMU_IFLA_BR_MCAST_STATS_ENABLED,
->      QEMU_IFLA_BR_MCAST_IGMP_VERSION,
->      QEMU_IFLA_BR_MCAST_MLD_VERSION,
-> +    QEMU_IFLA_BR_VLAN_STATS_PER_PORT,
-> +    QEMU_IFLA_BR_MULTI_BOOLOPT,
->      QEMU___IFLA_BR_MAX,
->  };
->  
-> @@ -438,6 +440,7 @@ static abi_long host_to_target_data_bridge_nlattr(struct nlattr *nlattr,
->      case QEMU_IFLA_BR_MCAST_STATS_ENABLED:
->      case QEMU_IFLA_BR_MCAST_IGMP_VERSION:
->      case QEMU_IFLA_BR_MCAST_MLD_VERSION:
-> +    case QEMU_IFLA_BR_VLAN_STATS_PER_PORT:
->          break;
->      /* uint16_t */
->      case QEMU_IFLA_BR_PRIORITY:
-> @@ -543,6 +546,12 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
->      case QEMU_IFLA_BRPORT_ROOT_ID:
->      case QEMU_IFLA_BRPORT_BRIDGE_ID:
->          break;
-> +    /* br_boolopt_multi { uint32_t, uint32_t } */
-> +    case QEMU_IFLA_BR_MULTI_BOOLOPT:
-> +        u32 = NLA_DATA(nlattr);
-> +        u32[0] = tswap32(u32[0]); /* optval */
-> +        u32[1] = tswap32(u32[1]); /* optmask */
-> +        break;
->      default:
->          gemu_log("Unknown QEMU_IFLA_BRPORT type %d\n", nlattr->nla_type);
->          break;
-> 
+https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-only
+
+So, conf.py could detect if it's being run on readthedocs.org:
+
+  ON_RTD = os.environ.get('READTHEDOCS', None) == 'True'
+
+And manipulate the "tags" variable accordingly:
+
+  if ON_RTD:
+     tags.add('devel')
+     tags.add('interop')
+
+Then, on an index.rst, it could be a simple matter of:
+
+.. only:: devel
+================
+Developers Guide
+================
+.. toctree::
+   docs/devel
+
+.. only:: interop
+=============
+Interop Guide
+=============
+.. toctree::
+   docs/interop
+
+.. only:: devel and interop
+===============
+QEMU Full Guide
+===============
+.. toctree::
+   docs/devel
+   docs/interop
+
+Or some alternative layout.  Please beware that I haven't performed a
+full examination of that (or similar) approach.
+
+If that doesn't work, I'd consider having a top level "common.py",
+whose contents are imported by the various "conf.py", instead of
+exec()'d.  That I've tried, and a simple:
+
+  from common import *
+  release = 'overridden_value'
+
+Works as expected and is respected by sphinx.
+
+- Cleber.
