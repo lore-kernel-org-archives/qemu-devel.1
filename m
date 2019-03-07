@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52436)
+Received: from eggs.gnu.org ([209.51.188.92]:52412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgU-0004x9-K9
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:42 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgT-0004vk-H2
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgS-0003cl-6v
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:38 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgR-0003cE-D7
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:37 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 14:03:10 +0100
-Message-Id: <20190307130323.9353-2-armbru@redhat.com>
+Date: Thu,  7 Mar 2019 14:03:22 +0100
+Message-Id: <20190307130323.9353-14-armbru@redhat.com>
 In-Reply-To: <20190307130323.9353-1-armbru@redhat.com>
 References: <20190307130323.9353-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 01/14] pflash: Rename pflash_t to
- PFlashCFI01, PFlashCFI02
+Subject: [Qemu-devel] [PATCH v3 13/14] pflash: Clean up after commit
+ 368a354f02b, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,630 +26,448 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu
 
-flash.h's incomplete struct pflash_t is completed both in
-pflash_cfi01.c and in pflash_cfi02.c.  The complete types are
-incompatible.  This can hide type errors, such as passing a pflash_t
-created with pflash_cfi02_register() to pflash_cfi01_get_memory().
-
-Furthermore, POSIX reserves typedef names ending with _t.
-
-Rename the two structs to PFlashCFI01 and PFlashCFI02.
+QOMification left parameter @qdev unused in pflash_cfi01_register()
+and pflash_cfi02_register().  All callers pass NULL.  Remove.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/vexpress.c        |  8 ++--
- hw/block/pflash_cfi01.c  | 89 +++++++++++++++++++++-------------------
- hw/block/pflash_cfi02.c  | 71 +++++++++++++++++---------------
- hw/i386/pc_sysfw.c       |  2 +-
- hw/mips/mips_malta.c     |  2 +-
- hw/xtensa/xtfpga.c       | 10 ++---
- include/hw/block/flash.h | 53 ++++++++++++++----------
- 7 files changed, 125 insertions(+), 110 deletions(-)
+ hw/arm/collie.c                          | 4 ++--
+ hw/arm/digic_boards.c                    | 2 +-
+ hw/arm/gumstix.c                         | 4 ++--
+ hw/arm/mainstone.c                       | 2 +-
+ hw/arm/musicpal.c                        | 4 ++--
+ hw/arm/omap_sx1.c                        | 4 ++--
+ hw/arm/versatilepb.c                     | 2 +-
+ hw/arm/xilinx_zynq.c                     | 2 +-
+ hw/arm/z2.c                              | 3 +--
+ hw/block/pflash_cfi01.c                  | 2 +-
+ hw/block/pflash_cfi02.c                  | 2 +-
+ hw/i386/pc_sysfw.c                       | 2 +-
+ hw/lm32/lm32_boards.c                    | 4 ++--
+ hw/lm32/milkymist.c                      | 2 +-
+ hw/microblaze/petalogix_ml605_mmu.c      | 3 +--
+ hw/microblaze/petalogix_s3adsp1800_mmu.c | 2 +-
+ hw/mips/mips_malta.c                     | 2 +-
+ hw/mips/mips_r4k.c                       | 2 +-
+ hw/ppc/ppc405_boards.c                   | 6 +++---
+ hw/ppc/sam460ex.c                        | 2 +-
+ hw/ppc/virtex_ml507.c                    | 2 +-
+ hw/sh4/r2d.c                             | 2 +-
+ include/hw/block/flash.h                 | 4 ++--
+ 23 files changed, 31 insertions(+), 33 deletions(-)
 
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index c02d18ee61..ed46d2e730 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -512,8 +512,8 @@ static void vexpress_modify_dtb(const struct arm_boot=
-_info *info, void *fdt)
- /* Open code a private version of pflash registration since we
-  * need to set non-default device width for VExpress platform.
-  */
--static pflash_t *ve_pflash_cfi01_register(hwaddr base, const char *name,
--                                          DriveInfo *di)
-+static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *na=
-me,
-+                                             DriveInfo *di)
- {
-     DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
+diff --git a/hw/arm/collie.c b/hw/arm/collie.c
+index 48b732c176..cbc4400f8e 100644
+--- a/hw/arm/collie.c
++++ b/hw/arm/collie.c
+@@ -36,12 +36,12 @@ static void collie_init(MachineState *machine)
+     s =3D sa1110_init(sysmem, collie_binfo.ram_size, machine->cpu_type);
 =20
-@@ -536,7 +536,7 @@ static pflash_t *ve_pflash_cfi01_register(hwaddr base=
-, const char *name,
-     qdev_init_nofail(dev);
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+-    pflash_cfi01_register(SA_CS0, NULL, "collie.fl1", 0x02000000,
++    pflash_cfi01_register(SA_CS0, "collie.fl1", 0x02000000,
+                     dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                     (64 * 1024), 512, 4, 0x00, 0x00, 0x00, 0x00, 0);
 =20
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
--    return OBJECT_CHECK(pflash_t, (dev), "cfi.pflash01");
-+    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
- }
+     dinfo =3D drive_get(IF_PFLASH, 0, 1);
+-    pflash_cfi01_register(SA_CS1, NULL, "collie.fl2", 0x02000000,
++    pflash_cfi01_register(SA_CS1, "collie.fl2", 0x02000000,
+                     dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                     (64 * 1024), 512, 4, 0x00, 0x00, 0x00, 0x00, 0);
 =20
- static void vexpress_common_init(MachineState *machine)
-@@ -548,7 +548,7 @@ static void vexpress_common_init(MachineState *machin=
-e)
-     qemu_irq pic[64];
-     uint32_t sys_id;
-     DriveInfo *dinfo;
--    pflash_t *pflash0;
-+    PFlashCFI01 *pflash0;
-     I2CBus *i2c;
-     ram_addr_t vram_size, sram_size;
-     MemoryRegion *sysmem =3D get_system_memory();
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index bffb4c40e7..a51ac9f399 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -65,12 +65,13 @@ do {                                                 =
-       \
- #define DPRINTF(fmt, ...) do { } while (0)
+diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
+index 9f11dcd11f..15a00a1be3 100644
+--- a/hw/arm/digic_boards.c
++++ b/hw/arm/digic_boards.c
+@@ -129,7 +129,7 @@ static void digic4_add_k8p3215uqb_rom(DigicBoardState=
+ *s, hwaddr addr,
+ #define FLASH_K8P3215UQB_SIZE (4 * 1024 * 1024)
+ #define FLASH_K8P3215UQB_SECTOR_SIZE (64 * 1024)
+=20
+-    pflash_cfi02_register(addr, NULL, "pflash", FLASH_K8P3215UQB_SIZE,
++    pflash_cfi02_register(addr, "pflash", FLASH_K8P3215UQB_SIZE,
+                           NULL, FLASH_K8P3215UQB_SECTOR_SIZE,
+                           FLASH_K8P3215UQB_SIZE / FLASH_K8P3215UQB_SECTO=
+R_SIZE,
+                           DIGIC4_ROM_MAX_SIZE / FLASH_K8P3215UQB_SIZE,
+diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+index 56cb763c4e..304dbeab2f 100644
+--- a/hw/arm/gumstix.c
++++ b/hw/arm/gumstix.c
+@@ -72,7 +72,7 @@ static void connex_init(MachineState *machine)
+ #else
+     be =3D 0;
+ #endif
+-    if (!pflash_cfi01_register(0x00000000, NULL, "connext.rom", connex_r=
+om,
++    if (!pflash_cfi01_register(0x00000000, "connext.rom", connex_rom,
+                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
+,
+                                sector_len, connex_rom / sector_len,
+                                2, 0, 0, 0, 0, be)) {
+@@ -109,7 +109,7 @@ static void verdex_init(MachineState *machine)
+ #else
+     be =3D 0;
+ #endif
+-    if (!pflash_cfi01_register(0x00000000, NULL, "verdex.rom", verdex_ro=
+m,
++    if (!pflash_cfi01_register(0x00000000, "verdex.rom", verdex_rom,
+                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
+,
+                                sector_len, verdex_rom / sector_len,
+                                2, 0, 0, 0, 0, be)) {
+diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
+index 0beb5c426b..2a1c1072db 100644
+--- a/hw/arm/mainstone.c
++++ b/hw/arm/mainstone.c
+@@ -148,7 +148,7 @@ static void mainstone_common_init(MemoryRegion *addre=
+ss_space_mem,
+             exit(1);
+         }
+=20
+-        if (!pflash_cfi01_register(mainstone_flash_base[i], NULL,
++        if (!pflash_cfi01_register(mainstone_flash_base[i],
+                                    i ? "mainstone.flash1" : "mainstone.f=
+lash0",
+                                    MAINSTONE_FLASH,
+                                    blk_by_legacy_dinfo(dinfo),
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index d22532a11c..cc780dfb37 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -1636,14 +1636,14 @@ static void musicpal_init(MachineState *machine)
+          * image is smaller than 32 MB.
+          */
+ #ifdef TARGET_WORDS_BIGENDIAN
+-        pflash_cfi02_register(0x100000000ULL-MP_FLASH_SIZE_MAX, NULL,
++        pflash_cfi02_register(0x100000000ULL - MP_FLASH_SIZE_MAX,
+                               "musicpal.flash", flash_size,
+                               blk, 0x10000, (flash_size + 0xffff) >> 16,
+                               MP_FLASH_SIZE_MAX / flash_size,
+                               2, 0x00BF, 0x236D, 0x0000, 0x0000,
+                               0x5555, 0x2AAA, 1);
+ #else
+-        pflash_cfi02_register(0x100000000ULL-MP_FLASH_SIZE_MAX, NULL,
++        pflash_cfi02_register(0x100000000ULL - MP_FLASH_SIZE_MAX,
+                               "musicpal.flash", flash_size,
+                               blk, 0x10000, (flash_size + 0xffff) >> 16,
+                               MP_FLASH_SIZE_MAX / flash_size,
+diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
+index 84550f0236..b1128777cf 100644
+--- a/hw/arm/omap_sx1.c
++++ b/hw/arm/omap_sx1.c
+@@ -152,7 +152,7 @@ static void sx1_init(MachineState *machine, const int=
+ version)
  #endif
 =20
--#define CFI_PFLASH01(obj) OBJECT_CHECK(pflash_t, (obj), TYPE_CFI_PFLASH0=
-1)
-+#define CFI_PFLASH01(obj) \
-+    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
-=20
- #define PFLASH_BE          0
- #define PFLASH_SECURE      1
-=20
--struct pflash_t {
-+struct PFlashCFI01 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-     /*< public >*/
-@@ -109,17 +110,17 @@ static const VMStateDescription vmstate_pflash =3D =
-{
-     .minimum_version_id =3D 1,
-     .post_load =3D pflash_post_load,
-     .fields =3D (VMStateField[]) {
--        VMSTATE_UINT8(wcycle, pflash_t),
--        VMSTATE_UINT8(cmd, pflash_t),
--        VMSTATE_UINT8(status, pflash_t),
--        VMSTATE_UINT64(counter, pflash_t),
-+        VMSTATE_UINT8(wcycle, PFlashCFI01),
-+        VMSTATE_UINT8(cmd, PFlashCFI01),
-+        VMSTATE_UINT8(status, PFlashCFI01),
-+        VMSTATE_UINT64(counter, PFlashCFI01),
-         VMSTATE_END_OF_LIST()
-     }
- };
-=20
- static void pflash_timer (void *opaque)
- {
--    pflash_t *pfl =3D opaque;
-+    PFlashCFI01 *pfl =3D opaque;
-=20
-     trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
-@@ -133,7 +134,7 @@ static void pflash_timer (void *opaque)
-  * If this code is called we know we have a device_width set for
-  * this flash.
-  */
--static uint32_t pflash_cfi_query(pflash_t *pfl, hwaddr offset)
-+static uint32_t pflash_cfi_query(PFlashCFI01 *pfl, hwaddr offset)
- {
-     int i;
-     uint32_t resp =3D 0;
-@@ -193,7 +194,7 @@ static uint32_t pflash_cfi_query(pflash_t *pfl, hwadd=
-r offset)
-=20
-=20
- /* Perform a device id query based on the bank width of the flash. */
--static uint32_t pflash_devid_query(pflash_t *pfl, hwaddr offset)
-+static uint32_t pflash_devid_query(PFlashCFI01 *pfl, hwaddr offset)
- {
-     int i;
-     uint32_t resp;
-@@ -241,7 +242,7 @@ static uint32_t pflash_devid_query(pflash_t *pfl, hwa=
-ddr offset)
-     return resp;
- }
-=20
--static uint32_t pflash_data_read(pflash_t *pfl, hwaddr offset,
-+static uint32_t pflash_data_read(PFlashCFI01 *pfl, hwaddr offset,
-                                  int width, int be)
- {
-     uint8_t *p;
-@@ -284,8 +285,8 @@ static uint32_t pflash_data_read(pflash_t *pfl, hwadd=
-r offset,
-     return ret;
- }
-=20
--static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
--                             int width, int be)
-+static uint32_t pflash_read(PFlashCFI01 *pfl, hwaddr offset,
-+                            int width, int be)
- {
-     hwaddr boff;
-     uint32_t ret;
-@@ -398,7 +399,7 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr of=
-fset,
- }
-=20
- /* update flash content on disk */
--static void pflash_update(pflash_t *pfl, int offset,
-+static void pflash_update(PFlashCFI01 *pfl, int offset,
-                           int size)
- {
-     int offset_end;
-@@ -412,7 +413,7 @@ static void pflash_update(pflash_t *pfl, int offset,
-     }
- }
-=20
--static inline void pflash_data_write(pflash_t *pfl, hwaddr offset,
-+static inline void pflash_data_write(PFlashCFI01 *pfl, hwaddr offset,
-                                      uint32_t value, int width, int be)
- {
-     uint8_t *p =3D pfl->storage;
-@@ -448,7 +449,7 @@ static inline void pflash_data_write(pflash_t *pfl, h=
-waddr offset,
-=20
- }
-=20
--static void pflash_write(pflash_t *pfl, hwaddr offset,
-+static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
-                          uint32_t value, int width, int be)
- {
-     uint8_t *p;
-@@ -654,7 +655,7 @@ static void pflash_write(pflash_t *pfl, hwaddr offset=
+     if ((dinfo =3D drive_get(IF_PFLASH, 0, fl_idx)) !=3D NULL) {
+-        if (!pflash_cfi01_register(OMAP_CS0_BASE, NULL,
++        if (!pflash_cfi01_register(OMAP_CS0_BASE,
+                                    "omap_sx1.flash0-1", flash_size,
+                                    blk_by_legacy_dinfo(dinfo),
+                                    sector_size, flash_size / sector_size=
 ,
- static MemTxResult pflash_mem_read_with_attrs(void *opaque, hwaddr addr,=
- uint64_t *value,
-                                               unsigned len, MemTxAttrs a=
-ttrs)
- {
--    pflash_t *pfl =3D opaque;
-+    PFlashCFI01 *pfl =3D opaque;
-     bool be =3D !!(pfl->features & (1 << PFLASH_BE));
+@@ -176,7 +176,7 @@ static void sx1_init(MachineState *machine, const int=
+ version)
+         memory_region_add_subregion(address_space,
+                                 OMAP_CS1_BASE + flash1_size, &cs[1]);
 =20
-     if ((pfl->features & (1 << PFLASH_SECURE)) && !attrs.secure) {
-@@ -668,7 +669,7 @@ static MemTxResult pflash_mem_read_with_attrs(void *o=
-paque, hwaddr addr, uint64_
- static MemTxResult pflash_mem_write_with_attrs(void *opaque, hwaddr addr=
-, uint64_t value,
-                                                unsigned len, MemTxAttrs =
-attrs)
- {
--    pflash_t *pfl =3D opaque;
-+    PFlashCFI01 *pfl =3D opaque;
-     bool be =3D !!(pfl->features & (1 << PFLASH_BE));
+-        if (!pflash_cfi01_register(OMAP_CS1_BASE, NULL,
++        if (!pflash_cfi01_register(OMAP_CS1_BASE,
+                                    "omap_sx1.flash1-1", flash1_size,
+                                    blk_by_legacy_dinfo(dinfo),
+                                    sector_size, flash1_size / sector_siz=
+e,
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index 22b09a1e61..82c5277462 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -365,7 +365,7 @@ static void versatile_init(MachineState *machine, int=
+ board_id)
+     /* 0x34000000 NOR Flash */
 =20
-     if ((pfl->features & (1 << PFLASH_SECURE)) && !attrs.secure) {
-@@ -687,7 +688,7 @@ static const MemoryRegionOps pflash_cfi01_ops =3D {
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+-    if (!pflash_cfi01_register(VERSATILE_FLASH_ADDR, NULL, "versatile.fl=
+ash",
++    if (!pflash_cfi01_register(VERSATILE_FLASH_ADDR, "versatile.flash",
+                           VERSATILE_FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           VERSATILE_FLASH_SECT_SIZE,
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 57497b0c4d..1fa4a77728 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -205,7 +205,7 @@ static void zynq_init(MachineState *machine)
+     DriveInfo *dinfo =3D drive_get(IF_PFLASH, 0, 0);
 =20
- static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
- {
--    pflash_t *pfl =3D CFI_PFLASH01(dev);
-+    PFlashCFI01 *pfl =3D CFI_PFLASH01(dev);
-     uint64_t total_len;
-     int ret;
-     uint64_t blocks_per_device, sector_len_per_device, device_len;
-@@ -864,14 +865,14 @@ static void pflash_cfi01_realize(DeviceState *dev, =
-Error **errp)
- }
+     /* AMD */
+-    pflash_cfi02_register(0xe2000000, NULL, "zynq.pflash", FLASH_SIZE,
++    pflash_cfi02_register(0xe2000000, "zynq.pflash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           FLASH_SECTOR_SIZE,
+                           FLASH_SIZE/FLASH_SECTOR_SIZE, 1,
+diff --git a/hw/arm/z2.c b/hw/arm/z2.c
+index 6f18d924df..f8081b2a10 100644
+--- a/hw/arm/z2.c
++++ b/hw/arm/z2.c
+@@ -324,8 +324,7 @@ static void z2_init(MachineState *machine)
+         exit(1);
+     }
 =20
- static Property pflash_cfi01_properties[] =3D {
--    DEFINE_PROP_DRIVE("drive", struct pflash_t, blk),
-+    DEFINE_PROP_DRIVE("drive", PFlashCFI01, blk),
-     /* num-blocks is the number of blocks actually visible to the guest,
-      * ie the total size of the device divided by the sector length.
-      * If we're emulating flash devices wired in parallel the actual
-      * number of blocks per indvidual device will differ.
-      */
--    DEFINE_PROP_UINT32("num-blocks", struct pflash_t, nb_blocs, 0),
--    DEFINE_PROP_UINT64("sector-length", struct pflash_t, sector_len, 0),
-+    DEFINE_PROP_UINT32("num-blocks", PFlashCFI01, nb_blocs, 0),
-+    DEFINE_PROP_UINT64("sector-length", PFlashCFI01, sector_len, 0),
-     /* width here is the overall width of this QEMU device in bytes.
-      * The QEMU device may be emulating a number of flash devices
-      * wired up in parallel; the width of each individual flash
-@@ -888,17 +889,17 @@ static Property pflash_cfi01_properties[] =3D {
-      * 16 bit devices making up a 32 bit wide QEMU device. This
-      * is deprecated for new uses of this device.
-      */
--    DEFINE_PROP_UINT8("width", struct pflash_t, bank_width, 0),
--    DEFINE_PROP_UINT8("device-width", struct pflash_t, device_width, 0),
--    DEFINE_PROP_UINT8("max-device-width", struct pflash_t, max_device_wi=
-dth, 0),
--    DEFINE_PROP_BIT("big-endian", struct pflash_t, features, PFLASH_BE, =
-0),
--    DEFINE_PROP_BIT("secure", struct pflash_t, features, PFLASH_SECURE, =
-0),
--    DEFINE_PROP_UINT16("id0", struct pflash_t, ident0, 0),
--    DEFINE_PROP_UINT16("id1", struct pflash_t, ident1, 0),
--    DEFINE_PROP_UINT16("id2", struct pflash_t, ident2, 0),
--    DEFINE_PROP_UINT16("id3", struct pflash_t, ident3, 0),
--    DEFINE_PROP_STRING("name", struct pflash_t, name),
--    DEFINE_PROP_BOOL("old-multiple-chip-handling", struct pflash_t,
-+    DEFINE_PROP_UINT8("width", PFlashCFI01, bank_width, 0),
-+    DEFINE_PROP_UINT8("device-width", PFlashCFI01, device_width, 0),
-+    DEFINE_PROP_UINT8("max-device-width", PFlashCFI01, max_device_width,=
- 0),
-+    DEFINE_PROP_BIT("big-endian", PFlashCFI01, features, PFLASH_BE, 0),
-+    DEFINE_PROP_BIT("secure", PFlashCFI01, features, PFLASH_SECURE, 0),
-+    DEFINE_PROP_UINT16("id0", PFlashCFI01, ident0, 0),
-+    DEFINE_PROP_UINT16("id1", PFlashCFI01, ident1, 0),
-+    DEFINE_PROP_UINT16("id2", PFlashCFI01, ident2, 0),
-+    DEFINE_PROP_UINT16("id3", PFlashCFI01, ident3, 0),
-+    DEFINE_PROP_STRING("name", PFlashCFI01, name),
-+    DEFINE_PROP_BOOL("old-multiple-chip-handling", PFlashCFI01,
-                      old_multiple_chip_handling, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -917,7 +918,7 @@ static void pflash_cfi01_class_init(ObjectClass *klas=
-s, void *data)
- static const TypeInfo pflash_cfi01_info =3D {
-     .name           =3D TYPE_CFI_PFLASH01,
-     .parent         =3D TYPE_SYS_BUS_DEVICE,
--    .instance_size  =3D sizeof(struct pflash_t),
-+    .instance_size  =3D sizeof(PFlashCFI01),
-     .class_init     =3D pflash_cfi01_class_init,
- };
-=20
-@@ -928,13 +929,15 @@ static void pflash_cfi01_register_types(void)
-=20
+-    if (!pflash_cfi01_register(Z2_FLASH_BASE,
+-                               NULL, "z2.flash0", Z2_FLASH_SIZE,
++    if (!pflash_cfi01_register(Z2_FLASH_BASE, "z2.flash0", Z2_FLASH_SIZE=
+,
+                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
+,
+                                sector_len, Z2_FLASH_SIZE / sector_len,
+                                4, 0, 0, 0, 0, be)) {
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 1c99aa6e4a..bd42487c0a 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -937,7 +937,7 @@ static void pflash_cfi01_register_types(void)
  type_init(pflash_cfi01_register_types)
 =20
--pflash_t *pflash_cfi01_register(hwaddr base,
--                                DeviceState *qdev, const char *name,
--                                hwaddr size,
--                                BlockBackend *blk,
--                                uint32_t sector_len, int nb_blocs,
--                                int bank_width, uint16_t id0, uint16_t i=
-d1,
--                                uint16_t id2, uint16_t id3, int be)
-+PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-+                                   DeviceState *qdev, const char *name,
-+                                   hwaddr size,
-+                                   BlockBackend *blk,
-+                                   uint32_t sector_len, int nb_blocs,
-+                                   int bank_width,
-+                                   uint16_t id0, uint16_t id1,
-+                                   uint16_t id2, uint16_t id3,
-+                                   int be)
- {
-     DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH01);
-=20
-@@ -956,14 +959,14 @@ pflash_t *pflash_cfi01_register(hwaddr base,
-     return CFI_PFLASH01(dev);
- }
-=20
--MemoryRegion *pflash_cfi01_get_memory(pflash_t *fl)
-+MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
- {
-     return &fl->mem;
- }
-=20
- static void postload_update_cb(void *opaque, int running, RunState state=
-)
- {
--    pflash_t *pfl =3D opaque;
-+    PFlashCFI01 *pfl =3D opaque;
-=20
-     /* This is called after bdrv_invalidate_cache_all.  */
-     qemu_del_vm_change_state_handler(pfl->vmstate);
-@@ -975,7 +978,7 @@ static void postload_update_cb(void *opaque, int runn=
-ing, RunState state)
-=20
- static int pflash_post_load(void *opaque, int version_id)
- {
--    pflash_t *pfl =3D opaque;
-+    PFlashCFI01 *pfl =3D opaque;
-=20
-     if (!pfl->ro) {
-         pfl->vmstate =3D qemu_add_vm_change_state_handler(postload_updat=
-e_cb,
+ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
+-                                   DeviceState *qdev, const char *name,
++                                   const char *name,
+                                    hwaddr size,
+                                    BlockBackend *blk,
+                                    uint32_t sector_len, int nb_blocs,
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 0f8b7b8c7b..9f8486e4cf 100644
+index 5ef40154b9..c261ebff72 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -57,9 +57,10 @@ do {                                                  =
-     \
-=20
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
-=20
--#define CFI_PFLASH02(obj) OBJECT_CHECK(pflash_t, (obj), TYPE_CFI_PFLASH0=
-2)
-+#define CFI_PFLASH02(obj) \
-+    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
-=20
--struct pflash_t {
-+struct PFlashCFI02 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-     /*< public >*/
-@@ -101,7 +102,7 @@ struct pflash_t {
- /*
-  * Set up replicated mappings of the same region.
-  */
--static void pflash_setup_mappings(pflash_t *pfl)
-+static void pflash_setup_mappings(PFlashCFI02 *pfl)
- {
-     unsigned i;
-     hwaddr size =3D memory_region_size(&pfl->orig_mem);
-@@ -115,7 +116,7 @@ static void pflash_setup_mappings(pflash_t *pfl)
-     }
- }
-=20
--static void pflash_register_memory(pflash_t *pfl, int rom_mode)
-+static void pflash_register_memory(PFlashCFI02 *pfl, int rom_mode)
- {
-     memory_region_rom_device_set_romd(&pfl->orig_mem, rom_mode);
-     pfl->rom_mode =3D rom_mode;
-@@ -123,7 +124,7 @@ static void pflash_register_memory(pflash_t *pfl, int=
- rom_mode)
-=20
- static void pflash_timer (void *opaque)
- {
--    pflash_t *pfl =3D opaque;
-+    PFlashCFI02 *pfl =3D opaque;
-=20
-     trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
-@@ -137,8 +138,8 @@ static void pflash_timer (void *opaque)
-     pfl->cmd =3D 0;
- }
-=20
--static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
--                             int width, int be)
-+static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
-+                            int width, int be)
- {
-     hwaddr boff;
-     uint32_t ret;
-@@ -246,7 +247,7 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr of=
-fset,
- }
-=20
- /* update flash content on disk */
--static void pflash_update(pflash_t *pfl, int offset,
-+static void pflash_update(PFlashCFI02 *pfl, int offset,
-                           int size)
- {
-     int offset_end;
-@@ -260,8 +261,8 @@ static void pflash_update(pflash_t *pfl, int offset,
-     }
- }
-=20
--static void pflash_write (pflash_t *pfl, hwaddr offset,
--                          uint32_t value, int width, int be)
-+static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-+                         uint32_t value, int width, int be)
- {
-     hwaddr boff;
-     uint8_t *p;
-@@ -533,7 +534,7 @@ static const MemoryRegionOps pflash_cfi02_ops_le =3D =
-{
-=20
- static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- {
--    pflash_t *pfl =3D CFI_PFLASH02(dev);
-+    PFlashCFI02 *pfl =3D CFI_PFLASH02(dev);
-     uint32_t chip_len;
-     int ret;
-     Error *local_err =3D NULL;
-@@ -679,19 +680,19 @@ static void pflash_cfi02_realize(DeviceState *dev, =
-Error **errp)
- }
-=20
- static Property pflash_cfi02_properties[] =3D {
--    DEFINE_PROP_DRIVE("drive", struct pflash_t, blk),
--    DEFINE_PROP_UINT32("num-blocks", struct pflash_t, nb_blocs, 0),
--    DEFINE_PROP_UINT32("sector-length", struct pflash_t, sector_len, 0),
--    DEFINE_PROP_UINT8("width", struct pflash_t, width, 0),
--    DEFINE_PROP_UINT8("mappings", struct pflash_t, mappings, 0),
--    DEFINE_PROP_UINT8("big-endian", struct pflash_t, be, 0),
--    DEFINE_PROP_UINT16("id0", struct pflash_t, ident0, 0),
--    DEFINE_PROP_UINT16("id1", struct pflash_t, ident1, 0),
--    DEFINE_PROP_UINT16("id2", struct pflash_t, ident2, 0),
--    DEFINE_PROP_UINT16("id3", struct pflash_t, ident3, 0),
--    DEFINE_PROP_UINT16("unlock-addr0", struct pflash_t, unlock_addr0, 0)=
-,
--    DEFINE_PROP_UINT16("unlock-addr1", struct pflash_t, unlock_addr1, 0)=
-,
--    DEFINE_PROP_STRING("name", struct pflash_t, name),
-+    DEFINE_PROP_DRIVE("drive", PFlashCFI02, blk),
-+    DEFINE_PROP_UINT32("num-blocks", PFlashCFI02, nb_blocs, 0),
-+    DEFINE_PROP_UINT32("sector-length", PFlashCFI02, sector_len, 0),
-+    DEFINE_PROP_UINT8("width", PFlashCFI02, width, 0),
-+    DEFINE_PROP_UINT8("mappings", PFlashCFI02, mappings, 0),
-+    DEFINE_PROP_UINT8("big-endian", PFlashCFI02, be, 0),
-+    DEFINE_PROP_UINT16("id0", PFlashCFI02, ident0, 0),
-+    DEFINE_PROP_UINT16("id1", PFlashCFI02, ident1, 0),
-+    DEFINE_PROP_UINT16("id2", PFlashCFI02, ident2, 0),
-+    DEFINE_PROP_UINT16("id3", PFlashCFI02, ident3, 0),
-+    DEFINE_PROP_UINT16("unlock-addr0", PFlashCFI02, unlock_addr0, 0),
-+    DEFINE_PROP_UINT16("unlock-addr1", PFlashCFI02, unlock_addr1, 0),
-+    DEFINE_PROP_STRING("name", PFlashCFI02, name),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
-@@ -707,7 +708,7 @@ static void pflash_cfi02_class_init(ObjectClass *klas=
-s, void *data)
- static const TypeInfo pflash_cfi02_info =3D {
-     .name           =3D TYPE_CFI_PFLASH02,
-     .parent         =3D TYPE_SYS_BUS_DEVICE,
--    .instance_size  =3D sizeof(struct pflash_t),
-+    .instance_size  =3D sizeof(PFlashCFI02),
-     .class_init     =3D pflash_cfi02_class_init,
- };
-=20
-@@ -718,15 +719,17 @@ static void pflash_cfi02_register_types(void)
-=20
+@@ -717,7 +717,7 @@ static void pflash_cfi02_register_types(void)
  type_init(pflash_cfi02_register_types)
 =20
--pflash_t *pflash_cfi02_register(hwaddr base,
--                                DeviceState *qdev, const char *name,
--                                hwaddr size,
--                                BlockBackend *blk, uint32_t sector_len,
--                                int nb_blocs, int nb_mappings, int width=
-,
--                                uint16_t id0, uint16_t id1,
--                                uint16_t id2, uint16_t id3,
--                                uint16_t unlock_addr0, uint16_t unlock_a=
-ddr1,
--                                int be)
-+PFlashCFI02 *pflash_cfi02_register(hwaddr base,
-+                                   DeviceState *qdev, const char *name,
-+                                   hwaddr size,
-+                                   BlockBackend *blk,
-+                                   uint32_t sector_len, int nb_blocs,
-+                                   int nb_mappings, int width,
-+                                   uint16_t id0, uint16_t id1,
-+                                   uint16_t id2, uint16_t id3,
-+                                   uint16_t unlock_addr0,
-+                                   uint16_t unlock_addr1,
-+                                   int be)
- {
-     DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH02);
-=20
+ PFlashCFI02 *pflash_cfi02_register(hwaddr base,
+-                                   DeviceState *qdev, const char *name,
++                                   const char *name,
+                                    hwaddr size,
+                                    BlockBackend *blk,
+                                    uint32_t sector_len, int nb_blocs,
 diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 091e22dd60..67e55342f6 100644
+index 67e55342f6..9a5be54a85 100644
 --- a/hw/i386/pc_sysfw.c
 +++ b/hw/i386/pc_sysfw.c
-@@ -111,7 +111,7 @@ static void pc_system_flash_init(MemoryRegion *rom_me=
+@@ -160,7 +160,7 @@ static void pc_system_flash_init(MemoryRegion *rom_me=
 mory)
-     char *fatal_errmsg =3D NULL;
-     hwaddr phys_addr =3D 0x100000000ULL;
-     int sector_bits, sector_size;
--    pflash_t *system_flash;
-+    PFlashCFI01 *system_flash;
-     MemoryRegion *flash_mem;
-     char name[64];
-     void *flash_ptr;
+=20
+         /* pflash_cfi01_register() creates a deep copy of the name */
+         snprintf(name, sizeof name, "system.flash%d", unit);
+-        system_flash =3D pflash_cfi01_register(phys_addr, NULL /* qdev *=
+/, name,
++        system_flash =3D pflash_cfi01_register(phys_addr, name,
+                                              size, blk, sector_size,
+                                              size >> sector_bits,
+                                              1      /* width */,
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index 05157f8eab..f726355309 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -114,7 +114,7 @@ static void lm32_evr_init(MachineState *machine)
+=20
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     /* Spansion S29NS128P */
+-    pflash_cfi02_register(flash_base, NULL, "lm32_evr.flash", flash_size=
+,
++    pflash_cfi02_register(flash_base, "lm32_evr.flash", flash_size,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           flash_sector_size, flash_size / flash_sector_s=
+ize,
+                           1, 2, 0x01, 0x7e, 0x43, 0x00, 0x555, 0x2aa, 1)=
+;
+@@ -207,7 +207,7 @@ static void lm32_uclinux_init(MachineState *machine)
+=20
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     /* Spansion S29NS128P */
+-    pflash_cfi02_register(flash_base, NULL, "lm32_uclinux.flash", flash_=
+size,
++    pflash_cfi02_register(flash_base, "lm32_uclinux.flash", flash_size,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           flash_sector_size, flash_size / flash_sector_s=
+ize,
+                           1, 2, 0x01, 0x7e, 0x43, 0x00, 0x555, 0x2aa, 1)=
+;
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index b080cf1ca9..ece7e3b699 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -121,7 +121,7 @@ milkymist_init(MachineState *machine)
+=20
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     /* Numonyx JS28F256J3F105 */
+-    pflash_cfi01_register(flash_base, NULL, "milkymist.flash", flash_siz=
+e,
++    pflash_cfi01_register(flash_base, "milkymist.flash", flash_size,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           flash_sector_size, flash_size / flash_sector_s=
+ize,
+                           2, 0x00, 0x89, 0x00, 0x1d, 1);
+diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogi=
+x_ml605_mmu.c
+index c730878d25..74bcc14cda 100644
+--- a/hw/microblaze/petalogix_ml605_mmu.c
++++ b/hw/microblaze/petalogix_ml605_mmu.c
+@@ -107,8 +107,7 @@ petalogix_ml605_init(MachineState *machine)
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     /* 5th parameter 2 means bank-width
+      * 10th paremeter 0 means little-endian */
+-    pflash_cfi01_register(FLASH_BASEADDR,
+-                          NULL, "petalogix_ml605.flash", FLASH_SIZE,
++    pflash_cfi01_register(FLASH_BASEADDR, "petalogix_ml605.flash", FLASH=
+_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           64 * KiB, FLASH_SIZE >> 16,
+                           2, 0x89, 0x18, 0x0000, 0x0, 0);
+diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/pet=
+alogix_s3adsp1800_mmu.c
+index b9f0b0d06e..a07b7f8edf 100644
+--- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
++++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+@@ -88,7 +88,7 @@ petalogix_s3adsp1800_init(MachineState *machine)
+=20
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     pflash_cfi01_register(FLASH_BASEADDR,
+-                          NULL, "petalogix_s3adsp1800.flash", FLASH_SIZE=
+,
++                          "petalogix_s3adsp1800.flash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           64 * KiB, FLASH_SIZE >> 16,
+                           1, 0x89, 0x18, 0x0000, 0x0, 1);
 diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 39aef4b6db..2827074e9b 100644
+index f63b1c4776..9c8b2896cc 100644
 --- a/hw/mips/mips_malta.c
 +++ b/hw/mips/mips_malta.c
-@@ -1189,7 +1189,7 @@ void mips_malta_init(MachineState *machine)
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     const char *initrd_filename =3D machine->initrd_filename;
-     char *filename;
--    pflash_t *fl;
-+    PFlashCFI01 *fl;
-     MemoryRegion *system_memory =3D get_system_memory();
-     MemoryRegion *ram_high =3D g_new(MemoryRegion, 1);
-     MemoryRegion *ram_low_preio =3D g_new(MemoryRegion, 1);
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index ab3e52b415..3d59a7a356 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -162,9 +162,9 @@ static void xtfpga_net_init(MemoryRegion *address_spa=
-ce,
-     memory_region_add_subregion(address_space, buffers, ram);
- }
+@@ -1274,7 +1274,7 @@ void mips_malta_init(MachineState *machine)
+                blk_name(pflash_blk), FLASH_SIZE >> 16);
+ #endif
+     }
+-    fl =3D pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
++    fl =3D pflash_cfi01_register(FLASH_ADDRESS, "mips_malta.bios",
+                                FLASH_SIZE,
+                                pflash_blk,
+                                65536, FLASH_SIZE >> 16,
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index a015a6d14e..0b9df466e7 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -235,7 +235,7 @@ void mips_r4k_init(MachineState *machine)
+         load_image_targphys(filename, 0x1fc00000, BIOS_SIZE);
+     } else if ((dinfo =3D drive_get(IF_PFLASH, 0, 0)) !=3D NULL) {
+         uint32_t mips_rom =3D 0x00400000;
+-        if (!pflash_cfi01_register(0x1fc00000, NULL, "mips_r4k.bios", mi=
+ps_rom,
++        if (!pflash_cfi01_register(0x1fc00000, "mips_r4k.bios", mips_rom=
+,
+                                    blk_by_legacy_dinfo(dinfo),
+                                    sector_len, mips_rom / sector_len,
+                                    4, 0, 0, 0, 0, be)) {
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 672717ef1b..dfaea45898 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -193,7 +193,7 @@ static void ref405ep_init(MachineState *machine)
+ #endif
+         bios_size =3D 8 * MiB;
+         pflash_cfi02_register((uint32_t)(-bios_size),
+-                              NULL, "ef405ep.bios", bios_size,
++                              "ef405ep.bios", bios_size,
+                               dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                               64 * KiB, bios_size / (64 * KiB), 1,
+                               2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+@@ -484,7 +484,7 @@ static void taihu_405ep_init(MachineState *machine)
+ #endif
+         bios_size =3D 2 * MiB;
+         pflash_cfi02_register(0xFFE00000,
+-                              NULL, "taihu_405ep.bios", bios_size,
++                              "taihu_405ep.bios", bios_size,
+                               dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                               64 * KiB, bios_size / (64 * KiB), 1,
+                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+@@ -526,7 +526,7 @@ static void taihu_405ep_init(MachineState *machine)
+ #ifdef DEBUG_BOARD_INIT
+         printf("Register application flash\n"
+ #endif
+-        pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bio=
+s_size,
++        pflash_cfi02_register(0xfc000000, "taihu_405ep.flash", bios_size=
+,
+                               dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                               64 * KiB, bios_size / (64 * KiB), 1,
+                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index c6258ca1d0..9af6018c7d 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -113,7 +113,7 @@ static int sam460ex_load_uboot(void)
 =20
--static pflash_t *xtfpga_flash_init(MemoryRegion *address_space,
--                                   const XtfpgaBoardDesc *board,
--                                   DriveInfo *dinfo, int be)
-+static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *address_space,
-+                                      const XtfpgaBoardDesc *board,
-+                                      DriveInfo *dinfo, int be)
- {
-     SysBusDevice *s;
-     DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-@@ -181,7 +181,7 @@ static pflash_t *xtfpga_flash_init(MemoryRegion *addr=
-ess_space,
-     s =3D SYS_BUS_DEVICE(dev);
-     memory_region_add_subregion(address_space, board->flash->base,
-                                 sysbus_mmio_get_region(s, 0));
--    return OBJECT_CHECK(pflash_t, (dev), "cfi.pflash01");
-+    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
- }
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     if (!pflash_cfi01_register(FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32)=
+,
+-                               NULL, "sam460ex.flash", FLASH_SIZE,
++                               "sam460ex.flash", FLASH_SIZE,
+                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
+,
+                                64 * KiB, FLASH_SIZE / (64 * KiB),
+                                1, 0x89, 0x18, 0x0000, 0x0, 1)) {
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 5a711cb3d9..d2085a839c 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -227,7 +227,7 @@ static void virtex_init(MachineState *machine)
+     memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
 =20
- static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
-@@ -229,7 +229,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board,=
- MachineState *machine)
-     XtensaMxPic *mx_pic =3D NULL;
-     qemu_irq *extints;
-     DriveInfo *dinfo;
--    pflash_t *flash =3D NULL;
-+    PFlashCFI01 *flash =3D NULL;
-     QemuOpts *machine_opts =3D qemu_get_machine_opts();
-     const char *kernel_filename =3D qemu_opt_get(machine_opts, "kernel")=
-;
-     const char *kernel_cmdline =3D qemu_opt_get(machine_opts, "append");
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+-    pflash_cfi01_register(PFLASH_BASEADDR, NULL, "virtex.flash", FLASH_S=
+IZE,
++    pflash_cfi01_register(PFLASH_BASEADDR, "virtex.flash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           64 * KiB, FLASH_SIZE >> 16,
+                           1, 0x89, 0x18, 0x0000, 0x0, 1);
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index cd23c60b86..c6514bb817 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -298,7 +298,7 @@ static void r2d_init(MachineState *machine)
+      * addressable in words of 16bit.
+      */
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+-    pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE,
++    pflash_cfi02_register(0x0, "r2d.flash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                           64 * KiB, FLASH_SIZE >> 16,
+                           1, 2, 0x0001, 0x227e, 0x2220, 0x2200,
 diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index 67c3aa329e..51d8f60c65 100644
+index aeea3ca99d..3e48901c84 100644
 --- a/include/hw/block/flash.h
 +++ b/include/hw/block/flash.h
-@@ -5,32 +5,41 @@
+@@ -14,7 +14,7 @@
+ typedef struct PFlashCFI01 PFlashCFI01;
 =20
- #include "exec/memory.h"
+ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
+-                                   DeviceState *qdev, const char *name,
++                                   const char *name,
+                                    hwaddr size,
+                                    BlockBackend *blk,
+                                    uint32_t sector_len, int nb_blocs,
+@@ -33,7 +33,7 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
+ typedef struct PFlashCFI02 PFlashCFI02;
 =20
--#define TYPE_CFI_PFLASH01 "cfi.pflash01"
--#define TYPE_CFI_PFLASH02 "cfi.pflash02"
--
--typedef struct pflash_t pflash_t;
--
- /* pflash_cfi01.c */
--pflash_t *pflash_cfi01_register(hwaddr base,
--                                DeviceState *qdev, const char *name,
--                                hwaddr size,
--                                BlockBackend *blk,
--                                uint32_t sector_len, int nb_blocs, int w=
-idth,
--                                uint16_t id0, uint16_t id1,
--                                uint16_t id2, uint16_t id3, int be);
-+
-+#define TYPE_CFI_PFLASH01 "cfi.pflash01"
-+
-+typedef struct PFlashCFI01 PFlashCFI01;
-+
-+PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-+                                   DeviceState *qdev, const char *name,
-+                                   hwaddr size,
-+                                   BlockBackend *blk,
-+                                   uint32_t sector_len, int nb_blocs,
-+                                   int width,
-+                                   uint16_t id0, uint16_t id1,
-+                                   uint16_t id2, uint16_t id3,
-+                                   int be);
-+MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
-=20
- /* pflash_cfi02.c */
--pflash_t *pflash_cfi02_register(hwaddr base,
--                                DeviceState *qdev, const char *name,
--                                hwaddr size,
--                                BlockBackend *blk, uint32_t sector_len,
--                                int nb_blocs, int nb_mappings, int width=
-,
--                                uint16_t id0, uint16_t id1,
--                                uint16_t id2, uint16_t id3,
--                                uint16_t unlock_addr0, uint16_t unlock_a=
-ddr1,
--                                int be);
-=20
--MemoryRegion *pflash_cfi01_get_memory(pflash_t *fl);
-+#define TYPE_CFI_PFLASH02 "cfi.pflash02"
-+
-+typedef struct PFlashCFI02 PFlashCFI02;
-+
-+PFlashCFI02 *pflash_cfi02_register(hwaddr base,
-+                                   DeviceState *qdev, const char *name,
-+                                   hwaddr size,
-+                                   BlockBackend *blk,
-+                                   uint32_t sector_len, int nb_blocs,
-+                                   int nb_mappings,
-+                                   int width,
-+                                   uint16_t id0, uint16_t id1,
-+                                   uint16_t id2, uint16_t id3,
-+                                   uint16_t unlock_addr0,
-+                                   uint16_t unlock_addr1,
-+                                   int be);
-=20
- /* nand.c */
- DeviceState *nand_init(BlockBackend *blk, int manf_id, int chip_id);
+ PFlashCFI02 *pflash_cfi02_register(hwaddr base,
+-                                   DeviceState *qdev, const char *name,
++                                   const char *name,
+                                    hwaddr size,
+                                    BlockBackend *blk,
+                                    uint32_t sector_len, int nb_blocs,
 --=20
 2.17.2
