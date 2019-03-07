@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37569)
+Received: from eggs.gnu.org ([209.51.188.92]:38156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1wks-0005Y4-4d
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:26 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1h1wmu-0007gB-I1
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:26:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1wkr-0003Tm-Ib
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:26 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 18:23:58 +0100
-Message-Id: <20190307172401.29451-10-armbru@redhat.com>
-In-Reply-To: <20190307172401.29451-1-armbru@redhat.com>
-References: <20190307172401.29451-1-armbru@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1h1wmt-000568-Lv
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:26:32 -0500
+Date: Thu, 7 Mar 2019 14:26:12 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190307172612.GC8899@habkost.net>
+References: <20190307090639.8261-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 09/12] pc_sysfw: Remove unused PcSysFwDevice
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307090639.8261-1-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] machine: Move acpi_nvdimm_state into
+ struct MachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org, sbhat@linux.ibm.com
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Thu, Mar 07, 2019 at 10:06:39AM +0100, Eric Auger wrote:
+> As NVDIMM support is looming for ARM and SPAPR, let's
+> move the acpi_nvdimm_state to the generic machine struct
+> instead of duplicating the same code in several machines.
+> It is also renamed into nvdimms_state.
+> 
+> nvdimm and nvdimm-persistence become generic machine options.
+> We also add a description for those options.
+> 
+> We also remove the nvdimms_state.is_enabled initialization to
+> false as objects are guaranteed to be zero initialized.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - s/acpi_nvdimm_state/nvdimms_state
+> - remove ms->nvdimms_state.is_enabled initialization to false.
+[...]
+> @@ -765,6 +806,20 @@ static void machine_class_init(ObjectClass *oc, void *data)
+>          &error_abort);
+>      object_class_property_set_description(oc, "memory-encryption",
+>          "Set memory encryption object to use", &error_abort);
+> +
+> +    object_class_property_add_bool(oc, "nvdimm",
+> +        machine_get_nvdimm, machine_set_nvdimm, &error_abort);
+> +    object_class_property_set_description(oc, "nvdimm",
+> +                                         "Set on/off to enable/disable NVDIMM "
+> +                                         "instantiation", NULL);
+> +
+> +    object_class_property_add_str(oc, "nvdimm-persistence",
+> +                                  machine_get_nvdimm_persistence,
+> +                                  machine_set_nvdimm_persistence, &error_abort);
+> +    object_class_property_set_description(oc, "nvdimm-persistence",
+> +                                          "Set NVDIMM persistence"
+> +                                          "Valid values are cpu and mem-ctrl",
+> +                                          NULL);
 
-This structure is not used since commit 6dd2a5c98a.
+As noted in another reply, I don't mind adding new MachineState
+fields, but now I noticed you are adding new user-visible
+options, which requires more care.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/i386/pc_sysfw.c | 5 -----
- 1 file changed, 5 deletions(-)
+This patch seems to make all machines except PC silently ignore
+the new nvdimm options.  If the current machine doesn't support
+nvdimm, "nvdimm-persistence=..." and "nvdimm=on" should be
+rejected by QEMU instead of silently ignored.
 
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 34727c5b1f..46b87afe23 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -40,11 +40,6 @@
-=20
- #define BIOS_FILENAME "bios.bin"
-=20
--typedef struct PcSysFwDevice {
--    SysBusDevice busdev;
--    uint8_t isapc_ram_fw;
--} PcSysFwDevice;
--
- static void pc_isa_bios_init(MemoryRegion *rom_memory,
-                              MemoryRegion *flash_mem,
-                              int ram_size)
---=20
-2.17.2
+Probably the simplest way to do that is by making the
+registration of those QOM properties conditional.
+
+We could add a simple
+  bool MachineClass::nvdimm_supported
+field, or we could add a
+  static void nvdimm_machine_class_init(MachineClass *mc);
+helper that would enable nvdimm support on the machine type.
+
+-- 
+Eduardo
