@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41356)
+Received: from eggs.gnu.org ([209.51.188.92]:41341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwF-00043j-35
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:52 -0500
+	(envelope-from <david@redhat.com>) id 1h1rwE-00043R-CB
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwE-0007xB-4v
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:51 -0500
+	(envelope-from <david@redhat.com>) id 1h1rwD-0007wG-51
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:50 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Mar 2019 13:15:10 +0100
-Message-Id: <20190307121539.12842-4-david@redhat.com>
-In-Reply-To: <20190307121539.12842-1-david@redhat.com>
-References: <20190307121539.12842-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 03/32] s390x/tcg: Utilities for vector
- instruction helpers
+Date: Thu,  7 Mar 2019 13:15:07 +0100
+Message-Id: <20190307121539.12842-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 00/32] s390x/tcg: Vector Instruction Support
+ Part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,122 +21,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-We'll have to read/write vector elements quite frequently from helpers.
-The tricky bit is properly taking care of endianess. Handle it similar
-to aarch64.
+This is the first part of vector instruction support for s390x. Parts
+will be sent and reviewed piece by piece.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/vec.h | 101 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
+Part 1: Vector Support Instructions
+Part 2: Vector Integer Instructions
+Part 3: Vector String Instructions
+Part 4: Vector Floating-Point Instructions
+
+The current state can be found at (kept updated):
+    https://github.com/davidhildenbrand/qemu/tree/vx
+It is based on
+    https://github.com/cohuck/qemu/tree/s390-next
+
+With the current state I can boot Linux kernel + user space compiled with
+SIMD support. This allows to boot distributions compiled exclusively for
+z13, requiring SIMD support. Also, I have a growing set of tests for
+kvm-unit-tests and tests/tcg which I cross-test on a real s390x system.
+
+In this part, the basic infrastructure and all Vector Support Instructions
+introduced with the "Vector Facility" are added. The Vector Extension
+Facilities are not considered for now.
+
+We make use of the existing gvec expansion + ool (out-of-line) support.
+This will be heavily used especially for part 2 (Integer Instructions)
+where we can actually reuse quite some existing gvec expansions.
+
+v2 -> v3:
+- "s390x/tcg: Utilities for vector instruction helpers"
+-- inline helpers in header file
+- "s390x/tcg: Implement VECTOR LOAD MULTIPLE"
+-- optimize loading of last element
+- "s390x/tcg: Implement VECTOR PACK *"
+-- make the static funtion arrays const
+- "s390x/tcg: Implement VECTOR REPLICATE"
+-- use "tcg_gen_gvec_dup_mem"
+- "s390x/tcg: Provide probe_write helper"
+-- Add check for CONFIG_USER_ONLY
+-- Optimize calculation of length
+- Added r-b's
+
+v1 -> v2:
+- Basically address all wonderful review comments from Richard (too many
+  to name them all)
+- Probe write access to get rid of FIXMEs
+- Heavily rework "s390x/tcg: Implement VECTOR PACK *"
+-- Process cc and !cc separately.
+-- Helper for VPK
+- Don't use a temporary vector register (for now)
+- Drop load_vec_element() and store_vec_element()
+- Use ES_* instead of MO_*, will come in handy when we use ES_128 later
+- .... many many other minor things
+
+David Hildenbrand (32):
+  s390x/tcg: Define vector instruction formats
+  s390x/tcg: Check vector register instructions at central point
+  s390x/tcg: Utilities for vector instruction helpers
+  s390x/tcg: Implement VECTOR GATHER ELEMENT
+  s390x/tcg: Implement VECTOR GENERATE BYTE MASK
+  s390x/tcg: Implement VECTOR GENERATE MASK
+  s390x/tcg: Implement VECTOR LOAD
+  s390x/tcg: Implement VECTOR LOAD AND REPLICATE
+  s390x/tcg: Implement VECTOR LOAD ELEMENT
+  s390x/tcg: Implement VECTOR LOAD ELEMENT IMMEDIATE
+  s390x/tcg: Implement VECTOR LOAD GR FROM VR ELEMENT
+  s390x/tcg: Implement VECTOR LOAD LOGICAL ELEMENT AND ZERO
+  s390x/tcg: Implement VECTOR LOAD MULTIPLE
+  s390x/tcg: Implement VECTOR LOAD TO BLOCK BOUNDARY
+  s390x/tcg: Implement VECTOR LOAD VR ELEMENT FROM GR
+  s390x/tcg: Implement VECTOR LOAD VR FROM GRS DISJOINT
+  s390x/tcg: Implement VECTOR LOAD WITH LENGTH
+  s390x/tcg: Implement VECTOR MERGE (HIGH|LOW)
+  s390x/tcg: Implement VECTOR PACK *
+  s390x/tcg: Implement VECTOR PERMUTE
+  s390x/tcg: Implement VECTOR PERMUTE DOUBLEWORD IMMEDIATE
+  s390x/tcg: Implement VECTOR REPLICATE
+  s390x/tcg: Implement VECTOR REPLICATE IMMEDIATE
+  s390x/tcg: Implement VECTOR SCATTER ELEMENT
+  s390x/tcg: Implement VECTOR SELECT
+  s390x/tcg: Implement VECTOR SIGN EXTEND TO DOUBLEWORD
+  s390x/tcg: Provide probe_write_access helper
+  s390x/tcg: Implement VECTOR STORE
+  s390x/tcg: Implement VECTOR STORE ELEMENT
+  s390x/tcg: Implement VECTOR STORE MULTIPLE
+  s390x/tcg: Implement VECTOR STORE WITH LENGTH
+  s390x/tcg: Implement VECTOR UNPACK *
+
+ target/s390x/Makefile.objs      |   1 +
+ target/s390x/cpu.h              |   7 +
+ target/s390x/helper.h           |  21 +
+ target/s390x/insn-data.def      |  82 +++
+ target/s390x/insn-format.def    |  25 +
+ target/s390x/internal.h         |   2 +
+ target/s390x/mem_helper.c       |  25 +
+ target/s390x/translate.c        |  61 ++-
+ target/s390x/translate_vx.inc.c | 935 ++++++++++++++++++++++++++++++++
+ target/s390x/vec.h              | 101 ++++
+ target/s390x/vec_helper.c       | 193 +++++++
+ 11 files changed, 1452 insertions(+), 1 deletion(-)
+ create mode 100644 target/s390x/translate_vx.inc.c
  create mode 100644 target/s390x/vec.h
+ create mode 100644 target/s390x/vec_helper.c
 
-diff --git a/target/s390x/vec.h b/target/s390x/vec.h
-new file mode 100644
-index 0000000000..3313fb43ee
---- /dev/null
-+++ b/target/s390x/vec.h
-@@ -0,0 +1,101 @@
-+/*
-+ * QEMU TCG support -- s390x vector utilitites
-+ *
-+ * Copyright (C) 2019 Red Hat Inc
-+ *
-+ * Authors:
-+ *   David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#ifndef S390X_VEC_H
-+#define S390X_VEC_H
-+
-+typedef union S390Vector {
-+    uint64_t doubleword[2];
-+    uint32_t word[4];
-+    uint16_t halfword[8];
-+    uint8_t byte[16];
-+} S390Vector;
-+
-+/*
-+ * Each vector is stored as two 64bit host values. So when talking about
-+ * byte/halfword/word numbers, we have to take care of proper translation
-+ * between element numbers.
-+ *
-+ * Big Endian (target/possible host)
-+ * B:  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7] - [ 8][ 9][10][11][12][13][14][15]
-+ * HW: [     0][     1][     2][     3] - [     4][     5][     6][     7]
-+ * W:  [             0][             1] - [             2][             3]
-+ * DW: [                             0] - [                             1]
-+ *
-+ * Little Endian (possible host)
-+ * B:  [ 7][ 6][ 5][ 4][ 3][ 2][ 1][ 0] - [15][14][13][12][11][10][ 9][ 8]
-+ * HW: [     3][     2][     1][     0] - [     7][     6][     5][     4]
-+ * W:  [             1][             0] - [             3][             2]
-+ * DW: [                             0] - [                             1]
-+ */
-+#ifndef HOST_WORDS_BIGENDIAN
-+#define H1(x)  ((x) ^ 7)
-+#define H2(x)  ((x) ^ 3)
-+#define H4(x)  ((x) ^ 1)
-+#else
-+#define H1(x)  (x)
-+#define H2(x)  (x)
-+#define H4(x)  (x)
-+#endif
-+
-+static inline uint8_t s390_vec_read_element8(const S390Vector *v, uint8_t enr)
-+{
-+    g_assert(enr < 16);
-+    return v->byte[H1(enr)];
-+}
-+
-+static inline uint16_t s390_vec_read_element16(const S390Vector *v, uint8_t enr)
-+{
-+    g_assert(enr < 8);
-+    return v->halfword[H2(enr)];
-+}
-+
-+static inline uint32_t s390_vec_read_element32(const S390Vector *v, uint8_t enr)
-+{
-+    g_assert(enr < 4);
-+    return v->word[H4(enr)];
-+}
-+
-+static inline uint64_t s390_vec_read_element64(const S390Vector *v, uint8_t enr)
-+{
-+    g_assert(enr < 2);
-+    return v->doubleword[enr];
-+}
-+
-+static inline void s390_vec_write_element8(S390Vector *v, uint8_t enr,
-+                                           uint8_t data)
-+{
-+    g_assert(enr < 16);
-+    v->byte[H1(enr)] = data;
-+}
-+
-+static inline void s390_vec_write_element16(S390Vector *v, uint8_t enr,
-+                                            uint16_t data)
-+{
-+    g_assert(enr < 8);
-+    v->halfword[H2(enr)] = data;
-+}
-+
-+static inline void s390_vec_write_element32(S390Vector *v, uint8_t enr,
-+                                            uint32_t data)
-+{
-+    g_assert(enr < 4);
-+    v->word[H4(enr)] = data;
-+}
-+
-+static inline void s390_vec_write_element64(S390Vector *v, uint8_t enr,
-+                                            uint64_t data)
-+{
-+    g_assert(enr < 2);
-+    v->doubleword[enr] = data;
-+}
-+
-+#endif /* S390X_VEC_H */
 -- 
 2.17.2
