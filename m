@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52418)
+Received: from eggs.gnu.org ([209.51.188.92]:52443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgU-0004wL-3W
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:39 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgV-0004xd-1m
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgO-0003Ze-GR
+	(envelope-from <armbru@redhat.com>) id 1h1sgO-0003aI-Pp
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:38 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 14:03:19 +0100
-Message-Id: <20190307130323.9353-11-armbru@redhat.com>
+Date: Thu,  7 Mar 2019 14:03:13 +0100
+Message-Id: <20190307130323.9353-5-armbru@redhat.com>
 In-Reply-To: <20190307130323.9353-1-armbru@redhat.com>
 References: <20190307130323.9353-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 10/14] hw/mips/malta: Remove fl_sectors
- variable
+Subject: [Qemu-devel] [PATCH v3 04/14] pflash: Rename *CFI_PFLASH* to
+ *PFLASH_CFI*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +26,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+pflash_cfi01.c and pflash_cfi02.c start their identifiers with
+pflash_cfi01_ and pflash_cfi02_ respectively, except for
+CFI_PFLASH01(), TYPE_CFI_PFLASH01, CFI_PFLASH02(), TYPE_CFI_PFLASH02.
+Rename for consistency.
 
-Variable fl_sectors is used just twice.  Since
-fl_sectors =3D bios_size >> 16 and bios_size =3D FLASH_SIZE there,
-we can simply use FLASH_SIZE >> 16, and eliminate variable.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- hw/mips/mips_malta.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/block/pflash_cfi01.c  | 12 ++++++------
+ hw/block/pflash_cfi02.c  | 12 ++++++------
+ include/hw/block/flash.h |  4 ++--
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 639ccefa98..750ea86b63 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1210,7 +1210,6 @@ void mips_malta_init(MachineState *machine)
-     DriveInfo *dinfo;
-     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-     int fl_idx =3D 0;
--    int fl_sectors =3D bios_size >> 16;
-     int be;
-=20
-     DeviceState *dev =3D qdev_create(NULL, TYPE_MIPS_MALTA);
-@@ -1273,13 +1272,13 @@ void mips_malta_init(MachineState *machine)
-         printf("Register parallel flash %d size " TARGET_FMT_lx " at "
-                "addr %08llx '%s' %x\n",
-                fl_idx, blk_getlength(pflash_blk), FLASH_ADDRESS,
--               blk_name(pflash_blk), fl_sectors);
-+               blk_name(pflash_blk), FLASH_SIZE >> 16);
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index d381f14e3c..f75f0a6998 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -59,8 +59,8 @@ do {                                                   =
+     \
+ #define DPRINTF(fmt, ...) do { } while (0)
  #endif
-     }
-     fl =3D pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
-                                BIOS_SIZE,
-                                pflash_blk,
--                               65536, fl_sectors,
-+                               65536, FLASH_SIZE >> 16,
-                                4, 0x0000, 0x0000, 0x0000, 0x0000, be);
-     bios =3D pflash_cfi01_get_memory(fl);
-     fl_idx++;
+=20
+-#define CFI_PFLASH01(obj) \
+-    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
++#define PFLASH_CFI01(obj) \
++    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
+=20
+ #define PFLASH_BE          0
+ #define PFLASH_SECURE      1
+@@ -698,7 +698,7 @@ static const MemoryRegionOps pflash_cfi01_ops =3D {
+=20
+ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+ {
+-    PFlashCFI01 *pfl =3D CFI_PFLASH01(dev);
++    PFlashCFI01 *pfl =3D PFLASH_CFI01(dev);
+     uint64_t total_len;
+     int ret;
+     uint64_t blocks_per_device, sector_len_per_device, device_len;
+@@ -926,7 +926,7 @@ static void pflash_cfi01_class_init(ObjectClass *klas=
+s, void *data)
+=20
+=20
+ static const TypeInfo pflash_cfi01_info =3D {
+-    .name           =3D TYPE_CFI_PFLASH01,
++    .name           =3D TYPE_PFLASH_CFI01,
+     .parent         =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size  =3D sizeof(PFlashCFI01),
+     .class_init     =3D pflash_cfi01_class_init,
+@@ -949,7 +949,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
+                                    uint16_t id2, uint16_t id3,
+                                    int be)
+ {
+-    DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH01);
++    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
+=20
+     if (blk) {
+         qdev_prop_set_drive(dev, "drive", blk, &error_abort);
+@@ -966,7 +966,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
+     qdev_init_nofail(dev);
+=20
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+-    return CFI_PFLASH01(dev);
++    return PFLASH_CFI01(dev);
+ }
+=20
+ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index 9f8486e4cf..c0869fc417 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -57,8 +57,8 @@ do {                                                   =
+    \
+=20
+ #define PFLASH_LAZY_ROMD_THRESHOLD 42
+=20
+-#define CFI_PFLASH02(obj) \
+-    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
++#define PFLASH_CFI02(obj) \
++    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
+=20
+ struct PFlashCFI02 {
+     /*< private >*/
+@@ -534,7 +534,7 @@ static const MemoryRegionOps pflash_cfi02_ops_le =3D =
+{
+=20
+ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+ {
+-    PFlashCFI02 *pfl =3D CFI_PFLASH02(dev);
++    PFlashCFI02 *pfl =3D PFLASH_CFI02(dev);
+     uint32_t chip_len;
+     int ret;
+     Error *local_err =3D NULL;
+@@ -706,7 +706,7 @@ static void pflash_cfi02_class_init(ObjectClass *klas=
+s, void *data)
+ }
+=20
+ static const TypeInfo pflash_cfi02_info =3D {
+-    .name           =3D TYPE_CFI_PFLASH02,
++    .name           =3D TYPE_PFLASH_CFI02,
+     .parent         =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size  =3D sizeof(PFlashCFI02),
+     .class_init     =3D pflash_cfi02_class_init,
+@@ -731,7 +731,7 @@ PFlashCFI02 *pflash_cfi02_register(hwaddr base,
+                                    uint16_t unlock_addr1,
+                                    int be)
+ {
+-    DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH02);
++    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI02);
+=20
+     if (blk) {
+         qdev_prop_set_drive(dev, "drive", blk, &error_abort);
+@@ -751,5 +751,5 @@ PFlashCFI02 *pflash_cfi02_register(hwaddr base,
+     qdev_init_nofail(dev);
+=20
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+-    return CFI_PFLASH02(dev);
++    return PFLASH_CFI02(dev);
+ }
+diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
+index 51d8f60c65..333005d9ff 100644
+--- a/include/hw/block/flash.h
++++ b/include/hw/block/flash.h
+@@ -7,7 +7,7 @@
+=20
+ /* pflash_cfi01.c */
+=20
+-#define TYPE_CFI_PFLASH01 "cfi.pflash01"
++#define TYPE_PFLASH_CFI01 "cfi.pflash01"
+=20
+ typedef struct PFlashCFI01 PFlashCFI01;
+=20
+@@ -24,7 +24,7 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
+=20
+ /* pflash_cfi02.c */
+=20
+-#define TYPE_CFI_PFLASH02 "cfi.pflash02"
++#define TYPE_PFLASH_CFI02 "cfi.pflash02"
+=20
+ typedef struct PFlashCFI02 PFlashCFI02;
+=20
 --=20
 2.17.2
