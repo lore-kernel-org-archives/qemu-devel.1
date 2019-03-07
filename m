@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60259)
+Received: from eggs.gnu.org ([209.51.188.92]:60257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMj-0002t5-Nd
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMj-0002t0-KT
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMh-0005sZ-MN
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:53 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:50980)
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMh-0005tF-Oc
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:52 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:50992)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1h1nMg-0005mn-59
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:50 -0500
+	id 1h1nMg-0005nJ-Ft
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:51 -0500
 From: elena.ufimtseva@oracle.com
-Date: Wed,  6 Mar 2019 23:22:34 -0800
-Message-Id: <20190307072234.9503-1-elena.ufimtseva@oracle.com>
-Subject: [Qemu-devel] [multiprocess RFC PATCH 28/37] multi-process: remote:
- use fd for socket from parent process
+Date: Wed,  6 Mar 2019 23:22:43 -0800
+Message-Id: <20190307072243.9685-1-elena.ufimtseva@oracle.com>
+Subject: [Qemu-devel] [multiprocess RFC PATCH 32/37] multi-process: handle
+ heartbit messages in remote process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +28,38 @@ Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, 
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
+and reply back to proxy object.
+
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- remote/remote-main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ remote/remote-main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 52da3c8..fa32f2a 100644
+index 3fa6cbd..1e45105 100644
 --- a/remote/remote-main.c
 +++ b/remote/remote-main.c
-@@ -63,6 +63,7 @@
- #include "block/qdict.h"
- #include "qapi/qmp/qlist.h"
- #include "qemu/log.h"
-+#include "qemu/cutils.h"
- 
- static ProxyLinkState *proxy_link;
- PCIDevice *remote_pci_dev;
-@@ -437,6 +438,7 @@ int main(int argc, char *argv[])
+@@ -339,6 +339,7 @@ static void process_msg(GIOCondition cond)
  {
+     ProcMsg *msg = NULL;
      Error *err = NULL;
-     QemuThread main_loop_thread;
-+    int fd = -1;
++    int wait;
  
-     module_call_init(MODULE_INIT_QOM);
- 
-@@ -461,7 +463,13 @@ int main(int argc, char *argv[])
-         return -1;
-     }
- 
--    proxy_link_set_sock(proxy_link, STDIN_FILENO);
-+    fd = qemu_parse_fd(argv[1]);
-+    if (fd == -1) {
-+        printf("Failed to parse fd for remote process.\n");
-+        return -EINVAL;
-+    }
-+
-+    proxy_link_set_sock(proxy_link, fd);
-     proxy_link_set_callback(proxy_link, process_msg);
- 
-     qemu_thread_create(&main_loop_thread, "remote-main-loop", remote_main_loop,
+     if ((cond & G_IO_HUP) || (cond & G_IO_ERR)) {
+         error_setg(&err, "socket closed, cond is %d", cond);
+@@ -418,6 +419,11 @@ static void process_msg(GIOCondition cond)
+     case DEVICE_DEL:
+         process_device_del_msg(msg);
+         break;
++    case PROXY_PING:
++        wait = msg->fds[0];
++        notify_proxy(wait, (uint32_t)getpid());
++        PUT_REMOTE_WAIT(wait);
++        break;
+     default:
+         error_setg(&err, "Unknown command");
+         goto finalize_loop;
 -- 
 1.8.3.1
