@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37290)
+Received: from eggs.gnu.org ([209.51.188.92]:37459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1wke-0005Jf-Sr
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:17 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1wkn-0005SV-Ua
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1wke-0003JE-1q
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:12 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1wkn-0003Pu-4P
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:21 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 18:23:52 +0100
-Message-Id: <20190307172401.29451-4-armbru@redhat.com>
+Date: Thu,  7 Mar 2019 18:23:55 +0100
+Message-Id: <20190307172401.29451-7-armbru@redhat.com>
 In-Reply-To: <20190307172401.29451-1-armbru@redhat.com>
 References: <20190307172401.29451-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 03/12] vl: Fix latent bug with -global and
- onboard devices
+Subject: [Qemu-devel] [PATCH v2 06/12] vl: Factor configure_blockdev() out
+ of main()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +23,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
 
-main() registers the user's -global only after we create the machine
-object, i.e. too late for devices created in the machine's
-.instance_init().
-
-Fortunately, we know the bug is only latent: the commit before
-previous fixed a bug that would've crashed any attempt to create a
-device in an .instance_init().
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+# Conflicts:
+#	vl.c
 ---
- vl.c | 19 ++-----------------
- 1 file changed, 2 insertions(+), 17 deletions(-)
+ vl.c | 71 +++++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 39 insertions(+), 32 deletions(-)
 
 diff --git a/vl.c b/vl.c
-index ea58a16a4a..3f41e72892 100644
+index 00cb8ea7ca..5a19d2a8ec 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2939,17 +2939,6 @@ static void user_register_global_props(void)
-                       global_init_func, NULL, NULL);
- }
-=20
--/*
-- * Note: we should see that these properties are actually having a
-- * priority: accel < machine < user. This means e.g. when user
-- * specifies something in "-global", it'll always be used with highest
-- * priority than either machine/accelerator compat properties.
-- */
--static void register_global_properties(MachineState *ms)
--{
--    user_register_global_props();
--}
--
- int main(int argc, char **argv, char **envp)
- {
-     int i;
-@@ -3943,6 +3932,8 @@ int main(int argc, char **argv, char **envp)
-      */
-     loc_set_none();
-=20
-+    user_register_global_props();
+@@ -1201,6 +1201,44 @@ typedef struct BlockdevOptionsQueueEntry {
+ 
+ typedef QSIMPLEQ_HEAD(, BlockdevOptionsQueueEntry) BlockdevOptionsQueue;
+ 
++static void configure_blockdev(BlockdevOptionsQueue *bdo_queue,
++                               MachineClass *machine_class, int snapshot)
++{
++    /* If the currently selected machine wishes to override the units-per-bus
++     * property of its default HBA interface type, do so now. */
++    if (machine_class->units_per_default_bus) {
++        override_max_devs(machine_class->block_default_type,
++                          machine_class->units_per_default_bus);
++    }
 +
-     replay_configure(icount_opts);
-=20
-     if (incoming && !preconfig_exit_requested) {
-@@ -4251,12 +4242,6 @@ int main(int argc, char **argv, char **envp)
-                      machine_class->name, machine_class->deprecation_rea=
-son);
-     }
-=20
--    /*
--     * Register all the global properties, including accel properties,
--     * machine properties, and user-specified ones.
--     */
--    register_global_properties(current_machine);
++    /* open the virtual block devices */
++    while (!QSIMPLEQ_EMPTY(bdo_queue)) {
++        BlockdevOptionsQueueEntry *bdo = QSIMPLEQ_FIRST(bdo_queue);
++
++        QSIMPLEQ_REMOVE_HEAD(bdo_queue, entry);
++        loc_push_restore(&bdo->loc);
++        qmp_blockdev_add(bdo->bdo, &error_fatal);
++        loc_pop(&bdo->loc);
++        qapi_free_BlockdevOptions(bdo->bdo);
++        g_free(bdo);
++    }
++    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
++        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
++                          NULL, NULL);
++    }
++    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
++                          &machine_class->block_default_type, &error_fatal)) {
++        /* We printed help */
++        exit(0);
++    }
++
++    default_drive(default_cdrom, snapshot, machine_class->block_default_type, 2,
++                  CDROM_OPTS);
++    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
++    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
++
++}
++
+ static QemuOptsList qemu_smp_opts = {
+     .name = "smp-opts",
+     .implied_opt_name = "cpus",
+@@ -4360,38 +4398,7 @@ int main(int argc, char **argv, char **envp)
+     ram_mig_init();
+     dirty_bitmap_mig_init();
+ 
+-    /* If the currently selected machine wishes to override the units-per-bus
+-     * property of its default HBA interface type, do so now. */
+-    if (machine_class->units_per_default_bus) {
+-        override_max_devs(machine_class->block_default_type,
+-                          machine_class->units_per_default_bus);
+-    }
 -
-     /*
-      * Migration object can only be created after global properties
-      * are applied correctly.
---=20
+-    /* open the virtual block devices */
+-    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
+-        BlockdevOptionsQueueEntry *bdo = QSIMPLEQ_FIRST(&bdo_queue);
+-
+-        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
+-        loc_push_restore(&bdo->loc);
+-        qmp_blockdev_add(bdo->bdo, &error_fatal);
+-        loc_pop(&bdo->loc);
+-        qapi_free_BlockdevOptions(bdo->bdo);
+-        g_free(bdo);
+-    }
+-    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
+-        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+-                          NULL, NULL);
+-    }
+-    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
+-                          &machine_class->block_default_type, &error_fatal)) {
+-        /* We printed help */
+-        exit(0);
+-    }
+-
+-    default_drive(default_cdrom, snapshot, machine_class->block_default_type, 2,
+-                  CDROM_OPTS);
+-    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+-    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
++    configure_blockdev(&bdo_queue, machine_class, snapshot);
+ 
+     qemu_opts_foreach(qemu_find_opts("mon"),
+                       mon_init_func, NULL, &error_fatal);
+-- 
 2.17.2
