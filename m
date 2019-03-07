@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51350)
+Received: from eggs.gnu.org ([209.51.188.92]:52343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1sd7-0002xQ-Vg
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:00:11 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgQ-0004r4-2F
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1sd6-00008q-Gm
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:00:09 -0500
-Resent-Message-Id: <E1h1sd6-00008q-Gm@eggs.gnu.org>
-Message-ID: <155196359474.8146.17303203557873902619@6acff2cf482b>
-In-Reply-To: <20190307121539.12842-1-david@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <armbru@redhat.com>) id 1h1sgO-0003a2-Ke
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:34 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu,  7 Mar 2019 14:03:09 +0100
+Message-Id: <20190307130323.9353-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 04:59:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/32] s390x/tcg: Vector Instruction
- Support Part 1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 00/14] pflash: Fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,134 +20,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzEyMTUzOS4xMjg0
-Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzEyMTUzOS4xMjg0Mi0x
-LWRhdmlkQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8zMl0g
-czM5MHgvdGNnOiBWZWN0b3IgSW5zdHJ1Y3Rpb24gU3VwcG9ydCBQYXJ0IDEKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDcxMjE1Mzku
-MTI4NDItMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDcxMjE1MzkuMTI4NDIt
-MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOGQwYWEx
-NzYwNiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKMzc2MzZiNTkxZiBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKNmUxZGZkZTBiZCBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKODU5ZDIxYjc3ZCBzMzkweC90
-Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVAo0ZGU5NmMzZjU2IHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQo4N2JmM2Y4NTQ0IHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
-ZV93cml0ZV9hY2Nlc3MgaGVscGVyCjRiYzZiNDkzNzEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
-VE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdPUkQKYzMyNzU0ZDI1YyBzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgU0VMRUNUCjIwNTZmM2Q3NTQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFNDQVRURVIgRUxFTUVOVApjYjVlMGNjYWQ2IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBS
-RVBMSUNBVEUgSU1NRURJQVRFCjc2Y2U2OWI0ZmIgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFJFUExJQ0FURQo3NmNmYWRjOWExIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRF
-IERPVUJMRVdPUkQgSU1NRURJQVRFCjUwN2RiZTA2OGQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
-VE9SIFBFUk1VVEUKMTdjNDZmMGZhMCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEFDSyAq
-CmIzNmZjNzE3OTMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIE1FUkdFIChISUdIfExPVykK
-ZjRiZGY4MTQ4OSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBXSVRIIExFTkdUSAo0
-MmZkMzc0MzI5IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEZST00gR1JTIERJ
-U0pPSU5UCjQ3Y2ZiNDBmZjcgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRUxF
-TUVOVCBGUk9NIEdSCjg1YjE3ODkzNGEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQg
-VE8gQkxPQ0sgQk9VTkRBUlkKOTYzY2JkN2M1MyBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
-TE9BRCBNVUxUSVBMRQpjYTcxYTgzZjQwIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FE
-IExPR0lDQUwgRUxFTUVOVCBBTkQgWkVSTwplZGIyZjdlMmEwIHMzOTB4L3RjZzogSW1wbGVtZW50
-IFZFQ1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVAoxMzcyYmFmNzg1IHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJQVRFCmY2ZTZlZTlkM2UgczM5MHgvdGNn
-OiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVAo1YjJjM2YyZWJkIHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNBVEUKYzRjZGVkZWM0ZiBzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgTE9BRAo5NmEwMzFiMDA4IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RP
-UiBHRU5FUkFURSBNQVNLCjM4ZDZkZTU3MTggczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdF
-TkVSQVRFIEJZVEUgTUFTSwpkMmVmNmZiZDQ1IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBH
-QVRIRVIgRUxFTUVOVAowZTYwZWE2OTUzIHMzOTB4L3RjZzogVXRpbGl0aWVzIGZvciB2ZWN0b3Ig
-aW5zdHJ1Y3Rpb24gaGVscGVycwoxNmJmNWY5NTQxIHMzOTB4L3RjZzogQ2hlY2sgdmVjdG9yIHJl
-Z2lzdGVyIGluc3RydWN0aW9ucyBhdCBjZW50cmFsIHBvaW50CjdkMGJkYWVkYjcgczM5MHgvdGNn
-OiBEZWZpbmUgdmVjdG9yIGluc3RydWN0aW9uIGZvcm1hdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvMzIgQ2hlY2tpbmcgY29tbWl0IDdkMGJkYWVkYjdlNCAoczM5MHgvdGNnOiBEZWZpbmUgdmVj
-dG9yIGluc3RydWN0aW9uIGZvcm1hdHMpCjIvMzIgQ2hlY2tpbmcgY29tbWl0IDE2YmY1Zjk1NDFl
-NiAoczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIgaW5zdHJ1Y3Rpb25zIGF0IGNlbnRy
-YWwgcG9pbnQpCjMvMzIgQ2hlY2tpbmcgY29tbWl0IDBlNjBlYTY5NTM4NSAoczM5MHgvdGNnOiBV
-dGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVjdGlvbiBoZWxwZXJzKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDEwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CjQvMzIgQ2hlY2tpbmcgY29tbWl0IGQyZWY2ZmJkNDVkZCAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIEdBVEhFUiBFTEVNRU5UKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCA0LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMzIgQ2hlY2tpbmcgY29t
-bWl0IDM4ZDZkZTU3MThiYyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVSQVRFIEJZ
-VEUgTUFTSykKNi8zMiBDaGVja2luZyBjb21taXQgOTZhMDMxYjAwODVmIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgR0VORVJBVEUgTUFTSykKNy8zMiBDaGVja2luZyBjb21taXQgYzRjZGVk
-ZWM0ZjdlIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCkKOC8zMiBDaGVja2luZyBj
-b21taXQgNWIyYzNmMmViZDAyIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBBTkQg
-UkVQTElDQVRFKQo5LzMyIENoZWNraW5nIGNvbW1pdCBmNmU2ZWU5ZDNlNTUgKHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQpCjEwLzMyIENoZWNraW5nIGNvbW1pdCAxMzcy
-YmFmNzg1OGUgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJ
-QVRFKQoxMS8zMiBDaGVja2luZyBjb21taXQgZWRiMmY3ZTJhMDlmIChzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgTE9BRCBHUiBGUk9NIFZSIEVMRU1FTlQpCjEyLzMyIENoZWNraW5nIGNvbW1p
-dCBjYTcxYTgzZjQwNTYgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIExPR0lDQUwg
-RUxFTUVOVCBBTkQgWkVSTykKMTMvMzIgQ2hlY2tpbmcgY29tbWl0IDk2M2NiZDdjNTMyNiAoczM5
-MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTVVMVElQTEUpCjE0LzMyIENoZWNraW5nIGNv
-bW1pdCA4NWIxNzg5MzRhOGQgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFRPIEJM
-T0NLIEJPVU5EQVJZKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM5NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0
-LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzMyIENoZWNraW5nIGNvbW1pdCA0N2Nm
-YjQwZmY3YTggKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJP
-TSBHUikKMTYvMzIgQ2hlY2tpbmcgY29tbWl0IDQyZmQzNzQzMjk0MSAoczM5MHgvdGNnOiBJbXBs
-ZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNv
-bW1pdCBmNGJkZjgxNDg5ZGQgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEgg
-TEVOR1RIKQoxOC8zMiBDaGVja2luZyBjb21taXQgYjM2ZmM3MTc5MzRiIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IDE3
-YzQ2ZjBmYTA5YyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
-ICcoJwojMTgzOiBGSUxFOiB0YXJnZXQvczM5MHgvdmVjX2hlbHBlci5jOjQ4OgordHlwZWRlZiB1
-aW50IyNUQklUUyMjX3QgKCp2cGsjI0JJVFMjI19mbikodWludCMjQklUUyMjX3QsIGludCAqKTsg
-ICAgICAgICAgICAgIFwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQ1IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDE5LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMC8zMiBDaGVj
-a2luZyBjb21taXQgNTA3ZGJlMDY4ZGZiIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
-TVVURSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQv
-czM5MHgvaGVscGVyLmg6MTQ0OgorREVGX0hFTFBFUl9GTEFHU181KGd2ZWNfdnBlcm0sIFRDR19D
-QUxMX05PX1JXRywgdm9pZCwgcHRyLCBjcHRyLCBjcHRyLCBjcHRyLCBpMzIpCgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIwLzMyIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjIxLzMyIENoZWNraW5nIGNvbW1pdCA3NmNmYWRjOWExNWEgKHMz
-OTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRFIERPVUJMRVdPUkQgSU1NRURJQVRFKQoy
-Mi8zMiBDaGVja2luZyBjb21taXQgNzZjZTY5YjRmYjM2IChzMzkweC90Y2c6IEltcGxlbWVudCBW
-RUNUT1IgUkVQTElDQVRFKQoyMy8zMiBDaGVja2luZyBjb21taXQgY2I1ZTBjY2FkNjlkIChzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElDQVRFIElNTUVESUFURSkKMjQvMzIgQ2hlY2tp
-bmcgY29tbWl0IDIwNTZmM2Q3NTQzYyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNDQVRU
-RVIgRUxFTUVOVCkKMjUvMzIgQ2hlY2tpbmcgY29tbWl0IGMzMjc1NGQyNWNjYyAoczM5MHgvdGNn
-OiBJbXBsZW1lbnQgVkVDVE9SIFNFTEVDVCkKMjYvMzIgQ2hlY2tpbmcgY29tbWl0IDRiYzZiNDkz
-NzFkZCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdP
-UkQpCjI3LzMyIENoZWNraW5nIGNvbW1pdCA4N2JmM2Y4NTQ0NmUgKHMzOTB4L3RjZzogUHJvdmlk
-ZSBwcm9iZV93cml0ZV9hY2Nlc3MgaGVscGVyKQoyOC8zMiBDaGVja2luZyBjb21taXQgNGRlOTZj
-M2Y1Njg4IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5n
-IGNvbW1pdCA4NTlkMjFiNzdkZTIgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBF
-TEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQgNmUxZGZkZTBiZDZhIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUpCjMxLzMyIENoZWNraW5nIGNvbW1pdCAzNzYz
-NmI1OTFmNzAgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkK
-MzIvMzIgQ2hlY2tpbmcgY29tbWl0IDhkMGFhMTc2MDYzMSAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDMwNzEyMTUzOS4xMjg0Mi0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGlu
-Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Alex Benn=C3=A9e posted this patch to address an XXX comment in
+pflash_cfi01_realize() the other day:
+
+Subject: [PATCH v2] hw/block: report when pflash backing file isn't align=
+ed
+Message-Id: <20190215122808.22301-1-alex.bennee@linaro.org>
+https://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg04166.html
+
+Review led me to look into its callers.  Most of them are pleasantly
+boring: they create flash memory of some fixed size at some fixed
+address.  A few are more creative, and some of the creative ones look
+quite broken to me.  Fix them, and clean up some along the way.
+
+v3:
+* PATCH 07,13: Commit message typo
+* PATCH 08: Replaced [Philippe, Magnus]
+* PATCH 09-11: New [Philippe]
+* PATCH 12: Straightforward rebase onto new patches
+* PATCH 14: Commit message improved [Philippe], lines joined [Zoltan]
+
+v2:
+* PATCH 01+10: Style cleanups [checkpatch]
+* PATCH 02: Rewritten [Peter, Philippe]
+* PATCH 03+04: New [Philippe]
+* PATCH 06: Commit message improved, FIXME added, accidental
+  replacement of 64 * KiB by 65536 backed out [Zoltan]
+* PATCH 07: Style tweak [Alex, David]
+* PATCH 08: Commit message typo [Philippe]
+* PATCH 11: Commit message typo [L=C3=A1szl=C3=B3]
+* Old PATCH 10 dropped [Max, Peter]
+
+Markus Armbruster (11):
+  pflash: Rename pflash_t to PFlashCFI01, PFlashCFI02
+  pflash_cfi01: Do not exit() on guest aborting "write to buffer"
+  pflash_cfi01: Log use of flawed "write to buffer"
+  pflash: Rename *CFI_PFLASH* to *PFLASH_CFI*
+  hw: Use PFLASH_CFI0{1,2} and TYPE_PFLASH_CFI0{1,2}
+  sam460ex: Don't size flash memory to match backing image
+  ppc405_boards: Don't size flash memory to match backing image
+  r2d: Fix flash memory size, sector size, width, device ID
+  mips_malta: Clean up definition of flash memory size somewhat
+  pflash: Clean up after commit 368a354f02b, part 1
+  pflash: Clean up after commit 368a354f02b, part 2
+
+Philippe Mathieu-Daud=C3=A9 (3):
+  hw/mips/malta: Fix the DEBUG_BOARD_INIT code
+  hw/mips/malta: Remove fl_sectors variable
+  hw/mips/malta: Restrict 'bios_size' variable scope
+
+ hw/arm/collie.c                          |   9 +-
+ hw/arm/digic_boards.c                    |   3 +-
+ hw/arm/gumstix.c                         |  10 +-
+ hw/arm/mainstone.c                       |   5 +-
+ hw/arm/musicpal.c                        |   8 +-
+ hw/arm/omap_sx1.c                        |  10 +-
+ hw/arm/versatilepb.c                     |   3 +-
+ hw/arm/vexpress.c                        |  10 +-
+ hw/arm/virt.c                            |   3 +-
+ hw/arm/xilinx_zynq.c                     |   7 +-
+ hw/arm/z2.c                              |   6 +-
+ hw/block/pflash_cfi01.c                  | 123 ++++++++++++-----------
+ hw/block/pflash_cfi02.c                  |  79 ++++++++-------
+ hw/i386/pc_sysfw.c                       |  10 +-
+ hw/lm32/lm32_boards.c                    |   8 +-
+ hw/lm32/milkymist.c                      |   5 +-
+ hw/microblaze/petalogix_ml605_mmu.c      |   6 +-
+ hw/microblaze/petalogix_s3adsp1800_mmu.c |   5 +-
+ hw/mips/mips_malta.c                     |  22 ++--
+ hw/mips/mips_r4k.c                       |   5 +-
+ hw/ppc/ppc405_boards.c                   |  57 ++++-------
+ hw/ppc/sam460ex.c                        |  42 +++++---
+ hw/ppc/virtex_ml507.c                    |   5 +-
+ hw/sh4/r2d.c                             |  17 +++-
+ hw/xtensa/xtfpga.c                       |  12 +--
+ include/hw/block/flash.h                 |  57 +++++++----
+ 26 files changed, 265 insertions(+), 262 deletions(-)
+
+--=20
+2.17.2
