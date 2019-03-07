@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44145)
+Received: from eggs.gnu.org ([209.51.188.92]:44225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1ttK-0005pH-Og
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:21:01 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1ttP-0005sW-L5
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:21:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1ttK-0000go-0V
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:20:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1ttO-0000vy-SE
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:21:03 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  7 Mar 2019 15:18:38 +0100
-Message-Id: <1551968334-18982-14-git-send-email-thuth@redhat.com>
+Date: Thu,  7 Mar 2019 15:18:40 +0100
+Message-Id: <1551968334-18982-16-git-send-email-thuth@redhat.com>
 In-Reply-To: <1551968334-18982-1-git-send-email-thuth@redhat.com>
 References: <1551968334-18982-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 13/29] hw/arm: Express dependencies of
- xilinx-zynq with Kconfig
+Subject: [Qemu-devel] [PATCH v4 15/29] hw/arm: Express dependencies of the
+ aspeed boards with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +23,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-arm@nongnu.org, John Snow <jsnow@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Add Kconfig dependencies for the xilinx-zynq-a9 board.
-This patch is based on earlier work by =C3=81kos Kov=C3=A1cs (i.e.
-his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+Dependencies have been determined by looking at hw/arm/aspeed.c
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
  default-configs/arm-softmmu.mak |  7 +------
- hw/arm/Kconfig                  | 14 ++++++++++++++
- 2 files changed, 15 insertions(+), 6 deletions(-)
+ hw/arm/Kconfig                  | 10 ++++++++++
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index f3ac12c..54b1c61 100644
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 44988f7..81c8156 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -16,6 +16,7 @@ CONFIG_STELLARIS=3Dy
- CONFIG_REALVIEW=3Dy
- CONFIG_VERSATILE=3Dy
- CONFIG_VEXPRESS=3Dy
-+CONFIG_ZYNQ=3Dy
- CONFIG_MAINSTONE=3Dy
- CONFIG_GUMSTIX=3Dy
- CONFIG_SPITZ=3Dy
-@@ -35,16 +36,11 @@ CONFIG_VIRTIO_MMIO=3Dy
-=20
- CONFIG_NETDUINO2=3Dy
-=20
--CONFIG_PL330=3Dy
--CONFIG_CADENCE=3Dy
- CONFIG_FRAMEBUFFER=3Dy
--CONFIG_XILINX_SPIPS=3Dy
--CONFIG_ZYNQ_DEVCFG=3Dy
-=20
- CONFIG_DIGIC=3Dy
- CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
--CONFIG_ZYNQ=3Dy
- CONFIG_STM32F2XX_TIMER=3Dy
- CONFIG_STM32F2XX_USART=3Dy
- CONFIG_STM32F2XX_SYSCFG=3Dy
-@@ -97,7 +93,6 @@ CONFIG_SMBUS_EEPROM=3Dy
- CONFIG_GPIO_KEY=3Dy
- CONFIG_MSF2=3Dy
- CONFIG_FW_CFG_DMA=3Dy
--CONFIG_XILINX_AXI=3Dy
- CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
-=20
- CONFIG_STRONGARM=3Dy
+@@ -23,15 +23,12 @@ CONFIG_SPITZ=y
+ CONFIG_TOSA=y
+ CONFIG_Z2=y
+ CONFIG_COLLIE=y
++CONFIG_ASPEED_SOC=y
+ 
+ CONFIG_VGA=y
+-CONFIG_TMP421=y
+-CONFIG_PCA9552=y
+ CONFIG_SSI_M25P80=y
+ CONFIG_ALLWINNER_EMAC=y
+ CONFIG_IMX_FEC=y
+-CONFIG_FTGMAC100=y
+-CONFIG_DS1338=y
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_VIRTIO_MMIO=y
+ 
+@@ -89,8 +86,6 @@ CONFIG_I82801B11=y
+ CONFIG_ACPI=y
+ CONFIG_ARM_VIRT=y
+ CONFIG_SMBIOS=y
+-CONFIG_ASPEED_SOC=y
+-CONFIG_SMBUS_EEPROM=y
+ CONFIG_GPIO_KEY=y
+ CONFIG_MSF2=y
+ CONFIG_FW_CFG_DMA=y
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 1a3ad0f..ef9cc97 100644
+index 43ef149..e162049 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -206,6 +206,20 @@ config VEXPRESS
-=20
- config ZYNQ
+@@ -262,6 +262,16 @@ config FSL_IMX6
+ 
+ config ASPEED_SOC
      bool
-+    select A9MPCORE
-+    select CADENCE # UART
-+    select PCI
-+    select PFLASH_CFI02
-+    select PL330
-+    select SDHCI
++    select DS1338
++    select FTGMAC100
++    select I2C
++    select PCA9552
++    select SERIAL
++    select SMBUS_EEPROM
++    select SSI
 +    select SSI_M25P80
-+    select USB_EHCI
-+    select USB_EHCI_SYSBUS
-+    select XILINX # UART
-+    select XILINX_AXI
-+    select XILINX_SPI
-+    select XILINX_SPIPS
-+    select ZYNQ_DEVCFG
-=20
- config ARM_V7M
++    select TMP105
++    select TMP421
+ 
+ config MPS2
      bool
---=20
+-- 
 1.8.3.1
