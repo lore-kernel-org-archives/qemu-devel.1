@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39874)
+Received: from eggs.gnu.org ([209.51.188.92]:39855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrA-0003ei-Nm
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:58 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wr9-0003cj-AZ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wr9-0008Qv-As
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:56 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56016)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wr7-0008P8-5N
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:55 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:43673)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1wr9-0008QE-2Z
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:55 -0500
-Received: by mail-wm1-x342.google.com with SMTP id q187so10151339wme.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:54 -0800 (PST)
+	id 1h1wr6-0008OL-Q5
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:53 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id d17so18395600wre.10
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:52 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 18:29:49 +0100
-Message-Id: <1551979804-6060-43-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 18:29:47 +0100
+Message-Id: <1551979804-6060-41-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
 References: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 42/57] qos-test: virtio-scsi test node
+Subject: [Qemu-devel] [PULL 40/57] qos-test: vhost-user test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,289 +28,630 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, lviver@redhat.com, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Cc: thuth@redhat.com, lviver@redhat.com
 
-From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-
-Convert tests/virtio-scsi-test in qgraph test node,
-virtio-scsi-test. This test consumes a virtio-scsi interface
+Convert tests/virtio-net-test in qgraph test node,
+virtio-net-test. This test consumes a virtio-net interface
 and checks that its function return the expected values.
 
-Some functions are implemented only for virtio-scsi-pci, so they
-don't consume virtio-scsi, but virtio-scsi-pci
+Note that this test does not allocate any virtio-net structure,
+it's all done by the qtest walking graph mechanism.  Nevertheless,
+vhost-user-test is a bit more complex than the other tests, because
+it requires more complicated setup of back-ends and thus almost each
+test has a slightly different opts.before function.
 
-Note that this test does not allocate any virtio-scsi structure,
-it's all done by the qtest walking graph mechanism
-
-Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include   |   4 +-
- tests/virtio-scsi-test.c | 143 +++++++++++++++++++----------------------------
- 2 files changed, 60 insertions(+), 87 deletions(-)
+ tests/Makefile.include  |   5 +-
+ tests/vhost-user-test.c | 381 +++++++++++++++++++-----------------------------
+ 2 files changed, 152 insertions(+), 234 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 48b7cf0..09483d0 100644
+index f45d115..a0b42c9 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -153,8 +153,6 @@ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
- 
- check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
- 
--check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
--
- check-qtest-pci-y += tests/e1000-test$(EXESUF)
- check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
- check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
-@@ -766,6 +764,7 @@ qos-test-obj-$(CONFIG_VIRTFS) += tests/virtio-9p-test.o
+@@ -204,7 +204,6 @@ check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
+ check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
+ check-qtest-i386-y += tests/q35-test$(EXESUF)
+ check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+-check-qtest-i386-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
+@@ -760,6 +759,7 @@ qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+ qos-test-obj-y += tests/e1000e-test.o
+ qos-test-obj-y += tests/pci-test.o
+ qos-test-obj-y += tests/sdhci-test.o
++qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test.o $(chardev-obj-y) $(test-io-obj-y)
+ qos-test-obj-y += tests/virtio-test.o
+ qos-test-obj-$(CONFIG_VIRTFS) += tests/virtio-9p-test.o
  qos-test-obj-y += tests/virtio-blk-test.o
- qos-test-obj-y += tests/virtio-net-test.o
- qos-test-obj-y += tests/virtio-rng-test.o
-+qos-test-obj-y += tests/virtio-scsi-test.o
- qos-test-obj-y += tests/virtio-serial-test.o
+@@ -835,9 +835,6 @@ tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
+ tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
+ tests/migration-test$(EXESUF): tests/migration-test.o
+ tests/test-announce-self$(EXESUF): tests/test-announce-self.o
+-tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
+-	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) \
+-	$(chardev-obj-y)
+ tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
+ tests/test-qemu-opts$(EXESUF): tests/test-qemu-opts.o $(test-util-obj-y)
+ tests/test-keyval$(EXESUF): tests/test-keyval.o $(test-util-obj-y) $(test-qapi-obj-y)
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 2a67a99..92dfeed 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -41,8 +41,7 @@
+ #define QEMU_CMD_MEMFD  " -m %d -object memory-backend-memfd,id=mem,size=%dM," \
+                         " -numa node,memdev=mem"
+ #define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s%s"
+-#define QEMU_CMD_NETDEV " -netdev vhost-user,id=net0,chardev=%s,vhostforce"
+-#define QEMU_CMD_NET    " -device virtio-net-pci,netdev=net0"
++#define QEMU_CMD_NETDEV " -netdev vhost-user,id=hs0,chardev=%s,vhostforce"
  
- check-unit-y += tests/test-qgraph$(EXESUF)
-@@ -813,7 +812,6 @@ tests/ne2000-test$(EXESUF): tests/ne2000-test.o
- tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
- tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
--tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
- tests/tpci200-test$(EXESUF): tests/tpci200-test.o
- tests/display-vga-test$(EXESUF): tests/display-vga-test.o
- tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 9298aa8..162b31c 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -18,6 +18,8 @@
- #include "standard-headers/linux/virtio_ids.h"
- #include "standard-headers/linux/virtio_pci.h"
- #include "standard-headers/linux/virtio_scsi.h"
-+#include "libqos/virtio-scsi.h"
-+#include "libqos/qgraph.h"
+ #define HUGETLBFS_MAGIC       0x958458f6
  
- #define PCI_SLOT                0x02
- #define PCI_FN                  0x00
-@@ -27,55 +29,28 @@
+@@ -136,13 +135,9 @@ enum {
+ };
  
- typedef struct {
-     QVirtioDevice *dev;
--    QOSState *qs;
-     int num_queues;
-     QVirtQueue *vq[MAX_NUM_QUEUES + 2];
--} QVirtIOSCSI;
-+} QVirtioSCSIQueues;
- 
--static QOSState *qvirtio_scsi_start(const char *extra_opts)
--{
--    QOSState *qs;
--    const char *arch = qtest_get_arch();
--    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
--                      "-device virtio-scsi-pci,id=vs0 "
--                      "-device scsi-hd,bus=vs0.0,drive=drv0 %s";
--
--    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        qs = qtest_pc_boot(cmd, extra_opts ? : "");
--    } else if (strcmp(arch, "ppc64") == 0) {
--        qs = qtest_spapr_boot(cmd, extra_opts ? : "");
--    } else {
--        g_printerr("virtio-scsi tests are only available on x86 or ppc64\n");
--        exit(EXIT_FAILURE);
--    }
--    global_qtest = qs->qts;
--    return qs;
--}
--
--static void qvirtio_scsi_stop(QOSState *qs)
--{
--    qtest_shutdown(qs);
--}
-+static QGuestAllocator *alloc;
- 
--static void qvirtio_scsi_pci_free(QVirtIOSCSI *vs)
-+static void qvirtio_scsi_pci_free(QVirtioSCSIQueues *vs)
- {
-     int i;
- 
-     for (i = 0; i < vs->num_queues + 2; i++) {
--        qvirtqueue_cleanup(vs->dev->bus, vs->vq[i], &vs->qs->alloc);
-+        qvirtqueue_cleanup(vs->dev->bus, vs->vq[i], alloc);
-     }
--    qvirtio_pci_device_disable(container_of(vs->dev, QVirtioPCIDevice, vdev));
--    qvirtio_pci_device_free((QVirtioPCIDevice *)vs->dev);
--    qvirtio_scsi_stop(vs->qs);
-     g_free(vs);
- }
- 
--static uint64_t qvirtio_scsi_alloc(QVirtIOSCSI *vs, size_t alloc_size,
-+static uint64_t qvirtio_scsi_alloc(QVirtioSCSIQueues *vs, size_t alloc_size,
-                                    const void *data)
- {
-     uint64_t addr;
- 
--    addr = guest_alloc(&vs->qs->alloc, alloc_size);
-+    addr = guest_alloc(alloc, alloc_size);
-     if (data) {
-         memwrite(addr, data, alloc_size);
-     }
-@@ -83,7 +58,8 @@ static uint64_t qvirtio_scsi_alloc(QVirtIOSCSI *vs, size_t alloc_size,
-     return addr;
- }
- 
--static uint8_t virtio_scsi_do_command(QVirtIOSCSI *vs, const uint8_t *cdb,
-+static uint8_t virtio_scsi_do_command(QVirtioSCSIQueues *vs,
-+                                      const uint8_t *cdb,
-                                       const uint8_t *data_in,
-                                       size_t data_in_len,
-                                       uint8_t *data_out, size_t data_out_len,
-@@ -133,40 +109,28 @@ static uint8_t virtio_scsi_do_command(QVirtIOSCSI *vs, const uint8_t *cdb,
-         memread(resp_addr, resp_out, sizeof(*resp_out));
-     }
- 
--    guest_free(&vs->qs->alloc, req_addr);
--    guest_free(&vs->qs->alloc, resp_addr);
--    guest_free(&vs->qs->alloc, data_in_addr);
--    guest_free(&vs->qs->alloc, data_out_addr);
-+    guest_free(alloc, req_addr);
-+    guest_free(alloc, resp_addr);
-+    guest_free(alloc, data_in_addr);
-+    guest_free(alloc, data_out_addr);
-     return response;
- }
- 
--static QVirtIOSCSI *qvirtio_scsi_pci_init(int slot)
-+static QVirtioSCSIQueues *qvirtio_scsi_init(QVirtioDevice *dev)
- {
-+    QVirtioSCSIQueues *vs;
-     const uint8_t test_unit_ready_cdb[VIRTIO_SCSI_CDB_SIZE] = {};
--    QVirtIOSCSI *vs;
+ typedef struct TestServer {
+-    QPCIBus *bus;
 -    QVirtioPCIDevice *dev;
-     struct virtio_scsi_cmd_resp resp;
-     int i;
+-    QVirtQueue *vq[VHOST_MAX_VIRTQUEUES];
+     gchar *socket_path;
+     gchar *mig_path;
+     gchar *chr_name;
+-    const gchar *mem_path;
+     gchar *tmpfs;
+     CharBackend chr;
+     int fds_num;
+@@ -158,9 +153,9 @@ typedef struct TestServer {
+     bool test_fail;
+     int test_flags;
+     int queues;
+-    QGuestAllocator alloc;
+ } TestServer;
  
--    vs = g_new0(QVirtIOSCSI, 1);
--
--    vs->qs = qvirtio_scsi_start("-drive file=blkdebug::null-co://,"
--                                "if=none,id=dr1,format=raw,file.align=4k "
--                                "-device scsi-hd,drive=dr1,lun=0,scsi-id=1");
--    dev = qvirtio_pci_device_find(vs->qs->pcibus, VIRTIO_ID_SCSI);
--    vs->dev = (QVirtioDevice *)dev;
--    g_assert(dev != NULL);
--    g_assert_cmphex(vs->dev->device_type, ==, VIRTIO_ID_SCSI);
--
--    qvirtio_pci_device_enable(dev);
--    qvirtio_start_device(vs->dev);
--
--    vs->num_queues = qvirtio_config_readl(vs->dev, 0);
-+    vs = g_new0(QVirtioSCSIQueues, 1);
-+    vs->dev = dev;
-+    vs->num_queues = qvirtio_config_readl(dev, 0);
++static const char *init_hugepagefs(void);
+ static TestServer *test_server_new(const gchar *name);
+ static void test_server_free(TestServer *server);
+ static void test_server_listen(TestServer *server);
+@@ -171,64 +166,28 @@ enum test_memfd {
+     TEST_MEMFD_NO,
+ };
  
-     g_assert_cmpint(vs->num_queues, <, MAX_NUM_QUEUES);
+-static char *get_qemu_cmd(TestServer *s,
+-                          int mem, enum test_memfd memfd,
+-                          const char *chr_opts, const char *extra)
++static void append_vhost_opts(TestServer *s, GString *cmd_line,
++                             const char *chr_opts)
+ {
+-    if (memfd == TEST_MEMFD_AUTO && qemu_memfd_check(0)) {
+-        memfd = TEST_MEMFD_YES;
+-    }
+-
+-    if (memfd == TEST_MEMFD_YES) {
+-        return g_strdup_printf(QEMU_CMD_MEMFD QEMU_CMD_CHR
+-                               QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, mem,
+-                               s->chr_name, s->socket_path,
+-                               chr_opts, s->chr_name, extra);
+-    } else {
+-        return g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR
+-                               QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, mem,
+-                               s->mem_path, s->chr_name, s->socket_path,
+-                               chr_opts, s->chr_name, extra);
+-    }
++    g_string_append_printf(cmd_line, QEMU_CMD_CHR QEMU_CMD_NETDEV,
++                           s->chr_name, s->socket_path,
++                           chr_opts, s->chr_name);
+ }
  
-     for (i = 0; i < vs->num_queues + 2; i++) {
--        vs->vq[i] = qvirtqueue_setup(vs->dev, &vs->qs->alloc, i);
-+        vs->vq[i] = qvirtqueue_setup(dev, alloc, i);
+-static void init_virtio_dev(QTestState *qts, TestServer *s, uint32_t features_mask)
++static void append_mem_opts(TestServer *server, GString *cmd_line,
++                            int size, enum test_memfd memfd)
+ {
+-    uint32_t features;
+-    int i;
+-
+-    s->bus = qpci_new_pc(qts, NULL);
+-    g_assert_nonnull(s->bus);
+-
+-    s->dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
+-    g_assert_nonnull(s->dev);
+-
+-    qvirtio_pci_device_enable(s->dev);
+-    qvirtio_start_device(&s->dev->vdev);
+-
+-    pc_alloc_init(&s->alloc, qts, 0);
+-
+-    for (i = 0; i < s->queues * 2; i++) {
+-        s->vq[i] = qvirtqueue_setup(&s->dev->vdev, &s->alloc, i);
++    if (memfd == TEST_MEMFD_AUTO) {
++        memfd = qemu_memfd_check(0) ? TEST_MEMFD_YES : TEST_MEMFD_NO;
      }
  
-     /* Clear the POWER ON OCCURRED unit attention */
-@@ -182,30 +146,18 @@ static QVirtIOSCSI *qvirtio_scsi_pci_init(int slot)
-     return vs;
- }
- 
--/* Tests only initialization so far. TODO: Replace with functional tests */
--static void pci_nop(void)
--{
--    QOSState *qs;
+-    features = qvirtio_get_features(&s->dev->vdev);
+-    features = features & features_mask;
+-    qvirtio_set_features(&s->dev->vdev, features);
 -
--    qs = qvirtio_scsi_start(NULL);
--    qvirtio_scsi_stop(qs);
+-    qvirtio_set_driver_ok(&s->dev->vdev);
 -}
 -
--static void hotplug(void)
-+static void hotplug(void *obj, void *data, QGuestAllocator *alloc)
- {
--    QOSState *qs;
+-static void uninit_virtio_dev(TestServer *s)
+-{
+-    int i;
++    if (memfd == TEST_MEMFD_YES) {
++        g_string_append_printf(cmd_line, QEMU_CMD_MEMFD, size, size);
++    } else {
++        const char *root = init_hugepagefs() ? : server->tmpfs;
+ 
+-    for (i = 0; i < s->queues * 2; i++) {
+-        qvirtqueue_cleanup(s->dev->vdev.bus, s->vq[i], &s->alloc);
++        g_string_append_printf(cmd_line, QEMU_CMD_MEM, size, size, root);
+     }
+-    alloc_destroy(&s->alloc);
 -
--    qs = qvirtio_scsi_start(
--            "-drive id=drv1,if=none,file=null-co://,format=raw");
-     qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drv1'}");
-     qtest_qmp_device_del("scsihd");
--    qvirtio_scsi_stop(qs);
+-    qvirtio_pci_device_free(s->dev);
  }
  
- /* Test WRITE SAME with the lba not aligned */
--static void test_unaligned_write_same(void)
-+static void test_unaligned_write_same(void *obj, void *data,
-+                                      QGuestAllocator *t_alloc)
+ static bool wait_for_fds(TestServer *s)
+@@ -465,17 +424,21 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+ static const char *init_hugepagefs(void)
  {
--    QVirtIOSCSI *vs;
-+    QVirtioSCSI *scsi = obj;
-+    QVirtioSCSIQueues *vs;
-     uint8_t buf1[512] = { 0 };
-     uint8_t buf2[512] = { 1 };
-     const uint8_t write_same_cdb_1[VIRTIO_SCSI_CDB_SIZE] = {
-@@ -218,27 +170,50 @@ static void test_unaligned_write_same(void)
-         0x41, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x33, 0x00, 0x00
-     };
+ #ifdef CONFIG_LINUX
++    static const char *hugepagefs;
+     const char *path = getenv("QTEST_HUGETLBFS_PATH");
+     struct statfs fs;
+     int ret;
  
--    vs = qvirtio_scsi_pci_init(PCI_SLOT);
-+    alloc = t_alloc;
-+    vs = qvirtio_scsi_init(scsi->vdev);
++    if (hugepagefs) {
++        return hugepagefs;
++    }
+     if (!path) {
+         return NULL;
+     }
  
-     g_assert_cmphex(0, ==,
--        virtio_scsi_do_command(vs, write_same_cdb_1, NULL, 0, buf1, 512, NULL));
-+        virtio_scsi_do_command(vs, write_same_cdb_1, NULL, 0, buf1, 512,
-+                               NULL));
+     if (access(path, R_OK | W_OK | X_OK)) {
+         g_test_message("access on path (%s): %s\n", path, strerror(errno));
+-        abort();
++        g_test_fail();
+         return NULL;
+     }
  
-     g_assert_cmphex(0, ==,
--        virtio_scsi_do_command(vs, write_same_cdb_2, NULL, 0, buf2, 512, NULL));
-+        virtio_scsi_do_command(vs, write_same_cdb_2, NULL, 0, buf2, 512,
-+                               NULL));
+@@ -485,17 +448,18 @@ static const char *init_hugepagefs(void)
  
-     g_assert_cmphex(0, ==,
--        virtio_scsi_do_command(vs, write_same_cdb_ndob, NULL, 0, NULL, 0, NULL));
-+        virtio_scsi_do_command(vs, write_same_cdb_ndob, NULL, 0, NULL, 0,
-+                               NULL));
+     if (ret != 0) {
+         g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
+-        abort();
++        g_test_fail();
+         return NULL;
+     }
  
-     qvirtio_scsi_pci_free(vs);
+     if (fs.f_type != HUGETLBFS_MAGIC) {
+         g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
+-        abort();
++        g_test_fail();
+         return NULL;
+     }
+ 
+-    return path;
++    hugepagefs = path;
++    return hugepagefs;
+ #else
+     return NULL;
+ #endif
+@@ -520,7 +484,6 @@ static TestServer *test_server_new(const gchar *name)
+     g_assert(tmpfs);
+ 
+     server->tmpfs = g_strdup(tmpfs);
+-    server->mem_path = init_hugepagefs() ? : server->tmpfs;
+     server->socket_path = g_strdup_printf("%s/%s.sock", tmpfs, name);
+     server->mig_path = g_strdup_printf("%s/%s.mig", tmpfs, name);
+     server->chr_name = g_strdup_printf("chr-%s", name);
+@@ -598,8 +561,6 @@ static void test_server_free(TestServer *server)
+     }
+ 
+     g_free(server->chr_name);
+-    g_assert(server->bus);
+-    qpci_free_pc(server->bus);
+ 
+     g_main_loop_unref(server->loop);
+     g_main_context_unref(server->context);
+@@ -693,70 +654,79 @@ GSourceFuncs test_migrate_source_funcs = {
+     .check = test_migrate_source_check,
+ };
+ 
+-static void test_read_guest_mem(const void *arg)
++static void vhost_user_test_cleanup(void *s)
++{
++    TestServer *server = s;
++
++    qos_invalidate_command_line();
++    test_server_free(server);
++}
++
++static void *vhost_user_test_setup(GString *cmd_line, void *arg)
+ {
+-    enum test_memfd memfd = GPOINTER_TO_INT(arg);
+-    TestServer *server = NULL;
+-    char *qemu_cmd = NULL;
+-    QTestState *s = NULL;
++    TestServer *server = test_server_new("vhost-user-test");
++    test_server_listen(server);
++
++    append_mem_opts(server, cmd_line, 256, TEST_MEMFD_AUTO);
++    append_vhost_opts(server, cmd_line, "");
++
++    g_test_queue_destroy(vhost_user_test_cleanup, server);
++
++    return server;
++}
+ 
+-    server = test_server_new(memfd == TEST_MEMFD_YES ?
+-                             "read-guest-memfd" : "read-guest-mem");
++static void *vhost_user_test_setup_memfd(GString *cmd_line, void *arg)
++{
++    TestServer *server = test_server_new("vhost-user-test");
+     test_server_listen(server);
+ 
+-    qemu_cmd = get_qemu_cmd(server, 256, memfd, "", "");
++    append_mem_opts(server, cmd_line, 256, TEST_MEMFD_YES);
++    append_vhost_opts(server, cmd_line, "");
++
++    g_test_queue_destroy(vhost_user_test_cleanup, server);
+ 
+-    s = qtest_start(qemu_cmd);
+-    g_free(qemu_cmd);
++    return server;
++}
+ 
+-    init_virtio_dev(global_qtest, server, 1u << VIRTIO_NET_F_MAC);
++static void test_read_guest_mem(void *obj, void *arg, QGuestAllocator *alloc)
++{
++    TestServer *server = arg;
+ 
+     if (!wait_for_fds(server)) {
+-        goto exit;
++        return;
+     }
+ 
+     read_guest_mem_server(global_qtest, server);
+-
+-exit:
+-    uninit_virtio_dev(server);
+-
+-    qtest_quit(s);
+-    test_server_free(server);
+ }
+ 
+-static void test_migrate(void)
++static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
+ {
+-    TestServer *s = test_server_new("src");
++    TestServer *s = arg;
+     TestServer *dest = test_server_new("dest");
++    GString *dest_cmdline = g_string_new(qos_get_current_command_line());
+     char *uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
+-    QTestState *from, *to;
++    QTestState *to;
+     GSource *source;
+-    gchar *cmd, *tmp;
+     QDict *rsp;
+     guint8 *log;
+     guint64 size;
+ 
+-    test_server_listen(s);
+-    test_server_listen(dest);
+-
+-    cmd = get_qemu_cmd(s, 256, TEST_MEMFD_AUTO, "", "");
+-    from = qtest_start(cmd);
+-    g_free(cmd);
+-
+-    init_virtio_dev(from, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+-        goto exit;
++        return;
+     }
+ 
+     size = get_log_size(s);
+     g_assert_cmpint(size, ==, (256 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
+ 
+-    tmp = g_strdup_printf(" -incoming %s", uri);
+-    cmd = get_qemu_cmd(dest, 256, TEST_MEMFD_AUTO, "", tmp);
+-    g_free(tmp);
+-    to = qtest_init(cmd);
+-    g_free(cmd);
+-    init_virtio_dev(to, dest, 1u << VIRTIO_NET_F_MAC);
++    test_server_listen(dest);
++    g_string_append_printf(dest_cmdline, " -incoming %s", uri);
++    append_mem_opts(dest, dest_cmdline, 256, TEST_MEMFD_AUTO);
++    append_vhost_opts(dest, dest_cmdline, "");
++    to = qtest_init(dest_cmdline->str);
++
++    /* This would be where you call qos_allocate_objects(to, NULL), if you want
++     * to talk to the QVirtioNet object on the destination.
++     */
+ 
+     source = g_source_new(&test_migrate_source_funcs,
+                           sizeof(TestMigrateSource));
+@@ -797,18 +767,11 @@ static void test_migrate(void)
+     g_assert(wait_for_fds(dest));
+     read_guest_mem_server(to, dest);
+ 
+-    uninit_virtio_dev(dest);
+-    qtest_quit(to);
+-
+     g_source_destroy(source);
+     g_source_unref(source);
+ 
+-exit:
+-    uninit_virtio_dev(s);
+-
++    qtest_quit(to);
+     test_server_free(dest);
+-    qtest_quit(from);
+-    test_server_free(s);
+     g_free(uri);
+ }
+ 
+@@ -856,20 +819,26 @@ connect_thread(gpointer data)
+     return NULL;
+ }
+ 
+-static void test_reconnect_subprocess(void)
++static void *vhost_user_test_setup_reconnect(GString *cmd_line, void *arg)
+ {
+     TestServer *s = test_server_new("reconnect");
+-    GSource *src;
+-    char *cmd;
+ 
+     g_thread_new("connect", connect_thread, s);
+-    cmd = get_qemu_cmd(s, 256, TEST_MEMFD_AUTO, ",server", "");
+-    qtest_start(cmd);
+-    g_free(cmd);
++    append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
++    append_vhost_opts(s, cmd_line, ",server");
++
++    g_test_queue_destroy(vhost_user_test_cleanup, s);
++
++    return s;
++}
++
++static void test_reconnect(void *obj, void *arg, QGuestAllocator *alloc)
++{
++    TestServer *s = arg;
++    GSource *src;
+ 
+-    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+-        goto exit;
++        return;
+     }
+ 
+     wait_for_rings_started(s, 2);
+@@ -883,159 +852,111 @@ static void test_reconnect_subprocess(void)
+     g_source_unref(src);
+     g_assert(wait_for_fds(s));
+     wait_for_rings_started(s, 2);
+-
+-exit:
+-    uninit_virtio_dev(s);
+-
+-    qtest_end();
+-    test_server_free(s);
+-    return;
+ }
+ 
+-static void test_reconnect(void)
+-{
+-    gchar *path = g_strdup_printf("/%s/vhost-user/reconnect/subprocess",
+-                                  qtest_get_arch());
+-    g_test_trap_subprocess(path, 0, 0);
+-    g_test_trap_assert_passed();
+-    g_free(path);
+-}
+-
+-static void test_connect_fail_subprocess(void)
++static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
+ {
+     TestServer *s = test_server_new("connect-fail");
+-    char *cmd;
+ 
+     s->test_fail = true;
+-    g_thread_new("connect", connect_thread, s);
+-    cmd = get_qemu_cmd(s, 256, TEST_MEMFD_AUTO, ",server", "");
+-    qtest_start(cmd);
+-    g_free(cmd);
+-
+-    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+-    if (!wait_for_fds(s)) {
+-        goto exit;
+-    }
+-    wait_for_rings_started(s, 2);
+ 
+-exit:
+-    uninit_virtio_dev(s);
++    g_thread_new("connect", connect_thread, s);
++    append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
++    append_vhost_opts(s, cmd_line, ",server");
+ 
+-    qtest_end();
+-    test_server_free(s);
+-}
++    g_test_queue_destroy(vhost_user_test_cleanup, s);
+ 
+-static void test_connect_fail(void)
+-{
+-    gchar *path = g_strdup_printf("/%s/vhost-user/connect-fail/subprocess",
+-                                  qtest_get_arch());
+-    g_test_trap_subprocess(path, 0, 0);
+-    g_test_trap_assert_passed();
+-    g_free(path);
++    return s;
+ }
+ 
+-static void test_flags_mismatch_subprocess(void)
++static void *vhost_user_test_setup_flags_mismatch(GString *cmd_line, void *arg)
+ {
+     TestServer *s = test_server_new("flags-mismatch");
+-    char *cmd;
+ 
+     s->test_flags = TEST_FLAGS_DISCONNECT;
+-    g_thread_new("connect", connect_thread, s);
+-    cmd = get_qemu_cmd(s, 256, TEST_MEMFD_AUTO, ",server", "");
+-    qtest_start(cmd);
+-    g_free(cmd);
+ 
+-    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+-    if (!wait_for_fds(s)) {
+-        goto exit;
+-    }
+-    wait_for_rings_started(s, 2);
++    g_thread_new("connect", connect_thread, s);
++    append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
++    append_vhost_opts(s, cmd_line, ",server");
+ 
+-exit:
+-    uninit_virtio_dev(s);
++    g_test_queue_destroy(vhost_user_test_cleanup, s);
+ 
+-    qtest_end();
+-    test_server_free(s);
++    return s;
+ }
+ 
+-static void test_flags_mismatch(void)
++static void test_vhost_user_started(void *obj, void *arg, QGuestAllocator *alloc)
+ {
+-    gchar *path = g_strdup_printf("/%s/vhost-user/flags-mismatch/subprocess",
+-                                  qtest_get_arch());
+-    g_test_trap_subprocess(path, 0, 0);
+-    g_test_trap_assert_passed();
+-    g_free(path);
+-}
++    TestServer *s = arg;
+ 
++    if (!wait_for_fds(s)) {
++        return;
++    }
++    wait_for_rings_started(s, 2);
++}
+ 
+-static void test_multiqueue(void)
++static void *vhost_user_test_setup_multiqueue(GString *cmd_line, void *arg)
+ {
+-    TestServer *s = test_server_new("mq");
+-    char *cmd;
+-    uint32_t features_mask = ~(QVIRTIO_F_BAD_FEATURE |
+-                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
+-                            (1u << VIRTIO_RING_F_EVENT_IDX));
++    TestServer *s = vhost_user_test_setup(cmd_line, arg);
++
+     s->queues = 2;
+-    test_server_listen(s);
++    g_string_append_printf(cmd_line,
++                           " -set netdev.hs0.queues=%d"
++                           " -global virtio-net-pci.vectors=%d",
++                           s->queues, s->queues * 2 + 2);
+ 
+-    if (qemu_memfd_check(0)) {
+-        cmd = g_strdup_printf(
+-            QEMU_CMD_MEMFD QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
+-            "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
+-            256, 256, s->chr_name,
+-            s->socket_path, "", s->chr_name,
+-            s->queues, s->queues * 2 + 2);
+-    } else {
+-        cmd = g_strdup_printf(
+-            QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
+-            "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
+-            256, 256, s->mem_path, s->chr_name,
+-            s->socket_path, "", s->chr_name,
+-            s->queues, s->queues * 2 + 2);
+-    }
+-    qtest_start(cmd);
+-    g_free(cmd);
++    return s;
++}
+ 
+-    init_virtio_dev(global_qtest, s, features_mask);
++static void test_multiqueue(void *obj, void *arg, QGuestAllocator *alloc)
++{
++    TestServer *s = arg;
+ 
+     wait_for_rings_started(s, s->queues * 2);
+-
+-    uninit_virtio_dev(s);
+-
+-    qtest_end();
+-
+-    test_server_free(s);
  }
  
 -int main(int argc, char **argv)
-+static void *virtio_scsi_hotplug_setup(GString *cmd_line, void *arg)
++static void register_vhost_user_test(void)
  {
 -    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/virtio/scsi/pci/nop", pci_nop);
--    qtest_add_func("/virtio/scsi/pci/hotplug", hotplug);
--    qtest_add_func("/virtio/scsi/pci/scsi-disk/unaligned-write-same",
--                   test_unaligned_write_same);
-+    g_string_append(cmd_line,
-+                    " -drive id=drv1,if=none,file=null-co://,format=raw");
-+    return arg;
-+}
++    QOSGraphTestOptions opts = {
++        .before = vhost_user_test_setup,
++        .subprocess = true,
++    };
+ 
+-    module_call_init(MODULE_INIT_QOM);
+     qemu_add_opts(&qemu_chardev_opts);
+ 
++    qos_add_test("vhost-user/read-guest-mem/memfile",
++                 "virtio-net",
++                 test_read_guest_mem, &opts);
++
+     if (qemu_memfd_check(0)) {
+-        qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
+-                            GINT_TO_POINTER(TEST_MEMFD_YES),
+-                            test_read_guest_mem);
++        opts.before = vhost_user_test_setup_memfd;
++        qos_add_test("vhost-user/read-guest-mem/memfd",
++                     "virtio-net",
++                     test_read_guest_mem, &opts);
+     }
+-    qtest_add_data_func("/vhost-user/read-guest-mem/memfile",
+-                        GINT_TO_POINTER(TEST_MEMFD_NO), test_read_guest_mem);
+-    qtest_add_func("/vhost-user/migrate", test_migrate);
+-    qtest_add_func("/vhost-user/multiqueue", test_multiqueue);
++
++    qos_add_test("vhost-user/migrate",
++                 "virtio-net",
++                 test_migrate, &opts);
+ 
+     /* keeps failing on build-system since Aug 15 2017 */
+     if (getenv("QTEST_VHOST_USER_FIXME")) {
+-        qtest_add_func("/vhost-user/reconnect/subprocess",
+-                       test_reconnect_subprocess);
+-        qtest_add_func("/vhost-user/reconnect", test_reconnect);
+-        qtest_add_func("/vhost-user/connect-fail/subprocess",
+-                       test_connect_fail_subprocess);
+-        qtest_add_func("/vhost-user/connect-fail", test_connect_fail);
+-        qtest_add_func("/vhost-user/flags-mismatch/subprocess",
+-                       test_flags_mismatch_subprocess);
+-        qtest_add_func("/vhost-user/flags-mismatch", test_flags_mismatch);
++        opts.before = vhost_user_test_setup_reconnect;
++        qos_add_test("vhost-user/reconnect", "virtio-net",
++                     test_reconnect, &opts);
++
++        opts.before = vhost_user_test_setup_connect_fail;
++        qos_add_test("vhost-user/connect-fail", "virtio-net",
++                     test_vhost_user_started, &opts);
++
++        opts.before = vhost_user_test_setup_flags_mismatch;
++        qos_add_test("vhost-user/flags-mismatch", "virtio-net",
++                     test_vhost_user_started, &opts);
+     }
  
 -    return g_test_run();
-+static void *virtio_scsi_setup(GString *cmd_line, void *arg)
-+{
-+    g_string_append(cmd_line,
-+                    " -drive file=blkdebug::null-co://,"
-+                    "if=none,id=dr1,format=raw,file.align=4k "
-+                    "-device scsi-hd,drive=dr1,lun=0,scsi-id=1");
-+    return arg;
++    opts.before = vhost_user_test_setup_multiqueue;
++    opts.edge.extra_device_opts = "mq=on";
++    qos_add_test("vhost-user/multiqueue",
++                 "virtio-net",
++                 test_multiqueue, &opts);
  }
-+
-+static void register_virtio_scsi_test(void)
-+{
-+    QOSGraphTestOptions opts = { };
-+
-+    opts.before = virtio_scsi_hotplug_setup;
-+    qos_add_test("hotplug", "virtio-scsi", hotplug, &opts);
-+
-+    opts.before = virtio_scsi_setup;
-+    qos_add_test("unaligned-write-same", "virtio-scsi",
-+                 test_unaligned_write_same, &opts);
-+}
-+
-+libqos_init(register_virtio_scsi_test);
++libqos_init(register_vhost_user_test);
 -- 
 1.8.3.1
