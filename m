@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59665)
+Received: from eggs.gnu.org ([209.51.188.92]:60467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1h1k3h-0005UM-3F
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:51:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1kAd-0006lh-7y
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:58:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <randrianasulu@gmail.com>) id 1h1k3c-0003zT-Md
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:51:01 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:32867)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
-	id 1h1k3c-0003xT-17
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:50:56 -0500
-Received: by mail-pg1-x544.google.com with SMTP id h11so10157703pgl.0
-	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 19:50:49 -0800 (PST)
-From: Andrew Randrianasulu <randrianasulu@gmail.com>
-Date: Thu, 7 Mar 2019 06:47:13 +0300
+	(envelope-from <dgibson@ozlabs.org>) id 1h1kAY-0008Dp-Oi
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:58:11 -0500
+Date: Thu, 7 Mar 2019 14:57:52 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190307035752.GG7722@umbus.fritz.box>
+References: <20190227085149.38596-1-aik@ozlabs.ru>
+	<20190227085149.38596-7-aik@ozlabs.ru>
+	<20190228033127.GA27799@umbus.fritz.box>
+	<ac6da63d-d039-73dd-d18e-0845b9ab94f7@ozlabs.ru>
+	<20190305014742.GD7877@umbus.fritz.box>
+	<1120a65a-1df5-2dbf-9860-64a2f81996cf@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_BRJgcDI5WyCkB8A"
-Message-Id: <201903070647.13740.randrianasulu@gmail.com>
-Subject: [Qemu-devel]  [PATCH v5-resend 0/2] Basic ATI VGA emulation
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qxfKREH7IwbezJ+T"
+Content-Disposition: inline
+In-Reply-To: <1120a65a-1df5-2dbf-9860-64a2f81996cf@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v3 6/6] spapr: Support NVIDIA V100 GPU
+ with NVLink2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,665 +29,1358 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: balaton@eik.bme.hu, qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>
 
---Boundary-00=_BRJgcDI5WyCkB8A
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+
+--qxfKREH7IwbezJ+T
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Tried this with mac99 machine and lubuntu 16.04 ppc.
+On Thu, Mar 07, 2019 at 01:40:33PM +1100, Alexey Kardashevskiy wrote:
+>=20
+>=20
+> On 05/03/2019 12:47, David Gibson wrote:
+> > On Thu, Feb 28, 2019 at 05:11:32PM +1100, Alexey Kardashevskiy wrote:
+> >> On 28/02/2019 14:31, David Gibson wrote:
+> >>> On Wed, Feb 27, 2019 at 07:51:49PM +1100, Alexey Kardashevskiy wrote:
+> >>>> NVIDIA V100 GPUs have on-board RAM which is mapped into the host mem=
+ory
+> >>>> space and accessible as normal RAM via an NVLink bus. The VFIO-PCI d=
+river
+> >>>> implements special regions for such GPUs and emulates an NVLink brid=
+ge.
+> >>>> NVLink2-enabled POWER9 CPUs also provide address translation services
+> >>>> which includes an ATS shootdown (ATSD) register exported via the NVL=
+ink
+> >>>> bridge device.
+> >>>>
+> >>>> This adds a quirk to VFIO to map the GPU memory and create an MR;
+> >>>> the new MR is stored in a PCI device as a QOM link. The sPAPR PCI us=
+es
+> >>>> this to get the MR and map it to the system address space.
+> >>>> Another quirk does the same for ATSD.
+> >>>>
+> >>>> This adds additional steps to sPAPR PHB setup:
+> >>>>
+> >>>> 1. Search for specific GPUs and NPUs, collect findings in
+> >>>> sPAPRPHBState::nvgpus, manage system address space mappings;
+> >>>>
+> >>>> 2. Add device-specific properties such as "ibm,npu", "ibm,gpu",
+> >>>> "memory-block", "link-speed" to advertise the NVLink2 function to
+> >>>> the guest;
+> >>>>
+> >>>> 3. Add "mmio-atsd" to vPHB to advertise the ATSD capability;
+> >>>>
+> >>>> 4. Add new memory blocks (with extra "linux,memory-usable" to prevent
+> >>>> the guest OS from accessing the new memory until it is onlined) and
+> >>>> npuphb# nodes representing an NPU unit for every vPHB as the GPU dri=
+ver
+> >>>> uses it for link discovery.
+> >>>>
+> >>>> This allocates space for GPU RAM and ATSD like we do for MMIOs by
+> >>>> adding 2 new parameters to the phb_placement() hook. Older machine t=
+ypes
+> >>>> set these to zero.
+> >>>>
+> >>>> This puts new memory nodes in a separate NUMA node to replicate the =
+host
+> >>>> system setup as the GPU driver relies on this.
+> >>>>
+> >>>> This adds requirement similar to EEH - one IOMMU group per vPHB.
+> >>>> The reason for this is that ATSD registers belong to a physical NPU
+> >>>> so they cannot invalidate translations on GPUs attached to another N=
+PU.
+> >>>> It is guaranteed by the host platform as it does not mix NVLink brid=
+ges
+> >>>> or GPUs from different NPU in the same IOMMU group. If more than one
+> >>>> IOMMU group is detected on a vPHB, this disables ATSD support for th=
+at
+> >>>> vPHB and prints a warning.
+> >>>>
+> >>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>>> ---
+> >>>> Changes:
+> >>>> v3:
+> >>>> * moved GPU RAM above PCI MMIO limit
+> >>>> * renamed QOM property to nvlink2-tgt
+> >>>> * moved nvlink2 code to its own file
+> >>>>
+> >>>> ---
+> >>>>
+> >>>> The example command line for redbud system:
+> >>>>
+> >>>> pbuild/qemu-aiku1804le-ppc64/ppc64-softmmu/qemu-system-ppc64 \
+> >>>> -nodefaults \
+> >>>> -chardev stdio,id=3DSTDIO0,signal=3Doff,mux=3Don \
+> >>>> -device spapr-vty,id=3Dsvty0,reg=3D0x71000110,chardev=3DSTDIO0 \
+> >>>> -mon id=3DMON0,chardev=3DSTDIO0,mode=3Dreadline -nographic -vga none=
+ \
+> >>>> -enable-kvm -m 384G \
+> >>>> -chardev socket,id=3DSOCKET0,server,nowait,host=3Dlocalhost,port=3D4=
+0000 \
+> >>>> -mon chardev=3DSOCKET0,mode=3Dcontrol \
+> >>>> -smp 80,sockets=3D1,threads=3D4 \
+> >>>> -netdev "tap,id=3DTAP0,helper=3D/home/aik/qemu-bridge-helper --br=3D=
+br0" \
+> >>>> -device "virtio-net-pci,id=3Dvnet0,mac=3D52:54:00:12:34:56,netdev=3D=
+TAP0" \
+> >>>> img/vdisk0.img \
+> >>>> -device "vfio-pci,id=3Dvfio0004_04_00_0,host=3D0004:04:00.0" \
+> >>>> -device "vfio-pci,id=3Dvfio0006_00_00_0,host=3D0006:00:00.0" \
+> >>>> -device "vfio-pci,id=3Dvfio0006_00_00_1,host=3D0006:00:00.1" \
+> >>>> -device "vfio-pci,id=3Dvfio0006_00_00_2,host=3D0006:00:00.2" \
+> >>>> -device "vfio-pci,id=3Dvfio0004_05_00_0,host=3D0004:05:00.0" \
+> >>>> -device "vfio-pci,id=3Dvfio0006_00_01_0,host=3D0006:00:01.0" \
+> >>>> -device "vfio-pci,id=3Dvfio0006_00_01_1,host=3D0006:00:01.1" \
+> >>>> -device "vfio-pci,id=3Dvfio0006_00_01_2,host=3D0006:00:01.2" \
+> >>>> -device spapr-pci-host-bridge,id=3Dphb1,index=3D1 \
+> >>>> -device "vfio-pci,id=3Dvfio0035_03_00_0,host=3D0035:03:00.0" \
+> >>>> -device "vfio-pci,id=3Dvfio0007_00_00_0,host=3D0007:00:00.0" \
+> >>>> -device "vfio-pci,id=3Dvfio0007_00_00_1,host=3D0007:00:00.1" \
+> >>>> -device "vfio-pci,id=3Dvfio0007_00_00_2,host=3D0007:00:00.2" \
+> >>>> -device "vfio-pci,id=3Dvfio0035_04_00_0,host=3D0035:04:00.0" \
+> >>>> -device "vfio-pci,id=3Dvfio0007_00_01_0,host=3D0007:00:01.0" \
+> >>>> -device "vfio-pci,id=3Dvfio0007_00_01_1,host=3D0007:00:01.1" \
+> >>>> -device "vfio-pci,id=3Dvfio0007_00_01_2,host=3D0007:00:01.2" -snapsh=
+ot \
+> >>>> -machine pseries \
+> >>>> -L /home/aik/t/qemu-ppc64-bios/ -d guest_errors
+> >>>>
+> >>>> Note that QEMU attaches PCI devices to the last added vPHB so first
+> >>>> 8 devices - 4:04:00.0 till 6:00:01.2 - go to the default vPHB, and
+> >>>> 35:03:00.0..7:00:01.2 to the vPHB with id=3Dphb1.
+> >>>> ---
+> >>>>  hw/ppc/Makefile.objs        |   2 +-
+> >>>>  hw/vfio/pci.h               |   2 +
+> >>>>  include/hw/pci-host/spapr.h |  41 ++++
+> >>>>  include/hw/ppc/spapr.h      |   3 +-
+> >>>>  hw/ppc/spapr.c              |  29 ++-
+> >>>>  hw/ppc/spapr_pci.c          |   8 +
+> >>>>  hw/ppc/spapr_pci_nvlink2.c  | 419 +++++++++++++++++++++++++++++++++=
++++
+> >>>>  hw/vfio/pci-quirks.c        | 120 +++++++++++
+> >>>>  hw/vfio/pci.c               |  14 ++
+> >>>>  hw/vfio/trace-events        |   4 +
+> >>>>  10 files changed, 637 insertions(+), 5 deletions(-)
+> >>>>  create mode 100644 hw/ppc/spapr_pci_nvlink2.c
+> >>>>
+> >>>> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> >>>> index 1111b21..636e717 100644
+> >>>> --- a/hw/ppc/Makefile.objs
+> >>>> +++ b/hw/ppc/Makefile.objs
+> >>>> @@ -9,7 +9,7 @@ obj-$(CONFIG_SPAPR_RNG) +=3D  spapr_rng.o
+> >>>>  # IBM PowerNV
+> >>>>  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o p=
+nv_psi.o pnv_occ.o pnv_bmc.o
+> >>>>  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+> >>>> -obj-y +=3D spapr_pci_vfio.o
+> >>>> +obj-y +=3D spapr_pci_vfio.o spapr_pci_nvlink2.o
+> >>>>  endif
+> >>>>  obj-$(CONFIG_PSERIES) +=3D spapr_rtas_ddw.o
+> >>>>  # PowerPC 4xx boards
+> >>>> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> >>>> index b1ae4c0..706c304 100644
+> >>>> --- a/hw/vfio/pci.h
+> >>>> +++ b/hw/vfio/pci.h
+> >>>> @@ -194,6 +194,8 @@ int vfio_populate_vga(VFIOPCIDevice *vdev, Error=
+ **errp);
+> >>>>  int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
+> >>>>                                 struct vfio_region_info *info,
+> >>>>                                 Error **errp);
+> >>>> +int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp=
+);
+> >>>> +int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp);
+> >>>> =20
+> >>>>  void vfio_display_reset(VFIOPCIDevice *vdev);
+> >>>>  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
+> >>>> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr=
+=2Eh
+> >>>> index ab0e3a0..e791dd4 100644
+> >>>> --- a/include/hw/pci-host/spapr.h
+> >>>> +++ b/include/hw/pci-host/spapr.h
+> >>>> @@ -87,6 +87,9 @@ struct sPAPRPHBState {
+> >>>>      uint32_t mig_liobn;
+> >>>>      hwaddr mig_mem_win_addr, mig_mem_win_size;
+> >>>>      hwaddr mig_io_win_addr, mig_io_win_size;
+> >>>> +    hwaddr nv2_gpa_win_addr;
+> >>>> +    hwaddr nv2_atsd_win_addr;
+> >>>> +    struct spapr_phb_pci_nvgpu_config *nvgpus;
+> >>>>  };
+> >>>> =20
+> >>>>  #define SPAPR_PCI_MEM_WIN_BUS_OFFSET 0x80000000ULL
+> >>>> @@ -105,6 +108,23 @@ struct sPAPRPHBState {
+> >>>> =20
+> >>>>  #define SPAPR_PCI_MSI_WINDOW         0x40000000000ULL
+> >>>> =20
+> >>>> +#define SPAPR_PCI_NV2RAM64_WIN_BASE  SPAPR_PCI_LIMIT
+> >>>> +#define SPAPR_PCI_NV2RAM64_WIN_SIZE  0x10000000000ULL /* 1 TiB for =
+all 6xGPUs */
+> >>>
+> >>> The comments and values below suggest that it is 1TiB for each GPU,
+> >>> rather than 1TiB shared by all 6.  Which is it?
+> >>
+> >>
+> >> 1TiB for all of them within 1 vPHB. Not sure where it suggests 1TiB for
+> >> each GPU.
+> >=20
+> > The fact that NV2ATSD_WIN_BASE is set at 6TiB above NV2RAM64_WIN_BASE
+> > is what suggested to me that there was one 1TiB window for each of the
+> > 6 possible GPUs.
+> >=20
+> >>>> +
+> >>>> +/* Max number of these GPUs per a physical box */
+> >>>> +#define NVGPU_MAX_NUM                6
+> >>>
+> >>> Is there any possibility later hardware revisions could increase this?
+> >>> If so we should probably leave some extra room in the address space.
+> >>
+> >> A GPU RAM window is 256GiB (and only 32GiB is used), and 3 is the
+> >> maximum in one group so far. So 1TiB should be enough for quite some
+> >> time. Having more GPUs in a box is probably possible but for now 6xGPU
+> >> require water cooling while 4xGPU does not so unless there is a new
+> >> generation of these GPUs comes out, the numbers won't change much.
+> >=20
+> > Hm, ok.
+> >=20
+> >> I'll double SPAPR_PCI_NV2RAM64_WIN_SIZE.
+> >=20
+> > Um.. I'm not sure how that follows from the above.
+>=20
+> 1TiB is enough now but 2TiB is more future proof. That was it.
 
-After upgrading r128 driver to -hwe part to get past this bug
-https://bugs.freedesktop.org/show_bug.cgi?id=91622
+Ok.
 
-and disabling accel I can see some image and cursor!
+> >>>> +/*
+> >>>> + * One NVLink bridge provides one ATSD register so it should be 18.
+> >>>> + * In practice though since we allow only one group per vPHB which =
+equals
+> >>>> + * to an NPU2 which has maximum 6 NVLink bridges.
+> >>>> + */
+> >>>> +#define NVGPU_MAX_ATSD               6
+> >>>> +
+> >>>> +#define SPAPR_PCI_NV2ATSD_WIN_BASE   (SPAPR_PCI_NV2RAM64_WIN_BASE +=
+ \
+> >>>> +                                      SPAPR_PCI_NV2RAM64_WIN_SIZE *=
+ \
+> >>>> +                                      NVGPU_MAX_NUM)
+> >>>> +#define SPAPR_PCI_NV2ATSD_WIN_SIZE   (NVGPU_MAX_ATSD * 0x10000)
+> >>>
+> >>> What's the significance of the 64 kiB constant here?  Should it be a
+> >>> symbolic name, or speleed "64 * kiB".
+> >>
+> >> Ok.
+> >=20
+> >=20
+> > Hmm.  Am I right in thinking that both each 64-bit RAM and each ATSD
+> > RAM slot is per-vPHB?=20
+>=20
+> These are windows from which I allocated RAM base and ATSD per GPU/NPU.
 
-qemu command:
+Ok, I guess that per-vPHB set of windows is what I'm meaning by "slot"
+then.
 
-ppc64-softmmu/qemu-system-ppc64 -M mac99 -device ati-vga \
--cdrom /mnt/sdb1/ISO/lubuntu-16.04-desktop-powerpc.iso -m 1G -boot d -cpu g4 -device usb-mouse -smp 1
+> > Would it make more sense to directly index into
+> > the array of slots with the phb index, rather than having a separate
+> > GPU index?
+>=20
+> There can be 1 or many "slots" per PHBs ("many" is not really encouraged
+> as they will miss ATSD but nevertheless), and "slots" are not in a
+> global list of any kind.
 
-model rv100 doesn't recognized by openfirmware, so no output from it.
+Ok, I think we're using different meanings of "slot" here.  By "slot"
+I was meaning one 64-bit and one ATS window with a common index
+(i.e. a slot in the array indices, rather than a physical slot on the
+system).  IIUC all the GPUs and NPUs on a vPHB will sit in a single
+"slot" by that sense.
 
-Menus in wondows still at wrong place (not shown, even), but generally speaking some image is on screen.
+> >>>> +
+> >>>>  static inline qemu_irq spapr_phb_lsi_qirq(struct sPAPRPHBState *phb=
+, int pin)
+> >>>>  {
+> >>>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> >>>> @@ -135,6 +155,11 @@ int spapr_phb_vfio_eeh_get_state(sPAPRPHBState =
+*sphb, int *state);
+> >>>>  int spapr_phb_vfio_eeh_reset(sPAPRPHBState *sphb, int option);
+> >>>>  int spapr_phb_vfio_eeh_configure(sPAPRPHBState *sphb);
+> >>>>  void spapr_phb_vfio_reset(DeviceState *qdev);
+> >>>> +void spapr_phb_nvgpu_setup(sPAPRPHBState *sphb);
+> >>>> +void spapr_phb_nvgpu_populate_dt(sPAPRPHBState *sphb, void *fdt, in=
+t bus_off);
+> >>>> +void spapr_phb_nvgpu_ram_populate_dt(sPAPRPHBState *sphb, void *fdt=
+);
+> >>>> +void spapr_phb_nvgpu_populate_pcidev_dt(PCIDevice *dev, void *fdt, =
+int offset,
+> >>>> +                                        sPAPRPHBState *sphb);
+> >>>>  #else
+> >>>>  static inline bool spapr_phb_eeh_available(sPAPRPHBState *sphb)
+> >>>>  {
+> >>>> @@ -161,6 +186,22 @@ static inline int spapr_phb_vfio_eeh_configure(=
+sPAPRPHBState *sphb)
+> >>>>  static inline void spapr_phb_vfio_reset(DeviceState *qdev)
+> >>>>  {
+> >>>>  }
+> >>>> +static inline void spapr_phb_nvgpu_setup(sPAPRPHBState *sphb)
+> >>>> +{
+> >>>> +}
+> >>>> +static inline void spapr_phb_nvgpu_populate_dt(sPAPRPHBState *sphb,=
+ void *fdt,
+> >>>> +                                               int bus_off)
+> >>>> +{
+> >>>> +}
+> >>>> +static inline void spapr_phb_nvgpu_ram_populate_dt(sPAPRPHBState *s=
+phb,
+> >>>> +                                                   void *fdt)
+> >>>> +{
+> >>>> +}
+> >>>> +static inline void spapr_phb_nvgpu_populate_pcidev_dt(PCIDevice *de=
+v, void *fdt,
+> >>>> +                                                      int offset,
+> >>>> +                                                      sPAPRPHBState=
+ *sphb)
+> >>>> +{
+> >>>> +}
+> >>>
+> >>> I'm guessing some of these should never get called on systems without
+> >>> NVLink2, in which case they should probably have a
+> >>> g_assert_not_reached() in there.
+> >>
+> >> I guess if you compile QEMU for --target-list=3Dppc64-softmmu in Windo=
+ws
+> >> (i.e. tcg + pseries + pci but no vfio), these will be called and crash
+> >> then, no?
+> >=20
+> > Well, if they can be called in that situation then, yes, they need to
+> > be no-ops like they are now.  But is that true for all of them?
+> > Hmm.. yes it might be, never mind.
+> >=20
+> >>>
+> >>>>  #endif
+> >>>> =20
+> >>>>  void spapr_phb_dma_reset(sPAPRPHBState *sphb);
+> >>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >>>> index 358bb38..9acf867 100644
+> >>>> --- a/include/hw/ppc/spapr.h
+> >>>> +++ b/include/hw/ppc/spapr.h
+> >>>> @@ -113,7 +113,8 @@ struct sPAPRMachineClass {
+> >>>>      void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+> >>>>                            uint64_t *buid, hwaddr *pio,=20
+> >>>>                            hwaddr *mmio32, hwaddr *mmio64,
+> >>>> -                          unsigned n_dma, uint32_t *liobns, Error *=
+*errp);
+> >>>> +                          unsigned n_dma, uint32_t *liobns, hwaddr =
+*nv2gpa,
+> >>>> +                          hwaddr *nv2atsd, Error **errp);
+> >>>>      sPAPRResizeHPT resize_hpt_default;
+> >>>>      sPAPRCapabilities default_caps;
+> >>>>      sPAPRIrq *irq;
+> >>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>>> index 74c9b07..fda6e7e 100644
+> >>>> --- a/hw/ppc/spapr.c
+> >>>> +++ b/hw/ppc/spapr.c
+> >>>> @@ -3929,7 +3929,9 @@ static void spapr_phb_pre_plug(HotplugHandler =
+*hotplug_dev, DeviceState *dev,
+> >>>>      smc->phb_placement(spapr, sphb->index,
+> >>>>                         &sphb->buid, &sphb->io_win_addr,
+> >>>>                         &sphb->mem_win_addr, &sphb->mem64_win_addr,
+> >>>> -                       windows_supported, sphb->dma_liobn, errp);
+> >>>> +                       windows_supported, sphb->dma_liobn,
+> >>>> +                       &sphb->nv2_gpa_win_addr, &sphb->nv2_atsd_win=
+_addr,
+> >>>> +                       errp);
+> >>>>  }
+> >>>> =20
+> >>>>  static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState=
+ *dev,
+> >>>> @@ -4129,7 +4131,8 @@ static const CPUArchIdList *spapr_possible_cpu=
+_arch_ids(MachineState *machine)
+> >>>>  static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t =
+index,
+> >>>>                                  uint64_t *buid, hwaddr *pio,
+> >>>>                                  hwaddr *mmio32, hwaddr *mmio64,
+> >>>> -                                unsigned n_dma, uint32_t *liobns, E=
+rror **errp)
+> >>>> +                                unsigned n_dma, uint32_t *liobns,
+> >>>> +                                hwaddr *nv2gpa, hwaddr *nv2atsd, Er=
+ror **errp)
+> >>>>  {
+> >>>>      /*
+> >>>>       * New-style PHB window placement.
+> >>>> @@ -4174,6 +4177,9 @@ static void spapr_phb_placement(sPAPRMachineSt=
+ate *spapr, uint32_t index,
+> >>>>      *pio =3D SPAPR_PCI_BASE + index * SPAPR_PCI_IO_WIN_SIZE;
+> >>>>      *mmio32 =3D SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM32_WIN_=
+SIZE;
+> >>>>      *mmio64 =3D SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM64_WIN_=
+SIZE;
+> >>>> +
+> >>>
+> >>> This doesn't look right.  SPAPR_PCI_NV2ATSD_WIN_BASE appears to be
+> >>> defined such that there slots for NVGPU_MAX_NUM gpa "slots" of size
+> >>> SPAPR_PCI_NV2RAM64_WIN_SIZE before we get to the ATSD base.
+> >>>
+> >>>> +    *nv2gpa =3D SPAPR_PCI_NV2RAM64_WIN_BASE + index * SPAPR_PCI_NV2=
+RAM64_WIN_SIZE;
+> >>>
+> >>> But this implies you need a "slot" for every possible PHB index, which
+> >>> is rather more than NVGPU_MAX_NUM.
+> >>>
+> >>>> +    *nv2atsd =3D SPAPR_PCI_NV2ATSD_WIN_BASE + index * SPAPR_PCI_NV2=
+ATSD_WIN_SIZE;
+> >>
+> >>
+> >> Ah right :( These should go then above 128TiB I guess as I do not real=
+ly
+> >> want them to appear inside a huge dma window.
+> >=20
+> > Right.  So actually looks like you are already indexing the window
+> > slots by phb index, in which case you need to allow for 32 slots even
+> > though only 6 can be populated at the moment.
+>=20
+>=20
+> Why precisely 32? Round up of 18?
 
---Boundary-00=_BRJgcDI5WyCkB8A
-Content-Type: text/x-log;
-  charset="iso 8859-1";
-  name="Xorg.1.log"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="Xorg.1.log"
+Because 32 is the allowed number of vPHBs.
 
-[  6238.260] 
-X.Org X Server 1.19.6
-Release Date: 2017-12-20
-[  6238.275] X Protocol Version 11, Revision 0
-[  6238.280] Build Operating System: Linux 4.4.0-138-powerpc64-smp ppc Ubuntu
-[  6238.283] Current Operating System: Linux lubuntu 4.4.0-21-powerpc-smp #37-Ubuntu SMP Mon Apr 18 18:33:34 UTC 2016 ppc
-[  6238.284] Kernel command line: ro ramdisk_size=1048576 file=/cdrom/preseed/lubuntu.seed boot=casper quiet splash --- 
-[  6238.302] Build Date: 25 October 2018  04:10:08PM
-[  6238.306] xorg-server 2:1.19.6-1ubuntu4.1~16.04.2 (For technical support please see http://www.ubuntu.com/support) 
-[  6238.313] Current version of pixman: 0.33.6
-[  6238.325] 	Before reporting problems, check http://wiki.x.org
-	to make sure that you have the latest version.
-[  6238.326] Markers: (--) probed, (**) from config file, (==) default setting,
-	(++) from command line, (!!) notice, (II) informational,
-	(WW) warning, (EE) error, (NI) not implemented, (??) unknown.
-[  6238.364] (==) Log file: "/var/log/Xorg.1.log", Time: Thu Mar  7 03:12:54 2019
-[  6238.381] (==) Using config file: "/etc/X11/xorg.conf"
-[  6238.387] (==) Using system config directory "/usr/share/X11/xorg.conf.d"
-[  6238.437] (==) ServerLayout "X.org Configured"
-[  6238.439] (**) |-->Screen "Screen0" (0)
-[  6238.440] (**) |   |-->Monitor "Monitor0"
-[  6238.449] (**) |   |-->Device "Card0"
-[  6238.451] (**) |-->Input Device "Mouse0"
-[  6238.451] (**) |-->Input Device "Keyboard0"
-[  6238.452] (==) Automatically adding devices
-[  6238.452] (==) Automatically enabling devices
-[  6238.452] (==) Automatically adding GPU devices
-[  6238.452] (==) Automatically binding GPU devices
-[  6238.454] (==) Max clients allowed: 256, resource mask: 0x1fffff
-[  6238.456] (WW) The directory "/usr/share/fonts/X11/cyrillic" does not exist.
-[  6238.456] 	Entry deleted from font path.
-[  6238.456] (WW) The directory "/usr/share/fonts/X11/100dpi/" does not exist.
-[  6238.456] 	Entry deleted from font path.
-[  6238.456] (WW) The directory "/usr/share/fonts/X11/75dpi/" does not exist.
-[  6238.456] 	Entry deleted from font path.
-[  6238.456] (WW) The directory "/usr/share/fonts/X11/Type1" does not exist.
-[  6238.457] 	Entry deleted from font path.
-[  6238.457] (WW) The directory "/usr/share/fonts/X11/100dpi" does not exist.
-[  6238.457] 	Entry deleted from font path.
-[  6238.457] (WW) The directory "/usr/share/fonts/X11/75dpi" does not exist.
-[  6238.457] 	Entry deleted from font path.
-[  6238.457] (WW) The directory "/usr/share/fonts/X11/cyrillic" does not exist.
-[  6238.457] 	Entry deleted from font path.
-[  6238.457] (WW) The directory "/usr/share/fonts/X11/100dpi/" does not exist.
-[  6238.457] 	Entry deleted from font path.
-[  6238.457] (WW) The directory "/usr/share/fonts/X11/75dpi/" does not exist.
-[  6238.458] 	Entry deleted from font path.
-[  6238.458] (WW) The directory "/usr/share/fonts/X11/Type1" does not exist.
-[  6238.458] 	Entry deleted from font path.
-[  6238.458] (WW) The directory "/usr/share/fonts/X11/100dpi" does not exist.
-[  6238.458] 	Entry deleted from font path.
-[  6238.458] (WW) The directory "/usr/share/fonts/X11/75dpi" does not exist.
-[  6238.458] 	Entry deleted from font path.
-[  6238.458] (**) FontPath set to:
-	/usr/share/fonts/X11/misc,
-	built-ins,
-	/usr/share/fonts/X11/misc,
-	built-ins
-[  6238.458] (**) ModulePath set to "/usr/lib/xorg/modules"
-[  6238.459] (WW) Hotplugging is on, devices using drivers 'kbd', 'mouse' or 'vmmouse' will be disabled.
-[  6238.459] (WW) Disabling Mouse0
-[  6238.460] (WW) Disabling Keyboard0
-[  6238.460] (II) Loader magic: 0x202ee710
-[  6238.461] (II) Module ABI versions:
-[  6238.461] 	X.Org ANSI C Emulation: 0.4
-[  6238.461] 	X.Org Video Driver: 23.0
-[  6238.461] 	X.Org XInput driver : 24.1
-[  6238.461] 	X.Org Server Extension : 10.0
-[  6238.669] (++) using VT number 2
+> >>>>  }
+> >>>> =20
+> >>>>  static ICSState *spapr_ics_get(XICSFabric *dev, int irq)
+> >>>> @@ -4376,6 +4382,18 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+> >>>>  /*
+> >>>>   * pseries-3.1
+> >>>>   */
+> >>>> +static void phb_placement_3_1(sPAPRMachineState *spapr, uint32_t in=
+dex,
+> >>>> +                              uint64_t *buid, hwaddr *pio,
+> >>>> +                              hwaddr *mmio32, hwaddr *mmio64,
+> >>>> +                              unsigned n_dma, uint32_t *liobns,
+> >>>> +                              hwaddr *nv2gpa, hwaddr *nv2atsd, Erro=
+r **errp)
+> >>>> +{
+> >>>> +    spapr_phb_placement(spapr, index, buid, pio, mmio32, mmio64, n_=
+dma, liobns,
+> >>>> +                        nv2gpa, nv2atsd, errp);
+> >>>> +    *nv2gpa =3D 0;
+> >>>> +    *nv2atsd =3D 0;
+> >>>> +}
+> >>>> +
+> >>>>  static void spapr_machine_3_1_class_options(MachineClass *mc)
+> >>>>  {
+> >>>>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> >>>> @@ -4391,6 +4409,7 @@ static void spapr_machine_3_1_class_options(Ma=
+chineClass *mc)
+> >>>>      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+> >>>>      smc->update_dt_enabled =3D false;
+> >>>>      smc->dr_phb_enabled =3D false;
+> >>>> +    smc->phb_placement =3D phb_placement_3_1;
+> >>>>  }
+> >>>> =20
+> >>>>  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+> >>>> @@ -4522,7 +4541,8 @@ DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
+> >>>>  static void phb_placement_2_7(sPAPRMachineState *spapr, uint32_t in=
+dex,
+> >>>>                                uint64_t *buid, hwaddr *pio,
+> >>>>                                hwaddr *mmio32, hwaddr *mmio64,
+> >>>> -                              unsigned n_dma, uint32_t *liobns, Err=
+or **errp)
+> >>>> +                              unsigned n_dma, uint32_t *liobns,
+> >>>> +                              hwaddr *nv2gpa, hwaddr *nv2atsd, Erro=
+r **errp)
+> >>>>  {
+> >>>>      /* Legacy PHB placement for pseries-2.7 and earlier machine typ=
+es */
+> >>>>      const uint64_t base_buid =3D 0x800000020000000ULL;
+> >>>> @@ -4566,6 +4586,9 @@ static void phb_placement_2_7(sPAPRMachineStat=
+e *spapr, uint32_t index,
+> >>>>       * fallback behaviour of automatically splitting a large "32-bi=
+t"
+> >>>>       * window into contiguous 32-bit and 64-bit windows
+> >>>>       */
+> >>>> +
+> >>>> +    *nv2gpa =3D 0;
+> >>>> +    *nv2atsd =3D 0;
+> >>>>  }
+> >>>> =20
+> >>>>  static void spapr_machine_2_7_class_options(MachineClass *mc)
+> >>>> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> >>>> index 06a5ffd..f076462 100644
+> >>>> --- a/hw/ppc/spapr_pci.c
+> >>>> +++ b/hw/ppc/spapr_pci.c
+> >>>> @@ -1355,6 +1355,8 @@ static void spapr_populate_pci_child_dt(PCIDev=
+ice *dev, void *fdt, int offset,
+> >>>>      if (sphb->pcie_ecs && pci_is_express(dev)) {
+> >>>>          _FDT(fdt_setprop_cell(fdt, offset, "ibm,pci-config-space-ty=
+pe", 0x1));
+> >>>>      }
+> >>>> +
+> >>>> +    spapr_phb_nvgpu_populate_pcidev_dt(dev, fdt, offset, sphb);
+> >>>>  }
+> >>>> =20
+> >>>>  /* create OF node for pci device and required OF DT properties */
+> >>>> @@ -1878,6 +1880,7 @@ static void spapr_phb_reset(DeviceState *qdev)
+> >>>>      sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(qdev);
+> >>>> =20
+> >>>>      spapr_phb_dma_reset(sphb);
+> >>>> +    spapr_phb_nvgpu_setup(sphb);
+> >>>> =20
+> >>>>      /* Reset the IOMMU state */
+> >>>>      object_child_foreach(OBJECT(qdev), spapr_phb_children_reset, NU=
+LL);
+> >>>> @@ -1910,6 +1913,8 @@ static Property spapr_phb_properties[] =3D {
+> >>>>                       pre_2_8_migration, false),
+> >>>>      DEFINE_PROP_BOOL("pcie-extended-configuration-space", sPAPRPHBS=
+tate,
+> >>>>                       pcie_ecs, true),
+> >>>> +    DEFINE_PROP_UINT64("gpa", sPAPRPHBState, nv2_gpa_win_addr, 0),
+> >>>> +    DEFINE_PROP_UINT64("atsd", sPAPRPHBState, nv2_atsd_win_addr, 0),
+> >>>>      DEFINE_PROP_END_OF_LIST(),
+> >>>>  };
+> >>>> =20
+> >>>> @@ -2282,6 +2287,9 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb, =
+uint32_t intc_phandle, void *fdt,
+> >>>>          return ret;
+> >>>>      }
+> >>>> =20
+> >>>> +    spapr_phb_nvgpu_populate_dt(phb, fdt, bus_off);
+> >>>> +    spapr_phb_nvgpu_ram_populate_dt(phb, fdt);
+> >>>> +
+> >>>>      return 0;
+> >>>>  }
+> >>>> =20
+> >>>> diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
+> >>>> new file mode 100644
+> >>>> index 0000000..965a6be
+> >>>> --- /dev/null
+> >>>> +++ b/hw/ppc/spapr_pci_nvlink2.c
+> >>>> @@ -0,0 +1,419 @@
+> >>>> +/*
+> >>>> + * QEMU sPAPR PCI for NVLink2 pass through
+> >>>> + *
+> >>>> + * Copyright (c) 2019 Alexey Kardashevskiy, IBM Corporation.
+> >>>> + *
+> >>>> + * Permission is hereby granted, free of charge, to any person obta=
+ining a copy
+> >>>> + * of this software and associated documentation files (the "Softwa=
+re"), to deal
+> >>>> + * in the Software without restriction, including without limitatio=
+n the rights
+> >>>> + * to use, copy, modify, merge, publish, distribute, sublicense, an=
+d/or sell
+> >>>> + * copies of the Software, and to permit persons to whom the Softwa=
+re is
+> >>>> + * furnished to do so, subject to the following conditions:
+> >>>> + *
+> >>>> + * The above copyright notice and this permission notice shall be i=
+ncluded in
+> >>>> + * all copies or substantial portions of the Software.
+> >>>> + *
+> >>>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, =
+EXPRESS OR
+> >>>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANT=
+ABILITY,
+> >>>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVEN=
+T SHALL
+> >>>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGE=
+S OR OTHER
+> >>>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, =
+ARISING FROM,
+> >>>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DE=
+ALINGS IN
+> >>>> + * THE SOFTWARE.
+> >>>> + */
+> >>>> +#include "qemu/osdep.h"
+> >>>> +#include "qapi/error.h"
+> >>>> +#include "qemu-common.h"
+> >>>> +#include "hw/pci/pci.h"
+> >>>> +#include "hw/pci-host/spapr.h"
+> >>>> +#include "qemu/error-report.h"
+> >>>> +#include "hw/ppc/fdt.h"
+> >>>> +#include "hw/pci/pci_bridge.h"
+> >>>> +
+> >>>> +#define PHANDLE_PCIDEV(phb, pdev)    (0x12000000 | \
+> >>>> +                                     (((phb)->index) << 16) | ((pde=
+v)->devfn))
+> >>>> +#define PHANDLE_GPURAM(phb, n)       (0x110000FF | ((n) << 8) | \
+> >>>> +                                     (((phb)->index) << 16))
+> >>>> +/* NVLink2 wants a separate NUMA node for its RAM */
+> >>>> +#define GPURAM_ASSOCIATIVITY(phb, n) (255 - ((phb)->index * 3 + (n)=
+))
+> >>>> +#define PHANDLE_NVLINK(phb, gn, nn)  (0x00130000 | (((phb)->index) =
+<< 8) | \
+> >>>> +                                     ((gn) << 4) | (nn))
+> >>>> +
+> >>>> +/* Max number of NVLinks per GPU in any physical box */
+> >>>> +#define NVGPU_MAX_LINKS              3
+> >>>> +
+> >>>> +struct spapr_phb_pci_nvgpu_config {
+> >>>> +    uint64_t nv2_ram_current;
+> >>>> +    uint64_t nv2_atsd_current;
+> >>>> +    int num; /* number of non empty (i.e. tgt!=3D0) entries in slot=
+s[] */
+> >>>> +    struct spapr_phb_pci_nvgpu_slot {
+> >>>> +        uint64_t tgt;
+> >>>> +        uint64_t gpa;
+> >>>> +        PCIDevice *gpdev;
+> >>>> +        int linknum;
+> >>>> +        struct {
+> >>>> +            uint64_t atsd_gpa;
+> >>>> +            PCIDevice *npdev;
+> >>>> +            uint32_t link_speed;
+> >>>> +        } links[NVGPU_MAX_LINKS];
+> >>>> +    } slots[NVGPU_MAX_NUM];
+> >>>> +};
+> >>>> +
+> >>>> +static int spapr_pci_nvgpu_get_slot(struct spapr_phb_pci_nvgpu_conf=
+ig *nvgpus,
+> >>>> +                                    uint64_t tgt)
+> >>>> +{
+> >>>> +    int i;
+> >>>> +
+> >>>> +    /* Search for partially collected "slot" */
+> >>>> +    for (i =3D 0; i < nvgpus->num; ++i) {
+> >>>> +        if (nvgpus->slots[i].tgt =3D=3D tgt) {
+> >>>> +            return i;
+> >>>> +        }
+> >>>> +    }
+> >>>> +
+> >>>> +    if (nvgpus->num =3D=3D ARRAY_SIZE(nvgpus->slots)) {
+> >>>> +        warn_report("Found too many NVLink bridges per GPU");
+> >>>> +        return -1;
+> >>>
+> >>> This is within qemu so it would be better to use the qemu error API
+> >>> than returning an error code.
+> >>
+> >> You mean returning Error**? Oh. Ok.
+> >=20
+> > Well, not returning, technically, but taking an Error ** parameter
+> > which is checked by the caller to detect errors.
+>=20
+>=20
+> None of these is actually propagated to the upper level as neither of
+> these is fatal (well, except one which I am turning into assert).
 
-[  6238.915] (II) systemd-logind: took control of session /org/freedesktop/login1/session/_31
-[  6239.091] (II) xfree86: Adding drm device (/dev/dri/card0)
-[  6239.229] (II) systemd-logind: got fd for /dev/dri/card0 226:0 fd 11 paused 0
-[  6239.328] (--) PCI:*(0:0:15:0) 1002:5046:1af4:1100 rev 0, Mem @ 0x81000000/16777216, 0x82000000/16384, I/O @ 0x00001000/256, BIOS @ 0x????????/65536
-[  6239.341] (II) "glx" will be loaded. This was enabled by default and also specified in the config file.
-[  6239.342] (II) LoadModule: "glx"
-[  6239.389] (II) Loading /usr/lib/xorg/modules/extensions/libglx.so
-[  6239.444] (II) Module glx: vendor="X.Org Foundation"
-[  6239.445] 	compiled for 1.19.6, module version = 1.0.0
-[  6239.446] 	ABI class: X.Org Server Extension, version 10.0
-[  6239.451] (II) LoadModule: "r128"
-[  6239.459] (II) Loading /usr/lib/xorg/modules/drivers/r128_drv.so
-[  6239.465] (II) Module r128: vendor="X.Org Foundation"
-[  6239.475] 	compiled for 1.19.3, module version = 6.10.2
-[  6239.475] 	Module class: X.Org Video Driver
-[  6239.476] 	ABI class: X.Org Video Driver, version 23.0
-[  6239.477] (II) R128: Driver for ATI Rage 128 chipsets:
-	ATI Rage 128 Mobility M3 LE (PCI), ATI Rage 128 Mobility M3 LF (AGP),
-	ATI Rage 128 Mobility M4 MF (AGP), ATI Rage 128 Mobility M4 ML (AGP),
-	ATI Rage 128 Pro GL PA (PCI/AGP), ATI Rage 128 Pro GL PB (PCI/AGP),
-	ATI Rage 128 Pro GL PC (PCI/AGP), ATI Rage 128 Pro GL PD (PCI),
-	ATI Rage 128 Pro GL PE (PCI/AGP), ATI Rage 128 Pro GL PF (AGP),
-	ATI Rage 128 Pro VR PG (PCI/AGP), ATI Rage 128 Pro VR PH (PCI/AGP),
-	ATI Rage 128 Pro VR PI (PCI/AGP), ATI Rage 128 Pro VR PJ (PCI/AGP),
-	ATI Rage 128 Pro VR PK (PCI/AGP), ATI Rage 128 Pro VR PL (PCI/AGP),
-	ATI Rage 128 Pro VR PM (PCI/AGP), ATI Rage 128 Pro VR PN (PCI/AGP),
-	ATI Rage 128 Pro VR PO (PCI/AGP), ATI Rage 128 Pro VR PP (PCI),
-	ATI Rage 128 Pro VR PQ (PCI/AGP), ATI Rage 128 Pro VR PR (PCI),
-	ATI Rage 128 Pro VR PS (PCI/AGP), ATI Rage 128 Pro VR PT (PCI/AGP),
-	ATI Rage 128 Pro VR PU (PCI/AGP), ATI Rage 128 Pro VR PV (PCI/AGP),
-	ATI Rage 128 Pro VR PW (PCI/AGP), ATI Rage 128 Pro VR PX (PCI/AGP),
-	ATI Rage 128 GL RE (PCI), ATI Rage 128 GL RF (AGP),
-	ATI Rage 128 RG (AGP), ATI Rage 128 VR RK (PCI),
-	ATI Rage 128 VR RL (AGP), ATI Rage 128 4X SE (PCI/AGP),
-	ATI Rage 128 4X SF (PCI/AGP), ATI Rage 128 4X SG (PCI/AGP),
-	ATI Rage 128 4X SH (PCI/AGP), ATI Rage 128 4X SK (PCI/AGP),
-	ATI Rage 128 4X SL (PCI/AGP), ATI Rage 128 4X SM (AGP),
-	ATI Rage 128 4X SN (PCI/AGP), ATI Rage 128 Pro ULTRA TF (AGP),
-	ATI Rage 128 Pro ULTRA TL (AGP), ATI Rage 128 Pro ULTRA TR (AGP),
-	ATI Rage 128 Pro ULTRA TS (AGP?), ATI Rage 128 Pro ULTRA TT (AGP?),
-	ATI Rage 128 Pro ULTRA TU (AGP?)
-[  6239.503] (II) R128(0): PCI bus 0 card 15 func 0
-[  6239.505] (==) R128(0): Depth 24, (--) framebuffer bpp 32
-[  6239.506] (II) R128(0): Pixel depth = 24 bits stored in 4 bytes (32 bpp pixmaps)
-[  6239.507] (==) R128(0): Default visual is TrueColor
-[  6239.508] (**) R128(0): Option "NoAccel" "1"
-[  6239.508] (**) R128(0): Option "PanelWidth" "1024"
-[  6239.509] (**) R128(0): Option "PanelHeight" "768"
-[  6239.509] (II) R128(0): VGAAccess option set to FALSE, VGA module load skipped
-[  6239.509] (==) R128(0): RGB weight 888
-[  6239.510] (II) R128(0): Using 8 bits per RGB (8 bit DAC)
-[  6239.510] (**) R128(0): Using framebuffer device
-[  6239.510] (II) Loading sub module "fbdevhw"
-[  6239.510] (II) LoadModule: "fbdevhw"
-[  6239.511] (II) Loading /usr/lib/xorg/modules/libfbdevhw.so
-[  6239.516] (II) Module fbdevhw: vendor="X.Org Foundation"
-[  6239.518] 	compiled for 1.19.6, module version = 0.0.2
-[  6239.519] 	ABI class: X.Org Video Driver, version 23.0
-[  6239.523] (--) R128(0): Chipset: "ATI Rage 128 Pro GL PF (AGP)" (ChipID = 0x5046)
-[  6239.523] (--) R128(0): Linear framebuffer at 0x80000000
-[  6239.523] (--) R128(0): MMIO registers at 0x82000000
-[  6239.525] (--) R128(0): VideoRAM: 16384 kByte (64-bit SDR SGRAM 1:1)
-[  6239.526] (II) Loading sub module "ddc"
-[  6239.526] (II) LoadModule: "ddc"
-[  6239.526] (II) Module "ddc" already built-in
-[  6239.526] (II) Loading sub module "i2c"
-[  6239.526] (II) LoadModule: "i2c"
-[  6239.526] (II) Module "i2c" already built-in
-[  6239.541] (II) R128(0): PLL parameters: rf=2950 rd=0 min=12500 max=25000; xclk=0
-[  6239.545] (II) R128(0): Output DVI-0 using monitor section Monitor0
-[  6239.546] (II) R128(0): I2C bus "DVI-0" initialized.
-[  6239.547] (**) R128(0): Option "NoDDC" "1"
-[  6239.549] (II) R128(0): EDID for output DVI-0
-[  6239.558] (II) R128(0): Not using default mode "1024x768i" (hsync out of range)
-[  6239.558] (II) R128(0): Not using default mode "1024x768" (vrefresh out of range)
-[  6239.558] (II) R128(0): Not using default mode "1024x768" (vrefresh out of range)
-[  6239.558] (II) R128(0): Not using default mode "1024x768" (hsync out of range)
-[  6239.559] (II) R128(0): Not using default mode "1024x768" (vrefresh out of range)
-[  6239.559] (II) R128(0): Not using default mode "1024x768" (hsync out of range)
-[  6239.559] (II) R128(0): Not using default mode "1024x768" (hsync out of range)
-[  6239.559] (II) R128(0): Printing probed modes for output DVI-0
-[  6239.561] (II) R128(0): Modeline "1024x768"x72.3   78.75  1024 1044 1140 1328  768 781 784 820 +hsync +vsync (59.3 kHz UP)
-[  6239.561] (II) R128(0): Modeline "1024x768"x75.0   78.75  1024 1040 1136 1312  768 769 772 800 +hsync +vsync (60.0 kHz d)
-[  6239.562] (II) R128(0): Output DVI-0 connected
-[  6239.563] (II) R128(0): Using user preference for initial modes
-[  6239.563] (II) R128(0): Output DVI-0 using initial mode 1024x768 +0+0
-[  6239.566] (==) R128(0): DPI set to (96, 96)
-[  6239.566] (II) Loading sub module "fb"
-[  6239.566] (II) LoadModule: "fb"
-[  6239.568] (II) Loading /usr/lib/xorg/modules/libfb.so
-[  6239.571] (II) Module fb: vendor="X.Org Foundation"
-[  6239.573] 	compiled for 1.19.6, module version = 1.0.0
-[  6239.573] 	ABI class: X.Org ANSI C Emulation, version 0.4
-[  6239.574] (==) R128(0): Using gamma correction (1.0, 1.0, 1.0)
-[  6239.574] (II) Loading sub module "ramdac"
-[  6239.574] (II) LoadModule: "ramdac"
-[  6239.575] (II) Module "ramdac" already built-in
-[  6239.575] (II) Loading sub module "shadowfb"
-[  6239.575] (II) LoadModule: "shadowfb"
-[  6239.577] (II) Loading /usr/lib/xorg/modules/libshadowfb.so
-[  6239.578] (II) Module shadowfb: vendor="X.Org Foundation"
-[  6239.579] 	compiled for 1.19.6, module version = 1.0.0
-[  6239.579] 	ABI class: X.Org ANSI C Emulation, version 0.4
-[  6239.580] (II) R128(0): Page flipping disabled
-[  6239.582] (--) Depth 24 pixmap format is 32 bpp
-[  6239.585] (II) R128(0): Acceleration of RENDER operations will be enabled upon successful loading of DRI and EXA
-[  6239.589] (WW) R128(0): Acceleration disabled, not initializing the DRI
-[  6239.604] (II) R128(0): Memory manager initialized to (0,0) (1024,4096)
-[  6239.607] (II) R128(0): Reserved area from (0,768) to (1024,770)
-[  6239.608] (II) R128(0): Largest offscreen area available: 1024 x 3326
-[  6239.608] (II) R128(0): Acceleration disabled
-[  6239.618] (==) R128(0): Backing store enabled
-[  6239.619] (==) R128(0): Silken mouse enabled
-[  6239.623] (II) R128(0): Will use 2 kb for hardware cursor 0 at offset 0x00302000
-[  6239.624] (II) R128(0): Largest offscreen area available: 1024 x 3325
-[  6239.627] (==) R128(0): DPMS enabled
-[  6239.632] (WW) R128(0): Option "PreferredMode" is not used
-[  6239.633] (WW) R128(0): Option "DefaultModes" is not used
-[  6239.633] (WW) R128(0): Direct rendering disabled
-[  6239.633] (II) R128(0): RandR 1.2 enabled, ignore the following RandR disabled message.
-[  6239.652] (--) RandR disabled
-[  6239.771] (II) SELinux: Disabled on system
-[  6239.784] (II) AIGLX: Screen 0 is not DRI2 capable
-[  6239.785] (EE) AIGLX: reverting to software rendering
-[  6239.898] (II) IGLX: enabled GLX_MESA_copy_sub_buffer
-[  6239.907] (II) IGLX: Loaded and initialized swrast
-[  6239.907] (II) GLX: Initialized DRISWRAST GL provider for screen 0
-[  6241.395] (II) config/udev: Adding input device QEMU QEMU USB Mouse (/dev/input/event2)
-[  6241.399] (**) QEMU QEMU USB Mouse: Applying InputClass "evdev pointer catchall"
-[  6241.401] (II) LoadModule: "evdev"
-[  6241.402] (II) Loading /usr/lib/xorg/modules/input/evdev_drv.so
-[  6241.411] (II) Module evdev: vendor="X.Org Foundation"
-[  6241.411] 	compiled for 1.19.3, module version = 2.10.5
-[  6241.412] 	Module class: X.Org XInput Driver
-[  6241.412] 	ABI class: X.Org XInput driver, version 24.1
-[  6241.413] (II) Using input driver 'evdev' for 'QEMU QEMU USB Mouse'
-[  6241.493] (II) systemd-logind: got fd for /dev/input/event2 13:66 fd 20 paused 0
-[  6241.500] (**) QEMU QEMU USB Mouse: always reports core events
-[  6241.502] (**) evdev: QEMU QEMU USB Mouse: Device: "/dev/input/event2"
-[  6241.508] (--) evdev: QEMU QEMU USB Mouse: Vendor 0x627 Product 0x1
-[  6241.509] (--) evdev: QEMU QEMU USB Mouse: Found 3 mouse buttons
-[  6241.509] (--) evdev: QEMU QEMU USB Mouse: Found scroll wheel(s)
-[  6241.509] (--) evdev: QEMU QEMU USB Mouse: Found relative axes
-[  6241.510] (--) evdev: QEMU QEMU USB Mouse: Found x and y relative axes
-[  6241.511] (II) evdev: QEMU QEMU USB Mouse: Configuring as mouse
-[  6241.511] (II) evdev: QEMU QEMU USB Mouse: Adding scrollwheel support
-[  6241.513] (**) evdev: QEMU QEMU USB Mouse: YAxisMapping: buttons 4 and 5
-[  6241.514] (**) evdev: QEMU QEMU USB Mouse: EmulateWheelButton: 4, EmulateWheelInertia: 10, EmulateWheelTimeout: 200
-[  6241.515] (**) Option "config_info" "udev:/sys/devices/pci0000:00/0000:00:0d.0/usb1/1-1/1-1:1.0/0003:0627:0001.0001/input/input2/event2"
-[  6241.515] (II) XINPUT: Adding extended input device "QEMU QEMU USB Mouse" (type: MOUSE, id 6)
-[  6241.526] (II) evdev: QEMU QEMU USB Mouse: initialized for relative axes.
-[  6241.541] (**) QEMU QEMU USB Mouse: (accel) keeping acceleration scheme 1
-[  6241.543] (**) QEMU QEMU USB Mouse: (accel) acceleration profile 0
-[  6241.554] (**) QEMU QEMU USB Mouse: (accel) acceleration factor: 2.000
-[  6241.555] (**) QEMU QEMU USB Mouse: (accel) acceleration threshold: 4
-[  6241.580] (II) config/udev: Adding input device QEMU QEMU USB Mouse (/dev/input/mouse1)
-[  6241.583] (II) No input driver specified, ignoring this device.
-[  6241.583] (II) This device may have been added with another device file.
-[  6241.639] (II) config/udev: Adding input device ADB keyboard (/dev/input/event0)
-[  6241.641] (**) ADB keyboard: Applying InputClass "evdev keyboard catchall"
-[  6241.642] (II) Using input driver 'evdev' for 'ADB keyboard'
-[  6241.654] (II) systemd-logind: got fd for /dev/input/event0 13:64 fd 21 paused 0
-[  6241.657] (**) ADB keyboard: always reports core events
-[  6241.658] (**) evdev: ADB keyboard: Device: "/dev/input/event0"
-[  6241.659] (--) evdev: ADB keyboard: Vendor 0x1 Product 0x2202
-[  6241.660] (--) evdev: ADB keyboard: Found keys
-[  6241.660] (II) evdev: ADB keyboard: Configuring as keyboard
-[  6241.661] (**) Option "config_info" "udev:/sys/devices/virtual/input/input0/event0"
-[  6241.662] (II) XINPUT: Adding extended input device "ADB keyboard" (type: KEYBOARD, id 7)
-[  6241.663] (**) Option "xkb_rules" "evdev"
-[  6241.663] (**) Option "xkb_model" "pc105"
-[  6241.664] (**) Option "xkb_layout" "us"
-[  6241.677] (II) config/udev: Adding input device ADB mouse (/dev/input/event1)
-[  6241.678] (**) ADB mouse: Applying InputClass "evdev pointer catchall"
-[  6241.679] (II) Using input driver 'evdev' for 'ADB mouse'
-[  6241.690] (II) systemd-logind: got fd for /dev/input/event1 13:65 fd 22 paused 0
-[  6241.691] (**) ADB mouse: always reports core events
-[  6241.693] (**) evdev: ADB mouse: Device: "/dev/input/event1"
-[  6241.694] (--) evdev: ADB mouse: Vendor 0x1 Product 0x3303
-[  6241.694] (--) evdev: ADB mouse: Found 3 mouse buttons
-[  6241.694] (--) evdev: ADB mouse: Found relative axes
-[  6241.695] (--) evdev: ADB mouse: Found x and y relative axes
-[  6241.695] (II) evdev: ADB mouse: Configuring as mouse
-[  6241.697] (**) evdev: ADB mouse: YAxisMapping: buttons 4 and 5
-[  6241.697] (**) evdev: ADB mouse: EmulateWheelButton: 4, EmulateWheelInertia: 10, EmulateWheelTimeout: 200
-[  6241.698] (**) Option "config_info" "udev:/sys/devices/virtual/input/input1/event1"
-[  6241.700] (II) XINPUT: Adding extended input device "ADB mouse" (type: MOUSE, id 8)
-[  6241.701] (II) evdev: ADB mouse: initialized for relative axes.
-[  6241.705] (**) ADB mouse: (accel) keeping acceleration scheme 1
-[  6241.706] (**) ADB mouse: (accel) acceleration profile 0
-[  6241.707] (**) ADB mouse: (accel) acceleration factor: 2.000
-[  6241.707] (**) ADB mouse: (accel) acceleration threshold: 4
-[  6241.715] (II) config/udev: Adding input device ADB mouse (/dev/input/mouse0)
-[  6241.716] (II) No input driver specified, ignoring this device.
-[  6241.717] (II) This device may have been added with another device file.
-[  6322.823] (II) systemd-logind: got pause for 13:64
-[  6322.847] (II) systemd-logind: got pause for 226:0
-[  6322.861] (II) systemd-logind: got pause for 13:66
-[  6322.868] (II) systemd-logind: got pause for 13:65
-[  6465.826] (II) systemd-logind: got resume for 13:64
-[  6466.059] (II) systemd-logind: got resume for 226:0
-[  6466.419] (II) systemd-logind: got resume for 13:66
-[  6466.447] (II) systemd-logind: got resume for 13:65
-[  6511.689] (II) systemd-logind: got pause for 13:64
-[  6511.731] (II) systemd-logind: got pause for 226:0
-[  6511.772] (II) systemd-logind: got pause for 13:66
-[  6511.808] (II) systemd-logind: got pause for 13:65
-[  6818.848] (II) systemd-logind: got resume for 13:64
-[  6819.130] (II) systemd-logind: got resume for 226:0
-[  6820.039] (II) systemd-logind: got resume for 13:66
-[  6820.134] (II) systemd-logind: got resume for 13:65
-[  6823.719] (II) systemd-logind: got pause for 13:64
-[  6823.726] (II) systemd-logind: got pause for 226:0
-[  6823.728] (II) systemd-logind: got pause for 13:66
-[  6823.731] (II) systemd-logind: got pause for 13:65
+Oh, ok.  In that case you don't need an Error **.
 
---Boundary-00=_BRJgcDI5WyCkB8A
-Content-Type: text/plain;
-  charset="iso 8859-1";
-  name="dmesg_ati_r128"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="dmesg_ati_r128"
+> >>>> +    }
+> >>>> +
+> >>>> +    i =3D nvgpus->num;
+> >>>> +    nvgpus->slots[i].tgt =3D tgt;
+> >>>> +    ++nvgpus->num;
+> >>>> +
+> >>>> +    return i;
+> >>>
+> >>> Might be nicer to return a pointer to the slot structure.
+> >>
+> >>
+> >> This can work.
+> >>
+> >>
+> >>>
+> >>>> +}
+> >>>> +
+> >>>> +static void spapr_pci_collect_nvgpu(struct spapr_phb_pci_nvgpu_conf=
+ig *nvgpus,
+> >>>> +                                    PCIDevice *pdev, uint64_t tgt,
+> >>>> +                                    MemoryRegion *mr)
+> >>>> +{
+> >>>> +    int i =3D spapr_pci_nvgpu_get_slot(nvgpus, tgt);
+> >>>> +
+> >>>> +    if (i < 0) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +    g_assert(!nvgpus->slots[i].gpdev);
+> >>>> +    nvgpus->slots[i].gpdev =3D pdev;
+> >>>> +
+> >>>> +    nvgpus->slots[i].gpa =3D nvgpus->nv2_ram_current;
+> >>>> +    nvgpus->nv2_ram_current +=3D memory_region_size(mr);
+> >>>> +}
+> >>>> +
+> >>>> +static void spapr_pci_collect_nvnpu(struct spapr_phb_pci_nvgpu_conf=
+ig *nvgpus,
+> >>>> +                                    PCIDevice *pdev, uint64_t tgt,
+> >>>> +                                    MemoryRegion *mr)
+> >>>> +{
+> >>>> +    int i =3D spapr_pci_nvgpu_get_slot(nvgpus, tgt), j;
+> >>>> +    struct spapr_phb_pci_nvgpu_slot *nvslot;
+> >>>> +
+> >>>> +    if (i < 0) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +
+> >>>> +    nvslot =3D &nvgpus->slots[i];
+> >>>> +    j =3D nvslot->linknum;
+> >>>> +    if (j =3D=3D ARRAY_SIZE(nvslot->links)) {
+> >>>> +        warn_report("Found too many NVLink2 bridges");
+> >>>> +        return;
+> >>>> +    }
+> >>>> +    ++nvslot->linknum;
+> >>>> +
+> >>>> +    g_assert(!nvslot->links[j].npdev);
+> >>>> +    nvslot->links[j].npdev =3D pdev;
+> >>>> +    nvslot->links[j].atsd_gpa =3D nvgpus->nv2_atsd_current;
+> >>>> +    nvgpus->nv2_atsd_current +=3D memory_region_size(mr);
+> >>>> +    nvslot->links[j].link_speed =3D
+> >>>> +        object_property_get_uint(OBJECT(pdev), "nvlink2-link-speed"=
+, NULL);
+> >>>> +}
+> >>>> +
+> >>>> +static void spapr_phb_pci_collect_nvgpu(PCIBus *bus, PCIDevice *pde=
+v,
+> >>>> +                                        void *opaque)
+> >>>> +{
+> >>>> +    PCIBus *sec_bus;
+> >>>> +    Object *po =3D OBJECT(pdev);
+> >>>> +    uint64_t tgt =3D object_property_get_uint(po, "nvlink2-tgt", NU=
+LL);
+> >>>> +
+> >>>> +    if (tgt) {
+> >>>> +        Object *mr_gpu =3D object_property_get_link(po, "nvlink2-mr=
+[0]", NULL);
+> >>>> +        Object *mr_npu =3D object_property_get_link(po, "nvlink2-at=
+sd-mr[0]",
+> >>>> +                                                  NULL);
+> >>>> +
+> >>>> +        if (mr_gpu) {
+> >>>> +            spapr_pci_collect_nvgpu(opaque, pdev, tgt, MEMORY_REGIO=
+N(mr_gpu));
+> >>>> +        } else if (mr_npu) {
+> >>>> +            spapr_pci_collect_nvnpu(opaque, pdev, tgt, MEMORY_REGIO=
+N(mr_npu));
+> >>>> +        } else {
+> >>>> +            warn_report("Unexpected device with \"nvlink2-tgt\"");
+> >>>
+> >>> IIUC this would have to be a code error, so should be an assert() not
+> >>> a warning.
+> >>
+> >>
+> >> Ok.
+> >>
+> >>>
+> >>>> +        }
+> >>>> +    }
+> >>>> +    if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=3D
+> >>>> +         PCI_HEADER_TYPE_BRIDGE)) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +
+> >>>> +    sec_bus =3D pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
+> >>>> +    if (!sec_bus) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +
+> >>>> +    pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
+> >>>> +                        spapr_phb_pci_collect_nvgpu, opaque);
+> >>>> +}
+> >>>> +
+> >>>> +void spapr_phb_nvgpu_setup(sPAPRPHBState *sphb)
+> >>>> +{
+> >>>> +    int i, j, valid_gpu_num;
+> >>>> +
+> >>>> +    /* If there are existing NVLink2 MRs, unmap those before recrea=
+ting */
+> >>>> +    if (sphb->nvgpus) {
+> >>>> +        for (i =3D 0; i < sphb->nvgpus->num; ++i) {
+> >>>> +            struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgp=
+us->slots[i];
+> >>>> +            Object *nv_mrobj =3D object_property_get_link(OBJECT(nv=
+slot->gpdev),
+> >>>> +                                                        "nvlink2-mr=
+[0]", NULL);
+> >>>> +
+> >>>> +            if (nv_mrobj) {
+> >>>> +                memory_region_del_subregion(get_system_memory(),
+> >>>> +                                            MEMORY_REGION(nv_mrobj)=
+);
+> >>>> +            }
+> >>>> +            for (j =3D 0; j < nvslot->linknum; ++j) {
+> >>>> +                PCIDevice *npdev =3D nvslot->links[j].npdev;
+> >>>> +                Object *atsd_mrobj;
+> >>>> +                atsd_mrobj =3D object_property_get_link(OBJECT(npde=
+v),
+> >>>> +                                                      "nvlink2-atsd=
+-mr[0]",
+> >>>> +                                                      NULL);
+> >>>> +                if (atsd_mrobj) {
+> >>>> +                    memory_region_del_subregion(get_system_memory(),
+> >>>> +                                                MEMORY_REGION(atsd_=
+mrobj));
+> >>>> +                }
+> >>>> +            }
+> >>>> +        }
+> >>>> +        g_free(sphb->nvgpus);
+> >>>
+> >>> Probably worth collecting the above into a nvgpu_free() helper -
+> >>> chances are you'll want it on cleanup paths as well.
+> >>
+> >> The only other cleanup path is below and it only executes if there is =
+no
+> >> MR added so for now it does not seem useful.
+> >=20
+> > Hrm... I've merged PHB hotplug recently.. so there should be a cleanup
+> > path for unplug as well.
+>=20
+>=20
+> ah right. Wooohooo :) btw with phb hotplug we can try supporting EEH on
+> hotplugged VFIO devices.
 
-[    0.000000] Using PowerMac machine description
-[    0.000000] Total memory = 1024MB; using 2048kB for hash table (at cfe00000)
-[    0.000000] Initializing cgroup subsys cpuset
-[    0.000000] Initializing cgroup subsys cpu
-[    0.000000] Initializing cgroup subsys cpuacct
-[    0.000000] Linux version 4.4.0-21-powerpc-smp (buildd@denneed04) (gcc version 5.3.1 20160413 (Ubuntu 5.3.1-14ubuntu2) ) #37-Ubuntu SMP Mon Apr 18 18:33:34 UTC 2016 (Ubuntu 4.4.0-21.37-powerpc-smp 4.4.6)
-[    0.000000] Found initrd at 0xc1b00000:0xc30f9ad3
-[    0.000000] Found UniNorth memory controller & host bridge @ 0xf8000000 revision: 0x07
-[    0.000000] Mapped at 0xff7c0000
-[    0.000000] Found a Keylargo mac-io controller, rev: 0, mapped at 0xff740000
-[    0.000000] Processor NAP mode on idle enabled.
-[    0.000000] PowerMac motherboard: PowerMac G4 AGP Graphics
-[    0.000000] CPU maps initialized for 1 thread per core
-[    0.000000]  (thread shift is 0)
-[    0.000000] bootconsole [udbg0] enabled
-[    0.000000] Found UniNorth PCI host bridge at 0x00000000f2000000. Firmware bus number: 0->0
-[    0.000000] PCI host bridge /pci@f2000000 (primary) ranges:
-[    0.000000]   IO 0x00000000f2000000..0x00000000f27fffff -> 0x0000000000000000
-[    0.000000]  MEM 0x0000000080000000..0x000000008fffffff -> 0x0000000080000000 
-[    0.000000] nvram: Checking bank 0...
-[    0.000000] Invalid signature
-[    0.000000] Invalid checksum
-[    0.000000] nvram: gen0=0, gen1=0
-[    0.000000] nvram: Active bank is: 0
-[    0.000000] nvram: OF partition at 0xffffffff
-[    0.000000] nvram: XP partition at 0xffffffff
-[    0.000000] nvram: NR partition at 0xffffffff
-[    0.000000] Top of RAM: 0x40000000, Total RAM: 0x40000000
-[    0.000000] Memory hole size: 0MB
-[    0.000000] Zone ranges:
-[    0.000000]   DMA      [mem 0x0000000000000000-0x000000002fffffff]
-[    0.000000]   Normal   empty
-[    0.000000]   HighMem  [mem 0x0000000030000000-0x000000003fffffff]
-[    0.000000] Movable zone start for each node
-[    0.000000] Early memory node ranges
-[    0.000000]   node   0: [mem 0x0000000000000000-0x000000003fffffff]
-[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000003fffffff]
-[    0.000000] On node 0 totalpages: 262144
-[    0.000000] free_area_init_node: node 0, pgdat c0bb0920, node_mem_map ef6ee000
-[    0.000000]   DMA zone: 1728 pages used for memmap
-[    0.000000]   DMA zone: 0 pages reserved
-[    0.000000]   DMA zone: 196608 pages, LIFO batch:31
-[    0.000000]   HighMem zone: 65536 pages, LIFO batch:15
-[    0.000000] PERCPU: Embedded 13 pages/cpu @ef6db000 s22188 r8192 d22868 u53248
-[    0.000000] pcpu-alloc: s22188 r8192 d22868 u53248 alloc=13*4096
-[    0.000000] pcpu-alloc: [0] 0 
-[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 260416
-[    0.000000] Kernel command line: ro ramdisk_size=1048576 file=/cdrom/preseed/lubuntu.seed boot=casper quiet splash --- 
-[    0.000000] PID hash table entries: 4096 (order: 2, 16384 bytes)
-[    0.000000] Dentry cache hash table entries: 131072 (order: 7, 524288 bytes)
-[    0.000000] Inode-cache hash table entries: 65536 (order: 6, 262144 bytes)
-[    0.000000] Sorting __ex_table...
-[    0.000000] allocated 1048576 bytes of page_ext
-[    0.000000] Memory: 932896K/1048576K available (8204K kernel code, 564K rwdata, 2784K rodata, 536K init, 1743K bss, 115680K reserved, 0K cma-reserved, 262144K highmem)
-[    0.000000] Kernel virtual memory layout:
-[    0.000000]   * 0xfff9f000..0xfffff000  : fixmap
-[    0.000000]   * 0xff800000..0xffc00000  : highmem PTEs
-[    0.000000]   * 0xfef37000..0xff800000  : early ioremap
-[    0.000000]   * 0xf1000000..0xfef37000  : vmalloc & ioremap
-[    0.000000] SLUB: HWalign=32, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
-[    0.000000] Hierarchical RCU implementation.
-[    0.000000] 	Build-time adjustment of leaf fanout to 32.
-[    0.000000] 	RCU restricting CPUs from NR_CPUS=4 to nr_cpu_ids=1.
-[    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=32, nr_cpu_ids=1
-[    0.000000] NR_IRQS:512 nr_irqs:512 16
-[    0.000000] mpic: Resetting
-[    0.000000] mpic: Setting up MPIC " MPIC 1   " version 1.2 at 80040000, max 1 CPUs
-[    0.000000] mpic: ISU size: 64, shift: 6, mask: 3f
-[    0.000000] mpic: Initializing for 64 sources
-[    0.000000] GMT Delta read from XPRAM: 0 minutes, DST: on
-[    0.000000] time_init: decrementer frequency = 100.000000 MHz
-[    0.000000] time_init: processor frequency   = 900.000000 MHz
-[    0.001095] clocksource: timebase: mask: 0xffffffffffffffff max_cycles: 0x171024e7e0, max_idle_ns: 440795205315 ns
-[    0.001390] clocksource: timebase mult[a000000] shift[24] registered
-[    0.001845] clockevent: decrementer mult[1999999a] shift[32] cpu[0]
-[    0.017324] Console: colour dummy device 80x25
-[    0.017578] console [tty0] enabled
-[    0.017734] bootconsole [udbg0] disabled
-[    0.025361] pid_max: default: 32768 minimum: 301
-[    0.027534] Security Framework initialized
-[    0.027651] Yama: becoming mindful.
-[    0.032695] AppArmor: AppArmor initialized
-[    0.036428] Mount-cache hash table entries: 2048 (order: 1, 8192 bytes)
-[    0.036486] Mountpoint-cache hash table entries: 2048 (order: 1, 8192 bytes)
-[    0.079970] Initializing cgroup subsys io
-[    0.080500] Initializing cgroup subsys memory
-[    0.080983] Initializing cgroup subsys devices
-[    0.081164] Initializing cgroup subsys freezer
-[    0.081325] Initializing cgroup subsys net_cls
-[    0.081478] Initializing cgroup subsys perf_event
-[    0.081664] Initializing cgroup subsys net_prio
-[    0.081829] Initializing cgroup subsys pids
-[    0.082751] ftrace: allocating 26562 entries in 78 pages
-[    0.210111] PowerMac SMP probe found 1 cpus
-[    0.238820] Brought up 1 CPUs
-[    0.262742] devtmpfs: initialized
-[    0.283110] evm: security.selinux
-[    0.283173] evm: security.SMACK64
-[    0.283192] evm: security.SMACK64EXEC
-[    0.283211] evm: security.SMACK64TRANSMUTE
-[    0.283229] evm: security.SMACK64MMAP
-[    0.283247] evm: security.ima
-[    0.283271] evm: security.capability
-[    0.288323] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
-[    0.314539] NET: Registered protocol family 16
-[    0.324119] cpuidle: using governor ladder
-[    0.324414] cpuidle: using governor menu
-[    0.358339] PCI: Probing PCI hardware
-[    0.363973] PCI host bridge to bus 0000:00
-[    0.364863] pci_bus 0000:00: root bus resource [io  0x0000-0x7fffff]
-[    0.365058] pci_bus 0000:00: root bus resource [mem 0x80000000-0x8fffffff]
-[    0.365507] pci_bus 0000:00: root bus resource [bus 00-ff]
-[    0.365987] pci_bus 0000:00: busn_res: [bus 00-ff] end is updated to ff
-[    0.368097] pci 0000:00:0b.0: [106b:001f] type 00 class 0x060000
-[    0.373345] pci 0000:00:0c.0: [106b:0022] type 00 class 0xff0000
-[    0.374833] pci 0000:00:0c.0: reg 0x10: [mem 0x80000000-0x8007ffff]
-[    0.394986] pci 0000:00:0d.0: [106b:003f] type 00 class 0x0c0310
-[    0.395999] pci 0000:00:0d.0: reg 0x10: [mem 0x80080000-0x800800ff]
-[    0.402045] pci 0000:00:0e.0: [106b:0021] type 00 class 0x020000
-[    0.402828] pci 0000:00:0e.0: reg 0x10: [mem 0x80200000-0x803fffff]
-[    0.407388] pci 0000:00:0f.0: [1002:5046] type 00 class 0x030000
-[    0.409097] pci 0000:00:0f.0: reg 0x10: [mem 0x81000000-0x81ffffff pref]
-[    0.411205] pci 0000:00:0f.0: reg 0x14: [io  0x1000-0x10ff]
-[    0.412979] pci 0000:00:0f.0: reg 0x18: [mem 0x82000000-0x82003fff]
-[    0.423850] pci 0000:00:0f.0: reg 0x30: [mem 0x82010000-0x8201ffff pref]
-[    0.428042] pci_bus 0000:00: busn_res: [bus 00-ff] end is updated to 00
-[    0.436557] pci_bus 0000:00: resource 4 [io  0x0000-0x7fffff]
-[    0.436676] pci_bus 0000:00: resource 5 [mem 0x80000000-0x8fffffff]
-[    0.484909] vgaarb: setting as boot device: PCI:0000:00:0f.0
-[    0.485313] vgaarb: device added: PCI:0000:00:0f.0,decodes=io+mem,owns=io+mem,locks=none
-[    0.485428] vgaarb: loaded
-[    0.485518] vgaarb: bridge control possible 0000:00:0f.0
-[    0.491977] SCSI subsystem initialized
-[    0.493404] libata version 3.00 loaded.
-[    0.495327] usbcore: registered new interface driver usbfs
-[    0.495999] usbcore: registered new interface driver hub
-[    0.496618] usbcore: registered new device driver usb
-[    0.518840] NetLabel: Initializing
-[    0.519021] NetLabel:  domain hash size = 128
-[    0.519066] NetLabel:  protocols = UNLABELED CIPSOv4
-[    0.522113] NetLabel:  unlabeled traffic allowed by default
-[    0.528433] clocksource: Switched to clocksource timebase
-[    0.719689] AppArmor: AppArmor Filesystem Enabled
-[    0.758307] NET: Registered protocol family 2
-[    0.770664] TCP established hash table entries: 8192 (order: 3, 32768 bytes)
-[    0.771112] TCP bind hash table entries: 8192 (order: 4, 65536 bytes)
-[    0.771941] TCP: Hash tables configured (established 8192 bind 8192)
-[    0.774338] UDP hash table entries: 512 (order: 2, 16384 bytes)
-[    0.774663] UDP-Lite hash table entries: 512 (order: 2, 16384 bytes)
-[    0.777937] NET: Registered protocol family 1
-[    0.782506] PCI: CLS 0 bytes, default 32
-[    0.795575] Trying to unpack rootfs image as initramfs...
-[   42.521883] Freeing initrd memory: 22500K (c1b00000 - c30f9000)
-[   42.524139] Thermal assist unit using timers, shrink_timer: 500 jiffies
-[   42.537487] futex hash table entries: 256 (order: 1, 8192 bytes)
-[   42.538917] audit: initializing netlink subsys (disabled)
-[   42.541071] audit: type=2000 audit(1551921969.428:1): initialized
-[   42.546535] Initialise system trusted keyring
-[   42.587959] zbud: loaded
-[   42.591517] VFS: Disk quotas dquot_6.6.0
-[   42.592323] VFS: Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
-[   42.603778] fuse init (API version 7.23)
-[   42.607406] Key type big_key registered
-[   42.620971] Key type asymmetric registered
-[   42.621102] Asymmetric key parser 'x509' registered
-[   42.621458] bounce: pool size: 64 pages
-[   42.621850] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
-[   42.623004] io scheduler noop registered
-[   42.623139] io scheduler deadline registered (default)
-[   42.623980] io scheduler cfq registered
-[   42.628539] pci_hotplug: PCI Hot Plug PCI Core version: 0.5
-[   42.628917] pciehp: PCI Express Hot Plug Controller Driver version: 0.4
-[   42.633997] aty128fb: Found Intel x86 BIOS ROM Image
-[   42.634043] aty128fb: Rage128 BIOS located
-[   42.637754] aty128fb: Rage128 PF PRO AGP [chip rev 0x0] 16M 128-bit SDR SGRAM (1:1)
-[   42.663788] Console: switching to colour frame buffer device 128x48
-[   42.670174] fb0: ATY Rage128 frame buffer device on Rage128 PF PRO AGP
-[   42.697145] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
-[   42.736786] pmac_zilog: 0.6 (Benjamin Herrenschmidt <benh@kernel.crashing.org>)
-[   42.739112] Generic non-volatile memory driver v1.1
-[   42.740560] Linux agpgart interface v0.103
-[   42.849029] brd: module loaded
-[   42.872708] loop: module loaded
-[   42.877820] MacIO PCI driver attached to Keylargo chipset
-[   42.885911] 0.00013020:ch-a: ttyPZ0 at MMIO 0x80013020 (irq = 37, base_baud = 230400) is a Z85c30 ESCC - Serial port
-[   42.888183] 0.00013000:ch-b: ttyPZ1 at MMIO 0x80013000 (irq = 36, base_baud = 230400) is a Z85c30 ESCC - Serial port
-[   42.894233] Macintosh CUDA driver v0.5 for Unified ADB.
-[   42.902662] adb: starting probe task...
-[   42.928854] adb devices: [2]: 2 2 [3]: 3 3
-[   42.934108] ADB keyboard at 2, handler 1
-[   42.934745] Detected ADB keyboard, type ANSI.
-[   42.937991] input: ADB keyboard as /devices/virtual/input/input0
-[   42.947964] ADB mouse at 3, handler set to 3 (Mouse Systems A3 Mouse, or compatible)
-[   42.951599] input: ADB mouse as /devices/virtual/input/input1
-[   42.952024] adb: finished probe task...
-[   43.920429] pata-macio 0.00020000:ata-3: Activating pata-macio chipset KeyLargo ATA-3, Apple bus ID 0
-[   43.936878] scsi host0: pata_macio
-[   43.939870] ata1: PATA max MWDMA2 irq 16
-[   44.967714] pata-macio 0.00021000:ata-3: Activating pata-macio chipset KeyLargo ATA-3, Apple bus ID 1
-[   44.974119] scsi host1: pata_macio
-[   44.975918] ata2: PATA max MWDMA2 irq 18
-[   44.982042] libphy: Fixed MDIO Bus: probed
-[   44.982313] tun: Universal TUN/TAP device driver, 1.6
-[   44.982388] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
-[   44.984418] PPP generic driver version 2.4.2
-[   44.986191] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
-[   44.986883] ehci-pci: EHCI PCI platform driver
-[   44.987676] ehci-platform: EHCI generic platform driver
-[   44.987893] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
-[   44.988241] ohci-pci: OHCI PCI platform driver
-[   44.990632] ohci-pci 0000:00:0d.0: OHCI PCI host controller
-[   44.991910] ohci-pci 0000:00:0d.0: new USB bus registered, assigned bus number 1
-[   44.994302] ohci-pci 0000:00:0d.0: irq 28, io mem 0x80080000
-[   45.062034] usb usb1: New USB device found, idVendor=1d6b, idProduct=0001
-[   45.062100] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
-[   45.062157] usb usb1: Product: OHCI PCI host controller
-[   45.062214] usb usb1: Manufacturer: Linux 4.4.0-21-powerpc-smp ohci_hcd
-[   45.062269] usb usb1: SerialNumber: 0000:00:0d.0
-[   45.069026] hub 1-0:1.0: USB hub found
-[   45.070228] hub 1-0:1.0: 3 ports detected
-[   45.080545] ohci-platform: OHCI generic platform driver
-[   45.080879] uhci_hcd: USB Universal Host Controller Interface driver
-[   45.084880] mousedev: PS/2 mouse device common for all mice
-[   45.087380] i2c /dev entries driver
-[   45.089166] device-mapper: uevent: version 1.0.3
-[   45.090879] device-mapper: ioctl: 4.34.0-ioctl (2015-10-28) initialised: dm-devel@redhat.com
-[   45.092715] ledtrig-cpu: registered to indicate activity on CPUs
-[   45.097725] NET: Registered protocol family 10
-[   45.111039] NET: Registered protocol family 17
-[   45.111983] Key type dns_resolver registered
-[   45.116374] registered taskstats version 1
-[   45.116826] Loading compiled-in X.509 certificates
-[   45.147038] ata2.01: NODEV after polling detection
-[   45.149977] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
-[   45.153267] ata2.00: configured for MWDMA2
-[   45.160487] Loaded X.509 cert 'Build time autogenerated kernel key: 4be2596f661edc589a661416cf2887229e4b74d6'
-[   45.162645] zswap: loaded using pool lzo/zbud
-[   45.201636] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
-[   45.224538] sr 1:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
-[   45.224946] cdrom: Uniform CD-ROM driver Revision: 3.20
-[   45.234943] sr 1:0:0:0: Attached scsi CD-ROM sr0
-[   45.236677] sr 1:0:0:0: Attached scsi generic sg0 type 5
-[   45.467727] usb 1-1: new full-speed USB device number 2 using ohci-pci
-[   45.542304] Key type trusted registered
-[   45.707529] usb 1-1: New USB device found, idVendor=0627, idProduct=0001
-[   45.707610] usb 1-1: New USB device strings: Mfr=1, Product=2, SerialNumber=9
-[   45.707660] usb 1-1: Product: QEMU USB Mouse
-[   45.707707] usb 1-1: Manufacturer: QEMU
-[   45.707754] usb 1-1: SerialNumber: 89126-pci.2:0d.0-1
-[   46.057491] Key type encrypted registered
-[   46.057694] AppArmor: AppArmor sha1 policy hashing enabled
-[   46.058240] ima: No TPM chip found, activating TPM-bypass!
-[   46.061838] evm: HMAC attrs: 0x1
-[   46.065722] hctosys: unable to open rtc device (rtc0)
-[   46.067749] PM: Hibernation image not present or could not be loaded.
-[   46.246599] Freeing unused kernel memory: 536K (c0abf000 - c0b45000)
-[   47.721106] random: systemd-udevd urandom read with 6 bits of entropy available
-[   49.482532] sungem.c:v1.0 David S. Miller <davem@redhat.com>
-[   49.533848] hidraw: raw HID events driver (C) Jiri Kosina
-[   49.550636] gem 0000:00:0e.0 eth0: Sun GEM (PCI) 10/100/1000BaseT Ethernet 52:54:00:12:34:56
-[   49.683529] usbcore: registered new interface driver usbhid
-[   49.683618] usbhid: USB HID core driver
-[   51.146412] gem 0000:00:0e.0 enp0s14: renamed from eth0
-[   51.203558] input: QEMU QEMU USB Mouse as /devices/pci0000:00/0000:00:0d.0/usb1/1-1/1-1:1.0/0003:0627:0001.0001/input/input2
-[   51.212432] hid-generic 0003:0627:0001.0001: input,hidraw0: USB HID v0.01 Mouse [QEMU QEMU USB Mouse] on usb-0000:00:0d.0-1/input0
-[   59.567766] ISO 9660 Extensions: RRIP_1991A
-[   61.508333] squashfs: version 4.0 (2009/01/31) Phillip Lougher
-[   62.578497] random: nonblocking pool is initialized
-[  185.166818] systemd[1]: systemd 229 running in system mode. (+PAM +AUDIT +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ -LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD -IDN)
-[  185.174700] systemd[1]: Detected architecture ppc.
-[  185.177665] systemd[1]: Set hostname to <lubuntu>.
-[  185.180941] systemd[1]: Initializing machine ID from random generator.
-[  188.513416] systemd[1]: Listening on Journal Socket (/dev/log).
-[  188.523606] systemd[1]: Created slice User and Session Slice.
-[  188.532621] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
-[  188.533578] systemd[1]: Listening on Syslog Socket.
-[  188.534075] systemd[1]: Reached target Remote File Systems (Pre).
-[  188.534369] systemd[1]: Reached target Remote File Systems.
-[  188.536739] systemd[1]: Listening on /dev/initctl Compatibility Named Pipe.
-[  188.537923] systemd[1]: Listening on Journal Socket.
-[  188.539844] systemd[1]: Listening on LVM2 metadata daemon socket.
-[  188.540169] systemd[1]: Reached target User and Group Name Lookups.
-[  188.540770] systemd[1]: Listening on LVM2 poll daemon socket.
-[  188.543828] systemd[1]: Listening on udev Kernel Socket.
-[  188.548038] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
-[  188.548596] systemd[1]: Reached target Encrypted Volumes.
-[  188.549781] systemd[1]: Listening on Device-mapper event daemon FIFOs.
-[  188.555361] systemd[1]: Listening on Journal Audit Socket.
-[  188.556406] systemd[1]: Listening on udev Control Socket.
-[  188.556614] systemd[1]: Reached target Swap.
-[  188.558477] systemd[1]: Created slice System Slice.
-[  188.609199] systemd[1]: Starting Nameserver information manager...
-[  188.626458] systemd[1]: Created slice system-serial\x2dgetty.slice.
-[  188.753461] systemd[1]: Mounting POSIX Message Queue File System...
-[  189.119604] systemd[1]: Starting Create list of required static device nodes for the current kernel...
-[  189.456628] systemd[1]: Starting LSB: controls configuration of serial ports...
-[  190.385372] systemd[1]: Started Read required files in advance.
-[  190.966494] systemd[1]: Starting Journal Service...
-[  191.392684] systemd[1]: Mounting Debug File System...
-[  191.393574] systemd[1]: Reached target Slices.
-[  191.917737] systemd[1]: Starting Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
-[  192.874564] systemd[1]: Starting Uncomplicated firewall...
-[  193.535007] systemd[1]: Starting Load Kernel Modules...
-[  194.189287] systemd[1]: Starting Remount Root and Kernel File Systems...
-[  195.402615] systemd[1]: Mounted Debug File System.
-[  195.460432] systemd[1]: Mounted POSIX Message Queue File System.
-[  195.975801] systemd[1]: Started Create list of required static device nodes for the current kernel.
-[  196.063460] systemd[1]: Started Uncomplicated firewall.
-[  196.199635] systemd[1]: Started Load Kernel Modules.
-[  197.889482] systemd[1]: Started Nameserver information manager.
-[  198.315375] systemd[1]: Started Remount Root and Kernel File Systems.
-[  198.856837] systemd[1]: Started Journal Service.
-[  211.834600] systemd-journald[817]: Received request to flush runtime journal from PID 1
-[  230.830117] rtc-generic rtc-generic: rtc core: registered rtc-generic as rtc0
-[  255.138657] zram: Added device: zram0
-[  259.324679] zram0: detected capacity change from 0 to 523661312
-[  262.272144] Adding 511384k swap on /dev/zram0.  Priority:5 extents:1 across:511384k SSFS
-[  295.870013] IPv6: ADDRCONF(NETDEV_UP): enp0s14: link is not ready
-[  296.012316] sungem_phy: PHY ID: 406210, addr: 0
-[  296.013285] gem 0000:00:0e.0 enp0s14: Found BCM5201 PHY
-[  296.015056] IPv6: ADDRCONF(NETDEV_UP): enp0s14: link is not ready
-[  297.216561] gem 0000:00:0e.0 enp0s14: Link is up at 100 Mbps, full-duplex
-[  297.217522] gem 0000:00:0e.0 enp0s14: Pause is disabled
-[  297.221530] IPv6: ADDRCONF(NETDEV_CHANGE): enp0s14: link becomes ready
-[ 6065.191742] [drm] Initialized drm 1.1.0 20060810
-[ 6065.459140] [drm] Supports vblank timestamp caching Rev 2 (21.10.2013).
-[ 6065.459224] [drm] No driver support for vblank timestamp query.
-[ 6065.459442] [drm] Initialized r128 2.5.0 20030725 for 0000:00:0f.0 on minor 0
-[ 6671.391221] pcmanfm[5032]: unhandled signal 11 at 00000004 nip 1fba3bf0 lr 20539d40 code 30001
-[ 6749.450215] pcmanfm[5103]: unhandled signal 11 at 00000004 nip 1fcdfbf0 lr 20675d40 code 30001
-[ 6769.840585] pcmanfm[5132]: unhandled signal 11 at 00000004 nip 1f946bf0 lr 202dcd40 code 30001
-[ 6783.255989] pcmanfm[5140]: unhandled signal 11 at 00000004 nip 1fd9bbf0 lr 20731d40 code 30001
-[ 6794.223292] pcmanfm[5148]: unhandled signal 11 at 00000004 nip 1f88cbf0 lr 20222d40 code 30001
-[ 6804.903538] pcmanfm[5156]: unhandled signal 11 at 00000004 nip 1f9afbf0 lr 20345d40 code 30001
+Yeah, Sam is looking into it.
 
---Boundary-00=_BRJgcDI5WyCkB8A--
+> >>>> +        sphb->nvgpus =3D NULL;
+> >>>> +    }
+> >>>> +
+> >>>> +    /* Search for GPUs and NPUs */
+> >>>> +    if (sphb->nv2_gpa_win_addr && sphb->nv2_atsd_win_addr) {
+> >>>> +        PCIBus *bus =3D PCI_HOST_BRIDGE(sphb)->bus;
+> >>>> +
+> >>>> +        sphb->nvgpus =3D g_new0(struct spapr_phb_pci_nvgpu_config, =
+1);
+> >>>> +        sphb->nvgpus->nv2_ram_current =3D sphb->nv2_gpa_win_addr;
+> >>>> +        sphb->nvgpus->nv2_atsd_current =3D sphb->nv2_atsd_win_addr;
+> >>>> +
+> >>>> +        pci_for_each_device(bus, pci_bus_num(bus),
+> >>>> +                            spapr_phb_pci_collect_nvgpu, sphb->nvgp=
+us);
+> >>>> +    }
+> >>>> +
+> >>>> +    /* Add found GPU RAM and ATSD MRs if found */
+> >>>> +    for (i =3D 0, valid_gpu_num =3D 0; i < sphb->nvgpus->num; ++i) {
+> >>>> +        Object *nvmrobj;
+> >>>> +        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->=
+slots[i];
+> >>>> +
+> >>>> +        if (!nvslot->gpdev) {
+> >>>> +            continue;
+> >>>> +        }
+> >>>> +        nvmrobj =3D object_property_get_link(OBJECT(nvslot->gpdev),
+> >>>> +                                           "nvlink2-mr[0]", NULL);
+> >>>> +        /* ATSD is pointless without GPU RAM MR so skip those */
+> >>>> +        if (!nvmrobj) {
+> >>>> +            continue;
+> >>>> +        }
+> >>>> +
+> >>>> +        ++valid_gpu_num;
+> >>>> +        memory_region_add_subregion(get_system_memory(), nvslot->gp=
+a,
+> >>>> +                                    MEMORY_REGION(nvmrobj));
+> >>>> +
+> >>>> +        for (j =3D 0; j < nvslot->linknum; ++j) {
+> >>>> +            Object *atsdmrobj;
+> >>>> +
+> >>>> +            atsdmrobj =3D object_property_get_link(OBJECT(nvslot->l=
+inks[j].npdev),
+> >>>> +                                                 "nvlink2-atsd-mr[0=
+]",
+> >>>> +                                                 NULL);
+> >>>> +            if (!atsdmrobj) {
+> >>>> +                continue;
+> >>>> +            }
+> >>>> +            memory_region_add_subregion(get_system_memory(),
+> >>>> +                                        nvslot->links[j].atsd_gpa,
+> >>>> +                                        MEMORY_REGION(atsdmrobj));
+> >>>> +        }
+> >>>> +    }
+> >>>> +
+> >>>> +    if (!valid_gpu_num) {
+> >>>> +        /* We did not find any interesting GPU */
+> >>>> +        g_free(sphb->nvgpus);
+> >>>> +        sphb->nvgpus =3D NULL;
+> >>>> +    }
+> >>>> +}
+> >>>> +
+> >>>> +void spapr_phb_nvgpu_populate_dt(sPAPRPHBState *sphb, void *fdt, in=
+t bus_off)
+> >>>> +{
+> >>>> +    int i, j, atsdnum =3D 0;
+> >>>> +    uint64_t atsd[8]; /* The existing limitation of known guests */
+> >>>> +
+> >>>> +    if (!sphb->nvgpus) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +
+> >>>> +    for (i =3D 0; (i < sphb->nvgpus->num) && (atsdnum < ARRAY_SIZE(=
+atsd)); ++i) {
+> >>>> +        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->=
+slots[i];
+> >>>> +
+> >>>> +        if (!nvslot->gpdev) {
+> >>>> +            continue;
+> >>>> +        }
+> >>>> +        for (j =3D 0; j < nvslot->linknum; ++j) {
+> >>>> +            if (!nvslot->links[j].atsd_gpa) {
+> >>>> +                continue;
+> >>>> +            }
+> >>>> +
+> >>>> +            if (atsdnum =3D=3D ARRAY_SIZE(atsd)) {
+> >>>> +                warn_report("Only %ld ATSD registers allowed",
+> >>>> +                            ARRAY_SIZE(atsd));
+> >>>
+> >>> Probably should be an error not a warning.
+> >>
+> >> We can still continue though, it is not fatal. These things come from
+> >> skiboot (which we control) but skiboot itself could compose the
+> >> properties itself or use whatever hostboot provided (does not happen n=
+ow
+> >> though) and I would not like to be blocked by hostboot if/when this ha=
+ppens.
+> >=20
+> > Um.. what?  atsdnum is just a counter incremented below, it doesn't
+> > come from skiboot or any other host-significant value.  The situation
+> > here is that we have more nvlinks assigned to a guest that qemu can
+> > support.  Yes, you could technically run the guest with some of the
+> > links unavailable, but that seems pretty clearly not what the user
+> > wanted.  Hence, an error is appropriate.
+>=20
+>=20
+> Not exactly. NVlinks are available whether there come with an ATSD VFIO
+> region or not, it was my choice to accompany ATSD with a NVLink2 bridge.
+> So it is quite possible to pass way too many links and yes QEMU won't
+> expose all accompaniying ATSDs to the guest but 1) guest might not need
+> this many ATSDs anyway (right now the NVIDIA driver always uses just one
+> and nobody complained about performance) 2) nvlink is functional as long
+> as the guest can access its config space.
+
+Sure, it can work.  But remember the qemu user is setting up this
+configuration.  I think it makes sense to error if it's a stupid and
+pointless configuration, even if the guest could technically work with
+it.
+
+> >>>> +                break;
+> >>>> +            }
+> >>>> +            atsd[atsdnum] =3D cpu_to_be64(nvslot->links[j].atsd_gpa=
+);
+> >>>> +            ++atsdnum;
+> >>>> +        }
+> >>>> +    }
+> >>>> +
+> >>>> +    if (!atsdnum) {
+> >>>> +        warn_report("No ATSD registers found");
+> >>>> +    } else if (!spapr_phb_eeh_available(sphb)) {
+> >>>> +        /*
+> >>>> +         * ibm,mmio-atsd contains ATSD registers; these belong to a=
+n NPU PHB
+> >>>> +         * which we do not emulate as a separate device. Instead we=
+ put
+> >>>> +         * ibm,mmio-atsd to the vPHB with GPU and make sure that we=
+ do not
+> >>>> +         * put GPUs from different IOMMU groups to the same vPHB to=
+ ensure
+> >>>> +         * that the guest will use ATSDs from the corresponding NPU.
+> >>>> +         */
+> >>>> +        warn_report("ATSD requires separate vPHB per GPU IOMMU grou=
+p");
+> >>>> +    } else {
+> >>>> +        _FDT((fdt_setprop(fdt, bus_off, "ibm,mmio-atsd",
+> >>>> +                          atsd, atsdnum * sizeof(atsd[0]))));
+> >>>> +    }
+> >>>> +}
+> >>>> +
+> >>>> +void spapr_phb_nvgpu_ram_populate_dt(sPAPRPHBState *sphb, void *fdt)
+> >>>> +{
+> >>>> +    int i, j, linkidx, npuoff;
+> >>>> +    char *npuname;
+> >>>> +
+> >>>> +    if (!sphb->nvgpus) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +
+> >>>> +    npuname =3D g_strdup_printf("npuphb%d", sphb->index);
+> >>>> +    npuoff =3D fdt_add_subnode(fdt, 0, npuname);
+> >>>> +    _FDT(npuoff);
+> >>>> +    _FDT(fdt_setprop_cell(fdt, npuoff, "#address-cells", 1));
+> >>>> +    _FDT(fdt_setprop_cell(fdt, npuoff, "#size-cells", 0));
+> >>>> +    /* Advertise NPU as POWER9 so the guest can enable NPU2 context=
+s */
+> >>>> +    _FDT((fdt_setprop_string(fdt, npuoff, "compatible", "ibm,power9=
+-npu")));
+> >>>> +    g_free(npuname);
+> >>>> +
+> >>>> +    for (i =3D 0, linkidx =3D 0; i < sphb->nvgpus->num; ++i) {
+> >>>> +        for (j =3D 0; j < sphb->nvgpus->slots[i].linknum; ++j) {
+> >>>> +            char *linkname =3D g_strdup_printf("link@%d", linkidx);
+> >>>> +            int off =3D fdt_add_subnode(fdt, npuoff, linkname);
+> >>>> +
+> >>>> +            _FDT(off);
+> >>>> +            /* _FDT((fdt_setprop_cell(fdt, off, "reg", linkidx)));
+> >>>> */
+> >>>
+> >>> Are the indices you're using for 'reg' and the unit name arbitrary?
+> >>> If so it's generally best to base them on some static property of the
+> >>> device, rather than just allocating sequentially.
+> >>
+> >> On the host reg is the link index. Here it is actually commented out as
+> >> a reminder for the future.
+> >>
+> >>>
+> >>>> +            _FDT((fdt_setprop_string(fdt, off, "compatible",
+> >>>> +                                     "ibm,npu-link")));
+> >>>> +            _FDT((fdt_setprop_cell(fdt, off, "phandle",
+> >>>> +                                   PHANDLE_NVLINK(sphb, i, j))));
+> >>>> +            _FDT((fdt_setprop_cell(fdt, off, "ibm,npu-link-index", =
+linkidx)));
+> >>>
+> >>> Why do you need the index here as well as in reg?
+> >>
+> >> I do not need "reg" really and I need index for this:
+> >>
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
+e/arch/powerpc/platforms/powernv/npu-dma.c?h=3Dv4.20#n692
+> >=20
+> >=20
+> > Ok, because of a silly binding.  That's a good enough reason.
+> >=20
+> >>>> +            g_free(linkname);
+> >>>> +            ++linkidx;
+> >>>> +        }
+> >>>> +    }
+> >>>> +
+> >>>> +    /* Add memory nodes for GPU RAM and mark them unusable */
+> >>>> +    for (i =3D 0; i < sphb->nvgpus->num; ++i) {
+> >>>> +        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->=
+slots[i];
+> >>>> +        Object *nv_mrobj =3D object_property_get_link(OBJECT(nvslot=
+->gpdev),
+> >>>> +                                                    "nvlink2-mr[0]"=
+, NULL);
+> >>>> +        uint32_t at =3D cpu_to_be32(GPURAM_ASSOCIATIVITY(sphb, i));
+> >>>> +        uint32_t associativity[] =3D { cpu_to_be32(0x4), at, at, at=
+, at };
+> >>>> +        uint64_t size =3D object_property_get_uint(nv_mrobj, "size"=
+, NULL);
+> >>>> +        uint64_t mem_reg[2] =3D { cpu_to_be64(nvslot->gpa), cpu_to_=
+be64(size) };
+> >>>> +        char *mem_name =3D g_strdup_printf("memory@%lx", nvslot->gp=
+a);
+> >>>> +        int off =3D fdt_add_subnode(fdt, 0, mem_name);
+> >>>> +
+> >>>> +        _FDT(off);
+> >>>> +        _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")=
+));
+> >>>> +        _FDT((fdt_setprop(fdt, off, "reg", mem_reg, sizeof(mem_reg)=
+)));
+> >>>> +        _FDT((fdt_setprop(fdt, off, "ibm,associativity", associativ=
+ity,
+> >>>> +                          sizeof(associativity))));
+> >>>> +
+> >>>> +        _FDT((fdt_setprop_string(fdt, off, "compatible",
+> >>>> +                                 "ibm,coherent-device-memory")));
+> >>>> +
+> >>>> +        mem_reg[1] =3D cpu_to_be64(0);
+> >>>> +        _FDT((fdt_setprop(fdt, off, "linux,usable-memory", mem_reg,
+> >>>> +                          sizeof(mem_reg))));
+> >>>> +        _FDT((fdt_setprop_cell(fdt, off, "phandle",
+> >>>> +                               PHANDLE_GPURAM(sphb, i))));
+> >>>> +        g_free(mem_name);
+> >>>> +    }
+> >>>> +
+> >>>> +}
+> >>>> +
+> >>>> +void spapr_phb_nvgpu_populate_pcidev_dt(PCIDevice *dev, void *fdt, =
+int offset,
+> >>>> +                                        sPAPRPHBState *sphb)
+> >>>> +{
+> >>>> +    int i, j;
+> >>>> +
+> >>>> +    if (!sphb->nvgpus) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +
+> >>>> +    for (i =3D 0; i < sphb->nvgpus->num; ++i) {
+> >>>> +        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->=
+slots[i];
+> >>>> +
+> >>>> +        /* Skip "slot" without attached GPU */
+> >>>
+> >>> IIUC a "slot" should always have at least one GPU.  You need to handle
+> >>> the case of an unitialized GPU in the "collect" functions because you
+> >>> don't know if you'll discover the GPU or an NPU first.  But here not
+> >>> having a GPU should be an error, shouldn't it?
+> >>
+> >>
+> >> If someone decides to pass 1 GPU with all related nvlinks and just
+> >> nvlinks from another GPU but without related GPU for whatever reason,
+> >> should we really stop him/her? Things won't work exactly at their best
+> >> but this still might be useful for weird debugging.
+> >=20
+> > Hm, ok, I guess so.
+> >=20
+> >>>> +        if (!nvslot->gpdev) {
+> >>>> +            continue;
+> >>>> +        }
+> >>>> +        if (dev =3D=3D nvslot->gpdev) {
+> >>>> +            uint32_t npus[nvslot->linknum];
+> >>>> +
+> >>>> +            for (j =3D 0; j < nvslot->linknum; ++j) {
+> >>>> +                PCIDevice *npdev =3D nvslot->links[j].npdev;
+> >>>> +
+> >>>> +                npus[j] =3D cpu_to_be32(PHANDLE_PCIDEV(sphb, npdev)=
+);
+> >>>> +            }
+> >>>> +            _FDT(fdt_setprop(fdt, offset, "ibm,npu", npus,
+> >>>> +                             j * sizeof(npus[0])));
+> >>>> +            _FDT((fdt_setprop_cell(fdt, offset, "phandle",
+> >>>> +                                   PHANDLE_PCIDEV(sphb, dev))));
+> >>>> +            continue;
+> >>>> +        }
+> >>>> +
+> >>>> +        for (j =3D 0; j < nvslot->linknum; ++j) {
+> >>>> +            if (dev !=3D nvslot->links[j].npdev) {
+> >>>> +                continue;
+> >>>> +            }
+> >>>> +
+> >>>> +            _FDT((fdt_setprop_cell(fdt, offset, "phandle",
+> >>>> +                                   PHANDLE_PCIDEV(sphb, dev))));
+> >>>> +            _FDT(fdt_setprop_cell(fdt, offset, "ibm,gpu",
+> >>>> +                                  PHANDLE_PCIDEV(sphb, nvslot->gpde=
+v)));
+> >>>> +            _FDT((fdt_setprop_cell(fdt, offset, "ibm,nvlink",
+> >>>> +                                   PHANDLE_NVLINK(sphb, i, j))));
+> >>>> +            /*
+> >>>> +             * If we ever want to emulate GPU RAM at the same locat=
+ion as on
+> >>>> +             * the host - here is the encoding GPA->TGT:
+> >>>> +             *
+> >>>> +             * gta  =3D ((sphb->nv2_gpa >> 42) & 0x1) << 42;
+> >>>> +             * gta |=3D ((sphb->nv2_gpa >> 45) & 0x3) << 43;
+> >>>> +             * gta |=3D ((sphb->nv2_gpa >> 49) & 0x3) << 45;
+> >>>> +             * gta |=3D sphb->nv2_gpa & ((1UL << 43) - 1);
+> >>>> +             */
+> >>>> +            _FDT(fdt_setprop_cell(fdt, offset, "memory-region",
+> >>>> +                                  PHANDLE_GPURAM(sphb, i)));
+> >>>> +            _FDT(fdt_setprop_u64(fdt, offset, "ibm,device-tgt-addr",
+> >>>> +                                 nvslot->tgt));
+> >>>> +            _FDT(fdt_setprop_cell(fdt, offset, "ibm,nvlink-speed",
+> >>>> +                                  nvslot->links[j].link_speed));
+> >>>> +        }
+> >>>> +    }
+> >>>> +}
+> >>>> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> >>>> index 40a1200..15ec0b4 100644
+> >>>> --- a/hw/vfio/pci-quirks.c
+> >>>> +++ b/hw/vfio/pci-quirks.c
+> >>>> @@ -2180,3 +2180,123 @@ int vfio_add_virt_caps(VFIOPCIDevice *vdev, =
+Error **errp)
+> >>>> =20
+> >>>>      return 0;
+> >>>>  }
+> >>>> +
+> >>>> +static void vfio_pci_nvlink2_get_tgt(Object *obj, Visitor *v,
+> >>>> +                                     const char *name,
+> >>>> +                                     void *opaque, Error **errp)
+> >>>> +{
+> >>>> +    uint64_t tgt =3D (uint64_t) opaque;
+> >>>> +    visit_type_uint64(v, name, &tgt, errp);
+> >>>> +}
+> >>>> +
+> >>>> +static void vfio_pci_nvlink2_get_link_speed(Object *obj, Visitor *v,
+> >>>> +                                                 const char *name,
+> >>>> +                                                 void *opaque, Erro=
+r **errp)
+> >>>> +{
+> >>>> +    uint32_t link_speed =3D (uint32_t)(uint64_t) opaque;
+> >>>> +    visit_type_uint32(v, name, &link_speed, errp);
+> >>>> +}
+> >>>> +
+> >>>> +int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp)
+> >>>> +{
+> >>>> +    int ret;
+> >>>> +    void *p;
+> >>>> +    struct vfio_region_info *nv2region =3D NULL;
+> >>>> +    struct vfio_info_cap_header *hdr;
+> >>>> +    MemoryRegion *nv2mr =3D g_malloc0(sizeof(*nv2mr));
+> >>>> +
+> >>>> +    ret =3D vfio_get_dev_region_info(&vdev->vbasedev,
+> >>>> +                                   VFIO_REGION_TYPE_PCI_VENDOR_TYPE=
+ |
+> >>>> +                                   PCI_VENDOR_ID_NVIDIA,
+> >>>> +                                   VFIO_REGION_SUBTYPE_NVIDIA_NVLIN=
+K2_RAM,
+> >>>> +                                   &nv2region);
+> >>>> +    if (ret) {
+> >>>> +        return ret;
+> >>>> +    }
+> >>>> +
+> >>>> +    p =3D mmap(NULL, nv2region->size, PROT_READ | PROT_WRITE | PROT=
+_EXEC,
+> >>>> +             MAP_SHARED, vdev->vbasedev.fd, nv2region->offset);
+> >>>> +
+> >>>> +    if (!p) {
+> >>>> +        return -errno;
+> >>>> +    }
+> >>>> +
+> >>>> +    memory_region_init_ram_ptr(nv2mr, OBJECT(vdev), "nvlink2-mr",
+> >>>> +                               nv2region->size, p);
+> >>>> +
+> >>>> +    hdr =3D vfio_get_region_info_cap(nv2region,
+> >>>> +                                   VFIO_REGION_INFO_CAP_NVLINK2_SSA=
+TGT);
+> >>>> +    if (hdr) {
+> >>>> +        struct vfio_region_info_cap_nvlink2_ssatgt *cap =3D (void *=
+) hdr;
+> >>>> +
+> >>>> +        object_property_add(OBJECT(vdev), "nvlink2-tgt", "uint64",
+> >>>> +                            vfio_pci_nvlink2_get_tgt, NULL, NULL,
+> >>>> +                            (void *) cap->tgt, NULL);
+> >>>> +        trace_vfio_pci_nvidia_gpu_setup_quirk(vdev->vbasedev.name, =
+cap->tgt,
+> >>>> +                                              nv2region->size);
+> >>>> +    }
+> >>>> +    g_free(nv2region);
+> >>>> +
+> >>>> +    return 0;
+> >>>> +}
+> >>>> +
+> >>>> +int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp)
+> >>>> +{
+> >>>> +    int ret;
+> >>>> +    void *p;
+> >>>> +    struct vfio_region_info *atsd_region =3D NULL;
+> >>>> +    struct vfio_info_cap_header *hdr;
+> >>>> +
+> >>>> +    ret =3D vfio_get_dev_region_info(&vdev->vbasedev,
+> >>>> +                                   VFIO_REGION_TYPE_PCI_VENDOR_TYPE=
+ |
+> >>>> +                                   PCI_VENDOR_ID_IBM,
+> >>>> +                                   VFIO_REGION_SUBTYPE_IBM_NVLINK2_=
+ATSD,
+> >>>> +                                   &atsd_region);
+> >>>> +    if (ret) {
+> >>>> +        return ret;
+> >>>> +    }
+> >>>> +
+> >>>> +    /* Some NVLink bridges come without assigned ATSD, skip MR part=
+ */
+> >>>> +    if (atsd_region->size) {
+> >>>> +        MemoryRegion *atsd_mr =3D g_malloc0(sizeof(*atsd_mr));
+> >>>> +
+> >>>> +        p =3D mmap(NULL, atsd_region->size, PROT_READ | PROT_WRITE =
+| PROT_EXEC,
+> >>>> +                 MAP_SHARED, vdev->vbasedev.fd, atsd_region->offset=
+);
+> >>>> +
+> >>>> +        if (!p) {
+> >>>> +            return -errno;
+> >>>> +        }
+> >>>> +
+> >>>> +        memory_region_init_ram_device_ptr(atsd_mr, OBJECT(vdev),
+> >>>> +                                          "nvlink2-atsd-mr",
+> >>>> +                                          atsd_region->size,
+> >>>> +                                          p);
+> >>>> +    }
+> >>>> +
+> >>>> +    hdr =3D vfio_get_region_info_cap(atsd_region,
+> >>>> +                                   VFIO_REGION_INFO_CAP_NVLINK2_SSA=
+TGT);
+> >>>> +    if (hdr) {
+> >>>> +        struct vfio_region_info_cap_nvlink2_ssatgt *cap =3D (void *=
+) hdr;
+> >>>> +
+> >>>> +        object_property_add(OBJECT(vdev), "nvlink2-tgt", "uint64",
+> >>>> +                            vfio_pci_nvlink2_get_tgt, NULL, NULL,
+> >>>> +                            (void *) cap->tgt, NULL);
+> >>>> +        trace_vfio_pci_nvlink2_setup_quirk_ssatgt(vdev->vbasedev.na=
+me, cap->tgt,
+> >>>> +                                                  atsd_region->size=
+);
+> >>>> +    }
+> >>>> +
+> >>>> +    hdr =3D vfio_get_region_info_cap(atsd_region,
+> >>>> +                                   VFIO_REGION_INFO_CAP_NVLINK2_LNK=
+SPD);
+> >>>> +    if (hdr) {
+> >>>> +        struct vfio_region_info_cap_nvlink2_lnkspd *cap =3D (void *=
+) hdr;
+> >>>> +
+> >>>> +        object_property_add(OBJECT(vdev), "nvlink2-link-speed", "ui=
+nt32",
+> >>>> +                            vfio_pci_nvlink2_get_link_speed, NULL, =
+NULL,
+> >>>> +                            (void *) (uint64_t) cap->link_speed, NU=
+LL);
+> >>>> +        trace_vfio_pci_nvlink2_setup_quirk_lnkspd(vdev->vbasedev.na=
+me,
+> >>>> +                                                  cap->link_speed);
+> >>>> +    }
+> >>>> +    g_free(atsd_region);
+> >>>> +
+> >>>> +    return 0;
+> >>>> +}
+> >>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> >>>> index dd12f36..07aa141 100644
+> >>>> --- a/hw/vfio/pci.c
+> >>>> +++ b/hw/vfio/pci.c
+> >>>> @@ -3069,6 +3069,20 @@ static void vfio_realize(PCIDevice *pdev, Err=
+or **errp)
+> >>>>          goto out_teardown;
+> >>>>      }
+> >>>> =20
+> >>>> +    if (vdev->vendor_id =3D=3D PCI_VENDOR_ID_NVIDIA) {
+> >>>> +        ret =3D vfio_pci_nvidia_v100_ram_init(vdev, errp);
+> >>>> +        if (ret && ret !=3D -ENODEV) {
+> >>>> +            error_report("Failed to setup NVIDIA V100 GPU RAM");
+> >>>> +        }
+> >>>> +    }
+> >>>> +
+> >>>> +    if (vdev->vendor_id =3D=3D PCI_VENDOR_ID_IBM) {
+> >>>> +        ret =3D vfio_pci_nvlink2_init(vdev, errp);
+> >>>> +        if (ret && ret !=3D -ENODEV) {
+> >>>> +            error_report("Failed to setup NVlink2 bridge");
+> >>>> +        }
+> >>>> +    }
+> >>>> +
+> >>>>      vfio_register_err_notifier(vdev);
+> >>>>      vfio_register_req_notifier(vdev);
+> >>>>      vfio_setup_resetfn_quirk(vdev);
+> >>>> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> >>>> index cf1e886..88841e9 100644
+> >>>> --- a/hw/vfio/trace-events
+> >>>> +++ b/hw/vfio/trace-events
+> >>>> @@ -87,6 +87,10 @@ vfio_pci_igd_opregion_enabled(const char *name) "=
+%s"
+> >>>>  vfio_pci_igd_host_bridge_enabled(const char *name) "%s"
+> >>>>  vfio_pci_igd_lpc_bridge_enabled(const char *name) "%s"
+> >>>> =20
+> >>>> +vfio_pci_nvidia_gpu_setup_quirk(const char *name, uint64_t tgt, uin=
+t64_t size) "%s tgt=3D0x%"PRIx64" size=3D0x%"PRIx64
+> >>>> +vfio_pci_nvlink2_setup_quirk_ssatgt(const char *name, uint64_t tgt,=
+ uint64_t size) "%s tgt=3D0x%"PRIx64" size=3D0x%"PRIx64
+> >>>> +vfio_pci_nvlink2_setup_quirk_lnkspd(const char *name, uint32_t link=
+_speed) "%s link_speed=3D0x%x"
+> >>>> +
+> >>>>  # hw/vfio/common.c
+> >>>>  vfio_region_write(const char *name, int index, uint64_t addr, uint6=
+4_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
+> >>>>  vfio_region_read(char *name, int index, uint64_t addr, unsigned siz=
+e, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) =3D 0x%"PRIx64
+> >>>
+> >>
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qxfKREH7IwbezJ+T
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAlr0ACgkQbDjKyiDZ
+s5JSvxAA1s1+QDmqN6bhwrHthR12cZ7Gdwg26H66Q4NX6vvRmRQRYLltFdaE4KNp
+ZbqbdE+3Uc0neXVk6/t57gOUmm9jWQCow8o7WZ+22H2/FrfhyyOo6ocdKY7x9DLR
+VSWNVxQBuV1Ao4t1BsWawPG++Ui9QMOfeLn5rp114Vbr+Avb0pcqKPDDTJJ9rOX9
+vYwuyyQwPCbwA95Dk4BfbFCxCBKVCQgr/qxEHE3fBUqpN1ws+e2LBbJkVcPFChp/
+m7407hfOqiuEaAX1MGPSndoIDcdMXig85vhMJfijthbo8Tr2W4kdUJbgeDnp/JpD
+UhO6GdIIfoj3unU5M1dhJVgesAIpX6cEw5oYKc4VUM+rasxB+PXsPme9/g9pdCK0
+91OnXU3txFXmNld7UHfzectoCP66F1EG2APXNA3d9eFC9NXP2LtKT7MIOFOy5RO+
+WPnTu9bXZw7x4nCMVTPh8NX5vAp3EvKYIUylblsVn+gITit8akGpprBiDsaeCdpl
+Ykd2AnY3LurFba8FXtW4GDpYP+foWVPxCbwFSJOv3e87WePcnQMumiZWA4oZd8su
+ZayT0Y2lwZYY+RyD+W2a8HDhTk1VwGsrWimVFSqwXkekmbDLpyB2w/3MUUa1N3HY
+KFa13pbcBvgNmh8PgHc3kCkBJdCRz/+BIVMWwgUzMA77qLls9wM=
+=I+mk
+-----END PGP SIGNATURE-----
+
+--qxfKREH7IwbezJ+T--
