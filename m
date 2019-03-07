@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55702)
+Received: from eggs.gnu.org ([209.51.188.92]:56781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1h3X-0002AY-NT
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:38:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1h9y-0003YT-Dw
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:45:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1h3W-0003u0-Kd
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:38:39 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:48385)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h1h3V-0003nI-Sk
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:38:38 -0500
-Date: Thu, 7 Mar 2019 01:38:24 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>
-Message-ID: <alpine.BSF.2.21.9999.1903070133170.66444@zero.eik.bme.hu>
-References: <cover.1551902740.git.balaton@eik.bme.hu>
-	<12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
-	<c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1h1h9w-0007hU-Iw
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:45:18 -0500
+Date: Thu, 7 Mar 2019 11:25:20 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190307002520.GB25123@umbus.fritz.box>
+References: <20190306060608.19935-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5-resend 2/2] mips_fulong2e: Add on-board
- graphics chip
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="DBIVS5p969aUjpLe"
+Content-Disposition: inline
+In-Reply-To: <20190306060608.19935-1-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH] target/ppc/spapr: Enable
+ H_PAGE_INIT in-kernel handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +24,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, 7 Mar 2019, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 3/6/19 9:05 PM, BALATON Zoltan wrote:
->> Add (partial) emulation of the on-board GPU of the machine. This
->> allows the PMON2000 firmware to run and should also work with Linux
->> console but probably not with X yet.
->>
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> Reviewed-by: Philippe Mathieu-Daud=C3=83=C2=A9 <philmd@redhat.com>
->> Tested-by: Philippe Mathieu-Daud=C3=83=C2=A9 <philmd@redhat.com>
->
-> Mojibaked again :(
 
-Sorry. Looks like my setup just can't handle your encoding. Maybe I need=20
-an additional header to specify content encoding? Do you have a git confi=
-g=20
-to tell format-patch to generate that? Or have a way for maintainers to=20
-correct this on merging automatically?
+--DBIVS5p969aUjpLe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Aleksandar, if you take this series, do you mind fixing with:
+On Wed, Mar 06, 2019 at 05:06:08PM +1100, Suraj Jitindar Singh wrote:
+> The H_CALL H_PAGE_INIT can be used to zero or copy a page of guest
+> memory. Enable the in-kernel H_PAGE_INIT handler.
+>=20
+> The in-kernel handler takes half the time to complete compared to
+> handling the H_CALL in userspace.
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-I think it should go via Gerd's tree together with the other patch.
+Applied, thanks.
 
-Regards,
-BALATON Zoltan
+> ---
+>  hw/ppc/spapr.c       | 3 +++
+>  target/ppc/kvm.c     | 5 +++++
+>  target/ppc/kvm_ppc.h | 5 +++++
+>  3 files changed, 13 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index cf1ef9ebd4..8ce97ff1e7 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2822,6 +2822,9 @@ static void spapr_machine_init(MachineState *machin=
+e)
+> =20
+>          /* H_CLEAR_MOD/_REF are mandatory in PAPR, but off by default */
+>          kvmppc_enable_clear_ref_mod_hcalls();
+> +
+> +        /* Enable H_PAGE_INIT */
+> +        kvmppc_enable_h_page_init();
+>      }
+> =20
+>      /* allocate RAM */
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 4e3f1e4b78..d0bfb076df 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2043,6 +2043,11 @@ void kvmppc_enable_clear_ref_mod_hcalls(void)
+>      kvmppc_enable_hcall(kvm_state, H_CLEAR_MOD);
+>  }
+> =20
+> +void kvmppc_enable_h_page_init(void)
+> +{
+> +    kvmppc_enable_hcall(kvm_state, H_PAGE_INIT);
+> +}
+> +
+>  void kvmppc_set_papr(PowerPCCPU *cpu)
+>  {
+>      CPUState *cs =3D CPU(cpu);
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 2937b36cae..2c2ea30e87 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -23,6 +23,7 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int =
+level);
+>  void kvmppc_enable_logical_ci_hcalls(void);
+>  void kvmppc_enable_set_mode_hcall(void);
+>  void kvmppc_enable_clear_ref_mod_hcalls(void);
+> +void kvmppc_enable_h_page_init(void);
+>  void kvmppc_set_papr(PowerPCCPU *cpu);
+>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+> @@ -138,6 +139,10 @@ static inline void kvmppc_enable_clear_ref_mod_hcall=
+s(void)
+>  {
+>  }
+> =20
+> +static inline void kvmppc_enable_h_page_init(void)
+> +{
+> +}
+> +
+>  static inline void kvmppc_set_papr(PowerPCCPU *cpu)
+>  {
+>  }
 
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-> Thanks!
->
-> Phil.
->
->> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->> ---
->>  hw/mips/mips_fulong2e.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
->> index fbbc543eed..f877693766 100644
->> --- a/hw/mips/mips_fulong2e.c
->> +++ b/hw/mips/mips_fulong2e.c
->> @@ -287,6 +287,7 @@ static void mips_fulong2e_init(MachineState *machi=
-ne)
->>      I2CBus *smbus;
->>      MIPSCPU *cpu;
->>      CPUMIPSState *env;
->> +    DeviceState *dev;
->>
->>      /* init CPUs */
->>      cpu =3D MIPS_CPU(cpu_create(machine->cpu_type));
->> @@ -347,6 +348,11 @@ static void mips_fulong2e_init(MachineState *mach=
-ine)
->>      vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5=
-],
->>                                 &smbus, &isa_bus);
->>
->> +    /* GPU */
->> +    dev =3D DEVICE(pci_create(pci_bus, -1, "ati-vga"));
->> +    qdev_prop_set_uint16(dev, "x-device-id", 0x5159);
->> +    qdev_init_nofail(dev);
->> +
->>      /* Populate SPD eeprom data */
->>      spd_data =3D spd_data_generate(DDR, ram_size, &err);
->>      if (err) {
->>
->
->
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--DBIVS5p969aUjpLe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAZO4ACgkQbDjKyiDZ
+s5ILrxAAzutApXlLYzTgpN4vHsL+IY28fJBDHUaIeXaIHvxLV91rHAplrnLKZrpv
+wTqlL/pbMjQlvDTnZK0WEE1KBNnReJRTOXD+UIW2WjU251S6iTwwt8UeXgRmqgYW
+lf9VYYNBUrPKV3nJ8rSDy1maBuh9Kc9PNKzK3mSQxfS9ycEaTgUGQ1fDIbToxxcZ
+LBYLv+Q9xzSs+caSh9mMHasMGgcWMNPz6qskj+2peOSy6qUBk2q1b8CFTC+gjwtY
+Ef8cafG55gz3vaBP2EX+iaelLDBw2vs5qH8JlafQ/1MYZmbK7J8Dwc/83hufcLxT
+aMyHbFu1iJRnIWxltysKwg7U6y9ImxLIgeo3ASZBxYNDbas17xDJFypXL9nU7j3i
+rBj+T/tW2GS/RniPbYjJNuahK37xCaO5mxS79a2yrJgZdGG6jdkcM6iibUgH1lFO
+qGNVZbSVfl0q8LHr1rVWoWcrNMSDIbEzNwl409hChoela86ri1qN/819g6o9EqZ9
+h5xpiUKnzaiEjvPYU97eWpR+0tdcBYmlp4BtUHcaqiF4f4aAjByATxcbudHtUFZ5
+LpYZk/OiPwVLO+JP4hxHZH782sV+GrOTkQv8P3zLOZQYg4LTlF7u/ofVwN1oVhT0
++Pl4my7duubbO9Lrk0r6VjwOqiJ4LaQQUNBe9nAaGbSNdnO4opU=
+=GiiY
+-----END PGP SIGNATURE-----
+
+--DBIVS5p969aUjpLe--
