@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39934)
+Received: from eggs.gnu.org ([209.51.188.92]:39976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrF-0003jX-VD
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:03 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrJ-0003oU-Qb
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrE-0008WU-L2
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:01 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35880)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrI-00008y-P3
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:05 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35321)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1wrE-0008VW-Ct
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:00 -0500
-Received: by mail-wr1-x431.google.com with SMTP id o17so18422043wrw.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:31:00 -0800 (PST)
+	id 1h1wrI-00008R-EX
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:04 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t18so18425811wrx.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:31:04 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 18:29:53 +0100
-Message-Id: <1551979804-6060-47-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 18:29:56 +0100
+Message-Id: <1551979804-6060-50-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
 References: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 46/57] qos-test: tpci200 test node
+Subject: [Qemu-devel] [PULL 49/57] qos-test: nvme test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,154 +32,156 @@ Cc: thuth@redhat.com, lviver@redhat.com, Emanuele Giuseppe Esposito <e.emanueleg
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Convert tests/tpci200-test to a driver node; currently it runs
-the PCI nop test only, but it also produces the ipack interface.
+Convert tests/nvme-test to a driver node; the code to discover the PCI
+device is replaced by generic qgraph code, therefore we're not placing it in tests/libqos.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |  3 +--
- tests/libqos/tpci200.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/tpci200-test.c   | 31 ------------------------
- 3 files changed, 66 insertions(+), 33 deletions(-)
- create mode 100644 tests/libqos/tpci200.c
- delete mode 100644 tests/tpci200-test.c
+ tests/Makefile.include |  3 +-
+ tests/nvme-test.c      | 78 +++++++++++++++++++++++++++-----------------------
+ 2 files changed, 43 insertions(+), 38 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 954b06b..905a361 100644
+index 0d06490..46f8c34 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -160,7 +160,6 @@ check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
- check-qtest-pci-$(CONFIG_NE2000_PCI) += tests/ne2000-test$(EXESUF)
- check-qtest-pci-$(CONFIG_NVME_PCI) += tests/nvme-test$(EXESUF)
+@@ -155,7 +155,6 @@ check-qtest-pci-y += tests/e1000-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
+-check-qtest-pci-$(CONFIG_NVME_PCI) += tests/nvme-test$(EXESUF)
  check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
--check-qtest-pci-$(CONFIG_IPACK) += tests/tpci200-test$(EXESUF)
- check-qtest-pci-$(CONFIG_IPACK) += $(check-qtest-ipack-y)
  check-qtest-pci-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
  check-qtest-pci-$(CONFIG_HDA) += tests/intel-hda-test$(EXESUF)
-@@ -731,6 +730,7 @@ qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
- qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
- qos-test-obj-y += tests/libqos/e1000e.o
- qos-test-obj-y += tests/libqos/sdhci.o
-+qos-test-obj-y += tests/libqos/tpci200.o
- qos-test-obj-y += tests/libqos/virtio.o
- qos-test-obj-$(CONFIG_VIRTFS) += tests/libqos/virtio-9p.o
- qos-test-obj-y += tests/libqos/virtio-balloon.o
-@@ -811,7 +811,6 @@ tests/ne2000-test$(EXESUF): tests/ne2000-test.o
- tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
- tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
--tests/tpci200-test$(EXESUF): tests/tpci200-test.o
- tests/display-vga-test$(EXESUF): tests/display-vga-test.o
- tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
- tests/qom-test$(EXESUF): tests/qom-test.o
-diff --git a/tests/libqos/tpci200.c b/tests/libqos/tpci200.c
-new file mode 100644
-index 0000000..98dc532
---- /dev/null
-+++ b/tests/libqos/tpci200.c
-@@ -0,0 +1,65 @@
-+/*
-+ * QTest testcase for tpci200 PCI-IndustryPack bridge
-+ *
-+ * Copyright (c) 2014 SUSE LINUX Products GmbH
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
+@@ -753,6 +752,7 @@ qos-test-obj-y += tests/ac97-test.o
+ qos-test-obj-y += tests/e1000e-test.o
+ qos-test-obj-y += tests/ipoctal232-test.o
+ qos-test-obj-y += tests/ne2000-test.o
++qos-test-obj-y += tests/nvme-test.o
+ qos-test-obj-y += tests/pci-test.o
+ qos-test-obj-y += tests/sdhci-test.o
+ qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test.o $(chardev-obj-y) $(test-io-obj-y)
+@@ -814,7 +814,6 @@ tests/test-hmp$(EXESUF): tests/test-hmp.o
+ tests/machine-none-test$(EXESUF): tests/machine-none-test.o
+ tests/device-plug-test$(EXESUF): tests/device-plug-test.o
+ tests/drive_del-test$(EXESUF): tests/drive_del-test.o
+-tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
+ tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
+ tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
+ tests/es1370-test$(EXESUF): tests/es1370-test.o
+diff --git a/tests/nvme-test.c b/tests/nvme-test.c
+index 2700ba8..b48d3a2 100644
+--- a/tests/nvme-test.c
++++ b/tests/nvme-test.c
+@@ -10,49 +10,47 @@
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
+ #include "libqtest.h"
+-#include "libqos/libqos-pc.h"
 +#include "libqos/qgraph.h"
 +#include "libqos/pci.h"
+ 
+-static QOSState *qnvme_start(const char *extra_opts)
++typedef struct QNvme QNvme;
 +
-+typedef struct QTpci200 QTpci200;
-+typedef struct QIpack QIpack;
-+
-+struct QIpack {
-+
-+};
-+struct QTpci200 {
++struct QNvme {
 +    QOSGraphObject obj;
 +    QPCIDevice dev;
-+    QIpack ipack;
 +};
 +
-+/* tpci200 */
-+static void *tpci200_get_driver(void *obj, const char *interface)
-+{
-+    QTpci200 *tpci200 = obj;
-+    if (!g_strcmp0(interface, "ipack")) {
-+        return &tpci200->ipack;
-+    }
++static void *nvme_get_driver(void *obj, const char *interface)
+ {
+-    QOSState *qs;
+-    const char *arch = qtest_get_arch();
+-    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
+-                      "-device nvme,addr=0x4.0,serial=foo,drive=drv0 %s";
+-
+-    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+-        qs = qtest_pc_boot(cmd, extra_opts ? : "");
+-        global_qtest = qs->qts;
+-        return qs;
++    QNvme *nvme = obj;
++
 +    if (!g_strcmp0(interface, "pci-device")) {
-+        return &tpci200->dev;
-+    }
-+
-+    fprintf(stderr, "%s not present in tpci200\n", interface);
++        return &nvme->dev;
+     }
+ 
+-    g_printerr("nvme tests are only available on x86\n");
+-    exit(EXIT_FAILURE);
++    fprintf(stderr, "%s not present in nvme\n", interface);
 +    g_assert_not_reached();
-+}
-+
-+static void *tpci200_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
-+{
-+    QTpci200 *tpci200 = g_new0(QTpci200, 1);
+ }
+ 
+-static void qnvme_stop(QOSState *qs)
++static void *nvme_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
+ {
+-    qtest_shutdown(qs);
+-}
++    QNvme *nvme = g_new0(QNvme, 1);
 +    QPCIBus *bus = pci_bus;
-+
-+    qpci_device_init(&tpci200->dev, bus, addr);
-+    tpci200->obj.get_driver = tpci200_get_driver;
-+    return &tpci200->obj;
-+}
-+
-+static void tpci200_register_nodes(void)
-+{
-+    QOSGraphEdgeOptions opts = {
-+        .extra_device_opts = "addr=04.0,id=ipack0",
-+    };
-+    add_qpci_address(&opts, &(QPCIAddress) { .devfn = QPCI_DEVFN(4, 0) });
-+
-+    qos_node_create_driver("tpci200", tpci200_create);
-+    qos_node_consumes("tpci200", "pci-bus", &opts);
-+    qos_node_produces("tpci200", "ipack");
-+    qos_node_produces("tpci200", "pci-device");
-+}
-+
-+libqos_init(tpci200_register_nodes);
-diff --git a/tests/tpci200-test.c b/tests/tpci200-test.c
-deleted file mode 100644
-index 0321ec2..0000000
---- a/tests/tpci200-test.c
-+++ /dev/null
-@@ -1,31 +0,0 @@
--/*
-- * QTest testcase for tpci200 PCI-IndustryPack bridge
-- *
-- * Copyright (c) 2014 SUSE LINUX Products GmbH
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- */
--
--#include "qemu/osdep.h"
--#include "libqtest.h"
--
--/* Tests only initialization so far. TODO: Replace with functional tests */
+ 
 -static void nop(void)
 -{
--}
+-    QOSState *qs;
++    qpci_device_init(&nvme->dev, bus, addr);
++    nvme->obj.get_driver = nvme_get_driver;
+ 
+-    qs = qnvme_start(NULL);
+-    qnvme_stop(qs);
++    return &nvme->obj;
+ }
+ 
+-static void nvmetest_cmb_test(void)
++/* This used to cause a NULL pointer dereference.  */
++static void nvmetest_oob_cmb_test(void *obj, void *data, QGuestAllocator *alloc)
+ {
+     const int cmb_bar_size = 2 * MiB;
+-    QOSState *qs;
+-    QPCIDevice *pdev;
++    QNvme *nvme = obj;
++    QPCIDevice *pdev = &nvme->dev;
+     QPCIBar bar;
+ 
+-    qs = qnvme_start("-global nvme.cmb_size_mb=2");
+-    pdev = qpci_device_find(qs->pcibus, QPCI_DEVFN(4,0));
+-    g_assert(pdev != NULL);
 -
+     qpci_device_enable(pdev);
+     bar = qpci_iomap(pdev, 2, NULL);
+ 
+@@ -65,16 +63,24 @@ static void nvmetest_cmb_test(void)
+     g_assert_cmpint(qpci_io_readb(pdev, bar, cmb_bar_size - 1), ==, 0x11);
+     g_assert_cmpint(qpci_io_readw(pdev, bar, cmb_bar_size - 1), !=, 0x2211);
+     g_assert_cmpint(qpci_io_readl(pdev, bar, cmb_bar_size - 1), !=, 0x44332211);
+-    g_free(pdev);
+-
+-    qnvme_stop(qs);
+ }
+ 
 -int main(int argc, char **argv)
--{
--    int ret;
--
++static void nvme_register_nodes(void)
+ {
 -    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/tpci200/nop", nop);
--
--    qtest_start("-device tpci200");
--    ret = g_test_run();
--
--    qtest_end();
--
--    return ret;
--}
+-    qtest_add_func("/nvme/nop", nop);
+-    qtest_add_func("/nvme/cmb_test", nvmetest_cmb_test);
++    QOSGraphEdgeOptions opts = {
++        .extra_device_opts = "addr=04.0,drive=drv0,serial=foo",
++        .before_cmd_line = "-drive id=drv0,if=none,file=null-co://,format=raw",
++    };
++
++    add_qpci_address(&opts, &(QPCIAddress) { .devfn = QPCI_DEVFN(4, 0) });
+ 
+-    return g_test_run();
++    qos_node_create_driver("nvme", nvme_create);
++    qos_node_consumes("nvme", "pci-bus", &opts);
++    qos_node_produces("nvme", "pci-device");
++
++    qos_add_test("oob-cmb-access", "nvme", nvmetest_oob_cmb_test, &(QOSGraphTestOptions) {
++        .edge.extra_device_opts = "cmb_size_mb=2"
++    });
+ }
++
++libqos_init(nvme_register_nodes);
 -- 
 1.8.3.1
