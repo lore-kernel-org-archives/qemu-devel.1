@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57867)
+Received: from eggs.gnu.org ([209.51.188.92]:57848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1jua-00081U-CI
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:41:37 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1juZ-0006yX-3s
+	(envelope-from <dgibson@ozlabs.org>) id 1h1juZ-00081L-50
 	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:41:36 -0500
-Date: Thu, 7 Mar 2019 14:29:24 +1100
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1h1juY-0006xQ-1W
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:41:35 -0500
+Date: Thu, 7 Mar 2019 14:30:14 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190307032924.GC7722@umbus.fritz.box>
+Message-ID: <20190307033013.GD7722@umbus.fritz.box>
 References: <20190306085032.15744-1-clg@kaod.org>
-	<20190306085032.15744-11-clg@kaod.org>
+	<20190306085032.15744-12-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YD3LsXFS42OYHhNZ"
+	protocol="application/pgp-signature"; boundary="Xm/fll+QQv+hsKip"
 Content-Disposition: inline
-In-Reply-To: <20190306085032.15744-11-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 10/27] ppc/xive: Make XIVE generate the
- proper interrupt types
+In-Reply-To: <20190306085032.15744-12-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 11/27] ppc/pnv: fix logging primitives
+ using Ox
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,112 +26,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---YD3LsXFS42OYHhNZ
+--Xm/fll+QQv+hsKip
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 06, 2019 at 09:50:15AM +0100, C=E9dric Le Goater wrote:
-> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->=20
-> It should be generic Hypervisor Virtualization interrupts for HV
-> directed rings and traditional External Interrupts for the OS directed
-> ring.
->=20
-> Don't generate anything for the user ring as it isn't actually
-> supported.
->=20
-> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+On Wed, Mar 06, 2019 at 09:50:16AM +0100, C=E9dric Le Goater wrote:
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Wow, that's a deeply weird starting point.  Applied.
+
 > ---
->  include/hw/ppc/xive.h |  3 ++-
->  hw/intc/xive.c        | 22 +++++++++++++++++++---
->  2 files changed, 21 insertions(+), 4 deletions(-)
+>  hw/ppc/pnv_lpc.c | 10 +++++-----
+>  hw/ppc/pnv_psi.c |  4 ++--
+>  2 files changed, 7 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index c4f27742ca09..6b89dc7679f9 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -313,7 +313,8 @@ typedef struct XiveTCTX {
->      DeviceState parent_obj;
-> =20
->      CPUState    *cs;
-> -    qemu_irq    output;
-> +    qemu_irq    hv_output;
-> +    qemu_irq    os_output;
-> =20
->      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
->  } XiveTCTX;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index a0b87001da25..237e7b256dc0 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -61,13 +61,28 @@ static uint8_t exception_mask(uint8_t ring)
->      }
->  }
-> =20
-> +static qemu_irq xive_tctx_output(XiveTCTX *tctx, uint8_t ring)
-> +{
-> +        switch (ring) {
-> +        case TM_QW0_USER:
-> +                return 0; /* Not supported */
-
-IIUC hitting this case would indicate a code error, not a guest error,
-in which case g_assert_not_reached() would be more appropriate that
-returning 0.
-
-Return "0" is kind of weird.  qemu_irq is actually a pointer so this
-is really returning NULL.  But I don't think most things that handle
-qemu_irq expect them to be NULL, so it's likely that this will just
-crash further on.
-
-Apart from that, LGTM.
-
-> +        case TM_QW1_OS:
-> +                return tctx->os_output;
-> +        case TM_QW2_HV_POOL:
-> +        case TM_QW3_HV_PHYS:
-> +                return tctx->hv_output;
-> +        default:
-> +                return 0;
-> +        }
-> +}
-> +
->  static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
->  {
->      uint8_t *regs =3D &tctx->regs[ring];
->      uint8_t nsr =3D regs[TM_NSR];
->      uint8_t mask =3D exception_mask(ring);
-> =20
-> -    qemu_irq_lower(tctx->output);
-> +    qemu_irq_lower(xive_tctx_output(tctx, ring));
-> =20
->      if (regs[TM_NSR] & mask) {
->          uint8_t cppr =3D regs[TM_PIPR];
-> @@ -100,7 +115,7 @@ static void xive_tctx_notify(XiveTCTX *tctx, uint8_t =
-ring)
->          default:
->              g_assert_not_reached();
->          }
-> -        qemu_irq_raise(tctx->output);
-> +        qemu_irq_raise(xive_tctx_output(tctx, ring));
->      }
->  }
-> =20
-> @@ -546,7 +561,8 @@ static void xive_tctx_realize(DeviceState *dev, Error=
- **errp)
->      env =3D &cpu->env;
->      switch (PPC_INPUT(env)) {
->      case PPC_FLAGS_INPUT_POWER9:
-> -        tctx->output =3D env->irq_inputs[POWER9_INPUT_INT];
-> +        tctx->hv_output =3D env->irq_inputs[POWER9_INPUT_HINT];
-> +        tctx->os_output =3D env->irq_inputs[POWER9_INPUT_INT];
+> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+> index 172a915cfc55..9b18ce55e391 100644
+> --- a/hw/ppc/pnv_lpc.c
+> +++ b/hw/ppc/pnv_lpc.c
+> @@ -294,7 +294,7 @@ static uint64_t lpc_hc_read(void *opaque, hwaddr addr=
+, unsigned size)
+>          val =3D  lpc->lpc_hc_error_addr;
 >          break;
-> =20
 >      default:
+> -        qemu_log_mask(LOG_UNIMP, "LPC HC Unimplemented register: Ox%"
+> +        qemu_log_mask(LOG_UNIMP, "LPC HC Unimplemented register: 0x%"
+>                        HWADDR_PRIx "\n", addr);
+>      }
+>      return val;
+> @@ -332,7 +332,7 @@ static void lpc_hc_write(void *opaque, hwaddr addr, u=
+int64_t val,
+>      case LPC_HC_ERROR_ADDRESS:
+>          break;
+>      default:
+> -        qemu_log_mask(LOG_UNIMP, "LPC HC Unimplemented register: Ox%"
+> +        qemu_log_mask(LOG_UNIMP, "LPC HC Unimplemented register: 0x%"
+>                        HWADDR_PRIx "\n", addr);
+>      }
+>  }
+> @@ -370,7 +370,7 @@ static uint64_t opb_master_read(void *opaque, hwaddr =
+addr, unsigned size)
+>          val =3D lpc->opb_irq_input;
+>          break;
+>      default:
+> -        qemu_log_mask(LOG_UNIMP, "OPB MASTER Unimplemented register: Ox%"
+> +        qemu_log_mask(LOG_UNIMP, "OPBM: read on unimplemented register: =
+0x%"
+>                        HWADDR_PRIx "\n", addr);
+>      }
+> =20
+> @@ -399,8 +399,8 @@ static void opb_master_write(void *opaque, hwaddr add=
+r,
+>          /* Read only */
+>          break;
+>      default:
+> -        qemu_log_mask(LOG_UNIMP, "OPB MASTER Unimplemented register: Ox%"
+> -                      HWADDR_PRIx "\n", addr);
+> +        qemu_log_mask(LOG_UNIMP, "OPBM: write on unimplemented register:=
+ 0x%"
+> +                      HWADDR_PRIx " val=3D0x%08"PRIx64"\n", addr, val);
+>      }
+>  }
+> =20
+> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> index 44bc0cbf58cb..c872be0b9c0d 100644
+> --- a/hw/ppc/pnv_psi.c
+> +++ b/hw/ppc/pnv_psi.c
+> @@ -323,7 +323,7 @@ static uint64_t pnv_psi_reg_read(PnvPsi *psi, uint32_=
+t offset, bool mmio)
+>          val =3D psi->regs[offset];
+>          break;
+>      default:
+> -        qemu_log_mask(LOG_UNIMP, "PSI: read at Ox%" PRIx32 "\n", offset);
+> +        qemu_log_mask(LOG_UNIMP, "PSI: read at 0x%" PRIx32 "\n", offset);
+>      }
+>      return val;
+>  }
+> @@ -382,7 +382,7 @@ static void pnv_psi_reg_write(PnvPsi *psi, uint32_t o=
+ffset, uint64_t val,
+>          pnv_psi_set_irsn(psi, val);
+>          break;
+>      default:
+> -        qemu_log_mask(LOG_UNIMP, "PSI: write at Ox%" PRIx32 "\n", offset=
+);
+> +        qemu_log_mask(LOG_UNIMP, "PSI: write at 0x%" PRIx32 "\n", offset=
+);
+>      }
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -139,24 +125,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---YD3LsXFS42OYHhNZ
+--Xm/fll+QQv+hsKip
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAkBIACgkQbDjKyiDZ
-s5LJJw//S2xpLtA6GYK+prekevZLcErOMzpupedSBqxo9fZjB3SVSV8N4+f69vXt
-qyaWSA53JP2BWgsbJ2W+EMGi7OMg6mXCpzrjbRRHwKGvojxEdJyF2ms8zirqblkv
-DnF5Jqekq5/fQKkh5xdgYhxYzf15zE7/FMD66yN5EDDCwo/81fVpsoQvzpWW1d4q
-19FkheWapIeiJHSW9TbIQLy2uF7TMAFc465VLSGBxzwn2dsD3QARYjDW2vGDXQcJ
-cEFuI6kEA4W1XE+X8Ssxv595ooBOQ48uH95NZZORSosHrAO/pZkGgXAE9ZUOc3i+
-u8JCjzmmjHgcwX1dGMOX2xoS8cNtF55MuP5TirIUhqXp7TKY4Am+do3GaDEiY9mZ
-ufUGKDOxnOrCABdgwjaoL+tjNf5Z3BmSDNSZAN3wA9S/sj1SFsWG2ObJdi2OIdXa
-RlOZwqP032z9mrhiVVbPIGvqgHzNuxg1OtGwnSXGUInNjnBstKK8TcaGdjxbyUc0
-ao8YHIoN+vAG0Z62arkroD/I38dXr44bhJXqihxhDDQcTJ7oYWBNMY06sChqoJZM
-UWNdP0quXWRC+yMsYA/FM/UtEaFnm7b9UKvIFlMSuOMrw7nNqO6e2l72lG7x1TIC
-tqTbFpzjxxQRbONBBilQMl6Za2Zx+3ikHpA0y8TWtQJNYnGL1lg=
-=AzMy
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAkEUACgkQbDjKyiDZ
+s5LWrg/+IqvwB7rF4+vWm8lBmA2FywgsOy/rVYI4SQryI5UiaquXWRDVBo0jfiNC
+/I3Rfn8ODCzli0qW2TGJDNtkc1kizc3MsQW8GORfph3vQcRwDonNbROAZyaZhbHm
+CTG6h4DajZUdPH0tAOBWKskK70lDY0xVgS0xsgpae+npiR81QHaG3ZZkfIEZFbDR
+T2VkLbduMRInClG/jT74yMt2azNNH5aS9obDnbv0oA5fnzBEsiXGL3bMNShtiAW6
+ClR9ubv6Rk4oWVvOHteARLLJhC217FunMQZdEZfVsRDJvjJvfjJ02R9eUhY1nNUm
+3W8AXo5XYfgkbI1uSw00I2Da9svf8sLcToCNxk3STb1s1KfMyQU7DUsi3llOpQQl
+7YPUyMz0kidQSamM6tjsvE1Jj5soJDd/dFcSxswPDdTXsAQf8FTBwNjWRoz62/d3
+PO0YV1Y896KNn9JWHiB+PHPcqTtLZ9XWzHXDa1Wwaxw5HzU5DfQ+o23mzmnMpB56
+4BIZOeGJiStZ7X4XL5TNu/QkrPGwQx5lQnvm0b+PtZhFguFhp5LDBXqCAUE2ySui
+pn2HwzkProTgJOZ8zeIBU0QIVI+bCJJjN+HDP1qfIqQDijhWF11Ij1mLpqMXPckq
+PqtRv5tfvvYkxSQG9dg6e4eOE5ZHCnZc4s+FNCPW/kBF6+GMWIQ=
+=ciqA
 -----END PGP SIGNATURE-----
 
---YD3LsXFS42OYHhNZ--
+--Xm/fll+QQv+hsKip--
