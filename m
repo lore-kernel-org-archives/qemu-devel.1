@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40936)
+Received: from eggs.gnu.org ([209.51.188.92]:41336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1h1ruq-0003GA-Cf
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:14:25 -0500
+	(envelope-from <david@redhat.com>) id 1h1rwE-00043Q-2j
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1h1rup-0006ml-A1
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:14:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45586)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1h1rup-0006k7-2N
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:14:23 -0500
-Date: Thu, 7 Mar 2019 07:14:17 -0500
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <20190307121417.fztvzzb6lyrpnjyx@dhcp-17-118.bos.redhat.com>
-References: <20190305172139.32662-1-peter.maydell@linaro.org>
-	<20190305172139.32662-9-peter.maydell@linaro.org>
-	<20190307014028.hggeogcxuwldc5ms@localhost.localdomain>
-	<CAFEAcA8jcshKLW8+fQJ30Y02LTmqxrwpShZKDP7NNOOGSwaY3A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8jcshKLW8+fQJ30Y02LTmqxrwpShZKDP7NNOOGSwaY3A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 08/12] docs: Provide separate conf.py
- for each manual we want
+	(envelope-from <david@redhat.com>) id 1h1rwD-0007wL-5X
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:50 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Thu,  7 Mar 2019 13:15:09 +0100
+Message-Id: <20190307121539.12842-3-david@redhat.com>
+In-Reply-To: <20190307121539.12842-1-david@redhat.com>
+References: <20190307121539.12842-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 02/32] s390x/tcg: Check vector register
+ instructions at central point
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +20,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-On Thu, Mar 07, 2019 at 09:49:44AM +0000, Peter Maydell wrote:
-> On Thu, 7 Mar 2019 at 01:40, Cleber Rosa <crosa@redhat.com> wrote:
-> > I have the impression that this can be simplified by making use of
-> > "only" tags:
-> >
-> > https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-only
-> >
-> > So, conf.py could detect if it's being run on readthedocs.org:
-> >
-> >   ON_RTD = os.environ.get('READTHEDOCS', None) == 'True'
-> >
-> > And manipulate the "tags" variable accordingly:
-> >
-> >   if ON_RTD:
-> >      tags.add('devel')
-> >      tags.add('interop')
-> >
-> > Then, on an index.rst, it could be a simple matter of:
-> >
-> > .. only:: devel
-> > ================
-> > Developers Guide
-> > ================
-> > .. toctree::
-> >    docs/devel
-> >
-> > .. only:: interop
-> > =============
-> > Interop Guide
-> > =============
-> > .. toctree::
-> >    docs/interop
-> >
-> > .. only:: devel and interop
-> > ===============
-> > QEMU Full Guide
-> > ===============
-> > .. toctree::
-> >    docs/devel
-> >    docs/interop
-> 
-> Thanks for pointing out the tags functionality. That said,
-> this won't do what we want, will it?
->  * building the docs gives all the docs in the build tree
->  * but we only install via 'make install' the ones the user wants
->
+Check them at a central point. We'll use a new instruction flag to
+flag all vector instructions (IF_VEC) and handle it very similar to
+AFP, whereby we use another unused position in the PSW mask to store
+the state of vector register enablement per translation block.
 
-It should be doable.  I put a PoC here:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu.h       |  7 +++++++
+ target/s390x/translate.c | 12 ++++++++++++
+ 2 files changed, 19 insertions(+)
 
-  https://github.com/clebergnu/sphinx-conditional-project/tree/master
-
-I'm understanding that the `make install` step is nothing but a copy
-of the produced build.  For this PoC, I used an HTML builder.
-
-> thanks
-> -- PMM
-
-Regards,
-- Cleber.
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index b71ac5183d..cb6d77053a 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -257,6 +257,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
+ /* PSW defines */
+ #undef PSW_MASK_PER
+ #undef PSW_MASK_UNUSED_2
++#undef PSW_MASK_UNUSED_3
+ #undef PSW_MASK_DAT
+ #undef PSW_MASK_IO
+ #undef PSW_MASK_EXT
+@@ -276,6 +277,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
+ 
+ #define PSW_MASK_PER            0x4000000000000000ULL
+ #define PSW_MASK_UNUSED_2       0x2000000000000000ULL
++#define PSW_MASK_UNUSED_3       0x1000000000000000ULL
+ #define PSW_MASK_DAT            0x0400000000000000ULL
+ #define PSW_MASK_IO             0x0200000000000000ULL
+ #define PSW_MASK_EXT            0x0100000000000000ULL
+@@ -323,12 +325,14 @@ extern const struct VMStateDescription vmstate_s390_cpu;
+ 
+ /* we'll use some unused PSW positions to store CR flags in tb flags */
+ #define FLAG_MASK_AFP           (PSW_MASK_UNUSED_2 >> FLAG_MASK_PSW_SHIFT)
++#define FLAG_MASK_VECTOR        (PSW_MASK_UNUSED_3 >> FLAG_MASK_PSW_SHIFT)
+ 
+ /* Control register 0 bits */
+ #define CR0_LOWPROT             0x0000000010000000ULL
+ #define CR0_SECONDARY           0x0000000004000000ULL
+ #define CR0_EDAT                0x0000000000800000ULL
+ #define CR0_AFP                 0x0000000000040000ULL
++#define CR0_VECTOR              0x0000000000020000ULL
+ #define CR0_EMERGENCY_SIGNAL_SC 0x0000000000004000ULL
+ #define CR0_EXTERNAL_CALL_SC    0x0000000000002000ULL
+ #define CR0_CKC_SC              0x0000000000000800ULL
+@@ -373,6 +377,9 @@ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
+     if (env->cregs[0] & CR0_AFP) {
+         *flags |= FLAG_MASK_AFP;
+     }
++    if (env->cregs[0] & CR0_VECTOR) {
++        *flags |= FLAG_MASK_VECTOR;
++    }
+ }
+ 
+ /* PER bits from control register 9 */
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 1d8030f8cd..d52c02c572 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -1203,6 +1203,7 @@ typedef struct {
+ #define IF_BFP      0x0008      /* binary floating point instruction */
+ #define IF_DFP      0x0010      /* decimal floating point instruction */
+ #define IF_PRIV     0x0020      /* privileged instruction */
++#define IF_VEC      0x0040      /* vector instruction */
+ 
+ struct DisasInsn {
+     unsigned opc:16;
+@@ -6337,11 +6338,22 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
+             if (insn->flags & IF_DFP) {
+                 dxc = 3;
+             }
++            if (insn->flags & IF_VEC) {
++                dxc = 0xfe;
++            }
+             if (dxc) {
+                 gen_data_exception(dxc);
+                 return DISAS_NORETURN;
+             }
+         }
++
++        /* if vector instructions not enabled, executing them is forbidden */
++        if (insn->flags & IF_VEC) {
++            if (!((s->base.tb->flags & FLAG_MASK_VECTOR))) {
++                gen_data_exception(0xfe);
++                return DISAS_NORETURN;
++            }
++        }
+     }
+ 
+     /* Check for insn specification exceptions.  */
+-- 
+2.17.2
