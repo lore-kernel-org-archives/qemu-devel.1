@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51835)
+Received: from eggs.gnu.org ([209.51.188.92]:52066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h1qQq-00066x-HS
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:39:21 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1qRo-0006kR-2J
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h1qQn-0005uK-65
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:39:18 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45921)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1qRl-0006Nc-4w
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:19 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:45028)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1h1qQm-0005si-L3
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:39:16 -0500
-Received: by mail-wr1-x444.google.com with SMTP id w17so16798047wrn.12
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 02:39:14 -0800 (PST)
-References: <20190227111347.15063-1-alex.bennee@linaro.org>
-	<87r2bl5oah.fsf@dusky.pond.sub.org>
-	<1a4d4fa0-3fd5-32ae-fcc3-dcd0376d0c28@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1a4d4fa0-3fd5-32ae-fcc3-dcd0376d0c28@redhat.com>
-Date: Thu, 07 Mar 2019 10:39:12 +0000
-Message-ID: <87sgvzezov.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1h1qRj-0006Fl-UE
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:16 -0500
+Received: by mail-wr1-x430.google.com with SMTP id w2so16801329wrt.11
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 02:40:08 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <13c59d63-1761-b61e-9cb9-039a3ef1be08@redhat.com>
+Date: Thu, 7 Mar 2019 11:40:05 +0100
 MIME-Version: 1.0
+In-Reply-To: <9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5] hw/block: better reporting on pflash
- backing file mismatch
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,216 +32,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
+On 07/03/19 07:39, Thomas Huth wrote:
+> On 06/03/2019 19.12, Paolo Bonzini wrote:
+>> Hi all,
+>>
+>> lately I have been thinking of converting the QEMU build system to
+>> Meson.  Meson is a relatively new build system that can replace
+>> Autotools or hand-written Makefiles such as QEMU; as a die-hard
+>> Autotools fan, I must say that Meson is by far better than anything else
+>> that has ever tried to replace Autotools, and actually has the potential
+>> to do so.
+>>
+>> Advantages of Meson that directly matter for QEMU include:[...]
+> 
+> I'm not objecting a new build system per se, but could you elaborate on
+>  problems of the current QEMU build system that will be fixed by this
+> change?
 
-Laszlo Ersek <lersek@redhat.com> writes:
+In order of importance:
 
-> On 03/05/19 16:33, Markus Armbruster wrote:
->> You neglected to cc: the maintainers of hw/block, I fixed that for you.
->>
->> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->>
->>> It looks like there was going to be code to check we had some sort of
->>> alignment so lets replace it with an actual check. This is a bit more
->>> useful than the enigmatic "failed to read the initial flash content"
->>> when we attempt to read the number of bytes the device should have.
->>>
->>> This is a potential confusing stumbling block when you move from using
->>> -bios to using -drive if=3Dpflash,file=3Dblob,format=3Draw,readonly for
->>> loading your firmware code. To mitigate that we automatically pad in
->>> the read-only case and warn the user when we have performed magic to
->>> enable things to Just Work (tm).
->>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->>
->> Philippe and I talked about various pflash issues last night.  He
->> explained to me how physical flash memory works and is used.  This
->> brought back my doubts on the wisdom of automatic padding.
->>
->> Errors in my recounting of his explanations are almost certainly
->> entirely mine.  Please correct them.
->>
->> We're talking about NOR flash.  NAND flash works differently.
->>
->> You can:
->>
->> * Read a cell.
->>
->> * Write a cell: change it from 1 to 0.
->>
->> * Erase a whole sector (block): change all cells to 1.  This is slow,
->>   burns power, and you can do it only so often before the flash wears
->>   out
->>
->> Say your physical machine has 1 MiB of NOR flash in 16 sectors of 64 KiB
->> each (unrealistic, as Philippe has pointed out elsewhere, but it'll do
->> here).  You compile your firmware, and the build process spits out a
->> flat image of 200000 bytes.  Here are a few distinct ways to deploy it
->> to your freshly erased flash memory:
->>
->> (1) You write your image to the flash.  Everything after byte 200000
->> remains writable.  This is nice for development.  With a bit of
->> ingenuity, you can come up with a patching scheme that lets you avoid
->> rewriting the whole flash for every little fix, saving flash wear.
->>
->> (2) You zero-pad your image to the full flash size, and write that to
->> the flash.  Everything after byte 200000 becomes unwritable.  You can't
->> erase the first 4 blocks (they hold your firmware), but you can still
->> erase the remaining 12.
->>
->> (3) You zero-pad your image to the next sector boundary, and write that
->> to the flash.  The remainder of block 4 becomes unwritable (and you
->> can't erase the block without destroying your firmware).  The remaining
->> 12 blocks remain writable.  This is commonly done for production,
->> because it reduces the ways a sector holding code can be corrupted,
->> making its checksum invalid.
->>
->> My point is: in the physical world, there is no single true way to pad.
->>
->> Back to your patch.  I think it conflates three changes:
->>
->> * We reject an undersized image with a sub-optimal error message.
->>   Improve that message.
->>
->> * We silently ignore an oversized image's tail.  Warn instead.
->>
->> * As a convenience feature, don't reject undersized read-only image, but
->>   pad it with 0xff instead, to simulate (1) above.
->>
->> Squashing the first two under a "better reporting on pflash backing file
->> mismatch" heading seems fine to me.  The last one is not about "better
->> reporting", and should therefore be a separate patch.
->>
->> I'm willing to do the split in the respin of my pflash fixes series.
->>
->> For the record, I'd summarily reject oversized images,
->
-> Rejection is not a bad idea IMO; I don't remember any use case where the
-> user benefits from the acceptance of an oversized image (with or without
-> warning).
+- Make lacks introspection abilities; people want to be able to quickly
+say "I don't have this security issue because I didn't compile this
+file".  Make only gives you the build logs, which may not be easily
+accessible to the end user.
 
-Fair enough, I can just error out here.
+- Makefile.objs unnesting does not apply throughout the tree, for
+example it does not apply to tests.  We don't apply it there because it
+it is hard to extend Makefile.objs to dozens of targets and it would
+also be very very slow.  The result is lack of homogeneity between
+places that use Makefile.objs and places that use Makefile.include.
 
->
->> and I'd drop the
->> convenience feature, but I'm not the maintainer here.  It's up to Kevin
->> and Max.
->
-> Auto-padding can save some space wherever a raw image is provided, even
-> when QEMU is used through libvirt. It's not hugely important IMO but
-> nice to have. (Especially if we decide *not* to describe pflash block
-> count and size traits in the firmware descriptor files.)
+- Makefile.objs unnesting is hard to understand---granted, you rarely
+have to understand it because it mostly works, but we should consider
+whether it is a local optimum.  For example, how many people know how to
+add a dynamically-loadd module to Makefile.objs?
 
-It's a potential point of confusion but we can just error out with a
-more useful error message. However we provide the convenience for -bios
-so why not on a read-only bios image?
+- The mix of recursive and non-recursive builds is hard to understand
+and slow, because we do the the Makefile.objs unnesting 20-30 times
+(once for every target).  We do spend time cleaning up warts left when
+contributors just hacked something together and reviewers lacked the
+expertise to notice that.
 
->
-> Thanks
-> Laszlo
->
->>
->>> ---
->>> v3
->>>   - tweak commit title/commentary
->>>   - use total_len instead of device_len for checks
->>>   - if the device is read-only do the padding for them
->>>   - accept baking_len > total_len (how to warn_report with NULL *errp?)
->>> v4
->>>   - error check blk_getlength
->>>   - optimise memset and use NOR erase pattern
->>>   - restore singular device (overly confusing)
->>>   - add warn_report for when we do magic
->>> v5
->>>   - remove mention of null padding
->>>   - use %zu for size_t fmt string
->>>   - add Laszlo r-b
->>> ---
->>>  hw/block/pflash_cfi01.c | 40 +++++++++++++++++++++++++++++++++-------
->>>  1 file changed, 33 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->>> index 9d1c356eb6..d8cfa4789a 100644
->>> --- a/hw/block/pflash_cfi01.c
->>> +++ b/hw/block/pflash_cfi01.c
->>> @@ -45,6 +45,7 @@
->>>  #include "qemu/bitops.h"
->>>  #include "qemu/host-utils.h"
->>>  #include "qemu/log.h"
->>> +#include "qemu/error-report.h"
->>>  #include "hw/sysbus.h"
->>>  #include "sysemu/sysemu.h"
->>>  #include "trace.h"
->>> @@ -730,13 +731,6 @@ static void pflash_cfi01_realize(DeviceState *dev,=
- Error **errp)
->>>      }
->>>      device_len =3D sector_len_per_device * blocks_per_device;
->>>
->>> -    /* XXX: to be fixed */
->>> -#if 0
->>> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 =
-* 1024) &&
->>> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024=
- * 1024))
->>> -        return NULL;
->>> -#endif
->>> -
->>>      memory_region_init_rom_device(
->>>          &pfl->mem, OBJECT(dev),
->>>          &pflash_cfi01_ops,
->>> @@ -763,6 +757,38 @@ static void pflash_cfi01_realize(DeviceState *dev,=
- Error **errp)
->>>      }
->>>
->>>      if (pfl->blk) {
->>> +        /*
->>> +         * Validate the backing store is the right size for pflash
->>> +         * devices. It should be padded to a multiple of the flash
->>> +         * block size. If the device is read-only we can elide the
->>> +         * check and just pad the region first. If the user supplies a
->>> +         * larger file we ignore the tail.
->>> +         */
->>> +        int64_t backing_len =3D blk_getlength(pfl->blk);
->>> +        if (backing_len < 0) {
->>> +            error_setg(errp, "unable to check size of backing file");
->>> +            return;
->>> +        }
->>> +
->>> +        if (backing_len < total_len) {
->>> +            if (pfl->ro) {
->>> +                size_t pad_bytes =3D total_len - backing_len;
->>> +                /* pad with NOR erase pattern */
->>> +                memset((uint8_t*)pfl->storage + backing_len, 0xff, pad=
-_bytes);
->>
->> If I add this patch to my series, I can fix up the white-space to make
->> checkpatch happy.
->>
->>> +                warn_report("device needs %" PRIu64
->>> +                            " bytes, padded with %zu 0xff bytes",
->>> +                            total_len, pad_bytes);
->>> +                total_len =3D backing_len;
->>> +            } else {
->>> +                error_setg(errp, "device needs %" PRIu64 " bytes, "
->>> +                           "backing file provides only %" PRIu64 " byt=
-es",
->>> +                           total_len, backing_len);
->>> +                return;
->>> +            }
->>> +        } else if (backing_len > total_len) {
->>> +            warn_report("device needs %" PRIu64 " bytes, rest ignored"=
-, total_len);
->>
->> Likewise, I can break this line.
->>
->>> +        }
->>> +
->>>          /* read the initial flash content */
->>>          ret =3D blk_pread(pfl->blk, 0, pfl->storage, total_len);
+- Makefile errors (e.g. pointing to a nonexistent file) only show when
+trying to build the file, so that some errors may go unnoticed if they
+don't reproduce on your machine.  Meson always detects missing source
+files, independent of whether your build uses them.
 
+FWIW and just to give an idea, I placed a quick (and of course untested)
+conversion of ui/Makefile.objs at the end of this message.
 
---
-Alex Benn=C3=A9e
+Paolo
+
+[1] https://clang.llvm.org/docs/JSONCompilationDatabase.html
+
+---
+# This would be ui/meson.build:
+
+vnc_sources = source_set.source_set()
+vnc_sources.add([], files(
+    'vnc.c',
+    'vnc-auth-vencrypt.c',
+    'vnc-enc-hextile.c',
+    'vnc-enc-tight.c',
+    'vnc-enc-zlib.c',
+    'vnc-enc-zrle.c',
+    'vnc-jobs.c',
+    'vnc-palette.c',
+    'vnc-ws.c'))
+vnc_sources.add('CONFIG_VNC_SASL', files(
+    'vnc-auth-sasl.c'))
+
+common_obj.add([], files(
+    'console.c',
+    'cursor.c',
+    'kbd-state.c',
+    'keymaps.c',
+    'input.c',
+    'input-keymap.c',
+    'input-legacy.c',
+    'qemu-pixman.c'))
+common_obj.add('CONFIG_LINUX', files(
+    'input-linux.c'))
+common_obj.add('CONFIG_SPICE', files(
+    'spice-core.c',
+    'spice-input.c',
+    'spice-display.c'))
+common_obj.add('CONFIG_COCOA', files(
+    'cocoa.c'))
+common_obj.add_all('CONFIG_VNC', vnc_sources)
+common_obj.add('CONFIG_VNC',
+    if_false: files('vnc-stubs.c'))
+
+if opengl.found()
+    common_obj.add([], files(
+        'console-gl.c',
+        'egl-helpers.c',
+        'egl-context.c',
+        'shader.c'), dependencies: opengl)
+    common_obj.add('CONFIG_OPENGL_DMABUF', files(
+        'egl-headless.c'))
+endif
+
+if sdl.found()
+    sdl_sources = source_set.source_set()
+    sdl_sources.add([], files(
+        'sdl2.c',
+        'sdl2-2d.c',
+        'sdl2-input.c'), dependencies: sdl)
+    sdl_sources.add('CONFIG_X11', files(
+        'x_keymap.c'), dependencies: x11)
+    sdl_sources.add('CONFIG_OPENGL', files(
+        'sdl2-gl.c'), dependencies: opengl)
+    modules += { 'ui-sdl': sdl_sources }
+endif
+
+if curses.found()
+    curses_sources = source_set.source_set()
+    curses_sources.add([], files(
+        'curses.c'), dependencies: curses)
+    modules += { 'ui-curses': curses_sources }
+endif
+
+if gtk.found()
+    gtk_sources = source_set.source_set()
+    gtk_sources.add([], files(
+        'gtk.c'), dependencies: gtk)
+    gtk_sources.add('CONFIG_X11', files(
+        'x_keymap.c'), dependencies: x11)
+    gtk_sources.add('CONFIG_OPENGL', files(
+        'gtk-egl.c'), dependencies: opengl)
+    gtk_sources.add('CONFIG_GTK_GL', files(
+        'gtk-gl-area.c'))
+    modules += { 'ui-gtk': gtk_sources }
+fi
