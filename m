@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33637)
+Received: from eggs.gnu.org ([209.51.188.92]:34330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1wba-0006Nu-Ez
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:14:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1h1wcv-0007ft-A1
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1wbW-0004lY-K5
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:14:48 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190307093723.655-1-armbru@redhat.com>
-	<20190307093723.655-2-armbru@redhat.com>
-	<87pnr2g1wv.fsf@zen.linaroharston>
-Date: Thu, 07 Mar 2019 18:14:33 +0100
-In-Reply-To: <87pnr2g1wv.fsf@zen.linaroharston> ("Alex =?utf-8?Q?Benn?=
-	=?utf-8?Q?=C3=A9e=22's?= message of
-	"Thu, 07 Mar 2019 15:05:52 +0000")
-Message-ID: <87mum6ppxi.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1h1wct-0006Ah-N7
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:16:12 -0500
+References: <20190307140312.28072-1-slp@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <93b48e49-87dd-9a05-49eb-09bbd7452154@redhat.com>
+Date: Thu, 7 Mar 2019 11:15:48 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v6 1/4] hw/block: better reporting on
- pflash backing file mismatch
+In-Reply-To: <20190307140312.28072-1-slp@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hQnnB8DA7vKKNhhIe4BfquVleXTOBBYd1"
+Subject: Re: [Qemu-devel] [PATCH] mirror: Confirm we're quiesced only if the
+ job is paused or cancelled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, lersek@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, philmd@redhat.com
+To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hQnnB8DA7vKKNhhIe4BfquVleXTOBBYd1
+From: Eric Blake <eblake@redhat.com>
+To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ mreitz@redhat.com
+Message-ID: <93b48e49-87dd-9a05-49eb-09bbd7452154@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] mirror: Confirm we're quiesced only if the
+ job is paused or cancelled
+References: <20190307140312.28072-1-slp@redhat.com>
+In-Reply-To: <20190307140312.28072-1-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Markus Armbruster <armbru@redhat.com> writes:
->
->> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> It looks like there was going to be code to check we had some sort of
->> alignment so let's replace it with an actual check.  Reject undersized
->> images with "device needs N bytes, backing file provides only M
->> bytes".  This is a bit more useful than the enigmatic "failed to read
->> the initial flash content" when we attempt to read the number of bytes
->> the device should have.  Continue to accept oversized images, but warn
->> "device needs N bytes, rest ignored".
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/block/pflash_cfi01.c | 29 ++++++++++++++++++++++-------
->>  1 file changed, 22 insertions(+), 7 deletions(-)
->>
->> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> index 9d1c356eb6..75ce8ef489 100644
->> --- a/hw/block/pflash_cfi01.c
->> +++ b/hw/block/pflash_cfi01.c
->> @@ -45,6 +45,7 @@
->>  #include "qemu/bitops.h"
->>  #include "qemu/host-utils.h"
->>  #include "qemu/log.h"
->> +#include "qemu/error-report.h"
->>  #include "hw/sysbus.h"
->>  #include "sysemu/sysemu.h"
->>  #include "trace.h"
->> @@ -730,13 +731,6 @@ static void pflash_cfi01_realize(DeviceState *dev, =
-Error **errp)
->>      }
->>      device_len =3D sector_len_per_device * blocks_per_device;
->>
->> -    /* XXX: to be fixed */
->> -#if 0
->> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 *=
- 1024) &&
->> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 =
-* 1024))
->> -        return NULL;
->> -#endif
->> -
->>      memory_region_init_rom_device(
->>          &pfl->mem, OBJECT(dev),
->>          &pflash_cfi01_ops,
->> @@ -763,6 +757,27 @@ static void pflash_cfi01_realize(DeviceState *dev, =
-Error **errp)
->>      }
->>
->>      if (pfl->blk) {
->> +        /*
->> +         * Validate the backing store is the right size for pflash
->> +         * devices. If the user supplies a larger file we ignore the
->> +         * tail.
->> +         */
->> +        int64_t backing_len =3D blk_getlength(pfl->blk);
->> +        if (backing_len < 0) {
->> +            error_setg(errp, "unable to check size of backing file");
->> +            return;
->> +        }
->> +
->> +        if (backing_len < total_len) {
->> +            error_setg(errp, "device needs %" PRIu64 " bytes, "
->> +                       "backing file provides only %" PRIu64 " bytes",
->> +                       total_len, backing_len);
->> +            return;
->> +        } else if (backing_len > total_len) {
->> +            warn_report("device needs %" PRIu64 " bytes, rest ignored",
->> +                        total_len);
->> +        }
->
-> As discussed elsewhere I'm happy for this just to error out with a
-> useful error message.
+On 3/7/19 8:03 AM, Sergio Lopez wrote:
+> While child_job_drained_begin() calls to job_pause(), the job doesn't
+> actually transition between states until it runs again and reaches a
+> pause point. This means bdrv_drained_begin() may return with some jobs
+> using the node still having 'busy =3D=3D true'.
+>=20
+> As a consequence, block_job_detach_aio_context() may get into a
+> deadlock, waiting for the job to be actually paused, while the coroutin=
+e
+> servicing the job is yielding and doesn't get the opportunity to get
+> scheduled again. This situation can be reproduced by issuing a
+> 'block-commit' immediately followed by a 'device_del'.
+>=20
+> To ensure bdrv_drained_begin() only returns when the jobs have been
+> paused, we change mirror_drained_poll() to only confirm it's quiesced
+> when job->paused =3D=3D true and there aren't any in-flight requests, e=
+xcept
+> if we reached that point by a drained section initiated by the
+> mirror/commit job itself.
+>=20
+> The other block jobs shouldn't need any changes, as the default
+> drained_poll() behavior is to only confirm it's quiesced if the job is
+> not busy or completed.
+>=20
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  block/mirror.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+>=20
 
-I'll do that in the next spin.  Thanks!
+> @@ -1119,6 +1126,16 @@ static void coroutine_fn mirror_pause(Job *job)
+>  static bool mirror_drained_poll(BlockJob *job)
+>  {
+>      MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common);
+> +
+> +    /* If the job isn't paused nor cancelled, we can't be sure that it=
+ won't
+> +     * issue more requets. We make an exception if we've reached this =
+point
 
->> +
->>          /* read the initial flash content */
->>          ret =3D blk_pread(pfl->blk, 0, pfl->storage, total_len);
->
->
-> --
-> Alex Benn=C3=A9e
+requests
+
+> +     * from one of our own drain sections, to avoid a deadlock waiting=
+ for
+> +     * ourselves.
+> +     */
+> +    if (!s->common.job.paused && !s->common.job.cancelled && !s->in_dr=
+ain) {
+> +        return true;
+> +    }
+> +
+>      return !!s->in_flight;
+>  }
+> =20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--hQnnB8DA7vKKNhhIe4BfquVleXTOBBYd1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBUcQACgkQp6FrSiUn
+Q2qZ4ggAgrRW22w7rL0Kzx7bbvy/7OmQwcU8ZFctMshLGKXPmMv19TCArAohgy+6
+BPplrBTO9anlX2y5gBSZvKKUVRYi1kXiQhw1OhjwuPbnJasYNUjhOp7tEEVMbjhp
+zZxFbkPacZiBdyUT55+rXJ1AFNLrT3wMPH1m/b5iwqQR25QH1s9Gn8QtzxsNs2g1
+HIBJHlhTsKtK1WFee2/hAHlfFehm6R6y7SVGaKbkcMbi6j5vR98ZmkOKgNXAKdqo
+KZvXZCqzFGXNs9i9jn32YIWLTyrEPfobszSahDNyQGlPi6KDARNokup5HCMlctvi
+jlx6uQsbbwGzTw4qa2lmSsKk//M1Iw==
+=nudE
+-----END PGP SIGNATURE-----
+
+--hQnnB8DA7vKKNhhIe4BfquVleXTOBBYd1--
