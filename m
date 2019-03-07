@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40347)
+Received: from eggs.gnu.org ([209.51.188.92]:40637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1vIC-00088p-O5
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:50:46 -0500
+	(envelope-from <david@redhat.com>) id 1h1vIo-0000Dk-JZ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:51:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1vI4-0000MJ-Rw
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:50:38 -0500
-Resent-Message-Id: <E1h1vI4-0000MJ-Rw@eggs.gnu.org>
-Message-ID: <155197378620.8146.10521486519515194346@6acff2cf482b>
-In-Reply-To: <20190307121539.12842-1-david@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <david@redhat.com>) id 1h1vIm-000155-SA
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:51:22 -0500
+References: <20190307090639.8261-1-eric.auger@redhat.com>
+	<d36618f5-4dc4-f4a2-2cb3-9a689cb3f771@redhat.com>
+	<8db3bb89-6b7f-fe6b-1ba5-3263da3d0528@redhat.com>
+	<3c64370f-1e91-70e0-6f7e-ce0a3c1175da@redhat.com>
+	<c9f7838f-0554-59d3-53c2-1a556119308b@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <994cdc93-0de5-a10f-e1b3-83b7f3ef01e4@redhat.com>
+Date: Thu, 7 Mar 2019 16:51:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 07:49:47 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/32] s390x/tcg: Vector Instruction
- Support Part 1
+In-Reply-To: <c9f7838f-0554-59d3-53c2-1a556119308b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] machine: Move acpi_nvdimm_state into
+ struct MachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,134 +28,380 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, richard.henderson@linaro.org, sbhat@linux.ibm.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzEyMTUzOS4xMjg0
-Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzEyMTUzOS4xMjg0Mi0x
-LWRhdmlkQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8zMl0g
-czM5MHgvdGNnOiBWZWN0b3IgSW5zdHJ1Y3Rpb24gU3VwcG9ydCBQYXJ0IDEKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDcxMjE1Mzku
-MTI4NDItMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDcxMjE1MzkuMTI4NDIt
-MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTg0OGRm
-Yzg4YSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKN2UzNjg0NzdjNSBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKNjA5OTc3ZjczNiBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKZGIwMWRiZjc2ZiBzMzkweC90
-Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVAo4NGMzN2I4ZjgyIHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQo2ZmZiZTk4MWIwIHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
-ZV93cml0ZV9hY2Nlc3MgaGVscGVyCjVkMWU5NzgyZTQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
-VE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdPUkQKZDQ3N2JmOGE0MiBzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgU0VMRUNUCjRhZGE0YWE0ZTggczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFNDQVRURVIgRUxFTUVOVAo1NDQ5NTM1NmYwIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBS
-RVBMSUNBVEUgSU1NRURJQVRFCjUzZmQ2NjMzNWMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFJFUExJQ0FURQoyZjdkNTY3NWJmIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRF
-IERPVUJMRVdPUkQgSU1NRURJQVRFCjFiMGVhNzU3NmIgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
-VE9SIFBFUk1VVEUKMDBkOWRmOTJjMSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEFDSyAq
-CjM3MDFlYTYxZmIgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIE1FUkdFIChISUdIfExPVykK
-MjlmNjE4M2M4MiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBXSVRIIExFTkdUSApj
-NzkxNGM5OGNlIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEZST00gR1JTIERJ
-U0pPSU5UCmEwMmZmY2VkOTEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRUxF
-TUVOVCBGUk9NIEdSCjA3NDlhYmRiZDQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQg
-VE8gQkxPQ0sgQk9VTkRBUlkKOWJlYzFkNmIwYiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
-TE9BRCBNVUxUSVBMRQo0YjgzOWJlNjg2IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FE
-IExPR0lDQUwgRUxFTUVOVCBBTkQgWkVSTwo2MTk4Yzc0OWVjIHMzOTB4L3RjZzogSW1wbGVtZW50
-IFZFQ1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVAoyM2Y2ZWQwMzg3IHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJQVRFCjIxNjhmM2VkMGUgczM5MHgvdGNn
-OiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVAo5NjFjZTQ2NDk3IHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNBVEUKMjRlNDRmYjc3MSBzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgTE9BRAoxMjhkN2NjZmVjIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RP
-UiBHRU5FUkFURSBNQVNLCjRiNzM0OWRjN2UgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdF
-TkVSQVRFIEJZVEUgTUFTSwo1NDU1N2IyZGRhIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBH
-QVRIRVIgRUxFTUVOVAo4MmJhMDUwY2JkIHMzOTB4L3RjZzogVXRpbGl0aWVzIGZvciB2ZWN0b3Ig
-aW5zdHJ1Y3Rpb24gaGVscGVycwoxMDY2NDU3ZTM0IHMzOTB4L3RjZzogQ2hlY2sgdmVjdG9yIHJl
-Z2lzdGVyIGluc3RydWN0aW9ucyBhdCBjZW50cmFsIHBvaW50CmJiNzA1MTEwODQgczM5MHgvdGNn
-OiBEZWZpbmUgdmVjdG9yIGluc3RydWN0aW9uIGZvcm1hdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvMzIgQ2hlY2tpbmcgY29tbWl0IGJiNzA1MTEwODQ1NSAoczM5MHgvdGNnOiBEZWZpbmUgdmVj
-dG9yIGluc3RydWN0aW9uIGZvcm1hdHMpCjIvMzIgQ2hlY2tpbmcgY29tbWl0IDEwNjY0NTdlMzQ2
-YiAoczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIgaW5zdHJ1Y3Rpb25zIGF0IGNlbnRy
-YWwgcG9pbnQpCjMvMzIgQ2hlY2tpbmcgY29tbWl0IDgyYmEwNTBjYmQwOSAoczM5MHgvdGNnOiBV
-dGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVjdGlvbiBoZWxwZXJzKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDEwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CjQvMzIgQ2hlY2tpbmcgY29tbWl0IDU0NTU3YjJkZGEwMyAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIEdBVEhFUiBFTEVNRU5UKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCA0LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMzIgQ2hlY2tpbmcgY29t
-bWl0IDRiNzM0OWRjN2VlZSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVSQVRFIEJZ
-VEUgTUFTSykKNi8zMiBDaGVja2luZyBjb21taXQgMTI4ZDdjY2ZlYzRlIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgR0VORVJBVEUgTUFTSykKNy8zMiBDaGVja2luZyBjb21taXQgMjRlNDRm
-Yjc3MTJmIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCkKOC8zMiBDaGVja2luZyBj
-b21taXQgOTYxY2U0NjQ5N2NmIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBBTkQg
-UkVQTElDQVRFKQo5LzMyIENoZWNraW5nIGNvbW1pdCAyMTY4ZjNlZDBlMGMgKHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQpCjEwLzMyIENoZWNraW5nIGNvbW1pdCAyM2Y2
-ZWQwMzg3MjkgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJ
-QVRFKQoxMS8zMiBDaGVja2luZyBjb21taXQgNjE5OGM3NDllYzk0IChzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgTE9BRCBHUiBGUk9NIFZSIEVMRU1FTlQpCjEyLzMyIENoZWNraW5nIGNvbW1p
-dCA0YjgzOWJlNjg2NWYgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIExPR0lDQUwg
-RUxFTUVOVCBBTkQgWkVSTykKMTMvMzIgQ2hlY2tpbmcgY29tbWl0IDliZWMxZDZiMGI2MyAoczM5
-MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTVVMVElQTEUpCjE0LzMyIENoZWNraW5nIGNv
-bW1pdCAwNzQ5YWJkYmQ0MzggKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFRPIEJM
-T0NLIEJPVU5EQVJZKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM5NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0
-LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzMyIENoZWNraW5nIGNvbW1pdCBhMDJm
-ZmNlZDkxOGYgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJP
-TSBHUikKMTYvMzIgQ2hlY2tpbmcgY29tbWl0IGM3OTE0Yzk4Y2UwZSAoczM5MHgvdGNnOiBJbXBs
-ZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNv
-bW1pdCAyOWY2MTgzYzgyMGEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEgg
-TEVOR1RIKQoxOC8zMiBDaGVja2luZyBjb21taXQgMzcwMWVhNjFmYmJjIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IDAw
-ZDlkZjkyYzFhOCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
-ICcoJwojMTgzOiBGSUxFOiB0YXJnZXQvczM5MHgvdmVjX2hlbHBlci5jOjQ4OgordHlwZWRlZiB1
-aW50IyNUQklUUyMjX3QgKCp2cGsjI0JJVFMjI19mbikodWludCMjQklUUyMjX3QsIGludCAqKTsg
-ICAgICAgICAgICAgIFwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQ1IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDE5LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMC8zMiBDaGVj
-a2luZyBjb21taXQgMWIwZWE3NTc2YmVjIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
-TVVURSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQv
-czM5MHgvaGVscGVyLmg6MTQ0OgorREVGX0hFTFBFUl9GTEFHU181KGd2ZWNfdnBlcm0sIFRDR19D
-QUxMX05PX1JXRywgdm9pZCwgcHRyLCBjcHRyLCBjcHRyLCBjcHRyLCBpMzIpCgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIwLzMyIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjIxLzMyIENoZWNraW5nIGNvbW1pdCAyZjdkNTY3NWJmODkgKHMz
-OTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRFIERPVUJMRVdPUkQgSU1NRURJQVRFKQoy
-Mi8zMiBDaGVja2luZyBjb21taXQgNTNmZDY2MzM1YzUzIChzMzkweC90Y2c6IEltcGxlbWVudCBW
-RUNUT1IgUkVQTElDQVRFKQoyMy8zMiBDaGVja2luZyBjb21taXQgNTQ0OTUzNTZmMDZjIChzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElDQVRFIElNTUVESUFURSkKMjQvMzIgQ2hlY2tp
-bmcgY29tbWl0IDRhZGE0YWE0ZTgwYiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNDQVRU
-RVIgRUxFTUVOVCkKMjUvMzIgQ2hlY2tpbmcgY29tbWl0IGQ0NzdiZjhhNDJkOSAoczM5MHgvdGNn
-OiBJbXBsZW1lbnQgVkVDVE9SIFNFTEVDVCkKMjYvMzIgQ2hlY2tpbmcgY29tbWl0IDVkMWU5Nzgy
-ZTQzYSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdP
-UkQpCjI3LzMyIENoZWNraW5nIGNvbW1pdCA2ZmZiZTk4MWIwYzEgKHMzOTB4L3RjZzogUHJvdmlk
-ZSBwcm9iZV93cml0ZV9hY2Nlc3MgaGVscGVyKQoyOC8zMiBDaGVja2luZyBjb21taXQgODRjMzdi
-OGY4MjFhIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5n
-IGNvbW1pdCBkYjAxZGJmNzZmMDQgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBF
-TEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQgNjA5OTc3ZjczNjAzIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUpCjMxLzMyIENoZWNraW5nIGNvbW1pdCA3ZTM2
-ODQ3N2M1MzcgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkK
-MzIvMzIgQ2hlY2tpbmcgY29tbWl0IDU4NDhkZmM4OGFiMSAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDMwNzEyMTUzOS4xMjg0Mi0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGlu
-Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 07.03.19 16:36, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 3/7/19 4:21 PM, David Hildenbrand wrote:
+>> On 07.03.19 16:15, Auger Eric wrote:
+>>> Hi Philippe, Eduardo,
+>>>
+>>> On 3/7/19 11:56 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> Hi Eric, Eduardo,
+>>>>
+>>>> On 3/7/19 10:06 AM, Eric Auger wrote:
+>>>>> As NVDIMM support is looming for ARM and SPAPR, let's
+>>>>> move the acpi_nvdimm_state to the generic machine struct
+>>>>> instead of duplicating the same code in several machines.
+>>>>> It is also renamed into nvdimms_state.
+>>>>>
+>>>>> nvdimm and nvdimm-persistence become generic machine options.
+>>>>> We also add a description for those options.
+>>>>>
+>>>>> We also remove the nvdimms_state.is_enabled initialization to
+>>>>> false as objects are guaranteed to be zero initialized.
+>>>>>
+>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>>>>>
+>>>>> ---
+>>>>>
+>>>>> v1 -> v2:
+>>>>> - s/acpi_nvdimm_state/nvdimms_state
+>>>>> - remove ms->nvdimms_state.is_enabled initialization to false.
+>>>>> ---
+>>>>>  hw/core/machine.c        | 55 ++++++++++++++++++++++++++++++++++++=
++++
+>>>>>  hw/i386/acpi-build.c     |  6 ++---
+>>>>>  hw/i386/pc.c             | 56 +++---------------------------------=
+----
+>>>>>  hw/i386/pc_piix.c        |  4 +--
+>>>>>  hw/i386/pc_q35.c         |  4 +--
+>>>>>  include/hw/boards.h      |  2 ++
+>>>>>  include/hw/i386/pc.h     |  4 ---
+>>>>>  include/hw/mem/pc-dimm.h |  1 -
+>>>>>  8 files changed, 68 insertions(+), 64 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+>>>>> index 766ca5899d..21a7209246 100644
+>>>>> --- a/hw/core/machine.c
+>>>>> +++ b/hw/core/machine.c
+>>>>> @@ -481,6 +481,47 @@ static void machine_set_memory_encryption(Obje=
+ct *obj, const char *value,
+>>>>>      ms->memory_encryption =3D g_strdup(value);
+>>>>>  }
+>>>>> =20
+>>>>> +static bool machine_get_nvdimm(Object *obj, Error **errp)
+>>>>> +{
+>>>>> +    MachineState *ms =3D MACHINE(obj);
+>>>>> +
+>>>>> +    return ms->nvdimms_state.is_enabled;
+>>>>> +}
+>>>>> +
+>>>>> +static void machine_set_nvdimm(Object *obj, bool value, Error **er=
+rp)
+>>>>> +{
+>>>>> +    MachineState *ms =3D MACHINE(obj);
+>>>>> +
+>>>>> +    ms->nvdimms_state.is_enabled =3D value;
+>>>>> +}
+>>>>> +
+>>>>> +static char *machine_get_nvdimm_persistence(Object *obj, Error **e=
+rrp)
+>>>>> +{
+>>>>> +    MachineState *ms =3D MACHINE(obj);
+>>>>> +
+>>>>> +    return g_strdup(ms->nvdimms_state.persistence_string);
+>>>>> +}
+>>>>> +
+>>>>> +static void machine_set_nvdimm_persistence(Object *obj, const char=
+ *value,
+>>>>> +                                               Error **errp)
+>>>>> +{
+>>>>> +    MachineState *ms =3D MACHINE(obj);
+>>>>> +    AcpiNVDIMMState *nvdimms_state =3D &ms->nvdimms_state;
+>>>>> +
+>>>>> +    if (strcmp(value, "cpu") =3D=3D 0)
+>>>>> +        nvdimms_state->persistence =3D 3;
+>>>>> +    else if (strcmp(value, "mem-ctrl") =3D=3D 0)
+>>>>> +        nvdimms_state->persistence =3D 2;
+>>>>> +    else {
+>>>>> +        error_setg(errp, "-machine nvdimm-persistence=3D%s: unsupp=
+orted option",
+>>>>> +                   value);
+>>>>> +        return;
+>>>>> +    }
+>>>>> +
+>>>>> +    g_free(nvdimms_state->persistence_string);
+>>>>> +    nvdimms_state->persistence_string =3D g_strdup(value);
+>>>>> +}
+>>>>> +
+>>>>>  void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, cons=
+t char *type)
+>>>>>  {
+>>>>>      strList *item =3D g_new0(strList, 1);
+>>>>> @@ -765,6 +806,20 @@ static void machine_class_init(ObjectClass *oc=
+, void *data)
+>>>>>          &error_abort);
+>>>>>      object_class_property_set_description(oc, "memory-encryption",
+>>>>>          "Set memory encryption object to use", &error_abort);
+>>>>> +
+>>>>> +    object_class_property_add_bool(oc, "nvdimm",
+>>>>> +        machine_get_nvdimm, machine_set_nvdimm, &error_abort);
+>>>>> +    object_class_property_set_description(oc, "nvdimm",
+>>>>> +                                         "Set on/off to enable/dis=
+able NVDIMM "
+>>>>> +                                         "instantiation", NULL);
+>>>>> +
+>>>>> +    object_class_property_add_str(oc, "nvdimm-persistence",
+>>>>> +                                  machine_get_nvdimm_persistence,
+>>>>> +                                  machine_set_nvdimm_persistence, =
+&error_abort);
+>>>>> +    object_class_property_set_description(oc, "nvdimm-persistence"=
+,
+>>>>> +                                          "Set NVDIMM persistence"
+>>>>> +                                          "Valid values are cpu an=
+d mem-ctrl",
+>>>>> +                                          NULL);
+>>>>>  }
+>>>>> =20
+>>>>>  static void machine_class_base_init(ObjectClass *oc, void *data)
+>>>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>>>>> index 9ecc96dcc7..2d7d46fe50 100644
+>>>>> --- a/hw/i386/acpi-build.c
+>>>>> +++ b/hw/i386/acpi-build.c
+>>>>> @@ -1867,7 +1867,7 @@ build_dsdt(GArray *table_data, BIOSLinker *li=
+nker,
+>>>>>              aml_append(scope, method);
+>>>>>          }
+>>>>> =20
+>>>>> -        if (pcms->acpi_nvdimm_state.is_enabled) {
+>>>>> +        if (machine->nvdimms_state.is_enabled) {
+>>>>>              method =3D aml_method("_E04", 0, AML_NOTSERIALIZED);
+>>>>>              aml_append(method, aml_notify(aml_name("\\_SB.NVDR"),
+>>>>>                                            aml_int(0x80)));
+>>>>> @@ -2704,9 +2704,9 @@ void acpi_build(AcpiBuildTables *tables, Mach=
+ineState *machine)
+>>>>>              build_dmar_q35(tables_blob, tables->linker);
+>>>>>          }
+>>>>>      }
+>>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
+>>>>> +    if (machine->nvdimms_state.is_enabled) {
+>>>>>          nvdimm_build_acpi(table_offsets, tables_blob, tables->link=
+er,
+>>>>> -                          &pcms->acpi_nvdimm_state, machine->ram_s=
+lots);
+>>>>> +                          &machine->nvdimms_state, machine->ram_sl=
+ots);
+>>>>>      }
+>>>>> =20
+>>>>>      /* Add tables supplied by user (if any) */
+>>>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>>>> index 42128183e9..cacc4068cf 100644
+>>>>> --- a/hw/i386/pc.c
+>>>>> +++ b/hw/i386/pc.c
+>>>>> @@ -2069,6 +2069,7 @@ static void pc_memory_pre_plug(HotplugHandler=
+ *hotplug_dev, DeviceState *dev,
+>>>>>  {
+>>>>>      const PCMachineState *pcms =3D PC_MACHINE(hotplug_dev);
+>>>>>      const PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
+>>>>> +    const MachineState *ms =3D MACHINE(hotplug_dev);
+>>>>>      const bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE=
+_NVDIMM);
+>>>>>      const uint64_t legacy_align =3D TARGET_PAGE_SIZE;
+>>>>> =20
+>>>>> @@ -2083,7 +2084,7 @@ static void pc_memory_pre_plug(HotplugHandler=
+ *hotplug_dev, DeviceState *dev,
+>>>>>          return;
+>>>>>      }
+>>>>> =20
+>>>>> -    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+>>>>> +    if (is_nvdimm && !ms->nvdimms_state.is_enabled) {
+>>>>>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' =
+in '-M'");
+>>>>>          return;
+>>>>>      }
+>>>>> @@ -2097,6 +2098,7 @@ static void pc_memory_plug(HotplugHandler *ho=
+tplug_dev,
+>>>>>  {
+>>>>>      Error *local_err =3D NULL;
+>>>>>      PCMachineState *pcms =3D PC_MACHINE(hotplug_dev);
+>>>>> +    MachineState *ms =3D MACHINE(hotplug_dev);
+>>>>>      bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIM=
+M);
+>>>>> =20
+>>>>>      pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms), &local_err);
+>>>>> @@ -2105,7 +2107,7 @@ static void pc_memory_plug(HotplugHandler *ho=
+tplug_dev,
+>>>>>      }
+>>>>> =20
+>>>>>      if (is_nvdimm) {
+>>>>> -        nvdimm_plug(&pcms->acpi_nvdimm_state);
+>>>>> +        nvdimm_plug(&ms->nvdimms_state);
+>>>>>      }
+>>>>> =20
+>>>>>      hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &er=
+ror_abort);
+>>>>> @@ -2546,47 +2548,6 @@ static void pc_machine_set_smm(Object *obj, =
+Visitor *v, const char *name,
+>>>>>      visit_type_OnOffAuto(v, name, &pcms->smm, errp);
+>>>>>  }
+>>>>> =20
+>>>>> -static bool pc_machine_get_nvdimm(Object *obj, Error **errp)
+>>>>> -{
+>>>>> -    PCMachineState *pcms =3D PC_MACHINE(obj);
+>>>>> -
+>>>>> -    return pcms->acpi_nvdimm_state.is_enabled;
+>>>>> -}
+>>>>> -
+>>>>> -static void pc_machine_set_nvdimm(Object *obj, bool value, Error *=
+*errp)
+>>>>> -{
+>>>>> -    PCMachineState *pcms =3D PC_MACHINE(obj);
+>>>>> -
+>>>>> -    pcms->acpi_nvdimm_state.is_enabled =3D value;
+>>>>> -}
+>>>>> -
+>>>>> -static char *pc_machine_get_nvdimm_persistence(Object *obj, Error =
+**errp)
+>>>>> -{
+>>>>> -    PCMachineState *pcms =3D PC_MACHINE(obj);
+>>>>> -
+>>>>> -    return g_strdup(pcms->acpi_nvdimm_state.persistence_string);
+>>>>> -}
+>>>>> -
+>>>>> -static void pc_machine_set_nvdimm_persistence(Object *obj, const c=
+har *value,
+>>>>> -                                               Error **errp)
+>>>>> -{
+>>>>> -    PCMachineState *pcms =3D PC_MACHINE(obj);
+>>>>> -    AcpiNVDIMMState *nvdimm_state =3D &pcms->acpi_nvdimm_state;
+>>>>> -
+>>>>> -    if (strcmp(value, "cpu") =3D=3D 0)
+>>>>> -        nvdimm_state->persistence =3D 3;
+>>>>> -    else if (strcmp(value, "mem-ctrl") =3D=3D 0)
+>>>>> -        nvdimm_state->persistence =3D 2;
+>>>>> -    else {
+>>>>> -        error_setg(errp, "-machine nvdimm-persistence=3D%s: unsupp=
+orted option",
+>>>>> -                   value);
+>>>>> -        return;
+>>>>> -    }
+>>>>> -
+>>>>> -    g_free(nvdimm_state->persistence_string);
+>>>>> -    nvdimm_state->persistence_string =3D g_strdup(value);
+>>>>> -}
+>>>>> -
+>>>>>  static bool pc_machine_get_smbus(Object *obj, Error **errp)
+>>>>>  {
+>>>>>      PCMachineState *pcms =3D PC_MACHINE(obj);
+>>>>> @@ -2636,8 +2597,6 @@ static void pc_machine_initfn(Object *obj)
+>>>>>      pcms->max_ram_below_4g =3D 0; /* use default */
+>>>>>      pcms->smm =3D ON_OFF_AUTO_AUTO;
+>>>>>      pcms->vmport =3D ON_OFF_AUTO_AUTO;
+>>>>> -    /* nvdimm is disabled on default. */
+>>>>> -    pcms->acpi_nvdimm_state.is_enabled =3D false;
+>>>>>      /* acpi build is enabled by default if machine supports it */
+>>>>>      pcms->acpi_build_enabled =3D PC_MACHINE_GET_CLASS(pcms)->has_a=
+cpi_build;
+>>>>>      pcms->smbus_enabled =3D true;
+>>>>> @@ -2798,13 +2757,6 @@ static void pc_machine_class_init(ObjectClas=
+s *oc, void *data)
+>>>>>      object_class_property_set_description(oc, PC_MACHINE_VMPORT,
+>>>>>          "Enable vmport (pc & q35)", &error_abort);
+>>>>> =20
+>>>>> -    object_class_property_add_bool(oc, PC_MACHINE_NVDIMM,
+>>>>> -        pc_machine_get_nvdimm, pc_machine_set_nvdimm, &error_abort=
+);
+>>>>> -
+>>>>> -    object_class_property_add_str(oc, PC_MACHINE_NVDIMM_PERSIST,
+>>>>> -        pc_machine_get_nvdimm_persistence,
+>>>>> -        pc_machine_set_nvdimm_persistence, &error_abort);
+>>>>> -
+>>>>>      object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
+>>>>>          pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
+>>>>> =20
+>>>>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>>>>> index 8770ecada9..16ebfc5a5a 100644
+>>>>> --- a/hw/i386/pc_piix.c
+>>>>> +++ b/hw/i386/pc_piix.c
+>>>>> @@ -297,8 +297,8 @@ static void pc_init1(MachineState *machine,
+>>>>>                                   PC_MACHINE_ACPI_DEVICE_PROP, &err=
+or_abort);
+>>>>>      }
+>>>>> =20
+>>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
+>>>>> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io=
+,
+>>>>> +    if (machine->nvdimms_state.is_enabled) {
+>>>>> +        nvdimm_init_acpi_state(&machine->nvdimms_state, system_io,
+>>>>>                                 pcms->fw_cfg, OBJECT(pcms));
+>>>>>      }
+>>>>>  }
+>>>>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+>>>>> index cfb9043e12..dacaa90611 100644
+>>>>> --- a/hw/i386/pc_q35.c
+>>>>> +++ b/hw/i386/pc_q35.c
+>>>>> @@ -329,8 +329,8 @@ static void pc_q35_init(MachineState *machine)
+>>>>>      pc_vga_init(isa_bus, host_bus);
+>>>>>      pc_nic_init(pcmc, isa_bus, host_bus);
+>>>>> =20
+>>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
+>>>>> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io=
+,
+>>>>> +    if (machine->nvdimms_state.is_enabled) {
+>>>>> +        nvdimm_init_acpi_state(&machine->nvdimms_state, system_io,
+>>>>>                                 pcms->fw_cfg, OBJECT(pcms));
+>>>>>      }
+>>>>>  }
+>>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>>>>> index 9690c71a6d..ccf0c5a69d 100644
+>>>>> --- a/include/hw/boards.h
+>>>>> +++ b/include/hw/boards.h
+>>>>> @@ -8,6 +8,7 @@
+>>>>>  #include "hw/qdev.h"
+>>>>>  #include "qom/object.h"
+>>>>>  #include "qom/cpu.h"
+>>>>> +#include "hw/mem/nvdimm.h"
+>>>>> =20
+>>>>>  /**
+>>>>>   * memory_region_allocate_system_memory - Allocate a board's main =
+memory
+>>>>> @@ -272,6 +273,7 @@ struct MachineState {
+>>>>>      const char *cpu_type;
+>>>>>      AccelState *accelerator;
+>>>>>      CPUArchIdList *possible_cpus;
+>>>>> +    AcpiNVDIMMState nvdimms_state;
+>>>>
+>>>> It looks we are breaking the generic/abstract machine design.
+>>>> You introduce 2 specific concepts here, ACPI and NVDIMM.
+>>> at least this should be renamed NVDIMMState according to last Igor's
+>>> comment.
+>>>>
+>>>> MachineClass tries to be generic, and and still suffer from specific
+>>>> fields inherited from the PC Machine.
+>>>>
+>>>> I'd use an intermediate Memory-related object between Machine and
+>>>> AcpiNVDIMM states.
+>>>>
+>>>> I see there already is DeviceMemoryState.
+>>>>
+>>>> Can AcpiNVDIMMState go there? That would be more acceptable IMHO.
+>>> DeviceMemoryState is also declared in include/hw/boards.h so does it
+>>> hide any details.
+>>>
+>>> Not every machine has device memory or irqchip_split either for insta=
+nce
+>>
+>> device_memory is an abstracted concept that can be theoretically
+>> implemented by any machine. nvdimm is not.
+>=20
+> Then maybe the DeviceMemoryState is misleading, NVDIMM might not be
+> related to QEMU's DeviceMemory concept, but it is a 'device memory' :)
+
+We should have/should name it MemoryDeviceState/memory_device_state.
+That is source of confusion (memory device vs. device memory) :) Yes, I
+am to blame.
+
+>=20
+> The between-object I'm referring to would be a container of device
+> memory types. It doesn't have to be a single instance but rather a list
+> of 'hw memory' interfaces.
+>
+>>
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
