@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39080)
+Received: from eggs.gnu.org ([209.51.188.92]:34225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1h217E-0005mI-Li
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 17:03:49 -0500
+	(envelope-from <lwhsu.freebsd@gmail.com>) id 1h20wa-0003Kr-UU
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:52:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1h2175-0004Xx-NT
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 17:03:43 -0500
-Date: Thu, 7 Mar 2019 15:03:32 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190307150332.72bde784@w520.home>
-In-Reply-To: <20190307050518.64968-3-aik@ozlabs.ru>
-References: <20190307050518.64968-1-aik@ozlabs.ru>
-	<20190307050518.64968-3-aik@ozlabs.ru>
+	(envelope-from <lwhsu.freebsd@gmail.com>) id 1h20wX-0000U3-RU
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:52:47 -0500
+Received: from mail-yw1-f65.google.com ([209.85.161.65]:38311)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lwhsu.freebsd@gmail.com>)
+	id 1h20wX-0000Rd-GT
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:52:45 -0500
+Received: by mail-yw1-f65.google.com with SMTP id x20so361528ywd.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 13:52:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v4 2/3] vfio: Make
- vfio_get_region_info_cap public
+References: <1551695576-13205-1-git-send-email-thuth@redhat.com>
+	<a0b53ff0-1ded-2a6e-aa4d-b1f4fcc407c1@redhat.com>
+	<CAPyFy2AnxWBXjUOWRy7_YpoSFadQBAXRooM+t4g6t6XOaF1XgA@mail.gmail.com>
+	<84cc4186-86a8-2152-11ab-bd4001b05ee7@redhat.com>
+In-Reply-To: <84cc4186-86a8-2152-11ab-bd4001b05ee7@redhat.com>
+From: Li-Wen Hsu <lwhsu@freebsd.org>
+Date: Fri, 8 Mar 2019 05:52:26 +0800
+Message-ID: <CAKBkRUyXQ=MucPiKWT7Q2Qt0jFiO_bszYxfsOjxHBNAFP_Hbsg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] cirrus.yml: Add macOS continuous
+ integration task
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Gavin Shan <gwshan@linux.vnet.ibm.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Leonardo Augusto =?UTF-8?B?R3VpbWFyw6Nlcw==?= Garcia <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Ed Maste <emaste@freebsd.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Thu,  7 Mar 2019 16:05:17 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Fri, Mar 8, 2019 at 4:30 AM Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 07/03/2019 21.26, Ed Maste wrote:
+> > On Mon, 4 Mar 2019 at 07:11, Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+.com> wrote:
+> >>
+> >> On 3/4/19 11:32 AM, Thomas Huth wrote:
+> >>> cirrus-ci.com also has the possibility to run CI tasks on macOS.
+> >>> Since most of the QEMU developers do not have access to macOS yet,
+> >>> let's add a CI pipeline for this operating system here, too.
+> >>
+> >>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Acked-by: Ed Maste <emaste@freebsd.org>
+>
+> Thanks! I can take this patch through my qtest tree.
 
-> This makes vfio_get_region_info_cap() to be used in quirks.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  include/hw/vfio/vfio-common.h | 2 ++
->  hw/vfio/common.c              | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+Hi Thomas,
 
+Sorry for the late reply, I checked and tested the patch, it works
+fine.  BTW, may I suggest:
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
+>From https://cirrus-ci.org/guide/macOS/ , the image high-sierra-base
+is lasted as "Not maintained", how about change to mojave-base?
 
+Also, perhaps we can put the common:
 
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 7624c9f511c4..fbf0966af484 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -189,6 +189,8 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
->  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
->                               uint32_t subtype, struct vfio_region_info **info);
->  bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_type);
-> +struct vfio_info_cap_header *
-> +vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id);
->  #endif
->  extern const MemoryListener vfio_prereg_listener;
->  
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index df2b4721bffb..4374cc6176a2 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -729,7 +729,7 @@ static void vfio_listener_release(VFIOContainer *container)
->      }
->  }
->  
-> -static struct vfio_info_cap_header *
-> +struct vfio_info_cap_header *
->  vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
->  {
->      struct vfio_info_cap_header *hdr;
+env:
+  CIRRUS_CLONE_DEPTH: 1
+
+in the global area?
+
+Thanks,
+Li-wen
