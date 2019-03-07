@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40637)
+Received: from eggs.gnu.org ([209.51.188.92]:41718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1vIo-0000Dk-JZ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:51:24 -0500
+	(envelope-from <imammedo@redhat.com>) id 1h1vMn-0003pb-8v
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:55:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1vIm-000155-SA
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:51:22 -0500
-References: <20190307090639.8261-1-eric.auger@redhat.com>
-	<d36618f5-4dc4-f4a2-2cb3-9a689cb3f771@redhat.com>
-	<8db3bb89-6b7f-fe6b-1ba5-3263da3d0528@redhat.com>
-	<3c64370f-1e91-70e0-6f7e-ce0a3c1175da@redhat.com>
-	<c9f7838f-0554-59d3-53c2-1a556119308b@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <994cdc93-0de5-a10f-e1b3-83b7f3ef01e4@redhat.com>
-Date: Thu, 7 Mar 2019 16:51:08 +0100
+	(envelope-from <imammedo@redhat.com>) id 1h1vMl-0005cZ-AQ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:55:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48710)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1h1vMj-0005Yt-6t
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:55:27 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DEAF3C2CF7
+	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 15:55:22 +0000 (UTC)
+Date: Thu, 7 Mar 2019 16:55:16 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190307165516.5fe005e5@redhat.com>
+In-Reply-To: <20190307100456.GG32268@redhat.com>
+References: <1551889825-227155-1-git-send-email-imammedo@redhat.com>
+	<20190306163938.GI20806@redhat.com>
+	<20190306175835.73cb31ad@Igors-MacBook-Pro.local>
+	<20190306171037.GJ20806@redhat.com>
+	<20190306194822.32254962@Igors-MacBook-Pro.local>
+	<20190307100456.GG32268@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c9f7838f-0554-59d3-53c2-1a556119308b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] machine: Move acpi_nvdimm_state into
- struct MachineState
+Subject: Re: [Qemu-devel] [PATCH] numa: warn if numa 'mem' option or default
+ RAM splitting between nodes is used.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,380 +38,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, richard.henderson@linaro.org, sbhat@linux.ibm.com
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, libvir-list@redhat.com, eblake@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-On 07.03.19 16:36, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 3/7/19 4:21 PM, David Hildenbrand wrote:
->> On 07.03.19 16:15, Auger Eric wrote:
->>> Hi Philippe, Eduardo,
->>>
->>> On 3/7/19 11:56 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> Hi Eric, Eduardo,
->>>>
->>>> On 3/7/19 10:06 AM, Eric Auger wrote:
->>>>> As NVDIMM support is looming for ARM and SPAPR, let's
->>>>> move the acpi_nvdimm_state to the generic machine struct
->>>>> instead of duplicating the same code in several machines.
->>>>> It is also renamed into nvdimms_state.
->>>>>
->>>>> nvdimm and nvdimm-persistence become generic machine options.
->>>>> We also add a description for those options.
->>>>>
->>>>> We also remove the nvdimms_state.is_enabled initialization to
->>>>> false as objects are guaranteed to be zero initialized.
->>>>>
->>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->>>>>
->>>>> ---
->>>>>
->>>>> v1 -> v2:
->>>>> - s/acpi_nvdimm_state/nvdimms_state
->>>>> - remove ms->nvdimms_state.is_enabled initialization to false.
->>>>> ---
->>>>>  hw/core/machine.c        | 55 ++++++++++++++++++++++++++++++++++++=
-+++
->>>>>  hw/i386/acpi-build.c     |  6 ++---
->>>>>  hw/i386/pc.c             | 56 +++---------------------------------=
-----
->>>>>  hw/i386/pc_piix.c        |  4 +--
->>>>>  hw/i386/pc_q35.c         |  4 +--
->>>>>  include/hw/boards.h      |  2 ++
->>>>>  include/hw/i386/pc.h     |  4 ---
->>>>>  include/hw/mem/pc-dimm.h |  1 -
->>>>>  8 files changed, 68 insertions(+), 64 deletions(-)
->>>>>
->>>>> diff --git a/hw/core/machine.c b/hw/core/machine.c
->>>>> index 766ca5899d..21a7209246 100644
->>>>> --- a/hw/core/machine.c
->>>>> +++ b/hw/core/machine.c
->>>>> @@ -481,6 +481,47 @@ static void machine_set_memory_encryption(Obje=
-ct *obj, const char *value,
->>>>>      ms->memory_encryption =3D g_strdup(value);
->>>>>  }
->>>>> =20
->>>>> +static bool machine_get_nvdimm(Object *obj, Error **errp)
->>>>> +{
->>>>> +    MachineState *ms =3D MACHINE(obj);
->>>>> +
->>>>> +    return ms->nvdimms_state.is_enabled;
->>>>> +}
->>>>> +
->>>>> +static void machine_set_nvdimm(Object *obj, bool value, Error **er=
-rp)
->>>>> +{
->>>>> +    MachineState *ms =3D MACHINE(obj);
->>>>> +
->>>>> +    ms->nvdimms_state.is_enabled =3D value;
->>>>> +}
->>>>> +
->>>>> +static char *machine_get_nvdimm_persistence(Object *obj, Error **e=
-rrp)
->>>>> +{
->>>>> +    MachineState *ms =3D MACHINE(obj);
->>>>> +
->>>>> +    return g_strdup(ms->nvdimms_state.persistence_string);
->>>>> +}
->>>>> +
->>>>> +static void machine_set_nvdimm_persistence(Object *obj, const char=
- *value,
->>>>> +                                               Error **errp)
->>>>> +{
->>>>> +    MachineState *ms =3D MACHINE(obj);
->>>>> +    AcpiNVDIMMState *nvdimms_state =3D &ms->nvdimms_state;
->>>>> +
->>>>> +    if (strcmp(value, "cpu") =3D=3D 0)
->>>>> +        nvdimms_state->persistence =3D 3;
->>>>> +    else if (strcmp(value, "mem-ctrl") =3D=3D 0)
->>>>> +        nvdimms_state->persistence =3D 2;
->>>>> +    else {
->>>>> +        error_setg(errp, "-machine nvdimm-persistence=3D%s: unsupp=
-orted option",
->>>>> +                   value);
->>>>> +        return;
->>>>> +    }
->>>>> +
->>>>> +    g_free(nvdimms_state->persistence_string);
->>>>> +    nvdimms_state->persistence_string =3D g_strdup(value);
->>>>> +}
->>>>> +
->>>>>  void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, cons=
-t char *type)
->>>>>  {
->>>>>      strList *item =3D g_new0(strList, 1);
->>>>> @@ -765,6 +806,20 @@ static void machine_class_init(ObjectClass *oc=
-, void *data)
->>>>>          &error_abort);
->>>>>      object_class_property_set_description(oc, "memory-encryption",
->>>>>          "Set memory encryption object to use", &error_abort);
->>>>> +
->>>>> +    object_class_property_add_bool(oc, "nvdimm",
->>>>> +        machine_get_nvdimm, machine_set_nvdimm, &error_abort);
->>>>> +    object_class_property_set_description(oc, "nvdimm",
->>>>> +                                         "Set on/off to enable/dis=
-able NVDIMM "
->>>>> +                                         "instantiation", NULL);
->>>>> +
->>>>> +    object_class_property_add_str(oc, "nvdimm-persistence",
->>>>> +                                  machine_get_nvdimm_persistence,
->>>>> +                                  machine_set_nvdimm_persistence, =
-&error_abort);
->>>>> +    object_class_property_set_description(oc, "nvdimm-persistence"=
-,
->>>>> +                                          "Set NVDIMM persistence"
->>>>> +                                          "Valid values are cpu an=
-d mem-ctrl",
->>>>> +                                          NULL);
->>>>>  }
->>>>> =20
->>>>>  static void machine_class_base_init(ObjectClass *oc, void *data)
->>>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->>>>> index 9ecc96dcc7..2d7d46fe50 100644
->>>>> --- a/hw/i386/acpi-build.c
->>>>> +++ b/hw/i386/acpi-build.c
->>>>> @@ -1867,7 +1867,7 @@ build_dsdt(GArray *table_data, BIOSLinker *li=
-nker,
->>>>>              aml_append(scope, method);
->>>>>          }
->>>>> =20
->>>>> -        if (pcms->acpi_nvdimm_state.is_enabled) {
->>>>> +        if (machine->nvdimms_state.is_enabled) {
->>>>>              method =3D aml_method("_E04", 0, AML_NOTSERIALIZED);
->>>>>              aml_append(method, aml_notify(aml_name("\\_SB.NVDR"),
->>>>>                                            aml_int(0x80)));
->>>>> @@ -2704,9 +2704,9 @@ void acpi_build(AcpiBuildTables *tables, Mach=
-ineState *machine)
->>>>>              build_dmar_q35(tables_blob, tables->linker);
->>>>>          }
->>>>>      }
->>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
->>>>> +    if (machine->nvdimms_state.is_enabled) {
->>>>>          nvdimm_build_acpi(table_offsets, tables_blob, tables->link=
-er,
->>>>> -                          &pcms->acpi_nvdimm_state, machine->ram_s=
-lots);
->>>>> +                          &machine->nvdimms_state, machine->ram_sl=
-ots);
->>>>>      }
->>>>> =20
->>>>>      /* Add tables supplied by user (if any) */
->>>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>>> index 42128183e9..cacc4068cf 100644
->>>>> --- a/hw/i386/pc.c
->>>>> +++ b/hw/i386/pc.c
->>>>> @@ -2069,6 +2069,7 @@ static void pc_memory_pre_plug(HotplugHandler=
- *hotplug_dev, DeviceState *dev,
->>>>>  {
->>>>>      const PCMachineState *pcms =3D PC_MACHINE(hotplug_dev);
->>>>>      const PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
->>>>> +    const MachineState *ms =3D MACHINE(hotplug_dev);
->>>>>      const bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE=
-_NVDIMM);
->>>>>      const uint64_t legacy_align =3D TARGET_PAGE_SIZE;
->>>>> =20
->>>>> @@ -2083,7 +2084,7 @@ static void pc_memory_pre_plug(HotplugHandler=
- *hotplug_dev, DeviceState *dev,
->>>>>          return;
->>>>>      }
->>>>> =20
->>>>> -    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
->>>>> +    if (is_nvdimm && !ms->nvdimms_state.is_enabled) {
->>>>>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' =
-in '-M'");
->>>>>          return;
->>>>>      }
->>>>> @@ -2097,6 +2098,7 @@ static void pc_memory_plug(HotplugHandler *ho=
-tplug_dev,
->>>>>  {
->>>>>      Error *local_err =3D NULL;
->>>>>      PCMachineState *pcms =3D PC_MACHINE(hotplug_dev);
->>>>> +    MachineState *ms =3D MACHINE(hotplug_dev);
->>>>>      bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIM=
-M);
->>>>> =20
->>>>>      pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms), &local_err);
->>>>> @@ -2105,7 +2107,7 @@ static void pc_memory_plug(HotplugHandler *ho=
-tplug_dev,
->>>>>      }
->>>>> =20
->>>>>      if (is_nvdimm) {
->>>>> -        nvdimm_plug(&pcms->acpi_nvdimm_state);
->>>>> +        nvdimm_plug(&ms->nvdimms_state);
->>>>>      }
->>>>> =20
->>>>>      hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &er=
-ror_abort);
->>>>> @@ -2546,47 +2548,6 @@ static void pc_machine_set_smm(Object *obj, =
-Visitor *v, const char *name,
->>>>>      visit_type_OnOffAuto(v, name, &pcms->smm, errp);
->>>>>  }
->>>>> =20
->>>>> -static bool pc_machine_get_nvdimm(Object *obj, Error **errp)
->>>>> -{
->>>>> -    PCMachineState *pcms =3D PC_MACHINE(obj);
->>>>> -
->>>>> -    return pcms->acpi_nvdimm_state.is_enabled;
->>>>> -}
->>>>> -
->>>>> -static void pc_machine_set_nvdimm(Object *obj, bool value, Error *=
-*errp)
->>>>> -{
->>>>> -    PCMachineState *pcms =3D PC_MACHINE(obj);
->>>>> -
->>>>> -    pcms->acpi_nvdimm_state.is_enabled =3D value;
->>>>> -}
->>>>> -
->>>>> -static char *pc_machine_get_nvdimm_persistence(Object *obj, Error =
-**errp)
->>>>> -{
->>>>> -    PCMachineState *pcms =3D PC_MACHINE(obj);
->>>>> -
->>>>> -    return g_strdup(pcms->acpi_nvdimm_state.persistence_string);
->>>>> -}
->>>>> -
->>>>> -static void pc_machine_set_nvdimm_persistence(Object *obj, const c=
-har *value,
->>>>> -                                               Error **errp)
->>>>> -{
->>>>> -    PCMachineState *pcms =3D PC_MACHINE(obj);
->>>>> -    AcpiNVDIMMState *nvdimm_state =3D &pcms->acpi_nvdimm_state;
->>>>> -
->>>>> -    if (strcmp(value, "cpu") =3D=3D 0)
->>>>> -        nvdimm_state->persistence =3D 3;
->>>>> -    else if (strcmp(value, "mem-ctrl") =3D=3D 0)
->>>>> -        nvdimm_state->persistence =3D 2;
->>>>> -    else {
->>>>> -        error_setg(errp, "-machine nvdimm-persistence=3D%s: unsupp=
-orted option",
->>>>> -                   value);
->>>>> -        return;
->>>>> -    }
->>>>> -
->>>>> -    g_free(nvdimm_state->persistence_string);
->>>>> -    nvdimm_state->persistence_string =3D g_strdup(value);
->>>>> -}
->>>>> -
->>>>>  static bool pc_machine_get_smbus(Object *obj, Error **errp)
->>>>>  {
->>>>>      PCMachineState *pcms =3D PC_MACHINE(obj);
->>>>> @@ -2636,8 +2597,6 @@ static void pc_machine_initfn(Object *obj)
->>>>>      pcms->max_ram_below_4g =3D 0; /* use default */
->>>>>      pcms->smm =3D ON_OFF_AUTO_AUTO;
->>>>>      pcms->vmport =3D ON_OFF_AUTO_AUTO;
->>>>> -    /* nvdimm is disabled on default. */
->>>>> -    pcms->acpi_nvdimm_state.is_enabled =3D false;
->>>>>      /* acpi build is enabled by default if machine supports it */
->>>>>      pcms->acpi_build_enabled =3D PC_MACHINE_GET_CLASS(pcms)->has_a=
-cpi_build;
->>>>>      pcms->smbus_enabled =3D true;
->>>>> @@ -2798,13 +2757,6 @@ static void pc_machine_class_init(ObjectClas=
-s *oc, void *data)
->>>>>      object_class_property_set_description(oc, PC_MACHINE_VMPORT,
->>>>>          "Enable vmport (pc & q35)", &error_abort);
->>>>> =20
->>>>> -    object_class_property_add_bool(oc, PC_MACHINE_NVDIMM,
->>>>> -        pc_machine_get_nvdimm, pc_machine_set_nvdimm, &error_abort=
-);
->>>>> -
->>>>> -    object_class_property_add_str(oc, PC_MACHINE_NVDIMM_PERSIST,
->>>>> -        pc_machine_get_nvdimm_persistence,
->>>>> -        pc_machine_set_nvdimm_persistence, &error_abort);
->>>>> -
->>>>>      object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
->>>>>          pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
->>>>> =20
->>>>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->>>>> index 8770ecada9..16ebfc5a5a 100644
->>>>> --- a/hw/i386/pc_piix.c
->>>>> +++ b/hw/i386/pc_piix.c
->>>>> @@ -297,8 +297,8 @@ static void pc_init1(MachineState *machine,
->>>>>                                   PC_MACHINE_ACPI_DEVICE_PROP, &err=
-or_abort);
->>>>>      }
->>>>> =20
->>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
->>>>> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io=
-,
->>>>> +    if (machine->nvdimms_state.is_enabled) {
->>>>> +        nvdimm_init_acpi_state(&machine->nvdimms_state, system_io,
->>>>>                                 pcms->fw_cfg, OBJECT(pcms));
->>>>>      }
->>>>>  }
->>>>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
->>>>> index cfb9043e12..dacaa90611 100644
->>>>> --- a/hw/i386/pc_q35.c
->>>>> +++ b/hw/i386/pc_q35.c
->>>>> @@ -329,8 +329,8 @@ static void pc_q35_init(MachineState *machine)
->>>>>      pc_vga_init(isa_bus, host_bus);
->>>>>      pc_nic_init(pcmc, isa_bus, host_bus);
->>>>> =20
->>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
->>>>> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io=
-,
->>>>> +    if (machine->nvdimms_state.is_enabled) {
->>>>> +        nvdimm_init_acpi_state(&machine->nvdimms_state, system_io,
->>>>>                                 pcms->fw_cfg, OBJECT(pcms));
->>>>>      }
->>>>>  }
->>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
->>>>> index 9690c71a6d..ccf0c5a69d 100644
->>>>> --- a/include/hw/boards.h
->>>>> +++ b/include/hw/boards.h
->>>>> @@ -8,6 +8,7 @@
->>>>>  #include "hw/qdev.h"
->>>>>  #include "qom/object.h"
->>>>>  #include "qom/cpu.h"
->>>>> +#include "hw/mem/nvdimm.h"
->>>>> =20
->>>>>  /**
->>>>>   * memory_region_allocate_system_memory - Allocate a board's main =
-memory
->>>>> @@ -272,6 +273,7 @@ struct MachineState {
->>>>>      const char *cpu_type;
->>>>>      AccelState *accelerator;
->>>>>      CPUArchIdList *possible_cpus;
->>>>> +    AcpiNVDIMMState nvdimms_state;
->>>>
->>>> It looks we are breaking the generic/abstract machine design.
->>>> You introduce 2 specific concepts here, ACPI and NVDIMM.
->>> at least this should be renamed NVDIMMState according to last Igor's
->>> comment.
->>>>
->>>> MachineClass tries to be generic, and and still suffer from specific
->>>> fields inherited from the PC Machine.
->>>>
->>>> I'd use an intermediate Memory-related object between Machine and
->>>> AcpiNVDIMM states.
->>>>
->>>> I see there already is DeviceMemoryState.
->>>>
->>>> Can AcpiNVDIMMState go there? That would be more acceptable IMHO.
->>> DeviceMemoryState is also declared in include/hw/boards.h so does it
->>> hide any details.
->>>
->>> Not every machine has device memory or irqchip_split either for insta=
-nce
->>
->> device_memory is an abstracted concept that can be theoretically
->> implemented by any machine. nvdimm is not.
+On Thu, 7 Mar 2019 10:04:56 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+
+> On Wed, Mar 06, 2019 at 07:48:22PM +0100, Igor Mammedov wrote:
+> > On Wed, 6 Mar 2019 17:10:37 +0000
+> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >  =20
+> > > On Wed, Mar 06, 2019 at 05:58:35PM +0100, Igor Mammedov wrote: =20
+> > > > On Wed, 6 Mar 2019 16:39:38 +0000
+> > > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> > > >  =20
+> > > > > On Wed, Mar 06, 2019 at 05:30:25PM +0100, Igor Mammedov wrote: =20
+> > > > > > Ammend -numa option docs and print warnings if 'mem' option or =
+default RAM
+> > > > > > splitting between nodes is used. It's intended to discourage us=
+ers from using
+> > > > > > configuration that allows only to fake NUMA on guest side while=
+ leading
+> > > > > > to reduced performance of the guest due to inability to properl=
+y configure
+> > > > > > VM's RAM on the host.
+> > > > > >=20
+> > > > > > In NUMA case, it's recommended to always explicitly configure g=
+uest RAM
+> > > > > > using -numa node,memdev=3D{backend-id} option.
+> > > > > >=20
+> > > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > > > ---
+> > > > > >  numa.c          |  5 +++++
+> > > > > >  qemu-options.hx | 12 ++++++++----
+> > > > > >  2 files changed, 13 insertions(+), 4 deletions(-)
+> > > > > >=20
+> > > > > > diff --git a/numa.c b/numa.c
+> > > > > > index 3875e1e..c6c2a6f 100644
+> > > > > > --- a/numa.c
+> > > > > > +++ b/numa.c
+> > > > > > @@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *m=
+s, NumaNodeOptions *node,
+> > > > > > =20
+> > > > > >      if (node->has_mem) {
+> > > > > >          numa_info[nodenr].node_mem =3D node->mem;
+> > > > > > +        warn_report("Parameter -numa node,mem is obsolete,"
+> > > > > > +                    " use -numa node,memdev instead"); =20
+> > > > >=20
+> > > > > I don't think we should do this. Libvirt isn't going to stop usin=
+g this
+> > > > > option in the near term. When users see warnings like this in log=
+s =20
+> > > > well when it was the only option available libvirt had no other cho=
+ice,
+> > > > but since memdev became available libvirt should try to use it when=
+ever
+> > > > possible. =20
+> > >=20
+> > > As we previously discussed, it is not possible for libvirt to use it
+> > > in all cases.
+> > >  =20
+> > > >  =20
+> > > > > they'll often file bugs reports thinking something is broken whic=
+h is
+> > > > > not the case here.  =20
+> > > > It's the exact purpose of the warning, to force user asking questio=
+ns
+> > > > and fix configuration, since he/she obviously not getting NUMA bene=
+fits
+> > > > and/or performance-wise =20
+> > >=20
+> > > That's only useful if it is possible to do something about the proble=
+m.
+> > > Libvirt wants to use the new option but it can't due to the live migr=
+ation
+> > > problems. So this simply leads to bug reports that will end up marked
+> > > as CANTFIX. =20
+> > The problem could be solved by user though, by reconfiguring and restar=
+ting
+> > domain since it's impossible to (at least as it stands now wrt migratio=
+n).
+> >  =20
+> > > I don't believe libvirt actually  suffers from the performance problem
+> > > you describe wrt lack of pinning.   When we attempt to pin guest NUMA
+> > > nodes to host NUMA nodes, libvirt *will* use "memdev". IIUC, we
+> > > use "mem" in the case where there /no/ requested pinning of guest
+> > > NUMA nodes, and so we're not suffering from the limitations of "mem"
+> > > in that case. =20
+> > What would be the use-case for not pinning numa nodes?
+> > If user isn't asking for pinning, VM would run with degraded performanc=
+e and
+> > it would be better of being non-numa. =20
 >=20
-> Then maybe the DeviceMemoryState is misleading, NVDIMM might not be
-> related to QEMU's DeviceMemory concept, but it is a 'device memory' :)
-
-We should have/should name it MemoryDeviceState/memory_device_state.
-That is source of confusion (memory device vs. device memory) :) Yes, I
-am to blame.
-
+> The guest could have been originally booted on a host which has 2 NUMA
+> nodes and have been migrated to a host with 1 NUMA node, in which case
+> pinnning is not relevant.
 >=20
-> The between-object I'm referring to would be a container of device
-> memory types. It doesn't have to be a single instance but rather a list
-> of 'hw memory' interfaces.
+> For CI purposes too it is reasonable to create guests with NUMA configura=
+tions
+> that bear no resemblance to the host NUMA configuration. This allows for =
+testing
+> the operation of guest applications. This is something that is relevant to
+> OpenStack for testnig Nova's handling of NUMA placement logic, since almo=
+st
+> all their testing is in VMs not bare metal.
 >
->>
+> Not pinning isn't common, but it is reasonable to do it.
 
+=20
+=20
+> > Even if user doesn't ask for pinning, non-pinned memdev (for new VMs wh=
+ere
+> > available) could be used as well. Users of 'mem' with new QEMU will see=
+ the warning
+> > and probably think about if they are configured VM correctly. =20
+>=20
+> We can't change to memdev due to migration problems. Since there is no
+> functional problem with using 'mem' in this scenario there's no pressing
+> reason to stop using 'mem'.
+The problem with it is that it blocks fixing bug in QEMU for the multi node=
+ case
+ '-numa node,mem + -mem-path + -mem-prealloc + -object "memdev",policy=3Dbi=
+nd'
+and it also gets in the way of unifying RAM handling using device-memory
+for initial RAM due to the same migration issue since RAM layout in migrati=
+on
+stream is different.
 
---=20
-
-Thanks,
-
-David / dhildenb
+> > Desire to deprecate 'mem' at least for new machines is to be able to pr=
+event user
+> > from creating broken configs and manage all RAM in the same manner (fro=
+ntend/backend).
+> > (I can't do it for old machine types but for new it is possible). =20
+>=20
+> As before libvirt can't make its CLI config dependant on machine type
+> version as that breaks live migration to old libvirt versions.
+>=20
+> Regards,
+> Daniel
