@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54767)
+Received: from eggs.gnu.org ([209.51.188.92]:56101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1soU-0003Dl-Vy
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:11:55 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h1sty-0007oK-UI
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:17:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1soU-0008W9-3v
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:11:55 -0500
-References: <20190307121539.12842-1-david@redhat.com>
-	<20190307121539.12842-4-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3bd6ff64-7866-5a6e-8b19-fffc2272a00f@redhat.com>
-Date: Thu, 7 Mar 2019 14:11:47 +0100
+	(envelope-from <no-reply@patchew.org>) id 1h1stx-0003FY-CB
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:17:34 -0500
+Resent-Message-Id: <E1h1stx-0003FY-CB@eggs.gnu.org>
+Message-ID: <155196463139.8146.3607540978161080023@6acff2cf482b>
+In-Reply-To: <20190307121539.12842-1-david@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190307121539.12842-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 03/32] s390x/tcg: Utilities for vector
- instruction helpers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Mar 2019 05:17:12 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/32] s390x/tcg: Vector Instruction
+ Support Part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,129 +24,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: david@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
 
-On 07/03/2019 13.15, David Hildenbrand wrote:
-> We'll have to read/write vector elements quite frequently from helpers.
-> The tricky bit is properly taking care of endianess. Handle it similar
-> to aarch64.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/vec.h | 101 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 101 insertions(+)
->  create mode 100644 target/s390x/vec.h
-> 
-> diff --git a/target/s390x/vec.h b/target/s390x/vec.h
-> new file mode 100644
-> index 0000000000..3313fb43ee
-> --- /dev/null
-> +++ b/target/s390x/vec.h
-> @@ -0,0 +1,101 @@
-> +/*
-> + * QEMU TCG support -- s390x vector utilitites
-> + *
-> + * Copyright (C) 2019 Red Hat Inc
-> + *
-> + * Authors:
-> + *   David Hildenbrand <david@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef S390X_VEC_H
-> +#define S390X_VEC_H
-> +
-> +typedef union S390Vector {
-> +    uint64_t doubleword[2];
-> +    uint32_t word[4];
-> +    uint16_t halfword[8];
-> +    uint8_t byte[16];
-> +} S390Vector;
-> +
-> +/*
-> + * Each vector is stored as two 64bit host values. So when talking about
-> + * byte/halfword/word numbers, we have to take care of proper translation
-> + * between element numbers.
-> + *
-> + * Big Endian (target/possible host)
-> + * B:  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7] - [ 8][ 9][10][11][12][13][14][15]
-> + * HW: [     0][     1][     2][     3] - [     4][     5][     6][     7]
-> + * W:  [             0][             1] - [             2][             3]
-> + * DW: [                             0] - [                             1]
-> + *
-> + * Little Endian (possible host)
-> + * B:  [ 7][ 6][ 5][ 4][ 3][ 2][ 1][ 0] - [15][14][13][12][11][10][ 9][ 8]
-> + * HW: [     3][     2][     1][     0] - [     7][     6][     5][     4]
-> + * W:  [             1][             0] - [             3][             2]
-> + * DW: [                             0] - [                             1]
-> + */
-> +#ifndef HOST_WORDS_BIGENDIAN
-> +#define H1(x)  ((x) ^ 7)
-> +#define H2(x)  ((x) ^ 3)
-> +#define H4(x)  ((x) ^ 1)
-> +#else
-> +#define H1(x)  (x)
-> +#define H2(x)  (x)
-> +#define H4(x)  (x)
-> +#endif
-> +
-> +static inline uint8_t s390_vec_read_element8(const S390Vector *v, uint8_t enr)
-> +{
-> +    g_assert(enr < 16);
-> +    return v->byte[H1(enr)];
-> +}
-> +
-> +static inline uint16_t s390_vec_read_element16(const S390Vector *v, uint8_t enr)
-> +{
-> +    g_assert(enr < 8);
-> +    return v->halfword[H2(enr)];
-> +}
-> +
-> +static inline uint32_t s390_vec_read_element32(const S390Vector *v, uint8_t enr)
-> +{
-> +    g_assert(enr < 4);
-> +    return v->word[H4(enr)];
-> +}
-> +
-> +static inline uint64_t s390_vec_read_element64(const S390Vector *v, uint8_t enr)
-> +{
-> +    g_assert(enr < 2);
-> +    return v->doubleword[enr];
-> +}
-> +
-> +static inline void s390_vec_write_element8(S390Vector *v, uint8_t enr,
-> +                                           uint8_t data)
-> +{
-> +    g_assert(enr < 16);
-> +    v->byte[H1(enr)] = data;
-> +}
-> +
-> +static inline void s390_vec_write_element16(S390Vector *v, uint8_t enr,
-> +                                            uint16_t data)
-> +{
-> +    g_assert(enr < 8);
-> +    v->halfword[H2(enr)] = data;
-> +}
-> +
-> +static inline void s390_vec_write_element32(S390Vector *v, uint8_t enr,
-> +                                            uint32_t data)
-> +{
-> +    g_assert(enr < 4);
-> +    v->word[H4(enr)] = data;
-> +}
-> +
-> +static inline void s390_vec_write_element64(S390Vector *v, uint8_t enr,
-> +                                            uint64_t data)
-> +{
-> +    g_assert(enr < 2);
-> +    v->doubleword[enr] = data;
-> +}
-> +
-> +#endif /* S390X_VEC_H */
-> 
-
-Pretty brain-twisting, but it looks right to me.
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzEyMTUzOS4xMjg0
+Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzEyMTUzOS4xMjg0Mi0x
+LWRhdmlkQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8zMl0g
+czM5MHgvdGNnOiBWZWN0b3IgSW5zdHJ1Y3Rpb24gU3VwcG9ydCBQYXJ0IDEKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
+IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDcxMjE1Mzku
+MTI4NDItMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDcxMjE1MzkuMTI4NDIt
+MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjY5NTRh
+NzkzOSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKNzliZGNhMzE4YSBzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKYjkwMjFjNzcxZSBzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKODNlMjc5NGUzZCBzMzkweC90
+Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVAo4MjllM2ZiM2U3IHMzOTB4L3RjZzog
+SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQpiZDc0MTViYTI4IHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
+ZV93cml0ZV9hY2Nlc3MgaGVscGVyCjFlNmUxNTMxMmIgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
+VE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdPUkQKOTM2NGY4MjZhNyBzMzkweC90Y2c6IEltcGxl
+bWVudCBWRUNUT1IgU0VMRUNUCjExMDU5MTM5ZTkgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
+IFNDQVRURVIgRUxFTUVOVAo5ZjI1MmZiZDQ5IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBS
+RVBMSUNBVEUgSU1NRURJQVRFCjFjNjI5MTIyOGYgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
+IFJFUExJQ0FURQo5ZGEwN2E3NTg4IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRF
+IERPVUJMRVdPUkQgSU1NRURJQVRFCjdkM2UyMzUyNGQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
+VE9SIFBFUk1VVEUKZTE2NDQ4MWIzYSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEFDSyAq
+CjViY2RiYTVkNTkgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIE1FUkdFIChISUdIfExPVykK
+ODEzMWYwM2JjYiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBXSVRIIExFTkdUSAo2
+YjNlMWE1ODMzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEZST00gR1JTIERJ
+U0pPSU5UCjliOTQ1NmRmNmMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRUxF
+TUVOVCBGUk9NIEdSCjNlMzEzN2ZjNWEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQg
+VE8gQkxPQ0sgQk9VTkRBUlkKZTEzYjc4ZmEzYSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
+TE9BRCBNVUxUSVBMRQo1ZGQwOTJjNDQzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FE
+IExPR0lDQUwgRUxFTUVOVCBBTkQgWkVSTwo3M2E3ZDU5MzZmIHMzOTB4L3RjZzogSW1wbGVtZW50
+IFZFQ1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVAo0YzNjYWM3ZGVhIHMzOTB4L3RjZzogSW1w
+bGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJQVRFCjJlZTc4Y2UxNjcgczM5MHgvdGNn
+OiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVAo2NTRjNjE0YzU2IHMzOTB4L3RjZzogSW1w
+bGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNBVEUKZDYwNmQwYjdmMiBzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgTE9BRAoxNWFlOGZhNzQwIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RP
+UiBHRU5FUkFURSBNQVNLCjgwY2I3NTMyNzggczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdF
+TkVSQVRFIEJZVEUgTUFTSwozODIyZGQyNjMzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBH
+QVRIRVIgRUxFTUVOVAozYzM2MGI4YjJhIHMzOTB4L3RjZzogVXRpbGl0aWVzIGZvciB2ZWN0b3Ig
+aW5zdHJ1Y3Rpb24gaGVscGVycwoyMWM2MjE5N2M1IHMzOTB4L3RjZzogQ2hlY2sgdmVjdG9yIHJl
+Z2lzdGVyIGluc3RydWN0aW9ucyBhdCBjZW50cmFsIHBvaW50CjFlZWEwZjhiN2EgczM5MHgvdGNn
+OiBEZWZpbmUgdmVjdG9yIGluc3RydWN0aW9uIGZvcm1hdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvMzIgQ2hlY2tpbmcgY29tbWl0IDFlZWEwZjhiN2E0YyAoczM5MHgvdGNnOiBEZWZpbmUgdmVj
+dG9yIGluc3RydWN0aW9uIGZvcm1hdHMpCjIvMzIgQ2hlY2tpbmcgY29tbWl0IDIxYzYyMTk3YzVk
+NSAoczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIgaW5zdHJ1Y3Rpb25zIGF0IGNlbnRy
+YWwgcG9pbnQpCjMvMzIgQ2hlY2tpbmcgY29tbWl0IDNjMzYwYjhiMmFlNiAoczM5MHgvdGNnOiBV
+dGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVjdGlvbiBoZWxwZXJzKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDEwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CjQvMzIgQ2hlY2tpbmcgY29tbWl0IDM4MjJkZDI2MzMzNiAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
+VkVDVE9SIEdBVEhFUiBFTEVNRU5UKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
+aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1v
+ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCA0LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMzIgQ2hlY2tpbmcgY29t
+bWl0IDgwY2I3NTMyNzg5YyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVSQVRFIEJZ
+VEUgTUFTSykKNi8zMiBDaGVja2luZyBjb21taXQgMTVhZThmYTc0MGRiIChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgR0VORVJBVEUgTUFTSykKNy8zMiBDaGVja2luZyBjb21taXQgZDYwNmQw
+YjdmMjc1IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCkKOC8zMiBDaGVja2luZyBj
+b21taXQgNjU0YzYxNGM1NjllIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBBTkQg
+UkVQTElDQVRFKQo5LzMyIENoZWNraW5nIGNvbW1pdCAyZWU3OGNlMTY3YzcgKHMzOTB4L3RjZzog
+SW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQpCjEwLzMyIENoZWNraW5nIGNvbW1pdCA0YzNj
+YWM3ZGVhMTQgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJ
+QVRFKQoxMS8zMiBDaGVja2luZyBjb21taXQgNzNhN2Q1OTM2ZmNiIChzMzkweC90Y2c6IEltcGxl
+bWVudCBWRUNUT1IgTE9BRCBHUiBGUk9NIFZSIEVMRU1FTlQpCjEyLzMyIENoZWNraW5nIGNvbW1p
+dCA1ZGQwOTJjNDQzOTkgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIExPR0lDQUwg
+RUxFTUVOVCBBTkQgWkVSTykKMTMvMzIgQ2hlY2tpbmcgY29tbWl0IGUxM2I3OGZhM2EyZiAoczM5
+MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTVVMVElQTEUpCjE0LzMyIENoZWNraW5nIGNv
+bW1pdCAzZTMxMzdmYzVhZGEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFRPIEJM
+T0NLIEJPVU5EQVJZKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
+b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM5NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
+Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0
+LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzMyIENoZWNraW5nIGNvbW1pdCA5Yjk0
+NTZkZjZjNGYgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJP
+TSBHUikKMTYvMzIgQ2hlY2tpbmcgY29tbWl0IDZiM2UxYTU4MzNmOCAoczM5MHgvdGNnOiBJbXBs
+ZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNv
+bW1pdCA4MTMxZjAzYmNiMjEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEgg
+TEVOR1RIKQoxOC8zMiBDaGVja2luZyBjb21taXQgNWJjZGJhNWQ1OTNkIChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IGUx
+NjQ0ODFiM2EyYSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
+ICcoJwojMTgzOiBGSUxFOiB0YXJnZXQvczM5MHgvdmVjX2hlbHBlci5jOjQ4OgordHlwZWRlZiB1
+aW50IyNUQklUUyMjX3QgKCp2cGsjI0JJVFMjI19mbikodWludCMjQklUUyMjX3QsIGludCAqKTsg
+ICAgICAgICAgICAgIFwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQ1IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDE5LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMC8zMiBDaGVj
+a2luZyBjb21taXQgN2QzZTIzNTI0ZDMwIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
+TVVURSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQv
+czM5MHgvaGVscGVyLmg6MTQ0OgorREVGX0hFTFBFUl9GTEFHU181KGd2ZWNfdnBlcm0sIFRDR19D
+QUxMX05PX1JXRywgdm9pZCwgcHRyLCBjcHRyLCBjcHRyLCBjcHRyLCBpMzIpCgp0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIwLzMyIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjIxLzMyIENoZWNraW5nIGNvbW1pdCA5ZGEwN2E3NTg4N2IgKHMz
+OTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRFIERPVUJMRVdPUkQgSU1NRURJQVRFKQoy
+Mi8zMiBDaGVja2luZyBjb21taXQgMWM2MjkxMjI4ZjU1IChzMzkweC90Y2c6IEltcGxlbWVudCBW
+RUNUT1IgUkVQTElDQVRFKQoyMy8zMiBDaGVja2luZyBjb21taXQgOWYyNTJmYmQ0OWQ1IChzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElDQVRFIElNTUVESUFURSkKMjQvMzIgQ2hlY2tp
+bmcgY29tbWl0IDExMDU5MTM5ZTljMiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNDQVRU
+RVIgRUxFTUVOVCkKMjUvMzIgQ2hlY2tpbmcgY29tbWl0IDkzNjRmODI2YTcwYSAoczM5MHgvdGNn
+OiBJbXBsZW1lbnQgVkVDVE9SIFNFTEVDVCkKMjYvMzIgQ2hlY2tpbmcgY29tbWl0IDFlNmUxNTMx
+MmIxZiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdP
+UkQpCjI3LzMyIENoZWNraW5nIGNvbW1pdCBiZDc0MTViYTI4NzEgKHMzOTB4L3RjZzogUHJvdmlk
+ZSBwcm9iZV93cml0ZV9hY2Nlc3MgaGVscGVyKQoyOC8zMiBDaGVja2luZyBjb21taXQgODI5ZTNm
+YjNlN2JmIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5n
+IGNvbW1pdCA4M2UyNzk0ZTNkN2YgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBF
+TEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQgYjkwMjFjNzcxZTUxIChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUpCjMxLzMyIENoZWNraW5nIGNvbW1pdCA3OWJk
+Y2EzMThhMjggKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkK
+MzIvMzIgQ2hlY2tpbmcgY29tbWl0IGY2OTU0YTc5Mzk2MCAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
+VkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDE5MDMwNzEyMTUzOS4xMjg0Mi0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGlu
+Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
