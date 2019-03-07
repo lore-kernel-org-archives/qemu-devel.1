@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44050)
+Received: from eggs.gnu.org ([209.51.188.92]:44277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1pvs-00047E-B3
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:21 -0500
+	(envelope-from <stefanha@gmail.com>) id 1h1pwj-0004tb-TJ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:08:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h1pvq-0007Vu-M8
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:19 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:37315)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h1pvp-0007Ue-D7
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:07:17 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  7 Mar 2019 11:06:56 +0100
-Message-Id: <20190307100656.14044-10-laurent@vivier.eu>
-In-Reply-To: <20190307100656.14044-1-laurent@vivier.eu>
-References: <20190307100656.14044-1-laurent@vivier.eu>
+	(envelope-from <stefanha@gmail.com>) id 1h1pwi-0007rT-BZ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:08:13 -0500
+Date: Thu, 7 Mar 2019 10:07:57 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190307100757.GA2843@stefanha-x1.localdomain>
+References: <20190227172256.30368-1-kwolf@redhat.com>
+	<20190227172256.30368-4-kwolf@redhat.com>
+	<20190301161724.GB18260@stefanha-x1.localdomain>
+	<d6ba8e66-5ddf-9091-ff44-5024a53240a8@redhat.com>
+	<20190306095147.GF22159@stefanha-x1.localdomain>
+	<ec417842-c9f4-7a7e-e49f-4d509115e540@redhat.com>
+	<20190306150633.GK6818@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 9/9] linux-user: add new netlink types
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="h31gzZEtNLTqOjlF"
+Content-Disposition: inline
+In-Reply-To: <20190306150633.GK6818@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 03/20] qcow2: Extend spec for
+ external data files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-Add QEMU_IFLA_BR_VLAN_STATS_PER_PORT (from linux v4.20),
-    QEMU_IFLA_BR_MULTI_BOOLOPT (from linux v5.0).
 
-The first new entry fixes the following error:
+--h31gzZEtNLTqOjlF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  Unknown QEMU_IFLA_BR type 45
+On Wed, Mar 06, 2019 at 04:06:33PM +0100, Kevin Wolf wrote:
+> Maybe add a new section "String header extensions" that covers both?
+>=20
+> If this remains the only patch in the series that would need a
+> significant change, I'd prefer a follow-up patch indeed.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190306200925.17605-1-laurent@vivier.eu>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/fd-trans.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+A follow-up patch sounds good.
 
-diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
-index 30425c9df6bc..612819c1b1ec 100644
---- a/linux-user/fd-trans.c
-+++ b/linux-user/fd-trans.c
-@@ -75,6 +75,8 @@ enum {
-     QEMU_IFLA_BR_MCAST_STATS_ENABLED,
-     QEMU_IFLA_BR_MCAST_IGMP_VERSION,
-     QEMU_IFLA_BR_MCAST_MLD_VERSION,
-+    QEMU_IFLA_BR_VLAN_STATS_PER_PORT,
-+    QEMU_IFLA_BR_MULTI_BOOLOPT,
-     QEMU___IFLA_BR_MAX,
- };
- 
-@@ -438,6 +440,7 @@ static abi_long host_to_target_data_bridge_nlattr(struct nlattr *nlattr,
-     case QEMU_IFLA_BR_MCAST_STATS_ENABLED:
-     case QEMU_IFLA_BR_MCAST_IGMP_VERSION:
-     case QEMU_IFLA_BR_MCAST_MLD_VERSION:
-+    case QEMU_IFLA_BR_VLAN_STATS_PER_PORT:
-         break;
-     /* uint16_t */
-     case QEMU_IFLA_BR_PRIORITY:
-@@ -543,6 +546,12 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
-     case QEMU_IFLA_BRPORT_ROOT_ID:
-     case QEMU_IFLA_BRPORT_BRIDGE_ID:
-         break;
-+    /* br_boolopt_multi { uint32_t, uint32_t } */
-+    case QEMU_IFLA_BR_MULTI_BOOLOPT:
-+        u32 = NLA_DATA(nlattr);
-+        u32[0] = tswap32(u32[0]); /* optval */
-+        u32[1] = tswap32(u32[1]); /* optmask */
-+        break;
-     default:
-         gemu_log("Unknown QEMU_IFLA_BRPORT type %d\n", nlattr->nla_type);
-         break;
--- 
-2.20.1
+Stefan
+
+--h31gzZEtNLTqOjlF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcgO19AAoJEJykq7OBq3PIilsH/0NeeIKTH1cdfowtM32H7CRy
+S9nal1qgxK4jbX4U+m8AsBYhjJOdcFACu8SyX5SAcfdetG1o3hgRLh9KKe30eYEI
+WWAVQfDfffANtCTACALSuZQ3YF5a19e/GtY4tJT3jGomClzuBrwhG3bTBoi+uUlm
+3bTYVTFe4e5MZvf0wq3M1wwO4pq77jGfuMktve4apldlN8NFFG+hRmAbX6USx6pm
++bAuy19/MWdQUsFx3xtuRx6rR5iU8DXHQOWY0yVerO/DC1xTRzZC+QzFiJd7IsEx
+eJS9IE/mSIqTfWbvoQ1eAQokddolYNti3iLu4zfLHt4751XqZYDD8iCwHfAYc+0=
+=lfkp
+-----END PGP SIGNATURE-----
+
+--h31gzZEtNLTqOjlF--
