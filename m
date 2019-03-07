@@ -1,28 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56131)
+Received: from eggs.gnu.org ([209.51.188.92]:57371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h1uat-0002lP-VQ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:06:05 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1h1uej-0005w0-87
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:09:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h1uas-0006a9-0F
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:05:59 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34587)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1h1uaq-0006Wg-2I
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:05:56 -0500
-Received: by mail-wr1-x442.google.com with SMTP id f14so17819324wrg.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 07:05:54 -0800 (PST)
-References: <20190307093723.655-1-armbru@redhat.com>
-	<20190307093723.655-2-armbru@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190307093723.655-2-armbru@redhat.com>
-Date: Thu, 07 Mar 2019 15:05:52 +0000
-Message-ID: <87pnr2g1wv.fsf@zen.linaroharston>
+	(envelope-from <jjherne@linux.ibm.com>) id 1h1uei-0001A9-A8
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:09:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36634
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1h1uei-00017a-1W
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:09:56 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x27ExNW9005754
+	for <qemu-devel@nongnu.org>; Thu, 7 Mar 2019 10:09:54 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2r34x5jyjy-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 10:09:54 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Thu, 7 Mar 2019 15:09:53 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-13-git-send-email-jjherne@linux.ibm.com>
+	<20190305133058.536c2eeb.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Thu, 7 Mar 2019 10:09:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v6 1/4] hw/block: better reporting on
- pflash backing file mismatch
+In-Reply-To: <20190305133058.536c2eeb.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <b67c0d7a-89a0-c61b-f082-da303eb6a830@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 12/16] s390-bios: Refactor virtio to run
+ channel programs via cio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +46,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, philmd@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+
+On 3/5/19 7:30 AM, Cornelia Huck wrote:
+> On Fri,  1 Mar 2019 13:59:32 -0500
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> 
+>> Now that we have a Channel I/O library let's modify virtio boot code to
+>> make use of it for running channel programs.
+>>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/virtio.c | 49 +++++++++++++++++++----------------------------
+>>   1 file changed, 20 insertions(+), 29 deletions(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+>> index aa9da72..711daf5 100644
+>> --- a/pc-bios/s390-ccw/virtio.c
+>> +++ b/pc-bios/s390-ccw/virtio.c
+>> @@ -14,6 +14,7 @@
+>>   #include "virtio.h"
+>>   #include "virtio-scsi.h"
+>>   #include "bswap.h"
+>> +#include "helper.h"
+>>   
+>>   #define VRING_WAIT_REPLY_TIMEOUT 30
+>>   
+>> @@ -89,33 +90,20 @@ int drain_irqs(SubChannelId schid)
+>>       }
+>>   }
+>>   
+>> -static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
+>> +static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
+>>   {
+>>       Ccw1 ccw = {};
+>> -    CmdOrb orb = {};
+>> -    int r;
+>> -
+>> -    enable_subchannel(vdev->schid);
+>> -
+>> -    /* start subchannel command */
+>> -    orb.fmt = 1;
+>> -    orb.cpa = (u32)(long)&ccw;
+>> -    orb.lpm = 0x80;
+>>   
+>>       ccw.cmd_code = cmd;
+>>       ccw.cda = (long)ptr;
+>>       ccw.count = len;
+>>   
+>> -    r = ssch(vdev->schid, &orb);
+>> -    /*
+>> -     * XXX Wait until device is done processing the CCW. For now we can
+>> -     *     assume that a simple tsch will have finished the CCW processing,
+>> -     *     but the architecture allows for asynchronous operation
+>> -     */
+>> -    if (!r) {
+>> -        r = drain_irqs(vdev->schid);
+>> +    if (sli) {
+>> +        ccw.flags |= CCW_FLAG_SLI;
+>>       }
+>> -    return r;
+>> +
+>> +    enable_subchannel(vdev->schid);
+> 
+> As said, maybe just move this to the main routine, instead of having to
+> call this here again and again.
+> 
+
+I can just remove this call all together, but because of the netboot case I'll need to add 
+a call to enable_subchannel to virtio_is_supported() or find_net_dev().
+
+netmain.c: main -> virtio_setup-> find_net_dev-> virtio_is_supported
+
+Let me know if you like this idea or not. If you're okay with it, I'll queue it up for v4. 
+IMHO, adding the call to find_net_dev makes more sense than virtio_is_supported.
 
 
-Markus Armbruster <armbru@redhat.com> writes:
+>> +    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
+>>   }
+>>   
+>>   static void vring_init(VRing *vr, VqInfo *info)
+> 
+> (...)
+> 
+>> @@ -324,7 +314,8 @@ bool virtio_is_supported(SubChannelId schid)
+>>       vdev.schid = schid;
+>>       memset(&vdev.senseid, 0, sizeof(vdev.senseid));
+>>       /* run sense id command */
+>> -    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid))) {
+>> +    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid),
+>> +                true)) {
+>>           return false;
+>>       }
+>>       if (vdev.senseid.cu_type == 0x3832) {
+> 
+> Can't you use the new routine for obtaining the cu type here?
+> 
 
-> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> It looks like there was going to be code to check we had some sort of
-> alignment so let's replace it with an actual check.  Reject undersized
-> images with "device needs N bytes, backing file provides only M
-> bytes".  This is a bit more useful than the enigmatic "failed to read
-> the initial flash content" when we attempt to read the number of bytes
-> the device should have.  Continue to accept oversized images, but warn
-> "device needs N bytes, rest ignored".
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/block/pflash_cfi01.c | 29 ++++++++++++++++++++++-------
->  1 file changed, 22 insertions(+), 7 deletions(-)
->
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index 9d1c356eb6..75ce8ef489 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -45,6 +45,7 @@
->  #include "qemu/bitops.h"
->  #include "qemu/host-utils.h"
->  #include "qemu/log.h"
-> +#include "qemu/error-report.h"
->  #include "hw/sysbus.h"
->  #include "sysemu/sysemu.h"
->  #include "trace.h"
-> @@ -730,13 +731,6 @@ static void pflash_cfi01_realize(DeviceState *dev, E=
-rror **errp)
->      }
->      device_len =3D sector_len_per_device * blocks_per_device;
->
-> -    /* XXX: to be fixed */
-> -#if 0
-> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 * =
-1024) &&
-> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 *=
- 1024))
-> -        return NULL;
-> -#endif
-> -
->      memory_region_init_rom_device(
->          &pfl->mem, OBJECT(dev),
->          &pflash_cfi01_ops,
-> @@ -763,6 +757,27 @@ static void pflash_cfi01_realize(DeviceState *dev, E=
-rror **errp)
->      }
->
->      if (pfl->blk) {
-> +        /*
-> +         * Validate the backing store is the right size for pflash
-> +         * devices. If the user supplies a larger file we ignore the
-> +         * tail.
-> +         */
-> +        int64_t backing_len =3D blk_getlength(pfl->blk);
-> +        if (backing_len < 0) {
-> +            error_setg(errp, "unable to check size of backing file");
-> +            return;
-> +        }
-> +
-> +        if (backing_len < total_len) {
-> +            error_setg(errp, "device needs %" PRIu64 " bytes, "
-> +                       "backing file provides only %" PRIu64 " bytes",
-> +                       total_len, backing_len);
-> +            return;
-> +        } else if (backing_len > total_len) {
-> +            warn_report("device needs %" PRIu64 " bytes, rest ignored",
-> +                        total_len);
-> +        }
+cu_type only returns the control unit type. This code goes on to look at the model number 
+as well. In hind sight, I could have noticed this and simply structured my code to return 
+the whole sense_id data structure. I'm not against making this change, but things seem 
+pretty clean as they are. :)
 
-As discussed elsewhere I'm happy for this just to error out with a
-useful error message.
-
-> +
->          /* read the initial flash content */
->          ret =3D blk_pread(pfl->blk, 0, pfl->storage, total_len);
-
-
---
-Alex Benn=C3=A9e
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
