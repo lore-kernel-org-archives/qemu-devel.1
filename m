@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49134)
+Received: from eggs.gnu.org ([209.51.188.92]:49233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arusakova917@gmail.com>) id 1h1vkG-00068n-Es
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:45 -0500
+	(envelope-from <berrange@redhat.com>) id 1h1vkR-0006J9-83
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arusakova917@gmail.com>) id 1h1vkE-0008H1-HQ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:44 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42919)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arusakova917@gmail.com>)
-	id 1h1vkA-00087l-US
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:39 -0500
-Received: by mail-wr1-x444.google.com with SMTP id r5so18119154wrg.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 08:19:34 -0800 (PST)
-From: Anastasiia Rusakova <arusakova917@gmail.com>
-Date: Thu,  7 Mar 2019 18:19:25 +0200
-Message-Id: <20190307161925.4158-1-rusakova.nastasia@icloud.com>
+	(envelope-from <berrange@redhat.com>) id 1h1vkQ-0008UE-DZ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1vkQ-0008T9-6x
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:19:54 -0500
+Date: Thu, 7 Mar 2019 16:19:44 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190307161944.GH32268@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
+	<20190307142609.GF2843@stefanha-x1.localdomain>
+	<20190307145120.GF32268@redhat.com>
+	<20190307110441-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] hw/block/virtio-blk: Clean req->dev
- repetitions
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190307110441-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
+ the concept description to docs/devel/qemu-multiprocess
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, jusual@mail.ru, Anastasiia Rusakova <arusakova917@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, elena.ufimtseva@oracle.com, john.g.johnson@oracle.com, sstabellini@kernel.org, jag.raman@oracle.com, konrad.wilk@oracle.com, qemu-devel@nongnu.org, ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com
 
-From: Anastasiia Rusakova <arusakova917@gmail.com>
+On Thu, Mar 07, 2019 at 11:05:36AM -0500, Michael S. Tsirkin wrote:
+> On Thu, Mar 07, 2019 at 02:51:20PM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
+> > The broadening of vhost-user support is useful with that in much the
+> > same way I imagine.
+>=20
+> vhost user has more of an impact but is also a bigger maintainance
+> burden as clients are packaged, can be restarted etc individually.
 
-Some functions sometimes uses req->dev even though a local variable
-VirtIOBlock* s = req->dev has already been defined.
-Updated places to use s everywhere in the file.
+It feels like we're having/accepted that cost already though since
+vhostuser exists today & has been expanding to cover more backends.
 
-Signed-off-by: Anastasiia Rusakova <arusakova917@gmail.com>
----
- hw/block/virtio-blk.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 0cc3c590b9..06e57a4d39 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -127,7 +127,7 @@ static void virtio_blk_rw_complete(void *opaque, int ret)
-         }
- 
-         if (ret) {
--            int p = virtio_ldl_p(VIRTIO_DEVICE(req->dev), &req->out.type);
-+            int p = virtio_ldl_p(VIRTIO_DEVICE(s), &req->out.type);
-             bool is_read = !(p & VIRTIO_BLK_T_OUT);
-             /* Note that memory may be dirtied on read failure.  If the
-              * virtio request is not completed here, as is the case for
-@@ -143,7 +143,7 @@ static void virtio_blk_rw_complete(void *opaque, int ret)
-         }
- 
-         virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
--        block_acct_done(blk_get_stats(req->dev->blk), &req->acct);
-+        block_acct_done(blk_get_stats(s->blk), &req->acct);
-         virtio_blk_free_request(req);
-     }
-     aio_context_release(blk_get_aio_context(s->conf.conf.blk));
-@@ -260,9 +260,9 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq *req)
- {
-     int status = VIRTIO_BLK_S_OK;
-     struct virtio_scsi_inhdr *scsi = NULL;
--    VirtIODevice *vdev = VIRTIO_DEVICE(req->dev);
--    VirtQueueElement *elem = &req->elem;
-     VirtIOBlock *blk = req->dev;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(blk);
-+    VirtQueueElement *elem = &req->elem;
- 
- #ifdef __linux__
-     int i;
-@@ -492,16 +492,18 @@ static void virtio_blk_submit_multireq(BlockBackend *blk, MultiReqBuffer *mrb)
- 
- static void virtio_blk_handle_flush(VirtIOBlockReq *req, MultiReqBuffer *mrb)
- {
--    block_acct_start(blk_get_stats(req->dev->blk), &req->acct, 0,
-+    VirtIOBlock *s = req->dev;
-+
-+    block_acct_start(blk_get_stats(s->blk), &req->acct, 0,
-                      BLOCK_ACCT_FLUSH);
- 
-     /*
-      * Make sure all outstanding writes are posted to the backing device.
-      */
-     if (mrb->is_write && mrb->num_reqs > 0) {
--        virtio_blk_submit_multireq(req->dev->blk, mrb);
-+        virtio_blk_submit_multireq(s->blk, mrb);
-     }
--    blk_aio_flush(req->dev->blk, virtio_blk_flush_complete, req);
-+    blk_aio_flush(s->blk, virtio_blk_flush_complete, req);
- }
- 
- static bool virtio_blk_sect_range_ok(VirtIOBlock *dev,
--- 
-2.20.1
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
