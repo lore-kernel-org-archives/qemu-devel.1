@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58902)
+Received: from eggs.gnu.org ([209.51.188.92]:58853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1wSC-0006OA-DB
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:09 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1wS8-0006Jg-Sw
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1wS8-0004fU-SZ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:06 -0500
-Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:40872)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1wRz-0004S8-VG
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:04:58 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37702)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1wS1-0004Qf-Jx
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:04:58 -0500
-Received: by mail-pf1-x435.google.com with SMTP id h1so11900042pfo.7
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:04:54 -0800 (PST)
+	id 1h1wRx-0004Lp-2p
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:04:54 -0500
+Received: by mail-pg1-x543.google.com with SMTP id q206so11741582pgq.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:04:47 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Mar 2019 09:04:27 -0800
-Message-Id: <20190307170440.3113-10-richard.henderson@linaro.org>
+Date: Thu,  7 Mar 2019 09:04:21 -0800
+Message-Id: <20190307170440.3113-4-richard.henderson@linaro.org>
 In-Reply-To: <20190307170440.3113-1-richard.henderson@linaro.org>
 References: <20190307170440.3113-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 09/22] target/arm: Implement the SUBP
- instruction
+Subject: [Qemu-devel] [PATCH v4 03/22] target/arm: Add MTE system registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +29,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This is TFSRE0_EL1, TFSR_EL1, TFSR_EL2, TFSR_EL3,
+RGSR_EL1, GCR_EL1, GMID_EL1, and PSTATE.TCO.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Fix extraction length.
+v3: Add GMID; add access_mte.
 ---
- target/arm/translate-a64.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ target/arm/cpu.h           |  3 ++
+ target/arm/internals.h     |  6 ++++
+ target/arm/helper.c        | 66 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-a64.c | 11 +++++++
+ 4 files changed, 86 insertions(+)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 0cf9eacebe..b9b33bc285 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -495,6 +495,9 @@ typedef struct CPUARMState {
+         uint64_t pmccfiltr_el0; /* Performance Monitor Filter Register */
+         uint64_t vpidr_el2; /* Virtualization Processor ID Register */
+         uint64_t vmpidr_el2; /* Virtualization Multiprocessor ID Register */
++        uint64_t tfsr_el[4]; /* tfsrel0_el1 is index 0.  */
++        uint64_t gcr_el1;
++        uint64_t rgsr_el1;
+     } cp15;
+ 
+     struct {
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 2922324f63..fbfa770c23 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -1002,4 +1002,10 @@ static inline bool allocation_tag_access_enabled(CPUARMState *env, int el,
+     return sctlr != 0;
+ }
+ 
++/*
++ * The log2 of the words in the tag block, for GMID_EL1.BS.
++ * The is the maximum, 256 bytes, which manipulates 64-bits of tags.
++ */
++#define GMID_EL1_BS  6
++
+ #endif
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index ab8006291b..7b30e1a1a9 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5732,6 +5732,69 @@ static const ARMCPRegInfo pauth_reginfo[] = {
+       .fieldoffset = offsetof(CPUARMState, apib_key.hi) },
+     REGINFO_SENTINEL
+ };
++
++static CPAccessResult access_mte(CPUARMState *env, const ARMCPRegInfo *ri,
++                                 bool isread)
++{
++    int el = arm_current_el(env);
++
++    if (el < 2 &&
++        arm_feature(env, ARM_FEATURE_EL2) &&
++        !(arm_hcr_el2_eff(env) & HCR_ATA)) {
++        return CP_ACCESS_TRAP_EL2;
++    }
++    if (el < 3 &&
++        arm_feature(env, ARM_FEATURE_EL3) &&
++        !(env->cp15.scr_el3 & SCR_ATA)) {
++        return CP_ACCESS_TRAP_EL3;
++    }
++    return CP_ACCESS_OK;
++}
++
++static uint64_t tco_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    return env->pstate & PSTATE_TCO;
++}
++
++static void tco_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t val)
++{
++    env->pstate = (env->pstate & ~PSTATE_TCO) | (val & PSTATE_TCO);
++}
++
++static const ARMCPRegInfo mte_reginfo[] = {
++    { .name = "TFSRE0_EL1", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 0, .crn = 6, .crm = 6, .opc2 = 1,
++      .access = PL1_RW, .accessfn = access_mte,
++      .fieldoffset = offsetof(CPUARMState, cp15.tfsr_el[0]) },
++    { .name = "TFSR_EL1", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 0, .crn = 6, .crm = 5, .opc2 = 0,
++      .access = PL1_RW, .accessfn = access_mte,
++      .fieldoffset = offsetof(CPUARMState, cp15.tfsr_el[1]) },
++    { .name = "TFSR_EL2", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 4, .crn = 6, .crm = 5, .opc2 = 0,
++      .access = PL2_RW, .accessfn = access_mte,
++      .fieldoffset = offsetof(CPUARMState, cp15.tfsr_el[2]) },
++    { .name = "TFSR_EL3", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 6, .crn = 6, .crm = 6, .opc2 = 0,
++      .access = PL3_RW,
++      .fieldoffset = offsetof(CPUARMState, cp15.tfsr_el[3]) },
++    { .name = "RGSR_EL1", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 5,
++      .access = PL1_RW, .accessfn = access_mte,
++      .fieldoffset = offsetof(CPUARMState, cp15.rgsr_el1) },
++    { .name = "GCR_EL1", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 6,
++      .access = PL1_RW, .accessfn = access_mte,
++      .fieldoffset = offsetof(CPUARMState, cp15.gcr_el1) },
++    { .name = "TCO", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 3, .crn = 4, .crm = 2, .opc2 = 7,
++      .type = ARM_CP_NO_RAW,
++      .access = PL0_RW, .readfn = tco_read, .writefn = tco_write },
++    { .name = "GMID_EL1", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 1, .crn = 0, .crm = 0, .opc2 = 4,
++      .access = PL1_R, .type = ARM_CP_CONST, .resetvalue = GMID_EL1_BS },
++    REGINFO_SENTINEL
++};
+ #endif
+ 
+ static CPAccessResult access_predinv(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -6676,6 +6739,9 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+     if (cpu_isar_feature(aa64_pauth, cpu)) {
+         define_arm_cp_regs(cpu, pauth_reginfo);
+     }
++    if (cpu_isar_feature(aa64_mte_insn_reg, cpu)) {
++        define_arm_cp_regs(cpu, mte_reginfo);
++    }
+ #endif
+ 
+     /*
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e756985982..b27f5c697a 100644
+index d971b57037..128b7f2e32 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5290,19 +5290,39 @@ static void handle_crc32(DisasContext *s,
-  */
- static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
- {
--    unsigned int sf, rm, opcode, rn, rd;
-+    unsigned int sf, rm, opcode, rn, rd, setflag;
-     sf = extract32(insn, 31, 1);
-+    setflag = extract32(insn, 29, 1);
-     rm = extract32(insn, 16, 5);
-     opcode = extract32(insn, 10, 6);
-     rn = extract32(insn, 5, 5);
-     rd = extract32(insn, 0, 5);
+@@ -1746,6 +1746,17 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+         s->base.is_jmp = DISAS_UPDATE;
+         break;
  
--    if (extract32(insn, 29, 1)) {
-+    if (setflag && opcode != 0) {
-         unallocated_encoding(s);
-         return;
-     }
- 
-     switch (opcode) {
-+    case 0: /* SUBP(S) */
-+        if (sf == 0 || !dc_isar_feature(aa64_mte_insn_reg, s)) {
++    case 0x1c: /* TCO */
++        if (!dc_isar_feature(aa64_mte_insn_reg, s)) {
 +            goto do_unallocated;
++        }
++        if (crm & 1) {
++            set_pstate_bits(PSTATE_TCO);
 +        } else {
-+            TCGv_i64 tcg_n, tcg_m, tcg_d;
-+
-+            tcg_n = read_cpu_reg_sp(s, rn, true);
-+            tcg_m = read_cpu_reg_sp(s, rm, true);
-+            tcg_gen_sextract_i64(tcg_n, tcg_n, 0, 56);
-+            tcg_gen_sextract_i64(tcg_m, tcg_m, 0, 56);
-+            tcg_d = cpu_reg(s, rd);
-+
-+            if (setflag) {
-+                gen_sub_CC(true, tcg_d, tcg_n, tcg_m);
-+            } else {
-+                tcg_gen_sub_i64(tcg_d, tcg_n, tcg_m);
-+            }
++            clear_pstate_bits(PSTATE_TCO);
 +        }
 +        break;
-     case 2: /* UDIV */
-         handle_div(s, false, sf, rm, rn, rd);
-         break;
++
+     default:
+     do_unallocated:
+         unallocated_encoding(s);
 -- 
 2.17.2
