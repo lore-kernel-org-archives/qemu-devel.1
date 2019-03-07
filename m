@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54765)
+Received: from eggs.gnu.org ([209.51.188.92]:56540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1xnD-0003hi-KM
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:30:56 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1xsH-0007wj-55
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:36:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1xnC-0000t5-UY
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:30:55 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39721)
+	(envelope-from <peter.maydell@linaro.org>) id 1h1xsC-0003u9-KJ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:36:06 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36951)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1xnC-0000sK-Nh
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:30:54 -0500
-Received: by mail-pf1-x442.google.com with SMTP id i20so12081762pfo.6
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 10:30:54 -0800 (PST)
-References: <20190307180520.13868-1-mark.cave-ayland@ilande.co.uk>
-	<20190307180520.13868-8-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2854ee32-3fff-2dce-6af0-b07d1f86ac5b@linaro.org>
-Date: Thu, 7 Mar 2019 10:30:50 -0800
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h1xsA-0003pa-Ur
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:36:03 -0500
+Received: by mail-ot1-x343.google.com with SMTP id b3so15027245otp.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 10:35:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190307180520.13868-8-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] target/ppc: introduce
- vsr64_offset() to simplify get_cpu_vsr{l, h}() and set_cpu_vsr{l, h}()
+References: <1551968191-10821-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1551968191-10821-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Mar 2019 18:35:47 +0000
+Message-ID: <CAFEAcA9=eKhnL40T8nZuktoVGabq8MoGoYLiRO1fjg9dsNXLXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 3/7/19 10:05 AM, Mark Cave-Ayland wrote:
-> Now that all VSX registers are stored in host endian order, there is no need
-> to go via different accessors depending upon the register number. Instead we
-> introduce vsr64_offset() and use it directly from within get_cpu_vsr{l,h}() and
-> set_cpu_vsr{l,h}().
-> 
-> This also allows us to rewrite avr64_offset() and fpr_offset() in terms of the
-> new vsr64_offset() function to more clearly express the relationship between the
-> VSX, FPR and VMX registers, and also remove vsrl_offset() which is no longer
-> required.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  target/ppc/cpu.h                    | 20 ++++++++++----------
->  target/ppc/translate/vsx-impl.inc.c | 34 ++++------------------------------
->  2 files changed, 14 insertions(+), 40 deletions(-)
+On Thu, 7 Mar 2019 at 14:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit 1ba530a4ecba6015d52d8f392fd327cfa07bc3=
+7a:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190304' into =
+staging (2019-03-04 13:38:54 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream-kconfig
+>
+> for you to fetch changes up to 1f749c0626f6f79cfc27fc3e6b910a6df03d3488:
+>
+>   kconfig: add documentation (2019-03-07 15:06:29 +0100)
+>
+> ----------------------------------------------------------------
+> Initial Kconfig work, excluding ARM and MIPS
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This passes my build tests, but something in your workflow
+has mangled a Cc: line in one of the commit messages.
+In commit 11db78e98317e1a0c the accented character in
+Herv=C3=A9 Poussineau's name has been mangled and isn't correct
+UTF-8. Could you fix that up and resend, please?
 
+PS: since the sphinx patchset just got in ahead of
+yours, Sphinx now warns:
+docs/devel/kconfig.rst: WARNING: document isn't included in any toctree
 
-r~
+I'll send a followup patch which adds 'kconfig' to
+docs/devel/index.rst once this is merged.
+
+thanks
+-- PMM
