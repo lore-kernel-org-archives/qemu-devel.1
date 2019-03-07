@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38370)
+Received: from eggs.gnu.org ([209.51.188.92]:39931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h1yG9-0005Vn-CN
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:00:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1h1yKH-0000Td-Fl
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:05:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h1yG8-0005ao-99
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:00:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47168)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h1yG8-0005Zj-2b
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:00:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h1yG5-0002hI-Vt
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 19:00:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E62CF2E80D0
-	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 19:00:45 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1h1yKG-0008RD-Lt
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:05:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h1yKG-0008Pp-A7
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 14:05:04 -0500
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<87r2bigarf.fsf@zen.linaroharston>
+	<a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
+	<CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
+	<62408d6c-5a61-ffb2-f810-6ef36703b277@redhat.com>
+	<CAMxuvaxeAdZKk_CQOyqCJdd_1kVZEBPCm0LRoP2u9aijOtbDxg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c0e04289-3373-3a56-b367-0d6033c52789@redhat.com>
+Date: Thu, 7 Mar 2019 13:04:59 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Mar 2019 18:51:14 -0000
-From: "Heitor R. Alves de Siqueira" <1818880@bugs.launchpad.net>
-Reply-To: Bug 1818880 <1818880@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155189278546.17656.7588906080638087853.malonedeb@gac.canonical.com>
-Message-Id: <155198467614.9219.16784935742679162808.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818880] Re: Deadlock when detaching network
- interface
+In-Reply-To: <CAMxuvaxeAdZKk_CQOyqCJdd_1kVZEBPCm0LRoP2u9aijOtbDxg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VKoNvbatrLGYSF9qj1erpbPcpHgabHO1q"
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,94 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-** Changed in: qemu (Ubuntu Disco)
-     Assignee: Heitor R. Alves de Siqueira (halves) =3D> (unassigned)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VKoNvbatrLGYSF9qj1erpbPcpHgabHO1q
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Message-ID: <c0e04289-3373-3a56-b367-0d6033c52789@redhat.com>
+Subject: Re: [Qemu-devel] converting build system to Meson?
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+ <87r2bigarf.fsf@zen.linaroharston>
+ <a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
+ <CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
+ <62408d6c-5a61-ffb2-f810-6ef36703b277@redhat.com>
+ <CAMxuvaxeAdZKk_CQOyqCJdd_1kVZEBPCm0LRoP2u9aijOtbDxg@mail.gmail.com>
+In-Reply-To: <CAMxuvaxeAdZKk_CQOyqCJdd_1kVZEBPCm0LRoP2u9aijOtbDxg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu (Ubuntu Cosmic)
-     Assignee: Heitor R. Alves de Siqueira (halves) =3D> (unassigned)
+On 3/7/19 12:17 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Thu, Mar 7, 2019 at 7:13 PM Paolo Bonzini <pbonzini@redhat.com> wrot=
+e:
+>>
+>> On 07/03/19 14:09, Peter Maydell wrote:
+>>> On Thu, 7 Mar 2019 at 12:56, Paolo Bonzini <pbonzini@redhat.com> wrot=
+e:
+>>>> In any case, this wouldn't change; as you suggest below, configure c=
+ould
+>>>> remain as a front-end (well, in-srcdir builds are not supported by
+>>>> Meson, so "../configure && ninja" perhaps).
+>>>
+>>> As an aside, it might be a nice idea to drop the in-srcdir
+>>> build altogether for QEMU anyway -- it's not really a very
+>>> good idea and it means our build system has to cope with two
+>>> different ways of working to no particularly useful end.
+>>
+>> I was actually going to propose that, but I was afraid of throwing two=
 
-** Changed in: qemu (Ubuntu Bionic)
-     Assignee: Heitor R. Alves de Siqueira (halves) =3D> (unassigned)
+>> bombs in the same day. :)
+>=20
+> As someone who has also been annoyed having to support in-tree and
+> out-of-tree, I support that move. I used to be a pretty happy use of
+> in-tree builds, but out-of-tree his generally equally convenient.
+>=20
+> Who is volunteering to do patches to deprecate the support? warning in
+> 4.0, and error in 4.1?
 
--- =
+How you build only affects developers, so I don't see this as needing to
+go through the usual qemu-deprecated.texi rules - we just get enough
+developers to agree to it, then have a flag day (and hopefully a sane
+enough patch to make an incremental in-tree build complain loudly, but
+with clear instructions that can be copied-and-pasted to turn into a
+clean VPATH build).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818880
+I don't mind a switch to mandatory out-of-tree builds (I like the
+convenience of in-tree for quick hacks, but VPATH is infinitely more
+flexible when testing multiple build configurations in parallel, and
+I've worked on other projects with mandatory VPATH builds without seeing
+too many complaints there).
 
-Title:
-  Deadlock when detaching network interface
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Status in Ubuntu Cloud Archive:
-  Confirmed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Confirmed
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
 
-Bug description:
-  [Impact]
-  Qemu guests hang indefinitely
+--VKoNvbatrLGYSF9qj1erpbPcpHgabHO1q
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  [Description]
-  When running a Qemu guest with VirtIO network interfaces, detaching an in=
-terface that's currently being used can result in a deadlock. The guest ins=
-tance will hang and become unresponsive to commands, and the only option is=
- to kill -9 the instance.
-  The reason for this is a dealock between a monitor and an RCU thread, whi=
-ch will fight over the BQL (qemu_global_mutex) and the critical RCU section=
- locks. The monitor thread will acquire the BQL for detaching the network i=
-nterface, and fire up a helper thread to deal with detaching the network ad=
-apter. That new thread needs to wait on the RCU thread to complete the dele=
-tion, but the RCU thread wants the BQL to commit its transactions.
-  This bug is already fixed upstream (73c6e4013b4c rcu: completely disable =
-pthread_atfork callbacks as soon as possible) and included for other series=
- (see below), so we don't need to backport it to Bionic onwards.
+-----BEGIN PGP SIGNATURE-----
 
-  Upstream commit:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D73c6e4013b4c
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBa1sACgkQp6FrSiUn
+Q2oytQf6A4PjLkjM1yfpLIUR1TxrJiAjhHO/tJeDa78zRAOC73ay/KsoydRwkcov
+tjLJXQVDPUOkFe1DkXTf8HE+/0whKqbhuqEB0QJGPH99WyzS05ukIdfzhiESXBCK
+PdMXBgKBOQOU1MaQMqqUBRg4Dw5/WB4jhI0EfKuDqlqr+qB7EmEvgvWZmxrf+mQf
+ga677RC0QsnHpym3Glx9PWmC4YMTT+as/i0nt7HYJRt7HEeEVd1fWxC0nTiqpy6f
+e04OvNOH760cyeZYd1DFefsc4HaJcFRbHMo0/+3G3GCy9xOgeXAtt0kXoNURQm56
+YQoybTx5BTecYviKwCm5b8kmczPC1g==
+=A4dj
+-----END PGP SIGNATURE-----
 
-  $ git describe --contains 73c6e4013b4c
-  v2.10.0-rc2~1^2~8
-
-  $ rmadison qemu
-  =3D=3D=3D> qemu | 1:2.5+dfsg-5ubuntu10.34 | xenial-updates/universe   | a=
-md64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.11+dfsg-1ubuntu7    | bionic/uni=
-verse           | amd64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/uni=
-verse           | amd64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:3.1+dfsg-2ubuntu2     | disco/univ=
-erse            | amd64, ...
-
-  [Test Case]
-  Being a racing condition, this is a tricky bug to reproduce consistently.=
- We've had reports of users running into this with OpenStack deployments an=
-d Windows Server guests, and the scenario is usually like this:
-  1) Deploy a 16vCPU Windows Server 2012 R2 guest with a virtio network int=
-erface
-  2) Stress the network interface with e.g. Windows HLK test suite or simil=
-ar
-  3) Repeatedly attach/detach the network adapter that's in use
-  It usually takes more than ~4000 attach/detach cycles to trigger the bug.
-
-  [Regression Potential]
-  Regressions for this might arise from the fact that the fix changes RCU l=
-ock code. Since this patch has been upstream and in other series for a whil=
-e, it's unlikely that it would regressions in RCU code specifically. Other =
-code that makes use of the RCU locks (MMIO and some monitor events) will be=
- thoroughly tested for any regressions with use-case scenarios and scripted=
- runs.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1818880/+subscriptions
+--VKoNvbatrLGYSF9qj1erpbPcpHgabHO1q--
