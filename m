@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60421)
+Received: from eggs.gnu.org ([209.51.188.92]:37177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1zee-00045K-Sq
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:30:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1h203T-0000EE-8J
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:55:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1zee-0005hb-8D
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:30:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h1zed-0005gm-VS
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:30:12 -0500
-References: <1551695576-13205-1-git-send-email-thuth@redhat.com>
-	<a0b53ff0-1ded-2a6e-aa4d-b1f4fcc407c1@redhat.com>
-	<CAPyFy2AnxWBXjUOWRy7_YpoSFadQBAXRooM+t4g6t6XOaF1XgA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <84cc4186-86a8-2152-11ab-bd4001b05ee7@redhat.com>
-Date: Thu, 7 Mar 2019 21:30:06 +0100
+	(envelope-from <bounces@canonical.com>) id 1h203R-0003lL-PB
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:55:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h203R-0003k2-HD
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:55:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h203Q-0007UE-1V
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 20:55:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0A5142E80C9
+	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 20:55:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAPyFy2AnxWBXjUOWRy7_YpoSFadQBAXRooM+t4g6t6XOaF1XgA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] cirrus.yml: Add macOS continuous
- integration task
+Date: Thu, 07 Mar 2019 20:44:41 -0000
+From: Dan Streetman <dan.streetman@canonical.com>
+Reply-To: Bug 1818880 <1818880@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155189278546.17656.7588906080638087853.malonedeb@gac.canonical.com>
+Message-Id: <155199148294.9171.4112681710924811082.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818880] Re: Deadlock when detaching network
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +37,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Maste <emaste@freebsd.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Li-Wen Hsu <lwhsu@freebsd.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 07/03/2019 21.26, Ed Maste wrote:
-> On Mon, 4 Mar 2019 at 07:11, Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
-.com> wrote:
->>
->> On 3/4/19 11:32 AM, Thomas Huth wrote:
->>> cirrus-ci.com also has the possibility to run CI tasks on macOS.
->>> Since most of the QEMU developers do not have access to macOS yet,
->>> let's add a CI pipeline for this operating system here, too.
->>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Acked-by: Ed Maste <emaste@freebsd.org>
+** Tags added: sts-sponsor-ddstreet
 
-Thanks! I can take this patch through my qtest tree.
+-- =
 
- Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818880
+
+Title:
+  Deadlock when detaching network interface
+
+Status in Ubuntu Cloud Archive:
+  Confirmed
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Confirmed
+Status in qemu source package in Bionic:
+  Fix Released
+Status in qemu source package in Cosmic:
+  Fix Released
+Status in qemu source package in Disco:
+  Fix Released
+
+Bug description:
+  [Impact]
+  Qemu guests hang indefinitely
+
+  [Description]
+  When running a Qemu guest with VirtIO network interfaces, detaching an in=
+terface that's currently being used can result in a deadlock. The guest ins=
+tance will hang and become unresponsive to commands, and the only option is=
+ to kill -9 the instance.
+  The reason for this is a dealock between a monitor and an RCU thread, whi=
+ch will fight over the BQL (qemu_global_mutex) and the critical RCU section=
+ locks. The monitor thread will acquire the BQL for detaching the network i=
+nterface, and fire up a helper thread to deal with detaching the network ad=
+apter. That new thread needs to wait on the RCU thread to complete the dele=
+tion, but the RCU thread wants the BQL to commit its transactions.
+  This bug is already fixed upstream (73c6e4013b4c rcu: completely disable =
+pthread_atfork callbacks as soon as possible) and included for other series=
+ (see below), so we don't need to backport it to Bionic onwards.
+
+  Upstream commit:
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D73c6e4013b4c
+
+  $ git describe --contains 73c6e4013b4c
+  v2.10.0-rc2~1^2~8
+
+  $ rmadison qemu
+  =3D=3D=3D> qemu | 1:2.5+dfsg-5ubuntu10.34 | xenial-updates/universe   | a=
+md64, ...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.11+dfsg-1ubuntu7    | bionic/uni=
+verse           | amd64, ...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/uni=
+verse           | amd64, ...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:3.1+dfsg-2ubuntu2     | disco/univ=
+erse            | amd64, ...
+
+  [Test Case]
+  Being a racing condition, this is a tricky bug to reproduce consistently.=
+ We've had reports of users running into this with OpenStack deployments an=
+d Windows Server guests, and the scenario is usually like this:
+  1) Deploy a 16vCPU Windows Server 2012 R2 guest with a virtio network int=
+erface
+  2) Stress the network interface with e.g. Windows HLK test suite or simil=
+ar
+  3) Repeatedly attach/detach the network adapter that's in use
+  It usually takes more than ~4000 attach/detach cycles to trigger the bug.
+
+  [Regression Potential]
+  Regressions for this might arise from the fact that the fix changes RCU l=
+ock code. Since this patch has been upstream and in other series for a whil=
+e, it's unlikely that it would regressions in RCU code specifically. Other =
+code that makes use of the RCU locks (MMIO and some monitor events) will be=
+ thoroughly tested for any regressions with use-case scenarios and scripted=
+ runs.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1818880/+subscriptions
