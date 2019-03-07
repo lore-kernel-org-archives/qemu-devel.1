@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42604)
+Received: from eggs.gnu.org ([209.51.188.92]:42917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1rz1-0006I4-LV
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:18:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1h1s0i-0007kL-1e
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:20:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h1rz0-0001NU-T1
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:18:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46782)
+	(envelope-from <berrange@redhat.com>) id 1h1s0c-0001sR-7R
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:20:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55761)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1rz0-0001NB-ND
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:18:42 -0500
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu,  7 Mar 2019 12:18:37 +0000
-Message-Id: <20190307121838.6345-2-berrange@redhat.com>
-In-Reply-To: <20190307121838.6345-1-berrange@redhat.com>
-References: <20190307121838.6345-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1s0c-0001s6-0Z
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:20:22 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4FB53C4EC4
+	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 12:20:21 +0000 (UTC)
+Date: Thu, 7 Mar 2019 12:20:18 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190307122018.GT32268@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190227145324.26188-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190227145324.26188-1-berrange@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/2] docs: clarify that spec-ctrl is only
- needed for Spectre v2
+Subject: Re: [Qemu-devel] [PATCH 0/1] migration: support for authorization
+ control on TLS connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +36,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-The docs currently say that the spec-ctrl feature is needed for both
-Spectre variants, but it is only used to address Spectre v2. Also
-remove the note about retpolines. The guest OS is usually treated
-as a blackbox from host mgmt pov, so it won't have knowledge about
-use of retpolines and thus should unconditionally expose spec-ctrl,
-allowing the guest to decide whether to use it or not.
+ping - soft freeze is less than a week away & I'd like to see this
+merged for this release.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- docs/qemu-cpu-models.texi | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+On Wed, Feb 27, 2019 at 02:53:23PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> This series provides the migration part of the authorization control se=
+ries
+> previously posted as:
+>=20
+>   v1: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04482.ht=
+ml
+>   v2: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05727.ht=
+ml
+>   v3: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01639.ht=
+ml
+>   v4: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04319.ht=
+ml
+>=20
+> The core authz framework is now merged & this patch has had
+> positive review. Thus this migration part is ready to go into the
+> migration maintainer's tree, should the maintainer consider them
+> acceptable.
+>=20
+> Daniel P. Berrang=C3=A9 (1):
+>   migration: add support for a "tls-authz" migration parameter
+>=20
+>  hmp.c                 |  9 +++++++++
+>  migration/migration.c |  8 ++++++++
+>  migration/tls.c       |  2 +-
+>  qapi/migration.json   | 14 +++++++++++++-
+>  4 files changed, 31 insertions(+), 2 deletions(-)
+>=20
+> --=20
+> 2.20.1
+>=20
 
-diff --git a/docs/qemu-cpu-models.texi b/docs/qemu-cpu-models.texi
-index 1b72584161..0ce528806d 100644
---- a/docs/qemu-cpu-models.texi
-+++ b/docs/qemu-cpu-models.texi
-@@ -158,8 +158,7 @@ support this feature.
-=20
- @item @code{spec-ctrl}
-=20
--Required to enable the Spectre (CVE-2017-5753 and CVE-2017-5715) fix,
--in cases where retpolines are not sufficient.
-+Required to enable the Spectre v2 (CVE-2017-5715) fix.
-=20
- Included by default in Intel CPU models with -IBRS suffix.
-=20
-@@ -249,8 +248,7 @@ included if using "Host passthrough" or "Host model".
-=20
- @item @code{ibpb}
-=20
--Required to enable the Spectre (CVE-2017-5753 and CVE-2017-5715) fix,
--in cases where retpolines are not sufficient.
-+Required to enable the Spectre v2 (CVE-2017-5715) fix.
-=20
- Included by default in AMD CPU models with -IBPB suffix.
-=20
+Regards,
+Daniel
 --=20
-2.20.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
