@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50534)
+Received: from eggs.gnu.org ([209.51.188.92]:50620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1sZ8-0000nA-Tc
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:56:04 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1sZb-000146-OH
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:56:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1sZ7-0004mD-A2
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:56:02 -0500
-Resent-Message-Id: <E1h1sZ7-0004mD-A2@eggs.gnu.org>
-Message-ID: <155196333089.8146.3533986695507826325@6acff2cf482b>
-In-Reply-To: <20190307121539.12842-1-david@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1sZa-0005MI-Qn
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:56:31 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:39770)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1h1sZa-0005Kr-H6
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:56:30 -0500
+Received: by mail-wr1-x435.google.com with SMTP id l12so851626wrp.6
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 04:56:30 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<87r2bigarf.fsf@zen.linaroharston>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
+Date: Thu, 7 Mar 2019 13:56:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 04:55:32 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/32] s390x/tcg: Vector Instruction
- Support Part 1
+In-Reply-To: <87r2bigarf.fsf@zen.linaroharston>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,134 +32,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzEyMTUzOS4xMjg0
-Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzEyMTUzOS4xMjg0Mi0x
-LWRhdmlkQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8zMl0g
-czM5MHgvdGNnOiBWZWN0b3IgSW5zdHJ1Y3Rpb24gU3VwcG9ydCBQYXJ0IDEKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDcxMjE1Mzku
-MTI4NDItMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDcxMjE1MzkuMTI4NDIt
-MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTgwNTEz
-YjQ5OSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKNjBkMDU0ZDE3ZSBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKODc2OGVmZTIzNCBzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKMmMxYTNhYTliYSBzMzkweC90
-Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVAoyYTFjM2E0NTlkIHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQo2MTI1ODE4MDQ0IHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
-ZV93cml0ZV9hY2Nlc3MgaGVscGVyCjEyMjQyODg0YWYgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
-VE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdPUkQKMDQ0NjZmYjZjYyBzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgU0VMRUNUCjViOWZlZTI4NTUgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFNDQVRURVIgRUxFTUVOVApkNjdkODlhOTYxIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBS
-RVBMSUNBVEUgSU1NRURJQVRFCjM2N2FhNGE4MDQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
-IFJFUExJQ0FURQo3OWFkMjA5NjU5IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRF
-IERPVUJMRVdPUkQgSU1NRURJQVRFCjhiZjFhZTNmYWEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
-VE9SIFBFUk1VVEUKMjExYTIzMDEyMiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEFDSyAq
-CjIwY2VlMzE3YWYgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIE1FUkdFIChISUdIfExPVykK
-MjI0NzcxYTFjZCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBXSVRIIExFTkdUSAo0
-NzQ5ZWJiMjg4IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEZST00gR1JTIERJ
-U0pPSU5UCjBmZmY4NDcwMTMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRUxF
-TUVOVCBGUk9NIEdSCjM3YTkwOWQxNTEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQg
-VE8gQkxPQ0sgQk9VTkRBUlkKNzljOTE1NTMzYyBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
-TE9BRCBNVUxUSVBMRQoyNGMxZDE3ZGFiIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FE
-IExPR0lDQUwgRUxFTUVOVCBBTkQgWkVSTwo4NWI1MWQxMmM2IHMzOTB4L3RjZzogSW1wbGVtZW50
-IFZFQ1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVAo5ZjAyY2YwOWEzIHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJQVRFCjc1NTM2ZWRhYjEgczM5MHgvdGNn
-OiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVAo0ODQyOWNmNzQzIHMzOTB4L3RjZzogSW1w
-bGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNBVEUKMjM2OTY2MmI3NCBzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgTE9BRAo3OTAzNTZhYTZlIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RP
-UiBHRU5FUkFURSBNQVNLCmQyNjc2MzFhNDQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdF
-TkVSQVRFIEJZVEUgTUFTSwo5OTE1MmQwOTQyIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBH
-QVRIRVIgRUxFTUVOVApjZjc4OTA4MjE2IHMzOTB4L3RjZzogVXRpbGl0aWVzIGZvciB2ZWN0b3Ig
-aW5zdHJ1Y3Rpb24gaGVscGVycwpjYTg0MzNjYTUyIHMzOTB4L3RjZzogQ2hlY2sgdmVjdG9yIHJl
-Z2lzdGVyIGluc3RydWN0aW9ucyBhdCBjZW50cmFsIHBvaW50CjFmMjNmOWIxMzAgczM5MHgvdGNn
-OiBEZWZpbmUgdmVjdG9yIGluc3RydWN0aW9uIGZvcm1hdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvMzIgQ2hlY2tpbmcgY29tbWl0IDFmMjNmOWIxMzA2ZiAoczM5MHgvdGNnOiBEZWZpbmUgdmVj
-dG9yIGluc3RydWN0aW9uIGZvcm1hdHMpCjIvMzIgQ2hlY2tpbmcgY29tbWl0IGNhODQzM2NhNTJj
-YyAoczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIgaW5zdHJ1Y3Rpb25zIGF0IGNlbnRy
-YWwgcG9pbnQpCjMvMzIgQ2hlY2tpbmcgY29tbWl0IGNmNzg5MDgyMTZjMSAoczM5MHgvdGNnOiBV
-dGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVjdGlvbiBoZWxwZXJzKQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMxNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDEwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CjQvMzIgQ2hlY2tpbmcgY29tbWl0IDk5MTUyZDA5NDJjOSAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIEdBVEhFUiBFTEVNRU5UKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCA0LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMzIgQ2hlY2tpbmcgY29t
-bWl0IGQyNjc2MzFhNDRhYiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVSQVRFIEJZ
-VEUgTUFTSykKNi8zMiBDaGVja2luZyBjb21taXQgNzkwMzU2YWE2ZTNlIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgR0VORVJBVEUgTUFTSykKNy8zMiBDaGVja2luZyBjb21taXQgMjM2OTY2
-MmI3NDM3IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCkKOC8zMiBDaGVja2luZyBj
-b21taXQgNDg0MjljZjc0M2Y3IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBBTkQg
-UkVQTElDQVRFKQo5LzMyIENoZWNraW5nIGNvbW1pdCA3NTUzNmVkYWIxMWUgKHMzOTB4L3RjZzog
-SW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQpCjEwLzMyIENoZWNraW5nIGNvbW1pdCA5ZjAy
-Y2YwOWEzOTIgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJ
-QVRFKQoxMS8zMiBDaGVja2luZyBjb21taXQgODViNTFkMTJjNmM5IChzMzkweC90Y2c6IEltcGxl
-bWVudCBWRUNUT1IgTE9BRCBHUiBGUk9NIFZSIEVMRU1FTlQpCjEyLzMyIENoZWNraW5nIGNvbW1p
-dCAyNGMxZDE3ZGFiZjUgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIExPR0lDQUwg
-RUxFTUVOVCBBTkQgWkVSTykKMTMvMzIgQ2hlY2tpbmcgY29tbWl0IDc5YzkxNTUzM2MyZSAoczM5
-MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTVVMVElQTEUpCjE0LzMyIENoZWNraW5nIGNv
-bW1pdCAzN2E5MDlkMTUxODMgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFRPIEJM
-T0NLIEJPVU5EQVJZKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM5NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0
-LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzMyIENoZWNraW5nIGNvbW1pdCAwZmZm
-ODQ3MDEzNmUgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJP
-TSBHUikKMTYvMzIgQ2hlY2tpbmcgY29tbWl0IDQ3NDllYmIyODg0NCAoczM5MHgvdGNnOiBJbXBs
-ZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNv
-bW1pdCAyMjQ3NzFhMWNkNzEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEgg
-TEVOR1RIKQoxOC8zMiBDaGVja2luZyBjb21taXQgMjBjZWUzMTdhZmIxIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IDIx
-MWEyMzAxMjIzMiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
-ICcoJwojMTgzOiBGSUxFOiB0YXJnZXQvczM5MHgvdmVjX2hlbHBlci5jOjQ4OgordHlwZWRlZiB1
-aW50IyNUQklUUyMjX3QgKCp2cGsjI0JJVFMjI19mbikodWludCMjQklUUyMjX3QsIGludCAqKTsg
-ICAgICAgICAgICAgIFwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQ1IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDE5LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMC8zMiBDaGVj
-a2luZyBjb21taXQgOGJmMWFlM2ZhYTNiIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
-TVVURSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQv
-czM5MHgvaGVscGVyLmg6MTQ0OgorREVGX0hFTFBFUl9GTEFHU181KGd2ZWNfdnBlcm0sIFRDR19D
-QUxMX05PX1JXRywgdm9pZCwgcHRyLCBjcHRyLCBjcHRyLCBjcHRyLCBpMzIpCgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIwLzMyIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjIxLzMyIENoZWNraW5nIGNvbW1pdCA3OWFkMjA5NjU5NDUgKHMz
-OTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRFIERPVUJMRVdPUkQgSU1NRURJQVRFKQoy
-Mi8zMiBDaGVja2luZyBjb21taXQgMzY3YWE0YTgwNDViIChzMzkweC90Y2c6IEltcGxlbWVudCBW
-RUNUT1IgUkVQTElDQVRFKQoyMy8zMiBDaGVja2luZyBjb21taXQgZDY3ZDg5YTk2MWM4IChzMzkw
-eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElDQVRFIElNTUVESUFURSkKMjQvMzIgQ2hlY2tp
-bmcgY29tbWl0IDViOWZlZTI4NTU2ZCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNDQVRU
-RVIgRUxFTUVOVCkKMjUvMzIgQ2hlY2tpbmcgY29tbWl0IDA0NDY2ZmI2Y2M4NiAoczM5MHgvdGNn
-OiBJbXBsZW1lbnQgVkVDVE9SIFNFTEVDVCkKMjYvMzIgQ2hlY2tpbmcgY29tbWl0IDEyMjQyODg0
-YWYyOSAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdP
-UkQpCjI3LzMyIENoZWNraW5nIGNvbW1pdCA2MTI1ODE4MDQ0NTUgKHMzOTB4L3RjZzogUHJvdmlk
-ZSBwcm9iZV93cml0ZV9hY2Nlc3MgaGVscGVyKQoyOC8zMiBDaGVja2luZyBjb21taXQgMmExYzNh
-NDU5ZGEzIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5n
-IGNvbW1pdCAyYzFhM2FhOWJhMzYgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBF
-TEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQgODc2OGVmZTIzNDYwIChzMzkweC90Y2c6IElt
-cGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUpCjMxLzMyIENoZWNraW5nIGNvbW1pdCA2MGQw
-NTRkMTdlYmUgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkK
-MzIvMzIgQ2hlY2tpbmcgY29tbWl0IDU4MDUxM2I0OTliNyAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
-VkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDMwNzEyMTUzOS4xMjg0Mi0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGlu
-Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 07/03/19 12:54, Alex Bennée wrote:
+> 
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> Hi all,
+>>
+>> lately I have been thinking of converting the QEMU build system to
+>> Meson.  Meson is a relatively new build system that can replace
+>> Autotools or hand-written Makefiles such as QEMU; as a die-hard
+>> Autotools fan, I must say that Meson is by far better than anything else
+>> that has ever tried to replace Autotools, and actually has the potential
+>> to do so.
+> 
+> I'm confused by the description of QEMU's build system as Autotools.
+
+It's not Autotools.  However, *I* am an Autotools fan and therefore have
+always looked with suspicion at Autoconf replacements such as CMake or
+SCons.  Meson is the first one which not only has pleasantly surprised
+me, but also I would consider an improvement for QEMU (Autotools
+wouldn't be enough of an improvement to suggest it).
+
+> . We certainly don't currently have a M4 DSL that vomits out an
+> impenetrable sets of Makefiles from a set of templates.> The configure script is
+> certainly large but portable and readable POSIX shell.
+
+Technically, the M4 DSL spits out shell, not Makefiles (Autoconf can be
+used with hand-written Makefiles).  Still,
+
+    if test "$sdl_image" != "no" ; then
+        if $pkg_config SDL2_image --exists; then
+            if test "$static" = "yes"; then
+                sdl_image_libs=$($pkg_config SDL2_image --libs --static
+2>/dev/null)
+            else
+                sdl_image_libs=$($pkg_config SDL2_image --libs 2>/dev/null)
+            fi
+            sdl_image_cflags=$($pkg_config SDL2_image --cflags 2>/dev/null)
+            sdl_image=yes
+
+            sdl_cflags="$sdl_cflags $sdl_image_cflags"
+            sdl_libs="$sdl_libs $sdl_image_libs"
+        else
+            if test "$sdl_image" = "yes" ; then
+                feature_not_found "sdl_image" "Install SDL Image devel"
+            else
+                sdl_image=no
+            fi
+        fi
+    fi
+
+is a bit more verbose than
+
+    sdl_image = dependency('SDL2_image',
+                           static: get_option('static'),
+                           required: get_option('sdl_image')):
+
+We are used to cut-and-paste, it doesn't mean it's the best way to
+approach the problem.
+
+> Finally there is a lot to be said for following the de-facto standard
+> ./configure && make pattern.
+
+At the same time, we don't follow the standard fully, for example
+--extra-cflags or --cc are QEMU-isms, --srcdir is replaced by
+--search-path, and so on.
+
+In any case, this wouldn't change; as you suggest below, configure could
+remain as a front-end (well, in-srcdir builds are not supported by
+Meson, so "../configure && ninja" perhaps).
+
+>> - ease of distributing a full copy of Meson to support distros that ship
+>> an older version (no dependencies apart from Python 3.5).  At 40000
+>> lines of Python, Meson is relatively small.
+> 
+> I suspect needing Python 3.5 means it will take a while before all our
+> build hosts will have it.
+
+Which ones don't?  (This is the information I might be missing and why I
+have started the thread). RHEL7 has it in software collections, OS X in
+Homebrew.   RHEL6 is not a supported host anymore.
+
+> However I have watched many build-systems appear over the years, often
+> with wonderful stories and ambitions to avoid all the mistakes and cruft
+> of "legacy" make systems only for them to run into their own
+> complexities. As someone who builds lots of random software my heart
+> tends to sink when I come across a non-standard system because it
+> becomes another thing I have to learn just to build something. If we do
+> decide to shift I would strongly encourage the front end to still be
+> configure/make just to keep the initial learning curve for people
+> checking out the QEMU source code for the first time.
+
+I agree.  Again,
+
+Paolo
