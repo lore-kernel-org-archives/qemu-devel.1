@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38303)
+Received: from eggs.gnu.org ([209.51.188.92]:38313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h206N-0001eW-AX
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:51 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h206O-0001fU-Qo
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h206M-0006W0-Ho
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h206M-0006Vl-Bd
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:51 -0500
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:34302)
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:46697)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h206M-0006V4-8t
+	id 1h206L-0006UP-Tr
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 15:58:50 -0500
-Received: by mail-wm1-x330.google.com with SMTP id o10so7579683wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 12:58:50 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id i16so19058295wrs.13
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 12:58:49 -0800 (PST)
+Received: from donizetti.lan ([2001:b07:6468:f312:c1b:dbd7:15a6:4014])
+	by smtp.gmail.com with ESMTPSA id
+	h126sm5581833wmf.2.2019.03.07.12.58.45 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 07 Mar 2019 12:58:46 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 21:58:43 +0100
-Message-Id: <20190307205844.20236-2-pbonzini@redhat.com>
-In-Reply-To: <20190307205844.20236-1-pbonzini@redhat.com>
-References: <20190307205844.20236-1-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 21:58:42 +0100
+Message-Id: <20190307205844.20236-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 33/54] ppc: Express dependencies of the
- 'prep' and '40p' machines with kconfig
+Subject: [Qemu-devel] [PULL v3 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +35,271 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-From: Thomas Huth <thuth@redhat.com>
+The following changes since commit 6cb4f6db4f4367faa33da85b15f75bbbd2bed2a6:
 
-Select the required devices in hw/ppc/Kconfig instead, so that
-ppc-softmmu.mak only contains the user-selectable PREP switch.
-Plug-in devices like NE2000_ISA are pulled in automatically by the
-Kconfig build system now.
+  Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-request' into staging (2019-03-07 16:16:02 +0000)
 
-Cc: Hervé Poussineau <hpoussin@reactos.org>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- default-configs/ppc-softmmu.mak |  8 --------
- hw/ppc/Kconfig                  | 10 ++++++++++
- 2 files changed, 10 insertions(+), 8 deletions(-)
+are available in the Git repository at:
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 9ad307a025..066cec9845 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -55,11 +55,3 @@ CONFIG_MAC_NEWWORLD=y
- 
- # For PReP
- CONFIG_PREP=y
--CONFIG_PREP_PCI=y
--CONFIG_RS6000_MC=y
--CONFIG_I82374=y
--CONFIG_I82378=y
--CONFIG_PCKBD=y
--CONFIG_NE2000_ISA=y
--CONFIG_PC87312=y
--CONFIG_CS4231A=y
-diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-index 32559e8b6d..78b0d92eba 100644
---- a/hw/ppc/Kconfig
-+++ b/hw/ppc/Kconfig
-@@ -39,6 +39,16 @@ config SAM460EX
- 
- config PREP
-     bool
-+    imply PCI_DEVICES
-+    imply TEST_DEVICES
-+    select CS4231A
-+    select PREP_PCI
-+    select I82374
-+    select I82378
-+    select LSI_SCSI_PCI
-+    select M48T59
-+    select PC87312
-+    select RS6000_MC
- 
- config RS6000_MC
-     bool
+  git://github.com/bonzini/qemu.git tags/for-upstream-kconfig
+
+for you to fetch changes up to 576c3f2f16e7392e28cc9fe10d9a920d67d3645b:
+
+  kconfig: add documentation (2019-03-07 21:54:22 +0100)
+
+----------------------------------------------------------------
+Initial Kconfig work, excluding ARM and MIPS
+
+----------------------------------------------------------------
+
+v2->v3: fix UTF-8, adjust documentation patch for Sphinx
+
+Paolo Bonzini (42):
+      9pfs: remove unnecessary conditionals
+      xtensa: rename CONFIG_XTENSA_FPGA to CONFIG_XTENSA_XTFPGA
+      minikconfig: add parser skeleton
+      minikconfig: add AST
+      minikconfig: add semantic analysis
+      kconfig: introduce kconfig files
+      build: switch to Kconfig
+      minikconfig: implement allnoconfig and defconfig modes
+      kconfig: introduce CONFIG_TEST_DEVICES
+      ide: express dependencies with Kconfig
+      build: convert pci.mak to Kconfig
+      build: convert sound.mak to Kconfig
+      build: convert usb.mak to Kconfig
+      block: fix recursion in hw/block/dataplane
+      scsi: express dependencies with Kconfig
+      isa: express dependencies with kconfig
+      i386: express dependencies with Kconfig
+      i2c: express dependencies with Kconfig
+      ptimer: express dependencies with Kconfig
+      vfio: express vfio dependencies with Kconfig
+      tpm: express dependencies with Kconfig
+      isa: express SuperIO dependencies with Kconfig
+      ssi: express dependencies with kconfig
+      sd: express dependencies with kconfig
+      ipmi: express dependencies with kconfig
+      alpha-softmmu.mak: express dependencies with Kconfig
+      cris-softmmu.mak: express dependencies with Kconfig
+      hppa-softmmu.mak: express dependencies with Kconfig
+      lm32-softmmu.mak: express dependencies with Kconfig
+      m68k-softmmu.mak: express dependencies with Kconfig
+      microblaze-softmmu.mak: express dependencies with Kconfig
+      moxie-softmmu.mak: express dependencies with Kconfig
+      nios2-softmmu.mak: express dependencies with Kconfig
+      or1k-softmmu.mak: express dependencies with Kconfig
+      riscv-softmmu.mak: replace CONFIG_* with Kconfig "select" directives
+      sh4-softmmu.mak: express dependencies with Kconfig
+      sparc-softmmu.mak: express dependencies with Kconfig
+      sparc64-softmmu.mak: express dependencies with Kconfig
+      unicore32-softmmu.mak: express dependencies with Kconfig
+      xtensa-softmmu.mak: express dependencies with Kconfig
+      .travis.yml: test that no-default-device builds do not regress
+      kconfig: add documentation
+
+Thomas Huth (6):
+      ppc64: Express dependencies of 'pseries' and 'powernv' machines with kconfig
+      ppc: Express dependencies of the 'prep' and '40p' machines with kconfig
+      ppc: Express dependencies of the Mac machines with kconfig
+      ppc: Express dependencies of the Sam460EX machines with kconfig
+      ppc: Express dependencies of the embedded machines with kconfig
+      s390x: express dependencies with Kconfig
+
+Yang Zhong (6):
+      hw/display: make edid configurable
+      hw/pci/Makefile.objs: make pcie configurable
+      display: express dependencies with kconfig
+      hyperv: express dependencies with kconfig
+      virtio: express virtio dependencies with Kconfig
+      i386-softmmu.mak: remove all CONFIG_* except boards definitions
+
+ .travis.yml                             |   6 +
+ Kconfig.host                            |  33 ++
+ Makefile                                |  27 +-
+ Makefile.target                         |   7 +-
+ configure                               |  42 +-
+ default-configs/alpha-softmmu.mak       |  26 +-
+ default-configs/arm-softmmu.mak         |  18 +-
+ default-configs/cris-softmmu.mak        |   6 +-
+ default-configs/hppa-softmmu.mak        |  20 +-
+ default-configs/hyperv.mak              |   2 -
+ default-configs/i386-softmmu.mak        |  93 ++---
+ default-configs/lm32-softmmu.mak        |  12 +-
+ default-configs/m68k-softmmu.mak        |   4 +-
+ default-configs/microblaze-softmmu.mak  |  12 +-
+ default-configs/mips-softmmu-common.mak |  10 +-
+ default-configs/mips64el-softmmu.mak    |   2 +
+ default-configs/moxie-softmmu.mak       |   7 +-
+ default-configs/nios2-softmmu.mak       |   6 +-
+ default-configs/or1k-softmmu.mak        |   5 +-
+ default-configs/pci.mak                 |  51 ---
+ default-configs/ppc-softmmu.mak         |  60 ---
+ default-configs/ppc64-softmmu.mak       |  13 -
+ default-configs/riscv32-softmmu.mak     |  21 +-
+ default-configs/riscv64-softmmu.mak     |  22 +-
+ default-configs/s390x-softmmu.mak       |  23 +-
+ default-configs/sh4-softmmu.mak         |  28 +-
+ default-configs/sh4eb-softmmu.mak       |  22 +-
+ default-configs/sound.mak               |   4 -
+ default-configs/sparc-softmmu.mak       |  24 +-
+ default-configs/sparc64-softmmu.mak     |  25 +-
+ default-configs/unicore32-softmmu.mak   |   6 +-
+ default-configs/usb.mak                 |  11 -
+ default-configs/virtio.mak              |  15 -
+ default-configs/xtensa-softmmu.mak      |   8 +-
+ default-configs/xtensaeb-softmmu.mak    |   7 +-
+ docs/devel/build-system.txt             |   1 -
+ docs/devel/index.rst                    |   1 +
+ docs/devel/kconfig.rst                  | 306 ++++++++++++++
+ hw/9pfs/Kconfig                         |   4 +
+ hw/9pfs/Makefile.objs                   |   2 -
+ hw/Kconfig                              |  73 ++++
+ hw/Makefile.objs                        |   4 +-
+ hw/acpi/Kconfig                         |  29 ++
+ hw/adc/Kconfig                          |   2 +
+ hw/alpha/Kconfig                        |  12 +
+ hw/arm/Kconfig                          | 124 ++++++
+ hw/audio/Kconfig                        |  52 +++
+ hw/block/Kconfig                        |  39 ++
+ hw/block/Makefile.objs                  |   3 +-
+ hw/block/dataplane/Makefile.objs        |   2 +-
+ hw/bt/Kconfig                           |   2 +
+ hw/char/Kconfig                         |  42 ++
+ hw/core/Kconfig                         |  11 +
+ hw/cpu/Kconfig                          |   8 +
+ hw/cris/Kconfig                         |   9 +
+ hw/display/Kconfig                      | 108 +++++
+ hw/display/Makefile.objs                |   4 +-
+ hw/dma/Kconfig                          |  21 +
+ hw/gpio/Kconfig                         |   9 +
+ hw/hppa/Kconfig                         |  10 +
+ hw/hyperv/Kconfig                       |   8 +
+ hw/i2c/Kconfig                          |  27 ++
+ hw/i2c/Makefile.objs                    |   2 +-
+ hw/i386/Kconfig                         |  99 +++++
+ hw/i386/Makefile.objs                   |   5 +-
+ hw/ide/Kconfig                          |  54 +++
+ hw/input/Kconfig                        |  33 ++
+ hw/intc/Kconfig                         |  57 +++
+ hw/ipack/Kconfig                        |   4 +
+ hw/ipmi/Kconfig                         |  22 +
+ hw/isa/Kconfig                          |  53 +++
+ hw/lm32/Kconfig                         |  13 +
+ hw/m68k/Kconfig                         |   9 +
+ hw/mem/Kconfig                          |  11 +
+ hw/microblaze/Kconfig                   |  20 +
+ hw/mips/Kconfig                         |  21 +
+ hw/misc/Kconfig                         | 118 ++++++
+ hw/misc/macio/Kconfig                   |  11 +
+ hw/moxie/Kconfig                        |   3 +
+ hw/net/Kconfig                          | 125 ++++++
+ hw/nios2/Kconfig                        |   8 +
+ hw/nvram/Kconfig                        |   9 +
+ hw/openrisc/Kconfig                     |   5 +
+ hw/pci-bridge/Kconfig                   |  29 ++
+ hw/pci-host/Kconfig                     |  51 +++
+ hw/pci/Kconfig                          |   9 +
+ hw/pci/Makefile.objs                    |   9 +-
+ hw/pcmcia/Kconfig                       |   2 +
+ hw/ppc/Kconfig                          | 121 ++++++
+ hw/riscv/Kconfig                        |  33 ++
+ hw/s390x/Kconfig                        |  11 +
+ hw/s390x/Makefile.objs                  |   4 +-
+ hw/scsi/Kconfig                         |  54 +++
+ hw/scsi/Makefile.objs                   |   2 +-
+ hw/sd/Kconfig                           |  17 +
+ hw/sh4/Kconfig                          |  23 ++
+ hw/smbios/Kconfig                       |   2 +
+ hw/sparc/Kconfig                        |  26 ++
+ hw/sparc64/Kconfig                      |  19 +
+ hw/ssi/Kconfig                          |  18 +
+ hw/timer/Kconfig                        |  63 +++
+ hw/tpm/Kconfig                          |  24 ++
+ hw/tricore/Kconfig                      |   2 +
+ hw/unicore32/Kconfig                    |   5 +
+ hw/usb/Kconfig                          |  91 ++++
+ hw/usb/Makefile.objs                    |   2 +-
+ hw/vfio/Kconfig                         |  36 ++
+ hw/virtio/Kconfig                       |  31 ++
+ hw/virtio/Makefile.objs                 |   2 +
+ hw/watchdog/Kconfig                     |  16 +
+ hw/xtensa/Kconfig                       |   8 +
+ hw/xtensa/Makefile.objs                 |   2 +-
+ rules.mak                               |   2 +-
+ scripts/make_device_config.sh           |  30 --
+ scripts/minikconf.py                    | 708 ++++++++++++++++++++++++++++++++
+ 115 files changed, 3211 insertions(+), 514 deletions(-)
+ create mode 100644 Kconfig.host
+ delete mode 100644 default-configs/hyperv.mak
+ delete mode 100644 default-configs/pci.mak
+ delete mode 100644 default-configs/sound.mak
+ delete mode 100644 default-configs/usb.mak
+ delete mode 100644 default-configs/virtio.mak
+ create mode 100644 docs/devel/kconfig.rst
+ create mode 100644 hw/9pfs/Kconfig
+ create mode 100644 hw/Kconfig
+ create mode 100644 hw/acpi/Kconfig
+ create mode 100644 hw/adc/Kconfig
+ create mode 100644 hw/alpha/Kconfig
+ create mode 100644 hw/arm/Kconfig
+ create mode 100644 hw/audio/Kconfig
+ create mode 100644 hw/block/Kconfig
+ create mode 100644 hw/bt/Kconfig
+ create mode 100644 hw/char/Kconfig
+ create mode 100644 hw/core/Kconfig
+ create mode 100644 hw/cpu/Kconfig
+ create mode 100644 hw/cris/Kconfig
+ create mode 100644 hw/display/Kconfig
+ create mode 100644 hw/dma/Kconfig
+ create mode 100644 hw/gpio/Kconfig
+ create mode 100644 hw/hppa/Kconfig
+ create mode 100644 hw/hyperv/Kconfig
+ create mode 100644 hw/i2c/Kconfig
+ create mode 100644 hw/i386/Kconfig
+ create mode 100644 hw/ide/Kconfig
+ create mode 100644 hw/input/Kconfig
+ create mode 100644 hw/intc/Kconfig
+ create mode 100644 hw/ipack/Kconfig
+ create mode 100644 hw/ipmi/Kconfig
+ create mode 100644 hw/isa/Kconfig
+ create mode 100644 hw/lm32/Kconfig
+ create mode 100644 hw/m68k/Kconfig
+ create mode 100644 hw/mem/Kconfig
+ create mode 100644 hw/microblaze/Kconfig
+ create mode 100644 hw/mips/Kconfig
+ create mode 100644 hw/misc/Kconfig
+ create mode 100644 hw/misc/macio/Kconfig
+ create mode 100644 hw/moxie/Kconfig
+ create mode 100644 hw/net/Kconfig
+ create mode 100644 hw/nios2/Kconfig
+ create mode 100644 hw/nvram/Kconfig
+ create mode 100644 hw/openrisc/Kconfig
+ create mode 100644 hw/pci-bridge/Kconfig
+ create mode 100644 hw/pci-host/Kconfig
+ create mode 100644 hw/pci/Kconfig
+ create mode 100644 hw/pcmcia/Kconfig
+ create mode 100644 hw/ppc/Kconfig
+ create mode 100644 hw/riscv/Kconfig
+ create mode 100644 hw/s390x/Kconfig
+ create mode 100644 hw/scsi/Kconfig
+ create mode 100644 hw/sd/Kconfig
+ create mode 100644 hw/sh4/Kconfig
+ create mode 100644 hw/smbios/Kconfig
+ create mode 100644 hw/sparc/Kconfig
+ create mode 100644 hw/sparc64/Kconfig
+ create mode 100644 hw/ssi/Kconfig
+ create mode 100644 hw/timer/Kconfig
+ create mode 100644 hw/tpm/Kconfig
+ create mode 100644 hw/tricore/Kconfig
+ create mode 100644 hw/unicore32/Kconfig
+ create mode 100644 hw/usb/Kconfig
+ create mode 100644 hw/vfio/Kconfig
+ create mode 100644 hw/virtio/Kconfig
+ create mode 100644 hw/watchdog/Kconfig
+ create mode 100644 hw/xtensa/Kconfig
+ delete mode 100644 scripts/make_device_config.sh
+ create mode 100644 scripts/minikconf.py
 -- 
 2.20.1
