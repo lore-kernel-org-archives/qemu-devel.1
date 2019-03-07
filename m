@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34330)
+Received: from eggs.gnu.org ([209.51.188.92]:37293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1wcv-0007ft-A1
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:16:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1wkf-0005Jp-3L
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1wct-0006Ah-N7
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:16:12 -0500
-References: <20190307140312.28072-1-slp@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <93b48e49-87dd-9a05-49eb-09bbd7452154@redhat.com>
-Date: Thu, 7 Mar 2019 11:15:48 -0600
+	(envelope-from <armbru@redhat.com>) id 1h1wke-0003JX-Ca
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:13 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu,  7 Mar 2019 18:23:53 +0100
+Message-Id: <20190307172401.29451-5-armbru@redhat.com>
+In-Reply-To: <20190307172401.29451-1-armbru@redhat.com>
+References: <20190307172401.29451-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190307140312.28072-1-slp@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hQnnB8DA7vKKNhhIe4BfquVleXTOBBYd1"
-Subject: Re: [Qemu-devel] [PATCH] mirror: Confirm we're quiesced only if the
- job is paused or cancelled
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 04/12] sysbus: Fix latent bug with onboard
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hQnnB8DA7vKKNhhIe4BfquVleXTOBBYd1
-From: Eric Blake <eblake@redhat.com>
-To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- mreitz@redhat.com
-Message-ID: <93b48e49-87dd-9a05-49eb-09bbd7452154@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] mirror: Confirm we're quiesced only if the
- job is paused or cancelled
-References: <20190307140312.28072-1-slp@redhat.com>
-In-Reply-To: <20190307140312.28072-1-slp@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The first call of sysbus_get_default() creates the main system bus and
+stores it in QOM as "/machine/unattached/sysbus".  This must not
+happen before main() creates "/machine", or else container_get() would
+"helpfully" create it as "container" object, and the real creation of
+"/machine" would later abort with "attempt to add duplicate property
+'machine' to object (type 'container')".  Has been that way ever since
+we wired up busses in QOM (commit f968fc6892d, v1.2.0).
 
-On 3/7/19 8:03 AM, Sergio Lopez wrote:
-> While child_job_drained_begin() calls to job_pause(), the job doesn't
-> actually transition between states until it runs again and reaches a
-> pause point. This means bdrv_drained_begin() may return with some jobs
-> using the node still having 'busy =3D=3D true'.
->=20
-> As a consequence, block_job_detach_aio_context() may get into a
-> deadlock, waiting for the job to be actually paused, while the coroutin=
-e
-> servicing the job is yielding and doesn't get the opportunity to get
-> scheduled again. This situation can be reproduced by issuing a
-> 'block-commit' immediately followed by a 'device_del'.
->=20
-> To ensure bdrv_drained_begin() only returns when the jobs have been
-> paused, we change mirror_drained_poll() to only confirm it's quiesced
-> when job->paused =3D=3D true and there aren't any in-flight requests, e=
-xcept
-> if we reached that point by a drained section initiated by the
-> mirror/commit job itself.
->=20
-> The other block jobs shouldn't need any changes, as the default
-> drained_poll() behavior is to only confirm it's quiesced if the job is
-> not busy or completed.
->=20
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> ---
->  block/mirror.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
->=20
+I believe the bug is latent.  I got it to bite by trying to
+qdev_create() a sysbus device from a machine's .instance_init()
+method.
 
-> @@ -1119,6 +1126,16 @@ static void coroutine_fn mirror_pause(Job *job)
->  static bool mirror_drained_poll(BlockJob *job)
->  {
->      MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common);
-> +
-> +    /* If the job isn't paused nor cancelled, we can't be sure that it=
- won't
-> +     * issue more requets. We make an exception if we've reached this =
-point
+The fix is obvious: store the main system bus in QOM right after
+creating "/machine".
 
-requests
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/core/sysbus.c | 3 ---
+ vl.c             | 4 ++++
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-> +     * from one of our own drain sections, to avoid a deadlock waiting=
- for
-> +     * ourselves.
-> +     */
-> +    if (!s->common.job.paused && !s->common.job.cancelled && !s->in_dr=
-ain) {
-> +        return true;
-> +    }
-> +
->      return !!s->in_flight;
->  }
-> =20
->=20
-
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 9f9edbcab9..307cf90a51 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -357,9 +357,6 @@ static void main_system_bus_create(void)
+     qbus_create_inplace(main_system_bus, system_bus_info.instance_size,
+                         TYPE_SYSTEM_BUS, NULL, "main-system-bus");
+     OBJECT(main_system_bus)->free =3D g_free;
+-    object_property_add_child(container_get(qdev_get_machine(),
+-                                            "/unattached"),
+-                              "sysbus", OBJECT(main_system_bus), NULL);
+ }
+=20
+ BusState *sysbus_get_default(void)
+diff --git a/vl.c b/vl.c
+index 3f41e72892..32144d25df 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3990,6 +3990,10 @@ int main(int argc, char **argv, char **envp)
+     }
+     object_property_add_child(object_get_root(), "machine",
+                               OBJECT(current_machine), &error_abort);
++    object_property_add_child(container_get(OBJECT(current_machine),
++                                            "/unattached"),
++                              "sysbus", OBJECT(sysbus_get_default()),
++                              NULL);
+=20
+     if (machine_class->minimum_page_bits) {
+         if (!set_preferred_target_page_bits(machine_class->minimum_page_=
+bits)) {
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---hQnnB8DA7vKKNhhIe4BfquVleXTOBBYd1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBUcQACgkQp6FrSiUn
-Q2qZ4ggAgrRW22w7rL0Kzx7bbvy/7OmQwcU8ZFctMshLGKXPmMv19TCArAohgy+6
-BPplrBTO9anlX2y5gBSZvKKUVRYi1kXiQhw1OhjwuPbnJasYNUjhOp7tEEVMbjhp
-zZxFbkPacZiBdyUT55+rXJ1AFNLrT3wMPH1m/b5iwqQR25QH1s9Gn8QtzxsNs2g1
-HIBJHlhTsKtK1WFee2/hAHlfFehm6R6y7SVGaKbkcMbi6j5vR98ZmkOKgNXAKdqo
-KZvXZCqzFGXNs9i9jn32YIWLTyrEPfobszSahDNyQGlPi6KDARNokup5HCMlctvi
-jlx6uQsbbwGzTw4qa2lmSsKk//M1Iw==
-=nudE
------END PGP SIGNATURE-----
-
---hQnnB8DA7vKKNhhIe4BfquVleXTOBBYd1--
+2.17.2
