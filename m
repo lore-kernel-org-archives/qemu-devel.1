@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58718)
+Received: from eggs.gnu.org ([209.51.188.92]:58867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h1t3f-0006FA-O8
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:27:36 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1h1t4H-0006kk-64
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:28:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h1t3f-00009Y-5c
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:27:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h1t3e-00009K-VS
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:27:35 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30276BDFA
-	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 13:27:34 +0000 (UTC)
-Date: Thu, 7 Mar 2019 14:27:30 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190307132730.trnlurxyuvptywcu@sirius.home.kraxel.org>
-References: <20190227145755.26556-1-berrange@redhat.com>
-	<20190307122358.GV32268@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1h1t4G-0000L7-Ir
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:28:13 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51662)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1h1t4G-0000KS-AX
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:28:12 -0500
+Received: by mail-wm1-x344.google.com with SMTP id n19so9248554wmi.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 05:28:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190307122358.GV32268@redhat.com>
+References: <20190307072025.8041-1-elena.ufimtseva@oracle.com>
+	<20190307104550.GE2843@stefanha-x1.localdomain>
+In-Reply-To: <20190307104550.GE2843@stefanha-x1.localdomain>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 7 Mar 2019 14:27:57 +0100
+Message-ID: <CAJ+F1CK_Lr+UKkzicLvfwcBRa4kTTrOQTm0wN8cEHek+Tkj=dw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/2] ui: support for authorization control
- on TLS connections
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 00/37] Initial support of
+ multi-process qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,17 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: elena.ufimtseva@oracle.com, john.g.johnson@oracle.com, Stefano Stabellini <sstabellini@kernel.org>, jag.raman@oracle.com, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, QEMU <qemu-devel@nongnu.org>, Ross Lagerwall <ross.lagerwall@citrix.com>, liran.alon@oracle.com, Stefan Hajnoczi <stefanha@redhat.com>, kanth.ghatraju@oracle.com
 
-On Thu, Mar 07, 2019 at 12:23:58PM +0000, Daniel P. Berrang=E9 wrote:
-> ping - soft freeze is less than a week away & i'd like this to get into
-> a ui queue pull request in time for 4.0 if there's no review objections
+Hi
 
-I'm aware, I'm busy preparing the pre-freeze pulls.  USB is on the list
-already, busy with UI right now. VGA comes next.
+On Thu, Mar 7, 2019 at 11:46 AM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Wed, Mar 06, 2019 at 11:20:25PM -0800, elena.ufimtseva@oracle.com wrot=
+e:
+> > From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> >
+> > Initial support of multi-process qemu
+>
+> Hi Elena,
+> Please use the following setting when sending future patch series:
+>
+>   $ git config sendemail.thread shallow
+>
+> This way all patches are part of a single email thread (starting with
+> your PATCH 00 cover letter).  Reviewers find this more convenient so
+> that individual emails don't get separated and lost.
+>
 
-Series queued.
+Please also check that there is no regression after each commit. In
+particular, the build shouldn't fail, so we can easily study, apply
+and bisect patches one by one.
 
-cheers,
-  Gerd
+thanks
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
