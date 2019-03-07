@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48893)
+Received: from eggs.gnu.org ([209.51.188.92]:50087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1h1gWz-0007xg-2u
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:05:02 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h1gcF-0003o6-C6
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:10:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1h1gWw-00061g-MW
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:05:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1h1gWw-00061K-AH
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:04:58 -0500
-Date: Wed, 6 Mar 2019 19:04:52 -0500
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <20190307000452.imsrx5t4egcpoe4h@localhost.localdomain>
-References: <20190305172139.32662-1-peter.maydell@linaro.org>
-	<20190305172139.32662-2-peter.maydell@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1h1gcE-0008Iu-61
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:10:27 -0500
+Resent-Message-Id: <E1h1gcE-0008Iu-61@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21138)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1h1gcD-0008Hp-TG
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:10:26 -0500
+Message-ID: <155191739897.30942.6092891211798534084@6acff2cf482b>
+In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190305172139.32662-2-peter.maydell@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/12] docs/cpu-hotplug.rst: Fix rST
- markup issues
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 6 Mar 2019 16:10:00 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] Enable build and install of our
+ rST docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, amarkovic@wavecomp.com
 
-On Tue, Mar 05, 2019 at 05:21:28PM +0000, Peter Maydell wrote:
-> sphinx-build complains:
->=20
-> docs/cpu-hotplug.rst:67: ERROR: Unexpected indentation.
-> docs/cpu-hotplug.rst:69: ERROR: Unexpected indentation.
-> docs/cpu-hotplug.rst:74: WARNING: Block quote ends without a blank line=
-; unexpected unindent.
-> docs/cpu-hotplug.rst:75: WARNING: Block quote ends without a blank line=
-; unexpected unindent.
-> docs/cpu-hotplug.rst:76: SEVERE: Unexpected section title.
->=20
-> }
-> {
-> docs/cpu-hotplug.rst:78: WARNING: Block quote ends without a blank line=
-; unexpected unindent.
->=20
-> These are the result of not indicating one of the literal
-> blocks by finishing the preceding paragraph with the "::" marker.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Message-id: 20190228145624.24885-2-peter.maydell@linaro.org
-> ---
->  docs/cpu-hotplug.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
-> index 1c268e00b41..e2d4e893b01 100644
-> --- a/docs/cpu-hotplug.rst
-> +++ b/docs/cpu-hotplug.rst
-> @@ -60,7 +60,7 @@ vCPU hotplug
->      hot-plugged (no "qom-path" member).  From its output in step (3), =
-we
->      can see that ``IvyBridge-IBRS-x86_64-cpu`` is present in socket 0,
->      while hot-plugging a CPU into socket 1 requires passing the listed
-> -    properties to QMP ``device_add``:
-> +    properties to QMP ``device_add``::
-> =20
->        (QEMU) device_add id=3Dcpu-2 driver=3DIvyBridge-IBRS-x86_64-cpu =
-socket-id=3D1 core-id=3D0 thread-id=3D0
->        {
-> --=20
-> 2.20.1
->=20
->=20
-
-This is an actual reStructuredText syntax violation (at a layer lower
-than sphinx) and thus can also be seen by simpler tools such as
-rst2{man,html,...}:
-
-   $ rst2html docs/cpu-hotplug.rst 1>/dev/null=20
-   docs/cpu-hotplug.rst:67: (ERROR/3) Unexpected indentation.
-   docs/cpu-hotplug.rst:69: (ERROR/3) Unexpected indentation.
-   docs/cpu-hotplug.rst:74: (WARNING/2) Block quote ends without a blank =
-line; unexpected unindent.
-   docs/cpu-hotplug.rst:75: (WARNING/2) Block quote ends without a blank =
-line; unexpected unindent.
-   docs/cpu-hotplug.rst:76: (SEVERE/4) Unexpected section title.
-
-   }
-   {
-   Exiting due to level-4 (SEVERE) system message.
-
-But I'm assuming the extended sphinx roles/directives will be used, so
-the only way to check against future breakage would be to build the
-docs.
-
-Do we have strong position in favor or against putting that into the
-"common" `make check` flow?  Anyway, these are all possibilities for
-future enhancements, so:
-
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNTE3MjEzOS4zMjY2
+Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA1MTcyMTM5
+LjMyNjYyLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
+UEFUQ0ggdjMgMDAvMTJdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MK
+Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
+ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
+OTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
+MDE5MDMwNTE3MjEzOS4zMjY2Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk4MzMyYTc2YTYgTUFJTlRBSU5FUlM6IEFkZCBlbnRyeSBm
+b3IgU3BoaW54IGRvY3VtZW50YXRpb24gaW5mcmFzdHJ1Y3R1cmUKNDFhMWJkZGI1NSBkb2NzL2Nv
+bmYucHk6IERvbid0IGhhcmQtY29kZSBRRU1VIHZlcnNpb24KOGQ0NzgwNzYzOSBNYWtlZmlsZTog
+QWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVyc2lvbiIgY29kZQowY2U5NTAxMjYzIE1h
+a2VmaWxlLCBjb25maWd1cmU6IFN1cHBvcnQgYnVpbGRpbmcgclNUIGRvY3VtZW50YXRpb24KNGY4
+ZjQ5YjM0MiBkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdl
+IHdhbnQKY2E2ZTA0Y2M4NiBkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCjRk
+ZWQwZDI5MjMgZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwg
+YnVpbGQKNGM5NjE3NTJhYiBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3Rlcicg
+dGhlbWUKM2FiNThjM2E4NiBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGly
+ZWN0b3J5CjdjN2Q5NWQ4ODQgZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngt
+cXVpY2tzdGFydAo1MGQxYTA1MjRkIGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9y
+bWF0CmIwYWUwYWVmNzMgZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
+cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgYjBhZTBhZWY3MzIz
+IChkb2NzL2NwdS1ob3RwbHVnLnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzEyIENoZWNr
+aW5nIGNvbW1pdCA1MGQxYTA1MjRkNjggKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
+Zm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNTogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVt
+b3J5LnR4dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoK
+UGF0Y2ggMi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzEyIENoZWNraW5nIGNvbW1p
+dCA3YzdkOTVkODg0NDYgKGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1
+aWNrc3RhcnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
+TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
+dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTIg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMiBDaGVja2luZyBjb21taXQgM2FiNThjM2E4
+NjZjIChkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5KQo1LzEy
+IENoZWNraW5nIGNvbW1pdCA0Yzk2MTc1MmFiNGMgKGRvY3MvY29uZi5weTogQ29uZmlndXJlIHRo
+ZSAnYWxhYmFzdGVyJyB0aGVtZSkKNi8xMiBDaGVja2luZyBjb21taXQgNGRlZDBkMjkyMzEyIChk
+b2NzL2NvbmYucHk6IERvbid0IGluY2x1ZGUgclNUIHNvdXJjZXMgaW4gSFRNTCBidWlsZCkKNy8x
+MiBDaGVja2luZyBjb21taXQgY2E2ZTA0Y2M4NjI0IChkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0
+aW9uIHdhcm5pbmdzKQo4LzEyIENoZWNraW5nIGNvbW1pdCA0ZjhmNDliMzQyN2MgKGRvY3M6IFBy
+b3ZpZGUgc2VwYXJhdGUgY29uZi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudCkKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojMTAyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
+Y2hhcmFjdGVycwojMTg3OiBGSUxFOiBkb2NzL2ludGVyb3AvY29uZi5weToxNToKK2h0bWxfdGhl
+bWVfb3B0aW9uc1snZGVzY3JpcHRpb24nXSA9IHUnU3lzdGVtIEVtdWxhdGlvbiBNYW5hZ2VtZW50
+IGFuZCBJbnRlcm9wZXJhYmlsaXR5IEd1aWRlJwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdz
+LCAxMzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKOS8xMiBDaGVja2luZyBjb21taXQgMGNlOTUwMTI2MzY0IChNYWtlZmlsZSwgY29uZmlndXJl
+OiBTdXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uKQoxMC8xMiBDaGVja2luZyBjb21t
+aXQgOGQ0NzgwNzYzOTQ1IChNYWtlZmlsZTogQWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtn
+dmVyc2lvbiIgY29kZSkKMTEvMTIgQ2hlY2tpbmcgY29tbWl0IDQxYTFiZGRiNTViNSAoZG9jcy9j
+b25mLnB5OiBEb24ndCBoYXJkLWNvZGUgUUVNVSB2ZXJzaW9uKQoxMi8xMiBDaGVja2luZyBjb21t
+aXQgOTgzMzJhNzZhNmI3IChNQUlOVEFJTkVSUzogQWRkIGVudHJ5IGZvciBTcGhpbnggZG9jdW1l
+bnRhdGlvbiBpbmZyYXN0cnVjdHVyZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
+L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxp
+bmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
