@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46044)
+Received: from eggs.gnu.org ([209.51.188.92]:46112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1q1q-0001KP-Jx
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:13:33 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1q1t-0001Of-Fu
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1q1o-0001fV-Ja
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:13:30 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45089)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1q1o-0001e9-0s
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:13:28 -0500
-Received: by mail-oi1-x243.google.com with SMTP id t82so12430082oie.12
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 02:13:27 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1h1q1p-0001hF-VL
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:13:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49872)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1q1p-0001ec-H9
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:13:29 -0500
+Date: Thu, 7 Mar 2019 10:13:19 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190307101319.GB2811@work-vm>
+References: <20190307072212.9058-1-elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
-In-Reply-To: <9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Mar 2019 10:13:13 +0000
-Message-ID: <CAFEAcA_RQU+HYczN4Z=vEL8U31---GTi_HOxg8y50pzX8p+p7Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] converting build system to Meson?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307072212.9058-1-elena.ufimtseva@oracle.com>
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 20/37] multi-process: Add
+ QMP & HMP commands to list remote processes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +27,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: elena.ufimtseva@oracle.com
+Cc: qemu-devel@nongnu.org, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, eblake@redhat.com, armbru@redhat.com
 
-On Thu, 7 Mar 2019 at 06:39, Thomas Huth <thuth@redhat.com> wrote:
-> On 06/03/2019 19.12, Paolo Bonzini wrote:
-> > lately I have been thinking of converting the QEMU build system to
-> > Meson.  Meson is a relatively new build system that can replace
-> > Autotools or hand-written Makefiles such as QEMU; as a die-hard
-> > Autotools fan, I must say that Meson is by far better than anything else
-> > that has ever tried to replace Autotools, and actually has the potential
-> > to do so.
-> >
-> > Advantages of Meson that directly matter for QEMU include:[...]
->
-> I'm not objecting a new build system per se, but could you elaborate on
->  problems of the current QEMU build system that will be fixed by this
-> change? Since apart from some minor glitches (with the *.mak file
-> dependencies for example), the current build system seems to work quite
-> well for me ... so at least I currently don't feel enough pain yet to do
-> such a big step, just because there is another new cool build system
-> around...
+* elena.ufimtseva@oracle.com (elena.ufimtseva@oracle.com) wrote:
+> From: Jagannathan Raman <jag.raman@oracle.com>
+> 
+> Add query-remote QMP command and remote-proc-list HMP command, to list
+> the remote processes spawned by QEMU.
+> 
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
+>  hmp-commands.hx        | 16 +++++++++
+>  hmp.h                  |  1 +
+>  hw/proxy/Makefile.objs |  1 +
+>  hw/proxy/monitor.c     | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  qapi/block-core.json   | 29 ++++++++++++++++
+>  5 files changed, 136 insertions(+)
+>  create mode 100644 hw/proxy/monitor.c
+> 
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 9b40359..fb3c8ba 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -725,6 +725,22 @@ STEXI
+>  Add device.
+>  ETEXI
+>  
+> +#if defined(CONFIG_MPQEMU)
+> +    {
+> +        .name       = "remote_proc_list",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "list remote devices and their linux process IDs",
 
-Yes, that tends to be my view. Our current build system:
- * has no dependencies that are problematic for older hosts
-   (contrast Meson, which needs Python 3.5, even if we take
-   the drastic step of shipping an entire build tool along
-   with QEMU; OSX python is 2.7 still)
- * is not particularly hard to deal with for the common cases
-   ("add new source file" is straightforward)
- * covers all our requirements as far as I'm aware
-   (whereas you've listed a couple of places where Meson
-   would need changes/extensions to support things we do already)
- * is generally flexible enough to be hackable to deal with odd
-   cases (it has escape mechanisms to generic-programmability,
-   even if they're ugly and awkward)
+Should probably just say 'process IDs' - it's not that Linux specific.
 
-So I think we'd need a more compelling reason to move right now.
-(This might change in the future, eg if Meson catches on to the
-extent that everybody is using it and competitors like CMake are
-more obviously eclipsed by it, in the way that git took over
-from svn and relegated mercurial and bzr to obscurity.)
+> +        .cmd        = hmp_remote_proc_list,
+> +    },
+> +
+> +STEXI
+> +@item remote_proc_list
+> +@findex remote_proc_list
+> +List remote devices and their linux process IDs.
+> +ETEXI
+> +#endif
+> +
+>      {
+>          .name       = "device_del",
+>          .args_type  = "id:s",
+> diff --git a/hmp.h b/hmp.h
+> index e0f32f0..0940634 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -149,5 +149,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+>  void hmp_info_sev(Monitor *mon, const QDict *qdict);
+> +void hmp_remote_proc_list(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/hw/proxy/Makefile.objs b/hw/proxy/Makefile.objs
+> index f562f5a..e642060 100644
+> --- a/hw/proxy/Makefile.objs
+> +++ b/hw/proxy/Makefile.objs
+> @@ -1,2 +1,3 @@
+>  common-obj-$(CONFIG_MPQEMU) += qemu-proxy.o
+>  common-obj-$(CONFIG_MPQEMU) += proxy-lsi53c895a.o
+> +common-obj-$(CONFIG_MPQEMU) += monitor.o
+> diff --git a/hw/proxy/monitor.c b/hw/proxy/monitor.c
+> new file mode 100644
+> index 0000000..3005eec
+> --- /dev/null
+> +++ b/hw/proxy/monitor.c
+> @@ -0,0 +1,89 @@
+> +/*
+> + * QEMU monitor command handler for multi-process QEMU
+> + *
+> + * Copyright 2019, Oracle and/or its affiliates. All rights reserved.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include <sys/types.h>
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/qapi-types-block-core.h"
+> +#include "qapi/qapi-commands-block-core.h"
+> +#include "monitor/monitor.h"
+> +#include "qemu/option.h"
+> +#include "hmp.h"
+> +#include "hw/boards.h"
+> +#include "hw/i386/pc.h"
+> +#include "hw/proxy/qemu-proxy.h"
+> +
+> +/*
+> + * TODO: Is there a callback where the allocated memory for QMP could be free'd
 
-thanks
--- PMM
+I think qmp will clean that up when it returns your list that you
+create (by making calls to qapi_free_RemoteProc or
+qapi_free_RemoteProcList as appropriate.)
+
+
+> + */
+> +RemoteProcList *qmp_query_remote(Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(current_machine);
+> +    RemoteProcList *proclist, *proc;
+> +    GHashTableIter itr;
+> +    PCIProxyDev *pdev;
+> +    PCIProxyDevClass *k;
+> +    DeviceState *d;
+> +    char *id;
+> +
+> +    proclist = NULL;
+> +
+> +    g_hash_table_iter_init(&itr, pcms->remote_devs);
+> +
+> +    while (g_hash_table_iter_next(&itr, (gpointer *)&id, (gpointer *)&pdev)) {
+> +        k = PCI_PROXY_DEV_GET_CLASS(pdev);
+> +        d = DEVICE(pdev);
+> +
+> +        proc = g_malloc0(sizeof(RemoteProcList));
+> +        proc->next = proclist;
+> +        proclist = proc;
+> +        proc->value = g_malloc0(sizeof(RemoteProc));
+> +        proc->value->pid = pdev->remote_pid;
+> +        proc->value->id = g_strdup(d->id);
+> +        proc->value->proc = g_strdup(k->command);
+> +    }
+> +
+> +    return proclist;
+> +}
+> +
+> +void hmp_remote_proc_list(Monitor *mon, const QDict *qdict)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(current_machine);
+> +    GHashTableIter itr;
+> +    PCIProxyDev *pdev;
+> +    PCIProxyDevClass *k;
+> +    char *id;
+> +
+> +    g_hash_table_iter_init(&itr, pcms->remote_devs);
+> +
+> +    monitor_printf(mon, "%8.8s\t%16.16s\t%16.16s\t%16.16s\n\n", "PID", "RID",
+> +                   "QEMU ID", "PROCESS NAME");
+> +
+> +    while (g_hash_table_iter_next(&itr, (gpointer *)&id, (gpointer *)&pdev)) {
+> +        k = PCI_PROXY_DEV_GET_CLASS(pdev);
+> +
+> +        monitor_printf(mon, "%8.8d\t%16.16s\t%16.16s\t%16.16s\n",
+> +                       pdev->remote_pid, pdev->rid, id, k->command);
+
+I don't think I understand what a RID is here.
+
+A more common way to write HMP commands is to call the qmp command and
+format it's output;  having said that your code here is probably
+simpler.
+
+> +    }
+> +}
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 2b8afbb..05394c4 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -647,6 +647,23 @@
+>             '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+>  
+>  ##
+> +# @RemoteProc:
+> +#
+> +# Remote process information.
+> +#
+> +# @id: Device ID
+> +#
+> +# @pid: Linux Process ID
+> +#
+> +# @proc: Process name
+> +#
+> +# Since:  3.0.93
+
+Note 'Since:' should be the version it gets merged into
+so it'll be 4.1 or 5.0 etc
+
+> +##
+> +{ 'struct': 'RemoteProc',
+> +  'data': {'id': 'str', 'pid': 'int32', 'proc': 'str' },
+> +  'if': 'defined(CONFIG_MPQEMU)' }
+> +
+> +##
+>  # @BlockMeasureInfo:
+>  #
+>  # Image file size calculation information.  This structure describes the size
+> @@ -768,6 +785,18 @@
+>  ##
+>  { 'command': 'query-block', 'returns': ['BlockInfo'] }
+>  
+> +##
+> +# @query-remote:
+> +#
+> +# Get a list of all the remote processes spawned by QEMU.
+> +#
+> +# Returns: a list of @RemoteProc describing each remote process.
+> +#
+> +# Since: 3.0.93
+> +#
+> +##
+> +{ 'command': 'query-remote', 'returns': ['RemoteProc'],
+> +  'if': 'defined(CONFIG_MPQEMU)' }
+>  
+>  ##
+>  # @BlockDeviceTimedStats:
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
