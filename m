@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50062)
+Received: from eggs.gnu.org ([209.51.188.92]:60821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h20bT-0006UM-6M
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:31:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1h20uc-0002cJ-Pj
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:50:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h20bR-0002p9-P9
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:30:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41860)
+	(envelope-from <bounces@canonical.com>) id 1h20uU-0005C3-TC
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:50:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h20bN-0002iD-8m
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:30:54 -0500
+	id 1h20uS-00055A-Gh
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:50:38 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h20bE-0005Hw-8H
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 21:30:44 +0000
+	id 1h20uQ-0007vo-Kg
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 21:50:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 373C22E80D1
-	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 21:30:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9B7D02E80CD
+	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 21:50:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Mar 2019 21:23:17 -0000
+Date: Thu, 07 Mar 2019 21:43:27 -0000
 From: "Heitor R. Alves de Siqueira" <1818880@bugs.launchpad.net>
 Reply-To: Bug 1818880 <1818880@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155189278546.17656.7588906080638087853.malonedeb@gac.canonical.com>
-Message-Id: <155199379744.8850.5717595629539467188.malone@gac.canonical.com>
+Message-Id: <155199500734.8973.8754190342273361963.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1818880] Re: Deadlock when detaching network
  interface
@@ -39,12 +39,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Patch v2:
-Added missing DEP3 info and corrected pkg version
-
-** Patch added: "Debdiff for xenial v2"
+** Patch removed: "Debdiff for xenial v2"
    https://bugs.launchpad.net/cloud-archive/+bug/1818880/+attachment/524456=
 7/+files/xenial_v2.debdiff
+
+** Patch added: "Correct debdiff for xenial v2"
+   https://bugs.launchpad.net/cloud-archive/+bug/1818880/+attachment/524456=
+8/+files/lp1818880-v2.debdiff
 
 -- =
 
