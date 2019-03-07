@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45701)
+Received: from eggs.gnu.org ([209.51.188.92]:45900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1vYX-0004oB-14
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:07:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1vZH-0005Ue-4J
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:08:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1vYV-0007UY-TT
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:07:37 -0500
-Resent-Message-Id: <E1h1vYV-0007UY-TT@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21032)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1vYV-0007SS-L4
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:07:35 -0500
-Message-ID: <155197484513.8146.16142982136689061618@6acff2cf482b>
-In-Reply-To: <20190307152450.20340-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1h1vZG-00080V-BS
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:08:23 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:32912)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h1vZG-0007zb-3W
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:08:22 -0500
+Received: by mail-ot1-x342.google.com with SMTP id q24so14607501otk.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 08:08:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 08:07:26 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/12] sphinx queue
+References: <CADYoBw1HTzqTjfyDgDbP042AH1EkS1DD7Sf4um8eO7d22t4CDA@mail.gmail.com>
+	<CAFEAcA9UzFdyAFkAuWzcV5x1JDBCTVr=okdLN-MpiduvACt4tw@mail.gmail.com>
+	<CADYoBw3yj9yuxUSFuwCqKbTZNFFDF7Je4Kgxt-Rvd71x3JusQA@mail.gmail.com>
+	<CAFEAcA_N83yo8xV3hCpVPFOhQj+R95+8fVePjEXgxKZtQPUP3w@mail.gmail.com>
+	<CADYoBw00Li2G4srfLvtG4pvBMfyEuDh0AU47wj5BcKOUkfWhKw@mail.gmail.com>
+	<CAFEAcA9Ycm43h8ekoc1uP_K7eLT98Qg+EFqE3Lvu66cjU5c5_A@mail.gmail.com>
+	<CADYoBw1QFQxicJJ9tQa2Ok7PAdWvgtD4MQncdJ0zi4E2vktVhQ@mail.gmail.com>
+In-Reply-To: <CADYoBw1QFQxicJJ9tQa2Ok7PAdWvgtD4MQncdJ0zi4E2vktVhQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Mar 2019 16:08:09 +0000
+Message-ID: <CAFEAcA-+U75+EQzcpV4kZHw+4xMSbMv3UJ0CV_Q3DVbNx5RbNg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] Added periodic IRQ support for
+ bcm2836_control local timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +35,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: bzt <bztemail@gmail.com>
+Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE1MjQ1MC4yMDM0
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA3MTUyNDUw
-LjIwMzQwLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UFVMTCAwMC8xMl0gc3BoaW54IHF1ZXVlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
-cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
-ICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwMzA3MTUyNDUwLjIwMzQwLTEtcGV0ZXIubWF5ZGVs
-bEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAzMDcxNTI0NTAuMjAzNDAtMS1wZXRlci5tYXlk
-ZWxsQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjZTg2ZjM5ZDg2
-IE1BSU5UQUlORVJTOiBBZGQgZW50cnkgZm9yIFNwaGlueCBkb2N1bWVudGF0aW9uIGluZnJhc3Ry
-dWN0dXJlCjgzODZhNTFjYmMgZG9jcy9jb25mLnB5OiBEb24ndCBoYXJkLWNvZGUgUUVNVSB2ZXJz
-aW9uCjFiZjNjY2NmY2MgTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3Zl
-cnNpb24iIGNvZGUKMmE1YTc3NTI5ZCBNYWtlZmlsZSwgY29uZmlndXJlOiBTdXBwb3J0IGJ1aWxk
-aW5nIHJTVCBkb2N1bWVudGF0aW9uCjNiOTMyMjYyOTYgZG9jczogUHJvdmlkZSBzZXBhcmF0ZSBj
-b25mLnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50CjE2MmFkOTE5YTQgZG9jcy9jb25mLnB5OiBE
-aXNhYmxlIG9wdGlvbiB3YXJuaW5ncwplNmUyMjNjOTAwIGRvY3MvY29uZi5weTogRG9uJ3QgaW5j
-bHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1aWxkCjk0NjQ3ZjgyNWIgZG9jcy9jb25mLnB5OiBD
-b25maWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lCjk0MTFlN2ZmY2QgZG9jcy9jb25mLnB5OiBE
-aXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeQo4Y2E3OWI4NjRjIGRvY3M6IENvbW1pdCBp
-bml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQKYTc3NTRhYTEzZSBkb2NzOiBDb252
-ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdAo4OWEyY2NkZWU3IGRvY3MvY3B1LWhvdHBsdWcu
-cnN0OiBGaXggclNUIG1hcmt1cCBpc3N1ZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTIgQ2hl
-Y2tpbmcgY29tbWl0IDg5YTJjY2RlZTc5YSAoZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1Qg
-bWFya3VwIGlzc3VlcykKMi8xMiBDaGVja2luZyBjb21taXQgYTc3NTRhYTEzZTYwIChkb2NzOiBD
-b252ZXJ0IG1lbW9yeS50eHQgdG8gcnN0IGZvcm1hdCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
-IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjc6IApy
-ZW5hbWUgZnJvbSBkb2NzL2RldmVsL21lbW9yeS50eHQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
-aW5ncywgMTk1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KMy8xMiBDaGVja2luZyBjb21taXQgOGNhNzliODY0YzAwIChkb2NzOiBDb21taXQgaW5p
-dGlhbCBmaWxlcyBmcm9tIHNwaGlueC1xdWlja3N0YXJ0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxOTog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE4OCBs
-aW5lcyBjaGVja2VkCgpQYXRjaCAzLzEyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjQvMTIg
-Q2hlY2tpbmcgY29tbWl0IDk0MTFlN2ZmY2RmYSAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIHVudXNl
-ZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMiBDaGVja2luZyBjb21taXQgOTQ2NDdmODI1YjYyIChk
-b2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUpCjYvMTIgQ2hlY2tp
-bmcgY29tbWl0IGU2ZTIyM2M5MDA1NCAoZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBz
-b3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTIgQ2hlY2tpbmcgY29tbWl0IDE2MmFkOTE5YTRlYSAo
-ZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8xMiBDaGVja2luZyBjb21t
-aXQgM2I5MzIyNjI5NjcxIChkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2gg
-bWFudWFsIHdlIHdhbnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEwMzogCm5ldyBmaWxlIG1vZGUgMTAw
-NjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE4ODogRklMRTogZG9jcy9pbnRl
-cm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2NyaXB0aW9uJ10gPSB1J1N5
-c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJpbGl0eSBHdWlkZScKCnRv
-dGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTIg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTIgQ2hlY2tpbmcgY29tbWl0IDJhNWE3NzUy
-OWRjNiAoTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRh
-dGlvbikKMTAvMTIgQ2hlY2tpbmcgY29tbWl0IDFiZjNjY2NmY2M2ZCAoTWFrZWZpbGU6IEFic3Ry
-YWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzEyIENoZWNraW5nIGNv
-bW1pdCA4Mzg2YTUxY2JjZGUgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVy
-c2lvbikKMTIvMTIgQ2hlY2tpbmcgY29tbWl0IGNlODZmMzlkODYxZCAoTUFJTlRBSU5FUlM6IEFk
-ZCBlbnRyeSBmb3IgU3BoaW54IGRvY3VtZW50YXRpb24gaW5mcmFzdHJ1Y3R1cmUpCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMzA3MTUyNDUw
-LjIwMzQwLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlw
-ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+On Thu, 7 Mar 2019 at 15:57, bzt <bztemail@gmail.com> wrote:
+>
+> Nope. I meant the second patch, sent on 4th Mar, which had all the
+> things fixed you listed in your review.
+>
+> But here's the modification for your latest query. This one controls
+> the timer depending on ENABLE bit. It sets the INTFLAG even if
+> INTENABLE is not set, and only raises the IRQ if both are set.
+
+Thanks. I've listed a couple of minor things below
+which I think are not quite handling the flags right,
+but the rest looks good.
+
+> @@ -78,6 +94,17 @@ static void bcm2836_control_update(BCM2836ControlState *s)
+>          s->fiqsrc[s->route_gpu_fiq] |= (uint32_t)1 << IRQ_GPU;
+>      }
+>
+> +    /* handle THE local timer interrupt for one of the cores' IRQ/FIQ */
+> +    if ((s->local_timer_control & LOCALTIMER_INTENABLE) &&
+> +        (s->local_timer_control & LOCALTIMER_INTFLAG)) {
+> +        if (s->route_localtimer & 4) {
+> +            s->fiqsrc[(s->route_localtimer & 3)] |= (uint32_t)1 << IRQ_TIMER;
+> +        } else {
+> +            s->irqsrc[(s->route_localtimer & 3)] |= (uint32_t)1 << IRQ_TIMER;
+> +        }
+> +        s->local_timer_control &= ~LOCALTIMER_INTENABLE;
+
+This shouldn't clear the INTENABLE flag.
+
+> +    }
+> +
+>      for (i = 0; i < BCM2836_NCORES; i++) {
+>          /* handle local timer interrupts for this core */
+>          if (s->timerirqs[i]) {
+> @@ -162,6 +189,55 @@ static void bcm2836_control_set_gpu_fiq(void
+> *opaque, int irq, int level)
+>      bcm2836_control_update(s);
+>  }
+
+> +static void bcm2836_control_local_timer_control(void *opaque, uint32_t val)
+> +{
+> +    BCM2836ControlState *s = opaque;
+> +
+> +    s->local_timer_control = val & ~LOCALTIMER_INTFLAG;
+
+This will clear the LOCALTIMER_INTFLAG if it was already
+set -- you want to preserve it, something like
+   s->local_timer_control = (s->local_timer_control & LOCALTIMER_INTFLAG) |
+     (val & ~LOCALTIMER_INTFLAG);
+
+> +    if (val & LOCALTIMER_ENABLE) {
+> +        bcm2836_control_local_timer_set_next(s);
+> +    } else {
+> +        timer_del(&s->timer);
+> +    }
+> +}
+> +
+> +static void bcm2836_control_local_timer_ack(void *opaque, uint32_t val)
+> +{
+> +    BCM2836ControlState *s = opaque;
+> +
+> +    if (val & LOCALTIMER_INTFLAG) {
+> +        s->local_timer_control |= LOCALTIMER_INTENABLE;
+> +        s->local_timer_control &= ~LOCALTIMER_INTFLAG;
+
+This should just clear the INTFLAG, it doesn't affect INTENABLE.
+
+> +    }
+> +    if ((val & LOCALTIMER_RELOAD) &&
+> +        (s->local_timer_control & LOCALTIMER_ENABLE)) {
+> +            bcm2836_control_local_timer_set_next(s);
+> +    }
+> +}
+
+thanks
+-- PMM
