@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39328)
+Received: from eggs.gnu.org ([209.51.188.92]:39385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wqZ-0002vj-Se
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:20 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wqc-0002z8-Qj
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wqY-0007v1-By
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:19 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:35868)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wqb-0007y0-LG
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:22 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39080)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1wqY-0007uE-3F
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:18 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id o17so18419085wrw.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:18 -0800 (PST)
+	id 1h1wqb-0007xN-Cy
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:21 -0500
+Received: by mail-wr1-x442.google.com with SMTP id l12so1948926wrp.6
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:21 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 18:29:17 +0100
-Message-Id: <1551979804-6060-11-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 18:29:20 +0100
+Message-Id: <1551979804-6060-14-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
 References: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 10/57] tests/libqos: arm/smdkc210 machine node
+Subject: [Qemu-devel] [PULL 13/57] tests/libqos: aarch64/xlnx-zcu102 machine
+ node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +33,35 @@ Cc: thuth@redhat.com, lviver@redhat.com, Emanuele Giuseppe Esposito <e.emanueleg
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add arm/smdkc210 machine machine to the graph. This machine contains generic-sdhci, so
+Add xlnx-zcu102 machine to the graph. This machine contains generic-sdhci, so
 its constructor must take care of setting it properly when called.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include              |  1 +
- tests/libqos/arm-smdkc210-machine.c | 91 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 92 insertions(+)
- create mode 100644 tests/libqos/arm-smdkc210-machine.c
+ tests/Makefile.include                     |  1 +
+ tests/libqos/aarch64-xlnx-zcu102-machine.c | 94 ++++++++++++++++++++++++++++++
+ 2 files changed, 95 insertions(+)
+ create mode 100644 tests/libqos/aarch64-xlnx-zcu102-machine.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 41d248d..959d026 100644
+index c7800d5..d675ad8 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -756,6 +756,7 @@ qos-test-obj-y += tests/libqos/sdhci.o
+@@ -755,6 +755,7 @@ qos-test-obj-y += $(libqos-pc-obj-y)
+ qos-test-obj-y += tests/libqos/sdhci.o
  
  # Machines
++qos-test-obj-y += tests/libqos/aarch64-xlnx-zcu102-machine.o
  qos-test-obj-y += tests/libqos/arm-raspi2-machine.o
-+qos-test-obj-y += tests/libqos/arm-smdkc210-machine.o
- qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
- 
- check-unit-y += tests/test-qgraph$(EXESUF)
-diff --git a/tests/libqos/arm-smdkc210-machine.c b/tests/libqos/arm-smdkc210-machine.c
+ qos-test-obj-y += tests/libqos/arm-sabrelite-machine.o
+ qos-test-obj-y += tests/libqos/arm-smdkc210-machine.o
+diff --git a/tests/libqos/aarch64-xlnx-zcu102-machine.c b/tests/libqos/aarch64-xlnx-zcu102-machine.c
 new file mode 100644
-index 0000000..1fb9dfc
+index 0000000..6fff040
 --- /dev/null
-+++ b/tests/libqos/arm-smdkc210-machine.c
-@@ -0,0 +1,91 @@
++++ b/tests/libqos/aarch64-xlnx-zcu102-machine.c
+@@ -0,0 +1,94 @@
 +/*
 + * libqos driver framework
 + *
@@ -85,72 +86,75 @@ index 0000000..1fb9dfc
 +#include "libqos/qgraph.h"
 +#include "sdhci.h"
 +
-+#define ARM_PAGE_SIZE             4096
-+#define SMDKC210_RAM_ADDR         0x40000000ull
-+#define SMDKC210_RAM_SIZE         0x40000000ull
++typedef struct QXlnxZCU102Machine QXlnxZCU102Machine;
 +
-+typedef struct QSmdkc210Machine QSmdkc210Machine;
-+
-+struct QSmdkc210Machine {
++struct QXlnxZCU102Machine {
 +    QOSGraphObject obj;
 +    QGuestAllocator alloc;
 +    QSDHCI_MemoryMapped sdhci;
 +};
 +
-+static void *smdkc210_get_driver(void *object, const char *interface)
++#define ARM_PAGE_SIZE          4096
++#define XLNX_ZCU102_RAM_ADDR   0
++#define XLNX_ZCU102_RAM_SIZE   0x20000000
++
++static void *xlnx_zcu102_get_driver(void *object, const char *interface)
 +{
-+    QSmdkc210Machine *machine = object;
++    QXlnxZCU102Machine *machine = object;
 +    if (!g_strcmp0(interface, "memory")) {
 +        return &machine->alloc;
 +    }
 +
-+    fprintf(stderr, "%s not present in arm/smdkc210\n", interface);
++    fprintf(stderr, "%s not present in aarch64/xlnx-zcu102\n", interface);
 +    g_assert_not_reached();
 +}
 +
-+static QOSGraphObject *smdkc210_get_device(void *obj, const char *device)
++static QOSGraphObject *xlnx_zcu102_get_device(void *obj, const char *device)
 +{
-+    QSmdkc210Machine *machine = obj;
++    QXlnxZCU102Machine *machine = obj;
 +    if (!g_strcmp0(device, "generic-sdhci")) {
 +        return &machine->sdhci.obj;
 +    }
 +
-+    fprintf(stderr, "%s not present in arm/smdkc210\n", device);
++    fprintf(stderr, "%s not present in aarch64/xlnx-zcu102\n", device);
 +    g_assert_not_reached();
 +}
 +
-+static void smdkc210_destructor(QOSGraphObject *obj)
++static void xlnx_zcu102_destructor(QOSGraphObject *obj)
 +{
-+    QSmdkc210Machine *machine = (QSmdkc210Machine *) obj;
++    QXlnxZCU102Machine *machine = (QXlnxZCU102Machine *) obj;
 +    alloc_destroy(&machine->alloc);
 +}
 +
-+static void *qos_create_machine_arm_smdkc210(QTestState *qts)
++static void *qos_create_machine_aarch64_xlnx_zcu102(QTestState *qts)
 +{
-+    QSmdkc210Machine *machine = g_new0(QSmdkc210Machine, 1);
++    QXlnxZCU102Machine *machine = g_new0(QXlnxZCU102Machine, 1);
 +
 +    alloc_init(&machine->alloc, 0,
-+               SMDKC210_RAM_ADDR,
-+               SMDKC210_RAM_ADDR + SMDKC210_RAM_SIZE,
++               XLNX_ZCU102_RAM_ADDR + (1 << 20),
++               XLNX_ZCU102_RAM_ADDR + XLNX_ZCU102_RAM_SIZE,
 +               ARM_PAGE_SIZE);
-+    machine->obj.get_device = smdkc210_get_device;
-+    machine->obj.get_driver = smdkc210_get_driver;
-+    machine->obj.destructor = smdkc210_destructor;
-+    qos_init_sdhci_mm(&machine->sdhci, qts, 0x12510000, &(QSDHCIProperties) {
-+        .version = 2,
++
++    machine->obj.get_device = xlnx_zcu102_get_device;
++    machine->obj.get_driver = xlnx_zcu102_get_driver;
++    machine->obj.destructor = xlnx_zcu102_destructor;
++    /* Datasheet: UG1085 (v1.7) */
++    qos_init_sdhci_mm(&machine->sdhci, qts, 0xff160000, &(QSDHCIProperties) {
++        .version = 3,
 +        .baseclock = 0,
 +        .capab.sdma = true,
-+        .capab.reg = 0x5e80080,
++        .capab.reg = 0x280737ec6481
 +    });
 +    return &machine->obj;
 +}
 +
-+static void smdkc210_register_nodes(void)
++static void xlnx_zcu102_register_nodes(void)
 +{
-+    qos_node_create_machine("arm/smdkc210", qos_create_machine_arm_smdkc210);
-+    qos_node_contains("arm/smdkc210", "generic-sdhci", NULL);
++    qos_node_create_machine("aarch64/xlnx-zcu102",
++                            qos_create_machine_aarch64_xlnx_zcu102);
++    qos_node_contains("aarch64/xlnx-zcu102", "generic-sdhci", NULL);
 +}
 +
-+libqos_init(smdkc210_register_nodes);
++libqos_init(xlnx_zcu102_register_nodes);
 -- 
 1.8.3.1
