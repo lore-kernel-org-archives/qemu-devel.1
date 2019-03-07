@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59046)
+Received: from eggs.gnu.org ([209.51.188.92]:59080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1wSt-0006zx-3I
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:52 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1wT3-00077y-DP
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1wSl-0005gM-7c
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:44 -0500
-Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:43730)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1wSu-0005mU-6e
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:55 -0500
+Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:34589)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1wSi-0004l1-1r
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:41 -0500
-Received: by mail-pf1-x42c.google.com with SMTP id q17so11892358pfh.10
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:05:07 -0800 (PST)
+	id 1h1wSm-0004fw-09
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:05:44 -0500
+Received: by mail-pf1-x42b.google.com with SMTP id u9so11902046pfn.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:05:05 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Mar 2019 09:04:37 -0800
-Message-Id: <20190307170440.3113-20-richard.henderson@linaro.org>
+Date: Thu,  7 Mar 2019 09:04:35 -0800
+Message-Id: <20190307170440.3113-18-richard.henderson@linaro.org>
 In-Reply-To: <20190307170440.3113-1-richard.henderson@linaro.org>
 References: <20190307170440.3113-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 19/22] target/arm: Create tagged ram when
- MTE is enabled
+Subject: [Qemu-devel] [PATCH v4 17/22] target/arm: Set PSTATE.TCO on
+ exception entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,145 +30,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+R0085 specifies that exception handlers begin with tag checks overridden.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h |  4 ++++
- hw/arm/virt.c    | 33 +++++++++++++++++++++++++++++++++
- target/arm/cpu.c | 21 ++++++++++++++++++---
- 3 files changed, 55 insertions(+), 3 deletions(-)
+v2: Only set if MTE feature present.
+---
+ target/arm/helper.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e24d1e082c..6d60d2f37d 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -768,6 +768,9 @@ struct ARMCPU {
-     /* MemoryRegion to use for secure physical accesses */
-     MemoryRegion *secure_memory;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c8773a5528..a529d30700 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -9628,6 +9628,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+     target_ulong addr = env->cp15.vbar_el[new_el];
+     unsigned int new_mode = aarch64_pstate_mode(new_el, true);
+     unsigned int cur_el = arm_current_el(env);
++    unsigned int new_pstate;
  
-+    /* MemoryRegion to use for allocation tag accesses */
-+    MemoryRegion *tag_memory;
-+
-     /* For v8M, pointer to the IDAU interface provided by board/SoC */
-     Object *idau;
+     /*
+      * Note that new_el can never be 0.  If cur_el is 0, then
+@@ -9721,7 +9722,11 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+     qemu_log_mask(CPU_LOG_INT, "...with ELR 0x%" PRIx64 "\n",
+                   env->elr_el[new_el]);
  
-@@ -2904,6 +2907,7 @@ int cpu_mmu_index(CPUARMState *env, bool ifetch);
- typedef enum ARMASIdx {
-     ARMASIdx_NS = 0,
-     ARMASIdx_S = 1,
-+    ARMASIdx_TAG = 2,
- } ARMASIdx;
- 
- /* Return the Exception Level targeted by debug exceptions. */
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index c7fb5348ae..5be76fc2ee 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1265,6 +1265,21 @@ static void create_secure_ram(VirtMachineState *vms,
-     g_free(nodename);
- }
- 
-+static void create_tag_ram(VirtMachineState *vms, MachineState *machine,
-+                           MemoryRegion *tag_sysmem)
-+{
-+    MemoryRegion *tagram = g_new(MemoryRegion, 1);
-+    hwaddr base = vms->memmap[VIRT_MEM].base / 32;
-+    hwaddr size = machine->ram_size / 32;
-+
-+    memory_region_init_ram(tagram, NULL, "mach-virt.tag", size, &error_fatal);
-+    memory_region_add_subregion(tag_sysmem, base, tagram);
-+
-+    /* ??? Do we really need an fdt entry, or is MemTag enabled sufficient.  */
-+    /* ??? We appear to need secure tag mem to go with secure mem.  */
-+    /* ??? Does that imply we need a fourth address space?  */
-+}
-+
- static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
- {
-     const VirtMachineState *board = container_of(binfo, VirtMachineState,
-@@ -1423,6 +1438,7 @@ static void machvirt_init(MachineState *machine)
-     qemu_irq pic[NUM_IRQS];
-     MemoryRegion *sysmem = get_system_memory();
-     MemoryRegion *secure_sysmem = NULL;
-+    MemoryRegion *tag_sysmem = NULL;
-     int n, virt_max_cpus;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-@@ -1584,6 +1600,20 @@ static void machvirt_init(MachineState *machine)
-                                      "secure-memory", &error_abort);
-         }
- 
-+        /*
-+         * The cpu adds the property iff MemTag is supported.
-+         * If it is, we must allocate the ram to back that up.
-+         */
-+        if (object_property_find(cpuobj, "tag-memory", NULL)) {
-+            if (!tag_sysmem) {
-+                tag_sysmem = g_new(MemoryRegion, 1);
-+                memory_region_init(tag_sysmem, OBJECT(machine),
-+                                   "tag-memory", UINT64_MAX / 32);
-+            }
-+            object_property_set_link(cpuobj, OBJECT(tag_sysmem),
-+                                     "tag-memory", &error_abort);
-+        }
-+
-         object_property_set_bool(cpuobj, true, "realized", &error_fatal);
-         object_unref(cpuobj);
-     }
-@@ -1626,6 +1656,9 @@ static void machvirt_init(MachineState *machine)
-         create_secure_ram(vms, secure_sysmem);
-         create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
-     }
-+    if (tag_sysmem) {
-+        create_tag_ram(vms, machine, tag_sysmem);
+-    pstate_write(env, PSTATE_DAIF | new_mode);
++    new_pstate = new_mode | PSTATE_DAIF;
++    if (cpu_isar_feature(aa64_mte, cpu)) {
++        new_pstate |= PSTATE_TCO;
 +    }
- 
-     vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
- 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 96f0ff0ec7..96506cf56d 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -870,6 +870,18 @@ void arm_cpu_post_init(Object *obj)
- 
-     qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property,
-                              &error_abort);
-+
-+#ifndef CONFIG_USER_ONLY
-+    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) &&
-+        cpu_isar_feature(aa64_mte, cpu)) {
-+        object_property_add_link(obj, "tag-memory",
-+                                 TYPE_MEMORY_REGION,
-+                                 (Object **)&cpu->tag_memory,
-+                                 qdev_prop_allow_set_link_before_realize,
-+                                 OBJ_PROP_LINK_STRONG,
-+                                 &error_abort);
-+    }
-+#endif
- }
- 
- static void arm_cpu_finalizefn(Object *obj)
-@@ -1182,16 +1194,19 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-     init_cpreg_list(cpu);
- 
- #ifndef CONFIG_USER_ONLY
-+    cs->num_ases = 1;
-     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-         cs->num_ases = 2;
--
-         if (!cpu->secure_memory) {
-             cpu->secure_memory = cs->memory;
-         }
-         cpu_address_space_init(cs, ARMASIdx_S, "cpu-secure-memory",
-                                cpu->secure_memory);
--    } else {
--        cs->num_ases = 1;
-+    }
-+    if (cpu->tag_memory != NULL) {
-+        cs->num_ases = 3;
-+        cpu_address_space_init(cs, ARMASIdx_TAG, "cpu-tag-memory",
-+                               cpu->tag_memory);
-     }
-     cpu_address_space_init(cs, ARMASIdx_NS, "cpu-memory", cs->memory);
++    pstate_write(env, new_pstate);
+     env->aarch64 = 1;
+     aarch64_restore_sp(env, new_el);
  
 -- 
 2.17.2
