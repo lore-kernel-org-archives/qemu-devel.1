@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60359)
+Received: from eggs.gnu.org ([209.51.188.92]:32907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h1hVf-0000D1-4D
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:07:44 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1hbP-0001U9-3x
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:13:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h1hVe-0007PQ-7C
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:07:43 -0500
-References: <1551823429-1440-1-git-send-email-guoheyi@huawei.com>
-	<20190306113354.5a98654b@redhat.com>
-	<b904272b-9eca-36e7-d24b-4c84b6c4f4af@huawei.com>
-	<20190306172045.14a58996@Igors-MacBook-Pro.local>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <28709fc5-5a34-0f26-ad81-db2baa6a0b53@huawei.com>
-Date: Thu, 7 Mar 2019 09:07:26 +0800
+	(envelope-from <philmd@redhat.com>) id 1h1hbO-0001Vj-5P
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:13:38 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:50599)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1hbL-0001V8-Qk
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:13:37 -0500
+Received: by mail-wm1-f65.google.com with SMTP id x7so7694318wmj.0
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 17:13:35 -0800 (PST)
+References: <20190306200925.17605-1-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c756da8a-2545-2349-dfa1-a2c44f21195d@redhat.com>
+Date: Thu, 7 Mar 2019 02:13:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190306172045.14a58996@Igors-MacBook-Pro.local>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw/arm/acpi: simplify AML bit
- and/or statement
+In-Reply-To: <20190306200925.17605-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: add new netlink types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, wanghaibin.wang@huawei.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-Got it; thanks.
+On 3/6/19 9:09 PM, Laurent Vivier wrote:
+> Add QEMU_IFLA_BR_VLAN_STATS_PER_PORT (from linux v4.20),
+>     QEMU_IFLA_BR_MULTI_BOOLOPT (from linux v5.0).
+> 
+> The first new entry fixes the following error:
+> 
+>   Unknown QEMU_IFLA_BR type 45
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-Heyi
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-On 2019/3/7 0:20, Igor Mammedov wrote:
-> On Wed, 6 Mar 2019 21:09:11 +0800
-> Heyi Guo <guoheyi@huawei.com> wrote:
->
->> Sorry, I didn't know the indention policy of qemu code. So we need to indent the 2nd line just after the parentheses it belongs to?
-> See "[PATCH v6 0/2] CODING_STYLE: trivial update" for clarification
->
->> Will change that and send next version.
->>
->> Thanks,
->>
->> Heyi
->>
->>
->> On 2019/3/6 18:33, Igor Mammedov wrote:
->>> On Wed, 6 Mar 2019 06:03:48 +0800
->>> Heyi Guo <guoheyi@huawei.com> wrote:
->>>
->>>> The last argument of AML bit and/or statement is the target variable,
->>>> so we don't need to use a NULL target and then an additional store
->>>> operation; a single bit and/or statement is enough.
->>>>
->>>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
->>>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>>> Cc: Igor Mammedov <imammedo@redhat.com>
->>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->>>> ---
->>>>    hw/arm/virt-acpi-build.c | 8 ++++----
->>>>    1 file changed, 4 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>> index 04b62c7..1c84e87 100644
->>>> --- a/hw/arm/virt-acpi-build.c
->>>> +++ b/hw/arm/virt-acpi-build.c
->>>> @@ -265,16 +265,16 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>>>            aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
->>>>        aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
->>>>        aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
->>>> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
->>>> +    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
->>>>                                    aml_name("CTRL")));
->>> pls fix indent in all such cases. I'd align it like this:
->>>      aml_append(ifctx,
->>>                 aml_and(aml_name("CTRL"), aml_int(0x1D), aml_name("CTRL")));
->>>
->>> or
->>>      aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
->>>                                aml_name("CTRL")));
->>>
->>>
->>> PS:
->>> When making multi-patch series use --cover-letter git option
->>>
->>>>    
->>>>        ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
->>>> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
->>>> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x08),
->>>>                                     aml_name("CDW1")));
->>>>        aml_append(ifctx, ifctx1);
->>>>    
->>>>        ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
->>>> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
->>>> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x10),
->>>>                                     aml_name("CDW1")));
->>>>        aml_append(ifctx, ifctx1);
->>>>    
->>>> @@ -283,7 +283,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>>>        aml_append(method, ifctx);
->>>>    
->>>>        elsectx = aml_else();
->>>> -    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
->>>> +    aml_append(elsectx, aml_or(aml_name("CDW1"), aml_int(4),
->>>>                                      aml_name("CDW1")));
->>>>        aml_append(elsectx, aml_return(aml_arg(3)));
->>>>        aml_append(method, elsectx);
->>> .
->>>
->>
->>
->
-> .
->
+> ---
+>  linux-user/fd-trans.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
+> index 30425c9df6bc..612819c1b1ec 100644
+> --- a/linux-user/fd-trans.c
+> +++ b/linux-user/fd-trans.c
+> @@ -75,6 +75,8 @@ enum {
+>      QEMU_IFLA_BR_MCAST_STATS_ENABLED,
+>      QEMU_IFLA_BR_MCAST_IGMP_VERSION,
+>      QEMU_IFLA_BR_MCAST_MLD_VERSION,
+> +    QEMU_IFLA_BR_VLAN_STATS_PER_PORT,
+> +    QEMU_IFLA_BR_MULTI_BOOLOPT,
+>      QEMU___IFLA_BR_MAX,
+>  };
+>  
+> @@ -438,6 +440,7 @@ static abi_long host_to_target_data_bridge_nlattr(struct nlattr *nlattr,
+>      case QEMU_IFLA_BR_MCAST_STATS_ENABLED:
+>      case QEMU_IFLA_BR_MCAST_IGMP_VERSION:
+>      case QEMU_IFLA_BR_MCAST_MLD_VERSION:
+> +    case QEMU_IFLA_BR_VLAN_STATS_PER_PORT:
+>          break;
+>      /* uint16_t */
+>      case QEMU_IFLA_BR_PRIORITY:
+> @@ -543,6 +546,12 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
+>      case QEMU_IFLA_BRPORT_ROOT_ID:
+>      case QEMU_IFLA_BRPORT_BRIDGE_ID:
+>          break;
+> +    /* br_boolopt_multi { uint32_t, uint32_t } */
+> +    case QEMU_IFLA_BR_MULTI_BOOLOPT:
+> +        u32 = NLA_DATA(nlattr);
+> +        u32[0] = tswap32(u32[0]); /* optval */
+> +        u32[1] = tswap32(u32[1]); /* optmask */
+> +        break;
+>      default:
+>          gemu_log("Unknown QEMU_IFLA_BRPORT type %d\n", nlattr->nla_type);
+>          break;
+> 
