@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41141)
+Received: from eggs.gnu.org ([209.51.188.92]:42203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1wvq-0007ML-Hr
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:35:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1h1x0S-0002ne-S5
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:40:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1wvn-0002jv-1U
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:35:46 -0500
-Resent-Message-Id: <E1h1wvn-0002jv-1U@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21085)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1wvm-0002iy-R5
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:35:42 -0500
-Message-ID: <155198012447.8146.4704002606224045353@6acff2cf482b>
-In-Reply-To: <20190307170440.3113-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1h1x0S-0005j5-6U
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:40:32 -0500
+References: <20190307165303.15382-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <415d75bd-2d62-d19a-8a5f-e463f4f72866@redhat.com>
+Date: Thu, 7 Mar 2019 11:40:25 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 09:35:25 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 00/22] target/arm: Implement
- ARMv8.5-MemTag, system mode
+In-Reply-To: <20190307165303.15382-1-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IG1tCIMt6q5wgmOr2MGM9QBX2X2AB64FK"
+Subject: Re: [Qemu-devel] [PATCH] qcow2 spec: Describe string header
+ extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE3MDQ0MC4zMTEz
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA3MTcw
-NDQwLjMxMTMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggdjQgMDAvMjJdIHRhcmdldC9hcm06IEltcGxlbWVudCBBUk12OC41LU1lbVRh
-Zywgc3lzdGVtIG1vZGUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
-IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
-dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
-Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAg
-ICAgIHBhdGNoZXcvMjAxOTAzMDcxNzA0NDAuMzExMy0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
-by5vcmcgLT4gcGF0Y2hldy8yMDE5MDMwNzE3MDQ0MC4zMTEzLTEtcmljaGFyZC5oZW5kZXJzb25A
-bGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjIzZmRlYmQyMTAgdGFy
-Z2V0L2FybTogRW5hYmxlIE1URQozY2YwMTk1M2ZmIHRhcmdldC9hcm06IEFkZCBhbGxvY2F0aW9u
-IHRhZyBzdG9yYWdlIGZvciBzeXN0ZW0gbW9kZQo0OTRkZjk2MzFiIHRhcmdldC9hcm06IENyZWF0
-ZSBhIFRMQiBlbnRyeSBmb3IgdGFnIHBoeXNpY2FsIGFkZHJlc3Mgc3BhY2UKYzNhZWE5MTVhZCB0
-YXJnZXQvYXJtOiBDcmVhdGUgdGFnZ2VkIHJhbSB3aGVuIE1URSBpcyBlbmFibGVkCmYwNzNkNTE3
-ZWMgdGFyZ2V0L2FybTogQ2FjaGUgdGhlIFRhZ2dlZCBiaXQgZm9yIGEgcGFnZSBpbiBNZW1UeEF0
-dHJzCjc1OTcxMTZmZWQgdGFyZ2V0L2FybTogU2V0IFBTVEFURS5UQ08gb24gZXhjZXB0aW9uIGVu
-dHJ5Cjc5OGQ3M2UxNjYgdGFyZ2V0L2FybTogSW1wbGVtZW50IGRhdGEgY2FjaGUgc2V0IGFsbG9j
-YXRpb24gdGFncwo4NDNhMmMxM2Q5IHRhcmdldC9hcm06IENsZWFuIGFkZHJlc3MgZm9yIERDIFpW
-QQpiZWZmNmUzNTU4IHRhcmdldC9hcm06IEltcGxlbWVudCB0aGUgYWNjZXNzIHRhZyBjYWNoZSBm
-bHVzaGVzCjc5YjUzMzU1MjQgdGFyZ2V0L2FybTogSW1wbGVtZW50IHRoZSBMREdNIGFuZCBTVEdN
-IGluc3RydWN0aW9ucwplZDlhOTE1NzAyIHRhcmdldC9hcm06IEltcGxlbWVudCB0aGUgU1RHUCBp
-bnN0cnVjdGlvbgowMTQzMzE5MjU2IHRhcmdldC9hcm06IEltcGxlbWVudCBMREcsIFNURywgU1Qy
-RyBpbnN0cnVjdGlvbnMKNTQzNTdkYjJjNSB0YXJnZXQvYXJtOiBEZWZpbmUgYXJtX2NwdV9kb191
-bmFsaWduZWRfYWNjZXNzIGZvciBDT05GSUdfVVNFUl9PTkxZCmQ3MmQxYTBjMGUgdGFyZ2V0L2Fy
-bTogSW1wbGVtZW50IHRoZSBTVUJQIGluc3RydWN0aW9uCmJhNTBhN2E5OWQgdGFyZ2V0L2FybTog
-SW1wbGVtZW50IHRoZSBHTUkgaW5zdHJ1Y3Rpb24KMDk1MzNlNGUyYyB0YXJnZXQvYXJtOiBJbXBs
-ZW1lbnQgQURERywgU1VCRyBpbnN0cnVjdGlvbnMKNTkzOTk5ZTg5YSB0YXJnZXQvYXJtOiBJbXBs
-ZW1lbnQgdGhlIElSRyBpbnN0cnVjdGlvbgo4MzA2ZmQ4MDMzIHRhcmdldC9hcm06IFN1cHByZXNz
-IHRhZyBjaGVjayBmb3Igc3Arb2Zmc2V0CmM3ZWRiZWI2OGMgdGFyZ2V0L2FybTogQWRkIGhlbHBl
-cl9tdGVfY2hlY2t7MSwgMn0KNDFlZmYzZmI0MCB0YXJnZXQvYXJtOiBBZGQgTVRFIHN5c3RlbSBy
-ZWdpc3RlcnMKNDZlOTc3NzM4NyB0YXJnZXQvYXJtOiBFeHRyYWN0IFRDTUEgd2l0aCBBUk1WQVBh
-cmFtZXRlcnMKZTY4ZDhkYTk2MiB0YXJnZXQvYXJtOiBBZGQgTVRFX0FDVElWRSB0byB0Yl9mbGFn
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yMiBDaGVja2luZyBjb21taXQgZTY4ZDhkYTk2Mjlk
-ICh0YXJnZXQvYXJtOiBBZGQgTVRFX0FDVElWRSB0byB0Yl9mbGFncykKMi8yMiBDaGVja2luZyBj
-b21taXQgNDZlOTc3NzM4N2ZmICh0YXJnZXQvYXJtOiBFeHRyYWN0IFRDTUEgd2l0aCBBUk1WQVBh
-cmFtZXRlcnMpCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpX
-eFcpCiM3MDogRklMRTogdGFyZ2V0L2FybS9pbnRlcm5hbHMuaDo5NjI6CisgICAgYm9vbCB0Y21h
-ICAgICAgIDogMTsKICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCA0OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIyIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgozLzIyIENoZWNraW5nIGNvbW1pdCA0MWVmZjNmYjQwMzQgKHRhcmdldC9hcm06IEFk
-ZCBNVEUgc3lzdGVtIHJlZ2lzdGVycykKNC8yMiBDaGVja2luZyBjb21taXQgYzdlZGJlYjY4YzU5
-ICh0YXJnZXQvYXJtOiBBZGQgaGVscGVyX210ZV9jaGVja3sxLCAyfSkKV0FSTklORzogYWRkZWQs
-IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
-PwojNDI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
-LCAxNjcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-Lgo1LzIyIENoZWNraW5nIGNvbW1pdCA4MzA2ZmQ4MDMzZWUgKHRhcmdldC9hcm06IFN1cHByZXNz
-IHRhZyBjaGVjayBmb3Igc3Arb2Zmc2V0KQo2LzIyIENoZWNraW5nIGNvbW1pdCA1OTM5OTllODlh
-MmYgKHRhcmdldC9hcm06IEltcGxlbWVudCB0aGUgSVJHIGluc3RydWN0aW9uKQo3LzIyIENoZWNr
-aW5nIGNvbW1pdCAwOTUzM2U0ZTJjZGEgKHRhcmdldC9hcm06IEltcGxlbWVudCBBRERHLCBTVUJH
-IGluc3RydWN0aW9ucykKOC8yMiBDaGVja2luZyBjb21taXQgYmE1MGE3YTk5ZGI5ICh0YXJnZXQv
-YXJtOiBJbXBsZW1lbnQgdGhlIEdNSSBpbnN0cnVjdGlvbikKOS8yMiBDaGVja2luZyBjb21taXQg
-ZDcyZDFhMGMwZWIxICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQgdGhlIFNVQlAgaW5zdHJ1Y3Rpb24p
-CjEwLzIyIENoZWNraW5nIGNvbW1pdCA1NDM1N2RiMmM1NjEgKHRhcmdldC9hcm06IERlZmluZSBh
-cm1fY3B1X2RvX3VuYWxpZ25lZF9hY2Nlc3MgZm9yIENPTkZJR19VU0VSX09OTFkpCjExLzIyIENo
-ZWNraW5nIGNvbW1pdCAwMTQzMzE5MjU2MDMgKHRhcmdldC9hcm06IEltcGxlbWVudCBMREcsIFNU
-RywgU1QyRyBpbnN0cnVjdGlvbnMpCjEyLzIyIENoZWNraW5nIGNvbW1pdCBlZDlhOTE1NzAyYzIg
-KHRhcmdldC9hcm06IEltcGxlbWVudCB0aGUgU1RHUCBpbnN0cnVjdGlvbikKMTMvMjIgQ2hlY2tp
-bmcgY29tbWl0IDc5YjUzMzU1MjQ1ZCAodGFyZ2V0L2FybTogSW1wbGVtZW50IHRoZSBMREdNIGFu
-ZCBTVEdNIGluc3RydWN0aW9ucykKMTQvMjIgQ2hlY2tpbmcgY29tbWl0IGJlZmY2ZTM1NTg1MCAo
-dGFyZ2V0L2FybTogSW1wbGVtZW50IHRoZSBhY2Nlc3MgdGFnIGNhY2hlIGZsdXNoZXMpCjE1LzIy
-IENoZWNraW5nIGNvbW1pdCA4NDNhMmMxM2Q5NDAgKHRhcmdldC9hcm06IENsZWFuIGFkZHJlc3Mg
-Zm9yIERDIFpWQSkKMTYvMjIgQ2hlY2tpbmcgY29tbWl0IDc5OGQ3M2UxNjYxOSAodGFyZ2V0L2Fy
-bTogSW1wbGVtZW50IGRhdGEgY2FjaGUgc2V0IGFsbG9jYXRpb24gdGFncykKMTcvMjIgQ2hlY2tp
-bmcgY29tbWl0IDc1OTcxMTZmZWQ5NSAodGFyZ2V0L2FybTogU2V0IFBTVEFURS5UQ08gb24gZXhj
-ZXB0aW9uIGVudHJ5KQoxOC8yMiBDaGVja2luZyBjb21taXQgZjA3M2Q1MTdlYzgwICh0YXJnZXQv
-YXJtOiBDYWNoZSB0aGUgVGFnZ2VkIGJpdCBmb3IgYSBwYWdlIGluIE1lbVR4QXR0cnMpCjE5LzIy
-IENoZWNraW5nIGNvbW1pdCBjM2FlYTkxNWFkYjQgKHRhcmdldC9hcm06IENyZWF0ZSB0YWdnZWQg
-cmFtIHdoZW4gTVRFIGlzIGVuYWJsZWQpCjIwLzIyIENoZWNraW5nIGNvbW1pdCA0OTRkZjk2MzFi
-MzkgKHRhcmdldC9hcm06IENyZWF0ZSBhIFRMQiBlbnRyeSBmb3IgdGFnIHBoeXNpY2FsIGFkZHJl
-c3Mgc3BhY2UpCjIxLzIyIENoZWNraW5nIGNvbW1pdCAzY2YwMTk1M2ZmOGIgKHRhcmdldC9hcm06
-IEFkZCBhbGxvY2F0aW9uIHRhZyBzdG9yYWdlIGZvciBzeXN0ZW0gbW9kZSkKMjIvMjIgQ2hlY2tp
-bmcgY29tbWl0IDIzZmRlYmQyMTA2YyAodGFyZ2V0L2FybTogRW5hYmxlIE1URSkKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDcxNzA0NDAu
-MzExMy0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90
-eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
-IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IG1tCIMt6q5wgmOr2MGM9QBX2X2AB64FK
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, qemu-devel@nongnu.org
+Message-ID: <415d75bd-2d62-d19a-8a5f-e463f4f72866@redhat.com>
+Subject: Re: [PATCH] qcow2 spec: Describe string header extensions
+References: <20190307165303.15382-1-kwolf@redhat.com>
+In-Reply-To: <20190307165303.15382-1-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 3/7/19 10:53 AM, Kevin Wolf wrote:
+> Be more specific about the string representation in header extensions.
+>=20
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  docs/interop/qcow2.txt | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+>=20
+
+Based-on: <20190227172256.30368-1-kwolf@redhat.com>
+
+> =20
+> =20
+> +=3D=3D String header extensions =3D=3D
+> +
+> +Some header extensions (such as the backing file format name and the e=
+xternal
+> +data file name) are just a single string. In this case, the header ext=
+ension
+> +length is the string length and the string is not '\0' terminated. (Th=
+e header
+> +extension padding can make it look like a string is '\0' terminated, b=
+ut
+> +neither is padding always necessary nor is there a guarantee that zero=
+ bytes
+> +are used for padding.)
+
+We didn't require 0 padding?  (goes and re-reads) - oops, yes that's
+correct. It makes it harder to extend a struct by making use of that
+padding if you can't guarantee what the padding had to be prior to the
+extension, and means that you have to consider whether there are any
+potential security risks of the padding being used as a side channel to
+leak information while still being a well-formed file. But changing the
+standard to require zero padding is different than documenting existing
+practice, so your patch is correct.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--IG1tCIMt6q5wgmOr2MGM9QBX2X2AB64FK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBV4kACgkQp6FrSiUn
+Q2r1iwf/UR+dedHQSz4G4qoIpLCx2q3Saf5JseS+9vlCN7p+kYlo+g8w6wy2v6Ph
+oKUcZbPzqgV5yh8ZSQzxSFcYNGytFhR109t1A1fI4l80vsLi+2+ikYqtlkssCZAd
+vZZPwQkGDIF3y5ApuiGibWel5Lbuj1WTR1f9PhRz6mo4ClhR3ppt24b1uKb2paxI
+Kb6tiOVrNbZjnmSwoDB6RQzYsvt8OXUhf334AWSLGi/Nmo/ZRyl1HYDZBtkQpHUq
+yj2+2MOlk0Tc0zZidg+TaTf5nvDLaeEnH9zIa0d0BLGjJUJCxlEMIuYdqlhB9j0O
+HIomEyOvCwq9r3qfoaIHAz5LqJFWVQ==
+=1qHl
+-----END PGP SIGNATURE-----
+
+--IG1tCIMt6q5wgmOr2MGM9QBX2X2AB64FK--
