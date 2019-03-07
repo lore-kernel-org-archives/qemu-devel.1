@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35892)
+Received: from eggs.gnu.org ([209.51.188.92]:36213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1tMj-0002O8-NF
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:47:18 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1h1tNu-000380-1l
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1tMi-0004ds-SR
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:47:17 -0500
-Received: from mail-wm1-f54.google.com ([209.85.128.54]:40387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1tMi-0004cs-9v
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:47:16 -0500
-Received: by mail-wm1-f54.google.com with SMTP id g20so9211667wmh.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 05:47:15 -0800 (PST)
-References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA-nGLVySjjK65Bfedr5H-6XP1_t1rpnupjL89KB-HN8wQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <646bf94e-66da-5083-d2b7-b96633bb5acf@redhat.com>
-Date: Thu, 7 Mar 2019 14:47:13 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-nGLVySjjK65Bfedr5H-6XP1_t1rpnupjL89KB-HN8wQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1h1tNt-0005ET-Di
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:48:30 -0500
+Received: from mail-eopbgr690134.outbound.protection.outlook.com
+	([40.107.69.134]:45134
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1h1tNt-0005Dd-2Z
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:48:29 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 7 Mar 2019 13:48:26 +0000
+Message-ID: <BN6PR2201MB125115C44ECE81BE1E1C9576C64C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20190305162829.20079-1-philmd@redhat.com>
+	<20190305162829.20079-2-philmd@redhat.com>,
+	<87pnr3upsq.fsf@dusky.pond.sub.org>
+In-Reply-To: <87pnr3upsq.fsf@dusky.pond.sub.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
- excluding ARM and MIPS
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 1/5] hw/mips/malta: Fix the
+ DEBUG_BOARD_INIT code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, =?Windows-1252?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 3/7/19 2:25 PM, Peter Maydell wrote:
-> On Mon, 4 Mar 2019 at 19:25, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> The following changes since commit 1ba530a4ecba6015d52d8f392fd327cfa07bc37a:
->>
->>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190304' into staging (2019-03-04 13:38:54 +0000)
->>
->> are available in the git repository at:
->>
->>
->>   git://github.com/bonzini/qemu.git tags/for-upstream-kconfig
->>
->> for you to fetch changes up to b1d8b9a6cc37e33dde1873379174de78957830ca:
->>
->>   kconfig: add documentation (2019-03-04 19:09:35 +0100)
->>
->> ----------------------------------------------------------------
->> Initial Kconfig work, excluding ARM and MIPS
-> 
-> Build failure for the Windows builds:
-> 
-> In file included from /home/petmay01/qemu-for-merges/hw/tpm/tpm_emulator.c:37:0:
-> /home/petmay01/qemu-for-merges/hw/tpm/tpm_ioctl.h:11:21: fatal error:
-> sys/uio.h: No such file or directory
-> 
-> I'm not sure what's happened here. It looks like the Kconfig machinery
-> is putting CONFIG_TPM_EMULATOR in build/x86-64-softmmu/config-devices.mak,
-> but configure is trying to put it into config-host.mak. The configure
-> code is where the "don't do TPM on windows" check is, but the Kconfig
-> entry in config-devices.mak overrides that and tries to build this
-> code on Windows anyway.
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [Qemu-devel] [PATCH 1/5] hw/mips/malta: Fix the DEBUG_BOARD_=
+INIT code
+>=20
+> Philippe Mathieu-Daud=E9 <philmd@redhat.com> writes:
+>=20
+> > Commit fa1d36df746 missed to convert this ifdef'ed out code.
+> > Introduce the pflash_blk variable.
+> >=20
+> > This fixes:
+> >=20
+> >    hw/mips/mips_malta.c:1273:16: error: implicit declaration of functio=
+n =91blk_name=92; did you mean =91basename=92? [-Werror=3Dimplicit-function=
+-declaration]
+> >                 blk_name(dinfo->bdrv), fl_sectors);
+> >                 ^~~~~~~~
+> >   hw/mips/mips_malta.c:1273:16: error: nested extern declaration of =91=
+blk_name=92 [-Werror=3Dnested-externs]
+> >   hw/mips/mips_malta.c:1273:30: error: =91DriveInfo=92 {aka =91struct D=
+riveInfo=92} has no member named =91bdrv=92
+> >                 blk_name(dinfo->bdrv), fl_sectors);
+> >                                 ^~
+> >=20
+> > Fixes: fa1d36df746
+> > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>=20
+> Question for the maintainers: Aurelien, Aleksandar, fix the
+> DEBUG_BOARD_INIT code or drop it?  It looks rather stale...
 
-Paolo, we might need:
+Markus,
 
--- >8 --
-diff --git a/Makefile b/Makefile
---- a/Makefile
-+++ b/Makefile
-@@ -336,6 +336,7 @@ MINIKCONF_ARGS = \
-     CONFIG_SPICE=$(CONFIG_SPICE) \
-     CONFIG_IVSHMEM=$(CONFIG_IVSHMEM) \
-     CONFIG_TPM=$(CONFIG_TPM) \
-+    CONFIG_TPM_EMULATOR=$(CONFIG_TPM_EMULATOR) \
-     CONFIG_XEN=$(CONFIG_XEN) \
-     CONFIG_OPENGL=$(CONFIG_OPENGL) \
-     CONFIG_X11=$(CONFIG_X11) \
----
+My vote is: drop it.
 
-I'm not sure about CONFIG_TPM_PASSTHROUGH.
+And, Markus, yes, if you agree with any patch from this series, please let =
+them all go though your pull request.
 
-> 
-> All the other builds seemed to run ok (I'm just rerunning one lot
-> which failed due to an issue on my end; will follow up if there's
-> any failure there).
-> 
-> thanks
-> -- PMM
-> 
+Regards,
+Aleksandar
