@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48402)
+Received: from eggs.gnu.org ([209.51.188.92]:48936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h1xOl-0007FG-Bt
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:05:40 -0500
+	(envelope-from <stefanha@redhat.com>) id 1h1xQI-000079-K3
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:07:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h1xOj-0006M7-7b
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:05:39 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Thu,  7 Mar 2019 18:05:19 +0000
-Message-Id: <20190307180520.13868-7-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20190307180520.13868-1-mark.cave-ayland@ilande.co.uk>
-References: <20190307180520.13868-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v2 6/7] target/ppc: switch fpr/vsrl registers
- so all VSX registers are in host endian order
+	(envelope-from <stefanha@redhat.com>) id 1h1xQH-0007xb-Nl
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:07:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46920)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1h1xQH-0007x9-GT
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:07:13 -0500
+Date: Thu, 7 Mar 2019 18:07:10 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190307180710.GE2915@stefanha-x1.localdomain>
+References: <20190307161925.4158-1-rusakova.nastasia@icloud.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qFgkTsE6LiHkLPZw"
+Content-Disposition: inline
+In-Reply-To: <20190307161925.4158-1-rusakova.nastasia@icloud.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hw/block/virtio-blk: Clean req->dev
+ repetitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,110 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org
+To: Anastasiia Rusakova <arusakova917@gmail.com>
+Cc: qemu-devel@nongnu.org, jusual@mail.ru
 
-When VSX support was initially added, the fpr registers were added at
-offset 0 of the VSR register and the vsrl registers were added at offset
-1. This is in contrast to the VMX registers (the last 32 VSX registers) which
-are stored in host-endian order.
 
-Switch the fpr/vsrl registers so that the lower 32 VSX registers are now also
-stored in host endian order to match the VMX registers. This ensures that TCG
-vector operations involving mixed VMX and VSX registers will function
-correctly.
+--qFgkTsE6LiHkLPZw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/cpu.h      | 4 ++--
- target/ppc/internal.h | 8 ++++----
- target/ppc/machine.c  | 8 ++++----
- 3 files changed, 10 insertions(+), 10 deletions(-)
+On Thu, Mar 07, 2019 at 06:19:25PM +0200, Anastasiia Rusakova wrote:
+> From: Anastasiia Rusakova <arusakova917@gmail.com>
+>=20
+> Some functions sometimes uses req->dev even though a local variable
+> VirtIOBlock* s =3D req->dev has already been defined.
+> Updated places to use s everywhere in the file.
+>=20
+> Signed-off-by: Anastasiia Rusakova <arusakova917@gmail.com>
+> ---
+>  hw/block/virtio-blk.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index aebb6c01ee..704e595014 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -2585,7 +2585,7 @@ static inline bool lsw_reg_in_range(int start, int nregs, int rx)
- 
- static inline int fpr_offset(int i)
- {
--    return offsetof(CPUPPCState, vsr[i].u64[0]);
-+    return offsetof(CPUPPCState, vsr[i].VsrD(0));
- }
- 
- static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
-@@ -2595,7 +2595,7 @@ static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
- 
- static inline int vsrl_offset(int i)
- {
--    return offsetof(CPUPPCState, vsr[i].u64[1]);
-+    return offsetof(CPUPPCState, vsr[i].VsrD(1));
- }
- 
- static inline int vsr_full_offset(int i)
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index 3ebbdf4da4..fb6f64ed1e 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -206,14 +206,14 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
- 
- static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
- {
--    vsr->VsrD(0) = env->vsr[n].u64[0];
--    vsr->VsrD(1) = env->vsr[n].u64[1];
-+    vsr->VsrD(0) = env->vsr[n].VsrD(0);
-+    vsr->VsrD(1) = env->vsr[n].VsrD(1);
- }
- 
- static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
- {
--    env->vsr[n].u64[0] = vsr->VsrD(0);
--    env->vsr[n].u64[1] = vsr->VsrD(1);
-+    env->vsr[n].VsrD(0) = vsr->VsrD(0);
-+    env->vsr[n].VsrD(1) = vsr->VsrD(1);
- }
- 
- void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index 756b6d2971..a92d0ad3a3 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -150,7 +150,7 @@ static int get_fpr(QEMUFile *f, void *pv, size_t size,
- {
-     ppc_vsr_t *v = pv;
- 
--    v->u64[0] = qemu_get_be64(f);
-+    v->VsrD(0) = qemu_get_be64(f);
- 
-     return 0;
- }
-@@ -160,7 +160,7 @@ static int put_fpr(QEMUFile *f, void *pv, size_t size,
- {
-     ppc_vsr_t *v = pv;
- 
--    qemu_put_be64(f, v->u64[0]);
-+    qemu_put_be64(f, v->VsrD(0));
-     return 0;
- }
- 
-@@ -181,7 +181,7 @@ static int get_vsr(QEMUFile *f, void *pv, size_t size,
- {
-     ppc_vsr_t *v = pv;
- 
--    v->u64[1] = qemu_get_be64(f);
-+    v->VsrD(1) = qemu_get_be64(f);
- 
-     return 0;
- }
-@@ -191,7 +191,7 @@ static int put_vsr(QEMUFile *f, void *pv, size_t size,
- {
-     ppc_vsr_t *v = pv;
- 
--    qemu_put_be64(f, v->u64[1]);
-+    qemu_put_be64(f, v->VsrD(1));
-     return 0;
- }
- 
--- 
-2.11.0
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
+
+--qFgkTsE6LiHkLPZw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcgV3OAAoJEJykq7OBq3PI2uEH/Rn2e/4KN5PuZwYDRqItiTww
+dEUf2p+n+CDyZJitvWm2iFHOmxp+yoj6BKSil4RJbtFx0MSvIsZ7BIzDfC/w+nTw
+USxxWIUp2ELdxekM7lEAEju+i9xQK3ji+4ZflW4JoTNMi1smst5a2vPR0hRvovoj
+IoZD6sjGPaDRIBT+oJQyqMpkx8Tatb4UShcwxDhhUu0zHRUcabXzKc5lNTK0Eexv
+V6XAe1tqjwTgB2EDszw1VfYkn4DQ4mJ8BUxOqsaTyEMyY2/Kz+pp8RBoFXTsI78t
+u/O3zBaevmxKf+bP8pbrZ06azCaj/KPA8pzQd3Qj2VRxNJ2ZGkHNg78JoegMJf4=
+=jqFK
+-----END PGP SIGNATURE-----
+
+--qFgkTsE6LiHkLPZw--
