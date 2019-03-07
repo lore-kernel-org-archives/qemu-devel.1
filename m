@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43580)
+Received: from eggs.gnu.org ([209.51.188.92]:43641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1x6D-0007l6-5u
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:46:30 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1x6K-0007tS-6D
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:46:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1x6C-0001lu-9S
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:46:29 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33770)
+	(envelope-from <philmd@redhat.com>) id 1h1x6J-0001wX-D3
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:46:36 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:36995)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1x6C-0001lE-2D
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:46:28 -0500
-Received: by mail-wr1-f65.google.com with SMTP id i12so18458393wrw.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:46:27 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1x6J-0001vb-6r
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:46:35 -0500
+Received: by mail-wr1-f65.google.com with SMTP id w6so18461969wrs.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:46:35 -0800 (PST)
 References: <20190307172401.29451-1-armbru@redhat.com>
-	<20190307172401.29451-7-armbru@redhat.com>
+	<20190307172401.29451-8-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a0c9dbfd-8e5c-fe62-3b5f-e01050b166e4@redhat.com>
-Date: Thu, 7 Mar 2019 18:46:25 +0100
+Message-ID: <3ea2a268-4871-2a4e-c1c1-e3f75f711f04@redhat.com>
+Date: Thu, 7 Mar 2019 18:46:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190307172401.29451-7-armbru@redhat.com>
+In-Reply-To: <20190307172401.29451-8-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/12] vl: Factor configure_blockdev()
- out of main()
+Subject: Re: [Qemu-devel] [PATCH v2 07/12] vl: Create block backends before
+ setting machine properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,107 +35,52 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com
 
 On 3/7/19 6:23 PM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> qemu-system-FOO's main() acts on command line arguments in its own
+> idiosyncratic order.  There's not much method to its madness.
+> Whenever we find a case where one kind of command line argument needs
+> to refer to something created for another kind later, we rejigger the
+> order.
 > 
-> # Conflicts:
-> #	vl.c
-
-^ leftover?
-
+> Block devices get created long after machine properties get processed.
+> Therefore, block device machine properties can be created, but not
+> set.  No such properties exist.  But the next commit will create some.
+> Time to rejigger again: create block devices earlier.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  vl.c | 71 +++++++++++++++++++++++++++++++++---------------------------
->  1 file changed, 39 insertions(+), 32 deletions(-)
+>  vl.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
 > diff --git a/vl.c b/vl.c
-> index 00cb8ea7ca..5a19d2a8ec 100644
+> index 5a19d2a8ec..c250483fc1 100644
 > --- a/vl.c
 > +++ b/vl.c
-> @@ -1201,6 +1201,44 @@ typedef struct BlockdevOptionsQueueEntry {
+> @@ -4272,6 +4272,13 @@ int main(int argc, char **argv, char **envp)
+>          exit(0);
+>      }
 >  
->  typedef QSIMPLEQ_HEAD(, BlockdevOptionsQueueEntry) BlockdevOptionsQueue;
->  
-> +static void configure_blockdev(BlockdevOptionsQueue *bdo_queue,
-> +                               MachineClass *machine_class, int snapshot)
-> +{
-> +    /* If the currently selected machine wishes to override the units-per-bus
-> +     * property of its default HBA interface type, do so now. */
-> +    if (machine_class->units_per_default_bus) {
-> +        override_max_devs(machine_class->block_default_type,
-> +                          machine_class->units_per_default_bus);
-> +    }
-> +
-> +    /* open the virtual block devices */
-> +    while (!QSIMPLEQ_EMPTY(bdo_queue)) {
-> +        BlockdevOptionsQueueEntry *bdo = QSIMPLEQ_FIRST(bdo_queue);
-> +
-> +        QSIMPLEQ_REMOVE_HEAD(bdo_queue, entry);
-> +        loc_push_restore(&bdo->loc);
-> +        qmp_blockdev_add(bdo->bdo, &error_fatal);
-> +        loc_pop(&bdo->loc);
-> +        qapi_free_BlockdevOptions(bdo->bdo);
-> +        g_free(bdo);
-> +    }
-> +    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-> +        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-> +                          NULL, NULL);
-> +    }
-> +    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
-> +                          &machine_class->block_default_type, &error_fatal)) {
-> +        /* We printed help */
-> +        exit(0);
-> +    }
-> +
-> +    default_drive(default_cdrom, snapshot, machine_class->block_default_type, 2,
-> +                  CDROM_OPTS);
-> +    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
-> +    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
-> +
-> +}
-> +
->  static QemuOptsList qemu_smp_opts = {
->      .name = "smp-opts",
->      .implied_opt_name = "cpus",
-> @@ -4360,38 +4398,7 @@ int main(int argc, char **argv, char **envp)
->      ram_mig_init();
->      dirty_bitmap_mig_init();
->  
-> -    /* If the currently selected machine wishes to override the units-per-bus
-> -     * property of its default HBA interface type, do so now. */
-> -    if (machine_class->units_per_default_bus) {
-> -        override_max_devs(machine_class->block_default_type,
-> -                          machine_class->units_per_default_bus);
-> -    }
-> -
-> -    /* open the virtual block devices */
-> -    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
-> -        BlockdevOptionsQueueEntry *bdo = QSIMPLEQ_FIRST(&bdo_queue);
-> -
-> -        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
-> -        loc_push_restore(&bdo->loc);
-> -        qmp_blockdev_add(bdo->bdo, &error_fatal);
-> -        loc_pop(&bdo->loc);
-> -        qapi_free_BlockdevOptions(bdo->bdo);
-> -        g_free(bdo);
-> -    }
-> -    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-> -        qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-> -                          NULL, NULL);
-> -    }
-> -    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
-> -                          &machine_class->block_default_type, &error_fatal)) {
-> -        /* We printed help */
-> -        exit(0);
-> -    }
-> -
-> -    default_drive(default_cdrom, snapshot, machine_class->block_default_type, 2,
-> -                  CDROM_OPTS);
-> -    default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
-> -    default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
-> +    configure_blockdev(&bdo_queue, machine_class, snapshot);
+> +    /*
+> +     * Note: we need to create block backends before
+> +     * machine_set_property(), so machine properties can refer to
+> +     * them.
+> +     */
+
+Thanks!
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+> +    configure_blockdev(&bdo_queue, machine_class, snapshot);
+> +
+>      machine_opts = qemu_get_machine_opts();
+>      qemu_opt_foreach(machine_opts, machine_set_property, current_machine,
+>                       &error_fatal);
+> @@ -4398,8 +4405,6 @@ int main(int argc, char **argv, char **envp)
+>      ram_mig_init();
+>      dirty_bitmap_mig_init();
 >  
+> -    configure_blockdev(&bdo_queue, machine_class, snapshot);
+> -
 >      qemu_opts_foreach(qemu_find_opts("mon"),
 >                        mon_init_func, NULL, &error_fatal);
+>  
 > 
