@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50693)
+Received: from eggs.gnu.org ([209.51.188.92]:51534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h1qMm-0003g5-Fd
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:35:09 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1qPZ-0005RE-T7
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:38:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h1qMg-0003YX-JQ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:35:07 -0500
-Date: Thu, 7 Mar 2019 11:34:55 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190307103455.GA5786@linux.fritz.box>
-References: <1545387387-9613-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-	<20190306215633.GM6818@localhost.localdomain>
-	<20190307102206.GC2843@stefanha-x1.localdomain>
+	(envelope-from <philmd@redhat.com>) id 1h1qPU-0005My-0z
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:38:01 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38962)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1qPT-0005Me-QV
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:37:55 -0500
+Received: by mail-wr1-f65.google.com with SMTP id l12so349657wrp.6
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 02:37:55 -0800 (PST)
+References: <20190307080244.9011-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <20956849-7110-c94c-ab2b-1e2b1e2994c0@redhat.com>
+Date: Thu, 7 Mar 2019 11:37:53 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ikeVEW9yuYc//A+q"
-Content-Disposition: inline
-In-Reply-To: <20190307102206.GC2843@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tcmu: Introduce qemu-tcmu
- utility
+In-Reply-To: <20190307080244.9011-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] virtio-gpu: fix reset.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Yaowei Bai <baiyaowei@cmss.chinamobile.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Amar Tumballi <atumball@redhat.com>, Mike Christie <mchristi@redhat.com>, Prasanna Kalever <pkalever@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiubo Li <xiubli@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
+On 3/7/19 9:02 AM, Gerd Hoffmann wrote:
+> Gerd Hoffmann (3):
+>   virtio: add class_size to VirtioPCIDeviceTypeInfo
+>   virtio-vga: fix reset.
+>   virtio-gpu: make virtio_gpu_reset static
+> 
+>  hw/virtio/virtio-pci.h         |  1 +
+>  include/hw/virtio/virtio-gpu.h |  1 -
+>  hw/display/virtio-gpu.c        |  2 +-
+>  hw/display/virtio-vga.c        | 17 +++++++++++++++--
+>  hw/virtio/virtio-pci.c         |  1 +
+>  5 files changed, 18 insertions(+), 4 deletions(-)
 
---ikeVEW9yuYc//A+q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 07.03.2019 um 11:22 hat Stefan Hajnoczi geschrieben:
-> On Wed, Mar 06, 2019 at 10:56:33PM +0100, Kevin Wolf wrote:
-> > Am 21.12.2018 um 11:16 hat Yaowei Bai geschrieben:
-> > * The first priority should be adding an in-process iscsi target that
-> >   can be managed with QMP, similar to the built-in NBD server.
->=20
-> Using the in-kernel SCSI target with TCMU, or do you mean implementing
-> the iSCSI network protocol inside QEMU?
-
-Using TCMU in this case, of course. This point was about external tool
-vs. exporting from a running QEMU instance, not about how to implement
-the actual functionality.
-
-Building an external command line tool around QMP functionality is easy,
-but the reverse way isn't necessarily. This is why I think QMP-based
-should come first.
-
-Kevin
-
---ikeVEW9yuYc//A+q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJcgPPPAAoJEH8JsnLIjy/WZloQAJmDzxVkkbkFjH987hYoq7i4
-hy+NP0e8aBvDWzq+MTYeN2MS3S3EC2nP36P7EWKiWN000Wm9nMz4gPzavR1N5831
-LhgnMmwWi+/vxCe8sIyAAIJBw3kkIeZc/CLGjGLVUs3r6N1WEcxw3qQBwu+wKt3+
-i655AD8SV9rim2UKPGoF/p7wNurrGm5He2CRhQ8Gu2qC5l9NvgjaQNic4aEnfv8l
-oOwePTU0/mSE8WeQGvADFPH5TdtEDnwl+LWQGpT88TwvRUOwIXKMAcLLcbIybZEr
-f4x8ZGtcQn+bruOvu5yAVP+iH/81da0YfVfgSzDOsddyvurAb2NmPKWCsbz00dOo
-8atWJOjpwHughb9fhDKtG5ir0RSRoxLypEtH1VnGHUwz/idAy0XhNtFThjTgVIX+
-t9Kqjz8t5ebYpKOVE9lmpBkb0y90KXA85aiTfJtE1dCDxhTEipJ+EhMfLcClSnhp
-2oDXHfIRrAsQzHxsfbcAp4n/jZvWVVGiVrzV5ps5BvdZMybC2LHw0u6EciRMuqkN
-9L+7A0nwlY3l6NUFdAgNMr9d7H6UFXI41173Y4GeiFKywCLjfHImg1/SPvKn9pyy
-r3NI6vyFC6OQt5JnbssacIaFEEIAa/XJV6vST8N7c5LcVf4RV7hecv38tYzvCM+s
-Cm8/7gCwJzPm2ZYsos55
-=EHWC
------END PGP SIGNATURE-----
-
---ikeVEW9yuYc//A+q--
+Series:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
