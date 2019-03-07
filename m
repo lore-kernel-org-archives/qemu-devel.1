@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39858)
+Received: from eggs.gnu.org ([209.51.188.92]:39874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wr9-0003cz-KE
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:56 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrA-0003ei-Nm
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wr4-0008ND-PZ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:55 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:36302)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wr9-0008Qv-As
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:56 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56016)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1wr4-0008MD-Gr
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:50 -0500
-Received: by mail-wm1-x331.google.com with SMTP id j125so10119108wmj.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:50 -0800 (PST)
+	id 1h1wr9-0008QE-2Z
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:55 -0500
+Received: by mail-wm1-x342.google.com with SMTP id q187so10151339wme.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:54 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 18:29:45 +0100
-Message-Id: <1551979804-6060-39-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 18:29:49 +0100
+Message-Id: <1551979804-6060-43-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
 References: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 38/57] tests/libqos: support multiqueue for
- virtio-net
+Subject: [Qemu-devel] [PULL 42/57] qos-test: virtio-scsi test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +28,289 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, lviver@redhat.com
+Cc: thuth@redhat.com, lviver@redhat.com, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Initialize the additional virtqueues if they are supported.
-This is needed to switch vhost-user-test's multiqueue test
-to the virtio-net qgraph.
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
+Convert tests/virtio-scsi-test in qgraph test node,
+virtio-scsi-test. This test consumes a virtio-scsi interface
+and checks that its function return the expected values.
+
+Some functions are implemented only for virtio-scsi-pci, so they
+don't consume virtio-scsi, but virtio-scsi-pci
+
+Note that this test does not allocate any virtio-scsi structure,
+it's all done by the qtest walking graph mechanism
+
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/libqos/virtio-net.c | 21 +++++++++++++++++----
- tests/libqos/virtio-net.h |  4 ++--
- tests/virtio-net-test.c   |  6 +++---
- 3 files changed, 22 insertions(+), 9 deletions(-)
+ tests/Makefile.include   |   4 +-
+ tests/virtio-scsi-test.c | 143 +++++++++++++++++++----------------------------
+ 2 files changed, 60 insertions(+), 87 deletions(-)
 
-diff --git a/tests/libqos/virtio-net.c b/tests/libqos/virtio-net.c
-index 3ddfbdc..61c5617 100644
---- a/tests/libqos/virtio-net.c
-+++ b/tests/libqos/virtio-net.c
-@@ -27,14 +27,19 @@ static QGuestAllocator *alloc;
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 48b7cf0..09483d0 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -153,8 +153,6 @@ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
  
- static void virtio_net_cleanup(QVirtioNet *interface)
+ check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
+ 
+-check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
+-
+ check-qtest-pci-y += tests/e1000-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
+@@ -766,6 +764,7 @@ qos-test-obj-$(CONFIG_VIRTFS) += tests/virtio-9p-test.o
+ qos-test-obj-y += tests/virtio-blk-test.o
+ qos-test-obj-y += tests/virtio-net-test.o
+ qos-test-obj-y += tests/virtio-rng-test.o
++qos-test-obj-y += tests/virtio-scsi-test.o
+ qos-test-obj-y += tests/virtio-serial-test.o
+ 
+ check-unit-y += tests/test-qgraph$(EXESUF)
+@@ -813,7 +812,6 @@ tests/ne2000-test$(EXESUF): tests/ne2000-test.o
+ tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
+ tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
+ tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
+-tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
+ tests/tpci200-test$(EXESUF): tests/tpci200-test.o
+ tests/display-vga-test$(EXESUF): tests/display-vga-test.o
+ tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 9298aa8..162b31c 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -18,6 +18,8 @@
+ #include "standard-headers/linux/virtio_ids.h"
+ #include "standard-headers/linux/virtio_pci.h"
+ #include "standard-headers/linux/virtio_scsi.h"
++#include "libqos/virtio-scsi.h"
++#include "libqos/qgraph.h"
+ 
+ #define PCI_SLOT                0x02
+ #define PCI_FN                  0x00
+@@ -27,55 +29,28 @@
+ 
+ typedef struct {
+     QVirtioDevice *dev;
+-    QOSState *qs;
+     int num_queues;
+     QVirtQueue *vq[MAX_NUM_QUEUES + 2];
+-} QVirtIOSCSI;
++} QVirtioSCSIQueues;
+ 
+-static QOSState *qvirtio_scsi_start(const char *extra_opts)
+-{
+-    QOSState *qs;
+-    const char *arch = qtest_get_arch();
+-    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
+-                      "-device virtio-scsi-pci,id=vs0 "
+-                      "-device scsi-hd,bus=vs0.0,drive=drv0 %s";
+-
+-    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+-        qs = qtest_pc_boot(cmd, extra_opts ? : "");
+-    } else if (strcmp(arch, "ppc64") == 0) {
+-        qs = qtest_spapr_boot(cmd, extra_opts ? : "");
+-    } else {
+-        g_printerr("virtio-scsi tests are only available on x86 or ppc64\n");
+-        exit(EXIT_FAILURE);
+-    }
+-    global_qtest = qs->qts;
+-    return qs;
+-}
+-
+-static void qvirtio_scsi_stop(QOSState *qs)
+-{
+-    qtest_shutdown(qs);
+-}
++static QGuestAllocator *alloc;
+ 
+-static void qvirtio_scsi_pci_free(QVirtIOSCSI *vs)
++static void qvirtio_scsi_pci_free(QVirtioSCSIQueues *vs)
  {
--    qvirtqueue_cleanup(interface->vdev->bus, interface->rx, alloc);
--    qvirtqueue_cleanup(interface->vdev->bus, interface->tx, alloc);
-+    int i;
-+
-+    for (i = 0; i < interface->n_queues; i++) {
-+        qvirtqueue_cleanup(interface->vdev->bus, interface->queues[i], alloc);
-+    }
-+    g_free(interface->queues);
+     int i;
+ 
+     for (i = 0; i < vs->num_queues + 2; i++) {
+-        qvirtqueue_cleanup(vs->dev->bus, vs->vq[i], &vs->qs->alloc);
++        qvirtqueue_cleanup(vs->dev->bus, vs->vq[i], alloc);
+     }
+-    qvirtio_pci_device_disable(container_of(vs->dev, QVirtioPCIDevice, vdev));
+-    qvirtio_pci_device_free((QVirtioPCIDevice *)vs->dev);
+-    qvirtio_scsi_stop(vs->qs);
+     g_free(vs);
  }
  
- static void virtio_net_setup(QVirtioNet *interface)
+-static uint64_t qvirtio_scsi_alloc(QVirtIOSCSI *vs, size_t alloc_size,
++static uint64_t qvirtio_scsi_alloc(QVirtioSCSIQueues *vs, size_t alloc_size,
+                                    const void *data)
  {
-     QVirtioDevice *vdev = interface->vdev;
-     uint64_t features;
-+    int i;
+     uint64_t addr;
  
-     features = qvirtio_get_features(vdev);
-     features &= ~(QVIRTIO_F_BAD_FEATURE |
-@@ -42,8 +47,16 @@ static void virtio_net_setup(QVirtioNet *interface)
-                   (1u << VIRTIO_RING_F_EVENT_IDX));
-     qvirtio_set_features(vdev, features);
- 
--    interface->rx = qvirtqueue_setup(vdev, alloc, 0);
--    interface->tx = qvirtqueue_setup(vdev, alloc, 1);
-+    if (features & (1u << VIRTIO_NET_F_MQ)) {
-+        interface->n_queues = qvirtio_config_readw(vdev, 8) * 2;
-+    } else {
-+        interface->n_queues = 2;
-+    }
-+
-+    interface->queues = g_new(QVirtQueue *, interface->n_queues);
-+    for (i = 0; i < interface->n_queues; i++) {
-+        interface->queues[i] = qvirtqueue_setup(vdev, alloc, i);
-+    }
-     qvirtio_set_driver_ok(vdev);
+-    addr = guest_alloc(&vs->qs->alloc, alloc_size);
++    addr = guest_alloc(alloc, alloc_size);
+     if (data) {
+         memwrite(addr, data, alloc_size);
+     }
+@@ -83,7 +58,8 @@ static uint64_t qvirtio_scsi_alloc(QVirtIOSCSI *vs, size_t alloc_size,
+     return addr;
  }
  
-diff --git a/tests/libqos/virtio-net.h b/tests/libqos/virtio-net.h
-index e6905cd..28238a1 100644
---- a/tests/libqos/virtio-net.h
-+++ b/tests/libqos/virtio-net.h
-@@ -26,8 +26,8 @@ typedef struct QVirtioNetDevice QVirtioNetDevice;
+-static uint8_t virtio_scsi_do_command(QVirtIOSCSI *vs, const uint8_t *cdb,
++static uint8_t virtio_scsi_do_command(QVirtioSCSIQueues *vs,
++                                      const uint8_t *cdb,
+                                       const uint8_t *data_in,
+                                       size_t data_in_len,
+                                       uint8_t *data_out, size_t data_out_len,
+@@ -133,40 +109,28 @@ static uint8_t virtio_scsi_do_command(QVirtIOSCSI *vs, const uint8_t *cdb,
+         memread(resp_addr, resp_out, sizeof(*resp_out));
+     }
  
- struct QVirtioNet {
-     QVirtioDevice *vdev;
--    QVirtQueue *rx;
--    QVirtQueue *tx;
-+    int n_queues;
-+    QVirtQueue **queues;
- };
+-    guest_free(&vs->qs->alloc, req_addr);
+-    guest_free(&vs->qs->alloc, resp_addr);
+-    guest_free(&vs->qs->alloc, data_in_addr);
+-    guest_free(&vs->qs->alloc, data_out_addr);
++    guest_free(alloc, req_addr);
++    guest_free(alloc, resp_addr);
++    guest_free(alloc, data_in_addr);
++    guest_free(alloc, data_out_addr);
+     return response;
+ }
  
- struct QVirtioNetPCI {
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 2d3630c..c58e670 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -136,8 +136,8 @@ static void send_recv_test(void *obj, void *data, QGuestAllocator *t_alloc)
+-static QVirtIOSCSI *qvirtio_scsi_pci_init(int slot)
++static QVirtioSCSIQueues *qvirtio_scsi_init(QVirtioDevice *dev)
  {
-     QVirtioNet *net_if = obj;
-     QVirtioDevice *dev = net_if->vdev;
--    QVirtQueue *rx = net_if->rx;
--    QVirtQueue *tx = net_if->tx;
-+    QVirtQueue *rx = net_if->queues[0];
-+    QVirtQueue *tx = net_if->queues[1];
-     int *sv = data;
++    QVirtioSCSIQueues *vs;
+     const uint8_t test_unit_ready_cdb[VIRTIO_SCSI_CDB_SIZE] = {};
+-    QVirtIOSCSI *vs;
+-    QVirtioPCIDevice *dev;
+     struct virtio_scsi_cmd_resp resp;
+     int i;
  
-     rx_test(dev, t_alloc, rx, sv[0]);
-@@ -148,7 +148,7 @@ static void stop_cont_test(void *obj, void *data, QGuestAllocator *t_alloc)
+-    vs = g_new0(QVirtIOSCSI, 1);
+-
+-    vs->qs = qvirtio_scsi_start("-drive file=blkdebug::null-co://,"
+-                                "if=none,id=dr1,format=raw,file.align=4k "
+-                                "-device scsi-hd,drive=dr1,lun=0,scsi-id=1");
+-    dev = qvirtio_pci_device_find(vs->qs->pcibus, VIRTIO_ID_SCSI);
+-    vs->dev = (QVirtioDevice *)dev;
+-    g_assert(dev != NULL);
+-    g_assert_cmphex(vs->dev->device_type, ==, VIRTIO_ID_SCSI);
+-
+-    qvirtio_pci_device_enable(dev);
+-    qvirtio_start_device(vs->dev);
+-
+-    vs->num_queues = qvirtio_config_readl(vs->dev, 0);
++    vs = g_new0(QVirtioSCSIQueues, 1);
++    vs->dev = dev;
++    vs->num_queues = qvirtio_config_readl(dev, 0);
+ 
+     g_assert_cmpint(vs->num_queues, <, MAX_NUM_QUEUES);
+ 
+     for (i = 0; i < vs->num_queues + 2; i++) {
+-        vs->vq[i] = qvirtqueue_setup(vs->dev, &vs->qs->alloc, i);
++        vs->vq[i] = qvirtqueue_setup(dev, alloc, i);
+     }
+ 
+     /* Clear the POWER ON OCCURRED unit attention */
+@@ -182,30 +146,18 @@ static QVirtIOSCSI *qvirtio_scsi_pci_init(int slot)
+     return vs;
+ }
+ 
+-/* Tests only initialization so far. TODO: Replace with functional tests */
+-static void pci_nop(void)
+-{
+-    QOSState *qs;
+-
+-    qs = qvirtio_scsi_start(NULL);
+-    qvirtio_scsi_stop(qs);
+-}
+-
+-static void hotplug(void)
++static void hotplug(void *obj, void *data, QGuestAllocator *alloc)
  {
-     QVirtioNet *net_if = obj;
-     QVirtioDevice *dev = net_if->vdev;
--    QVirtQueue *rx = net_if->rx;
-+    QVirtQueue *rx = net_if->queues[0];
-     int *sv = data;
+-    QOSState *qs;
+-
+-    qs = qvirtio_scsi_start(
+-            "-drive id=drv1,if=none,file=null-co://,format=raw");
+     qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drv1'}");
+     qtest_qmp_device_del("scsihd");
+-    qvirtio_scsi_stop(qs);
+ }
  
-     rx_stop_cont_test(dev, t_alloc, rx, sv[0]);
+ /* Test WRITE SAME with the lba not aligned */
+-static void test_unaligned_write_same(void)
++static void test_unaligned_write_same(void *obj, void *data,
++                                      QGuestAllocator *t_alloc)
+ {
+-    QVirtIOSCSI *vs;
++    QVirtioSCSI *scsi = obj;
++    QVirtioSCSIQueues *vs;
+     uint8_t buf1[512] = { 0 };
+     uint8_t buf2[512] = { 1 };
+     const uint8_t write_same_cdb_1[VIRTIO_SCSI_CDB_SIZE] = {
+@@ -218,27 +170,50 @@ static void test_unaligned_write_same(void)
+         0x41, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x33, 0x00, 0x00
+     };
+ 
+-    vs = qvirtio_scsi_pci_init(PCI_SLOT);
++    alloc = t_alloc;
++    vs = qvirtio_scsi_init(scsi->vdev);
+ 
+     g_assert_cmphex(0, ==,
+-        virtio_scsi_do_command(vs, write_same_cdb_1, NULL, 0, buf1, 512, NULL));
++        virtio_scsi_do_command(vs, write_same_cdb_1, NULL, 0, buf1, 512,
++                               NULL));
+ 
+     g_assert_cmphex(0, ==,
+-        virtio_scsi_do_command(vs, write_same_cdb_2, NULL, 0, buf2, 512, NULL));
++        virtio_scsi_do_command(vs, write_same_cdb_2, NULL, 0, buf2, 512,
++                               NULL));
+ 
+     g_assert_cmphex(0, ==,
+-        virtio_scsi_do_command(vs, write_same_cdb_ndob, NULL, 0, NULL, 0, NULL));
++        virtio_scsi_do_command(vs, write_same_cdb_ndob, NULL, 0, NULL, 0,
++                               NULL));
+ 
+     qvirtio_scsi_pci_free(vs);
+ }
+ 
+-int main(int argc, char **argv)
++static void *virtio_scsi_hotplug_setup(GString *cmd_line, void *arg)
+ {
+-    g_test_init(&argc, &argv, NULL);
+-    qtest_add_func("/virtio/scsi/pci/nop", pci_nop);
+-    qtest_add_func("/virtio/scsi/pci/hotplug", hotplug);
+-    qtest_add_func("/virtio/scsi/pci/scsi-disk/unaligned-write-same",
+-                   test_unaligned_write_same);
++    g_string_append(cmd_line,
++                    " -drive id=drv1,if=none,file=null-co://,format=raw");
++    return arg;
++}
+ 
+-    return g_test_run();
++static void *virtio_scsi_setup(GString *cmd_line, void *arg)
++{
++    g_string_append(cmd_line,
++                    " -drive file=blkdebug::null-co://,"
++                    "if=none,id=dr1,format=raw,file.align=4k "
++                    "-device scsi-hd,drive=dr1,lun=0,scsi-id=1");
++    return arg;
+ }
++
++static void register_virtio_scsi_test(void)
++{
++    QOSGraphTestOptions opts = { };
++
++    opts.before = virtio_scsi_hotplug_setup;
++    qos_add_test("hotplug", "virtio-scsi", hotplug, &opts);
++
++    opts.before = virtio_scsi_setup;
++    qos_add_test("unaligned-write-same", "virtio-scsi",
++                 test_unaligned_write_same, &opts);
++}
++
++libqos_init(register_virtio_scsi_test);
 -- 
 1.8.3.1
