@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38682)
+Received: from eggs.gnu.org ([209.51.188.92]:39060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjaggi.dev@gmail.com>) id 1h1tYc-0000r3-BZ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:59:35 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1tZV-0001Q4-Sn
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:00:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjaggi.dev@gmail.com>) id 1h1tYb-0005Z9-Hz
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:59:34 -0500
-Received: from mail-lf1-x12f.google.com ([2a00:1450:4864:20::12f]:33833)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1tZR-0006hd-0R
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:00:29 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34965)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjaggi.dev@gmail.com>)
-	id 1h1tYb-0005Wh-AA
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:59:33 -0500
-Received: by mail-lf1-x12f.google.com with SMTP id d26so11750589lfa.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 05:59:32 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h1tZQ-0006eO-Dv
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:00:24 -0500
+Received: by mail-pg1-x542.google.com with SMTP id e17so11336772pgd.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 06:00:24 -0800 (PST)
+References: <20190307121539.12842-1-david@redhat.com>
+	<20190307121539.12842-4-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f0bd00c0-2e67-44f1-0ced-1c18a78d99db@linaro.org>
+Date: Thu, 7 Mar 2019 06:00:19 -0800
 MIME-Version: 1.0
-From: manish jaggi <mjaggi.dev@gmail.com>
-Date: Thu, 7 Mar 2019 19:29:18 +0530
-Message-ID: <CAKSw8c6QTBSG6YDr1nLATrQYqybw+eUxEgVyEAQg+z7NqLqoxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] egl: EGL_MESA_image_dma_buf_export not supported /
- Failed to initialize EGL render node for SPICE GL
+In-Reply-To: <20190307121539.12842-4-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/32] s390x/tcg: Utilities for vector
+ instruction helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jayachandran Chandrasekharan Nair <jnair@marvell.com>, mjaggi@marvell.com
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi List,
-I am trying to run qemu with spice gl=on with the below command line
-and getting errors.
+On 3/7/19 4:15 AM, David Hildenbrand wrote:
+> We'll have to read/write vector elements quite frequently from helpers.
+> The tricky bit is properly taking care of endianess. Handle it similar
+> to aarch64.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/vec.h | 101 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 101 insertions(+)
+>  create mode 100644 target/s390x/vec.h
 
-qemu-system-x86_64 -cdrom ubuntu-18.04.2-desktop-amd64.iso -hda
-u1.qcow2 -enable-kvm -m 1G -cpu host -smp 8 -machine vmport=off -boot
-order=dc -device virtio-vga,virgl=on -spice
-gl=on,unix,addr=/home/mjaggi/spice.sock,password=1,disable-ticketing
--soundhw hda -device virtio-serial -chardev
-spicevmc,id=vdagent,debug=0,name=vdagent -device
-virtserialport,chardev=vdagent,name=com.redhat.spice.0
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-qemu-system-x86_64: egl: EGL_MESA_image_dma_buf_export not supported
-qemu-system-x86_64: Failed to initialize EGL render node for SPICE GL
 
-Qemu configuration
-./configure --enable-sdl --with-sdlabi=2.0 --enable-opengl
---enable-virglrenderer --enable-system --enable-modules
---target-list=x86_64-softmmu --enable-kvm  --disable-werror
-
-...
-OpenGL support    yes
-OpenGL dmabufs    yes
-
-As per configure script
-
-#include <epoxy/egl.h>
-#ifndef EGL_MESA_image_dma_buf_export
-# error mesa/epoxy lacks support for dmabufs (mesa 10.6+)
-#endif
-int main(void) { return 0; }
-EOF
-  if compile_prog "" "" ; then
-    opengl_dmabuf=yes
-  fi
-fi
-
-So if OpenGL dmabufs   is yes, should I be getting
-EGL_MESA_image_dma_buf_export not supported error ?
-What I could be missing here
-Need help/guidance.
-
--Thanks
-Manish
+r~
