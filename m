@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52443)
+Received: from eggs.gnu.org ([209.51.188.92]:52514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgV-0004xd-1m
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgX-00050o-DH
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgO-0003aI-Pp
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:38 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgW-0003gR-Bw
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:41 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 14:03:13 +0100
-Message-Id: <20190307130323.9353-5-armbru@redhat.com>
+Date: Thu,  7 Mar 2019 14:03:11 +0100
+Message-Id: <20190307130323.9353-3-armbru@redhat.com>
 In-Reply-To: <20190307130323.9353-1-armbru@redhat.com>
 References: <20190307130323.9353-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 04/14] pflash: Rename *CFI_PFLASH* to
- *PFLASH_CFI*
+Subject: [Qemu-devel] [PATCH v3 02/14] pflash_cfi01: Do not exit() on guest
+ aborting "write to buffer"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,147 +26,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu
 
-pflash_cfi01.c and pflash_cfi02.c start their identifiers with
-pflash_cfi01_ and pflash_cfi02_ respectively, except for
-CFI_PFLASH01(), TYPE_CFI_PFLASH01, CFI_PFLASH02(), TYPE_CFI_PFLASH02.
-Rename for consistency.
+When a guest tries to abort "write to buffer" (command 0xE8), we print
+"PFLASH: Possible BUG - Write block confirm", then exit(1).  Letting
+the guest terminate QEMU is not a good idea.  Instead, LOG_UNIMP we
+screwed up, then reset the device.
+
+Macro PFLASH_BUG() is now unused; delete it.
 
 Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- hw/block/pflash_cfi01.c  | 12 ++++++------
- hw/block/pflash_cfi02.c  | 12 ++++++------
- include/hw/block/flash.h |  4 ++--
- 3 files changed, 14 insertions(+), 14 deletions(-)
+ hw/block/pflash_cfi01.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
 diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index d381f14e3c..f75f0a6998 100644
+index a51ac9f399..e6d933a06d 100644
 --- a/hw/block/pflash_cfi01.c
 +++ b/hw/block/pflash_cfi01.c
-@@ -59,8 +59,8 @@ do {                                                   =
-     \
- #define DPRINTF(fmt, ...) do { } while (0)
- #endif
+@@ -49,12 +49,6 @@
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
 =20
--#define CFI_PFLASH01(obj) \
--    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
-+#define PFLASH_CFI01(obj) \
-+    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
-=20
- #define PFLASH_BE          0
- #define PFLASH_SECURE      1
-@@ -698,7 +698,7 @@ static const MemoryRegionOps pflash_cfi01_ops =3D {
-=20
- static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
- {
--    PFlashCFI01 *pfl =3D CFI_PFLASH01(dev);
-+    PFlashCFI01 *pfl =3D PFLASH_CFI01(dev);
-     uint64_t total_len;
-     int ret;
-     uint64_t blocks_per_device, sector_len_per_device, device_len;
-@@ -926,7 +926,7 @@ static void pflash_cfi01_class_init(ObjectClass *klas=
-s, void *data)
-=20
-=20
- static const TypeInfo pflash_cfi01_info =3D {
--    .name           =3D TYPE_CFI_PFLASH01,
-+    .name           =3D TYPE_PFLASH_CFI01,
-     .parent         =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size  =3D sizeof(PFlashCFI01),
-     .class_init     =3D pflash_cfi01_class_init,
-@@ -949,7 +949,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-                                    uint16_t id2, uint16_t id3,
-                                    int be)
- {
--    DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH01);
-+    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
-=20
-     if (blk) {
-         qdev_prop_set_drive(dev, "drive", blk, &error_abort);
-@@ -966,7 +966,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-     qdev_init_nofail(dev);
-=20
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
--    return CFI_PFLASH01(dev);
-+    return PFLASH_CFI01(dev);
- }
-=20
- MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 9f8486e4cf..c0869fc417 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -57,8 +57,8 @@ do {                                                   =
-    \
-=20
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
-=20
--#define CFI_PFLASH02(obj) \
--    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
-+#define PFLASH_CFI02(obj) \
-+    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
-=20
- struct PFlashCFI02 {
-     /*< private >*/
-@@ -534,7 +534,7 @@ static const MemoryRegionOps pflash_cfi02_ops_le =3D =
-{
-=20
- static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- {
--    PFlashCFI02 *pfl =3D CFI_PFLASH02(dev);
-+    PFlashCFI02 *pfl =3D PFLASH_CFI02(dev);
-     uint32_t chip_len;
-     int ret;
-     Error *local_err =3D NULL;
-@@ -706,7 +706,7 @@ static void pflash_cfi02_class_init(ObjectClass *klas=
-s, void *data)
- }
-=20
- static const TypeInfo pflash_cfi02_info =3D {
--    .name           =3D TYPE_CFI_PFLASH02,
-+    .name           =3D TYPE_PFLASH_CFI02,
-     .parent         =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size  =3D sizeof(PFlashCFI02),
-     .class_init     =3D pflash_cfi02_class_init,
-@@ -731,7 +731,7 @@ PFlashCFI02 *pflash_cfi02_register(hwaddr base,
-                                    uint16_t unlock_addr1,
-                                    int be)
- {
--    DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH02);
-+    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI02);
-=20
-     if (blk) {
-         qdev_prop_set_drive(dev, "drive", blk, &error_abort);
-@@ -751,5 +751,5 @@ PFlashCFI02 *pflash_cfi02_register(hwaddr base,
-     qdev_init_nofail(dev);
-=20
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
--    return CFI_PFLASH02(dev);
-+    return PFLASH_CFI02(dev);
- }
-diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index 51d8f60c65..333005d9ff 100644
---- a/include/hw/block/flash.h
-+++ b/include/hw/block/flash.h
-@@ -7,7 +7,7 @@
-=20
- /* pflash_cfi01.c */
-=20
--#define TYPE_CFI_PFLASH01 "cfi.pflash01"
-+#define TYPE_PFLASH_CFI01 "cfi.pflash01"
-=20
- typedef struct PFlashCFI01 PFlashCFI01;
-=20
-@@ -24,7 +24,7 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
-=20
- /* pflash_cfi02.c */
-=20
--#define TYPE_CFI_PFLASH02 "cfi.pflash02"
-+#define TYPE_PFLASH_CFI02 "cfi.pflash02"
-=20
- typedef struct PFlashCFI02 PFlashCFI02;
-=20
+-#define PFLASH_BUG(fmt, ...) \
+-do { \
+-    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
+-    exit(1); \
+-} while(0)
+-
+ /* #define PFLASH_DEBUG */
+ #ifdef PFLASH_DEBUG
+ #define DPRINTF(fmt, ...)                                   \
+@@ -623,8 +617,11 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr of=
+fset,
+                 pfl->wcycle =3D 0;
+                 pfl->status |=3D 0x80;
+             } else {
+-                DPRINTF("%s: unknown command for \"write block\"\n", __f=
+unc__);
+-                PFLASH_BUG("Write block confirm");
++                qemu_log_mask(LOG_UNIMP,
++                    "%s: Aborting write to buffer not implemented,"
++                    " the data is already written to storage!\n"
++                    "Flash device reset into READ mode.\n",
++                    __func__);
+                 goto reset_flash;
+             }
+             break;
 --=20
 2.17.2
