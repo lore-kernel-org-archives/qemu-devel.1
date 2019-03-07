@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52516)
+Received: from eggs.gnu.org ([209.51.188.92]:52586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgX-00050s-Ez
+	(envelope-from <armbru@redhat.com>) id 1h1sga-000559-Il
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgU-0003em-NH
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgY-0003iO-KH
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:44 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 14:03:16 +0100
-Message-Id: <20190307130323.9353-8-armbru@redhat.com>
+Date: Thu,  7 Mar 2019 14:03:17 +0100
+Message-Id: <20190307130323.9353-9-armbru@redhat.com>
 In-Reply-To: <20190307130323.9353-1-armbru@redhat.com>
 References: <20190307130323.9353-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/14] ppc405_boards: Don't size flash
- memory to match backing image
+Subject: [Qemu-devel] [PATCH v3 08/14] r2d: Fix flash memory size,
+ sector size, width, device ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,149 +21,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu, David Gibson <david@gibson.dropbear.id.au>
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu, Magnus Damm <magnus.damm@gmail.com>
 
-Machine "ref405ep" maps its flash memory at address 2^32 - image size.
-Image size is rounded up to the next multiple of 64KiB.  Useless,
-because pflash_cfi02_realize() fails with "failed to read the initial
-flash content" unless the rounding is a no-op.
+pflash_cfi02_register() takes a size in bytes, a block size in bytes
+and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
+FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
+number of blocks.  The latter happens to win: FLASH_SIZE / 4,
+i.e. 8MiB.
 
-If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
-other stuff.  No idea how that would play out, but useful outcomes
-seem unlikely.
+The best information we have on the physical hardware lists a Cypress
+S29PL127J60TFI130 128MiBit NOR flash addressable in words of 16 bits,
+in sectors of 4 and 32 Kibiwords.  We don't model multiple sector
+sizes.
 
-Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
-regardless of image size, to match the physical hardware.
+Fix the flash size from 8 to 16MiB, and adjust the sector size from 16
+to 64KiB.  Fix the width from 4 to 2.  While there, supply the real
+device IDs 0x0001, 0x227e, 0x2220, 0x2200 instead of zeros.
 
-Machine "taihu" maps its boot flash memory similarly.  The code even
-has a comment /* XXX: should check that size is 2MB */, followed by
-disabled code to adjust the size to 2MiB regardless of image size.
-
-Its code to map its application flash memory looks the same, except
-there the XXX comment asks for 32MiB, and the code to adjust the size
-isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
-to read the initial flash content" for images smaller than 32MiB.
-
-Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
-to match the physical hardware.  Delete dead code from application
-flash mapping, and simplify some.
-
-Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Magnus Damm <magnus.damm@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- hw/ppc/ppc405_boards.c | 51 +++++++++++++-----------------------------
- 1 file changed, 15 insertions(+), 36 deletions(-)
+ hw/sh4/r2d.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index f47b15f10e..672717ef1b 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
-     target_ulong kernel_base, initrd_base;
-     long kernel_size, initrd_size;
-     int linux_boot;
--    int fl_idx, fl_sectors, len;
-+    int len;
-     DriveInfo *dinfo;
-     MemoryRegion *sysmem =3D get_system_memory();
-=20
-@@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
- #ifdef DEBUG_BOARD_INIT
-     printf("%s: register BIOS\n", __func__);
- #endif
--    fl_idx =3D 0;
- #ifdef USE_FLASH_BIOS
--    dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
-+    dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (dinfo) {
--        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
--
--        bios_size =3D blk_getlength(blk);
--        fl_sectors =3D (bios_size + 65535) >> 16;
- #ifdef DEBUG_BOARD_INIT
--        printf("Register parallel flash %d size %lx"
--               " at addr %lx '%s' %d\n",
--               fl_idx, bios_size, -bios_size,
--               blk_name(blk), fl_sectors);
-+        printf("Register parallel flash\n");
- #endif
-+        bios_size =3D 8 * MiB;
-         pflash_cfi02_register((uint32_t)(-bios_size),
-                               NULL, "ef405ep.bios", bios_size,
--                              blk, 65536, fl_sectors, 1,
-+                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              64 * KiB, bios_size / (64 * KiB), 1,
-                               2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
-                               1);
--        fl_idx++;
-     } else
- #endif
-     {
-@@ -455,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
-     target_ulong kernel_base, initrd_base;
-     long kernel_size, initrd_size;
-     int linux_boot;
--    int fl_idx, fl_sectors;
-+    int fl_idx;
-     DriveInfo *dinfo;
-=20
-     /* RAM is soldered to the board so the size cannot be changed */
-@@ -486,21 +479,14 @@ static void taihu_405ep_init(MachineState *machine)
- #if defined(USE_FLASH_BIOS)
-     dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
-     if (dinfo) {
--        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
--
--        bios_size =3D blk_getlength(blk);
--        /* XXX: should check that size is 2MB */
--        //        bios_size =3D 2 * 1024 * 1024;
--        fl_sectors =3D (bios_size + 65535) >> 16;
- #ifdef DEBUG_BOARD_INIT
--        printf("Register parallel flash %d size %lx"
--               " at addr %lx '%s' %d\n",
--               fl_idx, bios_size, -bios_size,
--               blk_name(blk), fl_sectors);
-+        printf("Register boot flash\n");
- #endif
--        pflash_cfi02_register((uint32_t)(-bios_size),
-+        bios_size =3D 2 * MiB;
-+        pflash_cfi02_register(0xFFE00000,
-                               NULL, "taihu_405ep.bios", bios_size,
--                              blk, 65536, fl_sectors, 1,
-+                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              64 * KiB, bios_size / (64 * KiB), 1,
-                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
-                               1);
-         fl_idx++;
-@@ -536,20 +522,13 @@ static void taihu_405ep_init(MachineState *machine)
-     /* Register Linux flash */
-     dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
-     if (dinfo) {
--        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
--
--        bios_size =3D blk_getlength(blk);
--        /* XXX: should check that size is 32MB */
-         bios_size =3D 32 * MiB;
--        fl_sectors =3D (bios_size + 65535) >> 16;
- #ifdef DEBUG_BOARD_INIT
--        printf("Register parallel flash %d size %lx"
--               " at addr " TARGET_FMT_lx " '%s'\n",
--               fl_idx, bios_size, (target_ulong)0xfc000000,
--               blk_name(blk));
-+        printf("Register application flash\n"
- #endif
-         pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bio=
-s_size,
--                              blk, 65536, fl_sectors, 1,
-+                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              64 * KiB, bios_size / (64 * KiB), 1,
-                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
-                               1);
-         fl_idx++;
---=20
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index dcdb3728cb..cd23c60b86 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -44,7 +44,7 @@
+ #include "exec/address-spaces.h"
+ 
+ #define FLASH_BASE 0x00000000
+-#define FLASH_SIZE 0x02000000
++#define FLASH_SIZE (16 * MiB)
+ 
+ #define SDRAM_BASE 0x0c000000 /* Physical location of SDRAM: Area 3 */
+ #define SDRAM_SIZE 0x04000000
+@@ -288,12 +288,20 @@ static void r2d_init(MachineState *machine)
+     sysbus_mmio_map(busdev, 1, 0x1400080c);
+     mmio_ide_init_drives(dev, dinfo, NULL);
+ 
+-    /* onboard flash memory */
++    /*
++     * Onboard flash memory
++     * According to the old board user document in Japanese (under
++     * NDA) what is referred to as FROM (Area0) is connected via a
++     * 32-bit bus and CS0 to CN8. The docs mention a Cypress
++     * S29PL127J60TFI130 chipsset.  Per the 'S29PL-J 002-00615
++     * Rev. *E' datasheet, it is a 128Mbit NOR parallel flash
++     * addressable in words of 16bit.
++     */
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+-                          16 * KiB, FLASH_SIZE >> 16,
+-                          1, 4, 0x0000, 0x0000, 0x0000, 0x0000,
++                          64 * KiB, FLASH_SIZE >> 16,
++                          1, 2, 0x0001, 0x227e, 0x2220, 0x2200,
+                           0x555, 0x2aa, 0);
+ 
+     /* NIC: rtl8139 on-board, and 2 slots. */
+-- 
 2.17.2
