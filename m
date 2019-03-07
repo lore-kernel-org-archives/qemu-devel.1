@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49570)
+Received: from eggs.gnu.org ([209.51.188.92]:52021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1uDQ-0006vl-R9
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:45 -0500
+	(envelope-from <berrange@redhat.com>) id 1h1uN1-0006tg-L1
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:51:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1uDL-0003Z7-8p
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:44 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37595)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1uDL-0003YS-3M
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:39 -0500
-Received: by mail-pg1-x543.google.com with SMTP id q206so11422091pgq.4
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 06:41:39 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Mar 2019 06:41:25 -0800
-Message-Id: <20190307144126.31847-9-richard.henderson@linaro.org>
-In-Reply-To: <20190307144126.31847-1-richard.henderson@linaro.org>
-References: <20190307144126.31847-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 8/9] target/arm: Use extract2 for EXTR
+	(envelope-from <berrange@redhat.com>) id 1h1uMt-000310-Tb
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:51:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h1uMq-0002vn-4Q
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:51:30 -0500
+Date: Thu, 7 Mar 2019 14:51:20 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190307145120.GF32268@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
+	<20190307142609.GF2843@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190307142609.GF2843@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
+ the concept description to docs/devel/qemu-multiprocess
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: david@redhat.com, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: elena.ufimtseva@oracle.com, john.g.johnson@oracle.com, sstabellini@kernel.org, jag.raman@oracle.com, konrad.wilk@oracle.com, qemu-devel@nongnu.org, ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com
 
-This is, after all, how we implement extract2 in tcg/aarc64.
+On Thu, Mar 07, 2019 at 02:26:09PM +0000, Stefan Hajnoczi wrote:
+> On Wed, Mar 06, 2019 at 11:22:53PM -0800, elena.ufimtseva@oracle.com wrote:
+> > diff --git a/docs/devel/qemu-multiprocess.txt b/docs/devel/qemu-multiprocess.txt
+> > new file mode 100644
+> > index 0000000..e29c6c8
+> > --- /dev/null
+> > +++ b/docs/devel/qemu-multiprocess.txt
+> 
+> Thanks for this document and the interesting work that you are doing.
+> I'd like to discuss the security advantages gained by disaggregating
+> QEMU in more detail.
+> 
+> The security model for VMs managed by libvirt (most production x86, ppc,
+> s390 guests) is that the QEMU process is untrusted and only has access
+> to resources belonging to the guest.  SELinux is used to restrict the
+> process from accessing other files, processes, etc on the host.
 
-Cc: qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-a64.c | 38 ++++++++++++++++++++------------------
- 1 file changed, 20 insertions(+), 18 deletions(-)
+NB it doesn't have to be SELinux. Libvirt also supports AppArmor and
+can even do isolation with traditional DAC by putting each QEMU under
+a distinct UID/GID and having libvirtd set ownership on resources each
+VM is permitted to use.
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 1959046343..54fe94c436 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -4114,25 +4114,27 @@ static void disas_extract(DisasContext *s, uint32_t insn)
-             } else {
-                 tcg_gen_ext32u_i64(tcg_rd, cpu_reg(s, rm));
-             }
--        } else if (rm == rn) { /* ROR */
--            tcg_rm = cpu_reg(s, rm);
--            if (sf) {
--                tcg_gen_rotri_i64(tcg_rd, tcg_rm, imm);
--            } else {
--                TCGv_i32 tmp = tcg_temp_new_i32();
--                tcg_gen_extrl_i64_i32(tmp, tcg_rm);
--                tcg_gen_rotri_i32(tmp, tmp, imm);
--                tcg_gen_extu_i32_i64(tcg_rd, tmp);
--                tcg_temp_free_i32(tmp);
--            }
-         } else {
--            tcg_rm = read_cpu_reg(s, rm, sf);
--            tcg_rn = read_cpu_reg(s, rn, sf);
--            tcg_gen_shri_i64(tcg_rm, tcg_rm, imm);
--            tcg_gen_shli_i64(tcg_rn, tcg_rn, bitsize - imm);
--            tcg_gen_or_i64(tcg_rd, tcg_rm, tcg_rn);
--            if (!sf) {
--                tcg_gen_ext32u_i64(tcg_rd, tcg_rd);
-+            tcg_rm = cpu_reg(s, rm);
-+            tcg_rn = cpu_reg(s, rn);
-+
-+            if (sf) {
-+                /* Specialization to ROR happens in EXTRACT2.  */
-+                tcg_gen_extract2_i64(tcg_rd, tcg_rm, tcg_rn, imm);
-+            } else {
-+                TCGv_i32 t0 = tcg_temp_new_i32();
-+
-+                tcg_gen_extrl_i64_i32(t0, tcg_rm);
-+                if (rm == rn) {
-+                    tcg_gen_rotri_i32(t0, t0, imm);
-+                } else {
-+                    TCGv_i32 t1 = tcg_temp_new_i32();
-+                    tcg_gen_extrl_i64_i32(t1, tcg_rn);
-+                    tcg_gen_extract2_i32(t0, t0, t1, imm);
-+                    tcg_temp_free_i32(t1);
-+                }
-+                tcg_gen_extu_i32_i64(tcg_rd, t0);
-+                tcg_temp_free_i32(t0);
-             }
-         }
-     }
+> QEMU does not hold privileged resources that must be kept away from the
+> guest.  An escaped guest can access its image file, tap file descriptor,
+> etc but they are the same resources it could already access via device
+> emulation.
+> 
+> Can you give specific examples of how disaggregation improves security?
+
+I guess one obvious answer is that the existing security mechanisms like
+SELinux/ApArmor/DAC can be made to work in a more fine grained manner if
+there are distinct processes. This would allow for a more useful seccomp
+filter to better protect against secondary kernel exploits should QEMU
+itself be exploited, if we can protect individual components.
+
+Not everything is protected by MAC/DAC. For example network based disks
+typically have a username + password for accessing the remote storage
+server. Best practice would be a distinct username for every QEMU process
+such that each can only access its own storage, but I don't know of any
+app which does that. So ability to split off backends into separate
+processes could limit exposure of information that is not otherwise
+protected by current protection models.
+
+Whether any of this is useful in practice depends on the degree to
+which the individual disaggregated pieces of QEMU trust each other.
+Effectively they would have to consider each other as untrusted,
+so one compromised piece can't simply trigger its desired exploit
+via the communication channel with another disaggregated piece.
+
+The broadening of vhost-user support is useful with that in much the
+same way I imagine.
+
+Regards,
+Daniel
 -- 
-2.17.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
