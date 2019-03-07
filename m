@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54447)
+Received: from eggs.gnu.org ([209.51.188.92]:54765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1xmC-0002d8-G7
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:29:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1xnD-0003hi-KM
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:30:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1xm5-0000F8-Ba
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:29:46 -0500
-Resent-Message-Id: <E1h1xm5-0000F8-Ba@eggs.gnu.org>
-Message-ID: <155198336678.8146.12356454215730528202@6acff2cf482b>
-In-Reply-To: <20190307172401.29451-1-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1h1xnC-0000t5-UY
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:30:55 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39721)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h1xnC-0000sK-Nh
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:30:54 -0500
+Received: by mail-pf1-x442.google.com with SMTP id i20so12081762pfo.6
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 10:30:54 -0800 (PST)
+References: <20190307180520.13868-1-mark.cave-ayland@ilande.co.uk>
+	<20190307180520.13868-8-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2854ee32-3fff-2dce-6af0-b07d1f86ac5b@linaro.org>
+Date: Thu, 7 Mar 2019 10:30:50 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 10:29:28 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] pc: Support firmware
- configuration with -blockdev
+In-Reply-To: <20190307180520.13868-8-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] target/ppc: introduce
+ vsr64_offset() to simplify get_cpu_vsr{l, h}() and set_cpu_vsr{l, h}()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, philmd@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE3MjQwMS4yOTQ1
-MS0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAzMDcxNzI0MDEuMjk0NTEt
-MS1hcm1icnVAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzEy
-XSBwYzogU3VwcG9ydCBmaXJtd2FyZSBjb25maWd1cmF0aW9uIHdpdGggLWJsb2NrZGV2Cgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
-LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwMzA3
-MTcyNDAxLjI5NDUxLTEtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDMwNzE3MjQw
-MS4yOTQ1MS0xLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKZTE1OWQxZWQwZCBkb2NzL2ludGVyb3AvZmlybXdhcmUuanNvbjogUHJlZmVyIC1tYWNoaW5l
-IHRvIGlmPXBmbGFzaAo3YjM0OGViNDM4IHBjOiBTdXBwb3J0IGZpcm13YXJlIGNvbmZpZ3VyYXRp
-b24gd2l0aCAtYmxvY2tkZXYKMjc4MWY2MjZjZiBwY19zeXNmdzogUGFzcyBQQ01hY2hpbmVTdGF0
-ZSB0byBwY19zeXN0ZW1fZmlybXdhcmVfaW5pdCgpCjVlZDgxMDg5YzggcGNfc3lzZnc6IFJlbW92
-ZSB1bnVzZWQgUGNTeXNGd0RldmljZQowNmRmYzgyNGI5IHBmbGFzaF9jZmkwMTogQWRkIHBmbGFz
-aF9jZmkwMV9nZXRfYmxrKCkgaGVscGVyCmFjNWZmNmRmNzYgdmw6IENyZWF0ZSBibG9jayBiYWNr
-ZW5kcyBiZWZvcmUgc2V0dGluZyBtYWNoaW5lIHByb3BlcnRpZXMKNGZkNDE2NTdkYSB2bDogRmFj
-dG9yIGNvbmZpZ3VyZV9ibG9ja2RldigpIG91dCBvZiBtYWluKCkKOGU2YWEwYzdlOCB2bDogSW1w
-cm92ZSBsZWdpYmlsaXR5IG9mIEJsb2NrZGV2T3B0aW9ucyBxdWV1ZQo1NGY3ODVhZWY2IHN5c2J1
-czogRml4IGxhdGVudCBidWcgd2l0aCBvbmJvYXJkIGRldmljZXMKYTc0YjA2NGI3MiB2bDogRml4
-IGxhdGVudCBidWcgd2l0aCAtZ2xvYmFsIGFuZCBvbmJvYXJkIGRldmljZXMKMDA0YmY2ZmQ3YSBx
-b206IE1vdmUgY29tcGF0X3Byb3BzIG1hY2hpbmVyeSBmcm9tIHFkZXYgdG8gUU9NCjVmNGM5M2Vk
-ZTIgcWRldjogRml4IGxhdGVudCBidWcgd2l0aCBjb21wYXRfcHJvcHMgYW5kIG9uYm9hcmQgZGV2
-aWNlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgNWY0YzkzZWRl
-MmU5IChxZGV2OiBGaXggbGF0ZW50IGJ1ZyB3aXRoIGNvbXBhdF9wcm9wcyBhbmQgb25ib2FyZCBk
-ZXZpY2VzKQoyLzEyIENoZWNraW5nIGNvbW1pdCAwMDRiZjZmZDdhZjggKHFvbTogTW92ZSBjb21w
-YXRfcHJvcHMgbWFjaGluZXJ5IGZyb20gcWRldiB0byBRT00pCjMvMTIgQ2hlY2tpbmcgY29tbWl0
-IGE3NGIwNjRiNzJkNyAodmw6IEZpeCBsYXRlbnQgYnVnIHdpdGggLWdsb2JhbCBhbmQgb25ib2Fy
-ZCBkZXZpY2VzKQo0LzEyIENoZWNraW5nIGNvbW1pdCA1NGY3ODVhZWY2YWMgKHN5c2J1czogRml4
-IGxhdGVudCBidWcgd2l0aCBvbmJvYXJkIGRldmljZXMpCjUvMTIgQ2hlY2tpbmcgY29tbWl0IDhl
-NmFhMGM3ZTg1YyAodmw6IEltcHJvdmUgbGVnaWJpbGl0eSBvZiBCbG9ja2Rldk9wdGlvbnMgcXVl
-dWUpCjYvMTIgQ2hlY2tpbmcgY29tbWl0IDRmZDQxNjU3ZGEzOCAodmw6IEZhY3RvciBjb25maWd1
-cmVfYmxvY2tkZXYoKSBvdXQgb2YgbWFpbigpKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
-YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjU6IEZJTEU6IHZsLmM6MTIwNzoKKyAg
-ICAvKiBJZiB0aGUgY3VycmVudGx5IHNlbGVjdGVkIG1hY2hpbmUgd2lzaGVzIHRvIG92ZXJyaWRl
-IHRoZSB1bml0cy1wZXItYnVzCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGlu
-ZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzI2OiBGSUxFOiB2bC5jOjEyMDg6CisgICAgICogcHJv
-cGVydHkgb2YgaXRzIGRlZmF1bHQgSEJBIGludGVyZmFjZSB0eXBlLCBkbyBzbyBub3cuICovCgp0
-b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTIg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8xMiBDaGVja2luZyBjb21taXQgYWM1ZmY2ZGY3
-NjRmICh2bDogQ3JlYXRlIGJsb2NrIGJhY2tlbmRzIGJlZm9yZSBzZXR0aW5nIG1hY2hpbmUgcHJv
-cGVydGllcykKOC8xMiBDaGVja2luZyBjb21taXQgMDZkZmM4MjRiOWVhIChwZmxhc2hfY2ZpMDE6
-IEFkZCBwZmxhc2hfY2ZpMDFfZ2V0X2JsaygpIGhlbHBlcikKOS8xMiBDaGVja2luZyBjb21taXQg
-NWVkODEwODljODZiIChwY19zeXNmdzogUmVtb3ZlIHVudXNlZCBQY1N5c0Z3RGV2aWNlKQoxMC8x
-MiBDaGVja2luZyBjb21taXQgMjc4MWY2MjZjZjQwIChwY19zeXNmdzogUGFzcyBQQ01hY2hpbmVT
-dGF0ZSB0byBwY19zeXN0ZW1fZmlybXdhcmVfaW5pdCgpKQoxMS8xMiBDaGVja2luZyBjb21taXQg
-N2IzNDhlYjQzODY1IChwYzogU3VwcG9ydCBmaXJtd2FyZSBjb25maWd1cmF0aW9uIHdpdGggLWJs
-b2NrZGV2KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzcyOiBGSUxFOiBody9p
-Mzg2L3BjX3N5c2Z3LmM6MzI4OgorICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJwZmxhc2ggd2l0
-aCBrdm0gcmVxdWlyZXMgS1ZNIHJlYWRvbmx5IG1lbW9yeSBzdXBwb3J0Iik7Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDMxNSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMS8xMiBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoxMi8xMiBDaGVja2luZyBjb21taXQgZTE1OWQxZWQwZGUyIChk
-b2NzL2ludGVyb3AvZmlybXdhcmUuanNvbjogUHJlZmVyIC1tYWNoaW5lIHRvIGlmPXBmbGFzaCkK
-RVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQ5OiBGSUxFOiBkb2NzL2ludGVyb3AvZmlybXdh
-cmUuanNvbjoyMzk6CisjICAgICAgICAgICAgICAgICAgJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCAzMyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAxOTAzMDcxNzI0MDEuMjk0NTEtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNr
-cGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 3/7/19 10:05 AM, Mark Cave-Ayland wrote:
+> Now that all VSX registers are stored in host endian order, there is no need
+> to go via different accessors depending upon the register number. Instead we
+> introduce vsr64_offset() and use it directly from within get_cpu_vsr{l,h}() and
+> set_cpu_vsr{l,h}().
+> 
+> This also allows us to rewrite avr64_offset() and fpr_offset() in terms of the
+> new vsr64_offset() function to more clearly express the relationship between the
+> VSX, FPR and VMX registers, and also remove vsrl_offset() which is no longer
+> required.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  target/ppc/cpu.h                    | 20 ++++++++++----------
+>  target/ppc/translate/vsx-impl.inc.c | 34 ++++------------------------------
+>  2 files changed, 14 insertions(+), 40 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
