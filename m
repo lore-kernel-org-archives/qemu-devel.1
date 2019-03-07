@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40614)
+Received: from eggs.gnu.org ([209.51.188.92]:41588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h1nzV-0004az-Rt
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:03:04 -0500
+	(envelope-from <cohuck@redhat.com>) id 1h1o5J-0007fQ-TW
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:08:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h1nzT-0002Qh-VR
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:02:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h1nzS-0002P2-3S
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:02:54 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 957C630718D4
-	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 08:02:52 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  7 Mar 2019 09:02:44 +0100
-Message-Id: <20190307080244.9011-4-kraxel@redhat.com>
-In-Reply-To: <20190307080244.9011-1-kraxel@redhat.com>
-References: <20190307080244.9011-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] virtio-gpu: make virtio_gpu_reset static
+	(envelope-from <cohuck@redhat.com>) id 1h1o5J-000643-60
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:08:57 -0500
+Date: Thu, 7 Mar 2019 09:08:51 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190307090851.14582d67.cohuck@redhat.com>
+In-Reply-To: <96d70258-6ed8-136c-d824-a0403ace036f@linux.ibm.com>
+References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
+	<1551466776-29123-7-git-send-email-jjherne@linux.ibm.com>
+	<e3f0d9ab-c98b-d500-12e6-cfcc1a2b2a1b@redhat.com>
+	<96d70258-6ed8-136c-d824-a0403ace036f@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 06/16] s390-bios: Clean up
+ cio.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/hw/virtio/virtio-gpu.h | 1 -
- hw/display/virtio-gpu.c        | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+On Wed, 6 Mar 2019 13:42:17 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
-index 98504f907583..ce0ca7217175 100644
---- a/include/hw/virtio/virtio-gpu.h
-+++ b/include/hw/virtio/virtio-gpu.h
-@@ -148,7 +148,6 @@ extern const GraphicHwOps virtio_gpu_ops;
-     } while (0)
- 
- /* virtio-gpu.c */
--void virtio_gpu_reset(VirtIODevice *vdev);
- void virtio_gpu_ctrl_response(VirtIOGPU *g,
-                               struct virtio_gpu_ctrl_command *cmd,
-                               struct virtio_gpu_ctrl_hdr *resp,
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index a3627f58a9dd..4dbf48e42482 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -1346,7 +1346,7 @@ static void virtio_gpu_instance_init(Object *obj)
- {
- }
- 
--void virtio_gpu_reset(VirtIODevice *vdev)
-+static void virtio_gpu_reset(VirtIODevice *vdev)
- {
-     VirtIOGPU *g = VIRTIO_GPU(vdev);
-     struct virtio_gpu_simple_resource *res, *tmp;
--- 
-2.18.1
+> On 3/5/19 12:51 AM, Thomas Huth wrote:
+> > On 01/03/2019 19.59, Jason J. Herne wrote:  
+> >> Add proper typedefs to all structs and modify all bit fields to use consistent
+> >> formatting.
+> >>
+> >> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> >> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+> >> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+> >> ---
+> >>   pc-bios/s390-ccw/cio.h      | 152 ++++++++++++++++++++++----------------------
+> >>   pc-bios/s390-ccw/s390-ccw.h |   8 ---
+> >>   2 files changed, 76 insertions(+), 84 deletions(-)
+> >>
+> >> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+> >> index 1a0795f..2f58256 100644
+> >> --- a/pc-bios/s390-ccw/cio.h
+> >> +++ b/pc-bios/s390-ccw/cio.h  
+> > [...]  
+> >> -struct subchannel_id {
+> >> -        __u32 cssid  : 8;
+> >> -        __u32        : 4;
+> >> -        __u32 m      : 1;
+> >> -        __u32 ssid   : 2;
+> >> -        __u32 one    : 1;
+> >> -        __u32 sch_no : 16;
+> >> -} __attribute__ ((packed, aligned(4)));
+> >> +} __attribute__ ((packed, aligned(4))) Schib;
+> >> +
+> >> +typedef struct subchannel_id {
+> >> +        __u32 cssid:8;
+> >> +        __u32:4;  
+> > 
+> > __u32:4 looks a little bit funny. Not sure, but maybe this should be
+> > given a name like "reserved" or so?
+> >   
+> 
+> Perhaps, but this is not my code. I was just cleaning up the style. If you feel strongly 
+> that this patch is the place to give this a name, I can do that.
+
+FWIW, my personal preference for this is keeping it unnamed.
