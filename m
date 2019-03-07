@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40784)
+Received: from eggs.gnu.org ([209.51.188.92]:41458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1tg4-0005yA-Av
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:07:20 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1h1tic-0007r2-JQ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:10:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1tg3-0006yI-GO
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:07:16 -0500
-Resent-Message-Id: <E1h1tg3-0006yI-GO@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21055)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1tg3-0006wj-5j
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:07:15 -0500
-Message-ID: <155196760579.8146.17148647233084593514@6acff2cf482b>
-In-Reply-To: <1550908162-22644-1-git-send-email-thuth@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <pbonzini@redhat.com>) id 1h1tib-0001Lb-TP
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:09:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h1tib-0001IT-Ku
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:09:53 -0500
+References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA-nGLVySjjK65Bfedr5H-6XP1_t1rpnupjL89KB-HN8wQ@mail.gmail.com>
+	<646bf94e-66da-5083-d2b7-b96633bb5acf@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6e6cb20b-b903-fda5-1b7f-4379ae62b20a@redhat.com>
+Date: Thu, 7 Mar 2019 15:09:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 06:06:47 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/30] Kconfig dependencies for ARM
- machines
+In-Reply-To: <646bf94e-66da-5083-d2b7-b96633bb5acf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: fam@euphon.net, yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, philmd@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Yang Zhong <yang.zhong@intel.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUwOTA4MTYyLTIyNjQ0LTEt
-Z2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
-ZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
-c3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2Vy
-IGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1p
-bmd3QGZlZG9yYSBTSE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
-b2dzLzE1NTA5MDgxNjItMjI2NDQtMS1naXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tL3Rl
-c3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 07/03/19 14:47, Philippe Mathieu-Daud=C3=A9 wrote:
+> Paolo, we might need:
+>=20
+> -- >8 --
+> diff --git a/Makefile b/Makefile
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -336,6 +336,7 @@ MINIKCONF_ARGS =3D \
+>      CONFIG_SPICE=3D$(CONFIG_SPICE) \
+>      CONFIG_IVSHMEM=3D$(CONFIG_IVSHMEM) \
+>      CONFIG_TPM=3D$(CONFIG_TPM) \
+> +    CONFIG_TPM_EMULATOR=3D$(CONFIG_TPM_EMULATOR) \
+>      CONFIG_XEN=3D$(CONFIG_XEN) \
+>      CONFIG_OPENGL=3D$(CONFIG_OPENGL) \
+>      CONFIG_X11=3D$(CONFIG_X11) \
+> ---
+>=20
+> I'm not sure about CONFIG_TPM_PASSTHROUGH.
+
+Instead of that I'm disabling tpm completely in configure for mingw:
+
+tpm=3D""
+...
+if test "$tpm" =3D ""; then
+  if test "$mingw32" =3D "yes"; then
+    tpm=3Dno
+  else
+    tpm=3Dyes
+  fi
+elif test "$tpm" =3D "yes"; then
+  if test "$mingw32" =3D "yes" ; then
+    error_exit "TPM emulation only available on POSIX systems"
+  fi
+fi
+
+Paolo
