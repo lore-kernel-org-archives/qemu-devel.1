@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37763)
+Received: from eggs.gnu.org ([209.51.188.92]:38682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1tUX-00078m-Gr
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:55:22 -0500
+	(envelope-from <mjaggi.dev@gmail.com>) id 1h1tYc-0000r3-BZ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:59:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1tUW-0001D7-4d
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:55:21 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:31510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h1tUV-0001C0-P7
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:55:20 -0500
-Date: Thu, 7 Mar 2019 14:55:17 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <201903070647.13740.randrianasulu@gmail.com>
-Message-ID: <alpine.BSF.2.21.9999.1903071434410.53555@zero.eik.bme.hu>
-References: <201903070647.13740.randrianasulu@gmail.com>
+	(envelope-from <mjaggi.dev@gmail.com>) id 1h1tYb-0005Z9-Hz
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:59:34 -0500
+Received: from mail-lf1-x12f.google.com ([2a00:1450:4864:20::12f]:33833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjaggi.dev@gmail.com>)
+	id 1h1tYb-0005Wh-AA
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:59:33 -0500
+Received: by mail-lf1-x12f.google.com with SMTP id d26so11750589lfa.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 05:59:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v5-resend 0/2] Basic ATI VGA emulation
+From: manish jaggi <mjaggi.dev@gmail.com>
+Date: Thu, 7 Mar 2019 19:29:18 +0530
+Message-ID: <CAKSw8c6QTBSG6YDr1nLATrQYqybw+eUxEgVyEAQg+z7NqLqoxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] egl: EGL_MESA_image_dma_buf_export not supported /
+ Failed to initialize EGL render node for SPICE GL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Randrianasulu <randrianasulu@gmail.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Jayachandran Chandrasekharan Nair <jnair@marvell.com>, mjaggi@marvell.com
 
-Hello,
+Hi List,
+I am trying to run qemu with spice gl=on with the below command line
+and getting errors.
 
-On Thu, 7 Mar 2019, Andrew Randrianasulu wrote:
-> Tried this with mac99 machine and lubuntu 16.04 ppc.
+qemu-system-x86_64 -cdrom ubuntu-18.04.2-desktop-amd64.iso -hda
+u1.qcow2 -enable-kvm -m 1G -cpu host -smp 8 -machine vmport=off -boot
+order=dc -device virtio-vga,virgl=on -spice
+gl=on,unix,addr=/home/mjaggi/spice.sock,password=1,disable-ticketing
+-soundhw hda -device virtio-serial -chardev
+spicevmc,id=vdagent,debug=0,name=vdagent -device
+virtserialport,chardev=vdagent,name=com.redhat.spice.0
 
-Thanks for testing it. Do you want to add a Tested-by: tag? You can reply 
-to the patch (or series cover letter for all patches) with your Tested-by: 
-to declare that.
+qemu-system-x86_64: egl: EGL_MESA_image_dma_buf_export not supported
+qemu-system-x86_64: Failed to initialize EGL render node for SPICE GL
 
-> After upgrading r128 driver to -hwe part to get past this bug
-> https://bugs.freedesktop.org/show_bug.cgi?id=91622
->
-> and disabling accel I can see some image and cursor!
+Qemu configuration
+./configure --enable-sdl --with-sdlabi=2.0 --enable-opengl
+--enable-virglrenderer --enable-system --enable-modules
+--target-list=x86_64-softmmu --enable-kvm  --disable-werror
 
-Good. Accel is still not quite right, I now about that but couldn't fix it 
-yet. I'd need more time for that which I don't have now. So for now only 
-console and unaccelerated X is expected to work.
+...
+OpenGL support    yes
+OpenGL dmabufs    yes
 
-> qemu command:
->
-> ppc64-softmmu/qemu-system-ppc64 -M mac99 -device ati-vga \
-> -cdrom /mnt/sdb1/ISO/lubuntu-16.04-desktop-powerpc.iso -m 1G -boot d -cpu g4 -device usb-mouse -smp 1
+As per configure script
 
-The -cpu g4 is not needed as that's the default (it's also single core so 
--smp 1 is not needed either). You're probably also better off using -M 
-mac99,via=pmu which is closer to real hardware and adds USB keyboard and 
-mouse as well instead of ADB ones so you can omit the -device usb-mouse 
-option with that as well.
+#include <epoxy/egl.h>
+#ifndef EGL_MESA_image_dma_buf_export
+# error mesa/epoxy lacks support for dmabufs (mesa 10.6+)
+#endif
+int main(void) { return 0; }
+EOF
+  if compile_prog "" "" ; then
+    opengl_dmabuf=yes
+  fi
+fi
 
-> model rv100 doesn't recognized by openfirmware, so no output from it.
+So if OpenGL dmabufs   is yes, should I be getting
+EGL_MESA_image_dma_buf_export not supported error ?
+What I could be missing here
+Need help/guidance.
 
-rv100 is only supported for fulong2e console at the moment because drivers 
-for it probably need more features of the GPU implemented (such as command 
-FIFO) that aren't emulated yet. At first I only target rage128p as found 
-in PowerMac3,1 without 3D for Linux, X, MorphOS and maybe MacOS.
-
-> Menus in wondows still at wrong place (not shown, even), but generally speaking some image is on screen.
-
-I wonder if it's a bug in guest or due to Linux FB using some 2D ops that 
-are not correct? Maybe this could be cross-checked with an Intel version 
-of the same lubuntu version to make sure it's not a PPC specific xorg 
-problem.
-
-Regards,
-BALATON Zoltan
+-Thanks
+Manish
