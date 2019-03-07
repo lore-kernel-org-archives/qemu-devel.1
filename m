@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60193)
+Received: from eggs.gnu.org ([209.51.188.92]:60117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMd-0002nQ-W0
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:49 -0500
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMa-0002lw-CJ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMa-0005lF-WF
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:46 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:48832)
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMX-0005in-H7
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:42 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:50788)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1h1nMa-0005kB-Ji
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:44 -0500
+	id 1h1nMU-0005fG-ND
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:39 -0500
 From: elena.ufimtseva@oracle.com
-Date: Wed,  6 Mar 2019 23:22:39 -0800
-Message-Id: <20190307072239.9594-1-elena.ufimtseva@oracle.com>
-Subject: [Qemu-devel] [multiprocess RFC PATCH 30/37] multi-process: add
- processing of rdrive and rdevice command line
+Date: Wed,  6 Mar 2019 23:22:20 -0800
+Message-Id: <20190307072220.9207-1-elena.ufimtseva@oracle.com>
+Subject: [Qemu-devel] [multiprocess RFC PATCH 23/37] multi-process: add
+ command line options rdrive and rdevice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,169 +24,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, pbonzini@redhat.com
+Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Add processing of command line options rdrive and rdevice.
-After remote devices are created along with their proxies,
-signal the proxies to finish the configuration steps.
+These command option have the same notion as the drive and device,
+except these will be emulated in remote process.
+Added parameter rid identified the remote process group.
 
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+As an example, this will create the device emulated by the remote
+process:
+
+/usr/local/bin/qemu-system-x86_64 -name vm -m 6G -drive file=/root/ol7.qcow2,format=raw
+ -enable-kvm -machine q35,accel=kvm
+ -rdevice lsi53c895a,rid=0,id=scsi0,command=qemu-scsi-dev
+ -rdevice scsi-hd,rid=0,drive=drive0,bus=scsi0.0,scsi-id=0
+ -rdrive id=drive0,rid=0,file=/root/cirros-0.4.0-x86_64-disk.img,format=qcow3
+ -object memory-backend-file,id=mem,mem-path=/dev/shm/,size=6G,share=on -numa node,memdev=mem
+ -display none -vnc :0 -monitor stdio
+
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-
- Please enter the commit message for your changes. Lines starting
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 ---
- vl.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+ blockdev.c              | 12 ++++++++++++
+ include/sysemu/sysemu.h |  2 ++
+ qdev-monitor.c          |  9 +++++++++
+ qemu-options.hx         | 26 ++++++++++++++++++++++++++
+ 4 files changed, 49 insertions(+)
 
-diff --git a/vl.c b/vl.c
-index 4c5cc0d..f6bd66e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -30,6 +30,11 @@
- #include "qemu/help_option.h"
- #include "qemu/uuid.h"
- #include "sysemu/seccomp.h"
-+#include "qapi/qmp/qdict.h"
-+#include "block/qdict.h"
-+#include "qapi/qmp/qstring.h"
-+#include "qapi/qmp/qjson.h"
-+#include "qapi/qmp/qlist.h"
- 
- #ifdef CONFIG_SDL
- #if defined(__APPLE__) || defined(main)
-@@ -1165,6 +1170,21 @@ static int drive_init_func(void *opaque, QemuOpts *opts, Error **errp)
-     return drive_new(opts, *block_default_type, errp) == NULL;
- }
- 
-+#if defined(CONFIG_MPQEMU)
-+static int rdrive_init_func(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    DeviceState *dev;
+diff --git a/blockdev.c b/blockdev.c
+index 7e6bf99..c03a09f 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -4580,3 +4580,15 @@ QemuOptsList qemu_drive_opts = {
+         { /* end of list */ }
+     },
+ };
 +
-+    dev = qdev_remote_add(opts, false /* this is drive */, errp);
-+    if (!dev) {
-+        qemu_log_mask(LOG_REMOTE_DEBUG, "qdev_remote_add failed for drive.\n");
-+        return -1;
-+    }
-+    object_unref(OBJECT(dev));
-+    return 0;
-+}
-+#endif
++QemuOptsList qemu_rdrive_opts = {
++    .name = "rdrive",
++    .head = QTAILQ_HEAD_INITIALIZER(qemu_rdrive_opts.head),
++    .desc = {
++        /*
++         * no elements => accept any params
++         * validation will happen later
++         */
++        { /* end of list */ }
++    },
++};
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 89604a8..82622be 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -193,5 +193,7 @@ extern QemuOptsList qemu_nic_opts;
+ extern QemuOptsList qemu_net_opts;
+ extern QemuOptsList qemu_global_opts;
+ extern QemuOptsList qemu_mon_opts;
++extern QemuOptsList qemu_rdevice_opts;
++extern QemuOptsList qemu_rdrive_opts;
+ 
+ #endif
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 46d0ad0..eb7e542 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -964,6 +964,15 @@ QemuOptsList qemu_global_opts = {
+     },
+ };
+ 
++QemuOptsList qemu_rdevice_opts = {
++    .name = "rdevice",
++    .implied_opt_name = "driver",
++    .head = QTAILQ_HEAD_INITIALIZER(qemu_rdevice_opts.head),
++    .desc = {
++        { /* end of list */ }
++    },
++};
 +
- static int drive_enable_snapshot(void *opaque, QemuOpts *opts, Error **errp)
+ int qemu_global_option(const char *str)
  {
-     if (qemu_opt_get(opts, "snapshot") == NULL) {
-@@ -2298,6 +2318,21 @@ static int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
-     return 0;
- }
+     char driver[64], property[64];
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 1cf9aac..0b82013 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -535,6 +535,17 @@ Like the KCS interface, but defines a BT interface.  The default port is
  
-+#if defined(CONFIG_MPQEMU)
-+static int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    DeviceState *dev;
-+
-+    dev = qdev_remote_add(opts, true /* this is device */, errp);
-+    if (!dev) {
-+        qemu_log_mask(LOG_REMOTE_DEBUG, "qdev_remote_add failed for device.\n");
-+        return -1;
-+    }
-+    object_unref(OBJECT(dev));
-+    return 0;
-+}
-+#endif
-+
- static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
- {
-     Error *local_err = NULL;
-@@ -2984,6 +3019,7 @@ int main(int argc, char **argv, char **envp)
-     Error *err = NULL;
-     bool list_data_dirs = false;
-     char *dir, **dirs;
-+
-     typedef struct BlockdevOptions_queue {
-         BlockdevOptions *bdo;
-         Location loc;
-@@ -3036,6 +3072,11 @@ int main(int argc, char **argv, char **envp)
-     qemu_add_opts(&qemu_icount_opts);
-     qemu_add_opts(&qemu_semihosting_config_opts);
-     qemu_add_opts(&qemu_fw_cfg_opts);
-+#if defined(CONFIG_MPQEMU)
-+    qemu_add_opts(&qemu_rdrive_opts);
-+    qemu_add_opts(&qemu_rdevice_opts);
-+#endif
-+
-     module_call_init(MODULE_INIT_OPTS);
+ ETEXI
  
-     runstate_init();
-@@ -3633,6 +3674,22 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
++DEF("rdevice", HAS_ARG, QEMU_OPTION_rdevice,
++    "-rdevice driver[,prop[=value][,...]]\n"
++    "                add device (based on driver)\n"
++    "                prop=value,... sets driver properties\n"
++    "                use '-device help' to print all possible drivers\n"
++    "                use '-device driver,help' to print all possible properties\n",
++    QEMU_ARCH_ALL)
++STEXI
++Remote device options.
++ETEXI
 +
-+#if defined(CONFIG_MPQEMU)
-+            case QEMU_OPTION_rdevice:
-+                if (!qemu_opts_parse_noisily(qemu_find_opts("rdevice"),
-+                                             optarg, true)) {
-+                    exit(1);
-+                }
-+
-+                break;
-+            case QEMU_OPTION_rdrive:
-+                if (!qemu_opts_parse_noisily(qemu_find_opts("rdrive"),
-+                                             optarg, false)) {
-+                    exit(1);
-+                }
-+                break;
-+#endif
-             case QEMU_OPTION_smp:
-                 if (!qemu_opts_parse_noisily(qemu_find_opts("smp-opts"),
-                                              optarg, true)) {
-@@ -4387,6 +4444,7 @@ int main(int argc, char **argv, char **envp)
-         qapi_free_BlockdevOptions(bdo->bdo);
-         g_free(bdo);
-     }
-+
-     if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-                           NULL, NULL);
-@@ -4478,6 +4536,21 @@ int main(int argc, char **argv, char **envp)
-     qemu_opts_foreach(qemu_find_opts("device"),
-                       device_init_func, NULL, &error_fatal);
+ DEF("name", HAS_ARG, QEMU_OPTION_name,
+     "-name string1[,process=string2][,debug-threads=on|off]\n"
+     "                set the name of the guest\n"
+@@ -786,6 +797,21 @@ Please refer to the QAPI documentation of the @code{blockdev-add} QMP command.
  
-+#if defined(CONFIG_MPQEMU)
-+    if (qemu_opts_foreach(qemu_find_opts("rdrive"), rdrive_init_func,
-+                          NULL, &err)) {
-+        qemu_log_mask(LOG_REMOTE_DEBUG,
-+                      "Failed to execute rdrive_init_func\n.");
-+    }
+ ETEXI
+ 
++DEF("rdrive", HAS_ARG, QEMU_OPTION_rdrive,
++    "-rdrive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
++    "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
++    "       [,snapshot=on|off][,rerror=ignore|stop|report]\n"
++    "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
++    "       [,readonly=on|off][,copy-on-read=on|off]\n"
++    "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
++    "       [[,bps=b]|[[,bps_rd=r][,bps_wr=w]]]\n"
++    "       [[,iops=i]|[[,iops_rd=r][,iops_wr=w]]]\n"
++    "       [[,bps_max=bm]|[[,bps_rd_max=rm][,bps_wr_max=wm]]]\n"
++    "       [[,iops_max=im]|[[,iops_rd_max=irm][,iops_wr_max=iwm]]]\n"
++    "       [[,iops_size=is]]\n"
++    "       [[,group=g]]\n"
++    "                use 'file' as a drive image\n", QEMU_ARCH_ALL)
 +
-+    if (qemu_opts_foreach(qemu_find_opts("rdevice"),
-+
-+                          rdevice_init_func, NULL, &err)) {
-+        qemu_log_mask(LOG_REMOTE_DEBUG,
-+                      "Failed to execute rdevice_init_func\n.");
-+    }
-+#endif
-+
-     cpu_synchronize_all_post_init();
- 
-     rom_reset_order_override();
-@@ -4530,10 +4603,13 @@ int main(int argc, char **argv, char **envp)
-     qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
-     qemu_run_machine_init_done_notifiers();
- 
-+#if defined(CONFIG_MPQEMU)
-+    qdev_proxy_fire();
-     if (rom_check_and_register_reset() != 0) {
-         error_report("rom check and register reset failed");
-         exit(1);
-     }
-+#endif
- 
-     replay_start();
- 
+ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
+     "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
 -- 
 1.8.3.1
