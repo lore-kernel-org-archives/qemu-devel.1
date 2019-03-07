@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35280)
+Received: from eggs.gnu.org ([209.51.188.92]:37125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1uxe-0006nV-2b
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:29:31 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1v4k-0004WJ-Ij
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1uxa-0000Fy-2z
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:29:27 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190304194857.9780-1-philmd@redhat.com>
-	<20190304194857.9780-4-philmd@redhat.com>
-	<265e566a-f2f5-5eb8-2839-781030bc479a@redhat.com>
-Date: Thu, 07 Mar 2019 16:29:07 +0100
-In-Reply-To: <265e566a-f2f5-5eb8-2839-781030bc479a@redhat.com> (Laszlo Ersek's
-	message of "Tue, 5 Mar 2019 18:30:11 +0100")
-Message-ID: <87y35qput8.fsf@dusky.pond.sub.org>
+	(envelope-from <philmd@redhat.com>) id 1h1v4i-00079q-SH
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:36:50 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45166)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1v4i-00077J-GX
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:36:48 -0500
+Received: by mail-wr1-f66.google.com with SMTP id w17so17939263wrn.12
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 07:36:48 -0800 (PST)
+References: <20190307090639.8261-1-eric.auger@redhat.com>
+	<d36618f5-4dc4-f4a2-2cb3-9a689cb3f771@redhat.com>
+	<8db3bb89-6b7f-fe6b-1ba5-3263da3d0528@redhat.com>
+	<3c64370f-1e91-70e0-6f7e-ce0a3c1175da@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c9f7838f-0554-59d3-53c2-1a556119308b@redhat.com>
+Date: Thu, 7 Mar 2019 16:36:45 +0100
 MIME-Version: 1.0
+In-Reply-To: <3c64370f-1e91-70e0-6f7e-ce0a3c1175da@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] hw/i386/pc_sysfw: Let
- pc_system_firmware_init() access PCMachineState
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] machine: Move acpi_nvdimm_state into
+ struct MachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,96 +33,340 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>, Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, richard.henderson@linaro.org, sbhat@linux.ibm.com
 
-Laszlo Ersek <lersek@redhat.com> writes:
+On 3/7/19 4:21 PM, David Hildenbrand wrote:
+> On 07.03.19 16:15, Auger Eric wrote:
+>> Hi Philippe, Eduardo,
+>>
+>> On 3/7/19 11:56 AM, Philippe Mathieu-Daudé wrote:
+>>> Hi Eric, Eduardo,
+>>>
+>>> On 3/7/19 10:06 AM, Eric Auger wrote:
+>>>> As NVDIMM support is looming for ARM and SPAPR, let's
+>>>> move the acpi_nvdimm_state to the generic machine struct
+>>>> instead of duplicating the same code in several machines.
+>>>> It is also renamed into nvdimms_state.
+>>>>
+>>>> nvdimm and nvdimm-persistence become generic machine options.
+>>>> We also add a description for those options.
+>>>>
+>>>> We also remove the nvdimms_state.is_enabled initialization to
+>>>> false as objects are guaranteed to be zero initialized.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>>>>
+>>>> ---
+>>>>
+>>>> v1 -> v2:
+>>>> - s/acpi_nvdimm_state/nvdimms_state
+>>>> - remove ms->nvdimms_state.is_enabled initialization to false.
+>>>> ---
+>>>>  hw/core/machine.c        | 55 +++++++++++++++++++++++++++++++++++++++
+>>>>  hw/i386/acpi-build.c     |  6 ++---
+>>>>  hw/i386/pc.c             | 56 +++-------------------------------------
+>>>>  hw/i386/pc_piix.c        |  4 +--
+>>>>  hw/i386/pc_q35.c         |  4 +--
+>>>>  include/hw/boards.h      |  2 ++
+>>>>  include/hw/i386/pc.h     |  4 ---
+>>>>  include/hw/mem/pc-dimm.h |  1 -
+>>>>  8 files changed, 68 insertions(+), 64 deletions(-)
+>>>>
+>>>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+>>>> index 766ca5899d..21a7209246 100644
+>>>> --- a/hw/core/machine.c
+>>>> +++ b/hw/core/machine.c
+>>>> @@ -481,6 +481,47 @@ static void machine_set_memory_encryption(Object *obj, const char *value,
+>>>>      ms->memory_encryption = g_strdup(value);
+>>>>  }
+>>>>  
+>>>> +static bool machine_get_nvdimm(Object *obj, Error **errp)
+>>>> +{
+>>>> +    MachineState *ms = MACHINE(obj);
+>>>> +
+>>>> +    return ms->nvdimms_state.is_enabled;
+>>>> +}
+>>>> +
+>>>> +static void machine_set_nvdimm(Object *obj, bool value, Error **errp)
+>>>> +{
+>>>> +    MachineState *ms = MACHINE(obj);
+>>>> +
+>>>> +    ms->nvdimms_state.is_enabled = value;
+>>>> +}
+>>>> +
+>>>> +static char *machine_get_nvdimm_persistence(Object *obj, Error **errp)
+>>>> +{
+>>>> +    MachineState *ms = MACHINE(obj);
+>>>> +
+>>>> +    return g_strdup(ms->nvdimms_state.persistence_string);
+>>>> +}
+>>>> +
+>>>> +static void machine_set_nvdimm_persistence(Object *obj, const char *value,
+>>>> +                                               Error **errp)
+>>>> +{
+>>>> +    MachineState *ms = MACHINE(obj);
+>>>> +    AcpiNVDIMMState *nvdimms_state = &ms->nvdimms_state;
+>>>> +
+>>>> +    if (strcmp(value, "cpu") == 0)
+>>>> +        nvdimms_state->persistence = 3;
+>>>> +    else if (strcmp(value, "mem-ctrl") == 0)
+>>>> +        nvdimms_state->persistence = 2;
+>>>> +    else {
+>>>> +        error_setg(errp, "-machine nvdimm-persistence=%s: unsupported option",
+>>>> +                   value);
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    g_free(nvdimms_state->persistence_string);
+>>>> +    nvdimms_state->persistence_string = g_strdup(value);
+>>>> +}
+>>>> +
+>>>>  void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type)
+>>>>  {
+>>>>      strList *item = g_new0(strList, 1);
+>>>> @@ -765,6 +806,20 @@ static void machine_class_init(ObjectClass *oc, void *data)
+>>>>          &error_abort);
+>>>>      object_class_property_set_description(oc, "memory-encryption",
+>>>>          "Set memory encryption object to use", &error_abort);
+>>>> +
+>>>> +    object_class_property_add_bool(oc, "nvdimm",
+>>>> +        machine_get_nvdimm, machine_set_nvdimm, &error_abort);
+>>>> +    object_class_property_set_description(oc, "nvdimm",
+>>>> +                                         "Set on/off to enable/disable NVDIMM "
+>>>> +                                         "instantiation", NULL);
+>>>> +
+>>>> +    object_class_property_add_str(oc, "nvdimm-persistence",
+>>>> +                                  machine_get_nvdimm_persistence,
+>>>> +                                  machine_set_nvdimm_persistence, &error_abort);
+>>>> +    object_class_property_set_description(oc, "nvdimm-persistence",
+>>>> +                                          "Set NVDIMM persistence"
+>>>> +                                          "Valid values are cpu and mem-ctrl",
+>>>> +                                          NULL);
+>>>>  }
+>>>>  
+>>>>  static void machine_class_base_init(ObjectClass *oc, void *data)
+>>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>>>> index 9ecc96dcc7..2d7d46fe50 100644
+>>>> --- a/hw/i386/acpi-build.c
+>>>> +++ b/hw/i386/acpi-build.c
+>>>> @@ -1867,7 +1867,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>>>>              aml_append(scope, method);
+>>>>          }
+>>>>  
+>>>> -        if (pcms->acpi_nvdimm_state.is_enabled) {
+>>>> +        if (machine->nvdimms_state.is_enabled) {
+>>>>              method = aml_method("_E04", 0, AML_NOTSERIALIZED);
+>>>>              aml_append(method, aml_notify(aml_name("\\_SB.NVDR"),
+>>>>                                            aml_int(0x80)));
+>>>> @@ -2704,9 +2704,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>>>              build_dmar_q35(tables_blob, tables->linker);
+>>>>          }
+>>>>      }
+>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
+>>>> +    if (machine->nvdimms_state.is_enabled) {
+>>>>          nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
+>>>> -                          &pcms->acpi_nvdimm_state, machine->ram_slots);
+>>>> +                          &machine->nvdimms_state, machine->ram_slots);
+>>>>      }
+>>>>  
+>>>>      /* Add tables supplied by user (if any) */
+>>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>>> index 42128183e9..cacc4068cf 100644
+>>>> --- a/hw/i386/pc.c
+>>>> +++ b/hw/i386/pc.c
+>>>> @@ -2069,6 +2069,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>>  {
+>>>>      const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>>>>      const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>>>> +    const MachineState *ms = MACHINE(hotplug_dev);
+>>>>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>>>>      const uint64_t legacy_align = TARGET_PAGE_SIZE;
+>>>>  
+>>>> @@ -2083,7 +2084,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>>          return;
+>>>>      }
+>>>>  
+>>>> -    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+>>>> +    if (is_nvdimm && !ms->nvdimms_state.is_enabled) {
+>>>>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+>>>>          return;
+>>>>      }
+>>>> @@ -2097,6 +2098,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+>>>>  {
+>>>>      Error *local_err = NULL;
+>>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>>>> +    MachineState *ms = MACHINE(hotplug_dev);
+>>>>      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>>>>  
+>>>>      pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms), &local_err);
+>>>> @@ -2105,7 +2107,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+>>>>      }
+>>>>  
+>>>>      if (is_nvdimm) {
+>>>> -        nvdimm_plug(&pcms->acpi_nvdimm_state);
+>>>> +        nvdimm_plug(&ms->nvdimms_state);
+>>>>      }
+>>>>  
+>>>>      hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
+>>>> @@ -2546,47 +2548,6 @@ static void pc_machine_set_smm(Object *obj, Visitor *v, const char *name,
+>>>>      visit_type_OnOffAuto(v, name, &pcms->smm, errp);
+>>>>  }
+>>>>  
+>>>> -static bool pc_machine_get_nvdimm(Object *obj, Error **errp)
+>>>> -{
+>>>> -    PCMachineState *pcms = PC_MACHINE(obj);
+>>>> -
+>>>> -    return pcms->acpi_nvdimm_state.is_enabled;
+>>>> -}
+>>>> -
+>>>> -static void pc_machine_set_nvdimm(Object *obj, bool value, Error **errp)
+>>>> -{
+>>>> -    PCMachineState *pcms = PC_MACHINE(obj);
+>>>> -
+>>>> -    pcms->acpi_nvdimm_state.is_enabled = value;
+>>>> -}
+>>>> -
+>>>> -static char *pc_machine_get_nvdimm_persistence(Object *obj, Error **errp)
+>>>> -{
+>>>> -    PCMachineState *pcms = PC_MACHINE(obj);
+>>>> -
+>>>> -    return g_strdup(pcms->acpi_nvdimm_state.persistence_string);
+>>>> -}
+>>>> -
+>>>> -static void pc_machine_set_nvdimm_persistence(Object *obj, const char *value,
+>>>> -                                               Error **errp)
+>>>> -{
+>>>> -    PCMachineState *pcms = PC_MACHINE(obj);
+>>>> -    AcpiNVDIMMState *nvdimm_state = &pcms->acpi_nvdimm_state;
+>>>> -
+>>>> -    if (strcmp(value, "cpu") == 0)
+>>>> -        nvdimm_state->persistence = 3;
+>>>> -    else if (strcmp(value, "mem-ctrl") == 0)
+>>>> -        nvdimm_state->persistence = 2;
+>>>> -    else {
+>>>> -        error_setg(errp, "-machine nvdimm-persistence=%s: unsupported option",
+>>>> -                   value);
+>>>> -        return;
+>>>> -    }
+>>>> -
+>>>> -    g_free(nvdimm_state->persistence_string);
+>>>> -    nvdimm_state->persistence_string = g_strdup(value);
+>>>> -}
+>>>> -
+>>>>  static bool pc_machine_get_smbus(Object *obj, Error **errp)
+>>>>  {
+>>>>      PCMachineState *pcms = PC_MACHINE(obj);
+>>>> @@ -2636,8 +2597,6 @@ static void pc_machine_initfn(Object *obj)
+>>>>      pcms->max_ram_below_4g = 0; /* use default */
+>>>>      pcms->smm = ON_OFF_AUTO_AUTO;
+>>>>      pcms->vmport = ON_OFF_AUTO_AUTO;
+>>>> -    /* nvdimm is disabled on default. */
+>>>> -    pcms->acpi_nvdimm_state.is_enabled = false;
+>>>>      /* acpi build is enabled by default if machine supports it */
+>>>>      pcms->acpi_build_enabled = PC_MACHINE_GET_CLASS(pcms)->has_acpi_build;
+>>>>      pcms->smbus_enabled = true;
+>>>> @@ -2798,13 +2757,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>>>>      object_class_property_set_description(oc, PC_MACHINE_VMPORT,
+>>>>          "Enable vmport (pc & q35)", &error_abort);
+>>>>  
+>>>> -    object_class_property_add_bool(oc, PC_MACHINE_NVDIMM,
+>>>> -        pc_machine_get_nvdimm, pc_machine_set_nvdimm, &error_abort);
+>>>> -
+>>>> -    object_class_property_add_str(oc, PC_MACHINE_NVDIMM_PERSIST,
+>>>> -        pc_machine_get_nvdimm_persistence,
+>>>> -        pc_machine_set_nvdimm_persistence, &error_abort);
+>>>> -
+>>>>      object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
+>>>>          pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
+>>>>  
+>>>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>>>> index 8770ecada9..16ebfc5a5a 100644
+>>>> --- a/hw/i386/pc_piix.c
+>>>> +++ b/hw/i386/pc_piix.c
+>>>> @@ -297,8 +297,8 @@ static void pc_init1(MachineState *machine,
+>>>>                                   PC_MACHINE_ACPI_DEVICE_PROP, &error_abort);
+>>>>      }
+>>>>  
+>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
+>>>> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
+>>>> +    if (machine->nvdimms_state.is_enabled) {
+>>>> +        nvdimm_init_acpi_state(&machine->nvdimms_state, system_io,
+>>>>                                 pcms->fw_cfg, OBJECT(pcms));
+>>>>      }
+>>>>  }
+>>>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+>>>> index cfb9043e12..dacaa90611 100644
+>>>> --- a/hw/i386/pc_q35.c
+>>>> +++ b/hw/i386/pc_q35.c
+>>>> @@ -329,8 +329,8 @@ static void pc_q35_init(MachineState *machine)
+>>>>      pc_vga_init(isa_bus, host_bus);
+>>>>      pc_nic_init(pcmc, isa_bus, host_bus);
+>>>>  
+>>>> -    if (pcms->acpi_nvdimm_state.is_enabled) {
+>>>> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
+>>>> +    if (machine->nvdimms_state.is_enabled) {
+>>>> +        nvdimm_init_acpi_state(&machine->nvdimms_state, system_io,
+>>>>                                 pcms->fw_cfg, OBJECT(pcms));
+>>>>      }
+>>>>  }
+>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>>>> index 9690c71a6d..ccf0c5a69d 100644
+>>>> --- a/include/hw/boards.h
+>>>> +++ b/include/hw/boards.h
+>>>> @@ -8,6 +8,7 @@
+>>>>  #include "hw/qdev.h"
+>>>>  #include "qom/object.h"
+>>>>  #include "qom/cpu.h"
+>>>> +#include "hw/mem/nvdimm.h"
+>>>>  
+>>>>  /**
+>>>>   * memory_region_allocate_system_memory - Allocate a board's main memory
+>>>> @@ -272,6 +273,7 @@ struct MachineState {
+>>>>      const char *cpu_type;
+>>>>      AccelState *accelerator;
+>>>>      CPUArchIdList *possible_cpus;
+>>>> +    AcpiNVDIMMState nvdimms_state;
+>>>
+>>> It looks we are breaking the generic/abstract machine design.
+>>> You introduce 2 specific concepts here, ACPI and NVDIMM.
+>> at least this should be renamed NVDIMMState according to last Igor's
+>> comment.
+>>>
+>>> MachineClass tries to be generic, and and still suffer from specific
+>>> fields inherited from the PC Machine.
+>>>
+>>> I'd use an intermediate Memory-related object between Machine and
+>>> AcpiNVDIMM states.
+>>>
+>>> I see there already is DeviceMemoryState.
+>>>
+>>> Can AcpiNVDIMMState go there? That would be more acceptable IMHO.
+>> DeviceMemoryState is also declared in include/hw/boards.h so does it
+>> hide any details.
+>>
+>> Not every machine has device memory or irqchip_split either for instance
+> 
+> device_memory is an abstracted concept that can be theoretically
+> implemented by any machine. nvdimm is not.
 
-> On 03/04/19 20:48, Philippe Mathieu-Daud=C3=A9 wrote:
->> PCMachineState will be used in the next patch.
->> Since We can access PCMachineClass from it, directly use it.
->> We can also access pcmc->pci_enabled, remove the isapc_ram_fw
->> argument.
->>=20
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> [PMD: Extracted from bigger patch]
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>  hw/i386/pc.c         | 2 +-
->>  hw/i386/pc_sysfw.c   | 8 +++++---
->>  include/hw/i386/pc.h | 3 +--
->>  3 files changed, 7 insertions(+), 6 deletions(-)
->>=20
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 3889eccdc3..3cd8ed1794 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1830,7 +1830,7 @@ void pc_memory_init(PCMachineState *pcms,
->>      }
->>=20=20
->>      /* Initialize PC system firmware */
->> -    pc_system_firmware_init(rom_memory, !pcmc->pci_enabled);
->> +    pc_system_firmware_init(pcms, rom_memory);
->>=20=20
->>      option_rom_mr =3D g_malloc(sizeof(*option_rom_mr));
->>      memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
->> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
->> index 46b87afe23..55a3c563df 100644
->> --- a/hw/i386/pc_sysfw.c
->> +++ b/hw/i386/pc_sysfw.c
->> @@ -231,15 +231,17 @@ static void old_pc_system_rom_init(MemoryRegion *r=
-om_memory, bool isapc_ram_fw)
->>                                  bios);
->>  }
->>=20=20
->> -void pc_system_firmware_init(MemoryRegion *rom_memory, bool isapc_ram_f=
-w)
->> +void pc_system_firmware_init(PCMachineState *pcms,
->> +                             MemoryRegion *rom_memory)
->>  {
->> +    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
->>      DriveInfo *pflash_drv;
->>=20=20
->>      pflash_drv =3D drive_get(IF_PFLASH, 0, 0);
->>=20=20
->> -    if (isapc_ram_fw || pflash_drv =3D=3D NULL) {
->> +    if (!pcmc->pci_enabled || pflash_drv =3D=3D NULL) {
->>          /* When a pflash drive is not found, use rom-mode */
->> -        old_pc_system_rom_init(rom_memory, isapc_ram_fw);
->> +        old_pc_system_rom_init(rom_memory, true);
->>          return;
->>      }
->>=20=20
->
-> This code extraction (as a pure refactoring) is incorrect.
->
-> In Markus's patch at
-> <https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06804.html>,
-> the condition that guards the old_pc_system_rom_init() call loses one
-> half of the disjunction:
->
-> -    if (isapc_ram_fw || pflash_drv =3D=3D NULL) {
-> +    if (!pcmc->pci_enabled) {
->
-> namely the "pflash_drv =3D=3D NULL" sub-condition. Therefore the
-> old_pc_system_rom_init() call can hardwire the second argument as "true":
->
-> -        old_pc_system_rom_init(rom_memory, isapc_ram_fw);
-> +        old_pc_system_rom_init(rom_memory, true);
->
-> However, in this refactoring, the (pflash_drv =3D=3D NULL) subcondition is
-> not deleted; only the original condition is expressed differently.
-> Therefore we can't replace the "isapc_ram_fw" argument of
-> old_pc_system_rom_init() with plain "true", we have to use
-> "!pcmc->pci_enabled" instead.
+Then maybe the DeviceMemoryState is misleading, NVDIMM might not be
+related to QEMU's DeviceMemory concept, but it is a 'device memory' :)
 
-You're right
+The between-object I'm referring to would be a container of device
+memory types. It doesn't have to be a single instance but rather a list
+of 'hw memory' interfaces.
 
-> However, if we write down "!pcmc->pci_enabled" twice for this purpose,
-> then it becomes too complex to read (for me anyway). So in that case I'd
-> even suggest keeping the "isapc_ram_fw" local variable, just turn it
-> into a normal local variable rather than take it as a parameter.
->
-> In the next patch, "isapc_ram_fw" can be killed just the same.
-
-I'm doing that in my tree now.  Thanks!
+> 
+>> (ARM virt is a good example). So my understanding is we put in
+>> MachineState fields that are generic enough to be used by several
+>> machines and avoid duplication.
+>>
+>> Eduardo, do you have any objection wrt putting this state in the base
+>> machine?
+>>
+>> Thanks
+>>
+>> Eric
+> 
+> 
