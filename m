@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37526)
+Received: from eggs.gnu.org ([209.51.188.92]:37436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1wkq-0005Vn-KV
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1wkm-0005R0-IQ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1wkp-0003SB-Qo
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:24 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1wkl-0003Ou-OA
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:24:20 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 18:23:59 +0100
-Message-Id: <20190307172401.29451-11-armbru@redhat.com>
+Date: Thu,  7 Mar 2019 18:24:01 +0100
+Message-Id: <20190307172401.29451-13-armbru@redhat.com>
 In-Reply-To: <20190307172401.29451-1-armbru@redhat.com>
 References: <20190307172401.29451-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 10/12] pc_sysfw: Pass PCMachineState to
- pc_system_firmware_init()
+Subject: [Qemu-devel] [PATCH v2 12/12] docs/interop/firmware.json: Prefer
+ -machine to if=pflash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +23,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-pc_system_firmware_init() parameter @isapc_ram_fw is PCMachineState
-member pci_enabled negated.  The next commit will need more of
-PCMachineState.  To prepare for that, pass a PCMachineState *, and
-drop the now redundant parameter @isapc_ram_fw.
+The previous commit added a way to configure firmware with -blockdev
+rather than -drive if=pflash.  Document it as the preferred way.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/i386/pc.c         | 2 +-
- hw/i386/pc_sysfw.c   | 5 ++++-
- include/hw/i386/pc.h | 3 +--
- 3 files changed, 6 insertions(+), 4 deletions(-)
+ docs/interop/firmware.json | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3889eccdc3..3cd8ed1794 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1830,7 +1830,7 @@ void pc_memory_init(PCMachineState *pcms,
-     }
-=20
-     /* Initialize PC system firmware */
--    pc_system_firmware_init(rom_memory, !pcmc->pci_enabled);
-+    pc_system_firmware_init(pcms, rom_memory);
-=20
-     option_rom_mr =3D g_malloc(sizeof(*option_rom_mr));
-     memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 46b87afe23..785123252c 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -231,8 +231,11 @@ static void old_pc_system_rom_init(MemoryRegion *rom=
-_memory, bool isapc_ram_fw)
-                                 bios);
- }
-=20
--void pc_system_firmware_init(MemoryRegion *rom_memory, bool isapc_ram_fw=
-)
-+void pc_system_firmware_init(PCMachineState *pcms,
-+                             MemoryRegion *rom_memory)
- {
-+    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
-+    bool isapc_ram_fw =3D !pcmc->pci_enabled;
-     DriveInfo *pflash_drv;
-=20
-     pflash_drv =3D drive_get(IF_PFLASH, 0, 0);
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 3ff127ebd0..eb7360feac 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -278,8 +278,7 @@ extern PCIDevice *piix4_dev;
- int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
-=20
- /* pc_sysfw.c */
--void pc_system_firmware_init(MemoryRegion *rom_memory,
--                             bool isapc_ram_fw);
-+void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_mem=
-ory);
-=20
- /* acpi-build.c */
- void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
---=20
+diff --git a/docs/interop/firmware.json b/docs/interop/firmware.json
+index 28f9bc1591..db3cb38b6a 100644
+--- a/docs/interop/firmware.json
++++ b/docs/interop/firmware.json
+@@ -212,9 +212,13 @@
+ #
+ # @executable: Identifies the firmware executable. The firmware
+ #              executable may be shared by multiple virtual machine
+-#              definitions. The corresponding QEMU command line option
+-#              is "-drive
+-#              if=pflash,unit=0,readonly=on,file=@executable.@filename,format=@executable.@format".
++#              definitions. The preferred corresponding QEMU command
++#              line option is
++#                  -drive if=none,id=pflash0,readonly=on,file=@executable.@filename,format=@executable.@format
++#                  -machine pflash0=pflash0
++#              or equivalent -blockdev.
++#              With QEMU versions older than 4.0, you have to use
++#                  -drive if=pflash,unit=0,readonly=on,file=@executable.@filename,format=@executable.@format
+ #
+ # @nvram-template: Identifies the NVRAM template compatible with
+ #                  @executable. Management software instantiates an
+@@ -225,9 +229,14 @@
+ #                  individual copies of it are. An NVRAM file is
+ #                  typically used for persistently storing the
+ #                  non-volatile UEFI variables of a virtual machine
+-#                  definition. The corresponding QEMU command line
+-#                  option is "-drive
+-#                  if=pflash,unit=1,readonly=off,file=FILENAME_OF_PRIVATE_NVRAM_FILE,format=@nvram-template.@format".
++#                  definition. The preferred corresponding QEMU
++#                  command line option is
++#                      -drive if=none,id=pflash1,readonly=off,file=FILENAME_OF_PRIVATE_NVRAM_FILE,format=@nvram-template.@format
++#                      -machine pflash1=pflash1
++#                  or equivalent -blockdev.
++#                  With QEMU versions older than 4.0, you have to use
++#                      -drive if=pflash,unit=1,readonly=off,file=FILENAME_OF_PRIVATE_NVRAM_FILE,format=@nvram-template.@format
++#                  
+ #
+ # Since: 3.0
+ ##
+-- 
 2.17.2
