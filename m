@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39508)
+Received: from eggs.gnu.org ([209.51.188.92]:39556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wqn-0003Bd-PM
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:37 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wqr-0003I0-Qi
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wqk-00084a-GF
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:33 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42352)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wqp-0008AP-Qr
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:37 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38635)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1wqj-00083X-Fh
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:29 -0500
-Received: by mail-wr1-x441.google.com with SMTP id r5so18398960wrg.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:29 -0800 (PST)
+	id 1h1wqn-000869-OL
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:35 -0500
+Received: by mail-wr1-x442.google.com with SMTP id g12so18406097wrm.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:32 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 18:29:27 +0100
-Message-Id: <1551979804-6060-21-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 18:29:30 +0100
+Message-Id: <1551979804-6060-24-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
 References: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 20/57] qos-test: e1000e test node
+Subject: [Qemu-devel] [PULL 23/57] tests/libqos: virtio-mmio driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,476 +33,302 @@ Cc: thuth@redhat.com, lviver@redhat.com, Emanuele Giuseppe Esposito <e.emanueleg
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Convert tests/e1000e-test in qgraph test node, e1000e-test. This test
-consumes an e1000e interface and checks that its function return the
-expected values.
+Add virtio-mmio node in qgraph framework.
+virtio-mmio produces virtio-bus, the interface consumed by all virtio-*-device
+nodes.
 
-Note that this test does not allocate any e1000e structure, it's all done by the
-qtest walking graph mechanism
+Being a memory-mapped device, it doesn't have to provide a constructor
+to qgraph, since it's always "contained" inside some other nodes.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |   3 +-
- tests/e1000e-test.c    | 356 +++++++++++--------------------------------------
- 2 files changed, 78 insertions(+), 281 deletions(-)
+ tests/libqos/virtio-mmio.c | 116 +++++++++++++++++++++++++++------------------
+ tests/libqos/virtio-mmio.h |   6 ++-
+ tests/virtio-blk-test.c    |   3 +-
+ 3 files changed, 77 insertions(+), 48 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 5bd60a5..dbd0e68 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -167,7 +167,6 @@ check-qtest-virtio-$(CONFIG_VIRTIO_SERIAL) += tests/virtio-serial-test$(EXESUF)
- check-qtest-virtio-y += $(check-qtest-virtioserial-y)
- 
- check-qtest-pci-y += tests/e1000-test$(EXESUF)
--check-qtest-pci-y += tests/e1000e-test$(EXESUF)
- check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
- check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
- check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
-@@ -762,6 +761,7 @@ qos-test-obj-y += tests/libqos/ppc64_pseries-machine.o
- qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
- 
- # Tests
-+qos-test-obj-y += tests/e1000e-test.o
- qos-test-obj-y += tests/pci-test.o
- qos-test-obj-y += tests/sdhci-test.o
- 
-@@ -801,7 +801,6 @@ tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
- tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
- tests/fw_cfg-test$(EXESUF): tests/fw_cfg-test.o $(libqos-pc-obj-y)
- tests/e1000-test$(EXESUF): tests/e1000-test.o
--tests/e1000e-test$(EXESUF): tests/e1000e-test.o $(libqos-pc-obj-y)
- tests/rtl8139-test$(EXESUF): tests/rtl8139-test.o $(libqos-pc-obj-y)
- tests/pcnet-test$(EXESUF): tests/pcnet-test.o
- tests/pnv-xscom-test$(EXESUF): tests/pnv-xscom-test.o
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index 17a12b8..77ba809 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -32,210 +32,9 @@
- #include "qemu/iov.h"
- #include "qemu/bitops.h"
+diff --git a/tests/libqos/virtio-mmio.c b/tests/libqos/virtio-mmio.c
+index 7aa8383..3678c07 100644
+--- a/tests/libqos/virtio-mmio.c
++++ b/tests/libqos/virtio-mmio.c
+@@ -12,74 +12,74 @@
+ #include "libqos/virtio.h"
+ #include "libqos/virtio-mmio.h"
  #include "libqos/malloc.h"
--#include "libqos/malloc-pc.h"
 -#include "libqos/malloc-generic.h"
-+#include "libqos/e1000e.h"
++#include "libqos/qgraph.h"
+ #include "standard-headers/linux/virtio_ring.h"
  
--#define E1000E_IMS      (0x00d0)
--
--#define E1000E_STATUS   (0x0008)
--#define E1000E_STATUS_LU BIT(1)
--#define E1000E_STATUS_ASDV1000 BIT(9)
--
--#define E1000E_CTRL     (0x0000)
--#define E1000E_CTRL_RESET BIT(26)
--
--#define E1000E_RCTL     (0x0100)
--#define E1000E_RCTL_EN  BIT(1)
--#define E1000E_RCTL_UPE BIT(3)
--#define E1000E_RCTL_MPE BIT(4)
--
--#define E1000E_RFCTL     (0x5008)
--#define E1000E_RFCTL_EXTEN  BIT(15)
--
--#define E1000E_TCTL     (0x0400)
--#define E1000E_TCTL_EN  BIT(1)
--
--#define E1000E_CTRL_EXT             (0x0018)
--#define E1000E_CTRL_EXT_DRV_LOAD    BIT(28)
--#define E1000E_CTRL_EXT_TXLSFLOW    BIT(22)
--
--#define E1000E_RX0_MSG_ID           (0)
--#define E1000E_TX0_MSG_ID           (1)
--#define E1000E_OTHER_MSG_ID         (2)
--
--#define E1000E_IVAR                 (0x00E4)
--#define E1000E_IVAR_TEST_CFG        ((E1000E_RX0_MSG_ID << 0)    | BIT(3)  | \
--                                     (E1000E_TX0_MSG_ID << 8)    | BIT(11) | \
--                                     (E1000E_OTHER_MSG_ID << 16) | BIT(19) | \
--                                     BIT(31))
--
--#define E1000E_RING_LEN             (0x1000)
--#define E1000E_TXD_LEN              (16)
--#define E1000E_RXD_LEN              (16)
--
--#define E1000E_TDBAL    (0x3800)
--#define E1000E_TDBAH    (0x3804)
--#define E1000E_TDLEN    (0x3808)
--#define E1000E_TDH      (0x3810)
--#define E1000E_TDT      (0x3818)
--
--#define E1000E_RDBAL    (0x2800)
--#define E1000E_RDBAH    (0x2804)
--#define E1000E_RDLEN    (0x2808)
--#define E1000E_RDH      (0x2810)
--#define E1000E_RDT      (0x2818)
--
--typedef struct e1000e_device {
--    QPCIDevice *pci_dev;
--    QPCIBar mac_regs;
--
--    uint64_t tx_ring;
--    uint64_t rx_ring;
--} e1000e_device;
--
--static int test_sockets[2];
--static QGuestAllocator test_alloc;
--static QPCIBus *test_bus;
--
--static void e1000e_pci_foreach_callback(QPCIDevice *dev, int devfn, void *data)
--{
--    QPCIDevice **res = data;
--
--    g_assert_null(*res);
--    *res = dev;
--}
--
--static QPCIDevice *e1000e_device_find(QPCIBus *bus)
--{
--    static const int e1000e_vendor_id = 0x8086;
--    static const int e1000e_dev_id = 0x10D3;
--
--    QPCIDevice *e1000e_dev = NULL;
--
--    qpci_device_foreach(bus, e1000e_vendor_id, e1000e_dev_id,
--        e1000e_pci_foreach_callback, &e1000e_dev);
--
--    g_assert_nonnull(e1000e_dev);
--
--    return e1000e_dev;
--}
--
--static void e1000e_macreg_write(e1000e_device *d, uint32_t reg, uint32_t val)
--{
--    qpci_io_writel(d->pci_dev, d->mac_regs, reg, val);
--}
--
--static uint32_t e1000e_macreg_read(e1000e_device *d, uint32_t reg)
--{
--    return qpci_io_readl(d->pci_dev, d->mac_regs, reg);
--}
--
--static void e1000e_device_init(QPCIBus *bus, e1000e_device *d)
--{
--    uint32_t val;
--
--    d->pci_dev = e1000e_device_find(bus);
--
--    /* Enable the device */
--    qpci_device_enable(d->pci_dev);
--
--    /* Map BAR0 (mac registers) */
--    d->mac_regs = qpci_iomap(d->pci_dev, 0, NULL);
--
--    /* Reset the device */
--    val = e1000e_macreg_read(d, E1000E_CTRL);
--    e1000e_macreg_write(d, E1000E_CTRL, val | E1000E_CTRL_RESET);
--
--    /* Enable and configure MSI-X */
--    qpci_msix_enable(d->pci_dev);
--    e1000e_macreg_write(d, E1000E_IVAR, E1000E_IVAR_TEST_CFG);
--
--    /* Check the device status - link and speed */
--    val = e1000e_macreg_read(d, E1000E_STATUS);
--    g_assert_cmphex(val & (E1000E_STATUS_LU | E1000E_STATUS_ASDV1000),
--        ==, E1000E_STATUS_LU | E1000E_STATUS_ASDV1000);
--
--    /* Initialize TX/RX logic */
--    e1000e_macreg_write(d, E1000E_RCTL, 0);
--    e1000e_macreg_write(d, E1000E_TCTL, 0);
--
--    /* Notify the device that the driver is ready */
--    val = e1000e_macreg_read(d, E1000E_CTRL_EXT);
--    e1000e_macreg_write(d, E1000E_CTRL_EXT,
--        val | E1000E_CTRL_EXT_DRV_LOAD | E1000E_CTRL_EXT_TXLSFLOW);
--
--    /* Allocate and setup TX ring */
--    d->tx_ring = guest_alloc(&test_alloc, E1000E_RING_LEN);
--    g_assert(d->tx_ring != 0);
--
--    e1000e_macreg_write(d, E1000E_TDBAL, (uint32_t) d->tx_ring);
--    e1000e_macreg_write(d, E1000E_TDBAH, (uint32_t) (d->tx_ring >> 32));
--    e1000e_macreg_write(d, E1000E_TDLEN, E1000E_RING_LEN);
--    e1000e_macreg_write(d, E1000E_TDT, 0);
--    e1000e_macreg_write(d, E1000E_TDH, 0);
--
--    /* Enable transmit */
--    e1000e_macreg_write(d, E1000E_TCTL, E1000E_TCTL_EN);
--
--    /* Allocate and setup RX ring */
--    d->rx_ring = guest_alloc(&test_alloc, E1000E_RING_LEN);
--    g_assert(d->rx_ring != 0);
--
--    e1000e_macreg_write(d, E1000E_RDBAL, (uint32_t)d->rx_ring);
--    e1000e_macreg_write(d, E1000E_RDBAH, (uint32_t)(d->rx_ring >> 32));
--    e1000e_macreg_write(d, E1000E_RDLEN, E1000E_RING_LEN);
--    e1000e_macreg_write(d, E1000E_RDT, 0);
--    e1000e_macreg_write(d, E1000E_RDH, 0);
--
--    /* Enable receive */
--    e1000e_macreg_write(d, E1000E_RFCTL, E1000E_RFCTL_EXTEN);
--    e1000e_macreg_write(d, E1000E_RCTL, E1000E_RCTL_EN  |
--                                        E1000E_RCTL_UPE |
--                                        E1000E_RCTL_MPE);
--
--    /* Enable all interrupts */
--    e1000e_macreg_write(d, E1000E_IMS, 0xFFFFFFFF);
--}
--
--static void e1000e_tx_ring_push(e1000e_device *d, void *descr)
--{
--    uint32_t tail = e1000e_macreg_read(d, E1000E_TDT);
--    uint32_t len = e1000e_macreg_read(d, E1000E_TDLEN) / E1000E_TXD_LEN;
--
--    memwrite(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
--    e1000e_macreg_write(d, E1000E_TDT, (tail + 1) % len);
--
--    /* Read WB data for the packet transmitted */
--    memread(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
--}
--
--static void e1000e_rx_ring_push(e1000e_device *d, void *descr)
--{
--    uint32_t tail = e1000e_macreg_read(d, E1000E_RDT);
--    uint32_t len = e1000e_macreg_read(d, E1000E_RDLEN) / E1000E_RXD_LEN;
--
--    memwrite(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
--    e1000e_macreg_write(d, E1000E_RDT, (tail + 1) % len);
--
--    /* Read WB data for the packet received */
--    memread(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
--}
--
--static void e1000e_wait_isr(e1000e_device *d, uint16_t msg_id)
--{
--    guint64 end_time = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
--
--    do {
--        if (qpci_msix_pending(d->pci_dev, msg_id)) {
--            return;
--        }
--        clock_step(10000);
--    } while (g_get_monotonic_time() < end_time);
--
--    g_error("Timeout expired");
--}
--
--static void e1000e_send_verify(e1000e_device *d)
-+static void e1000e_send_verify(QE1000E *d, int *test_sockets, QGuestAllocator *alloc)
+ static uint8_t qvirtio_mmio_config_readb(QVirtioDevice *d, uint64_t off)
  {
-     struct {
-         uint64_t buffer_addr;
-@@ -268,7 +67,7 @@ static void e1000e_send_verify(e1000e_device *d)
-     uint32_t recv_len;
- 
-     /* Prepare test data buffer */
--    uint64_t data = guest_alloc(&test_alloc, data_len);
-+    uint64_t data = guest_alloc(alloc, data_len);
-     memwrite(data, "TEST", 5);
- 
-     /* Prepare TX descriptor */
-@@ -296,10 +95,10 @@ static void e1000e_send_verify(e1000e_device *d)
-     g_assert_cmpstr(buffer, == , "TEST");
- 
-     /* Free test data buffer */
--    guest_free(&test_alloc, data);
-+    guest_free(alloc, data);
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    return readb(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    return qtest_readb(dev->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
  }
  
--static void e1000e_receive_verify(e1000e_device *d)
-+static void e1000e_receive_verify(QE1000E *d, int *test_sockets, QGuestAllocator *alloc)
+ static uint16_t qvirtio_mmio_config_readw(QVirtioDevice *d, uint64_t off)
  {
-     union {
-         struct {
-@@ -348,7 +147,7 @@ static void e1000e_receive_verify(e1000e_device *d)
-     g_assert_cmpint(ret, == , sizeof(test) + sizeof(len));
- 
-     /* Prepare test data buffer */
--    uint64_t data = guest_alloc(&test_alloc, data_len);
-+    uint64_t data = guest_alloc(alloc, data_len);
- 
-     /* Prepare RX descriptor */
-     memset(&descr, 0, sizeof(descr));
-@@ -369,109 +168,108 @@ static void e1000e_receive_verify(e1000e_device *d)
-     g_assert_cmpstr(buffer, == , "TEST");
- 
-     /* Free test data buffer */
--    guest_free(&test_alloc, data);
--}
--
--static void e1000e_device_clear(QPCIBus *bus, e1000e_device *d)
--{
--    qpci_iounmap(d->pci_dev, d->mac_regs);
--    qpci_msix_disable(d->pci_dev);
-+    guest_free(alloc, data);
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    return readw(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    return qtest_readw(dev->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
  }
  
--static void data_test_init(e1000e_device *d)
-+static void test_e1000e_init(void *obj, void *data, QGuestAllocator * alloc)
+ static uint32_t qvirtio_mmio_config_readl(QVirtioDevice *d, uint64_t off)
  {
--    char *cmdline;
--
--    int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, test_sockets);
--    g_assert_cmpint(ret, != , -1);
--
--    cmdline = g_strdup_printf("-netdev socket,fd=%d,id=hs0 "
--                              "-device e1000e,netdev=hs0", test_sockets[1]);
--    g_assert_nonnull(cmdline);
--
--    qtest_start(cmdline);
--    g_free(cmdline);
--
--    pc_alloc_init(&test_alloc, global_qtest, 0);
--    test_bus = qpci_new_pc(global_qtest, &test_alloc);
--    g_assert_nonnull(test_bus);
--
--    e1000e_device_init(test_bus, d);
-+    /* init does nothing */
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    return readl(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    return qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
  }
  
--static void data_test_clear(e1000e_device *d)
-+static void test_e1000e_tx(void *obj, void *data, QGuestAllocator * alloc)
+ static uint64_t qvirtio_mmio_config_readq(QVirtioDevice *d, uint64_t off)
  {
--    e1000e_device_clear(test_bus, d);
--    close(test_sockets[0]);
--    alloc_destroy(&test_alloc);
--    g_free(d->pci_dev);
--    qpci_free_pc(test_bus);
--    qtest_end();
--}
--
--static void test_e1000e_init(gconstpointer data)
--{
--    e1000e_device d;
--
--    data_test_init(&d);
--    data_test_clear(&d);
--}
--
--static void test_e1000e_tx(gconstpointer data)
--{
--    e1000e_device d;
-+    QE1000E_PCI *e1000e = obj;
-+    QE1000E *d = &e1000e->e1000e;
-+    QOSGraphObject *e_object = obj;
-+    QPCIDevice *dev = e_object->get_driver(e_object, "pci-device");
-+
-+    /* FIXME: add spapr support */
-+    if (qpci_check_buggy_msi(dev)) {
-+        return;
-+    }
- 
--    data_test_init(&d);
--    e1000e_send_verify(&d);
--    data_test_clear(&d);
-+    e1000e_send_verify(d, data, alloc);
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    return readq(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    return qtest_readq(dev->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
  }
  
--static void test_e1000e_rx(gconstpointer data)
-+static void test_e1000e_rx(void *obj, void *data, QGuestAllocator * alloc)
+ static uint32_t qvirtio_mmio_get_features(QVirtioDevice *d)
  {
--    e1000e_device d;
-+    QE1000E_PCI *e1000e = obj;
-+    QE1000E *d = &e1000e->e1000e;
-+    QOSGraphObject *e_object = obj;
-+    QPCIDevice *dev = e_object->get_driver(e_object, "pci-device");
-+
-+    /* FIXME: add spapr support */
-+    if (qpci_check_buggy_msi(dev)) {
-+        return;
-+    }
- 
--    data_test_init(&d);
--    e1000e_receive_verify(&d);
--    data_test_clear(&d);
-+    e1000e_receive_verify(d, data, alloc);
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    writel(dev->addr + QVIRTIO_MMIO_HOST_FEATURES_SEL, 0);
+-    return readl(dev->addr + QVIRTIO_MMIO_HOST_FEATURES);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_HOST_FEATURES_SEL, 0);
++    return qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_HOST_FEATURES);
  }
  
--static void test_e1000e_multiple_transfers(gconstpointer data)
-+static void test_e1000e_multiple_transfers(void *obj, void *data,
-+                                           QGuestAllocator *alloc)
+ static void qvirtio_mmio_set_features(QVirtioDevice *d, uint32_t features)
  {
-     static const long iterations = 4 * 1024;
-     long i;
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
+     dev->features = features;
+-    writel(dev->addr + QVIRTIO_MMIO_GUEST_FEATURES_SEL, 0);
+-    writel(dev->addr + QVIRTIO_MMIO_GUEST_FEATURES, features);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_GUEST_FEATURES_SEL, 0);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_GUEST_FEATURES, features);
+ }
  
--    e1000e_device d;
-+    QE1000E_PCI *e1000e = obj;
-+    QE1000E *d = &e1000e->e1000e;
-+    QOSGraphObject *e_object = obj;
-+    QPCIDevice *dev = e_object->get_driver(e_object, "pci-device");
+ static uint32_t qvirtio_mmio_get_guest_features(QVirtioDevice *d)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
+     return dev->features;
+ }
  
--    data_test_init(&d);
-+    /* FIXME: add spapr support */
-+    if (qpci_check_buggy_msi(dev)) {
-+        return;
-+    }
+ static uint8_t qvirtio_mmio_get_status(QVirtioDevice *d)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    return (uint8_t)readl(dev->addr + QVIRTIO_MMIO_DEVICE_STATUS);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    return (uint8_t)qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_DEVICE_STATUS);
+ }
  
-     for (i = 0; i < iterations; i++) {
--        e1000e_send_verify(&d);
--        e1000e_receive_verify(&d);
-+        e1000e_send_verify(d, data, alloc);
-+        e1000e_receive_verify(d, data, alloc);
+ static void qvirtio_mmio_set_status(QVirtioDevice *d, uint8_t status)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    writel(dev->addr + QVIRTIO_MMIO_DEVICE_STATUS, (uint32_t)status);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_DEVICE_STATUS, (uint32_t)status);
+ }
+ 
+ static bool qvirtio_mmio_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
+     uint32_t isr;
+ 
+-    isr = readl(dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 1;
++    isr = qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 1;
+     if (isr != 0) {
+-        writel(dev->addr + QVIRTIO_MMIO_INTERRUPT_ACK, 1);
++        qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_INTERRUPT_ACK, 1);
+         return true;
      }
  
--    data_test_clear(&d);
+@@ -88,12 +88,12 @@ static bool qvirtio_mmio_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
+ 
+ static bool qvirtio_mmio_get_config_isr_status(QVirtioDevice *d)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
+     uint32_t isr;
+ 
+-    isr = readl(dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 2;
++    isr = qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 2;
+     if (isr != 0) {
+-        writel(dev->addr + QVIRTIO_MMIO_INTERRUPT_ACK, 2);
++        qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_INTERRUPT_ACK, 2);
+         return true;
+     }
+ 
+@@ -102,34 +102,34 @@ static bool qvirtio_mmio_get_config_isr_status(QVirtioDevice *d)
+ 
+ static void qvirtio_mmio_queue_select(QVirtioDevice *d, uint16_t index)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    writel(dev->addr + QVIRTIO_MMIO_QUEUE_SEL, (uint32_t)index);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_SEL, (uint32_t)index);
+ 
+-    g_assert_cmphex(readl(dev->addr + QVIRTIO_MMIO_QUEUE_PFN), ==, 0);
++    g_assert_cmphex(qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_PFN), ==, 0);
  }
  
--static void test_e1000e_hotplug(gconstpointer data)
-+static void test_e1000e_hotplug(void *obj, void *data, QGuestAllocator * alloc)
+ static uint16_t qvirtio_mmio_get_queue_size(QVirtioDevice *d)
  {
--    qtest_start("-device e1000e");
--
-     qtest_qmp_device_add("e1000e", "e1000e_net", "{'addr': '0x06'}");
-     qpci_unplug_acpi_device_test("e1000e_net", 0x06);
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    return (uint16_t)readl(dev->addr + QVIRTIO_MMIO_QUEUE_NUM_MAX);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    return (uint16_t)qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_NUM_MAX);
+ }
+ 
+ static void qvirtio_mmio_set_queue_address(QVirtioDevice *d, uint32_t pfn)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    writel(dev->addr + QVIRTIO_MMIO_QUEUE_PFN, pfn);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_PFN, pfn);
+ }
+ 
+ static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVirtioDevice *d,
+                                         QGuestAllocator *alloc, uint16_t index)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
+     QVirtQueue *vq;
+     uint64_t addr;
+ 
+     vq = g_malloc0(sizeof(*vq));
+     qvirtio_mmio_queue_select(d, index);
+-    writel(dev->addr + QVIRTIO_MMIO_QUEUE_ALIGN, dev->page_size);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_ALIGN, dev->page_size);
+ 
+     vq->index = index;
+     vq->size = qvirtio_mmio_get_queue_size(d);
+@@ -139,7 +139,7 @@ static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVirtioDevice *d,
+     vq->indirect = (dev->features & (1u << VIRTIO_RING_F_INDIRECT_DESC)) != 0;
+     vq->event = (dev->features & (1u << VIRTIO_RING_F_EVENT_IDX)) != 0;
+ 
+-    writel(dev->addr + QVIRTIO_MMIO_QUEUE_NUM, vq->size);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_NUM, vq->size);
+ 
+     /* Check different than 0 */
+     g_assert_cmpint(vq->size, !=, 0);
+@@ -163,8 +163,8 @@ static void qvirtio_mmio_virtqueue_cleanup(QVirtQueue *vq,
+ 
+ static void qvirtio_mmio_virtqueue_kick(QVirtioDevice *d, QVirtQueue *vq)
+ {
+-    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
+-    writel(dev->addr + QVIRTIO_MMIO_QUEUE_NOTIFY, vq->index);
++    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
++    qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_NOTIFY, vq->index);
+ }
+ 
+ const QVirtioBus qvirtio_mmio = {
+@@ -187,21 +187,45 @@ const QVirtioBus qvirtio_mmio = {
+     .virtqueue_kick = qvirtio_mmio_virtqueue_kick,
+ };
+ 
+-QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size)
++static void *qvirtio_mmio_get_driver(void *obj, const char *interface)
+ {
+-    QVirtioMMIODevice *dev;
+-    uint32_t magic;
+-    dev = g_malloc0(sizeof(*dev));
++    QVirtioMMIODevice *virtio_mmio = obj;
++    if (!g_strcmp0(interface, "virtio-bus")) {
++        return &virtio_mmio->vdev;
++    }
++    fprintf(stderr, "%s not present in virtio-mmio\n", interface);
++    g_assert_not_reached();
 +}
 +
-+static void data_test_clear(void *sockets)
++static void qvirtio_mmio_start_hw(QOSGraphObject *obj)
 +{
-+    int *test_sockets = sockets;
- 
--    qtest_end();
-+    close(test_sockets[0]);
-+    qos_invalidate_command_line();
-+    close(test_sockets[1]);
-+    g_free(test_sockets);
- }
- 
--int main(int argc, char **argv)
-+static void *data_test_init(GString *cmd_line, void *arg)
- {
--    g_test_init(&argc, &argv, NULL);
-+    int *test_sockets = g_new(int, 2);
-+    int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, test_sockets);
-+    g_assert_cmpint(ret, != , -1);
- 
--    qtest_add_data_func("e1000e/init", NULL, test_e1000e_init);
--    qtest_add_data_func("e1000e/tx", NULL, test_e1000e_tx);
--    qtest_add_data_func("e1000e/rx", NULL, test_e1000e_rx);
--    qtest_add_data_func("e1000e/multiple_transfers", NULL,
--        test_e1000e_multiple_transfers);
--    qtest_add_data_func("e1000e/hotplug", NULL, test_e1000e_hotplug);
-+    g_string_append_printf(cmd_line, " -netdev socket,fd=%d,id=hs0 ",
-+                           test_sockets[1]);
- 
--    return g_test_run();
-+    g_test_queue_destroy(data_test_clear, test_sockets);
-+    return test_sockets;
- }
-+
-+static void register_e1000e_test(void)
-+{
-+    QOSGraphTestOptions opts = {
-+        .before = data_test_init,
-+    };
-+
-+    qos_add_test("init", "e1000e", test_e1000e_init, &opts);
-+    qos_add_test("tx", "e1000e", test_e1000e_tx, &opts);
-+    qos_add_test("rx", "e1000e", test_e1000e_rx, &opts);
-+    qos_add_test("multiple_transfers", "e1000e",
-+                      test_e1000e_multiple_transfers, &opts);
-+    qos_add_test("hotplug", "e1000e", test_e1000e_hotplug, &opts);
++    QVirtioMMIODevice *dev = (QVirtioMMIODevice *) obj;
++    qvirtio_start_device(&dev->vdev);
 +}
+ 
+-    magic = readl(addr + QVIRTIO_MMIO_MAGIC_VALUE);
++void qvirtio_mmio_init_device(QVirtioMMIODevice *dev, QTestState *qts,
++                              uint64_t addr, uint32_t page_size)
++{
++    uint32_t magic;
++    magic = qtest_readl(qts, addr + QVIRTIO_MMIO_MAGIC_VALUE);
+     g_assert(magic == ('v' | 'i' << 8 | 'r' << 16 | 't' << 24));
+ 
++    dev->qts = qts;
+     dev->addr = addr;
+     dev->page_size = page_size;
+-    dev->vdev.device_type = readl(addr + QVIRTIO_MMIO_DEVICE_ID);
++    dev->vdev.device_type = qtest_readl(qts, addr + QVIRTIO_MMIO_DEVICE_ID);
+     dev->vdev.bus = &qvirtio_mmio;
+ 
+-    writel(addr + QVIRTIO_MMIO_GUEST_PAGE_SIZE, page_size);
++    qtest_writel(qts, addr + QVIRTIO_MMIO_GUEST_PAGE_SIZE, page_size);
 +
-+libqos_init(register_e1000e_test);
++    dev->obj.get_driver = qvirtio_mmio_get_driver;
++    dev->obj.start_hw = qvirtio_mmio_start_hw;
++}
+ 
+-    return dev;
++static void virtio_mmio_register_nodes(void)
++{
++    qos_node_create_driver("virtio-mmio", NULL);
++    qos_node_produces("virtio-mmio", "virtio-bus");
+ }
++
++libqos_init(virtio_mmio_register_nodes);
+diff --git a/tests/libqos/virtio-mmio.h b/tests/libqos/virtio-mmio.h
+index e3e52b9..17a1714 100644
+--- a/tests/libqos/virtio-mmio.h
++++ b/tests/libqos/virtio-mmio.h
+@@ -11,6 +11,7 @@
+ #define LIBQOS_VIRTIO_MMIO_H
+ 
+ #include "libqos/virtio.h"
++#include "libqos/qgraph.h"
+ 
+ #define QVIRTIO_MMIO_MAGIC_VALUE        0x000
+ #define QVIRTIO_MMIO_VERSION            0x004
+@@ -33,7 +34,9 @@
+ #define QVIRTIO_MMIO_DEVICE_SPECIFIC    0x100
+ 
+ typedef struct QVirtioMMIODevice {
++    QOSGraphObject obj;
+     QVirtioDevice vdev;
++    QTestState *qts;
+     uint64_t addr;
+     uint32_t page_size;
+     uint32_t features; /* As it cannot be read later, save it */
+@@ -41,6 +44,7 @@ typedef struct QVirtioMMIODevice {
+ 
+ extern const QVirtioBus qvirtio_mmio;
+ 
+-QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size);
++void qvirtio_mmio_init_device(QVirtioMMIODevice *dev, QTestState *qts,
++                              uint64_t addr, uint32_t page_size);
+ 
+ #endif
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 8f8ef19..3a8126f 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -833,7 +833,8 @@ static void mmio_basic(void)
+ 
+     arm_test_start();
+ 
+-    dev = qvirtio_mmio_init_device(MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
++    dev = g_malloc0(sizeof(QVirtioMMIODevice));
++    qvirtio_mmio_init_device(dev, global_qtest, MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
+     g_assert(dev != NULL);
+     g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
+ 
 -- 
 1.8.3.1
