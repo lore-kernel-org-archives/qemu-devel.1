@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59491)
+Received: from eggs.gnu.org ([209.51.188.92]:59537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLB-0001eX-Qc
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:19 -0500
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLH-0001fK-Hr
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLA-0004bM-HC
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:17 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:49650)
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLG-0004gl-Og
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:23 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:47654)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1h1nLA-0004Zi-7P
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:16 -0500
+	id 1h1nLG-0004gU-GP
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:22 -0500
 From: elena.ufimtseva@oracle.com
-Date: Wed,  6 Mar 2019 23:21:03 -0800
-Message-Id: <20190307072103.8243-1-elena.ufimtseva@oracle.com>
-Subject: [Qemu-devel] [multiprocess RFC PATCH 04/37] multi-process: Add stub
- functions to facilate build of multi-process
+Date: Wed,  6 Mar 2019 23:21:15 -0800
+Message-Id: <20190307072115.8428-1-elena.ufimtseva@oracle.com>
+Subject: [Qemu-devel] [multiprocess RFC PATCH 08/37] multi-process: add
+ functions to synchronize proxy and remote endpoints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,412 +24,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, pbonzini@redhat.com, rth@twiddle.net, pavel.dovgaluk@ispras.ru, anthony.perard@citrix.com, paul.durrant@citrix.com, kvm@vger.kernel.org
+Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, berrange@redhat.com
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-Add stub functions that are needed during compile time but not in
-runtime.
+In some cases, for example MMIO read, QEMU has to wait for the remote to
+complete a command before proceeding. An eventfd based mechanism is
+added to synchronize QEMU & remote process.
 
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- accel/stubs/kvm-stub.c    |  5 +++
- accel/stubs/tcg-stub.c    | 85 +++++++++++++++++++++++++++++++++++++++++++++++
- stubs/machine-init-done.c |  4 +++
- stubs/monitor.c           | 25 ++++++++++++++
- stubs/net-stub.c          | 31 +++++++++++++++++
- stubs/replay.c            | 14 ++++++++
- stubs/vl-stub.c           | 75 +++++++++++++++++++++++++++++++++++++++++
- stubs/vmstate.c           | 20 +++++++++++
- stubs/xen-mapcache.c      | 22 ++++++++++++
- 9 files changed, 281 insertions(+)
- create mode 100644 stubs/net-stub.c
- create mode 100644 stubs/vl-stub.c
- create mode 100644 stubs/xen-mapcache.c
+ include/io/proxy-link.h |  9 +++++++++
+ io/proxy-link.c         | 26 ++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 02d5170..573b4da 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -32,6 +32,7 @@ bool kvm_allowed;
- bool kvm_readonly_mem_allowed;
- bool kvm_ioeventfd_any_length_allowed;
- bool kvm_msi_use_devid;
-+bool kvm_halt_in_kernel_allowed;
+diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
+index ff602e4..a12c565 100644
+--- a/include/io/proxy-link.h
++++ b/include/io/proxy-link.h
+@@ -28,7 +28,9 @@
+ #include <stddef.h>
+ #include <stdint.h>
+ #include <glib.h>
++#include <unistd.h>
+ #include <pthread.h>
++#include <sys/eventfd.h>
  
- int kvm_destroy_vcpu(CPUState *cpu)
- {
-@@ -59,6 +60,10 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
- {
- }
- 
-+void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
-+{
-+}
-+
- int kvm_cpu_exec(CPUState *cpu)
- {
-     abort();
-diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
-index 76ae461..52722c7 100644
---- a/accel/stubs/tcg-stub.c
-+++ b/accel/stubs/tcg-stub.c
-@@ -16,11 +16,96 @@
- #include "tcg/tcg.h"
- #include "exec/cpu-common.h"
- #include "exec/exec-all.h"
-+#include "translate-all.h"
-+#include "exec/ram_addr.h"
-+
-+bool parallel_cpus;
- 
- void tb_flush(CPUState *cpu)
- {
- }
- 
-+void tb_check_watchpoint(CPUState *cpu)
-+{
-+}
-+
-+void tb_invalidate_phys_range(ram_addr_t start, ram_addr_t end)
-+{
-+}
-+
-+void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
-+                                   int is_cpu_write_access)
-+{
-+}
-+
-+void tb_invalidate_phys_page_fast(struct page_collection *pages,
-+                                  tb_page_addr_t start, int len)
-+{
-+}
-+
-+void tlb_init(CPUState *cpu)
-+{
-+}
-+
- void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
- {
- }
-+
-+void tlb_flush(CPUState *cpu)
-+{
-+}
-+
-+void tlb_flush_page(CPUState *cpu, target_ulong addr)
-+{
-+}
-+
-+void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
-+{
-+}
-+
-+void tcg_region_init(void)
-+{
-+}
-+
-+void tcg_register_thread(void)
-+{
-+}
-+
-+void tcg_flush_softmmu_tlb(CPUState *cs)
-+{
-+}
-+
-+void cpu_loop_exit_noexc(CPUState *cpu)
-+{
-+    cpu->exception_index = -1;
-+    cpu_loop_exit(cpu);
-+}
-+
-+void cpu_loop_exit(CPUState *cpu)
-+{
-+    cpu->can_do_io = 1;
-+    siglongjmp(cpu->jmp_env, 1);
-+}
-+
-+void cpu_reloading_memory_map(void)
-+{
-+}
-+
-+int cpu_exec(CPUState *cpu)
-+{
-+    return 0;
-+}
-+
-+void cpu_exec_step_atomic(CPUState *cpu)
-+{
-+}
-+
-+struct page_collection *
-+page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
-+{
-+    return NULL;
-+}
-+
-+void page_collection_unlock(struct page_collection *set)
-+{
-+}
-diff --git a/stubs/machine-init-done.c b/stubs/machine-init-done.c
-index 4121f17..5bff245 100644
---- a/stubs/machine-init-done.c
-+++ b/stubs/machine-init-done.c
-@@ -7,3 +7,7 @@ bool machine_init_done = true;
- void qemu_add_machine_init_done_notifier(Notifier *notify)
- {
- }
-+
-+void qemu_remove_machine_init_done_notifier(Notifier *notify)
-+{
-+}
-diff --git a/stubs/monitor.c b/stubs/monitor.c
-index b57fe6c..1973a3b 100644
---- a/stubs/monitor.c
-+++ b/stubs/monitor.c
-@@ -3,6 +3,8 @@
- #include "qapi/qapi-emit-events.h"
- #include "qemu-common.h"
- #include "monitor/monitor.h"
-+#include "qapi/qapi-types-misc.h"
-+#include "qapi/qapi-commands-misc.h"
- 
- __thread Monitor *cur_mon;
- 
-@@ -19,3 +21,26 @@ void monitor_init(Chardev *chr, int flags)
- void qapi_event_emit(QAPIEvent event, QDict *qdict)
- {
- }
-+
-+int monitor_get_cpu_index(void)
-+{
-+    return -ENOSYS;
-+}
-+void monitor_printf(Monitor *mon, const char *fmt, ...)
-+{
-+}
-+
-+bool monitor_cur_is_qmp(void)
-+{
-+    return false;
-+}
-+
-+ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
-+                                                   Error **errp)
-+{
-+    return NULL;
-+}
-+
-+void monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
-+{
-+}
-diff --git a/stubs/net-stub.c b/stubs/net-stub.c
-new file mode 100644
-index 0000000..cb2274b
---- /dev/null
-+++ b/stubs/net-stub.c
-@@ -0,0 +1,31 @@
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "net/net.h"
-+
-+int qemu_find_net_clients_except(const char *id, NetClientState **ncs,
-+                                 NetClientDriver type, int max)
-+{
-+    return -ENOSYS;
-+}
-+
-+NetClientState *net_hub_port_find(int hub_id)
-+{
-+    return NULL;
-+}
-+
-+int net_hub_id_for_client(NetClientState *nc, int *id)
-+{
-+    return -ENOSYS;
-+}
-+
-+int qemu_show_nic_models(const char *arg, const char *const *models)
-+{
-+    return -ENOSYS;
-+}
-+
-+int qemu_find_nic_model(NICInfo *nd, const char * const *models,
-+                        const char *default_model)
-+{
-+    return -ENOSYS;
-+}
-+
-diff --git a/stubs/replay.c b/stubs/replay.c
-index 4ac6078..38fd1d3 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -80,3 +80,17 @@ void replay_mutex_lock(void)
- void replay_mutex_unlock(void)
- {
- }
-+
-+bool replay_has_checkpoint(void)
-+{
-+    return false;
-+}
-+
-+int replay_get_instructions(void)
-+{
-+    return 0;
-+}
-+
-+void replay_account_executed_instructions(void)
-+{
-+}
-diff --git a/stubs/vl-stub.c b/stubs/vl-stub.c
-new file mode 100644
-index 0000000..bff6a94
---- /dev/null
-+++ b/stubs/vl-stub.c
-@@ -0,0 +1,75 @@
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/uuid.h"
-+#include "sysemu/sysemu.h"
-+#include "exec/cpu-common.h"
-+#include "exec/gdbstub.h"
-+#include "sysemu/replay.h"
-+#include "disas/disas.h"
-+
-+bool tcg_allowed;
-+bool xen_allowed;
-+bool boot_strict;
-+
-+int mem_prealloc;
-+int smp_cpus;
-+int vga_interface_type = VGA_NONE;
-+int smp_cores = 1;
-+int smp_threads = 1;
-+int icount_align_option;
-+int boot_menu;
-+
-+unsigned int max_cpus;
-+const uint32_t arch_type;
-+const char *mem_path;
-+uint8_t qemu_extra_params_fw[2];
-+uint8_t *boot_splash_filedata;
-+size_t boot_splash_filedata_size;
-+struct syminfo *syminfos;
-+
-+ram_addr_t ram_size;
-+MachineState *current_machine;
-+QemuUUID qemu_uuid;
-+
-+int runstate_is_running(void)
-+{
-+    return 0;
-+}
-+
-+void runstate_set(RunState new_state)
-+{
-+}
-+
-+void vm_state_notify(int running, RunState state)
-+{
-+}
-+
-+bool qemu_vmstop_requested(RunState *r)
-+{
-+    return false;
-+}
-+
-+void qemu_system_debug_request(void)
-+{
-+}
-+
-+char *qemu_find_file(int type, const char *name)
-+{
-+    return NULL;
-+}
-+
-+void gdb_set_stop_cpu(CPUState *cpu)
-+{
-+}
-+
-+void replay_enable_events(void)
-+{
-+}
-+
-+void replay_disable_events(void)
-+{
-+}
-+
-+void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-+{
-+}
-diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-index 6399474..a9a2bc2 100644
---- a/stubs/vmstate.c
-+++ b/stubs/vmstate.c
-@@ -1,9 +1,12 @@
  #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "migration/vmstate.h"
-+#include "migration/misc.h"
+ #include "qom/object.h"
+@@ -124,11 +126,18 @@ struct ProxyLinkState {
+     proxy_link_callback callback;
+ };
  
- const VMStateDescription vmstate_dummy = {};
- 
-+const VMStateInfo vmstate_info_timer;
++#define GET_REMOTE_WAIT eventfd(0, 0)
++#define PUT_REMOTE_WAIT(wait) close(wait)
++#define PROXY_LINK_WAIT_DONE 1
 +
- int vmstate_register_with_alias_id(DeviceState *dev,
-                                    int instance_id,
-                                    const VMStateDescription *vmsd,
-@@ -24,3 +27,20 @@ bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
- {
-     return true;
+ ProxyLinkState *proxy_link_create(void);
+ void proxy_link_finalize(ProxyLinkState *s);
+ 
+ void proxy_proc_send(ProxyLinkState *s, ProcMsg *msg);
+ int proxy_proc_recv(ProxyLinkState *s, ProcMsg *msg);
++uint64_t wait_for_remote(int efd);
++void notify_proxy(int fd, uint64_t val);
++
+ void proxy_link_set_sock(ProxyLinkState *s, int fd);
+ void proxy_link_set_callback(ProxyLinkState *s, proxy_link_callback callback);
+ void start_handler(ProxyLinkState *s);
+diff --git a/io/proxy-link.c b/io/proxy-link.c
+index 9ea0ed7..9f6ae77 100644
+--- a/io/proxy-link.c
++++ b/io/proxy-link.c
+@@ -31,6 +31,7 @@
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <unistd.h>
++#include <limits.h>
+ 
+ #include "qemu/module.h"
+ #include "io/proxy-link.h"
+@@ -210,6 +211,31 @@ int proxy_proc_recv(ProxyLinkState *s, ProcMsg *msg)
+     return rc;
  }
-+
-+void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
+ 
++uint64_t wait_for_remote(int efd)
 +{
++    uint64_t val;
++
++    if (read(efd, &val, sizeof(val)) == -1) {
++        qemu_log_mask(LOG_REMOTE_DEBUG, "Error wait_for_remote: %s\n",
++                      strerror(errno));
++        return ULLONG_MAX;
++    }
++
++    val = (val == ULLONG_MAX) ? val : (val - 1);
++
++    return val;
 +}
 +
-+void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
++void notify_proxy(int efd, uint64_t val)
 +{
++    val = (val == ULLONG_MAX) ? val : (val + 1);
++
++    if (write(efd, &val, sizeof(val)) == -1) {
++        qemu_log_mask(LOG_REMOTE_DEBUG, "Error notify_proxy: %s\n",
++                      strerror(errno));
++    }
 +}
 +
-+void vmstate_register_ram_global(MemoryRegion *mr)
-+{
-+}
-+
-+bool migration_is_idle(void)
-+{
-+    return true;
-+}
-diff --git a/stubs/xen-mapcache.c b/stubs/xen-mapcache.c
-new file mode 100644
-index 0000000..af5c031
---- /dev/null
-+++ b/stubs/xen-mapcache.c
-@@ -0,0 +1,22 @@
-+#include "qemu/osdep.h"
-+#include "exec/hwaddr.h"
-+#include "exec/cpu-common.h"
-+#include "sysemu/xen-mapcache.h"
-+
-+#ifdef CONFIG_XEN
-+
-+void xen_invalidate_map_cache_entry(uint8_t *buffer)
-+{
-+}
-+
-+uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size, uint8_t lock, bool dma)
-+{
-+    return NULL;
-+}
-+
-+ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
-+{
-+    return 0;
-+}
-+
-+#endif
+ static gboolean proxy_link_handler_prepare(GSource *gsrc, gint *timeout)
+ {
+     g_assert(timeout);
 -- 
 1.8.3.1
