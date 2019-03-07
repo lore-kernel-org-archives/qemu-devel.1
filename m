@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36099)
+Received: from eggs.gnu.org ([209.51.188.92]:36224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1rYz-0008NI-Ss
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:51:50 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1rZ6-0008SN-D7
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:51:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1rYz-0003Uc-40
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:51:49 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:55758)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1rZ5-0003ZE-KZ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:51:56 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:35580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1h1rYy-0003Tl-Qr
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:51:48 -0500
+	id 1h1rZ5-0003Ym-Ep
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:51:55 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Mar 2019 12:51:32 +0100
-Message-Id: <20190307115143.780-3-samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Mar 2019 12:51:43 +0100
+Message-Id: <20190307115143.780-14-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190307115143.780-1-samuel.thibault@ens-lyon.org>
 References: <20190307115143.780-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv2 1/1] slirp: remove QEMU Makefile.objs
+Subject: [Qemu-devel] [PULLv2 12/12] slirp: remove QEMU Makefile.objs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
