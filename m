@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41563)
+Received: from eggs.gnu.org ([209.51.188.92]:41868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1tjF-0008CU-3H
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:10:33 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h1tkN-0000Yr-76
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:11:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1tjE-0001px-Gu
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:10:33 -0500
-Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:39118)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1tjE-0001os-5d
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:10:32 -0500
-Received: by mail-pg1-x52c.google.com with SMTP id h8so11347226pgp.6
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 06:10:31 -0800 (PST)
-References: <20190307121539.12842-1-david@redhat.com>
-	<20190307121539.12842-28-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6caab30c-42bb-1eae-4f6b-577505764b8f@linaro.org>
-Date: Thu, 7 Mar 2019 06:10:27 -0800
+	(envelope-from <kwolf@redhat.com>) id 1h1tkL-000382-BT
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:11:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1h1tkG-0002nB-Ot
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:11:37 -0500
+Date: Thu, 7 Mar 2019 15:11:25 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190307141125.GD5786@linux.fritz.box>
+References: <20190307072025.8041-1-elena.ufimtseva@oracle.com>
+	<20190307072251.9823-1-elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20190307121539.12842-28-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 27/32] s390x/tcg: Provide
- probe_write_access helper
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307072251.9823-1-elena.ufimtseva@oracle.com>
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 35/37] multi-process:
+ QMP/HMP commands to resize block device on remote process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: elena.ufimtseva@oracle.com
+Cc: qemu-devel@nongnu.org, john.g.johnson@oracle.com, sstabellini@kernel.org, jag.raman@oracle.com, konrad.wilk@oracle.com, dgilbert@redhat.com, armbru@redhat.com, ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com
 
-On 3/7/19 4:15 AM, David Hildenbrand wrote:
-> +void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
-> +                        uintptr_t ra)
-> +{
-> +#ifdef CONFIG_USER_ONLY
-> +    if (!h2g_valid(addr) || !h2g_valid(addr + len - 1)) {
-> +        s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
-> +    }
+Am 07.03.2019 um 08:22 hat elena.ufimtseva@oracle.com geschrieben:
+> From: Jagannathan Raman <jag.raman@oracle.com>
+> 
+> Adds rblock_resize QMP/HMP commands to resize block devices on the remote
+> process.
+> 
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-You need
+Up to this patch, I thought that maybe the block layer related things
+would only need a few changes, like:
 
-  || page_check_range(addr, len, PAGE_WRITE) < 0
+* Have -rblockdev instead of -rdrive
+* Add QMP version for HMP-only only commands
 
-as well.
+But this one got me thinking. If I understand this correctly, the
+current design means that we have to duplicate every single QMP command
+to have a remote variant. This just doesn't scale.
 
+I'm not entirely sure what the final design should look like, but I
+think we need to have a separate QMP connection to the process that owns
+the block device so that the normal existing QMP commands can be used to
+managed it.
 
-r~
+In the long run, I think you'll want to separate the block backends from
+the device emulation anyway. The thing I have in mind is the storage
+daemon idea that was occasionally mentioned here and there; and the
+process that owns the device would connect to the backend process, maybe
+using the vhost-user protocol (or an extension of it with more
+management stuff). For the start, that separate process could in fact be
+the main process.
+
+For a limited prototype, maybe we could even use NBD, which is already
+existing (both server and client parts), but will obviously impact
+performance. Then we'd need a way to configure the remote device process
+to connect to either an external NBD server (e.g. qemu-nbd) or to the
+main process, which would manage the real storage and export it to the
+remote processes over NBD.
+
+In a second step, we could switch it over to a different protocol that
+is more feature complete and can provide better performance.
+
+This probably needs some more thought, but what do you think in general?
+
+Kevin
