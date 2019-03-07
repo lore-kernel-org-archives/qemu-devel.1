@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50490)
+Received: from eggs.gnu.org ([209.51.188.92]:50693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1qMB-0003DC-7w
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:34:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h1qMm-0003g5-Fd
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:35:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h1qM9-0003I0-E4
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:34:31 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:46085)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1qM8-0003Hg-P4
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:34:29 -0500
-Received: by mail-wr1-f66.google.com with SMTP id i16so16770873wrs.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 02:34:28 -0800 (PST)
-References: <20190307052137.2780-1-david@gibson.dropbear.id.au>
-	<ad194b40-507d-5de1-dc1c-23adb046fac7@ozlabs.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8b4397a2-ac07-eac1-9f49-5e6d439cb688@redhat.com>
-Date: Thu, 7 Mar 2019 11:34:25 +0100
+	(envelope-from <kwolf@redhat.com>) id 1h1qMg-0003YX-JQ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:35:07 -0500
+Date: Thu, 7 Mar 2019 11:34:55 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190307103455.GA5786@linux.fritz.box>
+References: <1545387387-9613-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+	<20190306215633.GM6818@localhost.localdomain>
+	<20190307102206.GC2843@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <ad194b40-507d-5de1-dc1c-23adb046fac7@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: Use CamelCase properly
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ikeVEW9yuYc//A+q"
+Content-Disposition: inline
+In-Reply-To: <20190307102206.GC2843@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tcmu: Introduce qemu-tcmu
+ utility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>, clg@kaod.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Yaowei Bai <baiyaowei@cmss.chinamobile.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Amar Tumballi <atumball@redhat.com>, Mike Christie <mchristi@redhat.com>, Prasanna Kalever <pkalever@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiubo Li <xiubli@redhat.com>
 
-On 3/7/19 6:38 AM, Alexey Kardashevskiy wrote:
-> On 07/03/2019 16:21, David Gibson wrote:
->> The qemu coding standard is to use CamelCase for type and structure names,
->> and the pseries code follows that... sort of.  There are quite a lot of
->> places where we bend the rules in order to preserve the capitalization of
->> internal acronyms like "PHB", "TCE", "DIMM" and most commonly "sPAPR".
->>
->> That was a bad idea - it frequently leads to names ending up with hard to
->> read clusters of capital letters, and means they don't catch the eye as
->> type identifiers, which is kind of the point of the CamelCase convention in
->> the first place.
->>
->> In short, keeping type identifiers look like CamelCase is more important
->> than preserving standard capitalization of internal "words".  So, this
->> patch renames a heap of spapr internal type names to a more standard
->> CamelCase.
->>
->> In addition to case changes, we also make some other identifier renames:
->>   VIOsPAPR* -> SpaprVio*
->>     The reverse word ordering was only ever used to mitigate the capital
->>     cluster, so revert to the natural ordering.
->>   VIOsPAPRVTYDevice -> SpaprVioVty
->>   VIOsPAPRVLANDevice -> SpaprVioVlan
->>     Brevity, since the "Device" didn't add useful information
->>   sPAPRDRConnector -> SpaprDrc
->>   sPAPRDRConnectorClass -> SpaprDrcClass
->>     Brevity, and makes it clearer this is the same thing as a "DRC"
->>     mentioned in many other places in the code
->>
->> This is 100% a mechanical search-and-replace patch. It will, however,
->> conflict with essentially any and all outstanding patches touching the
->> spapr code.
-> 
-> 
-> so it would be nice to have the script to fix those outstanding patches
-> before reposting.
 
-What I usually do:
+--ikeVEW9yuYc//A+q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-$ sed -i 's/sPAPRDRConnectorClass/SpaprDrcClass/' \
-  $(git grep -l sPAPRDRConnectorClass)
+Am 07.03.2019 um 11:22 hat Stefan Hajnoczi geschrieben:
+> On Wed, Mar 06, 2019 at 10:56:33PM +0100, Kevin Wolf wrote:
+> > Am 21.12.2018 um 11:16 hat Yaowei Bai geschrieben:
+> > * The first priority should be adding an in-process iscsi target that
+> >   can be managed with QMP, similar to the built-in NBD server.
+>=20
+> Using the in-kernel SCSI target with TCMU, or do you mean implementing
+> the iSCSI network protocol inside QEMU?
 
-> 
-> 
->>
->> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->> ---
->> Changes since RFC:
->>  * Added a number of extra renames for brevity and/or clarity
->>  * Fixed couple of places the new capitalization still wasn't right
->>
+Using TCMU in this case, of course. This point was about external tool
+vs. exporting from a running QEMU instance, not about how to implement
+the actual functionality.
+
+Building an external command line tool around QMP functionality is easy,
+but the reverse way isn't necessarily. This is why I think QMP-based
+should come first.
+
+Kevin
+
+--ikeVEW9yuYc//A+q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJcgPPPAAoJEH8JsnLIjy/WZloQAJmDzxVkkbkFjH987hYoq7i4
+hy+NP0e8aBvDWzq+MTYeN2MS3S3EC2nP36P7EWKiWN000Wm9nMz4gPzavR1N5831
+LhgnMmwWi+/vxCe8sIyAAIJBw3kkIeZc/CLGjGLVUs3r6N1WEcxw3qQBwu+wKt3+
+i655AD8SV9rim2UKPGoF/p7wNurrGm5He2CRhQ8Gu2qC5l9NvgjaQNic4aEnfv8l
+oOwePTU0/mSE8WeQGvADFPH5TdtEDnwl+LWQGpT88TwvRUOwIXKMAcLLcbIybZEr
+f4x8ZGtcQn+bruOvu5yAVP+iH/81da0YfVfgSzDOsddyvurAb2NmPKWCsbz00dOo
+8atWJOjpwHughb9fhDKtG5ir0RSRoxLypEtH1VnGHUwz/idAy0XhNtFThjTgVIX+
+t9Kqjz8t5ebYpKOVE9lmpBkb0y90KXA85aiTfJtE1dCDxhTEipJ+EhMfLcClSnhp
+2oDXHfIRrAsQzHxsfbcAp4n/jZvWVVGiVrzV5ps5BvdZMybC2LHw0u6EciRMuqkN
+9L+7A0nwlY3l6NUFdAgNMr9d7H6UFXI41173Y4GeiFKywCLjfHImg1/SPvKn9pyy
+r3NI6vyFC6OQt5JnbssacIaFEEIAa/XJV6vST8N7c5LcVf4RV7hecv38tYzvCM+s
+Cm8/7gCwJzPm2ZYsos55
+=EHWC
+-----END PGP SIGNATURE-----
+
+--ikeVEW9yuYc//A+q--
