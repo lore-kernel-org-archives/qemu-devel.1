@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40566)
+Received: from eggs.gnu.org ([209.51.188.92]:44354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h20IF-0006mF-0a
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:11:07 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h20S1-0000Jc-Bv
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:21:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h20IC-0007Tk-Lm
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:11:06 -0500
-Received: from mail-wm1-f50.google.com ([209.85.128.50]:38193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h20I8-0007E4-7F
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:11:02 -0500
-Received: by mail-wm1-f50.google.com with SMTP id a188so10567220wmf.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 13:10:46 -0800 (PST)
-References: <1551695576-13205-1-git-send-email-thuth@redhat.com>
-	<a0b53ff0-1ded-2a6e-aa4d-b1f4fcc407c1@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b15343fd-7a0f-4fae-01c3-24b558c349d7@redhat.com>
-Date: Thu, 7 Mar 2019 22:10:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <a0b53ff0-1ded-2a6e-aa4d-b1f4fcc407c1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] cirrus.yml: Add macOS continuous
- integration task
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h20Rz-0002V9-Dz
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 16:21:13 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Thu,  7 Mar 2019 21:20:56 +0000
+Message-Id: <20190307212058.4890-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 0/2] mac: fix booting from hd device with
+ -drive syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +18,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Ed Maste <emaste@freebsd.org>, Li-Wen Hsu <lwhsu@freebsd.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-stable@nongnu.org, david@gibson.dropbear.id.au
 
-On 04/03/19 12:08, Philippe Mathieu-Daudé wrote:
-> +macos_task:
-> +  osx_instance:
-> +    image: high-sierra-base
-> +  env:
-> +    CIRRUS_CLONE_DEPTH: 1
-> +  install_script:
-> +    - brew install pkg-config glib pixman make sdl2
+These two patches correct a mistake in the original FWPathProvider
+implementation for Old World and New World Macs whereby the alias name is
+used instead of the node name.
 
-Could you also install Python 3 ("python" in Homebrew is 3.7) and avoid
-Apple's obsolete /usr/bin/python (also needs something like
---python=/usr/local/bin/python3 in ./configure below).
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Thanks,
 
-Paolo
+Mark Cave-Ayland (2):
+  mac_oldworld: use node name instead of alias name for hd device in
+    FWPathProvider
+  mac_newworld: use node name instead of alias name for hd device in
+    FWPathProvider
 
-> +  script:
-> +    - ./configure || { cat config.log; exit 1; }
-> +    - gmake -j$(sysctl -n hw.ncpu)
-> +    - gmake check -j$(sysctl -n hw.ncpu)
+ hw/ppc/mac_newworld.c | 4 ++--
+ hw/ppc/mac_oldworld.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+-- 
+2.11.0
