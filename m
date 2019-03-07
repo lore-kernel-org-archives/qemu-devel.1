@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57841)
+Received: from eggs.gnu.org ([209.51.188.92]:57840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1juY-00081K-PK
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:41:35 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1juY-00081J-PH
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:41:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1juX-0006x9-Pj
+	(envelope-from <dgibson@ozlabs.org>) id 1h1juX-0006xE-Q9
 	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:41:34 -0500
-Date: Thu, 7 Mar 2019 14:30:53 +1100
+Date: Thu, 7 Mar 2019 14:32:09 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190307033053.GE7722@umbus.fritz.box>
+Message-ID: <20190307033209.GF7722@umbus.fritz.box>
 References: <20190306085032.15744-1-clg@kaod.org>
-	<20190306085032.15744-13-clg@kaod.org>
+	<20190306085032.15744-14-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mR8QP4gmHujQHb1c"
+	protocol="application/pgp-signature"; boundary="KJY2Ze80yH5MUxol"
 Content-Disposition: inline
-In-Reply-To: <20190306085032.15744-13-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 12/27] ppc/pnv: psi: add a PSIHB_REG macro
+In-Reply-To: <20190306085032.15744-14-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 13/27] ppc/pnv: psi: add a reset handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +28,54 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---mR8QP4gmHujQHb1c
+--KJY2Ze80yH5MUxol
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 06, 2019 at 09:50:17AM +0100, C=E9dric Le Goater wrote:
-> This is a simple helper to translate XSCOM addresses to MMIO addresses
+On Wed, Mar 06, 2019 at 09:50:18AM +0100, C=E9dric Le Goater wrote:
+> Reset all regs but keep the MMIO BAR enabled as it is at realize time.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-A worthy cleanup, regardless of anything else.  Applied.
+Again, I don't like the duplication of information between psi->reg
+and psi->bar.  But that's out of scope for this patch, so, applied.
 
 > ---
->  hw/ppc/pnv_psi.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  hw/ppc/pnv_psi.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >=20
 > diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-> index c872be0b9c0d..a2f8d0dece80 100644
+> index a2f8d0dece80..e61861bfd3c6 100644
 > --- a/hw/ppc/pnv_psi.c
 > +++ b/hw/ppc/pnv_psi.c
-> @@ -114,6 +114,8 @@
->  #define PSIHB_BAR_MASK                  0x0003fffffff00000ull
->  #define PSIHB_FSPBAR_MASK               0x0003ffff00000000ull
+> @@ -442,6 +442,15 @@ static const MemoryRegionOps pnv_psi_xscom_ops =3D {
+>      }
+>  };
 > =20
-> +#define PSIHB_REG(addr) (((addr) >> 3) + PSIHB_XSCOM_BAR)
+> +static void pnv_psi_reset(void *dev)
+> +{
+> +    PnvPsi *psi =3D PNV_PSI(dev);
 > +
->  static void pnv_psi_set_bar(PnvPsi *psi, uint64_t bar)
+> +    memset(psi->regs, 0x0, sizeof(psi->regs));
+> +
+> +    psi->regs[PSIHB_XSCOM_BAR] =3D psi->bar | PSIHB_BAR_EN;
+> +}
+> +
+>  static void pnv_psi_init(Object *obj)
 >  {
->      MemoryRegion *sysmem =3D get_system_memory();
-> @@ -392,13 +394,13 @@ static void pnv_psi_reg_write(PnvPsi *psi, uint32_t=
- offset, uint64_t val,
->   */
->  static uint64_t pnv_psi_mmio_read(void *opaque, hwaddr addr, unsigned si=
-ze)
->  {
-> -    return pnv_psi_reg_read(opaque, (addr >> 3) + PSIHB_XSCOM_BAR, true);
-> +    return pnv_psi_reg_read(opaque, PSIHB_REG(addr), true);
+>      PnvPsi *psi =3D PNV_PSI(obj);
+> @@ -511,6 +520,8 @@ static void pnv_psi_realize(DeviceState *dev, Error *=
+*errp)
+>          psi->regs[xivr] =3D PSIHB_XIVR_PRIO_MSK |
+>              ((uint64_t) i << PSIHB_XIVR_SRC_SH);
+>      }
+> +
+> +    qemu_register_reset(pnv_psi_reset, dev);
 >  }
 > =20
->  static void pnv_psi_mmio_write(void *opaque, hwaddr addr,
->                                uint64_t val, unsigned size)
->  {
-> -    pnv_psi_reg_write(opaque, (addr >> 3) + PSIHB_XSCOM_BAR, val, true);
-> +    pnv_psi_reg_write(opaque, PSIHB_REG(addr), val, true);
->  }
-> =20
->  static const MemoryRegionOps psi_mmio_ops =3D {
+>  static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -82,24 +83,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---mR8QP4gmHujQHb1c
+--KJY2Ze80yH5MUxol
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAkG0ACgkQbDjKyiDZ
-s5L84hAAjuonLxaWFmWqSAEcJyF/Q5aXz5iCv0GFd3cRcnD0IHYETQDQozk314qJ
-nUXzaQb/U2xT3pGstEw9hoCQtkNIPP/u1ndpuRyPvnLOXRSU2jKoAuOoRu5Nbs1c
-KDV4ALS0I4LrDoVdcYo0uY6pgxn2NZ5pKFVyXsMv9hy37VZfToFaC1wi3w/tLn2H
-OLTIum0jJ5bl5fmNUfgjrQm/ixcyeGM/VYgFm4ruubrPQOFLc6XlB+dTvjlkL72v
-9X2+iQ3dWZlJ9q2SiadfOcR/iJ/sxOiZ9Fpmpx9/ecRMZ8evrwqehAii0oGbL5FK
-H63+G3HPCG/VNVykAMCWRTJS2ymuXkmbACKPVkwfGdhaA4SXgK1tf74H4a9+VPu3
-dGKsGV5ubW7tgImzeAq/p5WlYWCDC/xx/jg6oHuX3G3Y2mEsmMPM6prCXgEMtIVh
-IOS2VdeZ18hl5BmD/Cnx3YU+98ySjHWqKeL2Qzld8uxIfaHIHVvy67KEIlmCRqA9
-Zy8D3Dy7pVh0KAomuyzRg8OAbb0a1tDr1hwYPAMROR61Giem0q44mo1Rawp1+N8u
-xVTLsP1fVNQFK8Y0lf6ZRdqYi3Nwzdx6Amvd0Z0ZJ9LQJzj+LFm7qD346xRcvWvk
-yyNJBzuKZtVjv46z1SecQJITUdathWU6bkFc+qW3NOfKucSqQrA=
-=7J7r
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAkLkACgkQbDjKyiDZ
+s5KZtw/+N2ykVcddgofQmqW0JWvSm7Ly+3RXdcRYR/FdD6AKE9g7oMaOlq1Zlzdk
+eU1D/3Vjb/zjfafyijzNWfcBU8JW/A/0ZNKD1Zt15iMuCi1D7yYFfyYNIbEtTZy8
+LL8fC21woj2vKOrCxfyc8zmGi6CPIOjuZzx9Lf6TqJeUKj+bL8HgeD+nTgJIUc2q
+cA3SRfgaiYYKYiQJMs3E2Ul3W6WWX102GeEvIWLBYFx9Ymcm/MlHKeDDfzFmHwqg
+9Sd3jZz3LfmQhXRnVLtrppRB3dhQZpKxjSsRXP56PhO1qd/q8LAM9VVa6R+4fL3i
+IPMWT116dTQkZjKfiAPoed/bpCpQ0Ha7noJuI+gr7oynVkdBfqAXzsGkOSOyPKIS
+9UZPlV/zhBSxbsORlNjUNW8R37wGXEKiSgclr+c2afqPN/A5HvcQ0dcnRbAXOvuv
+53Ki+mliPtNC3RwCWoZ+tGU/Yjt4E+C6hZR4r4o6tcO9aI0q4QOVrhqm6pPtjYLp
+VCEZQe9eQxdQMPxGwXblLqxyThTDvxuwGCiXaPZyn2pXAEWJwvzl12o2VsAFhQtf
+vlKVWmMdZ0uyEpsOQXNGte0AIfhoWlVsOOblXzz5DmPrSOhMePnqX4TxECNp9gh9
+V9U7Gj+0WQMjdVMmQNc8iB3oMwxMPTs4vSItcqC6ewfMNbDubx0=
+=w2R8
 -----END PGP SIGNATURE-----
 
---mR8QP4gmHujQHb1c--
+--KJY2Ze80yH5MUxol--
