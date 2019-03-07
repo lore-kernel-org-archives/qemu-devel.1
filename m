@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52695)
+Received: from eggs.gnu.org ([209.51.188.92]:53173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1uP6-0000BM-SY
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:53:50 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h1uR3-000225-IT
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h1uP2-0004up-Kd
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:53:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40442)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h1uP0-0004sC-0I
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:53:42 -0500
-References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
-	<8b794ba1-f719-e1f4-5a17-ba261aeebea6@redhat.com>
-	<20190307141642.GE5786@linux.fritz.box>
-	<106e1413-85e4-2ed9-0ffa-9c0f9fe73cf9@redhat.com>
-	<20190307144017.GI1598@char.us.oracle.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <65b59796-d92f-c94f-ec63-111c3270a93c@redhat.com>
-Date: Thu, 7 Mar 2019 15:53:33 +0100
+	(envelope-from <kwolf@redhat.com>) id 1h1uR2-0006XI-2S
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:55:49 -0500
+Date: Thu, 7 Mar 2019 15:55:32 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190307145532.GG5786@linux.fritz.box>
+References: <20190307093723.655-1-armbru@redhat.com>
+	<20190307093723.655-3-armbru@redhat.com>
+	<87h8cft2x6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190307144017.GI1598@char.us.oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87h8cft2x6.fsf@dusky.pond.sub.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
- the concept description to docs/devel/qemu-multiprocess
+Subject: Re: [Qemu-devel] [RFC PATCH v6 2/4] hw/block: Pad undersized
+ read-only images with 0xFF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,95 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, elena.ufimtseva@oracle.com, john.g.johnson@oracle.com, sstabellini@kernel.org, jag.raman@oracle.com, qemu-devel@nongnu.org, ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com, Govind Singh <govinds@codeaurora.org>, Eyal Ilsar <eilsar@codeaurora.org>, Rajendra Nayak <rnayak@codeaurora.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, lersek@redhat.com, philmd@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-On 07/03/2019 15.40, Konrad Rzeszutek Wilk wrote:
-> On Thu, Mar 07, 2019 at 03:21:47PM +0100, Thomas Huth wrote:
->> On 07/03/2019 15.16, Kevin Wolf wrote:
->>> Am 07.03.2019 um 09:14 hat Thomas Huth geschrieben:
->>>> On 07/03/2019 08.22, elena.ufimtseva@oracle.com wrote:
->>>>> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
->>>>>
->>>>> TODO: Make relevant changes to the doc.
->>>>>
->>>>> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
->>>>> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
->>>>> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
->>>>> ---
->>>>>  docs/devel/qemu-multiprocess.txt | 1109 ++++++++++++++++++++++++++=
-++++++++++++
->>>>>  1 file changed, 1109 insertions(+)
->>>>>  create mode 100644 docs/devel/qemu-multiprocess.txt
->>>>>
->>>>> diff --git a/docs/devel/qemu-multiprocess.txt b/docs/devel/qemu-mul=
-tiprocess.txt
->>>>> new file mode 100644
->>>>> index 0000000..e29c6c8
->>>>> --- /dev/null
->>>>> +++ b/docs/devel/qemu-multiprocess.txt
->>>>> @@ -0,0 +1,1109 @@
->>>>> +/*
->>>>> + * Copyright 2019, Oracle and/or its affiliates. All rights reserv=
-ed.
->>>>> + *
->>>>> + * Permission is hereby granted, free of charge, to any person obt=
-aining a copy
->>>>> + * of this software and associated documentation files (the "Softw=
-are"), to deal
->>>>> + * in the Software without restriction, including without limitati=
-on the rights
->>>>> + * to use, copy, modify, merge, publish, distribute, sublicense, a=
-nd/or sell
->>>>> + * copies of the Software, and to permit persons to whom the Softw=
-are is
->>>>> + * furnished to do so, subject to the following conditions:
->>>>> + *
->>>>> + * The above copyright notice and this permission notice shall be =
-included in
->>>>> + * all copies or substantial portions of the Software.
->>>>> + *
->>>>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,=
- EXPRESS OR
->>>>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHAN=
-TABILITY,
->>>>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVE=
-NT SHALL
->>>>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAG=
-ES OR OTHER
->>>>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,=
- ARISING FROM,
->>>>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER D=
-EALINGS IN
->>>>> + * THE SOFTWARE.
->>>>> + */
->>>>
->>>> Somehow weird to see such a big license statement talking about
->>>> "software", but which applies to a text file only... Not sure if it =
-is
->>>> an option for you, but maybe one of the Creative Common licenses
->>>> (dual-licensed with the GPLv2+) would be a better fit? E.g. for the =
-QEMU
->>>> website, the content is dual-licensed: https://www.qemu.org/license.=
-html
->>>
->>> While we're talking about licenses, the "All rights reserved." notice=
- is
->>> out of place in a license header that declares that a lot of permissi=
-ons
->>> are granted. Better to remove it to avoid any ambiguities that could
->>> result from the contradiction. (Applies to the whole series.)
->>
->> Apart from that, it is also not required for other work anymore. See:
->>
->> https://en.wikipedia.org/wiki/All_rights_reserved
+Am 07.03.2019 um 11:05 hat Markus Armbruster geschrieben:
+> Markus Armbruster <armbru@redhat.com> writes:
 >=20
-> Interesting. Do folks know why the Linux Foundation does it?
+> > From: Alex Benn=E9e <alex.bennee@linaro.org>
+> >
+> > We reject undersized images.  As of the previous commit, even with a
+> > decent error message.  Still, this is a potentially confusing
+> > stumbling block when you move from using -bios to using -drive
+> > if=3Dpflash,file=3Dblob,format=3Draw,readonly for loading your firmwa=
+re
+> > code. To mitigate that we automatically pad in the read-only case and
+> > warn the user when we have performed magic to enable things to Just
+> > Work (tm).
+> >
+> > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> > Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >=20
-> See for example cf0d37aecc06801d4847fb36740da4a5690d9d45 (in the Linux =
-kernel)
-> where every change they stamp it with their 'All Rights Reserved'?
+> I think this convenience feature is a bad idea, and this patch should
+> not be applied.  Here are my reasons.
+>=20
+> 1. As I explained in my disccussion of v5[*], there is no single true
+>    way to pad.  This patch pads with 0xFF.  When working with physical
+>    devices, you'd sometimes pad that way, but at other times, you'd pad
+>    differently.
+>=20
+> 2. Except this patch doesn't *actually* pad with 0xFF.  The block layer
+>    silently pads with zeros up to the next multiple of 512.  Evidence:
+>=20
+>     $ yes | dd of=3D4090b.img bs=3D1 count=3D4090
+>     4090+0 records in
+>     4090+0 records out
+>     4090 bytes (4.1 kB, 4.0 KiB) copied, 0.0186459 s, 219 kB/s
+>     $ qemu-io -f raw -c 'read -v 4000 96' 4090b.img
+>     00000fa0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
+.y.y.y.y.
+>     00000fb0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
+.y.y.y.y.
+>     00000fc0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
+.y.y.y.y.
+>     00000fd0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
+.y.y.y.y.
+>     00000fe0:  79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a 79 0a  y.y.y.y=
+.y.y.y.y.
+>     00000ff0:  79 0a 79 0a 79 0a 79 0a 79 0a 00 00 00 00 00 00  y.y.y.y=
+.y.......
+>     read 96/96 bytes at offset 4000
+>     96 bytes, 1 ops; 0.0001 sec (694.444 KiB/sec and 7407.4074 ops/sec)
+>=20
+>    This patch then pads some more with 0xFF to the flash memory size.
+>=20
+>    Because of that the way the magic padding works makes no sense, to b=
+e
+>    frank.  Going back to v3's zero padding would at least be explainabl=
+e
+>    without blushing.
+>=20
+>    I consider the block layer's padding a misfeature here, but right no=
+w
+>    we got to play the hand we've been dealt.
 
-No clue why they use it. Seems unnecessary to me. But as always: IANAL
+That will be solved as soon as the block layer is consistently converted
+to byte granularity. We've already converted a lot, but bdrv_getlength()
+is still sector (512 bytes) granularity.
 
- Thomas
+You could argue that file-posix should just reject files that are not
+sector aligned, but that's probably not right either because image
+formats don't necessarily have that alignment for their files.
+
+Maybe disk device should reject being attached to nodes that aren't a
+multiple of their physical and logical sector size. A 512-byte aligned
+image is probably suitable for most disks, but might not be for a virtual
+native 4k disk.
+
+> 3. Convenience magic has bitten us in the posterior so many times.  Jus=
+t
+>    say no unless there's a really compelling use case.  Where's the use
+>    case for this one?  We've rejected undersized images for ages, and
+>    nobody complained.  Why add convenience magic now?
+
+I agree.
+
+Kevin
