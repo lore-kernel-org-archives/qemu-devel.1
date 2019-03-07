@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47515)
+Received: from eggs.gnu.org ([209.51.188.92]:48893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1gRF-0003H8-Kx
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:59:10 -0500
+	(envelope-from <crosa@redhat.com>) id 1h1gWz-0007xg-2u
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:05:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1h1gRE-0003vw-0E
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:59:05 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:43814)
+	(envelope-from <crosa@redhat.com>) id 1h1gWw-00061g-MW
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:05:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1h1gRD-0003vH-Le
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 18:59:03 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Mar 2019 00:58:45 +0100
-Message-Id: <20190306235850.30110-8-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190306235850.30110-1-samuel.thibault@ens-lyon.org>
-References: <20190306235850.30110-1-samuel.thibault@ens-lyon.org>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1h1gWw-00061K-AH
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:04:58 -0500
+Date: Wed, 6 Mar 2019 19:04:52 -0500
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <20190307000452.imsrx5t4egcpoe4h@localhost.localdomain>
+References: <20190305172139.32662-1-peter.maydell@linaro.org>
+	<20190305172139.32662-2-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190305172139.32662-2-peter.maydell@linaro.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/12] slirp: use libslirp migration code
+Subject: Re: [Qemu-devel] [PATCH v3 01/12] docs/cpu-hotplug.rst: Fix rST
+ markup issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,338 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Tue, Mar 05, 2019 at 05:21:28PM +0000, Peter Maydell wrote:
+> sphinx-build complains:
+>=20
+> docs/cpu-hotplug.rst:67: ERROR: Unexpected indentation.
+> docs/cpu-hotplug.rst:69: ERROR: Unexpected indentation.
+> docs/cpu-hotplug.rst:74: WARNING: Block quote ends without a blank line=
+; unexpected unindent.
+> docs/cpu-hotplug.rst:75: WARNING: Block quote ends without a blank line=
+; unexpected unindent.
+> docs/cpu-hotplug.rst:76: SEVERE: Unexpected section title.
+>=20
+> }
+> {
+> docs/cpu-hotplug.rst:78: WARNING: Block quote ends without a blank line=
+; unexpected unindent.
+>=20
+> These are the result of not indicating one of the literal
+> blocks by finishing the preceding paragraph with the "::" marker.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Message-id: 20190228145624.24885-2-peter.maydell@linaro.org
+> ---
+>  docs/cpu-hotplug.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
+> index 1c268e00b41..e2d4e893b01 100644
+> --- a/docs/cpu-hotplug.rst
+> +++ b/docs/cpu-hotplug.rst
+> @@ -60,7 +60,7 @@ vCPU hotplug
+>      hot-plugged (no "qom-path" member).  From its output in step (3), =
+we
+>      can see that ``IvyBridge-IBRS-x86_64-cpu`` is present in socket 0,
+>      while hot-plugging a CPU into socket 1 requires passing the listed
+> -    properties to QMP ``device_add``:
+> +    properties to QMP ``device_add``::
+> =20
+>        (QEMU) device_add id=3Dcpu-2 driver=3DIvyBridge-IBRS-x86_64-cpu =
+socket-id=3D1 core-id=3D0 thread-id=3D0
+>        {
+> --=20
+> 2.20.1
+>=20
+>=20
 
-slirp migration code uses QEMU vmstate so far, when building WITH_QEMU.
+This is an actual reStructuredText syntax violation (at a layer lower
+than sphinx) and thus can also be seen by simpler tools such as
+rst2{man,html,...}:
 
-Introduce slirp_state_{load,save,version}() functions to move the
-state saving handling to libslirp side.
+   $ rst2html docs/cpu-hotplug.rst 1>/dev/null=20
+   docs/cpu-hotplug.rst:67: (ERROR/3) Unexpected indentation.
+   docs/cpu-hotplug.rst:69: (ERROR/3) Unexpected indentation.
+   docs/cpu-hotplug.rst:74: (WARNING/2) Block quote ends without a blank =
+line; unexpected unindent.
+   docs/cpu-hotplug.rst:75: (WARNING/2) Block quote ends without a blank =
+line; unexpected unindent.
+   docs/cpu-hotplug.rst:76: (SEVERE/4) Unexpected section title.
 
-So far, the bitstream compatibility should remain equal with current
-QEMU, as this is effectively using the same code, with the same format
-etc. When libslirp is made standalone, we will need some mechanism to
-ensure bitstream compatibility regardless of the libslirp version
-installed. See the FIXME note in the code.
+   }
+   {
+   Exiting due to level-4 (SEVERE) system message.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20190212162524.31504-3-marcandre.lureau@redhat.com>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- include/migration/qemu-file-types.h |  2 ++
- migration/qemu-file.h               |  1 -
- net/slirp.c                         | 55 +++++++++++++++++++++++++++++
- slirp/libslirp.h                    |  8 +++++
- slirp/slirp.c                       |  9 -----
- slirp/state.c                       | 52 ++++++++++++---------------
- slirp/state.h                       |  9 -----
- 7 files changed, 88 insertions(+), 48 deletions(-)
+But I'm assuming the extended sphinx roles/directives will be used, so
+the only way to check against future breakage would be to build the
+docs.
 
-diff --git a/include/migration/qemu-file-types.h b/include/migration/qemu=
--file-types.h
-index bd6d7dd7f9..bbe04d4484 100644
---- a/include/migration/qemu-file-types.h
-+++ b/include/migration/qemu-file-types.h
-@@ -25,6 +25,8 @@
- #ifndef QEMU_FILE_H
- #define QEMU_FILE_H
-=20
-+int qemu_file_get_error(QEMUFile *f);
-+
- void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size);
- void qemu_put_byte(QEMUFile *f, int v);
-=20
-diff --git a/migration/qemu-file.h b/migration/qemu-file.h
-index 2ccfcfb2a8..13baf896bd 100644
---- a/migration/qemu-file.h
-+++ b/migration/qemu-file.h
-@@ -149,7 +149,6 @@ void qemu_update_position(QEMUFile *f, size_t size);
- void qemu_file_reset_rate_limit(QEMUFile *f);
- void qemu_file_set_rate_limit(QEMUFile *f, int64_t new_rate);
- int64_t qemu_file_get_rate_limit(QEMUFile *f);
--int qemu_file_get_error(QEMUFile *f);
- void qemu_file_set_error(QEMUFile *f, int ret);
- int qemu_file_shutdown(QEMUFile *f);
- QEMUFile *qemu_file_get_return_path(QEMUFile *f);
-diff --git a/net/slirp.c b/net/slirp.c
-index a8fd9e6364..059b2d9b08 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -44,6 +44,8 @@
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "util.h"
-+#include "migration/register.h"
-+#include "migration/qemu-file-types.h"
-=20
- static int get_str_sep(char *buf, int buf_size, const char **pp, int sep=
-)
- {
-@@ -146,6 +148,7 @@ static void net_slirp_cleanup(NetClientState *nc)
-=20
-     g_slist_free_full(s->fwd, slirp_free_fwd);
-     main_loop_poll_remove_notifier(&s->poll_notifier);
-+    unregister_savevm(NULL, "slirp", s->slirp);
-     slirp_cleanup(s->slirp);
-     if (s->exit_notifier.notify) {
-         qemu_remove_exit_notifier(&s->exit_notifier);
-@@ -303,6 +306,46 @@ static void net_slirp_poll_notify(Notifier *notifier=
-, void *data)
-     }
- }
-=20
-+static ssize_t
-+net_slirp_stream_read(void *buf, size_t size, void *opaque)
-+{
-+    QEMUFile *f =3D opaque;
-+
-+    return qemu_get_buffer(f, buf, size);
-+}
-+
-+static ssize_t
-+net_slirp_stream_write(const void *buf, size_t size, void *opaque)
-+{
-+    QEMUFile *f =3D opaque;
-+
-+    qemu_put_buffer(f, buf, size);
-+    if (qemu_file_get_error(f)) {
-+        return -1;
-+    }
-+
-+    return size;
-+}
-+
-+static int net_slirp_state_load(QEMUFile *f, void *opaque, int version_i=
-d)
-+{
-+    Slirp *slirp =3D opaque;
-+
-+    return slirp_state_load(slirp, version_id, net_slirp_stream_read, f)=
-;
-+}
-+
-+static void net_slirp_state_save(QEMUFile *f, void *opaque)
-+{
-+    Slirp *slirp =3D opaque;
-+
-+    slirp_state_save(slirp, net_slirp_stream_write, f);
-+}
-+
-+static SaveVMHandlers savevm_slirp_state =3D {
-+    .save_state =3D net_slirp_state_save,
-+    .load_state =3D net_slirp_state_load,
-+};
-+
- static int net_slirp_init(NetClientState *peer, const char *model,
-                           const char *name, int restricted,
-                           bool ipv4, const char *vnetwork, const char *v=
-host,
-@@ -523,6 +566,18 @@ static int net_slirp_init(NetClientState *peer, cons=
-t char *model,
-                           &slirp_cb, s);
-     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
-=20
-+    /*
-+     * Make sure the current bitstream version of slirp is 4, to avoid
-+     * QEMU migration incompatibilities, if upstream slirp bumped the
-+     * version.
-+     *
-+     * FIXME: use bitfields of features? teach libslirp to save with
-+     * specific version?
-+     */
-+    g_assert(slirp_state_version() =3D=3D 4);
-+    register_savevm_live(NULL, "slirp", 0, slirp_state_version(),
-+                         &savevm_slirp_state, s->slirp);
-+
-     s->poll_notifier.notify =3D net_slirp_poll_notify;
-     main_loop_poll_add_notifier(&s->poll_notifier);
-=20
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 18c50bd7ba..7ce1e4d0d4 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -101,6 +101,14 @@ void slirp_socket_recv(Slirp *slirp, struct in_addr =
-guest_addr,
-                        int guest_port, const uint8_t *buf, int size);
- size_t slirp_socket_can_recv(Slirp *slirp, struct in_addr guest_addr,
-                              int guest_port);
-+
-+void slirp_state_save(Slirp *s, SlirpWriteCb write_cb, void *opaque);
-+
-+int slirp_state_load(Slirp *s, int version_id,
-+                     SlirpReadCb read_cb, void *opaque);
-+
-+int slirp_state_version(void);
-+
- #ifdef __cplusplus
- } /* extern "C" */
- #endif
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index cbdf9f778d..18af670a0a 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -23,9 +23,6 @@
-  */
- #include "slirp.h"
-=20
--#ifdef WITH_QEMU
--#include "state.h"
--#endif
-=20
- #ifndef _WIN32
- #include <net/if.h>
-@@ -326,9 +323,6 @@ Slirp *slirp_init(int restricted, bool in_enabled, st=
-ruct in_addr vnetwork,
-         translate_dnssearch(slirp, vdnssearch);
-     }
-=20
--#ifdef WITH_QEMU
--    slirp_state_register(slirp);
--#endif
-     return slirp;
- }
-=20
-@@ -342,9 +336,6 @@ void slirp_cleanup(Slirp *slirp)
-         g_free(e);
-     }
-=20
--#ifdef WITH_QEMU
--    slirp_state_unregister(slirp);
--#endif
-     ip_cleanup(slirp);
-     ip6_cleanup(slirp);
-     m_cleanup(slirp);
-diff --git a/slirp/state.c b/slirp/state.c
-index 0e5a706e87..f5dd80cdc8 100644
---- a/slirp/state.c
-+++ b/slirp/state.c
-@@ -21,13 +21,10 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
--#include "qemu/osdep.h"
--
- #include "slirp.h"
-+#include "vmstate.h"
- #include "state.h"
--#include "migration/vmstate.h"
--#include "migration/qemu-file-types.h"
--#include "migration/register.h"
-+#include "stream.h"
-=20
- static int slirp_tcp_post_load(void *opaque, int version)
- {
-@@ -180,7 +177,7 @@ static int slirp_socket_pre_load(void *opaque)
- #else
- /* Win uses u_long rather than uint32_t - but it's still 32bits long */
- #define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_SINGLE_TEST(f, s, t, 0, \
--                                       vmstate_info_uint32, u_long)
-+                                       slirp_vmstate_info_uint32, u_long=
-)
- #endif
-=20
- /* The OS provided ss_family field isn't that portable; it's size
-@@ -322,10 +319,13 @@ static const VMStateDescription vmstate_slirp =3D {
-     }
- };
-=20
--static void slirp_state_save(QEMUFile *f, void *opaque)
-+void slirp_state_save(Slirp *slirp, SlirpWriteCb write_cb, void *opaque)
- {
--    Slirp *slirp =3D opaque;
-     struct gfwd_list *ex_ptr;
-+    SlirpOStream f =3D {
-+        .write_cb =3D write_cb,
-+        .opaque =3D opaque,
-+    };
-=20
-     for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
-next)
-         if (ex_ptr->write_cb) {
-@@ -336,25 +336,29 @@ static void slirp_state_save(QEMUFile *f, void *opa=
-que)
-                 continue;
-             }
-=20
--            qemu_put_byte(f, 42);
--            vmstate_save_state(f, &vmstate_slirp_socket, so, NULL);
-+            slirp_ostream_write_u8(&f, 42);
-+            slirp_vmstate_save_state(&f, &vmstate_slirp_socket, so);
-         }
--    qemu_put_byte(f, 0);
-+    slirp_ostream_write_u8(&f, 0);
-=20
--    vmstate_save_state(f, &vmstate_slirp, slirp, NULL);
-+    slirp_vmstate_save_state(&f, &vmstate_slirp, slirp);
- }
-=20
-=20
--static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
-+int slirp_state_load(Slirp *slirp, int version_id,
-+                     SlirpReadCb read_cb, void *opaque)
- {
--    Slirp *slirp =3D opaque;
-     struct gfwd_list *ex_ptr;
-+    SlirpIStream f =3D {
-+        .read_cb =3D read_cb,
-+        .opaque =3D opaque,
-+    };
-=20
--    while (qemu_get_byte(f)) {
-+    while (slirp_istream_read_u8(&f)) {
-         int ret;
-         struct socket *so =3D socreate(slirp);
-=20
--        ret =3D vmstate_load_state(f, &vmstate_slirp_socket, so, version=
-_id);
-+        ret =3D slirp_vmstate_load_state(&f, &vmstate_slirp_socket, so, =
-version_id);
-         if (ret < 0) {
-             return ret;
-         }
-@@ -375,20 +379,10 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
-ue, int version_id)
-         }
-     }
-=20
--    return vmstate_load_state(f, &vmstate_slirp, slirp, version_id);
--}
--
--void slirp_state_register(Slirp *slirp)
--{
--    static SaveVMHandlers savevm_slirp_state =3D {
--        .save_state =3D slirp_state_save,
--        .load_state =3D slirp_state_load,
--    };
--
--    register_savevm_live(NULL, "slirp", 0, 4, &savevm_slirp_state, slirp=
-);
-+    return slirp_vmstate_load_state(&f, &vmstate_slirp, slirp, version_i=
-d);
- }
-=20
--void slirp_state_unregister(Slirp *slirp)
-+int slirp_state_version(void)
- {
--    unregister_savevm(NULL, "slirp", slirp);
-+    return 4;
- }
-diff --git a/slirp/state.h b/slirp/state.h
-index 154866898f..e69de29bb2 100644
---- a/slirp/state.h
-+++ b/slirp/state.h
-@@ -1,9 +0,0 @@
--#ifndef SLIRP_STATE_H_
--#define SLIRP_STATE_H_
--
--#include "libslirp.h"
--
--void slirp_state_register(Slirp *slirp);
--void slirp_state_unregister(Slirp *slirp);
--
--#endif /* SLIRP_STATE_H_ */
---=20
-2.20.1
+Do we have strong position in favor or against putting that into the
+"common" `make check` flow?  Anyway, these are all possibilities for
+future enhancements, so:
+
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
