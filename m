@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39976)
+Received: from eggs.gnu.org ([209.51.188.92]:39989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrJ-0003oU-Qb
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:06 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrL-0003pY-7C
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrI-00008y-P3
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:05 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35321)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrK-00009w-Aa
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:07 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:40977)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1wrI-00008R-EX
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:04 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t18so18425811wrx.2
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:31:04 -0800 (PST)
+	id 1h1wrK-00009O-1N
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:06 -0500
+Received: by mail-wr1-x434.google.com with SMTP id n2so18409129wrw.8
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:31:05 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 18:29:56 +0100
-Message-Id: <1551979804-6060-50-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 18:29:57 +0100
+Message-Id: <1551979804-6060-51-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
 References: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 49/57] qos-test: nvme test node
+Subject: [Qemu-devel] [PULL 50/57] qos-test: pcnet test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,156 +32,107 @@ Cc: thuth@redhat.com, lviver@redhat.com, Emanuele Giuseppe Esposito <e.emanueleg
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Convert tests/nvme-test to a driver node; the code to discover the PCI
-device is replaced by generic qgraph code, therefore we're not placing it in tests/libqos.
+Convert tests/pcnet-test to a driver node; currently it runs
+the PCI nop test only, therefore we're not placing it in tests/libqos.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |  3 +-
- tests/nvme-test.c      | 78 +++++++++++++++++++++++++++-----------------------
- 2 files changed, 43 insertions(+), 38 deletions(-)
+ tests/Makefile.include |  3 +--
+ tests/pcnet-test.c     | 46 ++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 37 insertions(+), 12 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 0d06490..46f8c34 100644
+index 46f8c34..0442be8 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -155,7 +155,6 @@ check-qtest-pci-y += tests/e1000-test$(EXESUF)
+@@ -153,7 +153,6 @@ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
+ 
+ check-qtest-pci-y += tests/e1000-test$(EXESUF)
  check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
- check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
+-check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
  check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
--check-qtest-pci-$(CONFIG_NVME_PCI) += tests/nvme-test$(EXESUF)
  check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
  check-qtest-pci-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
- check-qtest-pci-$(CONFIG_HDA) += tests/intel-hda-test$(EXESUF)
-@@ -753,6 +752,7 @@ qos-test-obj-y += tests/ac97-test.o
- qos-test-obj-y += tests/e1000e-test.o
- qos-test-obj-y += tests/ipoctal232-test.o
+@@ -754,6 +753,7 @@ qos-test-obj-y += tests/ipoctal232-test.o
  qos-test-obj-y += tests/ne2000-test.o
-+qos-test-obj-y += tests/nvme-test.o
+ qos-test-obj-y += tests/nvme-test.o
  qos-test-obj-y += tests/pci-test.o
++qos-test-obj-y += tests/pcnet-test.o
  qos-test-obj-y += tests/sdhci-test.o
  qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test.o $(chardev-obj-y) $(test-io-obj-y)
-@@ -814,7 +814,6 @@ tests/test-hmp$(EXESUF): tests/test-hmp.o
- tests/machine-none-test$(EXESUF): tests/machine-none-test.o
- tests/device-plug-test$(EXESUF): tests/device-plug-test.o
- tests/drive_del-test$(EXESUF): tests/drive_del-test.o
--tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
- tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
- tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
- tests/es1370-test$(EXESUF): tests/es1370-test.o
-diff --git a/tests/nvme-test.c b/tests/nvme-test.c
-index 2700ba8..b48d3a2 100644
---- a/tests/nvme-test.c
-+++ b/tests/nvme-test.c
-@@ -10,49 +10,47 @@
+ qos-test-obj-y += tests/virtio-test.o
+@@ -801,7 +801,6 @@ tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
+ tests/fw_cfg-test$(EXESUF): tests/fw_cfg-test.o $(libqos-pc-obj-y)
+ tests/e1000-test$(EXESUF): tests/e1000-test.o
+ tests/rtl8139-test$(EXESUF): tests/rtl8139-test.o $(libqos-pc-obj-y)
+-tests/pcnet-test$(EXESUF): tests/pcnet-test.o
+ tests/pnv-xscom-test$(EXESUF): tests/pnv-xscom-test.o
+ tests/eepro100-test$(EXESUF): tests/eepro100-test.o
+ tests/vmxnet3-test$(EXESUF): tests/vmxnet3-test.o
+diff --git a/tests/pcnet-test.c b/tests/pcnet-test.c
+index efb1ef4..484448c 100644
+--- a/tests/pcnet-test.c
++++ b/tests/pcnet-test.c
+@@ -9,23 +9,49 @@
+ 
  #include "qemu/osdep.h"
- #include "qemu/units.h"
  #include "libqtest.h"
--#include "libqos/libqos-pc.h"
 +#include "libqos/qgraph.h"
 +#include "libqos/pci.h"
  
--static QOSState *qnvme_start(const char *extra_opts)
-+typedef struct QNvme QNvme;
+-/* Tests only initialization so far. TODO: Replace with functional tests */
+-static void pci_nop(void)
++typedef struct QPCNet QPCNet;
 +
-+struct QNvme {
++struct QPCNet {
 +    QOSGraphObject obj;
 +    QPCIDevice dev;
 +};
 +
-+static void *nvme_get_driver(void *obj, const char *interface)
++static void *pcnet_get_driver(void *obj, const char *interface)
  {
--    QOSState *qs;
--    const char *arch = qtest_get_arch();
--    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
--                      "-device nvme,addr=0x4.0,serial=foo,drive=drv0 %s";
--
--    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        qs = qtest_pc_boot(cmd, extra_opts ? : "");
--        global_qtest = qs->qts;
--        return qs;
-+    QNvme *nvme = obj;
++    QPCNet *pcnet = obj;
 +
 +    if (!g_strcmp0(interface, "pci-device")) {
-+        return &nvme->dev;
-     }
- 
--    g_printerr("nvme tests are only available on x86\n");
--    exit(EXIT_FAILURE);
-+    fprintf(stderr, "%s not present in nvme\n", interface);
++        return &pcnet->dev;
++    }
++
++    fprintf(stderr, "%s not present in pcnet\n", interface);
 +    g_assert_not_reached();
  }
  
--static void qnvme_stop(QOSState *qs)
-+static void *nvme_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
+-int main(int argc, char **argv)
++static void *pcnet_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
  {
--    qtest_shutdown(qs);
--}
-+    QNvme *nvme = g_new0(QNvme, 1);
+-    int ret;
++    QPCNet *pcnet = g_new0(QPCNet, 1);
 +    QPCIBus *bus = pci_bus;
  
--static void nop(void)
--{
--    QOSState *qs;
-+    qpci_device_init(&nvme->dev, bus, addr);
-+    nvme->obj.get_driver = nvme_get_driver;
- 
--    qs = qnvme_start(NULL);
--    qnvme_stop(qs);
-+    return &nvme->obj;
- }
- 
--static void nvmetest_cmb_test(void)
-+/* This used to cause a NULL pointer dereference.  */
-+static void nvmetest_oob_cmb_test(void *obj, void *data, QGuestAllocator *alloc)
- {
-     const int cmb_bar_size = 2 * MiB;
--    QOSState *qs;
--    QPCIDevice *pdev;
-+    QNvme *nvme = obj;
-+    QPCIDevice *pdev = &nvme->dev;
-     QPCIBar bar;
- 
--    qs = qnvme_start("-global nvme.cmb_size_mb=2");
--    pdev = qpci_device_find(qs->pcibus, QPCI_DEVFN(4,0));
--    g_assert(pdev != NULL);
--
-     qpci_device_enable(pdev);
-     bar = qpci_iomap(pdev, 2, NULL);
- 
-@@ -65,16 +63,24 @@ static void nvmetest_cmb_test(void)
-     g_assert_cmpint(qpci_io_readb(pdev, bar, cmb_bar_size - 1), ==, 0x11);
-     g_assert_cmpint(qpci_io_readw(pdev, bar, cmb_bar_size - 1), !=, 0x2211);
-     g_assert_cmpint(qpci_io_readl(pdev, bar, cmb_bar_size - 1), !=, 0x44332211);
--    g_free(pdev);
--
--    qnvme_stop(qs);
- }
- 
--int main(int argc, char **argv)
-+static void nvme_register_nodes(void)
- {
 -    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/nvme/nop", nop);
--    qtest_add_func("/nvme/cmb_test", nvmetest_cmb_test);
+-    qtest_add_func("/pcnet/pci/nop", pci_nop);
++    qpci_device_init(&pcnet->dev, bus, addr);
++    pcnet->obj.get_driver = pcnet_get_driver;
+ 
+-    qtest_start("-device pcnet");
+-    ret = g_test_run();
++    return &pcnet->obj;
++}
+ 
+-    qtest_end();
++static void pcnet_register_nodes(void)
++{
 +    QOSGraphEdgeOptions opts = {
-+        .extra_device_opts = "addr=04.0,drive=drv0,serial=foo",
-+        .before_cmd_line = "-drive id=drv0,if=none,file=null-co://,format=raw",
++        .extra_device_opts = "addr=04.0",
 +    };
-+
 +    add_qpci_address(&opts, &(QPCIAddress) { .devfn = QPCI_DEVFN(4, 0) });
  
--    return g_test_run();
-+    qos_node_create_driver("nvme", nvme_create);
-+    qos_node_consumes("nvme", "pci-bus", &opts);
-+    qos_node_produces("nvme", "pci-device");
-+
-+    qos_add_test("oob-cmb-access", "nvme", nvmetest_oob_cmb_test, &(QOSGraphTestOptions) {
-+        .edge.extra_device_opts = "cmb_size_mb=2"
-+    });
+-    return ret;
++    qos_node_create_driver("pcnet", pcnet_create);
++    qos_node_consumes("pcnet", "pci-bus", &opts);
++    qos_node_produces("pcnet", "pci-device");
  }
 +
-+libqos_init(nvme_register_nodes);
++libqos_init(pcnet_register_nodes);
 -- 
 1.8.3.1
