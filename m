@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41715)
+Received: from eggs.gnu.org ([209.51.188.92]:41741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwe-0004Pj-Om
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:17 -0500
+	(envelope-from <david@redhat.com>) id 1h1rwg-0004RN-JO
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwd-0008RI-Ut
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:16 -0500
+	(envelope-from <david@redhat.com>) id 1h1rwa-0008PW-Jv
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:18 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Mar 2019 13:15:24 +0100
-Message-Id: <20190307121539.12842-18-david@redhat.com>
+Date: Thu,  7 Mar 2019 13:15:22 +0100
+Message-Id: <20190307121539.12842-16-david@redhat.com>
 In-Reply-To: <20190307121539.12842-1-david@redhat.com>
 References: <20190307121539.12842-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 17/32] s390x/tcg: Implement VECTOR LOAD WITH
- LENGTH
+Subject: [Qemu-devel] [PATCH v3 15/32] s390x/tcg: Implement VECTOR LOAD VR
+ ELEMENT FROM GR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +23,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-We can reuse the helper introduced along with VECTOR LOAD TO BLOCK
-BOUNDARY. We just have to take care of converting the highest index into
-a length.
+Very similar to VECTOR LOAD GR FROM VR ELEMENT, just the opposite
+direction. Also provide a fast path in case we don't care about the
+register content.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
  target/s390x/insn-data.def      |  2 ++
- target/s390x/translate.c        |  7 +++++++
- target/s390x/translate_vx.inc.c | 13 +++++++++++++
- 3 files changed, 22 insertions(+)
+ target/s390x/translate_vx.inc.c | 41 +++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index bdd66758fa..3c0b14bafd 100644
+index ad8df5283c..6814061204 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1008,6 +1008,8 @@
-     F(0xe722, VLVG,    VRS_b, V,   la2, r3, 0, 0, vlvg, 0, IF_VEC)
- /* VECTOR LOAD VR FROM GRS DISJOINT */
-     F(0xe762, VLVGP,   VRR_f, V,   r2, r3, 0, 0, vlvgp, 0, IF_VEC)
-+/* VECTOR LOAD WITH LENGTH */
-+    F(0xe737, VLL,     VRS_b, V,   la2, r3_32u, 0, 0, vll, 0, IF_VEC)
+@@ -1004,6 +1004,8 @@
+     F(0xe736, VLM,     VRS_a, V,   la2, 0, 0, 0, vlm, 0, IF_VEC)
+ /* VECTOR LOAD TO BLOCK BOUNDARY */
+     F(0xe707, VLBB,    VRX,   V,   la2, 0, 0, 0, vlbb, 0, IF_VEC)
++/* VECTOR LOAD VR ELEMENT FROM GR */
++    F(0xe722, VLVG,    VRS_b, V,   la2, r3, 0, 0, vlvg, 0, IF_VEC)
  
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 588fc21dd2..0afa8f7ca5 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -5794,6 +5794,13 @@ static void in2_r3_sr32(DisasContext *s, DisasFields *f, DisasOps *o)
- }
- #define SPEC_in2_r3_sr32 0
- 
-+static void in2_r3_32u(DisasContext *s, DisasFields *f, DisasOps *o)
-+{
-+    o->in2 = tcg_temp_new_i64();
-+    tcg_gen_ext32u_i64(o->in2, regs[get_field(f, r3)]);
-+}
-+#define SPEC_in2_r3_32u 0
-+
- static void in2_r2_32s(DisasContext *s, DisasFields *f, DisasOps *o)
- {
-     o->in2 = tcg_temp_new_i64();
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index abd33a9e3d..b8e69856cd 100644
+index f1eb458902..287bd9627d 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -519,3 +519,16 @@ static DisasJumpType op_vlvgp(DisasContext *s, DisasOps *o)
-     write_vec_element_i64(o->in2, get_field(s->fields, v1), 1, ES_64);
+@@ -471,3 +471,44 @@ static DisasJumpType op_vlbb(DisasContext *s, DisasOps *o)
+     tcg_temp_free_ptr(a0);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vll(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vlvg(DisasContext *s, DisasOps *o)
 +{
-+    const int v1_offs = vec_full_reg_offset(get_field(s->fields, v1));
-+    TCGv_ptr a0 = tcg_temp_new_ptr();
++    const uint8_t es = get_field(s->fields, m4);
++    TCGv_ptr ptr;
 +
-+    /* convert highest index into an actual length */
-+    tcg_gen_addi_i64(o->in2, o->in2, 1);
-+    tcg_gen_addi_ptr(a0, cpu_env, v1_offs);
-+    gen_helper_vll(cpu_env, a0, o->addr1, o->in2);
-+    tcg_temp_free_ptr(a0);
++    if (es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    /* fast path if we don't need the register content */
++    if (!get_field(s->fields, b2)) {
++        uint8_t enr = get_field(s->fields, d2) & (NUM_VEC_ELEMENTS(es) - 1);
++
++        write_vec_element_i64(o->in2, get_field(s->fields, v1), enr, es);
++        return DISAS_NEXT;
++    }
++
++    ptr = tcg_temp_new_ptr();
++    get_vec_element_ptr_i64(ptr, get_field(s->fields, v1), o->addr1, es);
++    switch (es) {
++    case ES_8:
++        tcg_gen_st8_i64(o->in2, ptr, 0);
++        break;
++    case ES_16:
++        tcg_gen_st16_i64(o->in2, ptr, 0);
++        break;
++    case ES_32:
++        tcg_gen_st32_i64(o->in2, ptr, 0);
++        break;
++    case ES_64:
++        tcg_gen_st_i64(o->in2, ptr, 0);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    tcg_temp_free_ptr(ptr);
++
 +    return DISAS_NEXT;
 +}
 -- 
