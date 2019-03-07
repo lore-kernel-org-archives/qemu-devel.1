@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52501)
+Received: from eggs.gnu.org ([209.51.188.92]:52516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgW-000508-Tb
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:46 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgX-00050s-Ez
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgV-0003ft-Jm
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:40 -0500
+	(envelope-from <armbru@redhat.com>) id 1h1sgU-0003em-NH
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:41 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 14:03:15 +0100
-Message-Id: <20190307130323.9353-7-armbru@redhat.com>
+Date: Thu,  7 Mar 2019 14:03:16 +0100
+Message-Id: <20190307130323.9353-8-armbru@redhat.com>
 In-Reply-To: <20190307130323.9353-1-armbru@redhat.com>
 References: <20190307130323.9353-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 06/14] sam460ex: Don't size flash memory to
- match backing image
+Subject: [Qemu-devel] [PATCH v3 07/14] ppc405_boards: Don't size flash
+ memory to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +24,149 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu, David Gibson <david@gibson.dropbear.id.au>
 
-Machine "sam460ex" maps its flash memory at address 0xFFF00000.  When
-no image is supplied, its size is 1MiB (0x100000), and 512KiB of ROM
-get mapped on top of its second half.  Else, it's the size of the
-image rounded up to the next multiple of 64KiB.
+Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+Image size is rounded up to the next multiple of 64KiB.  Useless,
+because pflash_cfi02_realize() fails with "failed to read the initial
+flash content" unless the rounding is a no-op.
 
-The rounding is actually useless: pflash_cfi01_realize() fails with
-"failed to read the initial flash content" unless it's a no-op.
+If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+other stuff.  No idea how that would play out, but useful outcomes
+seem unlikely.
 
-I have no idea what happens when the pflash's size exceeds 1MiB.
-Useful outcomes seem unlikely.
+Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+regardless of image size, to match the physical hardware.
 
-I guess memory at the end of the address space remains unmapped when
-it's smaller than 1MiB.  Again, useful outcomes seem unlikely.
+Machine "taihu" maps its boot flash memory similarly.  The code even
+has a comment /* XXX: should check that size is 2MB */, followed by
+disabled code to adjust the size to 2MiB regardless of image size.
 
-The physical hardware appears to have 512KiB of flash memory:
-https://eu.mouser.com/datasheet/2/268/atmel_AT49BV040B-1180330.pdf
+Its code to map its application flash memory looks the same, except
+there the XXX comment asks for 32MiB, and the code to adjust the size
+isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+to read the initial flash content" for images smaller than 32MiB.
 
-For now, just set the flash memory size to 1MiB regardless of image
-size, and document the mess.
+Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+to match the physical hardware.  Delete dead code from application
+flash mapping, and simplify some.
 
-Cc: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- hw/ppc/sam460ex.c | 41 ++++++++++++++++++++++++++---------------
- 1 file changed, 26 insertions(+), 15 deletions(-)
+ hw/ppc/ppc405_boards.c | 51 +++++++++++++-----------------------------
+ 1 file changed, 15 insertions(+), 36 deletions(-)
 
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index d455c4bd07..c6258ca1d0 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -91,32 +91,43 @@ struct boot_info {
-=20
- static int sam460ex_load_uboot(void)
- {
-+    /*
-+     * This first creates 1MiB of flash memory mapped at the end of
-+     * the 32-bit address space (0xFFF00000..0xFFFFFFFF).
-+     *
-+     * If_PFLASH unit 0 is defined, the flash memory is initialized
-+     * from that block backend.
-+     *
-+     * Else, it's initialized to zero.  And then 512KiB of ROM get
-+     * mapped on top of its second half (0xFFF80000..0xFFFFFFFF),
-+     * initialized from u-boot-sam460-20100605.bin.
-+     *
-+     * This doesn't smell right.
-+     *
-+     * The physical hardware appears to have 512KiB flash memory.
-+     *
-+     * TODO Figure out what we really need here, and clean this up.
-+     */
-+
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index f47b15f10e..672717ef1b 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
+     target_ulong kernel_base, initrd_base;
+     long kernel_size, initrd_size;
+     int linux_boot;
+-    int fl_idx, fl_sectors, len;
++    int len;
      DriveInfo *dinfo;
--    BlockBackend *blk =3D NULL;
--    hwaddr base =3D FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32);
--    long bios_size =3D FLASH_SIZE;
--    int fl_sectors;
+     MemoryRegion *sysmem =3D get_system_memory();
 =20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
--    if (dinfo) {
--        blk =3D blk_by_legacy_dinfo(dinfo);
--        bios_size =3D blk_getlength(blk);
--    }
--    fl_sectors =3D (bios_size + 65535) >> 16;
+@@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
+ #ifdef DEBUG_BOARD_INIT
+     printf("%s: register BIOS\n", __func__);
+ #endif
+-    fl_idx =3D 0;
+ #ifdef USE_FLASH_BIOS
+-    dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
++    dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     if (dinfo) {
+-        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
 -
--    if (!pflash_cfi01_register(base, NULL, "sam460ex.flash", bios_size,
--                               blk, 64 * KiB, fl_sectors,
-+    if (!pflash_cfi01_register(FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32)=
-,
-+                               NULL, "sam460ex.flash", FLASH_SIZE,
-+                               dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
-,
-+                               64 * KiB, FLASH_SIZE / (64 * KiB),
-                                1, 0x89, 0x18, 0x0000, 0x0, 1)) {
-         error_report("Error registering flash memory");
-         /* XXX: return an error instead? */
-         exit(1);
-     }
+-        bios_size =3D blk_getlength(blk);
+-        fl_sectors =3D (bios_size + 65535) >> 16;
+ #ifdef DEBUG_BOARD_INIT
+-        printf("Register parallel flash %d size %lx"
+-               " at addr %lx '%s' %d\n",
+-               fl_idx, bios_size, -bios_size,
+-               blk_name(blk), fl_sectors);
++        printf("Register parallel flash\n");
+ #endif
++        bios_size =3D 8 * MiB;
+         pflash_cfi02_register((uint32_t)(-bios_size),
+                               NULL, "ef405ep.bios", bios_size,
+-                              blk, 65536, fl_sectors, 1,
++                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              64 * KiB, bios_size / (64 * KiB), 1,
+                               2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+                               1);
+-        fl_idx++;
+     } else
+ #endif
+     {
+@@ -455,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
+     target_ulong kernel_base, initrd_base;
+     long kernel_size, initrd_size;
+     int linux_boot;
+-    int fl_idx, fl_sectors;
++    int fl_idx;
+     DriveInfo *dinfo;
 =20
--    if (!blk) {
-+    if (!dinfo) {
-         /*error_report("No flash image given with the 'pflash' parameter=
-,"
-                 " using default u-boot image");*/
--        base =3D UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32);
--        rom_add_file_fixed(UBOOT_FILENAME, base, -1);
-+        rom_add_file_fixed(UBOOT_FILENAME,
-+                           UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32=
-),
-+                           -1);
-     }
-=20
-     return 0;
+     /* RAM is soldered to the board so the size cannot be changed */
+@@ -486,21 +479,14 @@ static void taihu_405ep_init(MachineState *machine)
+ #if defined(USE_FLASH_BIOS)
+     dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+     if (dinfo) {
+-        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+-
+-        bios_size =3D blk_getlength(blk);
+-        /* XXX: should check that size is 2MB */
+-        //        bios_size =3D 2 * 1024 * 1024;
+-        fl_sectors =3D (bios_size + 65535) >> 16;
+ #ifdef DEBUG_BOARD_INIT
+-        printf("Register parallel flash %d size %lx"
+-               " at addr %lx '%s' %d\n",
+-               fl_idx, bios_size, -bios_size,
+-               blk_name(blk), fl_sectors);
++        printf("Register boot flash\n");
+ #endif
+-        pflash_cfi02_register((uint32_t)(-bios_size),
++        bios_size =3D 2 * MiB;
++        pflash_cfi02_register(0xFFE00000,
+                               NULL, "taihu_405ep.bios", bios_size,
+-                              blk, 65536, fl_sectors, 1,
++                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              64 * KiB, bios_size / (64 * KiB), 1,
+                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+                               1);
+         fl_idx++;
+@@ -536,20 +522,13 @@ static void taihu_405ep_init(MachineState *machine)
+     /* Register Linux flash */
+     dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+     if (dinfo) {
+-        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+-
+-        bios_size =3D blk_getlength(blk);
+-        /* XXX: should check that size is 32MB */
+         bios_size =3D 32 * MiB;
+-        fl_sectors =3D (bios_size + 65535) >> 16;
+ #ifdef DEBUG_BOARD_INIT
+-        printf("Register parallel flash %d size %lx"
+-               " at addr " TARGET_FMT_lx " '%s'\n",
+-               fl_idx, bios_size, (target_ulong)0xfc000000,
+-               blk_name(blk));
++        printf("Register application flash\n"
+ #endif
+         pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bio=
+s_size,
+-                              blk, 65536, fl_sectors, 1,
++                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              64 * KiB, bios_size / (64 * KiB), 1,
+                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+                               1);
+         fl_idx++;
 --=20
 2.17.2
