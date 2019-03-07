@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60715)
+Received: from eggs.gnu.org ([209.51.188.92]:34222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1y2e-0000WT-PR
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:46:53 -0500
+	(envelope-from <mlureau@redhat.com>) id 1h1y70-0004Il-CE
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:51:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1y2Y-0002Jy-AT
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:46:50 -0500
-Resent-Message-Id: <E1h1y2Y-0002Jy-AT@eggs.gnu.org>
-Message-ID: <155198438839.8146.6378949947943780555@6acff2cf482b>
-In-Reply-To: <20190307172401.29451-1-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <mlureau@redhat.com>) id 1h1y6z-0006X4-16
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:51:22 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:39874)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1h1y6y-0006Vu-S4
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:51:20 -0500
+Received: by mail-qt1-f194.google.com with SMTP id o6so18343447qtk.6
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 10:51:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 10:46:30 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] pc: Support firmware
- configuration with -blockdev
+References: <20190227135523.16952-1-berrange@redhat.com>
+	<20190227135523.16952-2-berrange@redhat.com>
+In-Reply-To: <20190227135523.16952-2-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 7 Mar 2019 19:51:07 +0100
+Message-ID: <CAMxuvayzG5RtsEoM+wwPuuKq0wTqEsn9CSvft-itvaDZ-89XRw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] chardev: add support for authorization
+ for TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +30,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, philmd@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE3MjQwMS4yOTQ1
-MS0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAzMDcxNzI0MDEuMjk0NTEt
-MS1hcm1icnVAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzEy
-XSBwYzogU3VwcG9ydCBmaXJtd2FyZSBjb25maWd1cmF0aW9uIHdpdGggLWJsb2NrZGV2Cgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
-LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwMzA3
-MTcyNDAxLjI5NDUxLTEtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDMwNzE3MjQw
-MS4yOTQ1MS0xLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKNmM1ZDI1ZDQ3YSBkb2NzL2ludGVyb3AvZmlybXdhcmUuanNvbjogUHJlZmVyIC1tYWNoaW5l
-IHRvIGlmPXBmbGFzaAo2MDY3ZWVkNzBiIHBjOiBTdXBwb3J0IGZpcm13YXJlIGNvbmZpZ3VyYXRp
-b24gd2l0aCAtYmxvY2tkZXYKMTJlYjM2MjYwNCBwY19zeXNmdzogUGFzcyBQQ01hY2hpbmVTdGF0
-ZSB0byBwY19zeXN0ZW1fZmlybXdhcmVfaW5pdCgpCjA2ODFhNDNkNDAgcGNfc3lzZnc6IFJlbW92
-ZSB1bnVzZWQgUGNTeXNGd0RldmljZQo0OGZkNDdhODVlIHBmbGFzaF9jZmkwMTogQWRkIHBmbGFz
-aF9jZmkwMV9nZXRfYmxrKCkgaGVscGVyCmVkNWRjOGRjZDMgdmw6IENyZWF0ZSBibG9jayBiYWNr
-ZW5kcyBiZWZvcmUgc2V0dGluZyBtYWNoaW5lIHByb3BlcnRpZXMKMjU3ZTJlYTM0NSB2bDogRmFj
-dG9yIGNvbmZpZ3VyZV9ibG9ja2RldigpIG91dCBvZiBtYWluKCkKNzI3MzJmY2M1YiB2bDogSW1w
-cm92ZSBsZWdpYmlsaXR5IG9mIEJsb2NrZGV2T3B0aW9ucyBxdWV1ZQpmYmM0M2I3Y2RjIHN5c2J1
-czogRml4IGxhdGVudCBidWcgd2l0aCBvbmJvYXJkIGRldmljZXMKZjliNWEwYzI3ZSB2bDogRml4
-IGxhdGVudCBidWcgd2l0aCAtZ2xvYmFsIGFuZCBvbmJvYXJkIGRldmljZXMKM2M4NWQyNGZlMiBx
-b206IE1vdmUgY29tcGF0X3Byb3BzIG1hY2hpbmVyeSBmcm9tIHFkZXYgdG8gUU9NCmEyY2Q3ZjI0
-NGIgcWRldjogRml4IGxhdGVudCBidWcgd2l0aCBjb21wYXRfcHJvcHMgYW5kIG9uYm9hcmQgZGV2
-aWNlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgYTJjZDdmMjQ0
-Yjk4IChxZGV2OiBGaXggbGF0ZW50IGJ1ZyB3aXRoIGNvbXBhdF9wcm9wcyBhbmQgb25ib2FyZCBk
-ZXZpY2VzKQoyLzEyIENoZWNraW5nIGNvbW1pdCAzYzg1ZDI0ZmUyNWMgKHFvbTogTW92ZSBjb21w
-YXRfcHJvcHMgbWFjaGluZXJ5IGZyb20gcWRldiB0byBRT00pCjMvMTIgQ2hlY2tpbmcgY29tbWl0
-IGY5YjVhMGMyN2U4OSAodmw6IEZpeCBsYXRlbnQgYnVnIHdpdGggLWdsb2JhbCBhbmQgb25ib2Fy
-ZCBkZXZpY2VzKQo0LzEyIENoZWNraW5nIGNvbW1pdCBmYmM0M2I3Y2RjNjQgKHN5c2J1czogRml4
-IGxhdGVudCBidWcgd2l0aCBvbmJvYXJkIGRldmljZXMpCjUvMTIgQ2hlY2tpbmcgY29tbWl0IDcy
-NzMyZmNjNWI1NSAodmw6IEltcHJvdmUgbGVnaWJpbGl0eSBvZiBCbG9ja2Rldk9wdGlvbnMgcXVl
-dWUpCjYvMTIgQ2hlY2tpbmcgY29tbWl0IDI1N2UyZWEzNDVjNyAodmw6IEZhY3RvciBjb25maWd1
-cmVfYmxvY2tkZXYoKSBvdXQgb2YgbWFpbigpKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
-YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjY6IEZJTEU6IHZsLmM6MTIwNzoKKyAg
-ICAvKiBJZiB0aGUgY3VycmVudGx5IHNlbGVjdGVkIG1hY2hpbmUgd2lzaGVzIHRvIG92ZXJyaWRl
-IHRoZSB1bml0cy1wZXItYnVzCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGlu
-ZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzI3OiBGSUxFOiB2bC5jOjEyMDg6CisgICAgICogcHJv
-cGVydHkgb2YgaXRzIGRlZmF1bHQgSEJBIGludGVyZmFjZSB0eXBlLCBkbyBzbyBub3cuICovCgp0
-b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTIg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8xMiBDaGVja2luZyBjb21taXQgZWQ1ZGM4ZGNk
-MzkzICh2bDogQ3JlYXRlIGJsb2NrIGJhY2tlbmRzIGJlZm9yZSBzZXR0aW5nIG1hY2hpbmUgcHJv
-cGVydGllcykKOC8xMiBDaGVja2luZyBjb21taXQgNDhmZDQ3YTg1ZWY5IChwZmxhc2hfY2ZpMDE6
-IEFkZCBwZmxhc2hfY2ZpMDFfZ2V0X2JsaygpIGhlbHBlcikKOS8xMiBDaGVja2luZyBjb21taXQg
-MDY4MWE0M2Q0MGFiIChwY19zeXNmdzogUmVtb3ZlIHVudXNlZCBQY1N5c0Z3RGV2aWNlKQoxMC8x
-MiBDaGVja2luZyBjb21taXQgMTJlYjM2MjYwNDdjIChwY19zeXNmdzogUGFzcyBQQ01hY2hpbmVT
-dGF0ZSB0byBwY19zeXN0ZW1fZmlybXdhcmVfaW5pdCgpKQoxMS8xMiBDaGVja2luZyBjb21taXQg
-NjA2N2VlZDcwYjVjIChwYzogU3VwcG9ydCBmaXJtd2FyZSBjb25maWd1cmF0aW9uIHdpdGggLWJs
-b2NrZGV2KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzcyOiBGSUxFOiBody9p
-Mzg2L3BjX3N5c2Z3LmM6MzI4OgorICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJwZmxhc2ggd2l0
-aCBrdm0gcmVxdWlyZXMgS1ZNIHJlYWRvbmx5IG1lbW9yeSBzdXBwb3J0Iik7Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDMxNSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMS8xMiBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoxMi8xMiBDaGVja2luZyBjb21taXQgNmM1ZDI1ZDQ3YTkyIChk
-b2NzL2ludGVyb3AvZmlybXdhcmUuanNvbjogUHJlZmVyIC1tYWNoaW5lIHRvIGlmPXBmbGFzaCkK
-RVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQ5OiBGSUxFOiBkb2NzL2ludGVyb3AvZmlybXdh
-cmUuanNvbjoyMzk6CisjICAgICAgICAgICAgICAgICAgJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCAzMyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAxOTAzMDcxNzI0MDEuMjk0NTEtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNr
-cGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Hi
+
+On Wed, Feb 27, 2019 at 2:55 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>
+> Currently any client which can complete the TLS handshake is able to use
+> a chardev server. The server admin can turn on the 'verify-peer' option
+> for the x509 creds to require the client to provide a x509
+> certificate. This means the client will have to acquire a certificate
+> from the CA before they are permitted to use the chardev server. This is
+> still a fairly low bar.
+>
+> This adds a 'tls-authz=3DOBJECT-ID' option to the socket chardev backend
+> which takes the ID of a previously added 'QAuthZ' object instance. This
+> will be used to validate the client's x509 distinguished name. Clients
+> failing the check will not be permitted to use the chardev server.
+>
+> For example to setup authorization that only allows connection from a
+> client whose x509 certificate distinguished name contains 'CN=3Dfred', yo=
+u
+> would use:
+>
+>   $QEMU -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls,\
+>                 endpoint=3Dserver,verify-peer=3Dyes \
+>         -object authz-simple,id=3Dauthz0,identity=3DCN=3Dlaptop.example.c=
+om,,\
+>                 O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
+>         -chardev socket,host=3D127.0.0.1,port=3D9000,server,\
+>                  tls-creds=3Dtls0,tls-authz=3Dauthz0 \
+>         ...other qemu args...
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  chardev/char-socket.c | 12 +++++++++++-
+>  chardev/char.c        |  3 +++
+>  qapi/char.json        |  6 ++++++
+>  qemu-options.hx       |  9 +++++++--
+>  4 files changed, 27 insertions(+), 3 deletions(-)
+>
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 4fcdd8aedd..12e78426aa 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -59,6 +59,7 @@ typedef struct {
+>      QIONetListener *listener;
+>      GSource *hup_source;
+>      QCryptoTLSCreds *tls_creds;
+> +    char *tls_authz;
+>      TCPChardevState state;
+>      int max_size;
+>      int do_telnetopt;
+> @@ -807,7 +808,7 @@ static void tcp_chr_tls_init(Chardev *chr)
+>      if (s->is_listen) {
+>          tioc =3D qio_channel_tls_new_server(
+>              s->ioc, s->tls_creds,
+> -            NULL, /* XXX Use an ACL */
+> +            s->tls_authz,
+>              &err);
+>      } else {
+>          tioc =3D qio_channel_tls_new_client(
+> @@ -1055,6 +1056,7 @@ static void char_socket_finalize(Object *obj)
+>      if (s->tls_creds) {
+>          object_unref(OBJECT(s->tls_creds));
+>      }
+> +    g_free(s->tls_authz);
+>
+>      qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+>  }
+> @@ -1242,6 +1244,11 @@ static bool qmp_chardev_validate_socket(ChardevSoc=
+ket *sock,
+>          break;
+>      }
+>
+> +    if (sock->has_tls_authz && !sock->has_tls_creds) {
+> +        error_setg(errp, "'tls_authz' option requires 'tls_creds' option=
+");
+> +        return false;
+> +    }
+> +
+>      /* Validate any options which have a dependancy on client vs server =
+*/
+>      if (!sock->has_server || sock->server) {
+>          if (sock->has_reconnect) {
+> @@ -1320,6 +1327,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>              }
+>          }
+>      }
+> +    s->tls_authz =3D g_strdup(sock->tls_authz);
+>
+>      s->addr =3D addr =3D socket_address_flatten(sock->addr);
+>
+> @@ -1399,6 +1407,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, C=
+hardevBackend *backend,
+>      sock->reconnect =3D qemu_opt_get_number(opts, "reconnect", 0);
+>      sock->has_tls_creds =3D qemu_opt_get(opts, "tls-creds");
+>      sock->tls_creds =3D g_strdup(qemu_opt_get(opts, "tls-creds"));
+> +    sock->has_tls_authz =3D qemu_opt_get(opts, "tls-authz");
+> +    sock->tls_authz =3D g_strdup(qemu_opt_get(opts, "tls-authz"));
+>
+>      addr =3D g_new0(SocketAddressLegacy, 1);
+>      if (path) {
+> diff --git a/chardev/char.c b/chardev/char.c
+> index f6d61fa5f8..514cd6b0c3 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -880,6 +880,9 @@ QemuOptsList qemu_chardev_opts =3D {
+>          },{
+>              .name =3D "tls-creds",
+>              .type =3D QEMU_OPT_STRING,
+> +        },{
+> +            .name =3D "tls-authz",
+> +            .type =3D QEMU_OPT_STRING,
+>          },{
+>              .name =3D "websocket",
+>              .type =3D QEMU_OPT_BOOL,
+> diff --git a/qapi/char.json b/qapi/char.json
+> index 77ed847972..7847c98d05 100644
+> --- a/qapi/char.json
+> +++ b/qapi/char.json
+> @@ -248,6 +248,11 @@
+>  # @addr: socket address to listen on (server=3Dtrue)
+>  #        or connect to (server=3Dfalse)
+>  # @tls-creds: the ID of the TLS credentials object (since 2.6)
+> +# @tls-authz: the ID of the QAuthZ authorization object against which
+> +#             the client's x509 distinguished name will validated. This
+
+will be? (not a native speaker, but sounds weird to me)
+
+> +#             object is only resolved at time of use, so can be deleted
+> +#             and recreated on the fly while the chardev server is activ=
+e.
+> +#             If missing, it will default to denying access (since 4.0)
+>  # @server: create server socket (default: true)
+>  # @wait: wait for incoming connection on server
+>  #        sockets (default: false).
+> @@ -268,6 +273,7 @@
+>  { 'struct': 'ChardevSocket',
+>    'data': { 'addr': 'SocketAddressLegacy',
+>              '*tls-creds': 'str',
+> +            '*tls-authz'  : 'str',
+>              '*server': 'bool',
+>              '*wait': 'bool',
+>              '*nodelay': 'bool',
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 1cf9aac1fe..aecbb2ca9c 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -2413,7 +2413,7 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+>      "-chardev null,id=3Did[,mux=3Don|off][,logfile=3DPATH][,logappend=3D=
+on|off]\n"
+>      "-chardev socket,id=3Did[,host=3Dhost],port=3Dport[,to=3Dto][,ipv4][=
+,ipv6][,nodelay][,reconnect=3Dseconds]\n"
+>      "         [,server][,nowait][,telnet][,websocket][,reconnect=3Dsecon=
+ds][,mux=3Don|off]\n"
+> -    "         [,logfile=3DPATH][,logappend=3Don|off][,tls-creds=3DID] (t=
+cp)\n"
+> +    "         [,logfile=3DPATH][,logappend=3Don|off][,tls-creds=3DID][,t=
+ls-authz=3DID] (tcp)\n"
+>      "-chardev socket,id=3Did,path=3Dpath[,server][,nowait][,telnet][,web=
+socket][,reconnect=3Dseconds]\n"
+>      "         [,mux=3Don|off][,logfile=3DPATH][,logappend=3Don|off] (uni=
+x)\n"
+>      "-chardev udp,id=3Did[,host=3Dhost],port=3Dport[,localaddr=3Dlocalad=
+dr]\n"
+> @@ -2542,7 +2542,7 @@ The available backends are:
+>  A void device. This device will not emit any data, and will drop any dat=
+a it
+>  receives. The null backend does not take any options.
+>
+> -@item -chardev socket,id=3D@var{id}[,@var{TCP options} or @var{unix opti=
+ons}][,server][,nowait][,telnet][,websocket][,reconnect=3D@var{seconds}][,t=
+ls-creds=3D@var{id}]
+> +@item -chardev socket,id=3D@var{id}[,@var{TCP options} or @var{unix opti=
+ons}][,server][,nowait][,telnet][,websocket][,reconnect=3D@var{seconds}][,t=
+ls-creds=3D@var{id}][,tls-authz=3D@var{id}]
+>
+>  Create a two-way stream socket, which can be either a TCP or a unix sock=
+et. A
+>  unix socket will be created if @option{path} is specified. Behaviour is
+> @@ -2568,6 +2568,11 @@ and specifies the id of the TLS credentials to use=
+ for the handshake. The
+>  credentials must be previously created with the @option{-object tls-cred=
+s}
+>  argument.
+>
+> +@option{tls-auth} provides the ID of the QAuthZ authorization object aga=
+inst
+> +which the client's x509 distinguished name will validated. This object i=
+s only
+
+same
+
+> +resolved at time of use, so can be deleted and recreated on the fly whil=
+e the
+> +chardev server is active. If missing, it will default to denying access.
+
+Why not have "(since 4.0)"  here?
+
+> +
+>  TCP and unix socket options are given below:
+>
+>  @table @option
+> --
+> 2.20.1
+>
+
+Other than that,
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
