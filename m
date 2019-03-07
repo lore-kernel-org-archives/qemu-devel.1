@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41395)
+Received: from eggs.gnu.org ([209.51.188.92]:41356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwH-000458-0U
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:54 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwF-0007y6-PL
+	(envelope-from <david@redhat.com>) id 1h1rwF-00043j-35
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:52 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <david@redhat.com>) id 1h1rwE-0007xB-4v
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:15:51 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Mar 2019 13:15:11 +0100
-Message-Id: <20190307121539.12842-5-david@redhat.com>
+Date: Thu,  7 Mar 2019 13:15:10 +0100
+Message-Id: <20190307121539.12842-4-david@redhat.com>
 In-Reply-To: <20190307121539.12842-1-david@redhat.com>
 References: <20190307121539.12842-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 04/32] s390x/tcg: Implement VECTOR GATHER
- ELEMENT
+Subject: [Qemu-devel] [PATCH v3 03/32] s390x/tcg: Utilities for vector
+ instruction helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +23,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Let's start with a more involved one, but it is the first in the list
-of vector support instructions (introduced with the vector facility).
+We'll have to read/write vector elements quite frequently from helpers.
+The tricky bit is properly taking care of endianess. Handle it similar
+to aarch64.
 
-Good thing is, we need a lot of basic infrastructure for this. Reading
-and writing vector elements as well as checking element validity.
-
-All vector instruction related translation functions will reside in
-translate_vx.inc.c, to be included in translate.c - similar to how
-other architectures handle it.
-
-While at it, directly add some documentation (which contains parts about
-things added in follow-up patches, but splitting this up does not make
-too much sense). Also add ES_* defines heavily used later.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      |   6 ++
- target/s390x/translate.c        |   2 +
- target/s390x/translate_vx.inc.c | 135 ++++++++++++++++++++++++++++++++
- 3 files changed, 143 insertions(+)
- create mode 100644 target/s390x/translate_vx.inc.c
+ target/s390x/vec.h | 101 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 101 insertions(+)
+ create mode 100644 target/s390x/vec.h
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 61b750a855..7d128ac9d6 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -972,6 +972,12 @@
-     D(0xb93e, KIMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KIMD)
-     D(0xb93f, KLMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KLMD)
- 
-+/* === Vector Support Instructions === */
-+
-+/* VECTOR GATHER ELEMENT */
-+    E(0xe713, VGEF,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_32, IF_VEC)
-+    E(0xe712, VGEG,    VRV,   V,   la2, 0, 0, 0, vge, 0, ES_64, IF_VEC)
-+
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-     E(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL, IF_PRIV)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index d52c02c572..a1c6698dea 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -5120,6 +5120,8 @@ static DisasJumpType op_mpcifc(DisasContext *s, DisasOps *o)
- }
- #endif
- 
-+#include "translate_vx.inc.c"
-+
- /* ====================================================================== */
- /* The "Cc OUTput" generators.  Given the generated output (and in some cases
-    the original inputs), update the various cc data structures in order to
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
+diff --git a/target/s390x/vec.h b/target/s390x/vec.h
 new file mode 100644
-index 0000000000..9864ec5134
+index 0000000000..3313fb43ee
 --- /dev/null
-+++ b/target/s390x/translate_vx.inc.c
-@@ -0,0 +1,135 @@
++++ b/target/s390x/vec.h
+@@ -0,0 +1,101 @@
 +/*
-+ * QEMU TCG support -- s390x vector instruction translation functions
++ * QEMU TCG support -- s390x vector utilitites
 + *
 + * Copyright (C) 2019 Red Hat Inc
 + *
@@ -93,129 +50,95 @@ index 0000000000..9864ec5134
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
 + */
++#ifndef S390X_VEC_H
++#define S390X_VEC_H
++
++typedef union S390Vector {
++    uint64_t doubleword[2];
++    uint32_t word[4];
++    uint16_t halfword[8];
++    uint8_t byte[16];
++} S390Vector;
 +
 +/*
-+ * For most instructions that use the same element size for reads and
-+ * writes, we can use real gvec vector expansion, which potantially uses
-+ * real host vector instructions. As they only work up to 64 bit elements,
-+ * 128 bit elements (vector is a single element) have to be handled
-+ * differently. Operations that are too complicated to encode via TCG ops
-+ * are handled via gvec ool (out-of-line) handlers.
++ * Each vector is stored as two 64bit host values. So when talking about
++ * byte/halfword/word numbers, we have to take care of proper translation
++ * between element numbers.
 + *
-+ * As soon as instructions use different element sizes for reads and writes
-+ * or access elements "out of their element scope" we expand them manually
-+ * in fancy loops, as gvec expansion does not deal with actual element
-+ * numbers and does also not support access to other elements.
++ * Big Endian (target/possible host)
++ * B:  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7] - [ 8][ 9][10][11][12][13][14][15]
++ * HW: [     0][     1][     2][     3] - [     4][     5][     6][     7]
++ * W:  [             0][             1] - [             2][             3]
++ * DW: [                             0] - [                             1]
 + *
-+ * 128 bit elements:
-+ *  As we only have i32/i64, such elements have to be loaded into two
-+ *  i64 values and can then be processed e.g. by tcg_gen_add2_i64.
-+ *
-+ * Sizes:
-+ *  On s390x, the operand size (oprsz) and the maximum size (maxsz) are
-+ *  always 16 (128 bit). What gvec code calls "vece", s390x calls "es",
-+ *  a.k.a. "element size". These values nicely map to MO_8 ... MO_64. Only
-+ *  128 bit element size has to be treated in a special way (MO_64 + 1).
-+ *  We will use ES_* instead of MO_* for this reason in this file.
-+ *
-+ * CC handling:
-+ *  As gvec ool-helpers can currently not return values (besides via
-+ *  pointers like vectors or cpu_env), whenever we have to set the CC and
-+ *  can't conclude the value from the result vector, we will directly
-+ *  set it in "env->cc_op" and mark it as static via set_cc_static()".
-+ *  Whenever this is done, the helper writes globals (cc_op).
++ * Little Endian (possible host)
++ * B:  [ 7][ 6][ 5][ 4][ 3][ 2][ 1][ 0] - [15][14][13][12][11][10][ 9][ 8]
++ * HW: [     3][     2][     1][     0] - [     7][     6][     5][     4]
++ * W:  [             1][             0] - [             3][             2]
++ * DW: [                             0] - [                             1]
 + */
++#ifndef HOST_WORDS_BIGENDIAN
++#define H1(x)  ((x) ^ 7)
++#define H2(x)  ((x) ^ 3)
++#define H4(x)  ((x) ^ 1)
++#else
++#define H1(x)  (x)
++#define H2(x)  (x)
++#define H4(x)  (x)
++#endif
 +
-+#define NUM_VEC_ELEMENT_BYTES(es) (1 << (es))
-+#define NUM_VEC_ELEMENTS(es) (16 / NUM_VEC_ELEMENT_BYTES(es))
-+
-+#define ES_8    MO_8
-+#define ES_16   MO_16
-+#define ES_32   MO_32
-+#define ES_64   MO_64
-+#define ES_128  4
-+
-+static inline bool valid_vec_element(uint8_t enr, TCGMemOp es)
++static inline uint8_t s390_vec_read_element8(const S390Vector *v, uint8_t enr)
 +{
-+    return !(enr & ~(NUM_VEC_ELEMENTS(es) - 1));
++    g_assert(enr < 16);
++    return v->byte[H1(enr)];
 +}
 +
-+static void read_vec_element_i64(TCGv_i64 dst, uint8_t reg, uint8_t enr,
-+                                 TCGMemOp memop)
++static inline uint16_t s390_vec_read_element16(const S390Vector *v, uint8_t enr)
 +{
-+    const int offs = vec_reg_offset(reg, enr, memop & MO_SIZE);
-+
-+    switch (memop) {
-+    case ES_8:
-+        tcg_gen_ld8u_i64(dst, cpu_env, offs);
-+        break;
-+    case ES_16:
-+        tcg_gen_ld16u_i64(dst, cpu_env, offs);
-+        break;
-+    case ES_32:
-+        tcg_gen_ld32u_i64(dst, cpu_env, offs);
-+        break;
-+    case ES_8 | MO_SIGN:
-+        tcg_gen_ld8s_i64(dst, cpu_env, offs);
-+        break;
-+    case ES_16 | MO_SIGN:
-+        tcg_gen_ld16s_i64(dst, cpu_env, offs);
-+        break;
-+    case ES_32 | MO_SIGN:
-+        tcg_gen_ld32s_i64(dst, cpu_env, offs);
-+        break;
-+    case ES_64:
-+    case ES_64 | MO_SIGN:
-+        tcg_gen_ld_i64(dst, cpu_env, offs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
++    g_assert(enr < 8);
++    return v->halfword[H2(enr)];
 +}
 +
-+static void write_vec_element_i64(TCGv_i64 src, int reg, uint8_t enr,
-+                                  TCGMemOp memop)
++static inline uint32_t s390_vec_read_element32(const S390Vector *v, uint8_t enr)
 +{
-+    const int offs = vec_reg_offset(reg, enr, memop & MO_SIZE);
-+
-+    switch (memop) {
-+    case ES_8:
-+        tcg_gen_st8_i64(src, cpu_env, offs);
-+        break;
-+    case ES_16:
-+        tcg_gen_st16_i64(src, cpu_env, offs);
-+        break;
-+    case ES_32:
-+        tcg_gen_st32_i64(src, cpu_env, offs);
-+        break;
-+    case ES_64:
-+        tcg_gen_st_i64(src, cpu_env, offs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
++    g_assert(enr < 4);
++    return v->word[H4(enr)];
 +}
 +
-+static DisasJumpType op_vge(DisasContext *s, DisasOps *o)
++static inline uint64_t s390_vec_read_element64(const S390Vector *v, uint8_t enr)
 +{
-+    const uint8_t es = s->insn->data;
-+    const uint8_t enr = get_field(s->fields, m3);
-+    TCGv_i64 tmp;
-+
-+    if (!valid_vec_element(enr, es)) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    tmp = tcg_temp_new_i64();
-+    read_vec_element_i64(tmp, get_field(s->fields, v2), enr, es);
-+    tcg_gen_add_i64(o->addr1, o->addr1, tmp);
-+    gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 0);
-+
-+    tcg_gen_qemu_ld_i64(tmp, o->addr1, get_mem_index(s), MO_TE | es);
-+    write_vec_element_i64(tmp, get_field(s->fields, v1), enr, es);
-+    tcg_temp_free_i64(tmp);
-+    return DISAS_NEXT;
++    g_assert(enr < 2);
++    return v->doubleword[enr];
 +}
++
++static inline void s390_vec_write_element8(S390Vector *v, uint8_t enr,
++                                           uint8_t data)
++{
++    g_assert(enr < 16);
++    v->byte[H1(enr)] = data;
++}
++
++static inline void s390_vec_write_element16(S390Vector *v, uint8_t enr,
++                                            uint16_t data)
++{
++    g_assert(enr < 8);
++    v->halfword[H2(enr)] = data;
++}
++
++static inline void s390_vec_write_element32(S390Vector *v, uint8_t enr,
++                                            uint32_t data)
++{
++    g_assert(enr < 4);
++    v->word[H4(enr)] = data;
++}
++
++static inline void s390_vec_write_element64(S390Vector *v, uint8_t enr,
++                                            uint64_t data)
++{
++    g_assert(enr < 2);
++    v->doubleword[enr] = data;
++}
++
++#endif /* S390X_VEC_H */
 -- 
 2.17.2
