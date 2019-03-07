@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49216)
+Received: from eggs.gnu.org ([209.51.188.92]:49209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1uCR-000620-VH
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:40:44 -0500
+	(envelope-from <konrad.wilk@oracle.com>) id 1h1uCR-00061o-MH
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:40:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h1uCQ-0001wl-UL
+	(envelope-from <konrad.wilk@oracle.com>) id 1h1uCQ-0001uN-GT
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:40:43 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:36048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1h1uCQ-0001sX-LV
+Received: from aserp2130.oracle.com ([141.146.126.79]:46604)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <konrad.wilk@oracle.com>)
+	id 1h1uCQ-0001fQ-4N
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:40:42 -0500
-Received: by mail-wm1-x334.google.com with SMTP id j125so9526851wmj.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 06:40:42 -0800 (PST)
-Date: Thu, 7 Mar 2019 14:40:39 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190307144039.GG2843@stefanha-x1.localdomain>
-References: <20190306115532.23025-1-peterx@redhat.com>
-	<20190306115532.23025-5-peterx@redhat.com>
+Date: Thu, 7 Mar 2019 09:40:17 -0500
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Message-ID: <20190307144017.GI1598@char.us.oracle.com>
+References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
+	<8b794ba1-f719-e1f4-5a17-ba261aeebea6@redhat.com>
+	<20190307141642.GE5786@linux.fritz.box>
+	<106e1413-85e4-2ed9-0ffa-9c0f9fe73cf9@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AGZzQgpsuUlWC1xT"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190306115532.23025-5-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] iothread: push gcontext earlier in
- the thread_fn
+In-Reply-To: <106e1413-85e4-2ed9-0ffa-9c0f9fe73cf9@redhat.com>
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
+ the concept description to docs/devel/qemu-multiprocess
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, elena.ufimtseva@oracle.com, john.g.johnson@oracle.com, sstabellini@kernel.org, jag.raman@oracle.com, qemu-devel@nongnu.org, ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com
 
+On Thu, Mar 07, 2019 at 03:21:47PM +0100, Thomas Huth wrote:
+> On 07/03/2019 15.16, Kevin Wolf wrote:
+> > Am 07.03.2019 um 09:14 hat Thomas Huth geschrieben:
+> >> On 07/03/2019 08.22, elena.ufimtseva@oracle.com wrote:
+> >>> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> >>>
+> >>> TODO: Make relevant changes to the doc.
+> >>>
+> >>> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> >>> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> >>> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> >>> ---
+> >>>  docs/devel/qemu-multiprocess.txt | 1109 ++++++++++++++++++++++++++++++++++++++
+> >>>  1 file changed, 1109 insertions(+)
+> >>>  create mode 100644 docs/devel/qemu-multiprocess.txt
+> >>>
+> >>> diff --git a/docs/devel/qemu-multiprocess.txt b/docs/devel/qemu-multiprocess.txt
+> >>> new file mode 100644
+> >>> index 0000000..e29c6c8
+> >>> --- /dev/null
+> >>> +++ b/docs/devel/qemu-multiprocess.txt
+> >>> @@ -0,0 +1,1109 @@
+> >>> +/*
+> >>> + * Copyright 2019, Oracle and/or its affiliates. All rights reserved.
+> >>> + *
+> >>> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> >>> + * of this software and associated documentation files (the "Software"), to deal
+> >>> + * in the Software without restriction, including without limitation the rights
+> >>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> >>> + * copies of the Software, and to permit persons to whom the Software is
+> >>> + * furnished to do so, subject to the following conditions:
+> >>> + *
+> >>> + * The above copyright notice and this permission notice shall be included in
+> >>> + * all copies or substantial portions of the Software.
+> >>> + *
+> >>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> >>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> >>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> >>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> >>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> >>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> >>> + * THE SOFTWARE.
+> >>> + */
+> >>
+> >> Somehow weird to see such a big license statement talking about
+> >> "software", but which applies to a text file only... Not sure if it is
+> >> an option for you, but maybe one of the Creative Common licenses
+> >> (dual-licensed with the GPLv2+) would be a better fit? E.g. for the QEMU
+> >> website, the content is dual-licensed: https://www.qemu.org/license.html
+> > 
+> > While we're talking about licenses, the "All rights reserved." notice is
+> > out of place in a license header that declares that a lot of permissions
+> > are granted. Better to remove it to avoid any ambiguities that could
+> > result from the contradiction. (Applies to the whole series.)
+> 
+> Apart from that, it is also not required for other work anymore. See:
+> 
+> https://en.wikipedia.org/wiki/All_rights_reserved
 
---AGZzQgpsuUlWC1xT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Interesting. Do folks know why the Linux Foundation does it?
 
-On Wed, Mar 06, 2019 at 07:55:31PM +0800, Peter Xu wrote:
-> +    /*
-> +     * We should do this as soon as we enter the thread, because the
-> +     * function will silently fail if it fails to acquire the
-> +     * gcontext.
-> +     */
-> +    g_main_context_push_thread_default(iothread->worker_context);
+See for example cf0d37aecc06801d4847fb36740da4a5690d9d45 (in the Linux kernel)
+where every change they stamp it with their 'All Rights Reserved'?
 
-I have a hard time understanding this comment.  The mention of how it
-fails makes me think "we'll never find out about failures anyway, so how
-does it help to call this early?".
-
-I suggest sticking to the point that this function must always be called
-first:
-
-  /*
-   * g_main_context_push_thread_default() must be called before anything
-   * in this new thread uses glib.
-   */
-
-Now people will think before moving this function call.
-
-Stefan
-
---AGZzQgpsuUlWC1xT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcgS1nAAoJEJykq7OBq3PIwQ0H/j98bNklG91RyMTwSsXFAqg0
-C/wtc6zCPbGfA7lCVV4e5CIxExgx+5WMWEFjacUq5+ZHMGWHlaanRhO8GvukRhcf
-cVe/5qKSBvaVSYq0emUacqqWF2386XIu3YKR96+YHhmhhTUVSy8uYVb7s5aNO0Di
-SiS/T07Ssg1x9XtBs0qElyMHyNSKOprWAF9Ayf+VsriaIFOFDqvrA5lt9qIb3U1T
-/1cfllSSheO3VzNl6hEnoedruiFAbwlmkEuNUQjb0tt1RrsxSZ/IjiOMScC296aS
-gcxYaqXnaOHyCg28jDm6aiV6o9FkGT9+qP3ZTrkLjIvIoYBYZvjnHQI9btXHgLY=
-=qZXY
------END PGP SIGNATURE-----
-
---AGZzQgpsuUlWC1xT--
+> 
+>  Thomas
