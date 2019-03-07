@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52066)
+Received: from eggs.gnu.org ([209.51.188.92]:52153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1qRo-0006kR-2J
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:21 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1qRr-0006mX-DL
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1qRl-0006Nc-4w
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:19 -0500
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:45028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1qRj-0006Fl-UE
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:16 -0500
-Received: by mail-wr1-x430.google.com with SMTP id w2so16801329wrt.11
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 02:40:08 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <13c59d63-1761-b61e-9cb9-039a3ef1be08@redhat.com>
-Date: Thu, 7 Mar 2019 11:40:05 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1h1qRp-0006PM-4t
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1qRo-0006FU-Oh
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 05:40:21 -0500
+Date: Thu, 7 Mar 2019 10:39:54 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190307103952.GC2811@work-vm>
+References: <20190307072215.9104-1-elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] converting build system to Meson?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307072215.9104-1-elena.ufimtseva@oracle.com>
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 21/37] multi-process:
+ QMP/HMP commands to add a device to the remote process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,139 +27,363 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: elena.ufimtseva@oracle.com
+Cc: qemu-devel@nongnu.org, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, berrange@redhat.com, armbru@redhat.com, eblake@redhat.com
 
-On 07/03/19 07:39, Thomas Huth wrote:
-> On 06/03/2019 19.12, Paolo Bonzini wrote:
->> Hi all,
->>
->> lately I have been thinking of converting the QEMU build system to
->> Meson.  Meson is a relatively new build system that can replace
->> Autotools or hand-written Makefiles such as QEMU; as a die-hard
->> Autotools fan, I must say that Meson is by far better than anything else
->> that has ever tried to replace Autotools, and actually has the potential
->> to do so.
->>
->> Advantages of Meson that directly matter for QEMU include:[...]
+* elena.ufimtseva@oracle.com (elena.ufimtseva@oracle.com) wrote:
+> From: Jagannathan Raman <jag.raman@oracle.com>
 > 
-> I'm not objecting a new build system per se, but could you elaborate on
->  problems of the current QEMU build system that will be fixed by this
-> change?
+> Adds rdevice_add QMP & HMP commands to hotplug device to a remote device.
+> 
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
+>  hmp-commands.hx         | 14 ++++++++
+>  hmp.h                   |  1 +
+>  hw/proxy/monitor.c      | 92 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/io/proxy-link.h |  2 ++
+>  include/monitor/qdev.h  |  4 +++
+>  monitor.c               |  5 +++
+>  qapi/misc.json          | 22 ++++++++++++
+>  remote/remote-main.c    | 48 ++++++++++++++++++++++++++
+>  8 files changed, 188 insertions(+)
+> 
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index fb3c8ba..7e8e8ab 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -727,6 +727,20 @@ ETEXI
+>  
+>  #if defined(CONFIG_MPQEMU)
+>      {
+> +        .name       = "rdevice_add",
+> +        .args_type  = "rdev_id:s,driver:s,id:s,drive:s,bus:s",
+> +        .params     = "rdev_id driver id drive bus",
+> +        .help       = "add device to remote proc, like -rdevice on the command line",
+> +        .cmd        = hmp_rdevice_add,
+> +    },
+> +
+> +STEXI
+> +@item rdevice_add @var{config}
+> +@findex rdevice_add
+> +Add device to remote proc.
+> +ETEXI
+> +
+> +    {
+>          .name       = "remote_proc_list",
+>          .args_type  = "",
+>          .params     = "",
+> diff --git a/hmp.h b/hmp.h
+> index 0940634..355a27e 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -150,5 +150,6 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+>  void hmp_info_sev(Monitor *mon, const QDict *qdict);
+>  void hmp_remote_proc_list(Monitor *mon, const QDict *qdict);
+> +void hmp_rdevice_add(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/hw/proxy/monitor.c b/hw/proxy/monitor.c
+> index 3005eec..2e2cda0 100644
+> --- a/hw/proxy/monitor.c
+> +++ b/hw/proxy/monitor.c
+> @@ -23,6 +23,7 @@
+>   */
+>  
+>  #include <sys/types.h>
+> +#include <string.h>
+>  
+>  #include "qemu/osdep.h"
+>  #include "qapi/qapi-types-block-core.h"
+> @@ -33,6 +34,13 @@
+>  #include "hw/boards.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/proxy/qemu-proxy.h"
+> +#include "qapi/qapi-commands-misc.h"
+> +#include "monitor/qdev.h"
+> +#include "qapi/qmp/qdict.h"
+> +#include "qapi/qmp/qjson.h"
+> +#include "qapi/qmp/qstring.h"
+> +#include "qapi/error.h"
+> +#include "io/proxy-link.h"
+>  
+>  /*
+>   * TODO: Is there a callback where the allocated memory for QMP could be free'd
+> @@ -87,3 +95,87 @@ void hmp_remote_proc_list(Monitor *mon, const QDict *qdict)
+>                         pdev->remote_pid, pdev->rid, id, k->command);
+>      }
+>  }
+> +
+> +static PCIProxyDev *get_proxy_device(QDict *qdict, Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(current_machine);
+> +    PCIProxyDev *pdev = NULL;
+> +    const char *rdev_id;
+> +
+> +    if (!qdict_haskey(qdict, "rdev_id")) {
+> +        error_setg(errp, "Please specify a value for rdev_id");
+> +        return NULL;
+> +    }
+> +
+> +    rdev_id = qdict_get_str(qdict, "rdev_id");
+> +
+> +    pdev = (PCIProxyDev *)g_hash_table_lookup(pcms->remote_devs, rdev_id);
+> +    if (!pdev) {
+> +        error_setg(errp,
+> +                   "No remote device by ID %s. Use query-remote command to get remote devices",
+> +                   rdev_id);
+> +    }
+> +
+> +    return pdev;
+> +}
+> +
+> +static void rdevice_add_del(QDict *qdict, proc_cmd_t cmd, Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(current_machine);
+> +    ProcMsg msg = {0};
+> +    PCIProxyDev *pdev = NULL;
+> +    const char *id;
+> +    QString *json;
+> +    int wait;
+> +
+> +    pdev = get_proxy_device(qdict, errp);
+> +    if (*errp) {
+> +        return;
+> +    }
+> +
+> +    qdict_del(qdict, "rdev_id");
+> +
+> +    id = qdict_get_str(qdict, "id");
+> +
+> +    json = qobject_to_json(QOBJECT(qdict));
+> +
+> +    wait = GET_REMOTE_WAIT;
+> +
+> +    msg.cmd = cmd;
+> +    msg.bytestream = 1;
+> +    msg.size = strlen(qstring_get_str(json));
+> +    msg.data2 = (uint8_t *)qstring_get_str(json);
+> +    msg.num_fds = 1;
+> +    msg.fds[0] = wait;
+> +
+> +    proxy_proc_send(pdev->proxy_link, &msg);
+> +    (void)wait_for_remote(wait);
+> +    PUT_REMOTE_WAIT(wait);
 
-In order of importance:
+Can this not fail? For example what happens if the external
+process dies just about here?
 
-- Make lacks introspection abilities; people want to be able to quickly
-say "I don't have this security issue because I didn't compile this
-file".  Make only gives you the build logs, which may not be easily
-accessible to the end user.
+> +    qstring_destroy_obj(QOBJECT(json));
 
-- Makefile.objs unnesting does not apply throughout the tree, for
-example it does not apply to tests.  We don't apply it there because it
-it is hard to extend Makefile.objs to dozens of targets and it would
-also be very very slow.  The result is lack of homogeneity between
-places that use Makefile.objs and places that use Makefile.include.
+All of this:
+    build some JSON
+    send it to the remote
+    wait for the response
 
-- Makefile.objs unnesting is hard to understand---granted, you rarely
-have to understand it because it mostly works, but we should consider
-whether it is a local optimum.  For example, how many people know how to
-add a dynamically-loadd module to Makefile.objs?
+all looks like something more generic than a device add/del - separate
+function?
 
-- The mix of recursive and non-recursive builds is hard to understand
-and slow, because we do the the Makefile.objs unnesting 20-30 times
-(once for every target).  We do spend time cleaning up warts left when
-contributors just hacked something together and reviewers lacked the
-expertise to notice that.
+> +    /* TODO: Only on success */
+> +    if (cmd == DEVICE_ADD) {
+> +        (void)g_hash_table_insert(pcms->remote_devs, (gpointer)g_strdup(id),
+> +                                  (gpointer)pdev);
+> +    }
+> +}
+> +
+> +void qmp_rdevice_add(QDict *qdict, QObject **ret_data, Error **errp)
+> +{
+> +    rdevice_add_del(qdict, DEVICE_ADD, errp);
+> +}
+> +
+> +void hmp_rdevice_add(Monitor *mon, const QDict *qdict)
+> +{
+> +    Error *err = NULL;
+> +
+> +    /* TODO: Is it OK to modify the QDict argument from HMP? */
+> +    rdevice_add_del((QDict *)qdict, DEVICE_ADD, &err);
+> +
+> +    if (err) {
+> +        monitor_printf(mon, "rdevice_add error: %s\n",
+> +                       error_get_pretty(err));
+> +        error_free(err);
+> +    }
+> +}
+> diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
+> index 175e2f1..8781508 100644
+> --- a/include/io/proxy-link.h
+> +++ b/include/io/proxy-link.h
+> @@ -60,6 +60,7 @@ typedef struct ProxyLinkState ProxyLinkState;
+>   * BAR_READ         Reads from PCI BAR region
+>   * SET_IRQFD        Sets the IRQFD to be used to raise interrupts directly
+>   *                  from remote device
+> + * DEVICE_ADD       QMP/HMP command to hotplug device
+>   *
+>   */
+>  typedef enum {
+> @@ -70,6 +71,7 @@ typedef enum {
+>      BAR_WRITE,
+>      BAR_READ,
+>      SET_IRQFD,
+> +    DEVICE_ADD,
+>      MAX,
+>  } proc_cmd_t;
+>  
+> diff --git a/include/monitor/qdev.h b/include/monitor/qdev.h
+> index 0ff3331..065701c 100644
+> --- a/include/monitor/qdev.h
+> +++ b/include/monitor/qdev.h
+> @@ -10,6 +10,10 @@ void hmp_info_qdm(Monitor *mon, const QDict *qdict);
+>  void hmp_info_qom_tree(Monitor *mon, const QDict *dict);
+>  void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp);
+>  
+> +#ifdef CONFIG_MPQEMU
+> +void qmp_rdevice_add(QDict *qdict, QObject **ret_data, Error **errp);
+> +#endif
+> +
 
-- Makefile errors (e.g. pointing to a nonexistent file) only show when
-trying to build the file, so that some errors may go unnoticed if they
-don't reproduce on your machine.  Meson always detects missing source
-files, independent of whether your build uses them.
+I don't think you need to bother ifdef'ing the headers
 
-FWIW and just to give an idea, I placed a quick (and of course untested)
-conversion of ui/Makefile.objs at the end of this message.
+>  int qdev_device_help(QemuOpts *opts);
+>  DeviceState *qdev_device_add(QemuOpts *opts, Error **errp);
+>  void qdev_set_id(DeviceState *dev, const char *id);
+> diff --git a/monitor.c b/monitor.c
+> index defa129..0ad52e5 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1155,6 +1155,11 @@ static void monitor_init_qmp_commands(void)
+>      qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
+>                           QCO_NO_OPTIONS);
+>  
+> +#ifdef CONFIG_MPQEMU
+> +    qmp_register_command(&qmp_commands, "rdevice_add", qmp_rdevice_add,
+> +                         QCO_NO_OPTIONS);
+> +#endif
+> +
+>      QTAILQ_INIT(&qmp_cap_negotiation_commands);
+>      qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities",
+>                           qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG);
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 8b3ca4f..28d49ea 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1663,6 +1663,28 @@
+>    'gen': false } # so we can get the additional arguments
+>  
+>  ##
+> +# @rdevice_add:
+> +#
+> +# @rdev_id: ID of the remote device root
+> +#
+> +# @driver: the name of the new device's driver
+> +#
+> +# @bus: the device's parent bus (device tree path)
+> +#
+> +# @id: the device's ID, must be unique
+> +#
+> +# Additional arguments depend on the type.
+> +#
+> +# Add a device.
+> +#
+> +# Since: 3.0
+> +##
+> +{ 'command': 'rdevice_add',
+> +  'data': {'rdev_id': 'str', 'driver': 'str', '*bus': 'str', '*id': 'str'},
+> +  'if': 'defined(CONFIG_MPQEMU)',
+> +  'gen': false } # so we can get the additional arguments
+> +
+> +##
+>  # @device_del:
+>  #
+>  # Remove a device from a guest
+> diff --git a/remote/remote-main.c b/remote/remote-main.c
+> index 4683e7d..03c14de 100644
+> --- a/remote/remote-main.c
+> +++ b/remote/remote-main.c
+> @@ -48,6 +48,11 @@
+>  #include "exec/memattrs.h"
+>  #include "exec/address-spaces.h"
+>  #include "remote/iohub.h"
+> +#include "qapi/qmp/qjson.h"
+> +#include "qapi/qmp/qobject.h"
+> +#include "qemu/option.h"
+> +#include "qemu/config-file.h"
+> +#include "monitor/qdev.h"
+>  
+>  static ProxyLinkState *proxy_link;
+>  PCIDevice *remote_pci_dev;
+> @@ -138,6 +143,44 @@ fail:
+>      PUT_REMOTE_WAIT(wait);
+>  }
+>  
+> +static void process_device_add_msg(ProcMsg *msg)
+> +{
+> +    Error *local_err = NULL;
+> +    const char *json = (const char *)msg->data2;
+> +    int wait = msg->fds[0];
+> +    QObject *qobj = NULL;
+> +    QDict *qdict = NULL;
+> +    QemuOpts *opts = NULL;
+> +
+> +    qobj = qobject_from_json(json, &local_err);
+> +    if (local_err) {
+> +        goto fail;
+> +    }
+> +
+> +    qdict = qobject_to(QDict, qobj);
+> +    assert(qdict);
+> +
+> +    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, &local_err);
+> +    if (local_err) {
+> +        goto fail;
+> +    }
+> +
+> +    (void)qdev_device_add(opts, &local_err);
+> +    if (local_err) {
+> +        goto fail;
+> +    }
+> +
+> +fail:
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +        /* TODO: communicate the exact error message to proxy */
+> +    }
+> +
+> +    notify_proxy(wait, 1);
+> +
+> +    PUT_REMOTE_WAIT(wait);
+> +}
+> +
+>  static void process_msg(GIOCondition cond)
+>  {
+>      ProcMsg *msg = NULL;
+> @@ -189,6 +232,9 @@ static void process_msg(GIOCondition cond)
+>      case SET_IRQFD:
+>          process_set_irqfd_msg(remote_pci_dev, msg);
+>          break;
+> +    case DEVICE_ADD:
+> +        process_device_add_msg(msg);
+> +        break;
 
-Paolo
+wrong patch?
 
-[1] https://clang.llvm.org/docs/JSONCompilationDatabase.html
+>      default:
+>          error_setg(&err, "Unknown command");
+>          goto finalize_loop;
+> @@ -225,6 +271,8 @@ int main(int argc, char *argv[])
+>  
+>      bdrv_init_with_whitelist();
+>  
+> +    qemu_add_opts(&qemu_device_opts);
+> +
 
----
-# This would be ui/meson.build:
-
-vnc_sources = source_set.source_set()
-vnc_sources.add([], files(
-    'vnc.c',
-    'vnc-auth-vencrypt.c',
-    'vnc-enc-hextile.c',
-    'vnc-enc-tight.c',
-    'vnc-enc-zlib.c',
-    'vnc-enc-zrle.c',
-    'vnc-jobs.c',
-    'vnc-palette.c',
-    'vnc-ws.c'))
-vnc_sources.add('CONFIG_VNC_SASL', files(
-    'vnc-auth-sasl.c'))
-
-common_obj.add([], files(
-    'console.c',
-    'cursor.c',
-    'kbd-state.c',
-    'keymaps.c',
-    'input.c',
-    'input-keymap.c',
-    'input-legacy.c',
-    'qemu-pixman.c'))
-common_obj.add('CONFIG_LINUX', files(
-    'input-linux.c'))
-common_obj.add('CONFIG_SPICE', files(
-    'spice-core.c',
-    'spice-input.c',
-    'spice-display.c'))
-common_obj.add('CONFIG_COCOA', files(
-    'cocoa.c'))
-common_obj.add_all('CONFIG_VNC', vnc_sources)
-common_obj.add('CONFIG_VNC',
-    if_false: files('vnc-stubs.c'))
-
-if opengl.found()
-    common_obj.add([], files(
-        'console-gl.c',
-        'egl-helpers.c',
-        'egl-context.c',
-        'shader.c'), dependencies: opengl)
-    common_obj.add('CONFIG_OPENGL_DMABUF', files(
-        'egl-headless.c'))
-endif
-
-if sdl.found()
-    sdl_sources = source_set.source_set()
-    sdl_sources.add([], files(
-        'sdl2.c',
-        'sdl2-2d.c',
-        'sdl2-input.c'), dependencies: sdl)
-    sdl_sources.add('CONFIG_X11', files(
-        'x_keymap.c'), dependencies: x11)
-    sdl_sources.add('CONFIG_OPENGL', files(
-        'sdl2-gl.c'), dependencies: opengl)
-    modules += { 'ui-sdl': sdl_sources }
-endif
-
-if curses.found()
-    curses_sources = source_set.source_set()
-    curses_sources.add([], files(
-        'curses.c'), dependencies: curses)
-    modules += { 'ui-curses': curses_sources }
-endif
-
-if gtk.found()
-    gtk_sources = source_set.source_set()
-    gtk_sources.add([], files(
-        'gtk.c'), dependencies: gtk)
-    gtk_sources.add('CONFIG_X11', files(
-        'x_keymap.c'), dependencies: x11)
-    gtk_sources.add('CONFIG_OPENGL', files(
-        'gtk-egl.c'), dependencies: opengl)
-    gtk_sources.add('CONFIG_GTK_GL', files(
-        'gtk-gl-area.c'))
-    modules += { 'ui-gtk': gtk_sources }
-fi
+wrong patch?
+>      if (qemu_init_main_loop(&err)) {
+>          error_report_err(err);
+>          return -EBUSY;
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
