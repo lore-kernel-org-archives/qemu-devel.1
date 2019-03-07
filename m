@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39207)
+Received: from eggs.gnu.org ([209.51.188.92]:39958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h1tZv-0001gq-EQ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:00:58 -0500
+	(envelope-from <slp@redhat.com>) id 1h1tcj-0003lN-2t
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:03:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h1tZo-0007EA-4n
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:00:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h1tZn-0007CC-UI
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:00:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h1tZm-0003BA-89
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 14:00:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 347A12E80CB
-	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 14:00:46 +0000 (UTC)
+	(envelope-from <slp@redhat.com>) id 1h1tcd-0002hF-Ax
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:03:49 -0500
+From: Sergio Lopez <slp@redhat.com>
+Date: Thu,  7 Mar 2019 15:03:12 +0100
+Message-Id: <20190307140312.28072-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Mar 2019 13:42:49 -0000
-From: "Heitor R. Alves de Siqueira" <1818880@bugs.launchpad.net>
-Reply-To: Bug 1818880 <1818880@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155189278546.17656.7588906080638087853.malonedeb@gac.canonical.com>
-Message-Id: <155196616980.17588.14829923828990835042.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818880] Re: Deadlock when detaching network
- interface
+Subject: [Qemu-devel] [PATCH] mirror: Confirm we're quiesced only if the job
+ is paused or cancelled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,164 +20,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, Sergio Lopez <slp@redhat.com>
 
-** Patch added: "Debdiff for xenial"
-   https://bugs.launchpad.net/cloud-archive/+bug/1818880/+attachment/524438=
-4/+files/xenial.debdiff
+While child_job_drained_begin() calls to job_pause(), the job doesn't
+actually transition between states until it runs again and reaches a
+pause point. This means bdrv_drained_begin() may return with some jobs
+using the node still having 'busy =3D=3D true'.
 
-** Description changed:
+As a consequence, block_job_detach_aio_context() may get into a
+deadlock, waiting for the job to be actually paused, while the coroutine
+servicing the job is yielding and doesn't get the opportunity to get
+scheduled again. This situation can be reproduced by issuing a
+'block-commit' immediately followed by a 'device_del'.
 
-  [Impact]
-  Qemu guests hang indefinitely
-  =
+To ensure bdrv_drained_begin() only returns when the jobs have been
+paused, we change mirror_drained_poll() to only confirm it's quiesced
+when job->paused =3D=3D true and there aren't any in-flight requests, exc=
+ept
+if we reached that point by a drained section initiated by the
+mirror/commit job itself.
 
-  [Description]
-  When running a Qemu guest with VirtIO network interfaces, detaching an in=
-terface that's currently being used can result in a deadlock. The guest ins=
-tance will hang and become unresponsive to commands, and the only option is=
- to kill -9 the instance.
-  The reason for this is a dealock between a monitor and an RCU thread, whi=
-ch will fight over the BQL (qemu_global_mutex) and the critical RCU section=
- locks. The monitor thread will acquire the BQL for detaching the network i=
-nterface, and fire up a helper thread to deal with detaching the network ad=
-apter. That new thread needs to wait on the RCU thread to complete the dele=
-tion, but the RCU thread wants the BQL to commit its transactions.
-  This bug is already fixed upstream (73c6e4013b4c rcu: completely disable =
-pthread_atfork callbacks as soon as possible) and included for other series=
- (see below), so we don't need to backport it to Bionic onwards.
-  =
+The other block jobs shouldn't need any changes, as the default
+drained_poll() behavior is to only confirm it's quiesced if the job is
+not busy or completed.
 
-  Upstream commit:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D73c6e4013b4c
-  =
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+ block/mirror.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-  $ git describe --contains 73c6e4013b4c
-  v2.10.0-rc2~1^2~8
-  =
-
-  $ rmadison qemu
-  =3D=3D=3D> qemu | 1:2.5+dfsg-5ubuntu10.34 | xenial-updates/universe   | a=
-md64, ...
--      qemu | 1:2.11+dfsg-1ubuntu7    | bionic/universe           | amd64, =
-...
--      qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/universe           | amd64, =
-...
--      qemu | 1:3.1+dfsg-2ubuntu2     | disco/universe            | amd64, =
-...
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.11+dfsg-1ubuntu7    | bionic/uni=
-verse           | amd64, ...
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/uni=
-verse           | amd64, ...
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:3.1+dfsg-2ubuntu2     | disco/univ=
-erse            | amd64, ...
-  =
-
-  [Test Case]
-  Being a racing condition, this is a tricky bug to reproduce consistently.=
- We've had reports of users running into this with OpenStack deployments an=
-d Windows Server guests, and the scenario is usually like this:
-  1) Deploy a 16vCPU Windows Server 2012 R2 guest with a virtio network int=
-erface
-  2) Stress the network interface with e.g. Windows HLK test suite or simil=
-ar
-  3) Repeatedly attach/detach the network adapter that's in use
-  It usually takes more than ~4000 attach/detach cycles to trigger the bug.
-  =
-
-  [Regression Potential]
-- Regressions for this might arise from the fact that the fix changes RCU l=
-ock code. Since this patch has been upstream and in other series for a whil=
-e, it's unlikely that it would regressions in RCU code specifically. Other =
-code that makes use of the RCU locks (MMIO and some monitor events) will be=
- thoroughly tested for any regressions with autokpkgtest and scripted Qemu =
-runs.
-+ Regressions for this might arise from the fact that the fix changes RCU l=
-ock code. Since this patch has been upstream and in other series for a whil=
-e, it's unlikely that it would regressions in RCU code specifically. Other =
-code that makes use of the RCU locks (MMIO and some monitor events) will be=
- thoroughly tested for any regressions with use-case scenarios and scripted=
- runs.
-
-** Tags added: sts-sponsor
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818880
-
-Title:
-  Deadlock when detaching network interface
-
-Status in Ubuntu Cloud Archive:
-  Confirmed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Confirmed
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
-
-Bug description:
-  [Impact]
-  Qemu guests hang indefinitely
-
-  [Description]
-  When running a Qemu guest with VirtIO network interfaces, detaching an in=
-terface that's currently being used can result in a deadlock. The guest ins=
-tance will hang and become unresponsive to commands, and the only option is=
- to kill -9 the instance.
-  The reason for this is a dealock between a monitor and an RCU thread, whi=
-ch will fight over the BQL (qemu_global_mutex) and the critical RCU section=
- locks. The monitor thread will acquire the BQL for detaching the network i=
-nterface, and fire up a helper thread to deal with detaching the network ad=
-apter. That new thread needs to wait on the RCU thread to complete the dele=
-tion, but the RCU thread wants the BQL to commit its transactions.
-  This bug is already fixed upstream (73c6e4013b4c rcu: completely disable =
-pthread_atfork callbacks as soon as possible) and included for other series=
- (see below), so we don't need to backport it to Bionic onwards.
-
-  Upstream commit:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D73c6e4013b4c
-
-  $ git describe --contains 73c6e4013b4c
-  v2.10.0-rc2~1^2~8
-
-  $ rmadison qemu
-  =3D=3D=3D> qemu | 1:2.5+dfsg-5ubuntu10.34 | xenial-updates/universe   | a=
-md64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.11+dfsg-1ubuntu7    | bionic/uni=
-verse           | amd64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:2.12+dfsg-3ubuntu8    | cosmic/uni=
-verse           | amd64, ...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu | 1:3.1+dfsg-2ubuntu2     | disco/univ=
-erse            | amd64, ...
-
-  [Test Case]
-  Being a racing condition, this is a tricky bug to reproduce consistently.=
- We've had reports of users running into this with OpenStack deployments an=
-d Windows Server guests, and the scenario is usually like this:
-  1) Deploy a 16vCPU Windows Server 2012 R2 guest with a virtio network int=
-erface
-  2) Stress the network interface with e.g. Windows HLK test suite or simil=
-ar
-  3) Repeatedly attach/detach the network adapter that's in use
-  It usually takes more than ~4000 attach/detach cycles to trigger the bug.
-
-  [Regression Potential]
-  Regressions for this might arise from the fact that the fix changes RCU l=
-ock code. Since this patch has been upstream and in other series for a whil=
-e, it's unlikely that it would regressions in RCU code specifically. Other =
-code that makes use of the RCU locks (MMIO and some monitor events) will be=
- thoroughly tested for any regressions with use-case scenarios and scripted=
- runs.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1818880/+subscriptions
+diff --git a/block/mirror.c b/block/mirror.c
+index 726d3c27fb..b7f076f97c 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -80,6 +80,7 @@ typedef struct MirrorBlockJob {
+     bool initial_zeroing_ongoing;
+     int in_active_write_counter;
+     bool prepared;
++    bool in_drain;
+ } MirrorBlockJob;
+=20
+ typedef struct MirrorBDSOpaque {
+@@ -679,9 +680,11 @@ static int mirror_exit_common(Job *job)
+=20
+         /* The mirror job has no requests in flight any more, but we nee=
+d to
+          * drain potential other users of the BDS before changing the gr=
+aph. */
++        s->in_drain =3D true;
+         bdrv_drained_begin(target_bs);
+         bdrv_replace_node(to_replace, target_bs, &local_err);
+         bdrv_drained_end(target_bs);
++        s->in_drain =3D false;
+         if (local_err) {
+             error_report_err(local_err);
+             ret =3D -EPERM;
+@@ -717,6 +720,7 @@ static int mirror_exit_common(Job *job)
+     bs_opaque->job =3D NULL;
+=20
+     bdrv_drained_end(src);
++    s->in_drain =3D false;
+     bdrv_unref(mirror_top_bs);
+     bdrv_unref(src);
+=20
+@@ -1000,10 +1004,12 @@ static int coroutine_fn mirror_run(Job *job, Erro=
+r **errp)
+              */
+             trace_mirror_before_drain(s, cnt);
+=20
++            s->in_drain =3D true;
+             bdrv_drained_begin(bs);
+             cnt =3D bdrv_get_dirty_count(s->dirty_bitmap);
+             if (cnt > 0 || mirror_flush(s) < 0) {
+                 bdrv_drained_end(bs);
++                s->in_drain =3D false;
+                 continue;
+             }
+=20
+@@ -1051,6 +1057,7 @@ immediate_exit:
+     bdrv_dirty_iter_free(s->dbi);
+=20
+     if (need_drain) {
++        s->in_drain =3D true;
+         bdrv_drained_begin(bs);
+     }
+=20
+@@ -1119,6 +1126,16 @@ static void coroutine_fn mirror_pause(Job *job)
+ static bool mirror_drained_poll(BlockJob *job)
+ {
+     MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common);
++
++    /* If the job isn't paused nor cancelled, we can't be sure that it w=
+on't
++     * issue more requets. We make an exception if we've reached this po=
+int
++     * from one of our own drain sections, to avoid a deadlock waiting f=
+or
++     * ourselves.
++     */
++    if (!s->common.job.paused && !s->common.job.cancelled && !s->in_drai=
+n) {
++        return true;
++    }
++
+     return !!s->in_flight;
+ }
+=20
+--=20
+2.20.1
