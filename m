@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39900)
+Received: from eggs.gnu.org ([209.51.188.92]:39952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrD-0003h9-1X
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:00 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrH-0003kF-5k
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrB-0008Ss-VF
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:59 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:42118)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h1wrG-000069-80
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:03 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:46334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h1wrB-0008SP-NL
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:30:57 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id r5so18400785wrg.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:30:57 -0800 (PST)
+	id 1h1wrF-00005E-Vt
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 12:31:02 -0500
+Received: by mail-wr1-x430.google.com with SMTP id i16so18390203wrs.13
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 09:31:01 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Mar 2019 18:29:51 +0100
-Message-Id: <1551979804-6060-45-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Mar 2019 18:29:54 +0100
+Message-Id: <1551979804-6060-48-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
 References: <1551979804-6060-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 44/57] tests: move virtio entirely to qos-test
+Subject: [Qemu-devel] [PULL 47/57] qos-test: ipoctal232 test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,158 +28,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, lviver@redhat.com
+Cc: thuth@redhat.com, lviver@redhat.com, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-The only remaining test that needs libqos-virtio-obj-y is drive_del-test,
-which really only needs a function.  Move that function to the test
-and remove libqos-virtio-obj-y.
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
+Convert tests/ipoctal232-test to a driver node; currently it runs
+the PCI nop test only, therefore we're not placing it in tests/libqos.
+
+This test creates a tpci200 node that produces an interface ipack
+consumed by the ipoctal232 device.
+
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |  9 ++++-----
- tests/drive_del-test.c | 25 +++++++++++++++++++------
- tests/libqos/virtio.c  | 18 ------------------
- tests/libqos/virtio.h  |  1 -
- 4 files changed, 23 insertions(+), 30 deletions(-)
+ tests/Makefile.include  |  5 +----
+ tests/ipoctal232-test.c | 35 ++++++++++++++++++++++++++---------
+ 2 files changed, 27 insertions(+), 13 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 09483d0..b4b53ca 100644
+index 905a361..3eaa888 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -161,7 +161,6 @@ check-qtest-pci-$(CONFIG_NE2000_PCI) += tests/ne2000-test$(EXESUF)
- check-qtest-pci-$(CONFIG_NVME_PCI) += tests/nvme-test$(EXESUF)
- check-qtest-pci-$(CONFIG_AC97) += tests/ac97-test$(EXESUF)
- check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
--check-qtest-pci-$(CONFIG_VIRTIO) += $(check-qtest-virtio-y)
- check-qtest-pci-$(CONFIG_IPACK) += tests/tpci200-test$(EXESUF)
- check-qtest-pci-$(CONFIG_IPACK) += $(check-qtest-ipack-y)
- check-qtest-pci-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
-@@ -254,7 +253,6 @@ check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_USB_UHCI) += tests/usb-hcd-uhci-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
--check-qtest-ppc64-$(CONFIG_VIRTIO) += $(check-qtest-virtio-y)
- check-qtest-ppc64-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
- check-qtest-ppc64-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-ppc64-$(CONFIG_RTL8139_PCI) += tests/test-filter-redirector$(EXESUF)
-@@ -728,18 +726,19 @@ libqos-pc-obj-y += tests/libqos/ahci.o
- libqos-omap-obj-y = $(libqos-obj-y) tests/libqos/i2c-omap.o
- libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
- libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
--libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o
+@@ -151,8 +151,6 @@ check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
+ check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
+ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
  
- # Devices
- qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
- qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
- qos-test-obj-y += tests/libqos/e1000e.o
- qos-test-obj-y += tests/libqos/sdhci.o
--qos-test-obj-y += $(libqos-virtio-obj-y)
-+qos-test-obj-y += tests/libqos/virtio.o
- qos-test-obj-$(CONFIG_VIRTFS) += tests/libqos/virtio-9p.o
- qos-test-obj-y += tests/libqos/virtio-balloon.o
- qos-test-obj-y += tests/libqos/virtio-blk.o
-+qos-test-obj-y += tests/libqos/virtio-mmio.o
- qos-test-obj-y += tests/libqos/virtio-net.o
-+qos-test-obj-y += tests/libqos/virtio-pci.o
- qos-test-obj-y += tests/libqos/virtio-rng.o
- qos-test-obj-y += tests/libqos/virtio-scsi.o
- qos-test-obj-y += tests/libqos/virtio-serial.o
-@@ -819,7 +818,7 @@ tests/qom-test$(EXESUF): tests/qom-test.o
+-check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
+-
+ check-qtest-pci-y += tests/e1000-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
+@@ -160,7 +158,6 @@ check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_NE2000_PCI) += tests/ne2000-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_NVME_PCI) += tests/nvme-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
+-check-qtest-pci-$(CONFIG_IPACK) += $(check-qtest-ipack-y)
+ check-qtest-pci-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_HDA) += tests/intel-hda-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) += tests/ivshmem-test$(EXESUF)
+@@ -755,6 +752,7 @@ qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+ # Tests
+ qos-test-obj-y += tests/ac97-test.o
+ qos-test-obj-y += tests/e1000e-test.o
++qos-test-obj-y += tests/ipoctal232-test.o
+ qos-test-obj-y += tests/pci-test.o
+ qos-test-obj-y += tests/sdhci-test.o
+ qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test.o $(chardev-obj-y) $(test-io-obj-y)
+@@ -812,7 +810,6 @@ tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
+ tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
+ tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
+ tests/display-vga-test$(EXESUF): tests/display-vga-test.o
+-tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
+ tests/qom-test$(EXESUF): tests/qom-test.o
  tests/test-hmp$(EXESUF): tests/test-hmp.o
  tests/machine-none-test$(EXESUF): tests/machine-none-test.o
- tests/device-plug-test$(EXESUF): tests/device-plug-test.o
--tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-obj-y)
-+tests/drive_del-test$(EXESUF): tests/drive_del-test.o
- tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
- tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
- tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
-diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
-index 4a1a088..2f9474e 100644
---- a/tests/drive_del-test.c
-+++ b/tests/drive_del-test.c
-@@ -63,6 +63,24 @@ static void test_drive_without_dev(void)
-     qtest_end();
+diff --git a/tests/ipoctal232-test.c b/tests/ipoctal232-test.c
+index 6849141..42d5371 100644
+--- a/tests/ipoctal232-test.c
++++ b/tests/ipoctal232-test.c
+@@ -9,23 +9,40 @@
+ 
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
++#include "libqos/qgraph.h"
++
++typedef struct QIpoctal232 QIpoctal232;
++
++struct QIpoctal232 {
++    QOSGraphObject obj;
++};
+ 
+ /* Tests only initialization so far. TODO: Replace with functional tests */
+-static void nop(void)
++static void nop(void *obj, void *data, QGuestAllocator *alloc)
+ {
  }
  
-+/*
-+ * qvirtio_get_dev_type:
-+ * Returns: the preferred virtio bus/device type for the current architecture.
-+ * TODO: delete this
-+ */
-+static const char *qvirtio_get_dev_type(void)
-+{
-+    const char *arch = qtest_get_arch();
-+
-+    if (g_str_equal(arch, "arm") || g_str_equal(arch, "aarch64")) {
-+        return "device";  /* for virtio-mmio */
-+    } else if (g_str_equal(arch, "s390x")) {
-+        return "ccw";
-+    } else {
-+        return "pci";
-+    }
+-int main(int argc, char **argv)
++static void *ipoctal232_create(void *pci_bus, QGuestAllocator *alloc,
++                               void *addr)
+ {
+-    int ret;
++    QIpoctal232 *ipoctal232 = g_new0(QIpoctal232, 1);
+ 
+-    g_test_init(&argc, &argv, NULL);
+-    qtest_add_func("/ipoctal232/tpci200/nop", nop);
++    return &ipoctal232->obj;
 +}
-+
- static void test_after_failed_device_add(void)
- {
-     char driver[32];
-@@ -119,16 +137,11 @@ static void test_drive_del_device_del(void)
  
- int main(int argc, char **argv)
- {
--    const char *arch = qtest_get_arch();
--
-     g_test_init(&argc, &argv, NULL);
+-    qtest_start("-device tpci200,id=ipack0 -device ipoctal232,bus=ipack0.0");
+-    ret = g_test_run();
++static void ipoctal232_register_nodes(void)
++{
++    qos_node_create_driver("ipoctal232", ipoctal232_create);
++    qos_node_consumes("ipoctal232", "ipack", &(QOSGraphEdgeOptions) {
++        .extra_device_opts = "bus=ipack0.0",
++    });
++}
  
-     qtest_add_func("/drive_del/without-dev", test_drive_without_dev);
+-    qtest_end();
++libqos_init(ipoctal232_register_nodes);
  
--    /* TODO I guess any arch with a hot-pluggable virtio bus would do */
--    if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64") ||
--        !strcmp(arch, "ppc") || !strcmp(arch, "ppc64") ||
--        !strcmp(arch, "s390x")) {
-+    if (qvirtio_get_dev_type() != NULL) {
-         qtest_add_func("/drive_del/after_failed_device_add",
-                        test_after_failed_device_add);
-         qtest_add_func("/blockdev/drive_del_device_del",
-diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
-index e4925d1..5e8f39b 100644
---- a/tests/libqos/virtio.c
-+++ b/tests/libqos/virtio.c
-@@ -350,24 +350,6 @@ void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx)
-     writew(vq->avail + 4 + (2 * vq->size), idx);
+-    return ret;
++static void register_ipoctal232_test(void)
++{
++    qos_add_test("nop", "ipoctal232", nop, NULL);
  }
- 
--/*
-- * qvirtio_get_dev_type:
-- * Returns: the preferred virtio bus/device type for the current architecture.
-- * TODO: delete this
-- */
--const char *qvirtio_get_dev_type(void)
--{
--    const char *arch = qtest_get_arch();
--
--    if (g_str_equal(arch, "arm") || g_str_equal(arch, "aarch64")) {
--        return "device";  /* for virtio-mmio */
--    } else if (g_str_equal(arch, "s390x")) {
--        return "ccw";
--    } else {
--        return "pci";
--    }
--}
--
- void qvirtio_start_device(QVirtioDevice *vdev)
- {
-     qvirtio_reset(vdev);
-diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
-index 3f97d79..51d2359 100644
---- a/tests/libqos/virtio.h
-+++ b/tests/libqos/virtio.h
-@@ -142,7 +142,6 @@ bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t *desc_idx, uint32_t *len);
- 
- void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx);
- 
--const char *qvirtio_get_dev_type(void);
- void qvirtio_start_device(QVirtioDevice *vdev);
- 
- #endif
++
++libqos_init(register_ipoctal232_test);
 -- 
 1.8.3.1
