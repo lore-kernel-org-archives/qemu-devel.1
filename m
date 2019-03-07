@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52712)
+Received: from eggs.gnu.org ([209.51.188.92]:54757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1ghl-0006fO-ML
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:16:10 -0500
+	(envelope-from <philmd@redhat.com>) id 1h1gxq-0000uR-O4
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:32:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1ghk-00048q-H9
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:16:09 -0500
-Resent-Message-Id: <E1h1ghk-00048q-H9@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h1ghk-00044y-7n
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:16:08 -0500
-Message-ID: <155191774565.30942.10544186869652280643@6acff2cf482b>
-In-Reply-To: <20190305172139.32662-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philmd@redhat.com>) id 1h1gxp-0001JG-Pp
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:32:46 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39900)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h1gxp-0001Iv-Jb
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:32:45 -0500
+Received: by mail-wm1-f66.google.com with SMTP id z84so7596838wmg.4
+	for <qemu-devel@nongnu.org>; Wed, 06 Mar 2019 16:32:44 -0800 (PST)
+References: <cover.1551902740.git.balaton@eik.bme.hu>
+	<12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>
+Date: Thu, 7 Mar 2019 01:32:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 6 Mar 2019 16:15:46 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Enable build and install of our
- rST docs
+In-Reply-To: <12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5-resend 2/2] mips_fulong2e: Add on-board
+ graphics chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, amarkovic@wavecomp.com
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNTE3MjEzOS4zMjY2
-Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA1MTcyMTM5
-LjMyNjYyLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0ggdjMgMDAvMTJdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
-OTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
-MDE5MDMwNTE3MjEzOS4zMjY2Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjM2ZDZiZjExYTYgTUFJTlRBSU5FUlM6IEFkZCBlbnRyeSBm
-b3IgU3BoaW54IGRvY3VtZW50YXRpb24gaW5mcmFzdHJ1Y3R1cmUKZWExNTM3NzY0NCBkb2NzL2Nv
-bmYucHk6IERvbid0IGhhcmQtY29kZSBRRU1VIHZlcnNpb24KNTVlMzBjN2FjMiBNYWtlZmlsZTog
-QWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVyc2lvbiIgY29kZQphOTRhZWExYTZiIE1h
-a2VmaWxlLCBjb25maWd1cmU6IFN1cHBvcnQgYnVpbGRpbmcgclNUIGRvY3VtZW50YXRpb24KYWVk
-NjQwYjhjNiBkb2NzOiBQcm92aWRlIHNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdl
-IHdhbnQKNzg5MjdlZTMwNyBkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCjEx
-YTY2OWZhZDAgZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwg
-YnVpbGQKMDYwZWNhZWQ0ZiBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3Rlcicg
-dGhlbWUKOGQxYzNmNzhlYSBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGly
-ZWN0b3J5CjlkNWMxZjc5OTIgZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngt
-cXVpY2tzdGFydApkYjhkZmMwZGY1IGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9y
-bWF0Cjc5MWE0Mzk3YTYgZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgNzkxYTQzOTdhNmM0
-IChkb2NzL2NwdS1ob3RwbHVnLnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzEyIENoZWNr
-aW5nIGNvbW1pdCBkYjhkZmMwZGY1MTMgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
-Zm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNjogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVt
-b3J5LnR4dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzEyIENoZWNraW5nIGNvbW1p
-dCA5ZDVjMWY3OTkyMzkgKGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1
-aWNrc3RhcnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTIg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMiBDaGVja2luZyBjb21taXQgOGQxYzNmNzhl
-YTM2IChkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5KQo1LzEy
-IENoZWNraW5nIGNvbW1pdCAwNjBlY2FlZDRmMGYgKGRvY3MvY29uZi5weTogQ29uZmlndXJlIHRo
-ZSAnYWxhYmFzdGVyJyB0aGVtZSkKNi8xMiBDaGVja2luZyBjb21taXQgMTFhNjY5ZmFkMDFjIChk
-b2NzL2NvbmYucHk6IERvbid0IGluY2x1ZGUgclNUIHNvdXJjZXMgaW4gSFRNTCBidWlsZCkKNy8x
-MiBDaGVja2luZyBjb21taXQgNzg5MjdlZTMwN2Y1IChkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0
-aW9uIHdhcm5pbmdzKQo4LzEyIENoZWNraW5nIGNvbW1pdCBhZWQ2NDBiOGM2YzIgKGRvY3M6IFBy
-b3ZpZGUgc2VwYXJhdGUgY29uZi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudCkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMTAyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojMTg3OiBGSUxFOiBkb2NzL2ludGVyb3AvY29uZi5weToxNToKK2h0bWxfdGhl
-bWVfb3B0aW9uc1snZGVzY3JpcHRpb24nXSA9IHUnU3lzdGVtIEVtdWxhdGlvbiBNYW5hZ2VtZW50
-IGFuZCBJbnRlcm9wZXJhYmlsaXR5IEd1aWRlJwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdz
-LCAxMzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKOS8xMiBDaGVja2luZyBjb21taXQgYTk0YWVhMWE2YjUzIChNYWtlZmlsZSwgY29uZmlndXJl
-OiBTdXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uKQoxMC8xMiBDaGVja2luZyBjb21t
-aXQgNTVlMzBjN2FjMmI0IChNYWtlZmlsZTogQWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtn
-dmVyc2lvbiIgY29kZSkKMTEvMTIgQ2hlY2tpbmcgY29tbWl0IGVhMTUzNzc2NDQ4MSAoZG9jcy9j
-b25mLnB5OiBEb24ndCBoYXJkLWNvZGUgUUVNVSB2ZXJzaW9uKQoxMi8xMiBDaGVja2luZyBjb21t
-aXQgMzZkNmJmMTFhNmZkIChNQUlOVEFJTkVSUzogQWRkIGVudHJ5IGZvciBTcGhpbnggZG9jdW1l
-bnRhdGlvbiBpbmZyYXN0cnVjdHVyZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAzMDUxNzIxMzkuMzI2NjItMS1wZXRlci5tYXlkZWxsQGxp
-bmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 3/6/19 9:05 PM, BALATON Zoltan wrote:
+> Add (partial) emulation of the on-board GPU of the machine. This
+> allows the PMON2000 firmware to run and should also work with Linux
+> console but probably not with X yet.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Reviewed-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+
+Mojibaked again :(
+
+Aleksandar, if you take this series, do you mind fixing with:
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Thanks!
+
+Phil.
+
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  hw/mips/mips_fulong2e.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+> index fbbc543eed..f877693766 100644
+> --- a/hw/mips/mips_fulong2e.c
+> +++ b/hw/mips/mips_fulong2e.c
+> @@ -287,6 +287,7 @@ static void mips_fulong2e_init(MachineState *machine)
+>      I2CBus *smbus;
+>      MIPSCPU *cpu;
+>      CPUMIPSState *env;
+> +    DeviceState *dev;
+>  
+>      /* init CPUs */
+>      cpu = MIPS_CPU(cpu_create(machine->cpu_type));
+> @@ -347,6 +348,11 @@ static void mips_fulong2e_init(MachineState *machine)
+>      vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
+>                                 &smbus, &isa_bus);
+>  
+> +    /* GPU */
+> +    dev = DEVICE(pci_create(pci_bus, -1, "ati-vga"));
+> +    qdev_prop_set_uint16(dev, "x-device-id", 0x5159);
+> +    qdev_init_nofail(dev);
+> +
+>      /* Populate SPD eeprom data */
+>      spd_data = spd_data_generate(DDR, ram_size, &err);
+>      if (err) {
+> 
