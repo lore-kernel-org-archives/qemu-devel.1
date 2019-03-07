@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60117)
+Received: from eggs.gnu.org ([209.51.188.92]:60122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMa-0002lw-CJ
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMa-0002m7-JP
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMX-0005in-H7
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:42 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:50788)
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMY-0005jh-JX
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:44 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:48722)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1h1nMU-0005fG-ND
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:39 -0500
+	id 1h1nMW-0005gb-Lv
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:41 -0500
 From: elena.ufimtseva@oracle.com
-Date: Wed,  6 Mar 2019 23:22:20 -0800
-Message-Id: <20190307072220.9207-1-elena.ufimtseva@oracle.com>
-Subject: [Qemu-devel] [multiprocess RFC PATCH 23/37] multi-process: add
- command line options rdrive and rdevice
+Date: Wed,  6 Mar 2019 23:22:26 -0800
+Message-Id: <20190307072226.9362-1-elena.ufimtseva@oracle.com>
+Subject: [Qemu-devel] [multiprocess RFC PATCH 25/37] multi-process:
+ configure remote side devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,130 +24,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com
+Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, berrange@redhat.com
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-These command option have the same notion as the drive and device,
-except these will be emulated in remote process.
-Added parameter rid identified the remote process group.
-
-As an example, this will create the device emulated by the remote
-process:
-
-/usr/local/bin/qemu-system-x86_64 -name vm -m 6G -drive file=/root/ol7.qcow2,format=raw
- -enable-kvm -machine q35,accel=kvm
- -rdevice lsi53c895a,rid=0,id=scsi0,command=qemu-scsi-dev
- -rdevice scsi-hd,rid=0,drive=drive0,bus=scsi0.0,scsi-id=0
- -rdrive id=drive0,rid=0,file=/root/cirros-0.4.0-x86_64-disk.img,format=qcow3
- -object memory-backend-file,id=mem,mem-path=/dev/shm/,size=6G,share=on -numa node,memdev=mem
- -display none -vnc :0 -monitor stdio
+Add functions to configure remote devices.
 
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- blockdev.c              | 12 ++++++++++++
- include/sysemu/sysemu.h |  2 ++
- qdev-monitor.c          |  9 +++++++++
- qemu-options.hx         | 26 ++++++++++++++++++++++++++
- 4 files changed, 49 insertions(+)
+ hw/proxy/qemu-proxy.c         | 41 +++++++++++++++++++++++++++++++++++++++--
+ include/hw/proxy/qemu-proxy.h |  2 ++
+ include/io/proxy-link.h       |  2 ++
+ 3 files changed, 43 insertions(+), 2 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 7e6bf99..c03a09f 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -4580,3 +4580,15 @@ QemuOptsList qemu_drive_opts = {
-         { /* end of list */ }
-     },
- };
+diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+index f519beb..9d075ec 100644
+--- a/hw/proxy/qemu-proxy.c
++++ b/hw/proxy/qemu-proxy.c
+@@ -52,6 +52,7 @@
+ #include "util/event_notifier-posix.c"
+ #include "hw/i386/pc.h"
+ #include "hw/boards.h"
++#include "include/qemu/log.h"
+ 
+ /*
+  * TODO: kvm_vm_ioctl is only available for per-target objects (NEED_CPU_H).
+@@ -61,6 +62,40 @@
+ int kvm_vm_ioctl(KVMState *s, int type, ...);
+ 
+ static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
++static void setup_irqfd(PCIProxyDev *dev);
 +
-+QemuOptsList qemu_rdrive_opts = {
-+    .name = "rdrive",
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_rdrive_opts.head),
-+    .desc = {
-+        /*
-+         * no elements => accept any params
-+         * validation will happen later
-+         */
-+        { /* end of list */ }
-+    },
-+};
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 89604a8..82622be 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -193,5 +193,7 @@ extern QemuOptsList qemu_nic_opts;
- extern QemuOptsList qemu_net_opts;
- extern QemuOptsList qemu_global_opts;
- extern QemuOptsList qemu_mon_opts;
-+extern QemuOptsList qemu_rdevice_opts;
-+extern QemuOptsList qemu_rdrive_opts;
- 
- #endif
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 46d0ad0..eb7e542 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -964,6 +964,15 @@ QemuOptsList qemu_global_opts = {
-     },
- };
- 
-+QemuOptsList qemu_rdevice_opts = {
-+    .name = "rdevice",
-+    .implied_opt_name = "driver",
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_rdevice_opts.head),
-+    .desc = {
-+        { /* end of list */ }
-+    },
-+};
++static void proxy_ready(PCIDevice *dev)
++{
++    PCIProxyDev *pdev = PCI_PROXY_DEV(dev);
 +
- int qemu_global_option(const char *str)
- {
-     char driver[64], property[64];
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 1cf9aac..0b82013 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -535,6 +535,17 @@ Like the KCS interface, but defines a BT interface.  The default port is
- 
- ETEXI
- 
-+DEF("rdevice", HAS_ARG, QEMU_OPTION_rdevice,
-+    "-rdevice driver[,prop[=value][,...]]\n"
-+    "                add device (based on driver)\n"
-+    "                prop=value,... sets driver properties\n"
-+    "                use '-device help' to print all possible drivers\n"
-+    "                use '-device driver,help' to print all possible properties\n",
-+    QEMU_ARCH_ALL)
-+STEXI
-+Remote device options.
-+ETEXI
++    setup_irqfd(pdev);
++}
 +
- DEF("name", HAS_ARG, QEMU_OPTION_name,
-     "-name string1[,process=string2][,debug-threads=on|off]\n"
-     "                set the name of the guest\n"
-@@ -786,6 +797,21 @@ Please refer to the QAPI documentation of the @code{blockdev-add} QMP command.
- 
- ETEXI
- 
-+DEF("rdrive", HAS_ARG, QEMU_OPTION_rdrive,
-+    "-rdrive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
-+    "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
-+    "       [,snapshot=on|off][,rerror=ignore|stop|report]\n"
-+    "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
-+    "       [,readonly=on|off][,copy-on-read=on|off]\n"
-+    "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
-+    "       [[,bps=b]|[[,bps_rd=r][,bps_wr=w]]]\n"
-+    "       [[,iops=i]|[[,iops_rd=r][,iops_wr=w]]]\n"
-+    "       [[,bps_max=bm]|[[,bps_rd_max=rm][,bps_wr_max=wm]]]\n"
-+    "       [[,iops_max=im]|[[,iops_rd_max=irm][,iops_wr_max=iwm]]]\n"
-+    "       [[,iops_size=is]]\n"
-+    "       [[,group=g]]\n"
-+    "                use 'file' as a drive image\n", QEMU_ARCH_ALL)
++static void set_remote_opts(PCIDevice *dev, QDict *qdict, unsigned int cmd)
++{
++    QString *qstr;
++    ProcMsg msg;
++    const char *str;
++    PCIProxyDev *pdev;
 +
- DEF("drive", HAS_ARG, QEMU_OPTION_drive,
-     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
-     "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
++    pdev = PCI_PROXY_DEV(dev);
++
++    qstr = qobject_to_json(QOBJECT(qdict));
++    str = qstring_get_str(qstr);
++    qemu_log_mask(LOG_REMOTE_DEBUG, "remote qdict in proxy: %s.\n", str);
++
++    memset(&msg, 0, sizeof(ProcMsg));
++
++    msg.data2 = (uint8_t *)str;
++    msg.cmd = cmd;
++    msg.bytestream = 1;
++    msg.size = qstring_get_length(qstr) + 1;
++    msg.num_fds = 0;
++
++    proxy_proc_send(pdev->proxy_link, &msg);
++
++    return;
++}
+ 
+ static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t *val, int l,
+                           unsigned int op)
+@@ -76,7 +111,8 @@ static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t *val, int l,
+ 
+     msg.data2 = (uint8_t *)malloc(sizeof(conf_data));
+     if (!msg.data2) {
+-        printf("Failed to allocate memory for msg.data2.");
++        qemu_log_mask(LOG_REMOTE_DEBUG, "Failed to allocate memory"
++                      " for msg.data2.\n");
+         return -ENOMEM;
+     }
+ 
+@@ -268,8 +304,9 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+     dev->sync = REMOTE_MEM_SYNC(object_new(TYPE_MEMORY_LISTENER));
+ 
+     configure_memory_sync(dev->sync, dev->proxy_link);
++    dev->set_remote_opts = set_remote_opts;
++    dev->proxy_ready = proxy_ready;
+ 
+-    setup_irqfd(dev);
+ }
+ 
+ static void send_bar_access_msg(ProxyLinkState *proxy_link, MemoryRegion *mr,
+diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.h
+index 55160b0..6b61bb7 100644
+--- a/include/hw/proxy/qemu-proxy.h
++++ b/include/hw/proxy/qemu-proxy.h
+@@ -28,6 +28,8 @@
+ #include "io/proxy-link.h"
+ #include "hw/proxy/memory-sync.h"
+ #include "qemu/event_notifier.h"
++#include "hw/pci/pci.h"
++#include "block/qdict.h"
+ 
+ #define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
+ 
+diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
+index ce2fcc3..21d63cc 100644
+--- a/include/io/proxy-link.h
++++ b/include/io/proxy-link.h
+@@ -72,6 +72,8 @@ typedef enum {
+     BAR_WRITE,
+     BAR_READ,
+     SET_IRQFD,
++    DEV_OPTS,
++    DRIVE_OPTS,
+     DEVICE_ADD,
+     DEVICE_DEL,
+     MAX,
 -- 
 1.8.3.1
