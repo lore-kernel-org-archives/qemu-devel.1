@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53765)
+Received: from eggs.gnu.org ([209.51.188.92]:53854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1jaw-0008Hi-Ua
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1jb2-0008KZ-Ud
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1jau-0006yf-Gb
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:18 -0500
-Date: Thu, 7 Mar 2019 12:44:27 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1h1jb0-00072N-Vp
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:24 -0500
+Date: Thu, 7 Mar 2019 12:48:59 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190307014427.GG25123@umbus.fritz.box>
+Message-ID: <20190307014859.GB7722@umbus.fritz.box>
 References: <20190306085032.15744-1-clg@kaod.org>
-	<20190306085032.15744-8-clg@kaod.org>
+	<20190306085032.15744-10-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NPukt5Otb9an/u20"
+	protocol="application/pgp-signature"; boundary="ADZbWkCsHQ7r3kzd"
 Content-Disposition: inline
-In-Reply-To: <20190306085032.15744-8-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 07/27] ppc/pnv: introduce a new
- dt_populate() operation to the chip model
+In-Reply-To: <20190306085032.15744-10-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 09/27] ppc/xive: activate HV support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +28,163 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---NPukt5Otb9an/u20
+--ADZbWkCsHQ7r3kzd
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 06, 2019 at 09:50:12AM +0100, C=E9dric Le Goater wrote:
-> The POWER9 and POWER8 processors have a different set of devices and a
-> different device tree layout.
+On Wed, Mar 06, 2019 at 09:50:14AM +0100, C=E9dric Le Goater wrote:
+> The NSR register of the HV ring has a different, although similar, bit
+> layout. TM_QW3_NSR_HE_PHYS bit should now be raised when the
+> Hypervisor interrupt line is signaled. Other bits TM_QW3_NSR_HE_POOL
+> and TM_QW3_NSR_HE_LSI are not modeled. LSI are for special interrupts
+> reserved for HW bringup and the POOL bit is used when signaling a
+> group of VPs. This is not currently implemented in Linux but it is in
+> pHyp.
+>=20
+> The most important special commands on the HV TIMA page are added to
+> let the core manage interrupts : acking and changing the CPU priority.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Applied, thanks.
-
 > ---
->  include/hw/ppc/pnv.h |  1 +
->  hw/ppc/pnv.c         | 27 +++++++++++++++++++++++++--
->  2 files changed, 26 insertions(+), 2 deletions(-)
+>  hw/intc/xive.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 54 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index ebbb3d0e9aa7..fa9ec50fd5be 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -102,6 +102,7 @@ typedef struct PnvChipClass {
->      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
->      void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
->      ISABus *(*isa_create)(PnvChip *chip, Error **errp);
-> +    void (*dt_populate)(PnvChip *chip, void *fdt);
->  } PnvChipClass;
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 7d7992c0ce3f..a0b87001da25 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -54,6 +54,8 @@ static uint8_t exception_mask(uint8_t ring)
+>      switch (ring) {
+>      case TM_QW1_OS:
+>          return TM_QW1_NSR_EO;
+> +    case TM_QW3_HV_PHYS:
+> +        return TM_QW3_NSR_HE;
+>      default:
+>          g_assert_not_reached();
+>      }
+> @@ -88,7 +90,16 @@ static void xive_tctx_notify(XiveTCTX *tctx, uint8_t r=
+ing)
+>      uint8_t *regs =3D &tctx->regs[ring];
 > =20
->  #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index a7ec76dbd6c7..087541a91a72 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -267,7 +267,7 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, uint=
-32_t pir,
->      g_free(reg);
->  }
-> =20
-> -static void pnv_dt_chip(PnvChip *chip, void *fdt)
-> +static void pnv_chip_power8_dt_populate(PnvChip *chip, void *fdt)
->  {
->      const char *typename =3D pnv_chip_core_typename(chip);
->      size_t typesize =3D object_type_get_instance_size(typename);
-> @@ -289,6 +289,25 @@ static void pnv_dt_chip(PnvChip *chip, void *fdt)
+>      if (regs[TM_PIPR] < regs[TM_CPPR]) {
+> -        regs[TM_NSR] |=3D exception_mask(ring);
+
+This means there's only one remaining caller to exception_mask, so it
+might be better to just open code it at that site.  That can be a
+later cleanup though, so applied to ppc-for-4.0.
+
+> +        switch (ring) {
+> +        case TM_QW1_OS:
+> +            regs[TM_NSR] |=3D TM_QW1_NSR_EO;
+> +            break;
+> +        case TM_QW3_HV_PHYS:
+> +            regs[TM_NSR] |=3D (TM_QW3_NSR_HE_PHYS << 6);
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +        }
+>          qemu_irq_raise(tctx->output);
 >      }
 >  }
+> @@ -109,6 +120,38 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8=
+_t ring, uint8_t cppr)
+>   * XIVE Thread Interrupt Management Area (TIMA)
+>   */
 > =20
-> +static void pnv_chip_power9_dt_populate(PnvChip *chip, void *fdt)
+> +static void xive_tm_set_hv_cppr(XiveTCTX *tctx, hwaddr offset,
+> +                                uint64_t value, unsigned size)
 > +{
-> +    const char *typename =3D pnv_chip_core_typename(chip);
-> +    size_t typesize =3D object_type_get_instance_size(typename);
-> +    int i;
-> +
-> +    pnv_dt_xscom(chip, fdt, 0);
-> +
-> +    for (i =3D 0; i < chip->nr_cores; i++) {
-> +        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-> +
-> +        pnv_dt_core(chip, pnv_core, fdt);
-> +    }
-> +
-> +    if (chip->ram_size) {
-> +        pnv_dt_memory(fdt, chip->chip_id, chip->ram_start, chip->ram_siz=
-e);
-> +    }
+> +    xive_tctx_set_cppr(tctx, TM_QW3_HV_PHYS, value & 0xff);
 > +}
 > +
->  static void pnv_dt_rtc(ISADevice *d, void *fdt, int lpc_off)
->  {
->      uint32_t io_base =3D d->ioport_id;
-> @@ -474,7 +493,7 @@ static void *pnv_dt_create(MachineState *machine)
+> +static uint64_t xive_tm_ack_hv_reg(XiveTCTX *tctx, hwaddr offset, unsign=
+ed size)
+> +{
+> +    return xive_tctx_accept(tctx, TM_QW3_HV_PHYS);
+> +}
+> +
+> +static uint64_t xive_tm_pull_pool_ctx(XiveTCTX *tctx, hwaddr offset,
+> +                                      unsigned size)
+> +{
+> +    uint64_t ret;
+> +
+> +    ret =3D tctx->regs[TM_QW2_HV_POOL + TM_WORD2] & TM_QW2W2_POOL_CAM;
+> +    tctx->regs[TM_QW2_HV_POOL + TM_WORD2] &=3D ~TM_QW2W2_POOL_CAM;
+> +    return ret;
+> +}
+> +
+> +static void xive_tm_vt_push(XiveTCTX *tctx, hwaddr offset,
+> +                            uint64_t value, unsigned size)
+> +{
+> +    tctx->regs[TM_QW3_HV_PHYS + TM_WORD2] =3D value & 0xff;
+> +}
+> +
+> +static uint64_t xive_tm_vt_poll(XiveTCTX *tctx, hwaddr offset, unsigned =
+size)
+> +{
+> +    return tctx->regs[TM_QW3_HV_PHYS + TM_WORD2] & 0xff;
+> +}
+> +
+>  /*
+>   * Define an access map for each page of the TIMA that we will use in
+>   * the memory region ops to filter values when doing loads and stores
+> @@ -288,10 +331,16 @@ static const XiveTmOp xive_tm_operations[] =3D {
+>       * effects
+>       */
+>      { XIVE_TM_OS_PAGE, TM_QW1_OS + TM_CPPR,   1, xive_tm_set_os_cppr, NU=
+LL },
+> +    { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_CPPR, 1, xive_tm_set_hv_cppr,=
+ NULL },
+> +    { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_WORD2, 1, xive_tm_vt_push, NU=
+LL },
+> +    { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_WORD2, 1, NULL, xive_tm_vt_po=
+ll },
 > =20
->      /* Populate device tree for each chip */
->      for (i =3D 0; i < pnv->num_chips; i++) {
-> -        pnv_dt_chip(pnv->chips[i], fdt);
-> +        PNV_CHIP_GET_CLASS(pnv->chips[i])->dt_populate(pnv->chips[i], fd=
-t);
->      }
+>      /* MMIOs above 2K : special operations with side effects */
+>      { XIVE_TM_OS_PAGE, TM_SPC_ACK_OS_REG,     2, NULL, xive_tm_ack_os_re=
+g },
+>      { XIVE_TM_OS_PAGE, TM_SPC_SET_OS_PENDING, 1, xive_tm_set_os_pending,=
+ NULL },
+> +    { XIVE_TM_HV_PAGE, TM_SPC_ACK_HV_REG,     2, NULL, xive_tm_ack_hv_re=
+g },
+> +    { XIVE_TM_HV_PAGE, TM_SPC_PULL_POOL_CTX,  4, NULL, xive_tm_pull_pool=
+_ctx },
+> +    { XIVE_TM_HV_PAGE, TM_SPC_PULL_POOL_CTX,  8, NULL, xive_tm_pull_pool=
+_ctx },
+>  };
 > =20
->      /* Populate ISA devices on chip 0 */
-> @@ -858,6 +877,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
->      k->isa_create =3D pnv_chip_power8_isa_create;
-> +    k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->xscom_base =3D 0x003fc0000000000ull;
->      dc->desc =3D "PowerNV Chip POWER8E";
+>  static const XiveTmOp *xive_tm_find_op(hwaddr offset, unsigned size, boo=
+l write)
+> @@ -323,7 +372,7 @@ void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset=
+, uint64_t value,
+>      const XiveTmOp *xto;
 > =20
-> @@ -876,6 +896,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
-lass, void *data)
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
->      k->isa_create =3D pnv_chip_power8_isa_create;
-> +    k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->xscom_base =3D 0x003fc0000000000ull;
->      dc->desc =3D "PowerNV Chip POWER8";
+>      /*
+> -     * TODO: check V bit in Q[0-3]W2, check PTER bit associated with CPU
+> +     * TODO: check V bit in Q[0-3]W2
+>       */
 > =20
-> @@ -894,6 +915,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
- *klass, void *data)
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
->      k->isa_create =3D pnv_chip_power8nvl_isa_create;
-> +    k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->xscom_base =3D 0x003fc0000000000ull;
->      dc->desc =3D "PowerNV Chip POWER8NVL";
+>      /*
+> @@ -360,7 +409,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
+set, unsigned size)
+>      const XiveTmOp *xto;
 > =20
-> @@ -954,6 +976,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
-lass, void *data)
->      k->core_pir =3D pnv_chip_core_pir_p9;
->      k->intc_create =3D pnv_chip_power9_intc_create;
->      k->isa_create =3D pnv_chip_power9_isa_create;
-> +    k->dt_populate =3D pnv_chip_power9_dt_populate;
->      k->xscom_base =3D 0x00603fc00000000ull;
->      dc->desc =3D "PowerNV Chip POWER9";
+>      /*
+> -     * TODO: check V bit in Q[0-3]W2, check PTER bit associated with CPU
+> +     * TODO: check V bit in Q[0-3]W2
+>       */
 > =20
+>      /*
+> @@ -472,6 +521,8 @@ static void xive_tctx_reset(void *dev)
+>       */
+>      tctx->regs[TM_QW1_OS + TM_PIPR] =3D
+>          ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
+> +    tctx->regs[TM_QW3_HV_PHYS + TM_PIPR] =3D
+> +        ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
+>  }
+> =20
+>  static void xive_tctx_realize(DeviceState *dev, Error **errp)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -153,24 +192,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NPukt5Otb9an/u20
+--ADZbWkCsHQ7r3kzd
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAd3sACgkQbDjKyiDZ
-s5KFLw/+MtOVA2lUSlJtY1cwCDcp5WvTMXA40awgohH0qrlzDc7ZcV+y5DJRffiy
-2L822rVZ8pJ+FLQWP0FbsTvQRRUSyp9TUb8Er4mUMqRKfxtpGJjgBp50f1MfTnj1
-nn6bzLiWx1GODeTI361VH2n84KbJWsiLZUW2gm9XXB/Xp3PmHXunrlto4F7r4y1n
-Cy/6iyd+VWoShF5BdyVT+KN7RgUEwwXOGXS3I8TVXt5RwgUT03WXjibAOsUeJR/1
-JjWTcbglJVEPibgpQJehyFfL3ZutTc+erOERO/iM87qF12lzcbeFewDn//cJbm5C
-NzX0ocX4b3d89xWlhtZgaYt65NdZso/3qsH00l0Mv/c3MxpQSkqVBZrUQMt9Nm88
-dP+kLsFOvzdwNKj/xAsfaQmPHWXh+zAOC+u2h2hVfsW5qlx/8M1HXmAzaOV7C6h4
-mP/X5wM6lqShs40qh7wHewxToMS+hK9+CJLwn0bovSgHKa8ABB2gGPrJ2OaEUiRu
-lUhxt4ws85mzwXoeZBUwMD5I76xlF9v80njLzLadIe9GhuXuHaRBP+Dv4Ma0p7VZ
-8jEcR4vQhkqxZ7ir6yJ1ZXbiPX18vcKuLHvBl+plqeZpIxgDuuCJ7j5t/tRo9fab
-PZu+PoWRpW8jA3oNsYFmKygcuGE5dYN7rXHdviqH+8xSmO0XvUY=
-=1vb4
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAeIoACgkQbDjKyiDZ
+s5Jitg//dSF3o1kKCuwdiwtjj4+xCgAKIpwMFkgd4DGj8OtQtnZGp23wxyH8MQBB
+uHMK/oZlPin2WFcYX7SpR+Xw62GbxQ/q92VicZuAp7TnSbrolUD7XbOPJBTNU/Fl
+RSTi2sStTjUXRW123uA4Qm+A9M57ac5fWWZ6+iOl+PnysvIxevK4I/F9KdZN2dwf
+mAt/V1/jN/NCix+ML3JGp3HlMAXyyAm8KfDIlRYARMF+n8aYmmt2fEhm4FggCIgb
+BHSgoRjPw66xgC4iJI6pvcwnAqDAiXnwh1nZfWnoE658h6cQTlrJCI3JqC0QI459
+nWTIZ7LahdzqC1S3y9cRcXv+fXUK7CSa35D2FovQtFJzOSQg323zqIkdk86ZxUlC
+he2nFl9EhyGCK65VL/YPiW5iecIBPBV3OKtwX+ceH/yULRDBm0VkTlQkeT2dWI6O
+Iqi3uXwpvrgQpromQLyz/6AyKSKWTJ6g9waeYzfCX23g/2fhT/JUH1Gs90dgI5Se
+wImPTSOIZsptBDbNRzdgb+1+Q5hHnDyjcD/48TLtT0DGTm9Sf1k8XyC/UiTcojyN
+ff0Nxtb0S62GN+ntxnWcxGDYPruclYtfUgxsT2N7AyE5yQxxCKp++rgC4HM0Eb69
+nq+n09HjhwIwFaXwVL/1rod8PSv/upfUTHzhka8RRVraNp/VuVo=
+=grKZ
 -----END PGP SIGNATURE-----
 
---NPukt5Otb9an/u20--
+--ADZbWkCsHQ7r3kzd--
