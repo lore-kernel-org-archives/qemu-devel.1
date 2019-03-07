@@ -1,37 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34408)
+Received: from eggs.gnu.org ([209.51.188.92]:36865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h21dU-0007j7-Jg
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 17:37:09 -0500
+	(envelope-from <kevin.tian@intel.com>) id 1h22Jn-0002sB-4x
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 18:20:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h21dT-0003id-PA
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 17:37:08 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46470)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1h21dR-00028E-1v
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 17:37:07 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x27MIapU103629
-	for <qemu-devel@nongnu.org>; Thu, 7 Mar 2019 17:36:06 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2r39vpensp-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 17:36:05 -0500
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Thu, 7 Mar 2019 22:36:03 -0000
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu,  7 Mar 2019 23:35:45 +0100
-In-Reply-To: <20190307223548.20516-1-clg@kaod.org>
-References: <20190307223548.20516-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190307223548.20516-13-clg@kaod.org>
+	(envelope-from <kevin.tian@intel.com>) id 1h22Jl-0007sh-EX
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 18:20:51 -0500
+Received: from mga14.intel.com ([192.55.52.115]:6786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1h22Ji-0007oR-Uo
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 18:20:47 -0500
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Thu, 7 Mar 2019 23:20:36 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19C97CA6B@SHSMSX104.ccr.corp.intel.com>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<20190221134051.2c28893e@w520.home>
+	<20190225022255.GP16456@joy-OptiPlex-7040>
+	<20190307104421.534ea56f@w520.home>
+In-Reply-To: <20190307104421.534ea56f@w520.home>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 12/15] ppc/pnv: activate XSCOM tests for
- POWER9
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,35 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Alex Williamson <alex.williamson@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+	Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu, Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-We now have enough support to let the XSCOM test run on POWER9.
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Friday, March 8, 2019 1:44 AM
+> > >
+> > > >         This kind of data needs to be saved / loaded in pre-copy an=
+d
+> > > >         stop-and-copy phase.
+> > > >         The data of device memory is held in device memory region.
+> > > >         Size of devie memory is usually larger than that of device
+> > > >         memory region. qemu needs to save/load it in chunks of size=
+ of
+> > > >         device memory region.
+> > > >         Not all device has device memory. Like IGD only uses system
+> memory.
+> > >
+> > > It seems a little gratuitous to me that this is a separate region or
+> > > that this data is handled separately.  All of this data is opaque to
+> > > QEMU, so why do we need to separate it?
+> > hi Alex,
+> > as the device state interfaces are provided by kernel, it is expected t=
+o
+> > meet as general needs as possible. So, do you think there are such use
+> > cases from user space that user space knows well of the device, and
+> > it wants kernel to return desired data back to it.
+> > E.g. It just wants to get whole device config data including all mmios,
+> > page tables, pci config data...
+> > or, It just wants to get current device memory snapshot, not including =
+any
+> > dirty data.
+> > Or, It just needs the dirty pages in device memory or system memory.
+> > With all this accurate query, quite a lot of useful features can be
+> > developped in user space.
+> >
+> > If all of this data is opaque to user app, seems the only use case is
+> > for live migration.
+>=20
+> I can certainly appreciate a more versatile interface, but I think
+> we're also trying to create the most simple interface we can, with the
+> primary target being live migration.  As soon as we start defining this
+> type of device memory and that type of device memory, we're going to
+> have another device come along that needs yet another because they have
+> a slightly different requirement.  Even without that, we're going to
+> have vendor drivers implement it differently, so what works for one
+> device for a more targeted approach may not work for all devices.  Can
+> you enumerate some specific examples of the use cases you imagine your
+> design to enable?
+>=20
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- tests/pnv-xscom-test.c | 2 --
- 1 file changed, 2 deletions(-)
+Do we want to consider an use case where user space would like to
+selectively introspect a portion of the device state (including implicit=20
+state which are not available through PCI regions), and may ask for
+capability of direct mapping of selected portion for scanning (e.g.
+device memory) instead of always turning on dirty logging on all
+device state?
 
-diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
-index 974f8da5b240..63d464048d53 100644
---- a/tests/pnv-xscom-test.c
-+++ b/tests/pnv-xscom-test.c
-@@ -39,7 +39,6 @@ static const PnvChip pnv_chips[] =3D {
-         .cfam_id    =3D 0x120d304980000000ull,
-         .first_core =3D 0x1,
-     },
--#if 0 /* POWER9 support is not ready yet */
-     {
-         .chip_type  =3D PNV_CHIP_POWER9,
-         .cpu_model  =3D "POWER9",
-@@ -47,7 +46,6 @@ static const PnvChip pnv_chips[] =3D {
-         .cfam_id    =3D 0x220d104900008000ull,
-         .first_core =3D 0x0,
-     },
--#endif
- };
-=20
- static uint64_t pnv_xscom_addr(const PnvChip *chip, uint32_t pcba)
---=20
-2.20.1
+Thanks
+Kevin
