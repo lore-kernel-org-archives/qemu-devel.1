@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54281)
+Received: from eggs.gnu.org ([209.51.188.92]:54767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1sml-0001m8-9O
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:10:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1h1soU-0003Dl-Vy
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:11:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1smj-00074C-0e
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:10:07 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1smi-00073u-O4
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:10:04 -0500
-Received: by mail-ot1-x343.google.com with SMTP id t7so13984823otk.8
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 05:10:04 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1h1soU-0008W9-3v
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:11:55 -0500
+References: <20190307121539.12842-1-david@redhat.com>
+	<20190307121539.12842-4-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3bd6ff64-7866-5a6e-8b19-fffc2272a00f@redhat.com>
+Date: Thu, 7 Mar 2019 14:11:47 +0100
 MIME-Version: 1.0
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<87r2bigarf.fsf@zen.linaroharston>
-	<a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
-In-Reply-To: <a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Mar 2019 13:09:52 +0000
-Message-ID: <CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] converting build system to Meson?
+In-Reply-To: <20190307121539.12842-4-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/32] s390x/tcg: Utilities for vector
+ instruction helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +25,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 7 Mar 2019 at 12:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> In any case, this wouldn't change; as you suggest below, configure could
-> remain as a front-end (well, in-srcdir builds are not supported by
-> Meson, so "../configure && ninja" perhaps).
+On 07/03/2019 13.15, David Hildenbrand wrote:
+> We'll have to read/write vector elements quite frequently from helpers.
+> The tricky bit is properly taking care of endianess. Handle it similar
+> to aarch64.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/vec.h | 101 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 101 insertions(+)
+>  create mode 100644 target/s390x/vec.h
+> 
+> diff --git a/target/s390x/vec.h b/target/s390x/vec.h
+> new file mode 100644
+> index 0000000000..3313fb43ee
+> --- /dev/null
+> +++ b/target/s390x/vec.h
+> @@ -0,0 +1,101 @@
+> +/*
+> + * QEMU TCG support -- s390x vector utilitites
+> + *
+> + * Copyright (C) 2019 Red Hat Inc
+> + *
+> + * Authors:
+> + *   David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef S390X_VEC_H
+> +#define S390X_VEC_H
+> +
+> +typedef union S390Vector {
+> +    uint64_t doubleword[2];
+> +    uint32_t word[4];
+> +    uint16_t halfword[8];
+> +    uint8_t byte[16];
+> +} S390Vector;
+> +
+> +/*
+> + * Each vector is stored as two 64bit host values. So when talking about
+> + * byte/halfword/word numbers, we have to take care of proper translation
+> + * between element numbers.
+> + *
+> + * Big Endian (target/possible host)
+> + * B:  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7] - [ 8][ 9][10][11][12][13][14][15]
+> + * HW: [     0][     1][     2][     3] - [     4][     5][     6][     7]
+> + * W:  [             0][             1] - [             2][             3]
+> + * DW: [                             0] - [                             1]
+> + *
+> + * Little Endian (possible host)
+> + * B:  [ 7][ 6][ 5][ 4][ 3][ 2][ 1][ 0] - [15][14][13][12][11][10][ 9][ 8]
+> + * HW: [     3][     2][     1][     0] - [     7][     6][     5][     4]
+> + * W:  [             1][             0] - [             3][             2]
+> + * DW: [                             0] - [                             1]
+> + */
+> +#ifndef HOST_WORDS_BIGENDIAN
+> +#define H1(x)  ((x) ^ 7)
+> +#define H2(x)  ((x) ^ 3)
+> +#define H4(x)  ((x) ^ 1)
+> +#else
+> +#define H1(x)  (x)
+> +#define H2(x)  (x)
+> +#define H4(x)  (x)
+> +#endif
+> +
+> +static inline uint8_t s390_vec_read_element8(const S390Vector *v, uint8_t enr)
+> +{
+> +    g_assert(enr < 16);
+> +    return v->byte[H1(enr)];
+> +}
+> +
+> +static inline uint16_t s390_vec_read_element16(const S390Vector *v, uint8_t enr)
+> +{
+> +    g_assert(enr < 8);
+> +    return v->halfword[H2(enr)];
+> +}
+> +
+> +static inline uint32_t s390_vec_read_element32(const S390Vector *v, uint8_t enr)
+> +{
+> +    g_assert(enr < 4);
+> +    return v->word[H4(enr)];
+> +}
+> +
+> +static inline uint64_t s390_vec_read_element64(const S390Vector *v, uint8_t enr)
+> +{
+> +    g_assert(enr < 2);
+> +    return v->doubleword[enr];
+> +}
+> +
+> +static inline void s390_vec_write_element8(S390Vector *v, uint8_t enr,
+> +                                           uint8_t data)
+> +{
+> +    g_assert(enr < 16);
+> +    v->byte[H1(enr)] = data;
+> +}
+> +
+> +static inline void s390_vec_write_element16(S390Vector *v, uint8_t enr,
+> +                                            uint16_t data)
+> +{
+> +    g_assert(enr < 8);
+> +    v->halfword[H2(enr)] = data;
+> +}
+> +
+> +static inline void s390_vec_write_element32(S390Vector *v, uint8_t enr,
+> +                                            uint32_t data)
+> +{
+> +    g_assert(enr < 4);
+> +    v->word[H4(enr)] = data;
+> +}
+> +
+> +static inline void s390_vec_write_element64(S390Vector *v, uint8_t enr,
+> +                                            uint64_t data)
+> +{
+> +    g_assert(enr < 2);
+> +    v->doubleword[enr] = data;
+> +}
+> +
+> +#endif /* S390X_VEC_H */
+> 
 
-As an aside, it might be a nice idea to drop the in-srcdir
-build altogether for QEMU anyway -- it's not really a very
-good idea and it means our build system has to cope with two
-different ways of working to no particularly useful end.
+Pretty brain-twisting, but it looks right to me.
 
-> > I suspect needing Python 3.5 means it will take a while before all our
-> > build hosts will have it.
->
-> Which ones don't?  (This is the information I might be missing and why I
-> have started the thread). RHEL7 has it in software collections, OS X in
-> Homebrew.   RHEL6 is not a supported host anymore.
-
-Of the various hosts I do builds on:
- * OSX is 2.7 only
- * the ppc64 box in the gcc compile farm is 2.7 and 3.4
-   ("Centos 7.5.1804")
- * the aarch64 box in the gcc compile farm is 2.7 and 3.4
-   ("Ubuntu 14.04.5 LTS", aka trusty)
-
-I haven't checked the BSD VM images.
-
-thanks
--- PMM
+Reviewed-by: Thomas Huth <thuth@redhat.com>
