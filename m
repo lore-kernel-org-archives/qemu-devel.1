@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56781)
+Received: from eggs.gnu.org ([209.51.188.92]:56783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1h9y-0003YT-Dw
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:45:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1h9y-0003YU-K8
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:45:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1h9w-0007hU-Iw
+	(envelope-from <dgibson@ozlabs.org>) id 1h1h9w-0007ha-JY
 	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 19:45:18 -0500
-Date: Thu, 7 Mar 2019 11:25:20 +1100
+Date: Thu, 7 Mar 2019 11:33:02 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190307002520.GB25123@umbus.fritz.box>
-References: <20190306060608.19935-1-sjitindarsingh@gmail.com>
+Message-ID: <20190307003302.GC25123@umbus.fritz.box>
+References: <20190306102812.28972-1-randrianasulu@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DBIVS5p969aUjpLe"
+	protocol="application/pgp-signature"; boundary="7gGkHNMELEOhSGF6"
 Content-Disposition: inline
-In-Reply-To: <20190306060608.19935-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH] target/ppc/spapr: Enable
- H_PAGE_INIT in-kernel handling
+In-Reply-To: <20190306102812.28972-1-randrianasulu@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3] PPC: E500: Add FSL I2C controller and
+ integrate RTC with it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +24,550 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Andrew Randrianasulu <randrianasulu@gmail.com>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org, Amit Singh Tomar <amit.tomar@freescale.com>
 
 
---DBIVS5p969aUjpLe
+--7gGkHNMELEOhSGF6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 06, 2019 at 05:06:08PM +1100, Suraj Jitindar Singh wrote:
-> The H_CALL H_PAGE_INIT can be used to zero or copy a page of guest
-> memory. Enable the in-kernel H_PAGE_INIT handler.
+On Wed, Mar 06, 2019 at 01:28:12PM +0300, Andrew Randrianasulu wrote:
+> Original commit message:
+> This patch adds an emulation model for i2c controller found on most of th=
+e FSL SoCs.
+> It also integrates the RTC (ds1338) that sits on the i2c Bus with e500 ma=
+chine model.
 >=20
-> The in-kernel handler takes half the time to complete compared to
-> handling the H_CALL in userspace.
+> Patch was originally written by Amit Singh Tomar <amit.tomar@freescale.co=
+m>
+> see http://patchwork.ozlabs.org/patch/431475/
+> I only fixed it enough for application on top of current qemu master
+> 20b084c4b1401b7f8fbc385649d48c67b6f43d44, and hopefully fixed checkpatch =
+errors
 >=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Tested by booting Linux kernel 4.20.12. Now e500 machine doesn't need=20
+> network time protocol daemon because it will have working RTC=20
+> (before all timestamps on files were from 2016)
+>=20
+>=20
+> Signed-off-by: Amit Singh Tomar <amit.tomar@freescale.com>
+> Signed-off-by: Andrew Randrianasulu <randrianasulu@gmail.com>
 
-Applied, thanks.
+Applied to ppc-for-4.0, thanks.
 
 > ---
->  hw/ppc/spapr.c       | 3 +++
->  target/ppc/kvm.c     | 5 +++++
->  target/ppc/kvm_ppc.h | 5 +++++
->  3 files changed, 13 insertions(+)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index cf1ef9ebd4..8ce97ff1e7 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2822,6 +2822,9 @@ static void spapr_machine_init(MachineState *machin=
-e)
-> =20
->          /* H_CLEAR_MOD/_REF are mandatory in PAPR, but off by default */
->          kvmppc_enable_clear_ref_mod_hcalls();
+> v1->v2: Expanded and fixed commit message
+>=20
+> v2->v3: Changed Subject line back to original and From: field to=20
+> my email address, moved my SoB line above first '---' and
+> added Tomar's Signed-off line back.
+>=20
+> ---
+>  default-configs/ppc-softmmu.mak |   2 +
+>  hw/i2c/Makefile.objs            |   1 +
+>  hw/i2c/mpc_i2c.c                | 357 ++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/ppc/e500.c                   |  54 ++++++
+>  4 files changed, 414 insertions(+)
+>  create mode 100644 hw/i2c/mpc_i2c.c
+>=20
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
+u.mak
+> index 52acb7cf39..a560971f0c 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -8,6 +8,8 @@ include usb.mak
+>  CONFIG_PPC4XX=3Dy
+>  CONFIG_M48T59=3Dy
+>  CONFIG_SERIAL=3Dy
+> +CONFIG_MPC_I2C=3Dy
+> +CONFIG_DS1338=3Dy
+>  CONFIG_I8257=3Dy
+>  CONFIG_OPENPIC=3Dy
+>  CONFIG_PPCE500_PCI=3Dy
+> diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
+> index 9205cbee16..3eb584254f 100644
+> --- a/hw/i2c/Makefile.objs
+> +++ b/hw/i2c/Makefile.objs
+> @@ -9,5 +9,6 @@ common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_i2c.o
+>  common-obj-$(CONFIG_IMX_I2C) +=3D imx_i2c.o
+>  common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_i2c.o
+>  common-obj-$(CONFIG_NRF51_SOC) +=3D microbit_i2c.o
+> +common-obj-$(CONFIG_MPC_I2C) +=3D mpc_i2c.o
+>  obj-$(CONFIG_OMAP) +=3D omap_i2c.o
+>  obj-$(CONFIG_PPC4XX) +=3D ppc4xx_i2c.o
+> diff --git a/hw/i2c/mpc_i2c.c b/hw/i2c/mpc_i2c.c
+> new file mode 100644
+> index 0000000000..693ca7ef6b
+> --- /dev/null
+> +++ b/hw/i2c/mpc_i2c.c
+> @@ -0,0 +1,357 @@
+> +/*
+> + * Copyright (C) 2014 Freescale Semiconductor, Inc. All rights reserved.
+> + *
+> + * Author: Amit Tomar, <Amit.Tomar@freescale.com>
+> + *
+> + * Description:
+> + * This file is derived from IMX I2C controller,
+> + * by Jean-Christophe DUBOIS .
+> + *
+> + * Thanks to Scott Wood and Alexander Graf for their kind help on this.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License, version 2 or la=
+ter,
+> + * as published by the Free Software Foundation.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+> + */
 > +
-> +        /* Enable H_PAGE_INIT */
-> +        kvmppc_enable_h_page_init();
+> +#include "qemu/osdep.h"
+> +#include "hw/i2c/i2c.h"
+> +#include "qemu/log.h"
+> +#include "hw/sysbus.h"
+> +
+> +/* #define DEBUG_I2C */
+> +
+> +#ifdef DEBUG_I2C
+> +#define DPRINTF(fmt, ...)              \
+> +    do { fprintf(stderr, "mpc_i2c[%s]: " fmt, __func__, ## __VA_ARGS__);=
+ \
+> +    } while (0)
+> +#else
+> +#define DPRINTF(fmt, ...) do {} while (0)
+> +#endif
+> +
+> +#define TYPE_MPC_I2C "mpc-i2c"
+> +#define MPC_I2C(obj) \
+> +    OBJECT_CHECK(MPCI2CState, (obj), TYPE_MPC_I2C)
+> +
+> +#define MPC_I2C_ADR   0x00
+> +#define MPC_I2C_FDR   0x04
+> +#define MPC_I2C_CR    0x08
+> +#define MPC_I2C_SR    0x0c
+> +#define MPC_I2C_DR    0x10
+> +#define MPC_I2C_DFSRR 0x14
+> +
+> +#define CCR_MEN  (1 << 7)
+> +#define CCR_MIEN (1 << 6)
+> +#define CCR_MSTA (1 << 5)
+> +#define CCR_MTX  (1 << 4)
+> +#define CCR_TXAK (1 << 3)
+> +#define CCR_RSTA (1 << 2)
+> +#define CCR_BCST (1 << 0)
+> +
+> +#define CSR_MCF  (1 << 7)
+> +#define CSR_MAAS (1 << 6)
+> +#define CSR_MBB  (1 << 5)
+> +#define CSR_MAL  (1 << 4)
+> +#define CSR_SRW  (1 << 2)
+> +#define CSR_MIF  (1 << 1)
+> +#define CSR_RXAK (1 << 0)
+> +
+> +#define CADR_MASK 0xFE
+> +#define CFDR_MASK 0x3F
+> +#define CCR_MASK  0xFC
+> +#define CSR_MASK  0xED
+> +#define CDR_MASK  0xFF
+> +
+> +#define CYCLE_RESET 0xFF
+> +
+> +typedef struct MPCI2CState {
+> +    SysBusDevice parent_obj;
+> +
+> +    I2CBus *bus;
+> +    qemu_irq irq;
+> +    MemoryRegion iomem;
+> +
+> +    uint8_t address;
+> +    uint8_t adr;
+> +    uint8_t fdr;
+> +    uint8_t cr;
+> +    uint8_t sr;
+> +    uint8_t dr;
+> +    uint8_t dfssr;
+> +} MPCI2CState;
+> +
+> +static bool mpc_i2c_is_enabled(MPCI2CState *s)
+> +{
+> +    return s->cr & CCR_MEN;
+> +}
+> +
+> +static bool mpc_i2c_is_master(MPCI2CState *s)
+> +{
+> +    return s->cr & CCR_MSTA;
+> +}
+> +
+> +static bool mpc_i2c_direction_is_tx(MPCI2CState *s)
+> +{
+> +    return s->cr & CCR_MTX;
+> +}
+> +
+> +static bool mpc_i2c_irq_pending(MPCI2CState *s)
+> +{
+> +    return s->sr & CSR_MIF;
+> +}
+> +
+> +static bool mpc_i2c_irq_is_enabled(MPCI2CState *s)
+> +{
+> +    return s->cr & CCR_MIEN;
+> +}
+> +
+> +static void mpc_i2c_reset(DeviceState *dev)
+> +{
+> +    MPCI2CState *i2c =3D MPC_I2C(dev);
+> +
+> +    i2c->address =3D 0xFF;
+> +    i2c->adr =3D 0x00;
+> +    i2c->fdr =3D 0x00;
+> +    i2c->cr =3D  0x00;
+> +    i2c->sr =3D  0x81;
+> +    i2c->dr =3D  0x00;
+> +}
+> +
+> +static void mpc_i2c_irq(MPCI2CState *s)
+> +{
+> +    bool irq_active =3D false;
+> +
+> +    if (mpc_i2c_is_enabled(s) && mpc_i2c_irq_is_enabled(s)
+> +                              && mpc_i2c_irq_pending(s)) {
+> +        irq_active =3D true;
+> +    }
+> +
+> +    if (irq_active) {
+> +        qemu_irq_raise(s->irq);
+> +    } else {
+> +        qemu_irq_lower(s->irq);
+> +    }
+> +}
+> +
+> +static void mpc_i2c_soft_reset(MPCI2CState *s)
+> +{
+> +    /* This is a soft reset. ADR is preserved during soft resets */
+> +    uint8_t adr =3D s->adr;
+> +    mpc_i2c_reset(DEVICE(s));
+> +    s->adr =3D adr;
+> +}
+> +
+> +static void  mpc_i2c_address_send(MPCI2CState *s)
+> +{
+> +    /* if returns non zero slave address is not right */
+> +    if (i2c_start_transfer(s->bus, s->dr >> 1, s->dr & (0x01))) {
+> +        s->sr |=3D CSR_RXAK;
+> +    } else {
+> +        s->address =3D s->dr;
+> +        s->sr &=3D ~CSR_RXAK;
+> +        s->sr |=3D  CSR_MCF; /* Set after Byte Transfer is completed */
+> +        s->sr |=3D  CSR_MIF; /* Set after Byte Transfer is completed */
+> +        mpc_i2c_irq(s);
+> +    }
+> +}
+> +
+> +static void  mpc_i2c_data_send(MPCI2CState *s)
+> +{
+> +    if (i2c_send(s->bus, s->dr)) {
+> +        /* End of transfer */
+> +        s->sr |=3D CSR_RXAK;
+> +        i2c_end_transfer(s->bus);
+> +    } else {
+> +        s->sr &=3D ~CSR_RXAK;
+> +        s->sr |=3D  CSR_MCF; /* Set after Byte Transfer is completed */
+> +        s->sr |=3D  CSR_MIF; /* Set after Byte Transfer is completed */
+> +        mpc_i2c_irq(s);
+> +    }
+> +}
+> +
+> +static void  mpc_i2c_data_recive(MPCI2CState *s)
+> +{
+> +    int ret;
+> +    /* get the next byte */
+> +    ret =3D i2c_recv(s->bus);
+> +    if (ret >=3D 0) {
+> +        s->sr |=3D CSR_MCF; /* Set after Byte Transfer is completed */
+> +        s->sr |=3D CSR_MIF; /* Set after Byte Transfer is completed */
+> +        mpc_i2c_irq(s);
+> +    } else {
+> +        DPRINTF("read failed for device");
+> +        ret =3D 0xff;
+> +    }
+> +    s->dr =3D ret;
+> +}
+> +
+> +static uint64_t mpc_i2c_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    MPCI2CState *s =3D opaque;
+> +    uint8_t value;
+> +
+> +    switch (addr) {
+> +    case MPC_I2C_ADR:
+> +        value =3D s->adr;
+> +        break;
+> +    case MPC_I2C_FDR:
+> +        value =3D s->fdr;
+> +        break;
+> +    case MPC_I2C_CR:
+> +        value =3D s->cr;
+> +        break;
+> +    case MPC_I2C_SR:
+> +        value =3D s->sr;
+> +        break;
+> +    case MPC_I2C_DR:
+> +        value =3D s->dr;
+> +        if (mpc_i2c_is_master(s)) { /* master mode */
+> +            if (mpc_i2c_direction_is_tx(s)) {
+> +                DPRINTF("MTX is set not in recv mode\n");
+> +            } else {
+> +                mpc_i2c_data_recive(s);
+> +            }
+> +        }
+> +        break;
+> +    default:
+> +        value =3D 0;
+> +        DPRINTF("ERROR: Bad read addr 0x%x\n", (unsigned int)addr);
+> +        break;
+> +    }
+> +
+> +    DPRINTF("%s: addr " TARGET_FMT_plx " %02" PRIx32 "\n", __func__,
+> +                                         addr, value);
+> +    return (uint64_t)value;
+> +}
+> +
+> +static void mpc_i2c_write(void *opaque, hwaddr addr,
+> +                            uint64_t value, unsigned size)
+> +{
+> +    MPCI2CState *s =3D opaque;
+> +
+> +    DPRINTF("%s: addr " TARGET_FMT_plx " val %08" PRIx64 "\n", __func__,
+> +                                             addr, value);
+> +    switch (addr) {
+> +    case MPC_I2C_ADR:
+> +        s->adr =3D value & CADR_MASK;
+> +        break;
+> +    case MPC_I2C_FDR:
+> +        s->fdr =3D value & CFDR_MASK;
+> +        break;
+> +    case MPC_I2C_CR:
+> +        if (mpc_i2c_is_enabled(s) && ((value & CCR_MEN) =3D=3D 0)) {
+> +            mpc_i2c_soft_reset(s);
+> +            break;
+> +        }
+> +        /* normal write */
+> +        s->cr =3D value & CCR_MASK;
+> +        if (mpc_i2c_is_master(s)) { /* master mode */
+> +            /* set the bus to busy after master is set as per RM */
+> +            s->sr |=3D CSR_MBB;
+> +        } else {
+> +            /* bus is not busy anymore */
+> +            s->sr &=3D ~CSR_MBB;
+> +            /* Reset the address for fresh write/read cycle */
+> +        if (s->address !=3D CYCLE_RESET) {
+> +            i2c_end_transfer(s->bus);
+> +            s->address =3D CYCLE_RESET;
+> +            }
+> +        }
+> +        /* For restart end the onging transfer */
+> +        if (s->cr & CCR_RSTA) {
+> +            if (s->address !=3D CYCLE_RESET) {
+> +                s->address =3D CYCLE_RESET;
+> +                i2c_end_transfer(s->bus);
+> +                s->cr &=3D ~CCR_RSTA;
+> +            }
+> +        }
+> +        break;
+> +    case MPC_I2C_SR:
+> +        s->sr =3D value & CSR_MASK;
+> +        /* Lower the interrupt */
+> +        if (!(s->sr & CSR_MIF) || !(s->sr & CSR_MAL)) {
+> +            mpc_i2c_irq(s);
+> +        }
+> +        break;
+> +    case MPC_I2C_DR:
+> +        /* if the device is not enabled, nothing to do */
+> +        if (!mpc_i2c_is_enabled(s)) {
+> +            break;
+> +        }
+> +        s->dr =3D value & CDR_MASK;
+> +        if (mpc_i2c_is_master(s)) { /* master mode */
+> +            if (s->address =3D=3D CYCLE_RESET) {
+> +                mpc_i2c_address_send(s);
+> +            } else {
+> +                mpc_i2c_data_send(s);
+> +            }
+> +        }
+> +        break;
+> +    case MPC_I2C_DFSRR:
+> +        s->dfssr =3D value;
+> +        break;
+> +    default:
+> +        DPRINTF("ERROR: Bad write addr 0x%x\n", (unsigned int)addr);
+> +        break;
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps i2c_ops =3D {
+> +    .read =3D  mpc_i2c_read,
+> +    .write =3D  mpc_i2c_write,
+> +    .valid.max_access_size =3D 1,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static const VMStateDescription mpc_i2c_vmstate =3D {
+> +    .name =3D TYPE_MPC_I2C,
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT8(address, MPCI2CState),
+> +        VMSTATE_UINT8(adr, MPCI2CState),
+> +        VMSTATE_UINT8(fdr, MPCI2CState),
+> +        VMSTATE_UINT8(cr, MPCI2CState),
+> +        VMSTATE_UINT8(sr, MPCI2CState),
+> +        VMSTATE_UINT8(dr, MPCI2CState),
+> +        VMSTATE_UINT8(dfssr, MPCI2CState),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void mpc_i2c_realize(DeviceState *dev, Error **errp)
+> +{
+> +    MPCI2CState  *i2c =3D MPC_I2C(dev);
+> +    sysbus_init_irq(SYS_BUS_DEVICE(dev), &i2c->irq);
+> +    memory_region_init_io(&i2c->iomem, OBJECT(i2c), &i2c_ops, i2c,
+> +                          "mpc-i2c", 0x14);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &i2c->iomem);
+> +    i2c->bus =3D i2c_init_bus(DEVICE(dev), "i2c");
+> +}
+> +
+> +static void mpc_i2c_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->vmsd  =3D &mpc_i2c_vmstate ;
+> +    dc->reset =3D mpc_i2c_reset;
+> +    dc->realize =3D mpc_i2c_realize;
+> +    dc->desc =3D "MPC I2C Controller";
+> +}
+> +
+> +static const TypeInfo mpc_i2c_type_info =3D {
+> +    .name          =3D TYPE_MPC_I2C,
+> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .instance_size =3D sizeof(MPCI2CState),
+> +    .class_init    =3D mpc_i2c_class_init,
+> +};
+> +
+> +static void mpc_i2c_register_types(void)
+> +{
+> +    type_register_static(&mpc_i2c_type_info);
+> +}
+> +
+> +type_init(mpc_i2c_register_types)
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index 7553f674c9..beb2efd694 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -42,6 +42,7 @@
+>  #include "qemu/error-report.h"
+>  #include "hw/platform-bus.h"
+>  #include "hw/net/fsl_etsec/etsec.h"
+> +#include "hw/i2c/i2c.h"
+> =20
+>  #define EPAPR_MAGIC                (0x45504150)
+>  #define BINARY_DEVICE_TREE_FILE    "mpc8544ds.dtb"
+> @@ -63,7 +64,10 @@
+>  #define MPC8544_PCI_REGS_SIZE      0x1000ULL
+>  #define MPC8544_UTIL_OFFSET        0xe0000ULL
+>  #define MPC8XXX_GPIO_OFFSET        0x000FF000ULL
+> +#define MPC8544_I2C_REGS_OFFSET    0x3000ULL
+>  #define MPC8XXX_GPIO_IRQ           47
+> +#define MPC8544_I2C_IRQ            43
+> +#define RTC_REGS_OFFSET            0x68
+> =20
+>  struct boot_info
+>  {
+> @@ -161,6 +165,39 @@ static void create_dt_mpc8xxx_gpio(void *fdt, const =
+char *soc, const char *mpic)
+>      g_free(poweroff);
+>  }
+> =20
+> +static void dt_rtc_create(void *fdt, const char *i2c, const char *alias)
+> +{
+> +    int offset =3D RTC_REGS_OFFSET;
+> +
+> +    gchar *rtc =3D g_strdup_printf("%s/rtc@%"PRIx32, i2c, offset);
+> +    qemu_fdt_add_subnode(fdt, rtc);
+> +    qemu_fdt_setprop_string(fdt, rtc, "compatible", "pericom,pt7c4338");
+> +    qemu_fdt_setprop_cells(fdt, rtc, "reg", offset);
+> +    qemu_fdt_setprop_string(fdt, "/aliases", alias, rtc);
+> +
+> +    g_free(rtc);
+> +}
+> +
+> +static void dt_i2c_create(void *fdt, const char *soc, const char *mpic,
+> +                             const char *alias)
+> +{
+> +    hwaddr mmio0 =3D MPC8544_I2C_REGS_OFFSET;
+> +    int irq0 =3D MPC8544_I2C_IRQ;
+> +
+> +    gchar *i2c =3D g_strdup_printf("%s/i2c@%"PRIx64, soc, mmio0);
+> +    qemu_fdt_add_subnode(fdt, i2c);
+> +    qemu_fdt_setprop_string(fdt, i2c, "device_type", "i2c");
+> +    qemu_fdt_setprop_string(fdt, i2c, "compatible", "fsl-i2c");
+> +    qemu_fdt_setprop_cells(fdt, i2c, "reg", mmio0, 0x14);
+> +    qemu_fdt_setprop_cells(fdt, i2c, "cell-index", 0);
+> +    qemu_fdt_setprop_cells(fdt, i2c, "interrupts", irq0, 0x2);
+> +    qemu_fdt_setprop_phandle(fdt, i2c, "interrupt-parent", mpic);
+> +    qemu_fdt_setprop_string(fdt, "/aliases", alias, i2c);
+> +
+> +    g_free(i2c);
+> +}
+> +
+> +
+>  typedef struct PlatformDevtreeData {
+>      void *fdt;
+>      const char *mpic;
+> @@ -464,6 +501,12 @@ static int ppce500_load_device_tree(PPCE500MachineSt=
+ate *pms,
+>                           soc, mpic, "serial0", 0, true);
 >      }
 > =20
->      /* allocate RAM */
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 4e3f1e4b78..d0bfb076df 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2043,6 +2043,11 @@ void kvmppc_enable_clear_ref_mod_hcalls(void)
->      kvmppc_enable_hcall(kvm_state, H_CLEAR_MOD);
->  }
-> =20
-> +void kvmppc_enable_h_page_init(void)
-> +{
-> +    kvmppc_enable_hcall(kvm_state, H_PAGE_INIT);
-> +}
+> +    /* i2c */
+> +    dt_i2c_create(fdt, soc, mpic, "i2c");
 > +
->  void kvmppc_set_papr(PowerPCCPU *cpu)
->  {
->      CPUState *cs =3D CPU(cpu);
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 2937b36cae..2c2ea30e87 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -23,6 +23,7 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int =
-level);
->  void kvmppc_enable_logical_ci_hcalls(void);
->  void kvmppc_enable_set_mode_hcall(void);
->  void kvmppc_enable_clear_ref_mod_hcalls(void);
-> +void kvmppc_enable_h_page_init(void);
->  void kvmppc_set_papr(PowerPCCPU *cpu);
->  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
->  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
-> @@ -138,6 +139,10 @@ static inline void kvmppc_enable_clear_ref_mod_hcall=
-s(void)
->  {
->  }
-> =20
-> +static inline void kvmppc_enable_h_page_init(void)
-> +{
-> +}
+> +    dt_rtc_create(fdt, "i2c", "rtc");
 > +
->  static inline void kvmppc_set_papr(PowerPCCPU *cpu)
->  {
->  }
+> +
+>      gutil =3D g_strdup_printf("%s/global-utilities@%llx", soc,
+>                              MPC8544_UTIL_OFFSET);
+>      qemu_fdt_add_subnode(fdt, gutil);
+> @@ -812,6 +855,7 @@ void ppce500_init(MachineState *machine)
+>      MemoryRegion *ccsr_addr_space;
+>      SysBusDevice *s;
+>      PPCE500CCSRState *ccsr;
+> +    I2CBus *i2c;
+> =20
+>      irqs =3D g_new0(IrqLines, smp_cpus);
+>      for (i =3D 0; i < smp_cpus; i++) {
+> @@ -887,6 +931,16 @@ void ppce500_init(MachineState *machine)
+>                         0, qdev_get_gpio_in(mpicdev, 42), 399193,
+>                         serial_hd(1), DEVICE_BIG_ENDIAN);
+>      }
+> +        /* I2C */
+> +    dev =3D qdev_create(NULL, "mpc-i2c");
+> +    s =3D SYS_BUS_DEVICE(dev);
+> +    qdev_init_nofail(dev);
+> +    sysbus_connect_irq(s, 0, qdev_get_gpio_in(mpicdev, MPC8544_I2C_IRQ));
+> +    memory_region_add_subregion(ccsr_addr_space, MPC8544_I2C_REGS_OFFSET,
+> +                                sysbus_mmio_get_region(s, 0));
+> +    i2c =3D (I2CBus *)qdev_get_child_bus(dev, "i2c");
+> +    i2c_create_slave(i2c, "ds1338", RTC_REGS_OFFSET);
+> +
+> =20
+>      /* General Utility device */
+>      dev =3D qdev_create(NULL, "mpc8544-guts");
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -113,24 +575,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---DBIVS5p969aUjpLe
+--7gGkHNMELEOhSGF6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAZO4ACgkQbDjKyiDZ
-s5ILrxAAzutApXlLYzTgpN4vHsL+IY28fJBDHUaIeXaIHvxLV91rHAplrnLKZrpv
-wTqlL/pbMjQlvDTnZK0WEE1KBNnReJRTOXD+UIW2WjU251S6iTwwt8UeXgRmqgYW
-lf9VYYNBUrPKV3nJ8rSDy1maBuh9Kc9PNKzK3mSQxfS9ycEaTgUGQ1fDIbToxxcZ
-LBYLv+Q9xzSs+caSh9mMHasMGgcWMNPz6qskj+2peOSy6qUBk2q1b8CFTC+gjwtY
-Ef8cafG55gz3vaBP2EX+iaelLDBw2vs5qH8JlafQ/1MYZmbK7J8Dwc/83hufcLxT
-aMyHbFu1iJRnIWxltysKwg7U6y9ImxLIgeo3ASZBxYNDbas17xDJFypXL9nU7j3i
-rBj+T/tW2GS/RniPbYjJNuahK37xCaO5mxS79a2yrJgZdGG6jdkcM6iibUgH1lFO
-qGNVZbSVfl0q8LHr1rVWoWcrNMSDIbEzNwl409hChoela86ri1qN/819g6o9EqZ9
-h5xpiUKnzaiEjvPYU97eWpR+0tdcBYmlp4BtUHcaqiF4f4aAjByATxcbudHtUFZ5
-LpYZk/OiPwVLO+JP4hxHZH782sV+GrOTkQv8P3zLOZQYg4LTlF7u/ofVwN1oVhT0
-+Pl4my7duubbO9Lrk0r6VjwOqiJ4LaQQUNBe9nAaGbSNdnO4opU=
-=GiiY
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAZr4ACgkQbDjKyiDZ
+s5Jm1hAAsRUKefuoZDqupWZ98SDrYaHF8emCJ/il6YENH6aLKu0g9/Ny3cKBPiG3
+mA8ugtCkoPEnk7BnilgcNOHW4AMy4hU8L6Dh4Scu7Z8SkaqNHkWEMkGqSnb6Gb/R
+znqN+3xDOh/jQGnlsblQTEBsTgRSSCxVd5eZihNWMbB4rHjxt9aIubwzlsY++pme
+vWfrR6qSvIidvs5n4vkD7K394gAkn8q63nM+ufoUbJYiHXxQKSvT2v+Ms3G6p9WI
+1IwpXkIJXigvbYnHHGnJU1Sa3PgAOKwu/tiaqHyXpv/vC2mdhvLaQ+K0WvdJ2d7r
+RYiVoCvzecg19T9dqXO3MOKbqaVBdvirkhcHUFK/yD9yBNTCURF9uYO/FUmYpRsN
+PVFu/+1HeI1/TAUeG2X/1jAWqBl0PMRBzlsWE+rHmcOG1tIRAecqf47qnsXi8rCT
+/nse/0ISRBub2fyRxocpp+JMcpnPvvcKGKUjB40bp4l/KUmonfM0dkkraUndVEbI
+RKUuLDgaOsPSxtjoFO+Xfymuo1P/CyU1/Z09//Sh5ZrMKxFFyzJlD79iejw69pvf
+Bi6EfurdDGMz4k1btNsK5RKuuZLOe96RQLN0np90JyOW0/XMzYqqfDpPaTtTKZNq
+bYpItJS4o6UoaTZQkDpwrezGTZqtd4omu/V3YxmbA3BsAU0ZExY=
+=5r0H
 -----END PGP SIGNATURE-----
 
---DBIVS5p969aUjpLe--
+--7gGkHNMELEOhSGF6--
