@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59765)
+Received: from eggs.gnu.org ([209.51.188.92]:59834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLm-00026R-AM
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:55 -0500
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLv-0002CS-PE
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLl-000514-8q
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:54 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:55424)
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nLu-0005Az-EX
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:03 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:55578)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1h1nLk-000501-V6
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:21:53 -0500
+	id 1h1nLu-0005AZ-3W
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:02 -0500
 From: elena.ufimtseva@oracle.com
-Date: Wed,  6 Mar 2019 23:21:37 -0800
-Message-Id: <20190307072137.8735-1-elena.ufimtseva@oracle.com>
-Subject: [Qemu-devel] [multiprocess RFC PATCH 14/37] multi-process: PCI BAR
- write handling for proxy & remote endpoints
+Date: Wed,  6 Mar 2019 23:21:44 -0800
+Message-Id: <20190307072144.8781-1-elena.ufimtseva@oracle.com>
+Subject: [Qemu-devel] [multiprocess RFC PATCH 15/37] multi-process: PCI BAR
+ read handling for proxy & remote endpoints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,153 +28,159 @@ Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, 
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-Proxy device object implements handler for PCI BAR writes. The handler
-sends BAR_WRITE message to the remote process with the BAR address and
-value to be written
-The remote process implements handler for BAR_WRITE message.
+Proxy device object implements the read handler for PCI BAR accesses.
+The handler sends BAR_READ message to the remote process.
+The remote process implements handler for BAR_READ message.
 
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 ---
- hw/proxy/qemu-proxy.c         | 28 ++++++++++++++++++++++++++++
+ hw/proxy/qemu-proxy.c         | 22 +++++++++++++++++++
  include/hw/proxy/qemu-proxy.h |  3 +++
- include/io/proxy-link.h       | 10 ++++++++++
- remote/remote-main.c          | 24 ++++++++++++++++++++++++
- 4 files changed, 65 insertions(+)
+ include/io/proxy-link.h       |  2 ++
+ remote/remote-main.c          | 49 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 76 insertions(+)
 
 diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index 91cc82b..49ed683 100644
+index 49ed683..08e549e 100644
 --- a/hw/proxy/qemu-proxy.c
 +++ b/hw/proxy/qemu-proxy.c
-@@ -201,3 +201,31 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
-         }
+@@ -207,6 +207,7 @@ static void send_bar_access_msg(ProxyLinkState *proxy_link, MemoryRegion *mr,
+                                 unsigned size, bool memory)
+ {
+     ProcMsg msg;
++    int wait;
+ 
+     memset(&msg, 0, sizeof(ProcMsg));
+ 
+@@ -219,9 +220,20 @@ static void send_bar_access_msg(ProxyLinkState *proxy_link, MemoryRegion *mr,
+     if (write) {
+         msg.cmd = BAR_WRITE;
+         msg.data1.bar_access.val = *val;
++    } else {
++        wait = GET_REMOTE_WAIT;
++
++        msg.cmd = BAR_READ;
++        msg.num_fds = 1;
++        msg.fds[0] = wait;
      }
+ 
+     proxy_proc_send(proxy_link, &msg);
++
++    if (!write) {
++        *val = wait_for_remote(wait);
++        PUT_REMOTE_WAIT(wait);
++    }
+ }
+ 
+ void proxy_default_bar_write(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
+@@ -229,3 +241,13 @@ void proxy_default_bar_write(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
+ {
+     send_bar_access_msg(dev->proxy_link, mr, true, addr, &val, size, memory);
  }
 +
-+static void send_bar_access_msg(ProxyLinkState *proxy_link, MemoryRegion *mr,
-+                                bool write, hwaddr addr, uint64_t *val,
++uint64_t proxy_default_bar_read(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
 +                                unsigned size, bool memory)
 +{
-+    ProcMsg msg;
++    uint64_t val;
 +
-+    memset(&msg, 0, sizeof(ProcMsg));
++    send_bar_access_msg(dev->proxy_link, mr, false, addr, &val, size, memory);
 +
-+    msg.bytestream = 0;
-+    msg.size = sizeof(msg.data1);
-+    msg.data1.bar_access.addr = mr->addr + addr;
-+    msg.data1.bar_access.size = size;
-+    msg.data1.bar_access.memory = memory;
-+
-+    if (write) {
-+        msg.cmd = BAR_WRITE;
-+        msg.data1.bar_access.val = *val;
-+    }
-+
-+    proxy_proc_send(proxy_link, &msg);
-+}
-+
-+void proxy_default_bar_write(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
-+                             uint64_t val, unsigned size, bool memory)
-+{
-+    send_bar_access_msg(dev->proxy_link, mr, true, addr, &val, size, memory);
++    return val;
 +}
 diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.h
-index 0b0d94a..567a7c6 100644
+index 567a7c6..e8d3a9c 100644
 --- a/include/hw/proxy/qemu-proxy.h
 +++ b/include/hw/proxy/qemu-proxy.h
-@@ -65,4 +65,7 @@ typedef struct PCIProxyDevClass {
-     char *command;
- } PCIProxyDevClass;
+@@ -68,4 +68,7 @@ typedef struct PCIProxyDevClass {
+ void proxy_default_bar_write(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
+                              uint64_t val, unsigned size, bool memory);
  
-+void proxy_default_bar_write(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
-+                             uint64_t val, unsigned size, bool memory);
++uint64_t proxy_default_bar_read(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
++                                unsigned size, bool memory);
 +
  #endif /* QEMU_PROXY_H */
 diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
-index 521df4f..2884852 100644
+index 2884852..dc3c074 100644
 --- a/include/io/proxy-link.h
 +++ b/include/io/proxy-link.h
-@@ -56,6 +56,7 @@ typedef struct ProxyLinkState ProxyLinkState;
-  * CONF_READ        PCI config. space read
+@@ -57,6 +57,7 @@ typedef struct ProxyLinkState ProxyLinkState;
   * CONF_WRITE       PCI config. space write
   * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
-+ * BAR_WRITE        Writes to PCI BAR region
+  * BAR_WRITE        Writes to PCI BAR region
++ * BAR_READ         Reads from PCI BAR region
   *
   */
  typedef enum {
-@@ -63,6 +64,7 @@ typedef enum {
-     CONF_READ,
+@@ -65,6 +66,7 @@ typedef enum {
      CONF_WRITE,
      SYNC_SYSMEM,
-+    BAR_WRITE,
+     BAR_WRITE,
++    BAR_READ,
      MAX,
  } proc_cmd_t;
  
-@@ -85,6 +87,13 @@ typedef struct {
- } sync_sysmem_msg_t;
- 
- typedef struct {
-+    hwaddr addr;
-+    uint64_t val;
-+    unsigned size;
-+    bool memory;
-+} bar_access_msg_t;
-+
-+typedef struct {
-     proc_cmd_t cmd;
-     int bytestream;
-     size_t size;
-@@ -92,6 +101,7 @@ typedef struct {
-     union {
-         uint64_t u64;
-         sync_sysmem_msg_t sync_sysmem;
-+        bar_access_msg_t bar_access;
-     } data1;
- 
-     int fds[REMOTE_MAX_FDS];
 diff --git a/remote/remote-main.c b/remote/remote-main.c
-index f708be2..cf7949c 100644
+index cf7949c..f0390cc 100644
 --- a/remote/remote-main.c
 +++ b/remote/remote-main.c
-@@ -45,6 +45,7 @@
- #include "qemu/config-file.h"
- #include "sysemu/sysemu.h"
- #include "block/block.h"
-+#include "exec/memattrs.h"
- 
- static ProxyLinkState *proxy_link;
- PCIDevice *remote_pci_dev;
-@@ -75,6 +76,23 @@ static void process_config_read(ProcMsg *msg)
-     PUT_REMOTE_WAIT(wait);
+@@ -93,6 +93,49 @@ static void process_bar_write(ProcMsg *msg, Error **errp)
+     }
  }
  
-+/* TODO: confirm memtx attrs. */
-+static void process_bar_write(ProcMsg *msg, Error **errp)
++static void process_bar_read(ProcMsg *msg, Error **errp)
 +{
 +    bar_access_msg_t *bar_access = &msg->data1.bar_access;
-+    AddressSpace *as =
-+        bar_access->memory ? &address_space_memory : &address_space_io;
++    AddressSpace *as;
++    int wait = msg->fds[0];
 +    MemTxResult res;
++    uint64_t val = 0;
++
++    as = bar_access->memory ? &address_space_memory : &address_space_io;
++
++    assert(bar_access->size <= sizeof(uint64_t));
 +
 +    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
-+                           (uint8_t *)&bar_access->val, bar_access->size, true);
++                           (uint8_t *)&val, bar_access->size, false);
 +
 +    if (res != MEMTX_OK) {
-+        error_setg(errp, "Could not perform address space write operation,"
++        error_setg(errp, "Could not perform address space read operation,"
 +                   " inaccessible address: %lx.", bar_access->addr);
++        val = (uint64_t)-1;
++        goto fail;
 +    }
++
++    switch (bar_access->size) {
++    case 4:
++        val = *((uint32_t *)&val);
++        break;
++    case 2:
++        val = *((uint16_t *)&val);
++        break;
++    case 1:
++        val = *((uint8_t *)&val);
++        break;
++    default:
++        error_setg(errp, "Invalid PCI BAR read size");
++        return;
++    }
++
++fail:
++    notify_proxy(wait, val);
++
++    PUT_REMOTE_WAIT(wait);
 +}
 +
  static void process_msg(GIOCondition cond)
  {
      ProcMsg *msg = NULL;
-@@ -101,6 +119,12 @@ static void process_msg(GIOCondition cond)
-     case CONF_READ:
-         process_config_read(msg);
+@@ -125,6 +168,12 @@ static void process_msg(GIOCondition cond)
+             goto finalize_loop;
+         }
          break;
-+    case BAR_WRITE:
-+        process_bar_write(msg, &err);
++    case BAR_READ:
++        process_bar_read(msg, &err);
 +        if (err) {
 +            goto finalize_loop;
 +        }
