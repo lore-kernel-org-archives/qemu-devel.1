@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41623)
+Received: from eggs.gnu.org ([209.51.188.92]:41655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwY-0004LD-8N
+	(envelope-from <david@redhat.com>) id 1h1rwa-0004LI-SH
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1h1rwX-0008Ns-Ac
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:10 -0500
+	(envelope-from <david@redhat.com>) id 1h1rwZ-0008Oo-2e
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 07:16:12 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Mar 2019 13:15:20 +0100
-Message-Id: <20190307121539.12842-14-david@redhat.com>
+Date: Thu,  7 Mar 2019 13:15:21 +0100
+Message-Id: <20190307121539.12842-15-david@redhat.com>
 In-Reply-To: <20190307121539.12842-1-david@redhat.com>
 References: <20190307121539.12842-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 13/32] s390x/tcg: Implement VECTOR LOAD
- MULTIPLE
+Subject: [Qemu-devel] [PATCH v3 14/32] s390x/tcg: Implement VECTOR LOAD TO
+ BLOCK BOUNDARY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +23,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Try to load the last element first. Access to the first element will
-be checked afterwards. This way, we can guarantee that the vector is
-not modified before we checked for all possible exceptions. (16 vectors
-cannot cross more than two pages)
+Very similar to LOAD COUNT TO BLOCK BOUNDARY, but instead of only
+calculating, the actual vector is loaded. Use a temporary vector to
+not modify the real vector on exceptions. Initialize that one to zero,
+to not leak any data. Provide a fast path if we're loading a full
+vector.
+
+As we don't have gvec ool handlers for single vectors, just calculate
+the vector address manually.
+
+We can reuse the helper later on for VECTOR LOAD WITH LENGTH. In fact,
+we are going to name it "vll" right from the beginning, because that's
+a better match.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
+ target/s390x/Makefile.objs      |  1 +
+ target/s390x/helper.h           |  3 +++
  target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 40 +++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
+ target/s390x/translate_vx.inc.c | 25 +++++++++++++++++++
+ target/s390x/vec_helper.c       | 44 +++++++++++++++++++++++++++++++++
+ 5 files changed, 75 insertions(+)
+ create mode 100644 target/s390x/vec_helper.c
 
+diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
+index 22a9a9927a..68eeee3d2f 100644
+--- a/target/s390x/Makefile.objs
++++ b/target/s390x/Makefile.objs
+@@ -1,6 +1,7 @@
+ obj-y += cpu.o cpu_models.o cpu_features.o gdbstub.o interrupt.o helper.o
+ obj-$(CONFIG_TCG) += translate.o cc_helper.o excp_helper.o fpu_helper.o
+ obj-$(CONFIG_TCG) += int_helper.o mem_helper.o misc_helper.o crypto_helper.o
++obj-$(CONFIG_TCG) += vec_helper.o
+ obj-$(CONFIG_SOFTMMU) += machine.o ioinst.o arch_dump.o mmu_helper.o diag.o
+ obj-$(CONFIG_SOFTMMU) += sigp.o
+ obj-$(CONFIG_KVM) += kvm.o
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index bb659257f6..6c745ba0f6 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -124,6 +124,9 @@ DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
+ DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
+ DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+ 
++/* === Vector Support Instructions === */
++DEF_HELPER_FLAGS_4(vll, TCG_CALL_NO_WG, void, env, ptr, i64, i64)
++
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+ DEF_HELPER_4(diag, void, env, i32, i32, i32)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 2b36205c84..fa0f3a9003 100644
+index fa0f3a9003..ad8df5283c 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1000,6 +1000,8 @@
-     F(0xe721, VLGV,    VRS_c, V,   la2, 0, r1, 0, vlgv, 0, IF_VEC)
- /* VECTOR LOAD LOGICAL ELEMENT AND ZERO */
+@@ -1002,6 +1002,8 @@
      F(0xe704, VLLEZ,   VRX,   V,   la2, 0, 0, 0, vllez, 0, IF_VEC)
-+/* VECTOR LOAD MULTIPLE */
-+    F(0xe736, VLM,     VRS_a, V,   la2, 0, 0, 0, vlm, 0, IF_VEC)
+ /* VECTOR LOAD MULTIPLE */
+     F(0xe736, VLM,     VRS_a, V,   la2, 0, 0, 0, vlm, 0, IF_VEC)
++/* VECTOR LOAD TO BLOCK BOUNDARY */
++    F(0xe707, VLBB,    VRX,   V,   la2, 0, 0, 0, vlbb, 0, IF_VEC)
  
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index cdad2a52f0..083f5c6213 100644
+index 083f5c6213..f1eb458902 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -406,3 +406,43 @@ static DisasJumpType op_vllez(DisasContext *s, DisasOps *o)
-     tcg_temp_free_i64(t);
+@@ -446,3 +446,28 @@ static DisasJumpType op_vlm(DisasContext *s, DisasOps *o)
+     tcg_temp_free_i64(t1);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vlm(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vlbb(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t v3 = get_field(s->fields, v3);
-+    uint8_t v1 = get_field(s->fields, v1);
-+    TCGv_i64 t0, t1;
++    const int64_t block_size = (1ull << (get_field(s->fields, m3) + 6));
++    const int v1_offs = vec_full_reg_offset(get_field(s->fields, v1));
++    TCGv_ptr a0;
++    TCGv_i64 bytes;
 +
-+    if (v3 < v1 || (v3 - v1 + 1) > 16) {
++    if (get_field(s->fields, m3) > 6) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
 +    }
 +
-+    /*
-+     * Check for possible access exceptions by trying to load the last
-+     * element. The first element will be checked first next.
-+     */
-+    t0 = tcg_temp_new_i64();
-+    t1 = tcg_temp_new_i64();
-+    gen_addi_and_wrap_i64(s, t0, o->addr1, (v3 - v1) * 16 + 8);
-+    tcg_gen_qemu_ld_i64(t0, t0, get_mem_index(s), MO_TEQ);
++    bytes = tcg_temp_new_i64();
++    a0 = tcg_temp_new_ptr();
++    /* calculate the number of bytes until the next block boundary */
++    tcg_gen_ori_i64(bytes, o->addr1, -block_size);
++    tcg_gen_neg_i64(bytes, bytes);
 +
-+    for (;; v1++) {
-+        tcg_gen_qemu_ld_i64(t1, o->addr1, get_mem_index(s), MO_TEQ);
-+        write_vec_element_i64(t1, v1, 0, ES_64);
-+        if (v1 == v3) {
-+            break;
-+        }
-+        gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
-+        tcg_gen_qemu_ld_i64(t1, o->addr1, get_mem_index(s), MO_TEQ);
-+        write_vec_element_i64(t1, v1, 1, ES_64);
-+        gen_addi_and_wrap_i64(s, o->addr1, o->addr1, 8);
-+    }
-+
-+    /* Store the last element, loaded first */
-+    write_vec_element_i64(t0, v1, 1, ES_64);
-+
-+    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(t1);
++    tcg_gen_addi_ptr(a0, cpu_env, v1_offs);
++    gen_helper_vll(cpu_env, a0, o->addr1, bytes);
++    tcg_temp_free_i64(bytes);
++    tcg_temp_free_ptr(a0);
 +    return DISAS_NEXT;
++}
+diff --git a/target/s390x/vec_helper.c b/target/s390x/vec_helper.c
+new file mode 100644
+index 0000000000..5b2333a8d6
+--- /dev/null
++++ b/target/s390x/vec_helper.c
+@@ -0,0 +1,44 @@
++/*
++ * QEMU TCG support -- s390x vector support instructions
++ *
++ * Copyright (C) 2019 Red Hat Inc
++ *
++ * Authors:
++ *   David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "internal.h"
++#include "vec.h"
++#include "tcg/tcg.h"
++#include "exec/helper-proto.h"
++#include "exec/cpu_ldst.h"
++#include "exec/exec-all.h"
++
++void HELPER(vll)(CPUS390XState *env, void *v1, uint64_t addr, uint64_t bytes)
++{
++    if (likely(bytes >= 16)) {
++        uint64_t t0, t1;
++
++        t0 = cpu_ldq_data_ra(env, addr, GETPC());
++        addr = wrap_address(env, addr + 8);
++        t1 = cpu_ldq_data_ra(env, addr, GETPC());
++        s390_vec_write_element64(v1, 0, t0);
++        s390_vec_write_element64(v1, 1, t1);
++    } else {
++        S390Vector tmp = {};
++        int i;
++
++        for (i = 0; i < bytes; i++) {
++            uint8_t byte = cpu_ldub_data_ra(env, addr, GETPC());
++
++            s390_vec_write_element8(&tmp, i, byte);
++            addr = wrap_address(env, addr + 1);
++        }
++        *(S390Vector *)v1 = tmp;
++    }
 +}
 -- 
 2.17.2
