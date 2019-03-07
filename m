@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59981)
+Received: from eggs.gnu.org ([209.51.188.92]:59993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nML-0002Ys-46
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:30 -0500
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMM-0002Zy-9p
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMH-0005a7-3Y
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h1nMI-0005af-DK
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:27 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:50636)
+Received: from userp2120.oracle.com ([156.151.31.85]:55888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1h1nMF-0005Yx-Gd
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:24 -0500
+	id 1h1nMH-0005ZH-4F
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 02:22:25 -0500
 From: elena.ufimtseva@oracle.com
-Date: Wed,  6 Mar 2019 23:22:15 -0800
-Message-Id: <20190307072215.9104-1-elena.ufimtseva@oracle.com>
-Subject: [Qemu-devel] [multiprocess RFC PATCH 21/37] multi-process: QMP/HMP
- commands to add a device to the remote process
+Date: Wed,  6 Mar 2019 23:22:12 -0800
+Message-Id: <20190307072212.9058-1-elena.ufimtseva@oracle.com>
+Subject: [Qemu-devel] [multiprocess RFC PATCH 20/37] multi-process: Add QMP
+ & HMP commands to list remote processes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,339 +24,212 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, dgilbert@redhat.com, berrange@redhat.com, armbru@redhat.com, eblake@redhat.com
+Cc: elena.ufimtseva@oracle.com, ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, dgilbert@redhat.com, eblake@redhat.com, armbru@redhat.com
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-Adds rdevice_add QMP & HMP commands to hotplug device to a remote device.
+Add query-remote QMP command and remote-proc-list HMP command, to list
+the remote processes spawned by QEMU.
 
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- hmp-commands.hx         | 14 ++++++++
- hmp.h                   |  1 +
- hw/proxy/monitor.c      | 92 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/io/proxy-link.h |  2 ++
- include/monitor/qdev.h  |  4 +++
- monitor.c               |  5 +++
- qapi/misc.json          | 22 ++++++++++++
- remote/remote-main.c    | 48 ++++++++++++++++++++++++++
- 8 files changed, 188 insertions(+)
+ hmp-commands.hx        | 16 +++++++++
+ hmp.h                  |  1 +
+ hw/proxy/Makefile.objs |  1 +
+ hw/proxy/monitor.c     | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json   | 29 ++++++++++++++++
+ 5 files changed, 136 insertions(+)
+ create mode 100644 hw/proxy/monitor.c
 
 diff --git a/hmp-commands.hx b/hmp-commands.hx
-index fb3c8ba..7e8e8ab 100644
+index 9b40359..fb3c8ba 100644
 --- a/hmp-commands.hx
 +++ b/hmp-commands.hx
-@@ -727,6 +727,20 @@ ETEXI
+@@ -725,6 +725,22 @@ STEXI
+ Add device.
+ ETEXI
  
- #if defined(CONFIG_MPQEMU)
-     {
-+        .name       = "rdevice_add",
-+        .args_type  = "rdev_id:s,driver:s,id:s,drive:s,bus:s",
-+        .params     = "rdev_id driver id drive bus",
-+        .help       = "add device to remote proc, like -rdevice on the command line",
-+        .cmd        = hmp_rdevice_add,
++#if defined(CONFIG_MPQEMU)
++    {
++        .name       = "remote_proc_list",
++        .args_type  = "",
++        .params     = "",
++        .help       = "list remote devices and their linux process IDs",
++        .cmd        = hmp_remote_proc_list,
 +    },
 +
 +STEXI
-+@item rdevice_add @var{config}
-+@findex rdevice_add
-+Add device to remote proc.
++@item remote_proc_list
++@findex remote_proc_list
++List remote devices and their linux process IDs.
 +ETEXI
++#endif
 +
-+    {
-         .name       = "remote_proc_list",
-         .args_type  = "",
-         .params     = "",
+     {
+         .name       = "device_del",
+         .args_type  = "id:s",
 diff --git a/hmp.h b/hmp.h
-index 0940634..355a27e 100644
+index e0f32f0..0940634 100644
 --- a/hmp.h
 +++ b/hmp.h
-@@ -150,5 +150,6 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+@@ -149,5 +149,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
  void hmp_info_sev(Monitor *mon, const QDict *qdict);
- void hmp_remote_proc_list(Monitor *mon, const QDict *qdict);
-+void hmp_rdevice_add(Monitor *mon, const QDict *qdict);
++void hmp_remote_proc_list(Monitor *mon, const QDict *qdict);
  
  #endif
+diff --git a/hw/proxy/Makefile.objs b/hw/proxy/Makefile.objs
+index f562f5a..e642060 100644
+--- a/hw/proxy/Makefile.objs
++++ b/hw/proxy/Makefile.objs
+@@ -1,2 +1,3 @@
+ common-obj-$(CONFIG_MPQEMU) += qemu-proxy.o
+ common-obj-$(CONFIG_MPQEMU) += proxy-lsi53c895a.o
++common-obj-$(CONFIG_MPQEMU) += monitor.o
 diff --git a/hw/proxy/monitor.c b/hw/proxy/monitor.c
-index 3005eec..2e2cda0 100644
---- a/hw/proxy/monitor.c
+new file mode 100644
+index 0000000..3005eec
+--- /dev/null
 +++ b/hw/proxy/monitor.c
-@@ -23,6 +23,7 @@
-  */
- 
- #include <sys/types.h>
-+#include <string.h>
- 
- #include "qemu/osdep.h"
- #include "qapi/qapi-types-block-core.h"
-@@ -33,6 +34,13 @@
- #include "hw/boards.h"
- #include "hw/i386/pc.h"
- #include "hw/proxy/qemu-proxy.h"
-+#include "qapi/qapi-commands-misc.h"
-+#include "monitor/qdev.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qjson.h"
-+#include "qapi/qmp/qstring.h"
-+#include "qapi/error.h"
-+#include "io/proxy-link.h"
- 
- /*
-  * TODO: Is there a callback where the allocated memory for QMP could be free'd
-@@ -87,3 +95,87 @@ void hmp_remote_proc_list(Monitor *mon, const QDict *qdict)
-                        pdev->remote_pid, pdev->rid, id, k->command);
-     }
- }
+@@ -0,0 +1,89 @@
++/*
++ * QEMU monitor command handler for multi-process QEMU
++ *
++ * Copyright 2019, Oracle and/or its affiliates. All rights reserved.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+static PCIProxyDev *get_proxy_device(QDict *qdict, Error **errp)
++#include <sys/types.h>
++
++#include "qemu/osdep.h"
++#include "qapi/qapi-types-block-core.h"
++#include "qapi/qapi-commands-block-core.h"
++#include "monitor/monitor.h"
++#include "qemu/option.h"
++#include "hmp.h"
++#include "hw/boards.h"
++#include "hw/i386/pc.h"
++#include "hw/proxy/qemu-proxy.h"
++
++/*
++ * TODO: Is there a callback where the allocated memory for QMP could be free'd
++ */
++RemoteProcList *qmp_query_remote(Error **errp)
 +{
 +    PCMachineState *pcms = PC_MACHINE(current_machine);
-+    PCIProxyDev *pdev = NULL;
-+    const char *rdev_id;
++    RemoteProcList *proclist, *proc;
++    GHashTableIter itr;
++    PCIProxyDev *pdev;
++    PCIProxyDevClass *k;
++    DeviceState *d;
++    char *id;
 +
-+    if (!qdict_haskey(qdict, "rdev_id")) {
-+        error_setg(errp, "Please specify a value for rdev_id");
-+        return NULL;
++    proclist = NULL;
++
++    g_hash_table_iter_init(&itr, pcms->remote_devs);
++
++    while (g_hash_table_iter_next(&itr, (gpointer *)&id, (gpointer *)&pdev)) {
++        k = PCI_PROXY_DEV_GET_CLASS(pdev);
++        d = DEVICE(pdev);
++
++        proc = g_malloc0(sizeof(RemoteProcList));
++        proc->next = proclist;
++        proclist = proc;
++        proc->value = g_malloc0(sizeof(RemoteProc));
++        proc->value->pid = pdev->remote_pid;
++        proc->value->id = g_strdup(d->id);
++        proc->value->proc = g_strdup(k->command);
 +    }
 +
-+    rdev_id = qdict_get_str(qdict, "rdev_id");
-+
-+    pdev = (PCIProxyDev *)g_hash_table_lookup(pcms->remote_devs, rdev_id);
-+    if (!pdev) {
-+        error_setg(errp,
-+                   "No remote device by ID %s. Use query-remote command to get remote devices",
-+                   rdev_id);
-+    }
-+
-+    return pdev;
++    return proclist;
 +}
 +
-+static void rdevice_add_del(QDict *qdict, proc_cmd_t cmd, Error **errp)
++void hmp_remote_proc_list(Monitor *mon, const QDict *qdict)
 +{
 +    PCMachineState *pcms = PC_MACHINE(current_machine);
-+    ProcMsg msg = {0};
-+    PCIProxyDev *pdev = NULL;
-+    const char *id;
-+    QString *json;
-+    int wait;
++    GHashTableIter itr;
++    PCIProxyDev *pdev;
++    PCIProxyDevClass *k;
++    char *id;
 +
-+    pdev = get_proxy_device(qdict, errp);
-+    if (*errp) {
-+        return;
-+    }
++    g_hash_table_iter_init(&itr, pcms->remote_devs);
 +
-+    qdict_del(qdict, "rdev_id");
++    monitor_printf(mon, "%8.8s\t%16.16s\t%16.16s\t%16.16s\n\n", "PID", "RID",
++                   "QEMU ID", "PROCESS NAME");
 +
-+    id = qdict_get_str(qdict, "id");
++    while (g_hash_table_iter_next(&itr, (gpointer *)&id, (gpointer *)&pdev)) {
++        k = PCI_PROXY_DEV_GET_CLASS(pdev);
 +
-+    json = qobject_to_json(QOBJECT(qdict));
-+
-+    wait = GET_REMOTE_WAIT;
-+
-+    msg.cmd = cmd;
-+    msg.bytestream = 1;
-+    msg.size = strlen(qstring_get_str(json));
-+    msg.data2 = (uint8_t *)qstring_get_str(json);
-+    msg.num_fds = 1;
-+    msg.fds[0] = wait;
-+
-+    proxy_proc_send(pdev->proxy_link, &msg);
-+    (void)wait_for_remote(wait);
-+    PUT_REMOTE_WAIT(wait);
-+
-+    qstring_destroy_obj(QOBJECT(json));
-+
-+    /* TODO: Only on success */
-+    if (cmd == DEVICE_ADD) {
-+        (void)g_hash_table_insert(pcms->remote_devs, (gpointer)g_strdup(id),
-+                                  (gpointer)pdev);
++        monitor_printf(mon, "%8.8d\t%16.16s\t%16.16s\t%16.16s\n",
++                       pdev->remote_pid, pdev->rid, id, k->command);
 +    }
 +}
-+
-+void qmp_rdevice_add(QDict *qdict, QObject **ret_data, Error **errp)
-+{
-+    rdevice_add_del(qdict, DEVICE_ADD, errp);
-+}
-+
-+void hmp_rdevice_add(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+
-+    /* TODO: Is it OK to modify the QDict argument from HMP? */
-+    rdevice_add_del((QDict *)qdict, DEVICE_ADD, &err);
-+
-+    if (err) {
-+        monitor_printf(mon, "rdevice_add error: %s\n",
-+                       error_get_pretty(err));
-+        error_free(err);
-+    }
-+}
-diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
-index 175e2f1..8781508 100644
---- a/include/io/proxy-link.h
-+++ b/include/io/proxy-link.h
-@@ -60,6 +60,7 @@ typedef struct ProxyLinkState ProxyLinkState;
-  * BAR_READ         Reads from PCI BAR region
-  * SET_IRQFD        Sets the IRQFD to be used to raise interrupts directly
-  *                  from remote device
-+ * DEVICE_ADD       QMP/HMP command to hotplug device
-  *
-  */
- typedef enum {
-@@ -70,6 +71,7 @@ typedef enum {
-     BAR_WRITE,
-     BAR_READ,
-     SET_IRQFD,
-+    DEVICE_ADD,
-     MAX,
- } proc_cmd_t;
- 
-diff --git a/include/monitor/qdev.h b/include/monitor/qdev.h
-index 0ff3331..065701c 100644
---- a/include/monitor/qdev.h
-+++ b/include/monitor/qdev.h
-@@ -10,6 +10,10 @@ void hmp_info_qdm(Monitor *mon, const QDict *qdict);
- void hmp_info_qom_tree(Monitor *mon, const QDict *dict);
- void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp);
- 
-+#ifdef CONFIG_MPQEMU
-+void qmp_rdevice_add(QDict *qdict, QObject **ret_data, Error **errp);
-+#endif
-+
- int qdev_device_help(QemuOpts *opts);
- DeviceState *qdev_device_add(QemuOpts *opts, Error **errp);
- void qdev_set_id(DeviceState *dev, const char *id);
-diff --git a/monitor.c b/monitor.c
-index defa129..0ad52e5 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1155,6 +1155,11 @@ static void monitor_init_qmp_commands(void)
-     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
-                          QCO_NO_OPTIONS);
- 
-+#ifdef CONFIG_MPQEMU
-+    qmp_register_command(&qmp_commands, "rdevice_add", qmp_rdevice_add,
-+                         QCO_NO_OPTIONS);
-+#endif
-+
-     QTAILQ_INIT(&qmp_cap_negotiation_commands);
-     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities",
-                          qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG);
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 8b3ca4f..28d49ea 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1663,6 +1663,28 @@
-   'gen': false } # so we can get the additional arguments
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 2b8afbb..05394c4 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -647,6 +647,23 @@
+            '*dirty-bitmaps': ['BlockDirtyInfo'] } }
  
  ##
-+# @rdevice_add:
++# @RemoteProc:
 +#
-+# @rdev_id: ID of the remote device root
++# Remote process information.
 +#
-+# @driver: the name of the new device's driver
++# @id: Device ID
 +#
-+# @bus: the device's parent bus (device tree path)
++# @pid: Linux Process ID
 +#
-+# @id: the device's ID, must be unique
++# @proc: Process name
 +#
-+# Additional arguments depend on the type.
-+#
-+# Add a device.
-+#
-+# Since: 3.0
++# Since:  3.0.93
 +##
-+{ 'command': 'rdevice_add',
-+  'data': {'rdev_id': 'str', 'driver': 'str', '*bus': 'str', '*id': 'str'},
-+  'if': 'defined(CONFIG_MPQEMU)',
-+  'gen': false } # so we can get the additional arguments
++{ 'struct': 'RemoteProc',
++  'data': {'id': 'str', 'pid': 'int32', 'proc': 'str' },
++  'if': 'defined(CONFIG_MPQEMU)' }
 +
 +##
- # @device_del:
+ # @BlockMeasureInfo:
  #
- # Remove a device from a guest
-diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 4683e7d..03c14de 100644
---- a/remote/remote-main.c
-+++ b/remote/remote-main.c
-@@ -48,6 +48,11 @@
- #include "exec/memattrs.h"
- #include "exec/address-spaces.h"
- #include "remote/iohub.h"
-+#include "qapi/qmp/qjson.h"
-+#include "qapi/qmp/qobject.h"
-+#include "qemu/option.h"
-+#include "qemu/config-file.h"
-+#include "monitor/qdev.h"
+ # Image file size calculation information.  This structure describes the size
+@@ -768,6 +785,18 @@
+ ##
+ { 'command': 'query-block', 'returns': ['BlockInfo'] }
  
- static ProxyLinkState *proxy_link;
- PCIDevice *remote_pci_dev;
-@@ -138,6 +143,44 @@ fail:
-     PUT_REMOTE_WAIT(wait);
- }
++##
++# @query-remote:
++#
++# Get a list of all the remote processes spawned by QEMU.
++#
++# Returns: a list of @RemoteProc describing each remote process.
++#
++# Since: 3.0.93
++#
++##
++{ 'command': 'query-remote', 'returns': ['RemoteProc'],
++  'if': 'defined(CONFIG_MPQEMU)' }
  
-+static void process_device_add_msg(ProcMsg *msg)
-+{
-+    Error *local_err = NULL;
-+    const char *json = (const char *)msg->data2;
-+    int wait = msg->fds[0];
-+    QObject *qobj = NULL;
-+    QDict *qdict = NULL;
-+    QemuOpts *opts = NULL;
-+
-+    qobj = qobject_from_json(json, &local_err);
-+    if (local_err) {
-+        goto fail;
-+    }
-+
-+    qdict = qobject_to(QDict, qobj);
-+    assert(qdict);
-+
-+    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, &local_err);
-+    if (local_err) {
-+        goto fail;
-+    }
-+
-+    (void)qdev_device_add(opts, &local_err);
-+    if (local_err) {
-+        goto fail;
-+    }
-+
-+fail:
-+    if (local_err) {
-+        error_report_err(local_err);
-+        /* TODO: communicate the exact error message to proxy */
-+    }
-+
-+    notify_proxy(wait, 1);
-+
-+    PUT_REMOTE_WAIT(wait);
-+}
-+
- static void process_msg(GIOCondition cond)
- {
-     ProcMsg *msg = NULL;
-@@ -189,6 +232,9 @@ static void process_msg(GIOCondition cond)
-     case SET_IRQFD:
-         process_set_irqfd_msg(remote_pci_dev, msg);
-         break;
-+    case DEVICE_ADD:
-+        process_device_add_msg(msg);
-+        break;
-     default:
-         error_setg(&err, "Unknown command");
-         goto finalize_loop;
-@@ -225,6 +271,8 @@ int main(int argc, char *argv[])
- 
-     bdrv_init_with_whitelist();
- 
-+    qemu_add_opts(&qemu_device_opts);
-+
-     if (qemu_init_main_loop(&err)) {
-         error_report_err(err);
-         return -EBUSY;
+ ##
+ # @BlockDeviceTimedStats:
 -- 
 1.8.3.1
