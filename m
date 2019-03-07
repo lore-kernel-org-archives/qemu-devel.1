@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60583)
+Received: from eggs.gnu.org ([209.51.188.92]:60926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1rBo-0001wC-2j
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:27:52 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h1rDZ-0002eT-RL
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:29:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1rBn-0006sV-2o
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:27:52 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:41779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1rBm-0006s6-Qi
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:27:51 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id t7so13735491otk.8
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 03:27:50 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1h1rDY-0007ep-ST
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:29:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53520)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h1rDY-0007eS-JS
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 06:29:40 -0500
+Date: Thu, 7 Mar 2019 11:29:33 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190307112933.GA2853@work-vm>
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
+	<CAFEAcA_RQU+HYczN4Z=vEL8U31---GTi_HOxg8y50pzX8p+p7Q@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190306235850.30110-1-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190306235850.30110-1-samuel.thibault@ens-lyon.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Mar 2019 11:27:38 +0000
-Message-ID: <CAFEAcA92uBmran70VSGvgd2dj034O5mxELSBfNSjzDg1Q=Ecyw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/12] slirp updates
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_RQU+HYczN4Z=vEL8U31---GTi_HOxg8y50pzX8p+p7Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-On Wed, 6 Mar 2019 at 23:59, Samuel Thibault
-<samuel.thibault@ens-lyon.org> wrote:
->
-> The following changes since commit 32694e98b8d7a246345448a8f707d2e11d6c65e2:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2019-03-06 18:52:19 +0000)
->
-> are available in the Git repository at:
->
->   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->
-> for you to fetch changes up to dd9eff6c839db3996c157f0a6a4e18f95683e58c:
->
->   slirp: remove QEMU Makefile.objs (2019-03-07 00:12:34 +0100)
->
-> ----------------------------------------------------------------
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On Thu, 7 Mar 2019 at 06:39, Thomas Huth <thuth@redhat.com> wrote:
+> > On 06/03/2019 19.12, Paolo Bonzini wrote:
+> > > lately I have been thinking of converting the QEMU build system to
+> > > Meson.  Meson is a relatively new build system that can replace
+> > > Autotools or hand-written Makefiles such as QEMU; as a die-hard
+> > > Autotools fan, I must say that Meson is by far better than anything else
+> > > that has ever tried to replace Autotools, and actually has the potential
+> > > to do so.
+> > >
+> > > Advantages of Meson that directly matter for QEMU include:[...]
+> >
+> > I'm not objecting a new build system per se, but could you elaborate on
+> >  problems of the current QEMU build system that will be fixed by this
+> > change? Since apart from some minor glitches (with the *.mak file
+> > dependencies for example), the current build system seems to work quite
+> > well for me ... so at least I currently don't feel enough pain yet to do
+> > such a big step, just because there is another new cool build system
+> > around...
+> 
+> Yes, that tends to be my view. Our current build system:
+>  * has no dependencies that are problematic for older hosts
+>    (contrast Meson, which needs Python 3.5, even if we take
+>    the drastic step of shipping an entire build tool along
+>    with QEMU; OSX python is 2.7 still)
+>  * is not particularly hard to deal with for the common cases
+>    ("add new source file" is straightforward)
+>  * covers all our requirements as far as I'm aware
+>    (whereas you've listed a couple of places where Meson
+>    would need changes/extensions to support things we do already)
+>  * is generally flexible enough to be hackable to deal with odd
+>    cases (it has escape mechanisms to generic-programmability,
+>    even if they're ugly and awkward)
 
-Hi; this fails to build on FreeBSD, I'm afraid:
+Pretty regularly I just give up on build directories and recreate
+them because of changes that our Makefiles haven't realised
+when updating a tree.
+(I can't say it's any one fault anywhere)
 
-In file included from /var/tmp/qemu-test.Sn5gQz/slirp/src/stream.c:24:
-In file included from /var/tmp/qemu-test.Sn5gQz/slirp/src/stream.h:4:
-/var/tmp/qemu-test.Sn5gQz/slirp/src/libslirp.h:29:19: warning: type
-specifier missing, defaults to 'int' [-Wimplicit-int]
-typedef ssize_t (*SlirpReadCb)(void *buf, size_t len, void *opaque);
-                  ^
-/var/tmp/qemu-test.Sn5gQz/slirp/src/libslirp.h:29:9: warning: type
-specifier missing, defaults to 'int' [-Wimplicit-int]
-typedef ssize_t (*SlirpReadCb)(void *buf, size_t len, void *opaque);
-~~~~~~~ ^
-/var/tmp/qemu-test.Sn5gQz/slirp/src/libslirp.h:29:17: error: function
-cannot return function type 'int (void *, size_t, void *)' (aka 'int
-(void *, unsigned
-long, void *)')
-typedef ssize_t (*SlirpReadCb)(void *buf, size_t len, void *opaque);
-                ^
-/var/tmp/qemu-test.Sn5gQz/slirp/src/libslirp.h:30:32: error: function
-cannot return function type 'ssize_t' (aka 'int (int *)')
-typedef ssize_t (*SlirpWriteCb)(const void *buf, size_t len, void *opaque);
-                               ^
-/var/tmp/qemu-test.Sn5gQz/slirp/src/libslirp.h:108:22: error: unknown
-type name 'SlirpReadCb'
-                     SlirpReadCb read_cb, void *opaque);
-                     ^
-In file included from /var/tmp/qemu-test.Sn5gQz/slirp/src/stream.c:24:
-/var/tmp/qemu-test.Sn5gQz/slirp/src/stream.h:7:5: error: unknown type
-name 'SlirpReadCb'
-    SlirpReadCb read_cb;
-    ^
-2 warnings and 4 errors generated.
+Having said that, the counterpoint in Meson is that it's build
+directories seem tobe exact-meson version dependent; doing a minor
+host update and you find you have to nuke your build directories.
 
-I think this is a missing #include of <sys/types.h> which is where
-ssize_t comes from -- on the other OSes it likely gets dragged in
-by default.
+Dave
 
-thanks
--- PMM
+> So I think we'd need a more compelling reason to move right now.
+> (This might change in the future, eg if Meson catches on to the
+> extent that everybody is using it and competitors like CMake are
+> more obviously eclipsed by it, in the way that git took over
+> from svn and relegated mercurial and bzr to obscurity.)
+> 
+> thanks
+> -- PMM
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
