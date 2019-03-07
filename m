@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59271)
+Received: from eggs.gnu.org ([209.51.188.92]:60359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1hPS-0007Jx-7a
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:01:18 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1h1hVf-0000D1-4D
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:07:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h1hPO-0005En-E6
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:01:15 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:51441)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h1hPM-00059V-4I
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:01:12 -0500
-Date: Thu, 7 Mar 2019 02:00:53 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <201903070131.56436.randrianasulu@gmail.com>
-Message-ID: <alpine.BSF.2.21.9999.1903070153210.71841@zero.eik.bme.hu>
-References: <201903070131.56436.randrianasulu@gmail.com>
+	(envelope-from <guoheyi@huawei.com>) id 1h1hVe-0007PQ-7C
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 20:07:43 -0500
+References: <1551823429-1440-1-git-send-email-guoheyi@huawei.com>
+	<20190306113354.5a98654b@redhat.com>
+	<b904272b-9eca-36e7-d24b-4c84b6c4f4af@huawei.com>
+	<20190306172045.14a58996@Igors-MacBook-Pro.local>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <28709fc5-5a34-0f26-ad81-db2baa6a0b53@huawei.com>
+Date: Thu, 7 Mar 2019 09:07:26 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] PMON2000 compilation and kernel question
+In-Reply-To: <20190306172045.14a58996@Igors-MacBook-Pro.local>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw/arm/acpi: simplify AML bit
+ and/or statement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +26,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Randrianasulu <randrianasulu@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, wanghaibin.wang@huawei.com
 
-On Thu, 7 Mar 2019, Andrew Randrianasulu wrote:
->> To find out if the compiled firmware does something different with the 
->> GPU chip you can enable ati-vga traces with -trace enable="ati*" that 
->> should print register accesses (there's also a define for even more 
->> debug messages in ati_int.h). You could compare those to see if the 
->> binary does something else with the GPU.
+Got it; thanks.
+
+Heyi
+
+On 2019/3/7 0:20, Igor Mammedov wrote:
+> On Wed, 6 Mar 2019 21:09:11 +0800
+> Heyi Guo <guoheyi@huawei.com> wrote:
 >
+>> Sorry, I didn't know the indention policy of qemu code. So we need to indent the 2nd line just after the parentheses it belongs to?
+> See "[PATCH v6 0/2] CODING_STYLE: trivial update" for clarification
 >
-> hm, did this, used 'diff -y' for comparing output. It seems my version does a lot more
-
-Checked off-list, just for the record: looks like your compiled binary 
-tries to set up a flat-panel display besides the CRT but flat-panel part 
-of GPU is not modelled and with both screens pmon tries to put CRT screen 
-at an 80MB offset which can't work as chip has only 16MB VRAM. This 
-results in distorted screen. I'm not sure why it does that but it 
-shouldn't try to use flat-panel display at the first place because 
-fulong2e mini-pc QEMU tries to emulate is not a laptop and has no flat 
-panel. The pmon_2e.bin binary does not do this and only creates a CRT 
-screen at offset 0 so I think the config used to compile pmon is not right 
-yet.
-
-Regards,
-BALATON Zoltan
+>> Will change that and send next version.
+>>
+>> Thanks,
+>>
+>> Heyi
+>>
+>>
+>> On 2019/3/6 18:33, Igor Mammedov wrote:
+>>> On Wed, 6 Mar 2019 06:03:48 +0800
+>>> Heyi Guo <guoheyi@huawei.com> wrote:
+>>>
+>>>> The last argument of AML bit and/or statement is the target variable,
+>>>> so we don't need to use a NULL target and then an additional store
+>>>> operation; a single bit and/or statement is enough.
+>>>>
+>>>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>>>> ---
+>>>>    hw/arm/virt-acpi-build.c | 8 ++++----
+>>>>    1 file changed, 4 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>>> index 04b62c7..1c84e87 100644
+>>>> --- a/hw/arm/virt-acpi-build.c
+>>>> +++ b/hw/arm/virt-acpi-build.c
+>>>> @@ -265,16 +265,16 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>>>>            aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+>>>>        aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+>>>>        aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
+>>>> -    aml_append(ifctx, aml_store(aml_and(aml_name("CTRL"), aml_int(0x1D), NULL),
+>>>> +    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
+>>>>                                    aml_name("CTRL")));
+>>> pls fix indent in all such cases. I'd align it like this:
+>>>      aml_append(ifctx,
+>>>                 aml_and(aml_name("CTRL"), aml_int(0x1D), aml_name("CTRL")));
+>>>
+>>> or
+>>>      aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
+>>>                                aml_name("CTRL")));
+>>>
+>>>
+>>> PS:
+>>> When making multi-patch series use --cover-letter git option
+>>>
+>>>>    
+>>>>        ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+>>>> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x08), NULL),
+>>>> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x08),
+>>>>                                     aml_name("CDW1")));
+>>>>        aml_append(ifctx, ifctx1);
+>>>>    
+>>>>        ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
+>>>> -    aml_append(ifctx1, aml_store(aml_or(aml_name("CDW1"), aml_int(0x10), NULL),
+>>>> +    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x10),
+>>>>                                     aml_name("CDW1")));
+>>>>        aml_append(ifctx, ifctx1);
+>>>>    
+>>>> @@ -283,7 +283,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>>>>        aml_append(method, ifctx);
+>>>>    
+>>>>        elsectx = aml_else();
+>>>> -    aml_append(elsectx, aml_store(aml_or(aml_name("CDW1"), aml_int(4), NULL),
+>>>> +    aml_append(elsectx, aml_or(aml_name("CDW1"), aml_int(4),
+>>>>                                      aml_name("CDW1")));
+>>>>        aml_append(elsectx, aml_return(aml_arg(3)));
+>>>>        aml_append(method, elsectx);
+>>> .
+>>>
+>>
+>>
+>
+> .
+>
