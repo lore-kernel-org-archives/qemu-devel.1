@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49493)
+Received: from eggs.gnu.org ([209.51.188.92]:49508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1uDI-0006nU-MS
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:37 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h1uDJ-0006oe-Qo
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h1uDH-0003WP-Sb
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:36 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33419)
+	(envelope-from <richard.henderson@linaro.org>) id 1h1uDI-0003XF-WE
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:37 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:39259)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h1uDH-0003Ve-Ko
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:35 -0500
-Received: by mail-pf1-x443.google.com with SMTP id i19so11590946pfd.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 06:41:35 -0800 (PST)
+	id 1h1uDI-0003Wk-Oy
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:41:36 -0500
+Received: by mail-pg1-x544.google.com with SMTP id h8so11414959pgp.6
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 06:41:36 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Mar 2019 06:41:22 -0800
-Message-Id: <20190307144126.31847-6-richard.henderson@linaro.org>
+Date: Thu,  7 Mar 2019 06:41:23 -0800
+Message-Id: <20190307144126.31847-7-richard.henderson@linaro.org>
 In-Reply-To: <20190307144126.31847-1-richard.henderson@linaro.org>
 References: <20190307144126.31847-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 5/9] tcg/i386: Support INDEX_op_extract2_{i32,
- i64}
+Subject: [Qemu-devel] [PATCH 6/9] tcg/arm: Support INDEX_op_extract2_i32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +31,72 @@ Cc: david@redhat.com
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.h     |  4 ++--
- tcg/i386/tcg-target.inc.c | 11 +++++++++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ tcg/arm/tcg-target.h     |  2 +-
+ tcg/arm/tcg-target.inc.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 2c58eaa9ed..241bf19413 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -124,7 +124,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_deposit_i32      1
- #define TCG_TARGET_HAS_extract_i32      1
- #define TCG_TARGET_HAS_sextract_i32     1
+diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
+index 4ee6c98958..17e771374d 100644
+--- a/tcg/arm/tcg-target.h
++++ b/tcg/arm/tcg-target.h
+@@ -116,7 +116,7 @@ extern bool use_idiv_instructions;
+ #define TCG_TARGET_HAS_deposit_i32      use_armv7_instructions
+ #define TCG_TARGET_HAS_extract_i32      use_armv7_instructions
+ #define TCG_TARGET_HAS_sextract_i32     use_armv7_instructions
 -#define TCG_TARGET_HAS_extract2_i32     0
 +#define TCG_TARGET_HAS_extract2_i32     1
  #define TCG_TARGET_HAS_movcond_i32      1
- #define TCG_TARGET_HAS_add2_i32         1
- #define TCG_TARGET_HAS_sub2_i32         1
-@@ -163,7 +163,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_deposit_i64      1
- #define TCG_TARGET_HAS_extract_i64      1
- #define TCG_TARGET_HAS_sextract_i64     0
--#define TCG_TARGET_HAS_extract2_i64     0
-+#define TCG_TARGET_HAS_extract2_i64     1
- #define TCG_TARGET_HAS_movcond_i64      1
- #define TCG_TARGET_HAS_add2_i64         1
- #define TCG_TARGET_HAS_sub2_i64         1
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index e0670e5098..1fa833840e 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -452,6 +452,7 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_SHUFPS      (0xc6 | P_EXT)
- #define OPC_SHLX        (0xf7 | P_EXT38 | P_DATA16)
- #define OPC_SHRX        (0xf7 | P_EXT38 | P_SIMDF2)
-+#define OPC_SHRD_Ib     (0xac | P_EXT)
- #define OPC_TESTL	(0x85)
- #define OPC_TZCNT       (0xbc | P_EXT | P_SIMDF3)
- #define OPC_UD2         (0x0b | P_EXT)
-@@ -2587,6 +2588,12 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
+ #define TCG_TARGET_HAS_mulu2_i32        1
+ #define TCG_TARGET_HAS_muls2_i32        1
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index 2245a8aeb9..6873b0cf95 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -2064,6 +2064,27 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_sextract_i32:
+         tcg_out_sextract(s, COND_AL, args[0], args[1], args[2], args[3]);
          break;
- 
-+    OP_32_64(extract2):
-+        /* Note that SHRD outputs to the r/m operand.  */
-+        tcg_out_modrm(s, OPC_SHRD_Ib + rexw, a2, a0);
-+        tcg_out8(s, args[3]);
-+        break;
-+
-     case INDEX_op_mb:
-         tcg_out_mb(s, a0);
-         break;
-@@ -2845,6 +2852,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     static const TCGTargetOpDef r_0 = { .args_ct_str = { "r", "0" } };
-     static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
-     static const TCGTargetOpDef r_r_re = { .args_ct_str = { "r", "r", "re" } };
-+    static const TCGTargetOpDef r_0_r = { .args_ct_str = { "r", "0", "r" } };
-     static const TCGTargetOpDef r_0_re = { .args_ct_str = { "r", "0", "re" } };
-     static const TCGTargetOpDef r_0_ci = { .args_ct_str = { "r", "0", "ci" } };
-     static const TCGTargetOpDef r_L = { .args_ct_str = { "r", "L" } };
-@@ -2970,6 +2978,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_ctpop_i32:
-     case INDEX_op_ctpop_i64:
-         return &r_r;
 +    case INDEX_op_extract2_i32:
-+    case INDEX_op_extract2_i64:
-+        return &r_0_r;
++        /* ??? These optimization vs zero should be generic.  */
++        /* ??? But we can't substitute 2 for 1 in the opcode stream yet.  */
++        if (const_args[1]) {
++            if (const_args[2]) {
++                tcg_out_movi(s, TCG_TYPE_REG, args[0], 0);
++            } else {
++                tcg_out_dat_reg(s, COND_AL, ARITH_MOV, args[0], 0,
++                                args[2], SHIFT_IMM_LSL(32 - args[3]));
++            }
++        } else if (const_args[2]) {
++            tcg_out_dat_reg(s, COND_AL, ARITH_MOV, args[0], 0,
++                            args[1], SHIFT_IMM_LSR(args[3]));
++        } else {
++            /* We can do extract2 in 2 insns, vs the 3 required otherwise.  */
++            tcg_out_dat_reg(s, COND_AL, ARITH_MOV, TCG_REG_TMP, 0,
++                            args[2], SHIFT_IMM_LSL(32 - args[3]));
++            tcg_out_dat_reg(s, COND_AL, ARITH_ORR, args[0], TCG_REG_TMP,
++                            args[1], SHIFT_IMM_LSR(args[3]));
++        }
++        break;
  
+     case INDEX_op_div_i32:
+         tcg_out_sdiv(s, COND_AL, args[0], args[1], args[2]);
+@@ -2108,6 +2129,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+         = { .args_ct_str = { "s", "s", "s", "s" } };
+     static const TCGTargetOpDef br
+         = { .args_ct_str = { "r", "rIN" } };
++    static const TCGTargetOpDef ext2
++        = { .args_ct_str = { "r", "rZ", "rZ" } };
+     static const TCGTargetOpDef dep
+         = { .args_ct_str = { "r", "0", "rZ" } };
+     static const TCGTargetOpDef movc
+@@ -2174,6 +2197,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+         return &br;
      case INDEX_op_deposit_i32:
-     case INDEX_op_deposit_i64:
+         return &dep;
++    case INDEX_op_extract2_i32:
++        return &ext2;
+     case INDEX_op_movcond_i32:
+         return &movc;
+     case INDEX_op_add2_i32:
 -- 
 2.17.2
