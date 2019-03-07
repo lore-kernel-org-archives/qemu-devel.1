@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52474)
+Received: from eggs.gnu.org ([209.51.188.92]:53764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h1jPX-0006Ra-CB
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:09:32 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1jaw-0008Hh-UX
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h1jPU-0001Rg-Mc
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:09:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1h1jPU-0001Qm-DF
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:09:28 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EC834811A9
-	for <qemu-devel@nongnu.org>; Thu,  7 Mar 2019 03:09:26 +0000 (UTC)
-Date: Thu, 7 Mar 2019 11:09:15 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190307030836.GA12485@xz-x1>
-References: <20190306115532.23025-1-peterx@redhat.com>
-	<20190306115532.23025-2-peterx@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1h1jav-0006yq-1k
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:18 -0500
+Date: Thu, 7 Mar 2019 12:36:18 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190307013618.GE25123@umbus.fritz.box>
+References: <20190306085032.15744-1-clg@kaod.org>
+	<20190306085032.15744-6-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="KuLpqunXa7jZSBt+"
 Content-Disposition: inline
-In-Reply-To: <20190306115532.23025-2-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] iothread: replace init_done_cond
- with a semaphore
+In-Reply-To: <20190306085032.15744-6-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 05/27] ppc/pnv: change the CPU machine_data
+ presenter type to Object *
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,111 +25,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, Mar 06, 2019 at 07:55:28PM +0800, Peter Xu wrote:
-> Only sending an init-done message using lock+cond seems an overkill to
-> me.  Replacing it with a simpler semaphore.
-> 
-> Meanwhile, init the semaphore unconditionally, then we can destroy it
-> unconditionally too in finalize which seems cleaner.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Sorry I've definitely lost Stefan's r-b for this patch.  It's the same
-patch as the one I posted in v1.
+--KuLpqunXa7jZSBt+
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Mar 06, 2019 at 09:50:10AM +0100, C=E9dric Le Goater wrote:
+> The POWER9 PowerNV machine will use a XIVE interrupt presenter type.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Applied patches 2..5.
 
 > ---
->  include/sysemu/iothread.h |  3 +--
->  iothread.c                | 17 ++++-------------
->  2 files changed, 5 insertions(+), 15 deletions(-)
-> 
-> diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-> index 8a7ac2c528..50411ba54a 100644
-> --- a/include/sysemu/iothread.h
-> +++ b/include/sysemu/iothread.h
-> @@ -27,8 +27,7 @@ typedef struct {
->      GMainContext *worker_context;
->      GMainLoop *main_loop;
->      GOnce once;
-> -    QemuMutex init_done_lock;
-> -    QemuCond init_done_cond;    /* is thread initialization done? */
-> +    QemuSemaphore init_done_sem; /* is thread init done? */
->      bool stopping;              /* has iothread_stop() been called? */
->      bool running;               /* should iothread_run() continue? */
->      int thread_id;
-> diff --git a/iothread.c b/iothread.c
-> index e615b7ae52..6e297e9ef1 100644
-> --- a/iothread.c
-> +++ b/iothread.c
-> @@ -55,10 +55,8 @@ static void *iothread_run(void *opaque)
->      rcu_register_thread();
->  
->      my_iothread = iothread;
-> -    qemu_mutex_lock(&iothread->init_done_lock);
->      iothread->thread_id = qemu_get_thread_id();
-> -    qemu_cond_signal(&iothread->init_done_cond);
-> -    qemu_mutex_unlock(&iothread->init_done_lock);
-> +    qemu_sem_post(&iothread->init_done_sem);
->  
->      while (iothread->running) {
->          aio_poll(iothread->ctx, true);
-> @@ -115,6 +113,7 @@ static void iothread_instance_init(Object *obj)
->  
->      iothread->poll_max_ns = IOTHREAD_POLL_MAX_NS_DEFAULT;
->      iothread->thread_id = -1;
-> +    qemu_sem_init(&iothread->init_done_sem, 0);
->  }
->  
->  static void iothread_instance_finalize(Object *obj)
-> @@ -123,10 +122,6 @@ static void iothread_instance_finalize(Object *obj)
->  
->      iothread_stop(iothread);
->  
-> -    if (iothread->thread_id != -1) {
-> -        qemu_cond_destroy(&iothread->init_done_cond);
-> -        qemu_mutex_destroy(&iothread->init_done_lock);
-> -    }
->      /*
->       * Before glib2 2.33.10, there is a glib2 bug that GSource context
->       * pointer may not be cleared even if the context has already been
-> @@ -145,6 +140,7 @@ static void iothread_instance_finalize(Object *obj)
->          g_main_context_unref(iothread->worker_context);
->          iothread->worker_context = NULL;
->      }
-> +    qemu_sem_destroy(&iothread->init_done_sem);
->  }
->  
->  static void iothread_complete(UserCreatable *obj, Error **errp)
-> @@ -173,8 +169,6 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+>  include/hw/ppc/pnv_core.h | 2 +-
+>  hw/ppc/pnv.c              | 6 +++---
+>  hw/ppc/pnv_core.c         | 2 +-
+>  3 files changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+> index 9961ea3a92cd..6874bb847a01 100644
+> --- a/include/hw/ppc/pnv_core.h
+> +++ b/include/hw/ppc/pnv_core.h
+> @@ -48,7 +48,7 @@ typedef struct PnvCoreClass {
+>  #define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
+> =20
+>  typedef struct PnvCPUState {
+> -    struct ICPState *icp;
+> +    Object *intc;
+>  } PnvCPUState;
+> =20
+>  static inline PnvCPUState *pnv_cpu_state(PowerPCCPU *cpu)
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 9aa81c7f09c2..b90d03711a05 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -684,7 +684,7 @@ static void pnv_chip_power8_intc_create(PnvChip *chip=
+, PowerPCCPU *cpu,
 >          return;
 >      }
->  
-> -    qemu_mutex_init(&iothread->init_done_lock);
-> -    qemu_cond_init(&iothread->init_done_cond);
->      iothread->once = (GOnce) G_ONCE_INIT;
->  
->      /* This assumes we are called from a thread with useful CPU affinity for us
-> @@ -188,12 +182,9 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
->      g_free(name);
->  
->      /* Wait for initialization to complete */
-> -    qemu_mutex_lock(&iothread->init_done_lock);
->      while (iothread->thread_id == -1) {
-> -        qemu_cond_wait(&iothread->init_done_cond,
-> -                       &iothread->init_done_lock);
-> +        qemu_sem_wait(&iothread->init_done_sem);
->      }
-> -    qemu_mutex_unlock(&iothread->init_done_lock);
+> =20
+> -    pnv_cpu->icp =3D ICP(obj);
+> +    pnv_cpu->intc =3D obj;
 >  }
->  
->  typedef struct {
-> -- 
-> 2.17.1
-> 
+> =20
+>  /*
+> @@ -1086,7 +1086,7 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int pi=
+r)
+>  {
+>      PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
+> =20
+> -    return cpu ? pnv_cpu_state(cpu)->icp : NULL;
+> +    return cpu ? ICP(pnv_cpu_state(cpu)->intc) : NULL;
+>  }
+> =20
+>  static void pnv_pic_print_info(InterruptStatsProvider *obj,
+> @@ -1099,7 +1099,7 @@ static void pnv_pic_print_info(InterruptStatsProvid=
+er *obj,
+>      CPU_FOREACH(cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> =20
+> -        icp_pic_print_info(pnv_cpu_state(cpu)->icp, mon);
+> +        icp_pic_print_info(ICP(pnv_cpu_state(cpu)->intc), mon);
+>      }
+> =20
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index 7c806da720c6..38179cdc53dc 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -198,7 +198,7 @@ static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
+>      PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
+> =20
+>      qemu_unregister_reset(pnv_cpu_reset, cpu);
+> -    object_unparent(OBJECT(pnv_cpu_state(cpu)->icp));
+> +    object_unparent(OBJECT(pnv_cpu_state(cpu)->intc));
+>      cpu_remove_sync(CPU(cpu));
+>      cpu->machine_data =3D NULL;
+>      g_free(pnv_cpu);
 
-Regards,
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
--- 
-Peter Xu
+--KuLpqunXa7jZSBt+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAdY8ACgkQbDjKyiDZ
+s5IE1A/+LQc05M5ckae2K5BPY9WLDOXKsyHTg7dDtAWJ6oIlAYRZVBi+GFqNaH6w
+R6JUlZDY++EqWFzBAHwuikugiAz7qhImQLjZhfpxJIdLKcQJYWYovSz3vZI6SreL
+EdIYtWse4blcMqH7TljSBzUZmgNJDeceCdb+rLX3OCN5U0Gp6WNIcdoAC7dMY+vk
+Xuc5Am8che6qhnyTnrBkUa/f/aMmG2eOMQ77DzfBkEqKpTNn9VCKQbuktCZvbR+P
+Muy02tFZgrwr4ocKTveioJXriSBgLEr0xLyay+ND89JtqIW01Dq2FQYVr9z/ByKb
+OUNIa1/7H12okgGVtsBzBpy+TEfuw3jXXcCkQpqVd4GNWz+9rgEyluQsp0eRcZ/U
+MzsUwHRFtjgM5xGURnfJtbbG2cBmHScjwy6yvnIBA4rYUpbM6MIC2fxjcplNh8ub
+hGw1sc4lmpDa3MZoFk1p7U2RE1gnwpk5ONVgWGlihR192ud3eCvDgcnO/uObHGEP
+YpQYlGdkOs1M9zB3cyqv+goeI0QD8f6evJ/MrbzLShS+GRxpLcvvjav08VtxiwnX
+m3hLE3bVTyFCPQ1AiOPLR+K+zQizBzAYUKi29vHO7lA33OgjajtWEMzNDS1JXF8S
+ttSeoGvxwGKu+hV/+wB0cDnq02B4llwE4B4Pg61DO7/rGDPxrTo=
+=5kzQ
+-----END PGP SIGNATURE-----
+
+--KuLpqunXa7jZSBt+--
