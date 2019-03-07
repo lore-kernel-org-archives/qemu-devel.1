@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56360)
+Received: from eggs.gnu.org ([209.51.188.92]:57480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1paF-0000vI-Ih
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:45:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h1pci-0001yF-4x
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:47:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h1paE-0000x5-B8
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:44:59 -0500
-Resent-Message-Id: <E1h1paE-0000x5-B8@eggs.gnu.org>
-Message-ID: <155195187663.5209.1847351233529638244@6acff2cf482b>
-In-Reply-To: <20190307093723.655-1-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1h1pch-0002I6-Em
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:47:32 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33857)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h1pch-0002HE-8N
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:47:31 -0500
+Received: by mail-oi1-x243.google.com with SMTP id g16so12410852oib.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 01:47:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 01:44:38 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH v6 0/4] hw/block: better reporting on
- pflash backing file mismatch
+References: <20190305172139.32662-1-peter.maydell@linaro.org>
+	<20190305172139.32662-2-peter.maydell@linaro.org>
+	<20190307000452.imsrx5t4egcpoe4h@localhost.localdomain>
+In-Reply-To: <20190307000452.imsrx5t4egcpoe4h@localhost.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Mar 2019 09:47:18 +0000
+Message-ID: <CAFEAcA90-pKTZrVun1ibQMKMNxcMHNz_b1o5grbN0fO0cTXcZw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 01/12] docs/cpu-hotplug.rst: Fix rST
+ markup issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, mreitz@redhat.com, lersek@redhat.com
+To: Cleber Rosa <crosa@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzA5MzcyMy42NTUt
-MS1hcm1icnVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA3MDkzNzIzLjY1NS0xLWFy
-bWJydUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIIHY2IDAvNF0g
-aHcvYmxvY2s6IGJldHRlciByZXBvcnRpbmcgb24gcGZsYXNoIGJhY2tpbmcgZmlsZSBtaXNtYXRj
-aAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJh
-c2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
-cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8y
-MDE5MDMwNzA5MzcyMy42NTUtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMzA3
-MDkzNzIzLjY1NS0xLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKNDhjNDUxOGUzNCBmaXh1cCEgaHcvYmxvY2s6IFBhZCB1bmRlcnNpemVkIHJlYWQtb25s
-eSBpbWFnZXMgd2l0aCAweEZGCmI1NDJjNTE1YjUgZml4dXAhIGh3L2Jsb2NrOiBiZXR0ZXIgcmVw
-b3J0aW5nIG9uIHBmbGFzaCBiYWNraW5nIGZpbGUgbWlzbWF0Y2gKOTM2ZGJlY2FhZCBody9ibG9j
-azogUGFkIHVuZGVyc2l6ZWQgcmVhZC1vbmx5IGltYWdlcyB3aXRoIDB4RkYKMGExMjAwNmE2ZSBo
-dy9ibG9jazogYmV0dGVyIHJlcG9ydGluZyBvbiBwZmxhc2ggYmFja2luZyBmaWxlIG1pc21hdGNo
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzQgQ2hlY2tpbmcgY29tbWl0IDBhMTIwMDZhNmU0NSAo
-aHcvYmxvY2s6IGJldHRlciByZXBvcnRpbmcgb24gcGZsYXNoIGJhY2tpbmcgZmlsZSBtaXNtYXRj
-aCkKMi80IENoZWNraW5nIGNvbW1pdCA5MzZkYmVjYWFkZTQgKGh3L2Jsb2NrOiBQYWQgdW5kZXJz
-aXplZCByZWFkLW9ubHkgaW1hZ2VzIHdpdGggMHhGRikKMy80IENoZWNraW5nIGNvbW1pdCBiNTQy
-YzUxNWI1M2IgKGZpeHVwISBody9ibG9jazogYmV0dGVyIHJlcG9ydGluZyBvbiBwZmxhc2ggYmFj
-a2luZyBmaWxlIG1pc21hdGNoKQpFUlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMp
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMv
-NCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC80IENoZWNraW5nIGNvbW1pdCA0OGM0NTE4
-ZTM0OGIgKGZpeHVwISBody9ibG9jazogUGFkIHVuZGVyc2l6ZWQgcmVhZC1vbmx5IGltYWdlcyB3
-aXRoIDB4RkYpCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgMzQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC80IGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
-Y2hldy5vcmcvbG9ncy8yMDE5MDMwNzA5MzcyMy42NTUtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0
-aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Thu, 7 Mar 2019 at 00:04, Cleber Rosa <crosa@redhat.com> wrote:
+> But I'm assuming the extended sphinx roles/directives will be used, so
+> the only way to check against future breakage would be to build the
+> docs.
+>
+> Do we have strong position in favor or against putting that into the
+> "common" `make check` flow?
+
+Assuming the host has sphinx-build, the docs will be built as
+part of "make", so actual errors will be caught. We should
+add the sphinx-build flag to make warnings into errors in
+the same way we use -Werror, but I wanted to get the series
+into master first.
+
+thanks
+-- PMM
