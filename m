@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48256)
+Received: from eggs.gnu.org ([209.51.188.92]:49119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhengui@huawei.com>) id 1h1oql-0002te-GZ
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:58:01 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h1ov5-0004KX-JV
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:02:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhengui@huawei.com>) id 1h1oqk-0006mp-L5
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 03:57:59 -0500
-From: Zhengui li <lizhengui@huawei.com>
-Date: Thu, 7 Mar 2019 16:57:17 +0800
-Message-ID: <1551949037-15528-1-git-send-email-lizhengui@huawei.com>
+	(envelope-from <no-reply@patchew.org>) id 1h1ov4-0001fF-LR
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 04:02:27 -0500
+Resent-Message-Id: <E1h1ov4-0001fF-LR@eggs.gnu.org>
+Message-ID: <155194931315.5209.17807345689899533807@6acff2cf482b>
+In-Reply-To: <1551949037-15528-1-git-send-email-lizhengui@huawei.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] scsi-disk: Fix crash if request is invaild or
- disk is no medium
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Mar 2019 01:01:54 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] scsi-disk: Fix crash if request is invaild
+ or disk is no medium
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,94 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com
-Cc: lizhengui@huawei.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com, wangjie88@huawei.com, zhengxiang9@huawei.com
+To: lizhengui@huawei.com
+Cc: fam@euphon.net, pbonzini@redhat.com, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, eric.fangyi@huawei.com, qemu-devel@nongnu.org, zhengxiang9@huawei.com, wangjie88@huawei.com
 
-From: Zhengui Li <lizhengui@huawei.com>
-
-Qemu will crash with the assertion error that "assert(r->req.aiocb !=
-NULL)" in scsi_read_complete if request is invaild or disk is no medium.
-The error is below:
-qemu-kvm: hw/scsi/scsi_disk.c:299: scsi_read_complete: Assertion
-`r->req.aiocb != NULL' failed.
-
-This patch add a funtion scsi_read_complete_noio to fix it.
-
-Signed-off-by: Zhengui Li <lizhengui@huawei.com>
----
- hw/scsi/scsi-disk.c | 37 ++++++++++++++++++++++++-------------
- 1 file changed, 24 insertions(+), 13 deletions(-)
-
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index d4e83ae..624df3c 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -296,22 +296,15 @@ static void scsi_dma_complete(void *opaque, int ret)
-     aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
- }
- 
--static void scsi_read_complete(void * opaque, int ret)
-+static void scsi_read_complete_noio(SCSIDiskReq *r, int ret)
- {
--    SCSIDiskReq *r = (SCSIDiskReq *)opaque;
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
--    int n;
-+    uint32_t n;
- 
--    assert(r->req.aiocb != NULL);
--    r->req.aiocb = NULL;
--    aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
--    if (scsi_disk_req_check_error(r, ret, true)) {
-+    assert (r->req.aiocb == NULL);
-+    if (scsi_disk_req_check_error(r, ret, false)) {
-         goto done;
-     }
- 
--    block_acct_done(blk_get_stats(s->qdev.conf.blk), &r->acct);
--    trace_scsi_disk_read_complete(r->req.tag, r->qiov.size);
--
-     n = r->qiov.size / 512;
-     r->sector += n;
-     r->sector_count -= n;
-@@ -319,6 +312,24 @@ static void scsi_read_complete(void * opaque, int ret)
- 
- done:
-     scsi_req_unref(&r->req);
-+}
-+
-+static void scsi_read_complete(void * opaque, int ret)
-+{
-+    SCSIDiskReq *r = (SCSIDiskReq *)opaque;
-+    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-+
-+    assert(r->req.aiocb != NULL);
-+    r->req.aiocb = NULL;
-+
-+    aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
-+    if (ret < 0) {
-+        block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acct);
-+    } else {
-+        block_acct_done(blk_get_stats(s->qdev.conf.blk), &r->acct);
-+        trace_scsi_disk_read_complete(r->req.tag, r->qiov.size);
-+    }
-+    scsi_read_complete_noio(r, ret);
-     aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
- }
- 
-@@ -395,12 +406,12 @@ static void scsi_read_data(SCSIRequest *req)
-     scsi_req_ref(&r->req);
-     if (r->req.cmd.mode == SCSI_XFER_TO_DEV) {
-         trace_scsi_disk_read_data_invalid();
--        scsi_read_complete(r, -EINVAL);
-+        scsi_read_complete_noio(r, -EINVAL);
-         return;
-     }
- 
-     if (!blk_is_available(req->dev->conf.blk)) {
--        scsi_read_complete(r, -ENOMEDIUM);
-+        scsi_read_complete_noio(r, -ENOMEDIUM);
-         return;
-     }
- 
--- 
-2.7.2.windows.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxOTQ5MDM3LTE1NTI4LTEt
+Z2l0LXNlbmQtZW1haWwtbGl6aGVuZ3VpQGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
+c2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxv
+dyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNTUxOTQ5
+MDM3LTE1NTI4LTEtZ2l0LXNlbmQtZW1haWwtbGl6aGVuZ3VpQGh1YXdlaS5jb20KU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSF0gc2NzaS1kaXNrOiBGaXggY3Jhc2ggaWYgcmVxdWVzdCBpcyBp
+bnZhaWxkIG9yIGRpc2sgaXMgbm8gbWVkaXVtCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQou
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
+Z10gICAgICAgICAgICAgICBwYXRjaGV3LzE1NTE5NDkwMzctMTU1MjgtMS1naXQtc2VuZC1lbWFp
+bC1saXpoZW5ndWlAaHVhd2VpLmNvbSAtPiBwYXRjaGV3LzE1NTE5NDkwMzctMTU1MjgtMS1naXQt
+c2VuZC1lbWFpbC1saXpoZW5ndWlAaHVhd2VpLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCjUwMTA4OGU3ZDcgc2NzaS1kaXNrOiBGaXggY3Jhc2ggaWYgcmVxdWVzdCBpcyBpbnZh
+aWxkIG9yIGRpc2sgaXMgbm8gbWVkaXVtCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogc3Bh
+Y2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMg
+JygnCiMzODogRklMRTogaHcvc2NzaS9zY3NpLWRpc2suYzozMDM6CisgICAgYXNzZXJ0IChyLT5y
+ZXEuYWlvY2IgPT0gTlVMTCk7CgpFUlJPUjogImZvbyAqIGJhciIgc2hvdWxkIGJlICJmb28gKmJh
+ciIKIzU1OiBGSUxFOiBody9zY3NpL3Njc2ktZGlzay5jOjMxNzoKK3N0YXRpYyB2b2lkIHNjc2lf
+cmVhZF9jb21wbGV0ZSh2b2lkICogb3BhcXVlLCBpbnQgcmV0KQoKdG90YWw6IDIgZXJyb3JzLCAw
+IHdhcm5pbmdzLCA2NCBsaW5lcyBjaGVja2VkCgpDb21taXQgNTAxMDg4ZTdkNzYzIChzY3NpLWRp
+c2s6IEZpeCBjcmFzaCBpZiByZXF1ZXN0IGlzIGludmFpbGQgb3IgZGlzayBpcyBubyBtZWRpdW0p
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTE5NDkwMzctMTU1MjgtMS1naXQtc2VuZC1lbWFpbC1s
+aXpoZW5ndWlAaHVhd2VpLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
+Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
+LmNvbQ==
