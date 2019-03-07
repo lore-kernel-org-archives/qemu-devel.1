@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53791)
+Received: from eggs.gnu.org ([209.51.188.92]:53793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1jay-0008Ht-Rm
-	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:21 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h1jay-0008Hu-SF
+	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h1jaw-0006zR-Tl
+	(envelope-from <dgibson@ozlabs.org>) id 1h1jaw-0006zE-Mx
 	for qemu-devel@nongnu.org; Wed, 06 Mar 2019 22:21:20 -0500
-Date: Thu, 7 Mar 2019 12:19:05 +1100
+Date: Thu, 7 Mar 2019 12:46:15 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190307011905.GD25123@umbus.fritz.box>
+Message-ID: <20190307014615.GA7722@umbus.fritz.box>
 References: <20190306085032.15744-1-clg@kaod.org>
-	<20190306085032.15744-2-clg@kaod.org>
+	<20190306085032.15744-9-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bjuZg6miEcdLYP6q"
+	protocol="application/pgp-signature"; boundary="Kj7319i9nmIyA2yE"
 Content-Disposition: inline
-In-Reply-To: <20190306085032.15744-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 01/27] ppc/xive: hardwire the Physical CAM
- line of the thread context
+In-Reply-To: <20190306085032.15744-9-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 08/27] ppc/pnv: introduce a new
+ pic_print_info() operation to the chip model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +29,124 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---bjuZg6miEcdLYP6q
+--Kj7319i9nmIyA2yE
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 06, 2019 at 09:50:06AM +0100, C=E9dric Le Goater wrote:
-> By default on P9, the HW CAM line (23bits) is hardwired to :
+On Wed, Mar 06, 2019 at 09:50:13AM +0100, C=E9dric Le Goater wrote:
+> The POWER9 and POWER8 processors have different interrupt controllers,
+> and reporting their state requires calling different helper routines.
 >=20
->       0x000||0b1||4Bit chip number||7Bit Thread number.
->=20
-> When the block group mode is enabled at the controller level (PowerNV),
-> the CAM line is changed for CAM compares to :
->=20
->       4Bit chip number||0x001||7Bit Thread number
->=20
-> This will require changes in xive_presenter_tctx_match() possibly.
-> This is a lowlevel functionality of the HW controller and it is not
-> strictly needed. Leave it for later.
+> However, the interrupt presenters are still handled in the higher
+> level pic_print_info() routine because they are not related to the
+> chip.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Applied to ppc-for-4.0, thanks.
+Applied, thanks.
 
 > ---
->  hw/intc/xive.c | 31 ++++++++++++++++++++++++++++++-
->  1 file changed, 30 insertions(+), 1 deletion(-)
+>  include/hw/ppc/pnv.h |  1 +
+>  hw/ppc/pnv.c         | 27 ++++++++++++++++++++++++---
+>  2 files changed, 25 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index daa7badc8492..b21759c93856 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1112,6 +1112,30 @@ XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, C=
-PUState *cs)
->      return xrc->get_tctx(xrtr, cs);
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index fa9ec50fd5be..eb4bba25b3e9 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -103,6 +103,7 @@ typedef struct PnvChipClass {
+>      void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
+>      ISABus *(*isa_create)(PnvChip *chip, Error **errp);
+>      void (*dt_populate)(PnvChip *chip, void *fdt);
+> +    void (*pic_print_info)(PnvChip *chip, Monitor *mon);
+>  } PnvChipClass;
+> =20
+>  #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 087541a91a72..7660eaa22cf9 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -567,6 +567,20 @@ static ISABus *pnv_isa_create(PnvChip *chip, Error *=
+*errp)
+>      return PNV_CHIP_GET_CLASS(chip)->isa_create(chip, errp);
 >  }
 > =20
-> +/*
-> + * By default on P9, the HW CAM line (23bits) is hardwired to :
-> + *
-> + *   0x000||0b1||4Bit chip number||7Bit Thread number.
-> + *
-> + * When the block grouping is enabled, the CAM line is changed to :
-> + *
-> + *   4Bit chip number||0x001||7Bit Thread number.
-> + */
-> +static uint32_t hw_cam_line(uint8_t chip_id, uint8_t tid)
+> +static void pnv_chip_power8_pic_print_info(PnvChip *chip, Monitor *mon)
 > +{
-> +    return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
+> +    Pnv8Chip *chip8 =3D PNV8_CHIP(chip);
+> +
+> +    ics_pic_print_info(&chip8->psi.ics, mon);
 > +}
 > +
-> +static bool xive_presenter_tctx_match_hw(XiveTCTX *tctx,
-> +                                         uint8_t nvt_blk, uint32_t nvt_i=
-dx)
+> +static void pnv_chip_power9_pic_print_info(PnvChip *chip, Monitor *mon)
 > +{
-> +    CPUPPCState *env =3D &POWERPC_CPU(tctx->cs)->env;
-> +    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
+> +    Pnv9Chip *chip9 =3D PNV9_CHIP(chip);
 > +
-> +    return hw_cam_line((pir >> 8) & 0xf, pir & 0x7f) =3D=3D
-> +        hw_cam_line(nvt_blk, nvt_idx);
+> +    pnv_xive_pic_print_info(&chip9->xive, mon);
 > +}
 > +
->  /*
->   * The thread context register words are in big-endian format.
->   */
-> @@ -1120,6 +1144,7 @@ static int xive_presenter_tctx_match(XiveTCTX *tctx=
-, uint8_t format,
->                                       bool cam_ignore, uint32_t logic_ser=
-v)
+>  static void pnv_init(MachineState *machine)
 >  {
->      uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
-> +    uint32_t qw3w2 =3D xive_tctx_word2(&tctx->regs[TM_QW3_HV_PHYS]);
->      uint32_t qw2w2 =3D xive_tctx_word2(&tctx->regs[TM_QW2_HV_POOL]);
->      uint32_t qw1w2 =3D xive_tctx_word2(&tctx->regs[TM_QW1_OS]);
->      uint32_t qw0w2 =3D xive_tctx_word2(&tctx->regs[TM_QW0_USER]);
-> @@ -1142,7 +1167,11 @@ static int xive_presenter_tctx_match(XiveTCTX *tct=
-x, uint8_t format,
+>      PnvMachineState *pnv =3D PNV_MACHINE(machine);
+> @@ -878,6 +892,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
+klass, void *data)
+>      k->intc_create =3D pnv_chip_power8_intc_create;
+>      k->isa_create =3D pnv_chip_power8_isa_create;
+>      k->dt_populate =3D pnv_chip_power8_dt_populate;
+> +    k->pic_print_info =3D pnv_chip_power8_pic_print_info;
+>      k->xscom_base =3D 0x003fc0000000000ull;
+>      dc->desc =3D "PowerNV Chip POWER8E";
 > =20
->          /* F=3D0 & i=3D0: Specific NVT notification */
+> @@ -897,6 +912,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
+lass, void *data)
+>      k->intc_create =3D pnv_chip_power8_intc_create;
+>      k->isa_create =3D pnv_chip_power8_isa_create;
+>      k->dt_populate =3D pnv_chip_power8_dt_populate;
+> +    k->pic_print_info =3D pnv_chip_power8_pic_print_info;
+>      k->xscom_base =3D 0x003fc0000000000ull;
+>      dc->desc =3D "PowerNV Chip POWER8";
 > =20
-> -        /* TODO (PowerNV) : PHYS ring */
-> +        /* PHYS ring */
-> +        if ((be32_to_cpu(qw3w2) & TM_QW3W2_VT) &&
-> +            xive_presenter_tctx_match_hw(tctx, nvt_blk, nvt_idx)) {
-> +            return TM_QW3_HV_PHYS;
+> @@ -916,6 +932,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
+ *klass, void *data)
+>      k->intc_create =3D pnv_chip_power8_intc_create;
+>      k->isa_create =3D pnv_chip_power8nvl_isa_create;
+>      k->dt_populate =3D pnv_chip_power8_dt_populate;
+> +    k->pic_print_info =3D pnv_chip_power8_pic_print_info;
+>      k->xscom_base =3D 0x003fc0000000000ull;
+>      dc->desc =3D "PowerNV Chip POWER8NVL";
+> =20
+> @@ -977,6 +994,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
+lass, void *data)
+>      k->intc_create =3D pnv_chip_power9_intc_create;
+>      k->isa_create =3D pnv_chip_power9_isa_create;
+>      k->dt_populate =3D pnv_chip_power9_dt_populate;
+> +    k->pic_print_info =3D pnv_chip_power9_pic_print_info;
+>      k->xscom_base =3D 0x00603fc00000000ull;
+>      dc->desc =3D "PowerNV Chip POWER9";
+> =20
+> @@ -1164,12 +1182,15 @@ static void pnv_pic_print_info(InterruptStatsProv=
+ider *obj,
+>      CPU_FOREACH(cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> =20
+> -        icp_pic_print_info(ICP(pnv_cpu_state(cpu)->intc), mon);
+> +        if (pnv_chip_is_power9(pnv->chips[0])) {
+> +            xive_tctx_pic_print_info(XIVE_TCTX(pnv_cpu_state(cpu)->intc)=
+, mon);
+> +        } else {
+> +            icp_pic_print_info(ICP(pnv_cpu_state(cpu)->intc), mon);
 > +        }
+>      }
 > =20
->          /* HV POOL ring */
->          if ((be32_to_cpu(qw2w2) & TM_QW2W2_VP) &&
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+> -        Pnv8Chip *chip8 =3D PNV8_CHIP(pnv->chips[i]);
+> -        ics_pic_print_info(&chip8->psi.ics, mon);
+> +        PNV_CHIP_GET_CLASS(pnv->chips[i])->pic_print_info(pnv->chips[i],=
+ mon);
+>      }
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -124,24 +154,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---bjuZg6miEcdLYP6q
+--Kj7319i9nmIyA2yE
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAcYYACgkQbDjKyiDZ
-s5Lfug/+IwzT3FjbrU+8foLXiHGlyr4zjrx49tXlQKhwemFQY8SIKAwSAokVzcuc
-S/1yUmcrWlDxHwKX5V+aiAXj4lPH4nZ4m0z85miFZQOasQd2nOMYWlZfxz1sEXqU
-ZKDowJXsGu/Bw//DFJRRIY1x9ftb/HvlKz+KSQ+pFnmamh9/d5nYFWlJ6xxrfXuP
-1C664vwLR2uhIUQA8+9FMzNnNFLShSf3ewRXgse+mX+rfYva4u38A7jVW5r/XOic
-p6xHFYNdZeFWx0OOAeSlJF2i7cuXfthUpRR0Ev1aBO25u3PHrpgHXn58FJqlsP12
-MA/MwKUSY+sAEkbC+GFj1g4S5mc430LnpWpwOMy9PJ2/f+2k56ceBATOzmqhvOvL
-Z3aD1mUr/tz4i2I22cEjL/pxUAT7jUAvKYa9OGnKc7jNRVTetrn0o/19gbW3+OX2
-cQ321QTvzXFBCPcyAONvZapxYTiaALzz2L+AwvmlgdpO1fAnW7iMxfh8GgCfwoUd
-Ikd0MwFUuj0zopvW9GlneDTD3dbf2KnrI3DPiXFRoL5Yoa7wnGxOQ8TXtj2vDXgn
-4AXo+J4inmsGzcdoWnhh50f/s4vynWRSawemP9/15oKlyolrjLam8ncowzXkqoeb
-jy2fwTgRJg73gRiCsOstfzuNu6Vg/HgRrYFfjVieB07tbCxGevc=
-=V/rT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyAd+YACgkQbDjKyiDZ
+s5LOaxAApVRJoASxkUeB3LBU5CaoIKZGTdxsNT+mRKuW5WRlIuQskLdBd/mAPJ7s
+FcowQ5i96Zo8nkNebyQVzo5aYCbhzsHKp9gi2vjQQDFrgbQLIiwbMpnAcXJKWYrj
+OqrYJ/ETzrO0VEIeXaK2fbdWSIJOY7myGjnxYW3ulPWV/vVcDxjM7jorqW4hv1TB
+A6EYpNnMjT06n1g8x6TLkBEgipwIbR/ESqPufi1ivvdDLYz6E93lCX+nws9Kl4xt
+QD+RZPbk9Cge6g1yCUai9czejG2YW73Qc/zFycH/ZlryfbZASPqPEcpW6gQzwpDH
+sPkIc/5/xuCehkz3hSlIAKvrBdGrpc9/t0oWtPWW6ebfSemSGCEGgHiCiapgpf1B
+JlA4k+zSnaM0pOqWWvZa3TEVxUQo7Dx1BUzcwId1kcRL3H9Yezwd0cNvtJnhj1GU
+y15LvTd57pK+QA/VeFfjOeWJQLtGYrr0HEt7nERiZpMXo/owkn1ByUwstceTlFCA
+h3++gicyQTJPO3wtVvLg/nL0hY1BFmfEIikRnjzNVA0RXNHnRmGjwS8iYRg5mtok
+ZvKKYaXg+G+Lh3nZiiEDrGkRx3K6xUZXCxjPop2lavr2pdaGdqdZUEnqHEuXvR9u
+pAqkkB1DT06d6GS3z02Ll4069DrDlwfZ3pTOnILG6Q9YdczNECA=
+=3MVw
 -----END PGP SIGNATURE-----
 
---bjuZg6miEcdLYP6q--
+--Kj7319i9nmIyA2yE--
