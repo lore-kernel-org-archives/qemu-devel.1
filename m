@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48458)
+Received: from eggs.gnu.org ([209.51.188.92]:48402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h1xOm-0007FP-P3
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:05:41 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h1xOl-0006Ow-IK
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h1xOl-0007FG-Bt
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:05:40 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1h1xOj-0006M7-7b
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 13:05:39 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Thu,  7 Mar 2019 18:05:17 +0000
-Message-Id: <20190307180520.13868-5-mark.cave-ayland@ilande.co.uk>
+Date: Thu,  7 Mar 2019 18:05:19 +0000
+Message-Id: <20190307180520.13868-7-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20190307180520.13868-1-mark.cave-ayland@ilande.co.uk>
 References: <20190307180520.13868-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v2 4/7] target/ppc: introduce avr_full_offset()
- function
+Subject: [Qemu-devel] [PATCH v2 6/7] target/ppc: switch fpr/vsrl registers
+ so all VSX registers are in host endian order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,135 +22,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org
 
-All TCG vector operations require pointers to the base address of the vector
-rather than separate access to the top and bottom 64-bits. Convert the VMX TCG
-instructions to use a new avr_full_offset() function instead of avr64_offset()
-which can then itself be written as a simple wrapper onto vsr_full_offset().
+When VSX support was initially added, the fpr registers were added at
+offset 0 of the VSR register and the vsrl registers were added at offset
+1. This is in contrast to the VMX registers (the last 32 VSX registers) which
+are stored in host-endian order.
 
-This same function can also reused in cpu_avr_ptr() to avoid having more than
-one copy of the offset calculation logic.
+Switch the fpr/vsrl registers so that the lower 32 VSX registers are now also
+stored in host endian order to match the VMX registers. This ensures that TCG
+vector operations involving mixed VMX and VSX registers will function
+correctly.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/cpu.h                    | 12 +++++++++++-
- target/ppc/translate/vmx-impl.inc.c | 22 +++++++++++-----------
- target/ppc/translate/vsx-impl.inc.c |  5 -----
- 3 files changed, 22 insertions(+), 17 deletions(-)
+ target/ppc/cpu.h      | 4 ++--
+ target/ppc/internal.h | 8 ++++----
+ target/ppc/machine.c  | 8 ++++----
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index d0580c6b6d..2a2792306f 100644
+index aebb6c01ee..704e595014 100644
 --- a/target/ppc/cpu.h
 +++ b/target/ppc/cpu.h
-@@ -2598,14 +2598,24 @@ static inline int vsrl_offset(int i)
-     return offsetof(CPUPPCState, vsr[i].u64[1]);
- }
+@@ -2585,7 +2585,7 @@ static inline bool lsw_reg_in_range(int start, int nregs, int rx)
  
-+static inline int vsr_full_offset(int i)
-+{
-+    return offsetof(CPUPPCState, vsr[i].u64[0]);
-+}
-+
- static inline uint64_t *cpu_vsrl_ptr(CPUPPCState *env, int i)
+ static inline int fpr_offset(int i)
  {
-     return (uint64_t *)((uintptr_t)env + vsrl_offset(i));
+-    return offsetof(CPUPPCState, vsr[i].u64[0]);
++    return offsetof(CPUPPCState, vsr[i].VsrD(0));
  }
  
-+static inline int avr_full_offset(int i)
-+{
-+    return vsr_full_offset(i + 32);
-+}
-+
- static inline ppc_avr_t *cpu_avr_ptr(CPUPPCState *env, int i)
+ static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
+@@ -2595,7 +2595,7 @@ static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
+ 
+ static inline int vsrl_offset(int i)
  {
--    return &env->vsr[32 + i];
-+    return (ppc_avr_t *)((uintptr_t)env + avr_full_offset(i));
+-    return offsetof(CPUPPCState, vsr[i].u64[1]);
++    return offsetof(CPUPPCState, vsr[i].VsrD(1));
  }
  
- void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env);
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index f1b15ae2cb..4e5d0bc0e0 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -10,7 +10,7 @@
- static inline TCGv_ptr gen_avr_ptr(int reg)
+ static inline int vsr_full_offset(int i)
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index 3ebbdf4da4..fb6f64ed1e 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -206,14 +206,14 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
+ 
+ static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
  {
-     TCGv_ptr r = tcg_temp_new_ptr();
--    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, vsr[32 + reg].u64[0]));
-+    tcg_gen_addi_ptr(r, cpu_env, avr_full_offset(reg));
-     return r;
+-    vsr->VsrD(0) = env->vsr[n].u64[0];
+-    vsr->VsrD(1) = env->vsr[n].u64[1];
++    vsr->VsrD(0) = env->vsr[n].VsrD(0);
++    vsr->VsrD(1) = env->vsr[n].VsrD(1);
  }
  
-@@ -205,7 +205,7 @@ static void gen_mtvscr(DisasContext *ctx)
-     }
- 
-     val = tcg_temp_new_i32();
--    bofs = avr64_offset(rB(ctx->opcode), true);
-+    bofs = avr_full_offset(rB(ctx->opcode));
- #ifdef HOST_WORDS_BIGENDIAN
-     bofs += 3 * 4;
- #endif
-@@ -284,9 +284,9 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
-     }                                                                   \
-                                                                         \
-     tcg_op(vece,                                                        \
--           avr64_offset(rD(ctx->opcode), true),                         \
--           avr64_offset(rA(ctx->opcode), true),                         \
--           avr64_offset(rB(ctx->opcode), true),                         \
-+           avr_full_offset(rD(ctx->opcode)),                            \
-+           avr_full_offset(rA(ctx->opcode)),                            \
-+           avr_full_offset(rB(ctx->opcode)),                            \
-            16, 16);                                                     \
- }
- 
-@@ -578,10 +578,10 @@ static void glue(gen_, NAME)(DisasContext *ctx)                         \
-         gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-         return;                                                         \
-     }                                                                   \
--    tcg_gen_gvec_4(avr64_offset(rD(ctx->opcode), true),                 \
-+    tcg_gen_gvec_4(avr_full_offset(rD(ctx->opcode)),                    \
-                    offsetof(CPUPPCState, vscr_sat),                     \
--                   avr64_offset(rA(ctx->opcode), true),                 \
--                   avr64_offset(rB(ctx->opcode), true),                 \
-+                   avr_full_offset(rA(ctx->opcode)),                    \
-+                   avr_full_offset(rB(ctx->opcode)),                    \
-                    16, 16, &g);                                         \
- }
- 
-@@ -755,7 +755,7 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
-             return;                                                     \
-         }                                                               \
-         simm = SIMM5(ctx->opcode);                                      \
--        tcg_op(avr64_offset(rD(ctx->opcode), true), 16, 16, simm);      \
-+        tcg_op(avr_full_offset(rD(ctx->opcode)), 16, 16, simm);         \
-     }
- 
- GEN_VXFORM_DUPI(vspltisb, tcg_gen_gvec_dup8i, 6, 12);
-@@ -850,8 +850,8 @@ static void gen_vsplt(DisasContext *ctx, int vece)
-     }
- 
-     uimm = UIMM5(ctx->opcode);
--    bofs = avr64_offset(rB(ctx->opcode), true);
--    dofs = avr64_offset(rD(ctx->opcode), true);
-+    bofs = avr_full_offset(rB(ctx->opcode));
-+    dofs = avr_full_offset(rD(ctx->opcode));
- 
-     /* Experimental testing shows that hardware masks the immediate.  */
-     bofs += (uimm << vece) & 15;
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 381ae0f2e9..7d02a235e7 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -10,11 +10,6 @@ static inline void set_vsrl(int n, TCGv_i64 src)
-     tcg_gen_st_i64(src, cpu_env, vsrl_offset(n));
- }
- 
--static inline int vsr_full_offset(int n)
--{
--    return offsetof(CPUPPCState, vsr[n].u64[0]);
--}
--
- static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
+ static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
  {
-     if (n < 32) {
+-    env->vsr[n].u64[0] = vsr->VsrD(0);
+-    env->vsr[n].u64[1] = vsr->VsrD(1);
++    env->vsr[n].VsrD(0) = vsr->VsrD(0);
++    env->vsr[n].VsrD(1) = vsr->VsrD(1);
+ }
+ 
+ void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
+diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+index 756b6d2971..a92d0ad3a3 100644
+--- a/target/ppc/machine.c
++++ b/target/ppc/machine.c
+@@ -150,7 +150,7 @@ static int get_fpr(QEMUFile *f, void *pv, size_t size,
+ {
+     ppc_vsr_t *v = pv;
+ 
+-    v->u64[0] = qemu_get_be64(f);
++    v->VsrD(0) = qemu_get_be64(f);
+ 
+     return 0;
+ }
+@@ -160,7 +160,7 @@ static int put_fpr(QEMUFile *f, void *pv, size_t size,
+ {
+     ppc_vsr_t *v = pv;
+ 
+-    qemu_put_be64(f, v->u64[0]);
++    qemu_put_be64(f, v->VsrD(0));
+     return 0;
+ }
+ 
+@@ -181,7 +181,7 @@ static int get_vsr(QEMUFile *f, void *pv, size_t size,
+ {
+     ppc_vsr_t *v = pv;
+ 
+-    v->u64[1] = qemu_get_be64(f);
++    v->VsrD(1) = qemu_get_be64(f);
+ 
+     return 0;
+ }
+@@ -191,7 +191,7 @@ static int put_vsr(QEMUFile *f, void *pv, size_t size,
+ {
+     ppc_vsr_t *v = pv;
+ 
+-    qemu_put_be64(f, v->u64[1]);
++    qemu_put_be64(f, v->VsrD(1));
+     return 0;
+ }
+ 
 -- 
 2.11.0
