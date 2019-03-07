@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39958)
+Received: from eggs.gnu.org ([209.51.188.92]:40468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1h1tcj-0003lN-2t
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:03:49 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h1tek-0005EH-Mg
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:06:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1h1tcd-0002hF-Ax
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:03:49 -0500
-From: Sergio Lopez <slp@redhat.com>
-Date: Thu,  7 Mar 2019 15:03:12 +0100
-Message-Id: <20190307140312.28072-1-slp@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1h1tei-0005EP-5b
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 09:05:54 -0500
+Resent-Message-Id: <E1h1tei-0005EP-5b@eggs.gnu.org>
+Message-ID: <155196751181.8146.5716631977711306575@6acff2cf482b>
+In-Reply-To: <20190307121539.12842-1-david@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] mirror: Confirm we're quiesced only if the job
- is paused or cancelled
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Mar 2019 06:05:13 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/32] s390x/tcg: Vector Instruction
+ Support Part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +24,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, Sergio Lopez <slp@redhat.com>
+To: david@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
 
-While child_job_drained_begin() calls to job_pause(), the job doesn't
-actually transition between states until it runs again and reaches a
-pause point. This means bdrv_drained_begin() may return with some jobs
-using the node still having 'busy =3D=3D true'.
-
-As a consequence, block_job_detach_aio_context() may get into a
-deadlock, waiting for the job to be actually paused, while the coroutine
-servicing the job is yielding and doesn't get the opportunity to get
-scheduled again. This situation can be reproduced by issuing a
-'block-commit' immediately followed by a 'device_del'.
-
-To ensure bdrv_drained_begin() only returns when the jobs have been
-paused, we change mirror_drained_poll() to only confirm it's quiesced
-when job->paused =3D=3D true and there aren't any in-flight requests, exc=
-ept
-if we reached that point by a drained section initiated by the
-mirror/commit job itself.
-
-The other block jobs shouldn't need any changes, as the default
-drained_poll() behavior is to only confirm it's quiesced if the job is
-not busy or completed.
-
-Signed-off-by: Sergio Lopez <slp@redhat.com>
----
- block/mirror.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/block/mirror.c b/block/mirror.c
-index 726d3c27fb..b7f076f97c 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -80,6 +80,7 @@ typedef struct MirrorBlockJob {
-     bool initial_zeroing_ongoing;
-     int in_active_write_counter;
-     bool prepared;
-+    bool in_drain;
- } MirrorBlockJob;
-=20
- typedef struct MirrorBDSOpaque {
-@@ -679,9 +680,11 @@ static int mirror_exit_common(Job *job)
-=20
-         /* The mirror job has no requests in flight any more, but we nee=
-d to
-          * drain potential other users of the BDS before changing the gr=
-aph. */
-+        s->in_drain =3D true;
-         bdrv_drained_begin(target_bs);
-         bdrv_replace_node(to_replace, target_bs, &local_err);
-         bdrv_drained_end(target_bs);
-+        s->in_drain =3D false;
-         if (local_err) {
-             error_report_err(local_err);
-             ret =3D -EPERM;
-@@ -717,6 +720,7 @@ static int mirror_exit_common(Job *job)
-     bs_opaque->job =3D NULL;
-=20
-     bdrv_drained_end(src);
-+    s->in_drain =3D false;
-     bdrv_unref(mirror_top_bs);
-     bdrv_unref(src);
-=20
-@@ -1000,10 +1004,12 @@ static int coroutine_fn mirror_run(Job *job, Erro=
-r **errp)
-              */
-             trace_mirror_before_drain(s, cnt);
-=20
-+            s->in_drain =3D true;
-             bdrv_drained_begin(bs);
-             cnt =3D bdrv_get_dirty_count(s->dirty_bitmap);
-             if (cnt > 0 || mirror_flush(s) < 0) {
-                 bdrv_drained_end(bs);
-+                s->in_drain =3D false;
-                 continue;
-             }
-=20
-@@ -1051,6 +1057,7 @@ immediate_exit:
-     bdrv_dirty_iter_free(s->dbi);
-=20
-     if (need_drain) {
-+        s->in_drain =3D true;
-         bdrv_drained_begin(bs);
-     }
-=20
-@@ -1119,6 +1126,16 @@ static void coroutine_fn mirror_pause(Job *job)
- static bool mirror_drained_poll(BlockJob *job)
- {
-     MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common);
-+
-+    /* If the job isn't paused nor cancelled, we can't be sure that it w=
-on't
-+     * issue more requets. We make an exception if we've reached this po=
-int
-+     * from one of our own drain sections, to avoid a deadlock waiting f=
-or
-+     * ourselves.
-+     */
-+    if (!s->common.job.paused && !s->common.job.cancelled && !s->in_drai=
-n) {
-+        return true;
-+    }
-+
-     return !!s->in_flight;
- }
-=20
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzEyMTUzOS4xMjg0
+Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzEyMTUzOS4xMjg0Mi0x
+LWRhdmlkQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8zMl0g
+czM5MHgvdGNnOiBWZWN0b3IgSW5zdHJ1Y3Rpb24gU3VwcG9ydCBQYXJ0IDEKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
+IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDcxMjE1Mzku
+MTI4NDItMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDcxMjE1MzkuMTI4NDIt
+MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjZmYjJk
+N2E0OCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKZGYyMzQwZWMwNiBzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKODA5ZWE3MmYyYSBzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKYmMyMGZjZjFlNCBzMzkweC90
+Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVAo3OWRjMTg5ZDJjIHMzOTB4L3RjZzog
+SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQo4MmFlNTAwYWQ5IHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
+ZV93cml0ZV9hY2Nlc3MgaGVscGVyCjcwYWQwOWJhMDEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
+VE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdPUkQKMzg3Y2UwYzc4OSBzMzkweC90Y2c6IEltcGxl
+bWVudCBWRUNUT1IgU0VMRUNUCjQyOGM1NGRlMmQgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
+IFNDQVRURVIgRUxFTUVOVAoxNDE2NTgyNmE4IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBS
+RVBMSUNBVEUgSU1NRURJQVRFCjYyYjhkZDMwNDMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
+IFJFUExJQ0FURQphMGJiZDgyOTAzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRF
+IERPVUJMRVdPUkQgSU1NRURJQVRFCmZjOWQ4OWI4MWEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
+VE9SIFBFUk1VVEUKZTExOGNlMDE0MCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEFDSyAq
+CjllYWUwMmQxZTggczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIE1FUkdFIChISUdIfExPVykK
+ZjQzYWIxMTk2NiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBXSVRIIExFTkdUSAo5
+MGIwODVlNjgzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEZST00gR1JTIERJ
+U0pPSU5UCmMwZDljNGEyMmIgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRUxF
+TUVOVCBGUk9NIEdSCmNmMzI4NjU0YmMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQg
+VE8gQkxPQ0sgQk9VTkRBUlkKZTg3NjYyYjI1NSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
+TE9BRCBNVUxUSVBMRQphODcxZWNlN2RkIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FE
+IExPR0lDQUwgRUxFTUVOVCBBTkQgWkVSTwpkZDljYzRhZDYxIHMzOTB4L3RjZzogSW1wbGVtZW50
+IFZFQ1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVApiN2FmNWZmODEzIHMzOTB4L3RjZzogSW1w
+bGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJQVRFCmRkMTk3ZmVmZjggczM5MHgvdGNn
+OiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVAplNjI0NGZjN2Y5IHMzOTB4L3RjZzogSW1w
+bGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNBVEUKNDg0ZDEzZTA1ZiBzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgTE9BRAo3MTJhYzBiMTNhIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RP
+UiBHRU5FUkFURSBNQVNLCjZjOGRiZDhlYWUgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdF
+TkVSQVRFIEJZVEUgTUFTSwowMTNkZjNmOTFjIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBH
+QVRIRVIgRUxFTUVOVApkM2NkZGEyMDczIHMzOTB4L3RjZzogVXRpbGl0aWVzIGZvciB2ZWN0b3Ig
+aW5zdHJ1Y3Rpb24gaGVscGVycwo1N2M5ZTNkNDJiIHMzOTB4L3RjZzogQ2hlY2sgdmVjdG9yIHJl
+Z2lzdGVyIGluc3RydWN0aW9ucyBhdCBjZW50cmFsIHBvaW50CjM3OWExZmIyMzcgczM5MHgvdGNn
+OiBEZWZpbmUgdmVjdG9yIGluc3RydWN0aW9uIGZvcm1hdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvMzIgQ2hlY2tpbmcgY29tbWl0IDM3OWExZmIyMzdmYSAoczM5MHgvdGNnOiBEZWZpbmUgdmVj
+dG9yIGluc3RydWN0aW9uIGZvcm1hdHMpCjIvMzIgQ2hlY2tpbmcgY29tbWl0IDU3YzllM2Q0MmIy
+NiAoczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIgaW5zdHJ1Y3Rpb25zIGF0IGNlbnRy
+YWwgcG9pbnQpCjMvMzIgQ2hlY2tpbmcgY29tbWl0IGQzY2RkYTIwNzMyYSAoczM5MHgvdGNnOiBV
+dGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVjdGlvbiBoZWxwZXJzKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDEwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CjQvMzIgQ2hlY2tpbmcgY29tbWl0IDAxM2RmM2Y5MWMxNSAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
+VkVDVE9SIEdBVEhFUiBFTEVNRU5UKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
+aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1v
+ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCA0LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMzIgQ2hlY2tpbmcgY29t
+bWl0IDZjOGRiZDhlYWVlYiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVSQVRFIEJZ
+VEUgTUFTSykKNi8zMiBDaGVja2luZyBjb21taXQgNzEyYWMwYjEzYTY5IChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgR0VORVJBVEUgTUFTSykKNy8zMiBDaGVja2luZyBjb21taXQgNDg0ZDEz
+ZTA1ZjNkIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCkKOC8zMiBDaGVja2luZyBj
+b21taXQgZTYyNDRmYzdmOTgwIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBBTkQg
+UkVQTElDQVRFKQo5LzMyIENoZWNraW5nIGNvbW1pdCBkZDE5N2ZlZmY4NWEgKHMzOTB4L3RjZzog
+SW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQpCjEwLzMyIENoZWNraW5nIGNvbW1pdCBiN2Fm
+NWZmODEzZjYgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJ
+QVRFKQoxMS8zMiBDaGVja2luZyBjb21taXQgZGQ5Y2M0YWQ2MWU0IChzMzkweC90Y2c6IEltcGxl
+bWVudCBWRUNUT1IgTE9BRCBHUiBGUk9NIFZSIEVMRU1FTlQpCjEyLzMyIENoZWNraW5nIGNvbW1p
+dCBhODcxZWNlN2RkZDIgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIExPR0lDQUwg
+RUxFTUVOVCBBTkQgWkVSTykKMTMvMzIgQ2hlY2tpbmcgY29tbWl0IGU4NzY2MmIyNTU5ZiAoczM5
+MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTVVMVElQTEUpCjE0LzMyIENoZWNraW5nIGNv
+bW1pdCBjZjMyODY1NGJjNDUgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFRPIEJM
+T0NLIEJPVU5EQVJZKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
+b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM5NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
+Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0
+LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzMyIENoZWNraW5nIGNvbW1pdCBjMGQ5
+YzRhMjJiYTEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJP
+TSBHUikKMTYvMzIgQ2hlY2tpbmcgY29tbWl0IDkwYjA4NWU2ODNlZCAoczM5MHgvdGNnOiBJbXBs
+ZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNv
+bW1pdCBmNDNhYjExOTY2NGIgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEgg
+TEVOR1RIKQoxOC8zMiBDaGVja2luZyBjb21taXQgOWVhZTAyZDFlOGQwIChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IGUx
+MThjZTAxNDA4NiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
+ICcoJwojMTgzOiBGSUxFOiB0YXJnZXQvczM5MHgvdmVjX2hlbHBlci5jOjQ4OgordHlwZWRlZiB1
+aW50IyNUQklUUyMjX3QgKCp2cGsjI0JJVFMjI19mbikodWludCMjQklUUyMjX3QsIGludCAqKTsg
+ICAgICAgICAgICAgIFwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQ1IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDE5LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMC8zMiBDaGVj
+a2luZyBjb21taXQgZmM5ZDg5YjgxYTM2IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
+TVVURSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQv
+czM5MHgvaGVscGVyLmg6MTQ0OgorREVGX0hFTFBFUl9GTEFHU181KGd2ZWNfdnBlcm0sIFRDR19D
+QUxMX05PX1JXRywgdm9pZCwgcHRyLCBjcHRyLCBjcHRyLCBjcHRyLCBpMzIpCgp0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIwLzMyIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjIxLzMyIENoZWNraW5nIGNvbW1pdCBhMGJiZDgyOTAzOTIgKHMz
+OTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRFIERPVUJMRVdPUkQgSU1NRURJQVRFKQoy
+Mi8zMiBDaGVja2luZyBjb21taXQgNjJiOGRkMzA0MzM1IChzMzkweC90Y2c6IEltcGxlbWVudCBW
+RUNUT1IgUkVQTElDQVRFKQoyMy8zMiBDaGVja2luZyBjb21taXQgMTQxNjU4MjZhOGJjIChzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElDQVRFIElNTUVESUFURSkKMjQvMzIgQ2hlY2tp
+bmcgY29tbWl0IDQyOGM1NGRlMmRjMCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNDQVRU
+RVIgRUxFTUVOVCkKMjUvMzIgQ2hlY2tpbmcgY29tbWl0IDM4N2NlMGM3ODlmOCAoczM5MHgvdGNn
+OiBJbXBsZW1lbnQgVkVDVE9SIFNFTEVDVCkKMjYvMzIgQ2hlY2tpbmcgY29tbWl0IDcwYWQwOWJh
+MDFjMyAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdP
+UkQpCjI3LzMyIENoZWNraW5nIGNvbW1pdCA4MmFlNTAwYWQ5YjEgKHMzOTB4L3RjZzogUHJvdmlk
+ZSBwcm9iZV93cml0ZV9hY2Nlc3MgaGVscGVyKQoyOC8zMiBDaGVja2luZyBjb21taXQgNzlkYzE4
+OWQyYzFkIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5n
+IGNvbW1pdCBiYzIwZmNmMWU0NDIgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBF
+TEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQgODA5ZWE3MmYyYWIyIChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUpCjMxLzMyIENoZWNraW5nIGNvbW1pdCBkZjIz
+NDBlYzA2MWUgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkK
+MzIvMzIgQ2hlY2tpbmcgY29tbWl0IDI2ZmIyZDdhNDgyOSAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
+VkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDE5MDMwNzEyMTUzOS4xMjg0Mi0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGlu
+Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
