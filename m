@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60413)
+Received: from eggs.gnu.org ([209.51.188.92]:33329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1h1t9w-0002LW-Sf
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:34:10 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1h1tEV-0005Jk-DK
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:38:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1h1t9v-0003LV-Ua
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:34:04 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Thu,  7 Mar 2019 16:33:58 +0300
-Message-Id: <1551965640-164939-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1551965640-164939-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1551965640-164939-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] block: iterate_format with account of
- whitelisting
+	(envelope-from <amarkovic@wavecomp.com>) id 1h1tEU-0006FO-Og
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:38:47 -0500
+Received: from mail-bn3nam01on0727.outbound.protection.outlook.com
+	([2a01:111:f400:fe41::727]:35376
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1h1tEU-00069G-DO
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:38:46 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 7 Mar 2019 13:38:41 +0000
+Message-ID: <BN6PR2201MB125187EA94D682FDA2275E1DC64C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1551902740.git.balaton@eik.bme.hu>
+	<12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
+	<c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>,
+	<alpine.BSF.2.21.9999.1903070133170.66444@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.9999.1903070133170.66444@zero.eik.bme.hu>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5-resend 2/2] mips_fulong2e: Add on-board
+ graphics chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,146 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, rkagan@virtuozzo.com, andrey.shinkevich@virtuozzo.com
+To: BALATON Zoltan <balaton@eik.bme.hu>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-bdrv_iterate_format (which is currently only used for printing out the
-formats supported by the block layer) doesn't take format whitelisting
-into account.
+> From: BALATON Zoltan <balaton@eik.bme.hu>
+> Subject: Re: [PATCH v5-resend 2/2] mips_fulong2e: Add on-board graphics c=
+hip
+>=20
+> > On Thu, 7 Mar 2019, Philippe Mathieu-Daud=E9 wrote:
+> > Aleksandar, if you take this series, do you mind fixing with:
+>=20
+> I think it should go via Gerd's tree together with the other patch.
+>=20
+> Regards,
+> BALATON Zoltan
 
-This creates a problem for tests: they enumerate supported formats to
-decide which tests to enable, but then discover that QEMU doesn't let
-them actually use some of those formats.
+Yes, Gerd, should you agree with the patches, let they both go through your
+tree/pull request, please.
 
-To avoid that, exclude formats that are not whitelisted from
-enumeration, if whitelisting is in use.  Since we have separate
-whitelists for r/w and r/o, take this a parameter to
-bdrv_iterate_format, and print two lists of supported formats (r/w and
-r/o) in main qemu.
-
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- block.c               | 23 +++++++++++++++++++----
- blockdev.c            |  4 +++-
- include/block/block.h |  2 +-
- qemu-img.c            |  2 +-
- 4 files changed, 24 insertions(+), 7 deletions(-)
-
-diff --git a/block.c b/block.c
-index 35e78e2..ccf008c 100644
---- a/block.c
-+++ b/block.c
-@@ -426,7 +426,7 @@ BlockDriver *bdrv_find_format(const char *format_name)
-     return bdrv_do_find_format(format_name);
- }
- 
--int bdrv_is_whitelisted(BlockDriver *drv, bool read_only)
-+static int bdrv_format_is_whitelisted(const char *format_name, bool read_only)
- {
-     static const char *whitelist_rw[] = {
-         CONFIG_BDRV_RW_WHITELIST
-@@ -441,13 +441,13 @@ int bdrv_is_whitelisted(BlockDriver *drv, bool read_only)
-     }
- 
-     for (p = whitelist_rw; *p; p++) {
--        if (!strcmp(drv->format_name, *p)) {
-+        if (!strcmp(format_name, *p)) {
-             return 1;
-         }
-     }
-     if (read_only) {
-         for (p = whitelist_ro; *p; p++) {
--            if (!strcmp(drv->format_name, *p)) {
-+            if (!strcmp(format_name, *p)) {
-                 return 1;
-             }
-         }
-@@ -455,6 +455,11 @@ int bdrv_is_whitelisted(BlockDriver *drv, bool read_only)
-     return 0;
- }
- 
-+int bdrv_is_whitelisted(BlockDriver *drv, bool read_only)
-+{
-+    return bdrv_format_is_whitelisted(drv->format_name, read_only);
-+}
-+
- bool bdrv_uses_whitelist(void)
- {
-     return use_bdrv_whitelist;
-@@ -4147,7 +4152,7 @@ static int qsort_strcmp(const void *a, const void *b)
- }
- 
- void bdrv_iterate_format(void (*it)(void *opaque, const char *name),
--                         void *opaque)
-+                         void *opaque, bool read_only)
- {
-     BlockDriver *drv;
-     int count = 0;
-@@ -4158,6 +4163,11 @@ void bdrv_iterate_format(void (*it)(void *opaque, const char *name),
-         if (drv->format_name) {
-             bool found = false;
-             int i = count;
-+
-+            if (use_bdrv_whitelist && !bdrv_is_whitelisted(drv, read_only)) {
-+                continue;
-+            }
-+
-             while (formats && i && !found) {
-                 found = !strcmp(formats[--i], drv->format_name);
-             }
-@@ -4176,6 +4186,11 @@ void bdrv_iterate_format(void (*it)(void *opaque, const char *name),
-             bool found = false;
-             int j = count;
- 
-+            if (use_bdrv_whitelist &&
-+                !bdrv_format_is_whitelisted(format_name, read_only)) {
-+                continue;
-+            }
-+
-             while (formats && j && !found) {
-                 found = !strcmp(formats[--j], format_name);
-             }
-diff --git a/blockdev.c b/blockdev.c
-index 7e6bf99..871966c 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -531,7 +531,9 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
-     if ((buf = qemu_opt_get(opts, "format")) != NULL) {
-         if (is_help_option(buf)) {
-             error_printf("Supported formats:");
--            bdrv_iterate_format(bdrv_format_print, NULL);
-+            bdrv_iterate_format(bdrv_format_print, NULL, false);
-+            error_printf("\nSupported formats (read-only):");
-+            bdrv_iterate_format(bdrv_format_print, NULL, true);
-             error_printf("\n");
-             goto early_err;
-         }
-diff --git a/include/block/block.h b/include/block/block.h
-index 5b5cf86..6a758a7 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -472,7 +472,7 @@ void bdrv_next_cleanup(BdrvNextIterator *it);
- BlockDriverState *bdrv_next_monitor_owned(BlockDriverState *bs);
- bool bdrv_is_encrypted(BlockDriverState *bs);
- void bdrv_iterate_format(void (*it)(void *opaque, const char *name),
--                         void *opaque);
-+                         void *opaque, bool read_only);
- const char *bdrv_get_node_name(const BlockDriverState *bs);
- const char *bdrv_get_device_name(const BlockDriverState *bs);
- const char *bdrv_get_device_or_node_name(const BlockDriverState *bs);
-diff --git a/qemu-img.c b/qemu-img.c
-index 660c018..5fac840 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -198,7 +198,7 @@ static void QEMU_NORETURN help(void)
-            "  'skip=N' skip N bs-sized blocks at the start of input\n";
- 
-     printf("%s\nSupported formats:", help_msg);
--    bdrv_iterate_format(format_print, NULL);
-+    bdrv_iterate_format(format_print, NULL, false);
-     printf("\n\n" QEMU_HELP_BOTTOM "\n");
-     exit(EXIT_SUCCESS);
- }
--- 
-1.8.3.1
+Sincerely,
+Aleksandar
