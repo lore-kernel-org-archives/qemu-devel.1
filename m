@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52982)
+Received: from eggs.gnu.org ([209.51.188.92]:53589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1w1n-0006YJ-5a
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:37:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1h1w4f-0008Vw-9f
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:40:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1w1m-0004Sr-8v
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:37:51 -0500
-References: <20190301191545.8728-1-jsnow@redhat.com>
-	<20190301191545.8728-8-jsnow@redhat.com>
-	<1055b446-a34d-2413-3e0c-85b433ae15b7@virtuozzo.com>
-	<5c1f1971-5050-9678-f7f4-d8d4c4b53709@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1h1w4e-0006Bh-Fa
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:40:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:5572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h1w4e-0006B5-5b
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:40:48 -0500
+References: <20190307072218.9153-1-elena.ufimtseva@oracle.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <ba994232-719e-1d6c-c502-23e0ad1532e5@redhat.com>
-Date: Thu, 7 Mar 2019 10:37:35 -0600
+Message-ID: <8fd5b9f2-50cc-3a5c-1b5c-92fa2331064d@redhat.com>
+Date: Thu, 7 Mar 2019 10:40:40 -0600
 MIME-Version: 1.0
-In-Reply-To: <5c1f1971-5050-9678-f7f4-d8d4c4b53709@redhat.com>
+In-Reply-To: <20190307072218.9153-1-elena.ufimtseva@oracle.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="nr1MLiOfMGfovbLJzus8FFm72I8JhorzT"
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] block/dirty-bitmaps: implement
- inconsistent bit
+	boundary="Ue61jTQOLzBVl401pRyCJ75EQlBlU54GZ"
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 22/37] multi-process:
+ QMP/HMP commands to remove device from the remote process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
+Cc: ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, dgilbert@redhat.com, berrange@redhat.com, armbru@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nr1MLiOfMGfovbLJzus8FFm72I8JhorzT
+--Ue61jTQOLzBVl401pRyCJ75EQlBlU54GZ
 From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>,
- Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
-Message-ID: <ba994232-719e-1d6c-c502-23e0ad1532e5@redhat.com>
-Subject: Re: [PATCH v3 7/7] block/dirty-bitmaps: implement inconsistent bit
-References: <20190301191545.8728-1-jsnow@redhat.com>
- <20190301191545.8728-8-jsnow@redhat.com>
- <1055b446-a34d-2413-3e0c-85b433ae15b7@virtuozzo.com>
- <5c1f1971-5050-9678-f7f4-d8d4c4b53709@redhat.com>
-In-Reply-To: <5c1f1971-5050-9678-f7f4-d8d4c4b53709@redhat.com>
+To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
+Cc: ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com,
+ kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com,
+ konrad.wilk@oracle.com, sstabellini@kernel.org, dgilbert@redhat.com,
+ berrange@redhat.com, armbru@redhat.com
+Message-ID: <8fd5b9f2-50cc-3a5c-1b5c-92fa2331064d@redhat.com>
+Subject: Re: [multiprocess RFC PATCH 22/37] multi-process: QMP/HMP commands to
+ remove device from the remote process
+References: <20190307072218.9153-1-elena.ufimtseva@oracle.com>
+In-Reply-To: <20190307072218.9153-1-elena.ufimtseva@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 3/6/19 3:46 PM, John Snow wrote:
+On 3/7/19 1:22 AM, elena.ufimtseva@oracle.com wrote:
+> From: Jagannathan Raman <jag.raman@oracle.com>
+>=20
+> Add rdevice_del QMP & HMP commands to hot-unplug device from remote
+> device.
+>=20
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
 
->> I think, inconsistent bitmaps should have readonly flag always set or =
-always unset, independently on can_write,
->> as we are not going to write something related to inconsistent bitmaps=
-=2E
->>
->=20
-> We'll never change metadata for inconsistent bitmaps, no. We might
-> delete them which causes a metadata change, though -- and right now the=
+Similar to my other mail (it will probably get hard to track whether
+I've replied everywhere or in order, thanks to the threading, but I see
+that's already been mentioned):
 
-> readonly check stops that in blockdev.c before we attempt (and fail) th=
-e
-> operation. It does have at least a light usage.
->=20
-> It's not a crucial feature, but I think the error message is nicer.
->=20
->> And I think, better is always unset, to have inconsistent bitmaps as s=
-omething unrelated to readonly.
->>
->=20
-> The way I think of it is as unrelated, which is why I set readonly and
-> inconsistent orthogonally.
->=20
->> Readonly are bitmaps, which are not marked IN_USE on open for some rea=
-son..
->>
->=20
-> I tend to think of readonly bitmaps as persistent bitmaps attached to
-> storage we are unable to write back to, so we must prevent their
-> modification.
 
-I like that wording (keeping read-only and inconsistent orthogonal),
+> +++ b/qapi/misc.json
+> @@ -1717,6 +1717,33 @@
+>  { 'command': 'device_del', 'data': {'id': 'str'} }
+> =20
+>  ##
+> +# @rdevice_del:
+> +#
 
->=20
-> I suppose the IN_USE viewpoint works too; "This is a bitmap that we hav=
-e
-> not marked as IN_USE so it must not be used."
->=20
+New QMP commands should favor '-' over '_'; if we add it at all, it
+should be 'rdevice-del'.
 
-Yes, it does work, but it is a bit more of a stretch, so I'm not quite
-as sure about using it.
+> +# Remove a device from a guest
+> +#
+> +# @rdev_id: ID of the remote device root
+> +#
+> +# @id: the device's ID
+> +#
+> +# Returns: Nothing on success
+> +#          If @id is not a valid device, DeviceNotFound
+> +#
+> +# Notes: When this command completes, the device may not be removed fr=
+om the
+> +#        guest.  Hot removal is an operation that requires guest coope=
+ration.
+> +#        This command merely requests that the guest begin the hot rem=
+oval
+> +#        process.  Completion of the device removal process is signale=
+d with a
+> +#        DEVICE_DELETED event. Guest reset will automatically complete=
+ removal
+> +#        for all devices.
+> +#
+> +# Since: 3.0
 
->> I understand, that inconsistent bitmaps are some kind of readonly too,=
- as we can't write to them..
->> But we can't read too anyway, and we don't interfere with reopen logic=
- at all. So again, better is
->> don't mark inconsistent bitmaps as readonly.
->>
->=20
-> Hm, so in your model; we just NEVER set readonly for persistent bitmaps=
-,
-> which incurs some changes at load time, but allows the reload_rw
-> function to go completely unmodified.
->=20
-> That's not unreasonable in terms of SLOC, but semantically I am not sur=
-e
-> which approach is better. I'm leaning towards keeping this as written
-> for now, but... well. Any thoughts, Eric? Would you like to flip a coin=
-?
-
-No strong preferences, other than let's get it in before soft freeze, to
-make sure we don't miss out on it entirely due to waiting for the coin
-flip :)
-
+and the soonest you're likely to get this in is 4.1.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -123,21 +105,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---nr1MLiOfMGfovbLJzus8FFm72I8JhorzT
+--Ue61jTQOLzBVl401pRyCJ75EQlBlU54GZ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBSM8ACgkQp6FrSiUn
-Q2rQmAf8C9NL4fv5TSgtYhgXlrevaKabLBosAO05AE/CNh/G9afsIOhc1w4Ofefp
-afhMDncxDH8qVuxRtfc3IVyCEigjVBTd7gtuxapRSEtftmJYzqcMZbR6B+qdJCm4
-zrSYVzByHgpWf/++oN3VhryNNz1FYHBCcWB49Xydw4P+bGk5YtnLfnkN6X5P3vcW
-HBCZF17785q+w5OIszb4OXhaQ6but5Ez9vyUJrq9XLg6TwA4r8U8nrwEYyzagT1+
-ahu1ZZEIbFjxsNsfZdz0aLmrXQJ4kZPwamGzLGNGVYmRgID3VkiWeAQtQClgkPDq
-kNM8O+o22uDRvs4lIp3lIacg/M6HSA==
-=c5MD
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBSYgACgkQp6FrSiUn
+Q2poPQgAqDw42IuabXhcVkjnyWN4gAiH00rNQXD1KwMOwoMugE0ZQq56odhtz0nR
+LJH8VZNPlkoOe95q9nCroznoujeResrIFf6gJFReQC79Y5DF15OIAERr+GLa77Ex
+QXqLFjv08O9ElWND34iOn+uPJW6OuesuE9NGqMAi9sbKdcwtBZ+3S/l5a5LF2NSC
+m56jbJ5RjH+VIgeZ36qrgAk5EfsbYdIUYx/VOjgCY2v/24v3M5eHEcXwZ9LLHLgl
+TKzjDOde0DXcsnr35cglgQyevhamJHZLKy+7cQKcmOtnYcpAhN+kAx+2QpEIReX1
+mhsc+9EkPmQzGAIXIL9NWev6WV6knQ==
+=2zzm
 -----END PGP SIGNATURE-----
 
---nr1MLiOfMGfovbLJzus8FFm72I8JhorzT--
+--Ue61jTQOLzBVl401pRyCJ75EQlBlU54GZ--
