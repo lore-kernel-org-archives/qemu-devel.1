@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33836)
+Received: from eggs.gnu.org ([209.51.188.92]:33846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1utD-0002V7-7O
+	(envelope-from <peter.maydell@linaro.org>) id 1h1utD-0002VX-PP
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h1utC-0004kA-Aw
+	(envelope-from <peter.maydell@linaro.org>) id 1h1utD-0004kp-0P
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:55 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:39120)
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:38222)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h1utC-0004jO-3V
+	id 1h1utC-0004k4-Pa
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 10:24:54 -0500
-Received: by mail-wm1-x336.google.com with SMTP id z84so9649162wmg.4
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 07:24:53 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id a188so9577504wmf.3
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 07:24:54 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id d1sm5338345wrs.13.2019.03.07.07.24.51
+	by smtp.gmail.com with ESMTPSA id d1sm5338345wrs.13.2019.03.07.07.24.52
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 07 Mar 2019 07:24:51 -0800 (PST)
+	Thu, 07 Mar 2019 07:24:52 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  7 Mar 2019 15:24:38 +0000
-Message-Id: <20190307152450.20340-1-peter.maydell@linaro.org>
+Date: Thu,  7 Mar 2019 15:24:39 +0000
+Message-Id: <20190307152450.20340-2-peter.maydell@linaro.org>
+In-Reply-To: <20190307152450.20340-1-peter.maydell@linaro.org>
+References: <20190307152450.20340-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/12] sphinx queue
+Subject: [Qemu-devel] [PULL 01/12] docs/cpu-hotplug.rst: Fix rST markup
+ issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +37,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The only difference from the v3 patchset is that I've
-changed a -d to -e in patch 10 as suggested by RTH.
+sphinx-build complains:
 
-thanks
--- PMM
+docs/cpu-hotplug.rst:67: ERROR: Unexpected indentation.
+docs/cpu-hotplug.rst:69: ERROR: Unexpected indentation.
+docs/cpu-hotplug.rst:74: WARNING: Block quote ends without a blank line; unexpected unindent.
+docs/cpu-hotplug.rst:75: WARNING: Block quote ends without a blank line; unexpected unindent.
+docs/cpu-hotplug.rst:76: SEVERE: Unexpected section title.
 
-The following changes since commit 32694e98b8d7a246345448a8f707d2e11d6c65e2:
+}
+{
+docs/cpu-hotplug.rst:78: WARNING: Block quote ends without a blank line; unexpected unindent.
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2019-03-06 18:52:19 +0000)
+These are the result of not indicating one of the literal
+blocks by finishing the preceding paragraph with the "::" marker.
 
-are available in the Git repository at:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Message-id: 20190305172139.32662-2-peter.maydell@linaro.org
+Message-id: 20190228145624.24885-2-peter.maydell@linaro.org
+---
+ docs/cpu-hotplug.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-sphinx-20190307
-
-for you to fetch changes up to c10e01b996df09f6cb4eceb2b7a9754bece927c9:
-
-  MAINTAINERS: Add entry for Sphinx documentation infrastructure (2019-03-07 14:26:47 +0000)
-
-----------------------------------------------------------------
-Enable building and installing rST docs with Sphinx
-
-----------------------------------------------------------------
-Peter Maydell (12):
-      docs/cpu-hotplug.rst: Fix rST markup issues
-      docs: Convert memory.txt to rst format
-      docs: Commit initial files from sphinx-quickstart
-      docs/conf.py: Disable unused _static directory
-      docs/conf.py: Configure the 'alabaster' theme
-      docs/conf.py: Don't include rST sources in HTML build
-      docs/conf.py: Disable option warnings
-      docs: Provide separate conf.py for each manual we want
-      Makefile, configure: Support building rST documentation
-      Makefile: Abstract out "identify the pkgversion" code
-      docs/conf.py: Don't hard-code QEMU version
-      MAINTAINERS: Add entry for Sphinx documentation infrastructure
-
- configure                             |  15 ++-
- Makefile                              |  78 ++++++++----
- .gitignore                            |   1 +
- MAINTAINERS                           |   6 +
- docs/conf.py                          | 216 ++++++++++++++++++++++++++++++++++
- docs/cpu-hotplug.rst                  |   2 +-
- docs/devel/conf.py                    |  15 +++
- docs/devel/index.rst                  |  21 ++++
- docs/devel/{memory.txt => memory.rst} | 128 +++++++++++---------
- docs/index.rst                        |  15 +++
- docs/interop/conf.py                  |  15 +++
- docs/interop/index.rst                |  18 +++
- 12 files changed, 449 insertions(+), 81 deletions(-)
- create mode 100644 docs/conf.py
- create mode 100644 docs/devel/conf.py
- create mode 100644 docs/devel/index.rst
- rename docs/devel/{memory.txt => memory.rst} (85%)
- create mode 100644 docs/index.rst
- create mode 100644 docs/interop/conf.py
- create mode 100644 docs/interop/index.rst
+diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
+index cfeb79f5711..d0b06403f19 100644
+--- a/docs/cpu-hotplug.rst
++++ b/docs/cpu-hotplug.rst
+@@ -60,7 +60,7 @@ vCPU hotplug
+     hot-plugged (no "qom-path" member).  From its output in step (3), we
+     can see that ``IvyBridge-IBRS-x86_64-cpu`` is present in socket 0,
+     while hot-plugging a CPU into socket 1 requires passing the listed
+-    properties to QMP ``device_add``:
++    properties to QMP ``device_add``::
+ 
+       (QEMU) device_add id=cpu-2 driver=IvyBridge-IBRS-x86_64-cpu socket-id=1 core-id=0 thread-id=0
+       {
+-- 
+2.20.1
