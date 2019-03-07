@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52651)
+Received: from eggs.gnu.org ([209.51.188.92]:53005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sge-00058a-ML
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:50 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h1shr-0006CN-Fl
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h1sgY-0003iW-Os
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:03:48 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Mar 2019 14:03:14 +0100
-Message-Id: <20190307130323.9353-6-armbru@redhat.com>
-In-Reply-To: <20190307130323.9353-1-armbru@redhat.com>
-References: <20190307130323.9353-1-armbru@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1h1shp-0004JN-L2
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 08:05:03 -0500
+Resent-Message-Id: <E1h1shp-0004JN-L2@eggs.gnu.org>
+Message-ID: <155196385892.8146.7631528904618995902@6acff2cf482b>
+In-Reply-To: <20190307121539.12842-1-david@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 05/14] hw: Use PFLASH_CFI0{1,
- 2} and TYPE_PFLASH_CFI0{1, 2}
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Mar 2019 05:04:20 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/32] s390x/tcg: Vector Instruction
+ Support Part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,152 +24,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu
+To: david@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
 
-We have two open-coded copies of macro PFLASH_CFI01().  Move the macro
-to the header, so we can ditch the copies.  Move PFLASH_CFI02() to the
-header for symmetry.
-
-We define macros TYPE_PFLASH_CFI01 and TYPE_PFLASH_CFI02 for type name
-strings, then mostly use the strings.  If the macros are worth
-defining, they are worth using.  Replace the strings by the macros.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
----
- hw/arm/vexpress.c        | 4 ++--
- hw/arm/virt.c            | 3 ++-
- hw/block/pflash_cfi01.c  | 3 ---
- hw/block/pflash_cfi02.c  | 3 ---
- hw/xtensa/xtfpga.c       | 4 ++--
- include/hw/block/flash.h | 4 ++++
- 6 files changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index ed46d2e730..f07134c424 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -515,7 +515,7 @@ static void vexpress_modify_dtb(const struct arm_boot=
-_info *info, void *fdt)
- static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *na=
-me,
-                                              DriveInfo *di)
- {
--    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
-=20
-     if (di) {
-         qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
-@@ -536,7 +536,7 @@ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr b=
-ase, const char *name,
-     qdev_init_nofail(dev);
-=20
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
--    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
-+    return PFLASH_CFI01(dev);
- }
-=20
- static void vexpress_common_init(MachineState *machine)
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index c7fb5348ae..773637876f 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -35,6 +35,7 @@
- #include "hw/arm/arm.h"
- #include "hw/arm/primecell.h"
- #include "hw/arm/virt.h"
-+#include "hw/block/flash.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/display/ramfb.h"
-@@ -879,7 +880,7 @@ static void create_one_flash(const char *name, hwaddr=
- flashbase,
-      * parameters as the flash devices on the Versatile Express board.
-      */
-     DriveInfo *dinfo =3D drive_get_next(IF_PFLASH);
--    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     const uint64_t sectorlength =3D 256 * 1024;
-=20
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index f75f0a6998..1c99aa6e4a 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -59,9 +59,6 @@ do {                                                   =
-     \
- #define DPRINTF(fmt, ...) do { } while (0)
- #endif
-=20
--#define PFLASH_CFI01(obj) \
--    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
--
- #define PFLASH_BE          0
- #define PFLASH_SECURE      1
-=20
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index c0869fc417..5ef40154b9 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -57,9 +57,6 @@ do {                                                   =
-    \
-=20
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
-=20
--#define PFLASH_CFI02(obj) \
--    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
--
- struct PFlashCFI02 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 3d59a7a356..e05ef75a75 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -167,7 +167,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
-ddress_space,
-                                       DriveInfo *dinfo, int be)
- {
-     SysBusDevice *s;
--    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
-=20
-     qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
-                         &error_abort);
-@@ -181,7 +181,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
-ddress_space,
-     s =3D SYS_BUS_DEVICE(dev);
-     memory_region_add_subregion(address_space, board->flash->base,
-                                 sysbus_mmio_get_region(s, 0));
--    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
-+    return PFLASH_CFI01(dev);
- }
-=20
- static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
-diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index 333005d9ff..aeea3ca99d 100644
---- a/include/hw/block/flash.h
-+++ b/include/hw/block/flash.h
-@@ -8,6 +8,8 @@
- /* pflash_cfi01.c */
-=20
- #define TYPE_PFLASH_CFI01 "cfi.pflash01"
-+#define PFLASH_CFI01(obj) \
-+    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
-=20
- typedef struct PFlashCFI01 PFlashCFI01;
-=20
-@@ -25,6 +27,8 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
- /* pflash_cfi02.c */
-=20
- #define TYPE_PFLASH_CFI02 "cfi.pflash02"
-+#define PFLASH_CFI02(obj) \
-+    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
-=20
- typedef struct PFlashCFI02 PFlashCFI02;
-=20
---=20
-2.17.2
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzEyMTUzOS4xMjg0
+Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzEyMTUzOS4xMjg0Mi0x
+LWRhdmlkQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8zMl0g
+czM5MHgvdGNnOiBWZWN0b3IgSW5zdHJ1Y3Rpb24gU3VwcG9ydCBQYXJ0IDEKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
+IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMDcxMjE1Mzku
+MTI4NDItMS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAzMDcxMjE1MzkuMTI4NDIt
+MS1kYXZpZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNWEyYjYw
+Y2RmYiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgVU5QQUNLICoKZTQ0ZjYxYTI5MyBzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgV0lUSCBMRU5HVEgKYWFmZjE5YTIyMyBzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUKNWJjOWE0ZDNmYyBzMzkweC90
+Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUgRUxFTUVOVAo0YTFkMTkxMzNiIHMzOTB4L3RjZzog
+SW1wbGVtZW50IFZFQ1RPUiBTVE9SRQphMmI1MmUzNmNmIHMzOTB4L3RjZzogUHJvdmlkZSBwcm9i
+ZV93cml0ZV9hY2Nlc3MgaGVscGVyCjJlMmIwYjdmYTkgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
+VE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdPUkQKNTk3ZjExN2YwYSBzMzkweC90Y2c6IEltcGxl
+bWVudCBWRUNUT1IgU0VMRUNUCmQ5NDQ3YjFlNTYgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
+IFNDQVRURVIgRUxFTUVOVAo3YjdjYmE2ZmU5IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBS
+RVBMSUNBVEUgSU1NRURJQVRFCjIwNWVjZTBjNjUgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9S
+IFJFUExJQ0FURQphMzE1ZGU2MzA1IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRF
+IERPVUJMRVdPUkQgSU1NRURJQVRFCjczYjgwZWVjYTEgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVD
+VE9SIFBFUk1VVEUKMWYyZTkwZDUxOCBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEFDSyAq
+CjJkMzU5MzVlODUgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIE1FUkdFIChISUdIfExPVykK
+NDljYzU1YjAyYiBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBXSVRIIExFTkdUSApj
+OWU0MzBjNmUxIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEZST00gR1JTIERJ
+U0pPSU5UCjJmZjllNjEyMDIgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgVlIgRUxF
+TUVOVCBGUk9NIEdSCmU2ODUyYzExZTMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQg
+VE8gQkxPQ0sgQk9VTkRBUlkKYzU2ZjZkNjIyOSBzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1Ig
+TE9BRCBNVUxUSVBMRQozZjM5MmIwMDkzIHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FE
+IExPR0lDQUwgRUxFTUVOVCBBTkQgWkVSTwo5YTIwMTQ2ODFhIHMzOTB4L3RjZzogSW1wbGVtZW50
+IFZFQ1RPUiBMT0FEIEdSIEZST00gVlIgRUxFTUVOVAoxZmQ5ZjQ0NjdmIHMzOTB4L3RjZzogSW1w
+bGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJQVRFCjc3MGRjZGI5YTMgczM5MHgvdGNn
+OiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgRUxFTUVOVApiMTVhMTEwZjIwIHMzOTB4L3RjZzogSW1w
+bGVtZW50IFZFQ1RPUiBMT0FEIEFORCBSRVBMSUNBVEUKYzYzYTU2ZmM5YSBzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgTE9BRAphMGM4NGRmYjU1IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RP
+UiBHRU5FUkFURSBNQVNLCmU0OTQwMGMxNTMgczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdF
+TkVSQVRFIEJZVEUgTUFTSwpmYzUwNTdhNDY1IHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBH
+QVRIRVIgRUxFTUVOVAo3ZjIwYjMxNTcwIHMzOTB4L3RjZzogVXRpbGl0aWVzIGZvciB2ZWN0b3Ig
+aW5zdHJ1Y3Rpb24gaGVscGVycwo2Mjc1NmVlY2M1IHMzOTB4L3RjZzogQ2hlY2sgdmVjdG9yIHJl
+Z2lzdGVyIGluc3RydWN0aW9ucyBhdCBjZW50cmFsIHBvaW50CmViZTI0YmE1MWYgczM5MHgvdGNn
+OiBEZWZpbmUgdmVjdG9yIGluc3RydWN0aW9uIGZvcm1hdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvMzIgQ2hlY2tpbmcgY29tbWl0IGViZTI0YmE1MWZjYyAoczM5MHgvdGNnOiBEZWZpbmUgdmVj
+dG9yIGluc3RydWN0aW9uIGZvcm1hdHMpCjIvMzIgQ2hlY2tpbmcgY29tbWl0IDYyNzU2ZWVjYzU2
+ZiAoczM5MHgvdGNnOiBDaGVjayB2ZWN0b3IgcmVnaXN0ZXIgaW5zdHJ1Y3Rpb25zIGF0IGNlbnRy
+YWwgcG9pbnQpCjMvMzIgQ2hlY2tpbmcgY29tbWl0IDdmMjBiMzE1NzBiYSAoczM5MHgvdGNnOiBV
+dGlsaXRpZXMgZm9yIHZlY3RvciBpbnN0cnVjdGlvbiBoZWxwZXJzKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMxNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDEwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CjQvMzIgQ2hlY2tpbmcgY29tbWl0IGZjNTA1N2E0NjVjYyAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
+VkVDVE9SIEdBVEhFUiBFTEVNRU5UKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
+aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1v
+ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCA0LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMzIgQ2hlY2tpbmcgY29t
+bWl0IGU0OTQwMGMxNTM3NiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIEdFTkVSQVRFIEJZ
+VEUgTUFTSykKNi8zMiBDaGVja2luZyBjb21taXQgYTBjODRkZmI1NWYyIChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgR0VORVJBVEUgTUFTSykKNy8zMiBDaGVja2luZyBjb21taXQgYzYzYTU2
+ZmM5YTIzIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCkKOC8zMiBDaGVja2luZyBj
+b21taXQgYjE1YTExMGYyMDI5IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgTE9BRCBBTkQg
+UkVQTElDQVRFKQo5LzMyIENoZWNraW5nIGNvbW1pdCA3NzBkY2RiOWEzOTMgKHMzOTB4L3RjZzog
+SW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQpCjEwLzMyIENoZWNraW5nIGNvbW1pdCAxZmQ5
+ZjQ0NjdmMGQgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIEVMRU1FTlQgSU1NRURJ
+QVRFKQoxMS8zMiBDaGVja2luZyBjb21taXQgOWEyMDE0NjgxYTgxIChzMzkweC90Y2c6IEltcGxl
+bWVudCBWRUNUT1IgTE9BRCBHUiBGUk9NIFZSIEVMRU1FTlQpCjEyLzMyIENoZWNraW5nIGNvbW1p
+dCAzZjM5MmIwMDkzNjEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIExPR0lDQUwg
+RUxFTUVOVCBBTkQgWkVSTykKMTMvMzIgQ2hlY2tpbmcgY29tbWl0IGM1NmY2ZDYyMjlmYSAoczM5
+MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIExPQUQgTVVMVElQTEUpCjE0LzMyIENoZWNraW5nIGNv
+bW1pdCBlNjg1MmMxMWUzZjkgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFRPIEJM
+T0NLIEJPVU5EQVJZKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
+b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM5NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
+Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0
+LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzMyIENoZWNraW5nIGNvbW1pdCAyZmY5
+ZTYxMjAyMTIgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFZSIEVMRU1FTlQgRlJP
+TSBHUikKMTYvMzIgQ2hlY2tpbmcgY29tbWl0IGM5ZTQzMGM2ZTEwYiAoczM5MHgvdGNnOiBJbXBs
+ZW1lbnQgVkVDVE9SIExPQUQgVlIgRlJPTSBHUlMgRElTSk9JTlQpCjE3LzMyIENoZWNraW5nIGNv
+bW1pdCA0OWNjNTViMDJiODEgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBMT0FEIFdJVEgg
+TEVOR1RIKQoxOC8zMiBDaGVja2luZyBjb21taXQgMmQzNTkzNWU4NTFiIChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgTUVSR0UgKEhJR0h8TE9XKSkKMTkvMzIgQ2hlY2tpbmcgY29tbWl0IDFm
+MmU5MGQ1MTgyZCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFBBQ0sgKikKRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
+ICcoJwojMTgzOiBGSUxFOiB0YXJnZXQvczM5MHgvdmVjX2hlbHBlci5jOjQ4OgordHlwZWRlZiB1
+aW50IyNUQklUUyMjX3QgKCp2cGsjI0JJVFMjI19mbikodWludCMjQklUUyMjX3QsIGludCAqKTsg
+ICAgICAgICAgICAgIFwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQ1IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDE5LzMyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMC8zMiBDaGVj
+a2luZyBjb21taXQgNzNiODBlZWNhMTgyIChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUEVS
+TVVURSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQv
+czM5MHgvaGVscGVyLmg6MTQ0OgorREVGX0hFTFBFUl9GTEFHU181KGd2ZWNfdnBlcm0sIFRDR19D
+QUxMX05PX1JXRywgdm9pZCwgcHRyLCBjcHRyLCBjcHRyLCBjcHRyLCBpMzIpCgp0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIwLzMyIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjIxLzMyIENoZWNraW5nIGNvbW1pdCBhMzE1ZGU2MzA1YzcgKHMz
+OTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBQRVJNVVRFIERPVUJMRVdPUkQgSU1NRURJQVRFKQoy
+Mi8zMiBDaGVja2luZyBjb21taXQgMjA1ZWNlMGM2NWRkIChzMzkweC90Y2c6IEltcGxlbWVudCBW
+RUNUT1IgUkVQTElDQVRFKQoyMy8zMiBDaGVja2luZyBjb21taXQgN2I3Y2JhNmZlOTRjIChzMzkw
+eC90Y2c6IEltcGxlbWVudCBWRUNUT1IgUkVQTElDQVRFIElNTUVESUFURSkKMjQvMzIgQ2hlY2tp
+bmcgY29tbWl0IGQ5NDQ3YjFlNTYzMiAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNDQVRU
+RVIgRUxFTUVOVCkKMjUvMzIgQ2hlY2tpbmcgY29tbWl0IDU5N2YxMTdmMGE4NSAoczM5MHgvdGNn
+OiBJbXBsZW1lbnQgVkVDVE9SIFNFTEVDVCkKMjYvMzIgQ2hlY2tpbmcgY29tbWl0IDJlMmIwYjdm
+YTkxOCAoczM5MHgvdGNnOiBJbXBsZW1lbnQgVkVDVE9SIFNJR04gRVhURU5EIFRPIERPVUJMRVdP
+UkQpCjI3LzMyIENoZWNraW5nIGNvbW1pdCBhMmI1MmUzNmNmODIgKHMzOTB4L3RjZzogUHJvdmlk
+ZSBwcm9iZV93cml0ZV9hY2Nlc3MgaGVscGVyKQoyOC8zMiBDaGVja2luZyBjb21taXQgNGExZDE5
+MTMzYmE0IChzMzkweC90Y2c6IEltcGxlbWVudCBWRUNUT1IgU1RPUkUpCjI5LzMyIENoZWNraW5n
+IGNvbW1pdCA1YmM5YTRkM2ZjNzkgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBF
+TEVNRU5UKQozMC8zMiBDaGVja2luZyBjb21taXQgYWFmZjE5YTIyMzZkIChzMzkweC90Y2c6IElt
+cGxlbWVudCBWRUNUT1IgU1RPUkUgTVVMVElQTEUpCjMxLzMyIENoZWNraW5nIGNvbW1pdCBlNDRm
+NjFhMjkzNWQgKHMzOTB4L3RjZzogSW1wbGVtZW50IFZFQ1RPUiBTVE9SRSBXSVRIIExFTkdUSCkK
+MzIvMzIgQ2hlY2tpbmcgY29tbWl0IDVhMmI2MGNkZmJhOCAoczM5MHgvdGNnOiBJbXBsZW1lbnQg
+VkVDVE9SIFVOUEFDSyAqKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDE5MDMwNzEyMTUzOS4xMjg0Mi0xLWRhdmlkQHJlZGhhdC5jb20vdGVzdGlu
+Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
