@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48082)
+Received: from eggs.gnu.org ([209.51.188.92]:48622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1vgO-0003R9-Li
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:15:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1h1viQ-0004gM-DQ
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h1vgN-0004i7-Sh
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:15:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h1vgN-0004h8-HK
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:15:43 -0500
-References: <20190307072251.9823-1-elena.ufimtseva@oracle.com>
+	(envelope-from <eblake@redhat.com>) id 1h1viP-0006cI-JU
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 11:17:50 -0500
+References: <20190307151046.15086-1-philmd@redhat.com>
+	<20190307151046.15086-3-philmd@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a8708e52-8a83-e21f-7ea6-0579b475ad6b@redhat.com>
-Date: Thu, 7 Mar 2019 10:15:36 -0600
+Message-ID: <208f5374-eef9-f467-9040-a576179e3ca4@redhat.com>
+Date: Thu, 7 Mar 2019 10:17:39 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190307072251.9823-1-elena.ufimtseva@oracle.com>
+In-Reply-To: <20190307151046.15086-3-philmd@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="xhYZtk7s265ffxgHEDpEDNyb6xCnIq2Ll"
-Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 35/37] multi-process:
- QMP/HMP commands to resize block device on remote process
+	boundary="Zxw3KU7fqeudQvSqfCLo238oMLtqCCMhk"
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] qemu-iotests: Add dependency to
+ qemu-nbd tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
-Cc: ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com, sstabellini@kernel.org, dgilbert@redhat.com, berrange@redhat.com, armbru@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xhYZtk7s265ffxgHEDpEDNyb6xCnIq2Ll
+--Zxw3KU7fqeudQvSqfCLo238oMLtqCCMhk
 From: Eric Blake <eblake@redhat.com>
-To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
-Cc: ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com,
- kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com,
- konrad.wilk@oracle.com, sstabellini@kernel.org, dgilbert@redhat.com,
- berrange@redhat.com, armbru@redhat.com
-Message-ID: <a8708e52-8a83-e21f-7ea6-0579b475ad6b@redhat.com>
-Subject: Re: [multiprocess RFC PATCH 35/37] multi-process: QMP/HMP commands to
- resize block device on remote process
-References: <20190307072251.9823-1-elena.ufimtseva@oracle.com>
-In-Reply-To: <20190307072251.9823-1-elena.ufimtseva@oracle.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <208f5374-eef9-f467-9040-a576179e3ca4@redhat.com>
+Subject: Re: [PATCH v4 2/2] qemu-iotests: Add dependency to qemu-nbd tool
+References: <20190307151046.15086-1-philmd@redhat.com>
+ <20190307151046.15086-3-philmd@redhat.com>
+In-Reply-To: <20190307151046.15086-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 3/7/19 1:22 AM, elena.ufimtseva@oracle.com wrote:
-> From: Jagannathan Raman <jag.raman@oracle.com>
+On 3/7/19 9:10 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Since a9660664fde, some iotests use qemu-nbd.
+> Add a dependency to build it before using it.
+> This fixes:
 >=20
-> Adds rblock_resize QMP/HMP commands to resize block devices on the remo=
-te
-> process.
+>   $ make check-block
+>     GEN     qemu-img-cmds.h
+>     CC      qemu-img.o
+>     LINK    qemu-img
+>     CC      qemu-io.o
+>     LINK    qemu-io
+>     CC      tests/qemu-iotests/socket_scm_helper.o
+>     LINK    tests/qemu-iotests/socket_scm_helper
+>   tests/qemu-iotests-quick.sh
+>   check: qemu-nbd not found
+>   make: *** [tests/Makefile.include:1059: check-tests/qemu-iotests-quic=
+k.sh] Error 1
 >=20
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
+>  tests/Makefile.include | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I know the discussion is questioning whether this is even the right way
-to go, but if we DO add a QMP command,
-
-> +++ b/qapi/block-core.json
-> @@ -1260,6 +1260,31 @@
->              'size': 'int' } }
-> =20
->  ##
-> +# @rblock_resize:
-
-It should be named 'rblock-resize'
-
-> +#
-> +# Resize a block image while a guest is running, on a remote device.
-> +#
-> +# @device: the name of the device to get the image resized
-> +#
-> +# @size:  new image size in bytes
-> +#
-> +# Returns: nothing on success
-> +#          If @device is not a valid block device, DeviceNotFound
-> +#
-> +# Since: 3.0.93
-
-and you've missed 3.0 (if you got it in THIS week, it would be Since
-4.0; but that's unlikely, so you want Since 4.1).
+I still have an NBD pull request coming up before soft freeze. Should I
+be planning to take this patch (as it is NBD-related) or the whole
+series (even though the first is more of a stretch), or is there a
+better tree for this to be staged through?
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -92,21 +78,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---xhYZtk7s265ffxgHEDpEDNyb6xCnIq2Ll
+--Zxw3KU7fqeudQvSqfCLo238oMLtqCCMhk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBQ6gACgkQp6FrSiUn
-Q2q77wf/T3j/ROb0aIpYJtXNzYN6MEbOIuu/i+ddhqC+tbGDhyrDKnSUQZcVT3M2
-I4wif/rtooSvKQxJRup/fZztOwYFiV4u+MNxUE2qA+/TRw/3eFO6Bi6x8tE+zzyE
-OWemWv9KA9E/C2LZ+zz73mBGMOKSIITG/QAxWk1pPAH/GTAiVttIMQym+zPkSdcf
-0w52KjLJ9yRmg45PNeTH8+PcomrnjgOuvEd4BvlL2OTrlg/YhXHSA8/L49vCaGIO
-G5mUhZNww/Vb8LrI5c1yj127zqJAuTgYWUbZ+LVo6hB36QKylttkqm/HCNaft8yI
-kITCKtZdm3lXycubtWfkePfhdJxDDQ==
-=Irio
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyBRCMACgkQp6FrSiUn
+Q2pnsAf9HjLJLuP7PEvD8rpYmPiSAX0d5jsGrts/PXdQQNsVdy9Qyi1eyk11rWAg
+zLa53jFBeeU4l5JOLvti7SDvbNSoLtK5lbmN++Iv3YfWShiwZTbh8N39h9r2FeWU
+vKWUKDDRJDvN93yZm888qGU0FbvUTmDC/ZyDa8qX1M/JuCXHX8HMqQV1KqE1QGLA
+MeI2hxnBOFLbLfcyY7cGvvndEZN/FDmb153g95IcOs5wAm5ljBH91oKQ650V8idP
+LbzFEKDyarPXZoNRRUks/pU0nBTuspc9NcssfLGXSvELrDPmuyYN/eQRVkEMp/Nx
+DfAl0zBQ8EiAMZnSN36MehULLt8YUw==
+=sFul
 -----END PGP SIGNATURE-----
 
---xhYZtk7s265ffxgHEDpEDNyb6xCnIq2Ll--
+--Zxw3KU7fqeudQvSqfCLo238oMLtqCCMhk--
