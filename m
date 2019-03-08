@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36544)
+Received: from eggs.gnu.org ([209.51.188.92]:36562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2FLI-00052h-C6
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:17 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2FLJ-00053f-9o
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2FLG-0007au-Dr
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:15 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2FLF-0007Tg-54
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:16 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  8 Mar 2019 14:14:38 +0100
-Message-Id: <20190308131445.17502-6-armbru@redhat.com>
+Date: Fri,  8 Mar 2019 14:14:35 +0100
+Message-Id: <20190308131445.17502-3-armbru@redhat.com>
 In-Reply-To: <20190308131445.17502-1-armbru@redhat.com>
 References: <20190308131445.17502-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 05/12] vl: Improve legibility of
- BlockdevOptions queue
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 02/12] qom: Move compat_props machinery from
+ qdev to QOM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +26,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
 
-Give the queue head type a name: BlockdevOptionsQueue.
-
-Rename the queue entry type from BlockdevOptions_queue to
-BlockdevOptionsQueueEntry.
+See the previous commit for rationale.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- vl.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+ hw/core/qdev.c         | 39 ---------------------------------------
+ include/hw/qdev-core.h |  4 ----
+ include/qom/object.h   |  3 +++
+ qom/object.c           | 39 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 42 insertions(+), 43 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index c38739e34c..3045ab0df3 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1193,6 +1193,14 @@ static void default_drive(int enable, int snapshot, BlockInterfaceType type,
- 
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 4f3200d54b..f9b6efe509 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -978,45 +978,6 @@ static void device_initfn(Object *obj)
+     QLIST_INIT(&dev->gpios);
  }
- 
-+typedef struct BlockdevOptionsQueueEntry {
-+    BlockdevOptions *bdo;
-+    Location loc;
-+    QSIMPLEQ_ENTRY(BlockdevOptionsQueueEntry) entry;
-+} BlockdevOptionsQueueEntry;
+=20
+-/*
+- * Global property defaults
+- * Slot 0: accelerator's global property defaults
+- * Slot 1: machine's global property defaults
+- * Each is a GPtrArray of of GlobalProperty.
+- * Applied in order, later entries override earlier ones.
+- */
+-static GPtrArray *object_compat_props[2];
+-
+-/*
+- * Set machine's global property defaults to @compat_props.
+- * May be called at most once.
+- */
+-void object_set_machine_compat_props(GPtrArray *compat_props)
+-{
+-    assert(!object_compat_props[1]);
+-    object_compat_props[1] =3D compat_props;
+-}
+-
+-/*
+- * Set accelerator's global property defaults to @compat_props.
+- * May be called at most once.
+- */
+-void object_set_accelerator_compat_props(GPtrArray *compat_props)
+-{
+-    assert(!object_compat_props[0]);
+-    object_compat_props[0] =3D compat_props;
+-}
+-
+-void object_apply_compat_props(Object *obj)
+-{
+-    int i;
+-
+-    for (i =3D 0; i < ARRAY_SIZE(object_compat_props); i++) {
+-        object_apply_global_props(obj, object_compat_props[i],
+-                                  &error_abort);
+-    }
+-}
+-
+ static void device_post_init(Object *obj)
+ {
+     /*
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index aa8a3ea782..33ed3b8dde 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -431,10 +431,6 @@ const char *qdev_fw_name(DeviceState *dev);
+=20
+ Object *qdev_get_machine(void);
+=20
+-void object_set_machine_compat_props(GPtrArray *compat_props);
+-void object_set_accelerator_compat_props(GPtrArray *compat_props);
+-void object_apply_compat_props(Object *obj);
+-
+ /* FIXME: make this a link<> */
+ void qdev_set_parent_bus(DeviceState *dev, BusState *bus);
+=20
+diff --git a/include/qom/object.h b/include/qom/object.h
+index e0262962b5..288cdddf44 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -677,6 +677,9 @@ Object *object_new_with_propv(const char *typename,
+=20
+ void object_apply_global_props(Object *obj, const GPtrArray *props,
+                                Error **errp);
++void object_set_machine_compat_props(GPtrArray *compat_props);
++void object_set_accelerator_compat_props(GPtrArray *compat_props);
++void object_apply_compat_props(Object *obj);
+=20
+ /**
+  * object_set_props:
+diff --git a/qom/object.c b/qom/object.c
+index 05a8567041..e3206d6799 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -408,6 +408,45 @@ void object_apply_global_props(Object *obj, const GP=
+trArray *props, Error **errp
+     }
+ }
+=20
++/*
++ * Global property defaults
++ * Slot 0: accelerator's global property defaults
++ * Slot 1: machine's global property defaults
++ * Each is a GPtrArray of of GlobalProperty.
++ * Applied in order, later entries override earlier ones.
++ */
++static GPtrArray *object_compat_props[2];
 +
-+typedef QSIMPLEQ_HEAD(, BlockdevOptionsQueueEntry) BlockdevOptionsQueue;
++/*
++ * Set machine's global property defaults to @compat_props.
++ * May be called at most once.
++ */
++void object_set_machine_compat_props(GPtrArray *compat_props)
++{
++    assert(!object_compat_props[1]);
++    object_compat_props[1] =3D compat_props;
++}
 +
- static QemuOptsList qemu_smp_opts = {
-     .name = "smp-opts",
-     .implied_opt_name = "cpus",
-@@ -2973,13 +2981,7 @@ int main(int argc, char **argv, char **envp)
-     Error *err = NULL;
-     bool list_data_dirs = false;
-     char *dir, **dirs;
--    typedef struct BlockdevOptions_queue {
--        BlockdevOptions *bdo;
--        Location loc;
--        QSIMPLEQ_ENTRY(BlockdevOptions_queue) entry;
--    } BlockdevOptions_queue;
--    QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
--        = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
-+    BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
- 
-     module_call_init(MODULE_INIT_TRACE);
- 
-@@ -3103,12 +3105,12 @@ int main(int argc, char **argv, char **envp)
-             case QEMU_OPTION_blockdev:
-                 {
-                     Visitor *v;
--                    BlockdevOptions_queue *bdo;
-+                    BlockdevOptionsQueueEntry *bdo;
- 
-                     v = qobject_input_visitor_new_str(optarg, "driver",
-                                                       &error_fatal);
- 
--                    bdo = g_new(BlockdevOptions_queue, 1);
-+                    bdo = g_new(BlockdevOptionsQueueEntry, 1);
-                     visit_type_BlockdevOptions(v, NULL, &bdo->bdo,
-                                                &error_fatal);
-                     visit_free(v);
-@@ -4368,7 +4370,7 @@ int main(int argc, char **argv, char **envp)
- 
-     /* open the virtual block devices */
-     while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
--        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
-+        BlockdevOptionsQueueEntry *bdo = QSIMPLEQ_FIRST(&bdo_queue);
- 
-         QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
-         loc_push_restore(&bdo->loc);
--- 
++/*
++ * Set accelerator's global property defaults to @compat_props.
++ * May be called at most once.
++ */
++void object_set_accelerator_compat_props(GPtrArray *compat_props)
++{
++    assert(!object_compat_props[0]);
++    object_compat_props[0] =3D compat_props;
++}
++
++void object_apply_compat_props(Object *obj)
++{
++    int i;
++
++    for (i =3D 0; i < ARRAY_SIZE(object_compat_props); i++) {
++        object_apply_global_props(obj, object_compat_props[i],
++                                  &error_abort);
++    }
++}
++
+ static void object_initialize_with_type(void *data, size_t size, TypeImp=
+l *type)
+ {
+     Object *obj =3D data;
+--=20
 2.17.2
