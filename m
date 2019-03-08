@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38038)
+Received: from eggs.gnu.org ([209.51.188.92]:40275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h29WX-0003F4-Sl
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:02:30 -0500
+	(envelope-from <thuth@redhat.com>) id 1h29k3-0005ws-GG
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:16:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h29WW-0003Tx-Mk
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:02:29 -0500
-References: <20190308013222.12524-1-philmd@redhat.com>
-	<20190308013222.12524-13-philmd@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1h29k2-0004YM-Rk
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:16:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57296)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h29k2-0004Xa-If
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:16:26 -0500
+References: <1551695576-13205-1-git-send-email-thuth@redhat.com>
+	<a0b53ff0-1ded-2a6e-aa4d-b1f4fcc407c1@redhat.com>
+	<b15343fd-7a0f-4fae-01c3-24b558c349d7@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2c1d16fc-fffa-1315-8a05-6dd080d2913d@redhat.com>
-Date: Fri, 8 Mar 2019 08:02:12 +0100
+Message-ID: <6fe67e61-b9a1-b2ef-28e2-534730c5d093@redhat.com>
+Date: Fri, 8 Mar 2019 08:16:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190308013222.12524-13-philmd@redhat.com>
+In-Reply-To: <b15343fd-7a0f-4fae-01c3-24b558c349d7@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 12/18] hw/nvram/fw_cfg: Keep reference
- of file_data in FWCfgState
+Subject: Re: [Qemu-devel] [PATCH] cirrus.yml: Add macOS continuous
+ integration task
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,26 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Ed Maste <emaste@freebsd.org>, Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 08/03/2019 02.32, Philippe Mathieu-Daud=C3=A9 wrote:
-> The 'file_data' is allocated by read_splashfile() (introduced in
-> commit 3d3b8303c6f8).  It is then used by fw_cfg_add_file(). Due
-> to the contract interface of fw_cfg_add_file(), it has to be valid
-> for the lifetime of the FwCfg object.
+On 07/03/2019 22.10, Paolo Bonzini wrote:
+> On 04/03/19 12:08, Philippe Mathieu-Daud=C3=A9 wrote:
+>> +macos_task:
+>> +  osx_instance:
+>> +    image: high-sierra-base
+>> +  env:
+>> +    CIRRUS_CLONE_DEPTH: 1
+>> +  install_script:
+>> +    - brew install pkg-config glib pixman make sdl2
 >=20
-> Keep a reference of 'file_data' in FWCfgState to be able to
-> free this memory in fw_cfg_common_unrealize().
-> We can now remove the res_free() from the main() loop.
-> The global boot_splash_filedata is now unused, remove it.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/nvram/fw_cfg.c         | 10 ++++++----
->  include/hw/nvram/fw_cfg.h |  1 +
->  include/sysemu/sysemu.h   |  1 -
->  vl.c                      |  9 ---------
->  4 files changed, 7 insertions(+), 14 deletions(-)
+> Could you also install Python 3 ("python" in Homebrew is 3.7) and avoid
+> Apple's obsolete /usr/bin/python (also needs something like
+> --python=3D/usr/local/bin/python3 in ./configure below).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Yes, can do.
+
+ Thomas
