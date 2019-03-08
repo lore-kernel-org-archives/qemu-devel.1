@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52545)
+Received: from eggs.gnu.org ([209.51.188.92]:53009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h2IGA-0006B0-4w
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:22:10 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h2III-0007fl-OP
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:24:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h2IG9-0001Sy-3P
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:22:10 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:30994)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h2IG8-0001QL-N2
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:22:09 -0500
-Date: Fri, 8 Mar 2019 17:22:06 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20190308073206.qd3efvlxgeos45np@sirius.home.kraxel.org>
-Message-ID: <alpine.BSF.2.21.9999.1903081718580.52464@zero.eik.bme.hu>
-References: <cover.1551902740.git.balaton@eik.bme.hu>
-	<12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
-	<c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>
-	<20190308073206.qd3efvlxgeos45np@sirius.home.kraxel.org>
+	(envelope-from <no-reply@patchew.org>) id 1h2IIH-0003Sj-OH
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:24:22 -0500
+Resent-Message-Id: <E1h2IIH-0003Sj-OH@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1h2IIH-0003Rj-Ek
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:24:21 -0500
+Message-ID: <155206223719.8146.7413985549144123168@6acff2cf482b>
+In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5-resend 2/2] mips_fulong2e: Add on-board
- graphics chip
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Mar 2019 08:23:58 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: pbonzini@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, yang.zhong@intel.com, thuth@redhat.com
 
-On Fri, 8 Mar 2019, Gerd Hoffmann wrote:
-> On Thu, Mar 07, 2019 at 01:32:41AM +0100, Philippe Mathieu-Daud=E9 wrot=
-e:
->> On 3/6/19 9:05 PM, BALATON Zoltan wrote:
->>> Add (partial) emulation of the on-board GPU of the machine. This
->>> allows the PMON2000 firmware to run and should also work with Linux
->>> console but probably not with X yet.
->>>
->>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>
->> Mojibaked again :(
->
-> Mail was sent without Content-Type: header.  Both mutt and "git am" on
-> my machine assume utf-8 and everything looks fine.  I guess your mail
-> client assumes something else ...
-
-So it came out good at the end but that depends on what maintainer's=20
-config does by default it seems.
-
-> "git send-email" should send the patches with correct headers, it even
-> asks for the charset it should use in case it finds non-ascii
-> characters.  So BALATON, could you check your mail client config, or
-> switch over to "git send-email" for submitting patches?
-
-I'm sending what git format-patch is generating and that does not add=20
-content type header by default. Is there a config option to enable that? =
-I=20
-can't use git send-email because I'm sending from different machine than =
-I=20
-use git on.
-
-Regards,
-BALATON Zoltan
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxNzIzNjE0LTE4MjMtMS1n
+aXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
+aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
+dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
+ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3Qt
+bWluZ3dAZmVkb3JhIFNIT1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVO
+RCA9PT0KCiAgQ0MgICAgICBody91c2IvZGV2LWJsdWV0b290aC5vCiAgQ0MgICAgICBody91c2Iv
+ZGV2LXNtYXJ0Y2FyZC1yZWFkZXIubwpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11LXRl
+c3Qvc3JjL2h3L3RwbS90cG1fZW11bGF0b3IuYzozNzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3Rw
+bS90cG1faW9jdGwuaDoxMToxMDogZmF0YWwgZXJyb3I6IHN5cy91aW8uaDogTm8gc3VjaCBmaWxl
+IG9yIGRpcmVjdG9yeQogI2luY2x1ZGUgPHN5cy91aW8uaD4KICAgICAgICAgIF5+fn5+fn5+fn5+
+CmNvbXBpbGF0aW9uIHRlcm1pbmF0ZWQuCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
+dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTUxNzIzNjE0LTE4MjMtMS1naXQtc2VuZC1lbWFpbC1w
+Ym9uemluaUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
