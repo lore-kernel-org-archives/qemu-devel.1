@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50265)
+Received: from eggs.gnu.org ([209.51.188.92]:51074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1h2G9D-0001sz-IF
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:06:53 -0500
+	(envelope-from <lersek@redhat.com>) id 1h2GC9-0004ON-Rl
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:09:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1h2G9B-00074h-LL
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:06:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1h2G9A-0003aj-Jg
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:06:49 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D7A9E30718CD
-	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 14:05:59 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  8 Mar 2019 15:04:52 +0100
-Message-Id: <20190308140454.32437-11-marcandre.lureau@redhat.com>
-In-Reply-To: <20190308140454.32437-1-marcandre.lureau@redhat.com>
-References: <20190308140454.32437-1-marcandre.lureau@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1h2GC7-0002xd-Tw
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:09:53 -0500
+References: <20190308062455.29755-1-armbru@redhat.com>
+	<481d398a-e26c-6c0a-20b7-7466ae1ebf1f@redhat.com>
+	<875zsteeih.fsf@dusky.pond.sub.org>
+	<20190308133510.GC31583@localhost.localdomain>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <7c5033f4-3d9f-be62-4d7e-9b5931c9aedb@redhat.com>
+Date: Fri, 8 Mar 2019 15:09:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 10/12] libvhost-user: add vu_queue_unpop()
+In-Reply-To: <20190308133510.GC31583@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7] pflash: Require backend size to match
+ device, improve errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,72 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, mst@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, philmd@redhat.com, alex.bennee@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-vhost-user-input will make use of this function to undo some queue pop
-in case the virtio queue does not have enough room.
+On 03/08/19 14:35, Kevin Wolf wrote:
+> Am 08.03.2019 um 13:28 hat Markus Armbruster geschrieben:
+>> Laszlo Ersek <lersek@redhat.com> writes:
+>>> This one has got to be one of the longest bike-shedding sessions! :)
+>>>
+>>> I'm fine with this patch, but I could suggest two improvements.
+>>>
+>>> (1) When blk_getlength() fails, we could format the negative error code
+>>> returned by it into the error message.
+>>
+>> I can do that.
+> 
+> By using error_setg_errno(), I assume. Not throwing away error details
+> is always good.
+> 
+>>> (2) We could extract the common code to a new function in
+>>> "hw/block/block.c". (It says "Common code for block device models" on
+>>> the tin.)
+>>
+>> There's so much common code in these two files even before this patch...
+> 
+> My understanding is that hw/block/block.c contains code that is
+> potentially useful to all kinds of block devices, not random code that
+> two specific similar devices happen to share.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- contrib/libvhost-user/libvhost-user.h | 14 ++++++++++++++
- contrib/libvhost-user/libvhost-user.c | 16 ++++++++++++++++
- 2 files changed, 30 insertions(+)
+Ah, OK.
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-index b0c798fa1a..01738bf44a 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -459,6 +459,20 @@ void vu_queue_notify(VuDev *dev, VuVirtq *vq);
-  */
- void *vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz);
-=20
-+
-+/**
-+ * vu_queue_unpop:
-+ * @dev: a VuDev context
-+ * @vq: a VuVirtq queue
-+ * @elem: The #VuVirtqElement
-+ * @len: number of bytes written
-+ *
-+ * Pretend the most recent element wasn't popped from the virtqueue.  Th=
-e next
-+ * call to vu_queue_pop() will refetch the element.
-+ */
-+void vu_queue_unpop(VuDev *dev, VuVirtq *vq, VuVirtqElement *elem,
-+                    size_t len);
-+
- /**
-  * vu_queue_rewind:
-  * @dev: a VuDev context
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-index fcf5014240..df72d3e440 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -1966,6 +1966,22 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
-     return elem;
- }
-=20
-+static void
-+vu_queue_detach_element(VuDev *dev, VuVirtq *vq, VuVirtqElement *elem,
-+                        size_t len)
-+{
-+    vq->inuse--;
-+    /* unmap, when DMA support is added */
-+}
-+
-+void
-+vu_queue_unpop(VuDev *dev, VuVirtq *vq, VuVirtqElement *elem,
-+               size_t len)
-+{
-+    vq->last_avail_idx--;
-+    vu_queue_detach_element(dev, vq, elem, len);
-+}
-+
- bool
- vu_queue_rewind(VuDev *dev, VuVirtq *vq, unsigned int num)
- {
---=20
-2.21.0.4.g36eb1cb9cf
+> If we want to deduplicate some code in the flash devices, without any
+> expectation that other devices will use it at some point, I'd rather
+> create a new source file hw/block/pflash_common.c or something like
+> that.
+
+Sure, that makes a lot of sense then.
+
+Cheers
+Laszlo
