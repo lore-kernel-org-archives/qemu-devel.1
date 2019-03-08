@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59476)
+Received: from eggs.gnu.org ([209.51.188.92]:59495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h2F5g-0008MZ-7p
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:59:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h2F5f-0008Nv-74
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:59:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h2F5b-0006Vh-2Y
+	(envelope-from <kwolf@redhat.com>) id 1h2F5b-0006aV-Sc
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:59:06 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  8 Mar 2019 13:58:01 +0100
-Message-Id: <20190308125823.32535-12-kwolf@redhat.com>
+Date: Fri,  8 Mar 2019 13:58:00 +0100
+Message-Id: <20190308125823.32535-11-kwolf@redhat.com>
 In-Reply-To: <20190308125823.32535-1-kwolf@redhat.com>
 References: <20190308125823.32535-1-kwolf@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/33] qemu-iotests: Test qcow2 preallocation
- modes
+Subject: [Qemu-devel] [PULL 10/33] qemu-iotests: Ensure GNU sed is used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,131 +25,198 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/243     | 63 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/243.out | 26 ++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 90 insertions(+)
- create mode 100755 tests/qemu-iotests/243
- create mode 100644 tests/qemu-iotests/243.out
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-diff --git a/tests/qemu-iotests/243 b/tests/qemu-iotests/243
-new file mode 100755
-index 0000000000..6a19919add
---- /dev/null
-+++ b/tests/qemu-iotests/243
-@@ -0,0 +1,63 @@
-+#!/bin/bash
-+#
-+# Test qcow2 preallocation
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dkwolf@redhat.com
-+
-+seq=3D$(basename $0)
-+echo "QA output created by $seq"
-+
-+status=3D1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+for mode in off metadata falloc full; do
-+
-+    echo
-+    echo "=3D=3D=3D preallocation=3D$mode =3D=3D=3D"
-+    echo
-+
-+    IMGOPTS=3D"preallocation=3D$mode" _make_test_img 64M
-+
-+    printf "File size: "
-+    du -b $TEST_IMG | cut -f1
-+
-+    # Can't use precise numbers here because they differ between filesys=
-tems
-+    printf "Disk usage: "
-+    [ $(du -B1 $TEST_IMG | cut -f1) -lt 1048576 ] && echo "low" || echo =
-"high"
-+
+Various sed regexp from common.filter use sed GNU extensions.
+Instead of spending time to write these regex to be POSIX compliant,
+verify the GNU sed is available and use it.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/common.filter | 36 ++++++++++++++++----------------
+ tests/qemu-iotests/common.rc     | 13 ++++++++++++
+ 2 files changed, 31 insertions(+), 18 deletions(-)
+
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
+.filter
+index c282bc24f0..35fddc746f 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -23,37 +23,37 @@
+ #
+ _filter_date()
+ {
+-    sed \
++    $SED \
+         -e 's/[A-Z][a-z][a-z] [A-z][a-z][a-z]  *[0-9][0-9]* [0-9][0-9]:[=
+0-9][0-9]:[0-9][0-9] [0-9][0-9][0-9][0-9]$/DATE/'
+ }
+=20
+ _filter_generated_node_ids()
+ {
+-     sed -re 's/\#block[0-9]{3,}/NODE_NAME/'
++    $SED -re 's/\#block[0-9]{3,}/NODE_NAME/'
+ }
+=20
+ _filter_qom_path()
+ {
+-    sed -e 's#\(Attached to: *\) /.*#\1 PATH#'
++    $SED -e 's#\(Attached to: *\) /.*#\1 PATH#'
+ }
+=20
+ # replace occurrences of the actual TEST_DIR value with TEST_DIR
+ _filter_testdir()
+ {
+-    sed -e "s#$TEST_DIR/#TEST_DIR/#g"
++    $SED -e "s#$TEST_DIR/#TEST_DIR/#g"
+ }
+=20
+ # replace occurrences of the actual IMGFMT value with IMGFMT
+ _filter_imgfmt()
+ {
+-    sed -e "s#$IMGFMT#IMGFMT#g"
++    $SED -e "s#$IMGFMT#IMGFMT#g"
+ }
+=20
+ # Replace error message when the format is not supported and delete
+ # the output lines after the first one
+ _filter_qemu_img_check()
+ {
+-    sed -e '/allocated.*fragmented.*compressed clusters/d' \
++    $SED -e '/allocated.*fragmented.*compressed clusters/d' \
+         -e 's/qemu-img: This image format does not support checks/No err=
+ors were found on the image./' \
+         -e '/Image end offset: [0-9]\+/d'
+ }
+@@ -61,13 +61,13 @@ _filter_qemu_img_check()
+ # Removes \r from messages
+ _filter_win32()
+ {
+-    sed -e 's/\r//g'
++    $SED -e 's/\r//g'
+ }
+=20
+ # sanitize qemu-io output
+ _filter_qemu_io()
+ {
+-    _filter_win32 | sed -e "s/[0-9]* ops\; [0-9/:. sec]* ([0-9/.inf]* [E=
+PTGMKiBbytes]*\/sec and [0-9/.inf]* ops\/sec)/X ops\; XX:XX:XX.X (XXX YYY=
+\/sec and XXX ops\/sec)/" \
++    _filter_win32 | $SED -e "s/[0-9]* ops\; [0-9/:. sec]* ([0-9/.inf]* [=
+EPTGMKiBbytes]*\/sec and [0-9/.inf]* ops\/sec)/X ops\; XX:XX:XX.X (XXX YY=
+Y\/sec and XXX ops\/sec)/" \
+         -e "s/: line [0-9][0-9]*:  *[0-9][0-9]*\( Aborted\| Killed\)/:\1=
+/" \
+         -e "s/qemu-io> //g"
+ }
+@@ -75,7 +75,7 @@ _filter_qemu_io()
+ # replace occurrences of QEMU_PROG with "qemu"
+ _filter_qemu()
+ {
+-    sed -e "s#\\(^\\|(qemu) \\)$(basename $QEMU_PROG):#\1QEMU_PROG:#" \
++    $SED -e "s#\\(^\\|(qemu) \\)$(basename $QEMU_PROG):#\1QEMU_PROG:#" \
+         -e 's#^QEMU [0-9]\+\.[0-9]\+\.[0-9]\+ monitor#QEMU X.Y.Z monitor=
+#' \
+         -e $'s#\r##' # QEMU monitor uses \r\n line endings
+ }
+@@ -84,7 +84,7 @@ _filter_qemu()
+ _filter_qmp()
+ {
+     _filter_win32 | \
+-    sed -e 's#\("\(micro\)\?seconds": \)[0-9]\+#\1 TIMESTAMP#g' \
++    $SED -e 's#\("\(micro\)\?seconds": \)[0-9]\+#\1 TIMESTAMP#g' \
+         -e 's#^{"QMP":.*}$#QMP_VERSION#' \
+         -e '/^    "QMP": {\s*$/, /^    }\s*$/ c\' \
+         -e '    QMP_VERSION'
+@@ -93,32 +93,32 @@ _filter_qmp()
+ # readline makes HMP command strings so long that git complains
+ _filter_hmp()
+ {
+-    sed -e $'s/^\\((qemu) \\)\\?.*\e\\[D/\\1/g' \
++    $SED -e $'s/^\\((qemu) \\)\\?.*\e\\[D/\\1/g' \
+         -e $'s/\e\\[K//g'
+ }
+=20
+ # replace block job offset
+ _filter_block_job_offset()
+ {
+-    sed -e 's/, "offset": [0-9]\+,/, "offset": OFFSET,/'
++    $SED -e 's/, "offset": [0-9]\+,/, "offset": OFFSET,/'
+ }
+=20
+ # replace block job len
+ _filter_block_job_len()
+ {
+-    sed -e 's/, "len": [0-9]\+,/, "len": LEN,/g'
++    $SED -e 's/, "len": [0-9]\+,/, "len": LEN,/g'
+ }
+=20
+ # replace actual image size (depends on the host filesystem)
+ _filter_actual_image_size()
+ {
+-    sed -s 's/\("actual-size":\s*\)[0-9]\+/\1SIZE/g'
++    $SED -s 's/\("actual-size":\s*\)[0-9]\+/\1SIZE/g'
+ }
+=20
+ # replace driver-specific options in the "Formatting..." line
+ _filter_img_create()
+ {
+-    sed -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
++    $SED -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+         -e "s#$TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGFMT#IMGFMT#g" \
+@@ -154,7 +154,7 @@ _filter_img_info()
+=20
+     discard=3D0
+     regex_json_spec_start=3D'^ *"format-specific": \{'
+-    sed -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
++    $SED -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+         -e "s#$TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGFMT#IMGFMT#g" \
+@@ -201,7 +201,7 @@ _filter_img_info()
+ # human and json output
+ _filter_qemu_img_map()
+ {
+-    sed -e 's/\([0-9a-fx]* *[0-9a-fx]* *\)[0-9a-fx]* */\1/g' \
++    $SED -e 's/\([0-9a-fx]* *[0-9a-fx]* *\)[0-9a-fx]* */\1/g' \
+         -e 's/"offset": [0-9]\+/"offset": OFFSET/g' \
+         -e 's/Mapped to *//' | _filter_testdir | _filter_imgfmt
+ }
+@@ -213,7 +213,7 @@ _filter_nbd()
+     # receive callbacks sometimes, making them unreliable.
+     #
+     # Filter out the TCP port number since this changes between runs.
+-    sed -e '/nbd\/.*\.c:/d' \
++    $SED -e '/nbd\/.*\.c:/d' \
+         -e 's#127\.0\.0\.1:[0-9]*#127.0.0.1:PORT#g' \
+         -e "s#?socket=3D$TEST_DIR#?socket=3DTEST_DIR#g" \
+         -e 's#\(foo\|PORT/\?\|.sock\): Failed to .*$#\1#'
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index f21020eba6..a543e546c2 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -17,6 +17,19 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+=20
++SED=3D
++for sed in sed gsed; do
++    ($sed --version | grep 'GNU sed') > /dev/null 2>&1
++    if [ "$?" -eq 0 ]; then
++        SED=3D$sed
++        break
++    fi
 +done
++if [ -z "$SED" ]; then
++    echo "$0: GNU sed not found"
++    exit 1
++fi
 +
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/243.out b/tests/qemu-iotests/243.out
-new file mode 100644
-index 0000000000..e531753ad1
---- /dev/null
-+++ b/tests/qemu-iotests/243.out
-@@ -0,0 +1,26 @@
-+QA output created by 243
-+
-+=3D=3D=3D preallocation=3Doff =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
-on=3Doff
-+File size: 196616
-+Disk usage: low
-+
-+=3D=3D=3D preallocation=3Dmetadata =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
-on=3Dmetadata
-+File size: 67436544
-+Disk usage: low
-+
-+=3D=3D=3D preallocation=3Dfalloc =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
-on=3Dfalloc
-+File size: 67436544
-+Disk usage: high
-+
-+=3D=3D=3D preallocation=3Dfull =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocati=
-on=3Dfull
-+File size: 67436544
-+Disk usage: high
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index b5ca63cf72..03aa93dbf5 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -241,3 +241,4 @@
- 239 rw auto quick
- 240 auto quick
- 242 rw auto quick
-+243 rw auto quick
+ dd()
+ {
+    if [ "$HOSTOS" =3D=3D "Linux" ]
 --=20
 2.20.1
