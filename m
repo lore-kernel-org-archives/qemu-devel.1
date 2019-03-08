@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35505)
+Received: from eggs.gnu.org ([209.51.188.92]:35687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h29Jd-0005ib-CA
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 01:49:10 -0500
+	(envelope-from <thuth@redhat.com>) id 1h29KX-0006SX-4G
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 01:50:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h29Jc-0007LO-CZ
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 01:49:09 -0500
-Received: from 19.mo4.mail-out.ovh.net ([87.98.179.66]:36772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1h29Jc-0007Ih-5F
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 01:49:08 -0500
-Received: from player794.ha.ovh.net (unknown [10.109.143.145])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 15EDC1DD77C
-	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 07:49:05 +0100 (CET)
-References: <20190306085032.15744-1-clg@kaod.org>
-	<20190306085032.15744-19-clg@kaod.org>
-	<20190307041816.GL7722@umbus.fritz.box>
-	<05109d65-4917-5929-2431-99ea25d4fb67@kaod.org>
-	<20190308001904.GI7722@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <575e8c00-3e0b-86f1-31e4-0fbb89796251@kaod.org>
-Date: Fri, 8 Mar 2019 07:49:00 +0100
+	(envelope-from <thuth@redhat.com>) id 1h29KW-0000AW-6s
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 01:50:05 -0500
+References: <20190308013222.12524-1-philmd@redhat.com>
+	<20190308013222.12524-7-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <37ef3c6b-e99e-859e-2324-9c59ff6bc1f8@redhat.com>
+Date: Fri, 8 Mar 2019 07:49:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190308001904.GI7722@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20190308013222.12524-7-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 18/27] ppc/pnv: add a LPC Controller model
- for POWER9
+Subject: Re: [Qemu-devel] [PATCH v2 06/18] hw/nvram/fw_cfg: Remove the
+ unnecessary boot_splash_filedata_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,176 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Daniel P . Berrange" <berrange@redhat.com>
 
-On 3/8/19 1:19 AM, David Gibson wrote:
-> On Thu, Mar 07, 2019 at 08:07:41AM +0100, C=E9dric Le Goater wrote:
->> On 3/7/19 5:18 AM, David Gibson wrote:
->>> On Wed, Mar 06, 2019 at 09:50:23AM +0100, C=E9dric Le Goater wrote:
-> [snip]
->>>> +static uint64_t pnv_lpc_mmio_read(void *opaque, hwaddr addr, unsign=
-ed size)
->>>> +{
->>>> +    PnvLpcController *lpc =3D PNV_LPC(opaque);
->>>> +    uint64_t val =3D 0;
->>>> +    uint32_t opb_addr =3D addr & ECCB_CTL_ADDR_MASK;
->>>> +    MemTxResult result;
->>>> +
->>>> +    switch (size) {
->>>> +    case 4:
->>>> +        val =3D address_space_ldl(&lpc->opb_as, opb_addr, MEMTXATTR=
-S_UNSPECIFIED,
->>>> +                                &result);
->>>> +        break;
->>>> +    case 1:
->>>> +        val =3D address_space_ldub(&lpc->opb_as, opb_addr, MEMTXATT=
-RS_UNSPECIFIED,
->>>> +                                 &result);
->>>> +        break;
->>>> +    default:
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB read failed at @0x%"
->>>> +                      HWADDR_PRIx " invalid size %d\n", addr, size)=
-;
->>>> +        return 0;
->>>> +    }
->>>> +
->>>> +    if (result !=3D MEMTX_OK) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB read failed at @0x%"
->>>> +                      HWADDR_PRIx "\n", addr);
->>>> +    }
->>>> +
->>>> +    return val;
->>>
->>> Couldn't you just map the relevant portion of the OPB AS into the MMI=
-O
->>> AS, rather than having to forward the IOs with explicit read/write
->>> functions?
->>
->> The underlying memory regions (ISA space, LPC HC, OPB regs) are the
->> same on POWER8. So this is one way to share the overall initialization=
-.=20
+On 08/03/2019 02.32, Philippe Mathieu-Daud=C3=A9 wrote:
+> The 'boot_splash_filedata_size' was introduced as a global variable
+> in 3d3b8303c6f. This variable is used as a 'size' argument to the
+> fw_cfg_add_file(). This function has an interface contract with his
+> 'data' argument, but there is no such contract for 'size' (this is
+> not a referenced pointer).  We can simply remove it.
 >=20
-> I don't understand how that relates to my question.  If anything that
-> sounds like it makes even more sense to map the common MR with the
-> actual registers into the MMIO AS as a subregion, rather than having a
-> redirect via the OPB AS.
-
-ok. I will try that.
-
-Thanks,
-
-C.  =20
-
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/nvram/fw_cfg.c       | 5 ++---
+>  include/sysemu/sysemu.h | 1 -
+>  vl.c                    | 1 -
+>  3 files changed, 2 insertions(+), 5 deletions(-)
 >=20
->> What I would have liked to do is to simplified the ECCB interface=20
->> (see pnv_lpc_do_eccb()).
->>
->> Thanks,
->>
->> C.=20
->>
->>
->>>> +}
->>>> +
->>>> +static void pnv_lpc_mmio_write(void *opaque, hwaddr addr,
->>>> +                                uint64_t val, unsigned size)
->>>> +{
->>>> +    PnvLpcController *lpc =3D PNV_LPC(opaque);
->>>> +    uint32_t opb_addr =3D addr & ECCB_CTL_ADDR_MASK;
->>>> +    MemTxResult result;
->>>> +
->>>> +    switch (size) {
->>>> +    case 4:
->>>> +        address_space_stl(&lpc->opb_as, opb_addr, val, MEMTXATTRS_U=
-NSPECIFIED,
->>>> +                          &result);
->>>> +         break;
->>>> +    case 1:
->>>> +        address_space_stb(&lpc->opb_as, opb_addr, val, MEMTXATTRS_U=
-NSPECIFIED,
->>>> +                          &result);
->>>> +        break;
->>>> +    default:
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB write failed at @0x%"
->>>> +                      HWADDR_PRIx " invalid size %d\n", addr, size)=
-;
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    if (result !=3D MEMTX_OK) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB write failed at @0x%"
->>>> +                      HWADDR_PRIx "\n", addr);
->>>> +    }
->>>> +}
->>>> +
->>>> +static const MemoryRegionOps pnv_lpc_mmio_ops =3D {
->>>> +    .read =3D pnv_lpc_mmio_read,
->>>> +    .write =3D pnv_lpc_mmio_write,
->>>> +    .impl =3D {
->>>> +        .min_access_size =3D 1,
->>>> +        .max_access_size =3D 4,
->>>> +    },
->>>> +    .endianness =3D DEVICE_BIG_ENDIAN,
->>>> +};
->>>> +
->>>>  static void pnv_lpc_eval_irqs(PnvLpcController *lpc)
->>>>  {
->>>>      bool lpc_to_opb_irq =3D false;
->>>> @@ -465,6 +627,43 @@ static const TypeInfo pnv_lpc_power8_info =3D {
->>>>      }
->>>>  };
->>>> =20
->>>> +static void pnv_lpc_power9_realize(DeviceState *dev, Error **errp)
->>>> +{
->>>> +    PnvLpcController *lpc =3D PNV_LPC(dev);
->>>> +    PnvLpcClass *plc =3D PNV_LPC_GET_CLASS(dev);
->>>> +    Error *local_err =3D NULL;
->>>> +
->>>> +    plc->parent_realize(dev, &local_err);
->>>> +    if (local_err) {
->>>> +        error_propagate(errp, local_err);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    /* P9 uses a MMIO region */
->>>> +    memory_region_init_io(&lpc->xscom_regs, OBJECT(lpc), &pnv_lpc_m=
-mio_ops,
->>>> +                          lpc, "lpcm", PNV9_LPCM_SIZE);
->>>> +}
->>>> +
->>>> +static void pnv_lpc_power9_class_init(ObjectClass *klass, void *dat=
-a)
->>>> +{
->>>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->>>> +    PnvLpcClass *plc =3D PNV_LPC_CLASS(klass);
->>>> +
->>>> +    dc->desc =3D "PowerNV LPC Controller POWER9";
->>>> +
->>>> +    plc->psi_irq =3D PSIHB9_IRQ_LPCHC;
->>>> +
->>>> +    device_class_set_parent_realize(dc, pnv_lpc_power9_realize,
->>>> +                                    &plc->parent_realize);
->>>> +}
->>>> +
->>>> +static const TypeInfo pnv_lpc_power9_info =3D {
->>>> +    .name          =3D TYPE_PNV9_LPC,
->>>> +    .parent        =3D TYPE_PNV_LPC,
->>>> +    .instance_size =3D sizeof(PnvLpcController),
->>>> +    .class_init    =3D pnv_lpc_power9_class_init,
->>>> +};
->>>> +
->>>>  static void pnv_lpc_realize(DeviceState *dev, Error **errp)
->>>>  {
->>>>      PnvLpcController *lpc =3D PNV_LPC(dev);
->>>> @@ -540,6 +739,7 @@ static void pnv_lpc_register_types(void)
->>>>  {
->>>>      type_register_static(&pnv_lpc_info);
->>>>      type_register_static(&pnv_lpc_power8_info);
->>>> +    type_register_static(&pnv_lpc_power9_info);
->>>>  }
->>>> =20
->>>>  type_init(pnv_lpc_register_types)
->>>
->>
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 8eb76a382c..b2dc0a80cb 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -217,15 +217,14 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>          }
+>          g_free(boot_splash_filedata);
+>          boot_splash_filedata =3D (uint8_t *)file_data;
+> -        boot_splash_filedata_size =3D file_size;
+> =20
+>          /* insert data */
+>          if (file_type =3D=3D JPG_FILE) {
+>              fw_cfg_add_file(s, "bootsplash.jpg",
+> -                    boot_splash_filedata, boot_splash_filedata_size);
+> +                            boot_splash_filedata, file_size);
+>          } else {
+>              fw_cfg_add_file(s, "bootsplash.bmp",
+> -                    boot_splash_filedata, boot_splash_filedata_size);
+> +                            boot_splash_filedata, file_size);
+>          }
+>          g_free(filename);
+>      }
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 89604a8328..6065d9e420 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -110,7 +110,6 @@ extern int old_param;
+>  extern int boot_menu;
+>  extern bool boot_strict;
+>  extern uint8_t *boot_splash_filedata;
+> -extern size_t boot_splash_filedata_size;
+>  extern bool enable_mlock;
+>  extern bool enable_cpu_pm;
+>  extern QEMUClockType rtc_clock;
+> diff --git a/vl.c b/vl.c
+> index 4c5cc0d8ad..fad6fec38c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -188,7 +188,6 @@ const char *prom_envs[MAX_PROM_ENVS];
+>  int boot_menu;
+>  bool boot_strict;
+>  uint8_t *boot_splash_filedata;
+> -size_t boot_splash_filedata_size;
+>  bool wakeup_suspend_enabled;
+> =20
+>  int icount_align_option;
 >=20
+
+Nice, one global variable less!
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
