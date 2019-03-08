@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54002)
+Received: from eggs.gnu.org ([209.51.188.92]:54081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h2Mqk-0006he-4l
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:16:15 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1h2Mqy-0006s5-5C
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:16:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h2Mqh-0006Av-Ts
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:16:13 -0500
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:34916)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1h2Mqg-00067N-Oe
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:16:11 -0500
-Received: by mail-ed1-x544.google.com with SMTP id g19so17513867edp.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 13:16:08 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  8 Mar 2019 21:15:57 +0000
-Message-Id: <20190308211557.22589-1-alex.bennee@linaro.org>
+	(envelope-from <alex.williamson@redhat.com>) id 1h2Mqx-0006LA-DK
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:16:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1h2Mqx-0006Kk-5T
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:16:27 -0500
+Date: Fri, 8 Mar 2019 14:16:23 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190308141623.566cfda4@x1.home>
+In-Reply-To: <cd99a2cc-a7e8-ef80-69b3-2082d28a3352@oracle.com>
+References: <20190222054939.19739-1-kraxel@redhat.com>
+	<20190222054939.19739-4-kraxel@redhat.com>
+	<cd99a2cc-a7e8-ef80-69b3-2082d28a3352@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] docs/booting.rst: start documenting the
- boot process
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] vfio/display: delay link up event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, rth@twiddle.net, f4bug@amsat.org, shannon.zhaosl@gmail.com, hpoussin@reactos.org, david@gibson.dropbear.id.au, mark.cave-ayland@ilande.co.uk, borntraeger@de.ibm.com, thuth@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, ehabkost@redhat.com, armbru@redhat.com, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org, intel-gvt-dev@lists.freedesktop.org
 
-While working on some test cases I realised there was quite a lot of
-assumed knowledge about how things boot up. I thought it would be
-worth gathering this together in a user facing document where we could
-pour in the details and background to the boot process. As it's quite
-wordy I thought it should be a separate document to the manual (which
-can obviously reference this). So far I've managed almost a thousand
-words and haven't actually related anything to QEMU's options yet.
+On Fri, 22 Feb 2019 11:19:11 +0000
+Liam Merwick <liam.merwick@oracle.com> wrote:
 
-So going forward:
+> On 22/02/2019 05:49, Gerd Hoffmann wrote:
+> > Kick the display link up event with a 0.1 sec delay,
+> > so the guest has a chance to notice the link down first.
+> > 
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>  
+> 
+> Depending on your thoughts on the suggestion in patch 1 regarding a 
+> comment at the 'err' label - another candidate in 
+> vfio_display_edid_link_up().
 
-  - is this a useful document to have in docs?
-  - are there any other areas to mention?
-    - out auto-magic -bios selection seems like something worth covering
-  - should we have some worked examples of command lines?
-    - I was thinking for example of read-only and pflash examples
-  - we should also describe why direct kernel boots exits
-    - and also the fact they are not that direct (some code executes
-      before a kernel - even if it's less than a full firmware)
+This would also get the following fixup rolled in.  Thanks,
 
-Submitted for comment....
+Alex
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- docs/booting.rst | 127 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 127 insertions(+)
- create mode 100644 docs/booting.rst
+ hw/vfio/display.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/docs/booting.rst b/docs/booting.rst
-new file mode 100644
-index 0000000000..a8a644ff9a
---- /dev/null
-+++ b/docs/booting.rst
-@@ -0,0 +1,127 @@
-+=====================================
-+Anatomy of a Boot, a QEMU perspective
-+=====================================
-+
-+This document attempts to give an overview of how machines boot-up and
-+how this matters to QEMU. We will discuss firmware and BIOSes and the
-+things they do before the OS kernel is loaded and your usable system
-+is finally ready.
-+
-+Firmware
-+========
-+
-+When a CPU is powered up it knows nothing about it's environment. It's
-+internal state, including the program counter (PC), will be reset to a
-+defined set of values and it will attempt to fetch it's first
-+instruction and execute it. It is the job of the firmware to bring a
-+CPU up from it's first few instructions to running in a relatively
-+sane execution environment. Firmware tends to be specific to the
-+hardware in question and is stored on non-volatile memory (memory that
-+survives a power off) usually a ROM or flash device on the computers
-+main board.
-+
-+Some examples of what firmware does include:
-+
-+Early Hardware Setup
-+--------------------
-+
-+Modern hardware often requires configuring before it is usable. For
-+example most modern systems won't have working RAM until the memory
-+controller has been programmed with the correct timings for whatever
-+memory is installed on the system. Processors may boot with a very
-+restricted view of the memory map until RAM and other key peripherals
-+have been configured to appear in it's address space. Some hardware
-+may not even appear until some sort of blob has been loaded into it so
-+it can start responding to the CPU.
-+
-+Fortunately for QEMU we don't have to worry too much about this very
-+low level configuration. The device model we present to the CPU at
-+start-up will generally respond to IO access from processor straight
-+away.
-+
-+BIOS or Firmware Services
-+-------------------------
-+
-+In the early days of the PC era the BIOS or Basic Input/Output System
-+provided an abstraction interface to the operating system which
-+allowed them to do basic IO operations without having to directly
-+drive the hardware. Since then the scope of these firmware services
-+have grown as systems become more and more complex.
-+
-+Modern firmware often follows the Unified Extensible Firmware
-+Interface (UEFI) which provides services like secure boot, persistent
-+variables and external time-keeping.
-+
-+There can often be multiple levels of firmware service functions. For
-+example systems which support secure execution enclaves generally have
-+a firmware component that executes in this secure mode which the
-+operating system can call in a defined secure manner to undertake
-+security sensitive tasks on it's behalf.
-+
-+Hardware Enumeration
-+--------------------
-+
-+It's easy to assume that modern hardware is built to be discover-able
-+and all the operating system needs to do is enumerate the various
-+buses on the system to find out what hardware exists. While buses like
-+PCI and USB do support discovery there is usually much more on a
-+modern system than just these two things.
-+
-+In the embedded world it used to be acceptable to have a custom
-+compiled kernel which knew where everything is meant to be. However
-+this was a brittle approach and not very flexible - most obviously if
-+you try and use a kernel compiled for one piece of hardware on another
-+piece of hardware that might nominally have the same processor.
-+
-+The more modern approach is to have a "generic" kernel that has a
-+number of different drivers compiled in which are then enabled based
-+on a hardware description provided by the firmware. This allows
-+flexibility on both sides. The software distribution is less concerned
-+about managing lots of different kernels for different pieces of
-+hardware. The hardware manufacturer is also able to make small changes
-+to the board over time to fix bugs or change minor components.
-+
-+The two main methods for this are the Advanced Configuration and Power
-+Interface (ACPI) and Device Trees. ACPI originated from the PC world
-+although is becoming increasingly common for "enterprise" hardware
-+like servers. Device Trees of various forms have existed for a while
-+with perhaps the most common being Flattened Device Trees (FDT).
-+
-+Boot Code
-+=========
-+
-+The line between firmware and boot code is a very blurry one. However
-+from a functionality point of view we have moved from ensuring the
-+hardware is usable as a computing device to finding and loading a
-+kernel which is then going to take over control of the system. Modern
-+firmware often has the ability to boot a kernel directly and in some
-+systems you might chain through several boot loaders before the final
-+kernel takes control.
-+
-+The boot loader needs to do 3 things:
-+
-+  - find a kernel and load it into RAM
-+  - ensure the CPU is in the correct mode for the kernel to boot
-+  - pass any information the kernel may need to boot and can't find itself
-+
-+Once it has done these things it can jump to the kernel and let it get
-+on with things.
-+
-+Kernel
-+======
-+
-+The Kernel now takes over and will be in charge of the system from now
-+on. It will enumerate all the devices on the system (again) and load
-+drivers that can control them. It will then locate some sort of
-+file-system and eventually start running programs that actually do
-+work.
-+
-+------------------------
-+How this relates to QEMU
-+------------------------
-+
-+TODO:
-+
-+  - -bios and -drive flash
-+  - dynamic and fixed hardware definitions
-+  - direct kernel boots
--- 
-2.20.1
+diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+index e8f312dc3308..a3d9c8f5beac 100644
+--- a/hw/vfio/display.c
++++ b/hw/vfio/display.c
+@@ -44,7 +44,9 @@ static void vfio_display_edid_link_up(void *opaque)
+     int fd = vdev->vbasedev.fd;
+ 
+     dpy->edid_regs->link_state = VFIO_DEVICE_GFX_LINK_STATE_UP;
+-    pwrite_field(fd, dpy->edid_info, dpy->edid_regs, link_state);
++    if (pwrite_field(fd, dpy->edid_info, dpy->edid_regs, link_state)) {
++        goto err;
++    }
+     trace_vfio_display_edid_link_up();
+     return;
+ 
