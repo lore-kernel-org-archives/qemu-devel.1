@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40454)
+Received: from eggs.gnu.org ([209.51.188.92]:40399)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1h2DvZ-0008Bk-4o
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:44:39 -0500
+	id 1h2DvV-00086G-HE
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:44:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1h2DvX-0005Xf-EH
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:44:37 -0500
+	id 1h2DvR-00054L-Iy
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:44:32 -0500
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Date: Fri, 8 Mar 2019 11:42:11 +0000
-Message-ID: <20190308114218.26692-5-shameerali.kolothum.thodi@huawei.com>
+Date: Fri, 8 Mar 2019 11:42:09 +0000
+Message-ID: <20190308114218.26692-3-shameerali.kolothum.thodi@huawei.com>
 In-Reply-To: <20190308114218.26692-1-shameerali.kolothum.thodi@huawei.com>
 References: <20190308114218.26692-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 04/11] hw/arm/virt: Add virtual ACPI device
+Subject: [Qemu-devel] [PATCH v2 02/11] hw/acpi: Make ACPI IO address space
+ configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,161 +27,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com
 Cc: linuxarm@huawei.com, xuwei5@hisilicon.com
 
-From: Samuel Ortiz <sameo@linux.intel.com>
+This is in preparation for adding support for ARM64 platforms
+where it doesn't use port mapped IO for ACPI IO space.
 
-This is to provide an acpi device interface for Arm/virt.
-This will be used by Arm/Virt to add hotplug support via
-ACPI GED device.
-
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- hw/arm/Makefile.objs  |   2 +-
- hw/arm/virt-acpi.c    | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/arm/virt.h |   1 +
- 3 files changed, 113 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/virt-acpi.c
+ hw/acpi/memory_hotplug.c         | 22 ++++++++++++++--------
+ hw/i386/acpi-build.c             |  3 ++-
+ include/hw/acpi/memory_hotplug.h |  5 +++--
+ 3 files changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index fa57c7c..e0db3cd 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -1,6 +1,6 @@
- obj-y += boot.o sysbus-fdt.o
- obj-$(CONFIG_ARM_VIRT) += virt.o
--obj-$(CONFIG_ACPI) += virt-acpi-build.o
-+obj-$(CONFIG_ACPI) += virt-acpi-build.o virt-acpi.o
- obj-$(CONFIG_DIGIC) += digic_boards.o
- obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
- obj-$(CONFIG_HIGHBANK) += highbank.o
-diff --git a/hw/arm/virt-acpi.c b/hw/arm/virt-acpi.c
-new file mode 100644
-index 0000000..df8a02b
---- /dev/null
-+++ b/hw/arm/virt-acpi.c
-@@ -0,0 +1,111 @@
-+/*
-+ *
-+ * Copyright (c) 2018 Intel Corporation
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/range.h"
-+#include "qapi/error.h"
-+#include "exec/address-spaces.h"
-+
-+#include "hw/hw.h"
-+#include "hw/hotplug.h"
-+#include "hw/sysbus.h"
-+#include "hw/arm/virt.h"
-+
-+#include "hw/acpi/acpi.h"
-+
-+typedef struct VirtAcpiState {
-+    SysBusDevice parent_obj;
-+} VirtAcpiState;
-+
-+#define TYPE_VIRT_ACPI "virt-acpi"
-+#define VIRT_ACPI(obj) \
-+    OBJECT_CHECK(VirtAcpiState, (obj), TYPE_VIRT_ACPI)
-+
-+static const VMStateDescription vmstate_acpi = {
-+    .name = "virt_acpi",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+};
-+
-+static void virt_device_plug_cb(HotplugHandler *hotplug_dev,
-+                                DeviceState *dev, Error **errp)
-+{
-+}
-+
-+static void virt_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                          DeviceState *dev, Error **errp)
-+{
-+}
-+
-+static void virt_device_unplug_cb(HotplugHandler *hotplug_dev,
-+                                  DeviceState *dev, Error **errp)
-+{
-+}
-+
-+static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
-+{
-+}
-+
-+static void virt_device_realize(DeviceState *dev, Error **errp)
-+{
-+}
-+
-+DeviceState *virt_acpi_init(void)
-+{
-+    return sysbus_create_simple(TYPE_VIRT_ACPI, -1, NULL);
-+}
-+
-+static Property virt_acpi_properties[] = {
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virt_acpi_class_init(ObjectClass *class, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(class);
-+    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(class);
-+    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
-+
-+    dc->desc = "ACPI";
-+    dc->vmsd = &vmstate_acpi;
-+    dc->props = virt_acpi_properties;
-+    dc->realize = virt_device_realize;
-+
-+    hc->plug = virt_device_plug_cb;
-+    hc->unplug_request = virt_device_unplug_request_cb;
-+    hc->unplug = virt_device_unplug_cb;
-+
-+    adevc->send_event = virt_send_ged;
-+}
-+
-+static const TypeInfo virt_acpi_info = {
-+    .name          = TYPE_VIRT_ACPI,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(VirtAcpiState),
-+    .class_init    = virt_acpi_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOTPLUG_HANDLER },
-+        { TYPE_ACPI_DEVICE_IF },
-+        { }
-+    }
-+};
-+
-+static void virt_acpi_register_types(void)
-+{
-+    type_register_static(&virt_acpi_info);
-+}
-+
-+type_init(virt_acpi_register_types)
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 507517c..6076167 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -145,6 +145,7 @@ typedef struct {
-     OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
+diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+index a6beb10..77ff0af 100644
+--- a/hw/acpi/memory_hotplug.c
++++ b/hw/acpi/memory_hotplug.c
+@@ -8,7 +8,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qapi-events-misc.h"
  
- void virt_acpi_setup(VirtMachineState *vms);
-+DeviceState *virt_acpi_init(void);
+-static uint16_t memhp_io_base;
++static hwaddr memhp_io_base;
  
- /* Return the number of used redistributor regions  */
- static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
+ static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
+ {
+@@ -182,7 +182,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
+ };
+ 
+ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+-                              MemHotplugState *state, uint16_t io_base)
++                              MemHotplugState *state, hwaddr io_base)
+ {
+     MachineState *machine = MACHINE(qdev_get_machine());
+ 
+@@ -315,7 +315,8 @@ const VMStateDescription vmstate_memory_hotplug = {
+ 
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+                               const char *res_root,
+-                              const char *event_handler_method)
++                              const char *event_handler_method,
++                              AmlRegionSpace rs)
+ {
+     int i;
+     Aml *ifctx;
+@@ -338,14 +339,19 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_name_decl("_UID", aml_string("Memory hotplug resources")));
+ 
+         crs = aml_resource_template();
+-        aml_append(crs,
+-            aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
+-                   MEMORY_HOTPLUG_IO_LEN)
+-        );
++        if (rs == AML_SYSTEM_IO) {
++            aml_append(crs,
++                aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
++                       MEMORY_HOTPLUG_IO_LEN)
++            );
++        } else {
++            aml_append(crs, aml_memory32_fixed(memhp_io_base,
++                            MEMORY_HOTPLUG_IO_LEN, AML_READ_WRITE));
++        }
+         aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
+ 
+         aml_append(mem_ctrl_dev, aml_operation_region(
+-            MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
++            MEMORY_HOTPLUG_IO_REGION, rs,
+             aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
+         );
+ 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 622ccb9..d9b554f 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1852,7 +1852,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+                        "\\_SB.PCI0", "\\_GPE._E02");
+     }
+-    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
++    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0",
++                             "\\_GPE._E03", AML_SYSTEM_IO);
+ 
+     scope =  aml_scope("_GPE");
+     {
+diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
+index fbfcbe6..52f9027 100644
+--- a/include/hw/acpi/memory_hotplug.h
++++ b/include/hw/acpi/memory_hotplug.h
+@@ -55,7 +55,7 @@ typedef struct MemHotplugState {
+ } MemHotplugState;
+ 
+ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+-                              MemHotplugState *state, uint16_t io_base);
++                              MemHotplugState *state, hwaddr io_base);
+ 
+ void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+                          DeviceState *dev, Error **errp);
+@@ -74,5 +74,6 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
+ 
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+                               const char *res_root,
+-                              const char *event_handler_method);
++                              const char *event_handler_method,
++                              AmlRegionSpace rs);
+ #endif
 -- 
 2.7.4
