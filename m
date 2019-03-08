@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53929)
+Received: from eggs.gnu.org ([209.51.188.92]:55007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2Am1-00028J-GN
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 03:22:34 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h2Api-000408-4d
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 03:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2Am0-0003uT-IB
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 03:22:33 -0500
-References: <20190307172401.29451-1-armbru@redhat.com>
-	<20190307172401.29451-12-armbru@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <12af2068-ecd6-4b77-495e-2f52b0b0b13e@redhat.com>
-Date: Fri, 8 Mar 2019 09:22:16 +0100
+	(envelope-from <no-reply@patchew.org>) id 1h2Apg-0001nt-6E
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 03:26:22 -0500
+Resent-Message-Id: <E1h2Apg-0001nt-6E@eggs.gnu.org>
+Message-ID: <155203355889.8146.6652099908806812632@6acff2cf482b>
+In-Reply-To: <20190307172401.29451-1-armbru@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190307172401.29451-12-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 11/12] pc: Support firmware
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Mar 2019 00:26:00 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 00/12] pc: Support firmware
  configuration with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,84 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
+To: armbru@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, philmd@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On 03/07/19 18:24, Markus Armbruster wrote:
-> The PC machines put firmware in ROM by default.  To get it put into
-> flash memory (required by OVMF), you have to use -drive
-> if=3Dpflash,unit=3D0,... and optionally -drive if=3Dpflash,unit=3D1,...
->=20
-> Why two -drive?  This permits setting up one part of the flash memory
-> read-only, and the other part read/write.  Below the hood, it creates
-> two separate flash devices, because we were too lazy to improve our
-> flash device models to support sector protection.
->=20
-> The problem at hand is to do the same with -blockdev somehow, as one
-> more step towards deprecating -drive.
->=20
-> Mapping -drive if=3Dnone,... to -blockdev is a solved problem.  With
-> if=3DT other than if=3Dnone, -drive additionally configures a block dev=
-ice
-> frontend.  For non-onboard devices, that part maps to -device.  Also a
-> solved problem.  For onboard devices such as PC flash memory, we have
-> an unsolved problem.
->=20
-> This is actually an instance of a wider problem: our general device
-> configuration interface doesn't cover onboard devices.  Instead, we
-> have a zoo of ad hoc interfaces that are much more limited.  Some of
-> them we'd rather deprecate (-drive, -net), but can't until we have
-> suitable replacements.
->=20
-> Sadly, I can't attack the wider problem today.  So back to the narrow
-> problem.
->=20
-> My first idea was to reduce it to its solved buddy by using pluggable
-> instead of onboard devices for the flash memory.  Workable, but it
-> requires some extra smarts in firmware descriptors and libvirt.  Paolo
-> had an idea that is simpler for libvirt: keep the devices onboard, and
-> add machine properties for their block backends.
->=20
-> The implementation is less than straightforward, I'm afraid.
->=20
-> First, block backend properties are *qdev* properties.  Machines can't
-> have those, as they're not devices.  I could duplicate these qdev
-> properties as QOM properties, but I hate that.
->=20
-> More seriously, the properties do not belong to the machine, they
-> belong to the onboard flash devices.  Adding them to the machine would
-> then require bad magic to somehow transfer them to the flash devices.
-> Fortunately, QOM provides the means to handle exactly this case: add
-> alias properties to the machine that forward to the onboard devices'
-> properties.
->=20
-> Properties need to be created in .instance_init() methods.  For PC
-> machines, that's pc_machine_initfn().  To make alias properties work,
-> we need to create the onboard flash devices there, too.  Requires
-> several bug fixes, in the previous commits.  We also have to realize
-> the devices.  More on that below.
->=20
-> If the user sets pflash0, firmware resides in flash memory.
-> pc_system_firmware_init() maps and realizes the flash devices.
->=20
-> Else, firmware resides in ROM.  The onboard flash devices aren't used
-> then.  pc_system_firmware_init() destroys them unrealized, along with
-> the alias properties.
->=20
-> The existing code to pick up drives defined with -drive if=3Dpflash is
-> replaced by code to desugar into the machine properties.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/i386/pc.c         |   2 +
->  hw/i386/pc_sysfw.c   | 243 ++++++++++++++++++++++++++++---------------
->  include/hw/i386/pc.h |   3 +
->  3 files changed, 166 insertions(+), 82 deletions(-)
-
-Thanks for addressing my comments!
-
-Acked-by: Laszlo Ersek <lersek@redhat.com>
-
-Laszlo
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE3MjQwMS4yOTQ1
+MS0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAzMDcxNzI0MDEuMjk0NTEt
+MS1hcm1icnVAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzEy
+XSBwYzogU3VwcG9ydCBmaXJtd2FyZSBjb25maWd1cmF0aW9uIHdpdGggLWJsb2NrZGV2Cgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
+ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
+LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwMzA3
+MTcyNDAxLjI5NDUxLTEtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDMwNzE3MjQw
+MS4yOTQ1MS0xLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
+dCcKM2VhOTI5ZGU2NSBkb2NzL2ludGVyb3AvZmlybXdhcmUuanNvbjogUHJlZmVyIC1tYWNoaW5l
+IHRvIGlmPXBmbGFzaApiMmYxMjBkYzUzIHBjOiBTdXBwb3J0IGZpcm13YXJlIGNvbmZpZ3VyYXRp
+b24gd2l0aCAtYmxvY2tkZXYKZTIwYzUyNzI3ZSBwY19zeXNmdzogUGFzcyBQQ01hY2hpbmVTdGF0
+ZSB0byBwY19zeXN0ZW1fZmlybXdhcmVfaW5pdCgpCmQ1MWYyOTBlOWUgcGNfc3lzZnc6IFJlbW92
+ZSB1bnVzZWQgUGNTeXNGd0RldmljZQo5NjU2NTQ0NWY4IHBmbGFzaF9jZmkwMTogQWRkIHBmbGFz
+aF9jZmkwMV9nZXRfYmxrKCkgaGVscGVyCmJiNDRhMDgwMjQgdmw6IENyZWF0ZSBibG9jayBiYWNr
+ZW5kcyBiZWZvcmUgc2V0dGluZyBtYWNoaW5lIHByb3BlcnRpZXMKMzgwNjU1N2UxZiB2bDogRmFj
+dG9yIGNvbmZpZ3VyZV9ibG9ja2RldigpIG91dCBvZiBtYWluKCkKOTg0ZjE4Mjg0ZSB2bDogSW1w
+cm92ZSBsZWdpYmlsaXR5IG9mIEJsb2NrZGV2T3B0aW9ucyBxdWV1ZQplZTVkMDYzYzI1IHN5c2J1
+czogRml4IGxhdGVudCBidWcgd2l0aCBvbmJvYXJkIGRldmljZXMKMWU1Zjg5ZDcxNiB2bDogRml4
+IGxhdGVudCBidWcgd2l0aCAtZ2xvYmFsIGFuZCBvbmJvYXJkIGRldmljZXMKMTk5NTRmZjBmYSBx
+b206IE1vdmUgY29tcGF0X3Byb3BzIG1hY2hpbmVyeSBmcm9tIHFkZXYgdG8gUU9NCjI3ZjFjNGYx
+ODQgcWRldjogRml4IGxhdGVudCBidWcgd2l0aCBjb21wYXRfcHJvcHMgYW5kIG9uYm9hcmQgZGV2
+aWNlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgMjdmMWM0ZjE4
+NDEwIChxZGV2OiBGaXggbGF0ZW50IGJ1ZyB3aXRoIGNvbXBhdF9wcm9wcyBhbmQgb25ib2FyZCBk
+ZXZpY2VzKQoyLzEyIENoZWNraW5nIGNvbW1pdCAxOTk1NGZmMGZhOTQgKHFvbTogTW92ZSBjb21w
+YXRfcHJvcHMgbWFjaGluZXJ5IGZyb20gcWRldiB0byBRT00pCjMvMTIgQ2hlY2tpbmcgY29tbWl0
+IDFlNWY4OWQ3MTZlOCAodmw6IEZpeCBsYXRlbnQgYnVnIHdpdGggLWdsb2JhbCBhbmQgb25ib2Fy
+ZCBkZXZpY2VzKQo0LzEyIENoZWNraW5nIGNvbW1pdCBlZTVkMDYzYzI1YTYgKHN5c2J1czogRml4
+IGxhdGVudCBidWcgd2l0aCBvbmJvYXJkIGRldmljZXMpCjUvMTIgQ2hlY2tpbmcgY29tbWl0IDk4
+NGYxODI4NGUwNSAodmw6IEltcHJvdmUgbGVnaWJpbGl0eSBvZiBCbG9ja2Rldk9wdGlvbnMgcXVl
+dWUpCjYvMTIgQ2hlY2tpbmcgY29tbWl0IDM4MDY1NTdlMWYwMCAodmw6IEZhY3RvciBjb25maWd1
+cmVfYmxvY2tkZXYoKSBvdXQgb2YgbWFpbigpKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
+YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjY6IEZJTEU6IHZsLmM6MTIwNzoKKyAg
+ICAvKiBJZiB0aGUgY3VycmVudGx5IHNlbGVjdGVkIG1hY2hpbmUgd2lzaGVzIHRvIG92ZXJyaWRl
+IHRoZSB1bml0cy1wZXItYnVzCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGlu
+ZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzI3OiBGSUxFOiB2bC5jOjEyMDg6CisgICAgICogcHJv
+cGVydHkgb2YgaXRzIGRlZmF1bHQgSEJBIGludGVyZmFjZSB0eXBlLCBkbyBzbyBub3cuICovCgp0
+b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTIg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8xMiBDaGVja2luZyBjb21taXQgYmI0NGEwODAy
+NDUxICh2bDogQ3JlYXRlIGJsb2NrIGJhY2tlbmRzIGJlZm9yZSBzZXR0aW5nIG1hY2hpbmUgcHJv
+cGVydGllcykKOC8xMiBDaGVja2luZyBjb21taXQgOTY1NjU0NDVmODIxIChwZmxhc2hfY2ZpMDE6
+IEFkZCBwZmxhc2hfY2ZpMDFfZ2V0X2JsaygpIGhlbHBlcikKOS8xMiBDaGVja2luZyBjb21taXQg
+ZDUxZjI5MGU5ZTc1IChwY19zeXNmdzogUmVtb3ZlIHVudXNlZCBQY1N5c0Z3RGV2aWNlKQoxMC8x
+MiBDaGVja2luZyBjb21taXQgZTIwYzUyNzI3ZTVkIChwY19zeXNmdzogUGFzcyBQQ01hY2hpbmVT
+dGF0ZSB0byBwY19zeXN0ZW1fZmlybXdhcmVfaW5pdCgpKQoxMS8xMiBDaGVja2luZyBjb21taXQg
+YjJmMTIwZGM1MzE5IChwYzogU3VwcG9ydCBmaXJtd2FyZSBjb25maWd1cmF0aW9uIHdpdGggLWJs
+b2NrZGV2KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzczOiBGSUxFOiBody9p
+Mzg2L3BjX3N5c2Z3LmM6MzI4OgorICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJwZmxhc2ggd2l0
+aCBrdm0gcmVxdWlyZXMgS1ZNIHJlYWRvbmx5IG1lbW9yeSBzdXBwb3J0Iik7Cgp0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDMxNSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMS8xMiBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoxMi8xMiBDaGVja2luZyBjb21taXQgM2VhOTI5ZGU2NTMxIChk
+b2NzL2ludGVyb3AvZmlybXdhcmUuanNvbjogUHJlZmVyIC1tYWNoaW5lIHRvIGlmPXBmbGFzaCkK
+RVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQ5OiBGSUxFOiBkb2NzL2ludGVyb3AvZmlybXdh
+cmUuanNvbjoyMzk6CisjICAgICAgICAgICAgICAgICAgJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCAzMyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
+ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
+Z3MvMjAxOTAzMDcxNzI0MDEuMjk0NTEtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNr
+cGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
