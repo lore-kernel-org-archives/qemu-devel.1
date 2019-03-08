@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46885)
+Received: from eggs.gnu.org ([209.51.188.92]:60093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h27fs-0002T7-D5
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 00:04:01 -0500
+	(envelope-from <armbru@redhat.com>) id 1h28wN-00007l-3g
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 01:25:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h27fr-0002rT-F0
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 00:04:00 -0500
-Date: Fri, 8 Mar 2019 15:39:11 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190308043911.GV7722@umbus.fritz.box>
-References: <20190226193408.23862-1-armbru@redhat.com>
-	<20190226193408.23862-8-armbru@redhat.com>
-	<87va15lds9.fsf@zen.linaroharston>
-	<87tvgfuq0g.fsf@dusky.pond.sub.org>
+	(envelope-from <armbru@redhat.com>) id 1h28wM-00038R-57
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 01:25:07 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri,  8 Mar 2019 07:24:55 +0100
+Message-Id: <20190308062455.29755-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="t0wvWpvf5IekHbuL"
-Content-Disposition: inline
-In-Reply-To: <87tvgfuq0g.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 07/11] ppc405_boards: Don't size flash
- memory to match backing image
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v7] pflash: Require backend size to match
+ device, improve errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +21,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, lersek@redhat.com, philmd@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
+From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
---t0wvWpvf5IekHbuL
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We reject undersized backends with a rather enigmatic "failed to read
+the initial flash content" error.
 
-On Thu, Mar 07, 2019 at 08:01:35AM +0100, Markus Armbruster wrote:
-> Alex Benn=E9e <alex.bennee@linaro.org> writes:
->=20
-> > Markus Armbruster <armbru@redhat.com> writes:
-> >
-> >> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
-> >> Image size is rounded up to the next multiple of 64KiB.  Useless,
-> >> because pflash_cfi02_realize() fails with "failed to read the initial
-> >> flash content" unless the rounding is a no-op.
-> >>
-> >> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
-> >> other stuff.  No idea how that would play out, but a useful outcomes
-> >> seem unlikely.
-> >>
-> >> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
-> >> regardless of image size, to match the physical hardware.
-> >>
-> >> Machine "taihu" maps its boot flash memory similarly.  The code even
-> >> has a comment /* XXX: should check that size is 2MB */, followed by
-> >> disabled code to adjust the size to 2MiB regardless of image size.
-> >>
-> >> Its code to map its application flash memory looks the same, except
-> >> there the XXX comment asks for 32MiB, and the code to adjust the size
-> >> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
-> >> to read the initial flash content" for images smaller than 32MiB.
-> >>
-> >> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
-> >> to match the physical hardware.  Delete dead code from application
-> >> flash mapping, and simplify some.
-> >
-> > It seems to me the DEBUG_BOARD_INIT code is probably out of date cruft
-> > that could be excised all together. But that doesn't stop this being
-> > useful:
->=20
-> David, would you like me to excise DEBUG_BOARD_INIT?
+We happily accept oversized images, ignoring their tail.  Throwing
+away parts of firmware that way is pretty much certain to end in an
+even more enigmatic failure to boot.
 
-If you have the chance to look at it, that would be great.
+Require the backend's size to match the device's size exactly.  Report
+mismatch as "device requires N bytes, block backend 'NAME' provides M
+bytes".
 
+Improve the error for actual read failures to "can't read initial
+flash content from block backend 'NAME'.
+
+We disabled code to limit device sizes to 8, 16, 32 or 64MiB more than
+a decade ago in commit 95d1f3edd5e and c8b153d7949, v0.9.1.  Bury.
+
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/block/pflash_cfi01.c | 31 ++++++++++++++++++++++---------
+ hw/block/pflash_cfi02.c | 31 +++++++++++++++++++++++--------
+ 2 files changed, 45 insertions(+), 17 deletions(-)
+
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 9d1c356eb6..2e3a05c0b3 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -730,13 +730,6 @@ static void pflash_cfi01_realize(DeviceState *dev, E=
+rror **errp)
+     }
+     device_len =3D sector_len_per_device * blocks_per_device;
+=20
+-    /* XXX: to be fixed */
+-#if 0
+-    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 * =
+1024) &&
+-        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 *=
+ 1024))
+-        return NULL;
+-#endif
+-
+     memory_region_init_rom_device(
+         &pfl->mem, OBJECT(dev),
+         &pflash_cfi01_ops,
+@@ -763,12 +756,32 @@ static void pflash_cfi01_realize(DeviceState *dev, =
+Error **errp)
+     }
+=20
+     if (pfl->blk) {
++        /*
++         * Validate the backing store is the right size for pflash
++         * devices. If the user supplies a larger file we ignore the
++         * tail.
++         */
++        int64_t backing_len =3D blk_getlength(pfl->blk);
++
++        if (backing_len < 0) {
++            error_setg(errp, "can't get size of block backend '%s'",
++                       blk_name(pfl->blk));
++            return;
++        }
++        if (backing_len !=3D total_len) {
++            error_setg(errp, "device requires %" PRIu64 " bytes, "
++                       "block backend '%s' provides %" PRIu64 " bytes",
++                       total_len, blk_name(pfl->blk), backing_len);
++            return;
++        }
++
+         /* read the initial flash content */
+         ret =3D blk_pread(pfl->blk, 0, pfl->storage, total_len);
+-
+         if (ret < 0) {
+             vmstate_unregister_ram(&pfl->mem, DEVICE(pfl));
+-            error_setg(errp, "failed to read the initial flash content")=
+;
++            error_setg(errp, "can't read initial flash content"
++                       " from block backend '%s'",
++                       blk_name(pfl->blk));
+             return;
+         }
+     }
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index 33779ce807..45b88d65d8 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -550,12 +550,6 @@ static void pflash_cfi02_realize(DeviceState *dev, E=
+rror **errp)
+     }
+=20
+     chip_len =3D pfl->sector_len * pfl->nb_blocs;
+-    /* XXX: to be fixed */
+-#if 0
+-    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 * =
+1024) &&
+-        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 *=
+ 1024))
+-        return NULL;
+-#endif
+=20
+     memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl), pfl->be ?
+                                   &pflash_cfi02_ops_be : &pflash_cfi02_o=
+ps_le,
+@@ -581,11 +575,32 @@ static void pflash_cfi02_realize(DeviceState *dev, =
+Error **errp)
+     }
+=20
+     if (pfl->blk) {
++        /*
++         * Validate the backing store is the right size for pflash
++         * devices. If the user supplies a larger file we ignore the
++         * tail.
++         */
++        int64_t backing_len =3D blk_getlength(pfl->blk);
++
++        if (backing_len < 0) {
++            error_setg(errp, "can't get size of block backend '%s'",
++                       blk_name(pfl->blk));
++            return;
++        }
++        if (backing_len !=3D chip_len) {
++            error_setg(errp, "device requires %" PRIu32 " bytes, "
++                       "block backend '%s' provides %" PRIu64 " bytes",
++                       chip_len, blk_name(pfl->blk), backing_len);
++            return;
++        }
++
+         /* read the initial flash content */
+         ret =3D blk_pread(pfl->blk, 0, pfl->storage, chip_len);
+         if (ret < 0) {
+-            vmstate_unregister_ram(&pfl->orig_mem, DEVICE(pfl));
+-            error_setg(errp, "failed to read the initial flash content")=
+;
++            vmstate_unregister_ram(&pfl->mem, DEVICE(pfl));
++            error_setg(errp, "can't read initial flash content"
++                       " from block backend '%s'",
++                       blk_name(pfl->blk));
+             return;
+         }
+     }
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---t0wvWpvf5IekHbuL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyB8e8ACgkQbDjKyiDZ
-s5IfOg//XHAgad/iDnVxwgZK6tDdfoegGJOn7fUQicEA5xR20bbUQJTh2+0BV3GU
-KjL1bQAqGr0cbXgA2vFSkEXJZ8imEUn+vmCzN0kCbvovoAlHaR5qthslW9JcT5oq
-bvlIBZHBEcCq7AOWqlgnVPhcoDd3TJ6KbXhk/2oLv0nD8m01WxM/Eyu9eZ9wVG58
-odV3A1oVJ/v38FY7dIiaLIBRkc5l4g8/yYeTJ0WRRBqpB6erPYNwEj/LAjd82+vx
-zVaEugawvjpj0r6zVKzSylwrQxDi7eGmv8+K4a7yXld7iL+C3vd0P3vW6sh0G0h8
-2PSbtSyXYP7YuQdktGgrzB11tSQQLsFbwUmdU0kPp55LirlaNBos61LJvmPnJ/qo
-Xga8N0E8CY4bXP1+llQRfWOClvu0SWcXY87cAd9kWNT9MnXvQBRHQeDI1WfLH0p2
-g+Ju87TRtMKRGFIK0r0R28LVRkmO20GrtxJmcpKRDbFY0J15LCNGe5VnrY/+AMiq
-9NqQw4hhDBRFh5pa40NQTawdD5zWILnCBkiYv84D20RJnfsrVJ4razPH431FMh1k
-THLo/8rkHFGuVU10MJFXunDYpk6q7mPUIkPST8+WblmMH3ffeliIdPTO0RqViYUb
-N/aITJQi6PCP/+REAgcYHEqPfAgZzjdbunwikV0yIViSomALyJg=
-=2KQt
------END PGP SIGNATURE-----
-
---t0wvWpvf5IekHbuL--
+2.17.2
