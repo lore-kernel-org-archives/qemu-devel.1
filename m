@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53485)
+Received: from eggs.gnu.org ([209.51.188.92]:54094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h2KT9-0002Bf-54
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:43:43 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h2KWM-0003DJ-PJ
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:47:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h2KT8-0007NE-Dx
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:43:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:25301)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h2KT8-0007Mf-7h
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:43:42 -0500
-Date: Fri, 8 Mar 2019 18:43:32 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190308184331.GJ2834@work-vm>
-References: <20190306114227.9125-1-dgilbert@redhat.com>
-	<20190306114227.9125-8-dgilbert@redhat.com>
-	<CAFEAcA-pxfaooirQMhxasBwZAhKQGeo3BG_hwefLJ-o7EYZJYQ@mail.gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1h2KWL-0002Ge-Vj
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:47:02 -0500
+References: <20190301191545.8728-1-jsnow@redhat.com>
+	<20190301191545.8728-8-jsnow@redhat.com>
+	<1055b446-a34d-2413-3e0c-85b433ae15b7@virtuozzo.com>
+	<5c1f1971-5050-9678-f7f4-d8d4c4b53709@redhat.com>
+	<ba994232-719e-1d6c-c502-23e0ad1532e5@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <0542e9a0-fc62-a184-564a-9401506e3966@redhat.com>
+Date: Fri, 8 Mar 2019 13:46:44 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-pxfaooirQMhxasBwZAhKQGeo3BG_hwefLJ-o7EYZJYQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 07/22] migration: Add an ability to ignore
- shared RAM blocks
+In-Reply-To: <ba994232-719e-1d6c-c502-23e0ad1532e5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] block/dirty-bitmaps: implement
+ inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, Zhang Chen <chen.zhang@intel.com>, Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Wed, 6 Mar 2019 at 11:55, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
-> >
-> > From: Yury Kotov <yury-kotov@yandex-team.ru>
-> >
-> > If ignore-shared capability is set then skip shared RAMBlocks during the
-> > RAM migration.
-> > Also, move qemu_ram_foreach_migratable_block (and rename) to the
-> > migration code, because it requires access to the migration capabilities.
-> >
-> 
-> > --- a/migration/rdma.c
-> > +++ b/migration/rdma.c
-> > @@ -644,7 +644,7 @@ static int qemu_rdma_init_ram_blocks(RDMAContext *rdma)
-> >
-> >      assert(rdma->blockmap == NULL);
-> >      memset(local, 0, sizeof *local);
-> > -    qemu_ram_foreach_migratable_block(qemu_rdma_init_one_block, rdma);
-> > +    foreach_not_ignored_block(qemu_rdma_init_one_block, rdma);
-> >      trace_qemu_rdma_init_ram_blocks(local->nb_blocks);
-> >      rdma->dest_blocks = g_new0(RDMADestBlock,
-> >                                 rdma->local_ram_blocks.nb_blocks);
-> 
-> Hi. This change causes Coverity to gripe (CID 1399413) because
-> the return value from foreach_not_ignored_block() is ignored
-> here but it is checked on every other use of the function.
-> 
-> This is one of those Coverity errors where it's just using a
-> sometimes-wrong heuristic, so we could just mark it as a false
-> positive (AFAICT qemu_rdma_init_one_block() always returns 0),
-> but OTOH rdma_add_block() and qemu_rdma_init_one_block()
-> carefully pipe through a return value, so maybe it's worth assert()ing
-> in case somebody changes rdma_add_block() to maybe fail later?
-> 
-> I don't think there's much in it -- let me know if you just want
-> me to mark the issue as a false positive.
 
-I'll patch it to check it, it's an easy enough check.
-(Although how well a failure cleans up in practice could be fun).
 
-Dave
+On 3/7/19 11:37 AM, Eric Blake wrote:
+> On 3/6/19 3:46 PM, John Snow wrote:
+> 
+>>> I think, inconsistent bitmaps should have readonly flag always set or always unset, independently on can_write,
+>>> as we are not going to write something related to inconsistent bitmaps.
+>>>
+>>
+>> We'll never change metadata for inconsistent bitmaps, no. We might
+>> delete them which causes a metadata change, though -- and right now the
+>> readonly check stops that in blockdev.c before we attempt (and fail) the
+>> operation. It does have at least a light usage.
+>>
+>> It's not a crucial feature, but I think the error message is nicer.
+>>
+>>> And I think, better is always unset, to have inconsistent bitmaps as something unrelated to readonly.
+>>>
+>>
+>> The way I think of it is as unrelated, which is why I set readonly and
+>> inconsistent orthogonally.
+>>
+>>> Readonly are bitmaps, which are not marked IN_USE on open for some reason..
+>>>
+>>
+>> I tend to think of readonly bitmaps as persistent bitmaps attached to
+>> storage we are unable to write back to, so we must prevent their
+>> modification.
+> 
+> I like that wording (keeping read-only and inconsistent orthogonal),
+> 
+>>
+>> I suppose the IN_USE viewpoint works too; "This is a bitmap that we have
+>> not marked as IN_USE so it must not be used."
+>>
+> 
+> Yes, it does work, but it is a bit more of a stretch, so I'm not quite
+> as sure about using it.
+> 
+>>> I understand, that inconsistent bitmaps are some kind of readonly too, as we can't write to them..
+>>> But we can't read too anyway, and we don't interfere with reopen logic at all. So again, better is
+>>> don't mark inconsistent bitmaps as readonly.
+>>>
+>>
+>> Hm, so in your model; we just NEVER set readonly for persistent bitmaps,
+>> which incurs some changes at load time, but allows the reload_rw
+>> function to go completely unmodified.
+>>
+>> That's not unreasonable in terms of SLOC, but semantically I am not sure
+>> which approach is better. I'm leaning towards keeping this as written
+>> for now, but... well. Any thoughts, Eric? Would you like to flip a coin?
+> 
+> No strong preferences, other than let's get it in before soft freeze, to
+> make sure we don't miss out on it entirely due to waiting for the coin
+> flip :)
+> 
+> 
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+OK. I have a slight preference for keeping the flag meanings orthogonal
+and logically consistent, because I believe it keeps the code less
+surprising to anyone who isn't Eric, Vlad, or myself.
+
+So I think I will stage this as-is, and if it poses a problem I will
+accept counter-proposals during freeze to shore it up if necessary.
+
+--js
