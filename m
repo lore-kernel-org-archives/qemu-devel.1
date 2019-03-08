@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41003)
+Received: from eggs.gnu.org ([209.51.188.92]:41478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h29oa-0007sD-9A
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:21:08 -0500
+	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1h29qL-0000zf-8T
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:22:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h29oZ-0001Rm-I5
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:21:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58658)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h29oZ-0001Qo-Bk
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:21:07 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
-	<cf14255c576fd361c6cdf941f8c637e613f6cb68.1550698466.git.DirtY.iCE.hu@gmail.com>
-	<63250655-a4a3-ef36-5882-65188093ff57@gmail.com>
-	<20190307155643.cuypwvu7znhqng5y@sirius.home.kraxel.org>
-	<80f2cc3a-2695-cd41-b379-74751c702771@gmail.com>
-Date: Fri, 08 Mar 2019 08:21:02 +0100
-In-Reply-To: <80f2cc3a-2695-cd41-b379-74751c702771@gmail.com>
-	(=?utf-8?B?IlpvbHTDoW4JS8WRdsOhZ8OzIidz?= message of "Fri, 8 Mar 2019
-	01:45:20 +0100")
-Message-ID: <878sxpj0gx.fsf@dusky.pond.sub.org>
+	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1h29qK-0003qG-4W
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:22:57 -0500
+Date: Fri, 8 Mar 2019 15:22:30 +0800
+From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+Message-ID: <20190308072230.GA9529@byw>
+Reply-To: baiyaowei@cmss.chinamobile.com
+References: <1545387387-9613-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+	<20190306215633.GM6818@localhost.localdomain>
+	<20190307084405.GB26350@byw>
+	<20190307112505.GB5786@linux.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 04/14] audio: -audiodev command line
- option basic implementation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307112505.GB5786@linux.fritz.box>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tcmu: Introduce qemu-tcmu
+ utility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Amar Tumballi <atumball@redhat.com>, Mike Christie <mchristi@redhat.com>, Prasanna Kalever <pkalever@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiubo Li <xiubli@redhat.com>, Fam Zheng <fam@euphon.net>, stefanha <stefanha@redhat.com>
 
-"Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
+> > > * The first priority should be adding an in-process iscsi target that
+> > >   can be managed with QMP, similar to the built-in NBD server.
+> > 
+> > Well, people used to manage iscsi targets through targetcli, a command
+> > line utility. Our intention is, with targetcli and qemu-tcmu, user can
+> > create/remove targets and backstores totally in just one place, so you
+> > don't need to create targets in targetcli and then turn to configure
+> > backstores in qemu-tcmu with QMP or command line, it's convenient.  So
+> > we decide to implement QMP in the future release but it's definitely
+> > in our plan.
+> 
+> I think QMP needs to come first to result in a clean design, because the
+> command line tool should only be a wrapper around the QMP code.
 
-> On 2019-03-07 16:56, Gerd Hoffmann wrote:
->> On Tue, Feb 26, 2019 at 02:39:38AM +0100, Zolt=C3=A1n K=C5=91v=C3=A1g=C3=
-=B3 wrote:
->>> On 2019-02-20 22:37, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n wrote:
->>> [...]
->>>> diff --git a/audio/audio.c b/audio/audio.c
->>>> index ce8e6ea8c2..8ad8cbe559 100644
->>>> --- a/audio/audio.c
->>>> +++ b/audio/audio.c
->>> [...]
->>>> @@ -2129,3 +1866,170 @@ void AUD_set_volume_in (SWVoiceIn *sw, int mut=
-e, uint8_t lvol, uint8_t rvol)
->>>>          }
->>>>      }
->>>>  }
->>>> +
->>>> +void audio_create_pdos(Audiodev *dev)
->>>> +{
->>>> +    switch (dev->driver) {
->>>> +#define CASE(DRIVER, driver, pdo_name)                              \
->>>> +    case AUDIODEV_DRIVER_##DRIVER:                                  \
->>>> +        dev->u.driver.in =3D g_malloc0(                              =
- \
->>>> +            sizeof(Audiodev##pdo_name##PerDirectionOptions));       \
->>> This should check has_in before overwriting. It'll work correctly when
->>> called from audio_legacy.c, but when using -audiodev it will overwrite
->>> the options passed by user (and leak memory) when called from
->>> audio_validate_opts. I'll fix it in the next update.
->>=20
->> Ping.  4.0 freeze is next tuesday.  Any chance for a v6 early enough
->> that we have a chance to get the first chunk into 4.0?  Monday latest,
->> preferably earlier ...
->
-> I'll try to do something this weekend, but I can't promise anything. I
-> still haven't got to reading through Markus' comments...
+Yeah, i agree this makes more sense from this point. Ok, i'll try to
+implement it in v2 as your suggestion. Thanks.
 
-Quoting myself: "We're down to minor stylistic issues.  Good work!"
+> But anyway, I still think the change I had in mind is necessary. Maybe
+> you can see the difference best in an example. Your documentation says
+> to use this:
+> 
+>     # qemu-tcmu
+>     # targetcli /backstores/user:qemu create qemulun 1G @id=test@file=/root/test.file
 
-Addressing these should not be hard.
+Let's call this one case1.
+
+> 
+> I think it should work more like this:
+> 
+>     # qemu-tcmu -blockdev driver=file,filename=/root/test.file,node-name=my_file \
+>                 -export my_export,node=my_file
+>     # targetcli /backstores/user:qemu create qemulun 1G my_export
+
+And this one case2.
+
+> 
+> In fact, something like this is probably required if we want to export
+> existing block nodes (that may be in use by a guest) from a running QEMU
+> instance. In this case, you don't want to open a new image file, but
+> export the already opened image file.
+
+I think the main difference between these two cases is just how the configuration
+of exported image file is passed to qemu-tcmu. Case1 uses cfgstr while case2
+uses command line. Case2 still needs one way to check whether the passed-in
+image file was opened, right? If so, case1 should also be able to use the same
+way to check that after extracting cfgstr. 
+
+Actually we thought about qemu-tcmu working like case2, but felt is's quite less
+flexible. With case2, e.g. when we want to export another new image file with
+one qemu-tcmu already running, we have to run another qemu-tcmu with
+the configuration of the new image file in commandline, or through QMP of the
+running qemu-tcmu, and then configure it with targetcli. So anyway,
+there's one more step for case2 to export a new image file. While for case1 
+you just need to run qemu-tcmu once and all other operations will be done
+within targetcli, which is more friendly to users i think.
+
+So i think qemu-tcmu's quite different from qemu-nbd at this point. We can
+export a image file by NBD protocol just with qemu-nbd itself. While for
+qemu-tcmu we still need targetcli to complete other ISCSI target
+configurations to export a image file. So moving the configuration of image
+file from cmdline to targetcli should be reasonable in my opinion.
+
+> 
+> (Also, can we somehow get rid of the 1G in the command line? qemu-tcmu
+> knows how big the image is and can provide this value.)
+
+Currently this size option is mandatory in targetcli, not all tools are
+so smart as QEMU. But maybe we could change it optional in the future.
