@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41478)
+Received: from eggs.gnu.org ([209.51.188.92]:41712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1h29qL-0000zf-8T
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:22:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1h29rb-0002Bq-19
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:24:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1h29qK-0003qG-4W
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:22:57 -0500
-Date: Fri, 8 Mar 2019 15:22:30 +0800
-From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-Message-ID: <20190308072230.GA9529@byw>
-Reply-To: baiyaowei@cmss.chinamobile.com
-References: <1545387387-9613-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-	<20190306215633.GM6818@localhost.localdomain>
-	<20190307084405.GB26350@byw>
-	<20190307112505.GB5786@linux.fritz.box>
+	(envelope-from <armbru@redhat.com>) id 1h29ra-00053H-7o
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:24:15 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190307130323.9353-1-armbru@redhat.com>
+	<20190307130323.9353-8-armbru@redhat.com>
+	<20190308001032.GF7722@umbus.fritz.box>
+Date: Fri, 08 Mar 2019 08:24:04 +0100
+In-Reply-To: <20190308001032.GF7722@umbus.fritz.box> (David Gibson's message
+	of "Fri, 8 Mar 2019 11:10:32 +1100")
+Message-ID: <874l8dj0bv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190307112505.GB5786@linux.fritz.box>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tcmu: Introduce qemu-tcmu
- utility
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 07/14] ppc405_boards: Don't size flash
+ memory to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Amar Tumballi <atumball@redhat.com>, Mike Christie <mchristi@redhat.com>, Prasanna Kalever <pkalever@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiubo Li <xiubli@redhat.com>, Fam Zheng <fam@euphon.net>, stefanha <stefanha@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Markus Armbruster <armbru@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-> > > * The first priority should be adding an in-process iscsi target that
-> > >   can be managed with QMP, similar to the built-in NBD server.
-> > 
-> > Well, people used to manage iscsi targets through targetcli, a command
-> > line utility. Our intention is, with targetcli and qemu-tcmu, user can
-> > create/remove targets and backstores totally in just one place, so you
-> > don't need to create targets in targetcli and then turn to configure
-> > backstores in qemu-tcmu with QMP or command line, it's convenient.  So
-> > we decide to implement QMP in the future release but it's definitely
-> > in our plan.
-> 
-> I think QMP needs to come first to result in a clean design, because the
-> command line tool should only be a wrapper around the QMP code.
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-Yeah, i agree this makes more sense from this point. Ok, i'll try to
-implement it in v2 as your suggestion. Thanks.
+> On Thu, Mar 07, 2019 at 02:03:16PM +0100, Markus Armbruster wrote:
+>> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+>> Image size is rounded up to the next multiple of 64KiB.  Useless,
+>> because pflash_cfi02_realize() fails with "failed to read the initial
+>> flash content" unless the rounding is a no-op.
+>>=20
+>> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+>> other stuff.  No idea how that would play out, but useful outcomes
+>> seem unlikely.
+>>=20
+>> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+>> regardless of image size, to match the physical hardware.
+>>=20
+>> Machine "taihu" maps its boot flash memory similarly.  The code even
+>> has a comment /* XXX: should check that size is 2MB */, followed by
+>> disabled code to adjust the size to 2MiB regardless of image size.
+>>=20
+>> Its code to map its application flash memory looks the same, except
+>> there the XXX comment asks for 32MiB, and the code to adjust the size
+>> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+>> to read the initial flash content" for images smaller than 32MiB.
+>>=20
+>> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+>> to match the physical hardware.  Delete dead code from application
+>> flash mapping, and simplify some.
+>>=20
+>> Cc: David Gibson <david@gibson.dropbear.id.au>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> I'm assuming because this is in a series I'm not otherwise CCed on
+> that this is going in through someone else's tree.  Let me know if you
+> want me take it through mine.
 
-> But anyway, I still think the change I had in mind is necessary. Maybe
-> you can see the difference best in an example. Your documentation says
-> to use this:
-> 
->     # qemu-tcmu
->     # targetcli /backstores/user:qemu create qemulun 1G @id=test@file=/root/test.file
-
-Let's call this one case1.
-
-> 
-> I think it should work more like this:
-> 
->     # qemu-tcmu -blockdev driver=file,filename=/root/test.file,node-name=my_file \
->                 -export my_export,node=my_file
->     # targetcli /backstores/user:qemu create qemulun 1G my_export
-
-And this one case2.
-
-> 
-> In fact, something like this is probably required if we want to export
-> existing block nodes (that may be in use by a guest) from a running QEMU
-> instance. In this case, you don't want to open a new image file, but
-> export the already opened image file.
-
-I think the main difference between these two cases is just how the configuration
-of exported image file is passed to qemu-tcmu. Case1 uses cfgstr while case2
-uses command line. Case2 still needs one way to check whether the passed-in
-image file was opened, right? If so, case1 should also be able to use the same
-way to check that after extracting cfgstr. 
-
-Actually we thought about qemu-tcmu working like case2, but felt is's quite less
-flexible. With case2, e.g. when we want to export another new image file with
-one qemu-tcmu already running, we have to run another qemu-tcmu with
-the configuration of the new image file in commandline, or through QMP of the
-running qemu-tcmu, and then configure it with targetcli. So anyway,
-there's one more step for case2 to export a new image file. While for case1 
-you just need to run qemu-tcmu once and all other operations will be done
-within targetcli, which is more friendly to users i think.
-
-So i think qemu-tcmu's quite different from qemu-nbd at this point. We can
-export a image file by NBD protocol just with qemu-nbd itself. While for
-qemu-tcmu we still need targetcli to complete other ISCSI target
-configurations to export a image file. So moving the configuration of image
-file from cmdline to targetcli should be reasonable in my opinion.
-
-> 
-> (Also, can we somehow get rid of the 1G in the command line? qemu-tcmu
-> knows how big the image is and can provide this value.)
-
-Currently this size option is mandatory in targetcli, not all tools are
-so smart as QEMU. But maybe we could change it optional in the future.
+I intend to take the complete series through my tree unless a maintainer
+objects.
