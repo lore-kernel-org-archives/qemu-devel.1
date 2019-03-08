@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60134)
+Received: from eggs.gnu.org ([209.51.188.92]:60174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h2Il0-0003KO-Ba
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:03 -0500
+	(envelope-from <stefanha@redhat.com>) id 1h2IlE-0003Uw-8s
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h2Ikz-0005su-Dy
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:02 -0500
+	(envelope-from <stefanha@redhat.com>) id 1h2IlA-00060x-IW
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:14 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  8 Mar 2019 16:53:38 +0000
-Message-Id: <20190308165344.10685-2-stefanha@redhat.com>
+Date: Fri,  8 Mar 2019 16:53:39 +0000
+Message-Id: <20190308165344.10685-3-stefanha@redhat.com>
 In-Reply-To: <20190308165344.10685-1-stefanha@redhat.com>
 References: <20190308165344.10685-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/7] MAINTAINERS: add missing support status
- fields
+Subject: [Qemu-devel] [PULL 2/7] hw/block/virtio-blk: Clean req->dev
+ repetitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +23,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Anastasiia Rusakova <arusakova917@gmail.com>
 
-This patch adds the "S:" line for areas of the codebase that currently
-lack a support status field.
+From: Anastasiia Rusakova <arusakova917@gmail.com>
 
-Note that there are a few more areas that are more abstract and do not
-correspond to a specific set of files.  They have not been modified.
+Some functions sometimes uses req->dev even though a local variable
+VirtIOBlock* s =3D req->dev has already been defined.
+Updated places to use s everywhere in the file.
 
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20190301163518.20702-1-stefanha@redhat.com
-Message-Id: <20190301163518.20702-1-stefanha@redhat.com>
+Signed-off-by: Anastasiia Rusakova <arusakova917@gmail.com>
+Message-id: 20190307161925.4158-1-rusakova.nastasia@icloud.com
+Message-Id: <20190307161925.4158-1-rusakova.nastasia@icloud.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- MAINTAINERS | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/block/virtio-blk.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 074ad46d47..1ed8cf7ee7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -338,6 +338,7 @@ F: include/hw/tricore/
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 0cc3c590b9..06e57a4d39 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -127,7 +127,7 @@ static void virtio_blk_rw_complete(void *opaque, int =
+ret)
+         }
 =20
- Multiarch Linux User Tests
- M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-+S: Maintained
- F: tests/tcg/multiarch/
+         if (ret) {
+-            int p =3D virtio_ldl_p(VIRTIO_DEVICE(req->dev), &req->out.ty=
+pe);
++            int p =3D virtio_ldl_p(VIRTIO_DEVICE(s), &req->out.type);
+             bool is_read =3D !(p & VIRTIO_BLK_T_OUT);
+             /* Note that memory may be dirtied on read failure.  If the
+              * virtio request is not completed here, as is the case for
+@@ -143,7 +143,7 @@ static void virtio_blk_rw_complete(void *opaque, int =
+ret)
+         }
 =20
- Guest CPU Cores (KVM):
-@@ -2094,6 +2095,7 @@ F: qemu.sasl
- Coroutines
- M: Stefan Hajnoczi <stefanha@redhat.com>
- M: Kevin Wolf <kwolf@redhat.com>
-+S: Maintained
- F: util/*coroutine*
- F: include/qemu/coroutine*
- F: tests/test-coroutine.c
-@@ -2540,6 +2542,7 @@ F: .gitlab-ci.yml
- Guest Test Compilation Support
- M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
- R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-+S: Maintained
- F: tests/tcg/Makefile
- F: tests/tcg/Makefile.include
- L: qemu-devel@nongnu.org
+         virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
+-        block_acct_done(blk_get_stats(req->dev->blk), &req->acct);
++        block_acct_done(blk_get_stats(s->blk), &req->acct);
+         virtio_blk_free_request(req);
+     }
+     aio_context_release(blk_get_aio_context(s->conf.conf.blk));
+@@ -260,9 +260,9 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq =
+*req)
+ {
+     int status =3D VIRTIO_BLK_S_OK;
+     struct virtio_scsi_inhdr *scsi =3D NULL;
+-    VirtIODevice *vdev =3D VIRTIO_DEVICE(req->dev);
+-    VirtQueueElement *elem =3D &req->elem;
+     VirtIOBlock *blk =3D req->dev;
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(blk);
++    VirtQueueElement *elem =3D &req->elem;
+=20
+ #ifdef __linux__
+     int i;
+@@ -492,16 +492,18 @@ static void virtio_blk_submit_multireq(BlockBackend=
+ *blk, MultiReqBuffer *mrb)
+=20
+ static void virtio_blk_handle_flush(VirtIOBlockReq *req, MultiReqBuffer =
+*mrb)
+ {
+-    block_acct_start(blk_get_stats(req->dev->blk), &req->acct, 0,
++    VirtIOBlock *s =3D req->dev;
++
++    block_acct_start(blk_get_stats(s->blk), &req->acct, 0,
+                      BLOCK_ACCT_FLUSH);
+=20
+     /*
+      * Make sure all outstanding writes are posted to the backing device=
+.
+      */
+     if (mrb->is_write && mrb->num_reqs > 0) {
+-        virtio_blk_submit_multireq(req->dev->blk, mrb);
++        virtio_blk_submit_multireq(s->blk, mrb);
+     }
+-    blk_aio_flush(req->dev->blk, virtio_blk_flush_complete, req);
++    blk_aio_flush(s->blk, virtio_blk_flush_complete, req);
+ }
+=20
+ static bool virtio_blk_sect_range_ok(VirtIOBlock *dev,
 --=20
 2.20.1
