@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45243)
+Received: from eggs.gnu.org ([209.51.188.92]:45370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h2HlT-0005xm-7Z
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:50:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1h2Hlm-0006D7-9D
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:50:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h2HlP-0001KE-2Z
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:50:25 -0500
-Date: Fri, 8 Mar 2019 15:49:28 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190308154927.GA2834@work-vm>
-References: <20190308013222.12524-1-philmd@redhat.com>
-	<20190308013222.12524-15-philmd@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1h2Hlk-0001u0-Rt
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:50:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57176)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h2Hlj-0001l4-7R
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:50:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h2Hlf-0003n2-IP
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 15:50:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 89EF72E80C9
+	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 15:50:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190308013222.12524-15-philmd@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 14/18] hw/nvram/fw_cfg: Add HMP 'info
- fw_cfg' command
+Date: Fri, 08 Mar 2019 15:35:43 -0000
+From: Scott Moser <ssmoser2+ubuntu@gmail.com>
+Reply-To: Bug 1819182 <1819182@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155205925919.27918.10336996226499931700.malonedeb@soybean.canonical.com>
+Message-Id: <155205934395.15700.14568849889267163588.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1819182] Re: info does not recognize file format
+ of vpc with subformat=fixed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,269 +37,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> When debugging a paravirtualized guest firmware, it results very
-> useful to dump the fw_cfg table.
-> Add a HMP command which displays the most useful fields.
-> We display each fw_cfg item data in hexadecimal (only the first 8
-> bytes):
->=20
-> $ (echo info fw_cfg; echo q) | qemu-system-x86_64 -S -monitor stdio
-> (qemu) info fw_cfg
-> Selector  Well-Known Key  Pathname ArchSpec Perm   Size Order Hex Data
->  0x0000   signature                          RO       4       51454d55
->  0x0001   id                                 RO       4       03000000
->  0x0002   uuid                               RO      16       000000000=
-0000000..
->  0x0003   ram_size                           RO       8       000000080=
-0000000
->  0x0004   nographic                          RO       2       0000
->  0x0005   nb_cpus                            RO       2       0100
->  0x000d   numa                               RO      16       000000000=
-0000000..
->  0x000e   boot_menu                          RO       2       0000
->  0x000f   max_cpus                           RO       2       0100
->  0x0019   file_dir                           RO    2052       0000000b0=
-0000000..
->  0x0021   file: etc/acpi/rsdp                RO      20  160  525344205=
-0545220..
->  0x0022   file: etc/acpi/tables              RO  131072  130  464143534=
-0000000..
->  0x0023   file: etc/boot-fail-wait           RO       4   15  ffffffff
->  0x0024   file: etc/e820                     RO      20   40  000000000=
-0000000..
->  0x0025   file: etc/smbios/smbios-anchor     RO      31   30  5f534d5f0=
-01f0208..
->  0x0026   file: etc/smbios/smbios-tables     RO     321   20  011b00010=
-1020300..
->  0x0027   file: etc/system-states            RO       6   90  800000818=
-280
->  0x0028   file: etc/table-loader             RO    4096  140  010000006=
-574632f..
->  0x002a   file: genroms/kvmvapic.bin         RO    9216   55  55aa12060=
-e0731c0..
->  0x0002   irq0_override                   *  RO       4       01000000
->  0x0003   e820_tables                     *  RO     324       000000000=
-0000000..
->  0x0004   hpet                            *  RO     121       0101a2868=
-00000d0..
-> (qemu) q
->=20
-> $ (echo info fw_cfg; echo q) | qemu-system-mips -S -monitor stdio
-> (qemu) info fw_cfg
-> This machine does not use fw_cfg
-> (qemu) q
->=20
-> $ (echo info fw_cfg; echo q) | qemu-system-ppc -S -monitor stdio
-> (qemu) info fw_cfg
-> Selector  Well-Known Key  Pathname ArchSpec Perm   Size Order Hex Data
->  0x0000   signature                          RO       4       51454d55
->  0x0001   id                                 RO       4       01000000
->  0x0002   uuid                               RO      16       000000000=
-0000000..
->  0x0003   ram_size                           RO       8       000000080=
-0000000
->  0x0004   nographic                          RO       2       0000
->  0x0005   nb_cpus                            RO       2       0100
->  0x0006   machine_id                         RO       2       0200
->  0x0007   kernel_addr                        RO       4       00000000
->  0x0008   kernel_size                        RO       4       00000000
->  0x0009   kernel_cmdline                     RO       4       00000000
->  0x000a   initrd_addr                        RO       4       00000000
->  0x000b   initdr_size                        RO       4       00000000
->  0x000c   boot_device                        RO       2       6300
->  0x000e   boot_menu                          RO       2       0000
->  0x000f   max_cpus                           RO       2       0100
->  0x0019   file_dir                           RO    2052       000000020=
-0000000..
->  0x0021   file: etc/boot-fail-wait           RO       4   15  ffffffff
->  0x0000   width                           *  RO       2       2003
->  0x0001   height                          *  RO       2       5802
->  0x0002   depth                           *  RO       2       2000
->  0x0003   tbfreq                          *  RO       4       c04bfd00
->  0x0004   clockfreq                       *  RO       4       80d6da0f
->  0x0005   is_kvm                          *  RO       4       00000000
->  0x0009   busfreq                         *  RO       4       8014ef03
-> (qemu) q
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+$ ./go-create
+#version: 2.11.1                                                           =
+     =
 
-I think this is fine from an HMP view; one thought of something that
-might be useful is an optional parameter to specify a particular key
-that dumps the whole object; then if you're particularly desperate to
-look at an acpi table you could do something like:
+qcow: PASS fmt=3Dqcow auto=3Dqcow exp=3Dqcow [name=3Dmy-img.qcow opts=3D]  =
+               =
 
-info fw_cfg "file: etc/acpi/tables"
+qcow2: PASS fmt=3Dqcow2 auto=3Dqcow2 exp=3Dqcow2 [name=3Dmy-img.qcow2 opts=
+=3D]            =
 
-and get a fun block of hex back.
+qed: PASS fmt=3Dqed auto=3Dqed exp=3Dqed [name=3Dmy-img.qed opts=3D]       =
+               =
 
-But that's just a suggestion, so:
+raw: PASS fmt=3Draw auto=3Draw exp=3Draw [name=3Dmy-img.raw opts=3D]       =
+               =
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+vdi: PASS fmt=3Dvdi auto=3Dvdi exp=3Dvdi [name=3Dmy-img.vdi opts=3D]       =
+               =
 
-> ---
-> v2: Check fw_cfg !=3D NULL (Michael)
->     Rename keys, display data in hexa (Laszlo)
-> ---
->  hmp-commands-info.hx      | 17 ++++++++++
->  hw/nvram/fw_cfg.c         | 71 ++++++++++++++++++++++++++++++++++++++-
->  include/hw/nvram/fw_cfg.h |  2 ++
->  3 files changed, 89 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index cbee8b944d..2c9538c8da 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -916,6 +916,23 @@ STEXI
->  @item info sev
->  @findex info sev
->  Show SEV information.
-> +ETEXI
-> +
-> +    {
-> +        .name       =3D "fw_cfg",
-> +        .args_type  =3D "",
-> +        .params     =3D "",
-> +        .help       =3D "Display the table firmware configuration entr=
-ies "
-> +                      "registered by a paravirtualized machine. Helpfu=
-l "
-> +                      "when debugging guest firmwares.",
-> +        .cmd        =3D hmp_info_fw_cfg,
-> +    },
-> +
-> +STEXI
-> +@item info fw_cfg
-> +@findex info fw_cfg
-> +Display the table firmware configuration entries registered by a parav=
-irtualized
-> +machine. This information is useful when debugging guest firmwares.
->  ETEXI
-> =20
->  STEXI
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 2a8d69ba07..4c82dcc125 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -35,6 +35,7 @@
->  #include "qemu/config-file.h"
->  #include "qemu/cutils.h"
->  #include "qapi/error.h"
-> +#include "monitor/monitor.h"
->  #include "qapi/qapi-commands-misc.h"
-> =20
->  #define FW_CFG_FILE_SLOTS_DFLT 0x20
-> @@ -1273,7 +1274,18 @@ static FirmwareConfigurationItem *create_qmp_fw_=
-cfg_item(FWCfgState *s,
->      return item;
->  }
-> =20
-> -FirmwareConfigurationItemList *qmp_query_fw_cfg_items(Error **errp)
-> +/**
-> + * query_fw_cfg_items:
-> + *
-> + * @use_hexdump: Whether to populate the @data field with the hexadeci=
-mal
-> + *               representation of the item data.
-> + * @errp: Pointer to a NULL initialized error object.
-> + *
-> + * Returns: A list of @FirmwareConfigurationItem, reverse sorted by th=
-e
-> + *          item selector key.
-> + */
-> +static FirmwareConfigurationItemList *query_fw_cfg_items(bool use_hexd=
-ump,
-> +                                                         Error **errp)
->  {
->      FirmwareConfigurationItemList *item_list =3D NULL;
->      uint32_t max_entries;
-> @@ -1294,6 +1306,9 @@ FirmwareConfigurationItemList *qmp_query_fw_cfg_i=
-tems(Error **errp)
->              if (!e->len) {
->                  continue;
->              }
-> +            if (use_hexdump) {
-> +                qmp_hex_length =3D MIN(e->len, 8);
-> +            }
-> =20
->              info =3D g_malloc0(sizeof(*info));
->              info->value =3D create_qmp_fw_cfg_item(s, e, arch, key,
-> @@ -1305,3 +1320,57 @@ FirmwareConfigurationItemList *qmp_query_fw_cfg_=
-items(Error **errp)
-> =20
->      return item_list;
->  }
-> +
-> +FirmwareConfigurationItemList *qmp_query_fw_cfg_items(Error **errp)
-> +{
-> +    return query_fw_cfg_items(false, errp);
-> +}
-> +
-> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict)
-> +{
-> +    FirmwareConfigurationItemList *item_list, *method;
-> +    Error *err =3D NULL;
-> +
-> +    item_list =3D query_fw_cfg_items(true, &err);
-> +    if (!item_list) {
-> +        monitor_printf(mon, "This machine does not use fw_cfg\n");
-> +        return;
-> +    }
-> +    if (err) {
-> +        monitor_printf(mon, "Could not query fw_cfg entries: %s\n",
-> +                       error_get_pretty(err));
-> +        error_free(err);
-> +        return;
-> +    }
-> +
-> +    monitor_printf(mon, "Selector  Well-Known Key  Pathname"
-> +                        " ArchSpec Perm   Size Order Hex Data\n");
-> +    for (method =3D item_list; method; method =3D method->next) {
-> +        if (method->value->has_path) {
-> +            monitor_printf(mon,
-> +                           " 0x%04x   file: %-28s %2s %7" PRId64
-> +                           "  %3" PRId64 "  %-16s%s\n",
-> +                           method->value->key,
-> +                           method->value->path,
-> +                           method->value->writeable ? "RW" : "RO",
-> +                           method->value->size,
-> +                           method->value->order,
-> +                           method->value->data,
-> +                           method->value->size > 8 ? ".." : "");
-> +        } else {
-> +            monitor_printf(mon,
-> +                           " 0x%04x   %-30s  %c  %2s %7" PRId64
-> +                           "       %-16s%s\n",
-> +                           method->value->key,
-> +                           method->value->has_keyname
-> +                                ? method->value->keyname : "",
-> +                           method->value->architecture_specific ? '*' =
-: ' ',
-> +                           method->value->writeable ? "RW" : "RO",
-> +                           method->value->size,
-> +                           method->value->data,
-> +                           method->value->size > 8 ? ".." : "");
-> +       }
-> +    }
-> +
-> +    qapi_free_FirmwareConfigurationItemList(item_list);
-> +}
-> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> index 83a0540b6c..5ac9adfe1f 100644
-> --- a/include/hw/nvram/fw_cfg.h
-> +++ b/include/hw/nvram/fw_cfg.h
-> @@ -243,4 +243,6 @@ bool fw_cfg_dma_enabled(void *opaque);
->   */
->  const char *fw_cfg_arch_key_name(uint16_t key);
-> =20
-> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict);
-> +
->  #endif
-> --=20
-> 2.20.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+vhdx: PASS fmt=3Dvhdx auto=3Dvhdx exp=3Dvhdx [name=3Dmy-img.vhdx opts=3D]  =
+               =
+
+vmdk: PASS fmt=3Dvmdk auto=3Dvmdk exp=3Dvmdk [name=3Dmy-img.vmdk opts=3D]  =
+               =
+
+vpc: PASS fmt=3Dvpc auto=3Dvpc exp=3Dvpc [name=3Dmy-img.vpc opts=3D]       =
+               =
+
+vpc-fixed: FAIL fmt=3Dvpc auto=3Draw exp=3Dvpc [name=3Dmy-img.vpc-fixed opt=
+s=3D-o subformat=3Dfixed]                                                  =
+                      =
+
+vpc-fforce: FAIL fmt=3Dvpc auto=3Draw exp=3Dvpc [name=3Dmy-img.vpc-fforce o=
+pts=3D-o subformat=3Dfixed,force_size]                                     =
+                      =
+
+FAIL [2]    =
+
+
+** Attachment added: "shell script reproducing and testing different types."
+   https://bugs.launchpad.net/qemu/+bug/1819182/+attachment/5244750/+files/=
+go-create
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1819182
+
+Title:
+  info does not recognize file format of vpc with subformat=3Dfixed
+
+Status in QEMU:
+  New
+
+Bug description:
+  After creating or converting an image to vpc with 'subformat=3Dfixed'
+  'qemu-img info' incorrectly identifies the image as 'raw' format.
+
+  $ qemu-img --version
+  qemu-img version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.10)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  $ qemu-img create -f vpc -o subformat=3Dfixed my.vpc 2G
+  Formatting 'my.vpc', fmt=3Dvpc size=3D2147483648 subformat=3Dfixed
+
+  $ qemu-img info my.vpc
+  image: my.vpc
+  file format: raw
+  virtual size: 2.0G (2147992064 bytes)
+  disk size: 4.0K
+
+  $ qemu-img info -f vpc my.vpc
+  image: my.vpc
+  file format: vpc
+  virtual size: 2.0G (2147991552 bytes)
+  disk size: 4.0K
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1819182/+subscriptions
