@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44820)
+Received: from eggs.gnu.org ([209.51.188.92]:44856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2M7H-0000os-03
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:16 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h2M7J-0000rZ-G8
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2M7F-0006tR-NT
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53372)
+	(envelope-from <jsnow@redhat.com>) id 1h2M7G-0006ur-RL
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M7F-0006r3-3d
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:13 -0500
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M7F-0006pw-As
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:14 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri,  8 Mar 2019 15:28:55 -0500
-Message-Id: <20190308202858.26636-15-jsnow@redhat.com>
+Date: Fri,  8 Mar 2019 15:28:53 -0500
+Message-Id: <20190308202858.26636-13-jsnow@redhat.com>
 In-Reply-To: <20190308202858.26636-1-jsnow@redhat.com>
 References: <20190308202858.26636-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 14/17] block/dirty-bitmaps: prohibit readonly
- bitmaps for backups
+Subject: [Qemu-devel] [PULL 12/17] block/dirty-bitmap: add inconsistent
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jsnow@redhat.com, peter.maydell@linaro.org
 
-drive and blockdev backup cannot use readonly bitmaps, because the
-sync=incremental mechanism actually edits the bitmaps on success.
+Even though the status field is deprecated, we still have to support
+it for a few more releases. Since this is a very new kind of bitmap
+state, it makes sense for it to have its own status field.
 
-If you really want to do this operation, use a copied bitmap.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190301191545.8728-5-jsnow@redhat.com
+Message-id: 20190301191545.8728-3-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ qapi/block-core.json | 7 ++++++-
+ block/dirty-bitmap.c | 7 ++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 455ab806b2..c6c7a64bfc 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3533,7 +3533,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
-             bdrv_unref(target_bs);
-             goto out;
-         }
--        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_ALLOW_RO, errp)) {
-+        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
-             goto out;
-         }
-     }
-@@ -3643,7 +3643,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
-             error_setg(errp, "Bitmap '%s' could not be found", backup->bitmap);
-             goto out;
-         }
--        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_ALLOW_RO, errp)) {
-+        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
-             goto out;
-         }
-     }
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index e639ef6d1c..ae55cd0704 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -442,10 +442,15 @@
+ #          recording new writes. If the bitmap was @disabled, it is not
+ #          recording new writes. (Since 2.12)
+ #
++# @inconsistent: This is a persistent dirty bitmap that was marked in-use on
++#                disk, and is unusable by QEMU. It can only be deleted.
++#                Please rely on the inconsistent field in @BlockDirtyInfo
++#                instead, as the status field is deprecated. (Since 4.0)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'DirtyBitmapStatus',
+-  'data': ['active', 'disabled', 'frozen', 'locked'] }
++  'data': ['active', 'disabled', 'frozen', 'locked', 'inconsistent'] }
+ 
+ ##
+ # @BlockDirtyInfo:
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index c611bfb971..987ea7ca29 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -209,10 +209,15 @@ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
+  *               or it can be Disabled and not recording writes.
+  * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
+  *               in any way from the monitor.
++ * (5) Inconsistent: This is a persistent bitmap whose "in use" bit is set, and
++ *                   is unusable by QEMU. It can be deleted to remove it from
++ *                   the qcow2.
+  */
+ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
+ {
+-    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
++    if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
++        return DIRTY_BITMAP_STATUS_INCONSISTENT;
++    } else if (bdrv_dirty_bitmap_has_successor(bitmap)) {
+         return DIRTY_BITMAP_STATUS_FROZEN;
+     } else if (bdrv_dirty_bitmap_busy(bitmap)) {
+         return DIRTY_BITMAP_STATUS_LOCKED;
 -- 
 2.17.2
