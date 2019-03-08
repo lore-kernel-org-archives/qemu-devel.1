@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36488)
+Received: from eggs.gnu.org ([209.51.188.92]:36886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2J3Q-000076-MX
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:13:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h2J5L-0001PJ-GT
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:15:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2J3P-00041m-Az
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:13:04 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36615)
+	(envelope-from <peter.maydell@linaro.org>) id 1h2J5K-0006qV-IV
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:15:03 -0500
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:40508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2J3L-0003i7-Mh
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:13:01 -0500
-Received: by mail-ot1-x343.google.com with SMTP id v62so17989083otb.3
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 09:12:53 -0800 (PST)
+	id 1h2J5K-0006pv-Bl
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:15:02 -0500
+Received: by mail-oi1-x22c.google.com with SMTP id x187so16404372oia.7
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 09:15:02 -0800 (PST)
 MIME-Version: 1.0
 References: <20190306114227.9125-1-dgilbert@redhat.com>
-	<20190306114227.9125-8-dgilbert@redhat.com>
-In-Reply-To: <20190306114227.9125-8-dgilbert@redhat.com>
+	<20190306114227.9125-20-dgilbert@redhat.com>
+In-Reply-To: <20190306114227.9125-20-dgilbert@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Mar 2019 17:12:41 +0000
-Message-ID: <CAFEAcA-pxfaooirQMhxasBwZAhKQGeo3BG_hwefLJ-o7EYZJYQ@mail.gmail.com>
+Date: Fri, 8 Mar 2019 17:14:50 +0000
+Message-ID: <CAFEAcA-mJdymqYBp-xrUbrXQ_fZ+mTZ90DG0nQs3v40HVxETzA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 07/22] migration: Add an ability to ignore
- shared RAM blocks
+Subject: Re: [Qemu-devel] [PULL 19/22] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +36,97 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
 On Wed, 6 Mar 2019 at 11:55, Dr. David Alan Gilbert (git)
 <dgilbert@redhat.com> wrote:
 >
-> From: Yury Kotov <yury-kotov@yandex-team.ru>
+> From: Wei Wang <wei.w.wang@intel.com>
 >
-> If ignore-shared capability is set then skip shared RAMBlocks during the
-> RAM migration.
-> Also, move qemu_ram_foreach_migratable_block (and rename) to the
-> migration code, because it requires access to the migration capabilities.
+> The new feature enables the virtio-balloon device to receive hints of
+> guest free pages from the free page vq.
 >
-
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -644,7 +644,7 @@ static int qemu_rdma_init_ram_blocks(RDMAContext *rdma)
+> A notifier is registered to the migration precopy notifier chain. The
+> notifier calls free_page_start after the migration thread syncs the dirty
+> bitmap, so that the free page optimization starts to clear bits of free
+> pages from the bitmap. It calls the free_page_stop before the migration
+> thread syncs the bitmap, which is the end of the current round of ram
+> save. The free_page_stop is also called to stop the optimization in the
+> case when there is an error occurred in the process of ram saving.
 >
->      assert(rdma->blockmap == NULL);
->      memset(local, 0, sizeof *local);
-> -    qemu_ram_foreach_migratable_block(qemu_rdma_init_one_block, rdma);
-> +    foreach_not_ignored_block(qemu_rdma_init_one_block, rdma);
->      trace_qemu_rdma_init_ram_blocks(local->nb_blocks);
->      rdma->dest_blocks = g_new0(RDMADestBlock,
->                                 rdma->local_ram_blocks.nb_blocks);
+> Note: balloon will report pages which were free at the time of this call.
+> As the reporting happens asynchronously, dirty bit logging must be
+> enabled before this free_page_start call is made. Guest reporting must be
+> disabled before the migration dirty bitmap is synchronized.
+>
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Peter Xu <peterx@redhat.com>
+> Message-Id: <1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>   dgilbert: Dropped kernel header update, fixed up CMD_ID_* name change
+> ---
 
-Hi. This change causes Coverity to gripe (CID 1399413) because
-the return value from foreach_not_ignored_block() is ignored
-here but it is checked on every other use of the function.
+Hi -- Coverity points out a use-after-free here (CID 1399412):
 
-This is one of those Coverity errors where it's just using a
-sometimes-wrong heuristic, so we could just mark it as a false
-positive (AFAICT qemu_rdma_init_one_block() always returns 0),
-but OTOH rdma_add_block() and qemu_rdma_init_one_block()
-carefully pipe through a return value, so maybe it's worth assert()ing
-in case somebody changes rdma_add_block() to maybe fail later?
+> +static bool get_free_page_hints(VirtIOBalloon *dev)
+> +{
+> +    VirtQueueElement *elem;
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> +    VirtQueue *vq = dev->free_page_vq;
+> +
+> +    while (dev->block_iothread) {
+> +        qemu_cond_wait(&dev->free_page_cond, &dev->free_page_lock);
+> +    }
+> +
+> +    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+> +    if (!elem) {
+> +        return false;
+> +    }
+> +
+> +    if (elem->out_num) {
+> +        uint32_t id;
+> +        size_t size = iov_to_buf(elem->out_sg, elem->out_num, 0,
+> +                                 &id, sizeof(id));
+> +        virtqueue_push(vq, elem, size);
+> +        g_free(elem);
 
-I don't think there's much in it -- let me know if you just want
-me to mark the issue as a false positive.
+Here we free elem...
+
+> +
+> +        virtio_tswap32s(vdev, &id);
+> +        if (unlikely(size != sizeof(id))) {
+> +            virtio_error(vdev, "received an incorrect cmd id");
+> +            return false;
+> +        }
+> +        if (id == dev->free_page_report_cmd_id) {
+> +            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+> +        } else {
+> +            /*
+> +             * Stop the optimization only when it has started. This
+> +             * avoids a stale stop sign for the previous command.
+> +             */
+> +            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
+> +                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+> +            }
+> +        }
+> +    }
+> +
+> +    if (elem->in_num) {
+
+...but we can fall through here and try to dereference elem...
+
+> +        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
+> +            qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
+> +                                      elem->in_sg[0].iov_len);
+> +        }
+> +        virtqueue_push(vq, elem, 1);
+> +        g_free(elem);
+
+...and then free it again.
+
+> +    }
+> +
+> +    return true;
+> +}
 
 thanks
 -- PMM
