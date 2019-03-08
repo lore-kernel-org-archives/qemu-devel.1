@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50788)
+Received: from eggs.gnu.org ([209.51.188.92]:51471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h2CUE-0006Hw-AK
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:12:19 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1h2CWb-0007yz-6G
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:14:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h2CUD-0005m9-Hm
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:12:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50074)
+	(envelope-from <pbonzini@redhat.com>) id 1h2CWa-0008U8-GT
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:14:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h2CUD-0005ko-B1
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:12:17 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D62530718CD
-	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 10:12:16 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  8 Mar 2019 10:12:10 +0000
-Message-Id: <20190308101210.28038-1-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h2CWa-0008Td-6C
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:14:44 -0500
+References: <CAEt6vxELvT1gadPihazzmKDsGgFDa1whxnKAVMEwsf_e7ycGdg@mail.gmail.com>
+	<d856dc98-018b-3eec-fe05-26035a64e9bb@redhat.com>
+	<5109bd99-ab78-ef32-b900-15896dc00d1f@redhat.com>
+	<20190308091917.kmjlvvkl5oxcetcu@sirius.home.kraxel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d59fa93f-4ecc-fa7b-9bf9-bb144c02d614@redhat.com>
+Date: Fri, 8 Mar 2019 11:14:36 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] migration/postcopy: Update the bandwidth
- during postcopy
+In-Reply-To: <20190308091917.kmjlvvkl5oxcetcu@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] qemu bluetooth support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peterx@redhat.com, quintela@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Daryl Oliver <gen.dr.aireagoirdragesteam@gmail.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 08/03/19 10:19, Gerd Hoffmann wrote:
+>   Hi,
+> 
+>> For Windows, we could also pass it through as an HID device, using
+>> something like virtio-input-host-pci but for USB.  It wouldn't be hard
+>> to implement, but you'd have to write a converter from Linux evdev
+>> descriptors to USB HID descriptors.
+> 
+> I think we actually have virtio-input windows drivers, didn't Ladi work
+> on that?
 
-The recently added max-postcopy-bandwidth parameter is only read
-at the transition from precopy->postcopy where as the older
-max-bandwidth parameter updates the migration bandwidth when changed
-even if the migration is already running.
+Ah indeed.  So virtio-input-host-pci might work even for Windows.
 
-Fix this discrepency so that:
-  a) You can change the bandwidth during postcopy by setting
-     max-postcopy-bandwidth
+Paolo
 
-  b) Changing max-bandwidth during postcopy has no effect
-     (it currently changes the postcopy bandwidth which isn't
-     expected).
-
-Fixes: 7e555c6c
-bz: https://bugzilla.redhat.com/show_bug.cgi?id=3D1686321
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index df6fd8e0e5..221f1b9ced 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1347,7 +1347,7 @@ static void migrate_params_apply(MigrateSetParamete=
-rs *params, Error **errp)
-=20
-     if (params->has_max_bandwidth) {
-         s->parameters.max_bandwidth =3D params->max_bandwidth;
--        if (s->to_dst_file) {
-+        if (s->to_dst_file && !migration_in_postcopy()) {
-             qemu_file_set_rate_limit(s->to_dst_file,
-                                 s->parameters.max_bandwidth / XFER_LIMIT=
-_RATIO);
-         }
-@@ -1379,6 +1379,10 @@ static void migrate_params_apply(MigrateSetParamet=
-ers *params, Error **errp)
-     }
-     if (params->has_max_postcopy_bandwidth) {
-         s->parameters.max_postcopy_bandwidth =3D params->max_postcopy_ba=
-ndwidth;
-+        if (s->to_dst_file && migration_in_postcopy()) {
-+            qemu_file_set_rate_limit(s->to_dst_file,
-+                    s->parameters.max_postcopy_bandwidth / XFER_LIMIT_RA=
-TIO);
-+        }
-     }
-     if (params->has_max_cpu_throttle) {
-         s->parameters.max_cpu_throttle =3D params->max_cpu_throttle;
---=20
-2.20.1
+> Another possible option would be to usb pass through a bluetooth dongle.
+> 
+> cheers,
+>   Gerd
+> 
