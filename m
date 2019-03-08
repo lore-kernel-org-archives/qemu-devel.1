@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58834)
+Received: from eggs.gnu.org ([209.51.188.92]:58914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h24Q1-00045g-Hi
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:35:26 -0500
+	(envelope-from <philmd@redhat.com>) id 1h24Q7-0004AZ-Fj
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:35:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h24Pz-0002xh-HT
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:35:25 -0500
+	(envelope-from <philmd@redhat.com>) id 1h24Q3-00034I-Ho
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:35:29 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  8 Mar 2019 02:32:16 +0100
-Message-Id: <20190308013222.12524-13-philmd@redhat.com>
+Date: Fri,  8 Mar 2019 02:32:17 +0100
+Message-Id: <20190308013222.12524-14-philmd@redhat.com>
 In-Reply-To: <20190308013222.12524-1-philmd@redhat.com>
 References: <20190308013222.12524-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 12/18] hw/nvram/fw_cfg: Keep reference of
- file_data in FWCfgState
+Subject: [Qemu-devel] [PATCH v2 13/18] hw/nvram/fw_cfg: Add QMP 'info
+ fw_cfg' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,117 +26,228 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-The 'file_data' is allocated by read_splashfile() (introduced in
-commit 3d3b8303c6f8).  It is then used by fw_cfg_add_file(). Due
-to the contract interface of fw_cfg_add_file(), it has to be valid
-for the lifetime of the FwCfg object.
+When debugging a paravirtualized guest firmware, it results very
+useful to dump the fw_cfg table.
+Add a QMP command which returns the most useful fields.
+Since the QMP protocol is not designed for passing stream data,
+we don't display a fw_cfg item data, only it's size:
 
-Keep a reference of 'file_data' in FWCfgState to be able to
-free this memory in fw_cfg_common_unrealize().
-We can now remove the res_free() from the main() loop.
-The global boot_splash_filedata is now unused, remove it.
+{ "execute": "query-fw_cfg-items" }
+{
+    "return": [
+        {
+            "architecture_specific": false,
+            "key": 0,
+            "writeable": false,
+            "size": 4,
+            "keyname": "signature"
+        },
+        {
+            "architecture_specific": false,
+            "key": 1,
+            "writeable": false,
+            "size": 4,
+            "keyname": "id"
+        },
+        {
+            "architecture_specific": false,
+            "key": 2,
+            "writeable": false,
+            "size": 16,
+            "keyname": "uuid"
+        },
+        ...
+        {
+            "order": 40,
+            "architecture_specific": false,
+            "key": 36,
+            "writeable": false,
+            "path": "etc/e820",
+            "size": 20,
+            "keyname": "file"
+        },
+        {
+            "order": 30,
+            "architecture_specific": false,
+            "key": 37,
+            "writeable": false,
+            "path": "etc/smbios/smbios-anchor",
+            "size": 31,
+            "keyname": "file"
+        },
+        ...
+        {
+            "architecture_specific": true,
+            "key": 3,
+            "writeable": false,
+            "size": 324,
+            "keyname": "e820_tables"
+        },
+        {
+            "architecture_specific": true,
+            "key": 4,
+            "writeable": false,
+            "size": 121,
+            "keyname": "hpet"
+        }
+    ]
+}
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/nvram/fw_cfg.c         | 10 ++++++----
- include/hw/nvram/fw_cfg.h |  1 +
- include/sysemu/sysemu.h   |  1 -
- vl.c                      |  9 ---------
- 4 files changed, 7 insertions(+), 14 deletions(-)
+v2: New commit, asked by Eric/Michael, using Laszlo suggestions
+---
+ hw/nvram/fw_cfg.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/misc.json    | 44 +++++++++++++++++++++++++++
+ 2 files changed, 120 insertions(+)
 
 diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 3ac6687a04..fc392cb7e0 100644
+index fc392cb7e0..2a8d69ba07 100644
 --- a/hw/nvram/fw_cfg.c
 +++ b/hw/nvram/fw_cfg.c
-@@ -215,16 +215,16 @@ static void fw_cfg_bootsplash(FWCfgState *s)
-             g_free(filename);
-             return;
-         }
--        g_free(boot_splash_filedata);
--        boot_splash_filedata =3D (uint8_t *)file_data;
-+        g_free(s->boot_splash.file_data);
-+        s->boot_splash.file_data =3D file_data;
+@@ -35,6 +35,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
++#include "qapi/qapi-commands-misc.h"
 =20
-         /* insert data */
-         if (file_type =3D=3D JPG_FILE) {
-             fw_cfg_add_file(s, "bootsplash.jpg",
--                            boot_splash_filedata, file_size);
-+                            s->boot_splash.file_data, file_size);
-         } else {
-             fw_cfg_add_file(s, "bootsplash.bmp",
--                            boot_splash_filedata, file_size);
-+                            s->boot_splash.file_data, file_size);
-         }
-         g_free(filename);
-     }
-@@ -974,6 +974,8 @@ static void fw_cfg_common_unrealize(DeviceState *dev,=
- Error **errp)
+ #define FW_CFG_FILE_SLOTS_DFLT 0x20
 =20
-     g_free(s->files);
-=20
-+    g_free(s->boot_splash.file_data);
-+
-     g_free(s->entries[0]);
-     g_free(s->entries[1]);
-     g_free(s->entry_order);
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index fcb771186c..83a0540b6c 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -56,6 +56,7 @@ struct FWCfgState {
-=20
-     uint32_t reboot_timeout;
-     struct {
-+        char *file_data;
-         uint16_t time_le16;
-     } boot_splash;
- };
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 6065d9e420..3cd856b015 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -109,7 +109,6 @@ extern int no_shutdown;
- extern int old_param;
- extern int boot_menu;
- extern bool boot_strict;
--extern uint8_t *boot_splash_filedata;
- extern bool enable_mlock;
- extern bool enable_cpu_pm;
- extern QEMUClockType rtc_clock;
-diff --git a/vl.c b/vl.c
-index fad6fec38c..47dd63a309 100644
---- a/vl.c
-+++ b/vl.c
-@@ -187,7 +187,6 @@ unsigned int nb_prom_envs =3D 0;
- const char *prom_envs[MAX_PROM_ENVS];
- int boot_menu;
- bool boot_strict;
--uint8_t *boot_splash_filedata;
- bool wakeup_suspend_enabled;
-=20
- int icount_align_option;
-@@ -558,12 +557,6 @@ const char *qemu_get_vm_name(void)
-     return qemu_name;
+@@ -1229,3 +1230,78 @@ static void fw_cfg_register_types(void)
  }
 =20
--static void res_free(void)
--{
--    g_free(boot_splash_filedata);
--    boot_splash_filedata =3D NULL;
--}
--
- static int default_driver_check(void *opaque, QemuOpts *opts, Error **er=
-rp)
- {
-     const char *driver =3D qemu_opt_get(opts, "driver");
-@@ -4591,8 +4584,6 @@ int main(int argc, char **argv, char **envp)
-     job_cancel_sync_all();
-     bdrv_close_all();
-=20
--    res_free();
--
-     /* vhost-user must be cleaned up before chardevs.  */
-     tpm_cleanup();
-     net_cleanup();
+ type_init(fw_cfg_register_types)
++
++static FirmwareConfigurationItem *create_qmp_fw_cfg_item(FWCfgState *s,
++                                                         FWCfgEntry *e,
++                                                         bool is_arch_sp=
+ecific,
++                                                         uint16_t key,
++                                                         size_t hex_leng=
+th)
++{
++    FirmwareConfigurationItem *item =3D g_malloc0(sizeof(*item));
++
++    item->key =3D key;
++    item->writeable =3D e->allow_write;
++    item->architecture_specific =3D is_arch_specific;
++    item->size =3D e->len;
++    if (hex_length) {
++        item->has_data =3D true;
++        item->data =3D qemu_strdup_hexlify(e->data, hex_length);
++    }
++
++    if (!is_arch_specific && key >=3D FW_CFG_FILE_FIRST) {
++        int id =3D key - FW_CFG_FILE_FIRST;
++        const char *path =3D s->files->f[id].name;
++
++        item->has_keyname =3D true;
++        item->keyname =3D g_strdup("file");
++        item->has_order =3D true;
++        item->order =3D get_fw_cfg_order(s, path);
++        item->has_path =3D true;
++        item->path =3D g_strdup(path);
++    } else {
++        const char *name;
++
++        if (is_arch_specific) {
++            key |=3D FW_CFG_ARCH_LOCAL;
++        }
++        name =3D key_name(key);
++        if (name) {
++            item->has_keyname =3D true;
++            item->keyname =3D g_strdup(name);
++        }
++    }
++    return item;
++}
++
++FirmwareConfigurationItemList *qmp_query_fw_cfg_items(Error **errp)
++{
++    FirmwareConfigurationItemList *item_list =3D NULL;
++    uint32_t max_entries;
++    int arch, key;
++    FWCfgState *s =3D fw_cfg_find();
++
++    if (s =3D=3D NULL) {
++        return NULL;
++    }
++
++    max_entries =3D fw_cfg_max_entry(s);
++    for (arch =3D ARRAY_SIZE(s->entries) - 1; arch >=3D 0 ; --arch) {
++        for (key =3D max_entries - 1; key >=3D 0; --key) {
++            FirmwareConfigurationItemList *info;
++            FWCfgEntry *e =3D &s->entries[arch][key];
++            size_t qmp_hex_length =3D 0;
++
++            if (!e->len) {
++                continue;
++            }
++
++            info =3D g_malloc0(sizeof(*info));
++            info->value =3D create_qmp_fw_cfg_item(s, e, arch, key,
++                                                 qmp_hex_length);
++            info->next =3D item_list;
++            item_list =3D info;
++        }
++    }
++
++    return item_list;
++}
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 8b3ca4fdd3..9d1da7c766 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3051,3 +3051,47 @@
+   'data': 'NumaOptions',
+   'allow-preconfig': true
+ }
++
++##
++# @FirmwareConfigurationItem:
++#
++# Firmware Configuration (fw_cfg) item.
++#
++# @key: The uint16 selector key.
++# @keyname: The stringified name if the selector refers to a well-known
++#           numerically defined item.
++# @architecture_specific: Indicates whether the configuration setting is
++#                         architecture specific.
++#                  false: The item is a generic configuration item.
++#                  true:  The item is specific to a particular architect=
+ure.
++# @writeable: Indicates whether the configuration setting is writeable b=
+y
++#             the guest.
++# @size: The length of @data associated with the item.
++# @data: A string representating the firmware configuration data.
++#        Note: This field is currently not used.
++# @path: If the key is a 'file', the named file path.
++# @order: If the key is a 'file', the named file order.
++#
++# Since 4.0
++##
++{ 'struct': 'FirmwareConfigurationItem',
++  'data': { 'key': 'uint16',
++            '*keyname': 'str',
++            'architecture_specific': 'bool',
++            'writeable': 'bool',
++            '*data': 'str',
++            'size': 'int',
++            '*path': 'str',
++            '*order': 'int' } }
++
++
++##
++# @query-fw_cfg-items:
++#
++# Returns the list of Firmware Configuration items.
++#
++# Returns: A list of @FirmwareConfigurationItem for each entry.
++#
++# Since 4.0
++##
++{ 'command': 'query-fw_cfg-items', 'returns': ['FirmwareConfigurationIte=
+m']}
 --=20
 2.20.1
