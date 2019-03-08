@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39748)
+Received: from eggs.gnu.org ([209.51.188.92]:40181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h2HNY-0001Hq-Ne
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:25:46 -0500
+	(envelope-from <mlureau@redhat.com>) id 1h2HOr-0002Mm-NE
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h2HNX-0003tk-6p
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:25:44 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Fri,  8 Mar 2019 16:25:11 +0100
-Message-Id: <20190308152511.10882-3-eric.auger@redhat.com>
-In-Reply-To: <20190308152511.10882-1-eric.auger@redhat.com>
-References: <20190308152511.10882-1-eric.auger@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1h2HOq-0007QT-Gh
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:27:05 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:45588)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1h2HOp-0007J4-V4
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:27:04 -0500
+Received: by mail-qt1-f196.google.com with SMTP id d18so21567889qtg.12
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 07:27:02 -0800 (PST)
 MIME-Version: 1.0
+References: <20190308152150.32030-1-berrange@redhat.com>
+	<20190308152150.32030-2-berrange@redhat.com>
+In-Reply-To: <20190308152150.32030-2-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 8 Mar 2019 16:26:50 +0100
+Message-ID: <CAMxuvaxEPBQyKCRReMObmANYjjT4Gn21o-EHEZJ_bm7Zr-tYMw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/2] machine: Move nvdimms state into struct
- MachineState
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] chardev: add support for
+ authorization for TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,372 +30,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, richard.henderson@linaro.org, sbhat@linux.ibm.com, philmd@redhat.com
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-As NVDIMM support is looming for ARM and SPAPR, let's
-move the acpi_nvdimm_state to the generic machine struct
-instead of duplicating the same code in several machines.
-It is also renamed into nvdimms_state and becomes a pointer.
+On Fri, Mar 8, 2019 at 4:22 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+> wrote:
+>
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>
+> Currently any client which can complete the TLS handshake is able to use
+> a chardev server. The server admin can turn on the 'verify-peer' option
+> for the x509 creds to require the client to provide a x509
+> certificate. This means the client will have to acquire a certificate
+> from the CA before they are permitted to use the chardev server. This is
+> still a fairly low bar.
+>
+> This adds a 'tls-authz=3DOBJECT-ID' option to the socket chardev backend
+> which takes the ID of a previously added 'QAuthZ' object instance. This
+> will be used to validate the client's x509 distinguished name. Clients
+> failing the check will not be permitted to use the chardev server.
+>
+> For example to setup authorization that only allows connection from a
+> client whose x509 certificate distinguished name contains 'CN=3Dfred', yo=
+u
+> would use:
+>
+>   $QEMU -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls,\
+>                 endpoint=3Dserver,verify-peer=3Dyes \
+>         -object authz-simple,id=3Dauthz0,identity=3DCN=3Dlaptop.example.c=
+om,,\
+>                 O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
+>         -chardev socket,host=3D127.0.0.1,port=3D9000,server,\
+>                  tls-creds=3Dtls0,tls-authz=3Dauthz0 \
+>         ...other qemu args...
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-nvdimm and nvdimm-persistence become generic machine options.
-They become guarded by a nvdimm_supported machine class member.
-We also add a description for those options.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-
----
-v2 -> v3
-- nvdimms_state becomes a pointer
-- add machine class nvdimm_supported
-
-v1 -> v2:
-- s/acpi_nvdimm_state/nvdimms_state
-- remove ms->nvdimms_state.is_enabled initialization to false.
----
- hw/core/machine.c    | 65 ++++++++++++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c |  6 ++--
- hw/i386/pc.c         | 57 ++++----------------------------------
- hw/i386/pc_piix.c    |  4 +--
- hw/i386/pc_q35.c     |  4 +--
- include/hw/boards.h  |  2 ++
- include/hw/i386/pc.h |  4 ---
- 7 files changed, 79 insertions(+), 63 deletions(-)
-
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 766ca5899d..29a33194a9 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -22,6 +22,7 @@
- #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
- #include "hw/pci/pci.h"
-+#include "hw/mem/nvdimm.h"
-=20
- GlobalProperty hw_compat_3_1[] =3D {
-     { "pcie-root-port", "x-speed", "2_5" },
-@@ -481,6 +482,47 @@ static void machine_set_memory_encryption(Object *ob=
-j, const char *value,
-     ms->memory_encryption =3D g_strdup(value);
- }
-=20
-+static bool machine_get_nvdimm(Object *obj, Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    return ms->nvdimms_state->is_enabled;
-+}
-+
-+static void machine_set_nvdimm(Object *obj, bool value, Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    ms->nvdimms_state->is_enabled =3D value;
-+}
-+
-+static char *machine_get_nvdimm_persistence(Object *obj, Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    return g_strdup(ms->nvdimms_state->persistence_string);
-+}
-+
-+static void machine_set_nvdimm_persistence(Object *obj, const char *valu=
-e,
-+                                           Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+    NVDIMMState *nvdimms_state =3D ms->nvdimms_state;
-+
-+    if (strcmp(value, "cpu") =3D=3D 0) {
-+        nvdimms_state->persistence =3D 3;
-+    } else if (strcmp(value, "mem-ctrl") =3D=3D 0) {
-+        nvdimms_state->persistence =3D 2;
-+    } else {
-+        error_setg(errp, "-machine nvdimm-persistence=3D%s: unsupported =
-option",
-+                   value);
-+        return;
-+    }
-+
-+    g_free(nvdimms_state->persistence_string);
-+    nvdimms_state->persistence_string =3D g_strdup(value);
-+}
-+
- void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char=
- *type)
- {
-     strList *item =3D g_new0(strList, 1);
-@@ -791,6 +833,28 @@ static void machine_initfn(Object *obj)
-     ms->mem_merge =3D true;
-     ms->enable_graphics =3D true;
-=20
-+    if (mc->nvdimm_supported) {
-+        ObjectClass *oc =3D OBJECT_CLASS(mc);
-+
-+        ms->nvdimms_state =3D g_new0(NVDIMMState, 1);
-+        object_class_property_add_bool(oc, "nvdimm",
-+                                       machine_get_nvdimm, machine_set_n=
-vdimm,
-+                                       &error_abort);
-+        object_class_property_set_description(oc, "nvdimm",
-+                                             "Set on/off to enable/disab=
-le "
-+                                             "NVDIMM instantiation", NUL=
-L);
-+
-+        object_class_property_add_str(oc, "nvdimm-persistence",
-+                                      machine_get_nvdimm_persistence,
-+                                      machine_set_nvdimm_persistence,
-+                                      &error_abort);
-+        object_class_property_set_description(oc, "nvdimm-persistence",
-+                                             "Set NVDIMM persistence"
-+                                             "Valid values are cpu, mem-=
-ctrl",
-+                                              NULL);
-+    }
-+
-+
-     /* Register notifier when init is done for sysbus sanity checks */
-     ms->sysbus_notifier.notify =3D machine_init_notify;
-     qemu_add_machine_init_done_notifier(&ms->sysbus_notifier);
-@@ -809,6 +873,7 @@ static void machine_finalize(Object *obj)
-     g_free(ms->dt_compatible);
-     g_free(ms->firmware);
-     g_free(ms->device_memory);
-+    g_free(ms->nvdimms_state);
- }
-=20
- bool machine_usb(MachineState *machine)
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9ecc96dcc7..416da318ae 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1867,7 +1867,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             aml_append(scope, method);
-         }
-=20
--        if (pcms->acpi_nvdimm_state.is_enabled) {
-+        if (machine->nvdimms_state->is_enabled) {
-             method =3D aml_method("_E04", 0, AML_NOTSERIALIZED);
-             aml_append(method, aml_notify(aml_name("\\_SB.NVDR"),
-                                           aml_int(0x80)));
-@@ -2704,9 +2704,9 @@ void acpi_build(AcpiBuildTables *tables, MachineSta=
-te *machine)
-             build_dmar_q35(tables_blob, tables->linker);
-         }
-     }
--    if (pcms->acpi_nvdimm_state.is_enabled) {
-+    if (machine->nvdimms_state->is_enabled) {
-         nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
--                          &pcms->acpi_nvdimm_state, machine->ram_slots);
-+                          machine->nvdimms_state, machine->ram_slots);
-     }
-=20
-     /* Add tables supplied by user (if any) */
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 0338dbe9da..71385cfac9 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2069,6 +2069,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotp=
-lug_dev, DeviceState *dev,
- {
-     const PCMachineState *pcms =3D PC_MACHINE(hotplug_dev);
-     const PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
-+    const MachineState *ms =3D MACHINE(hotplug_dev);
-     const bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIM=
-M);
-     const uint64_t legacy_align =3D TARGET_PAGE_SIZE;
-=20
-@@ -2083,7 +2084,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotp=
-lug_dev, DeviceState *dev,
-         return;
-     }
-=20
--    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
-+    if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
-         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M=
-'");
-         return;
-     }
-@@ -2097,6 +2098,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_=
-dev,
- {
-     Error *local_err =3D NULL;
-     PCMachineState *pcms =3D PC_MACHINE(hotplug_dev);
-+    MachineState *ms =3D MACHINE(hotplug_dev);
-     bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-=20
-     pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms), &local_err);
-@@ -2105,7 +2107,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_=
-dev,
-     }
-=20
-     if (is_nvdimm) {
--        nvdimm_plug(&pcms->acpi_nvdimm_state);
-+        nvdimm_plug(ms->nvdimms_state);
-     }
-=20
-     hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_ab=
-ort);
-@@ -2546,47 +2548,6 @@ static void pc_machine_set_smm(Object *obj, Visito=
-r *v, const char *name,
-     visit_type_OnOffAuto(v, name, &pcms->smm, errp);
- }
-=20
--static bool pc_machine_get_nvdimm(Object *obj, Error **errp)
--{
--    PCMachineState *pcms =3D PC_MACHINE(obj);
--
--    return pcms->acpi_nvdimm_state.is_enabled;
--}
--
--static void pc_machine_set_nvdimm(Object *obj, bool value, Error **errp)
--{
--    PCMachineState *pcms =3D PC_MACHINE(obj);
--
--    pcms->acpi_nvdimm_state.is_enabled =3D value;
--}
--
--static char *pc_machine_get_nvdimm_persistence(Object *obj, Error **errp=
-)
--{
--    PCMachineState *pcms =3D PC_MACHINE(obj);
--
--    return g_strdup(pcms->acpi_nvdimm_state.persistence_string);
--}
--
--static void pc_machine_set_nvdimm_persistence(Object *obj, const char *v=
-alue,
--                                               Error **errp)
--{
--    PCMachineState *pcms =3D PC_MACHINE(obj);
--    NVDIMMState *nvdimm_state =3D &pcms->acpi_nvdimm_state;
--
--    if (strcmp(value, "cpu") =3D=3D 0)
--        nvdimm_state->persistence =3D 3;
--    else if (strcmp(value, "mem-ctrl") =3D=3D 0)
--        nvdimm_state->persistence =3D 2;
--    else {
--        error_setg(errp, "-machine nvdimm-persistence=3D%s: unsupported =
-option",
--                   value);
--        return;
--    }
--
--    g_free(nvdimm_state->persistence_string);
--    nvdimm_state->persistence_string =3D g_strdup(value);
--}
--
- static bool pc_machine_get_smbus(Object *obj, Error **errp)
- {
-     PCMachineState *pcms =3D PC_MACHINE(obj);
-@@ -2636,8 +2597,6 @@ static void pc_machine_initfn(Object *obj)
-     pcms->max_ram_below_4g =3D 0; /* use default */
-     pcms->smm =3D ON_OFF_AUTO_AUTO;
-     pcms->vmport =3D ON_OFF_AUTO_AUTO;
--    /* nvdimm is disabled on default. */
--    pcms->acpi_nvdimm_state.is_enabled =3D false;
-     /* acpi build is enabled by default if machine supports it */
-     pcms->acpi_build_enabled =3D PC_MACHINE_GET_CLASS(pcms)->has_acpi_bu=
-ild;
-     pcms->smbus_enabled =3D true;
-@@ -2774,6 +2733,7 @@ static void pc_machine_class_init(ObjectClass *oc, =
-void *data)
-     hc->unplug =3D pc_machine_device_unplug_cb;
-     nc->nmi_monitor_handler =3D x86_nmi;
-     mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
-+    mc->nvdimm_supported =3D true;
-=20
-     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-         pc_machine_get_device_memory_region_size, NULL,
-@@ -2798,13 +2758,6 @@ static void pc_machine_class_init(ObjectClass *oc,=
- void *data)
-     object_class_property_set_description(oc, PC_MACHINE_VMPORT,
-         "Enable vmport (pc & q35)", &error_abort);
-=20
--    object_class_property_add_bool(oc, PC_MACHINE_NVDIMM,
--        pc_machine_get_nvdimm, pc_machine_set_nvdimm, &error_abort);
--
--    object_class_property_add_str(oc, PC_MACHINE_NVDIMM_PERSIST,
--        pc_machine_get_nvdimm_persistence,
--        pc_machine_set_nvdimm_persistence, &error_abort);
--
-     object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
-         pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
-=20
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 8770ecada9..8ad8e885c6 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -297,8 +297,8 @@ static void pc_init1(MachineState *machine,
-                                  PC_MACHINE_ACPI_DEVICE_PROP, &error_abo=
-rt);
-     }
-=20
--    if (pcms->acpi_nvdimm_state.is_enabled) {
--        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
-+    if (machine->nvdimms_state->is_enabled) {
-+        nvdimm_init_acpi_state(machine->nvdimms_state, system_io,
-                                pcms->fw_cfg, OBJECT(pcms));
-     }
- }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index cfb9043e12..372c6b73be 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -329,8 +329,8 @@ static void pc_q35_init(MachineState *machine)
-     pc_vga_init(isa_bus, host_bus);
-     pc_nic_init(pcmc, isa_bus, host_bus);
-=20
--    if (pcms->acpi_nvdimm_state.is_enabled) {
--        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
-+    if (machine->nvdimms_state->is_enabled) {
-+        nvdimm_init_acpi_state(machine->nvdimms_state, system_io,
-                                pcms->fw_cfg, OBJECT(pcms));
-     }
- }
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 9690c71a6d..e231860666 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -210,6 +210,7 @@ struct MachineClass {
-                                  int nb_nodes, ram_addr_t size);
-     bool ignore_boot_device_suffixes;
-     bool smbus_no_migration_support;
-+    bool nvdimm_supported;
-=20
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
-@@ -272,6 +273,7 @@ struct MachineState {
-     const char *cpu_type;
-     AccelState *accelerator;
-     CPUArchIdList *possible_cpus;
-+    struct NVDIMMState *nvdimms_state;
- };
-=20
- #define DEFINE_MACHINE(namestr, machine_initfn) \
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 94fb620d65..263a6343ff 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -45,8 +45,6 @@ struct PCMachineState {
-     OnOffAuto vmport;
-     OnOffAuto smm;
-=20
--    NVDIMMState acpi_nvdimm_state;
--
-     bool acpi_build_enabled;
-     bool smbus_enabled;
-     bool sata_enabled;
-@@ -74,8 +72,6 @@ struct PCMachineState {
- #define PC_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
- #define PC_MACHINE_VMPORT           "vmport"
- #define PC_MACHINE_SMM              "smm"
--#define PC_MACHINE_NVDIMM           "nvdimm"
--#define PC_MACHINE_NVDIMM_PERSIST   "nvdimm-persistence"
- #define PC_MACHINE_SMBUS            "smbus"
- #define PC_MACHINE_SATA             "sata"
- #define PC_MACHINE_PIT              "pit"
---=20
-2.20.1
+> ---
+>  chardev/char-socket.c | 12 +++++++++++-
+>  chardev/char.c        |  3 +++
+>  qapi/char.json        |  6 ++++++
+>  qemu-options.hx       | 10 ++++++++--
+>  4 files changed, 28 insertions(+), 3 deletions(-)
+>
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 6d287babfb..3916505d67 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -59,6 +59,7 @@ typedef struct {
+>      QIONetListener *listener;
+>      GSource *hup_source;
+>      QCryptoTLSCreds *tls_creds;
+> +    char *tls_authz;
+>      TCPChardevState state;
+>      int max_size;
+>      int do_telnetopt;
+> @@ -807,7 +808,7 @@ static void tcp_chr_tls_init(Chardev *chr)
+>      if (s->is_listen) {
+>          tioc =3D qio_channel_tls_new_server(
+>              s->ioc, s->tls_creds,
+> -            NULL, /* XXX Use an ACL */
+> +            s->tls_authz,
+>              &err);
+>      } else {
+>          tioc =3D qio_channel_tls_new_client(
+> @@ -1055,6 +1056,7 @@ static void char_socket_finalize(Object *obj)
+>      if (s->tls_creds) {
+>          object_unref(OBJECT(s->tls_creds));
+>      }
+> +    g_free(s->tls_authz);
+>
+>      qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+>  }
+> @@ -1242,6 +1244,11 @@ static bool qmp_chardev_validate_socket(ChardevSoc=
+ket *sock,
+>          break;
+>      }
+>
+> +    if (sock->has_tls_authz && !sock->has_tls_creds) {
+> +        error_setg(errp, "'tls_authz' option requires 'tls_creds' option=
+");
+> +        return false;
+> +    }
+> +
+>      /* Validate any options which have a dependancy on client vs server =
+*/
+>      if (!sock->has_server || sock->server) {
+>          if (sock->has_reconnect) {
+> @@ -1320,6 +1327,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>              }
+>          }
+>      }
+> +    s->tls_authz =3D g_strdup(sock->tls_authz);
+>
+>      s->addr =3D addr =3D socket_address_flatten(sock->addr);
+>
+> @@ -1399,6 +1407,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, C=
+hardevBackend *backend,
+>      sock->reconnect =3D qemu_opt_get_number(opts, "reconnect", 0);
+>      sock->has_tls_creds =3D qemu_opt_get(opts, "tls-creds");
+>      sock->tls_creds =3D g_strdup(qemu_opt_get(opts, "tls-creds"));
+> +    sock->has_tls_authz =3D qemu_opt_get(opts, "tls-authz");
+> +    sock->tls_authz =3D g_strdup(qemu_opt_get(opts, "tls-authz"));
+>
+>      addr =3D g_new0(SocketAddressLegacy, 1);
+>      if (path) {
+> diff --git a/chardev/char.c b/chardev/char.c
+> index f6d61fa5f8..514cd6b0c3 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -880,6 +880,9 @@ QemuOptsList qemu_chardev_opts =3D {
+>          },{
+>              .name =3D "tls-creds",
+>              .type =3D QEMU_OPT_STRING,
+> +        },{
+> +            .name =3D "tls-authz",
+> +            .type =3D QEMU_OPT_STRING,
+>          },{
+>              .name =3D "websocket",
+>              .type =3D QEMU_OPT_BOOL,
+> diff --git a/qapi/char.json b/qapi/char.json
+> index 77ed847972..a6e81ac7bc 100644
+> --- a/qapi/char.json
+> +++ b/qapi/char.json
+> @@ -248,6 +248,11 @@
+>  # @addr: socket address to listen on (server=3Dtrue)
+>  #        or connect to (server=3Dfalse)
+>  # @tls-creds: the ID of the TLS credentials object (since 2.6)
+> +# @tls-authz: the ID of the QAuthZ authorization object against which
+> +#             the client's x509 distinguished name will be validated. Th=
+is
+> +#             object is only resolved at time of use, so can be deleted
+> +#             and recreated on the fly while the chardev server is activ=
+e.
+> +#             If missing, it will default to denying access (since 4.0)
+>  # @server: create server socket (default: true)
+>  # @wait: wait for incoming connection on server
+>  #        sockets (default: false).
+> @@ -268,6 +273,7 @@
+>  { 'struct': 'ChardevSocket',
+>    'data': { 'addr': 'SocketAddressLegacy',
+>              '*tls-creds': 'str',
+> +            '*tls-authz'  : 'str',
+>              '*server': 'bool',
+>              '*wait': 'bool',
+>              '*nodelay': 'bool',
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 1cf9aac1fe..84f0e56702 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -2413,7 +2413,7 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+>      "-chardev null,id=3Did[,mux=3Don|off][,logfile=3DPATH][,logappend=3D=
+on|off]\n"
+>      "-chardev socket,id=3Did[,host=3Dhost],port=3Dport[,to=3Dto][,ipv4][=
+,ipv6][,nodelay][,reconnect=3Dseconds]\n"
+>      "         [,server][,nowait][,telnet][,websocket][,reconnect=3Dsecon=
+ds][,mux=3Don|off]\n"
+> -    "         [,logfile=3DPATH][,logappend=3Don|off][,tls-creds=3DID] (t=
+cp)\n"
+> +    "         [,logfile=3DPATH][,logappend=3Don|off][,tls-creds=3DID][,t=
+ls-authz=3DID] (tcp)\n"
+>      "-chardev socket,id=3Did,path=3Dpath[,server][,nowait][,telnet][,web=
+socket][,reconnect=3Dseconds]\n"
+>      "         [,mux=3Don|off][,logfile=3DPATH][,logappend=3Don|off] (uni=
+x)\n"
+>      "-chardev udp,id=3Did[,host=3Dhost],port=3Dport[,localaddr=3Dlocalad=
+dr]\n"
+> @@ -2542,7 +2542,7 @@ The available backends are:
+>  A void device. This device will not emit any data, and will drop any dat=
+a it
+>  receives. The null backend does not take any options.
+>
+> -@item -chardev socket,id=3D@var{id}[,@var{TCP options} or @var{unix opti=
+ons}][,server][,nowait][,telnet][,websocket][,reconnect=3D@var{seconds}][,t=
+ls-creds=3D@var{id}]
+> +@item -chardev socket,id=3D@var{id}[,@var{TCP options} or @var{unix opti=
+ons}][,server][,nowait][,telnet][,websocket][,reconnect=3D@var{seconds}][,t=
+ls-creds=3D@var{id}][,tls-authz=3D@var{id}]
+>
+>  Create a two-way stream socket, which can be either a TCP or a unix sock=
+et. A
+>  unix socket will be created if @option{path} is specified. Behaviour is
+> @@ -2568,6 +2568,12 @@ and specifies the id of the TLS credentials to use=
+ for the handshake. The
+>  credentials must be previously created with the @option{-object tls-cred=
+s}
+>  argument.
+>
+> +@option{tls-auth} provides the ID of the QAuthZ authorization object aga=
+inst
+> +which the client's x509 distinguished name will be validated. This objec=
+t is
+> +only resolved at time of use, so can be deleted and recreated on the fly
+> +while the chardev server is active. If missing, it will default to denyi=
+ng
+> +access.
+> +
+>  TCP and unix socket options are given below:
+>
+>  @table @option
+> --
+> 2.20.1
+>
