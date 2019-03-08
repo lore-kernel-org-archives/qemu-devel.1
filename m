@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56358)
+Received: from eggs.gnu.org ([209.51.188.92]:56651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1h2KfT-0008SU-5U
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:56:28 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1h2Kgk-0000kE-0F
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:57:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1h2KfS-0007Kt-0S
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:56:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43424)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1h2KfR-0007JE-La
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:56:25 -0500
-Date: Fri, 8 Mar 2019 15:56:21 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190308185621.GA17141@habkost.net>
-References: <20181227024304.12182-1-tao3.xu@intel.com>
-	<20181227024304.12182-3-tao3.xu@intel.com>
-	<20190114183545.GB28115@habkost.net>
-	<ad912a4e-986b-61d3-0fd8-1047ecabd651@intel.com>
-	<20190123191550.GX4136@habkost.net>
-	<ab92f502-bc96-34fd-0b21-6d1918648549@intel.com>
-	<20190128144848.GS4136@habkost.net>
-	<cfac07a0-bd3b-d10f-0edb-a31a8207b6af@intel.com>
+	(envelope-from <yuval.shaia@oracle.com>) id 1h2Kgi-0008Sq-8S
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:57:45 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:37522)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1h2Kgh-0008QC-TT
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:57:44 -0500
+Date: Fri, 8 Mar 2019 20:57:26 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190308185725.GA3373@lap1>
+References: <20190303203345.2472-1-yuval.shaia@oracle.com>
+	<20190303203345.2472-5-yuval.shaia@oracle.com>
+	<87r2bh9vae.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cfac07a0-bd3b-d10f-0edb-a31a8207b6af@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] i386: Add some MSR based features on
- Cascadelake-Server CPU model
+In-Reply-To: <87r2bh9vae.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4 4/9] {hmp,
+ hw/pvrdma}: Expose device internals via monitor interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,127 +30,408 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Xu <tao3.xu@intel.com>
-Cc: thomas.lendacky@amd.com, qemu-devel@nongnu.org, robert.hu@linux.intel.com, pbonzini@redhat.com, xuelian.guo@intel.com, rth@twiddle.net
+To: Markus Armbruster <armbru@redhat.com>
+Cc: dgilbert@redhat.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
 
-Hi,
+On Fri, Mar 08, 2019 at 05:37:45PM +0100, Markus Armbruster wrote:
+> Yuval Shaia <yuval.shaia@oracle.com> writes:
+> 
+> > Allow interrogating device internals through HMP interface.
+> > The exposed indicators can be used for troubleshooting by developers or
+> > sysadmin.
+> > There is no need to expose these attributes to a management system (e.x.
+> > libvirt) because (1) most of them are not "device-management' related
+> > info and (2) there is no guarantee the interface is stable.
+> >
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >  hmp-commands-info.hx       | 14 ++++++++
+> >  hmp.c                      | 27 +++++++++++++++
+> >  hmp.h                      |  1 +
+> >  hw/rdma/Makefile.objs      |  2 +-
+> >  hw/rdma/rdma_backend.c     | 70 +++++++++++++++++++++++++++++---------
+> >  hw/rdma/rdma_hmp.c         | 30 ++++++++++++++++
+> >  hw/rdma/rdma_rm.c          | 60 ++++++++++++++++++++++++++++++++
+> >  hw/rdma/rdma_rm.h          |  1 +
+> >  hw/rdma/rdma_rm_defs.h     | 27 ++++++++++++++-
+> >  hw/rdma/vmw/pvrdma.h       |  5 +++
+> >  hw/rdma/vmw/pvrdma_main.c  | 21 ++++++++++++
+> >  include/hw/rdma/rdma_hmp.h | 40 ++++++++++++++++++++++
+> >  12 files changed, 279 insertions(+), 19 deletions(-)
+> >  create mode 100644 hw/rdma/rdma_hmp.c
+> >  create mode 100644 include/hw/rdma/rdma_hmp.h
+> >
+> > diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> > index cbee8b944d..c59444c461 100644
+> > --- a/hmp-commands-info.hx
+> > +++ b/hmp-commands-info.hx
+> > @@ -202,6 +202,20 @@ STEXI
+> >  @item info pic
+> >  @findex info pic
+> >  Show PIC state.
+> > +ETEXI
+> > +
+> > +    {
+> > +        .name       = "rdma",
+> > +        .args_type  = "",
+> > +        .params     = "",
+> > +        .help       = "show RDMA state",
+> > +        .cmd        = hmp_info_rdma,
+> > +    },
+> > +
+> > +STEXI
+> > +@item info rdma
+> > +@findex info rdma
+> > +Show RDMA state.
+> >  ETEXI
+> >  
+> >      {
+> > diff --git a/hmp.c b/hmp.c
+> > index 1e006eeb49..68511b2441 100644
+> > --- a/hmp.c
+> > +++ b/hmp.c
+> > @@ -51,6 +51,7 @@
+> >  #include "qemu/error-report.h"
+> >  #include "exec/ramlist.h"
+> >  #include "hw/intc/intc.h"
+> > +#include "hw/rdma/rdma_hmp.h"
+> >  #include "migration/snapshot.h"
+> >  #include "migration/misc.h"
+> >  
+> > @@ -968,6 +969,32 @@ void hmp_info_pic(Monitor *mon, const QDict *qdict)
+> >                                     hmp_info_pic_foreach, mon);
+> >  }
+> >  
+> > +static int hmp_info_rdma_foreach(Object *obj, void *opaque)
+> > +{
+> > +    RdmaStatsProvider *rdma;
+> > +    RdmaStatsProviderClass *k;
+> > +    Monitor *mon = opaque;
+> > +
+> > +    if (object_dynamic_cast(obj, TYPE_RDMA_STATS_PROVIDER)) {
+> > +        rdma = RDMA_STATS_PROVIDER(obj);
+> > +        k = RDMA_STATS_PROVIDER_GET_CLASS(obj);
+> > +        if (k->print_statistics) {
+> > +            k->print_statistics(mon, rdma);
+> > +        } else {
+> > +            monitor_printf(mon, "RDMA statistics not available for %s.\n",
+> > +                           object_get_typename(obj));
+> > +        }
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +void hmp_info_rdma(Monitor *mon, const QDict *qdict)
+> > +{
+> > +    object_child_foreach_recursive(object_get_root(),
+> > +                                   hmp_info_rdma_foreach, mon);
+> > +}
+> > +
+> >  void hmp_info_pci(Monitor *mon, const QDict *qdict)
+> >  {
+> >      PciInfoList *info_list, *info;
+> > diff --git a/hmp.h b/hmp.h
+> > index 5f1addcca2..666949afc3 100644
+> > --- a/hmp.h
+> > +++ b/hmp.h
+> > @@ -36,6 +36,7 @@ void hmp_info_spice(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_balloon(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_irq(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_pic(Monitor *mon, const QDict *qdict);
+> > +void hmp_info_rdma(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_pci(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_block_jobs(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_tpm(Monitor *mon, const QDict *qdict);
+> 
+> HMP stuff looks good to me.
+> 
+> > diff --git a/hw/rdma/Makefile.objs b/hw/rdma/Makefile.objs
+> > index bd36cbf51c..dd59faff51 100644
+> > --- a/hw/rdma/Makefile.objs
+> > +++ b/hw/rdma/Makefile.objs
+> > @@ -1,5 +1,5 @@
+> >  ifeq ($(CONFIG_PVRDMA),y)
+> > -obj-$(CONFIG_PCI) += rdma_utils.o rdma_backend.o rdma_rm.o
+> > +obj-$(CONFIG_PCI) += rdma_utils.o rdma_backend.o rdma_rm.o rdma_hmp.o
+> >  obj-$(CONFIG_PCI) += vmw/pvrdma_dev_ring.o vmw/pvrdma_cmd.o \
+> >                       vmw/pvrdma_qp_ops.o vmw/pvrdma_main.o
+> >  endif
+> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> > index 9679b842d1..bc2fefcf93 100644
+> > --- a/hw/rdma/rdma_backend.c
+> > +++ b/hw/rdma/rdma_backend.c
+> 
+> The changes to this file look like they're for gathering stats.  The
+> patch would be much simpler to review had you kept the stats gathering
+> separate.  I can only review the HMP / QOM part, and to do that, I have
+> to identify what to ignore.
+> 
+> [...]
+> > diff --git a/hw/rdma/rdma_hmp.c b/hw/rdma/rdma_hmp.c
+> > new file mode 100644
+> > index 0000000000..c5814473c5
+> > --- /dev/null
+> > +++ b/hw/rdma/rdma_hmp.c
+> > @@ -0,0 +1,30 @@
+> > +/*
+> > + * RDMA device: Human Monitor interface
+> 
+> The file name and this comment are a bit akward.  Yes, you create
+> TYPE_RDMA_STATS_PROVIDER for use in HMP info rdma, but there's
+> absolutely nothing HMP-related in this file.  Same for rdma_hmp.h below.
+> 
+> Call them rdma_stats.c and rdma_stats.h?
+> 
+> > + *
+> > + * Copyright (C) 2018 Oracle
+> > + * Copyright (C) 2018 Red Hat Inc
+> > + *
+> > + * Authors:
+> > + *     Yuval Shaia <yuval.shaia@oracle.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> > + * See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "hw/rdma/rdma_hmp.h"
+> > +#include "qemu/module.h"
+> > +
+> > +static const TypeInfo rdma_hmp_info = {
+> > +    .name = TYPE_RDMA_STATS_PROVIDER,
+> > +    .parent = TYPE_INTERFACE,
+> > +    .class_size = sizeof(RdmaStatsProviderClass),
+> > +};
+> > +
+> > +static void rdma_hmp_register_types(void)
+> > +{
+> > +    type_register_static(&rdma_hmp_info);
+> > +}
+> > +
+> > +type_init(rdma_hmp_register_types)
+> 
+> Also rename _hmp_ to _stats_.
+> 
+> > diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> > index 14580ca379..e019de1a14 100644
+> > --- a/hw/rdma/rdma_rm.c
+> > +++ b/hw/rdma/rdma_rm.c
+> > @@ -16,6 +16,7 @@
+> >  #include "qemu/osdep.h"
+> >  #include "qapi/error.h"
+> >  #include "cpu.h"
+> > +#include "monitor/monitor.h"
+> >  
+> >  #include "trace.h"
+> >  #include "rdma_utils.h"
+> > @@ -26,6 +27,58 @@
+> >  #define PG_DIR_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
+> >  #define PG_TBL_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
+> >  
+> > +void rdma_dump_device_counters(Monitor *mon, RdmaDeviceResources *dev_res)
+> > +{
+> > +    monitor_printf(mon, "\ttx               : %" PRId64 "\n",
+> > +                   dev_res->stats.tx);
+> > +    monitor_printf(mon, "\ttx_len           : %" PRId64 "\n",
+> > +                   dev_res->stats.tx_len);
+> > +    monitor_printf(mon, "\ttx_err           : %" PRId64 "\n",
+> > +                   dev_res->stats.tx_err);
+> > +    monitor_printf(mon, "\trx_bufs          : %" PRId64 "\n",
+> > +                   dev_res->stats.rx_bufs);
+> > +    monitor_printf(mon, "\trx_bufs_len      : %" PRId64 "\n",
+> > +                   dev_res->stats.rx_bufs_len);
+> > +    monitor_printf(mon, "\trx_bufs_err      : %" PRId64 "\n",
+> > +                   dev_res->stats.rx_bufs_err);
+> > +    monitor_printf(mon, "\tcomps            : %" PRId64 "\n",
+> > +                   dev_res->stats.completions);
+> > +    monitor_printf(mon, "\tmissing_comps    : %" PRId32 "\n",
+> > +                   dev_res->stats.missing_cqe);
+> > +    monitor_printf(mon, "\tpoll_cq (bk)     : %" PRId64 "\n",
+> > +                   dev_res->stats.poll_cq_from_bk);
+> > +    monitor_printf(mon, "\tpoll_cq_ppoll_to : %" PRId64 "\n",
+> > +                   dev_res->stats.poll_cq_ppoll_to);
+> > +    monitor_printf(mon, "\tpoll_cq (fe)     : %" PRId64 "\n",
+> > +                   dev_res->stats.poll_cq_from_guest);
+> > +    monitor_printf(mon, "\tpoll_cq_empty    : %" PRId64 "\n",
+> > +                   dev_res->stats.poll_cq_from_guest_empty);
+> > +    monitor_printf(mon, "\tmad_tx           : %" PRId64 "\n",
+> > +                   dev_res->stats.mad_tx);
+> > +    monitor_printf(mon, "\tmad_tx_err       : %" PRId64 "\n",
+> > +                   dev_res->stats.mad_tx_err);
+> > +    monitor_printf(mon, "\tmad_rx           : %" PRId64 "\n",
+> > +                   dev_res->stats.mad_rx);
+> > +    monitor_printf(mon, "\tmad_rx_err       : %" PRId64 "\n",
+> > +                   dev_res->stats.mad_rx_err);
+> > +    monitor_printf(mon, "\tmad_rx_bufs      : %" PRId64 "\n",
+> > +                   dev_res->stats.mad_rx_bufs);
+> > +    monitor_printf(mon, "\tmad_rx_bufs_err  : %" PRId64 "\n",
+> > +                   dev_res->stats.mad_rx_bufs_err);
+> > +    monitor_printf(mon, "\tPDs              : %" PRId32 "\n",
+> > +                   dev_res->pd_tbl.used);
+> > +    monitor_printf(mon, "\tMRs              : %" PRId32 "\n",
+> > +                   dev_res->mr_tbl.used);
+> > +    monitor_printf(mon, "\tUCs              : %" PRId32 "\n",
+> > +                   dev_res->uc_tbl.used);
+> > +    monitor_printf(mon, "\tQPs              : %" PRId32 "\n",
+> > +                   dev_res->qp_tbl.used);
+> > +    monitor_printf(mon, "\tCQs              : %" PRId32 "\n",
+> > +                   dev_res->cq_tbl.used);
+> > +    monitor_printf(mon, "\tCEQ_CTXs         : %" PRId32 "\n",
+> > +                   dev_res->cqe_ctx_tbl.used);
+> > +}
+> > +
+> >  static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
+> >                                  uint32_t tbl_sz, uint32_t res_sz)
+> >  {
+> > @@ -37,6 +90,7 @@ static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
+> 
+> More stats gathering, I think.
+> 
+> [...]
+> > diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
+> > index 9ec87d2667..a527d306f6 100644
+> > --- a/hw/rdma/rdma_rm.h
+> > +++ b/hw/rdma/rdma_rm.h
+> > @@ -20,6 +20,7 @@
+> >  #include "rdma_backend_defs.h"
+> >  #include "rdma_rm_defs.h"
+> >  
+> > +void rdma_dump_device_counters(Monitor *mon, RdmaDeviceResources *dev_res);
+> >  int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
+> >                   Error **errp);
+> >  void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+> > diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+> > index f0ee1f3072..4b8d704cfe 100644
+> > --- a/hw/rdma/rdma_rm_defs.h
+> > +++ b/hw/rdma/rdma_rm_defs.h
+> 
+> Still more stats gathering, I think.
+> 
+> [...]
+> > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> > index b6061f4b6e..659331ac93 100644
+> > --- a/hw/rdma/vmw/pvrdma_main.c
+> > +++ b/hw/rdma/vmw/pvrdma_main.c
+> > @@ -25,6 +25,8 @@
+> >  #include "cpu.h"
+> >  #include "trace.h"
+> >  #include "sysemu/sysemu.h"
+> > +#include "monitor/monitor.h"
+> > +#include "hw/rdma/rdma_hmp.h"
+> >  
+> >  #include "../rdma_rm.h"
+> >  #include "../rdma_backend.h"
+> > @@ -55,6 +57,18 @@ static Property pvrdma_dev_properties[] = {
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >  
+> > +static void pvrdma_print_statistics(Monitor *mon, RdmaStatsProvider *obj)
+> > +{
+> > +    PVRDMADev *dev = PVRDMA_DEV(obj);
+> > +    PCIDevice *pdev = PCI_DEVICE(dev);
+> > +
+> > +    monitor_printf(mon, "%s, %x.%x\n", pdev->name, PCI_SLOT(pdev->devfn),
+> > +                   PCI_FUNC(pdev->devfn));
+> > +    monitor_printf(mon, "\tcommands         : %" PRId64 "\n",
+> > +                   dev->stats.commands);
+> > +    rdma_dump_device_counters(mon, &dev->rdma_dev_res);
+> > +}
+> > +
+> >  static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
+> >                            void *ring_state)
+> >  {
+> > @@ -394,6 +408,7 @@ static void pvrdma_regs_write(void *opaque, hwaddr addr, uint64_t val,
+> 
+> Still more stats gathering, I think.
+> 
+> [...]
+> > @@ -631,6 +648,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
+> >  {
+> >      DeviceClass *dc = DEVICE_CLASS(klass);
+> >      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> > +    RdmaStatsProviderClass *ir = RDMA_STATS_PROVIDER_CLASS(klass);
+> >  
+> >      k->realize = pvrdma_realize;
+> >      k->exit = pvrdma_exit;
+> > @@ -642,6 +660,8 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
+> >      dc->desc = "RDMA Device";
+> >      dc->props = pvrdma_dev_properties;
+> >      set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+> > +
+> > +    ir->print_statistics = pvrdma_print_statistics;
+> >  }
+> >  
+> >  static const TypeInfo pvrdma_info = {
+> > @@ -651,6 +671,7 @@ static const TypeInfo pvrdma_info = {
+> >      .class_init = pvrdma_class_init,
+> >      .interfaces = (InterfaceInfo[]) {
+> >          { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> > +        { TYPE_RDMA_STATS_PROVIDER },
+> 
+> We use INTERFACE_ rather than TYPE_ for some, but not all interfaces.
+> You follow TYPE_INTERRUPT_STATS_PROVIDER precedence.  We suck.  Not your
+> problem to solve.
+> 
+> >          { }
+> >      }
+> >  };
+> > diff --git a/include/hw/rdma/rdma_hmp.h b/include/hw/rdma/rdma_hmp.h
+> > new file mode 100644
+> > index 0000000000..dd23f2bc84
+> > --- /dev/null
+> > +++ b/include/hw/rdma/rdma_hmp.h
+> > @@ -0,0 +1,40 @@
+> > +/*
+> > + * RDMA device: Human Monitor interface
+> > + *
+> > + * Copyright (C) 2019 Oracle
+> > + * Copyright (C) 2019 Red Hat Inc
+> > + *
+> > + * Authors:
+> > + *     Yuval Shaia <yuval.shaia@oracle.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> > + * See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#ifndef RDMA_HMP_H
+> > +#define RDMA_HMP_H
+> > +
+> > +#include "qom/object.h"
+> > +
+> > +#define TYPE_RDMA_STATS_PROVIDER "rdma"
+> > +
+> > +#define RDMA_STATS_PROVIDER_CLASS(klass) \
+> > +    OBJECT_CLASS_CHECK(RdmaStatsProviderClass, (klass), \
+> > +                       TYPE_RDMA_STATS_PROVIDER)
+> > +#define RDMA_STATS_PROVIDER_GET_CLASS(obj) \
+> > +    OBJECT_GET_CLASS(RdmaStatsProviderClass, (obj), \
+> > +                     TYPE_RDMA_STATS_PROVIDER)
+> > +#define RDMA_STATS_PROVIDER(obj) \
+> > +    INTERFACE_CHECK(RdmaStatsProvider, (obj), \
+> > +                    TYPE_RDMA_STATS_PROVIDER)
+> > +
+> > +typedef struct RdmaStatsProvider RdmaStatsProvider;
+> > +
+> > +typedef struct RdmaStatsProviderClass {
+> > +    InterfaceClass parent;
+> > +
+> > +    void (*print_statistics)(Monitor *mon, RdmaStatsProvider *obj);
+> > +} RdmaStatsProviderClass;
+> > +
+> > +#endif
+> 
+> I think using QOM to find the RDMA devices came out rather nicely.
+> Thanks for giving it a try.
+> 
+> Please consider the renames I recommended.
 
-Sorry for taking so long to reply.  I was away from work for a
-few weeks and I'm still catching up on old threads.  Reply below:
-
-On Tue, Jan 29, 2019 at 04:55:20PM +0800, Tao Xu wrote:
-> On 1/28/2019 10:48 PM, Eduardo Habkost wrote:
-> > On Mon, Jan 28, 2019 at 04:33:40PM +0800, Tao Xu wrote:
-> > > On 1/24/2019 3:15 AM, Eduardo Habkost wrote:
-> > > > On Mon, Jan 21, 2019 at 05:29:32PM +0800, Tao Xu wrote:
-> > > > > On 1/15/2019 2:35 AM, Eduardo Habkost wrote:
-> > > > > > Sorry, we do have a problem here:
-> > > > > > 
-> > > > > > On Thu, Dec 27, 2018 at 10:43:04AM +0800, Tao Xu wrote:
-> > > > > > [...]
-> > > > > > >     #define PC_COMPAT_3_0 \
-> > > > > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > > > > > index 09706ad51a..5296c73cd5 100644
-> > > > > > > --- a/target/i386/cpu.c
-> > > > > > > +++ b/target/i386/cpu.c
-> > > > > > > @@ -2499,7 +2499,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-> > > > > > >                 CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
-> > > > > > >                 CPUID_7_0_ECX_AVX512VNNI,
-> > > > > > >             .features[FEAT_7_0_EDX] =
-> > > > > > > -            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-> > > > > > > +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
-> > > > > > > +            CPUID_7_0_EDX_ARCH_CAPABILITIES,
-> > > > > > 
-> > > > > > CPUID_7_0_EDX_ARCH_CAPABILITIES is still set on
-> > > > > > unmigratable_flags.  We need to make it migratable before adding
-> > > > > > it by default to a named CPU model.
-> > > > > > 
-> > > > > Hi Eduardo,
-> > > > > 
-> > > > > Do you mean I need to remove CPUID_7_0_EDX_ARCH_CAPABILITIES
-> > > > > from .migratable_flags? Or CPUID_7_0_EDX_ARCH_CAPABILITIES can not
-> > > > > support migration now?
-> > > > 
-> > > > We need to remove it from .unmigratable_flags, but only after
-> > > > confirm it is really migration-safe.  To make it migration-safe,
-> > > > the MSR value seen by the guest must have a predictable value
-> > > > that is 100% independent from host hardware or host software
-> > > > version.
-> > > > 
-> > > > This is easy to ensure if MSR_IA32_ARCH_CAPABILITIES is in
-> > > > KVM_GET_MSR_INDEX_LIST (meaning QEMU can actually configure the
-> > > > MSR value seen by the guest).  If MSR_IA32_ARCH_CAPABILITIES is
-> > > > not on KVM_GET_MSR_INDEX_LIST, arch-capabilities must not be
-> > > > returned by x86_cpu_get_supported_feature_word() when
-> > > > migratable_only is true.
-> > > > 
-> > > Thank you. I have seen your patch to migratable it:
-> > > 
-> > > [PATCH 0/2] i386: arch_capabilities fixes + migratability
-> > > http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg06701.html
-> > > 
-> > > So now can arch-capabilities and features exposed by it be added in
-> > > Cascadelake CPU model? Because Cascadelake CPU model can support it in
-> > > hardware. And for Icelake CPU model, Robert will add in the future.
-> > 
-> > Even if there's host hardware support for the MSR, the feature
-> > still depends on a KVM commit added in Linux v6.16 (commit
-                                                  ^^^^
-
-Sorry, I meant "4.16" above.
-
-> > 28c1c9fabf48 "KVM/VMX: Emulate MSR_IA32_ARCH_CAPABILITIES").  We
-> > would still have the kernel version dependency described below.
-> > 
-> Sorry, we are still confused about it. I read the kernel commit 28c1c9fabf48
-> again. This commit indeed enabling ARCH_CAPABILITIES and emulate it in the
-> platform which doesn't support it in hardware. But with your patch, the
-> ARCH_CAPABILITIES is like other CPU new features. When the guest start up
-> with old host kernel, it will just warning "warning: host doesn't support
-> requested feature...". Beside the warnings, will this has other further
-> problems?
-
-This is not a harmless warning if you need live migration.  Any
-management software that supports live migration must ensure the
-chosen CPU model is fully supported by the host (by using
-query-cpu-* commands or using the "enforce" flag), and existing
-VM configurations using Cascadelake CPU model would stop running
-on < v4.16 hosts if Cascadelake starts requiring
-arch-capabilities.
-
-> And other feature will have the same problem?
-
-We had similar issues with other features, and we have tried
-different solutions:
-
-SPEC_CTRL requires a host microcode update + Linux >= v4.16, and
-we have added new CPU models for it (the -IBRS variants).
-
-Some Opteron CPU models didn't have RDTSCP, and the feature
-requires Linux >= v4.5.  We could add RDTSCP to the existing CPU
-models because we documented the minimum host kernel version on
-qemu-doc.texi.
-
-SSBD requires a host microcode update + Linux >= v4.17.  We
-decided to not add new -SSBD CPU models, and let management
-software enable the flag when it knows it's safe.
-
+Will do, it perfectly make sense.
 
 > 
-> I am sorry for so many questions and this is really a tricky issue. Indeed,
-> the versioned CPU model will solve the problem of user using the old version
-> of kernel. But maybe it will have a long time to in-placement.
-> 
+> Acked-by: Markus Armbruster <armbru@redhat.com>
 
-It's too late to implement that in QEMU 4.0, but we could aim to
-do it in 4.1.
-
-Note that this doesn't block people from using the feature.  The
-features above are already enabled automatically by management
-software using libvirt's "host-model" mode.  Versioned CPU models
-will just make things more convenient for management software and
-people running QEMU from the command-line.
-
-
--- 
-Eduardo
+Thanks.
