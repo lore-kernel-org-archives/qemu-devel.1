@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37622)
+Received: from eggs.gnu.org ([209.51.188.92]:37786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h2Bh3-0007fX-Bc
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:21:30 -0500
+	(envelope-from <lersek@redhat.com>) id 1h2Bi7-0000Bo-T2
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:22:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h2Bh0-0003Nw-SL
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:21:29 -0500
-Date: Fri, 8 Mar 2019 10:21:20 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190308102120.14051cc2.cohuck@redhat.com>
-In-Reply-To: <5cf175cf-892c-d909-f832-127bf3f4747a@linux.ibm.com>
-References: <1551466776-29123-1-git-send-email-jjherne@linux.ibm.com>
-	<1551466776-29123-12-git-send-email-jjherne@linux.ibm.com>
-	<20190304193509.5eae1b41.cohuck@redhat.com>
-	<5cf175cf-892c-d909-f832-127bf3f4747a@linux.ibm.com>
+	(envelope-from <lersek@redhat.com>) id 1h2Bi6-0004hl-Kx
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:22:35 -0500
+References: <20190308013222.12524-1-philmd@redhat.com>
+	<20190308013222.12524-3-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <0d347de2-ad47-d71c-764f-f10d449f5510@redhat.com>
+Date: Fri, 8 Mar 2019 10:22:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 11/16] s390-bios: cio error handling
+In-Reply-To: <20190308013222.12524-3-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/18] hw/i386: Remove unused include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,122 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-On Thu, 7 Mar 2019 14:31:23 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+On 03/08/19 02:32, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> v2: Drop files that do use fw_cfg (Michael):
+> - hw/i386/acpi-build.c
+> - hw/i386/pc.c
+> ---
+>  hw/acpi/piix4.c | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 8fd25a5926..7b98121070 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -28,7 +28,6 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qapi/error.h"
+>  #include "qemu/range.h"
+> -#include "hw/nvram/fw_cfg.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/acpi/piix4.h"
+>  #include "hw/acpi/pcihp.h"
+>=20
 
-> On 3/4/19 1:35 PM, Cornelia Huck wrote:
-> > On Fri,  1 Mar 2019 13:59:31 -0500
-> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-> >   
-> >> Add verbose error output for when unexpected i/o errors happen. This eases the
-> >> burden of debugging and reporting i/o errors. No error information is printed
-> >> in the success case, here is an example of what is output on error:
-> >>
-> >> cio device error
-> >>    ssid  : 0x0000000000000000
-> >>    cssid : 0x0000000000000000
-> >>    sch_no: 0x0000000000000000
-> >>
-> >> Interrupt Response Block Data:
-> >>      Function Ctrl : [Start]
-> >>      Activity Ctrl : [Start-Pending]
-> >>      Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
-> >>      Device Status : [Unit-Check]
-> >>      Channel Status :
-> >>      cpa=: 0x000000007f8d6038
-> >>      prev_ccw=: 0x0000000000000000
-> >>      this_ccw=: 0x0000000000000000
-> >> Eckd Dasd Sense Data (fmt 32-bytes):
-> >>      Sense Condition Flags :
-> >>      Residual Count     =: 0x0000000000000000
-> >>      Phys Drive ID      =: 0x000000000000009e
-> >>      low cyl address    =: 0x0000000000000000
-> >>      head addr & hi cyl =: 0x0000000000000000
-> >>      format/message     =: 0x0000000000000008
-> >>      fmt-dependent[0-7] =: 0x0000000000000004
-> >>      fmt-dependent[8-15]=: 0xe561282305082fff
-> >>      prog action code   =: 0x0000000000000016
-> >>      Configuration info =: 0x00000000000040e0
-> >>      mcode / hi-cyl     =: 0x0000000000000000
-> >>      cyl & head addr [0]=: 0x0000000000000000
-> >>      cyl & head addr [1]=: 0x0000000000000000
-> >>      cyl & head addr [2]=: 0x0000000000000000
-> >>
-> >> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> >> ---
-> >>   pc-bios/s390-ccw/cio.c  | 230 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >>   pc-bios/s390-ccw/libc.h |  11 +++
-> >>   2 files changed, 241 insertions(+)
-> >>
-> >> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
-> >> index e61cfd3..c528bbf 100644
-> >> --- a/pc-bios/s390-ccw/cio.c
-> >> +++ b/pc-bios/s390-ccw/cio.c
-> >> @@ -82,6 +82,228 @@ static bool irb_error(Irb *irb)
-> >>       return irb->scsw.dstat != (SCSW_DSTAT_DEVEND | SCSW_DSTAT_CHEND);
-> >>   }
-> >>   
-> >> +static void print_eckd_dasd_sense_data(SenseDataEckdDasd *sd)
-> >> +{
-> >> +    char msgline[512];
-> >> +
-> >> +    if (sd->config_info & 0x8000) {
-> >> +        sclp_print("Eckd Dasd Sense Data (fmt 24-bytes):\n");
-> >> +    } else {
-> >> +        sclp_print("Eckd Dasd Sense Data (fmt 32-bytes):\n");
-> >> +    }
-> >> +
-> >> +    strcat(msgline, "    Sense Condition Flags :");
-> >> +    if (sd->status[0] & SNS_STAT0_CMD_REJECT) {
-> >> +        strcat(msgline, " [Cmd-Reject]");
-> >> +    }
-> >> +    if (sd->status[0] & SNS_STAT0_INTERVENTION_REQ) {
-> >> +        strcat(msgline, " [Intervention-Required]");
-> >> +    }
-> >> +    if (sd->status[0] & SNS_STAT0_BUS_OUT_CHECK) {
-> >> +        strcat(msgline, " [Bus-Out-Parity-Check]");
-> >> +    }
-> >> +    if (sd->status[0] & SNS_STAT0_EQUIPMENT_CHECK) {
-> >> +        strcat(msgline, " [Equipment-Check]");
-> >> +    }
-> >> +    if (sd->status[0] & SNS_STAT0_DATA_CHECK) {
-> >> +        strcat(msgline, " [Data-Check]");  
-> > 
-> > I'm wondering whether it would make sense to factor the common bits
-> > out. Might be overkill, though.
-> >   
-> 
-> I'm not huge fan of this error code myself. It looks nice in output and may be useful for 
-> debugging which is why I decided to submit it. I did think about ways to make it look 
-> cleaner but didn't come up with anything great. I'd be open to suggestions, but I also 
-> think going too deep is overkill.
-> 
-> ...
-> > Maybe do basic_sense + print sense data only if there's actually a unit
-> > check?
-> > 
-> > (Also, I'm not sure if you can even do a basic_sense in case e.g. of
-> > unexpected busy.)
-> >   
-> >> +        basic_sense(schid, &sd, sizeof(sd));
-> >> +        print_eckd_dasd_sense_data(&sd);
-> >>           rc = -1;
-> >>           break;
-> >>       }  
-> 
-> I've made a change that should address both issues. Preview:
-> 
->          if (cutype == CU_TYPE_DASD_3990 || cutype == CU_TYPE_UNKNOWN) {
->              if (!basic_sense(schid, cutype, &sd, sizeof(sd))) {
->                  print_eckd_dasd_sense_data(&sd);
->              }
->          }
-> 
-> Now we only print sense data if basic sense works. So if it fails because of a busy status 
-> (or any reason) we won't try to print.
-> 
-
-Sounds good!
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
