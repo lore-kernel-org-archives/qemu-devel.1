@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55204)
+Received: from eggs.gnu.org ([209.51.188.92]:55303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2GSf-000739-CP
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:27:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2GT1-0007Fh-1E
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:27:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2GSe-0003EA-Ke
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:26:57 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2GSe-0002xn-ES
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:26:56 -0500
-Received: by mail-wm1-f67.google.com with SMTP id g20so12463084wmh.5
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 06:26:53 -0800 (PST)
-References: <20190308062455.29755-1-armbru@redhat.com>
-	<481d398a-e26c-6c0a-20b7-7466ae1ebf1f@redhat.com>
-	<875zsteeih.fsf@dusky.pond.sub.org>
-	<20190308133510.GC31583@localhost.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <952775a8-3736-320a-9f4a-1b3ec396e208@redhat.com>
-Date: Fri, 8 Mar 2019 15:26:51 +0100
+	(envelope-from <armbru@redhat.com>) id 1h2GT0-0004ve-6q
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:27:19 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190307130323.9353-1-armbru@redhat.com>
+	<20190307130323.9353-7-armbru@redhat.com>
+	<a8a862f1-1f1e-818a-2ac6-bd54375c4dc3@redhat.com>
+Date: Fri, 08 Mar 2019 15:27:05 +0100
+In-Reply-To: <a8a862f1-1f1e-818a-2ac6-bd54375c4dc3@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri, 8 Mar 2019 15:04:28
+	+0100")
+Message-ID: <87wol9bfwm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190308133510.GC31583@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7] pflash: Require backend size to match
- device, improve errors
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 06/14] sam460ex: Don't size flash memory
+ to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, alex.bennee@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-On 3/8/19 2:35 PM, Kevin Wolf wrote:
-> Am 08.03.2019 um 13:28 hat Markus Armbruster geschrieben:
->> Laszlo Ersek <lersek@redhat.com> writes:
->>> This one has got to be one of the longest bike-shedding sessions! :)
->>>
->>> I'm fine with this patch, but I could suggest two improvements.
->>>
->>> (1) When blk_getlength() fails, we could format the negative error code
->>> returned by it into the error message.
->>
->> I can do that.
-> 
-> By using error_setg_errno(), I assume. Not throwing away error details
-> is always good.
-> 
->>> (2) We could extract the common code to a new function in
->>> "hw/block/block.c". (It says "Common code for block device models" on
->>> the tin.)
->>
->> There's so much common code in these two files even before this patch...
-> 
-> My understanding is that hw/block/block.c contains code that is
-> potentially useful to all kinds of block devices, not random code that
-> two specific similar devices happen to share.
-> 
-> If we want to deduplicate some code in the flash devices, without any
-> expectation that other devices will use it at some point, I'd rather
-> create a new source file hw/block/pflash_common.c or something like
-> that.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Agreed, I like that suggestion too.
-Actually we already have been talking about a such
-cleanup/refactor/rewrite with Markus, but this will wait the next QEMU
-dev cycle.
+> On 3/7/19 2:03 PM, Markus Armbruster wrote:
+>> Machine "sam460ex" maps its flash memory at address 0xFFF00000.  When
+>> no image is supplied, its size is 1MiB (0x100000), and 512KiB of ROM
+>> get mapped on top of its second half.  Else, it's the size of the
+>> image rounded up to the next multiple of 64KiB.
+>>=20
+>> The rounding is actually useless: pflash_cfi01_realize() fails with
+>> "failed to read the initial flash content" unless it's a no-op.
+>>=20
+>> I have no idea what happens when the pflash's size exceeds 1MiB.
+>> Useful outcomes seem unlikely.
+>
+> You now have! [*] "Hardwiring address lines leaves part of the hardware
+> unaddressable." Anything bigger than 1MiB mapped at 0xFFF00000 only has
+> the first MiB addressable. IOW anything above 1MiB is unaddressable, but
+> you still can map a such bigger flash.
+>
+> [*] https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg01380.html
+
+Well, that's what would happen with real hardware.  But this device
+model doesn't actually model address lines.  It simply asks
+pflash_cfi01_register() to map blk_getlength() bytes at the base
+address.  If you ask it to map gigabytes, it'll happily do so (as long
+as malloc plays along).
