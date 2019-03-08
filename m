@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45615)
+Received: from eggs.gnu.org ([209.51.188.92]:45596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h2CDS-0000x7-Ly
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:54:59 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h2CDR-0006Vv-U4
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h2CDS-0000wi-4N
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:54:58 -0500
-Received: from mail.uni-paderborn.de ([131.234.142.9]:49544)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1h2CDR-0006VK-5E
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:54:58 -0500
+Received: from mail.uni-paderborn.de ([131.234.142.9]:49520)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1h2CDR-0006V5-Lg
+	id 1h2CDQ-0006T6-6x
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:54:57 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri,  8 Mar 2019 10:54:33 +0100
-Message-Id: <20190308095433.12116-3-kbastian@mail.uni-paderborn.de>
-In-Reply-To: <20190308095433.12116-1-kbastian@mail.uni-paderborn.de>
-References: <20190308095433.12116-1-kbastian@mail.uni-paderborn.de>
+Date: Fri,  8 Mar 2019 10:54:31 +0100
+Message-Id: <20190308095433.12116-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 2/2] tricore: fixed RCR_CADDN instruction
+Subject: [Qemu-devel] [PULL 0/2] tricore patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +27,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david.brenken@efs-auto.de, christian.richter@efs-auto.de, georg.hofstetter@efs-auto.de, robert.rasche@efs-auto.de, lars.biermanski@efs-auto.de
 
-From: David Brenken <david.brenken@efs-auto.de>
+The following changes since commit 6cb4f6db4f4367faa33da85b15f75bbbd2bed2a6:
 
-Signed-off-by: Christian Richter <christian.richter@efs-auto.de>
-Signed-off-by: David Brenken <david.brenken@efs-auto.de>
-Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
-Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
-Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
+  Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-request' into staging (2019-03-07 16:16:02 +0000)
 
-Message-Id: <20190207073928.4048-3-david.brenken@efs-auto.org>
-Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
----
- target/tricore/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+are available in the Git repository at:
 
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index 5846f95316..b12c391be5 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -5871,8 +5871,8 @@ static void decode_rcr_cond_select(CPUTriCoreState *env, DisasContext *ctx)
-                       cpu_gpr_d[r3]);
-         break;
-     case OPC2_32_RCR_CADDN:
--        gen_condi_add(TCG_COND_EQ, cpu_gpr_d[r1], const9, cpu_gpr_d[r3],
--                      cpu_gpr_d[r4]);
-+        gen_condi_add(TCG_COND_EQ, cpu_gpr_d[r1], const9, cpu_gpr_d[r4],
-+                      cpu_gpr_d[r3]);
-         break;
-     case OPC2_32_RCR_SEL:
-         temp = tcg_const_i32(0);
+  https://github.com/bkoppelmann/qemu-tricore-upstream.git tags/pull-tricore-2019-03-08
+
+for you to fetch changes up to d1c1d88ce6fd768cb98cd7af81b1b23ac9fe168d:
+
+  tricore: fixed RCR_CADDN instruction (2019-03-08 10:00:59 +0100)
+
+----------------------------------------------------------------
+Fixes mixed up operands in CADDN and CADD
+
+----------------------------------------------------------------
+David Brenken (2):
+      tricore: fixed RCR_CADD instruction
+      tricore: fixed RCR_CADDN instruction
+
+ target/tricore/translate.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 -- 
 2.21.0
