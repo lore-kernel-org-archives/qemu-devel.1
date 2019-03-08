@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41712)
+Received: from eggs.gnu.org ([209.51.188.92]:43140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h29rb-0002Bq-19
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:24:15 -0500
+	(envelope-from <kraxel@redhat.com>) id 1h29zK-0004ob-Nl
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:32:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h29ra-00053H-7o
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:24:15 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190307130323.9353-1-armbru@redhat.com>
-	<20190307130323.9353-8-armbru@redhat.com>
-	<20190308001032.GF7722@umbus.fritz.box>
-Date: Fri, 08 Mar 2019 08:24:04 +0100
-In-Reply-To: <20190308001032.GF7722@umbus.fritz.box> (David Gibson's message
-	of "Fri, 8 Mar 2019 11:10:32 +1100")
-Message-ID: <874l8dj0bv.fsf@dusky.pond.sub.org>
+	(envelope-from <kraxel@redhat.com>) id 1h29zJ-0002Ib-TA
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:32:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h29zI-0002Hg-Rb
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:32:12 -0500
+Date: Fri, 8 Mar 2019 08:32:06 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190308073206.qd3efvlxgeos45np@sirius.home.kraxel.org>
+References: <cover.1551902740.git.balaton@eik.bme.hu>
+	<12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
+	<c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 07/14] ppc405_boards: Don't size flash
- memory to match backing image
+Subject: Re: [Qemu-devel] [PATCH v5-resend 2/2] mips_fulong2e: Add on-board
+ graphics chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Markus Armbruster <armbru@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+On Thu, Mar 07, 2019 at 01:32:41AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 3/6/19 9:05 PM, BALATON Zoltan wrote:
+> > Add (partial) emulation of the on-board GPU of the machine. This
+> > allows the PMON2000 firmware to run and should also work with Linux
+> > console but probably not with X yet.
+> >=20
+> > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> Mojibaked again :(
 
-> On Thu, Mar 07, 2019 at 02:03:16PM +0100, Markus Armbruster wrote:
->> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
->> Image size is rounded up to the next multiple of 64KiB.  Useless,
->> because pflash_cfi02_realize() fails with "failed to read the initial
->> flash content" unless the rounding is a no-op.
->>=20
->> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
->> other stuff.  No idea how that would play out, but useful outcomes
->> seem unlikely.
->>=20
->> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
->> regardless of image size, to match the physical hardware.
->>=20
->> Machine "taihu" maps its boot flash memory similarly.  The code even
->> has a comment /* XXX: should check that size is 2MB */, followed by
->> disabled code to adjust the size to 2MiB regardless of image size.
->>=20
->> Its code to map its application flash memory looks the same, except
->> there the XXX comment asks for 32MiB, and the code to adjust the size
->> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
->> to read the initial flash content" for images smaller than 32MiB.
->>=20
->> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
->> to match the physical hardware.  Delete dead code from application
->> flash mapping, and simplify some.
->>=20
->> Cc: David Gibson <david@gibson.dropbear.id.au>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> Acked-by: David Gibson <david@gibson.dropbear.id.au>
->> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> I'm assuming because this is in a series I'm not otherwise CCed on
-> that this is going in through someone else's tree.  Let me know if you
-> want me take it through mine.
+Mail was sent without Content-Type: header.  Both mutt and "git am" on
+my machine assume utf-8 and everything looks fine.  I guess your mail
+client assumes something else ...
 
-I intend to take the complete series through my tree unless a maintainer
-objects.
+"git send-email" should send the patches with correct headers, it even
+asks for the charset it should use in case it finds non-ascii
+characters.  So BALATON, could you check your mail client config, or
+switch over to "git send-email" for submitting patches?
+
+cheers,
+  Gerd
