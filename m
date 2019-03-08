@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42241)
+Received: from eggs.gnu.org ([209.51.188.92]:42244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h240N-0006F8-FM
+	(envelope-from <dgibson@ozlabs.org>) id 1h240N-0006FA-GW
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h240J-0000zM-Td
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:53 -0500
-Date: Fri, 8 Mar 2019 11:33:35 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1h240K-0000zt-BL
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:54 -0500
+Date: Fri, 8 Mar 2019 11:58:35 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190308003335.GP7722@umbus.fritz.box>
+Message-ID: <20190308005835.GR7722@umbus.fritz.box>
 References: <20190307223548.20516-1-clg@kaod.org>
-	<20190307223548.20516-13-clg@kaod.org>
+	<20190307223548.20516-15-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="MOLI6A2k/lnHENyK"
+	protocol="application/pgp-signature"; boundary="bpNGSkw8ExqLHKDe"
 Content-Disposition: inline
-In-Reply-To: <20190307223548.20516-13-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 12/15] ppc/pnv: activate XSCOM tests for
- POWER9
+In-Reply-To: <20190307223548.20516-15-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 14/15] ppc/pnv: add a "ibm,
+ opal/power-mgt" device tree node on POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +29,62 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---MOLI6A2k/lnHENyK
+--bpNGSkw8ExqLHKDe
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 07, 2019 at 11:35:45PM +0100, C=E9dric Le Goater wrote:
-> We now have enough support to let the XSCOM test run on POWER9.
+On Thu, Mar 07, 2019 at 11:35:47PM +0100, C=E9dric Le Goater wrote:
+> Activate only stop0 and stop1 levels. We should not need more levels
+> when under QEMU.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Applied, thanks.
+Applied, although..
 
 > ---
->  tests/pnv-xscom-test.c | 2 --
->  1 file changed, 2 deletions(-)
+>  hw/ppc/pnv.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 >=20
-> diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
-> index 974f8da5b240..63d464048d53 100644
-> --- a/tests/pnv-xscom-test.c
-> +++ b/tests/pnv-xscom-test.c
-> @@ -39,7 +39,6 @@ static const PnvChip pnv_chips[] =3D {
->          .cfam_id    =3D 0x120d304980000000ull,
->          .first_core =3D 0x1,
->      },
-> -#if 0 /* POWER9 support is not ready yet */
->      {
->          .chip_type  =3D PNV_CHIP_POWER9,
->          .cpu_model  =3D "POWER9",
-> @@ -47,7 +46,6 @@ static const PnvChip pnv_chips[] =3D {
->          .cfam_id    =3D 0x220d104900008000ull,
->          .first_core =3D 0x0,
->      },
-> -#endif
->  };
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index e68d419203e8..8be4d4cbf785 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -438,6 +438,16 @@ static void pnv_dt_isa(PnvMachineState *pnv, void *f=
+dt)
+>                         &args);
+>  }
 > =20
->  static uint64_t pnv_xscom_addr(const PnvChip *chip, uint32_t pcba)
+> +static void pnv_dt_power_mgt(void *fdt)
+> +{
+> +    int off;
+> +
+> +    off =3D fdt_add_subnode(fdt, 0, "ibm,opal");
+> +    off =3D fdt_add_subnode(fdt, off, "power-mgt");
+> +
+> +    _FDT(fdt_setprop_cell(fdt, off, "ibm,enabled-stop-levels", 0xc000000=
+0));
+> +}
+> +
+>  static void *pnv_dt_create(MachineState *machine)
+>  {
+>      const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
+> @@ -493,6 +503,11 @@ static void *pnv_dt_create(MachineState *machine)
+>          pnv_dt_bmc_sensors(pnv->bmc, fdt);
+>      }
+> =20
+> +    /* Create an extra node for power management on Power9 */
+> +    if (pnv_is_power9(pnv)) {
+
+=2E. as always, I think specific code calling generic helpers is a
+better pattern than generic code conditionally calling specific details.
+
+> +        pnv_dt_power_mgt(fdt);
+> +    }
+> +
+>      return fdt;
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -72,24 +92,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---MOLI6A2k/lnHENyK
+--bpNGSkw8ExqLHKDe
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyBuF4ACgkQbDjKyiDZ
-s5KHwA/9EoP3S66WqEPWewuNDPiecUUJPKZm4+W6+CCGTei0P8/7jGHR6zAuzW9M
-Vn6BCXnrjs1MA8ZgWUQBRJmK7WFy77ZNq6DwFyg6dXRscvb2NWrr/NHcwkP/0s5L
-m+aQybk5hN31MYNepGCCyQuEanPNJ99wvEiWx2JkeSE6Hc1oCujZxEiKjqcgzsda
-e2bOz88fTSGWROq4NUrxMJ0snow2crEftbeRl7/mkEjMjrBzG+uIUDmQjhcpQLhT
-cRJ5OsGdXeVqHI92gLPijo74X2cwu6utbbMBujJ2CwL/dRksdLFlH/8WdI4poUwJ
-HLgGr1sJi1U1vBKX2BwoHhw6425xOhY1aIMoMrP0FUt2V03x/L/Y1QRcLuo8qALL
-mfHq48mv5ih2+4XhpXB7g7OmnD9pD1ErJlaW7Encj1+lskJKuUtE/bHGcAVhO5MX
-KwyQfE0a7dgT6zFfhpJgW6QQqG/2oP05UDHJhqrN4eLLeelhWYhGRhnrt6xVP87z
-9GRqFUEOHcLOzoezBL0girLmfj4nC4WO3nblRXa2kF60BbaxHLJoqihCofrkZc2X
-JyZhdaxxx2vHtc/0VFVaTgvUhFxz/9w97gtQNHEeqiQwFmTMQN0j1S0cFIEwaC4P
-ltMU7BAPxhZEzsmWGpq+Nv7DFd3LTx8+xmnGfNFA968s/JmNg0U=
-=ShVF
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyBvjsACgkQbDjKyiDZ
+s5J/LBAA2/iG4A3JVjY70w2g9/7l6IHOU2fS1bGf6HAOC5mdZsO3a2proWvj8Oky
+/QZmh9WRCmTpd0MwK/eG6E50q7pJRyCvlU4lAJpnE39FFNVJgXKarebrpQouNmHR
+298bh7NozI1pYlkJ4JxvBhvxwevsRai4mpA6woI+m+yKDu/C/l9psbhq2saz1n/+
+5enrApEeInpuEGS07ffGMra5dpQd8tVO9tLAG9UilDEodIHp+E5h06k4oV4tnW7/
+GZXfG/scyZnbnyYy4L9/vz5OiKGiHDv2eXm+CNwyaRKnTsjU1lo5OcuY0iCYtXh1
+pTFtVtboXUEbXKn9oLe8DEh+6a2XiWwXo8mpgBVc2A9l3kVrGWnkRks6Us/8Ug2s
+s7CaorxdPOeAARKzmMPJh28ExQ/sm2SR7P7vggEDetJL31LdShZbNtFlX3fwYBbg
+5cqGGmOvdJ05qjMH2e+RBU3xSQjVCJteML83KMD208fborCHIzKisMabYYSApwW+
+3AbC1+lCL+KDOqzTnBI0nOzwxVQPWdF8rwSY9OETYHEXNnbaqQTb9XXD+jbhTLCx
+TVsW8FuDhs4LcNF3l2f2C+0wkBafCR+z8dOn8BCuDGqzhdQx0smaV7sZqbNl9h4x
+IpsgqWi1Hrxd/3Y5Y1J0O8y7TmkfXRxY2hC0aBkdTSjxRW4vUAc=
+=/Rek
 -----END PGP SIGNATURE-----
 
---MOLI6A2k/lnHENyK--
+--bpNGSkw8ExqLHKDe--
