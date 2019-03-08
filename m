@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45064)
+Received: from eggs.gnu.org ([209.51.188.92]:45243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1h2HkO-00056A-Ud
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:49:21 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h2HlT-0005xm-7Z
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1h2HkO-000895-1G
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:49:20 -0500
-From: Sergio Lopez <slp@redhat.com>
-Date: Fri,  8 Mar 2019 16:48:53 +0100
-Message-Id: <20190308154852.26308-1-slp@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1h2HlP-0001KE-2Z
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:50:25 -0500
+Date: Fri, 8 Mar 2019 15:49:28 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190308154927.GA2834@work-vm>
+References: <20190308013222.12524-1-philmd@redhat.com>
+	<20190308013222.12524-15-philmd@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190308013222.12524-15-philmd@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] mirror: Confirm we're quiesced only if the
- job is paused or cancelled
+Subject: Re: [Qemu-devel] [PATCH v2 14/18] hw/nvram/fw_cfg: Add HMP 'info
+ fw_cfg' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,116 +25,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Sergio Lopez <slp@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-While child_job_drained_begin() calls to job_pause(), the job doesn't
-actually transition between states until it runs again and reaches a
-pause point. This means bdrv_drained_begin() may return with some jobs
-using the node still having 'busy =3D=3D true'.
+* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> When debugging a paravirtualized guest firmware, it results very
+> useful to dump the fw_cfg table.
+> Add a HMP command which displays the most useful fields.
+> We display each fw_cfg item data in hexadecimal (only the first 8
+> bytes):
+>=20
+> $ (echo info fw_cfg; echo q) | qemu-system-x86_64 -S -monitor stdio
+> (qemu) info fw_cfg
+> Selector  Well-Known Key  Pathname ArchSpec Perm   Size Order Hex Data
+>  0x0000   signature                          RO       4       51454d55
+>  0x0001   id                                 RO       4       03000000
+>  0x0002   uuid                               RO      16       000000000=
+0000000..
+>  0x0003   ram_size                           RO       8       000000080=
+0000000
+>  0x0004   nographic                          RO       2       0000
+>  0x0005   nb_cpus                            RO       2       0100
+>  0x000d   numa                               RO      16       000000000=
+0000000..
+>  0x000e   boot_menu                          RO       2       0000
+>  0x000f   max_cpus                           RO       2       0100
+>  0x0019   file_dir                           RO    2052       0000000b0=
+0000000..
+>  0x0021   file: etc/acpi/rsdp                RO      20  160  525344205=
+0545220..
+>  0x0022   file: etc/acpi/tables              RO  131072  130  464143534=
+0000000..
+>  0x0023   file: etc/boot-fail-wait           RO       4   15  ffffffff
+>  0x0024   file: etc/e820                     RO      20   40  000000000=
+0000000..
+>  0x0025   file: etc/smbios/smbios-anchor     RO      31   30  5f534d5f0=
+01f0208..
+>  0x0026   file: etc/smbios/smbios-tables     RO     321   20  011b00010=
+1020300..
+>  0x0027   file: etc/system-states            RO       6   90  800000818=
+280
+>  0x0028   file: etc/table-loader             RO    4096  140  010000006=
+574632f..
+>  0x002a   file: genroms/kvmvapic.bin         RO    9216   55  55aa12060=
+e0731c0..
+>  0x0002   irq0_override                   *  RO       4       01000000
+>  0x0003   e820_tables                     *  RO     324       000000000=
+0000000..
+>  0x0004   hpet                            *  RO     121       0101a2868=
+00000d0..
+> (qemu) q
+>=20
+> $ (echo info fw_cfg; echo q) | qemu-system-mips -S -monitor stdio
+> (qemu) info fw_cfg
+> This machine does not use fw_cfg
+> (qemu) q
+>=20
+> $ (echo info fw_cfg; echo q) | qemu-system-ppc -S -monitor stdio
+> (qemu) info fw_cfg
+> Selector  Well-Known Key  Pathname ArchSpec Perm   Size Order Hex Data
+>  0x0000   signature                          RO       4       51454d55
+>  0x0001   id                                 RO       4       01000000
+>  0x0002   uuid                               RO      16       000000000=
+0000000..
+>  0x0003   ram_size                           RO       8       000000080=
+0000000
+>  0x0004   nographic                          RO       2       0000
+>  0x0005   nb_cpus                            RO       2       0100
+>  0x0006   machine_id                         RO       2       0200
+>  0x0007   kernel_addr                        RO       4       00000000
+>  0x0008   kernel_size                        RO       4       00000000
+>  0x0009   kernel_cmdline                     RO       4       00000000
+>  0x000a   initrd_addr                        RO       4       00000000
+>  0x000b   initdr_size                        RO       4       00000000
+>  0x000c   boot_device                        RO       2       6300
+>  0x000e   boot_menu                          RO       2       0000
+>  0x000f   max_cpus                           RO       2       0100
+>  0x0019   file_dir                           RO    2052       000000020=
+0000000..
+>  0x0021   file: etc/boot-fail-wait           RO       4   15  ffffffff
+>  0x0000   width                           *  RO       2       2003
+>  0x0001   height                          *  RO       2       5802
+>  0x0002   depth                           *  RO       2       2000
+>  0x0003   tbfreq                          *  RO       4       c04bfd00
+>  0x0004   clockfreq                       *  RO       4       80d6da0f
+>  0x0005   is_kvm                          *  RO       4       00000000
+>  0x0009   busfreq                         *  RO       4       8014ef03
+> (qemu) q
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-As a consequence, block_job_detach_aio_context() may get into a
-deadlock, waiting for the job to be actually paused, while the coroutine
-servicing the job is yielding and doesn't get the opportunity to get
-scheduled again. This situation can be reproduced by issuing a
-'block-commit' immediately followed by a 'device_del'.
+I think this is fine from an HMP view; one thought of something that
+might be useful is an optional parameter to specify a particular key
+that dumps the whole object; then if you're particularly desperate to
+look at an acpi table you could do something like:
 
-To ensure bdrv_drained_begin() only returns when the jobs have been
-paused, we change mirror_drained_poll() to only confirm it's quiesced
-when job->paused =3D=3D true and there aren't any in-flight requests, exc=
-ept
-if we reached that point by a drained section initiated by the
-mirror/commit job itself.
+info fw_cfg "file: etc/acpi/tables"
 
-The other block jobs shouldn't need any changes, as the default
-drained_poll() behavior is to only confirm it's quiesced if the job is
-not busy or completed.
+and get a fun block of hex back.
 
-Signed-off-by: Sergio Lopez <slp@redhat.com>
+But that's just a suggestion, so:
 
----
-v3
-  - mirror_exit_common: assert in_drain =3D=3D true instead of touching i=
-ts
-    value (thanks to Kevin Wolf)
-v2
-  - Fix typo (thanks to Eric Blake)
----
- block/mirror.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 726d3c27fb..d71b53ac37 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -80,6 +80,7 @@ typedef struct MirrorBlockJob {
-     bool initial_zeroing_ongoing;
-     int in_active_write_counter;
-     bool prepared;
-+    bool in_drain;
- } MirrorBlockJob;
-=20
- typedef struct MirrorBDSOpaque {
-@@ -679,6 +680,7 @@ static int mirror_exit_common(Job *job)
-=20
-         /* The mirror job has no requests in flight any more, but we nee=
-d to
-          * drain potential other users of the BDS before changing the gr=
-aph. */
-+        assert(s->in_drain);
-         bdrv_drained_begin(target_bs);
-         bdrv_replace_node(to_replace, target_bs, &local_err);
-         bdrv_drained_end(target_bs);
-@@ -717,6 +719,7 @@ static int mirror_exit_common(Job *job)
-     bs_opaque->job =3D NULL;
-=20
-     bdrv_drained_end(src);
-+    s->in_drain =3D false;
-     bdrv_unref(mirror_top_bs);
-     bdrv_unref(src);
-=20
-@@ -1000,10 +1003,12 @@ static int coroutine_fn mirror_run(Job *job, Erro=
-r **errp)
-              */
-             trace_mirror_before_drain(s, cnt);
-=20
-+            s->in_drain =3D true;
-             bdrv_drained_begin(bs);
-             cnt =3D bdrv_get_dirty_count(s->dirty_bitmap);
-             if (cnt > 0 || mirror_flush(s) < 0) {
-                 bdrv_drained_end(bs);
-+                s->in_drain =3D false;
-                 continue;
-             }
-=20
-@@ -1051,6 +1056,7 @@ immediate_exit:
-     bdrv_dirty_iter_free(s->dbi);
-=20
-     if (need_drain) {
-+        s->in_drain =3D true;
-         bdrv_drained_begin(bs);
-     }
-=20
-@@ -1119,6 +1125,16 @@ static void coroutine_fn mirror_pause(Job *job)
- static bool mirror_drained_poll(BlockJob *job)
- {
-     MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common);
-+
-+    /* If the job isn't paused nor cancelled, we can't be sure that it w=
-on't
-+     * issue more requests. We make an exception if we've reached this p=
-oint
-+     * from one of our own drain sections, to avoid a deadlock waiting f=
-or
-+     * ourselves.
-+     */
-+    if (!s->common.job.paused && !s->common.job.cancelled && !s->in_drai=
-n) {
-+        return true;
-+    }
-+
-     return !!s->in_flight;
- }
-=20
---=20
-2.20.1
+> ---
+> v2: Check fw_cfg !=3D NULL (Michael)
+>     Rename keys, display data in hexa (Laszlo)
+> ---
+>  hmp-commands-info.hx      | 17 ++++++++++
+>  hw/nvram/fw_cfg.c         | 71 ++++++++++++++++++++++++++++++++++++++-
+>  include/hw/nvram/fw_cfg.h |  2 ++
+>  3 files changed, 89 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index cbee8b944d..2c9538c8da 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -916,6 +916,23 @@ STEXI
+>  @item info sev
+>  @findex info sev
+>  Show SEV information.
+> +ETEXI
+> +
+> +    {
+> +        .name       =3D "fw_cfg",
+> +        .args_type  =3D "",
+> +        .params     =3D "",
+> +        .help       =3D "Display the table firmware configuration entr=
+ies "
+> +                      "registered by a paravirtualized machine. Helpfu=
+l "
+> +                      "when debugging guest firmwares.",
+> +        .cmd        =3D hmp_info_fw_cfg,
+> +    },
+> +
+> +STEXI
+> +@item info fw_cfg
+> +@findex info fw_cfg
+> +Display the table firmware configuration entries registered by a parav=
+irtualized
+> +machine. This information is useful when debugging guest firmwares.
+>  ETEXI
+> =20
+>  STEXI
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 2a8d69ba07..4c82dcc125 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -35,6 +35,7 @@
+>  #include "qemu/config-file.h"
+>  #include "qemu/cutils.h"
+>  #include "qapi/error.h"
+> +#include "monitor/monitor.h"
+>  #include "qapi/qapi-commands-misc.h"
+> =20
+>  #define FW_CFG_FILE_SLOTS_DFLT 0x20
+> @@ -1273,7 +1274,18 @@ static FirmwareConfigurationItem *create_qmp_fw_=
+cfg_item(FWCfgState *s,
+>      return item;
+>  }
+> =20
+> -FirmwareConfigurationItemList *qmp_query_fw_cfg_items(Error **errp)
+> +/**
+> + * query_fw_cfg_items:
+> + *
+> + * @use_hexdump: Whether to populate the @data field with the hexadeci=
+mal
+> + *               representation of the item data.
+> + * @errp: Pointer to a NULL initialized error object.
+> + *
+> + * Returns: A list of @FirmwareConfigurationItem, reverse sorted by th=
+e
+> + *          item selector key.
+> + */
+> +static FirmwareConfigurationItemList *query_fw_cfg_items(bool use_hexd=
+ump,
+> +                                                         Error **errp)
+>  {
+>      FirmwareConfigurationItemList *item_list =3D NULL;
+>      uint32_t max_entries;
+> @@ -1294,6 +1306,9 @@ FirmwareConfigurationItemList *qmp_query_fw_cfg_i=
+tems(Error **errp)
+>              if (!e->len) {
+>                  continue;
+>              }
+> +            if (use_hexdump) {
+> +                qmp_hex_length =3D MIN(e->len, 8);
+> +            }
+> =20
+>              info =3D g_malloc0(sizeof(*info));
+>              info->value =3D create_qmp_fw_cfg_item(s, e, arch, key,
+> @@ -1305,3 +1320,57 @@ FirmwareConfigurationItemList *qmp_query_fw_cfg_=
+items(Error **errp)
+> =20
+>      return item_list;
+>  }
+> +
+> +FirmwareConfigurationItemList *qmp_query_fw_cfg_items(Error **errp)
+> +{
+> +    return query_fw_cfg_items(false, errp);
+> +}
+> +
+> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict)
+> +{
+> +    FirmwareConfigurationItemList *item_list, *method;
+> +    Error *err =3D NULL;
+> +
+> +    item_list =3D query_fw_cfg_items(true, &err);
+> +    if (!item_list) {
+> +        monitor_printf(mon, "This machine does not use fw_cfg\n");
+> +        return;
+> +    }
+> +    if (err) {
+> +        monitor_printf(mon, "Could not query fw_cfg entries: %s\n",
+> +                       error_get_pretty(err));
+> +        error_free(err);
+> +        return;
+> +    }
+> +
+> +    monitor_printf(mon, "Selector  Well-Known Key  Pathname"
+> +                        " ArchSpec Perm   Size Order Hex Data\n");
+> +    for (method =3D item_list; method; method =3D method->next) {
+> +        if (method->value->has_path) {
+> +            monitor_printf(mon,
+> +                           " 0x%04x   file: %-28s %2s %7" PRId64
+> +                           "  %3" PRId64 "  %-16s%s\n",
+> +                           method->value->key,
+> +                           method->value->path,
+> +                           method->value->writeable ? "RW" : "RO",
+> +                           method->value->size,
+> +                           method->value->order,
+> +                           method->value->data,
+> +                           method->value->size > 8 ? ".." : "");
+> +        } else {
+> +            monitor_printf(mon,
+> +                           " 0x%04x   %-30s  %c  %2s %7" PRId64
+> +                           "       %-16s%s\n",
+> +                           method->value->key,
+> +                           method->value->has_keyname
+> +                                ? method->value->keyname : "",
+> +                           method->value->architecture_specific ? '*' =
+: ' ',
+> +                           method->value->writeable ? "RW" : "RO",
+> +                           method->value->size,
+> +                           method->value->data,
+> +                           method->value->size > 8 ? ".." : "");
+> +       }
+> +    }
+> +
+> +    qapi_free_FirmwareConfigurationItemList(item_list);
+> +}
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index 83a0540b6c..5ac9adfe1f 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -243,4 +243,6 @@ bool fw_cfg_dma_enabled(void *opaque);
+>   */
+>  const char *fw_cfg_arch_key_name(uint16_t key);
+> =20
+> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict);
+> +
+>  #endif
+> --=20
+> 2.20.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
