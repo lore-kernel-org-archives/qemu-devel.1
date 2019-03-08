@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36886)
+Received: from eggs.gnu.org ([209.51.188.92]:37227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2J5L-0001PJ-GT
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:15:04 -0500
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1h2J7H-0002KA-SL
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:17:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2J5K-0006qV-IV
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:15:03 -0500
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:40508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2J5K-0006pv-Bl
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:15:02 -0500
-Received: by mail-oi1-x22c.google.com with SMTP id x187so16404372oia.7
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 09:15:02 -0800 (PST)
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1h2J7G-0008KX-QB
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:17:03 -0500
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Fri, 8 Mar 2019 17:16:47 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8392F4940@lhreml524-mbs.china.huawei.com>
+References: <20190308114218.26692-1-shameerali.kolothum.thodi@huawei.com>
+	<20190308114218.26692-2-shameerali.kolothum.thodi@huawei.com>
+	<7490ad1c-d4a6-ad5b-ebbf-c27a674d9629@redhat.com>
+In-Reply-To: <7490ad1c-d4a6-ad5b-ebbf-c27a674d9629@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190306114227.9125-1-dgilbert@redhat.com>
-	<20190306114227.9125-20-dgilbert@redhat.com>
-In-Reply-To: <20190306114227.9125-20-dgilbert@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Mar 2019 17:14:50 +0000
-Message-ID: <CAFEAcA-mJdymqYBp-xrUbrXQ_fZ+mTZ90DG0nQs3v40HVxETzA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 19/22] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Subject: Re: [Qemu-devel] [PATCH v2 01/11] hw/acpi: Move constant
+ definitions to header files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, wei.w.wang@intel.com, yury-kotov@yandex-team.ru, Zhang Chen <chen.zhang@intel.com>, Markus Armbruster <armbru@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>
+Cc: Linuxarm <linuxarm@huawei.com>, "xuwei (O)" <xuwei5@huawei.com>
 
-On Wed, 6 Mar 2019 at 11:55, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
->
-> From: Wei Wang <wei.w.wang@intel.com>
->
-> The new feature enables the virtio-balloon device to receive hints of
-> guest free pages from the free page vq.
->
-> A notifier is registered to the migration precopy notifier chain. The
-> notifier calls free_page_start after the migration thread syncs the dirty
-> bitmap, so that the free page optimization starts to clear bits of free
-> pages from the bitmap. It calls the free_page_stop before the migration
-> thread syncs the bitmap, which is the end of the current round of ram
-> save. The free_page_stop is also called to stop the optimization in the
-> case when there is an error occurred in the process of ram saving.
->
-> Note: balloon will report pages which were free at the time of this call.
-> As the reporting happens asynchronously, dirty bit logging must be
-> enabled before this free_page_start call is made. Guest reporting must be
-> disabled before the migration dirty bitmap is synchronized.
->
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Peter Xu <peterx@redhat.com>
-> Message-Id: <1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->   dgilbert: Dropped kernel header update, fixed up CMD_ID_* name change
-> ---
-
-Hi -- Coverity points out a use-after-free here (CID 1399412):
-
-> +static bool get_free_page_hints(VirtIOBalloon *dev)
-> +{
-> +    VirtQueueElement *elem;
-> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> +    VirtQueue *vq = dev->free_page_vq;
-> +
-> +    while (dev->block_iothread) {
-> +        qemu_cond_wait(&dev->free_page_cond, &dev->free_page_lock);
-> +    }
-> +
-> +    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-> +    if (!elem) {
-> +        return false;
-> +    }
-> +
-> +    if (elem->out_num) {
-> +        uint32_t id;
-> +        size_t size = iov_to_buf(elem->out_sg, elem->out_num, 0,
-> +                                 &id, sizeof(id));
-> +        virtqueue_push(vq, elem, size);
-> +        g_free(elem);
-
-Here we free elem...
-
-> +
-> +        virtio_tswap32s(vdev, &id);
-> +        if (unlikely(size != sizeof(id))) {
-> +            virtio_error(vdev, "received an incorrect cmd id");
-> +            return false;
-> +        }
-> +        if (id == dev->free_page_report_cmd_id) {
-> +            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
-> +        } else {
-> +            /*
-> +             * Stop the optimization only when it has started. This
-> +             * avoids a stale stop sign for the previous command.
-> +             */
-> +            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
-> +                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> +            }
-> +        }
-> +    }
-> +
-> +    if (elem->in_num) {
-
-...but we can fall through here and try to dereference elem...
-
-> +        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
-> +            qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
-> +                                      elem->in_sg[0].iov_len);
-> +        }
-> +        virtqueue_push(vq, elem, 1);
-> +        g_free(elem);
-
-...and then free it again.
-
-> +    }
-> +
-> +    return true;
-> +}
-
-thanks
--- PMM
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQXVnZXIgRXJpYyBbbWFp
+bHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gU2VudDogMDggTWFyY2ggMjAxOSAxNjowOQ0K
+PiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9k
+aUBodWF3ZWkuY29tPjsNCj4gcWVtdS1kZXZlbEBub25nbnUub3JnOyBxZW11LWFybUBub25nbnUu
+b3JnOyBpbWFtbWVkb0ByZWRoYXQuY29tOw0KPiBwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc7IHNo
+YW5ub24uemhhb3NsQGdtYWlsLmNvbTsNCj4gc2FtZW9AbGludXguaW50ZWwuY29tOyBzZWJhc3Rp
+ZW4uYm9ldWZAaW50ZWwuY29tDQo+IENjOiBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47
+IHh1d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIg
+MDEvMTFdIGh3L2FjcGk6IE1vdmUgY29uc3RhbnQgZGVmaW5pdGlvbnMgdG8gaGVhZGVyDQo+IGZp
+bGVzDQo+IA0KPiBIaSwNCj4gDQo+IE9uIDMvOC8xOSAxMjo0MiBQTSwgU2hhbWVlciBLb2xvdGh1
+bSB3cm90ZToNCj4gPiBGcm9tOiBTZWJhc3RpZW4gQm9ldWYgPHNlYmFzdGllbi5ib2V1ZkBpbnRl
+bC5jb20+DQo+ID4NCj4gPiBCeSBtb3ZpbmcgdGhlIGRlZmluaXRpb24gb2YgbWVtb3J5IGhvdHBs
+dWcgcmVsYXRlZCBjb25zdGFudHMgdXNlZA0KPiA+IGJ5IEFDUEkgZm9yIGJvdGggQ1BVIGFuZCBt
+ZW1vcnksIHRoaXMgY29tbWl0cyBhbGxvd3MgdGhvc2UgdG8gYmUNCj4gPiB1c2VkIGZyb20gIG90
+aGVyIHBhcnRzIG9mIHRoZSBjb2RlLg0KPiANCj4gTWF5YmUgZWxhYm9yYXRlIG9uIHdoZXJlIHlv
+dSBpbnRlbmQgdG8gdXNlIHRoZW0uDQoNCk9rLg0KIA0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTog
+U2ViYXN0aWVuIEJvZXVmIDxzZWJhc3RpZW4uYm9ldWZAaW50ZWwuY29tPg0KPiA+IFNpZ25lZC1v
+ZmYtYnk6IFNoYW1lZXIgS29sb3RodW0gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2Vp
+LmNvbT4NCj4gPiAtLS0NCj4gPiAgaHcvYWNwaS9tZW1vcnlfaG90cGx1Zy5jICAgICAgICAgfCAy
+NiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+ICBpbmNsdWRlL2h3L2FjcGkvbWVtb3J5
+X2hvdHBsdWcuaCB8IDI2ICsrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ID4gIDIgZmlsZXMg
+Y2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygrKSwgMjYgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZm
+IC0tZ2l0IGEvaHcvYWNwaS9tZW1vcnlfaG90cGx1Zy5jIGIvaHcvYWNwaS9tZW1vcnlfaG90cGx1
+Zy5jDQo+ID4gaW5kZXggOTIxY2FkMi4uYTZiZWIxMCAxMDA2NDQNCj4gPiAtLS0gYS9ody9hY3Bp
+L21lbW9yeV9ob3RwbHVnLmMNCj4gPiArKysgYi9ody9hY3BpL21lbW9yeV9ob3RwbHVnLmMNCj4g
+PiBAQCAtOCwzMiArOCw2IEBADQo+ID4gICNpbmNsdWRlICJxYXBpL2Vycm9yLmgiDQo+ID4gICNp
+bmNsdWRlICJxYXBpL3FhcGktZXZlbnRzLW1pc2MuaCINCj4gPg0KPiA+IC0jZGVmaW5lIE1FTU9S
+WV9TTE9UU19OVU1CRVIgICAgICAgICAgIk1ETlIiDQo+ID4gLSNkZWZpbmUgTUVNT1JZX0hPVFBM
+VUdfSU9fUkVHSU9OICAgICAiSFBNUiINCj4gPiAtI2RlZmluZSBNRU1PUllfU0xPVF9BRERSX0xP
+VyAgICAgICAgICJNUkJMIg0KPiA+IC0jZGVmaW5lIE1FTU9SWV9TTE9UX0FERFJfSElHSCAgICAg
+ICAgIk1SQkgiDQo+ID4gLSNkZWZpbmUgTUVNT1JZX1NMT1RfU0laRV9MT1cgICAgICAgICAiTVJM
+TCINCj4gPiAtI2RlZmluZSBNRU1PUllfU0xPVF9TSVpFX0hJR0ggICAgICAgICJNUkxIIg0KPiA+
+IC0jZGVmaW5lIE1FTU9SWV9TTE9UX1BST1hJTUlUWSAgICAgICAgIk1QWCINCj4gPiAtI2RlZmlu
+ZSBNRU1PUllfU0xPVF9FTkFCTEVEICAgICAgICAgICJNRVMiDQo+ID4gLSNkZWZpbmUgTUVNT1JZ
+X1NMT1RfSU5TRVJUX0VWRU5UICAgICAiTUlOUyINCj4gPiAtI2RlZmluZSBNRU1PUllfU0xPVF9S
+RU1PVkVfRVZFTlQgICAgICJNUk1WIg0KPiA+IC0jZGVmaW5lIE1FTU9SWV9TTE9UX0VKRUNUICAg
+ICAgICAgICAgIk1FSiINCj4gPiAtI2RlZmluZSBNRU1PUllfU0xPVF9TTEVDVE9SICAgICAgICAg
+ICJNU0VMIg0KPiA+IC0jZGVmaW5lIE1FTU9SWV9TTE9UX09TVF9FVkVOVCAgICAgICAgIk1PRVYi
+DQo+ID4gLSNkZWZpbmUgTUVNT1JZX1NMT1RfT1NUX1NUQVRVUyAgICAgICAiTU9TQyINCj4gPiAt
+I2RlZmluZSBNRU1PUllfU0xPVF9MT0NLICAgICAgICAgICAgICJNTENLIg0KPiA+IC0jZGVmaW5l
+IE1FTU9SWV9TTE9UX1NUQVRVU19NRVRIT0QgICAgIk1SU1QiDQo+ID4gLSNkZWZpbmUgTUVNT1JZ
+X1NMT1RfQ1JTX01FVEhPRCAgICAgICAiTUNSUyINCj4gPiAtI2RlZmluZSBNRU1PUllfU0xPVF9P
+U1RfTUVUSE9EICAgICAgICJNT1NUIg0KPiA+IC0jZGVmaW5lIE1FTU9SWV9TTE9UX1BST1hJTUlU
+WV9NRVRIT0QgIk1QWE0iDQo+ID4gLSNkZWZpbmUgTUVNT1JZX1NMT1RfRUpFQ1RfTUVUSE9EICAg
+ICAiTUVKMCINCj4gPiAtI2RlZmluZSBNRU1PUllfU0xPVF9OT1RJRllfTUVUSE9EICAgICJNVEZZ
+Ig0KPiA+IC0jZGVmaW5lIE1FTU9SWV9TTE9UX1NDQU5fTUVUSE9EICAgICAgIk1TQ04iDQo+ID4g
+LSNkZWZpbmUgTUVNT1JZX0hPVFBMVUdfREVWSUNFICAgICAgICAiTUhQRCINCj4gPiAtI2RlZmlu
+ZSBNRU1PUllfSE9UUExVR19JT19MRU4gICAgICAgICAyNA0KPiA+IC0jZGVmaW5lIE1FTU9SWV9E
+RVZJQ0VTX0NPTlRBSU5FUiAgICAgIlxcX1NCLk1IUEMiDQo+IA0KPiBEbyB3ZSByZWFsbHkgbmVl
+ZCB0byBleHBvc2UgYWxsIG9mIHRoZW0uIEkganVzdCBjYW4gc2VlDQo+IE1FTU9SWV9TTE9UX1ND
+QU5fTUVUSE9EIHVzZWQgaW4gaHcvYWNwaS9nZWQuYz8gTWF5YmUgSSBtaXNzZWQgc29tZQ0KPiB0
+aG91Z2g/DQoNClRoYXQgaXMgcmlnaHQuIFRoaXMgd2FzIHRha2VuIGZyb20gdGhlIE5lbXUgYXBw
+cm9hY2ggYW5kIEkgdGhvdWdodCBpdCBtaWdodCBiZQ0KdXNlZnVsIGluIGZ1dHVyZSBjaGFuZ2Vz
+LiBCdXQgaWYgdGhlcmUgaXMgbm8gbWFqb3IgbW90aXZhdGlvbiBpbiBrZWVwaW5nIHRoaXMgaW4g
+aGVhZGVyLA0KSSBtYXkgc2tpcCB0aGlzIHBhdGNoIGFuZCBqdXN0IG1vdmUgdGhlIE1FTU9SWV9T
+TE9UX1NDQU5fTUVUSE9ELg0KDQo+IEFsc28gYXQgdGhlIGJlZ2lubmluZyBJIHRyaWVkIHRvIGZp
+bmQgc29tZSBzcGVjaWZpY2F0aW9uIGRldGFpbHMgZm9yDQo+IHRob3NlIHN0dWZmIGJ1dCBJIGZh
+aWxlZC4gSXQgd291bGQgYmUgaGVscGZ1bCBmb3IgYSBub24gc3BlY2lhbGlzdA0KPiByZWFkZXIg
+dG8gYWRkIGEgY29tbWVudCB0aGF0IGhlbHBzIHRvIHVuZGVyc3RhbmQgd2hhdCBpcyBwYXJ0IG9m
+IGENCj4gc3BlY2lmaWNhdGlvbiAobGluaz8pIGFuZCB3aGF0IGlzIGFyYml0cmFyaWx5IGRlZmlu
+ZWQuDQoNCk9rLiBJIGNvdWxkIG9ubHkgZmluZCB0aGlzIE5lbXUgd2lraSBkZXNjcmlwdGlvbiBo
+ZXJlDQpodHRwczovL2dpdGh1Yi5jb20vaW50ZWwvbmVtdS93aWtpL01lbW9yeS1ob3RwbHVnDQoN
+Ck5vdCBzdXJlIFFlbXUgb3IgQUNQSSBoYXMgYSBzaW1pbGFyIGRvY3VtZW50YXRpb24gZWxzZXdo
+ZXJlLg0KDQpUaGFua3MsDQpTaGFtZWVyDQoNCj4gVGhhbmtzDQo+IA0KPiBFcmljDQo+ID4gLQ0K
+PiA+ICBzdGF0aWMgdWludDE2X3QgbWVtaHBfaW9fYmFzZTsNCj4gPg0KPiA+ICBzdGF0aWMgQUNQ
+SU9TVEluZm8gKmFjcGlfbWVtb3J5X2RldmljZV9zdGF0dXMoaW50IHNsb3QsIE1lbVN0YXR1cw0K
+PiAqbWRldikNCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ody9hY3BpL21lbW9yeV9ob3RwbHVn
+LmgNCj4gYi9pbmNsdWRlL2h3L2FjcGkvbWVtb3J5X2hvdHBsdWcuaA0KPiA+IGluZGV4IDc3YzY1
+NzYuLmZiZmNiZTYgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVkZS9ody9hY3BpL21lbW9yeV9ob3Rw
+bHVnLmgNCj4gPiArKysgYi9pbmNsdWRlL2h3L2FjcGkvbWVtb3J5X2hvdHBsdWcuaA0KPiA+IEBA
+IC01LDYgKzUsMzIgQEANCj4gPiAgI2luY2x1ZGUgImh3L2FjcGkvYWNwaS5oIg0KPiA+ICAjaW5j
+bHVkZSAiaHcvYWNwaS9hbWwtYnVpbGQuaCINCj4gPg0KPiA+ICsjZGVmaW5lIE1FTU9SWV9TTE9U
+U19OVU1CRVIgICAgICAgICAgIk1ETlIiDQo+ID4gKyNkZWZpbmUgTUVNT1JZX0hPVFBMVUdfSU9f
+UkVHSU9OICAgICAiSFBNUiINCj4gPiArI2RlZmluZSBNRU1PUllfU0xPVF9BRERSX0xPVyAgICAg
+ICAgICJNUkJMIg0KPiA+ICsjZGVmaW5lIE1FTU9SWV9TTE9UX0FERFJfSElHSCAgICAgICAgIk1S
+QkgiDQo+ID4gKyNkZWZpbmUgTUVNT1JZX1NMT1RfU0laRV9MT1cgICAgICAgICAiTVJMTCINCj4g
+PiArI2RlZmluZSBNRU1PUllfU0xPVF9TSVpFX0hJR0ggICAgICAgICJNUkxIIg0KPiA+ICsjZGVm
+aW5lIE1FTU9SWV9TTE9UX1BST1hJTUlUWSAgICAgICAgIk1QWCINCj4gPiArI2RlZmluZSBNRU1P
+UllfU0xPVF9FTkFCTEVEICAgICAgICAgICJNRVMiDQo+ID4gKyNkZWZpbmUgTUVNT1JZX1NMT1Rf
+SU5TRVJUX0VWRU5UICAgICAiTUlOUyINCj4gPiArI2RlZmluZSBNRU1PUllfU0xPVF9SRU1PVkVf
+RVZFTlQgICAgICJNUk1WIg0KPiA+ICsjZGVmaW5lIE1FTU9SWV9TTE9UX0VKRUNUICAgICAgICAg
+ICAgIk1FSiINCj4gPiArI2RlZmluZSBNRU1PUllfU0xPVF9TTEVDVE9SICAgICAgICAgICJNU0VM
+Ig0KPiA+ICsjZGVmaW5lIE1FTU9SWV9TTE9UX09TVF9FVkVOVCAgICAgICAgIk1PRVYiDQo+ID4g
+KyNkZWZpbmUgTUVNT1JZX1NMT1RfT1NUX1NUQVRVUyAgICAgICAiTU9TQyINCj4gPiArI2RlZmlu
+ZSBNRU1PUllfU0xPVF9MT0NLICAgICAgICAgICAgICJNTENLIg0KPiA+ICsjZGVmaW5lIE1FTU9S
+WV9TTE9UX1NUQVRVU19NRVRIT0QgICAgIk1SU1QiDQo+ID4gKyNkZWZpbmUgTUVNT1JZX1NMT1Rf
+Q1JTX01FVEhPRCAgICAgICAiTUNSUyINCj4gPiArI2RlZmluZSBNRU1PUllfU0xPVF9PU1RfTUVU
+SE9EICAgICAgICJNT1NUIg0KPiA+ICsjZGVmaW5lIE1FTU9SWV9TTE9UX1BST1hJTUlUWV9NRVRI
+T0QgIk1QWE0iDQo+ID4gKyNkZWZpbmUgTUVNT1JZX1NMT1RfRUpFQ1RfTUVUSE9EICAgICAiTUVK
+MCINCj4gPiArI2RlZmluZSBNRU1PUllfU0xPVF9OT1RJRllfTUVUSE9EICAgICJNVEZZIg0KPiA+
+ICsjZGVmaW5lIE1FTU9SWV9TTE9UX1NDQU5fTUVUSE9EICAgICAgIk1TQ04iDQo+ID4gKyNkZWZp
+bmUgTUVNT1JZX0hPVFBMVUdfREVWSUNFICAgICAgICAiTUhQRCINCj4gPiArI2RlZmluZSBNRU1P
+UllfSE9UUExVR19JT19MRU4gICAgICAgICAyNA0KPiA+ICsjZGVmaW5lIE1FTU9SWV9ERVZJQ0VT
+X0NPTlRBSU5FUiAgICAgIlxcX1NCLk1IUEMiDQo+ID4gKw0KPiA+ICAvKioNCj4gPiAgICogTWVt
+U3RhdHVzOg0KPiA+ICAgKiBAaXNfcmVtb3Zpbmc6IHRoZSBtZW1vcnkgZGV2aWNlIGluIHNsb3Qg
+aGFzIGJlZW4gcmVxdWVzdGVkIHRvIGJlDQo+IGVqZWN0ZWQuDQo+ID4NCg==
