@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47783)
+Received: from eggs.gnu.org ([209.51.188.92]:51101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h2ANA-0001Vz-I4
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:56:53 -0500
+	(envelope-from <lersek@redhat.com>) id 1h2Ac5-0005xw-Kt
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 03:12:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h2AN8-0000Za-Le
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:56:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h2AN6-0000WW-Mp
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 02:56:50 -0500
-References: <1552029641-17223-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6bf81fec-9151-41a9-20d7-07f64c19443c@redhat.com>
-Date: Fri, 8 Mar 2019 08:56:38 +0100
+	(envelope-from <lersek@redhat.com>) id 1h2Ac4-0002NS-QX
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 03:12:17 -0500
+References: <20190307172401.29451-1-armbru@redhat.com>
+	<20190307172401.29451-11-armbru@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <cd7ad303-0865-8098-44ce-ddcdc1932d1e@redhat.com>
+Date: Fri, 8 Mar 2019 09:11:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <1552029641-17223-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20190307172401.29451-11-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] cirrus.yml: Add macOS continuous
- integration task
+Subject: Re: [Qemu-devel] [PATCH v2 10/12] pc_sysfw: Pass PCMachineState to
+ pc_system_firmware_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Ed Maste <emaste@freebsd.org>, Li-Wen Hsu <lwhsu@freebsd.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
 
-On 08/03/19 08:20, Thomas Huth wrote:
-> cirrus-ci.com also has the possibility to run CI tasks on macOS.
-> Since most of the QEMU developers do not have access to macOS yet,
-> let's add a CI pipeline for this operating system here, too.
+On 03/07/19 18:23, Markus Armbruster wrote:
+> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Acked-by: Ed Maste <emaste@freebsd.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-
+> pc_system_firmware_init() parameter @isapc_ram_fw is PCMachineState
+> member pci_enabled negated.  The next commit will need more of
+> PCMachineState.  To prepare for that, pass a PCMachineState *, and
+> drop the now redundant parameter @isapc_ram_fw.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  v2:
->  - Move CIRRUS_CLONE_DEPTH to generic part
->  - Use python from brew
->  - Use mojave-base instead of high-sierra-base
+>  hw/i386/pc.c         | 2 +-
+>  hw/i386/pc_sysfw.c   | 5 ++++-
+>  include/hw/i386/pc.h | 3 +--
+>  3 files changed, 6 insertions(+), 4 deletions(-)
 >=20
->  .cirrus.yml | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 3889eccdc3..3cd8ed1794 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1830,7 +1830,7 @@ void pc_memory_init(PCMachineState *pcms,
+>      }
+> =20
+>      /* Initialize PC system firmware */
+> -    pc_system_firmware_init(rom_memory, !pcmc->pci_enabled);
+> +    pc_system_firmware_init(pcms, rom_memory);
+> =20
+>      option_rom_mr =3D g_malloc(sizeof(*option_rom_mr));
+>      memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index 46b87afe23..785123252c 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -231,8 +231,11 @@ static void old_pc_system_rom_init(MemoryRegion *r=
+om_memory, bool isapc_ram_fw)
+>                                  bios);
+>  }
+> =20
+> -void pc_system_firmware_init(MemoryRegion *rom_memory, bool isapc_ram_=
+fw)
+> +void pc_system_firmware_init(PCMachineState *pcms,
+> +                             MemoryRegion *rom_memory)
+>  {
+> +    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
+> +    bool isapc_ram_fw =3D !pcmc->pci_enabled;
+>      DriveInfo *pflash_drv;
+> =20
+>      pflash_drv =3D drive_get(IF_PFLASH, 0, 0);
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 3ff127ebd0..eb7360feac 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -278,8 +278,7 @@ extern PCIDevice *piix4_dev;
+>  int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
+> =20
+>  /* pc_sysfw.c */
+> -void pc_system_firmware_init(MemoryRegion *rom_memory,
+> -                             bool isapc_ram_fw);
+> +void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_m=
+emory);
+> =20
+>  /* acpi-build.c */
+>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
 >=20
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> index 303fe72..47ef5bc 100644
-> --- a/.cirrus.yml
-> +++ b/.cirrus.yml
-> @@ -1,10 +1,11 @@
-> +env:
-> +  CIRRUS_CLONE_DEPTH: 1
-> +
->  freebsd_12_task:
->    freebsd_instance:
->      image: freebsd-12-0-release-amd64
->      cpu: 8
->      memory: 8G
-> -  env:
-> -    CIRRUS_CLONE_DEPTH: 1
->    install_script: pkg install -y
->      bison curl cyrus-sasl git glib gmake gnutls
->      nettle perl5 pixman pkgconf png usbredir
-> @@ -14,3 +15,13 @@ freebsd_12_task:
->      - ../configure || { cat config.log; exit 1; }
->      - gmake -j8
->      - gmake -j8 V=3D1 check
-> +
-> +macos_task:
-> +  osx_instance:
-> +    image: mojave-base
-> +  install_script:
-> +    - brew install pkg-config python glib pixman make sdl2
-> +  script:
-> +    - ./configure --python=3D/usr/local/bin/python3 || { cat config.lo=
-g; exit 1; }
-> +    - gmake -j$(sysctl -n hw.ncpu)
-> +    - gmake check -j$(sysctl -n hw.ncpu)
->=20
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks!
+Laszlo
