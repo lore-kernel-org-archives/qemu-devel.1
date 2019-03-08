@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42759)
+Received: from eggs.gnu.org ([209.51.188.92]:43397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h2HZv-0005m1-Db
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:38:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h2HcB-0007hl-6c
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h2HZt-0001hK-Fe
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:38:31 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h2HcA-0007oq-8s
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 10:40:51 -0500
+Date: Fri, 8 Mar 2019 16:40:44 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  8 Mar 2019 16:37:57 +0100
-Message-Id: <20190308153757.25794-9-kwolf@redhat.com>
-In-Reply-To: <20190308153757.25794-1-kwolf@redhat.com>
-References: <20190308153757.25794-1-kwolf@redhat.com>
+Message-ID: <20190308154043.GE31583@localhost.localdomain>
+References: <20190308062455.29755-1-armbru@redhat.com>
+	<481d398a-e26c-6c0a-20b7-7466ae1ebf1f@redhat.com>
+	<875zsteeih.fsf@dusky.pond.sub.org>
+	<20190308133510.GC31583@localhost.localdomain>
+	<87sgvxbft2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 8/8] file-posix: Make auto-read-only dynamic
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87sgvxbft2.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v7] pflash: Require backend size to match
+ device, improve errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,183 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, mreitz@redhat.com, alex.bennee@linaro.org
 
-Until now, with auto-read-only=3Don we tried to open the file read-write
-first and if that failed, read-only was tried. This is actually not good
-enough for libvirt, which gives QEMU SELinux permissions for read-write
-only as soon as it actually intends to write to the image. So we need to
-be able to switch between read-only and read-write at runtime.
+Am 08.03.2019 um 15:29 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+> 
+> > Am 08.03.2019 um 13:28 hat Markus Armbruster geschrieben:
+> >> Laszlo Ersek <lersek@redhat.com> writes:
+> >> > This one has got to be one of the longest bike-shedding sessions! :)
+> >> >
+> >> > I'm fine with this patch, but I could suggest two improvements.
+> >> >
+> >> > (1) When blk_getlength() fails, we could format the negative error code
+> >> > returned by it into the error message.
+> >> 
+> >> I can do that.
+> >
+> > By using error_setg_errno(), I assume. Not throwing away error details
+> > is always good.
+> >
+> >> > (2) We could extract the common code to a new function in
+> >> > "hw/block/block.c". (It says "Common code for block device models" on
+> >> > the tin.)
+> >> 
+> >> There's so much common code in these two files even before this patch...
+> >
+> > My understanding is that hw/block/block.c contains code that is
+> > potentially useful to all kinds of block devices, not random code that
+> > two specific similar devices happen to share.
+> >
+> > If we want to deduplicate some code in the flash devices, without any
+> > expectation that other devices will use it at some point, I'd rather
+> > create a new source file hw/block/pflash_common.c or something like
+> > that.
+> 
+> Yes.
+> 
+> The helper I came up with (appended) isn't really specific to flash
+> devices.  Would it be okay for hw/block/block.c even though only the two
+> flash devices use it for now?
 
-This patch makes auto-read-only dynamic, i.e. the file is opened
-read-only as long as no user of the node has requested write
-permissions, but it is automatically reopened read-write as soon as the
-first writer is attached. Conversely, if the last writer goes away, the
-file is reopened read-only again.
+Hm, it feels more like a helper for devices that can't decide whether
+they want to be a block device or not. Or that actually don't want to be
+a block device, but use a BlockBackend anyway. Reading in the whole
+image isn't something that a normal block device would do.
 
-bs->read_only is no longer set for auto-read-only=3Don files even if the
-file descriptor is opened read-only because it will be transparently
-upgraded as soon as a writer is attached. This changes the output of
-qemu-iotests 232.
+But yes, it doesn't have flash-specific knowledge, even though I hope
+that it's functionality that will remain very specific to these two
+devices.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/file-posix.c         | 36 +++++++++++++++++-------------------
- tests/qemu-iotests/232.out | 12 ++++++------
- 2 files changed, 23 insertions(+), 25 deletions(-)
+So it's your call, I don't have a strong opinion either way.
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index bcfb38ec4b..6718bc2e9c 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -376,13 +376,21 @@ static void raw_probe_alignment(BlockDriverState *b=
-s, int fd, Error **errp)
-     }
- }
-=20
--static void raw_parse_flags(int bdrv_flags, int *open_flags)
-+static void raw_parse_flags(int bdrv_flags, int *open_flags, bool has_wr=
-iters)
- {
-+    bool read_write =3D false;
-     assert(open_flags !=3D NULL);
-=20
-     *open_flags |=3D O_BINARY;
-     *open_flags &=3D ~O_ACCMODE;
--    if (bdrv_flags & BDRV_O_RDWR) {
-+
-+    if (bdrv_flags & BDRV_O_AUTO_RDONLY) {
-+        read_write =3D has_writers;
-+    } else if (bdrv_flags & BDRV_O_RDWR) {
-+        read_write =3D true;
-+    }
-+
-+    if (read_write) {
-         *open_flags |=3D O_RDWR;
-     } else {
-         *open_flags |=3D O_RDONLY;
-@@ -518,24 +526,12 @@ static int raw_open_common(BlockDriverState *bs, QD=
-ict *options,
-                                                false);
-=20
-     s->open_flags =3D open_flags;
--    raw_parse_flags(bdrv_flags, &s->open_flags);
-+    raw_parse_flags(bdrv_flags, &s->open_flags, false);
-=20
-     s->fd =3D -1;
-     fd =3D qemu_open(filename, s->open_flags, 0644);
-     ret =3D fd < 0 ? -errno : 0;
-=20
--    if (ret =3D=3D -EACCES || ret =3D=3D -EROFS) {
--        /* Try to degrade to read-only, but if it doesn't work, still us=
-e the
--         * normal error message. */
--        if (bdrv_apply_auto_read_only(bs, NULL, NULL) =3D=3D 0) {
--            bdrv_flags &=3D ~BDRV_O_RDWR;
--            raw_parse_flags(bdrv_flags, &s->open_flags);
--            assert(!(s->open_flags & O_CREAT));
--            fd =3D qemu_open(filename, s->open_flags);
--            ret =3D fd < 0 ? -errno : 0;
--        }
--    }
--
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Could not open '%s'", filename);
-         if (ret =3D=3D -EROFS) {
-@@ -846,12 +842,14 @@ static int raw_handle_perm_lock(BlockDriverState *b=
-s,
- }
-=20
- static int raw_reconfigure_getfd(BlockDriverState *bs, int flags,
--                                 int *open_flags, bool force_dup,
-+                                 int *open_flags, uint64_t perm, bool fo=
-rce_dup,
-                                  Error **errp)
- {
-     BDRVRawState *s =3D bs->opaque;
-     int fd =3D -1;
-     int ret;
-+    bool has_writers =3D perm &
-+        (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED | BLK_PERM_RESIZE);
-     int fcntl_flags =3D O_APPEND | O_NONBLOCK;
- #ifdef O_NOATIME
-     fcntl_flags |=3D O_NOATIME;
-@@ -862,7 +860,7 @@ static int raw_reconfigure_getfd(BlockDriverState *bs=
-, int flags,
-         *open_flags |=3D O_NONBLOCK;
-     }
-=20
--    raw_parse_flags(flags, open_flags);
-+    raw_parse_flags(flags, open_flags, has_writers);
-=20
- #ifdef O_ASYNC
-     /* Not all operating systems have O_ASYNC, and those that don't
-@@ -942,7 +940,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
-     qemu_opts_to_qdict(opts, state->options);
-=20
-     rs->fd =3D raw_reconfigure_getfd(state->bs, state->flags, &rs->open_=
-flags,
--                                   true, &local_err);
-+                                   state->perm, true, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         ret =3D -1;
-@@ -2715,7 +2713,7 @@ static int raw_check_perm(BlockDriverState *bs, uin=
-t64_t perm, uint64_t shared,
-     } else {
-         /* We may need a new fd if auto-read-only switches the mode */
-         assert(!s->perm_change_fd);
--        ret =3D raw_reconfigure_getfd(bs, bs->open_flags, &open_flags,
-+        ret =3D raw_reconfigure_getfd(bs, bs->open_flags, &open_flags, p=
-erm,
-                                     false, errp);
-         if (ret < 0) {
-             return ret;
-diff --git a/tests/qemu-iotests/232.out b/tests/qemu-iotests/232.out
-index dcb683afa3..3bd1a920af 100644
---- a/tests/qemu-iotests/232.out
-+++ b/tests/qemu-iotests/232.out
-@@ -22,12 +22,12 @@ NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
- NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
-=20
- QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,read-=
-only=3Doff,auto-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Perm=
-ission denied
--NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
--NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
-+NODE_NAME: TEST_DIR/t.IMGFMT (file)
-+NODE_NAME: TEST_DIR/t.IMGFMT (file)
-=20
- QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,auto-=
-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permission denied
--NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
--NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
-+NODE_NAME: TEST_DIR/t.IMGFMT (file)
-+NODE_NAME: TEST_DIR/t.IMGFMT (file)
-=20
- =3D=3D=3D -blockdev with read-write image: read-only/auto-read-only comb=
-inations =3D=3D=3D
-=20
-@@ -50,10 +50,10 @@ node0: TEST_DIR/t.IMGFMT (file, read-only)
- node0: TEST_DIR/t.IMGFMT (file, read-only)
-=20
- QEMU_PROG: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-nam=
-e=3Dnode0,read-only=3Doff,auto-read-only=3Doff: Could not open 'TEST_DIR/=
-t.IMGFMT': Permission denied
--node0: TEST_DIR/t.IMGFMT (file, read-only)
-+node0: TEST_DIR/t.IMGFMT (file)
- QEMU_PROG: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-nam=
-e=3Dnode0,read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permission=
- denied
-=20
- QEMU_PROG: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-nam=
-e=3Dnode0,auto-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permi=
-ssion denied
--node0: TEST_DIR/t.IMGFMT (file, read-only)
-+node0: TEST_DIR/t.IMGFMT (file)
- QEMU_PROG: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-nam=
-e=3Dnode0: Could not open 'TEST_DIR/t.IMGFMT': Permission denied
- *** done
---=20
-2.20.1
+> 
+> bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
+>                                  Error **errp)
+> {
+>     int64_t blk_len;
+>     int ret;
+> 
+>     blk_len = blk_getlength(blk);
+>     if (blk_len < 0) {
+>         error_setg_errno(errp, -blk_len,
+>                          "can't get size of block backend '%s'",
+>                          blk_name(blk));
+>         return false;
+>     }
+>     if (blk_len != size) {
+>         error_setg(errp, "device requires %" PRIu64 " bytes, "
+>                    "block backend '%s' provides %" PRIu64 " bytes",
+>                    size, blk_name(blk), blk_len);
+
+Should size use HWADDR_PRIu?
+
+I'm not sure if printing the BlockBackend name is a good idea because
+hopefully one day the BlockBackend will be anonymous even for the flash
+devices.
+
+>         return false;
+>     }
+> 
+>     /* TODO for @size > BDRV_REQUEST_MAX_BYTES, we'd need to loop */
+>     assert(size <= BDRV_REQUEST_MAX_BYTES);
+
+I don't think we'd ever want to read in more than 2 GB into a memory
+buffer. Before we even get close to this point, the devices should be
+reworked to be more like an actual block device and read only what is
+actually accessed.
+
+>     ret = blk_pread(blk, 0, buf, size);
+>     if (ret < 0) {
+>         error_setg_errno(errp, -ret, "can't read block backend '%s'",
+>                          blk_name(blk));
+>         return false;
+>     }
+>     return true;
+> }
+
+Kevin
