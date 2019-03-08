@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34980)
+Received: from eggs.gnu.org ([209.51.188.92]:35468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2NiN-0001r3-KP
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:11:40 -0500
+	(envelope-from <bsd@redhat.com>) id 1h2NlG-0002nu-Vn
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:14:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2NiM-0002p5-SO
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:11:39 -0500
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<20190305234337.18353-3-jsnow@redhat.com>
-	<28d6183a-f654-de55-36ed-ee0bafb47739@redhat.com>
-	<fe8ae9ab-068d-cc24-76de-e2a99215ea5f@redhat.com>
-	<d362b81a-1e9c-0761-3cbe-65739a051ce7@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <73ddcaa9-97dc-238b-2949-ac73bc863abe@redhat.com>
-Date: Fri, 8 Mar 2019 17:11:35 -0500
+	(envelope-from <bsd@redhat.com>) id 1h2NlG-0005AS-7n
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:14:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47426)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1h2NlG-0005A7-1H
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:14:38 -0500
+From: Bandan Das <bsd@redhat.com>
+References: <20190307095441.31921-1-kraxel@redhat.com>
+	<20190307095441.31921-4-kraxel@redhat.com>
+	<CAFEAcA_HzSj7sQ+aKEwHmJXkJcG8yLmn5ZsZKM5xxYUrBxO2rQ@mail.gmail.com>
+	<jpg36nxf8ta.fsf@linux.bootlegged.copy>
+Date: Fri, 08 Mar 2019 17:14:33 -0500
+In-Reply-To: <jpg36nxf8ta.fsf@linux.bootlegged.copy> (Bandan Das's message of
+	"Fri, 08 Mar 2019 14:46:41 -0500")
+Message-ID: <jpg8sxpypx2.fsf_-_@linux.bootlegged.copy>
 MIME-Version: 1.0
-In-Reply-To: <d362b81a-1e9c-0761-3cbe-65739a051ce7@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] block/qcow2-bitmap: Allow bitmap
- flushing
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] usb-mtp: fix return status of delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
 
+Spotted by Coverity: CID 1399414
 
-On 3/6/19 11:12 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 06.03.2019 18:59, John Snow wrote:
->>
->>
->> On 3/6/19 7:58 AM, Eric Blake wrote:
->>> On 3/5/19 5:43 PM, John Snow wrote:
->>>> Usually, we only write out bitmaps when we're about to close out the file,
->>>> so we always remove the bitmaps after to make it easier to determine the
->>>> source of truth for migration purposes.
->>>>
->>>> However, there may be times we want to flush bitmap data more aggressively,
->>>> like after a truncate event where we need to make the metadata consistent
->>>> again.
->>>
->>> Or, as I've mentioned in other threads, after every
->>> bitmap-add/bitmap-delete operation, so that 'qemu-img info -U' can see
->>> which persistent bitmaps exist. But that's one step further than this
->>> series, so I won't insist on it today.
->>>
->>
->> Yes, I was keeping that in mind as I wrote this. I think it extends to
->> those cases trivially, so long as Vladimir is OK with what I'm trying to do.
->>
-> 
-> I still don't see the point of flushing bitmaps, the only thing is optimizing
-> qemu-img info --force-share, which should never used except for debugging.
-> 
-> So, at least, if we'll have it, I'd prefer bitmap flushing to be optional,
-> and other code should not rely on it.
-> 
+mtp delete allows the a return status of delete succeeded,
+partial_delete or readonly - when none of the objects could be
+deleted.
 
-I don't have plans to add more uses of it personally, but I do think
-that resize represents a genuine case of wanting the feature.
+Some initiators recurse over the objects themselves. In that case,
+only READ_ONLY can be returned.
+
+Signed-off-by: Bandan Das <bsd@redhat.com>
+---
+ hw/usb/dev-mtp.c | 25 +++++++++----------------
+ 1 file changed, 9 insertions(+), 16 deletions(-)
+
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 06e376bcd2..e3401aad75 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1137,9 +1137,9 @@ static MTPData *usb_mtp_get_object_prop_value(MTPState *s, MTPControl *c,
+ 
+ /* Return correct return code for a delete event */
+ enum {
+-    ALL_DELETE,
+-    PARTIAL_DELETE,
++    ALL_DELETE = 1,
+     READ_ONLY,
++    PARTIAL_DELETE,
+ };
+ 
+ /* Assumes that children, if any, have been already freed */
+@@ -1155,8 +1155,7 @@ static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
+ static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
+ {
+     MTPObject *iter, *iter2;
+-    bool partial_delete = false;
+-    bool success = false;
++    int ret = 0;
+ 
+     /*
+      * TODO: Add support for Protection Status
+@@ -1165,34 +1164,28 @@ static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
+     QLIST_FOREACH(iter, &o->children, list) {
+         if (iter->format == FMT_ASSOCIATION) {
+             QLIST_FOREACH(iter2, &iter->children, list) {
+-                usb_mtp_deletefn(s, iter2, trans);
++                ret |= usb_mtp_deletefn(s, iter2, trans);
+             }
+         }
+     }
+ 
+     if (o->format == FMT_UNDEFINED_OBJECT) {
+         if (remove(o->path)) {
+-            partial_delete = true;
++            ret |= READ_ONLY;
+         } else {
+             usb_mtp_object_free_one(s, o);
+-            success = true;
++            ret |= ALL_DELETE;
+         }
+     } else if (o->format == FMT_ASSOCIATION) {
+         if (rmdir(o->path)) {
+-            partial_delete = true;
++            ret |= READ_ONLY;
+         } else {
+             usb_mtp_object_free_one(s, o);
+-            success = true;
++            ret |= ALL_DELETE;
+         }
+     }
+ 
+-    if (success && partial_delete) {
+-        return PARTIAL_DELETE;
+-    }
+-    if (!success && partial_delete) {
+-        return READ_ONLY;
+-    }
+-    return ALL_DELETE;
++    return ret;
+ }
+ 
+ static void usb_mtp_object_delete(MTPState *s, uint32_t handle,
+-- 
+2.19.2
