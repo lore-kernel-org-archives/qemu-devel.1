@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40400)
+Received: from eggs.gnu.org ([209.51.188.92]:40527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h2JQ9-0008MB-28
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:36:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h2JQu-0000Jb-NM
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:37:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h2JQ4-00085t-AZ
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:36:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h2JQ4-00085E-3w
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:36:28 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F33E55D674
-	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 17:36:26 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  8 Mar 2019 18:36:22 +0100
-Message-Id: <20190308173622.21386-1-pbonzini@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1h2JQt-0000E7-LJ
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:37:20 -0500
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:38573)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h2JQt-0000DM-BP
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:37:19 -0500
+Received: by mail-oi1-x230.google.com with SMTP id q81so16472694oic.5
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 09:37:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] vfio-pci: enable by default
+References: <20190307095441.31921-1-kraxel@redhat.com>
+	<20190307095441.31921-3-kraxel@redhat.com>
+In-Reply-To: <20190307095441.31921-3-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Mar 2019 17:37:06 +0000
+Message-ID: <CAFEAcA8qsLyowga086b_ELvucVKWC+PSzykG3th81pnts1jiuQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 2/4] usb-mtp: fix some usb_mtp_write_data
+ return paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bandan Das <bsd@redhat.com>
 
-CONFIG_VFIO_PCI was not "default y" - and once you do that, it is also im=
-portant
-to disable it if PCI is not there.
+On Thu, 7 Mar 2019 at 09:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> From: Bandan Das <bsd@redhat.com>
+>
+> During a write, free up the "path" before getting more data.
+> Also, while we at it, remove the confusing usage of d->fd for
+> storing mkdir status
+>
+> Spotted by Coverity: CID 1398642
+>
+> Signed-off-by: Bandan Das <bsd@redhat.com>
+> Message-id: 20190306210409.14842-3-bsd@redhat.com
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Reported-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/vfio/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi; Coverity found an issue with the code change here
+(CID 1399415):
 
-diff --git a/hw/vfio/Kconfig b/hw/vfio/Kconfig
-index ebda9fdf22..34da2a3cfd 100644
---- a/hw/vfio/Kconfig
-+++ b/hw/vfio/Kconfig
-@@ -4,8 +4,9 @@ config VFIO
-=20
- config VFIO_PCI
-     bool
-+    default y
-     select VFIO
--    depends on LINUX
-+    depends on LINUX && PCI
-=20
- config VFIO_CCW
-     bool
---=20
-2.20.1
+> index 4dde14fc7887..1f22284949df 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1605,7 +1605,7 @@ static int usb_mtp_update_object(MTPObject *parent, char *name)
+>      return ret;
+>  }
+>
+> -static void usb_mtp_write_data(MTPState *s)
+> +static int usb_mtp_write_data(MTPState *s)
+
+Here we change usb_mtp_write_data() to return an error code...
+
+>  {
+>      MTPData *d = s->data_out;
+>      MTPObject *parent =
+
+> @@ -1727,14 +1731,12 @@ static void usb_mtp_write_metadata(MTPState *s, uint64_t dlen)
+>      s->write_pending = true;
+>
+>      if (s->dataset.format == FMT_ASSOCIATION) {
+> -        usb_mtp_write_data(s);
+> -        /* next_handle will be allocated to the newly created dir */
+> -        if (d->fd == -1) {
+> +        if (usb_mtp_write_data(s)) {
+> +            /* next_handle will be allocated to the newly created dir */
+>              usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
+>                                   0, 0, 0, 0);
+>              return;
+
+...and we updated this callsite to check the error return value.
+
+But the two places in usb_mtp_get_data() that call
+usb_mtp_write_metadata() still don't check its return
+value: don't they need to handle failure too?
+
+thanks
+-- PMM
