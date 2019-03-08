@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48891)
+Received: from eggs.gnu.org ([209.51.188.92]:49708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2P7n-0003W1-6u
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:42:00 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h2PBf-0004lE-0y
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2P7k-0002xN-Kb
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:41:57 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36996)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2P7k-0002wW-BE
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:41:56 -0500
-Received: by mail-wm1-x342.google.com with SMTP id x10so13649946wmg.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 15:41:56 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20190307144126.31847-1-richard.henderson@linaro.org>
-	<20190307144126.31847-8-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2c32c0aa-cac8-365a-6b92-24c819bcb4e4@amsat.org>
-Date: Sat, 9 Mar 2019 00:41:53 +0100
+	(envelope-from <no-reply@patchew.org>) id 1h2PBd-0007ok-LG
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:45:58 -0500
+Resent-Message-Id: <E1h2PBd-0007ok-LG@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21095)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1h2PBd-0007ix-Bl
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:45:57 -0500
+Message-ID: <155208873155.8146.8897650748010904297@6acff2cf482b>
+In-Reply-To: <20190307144126.31847-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190307144126.31847-8-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 7/9] tcg/aarch64: Support
- INDEX_op_extract2_{i32, i64}
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Mar 2019 15:45:32 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,77 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: david@redhat.com
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, david@redhat.com
 
-On 3/7/19 3:41 PM, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tcg/aarch64/tcg-target.h     |  4 ++--
->  tcg/aarch64/tcg-target.inc.c | 11 +++++++++++
->  2 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-> index 6600a54a02..ce2bb1f90b 100644
-> --- a/tcg/aarch64/tcg-target.h
-> +++ b/tcg/aarch64/tcg-target.h
-> @@ -77,7 +77,7 @@ typedef enum {
->  #define TCG_TARGET_HAS_deposit_i32      1
->  #define TCG_TARGET_HAS_extract_i32      1
->  #define TCG_TARGET_HAS_sextract_i32     1
-> -#define TCG_TARGET_HAS_extract2_i32     0
-> +#define TCG_TARGET_HAS_extract2_i32     1
->  #define TCG_TARGET_HAS_movcond_i32      1
->  #define TCG_TARGET_HAS_add2_i32         1
->  #define TCG_TARGET_HAS_sub2_i32         1
-> @@ -114,7 +114,7 @@ typedef enum {
->  #define TCG_TARGET_HAS_deposit_i64      1
->  #define TCG_TARGET_HAS_extract_i64      1
->  #define TCG_TARGET_HAS_sextract_i64     1
-> -#define TCG_TARGET_HAS_extract2_i64     0
-> +#define TCG_TARGET_HAS_extract2_i64     1
->  #define TCG_TARGET_HAS_movcond_i64      1
->  #define TCG_TARGET_HAS_add2_i64         1
->  #define TCG_TARGET_HAS_sub2_i64         1
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index d57f9e500f..8b93598bce 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -2058,6 +2058,11 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
->          tcg_out_sbfm(s, ext, a0, a1, a2, a2 + args[3] - 1);
->          break;
->  
-> +    case INDEX_op_extract2_i64:
-> +    case INDEX_op_extract2_i32:
-> +        tcg_out_extr(s, ext, a0, a1, a2, args[3]);
-
-EXTR a0, a1, a2, #args[3] ; OK
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> +        break;
-> +
->      case INDEX_op_add2_i32:
->          tcg_out_addsub2(s, TCG_TYPE_I32, a0, a1, REG0(2), REG0(3),
->                          (int32_t)args[4], args[5], const_args[4],
-> @@ -2300,6 +2305,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
->          = { .args_ct_str = { "r", "r", "rAL" } };
->      static const TCGTargetOpDef dep
->          = { .args_ct_str = { "r", "0", "rZ" } };
-> +    static const TCGTargetOpDef ext2
-> +        = { .args_ct_str = { "r", "rZ", "rZ" } };
->      static const TCGTargetOpDef movc
->          = { .args_ct_str = { "r", "r", "rA", "rZ", "rZ" } };
->      static const TCGTargetOpDef add2
-> @@ -2430,6 +2437,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
->      case INDEX_op_deposit_i64:
->          return &dep;
->  
-> +    case INDEX_op_extract2_i32:
-> +    case INDEX_op_extract2_i64:
-> +        return &ext2;
-> +
->      case INDEX_op_add2_i32:
->      case INDEX_op_add2_i64:
->      case INDEX_op_sub2_i32:
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE0NDEyNi4zMTg0
+Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzE0
+NDEyNi4zMTg0Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwLzldIHRjZzogQWRkIHRjZ19nZW5fZXh0cmFjdDJfe2kzMixpNjR9Cgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
+YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
+aGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkw
+MzA3MTQ0MTI2LjMxODQ3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3
+LzIwMTkwMzA3MTQ0MTI2LjMxODQ3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjM4OThjY2NkZTkgdGFyZ2V0L2FybTogU2ltcGxp
+ZnkgQkZYSUwgZXhwYW5zaW9uCjJhZGE1ZDMxNmMgdGFyZ2V0L2FybTogVXNlIGV4dHJhY3QyIGZv
+ciBFWFRSCjQ5YjQ4NzAyMjcgdGNnL2FhcmNoNjQ6IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJf
+e2kzMiwgaTY0fQo5MmNkNjM4ZTU1IHRjZy9hcm06IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJf
+aTMyCjliOTNhN2JkZWIgdGNnL2kzODY6IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMiwg
+aTY0fQpkNWQ3Y2M3NzUwIHRjZzogVXNlIGV4dHJhY3QyIGluIHRjZ19nZW5fZGVwb3NpdF97aTMy
+LCBpNjR9CjY3YTYzNTY0NDYgdGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9zaGlmdGlfaTY0
+CjE3NzE0ZTEwZTIgdGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9CmM3OTM2YzVi
+OTQgdGNnOiBJbXBsZW1lbnQgdGNnX2dlbl9leHRyYWN0Ml97aTMyLCBpNjR9Cgo9PT0gT1VUUFVU
+IEJFR0lOID09PQoxLzkgQ2hlY2tpbmcgY29tbWl0IGM3OTM2YzViOTQwNCAodGNnOiBJbXBsZW1l
+bnQgdGNnX2dlbl9leHRyYWN0Ml97aTMyLCBpNjR9KQoyLzkgQ2hlY2tpbmcgY29tbWl0IDE3NzE0
+ZTEwZTIyMyAodGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9KQpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzEwOTogRklMRTogdGNnL29w
+dGltaXplLmM6MTIwNToKKyAgICAgICAgQ0FTRV9PUF8zMl82NChleHRyYWN0Mik6CiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
+OTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoz
+LzkgQ2hlY2tpbmcgY29tbWl0IDY3YTYzNTY0NDY4YSAodGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNn
+X2dlbl9zaGlmdGlfaTY0KQo0LzkgQ2hlY2tpbmcgY29tbWl0IGQ1ZDdjYzc3NTBlMyAodGNnOiBV
+c2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9kZXBvc2l0X3tpMzIsIGk2NH0pCjUvOSBDaGVja2luZyBj
+b21taXQgOWI5M2E3YmRlYmNkICh0Y2cvaTM4NjogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml97
+aTMyLCBpNjR9KQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4
+RSkKIzQ4OiBGSUxFOiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0LmluYy5jOjI1OTE6CisgICAgT1BfMzJf
+NjQoZXh0cmFjdDIpOgogICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgNTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS85IGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgo2LzkgQ2hlY2tpbmcgY29tbWl0IDkyY2Q2MzhlNTVjMCAodGNnL2FybTogU3Vw
+cG9ydCBJTkRFWF9vcF9leHRyYWN0Ml9pMzIpCjcvOSBDaGVja2luZyBjb21taXQgNDliNDg3MDIy
+N2U4ICh0Y2cvYWFyY2g2NDogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml97aTMyLCBpNjR9KQo4
+LzkgQ2hlY2tpbmcgY29tbWl0IDJhZGE1ZDMxNmNjYiAodGFyZ2V0L2FybTogVXNlIGV4dHJhY3Qy
+IGZvciBFWFRSKQo5LzkgQ2hlY2tpbmcgY29tbWl0IDM4OThjY2NkZTkzOSAodGFyZ2V0L2FybTog
+U2ltcGxpZnkgQkZYSUwgZXhwYW5zaW9uKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
+Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDMwNzE0NDEyNi4zMTg0Ny0xLXJpY2hhcmQuaGVuZGVy
+c29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
