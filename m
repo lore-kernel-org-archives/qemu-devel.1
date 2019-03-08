@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55307)
+Received: from eggs.gnu.org ([209.51.188.92]:55331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h2Mww-0000ca-B3
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:22:39 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h2Mwy-0000cq-Or
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:22:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h2Mwv-0002OW-FK
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:22:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h2Mwv-0002NS-3r
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:22:37 -0500
-References: <20190308202858.26636-1-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f51cb786-1949-6103-3bf1-8a255216c50d@redhat.com>
-Date: Fri, 8 Mar 2019 15:22:29 -0600
+	(envelope-from <jsnow@redhat.com>) id 1h2Mwx-0002QM-Op
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 16:22:40 -0500
+References: <20190308205845.25734-1-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <6c0eb003-6bd5-2683-5a0c-10578974890c@redhat.com>
+Date: Fri, 8 Mar 2019 16:22:32 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190308202858.26636-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ObDMrZd46gjtdGxAQFMyPL2F2q7b2HCPR"
-Subject: Re: [Qemu-devel] [PULL 00/17] Bitmaps patches
+In-Reply-To: <20190308205845.25734-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] bitmaps: Fix typo in function name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +23,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ObDMrZd46gjtdGxAQFMyPL2F2q7b2HCPR
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-Message-ID: <f51cb786-1949-6103-3bf1-8a255216c50d@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 00/17] Bitmaps patches
-References: <20190308202858.26636-1-jsnow@redhat.com>
-In-Reply-To: <20190308202858.26636-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 3/8/19 2:28 PM, John Snow wrote:
-> The following changes since commit 234afe78281b10a798fb97c584e1b677844a=
-aab8:
->=20
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2=
-019-03-08' into staging (2019-03-08 16:31:34 +0000)
->=20
-> are available in the Git repository at:
->=20
->   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
->=20
-> for you to fetch changes up to fc91aa3d937e56d512c702d9b966fcea0e499f0e=
-:
->=20
->   block/dirty-bitmaps: implement inconsistent bit (2019-03-08 14:07:29 =
--0500)
->=20
-> ----------------------------------------------------------------
-> Pull request
-
-Replying to the cover letter in case Peter doesn't see the nested reply:
-NACK, v2 coming up for minor checkpatch fixes
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 
---ObDMrZd46gjtdGxAQFMyPL2F2q7b2HCPR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+On 3/8/19 3:58 PM, Eric Blake wrote:
+> Commit a88b179f introduced the ability to set and query bitmap
+> persistence, but with an atypical spelling.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> Based-on: <20190308202858.26636-1-jsnow@redhat.com>
+> [PULL 00/17 Bitmaps patches]
+> (Don't know if John wants to do a v2 pull request to silence some
+> checkpatch warnings, in which case this could sneak in...)
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyC3RYACgkQp6FrSiUn
-Q2qT5wf+MFSFXowSQ5QMJUCK3HpgKpTyigwhLcANwLyDPl8mAUUq9cq4UFmMKOAe
-aa5ssZZmY4Otd6kOBg9p/x8+oVmQdwfYcik/kBtIiyzDj8ieCGz8JpORbdWAZl11
-ZqUB9wYMxKgKdRfAms2OWzYRj2JPc7l864nzE3uypDfUHB6PxMb33IXOVv++WOcR
-/AXa8E9HiisU688fdcm6ILlo4qKu/qbF89eLeg+46PbcRZThSh15I3d9PIyyAqke
-RYF41Dl+LN2+fq2uUhxbMFFjLGbWwZZzJQOOXn+TFL3XsnsIKT3HpzAyAKhBDcZT
-O4/JwBGDPNSD3ksFp6Qj1WFqwkYQxA==
-=yNz/
------END PGP SIGNATURE-----
+Yes, I'll take it. Staged.
 
---ObDMrZd46gjtdGxAQFMyPL2F2q7b2HCPR--
+--js
+
+>  include/block/dirty-bitmap.h   | 4 ++--
+>  block/dirty-bitmap.c           | 4 ++--
+>  block/qcow2-bitmap.c           | 6 +++---
+>  blockdev.c                     | 4 ++--
+>  migration/block-dirty-bitmap.c | 4 ++--
+>  5 files changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 2a782439547..8044ace63e4 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -78,7 +78,7 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
+>  void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+> 
+>  void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
+> -void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+> +void bdrv_dirty_bitmap_set_persistence(BdrvDirtyBitmap *bitmap,
+>                                         bool persistent);
+>  void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap);
+>  void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy);
+> @@ -103,7 +103,7 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
+>  bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+>  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+>  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+> -bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
+> +bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap);
+>  bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap);
+>  bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+>  BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 59c403c3fd5..b08d4ec69ee 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -739,7 +739,7 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
+>  }
+> 
+>  /* Called with BQL taken. */
+> -void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool persistent)
+> +void bdrv_dirty_bitmap_set_persistence(BdrvDirtyBitmap *bitmap, bool persistent)
+>  {
+>      qemu_mutex_lock(bitmap->mutex);
+>      bitmap->persistent = persistent;
+> @@ -764,7 +764,7 @@ void bdrv_dirty_bitmap_set_migration(BdrvDirtyBitmap *bitmap, bool migration)
+>      qemu_mutex_unlock(bitmap->mutex);
+>  }
+> 
+> -bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap)
+> +bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap)
+>  {
+>      return bitmap->persistent && !bitmap->migration;
+>  }
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index 80926966de2..6adbe06b4d2 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -968,7 +968,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+>              goto fail;
+>          }
+> 
+> -        bdrv_dirty_bitmap_set_persistance(bitmap, true);
+> +        bdrv_dirty_bitmap_set_persistence(bitmap, true);
+>          if (bm->flags & BME_FLAG_IN_USE) {
+>              bdrv_dirty_bitmap_set_inconsistent(bitmap);
+>          } else {
+> @@ -1426,7 +1426,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+>          uint32_t granularity = bdrv_dirty_bitmap_granularity(bitmap);
+>          Qcow2Bitmap *bm;
+> 
+> -        if (!bdrv_dirty_bitmap_get_persistance(bitmap) ||
+> +        if (!bdrv_dirty_bitmap_get_persistence(bitmap) ||
+>              bdrv_dirty_bitmap_readonly(bitmap) ||
+>              bdrv_dirty_bitmap_inconsistent(bitmap)) {
+>              continue;
+> @@ -1544,7 +1544,7 @@ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
+>      for (bitmap = bdrv_dirty_bitmap_next(bs, NULL); bitmap != NULL;
+>           bitmap = bdrv_dirty_bitmap_next(bs, bitmap))
+>      {
+> -        if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
+> +        if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
+>              bdrv_dirty_bitmap_set_readonly(bitmap, true);
+>          }
+>      }
+> diff --git a/blockdev.c b/blockdev.c
+> index 51fcfb7faf1..267debda336 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -2862,7 +2862,7 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+>          bdrv_disable_dirty_bitmap(bitmap);
+>      }
+> 
+> -    bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
+> +    bdrv_dirty_bitmap_set_persistence(bitmap, persistent);
+>   out:
+>      if (aio_context) {
+>          aio_context_release(aio_context);
+> @@ -2887,7 +2887,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+>          return;
+>      }
+> 
+> -    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
+> +    if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
+>          aio_context = bdrv_get_aio_context(bs);
+>          aio_context_acquire(aio_context);
+>          bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+> index 0fcf897f329..ac095dae0f5 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -320,7 +320,7 @@ static int init_dirty_bitmap_migration(void)
+>              if (bdrv_dirty_bitmap_enabled(bitmap)) {
+>                  dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_ENABLED;
+>              }
+> -            if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
+> +            if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
+>                  dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_PERSISTENT;
+>              }
+> 
+> @@ -472,7 +472,7 @@ static int dirty_bitmap_load_start(QEMUFile *f, DirtyBitmapLoadState *s)
+>      }
+> 
+>      if (flags & DIRTY_BITMAP_MIG_START_FLAG_PERSISTENT) {
+> -        bdrv_dirty_bitmap_set_persistance(s->bitmap, true);
+> +        bdrv_dirty_bitmap_set_persistence(s->bitmap, true);
+>      }
+> 
+>      bdrv_disable_dirty_bitmap(s->bitmap);
+> 
