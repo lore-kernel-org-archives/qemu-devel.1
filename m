@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48812)
+Received: from eggs.gnu.org ([209.51.188.92]:49688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2CO4-0001iK-BG
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:05:57 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h2CQf-0003dZ-KY
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2CO3-0007Jz-AU
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:05:56 -0500
-References: <20190308013222.12524-1-philmd@redhat.com>
-	<20190308013222.12524-7-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <eb5b1516-9dca-e9bc-4a2b-d5573c14146f@redhat.com>
-Date: Fri, 8 Mar 2019 11:05:37 +0100
+	(envelope-from <kwolf@redhat.com>) id 1h2CQe-0001eX-JO
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:08:37 -0500
+Date: Fri, 8 Mar 2019 11:08:26 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190308100826.GB5339@localhost.localdomain>
+References: <1545387387-9613-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+	<20190306215633.GM6818@localhost.localdomain>
+	<20190307084405.GB26350@byw>
+	<20190307112505.GB5786@linux.fritz.box> <20190308072230.GA9529@byw>
 MIME-Version: 1.0
-In-Reply-To: <20190308013222.12524-7-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/18] hw/nvram/fw_cfg: Remove the
- unnecessary boot_splash_filedata_size
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190308072230.GA9529@byw>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tcmu: Introduce qemu-tcmu
+ utility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +26,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Amar Tumballi <atumball@redhat.com>, Mike Christie <mchristi@redhat.com>, Prasanna Kalever <pkalever@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiubo Li <xiubli@redhat.com>, Fam Zheng <fam@euphon.net>, stefanha <stefanha@redhat.com>
 
-On 03/08/19 02:32, Philippe Mathieu-Daud=C3=A9 wrote:
-> The 'boot_splash_filedata_size' was introduced as a global variable
-> in 3d3b8303c6f. This variable is used as a 'size' argument to the
-> fw_cfg_add_file(). This function has an interface contract with his
+Am 08.03.2019 um 08:22 hat Yaowei Bai geschrieben:
+> > > > * The first priority should be adding an in-process iscsi target that
+> > > >   can be managed with QMP, similar to the built-in NBD server.
+> > > 
+> > > Well, people used to manage iscsi targets through targetcli, a command
+> > > line utility. Our intention is, with targetcli and qemu-tcmu, user can
+> > > create/remove targets and backstores totally in just one place, so you
+> > > don't need to create targets in targetcli and then turn to configure
+> > > backstores in qemu-tcmu with QMP or command line, it's convenient.  So
+> > > we decide to implement QMP in the future release but it's definitely
+> > > in our plan.
+> > 
+> > I think QMP needs to come first to result in a clean design, because the
+> > command line tool should only be a wrapper around the QMP code.
+> 
+> Yeah, i agree this makes more sense from this point. Ok, i'll try to
+> implement it in v2 as your suggestion. Thanks.
+> 
+> > But anyway, I still think the change I had in mind is necessary. Maybe
+> > you can see the difference best in an example. Your documentation says
+> > to use this:
+> > 
+> >     # qemu-tcmu
+> >     # targetcli /backstores/user:qemu create qemulun 1G @id=test@file=/root/test.file
+> 
+> Let's call this one case1.
+> 
+> > 
+> > I think it should work more like this:
+> > 
+> >     # qemu-tcmu -blockdev driver=file,filename=/root/test.file,node-name=my_file \
+> >                 -export my_export,node=my_file
+> >     # targetcli /backstores/user:qemu create qemulun 1G my_export
+> 
+> And this one case2.
+> 
+> > 
+> > In fact, something like this is probably required if we want to export
+> > existing block nodes (that may be in use by a guest) from a running QEMU
+> > instance. In this case, you don't want to open a new image file, but
+> > export the already opened image file.
+> 
+> I think the main difference between these two cases is just how the configuration
+> of exported image file is passed to qemu-tcmu. Case1 uses cfgstr while case2
+> uses command line. Case2 still needs one way to check whether the passed-in
+> image file was opened, right? If so, case1 should also be able to use the same
+> way to check that after extracting cfgstr. 
 
-s/with his/on its/
+I'm not sure what check you mean. Case 2 would need to find an existing
+export with the given name, of course, and would return an error if no
+such export exists yet.
 
-With that update:
+But for care 1, isn't the image explicitly opened when the target is
+configured? And if it can't be opened, -1 is returned to libtcmu?
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Actually we thought about qemu-tcmu working like case2, but felt is's quite less
+> flexible. With case2, e.g. when we want to export another new image file with
+> one qemu-tcmu already running, we have to run another qemu-tcmu with
+> the configuration of the new image file in commandline, or through QMP of the
+> running qemu-tcmu, and then configure it with targetcli. So anyway,
+> there's one more step for case2 to export a new image file. While for case1 
+> you just need to run qemu-tcmu once and all other operations will be done
+> within targetcli, which is more friendly to users i think.
 
-Thanks
-Laszlo
+Some users may call it more convenient (even though it's really the
+same, just moved to a different command, in the simple case that case 2
+supports). But it's actually not very flexible.
 
-> 'data' argument, but there is no such contract for 'size' (this is
-> not a referenced pointer).  We can simply remove it.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/nvram/fw_cfg.c       | 5 ++---
->  include/sysemu/sysemu.h | 1 -
->  vl.c                    | 1 -
->  3 files changed, 2 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 8eb76a382c..b2dc0a80cb 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -217,15 +217,14 @@ static void fw_cfg_bootsplash(FWCfgState *s)
->          }
->          g_free(boot_splash_filedata);
->          boot_splash_filedata =3D (uint8_t *)file_data;
-> -        boot_splash_filedata_size =3D file_size;
-> =20
->          /* insert data */
->          if (file_type =3D=3D JPG_FILE) {
->              fw_cfg_add_file(s, "bootsplash.jpg",
-> -                    boot_splash_filedata, boot_splash_filedata_size);
-> +                            boot_splash_filedata, file_size);
->          } else {
->              fw_cfg_add_file(s, "bootsplash.bmp",
-> -                    boot_splash_filedata, boot_splash_filedata_size);
-> +                            boot_splash_filedata, file_size);
->          }
->          g_free(filename);
->      }
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 89604a8328..6065d9e420 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -110,7 +110,6 @@ extern int old_param;
->  extern int boot_menu;
->  extern bool boot_strict;
->  extern uint8_t *boot_splash_filedata;
-> -extern size_t boot_splash_filedata_size;
->  extern bool enable_mlock;
->  extern bool enable_cpu_pm;
->  extern QEMUClockType rtc_clock;
-> diff --git a/vl.c b/vl.c
-> index 4c5cc0d8ad..fad6fec38c 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -188,7 +188,6 @@ const char *prom_envs[MAX_PROM_ENVS];
->  int boot_menu;
->  bool boot_strict;
->  uint8_t *boot_splash_filedata;
-> -size_t boot_splash_filedata_size;
->  bool wakeup_suspend_enabled;
-> =20
->  int icount_align_option;
->=20
+If we implement case 1, you can define your configuration exactly as
+with QEMU, including multiple -blockdev and -object options, and select
+the exact block node that you want to export.
+
+In case 2, you only have a single string, which comes with many
+downsides:
+
+* You cannot get the semantics of block nodes defined individually with
+  separate -blockdev options, but only a single tree that is managed as
+  a single unit.
+
+* Additional objects such as iothreads or secrets cannot be included in
+  the config string, so you must split the configuration and pass some
+  parts directly to qemu-tcmu and other parts to targetcli. This is
+  inconsistent.
+
+* You need a way to represent a possible options of a node in a string.
+  QEMU -drive already caused trouble by giving commas a special meaning.
+  This patch adds @ as a special character, without an option to escape
+  it. If you have a filename that contains @, there is no way to use it.
+
+* For the not yet implemented QMP part: You can export only images that
+  are newly opened. You cannot export images that are already opened and
+  in use. But exporting images that are in use by the VM is the main use
+  of even having a QMP interface.
+
+If I think a bit longer, I'm sure I can come up with more points. Case 2
+just doesn't feel right, it is like drives were configured in QEMU 0.10,
+not in 4.0, and we moved away from it for many reasons, most of which
+probably apply here, too.
+
+> So i think qemu-tcmu's quite different from qemu-nbd at this point. We can
+> export a image file by NBD protocol just with qemu-nbd itself. While for
+> qemu-tcmu we still need targetcli to complete other ISCSI target
+> configurations to export a image file. So moving the configuration of image
+> file from cmdline to targetcli should be reasonable in my opinion.
+
+Yes, it is different. But the restriction to configure everything in a
+single string is what makes moving the configuration to targetcli a
+problem.
+
+Kevin
