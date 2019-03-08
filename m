@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36352)
+Received: from eggs.gnu.org ([209.51.188.92]:36361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2FL5-0004nX-BC
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:04 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2FL7-0004oh-A3
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2FL3-0006R4-Fu
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2FL4-0006W5-Ja
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:04 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  8 Mar 2019 14:14:37 +0100
-Message-Id: <20190308131445.17502-5-armbru@redhat.com>
-In-Reply-To: <20190308131445.17502-1-armbru@redhat.com>
-References: <20190308131445.17502-1-armbru@redhat.com>
+Date: Fri,  8 Mar 2019 14:14:33 +0100
+Message-Id: <20190308131445.17502-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 04/12] sysbus: Fix latent bug with onboard
- devices
+Subject: [Qemu-devel] [PATCH v3 00/12] pc: Support firmware configuration
+ with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +24,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
 
-The first call of sysbus_get_default() creates the main system bus and
-stores it in QOM as "/machine/unattached/sysbus".  This must not
-happen before main() creates "/machine", or else container_get() would
-"helpfully" create it as "container" object, and the real creation of
-"/machine" would later abort with "attempt to add duplicate property
-'machine' to object (type 'container')".  Has been that way ever since
-we wired up busses in QOM (commit f968fc6892d, v1.2.0).
+Based-on: <20190308094610.21210-1-armbru@redhat.com>
 
-I believe the bug is latent.  I got it to bite by trying to
-qdev_create() a sysbus device from a machine's .instance_init()
-method.
+v3:
+* PATCH 05: Commit message tidied up [Philippe, L=C3=A1szl=C3=B3]
+* PATCH 06: Comment tidied up [checkpatch]
+* PATCH 12: Comment polish [L=C3=A1szl=C3=B3]
 
-The fix is obvious: store the main system bus in QOM right after
-creating "/machine".
+v2:
+* PATCH 05,06: New [Philippe]
+* PATCH 07: Old PATCH 5 rebased onto new patches, with new comment
+  [Philippe]
+* PATCH 08+10: New, factored out of old PATCH 6 [by Philippe]
+* PATCH 09: New [by Philippe]
+* PATCH 11: Remainder of old PATCH 6, with FIXME resolved, literal
+  4096 de-duplicated [L=C3=A1szl=C3=B3], extraneous error check deleted
+  [L=C3=A1szl=C3=B3], and comment typos fixed
+* PATCH 12: New
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- hw/core/sysbus.c | 3 ---
- vl.c             | 4 ++++
- 2 files changed, 4 insertions(+), 3 deletions(-)
+Markus Armbruster (9):
+  qdev: Fix latent bug with compat_props and onboard devices
+  qom: Move compat_props machinery from qdev to QOM
+  vl: Fix latent bug with -global and onboard devices
+  sysbus: Fix latent bug with onboard devices
+  vl: Improve legibility of BlockdevOptions queue
+  vl: Factor configure_blockdev() out of main()
+  vl: Create block backends before setting machine properties
+  pc: Support firmware configuration with -blockdev
+  docs/interop/firmware.json: Prefer -machine to if=3Dpflash
 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 9f9edbcab9..307cf90a51 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -357,9 +357,6 @@ static void main_system_bus_create(void)
-     qbus_create_inplace(main_system_bus, system_bus_info.instance_size,
-                         TYPE_SYSTEM_BUS, NULL, "main-system-bus");
-     OBJECT(main_system_bus)->free =3D g_free;
--    object_property_add_child(container_get(qdev_get_machine(),
--                                            "/unattached"),
--                              "sysbus", OBJECT(main_system_bus), NULL);
- }
-=20
- BusState *sysbus_get_default(void)
-diff --git a/vl.c b/vl.c
-index b6368662e0..c38739e34c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3991,6 +3991,10 @@ int main(int argc, char **argv, char **envp)
-     }
-     object_property_add_child(object_get_root(), "machine",
-                               OBJECT(current_machine), &error_abort);
-+    object_property_add_child(container_get(OBJECT(current_machine),
-+                                            "/unattached"),
-+                              "sysbus", OBJECT(sysbus_get_default()),
-+                              NULL);
-=20
-     if (machine_class->minimum_page_bits) {
-         if (!set_preferred_target_page_bits(machine_class->minimum_page_=
-bits)) {
+Philippe Mathieu-Daud=C3=A9 (3):
+  pflash_cfi01: Add pflash_cfi01_get_blk() helper
+  pc_sysfw: Remove unused PcSysFwDevice
+  pc_sysfw: Pass PCMachineState to pc_system_firmware_init()
+
+ accel/accel.c              |   1 +
+ docs/interop/firmware.json |  20 ++-
+ hw/block/pflash_cfi01.c    |   5 +
+ hw/core/qdev.c             |  21 +---
+ hw/core/sysbus.c           |   3 -
+ hw/i386/pc.c               |   4 +-
+ hw/i386/pc_sysfw.c         | 249 ++++++++++++++++++++++++-------------
+ include/hw/block/flash.h   |   1 +
+ include/hw/i386/pc.h       |   6 +-
+ include/hw/qdev-core.h     |   2 -
+ include/qom/object.h       |   3 +
+ qom/object.c               |  39 ++++++
+ vl.c                       | 125 ++++++++++---------
+ 13 files changed, 303 insertions(+), 176 deletions(-)
+
 --=20
 2.17.2
