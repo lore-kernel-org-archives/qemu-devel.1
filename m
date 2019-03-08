@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60414)
+Received: from eggs.gnu.org ([209.51.188.92]:60711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h2Ili-0003wG-JM
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:47 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1h2Imr-0004wF-IF
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:55:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h2Ilh-0006Q1-S4
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:46 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  8 Mar 2019 16:53:44 +0000
-Message-Id: <20190308165344.10685-8-stefanha@redhat.com>
-In-Reply-To: <20190308165344.10685-1-stefanha@redhat.com>
-References: <20190308165344.10685-1-stefanha@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1h2Imq-0007IK-R6
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:55:57 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52527)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1h2Imq-0007HA-F5
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:55:56 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f65so13167312wma.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 08:55:55 -0800 (PST)
+References: <20190308162906.10491-1-philmd@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190308162906.10491-1-philmd@redhat.com>
+Date: Fri, 08 Mar 2019 16:55:52 +0000
+Message-ID: <875zstfgpz.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 7/7] iothread: document about why we need
- explicit aio_poll()
+Subject: Re: [Qemu-devel] [PATCH 0/3] travis-ci: Test installing Sphinx
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <fam@euphon.net>
 
-From: Peter Xu <peterx@redhat.com>
 
-After consulting Paolo I know why we'd better keep the explicit
-aio_poll() in iothread_run().  Document it directly into the code so
-that future readers will know the answer from day one.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20190306115532.23025-6-peterx@redhat.com
-Message-Id: <20190306115532.23025-6-peterx@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- iothread.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+> Hi,
+>
+> This series improve the Travis CI to test installing the Sphinx
+> generated documentation in in-tree and out-of-tree builds.
+>
+> It is based on Peter's "Fix various issues with Sphinx build
+> machinery" series:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02625.html
 
-diff --git a/iothread.c b/iothread.c
-index ad64c757ac..7130be58e3 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -63,6 +63,15 @@ static void *iothread_run(void *opaque)
-     qemu_sem_post(&iothread->init_done_sem);
-=20
-     while (iothread->running) {
-+        /*
-+         * Note: from functional-wise the g_main_loop_run() below can
-+         * already cover the aio_poll() events, but we can't run the
-+         * main loop unconditionally because explicit aio_poll() here
-+         * is faster than g_main_loop_run() when we do not need the
-+         * gcontext at all (e.g., pure block layer iothreads).  In
-+         * other words, when we want to run the gcontext with the
-+         * iothread we need to pay some performance for functionality.
-+         */
-         aio_poll(iothread->ctx, true);
-=20
-         /*
---=20
-2.20.1
+Hmm I'd just combined the docs and out of tree build:
+
+  https://github.com/stsquad/qemu/commit/c4d5ae98005bc8a3cd0224321d3d593865=
+0c3ef6
+
+>
+> Regards,
+>
+> Phil.
+>
+> Based-on: <20190308135744.6480-1-peter.maydell@linaro.org>
+>
+> Philippe Mathieu-Daud=C3=A9 (3):
+>   .travis.yml: Reduce the out-of-tree target list
+>   .travis.yml: Test the documentation installation process
+>   .travis.yml: Test installing Sphinx documentation in out-of-tree build
+>
+>  .travis.yml | 20 +++++++++++++++-----
+>  1 file changed, 15 insertions(+), 5 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
