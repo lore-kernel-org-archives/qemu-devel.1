@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42073)
+Received: from eggs.gnu.org ([209.51.188.92]:42077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h240E-0006Bw-Ih
+	(envelope-from <dgibson@ozlabs.org>) id 1h240E-0006By-It
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h240C-0000to-C8
+	(envelope-from <dgibson@ozlabs.org>) id 1h240C-0000tb-CO
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:46 -0500
-Date: Fri, 8 Mar 2019 11:14:43 +1100
+Date: Fri, 8 Mar 2019 11:19:04 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190308001443.GG7722@umbus.fritz.box>
-References: <20190307052137.2780-1-david@gibson.dropbear.id.au>
-	<ad194b40-507d-5de1-dc1c-23adb046fac7@ozlabs.ru>
+Message-ID: <20190308001904.GI7722@umbus.fritz.box>
+References: <20190306085032.15744-1-clg@kaod.org>
+	<20190306085032.15744-19-clg@kaod.org>
+	<20190307041816.GL7722@umbus.fritz.box>
+	<05109d65-4917-5929-2431-99ea25d4fb67@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="r4jNezHNW2wfBox+"
+	protocol="application/pgp-signature"; boundary="qZVVwWJgpX9Jzs7f"
 Content-Disposition: inline
-In-Reply-To: <ad194b40-507d-5de1-dc1c-23adb046fac7@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH] spapr: Use CamelCase properly
+In-Reply-To: <05109d65-4917-5929-2431-99ea25d4fb67@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 18/27] ppc/pnv: add a LPC Controller model
+ for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +27,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: clg@kaod.org, groug@kaod.org, agraf@suse.de, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---r4jNezHNW2wfBox+
-Content-Type: text/plain; charset=us-ascii
+--qZVVwWJgpX9Jzs7f
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 07, 2019 at 04:38:28PM +1100, Alexey Kardashevskiy wrote:
->=20
->=20
-> On 07/03/2019 16:21, David Gibson wrote:
-> > The qemu coding standard is to use CamelCase for type and structure nam=
-es,
-> > and the pseries code follows that... sort of.  There are quite a lot of
-> > places where we bend the rules in order to preserve the capitalization =
-of
-> > internal acronyms like "PHB", "TCE", "DIMM" and most commonly "sPAPR".
+On Thu, Mar 07, 2019 at 08:07:41AM +0100, C=E9dric Le Goater wrote:
+> On 3/7/19 5:18 AM, David Gibson wrote:
+> > On Wed, Mar 06, 2019 at 09:50:23AM +0100, C=E9dric Le Goater wrote:
+[snip]
+> >> +static uint64_t pnv_lpc_mmio_read(void *opaque, hwaddr addr, unsigned=
+ size)
+> >> +{
+> >> +    PnvLpcController *lpc =3D PNV_LPC(opaque);
+> >> +    uint64_t val =3D 0;
+> >> +    uint32_t opb_addr =3D addr & ECCB_CTL_ADDR_MASK;
+> >> +    MemTxResult result;
+> >> +
+> >> +    switch (size) {
+> >> +    case 4:
+> >> +        val =3D address_space_ldl(&lpc->opb_as, opb_addr, MEMTXATTRS_=
+UNSPECIFIED,
+> >> +                                &result);
+> >> +        break;
+> >> +    case 1:
+> >> +        val =3D address_space_ldub(&lpc->opb_as, opb_addr, MEMTXATTRS=
+_UNSPECIFIED,
+> >> +                                 &result);
+> >> +        break;
+> >> +    default:
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB read failed at @0x%"
+> >> +                      HWADDR_PRIx " invalid size %d\n", addr, size);
+> >> +        return 0;
+> >> +    }
+> >> +
+> >> +    if (result !=3D MEMTX_OK) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB read failed at @0x%"
+> >> +                      HWADDR_PRIx "\n", addr);
+> >> +    }
+> >> +
+> >> +    return val;
 > >=20
-> > That was a bad idea - it frequently leads to names ending up with hard =
-to
-> > read clusters of capital letters, and means they don't catch the eye as
-> > type identifiers, which is kind of the point of the CamelCase conventio=
-n in
-> > the first place.
-> >=20
-> > In short, keeping type identifiers look like CamelCase is more important
-> > than preserving standard capitalization of internal "words".  So, this
-> > patch renames a heap of spapr internal type names to a more standard
-> > CamelCase.
-> >=20
-> > In addition to case changes, we also make some other identifier renames:
-> >   VIOsPAPR* -> SpaprVio*
-> >     The reverse word ordering was only ever used to mitigate the capital
-> >     cluster, so revert to the natural ordering.
-> >   VIOsPAPRVTYDevice -> SpaprVioVty
-> >   VIOsPAPRVLANDevice -> SpaprVioVlan
-> >     Brevity, since the "Device" didn't add useful information
-> >   sPAPRDRConnector -> SpaprDrc
-> >   sPAPRDRConnectorClass -> SpaprDrcClass
-> >     Brevity, and makes it clearer this is the same thing as a "DRC"
-> >     mentioned in many other places in the code
-> >=20
-> > This is 100% a mechanical search-and-replace patch. It will, however,
-> > conflict with essentially any and all outstanding patches touching the
-> > spapr code.
+> > Couldn't you just map the relevant portion of the OPB AS into the MMIO
+> > AS, rather than having to forward the IOs with explicit read/write
+> > functions?
 >=20
->=20
-> so it would be nice to have the script to fix those outstanding patches
-> before reposting.
+> The underlying memory regions (ISA space, LPC HC, OPB regs) are the
+> same on POWER8. So this is one way to share the overall initialization.=
+=20
 
-Sorry, I don't have a script for this.
+I don't understand how that relates to my question.  If anything that
+sounds like it makes even more sense to map the common MR with the
+actual registers into the MMIO AS as a subregion, rather than having a
+redirect via the OPB AS.
 
-The patch is equivalent to a scripted replacement, but I didn't
-actually make it with a script - I built it up interactively using the
-"regexxer" tool.
+> What I would have liked to do is to simplified the ECCB interface=20
+> (see pnv_lpc_do_eccb()).
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20
+>=20
+> >> +}
+> >> +
+> >> +static void pnv_lpc_mmio_write(void *opaque, hwaddr addr,
+> >> +                                uint64_t val, unsigned size)
+> >> +{
+> >> +    PnvLpcController *lpc =3D PNV_LPC(opaque);
+> >> +    uint32_t opb_addr =3D addr & ECCB_CTL_ADDR_MASK;
+> >> +    MemTxResult result;
+> >> +
+> >> +    switch (size) {
+> >> +    case 4:
+> >> +        address_space_stl(&lpc->opb_as, opb_addr, val, MEMTXATTRS_UNS=
+PECIFIED,
+> >> +                          &result);
+> >> +         break;
+> >> +    case 1:
+> >> +        address_space_stb(&lpc->opb_as, opb_addr, val, MEMTXATTRS_UNS=
+PECIFIED,
+> >> +                          &result);
+> >> +        break;
+> >> +    default:
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB write failed at @0x%"
+> >> +                      HWADDR_PRIx " invalid size %d\n", addr, size);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (result !=3D MEMTX_OK) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB write failed at @0x%"
+> >> +                      HWADDR_PRIx "\n", addr);
+> >> +    }
+> >> +}
+> >> +
+> >> +static const MemoryRegionOps pnv_lpc_mmio_ops =3D {
+> >> +    .read =3D pnv_lpc_mmio_read,
+> >> +    .write =3D pnv_lpc_mmio_write,
+> >> +    .impl =3D {
+> >> +        .min_access_size =3D 1,
+> >> +        .max_access_size =3D 4,
+> >> +    },
+> >> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> >> +};
+> >> +
+> >>  static void pnv_lpc_eval_irqs(PnvLpcController *lpc)
+> >>  {
+> >>      bool lpc_to_opb_irq =3D false;
+> >> @@ -465,6 +627,43 @@ static const TypeInfo pnv_lpc_power8_info =3D {
+> >>      }
+> >>  };
+> >> =20
+> >> +static void pnv_lpc_power9_realize(DeviceState *dev, Error **errp)
+> >> +{
+> >> +    PnvLpcController *lpc =3D PNV_LPC(dev);
+> >> +    PnvLpcClass *plc =3D PNV_LPC_GET_CLASS(dev);
+> >> +    Error *local_err =3D NULL;
+> >> +
+> >> +    plc->parent_realize(dev, &local_err);
+> >> +    if (local_err) {
+> >> +        error_propagate(errp, local_err);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /* P9 uses a MMIO region */
+> >> +    memory_region_init_io(&lpc->xscom_regs, OBJECT(lpc), &pnv_lpc_mmi=
+o_ops,
+> >> +                          lpc, "lpcm", PNV9_LPCM_SIZE);
+> >> +}
+> >> +
+> >> +static void pnv_lpc_power9_class_init(ObjectClass *klass, void *data)
+> >> +{
+> >> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> >> +    PnvLpcClass *plc =3D PNV_LPC_CLASS(klass);
+> >> +
+> >> +    dc->desc =3D "PowerNV LPC Controller POWER9";
+> >> +
+> >> +    plc->psi_irq =3D PSIHB9_IRQ_LPCHC;
+> >> +
+> >> +    device_class_set_parent_realize(dc, pnv_lpc_power9_realize,
+> >> +                                    &plc->parent_realize);
+> >> +}
+> >> +
+> >> +static const TypeInfo pnv_lpc_power9_info =3D {
+> >> +    .name          =3D TYPE_PNV9_LPC,
+> >> +    .parent        =3D TYPE_PNV_LPC,
+> >> +    .instance_size =3D sizeof(PnvLpcController),
+> >> +    .class_init    =3D pnv_lpc_power9_class_init,
+> >> +};
+> >> +
+> >>  static void pnv_lpc_realize(DeviceState *dev, Error **errp)
+> >>  {
+> >>      PnvLpcController *lpc =3D PNV_LPC(dev);
+> >> @@ -540,6 +739,7 @@ static void pnv_lpc_register_types(void)
+> >>  {
+> >>      type_register_static(&pnv_lpc_info);
+> >>      type_register_static(&pnv_lpc_power8_info);
+> >> +    type_register_static(&pnv_lpc_power9_info);
+> >>  }
+> >> =20
+> >>  type_init(pnv_lpc_register_types)
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -88,24 +200,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---r4jNezHNW2wfBox+
+--qZVVwWJgpX9Jzs7f
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyBs/MACgkQbDjKyiDZ
-s5Ki0A//d9338mmYVaj2QDv5iStaAc/rrhvuXlkksTOxwpLiJ6Xl0RIfBBjWeeiy
-3VhjF+a1y/vkJxFitPA6XQuBnxsAo1Is8lhWSdYhceLYFhwne1GqEHHhnlqqHB7q
-Zl8YIm0ulN70xe5kh4xkjzrWQDWST41dZ7+JygVXAW9RyGkn6bEfNEMDyYLX9jpM
-3jOYzpE8mc+xqIgPorCuqXMJriPtERi96NddQDcwjRB+se29wtsvYtB9tKvbeIrW
-xnuYuZJU8TMa/6umku8TQ01L+NMuyxODNTk7QdM3Pvq9dsmWD9wSPUELnaj6f+lN
-GAlqmisXZS79j0ocE3dWSi4mjVBCp2XTOmBsCcEmPjMr2m4+Be6YcvajiRhH0RNU
-PnJKOc0gN6jNRJu2oBKvKraxZoFQbz6mfU1NrNH8RVjyNxSDjTmXOqc3k91R9GAS
-i7hnTwxoX8IVpDozCbW6UUMGKnYdrAHG5d5VjTdKOJvD7gGeQr86NfEImD7Agjym
-kEF6pTbPloo4rR/EhBMtowwbe/x+o6YF2zze3o8Y8B2q/sVrU61/HSsUPQwuEvAF
-3SyVdWE4gKwAwptc60Eesy8yuh+Dt8fI48f7PynpgpWPrzKoGubPbITPD4cZeRrs
-z7Qphm8vH+2c0Z99IbRuLOWuFgjsNssAHX8hKNOUUdqPnkbYKZI=
-=Nzca
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyBtPgACgkQbDjKyiDZ
+s5JthBAAggXa+xcX6dgmKWux6w7WESruZxyBU5weXEmvT8safeHf99uxJZ4iSN3f
+wQ0NY1NaMDfKC362UnAWiX7M8OTlkIyMdgPxMuTNvnvdGWn4St0RfvSRDWbetHnk
+GTnd5HJ5lNy++uJpMQKUeRs4U/BeKujGYeyRx9E73rPGeoi6W3bwRnwwTbYkA+a7
+cQQfwPDTPj98h9l8sKGVxo3xKHftrg4gfTEOK5uP8FLBBoCM2hVWZiMpycNsmz1Z
+/sGYjlAmD/2z2eIJxLGsDha3Mf9Kmn/NORUSsATAscHOn8qXTaR2bmirkz/Ysj6U
+ALPiCdxBtL2IBjRlWdSCVnbA2eHE0MQ6OJghkruboapf9vkQ94csT6Xkj6yjnNb6
+oiFWYmV9kF0jWBmY+htA55L2miLibQBRukRWsg1VvdSDQUIs1oB09Rfi9AJogfhZ
+xi5/DYqrsW0n2JBOh+BwojXnGwwfohiXciK4jMmd/SDLP5I4XuHCYLJHZztC5Iny
+Almlii6lMA7bwj4oMsbrwRBY1kwCPQkZ3gXDrEdJ+fjW8OEdI9GDPizf3CZfPFH9
+e7+5ihM0I/uJD1UJnRLpx9otFNKU6RVsG5Wd0IhyVS6tfapRFl7GoxppdEo55/2/
+qgZZy+SsF9m/IfdTaTCgxYTrBJjv1zY2eDcnj2H+Eb2Oavm2NK0=
+=biqf
 -----END PGP SIGNATURE-----
 
---r4jNezHNW2wfBox+--
+--qZVVwWJgpX9Jzs7f--
