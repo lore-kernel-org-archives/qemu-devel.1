@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44025)
+Received: from eggs.gnu.org ([209.51.188.92]:44487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2C7E-000461-Ue
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:48:34 -0500
+	(envelope-from <stefanha@redhat.com>) id 1h2C9I-0005rV-Hm
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2C7D-0008Ap-PS
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:48:32 -0500
-References: <20190308013222.12524-1-philmd@redhat.com>
-	<20190308013222.12524-4-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <71bce75b-a2a9-061b-a1c2-7c4e49d957b1@redhat.com>
-Date: Fri, 8 Mar 2019 10:48:07 +0100
+	(envelope-from <stefanha@redhat.com>) id 1h2C9H-0001UQ-Nh
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:50:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33386)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1h2C9H-0001Tc-Dd
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:50:39 -0500
+Date: Fri, 8 Mar 2019 09:50:36 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190308095036.GC12318@stefanha-x1.localdomain>
+References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
+	<20190307142609.GF2843@stefanha-x1.localdomain>
+	<20190307145120.GF32268@redhat.com>
+	<20190307192727.GG2915@stefanha-x1.localdomain>
+	<BDEBF2EE-DE0F-46CF-B60E-536B3DA9BF77@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20190308013222.12524-4-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 03/18] cutils: Add qemu_strdup_hexlify()
- and qemu_strdup_unhexlify()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="JgQwtEuHJzHdouWu"
+Content-Disposition: inline
+In-Reply-To: <BDEBF2EE-DE0F-46CF-B60E-536B3DA9BF77@oracle.com>
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
+ the concept description to docs/devel/qemu-multiprocess
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,186 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: John G Johnson <john.g.johnson@oracle.com>
+Cc: =?iso-8859-1?Q?=22Daniel_P=2E_Berrang=E9=22?= <berrange@redhat.com>, Elena Ufimtseva <elena.ufimtseva@oracle.com>, sstabellini@kernel.org, Jag Raman <jag.raman@oracle.com>, konrad.wilk@oracle.com, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, ross.lagerwall@citrix.com, liran.alon@oracle.com, kanth.ghatraju@oracle.com
 
-Hi Phil,
 
-most important comment at the bottom.
+--JgQwtEuHJzHdouWu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 03/08/19 02:32, Philippe Mathieu-Daud=C3=A9 wrote:
-> Add two helpers: one to represent a binary data as a string of
-> hexadecimal values, and one to restore a such string into its
-> original binary data.
+On Thu, Mar 07, 2019 at 03:29:41PM -0800, John G Johnson wrote:
+> > On Mar 7, 2019, at 11:27 AM, Stefan Hajnoczi <stefanha@redhat.com> wrot=
+e:
+> > On Thu, Mar 07, 2019 at 02:51:20PM +0000, Daniel P. Berrang=E9 wrote:
+> >> On Thu, Mar 07, 2019 at 02:26:09PM +0000, Stefan Hajnoczi wrote:
+> >>> On Wed, Mar 06, 2019 at 11:22:53PM -0800, elena.ufimtseva@oracle.com =
+wrote:
+> >>>> diff --git a/docs/devel/qemu-multiprocess.txt b/docs/devel/qemu-mult=
+iprocess.txt
+> >>>> new file mode 100644
+> >>>> index 0000000..e29c6c8
+> >>>> --- /dev/null
+> >>>> +++ b/docs/devel/qemu-multiprocess.txt
+> >>>=20
+> >>> Thanks for this document and the interesting work that you are doing.
+> >>> I'd like to discuss the security advantages gained by disaggregating
+> >>> QEMU in more detail.
+> >>>=20
+> >>> The security model for VMs managed by libvirt (most production x86, p=
+pc,
+> >>> s390 guests) is that the QEMU process is untrusted and only has access
+> >>> to resources belonging to the guest.  SELinux is used to restrict the
+> >>> process from accessing other files, processes, etc on the host.
+> >>=20
+> >> NB it doesn't have to be SELinux. Libvirt also supports AppArmor and
+> >> can even do isolation with traditional DAC by putting each QEMU under
+> >> a distinct UID/GID and having libvirtd set ownership on resources each
+> >> VM is permitted to use.
+> >>=20
+> >>> QEMU does not hold privileged resources that must be kept away from t=
+he
+> >>> guest.  An escaped guest can access its image file, tap file descript=
+or,
+> >>> etc but they are the same resources it could already access via device
+> >>> emulation.
+> >>>=20
+> >>> Can you give specific examples of how disaggregation improves securit=
+y?
+> >=20
+> > Elena & collaborators: Dan has posted some ideas but please share yours
+> > so the security benefits of this patch series can be better understood.
+> >=20
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  include/qemu/cutils.h | 33 ++++++++++++++++++++++++++
->  util/cutils.c         | 55 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 88 insertions(+)
->=20
-> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-> index d2dad3057c..375a5508b0 100644
-> --- a/include/qemu/cutils.h
-> +++ b/include/qemu/cutils.h
-> @@ -171,6 +171,39 @@ bool test_buffer_is_zero_next_accel(void);
->  int uleb128_encode_small(uint8_t *out, uint32_t n);
->  int uleb128_decode_small(const uint8_t *in, uint32_t *n);
-> =20
-> +/**
-> + * qemu_strdup_hexlify:
+> 	Dan covered the main point.  The security regime we use (selinux)
+> constrains the actions of processes on objects, so having multiple proces=
+ses
+> allows us to apply more fine-grained policies.
 
-(1) I think the name "hexlify" is unusual. I think we should use
-encode/decode terminology, or hex/unhex, or, if we want to stick with
-the "stringify" pattern, hexify/unhexify. (No "l".)
+Please share the SELinux policy files, containerization scripts, etc.
+There is probably a home for them in qemu.git, libvirt.git, or elsewhere
+upstream.
 
-> + *
-> + * Encode a sequence of binary data into its hexadecimal stringified
-> + * representation.
-> + *
-> + * @ptr: Buffer to hexlify
-> + * @size: Length of the buffer
-> + *
-> + * Use qemu_strdup_unhexlify() to convert the hex string to original d=
-ata.
-> + *
-> + * Returns: A newly allocated, zero-terminated hex encoded string repr=
-esenting
-> + * the data. The returned string must be freed with g_free().
-> + */
-> +gchar *qemu_strdup_hexlify(gconstpointer ptr, gsize size);
-> +
-> +/**
-> + * qemu_strdup_unhexlify:
-> + *
-> + * Decode a sequence of hexadecimal encoded text into binary data.
-> + *
-> + * @hex_string: String to unhexlify
-> + * @out_size: if not NULL: gsize to be written with the data length
-> + *
-> + * This function is the opposite of qemu_strdup_hexlify().
-> + *
-> + * Returns: A newly allocated buffer containing the binary data that t=
-ext
-> + * represents. The returned buffer must be freed with g_free().
-> + * Note that the returned binary data is not necessarily zero-terminat=
-ed,
-> + * so it should not be used as a character string.
-> + */
-> +gpointer qemu_strdup_unhexlify(const gchar *hex_string, gsize *out_siz=
-e);
-> +
->  /**
->   * qemu_pstrcmp0:
->   * @str1: a non-NULL pointer to a C string (*str1 can be NULL)
-> diff --git a/util/cutils.c b/util/cutils.c
-> index e098debdc0..bf324c0d8b 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -779,6 +779,61 @@ int uleb128_decode_small(const uint8_t *in, uint32=
-_t *n)
->      }
->  }
-> =20
-> +static guchar hexval(const gchar v)
-> +{
-> +    switch (v) {
-> +    case '0' ... '9':
-> +        return v - '0';
-> +    case 'A' ... 'F':
-> +        return v - 'A' + 10;
-> +    case 'a' ... 'f':
-> +        return v - 'a' + 10;
-> +    default:
-> +        return 0;
-> +    }
-> +}
+We need to find a way to make the sandboxing improvements available to
+users besides yourself and easily reusable for developers who wish to
+convert additional device models.
 
-(2) I don't think that we should silently translate invalid characters
-to zero, in any hexadecimal decoder.
+Thanks,
+Stefan
 
-> +
-> +gchar *qemu_strdup_hexlify(gconstpointer ptr, gsize len)
-> +{
-> +    guchar *data =3D (guchar *)ptr;
-> +    gchar *hex_string;
-> +
-> +    if (!ptr || !len) {
-> +        return g_strdup("");
-> +    }
-> +
-> +    hex_string =3D g_malloc(2 * len + 1);
+--JgQwtEuHJzHdouWu
+Content-Type: application/pgp-signature; name="signature.asc"
 
-(3) Should check against integer overflow in the g_malloc() argument
-(multiplication and addition).
+-----BEGIN PGP SIGNATURE-----
 
-> +    for (gsize i =3D 0; i < len; i++) {
-> +        g_snprintf(&hex_string[2 * i], 3, "%02x", data[i]);
-> +    }
-> +
-> +    return hex_string;
-> +}
-> +
-> +gpointer qemu_strdup_unhexlify(const gchar *hex_string, gsize *out_siz=
-e)
-> +{
-> +    size_t size =3D 0;
-> +    guchar *data =3D NULL;
-> +
-> +    if (hex_string) {
-> +        size =3D strlen(hex_string) / 2;
+iQEcBAEBAgAGBQJcgjrsAAoJEJykq7OBq3PIEAoH/1puIYXQfuACGIzmU+DFyu9w
+2sb+QlDwF0UQPhV5PQGO2pYQTDir+92pEetAg+aXPyD6fWbpGKIzclb5K1TptuX7
+XbyHHhG39PlmrTQ+GQPqtOt0ss4Mm+GeI6inGOxxTlOT0FU9kV0HyENvAsTiY3pG
+3GcFdCsMVE6L468cE9wm/zhFWmRHP2uyCtfauZTIICcstrCa1X00oHN0nX5Qu4CE
+8NHQ/4j1S7BnXwjpr05H40GbyjYCAycSPAPfcTcRuAPtHiWT7Iu/v6WbsM8hsFvp
+oKOl9M+lR5tuzF2gW3d8wr8ZXgGwPMBepvrnRSvdtv5ApXWzjt31LzmpJCNfAUQ=
+=B2t/
+-----END PGP SIGNATURE-----
 
-(4) Should likely check that the length of the string is an even integer.
-
-> +        if (size) {
-> +            size_t i;
-> +
-> +            data =3D g_new(guchar, size + 1);
-> +            for (i =3D 0; i < size; i++) {
-> +                data[i]  =3D hexval(*hex_string++) << 4;
-> +                data[i] |=3D hexval(*hex_string++);
-> +            }
-> +            data[i] =3D '\0';
-> +        }
-> +    }
-> +    if (out_size) {
-> +        *out_size =3D size;
-> +    }
-> +    return data;
-> +}
-> +
->  /*
->   * helper to parse debug environment variables
->   */
->=20
-
-(5) Most importantly: I don't think we need this patch.
-
-First, AFAICS, the unhex function is never used in the series, and no
-unit test is being added for it. That makes it a bad candidate for
-"include/qemu/cutils.h".
-
-Second, while the hex function is used in PATCH v2 13/18
-("hw/nvram/fw_cfg: Add QMP 'info fw_cfg' command"), the documentation in
-that patch and the logic in the patch are inconsistent. The
-documentation -- i.e. both the commit message and the "misc.json" change
--- say that "FirmwareConfigurationItem.data" is unused (not populated).
-However, that's exactly what create_qmp_fw_cfg_item() uses the hex
-function for.
-
-Third, if we do decide that the QMP command should output the fw_cfg
-binary data, then the QMP tradition (to my knowledge) has been to use
-base64 encoding. GLib provides helpers for base64:
-
-https://developer.gnome.org/glib/stable/glib-Base64-Encoding.html
-
-and you can see examples of it being used in e.g.
-
-(a) qmp_ringbuf_read() [chardev/char-ringbuf.c] -- the  @ringbuf-read
-command is defined in "qapi/char.json"
-
-(b) qmp_guest_exec_status() [qga/commands.c] -- the @guest-exec-status
-command is defined in "qga/qapi-schema.json".
-
-Thanks
-Laszlo
+--JgQwtEuHJzHdouWu--
