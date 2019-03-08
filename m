@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42622)
+Received: from eggs.gnu.org ([209.51.188.92]:43404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2FiH-00089i-ST
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:39:02 -0500
+	(envelope-from <mst@redhat.com>) id 1h2Fkk-000267-TZ
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:41:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2FiH-00082O-4K
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:39:01 -0500
+	(envelope-from <mst@redhat.com>) id 1h2Fkk-0001n1-5q
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:41:34 -0500
+Received: from mail-qk1-f181.google.com ([209.85.222.181]:40222)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h2Fkj-0001ez-UU
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:41:34 -0500
+Received: by mail-qk1-f181.google.com with SMTP id h28so11139927qkk.7
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 05:41:32 -0800 (PST)
+Date: Fri, 8 Mar 2019 08:41:29 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190308083958-mutt-send-email-mst@kernel.org>
 References: <20190308131445.17502-1-armbru@redhat.com>
-	<20190308131445.17502-13-armbru@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <002f653d-5fad-8fd1-0e6c-590e2e47fb6c@redhat.com>
-Date: Fri, 8 Mar 2019 14:38:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190308131445.17502-13-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 12/12] docs/interop/firmware.json:
- Prefer -machine to if=pflash
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190308131445.17502-1-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] pc: Support firmware
+ configuration with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
 
-On 03/08/19 14:14, Markus Armbruster wrote:
-> The previous commit added a way to configure firmware with -blockdev
-> rather than -drive if=pflash.  Document it as the preferred way.
+On Fri, Mar 08, 2019 at 02:14:33PM +0100, Markus Armbruster wrote:
+> Based-on: <20190308094610.21210-1-armbru@redhat.com>
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  docs/interop/firmware.json | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
+> v3:
+> * PATCH 05: Commit message tidied up [Philippe, László]
+> * PATCH 06: Comment tidied up [checkpatch]
+> * PATCH 12: Comment polish [László]
 > 
-> diff --git a/docs/interop/firmware.json b/docs/interop/firmware.json
-> index 28f9bc1591..ff8c2ce5f2 100644
-> --- a/docs/interop/firmware.json
-> +++ b/docs/interop/firmware.json
-> @@ -212,9 +212,13 @@
->  #
->  # @executable: Identifies the firmware executable. The firmware
->  #              executable may be shared by multiple virtual machine
-> -#              definitions. The corresponding QEMU command line option
-> -#              is "-drive
-> -#              if=pflash,unit=0,readonly=on,file=@executable.@filename,format=@executable.@format".
-> +#              definitions. The preferred corresponding QEMU command
-> +#              line options are
-> +#                  -drive if=none,id=pflash0,readonly=on,file=@executable.@filename,format=@executable.@format
-> +#                  -machine pflash0=pflash0
-> +#              or equivalent -blockdev instead of -drive.
-> +#              With QEMU versions older than 4.0, you have to use
-> +#                  -drive if=pflash,unit=0,readonly=on,file=@executable.@filename,format=@executable.@format
->  #
->  # @nvram-template: Identifies the NVRAM template compatible with
->  #                  @executable. Management software instantiates an
-> @@ -225,9 +229,13 @@
->  #                  individual copies of it are. An NVRAM file is
->  #                  typically used for persistently storing the
->  #                  non-volatile UEFI variables of a virtual machine
-> -#                  definition. The corresponding QEMU command line
-> -#                  option is "-drive
-> -#                  if=pflash,unit=1,readonly=off,file=FILENAME_OF_PRIVATE_NVRAM_FILE,format=@nvram-template.@format".
-> +#                  definition. The preferred corresponding QEMU
-> +#                  command line options are
-> +#                      -drive if=none,id=pflash1,readonly=off,file=FILENAME_OF_PRIVATE_NVRAM_FILE,format=@nvram-template.@format
-> +#                      -machine pflash1=pflash1
-> +#                  or equivalent -blockdev instead of -drive.
-> +#                  With QEMU versions older than 4.0, you have to use
-> +#                      -drive if=pflash,unit=1,readonly=off,file=FILENAME_OF_PRIVATE_NVRAM_FILE,format=@nvram-template.@format
->  #
->  # Since: 3.0
->  ##
+> v2:
+> * PATCH 05,06: New [Philippe]
+> * PATCH 07: Old PATCH 5 rebased onto new patches, with new comment
+>   [Philippe]
+> * PATCH 08+10: New, factored out of old PATCH 6 [by Philippe]
+> * PATCH 09: New [by Philippe]
+> * PATCH 11: Remainder of old PATCH 6, with FIXME resolved, literal
+>   4096 de-duplicated [László], extraneous error check deleted
+>   [László], and comment typos fixed
+> * PATCH 12: New
 > 
+> Markus Armbruster (9):
+>   qdev: Fix latent bug with compat_props and onboard devices
+>   qom: Move compat_props machinery from qdev to QOM
+>   vl: Fix latent bug with -global and onboard devices
+>   sysbus: Fix latent bug with onboard devices
+>   vl: Improve legibility of BlockdevOptions queue
+>   vl: Factor configure_blockdev() out of main()
+>   vl: Create block backends before setting machine properties
+>   pc: Support firmware configuration with -blockdev
+>   docs/interop/firmware.json: Prefer -machine to if=pflash
+> 
+> Philippe Mathieu-Daudé (3):
+>   pflash_cfi01: Add pflash_cfi01_get_blk() helper
+>   pc_sysfw: Remove unused PcSysFwDevice
+>   pc_sysfw: Pass PCMachineState to pc_system_firmware_init()
 
-Awesome.
+OK looks good to me.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Thanks!
-Laszlo
+Paolo will you be merging this?
+
+
+>  accel/accel.c              |   1 +
+>  docs/interop/firmware.json |  20 ++-
+>  hw/block/pflash_cfi01.c    |   5 +
+>  hw/core/qdev.c             |  21 +---
+>  hw/core/sysbus.c           |   3 -
+>  hw/i386/pc.c               |   4 +-
+>  hw/i386/pc_sysfw.c         | 249 ++++++++++++++++++++++++-------------
+>  include/hw/block/flash.h   |   1 +
+>  include/hw/i386/pc.h       |   6 +-
+>  include/hw/qdev-core.h     |   2 -
+>  include/qom/object.h       |   3 +
+>  qom/object.c               |  39 ++++++
+>  vl.c                       | 125 ++++++++++---------
+>  13 files changed, 303 insertions(+), 176 deletions(-)
+> 
+> -- 
+> 2.17.2
