@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59863)
+Received: from eggs.gnu.org ([209.51.188.92]:59887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h2F5w-0000Am-5x
+	(envelope-from <kwolf@redhat.com>) id 1h2F5w-0000Bs-W7
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:59:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h2F5t-0008BL-FD
+	(envelope-from <kwolf@redhat.com>) id 1h2F5v-0008Jt-0b
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:59:23 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  8 Mar 2019 13:58:05 +0100
-Message-Id: <20190308125823.32535-16-kwolf@redhat.com>
+Date: Fri,  8 Mar 2019 13:58:13 +0100
+Message-Id: <20190308125823.32535-24-kwolf@redhat.com>
 In-Reply-To: <20190308125823.32535-1-kwolf@redhat.com>
 References: <20190308125823.32535-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/33] qcow2: Pass bs to qcow2_get_cluster_type()
+Subject: [Qemu-devel] [PULL 23/33] qcow2: Support external data file in
+ qemu-img check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,280 +25,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
+For external data files, data clusters must be excluded from the
+refcount calculations. Instead, an implicit refcount of 1 is assumed for
+the COPIED flag.
+
+Compressed clusters and internal snapshots are incompatible with
+external data files, so print an error if they are in use for images
+with an external data file.
+
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2.h          |  3 ++-
- block/qcow2-cluster.c  | 37 +++++++++++++++++++------------------
- block/qcow2-refcount.c | 10 +++++-----
- 3 files changed, 26 insertions(+), 24 deletions(-)
+ block/qcow2-refcount.c | 41 ++++++++++++++++++++++++++++++-----------
+ 1 file changed, 30 insertions(+), 11 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index c63c3959f7..7a34bd0c53 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -510,7 +510,8 @@ static inline int64_t qcow2_vm_state_offset(BDRVQcow2=
-State *s)
-     return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bit=
-s);
- }
-=20
--static inline QCow2ClusterType qcow2_get_cluster_type(uint64_t l2_entry)
-+static inline QCow2ClusterType qcow2_get_cluster_type(BlockDriverState *=
-bs,
-+                                                      uint64_t l2_entry)
- {
-     if (l2_entry & QCOW_OFLAG_COMPRESSED) {
-         return QCOW2_CLUSTER_COMPRESSED;
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 179aa2c728..9cc8f0f3e4 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -380,8 +380,8 @@ fail:
-  * as contiguous. (This allows it, for example, to stop at the first com=
-pressed
-  * cluster which may require a different handling)
-  */
--static int count_contiguous_clusters(int nb_clusters, int cluster_size,
--        uint64_t *l2_slice, uint64_t stop_flags)
-+static int count_contiguous_clusters(BlockDriverState *bs, int nb_cluste=
-rs,
-+        int cluster_size, uint64_t *l2_slice, uint64_t stop_flags)
- {
-     int i;
-     QCow2ClusterType first_cluster_type;
-@@ -394,7 +394,7 @@ static int count_contiguous_clusters(int nb_clusters,=
- int cluster_size,
-     }
-=20
-     /* must be allocated */
--    first_cluster_type =3D qcow2_get_cluster_type(first_entry);
-+    first_cluster_type =3D qcow2_get_cluster_type(bs, first_entry);
-     assert(first_cluster_type =3D=3D QCOW2_CLUSTER_NORMAL ||
-            first_cluster_type =3D=3D QCOW2_CLUSTER_ZERO_ALLOC);
-=20
-@@ -412,7 +412,8 @@ static int count_contiguous_clusters(int nb_clusters,=
- int cluster_size,
-  * Checks how many consecutive unallocated clusters in a given L2
-  * slice have the same cluster type.
-  */
--static int count_contiguous_clusters_unallocated(int nb_clusters,
-+static int count_contiguous_clusters_unallocated(BlockDriverState *bs,
-+                                                 int nb_clusters,
-                                                  uint64_t *l2_slice,
-                                                  QCow2ClusterType wanted=
-_type)
- {
-@@ -422,7 +423,7 @@ static int count_contiguous_clusters_unallocated(int =
-nb_clusters,
-            wanted_type =3D=3D QCOW2_CLUSTER_UNALLOCATED);
-     for (i =3D 0; i < nb_clusters; i++) {
-         uint64_t entry =3D be64_to_cpu(l2_slice[i]);
--        QCow2ClusterType type =3D qcow2_get_cluster_type(entry);
-+        QCow2ClusterType type =3D qcow2_get_cluster_type(bs, entry);
-=20
-         if (type !=3D wanted_type) {
-             break;
-@@ -595,7 +596,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, ui=
-nt64_t offset,
-      * true */
-     assert(nb_clusters <=3D INT_MAX);
-=20
--    type =3D qcow2_get_cluster_type(*cluster_offset);
-+    type =3D qcow2_get_cluster_type(bs, *cluster_offset);
-     if (s->qcow_version < 3 && (type =3D=3D QCOW2_CLUSTER_ZERO_PLAIN ||
-                                 type =3D=3D QCOW2_CLUSTER_ZERO_ALLOC)) {
-         qcow2_signal_corruption(bs, true, -1, -1, "Zero cluster entry fo=
-und"
-@@ -613,14 +614,14 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, =
-uint64_t offset,
-     case QCOW2_CLUSTER_ZERO_PLAIN:
-     case QCOW2_CLUSTER_UNALLOCATED:
-         /* how many empty clusters ? */
--        c =3D count_contiguous_clusters_unallocated(nb_clusters,
-+        c =3D count_contiguous_clusters_unallocated(bs, nb_clusters,
-                                                   &l2_slice[l2_index], t=
-ype);
-         *cluster_offset =3D 0;
-         break;
-     case QCOW2_CLUSTER_ZERO_ALLOC:
-     case QCOW2_CLUSTER_NORMAL:
-         /* how many allocated clusters ? */
--        c =3D count_contiguous_clusters(nb_clusters, s->cluster_size,
-+        c =3D count_contiguous_clusters(bs, nb_clusters, s->cluster_size=
-,
-                                       &l2_slice[l2_index], QCOW_OFLAG_ZE=
-RO);
-         *cluster_offset &=3D L2E_OFFSET_MASK;
-         if (offset_into_cluster(s, *cluster_offset)) {
-@@ -1013,14 +1014,14 @@ void qcow2_alloc_cluster_abort(BlockDriverState *=
-bs, QCowL2Meta *m)
-  * write, but require COW to be performed (this includes yet unallocated=
- space,
-  * which must copy from the backing file)
-  */
--static int count_cow_clusters(BDRVQcow2State *s, int nb_clusters,
-+static int count_cow_clusters(BlockDriverState *bs, int nb_clusters,
-     uint64_t *l2_slice, int l2_index)
- {
-     int i;
-=20
-     for (i =3D 0; i < nb_clusters; i++) {
-         uint64_t l2_entry =3D be64_to_cpu(l2_slice[l2_index + i]);
--        QCow2ClusterType cluster_type =3D qcow2_get_cluster_type(l2_entr=
-y);
-+        QCow2ClusterType cluster_type =3D qcow2_get_cluster_type(bs, l2_=
-entry);
-=20
-         switch(cluster_type) {
-         case QCOW2_CLUSTER_NORMAL:
-@@ -1165,7 +1166,7 @@ static int handle_copied(BlockDriverState *bs, uint=
-64_t guest_offset,
-     cluster_offset =3D be64_to_cpu(l2_slice[l2_index]);
-=20
-     /* Check how many clusters are already allocated and don't need COW =
-*/
--    if (qcow2_get_cluster_type(cluster_offset) =3D=3D QCOW2_CLUSTER_NORM=
-AL
-+    if (qcow2_get_cluster_type(bs, cluster_offset) =3D=3D QCOW2_CLUSTER_=
-NORMAL
-         && (cluster_offset & QCOW_OFLAG_COPIED))
-     {
-         /* If a specific host_offset is required, check it */
-@@ -1189,7 +1190,7 @@ static int handle_copied(BlockDriverState *bs, uint=
-64_t guest_offset,
-=20
-         /* We keep all QCOW_OFLAG_COPIED clusters */
-         keep_clusters =3D
--            count_contiguous_clusters(nb_clusters, s->cluster_size,
-+            count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
-                                       &l2_slice[l2_index],
-                                       QCOW_OFLAG_COPIED | QCOW_OFLAG_ZER=
-O);
-         assert(keep_clusters <=3D nb_clusters);
-@@ -1324,7 +1325,7 @@ static int handle_alloc(BlockDriverState *bs, uint6=
-4_t guest_offset,
-     if (entry & QCOW_OFLAG_COMPRESSED) {
-         nb_clusters =3D 1;
-     } else {
--        nb_clusters =3D count_cow_clusters(s, nb_clusters, l2_slice, l2_=
-index);
-+        nb_clusters =3D count_cow_clusters(bs, nb_clusters, l2_slice, l2=
-_index);
-     }
-=20
-     /* This function is only called when there were no non-COW clusters,=
- so if
-@@ -1332,7 +1333,7 @@ static int handle_alloc(BlockDriverState *bs, uint6=
-4_t guest_offset,
-      * wrong with our code. */
-     assert(nb_clusters > 0);
-=20
--    if (qcow2_get_cluster_type(entry) =3D=3D QCOW2_CLUSTER_ZERO_ALLOC &&
-+    if (qcow2_get_cluster_type(bs, entry) =3D=3D QCOW2_CLUSTER_ZERO_ALLO=
-C &&
-         (entry & QCOW_OFLAG_COPIED) &&
-         (!*host_offset ||
-          start_of_cluster(s, *host_offset) =3D=3D (entry & L2E_OFFSET_MA=
-SK)))
-@@ -1352,7 +1353,7 @@ static int handle_alloc(BlockDriverState *bs, uint6=
-4_t guest_offset,
-          * would be fine, too, but count_cow_clusters() above has limite=
-d
-          * nb_clusters already to a range of COW clusters */
-         preallocated_nb_clusters =3D
--            count_contiguous_clusters(nb_clusters, s->cluster_size,
-+            count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
-                                       &l2_slice[l2_index], QCOW_OFLAG_CO=
-PIED);
-         assert(preallocated_nb_clusters > 0);
-=20
-@@ -1616,7 +1617,7 @@ static int discard_in_l2_slice(BlockDriverState *bs=
-, uint64_t offset,
-          * If full_discard is true, the sector should not read back as z=
-eroes,
-          * but rather fall through to the backing file.
-          */
--        switch (qcow2_get_cluster_type(old_l2_entry)) {
-+        switch (qcow2_get_cluster_type(bs, old_l2_entry)) {
-         case QCOW2_CLUSTER_UNALLOCATED:
-             if (full_discard || !bs->backing) {
-                 continue;
-@@ -1729,7 +1730,7 @@ static int zero_in_l2_slice(BlockDriverState *bs, u=
-int64_t offset,
-          * Minimize L2 changes if the cluster already reads back as
-          * zeroes with correct allocation.
-          */
--        cluster_type =3D qcow2_get_cluster_type(old_offset);
-+        cluster_type =3D qcow2_get_cluster_type(bs, old_offset);
-         if (cluster_type =3D=3D QCOW2_CLUSTER_ZERO_PLAIN ||
-             (cluster_type =3D=3D QCOW2_CLUSTER_ZERO_ALLOC && !unmap)) {
-             continue;
-@@ -1871,7 +1872,7 @@ static int expand_zero_clusters_in_l1(BlockDriverSt=
-ate *bs, uint64_t *l1_table,
-                 uint64_t l2_entry =3D be64_to_cpu(l2_slice[j]);
-                 int64_t offset =3D l2_entry & L2E_OFFSET_MASK;
-                 QCow2ClusterType cluster_type =3D
--                    qcow2_get_cluster_type(l2_entry);
-+                    qcow2_get_cluster_type(bs, l2_entry);
-=20
-                 if (cluster_type !=3D QCOW2_CLUSTER_ZERO_PLAIN &&
-                     cluster_type !=3D QCOW2_CLUSTER_ZERO_ALLOC) {
 diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 6f13d470d3..05e7974d7e 100644
+index df73580e5d..e0fe322500 100644
 --- a/block/qcow2-refcount.c
 +++ b/block/qcow2-refcount.c
-@@ -1157,7 +1157,7 @@ void qcow2_free_any_clusters(BlockDriverState *bs, =
-uint64_t l2_entry,
- {
-     BDRVQcow2State *s =3D bs->opaque;
+@@ -1605,6 +1605,13 @@ static int check_refcounts_l2(BlockDriverState *bs=
+, BdrvCheckResult *res,
+                 res->corruptions++;
+             }
 =20
--    switch (qcow2_get_cluster_type(l2_entry)) {
-+    switch (qcow2_get_cluster_type(bs, l2_entry)) {
-     case QCOW2_CLUSTER_COMPRESSED:
-         {
-             int nb_csectors;
-@@ -1300,7 +1300,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState=
- *bs,
-                     entry &=3D ~QCOW_OFLAG_COPIED;
-                     offset =3D entry & L2E_OFFSET_MASK;
++            if (has_data_file(bs)) {
++                fprintf(stderr, "ERROR compressed cluster %d with data f=
+ile, "
++                        "entry=3D0x%" PRIx64 "\n", i, l2_entry);
++                res->corruptions++;
++                break;
++            }
++
+             /* Mark cluster as used */
+             nb_csectors =3D ((l2_entry >> s->csize_shift) &
+                            s->csize_mask) + 1;
+@@ -1695,11 +1702,13 @@ static int check_refcounts_l2(BlockDriverState *b=
+s, BdrvCheckResult *res,
+             }
 =20
--                    switch (qcow2_get_cluster_type(entry)) {
-+                    switch (qcow2_get_cluster_type(bs, entry)) {
-                     case QCOW2_CLUSTER_COMPRESSED:
-                         nb_csectors =3D ((entry >> s->csize_shift) &
-                                        s->csize_mask) + 1;
-@@ -1582,7 +1582,7 @@ static int check_refcounts_l2(BlockDriverState *bs,=
- BdrvCheckResult *res,
-     for(i =3D 0; i < s->l2_size; i++) {
-         l2_entry =3D be64_to_cpu(l2_table[i]);
-=20
--        switch (qcow2_get_cluster_type(l2_entry)) {
-+        switch (qcow2_get_cluster_type(bs, l2_entry)) {
-         case QCOW2_CLUSTER_COMPRESSED:
-             /* Compressed clusters don't have QCOW_OFLAG_COPIED */
-             if (l2_entry & QCOW_OFLAG_COPIED) {
-@@ -1633,7 +1633,7 @@ static int check_refcounts_l2(BlockDriverState *bs,=
- BdrvCheckResult *res,
-=20
-             /* Correct offsets are cluster aligned */
-             if (offset_into_cluster(s, offset)) {
--                if (qcow2_get_cluster_type(l2_entry) =3D=3D
-+                if (qcow2_get_cluster_type(bs, l2_entry) =3D=3D
-                     QCOW2_CLUSTER_ZERO_ALLOC)
-                 {
-                     fprintf(stderr, "%s offset=3D%" PRIx64 ": Preallocat=
-ed zero "
-@@ -1868,7 +1868,7 @@ static int check_oflag_copied(BlockDriverState *bs,=
- BdrvCheckResult *res,
-         for (j =3D 0; j < s->l2_size; j++) {
-             uint64_t l2_entry =3D be64_to_cpu(l2_table[j]);
-             uint64_t data_offset =3D l2_entry & L2E_OFFSET_MASK;
--            QCow2ClusterType cluster_type =3D qcow2_get_cluster_type(l2_=
-entry);
-+            QCow2ClusterType cluster_type =3D qcow2_get_cluster_type(bs,=
- l2_entry);
+             /* Mark cluster as used */
+-            ret =3D qcow2_inc_refcounts_imrt(bs, res,
+-                                           refcount_table, refcount_tabl=
+e_size,
+-                                           offset, s->cluster_size);
+-            if (ret < 0) {
+-                goto fail;
++            if (!has_data_file(bs)) {
++                ret =3D qcow2_inc_refcounts_imrt(bs, res, refcount_table=
+,
++                                               refcount_table_size,
++                                               offset, s->cluster_size);
++                if (ret < 0) {
++                    goto fail;
++                }
+             }
+             break;
+         }
+@@ -1884,12 +1893,16 @@ static int check_oflag_copied(BlockDriverState *b=
+s, BdrvCheckResult *res,
 =20
              if (cluster_type =3D=3D QCOW2_CLUSTER_NORMAL ||
                  cluster_type =3D=3D QCOW2_CLUSTER_ZERO_ALLOC) {
+-                ret =3D qcow2_get_refcount(bs,
+-                                         data_offset >> s->cluster_bits,
+-                                         &refcount);
+-                if (ret < 0) {
+-                    /* don't print message nor increment check_errors */
+-                    continue;
++                if (has_data_file(bs)) {
++                    refcount =3D 1;
++                } else {
++                    ret =3D qcow2_get_refcount(bs,
++                                             data_offset >> s->cluster_b=
+its,
++                                             &refcount);
++                    if (ret < 0) {
++                        /* don't print message nor increment check_error=
+s */
++                        continue;
++                    }
+                 }
+                 if ((refcount =3D=3D 1) !=3D ((l2_entry & QCOW_OFLAG_COP=
+IED) !=3D 0)) {
+                     fprintf(stderr, "%s OFLAG_COPIED data cluster: "
+@@ -2083,6 +2096,12 @@ static int calculate_refcounts(BlockDriverState *b=
+s, BdrvCheckResult *res,
+     }
+=20
+     /* snapshots */
++    if (has_data_file(bs) && s->nb_snapshots) {
++        fprintf(stderr, "ERROR %d snapshots in image with data file\n",
++                s->nb_snapshots);
++        res->corruptions++;
++    }
++
+     for (i =3D 0; i < s->nb_snapshots; i++) {
+         sn =3D s->snapshots + i;
+         if (offset_into_cluster(s, sn->l1_table_offset)) {
 --=20
 2.20.1
