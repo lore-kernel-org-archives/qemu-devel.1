@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48716)
+Received: from eggs.gnu.org ([209.51.188.92]:49063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2Hzb-0004s1-NG
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:05:04 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1h2I26-00063U-H5
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:07:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2Hza-0005MW-4W
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:05:03 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45645)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2HzY-0005KT-KM
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:05:02 -0500
-Received: by mail-ot1-x342.google.com with SMTP id i12so17769525otp.12
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 08:05:00 -0800 (PST)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1h2I25-0007P7-Sp
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:07:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:11040)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1h2I25-0007OL-MH
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:07:37 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 886B7F3FAD
+	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 16:07:36 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri,  8 Mar 2019 17:07:31 +0100
+Message-Id: <20190308160731.23312-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <1550029560-30530-1-git-send-email-sandra@codesourcery.com>
-	<1550029560-30530-3-git-send-email-sandra@codesourcery.com>
-	<CAFEAcA-Ocow8GzPCPO=346hnc4CZ6M02TwVp-e6G2EjY5-FESQ@mail.gmail.com>
-	<7d4097aa-4888-82f6-3e4e-eeeb8de9f55b@codesourcery.com>
-In-Reply-To: <7d4097aa-4888-82f6-3e4e-eeeb8de9f55b@codesourcery.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Mar 2019 16:04:46 +0000
-Message-ID: <CAFEAcA92mHFcPoNtsHJqUTzfjxvXh4CpjEy_=irMYu9gEpg=2Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] Add Nios II semihosting support.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] migration: fix small leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sandra Loosemore <sandra@codesourcery.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marek Vasut <marex@denx.de>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Fri, 8 Mar 2019 at 03:13, Sandra Loosemore <sandra@codesourcery.com> wrote:
->
-> On 3/7/19 7:58 AM, Peter Maydell wrote:
-> > On Wed, 13 Feb 2019 at 04:02, Sandra Loosemore <sandra@codesourcery.com> wrote:
-> >>
-> >> This patch adds support for libgloss semihosting to Nios II bare-metal
-> >> emulation.
-> >>
-> >> Signed-off-by: Sandra Loosemore <sandra@codesourcery.com>
-> >> Signed-off-by: Julian Brown <julian@codesourcery.com>
-> >
-> > Do you have a link to the spec that defines this semihosting
-> > ABI, please ?
->
-> Well, I just wrote some derived from the comments in the libgloss
-> sources; see the attachment.  :-)
+Spotted by ASAN, during make check.
 
-Thanks. So who "owns" this ABI (ie has the authority to change
-it and should be the end documenting it)? How many projects or
-bits of software are implementing either end of it?
+Fixes: 9aca82ba3108d15529a2e0f5b0996cac309a7216 ("migration: Create
+socket-address parameter")
+Cc: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ migration/migration.h | 2 +-
+ migration/migration.c | 2 +-
+ migration/socket.c    | 1 +
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
-If we decide that QEMU owns the spec we can put the documentation
-into docs/specs/.
-
-> FWIW this is pretty much a direct copy of the m68k semihosting protocol,
-> which CodeSourcery contributed ages ago to both libgloss and qemu.
-
-Yeah, and that seems to be undocumented too :-(  I'm not a huge
-fan of "this is just some random thing that's private to QEMU
-and libgloss".
-
-thanks
--- PMM
+diff --git a/migration/migration.h b/migration/migration.h
+index 99e99e56bd..1b10b19a67 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -308,7 +308,7 @@ void migrate_send_rp_resume_ack(MigrationIncomingStat=
+e *mis, uint32_t value);
+=20
+ void dirty_bitmap_mig_before_vm_start(void);
+ void init_dirty_bitmap_incoming_migration(void);
+-void migrate_add_address(SocketAddress *address);
++void migrate_add_address(const SocketAddress *address);
+=20
+ int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
+=20
+diff --git a/migration/migration.c b/migration/migration.c
+index df6fd8e0e5..9cc2036796 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -335,7 +335,7 @@ void migration_incoming_enable_colo(void)
+     migration_colo_enabled =3D true;
+ }
+=20
+-void migrate_add_address(SocketAddress *address)
++void migrate_add_address(const SocketAddress *address)
+ {
+     MigrationIncomingState *mis =3D migration_incoming_get_current();
+     SocketAddressList *addrs;
+diff --git a/migration/socket.c b/migration/socket.c
+index 239527fb1f..49bacf78fd 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -199,6 +199,7 @@ static void socket_start_incoming_migration(SocketAdd=
+ress *saddr,
+             return;
+         }
+         migrate_add_address(address);
++        qapi_free_SocketAddress(address);
+     }
+ }
+=20
+--=20
+2.21.0.4.g36eb1cb9cf
