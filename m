@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35830)
+Received: from eggs.gnu.org ([209.51.188.92]:46052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h2546-0003r4-Np
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 21:16:51 -0500
+	(envelope-from <jerry.lilijun@huawei.com>) id 1h25IG-0006eZ-AP
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 21:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h2542-0005Ql-Ey
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 21:16:48 -0500
-References: <20190308013222.12524-1-philmd@redhat.com>
-	<20190308013222.12524-17-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <82e36613-3968-3459-4be7-f0e927faeb5c@redhat.com>
-Date: Thu, 7 Mar 2019 20:16:24 -0600
-MIME-Version: 1.0
-In-Reply-To: <20190308013222.12524-17-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+	(envelope-from <jerry.lilijun@huawei.com>) id 1h25IF-0007kc-CF
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 21:31:28 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2486 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jerry.lilijun@huawei.com>)
+	id 1h25IE-0007cw-Uc
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 21:31:27 -0500
+Received: from dggeml406-hub.china.huawei.com (unknown [172.30.72.53])
+	by Forcepoint Email with ESMTP id 3BEFE75D6143515E8C07
+	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 10:31:21 +0800 (CST)
+From: "Lilijun (Jerry, Cloud Networking)" <jerry.lilijun@huawei.com>
+Date: Fri, 8 Mar 2019 02:31:12 +0000
+Message-ID: <40280F65B1B0B44E8089ED31C01616EBA394CD10@dggeml529-mbx.china.huawei.com>
+References: <40280F65B1B0B44E8089ED31C01616EBA3947B1A@dggeml529-mbx.china.huawei.com>
+	<20190306100646.GI22159@stefanha-x1.localdomain>
+In-Reply-To: <20190306100646.GI22159@stefanha-x1.localdomain>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 16/18] hw/firmware: Add Edk2Crypto and
- edk2_add_host_crypto_policy()
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] Question about VM inner route entry's lost when
+ vhost-user reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxin (U)" <wangxinxin.wang@huawei.com>, wangyunjian <wangyunjian@huawei.com>
 
-On 3/7/19 7:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The Edk2Crypto object is used to hold configuration values specific
-> to EDK2.
+Hi, Stefan
+
+This problem is related with backend vhost-user socket abnormal cases, we s=
+houldn't ask customers to configure it manually for backend's issues or dep=
+ends on guest OS's network configuration.
+
+Thanks
+
+> -----Original Message-----
+> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> Sent: Wednesday, March 06, 2019 6:07 PM
+> To: Lilijun (Jerry, Cloud Networking) <jerry.lilijun@huawei.com>
+> Cc: qemu-devel@nongnu.org; wangxin (U)
+> <wangxinxin.wang@huawei.com>; wangyunjian
+> <wangyunjian@huawei.com>
+> Subject: Re: [Qemu-devel] Question about VM inner route entry's lost when
+> vhost-user reconnect
 >=20
-> The edk2_add_host_crypto_policy() function loads crypto policies
-> from the host, and register them as fw_cfg named file items.
-> So far only the 'https' policy is supported.
+> On Mon, Mar 04, 2019 at 08:26:23AM +0000, Lilijun (Jerry, Cloud Networkin=
+g)
+> wrote:
+> >       I am running my VM using vhost-user NIC with OVS-DPDK.  The steps=
+ of
+> my question is shown as follows:
+> >      1) In the VM, I add one route entry manually on the vNIC eth0 usin=
+g the
+> linux tool route.
+> >      2) When restarting openvswitch service for the crash of the ovs-vs=
+witchd,
+> qemu's vhost-user reconnected successfully after 40s.
+> >      3) Here VM's vNIC will receive link down and up events, the interv=
+al
+> between the two events is about 40s.
+> >      3) But that route entry disappeared and that will cause user's net=
+work
+> traffic interruption and the service failed.
+> >
+> >      Is there some work on this problem?  Can we keep the vNIC's link u=
+p
+> status when do vhost-user's reconnecting work?
 >=20
-> An usercase example is the 'HTTPS Boof' feature of OVMF [*].
-
-s/An/A/ since "user" is a pronounced or hard 'u' (English is funny, but
-the rule of thumb is you add the consonant only before a soft u, and not
-a pronounced one; as in "give an umbrella to a unicorn")
-
+> Can you add the custom route to the network management tool inside the
+> guest so that it will be reinstated when the link comes back up?
 >=20
-> Usage example:
+> The details of how to do this depend on the guest's distro.
 >=20
->   $ qemu-system-x86_64 \
->       -object edk2_crypto,id=3Dhttps,\
-
-Might as well use --object (both spellings work for qemu, but since
---object is the only spelling for qemu-img/qemu-nbd, being consistent
-between the lot is useful).
-
->               ciphers=3D/etc/crypto-policies/back-ends/openssl.config,\
->               cacerts=3D/etc/pki/ca-trust/extracted/edk2/cacerts.bin
-
-(I really should follow through on my threat to teach QemuOpts to ignore
-whitespace after ','; but for this commit message, it's obvious the
-indentation has to be stripped for the command line to be valid)
-
->=20
-> (On Fedora these files are provided by the ca-certificates and
-> crypto-policies packages).
->=20
-> [*]: https://github.com/tianocore/edk2/blob/master/OvmfPkg/README
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> Stefan
