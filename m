@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49983)
+Received: from eggs.gnu.org ([209.51.188.92]:49999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2G80-0000uU-N3
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:38 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1h2G84-0000ww-8l
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2G7y-0001nG-KF
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:36 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45435)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2G7y-0001ex-EG
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:34 -0500
-Received: by mail-wr1-f67.google.com with SMTP id o7so1393468wrp.12
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 06:05:34 -0800 (PST)
-References: <20190307130323.9353-1-armbru@redhat.com>
-	<20190307130323.9353-15-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3e657733-2714-e9c9-1888-66d269e88b23@redhat.com>
-Date: Fri, 8 Mar 2019 15:05:31 +0100
+	(envelope-from <marcandre.lureau@redhat.com>) id 1h2G82-000263-HZ
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33430)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1h2G82-00022l-Af
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:38 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96A75C065855
+	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 14:05:37 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri,  8 Mar 2019 15:04:47 +0100
+Message-Id: <20190308140454.32437-6-marcandre.lureau@redhat.com>
+In-Reply-To: <20190308140454.32437-1-marcandre.lureau@redhat.com>
+References: <20190308140454.32437-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190307130323.9353-15-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 14/14] pflash: Clean up after commit
- 368a354f02b, part 2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 05/12] vhost-user: wrap some read/write with
+ retry handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, balaton@eik.bme.hu
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, mst@redhat.com
 
-On 3/7/19 2:03 PM, Markus Armbruster wrote:
-> Our pflash devices are simplistically modelled has having
-> "num-blocks" sectors of equal size "sector-length".  Real hardware
-> commonly has sectors of different sizes.  How our "sector-length"
-> property is related to the physical device's multiple sector sizes
-> is unclear.
-> 
-> Helper functions pflash_cfi01_register() and pflash_cfi02_register()
-> create a pflash device, set properties including "sector-length" and
-> "num-blocks", and realize.  They take parameters @size, @sector_len
-> and @nb_blocs.
-> 
-> QOMification left parameter @size unused.  Obviously, @size should
-> match @sector_len and @nb_blocs, i.e. size == sector_len * nb_blocs.
-> All callers satisfy this.
-> 
-> Remove @nb_blocs and compute it from @size and @sector_len.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ hw/virtio/vhost-user.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 0164060b2b..3b09c40578 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -968,7 +968,10 @@ static void slave_read(void *opaque)
+     iov.iov_base =3D &hdr;
+     iov.iov_len =3D VHOST_USER_HDR_SIZE;
+=20
+-    size =3D recvmsg(u->slave_fd, &msgh, 0);
++    do {
++        size =3D recvmsg(u->slave_fd, &msgh, 0);
++    } while (size < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN));
++
+     if (size !=3D VHOST_USER_HDR_SIZE) {
+         error_report("Failed to read from slave.");
+         goto err;
+@@ -997,7 +1000,10 @@ static void slave_read(void *opaque)
+     }
+=20
+     /* Read payload */
+-    size =3D read(u->slave_fd, &payload, hdr.size);
++    do {
++        size =3D read(u->slave_fd, &payload, hdr.size);
++    } while (size < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN));
++
+     if (size !=3D hdr.size) {
+         error_report("Failed to read payload from slave.");
+         goto err;
+@@ -1045,7 +1051,10 @@ static void slave_read(void *opaque)
+         iovec[1].iov_base =3D &payload;
+         iovec[1].iov_len =3D hdr.size;
+=20
+-        size =3D writev(u->slave_fd, iovec, ARRAY_SIZE(iovec));
++        do {
++            size =3D writev(u->slave_fd, iovec, ARRAY_SIZE(iovec));
++        } while (size < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN)=
+);
++
+         if (size !=3D VHOST_USER_HDR_SIZE + hdr.size) {
+             error_report("Failed to send msg reply to slave.");
+             goto err;
+--=20
+2.21.0.4.g36eb1cb9cf
