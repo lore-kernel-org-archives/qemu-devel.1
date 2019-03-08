@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43321)
+Received: from eggs.gnu.org ([209.51.188.92]:44756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2LwZ-0006og-PV
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:18:12 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h2M7C-0000nD-Nb
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2LwY-0006ec-Na
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:18:11 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40126)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2LwY-0006ds-G1
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:18:10 -0500
-Received: by mail-wr1-f65.google.com with SMTP id t6so3470095wrw.7
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 12:18:10 -0800 (PST)
-References: <20190308013222.12524-1-philmd@redhat.com>
-	<20190308013222.12524-14-philmd@redhat.com>
-	<0e007e09-cf54-312b-9563-59f3994209bf@redhat.com>
-	<40319ac6-4545-4e7b-0339-8229727355e3@redhat.com>
-	<a3c759a5-73df-f481-ba21-48ece92f1185@redhat.com>
-	<9f1cdb48-3262-de5e-a500-1dfb3d6372e5@redhat.com>
-	<f4d5a154-0c9d-0e1c-144c-c6855dadafd6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9f2f0884-3be1-7089-d10d-6549081a89a7@redhat.com>
-Date: Fri, 8 Mar 2019 21:18:07 +0100
-MIME-Version: 1.0
-In-Reply-To: <f4d5a154-0c9d-0e1c-144c-c6855dadafd6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 13/18] hw/nvram/fw_cfg: Add QMP 'info
- fw_cfg' command
+	(envelope-from <jsnow@redhat.com>) id 1h2M78-0006mC-Ai
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34956)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M77-0006hi-8h
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:06 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Fri,  8 Mar 2019 15:28:42 -0500
+Message-Id: <20190308202858.26636-2-jsnow@redhat.com>
+In-Reply-To: <20190308202858.26636-1-jsnow@redhat.com>
+References: <20190308202858.26636-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PULL 01/17] block/dirty-bitmap: add recording and
+ busy properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +24,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, peter.maydell@linaro.org
 
-On 3/8/19 9:00 PM, Laszlo Ersek wrote:
-> On 03/08/19 19:07, Philippe Mathieu-Daudé wrote:
->> On 3/8/19 6:31 PM, Eric Blake wrote:
->>> On 3/8/19 5:08 AM, Philippe Mathieu-Daudé wrote:
->>>>>> +##
->>>>>> +# @query-fw_cfg-items:
->>>>>
->>>>> That looks weird to mix - and _. Any reason we can't just go with
->>>>> query-firmware-config?
->>>>
->>>> Way better! I'll use query-firmware-config-items.
->>>
->>> Do we need the -items suffix? Also, is there a chance that we might ever
->>> want to extend the command to return more information that is global to
->>> firmware-config rather than per-item?
->>
->> Laszlo suggested it could be useful to ask for a specific item (with the
->> full data encoded?).
-> 
-> It's possible I referred to that a long time ago, but most recently, I
-> think it has been raised by Dave.
+The current API allows us to report a single status, which we've defined as:
 
-One of your 'random' ideas :)
+Frozen: has a successor, treated as qmp_locked, may or may not be enabled.
+Locked: no successor, qmp_locked. may or may not be enabled.
+Disabled: Not frozen or locked, disabled.
+Active: Not frozen, locked, or disabled.
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01959.html
+The problem is that both "Frozen" and "Locked" mean nearly the same thing,
+and that both of them do not intuit whether they are recording guest writes
+or not.
 
-  (6) If we want bells and whistles, two optional parameters could be
-  considered: one for identifying one specific key to request info about
-  (identify by selector? well-known macro name? file pathname?), and
-  another param for placing a limit, different from 8, on the individual
-  hexdump size.
+This patch deprecates that status field and introduces two orthogonal
+properties instead to replace it.
 
-  Important: these are not "requirements", just random ideas, food for
-  thought. I'm fine if you reject any subset of them, after
-  consideration.
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190223000614.13894-2-jsnow@redhat.com
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ qemu-deprecated.texi       |  6 ++++++
+ qapi/block-core.json       | 10 +++++++++-
+ block/dirty-bitmap.c       |  9 +++++++++
+ tests/qemu-iotests/236.out | 28 ++++++++++++++++++++++++++++
+ 4 files changed, 52 insertions(+), 1 deletion(-)
 
-> 
-> Thanks
-> Laszlo
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 45c57952da..7cfc9c3fce 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -67,6 +67,12 @@ topologies described with -smp include all possible cpus, i.e.
+ "autoload" parameter is now ignored. All bitmaps are automatically loaded
+ from qcow2 images.
+ 
++@subsection query-block result field dirty-bitmaps[i].status (since 4.0)
++
++The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
++the query-block command is deprecated. Two new boolean fields,
++``recording'' and ``busy'' effectively replace it.
++
+ @subsection query-cpus (since 2.12.0)
+ 
+ The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 2b8afbb924..6e543594b3 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -458,7 +458,14 @@
+ #
+ # @granularity: granularity of the dirty bitmap in bytes (since 1.4)
+ #
+-# @status: current status of the dirty bitmap (since 2.4)
++# @status: Deprecated in favor of @recording and @locked. (since 2.4)
++#
++# @recording: true if the bitmap is recording new writes from the guest.
++#             Replaces `active` and `disabled` statuses. (since 4.0)
++#
++# @busy: true if the bitmap is in-use by some operation (NBD or jobs)
++#        and cannot be modified via QMP or used by another operation.
++#        Replaces `locked` and `frozen` statuses. (since 4.0)
+ #
+ # @persistent: true if the bitmap will eventually be flushed to persistent
+ #              storage (since 4.0)
+@@ -467,6 +474,7 @@
+ ##
+ { 'struct': 'BlockDirtyInfo',
+   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
++           'recording': 'bool', 'busy': 'bool',
+            'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
+ 
+ ##
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index c6d4acebfa..101383b3af 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -226,6 +226,13 @@ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
+     }
+ }
+ 
++/* Called with BQL taken.  */
++static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
++{
++    return !bitmap->disabled || (bitmap->successor &&
++                                 !bitmap->successor->disabled);
++}
++
+ /**
+  * Create a successor bitmap destined to replace this bitmap after an operation.
+  * Requires that the bitmap is not frozen and has no successor.
+@@ -448,6 +455,8 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+         info->has_name = !!bm->name;
+         info->name = g_strdup(bm->name);
+         info->status = bdrv_dirty_bitmap_status(bm);
++        info->recording = bdrv_dirty_bitmap_recording(bm);
++        info->busy = bdrv_dirty_bitmap_user_locked(bm);
+         info->persistent = bm->persistent;
+         entry->value = info;
+         *plist = entry;
+diff --git a/tests/qemu-iotests/236.out b/tests/qemu-iotests/236.out
+index 5006f7bca1..815cd053f0 100644
+--- a/tests/qemu-iotests/236.out
++++ b/tests/qemu-iotests/236.out
+@@ -22,17 +22,21 @@ write -P0xcd 0x3ff0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": true,
+         "status": "active"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": true,
+         "status": "active"
+       }
+     ]
+@@ -84,17 +88,21 @@ write -P0xcd 0x3ff0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": true,
+         "status": "active"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": true,
+         "status": "active"
+       }
+     ]
+@@ -184,24 +192,30 @@ write -P0xea 0x3fe0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       }
+     ]
+@@ -251,24 +265,30 @@ write -P0xea 0x3fe0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       }
+     ]
+@@ -311,31 +331,39 @@ write -P0xea 0x3fe0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapD",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       }
+     ]
+-- 
+2.17.2
