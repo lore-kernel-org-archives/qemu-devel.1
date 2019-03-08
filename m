@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37175)
+Received: from eggs.gnu.org ([209.51.188.92]:37691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1h2LMO-0004bt-OJ
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:40:49 -0500
+	(envelope-from <mehta.aaru20@gmail.com>) id 1h2LPC-00066F-SG
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1h2LMN-00017p-Vg
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:40:48 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44939)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1h2LMN-00014u-OO
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:40:47 -0500
-Received: by mail-wr1-x443.google.com with SMTP id w2so22580463wrt.11
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 11:40:46 -0800 (PST)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
-	<cf14255c576fd361c6cdf941f8c637e613f6cb68.1550698466.git.DirtY.iCE.hu@gmail.com>
-	<63250655-a4a3-ef36-5882-65188093ff57@gmail.com>
-	<20190307155643.cuypwvu7znhqng5y@sirius.home.kraxel.org>
-	<80f2cc3a-2695-cd41-b379-74751c702771@gmail.com>
-	<878sxpj0gx.fsf@dusky.pond.sub.org>
-Message-ID: <8dac1a81-bd12-322d-4cdb-badd47133cd7@gmail.com>
-Date: Fri, 8 Mar 2019 20:40:42 +0100
-MIME-Version: 1.0
-In-Reply-To: <878sxpj0gx.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: hu-HU
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 04/14] audio: -audiodev command line
- option basic implementation
+	(envelope-from <mehta.aaru20@gmail.com>) id 1h2LPA-0002eT-0P
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:43:42 -0500
+Message-ID: <a09acf9e093c09a70896bb9886370cf7f049f941.camel@gmail.com>
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
+Date: Sat, 09 Mar 2019 01:13:19 +0530
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] thunk: improve readability of allocation loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +20,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On 2019-03-08 08:21, Markus Armbruster wrote:
-> "Zoltán Kővágó" <dirty.ice.hu@gmail.com> writes:
-> 
->> On 2019-03-07 16:56, Gerd Hoffmann wrote:
->>> On Tue, Feb 26, 2019 at 02:39:38AM +0100, Zoltán Kővágó wrote:
->>>> On 2019-02-20 22:37, Kővágó, Zoltán wrote:
->>>> [...]
->>>>> diff --git a/audio/audio.c b/audio/audio.c
->>>>> index ce8e6ea8c2..8ad8cbe559 100644
->>>>> --- a/audio/audio.c
->>>>> +++ b/audio/audio.c
->>>> [...]
->>>>> @@ -2129,3 +1866,170 @@ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
->>>>>          }
->>>>>      }
->>>>>  }
->>>>> +
->>>>> +void audio_create_pdos(Audiodev *dev)
->>>>> +{
->>>>> +    switch (dev->driver) {
->>>>> +#define CASE(DRIVER, driver, pdo_name)                              \
->>>>> +    case AUDIODEV_DRIVER_##DRIVER:                                  \
->>>>> +        dev->u.driver.in = g_malloc0(                               \
->>>>> +            sizeof(Audiodev##pdo_name##PerDirectionOptions));       \
->>>> This should check has_in before overwriting. It'll work correctly when
->>>> called from audio_legacy.c, but when using -audiodev it will overwrite
->>>> the options passed by user (and leak memory) when called from
->>>> audio_validate_opts. I'll fix it in the next update.
->>>
->>> Ping.  4.0 freeze is next tuesday.  Any chance for a v6 early enough
->>> that we have a chance to get the first chunk into 4.0?  Monday latest,
->>> preferably earlier ...
->>
->> I'll try to do something this weekend, but I can't promise anything. I
->> still haven't got to reading through Markus' comments...
-> 
-> Quoting myself: "We're down to minor stylistic issues.  Good work!"
-> 
-> Addressing these should not be hard.
-> 
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+---
+ thunk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I blame it on my horrible time management.  Also the recent sdl/audio
-patches generated some conflicts, I had to solve them first.  And magic
-errors like "'vfio-pci' is not a valid device model name" after update.
-
-Regards,
-Zoltan
+diff --git a/thunk.c b/thunk.c
+index 17f3d320bb..7f31cffe09 100644
+--- a/thunk.c
++++ b/thunk.c
+@@ -86,7 +86,7 @@ void thunk_register_struct(int id, const char *name, const argtype *types)
+ #endif
+     /* now we can alloc the data */
+ 
+-    for(i = 0;i < 2; i++) {
++    for (i = 0; i < ARRAY_SIZE(se->field_offsets); i++) {
+         offset = 0;
+         max_align = 1;
+         se->field_offsets[i] = g_new(int, nb_fields);
+-- 
+2.17.1
