@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43404)
+Received: from eggs.gnu.org ([209.51.188.92]:43639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h2Fkk-000267-TZ
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:41:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h2FlR-0002iC-I5
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h2Fkk-0001n1-5q
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:41:34 -0500
-Received: from mail-qk1-f181.google.com ([209.85.222.181]:40222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h2Fkj-0001ez-UU
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:41:34 -0500
-Received: by mail-qk1-f181.google.com with SMTP id h28so11139927qkk.7
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 05:41:32 -0800 (PST)
-Date: Fri, 8 Mar 2019 08:41:29 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190308083958-mutt-send-email-mst@kernel.org>
-References: <20190308131445.17502-1-armbru@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1h2FlQ-0004dx-Me
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:42:17 -0500
+Date: Fri, 8 Mar 2019 14:41:59 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190308134159.GD31583@localhost.localdomain>
+References: <20190307185401.41639-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190308131445.17502-1-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] pc: Support firmware
- configuration with -blockdev
+In-Reply-To: <20190307185401.41639-1-slp@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] mirror: Confirm we're quiesced only if
+ the job is paused or cancelled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +23,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-On Fri, Mar 08, 2019 at 02:14:33PM +0100, Markus Armbruster wrote:
-> Based-on: <20190308094610.21210-1-armbru@redhat.com>
+Am 07.03.2019 um 19:54 hat Sergio Lopez geschrieben:
+> While child_job_drained_begin() calls to job_pause(), the job doesn't
+> actually transition between states until it runs again and reaches a
+> pause point. This means bdrv_drained_begin() may return with some jobs
+> using the node still having 'busy == true'.
 > 
-> v3:
-> * PATCH 05: Commit message tidied up [Philippe, László]
-> * PATCH 06: Comment tidied up [checkpatch]
-> * PATCH 12: Comment polish [László]
+> As a consequence, block_job_detach_aio_context() may get into a
+> deadlock, waiting for the job to be actually paused, while the coroutine
+> servicing the job is yielding and doesn't get the opportunity to get
+> scheduled again. This situation can be reproduced by issuing a
+> 'block-commit' immediately followed by a 'device_del'.
 > 
-> v2:
-> * PATCH 05,06: New [Philippe]
-> * PATCH 07: Old PATCH 5 rebased onto new patches, with new comment
->   [Philippe]
-> * PATCH 08+10: New, factored out of old PATCH 6 [by Philippe]
-> * PATCH 09: New [by Philippe]
-> * PATCH 11: Remainder of old PATCH 6, with FIXME resolved, literal
->   4096 de-duplicated [László], extraneous error check deleted
->   [László], and comment typos fixed
-> * PATCH 12: New
+> To ensure bdrv_drained_begin() only returns when the jobs have been
+> paused, we change mirror_drained_poll() to only confirm it's quiesced
+> when job->paused == true and there aren't any in-flight requests, except
+> if we reached that point by a drained section initiated by the
+> mirror/commit job itself.
 > 
-> Markus Armbruster (9):
->   qdev: Fix latent bug with compat_props and onboard devices
->   qom: Move compat_props machinery from qdev to QOM
->   vl: Fix latent bug with -global and onboard devices
->   sysbus: Fix latent bug with onboard devices
->   vl: Improve legibility of BlockdevOptions queue
->   vl: Factor configure_blockdev() out of main()
->   vl: Create block backends before setting machine properties
->   pc: Support firmware configuration with -blockdev
->   docs/interop/firmware.json: Prefer -machine to if=pflash
+> The other block jobs shouldn't need any changes, as the default
+> drained_poll() behavior is to only confirm it's quiesced if the job is
+> not busy or completed.
 > 
-> Philippe Mathieu-Daudé (3):
->   pflash_cfi01: Add pflash_cfi01_get_blk() helper
->   pc_sysfw: Remove unused PcSysFwDevice
->   pc_sysfw: Pass PCMachineState to pc_system_firmware_init()
-
-OK looks good to me.
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-Paolo will you be merging this?
-
-
->  accel/accel.c              |   1 +
->  docs/interop/firmware.json |  20 ++-
->  hw/block/pflash_cfi01.c    |   5 +
->  hw/core/qdev.c             |  21 +---
->  hw/core/sysbus.c           |   3 -
->  hw/i386/pc.c               |   4 +-
->  hw/i386/pc_sysfw.c         | 249 ++++++++++++++++++++++++-------------
->  include/hw/block/flash.h   |   1 +
->  include/hw/i386/pc.h       |   6 +-
->  include/hw/qdev-core.h     |   2 -
->  include/qom/object.h       |   3 +
->  qom/object.c               |  39 ++++++
->  vl.c                       | 125 ++++++++++---------
->  13 files changed, 303 insertions(+), 176 deletions(-)
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
 > 
-> -- 
-> 2.17.2
+> ---
+> v2
+>   - Fix typo (thanks to Eric Blake)
+> ---
+>  block/mirror.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 726d3c27fb..1a1fb174b6 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -80,6 +80,7 @@ typedef struct MirrorBlockJob {
+>      bool initial_zeroing_ongoing;
+>      int in_active_write_counter;
+>      bool prepared;
+> +    bool in_drain;
+>  } MirrorBlockJob;
+>  
+>  typedef struct MirrorBDSOpaque {
+> @@ -679,9 +680,11 @@ static int mirror_exit_common(Job *job)
+>  
+>          /* The mirror job has no requests in flight any more, but we need to
+>           * drain potential other users of the BDS before changing the graph. */
+> +        s->in_drain = true;
+>          bdrv_drained_begin(target_bs);
+>          bdrv_replace_node(to_replace, target_bs, &local_err);
+>          bdrv_drained_end(target_bs);
+> +        s->in_drain = false;
+>          if (local_err) {
+>              error_report_err(local_err);
+>              ret = -EPERM;
+
+I think this hunk is wrong because this is nested: s->in_drain is
+already true before this block, so we're setting it to false too early.
+We can either drop is completely or just assert(s->in_drain).
+
+Other than this, the patch looks good to me.
+
+Kevin
