@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49945)
+Received: from eggs.gnu.org ([209.51.188.92]:49983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1h2G7r-0000n0-Q7
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:31 -0500
+	(envelope-from <philmd@redhat.com>) id 1h2G80-0000uU-N3
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1h2G7q-0001D0-B5
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:4430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1h2G7q-00016u-0n
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:26 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D31A23092656
-	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 14:05:24 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  8 Mar 2019 15:04:45 +0100
-Message-Id: <20190308140454.32437-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20190308140454.32437-1-marcandre.lureau@redhat.com>
-References: <20190308140454.32437-1-marcandre.lureau@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1h2G7y-0001nG-KF
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:36 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45435)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2G7y-0001ex-EG
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:05:34 -0500
+Received: by mail-wr1-f67.google.com with SMTP id o7so1393468wrp.12
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 06:05:34 -0800 (PST)
+References: <20190307130323.9353-1-armbru@redhat.com>
+	<20190307130323.9353-15-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3e657733-2714-e9c9-1888-66d269e88b23@redhat.com>
+Date: Fri, 8 Mar 2019 15:05:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 03/12] vhost-user: simplify
- vhost_user_init/vhost_user_cleanup
+In-Reply-To: <20190307130323.9353-15-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 14/14] pflash: Clean up after commit
+ 368a354f02b, part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,369 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, mst@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, balaton@eik.bme.hu
 
-Take a VhostUserState* that can be pre-allocated, and initialize it
-with the associated chardev.
+On 3/7/19 2:03 PM, Markus Armbruster wrote:
+> Our pflash devices are simplistically modelled has having
+> "num-blocks" sectors of equal size "sector-length".  Real hardware
+> commonly has sectors of different sizes.  How our "sector-length"
+> property is related to the physical device's multiple sector sizes
+> is unclear.
+> 
+> Helper functions pflash_cfi01_register() and pflash_cfi02_register()
+> create a pflash device, set properties including "sector-length" and
+> "num-blocks", and realize.  They take parameters @size, @sector_len
+> and @nb_blocs.
+> 
+> QOMification left parameter @size unused.  Obviously, @size should
+> match @sector_len and @nb_blocs, i.e. size == sector_len * nb_blocs.
+> All callers satisfy this.
+> 
+> Remove @nb_blocs and compute it from @size and @sector_len.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Tiwei Bie <tiwei.bie@intel.com>
----
- include/hw/virtio/vhost-user-blk.h  |  2 +-
- include/hw/virtio/vhost-user-scsi.h |  2 +-
- include/hw/virtio/vhost-user.h      |  2 +-
- backends/cryptodev-vhost-user.c     | 18 ++++--------------
- hw/block/vhost-user-blk.c           | 22 ++++------------------
- hw/scsi/vhost-user-scsi.c           | 20 ++++----------------
- hw/virtio/vhost-stub.c              |  4 ++--
- hw/virtio/vhost-user.c              | 16 ++++++++++++----
- net/vhost-user.c                    | 13 ++++---------
- 9 files changed, 33 insertions(+), 66 deletions(-)
-
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost=
--user-blk.h
-index d52944aeeb..a8a106eecb 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -36,7 +36,7 @@ typedef struct VHostUserBlk {
-     uint32_t queue_size;
-     uint32_t config_wce;
-     struct vhost_dev dev;
--    VhostUserState *vhost_user;
-+    VhostUserState vhost_user;
- } VHostUserBlk;
-=20
- #endif
-diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhos=
-t-user-scsi.h
-index e429cacd8e..738f9288bd 100644
---- a/include/hw/virtio/vhost-user-scsi.h
-+++ b/include/hw/virtio/vhost-user-scsi.h
-@@ -30,7 +30,7 @@
-=20
- typedef struct VHostUserSCSI {
-     VHostSCSICommon parent_obj;
--    VhostUserState *vhost_user;
-+    VhostUserState vhost_user;
- } VHostUserSCSI;
-=20
- #endif /* VHOST_USER_SCSI_H */
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-use=
-r.h
-index fd660393a0..811e325f42 100644
---- a/include/hw/virtio/vhost-user.h
-+++ b/include/hw/virtio/vhost-user.h
-@@ -22,7 +22,7 @@ typedef struct VhostUserState {
-     VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
- } VhostUserState;
-=20
--VhostUserState *vhost_user_init(void);
-+bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
-p);
- void vhost_user_cleanup(VhostUserState *user);
-=20
- #endif
-diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-u=
-ser.c
-index d539f14d59..1052a5d0e9 100644
---- a/backends/cryptodev-vhost-user.c
-+++ b/backends/cryptodev-vhost-user.c
-@@ -47,7 +47,7 @@
- typedef struct CryptoDevBackendVhostUser {
-     CryptoDevBackend parent_obj;
-=20
--    VhostUserState *vhost_user;
-+    VhostUserState vhost_user;
-     CharBackend chr;
-     char *chr_name;
-     bool opened;
-@@ -104,7 +104,7 @@ cryptodev_vhost_user_start(int queues,
-             continue;
-         }
-=20
--        options.opaque =3D s->vhost_user;
-+        options.opaque =3D &s->vhost_user;
-         options.backend_type =3D VHOST_BACKEND_TYPE_USER;
-         options.cc =3D b->conf.peers.ccs[i];
-         s->vhost_crypto[i] =3D cryptodev_vhost_init(&options);
-@@ -182,7 +182,6 @@ static void cryptodev_vhost_user_init(
-     size_t i;
-     Error *local_err =3D NULL;
-     Chardev *chr;
--    VhostUserState *user;
-     CryptoDevBackendClient *cc;
-     CryptoDevBackendVhostUser *s =3D
-                       CRYPTODEV_BACKEND_VHOST_USER(backend);
-@@ -213,15 +212,10 @@ static void cryptodev_vhost_user_init(
-         }
-     }
-=20
--    user =3D vhost_user_init();
--    if (!user) {
--        error_setg(errp, "Failed to init vhost_user");
-+    if (!vhost_user_init(&s->vhost_user, &s->chr, errp)) {
-         return;
-     }
-=20
--    user->chr =3D &s->chr;
--    s->vhost_user =3D user;
--
-     qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-                      cryptodev_vhost_user_event, NULL, s, NULL, true);
-=20
-@@ -307,11 +301,7 @@ static void cryptodev_vhost_user_cleanup(
-         }
-     }
-=20
--    if (s->vhost_user) {
--        vhost_user_cleanup(s->vhost_user);
--        g_free(s->vhost_user);
--        s->vhost_user =3D NULL;
--    }
-+    vhost_user_cleanup(&s->vhost_user);
- }
-=20
- static void cryptodev_vhost_user_set_chardev(Object *obj,
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 44ac814016..767c734a81 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -253,7 +253,6 @@ static void vhost_user_blk_device_realize(DeviceState=
- *dev, Error **errp)
- {
-     VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-     VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
--    VhostUserState *user;
-     struct vhost_virtqueue *vqs =3D NULL;
-     int i, ret;
-=20
-@@ -272,15 +271,10 @@ static void vhost_user_blk_device_realize(DeviceSta=
-te *dev, Error **errp)
-         return;
-     }
-=20
--    user =3D vhost_user_init();
--    if (!user) {
--        error_setg(errp, "vhost-user-blk: failed to init vhost_user");
-+    if (!vhost_user_init(&s->vhost_user, &s->chardev, errp)) {
-         return;
-     }
-=20
--    user->chr =3D &s->chardev;
--    s->vhost_user =3D user;
--
-     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-                 sizeof(struct virtio_blk_config));
-=20
-@@ -297,7 +291,7 @@ static void vhost_user_blk_device_realize(DeviceState=
- *dev, Error **errp)
-=20
-     vhost_dev_set_config_notifier(&s->dev, &blk_ops);
-=20
--    ret =3D vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_US=
-ER, 0);
-+    ret =3D vhost_dev_init(&s->dev, &s->vhost_user, VHOST_BACKEND_TYPE_U=
-SER, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-blk: vhost initialization failed: %=
-s",
-                    strerror(-ret));
-@@ -322,10 +316,7 @@ vhost_err:
- virtio_err:
-     g_free(vqs);
-     virtio_cleanup(vdev);
--
--    vhost_user_cleanup(user);
--    g_free(user);
--    s->vhost_user =3D NULL;
-+    vhost_user_cleanup(&s->vhost_user);
- }
-=20
- static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **er=
-rp)
-@@ -338,12 +329,7 @@ static void vhost_user_blk_device_unrealize(DeviceSt=
-ate *dev, Error **errp)
-     vhost_dev_cleanup(&s->dev);
-     g_free(vqs);
-     virtio_cleanup(vdev);
--
--    if (s->vhost_user) {
--        vhost_user_cleanup(s->vhost_user);
--        g_free(s->vhost_user);
--        s->vhost_user =3D NULL;
--    }
-+    vhost_user_cleanup(&s->vhost_user);
- }
-=20
- static void vhost_user_blk_instance_init(Object *obj)
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index 6728878a52..8b1e6876db 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -69,7 +69,6 @@ static void vhost_user_scsi_realize(DeviceState *dev, E=
-rror **errp)
-     VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(dev);
-     VHostUserSCSI *s =3D VHOST_USER_SCSI(dev);
-     VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(s);
--    VhostUserState *user;
-     Error *err =3D NULL;
-     int ret;
-=20
-@@ -86,30 +85,24 @@ static void vhost_user_scsi_realize(DeviceState *dev,=
- Error **errp)
-         return;
-     }
-=20
--    user =3D vhost_user_init();
--    if (!user) {
--        error_setg(errp, "vhost-user-scsi: failed to init vhost_user");
-+    if (!vhost_user_init(&s->vhost_user, &vs->conf.chardev, errp)) {
-         return;
-     }
--    user->chr =3D &vs->conf.chardev;
-=20
-     vsc->dev.nvqs =3D 2 + vs->conf.num_queues;
-     vsc->dev.vqs =3D g_new(struct vhost_virtqueue, vsc->dev.nvqs);
-     vsc->dev.vq_index =3D 0;
-     vsc->dev.backend_features =3D 0;
-=20
--    ret =3D vhost_dev_init(&vsc->dev, user,
-+    ret =3D vhost_dev_init(&vsc->dev, &s->vhost_user,
-                          VHOST_BACKEND_TYPE_USER, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-scsi: vhost initialization failed: =
-%s",
-                    strerror(-ret));
--        vhost_user_cleanup(user);
--        g_free(user);
-+        vhost_user_cleanup(&s->vhost_user);
-         return;
-     }
-=20
--    s->vhost_user =3D user;
--
-     /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
-     vsc->channel =3D 0;
-     vsc->lun =3D 0;
-@@ -130,12 +123,7 @@ static void vhost_user_scsi_unrealize(DeviceState *d=
-ev, Error **errp)
-     g_free(vqs);
-=20
-     virtio_scsi_common_unrealize(dev, errp);
--
--    if (s->vhost_user) {
--        vhost_user_cleanup(s->vhost_user);
--        g_free(s->vhost_user);
--        s->vhost_user =3D NULL;
--    }
-+    vhost_user_cleanup(&s->vhost_user);
- }
-=20
- static Property vhost_user_scsi_properties[] =3D {
-diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
-index 049089b5e2..c175148fce 100644
---- a/hw/virtio/vhost-stub.c
-+++ b/hw/virtio/vhost-stub.c
-@@ -7,9 +7,9 @@ bool vhost_has_free_slot(void)
-     return true;
- }
-=20
--VhostUserState *vhost_user_init(void)
-+bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
-p)
- {
--    return NULL;
-+    return false;
- }
-=20
- void vhost_user_cleanup(VhostUserState *user)
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 0d6c64e5ca..0164060b2b 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -1750,17 +1750,24 @@ static bool vhost_user_mem_section_filter(struct =
-vhost_dev *dev,
-     return result;
- }
-=20
--VhostUserState *vhost_user_init(void)
-+bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
-p)
- {
--    VhostUserState *user =3D g_new0(struct VhostUserState, 1);
--
--    return user;
-+    if (user->chr) {
-+        error_setg(errp, "Cannot initialize vhost-user state");
-+        return false;
-+    }
-+    user->chr =3D chr;
-+    return true;
- }
-=20
- void vhost_user_cleanup(VhostUserState *user)
- {
-     int i;
-=20
-+    if (!user->chr) {
-+        return;
-+    }
-+
-     for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
-         if (user->notifier[i].addr) {
-             object_unparent(OBJECT(&user->notifier[i].mr));
-@@ -1768,6 +1775,7 @@ void vhost_user_cleanup(VhostUserState *user)
-             user->notifier[i].addr =3D NULL;
-         }
-     }
-+    user->chr =3D NULL;
- }
-=20
- const VhostOps user_ops =3D {
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index cd9659df87..5a26a24708 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -304,19 +304,14 @@ static int net_vhost_user_init(NetClientState *peer=
-, const char *device,
- {
-     Error *err =3D NULL;
-     NetClientState *nc, *nc0 =3D NULL;
--    VhostUserState *user =3D NULL;
-     NetVhostUserState *s =3D NULL;
-+    VhostUserState *user;
-     int i;
-=20
-     assert(name);
-     assert(queues > 0);
-=20
--    user =3D vhost_user_init();
--    if (!user) {
--        error_report("failed to init vhost_user");
--        goto err;
--    }
--
-+    user =3D g_new0(struct VhostUserState, 1);
-     for (i =3D 0; i < queues; i++) {
-         nc =3D qemu_new_net_client(&net_vhost_user_info, peer, device, n=
-ame);
-         snprintf(nc->info_str, sizeof(nc->info_str), "vhost-user%d to %s=
-",
-@@ -325,11 +320,11 @@ static int net_vhost_user_init(NetClientState *peer=
-, const char *device,
-         if (!nc0) {
-             nc0 =3D nc;
-             s =3D DO_UPCAST(NetVhostUserState, nc, nc);
--            if (!qemu_chr_fe_init(&s->chr, chr, &err)) {
-+            if (!qemu_chr_fe_init(&s->chr, chr, &err) ||
-+                !vhost_user_init(user, &s->chr, &err)) {
-                 error_report_err(err);
-                 goto err;
-             }
--            user->chr =3D &s->chr;
-         }
-         s =3D DO_UPCAST(NetVhostUserState, nc, nc);
-         s->vhost_user =3D user;
---=20
-2.21.0.4.g36eb1cb9cf
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
