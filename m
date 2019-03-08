@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44919)
+Received: from eggs.gnu.org ([209.51.188.92]:44926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2M7L-0000u8-OH
+	(envelope-from <jsnow@redhat.com>) id 1h2M7L-0000uS-Ud
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2M7J-0006xB-3N
+	(envelope-from <jsnow@redhat.com>) id 1h2M7J-0006yg-Rj
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55640)
+Received: from mx1.redhat.com ([209.132.183.28]:56758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M7G-0006oV-UT
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:15 -0500
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M7J-0006v0-Hk
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:17 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri,  8 Mar 2019 15:28:51 -0500
-Message-Id: <20190308202858.26636-11-jsnow@redhat.com>
+Date: Fri,  8 Mar 2019 15:28:58 -0500
+Message-Id: <20190308202858.26636-18-jsnow@redhat.com>
 In-Reply-To: <20190308202858.26636-1-jsnow@redhat.com>
 References: <20190308202858.26636-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 10/17] iotests: add busy/recording bit test to
- 124
+Subject: [Qemu-devel] [PULL 17/17] block/dirty-bitmaps: implement
+ inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,157 +27,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jsnow@redhat.com, peter.maydell@linaro.org
 
-This adds a simple test that ensures the busy bit works for push backups,
-as well as doubling as bonus test for incremental backups that get interrupted
-by EIO errors.
+Set the inconsistent bit on load instead of rejecting such bitmaps.
+There is no way to un-set it; the only option is to delete the bitmap.
 
-Recording bit tests are already handled sufficiently by 236.
+Obvervations:
+- bitmap loading does not need to update the header for in_use bitmaps.
+- inconsistent bitmaps don't need to have their data loaded; they're
+  glorified corruption sentinels.
+- bitmap saving does not need to save inconsistent bitmaps back to disk.
+- bitmap reopening DOES need to drop the readonly flag from inconsistent
+  bitmaps to allow reopening of qcow2 files with non-qemu-owned bitmaps
+  being eventually flushed back to disk.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Eric Blake <eblake@redhat.com>
-Message-id: 20190223000614.13894-11-jsnow@redhat.com
+Message-id: 20190301191545.8728-8-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/124     | 113 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/124.out |   4 +-
- 2 files changed, 115 insertions(+), 2 deletions(-)
+ block/qcow2-bitmap.c | 103 ++++++++++++++++++++++---------------------
+ 1 file changed, 53 insertions(+), 50 deletions(-)
 
-diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-index 5aa1bf1bd6..80b356f7bb 100755
---- a/tests/qemu-iotests/124
-+++ b/tests/qemu-iotests/124
-@@ -634,6 +634,119 @@ class TestIncrementalBackupBlkdebug(TestIncrementalBackupBase):
-         self.vm.shutdown()
-         self.check_backups()
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 3ee524da4b..80926966de 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -343,9 +343,15 @@ static BdrvDirtyBitmap *load_bitmap(BlockDriverState *bs,
+     uint32_t granularity;
+     BdrvDirtyBitmap *bitmap = NULL;
  
-+    def test_incremental_pause(self):
-+        """
-+        Test an incremental backup that errors into a pause and is resumed.
-+        """
++    granularity = 1U << bm->granularity_bits;
++    bitmap = bdrv_create_dirty_bitmap(bs, granularity, bm->name, errp);
++    if (bitmap == NULL) {
++        goto fail;
++    }
 +
-+        drive0 = self.drives[0]
-+        # NB: The blkdebug script here looks for a "flush, read, read" pattern.
-+        # The flush occurs in hmp_io_writes, the first read in device_add, and
-+        # the last read during the block job.
-+        result = self.vm.qmp('blockdev-add',
-+                             node_name=drive0['id'],
-+                             driver=drive0['fmt'],
-+                             file={
-+                                 'driver': 'blkdebug',
-+                                 'image': {
-+                                     'driver': 'file',
-+                                     'filename': drive0['file']
-+                                 },
-+                                 'set-state': [{
-+                                     'event': 'flush_to_disk',
-+                                     'state': 1,
-+                                     'new_state': 2
-+                                 },{
-+                                     'event': 'read_aio',
-+                                     'state': 2,
-+                                     'new_state': 3
-+                                 }],
-+                                 'inject-error': [{
-+                                     'event': 'read_aio',
-+                                     'errno': 5,
-+                                     'state': 3,
-+                                     'immediately': False,
-+                                     'once': True
-+                                 }],
-+                             })
-+        self.assert_qmp(result, 'return', {})
-+        self.create_anchor_backup(drive0)
-+        bitmap = self.add_bitmap('bitmap0', drive0)
-+
-+        # Emulate guest activity
-+        self.hmp_io_writes(drive0['id'], (('0xab', 0, 512),
-+                                          ('0xfe', '16M', '256k'),
-+                                          ('0x64', '32736k', '64k')))
-+
-+        # For the purposes of query-block visibility of bitmaps, add a drive
-+        # frontend after we've written data; otherwise we can't use hmp-io
-+        result = self.vm.qmp("device_add",
-+                             id="device0",
-+                             drive=drive0['id'],
-+                             driver="virtio-blk")
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Bitmap Status Check
-+        query = self.vm.qmp('query-block')
-+        ret = [bmap for bmap in query['return'][0]['dirty-bitmaps']
-+               if bmap.get('name') == bitmap.name][0]
-+        self.assert_qmp(ret, 'count', 458752)
-+        self.assert_qmp(ret, 'granularity', 65536)
-+        self.assert_qmp(ret, 'status', 'active')
-+        self.assert_qmp(ret, 'busy', False)
-+        self.assert_qmp(ret, 'recording', True)
-+
-+        # Start backup
-+        parent, _ = bitmap.last_target()
-+        target = self.prepare_backup(bitmap, parent)
-+        res = self.vm.qmp('drive-backup',
-+                          job_id=bitmap.drive['id'],
-+                          device=bitmap.drive['id'],
-+                          sync='incremental',
-+                          bitmap=bitmap.name,
-+                          format=bitmap.drive['fmt'],
-+                          target=target,
-+                          mode='existing',
-+                          on_source_error='stop')
-+        self.assert_qmp(res, 'return', {})
-+
-+        # Wait for the error
-+        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
-+                                   match={"data":{"device":bitmap.drive['id']}})
-+        self.assert_qmp(event, 'data', {'device': bitmap.drive['id'],
-+                                        'action': 'stop',
-+                                        'operation': 'read'})
-+
-+        # Bitmap Status Check
-+        query = self.vm.qmp('query-block')
-+        ret = [bmap for bmap in query['return'][0]['dirty-bitmaps']
-+               if bmap.get('name') == bitmap.name][0]
-+        self.assert_qmp(ret, 'count', 458752)
-+        self.assert_qmp(ret, 'granularity', 65536)
-+        self.assert_qmp(ret, 'status', 'frozen')
-+        self.assert_qmp(ret, 'busy', True)
-+        self.assert_qmp(ret, 'recording', True)
-+
-+        # Resume and check incremental backup for consistency
-+        res = self.vm.qmp('block-job-resume', device=bitmap.drive['id'])
-+        self.assert_qmp(res, 'return', {})
-+        self.wait_qmp_backup(bitmap.drive['id'])
-+
-+        # Bitmap Status Check
-+        query = self.vm.qmp('query-block')
-+        ret = [bmap for bmap in query['return'][0]['dirty-bitmaps']
-+               if bmap.get('name') == bitmap.name][0]
-+        self.assert_qmp(ret, 'count', 0)
-+        self.assert_qmp(ret, 'granularity', 65536)
-+        self.assert_qmp(ret, 'status', 'active')
-+        self.assert_qmp(ret, 'busy', False)
-+        self.assert_qmp(ret, 'recording', True)
-+
-+        # Finalize / Cleanup
-+        self.make_reference_backup(bitmap)
-+        self.vm.shutdown()
-+        self.check_backups()
-+
+     if (bm->flags & BME_FLAG_IN_USE) {
+-        error_setg(errp, "Bitmap '%s' is in use", bm->name);
+-        goto fail;
++        /* Data is unusable, skip loading it */
++        return bitmap;
+     }
  
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2'])
-diff --git a/tests/qemu-iotests/124.out b/tests/qemu-iotests/124.out
-index e56cae021b..281b69efea 100644
---- a/tests/qemu-iotests/124.out
-+++ b/tests/qemu-iotests/124.out
-@@ -1,5 +1,5 @@
--...........
-+............
- ----------------------------------------------------------------------
--Ran 11 tests
-+Ran 12 tests
+     ret = bitmap_table_load(bs, &bm->table, &bitmap_table);
+@@ -356,12 +362,6 @@ static BdrvDirtyBitmap *load_bitmap(BlockDriverState *bs,
+         goto fail;
+     }
  
- OK
+-    granularity = 1U << bm->granularity_bits;
+-    bitmap = bdrv_create_dirty_bitmap(bs, granularity, bm->name, errp);
+-    if (bitmap == NULL) {
+-        goto fail;
+-    }
+-
+     ret = load_bitmap_data(bs, bitmap_table, bm->table.size, bitmap);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret, "Could not read bitmap '%s' from image",
+@@ -949,6 +949,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+     Qcow2Bitmap *bm;
+     GSList *created_dirty_bitmaps = NULL;
+     bool header_updated = false;
++    bool needs_update = false;
+ 
+     if (s->nb_bitmaps == 0) {
+         /* No bitmaps - nothing to do */
+@@ -962,35 +963,39 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+     }
+ 
+     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+-        if (!(bm->flags & BME_FLAG_IN_USE)) {
+-            BdrvDirtyBitmap *bitmap = load_bitmap(bs, bm, errp);
+-            if (bitmap == NULL) {
+-                goto fail;
+-            }
+-
+-            if (!(bm->flags & BME_FLAG_AUTO)) {
+-                bdrv_disable_dirty_bitmap(bitmap);
+-            }
+-            bdrv_dirty_bitmap_set_persistance(bitmap, true);
+-            bm->flags |= BME_FLAG_IN_USE;
+-            created_dirty_bitmaps =
+-                    g_slist_append(created_dirty_bitmaps, bitmap);
++        BdrvDirtyBitmap *bitmap = load_bitmap(bs, bm, errp);
++        if (bitmap == NULL) {
++            goto fail;
+         }
+-    }
+ 
+-    if (created_dirty_bitmaps != NULL) {
+-        if (can_write(bs)) {
+-            /* in_use flags must be updated */
+-            int ret = update_ext_header_and_dir_in_place(bs, bm_list);
+-            if (ret < 0) {
+-                error_setg_errno(errp, -ret, "Can't update bitmap directory");
+-                goto fail;
+-            }
+-            header_updated = true;
++        bdrv_dirty_bitmap_set_persistance(bitmap, true);
++        if (bm->flags & BME_FLAG_IN_USE) {
++            bdrv_dirty_bitmap_set_inconsistent(bitmap);
+         } else {
+-            g_slist_foreach(created_dirty_bitmaps, set_readonly_helper,
+-                            (gpointer)true);
++            /* NB: updated flags only get written if can_write(bs) is true. */
++            bm->flags |= BME_FLAG_IN_USE;
++            needs_update = true;
+         }
++        if (!(bm->flags & BME_FLAG_AUTO)) {
++            bdrv_disable_dirty_bitmap(bitmap);
++        }
++        created_dirty_bitmaps =
++            g_slist_append(created_dirty_bitmaps, bitmap);
++    }
++
++    if (needs_update && can_write(bs)) {
++        /* in_use flags must be updated */
++        int ret = update_ext_header_and_dir_in_place(bs, bm_list);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Can't update bitmap directory");
++            goto fail;
++        }
++        header_updated = true;
++    }
++
++    if (!can_write(bs)) {
++        g_slist_foreach(created_dirty_bitmaps, set_readonly_helper,
++                        (gpointer)true);
+     }
+ 
+     g_slist_free(created_dirty_bitmaps);
+@@ -1112,23 +1117,21 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
+     }
+ 
+     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+-        if (!(bm->flags & BME_FLAG_IN_USE)) {
+-            BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
+-            if (bitmap == NULL) {
+-                continue;
+-            }
+-
+-            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
+-                error_setg(errp, "Bitmap %s is not readonly but not marked"
+-                                 "'IN_USE' in the image. Something went wrong,"
+-                                 "all the bitmaps may be corrupted", bm->name);
+-                ret = -EINVAL;
+-                goto out;
+-            }
++        BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
++        if (bitmap == NULL) {
++            continue;
++        }
+ 
+-            bm->flags |= BME_FLAG_IN_USE;
+-            ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
++        if (!bdrv_dirty_bitmap_readonly(bitmap)) {
++            error_setg(errp, "Bitmap %s was loaded prior to rw-reopen, but was "
++                       "not marked as readonly. This is a bug, something went "
++                       "wrong. All of the bitmaps may be corrupted", bm->name);
++            ret = -EINVAL;
++            goto out;
+         }
++
++        bm->flags |= BME_FLAG_IN_USE;
++        ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
+     }
+ 
+     if (ro_dirty_bitmaps != NULL) {
+@@ -1424,8 +1427,8 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+         Qcow2Bitmap *bm;
+ 
+         if (!bdrv_dirty_bitmap_get_persistance(bitmap) ||
+-            bdrv_dirty_bitmap_readonly(bitmap))
+-        {
++            bdrv_dirty_bitmap_readonly(bitmap) ||
++            bdrv_dirty_bitmap_inconsistent(bitmap)) {
+             continue;
+         }
+ 
 -- 
 2.17.2
