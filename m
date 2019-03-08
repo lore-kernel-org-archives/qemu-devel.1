@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40148)
+Received: from eggs.gnu.org ([209.51.188.92]:41638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h2FZ8-0000M6-Op
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:29:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h2Fep-00058d-3A
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:35:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h2FZ5-0001c0-Ro
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:29:33 -0500
-Date: Fri, 8 Mar 2019 14:29:19 +0100
+	(envelope-from <kwolf@redhat.com>) id 1h2Fel-0001uZ-8B
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:35:24 -0500
+Date: Fri, 8 Mar 2019 14:35:10 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190308132919.GB31583@localhost.localdomain>
-References: <20190305125317.607155-1-vsementsov@virtuozzo.com>
-	<20190305125317.607155-2-vsementsov@virtuozzo.com>
+Message-ID: <20190308133510.GC31583@localhost.localdomain>
+References: <20190308062455.29755-1-armbru@redhat.com>
+	<481d398a-e26c-6c0a-20b7-7466ae1ebf1f@redhat.com>
+	<875zsteeih.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190305125317.607155-2-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] qapi: move to QOM path for
- x-block-latency-histogram-set
+In-Reply-To: <875zsteeih.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v7] pflash: Require backend size to match
+ device, improve errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, mreitz@redhat.com, armbru@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, philmd@redhat.com, alex.bennee@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-Am 05.03.2019 um 13:53 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/block-core.json |  4 ++--
->  blockdev.c           | 12 ++++++------
->  2 files changed, 8 insertions(+), 8 deletions(-)
+Am 08.03.2019 um 13:28 hat Markus Armbruster geschrieben:
+> Laszlo Ersek <lersek@redhat.com> writes:
+> > This one has got to be one of the longest bike-shedding sessions! :)
+> >
+> > I'm fine with this patch, but I could suggest two improvements.
+> >
+> > (1) When blk_getlength() fails, we could format the negative error code
+> > returned by it into the error message.
 > 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 2b8afbb924..8187de0836 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -541,7 +541,7 @@
->  # If only @device parameter is specified, remove all present latency histograms
+> I can do that.
 
-@device doesn't exist any more, so this should become @id.
+By using error_setg_errno(), I assume. Not throwing away error details
+is always good.
 
-The examples below need to be changed, too.
+> > (2) We could extract the common code to a new function in
+> > "hw/block/block.c". (It says "Common code for block device models" on
+> > the tin.)
+> 
+> There's so much common code in these two files even before this patch...
 
->  # for the device. Otherwise, add/reset some of (or all) latency histograms.
->  #
-> -# @device: device name to set latency histogram for.
-> +# @id: The name or QOM path of the guest device.
->  #
->  # @boundaries: list of interval boundary values (see description in
->  #              BlockLatencyHistogramInfo definition). If specified, all
-> @@ -599,7 +599,7 @@
->  # <- { "return": {} }
->  ##
->  { 'command': 'x-block-latency-histogram-set',
-> -  'data': {'device': 'str',
-> +  'data': {'id': 'str',
->             '*boundaries': ['uint64'],
->             '*boundaries-read': ['uint64'],
->             '*boundaries-write': ['uint64'],
+My understanding is that hw/block/block.c contains code that is
+potentially useful to all kinds of block devices, not random code that
+two specific similar devices happen to share.
 
-The rest of the series looks good to me.
+If we want to deduplicate some code in the flash devices, without any
+expectation that other devices will use it at some point, I'd rather
+create a new source file hw/block/pflash_common.c or something like
+that.
 
 Kevin
