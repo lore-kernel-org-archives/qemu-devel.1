@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42244)
+Received: from eggs.gnu.org ([209.51.188.92]:42247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h240N-0006FA-GW
+	(envelope-from <dgibson@ozlabs.org>) id 1h240N-0006FC-Gm
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h240K-0000zt-BL
+	(envelope-from <dgibson@ozlabs.org>) id 1h240K-00010K-DE
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:54 -0500
-Date: Fri, 8 Mar 2019 11:58:35 +1100
+Date: Fri, 8 Mar 2019 11:56:53 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190308005835.GR7722@umbus.fritz.box>
+Message-ID: <20190308005653.GQ7722@umbus.fritz.box>
 References: <20190307223548.20516-1-clg@kaod.org>
-	<20190307223548.20516-15-clg@kaod.org>
+	<20190307223548.20516-14-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bpNGSkw8ExqLHKDe"
+	protocol="application/pgp-signature"; boundary="9QFLzLG6sIJR48rg"
 Content-Disposition: inline
-In-Reply-To: <20190307223548.20516-15-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 14/15] ppc/pnv: add a "ibm,
- opal/power-mgt" device tree node on POWER9
+In-Reply-To: <20190307223548.20516-14-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 13/15] ppc/pnv: add more dummy XSCOM
+ addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +29,78 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---bpNGSkw8ExqLHKDe
+--9QFLzLG6sIJR48rg
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 07, 2019 at 11:35:47PM +0100, C=E9dric Le Goater wrote:
-> Activate only stop0 and stop1 levels. We should not need more levels
-> when under QEMU.
+On Thu, Mar 07, 2019 at 11:35:46PM +0100, C=E9dric Le Goater wrote:
+> To improve OPAL/skiboot support. We don't need to strictly model these
+> XSCOM accesses.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Applied, although..
+Applied, thanks.
 
 > ---
->  hw/ppc/pnv.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+>  hw/ppc/pnv_xscom.c | 33 +++++++++++++++++++++++++++------
+>  1 file changed, 27 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index e68d419203e8..8be4d4cbf785 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -438,6 +438,16 @@ static void pnv_dt_isa(PnvMachineState *pnv, void *f=
-dt)
->                         &args);
->  }
-> =20
-> +static void pnv_dt_power_mgt(void *fdt)
-> +{
-> +    int off;
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index 46fae41f32b0..c285ef514e88 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -64,11 +64,21 @@ static uint64_t xscom_read_default(PnvChip *chip, uin=
+t32_t pcba)
+>      switch (pcba) {
+>      case 0xf000f:
+>          return PNV_CHIP_GET_CLASS(chip)->chip_cfam_id;
+> +    case 0x18002:       /* ECID2 */
+> +        return 0;
 > +
-> +    off =3D fdt_add_subnode(fdt, 0, "ibm,opal");
-> +    off =3D fdt_add_subnode(fdt, off, "power-mgt");
+>      case 0x1010c00:     /* PIBAM FIR */
+>      case 0x1010c03:     /* PIBAM FIR MASK */
+> -    case 0x2020007:     /* ADU stuff */
+> -    case 0x2020009:     /* ADU stuff */
+> -    case 0x202000f:     /* ADU stuff */
 > +
-> +    _FDT(fdt_setprop_cell(fdt, off, "ibm,enabled-stop-levels", 0xc000000=
-0));
-> +}
+> +        /* P9 xscom reset */
+> +    case 0x0090018:     /* Receive status reg */
+> +    case 0x0090012:     /* log register */
+> +    case 0x0090013:     /* error register */
 > +
->  static void *pnv_dt_create(MachineState *machine)
->  {
->      const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
-> @@ -493,6 +503,11 @@ static void *pnv_dt_create(MachineState *machine)
->          pnv_dt_bmc_sensors(pnv->bmc, fdt);
->      }
-> =20
-> +    /* Create an extra node for power management on Power9 */
-> +    if (pnv_is_power9(pnv)) {
-
-=2E. as always, I think specific code calling generic helpers is a
-better pattern than generic code conditionally calling specific details.
-
-> +        pnv_dt_power_mgt(fdt);
-> +    }
+> +        /* P8 xscom reset */
+> +    case 0x2020007:     /* ADU stuff, log register */
+> +    case 0x2020009:     /* ADU stuff, error register */
+> +    case 0x202000f:     /* ADU stuff, receive status register*/
+>          return 0;
+>      case 0x2013f00:     /* PBA stuff */
+>      case 0x2013f01:     /* PBA stuff */
+> @@ -100,9 +110,20 @@ static bool xscom_write_default(PnvChip *chip, uint3=
+2_t pcba, uint64_t val)
+>      case 0x1010c03:     /* PIBAM FIR MASK */
+>      case 0x1010c04:     /* PIBAM FIR MASK */
+>      case 0x1010c05:     /* PIBAM FIR MASK */
+> -    case 0x2020007:     /* ADU stuff */
+> -    case 0x2020009:     /* ADU stuff */
+> -    case 0x202000f:     /* ADU stuff */
+> +        /* P9 xscom reset */
+> +    case 0x0090018:     /* Receive status reg */
+> +    case 0x0090012:     /* log register */
+> +    case 0x0090013:     /* error register */
 > +
->      return fdt;
->  }
-> =20
+> +        /* P8 xscom reset */
+> +    case 0x2020007:     /* ADU stuff, log register */
+> +    case 0x2020009:     /* ADU stuff, error register */
+> +    case 0x202000f:     /* ADU stuff, receive status register*/
+> +
+> +    case 0x2013028:     /* CAPP stuff */
+> +    case 0x201302a:     /* CAPP stuff */
+> +    case 0x2013801:     /* CAPP stuff */
+> +    case 0x2013802:     /* CAPP stuff */
+>          return true;
+>      default:
+>          return false;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -92,24 +108,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---bpNGSkw8ExqLHKDe
+--9QFLzLG6sIJR48rg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyBvjsACgkQbDjKyiDZ
-s5J/LBAA2/iG4A3JVjY70w2g9/7l6IHOU2fS1bGf6HAOC5mdZsO3a2proWvj8Oky
-/QZmh9WRCmTpd0MwK/eG6E50q7pJRyCvlU4lAJpnE39FFNVJgXKarebrpQouNmHR
-298bh7NozI1pYlkJ4JxvBhvxwevsRai4mpA6woI+m+yKDu/C/l9psbhq2saz1n/+
-5enrApEeInpuEGS07ffGMra5dpQd8tVO9tLAG9UilDEodIHp+E5h06k4oV4tnW7/
-GZXfG/scyZnbnyYy4L9/vz5OiKGiHDv2eXm+CNwyaRKnTsjU1lo5OcuY0iCYtXh1
-pTFtVtboXUEbXKn9oLe8DEh+6a2XiWwXo8mpgBVc2A9l3kVrGWnkRks6Us/8Ug2s
-s7CaorxdPOeAARKzmMPJh28ExQ/sm2SR7P7vggEDetJL31LdShZbNtFlX3fwYBbg
-5cqGGmOvdJ05qjMH2e+RBU3xSQjVCJteML83KMD208fborCHIzKisMabYYSApwW+
-3AbC1+lCL+KDOqzTnBI0nOzwxVQPWdF8rwSY9OETYHEXNnbaqQTb9XXD+jbhTLCx
-TVsW8FuDhs4LcNF3l2f2C+0wkBafCR+z8dOn8BCuDGqzhdQx0smaV7sZqbNl9h4x
-IpsgqWi1Hrxd/3Y5Y1J0O8y7TmkfXRxY2hC0aBkdTSjxRW4vUAc=
-=/Rek
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyBvdUACgkQbDjKyiDZ
+s5Lvhg/6AhwecWt9cNgScqLe7vbuYzXO2WNLOZlnHfx0C45ISa6yFL6V9c2D9T1y
+KsbyfFXrVpCNyu26ba52p3Joo08O1JPvSSYpwwMiDZfL+BS0OURxL9HCPB6/4UmP
+MPanDzc7toiNn27G28vdubyHb2eJH5NJWW8cR3VUsQKPhsWm1IyT/OfH5v4PiJOk
+UNjrKDG3iLFZSmRfixYvFOqCP+QVzGZ8gjNGkfV9q3M+XdkJrjzKqmyVTG5ZUDC+
+KdX+xkXZR2jIBALh6W3jIWbeK16d+rv1dfYQSdTnsa5t5RnQ8PpctSyNhKeTcTLd
+54tCOyfX2hWYTeAgX4O4wXR4GSntG0R/uAIKWVlibi3/9dFpaUNO2/tdiQfk6Hbm
+FPxhSz6cRLIv3LXFMKONnFMmUfnxw+j3+r+QoeLpB9XTG7P4uzqY781n7pTKnCG2
+1yNf49EOww0ZXEhcXPDsTqjytwb+Dp7dePrTBnXxDOy2gITD7zrnZaUaiVkxsBxJ
+XZ5Xh+/4q+0vFhgliXaon72XWusZx/Z/qFOMc9PwztBiDpPAahCUbUvLsZhzbuIQ
+KAbGYQ7MDUA0VoEVjeItUItrCBqIIuTCqdtglgPwePsShoNPmmZOywH1/EcCQrJ2
+0cNAR7wfaWmwx8XH98qdShq59b9JkXDJxFPfXdmNdny8l4hnhuI=
+=RFXP
 -----END PGP SIGNATURE-----
 
---bpNGSkw8ExqLHKDe--
+--9QFLzLG6sIJR48rg--
