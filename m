@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45621)
+Received: from eggs.gnu.org ([209.51.188.92]:46065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2ECC-0004Px-IE
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:01:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h2EEP-0005nf-Ko
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:04:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2EC8-0008Or-JZ
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:01:48 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190307172401.29451-1-armbru@redhat.com>
-	<20190307172401.29451-13-armbru@redhat.com>
-	<bf28d85a-f024-3c4f-e7e3-546f6f02ba9c@redhat.com>
-Date: Fri, 08 Mar 2019 13:01:10 +0100
-In-Reply-To: <bf28d85a-f024-3c4f-e7e3-546f6f02ba9c@redhat.com> (Laszlo Ersek's
-	message of "Fri, 8 Mar 2019 09:44:27 +0100")
-Message-ID: <87k1h9fud5.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1h2EEM-0003xO-R6
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:04:04 -0500
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:34948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h2EEM-0003iO-Ko
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:04:02 -0500
+Received: by mail-oi1-x22d.google.com with SMTP id u128so15671549oie.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 04:04:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 12/12] docs/interop/firmware.json:
- Prefer -machine to if=pflash
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<87r2bigarf.fsf@zen.linaroharston>
+	<a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
+	<CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
+	<62408d6c-5a61-ffb2-f810-6ef36703b277@redhat.com>
+	<20190308064743.xe4govhrfdsrzns3@sirius.home.kraxel.org>
+	<CAFEAcA_nb_s-DGQTf3GRMcN+9ke8XKyzf_n9QfpeCcKCoA439A@mail.gmail.com>
+	<20190308115810.6f2dq4ub5t55lnih@sirius.home.kraxel.org>
+In-Reply-To: <20190308115810.6f2dq4ub5t55lnih@sirius.home.kraxel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Mar 2019 12:03:47 +0000
+Message-ID: <CAFEAcA-mvCSZMQzx4N9UgbbEYaDkGGXB64dpnaVG4UacL=LKuA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-Laszlo Ersek <lersek@redhat.com> writes:
-
-> On 03/07/19 18:24, Markus Armbruster wrote:
->> The previous commit added a way to configure firmware with -blockdev
->> rather than -drive if=pflash.  Document it as the preferred way.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  docs/interop/firmware.json | 21 +++++++++++++++------
->>  1 file changed, 15 insertions(+), 6 deletions(-)
->> 
->> diff --git a/docs/interop/firmware.json b/docs/interop/firmware.json
->> index 28f9bc1591..db3cb38b6a 100644
->> --- a/docs/interop/firmware.json
->> +++ b/docs/interop/firmware.json
->> @@ -212,9 +212,13 @@
->>  #
->>  # @executable: Identifies the firmware executable. The firmware
->>  #              executable may be shared by multiple virtual machine
->> -#              definitions. The corresponding QEMU command line option
->> -#              is "-drive
->> -#              if=pflash,unit=0,readonly=on,file=@executable.@filename,format=@executable.@format".
->> +#              definitions. The preferred corresponding QEMU command
->> +#              line option is
->> +#                  -drive if=none,id=pflash0,readonly=on,file=@executable.@filename,format=@executable.@format
->> +#                  -machine pflash0=pflash0
->> +#              or equivalent -blockdev.
+On Fri, 8 Mar 2019 at 11:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> On Fri, Mar 08, 2019 at 10:31:20AM +0000, Peter Maydell wrote:
+> > I think in fact I have just broken in-tree builds with the
+> > Sphinx support patchset :-/
 >
-> If we used plural here ("options"), would that be an improvement?
->
->   The preferred corresponding QEMU command line options are
->     -drive ...
->     -machine ...
->   (or -blockdev equivalent to -drive).
+> Great opportunity!  Stop supporting in-tree build fixes a bug,
+> so this can be merged post soft-freeze.
 
-Definitely an improvement.
+Joking aside, this is quite tempting, because Sphinx simply
+does not support building into the same directory as its
+source documentation files. So we need to either:
+ * create an ad-hoc build directory (eg docs/built)
+   where Sphinx builds the docs to if we're doing an
+   in-tree build, and have the 'make install' phase pull
+   the docs out of there
+ * declare in-tree builds to be no longer supported at all
 
->> +#              With QEMU versions older than 4.0, you have to use
->
-> To make this easier to understand on first read, should we say
->
->   ... you have to use the single option ...
->
-> ?
->
-> (Maybe there is a better term than "single option" for the "-drive if=<not-NONE>" options, i.e. for those that configure both back-end and front-end.)
-
-I think we can leave this one to context.
-
-> If the above over-explained things, I'd be fine with the current patch as well. I just got these ideas and wanted to run them by you.
-
-Appreciated!
+thanks
+-- PMM
