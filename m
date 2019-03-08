@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46670)
+Received: from eggs.gnu.org ([209.51.188.92]:49691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Sandra_Loosemore@mentor.com>) id 1h25xH-0005hZ-Hc
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 22:13:52 -0500
+	(envelope-from <mst@redhat.com>) id 1h261r-0006mW-N0
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 22:18:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Sandra_Loosemore@mentor.com>) id 1h25xF-0007Xc-1M
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 22:13:50 -0500
-Received: from relay1.mentorg.com ([192.94.38.131]:37257)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Sandra_Loosemore@mentor.com>)
-	id 1h25x8-0007OX-0d
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 22:13:45 -0500
-References: <1550029560-30530-1-git-send-email-sandra@codesourcery.com>
-	<1550029560-30530-3-git-send-email-sandra@codesourcery.com>
-	<CAFEAcA-Ocow8GzPCPO=346hnc4CZ6M02TwVp-e6G2EjY5-FESQ@mail.gmail.com>
-From: Sandra Loosemore <sandra@codesourcery.com>
-Message-ID: <7d4097aa-4888-82f6-3e4e-eeeb8de9f55b@codesourcery.com>
-Date: Thu, 7 Mar 2019 20:13:26 -0700
+	(envelope-from <mst@redhat.com>) id 1h261k-0005vl-Er
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 22:18:30 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:33809)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h261g-0005oU-Jb
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 22:18:24 -0500
+Received: by mail-qt1-f194.google.com with SMTP id x20so2158224qto.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 19:18:22 -0800 (PST)
+Date: Thu, 7 Mar 2019 22:18:14 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190307221803-mutt-send-email-mst@kernel.org>
+References: <20190307145839.13128-1-philmd@redhat.com>
+	<a7e51315-7b36-3bfd-9c78-296ba74614f7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Ocow8GzPCPO=346hnc4CZ6M02TwVp-e6G2EjY5-FESQ@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="------------419B3ABBD09B002C13D8715E"
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] Add Nios II semihosting support.
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a7e51315-7b36-3bfd-9c78-296ba74614f7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] tests: Allow use of Ports bash and
+ GNU sed extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,125 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marek Vasut <marex@denx.de>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Kamil Rytarowski <n54@gmx.com>, Brad Smith <brad@comstyle.com>
 
---------------419B3ABBD09B002C13D8715E
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 3/7/19 7:58 AM, Peter Maydell wrote:
-> On Wed, 13 Feb 2019 at 04:02, Sandra Loosemore <sandra@codesourcery.com> wrote:
->>
->> This patch adds support for libgloss semihosting to Nios II bare-metal
->> emulation.
->>
->> Signed-off-by: Sandra Loosemore <sandra@codesourcery.com>
->> Signed-off-by: Julian Brown <julian@codesourcery.com>
+On Thu, Mar 07, 2019 at 04:27:36PM +0100, Thomas Huth wrote:
+> On 07/03/2019 15.58, Philippe Mathieu-Daudé wrote:
+> > Hi Thomas,
 > 
-> Do you have a link to the spec that defines this semihosting
-> ABI, please ?
+> ? -----^
+> 
+> I could take the patch for tests/data/acpi/rebuild-expected-aml.sh
+> through the qtests tree (if Michael or Igor don't want to take it), but
+> the other patches are not related to qtests...
+> 
+>  Thomas
 
-Well, I just wrote some derived from the comments in the libgloss 
-sources; see the attachment.  :-)
+You can pick it up, sure
 
-FWIW this is pretty much a direct copy of the m68k semihosting protocol, 
-which CodeSourcery contributed ages ago to both libgloss and qemu.
-
--Sandra
-
---------------419B3ABBD09B002C13D8715E
-Content-Type: text/plain; charset="UTF-8"; name="nios2-semi.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="nios2-semi.txt"
-
-TmlvcyBJSSBTZW1paG9zdGluZyBQcm90b2NvbAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tCgpUaGUgcnVudGltZSAobGliZ2xvc3MpIGluZGljYXRlcyBhIHNlbWlob3N0aW5nIHJl
-cXVlc3QgdG8gdGhlIGRlYnVnCmFnZW50IGJ5IGlzc3VpbmcgYSAiYnJlYWsgMSIgaW5zdHJ1
-Y3Rpb24uICByNCBhbmQgcjUgYXJlIHVzZWQgdG8gcGFzcwpwYXJhbWV0ZXJzIHBlciB0aGUg
-bm9ybWFsIEMgQUJJIG9uIG5pb3MyLgoKcjQgY29udGFpbnMgYSByZXF1ZXN0IGNvZGUuICBy
-NSBpcyB0eXBpY2FsbHkgYSBwb2ludGVyIHRvIGEgNC13b3JkCnBhcmFtZXRlciBibG9jaywg
-ZXhjZXB0IGZvciB0aGUgZXhpdCBvcGVyYXRpb24gd2hlcmUgaXQgaXMgYW4KaW1tZWRpYXRl
-IGludGVnZXIgdmFsdWUuCgpUaGUgcmVzdWx0IG9mIHRoZSBvcGVyYXRpb24gaXMgcmV0dXJu
-ZWQgaW4gdGhlIGZpcnN0IHdvcmQgb2YgdGhlCnBhcmFtZXRlciBibG9jay4gIFRoZSBzZWNv
-bmQgd29yZCBpcyB1c2VkIHRvIHJldHVybiBhbiBlcnJubyB2YWx1ZSwKZW5jb2RlZCBwZXIg
-dGhlICJFcnJubyBWYWx1ZXMiIHNlY3Rpb24gb2YgdGhlIFJTUCBkb2N1bWVudGF0aW9uIGlu
-IHRoZQpHREIgVXNlciBNYW51YWwuCgpUaGUgc3VwcG9ydGVkIHI0IHJlcXVlc3QgY29kZXMg
-YXJlOgoKI2RlZmluZSBIT1NURURfRVhJVCAgMAoKICBUZXJtaW5hdGUgcHJvZ3JhbSBleGVj
-dXRpb247IHNlbmQgYSAnVycgc3RvcCByZXBseSB0byBHREIuCgogIHI1IGNvbnRhaW5zIHRo
-ZSBleGl0IGNvZGUsIGFzIGFuIGltbWVkaWF0ZSBpbnRlZ2VyIHJhdGhlciB0aGFuIGluZGly
-ZWN0bHkKICBpbiBhIHBhcmFtZXRlciBibG9jay4gIFRoaXMgc2VtaWhvc3RpbmcgcmVxdWVz
-dCBpc24ndCBleHBlY3RlZCB0byByZXR1cm4uCgojZGVmaW5lIEhPU1RFRF9JTklUX1NJTSAx
-CgogIFJlc2VydmVkL3VuaW1wbGVtZW50ZWQuCgojZGVmaW5lIEhPU1RFRF9PUEVOIDIKCiAg
-T3BlbiBmaWxlOyAnRm9wZW4nIEdEQiBmaWxlaW8gcmVxdWVzdC4KCiAgcjUgcG9pbnRzIHRv
-IGEgcGFyYW1ldGVyIGJsb2NrIGNvbnRhaW5pbmc6CiAgWzBdIHBvaW50ZXIgdG8gZmlsZW5h
-bWUKICBbMV0gZmlsZW5hbWUgbGVuZ3RoCiAgWzJdIG9wZW4gZmxhZ3MsIGVuY29kZWQgcGVy
-IHRoZSBHREIgUlNQIGRvY3VtZW50YXRpb24KICBbM10gbW9kZSwgZW5jb2RlZCBwZXIgdGhl
-IEdEQiBSU1AgZG9jdW1lbnRhdGlvbgoKICBSZXR1cm4gdmFsdWVzIGluIHBhcmFtZXRlciBi
-bG9jazoKICBbMF0gZmlsZSBkZXNjcmlwdG9yIG9yIC0xIG9uIGVycm9yCiAgWzFdIGVycm5v
-LCBlbmNvZGVkIHBlciB0aGUgR0RCIFJTUCBkb2N1bWVudGF0aW9uCgojZGVmaW5lIEhPU1RF
-RF9DTE9TRSAzCgogIENsb3NlIGZpbGU7ICdGY2xvc2UnIEdEQiBmaWxlaW8gcmVxdWVzdC4K
-CiAgcjUgcG9pbnRzIHRvIGEgcGFyYW1ldGVyIGJsb2NrIGNvbnRhaW5pbmc6CiAgWzBdIGZp
-bGUgZGVzY3JpcHRvcgoKICBSZXR1cm4gdmFsdWVzIGluIHBhcmFtZXRlciBibG9jazoKICBb
-MF0gcmV0dXJuIHN0YXR1cwogIFsxXSBlcnJubywgZW5jb2RlZCBwZXIgdGhlIEdEQiBSU1Ag
-ZG9jdW1lbnRhdGlvbgoKI2RlZmluZSBIT1NURURfUkVBRCA0CgogIFJlYWQgZnJvbSBmaWxl
-OyAnRnJlYWQnIEdEQiBmaWxlaW8gcmVxdWVzdC4KCiAgcjUgcG9pbnRzIHRvIGEgcGFyYW1l
-dGVyIGJsb2NrIGNvbnRhaW5pbmc6CiAgWzBdIGZpbGUgZGVzY3JpcHRvcgogIFsxXSBwb2lu
-dGVyIHRvIGJ1ZmZlcgogIFsyXSBidWZmZXIgc2l6ZQogIAogIFJldHVybiB2YWx1ZXMgaW4g
-cGFyYW1ldGVyIGJsb2NrOgogIFswXSBudW1iZXIgb2YgYnl0ZXMgcmVhZAogIFsxXSBlcnJu
-bywgZW5jb2RlZCBwZXIgdGhlIEdEQiBSU1AgZG9jdW1lbnRhdGlvbgoKI2RlZmluZSBIT1NU
-RURfV1JJVEUgNQoKICBXcml0ZSB0byBmaWxlOyAnRndyaXRlJyBHREIgZmlsZWlvIHJlcXVl
-c3QuCgogIHI1IHBvaW50cyB0byBhIHBhcmFtZXRlciBibG9jayBjb250YWluaW5nOgogIFsw
-XSBmaWxlIGRlc2NyaXB0b3IKICBbMV0gcG9pbnRlciB0byBidWZmZXIKICBbMl0gYnl0ZSBj
-b3VudAogIAogIFJldHVybiB2YWx1ZXMgaW4gcGFyYW1ldGVyIGJsb2NrOgogIFswXSBudW1i
-ZXIgb2YgYnl0ZXMgd3JpdHRlbgogIFsxXSBlcnJubywgZW5jb2RlZCBwZXIgdGhlIEdEQiBS
-U1AgZG9jdW1lbnRhdGlvbgoKI2RlZmluZSBIT1NURURfTFNFRUsgNgoKICBGaWxlIHNlZWs7
-ICdGbHNlZWsnIEdEQiBmaWxlaW8gcmVxdWVzdC4KCiAgcjUgcG9pbnRzIHRvIGEgcGFyYW1l
-dGVyIGJsb2NrIGNvbnRhaW5pbmc6CiAgWzBdIGZpbGUgZGVzY3JpcHRvcgogIFsxXSBoaWdo
-IHdvcmQgb2YgNjQtYml0IG9mZnNldAogIFsyXSBsb3cgd29yZCBvZiA2NC1iaXQgb2Zmc2V0
-CiAgWzNdIHNlZWsgZmxhZywgZW5jb2RlZCBwZXIgdGhlIEdEQiBSU1AgZG9jdW1lbnRhdGlv
-bgoKICBSZXR1cm4gdmFsdWVzIGluIHBhcmFtZXRlciBibG9jazoKICBbMF0gaGlnaCB3b3Jk
-IG9mIDY0LWJpdCByZXN1bHQKICBbMV0gbG93IHdvcmQgb2YgNjQtYml0IHJlc3VsdAogIFsy
-XSBlcnJubywgZW5jb2RlZCBwZXIgdGhlIEdEQiBSU1AgZG9jdW1lbnRhdGlvbgoKI2RlZmlu
-ZSBIT1NURURfUkVOQU1FIDcKCiAgRmlsZSByZW5hbWU7ICdGcmVuYW1lJyBHREIgZmlsZWlv
-IHJlcXVlc3QuCgogIHI1IHBvaW50cyB0byBhIHBhcmFtZXRlciBibG9jayBjb250YWluaW5n
-OgogIFswXSBvbGRuYW1lIHBvaW50ZXIKICBbMV0gb2xkbmFtZSBsZW5ndGgKICBbMl0gbmV3
-bmFtZSBwb2ludGVyCiAgWzNdIG5ld25hbWUgbGVuZ3RoCgogIFJldHVybiB2YWx1ZXMgaW4g
-cGFyYW1ldGVyIGJsb2NrOgogIFswXSByZXR1cm4gc3RhdHVzCiAgWzFdIGVycm5vLCBlbmNv
-ZGVkIHBlciB0aGUgR0RCIFJTUCBkb2N1bWVudGF0aW9uCgojZGVmaW5lIEhPU1RFRF9VTkxJ
-TksgOAoKICBGaWxlIHVubGluay9kZWxldGU7ICdGdW5saW5rJyBHREIgZmlsZWlvIHJlcXVl
-c3QuCgogIHI1IHBvaW50cyB0byBhIHBhcmFtZXRlciBibG9jayBjb250YWluaW5nOgogIFsw
-XSBmaWxlbmFtZSBwb2ludGVyCiAgWzFdIGZpbGVuYW1lIGxlbmd0aAoKICBSZXR1cm4gdmFs
-dWVzIGluIHBhcmFtZXRlciBibG9jazoKICBbMF0gcmV0dXJuIHN0YXR1cwogIFsxXSBlcnJu
-bywgZW5jb2RlZCBwZXIgdGhlIEdEQiBSU1AgZG9jdW1lbnRhdGlvbgoKI2RlZmluZSBIT1NU
-RURfU1RBVCA5CgogIEZpbGUgaW5mb3JtYXRpb247ICdGc3RhdCcgR0RCIGZpbGVpbyByZXF1
-ZXN0LgoKICByNSBwb2ludHMgdG8gYSBwYXJhbWV0ZXIgYmxvY2sgY29udGFpbmluZzoKICBb
-MF0gZmlsZW5hbWUgcG9pbnRlcgogIFsxXSBmaWxlbmFtZSBsZW5ndGgKICBbMl0gcG9pbnRl
-ciB0byBzdGF0IGJ1ZiwgdXNpbmcgdGhlIHN0cnVjdHVyZSBkZWZpbml0aW9uIGluIHRoZSBH
-REIgUlNQCiAgICAgIGRvY3VtZW50YXRpb24gCgogIFJldHVybiB2YWx1ZXMgaW4gcGFyYW1l
-dGVyIGJsb2NrOgogIFswXSByZXR1cm4gc3RhdHVzCiAgWzFdIGVycm5vLCBlbmNvZGVkIHBl
-ciB0aGUgR0RCIFJTUCBkb2N1bWVudGF0aW9uCgojZGVmaW5lIEhPU1RFRF9GU1RBVCAxMAoK
-ICBGaWxlIGluZm9ybWF0aW9uOyAnRmZzdGF0JyBHREIgZmlsZWlvIHJlcXVlc3QuCiAgCiAg
-cjUgcG9pbnRzIHRvIGEgcGFyYW1ldGVyIGJsb2NrIGNvbnRhaW5pbmc6CiAgWzBdIGZpbGUg
-ZGVzY3JpcHRvcgogIFsxXSBwb2ludGVyIHRvIHN0YXQgYnVmLCB1c2luZyB0aGUgc3RydWN0
-dXJlIGRlZmluaXRpb24gaW4gdGhlIEdEQiBSU1AKICAgICAgZG9jdW1lbnRhdGlvbiAKCiAg
-UmV0dXJuIHZhbHVlcyBpbiBwYXJhbWV0ZXIgYmxvY2s6CiAgWzBdIHJldHVybiBzdGF0dXMK
-ICBbMV0gZXJybm8sIGVuY29kZWQgcGVyIHRoZSBHREIgUlNQIGRvY3VtZW50YXRpb24KCiNk
-ZWZpbmUgSE9TVEVEX0dFVFRJTUVPRkRBWSAxMQoKICBHZXQgY3VycmVudCB0aW1lOyAnRmdl
-dHRpbWVvZmRheScgR0RCIGZpbGVpbyByZXF1ZXN0LgoKICByNSBwb2ludHMgdG8gYSBwYXJh
-bWV0ZXIgYmxvY2sgY29udGFpbmluZzoKICBbMF0gdGltZXZhbCBwb2ludGVyLCB1c2luZyB0
-aGUgc3RydWN0dXJlIGRlZmluaXRpb24gaW4gdGhlIEdEQiBSU1AKICAgICAgZG9jdW1lbnRh
-dGlvbgoKICBSZXR1cm4gdmFsdWVzIGluIHBhcmFtZXRlciBibG9jazoKICBbMF0gcmV0dXJu
-IHN0YXR1cwogIFsxXSBlcnJubywgZW5jb2RlZCBwZXIgdGhlIEdEQiBSU1AgZG9jdW1lbnRh
-dGlvbgoKI2RlZmluZSBIT1NURURfSVNBVFRZIDEyCgogUmV0dXJuIHRydWUgaWYgdGhlIGZp
-bGUgZGVzY3JpcHRvciBpcyB0aGUgR0RCIGNvbnNvbGU7ICdGaXNhdHR5JyBHREIgZmlsZWlv
-CiByZXF1ZXN0LgoKICByNSBwb2ludHMgdG8gYSBwYXJhbWV0ZXIgYmxvY2sgY29udGFpbmlu
-ZzoKICBbMF0gZmlsZSBkZXNjcmlwdG9yCgogIFJldHVybiB2YWx1ZXMgaW4gcGFyYW1ldGVy
-IGJsb2NrOgogIFswXSByZXR1cm4gc3RhdHVzCiAgWzFdIGVycm5vLCBlbmNvZGVkIHBlciB0
-aGUgR0RCIFJTUCBkb2N1bWVudGF0aW9uCgojZGVmaW5lIEhPU1RFRF9TWVNURU0gMTMKCiAg
-U3lzdGVtIGNhbGw7ICdGc3lzdGVtJyBHREIgZmlsZWlvIHJlcXVlc3QuCgogIHI1IHBvaW50
-cyB0byBhIHBhcmFtZXRlciBibG9jayBjb250YWluaW5nOgogIFswXSBjb21tYW5kIHBvaW50
-ZXIKICBbMV0gY29tbWFuZCBsZW5ndGgKCiAgUmV0dXJuIHZhbHVlcyBpbiBwYXJhbWV0ZXIg
-YmxvY2s6CiAgWzBdIHJldHVybiBzdGF0dXMKICBbMV0gZXJybm8sIGVuY29kZWQgcGVyIHRo
-ZSBHREIgUlNQIGRvY3VtZW50YXRpb24K
---------------419B3ABBD09B002C13D8715E--
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
