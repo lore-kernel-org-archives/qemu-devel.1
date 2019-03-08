@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60197)
+Received: from eggs.gnu.org ([209.51.188.92]:60215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h2IlG-0003XD-DQ
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:19 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1h2IlI-0003ZD-6T
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h2IlE-00063d-BF
+	(envelope-from <eric.auger@redhat.com>) id 1h2IlG-00065D-FM
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33615)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1h2IlF-00062n-6J
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:54:18 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  8 Mar 2019 16:53:40 +0000
-Message-Id: <20190308165344.10685-4-stefanha@redhat.com>
-In-Reply-To: <20190308165344.10685-1-stefanha@redhat.com>
-References: <20190308165344.10685-1-stefanha@redhat.com>
+References: <20190214190603.25030-1-peter.maydell@linaro.org>
+	<20190214190603.25030-12-peter.maydell@linaro.org>
+	<72c526bd-6c30-5e7a-4ff0-da8473348d0a@redhat.com>
+	<CAFEAcA9_shDqjpqF-k9mvR1N6DY7HmXMPiOpkSFcnGpyC3W7tQ@mail.gmail.com>
+	<12a1fc59-da10-174b-6544-3af075da8057@redhat.com>
+	<CAFEAcA9kYUAP2fhKRn0GTvx4gXGMyimxeWSD8x6ZNd9HS+0ksQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <a83694c0-a473-0d70-430d-c73c33155699@redhat.com>
+Date: Fri, 8 Mar 2019 17:54:04 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/7] iothread: replace init_done_cond with a
- semaphore
+In-Reply-To: <CAFEAcA9kYUAP2fhKRn0GTvx4gXGMyimxeWSD8x6ZNd9HS+0ksQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 11/27] arm: Allow system registers for KVM
+ guests to be changed by QEMU code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,108 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+Hi Peter,
 
-Only sending an init-done message using lock+cond seems an overkill to
-me.  Replacing it with a simpler semaphore.
+On 3/8/19 4:53 PM, Peter Maydell wrote:
+> On Thu, 21 Feb 2019 at 14:55, Auger Eric <eric.auger@redhat.com> wrote:
+>>
+>> Hi,
+>> On 2/21/19 3:26 PM, Peter Maydell wrote:
+>>> On Thu, 21 Feb 2019 at 14:20, Auger Eric <eric.auger@redhat.com> wrote:
+>>>> [a regression using aarch64 KVM]
+>>> Can you provide the QEMU_EFI.fd ?
+>> I am using upstream EDK2 (https://github.com/tianocore/edk2) compiled in
+>> debug mode
+> 
+> I don't really want to mess about building EDK2. Could you just
+> provide the blob that demonstrates the bug, please?
 
-Meanwhile, init the semaphore unconditionally, then we can destroy it
-unconditionally too in finalize which seems cleaner.
+I just sent you the binary in a separate email.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-id: 20190306115532.23025-2-peterx@redhat.com
-Message-Id: <20190306115532.23025-2-peterx@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/sysemu/iothread.h |  3 +--
- iothread.c                | 17 ++++-------------
- 2 files changed, 5 insertions(+), 15 deletions(-)
+Thanks
 
-diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-index 8a7ac2c528..50411ba54a 100644
---- a/include/sysemu/iothread.h
-+++ b/include/sysemu/iothread.h
-@@ -27,8 +27,7 @@ typedef struct {
-     GMainContext *worker_context;
-     GMainLoop *main_loop;
-     GOnce once;
--    QemuMutex init_done_lock;
--    QemuCond init_done_cond;    /* is thread initialization done? */
-+    QemuSemaphore init_done_sem; /* is thread init done? */
-     bool stopping;              /* has iothread_stop() been called? */
-     bool running;               /* should iothread_run() continue? */
-     int thread_id;
-diff --git a/iothread.c b/iothread.c
-index e615b7ae52..6e297e9ef1 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -55,10 +55,8 @@ static void *iothread_run(void *opaque)
-     rcu_register_thread();
-=20
-     my_iothread =3D iothread;
--    qemu_mutex_lock(&iothread->init_done_lock);
-     iothread->thread_id =3D qemu_get_thread_id();
--    qemu_cond_signal(&iothread->init_done_cond);
--    qemu_mutex_unlock(&iothread->init_done_lock);
-+    qemu_sem_post(&iothread->init_done_sem);
-=20
-     while (iothread->running) {
-         aio_poll(iothread->ctx, true);
-@@ -115,6 +113,7 @@ static void iothread_instance_init(Object *obj)
-=20
-     iothread->poll_max_ns =3D IOTHREAD_POLL_MAX_NS_DEFAULT;
-     iothread->thread_id =3D -1;
-+    qemu_sem_init(&iothread->init_done_sem, 0);
- }
-=20
- static void iothread_instance_finalize(Object *obj)
-@@ -123,10 +122,6 @@ static void iothread_instance_finalize(Object *obj)
-=20
-     iothread_stop(iothread);
-=20
--    if (iothread->thread_id !=3D -1) {
--        qemu_cond_destroy(&iothread->init_done_cond);
--        qemu_mutex_destroy(&iothread->init_done_lock);
--    }
-     /*
-      * Before glib2 2.33.10, there is a glib2 bug that GSource context
-      * pointer may not be cleared even if the context has already been
-@@ -145,6 +140,7 @@ static void iothread_instance_finalize(Object *obj)
-         g_main_context_unref(iothread->worker_context);
-         iothread->worker_context =3D NULL;
-     }
-+    qemu_sem_destroy(&iothread->init_done_sem);
- }
-=20
- static void iothread_complete(UserCreatable *obj, Error **errp)
-@@ -173,8 +169,6 @@ static void iothread_complete(UserCreatable *obj, Err=
-or **errp)
-         return;
-     }
-=20
--    qemu_mutex_init(&iothread->init_done_lock);
--    qemu_cond_init(&iothread->init_done_cond);
-     iothread->once =3D (GOnce) G_ONCE_INIT;
-=20
-     /* This assumes we are called from a thread with useful CPU affinity=
- for us
-@@ -188,12 +182,9 @@ static void iothread_complete(UserCreatable *obj, Er=
-ror **errp)
-     g_free(name);
-=20
-     /* Wait for initialization to complete */
--    qemu_mutex_lock(&iothread->init_done_lock);
-     while (iothread->thread_id =3D=3D -1) {
--        qemu_cond_wait(&iothread->init_done_cond,
--                       &iothread->init_done_lock);
-+        qemu_sem_wait(&iothread->init_done_sem);
-     }
--    qemu_mutex_unlock(&iothread->init_done_lock);
- }
-=20
- typedef struct {
---=20
-2.20.1
+Eric
+> 
+> thanks
+> -- PMM
+> 
