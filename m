@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56692)
+Received: from eggs.gnu.org ([209.51.188.92]:58666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h23aj-0001Hn-FH
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:42:26 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1h23dj-0002IA-2o
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:45:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h23ah-0004P8-Gw
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:42:25 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44280)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1h23de-0007ko-Mw
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:45:29 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40907)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h23ag-0004MU-LT
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:42:23 -0500
-Received: by mail-wr1-f66.google.com with SMTP id w2so19527666wrt.11
-	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 16:42:20 -0800 (PST)
-References: <20190307152450.20340-1-peter.maydell@linaro.org>
-	<CAFEAcA-M7vo-rF=njSjdKiA85-2d4y=8B+otTdzDnuX=1h4Cnw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e655f84b-f033-539f-4c63-87b5e6260ebc@redhat.com>
-Date: Fri, 8 Mar 2019 01:42:17 +0100
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1h23dc-0007fo-NU
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:45:26 -0500
+Received: by mail-wm1-x344.google.com with SMTP id g20so10878177wmh.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Mar 2019 16:45:24 -0800 (PST)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
+	<cf14255c576fd361c6cdf941f8c637e613f6cb68.1550698466.git.DirtY.iCE.hu@gmail.com>
+	<63250655-a4a3-ef36-5882-65188093ff57@gmail.com>
+	<20190307155643.cuypwvu7znhqng5y@sirius.home.kraxel.org>
+Message-ID: <80f2cc3a-2695-cd41-b379-74751c702771@gmail.com>
+Date: Fri, 8 Mar 2019 01:45:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-M7vo-rF=njSjdKiA85-2d4y=8B+otTdzDnuX=1h4Cnw@mail.gmail.com>
+In-Reply-To: <20190307155643.cuypwvu7znhqng5y@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/12] sphinx queue
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 04/14] audio: -audiodev command line
+ option basic implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Peter,
-
-On 3/7/19 5:12 PM, Peter Maydell wrote:
-> On Thu, 7 Mar 2019 at 15:24, Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->> The only difference from the v3 patchset is that I've
->> changed a -d to -e in patch 10 as suggested by RTH.
->>
->> thanks
->> -- PMM
->>
->> The following changes since commit 32694e98b8d7a246345448a8f707d2e11d6c65e2:
->>
->>   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2019-03-06 18:52:19 +0000)
->>
->> are available in the Git repository at:
->>
->>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-sphinx-20190307
->>
->> for you to fetch changes up to c10e01b996df09f6cb4eceb2b7a9754bece927c9:
->>
->>   MAINTAINERS: Add entry for Sphinx documentation infrastructure (2019-03-07 14:26:47 +0000)
->>
->> ----------------------------------------------------------------
->> Enable building and installing rST docs with Sphinx
->>
->> ---------------------------------------------------------------
+On 2019-03-07 16:56, Gerd Hoffmann wrote:
+> On Tue, Feb 26, 2019 at 02:39:38AM +0100, Zoltán Kővágó wrote:
+>> On 2019-02-20 22:37, Kővágó, Zoltán wrote:
+>> [...]
+>>> diff --git a/audio/audio.c b/audio/audio.c
+>>> index ce8e6ea8c2..8ad8cbe559 100644
+>>> --- a/audio/audio.c
+>>> +++ b/audio/audio.c
+>> [...]
+>>> @@ -2129,3 +1866,170 @@ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
+>>>          }
+>>>      }
+>>>  }
+>>> +
+>>> +void audio_create_pdos(Audiodev *dev)
+>>> +{
+>>> +    switch (dev->driver) {
+>>> +#define CASE(DRIVER, driver, pdo_name)                              \
+>>> +    case AUDIODEV_DRIVER_##DRIVER:                                  \
+>>> +        dev->u.driver.in = g_malloc0(                               \
+>>> +            sizeof(Audiodev##pdo_name##PerDirectionOptions));       \
+>> This should check has_in before overwriting. It'll work correctly when
+>> called from audio_legacy.c, but when using -audiodev it will overwrite
+>> the options passed by user (and leak memory) when called from
+>> audio_validate_opts. I'll fix it in the next update.
 > 
-> Applied, thanks.
+> Ping.  4.0 freeze is next tuesday.  Any chance for a v6 early enough
+> that we have a chance to get the first chunk into 4.0?  Monday latest,
+> preferably earlier ...
 
-I'm getting:
+I'll try to do something this weekend, but I can't promise anything. I
+still haven't got to reading through Markus' comments...
 
-./configure --enable-tools --enable-doc
-[...]
-  GEN     qga/qapi-generated/qapi-gen
-  GEN     docs/qemu-block-drivers.7
-  GEN     docs/qemu-cpu-models.7
-  SPHINX  docs/devel
-  SPHINX  docs/interop
-  CC      qapi/qapi-visit-core.o
-Error: source directory and destination directory are same.
-Error: source directory and destination directory are same.
-Makefile:880: recipe for target 'docs/interop/index.html' failed
-make: *** [docs/interop/index.html] Error 1
-make: *** Waiting for unfinished jobs....
-Makefile:877: recipe for target 'docs/devel/index.html' failed
-make: *** [docs/devel/index.html] Error 1
-The command "make -j3 && ${TEST_CMD}" exited with 2.
-
-Is it due to the '-j3'?
-
-See: https://travis-ci.org/philmd/qemu/jobs/503343244
+Regards,
+Zoltan
