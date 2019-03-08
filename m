@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34692)
+Received: from eggs.gnu.org ([209.51.188.92]:34980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2NhD-00019z-A1
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:10:28 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h2NiN-0001r3-KP
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:11:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2NhC-0001xL-ED
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:10:27 -0500
+	(envelope-from <jsnow@redhat.com>) id 1h2NiM-0002p5-SO
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 17:11:39 -0500
 References: <20190305234337.18353-1-jsnow@redhat.com>
-	<20190305234337.18353-2-jsnow@redhat.com>
-	<714826c3-13a8-75e0-fbc8-b98f72edd359@virtuozzo.com>
+	<20190305234337.18353-3-jsnow@redhat.com>
+	<28d6183a-f654-de55-36ed-ee0bafb47739@redhat.com>
+	<fe8ae9ab-068d-cc24-76de-e2a99215ea5f@redhat.com>
+	<d362b81a-1e9c-0761-3cbe-65739a051ce7@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <a0bc9191-b9c3-aedf-bbd7-3b6a9e403a98@redhat.com>
-Date: Fri, 8 Mar 2019 17:10:22 -0500
+Message-ID: <73ddcaa9-97dc-238b-2949-ac73bc863abe@redhat.com>
+Date: Fri, 8 Mar 2019 17:11:35 -0500
 MIME-Version: 1.0
-In-Reply-To: <714826c3-13a8-75e0-fbc8-b98f72edd359@virtuozzo.com>
+In-Reply-To: <d362b81a-1e9c-0761-3cbe-65739a051ce7@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] block/qcow2-bitmap: Skip length check
- in some cases
+Subject: Re: [Qemu-devel] [PATCH 2/5] block/qcow2-bitmap: Allow bitmap
+ flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
 
 
-On 3/6/19 11:07 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 06.03.2019 2:43, John Snow wrote:
->> If we were to allow resizes, the length check that happens when we load
->> bitmap headers from disk when we read or store bitmaps would begin to
->> fail:
+On 3/6/19 11:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 06.03.2019 18:59, John Snow wrote:
 >>
->> Imagine the circumstance where we've resized bitmaps in memory, but they still
->> have the old values on-disk. The lengths will no longer match bdrv_getlength,
->> so we must allow this check to be skipped when flushing bitmaps to disk.
 >>
->> Limit this to when we are about to overwrite the headers: we will verify the
->> outgoing headers, but we will skip verifying the known stale headers.
+>> On 3/6/19 7:58 AM, Eric Blake wrote:
+>>> On 3/5/19 5:43 PM, John Snow wrote:
+>>>> Usually, we only write out bitmaps when we're about to close out the file,
+>>>> so we always remove the bitmaps after to make it easier to determine the
+>>>> source of truth for migration purposes.
+>>>>
+>>>> However, there may be times we want to flush bitmap data more aggressively,
+>>>> like after a truncate event where we need to make the metadata consistent
+>>>> again.
+>>>
+>>> Or, as I've mentioned in other threads, after every
+>>> bitmap-add/bitmap-delete operation, so that 'qemu-img info -U' can see
+>>> which persistent bitmaps exist. But that's one step further than this
+>>> series, so I won't insist on it today.
+>>>
 >>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   block/qcow2-bitmap.c | 34 +++++++++++++++++++++-------------
->>   1 file changed, 21 insertions(+), 13 deletions(-)
+>> Yes, I was keeping that in mind as I wrote this. I think it extends to
+>> those cases trivially, so long as Vladimir is OK with what I'm trying to do.
 >>
->> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->> index c3b210ede1..d02730004a 100644
->> --- a/block/qcow2-bitmap.c
->> +++ b/block/qcow2-bitmap.c
->> @@ -435,7 +435,8 @@ static inline Qcow2BitmapDirEntry *next_dir_entry(Qcow2BitmapDirEntry *entry)
->>       return (Qcow2BitmapDirEntry *)((uint8_t *)entry + dir_entry_size(entry));
->>   }
->>   
->> -static int check_dir_entry(BlockDriverState *bs, Qcow2BitmapDirEntry *entry)
->> +static int check_dir_entry(BlockDriverState *bs, Qcow2BitmapDirEntry *entry,
->> +                           bool allow_resize)
->>   {
->>       BDRVQcow2State *s = bs->opaque;
->>       uint64_t phys_bitmap_bytes;
->> @@ -462,8 +463,14 @@ static int check_dir_entry(BlockDriverState *bs, Qcow2BitmapDirEntry *entry)
->>           return len;
->>       }
->>   
->> -    fail = (phys_bitmap_bytes > BME_MAX_PHYS_SIZE) ||
->> -           (len > ((phys_bitmap_bytes * 8) << entry->granularity_bits));
->> +    if (phys_bitmap_bytes > BME_MAX_PHYS_SIZE) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    if (!allow_resize &&
->> +        (len > ((phys_bitmap_bytes * 8) << entry->granularity_bits))) {
->> +        return -EINVAL;
->> +    }
 > 
-> now I think, that we don't need additional parameter, but instead do this check only if
-> ! entry->flags & BME_FLAG_IN_USE, which will correspond to:
+> I still don't see the point of flushing bitmaps, the only thing is optimizing
+> qemu-img info --force-share, which should never used except for debugging.
 > 
-> 1. incoming: bitmap loaded from image
-> 2. outgoing: bitmap stored to the image
+> So, at least, if we'll have it, I'd prefer bitmap flushing to be optional,
+> and other code should not rely on it.
 > 
 
-I can't tell if I like this or not, because we'd skip checking the image
-on load if it was improperly stored. I guess that's... fine.
-
-Though, it would mean we also skip the consistency check on subsequent
-re-reads of the bitmap list, which I think we still want if only as a
-sanity check on the code, right?
-
-Further thoughts?
-
-(Maybe this portion of the code is due for a refactor in 4.1 so we can
-add better error messages to it, like Eric suggests.)
+I don't have plans to add more uses of it personally, but I do think
+that resize represents a genuine case of wanting the feature.
