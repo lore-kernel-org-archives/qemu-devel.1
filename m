@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36810)
+Received: from eggs.gnu.org ([209.51.188.92]:36809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h2Bem-0005YJ-7l
+	(envelope-from <jasowang@redhat.com>) id 1h2Bem-0005YI-7k
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h2Bej-0008Oa-HG
+	(envelope-from <jasowang@redhat.com>) id 1h2Bej-0008Nm-BH
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:19:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48112)
+Received: from mx1.redhat.com ([209.132.183.28]:51510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h2Bej-0008MV-7l
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1h2Bei-0008Ks-H8
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:19:05 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  8 Mar 2019 10:18:36 +0100
-Message-Id: <1552036723-1949-1-git-send-email-thuth@redhat.com>
+References: <20181109195653.11867-1-marcandre.lureau@redhat.com>
+	<dcc8d960-e970-b8b9-f17c-8cba0c871d0b@redhat.com>
+	<CAMxuvaz5mM6hVR=HknCLO27+zQsuxij1F2Jzgr7yVuLAP52Jog@mail.gmail.com>
+	<760d978d-2edb-9576-455f-120ca689493c@redhat.com>
+	<CAJ+F1C+jfoirwxzh8ERGxpbwwCHZTtCLk+-_eq2G+42YRmiHDQ@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <0c80c7cb-49c0-e631-6ad4-13e6f2149c64@redhat.com>
+Date: Fri, 8 Mar 2019 17:18:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAJ+F1C+jfoirwxzh8ERGxpbwwCHZTtCLk+-_eq2G+42YRmiHDQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/7] qtests, clean-ups and macOS CI testing
+Subject: Re: [Qemu-devel] [PATCH] RFC: net/socket: learn to talk with a unix
+ dgram socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +32,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Jones <rjones@redhat.com>
 
- Hi Peter,
 
-the following changes since commit 6cb4f6db4f4367faa33da85b15f75bbbd2bed2=
-a6:
+On 2019/3/8 =E4=B8=8A=E5=8D=8812:18, Marc-Andr=C3=A9 Lureau wrote:
+> Hi Jason
+>
+> On Thu, Nov 15, 2018 at 3:39 AM Jason Wang<jasowang@redhat.com>  wrote:
+>> On 2018/11/14 =E4=B8=8B=E5=8D=889:01, Marc-Andr=C3=A9 Lureau wrote:
+>>> Hi
+>>>
+>>> On Wed, Nov 14, 2018 at 7:46 AM Jason Wang<jasowang@redhat.com>  wrot=
+e:
+>>>> On 2018/11/10 =E4=B8=8A=E5=8D=883:56, Marc-Andr=C3=A9 Lureau wrote:
+>>>>> -net socket has a fd argument, and may be passed pre-opened sockets=
+.
+>>>>>
+>>>>> TCP sockets use framing.
+>>>>> UDP sockets have datagram boundaries.
+>>>>>
+>>>>> When given a unix dgram socket, it will be able to read from it, bu=
+t
+>>>>> will attempt to send on the dgram_dst, which is unset. The other en=
+d
+>>>>> will not receive the data.
+>>>>>
+>>>>> Let's teach -net socket to recognize a UNIX DGRAM socket, and use t=
+he
+>>>>> regular send() command (without dgram_dst).
+>>>>>
+>>>>> This makes running slirp out-of-process possible that
+>>>>> way (python pseudo-code):
+>>>>>
+>>>>> a, b =3D socket.socketpair(socket.AF_UNIX, socket.SOCK_DGRAM)
+>>>>>
+>>>>> subprocess.Popen('qemu -net socket,fd=3D%d -net user' % a.fileno(),=
+ shell=3DTrue)
+>>>>> subprocess.Popen('qemu ... -net nic -net socket,fd=3D%d' % b.fileno=
+(), shell=3DTrue)
+>>>>>
+>>>>> (to make slirp a seperate project altogether, we would have to have
+>>>>> some compatibility code and/or deprecate various options & HMP
+>>>>> commands for dynamic port forwarding etc - but this looks like a
+>>>>> reachable goal)
+>>>>>
+>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau<marcandre.lureau@redhat.com>
+>>>> I believe instead of supporting unnamed sockets, we should also supp=
+ort
+>>>> named one through cli?
+>>> This could be a later patch, I have no need for it yet. Perhaps it
+>>> should be a chardev then?
+>> I mean something like: -socket id=3Dud0,path=3D/tmp/XXX
+>>
+> Why not, but I have no need for it. If somebody has, he can make a patc=
+h.
+>
+>>>>> ---
+>>>>>     net/socket.c | 25 +++++++++++++++++++++----
+>>>>>     1 file changed, 21 insertions(+), 4 deletions(-)
+>>>>>
+>>>>> diff --git a/net/socket.c b/net/socket.c
+>>>>> index 7095eb749f..8a9c30892d 100644
+>>>>> --- a/net/socket.c
+>>>>> +++ b/net/socket.c
+>>>>> @@ -119,9 +119,13 @@ static ssize_t net_socket_receive_dgram(NetCli=
+entState *nc, const uint8_t *buf,
+>>>>>         ssize_t ret;
+>>>>>
+>>>>>         do {
+>>>>> -        ret =3D qemu_sendto(s->fd, buf, size, 0,
+>>>>> -                          (struct sockaddr *)&s->dgram_dst,
+>>>>> -                          sizeof(s->dgram_dst));
+>>>>> +        if (s->dgram_dst.sin_family !=3D AF_UNIX) {
+>>>>> +            ret =3D qemu_sendto(s->fd, buf, size, 0,
+>>>>> +                              (struct sockaddr *)&s->dgram_dst,
+>>>>> +                              sizeof(s->dgram_dst));
+>>>>> +        } else {
+>>>>> +            ret =3D send(s->fd, buf, size, 0);
+>>>>> +        }
+>>>> Any reason that send is a must here? send(2) said:
+>>>>           call
+>>>>
+>>>>               send(sockfd, buf, len, flags);
+>>>>
+>>>>           is equivalent to
+>>>>
+>>>>               sendto(sockfd, buf, len, flags, NULL, 0);
+>>> Yes they should be equivalent, but then we need to add ?: operators
+>>> for the dest arguments. I preferred to have an if() instead.
+>>>
+>>> thanks
+>> One possible issue here is I'm not sure there's a equivalent send() in
+>> e.g non POSIX system.
+> send() should be as common as sendto().
+>
+> Should I resend the patch without RFC?
 
-  Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-requ=
-est' into staging (2019-03-07 16:16:02 +0000)
 
-are available in the git repository at:
+Yes please.
 
-  https://gitlab.com/huth/qemu.git tags/pull-request-2019-03-08
 
-for you to fetch changes up to 4966c5bd8a6ab17214f54f8016426f95303f9760:
+> no other changes needed?
 
-  cirrus.yml: Add macOS continuous integration task (2019-03-08 09:54:29 =
-+0100)
 
-----------------------------------------------------------------
-- qtest fixes
-- Some generic clean-ups by Philippe
-- macOS CI testing via cirrus-ci.com
-----------------------------------------------------------------
+No.
 
-Marc-Andr=C3=A9 Lureau (1):
-      vhost-user-test: fix leaks
+Thanks
 
-Philippe Mathieu-Daud=C3=A9 (4):
-      tests: Move qdict-test-data.txt to tests/data/qobject/
-      hw: Remove unused 'hw/devices.h' include
-      hw/devices: Remove unused TC6393XB_RAM definition
-      tests/bios-tables: Improve portability by searching bash in the $PA=
-TH
 
-Thomas Huth (2):
-      tests: Do not use "\n" in g_test_message() strings
-      cirrus.yml: Add macOS continuous integration task
-
- .cirrus.yml                                         | 15 +++++++++++++--
- MAINTAINERS                                         |  2 +-
- configure                                           |  2 +-
- hw/alpha/typhoon.c                                  |  1 -
- hw/arm/allwinner-a10.c                              |  1 -
- hw/arm/collie.c                                     |  1 -
- hw/arm/cubieboard.c                                 |  1 -
- hw/arm/highbank.c                                   |  1 -
- hw/arm/mps2-tz.c                                    |  1 -
- hw/arm/musicpal.c                                   |  1 -
- hw/arm/nrf51_soc.c                                  |  1 -
- hw/arm/spitz.c                                      |  1 -
- hw/arm/virt.c                                       |  1 -
- hw/arm/z2.c                                         |  1 -
- hw/display/sm501.c                                  |  1 -
- hw/hppa/dino.c                                      |  1 -
- hw/intc/allwinner-a10-pic.c                         |  1 -
- hw/lm32/lm32_boards.c                               |  1 -
- hw/lm32/milkymist.c                                 |  1 -
- hw/microblaze/petalogix_ml605_mmu.c                 |  1 -
- hw/microblaze/petalogix_s3adsp1800_mmu.c            |  1 -
- hw/net/dp8393x.c                                    |  1 -
- hw/ppc/virtex_ml507.c                               |  1 -
- hw/sh4/r2d.c                                        |  1 -
- hw/tricore/tricore_testboard.c                      |  1 -
- hw/usb/tusb6010.c                                   |  1 -
- include/hw/devices.h                                |  1 -
- tests/check-qdict.c                                 |  2 +-
- tests/data/acpi/rebuild-expected-aml.sh             |  2 +-
- qdict-test-data.txt =3D> tests/data/qobject/qdict.txt |  0
- tests/ivshmem-test.c                                |  4 ++--
- tests/m48t59-test.c                                 |  4 ++--
- tests/migration-test.c                              |  4 ++--
- tests/rtc-test.c                                    |  4 ++--
- tests/rtl8139-test.c                                |  6 +++---
- tests/test-aio-multithread.c                        |  8 ++++----
- tests/test-coroutine.c                              | 10 ++++------
- tests/vhost-user-test.c                             | 13 ++++++++-----
- 38 files changed, 44 insertions(+), 56 deletions(-)
- rename qdict-test-data.txt =3D> tests/data/qobject/qdict.txt (100%)
+>
+> thanks!
+>
