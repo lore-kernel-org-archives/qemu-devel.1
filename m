@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44851)
+Received: from eggs.gnu.org ([209.51.188.92]:44853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2M7J-0000rH-8M
+	(envelope-from <jsnow@redhat.com>) id 1h2M7J-0000rI-8g
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2M7G-0006uC-HU
+	(envelope-from <jsnow@redhat.com>) id 1h2M7G-0006uS-Ij
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47348)
+Received: from mx1.redhat.com ([209.132.183.28]:38187)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M7F-0006mg-7M
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:13 -0500
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M7F-0006nd-SM
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:14 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri,  8 Mar 2019 15:28:47 -0500
-Message-Id: <20190308202858.26636-7-jsnow@redhat.com>
+Date: Fri,  8 Mar 2019 15:28:49 -0500
+Message-Id: <20190308202858.26636-9-jsnow@redhat.com>
 In-Reply-To: <20190308202858.26636-1-jsnow@redhat.com>
 References: <20190308202858.26636-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 06/17] block/dirty-bitmap: explicitly lock
- bitmaps with successors
+Subject: [Qemu-devel] [PULL 08/17] block/dirty-bitmaps: move comment block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +26,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jsnow@redhat.com, peter.maydell@linaro.org
 
-Instead of implying a user_locked/busy status, make it explicit.
-Now, bitmaps in use by migration, NBD or backup operations
-are all treated the same way with the same code paths.
+Simply move the big status enum comment block to above the status
+function, and document it as being deprecated. The whole confusing
+block can get deleted in three releases time.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190223000614.13894-7-jsnow@redhat.com
+Message-id: 20190223000614.13894-9-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/dirty-bitmap.c | 36 +++++++++++++++++++-----------------
+ 1 file changed, 19 insertions(+), 17 deletions(-)
 
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 2e3192d86f..abc219814c 100644
+index d50e74d337..980cae4fa3 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -50,7 +50,7 @@ struct BdrvDirtyBitmap {
-     HBitmap *meta;              /* Meta dirty bitmap */
-     bool qmp_locked;            /* Bitmap is locked, it can't be modified
-                                    through QMP */
--    BdrvDirtyBitmap *successor; /* Anonymous child; implies user_locked state */
-+    BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
-     char *name;                 /* Optional non-empty unique ID */
-     int64_t size;               /* Size of the bitmap, in bytes */
-     bool disabled;              /* Bitmap is disabled. It ignores all writes to
-@@ -188,10 +188,8 @@ bool bdrv_dirty_bitmap_has_successor(BdrvDirtyBitmap *bitmap)
-     return bitmap->successor;
+@@ -28,22 +28,6 @@
+ #include "block/block_int.h"
+ #include "block/blockjob.h"
+ 
+-/**
+- * A BdrvDirtyBitmap can be in four possible user-visible states:
+- * (1) Active:   successor is NULL, and disabled is false: full r/w mode
+- * (2) Disabled: successor is NULL, and disabled is true: qualified r/w mode,
+- *               guest writes are dropped, but monitor writes are possible,
+- *               through commands like merge and clear.
+- * (3) Frozen:   successor is not NULL.
+- *               A frozen bitmap cannot be renamed, deleted, cleared, set,
+- *               enabled, merged to, etc. A frozen bitmap can only abdicate()
+- *               or reclaim().
+- *               In this state, the anonymous successor bitmap may be either
+- *               Active and recording writes from the guest (e.g. backup jobs),
+- *               but it can be Disabled and not recording writes.
+- * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
+- *               in any way from the monitor.
+- */
+ struct BdrvDirtyBitmap {
+     QemuMutex *mutex;
+     HBitmap *bitmap;            /* Dirty bitmap implementation */
+@@ -204,7 +188,25 @@ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
+     return !bitmap->disabled;
  }
  
--/* Both conditions disallow user-modification via QMP. */
- bool bdrv_dirty_bitmap_user_locked(BdrvDirtyBitmap *bitmap) {
--    return bdrv_dirty_bitmap_has_successor(bitmap) ||
--           bdrv_dirty_bitmap_qmp_locked(bitmap);
-+    return bdrv_dirty_bitmap_qmp_locked(bitmap);
- }
- 
- void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked)
-@@ -267,8 +265,9 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
-     child->disabled = bitmap->disabled;
-     bitmap->disabled = true;
- 
--    /* Install the successor and freeze the parent */
-+    /* Install the successor and lock the parent */
-     bitmap->successor = child;
-+    bitmap->qmp_locked = true;
-     return 0;
- }
- 
-@@ -323,6 +322,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
-     bitmap->successor = NULL;
-     successor->persistent = bitmap->persistent;
-     bitmap->persistent = false;
-+    bitmap->qmp_locked = false;
-     bdrv_release_dirty_bitmap(bs, bitmap);
- 
-     return successor;
-@@ -352,6 +352,7 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-     }
- 
-     parent->disabled = successor->disabled;
-+    parent->qmp_locked = false;
-     bdrv_release_dirty_bitmap_locked(successor);
-     parent->successor = NULL;
- 
+-/* Called with BQL taken.  */
++/**
++ * bdrv_dirty_bitmap_status: This API is now deprecated.
++ * Called with BQL taken.
++ *
++ * A BdrvDirtyBitmap can be in four possible user-visible states:
++ * (1) Active:   successor is NULL, and disabled is false: full r/w mode
++ * (2) Disabled: successor is NULL, and disabled is true: qualified r/w mode,
++ *               guest writes are dropped, but monitor writes are possible,
++ *               through commands like merge and clear.
++ * (3) Frozen:   successor is not NULL.
++ *               A frozen bitmap cannot be renamed, deleted, cleared, set,
++ *               enabled, merged to, etc. A frozen bitmap can only abdicate()
++ *               or reclaim().
++ *               In this state, the anonymous successor bitmap may be either
++ *               Active and recording writes from the guest (e.g. backup jobs),
++ *               or it can be Disabled and not recording writes.
++ * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
++ *               in any way from the monitor.
++ */
+ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
+ {
+     if (bdrv_dirty_bitmap_has_successor(bitmap)) {
 -- 
 2.17.2
