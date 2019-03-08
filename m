@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49463)
+Received: from eggs.gnu.org ([209.51.188.92]:49829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2K8J-00013I-Qv
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:22:12 -0500
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h2K95-0001dS-CN
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:23:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2K8I-0000Fz-VW
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:22:11 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2K8I-0000FJ-OV
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:22:10 -0500
-Received: by mail-oi1-x242.google.com with SMTP id t206so16587423oib.3
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 10:22:10 -0800 (PST)
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1h2K94-0000oV-DT
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:22:59 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:32900)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+	id 1h2K94-0000lC-0a
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 13:22:58 -0500
+Date: Fri, 8 Mar 2019 10:22:46 -0800
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Message-ID: <20190308182246.GA20066@heatpipe>
+References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
+	<8b794ba1-f719-e1f4-5a17-ba261aeebea6@redhat.com>
+	<20190307141642.GE5786@linux.fritz.box>
 MIME-Version: 1.0
-References: <1550029560-30530-1-git-send-email-sandra@codesourcery.com>
-	<1550029560-30530-3-git-send-email-sandra@codesourcery.com>
-	<CAFEAcA-Ocow8GzPCPO=346hnc4CZ6M02TwVp-e6G2EjY5-FESQ@mail.gmail.com>
-	<7d4097aa-4888-82f6-3e4e-eeeb8de9f55b@codesourcery.com>
-	<CAFEAcA92mHFcPoNtsHJqUTzfjxvXh4CpjEy_=irMYu9gEpg=2Q@mail.gmail.com>
-	<bca405b0-1d08-5787-ddcc-d9205021689e@codesourcery.com>
-In-Reply-To: <bca405b0-1d08-5787-ddcc-d9205021689e@codesourcery.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Mar 2019 18:21:58 +0000
-Message-ID: <CAFEAcA9ZHj322qbY8BhdqFAqknc0nrfsFTUF3MN_49Ey_2OpiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] Add Nios II semihosting support.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307141642.GE5786@linux.fritz.box>
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
+ the concept description to docs/devel/qemu-multiprocess
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sandra Loosemore <sandra@codesourcery.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marek Vasut <marex@denx.de>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, john.g.johnson@oracle.com, sstabellini@kernel.org, jag.raman@oracle.com, konrad.wilk@oracle.com, ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com
 
-On Fri, 8 Mar 2019 at 17:01, Sandra Loosemore <sandra@codesourcery.com> wrote:
->
-> On 3/8/19 9:04 AM, Peter Maydell wrote:
-> > Thanks. So who "owns" this ABI (ie has the authority to change
-> > it and should be the end documenting it)? How many projects or
-> > bits of software are implementing either end of it?
->
-> Going back in ancient history, I implemented the m68k version in
-> libgloss in 2006 to support a hardware debug stub that CodeSourcery was
-> also providing at that time.  We later moved the runtime side of it into
-> target-agnostic code in an internal library, so when it came time to do
-> a similar JTAG debug stub for bare-metal Nios II hardware testing in
-> 2012, we re-used our existing code for both library and debug stub.
-> Later Altera implemented the same protocol in some proprietary
-> simulators they provided to us, and more recently we wrote these patches
-> to add it to QEMU.  We've shifted away from hardware testing and no
-> longer use the original debug stub now.
->
-> > If we decide that QEMU owns the spec we can put the documentation
-> > into docs/specs/.
->
-> Making QEMU the "owner" of the ABI seems a little peculiar to me since
-> it is only one client among several, and is a latecomer too.  I think
-> libgloss would make a little more sense.  OTOH, I have no problem with
-> making the documentation part of QEMU.
+On Thu, Mar 07, 2019 at 03:16:42PM +0100, Kevin Wolf wrote:
+> Am 07.03.2019 um 09:14 hat Thomas Huth geschrieben:
+> > On 07/03/2019 08.22, elena.ufimtseva@oracle.com wrote:
+> > > From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> > > 
+> > > TODO: Make relevant changes to the doc.
+> > > 
+> > > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> > > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> > > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> > > ---
+> > >  docs/devel/qemu-multiprocess.txt | 1109 ++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 1109 insertions(+)
+> > >  create mode 100644 docs/devel/qemu-multiprocess.txt
+> > > 
+> > > diff --git a/docs/devel/qemu-multiprocess.txt b/docs/devel/qemu-multiprocess.txt
+> > > new file mode 100644
+> > > index 0000000..e29c6c8
+> > > --- /dev/null
+> > > +++ b/docs/devel/qemu-multiprocess.txt
+> > > @@ -0,0 +1,1109 @@
+> > > +/*
+> > > + * Copyright 2019, Oracle and/or its affiliates. All rights reserved.
+> > > + *
+> > > + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> > > + * of this software and associated documentation files (the "Software"), to deal
+> > > + * in the Software without restriction, including without limitation the rights
+> > > + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> > > + * copies of the Software, and to permit persons to whom the Software is
+> > > + * furnished to do so, subject to the following conditions:
+> > > + *
+> > > + * The above copyright notice and this permission notice shall be included in
+> > > + * all copies or substantial portions of the Software.
+> > > + *
+> > > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> > > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> > > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> > > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> > > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> > > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> > > + * THE SOFTWARE.
+> > > + */
+> > 
+> > Somehow weird to see such a big license statement talking about
+> > "software", but which applies to a text file only... Not sure if it is
+> > an option for you, but maybe one of the Creative Common licenses
+> > (dual-licensed with the GPLv2+) would be a better fit? E.g. for the QEMU
+> > website, the content is dual-licensed: https://www.qemu.org/license.html
+> 
 
-Thanks for the backstory. I agree that if QEMU is just one of
-multiple implementations then it's not a great place to
-hold the specification. Either libgloss, or I suppose in
-theory Altera as the owner of the architecture could bless
-the specification and host it...
+Thanks Thomas,
+working on figuring this part out.
 
--- PMM
+> While we're talking about licenses, the "All rights reserved." notice is
+> out of place in a license header that declares that a lot of permissions
+> are granted. Better to remove it to avoid any ambiguities that could
+> result from the contradiction. (Applies to the whole series.)
+>
+
+Thanks Kevin,
+
+This will be removed.
+
+Elena
+
+> Kevin
