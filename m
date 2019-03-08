@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50240)
+Received: from eggs.gnu.org ([209.51.188.92]:50907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2Ece-0007Cf-7N
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:29:10 -0500
+	(envelope-from <philmd@redhat.com>) id 1h2EgD-0008Fr-RQ
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2Eca-0003W9-Rk
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:29:07 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190308062455.29755-1-armbru@redhat.com>
-	<481d398a-e26c-6c0a-20b7-7466ae1ebf1f@redhat.com>
-Date: Fri, 08 Mar 2019 13:28:54 +0100
-In-Reply-To: <481d398a-e26c-6c0a-20b7-7466ae1ebf1f@redhat.com> (Laszlo Ersek's
-	message of "Fri, 8 Mar 2019 12:47:52 +0100")
-Message-ID: <875zsteeih.fsf@dusky.pond.sub.org>
+	(envelope-from <philmd@redhat.com>) id 1h2EgB-0007C2-0k
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:32:49 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34701)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2EgA-0006vV-Qw
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:32:46 -0500
+Received: by mail-wr1-f67.google.com with SMTP id f14so21182548wrg.1
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 04:32:45 -0800 (PST)
+References: <20190308094610.21210-1-armbru@redhat.com>
+	<20190308094610.21210-14-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6086ea28-11a1-e72f-d4fb-6069543732c3@redhat.com>
+Date: Fri, 8 Mar 2019 13:32:42 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190308094610.21210-14-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7] pflash: Require backend size to match
- device, improve errors
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 13/15] mips_malta: Clean up definition
+ of flash memory size somewhat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,216 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, philmd@redhat.com, alex.bennee@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, balaton@eik.bme.hu, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+On 3/8/19 10:46 AM, Markus Armbruster wrote:
+> pflash_cfi01_register() takes a size in bytes, a block size in bytes
+> and a number of blocks.  mips_malta_init() passes BIOS_SIZE, 65536,
+> FLASH_SIZE >> 16.  Actually consistent only because BIOS_SIZE (defined
+> in include/hw/mips/bios.h as (4 * MiB)) matches FLASH_SIZE (defined
+> locally as 0x400000).  Confusing all the same.
+> 
+> Pass FLASH_SIZE instead of BIOS_SIZE.
+> 
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> On 03/08/19 07:24, Markus Armbruster wrote:
->> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>=20
->> We reject undersized backends with a rather enigmatic "failed to read
->> the initial flash content" error.
->>=20
->> We happily accept oversized images, ignoring their tail.  Throwing
->> away parts of firmware that way is pretty much certain to end in an
->> even more enigmatic failure to boot.
->>=20
->> Require the backend's size to match the device's size exactly.  Report
->> mismatch as "device requires N bytes, block backend 'NAME' provides M
->> bytes".
->>=20
->> Improve the error for actual read failures to "can't read initial
->> flash content from block backend 'NAME'.
->>=20
->> We disabled code to limit device sizes to 8, 16, 32 or 64MiB more than
->> a decade ago in commit 95d1f3edd5e and c8b153d7949, v0.9.1.  Bury.
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/block/pflash_cfi01.c | 31 ++++++++++++++++++++++---------
->>  hw/block/pflash_cfi02.c | 31 +++++++++++++++++++++++--------
->>  2 files changed, 45 insertions(+), 17 deletions(-)
->>=20
->> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> index 9d1c356eb6..2e3a05c0b3 100644
->> --- a/hw/block/pflash_cfi01.c
->> +++ b/hw/block/pflash_cfi01.c
->> @@ -730,13 +730,6 @@ static void pflash_cfi01_realize(DeviceState *dev, =
-Error **errp)
->>      }
->>      device_len =3D sector_len_per_device * blocks_per_device;
->>=20=20
->> -    /* XXX: to be fixed */
->> -#if 0
->> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 *=
- 1024) &&
->> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 =
-* 1024))
->> -        return NULL;
->> -#endif
->> -
->>      memory_region_init_rom_device(
->>          &pfl->mem, OBJECT(dev),
->>          &pflash_cfi01_ops,
->> @@ -763,12 +756,32 @@ static void pflash_cfi01_realize(DeviceState *dev,=
- Error **errp)
->>      }
->>=20=20
->>      if (pfl->blk) {
->> +        /*
->> +         * Validate the backing store is the right size for pflash
->> +         * devices. If the user supplies a larger file we ignore the
->> +         * tail.
->> +         */
->> +        int64_t backing_len =3D blk_getlength(pfl->blk);
->> +
->> +        if (backing_len < 0) {
->> +            error_setg(errp, "can't get size of block backend '%s'",
->> +                       blk_name(pfl->blk));
->> +            return;
->> +        }
->> +        if (backing_len !=3D total_len) {
->> +            error_setg(errp, "device requires %" PRIu64 " bytes, "
->> +                       "block backend '%s' provides %" PRIu64 " bytes",
->> +                       total_len, blk_name(pfl->blk), backing_len);
->> +            return;
->> +        }
->> +
->>          /* read the initial flash content */
->>          ret =3D blk_pread(pfl->blk, 0, pfl->storage, total_len);
->> -
->>          if (ret < 0) {
->>              vmstate_unregister_ram(&pfl->mem, DEVICE(pfl));
->> -            error_setg(errp, "failed to read the initial flash content"=
-);
->> +            error_setg(errp, "can't read initial flash content"
->> +                       " from block backend '%s'",
->> +                       blk_name(pfl->blk));
->>              return;
->>          }
->>      }
->> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
->> index 33779ce807..45b88d65d8 100644
->> --- a/hw/block/pflash_cfi02.c
->> +++ b/hw/block/pflash_cfi02.c
->> @@ -550,12 +550,6 @@ static void pflash_cfi02_realize(DeviceState *dev, =
-Error **errp)
->>      }
->>=20=20
->>      chip_len =3D pfl->sector_len * pfl->nb_blocs;
->> -    /* XXX: to be fixed */
->> -#if 0
->> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 *=
- 1024) &&
->> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 =
-* 1024))
->> -        return NULL;
->> -#endif
->>=20=20
->>      memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl), pfl->be ?
->>                                    &pflash_cfi02_ops_be : &pflash_cfi02_=
-ops_le,
->> @@ -581,11 +575,32 @@ static void pflash_cfi02_realize(DeviceState *dev,=
- Error **errp)
->>      }
->>=20=20
->>      if (pfl->blk) {
->> +        /*
->> +         * Validate the backing store is the right size for pflash
->> +         * devices. If the user supplies a larger file we ignore the
->> +         * tail.
->> +         */
->> +        int64_t backing_len =3D blk_getlength(pfl->blk);
->> +
->> +        if (backing_len < 0) {
->> +            error_setg(errp, "can't get size of block backend '%s'",
->> +                       blk_name(pfl->blk));
->> +            return;
->> +        }
->> +        if (backing_len !=3D chip_len) {
->> +            error_setg(errp, "device requires %" PRIu32 " bytes, "
->> +                       "block backend '%s' provides %" PRIu64 " bytes",
->> +                       chip_len, blk_name(pfl->blk), backing_len);
->> +            return;
->> +        }
->> +
->>          /* read the initial flash content */
->>          ret =3D blk_pread(pfl->blk, 0, pfl->storage, chip_len);
->>          if (ret < 0) {
->> -            vmstate_unregister_ram(&pfl->orig_mem, DEVICE(pfl));
->> -            error_setg(errp, "failed to read the initial flash content"=
-);
->> +            vmstate_unregister_ram(&pfl->mem, DEVICE(pfl));
->> +            error_setg(errp, "can't read initial flash content"
->> +                       " from block backend '%s'",
->> +                       blk_name(pfl->blk));
->>              return;
->>          }
->>      }
->>=20
->
-> This one has got to be one of the longest bike-shedding sessions! :)
->
-> I'm fine with this patch, but I could suggest two improvements.
->
-> (1) When blk_getlength() fails, we could format the negative error code
-> returned by it into the error message.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-I can do that.
-
-> (2) We could extract the common code to a new function in
-> "hw/block/block.c". (It says "Common code for block device models" on
-> the tin.)
-
-There's so much common code in these two files even before this patch...
-
-> I realize the vmstate_unregister_ram() rollbacks are not identical
-> between cfi01 and cfi02. However, that difference only draws my
-> attention to the fact that the unregister calls are not made on the
-> other error branches in this patch anyway!
-
-You're right, that needs fixing.
-
-> So we should have a common function like this:
->
-> void pflash_cfi_read_initial_content(BlockBackend *blk, uint64_t size,
->                                      void *buf, Error **errp)
-> {
->     int64_t backing_len =3D blk_getlength(blk);
->     int ret;
->
->     if (backing_len < 0) {
->         error_setg(...);
->         return;
->     }
->
->     if (backing_len !=3D size) {
->         error_setg(...);
->         return;
->     }
->
->     ret =3D blk_pread(blk, 0, buf, size);
->     if (ret < 0) {
->         error_setg(...);
->     }
-> }
->
-> And at the call sites, we can do
->
->     if (pfl->blk) {
->         Error *local_err =3D NULL;
->
->         pflash_cfi_read_initial_content(pfl->blk,
->                                         total_len OR chip_len,
->                                         pfl->storage,
->                                         &local_err);
->         if (local_err) {
->             error_propagate(errp, local_err);
->             vmstate_unregister_ram(...); // as appropriate for cfiXX
->             return;
->         }
->     }
-
-I'll give it a try for v8.  Thanks!
+> ---
+>  hw/mips/mips_malta.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 4dfe06a1a0..2f20f56458 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1262,7 +1262,7 @@ void mips_malta_init(MachineState *machine)
+>      /* Load firmware in flash / BIOS. */
+>      dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+>      fl = pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
+> -                               BIOS_SIZE,
+> +                               FLASH_SIZE,
+>                                 dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+>                                 65536, FLASH_SIZE >> 16,
+>                                 4, 0x0000, 0x0000, 0x0000, 0x0000, be);
+> 
