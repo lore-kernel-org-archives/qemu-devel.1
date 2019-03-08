@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53418)
+Received: from eggs.gnu.org ([209.51.188.92]:54274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h2Cdg-0002Kj-3Y
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:22:05 -0500
+	(envelope-from <kwolf@redhat.com>) id 1h2Ciw-0003wT-GX
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:27:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1h2Cdf-00005p-7e
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:22:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37690)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1h2Cde-0008W7-Va
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:22:03 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E7DE759461
-	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 10:22:01 +0000 (UTC)
-Date: Fri, 8 Mar 2019 10:21:58 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190308102158.GE12318@stefanha-x1.localdomain>
-References: <20190306115532.23025-1-peterx@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1h2Civ-0007Q3-Lt
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 05:27:30 -0500
+Date: Fri, 8 Mar 2019 11:27:21 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190308102721.GD5339@localhost.localdomain>
+References: <20190307165303.15382-1-kwolf@redhat.com>
+	<415d75bd-2d62-d19a-8a5f-e463f4f72866@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XuV1QlJbYrcVoo+x"
+	protocol="application/pgp-signature"; boundary="6c2NcOVqGQ03X4Wi"
 Content-Disposition: inline
-In-Reply-To: <20190306115532.23025-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] iothread: create gcontext
- unconditionally
+In-Reply-To: <415d75bd-2d62-d19a-8a5f-e463f4f72866@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2 spec: Describe string header
+ extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, stefanha@redhat.com, qemu-devel@nongnu.org
 
 
---XuV1QlJbYrcVoo+x
+--6c2NcOVqGQ03X4Wi
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 06, 2019 at 07:55:27PM +0800, Peter Xu wrote:
-> v2:
-> - add comment in patch 4
-> - add another patch to comment why we need explicit aio_poll() in
->   iothread_run loop
+Am 07.03.2019 um 18:40 hat Eric Blake geschrieben:
+> On 3/7/19 10:53 AM, Kevin Wolf wrote:
+> > Be more specific about the string representation in header extensions.
+> >=20
+> > Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  docs/interop/qcow2.txt | 14 ++++++++++++--
+> >  1 file changed, 12 insertions(+), 2 deletions(-)
+> >=20
 >=20
-> When I first read the iothread code, the gcontext confused me for
-> quite a while.  Meanwhile, I've been tackling with some races due to
-> this complexity as well.  How much we'll pay for creating the gcontext
-> unconditionally?  Do we really need this flexibitily (or is it really
-> a flexibility after all)?  I don't see much gain of existing code, but
-> I might be wrong.  Anyway, I wrote this patchset to see how the list
-> would think about it.
+> Based-on: <20190227172256.30368-1-kwolf@redhat.com>
 >=20
-> This series directly originates from previous discussion with
-> Marc-Andre where there's a slightly hacky way to try to acquire the
-> gcontext:
+> > =20
+> > =20
+> > +=3D=3D String header extensions =3D=3D
+> > +
+> > +Some header extensions (such as the backing file format name and the e=
+xternal
+> > +data file name) are just a single string. In this case, the header ext=
+ension
+> > +length is the string length and the string is not '\0' terminated. (Th=
+e header
+> > +extension padding can make it look like a string is '\0' terminated, b=
+ut
+> > +neither is padding always necessary nor is there a guarantee that zero=
+ bytes
+> > +are used for padding.)
 >=20
-> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05460.html
->=20
-> Now with this series logically above patch is not needed any more.
-> Please read patch 4 for more information.
->=20
-> And if this patchset can survive... how about running gcontext
-> directly in iothread_run()?  I believe there could be a bit more
-> things to clean but I'll see.
->=20
-> Make check passes for me.
->=20
-> Comments welcomed.  Thanks,
->=20
-> Peter Xu (5):
->   iothread: replace init_done_cond with a semaphore
->   iothread: create the gcontext unconditionally
->   iothread: create main loop unconditionally
->   iothread: push gcontext earlier in the thread_fn
->   iothread: document about why we need explicit aio_poll()
->=20
->  include/sysemu/iothread.h |  5 +--
->  iothread.c                | 91 +++++++++++++++++++--------------------
->  2 files changed, 46 insertions(+), 50 deletions(-)
->=20
-> --=20
-> 2.17.1
->=20
+> We didn't require 0 padding?  (goes and re-reads) - oops, yes that's
+> correct.
 
-I made the comment tweak discussed in this thread.
+Yes. QEMU does use zeroes, but the spec doesn't mandate it and changing
+it would be an incompatible change. And the worst that could happen is
+that someone leaves a hidden message in the padding, which doesn't
+really hurt.
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+> It makes it harder to extend a struct by making use of that
+> padding if you can't guarantee what the padding had to be prior to the
+> extension, and means that you have to consider whether there are any
+> potential security risks of the padding being used as a side channel to
+> leak information while still being a well-formed file.
 
-Stefan
+It doesn't actually make it harder because we have the length field
+which tells us the exact length of the valid data, so we shouldn't even
+try to use any of the padding.
 
---XuV1QlJbYrcVoo+x
+> But changing the standard to require zero padding is different than
+> documenting existing practice, so your patch is correct.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
+Kevin
+
+--6c2NcOVqGQ03X4Wi
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcgkJGAAoJEJykq7OBq3PIP1YH/RJfKG2siiPbW3g8Kf9tGzOP
-O+R4QpVk/iDcyOlxAGckZR5MlQ8+Hal7bH4iRXSlTbqDOPdBjQNiGibESjKYbgRz
-bwdIqrgHOB5kh23+nWoZSBKxbhYOz3JWbYA8O0cLJZdiHWr9S8bk+oQZoam1mPKK
-ftTLRu0PehSCT/GUD8IMIrNqPik7fejxpeOcXjgu63+jGwbIfN49SvmIoGfMKbdx
-xMQs4/DUgoAYAAFl1IVYDT59G7xQCWF7aWOnxLbogdRvk40hnOKo8v6mOEsXyRzJ
-wCmObnWGi3ZHy7JrvBY21e8v0Plm2v3CPrtqWcpYKiQW1xhzMb2Y8gyXLw8LIX0=
-=WTyv
+iQIcBAEBAgAGBQJcgkOJAAoJEH8JsnLIjy/WKDMQAJhVnoTOf7E9ZyF+OTTxhr1c
+6vHT+Ja9ZT6IyuM7SelYsqTGQIUhtCLlws9LDuCnnudiCfJ81CC2601r0CbmC9gz
+4eKRxXx0CZ59TO8QsxqCJV3ffBM7PCCr2+6q1KRXX1Rs6btRQyRSyvZ5JIrc2G4M
+7egBNkTipZ9xKaoilMUohjqkaVun1QEAsw3KHZ0FiAn5cwyBpK42FFA43Ucd1QSr
+uvGGnJV1g4Bn2wdmIhG3Mi9ra3YnOgt3Glawj+EWsPLLRe2FyZT5fWiqa+IdKrwn
+NQuxvtFBpDg1Y6+y+HNUqZgJ1/tyxIzc7nbmhCDFZtI9WaWcjiBrQ9Y4G3YpySY7
+9JqyoMrqbQ0JgAEKlS7CV3mzua6crt4YBI56QcXvtlHxQjBRJzeGN/QhGL4A0Y8b
+h6QZEySSE1TVkWL3nWlLE0+aWl7lVfFVWN/TXh4GuuAQGdhFAActOI+XtmShk2aU
+Wvwf9MFPgaKDe26OaTsJGVNP+hHz95RjULxGxQqEflYQkkrZfcusHrQp7e42Ij+Z
+N2/kk8Myb1argoBwnFUe8CGe89ABU/wbCXpswMv3LxoVlEekL1liUk9mWvr36TaF
+1Qi6Fh3nQmPIUUFM38PIwD6aTp119+ggz+u+d1CrxBF84+UJrcf4xWWlPd7dnO1t
+QmdzzKQhgbpBCLa8tnzw
+=O7vi
 -----END PGP SIGNATURE-----
 
---XuV1QlJbYrcVoo+x--
+--6c2NcOVqGQ03X4Wi--
