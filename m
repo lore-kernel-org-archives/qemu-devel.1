@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53009)
+Received: from eggs.gnu.org ([209.51.188.92]:53816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2III-0007fl-OP
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:24:23 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h2IKn-0000Dg-8g
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2IIH-0003Sj-OH
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:24:22 -0500
-Resent-Message-Id: <E1h2IIH-0003Sj-OH@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h2IIH-0003Rj-Ek
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:24:21 -0500
-Message-ID: <155206223719.8146.7413985549144123168@6acff2cf482b>
-In-Reply-To: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1h2IKm-00061S-GY
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:26:57 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h2IKm-00060o-AB
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:26:56 -0500
+Received: by mail-oi1-x242.google.com with SMTP id s16so16267650oih.9
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 08:26:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 8 Mar 2019 08:23:58 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
- excluding ARM and MIPS
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<87r2bigarf.fsf@zen.linaroharston>
+	<a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
+	<CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
+	<62408d6c-5a61-ffb2-f810-6ef36703b277@redhat.com>
+	<20190308064743.xe4govhrfdsrzns3@sirius.home.kraxel.org>
+	<CAFEAcA_nb_s-DGQTf3GRMcN+9ke8XKyzf_n9QfpeCcKCoA439A@mail.gmail.com>
+	<20190308115810.6f2dq4ub5t55lnih@sirius.home.kraxel.org>
+	<CAFEAcA-mvCSZMQzx4N9UgbbEYaDkGGXB64dpnaVG4UacL=LKuA@mail.gmail.com>
+	<e9626b6c-9476-7515-9aee-7dd3f75d42fd@redhat.com>
+In-Reply-To: <e9626b6c-9476-7515-9aee-7dd3f75d42fd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Mar 2019 16:26:43 +0000
+Message-ID: <CAFEAcA8cb+qRRW+va-G=Px2k1devv-UzpaL8naCR9QZQ2XF4NA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +37,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, yang.zhong@intel.com, thuth@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxNzIzNjE0LTE4MjMtMS1n
-aXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3Qt
-bWluZ3dAZmVkb3JhIFNIT1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KCiAgQ0MgICAgICBody91c2IvZGV2LWJsdWV0b290aC5vCiAgQ0MgICAgICBody91c2Iv
-ZGV2LXNtYXJ0Y2FyZC1yZWFkZXIubwpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11LXRl
-c3Qvc3JjL2h3L3RwbS90cG1fZW11bGF0b3IuYzozNzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3Rw
-bS90cG1faW9jdGwuaDoxMToxMDogZmF0YWwgZXJyb3I6IHN5cy91aW8uaDogTm8gc3VjaCBmaWxl
-IG9yIGRpcmVjdG9yeQogI2luY2x1ZGUgPHN5cy91aW8uaD4KICAgICAgICAgIF5+fn5+fn5+fn5+
-CmNvbXBpbGF0aW9uIHRlcm1pbmF0ZWQuCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTUxNzIzNjE0LTE4MjMtMS1naXQtc2VuZC1lbWFpbC1w
-Ym9uemluaUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEByZWRoYXQuY29t
+On Fri, 8 Mar 2019 at 16:17, Eric Blake <eblake@redhat.com> wrote:
+>
+> On 3/8/19 6:03 AM, Peter Maydell wrote:
+> > On Fri, 8 Mar 2019 at 11:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >> On Fri, Mar 08, 2019 at 10:31:20AM +0000, Peter Maydell wrote:
+> >>> I think in fact I have just broken in-tree builds with the
+> >>> Sphinx support patchset :-/
+> >>
+> >> Great opportunity!  Stop supporting in-tree build fixes a bug,
+> >> so this can be merged post soft-freeze.
+> >
+> > Joking aside, this is quite tempting, because Sphinx simply
+> > does not support building into the same directory as its
+> > source documentation files. So we need to either:
+> >  * create an ad-hoc build directory (eg docs/built)
+> >    where Sphinx builds the docs to if we're doing an
+> >    in-tree build, and have the 'make install' phase pull
+> >    the docs out of there
+>
+> Lots of work to just throw away if we plan on doing a flag day in 4.1.
+> But necessary if you want 4.0 to still support in-tree builds for one
+> last hurrah.
+
+It turned out not to be that much work:
+https://patchew.org/QEMU/20190308135744.6480-1-peter.maydell@linaro.org/20190308135744.6480-2-peter.maydell@linaro.org/
+
+thanks
+-- PMM
