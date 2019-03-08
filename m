@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49888)
+Received: from eggs.gnu.org ([209.51.188.92]:50472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2I62-0008Dv-Ty
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:11:44 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1h2I8B-0001Ag-14
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:13:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2I61-0001Nn-LJ
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:11:42 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46177)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2I61-0001NB-7w
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:11:41 -0500
-Received: by mail-wr1-x444.google.com with SMTP id i16so21929060wrs.13
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 08:11:41 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180103214925.16677-1-f4bug@amsat.org>
-	<20180103214925.16677-2-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ed8793ce-cc5f-a506-2bdc-a39e9fc79cc7@amsat.org>
-Date: Fri, 8 Mar 2019 17:11:36 +0100
+	(envelope-from <eric.auger@redhat.com>) id 1h2I8A-0003Rs-5u
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:13:55 -0500
+References: <20190308114218.26692-1-shameerali.kolothum.thodi@huawei.com>
+	<20190308114218.26692-3-shameerali.kolothum.thodi@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <e2e5a025-34bb-7a34-80c7-99d8cef37f2c@redhat.com>
+Date: Fri, 8 Mar 2019 17:13:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180103214925.16677-2-f4bug@amsat.org>
+In-Reply-To: <20190308114218.26692-3-shameerali.kolothum.thodi@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] sdbus: add a QMP command to access
- a SDBus
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/11] hw/acpi: Make ACPI IO address
+ space configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,192 +25,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Edgar Iglesias <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, imammedo@redhat.com, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com
+Cc: linuxarm@huawei.com, xuwei5@hisilicon.com
 
-Hi Markus,
+Hi,
 
-[Asking again from the correct series thread]
-
-On 1/3/18 10:49 PM, Philippe Mathieu-Daudé wrote:
-> Use Base64 to serialize the binary blobs in JSON.
-> So far at most 512 bytes will be transfered, which result
-> in a 684 bytes payload.
-> Since this command is intented for qtesting, it is acceptable.
-
-Any comment regarding QMP for this patch?
-
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  qapi-schema.json    | 41 +++++++++++++++++++++++++++++++++
->  hw/sd/sdbus-qmp.c   | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  stubs/qmp_sdbus.c   | 12 ++++++++++
->  hw/sd/Makefile.objs |  2 +-
->  stubs/Makefile.objs |  1 +
->  5 files changed, 120 insertions(+), 1 deletion(-)
->  create mode 100644 hw/sd/sdbus-qmp.c
->  create mode 100644 stubs/qmp_sdbus.c
+On 3/8/19 12:42 PM, Shameer Kolothum wrote:
+> This is in preparation for adding support for ARM64 platforms
+> where it doesn't use port mapped IO for ACPI IO space.
 > 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 18457954a8..be26e8cd34 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3200,3 +3200,44 @@
->  # Since: 2.11
->  ##
->  { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} }
-> +
-> +##
-> +# @SDBusCommandResponse:
-> +#
-> +# SD Bus command response.
-> +#
-> +# @base64: the command response encoded as a Base64 string, if any (optional)
-> +#
-> +# Since: 2.11
-> +##
-> +{ 'struct': 'SDBusCommandResponse', 'data': {'*base64': 'str'} }
-> +
-> +##
-> +# @x-debug-sdbus-command:
-> +#
-> +# Execute a command on a SD Bus return the response (if any).
-> +#
-> +# @qom-path: the SD Bus path
-> +# @command: the SD protocol command to execute in the bus
-> +# @arg: a 64-bit command argument (optional)
-> +# @crc: the command/argument CRC (optional)
-> +#
-> +# Returns: the response of the command encoded as a Base64 string
-> +#
-> +# Since: 2.11
-> +#
-> +# -> { "execute": "x-debug-sdbus-command",
-> +#      "arguments": { "qom-path": "/machine/unattached/device[32]/sd.0",
-> +#                     "command": 0x01
-> +#      }
-> +#    }
-> +# <- { "return": {'base64': 'A='} }
-> +#
-> +##
-> +{ 'command': 'x-debug-sdbus-command',
-> +  'data': { 'qom-path': 'str',
-> +            'command': 'uint8',
-> +            '*arg': 'uint64',
-> +            '*crc': 'uint16' },
-> +  'returns': 'SDBusCommandResponse'
-> +}
-> diff --git a/hw/sd/sdbus-qmp.c b/hw/sd/sdbus-qmp.c
-> new file mode 100644
-> index 0000000000..8c4b6f2aee
-> --- /dev/null
-> +++ b/hw/sd/sdbus-qmp.c
-> @@ -0,0 +1,65 @@
-> +/*
-> + * SD card bus QMP debugging interface (for QTesting).
-> + *
-> + * Copyright (c) 2017 ?
-> + *
-> + * Author:
-> + *  Philippe Mathieu-Daudé <f4bug@amsat.org>
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "hw/sd/sd.h"
-> +#include "qmp-commands.h"
-> +
-> +SDBusCommandResponse *qmp_x_debug_sdbus_command(const char *qom_path,
-> +                                                uint8_t command,
-> +                                                bool has_arg, uint64_t arg,
-> +                                                bool has_crc, uint16_t crc,
-> +                                                Error **errp)
-> +{
-> +    uint8_t response[16 + 1];
-> +    SDBusCommandResponse *res;
-> +    bool ambiguous = false;
-> +    Object *obj;
-> +    SDBus *sdbus;
-> +    int sz;
-> +
-> +    obj = object_resolve_path(qom_path, &ambiguous);
-> +    if (obj == NULL) {
-> +        if (ambiguous) {
-> +            error_setg(errp, "Path '%s' is ambiguous", qom_path);
-> +        } else {
-> +            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-> +                      "Device '%s' not found", qom_path);
-> +        }
-> +        return NULL;
-> +    }
-> +    sdbus = (SDBus *)object_dynamic_cast(obj, TYPE_SD_BUS);
-> +    if (sdbus == NULL) {
-> +        error_set(errp, ERROR_CLASS_GENERIC_ERROR,
-> +                  "Device '%s' not a sd-bus", qom_path);
-> +        return NULL;
-> +    }
-> +
-> +    res = g_new0(SDBusCommandResponse, 1);
-> +    sz = sdbus_do_command(sdbus,
-> +                          &(SDRequest){ command, arg, has_crc ? crc : -1 },
-> +                          response);
-> +    if (sz > 0) {
-> +        res->has_base64 = true;
-> +        res->base64 = g_base64_encode(response, sz);
-> +    }
-> +
-> +    return res;
-> +}
-> diff --git a/stubs/qmp_sdbus.c b/stubs/qmp_sdbus.c
-> new file mode 100644
-> index 0000000000..d9bd75ec71
-> --- /dev/null
-> +++ b/stubs/qmp_sdbus.c
-> @@ -0,0 +1,12 @@
-> +#include "qemu/osdep.h"
-> +#include "qmp-commands.h"
-> +#include "hw/sd/sd.h"
-> +
-> +SDBusCommandResponse *qmp_x_debug_sdbus_command(const char *qom_path,
-> +                                                uint8_t command,
-> +                                                bool has_arg, uint64_t arg,
-> +                                                bool has_crc, uint16_t crc,
-> +                                                Error **errp)
-> +{
-> +    return NULL;
-> +}
-> diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-> index c2b7664264..3a70477bba 100644
-> --- a/hw/sd/Makefile.objs
-> +++ b/hw/sd/Makefile.objs
-> @@ -1,6 +1,6 @@
->  common-obj-$(CONFIG_PL181) += pl181.o
->  common-obj-$(CONFIG_SSI_SD) += ssi-sd.o
-> -common-obj-$(CONFIG_SD) += sd.o core.o
-> +common-obj-$(CONFIG_SD) += sd.o core.o sdbus-qmp.o
->  common-obj-$(CONFIG_SDHCI) += sdhci.o
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+> ---
+>  hw/acpi/memory_hotplug.c         | 22 ++++++++++++++--------
+>  hw/i386/acpi-build.c             |  3 ++-
+>  include/hw/acpi/memory_hotplug.h |  5 +++--
+>  3 files changed, 19 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+> index a6beb10..77ff0af 100644
+> --- a/hw/acpi/memory_hotplug.c
+> +++ b/hw/acpi/memory_hotplug.c
+> @@ -8,7 +8,7 @@
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-events-misc.h"
 >  
->  obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 8cfe34328a..a46cb3b992 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -35,6 +35,7 @@ stub-obj-y += vm-stop.o
->  stub-obj-y += vmstate.o
->  stub-obj-$(CONFIG_WIN32) += fd-register.o
->  stub-obj-y += qmp_pc_dimm.o
-> +stub-obj-y += qmp_sdbus.o
->  stub-obj-y += target-monitor-defs.o
->  stub-obj-y += target-get-monitor-def.o
->  stub-obj-y += pc_madt_cpu_entry.o
+> -static uint16_t memhp_io_base;
+> +static hwaddr memhp_io_base;
+>  
+>  static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
+>  {
+> @@ -182,7 +182,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
+>  };
+>  
+>  void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+> -                              MemHotplugState *state, uint16_t io_base)
+> +                              MemHotplugState *state, hwaddr io_base)
+>  {
+>      MachineState *machine = MACHINE(qdev_get_machine());
+>  
+> @@ -315,7 +315,8 @@ const VMStateDescription vmstate_memory_hotplug = {
+>  
+>  void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+>                                const char *res_root,
+> -                              const char *event_handler_method)
+> +                              const char *event_handler_method,
+> +                              AmlRegionSpace rs)
+>  {
+>      int i;
+>      Aml *ifctx;
+> @@ -338,14 +339,19 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+>              aml_name_decl("_UID", aml_string("Memory hotplug resources")));
+>  
+>          crs = aml_resource_template();
+> -        aml_append(crs,
+> -            aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
+> -                   MEMORY_HOTPLUG_IO_LEN)
+> -        );
+> +        if (rs == AML_SYSTEM_IO) {
+> +            aml_append(crs,
+> +                aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
+> +                       MEMORY_HOTPLUG_IO_LEN)
+> +            );
+> +        } else {
+> +            aml_append(crs, aml_memory32_fixed(memhp_io_base,
+> +                            MEMORY_HOTPLUG_IO_LEN, AML_READ_WRITE));
+> +        }
+>          aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
+>  
+>          aml_append(mem_ctrl_dev, aml_operation_region(
+> -            MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
+> +            MEMORY_HOTPLUG_IO_REGION, rs,
+>              aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
+>          );
+>  
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 622ccb9..d9b554f 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1852,7 +1852,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+>                         "\\_SB.PCI0", "\\_GPE._E02");
+>      }
+> -    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
+> +    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0",
+> +                             "\\_GPE._E03", AML_SYSTEM_IO);
+>  
+>      scope =  aml_scope("_GPE");
+>      {
+> diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
+> index fbfcbe6..52f9027 100644
+> --- a/include/hw/acpi/memory_hotplug.h
+> +++ b/include/hw/acpi/memory_hotplug.h
+> @@ -55,7 +55,7 @@ typedef struct MemHotplugState {
+>  } MemHotplugState;
+>  
+>  void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+> -                              MemHotplugState *state, uint16_t io_base);
+> +                              MemHotplugState *state, hwaddr io_base);
+>  
+>  void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+>                           DeviceState *dev, Error **errp);
+> @@ -74,5 +74,6 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
+>  
+>  void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+>                                const char *res_root,
+> -                              const char *event_handler_method);
+> +                              const char *event_handler_method,
+> +                              AmlRegionSpace rs);
+>  #endif
 > 
