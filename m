@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42077)
+Received: from eggs.gnu.org ([209.51.188.92]:42075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h240E-0006By-It
+	(envelope-from <dgibson@ozlabs.org>) id 1h240E-0006Bx-Iu
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h240C-0000tb-CO
+	(envelope-from <dgibson@ozlabs.org>) id 1h240C-0000tl-C5
 	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 20:08:46 -0500
-Date: Fri, 8 Mar 2019 11:19:04 +1100
+Date: Fri, 8 Mar 2019 11:30:12 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190308001904.GI7722@umbus.fritz.box>
-References: <20190306085032.15744-1-clg@kaod.org>
-	<20190306085032.15744-19-clg@kaod.org>
-	<20190307041816.GL7722@umbus.fritz.box>
-	<05109d65-4917-5929-2431-99ea25d4fb67@kaod.org>
+Message-ID: <20190308003012.GM7722@umbus.fritz.box>
+References: <20190307223548.20516-1-clg@kaod.org>
+	<20190307223548.20516-10-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qZVVwWJgpX9Jzs7f"
+	protocol="application/pgp-signature"; boundary="iIq+KTIB+xWY0FJy"
 Content-Disposition: inline
-In-Reply-To: <05109d65-4917-5929-2431-99ea25d4fb67@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 18/27] ppc/pnv: add a LPC Controller model
- for POWER9
+In-Reply-To: <20190307223548.20516-10-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 09/15] ppc/pnv: add a OCC model for
+ POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,168 +29,198 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---qZVVwWJgpX9Jzs7f
+--iIq+KTIB+xWY0FJy
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 07, 2019 at 08:07:41AM +0100, C=E9dric Le Goater wrote:
-> On 3/7/19 5:18 AM, David Gibson wrote:
-> > On Wed, Mar 06, 2019 at 09:50:23AM +0100, C=E9dric Le Goater wrote:
-[snip]
-> >> +static uint64_t pnv_lpc_mmio_read(void *opaque, hwaddr addr, unsigned=
- size)
-> >> +{
-> >> +    PnvLpcController *lpc =3D PNV_LPC(opaque);
-> >> +    uint64_t val =3D 0;
-> >> +    uint32_t opb_addr =3D addr & ECCB_CTL_ADDR_MASK;
-> >> +    MemTxResult result;
-> >> +
-> >> +    switch (size) {
-> >> +    case 4:
-> >> +        val =3D address_space_ldl(&lpc->opb_as, opb_addr, MEMTXATTRS_=
-UNSPECIFIED,
-> >> +                                &result);
-> >> +        break;
-> >> +    case 1:
-> >> +        val =3D address_space_ldub(&lpc->opb_as, opb_addr, MEMTXATTRS=
-_UNSPECIFIED,
-> >> +                                 &result);
-> >> +        break;
-> >> +    default:
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB read failed at @0x%"
-> >> +                      HWADDR_PRIx " invalid size %d\n", addr, size);
-> >> +        return 0;
-> >> +    }
-> >> +
-> >> +    if (result !=3D MEMTX_OK) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB read failed at @0x%"
-> >> +                      HWADDR_PRIx "\n", addr);
-> >> +    }
-> >> +
-> >> +    return val;
-> >=20
-> > Couldn't you just map the relevant portion of the OPB AS into the MMIO
-> > AS, rather than having to forward the IOs with explicit read/write
-> > functions?
+On Thu, Mar 07, 2019 at 11:35:42PM +0100, C=E9dric Le Goater wrote:
+> The OCC on POWER9 is very similar to the one found on POWER8. Provide
+> the same routines with P9 values for the registers and IRQ number.
 >=20
-> The underlying memory regions (ISA space, LPC HC, OPB regs) are the
-> same on POWER8. So this is one way to share the overall initialization.=
-=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-I don't understand how that relates to my question.  If anything that
-sounds like it makes even more sense to map the common MR with the
-actual registers into the MMIO AS as a subregion, rather than having a
-redirect via the OPB AS.
+Applied, thanks.
 
-> What I would have liked to do is to simplified the ECCB interface=20
-> (see pnv_lpc_do_eccb()).
+> ---
 >=20
-> Thanks,
+>  Changes in v2 :
 >=20
-> C.=20
+>  - made use of the new class attributes for POWER9
 >=20
+>  include/hw/ppc/pnv.h       |  1 +
+>  include/hw/ppc/pnv_occ.h   |  2 ++
+>  include/hw/ppc/pnv_xscom.h |  3 ++
+>  hw/ppc/pnv.c               | 13 +++++++
+>  hw/ppc/pnv_occ.c           | 72 ++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 91 insertions(+)
 >=20
-> >> +}
-> >> +
-> >> +static void pnv_lpc_mmio_write(void *opaque, hwaddr addr,
-> >> +                                uint64_t val, unsigned size)
-> >> +{
-> >> +    PnvLpcController *lpc =3D PNV_LPC(opaque);
-> >> +    uint32_t opb_addr =3D addr & ECCB_CTL_ADDR_MASK;
-> >> +    MemTxResult result;
-> >> +
-> >> +    switch (size) {
-> >> +    case 4:
-> >> +        address_space_stl(&lpc->opb_as, opb_addr, val, MEMTXATTRS_UNS=
-PECIFIED,
-> >> +                          &result);
-> >> +         break;
-> >> +    case 1:
-> >> +        address_space_stb(&lpc->opb_as, opb_addr, val, MEMTXATTRS_UNS=
-PECIFIED,
-> >> +                          &result);
-> >> +        break;
-> >> +    default:
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB write failed at @0x%"
-> >> +                      HWADDR_PRIx " invalid size %d\n", addr, size);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (result !=3D MEMTX_OK) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "OPB write failed at @0x%"
-> >> +                      HWADDR_PRIx "\n", addr);
-> >> +    }
-> >> +}
-> >> +
-> >> +static const MemoryRegionOps pnv_lpc_mmio_ops =3D {
-> >> +    .read =3D pnv_lpc_mmio_read,
-> >> +    .write =3D pnv_lpc_mmio_write,
-> >> +    .impl =3D {
-> >> +        .min_access_size =3D 1,
-> >> +        .max_access_size =3D 4,
-> >> +    },
-> >> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> >> +};
-> >> +
-> >>  static void pnv_lpc_eval_irqs(PnvLpcController *lpc)
-> >>  {
-> >>      bool lpc_to_opb_irq =3D false;
-> >> @@ -465,6 +627,43 @@ static const TypeInfo pnv_lpc_power8_info =3D {
-> >>      }
-> >>  };
-> >> =20
-> >> +static void pnv_lpc_power9_realize(DeviceState *dev, Error **errp)
-> >> +{
-> >> +    PnvLpcController *lpc =3D PNV_LPC(dev);
-> >> +    PnvLpcClass *plc =3D PNV_LPC_GET_CLASS(dev);
-> >> +    Error *local_err =3D NULL;
-> >> +
-> >> +    plc->parent_realize(dev, &local_err);
-> >> +    if (local_err) {
-> >> +        error_propagate(errp, local_err);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    /* P9 uses a MMIO region */
-> >> +    memory_region_init_io(&lpc->xscom_regs, OBJECT(lpc), &pnv_lpc_mmi=
-o_ops,
-> >> +                          lpc, "lpcm", PNV9_LPCM_SIZE);
-> >> +}
-> >> +
-> >> +static void pnv_lpc_power9_class_init(ObjectClass *klass, void *data)
-> >> +{
-> >> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >> +    PnvLpcClass *plc =3D PNV_LPC_CLASS(klass);
-> >> +
-> >> +    dc->desc =3D "PowerNV LPC Controller POWER9";
-> >> +
-> >> +    plc->psi_irq =3D PSIHB9_IRQ_LPCHC;
-> >> +
-> >> +    device_class_set_parent_realize(dc, pnv_lpc_power9_realize,
-> >> +                                    &plc->parent_realize);
-> >> +}
-> >> +
-> >> +static const TypeInfo pnv_lpc_power9_info =3D {
-> >> +    .name          =3D TYPE_PNV9_LPC,
-> >> +    .parent        =3D TYPE_PNV_LPC,
-> >> +    .instance_size =3D sizeof(PnvLpcController),
-> >> +    .class_init    =3D pnv_lpc_power9_class_init,
-> >> +};
-> >> +
-> >>  static void pnv_lpc_realize(DeviceState *dev, Error **errp)
-> >>  {
-> >>      PnvLpcController *lpc =3D PNV_LPC(dev);
-> >> @@ -540,6 +739,7 @@ static void pnv_lpc_register_types(void)
-> >>  {
-> >>      type_register_static(&pnv_lpc_info);
-> >>      type_register_static(&pnv_lpc_power8_info);
-> >> +    type_register_static(&pnv_lpc_power9_info);
-> >>  }
-> >> =20
-> >>  type_init(pnv_lpc_register_types)
-> >=20
->=20
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 1cd1ad622d0b..39888f9d52c1 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -88,6 +88,7 @@ typedef struct Pnv9Chip {
+>      PnvXive      xive;
+>      Pnv9Psi      psi;
+>      PnvLpcController lpc;
+> +    PnvOCC       occ;
+>  } Pnv9Chip;
+> =20
+>  typedef struct PnvChipClass {
+> diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
+> index dab5a05f8e99..d22b65a71abe 100644
+> --- a/include/hw/ppc/pnv_occ.h
+> +++ b/include/hw/ppc/pnv_occ.h
+> @@ -25,6 +25,8 @@
+>  #define PNV_OCC(obj) OBJECT_CHECK(PnvOCC, (obj), TYPE_PNV_OCC)
+>  #define TYPE_PNV8_OCC TYPE_PNV_OCC "-POWER8"
+>  #define PNV8_OCC(obj) OBJECT_CHECK(PnvOCC, (obj), TYPE_PNV8_OCC)
+> +#define TYPE_PNV9_OCC TYPE_PNV_OCC "-POWER9"
+> +#define PNV9_OCC(obj) OBJECT_CHECK(PnvOCC, (obj), TYPE_PNV9_OCC)
+> =20
+>  typedef struct PnvOCC {
+>      DeviceState xd;
+> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+> index 403a365ed274..3292459fbb78 100644
+> --- a/include/hw/ppc/pnv_xscom.h
+> +++ b/include/hw/ppc/pnv_xscom.h
+> @@ -73,6 +73,9 @@ typedef struct PnvXScomInterfaceClass {
+>  #define PNV_XSCOM_OCC_BASE        0x0066000
+>  #define PNV_XSCOM_OCC_SIZE        0x6000
+> =20
+> +#define PNV9_XSCOM_OCC_BASE       PNV_XSCOM_OCC_BASE
+> +#define PNV9_XSCOM_OCC_SIZE       0x8000
+> +
+>  #define PNV9_XSCOM_PSIHB_BASE     0x5012900
+>  #define PNV9_XSCOM_PSIHB_SIZE     0x100
+> =20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 6ae9ce679505..1559a733235b 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -956,6 +956,11 @@ static void pnv_chip_power9_instance_init(Object *ob=
+j)
+>                              TYPE_PNV9_LPC, &error_abort, NULL);
+>      object_property_add_const_link(OBJECT(&chip9->lpc), "psi",
+>                                     OBJECT(&chip9->psi), &error_abort);
+> +
+> +    object_initialize_child(obj, "occ",  &chip9->occ, sizeof(chip9->occ),
+> +                            TYPE_PNV9_OCC, &error_abort, NULL);
+> +    object_property_add_const_link(OBJECT(&chip9->occ), "psi",
+> +                                   OBJECT(&chip9->psi), &error_abort);
+>  }
+> =20
+>  static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+> @@ -1012,6 +1017,14 @@ static void pnv_chip_power9_realize(DeviceState *d=
+ev, Error **errp)
+> =20
+>      chip->dt_isa_nodename =3D g_strdup_printf("/lpcm-opb@%" PRIx64 "/lpc=
+@0",
+>                                              (uint64_t) PNV9_LPCM_BASE(ch=
+ip));
+> +
+> +    /* Create the simplified OCC model */
+> +    object_property_set_bool(OBJECT(&chip9->occ), true, "realized", &loc=
+al_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    pnv_xscom_add_subregion(chip, PNV9_XSCOM_OCC_BASE, &chip9->occ.xscom=
+_regs);
+>  }
+> =20
+>  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+> diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
+> index ea725647c988..fdd9296e1bc7 100644
+> --- a/hw/ppc/pnv_occ.c
+> +++ b/hw/ppc/pnv_occ.c
+> @@ -109,6 +109,77 @@ static const TypeInfo pnv_occ_power8_type_info =3D {
+>      .class_init    =3D pnv_occ_power8_class_init,
+>  };
+> =20
+> +#define P9_OCB_OCI_OCCMISC              0x6080
+> +#define P9_OCB_OCI_OCCMISC_CLEAR        0x6081
+> +#define P9_OCB_OCI_OCCMISC_OR           0x6082
+> +
+> +
+> +static uint64_t pnv_occ_power9_xscom_read(void *opaque, hwaddr addr,
+> +                                          unsigned size)
+> +{
+> +    PnvOCC *occ =3D PNV_OCC(opaque);
+> +    uint32_t offset =3D addr >> 3;
+> +    uint64_t val =3D 0;
+> +
+> +    switch (offset) {
+> +    case P9_OCB_OCI_OCCMISC:
+> +        val =3D occ->occmisc;
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_UNIMP, "OCC Unimplemented register: Ox%"
+> +                      HWADDR_PRIx "\n", addr >> 3);
+> +    }
+> +    return val;
+> +}
+> +
+> +static void pnv_occ_power9_xscom_write(void *opaque, hwaddr addr,
+> +                                       uint64_t val, unsigned size)
+> +{
+> +    PnvOCC *occ =3D PNV_OCC(opaque);
+> +    uint32_t offset =3D addr >> 3;
+> +
+> +    switch (offset) {
+> +    case P9_OCB_OCI_OCCMISC_CLEAR:
+> +        pnv_occ_set_misc(occ, 0);
+> +        break;
+> +    case P9_OCB_OCI_OCCMISC_OR:
+> +        pnv_occ_set_misc(occ, occ->occmisc | val);
+> +        break;
+> +    case P9_OCB_OCI_OCCMISC:
+> +        pnv_occ_set_misc(occ, val);
+> +       break;
+> +    default:
+> +        qemu_log_mask(LOG_UNIMP, "OCC Unimplemented register: Ox%"
+> +                      HWADDR_PRIx "\n", addr >> 3);
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps pnv_occ_power9_xscom_ops =3D {
+> +    .read =3D pnv_occ_power9_xscom_read,
+> +    .write =3D pnv_occ_power9_xscom_write,
+> +    .valid.min_access_size =3D 8,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 8,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static void pnv_occ_power9_class_init(ObjectClass *klass, void *data)
+> +{
+> +    PnvOCCClass *poc =3D PNV_OCC_CLASS(klass);
+> +
+> +    poc->xscom_size =3D PNV9_XSCOM_OCC_SIZE;
+> +    poc->xscom_ops =3D &pnv_occ_power9_xscom_ops;
+> +    poc->psi_irq =3D PSIHB9_IRQ_OCC;
+> +}
+> +
+> +static const TypeInfo pnv_occ_power9_type_info =3D {
+> +    .name          =3D TYPE_PNV9_OCC,
+> +    .parent        =3D TYPE_PNV_OCC,
+> +    .instance_size =3D sizeof(PnvOCC),
+> +    .class_init    =3D pnv_occ_power9_class_init,
+> +};
+> +
+>  static void pnv_occ_realize(DeviceState *dev, Error **errp)
+>  {
+>      PnvOCC *occ =3D PNV_OCC(dev);
+> @@ -152,6 +223,7 @@ static void pnv_occ_register_types(void)
+>  {
+>      type_register_static(&pnv_occ_type_info);
+>      type_register_static(&pnv_occ_power8_type_info);
+> +    type_register_static(&pnv_occ_power9_type_info);
+>  }
+> =20
+>  type_init(pnv_occ_register_types);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -200,24 +228,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qZVVwWJgpX9Jzs7f
+--iIq+KTIB+xWY0FJy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyBtPgACgkQbDjKyiDZ
-s5JthBAAggXa+xcX6dgmKWux6w7WESruZxyBU5weXEmvT8safeHf99uxJZ4iSN3f
-wQ0NY1NaMDfKC362UnAWiX7M8OTlkIyMdgPxMuTNvnvdGWn4St0RfvSRDWbetHnk
-GTnd5HJ5lNy++uJpMQKUeRs4U/BeKujGYeyRx9E73rPGeoi6W3bwRnwwTbYkA+a7
-cQQfwPDTPj98h9l8sKGVxo3xKHftrg4gfTEOK5uP8FLBBoCM2hVWZiMpycNsmz1Z
-/sGYjlAmD/2z2eIJxLGsDha3Mf9Kmn/NORUSsATAscHOn8qXTaR2bmirkz/Ysj6U
-ALPiCdxBtL2IBjRlWdSCVnbA2eHE0MQ6OJghkruboapf9vkQ94csT6Xkj6yjnNb6
-oiFWYmV9kF0jWBmY+htA55L2miLibQBRukRWsg1VvdSDQUIs1oB09Rfi9AJogfhZ
-xi5/DYqrsW0n2JBOh+BwojXnGwwfohiXciK4jMmd/SDLP5I4XuHCYLJHZztC5Iny
-Almlii6lMA7bwj4oMsbrwRBY1kwCPQkZ3gXDrEdJ+fjW8OEdI9GDPizf3CZfPFH9
-e7+5ihM0I/uJD1UJnRLpx9otFNKU6RVsG5Wd0IhyVS6tfapRFl7GoxppdEo55/2/
-qgZZy+SsF9m/IfdTaTCgxYTrBJjv1zY2eDcnj2H+Eb2Oavm2NK0=
-=biqf
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyBt5QACgkQbDjKyiDZ
+s5KeRA/+IuWHMWjO0+SFRZSH5a31NekcitytQm4XlAuwEnSBj+YPFI8/+bq8TMUl
++Y3/2BE8+An4jFJPad3sRf3T2w0FVDxVJ8Sy2MZHbJ9HK7WlMSLM/SCMPIh+i1Fy
+1QRO81UwwvSUr9rX74xkdsJO309vFqgNPAIV84057a+SQSxvDh9X3A4YfkeWHHUX
+qQWhAZPFTITXXldhdOswT/2Ytgk4Ra/HUcaBCjQUlBnjqoFHU/az9rJRJFJYYFbz
+Q26BnsuEVGo2mmSLxzbVbGZ8hxCWVJFrEUj7+rrmB+LH0SopRHTG1E123z1VBG/z
+jGinI3qEJE32cSsYFYpEl36eV2AFgBUgquIaLnHrf8f550s/aEnlAAZFZmTYyNzu
+fLsOQ7I2wkonqXn5txCCgm6XDecIkFA8EslD80IOSY38qKxjyWB34V/4Gh6vANu1
+MtW8+wqnEz/iId6xM7bYFoOgT9xUh4OniMQOUFb8ISdvFUvMnh9SJjiukzbKNQvD
+dKJDb5FcHIi2Wl6cNRk/iy1uXfc3oUyyrG4K5WbMmAtE5xV5vgB3aNsEjQOucNbo
+wBssdl3O9UCYKWarPD6S4t5PhvlnixhCRMst8Da2VFxGMr1YQf3jdlPc7FqarzJ1
+6EikVkE5DBtNipN0Jjl6zU09QOibxirnyYWYZypobajKqmLssQk=
+=LQUA
 -----END PGP SIGNATURE-----
 
---qZVVwWJgpX9Jzs7f--
+--iIq+KTIB+xWY0FJy--
