@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44777)
+Received: from eggs.gnu.org ([209.51.188.92]:44775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2M7E-0000nQ-WB
+	(envelope-from <jsnow@redhat.com>) id 1h2M7E-0000nP-W3
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2M7B-0006ot-E4
+	(envelope-from <jsnow@redhat.com>) id 1h2M7B-0006ov-E5
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44850)
+Received: from mx1.redhat.com ([209.132.183.28]:38295)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M78-0006l3-7g
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1h2M78-0006j9-A4
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:29:07 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri,  8 Mar 2019 15:28:45 -0500
-Message-Id: <20190308202858.26636-5-jsnow@redhat.com>
+Date: Fri,  8 Mar 2019 15:28:43 -0500
+Message-Id: <20190308202858.26636-3-jsnow@redhat.com>
 In-Reply-To: <20190308202858.26636-1-jsnow@redhat.com>
 References: <20190308202858.26636-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 04/17] block/dirty-bitmap: change semantics of
- enabled predicate
+Subject: [Qemu-devel] [PULL 02/17] block/dirty-bitmaps: rename frozen
+ predicate helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +27,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jsnow@redhat.com, peter.maydell@linaro.org
 
-Currently, the enabled predicate means something like:
-"the QAPI status of the bitmap is ACTIVE."
-After this patch, it should mean exclusively:
-"This bitmap is recording guest writes, and is allowed to do so."
+"Frozen" was a good description a long time ago, but it isn't adequate now.
+Rename the frozen predicate to has_successor to make the semantics of the
+predicate more clear to outside callers.
 
-In many places, this is how this predicate was already used.
-Internal usages of the bitmap QPI can call user_locked to find out if
-the bitmap is in use by an operation.
+In the process, remove some calls to frozen() that no longer semantically
+make sense. For bdrv_enable_dirty_bitmap_locked and
+bdrv_disable_dirty_bitmap_locked, it doesn't make sense to prohibit QEMU
+internals from performing this action when we only wished to prohibit QMP
+users from issuing these commands. All of the QMP API commands for bitmap
+manipulation already check against user_locked() to prohibit these actions.
 
-To accommodate this, modify the create_successor routine to now
-explicitly disable the parent bitmap at creation time.
-
-Justifications:
-
-1. bdrv_dirty_bitmap_status suffers no change from the lack of
-   1:1 parity with the new predicates because of the order in which
-   the predicates are checked. This is now only for compatibility.
-
-2. bdrv_set_dirty() is unchanged: pre-patch, it was skipping bitmaps that were
-   disabled or had a successor, while post-patch it is only skipping bitmaps
-   that are disabled. To accommodate this, create_successor now ensures that
-   any bitmap with a successor is explicitly disabled.
-
-3. qcow2_store_persistent_dirty_bitmaps: No functional change. This function
-   cares only about the literal enabled bit, and makes no effort to check if
-   the bitmap is in-use or not. After this patch there are still no ways to
-   produce an enabled bitmap with a successor.
-
-4. block_dirty_bitmap_enable_prepare
-   block_dirty_bitmap_disable_prepare
-   init_dirty_bitmap_migration
-   nbd_export_new
-
-   These functions care about the literal enabled bit,
-   and already check user_locked separately.
+Several other assertions really want to check that the bitmap isn't in-use
+by another operation -- use the bitmap_user_locked function for this instead,
+which presently also checks for has_successor. This leaves some redundant
+checks of has_successor through different helpers that are addressed in
+forthcoming patches.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190223000614.13894-5-jsnow@redhat.com
+Message-id: 20190223000614.13894-3-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ include/block/dirty-bitmap.h   |  2 +-
+ block/dirty-bitmap.c           | 34 +++++++++++++++++++---------------
+ migration/block-dirty-bitmap.c |  2 +-
+ 3 files changed, 21 insertions(+), 17 deletions(-)
 
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 04a117fc81..cdbb4dfefd 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -36,7 +36,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
+ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
+ uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
+-bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
++bool bdrv_dirty_bitmap_has_successor(BdrvDirtyBitmap *bitmap);
+ const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap);
+ int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap);
+ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap);
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index b2b32e0323..2e3192d86f 100644
+index 101383b3af..c8fa21b526 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -209,7 +209,7 @@ bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap)
- /* Called with BQL taken.  */
- bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
- {
--    return !(bitmap->disabled || bitmap->successor);
-+    return !bitmap->disabled;
+@@ -50,7 +50,7 @@ struct BdrvDirtyBitmap {
+     HBitmap *meta;              /* Meta dirty bitmap */
+     bool qmp_locked;            /* Bitmap is locked, it can't be modified
+                                    through QMP */
+-    BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
++    BdrvDirtyBitmap *successor; /* Anonymous child; implies user_locked state */
+     char *name;                 /* Optional non-empty unique ID */
+     int64_t size;               /* Size of the bitmap, in bytes */
+     bool disabled;              /* Bitmap is disabled. It ignores all writes to
+@@ -183,14 +183,14 @@ const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap)
  }
  
  /* Called with BQL taken.  */
-@@ -236,6 +236,7 @@ static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
+-bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap)
++bool bdrv_dirty_bitmap_has_successor(BdrvDirtyBitmap *bitmap)
+ {
+     return bitmap->successor;
+ }
+ 
+ /* Both conditions disallow user-modification via QMP. */
+ bool bdrv_dirty_bitmap_user_locked(BdrvDirtyBitmap *bitmap) {
+-    return bdrv_dirty_bitmap_frozen(bitmap) ||
++    return bdrv_dirty_bitmap_has_successor(bitmap) ||
+            bdrv_dirty_bitmap_qmp_locked(bitmap);
+ }
+ 
+@@ -215,7 +215,7 @@ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
+ /* Called with BQL taken.  */
+ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
+ {
+-    if (bdrv_dirty_bitmap_frozen(bitmap)) {
++    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
+         return DIRTY_BITMAP_STATUS_FROZEN;
+     } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
+         return DIRTY_BITMAP_STATUS_LOCKED;
+@@ -235,7 +235,7 @@ static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
+ 
  /**
   * Create a successor bitmap destined to replace this bitmap after an operation.
-  * Requires that the bitmap is not user_locked and has no successor.
-+ * The successor will be enabled if the parent bitmap was.
+- * Requires that the bitmap is not frozen and has no successor.
++ * Requires that the bitmap is not user_locked and has no successor.
   * Called with BQL taken.
   */
  int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
-@@ -264,6 +265,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+@@ -244,12 +244,16 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+     uint64_t granularity;
+     BdrvDirtyBitmap *child;
  
-     /* Successor will be on or off based on our current state. */
-     child->disabled = bitmap->disabled;
-+    bitmap->disabled = true;
+-    if (bdrv_dirty_bitmap_frozen(bitmap)) {
+-        error_setg(errp, "Cannot create a successor for a bitmap that is "
+-                   "currently frozen");
++    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
++        error_setg(errp, "Cannot create a successor for a bitmap that is in-use "
++                   "by an operation");
++        return -1;
++    }
++    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
++        error_setg(errp, "Cannot create a successor for a bitmap that already "
++                   "has one");
+         return -1;
+     }
+-    assert(!bitmap->successor);
  
-     /* Install the successor and freeze the parent */
-     bitmap->successor = child;
-@@ -329,7 +331,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+     /* Create an anonymous successor */
+     granularity = bdrv_dirty_bitmap_granularity(bitmap);
+@@ -268,7 +272,6 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+ 
+ void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
+ {
+-    assert(!bdrv_dirty_bitmap_frozen(bitmap));
+     bitmap->disabled = false;
+ }
+ 
+@@ -285,7 +288,8 @@ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
+ static void bdrv_release_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
+ {
+     assert(!bitmap->active_iterators);
+-    assert(!bdrv_dirty_bitmap_frozen(bitmap));
++    assert(!bdrv_dirty_bitmap_user_locked(bitmap));
++    assert(!bdrv_dirty_bitmap_has_successor(bitmap));
+     assert(!bitmap->meta);
+     QLIST_REMOVE(bitmap, list);
+     hbitmap_free(bitmap->bitmap);
+@@ -325,7 +329,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
  /**
   * In cases of failure where we can no longer safely delete the parent,
   * we may wish to re-join the parent and child/successor.
-- * The merged parent will not be user_locked, nor explicitly re-enabled.
-+ * The merged parent will not be user_locked.
-+ * The marged parent will be enabled if and only if the successor was enabled.
+- * The merged parent will be un-frozen, but not explicitly re-enabled.
++ * The merged parent will not be user_locked, nor explicitly re-enabled.
   * Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.
   */
  BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-@@ -347,6 +350,8 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-         error_setg(errp, "Merging of parent and successor bitmap failed");
-         return NULL;
-     }
-+
-+    parent->disabled = successor->disabled;
-     bdrv_release_dirty_bitmap_locked(successor);
-     parent->successor = NULL;
+@@ -373,7 +377,8 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
  
+     bdrv_dirty_bitmaps_lock(bs);
+     QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
+-        assert(!bdrv_dirty_bitmap_frozen(bitmap));
++        assert(!bdrv_dirty_bitmap_user_locked(bitmap));
++        assert(!bdrv_dirty_bitmap_has_successor(bitmap));
+         assert(!bitmap->active_iterators);
+         hbitmap_truncate(bitmap->bitmap, bytes);
+         bitmap->size = bytes;
+@@ -391,7 +396,7 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+ 
+ /**
+  * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
+- * There must not be any frozen bitmaps attached.
++ * There must not be any user_locked bitmaps attached.
+  * This function does not remove persistent bitmaps from the storage.
+  * Called with BQL taken.
+  */
+@@ -428,7 +433,6 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+     bdrv_dirty_bitmap_lock(bitmap);
+-    assert(!bdrv_dirty_bitmap_frozen(bitmap));
+     bitmap->disabled = true;
+     bdrv_dirty_bitmap_unlock(bitmap);
+ }
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+index 6426151e4f..ac6954142f 100644
+--- a/migration/block-dirty-bitmap.c
++++ b/migration/block-dirty-bitmap.c
+@@ -542,7 +542,7 @@ static void dirty_bitmap_load_complete(QEMUFile *f, DirtyBitmapLoadState *s)
+         }
+     }
+ 
+-    if (bdrv_dirty_bitmap_frozen(s->bitmap)) {
++    if (bdrv_dirty_bitmap_has_successor(s->bitmap)) {
+         bdrv_dirty_bitmap_lock(s->bitmap);
+         if (enabled_bitmaps == NULL) {
+             /* in postcopy */
 -- 
 2.17.2
