@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46861)
+Received: from eggs.gnu.org ([209.51.188.92]:46885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h27fq-0002Sw-DA
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 00:03:59 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h27fs-0002T7-D5
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 00:04:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h27fp-0002l5-8f
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 00:03:58 -0500
-Date: Fri, 8 Mar 2019 15:34:56 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1h27fr-0002rT-F0
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 00:04:00 -0500
+Date: Fri, 8 Mar 2019 15:39:11 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190308043456.GU7722@umbus.fritz.box>
-References: <20190307050518.64968-1-aik@ozlabs.ru>
-	<20190307050518.64968-4-aik@ozlabs.ru>
-	<20190307150232.7384b7ce@w520.home>
+Message-ID: <20190308043911.GV7722@umbus.fritz.box>
+References: <20190226193408.23862-1-armbru@redhat.com>
+	<20190226193408.23862-8-armbru@redhat.com>
+	<87va15lds9.fsf@zen.linaroharston>
+	<87tvgfuq0g.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ePFeKdkqS71SfxAJ"
+	protocol="application/pgp-signature"; boundary="t0wvWpvf5IekHbuL"
 Content-Disposition: inline
-In-Reply-To: <20190307150232.7384b7ce@w520.home>
-Subject: Re: [Qemu-devel] [PATCH qemu v4 3/3] spapr: Support NVIDIA V100 GPU
- with NVLink2
+In-Reply-To: <87tvgfuq0g.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2 07/11] ppc405_boards: Don't size flash
+ memory to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Gavin Shan <gwshan@linux.vnet.ibm.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
 
---ePFeKdkqS71SfxAJ
-Content-Type: text/plain; charset=us-ascii
+--t0wvWpvf5IekHbuL
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 07, 2019 at 03:02:32PM -0700, Alex Williamson wrote:
-> On Thu,  7 Mar 2019 16:05:18 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> > index 40a12001f580..15ec0b4c2723 100644
-> > --- a/hw/vfio/pci-quirks.c
-> > +++ b/hw/vfio/pci-quirks.c
-> > @@ -2180,3 +2180,123 @@ int vfio_add_virt_caps(VFIOPCIDevice *vdev, Err=
-or **errp)
-> > =20
-> >      return 0;
-> >  }
-> > +
-> > +static void vfio_pci_nvlink2_get_tgt(Object *obj, Visitor *v,
-> > +                                     const char *name,
-> > +                                     void *opaque, Error **errp)
-> > +{
-> > +    uint64_t tgt =3D (uint64_t) opaque;
-> > +    visit_type_uint64(v, name, &tgt, errp);
-> > +}
-> > +
-> > +static void vfio_pci_nvlink2_get_link_speed(Object *obj, Visitor *v,
-> > +                                                 const char *name,
-> > +                                                 void *opaque, Error *=
-*errp)
-> > +{
-> > +    uint32_t link_speed =3D (uint32_t)(uint64_t) opaque;
-> > +    visit_type_uint32(v, name, &link_speed, errp);
-> > +}
-> > +
-> > +int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp)
-> > +{
-> > +    int ret;
-> > +    void *p;
-> > +    struct vfio_region_info *nv2region =3D NULL;
-> > +    struct vfio_info_cap_header *hdr;
-> > +    MemoryRegion *nv2mr =3D g_malloc0(sizeof(*nv2mr));
+On Thu, Mar 07, 2019 at 08:01:35AM +0100, Markus Armbruster wrote:
+> Alex Benn=E9e <alex.bennee@linaro.org> writes:
 >=20
-> This is leaked in the below error paths and there's no cleanup on
-> finalize.  I assume these devices don't support hotplug, but they could
-> at least use the existing quirk infrastructure so as not to set a bad
-> precedent.=20
+> > Markus Armbruster <armbru@redhat.com> writes:
+> >
+> >> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+> >> Image size is rounded up to the next multiple of 64KiB.  Useless,
+> >> because pflash_cfi02_realize() fails with "failed to read the initial
+> >> flash content" unless the rounding is a no-op.
+> >>
+> >> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+> >> other stuff.  No idea how that would play out, but a useful outcomes
+> >> seem unlikely.
+> >>
+> >> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+> >> regardless of image size, to match the physical hardware.
+> >>
+> >> Machine "taihu" maps its boot flash memory similarly.  The code even
+> >> has a comment /* XXX: should check that size is 2MB */, followed by
+> >> disabled code to adjust the size to 2MiB regardless of image size.
+> >>
+> >> Its code to map its application flash memory looks the same, except
+> >> there the XXX comment asks for 32MiB, and the code to adjust the size
+> >> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+> >> to read the initial flash content" for images smaller than 32MiB.
+> >>
+> >> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+> >> to match the physical hardware.  Delete dead code from application
+> >> flash mapping, and simplify some.
+> >
+> > It seems to me the DEBUG_BOARD_INIT code is probably out of date cruft
+> > that could be excised all together. But that doesn't stop this being
+> > useful:
 >=20
-> > +
-> > +    ret =3D vfio_get_dev_region_info(&vdev->vbasedev,
-> > +                                   VFIO_REGION_TYPE_PCI_VENDOR_TYPE |
-> > +                                   PCI_VENDOR_ID_NVIDIA,
-> > +                                   VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_=
-RAM,
-> > +                                   &nv2region);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    p =3D mmap(NULL, nv2region->size, PROT_READ | PROT_WRITE | PROT_EX=
-EC,
-> > +             MAP_SHARED, vdev->vbasedev.fd, nv2region->offset);
-> > +
-> > +    if (!p) {
-> > +        return -errno;
-> > +    }
->=20
-> I think the above suggestion requires simply defining a quirk above:
->=20
-> VFIOQuirk *quirk;
->=20
-> Initializing it with one MemoryRegion here:
->=20
-> quirk =3D vfio_quirk_alloc(1);
->=20
-> > +
-> > +    memory_region_init_ram_ptr(nv2mr, OBJECT(vdev), "nvlink2-mr",
->=20
-> s/nv2mr/quirk->mem/
->=20
-> > +                               nv2region->size, p);
->=20
-> Then adding it to the device, for instance assuming there's always a
-> BAR0, attach it there:
->=20
-> QLIST_INSERT_HEAD(&vdev->bars[0].quirks, quirk, next);
->=20
-> At least then it pretends to support cleanup.
+> David, would you like me to excise DEBUG_BOARD_INIT?
 
-This does simplify the cleanup of the extra MRs.  It is a bit odd to
-attach it specifically to a BAR that's not otherwise tied to these
-resources (both the NV2 memory and ATSD are special NVLink extensions,
-not attached to a PCI BAR).
-
+If you have the chance to look at it, that would be great.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -131,24 +80,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ePFeKdkqS71SfxAJ
+--t0wvWpvf5IekHbuL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyB8PAACgkQbDjKyiDZ
-s5Ialw//Zi3OlusQw5Xw0ud7c8GZ3OAfMYWRl4S3Z8XqNNXeuBjnWhG+unUS3ym5
-QSUXpRZCE5Vpb9H0hhFnbF7GYbmc1Cs5DJD2uxpOQvwyPWsn1PYw637mK5SxfNqk
-p3q9JZxplQ49engq9JSHVO9pO7NAqo2U/JAW5YuUULwEFzpwOfCjoQvfzh++jSRo
-TFdpAlILNqIrW/S37G61KtEr3bYHk/tRc4czaWLZrG32nAMzQlmTYRVKy05c1z49
-SVadP8sICbY1AKEdi8Jpb+bQZuhnK/6uM9Ecooij8athLP54N8jbOdIhIUIfHS49
-i8x/iaXs5iGMvlkRiGUTB7rAhRkCA1Rs1OzK3HDh6v0BsFewt1JclAeFBYooX7hK
-IiWloOS+XyhVyZkX4kaMMJzKkWiLiyP22GvHirdFWDqzyuDAp8HH4Myvu/gCdzJy
-8HRQtJee5EAZ7tOdd3V3SyZCEaRqCO/JR08fIuHZMSy3+Jk6OGUwoql1z5d127MW
-S5nYLqkRKI3VmxMOuod7BqIri42qGGFzHj9m9PmfvoFfU8lgkOMj2cXDMs1QxwF5
-qd3FxnwiW6ZGIlkgV0ei97XuwksXDa2bqYSzHXzgmlgg2o6PE8hk/+SztOTre8t2
-F89maTxRy80b4eAT8q7WHJ6R1kWCZFZg50SiNr794i1gXPJcSyY=
-=E34v
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyB8e8ACgkQbDjKyiDZ
+s5IfOg//XHAgad/iDnVxwgZK6tDdfoegGJOn7fUQicEA5xR20bbUQJTh2+0BV3GU
+KjL1bQAqGr0cbXgA2vFSkEXJZ8imEUn+vmCzN0kCbvovoAlHaR5qthslW9JcT5oq
+bvlIBZHBEcCq7AOWqlgnVPhcoDd3TJ6KbXhk/2oLv0nD8m01WxM/Eyu9eZ9wVG58
+odV3A1oVJ/v38FY7dIiaLIBRkc5l4g8/yYeTJ0WRRBqpB6erPYNwEj/LAjd82+vx
+zVaEugawvjpj0r6zVKzSylwrQxDi7eGmv8+K4a7yXld7iL+C3vd0P3vW6sh0G0h8
+2PSbtSyXYP7YuQdktGgrzB11tSQQLsFbwUmdU0kPp55LirlaNBos61LJvmPnJ/qo
+Xga8N0E8CY4bXP1+llQRfWOClvu0SWcXY87cAd9kWNT9MnXvQBRHQeDI1WfLH0p2
+g+Ju87TRtMKRGFIK0r0R28LVRkmO20GrtxJmcpKRDbFY0J15LCNGe5VnrY/+AMiq
+9NqQw4hhDBRFh5pa40NQTawdD5zWILnCBkiYv84D20RJnfsrVJ4razPH431FMh1k
+THLo/8rkHFGuVU10MJFXunDYpk6q7mPUIkPST8+WblmMH3ffeliIdPTO0RqViYUb
+N/aITJQi6PCP/+REAgcYHEqPfAgZzjdbunwikV0yIViSomALyJg=
+=2KQt
 -----END PGP SIGNATURE-----
 
---ePFeKdkqS71SfxAJ--
+--t0wvWpvf5IekHbuL--
