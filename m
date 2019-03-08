@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49373)
+Received: from eggs.gnu.org ([209.51.188.92]:49767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2MRs-0006Sk-3O
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:50:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1h2MTt-0007C6-4m
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:52:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2MRp-0003DB-Um
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:50:31 -0500
-Resent-Message-Id: <E1h2MRp-0003DB-Um@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21115)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h2MRm-00030R-Iw
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:50:29 -0500
-Message-ID: <155207820207.8146.10201840371109004667@6acff2cf482b>
-In-Reply-To: <20190308202858.26636-1-jsnow@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1h2MTs-00050D-Fe
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:52:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h2MTs-0004zW-4o
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:52:36 -0500
+References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8WZuAmNFQqCsvsN35UnFJk=sGcCJmF27v3SS++FnpXXQ@mail.gmail.com>
+	<150efd5f-dea0-93bd-c74c-6d012f4ab7d1@redhat.com>
+	<d8dd795b-1f4c-a802-e4ea-6cf06cdab5c6@redhat.com>
+	<6bd609b0-15e2-6a9e-2639-7904db417c0f@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ad46133c-d49a-32c8-b3e4-502df136abdc@redhat.com>
+Date: Fri, 8 Mar 2019 14:52:32 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 8 Mar 2019 12:50:03 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/17] Bitmaps patches
+In-Reply-To: <6bd609b0-15e2-6a9e-2639-7904db417c0f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Ei5gCp0txepSf2kzHrnqdlKVSYfkVoAO4"
+Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion,
+ excluding ARM and MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwODIwMjg1OC4yNjYz
-Ni0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwODIwMjg1OC4yNjYzNi0x
-LWpzbm93QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzE3XSBCaXRt
-YXBzIHBhdGNoZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
-di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAg
-IHBhdGNoZXcvMjAxOTAzMDgyMDI4NTguMjY2MzYtMS1qc25vd0ByZWRoYXQuY29tIC0+IHBhdGNo
-ZXcvMjAxOTAzMDgyMDI4NTguMjY2MzYtMS1qc25vd0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKM2Q1ZTcxOWNhNCBibG9jay9kaXJ0eS1iaXRtYXBzOiBpbXBsZW1l
-bnQgaW5jb25zaXN0ZW50IGJpdAo0NjU4MzFjZDU5IGJsb2NrL2RpcnR5LWJpdG1hcHM6IGRpc2Fs
-bG93IGJ1c3kgYml0bWFwcyBhcyBtZXJnZSBzb3VyY2UKMzE3ODA1NDVkZCBibG9jay9kaXJ0eS1i
-aXRtYXBzOiBwcm9oaWJpdCByZW1vdmluZyByZWFkb25seSBiaXRtYXBzCjc1NTllMzc0YTIgYmxv
-Y2svZGlydHktYml0bWFwczogcHJvaGliaXQgcmVhZG9ubHkgYml0bWFwcyBmb3IgYmFja3Vwcwph
-YTdkNjVmMmM3IGJsb2NrL2RpcnR5LWJpdG1hcHM6IGFkZCBibG9ja19kaXJ0eV9iaXRtYXBfY2hl
-Y2sgZnVuY3Rpb24KYzY4MGYzNGUxYSBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBpbmNvbnNpc3Rl
-bnQgc3RhdHVzCjE0NGZmMDliNGEgYmxvY2svZGlydHktYml0bWFwczogYWRkIGluY29uc2lzdGVu
-dCBiaXQKMzQwNGZiNGQzYyBpb3Rlc3RzOiBhZGQgYnVzeS9yZWNvcmRpbmcgYml0IHRlc3QgdG8g
-MTI0CmMxYWJlODRiYTAgYmxvY2tkZXY6IHJlbW92ZSB1bnVzZWQgcGFpbyBwYXJhbWV0ZXIgZG9j
-dW1lbnRhdGlvbgphOWNlYTA4ZGFlIGJsb2NrL2RpcnR5LWJpdG1hcHM6IG1vdmUgY29tbWVudCBi
-bG9jawowYzdjYjBhZmRhIGJsb2NrL2RpcnR5LWJpdG1hcHM6IHVuaWZ5IHFtcF9sb2NrZWQgYW5k
-IHVzZXJfbG9ja2VkIGNhbGxzCjA5NzgzOThmNjggYmxvY2svZGlydHktYml0bWFwOiBleHBsaWNp
-dGx5IGxvY2sgYml0bWFwcyB3aXRoIHN1Y2Nlc3NvcnMKMzU5YmFjNjdhYyBuYmQ6IGNoYW5nZSBl
-cnJvciBjaGVja2luZyBvcmRlciBmb3IgYml0bWFwcwowM2NhMjcyZGNmIGJsb2NrL2RpcnR5LWJp
-dG1hcDogY2hhbmdlIHNlbWFudGljcyBvZiBlbmFibGVkIHByZWRpY2F0ZQozOTc4OGM3MDEwIGJs
-b2NrL2RpcnR5LWJpdG1hcDogcmVtb3ZlIHNldC9yZXNldCBhc3NlcnRpb25zIGFnYWluc3QgZW5h
-YmxlZCBiaXQKOTUzZGNhNzg4ZSBibG9jay9kaXJ0eS1iaXRtYXBzOiByZW5hbWUgZnJvemVuIHBy
-ZWRpY2F0ZSBoZWxwZXIKYWQyMjZjZDAyZiBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCByZWNvcmRp
-bmcgYW5kIGJ1c3kgcHJvcGVydGllcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNyBDaGVja2lu
-ZyBjb21taXQgYWQyMjZjZDAyZjBkIChibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCByZWNvcmRpbmcg
-YW5kIGJ1c3kgcHJvcGVydGllcykKMi8xNyBDaGVja2luZyBjb21taXQgOTUzZGNhNzg4ZTAxIChi
-bG9jay9kaXJ0eS1iaXRtYXBzOiByZW5hbWUgZnJvemVuIHByZWRpY2F0ZSBoZWxwZXIpCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4NzogRklMRTogYmxvY2svZGlydHktYml0bWFw
-LmM6MjQ4OgorICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJDYW5ub3QgY3JlYXRlIGEgc3VjY2Vz
-c29yIGZvciBhIGJpdG1hcCB0aGF0IGlzIGluLXVzZSAiCgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDEyNCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCjMvMTcgQ2hlY2tpbmcgY29tbWl0IDM5Nzg4YzcwMTBkMiAoYmxvY2svZGlydHktYml0
-bWFwOiByZW1vdmUgc2V0L3Jlc2V0IGFzc2VydGlvbnMgYWdhaW5zdCBlbmFibGVkIGJpdCkKNC8x
-NyBDaGVja2luZyBjb21taXQgMDNjYTI3MmRjZmUyIChibG9jay9kaXJ0eS1iaXRtYXA6IGNoYW5n
-ZSBzZW1hbnRpY3Mgb2YgZW5hYmxlZCBwcmVkaWNhdGUpCjUvMTcgQ2hlY2tpbmcgY29tbWl0IDM1
-OWJhYzY3YWM0MCAobmJkOiBjaGFuZ2UgZXJyb3IgY2hlY2tpbmcgb3JkZXIgZm9yIGJpdG1hcHMp
-CjYvMTcgQ2hlY2tpbmcgY29tbWl0IDA5NzgzOThmNjg3OSAoYmxvY2svZGlydHktYml0bWFwOiBl
-eHBsaWNpdGx5IGxvY2sgYml0bWFwcyB3aXRoIHN1Y2Nlc3NvcnMpCjcvMTcgQ2hlY2tpbmcgY29t
-bWl0IDBjN2NiMGFmZGFmZiAoYmxvY2svZGlydHktYml0bWFwczogdW5pZnkgcW1wX2xvY2tlZCBh
-bmQgdXNlcl9sb2NrZWQgY2FsbHMpCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgZnVu
-Y3Rpb24gZGVjbGFyYXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUKIzM5OiBGSUxFOiBibG9jay9k
-aXJ0eS1iaXRtYXAuYzoxOTA6Citib29sIGJkcnZfZGlydHlfYml0bWFwX2J1c3koQmRydkRpcnR5
-Qml0bWFwICpiaXRtYXApIHsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjcxIGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDcvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjgvMTcgQ2hl
-Y2tpbmcgY29tbWl0IGE5Y2VhMDhkYWVlZCAoYmxvY2svZGlydHktYml0bWFwczogbW92ZSBjb21t
-ZW50IGJsb2NrKQo5LzE3IENoZWNraW5nIGNvbW1pdCBjMWFiZTg0YmEwMDQgKGJsb2NrZGV2OiBy
-ZW1vdmUgdW51c2VkIHBhaW8gcGFyYW1ldGVyIGRvY3VtZW50YXRpb24pCjEwLzE3IENoZWNraW5n
-IGNvbW1pdCAzNDA0ZmI0ZDNjYTcgKGlvdGVzdHM6IGFkZCBidXN5L3JlY29yZGluZyBiaXQgdGVz
-dCB0byAxMjQpCjExLzE3IENoZWNraW5nIGNvbW1pdCAxNDRmZjA5YjRhN2MgKGJsb2NrL2RpcnR5
-LWJpdG1hcHM6IGFkZCBpbmNvbnNpc3RlbnQgYml0KQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1
-c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjY6IEZJTEU6IGJsb2NrL2RpcnR5
-LWJpdG1hcC5jOjQ5OgorICAgIGJvb2wgaW5jb25zaXN0ZW50OyAgICAgICAgICAvKiBiaXRtYXAg
-aXMgcGVyc2lzdGVudCwgYnV0IGluY29uc2lzdGVudC4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRz
-IHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojMjg6IEZJTEU6IGJsb2NrL2Rp
-cnR5LWJpdG1hcC5jOjUxOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKiBhIFFN
-UCB1c2VyIGNhbiByZW1vdmUgaXQuICovCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDgy
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEy
-LzE3IENoZWNraW5nIGNvbW1pdCBjNjgwZjM0ZTFhZjUgKGJsb2NrL2RpcnR5LWJpdG1hcDogYWRk
-IGluY29uc2lzdGVudCBzdGF0dXMpCjEzLzE3IENoZWNraW5nIGNvbW1pdCBhYTdkNjVmMmM3MWYg
-KGJsb2NrL2RpcnR5LWJpdG1hcHM6IGFkZCBibG9ja19kaXJ0eV9iaXRtYXBfY2hlY2sgZnVuY3Rp
-b24pCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFyYXRpb25z
-IGdvIG9uIHRoZSBuZXh0IGxpbmUKIzM3OiBGSUxFOiBibG9jay9kaXJ0eS1iaXRtYXAuYzoxNzc6
-CitzdGF0aWMgYm9vbCBiZHJ2X2RpcnR5X2JpdG1hcF9idXN5KGNvbnN0IEJkcnZEaXJ0eUJpdG1h
-cCAqYml0bWFwKSB7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjg0OiBGSUxF
-OiBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFwLmM6MzA1OgorICAgICAgICAgICAgaWYgKGJk
-cnZfZGlydHlfYml0bWFwX2NoZWNrKGJpdG1hcCwgQkRSVl9CSVRNQVBfREVGQVVMVCwgJmxvY2Fs
-X2VycikpIHsKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMjM2IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDEzLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxNC8xNyBDaGVja2luZyBj
-b21taXQgNzU1OWUzNzRhMjJmIChibG9jay9kaXJ0eS1iaXRtYXBzOiBwcm9oaWJpdCByZWFkb25s
-eSBiaXRtYXBzIGZvciBiYWNrdXBzKQoxNS8xNyBDaGVja2luZyBjb21taXQgMzE3ODA1NDVkZDA4
-IChibG9jay9kaXJ0eS1iaXRtYXBzOiBwcm9oaWJpdCByZW1vdmluZyByZWFkb25seSBiaXRtYXBz
-KQoxNi8xNyBDaGVja2luZyBjb21taXQgNDY1ODMxY2Q1OTVmIChibG9jay9kaXJ0eS1iaXRtYXBz
-OiBkaXNhbGxvdyBidXN5IGJpdG1hcHMgYXMgbWVyZ2Ugc291cmNlKQoxNy8xNyBDaGVja2luZyBj
-b21taXQgM2Q1ZTcxOWNhNDRhIChibG9jay9kaXJ0eS1iaXRtYXBzOiBpbXBsZW1lbnQgaW5jb25z
-aXN0ZW50IGJpdCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTAzMDgyMDI4NTguMjY2MzYtMS1qc25vd0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hl
-Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ei5gCp0txepSf2kzHrnqdlKVSYfkVoAO4
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <ad46133c-d49a-32c8-b3e4-502df136abdc@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 00/54] Kconfig conversion, excluding ARM and
+ MIPS
+References: <1551723614-1823-1-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA8WZuAmNFQqCsvsN35UnFJk=sGcCJmF27v3SS++FnpXXQ@mail.gmail.com>
+ <150efd5f-dea0-93bd-c74c-6d012f4ab7d1@redhat.com>
+ <d8dd795b-1f4c-a802-e4ea-6cf06cdab5c6@redhat.com>
+ <6bd609b0-15e2-6a9e-2639-7904db417c0f@redhat.com>
+In-Reply-To: <6bd609b0-15e2-6a9e-2639-7904db417c0f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 3/6/19 4:12 AM, Thomas Huth wrote:
+> On 05/03/2019 21.08, Eric Blake wrote:
+> [...]
+>> 'make distclean' is a heavy hammer, is there anything smaller in scope=
+
+>> that will fix the problem without nuking everything, such as a strateg=
+ic
+>> touch or rm of one particular file?
+>=20
+> Try this in the top-level folder of your build directory:
+>=20
+>  rm *.mak.d
+
+Worked here, thanks!
+
+>=20
+> ... not sure whether we can somehow integrate that into the Makefile
+> magic, though...
+
+I'm not sure either, nor did I want to spend time today trying.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--Ei5gCp0txepSf2kzHrnqdlKVSYfkVoAO4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyC1hAACgkQp6FrSiUn
+Q2qb8Af+OFLuDGyiWTON6dWI8RDUevVGjrQlor0MWgG8Ii7YMhcXzKcNNBQ2vEHZ
+rDo84pUcr/+28Sy2a7eAeqyzqwIzGNYJxWwUE8iYqXMPHcmkxMagW48FGXlu0PDO
+MU3dLxpxWX2s0xAWiX0NjERaCcPQEYBssDlFBccol3LIthp4kj3x5mA+PkI+acNL
+3aPRbe49Wu9U6DKAFxUafMtSNlLzPrH83Zt9DhLuRby9LUCRAVDDJHFpxdJPxKZm
+oS7eeqm1zEQAgfJpfX+9zQ2z+pAURLZ9cm1Sl6z47S5rbAg0qHz9fhF90mEipbt9
+tz2ALt/5s2LHb7xSEwYBoRZP9wvbnw==
+=5p+P
+-----END PGP SIGNATURE-----
+
+--Ei5gCp0txepSf2kzHrnqdlKVSYfkVoAO4--
