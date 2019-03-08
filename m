@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57108)
+Received: from eggs.gnu.org ([209.51.188.92]:57952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2Ga0-0001xg-L3
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:34:33 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2Gf1-0003tA-Ug
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:39:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2GZy-0004CW-Pt
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:34:31 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35826)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2GZy-00041m-HL
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:34:30 -0500
-Received: by mail-wm1-f65.google.com with SMTP id y15so12651076wma.0
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 06:34:30 -0800 (PST)
-References: <20190307130323.9353-1-armbru@redhat.com>
-	<20190307130323.9353-7-armbru@redhat.com>
-	<a8a862f1-1f1e-818a-2ac6-bd54375c4dc3@redhat.com>
-	<87wol9bfwm.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <27f8fd02-e697-e0a4-f409-4db68d085e20@redhat.com>
-Date: Fri, 8 Mar 2019 15:34:26 +0100
+	(envelope-from <armbru@redhat.com>) id 1h2Gf0-0001M0-3d
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 09:39:42 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190308131445.17502-1-armbru@redhat.com>
+	<20190308083958-mutt-send-email-mst@kernel.org>
+Date: Fri, 08 Mar 2019 15:39:26 +0100
+In-Reply-To: <20190308083958-mutt-send-email-mst@kernel.org> (Michael
+	S. Tsirkin's message of "Fri, 8 Mar 2019 08:41:29 -0500")
+Message-ID: <87o96lbfc1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87wol9bfwm.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/14] sam460ex: Don't size flash memory
- to match backing image
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] pc: Support firmware
+ configuration with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On 3/8/19 3:27 PM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
-> 
->> On 3/7/19 2:03 PM, Markus Armbruster wrote:
->>> Machine "sam460ex" maps its flash memory at address 0xFFF00000.  When
->>> no image is supplied, its size is 1MiB (0x100000), and 512KiB of ROM
->>> get mapped on top of its second half.  Else, it's the size of the
->>> image rounded up to the next multiple of 64KiB.
->>>
->>> The rounding is actually useless: pflash_cfi01_realize() fails with
->>> "failed to read the initial flash content" unless it's a no-op.
->>>
->>> I have no idea what happens when the pflash's size exceeds 1MiB.
->>> Useful outcomes seem unlikely.
->>
->> You now have! [*] "Hardwiring address lines leaves part of the hardware
->> unaddressable." Anything bigger than 1MiB mapped at 0xFFF00000 only has
->> the first MiB addressable. IOW anything above 1MiB is unaddressable, but
->> you still can map a such bigger flash.
->>
->> [*] https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg01380.html
-> 
-> Well, that's what would happen with real hardware.  But this device
-> model doesn't actually model address lines.  It simply asks
-> pflash_cfi01_register() to map blk_getlength() bytes at the base
-> address.  If you ask it to map gigabytes, it'll happily do so (as long
-> as malloc plays along).
+"Michael S. Tsirkin" <mst@redhat.com> writes:
 
-Ah, I misunderstood your commit message then. About the QEMU crippled
-model, your commit description makes sense. Thus:
+> On Fri, Mar 08, 2019 at 02:14:33PM +0100, Markus Armbruster wrote:
+>> Based-on: <20190308094610.21210-1-armbru@redhat.com>
+>>=20
+>> v3:
+>> * PATCH 05: Commit message tidied up [Philippe, L=C3=A1szl=C3=B3]
+>> * PATCH 06: Comment tidied up [checkpatch]
+>> * PATCH 12: Comment polish [L=C3=A1szl=C3=B3]
+>>=20
+>> v2:
+>> * PATCH 05,06: New [Philippe]
+>> * PATCH 07: Old PATCH 5 rebased onto new patches, with new comment
+>>   [Philippe]
+>> * PATCH 08+10: New, factored out of old PATCH 6 [by Philippe]
+>> * PATCH 09: New [by Philippe]
+>> * PATCH 11: Remainder of old PATCH 6, with FIXME resolved, literal
+>>   4096 de-duplicated [L=C3=A1szl=C3=B3], extraneous error check deleted
+>>   [L=C3=A1szl=C3=B3], and comment typos fixed
+>> * PATCH 12: New
+>>=20
+>> Markus Armbruster (9):
+>>   qdev: Fix latent bug with compat_props and onboard devices
+>>   qom: Move compat_props machinery from qdev to QOM
+>>   vl: Fix latent bug with -global and onboard devices
+>>   sysbus: Fix latent bug with onboard devices
+>>   vl: Improve legibility of BlockdevOptions queue
+>>   vl: Factor configure_blockdev() out of main()
+>>   vl: Create block backends before setting machine properties
+>>   pc: Support firmware configuration with -blockdev
+>>   docs/interop/firmware.json: Prefer -machine to if=3Dpflash
+>>=20
+>> Philippe Mathieu-Daud=C3=A9 (3):
+>>   pflash_cfi01: Add pflash_cfi01_get_blk() helper
+>>   pc_sysfw: Remove unused PcSysFwDevice
+>>   pc_sysfw: Pass PCMachineState to pc_system_firmware_init()
+>
+> OK looks good to me.
+>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Thanks!
+
+> Paolo will you be merging this?
+
+Alternatively, I can do the pull request myself.  Paolo, would you like
+me to?
