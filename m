@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48913)
+Received: from eggs.gnu.org ([209.51.188.92]:50240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h2EVF-0005Sx-RV
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:21:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2Ece-0007Cf-7N
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:29:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h2EVE-0002mu-20
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:21:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44680)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h2EVD-0002iF-RY
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:21:27 -0500
-Date: Fri, 8 Mar 2019 12:21:18 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190308122118.GF19819@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<87r2bigarf.fsf@zen.linaroharston>
-	<a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
-	<CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
-	<62408d6c-5a61-ffb2-f810-6ef36703b277@redhat.com>
-	<CAMxuvaxeAdZKk_CQOyqCJdd_1kVZEBPCm0LRoP2u9aijOtbDxg@mail.gmail.com>
-	<c0e04289-3373-3a56-b367-0d6033c52789@redhat.com>
-	<81f2035b-f584-f9b7-e6af-4754707b2f17@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1h2Eca-0003W9-Rk
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:29:07 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190308062455.29755-1-armbru@redhat.com>
+	<481d398a-e26c-6c0a-20b7-7466ae1ebf1f@redhat.com>
+Date: Fri, 08 Mar 2019 13:28:54 +0100
+In-Reply-To: <481d398a-e26c-6c0a-20b7-7466ae1ebf1f@redhat.com> (Laszlo Ersek's
+	message of "Fri, 8 Mar 2019 12:47:52 +0100")
+Message-ID: <875zsteeih.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <81f2035b-f584-f9b7-e6af-4754707b2f17@redhat.com>
-Subject: Re: [Qemu-devel] converting build system to Meson?
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7] pflash: Require backend size to match
+ device, improve errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +25,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, philmd@redhat.com, alex.bennee@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Thu, Mar 07, 2019 at 01:24:07PM -0600, Eric Blake wrote:
-> On 3/7/19 1:04 PM, Eric Blake wrote:
-> 
-> > I don't mind a switch to mandatory out-of-tree builds (I like the
-> > convenience of in-tree for quick hacks, but VPATH is infinitely more
-> > flexible when testing multiple build configurations in parallel, and
-> > I've worked on other projects with mandatory VPATH builds without seeing
-> > too many complaints there).
-> 
-> I will add: The GNU Coding Standards require both in-tree and
-> out-of-tree builds to work (and you get that with Autotool'd projects).
+Laszlo Ersek <lersek@redhat.com> writes:
 
-You only get it with autotools if you are good at writing Makefile.ams :-)
-libvirt frequently breaks VPATH by accident when using autotools by
-missing $(srcdir) prefixes on paths.
+> On 03/08/19 07:24, Markus Armbruster wrote:
+>> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>=20
+>> We reject undersized backends with a rather enigmatic "failed to read
+>> the initial flash content" error.
+>>=20
+>> We happily accept oversized images, ignoring their tail.  Throwing
+>> away parts of firmware that way is pretty much certain to end in an
+>> even more enigmatic failure to boot.
+>>=20
+>> Require the backend's size to match the device's size exactly.  Report
+>> mismatch as "device requires N bytes, block backend 'NAME' provides M
+>> bytes".
+>>=20
+>> Improve the error for actual read failures to "can't read initial
+>> flash content from block backend 'NAME'.
+>>=20
+>> We disabled code to limit device sizes to 8, 16, 32 or 64MiB more than
+>> a decade ago in commit 95d1f3edd5e and c8b153d7949, v0.9.1.  Bury.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  hw/block/pflash_cfi01.c | 31 ++++++++++++++++++++++---------
+>>  hw/block/pflash_cfi02.c | 31 +++++++++++++++++++++++--------
+>>  2 files changed, 45 insertions(+), 17 deletions(-)
+>>=20
+>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+>> index 9d1c356eb6..2e3a05c0b3 100644
+>> --- a/hw/block/pflash_cfi01.c
+>> +++ b/hw/block/pflash_cfi01.c
+>> @@ -730,13 +730,6 @@ static void pflash_cfi01_realize(DeviceState *dev, =
+Error **errp)
+>>      }
+>>      device_len =3D sector_len_per_device * blocks_per_device;
+>>=20=20
+>> -    /* XXX: to be fixed */
+>> -#if 0
+>> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 *=
+ 1024) &&
+>> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 =
+* 1024))
+>> -        return NULL;
+>> -#endif
+>> -
+>>      memory_region_init_rom_device(
+>>          &pfl->mem, OBJECT(dev),
+>>          &pflash_cfi01_ops,
+>> @@ -763,12 +756,32 @@ static void pflash_cfi01_realize(DeviceState *dev,=
+ Error **errp)
+>>      }
+>>=20=20
+>>      if (pfl->blk) {
+>> +        /*
+>> +         * Validate the backing store is the right size for pflash
+>> +         * devices. If the user supplies a larger file we ignore the
+>> +         * tail.
+>> +         */
+>> +        int64_t backing_len =3D blk_getlength(pfl->blk);
+>> +
+>> +        if (backing_len < 0) {
+>> +            error_setg(errp, "can't get size of block backend '%s'",
+>> +                       blk_name(pfl->blk));
+>> +            return;
+>> +        }
+>> +        if (backing_len !=3D total_len) {
+>> +            error_setg(errp, "device requires %" PRIu64 " bytes, "
+>> +                       "block backend '%s' provides %" PRIu64 " bytes",
+>> +                       total_len, blk_name(pfl->blk), backing_len);
+>> +            return;
+>> +        }
+>> +
+>>          /* read the initial flash content */
+>>          ret =3D blk_pread(pfl->blk, 0, pfl->storage, total_len);
+>> -
+>>          if (ret < 0) {
+>>              vmstate_unregister_ram(&pfl->mem, DEVICE(pfl));
+>> -            error_setg(errp, "failed to read the initial flash content"=
+);
+>> +            error_setg(errp, "can't read initial flash content"
+>> +                       " from block backend '%s'",
+>> +                       blk_name(pfl->blk));
+>>              return;
+>>          }
+>>      }
+>> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+>> index 33779ce807..45b88d65d8 100644
+>> --- a/hw/block/pflash_cfi02.c
+>> +++ b/hw/block/pflash_cfi02.c
+>> @@ -550,12 +550,6 @@ static void pflash_cfi02_realize(DeviceState *dev, =
+Error **errp)
+>>      }
+>>=20=20
+>>      chip_len =3D pfl->sector_len * pfl->nb_blocs;
+>> -    /* XXX: to be fixed */
+>> -#if 0
+>> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 *=
+ 1024) &&
+>> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024 =
+* 1024))
+>> -        return NULL;
+>> -#endif
+>>=20=20
+>>      memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl), pfl->be ?
+>>                                    &pflash_cfi02_ops_be : &pflash_cfi02_=
+ops_le,
+>> @@ -581,11 +575,32 @@ static void pflash_cfi02_realize(DeviceState *dev,=
+ Error **errp)
+>>      }
+>>=20=20
+>>      if (pfl->blk) {
+>> +        /*
+>> +         * Validate the backing store is the right size for pflash
+>> +         * devices. If the user supplies a larger file we ignore the
+>> +         * tail.
+>> +         */
+>> +        int64_t backing_len =3D blk_getlength(pfl->blk);
+>> +
+>> +        if (backing_len < 0) {
+>> +            error_setg(errp, "can't get size of block backend '%s'",
+>> +                       blk_name(pfl->blk));
+>> +            return;
+>> +        }
+>> +        if (backing_len !=3D chip_len) {
+>> +            error_setg(errp, "device requires %" PRIu32 " bytes, "
+>> +                       "block backend '%s' provides %" PRIu64 " bytes",
+>> +                       chip_len, blk_name(pfl->blk), backing_len);
+>> +            return;
+>> +        }
+>> +
+>>          /* read the initial flash content */
+>>          ret =3D blk_pread(pfl->blk, 0, pfl->storage, chip_len);
+>>          if (ret < 0) {
+>> -            vmstate_unregister_ram(&pfl->orig_mem, DEVICE(pfl));
+>> -            error_setg(errp, "failed to read the initial flash content"=
+);
+>> +            vmstate_unregister_ram(&pfl->mem, DEVICE(pfl));
+>> +            error_setg(errp, "can't read initial flash content"
+>> +                       " from block backend '%s'",
+>> +                       blk_name(pfl->blk));
+>>              return;
+>>          }
+>>      }
+>>=20
+>
+> This one has got to be one of the longest bike-shedding sessions! :)
+>
+> I'm fine with this patch, but I could suggest two improvements.
+>
+> (1) When blk_getlength() fails, we could format the negative error code
+> returned by it into the error message.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I can do that.
+
+> (2) We could extract the common code to a new function in
+> "hw/block/block.c". (It says "Common code for block device models" on
+> the tin.)
+
+There's so much common code in these two files even before this patch...
+
+> I realize the vmstate_unregister_ram() rollbacks are not identical
+> between cfi01 and cfi02. However, that difference only draws my
+> attention to the fact that the unregister calls are not made on the
+> other error branches in this patch anyway!
+
+You're right, that needs fixing.
+
+> So we should have a common function like this:
+>
+> void pflash_cfi_read_initial_content(BlockBackend *blk, uint64_t size,
+>                                      void *buf, Error **errp)
+> {
+>     int64_t backing_len =3D blk_getlength(blk);
+>     int ret;
+>
+>     if (backing_len < 0) {
+>         error_setg(...);
+>         return;
+>     }
+>
+>     if (backing_len !=3D size) {
+>         error_setg(...);
+>         return;
+>     }
+>
+>     ret =3D blk_pread(blk, 0, buf, size);
+>     if (ret < 0) {
+>         error_setg(...);
+>     }
+> }
+>
+> And at the call sites, we can do
+>
+>     if (pfl->blk) {
+>         Error *local_err =3D NULL;
+>
+>         pflash_cfi_read_initial_content(pfl->blk,
+>                                         total_len OR chip_len,
+>                                         pfl->storage,
+>                                         &local_err);
+>         if (local_err) {
+>             error_propagate(errp, local_err);
+>             vmstate_unregister_ram(...); // as appropriate for cfiXX
+>             return;
+>         }
+>     }
+
+I'll give it a try for v8.  Thanks!
