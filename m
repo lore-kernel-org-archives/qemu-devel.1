@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47107)
+Received: from eggs.gnu.org ([209.51.188.92]:48891)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2OuW-0001Ff-My
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:28:18 -0500
+	id 1h2P7n-0003W1-6u
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:42:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2OuV-0000Ui-3Q
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:28:16 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34573)
+	id 1h2P7k-0002xN-Kb
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:41:57 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2OuU-0000RZ-LL
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:28:15 -0500
-Received: by mail-wr1-x443.google.com with SMTP id f14so23041821wrg.1
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 15:28:14 -0800 (PST)
+	id 1h2P7k-0002wW-BE
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:41:56 -0500
+Received: by mail-wm1-x342.google.com with SMTP id x10so13649946wmg.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 15:41:56 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20190307144126.31847-1-richard.henderson@linaro.org>
-	<20190307144126.31847-3-richard.henderson@linaro.org>
+	<20190307144126.31847-8-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7f43300d-a86e-f4ef-e250-46c864409b73@amsat.org>
-Date: Sat, 9 Mar 2019 00:28:11 +0100
+Message-ID: <2c32c0aa-cac8-365a-6b92-24c819bcb4e4@amsat.org>
+Date: Sat, 9 Mar 2019 00:41:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190307144126.31847-3-richard.henderson@linaro.org>
+In-Reply-To: <20190307144126.31847-8-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/9] tcg: Add INDEX_op_extract2_{i32,i64}
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 7/9] tcg/aarch64: Support
+ INDEX_op_extract2_{i32, i64}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,320 +39,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: david@redhat.com
 
-Hi Richard,
-
 On 3/7/19 3:41 PM, Richard Henderson wrote:
-> This will let backends implement the double-word shift operation.
-> 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  tcg/aarch64/tcg-target.h |  2 ++
->  tcg/arm/tcg-target.h     |  1 +
->  tcg/i386/tcg-target.h    |  2 ++
->  tcg/mips/tcg-target.h    |  2 ++
->  tcg/ppc/tcg-target.h     |  2 ++
->  tcg/riscv/tcg-target.h   |  2 ++
->  tcg/s390/tcg-target.h    |  2 ++
->  tcg/sparc/tcg-target.h   |  2 ++
->  tcg/tcg-opc.h            |  2 ++
->  tcg/tcg.h                |  1 +
->  tcg/tci/tcg-target.h     |  2 ++
->  tcg/optimize.c           | 10 ++++++++++
->  tcg/tcg-op.c             |  4 ++++
->  tcg/tcg.c                |  4 ++++
->  tcg/README               |  5 +++++
->  15 files changed, 43 insertions(+)
+>  tcg/aarch64/tcg-target.h     |  4 ++--
+>  tcg/aarch64/tcg-target.inc.c | 11 +++++++++++
+>  2 files changed, 13 insertions(+), 2 deletions(-)
 > 
 > diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-> index 2d93cf404e..6600a54a02 100644
+> index 6600a54a02..ce2bb1f90b 100644
 > --- a/tcg/aarch64/tcg-target.h
 > +++ b/tcg/aarch64/tcg-target.h
-> @@ -77,6 +77,7 @@ typedef enum {
+> @@ -77,7 +77,7 @@ typedef enum {
 >  #define TCG_TARGET_HAS_deposit_i32      1
 >  #define TCG_TARGET_HAS_extract_i32      1
 >  #define TCG_TARGET_HAS_sextract_i32     1
-> +#define TCG_TARGET_HAS_extract2_i32     0
+> -#define TCG_TARGET_HAS_extract2_i32     0
+> +#define TCG_TARGET_HAS_extract2_i32     1
 >  #define TCG_TARGET_HAS_movcond_i32      1
 >  #define TCG_TARGET_HAS_add2_i32         1
 >  #define TCG_TARGET_HAS_sub2_i32         1
-> @@ -113,6 +114,7 @@ typedef enum {
+> @@ -114,7 +114,7 @@ typedef enum {
 >  #define TCG_TARGET_HAS_deposit_i64      1
 >  #define TCG_TARGET_HAS_extract_i64      1
 >  #define TCG_TARGET_HAS_sextract_i64     1
-> +#define TCG_TARGET_HAS_extract2_i64     0
+> -#define TCG_TARGET_HAS_extract2_i64     0
+> +#define TCG_TARGET_HAS_extract2_i64     1
 >  #define TCG_TARGET_HAS_movcond_i64      1
 >  #define TCG_TARGET_HAS_add2_i64         1
 >  #define TCG_TARGET_HAS_sub2_i64         1
-> diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
-> index 16172f73a3..4ee6c98958 100644
-> --- a/tcg/arm/tcg-target.h
-> +++ b/tcg/arm/tcg-target.h
-> @@ -116,6 +116,7 @@ extern bool use_idiv_instructions;
->  #define TCG_TARGET_HAS_deposit_i32      use_armv7_instructions
->  #define TCG_TARGET_HAS_extract_i32      use_armv7_instructions
->  #define TCG_TARGET_HAS_sextract_i32     use_armv7_instructions
-> +#define TCG_TARGET_HAS_extract2_i32     0
->  #define TCG_TARGET_HAS_movcond_i32      1
->  #define TCG_TARGET_HAS_mulu2_i32        1
->  #define TCG_TARGET_HAS_muls2_i32        1
-> diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-> index 7995fe3eab..2c58eaa9ed 100644
-> --- a/tcg/i386/tcg-target.h
-> +++ b/tcg/i386/tcg-target.h
-> @@ -124,6 +124,7 @@ extern bool have_avx2;
->  #define TCG_TARGET_HAS_deposit_i32      1
->  #define TCG_TARGET_HAS_extract_i32      1
->  #define TCG_TARGET_HAS_sextract_i32     1
-> +#define TCG_TARGET_HAS_extract2_i32     0
->  #define TCG_TARGET_HAS_movcond_i32      1
->  #define TCG_TARGET_HAS_add2_i32         1
->  #define TCG_TARGET_HAS_sub2_i32         1
-> @@ -162,6 +163,7 @@ extern bool have_avx2;
->  #define TCG_TARGET_HAS_deposit_i64      1
->  #define TCG_TARGET_HAS_extract_i64      1
->  #define TCG_TARGET_HAS_sextract_i64     0
-> +#define TCG_TARGET_HAS_extract2_i64     0
->  #define TCG_TARGET_HAS_movcond_i64      1
->  #define TCG_TARGET_HAS_add2_i64         1
->  #define TCG_TARGET_HAS_sub2_i64         1
-> diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
-> index 5cb8672470..c6b091d849 100644
-> --- a/tcg/mips/tcg-target.h
-> +++ b/tcg/mips/tcg-target.h
-> @@ -162,6 +162,7 @@ extern bool use_mips32r2_instructions;
->  #define TCG_TARGET_HAS_deposit_i32      use_mips32r2_instructions
->  #define TCG_TARGET_HAS_extract_i32      use_mips32r2_instructions
->  #define TCG_TARGET_HAS_sextract_i32     0
-> +#define TCG_TARGET_HAS_extract2_i32     0
->  #define TCG_TARGET_HAS_ext8s_i32        use_mips32r2_instructions
->  #define TCG_TARGET_HAS_ext16s_i32       use_mips32r2_instructions
->  #define TCG_TARGET_HAS_rot_i32          use_mips32r2_instructions
-> @@ -177,6 +178,7 @@ extern bool use_mips32r2_instructions;
->  #define TCG_TARGET_HAS_deposit_i64      use_mips32r2_instructions
->  #define TCG_TARGET_HAS_extract_i64      use_mips32r2_instructions
->  #define TCG_TARGET_HAS_sextract_i64     0
-> +#define TCG_TARGET_HAS_extract2_i64     0
->  #define TCG_TARGET_HAS_ext8s_i64        use_mips32r2_instructions
->  #define TCG_TARGET_HAS_ext16s_i64       use_mips32r2_instructions
->  #define TCG_TARGET_HAS_rot_i64          use_mips32r2_instructions
-> diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-> index 52c1bb04b1..7627fb62d3 100644
-> --- a/tcg/ppc/tcg-target.h
-> +++ b/tcg/ppc/tcg-target.h
-> @@ -77,6 +77,7 @@ extern bool have_isa_3_00;
->  #define TCG_TARGET_HAS_deposit_i32      1
->  #define TCG_TARGET_HAS_extract_i32      1
->  #define TCG_TARGET_HAS_sextract_i32     0
-> +#define TCG_TARGET_HAS_extract2_i32     0
->  #define TCG_TARGET_HAS_movcond_i32      1
->  #define TCG_TARGET_HAS_mulu2_i32        0
->  #define TCG_TARGET_HAS_muls2_i32        0
-> @@ -115,6 +116,7 @@ extern bool have_isa_3_00;
->  #define TCG_TARGET_HAS_deposit_i64      1
->  #define TCG_TARGET_HAS_extract_i64      1
->  #define TCG_TARGET_HAS_sextract_i64     0
-> +#define TCG_TARGET_HAS_extract2_i64     0
->  #define TCG_TARGET_HAS_movcond_i64      1
->  #define TCG_TARGET_HAS_add2_i64         1
->  #define TCG_TARGET_HAS_sub2_i64         1
-> diff --git a/tcg/riscv/tcg-target.h b/tcg/riscv/tcg-target.h
-> index 60918cacb4..032439d806 100644
-> --- a/tcg/riscv/tcg-target.h
-> +++ b/tcg/riscv/tcg-target.h
-> @@ -93,6 +93,7 @@ typedef enum {
->  #define TCG_TARGET_HAS_deposit_i32      0
->  #define TCG_TARGET_HAS_extract_i32      0
->  #define TCG_TARGET_HAS_sextract_i32     0
-> +#define TCG_TARGET_HAS_extract2_i32     0
->  #define TCG_TARGET_HAS_add2_i32         1
->  #define TCG_TARGET_HAS_sub2_i32         1
->  #define TCG_TARGET_HAS_mulu2_i32        0
-> @@ -128,6 +129,7 @@ typedef enum {
->  #define TCG_TARGET_HAS_deposit_i64      0
->  #define TCG_TARGET_HAS_extract_i64      0
->  #define TCG_TARGET_HAS_sextract_i64     0
-> +#define TCG_TARGET_HAS_extract2_i64     0
->  #define TCG_TARGET_HAS_extrl_i64_i32    1
->  #define TCG_TARGET_HAS_extrh_i64_i32    1
->  #define TCG_TARGET_HAS_ext8s_i64        1
-> diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-> index 853ed6e7aa..07accabbd1 100644
-> --- a/tcg/s390/tcg-target.h
-> +++ b/tcg/s390/tcg-target.h
-> @@ -85,6 +85,7 @@ extern uint64_t s390_facilities;
->  #define TCG_TARGET_HAS_deposit_i32    (s390_facilities & FACILITY_GEN_INST_EXT)
->  #define TCG_TARGET_HAS_extract_i32    (s390_facilities & FACILITY_GEN_INST_EXT)
->  #define TCG_TARGET_HAS_sextract_i32   0
-> +#define TCG_TARGET_HAS_extract2_i32   0
->  #define TCG_TARGET_HAS_movcond_i32    1
->  #define TCG_TARGET_HAS_add2_i32       1
->  #define TCG_TARGET_HAS_sub2_i32       1
-> @@ -121,6 +122,7 @@ extern uint64_t s390_facilities;
->  #define TCG_TARGET_HAS_deposit_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
->  #define TCG_TARGET_HAS_extract_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
->  #define TCG_TARGET_HAS_sextract_i64   0
-> +#define TCG_TARGET_HAS_extract2_i64   0
->  #define TCG_TARGET_HAS_movcond_i64    1
->  #define TCG_TARGET_HAS_add2_i64       1
->  #define TCG_TARGET_HAS_sub2_i64       1
-> diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
-> index a0ed2a3342..633841ebf2 100644
-> --- a/tcg/sparc/tcg-target.h
-> +++ b/tcg/sparc/tcg-target.h
-> @@ -116,6 +116,7 @@ extern bool use_vis3_instructions;
->  #define TCG_TARGET_HAS_deposit_i32      0
->  #define TCG_TARGET_HAS_extract_i32      0
->  #define TCG_TARGET_HAS_sextract_i32     0
-> +#define TCG_TARGET_HAS_extract2_i32     0
->  #define TCG_TARGET_HAS_movcond_i32      1
->  #define TCG_TARGET_HAS_add2_i32         1
->  #define TCG_TARGET_HAS_sub2_i32         1
-> @@ -153,6 +154,7 @@ extern bool use_vis3_instructions;
->  #define TCG_TARGET_HAS_deposit_i64      0
->  #define TCG_TARGET_HAS_extract_i64      0
->  #define TCG_TARGET_HAS_sextract_i64     0
-> +#define TCG_TARGET_HAS_extract2_i64     0
->  #define TCG_TARGET_HAS_movcond_i64      1
->  #define TCG_TARGET_HAS_add2_i64         1
->  #define TCG_TARGET_HAS_sub2_i64         1
-> diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
-> index 4e0238ad1a..1bad6e4208 100644
-> --- a/tcg/tcg-opc.h
-> +++ b/tcg/tcg-opc.h
-> @@ -79,6 +79,7 @@ DEF(rotr_i32, 1, 2, 0, IMPL(TCG_TARGET_HAS_rot_i32))
->  DEF(deposit_i32, 1, 2, 2, IMPL(TCG_TARGET_HAS_deposit_i32))
->  DEF(extract_i32, 1, 1, 2, IMPL(TCG_TARGET_HAS_extract_i32))
->  DEF(sextract_i32, 1, 1, 2, IMPL(TCG_TARGET_HAS_sextract_i32))
-> +DEF(extract2_i32, 1, 2, 1, IMPL(TCG_TARGET_HAS_extract2_i32))
+> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+> index d57f9e500f..8b93598bce 100644
+> --- a/tcg/aarch64/tcg-target.inc.c
+> +++ b/tcg/aarch64/tcg-target.inc.c
+> @@ -2058,6 +2058,11 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+>          tcg_out_sbfm(s, ext, a0, a1, a2, a2 + args[3] - 1);
+>          break;
 >  
->  DEF(brcond_i32, 0, 2, 2, TCG_OPF_BB_END)
->  
-> @@ -146,6 +147,7 @@ DEF(rotr_i64, 1, 2, 0, IMPL64 | IMPL(TCG_TARGET_HAS_rot_i64))
->  DEF(deposit_i64, 1, 2, 2, IMPL64 | IMPL(TCG_TARGET_HAS_deposit_i64))
->  DEF(extract_i64, 1, 1, 2, IMPL64 | IMPL(TCG_TARGET_HAS_extract_i64))
->  DEF(sextract_i64, 1, 1, 2, IMPL64 | IMPL(TCG_TARGET_HAS_sextract_i64))
-> +DEF(extract2_i64, 1, 2, 1, IMPL64 | IMPL(TCG_TARGET_HAS_extract2_i64))
->  
->  /* size changing ops */
->  DEF(ext_i32_i64, 1, 1, 0, IMPL64)
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 32b7cf3489..7b1c15b40b 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -125,6 +125,7 @@ typedef uint64_t TCGRegSet;
->  #define TCG_TARGET_HAS_deposit_i64      0
->  #define TCG_TARGET_HAS_extract_i64      0
->  #define TCG_TARGET_HAS_sextract_i64     0
-> +#define TCG_TARGET_HAS_extract2_i64     0
->  #define TCG_TARGET_HAS_movcond_i64      0
->  #define TCG_TARGET_HAS_add2_i64         0
->  #define TCG_TARGET_HAS_sub2_i64         0
-> diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-> index 086f34e69a..8b90ab71cb 100644
-> --- a/tcg/tci/tcg-target.h
-> +++ b/tcg/tci/tcg-target.h
-> @@ -71,6 +71,7 @@
->  #define TCG_TARGET_HAS_deposit_i32      1
->  #define TCG_TARGET_HAS_extract_i32      0
->  #define TCG_TARGET_HAS_sextract_i32     0
-> +#define TCG_TARGET_HAS_extract2_i32     0
->  #define TCG_TARGET_HAS_eqv_i32          0
->  #define TCG_TARGET_HAS_nand_i32         0
->  #define TCG_TARGET_HAS_nor_i32          0
-> @@ -97,6 +98,7 @@
->  #define TCG_TARGET_HAS_deposit_i64      1
->  #define TCG_TARGET_HAS_extract_i64      0
->  #define TCG_TARGET_HAS_sextract_i64     0
-> +#define TCG_TARGET_HAS_extract2_i64     0
->  #define TCG_TARGET_HAS_div_i64          0
->  #define TCG_TARGET_HAS_rem_i64          0
->  #define TCG_TARGET_HAS_ext8s_i64        1
-> diff --git a/tcg/optimize.c b/tcg/optimize.c
-> index 01e80c3e46..a5f50a0608 100644
-> --- a/tcg/optimize.c
-> +++ b/tcg/optimize.c
-> @@ -1202,6 +1202,16 @@ void tcg_optimize(TCGContext *s)
->              }
->              goto do_default;
->  
-> +        CASE_OP_32_64(extract2):
-> +            if (arg_is_const(op->args[1]) && arg_is_const(op->args[2])) {
-> +                TCGArg v1 = arg_info(op->args[1])->val;
-> +                TCGArg v2 = arg_info(op->args[2])->val;
-> +                tmp = (v1 >> op->args[3]) | (v2 << (64 - op->args[3]));
-
-Shouldn't this be:
-
-tmp = (v1 >> op->args[3]) | (v2 << (TCG_TARGET_REG_BITS - op->args[3]));
-
-?
-
-> +                tcg_opt_gen_movi(s, op, op->args[0], tmp);
-> +                break;
-> +            }
-> +            goto do_default;
-> +
->          CASE_OP_32_64(setcond):
->              tmp = do_constant_folding_cond(opc, op->args[1],
->                                             op->args[2], op->args[3]);
-> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-> index 7c56c92c8e..deacc63e3b 100644
-> --- a/tcg/tcg-op.c
-> +++ b/tcg/tcg-op.c
-> @@ -823,6 +823,8 @@ void tcg_gen_extract2_i32(TCGv_i32 ret, TCGv_i32 al, TCGv_i32 ah,
->          tcg_gen_mov_i32(ret, ah);
->      } else if (al == ah) {
->          tcg_gen_rotri_i32(ret, al, ofs);
-> +    } else if (TCG_TARGET_HAS_extract2_i32) {
-> +        tcg_gen_op4i_i32(INDEX_op_extract2_i32, ret, al, ah, ofs);
->      } else {
->          TCGv_i32 t0 = tcg_temp_new_i32();
->          tcg_gen_shri_i32(t0, al, ofs);
-> @@ -2333,6 +2335,8 @@ void tcg_gen_extract2_i64(TCGv_i64 ret, TCGv_i64 al, TCGv_i64 ah,
->          tcg_gen_mov_i64(ret, ah);
->      } else if (al == ah) {
->          tcg_gen_rotri_i64(ret, al, ofs);
-> +    } else if (TCG_TARGET_HAS_extract2_i64) {
-> +        tcg_gen_op4i_i64(INDEX_op_extract2_i64, ret, al, ah, ofs);
->      } else {
->          TCGv_i64 t0 = tcg_temp_new_i64();
->          tcg_gen_shri_i64(t0, al, ofs);
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 9b2bf7f439..ade6050982 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -1425,6 +1425,8 @@ bool tcg_op_supported(TCGOpcode op)
->          return TCG_TARGET_HAS_extract_i32;
->      case INDEX_op_sextract_i32:
->          return TCG_TARGET_HAS_sextract_i32;
-> +    case INDEX_op_extract2_i32:
-> +        return TCG_TARGET_HAS_extract2_i32;
->      case INDEX_op_add2_i32:
->          return TCG_TARGET_HAS_add2_i32;
->      case INDEX_op_sub2_i32:
-> @@ -1522,6 +1524,8 @@ bool tcg_op_supported(TCGOpcode op)
->          return TCG_TARGET_HAS_extract_i64;
->      case INDEX_op_sextract_i64:
->          return TCG_TARGET_HAS_sextract_i64;
 > +    case INDEX_op_extract2_i64:
-> +        return TCG_TARGET_HAS_extract2_i64;
->      case INDEX_op_extrl_i64_i32:
->          return TCG_TARGET_HAS_extrl_i64_i32;
->      case INDEX_op_extrh_i64_i32:
-> diff --git a/tcg/README b/tcg/README
-> index 603f4df659..ddabf33017 100644
-> --- a/tcg/README
-> +++ b/tcg/README
-> @@ -343,6 +343,11 @@ at bit 8.  This operation would be equivalent to
->  
->  (using an arithmetic right shift).
->  
-> +* extract2_i64 dest, t1, t2, pos
+> +    case INDEX_op_extract2_i32:
+> +        tcg_out_extr(s, ext, a0, a1, a2, args[3]);
+
+EXTR a0, a1, a2, #args[3] ; OK
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +        break;
 > +
-> +Extract a 64-bit quantity from the concatenation of t2:t1,
-> +beginning at pos.
-> +
->  * extrl_i64_i32 t0, t1
+>      case INDEX_op_add2_i32:
+>          tcg_out_addsub2(s, TCG_TYPE_I32, a0, a1, REG0(2), REG0(3),
+>                          (int32_t)args[4], args[5], const_args[4],
+> @@ -2300,6 +2305,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+>          = { .args_ct_str = { "r", "r", "rAL" } };
+>      static const TCGTargetOpDef dep
+>          = { .args_ct_str = { "r", "0", "rZ" } };
+> +    static const TCGTargetOpDef ext2
+> +        = { .args_ct_str = { "r", "rZ", "rZ" } };
+>      static const TCGTargetOpDef movc
+>          = { .args_ct_str = { "r", "r", "rA", "rZ", "rZ" } };
+>      static const TCGTargetOpDef add2
+> @@ -2430,6 +2437,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+>      case INDEX_op_deposit_i64:
+>          return &dep;
 >  
->  For 64-bit hosts only, extract the low 32-bits of input T1 and place it
+> +    case INDEX_op_extract2_i32:
+> +    case INDEX_op_extract2_i64:
+> +        return &ext2;
+> +
+>      case INDEX_op_add2_i32:
+>      case INDEX_op_add2_i64:
+>      case INDEX_op_sub2_i32:
 > 
