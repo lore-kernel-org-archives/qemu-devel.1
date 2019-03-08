@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43171)
+Received: from eggs.gnu.org ([209.51.188.92]:43174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2C5A-0002Il-Pk
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:46:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2C5A-0002Ix-Ts
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:46:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2C59-0006Gh-Fk
+	(envelope-from <armbru@redhat.com>) id 1h2C59-0006H8-Q0
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:46:24 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  8 Mar 2019 10:46:06 +0100
-Message-Id: <20190308094610.21210-12-armbru@redhat.com>
+Date: Fri,  8 Mar 2019 10:45:58 +0100
+Message-Id: <20190308094610.21210-4-armbru@redhat.com>
 In-Reply-To: <20190308094610.21210-1-armbru@redhat.com>
 References: <20190308094610.21210-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 11/15] hw/mips/malta: Remove fl_sectors
- variable
+Subject: [Qemu-devel] [PATCH v4 03/15] pflash_cfi01: Log use of flawed
+ "write to buffer"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +26,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Our implementation of "write to buffer" (command 0xE8) is flawed.
+LOG_UNIMP its use, and add some FIXME comments.
 
-Variable fl_sectors is used just once.  Since
-fl_sectors =3D bios_size >> 16 and bios_size =3D FLASH_SIZE there,
-we can simply use FLASH_SIZE >> 16, and eliminate variable.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- hw/mips/mips_malta.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ hw/block/pflash_cfi01.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 8736d3a00e..51a3ecab59 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1206,7 +1206,6 @@ void mips_malta_init(MachineState *machine)
-     DriveInfo *dinfo;
-     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-     int fl_idx =3D 0;
--    int fl_sectors =3D bios_size >> 16;
-     int be;
-=20
-     DeviceState *dev =3D qdev_create(NULL, TYPE_MIPS_MALTA);
-@@ -1266,7 +1265,7 @@ void mips_malta_init(MachineState *machine)
-     fl =3D pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
-                                BIOS_SIZE,
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
-,
--                               65536, fl_sectors,
-+                               65536, FLASH_SIZE >> 16,
-                                4, 0x0000, 0x0000, 0x0000, 0x0000, be);
-     bios =3D pflash_cfi01_get_memory(fl);
-     fl_idx++;
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index e6d933a06d..d381f14e3c 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -502,6 +502,10 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr of=
+fset,
+             break;
+         case 0xe8: /* Write to buffer */
+             DPRINTF("%s: Write to buffer\n", __func__);
++            /* FIXME should save @offset, @width for case 1+ */
++            qemu_log_mask(LOG_UNIMP,
++                          "%s: Write to buffer emulation is flawed\n",
++                          __func__);
+             pfl->status |=3D 0x80; /* Ready! */
+             break;
+         case 0xf0: /* Probe for AMD flash */
+@@ -545,6 +549,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr off=
+set,
+             /* Mask writeblock size based on device width, or bank width=
+ if
+              * device width not specified.
+              */
++            /* FIXME check @offset, @width */
+             if (pfl->device_width) {
+                 value =3D extract32(value, 0, pfl->device_width * 8);
+             } else {
+@@ -582,7 +587,13 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr of=
+fset,
+     case 2:
+         switch (pfl->cmd) {
+         case 0xe8: /* Block write */
++            /* FIXME check @offset, @width */
+             if (!pfl->ro) {
++                /*
++                 * FIXME writing straight to memory is *wrong*.  We
++                 * should write to a buffer, and flush it to memory
++                 * only on confirm command (see below).
++                 */
+                 pflash_data_write(pfl, offset, value, width, be);
+             } else {
+                 pfl->status |=3D 0x10; /* Programming error */
+@@ -598,6 +609,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr off=
+set,
+                 pfl->wcycle++;
+                 if (!pfl->ro) {
+                     /* Flush the entire write buffer onto backing storag=
+e.  */
++                    /* FIXME premature! */
+                     pflash_update(pfl, offset & mask, pfl->writeblock_si=
+ze);
+                 } else {
+                     pfl->status |=3D 0x10; /* Programming error */
+@@ -614,6 +626,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr off=
+set,
+         switch (pfl->cmd) {
+         case 0xe8: /* Block write */
+             if (cmd =3D=3D 0xd0) {
++                /* FIXME this is where we should write out the buffer */
+                 pfl->wcycle =3D 0;
+                 pfl->status |=3D 0x80;
+             } else {
 --=20
 2.17.2
